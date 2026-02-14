@@ -1,5 +1,5 @@
 from typing import Dict, Any, List
-from .model import CreditMemoSection, Citation, EvidenceChunk
+from .model import CreditMemoSection, Citation, EvidenceChunk, CreditMemo
 from .citation_engine import citation_engine
 from .spreading_engine import spreading_engine
 from .graph_engine import graph_engine
@@ -30,15 +30,27 @@ class ArchivistAgent(CreditAgent):
         }
 
 class QuantAgent(CreditAgent):
-    """Handles financial spreading and ratio analysis."""
+    """Handles financial spreading, PD/LGD modeling, and Scenario Analysis."""
     def execute(self, context: Dict[str, Any]) -> Dict[str, Any]:
         borrower = context.get("borrower_name")
         raw_financials = context.get("raw_financial_text", "")
 
+        # 1. Spreading
         spread = spreading_engine.spread_financials(borrower, raw_financials)
 
+        # 2. Advanced Quant Models
+        pd_model = spreading_engine.calculate_pd_model(spread)
+        scenarios = spreading_engine.generate_scenarios(spread)
+
+        # Note: LGD requires debt facilities which are fetched separately in Orchestrator for now,
+        # but we can do a partial LGD here or let Orchestrator handle it.
+        # For simplicity, we'll let Orchestrator call get_debt_facilities and then LGD.
+        # Or better, we return what we can here.
+
         return {
-            "financial_spread": spread
+            "financial_spread": spread,
+            "pd_model": pd_model,
+            "scenario_analysis": scenarios
         }
 
 class RiskOfficerAgent(CreditAgent):
@@ -90,8 +102,44 @@ class WriterAgent(CreditAgent):
         for r in risks:
             risk_text += f"- {r}\n"
 
+        # Generate SWOT (Mock)
+        strengths = [
+            "Market leading position in core segment.",
+            f"Strong EBITDA generation (${spread.ebitda}M).",
+            "Diversified customer base."
+        ]
+        weaknesses = [
+            f"Elevated leverage at {spread.leverage_ratio:.1f}x.",
+            "Exposure to cyclical end-markets.",
+            "Recent management turnover."
+        ]
+        mitigants = [
+            "Strong free cash flow conversion.",
+            "Demonstrated ability to deleverage.",
+            "Sponsor support."
+        ]
+
         return {
             "executive_summary": exec_summary,
             "risk_section": risk_text,
-            "citations": citations
+            "citations": citations,
+            "key_strengths": strengths,
+            "key_weaknesses": weaknesses,
+            "mitigants": mitigants
+        }
+
+class SystemTwoAgent(CreditAgent):
+    """
+    Performs a second-pass critique and validation of the generated memo.
+    Protocol: System 2 Thinking
+    """
+    def execute(self, context: Dict[str, Any]) -> Dict[str, Any]:
+        memo = context.get("credit_memo")
+        if not memo:
+            return {"error": "No memo provided for critique"}
+
+        critique = spreading_engine.generate_critique(memo)
+
+        return {
+            "system_two_critique": critique
         }

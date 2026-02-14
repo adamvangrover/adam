@@ -609,6 +609,13 @@
                     </p>
                 </div>
 
+                <div style="margin-top: 20px;">
+                    <div class="metric-label">SCENARIO DISTRIBUTION</div>
+                    <div style="height: 150px;">
+                        <canvas id="scenarioChartMain"></canvas>
+                    </div>
+                </div>
+
             </div>
         </div>
 
@@ -626,6 +633,11 @@
                 <ul id="auditContent" class="audit-timeline">
                     <!-- Audit Content -->
                 </ul>
+
+                <h3 style="margin-top: 30px; border-top: 1px solid #333; padding-top: 20px; font-size: 1rem;">LIVE NEWS FEED</h3>
+                <div id="newsFeed" style="font-family: 'JetBrains Mono', monospace; font-size: 0.8em; color: #888; height: 200px; overflow-y: auto;">
+                    <!-- News Items -->
+                </div>
             </div>
         </div>
     </div>
@@ -633,6 +645,7 @@
     <script src="js/nav.js"></script>
     <script src="js/mock_data.js"></script>
     <script src="js/universal_loader.js"></script>
+    <script src="js/system2_engine.js"></script>
     <script>
         const TICKERS = ["AAPL", "MSFT", "GOOGL", "AMZN", "NVDA", "TSLA", "META"];
         let chartInstance = null;
@@ -776,6 +789,7 @@
             document.querySelectorAll('.ticker-item').forEach(el => el.classList.remove('active'));
             element.classList.add('active');
 
+            try {
 try {
                 let data = null;
                 let reportData = null;
@@ -832,6 +846,9 @@ try {
                         currentDCFState.report_data = null; // Clear old data if none found
                     }
 
+                    // Populate News Feed (Success Path)
+                    renderNewsFeed(data.spread.ticker || ticker);
+
                 } else {
                     throw new Error("Incomplete data artifacts from both sources.");
                 }
@@ -850,6 +867,8 @@ try {
                 renderReportTabs(mockData); // Pre-load mock report
                 currentDCFState.report_data = mockData; // Ensure tabs work
                 
+                renderNewsFeed(ticker); // Populate News Feed in Mock Mode
+
                 // Visual Indicator of Mock Mode
                 document.querySelector('.status-bar').innerHTML = `
                     <div style="display: flex; align-items: center; color: #ffaa00;">
@@ -1145,13 +1164,19 @@ try {
             // AI Outlook Generation (Mock)
             let outlook = "";
             if (val.risk_model.z_score > 3.0) {
-                outlook = `System detects high structural stability. Z-Score of ${val.risk_model.z_score} indicates minimal default probability. Balance sheet robust with ${val.risk_model.asset_coverage}x asset coverage. Recommendation: MAINTAIN OVERWEIGHT.`;
+                outlook = `System detects high structural stability. Z-Score of ${val.risk_model.z_score} indicates minimal default probability. Balance sheet robust with ${val.risk_model.asset_coverage}x asset coverage. Cash flow modeling supports a ${((1-data.valuation.dcf.wacc)*100).toFixed(1)}% IRR hurdle. Recommendation: MAINTAIN OVERWEIGHT.`;
             } else if (val.risk_model.z_score > 1.8) {
-                outlook = `Warning: Financials entering grey zone. Z-Score degradation to ${val.risk_model.z_score} suggests monitoring required. Leverage coverage at ${val.risk_model.asset_coverage}x is adequate but tightening.`;
+                outlook = `Warning: Financials entering grey zone. Z-Score degradation to ${val.risk_model.z_score} suggests monitoring required. Leverage coverage at ${val.risk_model.asset_coverage}x is adequate but tightening. WACC sensitivity suggests downside risk if rates rise above ${(data.valuation.dcf.wacc * 100 + 1.5).toFixed(1)}%.`;
             } else {
-                outlook = `CRITICAL ALERT: Distress signals active. Z-Score ${val.risk_model.z_score} implies high default probability. Immediate covenant review recommended.`;
+                outlook = `CRITICAL ALERT: Distress signals active. Z-Score ${val.risk_model.z_score} implies high default probability. Immediate covenant review recommended. Recovery estimate of ${(val.risk_model.lgd * 100).toFixed(0)}% prices in significant restructuring risk.`;
             }
             document.getElementById('aiOutlook').textContent = outlook;
+
+            // Render Main Scenario Chart
+            renderMainScenarioChart(val.forward_view?.price_targets);
+
+            // Populate News Feed
+            renderNewsFeed(data.ticker);
 
             // Populate Report Rationale
             if (val.risk_model && val.risk_model.rationale) {
@@ -1238,6 +1263,55 @@ try {
                 `;
                 list.appendChild(li);
             });
+        }
+
+        function renderMainScenarioChart(targets) {
+            const ctx = document.getElementById('scenarioChartMain').getContext('2d');
+
+            // Re-use chart instance logic
+            if (window.mainScenarioChart) window.mainScenarioChart.destroy();
+
+            window.mainScenarioChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Bear', 'Base', 'Bull'],
+                    datasets: [{
+                        label: 'Price Target ($)',
+                        data: [targets?.bear || 0, targets?.base || 0, targets?.bull || 0],
+                        backgroundColor: ['#ff0055', '#cccccc', '#00ff9d'],
+                        borderColor: '#333',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { grid: { color: '#333' }, ticks: { color: '#888' } },
+                        x: { grid: { display: false }, ticks: { color: '#ccc' } }
+                    }
+                }
+            });
+        }
+
+        function renderNewsFeed(ticker) {
+            const container = document.getElementById('newsFeed');
+            const headlines = [
+                { time: "2m ago", src: "DJ", title: `${ticker} to report earnings next week, analysts expect volatility.` },
+                { time: "15m ago", src: "BBG", title: `Sector rotation hits ${ticker} amid rate hike fears.` },
+                { time: "1h ago", src: "RTRS", title: `${ticker} announces new strategic partnership for cloud expansion.` },
+                { time: "3h ago", src: "DJ", title: `Options volume surges for ${ticker} calls.` }
+            ];
+
+            container.innerHTML = headlines.map(h => `
+                <div style="margin-bottom: 8px; border-bottom: 1px dotted #333; padding-bottom: 4px;">
+                    <div style="display:flex; justify-content:space-between; font-size:0.7em; color:#666;">
+                        <span>${h.time}</span><span>${h.src}</span>
+                    </div>
+                    <div style="color:#bbb;">${h.title}</div>
+                </div>
+            `).join('');
         }
     </script>
 </body>

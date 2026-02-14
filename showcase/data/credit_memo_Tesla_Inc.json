@@ -1,6 +1,6 @@
 {
   "borrower_name": "Tesla Inc.",
-  "report_date": "2026-02-13T02:55:10.466287",
+  "report_date": "2026-02-14T01:29:09.015726",
   "executive_summary": "The borrower Tesla Inc. presents a mixed credit profile. Financial performance shows strong EBITDA ($12500.0M) but elevated leverage (3.7x).  [Ref: TSLA_10Q_FY24_Q3.pdf]",
   "sections": [
     {
@@ -9,7 +9,7 @@
       "citations": [
         {
           "doc_id": "TSLA_10Q_FY24_Q3.pdf",
-          "chunk_id": "cee0925e-2945-4ff5-b5eb-3b05f1e0c071",
+          "chunk_id": "676f5443-a32a-46a4-98a4-ba4d1a946bd9",
           "page_number": 8
         }
       ],
@@ -27,6 +27,21 @@
       "citations": [],
       "author_agent": "Quant"
     }
+  ],
+  "key_strengths": [
+    "Market leading position in core segment.",
+    "Strong EBITDA generation ($12500.0M).",
+    "Diversified customer base."
+  ],
+  "key_weaknesses": [
+    "Elevated leverage at 3.7x.",
+    "Exposure to cyclical end-markets.",
+    "Recent management turnover."
+  ],
+  "mitigants": [
+    "Strong free cash flow conversion.",
+    "Demonstrated ability to deleverage.",
+    "Sponsor support."
   ],
   "financial_ratios": {
     "leverage_ratio": 3.656,
@@ -48,7 +63,15 @@
       "dscr": 83.33333333333333,
       "leverage_ratio": 3.656,
       "current_ratio": 1.7,
-      "period": "FY2024 Q3"
+      "period": "FY2024 Q3",
+      "gross_debt": 5000.0,
+      "cash": 25000.0,
+      "capex": 9000.0,
+      "fcf": 3500.0,
+      "ebitda_adjustments": {
+        "Stock Based Comp": 2500.0,
+        "Reg Credits": -1500.0
+      }
     },
     {
       "total_assets": 110216.0,
@@ -61,7 +84,15 @@
       "dscr": 83.33333333333333,
       "leverage_ratio": 3.656,
       "current_ratio": 1.7,
-      "period": "FY2023"
+      "period": "FY2023",
+      "gross_debt": 4600.0,
+      "cash": 23000.0,
+      "capex": 8550.0,
+      "fcf": 2975.0,
+      "ebitda_adjustments": {
+        "Stock Based Comp": 2500.0,
+        "Reg Credits": -1500.0
+      }
     },
     {
       "total_assets": 104705.2,
@@ -74,43 +105,140 @@
       "dscr": 83.33333333333333,
       "leverage_ratio": 3.656,
       "current_ratio": 1.7,
-      "period": "FY2022"
+      "period": "FY2022",
+      "gross_debt": 4370.0,
+      "cash": 21850.0,
+      "capex": 8122.5,
+      "fcf": 2528.75,
+      "ebitda_adjustments": {
+        "Stock Based Comp": 2500.0,
+        "Reg Credits": -1500.0
+      }
     }
   ],
   "dcf_analysis": {
     "free_cash_flow": [
-      8531.25,
-      8872.703124999998,
-      9139.52,
-      9323.624380078123,
-      9419.1018536875
+      3675.0,
+      3822.087499999999,
+      3937.0240000000003,
+      4016.330502187499,
+      4057.45926005
     ],
     "growth_rate": 0.03,
     "wacc": 0.09,
-    "terminal_value": 161694.58182163542,
-    "enterprise_value": 140169.44214364782,
-    "equity_value": 94469.44214364782,
-    "share_price": 185.0
+    "terminal_value": 69653.05063085834,
+    "enterprise_value": 60380.68276957137,
+    "equity_value": 80380.68276957137,
+    "share_price": 185.0,
+    "inputs": {
+      "wacc": 0.09,
+      "growth_rate": 0.03,
+      "tax_rate_proxy": 0.35,
+      "capex_margin": 0.05
+    }
   },
-  "risk_score": 75.0,
+  "pd_model": {
+    "input_factors": {
+      "Leverage Ratio": 3.656,
+      "DSCR": 83.33333333333333,
+      "Liquidity (Current Ratio)": 1.7,
+      "EBITDA Margin": 0.12886597938144329
+    },
+    "model_score": 70.0,
+    "implied_rating": "BBB",
+    "one_year_pd": 0.005,
+    "five_year_pd": 0.03
+  },
+  "lgd_analysis": {
+    "seniority_structure": [
+      {
+        "tranche": "ABL Revolver",
+        "amount": 5000.0,
+        "recovery_est": "85%"
+      },
+      {
+        "tranche": "Convertible Senior Notes",
+        "amount": 1800.0,
+        "recovery_est": "50%"
+      },
+      {
+        "tranche": "Auto ABS Facilities",
+        "amount": 3000.0,
+        "recovery_est": "95%"
+      }
+    ],
+    "recovery_rate_assumption": 0.7666666666666666,
+    "loss_given_default": 0.2333333333333334
+  },
+  "scenario_analysis": {
+    "scenarios": [
+      {
+        "name": "Bear Case",
+        "probability": 0.2,
+        "revenue_growth": -0.05,
+        "ebitda_margin": 0.2,
+        "implied_share_price": 105.0
+      },
+      {
+        "name": "Base Case",
+        "probability": 0.5,
+        "revenue_growth": 0.05,
+        "ebitda_margin": 0.3,
+        "implied_share_price": 150.0
+      },
+      {
+        "name": "Bull Case",
+        "probability": 0.3,
+        "revenue_growth": 0.12,
+        "ebitda_margin": 0.35,
+        "implied_share_price": 210.0
+      }
+    ],
+    "weighted_share_price": 159.0
+  },
+  "system_two_critique": {
+    "critique_points": [
+      "Credit thesis aligns with macro outlook.",
+      "Valuation assumptions appear conservative."
+    ],
+    "conviction_score": 0.85,
+    "verification_status": "PASS",
+    "author_agent": "System 2",
+    "quantitative_analysis": {
+      "ratios_checked": [
+        "Leverage",
+        "DSCR",
+        "Current Ratio",
+        "Altman Z-Score"
+      ],
+      "variance_analysis": "Historical margins are consistent with projections.",
+      "dcf_validation": "WACC assumption (9%) is consistent with sector risk."
+    },
+    "qualitative_analysis": {
+      "sentiment": "Positive management commentary in earnings call.",
+      "news_sentiment": "Neutral/Positive coverage in major financial outlets.",
+      "management_credibility": "High. Track record of meeting guidance."
+    }
+  },
+  "risk_score": 70.0,
   "credit_ratings": [
     {
       "agency": "Moody's",
       "rating": "Baa3",
       "outlook": "Positive",
-      "date": "2026-02-13"
+      "date": "2026-02-14"
     },
     {
       "agency": "S&P",
       "rating": "BBB",
       "outlook": "Stable",
-      "date": "2026-02-13"
+      "date": "2026-02-14"
     },
     {
       "agency": "Fitch",
       "rating": "BBB",
       "outlook": "Stable",
-      "date": "2026-02-13"
+      "date": "2026-02-14"
     }
   ],
   "debt_facilities": [
@@ -123,7 +251,9 @@
       "snc_rating": "Pass",
       "drc": 0.9,
       "ltv": 0.4,
-      "conviction_score": 0.88
+      "conviction_score": 0.88,
+      "lgd": 0.15,
+      "recovery_rate": 0.85
     },
     {
       "facility_type": "Convertible Senior Notes",
@@ -134,7 +264,9 @@
       "snc_rating": "Pass",
       "drc": 0.85,
       "ltv": 0.3,
-      "conviction_score": 0.85
+      "conviction_score": 0.85,
+      "lgd": 0.5,
+      "recovery_rate": 0.5
     },
     {
       "facility_type": "Auto ABS Facilities",
@@ -145,7 +277,9 @@
       "snc_rating": "Pass",
       "drc": 0.95,
       "ltv": 0.8,
-      "conviction_score": 0.92
+      "conviction_score": 0.92,
+      "lgd": 0.05,
+      "recovery_rate": 0.95
     }
   ],
   "equity_data": {
@@ -155,5 +289,96 @@
     "pe_ratio": 68.2,
     "dividend_yield": 0.0,
     "beta": 2.05
-  }
+  },
+  "agent_log": [
+    {
+      "transaction_id": "5b238de3-a029-459d-bd6a-ee8d5ece6107",
+      "timestamp": "2026-02-14T01:29:09.015537",
+      "user_id": "ArchivistAgent",
+      "action": "SEARCH_FILINGS",
+      "model_version": "gpt-4-32k",
+      "prompt_version": "v2.1",
+      "inputs": {
+        "ticker": "Tesla Inc.",
+        "doc_type": "10-K"
+      },
+      "outputs": {
+        "chunks_found": 15
+      },
+      "citations_count": 0,
+      "validation_status": "PASS",
+      "validation_errors": []
+    },
+    {
+      "transaction_id": "b9e98354-8bdc-48a3-a91a-278fc0aae9b6",
+      "timestamp": "2026-02-14T01:29:09.015570",
+      "user_id": "QuantAgent",
+      "action": "SPREAD_FINANCIALS",
+      "model_version": "gpt-4-32k",
+      "prompt_version": "v2.1",
+      "inputs": {
+        "source": "10-K Financial Tables"
+      },
+      "outputs": {
+        "spread_rows": 50,
+        "accuracy_check": "99.8%"
+      },
+      "citations_count": 5,
+      "validation_status": "PASS",
+      "validation_errors": []
+    },
+    {
+      "transaction_id": "34811e27-77f7-4ae1-9c4a-d84dc24cde7e",
+      "timestamp": "2026-02-14T01:29:09.015593",
+      "user_id": "RiskAgent",
+      "action": "IDENTIFY_RISKS",
+      "model_version": "gpt-4-32k",
+      "prompt_version": "v2.1",
+      "inputs": {
+        "spread": "calculated",
+        "news": "ingested"
+      },
+      "outputs": {
+        "risks_flagged": 3
+      },
+      "citations_count": 3,
+      "validation_status": "PASS",
+      "validation_errors": []
+    },
+    {
+      "transaction_id": "bac77dfb-d49a-4afc-80c4-804cb0b757a0",
+      "timestamp": "2026-02-14T01:29:09.015619",
+      "user_id": "SystemTwoAgent",
+      "action": "CRITIQUE_MEMO",
+      "model_version": "gpt-4-32k",
+      "prompt_version": "v2.5",
+      "inputs": {
+        "draft_memo": "complete"
+      },
+      "outputs": {
+        "conviction": 0.85
+      },
+      "citations_count": 0,
+      "validation_status": "PASS",
+      "validation_errors": []
+    }
+  ],
+  "peer_comps": [
+    {
+      "ticker": "PEER1",
+      "name": "Competitor A",
+      "ev_ebitda": 10.0,
+      "pe_ratio": 15.0,
+      "leverage_ratio": 2.0,
+      "market_cap": 50000.0
+    },
+    {
+      "ticker": "PEER2",
+      "name": "Competitor B",
+      "ev_ebitda": 12.0,
+      "pe_ratio": 18.0,
+      "leverage_ratio": 2.5,
+      "market_cap": 45000.0
+    }
+  ]
 }

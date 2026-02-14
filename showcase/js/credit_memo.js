@@ -4,11 +4,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     let libraryIndex = [];
     let currentMemo = null;
 
-    // centralized DOM Element map with safety checks
+    // centralized DOM Element map
     const elements = {
         generateBtn: document.getElementById('generate-btn'),
         memoPanel: document.getElementById('memo-panel'),
-        memoContent: document.getElementById('memo-content'),
         evidencePanel: document.getElementById('evidence-panel'),
         pdfViewer: document.getElementById('pdf-viewer'),
         closeEvidenceBtn: document.getElementById('close-evidence'),
@@ -17,14 +16,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         progressText: document.getElementById('progress-text'),
         agentStatus: document.getElementById('agent-status'),
         auditLogPanel: document.getElementById('audit-log-panel'),
-        auditLogContent: document.getElementById('audit-log-content'),
+        auditLogContent: document.getElementById('audit-table-body'),
         borrowerSelect: document.getElementById('borrower-select'),
         libraryList: document.getElementById('library-list')
     };
 
     // --- 2. Initialization ---
     try {
-        // await Promise.all([loadMockData(), loadLibraryIndex()]); // Legacy
         await loadLibraryIndex();
         renderLibraryList();
         logAudit("System", "Ready", "Credit Memo Orchestrator initialized.");
@@ -37,51 +35,70 @@ document.addEventListener('DOMContentLoaded', async () => {
     if(elements.generateBtn) elements.generateBtn.addEventListener('click', startGeneration);
     if(elements.closeEvidenceBtn) elements.closeEvidenceBtn.addEventListener('click', hideEvidence);
     
-    // Global Delegate for Tab Switching
     window.switchTab = (tabName) => {
-        // Hide all tab contents
-        document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
-        
-        // Reset all tab buttons
-        document.querySelectorAll('.tab-btn').forEach(el => {
-            el.style.borderBottom = '2px solid transparent';
-            el.style.color = 'var(--text-secondary, #888)';
+        document.querySelectorAll('#tab-memo, #tab-annex-a, #tab-annex-b, #tab-annex-c, #tab-risk-quant, #tab-system-2').forEach(el => {
+            el.classList.add('hidden');
         });
         
-        // Show target content
-        const target = document.getElementById(`tab-${tabName}`);
-        if(target) target.style.display = 'block';
+        document.querySelectorAll('.tab-btn').forEach(el => {
+            el.classList.remove('text-blue-400', 'border-blue-500');
+            el.classList.add('text-slate-400', 'border-transparent');
+        });
         
-        // Highlight target button
+        const target = document.getElementById(`tab-${tabName}`);
+        if(target) target.classList.remove('hidden');
+        
         const btn = document.getElementById(`btn-tab-${tabName}`);
         if(btn) {
-            btn.style.borderBottom = '2px solid var(--accent-color, #007bff)';
-            btn.style.color = 'var(--accent-color, #007bff)';
+            btn.classList.remove('text-slate-400', 'border-transparent');
+            btn.classList.add('text-blue-400', 'border-blue-500');
         }
     };
 
     // --- 4. Data Loading ---
-    // loadMockData removed - handled by UniversalLoader
 
     async function loadLibraryIndex() {
         try {
             libraryIndex = await window.universalLoader.loadLibrary();
+            console.log("Library Index Loaded:", libraryIndex);
         } catch(e) { console.warn("Library index fetch failed", e); }
     }
 
     async function loadCreditMemo(identifier) {
+        console.log("Loading Credit Memo:", identifier);
         try {
             const memo = await window.universalLoader.loadCreditMemo(identifier);
             if (!memo) throw new Error("No data found");
 
-            // Check if data is already in the final structure (has financials)
-            if (memo.historical_financials && Array.isArray(memo.historical_financials) && memo.historical_financials.length > 0) {
-                 currentMemo = memo;
+            console.log("Loaded Memo Keys:", Object.keys(memo));
+            if(memo.agent_log) console.log("Agent Log Length:", memo.agent_log.length);
+            else console.log("Agent Log Missing");
+
+            currentMemo = memo;
+
+            if (memo.historical_financials && Array.isArray(memo.historical_financials)) {
                  renderFullMemoUI(memo);
             } else {
-                 // Fallback to adapter for partial data
                  renderMemoFromMock(memo);
             }
+
+            // NEW: Render Persistent Agent Log
+            if (memo.agent_log && elements.auditLogContent) {
+                elements.auditLogContent.innerHTML = ''; // Clear session log
+                memo.agent_log.reverse().forEach(entry => {
+                   const time = new Date(entry.timestamp).toLocaleTimeString();
+                   const tr = document.createElement('tr');
+                   tr.style.borderBottom = '1px solid var(--glass-border, #333)';
+                   tr.innerHTML = `
+                        <td style="padding: 8px; color: var(--text-secondary, #666); font-size: 0.8em; font-family:monospace;">${time}</td>
+                        <td style="padding: 8px; color: var(--accent-color, #007bff); font-weight: bold;">${entry.user_id}</td>
+                        <td style="padding: 8px; color: var(--text-primary, #ccc);">${entry.action}</td>
+                        <td style="padding: 8px; color: var(--text-secondary, #888); font-size: 0.9em;">${JSON.stringify(entry.outputs).substring(0, 40)}...</td>
+                   `;
+                   elements.auditLogContent.appendChild(tr);
+                });
+            }
+
         } catch(e) {
             console.error("Could not load memo file:", e);
             logAudit("System", "Error", `Failed to load ${identifier}`);
@@ -89,26 +106,33 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // --- 5. Core Logic: Simulation ---
-    function startGeneration() {
-        const borrower = elements.borrowerSelect ? elements.borrowerSelect.value : "Apple Inc.";
+    function startGeneration(identifier) {
+        // Handle Event object or string
+        let borrower = "credit_memo_Apple_Inc.json";
+
+        if (typeof identifier === 'string') {
+            borrower = identifier;
+        } else if (elements.borrowerSelect) {
+            borrower = elements.borrowerSelect.value;
+        }
+
+        console.log("Starting generation for:", borrower);
         
         // UI Reset
-        if(elements.memoContent) elements.memoContent.innerHTML = ''; 
         if(elements.progressContainer) elements.progressContainer.style.display = 'block';
         hideEvidence();
 
         // Simulate Enterprise Agent Workflow
-        simulateAgent("Archivist", `Retrieving ${borrower} EDGAR filings...`, 0, 800)
-            .then(() => simulateAgent("Quant", "Normalizing EBITDA & spreading comps...", 33, 1200))
-            .then(() => simulateAgent("Risk Officer", "Analyzing covenant compliance...", 66, 1000))
-            .then(() => simulateAgent("Writer", "Synthesizing executive summary...", 90, 1500))
-            .then(() => {
+        simulateAgent("Archivist", `Retrieving context...`, 0, 800)
+            .then(() => simulateAgent("Quant", "Spreading financials...", 33, 1200))
+            .then(() => simulateAgent("Risk Officer", "Analyzing risks...", 66, 1000))
+            .then(() => simulateAgent("System 2", "Validating & Critiquing...", 90, 1500))
+            .then(async () => {
+                console.log("Workflow finished. Loading memo...");
+                await loadCreditMemo(borrower);
+                console.log("Memo loaded. Hiding progress...");
                 if(elements.progressContainer) elements.progressContainer.style.display = 'none';
-                
-                // Load data using Universal Loader
-                loadCreditMemo(borrower);
-                
-                logAudit("Orchestrator", "Complete", `Memo generated for ${borrower}`);
+                logAudit("Orchestrator", "Complete", `Memo generated.`);
             });
     }
 
@@ -118,10 +142,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             if(elements.agentStatus) elements.agentStatus.innerText = statusText;
             if(elements.progressFill) elements.progressFill.style.width = `${progressStart}%`;
 
-            logAudit(agentName, "Start", statusText);
+            // Only log if we are in a "live" simulation mode, otherwise the persistent log takes over
+            // logAudit(agentName, "Start", statusText);
 
             setTimeout(() => {
-                logAudit(agentName, "Complete", "Task finished");
+                // logAudit(agentName, "Complete", "Task finished");
                 resolve();
             }, duration);
         });
@@ -129,300 +154,600 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // --- 6. Core Logic: Rendering ---
 
-    // A. Sidebar Library Renderer
     function renderLibraryList() {
         if(!elements.libraryList) return;
         elements.libraryList.innerHTML = '';
         
         libraryIndex.forEach(item => {
             const itemDiv = document.createElement('div');
-            // Hybrid Styling: Using inline styles for structure but variables for theme
-            itemDiv.style.padding = '12px';
-            itemDiv.style.borderBottom = '1px solid var(--glass-border, rgba(255,255,255,0.1))';
-            itemDiv.style.cursor = 'pointer';
-            itemDiv.className = 'library-item group'; // Allows hover effects if CSS exists
+            itemDiv.className = 'p-3 border-b border-slate-700/50 cursor-pointer hover:bg-slate-800/50 transition';
 
-            const scoreColor = item.risk_score < 60 ? '#ff4444' : (item.risk_score < 80 ? '#ffbb33' : '#00C851');
+            const scoreColor = item.risk_score < 60 ? 'text-red-500' : (item.risk_score < 80 ? 'text-yellow-500' : 'text-emerald-500');
             
             itemDiv.innerHTML = `
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-                    <span style="font-weight:bold; color: var(--text-primary, #fff); font-size:0.9em;">${item.borrower_name}</span>
-                    <span style="font-size:0.75em; color: var(--text-secondary, #888);">${new Date(item.report_date).toLocaleDateString()}</span>
+                <div class="flex justify-between items-center mb-1">
+                    <span class="font-bold text-white text-sm">${item.borrower_name}</span>
+                    <span class="text-xs text-slate-500">${new Date(item.report_date).toLocaleDateString()}</span>
                 </div>
-                <div style="font-size:0.75em; color: var(--text-secondary, #888); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                <div class="text-xs text-slate-500 line-clamp-2 mb-2">
                     ${item.summary || 'No summary available.'}
                 </div>
-                <div style="margin-top:8px; display:flex; justify-content:space-between; align-items:center;">
-                     <span style="font-family:monospace; font-size:0.8em; font-weight:bold; color:${scoreColor}">Risk: ${item.risk_score}/100</span>
+                <div class="flex justify-between items-center">
+                     <span class="font-mono text-xs font-bold ${scoreColor}">Risk: ${item.risk_score}/100</span>
                 </div>
             `;
             
             itemDiv.onclick = () => {
-                startGeneration(); 
+                console.log("Library Item Clicked:", item.file);
+                startGeneration(item.file);
             };
             
             elements.libraryList.appendChild(itemDiv);
         });
     }
 
-    // B. Main Memo Container Renderer
+    // B. Main Memo Container Renderer (Updated to target specific IDs)
     function renderFullMemoUI(memo) {
-        if(!elements.memoContent) return;
+        const memoContainer = document.getElementById('memo-container');
+        if(memoContainer) memoContainer.innerHTML = generateMemoHtml(memo);
 
-        // 1. Tab Navigation
-        const tabsHtml = `
-            <div style="display: flex; gap: 20px; border-bottom: 1px solid var(--glass-border, rgba(255,255,255,0.1)); margin-bottom: 20px;">
-                <div id="btn-tab-memo" class="tab-btn" onclick="switchTab('memo')" style="padding: 10px; cursor: pointer; color: var(--accent-color, #007bff); border-bottom: 2px solid var(--accent-color, #007bff);">Memo</div>
-                <div id="btn-tab-financials" class="tab-btn" onclick="switchTab('financials')" style="padding: 10px; cursor: pointer; color: var(--text-secondary, #888);">Financials</div>
-                <div id="btn-tab-dcf" class="tab-btn" onclick="switchTab('dcf')" style="padding: 10px; cursor: pointer; color: var(--text-secondary, #888);">Valuation (DCF)</div>
-                <div id="btn-tab-cap" class="tab-btn" onclick="switchTab('cap')" style="padding: 10px; cursor: pointer; color: var(--text-secondary, #888);">Cap Structure</div>
-            </div>
-        `;
+        const finTable = document.getElementById('financials-table');
+        if(finTable) {
+             finTable.innerHTML = generateFinancialsTableContent(memo);
 
-        // 2. Tab Contents (Delegating to specific generators)
-        const contentHtml = `
-            <div id="tab-memo" class="tab-content" style="display:block;">${generateMemoHtml(memo)}</div>
-            <div id="tab-financials" class="tab-content" style="display:none;">${generateFinancialsHtml(memo)}</div>
-            <div id="tab-dcf" class="tab-content" style="display:none;">${generateDcfHtml(memo)}</div>
-            <div id="tab-cap" class="tab-content" style="display:none;">${generateCapStructureHtml(memo)}</div>
-        `;
+             // NEW: Financial Adjustments Panel
+             const existingPanel = document.getElementById('fin-adjustments-panel');
+             if(existingPanel) existingPanel.remove();
 
-        elements.memoContent.innerHTML = tabsHtml + contentHtml;
-        elements.memoContent.style.display = 'block';
+             const adjPanel = document.createElement('div');
+             adjPanel.id = 'fin-adjustments-panel';
+             adjPanel.className = "mt-6 border-t border-slate-700/50 pt-6";
+             adjPanel.innerHTML = generateFinancialAdjustmentsHtml(memo);
+
+             finTable.parentElement.parentElement.appendChild(adjPanel); // Append to card container
+             setupFinancialListeners(memo);
+        }
+
+        const dcfContainer = document.getElementById('dcf-container');
+        if(dcfContainer) dcfContainer.innerHTML = generateDcfHtml(memo);
+
+        const capContainer = document.getElementById('cap-structure-container');
+        if(capContainer) capContainer.innerHTML = generateCapStructureHtml(memo);
+
+        const riskContainer = document.getElementById('risk-quant-container');
+        if(riskContainer) riskContainer.innerHTML = generateRiskQuantHtml(memo);
+
+        const sys2Container = document.getElementById('system-2-container');
+        if(sys2Container) sys2Container.innerHTML = generateSystemTwoHtml(memo);
+
+        // Setup DCF listeners
+        setupDCFListeners(memo);
+
+        // Switch to memo tab by default
+        window.switchTab('memo');
     }
 
     // --- 7. Generators (HTML Builders) ---
 
-    // Generator 1: Main Narrative (Executive Summary + Risks)
+    // Generator 1: Main Narrative
     function generateMemoHtml(memo) {
-        // Safe accessors
         const name = memo.borrower_name || memo.borrower_details?.name;
-        const rating = memo.rating || memo.borrower_details?.rating || "N/A";
+        const rating = (memo.credit_ratings && memo.credit_ratings.length > 0) ? memo.credit_ratings[0].rating : (memo.rating || "N/A");
         const sector = memo.sector || memo.borrower_details?.sector || "General";
         const scoreColor = memo.risk_score < 60 ? 'text-red-500' : (memo.risk_score < 80 ? 'text-yellow-500' : 'text-emerald-500');
 
-        // Header
         let html = `
-            <div style="display:flex; justify-content:space-between; align-items:start; margin-bottom:20px; padding-bottom:20px; border-bottom:1px solid var(--glass-border, #333);">
+            <div class="flex justify-between items-start mb-8 pb-6 border-b border-slate-700/50">
                 <div>
-                    <h1 style="margin:0; font-size:2em; font-family:serif;">${name}</h1>
-                    <div style="font-size: 0.9em; color: var(--text-secondary, #888); margin-top:5px;">
-                        Rating: <span style="color: var(--accent-color, #fff); font-weight:bold;">${rating}</span> | Sector: ${sector}
+                    <h1 class="text-3xl font-serif text-slate-900 mb-2">${name}</h1>
+                    <div class="text-sm text-slate-500">
+                        Rating: <span class="font-bold text-slate-700">${rating}</span> | Sector: ${sector}
                     </div>
                 </div>
-                <div style="text-align:right;">
-                     <div style="font-size:0.8em; text-transform:uppercase; letter-spacing:1px; color:var(--text-secondary, #888);">Risk Score</div>
-                     <div class="${scoreColor}" style="font-size:1.8em; font-weight:bold; font-family:monospace;">${memo.risk_score}/100</div>
+                <div class="text-right">
+                     <div class="text-xs uppercase tracking-widest text-slate-400 mb-1">Risk Score</div>
+                     <div class="${scoreColor} text-4xl font-mono font-bold">${memo.risk_score}/100</div>
                 </div>
             </div>
         `;
 
-        // Sections
         const sections = memo.sections || [];
-        if (sections.length > 0) {
-            sections.forEach(sec => {
-                // Citation regex replacement
-                let content = sec.content.replace(/\[Ref:\s*(.*?)\]/g, (match, docId) => {
-                     return `<span class="citation-tag" onclick="viewEvidence('${docId}')" style="cursor:pointer; color:var(--accent-color, #007bff); font-size:0.8em; margin-left:5px;"><i class="fas fa-search"></i> [${docId}]</span>`;
-                });
-                
-                html += `
-                    <div style="margin-bottom:25px;">
-                        <h2 style="color: var(--accent-color, #fff); font-size:1.2em; border-bottom: 1px solid var(--glass-border, #333); padding-bottom: 5px; margin-bottom:10px;">${sec.title}</h2>
-                        <p style="line-height: 1.6; color: var(--text-primary, #ddd); font-size:0.95em;">${content}</p>
-                    </div>
-                `;
+        sections.forEach(sec => {
+            let content = sec.content.replace(/\[Ref:\s*(.*?)\]/g, (match, docId) => {
+                 // Look up citation metadata
+                 const citation = sec.citations ? sec.citations.find(c => c.doc_id === docId) : null;
+                 const chunkId = citation ? citation.chunk_id : '';
+                 const page = citation ? citation.page_number : 1;
+
+                 return `<span class="citation-tag bg-blue-50 text-blue-600 px-1 rounded cursor-pointer hover:bg-blue-100 transition" onclick="viewEvidence('${docId}', '${chunkId}', ${page})"><i class="fas fa-search mr-1"></i>[${docId}]</span>`;
             });
-        } else if (memo.documents) {
-            // Fallback if no specific sections
-            const doc = memo.documents[0];
-            doc.chunks.forEach(chunk => {
-                if(chunk.type === 'narrative') {
-                     html += `<p style="margin-bottom:10px;">${chunk.content} <span class="citation-tag" onclick="renderEvidence('${memo.borrower_name}', '${doc.doc_id}', '${chunk.chunk_id}')" style="cursor:pointer; color:var(--accent-color);">[${doc.doc_id}]</span></p>`;
-                }
-            });
+
+            html += `
+                <div class="mb-8">
+                    <h2 class="text-xl font-bold text-slate-800 border-b border-slate-200 pb-2 mb-4">${sec.title}</h2>
+                    <div class="prose prose-slate text-sm max-w-none text-slate-600 leading-relaxed whitespace-pre-line">${content}</div>
+                </div>
+            `;
+        });
+
+        if(memo.key_strengths && memo.key_strengths.length > 0) {
+            html += `<div class="grid grid-cols-2 gap-8 mb-8">`;
+            html += `<div><h3 class="font-bold text-emerald-600 mb-2 uppercase text-xs tracking-widest">Key Strengths</h3><ul class="list-disc pl-4 space-y-1 text-sm text-slate-600">`;
+            memo.key_strengths.forEach(s => html += `<li>${s}</li>`);
+            html += `</ul></div>`;
+
+            html += `<div><h3 class="font-bold text-red-600 mb-2 uppercase text-xs tracking-widest">Key Weaknesses</h3><ul class="list-disc pl-4 space-y-1 text-sm text-slate-600">`;
+            memo.key_weaknesses.forEach(w => html += `<li>${w}</li>`);
+            html += `</ul></div>`;
+            html += `</div>`;
         }
+
         return html;
     }
 
-    // Generator 2: Financials (Table)
-    function generateFinancialsHtml(memo) {
-        if (!memo.historical_financials) return '<p style="color:var(--text-secondary);">No structured financial data.</p>';
+    // Generator 2: Financials (Table Content Only)
+    function generateFinancialsTableContent(memo) {
+        if (!memo.historical_financials) return '';
         
-        let html = `<h3 style="color:var(--text-primary);">Historical Performance</h3>`;
-        html += `<table style="width:100%; border-collapse: collapse; margin-top:15px; font-family: monospace; font-size:0.9em;">`;
-        
-        // Headers
         const periods = memo.historical_financials.map(d => d.period);
-        html += `<thead style="color: var(--text-secondary); border-bottom: 1px solid var(--glass-border);"><tr><th style="text-align:left; padding:10px;">Metric</th>${periods.map(p => `<th style="text-align:right; padding:10px;">${p}</th>`).join('')}</tr></thead>`;
+        let html = `<thead class="text-slate-500 border-b border-slate-700"><tr><th class="p-3">Metric</th>${periods.map(p => `<th class="p-3 text-right">${p}</th>`).join('')}</tr></thead>`;
         
-        // Rows
         const metrics = [
             { key: "revenue", label: "Revenue" },
             { key: "ebitda", label: "EBITDA" },
             { key: "net_income", label: "Net Income" },
-            { key: "leverage_ratio", label: "Leverage (x)", fmt: (v) => v.toFixed(2) + 'x' }
+            { key: "gross_debt", label: "Gross Debt" },
+            { key: "cash", label: "Cash & Equiv." },
+            { key: "leverage_ratio", label: "Net Leverage (x)", fmt: (v) => v.toFixed(2) + 'x' },
+            { key: "dscr", label: "DSCR (x)", fmt: (v) => v.toFixed(2) + 'x' }
         ];
 
-        html += `<tbody>`;
+        html += `<tbody class="divide-y divide-slate-800/50">`;
         metrics.forEach(m => {
-            html += `<tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">`;
-            html += `<td style="padding:10px; color: var(--accent-color);">${m.label}</td>`;
+            html += `<tr>`;
+            html += `<td class="p-3 text-blue-400 font-bold">${m.label}</td>`;
             memo.historical_financials.forEach(period => {
                 let val = period[m.key];
+                if (val === undefined) val = 0;
                 val = m.fmt ? m.fmt(val) : formatCurrency(val);
-                html += `<td style="text-align:right; padding:10px; color:var(--text-primary);">${val}</td>`;
+                html += `<td class="p-3 text-right text-slate-300">${val}</td>`;
             });
+            html += `</tr>`;
+        });
+        html += `</tbody>`;
+        return html;
+    }
+
+    // NEW: Financial Adjustments HTML
+    function generateFinancialAdjustmentsHtml(memo) {
+        const latest = memo.historical_financials[0];
+        const adjustments = latest.ebitda_adjustments || {};
+
+        return `
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-sm font-bold text-slate-400 uppercase tracking-widest"><i class="fas fa-sliders-h mr-2"></i>Financial Adjustments (Client-Side)</h3>
+                <button id="btn-recalc-fin" class="text-xs bg-blue-900/50 text-blue-400 border border-blue-500/30 px-3 py-1 rounded hover:bg-blue-800/50 transition">
+                    <i class="fas fa-sync-alt mr-1"></i> Recalculate
+                </button>
+            </div>
+            <div class="grid grid-cols-2 gap-6">
+                <div class="bg-slate-800/30 p-4 rounded border border-slate-700/50">
+                    <h4 class="text-xs text-slate-500 uppercase mb-3">EBITDA Add-backs</h4>
+                    <div class="space-y-3" id="ebitda-adj-inputs">
+                        ${Object.entries(adjustments).map(([k,v]) => `
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm text-slate-400">${k}</span>
+                                <input type="number" class="bg-slate-900 border border-slate-700 rounded w-24 px-2 py-1 text-right text-xs text-white font-mono adj-input" data-key="${k}" value="${v}">
+                            </div>
+                        `).join('')}
+                        <div class="flex justify-between items-center pt-2 border-t border-slate-700/50">
+                            <span class="text-sm text-emerald-400 font-bold">Adj. EBITDA</span>
+                            <span class="text-sm text-emerald-400 font-mono font-bold" id="output-adj-ebitda">${formatCurrency(latest.ebitda)}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-slate-800/30 p-4 rounded border border-slate-700/50">
+                    <h4 class="text-xs text-slate-500 uppercase mb-3">Cash Flow Inputs</h4>
+                    <div class="flex justify-between items-center mb-2">
+                         <span class="text-sm text-slate-400">Capex</span>
+                         <input type="number" id="input-capex" class="bg-slate-900 border border-slate-700 rounded w-24 px-2 py-1 text-right text-xs text-white font-mono" value="${latest.capex || 0}">
+                    </div>
+                    <div class="flex justify-between items-center mb-2">
+                         <span class="text-sm text-slate-400">Cash Interest</span>
+                         <input type="number" id="input-interest" class="bg-slate-900 border border-slate-700 rounded w-24 px-2 py-1 text-right text-xs text-white font-mono" value="${latest.interest_expense || 0}">
+                    </div>
+                    <div class="mt-4 pt-2 border-t border-slate-700/50">
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-blue-400 font-bold">Free Cash Flow</span>
+                            <span class="text-sm text-blue-400 font-mono font-bold" id="output-fcf">${formatCurrency(latest.fcf || 0)}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    function setupFinancialListeners(memo) {
+        const btn = document.getElementById('btn-recalc-fin');
+        if(!btn) return;
+
+        btn.addEventListener('click', () => {
+            const latest = memo.historical_financials[0];
+            let baseEbitda = latest.ebitda;
+
+            let currentAdjSum = 0;
+            document.querySelectorAll('.adj-input').forEach(inp => {
+                currentAdjSum += parseFloat(inp.value) || 0;
+            });
+
+            let originalAdjSum = 0;
+            if(latest.ebitda_adjustments) {
+                Object.values(latest.ebitda_adjustments).forEach(v => originalAdjSum += v);
+            }
+
+            // New EBITDA = Original EBITDA - Original Adj + New Adj
+            const newEbitda = baseEbitda - originalAdjSum + currentAdjSum;
+            document.getElementById('output-adj-ebitda').innerText = formatCurrency(newEbitda);
+
+            // FCF = EBITDA - Interest - Capex - Taxes(proxy)
+            const capex = parseFloat(document.getElementById('input-capex').value) || 0;
+            const interest = parseFloat(document.getElementById('input-interest').value) || 0;
+            const tax = newEbitda * 0.25; // Proxy 25%
+
+            const fcf = newEbitda - interest - capex - tax;
+            document.getElementById('output-fcf').innerText = formatCurrency(fcf);
+
+            logAudit("User", "Recalc", `Financials updated. Adj EBITDA: ${formatCurrency(newEbitda)}`);
+        });
+    }
+
+    // Generator 3: Valuation (DCF) with Inputs
+    function generateDcfHtml(memo) {
+        if (!memo.dcf_analysis) return '<p class="text-slate-500 italic">No valuation data available.</p>';
+        const dcf = memo.dcf_analysis;
+        const inputs = dcf.inputs || { wacc: dcf.wacc, growth_rate: dcf.growth_rate };
+
+        let html = `
+            <div class="grid grid-cols-4 gap-4 mb-8">
+                 <div class="bg-slate-800/50 p-4 rounded border border-slate-700/50">
+                    <div class="text-xs text-slate-500 uppercase tracking-widest mb-1">WACC (Input)</div>
+                    <input type="number" id="dcf-input-wacc" value="${(inputs.wacc * 100).toFixed(1)}" step="0.1" class="bg-slate-900 border border-slate-700 rounded px-2 py-1 text-white font-mono w-full focus:border-blue-500 outline-none">
+                 </div>
+                 <div class="bg-slate-800/50 p-4 rounded border border-slate-700/50">
+                    <div class="text-xs text-slate-500 uppercase tracking-widest mb-1">Term Growth (Input)</div>
+                    <input type="number" id="dcf-input-growth" value="${(inputs.growth_rate * 100).toFixed(1)}" step="0.1" class="bg-slate-900 border border-slate-700 rounded px-2 py-1 text-white font-mono w-full focus:border-blue-500 outline-none">
+                 </div>
+                 <div class="bg-slate-800/50 p-4 rounded border border-slate-700/50">
+                    <div class="text-xs text-slate-500 uppercase tracking-widest mb-1">Implied Price</div>
+                    <div class="text-xl font-bold text-emerald-400 font-mono" id="dcf-output-price">$${dcf.share_price.toFixed(2)}</div>
+                 </div>
+                 <div class="bg-slate-800/50 p-4 rounded border border-slate-700/50">
+                    <div class="text-xs text-slate-500 uppercase tracking-widest mb-1">Enterprise Val</div>
+                    <div class="text-xl font-bold text-blue-400 font-mono" id="dcf-output-ev">${formatCurrency(dcf.enterprise_value)}</div>
+                 </div>
+            </div>
+        `;
+
+        html += `<h3 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4">Projected Free Cash Flow</h3>`;
+        html += `<table class="w-full text-left font-mono text-sm border-collapse mb-8">`;
+        html += `<thead class="text-slate-500 border-b border-slate-700"><tr><th class="p-2">Period</th><th class="p-2 text-right">Year 1</th><th class="p-2 text-right">Year 2</th><th class="p-2 text-right">Year 3</th><th class="p-2 text-right">Year 4</th><th class="p-2 text-right">Year 5</th></tr></thead>`;
+        html += `<tbody><tr class="border-b border-slate-800/50"><td class="p-2 font-bold text-white">Unlevered FCF</td>`;
+        
+        if (dcf.free_cash_flow) {
+            dcf.free_cash_flow.forEach(v => {
+                html += `<td class="p-2 text-right text-slate-300">${formatCurrency(v)}</td>`;
+            });
+        }
+        html += `</tr></tbody></table>`;
+
+        html += `
+            <div class="p-4 bg-slate-800/30 border border-slate-700/50 rounded flex justify-between items-center mb-8">
+                 <div>
+                    <div class="text-sm font-bold text-white">Terminal Value Calculation</div>
+                    <div class="text-xs text-slate-500 font-mono mt-1">Method: Gordon Growth</div>
+                 </div>
+                 <div class="text-right">
+                    <div class="text-2xl font-bold text-white font-mono" id="dcf-output-tv">${formatCurrency(dcf.terminal_value)}</div>
+                 </div>
+            </div>
+        `;
+
+        // NEW: Peer Comps
+        if (memo.peer_comps && memo.peer_comps.length > 0) {
+            html += generatePeerCompsHtml(memo);
+        }
+
+        return html;
+    }
+
+    function generatePeerCompsHtml(memo) {
+        let html = `<h3 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4 border-t border-slate-700 pt-6">Comparable Companies</h3>`;
+        html += `<table class="w-full text-left font-mono text-sm border-collapse mb-8">`;
+        html += `<thead class="text-slate-500 border-b border-slate-700"><tr><th class="p-2">Ticker</th><th class="p-2">Company</th><th class="p-2 text-right">EV/EBITDA</th><th class="p-2 text-right">P/E</th><th class="p-2 text-right">Lev (x)</th><th class="p-2 text-right">Mkt Cap</th></tr></thead>`;
+        html += `<tbody class="divide-y divide-slate-800/50">`;
+
+        memo.peer_comps.forEach(p => {
+            html += `<tr>`;
+            html += `<td class="p-2 text-blue-400 font-bold">${p.ticker}</td>`;
+            html += `<td class="p-2 text-white">${p.name}</td>`;
+            html += `<td class="p-2 text-right text-slate-300">${p.ev_ebitda.toFixed(1)}x</td>`;
+            html += `<td class="p-2 text-right text-slate-300">${p.pe_ratio.toFixed(1)}x</td>`;
+            html += `<td class="p-2 text-right text-slate-300">${p.leverage_ratio.toFixed(1)}x</td>`;
+            html += `<td class="p-2 text-right text-slate-300">${formatCurrency(p.market_cap)}</td>`;
             html += `</tr>`;
         });
         html += `</tbody></table>`;
         return html;
     }
 
-    // Generator 3: Valuation (DCF) - Ported from "Left" side logic
-    function generateDcfHtml(memo) {
-        if (!memo.dcf_analysis) return '<p style="color:var(--text-secondary);">No valuation data available.</p>';
-        const dcf = memo.dcf_analysis;
-
-        // Cards style
-        const cardStyle = "background: rgba(255,255,255,0.05); padding: 15px; border-radius: 4px; border: 1px solid var(--glass-border, #333);";
-        const labelStyle = "font-size: 0.7em; text-transform: uppercase; color: var(--text-secondary); letter-spacing: 1px; margin-bottom: 5px;";
-        const valueStyle = "font-size: 1.2em; font-weight: bold; font-family: monospace; color: var(--text-primary);";
-
-        let html = `
-            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 30px;">
-                 <div style="${cardStyle}">
-                    <div style="${labelStyle}">WACC</div>
-                    <div style="${valueStyle}">${(dcf.wacc * 100).toFixed(1)}%</div>
-                 </div>
-                 <div style="${cardStyle}">
-                    <div style="${labelStyle}">Term Growth</div>
-                    <div style="${valueStyle}">${(dcf.growth_rate * 100).toFixed(1)}%</div>
-                 </div>
-                 <div style="${cardStyle}">
-                    <div style="${labelStyle}">Implied Price</div>
-                    <div style="${valueStyle}; color: #00C851;">$${dcf.share_price.toFixed(2)}</div>
-                 </div>
-                 <div style="${cardStyle}">
-                    <div style="${labelStyle}">Enterprise Val</div>
-                    <div style="${valueStyle}; color: var(--accent-color);">${formatCurrency(dcf.enterprise_value)}</div>
-                 </div>
-            </div>
-        `;
-
-        // Projection Table
-        html += `<h3 style="font-size: 0.9em; font-weight: bold; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 15px;">Projected Free Cash Flow</h3>`;
-        html += `<table style="width:100%; text-align:left; font-family: monospace; font-size: 0.85em; border-collapse: collapse;">`;
-        html += `<thead style="color: var(--text-secondary); border-bottom: 1px solid var(--glass-border);"><tr><th style="padding:8px;">Period</th><th style="padding:8px; text-align:right;">Year 1</th><th style="padding:8px; text-align:right;">Year 2</th><th style="padding:8px; text-align:right;">Year 3</th><th style="padding:8px; text-align:right;">Year 4</th><th style="padding:8px; text-align:right;">Year 5</th></tr></thead>`;
-        html += `<tbody><tr style="border-bottom: 1px solid rgba(255,255,255,0.05);"><td style="padding:8px; font-weight:bold; color:var(--text-primary);">Unlevered FCF</td>`;
-        
-        if (dcf.free_cash_flow) {
-            dcf.free_cash_flow.forEach(v => {
-                html += `<td style="padding:8px; text-align:right; color:var(--text-primary);">${formatCurrency(v)}</td>`;
-            });
-        }
-        html += `</tr></tbody></table>`;
-
-        // Terminal Value Box
-        html += `
-            <div style="margin-top: 25px; padding: 15px; background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border); display: flex; justify-content: space-between; align-items: center;">
-                 <div>
-                    <div style="font-size: 0.9em; font-weight: bold; color: var(--text-primary);">Terminal Value Calculation</div>
-                    <div style="font-size: 0.7em; color: var(--text-secondary); font-family: monospace; margin-top: 4px;">Method: Gordon Growth</div>
-                 </div>
-                 <div style="text-align: right;">
-                    <div style="font-size: 1.4em; font-weight: bold; color: var(--text-primary); font-family: monospace;">${formatCurrency(dcf.terminal_value)}</div>
-                    <div style="font-size: 0.7em; color: var(--text-secondary);">Present Value: ${formatCurrency(dcf.terminal_value / Math.pow(1+dcf.wacc, 5))}</div>
-                 </div>
-            </div>
-        `;
-        return html;
-    }
-
-    // Generator 4: Cap Structure - Ported from "Left" side logic
+    // Generator 4: Cap Structure
     function generateCapStructureHtml(memo) {
         let html = '';
-        
-        // Equity Data
         if (memo.equity_data) {
             const eq = memo.equity_data;
             html += `
-                <div style="margin-bottom: 30px;">
-                     <h3 style="font-size: 0.8em; font-weight: bold; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 15px;">Equity Market Data</h3>
-                     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
-                        <div style="background:rgba(255,255,255,0.05); padding:10px; border-radius:4px;">
-                            <div style="font-size:0.7em; color:var(--text-secondary);">Market Cap</div>
-                            <div style="font-weight:bold; color:var(--text-primary); font-family:monospace;">${formatCurrency(eq.market_cap)}</div>
+                <div class="mb-8">
+                     <h3 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4">Equity Market Data</h3>
+                     <div class="grid grid-cols-3 gap-4">
+                        <div class="bg-slate-800/50 p-3 rounded border border-slate-700/50">
+                            <div class="text-xs text-slate-500">Market Cap</div>
+                            <div class="font-bold text-white font-mono">${formatCurrency(eq.market_cap)}</div>
                         </div>
-                        <div style="background:rgba(255,255,255,0.05); padding:10px; border-radius:4px;">
-                            <div style="font-size:0.7em; color:var(--text-secondary);">P/E Ratio</div>
-                            <div style="font-weight:bold; color:var(--accent-color); font-family:monospace;">${eq.pe_ratio ? eq.pe_ratio.toFixed(1)+'x' : 'N/A'}</div>
+                        <div class="bg-slate-800/50 p-3 rounded border border-slate-700/50">
+                            <div class="text-xs text-slate-500">P/E Ratio</div>
+                            <div class="font-bold text-blue-400 font-mono">${eq.pe_ratio ? eq.pe_ratio.toFixed(1)+'x' : 'N/A'}</div>
                         </div>
-                        <div style="background:rgba(255,255,255,0.05); padding:10px; border-radius:4px;">
-                            <div style="font-size:0.7em; color:var(--text-secondary);">Beta</div>
-                            <div style="font-weight:bold; color:var(--text-primary); font-family:monospace;">${eq.beta ? eq.beta.toFixed(2) : 'N/A'}</div>
+                        <div class="bg-slate-800/50 p-3 rounded border border-slate-700/50">
+                            <div class="text-xs text-slate-500">Beta</div>
+                            <div class="font-bold text-white font-mono">${eq.beta ? eq.beta.toFixed(2) : 'N/A'}</div>
                         </div>
                      </div>
                 </div>
             `;
         }
 
-        // Debt Facilities Table
         if (memo.debt_facilities && memo.debt_facilities.length > 0) {
-            html += `<div><h3 style="font-size: 0.8em; font-weight: bold; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 15px;">Debt Facilities</h3>`;
-            html += `<table style="width:100%; text-align:left; font-family: monospace; font-size: 0.8em; border-collapse: collapse;">`;
-            html += `<thead style="color: var(--text-secondary); border-bottom: 1px solid var(--glass-border);">
+            html += `<div><h3 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4">Debt Facilities</h3>`;
+            html += `<table class="w-full text-left font-mono text-xs border-collapse">`;
+            html += `<thead class="text-slate-500 border-b border-slate-700">
                         <tr>
-                            <th style="padding:8px;">Type</th>
-                            <th style="padding:8px; text-align:right;">Committed</th>
-                            <th style="padding:8px; text-align:right;">Drawn</th>
-                            <th style="padding:8px; text-align:right;">Rate</th>
-                            <th style="padding:8px; text-align:center;">Rating</th>
-                            <th style="padding:8px; text-align:center;">LTV</th>
+                            <th class="p-2">Type</th>
+                            <th class="p-2 text-right">Committed</th>
+                            <th class="p-2 text-right">Drawn</th>
+                            <th class="p-2 text-right">Rate</th>
+                            <th class="p-2 text-center">Rating</th>
+                            <th class="p-2 text-center">LTV</th>
                         </tr>
                      </thead><tbody>`;
             
             memo.debt_facilities.forEach(d => {
-                // Style logic for Rating
-                let ratingColor = '#00C851'; // Green
-                if (d.snc_rating === "Special Mention") ratingColor = '#ffbb33';
-                if (d.snc_rating === "Substandard" || d.snc_rating === "Doubtful") ratingColor = '#ff4444';
+                let ratingColor = 'text-emerald-400 border-emerald-400';
+                if (d.snc_rating === "Special Mention") ratingColor = 'text-yellow-400 border-yellow-400';
+                if (d.snc_rating === "Substandard" || d.snc_rating === "Doubtful") ratingColor = 'text-red-400 border-red-400';
 
-                // LTV Bar
                 const ltvPct = (d.ltv || 0) * 100;
-                const ltvColor = ltvPct < 60 ? '#00C851' : (ltvPct < 80 ? '#ffbb33' : '#ff4444');
+                const ltvColor = ltvPct < 60 ? 'bg-emerald-500' : (ltvPct < 80 ? 'bg-yellow-500' : 'bg-red-500');
 
                 html += `
-                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
-                        <td style="padding:8px; color:var(--text-primary); font-weight:bold;">${d.facility_type}</td>
-                        <td style="padding:8px; text-align:right; color:var(--text-primary);">${formatCurrency(d.amount_committed)}</td>
-                        <td style="padding:8px; text-align:right; color:var(--text-secondary);">${formatCurrency(d.amount_drawn)}</td>
-                        <td style="padding:8px; text-align:right; color:var(--accent-color);">${d.interest_rate}</td>
-                        <td style="padding:8px; text-align:center;"><span style="color:${ratingColor}; border:1px solid ${ratingColor}; padding:2px 4px; border-radius:3px; font-size:0.8em;">${d.snc_rating}</span></td>
-                        <td style="padding:8px; vertical-align:middle;">
-                            <div style="width:60px; height:4px; background:#333; margin:auto; position:relative; border-radius:2px;">
-                                <div style="width:${ltvPct}%; height:100%; background:${ltvColor}; border-radius:2px;"></div>
+                    <tr class="border-b border-slate-800/50">
+                        <td class="p-2 text-white font-bold">${d.facility_type}</td>
+                        <td class="p-2 text-right text-white">${formatCurrency(d.amount_committed)}</td>
+                        <td class="p-2 text-right text-slate-400">${formatCurrency(d.amount_drawn)}</td>
+                        <td class="p-2 text-right text-blue-400">${d.interest_rate}</td>
+                        <td class="p-2 text-center"><span class="${ratingColor} border px-1 rounded text-[10px]">${d.snc_rating}</span></td>
+                        <td class="p-2 align-middle">
+                            <div class="w-16 h-1 bg-slate-800 rounded mx-auto relative overflow-hidden">
+                                <div class="h-full ${ltvColor}" style="width:${ltvPct}%"></div>
                             </div>
                         </td>
                     </tr>
                 `;
             });
             html += `</tbody></table></div>`;
-        } else {
-            html += '<p style="color:var(--text-secondary); font-style:italic;">No debt facility data available.</p>';
         }
-        
         return html;
     }
 
-    // --- 8. Evidence Viewer Logic ---
+    // Generator 5: Risk Quant (PD/LGD/Scenarios)
+    function generateRiskQuantHtml(memo) {
+        if (!memo.pd_model) return '<p class="text-slate-500 italic">No quantitative risk models available.</p>';
+        const pd = memo.pd_model;
+        const scenarios = memo.scenario_analysis;
 
-    // A. Specific Coordinate Renderer
+        let html = '';
+
+        html += `
+            <div class="mb-8">
+                <h3 class="text-sm font-bold text-purple-400 uppercase tracking-widest mb-4 border-b border-slate-700 pb-2">Probability of Default (PD) Model</h3>
+                <div class="grid grid-cols-2 gap-8">
+                    <div class="bg-slate-800/30 p-4 rounded border border-slate-700/50">
+                         <div class="flex justify-between items-center mb-4">
+                            <span class="text-slate-400 text-sm">Model Score</span>
+                            <span class="text-2xl font-mono font-bold text-white">${pd.model_score.toFixed(1)}/100</span>
+                         </div>
+                         <div class="flex justify-between items-center mb-4">
+                            <span class="text-slate-400 text-sm">Implied Rating</span>
+                            <span class="text-xl font-mono font-bold text-purple-400 border border-purple-500 px-2 rounded">${pd.implied_rating}</span>
+                         </div>
+                         <div class="space-y-2">
+                             <div class="flex justify-between text-xs">
+                                <span class="text-slate-500">1-Year PD</span>
+                                <span class="text-white font-mono">${(pd.one_year_pd * 100).toFixed(2)}%</span>
+                             </div>
+                             <div class="flex justify-between text-xs">
+                                <span class="text-slate-500">5-Year PD</span>
+                                <span class="text-white font-mono">${(pd.five_year_pd * 100).toFixed(2)}%</span>
+                             </div>
+                         </div>
+                    </div>
+                    <div>
+                        <h4 class="text-xs text-slate-500 uppercase mb-2">Key Drivers</h4>
+                        <ul class="space-y-2 text-sm text-slate-300">
+                            ${Object.entries(pd.input_factors).map(([k,v]) => `
+                                <li class="flex justify-between border-b border-slate-800 pb-1">
+                                    <span>${k}</span>
+                                    <span class="font-mono text-blue-400">${typeof v === 'number' ? v.toFixed(2) : v}</span>
+                                </li>
+                            `).join('')}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        if (scenarios) {
+            html += `
+                <div class="mb-8">
+                    <h3 class="text-sm font-bold text-blue-400 uppercase tracking-widest mb-4 border-b border-slate-700 pb-2">Scenario Analysis</h3>
+                    <div class="grid grid-cols-3 gap-4">
+                        ${scenarios.scenarios.map(s => `
+                            <div class="bg-slate-800/30 p-4 rounded border border-slate-700/50 relative overflow-hidden">
+                                <div class="absolute top-0 right-0 bg-slate-700 text-[10px] px-2 py-0.5 rounded-bl text-white font-mono">${(s.probability * 100).toFixed(0)}% PROB</div>
+                                <h4 class="font-bold text-white mb-2">${s.name}</h4>
+                                <div class="text-2xl font-mono font-bold text-emerald-400 mb-2">$${s.implied_share_price.toFixed(2)}</div>
+                                <div class="text-xs text-slate-500 space-y-1">
+                                    <div>Rev Growth: ${(s.revenue_growth*100).toFixed(1)}%</div>
+                                    <div>EBITDA Margin: ${(s.ebitda_margin*100).toFixed(1)}%</div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="mt-4 text-center text-sm text-slate-400">
+                        Probability Weighted Price: <span class="text-white font-bold font-mono">$${scenarios.weighted_share_price.toFixed(2)}</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        return html;
+    }
+
+    // Generator 6: System 2 Critique
+    function generateSystemTwoHtml(memo) {
+        if (!memo.system_two_critique) return '<p class="text-slate-500 italic">No System 2 critique available.</p>';
+        const s2 = memo.system_two_critique;
+        const statusColor = s2.verification_status === "PASS" ? "text-emerald-400" : "text-yellow-400";
+        const icon = s2.verification_status === "PASS" ? "fa-check-circle" : "fa-exclamation-triangle";
+
+        let html = `
+            <div class="bg-slate-800/30 border border-slate-700/50 p-6 rounded-lg">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center gap-3">
+                         <div class="w-10 h-10 rounded-full bg-pink-900/30 flex items-center justify-center border border-pink-500/30">
+                            <i class="fas fa-brain text-pink-400"></i>
+                         </div>
+                         <div>
+                            <h3 class="font-bold text-white text-lg">System 2 Review</h3>
+                            <div class="text-xs text-slate-500">Autonomous Critique Agent</div>
+                         </div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-xs text-slate-500 uppercase">Conviction Score</div>
+                        <div class="text-2xl font-mono font-bold text-white">${(s2.conviction_score * 100).toFixed(0)}/100</div>
+                    </div>
+                </div>
+
+                <div class="mb-6">
+                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Critique Points</h4>
+                    <ul class="space-y-3">
+                        ${s2.critique_points.map(p => `
+                            <li class="flex gap-3 text-slate-300 text-sm bg-black/20 p-3 rounded border border-slate-800/50">
+                                <i class="fas fa-comment-dots text-pink-400 mt-1"></i>
+                                <span>${p}</span>
+                            </li>
+                        `).join('')}
+                    </ul>
+                </div>
+        `;
+
+        // NEW: Quantitative & Qualitative Analysis
+        if (s2.quantitative_analysis || s2.qualitative_analysis) {
+             const quant = s2.quantitative_analysis;
+             const qual = s2.qualitative_analysis;
+
+             if (quant) {
+                 html += `<div class="mb-6"><h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Quantitative Checks</h4>`;
+                 html += `<div class="bg-black/20 p-4 rounded border border-slate-800/50 space-y-2 text-sm text-slate-300">`;
+                 if (quant.ratios_checked) html += `<div><span class="text-slate-500">Ratios Verified:</span> ${quant.ratios_checked.join(', ')}</div>`;
+                 if (quant.variance_analysis) html += `<div><span class="text-slate-500">Variance:</span> ${quant.variance_analysis}</div>`;
+                 if (quant.dcf_validation) html += `<div><span class="text-slate-500">DCF Audit:</span> ${quant.dcf_validation}</div>`;
+                 html += `</div></div>`;
+             }
+
+             if (qual) {
+                 html += `<div class="mb-6"><h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Qualitative Signals</h4>`;
+                 html += `<div class="bg-black/20 p-4 rounded border border-slate-800/50 space-y-2 text-sm text-slate-300">`;
+                 if (qual.sentiment) html += `<div><span class="text-slate-500">Earnings Sentiment:</span> ${qual.sentiment}</div>`;
+                 if (qual.news_sentiment) html += `<div><span class="text-slate-500">News Sentiment:</span> ${qual.news_sentiment}</div>`;
+                 if (qual.management_credibility) html += `<div><span class="text-slate-500">Mgmt Credibility:</span> ${qual.management_credibility}</div>`;
+                 html += `</div></div>`;
+             }
+        }
+
+        html += `
+                <div class="flex items-center justify-between pt-4 border-t border-slate-700/50">
+                    <span class="text-xs text-slate-500 font-mono">AGENT: ${s2.author_agent}</span>
+                    <div class="flex items-center gap-2 ${statusColor}">
+                        <i class="fas ${icon}"></i>
+                        <span class="font-bold text-sm tracking-widest">${s2.verification_status}</span>
+                    </div>
+                </div>
+            </div>
+        `;
+        return html;
+    }
+
+    // --- 8. Interactivity ---
+
+    function setupDCFListeners(memo) {
+        if(!memo.dcf_analysis) return;
+
+        const waccInput = document.getElementById('dcf-input-wacc');
+        const growthInput = document.getElementById('dcf-input-growth');
+
+        const recalculate = () => {
+             const newWacc = parseFloat(waccInput.value) / 100;
+             const newGrowth = parseFloat(growthInput.value) / 100;
+
+             // Client-side Math (Mirroring backend)
+             const currentEbitda = memo.historical_financials[0].ebitda;
+             const baseFcf = currentEbitda * 0.65;
+
+             let projectedFcf = [];
+             let pvFcf = 0;
+
+             for(let i=1; i<=5; i++) {
+                 const g = 0.05 - (0.005 * (i-1));
+                 const fcf = baseFcf * Math.pow((1+g), i);
+                 projectedFcf.push(fcf);
+                 pvFcf += fcf / Math.pow((1+newWacc), i);
+             }
+
+             const termVal = (projectedFcf[4] * (1+newGrowth)) / (newWacc - newGrowth);
+             const pvTerm = termVal / Math.pow((1+newWacc), 5);
+             const ev = pvFcf + pvTerm;
+
+             // Equity
+             const debt = memo.historical_financials[0].total_liabilities;
+             const eq = ev - debt;
+             const shares = eq / memo.dcf_analysis.share_price;
+             const price = eq / shares;
+
+             document.getElementById('dcf-output-ev').innerText = formatCurrency(ev);
+             document.getElementById('dcf-output-price').innerText = '$' + price.toFixed(2);
+             document.getElementById('dcf-output-tv').innerText = formatCurrency(termVal);
+
+             logAudit("User", "Intervention", `DCF Re-calc: WACC=${(newWacc*100).toFixed(1)}%, g=${(newGrowth*100).toFixed(1)}%`);
+        };
+
+        if(waccInput) waccInput.addEventListener('change', recalculate);
+        if(growthInput) growthInput.addEventListener('change', recalculate);
+    }
+
+    // --- 9. Evidence Viewer Logic (Existing) ---
     window.renderEvidence = (borrowerName, docId, chunkId) => {
-        // Fallback search in library or mockData
         let data = currentMemo;
         if (!data || (data.borrower_name !== borrowerName && data.borrower_details?.name !== borrowerName)) {
-             // Try to find the right data if currentMemo isn't it
              data = mockData[Object.keys(mockData).find(k => mockData[k].borrower_details.name === borrowerName)] || currentMemo;
         }
 
@@ -430,68 +755,44 @@ document.addEventListener('DOMContentLoaded', async () => {
         const chunk = doc?.chunks?.find(c => c.chunk_id === chunkId);
         
         if (doc && chunk) {
-            setupPdfViewer(docId, chunk.page);
-            
-            // Draw BBox
-            const [x0, y0, x1, y1] = chunk.bbox;
-            const highlight = document.createElement('div');
-            highlight.className = 'bbox-highlight'; // Ensure CSS class exists or use inline below
-            highlight.style.position = 'absolute';
-            highlight.style.border = '2px solid var(--accent-color, #007bff)';
-            highlight.style.backgroundColor = 'rgba(0, 123, 255, 0.2)';
-            highlight.style.left = `${x0}px`;
-            highlight.style.top = `${y0}px`;
-            highlight.style.width = `${x1 - x0}px`;
-            highlight.style.height = `${y1 - y0}px`;
-            
-            const label = document.createElement('div');
-            label.innerText = chunk.type.toUpperCase();
-            label.style.background = 'var(--accent-color, #007bff)';
-            label.style.color = 'white';
-            label.style.fontSize = '10px';
-            label.style.fontWeight = 'bold';
-            label.style.padding = '2px 4px';
-            label.style.position = 'absolute';
-            label.style.top = '-18px';
-            label.style.left = '-2px';
-            
-            highlight.appendChild(label);
-            
-            const container = document.getElementById('pdf-page-container');
-            if(container) {
-                container.appendChild(highlight);
-                highlight.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
-            logAudit("Frontend", "Evidence", `Displayed precise artifact ${chunkId}`);
+            setupPdfViewer(docId, chunk.page, chunkId);
+            // logic to highlight from known chunk data if available
         }
     };
 
-    // B. Generic Viewer
-    window.viewEvidence = (docId) => {
-        setupPdfViewer(docId, 1);
-        logAudit("Frontend", "Evidence", `Opened document ${docId}`);
+    window.viewEvidence = (docId, chunkId, pageNum) => {
+        setupPdfViewer(docId, pageNum, chunkId);
+        // In a real app, we'd look up the exact BBOX from `chunkId` via API if not in frontend.
+        // For now, we visualize the successful link.
+        logAudit("Frontend", "Evidence", `Opened document ${docId} ${chunkId ? `(Chunk: ${chunkId})` : ''}`);
     };
 
-    function setupPdfViewer(docId, pageNum) {
+    function setupPdfViewer(docId, pageNum, chunkId) {
         if(!elements.evidencePanel || !elements.pdfViewer) return;
-
         elements.evidencePanel.classList.add('active');
-        elements.evidencePanel.style.width = '50%'; // Or class based toggle
-        
-        // Clear previous
+        elements.evidencePanel.style.width = '50%';
         elements.pdfViewer.innerHTML = '';
-        
+
         const pageDiv = document.createElement('div');
         pageDiv.id = 'pdf-page-container';
-        // Base styling for the "PDF" page
         pageDiv.style.background = '#fff'; 
         pageDiv.style.color = '#000';
         pageDiv.style.position = 'relative';
-        pageDiv.style.minHeight = '1000px'; // Simulated height
+        pageDiv.style.minHeight = '1000px';
         pageDiv.style.width = '100%';
         pageDiv.style.padding = '40px';
         pageDiv.style.boxShadow = '0 0 20px rgba(0,0,0,0.5)';
-        
+
+        let highlightHtml = '';
+        if (chunkId) {
+            // Simulated BBOX visualization since we don't carry BBOX in citations currently
+            highlightHtml = `
+                <div class="bbox-highlight" style="position: absolute; border: 2px solid #007bff; background-color: rgba(0, 123, 255, 0.1); left: 50px; top: 300px; width: 80%; height: 100px;">
+                    <div style="background: #007bff; color: white; font-size: 10px; font-weight: bold; padding: 2px 4px; position: absolute; top: -18px; left: -2px;">CHUNK: ${chunkId.substring(0,8)}...</div>
+                </div>
+            `;
+        }
+
         pageDiv.innerHTML = `
             <div style="border-bottom: 2px solid #ccc; padding-bottom: 10px; margin-bottom: 20px; display: flex; justify-content: space-between;">
                 <span style="font-weight: bold; font-family:sans-serif;">${docId}</span>
@@ -502,14 +803,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <p style="text-align:center; font-weight:bold;">Form 10-K</p>
                 <br>
                 <p><strong>ITEM 7. MANAGEMENT’S DISCUSSION AND ANALYSIS OF FINANCIAL CONDITION AND RESULTS OF OPERATIONS</strong></p>
-                <p>The following discussion and analysis should be read in conjunction with the Consolidated Financial Statements and related notes included elsewhere in this Annual Report on Form 10-K. This discussion contains forward-looking statements based upon current expectations that involve risks and uncertainties.</p>
-                <br>
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
-                <br>
+                <p>The following discussion and analysis should be read in conjunction with the Consolidated Financial Statements and related notes included elsewhere in this Annual Report on Form 10-K.</p>
                 <div style="background:#eee; padding:20px; border:1px solid #ddd; text-align:center; color:#888;">[Simulated PDF Content Visualization]</div>
+                ${highlightHtml}
             </div>
         `;
-        
         elements.pdfViewer.appendChild(pageDiv);
     }
 
@@ -520,10 +818,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // --- 9. Utilities ---
     function logAudit(actor, action, details) {
         if (!elements.auditLogContent) return;
-        
         const time = new Date().toLocaleTimeString();
         const tr = document.createElement('tr');
         tr.style.borderBottom = '1px solid var(--glass-border, #333)';
@@ -538,40 +834,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     function formatCurrency(val) {
         if (val === undefined || val === null) return 'N/A';
-        // Handle negative numbers
         const absVal = Math.abs(val);
         let str = '';
         if (absVal >= 1000) str = '$' + (absVal / 1000).toFixed(1) + 'B';
         else str = '$' + absVal.toFixed(1) + 'M';
-        
         return val < 0 ? `(${str})` : str;
     }
     
-    // Adapter for Mock Data fallback
     function renderMemoFromMock(data) {
-        const adapter = {
-            borrower_name: data.borrower_details?.name || data.borrower_name,
-            borrower_details: data.borrower_details,
-            risk_score: data.risk_score || 75,
-            rating: data.borrower_details?.rating,
-            sector: data.borrower_details?.sector,
-            documents: data.documents,
-            historical_financials: data.historical_financials, // Assuming mock data has this or it returns undefined
-            sections: [
-                { title: "Executive Summary", content: data.summary || (data.documents && data.documents[0].chunks.find(c=>c.type==='narrative')?.content) || "Analysis pending." },
-                { title: "Risk Factors", content: "Risk factors extracted from filings." }
-            ],
-            // Mock DCF if not present
-            dcf_analysis: data.dcf_analysis || {
-                wacc: 0.085,
-                growth_rate: 0.025,
-                share_price: 150.00,
-                enterprise_value: 2000000,
-                terminal_value: 2500000,
-                free_cash_flow: [12000, 13500, 14200, 15100, 16000]
-            }
-        };
-        currentMemo = adapter;
-        renderFullMemoUI(adapter);
+        currentMemo = data;
+        renderFullMemoUI(data);
     }
 });
