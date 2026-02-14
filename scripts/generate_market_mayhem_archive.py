@@ -786,6 +786,48 @@ NEWSLETTER_DATA = [
         <p><strong>Central Bank Response:</strong> The Fed has unleashed 'Unlimited QE', buying corporate bonds for the first time in history. The mantra is 'Don't Fight the Fed', but the economic data is catastrophic.</p>
         """,
         "source_priority": 3
+    },
+    {
+        "date": "2000-03-10",
+        "title": "MARKET MAYHEM: THE DOT COM PEAK",
+        "summary": "\"Irrational Exuberance\". The NASDAQ Composite peaked today at 5,048.62. Companies with no revenue are valued at billions. The bubble has found its pin.",
+        "type": "HISTORICAL",
+        "filename": "newsletter_market_mayhem_mar_2000.html",
+        "is_sourced": True,
+        "full_body": """
+        <p><strong>The Height of Folly.</strong> Today marks the peak of the Dot Com bubble. The NASDAQ has doubled in a year. IPOs are popping 400% on day one. Pets.com, Webvan, eToys—these are the titans of the new economy.</p>
+        <p><strong>The Valuation Problem:</strong> Traditional metrics like P/E are considered obsolete. 'Price to Clicks' and 'Eyeballs' are the new currency. But burn rates are accelerating, and the path to profitability is non-existent for many.</p>
+        <p><strong>The Turn:</strong> Japan has entered a recession, and the Fed is tightening. Capital is becoming expensive just as these cash-burning machines need it most.</p>
+        """,
+        "source_priority": 3
+    },
+    {
+        "date": "1997-07-02",
+        "title": "MARKET MAYHEM: ASIAN CONTAGION",
+        "summary": "\"Currency Collapse\". The Thai Baht has devalued, triggering a financial tsunami across East Asia. The 'Asian Tigers' are drowning in dollar-denominated debt.",
+        "type": "HISTORICAL",
+        "filename": "newsletter_market_mayhem_jul_1997.html",
+        "is_sourced": True,
+        "full_body": """
+        <p><strong>The Baht Breaks.</strong> After months of speculative attacks, Thailand was forced to float the Baht today. It collapsed immediately. The contagion is spreading rapidly to Malaysia, Indonesia, and South Korea.</p>
+        <p><strong>The IMF Steps In:</strong> The International Monetary Fund is preparing massive bailouts, but the conditions—strict austerity and high interest rates—are exacerbating the economic pain.</p>
+        <p><strong>Global Impact:</strong> While Western markets remain resilient for now, the deflationary shock from Asia is lowering global bond yields and commodity prices. Long-Term Capital Management (LTCM) is watching closely.</p>
+        """,
+        "source_priority": 3
+    },
+    {
+        "date": "1929-10-29",
+        "title": "MARKET MAYHEM: BLACK TUESDAY",
+        "summary": "\"The Great Crash\". The Roaring Twenties have ended in a scream. The stock market has collapsed, wiping out billions in wealth and shattering public confidence.",
+        "type": "HISTORICAL",
+        "filename": "newsletter_market_mayhem_oct_1929.html",
+        "is_sourced": True,
+        "full_body": """
+        <p><strong>Wall Street Lays an Egg.</strong> Panic selling reached a crescendo today. Ticker tapes ran hours late. Rumors of suicides are rampant. The Dow Jones Industrial Average has lost 12% today alone, following yesterday's 13% drop.</p>
+        <p><strong>Margin Calls:</strong> The crash was fueled by leverage. Brokers are liquidating positions indiscriminately as investors fail to meet margin calls. The savings of a generation have evaporated.</p>
+        <p><strong>The Economy:</strong> While politicians promise that 'prosperity is just around the corner', the destruction of wealth is likely to lead to a severe contraction in consumer spending and investment. The shadow of Depression looms.</p>
+        """,
+        "source_priority": 3
     }
 ]
 
