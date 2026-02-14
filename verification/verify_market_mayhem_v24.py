@@ -32,7 +32,7 @@ def verify_market_mayhem_v24():
             page.wait_for_selector(".system-monitor")
             regime = page.text_content("#sys-regime")
             print(f"Market Regime: {regime}")
-            assert "GREAT DIVERGENCE" in regime
+            assert "THE GREAT BIFURCATION" in regime
             print("System Monitor verified.")
 
             # 3. Verify Concept Cloud
@@ -53,6 +53,13 @@ def verify_market_mayhem_v24():
             # 5. Verify Chart
             assert page.is_visible("#sentimentChart")
             print("Chart verified.")
+
+            # 6. Verify New Bifurcation Links
+            print("Verifying new Bifurcation links...")
+            assert page.is_visible("a[href='report_great_bifurcation_2026.html']")
+            assert page.is_visible("a[href='system2_critique_bifurcation.html']")
+            assert page.is_visible("a[href='agent_alignment_log_feb_2026.html']")
+            print("Bifurcation links verified.")
 
             # Take Screenshot
             os.makedirs("verification_screenshots", exist_ok=True)

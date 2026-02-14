@@ -58,6 +58,12 @@ class FinancialSpread(BaseModel):
     leverage_ratio: float
     current_ratio: float
     period: str
+    # Extended Fields
+    gross_debt: Optional[float] = 0.0
+    cash: Optional[float] = 0.0
+    capex: Optional[float] = 0.0
+    fcf: Optional[float] = 0.0 # Free Cash Flow
+    ebitda_adjustments: Optional[Dict[str, float]] = {}
 
 class CreditRating(BaseModel):
     agency: str
@@ -90,6 +96,14 @@ class EquityMarketData(BaseModel):
     pe_ratio: float
     dividend_yield: float
     beta: float
+
+class PeerComp(BaseModel):
+    ticker: str
+    name: str
+    ev_ebitda: float
+    pe_ratio: float
+    leverage_ratio: float
+    market_cap: float
 
 class PDModel(BaseModel):
     """
@@ -128,6 +142,25 @@ class SystemTwoCritique(BaseModel):
     conviction_score: float
     verification_status: str
     author_agent: str = "System 2"
+    quantitative_analysis: Optional[Dict[str, Any]] = {}
+    qualitative_analysis: Optional[Dict[str, Any]] = {}
+
+class AuditLogEntry(BaseModel):
+    """
+    A rigorous audit log entry for compliance.
+    Protocol: Audit-as-Code
+    """
+    transaction_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    timestamp: str = Field(default_factory=lambda: datetime.utcnow().isoformat())
+    user_id: str
+    action: str
+    model_version: str
+    prompt_version: str
+    inputs: Dict[str, Any]
+    outputs: Dict[str, Any]
+    citations_count: int
+    validation_status: str  # PASS/FAIL/WARNING
+    validation_errors: List[str] = []
 
 class CreditMemo(BaseModel):
     """
@@ -152,20 +185,5 @@ class CreditMemo(BaseModel):
     debt_facilities: List[DebtFacility] = []
     repayment_schedule: List[RepaymentScheduleItem] = []
     equity_data: Optional[EquityMarketData] = None
-
-class AuditLogEntry(BaseModel):
-    """
-    A rigorous audit log entry for compliance.
-    Protocol: Audit-as-Code
-    """
-    transaction_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    timestamp: str = Field(default_factory=lambda: datetime.utcnow().isoformat())
-    user_id: str
-    action: str
-    model_version: str
-    prompt_version: str
-    inputs: Dict[str, Any]
-    outputs: Dict[str, Any]
-    citations_count: int
-    validation_status: str  # PASS/FAIL/WARNING
-    validation_errors: List[str] = []
+    agent_log: List[AuditLogEntry] = []
+    peer_comps: List[PeerComp] = []
