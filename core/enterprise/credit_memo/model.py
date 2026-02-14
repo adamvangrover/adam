@@ -64,6 +64,13 @@ class CreditRating(BaseModel):
     outlook: str
     date: str
 
+class RepaymentScheduleItem(BaseModel):
+    year: int
+    payment_amount: float
+    principal: float
+    interest: float
+    remaining_balance: float
+
 class DebtFacility(BaseModel):
     facility_type: str
     amount_committed: float
@@ -74,6 +81,7 @@ class DebtFacility(BaseModel):
     drc: float = 1.0 # 0-100%
     ltv: float = 0.5 # 0-100%
     conviction_score: float = 0.9 # 0-100%
+    repayment_schedule: List[RepaymentScheduleItem] = []
 
 class EquityMarketData(BaseModel):
     market_cap: float

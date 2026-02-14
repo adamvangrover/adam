@@ -1,7 +1,8 @@
 from typing import Dict, List, Any
-from .model import FinancialSpread, DCFAnalysis, CreditRating, DebtFacility, EquityMarketData
+from .model import FinancialSpread, DCFAnalysis, CreditRating, DebtFacility, EquityMarketData, RepaymentScheduleItem
 import random
 from datetime import datetime, timedelta
+from core.pipelines.mock_edgar import MockEdgar
 
 class SpreadingEngine:
     """
@@ -14,62 +15,53 @@ class SpreadingEngine:
         """
         name_lower = borrower_name.lower()
 
-        if "apple" in name_lower:
-            # Apple Inc. (FY2025 Q1 - Period Ending Dec 2024)
-            assets = 379300.0
-            liabilities = 291100.0
-            equity = assets - liabilities
-            revenue = 391000.0
-            ebitda = 132000.0
-            net_income = 102000.0
-            interest = 3900.0
+        # Try to map to MockEdgar
+        ticker_map = {
+            "apple": "AAPL",
+            "microsoft": "MSFT",
+            "alphabet": "GOOGL",
+            "amazon": "AMZN",
+            "nvidia": "NVDA",
+            "tesla": "TSLA",
+            "meta": "META"
+        }
 
-            return FinancialSpread(
-                total_assets=assets,
-                total_liabilities=liabilities,
-                total_equity=equity,
-                revenue=revenue,
-                ebitda=ebitda,
-                net_income=net_income,
-                interest_expense=interest,
-                dscr=ebitda / interest if interest > 0 else 999.0,
-                leverage_ratio=liabilities / ebitda if ebitda > 0 else 0.0,
-                current_ratio=0.98,
-                period="FY2025 Q1"
-            )
+        found_ticker = None
+        for key, val in ticker_map.items():
+            if key in name_lower:
+                found_ticker = val
+                break
 
-        elif "tesla" in name_lower:
-            # Tesla Inc. (FY2024 Q3 TTM)
-            assets = 119800.0
-            liabilities = 45700.0
-            equity = 74100.0
-            revenue = 97000.0
-            ebitda = 12500.0
-            net_income = 8400.0
-            interest = 150.0
+        if found_ticker:
+            try:
+                fin = MockEdgar.get_latest_financials(found_ticker)
+                # MockEdgar doesn't provide net_income, estimate it (EBITDA * 0.6)
+                net_income = fin.get("ebitda", 0) * 0.6
 
-            return FinancialSpread(
-                total_assets=assets,
-                total_liabilities=liabilities,
-                total_equity=equity,
-                revenue=revenue,
-                ebitda=ebitda,
-                net_income=net_income,
-                interest_expense=interest,
-                dscr=ebitda / interest if interest > 0 else 999.0,
-                leverage_ratio=liabilities / ebitda if ebitda > 0 else 0.0,
-                current_ratio=1.70,
-                period="FY2024 Q3"
-            )
+                return FinancialSpread(
+                    total_assets=fin.get("total_assets", 0),
+                    total_liabilities=fin.get("total_liabilities", 0),
+                    total_equity=fin.get("total_equity", 0),
+                    revenue=fin.get("revenue", 0),
+                    ebitda=fin.get("ebitda", 0),
+                    net_income=net_income,
+                    interest_expense=fin.get("interest_expense", 0),
+                    dscr=fin.get("ebitda", 0) / fin.get("interest_expense", 1) if fin.get("interest_expense", 0) > 0 else 999.0,
+                    leverage_ratio=fin.get("total_debt", 0) / fin.get("ebitda", 1) if fin.get("ebitda", 0) > 0 else 0.0,
+                    current_ratio=1.5, # Mock
+                    period=f"FY{fin.get('fiscal_year', 2026)}"
+                )
+            except Exception:
+                pass # Fallback
 
-        elif "jpmorgan" in name_lower or "chase" in name_lower:
-             # JPMorgan Chase (FY2024 Q4)
-            assets = 4000000.0
-            liabilities = 3655000.0
-            equity = 345000.0
-            revenue = 170000.0
-            ebitda = 90000.0
-            net_income = 56000.0
+        if "jpmorgan" in name_lower or "chase" in name_lower:
+             # JPMorgan Chase (FY2026 Proj)
+            assets = 4500000.0
+            liabilities = 4100000.0
+            equity = 400000.0
+            revenue = 190000.0
+            ebitda = 105000.0
+            net_income = 65000.0
             interest = 1.0
 
             return FinancialSpread(
@@ -83,7 +75,7 @@ class SpreadingEngine:
                 dscr=999.0,
                 leverage_ratio=liabilities / equity,
                 current_ratio=1.1,
-                period="FY2024 Q4"
+                period="FY2026 (Proj)"
             )
 
         elif "techcorp" in name_lower:
@@ -240,14 +232,58 @@ class SpreadingEngine:
                  CreditRating(agency="S&P", rating="BB", outlook="Stable", date=today)
             ]
 
+    def _generate_repayment_schedule(self, amount: float, rate_str: str, maturity_str: str) -> List[RepaymentScheduleItem]:
+        """
+        Generates a mock amortization schedule.
+        """
+        schedule = []
+        try:
+            balance = amount
+            # Simple assumption: 5% rate if variable, or parse
+            rate = 0.05
+            if "%" in rate_str:
+                import re
+                match = re.search(r'(\d+\.?\d*)%', rate_str)
+                if match:
+                    rate = float(match.group(1)) / 100
+
+            current_year = datetime.now().year
+
+            # 5 Year forecast
+            for i in range(1, 6):
+                year = current_year + i
+                interest = balance * rate
+
+                # Mock Principal Paydown (10% per year for amortizing, 0 for bullet)
+                principal = 0.0
+                if "Term Loan" in maturity_str or amount > 0: # Simplify: Assume some ammo for demo
+                     principal = amount * 0.10
+
+                if balance < principal: principal = balance
+
+                payment = interest + principal
+                balance -= principal
+
+                schedule.append(RepaymentScheduleItem(
+                    year=year,
+                    payment_amount=round(payment, 2),
+                    principal=round(principal, 2),
+                    interest=round(interest, 2),
+                    remaining_balance=round(balance, 2)
+                ))
+        except Exception:
+            pass
+        return schedule
+
     def get_debt_facilities(self, borrower_name: str) -> List[DebtFacility]:
         """
         Returns mock debt facilities.
         """
         name = borrower_name.lower()
+        facilities = []
 
         if "apple" in name:
-            return [
+            facilities = [
                 DebtFacility(
                     facility_type="Revolving Credit Facility",
                     amount_committed=10000.0,
@@ -255,8 +291,8 @@ class SpreadingEngine:
                     interest_rate="SOFR + 0.75%",
                     maturity_date="2028-09-15",
                     snc_rating="Pass",
-                    drc=1.0, # Strong cash flow
-                    ltv=0.0, # Unsecured
+                    drc=1.0,
+                    ltv=0.0,
                     conviction_score=0.98
                 ),
                 DebtFacility(
@@ -294,7 +330,7 @@ class SpreadingEngine:
                 )
             ]
         elif "tesla" in name:
-            return [
+            facilities = [
                 DebtFacility(
                     facility_type="ABL Revolver",
                     amount_committed=5000.0,
@@ -303,7 +339,7 @@ class SpreadingEngine:
                     maturity_date="2026-10-20",
                     snc_rating="Pass",
                     drc=0.9,
-                    ltv=0.4, # Secured by inventory/AR
+                    ltv=0.4,
                     conviction_score=0.88
                 ),
                 DebtFacility(
@@ -330,7 +366,7 @@ class SpreadingEngine:
                 )
             ]
         elif "techcorp" in name:
-             return [
+             facilities = [
                 DebtFacility(
                     facility_type="Revolver",
                     amount_committed=500.0,
@@ -366,7 +402,7 @@ class SpreadingEngine:
                 )
             ]
         else:
-            return [
+            facilities = [
                  DebtFacility(
                     facility_type="Revolver",
                     amount_committed=100.0,
@@ -390,6 +426,12 @@ class SpreadingEngine:
                     conviction_score=0.75
                  )
             ]
+
+        # Populate Schedules
+        for f in facilities:
+            f.repayment_schedule = self._generate_repayment_schedule(f.amount_drawn, f.interest_rate, f.maturity_date)
+
+        return facilities
 
     def get_equity_data(self, borrower_name: str) -> EquityMarketData:
         """

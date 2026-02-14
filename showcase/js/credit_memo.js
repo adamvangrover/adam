@@ -89,8 +89,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // --- 5. Core Logic: Simulation ---
-    function startGeneration() {
-        const borrower = elements.borrowerSelect ? elements.borrowerSelect.value : "Apple Inc.";
+    function startGeneration(targetId) {
+        // Fix for default value if library isn't loaded or select is empty
+        let borrower = targetId || (elements.borrowerSelect ? elements.borrowerSelect.value : "");
+
+        if (!borrower && libraryIndex.length > 0) {
+            borrower = libraryIndex[0].file || libraryIndex[0].id;
+        } else if (!borrower) {
+            borrower = "credit_memo_Apple_Inc.json"; // Fallback File
+        }
         
         // UI Reset
         if(elements.memoContent) elements.memoContent.innerHTML = ''; 
@@ -158,7 +165,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             `;
             
             itemDiv.onclick = () => {
-                startGeneration(); 
+                startGeneration(item.file || item.id);
             };
             
             elements.libraryList.appendChild(itemDiv);
@@ -173,22 +180,22 @@ document.addEventListener('DOMContentLoaded', async () => {
         const tabsHtml = `
             <div style="display: flex; gap: 20px; border-bottom: 1px solid var(--glass-border, rgba(255,255,255,0.1)); margin-bottom: 20px; overflow-x: auto;">
                 <div id="btn-tab-memo" class="tab-btn" onclick="switchTab('memo')" style="padding: 10px; cursor: pointer; color: var(--accent-color, #007bff); border-bottom: 2px solid var(--accent-color, #007bff); white-space: nowrap;">Memo</div>
-                <div id="btn-tab-financials" class="tab-btn" onclick="switchTab('financials')" style="padding: 10px; cursor: pointer; color: var(--text-secondary, #888); white-space: nowrap;">Financials</div>
-                <div id="btn-tab-dcf" class="tab-btn" onclick="switchTab('dcf')" style="padding: 10px; cursor: pointer; color: var(--text-secondary, #888); white-space: nowrap;">Valuation (DCF)</div>
-                <div id="btn-tab-cap" class="tab-btn" onclick="switchTab('cap')" style="padding: 10px; cursor: pointer; color: var(--text-secondary, #888); white-space: nowrap;">Cap Structure</div>
-                <div id="btn-tab-risk" class="tab-btn" onclick="switchTab('risk')" style="padding: 10px; cursor: pointer; color: var(--text-secondary, #888); white-space: nowrap;">Risk Quant</div>
-                <div id="btn-tab-sys2" class="tab-btn" onclick="switchTab('sys2')" style="padding: 10px; cursor: pointer; color: var(--text-secondary, #888); white-space: nowrap;">System 2</div>
+                <div id="btn-tab-annex-a" class="tab-btn" onclick="switchTab('annex-a')" style="padding: 10px; cursor: pointer; color: var(--text-secondary, #888); white-space: nowrap;">Annex A: Financials</div>
+                <div id="btn-tab-annex-b" class="tab-btn" onclick="switchTab('annex-b')" style="padding: 10px; cursor: pointer; color: var(--text-secondary, #888); white-space: nowrap;">Annex B: Valuation</div>
+                <div id="btn-tab-annex-c" class="tab-btn" onclick="switchTab('annex-c')" style="padding: 10px; cursor: pointer; color: var(--text-secondary, #888); white-space: nowrap;">Annex C: Cap Structure</div>
+                <div id="btn-tab-risk-quant" class="tab-btn" onclick="switchTab('risk-quant')" style="padding: 10px; cursor: pointer; color: var(--text-secondary, #888); white-space: nowrap;">Risk Quant</div>
+                <div id="btn-tab-system-2" class="tab-btn" onclick="switchTab('system-2')" style="padding: 10px; cursor: pointer; color: var(--text-secondary, #888); white-space: nowrap;">System 2</div>
             </div>
         `;
 
         // 2. Tab Contents (Delegating to specific generators)
         const contentHtml = `
             <div id="tab-memo" class="tab-content" style="display:block;">${generateMemoHtml(memo)}</div>
-            <div id="tab-financials" class="tab-content" style="display:none;">${generateFinancialsHtml(memo)}</div>
-            <div id="tab-dcf" class="tab-content" style="display:none;">${generateDcfHtml(memo)}</div>
-            <div id="tab-cap" class="tab-content" style="display:none;">${generateCapStructureHtml(memo)}</div>
-            <div id="tab-risk" class="tab-content" style="display:none;">${generateRiskQuantHtml(memo)}</div>
-            <div id="tab-sys2" class="tab-content" style="display:none;">${generateSystem2Html(memo)}</div>
+            <div id="tab-annex-a" class="tab-content" style="display:none;">${generateFinancialsHtml(memo)}</div>
+            <div id="tab-annex-b" class="tab-content" style="display:none;">${generateDcfHtml(memo)}</div>
+            <div id="tab-annex-c" class="tab-content" style="display:none;">${generateCapStructureHtml(memo)}</div>
+            <div id="tab-risk-quant" class="tab-content" style="display:none;">${generateRiskQuantHtml(memo)}</div>
+            <div id="tab-system-2" class="tab-content" style="display:none;">${generateSystem2Html(memo)}</div>
         `;
 
         elements.memoContent.innerHTML = tabsHtml + contentHtml;
@@ -204,7 +211,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     function generateMemoHtml(memo) {
         // Safe accessors
         const name = memo.borrower_name || memo.borrower_details?.name;
-        const rating = memo.rating || memo.borrower_details?.rating || "N/A";
+        let rating = memo.rating || memo.borrower_details?.rating || "N/A";
+        let ratingSource = "";
+
+        // Derive rating from array if missing
+        if (rating === "N/A" && memo.credit_ratings && memo.credit_ratings.length > 0) {
+             const m = memo.credit_ratings.find(r => r.agency.includes("Moody"));
+             if (m) { rating = m.rating; ratingSource = "Moody's"; }
+             else { rating = memo.credit_ratings[0].rating; ratingSource = memo.credit_ratings[0].agency; }
+        }
+
         const sector = memo.sector || memo.borrower_details?.sector || "General";
         const scoreColor = memo.risk_score < 60 ? 'text-red-500' : (memo.risk_score < 80 ? 'text-yellow-500' : 'text-emerald-500');
 
@@ -214,7 +230,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <div>
                     <h1 style="margin:0; font-size:2em; font-family:serif;">${name}</h1>
                     <div style="font-size: 0.9em; color: var(--text-secondary, #888); margin-top:5px;">
-                        Rating: <span style="color: var(--accent-color, #fff); font-weight:bold;">${rating}</span> | Sector: ${sector}
+                        Rating: <span style="color: var(--accent-color, #fff); font-weight:bold;">${rating}</span> <span style="font-size:0.8em">${ratingSource}</span> | Sector: ${sector}
                     </div>
                 </div>
                 <div style="text-align:right;">
@@ -348,7 +364,26 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Generator 4: Cap Structure - Ported from "Left" side logic
     function generateCapStructureHtml(memo) {
-        let html = '';
+        let html = '<h2 style="color: var(--accent-color, #fff); font-size:1.2em; border-bottom: 1px solid var(--glass-border, #333); padding-bottom: 5px; margin-bottom:20px;">Capital Structure</h2>';
+
+        // Credit Ratings (New)
+        if (memo.credit_ratings && memo.credit_ratings.length > 0) {
+            html += `
+                <div style="margin-bottom: 30px;">
+                     <h3 style="font-size: 0.8em; font-weight: bold; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 15px;">Corporate Credit Ratings</h3>
+                     <div style="display: flex; gap: 15px;">
+            `;
+            memo.credit_ratings.forEach(r => {
+                html += `
+                    <div style="background:rgba(255,255,255,0.05); padding:10px 20px; border-radius:4px; border:1px solid var(--glass-border);">
+                        <div style="font-size:0.7em; color:var(--text-secondary);">${r.agency}</div>
+                        <div style="font-weight:bold; color:var(--accent-color); font-family:monospace; font-size:1.1em;">${r.rating}</div>
+                        <div style="font-size:0.7em; color:var(--text-secondary);">${r.outlook}</div>
+                    </div>
+                `;
+            });
+            html += `</div></div>`;
+        }
         
         // Equity Data
         if (memo.equity_data) {
@@ -415,11 +450,63 @@ document.addEventListener('DOMContentLoaded', async () => {
                 `;
             });
             html += `</tbody></table></div>`;
+
+            // Repayment Schedule Visualization (New)
+            const firstFacility = memo.debt_facilities[0]; // Just visualize the first one for now
+            if (firstFacility && firstFacility.repayment_schedule && firstFacility.repayment_schedule.length > 0) {
+                html += `
+                    <div style="margin-top: 30px; background: rgba(255,255,255,0.03); padding: 15px; border-radius: 4px;">
+                        <h3 style="font-size: 0.8em; font-weight: bold; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 15px;">Forecasted Debt Schedule (Facility 1)</h3>
+                        <div style="height: 180px;">
+                            <canvas id="debtChart"></canvas>
+                        </div>
+                    </div>
+                `;
+
+                // Trigger Chart render after DOM update
+                setTimeout(() => renderDebtChart(firstFacility.repayment_schedule), 100);
+            }
+
         } else {
             html += '<p style="color:var(--text-secondary); font-style:italic;">No debt facility data available.</p>';
         }
         
         return html;
+    }
+
+    function renderDebtChart(schedule) {
+        const ctx = document.getElementById('debtChart');
+        if (!ctx) return;
+        if (window.debtChartInstance) window.debtChartInstance.destroy();
+
+        window.debtChartInstance = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: schedule.map(s => s.year),
+                datasets: [
+                    {
+                        label: 'Principal Paydown',
+                        data: schedule.map(s => s.principal),
+                        backgroundColor: '#007bff',
+                        stack: 'Stack 0'
+                    },
+                    {
+                        label: 'Interest Expense',
+                        data: schedule.map(s => s.interest),
+                        backgroundColor: '#ffbb33',
+                        stack: 'Stack 0'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: { stacked: true, grid: { display: false } },
+                    y: { stacked: true, grid: { color: 'rgba(255,255,255,0.1)' } }
+                }
+            }
+        });
     }
 
     // Generator 5: Risk Quant

@@ -16,7 +16,7 @@ import logging
 from datetime import datetime
 from typing import Dict, Any, List
 
-from core.pipelines.mock_edgar import EdgarSource
+from core.pipelines.mock_edgar import MockEdgar
 
 # Configure Logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -29,7 +29,7 @@ class SovereignPipeline:
         """
         self.bundle_path = bundle_path
         self.output_dir = output_dir
-        self.edgar_source = EdgarSource()
+        self.edgar_source = MockEdgar()
 
         # Load Bundle Definitions
         self.manifest = self._load_yaml(os.path.join(bundle_path, "manifest.yaml"))
