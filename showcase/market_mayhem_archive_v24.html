@@ -103,7 +103,7 @@
         "regime_classification": {
           "status_1": "The Great Bifurcation",
           "inflation_vector_1": "Industrial AI / Energy Inflation",
-          "geopolitical_state_1": "Fractured Ouroboros / Security Tariffs"
+          "geopolitical_state_1": "Fractured Ouroboros / Security Tariffs",
           "status_2": "Constructive Reset",
           "inflation_vector_2": "Tame CPI / Disinflationary",
           "geopolitical_state_2": "Endogenous Risk Variable"
@@ -5985,10 +5985,10 @@ Hello Q2! The first quarter is in the books, and the bulls are clearly in charge
                 const data = marketData.v23_knowledge_graph.nodes;
 
                 // Regime
-                document.getElementById('sys-regime').textContent = data.macro_ecosystem.regime_classification.status.toUpperCase();
+                document.getElementById('sys-regime').textContent = (data.macro_ecosystem.regime_classification.status_1 || "UNKNOWN").toUpperCase();
 
                 // Inflation
-                document.getElementById('sys-inflation').textContent = data.macro_ecosystem.regime_classification.inflation_vector;
+                document.getElementById('sys-inflation').textContent = (data.macro_ecosystem.regime_classification.inflation_vector_1 || "UNKNOWN");
 
                 // Verdict
                 const verdict = data.strategic_synthesis.final_verdict;

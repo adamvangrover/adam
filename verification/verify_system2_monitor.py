@@ -1,63 +1,36 @@
-import time
-import subprocess
 import os
-import sys
 from playwright.sync_api import sync_playwright
 
 def verify_system2_monitor():
-    # Start HTTP Server
-    server_process = subprocess.Popen(
-        [sys.executable, "-m", "http.server", "8000"],
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
-        cwd=os.getcwd()
-    )
-    time.sleep(2) # Wait for server to start
+    file_path = os.path.abspath("showcase/high_conviction_monitor.html")
 
-    try:
-        with sync_playwright() as p:
-            browser = p.chromium.launch(headless=True)
-            page = browser.new_page()
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True)
+        page = browser.new_page()
+        page.goto(f"file://{file_path}")
 
-            # Navigate to High Conviction Monitor
-            page.goto("http://localhost:8000/showcase/high_conviction_monitor.html")
+        # Check Title
+        title = page.title()
+        print(f"Page Title: {title}")
+        assert "HIGH CONVICTION MONITOR" in title
 
-            # 1. Verify Title
-            title = page.title()
-            print(f"Page Title: {title}")
-            assert "HIGH CONVICTION MONITOR" in title
-            print("Title verified.")
+        # Check if Grid is populated (implies JS ran)
+        page.wait_for_selector(".asset-card")
+        cards = page.query_selector_all(".asset-card")
+        print(f"Asset Cards found: {len(cards)}")
+        assert len(cards) > 0
 
-            # 2. Verify Card Injection
-            page.wait_for_selector(".asset-card")
-            cards = page.query_selector_all(".asset-card")
-            print(f"Asset Cards found: {len(cards)}")
-            assert len(cards) > 0
-            print("Asset cards verified.")
+        # Check for Live Indicator
+        indicator = page.query_selector(".live-indicator")
+        assert indicator is not None, "Live indicator not found"
 
-            # 3. Verify Judge Section
-            judge_section = page.query_selector(".judge-section")
-            assert judge_section is not None
-            print("System 2 Judge section verified.")
+        # Check for Timestamp
+        timestamp = page.inner_text("#lastUpdated")
+        print(f"Timestamp: {timestamp}")
+        assert "LAST UPDATE" in timestamp or "CONNECTING" in timestamp
 
-            # 4. Verify Score Calculation (Dynamic)
-            # Check if a score badge exists and has content
-            score_badge = page.query_selector(".conviction-badge")
-            score_text = score_badge.inner_text()
-            print(f"First Conviction Score: {score_text}")
-            assert "/100" in score_text
-            print("Score calculation verified.")
-
-            # Take Screenshot
-            os.makedirs("verification_screenshots", exist_ok=True)
-            screenshot_path = "verification_screenshots/system2_monitor.png"
-            page.screenshot(path=screenshot_path)
-            print(f"Screenshot saved to {screenshot_path}")
-
-            browser.close()
-
-    finally:
-        server_process.kill()
+        print("System 2 Monitor verification passed.")
+        browser.close()
 
 if __name__ == "__main__":
     verify_system2_monitor()
