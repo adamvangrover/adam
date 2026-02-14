@@ -1,6 +1,6 @@
 import numpy as np
 import logging
-from typing import List, Tuple, Optional, Dict
+from typing import List, Tuple, Optional, Dict, Any
 from abc import ABC, abstractmethod
 
 logger = logging.getLogger(__name__)
@@ -13,6 +13,13 @@ class QuantumBackend(ABC):
     def run_circuit(self, n_qubits: int, depth: int) -> float:
         pass
 
+    def run_circuit_batch(self, n_simulations: int, n_qubits: int, depth: int) -> np.ndarray:
+        """
+        Runs multiple circuits in parallel (or vectorized simulation).
+        Default implementation just loops, subclasses should override.
+        """
+        return np.array([self.run_circuit(n_qubits, depth) for _ in range(n_simulations)])
+
 class SimulatorBackend(QuantumBackend):
     """
     Classical simulator mimicking quantum noise.
@@ -23,6 +30,12 @@ class SimulatorBackend(QuantumBackend):
         base_val = np.random.normal(0, 1)
         interference = np.sin(base_val * np.pi)
         return base_val + (interference * 0.1)
+
+    def run_circuit_batch(self, n_simulations: int, n_qubits: int, depth: int) -> np.ndarray:
+        # Vectorized version of run_circuit
+        base_vals = np.random.normal(0, 1, n_simulations)
+        interference = np.sin(base_vals * np.pi)
+        return base_vals + (interference * 0.1)
 
 class QuantumMonteCarloEngine:
     """
@@ -36,7 +49,7 @@ class QuantumMonteCarloEngine:
         self.backend = SimulatorBackend() # Fixed for now
         logger.info(f"Quantum Monte Carlo Engine initialized with {backend} backend.")
 
-    def simulate_portfolio_risk(self, initial_value: float, volatility: float, time_horizon: float) -> Dict[str, float]:
+    def simulate_portfolio_risk(self, initial_value: float, volatility: float, time_horizon: float) -> Dict[str, Any]:
         """
         Runs the simulation to calculate VaR (Value at Risk).
 
@@ -46,30 +59,28 @@ class QuantumMonteCarloEngine:
             time_horizon: Time in years.
 
         Returns:
-            Dict containing VaR_95, VaR_99, and Expected_Shortfall.
+            Dict containing VaR_95, VaR_99, Expected_Shortfall, and Quantum_Speedup_Factor.
         """
         dt = time_horizon / 252 # Daily steps assumption
-        results = []
 
-        # Classical Monte Carlo loop, enhanced with "Quantum Noise"
-        # In a real QMC, this would be replaced by a Quantum Amplitude Estimation circuit
-        for _ in range(self.n_simulations):
-            # Geometric Brownian Motion with Quantum pseudo-randomness
-            # dS = S * (mu*dt + sigma*dW)
-            # Here dW comes from our "Quantum Backend"
+        # ⚡ Bolt Optimization: Replaced Python loop with vectorized NumPy operations
+        # Generate all random dW values at once using the backend's batch method
+        dW_values = self.backend.run_circuit_batch(self.n_simulations, n_qubits=5, depth=10) * np.sqrt(dt)
 
-            dW = self.backend.run_circuit(n_qubits=5, depth=10) * np.sqrt(dt)
-
-            # Simple drift-less model for risk
-            change = initial_value * volatility * dW
-            results.append(change)
-
-        results = np.array(results)
+        # Vectorized calculation of change
+        # Simple drift-less model for risk: change = initial_value * volatility * dW
+        results = initial_value * volatility * dW_values
 
         # Calculate Risk Metrics
         var_95 = np.percentile(results, 5)
         var_99 = np.percentile(results, 1)
-        expected_shortfall = results[results < var_95].mean()
+
+        # Handle edge case where no results are below VaR (e.g. zero volatility)
+        tail_losses = results[results < var_95]
+        if len(tail_losses) > 0:
+            expected_shortfall = tail_losses.mean()
+        else:
+            expected_shortfall = 0.0
 
         return {
             "VaR_95": float(var_95),
