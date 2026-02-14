@@ -84,6 +84,11 @@ class DebtFacility(BaseModel):
     lgd: float = 0.4 # Loss Given Default (0-1)
     recovery_rate: float = 0.6 # Recovery Rate (0-1)
 
+class RepaymentScheduleItem(BaseModel):
+    year: int
+    amount: float
+    source: str # e.g. "Senior Notes", "Term Loan A"
+
 class EquityMarketData(BaseModel):
     market_cap: float
     share_price: float
@@ -178,6 +183,7 @@ class CreditMemo(BaseModel):
     risk_score: float
     credit_ratings: List[CreditRating] = []
     debt_facilities: List[DebtFacility] = []
+    repayment_schedule: List[RepaymentScheduleItem] = []
     equity_data: Optional[EquityMarketData] = None
     agent_log: List[AuditLogEntry] = []
     peer_comps: List[PeerComp] = []
