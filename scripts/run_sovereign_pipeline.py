@@ -23,7 +23,7 @@ if __name__ == "__main__":
     pipeline = SovereignPipeline(bundle_path, output_dir)
 
     # Target Universe
-    tickers = ["AAPL", "MSFT", "GOOGL", "AMZN", "NVDA"]
+    tickers = ["AAPL", "MSFT", "GOOGL", "AMZN", "NVDA", "TSLA", "META"]
 
     print(f"Running Sovereign Pipeline for {len(tickers)} companies...")
 
