@@ -63,6 +63,7 @@ class CreditMemoOrchestrator:
         ratings = spreading_engine.get_credit_ratings(borrower_name)
         debt = spreading_engine.get_debt_facilities(borrower_name)
         equity = spreading_engine.get_equity_data(borrower_name)
+        repayment_schedule = spreading_engine.get_debt_repayment_schedule(debt)
 
         # 3.3 Advanced Quant: LGD Analysis
         lgd = spreading_engine.calculate_lgd_analysis(debt, spread.total_assets)
@@ -130,6 +131,7 @@ class CreditMemoOrchestrator:
             risk_score=pd_model.model_score if pd_model else 75.0, # Use PD model score if available
             credit_ratings=ratings,
             debt_facilities=debt,
+            repayment_schedule=repayment_schedule,
             equity_data=equity
         )
 

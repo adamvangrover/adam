@@ -48911,1334 +48911,104 @@ window.MOCK_DATA = {
   },
   "credit_library": [
     {
-      "id": "TechCorp_Inc",
-      "borrower_name": "TechCorp Inc.",
-      "report_date": "2026-02-13T02:55:10.459724",
-      "risk_score": 45.0,
-      "file": "credit_memo_TechCorp_Inc.json",
-      "summary": "The borrower TechCorp Inc. presents a mixed credit profile. Financial performance shows strong EBITDA ($350.0M) but elevated leverage (8.6x)."
-    },
-    {
       "id": "Apple_Inc",
       "borrower_name": "Apple Inc.",
       "ticker": "AAPL",
       "sector": "Technology",
-      "report_date": "2026-02-13T02:55:10.464462",
-      "risk_score": 75.0,
-      "summary": "Apple Inc. (Technology) presents a stable credit profile with a BBB rating. Key drivers include revenue from cloud adoption and normalizing hardware sales.",
-      "borrower_details": {
-        "name": "Apple Inc.",
-        "ticker": "AAPL",
-        "sector": "Technology",
-        "rating": "BBB"
-      },
-      "documents": [
-        {
-          "doc_id": "doc_AAPL_10K_2026",
-          "title": "AAPL 10-K",
-          "page_count": 50,
-          "chunks": [
-            {
-              "chunk_id": "chunk_001",
-              "type": "header",
-              "page": 1,
-              "bbox": [
-                50,
-                30,
-                400,
-                60
-              ],
-              "content": "Apple Inc. (AAPL) - FORM 10-K"
-            },
-            {
-              "chunk_id": "chunk_002",
-              "type": "narrative",
-              "page": 6,
-              "bbox": [
-                50,
-                384,
-                550,
-                657
-              ],
-              "content": "Revenue driven by cloud adoption (AAPL specific context)."
-            },
-            {
-              "chunk_id": "chunk_003",
-              "type": "narrative",
-              "page": 9,
-              "bbox": [
-                50,
-                248,
-                550,
-                733
-              ],
-              "content": "AI integration boosting margins (AAPL specific context)."
-            },
-            {
-              "chunk_id": "chunk_004",
-              "type": "narrative",
-              "page": 5,
-              "bbox": [
-                50,
-                328,
-                550,
-                679
-              ],
-              "content": "Hardware sales normalizing (AAPL specific context)."
-            },
-            {
-              "chunk_id": "chunk_005",
-              "type": "financial_table",
-              "page": 25,
-              "bbox": [
-                50,
-                200,
-                550,
-                500
-              ],
-              "content": "Consolidated Financial Statements",
-              "content_json": {
-                "total_assets": 455.0,
-                "total_liabilities": 269.0,
-                "total_equity": 186.0,
-                "ebitda": 72.0,
-                "total_debt": 106.0,
-                "interest_expense": 9.1
-              }
-            },
-            {
-              "chunk_id": "chunk_006",
-              "type": "risk_factor",
-              "page": 15,
-              "bbox": [
-                50,
-                367,
-                550,
-                714
-              ],
-              "content": "Risk Factor: Supply chain disruption"
-            },
-            {
-              "chunk_id": "chunk_007",
-              "type": "risk_factor",
-              "page": 19,
-              "bbox": [
-                50,
-                509,
-                550,
-                737
-              ],
-              "content": "Risk Factor: Rapid technological obsolescence"
-            },
-            {
-              "chunk_id": "chunk_008",
-              "type": "risk_factor",
-              "page": 18,
-              "bbox": [
-                50,
-                111,
-                550,
-                720
-              ],
-              "content": "Risk Factor: Data privacy regulation"
-            }
-          ]
-        }
-      ],
-      "market_data": {
-        "sentiment": 0.5562661191442066,
-        "trend": "Bullish"
-      }
+      "report_date": "2026-02-14T02:03:14.558313",
+      "risk_score": 80.0,
+      "file": "credit_memo_Apple_Inc.json",
+      "summary": "The borrower Apple Inc. presents a mixed credit profile. Financial performance shows strong EBITDA ($142000.0M) but elevated leverage (2.1x).  [Ref: A..."
     },
     {
       "id": "Microsoft_Corp",
       "borrower_name": "Microsoft Corp",
       "ticker": "MSFT",
       "sector": "Technology",
-      "report_date": "2026-02-13T01:31:38.448Z",
-      "risk_score": 92.0,
-      "summary": "Microsoft Corp maintains a pristine AAA rating. The analysis highlights significant margins driven by AI integration and a strong balance sheet.",
-      "borrower_details": {
-        "name": "Microsoft Corp",
-        "ticker": "MSFT",
-        "sector": "Technology",
-        "rating": "AAA"
-      },
-      "documents": [
-        {
-          "doc_id": "doc_MSFT_10K_2026",
-          "title": "MSFT 10-K",
-          "page_count": 50,
-          "chunks": [
-            {
-              "chunk_id": "chunk_001",
-              "type": "header",
-              "page": 1,
-              "bbox": [
-                50,
-                30,
-                400,
-                60
-              ],
-              "content": "Microsoft Corp (MSFT) - FORM 10-K"
-            },
-            {
-              "chunk_id": "chunk_002",
-              "type": "narrative",
-              "page": 10,
-              "bbox": [
-                50,
-                577,
-                550,
-                750
-              ],
-              "content": "Revenue driven by cloud adoption (MSFT specific context)."
-            },
-            {
-              "chunk_id": "chunk_003",
-              "type": "narrative",
-              "page": 10,
-              "bbox": [
-                50,
-                370,
-                550,
-                674
-              ],
-              "content": "AI integration boosting margins (MSFT specific context)."
-            },
-            {
-              "chunk_id": "chunk_004",
-              "type": "narrative",
-              "page": 10,
-              "bbox": [
-                50,
-                303,
-                550,
-                738
-              ],
-              "content": "Hardware sales normalizing (MSFT specific context)."
-            },
-            {
-              "chunk_id": "chunk_005",
-              "type": "financial_table",
-              "page": 25,
-              "bbox": [
-                50,
-                200,
-                550,
-                500
-              ],
-              "content": "Consolidated Financial Statements",
-              "content_json": {
-                "total_assets": 301.0,
-                "total_liabilities": 240.0,
-                "total_equity": 61.0,
-                "ebitda": 56.0,
-                "total_debt": 98.0,
-                "interest_expense": 6.02
-              }
-            },
-            {
-              "chunk_id": "chunk_006",
-              "type": "risk_factor",
-              "page": 17,
-              "bbox": [
-                50,
-                427,
-                550,
-                688
-              ],
-              "content": "Risk Factor: Supply chain disruption"
-            },
-            {
-              "chunk_id": "chunk_007",
-              "type": "risk_factor",
-              "page": 15,
-              "bbox": [
-                50,
-                245,
-                550,
-                707
-              ],
-              "content": "Risk Factor: Rapid technological obsolescence"
-            },
-            {
-              "chunk_id": "chunk_008",
-              "type": "risk_factor",
-              "page": 15,
-              "bbox": [
-                50,
-                229,
-                550,
-                698
-              ],
-              "content": "Risk Factor: Data privacy regulation"
-            }
-          ]
-        }
-      ],
-      "market_data": {
-        "sentiment": 0.8582996295554622,
-        "trend": "Bearish"
-      }
+      "report_date": "2026-02-14T02:03:14.560509",
+      "risk_score": 60.0,
+      "file": "credit_memo_Microsoft_Corp.json",
+      "summary": "The borrower Microsoft Corp presents a mixed credit profile. Financial performance shows strong EBITDA ($5.0M) but elevated leverage (10.0x).  [Ref: T..."
     },
     {
       "id": "NVIDIA_Corp",
       "borrower_name": "NVIDIA Corp",
       "ticker": "NVDA",
       "sector": "Technology",
-      "report_date": "2026-02-13T01:31:38.449Z",
-      "risk_score": 78.0,
-      "summary": "NVIDIA Corp (BBB+) shows aggressive growth but faces risks regarding supply chain concentration and rapid technological obsolescence.",
-      "borrower_details": {
-        "name": "NVIDIA Corp",
-        "ticker": "NVDA",
-        "sector": "Technology",
-        "rating": "BBB+"
-      },
-      "documents": [
-        {
-          "doc_id": "doc_NVDA_10K_2026",
-          "title": "NVDA 10-K",
-          "page_count": 50,
-          "chunks": [
-            {
-              "chunk_id": "chunk_001",
-              "type": "header",
-              "page": 1,
-              "bbox": [
-                50,
-                30,
-                400,
-                60
-              ],
-              "content": "NVIDIA Corp (NVDA) - FORM 10-K"
-            },
-            {
-              "chunk_id": "chunk_002",
-              "type": "narrative",
-              "page": 7,
-              "bbox": [
-                50,
-                447,
-                550,
-                692
-              ],
-              "content": "Revenue driven by cloud adoption (NVDA specific context)."
-            },
-            {
-              "chunk_id": "chunk_003",
-              "type": "narrative",
-              "page": 3,
-              "bbox": [
-                50,
-                402,
-                550,
-                683
-              ],
-              "content": "AI integration boosting margins (NVDA specific context)."
-            },
-            {
-              "chunk_id": "chunk_004",
-              "type": "narrative",
-              "page": 7,
-              "bbox": [
-                50,
-                435,
-                550,
-                693
-              ],
-              "content": "Hardware sales normalizing (NVDA specific context)."
-            },
-            {
-              "chunk_id": "chunk_005",
-              "type": "financial_table",
-              "page": 25,
-              "bbox": [
-                50,
-                200,
-                550,
-                500
-              ],
-              "content": "Consolidated Financial Statements",
-              "content_json": {
-                "total_assets": 133.0,
-                "total_liabilities": 94.0,
-                "total_equity": 39.0,
-                "ebitda": 13.0,
-                "total_debt": 28.0,
-                "interest_expense": 2.66
-              }
-            },
-            {
-              "chunk_id": "chunk_006",
-              "type": "risk_factor",
-              "page": 17,
-              "bbox": [
-                50,
-                522,
-                550,
-                690
-              ],
-              "content": "Risk Factor: Supply chain disruption"
-            },
-            {
-              "chunk_id": "chunk_007",
-              "type": "risk_factor",
-              "page": 17,
-              "bbox": [
-                50,
-                158,
-                550,
-                720
-              ],
-              "content": "Risk Factor: Rapid technological obsolescence"
-            },
-            {
-              "chunk_id": "chunk_008",
-              "type": "risk_factor",
-              "page": 15,
-              "bbox": [
-                50,
-                262,
-                550,
-                731
-              ],
-              "content": "Risk Factor: Data privacy regulation"
-            }
-          ]
-        }
-      ],
-      "market_data": {
-        "sentiment": 0.8095491948154185,
-        "trend": "Bullish"
-      }
+      "report_date": "2026-02-14T02:03:14.561605",
+      "risk_score": 60.0,
+      "file": "credit_memo_NVIDIA_Corp.json",
+      "summary": "The borrower NVIDIA Corp presents a mixed credit profile. Financial performance shows strong EBITDA ($5.0M) but elevated leverage (10.0x).  [Ref: Tech..."
     },
     {
       "id": "Alphabet_Inc",
       "borrower_name": "Alphabet Inc.",
       "ticker": "GOOGL",
       "sector": "Technology",
-      "report_date": "2026-02-13T01:31:38.451Z",
-      "risk_score": 79.0,
-      "summary": "Alphabet Inc. is rated BBB+ with a bearish market sentiment trend. Key risks include data privacy regulation and potential antitrust actions.",
-      "borrower_details": {
-        "name": "Alphabet Inc.",
-        "ticker": "GOOGL",
-        "sector": "Technology",
-        "rating": "BBB+"
-      },
-      "documents": [
-        {
-          "doc_id": "doc_GOOGL_10K_2026",
-          "title": "GOOGL 10-K",
-          "page_count": 50,
-          "chunks": [
-            {
-              "chunk_id": "chunk_001",
-              "type": "header",
-              "page": 1,
-              "bbox": [
-                50,
-                30,
-                400,
-                60
-              ],
-              "content": "Alphabet Inc. (GOOGL) - FORM 10-K"
-            },
-            {
-              "chunk_id": "chunk_002",
-              "type": "narrative",
-              "page": 8,
-              "bbox": [
-                50,
-                126,
-                550,
-                688
-              ],
-              "content": "Revenue driven by cloud adoption (GOOGL specific context)."
-            },
-            {
-              "chunk_id": "chunk_003",
-              "type": "narrative",
-              "page": 5,
-              "bbox": [
-                50,
-                357,
-                550,
-                675
-              ],
-              "content": "AI integration boosting margins (GOOGL specific context)."
-            },
-            {
-              "chunk_id": "chunk_004",
-              "type": "narrative",
-              "page": 4,
-              "bbox": [
-                50,
-                263,
-                550,
-                687
-              ],
-              "content": "Hardware sales normalizing (GOOGL specific context)."
-            },
-            {
-              "chunk_id": "chunk_005",
-              "type": "financial_table",
-              "page": 25,
-              "bbox": [
-                50,
-                200,
-                550,
-                500
-              ],
-              "content": "Consolidated Financial Statements",
-              "content_json": {
-                "total_assets": 343.0,
-                "total_liabilities": 223.0,
-                "total_equity": 120.0,
-                "ebitda": 50.0,
-                "total_debt": 111.0,
-                "interest_expense": 6.86
-              }
-            },
-            {
-              "chunk_id": "chunk_006",
-              "type": "risk_factor",
-              "page": 15,
-              "bbox": [
-                50,
-                121,
-                550,
-                717
-              ],
-              "content": "Risk Factor: Supply chain disruption"
-            },
-            {
-              "chunk_id": "chunk_007",
-              "type": "risk_factor",
-              "page": 16,
-              "bbox": [
-                50,
-                525,
-                550,
-                720
-              ],
-              "content": "Risk Factor: Rapid technological obsolescence"
-            },
-            {
-              "chunk_id": "chunk_008",
-              "type": "risk_factor",
-              "page": 17,
-              "bbox": [
-                50,
-                361,
-                550,
-                699
-              ],
-              "content": "Risk Factor: Data privacy regulation"
-            }
-          ]
-        }
-      ],
-      "market_data": {
-        "sentiment": 0.5544545887013579,
-        "trend": "Bearish"
-      }
+      "report_date": "2026-02-14T02:03:14.562725",
+      "risk_score": 60.0,
+      "file": "credit_memo_Alphabet_Inc.json",
+      "summary": "The borrower Alphabet Inc. presents a mixed credit profile. Financial performance shows strong EBITDA ($5.0M) but elevated leverage (10.0x).  [Ref: Te..."
     },
     {
-      "id": "Amazon_com_Inc",
+      "id": "Amazoncom_Inc",
       "borrower_name": "Amazon.com Inc.",
       "ticker": "AMZN",
       "sector": "Consumer",
-      "report_date": "2026-02-13T01:31:38.452Z",
-      "risk_score": 76.0,
-      "summary": "Amazon (Consumer) faces inflationary pressure and supply chain costs, impacting its BBB+ rating. Pivot to direct-to-consumer models supports EBITDA.",
-      "borrower_details": {
-        "name": "Amazon.com Inc.",
-        "ticker": "AMZN",
-        "sector": "Consumer",
-        "rating": "BBB+"
-      },
-      "documents": [
-        {
-          "doc_id": "doc_AMZN_10K_2026",
-          "title": "AMZN 10-K",
-          "page_count": 50,
-          "chunks": [
-            {
-              "chunk_id": "chunk_001",
-              "type": "header",
-              "page": 1,
-              "bbox": [
-                50,
-                30,
-                400,
-                60
-              ],
-              "content": "Amazon.com Inc. (AMZN) - FORM 10-K"
-            },
-            {
-              "chunk_id": "chunk_002",
-              "type": "narrative",
-              "page": 7,
-              "bbox": [
-                50,
-                482,
-                550,
-                662
-              ],
-              "content": "E-commerce channel growth (AMZN specific context)."
-            },
-            {
-              "chunk_id": "chunk_003",
-              "type": "narrative",
-              "page": 8,
-              "bbox": [
-                50,
-                477,
-                550,
-                745
-              ],
-              "content": "Direct-to-consumer pivot (AMZN specific context)."
-            },
-            {
-              "chunk_id": "chunk_004",
-              "type": "narrative",
-              "page": 7,
-              "bbox": [
-                50,
-                493,
-                550,
-                660
-              ],
-              "content": "Inventory levels elevated (AMZN specific context)."
-            },
-            {
-              "chunk_id": "chunk_005",
-              "type": "financial_table",
-              "page": 25,
-              "bbox": [
-                50,
-                200,
-                550,
-                500
-              ],
-              "content": "Consolidated Financial Statements",
-              "content_json": {
-                "total_assets": 382.0,
-                "total_liabilities": 224.0,
-                "total_equity": 158.0,
-                "ebitda": 67.0,
-                "total_debt": 79.0,
-                "interest_expense": 7.64
-              }
-            },
-            {
-              "chunk_id": "chunk_006",
-              "type": "risk_factor",
-              "page": 18,
-              "bbox": [
-                50,
-                465,
-                550,
-                703
-              ],
-              "content": "Risk Factor: Inflationary pressure"
-            },
-            {
-              "chunk_id": "chunk_007",
-              "type": "risk_factor",
-              "page": 15,
-              "bbox": [
-                50,
-                308,
-                550,
-                749
-              ],
-              "content": "Risk Factor: Supply chain costs"
-            },
-            {
-              "chunk_id": "chunk_008",
-              "type": "risk_factor",
-              "page": 19,
-              "bbox": [
-                50,
-                590,
-                550,
-                726
-              ],
-              "content": "Risk Factor: Shift in consumer spending"
-            }
-          ]
-        }
-      ],
-      "market_data": {
-        "sentiment": 0.8575813509675454,
-        "trend": "Neutral"
-      }
+      "report_date": "2026-02-14T02:03:14.563687",
+      "risk_score": 60.0,
+      "file": "credit_memo_Amazoncom_Inc.json",
+      "summary": "The borrower Amazon.com Inc. presents a mixed credit profile. Financial performance shows strong EBITDA ($5.0M) but elevated leverage (10.0x).  [Ref: ..."
     },
     {
       "id": "Tesla_Inc",
       "borrower_name": "Tesla Inc.",
       "ticker": "TSLA",
       "sector": "Consumer",
-      "report_date": "2026-02-13T02:55:10.466287",
-      "risk_score": 75.0,
+      "report_date": "2026-02-14T02:03:14.564915",
+      "risk_score": 80.0,
       "file": "credit_memo_Tesla_Inc.json",
-      "summary": "Tesla Inc. (BBB) exhibits elevated inventory levels and exposure to consumer spending shifts. High leverage relative to peers remains a concern.",
-      "borrower_details": {
-        "name": "Tesla Inc.",
-        "ticker": "TSLA",
-        "sector": "Consumer",
-        "rating": "BBB"
-      },
-      "documents": [
-        {
-          "doc_id": "doc_TSLA_10K_2026",
-          "title": "TSLA 10-K",
-          "page_count": 50,
-          "chunks": [
-            {
-              "chunk_id": "chunk_001",
-              "type": "header",
-              "page": 1,
-              "bbox": [
-                50,
-                30,
-                400,
-                60
-              ],
-              "content": "Tesla Inc. (TSLA) - FORM 10-K"
-            },
-            {
-              "chunk_id": "chunk_002",
-              "type": "narrative",
-              "page": 9,
-              "bbox": [
-                50,
-                317,
-                550,
-                682
-              ],
-              "content": "E-commerce channel growth (TSLA specific context)."
-            },
-            {
-              "chunk_id": "chunk_003",
-              "type": "narrative",
-              "page": 4,
-              "bbox": [
-                50,
-                119,
-                550,
-                680
-              ],
-              "content": "Direct-to-consumer pivot (TSLA specific context)."
-            },
-            {
-              "chunk_id": "chunk_004",
-              "type": "narrative",
-              "page": 10,
-              "bbox": [
-                50,
-                520,
-                550,
-                748
-              ],
-              "content": "Inventory levels elevated (TSLA specific context)."
-            },
-            {
-              "chunk_id": "chunk_005",
-              "type": "financial_table",
-              "page": 25,
-              "bbox": [
-                50,
-                200,
-                550,
-                500
-              ],
-              "content": "Consolidated Financial Statements",
-              "content_json": {
-                "total_assets": 391.0,
-                "total_liabilities": 211.0,
-                "total_equity": 180.0,
-                "ebitda": 57.0,
-                "total_debt": 183.0,
-                "interest_expense": 7.82
-              }
-            },
-            {
-              "chunk_id": "chunk_006",
-              "type": "risk_factor",
-              "page": 18,
-              "bbox": [
-                50,
-                533,
-                550,
-                688
-              ],
-              "content": "Risk Factor: Inflationary pressure"
-            },
-            {
-              "chunk_id": "chunk_007",
-              "type": "risk_factor",
-              "page": 17,
-              "bbox": [
-                50,
-                486,
-                550,
-                658
-              ],
-              "content": "Risk Factor: Supply chain costs"
-            },
-            {
-              "chunk_id": "chunk_008",
-              "type": "risk_factor",
-              "page": 20,
-              "bbox": [
-                50,
-                471,
-                550,
-                734
-              ],
-              "content": "Risk Factor: Shift in consumer spending"
-            }
-          ]
-        }
-      ],
-      "market_data": {
-        "sentiment": 0.5125647438956498,
-        "trend": "Neutral"
-      }
+      "summary": "The borrower Tesla Inc. presents a mixed credit profile. Financial performance shows strong EBITDA ($25000.0M) but elevated leverage (2.0x).  [Ref: TS..."
     },
     {
       "id": "Meta_Platforms",
       "borrower_name": "Meta Platforms",
       "ticker": "META",
       "sector": "Technology",
-      "report_date": "2026-02-13T01:31:38.455Z",
-      "risk_score": 77.0,
-      "summary": "Meta Platforms (BBB+) is navigating data privacy regulations while boosting margins through AI. The financial position is stable with $390.0B in assets.",
-      "borrower_details": {
-        "name": "Meta Platforms",
-        "ticker": "META",
-        "sector": "Technology",
-        "rating": "BBB+"
-      },
-      "documents": [
-        {
-          "doc_id": "doc_META_10K_2026",
-          "title": "META 10-K",
-          "page_count": 50,
-          "chunks": [
-            {
-              "chunk_id": "chunk_001",
-              "type": "header",
-              "page": 1,
-              "bbox": [
-                50,
-                30,
-                400,
-                60
-              ],
-              "content": "Meta Platforms (META) - FORM 10-K"
-            },
-            {
-              "chunk_id": "chunk_002",
-              "type": "narrative",
-              "page": 8,
-              "bbox": [
-                50,
-                452,
-                550,
-                670
-              ],
-              "content": "Revenue driven by cloud adoption (META specific context)."
-            },
-            {
-              "chunk_id": "chunk_003",
-              "type": "narrative",
-              "page": 10,
-              "bbox": [
-                50,
-                100,
-                550,
-                670
-              ],
-              "content": "AI integration boosting margins (META specific context)."
-            },
-            {
-              "chunk_id": "chunk_004",
-              "type": "narrative",
-              "page": 6,
-              "bbox": [
-                50,
-                309,
-                550,
-                745
-              ],
-              "content": "Hardware sales normalizing (META specific context)."
-            },
-            {
-              "chunk_id": "chunk_005",
-              "type": "financial_table",
-              "page": 25,
-              "bbox": [
-                50,
-                200,
-                550,
-                500
-              ],
-              "content": "Consolidated Financial Statements",
-              "content_json": {
-                "total_assets": 390.0,
-                "total_liabilities": 286.0,
-                "total_equity": 104.0,
-                "ebitda": 70.0,
-                "total_debt": 125.0,
-                "interest_expense": 7.8
-              }
-            },
-            {
-              "chunk_id": "chunk_006",
-              "type": "risk_factor",
-              "page": 18,
-              "bbox": [
-                50,
-                508,
-                550,
-                735
-              ],
-              "content": "Risk Factor: Supply chain disruption"
-            },
-            {
-              "chunk_id": "chunk_007",
-              "type": "risk_factor",
-              "page": 15,
-              "bbox": [
-                50,
-                392,
-                550,
-                662
-              ],
-              "content": "Risk Factor: Rapid technological obsolescence"
-            },
-            {
-              "chunk_id": "chunk_008",
-              "type": "risk_factor",
-              "page": 19,
-              "bbox": [
-                50,
-                263,
-                550,
-                722
-              ],
-              "content": "Risk Factor: Data privacy regulation"
-            }
-          ]
-        }
-      ],
-      "market_data": {
-        "sentiment": 0.5846905078388187,
-        "trend": "Neutral"
-      }
+      "report_date": "2026-02-14T02:03:14.566038",
+      "risk_score": 60.0,
+      "file": "credit_memo_Meta_Platforms.json",
+      "summary": "The borrower Meta Platforms presents a mixed credit profile. Financial performance shows strong EBITDA ($5.0M) but elevated leverage (10.0x).  [Ref: T..."
     },
     {
       "id": "JPMorgan_Chase",
       "borrower_name": "JPMorgan Chase",
       "ticker": "JPM",
       "sector": "Financial",
-      "report_date": "2026-02-13T02:55:10.467372",
-      "risk_score": 45.0,
+      "report_date": "2026-02-14T02:03:14.567333",
+      "risk_score": 60.0,
       "file": "credit_memo_JPMorgan_Chase.json",
-      "summary": "JPMorgan Chase (AA) demonstrates resilience despite interest rate volatility. Trading revenue has outperformed, contributing to a strong $68.0B EBITDA.",
-      "borrower_details": {
-        "name": "JPMorgan Chase",
-        "ticker": "JPM",
-        "sector": "Financial",
-        "rating": "AA"
-      },
-      "documents": [
-        {
-          "doc_id": "doc_JPM_10K_2026",
-          "title": "JPM 10-K",
-          "page_count": 50,
-          "chunks": [
-            {
-              "chunk_id": "chunk_001",
-              "type": "header",
-              "page": 1,
-              "bbox": [
-                50,
-                30,
-                400,
-                60
-              ],
-              "content": "JPMorgan Chase (JPM) - FORM 10-K"
-            },
-            {
-              "chunk_id": "chunk_002",
-              "type": "narrative",
-              "page": 4,
-              "bbox": [
-                50,
-                486,
-                550,
-                699
-              ],
-              "content": "Net interest income expanded (JPM specific context)."
-            },
-            {
-              "chunk_id": "chunk_003",
-              "type": "narrative",
-              "page": 7,
-              "bbox": [
-                50,
-                297,
-                550,
-                737
-              ],
-              "content": "Investment banking fees muted (JPM specific context)."
-            },
-            {
-              "chunk_id": "chunk_004",
-              "type": "narrative",
-              "page": 3,
-              "bbox": [
-                50,
-                220,
-                550,
-                749
-              ],
-              "content": "Trading revenue outperformed (JPM specific context)."
-            },
-            {
-              "chunk_id": "chunk_005",
-              "type": "financial_table",
-              "page": 25,
-              "bbox": [
-                50,
-                200,
-                550,
-                500
-              ],
-              "content": "Consolidated Financial Statements",
-              "content_json": {
-                "total_assets": 473.0,
-                "total_liabilities": 291.0,
-                "total_equity": 182.0,
-                "ebitda": 68.0,
-                "total_debt": 213.0,
-                "interest_expense": 9.46
-              }
-            },
-            {
-              "chunk_id": "chunk_006",
-              "type": "risk_factor",
-              "page": 17,
-              "bbox": [
-                50,
-                273,
-                550,
-                680
-              ],
-              "content": "Risk Factor: Interest rate volatility"
-            },
-            {
-              "chunk_id": "chunk_007",
-              "type": "risk_factor",
-              "page": 16,
-              "bbox": [
-                50,
-                423,
-                550,
-                652
-              ],
-              "content": "Risk Factor: Credit default rise"
-            },
-            {
-              "chunk_id": "chunk_008",
-              "type": "risk_factor",
-              "page": 15,
-              "bbox": [
-                50,
-                483,
-                550,
-                740
-              ],
-              "content": "Risk Factor: Regulatory capital requirements"
-            }
-          ]
-        }
-      ],
-      "market_data": {
-        "sentiment": 0.4238490822842891,
-        "trend": "Bullish"
-      }
+      "summary": "The borrower JPMorgan Chase presents a mixed credit profile. Financial performance shows strong EBITDA ($95000.0M) but elevated leverage (9.5x).  [Ref..."
     },
     {
       "id": "Goldman_Sachs",
       "borrower_name": "Goldman Sachs",
       "ticker": "GS",
       "sector": "Financial",
-      "report_date": "2026-02-13T01:31:38.458Z",
-      "risk_score": 72.0,
-      "summary": "Goldman Sachs holds a BBB rating. The firm is managing regulatory capital requirements and credit default risks. Strong trading revenue supports EBITDA.",
-      "borrower_details": {
-        "name": "Goldman Sachs",
-        "ticker": "GS",
-        "sector": "Financial",
-        "rating": "BBB"
-      },
-      "documents": [
-        {
-          "doc_id": "doc_GS_10K_2026",
-          "title": "GS 10-K",
-          "page_count": 50,
-          "chunks": [
-            {
-              "chunk_id": "chunk_001",
-              "type": "header",
-              "page": 1,
-              "bbox": [
-                50,
-                30,
-                400,
-                60
-              ],
-              "content": "Goldman Sachs (GS) - FORM 10-K"
-            },
-            {
-              "chunk_id": "chunk_002",
-              "type": "narrative",
-              "page": 8,
-              "bbox": [
-                50,
-                103,
-                550,
-                666
-              ],
-              "content": "Net interest income expanded (GS specific context)."
-            },
-            {
-              "chunk_id": "chunk_003",
-              "type": "narrative",
-              "page": 10,
-              "bbox": [
-                50,
-                580,
-                550,
-                657
-              ],
-              "content": "Investment banking fees muted (GS specific context)."
-            },
-            {
-              "chunk_id": "chunk_004",
-              "type": "narrative",
-              "page": 8,
-              "bbox": [
-                50,
-                286,
-                550,
-                747
-              ],
-              "content": "Trading revenue outperformed (GS specific context)."
-            },
-            {
-              "chunk_id": "chunk_005",
-              "type": "financial_table",
-              "page": 25,
-              "bbox": [
-                50,
-                200,
-                550,
-                500
-              ],
-              "content": "Consolidated Financial Statements",
-              "content_json": {
-                "total_assets": 466.0,
-                "total_liabilities": 367.0,
-                "total_equity": 99.0,
-                "ebitda": 87.0,
-                "total_debt": 230.0,
-                "interest_expense": 9.32
-              }
-            },
-            {
-              "chunk_id": "chunk_006",
-              "type": "risk_factor",
-              "page": 20,
-              "bbox": [
-                50,
-                528,
-                550,
-                667
-              ],
-              "content": "Risk Factor: Interest rate volatility"
-            },
-            {
-              "chunk_id": "chunk_007",
-              "type": "risk_factor",
-              "page": 16,
-              "bbox": [
-                50,
-                333,
-                550,
-                696
-              ],
-              "content": "Risk Factor: Credit default rise"
-            },
-            {
-              "chunk_id": "chunk_008",
-              "type": "risk_factor",
-              "page": 17,
-              "bbox": [
-                50,
-                148,
-                550,
-                727
-              ],
-              "content": "Risk Factor: Regulatory capital requirements"
-            }
-          ]
-        }
-      ],
-      "market_data": {
-        "sentiment": 0.5324114742699515,
-        "trend": "Bullish"
-      }
+      "report_date": "2026-02-14T02:03:14.568300",
+      "risk_score": 60.0,
+      "file": "credit_memo_Goldman_Sachs.json",
+      "summary": "The borrower Goldman Sachs presents a mixed credit profile. Financial performance shows strong EBITDA ($5.0M) but elevated leverage (10.0x).  [Ref: Ge..."
     },
     {
       "id": "Bank_of_America",
       "borrower_name": "Bank of America",
       "ticker": "BAC",
       "sector": "Financial",
-      "report_date": "2026-02-13T01:31:38.459Z",
-      "risk_score": 74.0,
-      "summary": "Bank of America (BBB+) has seen net interest income expand, though market trend is bearish. The bank maintains a conservative leverage profile.",
-      "borrower_details": {
-        "name": "Bank of America",
-        "ticker": "BAC",
-        "sector": "Financial",
-        "rating": "BBB+"
-      },
-      "documents": [
-        {
-          "doc_id": "doc_BAC_10K_2026",
-          "title": "BAC 10-K",
-          "page_count": 50,
-          "chunks": [
-            {
-              "chunk_id": "chunk_001",
-              "type": "header",
-              "page": 1,
-              "bbox": [
-                50,
-                30,
-                400,
-                60
-              ],
-              "content": "Bank of America (BAC) - FORM 10-K"
-            },
-            {
-              "chunk_id": "chunk_002",
-              "type": "narrative",
-              "page": 6,
-              "bbox": [
-                50,
-                301,
-                550,
-                696
-              ],
-              "content": "Net interest income expanded (BAC specific context)."
-            },
-            {
-              "chunk_id": "chunk_003",
-              "type": "narrative",
-              "page": 3,
-              "bbox": [
-                50,
-                291,
-                550,
-                652
-              ],
-              "content": "Investment banking fees muted (BAC specific context)."
-            },
-            {
-              "chunk_id": "chunk_004",
-              "type": "narrative",
-              "page": 8,
-              "bbox": [
-                50,
-                149,
-                550,
-                705
-              ],
-              "content": "Trading revenue outperformed (BAC specific context)."
-            },
-            {
-              "chunk_id": "chunk_005",
-              "type": "financial_table",
-              "page": 25,
-              "bbox": [
-                50,
-                200,
-                550,
-                500
-              ],
-              "content": "Consolidated Financial Statements",
-              "content_json": {
-                "total_assets": 272.0,
-                "total_liabilities": 217.0,
-                "total_equity": 55.0,
-                "ebitda": 51.0,
-                "total_debt": 103.0,
-                "interest_expense": 5.44
-              }
-            },
-            {
-              "chunk_id": "chunk_006",
-              "type": "risk_factor",
-              "page": 17,
-              "bbox": [
-                50,
-                181,
-                550,
-                747
-              ],
-              "content": "Risk Factor: Interest rate volatility"
-            },
-            {
-              "chunk_id": "chunk_007",
-              "type": "risk_factor",
-              "page": 19,
-              "bbox": [
-                50,
-                453,
-                550,
-                712
-              ],
-              "content": "Risk Factor: Credit default rise"
-            },
-            {
-              "chunk_id": "chunk_008",
-              "type": "risk_factor",
-              "page": 17,
-              "bbox": [
-                50,
-                273,
-                550,
-                664
-              ],
-              "content": "Risk Factor: Regulatory capital requirements"
-            }
-          ]
-        }
-      ],
-      "market_data": {
-        "sentiment": 0.777104784874584,
-        "trend": "Bearish"
-      }
+      "report_date": "2026-02-14T02:03:14.569251",
+      "risk_score": 60.0,
+      "file": "credit_memo_Bank_of_America.json",
+      "summary": "The borrower Bank of America presents a mixed credit profile. Financial performance shows strong EBITDA ($5.0M) but elevated leverage (10.0x).  [Ref: ..."
     }
   ],
   "credit_memos": {
@@ -50373,539 +49143,1231 @@ window.MOCK_DATA = {
       }
     },
     "TechCorp_Inc": {
-      "id": "TechCorp_Inc",
       "borrower_name": "TechCorp Inc.",
       "report_date": "2026-02-13T02:55:10.459724",
-      "risk_score": 45.0,
-      "file": "credit_memo_TechCorp_Inc.json",
-      "summary": "The borrower TechCorp Inc. presents a mixed credit profile. Financial performance shows strong EBITDA ($350.0M) but elevated leverage (8.6x)."
-    },
-    "Apple_Inc": {
-      "id": "Apple_Inc",
-      "borrower_name": "Apple Inc.",
-      "ticker": "AAPL",
-      "sector": "Technology",
-      "report_date": "2026-02-13T02:55:10.464462",
-      "risk_score": 75.0,
-      "summary": "Apple Inc. (Technology) presents a stable credit profile with a BBB rating. Key drivers include revenue from cloud adoption and normalizing hardware sales.",
-      "borrower_details": {
-        "name": "Apple Inc.",
-        "ticker": "AAPL",
-        "sector": "Technology",
-        "rating": "BBB"
-      },
-      "documents": [
+      "executive_summary": "The borrower TechCorp Inc. presents a mixed credit profile. Financial performance shows strong EBITDA ($350.0M) but elevated leverage (8.6x).  [Ref: TechCorp_10K_2025.pdf]",
+      "sections": [
         {
-          "doc_id": "doc_AAPL_10K_2026",
-          "title": "AAPL 10-K",
-          "page_count": 50,
-          "chunks": [
+          "title": "Executive Summary",
+          "content": "The borrower TechCorp Inc. presents a mixed credit profile. Financial performance shows strong EBITDA ($350.0M) but elevated leverage (8.6x).  [Ref: TechCorp_10K_2025.pdf]",
+          "citations": [
             {
-              "chunk_id": "chunk_001",
-              "type": "header",
-              "page": 1,
-              "bbox": [
-                50,
-                30,
-                400,
-                60
-              ],
-              "content": "Apple Inc. (AAPL) - FORM 10-K"
-            },
-            {
-              "chunk_id": "chunk_002",
-              "type": "narrative",
-              "page": 6,
-              "bbox": [
-                50,
-                384,
-                550,
-                657
-              ],
-              "content": "Revenue driven by cloud adoption (AAPL specific context)."
-            },
-            {
-              "chunk_id": "chunk_003",
-              "type": "narrative",
-              "page": 9,
-              "bbox": [
-                50,
-                248,
-                550,
-                733
-              ],
-              "content": "AI integration boosting margins (AAPL specific context)."
-            },
-            {
-              "chunk_id": "chunk_004",
-              "type": "narrative",
-              "page": 5,
-              "bbox": [
-                50,
-                328,
-                550,
-                679
-              ],
-              "content": "Hardware sales normalizing (AAPL specific context)."
-            },
-            {
-              "chunk_id": "chunk_005",
-              "type": "financial_table",
-              "page": 25,
-              "bbox": [
-                50,
-                200,
-                550,
-                500
-              ],
-              "content": "Consolidated Financial Statements",
-              "content_json": {
-                "total_assets": 455.0,
-                "total_liabilities": 269.0,
-                "total_equity": 186.0,
-                "ebitda": 72.0,
-                "total_debt": 106.0,
-                "interest_expense": 9.1
-              }
-            },
-            {
-              "chunk_id": "chunk_006",
-              "type": "risk_factor",
-              "page": 15,
-              "bbox": [
-                50,
-                367,
-                550,
-                714
-              ],
-              "content": "Risk Factor: Supply chain disruption"
-            },
-            {
-              "chunk_id": "chunk_007",
-              "type": "risk_factor",
-              "page": 19,
-              "bbox": [
-                50,
-                509,
-                550,
-                737
-              ],
-              "content": "Risk Factor: Rapid technological obsolescence"
-            },
-            {
-              "chunk_id": "chunk_008",
-              "type": "risk_factor",
-              "page": 18,
-              "bbox": [
-                50,
-                111,
-                550,
-                720
-              ],
-              "content": "Risk Factor: Data privacy regulation"
+              "doc_id": "TechCorp_10K_2025.pdf",
+              "chunk_id": "bf57b34d-cbc1-4ce5-a323-c928d2214657",
+              "page_number": 3
             }
-          ]
+          ],
+          "author_agent": "Writer"
+        },
+        {
+          "title": "Key Risks & Mitigants",
+          "content": "Key Risks:\n- HIGH: Leverage ratio exceeds 4.0x policy limit.\n",
+          "citations": [],
+          "author_agent": "Risk Officer"
+        },
+        {
+          "title": "Financial Analysis",
+          "content": "EBITDA: $350.0M | Leverage: 8.6x",
+          "citations": [],
+          "author_agent": "Quant"
         }
       ],
-      "market_data": {
-        "sentiment": 0.5562661191442066,
-        "trend": "Bullish"
+      "financial_ratios": {
+        "leverage_ratio": 8.571428571428571,
+        "dscr": 7.0,
+        "current_ratio": 1.5,
+        "revenue": 1200.0,
+        "ebitda": 350.0,
+        "net_income": 150.0
+      },
+      "historical_financials": [
+        {
+          "total_assets": 5000.0,
+          "total_liabilities": 3000.0,
+          "total_equity": 2000.0,
+          "revenue": 1200.0,
+          "ebitda": 350.0,
+          "net_income": 150.0,
+          "interest_expense": 50.0,
+          "dscr": 7.0,
+          "leverage_ratio": 8.571428571428571,
+          "current_ratio": 1.5,
+          "period": "FY2025 Mock"
+        },
+        {
+          "total_assets": 4600.0,
+          "total_liabilities": 2760.0,
+          "total_equity": 1840.0,
+          "revenue": 1080.0,
+          "ebitda": 308.0,
+          "net_income": 127.5,
+          "interest_expense": 50.0,
+          "dscr": 7.0,
+          "leverage_ratio": 8.571428571428571,
+          "current_ratio": 1.5,
+          "period": "FY2024"
+        },
+        {
+          "total_assets": 4370.0,
+          "total_liabilities": 2622.0,
+          "total_equity": 1748.0,
+          "revenue": 993.6,
+          "ebitda": 277.2,
+          "net_income": 112.2,
+          "interest_expense": 50.0,
+          "dscr": 7.0,
+          "leverage_ratio": 8.571428571428571,
+          "current_ratio": 1.5,
+          "period": "FY2023"
+        }
+      ],
+      "dcf_analysis": {
+        "free_cash_flow": [
+          238.875,
+          248.43568749999994,
+          255.90656,
+          261.0614826421874,
+          263.73485190325
+        ],
+        "growth_rate": 0.03,
+        "wacc": 0.09,
+        "terminal_value": 4527.448291005791,
+        "enterprise_value": 3924.7443800221386,
+        "equity_value": 924.7443800221386,
+        "share_price": 185.0
+      },
+      "risk_score": 45.0,
+      "credit_ratings": [
+        {
+          "agency": "Moody's",
+          "rating": "B2",
+          "outlook": "Negative",
+          "date": "2026-02-13"
+        },
+        {
+          "agency": "S&P",
+          "rating": "B",
+          "outlook": "Watch",
+          "date": "2026-02-13"
+        }
+      ],
+      "debt_facilities": [
+        {
+          "facility_type": "Revolver",
+          "amount_committed": 500.0,
+          "amount_drawn": 350.0,
+          "interest_rate": "SOFR + 3.50%",
+          "maturity_date": "2025-12-31",
+          "snc_rating": "Special Mention",
+          "drc": 0.4,
+          "ltv": 0.7,
+          "conviction_score": 0.45
+        },
+        {
+          "facility_type": "Term Loan B",
+          "amount_committed": 1200.0,
+          "amount_drawn": 1200.0,
+          "interest_rate": "SOFR + 4.75%",
+          "maturity_date": "2028-06-30",
+          "snc_rating": "Substandard",
+          "drc": 0.35,
+          "ltv": 0.85,
+          "conviction_score": 0.3
+        },
+        {
+          "facility_type": "Mezzanine Debt",
+          "amount_committed": 300.0,
+          "amount_drawn": 300.0,
+          "interest_rate": "12.00% PIK",
+          "maturity_date": "2029-06-30",
+          "snc_rating": "Doubtful",
+          "drc": 0.1,
+          "ltv": 0.95,
+          "conviction_score": 0.15
+        }
+      ],
+      "equity_data": {
+        "market_cap": 1200.0,
+        "share_price": 15.25,
+        "volume_avg_30d": 150000.0,
+        "pe_ratio": 18.5,
+        "dividend_yield": 0.0,
+        "beta": 1.85
+      }
+    },
+    "Apple_Inc": {
+      "borrower_name": "Apple Inc.",
+      "report_date": "2026-02-14T02:03:14.558313",
+      "executive_summary": "The borrower Apple Inc. presents a mixed credit profile. Financial performance shows strong EBITDA ($142000.0M) but elevated leverage (2.1x).  [Ref: AAPL_10Q_FY25_Q1.pdf]",
+      "sections": [
+        {
+          "title": "Executive Summary",
+          "content": "The borrower Apple Inc. presents a mixed credit profile. Financial performance shows strong EBITDA ($142000.0M) but elevated leverage (2.1x).  [Ref: AAPL_10Q_FY25_Q1.pdf]",
+          "citations": [
+            {
+              "doc_id": "AAPL_10Q_FY25_Q1.pdf",
+              "chunk_id": "c80d60f8-b080-4ba9-8746-52f16de5617c",
+              "page_number": 6
+            }
+          ],
+          "author_agent": "Writer"
+        },
+        {
+          "title": "Key Risks & Mitigants",
+          "content": "Key Risks:\n- CONNECTED PARTY RISK: Google (Alphabet) via Apple Inc. -> Google (Alphabet) is High risk.\n- CONNECTED PARTY RISK: European Commission via Apple Inc. -> European Commission is High risk.\n",
+          "citations": [],
+          "author_agent": "Risk Officer"
+        },
+        {
+          "title": "Financial Analysis",
+          "content": "EBITDA: $142000.0M | Leverage: 2.1x",
+          "citations": [],
+          "author_agent": "Quant"
+        }
+      ],
+      "key_strengths": [
+        "Market leading position in core segment.",
+        "Strong EBITDA generation ($142000.0M).",
+        "Diversified customer base."
+      ],
+      "key_weaknesses": [
+        "Elevated leverage at 2.1x.",
+        "Exposure to cyclical end-markets.",
+        "Recent management turnover."
+      ],
+      "mitigants": [
+        "Strong free cash flow conversion.",
+        "Demonstrated ability to deleverage.",
+        "Sponsor support."
+      ],
+      "financial_ratios": {
+        "leverage_ratio": 2.112676056338028,
+        "dscr": 39.44444444444444,
+        "current_ratio": 1.25,
+        "revenue": 420000.0,
+        "ebitda": 142000.0,
+        "net_income": 110000.0
+      },
+      "historical_financials": [
+        {
+          "total_assets": 375000.0,
+          "total_liabilities": 300000.0,
+          "total_equity": 75000.0,
+          "revenue": 420000.0,
+          "ebitda": 142000.0,
+          "net_income": 110000.0,
+          "interest_expense": 3600.0,
+          "dscr": 39.44444444444444,
+          "leverage_ratio": 2.112676056338028,
+          "current_ratio": 1.25,
+          "period": "FY2026 (Proj)"
+        },
+        {
+          "total_assets": 345000.0,
+          "total_liabilities": 276000.0,
+          "total_equity": 69000.0,
+          "revenue": 378000.0,
+          "ebitda": 124960.0,
+          "net_income": 93500.0,
+          "interest_expense": 3600.0,
+          "dscr": 39.44444444444444,
+          "leverage_ratio": 2.112676056338028,
+          "current_ratio": 1.25,
+          "period": "FY2025"
+        },
+        {
+          "total_assets": 327750.0,
+          "total_liabilities": 262200.0,
+          "total_equity": 65550.0,
+          "revenue": 347760.0,
+          "ebitda": 112464.0,
+          "net_income": 82280.0,
+          "interest_expense": 3600.0,
+          "dscr": 39.44444444444444,
+          "leverage_ratio": 2.112676056338028,
+          "current_ratio": 1.25,
+          "period": "FY2024"
+        }
+      ],
+      "dcf_analysis": {
+        "free_cash_flow": [
+          96915.0,
+          100793.90749999999,
+          103824.94720000001,
+          105916.37295768748,
+          107000.99705789001
+        ],
+        "growth_rate": 0.03,
+        "wacc": 0.09,
+        "terminal_value": 1836850.4494937786,
+        "enterprise_value": 1592324.8627518392,
+        "equity_value": 1292324.8627518392,
+        "share_price": 185.0,
+        "inputs": {
+          "wacc": 0.09,
+          "growth_rate": 0.03,
+          "tax_rate_proxy": 0.35,
+          "capex_margin": 0.05
+        }
+      },
+      "pd_model": {
+        "input_factors": {
+          "Leverage Ratio": 2.112676056338028,
+          "DSCR": 39.44444444444444,
+          "Liquidity (Current Ratio)": 1.25,
+          "EBITDA Margin": 0.3380952380952381
+        },
+        "model_score": 80.0,
+        "implied_rating": "A",
+        "one_year_pd": 0.001,
+        "five_year_pd": 0.01
+      },
+      "lgd_analysis": {
+        "seniority_structure": [
+          {
+            "tranche": "Revolving Credit Facility",
+            "amount": 10000.0,
+            "recovery_est": "90%"
+          },
+          {
+            "tranche": "Senior Unsecured Notes (2030)",
+            "amount": 2500.0,
+            "recovery_est": "70%"
+          },
+          {
+            "tranche": "Senior Unsecured Notes (2040)",
+            "amount": 1500.0,
+            "recovery_est": "60%"
+          },
+          {
+            "tranche": "Term Loan A",
+            "amount": 5000.0,
+            "recovery_est": "80%"
+          }
+        ],
+        "recovery_rate_assumption": 0.75,
+        "loss_given_default": 0.25
+      },
+      "scenario_analysis": {
+        "scenarios": [
+          {
+            "name": "Bear Case",
+            "probability": 0.2,
+            "revenue_growth": -0.05,
+            "ebitda_margin": 0.2,
+            "implied_share_price": 105.0
+          },
+          {
+            "name": "Base Case",
+            "probability": 0.5,
+            "revenue_growth": 0.05,
+            "ebitda_margin": 0.3,
+            "implied_share_price": 150.0
+          },
+          {
+            "name": "Bull Case",
+            "probability": 0.3,
+            "revenue_growth": 0.12,
+            "ebitda_margin": 0.35,
+            "implied_share_price": 210.0
+          }
+        ],
+        "weighted_share_price": 159.0
+      },
+      "system_two_critique": {
+        "critique_points": [
+          "Credit thesis aligns with macro outlook.",
+          "Valuation assumptions appear conservative."
+        ],
+        "conviction_score": 0.85,
+        "verification_status": "PASS",
+        "author_agent": "System 2"
+      },
+      "risk_score": 80.0,
+      "credit_ratings": [
+        {
+          "agency": "Moody's",
+          "rating": "Aaa",
+          "outlook": "Stable",
+          "date": "2026-02-13"
+        },
+        {
+          "agency": "S&P",
+          "rating": "AA+",
+          "outlook": "Stable",
+          "date": "2026-02-13"
+        },
+        {
+          "agency": "Fitch",
+          "rating": "AA+",
+          "outlook": "Stable",
+          "date": "2026-02-13"
+        }
+      ],
+      "debt_facilities": [
+        {
+          "facility_type": "Revolving Credit Facility",
+          "amount_committed": 10000.0,
+          "amount_drawn": 0.0,
+          "interest_rate": "SOFR + 0.75%",
+          "maturity_date": "2028-09-15",
+          "snc_rating": "Pass",
+          "drc": 1.0,
+          "ltv": 0.0,
+          "conviction_score": 0.98,
+          "lgd": 0.1,
+          "recovery_rate": 0.9
+        },
+        {
+          "facility_type": "Senior Unsecured Notes (2030)",
+          "amount_committed": 2500.0,
+          "amount_drawn": 2500.0,
+          "interest_rate": "3.25%",
+          "maturity_date": "2030-05-11",
+          "snc_rating": "Pass",
+          "drc": 1.0,
+          "ltv": 0.1,
+          "conviction_score": 0.95,
+          "lgd": 0.3,
+          "recovery_rate": 0.7
+        },
+        {
+          "facility_type": "Senior Unsecured Notes (2040)",
+          "amount_committed": 1500.0,
+          "amount_drawn": 1500.0,
+          "interest_rate": "4.10%",
+          "maturity_date": "2040-02-28",
+          "snc_rating": "Pass",
+          "drc": 1.0,
+          "ltv": 0.1,
+          "conviction_score": 0.92,
+          "lgd": 0.4,
+          "recovery_rate": 0.6
+        },
+        {
+          "facility_type": "Term Loan A",
+          "amount_committed": 5000.0,
+          "amount_drawn": 5000.0,
+          "interest_rate": "SOFR + 1.10%",
+          "maturity_date": "2027-03-30",
+          "snc_rating": "Pass",
+          "drc": 1.0,
+          "ltv": 0.2,
+          "conviction_score": 0.9,
+          "lgd": 0.2,
+          "recovery_rate": 0.8
+        }
+      ],
+      "repayment_schedule": [
+        {
+          "year": 2027,
+          "amount": 0.0,
+          "source": "Revolving Credit Facility Interest"
+        },
+        {
+          "year": 2027,
+          "amount": 81.25,
+          "source": "Senior Unsecured Notes (2030) Interest"
+        },
+        {
+          "year": 2027,
+          "amount": 61.49999999999999,
+          "source": "Senior Unsecured Notes (2040) Interest"
+        },
+        {
+          "year": 2027,
+          "amount": 5000.0,
+          "source": "Term Loan A Maturity"
+        },
+        {
+          "year": 2028,
+          "amount": 0.0,
+          "source": "Revolving Credit Facility Maturity"
+        },
+        {
+          "year": 2028,
+          "amount": 81.25,
+          "source": "Senior Unsecured Notes (2030) Interest"
+        },
+        {
+          "year": 2028,
+          "amount": 61.49999999999999,
+          "source": "Senior Unsecured Notes (2040) Interest"
+        },
+        {
+          "year": 2029,
+          "amount": 81.25,
+          "source": "Senior Unsecured Notes (2030) Interest"
+        },
+        {
+          "year": 2029,
+          "amount": 61.49999999999999,
+          "source": "Senior Unsecured Notes (2040) Interest"
+        },
+        {
+          "year": 2030,
+          "amount": 2500.0,
+          "source": "Senior Unsecured Notes (2030) Maturity"
+        },
+        {
+          "year": 2030,
+          "amount": 61.49999999999999,
+          "source": "Senior Unsecured Notes (2040) Interest"
+        },
+        {
+          "year": 2031,
+          "amount": 61.49999999999999,
+          "source": "Senior Unsecured Notes (2040) Interest"
+        }
+      ],
+      "equity_data": {
+        "market_cap": 3450000.0,
+        "share_price": 225.5,
+        "volume_avg_30d": 45000000.0,
+        "pe_ratio": 31.5,
+        "dividend_yield": 0.55,
+        "beta": 1.15
       }
     },
     "Microsoft_Corp": {
-      "id": "Microsoft_Corp",
       "borrower_name": "Microsoft Corp",
-      "ticker": "MSFT",
-      "sector": "Technology",
-      "report_date": "2026-02-13T01:31:38.448Z",
-      "risk_score": 92.0,
-      "summary": "Microsoft Corp maintains a pristine AAA rating. The analysis highlights significant margins driven by AI integration and a strong balance sheet.",
-      "borrower_details": {
-        "name": "Microsoft Corp",
-        "ticker": "MSFT",
-        "sector": "Technology",
-        "rating": "AAA"
-      },
-      "documents": [
+      "report_date": "2026-02-14T02:03:14.560509",
+      "executive_summary": "The borrower Microsoft Corp presents a mixed credit profile. Financial performance shows strong EBITDA ($5.0M) but elevated leverage (10.0x).  [Ref: TechCorp_10K_2025.pdf]",
+      "sections": [
         {
-          "doc_id": "doc_MSFT_10K_2026",
-          "title": "MSFT 10-K",
-          "page_count": 50,
-          "chunks": [
+          "title": "Executive Summary",
+          "content": "The borrower Microsoft Corp presents a mixed credit profile. Financial performance shows strong EBITDA ($5.0M) but elevated leverage (10.0x).  [Ref: TechCorp_10K_2025.pdf]",
+          "citations": [
             {
-              "chunk_id": "chunk_001",
-              "type": "header",
-              "page": 1,
-              "bbox": [
-                50,
-                30,
-                400,
-                60
-              ],
-              "content": "Microsoft Corp (MSFT) - FORM 10-K"
-            },
-            {
-              "chunk_id": "chunk_002",
-              "type": "narrative",
-              "page": 10,
-              "bbox": [
-                50,
-                577,
-                550,
-                750
-              ],
-              "content": "Revenue driven by cloud adoption (MSFT specific context)."
-            },
-            {
-              "chunk_id": "chunk_003",
-              "type": "narrative",
-              "page": 10,
-              "bbox": [
-                50,
-                370,
-                550,
-                674
-              ],
-              "content": "AI integration boosting margins (MSFT specific context)."
-            },
-            {
-              "chunk_id": "chunk_004",
-              "type": "narrative",
-              "page": 10,
-              "bbox": [
-                50,
-                303,
-                550,
-                738
-              ],
-              "content": "Hardware sales normalizing (MSFT specific context)."
-            },
-            {
-              "chunk_id": "chunk_005",
-              "type": "financial_table",
-              "page": 25,
-              "bbox": [
-                50,
-                200,
-                550,
-                500
-              ],
-              "content": "Consolidated Financial Statements",
-              "content_json": {
-                "total_assets": 301.0,
-                "total_liabilities": 240.0,
-                "total_equity": 61.0,
-                "ebitda": 56.0,
-                "total_debt": 98.0,
-                "interest_expense": 6.02
-              }
-            },
-            {
-              "chunk_id": "chunk_006",
-              "type": "risk_factor",
-              "page": 17,
-              "bbox": [
-                50,
-                427,
-                550,
-                688
-              ],
-              "content": "Risk Factor: Supply chain disruption"
-            },
-            {
-              "chunk_id": "chunk_007",
-              "type": "risk_factor",
-              "page": 15,
-              "bbox": [
-                50,
-                245,
-                550,
-                707
-              ],
-              "content": "Risk Factor: Rapid technological obsolescence"
-            },
-            {
-              "chunk_id": "chunk_008",
-              "type": "risk_factor",
-              "page": 15,
-              "bbox": [
-                50,
-                229,
-                550,
-                698
-              ],
-              "content": "Risk Factor: Data privacy regulation"
+              "doc_id": "TechCorp_10K_2025.pdf",
+              "chunk_id": "88aa8219-2f7a-4666-ae78-0820c2439969",
+              "page_number": 3
             }
-          ]
+          ],
+          "author_agent": "Writer"
+        },
+        {
+          "title": "Key Risks & Mitigants",
+          "content": "Key Risks:\n- HIGH: Leverage ratio exceeds 4.0x policy limit.\n",
+          "citations": [],
+          "author_agent": "Risk Officer"
+        },
+        {
+          "title": "Financial Analysis",
+          "content": "EBITDA: $5.0M | Leverage: 10.0x",
+          "citations": [],
+          "author_agent": "Quant"
         }
       ],
-      "market_data": {
-        "sentiment": 0.8582996295554622,
-        "trend": "Bearish"
+      "key_strengths": [
+        "Market leading position in core segment.",
+        "Strong EBITDA generation ($5.0M).",
+        "Diversified customer base."
+      ],
+      "key_weaknesses": [
+        "Elevated leverage at 10.0x.",
+        "Exposure to cyclical end-markets.",
+        "Recent management turnover."
+      ],
+      "mitigants": [
+        "Strong free cash flow conversion.",
+        "Demonstrated ability to deleverage.",
+        "Sponsor support."
+      ],
+      "financial_ratios": {
+        "leverage_ratio": 10.0,
+        "dscr": 5.0,
+        "current_ratio": 2.0,
+        "revenue": 20.0,
+        "ebitda": 5.0,
+        "net_income": 2.0
+      },
+      "historical_financials": [
+        {
+          "total_assets": 100.0,
+          "total_liabilities": 50.0,
+          "total_equity": 50.0,
+          "revenue": 20.0,
+          "ebitda": 5.0,
+          "net_income": 2.0,
+          "interest_expense": 1.0,
+          "dscr": 5.0,
+          "leverage_ratio": 10.0,
+          "current_ratio": 2.0,
+          "period": "FY2025"
+        },
+        {
+          "total_assets": 92.0,
+          "total_liabilities": 46.0,
+          "total_equity": 46.0,
+          "revenue": 18.0,
+          "ebitda": 4.4,
+          "net_income": 1.7,
+          "interest_expense": 1.0,
+          "dscr": 5.0,
+          "leverage_ratio": 10.0,
+          "current_ratio": 2.0,
+          "period": "FY2024"
+        },
+        {
+          "total_assets": 87.39999999999999,
+          "total_liabilities": 43.699999999999996,
+          "total_equity": 43.699999999999996,
+          "revenue": 16.560000000000002,
+          "ebitda": 3.9600000000000004,
+          "net_income": 1.496,
+          "interest_expense": 1.0,
+          "dscr": 5.0,
+          "leverage_ratio": 10.0,
+          "current_ratio": 2.0,
+          "period": "FY2023"
+        }
+      ],
+      "dcf_analysis": {
+        "free_cash_flow": [
+          3.4125,
+          3.5490812499999995,
+          3.6558080000000004,
+          3.729449752031249,
+          3.767640741475
+        ],
+        "growth_rate": 0.03,
+        "wacc": 0.09,
+        "terminal_value": 64.67783272865418,
+        "enterprise_value": 56.06777685745914,
+        "equity_value": 6.067776857459137,
+        "share_price": 185.0,
+        "inputs": {
+          "wacc": 0.09,
+          "growth_rate": 0.03,
+          "tax_rate_proxy": 0.35,
+          "capex_margin": 0.05
+        }
+      },
+      "pd_model": {
+        "input_factors": {
+          "Leverage Ratio": 10.0,
+          "DSCR": 5.0,
+          "Liquidity (Current Ratio)": 2.0,
+          "EBITDA Margin": 0.25
+        },
+        "model_score": 60.0,
+        "implied_rating": "BB",
+        "one_year_pd": 0.02,
+        "five_year_pd": 0.1
+      },
+      "lgd_analysis": {
+        "seniority_structure": [
+          {
+            "tranche": "Revolver",
+            "amount": 100.0,
+            "recovery_est": "70%"
+          },
+          {
+            "tranche": "Term Loan",
+            "amount": 500.0,
+            "recovery_est": "60%"
+          }
+        ],
+        "recovery_rate_assumption": 0.6499999999999999,
+        "loss_given_default": 0.3500000000000001
+      },
+      "scenario_analysis": {
+        "scenarios": [
+          {
+            "name": "Bear Case",
+            "probability": 0.2,
+            "revenue_growth": -0.05,
+            "ebitda_margin": 0.2,
+            "implied_share_price": 105.0
+          },
+          {
+            "name": "Base Case",
+            "probability": 0.5,
+            "revenue_growth": 0.05,
+            "ebitda_margin": 0.3,
+            "implied_share_price": 150.0
+          },
+          {
+            "name": "Bull Case",
+            "probability": 0.3,
+            "revenue_growth": 0.12,
+            "ebitda_margin": 0.35,
+            "implied_share_price": 210.0
+          }
+        ],
+        "weighted_share_price": 159.0
+      },
+      "system_two_critique": {
+        "critique_points": [
+          "Credit thesis aligns with macro outlook.",
+          "Valuation assumptions appear conservative."
+        ],
+        "conviction_score": 0.85,
+        "verification_status": "PASS",
+        "author_agent": "System 2"
+      },
+      "risk_score": 60.0,
+      "credit_ratings": [
+        {
+          "agency": "Moody's",
+          "rating": "Ba2",
+          "outlook": "Stable",
+          "date": "2026-02-13"
+        },
+        {
+          "agency": "S&P",
+          "rating": "BB",
+          "outlook": "Stable",
+          "date": "2026-02-13"
+        }
+      ],
+      "debt_facilities": [
+        {
+          "facility_type": "Revolver",
+          "amount_committed": 100.0,
+          "amount_drawn": 20.0,
+          "interest_rate": "Prime + 1.0%",
+          "maturity_date": "2026-01-01",
+          "snc_rating": "Pass",
+          "drc": 0.8,
+          "ltv": 0.5,
+          "conviction_score": 0.7,
+          "lgd": 0.3,
+          "recovery_rate": 0.7
+        },
+        {
+          "facility_type": "Term Loan",
+          "amount_committed": 500.0,
+          "amount_drawn": 500.0,
+          "interest_rate": "5.50%",
+          "maturity_date": "2029-01-01",
+          "snc_rating": "Pass",
+          "drc": 0.75,
+          "ltv": 0.6,
+          "conviction_score": 0.75,
+          "lgd": 0.4,
+          "recovery_rate": 0.6
+        }
+      ],
+      "repayment_schedule": [
+        {
+          "year": 2027,
+          "amount": 27.5,
+          "source": "Term Loan Interest"
+        },
+        {
+          "year": 2028,
+          "amount": 27.5,
+          "source": "Term Loan Interest"
+        },
+        {
+          "year": 2029,
+          "amount": 500.0,
+          "source": "Term Loan Maturity"
+        }
+      ],
+      "equity_data": {
+        "market_cap": 100.0,
+        "share_price": 10.0,
+        "volume_avg_30d": 1000.0,
+        "pe_ratio": 15.0,
+        "dividend_yield": 1.0,
+        "beta": 1.0
       }
     },
     "NVIDIA_Corp": {
-      "id": "NVIDIA_Corp",
       "borrower_name": "NVIDIA Corp",
-      "ticker": "NVDA",
-      "sector": "Technology",
-      "report_date": "2026-02-13T01:31:38.449Z",
-      "risk_score": 78.0,
-      "summary": "NVIDIA Corp (BBB+) shows aggressive growth but faces risks regarding supply chain concentration and rapid technological obsolescence.",
-      "borrower_details": {
-        "name": "NVIDIA Corp",
-        "ticker": "NVDA",
-        "sector": "Technology",
-        "rating": "BBB+"
-      },
-      "documents": [
+      "report_date": "2026-02-14T02:03:14.561605",
+      "executive_summary": "The borrower NVIDIA Corp presents a mixed credit profile. Financial performance shows strong EBITDA ($5.0M) but elevated leverage (10.0x).  [Ref: TechCorp_10K_2025.pdf]",
+      "sections": [
         {
-          "doc_id": "doc_NVDA_10K_2026",
-          "title": "NVDA 10-K",
-          "page_count": 50,
-          "chunks": [
+          "title": "Executive Summary",
+          "content": "The borrower NVIDIA Corp presents a mixed credit profile. Financial performance shows strong EBITDA ($5.0M) but elevated leverage (10.0x).  [Ref: TechCorp_10K_2025.pdf]",
+          "citations": [
             {
-              "chunk_id": "chunk_001",
-              "type": "header",
-              "page": 1,
-              "bbox": [
-                50,
-                30,
-                400,
-                60
-              ],
-              "content": "NVIDIA Corp (NVDA) - FORM 10-K"
-            },
-            {
-              "chunk_id": "chunk_002",
-              "type": "narrative",
-              "page": 7,
-              "bbox": [
-                50,
-                447,
-                550,
-                692
-              ],
-              "content": "Revenue driven by cloud adoption (NVDA specific context)."
-            },
-            {
-              "chunk_id": "chunk_003",
-              "type": "narrative",
-              "page": 3,
-              "bbox": [
-                50,
-                402,
-                550,
-                683
-              ],
-              "content": "AI integration boosting margins (NVDA specific context)."
-            },
-            {
-              "chunk_id": "chunk_004",
-              "type": "narrative",
-              "page": 7,
-              "bbox": [
-                50,
-                435,
-                550,
-                693
-              ],
-              "content": "Hardware sales normalizing (NVDA specific context)."
-            },
-            {
-              "chunk_id": "chunk_005",
-              "type": "financial_table",
-              "page": 25,
-              "bbox": [
-                50,
-                200,
-                550,
-                500
-              ],
-              "content": "Consolidated Financial Statements",
-              "content_json": {
-                "total_assets": 133.0,
-                "total_liabilities": 94.0,
-                "total_equity": 39.0,
-                "ebitda": 13.0,
-                "total_debt": 28.0,
-                "interest_expense": 2.66
-              }
-            },
-            {
-              "chunk_id": "chunk_006",
-              "type": "risk_factor",
-              "page": 17,
-              "bbox": [
-                50,
-                522,
-                550,
-                690
-              ],
-              "content": "Risk Factor: Supply chain disruption"
-            },
-            {
-              "chunk_id": "chunk_007",
-              "type": "risk_factor",
-              "page": 17,
-              "bbox": [
-                50,
-                158,
-                550,
-                720
-              ],
-              "content": "Risk Factor: Rapid technological obsolescence"
-            },
-            {
-              "chunk_id": "chunk_008",
-              "type": "risk_factor",
-              "page": 15,
-              "bbox": [
-                50,
-                262,
-                550,
-                731
-              ],
-              "content": "Risk Factor: Data privacy regulation"
+              "doc_id": "TechCorp_10K_2025.pdf",
+              "chunk_id": "d2efbe73-fce7-4049-88b7-9f19664df63a",
+              "page_number": 3
             }
-          ]
+          ],
+          "author_agent": "Writer"
+        },
+        {
+          "title": "Key Risks & Mitigants",
+          "content": "Key Risks:\n- HIGH: Leverage ratio exceeds 4.0x policy limit.\n",
+          "citations": [],
+          "author_agent": "Risk Officer"
+        },
+        {
+          "title": "Financial Analysis",
+          "content": "EBITDA: $5.0M | Leverage: 10.0x",
+          "citations": [],
+          "author_agent": "Quant"
         }
       ],
-      "market_data": {
-        "sentiment": 0.8095491948154185,
-        "trend": "Bullish"
+      "key_strengths": [
+        "Market leading position in core segment.",
+        "Strong EBITDA generation ($5.0M).",
+        "Diversified customer base."
+      ],
+      "key_weaknesses": [
+        "Elevated leverage at 10.0x.",
+        "Exposure to cyclical end-markets.",
+        "Recent management turnover."
+      ],
+      "mitigants": [
+        "Strong free cash flow conversion.",
+        "Demonstrated ability to deleverage.",
+        "Sponsor support."
+      ],
+      "financial_ratios": {
+        "leverage_ratio": 10.0,
+        "dscr": 5.0,
+        "current_ratio": 2.0,
+        "revenue": 20.0,
+        "ebitda": 5.0,
+        "net_income": 2.0
+      },
+      "historical_financials": [
+        {
+          "total_assets": 100.0,
+          "total_liabilities": 50.0,
+          "total_equity": 50.0,
+          "revenue": 20.0,
+          "ebitda": 5.0,
+          "net_income": 2.0,
+          "interest_expense": 1.0,
+          "dscr": 5.0,
+          "leverage_ratio": 10.0,
+          "current_ratio": 2.0,
+          "period": "FY2025"
+        },
+        {
+          "total_assets": 92.0,
+          "total_liabilities": 46.0,
+          "total_equity": 46.0,
+          "revenue": 18.0,
+          "ebitda": 4.4,
+          "net_income": 1.7,
+          "interest_expense": 1.0,
+          "dscr": 5.0,
+          "leverage_ratio": 10.0,
+          "current_ratio": 2.0,
+          "period": "FY2024"
+        },
+        {
+          "total_assets": 87.39999999999999,
+          "total_liabilities": 43.699999999999996,
+          "total_equity": 43.699999999999996,
+          "revenue": 16.560000000000002,
+          "ebitda": 3.9600000000000004,
+          "net_income": 1.496,
+          "interest_expense": 1.0,
+          "dscr": 5.0,
+          "leverage_ratio": 10.0,
+          "current_ratio": 2.0,
+          "period": "FY2023"
+        }
+      ],
+      "dcf_analysis": {
+        "free_cash_flow": [
+          3.4125,
+          3.5490812499999995,
+          3.6558080000000004,
+          3.729449752031249,
+          3.767640741475
+        ],
+        "growth_rate": 0.03,
+        "wacc": 0.09,
+        "terminal_value": 64.67783272865418,
+        "enterprise_value": 56.06777685745914,
+        "equity_value": 6.067776857459137,
+        "share_price": 185.0,
+        "inputs": {
+          "wacc": 0.09,
+          "growth_rate": 0.03,
+          "tax_rate_proxy": 0.35,
+          "capex_margin": 0.05
+        }
+      },
+      "pd_model": {
+        "input_factors": {
+          "Leverage Ratio": 10.0,
+          "DSCR": 5.0,
+          "Liquidity (Current Ratio)": 2.0,
+          "EBITDA Margin": 0.25
+        },
+        "model_score": 60.0,
+        "implied_rating": "BB",
+        "one_year_pd": 0.02,
+        "five_year_pd": 0.1
+      },
+      "lgd_analysis": {
+        "seniority_structure": [
+          {
+            "tranche": "Revolver",
+            "amount": 100.0,
+            "recovery_est": "70%"
+          },
+          {
+            "tranche": "Term Loan",
+            "amount": 500.0,
+            "recovery_est": "60%"
+          }
+        ],
+        "recovery_rate_assumption": 0.6499999999999999,
+        "loss_given_default": 0.3500000000000001
+      },
+      "scenario_analysis": {
+        "scenarios": [
+          {
+            "name": "Bear Case",
+            "probability": 0.2,
+            "revenue_growth": -0.05,
+            "ebitda_margin": 0.2,
+            "implied_share_price": 105.0
+          },
+          {
+            "name": "Base Case",
+            "probability": 0.5,
+            "revenue_growth": 0.05,
+            "ebitda_margin": 0.3,
+            "implied_share_price": 150.0
+          },
+          {
+            "name": "Bull Case",
+            "probability": 0.3,
+            "revenue_growth": 0.12,
+            "ebitda_margin": 0.35,
+            "implied_share_price": 210.0
+          }
+        ],
+        "weighted_share_price": 159.0
+      },
+      "system_two_critique": {
+        "critique_points": [
+          "Credit thesis aligns with macro outlook.",
+          "Valuation assumptions appear conservative."
+        ],
+        "conviction_score": 0.85,
+        "verification_status": "PASS",
+        "author_agent": "System 2"
+      },
+      "risk_score": 60.0,
+      "credit_ratings": [
+        {
+          "agency": "Moody's",
+          "rating": "Ba2",
+          "outlook": "Stable",
+          "date": "2026-02-13"
+        },
+        {
+          "agency": "S&P",
+          "rating": "BB",
+          "outlook": "Stable",
+          "date": "2026-02-13"
+        }
+      ],
+      "debt_facilities": [
+        {
+          "facility_type": "Revolver",
+          "amount_committed": 100.0,
+          "amount_drawn": 20.0,
+          "interest_rate": "Prime + 1.0%",
+          "maturity_date": "2026-01-01",
+          "snc_rating": "Pass",
+          "drc": 0.8,
+          "ltv": 0.5,
+          "conviction_score": 0.7,
+          "lgd": 0.3,
+          "recovery_rate": 0.7
+        },
+        {
+          "facility_type": "Term Loan",
+          "amount_committed": 500.0,
+          "amount_drawn": 500.0,
+          "interest_rate": "5.50%",
+          "maturity_date": "2029-01-01",
+          "snc_rating": "Pass",
+          "drc": 0.75,
+          "ltv": 0.6,
+          "conviction_score": 0.75,
+          "lgd": 0.4,
+          "recovery_rate": 0.6
+        }
+      ],
+      "repayment_schedule": [
+        {
+          "year": 2027,
+          "amount": 27.5,
+          "source": "Term Loan Interest"
+        },
+        {
+          "year": 2028,
+          "amount": 27.5,
+          "source": "Term Loan Interest"
+        },
+        {
+          "year": 2029,
+          "amount": 500.0,
+          "source": "Term Loan Maturity"
+        }
+      ],
+      "equity_data": {
+        "market_cap": 100.0,
+        "share_price": 10.0,
+        "volume_avg_30d": 1000.0,
+        "pe_ratio": 15.0,
+        "dividend_yield": 1.0,
+        "beta": 1.0
       }
     },
     "Alphabet_Inc": {
-      "id": "Alphabet_Inc",
       "borrower_name": "Alphabet Inc.",
-      "ticker": "GOOGL",
-      "sector": "Technology",
-      "report_date": "2026-02-13T01:31:38.451Z",
-      "risk_score": 79.0,
-      "summary": "Alphabet Inc. is rated BBB+ with a bearish market sentiment trend. Key risks include data privacy regulation and potential antitrust actions.",
-      "borrower_details": {
-        "name": "Alphabet Inc.",
-        "ticker": "GOOGL",
-        "sector": "Technology",
-        "rating": "BBB+"
-      },
-      "documents": [
+      "report_date": "2026-02-14T02:03:14.562725",
+      "executive_summary": "The borrower Alphabet Inc. presents a mixed credit profile. Financial performance shows strong EBITDA ($5.0M) but elevated leverage (10.0x).  [Ref: TechCorp_10K_2025.pdf]",
+      "sections": [
         {
-          "doc_id": "doc_GOOGL_10K_2026",
-          "title": "GOOGL 10-K",
-          "page_count": 50,
-          "chunks": [
+          "title": "Executive Summary",
+          "content": "The borrower Alphabet Inc. presents a mixed credit profile. Financial performance shows strong EBITDA ($5.0M) but elevated leverage (10.0x).  [Ref: TechCorp_10K_2025.pdf]",
+          "citations": [
             {
-              "chunk_id": "chunk_001",
-              "type": "header",
-              "page": 1,
-              "bbox": [
-                50,
-                30,
-                400,
-                60
-              ],
-              "content": "Alphabet Inc. (GOOGL) - FORM 10-K"
-            },
-            {
-              "chunk_id": "chunk_002",
-              "type": "narrative",
-              "page": 8,
-              "bbox": [
-                50,
-                126,
-                550,
-                688
-              ],
-              "content": "Revenue driven by cloud adoption (GOOGL specific context)."
-            },
-            {
-              "chunk_id": "chunk_003",
-              "type": "narrative",
-              "page": 5,
-              "bbox": [
-                50,
-                357,
-                550,
-                675
-              ],
-              "content": "AI integration boosting margins (GOOGL specific context)."
-            },
-            {
-              "chunk_id": "chunk_004",
-              "type": "narrative",
-              "page": 4,
-              "bbox": [
-                50,
-                263,
-                550,
-                687
-              ],
-              "content": "Hardware sales normalizing (GOOGL specific context)."
-            },
-            {
-              "chunk_id": "chunk_005",
-              "type": "financial_table",
-              "page": 25,
-              "bbox": [
-                50,
-                200,
-                550,
-                500
-              ],
-              "content": "Consolidated Financial Statements",
-              "content_json": {
-                "total_assets": 343.0,
-                "total_liabilities": 223.0,
-                "total_equity": 120.0,
-                "ebitda": 50.0,
-                "total_debt": 111.0,
-                "interest_expense": 6.86
-              }
-            },
-            {
-              "chunk_id": "chunk_006",
-              "type": "risk_factor",
-              "page": 15,
-              "bbox": [
-                50,
-                121,
-                550,
-                717
-              ],
-              "content": "Risk Factor: Supply chain disruption"
-            },
-            {
-              "chunk_id": "chunk_007",
-              "type": "risk_factor",
-              "page": 16,
-              "bbox": [
-                50,
-                525,
-                550,
-                720
-              ],
-              "content": "Risk Factor: Rapid technological obsolescence"
-            },
-            {
-              "chunk_id": "chunk_008",
-              "type": "risk_factor",
-              "page": 17,
-              "bbox": [
-                50,
-                361,
-                550,
-                699
-              ],
-              "content": "Risk Factor: Data privacy regulation"
+              "doc_id": "TechCorp_10K_2025.pdf",
+              "chunk_id": "9264b28e-9615-4ad8-8383-8cf944872f4f",
+              "page_number": 3
             }
-          ]
+          ],
+          "author_agent": "Writer"
+        },
+        {
+          "title": "Key Risks & Mitigants",
+          "content": "Key Risks:\n- HIGH: Leverage ratio exceeds 4.0x policy limit.\n",
+          "citations": [],
+          "author_agent": "Risk Officer"
+        },
+        {
+          "title": "Financial Analysis",
+          "content": "EBITDA: $5.0M | Leverage: 10.0x",
+          "citations": [],
+          "author_agent": "Quant"
         }
       ],
-      "market_data": {
-        "sentiment": 0.5544545887013579,
-        "trend": "Bearish"
+      "key_strengths": [
+        "Market leading position in core segment.",
+        "Strong EBITDA generation ($5.0M).",
+        "Diversified customer base."
+      ],
+      "key_weaknesses": [
+        "Elevated leverage at 10.0x.",
+        "Exposure to cyclical end-markets.",
+        "Recent management turnover."
+      ],
+      "mitigants": [
+        "Strong free cash flow conversion.",
+        "Demonstrated ability to deleverage.",
+        "Sponsor support."
+      ],
+      "financial_ratios": {
+        "leverage_ratio": 10.0,
+        "dscr": 5.0,
+        "current_ratio": 2.0,
+        "revenue": 20.0,
+        "ebitda": 5.0,
+        "net_income": 2.0
+      },
+      "historical_financials": [
+        {
+          "total_assets": 100.0,
+          "total_liabilities": 50.0,
+          "total_equity": 50.0,
+          "revenue": 20.0,
+          "ebitda": 5.0,
+          "net_income": 2.0,
+          "interest_expense": 1.0,
+          "dscr": 5.0,
+          "leverage_ratio": 10.0,
+          "current_ratio": 2.0,
+          "period": "FY2025"
+        },
+        {
+          "total_assets": 92.0,
+          "total_liabilities": 46.0,
+          "total_equity": 46.0,
+          "revenue": 18.0,
+          "ebitda": 4.4,
+          "net_income": 1.7,
+          "interest_expense": 1.0,
+          "dscr": 5.0,
+          "leverage_ratio": 10.0,
+          "current_ratio": 2.0,
+          "period": "FY2024"
+        },
+        {
+          "total_assets": 87.39999999999999,
+          "total_liabilities": 43.699999999999996,
+          "total_equity": 43.699999999999996,
+          "revenue": 16.560000000000002,
+          "ebitda": 3.9600000000000004,
+          "net_income": 1.496,
+          "interest_expense": 1.0,
+          "dscr": 5.0,
+          "leverage_ratio": 10.0,
+          "current_ratio": 2.0,
+          "period": "FY2023"
+        }
+      ],
+      "dcf_analysis": {
+        "free_cash_flow": [
+          3.4125,
+          3.5490812499999995,
+          3.6558080000000004,
+          3.729449752031249,
+          3.767640741475
+        ],
+        "growth_rate": 0.03,
+        "wacc": 0.09,
+        "terminal_value": 64.67783272865418,
+        "enterprise_value": 56.06777685745914,
+        "equity_value": 6.067776857459137,
+        "share_price": 185.0,
+        "inputs": {
+          "wacc": 0.09,
+          "growth_rate": 0.03,
+          "tax_rate_proxy": 0.35,
+          "capex_margin": 0.05
+        }
+      },
+      "pd_model": {
+        "input_factors": {
+          "Leverage Ratio": 10.0,
+          "DSCR": 5.0,
+          "Liquidity (Current Ratio)": 2.0,
+          "EBITDA Margin": 0.25
+        },
+        "model_score": 60.0,
+        "implied_rating": "BB",
+        "one_year_pd": 0.02,
+        "five_year_pd": 0.1
+      },
+      "lgd_analysis": {
+        "seniority_structure": [
+          {
+            "tranche": "Revolver",
+            "amount": 100.0,
+            "recovery_est": "70%"
+          },
+          {
+            "tranche": "Term Loan",
+            "amount": 500.0,
+            "recovery_est": "60%"
+          }
+        ],
+        "recovery_rate_assumption": 0.6499999999999999,
+        "loss_given_default": 0.3500000000000001
+      },
+      "scenario_analysis": {
+        "scenarios": [
+          {
+            "name": "Bear Case",
+            "probability": 0.2,
+            "revenue_growth": -0.05,
+            "ebitda_margin": 0.2,
+            "implied_share_price": 105.0
+          },
+          {
+            "name": "Base Case",
+            "probability": 0.5,
+            "revenue_growth": 0.05,
+            "ebitda_margin": 0.3,
+            "implied_share_price": 150.0
+          },
+          {
+            "name": "Bull Case",
+            "probability": 0.3,
+            "revenue_growth": 0.12,
+            "ebitda_margin": 0.35,
+            "implied_share_price": 210.0
+          }
+        ],
+        "weighted_share_price": 159.0
+      },
+      "system_two_critique": {
+        "critique_points": [
+          "Credit thesis aligns with macro outlook.",
+          "Valuation assumptions appear conservative."
+        ],
+        "conviction_score": 0.85,
+        "verification_status": "PASS",
+        "author_agent": "System 2"
+      },
+      "risk_score": 60.0,
+      "credit_ratings": [
+        {
+          "agency": "Moody's",
+          "rating": "Ba2",
+          "outlook": "Stable",
+          "date": "2026-02-13"
+        },
+        {
+          "agency": "S&P",
+          "rating": "BB",
+          "outlook": "Stable",
+          "date": "2026-02-13"
+        }
+      ],
+      "debt_facilities": [
+        {
+          "facility_type": "Revolver",
+          "amount_committed": 100.0,
+          "amount_drawn": 20.0,
+          "interest_rate": "Prime + 1.0%",
+          "maturity_date": "2026-01-01",
+          "snc_rating": "Pass",
+          "drc": 0.8,
+          "ltv": 0.5,
+          "conviction_score": 0.7,
+          "lgd": 0.3,
+          "recovery_rate": 0.7
+        },
+        {
+          "facility_type": "Term Loan",
+          "amount_committed": 500.0,
+          "amount_drawn": 500.0,
+          "interest_rate": "5.50%",
+          "maturity_date": "2029-01-01",
+          "snc_rating": "Pass",
+          "drc": 0.75,
+          "ltv": 0.6,
+          "conviction_score": 0.75,
+          "lgd": 0.4,
+          "recovery_rate": 0.6
+        }
+      ],
+      "repayment_schedule": [
+        {
+          "year": 2027,
+          "amount": 27.5,
+          "source": "Term Loan Interest"
+        },
+        {
+          "year": 2028,
+          "amount": 27.5,
+          "source": "Term Loan Interest"
+        },
+        {
+          "year": 2029,
+          "amount": 500.0,
+          "source": "Term Loan Maturity"
+        }
+      ],
+      "equity_data": {
+        "market_cap": 100.0,
+        "share_price": 10.0,
+        "volume_avg_30d": 1000.0,
+        "pe_ratio": 15.0,
+        "dividend_yield": 1.0,
+        "beta": 1.0
       }
     },
     "Amazon_com_Inc": {
@@ -51041,665 +50503,4235 @@ window.MOCK_DATA = {
       }
     },
     "Tesla_Inc": {
-      "id": "Tesla_Inc",
       "borrower_name": "Tesla Inc.",
-      "ticker": "TSLA",
-      "sector": "Consumer",
-      "report_date": "2026-02-13T02:55:10.466287",
-      "risk_score": 75.0,
-      "file": "credit_memo_Tesla_Inc.json",
-      "summary": "Tesla Inc. (BBB) exhibits elevated inventory levels and exposure to consumer spending shifts. High leverage relative to peers remains a concern.",
-      "borrower_details": {
-        "name": "Tesla Inc.",
-        "ticker": "TSLA",
-        "sector": "Consumer",
-        "rating": "BBB"
-      },
-      "documents": [
+      "report_date": "2026-02-14T02:03:14.564915",
+      "executive_summary": "The borrower Tesla Inc. presents a mixed credit profile. Financial performance shows strong EBITDA ($25000.0M) but elevated leverage (2.0x).  [Ref: TSLA_10Q_FY24_Q3.pdf]",
+      "sections": [
         {
-          "doc_id": "doc_TSLA_10K_2026",
-          "title": "TSLA 10-K",
-          "page_count": 50,
-          "chunks": [
+          "title": "Executive Summary",
+          "content": "The borrower Tesla Inc. presents a mixed credit profile. Financial performance shows strong EBITDA ($25000.0M) but elevated leverage (2.0x).  [Ref: TSLA_10Q_FY24_Q3.pdf]",
+          "citations": [
             {
-              "chunk_id": "chunk_001",
-              "type": "header",
-              "page": 1,
-              "bbox": [
-                50,
-                30,
-                400,
-                60
-              ],
-              "content": "Tesla Inc. (TSLA) - FORM 10-K"
-            },
-            {
-              "chunk_id": "chunk_002",
-              "type": "narrative",
-              "page": 9,
-              "bbox": [
-                50,
-                317,
-                550,
-                682
-              ],
-              "content": "E-commerce channel growth (TSLA specific context)."
-            },
-            {
-              "chunk_id": "chunk_003",
-              "type": "narrative",
-              "page": 4,
-              "bbox": [
-                50,
-                119,
-                550,
-                680
-              ],
-              "content": "Direct-to-consumer pivot (TSLA specific context)."
-            },
-            {
-              "chunk_id": "chunk_004",
-              "type": "narrative",
-              "page": 10,
-              "bbox": [
-                50,
-                520,
-                550,
-                748
-              ],
-              "content": "Inventory levels elevated (TSLA specific context)."
-            },
-            {
-              "chunk_id": "chunk_005",
-              "type": "financial_table",
-              "page": 25,
-              "bbox": [
-                50,
-                200,
-                550,
-                500
-              ],
-              "content": "Consolidated Financial Statements",
-              "content_json": {
-                "total_assets": 391.0,
-                "total_liabilities": 211.0,
-                "total_equity": 180.0,
-                "ebitda": 57.0,
-                "total_debt": 183.0,
-                "interest_expense": 7.82
-              }
-            },
-            {
-              "chunk_id": "chunk_006",
-              "type": "risk_factor",
-              "page": 18,
-              "bbox": [
-                50,
-                533,
-                550,
-                688
-              ],
-              "content": "Risk Factor: Inflationary pressure"
-            },
-            {
-              "chunk_id": "chunk_007",
-              "type": "risk_factor",
-              "page": 17,
-              "bbox": [
-                50,
-                486,
-                550,
-                658
-              ],
-              "content": "Risk Factor: Supply chain costs"
-            },
-            {
-              "chunk_id": "chunk_008",
-              "type": "risk_factor",
-              "page": 20,
-              "bbox": [
-                50,
-                471,
-                550,
-                734
-              ],
-              "content": "Risk Factor: Shift in consumer spending"
+              "doc_id": "TSLA_10Q_FY24_Q3.pdf",
+              "chunk_id": "4e5fe115-b41f-47ef-8c36-e3b6e5cbd201",
+              "page_number": 8
             }
-          ]
+          ],
+          "author_agent": "Writer"
+        },
+        {
+          "title": "Key Risks & Mitigants",
+          "content": "Key Risks:\n- CONNECTED PARTY RISK: xAI via Tesla Inc. -> xAI is High risk.\n- CONNECTED PARTY RISK: X (Twitter) via Tesla Inc. -> X (Twitter) is High risk.\n",
+          "citations": [],
+          "author_agent": "Risk Officer"
+        },
+        {
+          "title": "Financial Analysis",
+          "content": "EBITDA: $25000.0M | Leverage: 2.0x",
+          "citations": [],
+          "author_agent": "Quant"
         }
       ],
-      "market_data": {
-        "sentiment": 0.5125647438956498,
-        "trend": "Neutral"
+      "key_strengths": [
+        "Market leading position in core segment.",
+        "Strong EBITDA generation ($25000.0M).",
+        "Diversified customer base."
+      ],
+      "key_weaknesses": [
+        "Elevated leverage at 2.0x.",
+        "Exposure to cyclical end-markets.",
+        "Recent management turnover."
+      ],
+      "mitigants": [
+        "Strong free cash flow conversion.",
+        "Demonstrated ability to deleverage.",
+        "Sponsor support."
+      ],
+      "financial_ratios": {
+        "leverage_ratio": 2.0,
+        "dscr": 250.0,
+        "current_ratio": 3.0,
+        "revenue": 160000.0,
+        "ebitda": 25000.0,
+        "net_income": 18000.0
+      },
+      "historical_financials": [
+        {
+          "total_assets": 150000.0,
+          "total_liabilities": 50000.0,
+          "total_equity": 100000.0,
+          "revenue": 160000.0,
+          "ebitda": 25000.0,
+          "net_income": 18000.0,
+          "interest_expense": 100.0,
+          "dscr": 250.0,
+          "leverage_ratio": 2.0,
+          "current_ratio": 3.0,
+          "period": "FY2026 (Proj)"
+        },
+        {
+          "total_assets": 138000.0,
+          "total_liabilities": 46000.0,
+          "total_equity": 92000.0,
+          "revenue": 144000.0,
+          "ebitda": 22000.0,
+          "net_income": 15300.0,
+          "interest_expense": 100.0,
+          "dscr": 250.0,
+          "leverage_ratio": 2.0,
+          "current_ratio": 3.0,
+          "period": "FY2025"
+        },
+        {
+          "total_assets": 131100.0,
+          "total_liabilities": 43700.0,
+          "total_equity": 87400.0,
+          "revenue": 132480.0,
+          "ebitda": 19800.0,
+          "net_income": 13464.0,
+          "interest_expense": 100.0,
+          "dscr": 250.0,
+          "leverage_ratio": 2.0,
+          "current_ratio": 3.0,
+          "period": "FY2024"
+        }
+      ],
+      "dcf_analysis": {
+        "free_cash_flow": [
+          17062.5,
+          17745.406249999996,
+          18279.04,
+          18647.248760156246,
+          18838.203707375
+        ],
+        "growth_rate": 0.03,
+        "wacc": 0.09,
+        "terminal_value": 323389.16364327085,
+        "enterprise_value": 280338.88428729563,
+        "equity_value": 230338.88428729563,
+        "share_price": 185.0,
+        "inputs": {
+          "wacc": 0.09,
+          "growth_rate": 0.03,
+          "tax_rate_proxy": 0.35,
+          "capex_margin": 0.05
+        }
+      },
+      "pd_model": {
+        "input_factors": {
+          "Leverage Ratio": 2.0,
+          "DSCR": 250.0,
+          "Liquidity (Current Ratio)": 3.0,
+          "EBITDA Margin": 0.15625
+        },
+        "model_score": 80.0,
+        "implied_rating": "A",
+        "one_year_pd": 0.001,
+        "five_year_pd": 0.01
+      },
+      "lgd_analysis": {
+        "seniority_structure": [
+          {
+            "tranche": "ABL Revolver",
+            "amount": 5000.0,
+            "recovery_est": "85%"
+          },
+          {
+            "tranche": "Convertible Senior Notes",
+            "amount": 1800.0,
+            "recovery_est": "50%"
+          },
+          {
+            "tranche": "Auto ABS Facilities",
+            "amount": 3000.0,
+            "recovery_est": "95%"
+          }
+        ],
+        "recovery_rate_assumption": 0.7666666666666666,
+        "loss_given_default": 0.2333333333333334
+      },
+      "scenario_analysis": {
+        "scenarios": [
+          {
+            "name": "Bear Case",
+            "probability": 0.2,
+            "revenue_growth": -0.05,
+            "ebitda_margin": 0.2,
+            "implied_share_price": 105.0
+          },
+          {
+            "name": "Base Case",
+            "probability": 0.5,
+            "revenue_growth": 0.05,
+            "ebitda_margin": 0.3,
+            "implied_share_price": 150.0
+          },
+          {
+            "name": "Bull Case",
+            "probability": 0.3,
+            "revenue_growth": 0.12,
+            "ebitda_margin": 0.35,
+            "implied_share_price": 210.0
+          }
+        ],
+        "weighted_share_price": 159.0
+      },
+      "system_two_critique": {
+        "critique_points": [
+          "Credit thesis aligns with macro outlook.",
+          "Valuation assumptions appear conservative."
+        ],
+        "conviction_score": 0.85,
+        "verification_status": "PASS",
+        "author_agent": "System 2"
+      },
+      "risk_score": 80.0,
+      "credit_ratings": [
+        {
+          "agency": "Moody's",
+          "rating": "Baa3",
+          "outlook": "Positive",
+          "date": "2026-02-13"
+        },
+        {
+          "agency": "S&P",
+          "rating": "BBB",
+          "outlook": "Stable",
+          "date": "2026-02-13"
+        },
+        {
+          "agency": "Fitch",
+          "rating": "BBB",
+          "outlook": "Stable",
+          "date": "2026-02-13"
+        }
+      ],
+      "debt_facilities": [
+        {
+          "facility_type": "ABL Revolver",
+          "amount_committed": 5000.0,
+          "amount_drawn": 500.0,
+          "interest_rate": "SOFR + 1.50%",
+          "maturity_date": "2026-10-20",
+          "snc_rating": "Pass",
+          "drc": 0.9,
+          "ltv": 0.4,
+          "conviction_score": 0.88,
+          "lgd": 0.15,
+          "recovery_rate": 0.85
+        },
+        {
+          "facility_type": "Convertible Senior Notes",
+          "amount_committed": 1800.0,
+          "amount_drawn": 1800.0,
+          "interest_rate": "2.00%",
+          "maturity_date": "2027-05-15",
+          "snc_rating": "Pass",
+          "drc": 0.85,
+          "ltv": 0.3,
+          "conviction_score": 0.85,
+          "lgd": 0.5,
+          "recovery_rate": 0.5
+        },
+        {
+          "facility_type": "Auto ABS Facilities",
+          "amount_committed": 3000.0,
+          "amount_drawn": 2200.0,
+          "interest_rate": "Variable",
+          "maturity_date": "Rolling",
+          "snc_rating": "Pass",
+          "drc": 0.95,
+          "ltv": 0.8,
+          "conviction_score": 0.92,
+          "lgd": 0.05,
+          "recovery_rate": 0.95
+        }
+      ],
+      "repayment_schedule": [
+        {
+          "year": 2027,
+          "amount": 1800.0,
+          "source": "Convertible Senior Notes Maturity"
+        }
+      ],
+      "equity_data": {
+        "market_cap": 850000.0,
+        "share_price": 265.4,
+        "volume_avg_30d": 98000000.0,
+        "pe_ratio": 68.2,
+        "dividend_yield": 0.0,
+        "beta": 2.05
       }
     },
     "Meta_Platforms": {
-      "id": "Meta_Platforms",
       "borrower_name": "Meta Platforms",
-      "ticker": "META",
-      "sector": "Technology",
-      "report_date": "2026-02-13T01:31:38.455Z",
-      "risk_score": 77.0,
-      "summary": "Meta Platforms (BBB+) is navigating data privacy regulations while boosting margins through AI. The financial position is stable with $390.0B in assets.",
-      "borrower_details": {
-        "name": "Meta Platforms",
-        "ticker": "META",
-        "sector": "Technology",
-        "rating": "BBB+"
-      },
-      "documents": [
+      "report_date": "2026-02-14T02:03:14.566038",
+      "executive_summary": "The borrower Meta Platforms presents a mixed credit profile. Financial performance shows strong EBITDA ($5.0M) but elevated leverage (10.0x).  [Ref: TechCorp_10K_2025.pdf]",
+      "sections": [
         {
-          "doc_id": "doc_META_10K_2026",
-          "title": "META 10-K",
-          "page_count": 50,
-          "chunks": [
+          "title": "Executive Summary",
+          "content": "The borrower Meta Platforms presents a mixed credit profile. Financial performance shows strong EBITDA ($5.0M) but elevated leverage (10.0x).  [Ref: TechCorp_10K_2025.pdf]",
+          "citations": [
             {
-              "chunk_id": "chunk_001",
-              "type": "header",
-              "page": 1,
-              "bbox": [
-                50,
-                30,
-                400,
-                60
-              ],
-              "content": "Meta Platforms (META) - FORM 10-K"
-            },
-            {
-              "chunk_id": "chunk_002",
-              "type": "narrative",
-              "page": 8,
-              "bbox": [
-                50,
-                452,
-                550,
-                670
-              ],
-              "content": "Revenue driven by cloud adoption (META specific context)."
-            },
-            {
-              "chunk_id": "chunk_003",
-              "type": "narrative",
-              "page": 10,
-              "bbox": [
-                50,
-                100,
-                550,
-                670
-              ],
-              "content": "AI integration boosting margins (META specific context)."
-            },
-            {
-              "chunk_id": "chunk_004",
-              "type": "narrative",
-              "page": 6,
-              "bbox": [
-                50,
-                309,
-                550,
-                745
-              ],
-              "content": "Hardware sales normalizing (META specific context)."
-            },
-            {
-              "chunk_id": "chunk_005",
-              "type": "financial_table",
-              "page": 25,
-              "bbox": [
-                50,
-                200,
-                550,
-                500
-              ],
-              "content": "Consolidated Financial Statements",
-              "content_json": {
-                "total_assets": 390.0,
-                "total_liabilities": 286.0,
-                "total_equity": 104.0,
-                "ebitda": 70.0,
-                "total_debt": 125.0,
-                "interest_expense": 7.8
-              }
-            },
-            {
-              "chunk_id": "chunk_006",
-              "type": "risk_factor",
-              "page": 18,
-              "bbox": [
-                50,
-                508,
-                550,
-                735
-              ],
-              "content": "Risk Factor: Supply chain disruption"
-            },
-            {
-              "chunk_id": "chunk_007",
-              "type": "risk_factor",
-              "page": 15,
-              "bbox": [
-                50,
-                392,
-                550,
-                662
-              ],
-              "content": "Risk Factor: Rapid technological obsolescence"
-            },
-            {
-              "chunk_id": "chunk_008",
-              "type": "risk_factor",
-              "page": 19,
-              "bbox": [
-                50,
-                263,
-                550,
-                722
-              ],
-              "content": "Risk Factor: Data privacy regulation"
+              "doc_id": "TechCorp_10K_2025.pdf",
+              "chunk_id": "5d214c07-b0c8-4256-9045-efc8ec0d99e3",
+              "page_number": 3
             }
-          ]
+          ],
+          "author_agent": "Writer"
+        },
+        {
+          "title": "Key Risks & Mitigants",
+          "content": "Key Risks:\n- HIGH: Leverage ratio exceeds 4.0x policy limit.\n",
+          "citations": [],
+          "author_agent": "Risk Officer"
+        },
+        {
+          "title": "Financial Analysis",
+          "content": "EBITDA: $5.0M | Leverage: 10.0x",
+          "citations": [],
+          "author_agent": "Quant"
         }
       ],
-      "market_data": {
-        "sentiment": 0.5846905078388187,
-        "trend": "Neutral"
+      "key_strengths": [
+        "Market leading position in core segment.",
+        "Strong EBITDA generation ($5.0M).",
+        "Diversified customer base."
+      ],
+      "key_weaknesses": [
+        "Elevated leverage at 10.0x.",
+        "Exposure to cyclical end-markets.",
+        "Recent management turnover."
+      ],
+      "mitigants": [
+        "Strong free cash flow conversion.",
+        "Demonstrated ability to deleverage.",
+        "Sponsor support."
+      ],
+      "financial_ratios": {
+        "leverage_ratio": 10.0,
+        "dscr": 5.0,
+        "current_ratio": 2.0,
+        "revenue": 20.0,
+        "ebitda": 5.0,
+        "net_income": 2.0
+      },
+      "historical_financials": [
+        {
+          "total_assets": 100.0,
+          "total_liabilities": 50.0,
+          "total_equity": 50.0,
+          "revenue": 20.0,
+          "ebitda": 5.0,
+          "net_income": 2.0,
+          "interest_expense": 1.0,
+          "dscr": 5.0,
+          "leverage_ratio": 10.0,
+          "current_ratio": 2.0,
+          "period": "FY2025"
+        },
+        {
+          "total_assets": 92.0,
+          "total_liabilities": 46.0,
+          "total_equity": 46.0,
+          "revenue": 18.0,
+          "ebitda": 4.4,
+          "net_income": 1.7,
+          "interest_expense": 1.0,
+          "dscr": 5.0,
+          "leverage_ratio": 10.0,
+          "current_ratio": 2.0,
+          "period": "FY2024"
+        },
+        {
+          "total_assets": 87.39999999999999,
+          "total_liabilities": 43.699999999999996,
+          "total_equity": 43.699999999999996,
+          "revenue": 16.560000000000002,
+          "ebitda": 3.9600000000000004,
+          "net_income": 1.496,
+          "interest_expense": 1.0,
+          "dscr": 5.0,
+          "leverage_ratio": 10.0,
+          "current_ratio": 2.0,
+          "period": "FY2023"
+        }
+      ],
+      "dcf_analysis": {
+        "free_cash_flow": [
+          3.4125,
+          3.5490812499999995,
+          3.6558080000000004,
+          3.729449752031249,
+          3.767640741475
+        ],
+        "growth_rate": 0.03,
+        "wacc": 0.09,
+        "terminal_value": 64.67783272865418,
+        "enterprise_value": 56.06777685745914,
+        "equity_value": 6.067776857459137,
+        "share_price": 185.0,
+        "inputs": {
+          "wacc": 0.09,
+          "growth_rate": 0.03,
+          "tax_rate_proxy": 0.35,
+          "capex_margin": 0.05
+        }
+      },
+      "pd_model": {
+        "input_factors": {
+          "Leverage Ratio": 10.0,
+          "DSCR": 5.0,
+          "Liquidity (Current Ratio)": 2.0,
+          "EBITDA Margin": 0.25
+        },
+        "model_score": 60.0,
+        "implied_rating": "BB",
+        "one_year_pd": 0.02,
+        "five_year_pd": 0.1
+      },
+      "lgd_analysis": {
+        "seniority_structure": [
+          {
+            "tranche": "Revolver",
+            "amount": 100.0,
+            "recovery_est": "70%"
+          },
+          {
+            "tranche": "Term Loan",
+            "amount": 500.0,
+            "recovery_est": "60%"
+          }
+        ],
+        "recovery_rate_assumption": 0.6499999999999999,
+        "loss_given_default": 0.3500000000000001
+      },
+      "scenario_analysis": {
+        "scenarios": [
+          {
+            "name": "Bear Case",
+            "probability": 0.2,
+            "revenue_growth": -0.05,
+            "ebitda_margin": 0.2,
+            "implied_share_price": 105.0
+          },
+          {
+            "name": "Base Case",
+            "probability": 0.5,
+            "revenue_growth": 0.05,
+            "ebitda_margin": 0.3,
+            "implied_share_price": 150.0
+          },
+          {
+            "name": "Bull Case",
+            "probability": 0.3,
+            "revenue_growth": 0.12,
+            "ebitda_margin": 0.35,
+            "implied_share_price": 210.0
+          }
+        ],
+        "weighted_share_price": 159.0
+      },
+      "system_two_critique": {
+        "critique_points": [
+          "Credit thesis aligns with macro outlook.",
+          "Valuation assumptions appear conservative."
+        ],
+        "conviction_score": 0.85,
+        "verification_status": "PASS",
+        "author_agent": "System 2"
+      },
+      "risk_score": 60.0,
+      "credit_ratings": [
+        {
+          "agency": "Moody's",
+          "rating": "Ba2",
+          "outlook": "Stable",
+          "date": "2026-02-13"
+        },
+        {
+          "agency": "S&P",
+          "rating": "BB",
+          "outlook": "Stable",
+          "date": "2026-02-13"
+        }
+      ],
+      "debt_facilities": [
+        {
+          "facility_type": "Revolver",
+          "amount_committed": 100.0,
+          "amount_drawn": 20.0,
+          "interest_rate": "Prime + 1.0%",
+          "maturity_date": "2026-01-01",
+          "snc_rating": "Pass",
+          "drc": 0.8,
+          "ltv": 0.5,
+          "conviction_score": 0.7,
+          "lgd": 0.3,
+          "recovery_rate": 0.7
+        },
+        {
+          "facility_type": "Term Loan",
+          "amount_committed": 500.0,
+          "amount_drawn": 500.0,
+          "interest_rate": "5.50%",
+          "maturity_date": "2029-01-01",
+          "snc_rating": "Pass",
+          "drc": 0.75,
+          "ltv": 0.6,
+          "conviction_score": 0.75,
+          "lgd": 0.4,
+          "recovery_rate": 0.6
+        }
+      ],
+      "repayment_schedule": [
+        {
+          "year": 2027,
+          "amount": 27.5,
+          "source": "Term Loan Interest"
+        },
+        {
+          "year": 2028,
+          "amount": 27.5,
+          "source": "Term Loan Interest"
+        },
+        {
+          "year": 2029,
+          "amount": 500.0,
+          "source": "Term Loan Maturity"
+        }
+      ],
+      "equity_data": {
+        "market_cap": 100.0,
+        "share_price": 10.0,
+        "volume_avg_30d": 1000.0,
+        "pe_ratio": 15.0,
+        "dividend_yield": 1.0,
+        "beta": 1.0
       }
     },
     "JPMorgan_Chase": {
-      "id": "JPMorgan_Chase",
       "borrower_name": "JPMorgan Chase",
-      "ticker": "JPM",
-      "sector": "Financial",
-      "report_date": "2026-02-13T02:55:10.467372",
-      "risk_score": 45.0,
-      "file": "credit_memo_JPMorgan_Chase.json",
-      "summary": "JPMorgan Chase (AA) demonstrates resilience despite interest rate volatility. Trading revenue has outperformed, contributing to a strong $68.0B EBITDA.",
-      "borrower_details": {
-        "name": "JPMorgan Chase",
-        "ticker": "JPM",
-        "sector": "Financial",
-        "rating": "AA"
-      },
-      "documents": [
+      "report_date": "2026-02-14T02:03:14.567333",
+      "executive_summary": "The borrower JPMorgan Chase presents a mixed credit profile. Financial performance shows strong EBITDA ($95000.0M) but elevated leverage (9.5x).  [Ref: JPM_Earnings_Release_4Q24.pdf]",
+      "sections": [
         {
-          "doc_id": "doc_JPM_10K_2026",
-          "title": "JPM 10-K",
-          "page_count": 50,
-          "chunks": [
+          "title": "Executive Summary",
+          "content": "The borrower JPMorgan Chase presents a mixed credit profile. Financial performance shows strong EBITDA ($95000.0M) but elevated leverage (9.5x).  [Ref: JPM_Earnings_Release_4Q24.pdf]",
+          "citations": [
             {
-              "chunk_id": "chunk_001",
-              "type": "header",
-              "page": 1,
-              "bbox": [
-                50,
-                30,
-                400,
-                60
-              ],
-              "content": "JPMorgan Chase (JPM) - FORM 10-K"
-            },
-            {
-              "chunk_id": "chunk_002",
-              "type": "narrative",
-              "page": 4,
-              "bbox": [
-                50,
-                486,
-                550,
-                699
-              ],
-              "content": "Net interest income expanded (JPM specific context)."
-            },
-            {
-              "chunk_id": "chunk_003",
-              "type": "narrative",
-              "page": 7,
-              "bbox": [
-                50,
-                297,
-                550,
-                737
-              ],
-              "content": "Investment banking fees muted (JPM specific context)."
-            },
-            {
-              "chunk_id": "chunk_004",
-              "type": "narrative",
-              "page": 3,
-              "bbox": [
-                50,
-                220,
-                550,
-                749
-              ],
-              "content": "Trading revenue outperformed (JPM specific context)."
-            },
-            {
-              "chunk_id": "chunk_005",
-              "type": "financial_table",
-              "page": 25,
-              "bbox": [
-                50,
-                200,
-                550,
-                500
-              ],
-              "content": "Consolidated Financial Statements",
-              "content_json": {
-                "total_assets": 473.0,
-                "total_liabilities": 291.0,
-                "total_equity": 182.0,
-                "ebitda": 68.0,
-                "total_debt": 213.0,
-                "interest_expense": 9.46
-              }
-            },
-            {
-              "chunk_id": "chunk_006",
-              "type": "risk_factor",
-              "page": 17,
-              "bbox": [
-                50,
-                273,
-                550,
-                680
-              ],
-              "content": "Risk Factor: Interest rate volatility"
-            },
-            {
-              "chunk_id": "chunk_007",
-              "type": "risk_factor",
-              "page": 16,
-              "bbox": [
-                50,
-                423,
-                550,
-                652
-              ],
-              "content": "Risk Factor: Credit default rise"
-            },
-            {
-              "chunk_id": "chunk_008",
-              "type": "risk_factor",
-              "page": 15,
-              "bbox": [
-                50,
-                483,
-                550,
-                740
-              ],
-              "content": "Risk Factor: Regulatory capital requirements"
+              "doc_id": "JPM_Earnings_Release_4Q24.pdf",
+              "chunk_id": "0557f056-3bcc-4a74-be47-79d71f2d7ec0",
+              "page_number": 1
             }
-          ]
+          ],
+          "author_agent": "Writer"
+        },
+        {
+          "title": "Key Risks & Mitigants",
+          "content": "Key Risks:\n- HIGH: Leverage ratio exceeds 4.0x policy limit.\n",
+          "citations": [],
+          "author_agent": "Risk Officer"
+        },
+        {
+          "title": "Financial Analysis",
+          "content": "EBITDA: $95000.0M | Leverage: 9.5x",
+          "citations": [],
+          "author_agent": "Quant"
         }
       ],
-      "market_data": {
-        "sentiment": 0.4238490822842891,
-        "trend": "Bullish"
+      "key_strengths": [
+        "Market leading position in core segment.",
+        "Strong EBITDA generation ($95000.0M).",
+        "Diversified customer base."
+      ],
+      "key_weaknesses": [
+        "Elevated leverage at 9.5x.",
+        "Exposure to cyclical end-markets.",
+        "Recent management turnover."
+      ],
+      "mitigants": [
+        "Strong free cash flow conversion.",
+        "Demonstrated ability to deleverage.",
+        "Sponsor support."
+      ],
+      "financial_ratios": {
+        "leverage_ratio": 9.5,
+        "dscr": 999.0,
+        "current_ratio": 1.1,
+        "revenue": 185000.0,
+        "ebitda": 95000.0,
+        "net_income": 60000.0
+      },
+      "historical_financials": [
+        {
+          "total_assets": 4200000.0,
+          "total_liabilities": 3800000.0,
+          "total_equity": 400000.0,
+          "revenue": 185000.0,
+          "ebitda": 95000.0,
+          "net_income": 60000.0,
+          "interest_expense": 1.0,
+          "dscr": 999.0,
+          "leverage_ratio": 9.5,
+          "current_ratio": 1.1,
+          "period": "FY2026 (Proj)"
+        },
+        {
+          "total_assets": 3864000.0,
+          "total_liabilities": 3496000.0,
+          "total_equity": 368000.0,
+          "revenue": 166500.0,
+          "ebitda": 83600.0,
+          "net_income": 51000.0,
+          "interest_expense": 1.0,
+          "dscr": 999.0,
+          "leverage_ratio": 9.5,
+          "current_ratio": 1.1,
+          "period": "FY2025"
+        },
+        {
+          "total_assets": 3670800.0,
+          "total_liabilities": 3321200.0,
+          "total_equity": 349600.0,
+          "revenue": 153180.0,
+          "ebitda": 75240.0,
+          "net_income": 44880.0,
+          "interest_expense": 1.0,
+          "dscr": 999.0,
+          "leverage_ratio": 9.5,
+          "current_ratio": 1.1,
+          "period": "FY2024"
+        }
+      ],
+      "dcf_analysis": {
+        "free_cash_flow": [
+          64837.5,
+          67432.54374999998,
+          69460.352,
+          70859.54528859373,
+          71585.174088025
+        ],
+        "growth_rate": 0.03,
+        "wacc": 0.09,
+        "terminal_value": 1228878.8218444292,
+        "enterprise_value": 1065287.7602917235,
+        "equity_value": -2734712.2397082765,
+        "share_price": -2734712.2397082765,
+        "inputs": {
+          "wacc": 0.09,
+          "growth_rate": 0.03,
+          "tax_rate_proxy": 0.35,
+          "capex_margin": 0.05
+        }
+      },
+      "pd_model": {
+        "input_factors": {
+          "Leverage Ratio": 9.5,
+          "DSCR": 999.0,
+          "Liquidity (Current Ratio)": 1.1,
+          "EBITDA Margin": 0.5135135135135135
+        },
+        "model_score": 60.0,
+        "implied_rating": "BB",
+        "one_year_pd": 0.02,
+        "five_year_pd": 0.1
+      },
+      "lgd_analysis": {
+        "seniority_structure": [
+          {
+            "tranche": "Revolver",
+            "amount": 100.0,
+            "recovery_est": "70%"
+          },
+          {
+            "tranche": "Term Loan",
+            "amount": 500.0,
+            "recovery_est": "60%"
+          }
+        ],
+        "recovery_rate_assumption": 0.6499999999999999,
+        "loss_given_default": 0.3500000000000001
+      },
+      "scenario_analysis": {
+        "scenarios": [
+          {
+            "name": "Bear Case",
+            "probability": 0.2,
+            "revenue_growth": -0.05,
+            "ebitda_margin": 0.2,
+            "implied_share_price": 105.0
+          },
+          {
+            "name": "Base Case",
+            "probability": 0.5,
+            "revenue_growth": 0.05,
+            "ebitda_margin": 0.3,
+            "implied_share_price": 150.0
+          },
+          {
+            "name": "Bull Case",
+            "probability": 0.3,
+            "revenue_growth": 0.12,
+            "ebitda_margin": 0.35,
+            "implied_share_price": 210.0
+          }
+        ],
+        "weighted_share_price": 159.0
+      },
+      "system_two_critique": {
+        "critique_points": [
+          "Credit thesis aligns with macro outlook.",
+          "Valuation assumptions appear conservative."
+        ],
+        "conviction_score": 0.85,
+        "verification_status": "PASS",
+        "author_agent": "System 2"
+      },
+      "risk_score": 60.0,
+      "credit_ratings": [
+        {
+          "agency": "Moody's",
+          "rating": "A1",
+          "outlook": "Stable",
+          "date": "2026-02-13"
+        },
+        {
+          "agency": "S&P",
+          "rating": "A-",
+          "outlook": "Stable",
+          "date": "2026-02-13"
+        },
+        {
+          "agency": "Fitch",
+          "rating": "AA-",
+          "outlook": "Stable",
+          "date": "2026-02-13"
+        }
+      ],
+      "debt_facilities": [
+        {
+          "facility_type": "Revolver",
+          "amount_committed": 100.0,
+          "amount_drawn": 20.0,
+          "interest_rate": "Prime + 1.0%",
+          "maturity_date": "2026-01-01",
+          "snc_rating": "Pass",
+          "drc": 0.8,
+          "ltv": 0.5,
+          "conviction_score": 0.7,
+          "lgd": 0.3,
+          "recovery_rate": 0.7
+        },
+        {
+          "facility_type": "Term Loan",
+          "amount_committed": 500.0,
+          "amount_drawn": 500.0,
+          "interest_rate": "5.50%",
+          "maturity_date": "2029-01-01",
+          "snc_rating": "Pass",
+          "drc": 0.75,
+          "ltv": 0.6,
+          "conviction_score": 0.75,
+          "lgd": 0.4,
+          "recovery_rate": 0.6
+        }
+      ],
+      "repayment_schedule": [
+        {
+          "year": 2027,
+          "amount": 27.5,
+          "source": "Term Loan Interest"
+        },
+        {
+          "year": 2028,
+          "amount": 27.5,
+          "source": "Term Loan Interest"
+        },
+        {
+          "year": 2029,
+          "amount": 500.0,
+          "source": "Term Loan Maturity"
+        }
+      ],
+      "equity_data": {
+        "market_cap": 580000.0,
+        "share_price": 205.1,
+        "volume_avg_30d": 9500000.0,
+        "pe_ratio": 11.8,
+        "dividend_yield": 2.3,
+        "beta": 1.05
       }
     },
     "Goldman_Sachs": {
-      "id": "Goldman_Sachs",
       "borrower_name": "Goldman Sachs",
-      "ticker": "GS",
-      "sector": "Financial",
-      "report_date": "2026-02-13T01:31:38.458Z",
-      "risk_score": 72.0,
-      "summary": "Goldman Sachs holds a BBB rating. The firm is managing regulatory capital requirements and credit default risks. Strong trading revenue supports EBITDA.",
-      "borrower_details": {
-        "name": "Goldman Sachs",
-        "ticker": "GS",
-        "sector": "Financial",
-        "rating": "BBB"
-      },
-      "documents": [
+      "report_date": "2026-02-14T02:03:14.568300",
+      "executive_summary": "The borrower Goldman Sachs presents a mixed credit profile. Financial performance shows strong EBITDA ($5.0M) but elevated leverage (10.0x).  [Ref: Generic_Borrower_Profile.pdf]",
+      "sections": [
         {
-          "doc_id": "doc_GS_10K_2026",
-          "title": "GS 10-K",
-          "page_count": 50,
-          "chunks": [
+          "title": "Executive Summary",
+          "content": "The borrower Goldman Sachs presents a mixed credit profile. Financial performance shows strong EBITDA ($5.0M) but elevated leverage (10.0x).  [Ref: Generic_Borrower_Profile.pdf]",
+          "citations": [
             {
-              "chunk_id": "chunk_001",
-              "type": "header",
-              "page": 1,
-              "bbox": [
-                50,
-                30,
-                400,
-                60
-              ],
-              "content": "Goldman Sachs (GS) - FORM 10-K"
-            },
-            {
-              "chunk_id": "chunk_002",
-              "type": "narrative",
-              "page": 8,
-              "bbox": [
-                50,
-                103,
-                550,
-                666
-              ],
-              "content": "Net interest income expanded (GS specific context)."
-            },
-            {
-              "chunk_id": "chunk_003",
-              "type": "narrative",
-              "page": 10,
-              "bbox": [
-                50,
-                580,
-                550,
-                657
-              ],
-              "content": "Investment banking fees muted (GS specific context)."
-            },
-            {
-              "chunk_id": "chunk_004",
-              "type": "narrative",
-              "page": 8,
-              "bbox": [
-                50,
-                286,
-                550,
-                747
-              ],
-              "content": "Trading revenue outperformed (GS specific context)."
-            },
-            {
-              "chunk_id": "chunk_005",
-              "type": "financial_table",
-              "page": 25,
-              "bbox": [
-                50,
-                200,
-                550,
-                500
-              ],
-              "content": "Consolidated Financial Statements",
-              "content_json": {
-                "total_assets": 466.0,
-                "total_liabilities": 367.0,
-                "total_equity": 99.0,
-                "ebitda": 87.0,
-                "total_debt": 230.0,
-                "interest_expense": 9.32
-              }
-            },
-            {
-              "chunk_id": "chunk_006",
-              "type": "risk_factor",
-              "page": 20,
-              "bbox": [
-                50,
-                528,
-                550,
-                667
-              ],
-              "content": "Risk Factor: Interest rate volatility"
-            },
-            {
-              "chunk_id": "chunk_007",
-              "type": "risk_factor",
-              "page": 16,
-              "bbox": [
-                50,
-                333,
-                550,
-                696
-              ],
-              "content": "Risk Factor: Credit default rise"
-            },
-            {
-              "chunk_id": "chunk_008",
-              "type": "risk_factor",
-              "page": 17,
-              "bbox": [
-                50,
-                148,
-                550,
-                727
-              ],
-              "content": "Risk Factor: Regulatory capital requirements"
+              "doc_id": "Generic_Borrower_Profile.pdf",
+              "chunk_id": "d2332adf-8770-41ca-9dea-26def5bfed7b",
+              "page_number": 1
             }
-          ]
+          ],
+          "author_agent": "Writer"
+        },
+        {
+          "title": "Key Risks & Mitigants",
+          "content": "Key Risks:\n- HIGH: Leverage ratio exceeds 4.0x policy limit.\n",
+          "citations": [],
+          "author_agent": "Risk Officer"
+        },
+        {
+          "title": "Financial Analysis",
+          "content": "EBITDA: $5.0M | Leverage: 10.0x",
+          "citations": [],
+          "author_agent": "Quant"
         }
       ],
-      "market_data": {
-        "sentiment": 0.5324114742699515,
-        "trend": "Bullish"
+      "key_strengths": [
+        "Market leading position in core segment.",
+        "Strong EBITDA generation ($5.0M).",
+        "Diversified customer base."
+      ],
+      "key_weaknesses": [
+        "Elevated leverage at 10.0x.",
+        "Exposure to cyclical end-markets.",
+        "Recent management turnover."
+      ],
+      "mitigants": [
+        "Strong free cash flow conversion.",
+        "Demonstrated ability to deleverage.",
+        "Sponsor support."
+      ],
+      "financial_ratios": {
+        "leverage_ratio": 10.0,
+        "dscr": 5.0,
+        "current_ratio": 2.0,
+        "revenue": 20.0,
+        "ebitda": 5.0,
+        "net_income": 2.0
+      },
+      "historical_financials": [
+        {
+          "total_assets": 100.0,
+          "total_liabilities": 50.0,
+          "total_equity": 50.0,
+          "revenue": 20.0,
+          "ebitda": 5.0,
+          "net_income": 2.0,
+          "interest_expense": 1.0,
+          "dscr": 5.0,
+          "leverage_ratio": 10.0,
+          "current_ratio": 2.0,
+          "period": "FY2025"
+        },
+        {
+          "total_assets": 92.0,
+          "total_liabilities": 46.0,
+          "total_equity": 46.0,
+          "revenue": 18.0,
+          "ebitda": 4.4,
+          "net_income": 1.7,
+          "interest_expense": 1.0,
+          "dscr": 5.0,
+          "leverage_ratio": 10.0,
+          "current_ratio": 2.0,
+          "period": "FY2024"
+        },
+        {
+          "total_assets": 87.39999999999999,
+          "total_liabilities": 43.699999999999996,
+          "total_equity": 43.699999999999996,
+          "revenue": 16.560000000000002,
+          "ebitda": 3.9600000000000004,
+          "net_income": 1.496,
+          "interest_expense": 1.0,
+          "dscr": 5.0,
+          "leverage_ratio": 10.0,
+          "current_ratio": 2.0,
+          "period": "FY2023"
+        }
+      ],
+      "dcf_analysis": {
+        "free_cash_flow": [
+          3.4125,
+          3.5490812499999995,
+          3.6558080000000004,
+          3.729449752031249,
+          3.767640741475
+        ],
+        "growth_rate": 0.03,
+        "wacc": 0.09,
+        "terminal_value": 64.67783272865418,
+        "enterprise_value": 56.06777685745914,
+        "equity_value": 6.067776857459137,
+        "share_price": 185.0,
+        "inputs": {
+          "wacc": 0.09,
+          "growth_rate": 0.03,
+          "tax_rate_proxy": 0.35,
+          "capex_margin": 0.05
+        }
+      },
+      "pd_model": {
+        "input_factors": {
+          "Leverage Ratio": 10.0,
+          "DSCR": 5.0,
+          "Liquidity (Current Ratio)": 2.0,
+          "EBITDA Margin": 0.25
+        },
+        "model_score": 60.0,
+        "implied_rating": "BB",
+        "one_year_pd": 0.02,
+        "five_year_pd": 0.1
+      },
+      "lgd_analysis": {
+        "seniority_structure": [
+          {
+            "tranche": "Revolver",
+            "amount": 100.0,
+            "recovery_est": "70%"
+          },
+          {
+            "tranche": "Term Loan",
+            "amount": 500.0,
+            "recovery_est": "60%"
+          }
+        ],
+        "recovery_rate_assumption": 0.6499999999999999,
+        "loss_given_default": 0.3500000000000001
+      },
+      "scenario_analysis": {
+        "scenarios": [
+          {
+            "name": "Bear Case",
+            "probability": 0.2,
+            "revenue_growth": -0.05,
+            "ebitda_margin": 0.2,
+            "implied_share_price": 105.0
+          },
+          {
+            "name": "Base Case",
+            "probability": 0.5,
+            "revenue_growth": 0.05,
+            "ebitda_margin": 0.3,
+            "implied_share_price": 150.0
+          },
+          {
+            "name": "Bull Case",
+            "probability": 0.3,
+            "revenue_growth": 0.12,
+            "ebitda_margin": 0.35,
+            "implied_share_price": 210.0
+          }
+        ],
+        "weighted_share_price": 159.0
+      },
+      "system_two_critique": {
+        "critique_points": [
+          "Credit thesis aligns with macro outlook.",
+          "Valuation assumptions appear conservative."
+        ],
+        "conviction_score": 0.85,
+        "verification_status": "PASS",
+        "author_agent": "System 2"
+      },
+      "risk_score": 60.0,
+      "credit_ratings": [
+        {
+          "agency": "Moody's",
+          "rating": "Ba2",
+          "outlook": "Stable",
+          "date": "2026-02-13"
+        },
+        {
+          "agency": "S&P",
+          "rating": "BB",
+          "outlook": "Stable",
+          "date": "2026-02-13"
+        }
+      ],
+      "debt_facilities": [
+        {
+          "facility_type": "Revolver",
+          "amount_committed": 100.0,
+          "amount_drawn": 20.0,
+          "interest_rate": "Prime + 1.0%",
+          "maturity_date": "2026-01-01",
+          "snc_rating": "Pass",
+          "drc": 0.8,
+          "ltv": 0.5,
+          "conviction_score": 0.7,
+          "lgd": 0.3,
+          "recovery_rate": 0.7
+        },
+        {
+          "facility_type": "Term Loan",
+          "amount_committed": 500.0,
+          "amount_drawn": 500.0,
+          "interest_rate": "5.50%",
+          "maturity_date": "2029-01-01",
+          "snc_rating": "Pass",
+          "drc": 0.75,
+          "ltv": 0.6,
+          "conviction_score": 0.75,
+          "lgd": 0.4,
+          "recovery_rate": 0.6
+        }
+      ],
+      "repayment_schedule": [
+        {
+          "year": 2027,
+          "amount": 27.5,
+          "source": "Term Loan Interest"
+        },
+        {
+          "year": 2028,
+          "amount": 27.5,
+          "source": "Term Loan Interest"
+        },
+        {
+          "year": 2029,
+          "amount": 500.0,
+          "source": "Term Loan Maturity"
+        }
+      ],
+      "equity_data": {
+        "market_cap": 100.0,
+        "share_price": 10.0,
+        "volume_avg_30d": 1000.0,
+        "pe_ratio": 15.0,
+        "dividend_yield": 1.0,
+        "beta": 1.0
       }
     },
     "Bank_of_America": {
-      "id": "Bank_of_America",
       "borrower_name": "Bank of America",
-      "ticker": "BAC",
-      "sector": "Financial",
-      "report_date": "2026-02-13T01:31:38.459Z",
-      "risk_score": 74.0,
-      "summary": "Bank of America (BBB+) has seen net interest income expand, though market trend is bearish. The bank maintains a conservative leverage profile.",
-      "borrower_details": {
-        "name": "Bank of America",
-        "ticker": "BAC",
-        "sector": "Financial",
-        "rating": "BBB+"
-      },
-      "documents": [
+      "report_date": "2026-02-14T02:03:14.569251",
+      "executive_summary": "The borrower Bank of America presents a mixed credit profile. Financial performance shows strong EBITDA ($5.0M) but elevated leverage (10.0x).  [Ref: Generic_Borrower_Profile.pdf]",
+      "sections": [
         {
-          "doc_id": "doc_BAC_10K_2026",
-          "title": "BAC 10-K",
-          "page_count": 50,
-          "chunks": [
+          "title": "Executive Summary",
+          "content": "The borrower Bank of America presents a mixed credit profile. Financial performance shows strong EBITDA ($5.0M) but elevated leverage (10.0x).  [Ref: Generic_Borrower_Profile.pdf]",
+          "citations": [
             {
-              "chunk_id": "chunk_001",
-              "type": "header",
-              "page": 1,
-              "bbox": [
-                50,
-                30,
-                400,
-                60
-              ],
-              "content": "Bank of America (BAC) - FORM 10-K"
-            },
-            {
-              "chunk_id": "chunk_002",
-              "type": "narrative",
-              "page": 6,
-              "bbox": [
-                50,
-                301,
-                550,
-                696
-              ],
-              "content": "Net interest income expanded (BAC specific context)."
-            },
-            {
-              "chunk_id": "chunk_003",
-              "type": "narrative",
-              "page": 3,
-              "bbox": [
-                50,
-                291,
-                550,
-                652
-              ],
-              "content": "Investment banking fees muted (BAC specific context)."
-            },
-            {
-              "chunk_id": "chunk_004",
-              "type": "narrative",
-              "page": 8,
-              "bbox": [
-                50,
-                149,
-                550,
-                705
-              ],
-              "content": "Trading revenue outperformed (BAC specific context)."
-            },
-            {
-              "chunk_id": "chunk_005",
-              "type": "financial_table",
-              "page": 25,
-              "bbox": [
-                50,
-                200,
-                550,
-                500
-              ],
-              "content": "Consolidated Financial Statements",
-              "content_json": {
-                "total_assets": 272.0,
-                "total_liabilities": 217.0,
-                "total_equity": 55.0,
-                "ebitda": 51.0,
-                "total_debt": 103.0,
-                "interest_expense": 5.44
-              }
-            },
-            {
-              "chunk_id": "chunk_006",
-              "type": "risk_factor",
-              "page": 17,
-              "bbox": [
-                50,
-                181,
-                550,
-                747
-              ],
-              "content": "Risk Factor: Interest rate volatility"
-            },
-            {
-              "chunk_id": "chunk_007",
-              "type": "risk_factor",
-              "page": 19,
-              "bbox": [
-                50,
-                453,
-                550,
-                712
-              ],
-              "content": "Risk Factor: Credit default rise"
-            },
-            {
-              "chunk_id": "chunk_008",
-              "type": "risk_factor",
-              "page": 17,
-              "bbox": [
-                50,
-                273,
-                550,
-                664
-              ],
-              "content": "Risk Factor: Regulatory capital requirements"
+              "doc_id": "Generic_Borrower_Profile.pdf",
+              "chunk_id": "800e923e-2975-430a-93fd-50362ccbd712",
+              "page_number": 1
             }
-          ]
+          ],
+          "author_agent": "Writer"
+        },
+        {
+          "title": "Key Risks & Mitigants",
+          "content": "Key Risks:\n- HIGH: Leverage ratio exceeds 4.0x policy limit.\n",
+          "citations": [],
+          "author_agent": "Risk Officer"
+        },
+        {
+          "title": "Financial Analysis",
+          "content": "EBITDA: $5.0M | Leverage: 10.0x",
+          "citations": [],
+          "author_agent": "Quant"
         }
       ],
-      "market_data": {
-        "sentiment": 0.777104784874584,
-        "trend": "Bearish"
+      "key_strengths": [
+        "Market leading position in core segment.",
+        "Strong EBITDA generation ($5.0M).",
+        "Diversified customer base."
+      ],
+      "key_weaknesses": [
+        "Elevated leverage at 10.0x.",
+        "Exposure to cyclical end-markets.",
+        "Recent management turnover."
+      ],
+      "mitigants": [
+        "Strong free cash flow conversion.",
+        "Demonstrated ability to deleverage.",
+        "Sponsor support."
+      ],
+      "financial_ratios": {
+        "leverage_ratio": 10.0,
+        "dscr": 5.0,
+        "current_ratio": 2.0,
+        "revenue": 20.0,
+        "ebitda": 5.0,
+        "net_income": 2.0
+      },
+      "historical_financials": [
+        {
+          "total_assets": 100.0,
+          "total_liabilities": 50.0,
+          "total_equity": 50.0,
+          "revenue": 20.0,
+          "ebitda": 5.0,
+          "net_income": 2.0,
+          "interest_expense": 1.0,
+          "dscr": 5.0,
+          "leverage_ratio": 10.0,
+          "current_ratio": 2.0,
+          "period": "FY2025"
+        },
+        {
+          "total_assets": 92.0,
+          "total_liabilities": 46.0,
+          "total_equity": 46.0,
+          "revenue": 18.0,
+          "ebitda": 4.4,
+          "net_income": 1.7,
+          "interest_expense": 1.0,
+          "dscr": 5.0,
+          "leverage_ratio": 10.0,
+          "current_ratio": 2.0,
+          "period": "FY2024"
+        },
+        {
+          "total_assets": 87.39999999999999,
+          "total_liabilities": 43.699999999999996,
+          "total_equity": 43.699999999999996,
+          "revenue": 16.560000000000002,
+          "ebitda": 3.9600000000000004,
+          "net_income": 1.496,
+          "interest_expense": 1.0,
+          "dscr": 5.0,
+          "leverage_ratio": 10.0,
+          "current_ratio": 2.0,
+          "period": "FY2023"
+        }
+      ],
+      "dcf_analysis": {
+        "free_cash_flow": [
+          3.4125,
+          3.5490812499999995,
+          3.6558080000000004,
+          3.729449752031249,
+          3.767640741475
+        ],
+        "growth_rate": 0.03,
+        "wacc": 0.09,
+        "terminal_value": 64.67783272865418,
+        "enterprise_value": 56.06777685745914,
+        "equity_value": 6.067776857459137,
+        "share_price": 185.0,
+        "inputs": {
+          "wacc": 0.09,
+          "growth_rate": 0.03,
+          "tax_rate_proxy": 0.35,
+          "capex_margin": 0.05
+        }
+      },
+      "pd_model": {
+        "input_factors": {
+          "Leverage Ratio": 10.0,
+          "DSCR": 5.0,
+          "Liquidity (Current Ratio)": 2.0,
+          "EBITDA Margin": 0.25
+        },
+        "model_score": 60.0,
+        "implied_rating": "BB",
+        "one_year_pd": 0.02,
+        "five_year_pd": 0.1
+      },
+      "lgd_analysis": {
+        "seniority_structure": [
+          {
+            "tranche": "Revolver",
+            "amount": 100.0,
+            "recovery_est": "70%"
+          },
+          {
+            "tranche": "Term Loan",
+            "amount": 500.0,
+            "recovery_est": "60%"
+          }
+        ],
+        "recovery_rate_assumption": 0.6499999999999999,
+        "loss_given_default": 0.3500000000000001
+      },
+      "scenario_analysis": {
+        "scenarios": [
+          {
+            "name": "Bear Case",
+            "probability": 0.2,
+            "revenue_growth": -0.05,
+            "ebitda_margin": 0.2,
+            "implied_share_price": 105.0
+          },
+          {
+            "name": "Base Case",
+            "probability": 0.5,
+            "revenue_growth": 0.05,
+            "ebitda_margin": 0.3,
+            "implied_share_price": 150.0
+          },
+          {
+            "name": "Bull Case",
+            "probability": 0.3,
+            "revenue_growth": 0.12,
+            "ebitda_margin": 0.35,
+            "implied_share_price": 210.0
+          }
+        ],
+        "weighted_share_price": 159.0
+      },
+      "system_two_critique": {
+        "critique_points": [
+          "Credit thesis aligns with macro outlook.",
+          "Valuation assumptions appear conservative."
+        ],
+        "conviction_score": 0.85,
+        "verification_status": "PASS",
+        "author_agent": "System 2"
+      },
+      "risk_score": 60.0,
+      "credit_ratings": [
+        {
+          "agency": "Moody's",
+          "rating": "Ba2",
+          "outlook": "Stable",
+          "date": "2026-02-13"
+        },
+        {
+          "agency": "S&P",
+          "rating": "BB",
+          "outlook": "Stable",
+          "date": "2026-02-13"
+        }
+      ],
+      "debt_facilities": [
+        {
+          "facility_type": "Revolver",
+          "amount_committed": 100.0,
+          "amount_drawn": 20.0,
+          "interest_rate": "Prime + 1.0%",
+          "maturity_date": "2026-01-01",
+          "snc_rating": "Pass",
+          "drc": 0.8,
+          "ltv": 0.5,
+          "conviction_score": 0.7,
+          "lgd": 0.3,
+          "recovery_rate": 0.7
+        },
+        {
+          "facility_type": "Term Loan",
+          "amount_committed": 500.0,
+          "amount_drawn": 500.0,
+          "interest_rate": "5.50%",
+          "maturity_date": "2029-01-01",
+          "snc_rating": "Pass",
+          "drc": 0.75,
+          "ltv": 0.6,
+          "conviction_score": 0.75,
+          "lgd": 0.4,
+          "recovery_rate": 0.6
+        }
+      ],
+      "repayment_schedule": [
+        {
+          "year": 2027,
+          "amount": 27.5,
+          "source": "Term Loan Interest"
+        },
+        {
+          "year": 2028,
+          "amount": 27.5,
+          "source": "Term Loan Interest"
+        },
+        {
+          "year": 2029,
+          "amount": 500.0,
+          "source": "Term Loan Maturity"
+        }
+      ],
+      "equity_data": {
+        "market_cap": 100.0,
+        "share_price": 10.0,
+        "volume_avg_30d": 1000.0,
+        "pe_ratio": 15.0,
+        "dividend_yield": 1.0,
+        "beta": 1.0
+      }
+    },
+    "credit_memo_Meta_Platforms.json": {
+      "borrower_name": "Meta Platforms",
+      "report_date": "2026-02-14T02:03:14.566038",
+      "executive_summary": "The borrower Meta Platforms presents a mixed credit profile. Financial performance shows strong EBITDA ($5.0M) but elevated leverage (10.0x).  [Ref: TechCorp_10K_2025.pdf]",
+      "sections": [
+        {
+          "title": "Executive Summary",
+          "content": "The borrower Meta Platforms presents a mixed credit profile. Financial performance shows strong EBITDA ($5.0M) but elevated leverage (10.0x).  [Ref: TechCorp_10K_2025.pdf]",
+          "citations": [
+            {
+              "doc_id": "TechCorp_10K_2025.pdf",
+              "chunk_id": "5d214c07-b0c8-4256-9045-efc8ec0d99e3",
+              "page_number": 3
+            }
+          ],
+          "author_agent": "Writer"
+        },
+        {
+          "title": "Key Risks & Mitigants",
+          "content": "Key Risks:\n- HIGH: Leverage ratio exceeds 4.0x policy limit.\n",
+          "citations": [],
+          "author_agent": "Risk Officer"
+        },
+        {
+          "title": "Financial Analysis",
+          "content": "EBITDA: $5.0M | Leverage: 10.0x",
+          "citations": [],
+          "author_agent": "Quant"
+        }
+      ],
+      "key_strengths": [
+        "Market leading position in core segment.",
+        "Strong EBITDA generation ($5.0M).",
+        "Diversified customer base."
+      ],
+      "key_weaknesses": [
+        "Elevated leverage at 10.0x.",
+        "Exposure to cyclical end-markets.",
+        "Recent management turnover."
+      ],
+      "mitigants": [
+        "Strong free cash flow conversion.",
+        "Demonstrated ability to deleverage.",
+        "Sponsor support."
+      ],
+      "financial_ratios": {
+        "leverage_ratio": 10.0,
+        "dscr": 5.0,
+        "current_ratio": 2.0,
+        "revenue": 20.0,
+        "ebitda": 5.0,
+        "net_income": 2.0
+      },
+      "historical_financials": [
+        {
+          "total_assets": 100.0,
+          "total_liabilities": 50.0,
+          "total_equity": 50.0,
+          "revenue": 20.0,
+          "ebitda": 5.0,
+          "net_income": 2.0,
+          "interest_expense": 1.0,
+          "dscr": 5.0,
+          "leverage_ratio": 10.0,
+          "current_ratio": 2.0,
+          "period": "FY2025"
+        },
+        {
+          "total_assets": 92.0,
+          "total_liabilities": 46.0,
+          "total_equity": 46.0,
+          "revenue": 18.0,
+          "ebitda": 4.4,
+          "net_income": 1.7,
+          "interest_expense": 1.0,
+          "dscr": 5.0,
+          "leverage_ratio": 10.0,
+          "current_ratio": 2.0,
+          "period": "FY2024"
+        },
+        {
+          "total_assets": 87.39999999999999,
+          "total_liabilities": 43.699999999999996,
+          "total_equity": 43.699999999999996,
+          "revenue": 16.560000000000002,
+          "ebitda": 3.9600000000000004,
+          "net_income": 1.496,
+          "interest_expense": 1.0,
+          "dscr": 5.0,
+          "leverage_ratio": 10.0,
+          "current_ratio": 2.0,
+          "period": "FY2023"
+        }
+      ],
+      "dcf_analysis": {
+        "free_cash_flow": [
+          3.4125,
+          3.5490812499999995,
+          3.6558080000000004,
+          3.729449752031249,
+          3.767640741475
+        ],
+        "growth_rate": 0.03,
+        "wacc": 0.09,
+        "terminal_value": 64.67783272865418,
+        "enterprise_value": 56.06777685745914,
+        "equity_value": 6.067776857459137,
+        "share_price": 185.0,
+        "inputs": {
+          "wacc": 0.09,
+          "growth_rate": 0.03,
+          "tax_rate_proxy": 0.35,
+          "capex_margin": 0.05
+        }
+      },
+      "pd_model": {
+        "input_factors": {
+          "Leverage Ratio": 10.0,
+          "DSCR": 5.0,
+          "Liquidity (Current Ratio)": 2.0,
+          "EBITDA Margin": 0.25
+        },
+        "model_score": 60.0,
+        "implied_rating": "BB",
+        "one_year_pd": 0.02,
+        "five_year_pd": 0.1
+      },
+      "lgd_analysis": {
+        "seniority_structure": [
+          {
+            "tranche": "Revolver",
+            "amount": 100.0,
+            "recovery_est": "70%"
+          },
+          {
+            "tranche": "Term Loan",
+            "amount": 500.0,
+            "recovery_est": "60%"
+          }
+        ],
+        "recovery_rate_assumption": 0.6499999999999999,
+        "loss_given_default": 0.3500000000000001
+      },
+      "scenario_analysis": {
+        "scenarios": [
+          {
+            "name": "Bear Case",
+            "probability": 0.2,
+            "revenue_growth": -0.05,
+            "ebitda_margin": 0.2,
+            "implied_share_price": 105.0
+          },
+          {
+            "name": "Base Case",
+            "probability": 0.5,
+            "revenue_growth": 0.05,
+            "ebitda_margin": 0.3,
+            "implied_share_price": 150.0
+          },
+          {
+            "name": "Bull Case",
+            "probability": 0.3,
+            "revenue_growth": 0.12,
+            "ebitda_margin": 0.35,
+            "implied_share_price": 210.0
+          }
+        ],
+        "weighted_share_price": 159.0
+      },
+      "system_two_critique": {
+        "critique_points": [
+          "Credit thesis aligns with macro outlook.",
+          "Valuation assumptions appear conservative."
+        ],
+        "conviction_score": 0.85,
+        "verification_status": "PASS",
+        "author_agent": "System 2"
+      },
+      "risk_score": 60.0,
+      "credit_ratings": [
+        {
+          "agency": "Moody's",
+          "rating": "Ba2",
+          "outlook": "Stable",
+          "date": "2026-02-13"
+        },
+        {
+          "agency": "S&P",
+          "rating": "BB",
+          "outlook": "Stable",
+          "date": "2026-02-13"
+        }
+      ],
+      "debt_facilities": [
+        {
+          "facility_type": "Revolver",
+          "amount_committed": 100.0,
+          "amount_drawn": 20.0,
+          "interest_rate": "Prime + 1.0%",
+          "maturity_date": "2026-01-01",
+          "snc_rating": "Pass",
+          "drc": 0.8,
+          "ltv": 0.5,
+          "conviction_score": 0.7,
+          "lgd": 0.3,
+          "recovery_rate": 0.7
+        },
+        {
+          "facility_type": "Term Loan",
+          "amount_committed": 500.0,
+          "amount_drawn": 500.0,
+          "interest_rate": "5.50%",
+          "maturity_date": "2029-01-01",
+          "snc_rating": "Pass",
+          "drc": 0.75,
+          "ltv": 0.6,
+          "conviction_score": 0.75,
+          "lgd": 0.4,
+          "recovery_rate": 0.6
+        }
+      ],
+      "repayment_schedule": [
+        {
+          "year": 2027,
+          "amount": 27.5,
+          "source": "Term Loan Interest"
+        },
+        {
+          "year": 2028,
+          "amount": 27.5,
+          "source": "Term Loan Interest"
+        },
+        {
+          "year": 2029,
+          "amount": 500.0,
+          "source": "Term Loan Maturity"
+        }
+      ],
+      "equity_data": {
+        "market_cap": 100.0,
+        "share_price": 10.0,
+        "volume_avg_30d": 1000.0,
+        "pe_ratio": 15.0,
+        "dividend_yield": 1.0,
+        "beta": 1.0
+      }
+    },
+    "credit_memo_Apple_Inc.json": {
+      "borrower_name": "Apple Inc.",
+      "report_date": "2026-02-14T02:03:14.558313",
+      "executive_summary": "The borrower Apple Inc. presents a mixed credit profile. Financial performance shows strong EBITDA ($142000.0M) but elevated leverage (2.1x).  [Ref: AAPL_10Q_FY25_Q1.pdf]",
+      "sections": [
+        {
+          "title": "Executive Summary",
+          "content": "The borrower Apple Inc. presents a mixed credit profile. Financial performance shows strong EBITDA ($142000.0M) but elevated leverage (2.1x).  [Ref: AAPL_10Q_FY25_Q1.pdf]",
+          "citations": [
+            {
+              "doc_id": "AAPL_10Q_FY25_Q1.pdf",
+              "chunk_id": "c80d60f8-b080-4ba9-8746-52f16de5617c",
+              "page_number": 6
+            }
+          ],
+          "author_agent": "Writer"
+        },
+        {
+          "title": "Key Risks & Mitigants",
+          "content": "Key Risks:\n- CONNECTED PARTY RISK: Google (Alphabet) via Apple Inc. -> Google (Alphabet) is High risk.\n- CONNECTED PARTY RISK: European Commission via Apple Inc. -> European Commission is High risk.\n",
+          "citations": [],
+          "author_agent": "Risk Officer"
+        },
+        {
+          "title": "Financial Analysis",
+          "content": "EBITDA: $142000.0M | Leverage: 2.1x",
+          "citations": [],
+          "author_agent": "Quant"
+        }
+      ],
+      "key_strengths": [
+        "Market leading position in core segment.",
+        "Strong EBITDA generation ($142000.0M).",
+        "Diversified customer base."
+      ],
+      "key_weaknesses": [
+        "Elevated leverage at 2.1x.",
+        "Exposure to cyclical end-markets.",
+        "Recent management turnover."
+      ],
+      "mitigants": [
+        "Strong free cash flow conversion.",
+        "Demonstrated ability to deleverage.",
+        "Sponsor support."
+      ],
+      "financial_ratios": {
+        "leverage_ratio": 2.112676056338028,
+        "dscr": 39.44444444444444,
+        "current_ratio": 1.25,
+        "revenue": 420000.0,
+        "ebitda": 142000.0,
+        "net_income": 110000.0
+      },
+      "historical_financials": [
+        {
+          "total_assets": 375000.0,
+          "total_liabilities": 300000.0,
+          "total_equity": 75000.0,
+          "revenue": 420000.0,
+          "ebitda": 142000.0,
+          "net_income": 110000.0,
+          "interest_expense": 3600.0,
+          "dscr": 39.44444444444444,
+          "leverage_ratio": 2.112676056338028,
+          "current_ratio": 1.25,
+          "period": "FY2026 (Proj)"
+        },
+        {
+          "total_assets": 345000.0,
+          "total_liabilities": 276000.0,
+          "total_equity": 69000.0,
+          "revenue": 378000.0,
+          "ebitda": 124960.0,
+          "net_income": 93500.0,
+          "interest_expense": 3600.0,
+          "dscr": 39.44444444444444,
+          "leverage_ratio": 2.112676056338028,
+          "current_ratio": 1.25,
+          "period": "FY2025"
+        },
+        {
+          "total_assets": 327750.0,
+          "total_liabilities": 262200.0,
+          "total_equity": 65550.0,
+          "revenue": 347760.0,
+          "ebitda": 112464.0,
+          "net_income": 82280.0,
+          "interest_expense": 3600.0,
+          "dscr": 39.44444444444444,
+          "leverage_ratio": 2.112676056338028,
+          "current_ratio": 1.25,
+          "period": "FY2024"
+        }
+      ],
+      "dcf_analysis": {
+        "free_cash_flow": [
+          96915.0,
+          100793.90749999999,
+          103824.94720000001,
+          105916.37295768748,
+          107000.99705789001
+        ],
+        "growth_rate": 0.03,
+        "wacc": 0.09,
+        "terminal_value": 1836850.4494937786,
+        "enterprise_value": 1592324.8627518392,
+        "equity_value": 1292324.8627518392,
+        "share_price": 185.0,
+        "inputs": {
+          "wacc": 0.09,
+          "growth_rate": 0.03,
+          "tax_rate_proxy": 0.35,
+          "capex_margin": 0.05
+        }
+      },
+      "pd_model": {
+        "input_factors": {
+          "Leverage Ratio": 2.112676056338028,
+          "DSCR": 39.44444444444444,
+          "Liquidity (Current Ratio)": 1.25,
+          "EBITDA Margin": 0.3380952380952381
+        },
+        "model_score": 80.0,
+        "implied_rating": "A",
+        "one_year_pd": 0.001,
+        "five_year_pd": 0.01
+      },
+      "lgd_analysis": {
+        "seniority_structure": [
+          {
+            "tranche": "Revolving Credit Facility",
+            "amount": 10000.0,
+            "recovery_est": "90%"
+          },
+          {
+            "tranche": "Senior Unsecured Notes (2030)",
+            "amount": 2500.0,
+            "recovery_est": "70%"
+          },
+          {
+            "tranche": "Senior Unsecured Notes (2040)",
+            "amount": 1500.0,
+            "recovery_est": "60%"
+          },
+          {
+            "tranche": "Term Loan A",
+            "amount": 5000.0,
+            "recovery_est": "80%"
+          }
+        ],
+        "recovery_rate_assumption": 0.75,
+        "loss_given_default": 0.25
+      },
+      "scenario_analysis": {
+        "scenarios": [
+          {
+            "name": "Bear Case",
+            "probability": 0.2,
+            "revenue_growth": -0.05,
+            "ebitda_margin": 0.2,
+            "implied_share_price": 105.0
+          },
+          {
+            "name": "Base Case",
+            "probability": 0.5,
+            "revenue_growth": 0.05,
+            "ebitda_margin": 0.3,
+            "implied_share_price": 150.0
+          },
+          {
+            "name": "Bull Case",
+            "probability": 0.3,
+            "revenue_growth": 0.12,
+            "ebitda_margin": 0.35,
+            "implied_share_price": 210.0
+          }
+        ],
+        "weighted_share_price": 159.0
+      },
+      "system_two_critique": {
+        "critique_points": [
+          "Credit thesis aligns with macro outlook.",
+          "Valuation assumptions appear conservative."
+        ],
+        "conviction_score": 0.85,
+        "verification_status": "PASS",
+        "author_agent": "System 2"
+      },
+      "risk_score": 80.0,
+      "credit_ratings": [
+        {
+          "agency": "Moody's",
+          "rating": "Aaa",
+          "outlook": "Stable",
+          "date": "2026-02-13"
+        },
+        {
+          "agency": "S&P",
+          "rating": "AA+",
+          "outlook": "Stable",
+          "date": "2026-02-13"
+        },
+        {
+          "agency": "Fitch",
+          "rating": "AA+",
+          "outlook": "Stable",
+          "date": "2026-02-13"
+        }
+      ],
+      "debt_facilities": [
+        {
+          "facility_type": "Revolving Credit Facility",
+          "amount_committed": 10000.0,
+          "amount_drawn": 0.0,
+          "interest_rate": "SOFR + 0.75%",
+          "maturity_date": "2028-09-15",
+          "snc_rating": "Pass",
+          "drc": 1.0,
+          "ltv": 0.0,
+          "conviction_score": 0.98,
+          "lgd": 0.1,
+          "recovery_rate": 0.9
+        },
+        {
+          "facility_type": "Senior Unsecured Notes (2030)",
+          "amount_committed": 2500.0,
+          "amount_drawn": 2500.0,
+          "interest_rate": "3.25%",
+          "maturity_date": "2030-05-11",
+          "snc_rating": "Pass",
+          "drc": 1.0,
+          "ltv": 0.1,
+          "conviction_score": 0.95,
+          "lgd": 0.3,
+          "recovery_rate": 0.7
+        },
+        {
+          "facility_type": "Senior Unsecured Notes (2040)",
+          "amount_committed": 1500.0,
+          "amount_drawn": 1500.0,
+          "interest_rate": "4.10%",
+          "maturity_date": "2040-02-28",
+          "snc_rating": "Pass",
+          "drc": 1.0,
+          "ltv": 0.1,
+          "conviction_score": 0.92,
+          "lgd": 0.4,
+          "recovery_rate": 0.6
+        },
+        {
+          "facility_type": "Term Loan A",
+          "amount_committed": 5000.0,
+          "amount_drawn": 5000.0,
+          "interest_rate": "SOFR + 1.10%",
+          "maturity_date": "2027-03-30",
+          "snc_rating": "Pass",
+          "drc": 1.0,
+          "ltv": 0.2,
+          "conviction_score": 0.9,
+          "lgd": 0.2,
+          "recovery_rate": 0.8
+        }
+      ],
+      "repayment_schedule": [
+        {
+          "year": 2027,
+          "amount": 0.0,
+          "source": "Revolving Credit Facility Interest"
+        },
+        {
+          "year": 2027,
+          "amount": 81.25,
+          "source": "Senior Unsecured Notes (2030) Interest"
+        },
+        {
+          "year": 2027,
+          "amount": 61.49999999999999,
+          "source": "Senior Unsecured Notes (2040) Interest"
+        },
+        {
+          "year": 2027,
+          "amount": 5000.0,
+          "source": "Term Loan A Maturity"
+        },
+        {
+          "year": 2028,
+          "amount": 0.0,
+          "source": "Revolving Credit Facility Maturity"
+        },
+        {
+          "year": 2028,
+          "amount": 81.25,
+          "source": "Senior Unsecured Notes (2030) Interest"
+        },
+        {
+          "year": 2028,
+          "amount": 61.49999999999999,
+          "source": "Senior Unsecured Notes (2040) Interest"
+        },
+        {
+          "year": 2029,
+          "amount": 81.25,
+          "source": "Senior Unsecured Notes (2030) Interest"
+        },
+        {
+          "year": 2029,
+          "amount": 61.49999999999999,
+          "source": "Senior Unsecured Notes (2040) Interest"
+        },
+        {
+          "year": 2030,
+          "amount": 2500.0,
+          "source": "Senior Unsecured Notes (2030) Maturity"
+        },
+        {
+          "year": 2030,
+          "amount": 61.49999999999999,
+          "source": "Senior Unsecured Notes (2040) Interest"
+        },
+        {
+          "year": 2031,
+          "amount": 61.49999999999999,
+          "source": "Senior Unsecured Notes (2040) Interest"
+        }
+      ],
+      "equity_data": {
+        "market_cap": 3450000.0,
+        "share_price": 225.5,
+        "volume_avg_30d": 45000000.0,
+        "pe_ratio": 31.5,
+        "dividend_yield": 0.55,
+        "beta": 1.15
+      }
+    },
+    "credit_memo_Alphabet_Inc.json": {
+      "borrower_name": "Alphabet Inc.",
+      "report_date": "2026-02-14T02:03:14.562725",
+      "executive_summary": "The borrower Alphabet Inc. presents a mixed credit profile. Financial performance shows strong EBITDA ($5.0M) but elevated leverage (10.0x).  [Ref: TechCorp_10K_2025.pdf]",
+      "sections": [
+        {
+          "title": "Executive Summary",
+          "content": "The borrower Alphabet Inc. presents a mixed credit profile. Financial performance shows strong EBITDA ($5.0M) but elevated leverage (10.0x).  [Ref: TechCorp_10K_2025.pdf]",
+          "citations": [
+            {
+              "doc_id": "TechCorp_10K_2025.pdf",
+              "chunk_id": "9264b28e-9615-4ad8-8383-8cf944872f4f",
+              "page_number": 3
+            }
+          ],
+          "author_agent": "Writer"
+        },
+        {
+          "title": "Key Risks & Mitigants",
+          "content": "Key Risks:\n- HIGH: Leverage ratio exceeds 4.0x policy limit.\n",
+          "citations": [],
+          "author_agent": "Risk Officer"
+        },
+        {
+          "title": "Financial Analysis",
+          "content": "EBITDA: $5.0M | Leverage: 10.0x",
+          "citations": [],
+          "author_agent": "Quant"
+        }
+      ],
+      "key_strengths": [
+        "Market leading position in core segment.",
+        "Strong EBITDA generation ($5.0M).",
+        "Diversified customer base."
+      ],
+      "key_weaknesses": [
+        "Elevated leverage at 10.0x.",
+        "Exposure to cyclical end-markets.",
+        "Recent management turnover."
+      ],
+      "mitigants": [
+        "Strong free cash flow conversion.",
+        "Demonstrated ability to deleverage.",
+        "Sponsor support."
+      ],
+      "financial_ratios": {
+        "leverage_ratio": 10.0,
+        "dscr": 5.0,
+        "current_ratio": 2.0,
+        "revenue": 20.0,
+        "ebitda": 5.0,
+        "net_income": 2.0
+      },
+      "historical_financials": [
+        {
+          "total_assets": 100.0,
+          "total_liabilities": 50.0,
+          "total_equity": 50.0,
+          "revenue": 20.0,
+          "ebitda": 5.0,
+          "net_income": 2.0,
+          "interest_expense": 1.0,
+          "dscr": 5.0,
+          "leverage_ratio": 10.0,
+          "current_ratio": 2.0,
+          "period": "FY2025"
+        },
+        {
+          "total_assets": 92.0,
+          "total_liabilities": 46.0,
+          "total_equity": 46.0,
+          "revenue": 18.0,
+          "ebitda": 4.4,
+          "net_income": 1.7,
+          "interest_expense": 1.0,
+          "dscr": 5.0,
+          "leverage_ratio": 10.0,
+          "current_ratio": 2.0,
+          "period": "FY2024"
+        },
+        {
+          "total_assets": 87.39999999999999,
+          "total_liabilities": 43.699999999999996,
+          "total_equity": 43.699999999999996,
+          "revenue": 16.560000000000002,
+          "ebitda": 3.9600000000000004,
+          "net_income": 1.496,
+          "interest_expense": 1.0,
+          "dscr": 5.0,
+          "leverage_ratio": 10.0,
+          "current_ratio": 2.0,
+          "period": "FY2023"
+        }
+      ],
+      "dcf_analysis": {
+        "free_cash_flow": [
+          3.4125,
+          3.5490812499999995,
+          3.6558080000000004,
+          3.729449752031249,
+          3.767640741475
+        ],
+        "growth_rate": 0.03,
+        "wacc": 0.09,
+        "terminal_value": 64.67783272865418,
+        "enterprise_value": 56.06777685745914,
+        "equity_value": 6.067776857459137,
+        "share_price": 185.0,
+        "inputs": {
+          "wacc": 0.09,
+          "growth_rate": 0.03,
+          "tax_rate_proxy": 0.35,
+          "capex_margin": 0.05
+        }
+      },
+      "pd_model": {
+        "input_factors": {
+          "Leverage Ratio": 10.0,
+          "DSCR": 5.0,
+          "Liquidity (Current Ratio)": 2.0,
+          "EBITDA Margin": 0.25
+        },
+        "model_score": 60.0,
+        "implied_rating": "BB",
+        "one_year_pd": 0.02,
+        "five_year_pd": 0.1
+      },
+      "lgd_analysis": {
+        "seniority_structure": [
+          {
+            "tranche": "Revolver",
+            "amount": 100.0,
+            "recovery_est": "70%"
+          },
+          {
+            "tranche": "Term Loan",
+            "amount": 500.0,
+            "recovery_est": "60%"
+          }
+        ],
+        "recovery_rate_assumption": 0.6499999999999999,
+        "loss_given_default": 0.3500000000000001
+      },
+      "scenario_analysis": {
+        "scenarios": [
+          {
+            "name": "Bear Case",
+            "probability": 0.2,
+            "revenue_growth": -0.05,
+            "ebitda_margin": 0.2,
+            "implied_share_price": 105.0
+          },
+          {
+            "name": "Base Case",
+            "probability": 0.5,
+            "revenue_growth": 0.05,
+            "ebitda_margin": 0.3,
+            "implied_share_price": 150.0
+          },
+          {
+            "name": "Bull Case",
+            "probability": 0.3,
+            "revenue_growth": 0.12,
+            "ebitda_margin": 0.35,
+            "implied_share_price": 210.0
+          }
+        ],
+        "weighted_share_price": 159.0
+      },
+      "system_two_critique": {
+        "critique_points": [
+          "Credit thesis aligns with macro outlook.",
+          "Valuation assumptions appear conservative."
+        ],
+        "conviction_score": 0.85,
+        "verification_status": "PASS",
+        "author_agent": "System 2"
+      },
+      "risk_score": 60.0,
+      "credit_ratings": [
+        {
+          "agency": "Moody's",
+          "rating": "Ba2",
+          "outlook": "Stable",
+          "date": "2026-02-13"
+        },
+        {
+          "agency": "S&P",
+          "rating": "BB",
+          "outlook": "Stable",
+          "date": "2026-02-13"
+        }
+      ],
+      "debt_facilities": [
+        {
+          "facility_type": "Revolver",
+          "amount_committed": 100.0,
+          "amount_drawn": 20.0,
+          "interest_rate": "Prime + 1.0%",
+          "maturity_date": "2026-01-01",
+          "snc_rating": "Pass",
+          "drc": 0.8,
+          "ltv": 0.5,
+          "conviction_score": 0.7,
+          "lgd": 0.3,
+          "recovery_rate": 0.7
+        },
+        {
+          "facility_type": "Term Loan",
+          "amount_committed": 500.0,
+          "amount_drawn": 500.0,
+          "interest_rate": "5.50%",
+          "maturity_date": "2029-01-01",
+          "snc_rating": "Pass",
+          "drc": 0.75,
+          "ltv": 0.6,
+          "conviction_score": 0.75,
+          "lgd": 0.4,
+          "recovery_rate": 0.6
+        }
+      ],
+      "repayment_schedule": [
+        {
+          "year": 2027,
+          "amount": 27.5,
+          "source": "Term Loan Interest"
+        },
+        {
+          "year": 2028,
+          "amount": 27.5,
+          "source": "Term Loan Interest"
+        },
+        {
+          "year": 2029,
+          "amount": 500.0,
+          "source": "Term Loan Maturity"
+        }
+      ],
+      "equity_data": {
+        "market_cap": 100.0,
+        "share_price": 10.0,
+        "volume_avg_30d": 1000.0,
+        "pe_ratio": 15.0,
+        "dividend_yield": 1.0,
+        "beta": 1.0
+      }
+    },
+    "credit_memo_NVIDIA_Corp.json": {
+      "borrower_name": "NVIDIA Corp",
+      "report_date": "2026-02-14T02:03:14.561605",
+      "executive_summary": "The borrower NVIDIA Corp presents a mixed credit profile. Financial performance shows strong EBITDA ($5.0M) but elevated leverage (10.0x).  [Ref: TechCorp_10K_2025.pdf]",
+      "sections": [
+        {
+          "title": "Executive Summary",
+          "content": "The borrower NVIDIA Corp presents a mixed credit profile. Financial performance shows strong EBITDA ($5.0M) but elevated leverage (10.0x).  [Ref: TechCorp_10K_2025.pdf]",
+          "citations": [
+            {
+              "doc_id": "TechCorp_10K_2025.pdf",
+              "chunk_id": "d2efbe73-fce7-4049-88b7-9f19664df63a",
+              "page_number": 3
+            }
+          ],
+          "author_agent": "Writer"
+        },
+        {
+          "title": "Key Risks & Mitigants",
+          "content": "Key Risks:\n- HIGH: Leverage ratio exceeds 4.0x policy limit.\n",
+          "citations": [],
+          "author_agent": "Risk Officer"
+        },
+        {
+          "title": "Financial Analysis",
+          "content": "EBITDA: $5.0M | Leverage: 10.0x",
+          "citations": [],
+          "author_agent": "Quant"
+        }
+      ],
+      "key_strengths": [
+        "Market leading position in core segment.",
+        "Strong EBITDA generation ($5.0M).",
+        "Diversified customer base."
+      ],
+      "key_weaknesses": [
+        "Elevated leverage at 10.0x.",
+        "Exposure to cyclical end-markets.",
+        "Recent management turnover."
+      ],
+      "mitigants": [
+        "Strong free cash flow conversion.",
+        "Demonstrated ability to deleverage.",
+        "Sponsor support."
+      ],
+      "financial_ratios": {
+        "leverage_ratio": 10.0,
+        "dscr": 5.0,
+        "current_ratio": 2.0,
+        "revenue": 20.0,
+        "ebitda": 5.0,
+        "net_income": 2.0
+      },
+      "historical_financials": [
+        {
+          "total_assets": 100.0,
+          "total_liabilities": 50.0,
+          "total_equity": 50.0,
+          "revenue": 20.0,
+          "ebitda": 5.0,
+          "net_income": 2.0,
+          "interest_expense": 1.0,
+          "dscr": 5.0,
+          "leverage_ratio": 10.0,
+          "current_ratio": 2.0,
+          "period": "FY2025"
+        },
+        {
+          "total_assets": 92.0,
+          "total_liabilities": 46.0,
+          "total_equity": 46.0,
+          "revenue": 18.0,
+          "ebitda": 4.4,
+          "net_income": 1.7,
+          "interest_expense": 1.0,
+          "dscr": 5.0,
+          "leverage_ratio": 10.0,
+          "current_ratio": 2.0,
+          "period": "FY2024"
+        },
+        {
+          "total_assets": 87.39999999999999,
+          "total_liabilities": 43.699999999999996,
+          "total_equity": 43.699999999999996,
+          "revenue": 16.560000000000002,
+          "ebitda": 3.9600000000000004,
+          "net_income": 1.496,
+          "interest_expense": 1.0,
+          "dscr": 5.0,
+          "leverage_ratio": 10.0,
+          "current_ratio": 2.0,
+          "period": "FY2023"
+        }
+      ],
+      "dcf_analysis": {
+        "free_cash_flow": [
+          3.4125,
+          3.5490812499999995,
+          3.6558080000000004,
+          3.729449752031249,
+          3.767640741475
+        ],
+        "growth_rate": 0.03,
+        "wacc": 0.09,
+        "terminal_value": 64.67783272865418,
+        "enterprise_value": 56.06777685745914,
+        "equity_value": 6.067776857459137,
+        "share_price": 185.0,
+        "inputs": {
+          "wacc": 0.09,
+          "growth_rate": 0.03,
+          "tax_rate_proxy": 0.35,
+          "capex_margin": 0.05
+        }
+      },
+      "pd_model": {
+        "input_factors": {
+          "Leverage Ratio": 10.0,
+          "DSCR": 5.0,
+          "Liquidity (Current Ratio)": 2.0,
+          "EBITDA Margin": 0.25
+        },
+        "model_score": 60.0,
+        "implied_rating": "BB",
+        "one_year_pd": 0.02,
+        "five_year_pd": 0.1
+      },
+      "lgd_analysis": {
+        "seniority_structure": [
+          {
+            "tranche": "Revolver",
+            "amount": 100.0,
+            "recovery_est": "70%"
+          },
+          {
+            "tranche": "Term Loan",
+            "amount": 500.0,
+            "recovery_est": "60%"
+          }
+        ],
+        "recovery_rate_assumption": 0.6499999999999999,
+        "loss_given_default": 0.3500000000000001
+      },
+      "scenario_analysis": {
+        "scenarios": [
+          {
+            "name": "Bear Case",
+            "probability": 0.2,
+            "revenue_growth": -0.05,
+            "ebitda_margin": 0.2,
+            "implied_share_price": 105.0
+          },
+          {
+            "name": "Base Case",
+            "probability": 0.5,
+            "revenue_growth": 0.05,
+            "ebitda_margin": 0.3,
+            "implied_share_price": 150.0
+          },
+          {
+            "name": "Bull Case",
+            "probability": 0.3,
+            "revenue_growth": 0.12,
+            "ebitda_margin": 0.35,
+            "implied_share_price": 210.0
+          }
+        ],
+        "weighted_share_price": 159.0
+      },
+      "system_two_critique": {
+        "critique_points": [
+          "Credit thesis aligns with macro outlook.",
+          "Valuation assumptions appear conservative."
+        ],
+        "conviction_score": 0.85,
+        "verification_status": "PASS",
+        "author_agent": "System 2"
+      },
+      "risk_score": 60.0,
+      "credit_ratings": [
+        {
+          "agency": "Moody's",
+          "rating": "Ba2",
+          "outlook": "Stable",
+          "date": "2026-02-13"
+        },
+        {
+          "agency": "S&P",
+          "rating": "BB",
+          "outlook": "Stable",
+          "date": "2026-02-13"
+        }
+      ],
+      "debt_facilities": [
+        {
+          "facility_type": "Revolver",
+          "amount_committed": 100.0,
+          "amount_drawn": 20.0,
+          "interest_rate": "Prime + 1.0%",
+          "maturity_date": "2026-01-01",
+          "snc_rating": "Pass",
+          "drc": 0.8,
+          "ltv": 0.5,
+          "conviction_score": 0.7,
+          "lgd": 0.3,
+          "recovery_rate": 0.7
+        },
+        {
+          "facility_type": "Term Loan",
+          "amount_committed": 500.0,
+          "amount_drawn": 500.0,
+          "interest_rate": "5.50%",
+          "maturity_date": "2029-01-01",
+          "snc_rating": "Pass",
+          "drc": 0.75,
+          "ltv": 0.6,
+          "conviction_score": 0.75,
+          "lgd": 0.4,
+          "recovery_rate": 0.6
+        }
+      ],
+      "repayment_schedule": [
+        {
+          "year": 2027,
+          "amount": 27.5,
+          "source": "Term Loan Interest"
+        },
+        {
+          "year": 2028,
+          "amount": 27.5,
+          "source": "Term Loan Interest"
+        },
+        {
+          "year": 2029,
+          "amount": 500.0,
+          "source": "Term Loan Maturity"
+        }
+      ],
+      "equity_data": {
+        "market_cap": 100.0,
+        "share_price": 10.0,
+        "volume_avg_30d": 1000.0,
+        "pe_ratio": 15.0,
+        "dividend_yield": 1.0,
+        "beta": 1.0
+      }
+    },
+    "credit_memo_Bank_of_America.json": {
+      "borrower_name": "Bank of America",
+      "report_date": "2026-02-14T02:03:14.569251",
+      "executive_summary": "The borrower Bank of America presents a mixed credit profile. Financial performance shows strong EBITDA ($5.0M) but elevated leverage (10.0x).  [Ref: Generic_Borrower_Profile.pdf]",
+      "sections": [
+        {
+          "title": "Executive Summary",
+          "content": "The borrower Bank of America presents a mixed credit profile. Financial performance shows strong EBITDA ($5.0M) but elevated leverage (10.0x).  [Ref: Generic_Borrower_Profile.pdf]",
+          "citations": [
+            {
+              "doc_id": "Generic_Borrower_Profile.pdf",
+              "chunk_id": "800e923e-2975-430a-93fd-50362ccbd712",
+              "page_number": 1
+            }
+          ],
+          "author_agent": "Writer"
+        },
+        {
+          "title": "Key Risks & Mitigants",
+          "content": "Key Risks:\n- HIGH: Leverage ratio exceeds 4.0x policy limit.\n",
+          "citations": [],
+          "author_agent": "Risk Officer"
+        },
+        {
+          "title": "Financial Analysis",
+          "content": "EBITDA: $5.0M | Leverage: 10.0x",
+          "citations": [],
+          "author_agent": "Quant"
+        }
+      ],
+      "key_strengths": [
+        "Market leading position in core segment.",
+        "Strong EBITDA generation ($5.0M).",
+        "Diversified customer base."
+      ],
+      "key_weaknesses": [
+        "Elevated leverage at 10.0x.",
+        "Exposure to cyclical end-markets.",
+        "Recent management turnover."
+      ],
+      "mitigants": [
+        "Strong free cash flow conversion.",
+        "Demonstrated ability to deleverage.",
+        "Sponsor support."
+      ],
+      "financial_ratios": {
+        "leverage_ratio": 10.0,
+        "dscr": 5.0,
+        "current_ratio": 2.0,
+        "revenue": 20.0,
+        "ebitda": 5.0,
+        "net_income": 2.0
+      },
+      "historical_financials": [
+        {
+          "total_assets": 100.0,
+          "total_liabilities": 50.0,
+          "total_equity": 50.0,
+          "revenue": 20.0,
+          "ebitda": 5.0,
+          "net_income": 2.0,
+          "interest_expense": 1.0,
+          "dscr": 5.0,
+          "leverage_ratio": 10.0,
+          "current_ratio": 2.0,
+          "period": "FY2025"
+        },
+        {
+          "total_assets": 92.0,
+          "total_liabilities": 46.0,
+          "total_equity": 46.0,
+          "revenue": 18.0,
+          "ebitda": 4.4,
+          "net_income": 1.7,
+          "interest_expense": 1.0,
+          "dscr": 5.0,
+          "leverage_ratio": 10.0,
+          "current_ratio": 2.0,
+          "period": "FY2024"
+        },
+        {
+          "total_assets": 87.39999999999999,
+          "total_liabilities": 43.699999999999996,
+          "total_equity": 43.699999999999996,
+          "revenue": 16.560000000000002,
+          "ebitda": 3.9600000000000004,
+          "net_income": 1.496,
+          "interest_expense": 1.0,
+          "dscr": 5.0,
+          "leverage_ratio": 10.0,
+          "current_ratio": 2.0,
+          "period": "FY2023"
+        }
+      ],
+      "dcf_analysis": {
+        "free_cash_flow": [
+          3.4125,
+          3.5490812499999995,
+          3.6558080000000004,
+          3.729449752031249,
+          3.767640741475
+        ],
+        "growth_rate": 0.03,
+        "wacc": 0.09,
+        "terminal_value": 64.67783272865418,
+        "enterprise_value": 56.06777685745914,
+        "equity_value": 6.067776857459137,
+        "share_price": 185.0,
+        "inputs": {
+          "wacc": 0.09,
+          "growth_rate": 0.03,
+          "tax_rate_proxy": 0.35,
+          "capex_margin": 0.05
+        }
+      },
+      "pd_model": {
+        "input_factors": {
+          "Leverage Ratio": 10.0,
+          "DSCR": 5.0,
+          "Liquidity (Current Ratio)": 2.0,
+          "EBITDA Margin": 0.25
+        },
+        "model_score": 60.0,
+        "implied_rating": "BB",
+        "one_year_pd": 0.02,
+        "five_year_pd": 0.1
+      },
+      "lgd_analysis": {
+        "seniority_structure": [
+          {
+            "tranche": "Revolver",
+            "amount": 100.0,
+            "recovery_est": "70%"
+          },
+          {
+            "tranche": "Term Loan",
+            "amount": 500.0,
+            "recovery_est": "60%"
+          }
+        ],
+        "recovery_rate_assumption": 0.6499999999999999,
+        "loss_given_default": 0.3500000000000001
+      },
+      "scenario_analysis": {
+        "scenarios": [
+          {
+            "name": "Bear Case",
+            "probability": 0.2,
+            "revenue_growth": -0.05,
+            "ebitda_margin": 0.2,
+            "implied_share_price": 105.0
+          },
+          {
+            "name": "Base Case",
+            "probability": 0.5,
+            "revenue_growth": 0.05,
+            "ebitda_margin": 0.3,
+            "implied_share_price": 150.0
+          },
+          {
+            "name": "Bull Case",
+            "probability": 0.3,
+            "revenue_growth": 0.12,
+            "ebitda_margin": 0.35,
+            "implied_share_price": 210.0
+          }
+        ],
+        "weighted_share_price": 159.0
+      },
+      "system_two_critique": {
+        "critique_points": [
+          "Credit thesis aligns with macro outlook.",
+          "Valuation assumptions appear conservative."
+        ],
+        "conviction_score": 0.85,
+        "verification_status": "PASS",
+        "author_agent": "System 2"
+      },
+      "risk_score": 60.0,
+      "credit_ratings": [
+        {
+          "agency": "Moody's",
+          "rating": "Ba2",
+          "outlook": "Stable",
+          "date": "2026-02-13"
+        },
+        {
+          "agency": "S&P",
+          "rating": "BB",
+          "outlook": "Stable",
+          "date": "2026-02-13"
+        }
+      ],
+      "debt_facilities": [
+        {
+          "facility_type": "Revolver",
+          "amount_committed": 100.0,
+          "amount_drawn": 20.0,
+          "interest_rate": "Prime + 1.0%",
+          "maturity_date": "2026-01-01",
+          "snc_rating": "Pass",
+          "drc": 0.8,
+          "ltv": 0.5,
+          "conviction_score": 0.7,
+          "lgd": 0.3,
+          "recovery_rate": 0.7
+        },
+        {
+          "facility_type": "Term Loan",
+          "amount_committed": 500.0,
+          "amount_drawn": 500.0,
+          "interest_rate": "5.50%",
+          "maturity_date": "2029-01-01",
+          "snc_rating": "Pass",
+          "drc": 0.75,
+          "ltv": 0.6,
+          "conviction_score": 0.75,
+          "lgd": 0.4,
+          "recovery_rate": 0.6
+        }
+      ],
+      "repayment_schedule": [
+        {
+          "year": 2027,
+          "amount": 27.5,
+          "source": "Term Loan Interest"
+        },
+        {
+          "year": 2028,
+          "amount": 27.5,
+          "source": "Term Loan Interest"
+        },
+        {
+          "year": 2029,
+          "amount": 500.0,
+          "source": "Term Loan Maturity"
+        }
+      ],
+      "equity_data": {
+        "market_cap": 100.0,
+        "share_price": 10.0,
+        "volume_avg_30d": 1000.0,
+        "pe_ratio": 15.0,
+        "dividend_yield": 1.0,
+        "beta": 1.0
+      }
+    },
+    "credit_memo_JPMorgan_Chase.json": {
+      "borrower_name": "JPMorgan Chase",
+      "report_date": "2026-02-14T02:03:14.567333",
+      "executive_summary": "The borrower JPMorgan Chase presents a mixed credit profile. Financial performance shows strong EBITDA ($95000.0M) but elevated leverage (9.5x).  [Ref: JPM_Earnings_Release_4Q24.pdf]",
+      "sections": [
+        {
+          "title": "Executive Summary",
+          "content": "The borrower JPMorgan Chase presents a mixed credit profile. Financial performance shows strong EBITDA ($95000.0M) but elevated leverage (9.5x).  [Ref: JPM_Earnings_Release_4Q24.pdf]",
+          "citations": [
+            {
+              "doc_id": "JPM_Earnings_Release_4Q24.pdf",
+              "chunk_id": "0557f056-3bcc-4a74-be47-79d71f2d7ec0",
+              "page_number": 1
+            }
+          ],
+          "author_agent": "Writer"
+        },
+        {
+          "title": "Key Risks & Mitigants",
+          "content": "Key Risks:\n- HIGH: Leverage ratio exceeds 4.0x policy limit.\n",
+          "citations": [],
+          "author_agent": "Risk Officer"
+        },
+        {
+          "title": "Financial Analysis",
+          "content": "EBITDA: $95000.0M | Leverage: 9.5x",
+          "citations": [],
+          "author_agent": "Quant"
+        }
+      ],
+      "key_strengths": [
+        "Market leading position in core segment.",
+        "Strong EBITDA generation ($95000.0M).",
+        "Diversified customer base."
+      ],
+      "key_weaknesses": [
+        "Elevated leverage at 9.5x.",
+        "Exposure to cyclical end-markets.",
+        "Recent management turnover."
+      ],
+      "mitigants": [
+        "Strong free cash flow conversion.",
+        "Demonstrated ability to deleverage.",
+        "Sponsor support."
+      ],
+      "financial_ratios": {
+        "leverage_ratio": 9.5,
+        "dscr": 999.0,
+        "current_ratio": 1.1,
+        "revenue": 185000.0,
+        "ebitda": 95000.0,
+        "net_income": 60000.0
+      },
+      "historical_financials": [
+        {
+          "total_assets": 4200000.0,
+          "total_liabilities": 3800000.0,
+          "total_equity": 400000.0,
+          "revenue": 185000.0,
+          "ebitda": 95000.0,
+          "net_income": 60000.0,
+          "interest_expense": 1.0,
+          "dscr": 999.0,
+          "leverage_ratio": 9.5,
+          "current_ratio": 1.1,
+          "period": "FY2026 (Proj)"
+        },
+        {
+          "total_assets": 3864000.0,
+          "total_liabilities": 3496000.0,
+          "total_equity": 368000.0,
+          "revenue": 166500.0,
+          "ebitda": 83600.0,
+          "net_income": 51000.0,
+          "interest_expense": 1.0,
+          "dscr": 999.0,
+          "leverage_ratio": 9.5,
+          "current_ratio": 1.1,
+          "period": "FY2025"
+        },
+        {
+          "total_assets": 3670800.0,
+          "total_liabilities": 3321200.0,
+          "total_equity": 349600.0,
+          "revenue": 153180.0,
+          "ebitda": 75240.0,
+          "net_income": 44880.0,
+          "interest_expense": 1.0,
+          "dscr": 999.0,
+          "leverage_ratio": 9.5,
+          "current_ratio": 1.1,
+          "period": "FY2024"
+        }
+      ],
+      "dcf_analysis": {
+        "free_cash_flow": [
+          64837.5,
+          67432.54374999998,
+          69460.352,
+          70859.54528859373,
+          71585.174088025
+        ],
+        "growth_rate": 0.03,
+        "wacc": 0.09,
+        "terminal_value": 1228878.8218444292,
+        "enterprise_value": 1065287.7602917235,
+        "equity_value": -2734712.2397082765,
+        "share_price": -2734712.2397082765,
+        "inputs": {
+          "wacc": 0.09,
+          "growth_rate": 0.03,
+          "tax_rate_proxy": 0.35,
+          "capex_margin": 0.05
+        }
+      },
+      "pd_model": {
+        "input_factors": {
+          "Leverage Ratio": 9.5,
+          "DSCR": 999.0,
+          "Liquidity (Current Ratio)": 1.1,
+          "EBITDA Margin": 0.5135135135135135
+        },
+        "model_score": 60.0,
+        "implied_rating": "BB",
+        "one_year_pd": 0.02,
+        "five_year_pd": 0.1
+      },
+      "lgd_analysis": {
+        "seniority_structure": [
+          {
+            "tranche": "Revolver",
+            "amount": 100.0,
+            "recovery_est": "70%"
+          },
+          {
+            "tranche": "Term Loan",
+            "amount": 500.0,
+            "recovery_est": "60%"
+          }
+        ],
+        "recovery_rate_assumption": 0.6499999999999999,
+        "loss_given_default": 0.3500000000000001
+      },
+      "scenario_analysis": {
+        "scenarios": [
+          {
+            "name": "Bear Case",
+            "probability": 0.2,
+            "revenue_growth": -0.05,
+            "ebitda_margin": 0.2,
+            "implied_share_price": 105.0
+          },
+          {
+            "name": "Base Case",
+            "probability": 0.5,
+            "revenue_growth": 0.05,
+            "ebitda_margin": 0.3,
+            "implied_share_price": 150.0
+          },
+          {
+            "name": "Bull Case",
+            "probability": 0.3,
+            "revenue_growth": 0.12,
+            "ebitda_margin": 0.35,
+            "implied_share_price": 210.0
+          }
+        ],
+        "weighted_share_price": 159.0
+      },
+      "system_two_critique": {
+        "critique_points": [
+          "Credit thesis aligns with macro outlook.",
+          "Valuation assumptions appear conservative."
+        ],
+        "conviction_score": 0.85,
+        "verification_status": "PASS",
+        "author_agent": "System 2"
+      },
+      "risk_score": 60.0,
+      "credit_ratings": [
+        {
+          "agency": "Moody's",
+          "rating": "A1",
+          "outlook": "Stable",
+          "date": "2026-02-13"
+        },
+        {
+          "agency": "S&P",
+          "rating": "A-",
+          "outlook": "Stable",
+          "date": "2026-02-13"
+        },
+        {
+          "agency": "Fitch",
+          "rating": "AA-",
+          "outlook": "Stable",
+          "date": "2026-02-13"
+        }
+      ],
+      "debt_facilities": [
+        {
+          "facility_type": "Revolver",
+          "amount_committed": 100.0,
+          "amount_drawn": 20.0,
+          "interest_rate": "Prime + 1.0%",
+          "maturity_date": "2026-01-01",
+          "snc_rating": "Pass",
+          "drc": 0.8,
+          "ltv": 0.5,
+          "conviction_score": 0.7,
+          "lgd": 0.3,
+          "recovery_rate": 0.7
+        },
+        {
+          "facility_type": "Term Loan",
+          "amount_committed": 500.0,
+          "amount_drawn": 500.0,
+          "interest_rate": "5.50%",
+          "maturity_date": "2029-01-01",
+          "snc_rating": "Pass",
+          "drc": 0.75,
+          "ltv": 0.6,
+          "conviction_score": 0.75,
+          "lgd": 0.4,
+          "recovery_rate": 0.6
+        }
+      ],
+      "repayment_schedule": [
+        {
+          "year": 2027,
+          "amount": 27.5,
+          "source": "Term Loan Interest"
+        },
+        {
+          "year": 2028,
+          "amount": 27.5,
+          "source": "Term Loan Interest"
+        },
+        {
+          "year": 2029,
+          "amount": 500.0,
+          "source": "Term Loan Maturity"
+        }
+      ],
+      "equity_data": {
+        "market_cap": 580000.0,
+        "share_price": 205.1,
+        "volume_avg_30d": 9500000.0,
+        "pe_ratio": 11.8,
+        "dividend_yield": 2.3,
+        "beta": 1.05
+      }
+    },
+    "credit_memo_TechCorp_Inc.json": {
+      "borrower_name": "TechCorp Inc.",
+      "report_date": "2026-02-13T02:55:10.459724",
+      "executive_summary": "The borrower TechCorp Inc. presents a mixed credit profile. Financial performance shows strong EBITDA ($350.0M) but elevated leverage (8.6x).  [Ref: TechCorp_10K_2025.pdf]",
+      "sections": [
+        {
+          "title": "Executive Summary",
+          "content": "The borrower TechCorp Inc. presents a mixed credit profile. Financial performance shows strong EBITDA ($350.0M) but elevated leverage (8.6x).  [Ref: TechCorp_10K_2025.pdf]",
+          "citations": [
+            {
+              "doc_id": "TechCorp_10K_2025.pdf",
+              "chunk_id": "bf57b34d-cbc1-4ce5-a323-c928d2214657",
+              "page_number": 3
+            }
+          ],
+          "author_agent": "Writer"
+        },
+        {
+          "title": "Key Risks & Mitigants",
+          "content": "Key Risks:\n- HIGH: Leverage ratio exceeds 4.0x policy limit.\n",
+          "citations": [],
+          "author_agent": "Risk Officer"
+        },
+        {
+          "title": "Financial Analysis",
+          "content": "EBITDA: $350.0M | Leverage: 8.6x",
+          "citations": [],
+          "author_agent": "Quant"
+        }
+      ],
+      "financial_ratios": {
+        "leverage_ratio": 8.571428571428571,
+        "dscr": 7.0,
+        "current_ratio": 1.5,
+        "revenue": 1200.0,
+        "ebitda": 350.0,
+        "net_income": 150.0
+      },
+      "historical_financials": [
+        {
+          "total_assets": 5000.0,
+          "total_liabilities": 3000.0,
+          "total_equity": 2000.0,
+          "revenue": 1200.0,
+          "ebitda": 350.0,
+          "net_income": 150.0,
+          "interest_expense": 50.0,
+          "dscr": 7.0,
+          "leverage_ratio": 8.571428571428571,
+          "current_ratio": 1.5,
+          "period": "FY2025 Mock"
+        },
+        {
+          "total_assets": 4600.0,
+          "total_liabilities": 2760.0,
+          "total_equity": 1840.0,
+          "revenue": 1080.0,
+          "ebitda": 308.0,
+          "net_income": 127.5,
+          "interest_expense": 50.0,
+          "dscr": 7.0,
+          "leverage_ratio": 8.571428571428571,
+          "current_ratio": 1.5,
+          "period": "FY2024"
+        },
+        {
+          "total_assets": 4370.0,
+          "total_liabilities": 2622.0,
+          "total_equity": 1748.0,
+          "revenue": 993.6,
+          "ebitda": 277.2,
+          "net_income": 112.2,
+          "interest_expense": 50.0,
+          "dscr": 7.0,
+          "leverage_ratio": 8.571428571428571,
+          "current_ratio": 1.5,
+          "period": "FY2023"
+        }
+      ],
+      "dcf_analysis": {
+        "free_cash_flow": [
+          238.875,
+          248.43568749999994,
+          255.90656,
+          261.0614826421874,
+          263.73485190325
+        ],
+        "growth_rate": 0.03,
+        "wacc": 0.09,
+        "terminal_value": 4527.448291005791,
+        "enterprise_value": 3924.7443800221386,
+        "equity_value": 924.7443800221386,
+        "share_price": 185.0
+      },
+      "risk_score": 45.0,
+      "credit_ratings": [
+        {
+          "agency": "Moody's",
+          "rating": "B2",
+          "outlook": "Negative",
+          "date": "2026-02-13"
+        },
+        {
+          "agency": "S&P",
+          "rating": "B",
+          "outlook": "Watch",
+          "date": "2026-02-13"
+        }
+      ],
+      "debt_facilities": [
+        {
+          "facility_type": "Revolver",
+          "amount_committed": 500.0,
+          "amount_drawn": 350.0,
+          "interest_rate": "SOFR + 3.50%",
+          "maturity_date": "2025-12-31",
+          "snc_rating": "Special Mention",
+          "drc": 0.4,
+          "ltv": 0.7,
+          "conviction_score": 0.45
+        },
+        {
+          "facility_type": "Term Loan B",
+          "amount_committed": 1200.0,
+          "amount_drawn": 1200.0,
+          "interest_rate": "SOFR + 4.75%",
+          "maturity_date": "2028-06-30",
+          "snc_rating": "Substandard",
+          "drc": 0.35,
+          "ltv": 0.85,
+          "conviction_score": 0.3
+        },
+        {
+          "facility_type": "Mezzanine Debt",
+          "amount_committed": 300.0,
+          "amount_drawn": 300.0,
+          "interest_rate": "12.00% PIK",
+          "maturity_date": "2029-06-30",
+          "snc_rating": "Doubtful",
+          "drc": 0.1,
+          "ltv": 0.95,
+          "conviction_score": 0.15
+        }
+      ],
+      "equity_data": {
+        "market_cap": 1200.0,
+        "share_price": 15.25,
+        "volume_avg_30d": 150000.0,
+        "pe_ratio": 18.5,
+        "dividend_yield": 0.0,
+        "beta": 1.85
+      }
+    },
+    "credit_memo_Microsoft_Corp.json": {
+      "borrower_name": "Microsoft Corp",
+      "report_date": "2026-02-14T02:03:14.560509",
+      "executive_summary": "The borrower Microsoft Corp presents a mixed credit profile. Financial performance shows strong EBITDA ($5.0M) but elevated leverage (10.0x).  [Ref: TechCorp_10K_2025.pdf]",
+      "sections": [
+        {
+          "title": "Executive Summary",
+          "content": "The borrower Microsoft Corp presents a mixed credit profile. Financial performance shows strong EBITDA ($5.0M) but elevated leverage (10.0x).  [Ref: TechCorp_10K_2025.pdf]",
+          "citations": [
+            {
+              "doc_id": "TechCorp_10K_2025.pdf",
+              "chunk_id": "88aa8219-2f7a-4666-ae78-0820c2439969",
+              "page_number": 3
+            }
+          ],
+          "author_agent": "Writer"
+        },
+        {
+          "title": "Key Risks & Mitigants",
+          "content": "Key Risks:\n- HIGH: Leverage ratio exceeds 4.0x policy limit.\n",
+          "citations": [],
+          "author_agent": "Risk Officer"
+        },
+        {
+          "title": "Financial Analysis",
+          "content": "EBITDA: $5.0M | Leverage: 10.0x",
+          "citations": [],
+          "author_agent": "Quant"
+        }
+      ],
+      "key_strengths": [
+        "Market leading position in core segment.",
+        "Strong EBITDA generation ($5.0M).",
+        "Diversified customer base."
+      ],
+      "key_weaknesses": [
+        "Elevated leverage at 10.0x.",
+        "Exposure to cyclical end-markets.",
+        "Recent management turnover."
+      ],
+      "mitigants": [
+        "Strong free cash flow conversion.",
+        "Demonstrated ability to deleverage.",
+        "Sponsor support."
+      ],
+      "financial_ratios": {
+        "leverage_ratio": 10.0,
+        "dscr": 5.0,
+        "current_ratio": 2.0,
+        "revenue": 20.0,
+        "ebitda": 5.0,
+        "net_income": 2.0
+      },
+      "historical_financials": [
+        {
+          "total_assets": 100.0,
+          "total_liabilities": 50.0,
+          "total_equity": 50.0,
+          "revenue": 20.0,
+          "ebitda": 5.0,
+          "net_income": 2.0,
+          "interest_expense": 1.0,
+          "dscr": 5.0,
+          "leverage_ratio": 10.0,
+          "current_ratio": 2.0,
+          "period": "FY2025"
+        },
+        {
+          "total_assets": 92.0,
+          "total_liabilities": 46.0,
+          "total_equity": 46.0,
+          "revenue": 18.0,
+          "ebitda": 4.4,
+          "net_income": 1.7,
+          "interest_expense": 1.0,
+          "dscr": 5.0,
+          "leverage_ratio": 10.0,
+          "current_ratio": 2.0,
+          "period": "FY2024"
+        },
+        {
+          "total_assets": 87.39999999999999,
+          "total_liabilities": 43.699999999999996,
+          "total_equity": 43.699999999999996,
+          "revenue": 16.560000000000002,
+          "ebitda": 3.9600000000000004,
+          "net_income": 1.496,
+          "interest_expense": 1.0,
+          "dscr": 5.0,
+          "leverage_ratio": 10.0,
+          "current_ratio": 2.0,
+          "period": "FY2023"
+        }
+      ],
+      "dcf_analysis": {
+        "free_cash_flow": [
+          3.4125,
+          3.5490812499999995,
+          3.6558080000000004,
+          3.729449752031249,
+          3.767640741475
+        ],
+        "growth_rate": 0.03,
+        "wacc": 0.09,
+        "terminal_value": 64.67783272865418,
+        "enterprise_value": 56.06777685745914,
+        "equity_value": 6.067776857459137,
+        "share_price": 185.0,
+        "inputs": {
+          "wacc": 0.09,
+          "growth_rate": 0.03,
+          "tax_rate_proxy": 0.35,
+          "capex_margin": 0.05
+        }
+      },
+      "pd_model": {
+        "input_factors": {
+          "Leverage Ratio": 10.0,
+          "DSCR": 5.0,
+          "Liquidity (Current Ratio)": 2.0,
+          "EBITDA Margin": 0.25
+        },
+        "model_score": 60.0,
+        "implied_rating": "BB",
+        "one_year_pd": 0.02,
+        "five_year_pd": 0.1
+      },
+      "lgd_analysis": {
+        "seniority_structure": [
+          {
+            "tranche": "Revolver",
+            "amount": 100.0,
+            "recovery_est": "70%"
+          },
+          {
+            "tranche": "Term Loan",
+            "amount": 500.0,
+            "recovery_est": "60%"
+          }
+        ],
+        "recovery_rate_assumption": 0.6499999999999999,
+        "loss_given_default": 0.3500000000000001
+      },
+      "scenario_analysis": {
+        "scenarios": [
+          {
+            "name": "Bear Case",
+            "probability": 0.2,
+            "revenue_growth": -0.05,
+            "ebitda_margin": 0.2,
+            "implied_share_price": 105.0
+          },
+          {
+            "name": "Base Case",
+            "probability": 0.5,
+            "revenue_growth": 0.05,
+            "ebitda_margin": 0.3,
+            "implied_share_price": 150.0
+          },
+          {
+            "name": "Bull Case",
+            "probability": 0.3,
+            "revenue_growth": 0.12,
+            "ebitda_margin": 0.35,
+            "implied_share_price": 210.0
+          }
+        ],
+        "weighted_share_price": 159.0
+      },
+      "system_two_critique": {
+        "critique_points": [
+          "Credit thesis aligns with macro outlook.",
+          "Valuation assumptions appear conservative."
+        ],
+        "conviction_score": 0.85,
+        "verification_status": "PASS",
+        "author_agent": "System 2"
+      },
+      "risk_score": 60.0,
+      "credit_ratings": [
+        {
+          "agency": "Moody's",
+          "rating": "Ba2",
+          "outlook": "Stable",
+          "date": "2026-02-13"
+        },
+        {
+          "agency": "S&P",
+          "rating": "BB",
+          "outlook": "Stable",
+          "date": "2026-02-13"
+        }
+      ],
+      "debt_facilities": [
+        {
+          "facility_type": "Revolver",
+          "amount_committed": 100.0,
+          "amount_drawn": 20.0,
+          "interest_rate": "Prime + 1.0%",
+          "maturity_date": "2026-01-01",
+          "snc_rating": "Pass",
+          "drc": 0.8,
+          "ltv": 0.5,
+          "conviction_score": 0.7,
+          "lgd": 0.3,
+          "recovery_rate": 0.7
+        },
+        {
+          "facility_type": "Term Loan",
+          "amount_committed": 500.0,
+          "amount_drawn": 500.0,
+          "interest_rate": "5.50%",
+          "maturity_date": "2029-01-01",
+          "snc_rating": "Pass",
+          "drc": 0.75,
+          "ltv": 0.6,
+          "conviction_score": 0.75,
+          "lgd": 0.4,
+          "recovery_rate": 0.6
+        }
+      ],
+      "repayment_schedule": [
+        {
+          "year": 2027,
+          "amount": 27.5,
+          "source": "Term Loan Interest"
+        },
+        {
+          "year": 2028,
+          "amount": 27.5,
+          "source": "Term Loan Interest"
+        },
+        {
+          "year": 2029,
+          "amount": 500.0,
+          "source": "Term Loan Maturity"
+        }
+      ],
+      "equity_data": {
+        "market_cap": 100.0,
+        "share_price": 10.0,
+        "volume_avg_30d": 1000.0,
+        "pe_ratio": 15.0,
+        "dividend_yield": 1.0,
+        "beta": 1.0
+      }
+    },
+    "credit_memo_Goldman_Sachs.json": {
+      "borrower_name": "Goldman Sachs",
+      "report_date": "2026-02-14T02:03:14.568300",
+      "executive_summary": "The borrower Goldman Sachs presents a mixed credit profile. Financial performance shows strong EBITDA ($5.0M) but elevated leverage (10.0x).  [Ref: Generic_Borrower_Profile.pdf]",
+      "sections": [
+        {
+          "title": "Executive Summary",
+          "content": "The borrower Goldman Sachs presents a mixed credit profile. Financial performance shows strong EBITDA ($5.0M) but elevated leverage (10.0x).  [Ref: Generic_Borrower_Profile.pdf]",
+          "citations": [
+            {
+              "doc_id": "Generic_Borrower_Profile.pdf",
+              "chunk_id": "d2332adf-8770-41ca-9dea-26def5bfed7b",
+              "page_number": 1
+            }
+          ],
+          "author_agent": "Writer"
+        },
+        {
+          "title": "Key Risks & Mitigants",
+          "content": "Key Risks:\n- HIGH: Leverage ratio exceeds 4.0x policy limit.\n",
+          "citations": [],
+          "author_agent": "Risk Officer"
+        },
+        {
+          "title": "Financial Analysis",
+          "content": "EBITDA: $5.0M | Leverage: 10.0x",
+          "citations": [],
+          "author_agent": "Quant"
+        }
+      ],
+      "key_strengths": [
+        "Market leading position in core segment.",
+        "Strong EBITDA generation ($5.0M).",
+        "Diversified customer base."
+      ],
+      "key_weaknesses": [
+        "Elevated leverage at 10.0x.",
+        "Exposure to cyclical end-markets.",
+        "Recent management turnover."
+      ],
+      "mitigants": [
+        "Strong free cash flow conversion.",
+        "Demonstrated ability to deleverage.",
+        "Sponsor support."
+      ],
+      "financial_ratios": {
+        "leverage_ratio": 10.0,
+        "dscr": 5.0,
+        "current_ratio": 2.0,
+        "revenue": 20.0,
+        "ebitda": 5.0,
+        "net_income": 2.0
+      },
+      "historical_financials": [
+        {
+          "total_assets": 100.0,
+          "total_liabilities": 50.0,
+          "total_equity": 50.0,
+          "revenue": 20.0,
+          "ebitda": 5.0,
+          "net_income": 2.0,
+          "interest_expense": 1.0,
+          "dscr": 5.0,
+          "leverage_ratio": 10.0,
+          "current_ratio": 2.0,
+          "period": "FY2025"
+        },
+        {
+          "total_assets": 92.0,
+          "total_liabilities": 46.0,
+          "total_equity": 46.0,
+          "revenue": 18.0,
+          "ebitda": 4.4,
+          "net_income": 1.7,
+          "interest_expense": 1.0,
+          "dscr": 5.0,
+          "leverage_ratio": 10.0,
+          "current_ratio": 2.0,
+          "period": "FY2024"
+        },
+        {
+          "total_assets": 87.39999999999999,
+          "total_liabilities": 43.699999999999996,
+          "total_equity": 43.699999999999996,
+          "revenue": 16.560000000000002,
+          "ebitda": 3.9600000000000004,
+          "net_income": 1.496,
+          "interest_expense": 1.0,
+          "dscr": 5.0,
+          "leverage_ratio": 10.0,
+          "current_ratio": 2.0,
+          "period": "FY2023"
+        }
+      ],
+      "dcf_analysis": {
+        "free_cash_flow": [
+          3.4125,
+          3.5490812499999995,
+          3.6558080000000004,
+          3.729449752031249,
+          3.767640741475
+        ],
+        "growth_rate": 0.03,
+        "wacc": 0.09,
+        "terminal_value": 64.67783272865418,
+        "enterprise_value": 56.06777685745914,
+        "equity_value": 6.067776857459137,
+        "share_price": 185.0,
+        "inputs": {
+          "wacc": 0.09,
+          "growth_rate": 0.03,
+          "tax_rate_proxy": 0.35,
+          "capex_margin": 0.05
+        }
+      },
+      "pd_model": {
+        "input_factors": {
+          "Leverage Ratio": 10.0,
+          "DSCR": 5.0,
+          "Liquidity (Current Ratio)": 2.0,
+          "EBITDA Margin": 0.25
+        },
+        "model_score": 60.0,
+        "implied_rating": "BB",
+        "one_year_pd": 0.02,
+        "five_year_pd": 0.1
+      },
+      "lgd_analysis": {
+        "seniority_structure": [
+          {
+            "tranche": "Revolver",
+            "amount": 100.0,
+            "recovery_est": "70%"
+          },
+          {
+            "tranche": "Term Loan",
+            "amount": 500.0,
+            "recovery_est": "60%"
+          }
+        ],
+        "recovery_rate_assumption": 0.6499999999999999,
+        "loss_given_default": 0.3500000000000001
+      },
+      "scenario_analysis": {
+        "scenarios": [
+          {
+            "name": "Bear Case",
+            "probability": 0.2,
+            "revenue_growth": -0.05,
+            "ebitda_margin": 0.2,
+            "implied_share_price": 105.0
+          },
+          {
+            "name": "Base Case",
+            "probability": 0.5,
+            "revenue_growth": 0.05,
+            "ebitda_margin": 0.3,
+            "implied_share_price": 150.0
+          },
+          {
+            "name": "Bull Case",
+            "probability": 0.3,
+            "revenue_growth": 0.12,
+            "ebitda_margin": 0.35,
+            "implied_share_price": 210.0
+          }
+        ],
+        "weighted_share_price": 159.0
+      },
+      "system_two_critique": {
+        "critique_points": [
+          "Credit thesis aligns with macro outlook.",
+          "Valuation assumptions appear conservative."
+        ],
+        "conviction_score": 0.85,
+        "verification_status": "PASS",
+        "author_agent": "System 2"
+      },
+      "risk_score": 60.0,
+      "credit_ratings": [
+        {
+          "agency": "Moody's",
+          "rating": "Ba2",
+          "outlook": "Stable",
+          "date": "2026-02-13"
+        },
+        {
+          "agency": "S&P",
+          "rating": "BB",
+          "outlook": "Stable",
+          "date": "2026-02-13"
+        }
+      ],
+      "debt_facilities": [
+        {
+          "facility_type": "Revolver",
+          "amount_committed": 100.0,
+          "amount_drawn": 20.0,
+          "interest_rate": "Prime + 1.0%",
+          "maturity_date": "2026-01-01",
+          "snc_rating": "Pass",
+          "drc": 0.8,
+          "ltv": 0.5,
+          "conviction_score": 0.7,
+          "lgd": 0.3,
+          "recovery_rate": 0.7
+        },
+        {
+          "facility_type": "Term Loan",
+          "amount_committed": 500.0,
+          "amount_drawn": 500.0,
+          "interest_rate": "5.50%",
+          "maturity_date": "2029-01-01",
+          "snc_rating": "Pass",
+          "drc": 0.75,
+          "ltv": 0.6,
+          "conviction_score": 0.75,
+          "lgd": 0.4,
+          "recovery_rate": 0.6
+        }
+      ],
+      "repayment_schedule": [
+        {
+          "year": 2027,
+          "amount": 27.5,
+          "source": "Term Loan Interest"
+        },
+        {
+          "year": 2028,
+          "amount": 27.5,
+          "source": "Term Loan Interest"
+        },
+        {
+          "year": 2029,
+          "amount": 500.0,
+          "source": "Term Loan Maturity"
+        }
+      ],
+      "equity_data": {
+        "market_cap": 100.0,
+        "share_price": 10.0,
+        "volume_avg_30d": 1000.0,
+        "pe_ratio": 15.0,
+        "dividend_yield": 1.0,
+        "beta": 1.0
+      }
+    },
+    "credit_memo_Tesla_Inc.json": {
+      "borrower_name": "Tesla Inc.",
+      "report_date": "2026-02-14T02:03:14.564915",
+      "executive_summary": "The borrower Tesla Inc. presents a mixed credit profile. Financial performance shows strong EBITDA ($25000.0M) but elevated leverage (2.0x).  [Ref: TSLA_10Q_FY24_Q3.pdf]",
+      "sections": [
+        {
+          "title": "Executive Summary",
+          "content": "The borrower Tesla Inc. presents a mixed credit profile. Financial performance shows strong EBITDA ($25000.0M) but elevated leverage (2.0x).  [Ref: TSLA_10Q_FY24_Q3.pdf]",
+          "citations": [
+            {
+              "doc_id": "TSLA_10Q_FY24_Q3.pdf",
+              "chunk_id": "4e5fe115-b41f-47ef-8c36-e3b6e5cbd201",
+              "page_number": 8
+            }
+          ],
+          "author_agent": "Writer"
+        },
+        {
+          "title": "Key Risks & Mitigants",
+          "content": "Key Risks:\n- CONNECTED PARTY RISK: xAI via Tesla Inc. -> xAI is High risk.\n- CONNECTED PARTY RISK: X (Twitter) via Tesla Inc. -> X (Twitter) is High risk.\n",
+          "citations": [],
+          "author_agent": "Risk Officer"
+        },
+        {
+          "title": "Financial Analysis",
+          "content": "EBITDA: $25000.0M | Leverage: 2.0x",
+          "citations": [],
+          "author_agent": "Quant"
+        }
+      ],
+      "key_strengths": [
+        "Market leading position in core segment.",
+        "Strong EBITDA generation ($25000.0M).",
+        "Diversified customer base."
+      ],
+      "key_weaknesses": [
+        "Elevated leverage at 2.0x.",
+        "Exposure to cyclical end-markets.",
+        "Recent management turnover."
+      ],
+      "mitigants": [
+        "Strong free cash flow conversion.",
+        "Demonstrated ability to deleverage.",
+        "Sponsor support."
+      ],
+      "financial_ratios": {
+        "leverage_ratio": 2.0,
+        "dscr": 250.0,
+        "current_ratio": 3.0,
+        "revenue": 160000.0,
+        "ebitda": 25000.0,
+        "net_income": 18000.0
+      },
+      "historical_financials": [
+        {
+          "total_assets": 150000.0,
+          "total_liabilities": 50000.0,
+          "total_equity": 100000.0,
+          "revenue": 160000.0,
+          "ebitda": 25000.0,
+          "net_income": 18000.0,
+          "interest_expense": 100.0,
+          "dscr": 250.0,
+          "leverage_ratio": 2.0,
+          "current_ratio": 3.0,
+          "period": "FY2026 (Proj)"
+        },
+        {
+          "total_assets": 138000.0,
+          "total_liabilities": 46000.0,
+          "total_equity": 92000.0,
+          "revenue": 144000.0,
+          "ebitda": 22000.0,
+          "net_income": 15300.0,
+          "interest_expense": 100.0,
+          "dscr": 250.0,
+          "leverage_ratio": 2.0,
+          "current_ratio": 3.0,
+          "period": "FY2025"
+        },
+        {
+          "total_assets": 131100.0,
+          "total_liabilities": 43700.0,
+          "total_equity": 87400.0,
+          "revenue": 132480.0,
+          "ebitda": 19800.0,
+          "net_income": 13464.0,
+          "interest_expense": 100.0,
+          "dscr": 250.0,
+          "leverage_ratio": 2.0,
+          "current_ratio": 3.0,
+          "period": "FY2024"
+        }
+      ],
+      "dcf_analysis": {
+        "free_cash_flow": [
+          17062.5,
+          17745.406249999996,
+          18279.04,
+          18647.248760156246,
+          18838.203707375
+        ],
+        "growth_rate": 0.03,
+        "wacc": 0.09,
+        "terminal_value": 323389.16364327085,
+        "enterprise_value": 280338.88428729563,
+        "equity_value": 230338.88428729563,
+        "share_price": 185.0,
+        "inputs": {
+          "wacc": 0.09,
+          "growth_rate": 0.03,
+          "tax_rate_proxy": 0.35,
+          "capex_margin": 0.05
+        }
+      },
+      "pd_model": {
+        "input_factors": {
+          "Leverage Ratio": 2.0,
+          "DSCR": 250.0,
+          "Liquidity (Current Ratio)": 3.0,
+          "EBITDA Margin": 0.15625
+        },
+        "model_score": 80.0,
+        "implied_rating": "A",
+        "one_year_pd": 0.001,
+        "five_year_pd": 0.01
+      },
+      "lgd_analysis": {
+        "seniority_structure": [
+          {
+            "tranche": "ABL Revolver",
+            "amount": 5000.0,
+            "recovery_est": "85%"
+          },
+          {
+            "tranche": "Convertible Senior Notes",
+            "amount": 1800.0,
+            "recovery_est": "50%"
+          },
+          {
+            "tranche": "Auto ABS Facilities",
+            "amount": 3000.0,
+            "recovery_est": "95%"
+          }
+        ],
+        "recovery_rate_assumption": 0.7666666666666666,
+        "loss_given_default": 0.2333333333333334
+      },
+      "scenario_analysis": {
+        "scenarios": [
+          {
+            "name": "Bear Case",
+            "probability": 0.2,
+            "revenue_growth": -0.05,
+            "ebitda_margin": 0.2,
+            "implied_share_price": 105.0
+          },
+          {
+            "name": "Base Case",
+            "probability": 0.5,
+            "revenue_growth": 0.05,
+            "ebitda_margin": 0.3,
+            "implied_share_price": 150.0
+          },
+          {
+            "name": "Bull Case",
+            "probability": 0.3,
+            "revenue_growth": 0.12,
+            "ebitda_margin": 0.35,
+            "implied_share_price": 210.0
+          }
+        ],
+        "weighted_share_price": 159.0
+      },
+      "system_two_critique": {
+        "critique_points": [
+          "Credit thesis aligns with macro outlook.",
+          "Valuation assumptions appear conservative."
+        ],
+        "conviction_score": 0.85,
+        "verification_status": "PASS",
+        "author_agent": "System 2"
+      },
+      "risk_score": 80.0,
+      "credit_ratings": [
+        {
+          "agency": "Moody's",
+          "rating": "Baa3",
+          "outlook": "Positive",
+          "date": "2026-02-13"
+        },
+        {
+          "agency": "S&P",
+          "rating": "BBB",
+          "outlook": "Stable",
+          "date": "2026-02-13"
+        },
+        {
+          "agency": "Fitch",
+          "rating": "BBB",
+          "outlook": "Stable",
+          "date": "2026-02-13"
+        }
+      ],
+      "debt_facilities": [
+        {
+          "facility_type": "ABL Revolver",
+          "amount_committed": 5000.0,
+          "amount_drawn": 500.0,
+          "interest_rate": "SOFR + 1.50%",
+          "maturity_date": "2026-10-20",
+          "snc_rating": "Pass",
+          "drc": 0.9,
+          "ltv": 0.4,
+          "conviction_score": 0.88,
+          "lgd": 0.15,
+          "recovery_rate": 0.85
+        },
+        {
+          "facility_type": "Convertible Senior Notes",
+          "amount_committed": 1800.0,
+          "amount_drawn": 1800.0,
+          "interest_rate": "2.00%",
+          "maturity_date": "2027-05-15",
+          "snc_rating": "Pass",
+          "drc": 0.85,
+          "ltv": 0.3,
+          "conviction_score": 0.85,
+          "lgd": 0.5,
+          "recovery_rate": 0.5
+        },
+        {
+          "facility_type": "Auto ABS Facilities",
+          "amount_committed": 3000.0,
+          "amount_drawn": 2200.0,
+          "interest_rate": "Variable",
+          "maturity_date": "Rolling",
+          "snc_rating": "Pass",
+          "drc": 0.95,
+          "ltv": 0.8,
+          "conviction_score": 0.92,
+          "lgd": 0.05,
+          "recovery_rate": 0.95
+        }
+      ],
+      "repayment_schedule": [
+        {
+          "year": 2027,
+          "amount": 1800.0,
+          "source": "Convertible Senior Notes Maturity"
+        }
+      ],
+      "equity_data": {
+        "market_cap": 850000.0,
+        "share_price": 265.4,
+        "volume_avg_30d": 98000000.0,
+        "pe_ratio": 68.2,
+        "dividend_yield": 0.0,
+        "beta": 2.05
+      }
+    },
+    "credit_memo_Amazoncom_Inc.json": {
+      "borrower_name": "Amazon.com Inc.",
+      "report_date": "2026-02-14T02:03:14.563687",
+      "executive_summary": "The borrower Amazon.com Inc. presents a mixed credit profile. Financial performance shows strong EBITDA ($5.0M) but elevated leverage (10.0x).  [Ref: Generic_Borrower_Profile.pdf]",
+      "sections": [
+        {
+          "title": "Executive Summary",
+          "content": "The borrower Amazon.com Inc. presents a mixed credit profile. Financial performance shows strong EBITDA ($5.0M) but elevated leverage (10.0x).  [Ref: Generic_Borrower_Profile.pdf]",
+          "citations": [
+            {
+              "doc_id": "Generic_Borrower_Profile.pdf",
+              "chunk_id": "d8b29a0b-0015-4de1-9926-323c41ee980d",
+              "page_number": 1
+            }
+          ],
+          "author_agent": "Writer"
+        },
+        {
+          "title": "Key Risks & Mitigants",
+          "content": "Key Risks:\n- HIGH: Leverage ratio exceeds 4.0x policy limit.\n",
+          "citations": [],
+          "author_agent": "Risk Officer"
+        },
+        {
+          "title": "Financial Analysis",
+          "content": "EBITDA: $5.0M | Leverage: 10.0x",
+          "citations": [],
+          "author_agent": "Quant"
+        }
+      ],
+      "key_strengths": [
+        "Market leading position in core segment.",
+        "Strong EBITDA generation ($5.0M).",
+        "Diversified customer base."
+      ],
+      "key_weaknesses": [
+        "Elevated leverage at 10.0x.",
+        "Exposure to cyclical end-markets.",
+        "Recent management turnover."
+      ],
+      "mitigants": [
+        "Strong free cash flow conversion.",
+        "Demonstrated ability to deleverage.",
+        "Sponsor support."
+      ],
+      "financial_ratios": {
+        "leverage_ratio": 10.0,
+        "dscr": 5.0,
+        "current_ratio": 2.0,
+        "revenue": 20.0,
+        "ebitda": 5.0,
+        "net_income": 2.0
+      },
+      "historical_financials": [
+        {
+          "total_assets": 100.0,
+          "total_liabilities": 50.0,
+          "total_equity": 50.0,
+          "revenue": 20.0,
+          "ebitda": 5.0,
+          "net_income": 2.0,
+          "interest_expense": 1.0,
+          "dscr": 5.0,
+          "leverage_ratio": 10.0,
+          "current_ratio": 2.0,
+          "period": "FY2025"
+        },
+        {
+          "total_assets": 92.0,
+          "total_liabilities": 46.0,
+          "total_equity": 46.0,
+          "revenue": 18.0,
+          "ebitda": 4.4,
+          "net_income": 1.7,
+          "interest_expense": 1.0,
+          "dscr": 5.0,
+          "leverage_ratio": 10.0,
+          "current_ratio": 2.0,
+          "period": "FY2024"
+        },
+        {
+          "total_assets": 87.39999999999999,
+          "total_liabilities": 43.699999999999996,
+          "total_equity": 43.699999999999996,
+          "revenue": 16.560000000000002,
+          "ebitda": 3.9600000000000004,
+          "net_income": 1.496,
+          "interest_expense": 1.0,
+          "dscr": 5.0,
+          "leverage_ratio": 10.0,
+          "current_ratio": 2.0,
+          "period": "FY2023"
+        }
+      ],
+      "dcf_analysis": {
+        "free_cash_flow": [
+          3.4125,
+          3.5490812499999995,
+          3.6558080000000004,
+          3.729449752031249,
+          3.767640741475
+        ],
+        "growth_rate": 0.03,
+        "wacc": 0.09,
+        "terminal_value": 64.67783272865418,
+        "enterprise_value": 56.06777685745914,
+        "equity_value": 6.067776857459137,
+        "share_price": 185.0,
+        "inputs": {
+          "wacc": 0.09,
+          "growth_rate": 0.03,
+          "tax_rate_proxy": 0.35,
+          "capex_margin": 0.05
+        }
+      },
+      "pd_model": {
+        "input_factors": {
+          "Leverage Ratio": 10.0,
+          "DSCR": 5.0,
+          "Liquidity (Current Ratio)": 2.0,
+          "EBITDA Margin": 0.25
+        },
+        "model_score": 60.0,
+        "implied_rating": "BB",
+        "one_year_pd": 0.02,
+        "five_year_pd": 0.1
+      },
+      "lgd_analysis": {
+        "seniority_structure": [
+          {
+            "tranche": "Revolver",
+            "amount": 100.0,
+            "recovery_est": "70%"
+          },
+          {
+            "tranche": "Term Loan",
+            "amount": 500.0,
+            "recovery_est": "60%"
+          }
+        ],
+        "recovery_rate_assumption": 0.6499999999999999,
+        "loss_given_default": 0.3500000000000001
+      },
+      "scenario_analysis": {
+        "scenarios": [
+          {
+            "name": "Bear Case",
+            "probability": 0.2,
+            "revenue_growth": -0.05,
+            "ebitda_margin": 0.2,
+            "implied_share_price": 105.0
+          },
+          {
+            "name": "Base Case",
+            "probability": 0.5,
+            "revenue_growth": 0.05,
+            "ebitda_margin": 0.3,
+            "implied_share_price": 150.0
+          },
+          {
+            "name": "Bull Case",
+            "probability": 0.3,
+            "revenue_growth": 0.12,
+            "ebitda_margin": 0.35,
+            "implied_share_price": 210.0
+          }
+        ],
+        "weighted_share_price": 159.0
+      },
+      "system_two_critique": {
+        "critique_points": [
+          "Credit thesis aligns with macro outlook.",
+          "Valuation assumptions appear conservative."
+        ],
+        "conviction_score": 0.85,
+        "verification_status": "PASS",
+        "author_agent": "System 2"
+      },
+      "risk_score": 60.0,
+      "credit_ratings": [
+        {
+          "agency": "Moody's",
+          "rating": "Ba2",
+          "outlook": "Stable",
+          "date": "2026-02-13"
+        },
+        {
+          "agency": "S&P",
+          "rating": "BB",
+          "outlook": "Stable",
+          "date": "2026-02-13"
+        }
+      ],
+      "debt_facilities": [
+        {
+          "facility_type": "Revolver",
+          "amount_committed": 100.0,
+          "amount_drawn": 20.0,
+          "interest_rate": "Prime + 1.0%",
+          "maturity_date": "2026-01-01",
+          "snc_rating": "Pass",
+          "drc": 0.8,
+          "ltv": 0.5,
+          "conviction_score": 0.7,
+          "lgd": 0.3,
+          "recovery_rate": 0.7
+        },
+        {
+          "facility_type": "Term Loan",
+          "amount_committed": 500.0,
+          "amount_drawn": 500.0,
+          "interest_rate": "5.50%",
+          "maturity_date": "2029-01-01",
+          "snc_rating": "Pass",
+          "drc": 0.75,
+          "ltv": 0.6,
+          "conviction_score": 0.75,
+          "lgd": 0.4,
+          "recovery_rate": 0.6
+        }
+      ],
+      "repayment_schedule": [
+        {
+          "year": 2027,
+          "amount": 27.5,
+          "source": "Term Loan Interest"
+        },
+        {
+          "year": 2028,
+          "amount": 27.5,
+          "source": "Term Loan Interest"
+        },
+        {
+          "year": 2029,
+          "amount": 500.0,
+          "source": "Term Loan Maturity"
+        }
+      ],
+      "equity_data": {
+        "market_cap": 100.0,
+        "share_price": 10.0,
+        "volume_avg_30d": 1000.0,
+        "pe_ratio": 15.0,
+        "dividend_yield": 1.0,
+        "beta": 1.0
+      }
+    },
+    "Amazoncom_Inc": {
+      "borrower_name": "Amazon.com Inc.",
+      "report_date": "2026-02-14T02:03:14.563687",
+      "executive_summary": "The borrower Amazon.com Inc. presents a mixed credit profile. Financial performance shows strong EBITDA ($5.0M) but elevated leverage (10.0x).  [Ref: Generic_Borrower_Profile.pdf]",
+      "sections": [
+        {
+          "title": "Executive Summary",
+          "content": "The borrower Amazon.com Inc. presents a mixed credit profile. Financial performance shows strong EBITDA ($5.0M) but elevated leverage (10.0x).  [Ref: Generic_Borrower_Profile.pdf]",
+          "citations": [
+            {
+              "doc_id": "Generic_Borrower_Profile.pdf",
+              "chunk_id": "d8b29a0b-0015-4de1-9926-323c41ee980d",
+              "page_number": 1
+            }
+          ],
+          "author_agent": "Writer"
+        },
+        {
+          "title": "Key Risks & Mitigants",
+          "content": "Key Risks:\n- HIGH: Leverage ratio exceeds 4.0x policy limit.\n",
+          "citations": [],
+          "author_agent": "Risk Officer"
+        },
+        {
+          "title": "Financial Analysis",
+          "content": "EBITDA: $5.0M | Leverage: 10.0x",
+          "citations": [],
+          "author_agent": "Quant"
+        }
+      ],
+      "key_strengths": [
+        "Market leading position in core segment.",
+        "Strong EBITDA generation ($5.0M).",
+        "Diversified customer base."
+      ],
+      "key_weaknesses": [
+        "Elevated leverage at 10.0x.",
+        "Exposure to cyclical end-markets.",
+        "Recent management turnover."
+      ],
+      "mitigants": [
+        "Strong free cash flow conversion.",
+        "Demonstrated ability to deleverage.",
+        "Sponsor support."
+      ],
+      "financial_ratios": {
+        "leverage_ratio": 10.0,
+        "dscr": 5.0,
+        "current_ratio": 2.0,
+        "revenue": 20.0,
+        "ebitda": 5.0,
+        "net_income": 2.0
+      },
+      "historical_financials": [
+        {
+          "total_assets": 100.0,
+          "total_liabilities": 50.0,
+          "total_equity": 50.0,
+          "revenue": 20.0,
+          "ebitda": 5.0,
+          "net_income": 2.0,
+          "interest_expense": 1.0,
+          "dscr": 5.0,
+          "leverage_ratio": 10.0,
+          "current_ratio": 2.0,
+          "period": "FY2025"
+        },
+        {
+          "total_assets": 92.0,
+          "total_liabilities": 46.0,
+          "total_equity": 46.0,
+          "revenue": 18.0,
+          "ebitda": 4.4,
+          "net_income": 1.7,
+          "interest_expense": 1.0,
+          "dscr": 5.0,
+          "leverage_ratio": 10.0,
+          "current_ratio": 2.0,
+          "period": "FY2024"
+        },
+        {
+          "total_assets": 87.39999999999999,
+          "total_liabilities": 43.699999999999996,
+          "total_equity": 43.699999999999996,
+          "revenue": 16.560000000000002,
+          "ebitda": 3.9600000000000004,
+          "net_income": 1.496,
+          "interest_expense": 1.0,
+          "dscr": 5.0,
+          "leverage_ratio": 10.0,
+          "current_ratio": 2.0,
+          "period": "FY2023"
+        }
+      ],
+      "dcf_analysis": {
+        "free_cash_flow": [
+          3.4125,
+          3.5490812499999995,
+          3.6558080000000004,
+          3.729449752031249,
+          3.767640741475
+        ],
+        "growth_rate": 0.03,
+        "wacc": 0.09,
+        "terminal_value": 64.67783272865418,
+        "enterprise_value": 56.06777685745914,
+        "equity_value": 6.067776857459137,
+        "share_price": 185.0,
+        "inputs": {
+          "wacc": 0.09,
+          "growth_rate": 0.03,
+          "tax_rate_proxy": 0.35,
+          "capex_margin": 0.05
+        }
+      },
+      "pd_model": {
+        "input_factors": {
+          "Leverage Ratio": 10.0,
+          "DSCR": 5.0,
+          "Liquidity (Current Ratio)": 2.0,
+          "EBITDA Margin": 0.25
+        },
+        "model_score": 60.0,
+        "implied_rating": "BB",
+        "one_year_pd": 0.02,
+        "five_year_pd": 0.1
+      },
+      "lgd_analysis": {
+        "seniority_structure": [
+          {
+            "tranche": "Revolver",
+            "amount": 100.0,
+            "recovery_est": "70%"
+          },
+          {
+            "tranche": "Term Loan",
+            "amount": 500.0,
+            "recovery_est": "60%"
+          }
+        ],
+        "recovery_rate_assumption": 0.6499999999999999,
+        "loss_given_default": 0.3500000000000001
+      },
+      "scenario_analysis": {
+        "scenarios": [
+          {
+            "name": "Bear Case",
+            "probability": 0.2,
+            "revenue_growth": -0.05,
+            "ebitda_margin": 0.2,
+            "implied_share_price": 105.0
+          },
+          {
+            "name": "Base Case",
+            "probability": 0.5,
+            "revenue_growth": 0.05,
+            "ebitda_margin": 0.3,
+            "implied_share_price": 150.0
+          },
+          {
+            "name": "Bull Case",
+            "probability": 0.3,
+            "revenue_growth": 0.12,
+            "ebitda_margin": 0.35,
+            "implied_share_price": 210.0
+          }
+        ],
+        "weighted_share_price": 159.0
+      },
+      "system_two_critique": {
+        "critique_points": [
+          "Credit thesis aligns with macro outlook.",
+          "Valuation assumptions appear conservative."
+        ],
+        "conviction_score": 0.85,
+        "verification_status": "PASS",
+        "author_agent": "System 2"
+      },
+      "risk_score": 60.0,
+      "credit_ratings": [
+        {
+          "agency": "Moody's",
+          "rating": "Ba2",
+          "outlook": "Stable",
+          "date": "2026-02-13"
+        },
+        {
+          "agency": "S&P",
+          "rating": "BB",
+          "outlook": "Stable",
+          "date": "2026-02-13"
+        }
+      ],
+      "debt_facilities": [
+        {
+          "facility_type": "Revolver",
+          "amount_committed": 100.0,
+          "amount_drawn": 20.0,
+          "interest_rate": "Prime + 1.0%",
+          "maturity_date": "2026-01-01",
+          "snc_rating": "Pass",
+          "drc": 0.8,
+          "ltv": 0.5,
+          "conviction_score": 0.7,
+          "lgd": 0.3,
+          "recovery_rate": 0.7
+        },
+        {
+          "facility_type": "Term Loan",
+          "amount_committed": 500.0,
+          "amount_drawn": 500.0,
+          "interest_rate": "5.50%",
+          "maturity_date": "2029-01-01",
+          "snc_rating": "Pass",
+          "drc": 0.75,
+          "ltv": 0.6,
+          "conviction_score": 0.75,
+          "lgd": 0.4,
+          "recovery_rate": 0.6
+        }
+      ],
+      "repayment_schedule": [
+        {
+          "year": 2027,
+          "amount": 27.5,
+          "source": "Term Loan Interest"
+        },
+        {
+          "year": 2028,
+          "amount": 27.5,
+          "source": "Term Loan Interest"
+        },
+        {
+          "year": 2029,
+          "amount": 500.0,
+          "source": "Term Loan Maturity"
+        }
+      ],
+      "equity_data": {
+        "market_cap": 100.0,
+        "share_price": 10.0,
+        "volume_avg_30d": 1000.0,
+        "pe_ratio": 15.0,
+        "dividend_yield": 1.0,
+        "beta": 1.0
       }
     }
   }

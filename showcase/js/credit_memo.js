@@ -181,6 +181,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         const sys2Container = document.getElementById('system-2-container');
         if(sys2Container) sys2Container.innerHTML = generateSystemTwoHtml(memo);
 
+        // Render Repayment Chart
+        if (memo.repayment_schedule) {
+            renderRepaymentChart(memo);
+        }
+
         // Setup DCF listeners
         setupDCFListeners(memo);
 
@@ -389,7 +394,74 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
             html += `</tbody></table></div>`;
         }
+
+        // Add Chart Container
+        html += `
+            <div class="mt-8">
+                <h3 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4">Debt Repayment Schedule (Forecast)</h3>
+                <div class="bg-slate-800/30 p-4 rounded border border-slate-700/50 relative" style="height: 300px;">
+                    <canvas id="repayment-chart"></canvas>
+                </div>
+            </div>
+        `;
+
         return html;
+    }
+
+    function renderRepaymentChart(memo) {
+        const ctx = document.getElementById('repayment-chart');
+        if (!ctx || !memo.repayment_schedule) return;
+
+        // Destroy existing chart if any
+        if (window.repaymentChartInstance) {
+            window.repaymentChartInstance.destroy();
+        }
+
+        const labels = memo.repayment_schedule.map(item => item.year);
+        const data = memo.repayment_schedule.map(item => item.amount);
+        const backgrounds = memo.repayment_schedule.map(item =>
+            item.source.includes('Maturity') ? 'rgba(239, 68, 68, 0.7)' : 'rgba(59, 130, 246, 0.7)'
+        );
+
+        window.repaymentChartInstance = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Repayment Amount ($M)',
+                    data: data,
+                    backgroundColor: backgrounds,
+                    borderColor: backgrounds.map(c => c.replace('0.7', '1.0')),
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                        ticks: { color: '#94a3b8' }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: '#94a3b8' }
+                    }
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const item = memo.repayment_schedule[context.dataIndex];
+                                return `${item.source}: ${formatCurrency(item.amount)}`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
     }
 
     // Generator 5: Risk Quant (PD/LGD/Scenarios)

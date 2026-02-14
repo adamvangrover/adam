@@ -1,5 +1,5 @@
 from typing import Dict, List, Any
-from .model import FinancialSpread, DCFAnalysis, CreditRating, DebtFacility, EquityMarketData, PDModel, LGDAnalysis, Scenario, ScenarioAnalysis, SystemTwoCritique, CreditMemo
+from .model import FinancialSpread, DCFAnalysis, CreditRating, DebtFacility, EquityMarketData, PDModel, LGDAnalysis, Scenario, ScenarioAnalysis, SystemTwoCritique, CreditMemo, RepaymentScheduleItem
 import random
 from datetime import datetime, timedelta
 
@@ -15,14 +15,14 @@ class SpreadingEngine:
         name_lower = borrower_name.lower()
 
         if "apple" in name_lower:
-            # Apple Inc. (FY2025 Q1 - Period Ending Dec 2024)
-            assets = 379300.0
-            liabilities = 291100.0
-            equity = assets - liabilities
-            revenue = 391000.0
-            ebitda = 132000.0
-            net_income = 102000.0
-            interest = 3900.0
+            # Apple Inc. (FY2026 Projection)
+            assets = 375000.0
+            liabilities = 300000.0
+            equity = 75000.0
+            revenue = 420000.0
+            ebitda = 142000.0
+            net_income = 110000.0
+            interest = 3600.0
 
             return FinancialSpread(
                 total_assets=assets,
@@ -34,19 +34,19 @@ class SpreadingEngine:
                 interest_expense=interest,
                 dscr=ebitda / interest if interest > 0 else 999.0,
                 leverage_ratio=liabilities / ebitda if ebitda > 0 else 0.0,
-                current_ratio=0.98,
-                period="FY2025 Q1"
+                current_ratio=1.25,
+                period="FY2026 (Proj)"
             )
 
         elif "tesla" in name_lower:
-            # Tesla Inc. (FY2024 Q3 TTM)
-            assets = 119800.0
-            liabilities = 45700.0
-            equity = 74100.0
-            revenue = 97000.0
-            ebitda = 12500.0
-            net_income = 8400.0
-            interest = 150.0
+            # Tesla Inc. (FY2026 Projection)
+            assets = 150000.0
+            liabilities = 50000.0
+            equity = 100000.0
+            revenue = 160000.0
+            ebitda = 25000.0
+            net_income = 18000.0
+            interest = 100.0
 
             return FinancialSpread(
                 total_assets=assets,
@@ -58,18 +58,18 @@ class SpreadingEngine:
                 interest_expense=interest,
                 dscr=ebitda / interest if interest > 0 else 999.0,
                 leverage_ratio=liabilities / ebitda if ebitda > 0 else 0.0,
-                current_ratio=1.70,
-                period="FY2024 Q3"
+                current_ratio=3.0,
+                period="FY2026 (Proj)"
             )
 
         elif "jpmorgan" in name_lower or "chase" in name_lower:
-             # JPMorgan Chase (FY2024 Q4)
-            assets = 4000000.0
-            liabilities = 3655000.0
-            equity = 345000.0
-            revenue = 170000.0
-            ebitda = 90000.0
-            net_income = 56000.0
+             # JPMorgan Chase (FY2026 Projection)
+            assets = 4200000.0
+            liabilities = 3800000.0
+            equity = 400000.0
+            revenue = 185000.0
+            ebitda = 95000.0
+            net_income = 60000.0
             interest = 1.0
 
             return FinancialSpread(
@@ -83,7 +83,7 @@ class SpreadingEngine:
                 dscr=999.0,
                 leverage_ratio=liabilities / equity,
                 current_ratio=1.1,
-                period="FY2024 Q4"
+                period="FY2026 (Proj)"
             )
 
         elif "techcorp" in name_lower:
@@ -215,7 +215,8 @@ class SpreadingEngine:
         Returns mock credit ratings.
         """
         name = borrower_name.lower()
-        today = datetime.now().strftime("%Y-%m-%d")
+        # Ensure ratings appear current for 2026 context
+        today = "2026-02-13"
 
         if "apple" in name:
             return [
@@ -245,6 +246,53 @@ class SpreadingEngine:
                  CreditRating(agency="Moody's", rating="Ba2", outlook="Stable", date=today),
                  CreditRating(agency="S&P", rating="BB", outlook="Stable", date=today)
             ]
+
+    def get_debt_repayment_schedule(self, debt_facilities: List[DebtFacility]) -> List[RepaymentScheduleItem]:
+        """
+        Generates a 5-year repayment forecast.
+        """
+        schedule = []
+        current_year = 2026
+
+        for facility in debt_facilities:
+            try:
+                # Naive parsing of maturity date "YYYY-MM-DD" or "Rolling"
+                if "Rolling" in facility.maturity_date:
+                    continue
+
+                maturity_year = int(facility.maturity_date.split("-")[0])
+
+                # Check if within 5 year forecast window
+                if current_year < maturity_year <= current_year + 5:
+                    schedule.append(RepaymentScheduleItem(
+                        year=maturity_year,
+                        amount=facility.amount_drawn,
+                        source=f"{facility.facility_type} Maturity"
+                    ))
+
+                # Add interest payments (Mock calculation)
+                # Assuming simple annual interest for visualization
+                if "SOFR" in facility.interest_rate:
+                    rate = 0.055 # Proxy for SOFR + Margin
+                elif "%" in facility.interest_rate:
+                    rate = float(facility.interest_rate.replace("%", "").strip()) / 100.0
+                else:
+                    rate = 0.05
+
+                annual_interest = facility.amount_drawn * rate
+                for y in range(current_year + 1, min(maturity_year, current_year + 6)):
+                     schedule.append(RepaymentScheduleItem(
+                        year=y,
+                        amount=annual_interest,
+                        source=f"{facility.facility_type} Interest"
+                    ))
+
+            except Exception:
+                pass # Skip complex parsing for now
+
+        # Sort by year
+        schedule.sort(key=lambda x: x.year)
+        return schedule
 
     def get_debt_facilities(self, borrower_name: str) -> List[DebtFacility]:
         """
