@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM v23.5 :: COUNTERFACTUAL: THE 2000 SOFT LANDING</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/market_mayhem_tiers.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/nav.js" defer></script>
+    <script src="js/market_mayhem_viewer.js" defer></script>
+</head>
+<body class="tier-high">
+
+    <!-- System 2 Verification Overlay -->
+    <div id="system2-overlay" class="system2-overlay">
+        <div class="system2-terminal">
+            <div id="sys2-content"></div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="cyber-toast-container"></div>
+
+    <!-- Raw Source Modal -->
+    <div id="raw-source-modal" class="raw-source-modal">
+        <div class="raw-source-header">
+            <span>SOURCE_DATA.JSON</span>
+            <span style="cursor:pointer; color:#cc0000;" onclick="toggleSource()">[CLOSE]</span>
+        </div>
+        <div class="raw-source-content" id="raw-source-content"></div>
+    </div>
+
+    <!-- Virtual Toolbar for High Tier -->
+    <div class="doc-toolbar" style="display: flex;">
+        <div class="toolbar-item" onclick="window.location.href='market_mayhem_archive.html'"><strong>FILE</strong></div>
+        <div class="toolbar-item" onclick="showToast('EDIT MODE: READ ONLY (SIMULATION)')">EDIT</div>
+        <div class="toolbar-item" onclick="toggleTheme()">VIEW</div>
+        <div class="toolbar-item" onclick="showToast('INSERT: PERMISSION DENIED')">INSERT</div>
+        <div class="toolbar-item" onclick="showToast('FORMAT: LOCKED')">FORMAT</div>
+        <div class="toolbar-item" onclick="runVerification()" style="color: #0078d7;"><strong>VERIFY</strong></div>
+        <div style="flex-grow:1;"></div>
+        <div class="toolbar-item" style="color:#666;">ADAM_V26_EDITOR</div>
+    </div>
+
+    <div class="newsletter-wrapper">
+        <div class="paper-sheet" id="paper-sheet">
+
+            <!-- High Tier Header UI -->
+            <div class="doc-header-ui" style="display: flex;">
+                <span id="verification-status" style="color: #ffaa00;">SIMULATION // COUNTERFACTUAL</span>
+                <span>2bbbbc61</span>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; font-family:'JetBrains Mono'; font-size:0.8rem; color:#666; margin-bottom:20px; margin-top: 20px;">
+                <span>2000-03-10</span>
+                <span>ID: 2bbbbc61</span>
+            </div>
+
+            <h1 class="title">COUNTERFACTUAL: THE 2000 SOFT LANDING</h1>
+
+            <!-- Metadata Panel for High Tier (Embedded in Doc) -->
+            <div class="doc-metadata-panel" style="display: grid;">
+                <div class="doc-metadata-item"><strong>Classification</strong>RESTRICTED</div>
+                <div class="doc-metadata-item"><strong>Confidence</strong>85/100</div>
+                <div class="doc-metadata-item"><strong>Divergence</strong>70/100</div>
+                <div class="doc-metadata-item"><strong>Simulator</strong>Nexus_Core</div>
+            </div>
+
+            <div id="financialChartContainer" style="display:none; margin-bottom: 30px;">
+                <canvas id="financialChart"></canvas>
+            </div>
+
+            
+        <h3>Scenario Parameters: Rate Stability</h3>
+        <p><strong>Divergence Point:</strong> February 2000. Greenspan announces a pause in rate hikes, citing productivity gains from the internet revolution.</p>
+        
+        <h3>Outcome: The Plateau</h3>
+        <p>The NASDAQ Composite peaked at 5,048 but retreated orderly to 4,000. Capital continued to flow into fiber optics and telecom. Companies like Pets.com still failed, but Amazon and Cisco consolidated power faster.</p>
+        
+        <h3>Long-Term Consequence: Faster Digitization</h3>
+        <p>With capital markets still open, broadband infrastructure was built out 3 years ahead of schedule. Streaming video and cloud computing emerged in 2003 rather than 2006. The Great Financial Crisis of 2008 was potentially exacerbated by an even larger tech-driven wealth effect masking housing issues.</p>
+        
+
+            <!-- Provenance Log (All Tiers) -->
+            <div class="provenance-log">
+                <div class="log-entry">
+                    <span>> HASH_CHECK</span>
+                    <span style="color:var(--terminal-green);">2bbbbc61c96dade0da849fcbb18ca1063d91b2838e4960a14688c5eed14826ee</span>
+                </div>
+                <div class="log-entry">
+                    <span>> DIVERGENCE_INDEX</span>
+                    <span>70% (BASELINE: 2024_REALITY)</span>
+                </div>
+                <div class="log-entry">
+                    <span>> SCENARIO_LOCK</span>
+                    <span>85%</span>
+                </div>
+                <div class="log-entry">
+                    <span>> CRITIQUE_LOG</span>
+                    <span>"Nexus Simulation Engine verified divergence of 70%. Scenario Plausible."</span>
+                </div>
+            </div>
+
+            <a href="#" class="source-jump-btn" onclick="toggleSource(); return false;" title="View Source JSON">JUMP TO SOURCE</a>
+
+            <div style="margin-top: 40px; border-top: 1px solid #ccc; padding-top: 20px; font-style: italic; color: #666;">
+                End of Simulation.
+            </div>
+        </div>
+
+        <aside class="cyber-sidebar">
+            <div class="sidebar-widget">
+                <div class="sidebar-title">Simulation Metadata</div>
+                <div class="stat-row"><span>DATE</span> <span class="stat-val">2000-03-10</span></div>
+                <div class="stat-row"><span>TYPE</span> <span class="stat-val">COUNTERFACTUAL</span></div>
+                <div class="stat-row"><span>CLASS</span> <span class="stat-val">RESTRICTED</span></div>
+                <div class="stat-row"><span>PROVENANCE</span> <span class="stat-val" title="2bbbbc61c96dade0da849fcbb18ca1063d91b2838e4960a14688c5eed14826ee">2bbbbc61</span></div>
+            </div>
+
+            <div class="sidebar-widget">
+                <div class="sidebar-title">Sentiment Analysis</div>
+                <div class="stat-row"><span>SCORE</span> <span class="stat-val">60/100</span></div>
+                <div class="sentiment-bar">
+                    <div class="sentiment-fill" style="width: 60%;"></div>
+                </div>
+            </div>
+
+            <div class="sidebar-widget">
+                <div class="sidebar-title">Detected Entities</div>
+                <div class="tag-cloud">
+                    <a href="market_mayhem_archive.html?search=NDX" class="tag ticker" style="text-decoration:none;">$NDX</a><a href="market_mayhem_archive.html?search=AMZN" class="tag ticker" style="text-decoration:none;">$AMZN</a><a href="market_mayhem_archive.html?search=CSCO" class="tag ticker" style="text-decoration:none;">$CSCO</a><a href="market_mayhem_archive.html?search=US_FED" class="tag" style="text-decoration:none;">US_FED</a><a href="market_mayhem_archive.html?search=Tech_Bubble" class="tag" style="text-decoration:none;">Tech_Bubble</a>
+                </div>
+            </div>
+
+             <div class="sidebar-widget">
+                <div class="sidebar-title">Simulation Confidence</div>
+                 <div class="stat-row"><span>CONFIDENCE</span> <span class="stat-val">85/100</span></div>
+                 <div class="sentiment-bar">
+                    <div class="sentiment-fill" style="width: 85%; background: #00ff00;"></div>
+                </div>
+            </div>
+
+             <div class="sidebar-widget" style="border-color: #555;">
+                <div class="sidebar-title">Nexus Agent Log</div>
+                 <div style="font-size: 0.75rem; color: #ccc; font-style: italic;">
+                    "Nexus Simulation Engine verified divergence of 70%. Scenario Plausible."
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Hidden Raw Data -->
+    <textarea id="hidden-raw-data" style="display:none;">{
+  "title": "COUNTERFACTUAL: THE 2000 SOFT LANDING",
+  "date": "2000-03-10",
+  "summary": "Simulation: What if the Fed had not tightened rates in 1999-2000? The Dot Com bubble deflates slowly rather than popping.",
+  "full_body": "\n        <h3>Scenario Parameters: Rate Stability</h3>\n        <p><strong>Divergence Point:</strong> February 2000. Greenspan announces a pause in rate hikes, citing productivity gains from the internet revolution.</p>\n        \n        <h3>Outcome: The Plateau</h3>\n        <p>The NASDAQ Composite peaked at 5,048 but retreated orderly to 4,000. Capital continued to flow into fiber optics and telecom. Companies like Pets.com still failed, but Amazon and Cisco consolidated power faster.</p>\n        \n        <h3>Long-Term Consequence: Faster Digitization</h3>\n        <p>With capital markets still open, broadband infrastructure was built out 3 years ahead of schedule. Streaming video and cloud computing emerged in 2003 rather than 2006. The Great Financial Crisis of 2008 was potentially exacerbated by an even larger tech-driven wealth effect masking housing issues.</p>\n        ",
+  "metrics": {
+    "NASDAQ_Simulated": {
+      "2000": "4500",
+      "2001": "4200",
+      "2002": "3800",
+      "2003": "4100"
+    }
+  },
+  "entities": [
+    "$NDX",
+    "$AMZN",
+    "$CSCO",
+    "US_FED",
+    "Tech_Bubble"
+  ],
+  "sentiment": 60,
+  "divergence": 70,
+  "conviction": 85
+}</textarea>
+
+    <script>
+        const metricsData = {"NASDAQ_Simulated": {"2000": "4500", "2001": "4200", "2002": "3800", "2003": "4100"}};
+        if (metricsData && Object.keys(metricsData).length > 0) {
+            const ctx = document.getElementById('financialChart');
+            const container = document.getElementById('financialChartContainer');
+            let labels = [];
+            let values = [];
+            let labelName = "Metric";
+            for (const [key, val] of Object.entries(metricsData)) {
+                if (typeof val === 'object') {
+                    labels = Object.keys(val);
+                    values = Object.values(val).map(v => parseFloat(v));
+                    labelName = key;
+                    break;
+                }
+            }
+            if (labels.length > 0) {
+                container.style.display = 'block';
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: labelName,
+                            data: values,
+                            borderColor: '#ffaa00',
+                            backgroundColor: 'rgba(255, 170, 0, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.4,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: { legend: { display: true } }
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+</html>
