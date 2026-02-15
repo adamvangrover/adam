@@ -54,6 +54,12 @@ except ImportError as e:
     print(f"Warning: Credit Sentinel import failed: {e}")
     CREDIT_SENTINEL_AVAILABLE = False
 
+try:
+    from core.governance.constitution import Constitution
+    CONSTITUTION_AVAILABLE = True
+except ImportError:
+    CONSTITUTION_AVAILABLE = False
+
 
 # Global Orchestrator Singleton
 _orchestrator = None
@@ -535,6 +541,31 @@ def get_agent_status(agent_name: str) -> str:
         return f"Agent '{agent_name}' is ACTIVE. Type: {type(agent).__name__}"
     else:
         return f"Agent '{agent_name}' is NOT FOUND."
+
+@mcp.tool()
+def check_governance_compliance(action: str, context: str) -> str:
+    """
+    Checks if an action complies with the governance constitution.
+    Args:
+        action: The action name.
+        context: A JSON string representing the context (e.g., '{"risk_score": 0.5}').
+    """
+    if not CONSTITUTION_AVAILABLE:
+        return json.dumps({"status": "ERROR", "message": "Constitution module not available."})
+
+    try:
+        context_dict = json.loads(context)
+    except json.JSONDecodeError:
+        return json.dumps({"status": "ERROR", "message": "Invalid JSON context."})
+
+    constitution = Constitution()
+    is_allowed = constitution.check_action(action, context_dict)
+
+    return json.dumps({
+        "action": action,
+        "allowed": is_allowed,
+        "audit_log": constitution.get_audit_log()
+    }, indent=2)
 
 # --- Prompts ---
 
