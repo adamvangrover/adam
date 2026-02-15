@@ -1,5 +1,17 @@
 # Changelog
 
+## v26.5 - Protocol ARCHITECT_INFINITE (Day 6)
+
+### Jules' Log
+> "I noticed we lack a specialized mechanism to capitalize on price inefficiencies across the fragmented crypto exchanges. While `CryptoAgent` provides basic analysis, it doesn't actively hunt for arbitrage. I researched high-frequency arbitrage patterns and built `CryptoArbitrageAgent` to bridge this gap, using `ccxt` to scan multiple exchanges for spread opportunities."
+
+### Added
+- **New Organ**: `core/agents/specialized/crypto_arbitrage_agent.py` - A specialized agent that monitors price spreads across exchanges (e.g., Binance vs Kraken) and identifies arbitrage opportunities.
+- **Tests**: `tests/test_crypto_arbitrage_agent.py` - Unit tests verifying spread calculation and opportunity detection with mocked exchange data.
+- **Dependencies**: Added `ccxt` to `requirements.txt`.
+- **UI**: Created `showcase/unified_dashboard.html` (Adam Protocol: Unified Command) to bridge Legacy Showcase, Adam OS, and the new WebApp.
+- **Widget**: Added `showcase/js/crypto_arbitrage_widget.js` to visualize real-time arbitrage opportunities in the new dashboard.
+
 ## v26.4 - Protocol ARCHITECT_INFINITE (Day 5)
 
 ### Jules' Log
