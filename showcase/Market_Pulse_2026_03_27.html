@@ -11,6 +11,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="js/nav.js" defer></script>
+    <script src="js/market_mayhem_viewer.js" defer></script>
 </head>
 <body class="tier-low">
 
@@ -141,7 +142,7 @@ The market has been reacting to the Sovereign AI & Crypto Supercycle. We are see
             <div class="sidebar-widget">
                 <div class="sidebar-title">Detected Entities</div>
                 <div class="tag-cloud">
-
+                    <a href="market_mayhem_archive.html?search=AI" class="tag" style="text-decoration:none; border-color:#666;">AI</a><a href="market_mayhem_archive.html?search=Crypto" class="tag" style="text-decoration:none; border-color:#666;">Crypto</a><a href="market_mayhem_archive.html?search=Energy" class="tag" style="text-decoration:none; border-color:#666;">Energy</a><a href="market_mayhem_archive.html?search=Tech" class="tag" style="text-decoration:none; border-color:#666;">Tech</a><a href="market_mayhem_archive.html?search=Volatility" class="tag" style="text-decoration:none; border-color:#666;">Volatility</a>
                 </div>
             </div>
 
@@ -187,7 +188,14 @@ The market has been reacting to the Sovereign AI & Crypto Supercycle. We are see
   "entities": {
     "tickers": [],
     "agents": [],
-    "sovereigns": []
+    "sovereigns": [],
+    "keywords": [
+      "AI",
+      "Crypto",
+      "Energy",
+      "Tech",
+      "Volatility"
+    ]
   },
   "provenance_hash": "8d1c3bef04d781f917ce14d4b9a2acc9f6faa217f459e164b8b48a57040172c5",
   "filename": "Market_Pulse_2026_03_27.html",
@@ -202,79 +210,6 @@ The market has been reacting to the Sovereign AI & Crypto Supercycle. We are see
 }</textarea>
 
     <script>
-        // --- INTERACTION LOGIC ---
-
-        function showToast(msg) {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            toast.className = 'cyber-toast';
-            toast.innerText = '> ' + msg;
-            container.appendChild(toast);
-            setTimeout(() => {
-                toast.style.opacity = '0';
-                setTimeout(() => toast.remove(), 300);
-            }, 3000);
-        }
-
-        function toggleTheme() {
-            document.body.classList.toggle('dark-mode');
-            const isDark = document.body.classList.contains('dark-mode');
-            showToast('THEME: ' + (isDark ? 'DARK_MODE' : 'LIGHT_MODE'));
-        }
-
-        function toggleSource() {
-            const modal = document.getElementById('raw-source-modal');
-            const content = document.getElementById('raw-source-content');
-            const rawData = document.getElementById('hidden-raw-data').value;
-
-            if (modal.style.display === 'flex') {
-                modal.style.display = 'none';
-            } else {
-                content.innerText = rawData || "NO SOURCE DATA AVAILABLE.";
-                modal.style.display = 'flex';
-            }
-        }
-
-        function runVerification() {
-            const overlay = document.getElementById('system2-overlay');
-            const content = document.getElementById('sys2-content');
-            const status = document.getElementById('verification-status');
-
-            overlay.style.display = 'flex';
-            content.innerHTML = '';
-
-            const lines = [
-                "INITIATING SYSTEM 2 PROTOCOL...",
-                "VERIFYING CRYPTOGRAPHIC SIGNATURE...",
-                "HASH: 8d1c3bef04d781f917ce14d4b9a2acc9f6faa217f459e164b8b48a57040172c5",
-                "CHECKING CHAIN OF CUSTODY...",
-                "ANALYZING SENTIMENT VECTORS...",
-                "CROSS-REFERENCING KNOWLEDGE GRAPH...",
-                "VERIFICATION COMPLETE."
-            ];
-
-            let i = 0;
-            function addLine() {
-                if (i < lines.length) {
-                    const div = document.createElement('div');
-                    div.className = 'system2-line';
-                    div.innerText = '> ' + lines[i];
-                    div.style.opacity = 1;
-                    content.appendChild(div);
-                    i++;
-                    setTimeout(addLine, 400);
-                } else {
-                    setTimeout(() => {
-                        overlay.style.display = 'none';
-                        showToast('DOCUMENT VERIFIED');
-                        if(status) status.innerText = "VERIFIED // AUTHENTICATED";
-                        if(status) status.style.color = "#aaffaa";
-                    }, 1000);
-                }
-            }
-            addLine();
-        }
-
         // Chart Injection Logic
         const metricsData = {};
 
