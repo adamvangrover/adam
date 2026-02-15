@@ -4,10 +4,34 @@ window.CyberDashboard = {
         this.injectAssets();
         this.injectLayout();
         this.injectMetadataHeader();
+        this.injectSwarmWidget();
+        this.injectFocusMode();
         this.processCitations();
         this.injectSystem2();
         this.setupSearch();
+        this.ensureDataLoaded();
         console.log("Dashboard Protocol Online.");
+    },
+
+    ensureDataLoaded: function() {
+        // Attempt to sync with global mock data if available
+        if (typeof window.MOCK_DATA !== 'undefined') {
+            console.log("SYNC: Connection to Core Data Grid established.");
+            this.mockData = window.MOCK_DATA;
+            // Re-run tagging now that we have data
+            const container = document.getElementById('header-tags');
+            if (container) container.innerHTML = ''; // Clear existing
+            this.generateTags();
+        } else {
+            console.warn("SYNC: Core Data Grid offline. Operating in autonomous mode.");
+            // Retry once after 2 seconds (in case of async load)
+            setTimeout(() => {
+                if (typeof window.MOCK_DATA !== 'undefined' && !this.mockData) {
+                    this.mockData = window.MOCK_DATA;
+                    this.generateTags();
+                }
+            }, 2000);
+        }
     },
 
     injectAssets: function() {
@@ -69,6 +93,93 @@ window.CyberDashboard = {
         document.body.appendChild(container);
     },
 
+    injectSwarmWidget: function() {
+        const sidebar = document.querySelector('.sidebar') || document.querySelector('aside');
+        if (!sidebar) return;
+
+        const widget = document.createElement('div');
+        widget.className = 'swarm-widget';
+        widget.innerHTML = `
+            <div class="sidebar-title" style="color:var(--neon-green)">SWARM INTELLIGENCE</div>
+            <div id="swarm-content"></div>
+        `;
+
+        const content = widget.querySelector('#swarm-content');
+
+        // Mock Agents (Fallback or from Data)
+        let agents = [
+            { name: 'MarketScanner_v9', status: 'active' },
+            { name: 'SentimentOracle', status: 'busy' },
+            { name: 'RiskGuardian', status: 'active' }
+        ];
+
+        if (this.mockData && this.mockData.agents) {
+             // If we had live agent data structure
+        }
+
+        agents.forEach(agent => {
+            const row = document.createElement('div');
+            row.className = 'swarm-agent-row';
+            row.innerHTML = `
+                <div class="agent-status-dot ${agent.status === 'busy' ? 'busy' : ''}"></div>
+                <span>${agent.name}</span>
+            `;
+            content.appendChild(row);
+        });
+
+        // Add to top of sidebar
+        sidebar.insertBefore(widget, sidebar.firstChild);
+    },
+
+    injectFocusMode: function() {
+        const header = document.getElementById('cyber-header');
+        if (!header) return;
+
+        const btn = document.createElement('button');
+        btn.className = 'cyber-btn';
+        btn.textContent = 'FOCUS MODE';
+        btn.style.marginLeft = '10px';
+        btn.onclick = () => {
+            document.body.classList.toggle('focus-mode-active');
+            btn.classList.toggle('active');
+            this.logInteraction(document.body.classList.contains('focus-mode-active') ? "FOCUS MODE ENGAGED" : "FOCUS MODE DISENGAGED");
+        };
+
+        header.appendChild(btn);
+
+        // Hover logic
+        const content = document.getElementById('main-content-area');
+        if (content) {
+            content.addEventListener('mouseover', (e) => {
+                if (!document.body.classList.contains('focus-mode-active')) return;
+                if (e.target.tagName === 'P') {
+                    const paragraphs = content.querySelectorAll('p');
+                    paragraphs.forEach(p => {
+                        if (p !== e.target) p.classList.add('focus-dimmed');
+                        else p.classList.remove('focus-dimmed');
+                    });
+                }
+            });
+
+            content.addEventListener('mouseout', () => {
+                if (!document.body.classList.contains('focus-mode-active')) return;
+                const paragraphs = content.querySelectorAll('p');
+                paragraphs.forEach(p => p.classList.remove('focus-dimmed'));
+            });
+        }
+    },
+
+    logInteraction: function(msg) {
+        const terminal = document.getElementById('sys2-logs');
+        if (!terminal) return;
+        const entry = document.createElement('div');
+        entry.className = 'log-entry';
+        const time = new Date().toLocaleTimeString();
+        entry.innerHTML = `<span class="log-timestamp">[${time}]</span> <span style="color:#fff">${msg}</span>`;
+        terminal.appendChild(entry);
+        terminal.parentElement.scrollTop = terminal.parentElement.scrollHeight;
+    },
+
     injectMetadataHeader: function() {
         const header = document.getElementById('cyber-header');
         if (!header) return;
@@ -117,6 +228,8 @@ window.CyberDashboard = {
         const container = document.getElementById('header-tags');
         if (!container) return;
 
+        container.innerHTML = ''; // Clear previous
+
         const TAG_RULES = {
             'AI': /ai|artificial intelligence|neural|chatgpt|llm|compute|gpu|nvidia/i,
             'CRYPTO': /crypto|bitcoin|ethereum|btc|eth|blockchain|defi/i,
@@ -127,6 +240,7 @@ window.CyberDashboard = {
             'VOLATILITY': /volatility|vix|fear|panic|crash|correction/i
         };
 
+        // 1. Rule-based Tags
         for (const [tag, regex] of Object.entries(TAG_RULES)) {
             if (regex.test(text)) {
                 const pill = document.createElement('span');
@@ -135,6 +249,27 @@ window.CyberDashboard = {
                 pill.onclick = () => this.highlightText(tag);
                 container.appendChild(pill);
             }
+        }
+
+        // 2. Data-driven Entity Tags (from MOCK_DATA)
+        if (this.mockData && this.mockData.credit_memos) {
+            const tickers = Object.values(this.mockData.credit_memos).map(m => m.ticker).filter(Boolean);
+            const uniqueTickers = [...new Set(tickers)];
+
+            uniqueTickers.forEach(ticker => {
+                // Check if ticker exists in text (whole word)
+                const tickerRegex = new RegExp(`\\b${ticker}\\b`, 'i');
+                if (tickerRegex.test(text)) {
+                    const pill = document.createElement('a');
+                    pill.className = 'tag-pill concept-link';
+                    pill.textContent = ticker;
+                    pill.style.borderColor = 'var(--neon-green)';
+                    pill.style.color = 'var(--neon-green)';
+                    pill.href = `credit_memo_v2.html?ticker=${ticker}`;
+                    pill.title = `View Credit Memo for ${ticker}`;
+                    container.appendChild(pill);
+                }
+            });
         }
     },
 
@@ -214,6 +349,21 @@ window.CyberDashboard = {
             const chip = document.createElement('span');
             chip.className = 'source-chip';
             chip.innerText = `[${index + 1}]`;
+
+            // Check for POS:TICKER pattern for interactive linking
+            const tickerMatch = verifyId.match(/POS:([A-Z]+)/);
+            if (tickerMatch) {
+                const ticker = tickerMatch[1];
+                chip.onclick = (e) => {
+                    e.stopPropagation();
+                    this.logInteraction(`Navigating to intelligence node: ${ticker}`);
+                    // Optional: Open in new tab or navigate
+                    // window.location.href = `credit_memo_v2.html?ticker=${ticker}`;
+                    console.log(`Navigate to ${ticker}`);
+                };
+                chip.style.cursor = "pointer";
+                chip.title = `Click to access ${ticker} Credit Memo`;
+            }
 
             const tooltip = document.createElement('div');
             tooltip.className = 'source-tooltip';
