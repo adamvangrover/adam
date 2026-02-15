@@ -5,72 +5,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ADAM v23.5 :: GLOBAL MACRO-STRATEGIC OUTLOOK 2026: THE REFLATIONARY AGENTIC BOOM</title>
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/market_mayhem_tiers.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="js/nav.js" defer></script>
-    <style>
-        :root {
-            --paper-bg: #fdfbf7;
-            --ink-color: #1a1a1a;
-            --accent-red: #cc0000;
-            --cyber-black: #050b14;
-            --cyber-blue: #00f3ff;
-            --cyber-green: #00ff00;
-        }
-        body { margin: 0; background: var(--cyber-black); color: #e0e0e0; font-family: 'Inter', sans-serif; }
+</head>
+<body class="tier-high">
 
-        .newsletter-wrapper {
-            max-width: 1200px;
-            margin: 40px auto;
-            display: grid;
-            grid-template-columns: 3fr 1fr;
-            gap: 40px;
-            padding: 20px;
-        }
-        @media (max-width: 768px) { .newsletter-wrapper { grid-template-columns: 1fr; } }
+    <!-- System 2 Verification Overlay -->
+    <div id="system2-overlay" class="system2-overlay">
+        <div class="system2-terminal">
+            <div id="sys2-content"></div>
+        </div>
+    </div>
 
-        .paper-sheet {
-            background: var(--paper-bg);
-            color: var(--ink-color);
-            padding: 60px;
-            font-family: 'Georgia', 'Times New Roman', serif;
-            box-shadow: 0 0 50px rgba(0,0,0,0.5);
-            position: relative;
-        }
+    <!-- Toast Container -->
+    <div id="toast-container" class="cyber-toast-container"></div>
 
-        h1.title {
-            font-family: 'Playfair Display', serif; font-size: 3rem; border-bottom: 4px solid var(--ink-color);
-            padding-bottom: 20px; margin-bottom: 30px; letter-spacing: -1px; line-height: 1.1;
-        }
-        h2 {
-            font-family: 'Inter', sans-serif; font-weight: 700; font-size: 1.2rem; margin-top: 40px;
-            margin-bottom: 15px; color: var(--accent-red); text-transform: uppercase; letter-spacing: 1px;
-        }
-        p { line-height: 1.8; margin-bottom: 20px; font-size: 1.05rem; }
-        li { line-height: 1.6; margin-bottom: 10px; }
-
-        /* Cyber HUD Sidebar */
-        .cyber-sidebar { font-family: 'JetBrains Mono', monospace; }
-        .sidebar-widget {
-            border: 1px solid #333; background: rgba(5, 11, 20, 0.8); padding: 15px; margin-bottom: 20px;
-            backdrop-filter: blur(5px);
-        }
-        .sidebar-title {
-            color: var(--cyber-blue); font-size: 0.75rem; text-transform: uppercase; border-bottom: 1px solid #333;
-            padding-bottom: 8px; margin-bottom: 12px; letter-spacing: 1px;
-        }
-        .stat-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.8rem; color: #aaa; }
-        .stat-val { color: #fff; font-weight: bold; }
-
-        .sentiment-bar { height: 4px; background: #333; margin-top: 5px; border-radius: 2px; overflow: hidden; }
-        .sentiment-fill { height: 100%; background: var(--cyber-blue); }
-
-        .tag-cloud { display: flex; flex-wrap: wrap; gap: 5px; }
-        .tag { background: #222; color: #ccc; padding: 2px 6px; font-size: 0.7rem; border-radius: 3px; border: 1px solid #444; }
-        .tag.ticker { color: var(--cyber-green); border-color: var(--cyber-green); }
-        .tag.agent { color: var(--cyber-blue); border-color: var(--cyber-blue); }
+    <!-- Raw Source Modal -->
+    <div id="raw-source-modal" class="raw-source-modal">
+        <div class="raw-source-header">
+            <span>SOURCE_DATA.JSON</span>
+            <span style="cursor:pointer; color:#cc0000;" onclick="toggleSource()">[CLOSE]</span>
+        </div>
+        <div class="raw-source-content" id="raw-source-content"></div>
+    </div>
 
         .cyber-btn {
             font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; padding: 8px 16px; border: 1px solid #444;
@@ -81,18 +42,46 @@
 </head>
 <body>
     <div style="max-width: 1400px; margin: 0 auto; padding: 20px; display:flex; justify-content:space-between; align-items:center;">
+    <!-- Virtual Toolbar for High Tier -->
+    <div class="doc-toolbar" style="display: flex;">
+        <div class="toolbar-item" onclick="window.location.href='market_mayhem_archive.html'"><strong>FILE</strong></div>
+        <div class="toolbar-item" onclick="showToast('EDIT MODE: READ ONLY (ARCHIVED)')">EDIT</div>
+        <div class="toolbar-item" onclick="toggleTheme()">VIEW</div>
+        <div class="toolbar-item" onclick="showToast('INSERT: PERMISSION DENIED')">INSERT</div>
+        <div class="toolbar-item" onclick="showToast('FORMAT: LOCKED')">FORMAT</div>
+        <div class="toolbar-item" onclick="runVerification()" style="color: #0078d7;"><strong>VERIFY</strong></div>
+        <div style="flex-grow:1;"></div>
+        <div class="toolbar-item" style="color:#666;">ADAM_V26_EDITOR</div>
+    </div>
+
+    <div style="max-width: 1400px; margin: 0 auto; padding: 10px 20px; display:flex; justify-content:space-between; align-items:center; display: none;">
         <a href="market_mayhem_archive.html" class="cyber-btn">&larr; RETURN TO ARCHIVE</a>
         <div style="font-family:'JetBrains Mono'; font-size:0.7rem; color:#666;">SECURE CONNECTION ESTABLISHED</div>
     </div>
 
     <div class="newsletter-wrapper">
-        <div class="paper-sheet">
-            <div style="display:flex; justify-content:space-between; font-family:'JetBrains Mono'; font-size:0.8rem; color:#666; margin-bottom:20px;">
+        <div class="paper-sheet" id="paper-sheet">
+
+            <!-- High Tier Header UI -->
+            <div class="doc-header-ui" style="display: flex;">
+                <span id="verification-status">CONFIDENTIAL // SYSTEM 2 REVIEW</span>
+                <span>266a3c1a</span>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; font-family:'JetBrains Mono'; font-size:0.8rem; color:#666; margin-bottom:20px; margin-top: 20px;">
                 <span>2026-01-12</span>
                 <span>ID: 266a3c1a</span>
             </div>
 
             <h1 class="title">GLOBAL MACRO-STRATEGIC OUTLOOK 2026: THE REFLATIONARY AGENTIC BOOM</h1>
+
+            <!-- Metadata Panel for High Tier (Embedded in Doc) -->
+            <div class="doc-metadata-panel" style="display: grid;">
+                <div class="doc-metadata-item"><strong>Classification</strong>UNCLASSIFIED</div>
+                <div class="doc-metadata-item"><strong>Conviction</strong>50/100</div>
+                <div class="doc-metadata-item"><strong>Sentiment</strong>77/100</div>
+                <div class="doc-metadata-item"><strong>Reviewer</strong>Risk_Engine</div>
+            </div>
 
             <div id="financialChartContainer" style="display:none; margin-bottom: 30px;">
                 <canvas id="financialChart"></canvas>
@@ -103,6 +92,28 @@
         <p>As markets open on January 12, 2026, the global financial system has decisively exited the post-pandemic transitional phase and entered a new, distinct market regime: the <strong>Reflationary Agentic Boom</strong>. This paradigm is defined by a paradoxical but potent combination of accelerating economic growth in the United States, sticky inflation floors driven by geopolitical fragmentation and tariffs, and a technological productivity shock moving from generative experimentation to "agentic" execution.</p>
         <p>The prevailing narrative of late 2024 and 2025—that the Federal Reserve's tightening cycle would inevitably induce a recession—has been falsified by the data. Instead, the US economy is tracking toward a robust 2.5% to 2.6% real GDP growth rate for 2026. This resilience is not merely a cyclical rebound but a structural shift powered by three pillars: the fiscal impulse of anticipated tax cuts, the capital expenditure (Capex) super-cycle associated with "Sovereign AI," and the integration of digital assets into the institutional balance sheet via new accounting standards.</p>
 
+
+            <!-- Provenance Log (All Tiers) -->
+            <div class="provenance-log">
+                <div class="log-entry">
+                    <span>> HASH_CHECK</span>
+                    <span style="color:var(--terminal-green);">266a3c1adc5cf3a6f8489349834be4d97b64f94d39f70f200d188518cabf4b8d</span>
+                </div>
+                <div class="log-entry">
+                    <span>> SENTIMENT_SCAN</span>
+                    <span>77 (DENSITY: 64)</span>
+                </div>
+                <div class="log-entry">
+                    <span>> CONVICTION_LOCK</span>
+                    <span>50%</span>
+                </div>
+                <div class="log-entry">
+                    <span>> CRITIQUE_LOG</span>
+                    <span>"Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 77/100. Cross-reference with knowledge graph completed."</span>
+                </div>
+            </div>
+
+            <a href="#" class="source-jump-btn" onclick="toggleSource(); return false;" title="View Source JSON">JUMP TO SOURCE</a>
 
             <div style="margin-top: 40px; border-top: 1px solid #ccc; padding-top: 20px; font-style: italic; color: #666;">
                 End of Transmission.
@@ -129,7 +140,7 @@
             <div class="sidebar-widget">
                 <div class="sidebar-title">Detected Entities</div>
                 <div class="tag-cloud">
-                    <span class="tag">US</span>
+                    <a href="market_mayhem_archive.html?search=US" class="tag" style="text-decoration:none;">US</a>
                 </div>
             </div>
 
@@ -164,7 +175,106 @@
         </aside>
     </div>
 
+    <!-- Hidden Raw Data -->
+    <textarea id="hidden-raw-data" style="display:none;">{
+  "date": "2026-01-12",
+  "title": "GLOBAL MACRO-STRATEGIC OUTLOOK 2026: THE REFLATIONARY AGENTIC BOOM",
+  "summary": "As markets open on January 12, 2026, the global financial system has entered a new regime: the Reflationary Agentic Boom.",
+  "type": "ANNUAL_STRATEGY",
+  "filename": "newsletter_market_mayhem_jan_2026.html",
+  "is_sourced": true,
+  "full_body": "\n        <h3>1. Executive Intelligence Summary: The Architecture of the New Regime</h3>\n        <p>As markets open on January 12, 2026, the global financial system has decisively exited the post-pandemic transitional phase and entered a new, distinct market regime: the <strong>Reflationary Agentic Boom</strong>. This paradigm is defined by a paradoxical but potent combination of accelerating economic growth in the United States, sticky inflation floors driven by geopolitical fragmentation and tariffs, and a technological productivity shock moving from generative experimentation to \"agentic\" execution.</p>\n        <p>The prevailing narrative of late 2024 and 2025\u2014that the Federal Reserve's tightening cycle would inevitably induce a recession\u2014has been falsified by the data. Instead, the US economy is tracking toward a robust 2.5% to 2.6% real GDP growth rate for 2026. This resilience is not merely a cyclical rebound but a structural shift powered by three pillars: the fiscal impulse of anticipated tax cuts, the capital expenditure (Capex) super-cycle associated with \"Sovereign AI,\" and the integration of digital assets into the institutional balance sheet via new accounting standards.</p>\n        ",
+  "source_priority": 3,
+  "sentiment_score": 77,
+  "entities": {
+    "tickers": [],
+    "agents": [],
+    "sovereigns": [
+      "US"
+    ]
+  },
+  "provenance_hash": "266a3c1adc5cf3a6f8489349834be4d97b64f94d39f70f200d188518cabf4b8d",
+  "metrics_json": "{}",
+  "conviction": 50,
+  "semantic_score": 64,
+  "probability": 50,
+  "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 77/100. Cross-reference with knowledge graph completed."
+}</textarea>
+
     <script>
+        // --- INTERACTION LOGIC ---
+
+        function showToast(msg) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'cyber-toast';
+            toast.innerText = '> ' + msg;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            showToast('THEME: ' + (isDark ? 'DARK_MODE' : 'LIGHT_MODE'));
+        }
+
+        function toggleSource() {
+            const modal = document.getElementById('raw-source-modal');
+            const content = document.getElementById('raw-source-content');
+            const rawData = document.getElementById('hidden-raw-data').value;
+
+            if (modal.style.display === 'flex') {
+                modal.style.display = 'none';
+            } else {
+                content.innerText = rawData || "NO SOURCE DATA AVAILABLE.";
+                modal.style.display = 'flex';
+            }
+        }
+
+        function runVerification() {
+            const overlay = document.getElementById('system2-overlay');
+            const content = document.getElementById('sys2-content');
+            const status = document.getElementById('verification-status');
+
+            overlay.style.display = 'flex';
+            content.innerHTML = '';
+
+            const lines = [
+                "INITIATING SYSTEM 2 PROTOCOL...",
+                "VERIFYING CRYPTOGRAPHIC SIGNATURE...",
+                "HASH: 266a3c1adc5cf3a6f8489349834be4d97b64f94d39f70f200d188518cabf4b8d",
+                "CHECKING CHAIN OF CUSTODY...",
+                "ANALYZING SENTIMENT VECTORS...",
+                "CROSS-REFERENCING KNOWLEDGE GRAPH...",
+                "VERIFICATION COMPLETE."
+            ];
+
+            let i = 0;
+            function addLine() {
+                if (i < lines.length) {
+                    const div = document.createElement('div');
+                    div.className = 'system2-line';
+                    div.innerText = '> ' + lines[i];
+                    div.style.opacity = 1;
+                    content.appendChild(div);
+                    i++;
+                    setTimeout(addLine, 400);
+                } else {
+                    setTimeout(() => {
+                        overlay.style.display = 'none';
+                        showToast('DOCUMENT VERIFIED');
+                        if(status) status.innerText = "VERIFIED // AUTHENTICATED";
+                        if(status) status.style.color = "#aaffaa";
+                    }, 1000);
+                }
+            }
+            addLine();
+        }
+
         // Chart Injection Logic
         const metricsData = {};
 

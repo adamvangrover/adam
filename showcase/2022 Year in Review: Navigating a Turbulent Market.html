@@ -5,94 +5,74 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ADAM v23.5 :: 2022 Year in Review: Navigating a Turbulent Market</title>
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/market_mayhem_tiers.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="js/nav.js" defer></script>
-    <style>
-        :root {
-            --paper-bg: #fdfbf7;
-            --ink-color: #1a1a1a;
-            --accent-red: #cc0000;
-            --cyber-black: #050b14;
-            --cyber-blue: #00f3ff;
-            --cyber-green: #00ff00;
-        }
-        body { margin: 0; background: var(--cyber-black); color: #e0e0e0; font-family: 'Inter', sans-serif; }
-
-        .newsletter-wrapper {
-            max-width: 1200px;
-            margin: 40px auto;
-            display: grid;
-            grid-template-columns: 3fr 1fr;
-            gap: 40px;
-            padding: 20px;
-        }
-        @media (max-width: 768px) { .newsletter-wrapper { grid-template-columns: 1fr; } }
-
-        .paper-sheet {
-            background: var(--paper-bg);
-            color: var(--ink-color);
-            padding: 60px;
-            font-family: 'Georgia', 'Times New Roman', serif;
-            box-shadow: 0 0 50px rgba(0,0,0,0.5);
-            position: relative;
-        }
-
-        h1.title {
-            font-family: 'Playfair Display', serif; font-size: 3rem; border-bottom: 4px solid var(--ink-color);
-            padding-bottom: 20px; margin-bottom: 30px; letter-spacing: -1px; line-height: 1.1;
-        }
-        h2 {
-            font-family: 'Inter', sans-serif; font-weight: 700; font-size: 1.2rem; margin-top: 40px;
-            margin-bottom: 15px; color: var(--accent-red); text-transform: uppercase; letter-spacing: 1px;
-        }
-        p { line-height: 1.8; margin-bottom: 20px; font-size: 1.05rem; }
-        li { line-height: 1.6; margin-bottom: 10px; }
-
-        /* Cyber HUD Sidebar */
-        .cyber-sidebar { font-family: 'JetBrains Mono', monospace; }
-        .sidebar-widget {
-            border: 1px solid #333; background: rgba(5, 11, 20, 0.8); padding: 15px; margin-bottom: 20px;
-            backdrop-filter: blur(5px);
-        }
-        .sidebar-title {
-            color: var(--cyber-blue); font-size: 0.75rem; text-transform: uppercase; border-bottom: 1px solid #333;
-            padding-bottom: 8px; margin-bottom: 12px; letter-spacing: 1px;
-        }
-        .stat-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.8rem; color: #aaa; }
-        .stat-val { color: #fff; font-weight: bold; }
-
-        .sentiment-bar { height: 4px; background: #333; margin-top: 5px; border-radius: 2px; overflow: hidden; }
-        .sentiment-fill { height: 100%; background: var(--cyber-blue); }
-
-        .tag-cloud { display: flex; flex-wrap: wrap; gap: 5px; }
-        .tag { background: #222; color: #ccc; padding: 2px 6px; font-size: 0.7rem; border-radius: 3px; border: 1px solid #444; }
-        .tag.ticker { color: var(--cyber-green); border-color: var(--cyber-green); }
-        .tag.agent { color: var(--cyber-blue); border-color: var(--cyber-blue); }
-
-        .cyber-btn {
-            font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; padding: 8px 16px; border: 1px solid #444;
-            color: #e0e0e0; background: rgba(0,0,0,0.8); text-decoration: none; display: inline-block;
-        }
-        .cyber-btn:hover { border-color: var(--cyber-blue); color: var(--cyber-blue); }
-    </style>
 </head>
-<body>
-    <div style="max-width: 1400px; margin: 0 auto; padding: 20px; display:flex; justify-content:space-between; align-items:center;">
+<body class="tier-high">
+
+    <!-- System 2 Verification Overlay -->
+    <div id="system2-overlay" class="system2-overlay">
+        <div class="system2-terminal">
+            <div id="sys2-content"></div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="cyber-toast-container"></div>
+
+    <!-- Raw Source Modal -->
+    <div id="raw-source-modal" class="raw-source-modal">
+        <div class="raw-source-header">
+            <span>SOURCE_DATA.JSON</span>
+            <span style="cursor:pointer; color:#cc0000;" onclick="toggleSource()">[CLOSE]</span>
+        </div>
+        <div class="raw-source-content" id="raw-source-content"></div>
+    </div>
+
+    <!-- Virtual Toolbar for High Tier -->
+    <div class="doc-toolbar" style="display: flex;">
+        <div class="toolbar-item" onclick="window.location.href='market_mayhem_archive.html'"><strong>FILE</strong></div>
+        <div class="toolbar-item" onclick="showToast('EDIT MODE: READ ONLY (ARCHIVED)')">EDIT</div>
+        <div class="toolbar-item" onclick="toggleTheme()">VIEW</div>
+        <div class="toolbar-item" onclick="showToast('INSERT: PERMISSION DENIED')">INSERT</div>
+        <div class="toolbar-item" onclick="showToast('FORMAT: LOCKED')">FORMAT</div>
+        <div class="toolbar-item" onclick="runVerification()" style="color: #0078d7;"><strong>VERIFY</strong></div>
+        <div style="flex-grow:1;"></div>
+        <div class="toolbar-item" style="color:#666;">ADAM_V26_EDITOR</div>
+    </div>
+
+    <div style="max-width: 1400px; margin: 0 auto; padding: 10px 20px; display:flex; justify-content:space-between; align-items:center; display: none;">
         <a href="market_mayhem_archive.html" class="cyber-btn">&larr; RETURN TO ARCHIVE</a>
         <div style="font-family:'JetBrains Mono'; font-size:0.7rem; color:#666;">SECURE CONNECTION ESTABLISHED</div>
     </div>
 
     <div class="newsletter-wrapper">
-        <div class="paper-sheet">
-            <div style="display:flex; justify-content:space-between; font-family:'JetBrains Mono'; font-size:0.8rem; color:#666; margin-bottom:20px;">
+        <div class="paper-sheet" id="paper-sheet">
+
+            <!-- High Tier Header UI -->
+            <div class="doc-header-ui" style="display: flex;">
+                <span id="verification-status">CONFIDENTIAL // SYSTEM 2 REVIEW</span>
+                <span>314d1cfd</span>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; font-family:'JetBrains Mono'; font-size:0.8rem; color:#666; margin-bottom:20px; margin-top: 20px;">
                 <span>2023-01-01</span>
                 <span>ID: 314d1cfd</span>
             </div>
 
             <h1 class="title">2022 Year in Review: Navigating a Turbulent Market</h1>
+
+            <!-- Metadata Panel for High Tier (Embedded in Doc) -->
+            <div class="doc-metadata-panel" style="display: grid;">
+                <div class="doc-metadata-item"><strong>Classification</strong>UNCLASSIFIED</div>
+                <div class="doc-metadata-item"><strong>Conviction</strong>60/100</div>
+                <div class="doc-metadata-item"><strong>Sentiment</strong>73/100</div>
+                <div class="doc-metadata-item"><strong>Reviewer</strong>Risk_Engine</div>
+            </div>
 
             <div id="financialChartContainer" style="display:none; margin-bottom: 30px;">
                 <canvas id="financialChart"></canvas>
@@ -105,6 +85,28 @@
 <h2>Portfolio Construction and Optimization</h2><p>In a volatile and uncertain market like 2022, portfolio construction and optimization are crucial. Investors should consider: <em> <strong>Diversification:</strong>  Diversifying across asset classes, sectors, and geographies to reduce risk. </em> <strong>Risk Management:</strong>  Implementing risk management strategies, such as hedging or position sizing, to mitigate potential losses. <em> <strong>Value Investing:</strong>  Focusing on undervalued companies with strong fundamentals. </em> <strong>Long-Term Perspective:</strong>  Maintaining a long-term perspective and avoiding impulsive decisions based on short-term market fluctuations.</p>
 <h2>Looking Ahead</h2><p>While 2022 presented significant challenges, it also created opportunities for investors. As we move forward, it's essential to stay informed about market trends, assess risks carefully, and maintain a disciplined investment approach. Adam v15.4 can assist investors in navigating the complexities of the market and making informed decisions.</p>
 
+
+            <!-- Provenance Log (All Tiers) -->
+            <div class="provenance-log">
+                <div class="log-entry">
+                    <span>> HASH_CHECK</span>
+                    <span style="color:var(--terminal-green);">314d1cfdda9661921873263aaec4bc34da923be44c0c6e89fa1a719146368938</span>
+                </div>
+                <div class="log-entry">
+                    <span>> SENTIMENT_SCAN</span>
+                    <span>73 (DENSITY: 44)</span>
+                </div>
+                <div class="log-entry">
+                    <span>> CONVICTION_LOCK</span>
+                    <span>60%</span>
+                </div>
+                <div class="log-entry">
+                    <span>> CRITIQUE_LOG</span>
+                    <span>"Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 73/100. Cross-reference with knowledge graph completed."</span>
+                </div>
+            </div>
+
+            <a href="#" class="source-jump-btn" onclick="toggleSource(); return false;" title="View Source JSON">JUMP TO SOURCE</a>
 
             <div style="margin-top: 40px; border-top: 1px solid #ccc; padding-top: 20px; font-style: italic; color: #666;">
                 End of Transmission.
@@ -131,7 +133,7 @@
             <div class="sidebar-widget">
                 <div class="sidebar-title">Detected Entities</div>
                 <div class="tag-cloud">
-                    <span class="tag">US</span><span class="tag">CN</span>
+                    <a href="market_mayhem_archive.html?search=US" class="tag" style="text-decoration:none;">US</a><a href="market_mayhem_archive.html?search=CN" class="tag" style="text-decoration:none;">CN</a>
                 </div>
             </div>
 
@@ -166,7 +168,107 @@
         </aside>
     </div>
 
+    <!-- Hidden Raw Data -->
+    <textarea id="hidden-raw-data" style="display:none;">{
+  "title": "2022 Year in Review: Navigating a Turbulent Market",
+  "date": "2023-01-01",
+  "summary": "2022 was a challenging year for investors, marked by heightened volatility, rising inflation, and geopolitical tensions. Major stock indices experienced significant declines, with the S&P 500 ending t...",
+  "type": "MARKET_OUTLOOK",
+  "full_body": "<h2>Market Overview</h2><p>2022 was a challenging year for investors, marked by heightened volatility, rising inflation, and geopolitical tensions. Major stock indices experienced significant declines, with the S&P 500 ending the year down 19.4%. The technology sector was particularly hard hit, as rising interest rates and slowing economic growth weighed on valuations.</p>\n<h2>Major Themes and Trends</h2><p>Several key themes and trends shaped the market in 2022: <em> <strong>Inflation:</strong> Inflation surged to multi-decade highs, driven by supply chain disruptions, strong consumer demand, and expansionary monetary policies. </em> <strong>Rising Interest Rates:</strong>  Central banks responded to inflation by aggressively raising interest rates, leading to increased borrowing costs and tighter financial conditions. <em> <strong>Geopolitical Risks:</strong> The war in Ukraine, tensions between the US and China, and political instability in several regions added to market uncertainty. </em> <strong>Energy Crisis:</strong>  The energy crisis, triggered by the war in Ukraine and supply constraints, led to soaring energy prices and concerns about economic growth. <em> <strong>Shifting Consumer Behavior:</strong>  Consumer spending patterns shifted as inflation and economic uncertainty weighed on discretionary spending. </em> <strong>Technological Innovation:</strong>  Despite market challenges, technological innovation continued at a rapid pace, with advancements in artificial intelligence, cloud computing, and renewable energy.</p>\n<h2>Industry Performance</h2><p>Industry performance was mixed in 2022: <em> <strong>Energy:</strong> The energy sector was the top performer, benefiting from high energy prices. </em> <strong>Utilities:</strong>  Utilities also performed relatively well, as they are considered defensive investments in times of economic uncertainty. <em> <strong>Consumer Staples:</strong>  Consumer staples companies, which provide essential goods and services, also showed resilience. </em> <strong>Technology:</strong>  The technology sector was the worst performer, as valuations declined sharply. * <strong>Consumer Discretionary:</strong>  Consumer discretionary companies, which are sensitive to economic conditions, also faced headwinds.</p>\n<h2>Top Performers</h2><p>Some of the top-performing companies in 2022 included: <em> <strong>ExxonMobil (XOM):</strong>  Benefited from high oil prices. </em> <strong>Chevron (CVX):</strong>  Another energy giant that profited from the energy crisis. <em> <strong>NextEra Energy (NEE):</strong>  A leading renewable energy company. </em> <strong>PepsiCo (PEP):</strong>  A consumer staples giant with strong brand recognition. * <strong>Dollar General (DG):</strong>  A discount retailer that benefited from value-conscious consumers.</p>\n<h2>Portfolio Construction and Optimization</h2><p>In a volatile and uncertain market like 2022, portfolio construction and optimization are crucial. Investors should consider: <em> <strong>Diversification:</strong>  Diversifying across asset classes, sectors, and geographies to reduce risk. </em> <strong>Risk Management:</strong>  Implementing risk management strategies, such as hedging or position sizing, to mitigate potential losses. <em> <strong>Value Investing:</strong>  Focusing on undervalued companies with strong fundamentals. </em> <strong>Long-Term Perspective:</strong>  Maintaining a long-term perspective and avoiding impulsive decisions based on short-term market fluctuations.</p>\n<h2>Looking Ahead</h2><p>While 2022 presented significant challenges, it also created opportunities for investors. As we move forward, it's essential to stay informed about market trends, assess risks carefully, and maintain a disciplined investment approach. Adam v15.4 can assist investors in navigating the complexities of the market and making informed decisions.</p>\n",
+  "sentiment_score": 73,
+  "entities": {
+    "tickers": [],
+    "agents": [],
+    "sovereigns": [
+      "US",
+      "CN"
+    ]
+  },
+  "provenance_hash": "314d1cfdda9661921873263aaec4bc34da923be44c0c6e89fa1a719146368938",
+  "filename": "2022 Year in Review: Navigating a Turbulent Market.html",
+  "is_sourced": true,
+  "metrics_json": "{}",
+  "source_priority": 2,
+  "conviction": 60,
+  "semantic_score": 44,
+  "probability": 80,
+  "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 73/100. Cross-reference with knowledge graph completed."
+}</textarea>
+
     <script>
+        // --- INTERACTION LOGIC ---
+
+        function showToast(msg) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'cyber-toast';
+            toast.innerText = '> ' + msg;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            showToast('THEME: ' + (isDark ? 'DARK_MODE' : 'LIGHT_MODE'));
+        }
+
+        function toggleSource() {
+            const modal = document.getElementById('raw-source-modal');
+            const content = document.getElementById('raw-source-content');
+            const rawData = document.getElementById('hidden-raw-data').value;
+
+            if (modal.style.display === 'flex') {
+                modal.style.display = 'none';
+            } else {
+                content.innerText = rawData || "NO SOURCE DATA AVAILABLE.";
+                modal.style.display = 'flex';
+            }
+        }
+
+        function runVerification() {
+            const overlay = document.getElementById('system2-overlay');
+            const content = document.getElementById('sys2-content');
+            const status = document.getElementById('verification-status');
+
+            overlay.style.display = 'flex';
+            content.innerHTML = '';
+
+            const lines = [
+                "INITIATING SYSTEM 2 PROTOCOL...",
+                "VERIFYING CRYPTOGRAPHIC SIGNATURE...",
+                "HASH: 314d1cfdda9661921873263aaec4bc34da923be44c0c6e89fa1a719146368938",
+                "CHECKING CHAIN OF CUSTODY...",
+                "ANALYZING SENTIMENT VECTORS...",
+                "CROSS-REFERENCING KNOWLEDGE GRAPH...",
+                "VERIFICATION COMPLETE."
+            ];
+
+            let i = 0;
+            function addLine() {
+                if (i < lines.length) {
+                    const div = document.createElement('div');
+                    div.className = 'system2-line';
+                    div.innerText = '> ' + lines[i];
+                    div.style.opacity = 1;
+                    content.appendChild(div);
+                    i++;
+                    setTimeout(addLine, 400);
+                } else {
+                    setTimeout(() => {
+                        overlay.style.display = 'none';
+                        showToast('DOCUMENT VERIFIED');
+                        if(status) status.innerText = "VERIFIED // AUTHENTICATED";
+                        if(status) status.style.color = "#aaffaa";
+                    }, 1000);
+                }
+            }
+            addLine();
+        }
+
         // Chart Injection Logic
         const metricsData = {};
 

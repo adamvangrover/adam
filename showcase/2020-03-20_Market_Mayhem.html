@@ -5,94 +5,74 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ADAM v23.5 :: Market Mayhem Newsletter - March 20, 2020</title>
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/market_mayhem_tiers.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="js/nav.js" defer></script>
-    <style>
-        :root {
-            --paper-bg: #fdfbf7;
-            --ink-color: #1a1a1a;
-            --accent-red: #cc0000;
-            --cyber-black: #050b14;
-            --cyber-blue: #00f3ff;
-            --cyber-green: #00ff00;
-        }
-        body { margin: 0; background: var(--cyber-black); color: #e0e0e0; font-family: 'Inter', sans-serif; }
-
-        .newsletter-wrapper {
-            max-width: 1200px;
-            margin: 40px auto;
-            display: grid;
-            grid-template-columns: 3fr 1fr;
-            gap: 40px;
-            padding: 20px;
-        }
-        @media (max-width: 768px) { .newsletter-wrapper { grid-template-columns: 1fr; } }
-
-        .paper-sheet {
-            background: var(--paper-bg);
-            color: var(--ink-color);
-            padding: 60px;
-            font-family: 'Georgia', 'Times New Roman', serif;
-            box-shadow: 0 0 50px rgba(0,0,0,0.5);
-            position: relative;
-        }
-
-        h1.title {
-            font-family: 'Playfair Display', serif; font-size: 3rem; border-bottom: 4px solid var(--ink-color);
-            padding-bottom: 20px; margin-bottom: 30px; letter-spacing: -1px; line-height: 1.1;
-        }
-        h2 {
-            font-family: 'Inter', sans-serif; font-weight: 700; font-size: 1.2rem; margin-top: 40px;
-            margin-bottom: 15px; color: var(--accent-red); text-transform: uppercase; letter-spacing: 1px;
-        }
-        p { line-height: 1.8; margin-bottom: 20px; font-size: 1.05rem; }
-        li { line-height: 1.6; margin-bottom: 10px; }
-
-        /* Cyber HUD Sidebar */
-        .cyber-sidebar { font-family: 'JetBrains Mono', monospace; }
-        .sidebar-widget {
-            border: 1px solid #333; background: rgba(5, 11, 20, 0.8); padding: 15px; margin-bottom: 20px;
-            backdrop-filter: blur(5px);
-        }
-        .sidebar-title {
-            color: var(--cyber-blue); font-size: 0.75rem; text-transform: uppercase; border-bottom: 1px solid #333;
-            padding-bottom: 8px; margin-bottom: 12px; letter-spacing: 1px;
-        }
-        .stat-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.8rem; color: #aaa; }
-        .stat-val { color: #fff; font-weight: bold; }
-
-        .sentiment-bar { height: 4px; background: #333; margin-top: 5px; border-radius: 2px; overflow: hidden; }
-        .sentiment-fill { height: 100%; background: var(--cyber-blue); }
-
-        .tag-cloud { display: flex; flex-wrap: wrap; gap: 5px; }
-        .tag { background: #222; color: #ccc; padding: 2px 6px; font-size: 0.7rem; border-radius: 3px; border: 1px solid #444; }
-        .tag.ticker { color: var(--cyber-green); border-color: var(--cyber-green); }
-        .tag.agent { color: var(--cyber-blue); border-color: var(--cyber-blue); }
-
-        .cyber-btn {
-            font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; padding: 8px 16px; border: 1px solid #444;
-            color: #e0e0e0; background: rgba(0,0,0,0.8); text-decoration: none; display: inline-block;
-        }
-        .cyber-btn:hover { border-color: var(--cyber-blue); color: var(--cyber-blue); }
-    </style>
 </head>
-<body>
-    <div style="max-width: 1400px; margin: 0 auto; padding: 20px; display:flex; justify-content:space-between; align-items:center;">
+<body class="tier-high">
+
+    <!-- System 2 Verification Overlay -->
+    <div id="system2-overlay" class="system2-overlay">
+        <div class="system2-terminal">
+            <div id="sys2-content"></div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="cyber-toast-container"></div>
+
+    <!-- Raw Source Modal -->
+    <div id="raw-source-modal" class="raw-source-modal">
+        <div class="raw-source-header">
+            <span>SOURCE_DATA.JSON</span>
+            <span style="cursor:pointer; color:#cc0000;" onclick="toggleSource()">[CLOSE]</span>
+        </div>
+        <div class="raw-source-content" id="raw-source-content"></div>
+    </div>
+
+    <!-- Virtual Toolbar for High Tier -->
+    <div class="doc-toolbar" style="display: flex;">
+        <div class="toolbar-item" onclick="window.location.href='market_mayhem_archive.html'"><strong>FILE</strong></div>
+        <div class="toolbar-item" onclick="showToast('EDIT MODE: READ ONLY (ARCHIVED)')">EDIT</div>
+        <div class="toolbar-item" onclick="toggleTheme()">VIEW</div>
+        <div class="toolbar-item" onclick="showToast('INSERT: PERMISSION DENIED')">INSERT</div>
+        <div class="toolbar-item" onclick="showToast('FORMAT: LOCKED')">FORMAT</div>
+        <div class="toolbar-item" onclick="runVerification()" style="color: #0078d7;"><strong>VERIFY</strong></div>
+        <div style="flex-grow:1;"></div>
+        <div class="toolbar-item" style="color:#666;">ADAM_V26_EDITOR</div>
+    </div>
+
+    <div style="max-width: 1400px; margin: 0 auto; padding: 10px 20px; display:flex; justify-content:space-between; align-items:center; display: none;">
         <a href="market_mayhem_archive.html" class="cyber-btn">&larr; RETURN TO ARCHIVE</a>
         <div style="font-family:'JetBrains Mono'; font-size:0.7rem; color:#666;">SECURE CONNECTION ESTABLISHED</div>
     </div>
 
     <div class="newsletter-wrapper">
-        <div class="paper-sheet">
-            <div style="display:flex; justify-content:space-between; font-family:'JetBrains Mono'; font-size:0.8rem; color:#666; margin-bottom:20px;">
+        <div class="paper-sheet" id="paper-sheet">
+
+            <!-- High Tier Header UI -->
+            <div class="doc-header-ui" style="display: flex;">
+                <span id="verification-status">CONFIDENTIAL // SYSTEM 2 REVIEW</span>
+                <span>eeb6772a</span>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; font-family:'JetBrains Mono'; font-size:0.8rem; color:#666; margin-bottom:20px; margin-top: 20px;">
                 <span>2020-03-20</span>
                 <span>ID: eeb6772a</span>
             </div>
 
             <h1 class="title">Market Mayhem Newsletter - March 20, 2020</h1>
+
+            <!-- Metadata Panel for High Tier (Embedded in Doc) -->
+            <div class="doc-metadata-panel" style="display: grid;">
+                <div class="doc-metadata-item"><strong>Classification</strong>UNCLASSIFIED</div>
+                <div class="doc-metadata-item"><strong>Conviction</strong>71/100</div>
+                <div class="doc-metadata-item"><strong>Sentiment</strong>40/100</div>
+                <div class="doc-metadata-item"><strong>Reviewer</strong>Market_Maker</div>
+            </div>
 
             <div id="financialChartContainer" style="display:none; margin-bottom: 30px;">
                 <canvas id="financialChart"></canvas>
@@ -163,6 +143,28 @@
 <em>Disclaimer: This newsletter is for informational purposes only and does not constitute financial advice. Past performance is not indicative of future results. Do your own research before making any investment decisions.</em></p>
 
 
+            <!-- Provenance Log (All Tiers) -->
+            <div class="provenance-log">
+                <div class="log-entry">
+                    <span>> HASH_CHECK</span>
+                    <span style="color:var(--terminal-green);">eeb6772a434e5b9a9de60698ffdf56c95d536d4850da8b18a37c280b01d34f62</span>
+                </div>
+                <div class="log-entry">
+                    <span>> SENTIMENT_SCAN</span>
+                    <span>40 (DENSITY: 64)</span>
+                </div>
+                <div class="log-entry">
+                    <span>> CONVICTION_LOCK</span>
+                    <span>71%</span>
+                </div>
+                <div class="log-entry">
+                    <span>> CRITIQUE_LOG</span>
+                    <span>"Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 40/100. Cross-reference with knowledge graph completed."</span>
+                </div>
+            </div>
+
+            <a href="#" class="source-jump-btn" onclick="toggleSource(); return false;" title="View Source JSON">JUMP TO SOURCE</a>
+
             <div style="margin-top: 40px; border-top: 1px solid #ccc; padding-top: 20px; font-style: italic; color: #666;">
                 End of Transmission.
             </div>
@@ -188,7 +190,7 @@
             <div class="sidebar-widget">
                 <div class="sidebar-title">Detected Entities</div>
                 <div class="tag-cloud">
-                    <span class="tag">US</span><span class="tag">CN</span><span class="tag">EU</span>
+                    <a href="market_mayhem_archive.html?search=US" class="tag" style="text-decoration:none;">US</a><a href="market_mayhem_archive.html?search=CN" class="tag" style="text-decoration:none;">CN</a><a href="market_mayhem_archive.html?search=EU" class="tag" style="text-decoration:none;">EU</a>
                 </div>
             </div>
 
@@ -223,7 +225,109 @@
         </aside>
     </div>
 
+    <!-- Hidden Raw Data -->
+    <textarea id="hidden-raw-data" style="display:none;">{
+  "title": "Market Mayhem Newsletter - March 20, 2020",
+  "date": "2020-03-20",
+  "summary": "   Mood: \"Lockdown\"\n   Driver: COVID-19 Pandemic\n   Theme: \"The Great Shut-In\" \u2014 The global economy has come to a screeching halt. With \"15 Days to Slow the Spread\" in effect, markets are pricing in a...",
+  "type": "NEWSLETTER",
+  "full_body": "<h3>Your weekly guide to navigating the financial storms and spotting the sunshine!</h3>\n<h2>Market Snapshot</h2>\n<em>   <strong>S&P 500:</strong> 2,304 (-15% WoW) </em>[The fastest bear market in history]*\n<ul>\n<li>  <strong>Dow Jones:</strong> 19,173 (-17% WoW)</li>\n<li>  <strong>Nasdaq Composite:</strong> 6,879 (-12% WoW)</li>\n<li>  <strong>Brent Crude Oil:</strong> $26.98 (-20% WoW)</li>\n</ul>\n<em>   <strong>Gold:</strong> $1,498 (-2% WoW) </em>[Liquidity crunch hits everything]*\n<em>   <strong>Bitcoin:</strong> $6,190 (+15% WoW) </em>[Rebounding from the $3k flash crash]*\n<h2>Market Mayhem: Executive Summary</h2>\n<ul>\n<li>  <strong>Mood:</strong> <strong>\"Lockdown\"</strong></li>\n<li>  <strong>Driver:</strong> <strong>COVID-19 Pandemic</strong></li>\n<li>  <strong>Theme:</strong> <strong>\"The Great Shut-In\"</strong> \u2014 The global economy has come to a screeching halt. With \"15 Days to Slow the Spread\" in effect, markets are pricing in a depression-level GDP contraction.</li>\n</ul>\n<h2>Key News & Events (The \"What Happened\")</h2>\n<p>1.  <strong>Fed Cuts to Zero:</strong> In a historic Sunday night move, the Federal Reserve slashed rates to 0-0.25% and launched \"QE Infinity\" ($700B+).\n2.  <strong>Circuit Breakers Triggered:</strong> Trading was halted multiple times this week as the S&P 500 fell 7% at the open. Volatility is at 2008 levels.\n3.  <strong>Oil Price War:</strong> Saudi Arabia and Russia are flooding the market just as demand evaporates. WTI crude fell below $25.\n4.  <strong>California Locks Down:</strong> Governor Newsom issued the first statewide \"Stay at Home\" order. New York is expected to follow.\n5.  <strong>Cash Dash:</strong> Investors are selling <em>everything</em> (even Gold and Treasuries) to raise cash. The Dollar index (DXY) spiked to 102.</p>\n<h2>Top Investment Ideas (The \"Alpha\")</h2>\n<h3>1. \"Stay at Home\" Stocks</h3>\n<ul>\n<li>  <strong>Rationale:</strong> If we are all stuck inside, we need tools to work and play. <strong>Zoom Video (ZM)</strong>, <strong>Peloton (PTON)</strong>, and <strong>Netflix (NFLX)</strong> are the new defensive utilities.</li>\n<li>  <strong>Key Risks:</strong> Valuation. These names are crowded.</li>\n</ul>\n<h3>2. Digital Payments</h3>\n<ul>\n<li>  <strong>Rationale:</strong> Physical cash is \"dirty.\" Contactless payments (PayPal, Square) will see accelerated adoption.</li>\n<li>  <strong>Key Risks:</strong> Small business bankruptcy wave could hurt payment volumes.</li>\n</ul>\n<h2>Notable Signals & Rumors</h2>\n<ul>\n<li>  <strong>Signal:</strong> <strong>Insider Buying:</strong> Bill Ackman famously hedged his portfolio, but now rumors say he's closing the hedges and going long. \"Hell is coming\" turned into \"Buy the bottom.\"</li>\n<li>  <strong>Whisper:</strong> \"Congress is working on a stimulus bill. $1 Trillion? $2 Trillion? Helicopter money (checks to citizens) is on the table.\"</li>\n</ul>\n<h2>Policy Impact & Geopolitical Outlook</h2>\n<ul>\n<li>  <strong>Central Banks:</strong> The Fed is now buying corporate bonds? The mandate has expanded to \"Save the Credit Markets.\"</li>\n<li>  <strong>Geopolitics:</strong> Borders are closing. The EU is shutting down travel. Supply chains are shattered.</li>\n</ul>\n<h2>Deals & Corporate Actions</h2>\n<ul>\n<li>  <strong>M&A:</strong> <strong>Dead.</strong> No one is doing deals when you can't price risk.</li>\n<li>  <strong>Dividends:</strong> <strong>Boeing</strong>, <strong>Delta</strong>, and <strong>Ford</strong> suspend dividends and buybacks to preserve cash.</li>\n</ul>\n<h2>Earnings Watch (Next Week)</h2>\n<ul>\n<li>  <strong>Nike (NKE):</strong> The first look at the impact of retail closures in China and the US.</li>\n<li>  <strong>Micron (MU):</strong> Will supply chain disruptions hurt memory chip output?</li>\n</ul>\n<h2>Thematic Deep Dive: \"The Velocity of Money vs. The Velocity of Viral Spread\"</h2>\n<p>We are witnessing a race. The virus spreads exponentially, shutting down economic activity. The Fed creates money exponentially, trying to fill the hole.</p>\n<p>Currently, the virus is winning. But don't underestimate the power of infinite liquidity. Once the infection curve flattens, the liquidity curve will remain vertical. We might see the sharpest recession followed by the sharpest recovery in history.</p>\n<h2>Year Ahead Forecast</h2>\n<strong>Neutral.</strong> We are likely near a tradable bottom, but the V-shaped recovery depends entirely on the virus. Don't try to be a hero\u2014dollar cost average into high-quality tech.\n<h2>Quirky Sign-Off</h2>\n<p>> \"Everything we do before a pandemic will seem alarmist. Everything we do after will seem inadequate.\" \u2014 <em>Michael Leavitt</em></p>\n<p>Stay safe, wash your hands, and HODL.</p>\n<p>---\n<em>Disclaimer: This newsletter is for informational purposes only and does not constitute financial advice. Past performance is not indicative of future results. Do your own research before making any investment decisions.</em></p>\n",
+  "sentiment_score": 40,
+  "entities": {
+    "tickers": [],
+    "agents": [],
+    "sovereigns": [
+      "US",
+      "CN",
+      "EU"
+    ]
+  },
+  "provenance_hash": "eeb6772a434e5b9a9de60698ffdf56c95d536d4850da8b18a37c280b01d34f62",
+  "filename": "2020-03-20_Market_Mayhem.html",
+  "is_sourced": true,
+  "metrics_json": "{}",
+  "source_priority": 2,
+  "conviction": 71,
+  "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 40/100. Cross-reference with knowledge graph completed.",
+  "quality": 100,
+  "semantic_score": 64,
+  "probability": 71
+}</textarea>
+
     <script>
+        // --- INTERACTION LOGIC ---
+
+        function showToast(msg) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'cyber-toast';
+            toast.innerText = '> ' + msg;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            showToast('THEME: ' + (isDark ? 'DARK_MODE' : 'LIGHT_MODE'));
+        }
+
+        function toggleSource() {
+            const modal = document.getElementById('raw-source-modal');
+            const content = document.getElementById('raw-source-content');
+            const rawData = document.getElementById('hidden-raw-data').value;
+
+            if (modal.style.display === 'flex') {
+                modal.style.display = 'none';
+            } else {
+                content.innerText = rawData || "NO SOURCE DATA AVAILABLE.";
+                modal.style.display = 'flex';
+            }
+        }
+
+        function runVerification() {
+            const overlay = document.getElementById('system2-overlay');
+            const content = document.getElementById('sys2-content');
+            const status = document.getElementById('verification-status');
+
+            overlay.style.display = 'flex';
+            content.innerHTML = '';
+
+            const lines = [
+                "INITIATING SYSTEM 2 PROTOCOL...",
+                "VERIFYING CRYPTOGRAPHIC SIGNATURE...",
+                "HASH: eeb6772a434e5b9a9de60698ffdf56c95d536d4850da8b18a37c280b01d34f62",
+                "CHECKING CHAIN OF CUSTODY...",
+                "ANALYZING SENTIMENT VECTORS...",
+                "CROSS-REFERENCING KNOWLEDGE GRAPH...",
+                "VERIFICATION COMPLETE."
+            ];
+
+            let i = 0;
+            function addLine() {
+                if (i < lines.length) {
+                    const div = document.createElement('div');
+                    div.className = 'system2-line';
+                    div.innerText = '> ' + lines[i];
+                    div.style.opacity = 1;
+                    content.appendChild(div);
+                    i++;
+                    setTimeout(addLine, 400);
+                } else {
+                    setTimeout(() => {
+                        overlay.style.display = 'none';
+                        showToast('DOCUMENT VERIFIED');
+                        if(status) status.innerText = "VERIFIED // AUTHENTICATED";
+                        if(status) status.style.color = "#aaffaa";
+                    }, 1000);
+                }
+            }
+            addLine();
+        }
+
         // Chart Injection Logic
         const metricsData = {};
 

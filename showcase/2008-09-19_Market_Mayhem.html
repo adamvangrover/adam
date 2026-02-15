@@ -5,94 +5,74 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ADAM v23.5 :: Market Mayhem Newsletter - September 19, 2008</title>
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/market_mayhem_tiers.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="js/nav.js" defer></script>
-    <style>
-        :root {
-            --paper-bg: #fdfbf7;
-            --ink-color: #1a1a1a;
-            --accent-red: #cc0000;
-            --cyber-black: #050b14;
-            --cyber-blue: #00f3ff;
-            --cyber-green: #00ff00;
-        }
-        body { margin: 0; background: var(--cyber-black); color: #e0e0e0; font-family: 'Inter', sans-serif; }
-
-        .newsletter-wrapper {
-            max-width: 1200px;
-            margin: 40px auto;
-            display: grid;
-            grid-template-columns: 3fr 1fr;
-            gap: 40px;
-            padding: 20px;
-        }
-        @media (max-width: 768px) { .newsletter-wrapper { grid-template-columns: 1fr; } }
-
-        .paper-sheet {
-            background: var(--paper-bg);
-            color: var(--ink-color);
-            padding: 60px;
-            font-family: 'Georgia', 'Times New Roman', serif;
-            box-shadow: 0 0 50px rgba(0,0,0,0.5);
-            position: relative;
-        }
-
-        h1.title {
-            font-family: 'Playfair Display', serif; font-size: 3rem; border-bottom: 4px solid var(--ink-color);
-            padding-bottom: 20px; margin-bottom: 30px; letter-spacing: -1px; line-height: 1.1;
-        }
-        h2 {
-            font-family: 'Inter', sans-serif; font-weight: 700; font-size: 1.2rem; margin-top: 40px;
-            margin-bottom: 15px; color: var(--accent-red); text-transform: uppercase; letter-spacing: 1px;
-        }
-        p { line-height: 1.8; margin-bottom: 20px; font-size: 1.05rem; }
-        li { line-height: 1.6; margin-bottom: 10px; }
-
-        /* Cyber HUD Sidebar */
-        .cyber-sidebar { font-family: 'JetBrains Mono', monospace; }
-        .sidebar-widget {
-            border: 1px solid #333; background: rgba(5, 11, 20, 0.8); padding: 15px; margin-bottom: 20px;
-            backdrop-filter: blur(5px);
-        }
-        .sidebar-title {
-            color: var(--cyber-blue); font-size: 0.75rem; text-transform: uppercase; border-bottom: 1px solid #333;
-            padding-bottom: 8px; margin-bottom: 12px; letter-spacing: 1px;
-        }
-        .stat-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.8rem; color: #aaa; }
-        .stat-val { color: #fff; font-weight: bold; }
-
-        .sentiment-bar { height: 4px; background: #333; margin-top: 5px; border-radius: 2px; overflow: hidden; }
-        .sentiment-fill { height: 100%; background: var(--cyber-blue); }
-
-        .tag-cloud { display: flex; flex-wrap: wrap; gap: 5px; }
-        .tag { background: #222; color: #ccc; padding: 2px 6px; font-size: 0.7rem; border-radius: 3px; border: 1px solid #444; }
-        .tag.ticker { color: var(--cyber-green); border-color: var(--cyber-green); }
-        .tag.agent { color: var(--cyber-blue); border-color: var(--cyber-blue); }
-
-        .cyber-btn {
-            font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; padding: 8px 16px; border: 1px solid #444;
-            color: #e0e0e0; background: rgba(0,0,0,0.8); text-decoration: none; display: inline-block;
-        }
-        .cyber-btn:hover { border-color: var(--cyber-blue); color: var(--cyber-blue); }
-    </style>
 </head>
-<body>
-    <div style="max-width: 1400px; margin: 0 auto; padding: 20px; display:flex; justify-content:space-between; align-items:center;">
+<body class="tier-high">
+
+    <!-- System 2 Verification Overlay -->
+    <div id="system2-overlay" class="system2-overlay">
+        <div class="system2-terminal">
+            <div id="sys2-content"></div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="cyber-toast-container"></div>
+
+    <!-- Raw Source Modal -->
+    <div id="raw-source-modal" class="raw-source-modal">
+        <div class="raw-source-header">
+            <span>SOURCE_DATA.JSON</span>
+            <span style="cursor:pointer; color:#cc0000;" onclick="toggleSource()">[CLOSE]</span>
+        </div>
+        <div class="raw-source-content" id="raw-source-content"></div>
+    </div>
+
+    <!-- Virtual Toolbar for High Tier -->
+    <div class="doc-toolbar" style="display: flex;">
+        <div class="toolbar-item" onclick="window.location.href='market_mayhem_archive.html'"><strong>FILE</strong></div>
+        <div class="toolbar-item" onclick="showToast('EDIT MODE: READ ONLY (ARCHIVED)')">EDIT</div>
+        <div class="toolbar-item" onclick="toggleTheme()">VIEW</div>
+        <div class="toolbar-item" onclick="showToast('INSERT: PERMISSION DENIED')">INSERT</div>
+        <div class="toolbar-item" onclick="showToast('FORMAT: LOCKED')">FORMAT</div>
+        <div class="toolbar-item" onclick="runVerification()" style="color: #0078d7;"><strong>VERIFY</strong></div>
+        <div style="flex-grow:1;"></div>
+        <div class="toolbar-item" style="color:#666;">ADAM_V26_EDITOR</div>
+    </div>
+
+    <div style="max-width: 1400px; margin: 0 auto; padding: 10px 20px; display:flex; justify-content:space-between; align-items:center; display: none;">
         <a href="market_mayhem_archive.html" class="cyber-btn">&larr; RETURN TO ARCHIVE</a>
         <div style="font-family:'JetBrains Mono'; font-size:0.7rem; color:#666;">SECURE CONNECTION ESTABLISHED</div>
     </div>
 
     <div class="newsletter-wrapper">
-        <div class="paper-sheet">
-            <div style="display:flex; justify-content:space-between; font-family:'JetBrains Mono'; font-size:0.8rem; color:#666; margin-bottom:20px;">
+        <div class="paper-sheet" id="paper-sheet">
+
+            <!-- High Tier Header UI -->
+            <div class="doc-header-ui" style="display: flex;">
+                <span id="verification-status">CONFIDENTIAL // SYSTEM 2 REVIEW</span>
+                <span>7d27a63c</span>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; font-family:'JetBrains Mono'; font-size:0.8rem; color:#666; margin-bottom:20px; margin-top: 20px;">
                 <span>2008-09-19</span>
                 <span>ID: 7d27a63c</span>
             </div>
 
             <h1 class="title">Market Mayhem Newsletter - September 19, 2008</h1>
+
+            <!-- Metadata Panel for High Tier (Embedded in Doc) -->
+            <div class="doc-metadata-panel" style="display: grid;">
+                <div class="doc-metadata-item"><strong>Classification</strong>UNCLASSIFIED</div>
+                <div class="doc-metadata-item"><strong>Conviction</strong>75/100</div>
+                <div class="doc-metadata-item"><strong>Sentiment</strong>22/100</div>
+                <div class="doc-metadata-item"><strong>Reviewer</strong>Overseer</div>
+            </div>
 
             <div id="financialChartContainer" style="display:none; margin-bottom: 30px;">
                 <canvas id="financialChart"></canvas>
@@ -164,6 +144,28 @@
 <em>Disclaimer: This newsletter is for informational purposes only and does not constitute financial advice. Past performance is not indicative of future results. Do your own research before making any investment decisions.</em></p>
 
 
+            <!-- Provenance Log (All Tiers) -->
+            <div class="provenance-log">
+                <div class="log-entry">
+                    <span>> HASH_CHECK</span>
+                    <span style="color:var(--terminal-green);">7d27a63c6c69e3923252141bb0f13465f3d6f86ebc53dc2e25841d360ad86617</span>
+                </div>
+                <div class="log-entry">
+                    <span>> SENTIMENT_SCAN</span>
+                    <span>22 (DENSITY: 59)</span>
+                </div>
+                <div class="log-entry">
+                    <span>> CONVICTION_LOCK</span>
+                    <span>75%</span>
+                </div>
+                <div class="log-entry">
+                    <span>> CRITIQUE_LOG</span>
+                    <span>"Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 22/100. Cross-reference with knowledge graph completed."</span>
+                </div>
+            </div>
+
+            <a href="#" class="source-jump-btn" onclick="toggleSource(); return false;" title="View Source JSON">JUMP TO SOURCE</a>
+
             <div style="margin-top: 40px; border-top: 1px solid #ccc; padding-top: 20px; font-style: italic; color: #666;">
                 End of Transmission.
             </div>
@@ -224,7 +226,105 @@
         </aside>
     </div>
 
+    <!-- Hidden Raw Data -->
+    <textarea id="hidden-raw-data" style="display:none;">{
+  "title": "Market Mayhem Newsletter - September 19, 2008",
+  "date": "2008-09-19",
+  "summary": "   Mood: \"Existential Panic\"\n   Driver: Systemic Failure\n   Theme: \"The Week Wall Street Broke\" \u2014 There are decades where nothing happens; and there are weeks where decades happen. This was one of tho...",
+  "type": "NEWSLETTER",
+  "full_body": "<h3>Your weekly guide to navigating the financial storms and spotting the sunshine!</h3>\n<h2>Market Snapshot</h2>\n<em>   <strong>S&P 500:</strong> 1,255 (+0.3% WoW) </em>[Volatile week! Closed higher on TARP rumor]*\n<ul>\n<li>  <strong>Dow Jones:</strong> 11,388 (-0.3% WoW)</li>\n<li>  <strong>Nasdaq Composite:</strong> 2,273 (+0.6% WoW)</li>\n<li>  <strong>Brent Crude Oil:</strong> $104.55 (+3.2% WoW)</li>\n</ul>\n<em>   <strong>Gold:</strong> $864.00 (+11.5% WoW) </em>[Record 1-day gain]*\n<ul>\n<li>  <strong>Lehman Brothers:</strong> $0.00 (-100% WoW)</li>\n</ul>\n<h2>Market Mayhem: Executive Summary</h2>\n<ul>\n<li>  <strong>Mood:</strong> <strong>\"Existential Panic\"</strong></li>\n<li>  <strong>Driver:</strong> <strong>Systemic Failure</strong></li>\n<li>  <strong>Theme:</strong> <strong>\"The Week Wall Street Broke\"</strong> \u2014 There are decades where nothing happens; and there are weeks where decades happen. This was one of those weeks. A 158-year-old bank vanished, the world's largest insurer was nationalized, and the money market broke the buck.</li>\n</ul>\n<h2>Key News & Events (The \"What Happened\")</h2>\n<p>1.  <strong>Lehman Brothers Files for Chapter 11:</strong> The unthinkable happened Monday morning. No bailout. $600B in assets frozen. The largest bankruptcy in U.S. history.\n2.  <strong>AIG Nationalized:</strong> The Fed stepped in with an $85 billion credit facility to save American International Group, taking a 79.9% equity stake. \"Too Big to Fail\" is now official policy.\n3.  <strong>Merrill Lynch Sold:</strong> In a shotgun wedding, <strong>Bank of America</strong> agreed to buy Merrill Lynch for $50B to prevent it from being the next domino.\n4.  <strong>Reserve Primary Fund \"Breaks the Buck\":</strong> The $62B money market fund saw its NAV fall to $0.97 due to Lehman exposure, triggering a run on the safest asset class in the world.\n5.  <strong>SEC Bans Short Selling:</strong> In a desperate move to stop the bleeding, the SEC halted short selling on 799 financial stocks.</p>\n<h2>Top Investment Ideas (The \"Alpha\")</h2>\n<h3>1. Gold (The Ultimate Haven)</h3>\n<ul>\n<li>  <strong>Rationale:</strong> Trust in paper assets has evaporated. Gold posted its largest single-day gain ever ($70) as investors fled counterparty risk.</li>\n<li>  <strong>Key Risks:</strong> Volatility is extreme; margin calls elsewhere could force liquidations.</li>\n</ul>\n<h3>2. Treasury Bills (Cash is King)</h3>\n<em>   <strong>Rationale:</strong> With money market funds breaking the buck, the only safe place is 3-month T-Bills. Yields briefly went </em>negative* as panic buying set in.\n<ul>\n<li>  <strong>Key Risks:</strong> Negative real returns.</li>\n</ul>\n<h2>Notable Signals & Rumors</h2>\n<ul>\n<li>  <strong>Signal:</strong> <strong>TED Spread Explosion:</strong> The spread between T-Bills and Eurodollars hit record highs. Banks are too terrified to lend to each other overnight.</li>\n<li>  <strong>Whisper:</strong> \"Paulson and Bernanke are cooking up something massive over the weekend. A 'TARP' to buy toxic assets? $700 Billion?\"</li>\n</ul>\n<h2>Policy Impact & Geopolitical Outlook</h2>\n<ul>\n<li>  <strong>Central Banks:</strong> The Fed is flooding the system with liquidity, but the gears are stuck. The discount window is wide open.</li>\n<li>  <strong>Politics:</strong> Presidential candidates Obama and McCain are suspending campaigns to deal with the crisis. Washington is in shock.</li>\n</ul>\n<h2>Deals & Corporate Actions</h2>\n<ul>\n<li>  <strong>M&A:</strong> <strong>Bank of America</strong> buys <strong>Merrill Lynch</strong> ($50B).</li>\n<li>  <strong>M&A:</strong> <strong>Barclays</strong> picks up the carcass of Lehman's North American operations for a song ($1.75B).</li>\n</ul>\n<h2>Earnings Watch (Next Week)</h2>\n<ul>\n<li>  <strong>Goldman Sachs (GS) & Morgan Stanley (MS):</strong> The last two standalone investment banks. Can they survive, or will they be forced to become bank holding companies?</li>\n</ul>\n<h2>Thematic Deep Dive: \"Moral Hazard is Dead\"</h2>\n<p>For years, the \"Fed Put\" protected risk-takers. On Monday, Hank Paulson killed it by letting Lehman fail. By Tuesday, he realized he made a mistake. By Wednesday, he bailed out AIG.</p>\n<p>We are now in uncharted territory. The government is now the insurer of last resort, the lender of last resort, and the buyer of last resort. The free market for financials has been suspended.</p>\n<h2>Year Ahead Forecast</h2>\n<strong>Bearish.</strong> This isn't a correction; it's a deleveraging event. The credit crunch will hit Main Street hard. Cash is your best friend until the toxic assets are cleared.\n<h2>Quirky Sign-Off</h2>\n<p>> \"When the music stops, in terms of liquidity, things will be complicated. But as long as the music is playing, you've got to get up and dance.\" \u2014 <em>Chuck Prince (Citi CEO), famously wrong last year.</em></p>\n<p>The music has stopped.</p>\n<p>---\n<em>Disclaimer: This newsletter is for informational purposes only and does not constitute financial advice. Past performance is not indicative of future results. Do your own research before making any investment decisions.</em></p>\n",
+  "sentiment_score": 22,
+  "entities": {
+    "tickers": [],
+    "agents": [],
+    "sovereigns": []
+  },
+  "provenance_hash": "7d27a63c6c69e3923252141bb0f13465f3d6f86ebc53dc2e25841d360ad86617",
+  "filename": "2008-09-19_Market_Mayhem.html",
+  "is_sourced": true,
+  "metrics_json": "{}",
+  "source_priority": 2,
+  "conviction": 75,
+  "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 22/100. Cross-reference with knowledge graph completed.",
+  "quality": 100,
+  "semantic_score": 59,
+  "probability": 75
+}</textarea>
+
     <script>
+        // --- INTERACTION LOGIC ---
+
+        function showToast(msg) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'cyber-toast';
+            toast.innerText = '> ' + msg;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            showToast('THEME: ' + (isDark ? 'DARK_MODE' : 'LIGHT_MODE'));
+        }
+
+        function toggleSource() {
+            const modal = document.getElementById('raw-source-modal');
+            const content = document.getElementById('raw-source-content');
+            const rawData = document.getElementById('hidden-raw-data').value;
+
+            if (modal.style.display === 'flex') {
+                modal.style.display = 'none';
+            } else {
+                content.innerText = rawData || "NO SOURCE DATA AVAILABLE.";
+                modal.style.display = 'flex';
+            }
+        }
+
+        function runVerification() {
+            const overlay = document.getElementById('system2-overlay');
+            const content = document.getElementById('sys2-content');
+            const status = document.getElementById('verification-status');
+
+            overlay.style.display = 'flex';
+            content.innerHTML = '';
+
+            const lines = [
+                "INITIATING SYSTEM 2 PROTOCOL...",
+                "VERIFYING CRYPTOGRAPHIC SIGNATURE...",
+                "HASH: 7d27a63c6c69e3923252141bb0f13465f3d6f86ebc53dc2e25841d360ad86617",
+                "CHECKING CHAIN OF CUSTODY...",
+                "ANALYZING SENTIMENT VECTORS...",
+                "CROSS-REFERENCING KNOWLEDGE GRAPH...",
+                "VERIFICATION COMPLETE."
+            ];
+
+            let i = 0;
+            function addLine() {
+                if (i < lines.length) {
+                    const div = document.createElement('div');
+                    div.className = 'system2-line';
+                    div.innerText = '> ' + lines[i];
+                    div.style.opacity = 1;
+                    content.appendChild(div);
+                    i++;
+                    setTimeout(addLine, 400);
+                } else {
+                    setTimeout(() => {
+                        overlay.style.display = 'none';
+                        showToast('DOCUMENT VERIFIED');
+                        if(status) status.innerText = "VERIFIED // AUTHENTICATED";
+                        if(status) status.style.color = "#aaffaa";
+                    }, 1000);
+                }
+            }
+            addLine();
+        }
+
         // Chart Injection Logic
         const metricsData = {};
 

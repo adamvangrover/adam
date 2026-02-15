@@ -1,0 +1,428 @@
+/* --- BASE VARIABLES --- */
+:root {
+    --doc-bg: #f5f5f5;
+    --paper-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    --toolbar-bg: #e0e0e0;
+    --toolbar-border: #ccc;
+    --terminal-green: #00ff00;
+    --terminal-bg: #0d0d0d;
+}
+
+/* --- TIER HIGH: VIRTUAL DOCUMENT (Word/Acrobat Style) --- */
+body.tier-high {
+    background-color: #333;
+    background-image: radial-gradient(#444 1px, transparent 1px);
+    background-size: 20px 20px;
+}
+
+.tier-high .newsletter-wrapper {
+    max-width: 1100px; /* Wider for doc feel */
+    background: transparent;
+    box-shadow: none;
+    display: block; /* Override grid for document focus */
+    margin: 20px auto;
+}
+
+.tier-high .paper-sheet {
+    background: #fff;
+    color: #000;
+    padding: 80px 90px;
+    min-height: 1100px; /* A4-ish ratio */
+    box-shadow: var(--paper-shadow);
+    position: relative;
+    margin: 0 auto;
+    border: 1px solid #ccc;
+    font-family: 'Times New Roman', serif; /* Classic doc font */
+}
+
+/* Virtual Toolbar */
+.tier-high .doc-toolbar {
+    display: flex;
+    background: #f3f3f3;
+    border-bottom: 1px solid #ccc;
+    padding: 8px 15px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 13px;
+    color: #333;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    width: 100%;
+    margin-bottom: 0;
+    border-radius: 4px 4px 0 0;
+}
+
+.tier-high .toolbar-item {
+    margin-right: 20px;
+    cursor: pointer;
+}
+.tier-high .toolbar-item:hover {
+    color: #0078d7;
+}
+
+.tier-high .doc-header-ui {
+    background: #2b579a; /* Word Blue */
+    color: white;
+    padding: 5px 15px;
+    font-family: 'Segoe UI', sans-serif;
+    font-size: 12px;
+    border-radius: 4px 4px 0 0;
+    display: flex;
+    justify-content: space-between;
+}
+
+/* Metadata floats in the margins or a specific property box */
+.tier-high .cyber-sidebar {
+    display: none; /* Hide default sidebar, we integrate it differently */
+}
+
+.tier-high .doc-metadata-panel {
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+    padding: 15px;
+    margin-bottom: 30px;
+    font-family: 'Segoe UI', sans-serif;
+    font-size: 0.9rem;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+}
+
+.tier-high .doc-metadata-item strong {
+    display: block;
+    color: #666;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+}
+
+/* --- TIER MEDIUM: PROFESSIONAL NEWSLETTER (Substack/FT) --- */
+body.tier-medium {
+    background-color: #fdfbf7; /* Creamy paper */
+    color: #1a1a1a;
+}
+
+.tier-medium .newsletter-wrapper {
+    max-width: 900px;
+    display: block; /* Single column read */
+    margin: 40px auto;
+}
+
+.tier-medium .paper-sheet {
+    background: transparent;
+    box-shadow: none;
+    padding: 0;
+    border: none;
+    color: #1a1a1a;
+    font-family: 'Georgia', serif;
+}
+
+.tier-medium .title {
+    font-family: 'Playfair Display', serif;
+    font-size: 3.5rem;
+    text-align: center;
+    border-bottom: 4px double #000;
+    padding-bottom: 30px;
+    margin-bottom: 40px;
+}
+
+.tier-medium h2 {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    color: #111;
+    border-left: 5px solid #cc0000;
+    padding-left: 15px;
+}
+
+.tier-medium .cyber-sidebar {
+    background: #fff;
+    border: 1px solid #eee;
+    padding: 20px;
+    margin-top: 40px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.tier-medium .sidebar-widget {
+    background: transparent;
+    border: none;
+    border-left: 1px solid #eee;
+    padding-left: 15px;
+    backdrop-filter: none;
+}
+
+.tier-medium .sidebar-title {
+    color: #cc0000;
+    border-bottom: none;
+    font-family: 'Helvetica Neue', sans-serif;
+    font-weight: bold;
+}
+
+.tier-medium .stat-val {
+    color: #000;
+}
+
+/* --- TIER LOW: FEED / TERMINAL / CHAT --- */
+body.tier-low {
+    background-color: #000;
+    color: #0f0;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+.tier-low .newsletter-wrapper {
+    max-width: 800px;
+    margin: 20px auto;
+    display: flex;
+    flex-direction: column-reverse; /* Latest at bottom feel */
+}
+
+.tier-low .paper-sheet {
+    background: #050505;
+    border: 1px solid #333;
+    padding: 20px;
+    box-shadow: none;
+    color: #ccc;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+.tier-low .title {
+    font-size: 1.2rem;
+    color: #0f0;
+    border: none;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+}
+.tier-low .title::before {
+    content: "> INCOMING TRANSMISSION: ";
+}
+
+.tier-low h2, .tier-low h3 {
+    color: #00f3ff;
+    font-size: 1rem;
+    text-transform: uppercase;
+    margin-top: 20px;
+}
+
+.tier-low p {
+    margin-bottom: 10px;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+.tier-low .cyber-sidebar {
+    border-top: 1px dashed #333;
+    padding-top: 20px;
+    margin-top: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.tier-low .sidebar-widget {
+    background: #111;
+    border: 1px solid #333;
+    padding: 5px 10px;
+    flex: 1 1 150px;
+}
+
+.tier-low .stat-row {
+    font-size: 0.7rem;
+}
+
+/* --- COMMON UTILITIES FOR ENHANCEMENTS --- */
+
+/* Provenance Log */
+.provenance-log {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    background: #f4f4f4;
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-top: 30px;
+    color: #555;
+}
+.tier-low .provenance-log {
+    background: #111;
+    border-color: #333;
+    color: #666;
+}
+
+.log-entry {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px dotted #ccc;
+    padding: 2px 0;
+}
+.log-entry:last-child { border-bottom: none; }
+
+/* Jump to Source Button */
+.source-jump-btn {
+    display: inline-block;
+    padding: 5px 10px;
+    background: #eee;
+    border: 1px solid #ccc;
+    color: #333;
+    text-decoration: none;
+    font-size: 0.7rem;
+    font-family: sans-serif;
+    margin-top: 10px;
+    border-radius: 3px;
+}
+.source-jump-btn:hover {
+    background: #ddd;
+}
+.tier-low .source-jump-btn {
+    background: #000;
+    border-color: #0f0;
+    color: #0f0;
+}
+.tier-low .source-jump-btn:hover {
+    background: #0f0;
+    color: #000;
+}
+
+/* Agent Avatar */
+.agent-avatar {
+    width: 30px;
+    height: 30px;
+    background: #ccc;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 10px;
+    font-weight: bold;
+    color: #fff;
+    font-size: 0.8rem;
+}
+.agent-avatar.core { background: #000; }
+.agent-avatar.market { background: #cc0000; }
+.agent-avatar.risk { background: #ffaa00; }
+
+/* --- ENHANCED SYSTEM 2 OVERLAY --- */
+.system2-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.95);
+    z-index: 1000;
+    display: none; /* Toggled by JS */
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    font-family: 'Courier New', monospace;
+    color: #00ff00;
+}
+
+.system2-terminal {
+    width: 600px;
+    height: 400px;
+    background: #000;
+    border: 1px solid #00ff00;
+    padding: 20px;
+    box-shadow: 0 0 20px rgba(0, 255, 0, 0.2);
+    overflow-y: auto;
+}
+
+.system2-line {
+    margin-bottom: 5px;
+    opacity: 0; /* Animated in */
+}
+
+/* --- TOAST NOTIFICATIONS --- */
+.cyber-toast-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 2000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.cyber-toast {
+    background: rgba(10, 20, 30, 0.9);
+    border: 1px solid #00f3ff;
+    color: #00f3ff;
+    padding: 10px 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    box-shadow: 0 0 10px rgba(0, 243, 255, 0.2);
+    animation: slideIn 0.3s ease-out forwards;
+    opacity: 0;
+}
+
+@keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+/* --- RAW SOURCE VIEWER --- */
+.raw-source-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80%;
+    height: 80%;
+    background: #1e1e1e;
+    border: 1px solid #444;
+    z-index: 1500;
+    display: none;
+    flex-direction: column;
+    box-shadow: 0 0 30px rgba(0,0,0,0.8);
+}
+
+.raw-source-header {
+    background: #252526;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #333;
+    color: #ccc;
+    font-family: sans-serif;
+    font-size: 0.9rem;
+}
+
+.raw-source-content {
+    flex-grow: 1;
+    padding: 20px;
+    overflow: auto;
+    color: #d4d4d4;
+    font-family: 'Consolas', 'Courier New', monospace;
+    white-space: pre-wrap;
+    font-size: 0.85rem;
+}
+
+/* --- DARK MODE FOR HIGH TIER --- */
+body.tier-high.dark-mode {
+    background-color: #111;
+    background-image: radial-gradient(#222 1px, transparent 1px);
+}
+
+body.tier-high.dark-mode .paper-sheet {
+    background: #1e1e1e;
+    color: #d4d4d4;
+    border-color: #333;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+}
+
+body.tier-high.dark-mode .doc-toolbar {
+    background: #252526;
+    border-color: #333;
+    color: #ccc;
+}
+
+body.tier-high.dark-mode .doc-header-ui {
+    background: #007acc; /* VS Code Blueish */
+}
+
+body.tier-high.dark-mode .doc-metadata-panel {
+    background: #252526;
+    border-color: #333;
+    color: #ccc;
+}
