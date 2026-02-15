@@ -14,13 +14,33 @@
 </head>
 <body class="tier-high">
 
+    <!-- System 2 Verification Overlay -->
+    <div id="system2-overlay" class="system2-overlay">
+        <div class="system2-terminal">
+            <div id="sys2-content"></div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="cyber-toast-container"></div>
+
+    <!-- Raw Source Modal -->
+    <div id="raw-source-modal" class="raw-source-modal">
+        <div class="raw-source-header">
+            <span>SOURCE_DATA.JSON</span>
+            <span style="cursor:pointer; color:#cc0000;" onclick="toggleSource()">[CLOSE]</span>
+        </div>
+        <div class="raw-source-content" id="raw-source-content"></div>
+    </div>
+
     <!-- Virtual Toolbar for High Tier -->
     <div class="doc-toolbar" style="display: flex;">
         <div class="toolbar-item" onclick="window.location.href='market_mayhem_archive.html'"><strong>FILE</strong></div>
-        <div class="toolbar-item">EDIT</div>
-        <div class="toolbar-item">VIEW</div>
-        <div class="toolbar-item">INSERT</div>
-        <div class="toolbar-item">FORMAT</div>
+        <div class="toolbar-item" onclick="showToast('EDIT MODE: READ ONLY (ARCHIVED)')">EDIT</div>
+        <div class="toolbar-item" onclick="toggleTheme()">VIEW</div>
+        <div class="toolbar-item" onclick="showToast('INSERT: PERMISSION DENIED')">INSERT</div>
+        <div class="toolbar-item" onclick="showToast('FORMAT: LOCKED')">FORMAT</div>
+        <div class="toolbar-item" onclick="runVerification()" style="color: #0078d7;"><strong>VERIFY</strong></div>
         <div style="flex-grow:1;"></div>
         <div class="toolbar-item" style="color:#666;">ADAM_V26_EDITOR</div>
     </div>
@@ -31,11 +51,11 @@
     </div>
 
     <div class="newsletter-wrapper">
-        <div class="paper-sheet">
+        <div class="paper-sheet" id="paper-sheet">
 
             <!-- High Tier Header UI -->
             <div class="doc-header-ui" style="display: flex;">
-                <span>CONFIDENTIAL // SYSTEM 2 REVIEW</span>
+                <span id="verification-status">CONFIDENTIAL // SYSTEM 2 REVIEW</span>
                 <span>5e527838</span>
             </div>
 
@@ -116,7 +136,7 @@
                 </div>
             </div>
 
-            <a href="#" class="source-jump-btn" title="View Source JSON">JUMP TO SOURCE</a>
+            <a href="#" class="source-jump-btn" onclick="toggleSource(); return false;" title="View Source JSON">JUMP TO SOURCE</a>
 
             <div style="margin-top: 40px; border-top: 1px solid #ccc; padding-top: 20px; font-style: italic; color: #666;">
                 End of Transmission.
@@ -143,7 +163,7 @@
             <div class="sidebar-widget">
                 <div class="sidebar-title">Detected Entities</div>
                 <div class="tag-cloud">
-                    <span class="tag">US</span>
+                    <a href="market_mayhem_archive.html?search=US" class="tag" style="text-decoration:none;">US</a>
                 </div>
             </div>
 
@@ -178,7 +198,107 @@
         </aside>
     </div>
 
+    <!-- Hidden Raw Data -->
+    <textarea id="hidden-raw-data" style="display:none;">{
+  "title": "MARKET PULSE // 2025-05-19",
+  "date": "2025-05-19",
+  "summary": "Market analysis and strategic insights.",
+  "type": "NEWSLETTER",
+  "full_body": "<strong>Status:</strong> ONLINE\n<strong>Clearance:</strong> PUBLIC\n<strong>Tone:</strong> CYBER-MINIMALIST\n<p>---</p>\n<h2>< SYSTEM_OVERVIEW ></h2>\n<p>The S&P 500 is testing key resistance at 5,450 as the \"AI Rotation\" trade broadens beyond semiconductors into software and utilities. Volatility (VIX) remains suppressed (13.2), suggesting complacency or a structured calm before the next macro catalyst (June FOMC).</p>\n<h2>< NODES_IN_FOCUS ></h2>\n<ul>\n<li>  <strong>SECTOR: UTILITIES (XLU)</strong></li>\n<li>  <strong>Signal:</strong> +4.2% WTD.</li>\n<li>  <strong>Thesis:</strong> \"Power is the new Oil.\" Data center energy demand is driving re-rating of regulated utilities with nuclear exposure.</li>\n<li>  <strong>Conviction:</strong> HIGH.</li>\n</ul>\n<ul>\n<li>  <strong>CRYPTO: BITCOIN (BTC)</strong></li>\n<li>  <strong>Signal:</strong> Range-bound ($88k - $92k).</li>\n<li>  <strong>Thesis:</strong> Institutional accumulation via ETF inflows is offsetting miner capitulation post-halving. Expect breakout if CPI prints < 2.8%.</li>\n<li>  <strong>Conviction:</strong> MEDIUM.</li>\n</ul>\n<ul>\n<li>  <strong>MACRO: JAPAN (USD/JPY)</strong></li>\n<li>  <strong>Signal:</strong> 158.50 (Intervention Watch).</li>\n<li>  <strong>Thesis:</strong> BOJ is cornered. Further yield curve control adjustments are inevitable. Short JGBs remains the \"Widowmaker\" trade, but the risk/reward is tilting.</li>\n<li>  <strong>Conviction:</strong> LOW (High Volatility).</li>\n</ul>\n<h2>< DATA_STREAM ></h2>\n<p>| METRIC | VALUE | DELTA (YoY) |\n| :--- | :--- | :--- |\n| <strong>US 10Y Yield</strong> | 4.35% | -12bps |\n| <strong>Brent Crude</strong> | $82.40 | +3.5% |\n| <strong>Gold</strong> | $2,410 | +15.2% |\n| <strong>Global Liquidity</strong> | $98.5T | +2.1% |</p>\n<h2>< SYNTHESIS ></h2>\n<p>Markets are pricing in a \"Goldilocks\" soft landing, but the divergence between equity valuations (21x fwd P/E) and real rates (2.0%) is expanding. We recommend a barbell strategy: Long AI infrastructure (Hardware/Energy) and Short Consumer Discretionary (High-end retail showing cracks).</p>\n<p>> \"In the age of information, silence is the most expensive luxury. In the age of AI, compute is the new currency.\"</p>\n<strong>END_TRANSMISSION</strong>\n",
+  "sentiment_score": 0,
+  "entities": {
+    "tickers": [],
+    "agents": [],
+    "sovereigns": [
+      "US"
+    ]
+  },
+  "provenance_hash": "5e527838fda511c11385f2e2b26c5931351f458f6892c14dd354272ffd0adf14",
+  "filename": "market_pulse_20250519.html",
+  "is_sourced": true,
+  "metrics_json": "{}",
+  "source_priority": 2,
+  "conviction": 50,
+  "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 0/100. Cross-reference with knowledge graph completed.",
+  "quality": 100,
+  "semantic_score": 75,
+  "probability": 70
+}</textarea>
+
     <script>
+        // --- INTERACTION LOGIC ---
+
+        function showToast(msg) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'cyber-toast';
+            toast.innerText = '> ' + msg;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            showToast('THEME: ' + (isDark ? 'DARK_MODE' : 'LIGHT_MODE'));
+        }
+
+        function toggleSource() {
+            const modal = document.getElementById('raw-source-modal');
+            const content = document.getElementById('raw-source-content');
+            const rawData = document.getElementById('hidden-raw-data').value;
+
+            if (modal.style.display === 'flex') {
+                modal.style.display = 'none';
+            } else {
+                content.innerText = rawData || "NO SOURCE DATA AVAILABLE.";
+                modal.style.display = 'flex';
+            }
+        }
+
+        function runVerification() {
+            const overlay = document.getElementById('system2-overlay');
+            const content = document.getElementById('sys2-content');
+            const status = document.getElementById('verification-status');
+
+            overlay.style.display = 'flex';
+            content.innerHTML = '';
+
+            const lines = [
+                "INITIATING SYSTEM 2 PROTOCOL...",
+                "VERIFYING CRYPTOGRAPHIC SIGNATURE...",
+                "HASH: 5e527838fda511c11385f2e2b26c5931351f458f6892c14dd354272ffd0adf14",
+                "CHECKING CHAIN OF CUSTODY...",
+                "ANALYZING SENTIMENT VECTORS...",
+                "CROSS-REFERENCING KNOWLEDGE GRAPH...",
+                "VERIFICATION COMPLETE."
+            ];
+
+            let i = 0;
+            function addLine() {
+                if (i < lines.length) {
+                    const div = document.createElement('div');
+                    div.className = 'system2-line';
+                    div.innerText = '> ' + lines[i];
+                    div.style.opacity = 1;
+                    content.appendChild(div);
+                    i++;
+                    setTimeout(addLine, 400);
+                } else {
+                    setTimeout(() => {
+                        overlay.style.display = 'none';
+                        showToast('DOCUMENT VERIFIED');
+                        if(status) status.innerText = "VERIFIED // AUTHENTICATED";
+                        if(status) status.style.color = "#aaffaa";
+                    }, 1000);
+                }
+            }
+            addLine();
+        }
+
         // Chart Injection Logic
         const metricsData = {};
 

@@ -818,13 +818,33 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 </head>
 <body class="{tier_class}">
 
+    <!-- System 2 Verification Overlay -->
+    <div id="system2-overlay" class="system2-overlay">
+        <div class="system2-terminal">
+            <div id="sys2-content"></div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="cyber-toast-container"></div>
+
+    <!-- Raw Source Modal -->
+    <div id="raw-source-modal" class="raw-source-modal">
+        <div class="raw-source-header">
+            <span>SOURCE_DATA.JSON</span>
+            <span style="cursor:pointer; color:#cc0000;" onclick="toggleSource()">[CLOSE]</span>
+        </div>
+        <div class="raw-source-content" id="raw-source-content"></div>
+    </div>
+
     <!-- Virtual Toolbar for High Tier -->
     <div class="doc-toolbar" style="display: {toolbar_display};">
         <div class="toolbar-item" onclick="window.location.href='market_mayhem_archive.html'"><strong>FILE</strong></div>
-        <div class="toolbar-item">EDIT</div>
-        <div class="toolbar-item">VIEW</div>
-        <div class="toolbar-item">INSERT</div>
-        <div class="toolbar-item">FORMAT</div>
+        <div class="toolbar-item" onclick="showToast('EDIT MODE: READ ONLY (ARCHIVED)')">EDIT</div>
+        <div class="toolbar-item" onclick="toggleTheme()">VIEW</div>
+        <div class="toolbar-item" onclick="showToast('INSERT: PERMISSION DENIED')">INSERT</div>
+        <div class="toolbar-item" onclick="showToast('FORMAT: LOCKED')">FORMAT</div>
+        <div class="toolbar-item" onclick="runVerification()" style="color: #0078d7;"><strong>VERIFY</strong></div>
         <div style="flex-grow:1;"></div>
         <div class="toolbar-item" style="color:#666;">ADAM_V26_EDITOR</div>
     </div>
@@ -835,11 +855,11 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     </div>
 
     <div class="newsletter-wrapper">
-        <div class="paper-sheet">
+        <div class="paper-sheet" id="paper-sheet">
 
             <!-- High Tier Header UI -->
             <div class="doc-header-ui" style="display: {header_ui_display};">
-                <span>CONFIDENTIAL // SYSTEM 2 REVIEW</span>
+                <span id="verification-status">CONFIDENTIAL // SYSTEM 2 REVIEW</span>
                 <span>{prov_short}</span>
             </div>
 
@@ -884,7 +904,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
                 </div>
             </div>
 
-            <a href="#" class="source-jump-btn" title="View Source JSON">JUMP TO SOURCE</a>
+            <a href="#" class="source-jump-btn" onclick="toggleSource(); return false;" title="View Source JSON">JUMP TO SOURCE</a>
 
             <div style="margin-top: 40px; border-top: 1px solid #ccc; padding-top: 20px; font-style: italic; color: #666;">
                 End of Transmission.
@@ -946,7 +966,83 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         </aside>
     </div>
 
+    <!-- Hidden Raw Data -->
+    <textarea id="hidden-raw-data" style="display:none;">{raw_source}</textarea>
+
     <script>
+        // --- INTERACTION LOGIC ---
+
+        function showToast(msg) {{
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'cyber-toast';
+            toast.innerText = '> ' + msg;
+            container.appendChild(toast);
+            setTimeout(() => {{
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }}, 3000);
+        }}
+
+        function toggleTheme() {{
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            showToast('THEME: ' + (isDark ? 'DARK_MODE' : 'LIGHT_MODE'));
+        }}
+
+        function toggleSource() {{
+            const modal = document.getElementById('raw-source-modal');
+            const content = document.getElementById('raw-source-content');
+            const rawData = document.getElementById('hidden-raw-data').value;
+
+            if (modal.style.display === 'flex') {{
+                modal.style.display = 'none';
+            }} else {{
+                content.innerText = rawData || "NO SOURCE DATA AVAILABLE.";
+                modal.style.display = 'flex';
+            }}
+        }}
+
+        function runVerification() {{
+            const overlay = document.getElementById('system2-overlay');
+            const content = document.getElementById('sys2-content');
+            const status = document.getElementById('verification-status');
+
+            overlay.style.display = 'flex';
+            content.innerHTML = '';
+
+            const lines = [
+                "INITIATING SYSTEM 2 PROTOCOL...",
+                "VERIFYING CRYPTOGRAPHIC SIGNATURE...",
+                "HASH: {prov_hash}",
+                "CHECKING CHAIN OF CUSTODY...",
+                "ANALYZING SENTIMENT VECTORS...",
+                "CROSS-REFERENCING KNOWLEDGE GRAPH...",
+                "VERIFICATION COMPLETE."
+            ];
+
+            let i = 0;
+            function addLine() {{
+                if (i < lines.length) {{
+                    const div = document.createElement('div');
+                    div.className = 'system2-line';
+                    div.innerText = '> ' + lines[i];
+                    div.style.opacity = 1;
+                    content.appendChild(div);
+                    i++;
+                    setTimeout(addLine, 400);
+                }} else {{
+                    setTimeout(() => {{
+                        overlay.style.display = 'none';
+                        showToast('DOCUMENT VERIFIED');
+                        if(status) status.innerText = "VERIFIED // AUTHENTICATED";
+                        if(status) status.style.color = "#aaffaa";
+                    }}, 1000);
+                }}
+            }}
+            addLine();
+        }}
+
         // Chart Injection Logic
         const metricsData = {metrics_json};
 
@@ -1096,8 +1192,8 @@ def generate_archive():
 
         # Entity HTML
         entity_html = ""
-        for t in item['entities']['tickers']: entity_html += f'<span class="tag ticker">${t}</span>'
-        for s in item['entities']['sovereigns']: entity_html += f'<span class="tag">{s}</span>'
+        for t in item['entities']['tickers']: entity_html += f'<a href="market_mayhem_archive.html?search={t}" class="tag ticker" style="text-decoration:none;">${t}</a>'
+        for s in item['entities']['sovereigns']: entity_html += f'<a href="market_mayhem_archive.html?search={s}" class="tag" style="text-decoration:none;">{s}</a>'
 
         # Agent HTML (with Avatars)
         agent_html = ""
@@ -1129,6 +1225,9 @@ def generate_archive():
         reviewer_match = re.search(r'Agent (\w+)', critique)
         reviewer_agent = reviewer_match.group(1) if reviewer_match else "SYSTEM"
 
+        # Serialize entire item as raw source
+        raw_source = json.dumps(item, default=str, indent=2)
+
         content = HTML_TEMPLATE.format(
             title=item["title"],
             date=item["date"],
@@ -1152,7 +1251,8 @@ def generate_archive():
             header_ui_display=header_ui_display,
             metadata_panel_display=metadata_panel_display,
             nav_display=nav_display,
-            reviewer_agent=reviewer_agent
+            reviewer_agent=reviewer_agent,
+            raw_source=raw_source
         )
 
         with open(out_path, "w", encoding='utf-8') as f:

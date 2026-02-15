@@ -14,13 +14,33 @@
 </head>
 <body class="tier-high">
 
+    <!-- System 2 Verification Overlay -->
+    <div id="system2-overlay" class="system2-overlay">
+        <div class="system2-terminal">
+            <div id="sys2-content"></div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="cyber-toast-container"></div>
+
+    <!-- Raw Source Modal -->
+    <div id="raw-source-modal" class="raw-source-modal">
+        <div class="raw-source-header">
+            <span>SOURCE_DATA.JSON</span>
+            <span style="cursor:pointer; color:#cc0000;" onclick="toggleSource()">[CLOSE]</span>
+        </div>
+        <div class="raw-source-content" id="raw-source-content"></div>
+    </div>
+
     <!-- Virtual Toolbar for High Tier -->
     <div class="doc-toolbar" style="display: flex;">
         <div class="toolbar-item" onclick="window.location.href='market_mayhem_archive.html'"><strong>FILE</strong></div>
-        <div class="toolbar-item">EDIT</div>
-        <div class="toolbar-item">VIEW</div>
-        <div class="toolbar-item">INSERT</div>
-        <div class="toolbar-item">FORMAT</div>
+        <div class="toolbar-item" onclick="showToast('EDIT MODE: READ ONLY (ARCHIVED)')">EDIT</div>
+        <div class="toolbar-item" onclick="toggleTheme()">VIEW</div>
+        <div class="toolbar-item" onclick="showToast('INSERT: PERMISSION DENIED')">INSERT</div>
+        <div class="toolbar-item" onclick="showToast('FORMAT: LOCKED')">FORMAT</div>
+        <div class="toolbar-item" onclick="runVerification()" style="color: #0078d7;"><strong>VERIFY</strong></div>
         <div style="flex-grow:1;"></div>
         <div class="toolbar-item" style="color:#666;">ADAM_V26_EDITOR</div>
     </div>
@@ -31,11 +51,11 @@
     </div>
 
     <div class="newsletter-wrapper">
-        <div class="paper-sheet">
+        <div class="paper-sheet" id="paper-sheet">
 
             <!-- High Tier Header UI -->
             <div class="doc-header-ui" style="display: flex;">
-                <span>CONFIDENTIAL // SYSTEM 2 REVIEW</span>
+                <span id="verification-status">CONFIDENTIAL // SYSTEM 2 REVIEW</span>
                 <span>015bae6c</span>
             </div>
 
@@ -151,7 +171,7 @@
                 </div>
             </div>
 
-            <a href="#" class="source-jump-btn" title="View Source JSON">JUMP TO SOURCE</a>
+            <a href="#" class="source-jump-btn" onclick="toggleSource(); return false;" title="View Source JSON">JUMP TO SOURCE</a>
 
             <div style="margin-top: 40px; border-top: 1px solid #ccc; padding-top: 20px; font-style: italic; color: #666;">
                 End of Transmission.
@@ -178,7 +198,7 @@
             <div class="sidebar-widget">
                 <div class="sidebar-title">Detected Entities</div>
                 <div class="tag-cloud">
-                    <span class="tag">CN</span><span class="tag">EU</span>
+                    <a href="market_mayhem_archive.html?search=CN" class="tag" style="text-decoration:none;">CN</a><a href="market_mayhem_archive.html?search=EU" class="tag" style="text-decoration:none;">EU</a>
                 </div>
             </div>
 
@@ -213,7 +233,108 @@
         </aside>
     </div>
 
+    <!-- Hidden Raw Data -->
+    <textarea id="hidden-raw-data" style="display:none;">{
+  "title": "\ud83d\udcd1 Equity Research Note: December 10, 2025",
+  "date": "2025-12-10",
+  "summary": "Market analysis and strategic insights.",
+  "type": "NEWSLETTER",
+  "full_body": "<strong>Coverage Update</strong>\n<h2>Key Metrics</h2>\n<strong>AAPL</strong>\n<ul>\n<li>Price: $277.18</li>\n<li>P/E: 37.2</li>\n<li>Vol: 31,711,233</li>\n</ul>\n<strong>AMZN</strong>\n<ul>\n<li>Price: $227.92</li>\n<li>P/E: 32.2</li>\n<li>Vol: 23,202,026</li>\n</ul>\n<strong>GOOGL</strong>\n<ul>\n<li>Price: $317.08</li>\n<li>P/E: 31.3</li>\n<li>Vol: 30,125,542</li>\n</ul>\n<strong>META</strong>\n<ul>\n<li>Price: $656.96</li>\n<li>P/E: 29.1</li>\n<li>Vol: 12,937,317</li>\n</ul>\n<strong>MSFT</strong>\n<ul>\n<li>Price: $492.02</li>\n<li>P/E: 35.0</li>\n<li>Vol: 14,081,114</li>\n</ul>\n<strong>NVDA</strong>\n<ul>\n<li>Price: $184.97</li>\n<li>P/E: 45.9</li>\n<li>Vol: 142,114,605</li>\n</ul>\n<strong>TSLA</strong>\n<ul>\n<li>Price: $445.17</li>\n<li>P/E: 307.0</li>\n<li>Vol: 60,868,108</li>\n</ul>\n<h2>Analyst Commentary</h2>\n<p>Recent news flow suggests increased volatility in the tech sector.</p>\n<ul>\n<li>  <strong>AAPL:</strong> What Trump's Nvidia China sales approval means for the Mag 7</li>\n</ul>\n<ul>\n<li>  <strong>NVDA:</strong> OpenAI CEO joins Jimmy Fallon following Nvidia CEO's Joe Rogan chat</li>\n</ul>\n<ul>\n<li>  <strong>TSLA:</strong> Stock market today: Dow, S&P 500, Nasdaq futures waver with Fed rate decision on deck</li>\n</ul>\n<ul>\n<li>  <strong>MSFT:</strong> What Trump's Nvidia China sales approval means for the Mag 7</li>\n</ul>\n<ul>\n<li>  <strong>GOOGL:</strong> Stock market today: Dow, S&P 500, Nasdaq futures waver with Fed rate decision on deck</li>\n</ul>\n<ul>\n<li>  <strong>AMZN:</strong> Oracle set to report earnings as Wall Street looks for cracks in the AI bubble</li>\n</ul>\n<ul>\n<li>  <strong>META:</strong> Slack's CEO is joining OpenAI to find the money to pay for all those data centers</li>\n</ul>\n<h2>Recommendation</h2>\n<strong>NEUTRAL</strong> on broad tech indices. <strong>BULLISH</strong> on sovereign silicon plays.\n<p>---\n<em>Generated by Adam v23.5</em></p>\n",
+  "sentiment_score": 100,
+  "entities": {
+    "tickers": [],
+    "agents": [],
+    "sovereigns": [
+      "CN",
+      "EU"
+    ]
+  },
+  "provenance_hash": "015bae6c227655b5a671caf5709b70c6c8c8726b6c9545f0ecc088bc51adcb5e",
+  "filename": "Equity_Research_20251210.html",
+  "is_sourced": true,
+  "metrics_json": "{}",
+  "source_priority": 2,
+  "conviction": 50,
+  "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 100/100. Cross-reference with knowledge graph completed.",
+  "quality": 100,
+  "semantic_score": 62,
+  "probability": 50
+}</textarea>
+
     <script>
+        // --- INTERACTION LOGIC ---
+
+        function showToast(msg) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'cyber-toast';
+            toast.innerText = '> ' + msg;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            showToast('THEME: ' + (isDark ? 'DARK_MODE' : 'LIGHT_MODE'));
+        }
+
+        function toggleSource() {
+            const modal = document.getElementById('raw-source-modal');
+            const content = document.getElementById('raw-source-content');
+            const rawData = document.getElementById('hidden-raw-data').value;
+
+            if (modal.style.display === 'flex') {
+                modal.style.display = 'none';
+            } else {
+                content.innerText = rawData || "NO SOURCE DATA AVAILABLE.";
+                modal.style.display = 'flex';
+            }
+        }
+
+        function runVerification() {
+            const overlay = document.getElementById('system2-overlay');
+            const content = document.getElementById('sys2-content');
+            const status = document.getElementById('verification-status');
+
+            overlay.style.display = 'flex';
+            content.innerHTML = '';
+
+            const lines = [
+                "INITIATING SYSTEM 2 PROTOCOL...",
+                "VERIFYING CRYPTOGRAPHIC SIGNATURE...",
+                "HASH: 015bae6c227655b5a671caf5709b70c6c8c8726b6c9545f0ecc088bc51adcb5e",
+                "CHECKING CHAIN OF CUSTODY...",
+                "ANALYZING SENTIMENT VECTORS...",
+                "CROSS-REFERENCING KNOWLEDGE GRAPH...",
+                "VERIFICATION COMPLETE."
+            ];
+
+            let i = 0;
+            function addLine() {
+                if (i < lines.length) {
+                    const div = document.createElement('div');
+                    div.className = 'system2-line';
+                    div.innerText = '> ' + lines[i];
+                    div.style.opacity = 1;
+                    content.appendChild(div);
+                    i++;
+                    setTimeout(addLine, 400);
+                } else {
+                    setTimeout(() => {
+                        overlay.style.display = 'none';
+                        showToast('DOCUMENT VERIFIED');
+                        if(status) status.innerText = "VERIFIED // AUTHENTICATED";
+                        if(status) status.style.color = "#aaffaa";
+                    }, 1000);
+                }
+            }
+            addLine();
+        }
+
         // Chart Injection Logic
         const metricsData = {};
 

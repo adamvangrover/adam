@@ -14,13 +14,33 @@
 </head>
 <body class="tier-high">
 
+    <!-- System 2 Verification Overlay -->
+    <div id="system2-overlay" class="system2-overlay">
+        <div class="system2-terminal">
+            <div id="sys2-content"></div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="cyber-toast-container"></div>
+
+    <!-- Raw Source Modal -->
+    <div id="raw-source-modal" class="raw-source-modal">
+        <div class="raw-source-header">
+            <span>SOURCE_DATA.JSON</span>
+            <span style="cursor:pointer; color:#cc0000;" onclick="toggleSource()">[CLOSE]</span>
+        </div>
+        <div class="raw-source-content" id="raw-source-content"></div>
+    </div>
+
     <!-- Virtual Toolbar for High Tier -->
     <div class="doc-toolbar" style="display: flex;">
         <div class="toolbar-item" onclick="window.location.href='market_mayhem_archive.html'"><strong>FILE</strong></div>
-        <div class="toolbar-item">EDIT</div>
-        <div class="toolbar-item">VIEW</div>
-        <div class="toolbar-item">INSERT</div>
-        <div class="toolbar-item">FORMAT</div>
+        <div class="toolbar-item" onclick="showToast('EDIT MODE: READ ONLY (ARCHIVED)')">EDIT</div>
+        <div class="toolbar-item" onclick="toggleTheme()">VIEW</div>
+        <div class="toolbar-item" onclick="showToast('INSERT: PERMISSION DENIED')">INSERT</div>
+        <div class="toolbar-item" onclick="showToast('FORMAT: LOCKED')">FORMAT</div>
+        <div class="toolbar-item" onclick="runVerification()" style="color: #0078d7;"><strong>VERIFY</strong></div>
         <div style="flex-grow:1;"></div>
         <div class="toolbar-item" style="color:#666;">ADAM_V26_EDITOR</div>
     </div>
@@ -31,11 +51,11 @@
     </div>
 
     <div class="newsletter-wrapper">
-        <div class="paper-sheet">
+        <div class="paper-sheet" id="paper-sheet">
 
             <!-- High Tier Header UI -->
             <div class="doc-header-ui" style="display: flex;">
-                <span>CONFIDENTIAL // SYSTEM 2 REVIEW</span>
+                <span id="verification-status">CONFIDENTIAL // SYSTEM 2 REVIEW</span>
                 <span>c08bc9a1</span>
             </div>
 
@@ -171,7 +191,7 @@
                 </div>
             </div>
 
-            <a href="#" class="source-jump-btn" title="View Source JSON">JUMP TO SOURCE</a>
+            <a href="#" class="source-jump-btn" onclick="toggleSource(); return false;" title="View Source JSON">JUMP TO SOURCE</a>
 
             <div style="margin-top: 40px; border-top: 1px solid #ccc; padding-top: 20px; font-style: italic; color: #666;">
                 End of Transmission.
@@ -198,7 +218,7 @@
             <div class="sidebar-widget">
                 <div class="sidebar-title">Detected Entities</div>
                 <div class="tag-cloud">
-                    <span class="tag">US</span><span class="tag">CN</span>
+                    <a href="market_mayhem_archive.html?search=US" class="tag" style="text-decoration:none;">US</a><a href="market_mayhem_archive.html?search=CN" class="tag" style="text-decoration:none;">CN</a>
                 </div>
             </div>
 
@@ -233,7 +253,108 @@
         </aside>
     </div>
 
+    <!-- Hidden Raw Data -->
+    <textarea id="hidden-raw-data" style="display:none;">{
+  "title": "\ud83c\udfed Industry Report: December 10, 2025",
+  "date": "2025-12-10",
+  "summary": "Market analysis and strategic insights.",
+  "type": "INDUSTRY_REPORT",
+  "full_body": "<strong>Sector Focus: Technology & AI</strong>\n<h2>\ud83d\udcca Sector Performance</h2>\n<p>| Company | Price | P/E | Market Cap |\n| :--- | :--- | :--- | :--- |</p>\n<p>| <strong>AAPL</strong> | $277.18 | 37.2 | $4,113B |</p>\n<p>| <strong>AMZN</strong> | $227.92 | 32.2 | $2,437B |</p>\n<p>| <strong>GOOGL</strong> | $317.08 | 31.3 | $3,841B |</p>\n<p>| <strong>META</strong> | $656.96 | 29.1 | $1,656B |</p>\n<p>| <strong>MSFT</strong> | $492.02 | 35.0 | $3,657B |</p>\n<p>| <strong>NVDA</strong> | $184.97 | 45.9 | $4,503B |</p>\n<p>| <strong>TSLA</strong> | $445.17 | 307.0 | $1,481B |</p>\n<h2>\ud83d\udcf0 Sector News</h2>\n<strong>AAPL</strong>\n<ul>\n<li>What Trump's Nvidia China sales approval means for the Mag 7</li>\n</ul>\n<ul>\n<li>Disney nominates former Apple COO to its board</li>\n</ul>\n<ul>\n<li>Apple Stock Gets Three Price-Target Hikes. Here's Why.</li>\n</ul>\n<br>\n<strong>NVDA</strong>\n<ul>\n<li>OpenAI CEO joins Jimmy Fallon following Nvidia CEO's Joe Rogan chat</li>\n</ul>\n<ul>\n<li>Trump tariffs live updates: Trump floats 'some' additional tariff carveouts; US unveils $12B farmer bailout</li>\n</ul>\n<ul>\n<li>How Nvidia selling in China helps 'propel the market forward'</li>\n</ul>\n<br>\n<strong>TSLA</strong>\n<ul>\n<li>Stock market today: Dow, S&P 500, Nasdaq futures waver with Fed rate decision on deck</li>\n</ul>\n<ul>\n<li>How Mag 7's lead over other stocks could shrink in 2026</li>\n</ul>\n<ul>\n<li>Dow Jones Futures: GE Vernova Jumps Late; Fed Decision Looms</li>\n</ul>\n<br>\n<strong>MSFT</strong>\n<ul>\n<li>What Trump's Nvidia China sales approval means for the Mag 7</li>\n</ul>\n<ul>\n<li>Trump approves Nvidia H200 chips for sale to China</li>\n</ul>\n<ul>\n<li>2 Things Every Iren Investor Needs to know</li>\n</ul>\n<br>\n<strong>GOOGL</strong>\n<ul>\n<li>Stock market today: Dow, S&P 500, Nasdaq futures waver with Fed rate decision on deck</li>\n</ul>\n<ul>\n<li>Tesla unsupervised FSD milestone 'very close,' Piper Sandler says</li>\n</ul>\n<ul>\n<li>Trump approves Nvidia H200 chips for sale to China</li>\n</ul>\n<br>\n<strong>AMZN</strong>\n<ul>\n<li>Oracle set to report earnings as Wall Street looks for cracks in the AI bubble</li>\n</ul>\n<ul>\n<li>Trump approves Nvidia H200 chips for sale to China</li>\n</ul>\n<ul>\n<li>Dave Ramsey Reacts To A Father Trying To Bribe His Son For Control Of A $300K Trust. 'What Planet Does He Live On?'</li>\n</ul>\n<br>\n<strong>META</strong>\n<ul>\n<li>Slack's CEO is joining OpenAI to find the money to pay for all those data centers</li>\n</ul>\n<ul>\n<li>How Mag 7's lead over other stocks could shrink in 2026</li>\n</ul>\n<ul>\n<li>Trump approves Nvidia H200 chips for sale to China</li>\n</ul>\n<br>\n<p>---\n<em>Generated by Adam v23.5</em></p>\n",
+  "sentiment_score": 50,
+  "entities": {
+    "tickers": [],
+    "agents": [],
+    "sovereigns": [
+      "US",
+      "CN"
+    ]
+  },
+  "provenance_hash": "c08bc9a179934b0d855844cc80658730106e6553a512612d6b22482b2ed9127c",
+  "filename": "Industry_Report_20251210.html",
+  "is_sourced": true,
+  "metrics_json": "{}",
+  "source_priority": 2,
+  "conviction": 0,
+  "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 50/100. Cross-reference with knowledge graph completed.",
+  "quality": 100,
+  "semantic_score": 57,
+  "probability": 0
+}</textarea>
+
     <script>
+        // --- INTERACTION LOGIC ---
+
+        function showToast(msg) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'cyber-toast';
+            toast.innerText = '> ' + msg;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            showToast('THEME: ' + (isDark ? 'DARK_MODE' : 'LIGHT_MODE'));
+        }
+
+        function toggleSource() {
+            const modal = document.getElementById('raw-source-modal');
+            const content = document.getElementById('raw-source-content');
+            const rawData = document.getElementById('hidden-raw-data').value;
+
+            if (modal.style.display === 'flex') {
+                modal.style.display = 'none';
+            } else {
+                content.innerText = rawData || "NO SOURCE DATA AVAILABLE.";
+                modal.style.display = 'flex';
+            }
+        }
+
+        function runVerification() {
+            const overlay = document.getElementById('system2-overlay');
+            const content = document.getElementById('sys2-content');
+            const status = document.getElementById('verification-status');
+
+            overlay.style.display = 'flex';
+            content.innerHTML = '';
+
+            const lines = [
+                "INITIATING SYSTEM 2 PROTOCOL...",
+                "VERIFYING CRYPTOGRAPHIC SIGNATURE...",
+                "HASH: c08bc9a179934b0d855844cc80658730106e6553a512612d6b22482b2ed9127c",
+                "CHECKING CHAIN OF CUSTODY...",
+                "ANALYZING SENTIMENT VECTORS...",
+                "CROSS-REFERENCING KNOWLEDGE GRAPH...",
+                "VERIFICATION COMPLETE."
+            ];
+
+            let i = 0;
+            function addLine() {
+                if (i < lines.length) {
+                    const div = document.createElement('div');
+                    div.className = 'system2-line';
+                    div.innerText = '> ' + lines[i];
+                    div.style.opacity = 1;
+                    content.appendChild(div);
+                    i++;
+                    setTimeout(addLine, 400);
+                } else {
+                    setTimeout(() => {
+                        overlay.style.display = 'none';
+                        showToast('DOCUMENT VERIFIED');
+                        if(status) status.innerText = "VERIFIED // AUTHENTICATED";
+                        if(status) status.style.color = "#aaffaa";
+                    }, 1000);
+                }
+            }
+            addLine();
+        }
+
         // Chart Injection Logic
         const metricsData = {};
 
