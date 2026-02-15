@@ -128,11 +128,10 @@ class AdamNavigator {
     _getMenuConfig() {
         return [
             { name: 'Mission Control', icon: 'fa-tachometer-alt', link: 'index.html' },
+            { name: 'Mission Control v3', icon: 'fa-satellite-dish', link: 'mission_control_v3.html' },
+            { name: 'Analytics Hub', icon: 'fa-chart-pie', link: 'analytics_hub.html' },
             { name: 'Chat Portal', icon: 'fa-comments', link: 'chat.html' },
             { name: 'Terminal', icon: 'fa-terminal', link: 'terminal.html' },
-            { type: 'divider' },
-            { name: 'System Evolution', icon: 'fa-history', link: 'evolution_v2.html' },
-            { name: 'Market Archive', icon: 'fa-archive', link: 'archive_v2/index.html' },
             { type: 'divider' },
             { name: 'System Evolution', icon: 'fa-history', link: 'evolution_v2.html' },
             { name: 'Market Archive', icon: 'fa-archive', link: 'archive_v2/index.html' },

@@ -43,20 +43,30 @@ def analyze_sentiment(text):
     return int(score)
 
 def extract_entities(text):
-    """Extracts Tickers ($AAPL) and Agents (@AgentName) and potential Sovereigns."""
+    """Extracts Tickers ($AAPL), Agents (@AgentName), Sovereigns, and Keywords."""
     tickers = sorted(list(set(re.findall(r'\$([A-Z]{2,5})', text))))
     agents = sorted(list(set(re.findall(r'@([A-Za-z0-9_]+)', text))))
 
-    # Simple heuristic for Sovereigns/Countries
+    # Enhanced Sovereign Detection
     sovereigns = []
-    if "United States" in text or "US" in text: sovereigns.append("US")
-    if "China" in text: sovereigns.append("CN")
-    if "Europe" in text or "EU" in text: sovereigns.append("EU")
+    if "United States" in text or "US" in text or "Fed" in text: sovereigns.append("US_FED")
+    if "China" in text or "PBOC" in text: sovereigns.append("CN_PBOC")
+    if "Europe" in text or "ECB" in text: sovereigns.append("EU_ECB")
+    if "Japan" in text or "BOJ" in text: sovereigns.append("JP_BOJ")
+
+    # Keywords (Fallback Tags)
+    keywords = []
+    common_terms = ["Inflation", "Recession", "AI", "Crypto", "Bitcoin", "Ethereum", "Gold", "Oil", "Tech", "Energy", "Banks", "Housing", "Retail", "Supply Chain", "Labor", "Yields", "Bonds", "Equities", "Volatility", "Growth", "Value", "Quality", "Momentum", "Dividend", "IPO", "SPAC", "NFT", "DeFi", "Web3", "Metaverse", "Cloud", "SaaS", "Cybersecurity", "Semiconductors", "EV", "Green Energy", "ESG"]
+
+    for term in common_terms:
+        if term.lower() in text.lower():
+            keywords.append(term)
 
     return {
         "tickers": tickers,
         "agents": agents,
-        "sovereigns": sovereigns
+        "sovereigns": list(set(sovereigns)),
+        "keywords": sorted(list(set(keywords)))[:5]  # Limit to 5 keywords
     }
 
 def calculate_conviction(text):
@@ -664,6 +674,8 @@ def parse_html_file(filepath):
         elif "glitch" in lower_title: type_ = "CYBER_GLITCH"
         elif "outlook" in lower_title or "strategy" in lower_title: type_ = "STRATEGY"
         elif "snc" in lower_title: type_ = "GUIDE"
+        elif "counterfactual" in lower_title: type_ = "COUNTERFACTUAL"
+        elif "audit" in lower_title: type_ = "SYSTEM_AUDIT"
 
         sentiment = analyze_sentiment(content)
         entities = extract_entities(content)
@@ -857,6 +869,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="js/nav.js" defer></script>
+    <script src="js/market_mayhem_viewer.js" defer></script>
 </head>
 <body class="{tier_class}">
 
@@ -1012,79 +1025,6 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     <textarea id="hidden-raw-data" style="display:none;">{raw_source}</textarea>
 
     <script>
-        // --- INTERACTION LOGIC ---
-
-        function showToast(msg) {{
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            toast.className = 'cyber-toast';
-            toast.innerText = '> ' + msg;
-            container.appendChild(toast);
-            setTimeout(() => {{
-                toast.style.opacity = '0';
-                setTimeout(() => toast.remove(), 300);
-            }}, 3000);
-        }}
-
-        function toggleTheme() {{
-            document.body.classList.toggle('dark-mode');
-            const isDark = document.body.classList.contains('dark-mode');
-            showToast('THEME: ' + (isDark ? 'DARK_MODE' : 'LIGHT_MODE'));
-        }}
-
-        function toggleSource() {{
-            const modal = document.getElementById('raw-source-modal');
-            const content = document.getElementById('raw-source-content');
-            const rawData = document.getElementById('hidden-raw-data').value;
-
-            if (modal.style.display === 'flex') {{
-                modal.style.display = 'none';
-            }} else {{
-                content.innerText = rawData || "NO SOURCE DATA AVAILABLE.";
-                modal.style.display = 'flex';
-            }}
-        }}
-
-        function runVerification() {{
-            const overlay = document.getElementById('system2-overlay');
-            const content = document.getElementById('sys2-content');
-            const status = document.getElementById('verification-status');
-
-            overlay.style.display = 'flex';
-            content.innerHTML = '';
-
-            const lines = [
-                "INITIATING SYSTEM 2 PROTOCOL...",
-                "VERIFYING CRYPTOGRAPHIC SIGNATURE...",
-                "HASH: {prov_hash}",
-                "CHECKING CHAIN OF CUSTODY...",
-                "ANALYZING SENTIMENT VECTORS...",
-                "CROSS-REFERENCING KNOWLEDGE GRAPH...",
-                "VERIFICATION COMPLETE."
-            ];
-
-            let i = 0;
-            function addLine() {{
-                if (i < lines.length) {{
-                    const div = document.createElement('div');
-                    div.className = 'system2-line';
-                    div.innerText = '> ' + lines[i];
-                    div.style.opacity = 1;
-                    content.appendChild(div);
-                    i++;
-                    setTimeout(addLine, 400);
-                }} else {{
-                    setTimeout(() => {{
-                        overlay.style.display = 'none';
-                        showToast('DOCUMENT VERIFIED');
-                        if(status) status.innerText = "VERIFIED // AUTHENTICATED";
-                        if(status) status.style.color = "#aaffaa";
-                    }}, 1000);
-                }}
-            }}
-            addLine();
-        }}
-
         // Chart Injection Logic
         const metricsData = {metrics_json};
 
@@ -1236,6 +1176,10 @@ def generate_archive():
         entity_html = ""
         for t in item['entities']['tickers']: entity_html += f'<a href="market_mayhem_archive.html?search={t}" class="tag ticker" style="text-decoration:none;">${t}</a>'
         for s in item['entities']['sovereigns']: entity_html += f'<a href="market_mayhem_archive.html?search={s}" class="tag" style="text-decoration:none;">{s}</a>'
+        for k in item['entities'].get('keywords', []): entity_html += f'<a href="market_mayhem_archive.html?search={k}" class="tag" style="text-decoration:none; border-color:#666;">{k}</a>'
+
+        if not entity_html:
+            entity_html = f'<span class="tag" style="border-color:#444;">{item["type"]}</span>'
 
         # Agent HTML (with Avatars)
         agent_html = ""
@@ -1636,6 +1580,15 @@ def generate_archive():
             document.getElementById('searchInput').value = term;
             applyFilters();
         }
+
+        // Initialize from URL params
+        window.addEventListener('DOMContentLoaded', () => {
+            const params = new URLSearchParams(window.location.search);
+            const search = params.get('search');
+            if (search) {
+                setSearch(search);
+            }
+        });
     </script>
 </body>
 </html>
