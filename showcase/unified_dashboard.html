@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM PROTOCOL: UNIFIED COMMAND</title>
+
+    <!-- Dependencies -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/cyber_glitch.css">
+
+    <style>
+        body {
+            background-color: #050505;
+            background-image:
+                radial-gradient(circle at 50% 50%, rgba(20, 30, 40, 0.4) 0%, rgba(0,0,0,0.8) 100%),
+                url('https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=2070&auto=format&fit=crop');
+            background-size: cover;
+            background-attachment: fixed;
+            color: #e0e0e0;
+            font-family: 'Share Tech Mono', monospace;
+            overflow-x: hidden;
+        }
+
+        .glass-panel {
+            background: rgba(10, 15, 20, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .glass-panel:hover {
+            border-color: rgba(0, 243, 255, 0.5);
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .nav-btn {
+            background: linear-gradient(90deg, transparent, rgba(0, 243, 255, 0.1));
+            border-left: 2px solid rgba(0, 243, 255, 0.3);
+            color: #aaa;
+            transition: all 0.2s;
+        }
+        .nav-btn:hover, .nav-btn.active {
+            background: linear-gradient(90deg, rgba(0, 243, 255, 0.1), rgba(0, 243, 255, 0.2));
+            border-left-color: #00f3ff;
+            color: #fff;
+            padding-left: 1.5rem;
+        }
+
+        /* Iframe Container */
+        #viewport-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            border: 1px solid rgba(0, 255, 0, 0.2);
+            background: #000;
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+    </style>
+</head>
+<body class="h-screen flex flex-col overflow-hidden">
+
+    <!-- Header -->
+    <header class="h-14 bg-black/80 border-b border-cyan-900 flex items-center justify-between px-6 z-50">
+        <div class="flex items-center gap-4">
+            <div class="text-2xl font-bold text-cyan-400 tracking-tighter glitch-text" data-text="ADAM PROTOCOL">ADAM PROTOCOL</div>
+            <div class="h-6 w-px bg-gray-700"></div>
+            <div class="text-xs text-gray-400 font-mono">ARCHITECT_INFINITE // UNIFIED COMMAND</div>
+        </div>
+
+        <div class="flex items-center gap-6">
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                <span class="text-xs text-green-400">SYSTEM ONLINE</span>
+            </div>
+            <div class="text-xs text-gray-500" id="clock">00:00:00</div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="flex-1 flex overflow-hidden">
+
+        <!-- Sidebar Navigation -->
+        <aside class="w-64 bg-black/60 border-r border-cyan-900/50 flex flex-col backdrop-blur-md">
+            <div class="p-4">
+                <div class="text-xs font-bold text-gray-500 mb-2 uppercase tracking-widest">Modules</div>
+                <nav class="flex flex-col gap-1">
+                    <button class="nav-btn w-full text-left px-4 py-3 text-sm flex items-center gap-3 active" onclick="loadView('adam_os_v30.html')">
+                        <i class="fas fa-microchip w-5 text-center"></i> ADAM OS v30
+                    </button>
+                    <button class="nav-btn w-full text-left px-4 py-3 text-sm flex items-center gap-3" onclick="loadView('market_mayhem_archive.html')">
+                        <i class="fas fa-chart-line w-5 text-center"></i> Market Mayhem
+                    </button>
+                    <button class="nav-btn w-full text-left px-4 py-3 text-sm flex items-center gap-3" onclick="loadView('credit_memo_automation.html')">
+                        <i class="fas fa-file-contract w-5 text-center"></i> Credit Intel
+                    </button>
+                    <button class="nav-btn w-full text-left px-4 py-3 text-sm flex items-center gap-3" onclick="loadView('mission_control_v2.html')">
+                        <i class="fas fa-satellite-dish w-5 text-center"></i> Mission Control
+                    </button>
+                </nav>
+
+                <div class="mt-8 text-xs font-bold text-gray-500 mb-2 uppercase tracking-widest">External</div>
+                <nav class="flex flex-col gap-1">
+                    <a href="../webapp/" target="_blank" class="nav-btn w-full text-left px-4 py-3 text-sm flex items-center gap-3 hover:text-cyan-300">
+                        <i class="fas fa-external-link-alt w-5 text-center"></i> Neural WebApp
+                        <span class="ml-auto text-[10px] border border-gray-600 px-1 rounded">REACT</span>
+                    </a>
+                </nav>
+            </div>
+
+            <!-- Widget Area -->
+            <div class="mt-auto p-4 border-t border-cyan-900/50">
+                <div id="crypto-arbitrage-widget" class="glass-panel p-3 rounded">
+                    <!-- Widget Injected Here -->
+                </div>
+            </div>
+        </aside>
+
+        <!-- Viewport -->
+        <main class="flex-1 relative bg-black">
+            <div id="viewport-container">
+                <iframe id="main-frame" src="adam_os_v30.html"></iframe>
+            </div>
+
+            <!-- Overlay Loading -->
+            <div id="loader" class="absolute inset-0 bg-black flex items-center justify-center z-10 pointer-events-none opacity-0 transition-opacity duration-500">
+                <div class="text-cyan-500 font-mono animate-pulse">ESTABLISHING UPLINK...</div>
+            </div>
+        </main>
+
+    </div>
+
+    <script src="js/crypto_arbitrage_widget.js"></script>
+    <script>
+        // Clock
+        setInterval(() => {
+            const now = new Date();
+            document.getElementById('clock').innerText = now.toISOString().split('T')[1].split('.')[0] + " UTC";
+        }, 1000);
+
+        // View Loader
+        function loadView(url) {
+            const frame = document.getElementById('main-frame');
+            const loader = document.getElementById('loader');
+
+            // Highlight active button
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+
+            // Animation
+            loader.style.opacity = '1';
+
+            setTimeout(() => {
+                frame.src = url;
+                frame.onload = () => {
+                    loader.style.opacity = '0';
+                };
+            }, 300);
+        }
+    </script>
+</body>
+</html>
