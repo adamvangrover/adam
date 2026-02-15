@@ -36,8 +36,31 @@ class TestingConfig(Config):
     CORE_INTEGRATION = False
 
 
+class ProductionConfig(Config):
+    """
+    🛡️ Sentinel: Production configuration.
+    - DEBUG is False
+    - Requires SECRET_KEY to be set
+    - Logs to stdout/stderr for container orchestration
+    """
+    DEBUG = False
+    TESTING = False
+
+    @classmethod
+    def init_app(cls, app):
+        Config.init_app(app)
+
+        # Log to stderr
+        import logging
+        from logging import StreamHandler
+        file_handler = StreamHandler()
+        file_handler.setLevel(logging.INFO)
+        app.logger.addHandler(file_handler)
+
+
 config = {
     'development': DevelopmentConfig,
     'testing': TestingConfig,
-    'default': DevelopmentConfig
+    'production': ProductionConfig,
+    'default': ProductionConfig
 }
