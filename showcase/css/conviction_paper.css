@@ -4,7 +4,7 @@
     --ink-color: #222;
     --accent-red: #cc0000;
     --font-serif: 'Georgia', 'Times New Roman', serif;
-    --font-mono: 'Courier New', monospace;
+    --font-mono: 'JetBrains Mono', 'Courier New', monospace;
     --binder-bg: #1a1a1a;
 }
 
@@ -33,7 +33,7 @@ body {
     box-sizing: border-box;
     z-index: 1000;
     border-bottom: 2px solid #333;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: var(--font-mono);
 }
 
 .binder-btn {
@@ -45,6 +45,7 @@ body {
     font-size: 0.9rem;
     transition: all 0.2s;
     text-transform: uppercase;
+    font-family: var(--font-mono);
 }
 .binder-btn:hover {
     background: #444;
@@ -72,6 +73,7 @@ body {
     justify-content: center;
     padding-bottom: 50px;
     min-height: calc(100vh - 130px);
+    position: relative; /* For binder rings positioning context */
 }
 
 .paper-sheet {
@@ -84,6 +86,7 @@ body {
     position: relative;
     font-size: 12pt;
     line-height: 1.6;
+    overflow: hidden; /* Keep watermark contained */
 }
 
 /* Texture Effect & Binder Holes */
@@ -94,12 +97,58 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
+    /* Noise texture + Gradient + Holes */
     background-image:
-        radial-gradient(circle at 15px 50px, #333 6px, transparent 7px),
-        radial-gradient(circle at 15px 50%, #333 6px, transparent 7px),
-        radial-gradient(circle at 15px calc(100% - 50px), #333 6px, transparent 7px),
-        url("data:image/svg+xml,%3Csvg width='4' height='4' viewBox='0 0 4 4' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 3h1v1H1V3zm2-2h1v1H3V1z' fill='%23000000' fill-opacity='0.02' fill-rule='evenodd'/%3E%3C/svg%3E");
+        radial-gradient(circle at 15px 50px, #222 6px, transparent 7px),
+        radial-gradient(circle at 15px 50%, #222 6px, transparent 7px),
+        radial-gradient(circle at 15px calc(100% - 50px), #222 6px, transparent 7px),
+        url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
     pointer-events: none;
+    z-index: 1;
+}
+
+/* Watermark */
+.watermark {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-45deg);
+    font-size: 6rem;
+    color: rgba(0, 0, 0, 0.03);
+    font-family: 'Stencil', var(--font-mono);
+    white-space: nowrap;
+    border: 8px solid rgba(0,0,0,0.03);
+    padding: 20px 40px;
+    text-transform: uppercase;
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Binder Rings Visuals */
+.binder-rings-container {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    transform: translateX(calc(-105mm + 5px)); /* Position relative to center - half width + offset */
+    height: 100%;
+    width: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 50px 0; /* Align with holes */
+    box-sizing: border-box;
+    pointer-events: none;
+    z-index: 10;
+}
+
+.binder-ring {
+    width: 40px;
+    height: 25px;
+    background: linear-gradient(90deg, #333 0%, #888 20%, #ddd 50%, #888 80%, #333 100%);
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.6);
+    position: relative;
+    left: -20px; /* Overlap the edge */
 }
 
 /* Typography */
@@ -113,6 +162,8 @@ h1.headline {
     padding-bottom: 10px;
     margin-bottom: 30px;
     letter-spacing: 1px;
+    position: relative;
+    z-index: 2;
 }
 
 h2 {
@@ -121,6 +172,8 @@ h2 {
     border-bottom: 1px solid #ccc;
     padding-bottom: 5px;
     margin-top: 30px;
+    position: relative;
+    z-index: 2;
 }
 
 .meta-header {
@@ -131,31 +184,46 @@ h2 {
     border-bottom: 1px solid #000;
     padding-bottom: 5px;
     margin-bottom: 20px;
+    position: relative;
+    z-index: 2;
 }
 
 .conviction-stamp {
     position: absolute;
     top: 30px;
     right: 30px;
-    border: 3px solid var(--accent-red);
+    border: 4px solid var(--accent-red);
     color: var(--accent-red);
     font-family: 'Stencil', var(--font-mono);
     font-size: 1.5rem;
-    padding: 10px;
+    padding: 10px 20px;
     transform: rotate(-15deg);
-    opacity: 0.8;
+    opacity: 0.85;
     text-transform: uppercase;
     font-weight: bold;
+    mix-blend-mode: multiply;
+    z-index: 5;
+    mask-image: url("data:image/svg+xml,%3Csvg width='200' height='100' viewBox='0 0 200 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' fill='white'/%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.3'/%3E%3C/svg%3E");
+    mask-mode: alpha;
+    background-color: rgba(204, 0, 0, 0.05);
 }
 
 .footer-note {
     margin-top: 50px;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     text-align: center;
     font-style: italic;
     color: #666;
     border-top: 1px solid #ccc;
     padding-top: 10px;
+    font-family: var(--font-mono);
+    position: relative;
+    z-index: 2;
+}
+
+.article-body {
+    position: relative;
+    z-index: 2;
 }
 
 /* Print Styles */
@@ -163,7 +231,7 @@ h2 {
     body {
         background: #fff;
     }
-    .binder-nav {
+    .binder-nav, .binder-rings-container {
         display: none;
     }
     .binder-container {
@@ -177,26 +245,14 @@ h2 {
         min-height: auto;
         page-break-after: always;
         padding: 20mm; /* Restore standard padding */
+        overflow: visible;
     }
     .paper-sheet::before {
         display: none; /* Remove texture/holes for clean print */
     }
-
-    /* Watermark for Print */
-    .paper-sheet::after {
-        content: "TOP SECRET // MARKET MAYHEM";
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%) rotate(-45deg);
-        font-size: 4rem;
-        color: rgba(0, 0, 0, 0.05);
-        font-family: 'Stencil', 'Courier New', monospace;
-        z-index: 9999;
-        pointer-events: none;
-        white-space: nowrap;
-        border: 5px solid rgba(0,0,0,0.05);
-        padding: 20px;
-        text-transform: uppercase;
+    .watermark {
+        display: block; /* Ensure watermark prints if desired, or hide it */
+        border-color: rgba(0,0,0,0.1);
+        color: rgba(0,0,0,0.1);
     }
 }
