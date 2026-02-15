@@ -14,13 +14,33 @@
 </head>
 <body class="tier-high">
 
+    <!-- System 2 Verification Overlay -->
+    <div id="system2-overlay" class="system2-overlay">
+        <div class="system2-terminal">
+            <div id="sys2-content"></div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="cyber-toast-container"></div>
+
+    <!-- Raw Source Modal -->
+    <div id="raw-source-modal" class="raw-source-modal">
+        <div class="raw-source-header">
+            <span>SOURCE_DATA.JSON</span>
+            <span style="cursor:pointer; color:#cc0000;" onclick="toggleSource()">[CLOSE]</span>
+        </div>
+        <div class="raw-source-content" id="raw-source-content"></div>
+    </div>
+
     <!-- Virtual Toolbar for High Tier -->
     <div class="doc-toolbar" style="display: flex;">
         <div class="toolbar-item" onclick="window.location.href='market_mayhem_archive.html'"><strong>FILE</strong></div>
-        <div class="toolbar-item">EDIT</div>
-        <div class="toolbar-item">VIEW</div>
-        <div class="toolbar-item">INSERT</div>
-        <div class="toolbar-item">FORMAT</div>
+        <div class="toolbar-item" onclick="showToast('EDIT MODE: READ ONLY (ARCHIVED)')">EDIT</div>
+        <div class="toolbar-item" onclick="toggleTheme()">VIEW</div>
+        <div class="toolbar-item" onclick="showToast('INSERT: PERMISSION DENIED')">INSERT</div>
+        <div class="toolbar-item" onclick="showToast('FORMAT: LOCKED')">FORMAT</div>
+        <div class="toolbar-item" onclick="runVerification()" style="color: #0078d7;"><strong>VERIFY</strong></div>
         <div style="flex-grow:1;"></div>
         <div class="toolbar-item" style="color:#666;">ADAM_V26_EDITOR</div>
     </div>
@@ -31,11 +51,11 @@
     </div>
 
     <div class="newsletter-wrapper">
-        <div class="paper-sheet">
+        <div class="paper-sheet" id="paper-sheet">
 
             <!-- High Tier Header UI -->
             <div class="doc-header-ui" style="display: flex;">
-                <span>CONFIDENTIAL // SYSTEM 2 REVIEW</span>
+                <span id="verification-status">CONFIDENTIAL // SYSTEM 2 REVIEW</span>
                 <span>499cfc01</span>
             </div>
 
@@ -80,7 +100,7 @@
                 </div>
             </div>
 
-            <a href="#" class="source-jump-btn" title="View Source JSON">JUMP TO SOURCE</a>
+            <a href="#" class="source-jump-btn" onclick="toggleSource(); return false;" title="View Source JSON">JUMP TO SOURCE</a>
 
             <div style="margin-top: 40px; border-top: 1px solid #ccc; padding-top: 20px; font-style: italic; color: #666;">
                 End of Transmission.
@@ -142,7 +162,104 @@
         </aside>
     </div>
 
+    <!-- Hidden Raw Data -->
+    <textarea id="hidden-raw-data" style="display:none;">{
+  "title": "Microsoft Corporation (MSFT) Report",
+  "date": "2025-02-24",
+  "summary": "Microsoft demonstrates robust financial performance driven by cloud and productivity growth. Despite challenges in gaming and regulatory scrutiny, strategic AI investments and the Activision Blizzard acquisition position it for continued market leadership.",
+  "type": "COMPANY_REPORT",
+  "full_body": "<h2>Executive Summary</h2><p>Microsoft demonstrates robust financial performance driven by cloud and productivity growth. Despite challenges in gaming and regulatory scrutiny, strategic AI investments and the Activision Blizzard acquisition position it for continued market leadership.</p><h2>Segments</h2><ul><li><strong>name:</strong> Productivity and Business Processes, <strong>revenue_growth:</strong> 13%, <strong>key_drivers:</strong> ['Microsoft 365 Commercial cloud', 'LinkedIn', 'Dynamics 365'], <strong>highlights:</strong> ['Microsoft 365 Commercial cloud revenue grew 16% driven by seat growth and increased revenue per user.', 'LinkedIn revenue increased 9% demonstrating continued strength in professional networking and talent acquisition.', 'Dynamics 365 revenue surged by 19% due to growth across all workloads.']</li><li><strong>name:</strong> Intelligent Cloud, <strong>revenue_growth:</strong> 19%, <strong>key_drivers:</strong> ['Azure and other cloud services'], <strong>highlights:</strong> ['Azure and other cloud services revenue grew 32%, with AI services growing 178%.'], <strong>concerns:</strong> ['Slight decline in Server products revenue due to tough comparison with prior year.']</li><li><strong>name:</strong> More Personal Computing, <strong>revenue_growth:</strong> 7%, <strong>key_drivers:</strong> ['Xbox content and services', 'Search and news advertising'], <strong>highlights:</strong> ['Windows OEM and Devices revenue increased 3% due to commercial inventory builds.', 'Xbox content and services revenue increased 24% driven by Game Pass and the Activision Blizzard acquisition.', 'Search and news advertising revenue excluding traffic acquisition costs increased 20%.'], <strong>concerns:</strong> ['Xbox hardware revenue decreased 29% due to lower console sales.']</li></ul><h2>Competitive Landscape</h2><h3>Cloud Computing</h3><h4>Main Competitors</h4><ul><li>Amazon Web Services (AWS)</li><li>Google Cloud Platform (GCP)</li></ul><h4>Microsoft Differentiators</h4><ul><li>Hybrid cloud offerings</li><li>Strong enterprise relationships</li></ul><h3>Productivity Software</h3><h4>Main Competitors</h4><ul><li>Google Workspace</li></ul><h4>Microsoft Differentiators</h4><ul><li>Entrenched position in the enterprise market</li><li>Comprehensive offerings</li></ul><h3>Gaming</h3><h4>Main Competitors</h4><ul><li>Sony PlayStation</li><li>Nintendo</li><li>Mobile gaming platforms</li></ul><h4>Microsoft Differentiators</h4><ul><li>Xbox Game Pass</li><li>Activision Blizzard acquisition (pending)</li><li>Cloud gaming</li></ul><h2>Activision Blizzard Acquisition</h2><h3>Opportunities</h3><ul><li>Expanding Game Pass with popular franchises</li><li>Mobile gaming expansion through titles like Candy Crush</li><li>Accelerated metaverse ambitions</li></ul><h3>Challenges</h3><ul><li>Regulatory scrutiny and potential antitrust concerns</li><li>Complexity of integrating a large organization</li><li>Potential cultural clashes</li></ul><h2>Ai Strategy</h2><ul><li>Integrating AI capabilities into existing products (Microsoft 365, Dynamics 365, Bing)</li><li>Developing new AI-powered products and services (Azure AI platform, Copilot)</li><li>Strategic partnership with OpenAI for cutting-edge research and models</li></ul><h2>Trading Levels</h2><h3>Equity</h3><h4>Outlook</h4><p>Positive</p><h4>Price Target</h4><p>450</p><h4>Potential Upside</h4><p>12.5%</p><h3>Debt</h3><h4>Credit Rating</h4><p>AAA</p><h4>Spread To Treasuries</h4><p>50-70 basis points (example for 3.125% Notes due 2028)</p><h4>Outlook</h4><p>Stable</p><h2>Valuation</h2><h3>Model</h3><p>Discounted Cash Flow (DCF)</p><h3>Assumptions</h3><h4>Revenue Growth</h4><p>15% (next 5 years)</p><h4>Operating Margin</h4><p>42% (long-term)</p><h4>Discount Rate</h4><p>8%</p><h4>Terminal Growth Rate</h4><p>4%</p><h3>Price Target</h3><p>450</p>",
+  "sentiment_score": 97,
+  "entities": {
+    "tickers": [],
+    "agents": [],
+    "sovereigns": []
+  },
+  "provenance_hash": "499cfc0153350b0ca708fa0fbe94217a7429cadbd39b462ac7b4a1b5096a6528",
+  "filename": "msft_company_report_20250224.html",
+  "is_sourced": true,
+  "metrics_json": "{}",
+  "source_priority": 2,
+  "conviction": 0,
+  "semantic_score": 37,
+  "probability": 0,
+  "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 97/100. Cross-reference with knowledge graph completed."
+}</textarea>
+
     <script>
+        // --- INTERACTION LOGIC ---
+
+        function showToast(msg) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'cyber-toast';
+            toast.innerText = '> ' + msg;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            showToast('THEME: ' + (isDark ? 'DARK_MODE' : 'LIGHT_MODE'));
+        }
+
+        function toggleSource() {
+            const modal = document.getElementById('raw-source-modal');
+            const content = document.getElementById('raw-source-content');
+            const rawData = document.getElementById('hidden-raw-data').value;
+
+            if (modal.style.display === 'flex') {
+                modal.style.display = 'none';
+            } else {
+                content.innerText = rawData || "NO SOURCE DATA AVAILABLE.";
+                modal.style.display = 'flex';
+            }
+        }
+
+        function runVerification() {
+            const overlay = document.getElementById('system2-overlay');
+            const content = document.getElementById('sys2-content');
+            const status = document.getElementById('verification-status');
+
+            overlay.style.display = 'flex';
+            content.innerHTML = '';
+
+            const lines = [
+                "INITIATING SYSTEM 2 PROTOCOL...",
+                "VERIFYING CRYPTOGRAPHIC SIGNATURE...",
+                "HASH: 499cfc0153350b0ca708fa0fbe94217a7429cadbd39b462ac7b4a1b5096a6528",
+                "CHECKING CHAIN OF CUSTODY...",
+                "ANALYZING SENTIMENT VECTORS...",
+                "CROSS-REFERENCING KNOWLEDGE GRAPH...",
+                "VERIFICATION COMPLETE."
+            ];
+
+            let i = 0;
+            function addLine() {
+                if (i < lines.length) {
+                    const div = document.createElement('div');
+                    div.className = 'system2-line';
+                    div.innerText = '> ' + lines[i];
+                    div.style.opacity = 1;
+                    content.appendChild(div);
+                    i++;
+                    setTimeout(addLine, 400);
+                } else {
+                    setTimeout(() => {
+                        overlay.style.display = 'none';
+                        showToast('DOCUMENT VERIFIED');
+                        if(status) status.innerText = "VERIFIED // AUTHENTICATED";
+                        if(status) status.style.color = "#aaffaa";
+                    }, 1000);
+                }
+            }
+            addLine();
+        }
+
         // Chart Injection Logic
         const metricsData = {};
 

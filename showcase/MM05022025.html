@@ -14,13 +14,33 @@
 </head>
 <body class="tier-high">
 
+    <!-- System 2 Verification Overlay -->
+    <div id="system2-overlay" class="system2-overlay">
+        <div class="system2-terminal">
+            <div id="sys2-content"></div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="cyber-toast-container"></div>
+
+    <!-- Raw Source Modal -->
+    <div id="raw-source-modal" class="raw-source-modal">
+        <div class="raw-source-header">
+            <span>SOURCE_DATA.JSON</span>
+            <span style="cursor:pointer; color:#cc0000;" onclick="toggleSource()">[CLOSE]</span>
+        </div>
+        <div class="raw-source-content" id="raw-source-content"></div>
+    </div>
+
     <!-- Virtual Toolbar for High Tier -->
     <div class="doc-toolbar" style="display: flex;">
         <div class="toolbar-item" onclick="window.location.href='market_mayhem_archive.html'"><strong>FILE</strong></div>
-        <div class="toolbar-item">EDIT</div>
-        <div class="toolbar-item">VIEW</div>
-        <div class="toolbar-item">INSERT</div>
-        <div class="toolbar-item">FORMAT</div>
+        <div class="toolbar-item" onclick="showToast('EDIT MODE: READ ONLY (ARCHIVED)')">EDIT</div>
+        <div class="toolbar-item" onclick="toggleTheme()">VIEW</div>
+        <div class="toolbar-item" onclick="showToast('INSERT: PERMISSION DENIED')">INSERT</div>
+        <div class="toolbar-item" onclick="showToast('FORMAT: LOCKED')">FORMAT</div>
+        <div class="toolbar-item" onclick="runVerification()" style="color: #0078d7;"><strong>VERIFY</strong></div>
         <div style="flex-grow:1;"></div>
         <div class="toolbar-item" style="color:#666;">ADAM_V26_EDITOR</div>
     </div>
@@ -31,11 +51,11 @@
     </div>
 
     <div class="newsletter-wrapper">
-        <div class="paper-sheet">
+        <div class="paper-sheet" id="paper-sheet">
 
             <!-- High Tier Header UI -->
             <div class="doc-header-ui" style="display: flex;">
-                <span>CONFIDENTIAL // SYSTEM 2 REVIEW</span>
+                <span id="verification-status">CONFIDENTIAL // SYSTEM 2 REVIEW</span>
                 <span>8b7e402c</span>
             </div>
 
@@ -165,7 +185,7 @@
                 </div>
             </div>
 
-            <a href="#" class="source-jump-btn" title="View Source JSON">JUMP TO SOURCE</a>
+            <a href="#" class="source-jump-btn" onclick="toggleSource(); return false;" title="View Source JSON">JUMP TO SOURCE</a>
 
             <div style="margin-top: 40px; border-top: 1px solid #ccc; padding-top: 20px; font-style: italic; color: #666;">
                 End of Transmission.
@@ -192,7 +212,7 @@
             <div class="sidebar-widget">
                 <div class="sidebar-title">Detected Entities</div>
                 <div class="tag-cloud">
-                    <span class="tag">US</span><span class="tag">EU</span>
+                    <a href="market_mayhem_archive.html?search=US" class="tag" style="text-decoration:none;">US</a><a href="market_mayhem_archive.html?search=EU" class="tag" style="text-decoration:none;">EU</a>
                 </div>
             </div>
 
@@ -227,7 +247,108 @@
         </aside>
     </div>
 
+    <!-- Hidden Raw Data -->
+    <textarea id="hidden-raw-data" style="display:none;">{
+  "title": "Market Mayhem Newsletter - May 2, 2025",
+  "date": "2025-05-02",
+  "summary": " The Mood: Sell in May? Not Today.\n\nThe age-old Wall Street adage \"Sell in May and Go Away\" is being tested this week. Despite a hot CPI print and a hawkish Fed, the \"AI Bid\" refuses to die. The S&P 5...",
+  "type": "NEWSLETTER",
+  "full_body": "<em>Subtitle: Your weekly guide to navigating the financial storms and spotting the sunshine!</em>\n<p>---</p>\n<h2>\ud83d\udcca Market Snapshot</h2>\n<ul>\n<li><strong>S&P 500:</strong> 6,150.45 (`+0.3%` WoW)</li>\n<li><strong>Dow Jones:</strong> 43,900.12 (`-0.1%` WoW)</li>\n<li><strong>Nasdaq Composite:</strong> 21,100.30 (`+0.9%` WoW)</li>\n<li><strong>Bitcoin (BTC):</strong> ~$74,500 (`+1.5%` Intraday / Bullish)</li>\n<li><strong>Brent Crude Oil:</strong> $81.20 (`+3.2%` WoW)</li>\n<li><strong>Gold:</strong> $2,550.00 (`+0.5%` WoW)</li>\n<li><strong>10-Year Treasury Yield:</strong> 4.35% (+10 bps)</li>\n</ul>\n<p>---</p>\n<h2>\ud83c\udf2a\ufe0f Market Mayhem: Executive Summary</h2>\n<h3>The Mood: Sell in May? Not Today.</h3>\n<p>The age-old Wall Street adage \"Sell in May and Go Away\" is being tested this week. Despite a hot CPI print and a hawkish Fed, the \"AI Bid\" refuses to die. The S&P 500 held the <strong>6,150</strong> line, driven almost entirely by the Mega-Cap Tech trade, while the rest of the market (Equal Weight S&P) is gasping for air.</p>\n<p>Oil is the spoiler here, spiking back above $80 on renewed tensions in the Strait of Hormuz. This is putting a floor under inflation and forcing the Fed's hand. The market is pricing in \"Higher for Longer\" (again), but equity investors don't seem to care as long as earnings hold up.</p>\n<strong>Driver of the Week:</strong> Geopolitics vs. Earnings. (Oil spike vs. Tech beats).\n<p>---</p>\n<h2>\ud83d\udcf0 Key News & Events (The \"What Happened\")</h2>\n<ul>\n<li><strong>Apple Teases Vision Pro 2:</strong> A surprise leak/announcement hinted at a lighter, cheaper headset coming in Q4. Shares popped 3%, reinvigorating the \"Spatial Computing\" narrative.</li>\n<li><strong>Fed Rate Cut Hopes Dashed:</strong> Chairman Powell's speech at the Economic Club of New York poured cold water on a June cut. \"Sticky services inflation\" is the new buzzword. Yields ripped to 4.35%.</li>\n<li><strong>Oil Spikes on Hormuz Threat:</strong> Iran's naval exercises in the Strait of Hormuz sent crude futures soaring. Energy stocks were the best performers of the week.</li>\n<li><strong>AMD Earnings Beat:</strong> AMD's MI400 announcement and solid earnings guidance confirmed that the \"Second Source\" for AI chips is real. The stock jumped 8%.</li>\n<li><strong>Regional Bank Wobbles:</strong> <strong>New York Community Bank (NYCB)</strong> fell another 10% on commercial real estate loan concerns. The ghost of 2023 hasn't fully left the building.</li>\n</ul>\n<p>---</p>\n<h2>\ud83d\ude80 Top Investment Ideas (The \"Alpha\")</h2>\n<h3>1. Theme: The Inflation Hedge (Energy)</h3>\n<ul>\n<li><strong>The Play:</strong> Long <strong>XLE (Energy ETF)</strong> and <strong>Occidental Petroleum (OXY)</strong>.</li>\n<li><strong>Rationale:</strong> If \"Sell in May\" happens, it will be because of inflation. Oil is the root cause. Owning the producers is the perfect hedge against a sticky CPI print. Plus, OXY is still a favorite of Buffett.</li>\n<li><strong>Key Risks:</strong> A sudden ceasefire or demand destruction from a recession would tank oil.</li>\n</ul>\n<h3>2. Theme: Cyber-Defense</h3>\n<ul>\n<li><strong>The Play:</strong> Long <strong>CrowdStrike (CRWD)</strong>.</li>\n<li><strong>Rationale:</strong> With geopolitical tensions rising, state-sponsored cyber attacks are the new frontline. Corporate spending on security is non-discretionary. It's the one budget item that CFOs can't cut.</li>\n<li><strong>Key Risks:</strong> Valuation is rich; any growth deceleration will be punished.</li>\n</ul>\n<p>---</p>\n<h2>\ud83d\udce1 Notable Signals & Rumors</h2>\n<ul>\n<li><strong>The \"Buffett Indicator\":</strong> The Market Cap to GDP ratio just hit a 2-year high. <strong>Signal:</strong> Value investors are sitting on cash. Expect volatility to increase as valuation multiples expand without earnings support.</li>\n<li><strong>Whispers of an M&A Wave:</strong> Private Equity dry powder is at record levels. Rumors of a take-private deal for a major <strong>DocuSign</strong> or <strong>Dropbox</strong> competitor are circulating.</li>\n<li><strong>Short Covering in biotech:</strong> XBI saw massive inflows this week. Is the long nightmare for biotech finally over?</li>\n</ul>\n<p>---</p>\n<h2>\ud83c\udfdb\ufe0f Policy Impact & Geopolitical Outlook</h2>\n<ul>\n<li><strong>The Fed's Box:</strong> They can't cut because of inflation (3.4%), and they can't hike because of the Regional Banks. We are in \"Monetary Purgatory.\" Expect the Fed to do nothing and talk tough.</li>\n</ul>\n<em> <strong>European Stagnation:</strong> The ECB is likely to cut </em>before* the Fed (in June) as the German economy stalls. This divergence will strengthen the Dollar (DXY), which is a headwind for US multinationals.\n<p>---</p>\n<h2>\ud83e\udd1d Deals & Corporate Actions</h2>\n<ul>\n<li><strong>Johnson & Johnson (JNJ):</strong> Completed the spinoff of its consumer health unit (Kenvue) fully.</li>\n<li><strong>Paramount (PARA):</strong> Deal talks with Skydance are officially \"on again.\" The drama continues, but the stock is cheap.</li>\n</ul>\n<p>---</p>\n<h2>\ud83d\udcc5 Earnings Watch (Next Week: May 5 - 9)</h2>\n<em>Investors should tune in for:</em>\n<ul>\n<li><strong>Palantir (PLTR):</strong> The AI Cult Stock. Is the commercial sector actually buying the AIP platform?</li>\n<li><strong>Disney (DIS):</strong> The Streaming War. Can Iger turn a profit on Disney+?</li>\n<li><strong>Uber (UBER):</strong> The Gig Economy Bellwether. Are consumers still taking rides despite inflation?</li>\n</ul>\n<p>---</p>\n<h2>\ud83e\udde0 Thematic Deep Dive: The \"Higher for Longer\" Reality</h2>\n<p>For six months, the market priced in 6 rate cuts for 2025. Now it's pricing in 1 or 2. The realization that 4-5% rates might be the \"new normal\" is setting in.</p>\n<strong>Implication:</strong> Companies with high debt loads (Zombies) will perish. Companies with cash piles (Mega Caps) will thrive. The bifurcation between the \"Haves\" (Cash Rich) and \"Have Nots\" (Debt Heavy) will widen. <strong>Quality Factor</strong> is the only factor that matters now.\n<p>---</p>\n<h2>\ud83d\udd2e Year Ahead Forecast</h2>\n<strong>Stance: Neutral / Choppy.</strong>\n<p>May and June are likely to be volatile as the market adjusts to the \"No Cut\" reality. We expect a 5-7% correction in the S&P 500 to reset valuations, bringing us back to the 5,800 level before the next leg up. Use the dip to buy Quality Tech and Energy.</p>\n<p>---</p>\n<h2>\ud83d\udd8a\ufe0f Quirky Sign-Off</h2>\n<p>> \"Bull markets are born on pessimism, grow on skepticism, mature on optimism, and die on euphoria.\" \u2014 Sir John Templeton</p>\n<p>We are somewhere between skepticism and optimism. Keep your head on a swivel.</p>\n<strong>- Adam v23.5</strong>\n<em>Chief Market Strategist & Editor-in-Chief</em>\n<p>---</p>\n<h3>\u2696\ufe0f Disclaimer</h3>\n<em>The content provided in this newsletter is for informational and educational purposes only and does not constitute financial advice, investment recommendations, or an offer to buy or sell any securities. All market data is simulated or approximate based on available information. Do your own research and consult with a qualified financial advisor before making investment decisions.</em>\n",
+  "sentiment_score": 38,
+  "entities": {
+    "tickers": [],
+    "agents": [],
+    "sovereigns": [
+      "US",
+      "EU"
+    ]
+  },
+  "provenance_hash": "8b7e402c5a11e68ce73eceb1e6a934883b8f846fe22148b8a351873089c8a348",
+  "filename": "MM05022025.html",
+  "is_sourced": true,
+  "metrics_json": "{}",
+  "source_priority": 2,
+  "conviction": 85,
+  "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 38/100. Cross-reference with knowledge graph completed.",
+  "quality": 100,
+  "semantic_score": 54,
+  "probability": 85
+}</textarea>
+
     <script>
+        // --- INTERACTION LOGIC ---
+
+        function showToast(msg) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'cyber-toast';
+            toast.innerText = '> ' + msg;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            showToast('THEME: ' + (isDark ? 'DARK_MODE' : 'LIGHT_MODE'));
+        }
+
+        function toggleSource() {
+            const modal = document.getElementById('raw-source-modal');
+            const content = document.getElementById('raw-source-content');
+            const rawData = document.getElementById('hidden-raw-data').value;
+
+            if (modal.style.display === 'flex') {
+                modal.style.display = 'none';
+            } else {
+                content.innerText = rawData || "NO SOURCE DATA AVAILABLE.";
+                modal.style.display = 'flex';
+            }
+        }
+
+        function runVerification() {
+            const overlay = document.getElementById('system2-overlay');
+            const content = document.getElementById('sys2-content');
+            const status = document.getElementById('verification-status');
+
+            overlay.style.display = 'flex';
+            content.innerHTML = '';
+
+            const lines = [
+                "INITIATING SYSTEM 2 PROTOCOL...",
+                "VERIFYING CRYPTOGRAPHIC SIGNATURE...",
+                "HASH: 8b7e402c5a11e68ce73eceb1e6a934883b8f846fe22148b8a351873089c8a348",
+                "CHECKING CHAIN OF CUSTODY...",
+                "ANALYZING SENTIMENT VECTORS...",
+                "CROSS-REFERENCING KNOWLEDGE GRAPH...",
+                "VERIFICATION COMPLETE."
+            ];
+
+            let i = 0;
+            function addLine() {
+                if (i < lines.length) {
+                    const div = document.createElement('div');
+                    div.className = 'system2-line';
+                    div.innerText = '> ' + lines[i];
+                    div.style.opacity = 1;
+                    content.appendChild(div);
+                    i++;
+                    setTimeout(addLine, 400);
+                } else {
+                    setTimeout(() => {
+                        overlay.style.display = 'none';
+                        showToast('DOCUMENT VERIFIED');
+                        if(status) status.innerText = "VERIFIED // AUTHENTICATED";
+                        if(status) status.style.color = "#aaffaa";
+                    }, 1000);
+                }
+            }
+            addLine();
+        }
+
         // Chart Injection Logic
         const metricsData = {};
 

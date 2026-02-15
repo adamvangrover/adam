@@ -14,13 +14,33 @@
 </head>
 <body class="tier-high">
 
+    <!-- System 2 Verification Overlay -->
+    <div id="system2-overlay" class="system2-overlay">
+        <div class="system2-terminal">
+            <div id="sys2-content"></div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="cyber-toast-container"></div>
+
+    <!-- Raw Source Modal -->
+    <div id="raw-source-modal" class="raw-source-modal">
+        <div class="raw-source-header">
+            <span>SOURCE_DATA.JSON</span>
+            <span style="cursor:pointer; color:#cc0000;" onclick="toggleSource()">[CLOSE]</span>
+        </div>
+        <div class="raw-source-content" id="raw-source-content"></div>
+    </div>
+
     <!-- Virtual Toolbar for High Tier -->
     <div class="doc-toolbar" style="display: flex;">
         <div class="toolbar-item" onclick="window.location.href='market_mayhem_archive.html'"><strong>FILE</strong></div>
-        <div class="toolbar-item">EDIT</div>
-        <div class="toolbar-item">VIEW</div>
-        <div class="toolbar-item">INSERT</div>
-        <div class="toolbar-item">FORMAT</div>
+        <div class="toolbar-item" onclick="showToast('EDIT MODE: READ ONLY (ARCHIVED)')">EDIT</div>
+        <div class="toolbar-item" onclick="toggleTheme()">VIEW</div>
+        <div class="toolbar-item" onclick="showToast('INSERT: PERMISSION DENIED')">INSERT</div>
+        <div class="toolbar-item" onclick="showToast('FORMAT: LOCKED')">FORMAT</div>
+        <div class="toolbar-item" onclick="runVerification()" style="color: #0078d7;"><strong>VERIFY</strong></div>
         <div style="flex-grow:1;"></div>
         <div class="toolbar-item" style="color:#666;">ADAM_V26_EDITOR</div>
     </div>
@@ -31,11 +51,11 @@
     </div>
 
     <div class="newsletter-wrapper">
-        <div class="paper-sheet">
+        <div class="paper-sheet" id="paper-sheet">
 
             <!-- High Tier Header UI -->
             <div class="doc-header-ui" style="display: flex;">
-                <span>CONFIDENTIAL // SYSTEM 2 REVIEW</span>
+                <span id="verification-status">CONFIDENTIAL // SYSTEM 2 REVIEW</span>
                 <span>1be636af</span>
             </div>
 
@@ -108,7 +128,7 @@
                 </div>
             </div>
 
-            <a href="#" class="source-jump-btn" title="View Source JSON">JUMP TO SOURCE</a>
+            <a href="#" class="source-jump-btn" onclick="toggleSource(); return false;" title="View Source JSON">JUMP TO SOURCE</a>
 
             <div style="margin-top: 40px; border-top: 1px solid #ccc; padding-top: 20px; font-style: italic; color: #666;">
                 End of Transmission.
@@ -170,7 +190,105 @@
         </aside>
     </div>
 
+    <!-- Hidden Raw Data -->
+    <textarea id="hidden-raw-data" style="display:none;">{
+  "title": "Model Performance Review: Q3 2025",
+  "date": "2025-10-15",
+  "summary": "Market analysis and strategic insights.",
+  "type": "PERFORMANCE_REVIEW",
+  "full_body": "<strong>Date:</strong> 2025-10-15\n<strong>Analyst:</strong> Adam Risk Engine (Audit Module)\n<h2>1. Accuracy Audit (Prediction vs. Reality)</h2>\n<p>The following table analyzes the key predictions made in the Q2 \"Outlook\" versus the realized market data for Q3 2025.</p>\n<p>| Prediction | Confidence | Realized Outcome | Verdict | Accuracy Score |\n| :--- | :---: | :--- | :--- | :---: |\n| <strong>\"Oil to break $90/bbl\"</strong> | 75% | Brent peaked at $88.40, then faded to $78. | <strong>MISS</strong> | 65% |\n| <strong>\"Fed Pause in September\"</strong> | 90% | Fed held rates steady (5.25%). | <strong>HIT</strong> | 100% |\n| <strong>\"Small Cap Rotation\"</strong> | 60% | Russell 2000 dropped 8%. | <strong>MISS</strong> | 0% |\n| <strong>\"Yen Volatility > 15%\"</strong> | 85% | JPY Implied Vol hit 18%. | <strong>HIT</strong> | 95% |</p>\n<strong>Aggregate System Precision:</strong> 72.4%\n<strong>Bias Detected:</strong> The model currently exhibits a \"Permabull\" bias in Small Caps (IWM), consistently underestimating the impact of refinancing walls on zombie companies.\n<h2>2. Sentiment Model Calibration</h2>\n<ul>\n<li>  <strong>Issue:</strong> The NLP engine flagged \"layoffs\" as purely negative.</li>\n<li>  <strong>Reality:</strong> Market reacted positively to \"efficiency measures\" (e.g., Meta, Google).</li>\n<li>  <strong>Adjustment:</strong> We have retrained the `FinBERT` layer to contextualize \"layoffs\" within \"margin expansion\" narratives.</li>\n</ul>\n<h2>3. Analytical Rigor & Reasoning</h2>\n<ul>\n<li>  <strong>Deficiency:</strong> In the July \"Crypto Shock\" report, the causal link between \"SEC Regulation\" and \"Bitcoin Dominance\" was asserted but not mathematically proven.</li>\n<li>  <strong>Correction:</strong> Future Deep Dives must include a <strong>Granger Causality Test</strong> or a Correlation Matrix heatmap to substantiate narrative claims.</li>\n<li>  <strong>New Protocol:</strong> \"No Narrative Without Numbers.\"</li>\n</ul>\n<p>---</p>\n<h2>4. Development Notes for Human Operators</h2>\n> The machine is good at extrapolating trends, but bad at predicting turning points driven by <em>political</em> irrationality. The Q3 miss on Oil was due to an unmodeled geopolitical de-escalation deal. We recommend increasing the weight of \"Diplomatic Cables\" in the ingestion pipeline.\n<strong>Signed:</strong> <em>Adam Audit Bot v2.1</em>\n",
+  "sentiment_score": 0,
+  "entities": {
+    "tickers": [],
+    "agents": [],
+    "sovereigns": []
+  },
+  "provenance_hash": "1be636afbcaad73b71ea57925263a7e7417fbabc0ede28fa308248478642d74b",
+  "filename": "Model_Performance_Review_Q3_2025.html",
+  "is_sourced": true,
+  "metrics_json": "{}",
+  "source_priority": 2,
+  "conviction": 100,
+  "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 0/100. Cross-reference with knowledge graph completed.",
+  "quality": 100,
+  "semantic_score": 78,
+  "probability": 100
+}</textarea>
+
     <script>
+        // --- INTERACTION LOGIC ---
+
+        function showToast(msg) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'cyber-toast';
+            toast.innerText = '> ' + msg;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            showToast('THEME: ' + (isDark ? 'DARK_MODE' : 'LIGHT_MODE'));
+        }
+
+        function toggleSource() {
+            const modal = document.getElementById('raw-source-modal');
+            const content = document.getElementById('raw-source-content');
+            const rawData = document.getElementById('hidden-raw-data').value;
+
+            if (modal.style.display === 'flex') {
+                modal.style.display = 'none';
+            } else {
+                content.innerText = rawData || "NO SOURCE DATA AVAILABLE.";
+                modal.style.display = 'flex';
+            }
+        }
+
+        function runVerification() {
+            const overlay = document.getElementById('system2-overlay');
+            const content = document.getElementById('sys2-content');
+            const status = document.getElementById('verification-status');
+
+            overlay.style.display = 'flex';
+            content.innerHTML = '';
+
+            const lines = [
+                "INITIATING SYSTEM 2 PROTOCOL...",
+                "VERIFYING CRYPTOGRAPHIC SIGNATURE...",
+                "HASH: 1be636afbcaad73b71ea57925263a7e7417fbabc0ede28fa308248478642d74b",
+                "CHECKING CHAIN OF CUSTODY...",
+                "ANALYZING SENTIMENT VECTORS...",
+                "CROSS-REFERENCING KNOWLEDGE GRAPH...",
+                "VERIFICATION COMPLETE."
+            ];
+
+            let i = 0;
+            function addLine() {
+                if (i < lines.length) {
+                    const div = document.createElement('div');
+                    div.className = 'system2-line';
+                    div.innerText = '> ' + lines[i];
+                    div.style.opacity = 1;
+                    content.appendChild(div);
+                    i++;
+                    setTimeout(addLine, 400);
+                } else {
+                    setTimeout(() => {
+                        overlay.style.display = 'none';
+                        showToast('DOCUMENT VERIFIED');
+                        if(status) status.innerText = "VERIFIED // AUTHENTICATED";
+                        if(status) status.style.color = "#aaffaa";
+                    }, 1000);
+                }
+            }
+            addLine();
+        }
+
         // Chart Injection Logic
         const metricsData = {};
 

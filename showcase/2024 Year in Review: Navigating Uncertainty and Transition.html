@@ -14,13 +14,33 @@
 </head>
 <body class="tier-high">
 
+    <!-- System 2 Verification Overlay -->
+    <div id="system2-overlay" class="system2-overlay">
+        <div class="system2-terminal">
+            <div id="sys2-content"></div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="cyber-toast-container"></div>
+
+    <!-- Raw Source Modal -->
+    <div id="raw-source-modal" class="raw-source-modal">
+        <div class="raw-source-header">
+            <span>SOURCE_DATA.JSON</span>
+            <span style="cursor:pointer; color:#cc0000;" onclick="toggleSource()">[CLOSE]</span>
+        </div>
+        <div class="raw-source-content" id="raw-source-content"></div>
+    </div>
+
     <!-- Virtual Toolbar for High Tier -->
     <div class="doc-toolbar" style="display: flex;">
         <div class="toolbar-item" onclick="window.location.href='market_mayhem_archive.html'"><strong>FILE</strong></div>
-        <div class="toolbar-item">EDIT</div>
-        <div class="toolbar-item">VIEW</div>
-        <div class="toolbar-item">INSERT</div>
-        <div class="toolbar-item">FORMAT</div>
+        <div class="toolbar-item" onclick="showToast('EDIT MODE: READ ONLY (ARCHIVED)')">EDIT</div>
+        <div class="toolbar-item" onclick="toggleTheme()">VIEW</div>
+        <div class="toolbar-item" onclick="showToast('INSERT: PERMISSION DENIED')">INSERT</div>
+        <div class="toolbar-item" onclick="showToast('FORMAT: LOCKED')">FORMAT</div>
+        <div class="toolbar-item" onclick="runVerification()" style="color: #0078d7;"><strong>VERIFY</strong></div>
         <div style="flex-grow:1;"></div>
         <div class="toolbar-item" style="color:#666;">ADAM_V26_EDITOR</div>
     </div>
@@ -31,11 +51,11 @@
     </div>
 
     <div class="newsletter-wrapper">
-        <div class="paper-sheet">
+        <div class="paper-sheet" id="paper-sheet">
 
             <!-- High Tier Header UI -->
             <div class="doc-header-ui" style="display: flex;">
-                <span>CONFIDENTIAL // SYSTEM 2 REVIEW</span>
+                <span id="verification-status">CONFIDENTIAL // SYSTEM 2 REVIEW</span>
                 <span>1ea6fdf2</span>
             </div>
 
@@ -86,7 +106,7 @@
                 </div>
             </div>
 
-            <a href="#" class="source-jump-btn" title="View Source JSON">JUMP TO SOURCE</a>
+            <a href="#" class="source-jump-btn" onclick="toggleSource(); return false;" title="View Source JSON">JUMP TO SOURCE</a>
 
             <div style="margin-top: 40px; border-top: 1px solid #ccc; padding-top: 20px; font-style: italic; color: #666;">
                 End of Transmission.
@@ -148,7 +168,104 @@
         </aside>
     </div>
 
+    <!-- Hidden Raw Data -->
+    <textarea id="hidden-raw-data" style="display:none;">{
+  "title": "2024 Year in Review: Navigating Uncertainty and Transition",
+  "date": "2025-01-01",
+  "summary": "2024 was a year of uncertainty and transition for the financial markets. After a strong recovery in 2023, market volatility increased as investors grappled with mixed economic signals, geopolitical ri...",
+  "type": "MARKET_OUTLOOK",
+  "full_body": "<h2>Market Overview</h2><p>2024 was a year of uncertainty and transition for the financial markets. After a strong recovery in 2023, market volatility increased as investors grappled with mixed economic signals, geopolitical risks, and the ongoing energy transition. Major stock indices experienced moderate gains, with the S&P 500 ending the year up approximately 5%.</p>\n<h2>Major Themes and Trends</h2><p>Several key themes and trends shaped the market in 2024: <em> <strong>Economic Slowdown:</strong>  Global economic growth slowed as central banks continued to tighten monetary policies to combat persistent inflation. </em> <strong>Inflation Persistence:</strong>  Inflation proved to be more persistent than initially anticipated, raising concerns about stagflation and potential recessionary pressures. <em> <strong>Geopolitical Volatility:</strong>  Geopolitical tensions remained elevated, with ongoing conflicts and trade disputes contributing to market uncertainty. </em> <strong>Energy Transition Challenges:</strong>  The energy transition faced challenges, including supply chain bottlenecks, infrastructure limitations, and regulatory hurdles. <em> <strong>AI Regulation:</strong>  Governments and regulatory bodies began to grapple with the implications of AI, leading to increased scrutiny and potential regulatory changes. </em> <strong>Market Bifurcation:</strong>  The market experienced a bifurcation, with some sectors and companies performing well while others struggled to adapt to the changing environment.</p>\n<h2>Industry Performance</h2><p>Industry performance was mixed in 2024: <em> <strong>Healthcare:</strong>  The healthcare sector continued to show resilience, driven by innovation and demographic trends. </em> <strong>Consumer Staples:</strong>  Consumer staples companies maintained stable performance, benefiting from consistent demand for essential goods. <em> <strong>Energy:</strong>  The energy sector experienced volatility, with renewable energy companies outperforming traditional fossil fuel companies. </em> <strong>Technology:</strong>  The technology sector's performance was mixed, with some companies benefiting from AI advancements while others faced regulatory headwinds. * <strong>Financials:</strong>  The financials sector faced challenges due to rising interest rates and potential credit risks.</p>\n<h2>Top Performers</h2><p>Some of the top-performing companies in 2024 included: <em> <strong>Johnson & Johnson (JNJ):</strong>  A diversified healthcare company with a strong track record. </em> <strong>Procter & Gamble (PG):</strong>  A consumer staples giant with a broad portfolio of brands. <em> <strong>Enphase Energy (ENPH):</strong>  A leading provider of solar microinverter systems. </em> <strong>Salesforce (CRM):</strong>  A cloud-based software company that continued to expand its market share. * <strong>Visa (V):</strong>  A global payments technology company that benefited from increased digital transactions.</p>\n<h2>Portfolio Construction and Optimization</h2><p>In a year of uncertainty and transition like 2024, portfolio construction and optimization required a more nuanced approach: <em> <strong>Balancing Growth and Value:</strong>  Combining growth investments in promising sectors with value investments in undervalued companies. </em> <strong>Active Management:</strong>  Actively managing the portfolio to adapt to changing market conditions and opportunities. <em> <strong>Risk Mitigation:</strong>  Implementing risk mitigation strategies to protect against potential downturns and volatility. </em> <strong>Alternative Investments:</strong>  Considering alternative investments, such as private equity or real estate, to diversify the portfolio.</p>\n<h2>Looking Ahead</h2><p>2024 highlighted the importance of adaptability and resilience in navigating uncertain markets. As we move forward, investors should focus on long-term trends, such as the energy transition, AI development, and demographic shifts. Adam v15.4 can assist investors in understanding these trends, managing risks, and making informed investment decisions.</p>\n",
+  "sentiment_score": 82,
+  "entities": {
+    "tickers": [],
+    "agents": [],
+    "sovereigns": []
+  },
+  "provenance_hash": "1ea6fdf2d79417e86ec1bc8886869a5a61e1a99d8bdbf760e1b26c2e84dd08b4",
+  "filename": "2024 Year in Review: Navigating Uncertainty and Transition.html",
+  "is_sourced": true,
+  "metrics_json": "{}",
+  "source_priority": 2,
+  "conviction": 16,
+  "semantic_score": 42,
+  "probability": 36,
+  "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 82/100. Cross-reference with knowledge graph completed."
+}</textarea>
+
     <script>
+        // --- INTERACTION LOGIC ---
+
+        function showToast(msg) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'cyber-toast';
+            toast.innerText = '> ' + msg;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            showToast('THEME: ' + (isDark ? 'DARK_MODE' : 'LIGHT_MODE'));
+        }
+
+        function toggleSource() {
+            const modal = document.getElementById('raw-source-modal');
+            const content = document.getElementById('raw-source-content');
+            const rawData = document.getElementById('hidden-raw-data').value;
+
+            if (modal.style.display === 'flex') {
+                modal.style.display = 'none';
+            } else {
+                content.innerText = rawData || "NO SOURCE DATA AVAILABLE.";
+                modal.style.display = 'flex';
+            }
+        }
+
+        function runVerification() {
+            const overlay = document.getElementById('system2-overlay');
+            const content = document.getElementById('sys2-content');
+            const status = document.getElementById('verification-status');
+
+            overlay.style.display = 'flex';
+            content.innerHTML = '';
+
+            const lines = [
+                "INITIATING SYSTEM 2 PROTOCOL...",
+                "VERIFYING CRYPTOGRAPHIC SIGNATURE...",
+                "HASH: 1ea6fdf2d79417e86ec1bc8886869a5a61e1a99d8bdbf760e1b26c2e84dd08b4",
+                "CHECKING CHAIN OF CUSTODY...",
+                "ANALYZING SENTIMENT VECTORS...",
+                "CROSS-REFERENCING KNOWLEDGE GRAPH...",
+                "VERIFICATION COMPLETE."
+            ];
+
+            let i = 0;
+            function addLine() {
+                if (i < lines.length) {
+                    const div = document.createElement('div');
+                    div.className = 'system2-line';
+                    div.innerText = '> ' + lines[i];
+                    div.style.opacity = 1;
+                    content.appendChild(div);
+                    i++;
+                    setTimeout(addLine, 400);
+                } else {
+                    setTimeout(() => {
+                        overlay.style.display = 'none';
+                        showToast('DOCUMENT VERIFIED');
+                        if(status) status.innerText = "VERIFIED // AUTHENTICATED";
+                        if(status) status.style.color = "#aaffaa";
+                    }, 1000);
+                }
+            }
+            addLine();
+        }
+
         // Chart Injection Logic
         const metricsData = {};
 

@@ -14,13 +14,33 @@
 </head>
 <body class="tier-high">
 
+    <!-- System 2 Verification Overlay -->
+    <div id="system2-overlay" class="system2-overlay">
+        <div class="system2-terminal">
+            <div id="sys2-content"></div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="cyber-toast-container"></div>
+
+    <!-- Raw Source Modal -->
+    <div id="raw-source-modal" class="raw-source-modal">
+        <div class="raw-source-header">
+            <span>SOURCE_DATA.JSON</span>
+            <span style="cursor:pointer; color:#cc0000;" onclick="toggleSource()">[CLOSE]</span>
+        </div>
+        <div class="raw-source-content" id="raw-source-content"></div>
+    </div>
+
     <!-- Virtual Toolbar for High Tier -->
     <div class="doc-toolbar" style="display: flex;">
         <div class="toolbar-item" onclick="window.location.href='market_mayhem_archive.html'"><strong>FILE</strong></div>
-        <div class="toolbar-item">EDIT</div>
-        <div class="toolbar-item">VIEW</div>
-        <div class="toolbar-item">INSERT</div>
-        <div class="toolbar-item">FORMAT</div>
+        <div class="toolbar-item" onclick="showToast('EDIT MODE: READ ONLY (ARCHIVED)')">EDIT</div>
+        <div class="toolbar-item" onclick="toggleTheme()">VIEW</div>
+        <div class="toolbar-item" onclick="showToast('INSERT: PERMISSION DENIED')">INSERT</div>
+        <div class="toolbar-item" onclick="showToast('FORMAT: LOCKED')">FORMAT</div>
+        <div class="toolbar-item" onclick="runVerification()" style="color: #0078d7;"><strong>VERIFY</strong></div>
         <div style="flex-grow:1;"></div>
         <div class="toolbar-item" style="color:#666;">ADAM_V26_EDITOR</div>
     </div>
@@ -31,11 +51,11 @@
     </div>
 
     <div class="newsletter-wrapper">
-        <div class="paper-sheet">
+        <div class="paper-sheet" id="paper-sheet">
 
             <!-- High Tier Header UI -->
             <div class="doc-header-ui" style="display: flex;">
-                <span>CONFIDENTIAL // SYSTEM 2 REVIEW</span>
+                <span id="verification-status">CONFIDENTIAL // SYSTEM 2 REVIEW</span>
                 <span>94d42b3a</span>
             </div>
 
@@ -85,7 +105,7 @@
                 </div>
             </div>
 
-            <a href="#" class="source-jump-btn" title="View Source JSON">JUMP TO SOURCE</a>
+            <a href="#" class="source-jump-btn" onclick="toggleSource(); return false;" title="View Source JSON">JUMP TO SOURCE</a>
 
             <div style="margin-top: 40px; border-top: 1px solid #ccc; padding-top: 20px; font-style: italic; color: #666;">
                 End of Transmission.
@@ -112,7 +132,7 @@
             <div class="sidebar-widget">
                 <div class="sidebar-title">Detected Entities</div>
                 <div class="tag-cloud">
-                    <span class="tag">CN</span>
+                    <a href="market_mayhem_archive.html?search=CN" class="tag" style="text-decoration:none;">CN</a>
                 </div>
             </div>
 
@@ -147,7 +167,106 @@
         </aside>
     </div>
 
+    <!-- Hidden Raw Data -->
+    <textarea id="hidden-raw-data" style="display:none;">{
+  "title": "Adam v15.4 Newsletter - February 7, 2025",
+  "date": "2025-02-07",
+  "summary": "Market volatility has increased this week as investors grapple with uncertainty surrounding the new administration's policy agenda and potential changes to the regulatory landscape. Concerns about pot...",
+  "type": "NEWSLETTER",
+  "full_body": "<h2>Market Mayhem (Executive Summary)</h2><p>Market volatility has increased this week as investors grapple with uncertainty surrounding the new administration's policy agenda and potential changes to the regulatory landscape. Concerns about potential tariffs and trade tensions have also weighed on market sentiment. The S&P 500 is down 1.2% for the week, while the Nasdaq has fallen 1.8%.</p>\n<h2>Key News & Events</h2><ul><li>New administration announces plans for infrastructure spending and tax reform.</li><li>Concerns rise about potential trade tensions with China and other key trading partners.</li><li>Regulatory changes are expected in the technology and healthcare sectors.</li><li>Inflation remains elevated, with the CPI rising 0.4% in January.</li><li>The Federal Reserve signals potential interest rate hikes in the coming months.</li></ul><h2>Top Investment Ideas</h2><h2>Notable Signals & Rumors</h2><ul><li>Rumors of increased regulatory scrutiny on technology giants are circulating.</li><li>A prominent economist warns of potential stagflation, a combination of slow economic growth and high inflation.</li><li>Insider buying activity has increased in the energy and materials sectors.</li></ul><h2>Policy Impact & Geopolitical Outlook</h2><p>The new administration's policy agenda is expected to have a significant impact on various sectors, with potential winners and losers emerging. Trade tensions and geopolitical risks remain elevated, adding to market uncertainty. Investors should closely monitor policy developments and assess their potential impact on their portfolios.</p>\n<h2>Deals & Corporate Actions</h2><ul><li>A major pharmaceutical company announces a merger with a biotechnology firm.</li><li>A leading technology company announces a strategic partnership with a government agency.</li><li>An energy company announces a new renewable energy project.</li></ul><h2>Earnings Watch</h2><ul><li>Several major banks are scheduled to report earnings next week.</li><li>Retail companies are expected to report earnings later this month.</li><li>The upcoming earnings season will provide insights into the health of the consumer and the overall economy.</li></ul><h2>Thematic Deep Dive</h2><p>This section provides a deep dive into the potential impact of regulatory changes on various sectors, including technology, healthcare, and energy. We also discuss strategies for managing regulatory risk and identifying investment opportunities in a changing regulatory landscape.</p>\n<h2>Fun Tidbits & Quotes</h2><ul><li>\"The only constant in life is change.\" - Heraclitus</li><li>Did you know that the first stock exchange was established in Amsterdam in 1602?</li></ul><h2>Quirky Sign-Off</h2><p>Stay agile, stay informed, and may your investments weather any storm!</p>\n<h2>Disclaimer</h2><p>The information and recommendations provided in this newsletter are for informational purposes only and should not be construed as financial advice. Investing involves risk, and you could lose money. Consult with a qualified financial advisor before making any investment decisions.</p>\n",
+  "sentiment_score": 12,
+  "entities": {
+    "tickers": [],
+    "agents": [],
+    "sovereigns": [
+      "CN"
+    ]
+  },
+  "provenance_hash": "94d42b3af89c4c5a99b7709162f78c7908d69b5a21d61311f5dd0240c9a19aea",
+  "filename": "newsletter_2025_02_07.html",
+  "is_sourced": true,
+  "metrics_json": "{}",
+  "source_priority": 2,
+  "conviction": 9,
+  "semantic_score": 46,
+  "probability": 29,
+  "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 12/100. Cross-reference with knowledge graph completed."
+}</textarea>
+
     <script>
+        // --- INTERACTION LOGIC ---
+
+        function showToast(msg) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'cyber-toast';
+            toast.innerText = '> ' + msg;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            showToast('THEME: ' + (isDark ? 'DARK_MODE' : 'LIGHT_MODE'));
+        }
+
+        function toggleSource() {
+            const modal = document.getElementById('raw-source-modal');
+            const content = document.getElementById('raw-source-content');
+            const rawData = document.getElementById('hidden-raw-data').value;
+
+            if (modal.style.display === 'flex') {
+                modal.style.display = 'none';
+            } else {
+                content.innerText = rawData || "NO SOURCE DATA AVAILABLE.";
+                modal.style.display = 'flex';
+            }
+        }
+
+        function runVerification() {
+            const overlay = document.getElementById('system2-overlay');
+            const content = document.getElementById('sys2-content');
+            const status = document.getElementById('verification-status');
+
+            overlay.style.display = 'flex';
+            content.innerHTML = '';
+
+            const lines = [
+                "INITIATING SYSTEM 2 PROTOCOL...",
+                "VERIFYING CRYPTOGRAPHIC SIGNATURE...",
+                "HASH: 94d42b3af89c4c5a99b7709162f78c7908d69b5a21d61311f5dd0240c9a19aea",
+                "CHECKING CHAIN OF CUSTODY...",
+                "ANALYZING SENTIMENT VECTORS...",
+                "CROSS-REFERENCING KNOWLEDGE GRAPH...",
+                "VERIFICATION COMPLETE."
+            ];
+
+            let i = 0;
+            function addLine() {
+                if (i < lines.length) {
+                    const div = document.createElement('div');
+                    div.className = 'system2-line';
+                    div.innerText = '> ' + lines[i];
+                    div.style.opacity = 1;
+                    content.appendChild(div);
+                    i++;
+                    setTimeout(addLine, 400);
+                } else {
+                    setTimeout(() => {
+                        overlay.style.display = 'none';
+                        showToast('DOCUMENT VERIFIED');
+                        if(status) status.innerText = "VERIFIED // AUTHENTICATED";
+                        if(status) status.style.color = "#aaffaa";
+                    }, 1000);
+                }
+            }
+            addLine();
+        }
+
         // Chart Injection Logic
         const metricsData = {};
 

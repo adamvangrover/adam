@@ -14,13 +14,33 @@
 </head>
 <body class="tier-high">
 
+    <!-- System 2 Verification Overlay -->
+    <div id="system2-overlay" class="system2-overlay">
+        <div class="system2-terminal">
+            <div id="sys2-content"></div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="cyber-toast-container"></div>
+
+    <!-- Raw Source Modal -->
+    <div id="raw-source-modal" class="raw-source-modal">
+        <div class="raw-source-header">
+            <span>SOURCE_DATA.JSON</span>
+            <span style="cursor:pointer; color:#cc0000;" onclick="toggleSource()">[CLOSE]</span>
+        </div>
+        <div class="raw-source-content" id="raw-source-content"></div>
+    </div>
+
     <!-- Virtual Toolbar for High Tier -->
     <div class="doc-toolbar" style="display: flex;">
         <div class="toolbar-item" onclick="window.location.href='market_mayhem_archive.html'"><strong>FILE</strong></div>
-        <div class="toolbar-item">EDIT</div>
-        <div class="toolbar-item">VIEW</div>
-        <div class="toolbar-item">INSERT</div>
-        <div class="toolbar-item">FORMAT</div>
+        <div class="toolbar-item" onclick="showToast('EDIT MODE: READ ONLY (ARCHIVED)')">EDIT</div>
+        <div class="toolbar-item" onclick="toggleTheme()">VIEW</div>
+        <div class="toolbar-item" onclick="showToast('INSERT: PERMISSION DENIED')">INSERT</div>
+        <div class="toolbar-item" onclick="showToast('FORMAT: LOCKED')">FORMAT</div>
+        <div class="toolbar-item" onclick="runVerification()" style="color: #0078d7;"><strong>VERIFY</strong></div>
         <div style="flex-grow:1;"></div>
         <div class="toolbar-item" style="color:#666;">ADAM_V26_EDITOR</div>
     </div>
@@ -31,11 +51,11 @@
     </div>
 
     <div class="newsletter-wrapper">
-        <div class="paper-sheet">
+        <div class="paper-sheet" id="paper-sheet">
 
             <!-- High Tier Header UI -->
             <div class="doc-header-ui" style="display: flex;">
-                <span>CONFIDENTIAL // SYSTEM 2 REVIEW</span>
+                <span id="verification-status">CONFIDENTIAL // SYSTEM 2 REVIEW</span>
                 <span>520624c1</span>
             </div>
 
@@ -86,7 +106,7 @@
                 </div>
             </div>
 
-            <a href="#" class="source-jump-btn" title="View Source JSON">JUMP TO SOURCE</a>
+            <a href="#" class="source-jump-btn" onclick="toggleSource(); return false;" title="View Source JSON">JUMP TO SOURCE</a>
 
             <div style="margin-top: 40px; border-top: 1px solid #ccc; padding-top: 20px; font-style: italic; color: #666;">
                 End of Transmission.
@@ -148,7 +168,104 @@
         </aside>
     </div>
 
+    <!-- Hidden Raw Data -->
+    <textarea id="hidden-raw-data" style="display:none;">{
+  "title": "2023 Year in Review: A Year of Recovery and Resilience",
+  "date": "2024-01-01",
+  "summary": "2023 proved to be a year of recovery and resilience for the financial markets.  After a challenging 2022, major stock indices rebounded, with the S&P 500 gaining approximately 20%. The technology sect...",
+  "type": "MARKET_OUTLOOK",
+  "full_body": "<h2>Market Overview</h2><p>2023 proved to be a year of recovery and resilience for the financial markets.  After a challenging 2022, major stock indices rebounded, with the S&P 500 gaining approximately 20%. The technology sector led the way, as investors regained confidence in growth stocks and innovation continued to drive returns.</p>\n<h2>Major Themes and Trends</h2><p>Several key themes and trends shaped the market in 2023: <em> <strong>Inflation Moderation:</strong> Inflation gradually moderated throughout the year, as supply chain disruptions eased and central bank policies took effect. </em> <strong>Interest Rate Stabilization:</strong>  While interest rates remained elevated, they stabilized at a level that supported economic growth without fueling excessive inflation. <em> <strong>Geopolitical Resilience:</strong>  Despite ongoing geopolitical tensions, the markets demonstrated resilience, adapting to uncertainties and focusing on economic fundamentals. </em> <strong>Energy Transition:</strong>  The energy transition continued to gain momentum, with increased investment in renewable energy and growing adoption of electric vehicles. <em> <strong>Artificial Intelligence (AI):</strong>  AI emerged as a dominant theme, with breakthroughs in generative AI and large language models capturing investor attention. </em> <strong>Focus on Profitability:</strong>  Investors shifted their focus towards companies with strong profitability and sustainable business models.</p>\n<h2>Industry Performance</h2><p>Industry performance was generally positive in 2023: <em> <strong>Technology:</strong>  The technology sector was the top performer, driven by AI advancements and renewed investor confidence. </em> <strong>Healthcare:</strong>  Healthcare also performed well, as innovation in areas like biotechnology and pharmaceuticals continued to attract investment. <em> <strong>Industrials:</strong>  The industrials sector benefited from increased infrastructure spending and supply chain improvements. </em> <strong>Consumer Discretionary:</strong>  Consumer discretionary companies saw a rebound in sales as consumer confidence improved. * <strong>Energy:</strong>  The energy sector's performance was more moderate, as oil prices stabilized and the focus shifted towards renewable energy.</p>\n<h2>Top Performers</h2><p>Some of the top-performing companies in 2023 included: <em> <strong>NVIDIA (NVDA):</strong>  A leading AI chipmaker that benefited from the AI boom. </em> <strong>Tesla (TSLA):</strong>  Continued its growth trajectory in the electric vehicle market. <em> <strong>Microsoft (MSFT):</strong>  Showed strong performance across its cloud computing and software businesses. </em> <strong>Alphabet (GOOGL):</strong>  Benefited from growth in its advertising and cloud businesses. * <strong>UnitedHealth Group (UNH):</strong>  A leading healthcare company with a diversified business model.</p>\n<h2>Portfolio Construction and Optimization</h2><p>In a recovering market like 2023, portfolio construction and optimization focused on: <em> <strong>Growth Investing:</strong>  Capitalizing on growth opportunities in sectors like technology and healthcare. </em> <strong>Value Investing:</strong>  Continuing to identify undervalued companies with strong fundamentals. <em> <strong>Risk Management:</strong>  Balancing growth opportunities with risk management strategies to protect against potential market downturns. </em> <strong>ESG Considerations:</strong>  Integrating environmental, social, and governance (ESG) factors into investment decisions.</p>\n<h2>Looking Ahead</h2><p>2023 demonstrated the resilience of the markets and the power of innovation. As we look ahead, it's crucial to remain adaptable, embrace new technologies, and maintain a balanced investment approach. Adam v15.4 can assist investors in identifying opportunities, managing risks, and achieving their financial goals.</p>\n",
+  "sentiment_score": 91,
+  "entities": {
+    "tickers": [],
+    "agents": [],
+    "sovereigns": []
+  },
+  "provenance_hash": "520624c11f28c253253dac3695a3eaa24a7206b53b86041a719f7412b5e7af70",
+  "filename": "2023 Year in Review: A Year of Recovery and Resilience.html",
+  "is_sourced": true,
+  "metrics_json": "{}",
+  "source_priority": 2,
+  "conviction": 50,
+  "semantic_score": 43,
+  "probability": 50,
+  "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 91/100. Cross-reference with knowledge graph completed."
+}</textarea>
+
     <script>
+        // --- INTERACTION LOGIC ---
+
+        function showToast(msg) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'cyber-toast';
+            toast.innerText = '> ' + msg;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            showToast('THEME: ' + (isDark ? 'DARK_MODE' : 'LIGHT_MODE'));
+        }
+
+        function toggleSource() {
+            const modal = document.getElementById('raw-source-modal');
+            const content = document.getElementById('raw-source-content');
+            const rawData = document.getElementById('hidden-raw-data').value;
+
+            if (modal.style.display === 'flex') {
+                modal.style.display = 'none';
+            } else {
+                content.innerText = rawData || "NO SOURCE DATA AVAILABLE.";
+                modal.style.display = 'flex';
+            }
+        }
+
+        function runVerification() {
+            const overlay = document.getElementById('system2-overlay');
+            const content = document.getElementById('sys2-content');
+            const status = document.getElementById('verification-status');
+
+            overlay.style.display = 'flex';
+            content.innerHTML = '';
+
+            const lines = [
+                "INITIATING SYSTEM 2 PROTOCOL...",
+                "VERIFYING CRYPTOGRAPHIC SIGNATURE...",
+                "HASH: 520624c11f28c253253dac3695a3eaa24a7206b53b86041a719f7412b5e7af70",
+                "CHECKING CHAIN OF CUSTODY...",
+                "ANALYZING SENTIMENT VECTORS...",
+                "CROSS-REFERENCING KNOWLEDGE GRAPH...",
+                "VERIFICATION COMPLETE."
+            ];
+
+            let i = 0;
+            function addLine() {
+                if (i < lines.length) {
+                    const div = document.createElement('div');
+                    div.className = 'system2-line';
+                    div.innerText = '> ' + lines[i];
+                    div.style.opacity = 1;
+                    content.appendChild(div);
+                    i++;
+                    setTimeout(addLine, 400);
+                } else {
+                    setTimeout(() => {
+                        overlay.style.display = 'none';
+                        showToast('DOCUMENT VERIFIED');
+                        if(status) status.innerText = "VERIFIED // AUTHENTICATED";
+                        if(status) status.style.color = "#aaffaa";
+                    }, 1000);
+                }
+            }
+            addLine();
+        }
+
         // Chart Injection Logic
         const metricsData = {};
 

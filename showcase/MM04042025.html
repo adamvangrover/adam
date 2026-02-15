@@ -14,13 +14,33 @@
 </head>
 <body class="tier-high">
 
+    <!-- System 2 Verification Overlay -->
+    <div id="system2-overlay" class="system2-overlay">
+        <div class="system2-terminal">
+            <div id="sys2-content"></div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="cyber-toast-container"></div>
+
+    <!-- Raw Source Modal -->
+    <div id="raw-source-modal" class="raw-source-modal">
+        <div class="raw-source-header">
+            <span>SOURCE_DATA.JSON</span>
+            <span style="cursor:pointer; color:#cc0000;" onclick="toggleSource()">[CLOSE]</span>
+        </div>
+        <div class="raw-source-content" id="raw-source-content"></div>
+    </div>
+
     <!-- Virtual Toolbar for High Tier -->
     <div class="doc-toolbar" style="display: flex;">
         <div class="toolbar-item" onclick="window.location.href='market_mayhem_archive.html'"><strong>FILE</strong></div>
-        <div class="toolbar-item">EDIT</div>
-        <div class="toolbar-item">VIEW</div>
-        <div class="toolbar-item">INSERT</div>
-        <div class="toolbar-item">FORMAT</div>
+        <div class="toolbar-item" onclick="showToast('EDIT MODE: READ ONLY (ARCHIVED)')">EDIT</div>
+        <div class="toolbar-item" onclick="toggleTheme()">VIEW</div>
+        <div class="toolbar-item" onclick="showToast('INSERT: PERMISSION DENIED')">INSERT</div>
+        <div class="toolbar-item" onclick="showToast('FORMAT: LOCKED')">FORMAT</div>
+        <div class="toolbar-item" onclick="runVerification()" style="color: #0078d7;"><strong>VERIFY</strong></div>
         <div style="flex-grow:1;"></div>
         <div class="toolbar-item" style="color:#666;">ADAM_V26_EDITOR</div>
     </div>
@@ -31,11 +51,11 @@
     </div>
 
     <div class="newsletter-wrapper">
-        <div class="paper-sheet">
+        <div class="paper-sheet" id="paper-sheet">
 
             <!-- High Tier Header UI -->
             <div class="doc-header-ui" style="display: flex;">
-                <span>CONFIDENTIAL // SYSTEM 2 REVIEW</span>
+                <span id="verification-status">CONFIDENTIAL // SYSTEM 2 REVIEW</span>
                 <span>2b5781c9</span>
             </div>
 
@@ -165,7 +185,7 @@
                 </div>
             </div>
 
-            <a href="#" class="source-jump-btn" title="View Source JSON">JUMP TO SOURCE</a>
+            <a href="#" class="source-jump-btn" onclick="toggleSource(); return false;" title="View Source JSON">JUMP TO SOURCE</a>
 
             <div style="margin-top: 40px; border-top: 1px solid #ccc; padding-top: 20px; font-style: italic; color: #666;">
                 End of Transmission.
@@ -192,7 +212,7 @@
             <div class="sidebar-widget">
                 <div class="sidebar-title">Detected Entities</div>
                 <div class="tag-cloud">
-                    <span class="tag">US</span><span class="tag">CN</span>
+                    <a href="market_mayhem_archive.html?search=US" class="tag" style="text-decoration:none;">US</a><a href="market_mayhem_archive.html?search=CN" class="tag" style="text-decoration:none;">CN</a>
                 </div>
             </div>
 
@@ -227,7 +247,108 @@
         </aside>
     </div>
 
+    <!-- Hidden Raw Data -->
+    <textarea id="hidden-raw-data" style="display:none;">{
+  "title": "Market Mayhem Newsletter - April 4, 2025",
+  "date": "2025-04-04",
+  "summary": " The Mood: Spring Awakening\n\nHello Q2! The first quarter is in the books, and the bulls are clearly in charge. The S&P 500 is knocking on the door of the psychological 6,000 level. Can we break throug...",
+  "type": "NEWSLETTER",
+  "full_body": "<em>Subtitle: Your weekly guide to navigating the financial storms and spotting the sunshine!</em>\n<p>---</p>\n<h2>\ud83d\udcca Market Snapshot</h2>\n<ul>\n<li><strong>S&P 500:</strong> 5,980.12 (`+1.1%` WoW)</li>\n<li><strong>Dow Jones:</strong> 43,100.50 (`+0.5%` WoW)</li>\n<li><strong>Nasdaq Composite:</strong> 20,450.80 (`+1.8%` WoW)</li>\n<li><strong>Bitcoin (BTC):</strong> ~$72,000 (`+4.0%` Intraday / Bullish)</li>\n<li><strong>Brent Crude Oil:</strong> $78.50 (`-0.2%` WoW)</li>\n<li><strong>Gold:</strong> $2,410.00 (`+1.5%` WoW)</li>\n<li><strong>10-Year Treasury Yield:</strong> 4.25% (-5 bps)</li>\n</ul>\n<p>---</p>\n<h2>\ud83c\udf2a\ufe0f Market Mayhem: Executive Summary</h2>\n<h3>The Mood: Spring Awakening</h3>\n<p>Hello Q2! The first quarter is in the books, and the bulls are clearly in charge. The S&P 500 is knocking on the door of the psychological <strong>6,000</strong> level. Can we break through?</p>\n<p>The catalyst this week was the \"Goldilocks\" Jobs Report\u2014not too hot, not too cold. It kept the \"Soft Landing\" dream alive. Meanwhile, Crypto is heating up as we approach the one-year anniversary of the last Halving, with Bitcoin reclaiming $72k. The risk appetite is back, but so are the valuations.</p>\n<strong>Driver of the Week:</strong> The Goldilocks Data. (Jobs + moderate inflation).\n<p>---</p>\n<h2>\ud83d\udcf0 Key News & Events (The \"What Happened\")</h2>\n<ul>\n<li><strong>Tesla Q1 Deliveries Miss:</strong> The EV giant missed delivery estimates by 5%, citing \"production ramp challenges\" in Berlin. The stock dipped 3%, dragging the wider EV sector.</li>\n<li><strong>Bitcoin Halving Anniversary Rally:</strong> One year post-halving (approx), the supply shock is finally being felt on exchanges. ETF inflows hit a monthly record.</li>\n<li><strong>JPMorgan CEO Warning:</strong> Jamie Dimon warned of an \"economic hurricane\" (downgraded from \"storm\") due to fiscal spending, but the market largely ignored him.</li>\n<li><strong>Google's \"Search SGE\" Rollout:</strong> The full deployment of AI in Search is disrupting the SEO industry but boosting Alphabet's ad revenue projections.</li>\n<li><strong>Japan Ends Yield Curve Control:</strong> The BOJ finally signaled the end of negative rates, causing a ripple effect in global bond markets, but US Treasuries remained surprisingly stable.</li>\n</ul>\n<p>---</p>\n<h2>\ud83d\ude80 Top Investment Ideas (The \"Alpha\")</h2>\n<h3>1. Theme: The Data Center Buildout (Utilities)</h3>\n<ul>\n<li><strong>The Play:</strong> Long <strong>Vistra Corp (VST)</strong> and <strong>Constellation Energy (CEG)</strong>.</li>\n<li><strong>Rationale:</strong> The AI revolution needs power. A lot of it. Utilities are no longer boring dividend stocks; they are AI growth plays. The demand for \"clean, 24/7 power\" (Nuclear) is skyrocketing.</li>\n<li><strong>Key Risks:</strong> Regulatory caps on power prices.</li>\n</ul>\n<h3>2. Theme: The \"Reflation\" Trade (Materials)</h3>\n<ul>\n<li><strong>The Play:</strong> Long <strong>Materials Select Sector SPDR (XLB)</strong>.</li>\n<li><strong>Rationale:</strong> As manufacturing PMIs bottom out and start to turn up, commodities like Copper, Steel, and Lithium are catching a bid. It's an early-cycle recovery play.</li>\n<li><strong>Key Risks:</strong> A double-dip recession.</li>\n</ul>\n<p>---</p>\n<h2>\ud83d\udce1 Notable Signals & Rumors</h2>\n<ul>\n<li><strong>The \"Small Cap\" Divergence:</strong> While the S&P is at highs, the Russell 2000 is still lagging. <strong>Signal:</strong> If the Russell breaks out above 2,200, it confirms a broad-based rally. If it fails, the S&P breakout is a \"fake out.\"</li>\n<li><strong>Insider Selling in Semis:</strong> Some executives at mid-tier chip companies are unloading shares. Are we at \"Peak Cycle\"?</li>\n<li><strong>Reddit IPO Lockup Expiry:</strong> Watch out for volatility in <strong>RDDT</strong> as the lockup expires next week.</li>\n</ul>\n<p>---</p>\n<h2>\ud83c\udfdb\ufe0f Policy Impact & Geopolitical Outlook</h2>\n<ul>\n<li><strong>Fiscal Dominance:</strong> The US deficit is the elephant in the room. With the election cycle heating up, don't expect any spending cuts. This is bullish for hard assets (Gold/BTC) and bearish for the long-term bond.</li>\n<li><strong>Taiwan Election Aftershocks:</strong> Continued posturing in the South China Sea is keeping defense stocks bid. <strong>Lockheed Martin (LMT)</strong> remains a portfolio staple.</li>\n</ul>\n<p>---</p>\n<h2>\ud83e\udd1d Deals & Corporate Actions</h2>\n<ul>\n<li><strong>Home Depot (HD) acquires SRS Distribution:</strong> A massive $18B bet on the professional contractor market.</li>\n<li><strong>Rubrik IPO:</strong> The cybersecurity firm successfully listed, popping 20% on Day 1. The IPO window is officially open.</li>\n</ul>\n<p>---</p>\n<h2>\ud83d\udcc5 Earnings Watch (Next Week: Apr 7 - 11)</h2>\n<em>Investors should tune in for:</em>\n<ul>\n<li><strong>Delta Air Lines (DAL):</strong> The Consumer Travel check. Are summer bookings holding up?</li>\n<li><strong>JPMorgan Chase (JPM):</strong> The Q1 Earnings Season kickoff. Dimon's commentary will set the tone for the entire market.</li>\n<li><strong>BlackRock (BLK):</strong> The flow monster. Where is the money going? (hint: Bitcoin ETFs).</li>\n</ul>\n<p>---</p>\n<h2>\ud83e\udde0 Thematic Deep Dive: The \"Nuclear\" Option</h2>\n<p>Nuclear energy has gone from a pariah to a savior. With AI data centers requiring massive baseload power that wind and solar can't provide reliably, Nuclear is the <em>only</em> carbon-free solution.</p>\n<strong>Implication:</strong> The \"Uranium Squeeze\" is just beginning. Stocks like <strong>Cameco (CCJ)</strong> and the <strong>URA</strong> ETF are long-term holds. The regulatory headwinds are turning into tailwinds as governments scramble for energy security.\n<p>---</p>\n<h2>\ud83d\udd2e Year Ahead Forecast</h2>\n<strong>Stance: Bullish.</strong>\n<p>We are entering the \"Sweet Spot\" of the cycle\u2014growth is recovering, and the Fed is done hiking. 6,000 on the S&P 500 is imminent. Enjoy the ride, but keep your stop-losses tight.</p>\n<p>---</p>\n<h2>\ud83d\udd8a\ufe0f Quirky Sign-Off</h2>\n<p>> \"Opportunities come infrequently. When it rains gold, put out the bucket, not the thimble.\" \u2014 Warren Buffett</p>\n<p>The bucket is out. Let's fill it up.</p>\n<strong>- Adam v23.5</strong>\n<em>Chief Market Strategist & Editor-in-Chief</em>\n<p>---</p>\n<h3>\u2696\ufe0f Disclaimer</h3>\n<em>The content provided in this newsletter is for informational and educational purposes only and does not constitute financial advice, investment recommendations, or an offer to buy or sell any securities. All market data is simulated or approximate based on available information. Do your own research and consult with a qualified financial advisor before making investment decisions.</em>\n",
+  "sentiment_score": 66,
+  "entities": {
+    "tickers": [],
+    "agents": [],
+    "sovereigns": [
+      "US",
+      "CN"
+    ]
+  },
+  "provenance_hash": "2b5781c9f3fb59bc4cde58f26a35079358f618cdccb07644fd0c97db71e0d03c",
+  "filename": "MM04042025.html",
+  "is_sourced": true,
+  "metrics_json": "{}",
+  "source_priority": 2,
+  "conviction": 100,
+  "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 66/100. Cross-reference with knowledge graph completed.",
+  "quality": 100,
+  "semantic_score": 60,
+  "probability": 100
+}</textarea>
+
     <script>
+        // --- INTERACTION LOGIC ---
+
+        function showToast(msg) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'cyber-toast';
+            toast.innerText = '> ' + msg;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            showToast('THEME: ' + (isDark ? 'DARK_MODE' : 'LIGHT_MODE'));
+        }
+
+        function toggleSource() {
+            const modal = document.getElementById('raw-source-modal');
+            const content = document.getElementById('raw-source-content');
+            const rawData = document.getElementById('hidden-raw-data').value;
+
+            if (modal.style.display === 'flex') {
+                modal.style.display = 'none';
+            } else {
+                content.innerText = rawData || "NO SOURCE DATA AVAILABLE.";
+                modal.style.display = 'flex';
+            }
+        }
+
+        function runVerification() {
+            const overlay = document.getElementById('system2-overlay');
+            const content = document.getElementById('sys2-content');
+            const status = document.getElementById('verification-status');
+
+            overlay.style.display = 'flex';
+            content.innerHTML = '';
+
+            const lines = [
+                "INITIATING SYSTEM 2 PROTOCOL...",
+                "VERIFYING CRYPTOGRAPHIC SIGNATURE...",
+                "HASH: 2b5781c9f3fb59bc4cde58f26a35079358f618cdccb07644fd0c97db71e0d03c",
+                "CHECKING CHAIN OF CUSTODY...",
+                "ANALYZING SENTIMENT VECTORS...",
+                "CROSS-REFERENCING KNOWLEDGE GRAPH...",
+                "VERIFICATION COMPLETE."
+            ];
+
+            let i = 0;
+            function addLine() {
+                if (i < lines.length) {
+                    const div = document.createElement('div');
+                    div.className = 'system2-line';
+                    div.innerText = '> ' + lines[i];
+                    div.style.opacity = 1;
+                    content.appendChild(div);
+                    i++;
+                    setTimeout(addLine, 400);
+                } else {
+                    setTimeout(() => {
+                        overlay.style.display = 'none';
+                        showToast('DOCUMENT VERIFIED');
+                        if(status) status.innerText = "VERIFIED // AUTHENTICATED";
+                        if(status) status.style.color = "#aaffaa";
+                    }, 1000);
+                }
+            }
+            addLine();
+        }
+
         // Chart Injection Logic
         const metricsData = {};
 

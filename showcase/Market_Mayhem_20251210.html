@@ -14,13 +14,33 @@
 </head>
 <body class="tier-high">
 
+    <!-- System 2 Verification Overlay -->
+    <div id="system2-overlay" class="system2-overlay">
+        <div class="system2-terminal">
+            <div id="sys2-content"></div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="cyber-toast-container"></div>
+
+    <!-- Raw Source Modal -->
+    <div id="raw-source-modal" class="raw-source-modal">
+        <div class="raw-source-header">
+            <span>SOURCE_DATA.JSON</span>
+            <span style="cursor:pointer; color:#cc0000;" onclick="toggleSource()">[CLOSE]</span>
+        </div>
+        <div class="raw-source-content" id="raw-source-content"></div>
+    </div>
+
     <!-- Virtual Toolbar for High Tier -->
     <div class="doc-toolbar" style="display: flex;">
         <div class="toolbar-item" onclick="window.location.href='market_mayhem_archive.html'"><strong>FILE</strong></div>
-        <div class="toolbar-item">EDIT</div>
-        <div class="toolbar-item">VIEW</div>
-        <div class="toolbar-item">INSERT</div>
-        <div class="toolbar-item">FORMAT</div>
+        <div class="toolbar-item" onclick="showToast('EDIT MODE: READ ONLY (ARCHIVED)')">EDIT</div>
+        <div class="toolbar-item" onclick="toggleTheme()">VIEW</div>
+        <div class="toolbar-item" onclick="showToast('INSERT: PERMISSION DENIED')">INSERT</div>
+        <div class="toolbar-item" onclick="showToast('FORMAT: LOCKED')">FORMAT</div>
+        <div class="toolbar-item" onclick="runVerification()" style="color: #0078d7;"><strong>VERIFY</strong></div>
         <div style="flex-grow:1;"></div>
         <div class="toolbar-item" style="color:#666;">ADAM_V26_EDITOR</div>
     </div>
@@ -31,11 +51,11 @@
     </div>
 
     <div class="newsletter-wrapper">
-        <div class="paper-sheet">
+        <div class="paper-sheet" id="paper-sheet">
 
             <!-- High Tier Header UI -->
             <div class="doc-header-ui" style="display: flex;">
-                <span>CONFIDENTIAL // SYSTEM 2 REVIEW</span>
+                <span id="verification-status">CONFIDENTIAL // SYSTEM 2 REVIEW</span>
                 <span>f23b7dfc</span>
             </div>
 
@@ -161,7 +181,7 @@
                 </div>
             </div>
 
-            <a href="#" class="source-jump-btn" title="View Source JSON">JUMP TO SOURCE</a>
+            <a href="#" class="source-jump-btn" onclick="toggleSource(); return false;" title="View Source JSON">JUMP TO SOURCE</a>
 
             <div style="margin-top: 40px; border-top: 1px solid #ccc; padding-top: 20px; font-style: italic; color: #666;">
                 End of Transmission.
@@ -188,7 +208,7 @@
             <div class="sidebar-widget">
                 <div class="sidebar-title">Detected Entities</div>
                 <div class="tag-cloud">
-                    <span class="tag">US</span><span class="tag">CN</span>
+                    <a href="market_mayhem_archive.html?search=US" class="tag" style="text-decoration:none;">US</a><a href="market_mayhem_archive.html?search=CN" class="tag" style="text-decoration:none;">CN</a>
                 </div>
             </div>
 
@@ -223,7 +243,108 @@
         </aside>
     </div>
 
+    <!-- Hidden Raw Data -->
+    <textarea id="hidden-raw-data" style="display:none;">{
+  "title": "\ud83c\udf29\ufe0f Market Mayhem: December 10, 2025",
+  "date": "2025-12-10",
+  "summary": "Market analysis and strategic insights.",
+  "type": "NEWSLETTER",
+  "full_body": "<strong>\"The Calm Before the Quantum Storm?\"</strong>\n<p>Welcome to <em>Market Mayhem</em>, your autonomous briefing on the chaos of capital.</p>\n<h2>\ud83d\udcca Market Pulse</h2>\n<h3>AAPL</h3>\n<ul>\n<li><strong>Price:</strong> $277.18</li>\n<li><strong>P/E:</strong> 37.2x</li>\n<li><strong>Market Cap:</strong> $4,113,459,052,544</li>\n</ul>\n<h3>AMZN</h3>\n<ul>\n<li><strong>Price:</strong> $227.92</li>\n<li><strong>P/E:</strong> 32.2x</li>\n<li><strong>Market Cap:</strong> $2,436,513,923,072</li>\n</ul>\n<h3>GOOGL</h3>\n<ul>\n<li><strong>Price:</strong> $317.08</li>\n<li><strong>P/E:</strong> 31.3x</li>\n<li><strong>Market Cap:</strong> $3,840,511,311,872</li>\n</ul>\n<h3>META</h3>\n<ul>\n<li><strong>Price:</strong> $656.96</li>\n<li><strong>P/E:</strong> 29.1x</li>\n<li><strong>Market Cap:</strong> $1,655,885,922,304</li>\n</ul>\n<h3>MSFT</h3>\n<ul>\n<li><strong>Price:</strong> $492.02</li>\n<li><strong>P/E:</strong> 35.0x</li>\n<li><strong>Market Cap:</strong> $3,657,266,364,416</li>\n</ul>\n<h3>NVDA</h3>\n<ul>\n<li><strong>Price:</strong> $184.97</li>\n<li><strong>P/E:</strong> 45.9x</li>\n<li><strong>Market Cap:</strong> $4,503,464,574,976</li>\n</ul>\n<h3>TSLA</h3>\n<ul>\n<li><strong>Price:</strong> $445.17</li>\n<li><strong>P/E:</strong> 307.0x</li>\n<li><strong>Market Cap:</strong> $1,480,554,971,136</li>\n</ul>\n<h2>\ud83d\udcf0 Headlines from the Edge</h2>\n<p>#### AAPL</p>\n<em>   [What Trump's Nvidia China sales approval means for the Mag 7](https://finance.yahoo.com/video/trumps-nvidia-china-sales-approval-160000783.html) - </em>Yahoo Finance Video*\n<em>   [Disney nominates former Apple COO to its board](https://finance.yahoo.com/news/disney-nominates-former-apple-coo-223437961.html) - </em>Reuters*\n<em>   [Apple Stock Gets Three Price-Target Hikes. Here's Why.](https://www.investors.com/news/technology/apple-stock-3-price-target-hikes/?src=A00220&yptr=yahoo) - </em>Investor's Business Daily*\n<p>#### NVDA</p>\n<em>   [OpenAI CEO joins Jimmy Fallon following Nvidia CEO's Joe Rogan chat](https://finance.yahoo.com/video/openai-ceo-joins-jimmy-fallon-223657372.html) - </em>Yahoo Finance Video*\n<em>   [Trump tariffs live updates: Trump floats 'some' additional tariff carveouts; US unveils $12B farmer bailout](https://finance.yahoo.com/news/live/trump-tariffs-live-updates-trump-floats-some-additional-tariff-carveouts-us-unveils-12b-farmer-bailout-231853619.html) - </em>Yahoo Finance*\n<em>   [How Nvidia selling in China helps 'propel the market forward'](https://finance.yahoo.com/video/nvidia-selling-china-helps-propel-143742997.html) - </em>Yahoo Finance Video*\n<p>#### TSLA</p>\n<em>   [Stock market today: Dow, S&P 500, Nasdaq futures waver with Fed rate decision on deck](https://finance.yahoo.com/news/live/stock-market-today-dow-sp-500-nasdaq-futures-waver-with-fed-rate-decision-on-deck-235110760.html) - </em>Yahoo Finance*\n<em>   [How Mag 7's lead over other stocks could shrink in 2026](https://finance.yahoo.com/video/mag-7s-lead-over-other-120052402.html) - </em>Yahoo Finance Video*\n<em>   [Dow Jones Futures: GE Vernova Jumps Late; Fed Decision Looms](https://www.investors.com/market-trend/stock-market-today/dow-jones-futures-ge-vernova-fed-decision-tesla-nvidia-taiwan-semiconductor/?src=A00220&yptr=yahoo) - </em>Investor's Business Daily*\n<p>#### MSFT</p>\n<em>   [What Trump's Nvidia China sales approval means for the Mag 7](https://finance.yahoo.com/video/trumps-nvidia-china-sales-approval-160000783.html) - </em>Yahoo Finance Video*\n<em>   [Trump approves Nvidia H200 chips for sale to China](https://finance.yahoo.com/news/trump-approves-nvidia-h200-chips-for-sale-to-china-203937120.html) - </em>Yahoo Finance*\n<em>   [2 Things Every Iren Investor Needs to know](https://finance.yahoo.com/news/2-things-every-iren-investor-005000444.html) - </em>Motley Fool*\n<p>#### GOOGL</p>\n<em>   [Stock market today: Dow, S&P 500, Nasdaq futures waver with Fed rate decision on deck](https://finance.yahoo.com/news/live/stock-market-today-dow-sp-500-nasdaq-futures-waver-with-fed-rate-decision-on-deck-235110760.html) - </em>Yahoo Finance*\n<em>   [Tesla unsupervised FSD milestone 'very close,' Piper Sandler says](https://finance.yahoo.com/news/tesla-unsupervised-fsd-milestone-very-close-piper-sandler-says-185014902.html) - </em>Yahoo Finance*\n<em>   [Trump approves Nvidia H200 chips for sale to China](https://finance.yahoo.com/news/trump-approves-nvidia-h200-chips-for-sale-to-china-203937120.html) - </em>Yahoo Finance*\n<p>#### AMZN</p>\n<em>   [Oracle set to report earnings as Wall Street looks for cracks in the AI bubble](https://finance.yahoo.com/news/oracle-set-to-report-earnings-as-wall-street-looks-for-cracks-in-the-ai-bubble-200454831.html) - </em>Yahoo Finance*\n<em>   [Trump approves Nvidia H200 chips for sale to China](https://finance.yahoo.com/news/trump-approves-nvidia-h200-chips-for-sale-to-china-203937120.html) - </em>Yahoo Finance*\n<em>   [Dave Ramsey Reacts To A Father Trying To Bribe His Son For Control Of A $300K Trust. 'What Planet Does He Live On?'](https://finance.yahoo.com/news/dave-ramsey-reacts-father-trying-233007017.html) - </em>Benzinga*\n<p>#### META</p>\n<em>   [Slack's CEO is joining OpenAI to find the money to pay for all those data centers](https://tech.yahoo.com/business/article/slacks-ceo-joining-openai-money-220411211.html) - </em>Engadget*\n<em>   [How Mag 7's lead over other stocks could shrink in 2026](https://finance.yahoo.com/video/mag-7s-lead-over-other-120052402.html) - </em>Yahoo Finance Video*\n<em>   [Trump approves Nvidia H200 chips for sale to China](https://finance.yahoo.com/news/trump-approves-nvidia-h200-chips-for-sale-to-china-203937120.html) - </em>Yahoo Finance*\n<h2>\ud83e\udd16 Adam's Take</h2>\n<em>Autonomous synthesis based on HDKG analysis:</em>\n<p>> The market is showing signs of high valuation multiples in the tech sector.\n> P/E ratios suggest priced-in perfection.\n> News flow indicates significant activity in AAPL, NVDA, TSLA, MSFT, GOOGL, AMZN, META.</p>\n<p>---\n<em>Generated by Adam v23.5 Autonomous Financial Analyst</em></p>\n",
+  "sentiment_score": 50,
+  "entities": {
+    "tickers": [],
+    "agents": [],
+    "sovereigns": [
+      "US",
+      "CN"
+    ]
+  },
+  "provenance_hash": "f23b7dfce676d020837df1ab2a33541aad74ee70597aaf2d187d2cb9bba367e1",
+  "filename": "Market_Mayhem_20251210.html",
+  "is_sourced": true,
+  "metrics_json": "{}",
+  "source_priority": 2,
+  "conviction": 0,
+  "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 50/100. Cross-reference with knowledge graph completed.",
+  "quality": 100,
+  "semantic_score": 35,
+  "probability": 0
+}</textarea>
+
     <script>
+        // --- INTERACTION LOGIC ---
+
+        function showToast(msg) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'cyber-toast';
+            toast.innerText = '> ' + msg;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            showToast('THEME: ' + (isDark ? 'DARK_MODE' : 'LIGHT_MODE'));
+        }
+
+        function toggleSource() {
+            const modal = document.getElementById('raw-source-modal');
+            const content = document.getElementById('raw-source-content');
+            const rawData = document.getElementById('hidden-raw-data').value;
+
+            if (modal.style.display === 'flex') {
+                modal.style.display = 'none';
+            } else {
+                content.innerText = rawData || "NO SOURCE DATA AVAILABLE.";
+                modal.style.display = 'flex';
+            }
+        }
+
+        function runVerification() {
+            const overlay = document.getElementById('system2-overlay');
+            const content = document.getElementById('sys2-content');
+            const status = document.getElementById('verification-status');
+
+            overlay.style.display = 'flex';
+            content.innerHTML = '';
+
+            const lines = [
+                "INITIATING SYSTEM 2 PROTOCOL...",
+                "VERIFYING CRYPTOGRAPHIC SIGNATURE...",
+                "HASH: f23b7dfce676d020837df1ab2a33541aad74ee70597aaf2d187d2cb9bba367e1",
+                "CHECKING CHAIN OF CUSTODY...",
+                "ANALYZING SENTIMENT VECTORS...",
+                "CROSS-REFERENCING KNOWLEDGE GRAPH...",
+                "VERIFICATION COMPLETE."
+            ];
+
+            let i = 0;
+            function addLine() {
+                if (i < lines.length) {
+                    const div = document.createElement('div');
+                    div.className = 'system2-line';
+                    div.innerText = '> ' + lines[i];
+                    div.style.opacity = 1;
+                    content.appendChild(div);
+                    i++;
+                    setTimeout(addLine, 400);
+                } else {
+                    setTimeout(() => {
+                        overlay.style.display = 'none';
+                        showToast('DOCUMENT VERIFIED');
+                        if(status) status.innerText = "VERIFIED // AUTHENTICATED";
+                        if(status) status.style.color = "#aaffaa";
+                    }, 1000);
+                }
+            }
+            addLine();
+        }
+
         // Chart Injection Logic
         const metricsData = {};
 

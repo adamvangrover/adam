@@ -14,13 +14,33 @@
 </head>
 <body class="tier-high">
 
+    <!-- System 2 Verification Overlay -->
+    <div id="system2-overlay" class="system2-overlay">
+        <div class="system2-terminal">
+            <div id="sys2-content"></div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="cyber-toast-container"></div>
+
+    <!-- Raw Source Modal -->
+    <div id="raw-source-modal" class="raw-source-modal">
+        <div class="raw-source-header">
+            <span>SOURCE_DATA.JSON</span>
+            <span style="cursor:pointer; color:#cc0000;" onclick="toggleSource()">[CLOSE]</span>
+        </div>
+        <div class="raw-source-content" id="raw-source-content"></div>
+    </div>
+
     <!-- Virtual Toolbar for High Tier -->
     <div class="doc-toolbar" style="display: flex;">
         <div class="toolbar-item" onclick="window.location.href='market_mayhem_archive.html'"><strong>FILE</strong></div>
-        <div class="toolbar-item">EDIT</div>
-        <div class="toolbar-item">VIEW</div>
-        <div class="toolbar-item">INSERT</div>
-        <div class="toolbar-item">FORMAT</div>
+        <div class="toolbar-item" onclick="showToast('EDIT MODE: READ ONLY (ARCHIVED)')">EDIT</div>
+        <div class="toolbar-item" onclick="toggleTheme()">VIEW</div>
+        <div class="toolbar-item" onclick="showToast('INSERT: PERMISSION DENIED')">INSERT</div>
+        <div class="toolbar-item" onclick="showToast('FORMAT: LOCKED')">FORMAT</div>
+        <div class="toolbar-item" onclick="runVerification()" style="color: #0078d7;"><strong>VERIFY</strong></div>
         <div style="flex-grow:1;"></div>
         <div class="toolbar-item" style="color:#666;">ADAM_V26_EDITOR</div>
     </div>
@@ -31,11 +51,11 @@
     </div>
 
     <div class="newsletter-wrapper">
-        <div class="paper-sheet">
+        <div class="paper-sheet" id="paper-sheet">
 
             <!-- High Tier Header UI -->
             <div class="doc-header-ui" style="display: flex;">
-                <span>CONFIDENTIAL // SYSTEM 2 REVIEW</span>
+                <span id="verification-status">CONFIDENTIAL // SYSTEM 2 REVIEW</span>
                 <span>940c7cf8</span>
             </div>
 
@@ -85,7 +105,7 @@
                 </div>
             </div>
 
-            <a href="#" class="source-jump-btn" title="View Source JSON">JUMP TO SOURCE</a>
+            <a href="#" class="source-jump-btn" onclick="toggleSource(); return false;" title="View Source JSON">JUMP TO SOURCE</a>
 
             <div style="margin-top: 40px; border-top: 1px solid #ccc; padding-top: 20px; font-style: italic; color: #666;">
                 End of Transmission.
@@ -147,7 +167,104 @@
         </aside>
     </div>
 
+    <!-- Hidden Raw Data -->
+    <textarea id="hidden-raw-data" style="display:none;">{
+  "title": "Adam v15.4 Newsletter - February 14, 2025",
+  "date": "2025-02-14",
+  "summary": "Market sentiment is recovering as inflation shows signs of moderating and corporate earnings remain strong. The S&P 500 is up 0.8% for the week, while the Nasdaq has gained 1.2%. Investors are cautiou...",
+  "type": "NEWSLETTER",
+  "full_body": "<h2>Market Mayhem (Executive Summary)</h2><p>Market sentiment is recovering as inflation shows signs of moderating and corporate earnings remain strong. The S&P 500 is up 0.8% for the week, while the Nasdaq has gained 1.2%. Investors are cautiously optimistic about the potential for a \"soft landing\" for the economy, where inflation is controlled without triggering a recession. However, geopolitical risks persist, and the upcoming Federal Reserve meeting will be closely watched for signals on the future direction of monetary policy.</p>\n<h2>Key News & Events</h2><ul><li>Inflation moderates, with the CPI rising 0.3% in January.</li><li>Strong corporate earnings reports continue, boosting investor confidence.</li><li>The Federal Reserve is expected to maintain its current monetary policy stance.</li><li>Geopolitical tensions remain elevated, but there are signs of potential de-escalation.</li><li>The energy transition continues to gain momentum, with new investments in renewable energy and electric vehicles.</li></ul><h2>Top Investment Ideas</h2><h2>Notable Signals & Rumors</h2><ul><li>A major investment bank upgrades its outlook for the technology sector.</li><li>Rumors of a potential breakthrough in nuclear fusion technology are circulating.</li><li>Insider buying activity has increased in the renewable energy sector.</li></ul><h2>Policy Impact & Geopolitical Outlook</h2><p>The Federal Reserve's upcoming meeting will be closely watched for signals on the future direction of monetary policy. While inflation is moderating, it remains above the Fed's target, and there are concerns that further rate hikes could trigger a recession. Geopolitical risks persist, but there are signs of potential de-escalation in some regions, which could boost market sentiment.</p>\n<h2>Deals & Corporate Actions</h2><ul><li>Tesla (TSLA) announces a new partnership with a major automaker to develop electric vehicle charging infrastructure.</li><li>Amazon (AMZN) expands its presence in the healthcare sector with a new acquisition.</li><li>A major energy company announces a significant investment in renewable energy projects.</li></ul><h2>Earnings Watch</h2><ul><li>Several major retailers are scheduled to report earnings next week.</li><li>Consumer discretionary companies are expected to report earnings later this month.</li><li>The upcoming earnings season will provide insights into the health of the consumer and the overall economy.</li></ul><h2>Thematic Deep Dive</h2><p>This section explores the ongoing energy transition and its implications for investors. We discuss the growth potential of renewable energy, the challenges facing traditional energy companies, and the investment opportunities in clean technology and energy infrastructure.</p>\n<h2>Fun Tidbits & Quotes</h2><ul><li>\"The stone age didn't end for lack of stones, and the oil age won't end for lack of oil.\" - Sheikh Zaki Yamani</li><li>Did you know that the first commercial solar panel was created in 1954?</li></ul><h2>Quirky Sign-Off</h2><p>Stay optimistic, stay informed, and may your portfolio shine bright!</p>\n<h2>Disclaimer</h2><p>The information and recommendations provided in this newsletter are for informational purposes only and should not be construed as financial advice. Investing involves risk, and you could lose money. Consult with a qualified financial advisor before making any investment decisions.</p>\n",
+  "sentiment_score": 42,
+  "entities": {
+    "tickers": [],
+    "agents": [],
+    "sovereigns": []
+  },
+  "provenance_hash": "940c7cf8dbbac6029c104f17ebdf0f5f271956fd4faa753e08f7500379b376d7",
+  "filename": "newsletter_2025_02_14.html",
+  "is_sourced": true,
+  "metrics_json": "{}",
+  "source_priority": 2,
+  "conviction": 27,
+  "semantic_score": 45,
+  "probability": 27,
+  "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 42/100. Cross-reference with knowledge graph completed."
+}</textarea>
+
     <script>
+        // --- INTERACTION LOGIC ---
+
+        function showToast(msg) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'cyber-toast';
+            toast.innerText = '> ' + msg;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            showToast('THEME: ' + (isDark ? 'DARK_MODE' : 'LIGHT_MODE'));
+        }
+
+        function toggleSource() {
+            const modal = document.getElementById('raw-source-modal');
+            const content = document.getElementById('raw-source-content');
+            const rawData = document.getElementById('hidden-raw-data').value;
+
+            if (modal.style.display === 'flex') {
+                modal.style.display = 'none';
+            } else {
+                content.innerText = rawData || "NO SOURCE DATA AVAILABLE.";
+                modal.style.display = 'flex';
+            }
+        }
+
+        function runVerification() {
+            const overlay = document.getElementById('system2-overlay');
+            const content = document.getElementById('sys2-content');
+            const status = document.getElementById('verification-status');
+
+            overlay.style.display = 'flex';
+            content.innerHTML = '';
+
+            const lines = [
+                "INITIATING SYSTEM 2 PROTOCOL...",
+                "VERIFYING CRYPTOGRAPHIC SIGNATURE...",
+                "HASH: 940c7cf8dbbac6029c104f17ebdf0f5f271956fd4faa753e08f7500379b376d7",
+                "CHECKING CHAIN OF CUSTODY...",
+                "ANALYZING SENTIMENT VECTORS...",
+                "CROSS-REFERENCING KNOWLEDGE GRAPH...",
+                "VERIFICATION COMPLETE."
+            ];
+
+            let i = 0;
+            function addLine() {
+                if (i < lines.length) {
+                    const div = document.createElement('div');
+                    div.className = 'system2-line';
+                    div.innerText = '> ' + lines[i];
+                    div.style.opacity = 1;
+                    content.appendChild(div);
+                    i++;
+                    setTimeout(addLine, 400);
+                } else {
+                    setTimeout(() => {
+                        overlay.style.display = 'none';
+                        showToast('DOCUMENT VERIFIED');
+                        if(status) status.innerText = "VERIFIED // AUTHENTICATED";
+                        if(status) status.style.color = "#aaffaa";
+                    }, 1000);
+                }
+            }
+            addLine();
+        }
+
         // Chart Injection Logic
         const metricsData = {};
 

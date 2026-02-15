@@ -14,13 +14,33 @@
 </head>
 <body class="tier-high">
 
+    <!-- System 2 Verification Overlay -->
+    <div id="system2-overlay" class="system2-overlay">
+        <div class="system2-terminal">
+            <div id="sys2-content"></div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="cyber-toast-container"></div>
+
+    <!-- Raw Source Modal -->
+    <div id="raw-source-modal" class="raw-source-modal">
+        <div class="raw-source-header">
+            <span>SOURCE_DATA.JSON</span>
+            <span style="cursor:pointer; color:#cc0000;" onclick="toggleSource()">[CLOSE]</span>
+        </div>
+        <div class="raw-source-content" id="raw-source-content"></div>
+    </div>
+
     <!-- Virtual Toolbar for High Tier -->
     <div class="doc-toolbar" style="display: flex;">
         <div class="toolbar-item" onclick="window.location.href='market_mayhem_archive.html'"><strong>FILE</strong></div>
-        <div class="toolbar-item">EDIT</div>
-        <div class="toolbar-item">VIEW</div>
-        <div class="toolbar-item">INSERT</div>
-        <div class="toolbar-item">FORMAT</div>
+        <div class="toolbar-item" onclick="showToast('EDIT MODE: READ ONLY (ARCHIVED)')">EDIT</div>
+        <div class="toolbar-item" onclick="toggleTheme()">VIEW</div>
+        <div class="toolbar-item" onclick="showToast('INSERT: PERMISSION DENIED')">INSERT</div>
+        <div class="toolbar-item" onclick="showToast('FORMAT: LOCKED')">FORMAT</div>
+        <div class="toolbar-item" onclick="runVerification()" style="color: #0078d7;"><strong>VERIFY</strong></div>
         <div style="flex-grow:1;"></div>
         <div class="toolbar-item" style="color:#666;">ADAM_V26_EDITOR</div>
     </div>
@@ -31,11 +51,11 @@
     </div>
 
     <div class="newsletter-wrapper">
-        <div class="paper-sheet">
+        <div class="paper-sheet" id="paper-sheet">
 
             <!-- High Tier Header UI -->
             <div class="doc-header-ui" style="display: flex;">
-                <span>CONFIDENTIAL // SYSTEM 2 REVIEW</span>
+                <span id="verification-status">CONFIDENTIAL // SYSTEM 2 REVIEW</span>
                 <span>1d50206b</span>
             </div>
 
@@ -143,7 +163,7 @@
                 </div>
             </div>
 
-            <a href="#" class="source-jump-btn" title="View Source JSON">JUMP TO SOURCE</a>
+            <a href="#" class="source-jump-btn" onclick="toggleSource(); return false;" title="View Source JSON">JUMP TO SOURCE</a>
 
             <div style="margin-top: 40px; border-top: 1px solid #ccc; padding-top: 20px; font-style: italic; color: #666;">
                 End of Transmission.
@@ -205,7 +225,105 @@
         </aside>
     </div>
 
+    <!-- Hidden Raw Data -->
+    <textarea id="hidden-raw-data" style="display:none;">{
+  "title": "Market Mayhem Newsletter - October 23, 1987",
+  "date": "1987-10-23",
+  "summary": "   Mood: \"Shell-Shocked\"\n   Driver: Program Trading\n   Theme: \"Black Monday\" \u2014 On October 19th, the Dow Jones Industrial Average fell 22.6% in a single day. 508 points. It was the largest one-day perc...",
+  "type": "NEWSLETTER",
+  "full_body": "<h3>Your weekly guide to navigating the financial storms and spotting the sunshine!</h3>\n<h2>Market Snapshot</h2>\n<em>   <strong>S&P 500:</strong> 248 (-20% WoW) </em>[Rebounding from the Monday low]*\n<em>   <strong>Dow Jones:</strong> 1,950 (-13% WoW) </em>[Down 508 points on Monday alone]*\n<ul>\n<li>  <strong>Nasdaq Composite:</strong> 330 (-15% WoW)</li>\n<li>  <strong>Brent Crude Oil:</strong> $18.50 (-2% WoW)</li>\n<li>  <strong>Gold:</strong> $475 (+3% WoW)</li>\n</ul>\n<em>   <strong>Treasury Yield (10Y):</strong> 9.00% </em>[Fell from 10.2% as flight to safety kicked in]*\n<h2>Market Mayhem: Executive Summary</h2>\n<ul>\n<li>  <strong>Mood:</strong> <strong>\"Shell-Shocked\"</strong></li>\n<li>  <strong>Driver:</strong> <strong>Program Trading</strong></li>\n<li>  <strong>Theme:</strong> <strong>\"Black Monday\"</strong> \u2014 On October 19th, the Dow Jones Industrial Average fell 22.6% in a single day. 508 points. It was the largest one-day percentage drop in history.</li>\n</ul>\n<h2>Key News & Events (The \"What Happened\")</h2>\n<p>1.  <strong>The Crash:</strong> Monday, Oct 19. Panic selling overwhelmed the specialists. \"Portfolio Insurance\" algorithms sold futures into a falling market, creating a feedback loop of doom.\n2.  <strong>Greenspan Speaks:</strong> Newly appointed Fed Chair Alan Greenspan issued a terse one-sentence statement Tuesday morning: \"The Federal Reserve... stands ready to serve as a source of liquidity to support the economic and financial system.\"\n3.  <strong>Exchange Closures?</strong> Rumors swirled on Tuesday that the NYSE would close. It didn't, but many stocks didn't open for trading for hours due to order imbalances.\n4.  <strong>Hong Kong Halts:</strong> The Hong Kong Stock Exchange closed for the rest of the week.\n5.  <strong>Buybacks Announced:</strong> Corporations rushed to announce share buybacks to support their stock prices, putting a floor under the market by Wednesday.</p>\n<h2>Top Investment Ideas (The \"Alpha\")</h2>\n<h3>1. Blue Chip Value (Warren Buffett Style)</h3>\n<ul>\n<li>  <strong>Rationale:</strong> Did <strong>Coca-Cola</strong> or <strong>Gillette</strong> lose 20% of their future earnings power in 6 hours? No. Mr. Market is manic-depressive. It's a buying opportunity of a generation.</li>\n<li>  <strong>Key Risks:</strong> A recession could follow (like 1929).</li>\n</ul>\n<h3>2. Bonds (The Pivot)</h3>\n<ul>\n<li>  <strong>Rationale:</strong> The crash likely kills the inflation scare. Yields at 10% are attractive if the economy slows.</li>\n<li>  <strong>Key Risks:</strong> Inflation stays high.</li>\n</ul>\n<h2>Notable Signals & Rumors</h2>\n<ul>\n<li>  <strong>Signal:</strong> <strong>P/E Compression:</strong> The market P/E fell from 22x to 15x in two days. Valuation is finally reasonable.</li>\n<li>  <strong>Whisper:</strong> \"The computers did it. Expect Congress to ban 'Program Trading' and 'Index Arbitrage'.\"</li>\n</ul>\n<h2>Policy Impact & Geopolitical Outlook</h2>\n<ul>\n<li>  <strong>Central Banks:</strong> The Fed is flooding the system. Rates are heading lower. The \"Greenspan Put\" is born.</li>\n<li>  <strong>Geopolitics:</strong> Tensions in the Persian Gulf (Iran attacking tankers) triggered the initial sell-off last week, but now domestic liquidity is the only story.</li>\n</ul>\n<h2>Deals & Corporate Actions</h2>\n<ul>\n<li>  <strong>M&A:</strong> <strong>Failed Deals.</strong> Arbitrageurs were wiped out. Many leveraged buyouts (LBOs) are being pulled or renegotiated.</li>\n<li>  <strong>Corporate Action:</strong> <strong>Honeywell</strong>, <strong>Citicorp</strong>, and dozens of others announced massive buyback programs.</li>\n</ul>\n<h2>Earnings Watch (Next Week)</h2>\n<ul>\n<li>  <strong>Exxon (XOM):</strong> Will oil price volatility impact earnings?</li>\n<li>  <strong>IBM:</strong> Can Big Blue lead the tech recovery?</li>\n</ul>\n<h2>Thematic Deep Dive: \"The Failure of Portfolio Insurance\"</h2>\n<p>Wall Street thought it had conquered risk. \"Portfolio Insurance\" promised to limit downside by automatically shorting futures when stocks fell.</p>\n<p>It worked in theory. In practice, when everyone tries to rush through the same exit door at the same time, the door jams. The liquidity wasn't there. Instead of hedging risk, the algorithms amplified it. Lesson: Financial engineering cannot eliminate systemic risk.</p>\n<h2>Year Ahead Forecast</h2>\n<strong>Cautiously Bullish.</strong> Unlike 1929, the Fed stepped in immediately. The banking system is solvent. We believe the \"Great Bull Market\" that started in 1982 is wounded but alive.\n<h2>Quirky Sign-Off</h2>\n<p>> \"It's a buy signal when you see an investor jumping out of a window.\" \u2014 <em>Wall Street Adage (Dark Humor)</em></p>\n<p>Keep your head when others are losing theirs.</p>\n<p>---\n<em>Disclaimer: This newsletter is for informational purposes only and does not constitute financial advice. Past performance is not indicative of future results. Do your own research before making any investment decisions.</em></p>\n",
+  "sentiment_score": 25,
+  "entities": {
+    "tickers": [],
+    "agents": [],
+    "sovereigns": []
+  },
+  "provenance_hash": "1d50206b805a4967460ab5e7f0ae4c8b9c6dc94e558223d6832340279ef0764c",
+  "filename": "1987-10-23_Market_Mayhem.html",
+  "is_sourced": true,
+  "metrics_json": "{}",
+  "source_priority": 2,
+  "conviction": 50,
+  "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 25/100. Cross-reference with knowledge graph completed.",
+  "quality": 100,
+  "semantic_score": 64,
+  "probability": 50
+}</textarea>
+
     <script>
+        // --- INTERACTION LOGIC ---
+
+        function showToast(msg) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'cyber-toast';
+            toast.innerText = '> ' + msg;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            showToast('THEME: ' + (isDark ? 'DARK_MODE' : 'LIGHT_MODE'));
+        }
+
+        function toggleSource() {
+            const modal = document.getElementById('raw-source-modal');
+            const content = document.getElementById('raw-source-content');
+            const rawData = document.getElementById('hidden-raw-data').value;
+
+            if (modal.style.display === 'flex') {
+                modal.style.display = 'none';
+            } else {
+                content.innerText = rawData || "NO SOURCE DATA AVAILABLE.";
+                modal.style.display = 'flex';
+            }
+        }
+
+        function runVerification() {
+            const overlay = document.getElementById('system2-overlay');
+            const content = document.getElementById('sys2-content');
+            const status = document.getElementById('verification-status');
+
+            overlay.style.display = 'flex';
+            content.innerHTML = '';
+
+            const lines = [
+                "INITIATING SYSTEM 2 PROTOCOL...",
+                "VERIFYING CRYPTOGRAPHIC SIGNATURE...",
+                "HASH: 1d50206b805a4967460ab5e7f0ae4c8b9c6dc94e558223d6832340279ef0764c",
+                "CHECKING CHAIN OF CUSTODY...",
+                "ANALYZING SENTIMENT VECTORS...",
+                "CROSS-REFERENCING KNOWLEDGE GRAPH...",
+                "VERIFICATION COMPLETE."
+            ];
+
+            let i = 0;
+            function addLine() {
+                if (i < lines.length) {
+                    const div = document.createElement('div');
+                    div.className = 'system2-line';
+                    div.innerText = '> ' + lines[i];
+                    div.style.opacity = 1;
+                    content.appendChild(div);
+                    i++;
+                    setTimeout(addLine, 400);
+                } else {
+                    setTimeout(() => {
+                        overlay.style.display = 'none';
+                        showToast('DOCUMENT VERIFIED');
+                        if(status) status.innerText = "VERIFIED // AUTHENTICATED";
+                        if(status) status.style.color = "#aaffaa";
+                    }, 1000);
+                }
+            }
+            addLine();
+        }
+
         // Chart Injection Logic
         const metricsData = {};
 
