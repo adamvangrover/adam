@@ -125,6 +125,24 @@ def calculate_provenance(text):
     """Generates a SHA-256 hash of the content."""
     return hashlib.sha256(text.encode('utf-8')).hexdigest()
 
+def determine_tier(type_, quality):
+    """Determines the visual tier based on type and quality."""
+    # Force low tier for specific types regardless of quality score (Feed/Chat style)
+    if type_ in ["MARKET_PULSE", "DAILY_BRIEFING", "CYBER_GLITCH", "TECH_WATCH", "AGENT_NOTE"]:
+        return "tier-low"
+
+    if type_ in ["DEEP_DIVE", "SPECIAL_EDITION", "STRATEGY", "ANNUAL_STRATEGY", "HISTORICAL"]:
+        return "tier-high"
+
+    # Fallback to quality for standard newsletters
+    if quality >= 90:
+        return "tier-high"
+
+    if type_ in ["NEWSLETTER", "WEEKLY_RECAP", "INDUSTRY_REPORT", "COMPANY_REPORT"]:
+        return "tier-medium"
+
+    return "tier-medium"
+
 # --- Formatting Helpers ---
 
 def simple_md_to_html(text):
@@ -198,23 +216,14 @@ def parse_date(date_str):
         except ValueError:
             continue
 
-    # Regex Parsing with prioritization
-
-    # Check for MMDDYYYY (8 digits) specifically if it looks like month is first
-    # But YYYYMMDD is also 8 digits.
-    # Logic: if first 4 digits are > 1900, assume YYYYMMDD.
-    # If first 2 digits are <= 12, assume MMDDYYYY?
-
     match_us = re.search(r'^(\d{2})[-_]?(\d{2})[-_]?(\d{4})$', date_str)
     if match_us:
-        # MMDDYYYY or DDMMYYYY
         return f"{match_us.group(3)}-{match_us.group(1)}-{match_us.group(2)}"
 
     match_iso = re.search(r'^(\d{4})[-_]?(\d{2})[-_]?(\d{2})$', date_str)
     if match_iso:
          return f"{match_iso.group(1)}-{match_iso.group(2)}-{match_iso.group(3)}"
 
-    # Fallback to loose search
     match = re.search(r'(\d{4})[-_]?(\d{2})[-_]?(\d{2})', date_str)
     if match:
         return f"{match.group(1)}-{match.group(2)}-{match.group(3)}"
@@ -264,7 +273,6 @@ def parse_json_file(filepath):
 
         if not data: return None
 
-        # Extract Title
         title = data.get('title') or data.get('topic') or data.get('report_title')
         if not title:
             company = data.get('company') or data.get('company_name')
@@ -273,7 +281,6 @@ def parse_json_file(filepath):
             else:
                 title = 'Untitled Report'
 
-        # Extract Date
         date_str = "2025-01-01"
         filename = os.path.basename(filepath)
         date_match = re.search(r'(\d{4}_\d{2}_\d{2})', filename)
@@ -285,28 +292,23 @@ def parse_json_file(filepath):
         elif date_match:
             date_str = parse_date(date_match.group(1).replace('_', '-'))
         else:
-             # Stricter Year Check (19xx or 20xx) to avoid matching MMDDYYYY as YYYYMMDD
              date_match_2 = re.search(r'((?:19|20)\d{2})[-_]?(\d{2})[-_]?(\d{2})', filename)
              if date_match_2:
                  date_str = f"{date_match_2.group(1)}-{date_match_2.group(2)}-{date_match_2.group(3)}"
              else:
-                 # Check for MMDDYYYY
                  match_us = re.search(r'(\d{2})(\d{2})(\d{4})', filename)
                  if match_us:
                      date_str = f"{match_us.group(3)}-{match_us.group(1)}-{match_us.group(2)}"
 
-        # Construct Body
         body_html = ""
         summary = data.get('summary', "")
 
-        # Financial Metrics for Visualization (if available)
         metrics_json = "{}"
         if "financial_performance" in data and "metrics" in data["financial_performance"]:
              metrics_json = json.dumps(data["financial_performance"]["metrics"])
         elif "metrics" in data:
              metrics_json = json.dumps(data["metrics"])
 
-        # Schema 1: 'sections' list
         sections = data.get('sections', [])
         if sections:
             for section in sections:
@@ -326,7 +328,6 @@ def parse_json_file(filepath):
                         body_html += "</ul>"
 
                     if 'metrics' in section:
-                         # Capture metrics for this section for the body, but also potential chart
                          metrics_data = section['metrics']
                          if isinstance(metrics_data, dict):
                              body_html += format_dict_as_html(metrics_data, 3)
@@ -336,8 +337,6 @@ def parse_json_file(filepath):
                                  body_html += f"<li>{m}</li>"
                              body_html += "</ul>"
 
-
-        # Schema 2: 'analysis' dict
         elif "analysis" in data:
             if summary: body_html += f"<h2>Executive Summary</h2><p>{summary}</p>"
             body_html += format_dict_as_html(data['analysis'])
@@ -350,7 +349,6 @@ def parse_json_file(filepath):
                      else:
                          body_html += f"<p>{data[key]}</p>"
 
-        # Schema 3: Generic
         elif summary:
              body_html += f"<p>{summary}</p>"
              for k, v in data.items():
@@ -359,28 +357,27 @@ def parse_json_file(filepath):
 
         if not summary: summary = f"Market Report from {date_str}"
 
-        # Determine Type
         type_ = "NEWSLETTER"
         lower_title = title.lower()
         if "deep dive" in lower_title: type_ = "DEEP_DIVE"
         elif "industry" in lower_title: type_ = "INDUSTRY_REPORT"
+        elif "daily briefing" in lower_title: type_ = "DAILY_BRIEFING"
+        elif "market pulse" in lower_title: type_ = "MARKET_PULSE"
+        elif "tech watch" in lower_title: type_ = "TECH_WATCH"
         elif "company" in lower_title or "report" in lower_title: type_ = "COMPANY_REPORT"
         elif "thematic" in lower_title: type_ = "THEMATIC_REPORT"
         elif "outlook" in lower_title or "review" in lower_title: type_ = "MARKET_OUTLOOK"
 
-        # Determine filename
         if "file_name" in data:
             out_filename = data["file_name"].replace('.json', '.html')
         else:
             out_filename = filename.replace('.json', '.html').replace('.md', '.html')
 
-        # Analysis
         full_text = f"{title} {summary} {body_html}"
         sentiment = analyze_sentiment(full_text)
         entities = extract_entities(full_text)
         prov_hash = calculate_provenance(full_text)
 
-        # New Metrics
         conviction = calculate_conviction(full_text)
         semantic_score = calculate_semantic_score(full_text)
         probability = calculate_probability(full_text)
@@ -397,7 +394,7 @@ def parse_json_file(filepath):
             "filename": out_filename,
             "is_sourced": True,
             "metrics_json": metrics_json,
-            "source_priority": 2, # Higher priority than restored HTML
+            "source_priority": 2,
             "conviction": conviction,
             "semantic_score": semantic_score,
             "probability": probability
@@ -432,12 +429,10 @@ def parse_txt_file(filepath):
         if summary_match:
              summary = summary_match.group(1)[:300] + "..."
 
-        # Analysis
         sentiment = analyze_sentiment(content)
         entities = extract_entities(content)
         prov_hash = calculate_provenance(content)
 
-        # New Metrics
         conviction = calculate_conviction(content)
         semantic_score = calculate_semantic_score(content)
         probability = calculate_probability(content)
@@ -477,20 +472,14 @@ def parse_markdown_file(filepath):
 
         date_match = re.search(r'\*\*Date:\*\* (.*?)$', content, re.MULTILINE)
         if not date_match:
-             # Try to find date in Title (e.g., "Newsletter - July 14, 2025")
              date_in_title = re.search(r'(January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{1,2},?\s+\d{4}', title, re.IGNORECASE)
              if date_in_title:
                  raw_date = date_in_title.group(0)
              else:
-                 # Try MMDDYYYY logic first for filename parsing if needed, but parse_date handles standard formats
-                 # If filename is MM04042025.md (04042025 matches YYYYMMDD with loose regex)
-
-                 # Stricter YYYYMMDD check
                  date_match = re.search(r'((?:19|20)\d{2})[-_]?(\d{2})[-_]?(\d{2})', filename)
                  if date_match:
                      raw_date = f"{date_match.group(1)}-{date_match.group(2)}-{date_match.group(3)}"
                  else:
-                     # Check for MMDDYYYY in filename
                      match_us = re.search(r'(\d{2})(\d{2})(\d{4})', filename)
                      if match_us:
                          raw_date = f"{match_us.group(3)}-{match_us.group(1)}-{match_us.group(2)}"
@@ -503,6 +492,7 @@ def parse_markdown_file(filepath):
 
         if "Deep_Dive" in filename: type_ = "DEEP_DIVE"
         elif "Pulse" in filename or "Pulse" in title: type_ = "MARKET_PULSE"
+        elif "Daily" in filename or "Briefing" in title: type_ = "DAILY_BRIEFING"
         elif "Industry" in filename: type_ = "INDUSTRY_REPORT"
         elif "Weekly" in filename: type_ = "WEEKLY_RECAP"
         elif "Tech_Watch" in filename: type_ = "TECH_WATCH"
@@ -517,7 +507,6 @@ def parse_markdown_file(filepath):
         else:
             summary = "Market analysis and strategic insights."
 
-        # Extract New Metadata (Conviction/Critique)
         conviction_match = re.search(r'\*\*Conviction:\*\* .*?(\d+)/100', content)
         conviction_score = int(conviction_match.group(1)) if conviction_match else 50
 
@@ -532,17 +521,14 @@ def parse_markdown_file(filepath):
 
         body_html = simple_md_to_html(content)
 
-        # Analysis
         sentiment = analyze_sentiment(content)
         entities = extract_entities(content)
         prov_hash = calculate_provenance(content)
 
-        # New Metrics (Calculated if not present in MD)
         semantic_score = calculate_semantic_score(content)
         probability = calculate_probability(content)
 
-        # If conviction was not extracted from MD metadata, calculate it
-        if conviction_score == 50: # Default or not found
+        if conviction_score == 50:
              conviction_score = calculate_conviction(content)
 
         item = {
@@ -579,26 +565,21 @@ def parse_html_file(filepath):
     try:
         with open(filepath, 'r', encoding='utf-8') as f:
             content = f.read()
-            # Reset file pointer for BS4
             f.seek(0)
             soup = BeautifulSoup(f, 'html.parser')
 
         filename = os.path.basename(filepath)
 
-        # Skip indices and dashboards if they are in the source list but not content
         if filename in ["index.html", "market_mayhem_archive.html", "daily_briefings_library.html",
                         "market_pulse_library.html", "house_view_library.html", "portfolio_dashboard.html",
-                        "data.html", "reports.html", "agents.html", "chat.html"]:
+                        "data.html", "reports.html", "agents.html", "chat.html", "market_mayhem_rebuild.html", "market_mayhem_conviction.html"]:
             return None
 
-        # --- Strategy 1: Extract from Legacy Newsletter Structure ---
         container = soup.find('div', class_='newsletter-container')
         if container:
-            # Extract Title
             title_tag = soup.find('h1', class_='title')
             title = title_tag.get_text(strip=True) if title_tag else "Untitled Newsletter"
 
-            # Extract Date
             date_str = "2025-01-01"
             meta_div = soup.find('div', class_='meta-header')
             if meta_div:
@@ -608,13 +589,11 @@ def parse_html_file(filepath):
                         date_str = parse_date(text.replace("Date:", "").strip())
                         break
             
-            # Extract Summary
             summary = "Market analysis."
             summary_p = soup.find('p', style=lambda s: s and 'italic' in s)
             if summary_p:
                 summary = summary_p.get_text(strip=True).replace("Executive Summary:", "").strip()
 
-            # Extract Type
             type_badge = soup.find('div', class_='cyber-badge-overlay')
             type_ = "NEWSLETTER"
             if type_badge:
@@ -623,7 +602,6 @@ def parse_html_file(filepath):
                 elif "MONTHLY" in badge_text: type_ = "NEWSLETTER"
                 elif "FLASH" in badge_text: type_ = "MARKET_PULSE"
 
-            # Extract Body (cleaning up)
             for match in container.find_all(['h1', 'div'], class_=['title', 'meta-header', 'cyber-badge-overlay', 'back-link']):
                 match.decompose()
             disclaimers = container.find_all('div', style=lambda s: s and 'border-top' in s)
@@ -650,9 +628,9 @@ def parse_html_file(filepath):
                 "entities": entities,
                 "provenance_hash": prov_hash,
                 "filename": filename,
-                "is_sourced": True, # Recovered content can be treated as sourced
+                "is_sourced": True,
                 "metrics_json": "{}",
-                "source_priority": 1, # Lower priority than MD/JSON
+                "source_priority": 1,
                 "conviction": conviction,
                 "semantic_score": semantic_score,
                 "probability": probability
@@ -660,31 +638,23 @@ def parse_html_file(filepath):
             item["critique"] = generate_critique(item)
             return item
 
-        # --- Strategy 2: Extract from Generated/Generic HTML ---
-        
-        # Title
         title_match = re.search(r'<title>(?:ADAM v23\.5 :: )?(.*?)</title>', content, re.IGNORECASE)
         title = title_match.group(1).strip() if title_match else filename.replace('.html', '').replace('_', ' ')
 
-        # Date Logic (Filename Priority -> Content Regex)
         date = "2025-01-01" 
         
-        # 1. MMXXXXYYYY format (e.g. MM09192025)
         mm_match = re.search(r'MM(\d{2})(\d{2})(\d{4})', filename)
         if mm_match:
             date = f"{mm_match.group(3)}-{mm_match.group(1)}-{mm_match.group(2)}"
         else:
-            # 2. Standard patterns in filename
             date_match = re.search(r'(\d{4})[-_]?(\d{2})[-_]?(\d{2})', filename)
             if date_match:
                 date = f"{date_match.group(1)}-{date_match.group(2)}-{date_match.group(3)}"
             else:
-                # 3. Content search
                 content_date = re.search(r'(\w+ \d{1,2}, \d{4})', content)
                 if content_date:
                     date = parse_date(content_date.group(1))
 
-        # Type Logic
         type_ = "NEWSLETTER"
         lower_title = title.lower()
         if "deep dive" in lower_title or "deep_dive" in filename: type_ = "DEEP_DIVE"
@@ -695,7 +665,6 @@ def parse_html_file(filepath):
         elif "outlook" in lower_title or "strategy" in lower_title: type_ = "STRATEGY"
         elif "snc" in lower_title: type_ = "GUIDE"
 
-        # Analysis
         sentiment = analyze_sentiment(content)
         entities = extract_entities(content)
         prov_hash = calculate_provenance(content)
@@ -709,12 +678,12 @@ def parse_html_file(filepath):
             "date": date,
             "summary": "Report content.",
             "type": type_,
-            "full_body": "", # No need to re-render body for existing HTML if we aren't regenerating it
+            "full_body": "",
             "sentiment_score": sentiment,
             "entities": entities,
             "provenance_hash": prov_hash,
             "filename": filename,
-            "is_sourced": False, # Do not overwrite existing HTML unless it was the legacy kind
+            "is_sourced": False,
             "metrics_json": "{}",
             "conviction": conviction,
             "semantic_score": semantic_score,
@@ -742,7 +711,7 @@ NEWSLETTER_DATA = [
         <p>As markets open on January 12, 2026, the global financial system has decisively exited the post-pandemic transitional phase and entered a new, distinct market regime: the <strong>Reflationary Agentic Boom</strong>. This paradigm is defined by a paradoxical but potent combination of accelerating economic growth in the United States, sticky inflation floors driven by geopolitical fragmentation and tariffs, and a technological productivity shock moving from generative experimentation to "agentic" execution.</p>
         <p>The prevailing narrative of late 2024 and 2025—that the Federal Reserve's tightening cycle would inevitably induce a recession—has been falsified by the data. Instead, the US economy is tracking toward a robust 2.5% to 2.6% real GDP growth rate for 2026. This resilience is not merely a cyclical rebound but a structural shift powered by three pillars: the fiscal impulse of anticipated tax cuts, the capital expenditure (Capex) super-cycle associated with "Sovereign AI," and the integration of digital assets into the institutional balance sheet via new accounting standards.</p>
         """,
-        "source_priority": 3 # Highest priority (Static)
+        "source_priority": 3
     },
     {
         "date": "2008-09-19",
@@ -831,7 +800,7 @@ NEWSLETTER_DATA = [
     }
 ]
 
-# --- Report Template (Enhanced with Cyber HUD) ---
+# --- Report Template (Enhanced with Tiers and Provenance) ---
 
 HTML_TEMPLATE = """<!DOCTYPE html>
 <html lang="en">
@@ -840,100 +809,82 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ADAM v23.5 :: {title}</title>
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/market_mayhem_tiers.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="js/nav.js" defer></script>
-    <style>
-        :root {{
-            --paper-bg: #fdfbf7;
-            --ink-color: #1a1a1a;
-            --accent-red: #cc0000;
-            --cyber-black: #050b14;
-            --cyber-blue: #00f3ff;
-            --cyber-green: #00ff00;
-        }}
-        body {{ margin: 0; background: var(--cyber-black); color: #e0e0e0; font-family: 'Inter', sans-serif; }}
-
-        .newsletter-wrapper {{
-            max-width: 1200px;
-            margin: 40px auto;
-            display: grid;
-            grid-template-columns: 3fr 1fr;
-            gap: 40px;
-            padding: 20px;
-        }}
-        @media (max-width: 768px) {{ .newsletter-wrapper {{ grid-template-columns: 1fr; }} }}
-
-        .paper-sheet {{
-            background: var(--paper-bg);
-            color: var(--ink-color);
-            padding: 60px;
-            font-family: 'Georgia', 'Times New Roman', serif;
-            box-shadow: 0 0 50px rgba(0,0,0,0.5);
-            position: relative;
-        }}
-
-        h1.title {{
-            font-family: 'Playfair Display', serif; font-size: 3rem; border-bottom: 4px solid var(--ink-color);
-            padding-bottom: 20px; margin-bottom: 30px; letter-spacing: -1px; line-height: 1.1;
-        }}
-        h2 {{
-            font-family: 'Inter', sans-serif; font-weight: 700; font-size: 1.2rem; margin-top: 40px;
-            margin-bottom: 15px; color: var(--accent-red); text-transform: uppercase; letter-spacing: 1px;
-        }}
-        p {{ line-height: 1.8; margin-bottom: 20px; font-size: 1.05rem; }}
-        li {{ line-height: 1.6; margin-bottom: 10px; }}
-
-        /* Cyber HUD Sidebar */
-        .cyber-sidebar {{ font-family: 'JetBrains Mono', monospace; }}
-        .sidebar-widget {{
-            border: 1px solid #333; background: rgba(5, 11, 20, 0.8); padding: 15px; margin-bottom: 20px;
-            backdrop-filter: blur(5px);
-        }}
-        .sidebar-title {{
-            color: var(--cyber-blue); font-size: 0.75rem; text-transform: uppercase; border-bottom: 1px solid #333;
-            padding-bottom: 8px; margin-bottom: 12px; letter-spacing: 1px;
-        }}
-        .stat-row {{ display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.8rem; color: #aaa; }}
-        .stat-val {{ color: #fff; font-weight: bold; }}
-
-        .sentiment-bar {{ height: 4px; background: #333; margin-top: 5px; border-radius: 2px; overflow: hidden; }}
-        .sentiment-fill {{ height: 100%; background: var(--cyber-blue); }}
-
-        .tag-cloud {{ display: flex; flex-wrap: wrap; gap: 5px; }}
-        .tag {{ background: #222; color: #ccc; padding: 2px 6px; font-size: 0.7rem; border-radius: 3px; border: 1px solid #444; }}
-        .tag.ticker {{ color: var(--cyber-green); border-color: var(--cyber-green); }}
-        .tag.agent {{ color: var(--cyber-blue); border-color: var(--cyber-blue); }}
-
-        .cyber-btn {{
-            font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; padding: 8px 16px; border: 1px solid #444;
-            color: #e0e0e0; background: rgba(0,0,0,0.8); text-decoration: none; display: inline-block;
-        }}
-        .cyber-btn:hover {{ border-color: var(--cyber-blue); color: var(--cyber-blue); }}
-    </style>
 </head>
-<body>
-    <div style="max-width: 1400px; margin: 0 auto; padding: 20px; display:flex; justify-content:space-between; align-items:center;">
+<body class="{tier_class}">
+
+    <!-- Virtual Toolbar for High Tier -->
+    <div class="doc-toolbar" style="display: {toolbar_display};">
+        <div class="toolbar-item" onclick="window.location.href='market_mayhem_archive.html'"><strong>FILE</strong></div>
+        <div class="toolbar-item">EDIT</div>
+        <div class="toolbar-item">VIEW</div>
+        <div class="toolbar-item">INSERT</div>
+        <div class="toolbar-item">FORMAT</div>
+        <div style="flex-grow:1;"></div>
+        <div class="toolbar-item" style="color:#666;">ADAM_V26_EDITOR</div>
+    </div>
+
+    <div style="max-width: 1400px; margin: 0 auto; padding: 10px 20px; display:flex; justify-content:space-between; align-items:center; display: {nav_display};">
         <a href="market_mayhem_archive.html" class="cyber-btn">&larr; RETURN TO ARCHIVE</a>
         <div style="font-family:'JetBrains Mono'; font-size:0.7rem; color:#666;">SECURE CONNECTION ESTABLISHED</div>
     </div>
 
     <div class="newsletter-wrapper">
         <div class="paper-sheet">
-            <div style="display:flex; justify-content:space-between; font-family:'JetBrains Mono'; font-size:0.8rem; color:#666; margin-bottom:20px;">
+
+            <!-- High Tier Header UI -->
+            <div class="doc-header-ui" style="display: {header_ui_display};">
+                <span>CONFIDENTIAL // SYSTEM 2 REVIEW</span>
+                <span>{prov_short}</span>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; font-family:'JetBrains Mono'; font-size:0.8rem; color:#666; margin-bottom:20px; margin-top: 20px;">
                 <span>{date}</span>
                 <span>ID: {prov_short}</span>
             </div>
 
             <h1 class="title">{title}</h1>
 
+            <!-- Metadata Panel for High Tier (Embedded in Doc) -->
+            <div class="doc-metadata-panel" style="display: {metadata_panel_display};">
+                <div class="doc-metadata-item"><strong>Classification</strong>UNCLASSIFIED</div>
+                <div class="doc-metadata-item"><strong>Conviction</strong>{conviction}/100</div>
+                <div class="doc-metadata-item"><strong>Sentiment</strong>{sentiment_score}/100</div>
+                <div class="doc-metadata-item"><strong>Reviewer</strong>{reviewer_agent}</div>
+            </div>
+
             <div id="financialChartContainer" style="display:none; margin-bottom: 30px;">
                 <canvas id="financialChart"></canvas>
             </div>
 
             {full_body}
+
+            <!-- Provenance Log (All Tiers) -->
+            <div class="provenance-log">
+                <div class="log-entry">
+                    <span>> HASH_CHECK</span>
+                    <span style="color:var(--terminal-green);">{prov_hash}</span>
+                </div>
+                <div class="log-entry">
+                    <span>> SENTIMENT_SCAN</span>
+                    <span>{sentiment_score} (DENSITY: {semantic_score})</span>
+                </div>
+                <div class="log-entry">
+                    <span>> CONVICTION_LOCK</span>
+                    <span>{conviction}%</span>
+                </div>
+                <div class="log-entry">
+                    <span>> CRITIQUE_LOG</span>
+                    <span>"{critique}"</span>
+                </div>
+            </div>
+
+            <a href="#" class="source-jump-btn" title="View Source JSON">JUMP TO SOURCE</a>
 
             <div style="margin-top: 40px; border-top: 1px solid #ccc; padding-top: 20px; font-style: italic; color: #666;">
                 End of Transmission.
@@ -1051,9 +1002,8 @@ def get_all_data():
     """Gather all newsletter and report data."""
     all_items = []
 
-    # 1. Add Static Data (ensure processing)
+    # 1. Add Static Data
     for item in NEWSLETTER_DATA:
-        # Create a copy to avoid modifying the original global list repeatedly if called multiple times
         item = item.copy()
         full_text = f"{item['title']} {item['summary']} {item.get('full_body', '')}"
         item['sentiment_score'] = analyze_sentiment(full_text)
@@ -1068,7 +1018,7 @@ def get_all_data():
 
         all_items.append(item)
 
-    # 2. Scan Directories (Source)
+    # 2. Scan Directories
     for source_dir in SOURCE_DIRS:
         if not os.path.exists(source_dir): continue
         files = glob.glob(os.path.join(source_dir, "*"))
@@ -1077,12 +1027,11 @@ def get_all_data():
             if filepath.endswith(".json"): item = parse_json_file(filepath)
             elif filepath.endswith(".md"): item = parse_markdown_file(filepath)
             elif filepath.endswith(".txt"): item = parse_txt_file(filepath)
-            elif filepath.endswith(".html"): item = parse_html_file(filepath) # Handle recovered legacy HTML in source dirs
+            elif filepath.endswith(".html"): item = parse_html_file(filepath)
 
             if item: all_items.append(item)
 
-    # 3. Scan Showcase for existing HTML Artifacts (Data Vault, Glitches, Newsletters)
-    # This captures files that might not be in source dirs but exist in the output folder
+    # 3. Scan Showcase
     if os.path.exists(SHOWCASE_DIR):
         files = glob.glob(os.path.join(SHOWCASE_DIR, "*.html"))
         for filepath in files:
@@ -1090,9 +1039,6 @@ def get_all_data():
             if item: all_items.append(item)
 
     # Deduplicate
-    # We group by Date. If multiple items have the same date, we pick the one with highest priority.
-    # If same priority, we pick the first one or try to merge unique types.
-
     grouped_by_date = {}
     for item in all_items:
         date = item['date']
@@ -1102,29 +1048,19 @@ def get_all_data():
 
     final_items = []
     for date, items in grouped_by_date.items():
-        # Sort by priority (descending)
-        # Priority: Static (3) > Source MD/JSON (2) > Recovered HTML (1) > Existing Showcase HTML (0)
-        # Default source_priority for existing showcase HTML is effectively 0 or handled by is_sourced=False
-        
-        # Ensure priority exists
         for i in items:
             if 'source_priority' not in i: i['source_priority'] = 0 if not i.get('is_sourced', False) else 1
 
         items.sort(key=lambda x: x.get('source_priority', 0), reverse=True)
 
-        # Logic: We might want multiple items for the same day if they are different types (e.g. Newsletter vs Deep Dive)
-        # But duplicates of the SAME content should be removed.
-        
         unique_types = {}
         for item in items:
             t = item['type']
-            # Use title as a secondary key to allow multiple distinct reports of same type on same day
             key = f"{t}_{item['title']}"
             
             if key not in unique_types:
                 unique_types[key] = item
             else:
-                # If same type/title, pick higher priority
                 if item.get('source_priority', 0) > unique_types[key].get('source_priority', 0):
                     unique_types[key] = item
 
@@ -1139,37 +1075,38 @@ def generate_archive():
 
     sorted_items = get_all_data()
 
-    # Dump JSON Index for Conviction Paper Viewer
+    # Dump JSON Index
     json_path = os.path.join("showcase/data", "market_mayhem_index.json")
-    # Ensure directory exists
     os.makedirs(os.path.dirname(json_path), exist_ok=True)
     with open(json_path, "w", encoding="utf-8") as f:
         json.dump(sorted_items, f, default=str, indent=2)
     print(f"Generated Index JSON: {json_path}")
 
-    # 3. Generate HTML Reports (Only for sourced items that need generation)
+    # Generate HTML Reports
     print(f"Generating report pages for sourced items...")
     count = 0
     for item in sorted_items:
         if not item.get("is_sourced", False) or not item.get("full_body"): 
             continue
         
-        # Only generate if it's a priority item (not just scraping existing showcase html)
         if item.get("source_priority", 0) < 2:
             continue
 
         count += 1
 
-        # Build Entity HTML
+        # Entity HTML
         entity_html = ""
         for t in item['entities']['tickers']: entity_html += f'<span class="tag ticker">${t}</span>'
         for s in item['entities']['sovereigns']: entity_html += f'<span class="tag">{s}</span>'
 
-        # Build Agent HTML
+        # Agent HTML (with Avatars)
         agent_html = ""
         if item['entities']['agents']:
             for a in item['entities']['agents']:
-                agent_html += f'<div style="font-size:0.75rem; color:#ccc;"><i class="fas fa-robot"></i> {a}</div>'
+                avatar_class = "core"
+                if "Market" in a: avatar_class = "market"
+                if "Risk" in a: avatar_class = "risk"
+                agent_html += f'<div style="display:flex; align-items:center;"><div class="agent-avatar {avatar_class}">{a[:2]}</div><div style="font-size:0.75rem; color:#ccc;">{a}</div></div>'
         else:
             agent_html = '<div style="font-size:0.75rem; color:#666;">System Core</div>'
 
@@ -1177,6 +1114,20 @@ def generate_archive():
 
         conviction = item.get("conviction", 50)
         conviction_color = "#00ff00" if conviction > 70 else ("#ffff00" if conviction > 40 else "#ff0000")
+
+        # Determine Tier
+        tier_class = determine_tier(item['type'], item.get('quality', 100))
+
+        # UI Toggles based on Tier
+        toolbar_display = "flex" if tier_class == "tier-high" else "none"
+        header_ui_display = "flex" if tier_class == "tier-high" else "none"
+        metadata_panel_display = "grid" if tier_class == "tier-high" else "none"
+        nav_display = "none" if tier_class == "tier-high" else "flex" # High tier uses toolbar for nav
+
+        # Extract reviewer agent from critique for metadata panel
+        critique = item.get("critique", "Agent System reviewed this.")
+        reviewer_match = re.search(r'Agent (\w+)', critique)
+        reviewer_agent = reviewer_match.group(1) if reviewer_match else "SYSTEM"
 
         content = HTML_TEMPLATE.format(
             title=item["title"],
@@ -1192,29 +1143,30 @@ def generate_archive():
             metrics_json=item.get("metrics_json", "{}"),
             conviction=conviction,
             conviction_color=conviction_color,
-            critique=item.get("critique", "No critique available."),
+            critique=critique,
             quality=item.get("quality", 100),
             semantic_score=item.get("semantic_score", 0),
-            probability=item.get("probability", 50)
+            probability=item.get("probability", 50),
+            tier_class=tier_class,
+            toolbar_display=toolbar_display,
+            header_ui_display=header_ui_display,
+            metadata_panel_display=metadata_panel_display,
+            nav_display=nav_display,
+            reviewer_agent=reviewer_agent
         )
 
         with open(out_path, "w", encoding='utf-8') as f:
             f.write(content)
     print(f"Generated {count} sourced pages.")
 
-    # 4. Generate Main Archive Page (Cyber Dashboard)
-
-    # Prepare data for Chart.js
-    # Filter to ensure we have valid dates for sorting
-    chart_items = [i for i in sorted_items if i['date'] and i['date'] != "2025-01-01"] # Filter out defaults for chart clarity if needed, or keep
-    # Sort chronological for chart
+    # Generate Main Archive Page
+    chart_items = [i for i in sorted_items if i['date'] and i['date'] != "2025-01-01"]
     chart_items.sort(key=lambda x: x['date'])
     
     dates = [i['date'] for i in chart_items]
     sentiments = [i['sentiment_score'] for i in chart_items]
     convictions = [i.get('conviction', 50) for i in chart_items]
 
-    # Calculate 5-point Moving Average
     window_size = 5
     moving_averages = []
     for i in range(len(sentiments)):
@@ -1225,13 +1177,11 @@ def generate_archive():
              window = sentiments[i-window_size+1:i+1]
              moving_averages.append(sum(window)/window_size)
 
-    # Calculate Market Regime
     if not sentiments:
         market_regime = "UNKNOWN"
         regime_color = "#888"
     else:
         latest_avg = moving_averages[-1]
-
         if latest_avg > 60:
             market_regime = "BULLISH AGENTIC"
             regime_color = "#00ff00"
@@ -1242,15 +1192,12 @@ def generate_archive():
             market_regime = "VOLATILE TRANSITION"
             regime_color = "#ffff00"
 
-    # Count Agents
     active_agents_count = len(set([a for i in sorted_items for a in i['entities']['agents']]))
 
-    # Top Entities
     all_tickers = []
     for i in sorted_items: all_tickers.extend(i['entities']['tickers'])
     ticker_counts = Counter(all_tickers).most_common(10)
 
-    # Grouping
     grouped = {}
     historical = []
     for item in sorted_items:
@@ -1367,11 +1314,9 @@ def generate_archive():
             <div class="filter-group">
                 <label class="filter-label">Special Collections</label>
                 <div style="display: flex; flex-direction: column; gap: 5px;">
-                    <a href="daily_briefings_library.html" class="cyber-btn" style="text-align:center;">DAILY BRIEFINGS</a>
-                    <a href="market_pulse_library.html" class="cyber-btn" style="text-align:center;">MARKET PULSE</a>
-                    <a href="house_view_library.html" class="cyber-btn" style="text-align:center;">HOUSE VIEW</a>
+                    <a href="market_mayhem_rebuild.html" class="cyber-btn" style="text-align:center; border-color: #00f3ff; color: #00f3ff;">SYSTEM 2 HUB</a>
+                    <a href="market_mayhem_conviction.html" class="cyber-btn" style="text-align:center;">CONVICTION PAPER</a>
                     <a href="portfolio_dashboard.html" class="cyber-btn" style="text-align:center; border-color: #33ff00; color: #33ff00;">PORTFOLIO DASHBOARD</a>
-                    <a href="data.html" class="cyber-btn" style="text-align:center; border-color: #888; color: #aaa;">DATA VAULT</a>
                     <a href="macro_glitch_monitor.html" class="cyber-btn" style="text-align:center; border-color: #ff00ff; color: #ff00ff;">GLITCH MONITOR</a>
                 </div>
             </div>
@@ -1432,10 +1377,8 @@ def generate_archive():
             <div id="archiveGrid">
     """
 
-    # Inject Items
     for year in sorted(grouped.keys(), reverse=True):
         for item in grouped[year]:
-            # sanitize for data attributes
             safe_title = item['title'].replace('"', "'").lower()
             safe_summary = item['summary'].replace('"', "'").lower()
             
@@ -1454,7 +1397,6 @@ def generate_archive():
             </div>
             """
 
-    # Historical
     for item in historical:
          safe_title = item['title'].replace('"', "'").lower()
          safe_summary = item['summary'].replace('"', "'").lower()
@@ -1478,7 +1420,6 @@ def generate_archive():
     </div>
 
     <script>
-        // Chart Initialization
         const ctx = document.getElementById('sentimentChart').getContext('2d');
         const chartData = {
             labels: """ + json.dumps(dates) + """,
@@ -1529,7 +1470,6 @@ def generate_archive():
             }
         });
 
-        // Filter Logic
         function applyFilters() {
             const search = document.getElementById('searchInput').value.toLowerCase();
             const year = document.getElementById('yearFilter').value;
