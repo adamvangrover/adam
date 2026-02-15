@@ -797,6 +797,48 @@ NEWSLETTER_DATA = [
         <p><strong>The Economy:</strong> While politicians promise that 'prosperity is just around the corner', the destruction of wealth is likely to lead to a severe contraction in consumer spending and investment. The shadow of Depression looms.</p>
         """,
         "source_priority": 3
+    },
+    {
+        "date": "1971-08-15",
+        "title": "MARKET MAYHEM: THE NIXON SHOCK",
+        "summary": "\"Gold Window Closed\". President Nixon has suspended the convertibility of the dollar into gold. The Bretton Woods system is dead. Currencies are now floating in a sea of fiat.",
+        "type": "HISTORICAL",
+        "filename": "newsletter_market_mayhem_aug_1971.html",
+        "is_sourced": True,
+        "full_body": """
+        <p><strong>The End of Money as We Knew It.</strong> In a Sunday evening address, President Nixon announced that the United States would no longer convert dollars to gold at a fixed value. The anchor of the global financial system has been cut loose.</p>
+        <p><strong>Inflation Unleashed:</strong> Without the discipline of gold, the printing presses are free to run. Markets are reacting with extreme volatility as traders try to price currencies in a world without a fixed standard.</p>
+        <p><strong>The New Era:</strong> We have entered the age of fiat currency. The value of money is now based solely on faith in the issuing government. The long-term consequences for inflation and debt are unknown, but the immediate impact is chaos.</p>
+        """,
+        "source_priority": 3
+    },
+    {
+        "date": "2010-05-06",
+        "title": "MARKET MAYHEM: THE FLASH CRASH",
+        "summary": "\"998 Points in Minutes\". The Dow Jones Industrial Average plunged nearly 1,000 points in minutes, only to recover shortly after. Algorithms have taken control, and they are fragile.",
+        "type": "HISTORICAL",
+        "filename": "newsletter_market_mayhem_may_2010.html",
+        "is_sourced": True,
+        "full_body": """
+        <p><strong>The Machines Took Over.</strong> At 2:45 PM, the US stock market collapsed. The Dow lost 9% of its value in a matter of minutes. Blue-chip stocks like P&G traded at pennies. Then, just as quickly, it bounced back.</p>
+        <p><strong>High Frequency Trading:</strong> The culprit appears to be a feedback loop of algorithmic selling. 'Spoofing' and 'quote stuffing' are the new weapons of market warfare. Human traders stood by, helpless, as the machines drove the market off a cliff.</p>
+        <p><strong>Fragility:</strong> Today proved that liquidity is an illusion. In a crisis, the HFTs pull their bids, leaving a vacuum. The market structure is broken.</p>
+        """,
+        "source_priority": 3
+    },
+    {
+        "date": "2021-01-28",
+        "title": "MARKET MAYHEM: THE MEME STOCK REVOLT",
+        "summary": "\"Power to the Players\". Retail traders on Reddit have cornered hedge funds in a massive short squeeze. GME hit $483. Robinhood has halted trading. The definition of 'value' is broken.",
+        "type": "HISTORICAL",
+        "filename": "newsletter_market_mayhem_jan_2021.html",
+        "is_sourced": True,
+        "full_body": """
+        <p><strong>David vs. Goliath.</strong> A band of retail traders on r/WallStreetBets has executed a short squeeze on GameStop ($GME) that has brought multi-billion dollar hedge funds to their knees. Melvin Capital requires a bailout.</p>
+        <p><strong>The Halt:</strong> In an unprecedented move, brokerages like Robinhood restricted buying of the volatile stocks, citing clearinghouse capital requirements. The outcry is massive. Calls for regulation and investigation are deafening.</p>
+        <p><strong>The New Market:</strong> Narrative is now a fundamental. Flows dictate price, not earnings. The democratization of finance has unleashed a chaotic force that Wall Street does not yet understand.</p>
+        """,
+        "source_priority": 3
     }
 ]
 
