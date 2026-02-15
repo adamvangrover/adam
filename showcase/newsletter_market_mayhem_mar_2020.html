@@ -11,6 +11,75 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="js/nav.js" defer></script>
+    <style>
+        :root {
+            --paper-bg: #fdfbf7;
+            --ink-color: #1a1a1a;
+            --accent-red: #cc0000;
+            --cyber-black: #050b14;
+            --cyber-blue: #00f3ff;
+            --cyber-green: #00ff00;
+        }
+        body { margin: 0; background: var(--cyber-black); color: #e0e0e0; font-family: 'Inter', sans-serif; }
+
+        .newsletter-wrapper {
+            max-width: 1200px;
+            margin: 40px auto;
+            display: grid;
+            grid-template-columns: 3fr 1fr;
+            gap: 40px;
+            padding: 20px;
+        }
+        @media (max-width: 768px) { .newsletter-wrapper { grid-template-columns: 1fr; } }
+
+        .paper-sheet {
+            background: var(--paper-bg);
+            color: var(--ink-color);
+            padding: 60px;
+            font-family: 'Georgia', 'Times New Roman', serif;
+            box-shadow: 0 0 50px rgba(0,0,0,0.5);
+            position: relative;
+        }
+
+        h1.title {
+            font-family: 'Playfair Display', serif; font-size: 3rem; border-bottom: 4px solid var(--ink-color);
+            padding-bottom: 20px; margin-bottom: 30px; letter-spacing: -1px; line-height: 1.1;
+        }
+        h2 {
+            font-family: 'Inter', sans-serif; font-weight: 700; font-size: 1.2rem; margin-top: 40px;
+            margin-bottom: 15px; color: var(--accent-red); text-transform: uppercase; letter-spacing: 1px;
+        }
+        p { line-height: 1.8; margin-bottom: 20px; font-size: 1.05rem; }
+        li { line-height: 1.6; margin-bottom: 10px; }
+
+        /* Cyber HUD Sidebar */
+        .cyber-sidebar { font-family: 'JetBrains Mono', monospace; }
+        .sidebar-widget {
+            border: 1px solid #333; background: rgba(5, 11, 20, 0.8); padding: 15px; margin-bottom: 20px;
+            backdrop-filter: blur(5px);
+        }
+        .sidebar-title {
+            color: var(--cyber-blue); font-size: 0.75rem; text-transform: uppercase; border-bottom: 1px solid #333;
+            padding-bottom: 8px; margin-bottom: 12px; letter-spacing: 1px;
+        }
+        .stat-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.8rem; color: #aaa; }
+        .stat-val { color: #fff; font-weight: bold; }
+
+        .sentiment-bar { height: 4px; background: #333; margin-top: 5px; border-radius: 2px; overflow: hidden; }
+        .sentiment-fill { height: 100%; background: var(--cyber-blue); }
+
+        .tag-cloud { display: flex; flex-wrap: wrap; gap: 5px; }
+        .tag { background: #222; color: #ccc; padding: 2px 6px; font-size: 0.7rem; border-radius: 3px; border: 1px solid #444; }
+        .tag.ticker { color: var(--cyber-green); border-color: var(--cyber-green); }
+        .tag.agent { color: var(--cyber-blue); border-color: var(--cyber-blue); }
+
+        .cyber-btn {
+            font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; padding: 8px 16px; border: 1px solid #444;
+            color: #e0e0e0; background: rgba(0,0,0,0.8); text-decoration: none; display: inline-block;
+        }
+        .cyber-btn:hover { border-color: var(--cyber-blue); color: var(--cyber-blue); }
+    </style>
+<link rel="stylesheet" href="css/cyberpunk-core.css">
 </head>
 <body class="tier-high">
 
@@ -193,5 +262,7 @@
             }
         }
     </script>
+<script src="js/dashboard-logic.js" defer></script>
+<script>document.addEventListener("DOMContentLoaded", () => window.CyberDashboard.init());</script>
 </body>
 </html>
