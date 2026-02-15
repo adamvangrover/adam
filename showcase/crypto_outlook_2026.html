@@ -5,112 +5,100 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ADAM v23.5 :: Crypto Institutionalization 2026: The New Treasury Standard</title>
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/market_mayhem_tiers.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        :root {
-            --paper-bg: #fdfbf7;
-            --ink-color: #1a1a1a;
-            --accent-red: #cc0000;
-            --cyber-black: #050b14;
-            --cyber-blue: #00f3ff;
-        }
-        body { margin: 0; background: var(--cyber-black); color: #e0e0e0; font-family: 'Inter', sans-serif; }
-
-        .newsletter-wrapper {
-            max-width: 1000px;
-            margin: 40px auto;
-            display: grid;
-            grid-template-columns: 3fr 1fr;
-            gap: 40px;
-            padding: 20px;
-        }
-
-        /* Responsive for mobile */
-        @media (max-width: 768px) {
-            .newsletter-wrapper { grid-template-columns: 1fr; }
-        }
-
-        .paper-sheet {
-            background: var(--paper-bg);
-            color: var(--ink-color);
-            padding: 60px;
-            font-family: 'Georgia', 'Times New Roman', serif;
-            box-shadow: 0 0 50px rgba(0,0,0,0.5);
-            position: relative;
-        }
-
-        /* Typography */
-        h1.title {
-            font-family: 'Playfair Display', serif;
-            font-size: 3rem;
-            border-bottom: 4px solid var(--ink-color);
-            padding-bottom: 20px;
-            margin-bottom: 30px;
-            letter-spacing: -1px;
-            line-height: 1.1;
-        }
-        h2 {
-            font-family: 'Inter', sans-serif;
-            font-weight: 700;
-            font-size: 1.2rem;
-            margin-top: 40px;
-            margin-bottom: 15px;
-            color: var(--accent-red);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        p { line-height: 1.8; margin-bottom: 20px; font-size: 1.05rem; }
-        li { line-height: 1.6; margin-bottom: 10px; }
-
-        /* Sidebar */
-        .cyber-sidebar {
-            font-family: 'JetBrains Mono', monospace;
-        }
-        .sidebar-widget {
-            border: 1px solid #333;
-            background: rgba(255,255,255,0.02);
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-        .sidebar-title {
-            color: var(--cyber-blue);
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            border-bottom: 1px solid #333;
-            padding-bottom: 10px;
-            margin-bottom: 15px;
-        }
-
-        .cyber-btn {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.75rem;
-            padding: 6px 12px;
-            border: 1px solid #444;
-            color: #e0e0e0;
-            background: rgba(0,0,0,0.8);
-            text-decoration: none;
-            display: inline-block;
-            margin-bottom: 20px;
-        }
-        .cyber-btn:hover { border-color: var(--cyber-blue); color: var(--cyber-blue); }
-    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/nav.js" defer></script>
 </head>
-<body>
-    <div style="max-width: 1400px; margin: 0 auto; padding: 20px;">
-        <a href="market_mayhem_archive.html" class="cyber-btn">&larr; BACK TO ARCHIVE</a>
+<body class="tier-high">
+
+    <!-- System 2 Verification Overlay -->
+    <div id="system2-overlay" class="system2-overlay">
+        <div class="system2-terminal">
+            <div id="sys2-content"></div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="cyber-toast-container"></div>
+
+    <!-- Raw Source Modal -->
+    <div id="raw-source-modal" class="raw-source-modal">
+        <div class="raw-source-header">
+            <span>SOURCE_DATA.JSON</span>
+            <span style="cursor:pointer; color:#cc0000;" onclick="toggleSource()">[CLOSE]</span>
+        </div>
+        <div class="raw-source-content" id="raw-source-content"></div>
+    </div>
+
+    <!-- Virtual Toolbar for High Tier -->
+    <div class="doc-toolbar" style="display: flex;">
+        <div class="toolbar-item" onclick="window.location.href='market_mayhem_archive.html'"><strong>FILE</strong></div>
+        <div class="toolbar-item" onclick="showToast('EDIT MODE: READ ONLY (ARCHIVED)')">EDIT</div>
+        <div class="toolbar-item" onclick="toggleTheme()">VIEW</div>
+        <div class="toolbar-item" onclick="showToast('INSERT: PERMISSION DENIED')">INSERT</div>
+        <div class="toolbar-item" onclick="showToast('FORMAT: LOCKED')">FORMAT</div>
+        <div class="toolbar-item" onclick="runVerification()" style="color: #0078d7;"><strong>VERIFY</strong></div>
+        <div style="flex-grow:1;"></div>
+        <div class="toolbar-item" style="color:#666;">ADAM_V26_EDITOR</div>
+    </div>
+
+    <div style="max-width: 1400px; margin: 0 auto; padding: 10px 20px; display:flex; justify-content:space-between; align-items:center; display: none;">
+        <a href="market_mayhem_archive.html" class="cyber-btn">&larr; RETURN TO ARCHIVE</a>
+        <div style="font-family:'JetBrains Mono'; font-size:0.7rem; color:#666;">SECURE CONNECTION ESTABLISHED</div>
     </div>
 
     <div class="newsletter-wrapper">
-        <div class="paper-sheet">
-            <div style="display:flex; justify-content:space-between; font-family:'JetBrains Mono'; font-size:0.8rem; color:#666; margin-bottom:20px;">
+        <div class="paper-sheet" id="paper-sheet">
+
+            <!-- High Tier Header UI -->
+            <div class="doc-header-ui" style="display: flex;">
+                <span id="verification-status">CONFIDENTIAL // SYSTEM 2 REVIEW</span>
+                <span>891c9d7c</span>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; font-family:'JetBrains Mono'; font-size:0.8rem; color:#666; margin-bottom:20px; margin-top: 20px;">
                 <span>2026-03-10</span>
-                <span>TYPE: NEWSLETTER</span>
+                <span>ID: 891c9d7c</span>
             </div>
 
             <h1 class="title">Crypto Institutionalization 2026: The New Treasury Standard</h1>
 
-            <h2>Executive Summary</h2><p>The first quarter of 2026 has witnessed a seismic shift in corporate treasury management. With fair value accounting now the standard (FASB ASU 2023-08), the friction for holding digital assets on balance sheets has evaporated. We are observing a 'domino effect' where major tech and industrial conglomerates are allocating 2-5% of their cash reserves to Bitcoin to hedge against monetary debasement and sticky inflation.</p>
+            <!-- Metadata Panel for High Tier (Embedded in Doc) -->
+            <div class="doc-metadata-panel" style="display: grid;">
+                <div class="doc-metadata-item"><strong>Classification</strong>UNCLASSIFIED</div>
+                <div class="doc-metadata-item"><strong>Conviction</strong>50/100</div>
+                <div class="doc-metadata-item"><strong>Sentiment</strong>92/100</div>
+                <div class="doc-metadata-item"><strong>Reviewer</strong>Market_Maker</div>
+            </div>
+
+            <div class="doc-tags" style="display: grid; margin-bottom: 30px; font-family: 'Segoe UI', sans-serif; font-size: 0.8rem; color: #666;">
+                <strong style="margin-right: 10px;">SUBJECTS:</strong>
+            </div>
+
+            <div id="financialChartContainer" style="display:none; margin-bottom: 30px;">
+                <canvas id="financialChart"></canvas>
+            </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Executive Summary</h2><p>The first quarter of 2026 has witnessed a seismic shift in corporate treasury management. With fair value accounting now the standard (FASB ASU 2023-08), the friction for holding digital assets on balance sheets has evaporated. We are observing a 'domino effect' where major tech and industrial conglomerates are allocating 2-5% of their cash reserves to Bitcoin to hedge against monetary debasement and sticky inflation.</p>
 <p>Simultaneously, the convergence of 'Sovereign AI' and 'Sovereign Crypto' is creating a new geopolitical asset class: 'Compute-Backed Money'. Nations with abundant energy resources are leveraging them to power both AI data centers and Bitcoin mining operations, effectively monetizing their energy at the source.</p>
 <h2>The FASB Catalyst</h2><p>Prior to 2025, digital assets were treated as indefinite-lived intangible assets, subject to impairment losses but not allowed to reflect price appreciation until sold. This asymmetry discouraged institutional adoption. The new fair value rules allow companies to mark their holdings to market, reflecting true economic value.</p>
 <strong>Impact:</strong>
@@ -118,7 +106,7 @@
 <li><strong>Earnings Volatility:</strong> While fair value introduces volatility to quarterly earnings, it also allows companies to recognize gains, boosting EPS during bull markets.</li>
 <li><strong>Balance Sheet Health:</strong> Companies like MicroStrategy (MSTR) and Block (SQ) have seen their book value readjust upwards by billions, improving debt covenants and borrowing capacity.</li>
 </ul>
-<h2>Sovereign AI & Crypto Convergence</h2><p>The concept of 'Energy Sovereignty' is now paramount. We are tracking significant state-level investments in dual-purpose facilities:</p>
+<h2>Sovereign AI &amp; Crypto Convergence</h2><p>The concept of 'Energy Sovereignty' is now paramount. We are tracking significant state-level investments in dual-purpose facilities:</p>
 <ul>
 <li><strong>The Middle East:</strong> Qatar and UAE are deploying 5GW+ of solar capacity dedicated to a hybrid AI/Mining stack.</li>
 <li><strong>Latin America:</strong> El Salvador's 'Volcano Bonds' have been oversubscribed, funding a new geothermal powered 'Bitcoin City'.</li>
@@ -131,29 +119,234 @@
 </ul>
 
 
+
+
+
+
+            <!-- Provenance Log (All Tiers) -->
+            <div class="provenance-log">
+                <div class="log-entry">
+                    <span>> HASH_CHECK</span>
+                    <span style="color:var(--terminal-green);">891c9d7c3f90805fc1cb4297b9ca6607115c03db52d05ad57f50d7fae71508fd</span>
+                </div>
+                <div class="log-entry">
+                    <span>> SENTIMENT_SCAN</span>
+                    <span>92 (DENSITY: 29)</span>
+                </div>
+                <div class="log-entry">
+                    <span>> CONVICTION_LOCK</span>
+                    <span>50%</span>
+                </div>
+                <div class="log-entry">
+                    <span>> CRITIQUE_LOG</span>
+                    <span>"Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 92/100. Cross-reference with knowledge graph completed."</span>
+                </div>
+            </div>
+
+            <a href="#" class="source-jump-btn" onclick="toggleSource(); return false;" title="View Source JSON">JUMP TO SOURCE</a>
+
             <div style="margin-top: 40px; border-top: 1px solid #ccc; padding-top: 20px; font-style: italic; color: #666;">
-                End of Report.
+                End of Transmission.
             </div>
         </div>
 
         <aside class="cyber-sidebar">
             <div class="sidebar-widget">
-                <div class="sidebar-title">Metadata</div>
-                <div style="font-size: 0.8rem; color: #aaa;">
-                    <div>DATE: <span style="color:#fff">2026-03-10</span></div>
-                    <div>TYPE: <span style="color:#fff">NEWSLETTER</span></div>
-                    <div>CLASS: <span style="color:#fff">UNCLASSIFIED</span></div>
+                <div class="sidebar-title">Intelligence Metadata</div>
+                <div class="stat-row"><span>DATE</span> <span class="stat-val">2026-03-10</span></div>
+                <div class="stat-row"><span>TYPE</span> <span class="stat-val">ID: 923df4f0</span></div>
+                <div class="stat-row"><span>CLASS</span> <span class="stat-val">UNCLASSIFIED</span></div>
+                <div class="stat-row"><span>PROVENANCE</span> <span class="stat-val" title="891c9d7c3f90805fc1cb4297b9ca6607115c03db52d05ad57f50d7fae71508fd">891c9d7c</span></div>
+            </div>
+
+            <div class="sidebar-widget">
+                <div class="sidebar-title">Sentiment Analysis</div>
+                <div class="stat-row"><span>SCORE</span> <span class="stat-val">92/100</span></div>
+                <div class="sentiment-bar">
+                    <div class="sentiment-fill" style="width: 92%;"></div>
+                </div>
+            </div>
+
+            <div class="sidebar-widget">
+                <div class="sidebar-title">Detected Entities</div>
+                <div class="tag-cloud">
+
                 </div>
             </div>
 
              <div class="sidebar-widget">
-                <div class="sidebar-title">System Status</div>
-                 <div style="display:flex; align-items:center; gap:10px;">
-                    <div style="width:10px; height:10px; background:#00ff00; border-radius:50%; box-shadow: 0 0 5px #00ff00;"></div>
-                    <span style="font-size:0.8rem; color:#00ff00;">ONLINE</span>
+                <div class="sidebar-title">Agent Conviction</div>
+                 <div class="stat-row"><span>CONFIDENCE</span> <span class="stat-val">50/100</span></div>
+                 <div class="sentiment-bar">
+                    <div class="sentiment-fill" style="width: 50%; background: #ffff00;"></div>
+                </div>
+            </div>
+
+            <div class="sidebar-widget">
+                <div class="sidebar-title">Semantic Analysis</div>
+                 <div class="stat-row"><span>DENSITY</span> <span class="stat-val">29/100</span></div>
+                 <div class="stat-row"><span>PROBABILITY</span> <span class="stat-val">50/100</span></div>
+            </div>
+
+             <div class="sidebar-widget" style="border-color: #555;">
+                <div class="sidebar-title">Reviewer Agent Log</div>
+                 <div style="font-size: 0.75rem; color: #ccc; font-style: italic;">
+                    "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 92/100. Cross-reference with knowledge graph completed."
+                </div>
+                <div class="stat-row" style="margin-top:10px;"><span>QUALITY SCORE</span> <span class="stat-val">100/100</span></div>
+            </div>
+
+             <div class="sidebar-widget">
+                <div class="sidebar-title">Contributing Agents</div>
+                 <div style="display:flex; flex-direction:column; gap:5px;">
+                    <div style="font-size:0.75rem; color:#666;">System Core</div>
                 </div>
             </div>
         </aside>
     </div>
+
+    <!-- Hidden Raw Data -->
+    <textarea id="hidden-raw-data" style="display:none;">{
+  "title": "Crypto Institutionalization 2026: The New Treasury Standard",
+  "date": "2026-03-10",
+  "summary": "The first quarter of 2026 has witnessed a seismic shift in corporate treasury management. With fair value accounting now the standard (FASB ASU 2023-08), the friction for holding digital assets on bal...",
+  "type": "ID: 923df4f0",
+  "full_body": "\n  \n\n\n\n  \n\n\n\n\n\n\n\n\n\n\n<h2>Executive Summary</h2><p>The first quarter of 2026 has witnessed a seismic shift in corporate treasury management. With fair value accounting now the standard (FASB ASU 2023-08), the friction for holding digital assets on balance sheets has evaporated. We are observing a 'domino effect' where major tech and industrial conglomerates are allocating 2-5% of their cash reserves to Bitcoin to hedge against monetary debasement and sticky inflation.</p>\n<p>Simultaneously, the convergence of 'Sovereign AI' and 'Sovereign Crypto' is creating a new geopolitical asset class: 'Compute-Backed Money'. Nations with abundant energy resources are leveraging them to power both AI data centers and Bitcoin mining operations, effectively monetizing their energy at the source.</p>\n<h2>The FASB Catalyst</h2><p>Prior to 2025, digital assets were treated as indefinite-lived intangible assets, subject to impairment losses but not allowed to reflect price appreciation until sold. This asymmetry discouraged institutional adoption. The new fair value rules allow companies to mark their holdings to market, reflecting true economic value.</p>\n<strong>Impact:</strong>\n<ul>\n<li><strong>Earnings Volatility:</strong> While fair value introduces volatility to quarterly earnings, it also allows companies to recognize gains, boosting EPS during bull markets.</li>\n<li><strong>Balance Sheet Health:</strong> Companies like MicroStrategy (MSTR) and Block (SQ) have seen their book value readjust upwards by billions, improving debt covenants and borrowing capacity.</li>\n</ul>\n<h2>Sovereign AI &amp; Crypto Convergence</h2><p>The concept of 'Energy Sovereignty' is now paramount. We are tracking significant state-level investments in dual-purpose facilities:</p>\n<ul>\n<li><strong>The Middle East:</strong> Qatar and UAE are deploying 5GW+ of solar capacity dedicated to a hybrid AI/Mining stack.</li>\n<li><strong>Latin America:</strong> El Salvador's 'Volcano Bonds' have been oversubscribed, funding a new geothermal powered 'Bitcoin City'.</li>\n</ul>\n<p>This trend suggests a bifurcated monetary system where energy-backed digital currencies compete with debt-backed fiat currencies.</p>\n<h2>Market Outlook</h2><p>We maintain a <strong>STRONG BULLISH</strong> outlook on the digital asset sector for 2026.</p>\n<ul>\n<li><strong>Bitcoin Target:</strong> $150,000 by Q4 2026, driven by corporate treasury inflows and the 'halving echo' effect.</li>\n<li><strong>Institutional DeFi:</strong> Real World Asset (RWA) tokenization is expected to reach $1 Trillion TVL, as Treasury Bills and private credit move on-chain for 24/7 liquidity.</li>\n</ul>\n  \n\n\n\n",
+  "sentiment_score": 92,
+  "entities": {
+    "tickers": [],
+    "agents": [],
+    "sovereigns": []
+  },
+  "provenance_hash": "891c9d7c3f90805fc1cb4297b9ca6607115c03db52d05ad57f50d7fae71508fd",
+  "filename": "crypto_outlook_2026.html",
+  "is_sourced": true,
+  "metrics_json": "{}",
+  "source_priority": 2,
+  "conviction": 50,
+  "semantic_score": 29,
+  "probability": 50,
+  "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 92/100. Cross-reference with knowledge graph completed."
+}</textarea>
+
+    <script>
+        // --- INTERACTION LOGIC ---
+
+        function showToast(msg) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'cyber-toast';
+            toast.innerText = '> ' + msg;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            showToast('THEME: ' + (isDark ? 'DARK_MODE' : 'LIGHT_MODE'));
+        }
+
+        function toggleSource() {
+            const modal = document.getElementById('raw-source-modal');
+            const content = document.getElementById('raw-source-content');
+            const rawData = document.getElementById('hidden-raw-data').value;
+
+            if (modal.style.display === 'flex') {
+                modal.style.display = 'none';
+            } else {
+                content.innerText = rawData || "NO SOURCE DATA AVAILABLE.";
+                modal.style.display = 'flex';
+            }
+        }
+
+        function runVerification() {
+            const overlay = document.getElementById('system2-overlay');
+            const content = document.getElementById('sys2-content');
+            const status = document.getElementById('verification-status');
+
+            overlay.style.display = 'flex';
+            content.innerHTML = '';
+
+            const lines = [
+                "INITIATING SYSTEM 2 PROTOCOL...",
+                "VERIFYING CRYPTOGRAPHIC SIGNATURE...",
+                "HASH: 891c9d7c3f90805fc1cb4297b9ca6607115c03db52d05ad57f50d7fae71508fd",
+                "CHECKING CHAIN OF CUSTODY...",
+                "ANALYZING SENTIMENT VECTORS...",
+                "CROSS-REFERENCING KNOWLEDGE GRAPH...",
+                "VERIFICATION COMPLETE."
+            ];
+
+            let i = 0;
+            function addLine() {
+                if (i < lines.length) {
+                    const div = document.createElement('div');
+                    div.className = 'system2-line';
+                    div.innerText = '> ' + lines[i];
+                    div.style.opacity = 1;
+                    content.appendChild(div);
+                    i++;
+                    setTimeout(addLine, 400);
+                } else {
+                    setTimeout(() => {
+                        overlay.style.display = 'none';
+                        showToast('DOCUMENT VERIFIED');
+                        if(status) status.innerText = "VERIFIED // AUTHENTICATED";
+                        if(status) status.style.color = "#aaffaa";
+                    }, 1000);
+                }
+            }
+            addLine();
+        }
+
+        // Chart Injection Logic
+        const metricsData = {};
+
+        if (metricsData && Object.keys(metricsData).length > 0) {
+            const ctx = document.getElementById('financialChart');
+            const container = document.getElementById('financialChartContainer');
+
+            // Basic parsing of metrics structure (assuming flat or Year->Val)
+            let labels = [];
+            let values = [];
+            let labelName = "Metric";
+
+            // Try to find a timeseries
+            for (const [key, val] of Object.entries(metricsData)) {
+                if (typeof val === 'object') {
+                    // Likely year -> value
+                    labels = Object.keys(val);
+                    values = Object.values(val).map(v => parseFloat(v.replace(/[^0-9.-]/g, '')));
+                    labelName = key;
+                    break;
+                }
+            }
+
+            if (labels.length > 0) {
+                container.style.display = 'block';
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: labelName,
+                            data: values,
+                            backgroundColor: 'rgba(204, 0, 0, 0.5)',
+                            borderColor: '#cc0000',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: { legend: { display: true } }
+                    }
+                });
+            }
+        }
+    </script>
 </body>
 </html>

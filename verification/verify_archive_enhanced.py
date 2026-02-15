@@ -30,13 +30,14 @@ def verify_archive():
         print("Enhanced Archive screenshot saved.")
 
         # 2. Click Agent Note
-        agent_note.locator("a.read-btn").click()
+        agent_note.locator("a.cyber-btn").click()
 
         # 3. Verify Agent Note Page
         print("Verifying Agent Note Page...")
         expect(page).to_have_title("ADAM v23.5 :: Agent Alignment Log: Protocol v23.5 (December 12, 2025)")
         expect(page.locator("h1.title")).to_contain_text("Agent Alignment Log")
-        expect(page.locator("text=Neuro-Symbolic Bridge")).to_be_visible()
+        # Be specific to avoid matching hidden raw data
+        expect(page.locator("h2", has_text="Neuro-Symbolic Bridge")).to_be_visible()
 
         page.screenshot(path="verification/agent_note.png")
         print("Agent Note screenshot saved.")

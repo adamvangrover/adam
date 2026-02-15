@@ -1,0 +1,23 @@
+Navigating to Archive...
+Checking for Agent Note...
+Traceback (most recent call last):
+  File "/app/verification/verify_archive_enhanced.py", line 47, in <module>
+    verify_archive()
+  File "/app/verification/verify_archive_enhanced.py", line 21, in verify_archive
+    expect(agent_note.locator(".type-badge")).to_have_css("background-color", "rgb(0, 255, 0)")
+  File "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/playwright/sync_api/_generated.py", line 19712, in to_have_css
+    self._sync(
+  File "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/playwright/_impl/_sync_base.py", line 115, in _sync
+    return task.result()
+           ^^^^^^^^^^^^^
+  File "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/playwright/_impl/_assertions.py", line 406, in to_have_css
+    await self._expect_impl(
+  File "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/playwright/_impl/_assertions.py", line 85, in _expect_impl
+    raise AssertionError(
+AssertionError: Locator expected to have CSS 'rgb(0, 255, 0)'
+Actual value: rgb(51, 51, 51)
+Call log:
+  - Expect "to_have_css" with timeout 5000ms
+  - waiting for locator(".archive-item").filter(has_text="Agent Alignment Log").first.locator(".type-badge")
+    8 × locator resolved to <span class="type-badge">AGENT_NOTE</span>
+      - unexpected value "rgb(51, 51, 51)"

@@ -575,8 +575,107 @@ def parse_html_file(filepath):
                         "data.html", "reports.html", "agents.html", "chat.html", "market_mayhem_rebuild.html", "market_mayhem_conviction.html"]:
             return None
 
+        # Check for new or legacy paper-sheet format
+        paper_sheet = soup.find('div', class_='paper-sheet')
+
+        # Check for legacy newsletter-container format
         container = soup.find('div', class_='newsletter-container')
-        if container:
+
+        # Prioritize paper-sheet extraction as it's used in both new and some legacy files
+        if paper_sheet:
+            # Detect if this is already the NEW format by looking for doc-toolbar or doc-header-ui in the SOUP (outside or inside)
+            is_new_format = soup.find('div', class_='doc-toolbar') or soup.find('div', class_='doc-header-ui')
+
+            # Clean up template elements to extract pure content
+            for trash in paper_sheet.find_all('div', class_=['doc-header-ui', 'doc-metadata-panel', 'provenance-log', 'adam-critique', 'doc-tags']):
+                trash.decompose()
+            # Remove by ID
+            for trash_id in paper_sheet.find_all('div', id=['financialChartContainer']):
+                trash_id.decompose()
+
+            for trash in paper_sheet.find_all(['a'], class_=['source-jump-btn']):
+                trash.decompose()
+            for trash in paper_sheet.find_all('div', style=lambda s: s and ('border-top' in s or 'font-style: italic' in s)):
+                trash.decompose() # Remove footer "End of Transmission" or legacy footers
+
+            # Title extraction
+            title_tag = paper_sheet.find('h1', class_='title')
+            title = title_tag.get_text(strip=True) if title_tag else "Untitled Report"
+            if title_tag: title_tag.decompose() # Remove title from body
+
+            # Date/Type extraction (Legacy specific often at top)
+            # Legacy often has <div style="display:flex... margin-bottom:20px;"><span>DATE</span><span>TYPE</span></div>
+            # We try to find date in the content if not found otherwise
+            date_str = "2025-01-01"
+            type_str = "NEWSLETTER"
+
+            # Legacy date/type row removal and extraction
+            meta_row = paper_sheet.find('div', style=lambda s: s and 'display:flex' in s and 'justify-content:space-between' in s)
+            if meta_row:
+                spans = meta_row.find_all('span')
+                if len(spans) >= 1:
+                    date_text = spans[0].get_text(strip=True)
+                    date_str = parse_date(date_text)
+                if len(spans) >= 2:
+                    type_text = spans[1].get_text(strip=True).replace("TYPE:", "").strip()
+                    if type_text: type_str = type_text
+                meta_row.decompose()
+
+            # Dynamic Chart Area (Legacy) removal
+            dynamic_chart = paper_sheet.find('div', id='dynamic-chart-area')
+            if dynamic_chart: dynamic_chart.decompose()
+
+            # Summary extraction
+            summary = "Market Analysis."
+            # Try to find first p or a specific summary block
+            # In legacy, often "Welcome to Market Mayhem..." or similar
+            first_p = paper_sheet.find('p')
+            if first_p:
+                summary = first_p.get_text(strip=True)[:200] + "..."
+
+            # Body HTML
+            body_html = "".join([str(x) for x in paper_sheet.contents])
+
+            # Clean up corrupted text artifacts from previous generations
+            artifacts = [
+                "High Tier Header UI",
+                "Metadata Panel for High Tier (Embedded in Doc)",
+                "Provenance Log (All Tiers)",
+                "SUBJECTS:"
+            ]
+            for artifact in artifacts:
+                body_html = body_html.replace(artifact, "")
+
+            full_text = soup.get_text()
+            sentiment = analyze_sentiment(full_text)
+            entities = extract_entities(full_text)
+            prov_hash = calculate_provenance(full_text)
+
+            conviction = calculate_conviction(full_text)
+            semantic_score = calculate_semantic_score(full_text)
+            probability = calculate_probability(full_text)
+
+            item = {
+                "title": title,
+                "date": date_str,
+                "summary": summary,
+                "type": type_str,
+                "full_body": body_html,
+                "sentiment_score": sentiment,
+                "entities": entities,
+                "provenance_hash": prov_hash,
+                "filename": filename,
+                "is_sourced": True, # Force regeneration
+                "metrics_json": "{}",
+                "source_priority": 2, # Priority 2 to ensure regeneration
+                "conviction": conviction,
+                "semantic_score": semantic_score,
+                "probability": probability
+            }
+            item["critique"] = generate_critique(item)
+            return item
+
+        elif container:
             title_tag = soup.find('h1', class_='title')
             title = title_tag.get_text(strip=True) if title_tag else "Untitled Newsletter"
 
@@ -876,6 +975,10 @@ HTML_TEMPLATE = """<!DOCTYPE html>
                 <div class="doc-metadata-item"><strong>Conviction</strong>{conviction}/100</div>
                 <div class="doc-metadata-item"><strong>Sentiment</strong>{sentiment_score}/100</div>
                 <div class="doc-metadata-item"><strong>Reviewer</strong>{reviewer_agent}</div>
+            </div>
+
+            <div class="doc-tags" style="display: {metadata_panel_display}; margin-bottom: 30px; font-family: 'Segoe UI', sans-serif; font-size: 0.8rem; color: #666;">
+                <strong style="margin-right: 10px;">SUBJECTS:</strong> {entity_html}
             </div>
 
             <div id="financialChartContainer" style="display:none; margin-bottom: 30px;">
@@ -1398,6 +1501,12 @@ def generate_archive():
         .type-DEEP_DIVE {{ border-left-color: #cc0000; }}
         .type-MARKET_PULSE {{ border-left-color: #00f3ff; }}
         .type-HISTORICAL {{ border-left-color: #666; }}
+
+        .type-AGENT_NOTE {{ border-left-color: #00ff00; }}
+        .type-AGENT_NOTE .type-badge {{ background-color: #00ff00; color: #000; }}
+
+        .type-PERFORMANCE_REVIEW {{ border-left-color: #60a5fa; }}
+        .type-PERFORMANCE_REVIEW .type-badge {{ background-color: #60a5fa; color: #000; }}
     </style>
 </head>
 <body>
@@ -1594,6 +1703,14 @@ def generate_archive():
             document.getElementById('searchInput').value = term;
             applyFilters();
         }
+
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const searchParam = urlParams.get('search');
+            if (searchParam) {
+                setSearch(searchParam);
+            }
+        };
     </script>
 </body>
 </html>

@@ -5,160 +5,180 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ADAM v23.5 :: MARKET MAYHEM</title>
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/market_mayhem_tiers.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/system2.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="js/nav.js" defer></script>
-    <style>
-        :root {
-            --paper-bg: #fdfbf7;
-            --ink-color: #1a1a1a;
-            --accent-red: #cc0000;
-            --cyber-black: #050b14;
-            --cyber-blue: #00f3ff;
-            --cyber-green: #00ff00;
-        }
-        body { margin: 0; background: var(--cyber-black); color: #e0e0e0; font-family: 'Inter', sans-serif; }
-
-        .newsletter-wrapper {
-            max-width: 1200px;
-            margin: 40px auto;
-            display: grid;
-            grid-template-columns: 3fr 1fr;
-            gap: 40px;
-            padding: 20px;
-        }
-        @media (max-width: 768px) { .newsletter-wrapper { grid-template-columns: 1fr; } }
-
-        .paper-sheet {
-            background: var(--paper-bg);
-            color: var(--ink-color);
-            padding: 60px;
-            font-family: 'Georgia', 'Times New Roman', serif;
-            box-shadow: 0 0 50px rgba(0,0,0,0.5);
-            position: relative;
-        }
-
-        h1.title {
-            font-family: 'Playfair Display', serif; font-size: 3rem; border-bottom: 4px solid var(--ink-color);
-            padding-bottom: 20px; margin-bottom: 30px; letter-spacing: -1px; line-height: 1.1;
-        }
-        h2 {
-            font-family: 'Inter', sans-serif; font-weight: 700; font-size: 1.2rem; margin-top: 40px;
-            margin-bottom: 15px; color: var(--accent-red); text-transform: uppercase; letter-spacing: 1px;
-        }
-        p { line-height: 1.8; margin-bottom: 20px; font-size: 1.05rem; }
-        li { line-height: 1.6; margin-bottom: 10px; }
-
-        /* Cyber HUD Sidebar */
-        .cyber-sidebar { font-family: 'JetBrains Mono', monospace; }
-        .sidebar-widget {
-            border: 1px solid #333; background: rgba(5, 11, 20, 0.8); padding: 15px; margin-bottom: 20px;
-            backdrop-filter: blur(5px);
-        }
-        .sidebar-title {
-            color: var(--cyber-blue); font-size: 0.75rem; text-transform: uppercase; border-bottom: 1px solid #333;
-            padding-bottom: 8px; margin-bottom: 12px; letter-spacing: 1px;
-        }
-        .stat-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.8rem; color: #aaa; }
-        .stat-val { color: #fff; font-weight: bold; }
-
-        .sentiment-bar { height: 4px; background: #333; margin-top: 5px; border-radius: 2px; overflow: hidden; }
-        .sentiment-fill { height: 100%; background: var(--cyber-blue); }
-
-        .tag-cloud { display: flex; flex-wrap: wrap; gap: 5px; }
-        .tag { background: #222; color: #ccc; padding: 2px 6px; font-size: 0.7rem; border-radius: 3px; border: 1px solid #444; }
-        .tag.ticker { color: var(--cyber-green); border-color: var(--cyber-green); }
-        .tag.agent { color: var(--cyber-blue); border-color: var(--cyber-blue); }
-
-        .cyber-btn {
-            font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; padding: 8px 16px; border: 1px solid #444;
-            color: #e0e0e0; background: rgba(0,0,0,0.8); text-decoration: none; display: inline-block;
-        }
-        .cyber-btn:hover { border-color: var(--cyber-blue); color: var(--cyber-blue); }
-    </style>
-<link rel="stylesheet" href="css/cyberpunk-core.css">
 </head>
-<body>
-    <div style="max-width: 1400px; margin: 0 auto; padding: 20px; display:flex; justify-content:space-between; align-items:center;">
+<body class="tier-high">
+
+    <!-- System 2 Verification Overlay -->
+    <div id="system2-overlay" class="system2-overlay">
+        <div class="system2-terminal">
+            <div id="sys2-content"></div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="cyber-toast-container"></div>
+
+    <!-- Raw Source Modal -->
+    <div id="raw-source-modal" class="raw-source-modal">
+        <div class="raw-source-header">
+            <span>SOURCE_DATA.JSON</span>
+            <span style="cursor:pointer; color:#cc0000;" onclick="toggleSource()">[CLOSE]</span>
+        </div>
+        <div class="raw-source-content" id="raw-source-content"></div>
+    </div>
+
+    <!-- Virtual Toolbar for High Tier -->
+    <div class="doc-toolbar" style="display: flex;">
+        <div class="toolbar-item" onclick="window.location.href='market_mayhem_archive.html'"><strong>FILE</strong></div>
+        <div class="toolbar-item" onclick="showToast('EDIT MODE: READ ONLY (ARCHIVED)')">EDIT</div>
+        <div class="toolbar-item" onclick="toggleTheme()">VIEW</div>
+        <div class="toolbar-item" onclick="showToast('INSERT: PERMISSION DENIED')">INSERT</div>
+        <div class="toolbar-item" onclick="showToast('FORMAT: LOCKED')">FORMAT</div>
+        <div class="toolbar-item" onclick="runVerification()" style="color: #0078d7;"><strong>VERIFY</strong></div>
+        <div style="flex-grow:1;"></div>
+        <div class="toolbar-item" style="color:#666;">ADAM_V26_EDITOR</div>
+    </div>
+
+    <div style="max-width: 1400px; margin: 0 auto; padding: 10px 20px; display:flex; justify-content:space-between; align-items:center; display: none;">
         <a href="market_mayhem_archive.html" class="cyber-btn">&larr; RETURN TO ARCHIVE</a>
         <div style="font-family:'JetBrains Mono'; font-size:0.7rem; color:#666;">SECURE CONNECTION ESTABLISHED</div>
     </div>
 
     <div class="newsletter-wrapper">
-        <div class="paper-sheet">
-            <div style="display:flex; justify-content:space-between; font-family:'JetBrains Mono'; font-size:0.8rem; color:#666; margin-bottom:20px;">
+        <div class="paper-sheet" id="paper-sheet">
+
+            <!-- High Tier Header UI -->
+            <div class="doc-header-ui" style="display: flex;">
+                <span id="verification-status">CONFIDENTIAL // SYSTEM 2 REVIEW</span>
+                <span>32ea4484</span>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; font-family:'JetBrains Mono'; font-size:0.8rem; color:#666; margin-bottom:20px; margin-top: 20px;">
                 <span>2026-02-13</span>
-                <span>ID: 66a2d18f</span>
+                <span>ID: 32ea4484</span>
             </div>
 
             <h1 class="title">MARKET MAYHEM</h1>
-            <h3 style="font-family: 'Inter', sans-serif; font-weight: 600; font-size: 1.5rem; margin-top: -20px; margin-bottom: 30px; color: #333;">🟢 SYSTEM STATUS: NOMINAL (Stabilization Protocol Engaged)</h3>
 
-            <!-- Dynamic Chart Injection Area if metrics exist -->
+            <!-- Metadata Panel for High Tier (Embedded in Doc) -->
+            <div class="doc-metadata-panel" style="display: grid;">
+                <div class="doc-metadata-item"><strong>Classification</strong>UNCLASSIFIED</div>
+                <div class="doc-metadata-item"><strong>Conviction</strong>50/100</div>
+                <div class="doc-metadata-item"><strong>Sentiment</strong>77/100</div>
+                <div class="doc-metadata-item"><strong>Reviewer</strong>Market_Maker</div>
+            </div>
+
+            <div class="doc-tags" style="display: grid; margin-bottom: 30px; font-family: 'Segoe UI', sans-serif; font-size: 0.8rem; color: #666;">
+                <strong style="margin-right: 10px;">SUBJECTS:</strong> <a href="market_mayhem_archive.html?search=US" class="tag" style="text-decoration:none;">US</a>
+            </div>
+
             <div id="financialChartContainer" style="display:none; margin-bottom: 30px;">
                 <canvas id="financialChart"></canvas>
             </div>
 
-            <div class="content-grid">
-                <div class="main-column">
-                    <h2 style="margin-top:0;">📡 Signal Integrity: The CPI Sedative</h2>
-                    <p style="font-size: 1.1rem; color: #333;">
-                        The simulation has stopped its violent descent, but the recovery feels like a low-resolution patch rather than a full reboot. The S&P 500 managed a faint green pixel, rising +0.52% to <strong>6,867.95</strong>. The "AI Disruption" crash of earlier this week has been temporarily halted by a tame January CPI print (2.4% headline), providing a much-needed sedative for the architecture.
-                    </p>
 
-                    <h2 style="border-top: 1px solid #eee; padding-top: 20px;">Credit Dominance Check: Constructive Reset</h2>
-                    <p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h3 style="font-family: 'Inter', sans-serif; font-weight: 600; font-size: 1.5rem; margin-top: -20px; margin-bottom: 30px; color: #333;">🟢 SYSTEM STATUS: NOMINAL (Stabilization Protocol Engaged)</h3>
+ Dynamic Chart Injection Area if metrics exist
+
+<div class="content-grid">
+<div class="main-column">
+<h2 style="margin-top:0;">📡 Signal Integrity: The CPI Sedative</h2>
+<p style="font-size: 1.1rem; color: #333;">
+                        The simulation has stopped its violent descent, but the recovery feels like a low-resolution patch rather than a full reboot. The S&amp;P 500 managed a faint green pixel, rising +0.52% to <strong>6,867.95</strong>. The "AI Disruption" crash of earlier this week has been temporarily halted by a tame January CPI print (2.4% headline), providing a much-needed sedative for the architecture.
+                    </p>
+<h2 style="border-top: 1px solid #eee; padding-top: 20px;">Credit Dominance Check: Constructive Reset</h2>
+<p>
                         Today we are seeing a <strong>Constructive Reset</strong>. The 10-Year Treasury Yield plummeted to <strong>4.05% (-5bps)</strong>, its lowest point in months, as bond traders aggressively re-installed their "June Rate Cut" plugins. High Yield credit (HYG) mirrored this stability, ticking up +0.12%.
                     </p>
-                    <p>
-                        <strong>The Signal:</strong> For once, this isn't a trap. Credit and bonds are leading the stabilization—falling yields are finally acting as a floor for equities. However, the Nasdaq remains the "lagging artifact" (finishing the week -2.1%), proving that while inflation is cooling, the fever of AI over-valuation hasn't fully broken.
+<p>
+<strong>The Signal:</strong> For once, this isn't a trap. Credit and bonds are leading the stabilization—falling yields are finally acting as a floor for equities. However, the Nasdaq remains the "lagging artifact" (finishing the week -2.1%), proving that while inflation is cooling, the fever of AI over-valuation hasn't fully broken.
                     </p>
-
-                    <h2>🏮 Artifacts</h2>
-                    <ul>
-                        <li><strong>Bitcoin ($68,918 | +4.43%):</strong> A classic "dead cat" or a structural reclaim? After a brutal flush toward $60k, BTC jumped back toward the $69k handle. It’s correlating with the "Magnificent 7" rebound, but the frame rate is still choppy.</li>
-                        <li><strong>Rivian (RIVN | +26.6%):</strong> A massive outlier in the industrial sector. A surprise earnings beat has turned this "zombie-adjacent" credit into the day’s top speculative render.</li>
-                        <li><strong>Applied Materials (AMAT | +8.0%):</strong> Proving that while "AI Software" is glitching, the "Hardware/Foundry" layer is still the bedrock of the simulation.</li>
-                        <li><strong>Gold ($5,033):</strong> Breaking through the $5,000 barrier. A clear signal that despite the "tame" CPI, institutional players are still hedging against a systemic collapse of the currency-code.</li>
-                    </ul>
-
-                    <h2 style="color: #6600cc;">🌀 The Glitch: Narrative Replacement</h2>
-                    <p style="font-style: italic; border-left: 3px solid #6600cc; padding-left: 15px; color: #555;">
+<h2>🏮 Artifacts</h2>
+<ul>
+<li><strong>Bitcoin ($68,918 | +4.43%):</strong> A classic "dead cat" or a structural reclaim? After a brutal flush toward $60k, BTC jumped back toward the $69k handle. It’s correlating with the "Magnificent 7" rebound, but the frame rate is still choppy.</li>
+<li><strong>Rivian (RIVN | +26.6%):</strong> A massive outlier in the industrial sector. A surprise earnings beat has turned this "zombie-adjacent" credit into the day’s top speculative render.</li>
+<li><strong>Applied Materials (AMAT | +8.0%):</strong> Proving that while "AI Software" is glitching, the "Hardware/Foundry" layer is still the bedrock of the simulation.</li>
+<li><strong>Gold ($5,033):</strong> Breaking through the $5,000 barrier. A clear signal that despite the "tame" CPI, institutional players are still hedging against a systemic collapse of the currency-code.</li>
+</ul>
+<h2 style="color: #6600cc;">🌀 The Glitch: Narrative Replacement</h2>
+<p style="font-style: italic; border-left: 3px solid #6600cc; padding-left: 15px; color: #555;">
                         "Today was a lesson in 'Narrative Replacement.' We swapped the terror of 'AI taking our jobs' for the comfort of 'Inflation is slowing down.' But look at Gold—$5,000 is a monument to the fact that no one actually trusts the structural integrity of the USD-render. We are heading into a long holiday weekend with the Dow at 50k and Gold at $5k. It’s a beautiful, symmetrical hallucination. The architect is letting us rest, but the 'AI Debt' we accrued this week hasn't been paid—it's just been refinanced into the next month's volatility."
                     </p>
-
-                    <p style="margin-top: 30px; font-weight: bold;">
+<p style="margin-top: 30px; font-weight: bold;">
                         Next Transmission: Tuesday, Feb 17, 18:00 ET (Markets closed Monday for Presidents' Day).
                     </p>
-
-                    <!-- System 2 Critique (New Addition) -->
-                    <div class="system2-critique">
-                        <p style="font-size: 0.9rem; color: #666; margin-bottom: 20px;">
-                            <strong>Judge's Note:</strong> Retrospective analysis of this briefing's accuracy based on subsequent market data (Q2 2026).
+<!-- System 2 Critique (New Addition) -->
+<div class="system2-critique">
+<p style="font-size: 0.9rem; color: #666; margin-bottom: 20px;">
+<strong>Judge's Note:</strong> Retrospective analysis of this briefing's accuracy based on subsequent market data (Q2 2026).
                         </p>
+<div class="critique-row">
+<span class="critique-label">Prediction: Constructive Reset</span>
+<span class="critique-val critique-pass">ACCURATE (Yields stabilized in 4.0-4.2% range through March)</span>
+</div>
+<div class="critique-row">
+<span class="critique-label">Assessment: AI "Fever" Not Broken</span>
+<span class="critique-val critique-pass">VALIDATED (Nasdaq reclaimed highs in late Feb)</span>
+</div>
+<div class="critique-row">
+<span class="critique-label">Signal: Gold as "Systemic Hedge"</span>
+<span class="critique-val critique-pass">PRESCIENT (Gold continued to $5,200)</span>
+</div>
+<div class="critique-row" style="border-bottom:0;">
+<span class="critique-label">Overall Accuracy Score</span>
+<span class="critique-val critique-score-val">95/100</span>
+</div>
+</div>
+</div>
+</div>
 
-                        <div class="critique-row">
-                            <span class="critique-label">Prediction: Constructive Reset</span>
-                            <span class="critique-val critique-pass">ACCURATE (Yields stabilized in 4.0-4.2% range through March)</span>
-                        </div>
-                        <div class="critique-row">
-                            <span class="critique-label">Assessment: AI "Fever" Not Broken</span>
-                            <span class="critique-val critique-pass">VALIDATED (Nasdaq reclaimed highs in late Feb)</span>
-                        </div>
-                        <div class="critique-row">
-                            <span class="critique-label">Signal: Gold as "Systemic Hedge"</span>
-                            <span class="critique-val critique-pass">PRESCIENT (Gold continued to $5,200)</span>
-                        </div>
-                        <div class="critique-row" style="border-bottom:0;">
-                            <span class="critique-label">Overall Accuracy Score</span>
-                            <span class="critique-val critique-score-val">95/100</span>
-                        </div>
-                    </div>
+
+
+
+
+
+            <!-- Provenance Log (All Tiers) -->
+            <div class="provenance-log">
+                <div class="log-entry">
+                    <span>> HASH_CHECK</span>
+                    <span style="color:var(--terminal-green);">32ea4484b1e820cdb7559aa18fa4ebc13359148842d43b51341e3a222e049704</span>
+                </div>
+                <div class="log-entry">
+                    <span>> SENTIMENT_SCAN</span>
+                    <span>77 (DENSITY: 26)</span>
+                </div>
+                <div class="log-entry">
+                    <span>> CONVICTION_LOCK</span>
+                    <span>50%</span>
+                </div>
+                <div class="log-entry">
+                    <span>> CRITIQUE_LOG</span>
+                    <span>"Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 77/100. Cross-reference with knowledge graph completed."</span>
                 </div>
             </div>
+
+            <a href="#" class="source-jump-btn" onclick="toggleSource(); return false;" title="View Source JSON">JUMP TO SOURCE</a>
 
             <div style="margin-top: 40px; border-top: 1px solid #ccc; padding-top: 20px; font-style: italic; color: #666;">
                 End of Transmission.
@@ -169,30 +189,46 @@
             <div class="sidebar-widget">
                 <div class="sidebar-title">Intelligence Metadata</div>
                 <div class="stat-row"><span>DATE</span> <span class="stat-val">2026-02-13</span></div>
-                <div class="stat-row"><span>TYPE</span> <span class="stat-val">NEWSLETTER</span></div>
+                <div class="stat-row"><span>TYPE</span> <span class="stat-val">ID: a590363a</span></div>
                 <div class="stat-row"><span>CLASS</span> <span class="stat-val">UNCLASSIFIED</span></div>
-                <div class="stat-row"><span>PROVENANCE</span> <span class="stat-val" title="66a2d18fbc1bc1c43d06c6b407b387ebbf284793a0b3a5aaf960d8a4ced177ee">66a2d18f</span></div>
+                <div class="stat-row"><span>PROVENANCE</span> <span class="stat-val" title="32ea4484b1e820cdb7559aa18fa4ebc13359148842d43b51341e3a222e049704">32ea4484</span></div>
             </div>
 
             <div class="sidebar-widget">
                 <div class="sidebar-title">Sentiment Analysis</div>
-                <div class="stat-row"><span>SCORE</span> <span class="stat-val">65/100</span></div> <!-- Slightly lower than usual due to crash earlier -->
+                <div class="stat-row"><span>SCORE</span> <span class="stat-val">77/100</span></div>
                 <div class="sentiment-bar">
-                    <div class="sentiment-fill" style="width: 65%;"></div>
+                    <div class="sentiment-fill" style="width: 77%;"></div>
                 </div>
             </div>
 
             <div class="sidebar-widget">
                 <div class="sidebar-title">Detected Entities</div>
                 <div class="tag-cloud">
-                    <span class="tag ticker">BTC</span>
-                    <span class="tag ticker">RIVN</span>
-                    <span class="tag ticker">AMAT</span>
-                    <span class="tag ticker">SPX</span>
-                    <span class="tag ticker">HYG</span>
-                    <span class="tag">GOLD</span>
-                    <span class="tag">CPI</span>
+                    <a href="market_mayhem_archive.html?search=US" class="tag" style="text-decoration:none;">US</a>
                 </div>
+            </div>
+
+             <div class="sidebar-widget">
+                <div class="sidebar-title">Agent Conviction</div>
+                 <div class="stat-row"><span>CONFIDENCE</span> <span class="stat-val">50/100</span></div>
+                 <div class="sentiment-bar">
+                    <div class="sentiment-fill" style="width: 50%; background: #ffff00;"></div>
+                </div>
+            </div>
+
+            <div class="sidebar-widget">
+                <div class="sidebar-title">Semantic Analysis</div>
+                 <div class="stat-row"><span>DENSITY</span> <span class="stat-val">26/100</span></div>
+                 <div class="stat-row"><span>PROBABILITY</span> <span class="stat-val">50/100</span></div>
+            </div>
+
+             <div class="sidebar-widget" style="border-color: #555;">
+                <div class="sidebar-title">Reviewer Agent Log</div>
+                 <div style="font-size: 0.75rem; color: #ccc; font-style: italic;">
+                    "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 77/100. Cross-reference with knowledge graph completed."
+                </div>
+                <div class="stat-row" style="margin-top:10px;"><span>QUALITY SCORE</span> <span class="stat-val">100/100</span></div>
             </div>
 
              <div class="sidebar-widget">
@@ -203,7 +239,151 @@
             </div>
         </aside>
     </div>
-<script src="js/dashboard-logic.js" defer></script>
-<script>document.addEventListener("DOMContentLoaded", () => window.CyberDashboard.init());</script>
+
+    <!-- Hidden Raw Data -->
+    <textarea id="hidden-raw-data" style="display:none;">{
+  "title": "MARKET MAYHEM",
+  "date": "2026-02-13",
+  "summary": "The simulation has stopped its violent descent, but the recovery feels like a low-resolution patch rather than a full reboot. The S&P 500 managed a faint green pixel, rising +0.52% to6,867.95. The \"AI...",
+  "type": "ID: a590363a",
+  "full_body": "\n  \n\n\n\n  \n\n\n\n\n\n\n\n\n\n\n<h3 style=\"font-family: 'Inter', sans-serif; font-weight: 600; font-size: 1.5rem; margin-top: -20px; margin-bottom: 30px; color: #333;\">\ud83d\udfe2 SYSTEM STATUS: NOMINAL (Stabilization Protocol Engaged)</h3>\n Dynamic Chart Injection Area if metrics exist \n\n<div class=\"content-grid\">\n<div class=\"main-column\">\n<h2 style=\"margin-top:0;\">\ud83d\udce1 Signal Integrity: The CPI Sedative</h2>\n<p style=\"font-size: 1.1rem; color: #333;\">\n                        The simulation has stopped its violent descent, but the recovery feels like a low-resolution patch rather than a full reboot. The S&amp;P 500 managed a faint green pixel, rising +0.52% to <strong>6,867.95</strong>. The \"AI Disruption\" crash of earlier this week has been temporarily halted by a tame January CPI print (2.4% headline), providing a much-needed sedative for the architecture.\n                    </p>\n<h2 style=\"border-top: 1px solid #eee; padding-top: 20px;\">Credit Dominance Check: Constructive Reset</h2>\n<p>\n                        Today we are seeing a <strong>Constructive Reset</strong>. The 10-Year Treasury Yield plummeted to <strong>4.05% (-5bps)</strong>, its lowest point in months, as bond traders aggressively re-installed their \"June Rate Cut\" plugins. High Yield credit (HYG) mirrored this stability, ticking up +0.12%.\n                    </p>\n<p>\n<strong>The Signal:</strong> For once, this isn't a trap. Credit and bonds are leading the stabilization\u2014falling yields are finally acting as a floor for equities. However, the Nasdaq remains the \"lagging artifact\" (finishing the week -2.1%), proving that while inflation is cooling, the fever of AI over-valuation hasn't fully broken.\n                    </p>\n<h2>\ud83c\udfee Artifacts</h2>\n<ul>\n<li><strong>Bitcoin ($68,918 | +4.43%):</strong> A classic \"dead cat\" or a structural reclaim? After a brutal flush toward $60k, BTC jumped back toward the $69k handle. It\u2019s correlating with the \"Magnificent 7\" rebound, but the frame rate is still choppy.</li>\n<li><strong>Rivian (RIVN | +26.6%):</strong> A massive outlier in the industrial sector. A surprise earnings beat has turned this \"zombie-adjacent\" credit into the day\u2019s top speculative render.</li>\n<li><strong>Applied Materials (AMAT | +8.0%):</strong> Proving that while \"AI Software\" is glitching, the \"Hardware/Foundry\" layer is still the bedrock of the simulation.</li>\n<li><strong>Gold ($5,033):</strong> Breaking through the $5,000 barrier. A clear signal that despite the \"tame\" CPI, institutional players are still hedging against a systemic collapse of the currency-code.</li>\n</ul>\n<h2 style=\"color: #6600cc;\">\ud83c\udf00 The Glitch: Narrative Replacement</h2>\n<p style=\"font-style: italic; border-left: 3px solid #6600cc; padding-left: 15px; color: #555;\">\n                        \"Today was a lesson in 'Narrative Replacement.' We swapped the terror of 'AI taking our jobs' for the comfort of 'Inflation is slowing down.' But look at Gold\u2014$5,000 is a monument to the fact that no one actually trusts the structural integrity of the USD-render. We are heading into a long holiday weekend with the Dow at 50k and Gold at $5k. It\u2019s a beautiful, symmetrical hallucination. The architect is letting us rest, but the 'AI Debt' we accrued this week hasn't been paid\u2014it's just been refinanced into the next month's volatility.\"\n                    </p>\n<p style=\"margin-top: 30px; font-weight: bold;\">\n                        Next Transmission: Tuesday, Feb 17, 18:00 ET (Markets closed Monday for Presidents' Day).\n                    </p>\n<!-- System 2 Critique (New Addition) -->\n<div class=\"system2-critique\">\n<p style=\"font-size: 0.9rem; color: #666; margin-bottom: 20px;\">\n<strong>Judge's Note:</strong> Retrospective analysis of this briefing's accuracy based on subsequent market data (Q2 2026).\n                        </p>\n<div class=\"critique-row\">\n<span class=\"critique-label\">Prediction: Constructive Reset</span>\n<span class=\"critique-val critique-pass\">ACCURATE (Yields stabilized in 4.0-4.2% range through March)</span>\n</div>\n<div class=\"critique-row\">\n<span class=\"critique-label\">Assessment: AI \"Fever\" Not Broken</span>\n<span class=\"critique-val critique-pass\">VALIDATED (Nasdaq reclaimed highs in late Feb)</span>\n</div>\n<div class=\"critique-row\">\n<span class=\"critique-label\">Signal: Gold as \"Systemic Hedge\"</span>\n<span class=\"critique-val critique-pass\">PRESCIENT (Gold continued to $5,200)</span>\n</div>\n<div class=\"critique-row\" style=\"border-bottom:0;\">\n<span class=\"critique-label\">Overall Accuracy Score</span>\n<span class=\"critique-val critique-score-val\">95/100</span>\n</div>\n</div>\n</div>\n</div>\n  \n\n\n\n",
+  "sentiment_score": 77,
+  "entities": {
+    "tickers": [],
+    "agents": [],
+    "sovereigns": [
+      "US"
+    ]
+  },
+  "provenance_hash": "32ea4484b1e820cdb7559aa18fa4ebc13359148842d43b51341e3a222e049704",
+  "filename": "newsletter_market_mayhem_feb_13_2026.html",
+  "is_sourced": true,
+  "metrics_json": "{}",
+  "source_priority": 2,
+  "conviction": 50,
+  "semantic_score": 26,
+  "probability": 50,
+  "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 77/100. Cross-reference with knowledge graph completed."
+}</textarea>
+
+    <script>
+        // --- INTERACTION LOGIC ---
+
+        function showToast(msg) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'cyber-toast';
+            toast.innerText = '> ' + msg;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            showToast('THEME: ' + (isDark ? 'DARK_MODE' : 'LIGHT_MODE'));
+        }
+
+        function toggleSource() {
+            const modal = document.getElementById('raw-source-modal');
+            const content = document.getElementById('raw-source-content');
+            const rawData = document.getElementById('hidden-raw-data').value;
+
+            if (modal.style.display === 'flex') {
+                modal.style.display = 'none';
+            } else {
+                content.innerText = rawData || "NO SOURCE DATA AVAILABLE.";
+                modal.style.display = 'flex';
+            }
+        }
+
+        function runVerification() {
+            const overlay = document.getElementById('system2-overlay');
+            const content = document.getElementById('sys2-content');
+            const status = document.getElementById('verification-status');
+
+            overlay.style.display = 'flex';
+            content.innerHTML = '';
+
+            const lines = [
+                "INITIATING SYSTEM 2 PROTOCOL...",
+                "VERIFYING CRYPTOGRAPHIC SIGNATURE...",
+                "HASH: 32ea4484b1e820cdb7559aa18fa4ebc13359148842d43b51341e3a222e049704",
+                "CHECKING CHAIN OF CUSTODY...",
+                "ANALYZING SENTIMENT VECTORS...",
+                "CROSS-REFERENCING KNOWLEDGE GRAPH...",
+                "VERIFICATION COMPLETE."
+            ];
+
+            let i = 0;
+            function addLine() {
+                if (i < lines.length) {
+                    const div = document.createElement('div');
+                    div.className = 'system2-line';
+                    div.innerText = '> ' + lines[i];
+                    div.style.opacity = 1;
+                    content.appendChild(div);
+                    i++;
+                    setTimeout(addLine, 400);
+                } else {
+                    setTimeout(() => {
+                        overlay.style.display = 'none';
+                        showToast('DOCUMENT VERIFIED');
+                        if(status) status.innerText = "VERIFIED // AUTHENTICATED";
+                        if(status) status.style.color = "#aaffaa";
+                    }, 1000);
+                }
+            }
+            addLine();
+        }
+
+        // Chart Injection Logic
+        const metricsData = {};
+
+        if (metricsData && Object.keys(metricsData).length > 0) {
+            const ctx = document.getElementById('financialChart');
+            const container = document.getElementById('financialChartContainer');
+
+            // Basic parsing of metrics structure (assuming flat or Year->Val)
+            let labels = [];
+            let values = [];
+            let labelName = "Metric";
+
+            // Try to find a timeseries
+            for (const [key, val] of Object.entries(metricsData)) {
+                if (typeof val === 'object') {
+                    // Likely year -> value
+                    labels = Object.keys(val);
+                    values = Object.values(val).map(v => parseFloat(v.replace(/[^0-9.-]/g, '')));
+                    labelName = key;
+                    break;
+                }
+            }
+
+            if (labels.length > 0) {
+                container.style.display = 'block';
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: labelName,
+                            data: values,
+                            backgroundColor: 'rgba(204, 0, 0, 0.5)',
+                            borderColor: '#cc0000',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: { legend: { display: true } }
+                    }
+                });
+            }
+        }
+    </script>
 </body>
 </html>

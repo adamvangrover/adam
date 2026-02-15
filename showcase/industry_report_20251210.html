@@ -5,279 +5,368 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ADAM v23.5 :: 🏭 Industry Report: December 10, 2025</title>
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/market_mayhem_tiers.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        :root {
-            --paper-bg: #fdfbf7;
-            --ink-color: #1a1a1a;
-            --accent-red: #cc0000;
-            --cyber-black: #050b14;
-            --cyber-blue: #00f3ff;
-            --cyber-glass: rgba(0, 243, 255, 0.1);
-        }
-        body { margin: 0; background: var(--cyber-black); color: #e0e0e0; font-family: 'Inter', sans-serif; }
-
-        .newsletter-wrapper {
-            max-width: 1200px;
-            margin: 40px auto;
-            display: grid;
-            grid-template-columns: 3fr 1fr;
-            gap: 40px;
-            padding: 20px;
-        }
-        @media (max-width: 800px) {
-            .newsletter-wrapper { grid-template-columns: 1fr; }
-        }
-
-        .paper-sheet {
-            background: var(--paper-bg);
-            color: var(--ink-color);
-            padding: 60px;
-            font-family: 'Georgia', 'Times New Roman', serif;
-            box-shadow: 0 0 50px rgba(0,0,0,0.5);
-            position: relative;
-        }
-
-        /* Typography */
-        h1.title {
-            font-family: 'Playfair Display', serif;
-            font-size: 3rem;
-            border-bottom: 4px solid var(--ink-color);
-            padding-bottom: 20px;
-            margin-bottom: 30px;
-            letter-spacing: -1px;
-            line-height: 1.1;
-        }
-        h2, h3 {
-            font-family: 'Inter', sans-serif;
-            font-weight: 700;
-            margin-top: 40px;
-            margin-bottom: 15px;
-            color: var(--accent-red);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        h2 { font-size: 1.2rem; }
-        h3 { font-size: 1.0rem; color: #333; }
-
-        p, li { line-height: 1.8; margin-bottom: 20px; font-size: 1.05rem; }
-
-        /* Sidebar */
-        .cyber-sidebar {
-            font-family: 'JetBrains Mono', monospace;
-        }
-        .sidebar-widget {
-            border: 1px solid #333;
-            background: rgba(5, 11, 20, 0.8);
-            backdrop-filter: blur(5px);
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 0 20px rgba(0, 243, 255, 0.05);
-        }
-        .sidebar-title {
-            color: var(--cyber-blue);
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            border-bottom: 1px solid #333;
-            padding-bottom: 10px;
-            margin-bottom: 15px;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        /* Sentiment Meter */
-        .sentiment-track {
-            height: 6px; background: #333; border-radius: 3px; overflow: hidden; margin-top: 10px;
-        }
-        .sentiment-bar {
-            height: 100%; background: linear-gradient(90deg, #ff0000, #ffff00, #00ff00);
-            width: 50%;
-            transition: width 1s ease-in-out;
-        }
-
-        /* Ticker Tag */
-        .ticker-tag {
-            display: inline-block;
-            background: rgba(0, 243, 255, 0.1);
-            color: var(--cyber-blue);
-            padding: 4px 8px;
-            margin: 2px;
-            font-size: 0.75rem;
-            border: 1px solid rgba(0, 243, 255, 0.3);
-            border-radius: 2px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .ticker-tag:hover { background: var(--cyber-blue); color: #000; }
-
-        /* Adam Critique */
-        .adam-critique {
-            background: #0f172a;
-            border-left: 4px solid var(--cyber-blue);
-            color: #94a3b8;
-            padding: 20px;
-            margin-top: 40px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.85rem;
-        }
-
-        .cyber-btn {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.75rem;
-            padding: 6px 12px;
-            border: 1px solid #444;
-            color: #e0e0e0;
-            background: rgba(0,0,0,0.8);
-            text-decoration: none;
-            display: inline-block;
-            margin-bottom: 20px;
-        }
-        .cyber-btn:hover { border-color: var(--cyber-blue); color: var(--cyber-blue); }
-
-        /* Provenance Badge */
-        .provenance-badge {
-            font-size: 0.6rem; color: #555; margin-top: 10px; border-top: 1px solid #222; padding-top: 5px;
-        }
-
-        .chart-container {
-            position: relative; height: 200px; width: 100%; margin-bottom: 20px;
-        }
-    </style>
+    <script src="js/nav.js" defer></script>
 </head>
-<body>
-    <div style="max-width: 1400px; margin: 0 auto; padding: 20px;">
-        <a href="market_mayhem_archive.html" class="cyber-btn">&larr; BACK TO ARCHIVE</a>
+<body class="tier-high">
+
+    <!-- System 2 Verification Overlay -->
+    <div id="system2-overlay" class="system2-overlay">
+        <div class="system2-terminal">
+            <div id="sys2-content"></div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="cyber-toast-container"></div>
+
+    <!-- Raw Source Modal -->
+    <div id="raw-source-modal" class="raw-source-modal">
+        <div class="raw-source-header">
+            <span>SOURCE_DATA.JSON</span>
+            <span style="cursor:pointer; color:#cc0000;" onclick="toggleSource()">[CLOSE]</span>
+        </div>
+        <div class="raw-source-content" id="raw-source-content"></div>
+    </div>
+
+    <!-- Virtual Toolbar for High Tier -->
+    <div class="doc-toolbar" style="display: flex;">
+        <div class="toolbar-item" onclick="window.location.href='market_mayhem_archive.html'"><strong>FILE</strong></div>
+        <div class="toolbar-item" onclick="showToast('EDIT MODE: READ ONLY (ARCHIVED)')">EDIT</div>
+        <div class="toolbar-item" onclick="toggleTheme()">VIEW</div>
+        <div class="toolbar-item" onclick="showToast('INSERT: PERMISSION DENIED')">INSERT</div>
+        <div class="toolbar-item" onclick="showToast('FORMAT: LOCKED')">FORMAT</div>
+        <div class="toolbar-item" onclick="runVerification()" style="color: #0078d7;"><strong>VERIFY</strong></div>
+        <div style="flex-grow:1;"></div>
+        <div class="toolbar-item" style="color:#666;">ADAM_V26_EDITOR</div>
+    </div>
+
+    <div style="max-width: 1400px; margin: 0 auto; padding: 10px 20px; display:flex; justify-content:space-between; align-items:center; display: none;">
+        <a href="market_mayhem_archive.html" class="cyber-btn">&larr; RETURN TO ARCHIVE</a>
+        <div style="font-family:'JetBrains Mono'; font-size:0.7rem; color:#666;">SECURE CONNECTION ESTABLISHED</div>
     </div>
 
     <div class="newsletter-wrapper">
-        <!-- Main Content (Paper Style) -->
-        <div class="paper-sheet">
-            <div style="display:flex; justify-content:space-between; font-family:'JetBrains Mono'; font-size:0.8rem; color:#666; margin-bottom:20px;">
+        <div class="paper-sheet" id="paper-sheet">
+
+            <!-- High Tier Header UI -->
+            <div class="doc-header-ui" style="display: flex;">
+                <span id="verification-status">CONFIDENTIAL // SYSTEM 2 REVIEW</span>
+                <span>05a616e4</span>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; font-family:'JetBrains Mono'; font-size:0.8rem; color:#666; margin-bottom:20px; margin-top: 20px;">
                 <span>2025-01-01</span>
-                <span>TYPE: NEWSLETTER</span>
+                <span>ID: 05a616e4</span>
             </div>
 
             <h1 class="title">🏭 Industry Report: December 10, 2025</h1>
 
-            <p style="font-size: 1.2rem; font-style: italic; color: #444; border-bottom: 1px solid #eee; padding-bottom: 20px;">
+            <!-- Metadata Panel for High Tier (Embedded in Doc) -->
+            <div class="doc-metadata-panel" style="display: grid;">
+                <div class="doc-metadata-item"><strong>Classification</strong>UNCLASSIFIED</div>
+                <div class="doc-metadata-item"><strong>Conviction</strong>0/100</div>
+                <div class="doc-metadata-item"><strong>Sentiment</strong>100/100</div>
+                <div class="doc-metadata-item"><strong>Reviewer</strong>Market_Maker</div>
+            </div>
+
+            <div class="doc-tags" style="display: grid; margin-bottom: 30px; font-family: 'Segoe UI', sans-serif; font-size: 0.8rem; color: #666;">
+                <strong style="margin-right: 10px;">SUBJECTS:</strong> <a href="market_mayhem_archive.html?search=US" class="tag" style="text-decoration:none;">US</a><a href="market_mayhem_archive.html?search=CN" class="tag" style="text-decoration:none;">CN</a><a href="market_mayhem_archive.html?search=EU" class="tag" style="text-decoration:none;">EU</a>
+            </div>
+
+            <div id="financialChartContainer" style="display:none; margin-bottom: 30px;">
+                <canvas id="financialChart"></canvas>
+            </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<p style="font-size: 1.2rem; font-style: italic; color: #444; border-bottom: 1px solid #eee; padding-bottom: 20px;">
                 Generated from archive.
             </p>
-
-            <div id="dynamic-chart-area"></div>
-
-            <br><br><strong>Sector Focus: Technology & AI</strong><br><br><h2>📊 Sector Performance</h2><br><br>| Company | Price | P/E | Market Cap |
-| :--- | :--- | :--- | :--- |<br><br>| <strong>AAPL</strong> | $277.18 | 37.2 | $4,113B |<br><br>| <strong>AMZN</strong> | $227.92 | 32.2 | $2,437B |<br><br>| <strong>GOOGL</strong> | $317.08 | 31.3 | $3,841B |<br><br>| <strong>META</strong> | $656.96 | 29.1 | $1,656B |<br><br>| <strong>MSFT</strong> | $492.02 | 35.0 | $3,657B |<br><br>| <strong>NVDA</strong> | $184.97 | 45.9 | $4,503B |<br><br>| <strong>TSLA</strong> | $445.17 | 307.0 | $1,481B |<br><br>
-<h2>📰 Sector News</h2><br><br>
-<strong>AAPL</strong><br><br>* What Trump's Nvidia China sales approval means for the Mag 7<br><br>* Disney nominates former Apple COO to its board<br><br>* Apple Stock Gets Three Price-Target Hikes. Here's Why.<br><br><br><br><br><strong>NVDA</strong><br><br>* OpenAI CEO joins Jimmy Fallon following Nvidia CEO's Joe Rogan chat<br><br>* Trump tariffs live updates: Trump floats 'some' additional tariff carveouts; US unveils $12B farmer bailout<br><br>* How Nvidia selling in China helps 'propel the market forward'<br><br><br><br><br><strong>TSLA</strong><br><br>* Stock market today: Dow, S&P 500, Nasdaq futures waver with Fed rate decision on deck<br><br>* How Mag 7's lead over other stocks could shrink in 2026<br><br>* Dow Jones Futures: GE Vernova Jumps Late; Fed Decision Looms<br><br><br><br><br><strong>MSFT</strong><br><br>* What Trump's Nvidia China sales approval means for the Mag 7<br><br>* Trump approves Nvidia H200 chips for sale to China<br><br>* 2 Things Every Iren Investor Needs to know<br><br><br><br><br><strong>GOOGL</strong><br><br>* Stock market today: Dow, S&P 500, Nasdaq futures waver with Fed rate decision on deck<br><br>* Tesla unsupervised FSD milestone 'very close,' Piper Sandler says<br><br>* Trump approves Nvidia H200 chips for sale to China<br><br><br><br><br><strong>AMZN</strong><br><br>* Oracle set to report earnings as Wall Street looks for cracks in the AI bubble<br><br>* Trump approves Nvidia H200 chips for sale to China<br><br>* Dave Ramsey Reacts To A Father Trying To Bribe His Son For Control Of A $300K Trust. 'What Planet Does He Live On?'<br><br><br><br><br><strong>META</strong><br><br>* Slack's CEO is joining OpenAI to find the money to pay for all those data centers<br><br>* How Mag 7's lead over other stocks could shrink in 2026<br><br>* Trump approves Nvidia H200 chips for sale to China<br><br><br><br><br>
+<br/><br/><strong>Sector Focus: Technology &amp; AI</strong><br/><br/><h2>📊 Sector Performance</h2><br/><br/>| Company | Price | P/E | Market Cap |
+| :--- | :--- | :--- | :--- |<br/><br/>| <strong>AAPL</strong> | $277.18 | 37.2 | $4,113B |<br/><br/>| <strong>AMZN</strong> | $227.92 | 32.2 | $2,437B |<br/><br/>| <strong>GOOGL</strong> | $317.08 | 31.3 | $3,841B |<br/><br/>| <strong>META</strong> | $656.96 | 29.1 | $1,656B |<br/><br/>| <strong>MSFT</strong> | $492.02 | 35.0 | $3,657B |<br/><br/>| <strong>NVDA</strong> | $184.97 | 45.9 | $4,503B |<br/><br/>| <strong>TSLA</strong> | $445.17 | 307.0 | $1,481B |<br/><br/>
+<h2>📰 Sector News</h2><br/><br/>
+<strong>AAPL</strong><br/><br/>* What Trump's Nvidia China sales approval means for the Mag 7<br/><br/>* Disney nominates former Apple COO to its board<br/><br/>* Apple Stock Gets Three Price-Target Hikes. Here's Why.<br/><br/><br/><br/><br/><strong>NVDA</strong><br/><br/>* OpenAI CEO joins Jimmy Fallon following Nvidia CEO's Joe Rogan chat<br/><br/>* Trump tariffs live updates: Trump floats 'some' additional tariff carveouts; US unveils $12B farmer bailout<br/><br/>* How Nvidia selling in China helps 'propel the market forward'<br/><br/><br/><br/><br/><strong>TSLA</strong><br/><br/>* Stock market today: Dow, S&P 500, Nasdaq futures waver with Fed rate decision on deck<br/><br/>* How Mag 7's lead over other stocks could shrink in 2026<br/><br/>* Dow Jones Futures: GE Vernova Jumps Late; Fed Decision Looms<br/><br/><br/><br/><br/><strong>MSFT</strong><br/><br/>* What Trump's Nvidia China sales approval means for the Mag 7<br/><br/>* Trump approves Nvidia H200 chips for sale to China<br/><br/>* 2 Things Every Iren Investor Needs to know<br/><br/><br/><br/><br/><strong>GOOGL</strong><br/><br/>* Stock market today: Dow, S&P 500, Nasdaq futures waver with Fed rate decision on deck<br/><br/>* Tesla unsupervised FSD milestone 'very close,' Piper Sandler says<br/><br/>* Trump approves Nvidia H200 chips for sale to China<br/><br/><br/><br/><br/><strong>AMZN</strong><br/><br/>* Oracle set to report earnings as Wall Street looks for cracks in the AI bubble<br/><br/>* Trump approves Nvidia H200 chips for sale to China<br/><br/>* Dave Ramsey Reacts To A Father Trying To Bribe His Son For Control Of A $300K Trust. 'What Planet Does He Live On?'<br/><br/><br/><br/><br/><strong>META</strong><br/><br/>* Slack's CEO is joining OpenAI to find the money to pay for all those data centers<br/><br/>* How Mag 7's lead over other stocks could shrink in 2026<br/><br/>* Trump approves Nvidia H200 chips for sale to China<br/><br/><br/><br/><br/>
 ---
 *Generated by Adam v23.5*
 
-            <div class="adam-critique">
-                <strong style="color: var(--cyber-blue);">/// ADAM SYSTEM CRITIQUE</strong><br><br>
-                Data ingested from legacy archives.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            <!-- Provenance Log (All Tiers) -->
+            <div class="provenance-log">
+                <div class="log-entry">
+                    <span>> HASH_CHECK</span>
+                    <span style="color:var(--terminal-green);">05a616e497de225e9324663d7843988591a231879686a2d9b751ab7758ce8ecc</span>
+                </div>
+                <div class="log-entry">
+                    <span>> SENTIMENT_SCAN</span>
+                    <span>100 (DENSITY: 24)</span>
+                </div>
+                <div class="log-entry">
+                    <span>> CONVICTION_LOCK</span>
+                    <span>0%</span>
+                </div>
+                <div class="log-entry">
+                    <span>> CRITIQUE_LOG</span>
+                    <span>"Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 100/100. Cross-reference with knowledge graph completed."</span>
+                </div>
+            </div>
+
+            <a href="#" class="source-jump-btn" onclick="toggleSource(); return false;" title="View Source JSON">JUMP TO SOURCE</a>
+
+            <div style="margin-top: 40px; border-top: 1px solid #ccc; padding-top: 20px; font-style: italic; color: #666;">
+                End of Transmission.
             </div>
         </div>
 
-        <!-- Sidebar (Cyber Style) -->
         <aside class="cyber-sidebar">
             <div class="sidebar-widget">
-                <div class="sidebar-title">Market Sentiment <span>50</span></div>
-                <div class="sentiment-track">
-                    <div class="sentiment-bar"></div>
-                </div>
-                <div style="font-size:0.7rem; color:#666; margin-top:5px; display:flex; justify-content:space-between;">
-                    <span>PANIC</span><span>NEUTRAL</span><span>EUPHORIA</span>
+                <div class="sidebar-title">Intelligence Metadata</div>
+                <div class="stat-row"><span>DATE</span> <span class="stat-val">2025-01-01</span></div>
+                <div class="stat-row"><span>TYPE</span> <span class="stat-val">ID: 679b780f</span></div>
+                <div class="stat-row"><span>CLASS</span> <span class="stat-val">UNCLASSIFIED</span></div>
+                <div class="stat-row"><span>PROVENANCE</span> <span class="stat-val" title="05a616e497de225e9324663d7843988591a231879686a2d9b751ab7758ce8ecc">05a616e4</span></div>
+            </div>
+
+            <div class="sidebar-widget">
+                <div class="sidebar-title">Sentiment Analysis</div>
+                <div class="stat-row"><span>SCORE</span> <span class="stat-val">100/100</span></div>
+                <div class="sentiment-bar">
+                    <div class="sentiment-fill" style="width: 100%;"></div>
                 </div>
             </div>
 
             <div class="sidebar-widget">
-                <div class="sidebar-title">Entities Tracked</div>
-                <div>
-                    <span class="ticker-tag">SPX</span>
+                <div class="sidebar-title">Detected Entities</div>
+                <div class="tag-cloud">
+                    <a href="market_mayhem_archive.html?search=US" class="tag" style="text-decoration:none;">US</a><a href="market_mayhem_archive.html?search=CN" class="tag" style="text-decoration:none;">CN</a><a href="market_mayhem_archive.html?search=EU" class="tag" style="text-decoration:none;">EU</a>
+                </div>
+            </div>
+
+             <div class="sidebar-widget">
+                <div class="sidebar-title">Agent Conviction</div>
+                 <div class="stat-row"><span>CONFIDENCE</span> <span class="stat-val">0/100</span></div>
+                 <div class="sentiment-bar">
+                    <div class="sentiment-fill" style="width: 0%; background: #ff0000;"></div>
                 </div>
             </div>
 
             <div class="sidebar-widget">
+                <div class="sidebar-title">Semantic Analysis</div>
+                 <div class="stat-row"><span>DENSITY</span> <span class="stat-val">24/100</span></div>
+                 <div class="stat-row"><span>PROBABILITY</span> <span class="stat-val">0/100</span></div>
+            </div>
+
+             <div class="sidebar-widget" style="border-color: #555;">
+                <div class="sidebar-title">Reviewer Agent Log</div>
+                 <div style="font-size: 0.75rem; color: #ccc; font-style: italic;">
+                    "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 100/100. Cross-reference with knowledge graph completed."
+                </div>
+                <div class="stat-row" style="margin-top:10px;"><span>QUALITY SCORE</span> <span class="stat-val">100/100</span></div>
+            </div>
+
+             <div class="sidebar-widget">
                 <div class="sidebar-title">Contributing Agents</div>
-                <div style="font-size:0.8rem; color:#888;">
-                    System Orchestrator
-                </div>
-            </div>
-
-            <div class="sidebar-widget">
-                <div class="sidebar-title">Highlights</div>
-                <ul style="font-size:0.8rem; color:#aaa; padding-left:20px; line-height:1.5;">
-
-                </ul>
-            </div>
-
-            <div class="sidebar-widget">
-                <div class="sidebar-title">Provenance</div>
-                <div class="provenance-badge">
-                    HASH: <span style="color: var(--cyber-blue)">32bbbf42</span><br>
-                    SRC: Industry_Report_20251210.md<br>
-                    MODEL: v23.5 (Legacy Compatible)
+                 <div style="display:flex; flex-direction:column; gap:5px;">
+                    <div style="font-size:0.75rem; color:#666;">System Core</div>
                 </div>
             </div>
         </aside>
     </div>
 
+    <!-- Hidden Raw Data -->
+    <textarea id="hidden-raw-data" style="display:none;">{
+  "title": "\ud83c\udfed Industry Report: December 10, 2025",
+  "date": "2025-01-01",
+  "summary": "Generated from archive....",
+  "type": "ID: 679b780f",
+  "full_body": "\n  \n\n\n\n  \n\n\n\n\n\n\n\n\n\n\n<p style=\"font-size: 1.2rem; font-style: italic; color: #444; border-bottom: 1px solid #eee; padding-bottom: 20px;\">\n                Generated from archive.\n            </p>\n<br/><br/><strong>Sector Focus: Technology &amp; AI</strong><br/><br/><h2>\ud83d\udcca Sector Performance</h2><br/><br/>| Company | Price | P/E | Market Cap |\n| :--- | :--- | :--- | :--- |<br/><br/>| <strong>AAPL</strong> | $277.18 | 37.2 | $4,113B |<br/><br/>| <strong>AMZN</strong> | $227.92 | 32.2 | $2,437B |<br/><br/>| <strong>GOOGL</strong> | $317.08 | 31.3 | $3,841B |<br/><br/>| <strong>META</strong> | $656.96 | 29.1 | $1,656B |<br/><br/>| <strong>MSFT</strong> | $492.02 | 35.0 | $3,657B |<br/><br/>| <strong>NVDA</strong> | $184.97 | 45.9 | $4,503B |<br/><br/>| <strong>TSLA</strong> | $445.17 | 307.0 | $1,481B |<br/><br/>\n<h2>\ud83d\udcf0 Sector News</h2><br/><br/>\n<strong>AAPL</strong><br/><br/>* What Trump's Nvidia China sales approval means for the Mag 7<br/><br/>* Disney nominates former Apple COO to its board<br/><br/>* Apple Stock Gets Three Price-Target Hikes. Here's Why.<br/><br/><br/><br/><br/><strong>NVDA</strong><br/><br/>* OpenAI CEO joins Jimmy Fallon following Nvidia CEO's Joe Rogan chat<br/><br/>* Trump tariffs live updates: Trump floats 'some' additional tariff carveouts; US unveils $12B farmer bailout<br/><br/>* How Nvidia selling in China helps 'propel the market forward'<br/><br/><br/><br/><br/><strong>TSLA</strong><br/><br/>* Stock market today: Dow, S&P 500, Nasdaq futures waver with Fed rate decision on deck<br/><br/>* How Mag 7's lead over other stocks could shrink in 2026<br/><br/>* Dow Jones Futures: GE Vernova Jumps Late; Fed Decision Looms<br/><br/><br/><br/><br/><strong>MSFT</strong><br/><br/>* What Trump's Nvidia China sales approval means for the Mag 7<br/><br/>* Trump approves Nvidia H200 chips for sale to China<br/><br/>* 2 Things Every Iren Investor Needs to know<br/><br/><br/><br/><br/><strong>GOOGL</strong><br/><br/>* Stock market today: Dow, S&P 500, Nasdaq futures waver with Fed rate decision on deck<br/><br/>* Tesla unsupervised FSD milestone 'very close,' Piper Sandler says<br/><br/>* Trump approves Nvidia H200 chips for sale to China<br/><br/><br/><br/><br/><strong>AMZN</strong><br/><br/>* Oracle set to report earnings as Wall Street looks for cracks in the AI bubble<br/><br/>* Trump approves Nvidia H200 chips for sale to China<br/><br/>* Dave Ramsey Reacts To A Father Trying To Bribe His Son For Control Of A $300K Trust. 'What Planet Does He Live On?'<br/><br/><br/><br/><br/><strong>META</strong><br/><br/>* Slack's CEO is joining OpenAI to find the money to pay for all those data centers<br/><br/>* How Mag 7's lead over other stocks could shrink in 2026<br/><br/>* Trump approves Nvidia H200 chips for sale to China<br/><br/><br/><br/><br/>\n---\n*Generated by Adam v23.5*\n\n            \n\n\n              \n\n\n\n\n\n              \n\n\n\n\n\n              \n\n\n\n\n\n              \n\n\n\n\n\n              \n\n\n\n",
+  "sentiment_score": 100,
+  "entities": {
+    "tickers": [],
+    "agents": [],
+    "sovereigns": [
+      "US",
+      "CN",
+      "EU"
+    ]
+  },
+  "provenance_hash": "05a616e497de225e9324663d7843988591a231879686a2d9b751ab7758ce8ecc",
+  "filename": "industry_report_20251210.html",
+  "is_sourced": true,
+  "metrics_json": "{}",
+  "source_priority": 2,
+  "conviction": 0,
+  "semantic_score": 24,
+  "probability": 0,
+  "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 100/100. Cross-reference with knowledge graph completed."
+}</textarea>
+
     <script>
-        // Inject Data for potential JS usage
-        window.REPORT_METRICS = {};
+        // --- INTERACTION LOGIC ---
 
-        // Simple Chart Generation if metrics exist
-        if (window.REPORT_METRICS && Object.keys(window.REPORT_METRICS).length > 0) {
-            const chartArea = document.getElementById('dynamic-chart-area');
+        function showToast(msg) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'cyber-toast';
+            toast.innerText = '> ' + msg;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
 
-            // Loop through metrics and create charts
-            for (const [key, value] of Object.entries(window.REPORT_METRICS)) {
-                if (typeof value === 'object' && value !== null) {
-                    const container = document.createElement('div');
-                    container.className = 'chart-container';
-                    const canvas = document.createElement('canvas');
-                    container.appendChild(canvas);
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            showToast('THEME: ' + (isDark ? 'DARK_MODE' : 'LIGHT_MODE'));
+        }
 
-                    // Title
-                    const title = document.createElement('h3');
-                    title.innerText = key;
-                    title.style.color = '#333';
-                    title.style.fontSize = '0.9rem';
-                    chartArea.appendChild(title);
-                    chartArea.appendChild(container);
+        function toggleSource() {
+            const modal = document.getElementById('raw-source-modal');
+            const content = document.getElementById('raw-source-content');
+            const rawData = document.getElementById('hidden-raw-data').value;
 
-                    // Parse Data
-                    const labels = Object.keys(value);
-                    const dataPoints = Object.values(value).map(v => {
-                        if (typeof v === 'string') return parseFloat(v.replace(/[^0-9.]/g, ''));
-                        return v;
-                    });
+            if (modal.style.display === 'flex') {
+                modal.style.display = 'none';
+            } else {
+                content.innerText = rawData || "NO SOURCE DATA AVAILABLE.";
+                modal.style.display = 'flex';
+            }
+        }
 
-                    new Chart(canvas, {
-                        type: 'bar',
-                        data: {
-                            labels: labels,
-                            datasets: [{
-                                label: key,
-                                data: dataPoints,
-                                backgroundColor: 'rgba(204, 0, 0, 0.5)',
-                                borderColor: 'rgba(204, 0, 0, 1)',
-                                borderWidth: 1
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: { legend: { display: false } },
-                            scales: {
-                                y: { grid: { color: '#ddd' } },
-                                x: { grid: { display: false } }
-                            }
-                        }
-                    });
+        function runVerification() {
+            const overlay = document.getElementById('system2-overlay');
+            const content = document.getElementById('sys2-content');
+            const status = document.getElementById('verification-status');
+
+            overlay.style.display = 'flex';
+            content.innerHTML = '';
+
+            const lines = [
+                "INITIATING SYSTEM 2 PROTOCOL...",
+                "VERIFYING CRYPTOGRAPHIC SIGNATURE...",
+                "HASH: 05a616e497de225e9324663d7843988591a231879686a2d9b751ab7758ce8ecc",
+                "CHECKING CHAIN OF CUSTODY...",
+                "ANALYZING SENTIMENT VECTORS...",
+                "CROSS-REFERENCING KNOWLEDGE GRAPH...",
+                "VERIFICATION COMPLETE."
+            ];
+
+            let i = 0;
+            function addLine() {
+                if (i < lines.length) {
+                    const div = document.createElement('div');
+                    div.className = 'system2-line';
+                    div.innerText = '> ' + lines[i];
+                    div.style.opacity = 1;
+                    content.appendChild(div);
+                    i++;
+                    setTimeout(addLine, 400);
+                } else {
+                    setTimeout(() => {
+                        overlay.style.display = 'none';
+                        showToast('DOCUMENT VERIFIED');
+                        if(status) status.innerText = "VERIFIED // AUTHENTICATED";
+                        if(status) status.style.color = "#aaffaa";
+                    }, 1000);
                 }
+            }
+            addLine();
+        }
+
+        // Chart Injection Logic
+        const metricsData = {};
+
+        if (metricsData && Object.keys(metricsData).length > 0) {
+            const ctx = document.getElementById('financialChart');
+            const container = document.getElementById('financialChartContainer');
+
+            // Basic parsing of metrics structure (assuming flat or Year->Val)
+            let labels = [];
+            let values = [];
+            let labelName = "Metric";
+
+            // Try to find a timeseries
+            for (const [key, val] of Object.entries(metricsData)) {
+                if (typeof val === 'object') {
+                    // Likely year -> value
+                    labels = Object.keys(val);
+                    values = Object.values(val).map(v => parseFloat(v.replace(/[^0-9.-]/g, '')));
+                    labelName = key;
+                    break;
+                }
+            }
+
+            if (labels.length > 0) {
+                container.style.display = 'block';
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: labelName,
+                            data: values,
+                            backgroundColor: 'rgba(204, 0, 0, 0.5)',
+                            borderColor: '#cc0000',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: { legend: { display: true } }
+                    }
+                });
             }
         }
     </script>

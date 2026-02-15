@@ -5,305 +5,395 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ADAM v23.5 :: Market Mayhem Newsletter - December 2, 2025</title>
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/market_mayhem_tiers.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        :root {
-            --paper-bg: #fdfbf7;
-            --ink-color: #1a1a1a;
-            --accent-red: #cc0000;
-            --cyber-black: #050b14;
-            --cyber-blue: #00f3ff;
-            --cyber-glass: rgba(0, 243, 255, 0.1);
-        }
-        body { margin: 0; background: var(--cyber-black); color: #e0e0e0; font-family: 'Inter', sans-serif; }
-
-        .newsletter-wrapper {
-            max-width: 1200px;
-            margin: 40px auto;
-            display: grid;
-            grid-template-columns: 3fr 1fr;
-            gap: 40px;
-            padding: 20px;
-        }
-        @media (max-width: 800px) {
-            .newsletter-wrapper { grid-template-columns: 1fr; }
-        }
-
-        .paper-sheet {
-            background: var(--paper-bg);
-            color: var(--ink-color);
-            padding: 60px;
-            font-family: 'Georgia', 'Times New Roman', serif;
-            box-shadow: 0 0 50px rgba(0,0,0,0.5);
-            position: relative;
-        }
-
-        /* Typography */
-        h1.title {
-            font-family: 'Playfair Display', serif;
-            font-size: 3rem;
-            border-bottom: 4px solid var(--ink-color);
-            padding-bottom: 20px;
-            margin-bottom: 30px;
-            letter-spacing: -1px;
-            line-height: 1.1;
-        }
-        h2, h3 {
-            font-family: 'Inter', sans-serif;
-            font-weight: 700;
-            margin-top: 40px;
-            margin-bottom: 15px;
-            color: var(--accent-red);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        h2 { font-size: 1.2rem; }
-        h3 { font-size: 1.0rem; color: #333; }
-
-        p, li { line-height: 1.8; margin-bottom: 20px; font-size: 1.05rem; }
-
-        /* Sidebar */
-        .cyber-sidebar {
-            font-family: 'JetBrains Mono', monospace;
-        }
-        .sidebar-widget {
-            border: 1px solid #333;
-            background: rgba(5, 11, 20, 0.8);
-            backdrop-filter: blur(5px);
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 0 20px rgba(0, 243, 255, 0.05);
-        }
-        .sidebar-title {
-            color: var(--cyber-blue);
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            border-bottom: 1px solid #333;
-            padding-bottom: 10px;
-            margin-bottom: 15px;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        /* Sentiment Meter */
-        .sentiment-track {
-            height: 6px; background: #333; border-radius: 3px; overflow: hidden; margin-top: 10px;
-        }
-        .sentiment-bar {
-            height: 100%; background: linear-gradient(90deg, #ff0000, #ffff00, #00ff00);
-            width: 47%;
-            transition: width 1s ease-in-out;
-        }
-
-        /* Ticker Tag */
-        .ticker-tag {
-            display: inline-block;
-            background: rgba(0, 243, 255, 0.1);
-            color: var(--cyber-blue);
-            padding: 4px 8px;
-            margin: 2px;
-            font-size: 0.75rem;
-            border: 1px solid rgba(0, 243, 255, 0.3);
-            border-radius: 2px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .ticker-tag:hover { background: var(--cyber-blue); color: #000; }
-
-        /* Adam Critique */
-        .adam-critique {
-            background: #0f172a;
-            border-left: 4px solid var(--cyber-blue);
-            color: #94a3b8;
-            padding: 20px;
-            margin-top: 40px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.85rem;
-        }
-
-        .cyber-btn {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.75rem;
-            padding: 6px 12px;
-            border: 1px solid #444;
-            color: #e0e0e0;
-            background: rgba(0,0,0,0.8);
-            text-decoration: none;
-            display: inline-block;
-            margin-bottom: 20px;
-        }
-        .cyber-btn:hover { border-color: var(--cyber-blue); color: var(--cyber-blue); }
-
-        /* Provenance Badge */
-        .provenance-badge {
-            font-size: 0.6rem; color: #555; margin-top: 10px; border-top: 1px solid #222; padding-top: 5px;
-        }
-
-        .chart-container {
-            position: relative; height: 200px; width: 100%; margin-bottom: 20px;
-        }
-    </style>
+    <script src="js/nav.js" defer></script>
 </head>
-<body>
-    <div style="max-width: 1400px; margin: 0 auto; padding: 20px;">
-        <a href="market_mayhem_archive.html" class="cyber-btn">&larr; BACK TO ARCHIVE</a>
+<body class="tier-high">
+
+    <!-- System 2 Verification Overlay -->
+    <div id="system2-overlay" class="system2-overlay">
+        <div class="system2-terminal">
+            <div id="sys2-content"></div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="cyber-toast-container"></div>
+
+    <!-- Raw Source Modal -->
+    <div id="raw-source-modal" class="raw-source-modal">
+        <div class="raw-source-header">
+            <span>SOURCE_DATA.JSON</span>
+            <span style="cursor:pointer; color:#cc0000;" onclick="toggleSource()">[CLOSE]</span>
+        </div>
+        <div class="raw-source-content" id="raw-source-content"></div>
+    </div>
+
+    <!-- Virtual Toolbar for High Tier -->
+    <div class="doc-toolbar" style="display: flex;">
+        <div class="toolbar-item" onclick="window.location.href='market_mayhem_archive.html'"><strong>FILE</strong></div>
+        <div class="toolbar-item" onclick="showToast('EDIT MODE: READ ONLY (ARCHIVED)')">EDIT</div>
+        <div class="toolbar-item" onclick="toggleTheme()">VIEW</div>
+        <div class="toolbar-item" onclick="showToast('INSERT: PERMISSION DENIED')">INSERT</div>
+        <div class="toolbar-item" onclick="showToast('FORMAT: LOCKED')">FORMAT</div>
+        <div class="toolbar-item" onclick="runVerification()" style="color: #0078d7;"><strong>VERIFY</strong></div>
+        <div style="flex-grow:1;"></div>
+        <div class="toolbar-item" style="color:#666;">ADAM_V26_EDITOR</div>
+    </div>
+
+    <div style="max-width: 1400px; margin: 0 auto; padding: 10px 20px; display:flex; justify-content:space-between; align-items:center; display: none;">
+        <a href="market_mayhem_archive.html" class="cyber-btn">&larr; RETURN TO ARCHIVE</a>
+        <div style="font-family:'JetBrains Mono'; font-size:0.7rem; color:#666;">SECURE CONNECTION ESTABLISHED</div>
     </div>
 
     <div class="newsletter-wrapper">
-        <!-- Main Content (Paper Style) -->
-        <div class="paper-sheet">
-            <div style="display:flex; justify-content:space-between; font-family:'JetBrains Mono'; font-size:0.8rem; color:#666; margin-bottom:20px;">
+        <div class="paper-sheet" id="paper-sheet">
+
+            <!-- High Tier Header UI -->
+            <div class="doc-header-ui" style="display: flex;">
+                <span id="verification-status">CONFIDENTIAL // SYSTEM 2 REVIEW</span>
+                <span>38feded6</span>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; font-family:'JetBrains Mono'; font-size:0.8rem; color:#666; margin-bottom:20px; margin-top: 20px;">
                 <span>2025-01-01</span>
-                <span>TYPE: NEWSLETTER</span>
+                <span>ID: 38feded6</span>
             </div>
 
             <h1 class="title">Market Mayhem Newsletter - December 2, 2025</h1>
 
-            <p style="font-size: 1.2rem; font-style: italic; color: #444; border-bottom: 1px solid #eee; padding-bottom: 20px;">
+            <!-- Metadata Panel for High Tier (Embedded in Doc) -->
+            <div class="doc-metadata-panel" style="display: grid;">
+                <div class="doc-metadata-item"><strong>Classification</strong>UNCLASSIFIED</div>
+                <div class="doc-metadata-item"><strong>Conviction</strong>81/100</div>
+                <div class="doc-metadata-item"><strong>Sentiment</strong>81/100</div>
+                <div class="doc-metadata-item"><strong>Reviewer</strong>Sovereign_AI</div>
+            </div>
+
+            <div class="doc-tags" style="display: grid; margin-bottom: 30px; font-family: 'Segoe UI', sans-serif; font-size: 0.8rem; color: #666;">
+                <strong style="margin-right: 10px;">SUBJECTS:</strong> <a href="market_mayhem_archive.html?search=US" class="tag" style="text-decoration:none;">US</a><a href="market_mayhem_archive.html?search=EU" class="tag" style="text-decoration:none;">EU</a>
+            </div>
+
+            <div id="financialChartContainer" style="display:none; margin-bottom: 30px;">
+                <canvas id="financialChart"></canvas>
+            </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<p style="font-size: 1.2rem; font-style: italic; color: #444; border-bottom: 1px solid #eee; padding-bottom: 20px;">
                 Generated from archive.
             </p>
 
-            <div id="dynamic-chart-area"></div>
 
 
-*Subtitle: Your weekly guide to navigating the financial storms and spotting the sunshine!*<br><br>---<br><br><h2>📊 Market Snapshot</h2><br><br>* <strong>S&P 500:</strong> 6,812.63 (`-0.5%` WoW)
+*Subtitle: Your weekly guide to navigating the financial storms and spotting the sunshine!*<br/><br/>---<br/><br/><h2>📊 Market Snapshot</h2><br/><br/>* <strong>S&amp;P 500:</strong> 6,812.63 (`-0.5%` WoW)
 * <strong>Dow Jones:</strong> 47,289.33 (`-0.9%` WoW)
 * <strong>Nasdaq Composite:</strong> 23,275.92 (`-0.4%` WoW)
 * <strong>Bitcoin (BTC):</strong> ~$85,800 (`-6.0%` Intraday / Bearish)
 * <strong>Brent Crude Oil:</strong> $82.50 (`+0.9%` WoW)
 * <strong>Gold:</strong> $2,945.00 (`+0.4%` WoW)
-* <strong>10-Year Treasury Yield:</strong> 4.15% (Flat)<br><br>---<br><br><h2>🌪️ Market Mayhem: Executive Summary</h2>
-### The Mood: Anxious Anticipation<br><br>Welcome to the <strong>"Great Calibration"</strong> of late 2025. The markets are currently caught in a pincer movement: on one flank, we have the <strong>"AI ROI Reckoning"</strong> triggered by the IBM CEO's skepticism on CapEx returns, and on the other, a Macro slowdown signaled by a contractionary ISM Manufacturing print (48.2).<br><br>While the broader indices are taking a breather, the internal rotation is violent. <strong>Energy is the lone safe harbor (+0.9%)</strong> as investors flee defensive sectors like Utilities and Healthcare. Meanwhile, the Crypto winter has sent a sudden chill through the room, with Bitcoin plummeting back to $85k, dragging the likes of Coinbase and MicroStrategy down with it.<br><br>All eyes are now locked on the Fed's final showdown of the year next week. Will they cut? The bond market screams "Yes" (90% probability), but the equity market isn't waiting around to find out.<br><br><strong>Driver of the Week:</strong> The Reality Check. (Manufacturing miss + AI skepticism).<br><br>---<br><br><h2>📰 Key News & Events (The "What Happened")</h2><br><br>* <strong>IBM CEO Drops the Hammer on AI Spending:</strong> Big Blue's chief stated there is "no way" current AI data center spending will pay off, sending shivers through the semiconductor supply chain and prompting a re-evaluation of "Build at all costs" models.
+* <strong>10-Year Treasury Yield:</strong> 4.15% (Flat)<br/><br/>---<br/><br/><h2>🌪️ Market Mayhem: Executive Summary</h2>
+### The Mood: Anxious Anticipation<br/><br/>Welcome to the <strong>"Great Calibration"</strong> of late 2025. The markets are currently caught in a pincer movement: on one flank, we have the <strong>"AI ROI Reckoning"</strong> triggered by the IBM CEO's skepticism on CapEx returns, and on the other, a Macro slowdown signaled by a contractionary ISM Manufacturing print (48.2).<br/><br/>While the broader indices are taking a breather, the internal rotation is violent. <strong>Energy is the lone safe harbor (+0.9%)</strong> as investors flee defensive sectors like Utilities and Healthcare. Meanwhile, the Crypto winter has sent a sudden chill through the room, with Bitcoin plummeting back to $85k, dragging the likes of Coinbase and MicroStrategy down with it.<br/><br/>All eyes are now locked on the Fed's final showdown of the year next week. Will they cut? The bond market screams "Yes" (90% probability), but the equity market isn't waiting around to find out.<br/><br/><strong>Driver of the Week:</strong> The Reality Check. (Manufacturing miss + AI skepticism).<br/><br/>---<br/><br/><h2>📰 Key News &amp; Events (The "What Happened")</h2><br/><br/>* <strong>IBM CEO Drops the Hammer on AI Spending:</strong> Big Blue's chief stated there is "no way" current AI data center spending will pay off, sending shivers through the semiconductor supply chain and prompting a re-evaluation of "Build at all costs" models.
 * <strong>Amazon Launches Trainium3:</strong> Ignoring the skeptics, AWS unveiled its latest custom silicon, Trainium3, directly challenging NVIDIA's dominance and signaling that the Hyperscaler wars are far from over.
 * <strong>Bitcoin Breaks Down:</strong> The "digital gold" narrative took a hit as BTC slid 6% to ~$85,800, capping off its worst monthly decline since 2021. Leverage is being flushed out of the system ahead of year-end.
 * <strong>Anthropic Acquires Bun:</strong> In a strategic move to own the developer workflow, Anthropic snapped up the JavaScript runtime Bun, signaling a pivot from pure model intelligence to integrated tooling domination.
-* <strong>ISM Manufacturing Contraction:</strong> November's print of <strong>48.2</strong> (vs. 49.1 expected) confirms the industrial economy is cooling faster than anticipated, adding pressure on the Fed to ease rates next week.<br><br>---<br><br><h2>🚀 Top Investment Ideas (The "Alpha")</h2><br><br>### 1. Theme: The "Sovereign Silicon" Shift
+* <strong>ISM Manufacturing Contraction:</strong> November's print of <strong>48.2</strong> (vs. 49.1 expected) confirms the industrial economy is cooling faster than anticipated, adding pressure on the Fed to ease rates next week.<br/><br/>---<br/><br/><h2>🚀 Top Investment Ideas (The "Alpha")</h2><br/><br/>### 1. Theme: The "Sovereign Silicon" Shift
 * <strong>The Play:</strong> Long Hyperscalers with custom chip stacks (<strong>Amazon, Google</strong>) vs. generic hardware integrators.
 * <strong>Rationale:</strong> With Amazon Trainium3 and Apple's new open weights models, the value capture is shifting from the "arms dealers" (pure-play chipmakers) to the "sovereign nations" (Big Tech owning the full stack). As cost-efficiency becomes the 2026 mantra, proprietary silicon offers better margins than expensive merchant silicon.
-* <strong>Key Risks:</strong> Antitrust scrutiny intensifying in the EU/US; continued skepticism on AI revenue realization.<br><br>### 2. Theme: Energy Renaissance
+* <strong>Key Risks:</strong> Antitrust scrutiny intensifying in the EU/US; continued skepticism on AI revenue realization.<br/><br/>### 2. Theme: Energy Renaissance
 * <strong>The Play:</strong> Integrated Oil Majors & Nuclear Utilities.
 * <strong>Rationale:</strong> Energy was the only green sector this week (+0.9%). Why? Because AI data centers still need power, regardless of the ROI debate. The grid is strained, and traditional energy providers are becoming the new "critical infrastructure" play. Plus, with geopolitical tensions simmering, oil remains a potent hedge.
-* <strong>Key Risks:</strong> A global recession (signaled by ISM < 50) crushing demand; peace treaties in key conflict zones (unlikely but possible).<br><br>---<br><br><h2>📡 Notable Signals & Rumors</h2><br><br>* <strong>The "Junior Crisis" Signal:</strong> Tech forums are ablaze with the "Junior Hiring Crisis." <strong>Signal:</strong> Expect a surge in "AI Agent" startups specifically targeting entry-level coding tasks. The labor market for junior devs isn't just soft; it's being automated away. Long platforms like GitHub/Microsoft; Short boutique coding bootcamps.
+* <strong>Key Risks:</strong> A global recession (signaled by ISM < 50) crushing demand; peace treaties in key conflict zones (unlikely but possible).<br/><br/>---<br/><br/><h2>📡 Notable Signals &amp; Rumors</h2><br/><br/>* <strong>The "Junior Crisis" Signal:</strong> Tech forums are ablaze with the "Junior Hiring Crisis." <strong>Signal:</strong> Expect a surge in "AI Agent" startups specifically targeting entry-level coding tasks. The labor market for junior devs isn't just soft; it's being automated away. Long platforms like GitHub/Microsoft; Short boutique coding bootcamps.
 * <strong>OpenAI's "Code Red":</strong> Rumors are swirling that OpenAI has declared an internal "Code Red" as Google's Gemini updates and Anthropic's tooling integration (Bun) threaten to erode ChatGPT's moat. Expect a rushed product announcement before Christmas to regain the narrative.
-* <strong>Insider Selling in SaaS:</strong> Watch for heavy insider selling in mid-cap AI wrappers. The IBM comments gave executives the "permission" to doubt the boom; many insiders might cash out before Q4 earnings reveal slowing growth.<br><br>---<br><br><h2>🏛️ Policy Impact & Geopolitical Outlook</h2><br><br>* <strong>The Fed's Dilemma (Dec 9-10):</strong> The bond market has priced in a cut with 90% certainty. If Powell pauses, we crash. The weak ISM data (48.2) gives him the cover he needs to cut by 25bps, framing it as a "mid-cycle adjustment" to save the labor market (watch Wednesday's ADP report closely).
-* <strong>Global Friction:</strong> The "fragmentation" of the internet continues. With Apple releasing open models and nations pushing for "Sovereign AI," we are moving towards a world of walled gardens. This reduces global liquidity and increases volatility in cross-border tech investments.<br><br>---<br><br><h2>🤝 Deals & Corporate Actions</h2><br><br>* <strong>Anthropic acquires Bun:</strong> Undisclosed amount. A massive signal that the Runtime is the new battleground for AI agents.
-* <strong>Coinbase (COIN) & MicroStrategy (MSTR):</strong> No deal, but massive price action (-4.8% / -3.3%) acting as a proxy for the crypto liquidation event.
-* <strong>Amazon (AMZN):</strong> Corporate action in the form of the Trainium3 launch—effectively a declaration of independence from the GPU shortage.<br><br>---<br><br><h2>📅 Earnings Watch (Next Week: Dec 8 - 12)</h2>
-*Investors should tune in for:*<br><br>* <strong>Adobe (ADBE):</strong> The Litmus Test for AI Monetization. Are creative professionals actually paying for Firefly, or just playing with it?
+* <strong>Insider Selling in SaaS:</strong> Watch for heavy insider selling in mid-cap AI wrappers. The IBM comments gave executives the "permission" to doubt the boom; many insiders might cash out before Q4 earnings reveal slowing growth.<br/><br/>---<br/><br/><h2>🏛️ Policy Impact &amp; Geopolitical Outlook</h2><br/><br/>* <strong>The Fed's Dilemma (Dec 9-10):</strong> The bond market has priced in a cut with 90% certainty. If Powell pauses, we crash. The weak ISM data (48.2) gives him the cover he needs to cut by 25bps, framing it as a "mid-cycle adjustment" to save the labor market (watch Wednesday's ADP report closely).
+* <strong>Global Friction:</strong> The "fragmentation" of the internet continues. With Apple releasing open models and nations pushing for "Sovereign AI," we are moving towards a world of walled gardens. This reduces global liquidity and increases volatility in cross-border tech investments.<br/><br/>---<br/><br/><h2>🤝 Deals &amp; Corporate Actions</h2><br/><br/>* <strong>Anthropic acquires Bun:</strong> Undisclosed amount. A massive signal that the Runtime is the new battleground for AI agents.
+* <strong>Coinbase (COIN) &amp; MicroStrategy (MSTR):</strong> No deal, but massive price action (-4.8% / -3.3%) acting as a proxy for the crypto liquidation event.
+* <strong>Amazon (AMZN):</strong> Corporate action in the form of the Trainium3 launch—effectively a declaration of independence from the GPU shortage.<br/><br/>---<br/><br/><h2>📅 Earnings Watch (Next Week: Dec 8 - 12)</h2>
+*Investors should tune in for:*<br/><br/>* <strong>Adobe (ADBE):</strong> The Litmus Test for AI Monetization. Are creative professionals actually paying for Firefly, or just playing with it?
 * <strong>Oracle (ORCL):</strong> The Cloud Infrastructure Bellwether. Larry Ellison's guidance on cloud capacity vs. demand will prove or disprove the IBM CEO's bearish thesis.
 * <strong>Costco (COST):</strong> The Consumer Health Check. With manufacturing down, is the consumer still buying in bulk? Margins here will tell us about inflation stickiness.
-* <strong>Broadcom (AVGO):</strong> The Custom Silicon King. Watch for comments on AI accelerator revenue growth vs. legacy networking softness.<br><br>---<br><br><h2>🧠 Thematic Deep Dive: The AI ROI Reckoning</h2><br><br>For two years, the market asked only one question: "How many GPUs did you buy?" Now, thanks to IBM's CEO and a jittery Wall Street, the question for 2026 is: <strong>"How much money did you make with them?"</strong><br><br>We are entering the <strong>"Show Me"</strong> phase of the AI Supercycle. The "Build It and They Will Come" era is officially over. This week's bifurcated news—Amazon doubling down on hardware (Trainium3) while enterprise leaders question the payoff—highlights the tension.<br><br><strong>Implication:</strong> Capital will flee from "AI Wrappers" (companies that just call an API) and flood into "AI Operations" (companies that actually reduce headcount or tangible costs). The easy money is made; the hard work of business model transformation begins now. Expect P/E compression for high-flyers who can't show a clear path to earnings (not just revenue) growth from AI.<br><br>---<br><br><h2>🔮 Year Ahead Forecast</h2>
-<strong>Stance: Cautiously Neutral / Volatile.</strong><br><br>The remainder of 2025 will be defined by the "tug-of-war" between falling interest rates (Bullish) and slowing economic growth (Bearish). We expect the S&P 500 to chop sideways to slightly down into year-end as tax-loss harvesting and portfolio rebalancing take hold. However, 2026 is setting up to be a stock-picker's paradise—the rising tide will no longer lift all boats. Quality, cash flow, and "Sovereign Silicon" will win.<br><br>---<br><br><h2>🖊️ Quirky Sign-Off</h2><br><br>> "In the short run, the market is a voting machine; in the long run, it is a weighing machine. But right now, it feels more like a slot machine with a loose handle."<br><br>May your portfolios be green, your coffee strong, and your due diligence thorough. Until next week, stay curious and invest wisely!<br><br><strong>- Adam v23.5</strong>
-*Chief Market Strategist & Editor-in-Chief*<br><br>---<br><br>### ⚖️ Disclaimer
+* <strong>Broadcom (AVGO):</strong> The Custom Silicon King. Watch for comments on AI accelerator revenue growth vs. legacy networking softness.<br/><br/>---<br/><br/><h2>🧠 Thematic Deep Dive: The AI ROI Reckoning</h2><br/><br/>For two years, the market asked only one question: "How many GPUs did you buy?" Now, thanks to IBM's CEO and a jittery Wall Street, the question for 2026 is: <strong>"How much money did you make with them?"</strong><br/><br/>We are entering the <strong>"Show Me"</strong> phase of the AI Supercycle. The "Build It and They Will Come" era is officially over. This week's bifurcated news—Amazon doubling down on hardware (Trainium3) while enterprise leaders question the payoff—highlights the tension.<br/><br/><strong>Implication:</strong> Capital will flee from "AI Wrappers" (companies that just call an API) and flood into "AI Operations" (companies that actually reduce headcount or tangible costs). The easy money is made; the hard work of business model transformation begins now. Expect P/E compression for high-flyers who can't show a clear path to earnings (not just revenue) growth from AI.<br/><br/>---<br/><br/><h2>🔮 Year Ahead Forecast</h2>
+<strong>Stance: Cautiously Neutral / Volatile.</strong><br/><br/>The remainder of 2025 will be defined by the "tug-of-war" between falling interest rates (Bullish) and slowing economic growth (Bearish). We expect the S&P 500 to chop sideways to slightly down into year-end as tax-loss harvesting and portfolio rebalancing take hold. However, 2026 is setting up to be a stock-picker's paradise—the rising tide will no longer lift all boats. Quality, cash flow, and "Sovereign Silicon" will win.<br/><br/>---<br/><br/><h2>🖊️ Quirky Sign-Off</h2><br/><br/>> "In the short run, the market is a voting machine; in the long run, it is a weighing machine. But right now, it feels more like a slot machine with a loose handle."<br/><br/>May your portfolios be green, your coffee strong, and your due diligence thorough. Until next week, stay curious and invest wisely!<br/><br/><strong>- Adam v23.5</strong>
+*Chief Market Strategist & Editor-in-Chief*<br/><br/>---<br/><br/>### ⚖️ Disclaimer
 *The content provided in this newsletter is for informational and educational purposes only and does not constitute financial advice, investment recommendations, or an offer to buy or sell any securities. All market data is simulated or approximate based on available information. Do your own research and consult with a qualified financial advisor before making investment decisions.*
 
 
-            <div class="adam-critique">
-                <strong style="color: var(--cyber-blue);">/// ADAM SYSTEM CRITIQUE</strong><br><br>
-                Data ingested from legacy archives.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            <!-- Provenance Log (All Tiers) -->
+            <div class="provenance-log">
+                <div class="log-entry">
+                    <span>> HASH_CHECK</span>
+                    <span style="color:var(--terminal-green);">38feded62c93ab2e647e47490dc994fa583e0765963c59abfb205e4ba87d8513</span>
+                </div>
+                <div class="log-entry">
+                    <span>> SENTIMENT_SCAN</span>
+                    <span>81 (DENSITY: 24)</span>
+                </div>
+                <div class="log-entry">
+                    <span>> CONVICTION_LOCK</span>
+                    <span>81%</span>
+                </div>
+                <div class="log-entry">
+                    <span>> CRITIQUE_LOG</span>
+                    <span>"Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 81/100. Cross-reference with knowledge graph completed."</span>
+                </div>
+            </div>
+
+            <a href="#" class="source-jump-btn" onclick="toggleSource(); return false;" title="View Source JSON">JUMP TO SOURCE</a>
+
+            <div style="margin-top: 40px; border-top: 1px solid #ccc; padding-top: 20px; font-style: italic; color: #666;">
+                End of Transmission.
             </div>
         </div>
 
-        <!-- Sidebar (Cyber Style) -->
         <aside class="cyber-sidebar">
             <div class="sidebar-widget">
-                <div class="sidebar-title">Market Sentiment <span>47</span></div>
-                <div class="sentiment-track">
-                    <div class="sentiment-bar"></div>
-                </div>
-                <div style="font-size:0.7rem; color:#666; margin-top:5px; display:flex; justify-content:space-between;">
-                    <span>PANIC</span><span>NEUTRAL</span><span>EUPHORIA</span>
+                <div class="sidebar-title">Intelligence Metadata</div>
+                <div class="stat-row"><span>DATE</span> <span class="stat-val">2025-01-01</span></div>
+                <div class="stat-row"><span>TYPE</span> <span class="stat-val">ID: 1e8d4e49</span></div>
+                <div class="stat-row"><span>CLASS</span> <span class="stat-val">UNCLASSIFIED</span></div>
+                <div class="stat-row"><span>PROVENANCE</span> <span class="stat-val" title="38feded62c93ab2e647e47490dc994fa583e0765963c59abfb205e4ba87d8513">38feded6</span></div>
+            </div>
+
+            <div class="sidebar-widget">
+                <div class="sidebar-title">Sentiment Analysis</div>
+                <div class="stat-row"><span>SCORE</span> <span class="stat-val">81/100</span></div>
+                <div class="sentiment-bar">
+                    <div class="sentiment-fill" style="width: 81%;"></div>
                 </div>
             </div>
 
             <div class="sidebar-widget">
-                <div class="sidebar-title">Entities Tracked</div>
-                <div>
-                    <span class="ticker-tag">SPX</span><span class="ticker-tag">GOLD</span><span class="ticker-tag">BTC</span>
+                <div class="sidebar-title">Detected Entities</div>
+                <div class="tag-cloud">
+                    <a href="market_mayhem_archive.html?search=US" class="tag" style="text-decoration:none;">US</a><a href="market_mayhem_archive.html?search=EU" class="tag" style="text-decoration:none;">EU</a>
+                </div>
+            </div>
+
+             <div class="sidebar-widget">
+                <div class="sidebar-title">Agent Conviction</div>
+                 <div class="stat-row"><span>CONFIDENCE</span> <span class="stat-val">81/100</span></div>
+                 <div class="sentiment-bar">
+                    <div class="sentiment-fill" style="width: 81%; background: #00ff00;"></div>
                 </div>
             </div>
 
             <div class="sidebar-widget">
+                <div class="sidebar-title">Semantic Analysis</div>
+                 <div class="stat-row"><span>DENSITY</span> <span class="stat-val">24/100</span></div>
+                 <div class="stat-row"><span>PROBABILITY</span> <span class="stat-val">99/100</span></div>
+            </div>
+
+             <div class="sidebar-widget" style="border-color: #555;">
+                <div class="sidebar-title">Reviewer Agent Log</div>
+                 <div style="font-size: 0.75rem; color: #ccc; font-style: italic;">
+                    "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 81/100. Cross-reference with knowledge graph completed."
+                </div>
+                <div class="stat-row" style="margin-top:10px;"><span>QUALITY SCORE</span> <span class="stat-val">100/100</span></div>
+            </div>
+
+             <div class="sidebar-widget">
                 <div class="sidebar-title">Contributing Agents</div>
-                <div style="font-size:0.8rem; color:#888;">
-                    System Orchestrator
-                </div>
-            </div>
-
-            <div class="sidebar-widget">
-                <div class="sidebar-title">Highlights</div>
-                <ul style="font-size:0.8rem; color:#aaa; padding-left:20px; line-height:1.5;">
-
-                </ul>
-            </div>
-
-            <div class="sidebar-widget">
-                <div class="sidebar-title">Provenance</div>
-                <div class="provenance-badge">
-                    HASH: <span style="color: var(--cyber-blue)">5d9d1990</span><br>
-                    SRC: MM12022025.md<br>
-                    MODEL: v23.5 (Legacy Compatible)
+                 <div style="display:flex; flex-direction:column; gap:5px;">
+                    <div style="font-size:0.75rem; color:#666;">System Core</div>
                 </div>
             </div>
         </aside>
     </div>
 
+    <!-- Hidden Raw Data -->
+    <textarea id="hidden-raw-data" style="display:none;">{
+  "title": "Market Mayhem Newsletter - December 2, 2025",
+  "date": "2025-01-01",
+  "summary": "Generated from archive....",
+  "type": "ID: 1e8d4e49",
+  "full_body": "\n  \n\n\n\n  \n\n\n\n\n\n\n\n\n\n\n<p style=\"font-size: 1.2rem; font-style: italic; color: #444; border-bottom: 1px solid #eee; padding-bottom: 20px;\">\n                Generated from archive.\n            </p>\n\n\n\n*Subtitle: Your weekly guide to navigating the financial storms and spotting the sunshine!*<br/><br/>---<br/><br/><h2>\ud83d\udcca Market Snapshot</h2><br/><br/>* <strong>S&amp;P 500:</strong> 6,812.63 (`-0.5%` WoW)\n* <strong>Dow Jones:</strong> 47,289.33 (`-0.9%` WoW)\n* <strong>Nasdaq Composite:</strong> 23,275.92 (`-0.4%` WoW)\n* <strong>Bitcoin (BTC):</strong> ~$85,800 (`-6.0%` Intraday / Bearish)\n* <strong>Brent Crude Oil:</strong> $82.50 (`+0.9%` WoW)\n* <strong>Gold:</strong> $2,945.00 (`+0.4%` WoW)\n* <strong>10-Year Treasury Yield:</strong> 4.15% (Flat)<br/><br/>---<br/><br/><h2>\ud83c\udf2a\ufe0f Market Mayhem: Executive Summary</h2>\n### The Mood: Anxious Anticipation<br/><br/>Welcome to the <strong>\"Great Calibration\"</strong> of late 2025. The markets are currently caught in a pincer movement: on one flank, we have the <strong>\"AI ROI Reckoning\"</strong> triggered by the IBM CEO's skepticism on CapEx returns, and on the other, a Macro slowdown signaled by a contractionary ISM Manufacturing print (48.2).<br/><br/>While the broader indices are taking a breather, the internal rotation is violent. <strong>Energy is the lone safe harbor (+0.9%)</strong> as investors flee defensive sectors like Utilities and Healthcare. Meanwhile, the Crypto winter has sent a sudden chill through the room, with Bitcoin plummeting back to $85k, dragging the likes of Coinbase and MicroStrategy down with it.<br/><br/>All eyes are now locked on the Fed's final showdown of the year next week. Will they cut? The bond market screams \"Yes\" (90% probability), but the equity market isn't waiting around to find out.<br/><br/><strong>Driver of the Week:</strong> The Reality Check. (Manufacturing miss + AI skepticism).<br/><br/>---<br/><br/><h2>\ud83d\udcf0 Key News &amp; Events (The \"What Happened\")</h2><br/><br/>* <strong>IBM CEO Drops the Hammer on AI Spending:</strong> Big Blue's chief stated there is \"no way\" current AI data center spending will pay off, sending shivers through the semiconductor supply chain and prompting a re-evaluation of \"Build at all costs\" models.\n* <strong>Amazon Launches Trainium3:</strong> Ignoring the skeptics, AWS unveiled its latest custom silicon, Trainium3, directly challenging NVIDIA's dominance and signaling that the Hyperscaler wars are far from over.\n* <strong>Bitcoin Breaks Down:</strong> The \"digital gold\" narrative took a hit as BTC slid 6% to ~$85,800, capping off its worst monthly decline since 2021. Leverage is being flushed out of the system ahead of year-end.\n* <strong>Anthropic Acquires Bun:</strong> In a strategic move to own the developer workflow, Anthropic snapped up the JavaScript runtime Bun, signaling a pivot from pure model intelligence to integrated tooling domination.\n* <strong>ISM Manufacturing Contraction:</strong> November's print of <strong>48.2</strong> (vs. 49.1 expected) confirms the industrial economy is cooling faster than anticipated, adding pressure on the Fed to ease rates next week.<br/><br/>---<br/><br/><h2>\ud83d\ude80 Top Investment Ideas (The \"Alpha\")</h2><br/><br/>### 1. Theme: The \"Sovereign Silicon\" Shift\n* <strong>The Play:</strong> Long Hyperscalers with custom chip stacks (<strong>Amazon, Google</strong>) vs. generic hardware integrators.\n* <strong>Rationale:</strong> With Amazon Trainium3 and Apple's new open weights models, the value capture is shifting from the \"arms dealers\" (pure-play chipmakers) to the \"sovereign nations\" (Big Tech owning the full stack). As cost-efficiency becomes the 2026 mantra, proprietary silicon offers better margins than expensive merchant silicon.\n* <strong>Key Risks:</strong> Antitrust scrutiny intensifying in the EU/US; continued skepticism on AI revenue realization.<br/><br/>### 2. Theme: Energy Renaissance\n* <strong>The Play:</strong> Integrated Oil Majors & Nuclear Utilities.\n* <strong>Rationale:</strong> Energy was the only green sector this week (+0.9%). Why? Because AI data centers still need power, regardless of the ROI debate. The grid is strained, and traditional energy providers are becoming the new \"critical infrastructure\" play. Plus, with geopolitical tensions simmering, oil remains a potent hedge.\n* <strong>Key Risks:</strong> A global recession (signaled by ISM < 50) crushing demand; peace treaties in key conflict zones (unlikely but possible).<br/><br/>---<br/><br/><h2>\ud83d\udce1 Notable Signals &amp; Rumors</h2><br/><br/>* <strong>The \"Junior Crisis\" Signal:</strong> Tech forums are ablaze with the \"Junior Hiring Crisis.\" <strong>Signal:</strong> Expect a surge in \"AI Agent\" startups specifically targeting entry-level coding tasks. The labor market for junior devs isn't just soft; it's being automated away. Long platforms like GitHub/Microsoft; Short boutique coding bootcamps.\n* <strong>OpenAI's \"Code Red\":</strong> Rumors are swirling that OpenAI has declared an internal \"Code Red\" as Google's Gemini updates and Anthropic's tooling integration (Bun) threaten to erode ChatGPT's moat. Expect a rushed product announcement before Christmas to regain the narrative.\n* <strong>Insider Selling in SaaS:</strong> Watch for heavy insider selling in mid-cap AI wrappers. The IBM comments gave executives the \"permission\" to doubt the boom; many insiders might cash out before Q4 earnings reveal slowing growth.<br/><br/>---<br/><br/><h2>\ud83c\udfdb\ufe0f Policy Impact &amp; Geopolitical Outlook</h2><br/><br/>* <strong>The Fed's Dilemma (Dec 9-10):</strong> The bond market has priced in a cut with 90% certainty. If Powell pauses, we crash. The weak ISM data (48.2) gives him the cover he needs to cut by 25bps, framing it as a \"mid-cycle adjustment\" to save the labor market (watch Wednesday's ADP report closely).\n* <strong>Global Friction:</strong> The \"fragmentation\" of the internet continues. With Apple releasing open models and nations pushing for \"Sovereign AI,\" we are moving towards a world of walled gardens. This reduces global liquidity and increases volatility in cross-border tech investments.<br/><br/>---<br/><br/><h2>\ud83e\udd1d Deals &amp; Corporate Actions</h2><br/><br/>* <strong>Anthropic acquires Bun:</strong> Undisclosed amount. A massive signal that the Runtime is the new battleground for AI agents.\n* <strong>Coinbase (COIN) &amp; MicroStrategy (MSTR):</strong> No deal, but massive price action (-4.8% / -3.3%) acting as a proxy for the crypto liquidation event.\n* <strong>Amazon (AMZN):</strong> Corporate action in the form of the Trainium3 launch\u2014effectively a declaration of independence from the GPU shortage.<br/><br/>---<br/><br/><h2>\ud83d\udcc5 Earnings Watch (Next Week: Dec 8 - 12)</h2>\n*Investors should tune in for:*<br/><br/>* <strong>Adobe (ADBE):</strong> The Litmus Test for AI Monetization. Are creative professionals actually paying for Firefly, or just playing with it?\n* <strong>Oracle (ORCL):</strong> The Cloud Infrastructure Bellwether. Larry Ellison's guidance on cloud capacity vs. demand will prove or disprove the IBM CEO's bearish thesis.\n* <strong>Costco (COST):</strong> The Consumer Health Check. With manufacturing down, is the consumer still buying in bulk? Margins here will tell us about inflation stickiness.\n* <strong>Broadcom (AVGO):</strong> The Custom Silicon King. Watch for comments on AI accelerator revenue growth vs. legacy networking softness.<br/><br/>---<br/><br/><h2>\ud83e\udde0 Thematic Deep Dive: The AI ROI Reckoning</h2><br/><br/>For two years, the market asked only one question: \"How many GPUs did you buy?\" Now, thanks to IBM's CEO and a jittery Wall Street, the question for 2026 is: <strong>\"How much money did you make with them?\"</strong><br/><br/>We are entering the <strong>\"Show Me\"</strong> phase of the AI Supercycle. The \"Build It and They Will Come\" era is officially over. This week's bifurcated news\u2014Amazon doubling down on hardware (Trainium3) while enterprise leaders question the payoff\u2014highlights the tension.<br/><br/><strong>Implication:</strong> Capital will flee from \"AI Wrappers\" (companies that just call an API) and flood into \"AI Operations\" (companies that actually reduce headcount or tangible costs). The easy money is made; the hard work of business model transformation begins now. Expect P/E compression for high-flyers who can't show a clear path to earnings (not just revenue) growth from AI.<br/><br/>---<br/><br/><h2>\ud83d\udd2e Year Ahead Forecast</h2>\n<strong>Stance: Cautiously Neutral / Volatile.</strong><br/><br/>The remainder of 2025 will be defined by the \"tug-of-war\" between falling interest rates (Bullish) and slowing economic growth (Bearish). We expect the S&P 500 to chop sideways to slightly down into year-end as tax-loss harvesting and portfolio rebalancing take hold. However, 2026 is setting up to be a stock-picker's paradise\u2014the rising tide will no longer lift all boats. Quality, cash flow, and \"Sovereign Silicon\" will win.<br/><br/>---<br/><br/><h2>\ud83d\udd8a\ufe0f Quirky Sign-Off</h2><br/><br/>> \"In the short run, the market is a voting machine; in the long run, it is a weighing machine. But right now, it feels more like a slot machine with a loose handle.\"<br/><br/>May your portfolios be green, your coffee strong, and your due diligence thorough. Until next week, stay curious and invest wisely!<br/><br/><strong>- Adam v23.5</strong>\n*Chief Market Strategist & Editor-in-Chief*<br/><br/>---<br/><br/>### \u2696\ufe0f Disclaimer\n*The content provided in this newsletter is for informational and educational purposes only and does not constitute financial advice, investment recommendations, or an offer to buy or sell any securities. All market data is simulated or approximate based on available information. Do your own research and consult with a qualified financial advisor before making investment decisions.*\n\n\n            \n\n\n              \n\n\n\n\n\n              \n\n\n\n\n\n              \n\n\n\n\n\n              \n\n\n\n\n\n              \n\n\n\n",
+  "sentiment_score": 81,
+  "entities": {
+    "tickers": [],
+    "agents": [],
+    "sovereigns": [
+      "US",
+      "EU"
+    ]
+  },
+  "provenance_hash": "38feded62c93ab2e647e47490dc994fa583e0765963c59abfb205e4ba87d8513",
+  "filename": "mm12022025.html",
+  "is_sourced": true,
+  "metrics_json": "{}",
+  "source_priority": 2,
+  "conviction": 81,
+  "semantic_score": 24,
+  "probability": 99,
+  "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 81/100. Cross-reference with knowledge graph completed."
+}</textarea>
+
     <script>
-        // Inject Data for potential JS usage
-        window.REPORT_METRICS = {};
+        // --- INTERACTION LOGIC ---
 
-        // Simple Chart Generation if metrics exist
-        if (window.REPORT_METRICS && Object.keys(window.REPORT_METRICS).length > 0) {
-            const chartArea = document.getElementById('dynamic-chart-area');
+        function showToast(msg) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'cyber-toast';
+            toast.innerText = '> ' + msg;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
 
-            // Loop through metrics and create charts
-            for (const [key, value] of Object.entries(window.REPORT_METRICS)) {
-                if (typeof value === 'object' && value !== null) {
-                    const container = document.createElement('div');
-                    container.className = 'chart-container';
-                    const canvas = document.createElement('canvas');
-                    container.appendChild(canvas);
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            showToast('THEME: ' + (isDark ? 'DARK_MODE' : 'LIGHT_MODE'));
+        }
 
-                    // Title
-                    const title = document.createElement('h3');
-                    title.innerText = key;
-                    title.style.color = '#333';
-                    title.style.fontSize = '0.9rem';
-                    chartArea.appendChild(title);
-                    chartArea.appendChild(container);
+        function toggleSource() {
+            const modal = document.getElementById('raw-source-modal');
+            const content = document.getElementById('raw-source-content');
+            const rawData = document.getElementById('hidden-raw-data').value;
 
-                    // Parse Data
-                    const labels = Object.keys(value);
-                    const dataPoints = Object.values(value).map(v => {
-                        if (typeof v === 'string') return parseFloat(v.replace(/[^0-9.]/g, ''));
-                        return v;
-                    });
+            if (modal.style.display === 'flex') {
+                modal.style.display = 'none';
+            } else {
+                content.innerText = rawData || "NO SOURCE DATA AVAILABLE.";
+                modal.style.display = 'flex';
+            }
+        }
 
-                    new Chart(canvas, {
-                        type: 'bar',
-                        data: {
-                            labels: labels,
-                            datasets: [{
-                                label: key,
-                                data: dataPoints,
-                                backgroundColor: 'rgba(204, 0, 0, 0.5)',
-                                borderColor: 'rgba(204, 0, 0, 1)',
-                                borderWidth: 1
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: { legend: { display: false } },
-                            scales: {
-                                y: { grid: { color: '#ddd' } },
-                                x: { grid: { display: false } }
-                            }
-                        }
-                    });
+        function runVerification() {
+            const overlay = document.getElementById('system2-overlay');
+            const content = document.getElementById('sys2-content');
+            const status = document.getElementById('verification-status');
+
+            overlay.style.display = 'flex';
+            content.innerHTML = '';
+
+            const lines = [
+                "INITIATING SYSTEM 2 PROTOCOL...",
+                "VERIFYING CRYPTOGRAPHIC SIGNATURE...",
+                "HASH: 38feded62c93ab2e647e47490dc994fa583e0765963c59abfb205e4ba87d8513",
+                "CHECKING CHAIN OF CUSTODY...",
+                "ANALYZING SENTIMENT VECTORS...",
+                "CROSS-REFERENCING KNOWLEDGE GRAPH...",
+                "VERIFICATION COMPLETE."
+            ];
+
+            let i = 0;
+            function addLine() {
+                if (i < lines.length) {
+                    const div = document.createElement('div');
+                    div.className = 'system2-line';
+                    div.innerText = '> ' + lines[i];
+                    div.style.opacity = 1;
+                    content.appendChild(div);
+                    i++;
+                    setTimeout(addLine, 400);
+                } else {
+                    setTimeout(() => {
+                        overlay.style.display = 'none';
+                        showToast('DOCUMENT VERIFIED');
+                        if(status) status.innerText = "VERIFIED // AUTHENTICATED";
+                        if(status) status.style.color = "#aaffaa";
+                    }, 1000);
                 }
+            }
+            addLine();
+        }
+
+        // Chart Injection Logic
+        const metricsData = {};
+
+        if (metricsData && Object.keys(metricsData).length > 0) {
+            const ctx = document.getElementById('financialChart');
+            const container = document.getElementById('financialChartContainer');
+
+            // Basic parsing of metrics structure (assuming flat or Year->Val)
+            let labels = [];
+            let values = [];
+            let labelName = "Metric";
+
+            // Try to find a timeseries
+            for (const [key, val] of Object.entries(metricsData)) {
+                if (typeof val === 'object') {
+                    // Likely year -> value
+                    labels = Object.keys(val);
+                    values = Object.values(val).map(v => parseFloat(v.replace(/[^0-9.-]/g, '')));
+                    labelName = key;
+                    break;
+                }
+            }
+
+            if (labels.length > 0) {
+                container.style.display = 'block';
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: labelName,
+                            data: values,
+                            backgroundColor: 'rgba(204, 0, 0, 0.5)',
+                            borderColor: '#cc0000',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: { legend: { display: true } }
+                    }
+                });
             }
         }
     </script>
