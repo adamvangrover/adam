@@ -1,15 +1,16 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+
+<html class="scroll-smooth" lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Market Mayhem - Interactive Weekly Briefing</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Market Mayhem - Interactive Weekly Briefing</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<style>
         body { font-family: 'Inter', sans-serif; background-color: #f8f7f4; color: #1a1a1a; }
         .chart-container { position: relative; width: 100%; max-width: 600px; margin: 0 auto; height: 300px; }
         @media (min-width: 768px) { .chart-container { height: 350px; } }
@@ -19,115 +20,109 @@
         .fade-in { animation: fadeIn 0.5s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
-</head>
-<body class="antialiased">
-    <!-- Header -->
-    <header class="bg-white/80 backdrop-blur-lg sticky top-0 z-50 border-b border-gray-200">
-        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16">
-                <div class="flex items-center">
-                    <a href="market_mayhem_archive.html" class="text-gray-500 hover:text-gray-900 mr-4">&larr; Archive</a>
-                    <span class="text-2xl font-bold text-gray-800">Market Mayhem</span>
-                </div>
-                <div class="hidden md:block">
-                    <div class="ml-10 flex items-baseline space-x-4">
-                        <a href="#pulse" class="nav-link text-gray-600 px-3 py-2 rounded-md text-sm font-medium">Market Pulse</a>
-                        <a href="#themes" class="nav-link text-gray-600 px-3 py-2 rounded-md text-sm font-medium">Strategic Themes</a>
-                        <a href="#movers" class="nav-link text-gray-600 px-3 py-2 rounded-md text-sm font-medium">Market Movers</a>
-                        <a href="#outlook" class="nav-link text-gray-600 px-3 py-2 rounded-md text-sm font-medium">Forward Outlook</a>
-                    </div>
-                </div>
-            </div>
-        </nav>
-    </header>
-
-    <main>
-        <div id="pulse" class="py-12 md:py-20 bg-white">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="text-center">
-                    <h2 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">Market Pulse</h2>
-                    <p class="mt-3 max-w-2xl mx-auto text-lg text-gray-500">Summary for the week ending June 27, 2025.</p>
-                </div>
-                <div class="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
-                    <div id="sp500-card" class="bg-gray-50 p-6 rounded-2xl shadow-sm"></div>
-                    <div id="dow-card" class="bg-gray-50 p-6 rounded-2xl shadow-sm"></div>
-                    <div id="nasdaq-card" class="bg-gray-50 p-6 rounded-2xl shadow-sm"></div>
-                    <div id="oil-card" class="bg-gray-50 p-6 rounded-2xl shadow-sm"></div>
-                    <div id="gold-card" class="bg-gray-50 p-6 rounded-2xl shadow-sm"></div>
-                </div>
-                <div class="mt-12">
-                    <div class="bg-white p-4 sm:p-6 rounded-2xl">
-                         <h3 class="text-lg font-medium leading-6 text-gray-900 text-center mb-4">U.S. Index Performance</h3>
-                         <div class="chart-container">
-                            <canvas id="indicesChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div id="themes" class="py-12 md:py-20">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="text-center">
-                    <h2 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">Strategic Investment Themes</h2>
-                    <p class="mt-3 max-w-3xl mx-auto text-lg text-gray-500">Secular trends shaping the investment landscape.</p>
-                </div>
-                <div class="mt-10">
-                    <div class="border-b border-gray-200 mb-8">
-                        <nav class="-mb-px flex justify-center space-x-4 md:space-x-8" aria-label="Tabs">
-                            <button id="tab-ai" data-tab="ai" class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-gray-500 hover:text-indigo-600 hover:border-indigo-500">
-                                &#x1F9E0; AI Infrastructure Supercycle
+<link href="css/cyberpunk-core.css" rel="stylesheet"/></head>
+<body class="antialiased"><div class="dashboard-container"><header class="cyber-hud-header"><div class="hud-section left"><div class="conviction-gauge-container"><span>CONVICTION:</span><div class="conviction-bar"><div class="conviction-fill"></div></div><span class="conviction-value">--%</span></div></div><div class="hud-section center"><div class="metadata-tags"></div></div><div class="hud-section right"><input class="hud-search" id="hud-search-input" placeholder="SEARCH INTEL..." type="text"/></div></header><main class="cyber-main-content">
+<!-- Header -->
+<header class="bg-white/80 backdrop-blur-lg sticky top-0 z-50 border-b border-gray-200">
+<nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex items-center justify-between h-16">
+<div class="flex items-center">
+<a class="text-gray-500 hover:text-gray-900 mr-4" href="market_mayhem_archive.html">← Archive</a>
+<span class="text-2xl font-bold text-gray-800">Market Mayhem</span>
+</div>
+<div class="hidden md:block">
+<div class="ml-10 flex items-baseline space-x-4">
+<a class="nav-link text-gray-600 px-3 py-2 rounded-md text-sm font-medium" href="#pulse">Market Pulse</a>
+<a class="nav-link text-gray-600 px-3 py-2 rounded-md text-sm font-medium" href="#themes">Strategic Themes</a>
+<a class="nav-link text-gray-600 px-3 py-2 rounded-md text-sm font-medium" href="#movers">Market Movers</a>
+<a class="nav-link text-gray-600 px-3 py-2 rounded-md text-sm font-medium" href="#outlook">Forward Outlook</a>
+</div>
+</div>
+</div>
+</nav>
+</header>
+<main>
+<div class="py-12 md:py-20 bg-white" id="pulse">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="text-center">
+<h2 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">Market Pulse</h2>
+<p class="mt-3 max-w-2xl mx-auto text-lg text-gray-500">Summary for the week ending June 27, 2025.</p>
+</div>
+<div class="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+<div class="bg-gray-50 p-6 rounded-2xl shadow-sm" id="sp500-card"></div>
+<div class="bg-gray-50 p-6 rounded-2xl shadow-sm" id="dow-card"></div>
+<div class="bg-gray-50 p-6 rounded-2xl shadow-sm" id="nasdaq-card"></div>
+<div class="bg-gray-50 p-6 rounded-2xl shadow-sm" id="oil-card"></div>
+<div class="bg-gray-50 p-6 rounded-2xl shadow-sm" id="gold-card"></div>
+</div>
+<div class="mt-12">
+<div class="bg-white p-4 sm:p-6 rounded-2xl">
+<h3 class="text-lg font-medium leading-6 text-gray-900 text-center mb-4">U.S. Index Performance</h3>
+<div class="chart-container">
+<canvas id="indicesChart"></canvas>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="py-12 md:py-20" id="themes">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="text-center">
+<h2 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">Strategic Investment Themes</h2>
+<p class="mt-3 max-w-3xl mx-auto text-lg text-gray-500">Secular trends shaping the investment landscape.</p>
+</div>
+<div class="mt-10">
+<div class="border-b border-gray-200 mb-8">
+<nav aria-label="Tabs" class="-mb-px flex justify-center space-x-4 md:space-x-8">
+<button class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-gray-500 hover:text-indigo-600 hover:border-indigo-500" data-tab="ai" id="tab-ai">
+                                🧠 AI Infrastructure Supercycle
                             </button>
-                            <button id="tab-cyber" data-tab="cyber" class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-gray-500 hover:text-indigo-600 hover:border-indigo-500">
-                                &#x1F512; Cybersecurity Imperative
+<button class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-gray-500 hover:text-indigo-600 hover:border-indigo-500" data-tab="cyber" id="tab-cyber">
+                                🔒 Cybersecurity Imperative
                             </button>
-                            <button id="tab-supply" data-tab="supply" class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-gray-500 hover:text-indigo-600 hover:border-indigo-500">
-                                &#x1F69A; Supply Chain Resilience
+<button class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-gray-500 hover:text-indigo-600 hover:border-indigo-500" data-tab="supply" id="tab-supply">
+                                🚚 Supply Chain Resilience
                             </button>
-                        </nav>
-                    </div>
-                    <div id="tab-content" class="fade-in"></div>
-                </div>
-            </div>
-        </div>
-
-        <div id="movers" class="py-12 md:py-20 bg-white">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="text-center">
-                    <h2 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">Market Movers</h2>
-                    <p class="mt-3 max-w-2xl mx-auto text-lg text-gray-500">Significant corporate deals and signals.</p>
-                </div>
-                <div id="ma-deals" class="mt-12"></div>
-                <div class="mt-12 grid gap-8 lg:grid-cols-2">
-                    <div id="ipo-section"></div>
-                    <div id="options-section" class="bg-gray-50 p-6 rounded-2xl"></div>
-                </div>
-            </div>
-        </div>
-
-        <div id="outlook" class="py-12 md:py-20">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="text-center">
-                    <h2 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">Forward Outlook</h2>
-                    <p class="mt-3 max-w-2xl mx-auto text-lg text-gray-500">Key economic data for the week ahead (June 30, 2025).</p>
-                </div>
-                <div class="mt-12 grid gap-12 lg:grid-cols-2">
-                    <div id="economic-calendar"></div>
-                    <div id="earnings-watch"></div>
-                </div>
-            </div>
-        </div>
-    </main>
-
-    <footer class="bg-white border-t border-gray-200">
-        <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-            <div class="text-center text-xs text-gray-500">
-                <p>Disclaimer: Informational purposes only. Consult a qualified financial advisor.</p>
-                <p class="mt-2">Market Mayhem - June 29, 2025</p>
-            </div>
-        </div>
-    </footer>
-
+</nav>
+</div>
+<div class="fade-in" id="tab-content"></div>
+</div>
+</div>
+</div>
+<div class="py-12 md:py-20 bg-white" id="movers">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="text-center">
+<h2 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">Market Movers</h2>
+<p class="mt-3 max-w-2xl mx-auto text-lg text-gray-500">Significant corporate deals and signals.</p>
+</div>
+<div class="mt-12" id="ma-deals"></div>
+<div class="mt-12 grid gap-8 lg:grid-cols-2">
+<div id="ipo-section"></div>
+<div class="bg-gray-50 p-6 rounded-2xl" id="options-section"></div>
+</div>
+</div>
+</div>
+<div class="py-12 md:py-20" id="outlook">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="text-center">
+<h2 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">Forward Outlook</h2>
+<p class="mt-3 max-w-2xl mx-auto text-lg text-gray-500">Key economic data for the week ahead (June 30, 2025).</p>
+</div>
+<div class="mt-12 grid gap-12 lg:grid-cols-2">
+<div id="economic-calendar"></div>
+<div id="earnings-watch"></div>
+</div>
+</div>
+</div>
+</main>
+<footer class="bg-white border-t border-gray-200">
+<div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+<div class="text-center text-xs text-gray-500">
+<p>Disclaimer: Informational purposes only. Consult a qualified financial advisor.</p>
+<p class="mt-2">Market Mayhem - June 29, 2025</p>
+</div>
+</div>
+</footer>
 <script>
 const App = {
     data: {
@@ -255,5 +250,5 @@ const App = {
 };
 document.addEventListener('DOMContentLoaded', () => App.init());
 </script>
-</body>
+<script defer src="js/dashboard-logic.js"></script></main><footer class="system2-terminal collapsed"><div class="terminal-header"><span>SYSTEM 2 DIAGNOSTICS // AGENT TRACE</span><i class="fas fa-chevron-up toggle-icon"></i></div><div class="terminal-body"></div></footer></div></body>
 </html>
