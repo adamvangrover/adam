@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM | Network Map</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+    <link rel="stylesheet" href="css/style.css">
+
+    <style>
+        :root {
+            --bg-deep: #050505;
+            --panel-bg: rgba(20, 20, 25, 0.9);
+            --border: #333;
+            --accent: #00f3ff;
+            --text-main: #d4d4d8;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            font-family: 'Share Tech Mono', monospace;
+            overflow: hidden;
+        }
+
+        .crt-overlay {
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 50;
+        }
+
+        .glass-panel {
+            background: var(--panel-bg);
+            border: 1px solid var(--border);
+            backdrop-filter: blur(4px);
+        }
+
+        #network-container {
+            width: 100%;
+            height: 100vh;
+            background: radial-gradient(circle at center, #111 0%, #000 100%);
+        }
+    </style>
+</head>
+<body class="h-screen flex flex-col">
+    <div class="crt-overlay"></div>
+
+    <!-- Header -->
+    <header class="absolute top-0 left-0 w-full h-16 flex items-center justify-between px-6 z-40 bg-gradient-to-b from-black to-transparent pointer-events-none">
+        <div class="flex items-center gap-4 pointer-events-auto">
+            <h1 class="text-2xl tracking-widest font-bold text-cyan-400">ADAM <span class="text-white">NETWORK</span></h1>
+        </div>
+        <div class="pointer-events-auto">
+            <a href="index.html" class="px-4 py-2 border border-cyan-500/50 bg-black/50 text-cyan-400 hover:bg-cyan-500/20 rounded text-xs font-mono">EXIT MAP</a>
+        </div>
+    </header>
+
+    <!-- Main Graph Area -->
+    <div id="network-container"></div>
+
+    <!-- Overlay Info -->
+    <div class="absolute bottom-6 left-6 glass-panel p-4 rounded max-w-md pointer-events-none z-40">
+        <h3 class="text-cyan-400 font-bold mb-2">SYSTEM TOPOLOGY</h3>
+        <p class="text-xs text-zinc-400 font-mono">
+            Interactive map of the Adam v23.5 architecture.
+            <br>
+            <span class="text-white">> Click nodes to navigate.</span>
+            <br>
+            <span class="text-white">> Drag to explore structure.</span>
+        </p>
+    </div>
+
+    <!-- Adam Global Nav -->
+    <script src="js/nav.js" data-root=".."></script>
+
+    <script>
+        async function initMap() {
+            try {
+                const res = await fetch('site_map.json');
+                const siteMap = await res.json();
+                renderGraph(siteMap);
+            } catch (e) {
+                console.error("Failed to load site map", e);
+                document.getElementById('network-container').innerHTML = `<div class='text-red-500 p-10 font-mono'>Failed to load site map.</div>`;
+            }
+        }
+
+        function renderGraph(siteMap) {
+            const nodes = [];
+            const edges = [];
+            const categories = siteMap.categories;
+
+            // Center Node
+            nodes.push({ id: 'hub', label: 'ADAM\nCORE', shape: 'hexagon', size: 40, color: '#ef4444', font: { color: '#fff', size: 16 } });
+
+            categories.forEach((cat, idx) => {
+                // Category Node
+                const catNodeId = `cat_${cat.id}`;
+                nodes.push({
+                    id: catNodeId,
+                    label: cat.name.toUpperCase(),
+                    shape: 'box',
+                    color: { background: '#1e293b', border: '#0ea5e9' },
+                    font: { color: '#38bdf8' }
+                });
+                edges.push({ from: 'hub', to: catNodeId, length: 200, color: { color: '#333', opacity: 0.5 } });
+
+                // Page Nodes
+                cat.items.forEach(item => {
+                    nodes.push({
+                        id: item.link,
+                        label: item.name,
+                        shape: 'dot',
+                        size: 10,
+                        color: '#10b981',
+                        title: item.description, // Tooltip
+                        font: { color: '#d1d5db', size: 12, face: 'JetBrains Mono' }
+                    });
+                    edges.push({ from: catNodeId, to: item.link, length: 100, color: '#334155' });
+                });
+            });
+
+            const container = document.getElementById('network-container');
+            const data = {
+                nodes: new vis.DataSet(nodes),
+                edges: new vis.DataSet(edges)
+            };
+            const options = {
+                nodes: {
+                    borderWidth: 2,
+                    shadow: true
+                },
+                edges: {
+                    width: 1,
+                    smooth: { type: 'continuous' }
+                },
+                physics: {
+                    stabilization: false,
+                    barnesHut: {
+                        gravitationalConstant: -2000,
+                        springConstant: 0.04,
+                        springLength: 95
+                    }
+                },
+                interaction: { hover: true }
+            };
+
+            const network = new vis.Network(container, data, options);
+
+            network.on("click", function(params) {
+                if(params.nodes.length > 0) {
+                    const nodeId = params.nodes[0];
+                    if (nodeId.endsWith('.html')) {
+                        window.location.href = nodeId;
+                    }
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', initMap);
+    </script>
+</body>
+</html>

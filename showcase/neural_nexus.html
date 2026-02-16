@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM // NEURAL NEXUS</title>
+
+    <!-- External Lib: Force-Graph-3D -->
+    <script src="https://unpkg.com/3d-force-graph"></script>
+
+    <link rel="stylesheet" href="css/neural_nexus.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="js/neural_nexus.js" defer></script>
+</head>
+<body>
+
+    <!-- Loading Screen -->
+    <div id="loader">
+        <i class="fas fa-network-wired fa-3x" style="color:#06b6d4;"></i>
+        <div class="loader-text">ESTABLISHING NEURAL LINK...</div>
+    </div>
+
+    <!-- HUD -->
+    <div id="nexus-hud">
+        <div class="hud-panel">
+            <div class="hud-title">SYSTEM STATUS</div>
+            <div class="stat-row">
+                <span>NODES</span>
+                <span id="stat-nodes" class="stat-val">--</span>
+            </div>
+            <div class="stat-row">
+                <span>SYNAPSES</span>
+                <span id="stat-links" class="stat-val">--</span>
+            </div>
+            <div class="stat-row">
+                <span>LATENCY</span>
+                <span class="stat-val" style="color:#10b981;">12ms</span>
+            </div>
+        </div>
+
+        <div class="hud-panel">
+            <div class="hud-title">LEGEND</div>
+            <div class="stat-row"><span style="color:#fff;">CORE</span> <span>Main System</span></div>
+            <div class="stat-row"><span style="color:#06b6d4;">AGENT</span> <span>Autonomous Unit</span></div>
+            <div class="stat-row"><span style="color:#10b981;">POS</span> <span>Bullish Signal</span></div>
+            <div class="stat-row"><span style="color:#ef4444;">NEG</span> <span>Bearish Signal</span></div>
+        </div>
+    </div>
+
+    <!-- Node Hover Info -->
+    <div id="node-info" class="hud-panel">
+        <div id="info-title" class="hud-title">NODE INFO</div>
+        <div class="stat-row">
+            <span>TYPE</span>
+            <span id="info-type" class="stat-val">--</span>
+        </div>
+        <div class="stat-row">
+            <span>ID</span>
+            <span id="info-id" class="stat-val" style="font-size:0.6rem;">--</span>
+        </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls">
+        <button id="btn-reset" class="nexus-btn"><i class="fas fa-compress"></i> RESET CAM</button>
+        <button id="btn-spin" class="nexus-btn"><i class="fas fa-sync"></i> ORBIT</button>
+        <button onclick="window.location.href='bridge.html'" class="nexus-btn" style="border-color:#fff; color:#fff;">
+            <i class="fas fa-sign-out-alt"></i> EXIT NEXUS
+        </button>
+    </div>
+
+    <div id="graph-container"></div>
+
+</body>
+</html>

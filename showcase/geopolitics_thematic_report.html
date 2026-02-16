@@ -11,6 +11,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="js/nav.js" defer></script>
+    <script src="js/market_mayhem_viewer.js" defer></script>
 </head>
 <body class="tier-high">
 
@@ -35,8 +36,11 @@
 
     <!-- Virtual Toolbar for High Tier -->
     <div class="doc-toolbar" style="display: flex;">
-        <div class="toolbar-item" onclick="window.location.href='market_mayhem_archive.html'"><strong>FILE</strong></div>
-        <div class="toolbar-item" onclick="showToast('EDIT MODE: READ ONLY (ARCHIVED)')">EDIT</div>
+        <div class="toolbar-item" onclick="window.location.href='market_mayhem_archive_v24.html'"><strong>FILE</strong></div>
+        <div class="toolbar-item" onclick="toggleRedactionMode()">REDACT</div>
+        <div class="toolbar-item" onclick="printReport()">PRINT</div>
+        <div class="toolbar-item" onclick="shareReport()">SHARE</div>
+        <div class="toolbar-item" onclick="downloadReport()">DOWNLOAD</div>
         <div class="toolbar-item" onclick="toggleTheme()">VIEW</div>
         <div class="toolbar-item" onclick="showToast('INSERT: PERMISSION DENIED')">INSERT</div>
         <div class="toolbar-item" onclick="showToast('FORMAT: LOCKED')">FORMAT</div>
@@ -46,12 +50,15 @@
     </div>
 
     <div style="max-width: 1400px; margin: 0 auto; padding: 10px 20px; display:flex; justify-content:space-between; align-items:center; display: none;">
-        <a href="market_mayhem_archive.html" class="cyber-btn">&larr; RETURN TO ARCHIVE</a>
+        <a href="market_mayhem_archive_v24.html" class="cyber-btn">&larr; RETURN TO ARCHIVE</a>
         <div style="font-family:'JetBrains Mono'; font-size:0.7rem; color:#666;">SECURE CONNECTION ESTABLISHED</div>
     </div>
 
     <div class="newsletter-wrapper">
         <div class="paper-sheet" id="paper-sheet">
+
+            <!-- Top Secret Stamp -->
+            <div id="top-secret-stamp" class="top-secret-stamp">TOP SECRET</div>
 
             <!-- High Tier Header UI -->
             <div class="doc-header-ui" style="display: flex;">
@@ -78,7 +85,8 @@
                 <canvas id="financialChart"></canvas>
             </div>
 
-            <h2>The Interplay of Geopolitics and Markets</h2><p>Geopolitical events and political tensions can have a profound impact on financial markets, creating both risks and opportunities for investors. This section explores the complex relationship between geopolitics and markets, highlighting how global events can influence investor sentiment, asset prices, and economic trends.</p>
+            <div id="document-body">
+                <h2>The Interplay of Geopolitics and Markets</h2><p>Geopolitical events and political tensions can have a profound impact on financial markets, creating both risks and opportunities for investors. This section explores the complex relationship between geopolitics and markets, highlighting how global events can influence investor sentiment, asset prices, and economic trends.</p>
 <h2>Geopolitical Risks and Market Volatility</h2><p>Geopolitical risks, such as conflicts, trade wars, and political instability, can increase market volatility and uncertainty. These events can disrupt supply chains, impact economic growth, and trigger investor fear, leading to market downturns and asset price fluctuations.</p>
 <h2>Tariffs and Trade Wars: Potential Impacts</h2><p>Tariffs and trade wars can significantly impact global trade and economic growth. Increased tariffs can lead to higher prices for consumers, reduced trade volumes, and disruptions to supply chains. This can negatively affect corporate earnings, investor confidence, and overall market performance.</p>
 <h2>Wars and Conflicts: Escalation and De-escalation</h2><p>Wars and conflicts can create significant geopolitical risks, impacting market sentiment, disrupting economic activity, and causing humanitarian crises. The escalation or de-escalation of conflicts can have a profound impact on financial markets, leading to increased volatility and uncertainty. Investors need to closely monitor developments in conflict zones and assess their potential impact on their portfolios.</p>
@@ -87,6 +95,7 @@
 <h2>Case Studies: Geopolitical Impacts on Markets</h2><p>This section examines specific case studies of how geopolitical events have impacted financial markets in the past, such as the 2008 financial crisis, the 2011 Arab Spring, and the 2020 COVID-19 pandemic. These case studies provide valuable insights into the potential consequences of geopolitical risks and the importance of proactive risk management.</p>
 <h2>Conclusion</h2><p>Geopolitics is an integral factor in financial markets, creating both challenges and opportunities for investors. By understanding the interplay between geopolitics and markets, investors can develop strategies to navigate uncertainty, manage risks, and position themselves for success in a dynamic global environment.</p>
 
+            </div>
 
             <!-- Provenance Log (All Tiers) -->
             <div class="provenance-log">
@@ -135,7 +144,7 @@
             <div class="sidebar-widget">
                 <div class="sidebar-title">Detected Entities</div>
                 <div class="tag-cloud">
-
+                    <a href="market_mayhem_archive_v24.html?search=AI" class="tag" style="text-decoration:none; border-color:#666;">AI</a><a href="market_mayhem_archive_v24.html?search=Bonds" class="tag" style="text-decoration:none; border-color:#666;">Bonds</a><a href="market_mayhem_archive_v24.html?search=EV" class="tag" style="text-decoration:none; border-color:#666;">EV</a><a href="market_mayhem_archive_v24.html?search=Energy" class="tag" style="text-decoration:none; border-color:#666;">Energy</a><a href="market_mayhem_archive_v24.html?search=Equities" class="tag" style="text-decoration:none; border-color:#666;">Equities</a>
                 </div>
             </div>
 
@@ -181,7 +190,14 @@
   "entities": {
     "tickers": [],
     "agents": [],
-    "sovereigns": []
+    "sovereigns": [],
+    "keywords": [
+      "AI",
+      "Bonds",
+      "EV",
+      "Energy",
+      "Equities"
+    ]
   },
   "provenance_hash": "dcd61b71b6836a19e339e1870be6967b3dc6a08e11ac459afaeb8e2b86dd3887",
   "filename": "geopolitics_thematic_report.html",
@@ -195,79 +211,6 @@
 }</textarea>
 
     <script>
-        // --- INTERACTION LOGIC ---
-
-        function showToast(msg) {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            toast.className = 'cyber-toast';
-            toast.innerText = '> ' + msg;
-            container.appendChild(toast);
-            setTimeout(() => {
-                toast.style.opacity = '0';
-                setTimeout(() => toast.remove(), 300);
-            }, 3000);
-        }
-
-        function toggleTheme() {
-            document.body.classList.toggle('dark-mode');
-            const isDark = document.body.classList.contains('dark-mode');
-            showToast('THEME: ' + (isDark ? 'DARK_MODE' : 'LIGHT_MODE'));
-        }
-
-        function toggleSource() {
-            const modal = document.getElementById('raw-source-modal');
-            const content = document.getElementById('raw-source-content');
-            const rawData = document.getElementById('hidden-raw-data').value;
-
-            if (modal.style.display === 'flex') {
-                modal.style.display = 'none';
-            } else {
-                content.innerText = rawData || "NO SOURCE DATA AVAILABLE.";
-                modal.style.display = 'flex';
-            }
-        }
-
-        function runVerification() {
-            const overlay = document.getElementById('system2-overlay');
-            const content = document.getElementById('sys2-content');
-            const status = document.getElementById('verification-status');
-
-            overlay.style.display = 'flex';
-            content.innerHTML = '';
-
-            const lines = [
-                "INITIATING SYSTEM 2 PROTOCOL...",
-                "VERIFYING CRYPTOGRAPHIC SIGNATURE...",
-                "HASH: dcd61b71b6836a19e339e1870be6967b3dc6a08e11ac459afaeb8e2b86dd3887",
-                "CHECKING CHAIN OF CUSTODY...",
-                "ANALYZING SENTIMENT VECTORS...",
-                "CROSS-REFERENCING KNOWLEDGE GRAPH...",
-                "VERIFICATION COMPLETE."
-            ];
-
-            let i = 0;
-            function addLine() {
-                if (i < lines.length) {
-                    const div = document.createElement('div');
-                    div.className = 'system2-line';
-                    div.innerText = '> ' + lines[i];
-                    div.style.opacity = 1;
-                    content.appendChild(div);
-                    i++;
-                    setTimeout(addLine, 400);
-                } else {
-                    setTimeout(() => {
-                        overlay.style.display = 'none';
-                        showToast('DOCUMENT VERIFIED');
-                        if(status) status.innerText = "VERIFIED // AUTHENTICATED";
-                        if(status) status.style.color = "#aaffaa";
-                    }, 1000);
-                }
-            }
-            addLine();
-        }
-
         // Chart Injection Logic
         const metricsData = {};
 

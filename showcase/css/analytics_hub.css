@@ -1,0 +1,128 @@
+:root {
+    --bg-color: #050b14;
+    --panel-bg: rgba(15, 23, 42, 0.7);
+    --border-color: #334155;
+    --text-primary: #e2e8f0;
+    --text-secondary: #94a3b8;
+    --accent-cyan: #00f3ff;
+    --accent-magenta: #ff00ff;
+    --accent-green: #00ff00;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    font-family: 'Inter', sans-serif;
+    overflow-x: hidden;
+}
+
+.mono { font-family: 'JetBrains Mono', monospace; }
+
+.hub-container {
+    padding: 20px;
+    max-width: 1600px;
+    margin: 0 auto;
+}
+
+.hub-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    grid-template-rows: auto auto auto;
+    gap: 20px;
+}
+
+/* Specific Grid Areas */
+.hub-header { grid-column: 1 / -1; }
+.hub-chart-main { grid-column: 1 / 9; height: 400px; }
+.hub-sidebar-stats { grid-column: 9 / -1; height: 400px; }
+.hub-row-secondary { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+
+.glass-panel {
+    background: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 20px;
+    backdrop-filter: blur(10px);
+    position: relative;
+    overflow: hidden;
+}
+
+.panel-title {
+    font-family: 'JetBrains Mono';
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.stat-value-lg {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #fff;
+    font-family: 'JetBrains Mono';
+}
+
+.stat-delta {
+    font-size: 0.8rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: bold;
+}
+.delta-pos { color: var(--accent-green); background: rgba(0,255,0,0.1); }
+.delta-neg { color: #ff4444; background: rgba(255,0,0,0.1); }
+
+/* Timeline Interaction */
+.timeline-scrubber {
+    width: 100%;
+    height: 40px;
+    background: #1e293b;
+    border-radius: 4px;
+    margin-top: 10px;
+    position: relative;
+    cursor: crosshair;
+}
+
+/* Entity Gravity Bubbles (CSS only fallback, JS will handle canvas) */
+.gravity-container {
+    width: 100%;
+    height: 300px;
+    position: relative;
+}
+
+/* List Items */
+.insight-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.insight-item {
+    padding: 10px;
+    border-bottom: 1px solid #333;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.85rem;
+}
+.insight-item:last-child { border-bottom: none; }
+.insight-score {
+    font-family: 'JetBrains Mono';
+    color: var(--accent-cyan);
+}
+
+/* Animations */
+@keyframes scanline {
+    0% { top: 0; }
+    100% { top: 100%; }
+}
+.scan-overlay {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: linear-gradient(to bottom, transparent 50%, rgba(0, 243, 255, 0.05) 51%, transparent 52%);
+    background-size: 100% 4px;
+    pointer-events: none;
+    z-index: 10;
+}

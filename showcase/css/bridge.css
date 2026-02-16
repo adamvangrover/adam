@@ -1,0 +1,145 @@
+body {
+    margin: 0;
+    background: #000;
+    color: #fff;
+    font-family: 'JetBrains Mono', monospace;
+    overflow: hidden;
+}
+
+.bridge-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at 50% 50%, #0f172a 0%, #000 80%);
+    z-index: -1;
+}
+
+.bridge-container {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+}
+
+/* Header */
+.bridge-header {
+    text-align: center;
+    margin-bottom: 3rem;
+    animation: fadeInDown 1s ease-out;
+}
+
+.system-title {
+    font-size: 3rem;
+    font-weight: 700;
+    letter-spacing: 0.5rem;
+    color: transparent;
+    -webkit-text-stroke: 1px #06b6d4;
+    text-shadow: 0 0 20px rgba(6, 182, 212, 0.5);
+}
+
+.system-status {
+    font-size: 0.8rem;
+    color: #64748b;
+    margin-top: 10px;
+}
+
+/* Grid */
+.nav-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    width: 100%;
+    max-width: 1200px;
+}
+
+.bridge-card {
+    background: rgba(30, 41, 59, 0.3);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    border-radius: 12px;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    text-decoration: none;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    backdrop-filter: blur(10px);
+    position: relative;
+    overflow: hidden;
+    height: 200px;
+}
+
+.bridge-card:hover {
+    background: rgba(6, 182, 212, 0.1);
+    border-color: #06b6d4;
+    transform: translateY(-10px) scale(1.05);
+    box-shadow: 0 20px 40px -10px rgba(6, 182, 212, 0.3);
+}
+
+.card-icon {
+    font-size: 2.5rem;
+    color: #94a3b8;
+    margin-bottom: 1rem;
+    transition: color 0.3s;
+}
+
+.bridge-card:hover .card-icon {
+    color: #06b6d4;
+    text-shadow: 0 0 15px #06b6d4;
+}
+
+.card-title {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #fff;
+    margin-bottom: 0.5rem;
+}
+
+.card-desc {
+    font-size: 0.75rem;
+    color: #64748b;
+    max-width: 80%;
+}
+
+/* Specific Card Colors */
+.card-mission:hover { border-color: #ef4444; box-shadow: 0 20px 40px -10px rgba(239, 68, 68, 0.3); }
+.card-mission:hover .card-icon { color: #ef4444; text-shadow: 0 0 15px #ef4444; }
+
+.card-nexus:hover { border-color: #8b5cf6; box-shadow: 0 20px 40px -10px rgba(139, 92, 246, 0.3); }
+.card-nexus:hover .card-icon { color: #8b5cf6; text-shadow: 0 0 15px #8b5cf6; }
+
+/* Footer */
+.bridge-footer {
+    margin-top: 3rem;
+    font-size: 0.7rem;
+    color: #475569;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+/* Animations */
+@keyframes fadeInDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Background Particles (Simple CSS) */
+.particle {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 50%;
+    animation: float 10s infinite linear;
+}
+
+@keyframes float {
+    0% { transform: translateY(100vh); opacity: 0; }
+    50% { opacity: 1; }
+    100% { transform: translateY(-100px); opacity: 0; }
+}

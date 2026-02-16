@@ -293,6 +293,10 @@ window.CyberDashboard = {
             const regex = /(\$\d{1,3}(,\d{3})*(\.\d{2})?)|(\d+(\.\d+)?%)|(20\d{2})/g;
 
             while(node = walker.nextNode()) {
+                // Optimization: Stop scanning once we have enough nodes
+                // The processing loop below limits to index <= 20 (21 items)
+                if (nodesToReplace.length > 20) break;
+
                 if (node.parentElement.tagName !== 'SCRIPT' &&
                     node.parentElement.tagName !== 'STYLE' &&
                     node.textContent.match(regex)) {

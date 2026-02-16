@@ -28,7 +28,7 @@ class AdamNavigator {
     /**
      * MASTER BOOT SEQUENCE
      */
-    init() {
+    async init() {
         try {
             console.log(`[AdamNavigator] Initializing v${this.version}...`);
 
@@ -41,6 +41,9 @@ class AdamNavigator {
             // 2. Resolve Environment Paths
             this._resolvePaths();
 
+            // 2.5 Load Site Map
+            await this._fetchSiteMap();
+
             // 3. Inject External Dependencies (CSS/Fonts)
             this._injectDependencies();
 
@@ -49,6 +52,7 @@ class AdamNavigator {
 
             // 5. Render Interface
             this._renderNavigation();
+            this._renderBridge();
             this._injectCommandPalette();
             this._injectGlobalStyles();
 
@@ -60,6 +64,18 @@ class AdamNavigator {
         } catch (e) {
             console.error("[AdamNavigator] Critical Failure:", e);
             this._renderSafeMode(e);
+        }
+    }
+
+    async _fetchSiteMap() {
+        try {
+            const response = await fetch(this._sanitizePath(`${this.showcasePath}/site_map.json`));
+            if (response.ok) {
+                this.siteMap = await response.json();
+                console.log("[AdamNavigator] Site Map Loaded");
+            }
+        } catch (e) {
+            console.warn("[AdamNavigator] Site Map Load Failed, using fallback.", e);
         }
     }
 
@@ -143,6 +159,24 @@ class AdamNavigator {
      * Returns the Menu Configuration Object
      */
     _getMenuConfig() {
+        if (this.siteMap && this.siteMap.categories) {
+            const menu = [];
+            this.siteMap.categories.forEach((cat, index) => {
+                if (index > 0) menu.push({ type: 'divider' });
+                cat.items.forEach(item => {
+                    menu.push({
+                        name: item.name,
+                        icon: item.icon || 'fa-circle',
+                        link: item.link
+                    });
+                });
+            });
+            menu.push({ type: 'divider' });
+            menu.push({ name: 'Root Directory', icon: 'fa-folder-tree', link: 'ROOT' });
+            return menu;
+        }
+
+        // Fallback
         return [
             { name: 'Mission Control', icon: 'fa-tachometer-alt', link: 'index.html' },
             { name: 'Chat Portal', icon: 'fa-comments', link: 'chat.html' },
@@ -176,6 +210,26 @@ class AdamNavigator {
             { type: 'divider' },
             { name: 'Root Directory', icon: 'fa-folder-tree', link: 'ROOT' }
         ];
+    }
+
+    _renderBridge() {
+        const bridgeBtn = document.createElement('button');
+        bridgeBtn.className = 'fixed bottom-6 right-6 z-50 w-12 h-12 bg-cyan-500/20 border border-cyan-500 rounded-full flex items-center justify-center text-cyan-400 hover:bg-cyan-500 hover:text-white transition-all duration-300 backdrop-blur shadow-lg shadow-cyan-500/20 group';
+        bridgeBtn.innerHTML = '<i class="fas fa-project-diagram"></i>';
+        bridgeBtn.setAttribute('aria-label', 'Launch Network Bridge');
+        bridgeBtn.title = 'Network Bridge';
+
+        // Tooltip
+        const tooltip = document.createElement('div');
+        tooltip.className = 'absolute right-14 bg-black/80 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap border border-slate-700 pointer-events-none';
+        tooltip.innerText = 'Network Bridge';
+        bridgeBtn.appendChild(tooltip);
+
+        bridgeBtn.onclick = () => {
+            window.location.href = this._sanitizePath(`${this.showcasePath}/network_map.html`);
+        };
+
+        document.body.appendChild(bridgeBtn);
     }
 
     /**

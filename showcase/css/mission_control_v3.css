@@ -1,0 +1,169 @@
+/* MISSION CONTROL V3 - CYBERPUNK THEME */
+
+:root {
+    --mc-bg: #030712; /* Very dark blue/black */
+    --mc-panel: rgba(15, 23, 42, 0.85);
+    --mc-border: rgba(56, 189, 248, 0.2);
+    --mc-neon: #00f3ff;
+    --mc-alert: #ef4444;
+    --mc-warn: #f59e0b;
+    --mc-success: #10b981;
+}
+
+body.mission-control-v3 {
+    background-color: var(--mc-bg);
+    background-image:
+        linear-gradient(rgba(0, 243, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 243, 255, 0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.mc-grid {
+    display: grid;
+    grid-template-columns: 300px 1fr 350px;
+    grid-template-rows: 80px 1fr;
+    height: 100vh;
+    gap: 15px;
+    padding: 15px;
+}
+
+/* --- HEADER --- */
+.mc-header {
+    grid-column: 1 / -1;
+    background: var(--mc-panel);
+    border: 1px solid var(--mc-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 30px;
+    border-radius: 4px;
+    box-shadow: 0 0 20px rgba(0, 243, 255, 0.1);
+}
+
+.defcon-badge {
+    padding: 5px 15px;
+    background: rgba(255, 0, 0, 0.2);
+    border: 1px solid red;
+    color: red;
+    font-weight: bold;
+    animation: pulse-red 2s infinite;
+}
+
+/* --- PANELS --- */
+.mc-panel {
+    background: var(--mc-panel);
+    border: 1px solid var(--mc-border);
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+}
+
+.mc-panel-header {
+    padding: 10px 15px;
+    background: rgba(0, 0, 0, 0.3);
+    border-bottom: 1px solid var(--mc-border);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--mc-neon);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* --- LEFT: SYSTEM STATUS --- */
+.status-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    padding: 15px;
+}
+
+.status-card {
+    background: rgba(0,0,0,0.3);
+    border: 1px solid #333;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.status-val {
+    font-family: 'JetBrains Mono';
+    font-weight: bold;
+    color: #fff;
+}
+
+/* --- CENTER: MAP / NEXUS --- */
+.map-container {
+    width: 100%;
+    height: 100%;
+    background: #000;
+    position: relative;
+}
+
+iframe.nexus-frame {
+    width: 100%;
+    height: 100%;
+    border: none;
+    opacity: 0.8;
+}
+
+/* --- RIGHT: SWARM & LOGS --- */
+.swarm-list {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 10px;
+}
+
+.agent-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    font-size: 0.8rem;
+}
+
+.agent-status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #555;
+}
+.agent-status-dot.active { background: var(--mc-success); box-shadow: 0 0 5px var(--mc-success); }
+.agent-status-dot.busy { background: var(--mc-warn); }
+
+.agent-task {
+    color: #888;
+    font-size: 0.7rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 150px;
+}
+
+.sys2-log {
+    height: 200px;
+    border-top: 1px solid var(--mc-border);
+    background: #000;
+    padding: 10px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.7rem;
+    color: var(--mc-success);
+    overflow-y: auto;
+}
+
+/* --- ANIMATIONS --- */
+@keyframes pulse-red {
+    0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+
+.glitch-text:hover {
+    text-shadow: 2px 0 #ff00c1, -2px 0 #00fff9;
+}

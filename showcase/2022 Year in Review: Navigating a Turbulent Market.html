@@ -11,6 +11,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="js/nav.js" defer></script>
+    <script src="js/market_mayhem_viewer.js" defer></script>
 </head>
 <body class="tier-high">
 
@@ -35,8 +36,11 @@
 
     <!-- Virtual Toolbar for High Tier -->
     <div class="doc-toolbar" style="display: flex;">
-        <div class="toolbar-item" onclick="window.location.href='market_mayhem_archive.html'"><strong>FILE</strong></div>
-        <div class="toolbar-item" onclick="showToast('EDIT MODE: READ ONLY (ARCHIVED)')">EDIT</div>
+        <div class="toolbar-item" onclick="window.location.href='market_mayhem_archive_v24.html'"><strong>FILE</strong></div>
+        <div class="toolbar-item" onclick="toggleRedactionMode()">REDACT</div>
+        <div class="toolbar-item" onclick="printReport()">PRINT</div>
+        <div class="toolbar-item" onclick="shareReport()">SHARE</div>
+        <div class="toolbar-item" onclick="downloadReport()">DOWNLOAD</div>
         <div class="toolbar-item" onclick="toggleTheme()">VIEW</div>
         <div class="toolbar-item" onclick="showToast('INSERT: PERMISSION DENIED')">INSERT</div>
         <div class="toolbar-item" onclick="showToast('FORMAT: LOCKED')">FORMAT</div>
@@ -46,12 +50,15 @@
     </div>
 
     <div style="max-width: 1400px; margin: 0 auto; padding: 10px 20px; display:flex; justify-content:space-between; align-items:center; display: none;">
-        <a href="market_mayhem_archive.html" class="cyber-btn">&larr; RETURN TO ARCHIVE</a>
+        <a href="market_mayhem_archive_v24.html" class="cyber-btn">&larr; RETURN TO ARCHIVE</a>
         <div style="font-family:'JetBrains Mono'; font-size:0.7rem; color:#666;">SECURE CONNECTION ESTABLISHED</div>
     </div>
 
     <div class="newsletter-wrapper">
         <div class="paper-sheet" id="paper-sheet">
+
+            <!-- Top Secret Stamp -->
+            <div id="top-secret-stamp" class="top-secret-stamp">TOP SECRET</div>
 
             <!-- High Tier Header UI -->
             <div class="doc-header-ui" style="display: flex;">
@@ -78,13 +85,15 @@
                 <canvas id="financialChart"></canvas>
             </div>
 
-            <h2>Market Overview</h2><p>2022 was a challenging year for investors, marked by heightened volatility, rising inflation, and geopolitical tensions. Major stock indices experienced significant declines, with the S&P 500 ending the year down 19.4%. The technology sector was particularly hard hit, as rising interest rates and slowing economic growth weighed on valuations.</p>
+            <div id="document-body">
+                <h2>Market Overview</h2><p>2022 was a challenging year for investors, marked by heightened volatility, rising inflation, and geopolitical tensions. Major stock indices experienced significant declines, with the S&P 500 ending the year down 19.4%. The technology sector was particularly hard hit, as rising interest rates and slowing economic growth weighed on valuations.</p>
 <h2>Major Themes and Trends</h2><p>Several key themes and trends shaped the market in 2022: <em> <strong>Inflation:</strong> Inflation surged to multi-decade highs, driven by supply chain disruptions, strong consumer demand, and expansionary monetary policies. </em> <strong>Rising Interest Rates:</strong>  Central banks responded to inflation by aggressively raising interest rates, leading to increased borrowing costs and tighter financial conditions. <em> <strong>Geopolitical Risks:</strong> The war in Ukraine, tensions between the US and China, and political instability in several regions added to market uncertainty. </em> <strong>Energy Crisis:</strong>  The energy crisis, triggered by the war in Ukraine and supply constraints, led to soaring energy prices and concerns about economic growth. <em> <strong>Shifting Consumer Behavior:</strong>  Consumer spending patterns shifted as inflation and economic uncertainty weighed on discretionary spending. </em> <strong>Technological Innovation:</strong>  Despite market challenges, technological innovation continued at a rapid pace, with advancements in artificial intelligence, cloud computing, and renewable energy.</p>
 <h2>Industry Performance</h2><p>Industry performance was mixed in 2022: <em> <strong>Energy:</strong> The energy sector was the top performer, benefiting from high energy prices. </em> <strong>Utilities:</strong>  Utilities also performed relatively well, as they are considered defensive investments in times of economic uncertainty. <em> <strong>Consumer Staples:</strong>  Consumer staples companies, which provide essential goods and services, also showed resilience. </em> <strong>Technology:</strong>  The technology sector was the worst performer, as valuations declined sharply. * <strong>Consumer Discretionary:</strong>  Consumer discretionary companies, which are sensitive to economic conditions, also faced headwinds.</p>
 <h2>Top Performers</h2><p>Some of the top-performing companies in 2022 included: <em> <strong>ExxonMobil (XOM):</strong>  Benefited from high oil prices. </em> <strong>Chevron (CVX):</strong>  Another energy giant that profited from the energy crisis. <em> <strong>NextEra Energy (NEE):</strong>  A leading renewable energy company. </em> <strong>PepsiCo (PEP):</strong>  A consumer staples giant with strong brand recognition. * <strong>Dollar General (DG):</strong>  A discount retailer that benefited from value-conscious consumers.</p>
 <h2>Portfolio Construction and Optimization</h2><p>In a volatile and uncertain market like 2022, portfolio construction and optimization are crucial. Investors should consider: <em> <strong>Diversification:</strong>  Diversifying across asset classes, sectors, and geographies to reduce risk. </em> <strong>Risk Management:</strong>  Implementing risk management strategies, such as hedging or position sizing, to mitigate potential losses. <em> <strong>Value Investing:</strong>  Focusing on undervalued companies with strong fundamentals. </em> <strong>Long-Term Perspective:</strong>  Maintaining a long-term perspective and avoiding impulsive decisions based on short-term market fluctuations.</p>
 <h2>Looking Ahead</h2><p>While 2022 presented significant challenges, it also created opportunities for investors. As we move forward, it's essential to stay informed about market trends, assess risks carefully, and maintain a disciplined investment approach. Adam v15.4 can assist investors in navigating the complexities of the market and making informed decisions.</p>
 
+            </div>
 
             <!-- Provenance Log (All Tiers) -->
             <div class="provenance-log">
@@ -133,7 +142,7 @@
             <div class="sidebar-widget">
                 <div class="sidebar-title">Detected Entities</div>
                 <div class="tag-cloud">
-                    <a href="market_mayhem_archive.html?search=US" class="tag" style="text-decoration:none;">US</a><a href="market_mayhem_archive.html?search=CN" class="tag" style="text-decoration:none;">CN</a>
+                    <a href="market_mayhem_archive_v24.html?search=US_FED" class="tag" style="text-decoration:none;">US_FED</a><a href="market_mayhem_archive_v24.html?search=CN_PBOC" class="tag" style="text-decoration:none;">CN_PBOC</a><a href="market_mayhem_archive_v24.html?search=AI" class="tag" style="text-decoration:none; border-color:#666;">AI</a><a href="market_mayhem_archive_v24.html?search=Banks" class="tag" style="text-decoration:none; border-color:#666;">Banks</a><a href="market_mayhem_archive_v24.html?search=Cloud" class="tag" style="text-decoration:none; border-color:#666;">Cloud</a><a href="market_mayhem_archive_v24.html?search=EV" class="tag" style="text-decoration:none; border-color:#666;">EV</a><a href="market_mayhem_archive_v24.html?search=Energy" class="tag" style="text-decoration:none; border-color:#666;">Energy</a>
                 </div>
             </div>
 
@@ -180,8 +189,15 @@
     "tickers": [],
     "agents": [],
     "sovereigns": [
-      "US",
-      "CN"
+      "US_FED",
+      "CN_PBOC"
+    ],
+    "keywords": [
+      "AI",
+      "Banks",
+      "Cloud",
+      "EV",
+      "Energy"
     ]
   },
   "provenance_hash": "314d1cfdda9661921873263aaec4bc34da923be44c0c6e89fa1a719146368938",
@@ -196,79 +212,6 @@
 }</textarea>
 
     <script>
-        // --- INTERACTION LOGIC ---
-
-        function showToast(msg) {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            toast.className = 'cyber-toast';
-            toast.innerText = '> ' + msg;
-            container.appendChild(toast);
-            setTimeout(() => {
-                toast.style.opacity = '0';
-                setTimeout(() => toast.remove(), 300);
-            }, 3000);
-        }
-
-        function toggleTheme() {
-            document.body.classList.toggle('dark-mode');
-            const isDark = document.body.classList.contains('dark-mode');
-            showToast('THEME: ' + (isDark ? 'DARK_MODE' : 'LIGHT_MODE'));
-        }
-
-        function toggleSource() {
-            const modal = document.getElementById('raw-source-modal');
-            const content = document.getElementById('raw-source-content');
-            const rawData = document.getElementById('hidden-raw-data').value;
-
-            if (modal.style.display === 'flex') {
-                modal.style.display = 'none';
-            } else {
-                content.innerText = rawData || "NO SOURCE DATA AVAILABLE.";
-                modal.style.display = 'flex';
-            }
-        }
-
-        function runVerification() {
-            const overlay = document.getElementById('system2-overlay');
-            const content = document.getElementById('sys2-content');
-            const status = document.getElementById('verification-status');
-
-            overlay.style.display = 'flex';
-            content.innerHTML = '';
-
-            const lines = [
-                "INITIATING SYSTEM 2 PROTOCOL...",
-                "VERIFYING CRYPTOGRAPHIC SIGNATURE...",
-                "HASH: 314d1cfdda9661921873263aaec4bc34da923be44c0c6e89fa1a719146368938",
-                "CHECKING CHAIN OF CUSTODY...",
-                "ANALYZING SENTIMENT VECTORS...",
-                "CROSS-REFERENCING KNOWLEDGE GRAPH...",
-                "VERIFICATION COMPLETE."
-            ];
-
-            let i = 0;
-            function addLine() {
-                if (i < lines.length) {
-                    const div = document.createElement('div');
-                    div.className = 'system2-line';
-                    div.innerText = '> ' + lines[i];
-                    div.style.opacity = 1;
-                    content.appendChild(div);
-                    i++;
-                    setTimeout(addLine, 400);
-                } else {
-                    setTimeout(() => {
-                        overlay.style.display = 'none';
-                        showToast('DOCUMENT VERIFIED');
-                        if(status) status.innerText = "VERIFIED // AUTHENTICATED";
-                        if(status) status.style.color = "#aaffaa";
-                    }, 1000);
-                }
-            }
-            addLine();
-        }
-
         // Chart Injection Logic
         const metricsData = {};
 

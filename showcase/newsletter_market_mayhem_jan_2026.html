@@ -11,6 +11,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="js/nav.js" defer></script>
+    <script src="js/market_mayhem_viewer.js" defer></script>
 </head>
 <body class="tier-high">
 
@@ -33,19 +34,13 @@
         <div class="raw-source-content" id="raw-source-content"></div>
     </div>
 
-        .cyber-btn {
-            font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; padding: 8px 16px; border: 1px solid #444;
-            color: #e0e0e0; background: rgba(0,0,0,0.8); text-decoration: none; display: inline-block;
-        }
-        .cyber-btn:hover { border-color: var(--cyber-blue); color: var(--cyber-blue); }
-    </style>
-</head>
-<body>
-    <div style="max-width: 1400px; margin: 0 auto; padding: 20px; display:flex; justify-content:space-between; align-items:center;">
     <!-- Virtual Toolbar for High Tier -->
     <div class="doc-toolbar" style="display: flex;">
-        <div class="toolbar-item" onclick="window.location.href='market_mayhem_archive.html'"><strong>FILE</strong></div>
-        <div class="toolbar-item" onclick="showToast('EDIT MODE: READ ONLY (ARCHIVED)')">EDIT</div>
+        <div class="toolbar-item" onclick="window.location.href='market_mayhem_archive_v24.html'"><strong>FILE</strong></div>
+        <div class="toolbar-item" onclick="toggleRedactionMode()">REDACT</div>
+        <div class="toolbar-item" onclick="printReport()">PRINT</div>
+        <div class="toolbar-item" onclick="shareReport()">SHARE</div>
+        <div class="toolbar-item" onclick="downloadReport()">DOWNLOAD</div>
         <div class="toolbar-item" onclick="toggleTheme()">VIEW</div>
         <div class="toolbar-item" onclick="showToast('INSERT: PERMISSION DENIED')">INSERT</div>
         <div class="toolbar-item" onclick="showToast('FORMAT: LOCKED')">FORMAT</div>
@@ -55,22 +50,25 @@
     </div>
 
     <div style="max-width: 1400px; margin: 0 auto; padding: 10px 20px; display:flex; justify-content:space-between; align-items:center; display: none;">
-        <a href="market_mayhem_archive.html" class="cyber-btn">&larr; RETURN TO ARCHIVE</a>
+        <a href="market_mayhem_archive_v24.html" class="cyber-btn">&larr; RETURN TO ARCHIVE</a>
         <div style="font-family:'JetBrains Mono'; font-size:0.7rem; color:#666;">SECURE CONNECTION ESTABLISHED</div>
     </div>
 
     <div class="newsletter-wrapper">
         <div class="paper-sheet" id="paper-sheet">
 
+            <!-- Top Secret Stamp -->
+            <div id="top-secret-stamp" class="top-secret-stamp">TOP SECRET</div>
+
             <!-- High Tier Header UI -->
             <div class="doc-header-ui" style="display: flex;">
                 <span id="verification-status">CONFIDENTIAL // SYSTEM 2 REVIEW</span>
-                <span>266a3c1a</span>
+                <span>68849303</span>
             </div>
 
             <div style="display:flex; justify-content:space-between; font-family:'JetBrains Mono'; font-size:0.8rem; color:#666; margin-bottom:20px; margin-top: 20px;">
                 <span>2026-01-12</span>
-                <span>ID: 266a3c1a</span>
+                <span>ID: 68849303</span>
             </div>
 
             <h1 class="title">GLOBAL MACRO-STRATEGIC OUTLOOK 2026: THE REFLATIONARY AGENTIC BOOM</h1>
@@ -87,17 +85,17 @@
                 <canvas id="financialChart"></canvas>
             </div>
 
-
-        <h3>1. Executive Intelligence Summary: The Architecture of the New Regime</h3>
-        <p>As markets open on January 12, 2026, the global financial system has decisively exited the post-pandemic transitional phase and entered a new, distinct market regime: the <strong>Reflationary Agentic Boom</strong>. This paradigm is defined by a paradoxical but potent combination of accelerating economic growth in the United States, sticky inflation floors driven by geopolitical fragmentation and tariffs, and a technological productivity shock moving from generative experimentation to "agentic" execution.</p>
-        <p>The prevailing narrative of late 2024 and 2025—that the Federal Reserve's tightening cycle would inevitably induce a recession—has been falsified by the data. Instead, the US economy is tracking toward a robust 2.5% to 2.6% real GDP growth rate for 2026. This resilience is not merely a cyclical rebound but a structural shift powered by three pillars: the fiscal impulse of anticipated tax cuts, the capital expenditure (Capex) super-cycle associated with "Sovereign AI," and the integration of digital assets into the institutional balance sheet via new accounting standards.</p>
-
+            <div id="document-body">
+                <h3>1. Executive Intelligence Summary: The Architecture of the New Regime</h3>
+<p>As markets open on January 12, 2026, the global financial system has decisively exited the post-pandemic transitional phase and entered a new, distinct market regime: the <strong>Reflationary Agentic Boom</strong>. This paradigm is defined by a paradoxical but potent combination of accelerating economic growth in the United States, sticky inflation floors driven by geopolitical fragmentation and tariffs, and a technological productivity shock moving from generative experimentation to "agentic" execution.</p>
+<p>The prevailing narrative of late 2024 and 2025—that the Federal Reserve's tightening cycle would inevitably induce a recession—has been falsified by the data. Instead, the US economy is tracking toward a robust 2.5% to 2.6% real GDP growth rate for 2026. This resilience is not merely a cyclical rebound but a structural shift powered by three pillars: the fiscal impulse of anticipated tax cuts, the capital expenditure (Capex) super-cycle associated with "Sovereign AI," and the integration of digital assets into the institutional balance sheet via new accounting standards.</p>
+            </div>
 
             <!-- Provenance Log (All Tiers) -->
             <div class="provenance-log">
                 <div class="log-entry">
                     <span>> HASH_CHECK</span>
-                    <span style="color:var(--terminal-green);">266a3c1adc5cf3a6f8489349834be4d97b64f94d39f70f200d188518cabf4b8d</span>
+                    <span style="color:var(--terminal-green);">68849303d5fcd9b13ed403faa17feb28fe671af75cb8b8ca3929a910d7942180</span>
                 </div>
                 <div class="log-entry">
                     <span>> SENTIMENT_SCAN</span>
@@ -126,7 +124,7 @@
                 <div class="stat-row"><span>DATE</span> <span class="stat-val">2026-01-12</span></div>
                 <div class="stat-row"><span>TYPE</span> <span class="stat-val">ANNUAL_STRATEGY</span></div>
                 <div class="stat-row"><span>CLASS</span> <span class="stat-val">UNCLASSIFIED</span></div>
-                <div class="stat-row"><span>PROVENANCE</span> <span class="stat-val" title="266a3c1adc5cf3a6f8489349834be4d97b64f94d39f70f200d188518cabf4b8d">266a3c1a</span></div>
+                <div class="stat-row"><span>PROVENANCE</span> <span class="stat-val" title="68849303d5fcd9b13ed403faa17feb28fe671af75cb8b8ca3929a910d7942180">68849303</span></div>
             </div>
 
             <div class="sidebar-widget">
@@ -140,7 +138,7 @@
             <div class="sidebar-widget">
                 <div class="sidebar-title">Detected Entities</div>
                 <div class="tag-cloud">
-                    <a href="market_mayhem_archive.html?search=US" class="tag" style="text-decoration:none;">US</a>
+                    <a href="market_mayhem_archive_v24.html?search=US_FED" class="tag" style="text-decoration:none;">US_FED</a><a href="market_mayhem_archive_v24.html?search=AI" class="tag" style="text-decoration:none; border-color:#666;">AI</a><a href="market_mayhem_archive_v24.html?search=DeFi" class="tag" style="text-decoration:none; border-color:#666;">DeFi</a><a href="market_mayhem_archive_v24.html?search=EV" class="tag" style="text-decoration:none; border-color:#666;">EV</a><a href="market_mayhem_archive_v24.html?search=Growth" class="tag" style="text-decoration:none; border-color:#666;">Growth</a><a href="market_mayhem_archive_v24.html?search=Inflation" class="tag" style="text-decoration:none; border-color:#666;">Inflation</a>
                 </div>
             </div>
 
@@ -183,17 +181,24 @@
   "type": "ANNUAL_STRATEGY",
   "filename": "newsletter_market_mayhem_jan_2026.html",
   "is_sourced": true,
-  "full_body": "\n        <h3>1. Executive Intelligence Summary: The Architecture of the New Regime</h3>\n        <p>As markets open on January 12, 2026, the global financial system has decisively exited the post-pandemic transitional phase and entered a new, distinct market regime: the <strong>Reflationary Agentic Boom</strong>. This paradigm is defined by a paradoxical but potent combination of accelerating economic growth in the United States, sticky inflation floors driven by geopolitical fragmentation and tariffs, and a technological productivity shock moving from generative experimentation to \"agentic\" execution.</p>\n        <p>The prevailing narrative of late 2024 and 2025\u2014that the Federal Reserve's tightening cycle would inevitably induce a recession\u2014has been falsified by the data. Instead, the US economy is tracking toward a robust 2.5% to 2.6% real GDP growth rate for 2026. This resilience is not merely a cyclical rebound but a structural shift powered by three pillars: the fiscal impulse of anticipated tax cuts, the capital expenditure (Capex) super-cycle associated with \"Sovereign AI,\" and the integration of digital assets into the institutional balance sheet via new accounting standards.</p>\n        ",
+  "full_body": "<h3>1. Executive Intelligence Summary: The Architecture of the New Regime</h3>\n<p>As markets open on January 12, 2026, the global financial system has decisively exited the post-pandemic transitional phase and entered a new, distinct market regime: the <strong>Reflationary Agentic Boom</strong>. This paradigm is defined by a paradoxical but potent combination of accelerating economic growth in the United States, sticky inflation floors driven by geopolitical fragmentation and tariffs, and a technological productivity shock moving from generative experimentation to \"agentic\" execution.</p>\n<p>The prevailing narrative of late 2024 and 2025\u2014that the Federal Reserve's tightening cycle would inevitably induce a recession\u2014has been falsified by the data. Instead, the US economy is tracking toward a robust 2.5% to 2.6% real GDP growth rate for 2026. This resilience is not merely a cyclical rebound but a structural shift powered by three pillars: the fiscal impulse of anticipated tax cuts, the capital expenditure (Capex) super-cycle associated with \"Sovereign AI,\" and the integration of digital assets into the institutional balance sheet via new accounting standards.</p>",
   "source_priority": 3,
   "sentiment_score": 77,
   "entities": {
     "tickers": [],
     "agents": [],
     "sovereigns": [
-      "US"
+      "US_FED"
+    ],
+    "keywords": [
+      "AI",
+      "DeFi",
+      "EV",
+      "Growth",
+      "Inflation"
     ]
   },
-  "provenance_hash": "266a3c1adc5cf3a6f8489349834be4d97b64f94d39f70f200d188518cabf4b8d",
+  "provenance_hash": "68849303d5fcd9b13ed403faa17feb28fe671af75cb8b8ca3929a910d7942180",
   "metrics_json": "{}",
   "conviction": 50,
   "semantic_score": 64,
@@ -202,79 +207,6 @@
 }</textarea>
 
     <script>
-        // --- INTERACTION LOGIC ---
-
-        function showToast(msg) {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            toast.className = 'cyber-toast';
-            toast.innerText = '> ' + msg;
-            container.appendChild(toast);
-            setTimeout(() => {
-                toast.style.opacity = '0';
-                setTimeout(() => toast.remove(), 300);
-            }, 3000);
-        }
-
-        function toggleTheme() {
-            document.body.classList.toggle('dark-mode');
-            const isDark = document.body.classList.contains('dark-mode');
-            showToast('THEME: ' + (isDark ? 'DARK_MODE' : 'LIGHT_MODE'));
-        }
-
-        function toggleSource() {
-            const modal = document.getElementById('raw-source-modal');
-            const content = document.getElementById('raw-source-content');
-            const rawData = document.getElementById('hidden-raw-data').value;
-
-            if (modal.style.display === 'flex') {
-                modal.style.display = 'none';
-            } else {
-                content.innerText = rawData || "NO SOURCE DATA AVAILABLE.";
-                modal.style.display = 'flex';
-            }
-        }
-
-        function runVerification() {
-            const overlay = document.getElementById('system2-overlay');
-            const content = document.getElementById('sys2-content');
-            const status = document.getElementById('verification-status');
-
-            overlay.style.display = 'flex';
-            content.innerHTML = '';
-
-            const lines = [
-                "INITIATING SYSTEM 2 PROTOCOL...",
-                "VERIFYING CRYPTOGRAPHIC SIGNATURE...",
-                "HASH: 266a3c1adc5cf3a6f8489349834be4d97b64f94d39f70f200d188518cabf4b8d",
-                "CHECKING CHAIN OF CUSTODY...",
-                "ANALYZING SENTIMENT VECTORS...",
-                "CROSS-REFERENCING KNOWLEDGE GRAPH...",
-                "VERIFICATION COMPLETE."
-            ];
-
-            let i = 0;
-            function addLine() {
-                if (i < lines.length) {
-                    const div = document.createElement('div');
-                    div.className = 'system2-line';
-                    div.innerText = '> ' + lines[i];
-                    div.style.opacity = 1;
-                    content.appendChild(div);
-                    i++;
-                    setTimeout(addLine, 400);
-                } else {
-                    setTimeout(() => {
-                        overlay.style.display = 'none';
-                        showToast('DOCUMENT VERIFIED');
-                        if(status) status.innerText = "VERIFIED // AUTHENTICATED";
-                        if(status) status.style.color = "#aaffaa";
-                    }, 1000);
-                }
-            }
-            addLine();
-        }
-
         // Chart Injection Logic
         const metricsData = {};
 

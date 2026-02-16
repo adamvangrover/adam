@@ -17,7 +17,9 @@ SOURCE_DIRS = [
     "core/libraries_and_archives/generated_content"
 ]
 SHOWCASE_DIR = "showcase"
-ARCHIVE_FILE = "showcase/market_mayhem_archive.html"
+ARCHIVE_FILE = "showcase/market_mayhem_archive_v24.html" # Updated to v24 to match previous file name usage
+TEMPLATE_FILE = "showcase/templates/market_mayhem_report.html"
+DATA_FILE = "showcase/data/newsletter_data.json"
 
 # --- Analysis Helpers ---
 
@@ -43,20 +45,30 @@ def analyze_sentiment(text):
     return int(score)
 
 def extract_entities(text):
-    """Extracts Tickers ($AAPL) and Agents (@AgentName) and potential Sovereigns."""
+    """Extracts Tickers ($AAPL), Agents (@AgentName), Sovereigns, and Keywords."""
     tickers = sorted(list(set(re.findall(r'\$([A-Z]{2,5})', text))))
     agents = sorted(list(set(re.findall(r'@([A-Za-z0-9_]+)', text))))
 
-    # Simple heuristic for Sovereigns/Countries
+    # Enhanced Sovereign Detection
     sovereigns = []
-    if "United States" in text or "US" in text: sovereigns.append("US")
-    if "China" in text: sovereigns.append("CN")
-    if "Europe" in text or "EU" in text: sovereigns.append("EU")
+    if "United States" in text or "US" in text or "Fed" in text: sovereigns.append("US_FED")
+    if "China" in text or "PBOC" in text: sovereigns.append("CN_PBOC")
+    if "Europe" in text or "ECB" in text: sovereigns.append("EU_ECB")
+    if "Japan" in text or "BOJ" in text: sovereigns.append("JP_BOJ")
+
+    # Keywords (Fallback Tags)
+    keywords = []
+    common_terms = ["Inflation", "Recession", "AI", "Crypto", "Bitcoin", "Ethereum", "Gold", "Oil", "Tech", "Energy", "Banks", "Housing", "Retail", "Supply Chain", "Labor", "Yields", "Bonds", "Equities", "Volatility", "Growth", "Value", "Quality", "Momentum", "Dividend", "IPO", "SPAC", "NFT", "DeFi", "Web3", "Metaverse", "Cloud", "SaaS", "Cybersecurity", "Semiconductors", "EV", "Green Energy", "ESG"]
+
+    for term in common_terms:
+        if term.lower() in text.lower():
+            keywords.append(term)
 
     return {
         "tickers": tickers,
         "agents": agents,
-        "sovereigns": sovereigns
+        "sovereigns": list(set(sovereigns)),
+        "keywords": sorted(list(set(keywords)))[:5]  # Limit to 5 keywords
     }
 
 def calculate_conviction(text):
@@ -131,7 +143,7 @@ def determine_tier(type_, quality):
     if type_ in ["MARKET_PULSE", "DAILY_BRIEFING", "CYBER_GLITCH", "TECH_WATCH", "AGENT_NOTE"]:
         return "tier-low"
 
-    if type_ in ["DEEP_DIVE", "SPECIAL_EDITION", "STRATEGY", "ANNUAL_STRATEGY", "HISTORICAL"]:
+    if type_ in ["DEEP_DIVE", "SPECIAL_EDITION", "STRATEGY", "ANNUAL_STRATEGY", "HISTORICAL", "COUNTERFACTUAL"]:
         return "tier-high"
 
     # Fallback to quality for standard newsletters
@@ -570,7 +582,7 @@ def parse_html_file(filepath):
 
         filename = os.path.basename(filepath)
 
-        if filename in ["index.html", "market_mayhem_archive.html", "daily_briefings_library.html",
+        if filename in ["index.html", "market_mayhem_archive.html", "market_mayhem_archive_v24.html", "daily_briefings_library.html",
                         "market_pulse_library.html", "house_view_library.html", "portfolio_dashboard.html",
                         "data.html", "reports.html", "agents.html", "chat.html", "market_mayhem_rebuild.html", "market_mayhem_conviction.html"]:
             return None
@@ -664,6 +676,8 @@ def parse_html_file(filepath):
         elif "glitch" in lower_title: type_ = "CYBER_GLITCH"
         elif "outlook" in lower_title or "strategy" in lower_title: type_ = "STRATEGY"
         elif "snc" in lower_title: type_ = "GUIDE"
+        elif "counterfactual" in lower_title: type_ = "COUNTERFACTUAL"
+        elif "audit" in lower_title: type_ = "SYSTEM_AUDIT"
 
         sentiment = analyze_sentiment(content)
         entities = extract_entities(content)
@@ -696,452 +710,29 @@ def parse_html_file(filepath):
         print(f"Error parsing HTML {filepath}: {e}")
         return None
 
-# --- Static Data ---
-
-NEWSLETTER_DATA = [
-    {
-        "date": "2026-01-12",
-        "title": "GLOBAL MACRO-STRATEGIC OUTLOOK 2026: THE REFLATIONARY AGENTIC BOOM",
-        "summary": "As markets open on January 12, 2026, the global financial system has entered a new regime: the Reflationary Agentic Boom.",
-        "type": "ANNUAL_STRATEGY",
-        "filename": "newsletter_market_mayhem_jan_2026.html",
-        "is_sourced": True,
-        "full_body": """
-        <h3>1. Executive Intelligence Summary: The Architecture of the New Regime</h3>
-        <p>As markets open on January 12, 2026, the global financial system has decisively exited the post-pandemic transitional phase and entered a new, distinct market regime: the <strong>Reflationary Agentic Boom</strong>. This paradigm is defined by a paradoxical but potent combination of accelerating economic growth in the United States, sticky inflation floors driven by geopolitical fragmentation and tariffs, and a technological productivity shock moving from generative experimentation to "agentic" execution.</p>
-        <p>The prevailing narrative of late 2024 and 2025—that the Federal Reserve's tightening cycle would inevitably induce a recession—has been falsified by the data. Instead, the US economy is tracking toward a robust 2.5% to 2.6% real GDP growth rate for 2026. This resilience is not merely a cyclical rebound but a structural shift powered by three pillars: the fiscal impulse of anticipated tax cuts, the capital expenditure (Capex) super-cycle associated with "Sovereign AI," and the integration of digital assets into the institutional balance sheet via new accounting standards.</p>
-        """,
-        "source_priority": 3
-    },
-    {
-        "date": "2008-09-19",
-        "title": "MARKET MAYHEM: THE LEHMAN MOMENT",
-        "summary": "\"Existential Panic\". There are decades where nothing happens; and there are weeks where decades happen. This was one of those weeks. A 158-year-old bank vanished, the world's largest insurer was nationalized, and the money market broke the buck.",
-        "type": "HISTORICAL",
-        "filename": "newsletter_market_mayhem_sep_2008.html",
-        "is_sourced": True,
-        "full_body": """
-        <p><strong>The Week Wall Street Died.</strong> On Monday, September 15th, Lehman Brothers filed for the largest bankruptcy in U.S. history ($600B+ assets). The government let them fail, hoping to reduce moral hazard. The result was global panic.</p>
-        <p>By Tuesday, AIG—the insurer of the world's financial system via CDS—was on the brink. The Fed stepped in with an $85B revolving credit facility, effectively nationalizing the company.</p>
-        <p><strong>The Real Panic:</strong> The Reserve Primary Fund, a money market fund considered 'as good as cash', broke the buck (NAV fell to $0.97) due to Lehman exposure. This triggered a $140B run on money market funds, freezing the commercial paper market. The gears of capitalism have ground to a halt.</p>
-        """,
-        "source_priority": 3
-    },
-    {
-        "date": "1987-10-23",
-        "title": "MARKET MAYHEM: BLACK MONDAY AFTERMATH",
-        "summary": "\"Shell-Shocked\". On October 19th, the Dow Jones Industrial Average fell 22.6% in a single day. 508 points. It was the largest one-day percentage drop in history.",
-        "type": "HISTORICAL",
-        "filename": "newsletter_market_mayhem_oct_1987.html",
-        "is_sourced": True,
-        "full_body": """
-        <p><strong>The Crash.</strong> Monday, October 19th, will live in infamy. The Dow Jones Industrial Average collapsed 508 points, losing 22.6% of its value in a single session. Volume on the NYSE reached an unprecedented 604 million shares, leaving the ticker tape hours behind.</p>
-        <p><strong>The Culprit:</strong> Program trading. 'Portfolio Insurance' strategies, designed to sell futures as the market falls to hedge portfolios, kicked in simultaneously. This selling pressure crushed the futures market, which dragged down the spot market in a vicious spiral.</p>
-        <p><strong>The Aftermath:</strong> Alan Greenspan's Fed has issued a statement: 'The Federal Reserve, consistent with its responsibilities as the Nation's central bank, affirmed today its readiness to serve as a source of liquidity to support the economic and financial system.' The bleeding has stopped, but the scar remains.</p>
-        """,
-        "source_priority": 3
-    },
-     {
-        "date": "2020-03-20",
-        "title": "MARKET MAYHEM: THE GREAT SHUT-IN",
-        "summary": "\"Lockdown\". The global economy has come to a screeching halt. With \"15 Days to Slow the Spread\" in effect, markets are pricing in a depression-level GDP contraction.",
-        "type": "HISTORICAL",
-        "filename": "newsletter_market_mayhem_mar_2020.html",
-        "is_sourced": True,
-        "full_body": """
-        <p><strong>The World Has Stopped.</strong> In an unprecedented event, the global economy has entered a medically-induced coma. The S&P 500 has crashed 34% from its February highs, the fastest bear market in history.</p>
-        <p>Volatility is off the charts. The VIX closed at 82.69 on March 16th, surpassing the 2008 peak. Credit spreads have blown out, and liquidity in the Treasury market—usually the deepest in the world—has evaporated.</p>
-        <p><strong>Oil Shock:</strong> Demand destruction is so severe that WTI crude futures are trading at imminent risk of turning negative due to storage capacity constraints. (Update: They did, hitting -$37.63 in April).</p>
-        <p><strong>Central Bank Response:</strong> The Fed has unleashed 'Unlimited QE', buying corporate bonds for the first time in history. The mantra is 'Don't Fight the Fed', but the economic data is catastrophic.</p>
-        """,
-        "source_priority": 3
-    },
-    {
-        "date": "2000-03-10",
-        "title": "MARKET MAYHEM: THE DOT COM PEAK",
-        "summary": "\"Irrational Exuberance\". The NASDAQ Composite peaked today at 5,048.62. Companies with no revenue are valued at billions. The bubble has found its pin.",
-        "type": "HISTORICAL",
-        "filename": "newsletter_market_mayhem_mar_2000.html",
-        "is_sourced": True,
-        "full_body": """
-        <p><strong>The Height of Folly.</strong> Today marks the peak of the Dot Com bubble. The NASDAQ has doubled in a year. IPOs are popping 400% on day one. Pets.com, Webvan, eToys—these are the titans of the new economy.</p>
-        <p><strong>The Valuation Problem:</strong> Traditional metrics like P/E are considered obsolete. 'Price to Clicks' and 'Eyeballs' are the new currency. But burn rates are accelerating, and the path to profitability is non-existent for many.</p>
-        <p><strong>The Turn:</strong> Japan has entered a recession, and the Fed is tightening. Capital is becoming expensive just as these cash-burning machines need it most.</p>
-        """,
-        "source_priority": 3
-    },
-    {
-        "date": "1997-07-02",
-        "title": "MARKET MAYHEM: ASIAN CONTAGION",
-        "summary": "\"Currency Collapse\". The Thai Baht has devalued, triggering a financial tsunami across East Asia. The 'Asian Tigers' are drowning in dollar-denominated debt.",
-        "type": "HISTORICAL",
-        "filename": "newsletter_market_mayhem_jul_1997.html",
-        "is_sourced": True,
-        "full_body": """
-        <p><strong>The Baht Breaks.</strong> After months of speculative attacks, Thailand was forced to float the Baht today. It collapsed immediately. The contagion is spreading rapidly to Malaysia, Indonesia, and South Korea.</p>
-        <p><strong>The IMF Steps In:</strong> The International Monetary Fund is preparing massive bailouts, but the conditions—strict austerity and high interest rates—are exacerbating the economic pain.</p>
-        <p><strong>Global Impact:</strong> While Western markets remain resilient for now, the deflationary shock from Asia is lowering global bond yields and commodity prices. Long-Term Capital Management (LTCM) is watching closely.</p>
-        """,
-        "source_priority": 3
-    },
-    {
-        "date": "1929-10-29",
-        "title": "MARKET MAYHEM: BLACK TUESDAY",
-        "summary": "\"The Great Crash\". The Roaring Twenties have ended in a scream. The stock market has collapsed, wiping out billions in wealth and shattering public confidence.",
-        "type": "HISTORICAL",
-        "filename": "newsletter_market_mayhem_oct_1929.html",
-        "is_sourced": True,
-        "full_body": """
-        <p><strong>Wall Street Lays an Egg.</strong> Panic selling reached a crescendo today. Ticker tapes ran hours late. Rumors of suicides are rampant. The Dow Jones Industrial Average has lost 12% today alone, following yesterday's 13% drop.</p>
-        <p><strong>Margin Calls:</strong> The crash was fueled by leverage. Brokers are liquidating positions indiscriminately as investors fail to meet margin calls. The savings of a generation have evaporated.</p>
-        <p><strong>The Economy:</strong> While politicians promise that 'prosperity is just around the corner', the destruction of wealth is likely to lead to a severe contraction in consumer spending and investment. The shadow of Depression looms.</p>
-        """,
-        "source_priority": 3
-    },
-    {
-        "date": "1971-08-15",
-        "title": "MARKET MAYHEM: THE NIXON SHOCK",
-        "summary": "\"Gold Window Closed\". President Nixon has suspended the convertibility of the dollar into gold. The Bretton Woods system is dead. Currencies are now floating in a sea of fiat.",
-        "type": "HISTORICAL",
-        "filename": "newsletter_market_mayhem_aug_1971.html",
-        "is_sourced": True,
-        "full_body": """
-        <p><strong>The End of Money as We Knew It.</strong> In a Sunday evening address, President Nixon announced that the United States would no longer convert dollars to gold at a fixed value. The anchor of the global financial system has been cut loose.</p>
-        <p><strong>Inflation Unleashed:</strong> Without the discipline of gold, the printing presses are free to run. Markets are reacting with extreme volatility as traders try to price currencies in a world without a fixed standard.</p>
-        <p><strong>The New Era:</strong> We have entered the age of fiat currency. The value of money is now based solely on faith in the issuing government. The long-term consequences for inflation and debt are unknown, but the immediate impact is chaos.</p>
-        """,
-        "source_priority": 3
-    },
-    {
-        "date": "2010-05-06",
-        "title": "MARKET MAYHEM: THE FLASH CRASH",
-        "summary": "\"998 Points in Minutes\". The Dow Jones Industrial Average plunged nearly 1,000 points in minutes, only to recover shortly after. Algorithms have taken control, and they are fragile.",
-        "type": "HISTORICAL",
-        "filename": "newsletter_market_mayhem_may_2010.html",
-        "is_sourced": True,
-        "full_body": """
-        <p><strong>The Machines Took Over.</strong> At 2:45 PM, the US stock market collapsed. The Dow lost 9% of its value in a matter of minutes. Blue-chip stocks like P&G traded at pennies. Then, just as quickly, it bounced back.</p>
-        <p><strong>High Frequency Trading:</strong> The culprit appears to be a feedback loop of algorithmic selling. 'Spoofing' and 'quote stuffing' are the new weapons of market warfare. Human traders stood by, helpless, as the machines drove the market off a cliff.</p>
-        <p><strong>Fragility:</strong> Today proved that liquidity is an illusion. In a crisis, the HFTs pull their bids, leaving a vacuum. The market structure is broken.</p>
-        """,
-        "source_priority": 3
-    },
-    {
-        "date": "2021-01-28",
-        "title": "MARKET MAYHEM: THE MEME STOCK REVOLT",
-        "summary": "\"Power to the Players\". Retail traders on Reddit have cornered hedge funds in a massive short squeeze. GME hit $483. Robinhood has halted trading. The definition of 'value' is broken.",
-        "type": "HISTORICAL",
-        "filename": "newsletter_market_mayhem_jan_2021.html",
-        "is_sourced": True,
-        "full_body": """
-        <p><strong>David vs. Goliath.</strong> A band of retail traders on r/WallStreetBets has executed a short squeeze on GameStop ($GME) that has brought multi-billion dollar hedge funds to their knees. Melvin Capital requires a bailout.</p>
-        <p><strong>The Halt:</strong> In an unprecedented move, brokerages like Robinhood restricted buying of the volatile stocks, citing clearinghouse capital requirements. The outcry is massive. Calls for regulation and investigation are deafening.</p>
-        <p><strong>The New Market:</strong> Narrative is now a fundamental. Flows dictate price, not earnings. The democratization of finance has unleashed a chaotic force that Wall Street does not yet understand.</p>
-        """,
-        "source_priority": 3
-    }
-]
-
-# --- Report Template (Enhanced with Tiers and Provenance) ---
-
-HTML_TEMPLATE = """<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADAM v23.5 :: {title}</title>
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/market_mayhem_tiers.css">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="js/nav.js" defer></script>
-</head>
-<body class="{tier_class}">
-
-    <!-- System 2 Verification Overlay -->
-    <div id="system2-overlay" class="system2-overlay">
-        <div class="system2-terminal">
-            <div id="sys2-content"></div>
-        </div>
-    </div>
-
-    <!-- Toast Container -->
-    <div id="toast-container" class="cyber-toast-container"></div>
-
-    <!-- Raw Source Modal -->
-    <div id="raw-source-modal" class="raw-source-modal">
-        <div class="raw-source-header">
-            <span>SOURCE_DATA.JSON</span>
-            <span style="cursor:pointer; color:#cc0000;" onclick="toggleSource()">[CLOSE]</span>
-        </div>
-        <div class="raw-source-content" id="raw-source-content"></div>
-    </div>
-
-    <!-- Virtual Toolbar for High Tier -->
-    <div class="doc-toolbar" style="display: {toolbar_display};">
-        <div class="toolbar-item" onclick="window.location.href='market_mayhem_archive.html'"><strong>FILE</strong></div>
-        <div class="toolbar-item" onclick="showToast('EDIT MODE: READ ONLY (ARCHIVED)')">EDIT</div>
-        <div class="toolbar-item" onclick="toggleTheme()">VIEW</div>
-        <div class="toolbar-item" onclick="showToast('INSERT: PERMISSION DENIED')">INSERT</div>
-        <div class="toolbar-item" onclick="showToast('FORMAT: LOCKED')">FORMAT</div>
-        <div class="toolbar-item" onclick="runVerification()" style="color: #0078d7;"><strong>VERIFY</strong></div>
-        <div style="flex-grow:1;"></div>
-        <div class="toolbar-item" style="color:#666;">ADAM_V26_EDITOR</div>
-    </div>
-
-    <div style="max-width: 1400px; margin: 0 auto; padding: 10px 20px; display:flex; justify-content:space-between; align-items:center; display: {nav_display};">
-        <a href="market_mayhem_archive.html" class="cyber-btn">&larr; RETURN TO ARCHIVE</a>
-        <div style="font-family:'JetBrains Mono'; font-size:0.7rem; color:#666;">SECURE CONNECTION ESTABLISHED</div>
-    </div>
-
-    <div class="newsletter-wrapper">
-        <div class="paper-sheet" id="paper-sheet">
-
-            <!-- High Tier Header UI -->
-            <div class="doc-header-ui" style="display: {header_ui_display};">
-                <span id="verification-status">CONFIDENTIAL // SYSTEM 2 REVIEW</span>
-                <span>{prov_short}</span>
-            </div>
-
-            <div style="display:flex; justify-content:space-between; font-family:'JetBrains Mono'; font-size:0.8rem; color:#666; margin-bottom:20px; margin-top: 20px;">
-                <span>{date}</span>
-                <span>ID: {prov_short}</span>
-            </div>
-
-            <h1 class="title">{title}</h1>
-
-            <!-- Metadata Panel for High Tier (Embedded in Doc) -->
-            <div class="doc-metadata-panel" style="display: {metadata_panel_display};">
-                <div class="doc-metadata-item"><strong>Classification</strong>UNCLASSIFIED</div>
-                <div class="doc-metadata-item"><strong>Conviction</strong>{conviction}/100</div>
-                <div class="doc-metadata-item"><strong>Sentiment</strong>{sentiment_score}/100</div>
-                <div class="doc-metadata-item"><strong>Reviewer</strong>{reviewer_agent}</div>
-            </div>
-
-            <div id="financialChartContainer" style="display:none; margin-bottom: 30px;">
-                <canvas id="financialChart"></canvas>
-            </div>
-
-            {full_body}
-
-            <!-- Provenance Log (All Tiers) -->
-            <div class="provenance-log">
-                <div class="log-entry">
-                    <span>> HASH_CHECK</span>
-                    <span style="color:var(--terminal-green);">{prov_hash}</span>
-                </div>
-                <div class="log-entry">
-                    <span>> SENTIMENT_SCAN</span>
-                    <span>{sentiment_score} (DENSITY: {semantic_score})</span>
-                </div>
-                <div class="log-entry">
-                    <span>> CONVICTION_LOCK</span>
-                    <span>{conviction}%</span>
-                </div>
-                <div class="log-entry">
-                    <span>> CRITIQUE_LOG</span>
-                    <span>"{critique}"</span>
-                </div>
-            </div>
-
-            <a href="#" class="source-jump-btn" onclick="toggleSource(); return false;" title="View Source JSON">JUMP TO SOURCE</a>
-
-            <div style="margin-top: 40px; border-top: 1px solid #ccc; padding-top: 20px; font-style: italic; color: #666;">
-                End of Transmission.
-            </div>
-        </div>
-
-        <aside class="cyber-sidebar">
-            <div class="sidebar-widget">
-                <div class="sidebar-title">Intelligence Metadata</div>
-                <div class="stat-row"><span>DATE</span> <span class="stat-val">{date}</span></div>
-                <div class="stat-row"><span>TYPE</span> <span class="stat-val">{type}</span></div>
-                <div class="stat-row"><span>CLASS</span> <span class="stat-val">UNCLASSIFIED</span></div>
-                <div class="stat-row"><span>PROVENANCE</span> <span class="stat-val" title="{prov_hash}">{prov_short}</span></div>
-            </div>
-
-            <div class="sidebar-widget">
-                <div class="sidebar-title">Sentiment Analysis</div>
-                <div class="stat-row"><span>SCORE</span> <span class="stat-val">{sentiment_score}/100</span></div>
-                <div class="sentiment-bar">
-                    <div class="sentiment-fill" style="width: {sentiment_score}%;"></div>
-                </div>
-            </div>
-
-            <div class="sidebar-widget">
-                <div class="sidebar-title">Detected Entities</div>
-                <div class="tag-cloud">
-                    {entity_html}
-                </div>
-            </div>
-
-             <div class="sidebar-widget">
-                <div class="sidebar-title">Agent Conviction</div>
-                 <div class="stat-row"><span>CONFIDENCE</span> <span class="stat-val">{conviction}/100</span></div>
-                 <div class="sentiment-bar">
-                    <div class="sentiment-fill" style="width: {conviction}%; background: {conviction_color};"></div>
-                </div>
-            </div>
-
-            <div class="sidebar-widget">
-                <div class="sidebar-title">Semantic Analysis</div>
-                 <div class="stat-row"><span>DENSITY</span> <span class="stat-val">{semantic_score}/100</span></div>
-                 <div class="stat-row"><span>PROBABILITY</span> <span class="stat-val">{probability}/100</span></div>
-            </div>
-
-             <div class="sidebar-widget" style="border-color: #555;">
-                <div class="sidebar-title">Reviewer Agent Log</div>
-                 <div style="font-size: 0.75rem; color: #ccc; font-style: italic;">
-                    "{critique}"
-                </div>
-                <div class="stat-row" style="margin-top:10px;"><span>QUALITY SCORE</span> <span class="stat-val">{quality}/100</span></div>
-            </div>
-
-             <div class="sidebar-widget">
-                <div class="sidebar-title">Contributing Agents</div>
-                 <div style="display:flex; flex-direction:column; gap:5px;">
-                    {agent_html}
-                </div>
-            </div>
-        </aside>
-    </div>
-
-    <!-- Hidden Raw Data -->
-    <textarea id="hidden-raw-data" style="display:none;">{raw_source}</textarea>
-
-    <script>
-        // --- INTERACTION LOGIC ---
-
-        function showToast(msg) {{
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            toast.className = 'cyber-toast';
-            toast.innerText = '> ' + msg;
-            container.appendChild(toast);
-            setTimeout(() => {{
-                toast.style.opacity = '0';
-                setTimeout(() => toast.remove(), 300);
-            }}, 3000);
-        }}
-
-        function toggleTheme() {{
-            document.body.classList.toggle('dark-mode');
-            const isDark = document.body.classList.contains('dark-mode');
-            showToast('THEME: ' + (isDark ? 'DARK_MODE' : 'LIGHT_MODE'));
-        }}
-
-        function toggleSource() {{
-            const modal = document.getElementById('raw-source-modal');
-            const content = document.getElementById('raw-source-content');
-            const rawData = document.getElementById('hidden-raw-data').value;
-
-            if (modal.style.display === 'flex') {{
-                modal.style.display = 'none';
-            }} else {{
-                content.innerText = rawData || "NO SOURCE DATA AVAILABLE.";
-                modal.style.display = 'flex';
-            }}
-        }}
-
-        function runVerification() {{
-            const overlay = document.getElementById('system2-overlay');
-            const content = document.getElementById('sys2-content');
-            const status = document.getElementById('verification-status');
-
-            overlay.style.display = 'flex';
-            content.innerHTML = '';
-
-            const lines = [
-                "INITIATING SYSTEM 2 PROTOCOL...",
-                "VERIFYING CRYPTOGRAPHIC SIGNATURE...",
-                "HASH: {prov_hash}",
-                "CHECKING CHAIN OF CUSTODY...",
-                "ANALYZING SENTIMENT VECTORS...",
-                "CROSS-REFERENCING KNOWLEDGE GRAPH...",
-                "VERIFICATION COMPLETE."
-            ];
-
-            let i = 0;
-            function addLine() {{
-                if (i < lines.length) {{
-                    const div = document.createElement('div');
-                    div.className = 'system2-line';
-                    div.innerText = '> ' + lines[i];
-                    div.style.opacity = 1;
-                    content.appendChild(div);
-                    i++;
-                    setTimeout(addLine, 400);
-                }} else {{
-                    setTimeout(() => {{
-                        overlay.style.display = 'none';
-                        showToast('DOCUMENT VERIFIED');
-                        if(status) status.innerText = "VERIFIED // AUTHENTICATED";
-                        if(status) status.style.color = "#aaffaa";
-                    }}, 1000);
-                }}
-            }}
-            addLine();
-        }}
-
-        // Chart Injection Logic
-        const metricsData = {metrics_json};
-
-        if (metricsData && Object.keys(metricsData).length > 0) {{
-            const ctx = document.getElementById('financialChart');
-            const container = document.getElementById('financialChartContainer');
-
-            // Basic parsing of metrics structure (assuming flat or Year->Val)
-            let labels = [];
-            let values = [];
-            let labelName = "Metric";
-
-            // Try to find a timeseries
-            for (const [key, val] of Object.entries(metricsData)) {{
-                if (typeof val === 'object') {{
-                    // Likely year -> value
-                    labels = Object.keys(val);
-                    values = Object.values(val).map(v => parseFloat(v.replace(/[^0-9.-]/g, '')));
-                    labelName = key;
-                    break;
-                }}
-            }}
-
-            if (labels.length > 0) {{
-                container.style.display = 'block';
-                new Chart(ctx, {{
-                    type: 'bar',
-                    data: {{
-                        labels: labels,
-                        datasets: [{{
-                            label: labelName,
-                            data: values,
-                            backgroundColor: 'rgba(204, 0, 0, 0.5)',
-                            borderColor: '#cc0000',
-                            borderWidth: 1
-                        }}]
-                    }},
-                    options: {{
-                        responsive: true,
-                        plugins: {{ legend: {{ display: true }} }}
-                    }}
-                }});
-            }}
-        }}
-    </script>
-</body>
-</html>
-"""
-
 # --- Main Generation ---
+
+def load_template():
+    """Loads the HTML template from file."""
+    if not os.path.exists(TEMPLATE_FILE):
+        raise FileNotFoundError(f"Template file not found: {TEMPLATE_FILE}")
+    with open(TEMPLATE_FILE, 'r', encoding='utf-8') as f:
+        return f.read()
+
+def load_static_data():
+    """Loads static newsletter data from JSON."""
+    if not os.path.exists(DATA_FILE):
+        return []
+    with open(DATA_FILE, 'r', encoding='utf-8') as f:
+        return json.load(f)
 
 def get_all_data():
     """Gather all newsletter and report data."""
     all_items = []
 
     # 1. Add Static Data
-    for item in NEWSLETTER_DATA:
+    static_data = load_static_data()
+    for item in static_data:
         item = item.copy()
         full_text = f"{item['title']} {item['summary']} {item.get('full_body', '')}"
         item['sentiment_score'] = analyze_sentiment(full_text)
@@ -1211,6 +802,12 @@ def get_all_data():
 def generate_archive():
     print("Starting Enhanced Archive Generation...")
 
+    try:
+        HTML_TEMPLATE = load_template()
+    except FileNotFoundError as e:
+        print(f"Error: {e}")
+        return
+
     sorted_items = get_all_data()
 
     # Dump JSON Index
@@ -1234,8 +831,12 @@ def generate_archive():
 
         # Entity HTML
         entity_html = ""
-        for t in item['entities']['tickers']: entity_html += f'<a href="market_mayhem_archive.html?search={t}" class="tag ticker" style="text-decoration:none;">${t}</a>'
-        for s in item['entities']['sovereigns']: entity_html += f'<a href="market_mayhem_archive.html?search={s}" class="tag" style="text-decoration:none;">{s}</a>'
+        for t in item['entities']['tickers']: entity_html += f'<a href="market_mayhem_archive_v24.html?search={t}" class="tag ticker" style="text-decoration:none;">${t}</a>'
+        for s in item['entities']['sovereigns']: entity_html += f'<a href="market_mayhem_archive_v24.html?search={s}" class="tag" style="text-decoration:none;">{s}</a>'
+        for k in item['entities'].get('keywords', []): entity_html += f'<a href="market_mayhem_archive_v24.html?search={k}" class="tag" style="text-decoration:none; border-color:#666;">{k}</a>'
+
+        if not entity_html:
+            entity_html = f'<span class="tag" style="border-color:#444;">{item["type"]}</span>'
 
         # Agent HTML (with Avatars)
         agent_html = ""
@@ -1636,6 +1237,15 @@ def generate_archive():
             document.getElementById('searchInput').value = term;
             applyFilters();
         }
+
+        // Initialize from URL params
+        window.addEventListener('DOMContentLoaded', () => {
+            const params = new URLSearchParams(window.location.search);
+            const search = params.get('search');
+            if (search) {
+                setSearch(search);
+            }
+        });
     </script>
 </body>
 </html>

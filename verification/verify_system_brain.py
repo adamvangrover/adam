@@ -1,51 +1,54 @@
+from playwright.sync_api import sync_playwright
 import os
 import sys
-import threading
+import subprocess
 import time
-from http.server import SimpleHTTPRequestHandler, HTTPServer
-from playwright.sync_api import sync_playwright
+import signal
 
-# Server configuration
-PORT = 8124
-SERVER_URL = f"http://localhost:{PORT}/showcase/system_brain.html"
+def run():
+    # Start server
+    server_process = subprocess.Popen(
+        [sys.executable, "-m", "http.server", "8081"],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL
+    )
+    time.sleep(2) # Give it time to start
 
-def start_server():
-    """Starts a simple HTTP server in a background thread."""
-    root_dir = os.getcwd()
-    class Handler(SimpleHTTPRequestHandler):
-        def log_message(self, format, *args):
-            pass
+    try:
+        with sync_playwright() as p:
+            browser = p.chromium.launch(headless=True)
+            page = browser.new_page()
+            page.set_viewport_size({"width": 1280, "height": 800})
 
-    httpd = HTTPServer(('localhost', PORT), Handler)
-    httpd.serve_forever()
+            url = "http://localhost:8081/showcase/system_brain.html"
+            print(f"Navigating to {url}")
+            page.goto(url)
 
-def verify_system_brain():
-    with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)
-        page = browser.new_page()
+            # Wait for data to load and render
+            try:
+                page.wait_for_selector("#agent-count", timeout=5000)
+                page.wait_for_selector("#synapse-list tr", timeout=5000)
+                print("Data loaded.")
 
-        print(f"Navigating to {SERVER_URL}")
-        page.goto(SERVER_URL)
+                # Assert knowledge percent is not default
+                k_percent = page.text_content("#knowledge-percent")
+                if k_percent == "--%":
+                    print("FAIL: Knowledge coverage percentage is still default (--%)")
+                else:
+                    print(f"PASS: Knowledge coverage percentage is {k_percent}")
 
-        # Wait for Chart.js canvases to be present
-        try:
-            page.wait_for_selector("#memoryChart", timeout=5000)
-            print("Memory Chart found")
-            page.wait_for_selector("#agent-list li", timeout=5000)
-            print("Agent list populated")
-        except Exception as e:
-            print(f"Timeout waiting for elements: {e}")
+            except Exception as e:
+                print(f"Timeout or error: {e}")
 
-        os.makedirs("verification", exist_ok=True)
-        screenshot_path = "verification/system_brain.png"
-        page.screenshot(path=screenshot_path)
-        print(f"Screenshot saved to {screenshot_path}")
+            screenshot_path = "verification/system_brain_screenshot.png"
+            page.screenshot(path=screenshot_path, full_page=True)
+            print(f"Screenshot saved to {screenshot_path}")
 
-        browser.close()
+            browser.close()
+    finally:
+        server_process.terminate()
+        server_process.wait()
 
 if __name__ == "__main__":
-    server_thread = threading.Thread(target=start_server, daemon=True)
-    server_thread.start()
-    time.sleep(1)
-    verify_system_brain()
-    sys.exit(0)
+    os.makedirs("verification", exist_ok=True)
+    run()

@@ -11,6 +11,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="js/nav.js" defer></script>
+    <script src="js/market_mayhem_viewer.js" defer></script>
 </head>
 <body class="tier-high">
 
@@ -35,8 +36,11 @@
 
     <!-- Virtual Toolbar for High Tier -->
     <div class="doc-toolbar" style="display: flex;">
-        <div class="toolbar-item" onclick="window.location.href='market_mayhem_archive.html'"><strong>FILE</strong></div>
-        <div class="toolbar-item" onclick="showToast('EDIT MODE: READ ONLY (ARCHIVED)')">EDIT</div>
+        <div class="toolbar-item" onclick="window.location.href='market_mayhem_archive_v24.html'"><strong>FILE</strong></div>
+        <div class="toolbar-item" onclick="toggleRedactionMode()">REDACT</div>
+        <div class="toolbar-item" onclick="printReport()">PRINT</div>
+        <div class="toolbar-item" onclick="shareReport()">SHARE</div>
+        <div class="toolbar-item" onclick="downloadReport()">DOWNLOAD</div>
         <div class="toolbar-item" onclick="toggleTheme()">VIEW</div>
         <div class="toolbar-item" onclick="showToast('INSERT: PERMISSION DENIED')">INSERT</div>
         <div class="toolbar-item" onclick="showToast('FORMAT: LOCKED')">FORMAT</div>
@@ -46,12 +50,15 @@
     </div>
 
     <div style="max-width: 1400px; margin: 0 auto; padding: 10px 20px; display:flex; justify-content:space-between; align-items:center; display: none;">
-        <a href="market_mayhem_archive.html" class="cyber-btn">&larr; RETURN TO ARCHIVE</a>
+        <a href="market_mayhem_archive_v24.html" class="cyber-btn">&larr; RETURN TO ARCHIVE</a>
         <div style="font-family:'JetBrains Mono'; font-size:0.7rem; color:#666;">SECURE CONNECTION ESTABLISHED</div>
     </div>
 
     <div class="newsletter-wrapper">
         <div class="paper-sheet" id="paper-sheet">
+
+            <!-- Top Secret Stamp -->
+            <div id="top-secret-stamp" class="top-secret-stamp">TOP SECRET</div>
 
             <!-- High Tier Header UI -->
             <div class="doc-header-ui" style="display: flex;">
@@ -78,7 +85,9 @@
                 <canvas id="financialChart"></canvas>
             </div>
 
-            <h2>Executive Summary</h2><p>Nvidia's Q4 FY25 results were exceptional, exceeding expectations.  However, considering potential headwinds and incorporating a moderate shock in the out years, we revise our price target to $315 while maintaining a "Strong Buy" rating.</p><h2>Q4 Fy25 Highlights</h2><ul><li>Record quarterly revenue of $39.3 billion, up 78% year-over-year.</li><li>Record data center revenue of $35.6 billion, up 93% year-over-year.</li><li>Strong demand for Blackwell architecture, with $11 billion in revenue in its first quarter.</li><li>Gaming revenue down year-over-year due to supply constraints, but expected to rebound with new GeForce RTX 50 series launch.</li><li>Automotive revenue up 103% year-over-year, driven by self-driving platforms.</li></ul><h2>Fy25 Highlights</h2><ul><li>Record full-year revenue of $130.5 billion, up 114% year-over-year.</li><li>Data center revenue for FY25 was $115.2 billion, up 142% year-over-year.</li><li>Gaming revenue up 9% year-over-year, driven by GeForce RTX 40 series.</li><li>Professional Visualization revenue up 21% year-over-year.</li><li>Automotive revenue up 55% year-over-year.</li></ul><h2>Key Growth Drivers</h2><ul><li>Continued strong demand for AI and HPC solutions.</li><li>Rapid adoption of Blackwell architecture in data centers.</li><li>Expanding use of AI in gaming, professional visualization, and automotive.</li><li>Growth of cloud gaming and the metaverse.</li><li>Increasing adoption of autonomous driving technology.</li></ul><h2>Challenges</h2><ul><li>Maintaining technological leadership in a competitive landscape.</li><li>Managing supply chain constraints and geopolitical risks.</li><li>Addressing environmental concerns related to energy consumption.</li></ul><h2>Financial Performance</h2><h3>Revenue Growth</h3><p>Exceeded expectations in Q4 FY25 and FY25.</p><h3>Profitability</h3><p>Strong margins, but potential pressure from R&D and competition.</p><h3>Balance Sheet</h3><p>Healthy with ample liquidity.</p><h2>Valuation</h2><h3>Model</h3><p>DCF and comparable company analysis</p><h3>Justification</h3><p>The updated DCF model incorporates the strong Q4 results, revised growth expectations, and potential shocks in the out years.  Comparable company analysis supports the premium valuation given Nvidia's growth prospects and market leadership.</p><h2>Dcf Details</h2><h3>Revenue Growth</h3><ul><li><strong>year:</strong> FY26, <strong>growth:</strong> 25%</li><li><strong>year:</strong> FY27, <strong>growth:</strong> 20%</li><li><strong>year:</strong> FY28-FY29, <strong>growth:</strong> 18%</li><li><strong>year:</strong> FY30-FY31, <strong>growth:</strong> 15%</li><li><strong>year:</strong> FY32-FY34, <strong>growth:</strong> 10%</li><li><strong>year:</strong> Terminal, <strong>growth:</strong> 3%</li></ul><h3>Gross Margin</h3><p>Gradually declining from 73% in FY25 to 68% in the terminal year.</p><h3>Operating Expenses</h3><p>Growing slower than revenue, but with detailed analysis of R&D.</p><h3>Tax Rate</h3><p>17%</p><h3>Discount Rate Wacc</h3><p>11%</p><h3>Terminal Multiple</h3><p>14x</p><h2>Trading Levels</h2><h3>Equity</h3><h4>Outlook</h4><p>Very Positive</p><h4>Price Target</h4><p>315</p><h4>Potential Upside</h4><p>150%</p>
+            <div id="document-body">
+                <h2>Executive Summary</h2><p>Nvidia's Q4 FY25 results were exceptional, exceeding expectations.  However, considering potential headwinds and incorporating a moderate shock in the out years, we revise our price target to $315 while maintaining a "Strong Buy" rating.</p><h2>Q4 Fy25 Highlights</h2><ul><li>Record quarterly revenue of $39.3 billion, up 78% year-over-year.</li><li>Record data center revenue of $35.6 billion, up 93% year-over-year.</li><li>Strong demand for Blackwell architecture, with $11 billion in revenue in its first quarter.</li><li>Gaming revenue down year-over-year due to supply constraints, but expected to rebound with new GeForce RTX 50 series launch.</li><li>Automotive revenue up 103% year-over-year, driven by self-driving platforms.</li></ul><h2>Fy25 Highlights</h2><ul><li>Record full-year revenue of $130.5 billion, up 114% year-over-year.</li><li>Data center revenue for FY25 was $115.2 billion, up 142% year-over-year.</li><li>Gaming revenue up 9% year-over-year, driven by GeForce RTX 40 series.</li><li>Professional Visualization revenue up 21% year-over-year.</li><li>Automotive revenue up 55% year-over-year.</li></ul><h2>Key Growth Drivers</h2><ul><li>Continued strong demand for AI and HPC solutions.</li><li>Rapid adoption of Blackwell architecture in data centers.</li><li>Expanding use of AI in gaming, professional visualization, and automotive.</li><li>Growth of cloud gaming and the metaverse.</li><li>Increasing adoption of autonomous driving technology.</li></ul><h2>Challenges</h2><ul><li>Maintaining technological leadership in a competitive landscape.</li><li>Managing supply chain constraints and geopolitical risks.</li><li>Addressing environmental concerns related to energy consumption.</li></ul><h2>Financial Performance</h2><h3>Revenue Growth</h3><p>Exceeded expectations in Q4 FY25 and FY25.</p><h3>Profitability</h3><p>Strong margins, but potential pressure from R&D and competition.</p><h3>Balance Sheet</h3><p>Healthy with ample liquidity.</p><h2>Valuation</h2><h3>Model</h3><p>DCF and comparable company analysis</p><h3>Justification</h3><p>The updated DCF model incorporates the strong Q4 results, revised growth expectations, and potential shocks in the out years.  Comparable company analysis supports the premium valuation given Nvidia's growth prospects and market leadership.</p><h2>Dcf Details</h2><h3>Revenue Growth</h3><ul><li><strong>year:</strong> FY26, <strong>growth:</strong> 25%</li><li><strong>year:</strong> FY27, <strong>growth:</strong> 20%</li><li><strong>year:</strong> FY28-FY29, <strong>growth:</strong> 18%</li><li><strong>year:</strong> FY30-FY31, <strong>growth:</strong> 15%</li><li><strong>year:</strong> FY32-FY34, <strong>growth:</strong> 10%</li><li><strong>year:</strong> Terminal, <strong>growth:</strong> 3%</li></ul><h3>Gross Margin</h3><p>Gradually declining from 73% in FY25 to 68% in the terminal year.</p><h3>Operating Expenses</h3><p>Growing slower than revenue, but with detailed analysis of R&D.</p><h3>Tax Rate</h3><p>17%</p><h3>Discount Rate Wacc</h3><p>11%</p><h3>Terminal Multiple</h3><p>14x</p><h2>Trading Levels</h2><h3>Equity</h3><h4>Outlook</h4><p>Very Positive</p><h4>Price Target</h4><p>315</p><h4>Potential Upside</h4><p>150%</p>
+            </div>
 
             <!-- Provenance Log (All Tiers) -->
             <div class="provenance-log">
@@ -127,7 +136,7 @@
             <div class="sidebar-widget">
                 <div class="sidebar-title">Detected Entities</div>
                 <div class="tag-cloud">
-
+                    <a href="market_mayhem_archive_v24.html?search=AI" class="tag" style="text-decoration:none; border-color:#666;">AI</a><a href="market_mayhem_archive_v24.html?search=Cloud" class="tag" style="text-decoration:none; border-color:#666;">Cloud</a><a href="market_mayhem_archive_v24.html?search=EV" class="tag" style="text-decoration:none; border-color:#666;">EV</a><a href="market_mayhem_archive_v24.html?search=Energy" class="tag" style="text-decoration:none; border-color:#666;">Energy</a><a href="market_mayhem_archive_v24.html?search=Growth" class="tag" style="text-decoration:none; border-color:#666;">Growth</a>
                 </div>
             </div>
 
@@ -173,7 +182,14 @@
   "entities": {
     "tickers": [],
     "agents": [],
-    "sovereigns": []
+    "sovereigns": [],
+    "keywords": [
+      "AI",
+      "Cloud",
+      "EV",
+      "Energy",
+      "Growth"
+    ]
   },
   "provenance_hash": "3e02ebc0a6de0c8c5124063f546b5f0e52fe46c73f4837e13903899e33f2d383",
   "filename": "nvda_company_report_20250226.html",
@@ -187,79 +203,6 @@
 }</textarea>
 
     <script>
-        // --- INTERACTION LOGIC ---
-
-        function showToast(msg) {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            toast.className = 'cyber-toast';
-            toast.innerText = '> ' + msg;
-            container.appendChild(toast);
-            setTimeout(() => {
-                toast.style.opacity = '0';
-                setTimeout(() => toast.remove(), 300);
-            }, 3000);
-        }
-
-        function toggleTheme() {
-            document.body.classList.toggle('dark-mode');
-            const isDark = document.body.classList.contains('dark-mode');
-            showToast('THEME: ' + (isDark ? 'DARK_MODE' : 'LIGHT_MODE'));
-        }
-
-        function toggleSource() {
-            const modal = document.getElementById('raw-source-modal');
-            const content = document.getElementById('raw-source-content');
-            const rawData = document.getElementById('hidden-raw-data').value;
-
-            if (modal.style.display === 'flex') {
-                modal.style.display = 'none';
-            } else {
-                content.innerText = rawData || "NO SOURCE DATA AVAILABLE.";
-                modal.style.display = 'flex';
-            }
-        }
-
-        function runVerification() {
-            const overlay = document.getElementById('system2-overlay');
-            const content = document.getElementById('sys2-content');
-            const status = document.getElementById('verification-status');
-
-            overlay.style.display = 'flex';
-            content.innerHTML = '';
-
-            const lines = [
-                "INITIATING SYSTEM 2 PROTOCOL...",
-                "VERIFYING CRYPTOGRAPHIC SIGNATURE...",
-                "HASH: 3e02ebc0a6de0c8c5124063f546b5f0e52fe46c73f4837e13903899e33f2d383",
-                "CHECKING CHAIN OF CUSTODY...",
-                "ANALYZING SENTIMENT VECTORS...",
-                "CROSS-REFERENCING KNOWLEDGE GRAPH...",
-                "VERIFICATION COMPLETE."
-            ];
-
-            let i = 0;
-            function addLine() {
-                if (i < lines.length) {
-                    const div = document.createElement('div');
-                    div.className = 'system2-line';
-                    div.innerText = '> ' + lines[i];
-                    div.style.opacity = 1;
-                    content.appendChild(div);
-                    i++;
-                    setTimeout(addLine, 400);
-                } else {
-                    setTimeout(() => {
-                        overlay.style.display = 'none';
-                        showToast('DOCUMENT VERIFIED');
-                        if(status) status.innerText = "VERIFIED // AUTHENTICATED";
-                        if(status) status.style.color = "#aaffaa";
-                    }, 1000);
-                }
-            }
-            addLine();
-        }
-
         // Chart Injection Logic
         const metricsData = {};
 

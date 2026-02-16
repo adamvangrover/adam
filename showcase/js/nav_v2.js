@@ -28,7 +28,7 @@ class AdamNavigator {
     /**
      * MASTER BOOT SEQUENCE
      */
-    init() {
+    async init() {
         try {
             console.log(`[AdamNavigator] Initializing v${this.version}...`);
 
@@ -41,17 +41,20 @@ class AdamNavigator {
             // 2. Resolve Environment Paths
             this._resolvePaths();
 
-            // 3. Inject External Dependencies (CSS/Fonts)
+            // 3. Load Site Map
+            await this._fetchSiteMap();
+
+            // 4. Inject External Dependencies (CSS/Fonts)
             this._injectDependencies();
 
-            // 4. Boot Core Application Logic (Mock Data/App.js)
+            // 5. Boot Core Application Logic (Mock Data/App.js)
             this._bootCoreSystem();
 
-            // 5. Render Interface
+            // 6. Render Interface
             this._renderNavigation();
             this._injectGlobalStyles();
 
-            // 6. Bind Human Interaction Events
+            // 7. Bind Human Interaction Events
             this._bindEvents();
 
             console.log("[AdamNavigator] System Online.");
@@ -62,19 +65,40 @@ class AdamNavigator {
         }
     }
 
+    async _fetchSiteMap() {
+        try {
+            const response = await fetch(this._sanitizePath(`${this.showcasePath}/site_map.json`));
+            if (response.ok) {
+                this.siteMap = await response.json();
+                console.log("[AdamNavigator] Site Map Loaded");
+            }
+        } catch (e) {
+            console.warn("[AdamNavigator] Site Map Load Failed, using fallback.", e);
+        }
+    }
+
     /**
      * Determines relative paths based on script tag location.
      * Critical for sub-directory navigation.
      */
     _resolvePaths() {
-        const scriptTag = document.querySelector('script[src*="nav.js"]');
+        // Try to find the script tag that loaded this file
+        let scriptTag = document.querySelector('script[src*="nav_v2.js"]');
+        if (!scriptTag) scriptTag = document.querySelector('script[src*="nav.js"]');
+
         const dataRoot = scriptTag ? scriptTag.getAttribute('data-root') : null;
 
-        this.rootPath = dataRoot || '.';
+        // Fallback: If we are in /showcase/ and no data-root, assume root is ..
+        if (!dataRoot && window.location.pathname.includes('/showcase/')) {
+            this.rootPath = '..';
+        } else {
+            this.rootPath = dataRoot || '.';
+        }
+
         const cleanRoot = this.rootPath.replace(/\/$/, '');
         this.showcasePath = `${cleanRoot}/showcase`;
 
-        console.log(`[AdamNavigator] Environment: ${this.isGitHub ? 'GITHUB' : 'LOCAL'} | Root: ${this.rootPath}`);
+        console.log(`[AdamNavigator] Environment: ${this.isGitHub ? 'GITHUB' : 'LOCAL'} | Root: ${this.rootPath} | Showcase: ${this.showcasePath}`);
     }
 
     /**
@@ -100,6 +124,13 @@ class AdamNavigator {
                 link.href = this.config.dependencies.fontAwesome;
                 document.head.appendChild(link);
             }
+            // Load Mayhem Overlay CSS
+            if (!document.querySelector('link[href*="mayhem_overlay.css"]')) {
+                const link = document.createElement('link');
+                link.rel = "stylesheet";
+                link.href = this._sanitizePath(`${this.showcasePath}/css/mayhem_overlay.css`);
+                document.head.appendChild(link);
+            }
         }, 0);
     }
 
@@ -107,6 +138,13 @@ class AdamNavigator {
      * Loads Mock Data and App Logic sequentially.
      */
     _bootCoreSystem() {
+        // Load Mayhem Overlay JS
+        if (!window.mayhemOverlay) {
+            const overlayScript = document.createElement('script');
+            overlayScript.src = this._sanitizePath(`${this.showcasePath}/js/mayhem_overlay.js`);
+            document.body.appendChild(overlayScript);
+        }
+
         if (!window.dataManager) {
             const mockScript = document.createElement('script');
             mockScript.src = this._sanitizePath(`${this.showcasePath}/js/mock_data.js`);
@@ -126,16 +164,34 @@ class AdamNavigator {
      * Returns the Menu Configuration Object
      */
     _getMenuConfig() {
+        if (this.siteMap && this.siteMap.categories) {
+            const menu = [];
+            this.siteMap.categories.forEach((cat, index) => {
+                if (index > 0) menu.push({ type: 'divider' });
+                cat.items.forEach(item => {
+                    menu.push({
+                        name: item.name,
+                        icon: item.icon || 'fa-circle',
+                        link: item.link
+                    });
+                });
+            });
+            menu.push({ type: 'divider' });
+            menu.push({ name: 'Root Directory', icon: 'fa-folder-tree', link: 'ROOT' });
+            return menu;
+        }
+
+        // Fallback
         return [
             { name: 'Mission Control', icon: 'fa-tachometer-alt', link: 'index.html' },
+            { name: 'Mission Control v3', icon: 'fa-satellite-dish', link: 'mission_control_v3.html' },
+            { name: 'Analytics Hub', icon: 'fa-chart-pie', link: 'analytics_hub.html' },
             { name: 'Chat Portal', icon: 'fa-comments', link: 'chat.html' },
             { name: 'Terminal', icon: 'fa-terminal', link: 'terminal.html' },
             { type: 'divider' },
             { name: 'System Evolution', icon: 'fa-history', link: 'evolution_v2.html' },
             { name: 'Market Archive', icon: 'fa-archive', link: 'archive_v2/index.html' },
-            { type: 'divider' },
-            { name: 'System Evolution', icon: 'fa-history', link: 'evolution_v2.html' },
-            { name: 'Market Archive', icon: 'fa-archive', link: 'archive_v2/index.html' },
+            { name: 'Mayhem Neural Link', icon: 'fa-brain', link: 'javascript:window.mayhemOverlay.toggle()' },
             { type: 'divider' },
             { name: 'Trading Platform', icon: 'fa-chart-line', link: 'trading.html' },
             { name: 'Robo Advisor', icon: 'fa-robot', link: 'robo_advisor.html' },
@@ -197,6 +253,8 @@ class AdamNavigator {
 
             if (item.link === 'ROOT') {
                 linkUrl = this._sanitizePath(`${this.rootPath}/index.html`);
+            } else if (item.link.startsWith('javascript:')) {
+                linkUrl = item.link;
             } else {
                 linkUrl = this._sanitizePath(`${this.showcasePath}/${item.link}`);
 

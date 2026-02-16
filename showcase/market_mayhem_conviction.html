@@ -8,33 +8,85 @@
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        /* Embedded CSS for simplicity */
         .loading {
             color: #fff;
             text-align: center;
             font-family: 'JetBrains Mono', monospace;
             margin-top: 100px;
         }
+        /* Modal Styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: #111;
+            border: 2px solid #00f3ff;
+            padding: 20px;
+            width: 80%;
+            max-width: 900px;
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.3);
+            position: relative;
+        }
+        .modal-close {
+            position: absolute;
+            top: 10px; right: 15px;
+            color: #ff0000;
+            cursor: pointer;
+            font-family: 'JetBrains Mono';
+            font-weight: bold;
+        }
     </style>
-<link rel="stylesheet" href="css/cyberpunk-core.css">
+    <link rel="stylesheet" href="css/cyberpunk-core.css">
 </head>
 <body>
 
-    <nav class="binder-nav">
-        <div style="font-weight: bold; color: #00f3ff; letter-spacing: 1px;">ADAM // CONVICTION PAPER</div>
+    <!-- Sidebar Table of Contents -->
+    <div id="sidebar" class="sidebar-toc">
+        <input type="text" id="sidebarSearch" class="sidebar-search" placeholder="SEARCH INTELLIGENCE..." onkeyup="filterTOC()">
+        <ul id="tocList" class="toc-list">
+            <!-- JS will populate this -->
+        </ul>
+    </div>
 
-        <div style="display: flex; gap: 10px;">
-            <button id="prevBtn" class="binder-btn" onclick="prevPage()">Previous</button>
-            <span id="pageIndicator" style="font-family: 'JetBrains Mono'; font-size: 0.8rem; align-self: center; margin: 0 10px; color: #aaa;">PAGE 1 / 1</span>
-            <button id="nextBtn" class="binder-btn" onclick="nextPage()">Next</button>
+    <!-- Chart Modal -->
+    <div id="trendModal" class="modal-overlay">
+        <div class="modal-content">
+            <span class="modal-close" onclick="toggleTrendModal()">[CLOSE]</span>
+            <h2 style="font-family:'JetBrains Mono'; color:#00f3ff; margin-top:0;">SENTIMENT TRENDS</h2>
+            <canvas id="trendChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Navigation Bar -->
+    <nav class="binder-nav">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <button id="sidebarToggle" class="binder-btn" onclick="toggleSidebar()">☰ INDEX</button>
+            <div style="font-weight: bold; color: #00f3ff; letter-spacing: 1px;">ADAM // CONVICTION PAPER</div>
         </div>
 
-        <div>
-            <button class="binder-btn print-btn" onclick="window.print()">PRINT TO PDF</button>
+        <div style="display: flex; gap: 10px;">
+            <button id="prevBtn" class="binder-btn" onclick="prevPage()">PREVIOUS</button>
+            <span id="pageIndicator" style="font-family: 'JetBrains Mono'; font-size: 0.8rem; align-self: center; margin: 0 10px; color: #aaa;">PAGE 1 / 1</span>
+            <button id="nextBtn" class="binder-btn" onclick="nextPage()">NEXT</button>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <button id="terminalBtn" class="binder-btn" onclick="toggleTerminalMode()">>_ TERMINAL</button>
+            <button id="trendBtn" class="binder-btn" onclick="toggleTrendModal()">📈 TRENDS</button>
+            <button id="redactTool" class="binder-btn" onclick="toggleRedactMode()" title="Toggle Redaction Tool">█ REDACT</button>
+            <button id="glitchBtn" class="binder-btn" onclick="triggerGlitch()">⚡ GLITCH</button>
+            <button class="binder-btn print-btn" onclick="window.print()">PRINT</button>
             <a href="market_mayhem_archive.html" class="binder-btn" style="text-decoration: none; margin-left: 10px;">EXIT</a>
         </div>
     </nav>
 
+    <!-- Main Content Area -->
     <div id="binderContainer" class="binder-container">
         <div class="loading">Loading Intelligence...</div>
     </div>
@@ -42,14 +94,102 @@
     <script>
         let articles = [];
         let currentIndex = 0;
+        let isRedactMode = false;
+        let isTerminalMode = false;
+        let chartInstance = null;
+        let glitchTimer = null;
 
+        // UI Interactions
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const container = document.getElementById('binderContainer');
+            sidebar.classList.toggle('open');
+            container.classList.toggle('shifted');
+            document.getElementById('sidebarToggle').classList.toggle('active');
+        }
+
+        function toggleTerminalMode() {
+            isTerminalMode = !isTerminalMode;
+            document.body.classList.toggle('terminal-mode');
+            const btn = document.getElementById('terminalBtn');
+            if (isTerminalMode) {
+                btn.classList.add('active');
+                btn.innerHTML = ">_ GUI";
+            } else {
+                btn.classList.remove('active');
+                btn.innerHTML = ">_ TERMINAL";
+            }
+        }
+
+        function toggleTrendModal() {
+            const modal = document.getElementById('trendModal');
+            if (modal.style.display === 'flex') {
+                modal.style.display = 'none';
+            } else {
+                modal.style.display = 'flex';
+                renderTrendChart();
+            }
+        }
+
+        function triggerGlitch() {
+            const sheet = document.querySelector('.paper-sheet');
+            if (!sheet) return;
+            sheet.classList.add('glitch-effect');
+            setTimeout(() => {
+                sheet.classList.remove('glitch-effect');
+            }, 500); // 0.5s duration
+        }
+
+        function startRandomGlitch() {
+            // Clear any existing timer
+            if (glitchTimer) clearTimeout(glitchTimer);
+
+            // Random interval between 8 and 20 seconds
+            const delay = Math.random() * 12000 + 8000;
+
+            glitchTimer = setTimeout(() => {
+                // Only glitch if modal is closed and not in redaction mode (to avoid annoying user)
+                const modal = document.getElementById('trendModal');
+                const modalOpen = modal.style.display === 'flex';
+
+                if (!modalOpen && !isRedactMode) {
+                    triggerGlitch();
+                }
+                startRandomGlitch(); // Schedule next
+            }, delay);
+        }
+
+        function toggleRedactMode() {
+            isRedactMode = !isRedactMode;
+            const btn = document.getElementById('redactTool');
+            const sheet = document.querySelector('.paper-sheet');
+
+            if (isRedactMode) {
+                btn.classList.add('active');
+                if (sheet) sheet.classList.add('redaction-mode');
+            } else {
+                btn.classList.remove('active');
+                if (sheet) sheet.classList.remove('redaction-mode');
+            }
+        }
+
+        function handleRedaction(e) {
+            if (!isRedactMode) return;
+            // Allow redacting P, SPAN, LI, H1-H6 elements
+            const validTags = ['P', 'SPAN', 'LI', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'TD'];
+            if (validTags.includes(e.target.tagName)) {
+                e.target.classList.toggle('redacted-text');
+            }
+        }
+
+        // Data Loading & Processing
         async function loadData() {
             try {
                 const response = await fetch('data/market_mayhem_index.json');
                 if (!response.ok) throw new Error('Failed to load index');
                 articles = await response.json();
 
-                // Filter out items without full body or minimal content
+                // Filter valid articles
                 articles = articles.filter(a => a.full_body && a.full_body.length > 50);
 
                 if (articles.length === 0) {
@@ -57,61 +197,189 @@
                     return;
                 }
 
-                renderPage(currentIndex);
+                generateTOC();
+                handleDeepLinking();
             } catch (e) {
                 console.error(e);
                 document.getElementById('binderContainer').innerHTML = `<div class="loading" style="color:red">Error loading data: ${e.message}</div>`;
             }
         }
 
+        function generateTOC() {
+            const list = document.getElementById('tocList');
+            list.innerHTML = '';
+            articles.forEach((item, index) => {
+                const li = document.createElement('li');
+                li.className = 'toc-item';
+                li.innerHTML = `
+                    <span class="toc-date">${item.date}</span>
+                    ${item.title}
+                `;
+                li.onclick = () => {
+                    if (index !== currentIndex) {
+                        animatePageTurn(index > currentIndex ? 'next' : 'prev', () => {
+                            currentIndex = index;
+                            renderPage(currentIndex);
+                        });
+                    }
+                    if (window.innerWidth < 800) toggleSidebar(); // Auto-close on mobile
+                };
+                list.appendChild(li);
+            });
+        }
+
+        function filterTOC() {
+            const query = document.getElementById('sidebarSearch').value.toLowerCase();
+            const items = document.querySelectorAll('.toc-item');
+            items.forEach(item => {
+                if (item.innerText.toLowerCase().includes(query)) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        function handleDeepLinking() {
+            const params = new URLSearchParams(window.location.search);
+
+            // Check for ?page=X
+            if (params.has('page')) {
+                const pageIdx = parseInt(params.get('page')) - 1;
+                if (pageIdx >= 0 && pageIdx < articles.length) {
+                    currentIndex = pageIdx;
+                }
+            }
+            // Check for ?file=filename.html
+            else if (params.has('file')) {
+                const filename = params.get('file');
+                const idx = articles.findIndex(a => a.filename === filename);
+                if (idx !== -1) currentIndex = idx;
+            }
+
+            renderPage(currentIndex);
+        }
+
+        function updateURL(index) {
+            const item = articles[index];
+            const url = new URL(window.location);
+            url.searchParams.set('page', index + 1);
+            if (item.filename) {
+                url.searchParams.set('file', item.filename);
+            }
+            window.history.pushState({}, '', url);
+        }
+
+        // Animation
+        function animatePageTurn(direction, callback) {
+            const wrapper = document.querySelector('.sheet-wrapper');
+            if (!wrapper) {
+                callback();
+                return;
+            }
+
+            // Remove existing animation classes
+            wrapper.classList.remove('page-turning-left', 'page-turning-right');
+
+            // Trigger reflow
+            void wrapper.offsetWidth;
+
+            const animClass = direction === 'next' ? 'page-turning-left' : 'page-turning-right';
+            wrapper.classList.add(animClass);
+
+            // Wait for half the animation (0.3s) to swap content, looks more realistic
+            setTimeout(() => {
+                callback();
+                // Remove class after animation completes
+                setTimeout(() => {
+                    wrapper.classList.remove(animClass);
+                }, 300);
+            }, 300);
+        }
+
+        // Rendering Logic
         function renderPage(index) {
             const container = document.getElementById('binderContainer');
             const item = articles[index];
 
-            // Update Indicator
+            // Update Global State
+            updateURL(index);
+
+            // Update UI State
             document.getElementById('pageIndicator').innerText = `PAGE ${index + 1} / ${articles.length}`;
             document.getElementById('prevBtn').disabled = index === 0;
             document.getElementById('nextBtn').disabled = index === articles.length - 1;
 
-            // Generate Content
+            // Highlight TOC item
+            document.querySelectorAll('.toc-item').forEach((el, i) => {
+                if (i === index) {
+                    el.classList.add('active');
+                    el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
+                else el.classList.remove('active');
+            });
+
+            // --- Construct Content ---
+
+            // Conviction Badge
             let convictionBadge = '';
             if (item.conviction) {
                 convictionBadge = `<div class="conviction-stamp" style="border-color: ${getConvictionColor(item.conviction)}; color: ${getConvictionColor(item.conviction)}">CONVICTION: ${item.conviction}%</div>`;
             }
 
-            // Clean body (sometimes has HTML structure in it, we strip main container if present)
-            let bodyContent = item.full_body;
-            // Simple cleanup if needed, but usually full_body is just the content HTML
+            // Critique Stamp
+            let critiqueHTML = '';
+            if (item.critique) {
+                critiqueHTML = `<div class="critique-stamp">${item.critique}</div>`;
+            }
+
+            // Entity Tags
+            let tagsHTML = '';
+            if (item.entities && (item.entities.keywords || item.entities.tickers)) {
+                tagsHTML = '<div class="entity-tags-container">';
+                if (item.entities.tickers) {
+                    item.entities.tickers.forEach(t => tagsHTML += `<span class="entity-tag">#${t}</span>`);
+                }
+                if (item.entities.keywords) {
+                    item.entities.keywords.forEach(k => tagsHTML += `<span class="entity-tag">${k}</span>`);
+                }
+                tagsHTML += '</div>';
+            }
 
             const html = `
-                <div class="binder-rings-container">
-                    <div class="binder-ring"></div>
-                    <div class="binder-ring"></div>
-                    <div class="binder-ring"></div>
-                </div>
-                <div class="paper-sheet">
-                    <div class="watermark">TOP SECRET</div>
-                    ${convictionBadge}
-
-                    <div class="meta-header">
-                        <span>DATE: ${item.date}</span>
-                        <span>TYPE: ${item.type || 'REPORT'}</span>
-                        <span>ID: ${item.provenance_hash ? item.provenance_hash.substring(0,8) : 'UNKNOWN'}</span>
+                <div class="sheet-wrapper">
+                    <div class="binder-rings-container">
+                        <div class="binder-ring"></div>
+                        <div class="binder-ring"></div>
+                        <div class="binder-ring"></div>
                     </div>
+                    <div class="paper-sheet ${isRedactMode ? 'redaction-mode' : ''}" onclick="handleRedaction(event)">
+                        <div class="watermark">TOP SECRET</div>
+                        ${convictionBadge}
 
-                    <h1 class="headline">${item.title}</h1>
+                        <div class="meta-header">
+                            <span>DATE: ${item.date}</span>
+                            <span>TYPE: ${item.type || 'REPORT'}</span>
+                            <span>ID: ${item.provenance_hash ? item.provenance_hash.substring(0,8) : 'UNKNOWN'}</span>
+                        </div>
 
-                    <div style="font-style: italic; font-family: 'Times New Roman', serif; margin-bottom: 30px; border-left: 3px solid #ccc; padding-left: 15px;">
-                        ${item.summary}
-                    </div>
+                        <h1 class="headline">${item.title}</h1>
 
-                    <div class="article-body">
-                        ${bodyContent}
-                    </div>
+                        <div style="font-style: italic; font-family: 'Times New Roman', serif; margin-bottom: 30px; border-left: 3px solid #ccc; padding-left: 15px;">
+                            ${item.summary}
+                        </div>
 
-                    <div class="footer-note">
-                        Generated by ADAM v23.5 | Autonomous Financial Intelligence System<br>
-                        Confidential - For Internal Use Only
+                        <div class="article-body">
+                            ${item.full_body}
+                        </div>
+
+                        ${critiqueHTML}
+                        ${tagsHTML}
+
+                        <div class="footer-note">
+                            Generated by ADAM v23.5 | Autonomous Financial Intelligence System<br>
+                            Confidential - For Internal Use Only
+                        </div>
                     </div>
                 </div>
             `;
@@ -121,27 +389,79 @@
         }
 
         function getConvictionColor(score) {
-            if (score >= 80) return '#cc0000'; // High conviction red
-            if (score >= 60) return '#009900'; // Green
-            return '#888'; // Grey
+            if (score >= 80) return '#cc0000';
+            if (score >= 60) return '#009900';
+            return '#888';
         }
 
         function nextPage() {
             if (currentIndex < articles.length - 1) {
-                currentIndex++;
-                renderPage(currentIndex);
+                animatePageTurn('next', () => {
+                    currentIndex++;
+                    renderPage(currentIndex);
+                });
             }
         }
 
         function prevPage() {
             if (currentIndex > 0) {
-                currentIndex--;
-                renderPage(currentIndex);
+                animatePageTurn('prev', () => {
+                    currentIndex--;
+                    renderPage(currentIndex);
+                });
             }
+        }
+
+        function renderTrendChart() {
+            if (chartInstance) chartInstance.destroy();
+
+            // Prepare Data: Sort by date
+            const sortedArticles = [...articles].sort((a, b) => new Date(a.date) - new Date(b.date));
+            const labels = sortedArticles.map(a => a.date);
+            const data = sortedArticles.map(a => a.sentiment_score);
+
+            const ctx = document.getElementById('trendChart').getContext('2d');
+            chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Sentiment Score',
+                        data: data,
+                        borderColor: '#00f3ff',
+                        backgroundColor: 'rgba(0, 243, 255, 0.1)',
+                        borderWidth: 1,
+                        pointRadius: 2,
+                        tension: 0.1,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            grid: { color: '#333' },
+                            ticks: { color: '#00f3ff' }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#666', maxTicksLimit: 10 }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: { color: '#fff', font: { family: 'JetBrains Mono' } }
+                        }
+                    }
+                }
+            });
         }
 
         // Initialize
         loadData();
+        startRandomGlitch();
 
         // Keyboard Navigation
         document.addEventListener('keydown', (e) => {

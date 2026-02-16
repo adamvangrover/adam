@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM v26.0 :: INTELLIGENCE LIBRARY</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/library.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Core Navigation -->
+    <script src="js/nav.js" data-root=".." defer></script>
+    <!-- Logic -->
+    <script src="js/library_logic.js" defer></script>
+</head>
+<body>
+
+    <div class="library-main">
+        <!-- Header -->
+        <header class="library-header">
+            <div style="display: flex; align-items: center; gap: 20px;">
+                <i class="fas fa-book-journal-whills text-cyan-400 text-2xl"></i>
+                <div>
+                    <h1 class="mono text-lg font-bold tracking-widest text-white">INTELLIGENCE LIBRARY</h1>
+                    <div class="mono text-xs text-slate-400" id="countDisplay">LOADING DATA...</div>
+                </div>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 30px;">
+                <!-- View Toggle -->
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span class="mono text-xs text-slate-400">ANALYST</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="viewToggle" class="toggle-input">
+                        <span class="toggle-slider"></span>
+                    </label>
+                    <span class="mono text-xs text-green-400">SYSTEM</span>
+                </div>
+
+                <!-- Actions -->
+                <div style="display: flex; gap: 10px;">
+                    <button id="btnUpload" class="btn-cyber">
+                        <i class="fas fa-upload"></i> UPLOAD
+                    </button>
+                    <button id="btnExport" class="btn-cyber secondary">
+                        <i class="fas fa-download"></i> EXPORT
+                    </button>
+                    <a href="editor_studio.html" class="btn-cyber bg-cyan-900/30">
+                        <i class="fas fa-plus"></i> NEW REPORT
+                    </a>
+                    <a href="nexus_explorer.html" class="btn-cyber bg-purple-900/30">
+                        <i class="fas fa-project-diagram"></i> GRAPH
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <div class="library-layout">
+            <!-- Sidebar -->
+            <aside class="library-sidebar">
+                <div class="sidebar-section">
+                    <div class="sidebar-title">SEARCH & QUERY</div>
+                    <input type="text" id="searchInput" class="form-input" placeholder="Keyword or Hash...">
+                </div>
+
+                <div class="sidebar-section">
+                    <div class="sidebar-title">ARTIFACT TYPE</div>
+                    <select id="typeFilter" class="form-input">
+                        <option value="ALL">ALL TYPES</option>
+                        <option value="DAILY_BRIEFING">Daily Briefing</option>
+                        <option value="NEWSLETTER">Newsletter</option>
+                        <option value="MARKET_PULSE">Market Pulse</option>
+                        <option value="DEEP_DIVE">Deep Dive</option>
+                        <option value="STRATEGY">Strategy</option>
+                        <option value="COUNTERFACTUAL">Counterfactual</option>
+                    </select>
+                </div>
+
+                <div class="sidebar-section">
+                    <div class="sidebar-title">SENTIMENT ALIGNMENT</div>
+                    <select id="sentimentFilter" class="form-input">
+                        <option value="ALL">ANY SENTIMENT</option>
+                        <option value="POSITIVE">BULLISH (>60)</option>
+                        <option value="NEUTRAL">NEUTRAL (40-60)</option>
+                        <option value="NEGATIVE">BEARISH (<40)</option>
+                    </select>
+                </div>
+
+                <div class="sidebar-section">
+                    <div class="sidebar-title">QUICK ACTIONS</div>
+                    <div class="flex flex-col gap-2">
+                        <button class="text-left text-xs text-slate-400 hover:text-white transition"><i class="fas fa-history"></i> Recent Changes</button>
+                        <button class="text-left text-xs text-slate-400 hover:text-white transition"><i class="fas fa-star"></i> Favorites</button>
+                        <button class="text-left text-xs text-slate-400 hover:text-white transition"><i class="fas fa-trash"></i> Trash</button>
+                    </div>
+                </div>
+
+                <div class="mt-auto pt-10 text-center">
+                    <div class="mono text-[10px] text-slate-600">
+                        SECURE STORAGE: ENCRYPTED<br>
+                        NODE: US-EAST-4
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Main Content Area -->
+            <main class="library-content custom-scrollbar">
+                <div id="humanView" class="view-human">
+                    <!-- Cards Injected Here -->
+                </div>
+                <div id="machineView" class="view-machine">
+                    <!-- JSON Injected Here -->
+                </div>
+            </main>
+        </div>
+    </div>
+
+</body>
+</html>

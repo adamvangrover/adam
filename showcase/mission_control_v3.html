@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM v26.0 :: MISSION CONTROL v3</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/mission_control_v3.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="js/nav_v2.js" data-root=".."></script>
+    <script src="js/mission_control_v3.js" defer></script>
+</head>
+<body class="mission-control-v3">
+
+    <div class="mc-grid">
+        <!-- HEADER -->
+        <header class="mc-header">
+            <div style="display:flex; align-items:center; gap:20px;">
+                <h1 class="mono" style="color:#fff; margin:0; font-size:1.2rem;">ADAM <span style="color:var(--mc-neon);">v26.0</span> // GLOBAL COMMAND</h1>
+                <div id="defcon-badge" class="defcon-badge">DEFCON 5</div>
+            </div>
+            <div style="display:flex; gap:20px; font-family:'JetBrains Mono'; font-size:0.8rem; color:#888;">
+                <span>SYS_TIME: <span style="color:#fff;" id="sys-time">Running...</span></span>
+                <span>NET_STATUS: <span style="color:var(--mc-success);">ONLINE</span></span>
+            </div>
+        </header>
+
+        <!-- LEFT PANEL: METRICS -->
+        <aside class="mc-panel">
+            <div class="mc-panel-header">
+                <span>SYSTEM STATUS</span>
+                <i class="fas fa-microchip"></i>
+            </div>
+            <div class="status-grid">
+                <div class="status-card">
+                    <span style="color:#888; font-size:0.75rem;">VOLATILITY (VIX)</span>
+                    <span class="status-val" id="metric-vix" style="color:var(--mc-warn);">18.42</span>
+                </div>
+                <div class="status-card">
+                    <span style="color:#888; font-size:0.75rem;">SYSTEM LOAD</span>
+                    <span class="status-val" id="metric-load">42%</span>
+                </div>
+                <div class="status-card">
+                    <span style="color:#888; font-size:0.75rem;">ACTIVE AGENTS</span>
+                    <span class="status-val">14</span>
+                </div>
+                <div class="status-card">
+                    <span style="color:#888; font-size:0.75rem;">PENDING TASKS</span>
+                    <span class="status-val">89</span>
+                </div>
+            </div>
+
+            <div style="flex-grow:1; background:rgba(0,0,0,0.5); border-top:1px solid var(--mc-border); padding:15px;">
+                <h4 class="mono" style="color:#fff; font-size:0.8rem; margin-top:0;">CRITICAL ALERTS</h4>
+                <ul style="list-style:none; padding:0; font-size:0.75rem; color:var(--mc-alert);">
+                    <li style="margin-bottom:5px;">> LATENCY SPIKE DETECTED (USE-1)</li>
+                    <li style="margin-bottom:5px;">> MEMORY PRESSURE: AGENT_04</li>
+                </ul>
+            </div>
+        </aside>
+
+        <!-- CENTER: MAP / NEXUS -->
+        <main class="mc-panel">
+            <div class="mc-panel-header">
+                <span>GLOBAL NEXUS VISUALIZATION</span>
+                <i class="fas fa-globe"></i>
+            </div>
+            <div class="map-container">
+                <iframe src="nexus.html?embed=true" class="nexus-frame"></iframe>
+
+                <div style="position:absolute; bottom:20px; left:20px; z-index:10; background:rgba(0,0,0,0.8); padding:10px; border:1px solid #333; font-family:'JetBrains Mono'; font-size:0.7rem; color:#fff;">
+                    <div>VIEW: ORBITAL</div>
+                    <div>LAYER: MACRO_ECONOMIC</div>
+                    <div>ZOOM: 100%</div>
+                </div>
+            </div>
+        </main>
+
+        <!-- RIGHT: SWARM & LOGS -->
+        <aside class="mc-panel">
+            <div class="mc-panel-header">
+                <span>ACTIVE SWARM</span>
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="swarm-list" id="swarm-list">
+                <!-- Dynamically populated by JS -->
+                <div class="agent-row">
+                    <div class="agent-status-dot active"></div>
+                    <div style="font-weight:bold; color:#fff;">Market_Maker_01</div>
+                    <div class="agent-task">Scanning Order Book</div>
+                </div>
+                <div class="agent-row">
+                    <div class="agent-status-dot"></div>
+                    <div style="font-weight:bold; color:#fff;">Risk_Engine_Alpha</div>
+                    <div class="agent-task">Idle</div>
+                </div>
+                <div class="agent-row">
+                    <div class="agent-status-dot busy"></div>
+                    <div style="font-weight:bold; color:#fff;">Sentiment_Crawler</div>
+                    <div class="agent-task">Parsing Twitter Stream</div>
+                </div>
+                <div class="agent-row">
+                    <div class="agent-status-dot active"></div>
+                    <div style="font-weight:bold; color:#fff;">Nexus_Link_Node</div>
+                    <div class="agent-task">Updating Graph</div>
+                </div>
+            </div>
+
+            <div class="sys2-log" id="sys2-log">
+                <!-- Logs go here -->
+                <div>> SYSTEM BOOT COMPLETE.</div>
+            </div>
+        </aside>
+    </div>
+
+    <script>
+        // Simple Time Update
+        setInterval(() => {
+            document.getElementById('sys-time').innerText = new Date().toISOString().split('T')[1].split('.')[0];
+        }, 1000);
+    </script>
+</body>
+</html>

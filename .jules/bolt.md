@@ -59,3 +59,7 @@
 ## 2026-10-25 - [Vectorized Quantum Monte Carlo]
 **Learning:** The `QuantumMonteCarloEngine` in `core/risk_engine/quantum_monte_carlo.py` was using a Python loop to generate simulations, which is significantly slower than using NumPy's vectorized operations.
 **Action:** Replaced the loop with a vectorized `run_circuit_batch` method in `SimulatorBackend`, resulting in a ~4.6x speedup (0.35s -> 0.076s for 100k simulations). Always check for loops in numerical simulations and vectorize where possible.
+
+## 2026-10-26 - [DOM Traversal Optimization]
+**Learning:** `TreeWalker` in `showcase/js/dashboard-logic.js` was traversing the entire document and running regex matching on every text node, even though only the first 20 matches were used. This caused unnecessary processing on large pages (~58ms vs ~0.3ms for 5000 nodes).
+**Action:** Always implement an early exit condition when scanning the DOM for a limited number of matches.
