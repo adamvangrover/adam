@@ -36,8 +36,9 @@
 
     <!-- Virtual Toolbar for High Tier -->
     <div class="doc-toolbar" style="display: flex;">
-        <div class="toolbar-item" onclick="window.location.href='market_mayhem_archive.html'"><strong>FILE</strong></div>
-        <div class="toolbar-item" onclick="showToast('EDIT MODE: READ ONLY (ARCHIVED)')">EDIT</div>
+        <div class="toolbar-item" onclick="window.location.href='market_mayhem_archive_v24.html'"><strong>FILE</strong></div>
+        <div class="toolbar-item" onclick="toggleRedactionMode()">REDACT</div>
+        <div class="toolbar-item" onclick="printReport()">PRINT</div>
         <div class="toolbar-item" onclick="toggleTheme()">VIEW</div>
         <div class="toolbar-item" onclick="showToast('INSERT: PERMISSION DENIED')">INSERT</div>
         <div class="toolbar-item" onclick="showToast('FORMAT: LOCKED')">FORMAT</div>
@@ -47,22 +48,25 @@
     </div>
 
     <div style="max-width: 1400px; margin: 0 auto; padding: 10px 20px; display:flex; justify-content:space-between; align-items:center; display: none;">
-        <a href="market_mayhem_archive.html" class="cyber-btn">&larr; RETURN TO ARCHIVE</a>
+        <a href="market_mayhem_archive_v24.html" class="cyber-btn">&larr; RETURN TO ARCHIVE</a>
         <div style="font-family:'JetBrains Mono'; font-size:0.7rem; color:#666;">SECURE CONNECTION ESTABLISHED</div>
     </div>
 
     <div class="newsletter-wrapper">
         <div class="paper-sheet" id="paper-sheet">
 
+            <!-- Top Secret Stamp -->
+            <div id="top-secret-stamp" class="top-secret-stamp">TOP SECRET</div>
+
             <!-- High Tier Header UI -->
             <div class="doc-header-ui" style="display: flex;">
                 <span id="verification-status">CONFIDENTIAL // SYSTEM 2 REVIEW</span>
-                <span>01de420f</span>
+                <span>c79435b5</span>
             </div>
 
             <div style="display:flex; justify-content:space-between; font-family:'JetBrains Mono'; font-size:0.8rem; color:#666; margin-bottom:20px; margin-top: 20px;">
                 <span>2020-03-20</span>
-                <span>ID: 01de420f</span>
+                <span>ID: c79435b5</span>
             </div>
 
             <h1 class="title">MARKET MAYHEM: THE GREAT SHUT-IN</h1>
@@ -79,18 +83,18 @@
                 <canvas id="financialChart"></canvas>
             </div>
 
-
-        <p><strong>The World Has Stopped.</strong> In an unprecedented event, the global economy has entered a medically-induced coma. The S&P 500 has crashed 34% from its February highs, the fastest bear market in history.</p>
-        <p>Volatility is off the charts. The VIX closed at 82.69 on March 16th, surpassing the 2008 peak. Credit spreads have blown out, and liquidity in the Treasury market—usually the deepest in the world—has evaporated.</p>
-        <p><strong>Oil Shock:</strong> Demand destruction is so severe that WTI crude futures are trading at imminent risk of turning negative due to storage capacity constraints. (Update: They did, hitting -$37.63 in April).</p>
-        <p><strong>Central Bank Response:</strong> The Fed has unleashed 'Unlimited QE', buying corporate bonds for the first time in history. The mantra is 'Don't Fight the Fed', but the economic data is catastrophic.</p>
-
+            <div id="document-body">
+                <p><strong>The World Has Stopped.</strong> In an unprecedented event, the global economy has entered a medically-induced coma. The S&P 500 has crashed 34% from its February highs, the fastest bear market in history.</p>
+<p>Volatility is off the charts. The VIX closed at 82.69 on March 16th, surpassing the 2008 peak. Credit spreads have blown out, and liquidity in the Treasury market—usually the deepest in the world—has evaporated.</p>
+<p><strong>Oil Shock:</strong> Demand destruction is so severe that WTI crude futures are trading at imminent risk of turning negative due to storage capacity constraints. (Update: They did, hitting -$37.63 in April).</p>
+<p><strong>Central Bank Response:</strong> The Fed has unleashed 'Unlimited QE', buying corporate bonds for the first time in history. The mantra is 'Don't Fight the Fed', but the economic data is catastrophic.</p>
+            </div>
 
             <!-- Provenance Log (All Tiers) -->
             <div class="provenance-log">
                 <div class="log-entry">
                     <span>> HASH_CHECK</span>
-                    <span style="color:var(--terminal-green);">01de420f6bca125bf6ecc08657a68afaa74ed100ec86f7663b9faa763d7a39c5</span>
+                    <span style="color:var(--terminal-green);">c79435b514fd775700564d6dc1bdc047f1d459b783eb05d854d8f07cf7cbb756</span>
                 </div>
                 <div class="log-entry">
                     <span>> SENTIMENT_SCAN</span>
@@ -119,7 +123,7 @@
                 <div class="stat-row"><span>DATE</span> <span class="stat-val">2020-03-20</span></div>
                 <div class="stat-row"><span>TYPE</span> <span class="stat-val">HISTORICAL</span></div>
                 <div class="stat-row"><span>CLASS</span> <span class="stat-val">UNCLASSIFIED</span></div>
-                <div class="stat-row"><span>PROVENANCE</span> <span class="stat-val" title="01de420f6bca125bf6ecc08657a68afaa74ed100ec86f7663b9faa763d7a39c5">01de420f</span></div>
+                <div class="stat-row"><span>PROVENANCE</span> <span class="stat-val" title="c79435b514fd775700564d6dc1bdc047f1d459b783eb05d854d8f07cf7cbb756">c79435b5</span></div>
             </div>
 
             <div class="sidebar-widget">
@@ -133,7 +137,7 @@
             <div class="sidebar-widget">
                 <div class="sidebar-title">Detected Entities</div>
                 <div class="tag-cloud">
-                    <a href="market_mayhem_archive.html?search=US_FED" class="tag" style="text-decoration:none;">US_FED</a><a href="market_mayhem_archive.html?search=AI" class="tag" style="text-decoration:none; border-color:#666;">AI</a><a href="market_mayhem_archive.html?search=Bonds" class="tag" style="text-decoration:none; border-color:#666;">Bonds</a><a href="market_mayhem_archive.html?search=EV" class="tag" style="text-decoration:none; border-color:#666;">EV</a><a href="market_mayhem_archive.html?search=Oil" class="tag" style="text-decoration:none; border-color:#666;">Oil</a><a href="market_mayhem_archive.html?search=Volatility" class="tag" style="text-decoration:none; border-color:#666;">Volatility</a>
+                    <a href="market_mayhem_archive_v24.html?search=US_FED" class="tag" style="text-decoration:none;">US_FED</a><a href="market_mayhem_archive_v24.html?search=AI" class="tag" style="text-decoration:none; border-color:#666;">AI</a><a href="market_mayhem_archive_v24.html?search=Bonds" class="tag" style="text-decoration:none; border-color:#666;">Bonds</a><a href="market_mayhem_archive_v24.html?search=EV" class="tag" style="text-decoration:none; border-color:#666;">EV</a><a href="market_mayhem_archive_v24.html?search=Oil" class="tag" style="text-decoration:none; border-color:#666;">Oil</a><a href="market_mayhem_archive_v24.html?search=Volatility" class="tag" style="text-decoration:none; border-color:#666;">Volatility</a>
                 </div>
             </div>
 
@@ -176,7 +180,7 @@
   "type": "HISTORICAL",
   "filename": "newsletter_market_mayhem_mar_2020.html",
   "is_sourced": true,
-  "full_body": "\n        <p><strong>The World Has Stopped.</strong> In an unprecedented event, the global economy has entered a medically-induced coma. The S&P 500 has crashed 34% from its February highs, the fastest bear market in history.</p>\n        <p>Volatility is off the charts. The VIX closed at 82.69 on March 16th, surpassing the 2008 peak. Credit spreads have blown out, and liquidity in the Treasury market\u2014usually the deepest in the world\u2014has evaporated.</p>\n        <p><strong>Oil Shock:</strong> Demand destruction is so severe that WTI crude futures are trading at imminent risk of turning negative due to storage capacity constraints. (Update: They did, hitting -$37.63 in April).</p>\n        <p><strong>Central Bank Response:</strong> The Fed has unleashed 'Unlimited QE', buying corporate bonds for the first time in history. The mantra is 'Don't Fight the Fed', but the economic data is catastrophic.</p>\n        ",
+  "full_body": "<p><strong>The World Has Stopped.</strong> In an unprecedented event, the global economy has entered a medically-induced coma. The S&P 500 has crashed 34% from its February highs, the fastest bear market in history.</p>\n<p>Volatility is off the charts. The VIX closed at 82.69 on March 16th, surpassing the 2008 peak. Credit spreads have blown out, and liquidity in the Treasury market\u2014usually the deepest in the world\u2014has evaporated.</p>\n<p><strong>Oil Shock:</strong> Demand destruction is so severe that WTI crude futures are trading at imminent risk of turning negative due to storage capacity constraints. (Update: They did, hitting -$37.63 in April).</p>\n<p><strong>Central Bank Response:</strong> The Fed has unleashed 'Unlimited QE', buying corporate bonds for the first time in history. The mantra is 'Don't Fight the Fed', but the economic data is catastrophic.</p>",
   "source_priority": 3,
   "sentiment_score": 85,
   "entities": {
@@ -193,7 +197,7 @@
       "Volatility"
     ]
   },
-  "provenance_hash": "01de420f6bca125bf6ecc08657a68afaa74ed100ec86f7663b9faa763d7a39c5",
+  "provenance_hash": "c79435b514fd775700564d6dc1bdc047f1d459b783eb05d854d8f07cf7cbb756",
   "metrics_json": "{}",
   "conviction": 50,
   "semantic_score": 67,

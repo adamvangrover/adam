@@ -36,8 +36,9 @@
 
     <!-- Virtual Toolbar for High Tier -->
     <div class="doc-toolbar" style="display: flex;">
-        <div class="toolbar-item" onclick="window.location.href='market_mayhem_archive.html'"><strong>FILE</strong></div>
-        <div class="toolbar-item" onclick="showToast('EDIT MODE: READ ONLY (ARCHIVED)')">EDIT</div>
+        <div class="toolbar-item" onclick="window.location.href='market_mayhem_archive_v24.html'"><strong>FILE</strong></div>
+        <div class="toolbar-item" onclick="toggleRedactionMode()">REDACT</div>
+        <div class="toolbar-item" onclick="printReport()">PRINT</div>
         <div class="toolbar-item" onclick="toggleTheme()">VIEW</div>
         <div class="toolbar-item" onclick="showToast('INSERT: PERMISSION DENIED')">INSERT</div>
         <div class="toolbar-item" onclick="showToast('FORMAT: LOCKED')">FORMAT</div>
@@ -47,12 +48,15 @@
     </div>
 
     <div style="max-width: 1400px; margin: 0 auto; padding: 10px 20px; display:flex; justify-content:space-between; align-items:center; display: none;">
-        <a href="market_mayhem_archive.html" class="cyber-btn">&larr; RETURN TO ARCHIVE</a>
+        <a href="market_mayhem_archive_v24.html" class="cyber-btn">&larr; RETURN TO ARCHIVE</a>
         <div style="font-family:'JetBrains Mono'; font-size:0.7rem; color:#666;">SECURE CONNECTION ESTABLISHED</div>
     </div>
 
     <div class="newsletter-wrapper">
         <div class="paper-sheet" id="paper-sheet">
+
+            <!-- Top Secret Stamp -->
+            <div id="top-secret-stamp" class="top-secret-stamp">TOP SECRET</div>
 
             <!-- High Tier Header UI -->
             <div class="doc-header-ui" style="display: flex;">
@@ -79,7 +83,8 @@
                 <canvas id="financialChart"></canvas>
             </div>
 
-            <h2>AI Revolutionizing Industries</h2><p>Artificial intelligence (AI) is rapidly transforming various industries, from healthcare and finance to manufacturing and transportation. AI-powered applications are automating tasks, improving efficiency, and enabling new possibilities. This section explores the impact of AI on key industries and highlights the transformative potential of this technology.</p>
+            <div id="document-body">
+                <h2>AI Revolutionizing Industries</h2><p>Artificial intelligence (AI) is rapidly transforming various industries, from healthcare and finance to manufacturing and transportation. AI-powered applications are automating tasks, improving efficiency, and enabling new possibilities. This section explores the impact of AI on key industries and highlights the transformative potential of this technology.</p>
 <h2>AI in Healthcare</h2><p>AI is revolutionizing healthcare by improving diagnostics, accelerating drug discovery, personalizing treatments, and enhancing patient care. AI-powered medical imaging analysis, predictive analytics for disease prevention, and robotic surgery are just a few examples of how AI is changing the healthcare landscape.</p>
 <h2>AI in Finance</h2><p>AI is transforming the financial industry by automating trading, improving risk management, detecting fraud, and personalizing financial services. AI-powered robo-advisors, algorithmic trading platforms, and fraud detection systems are enhancing efficiency and creating new opportunities in the financial sector.</p>
 <h2>AI in Manufacturing</h2><p>AI is revolutionizing manufacturing by optimizing production processes, improving quality control, and enabling predictive maintenance. AI-powered robots, computer vision systems, and machine learning algorithms are enhancing productivity and creating smart factories.</p>
@@ -88,6 +93,7 @@
 <h2>Challenges and Considerations</h2><p>While AI offers tremendous potential, there are also challenges and considerations: <em> <strong>Ethical Concerns:</strong>  Ensuring responsible AI development and addressing potential biases and ethical implications. </em> <strong>Regulatory Landscape:</strong>  Navigating the evolving regulatory landscape and ensuring compliance with data privacy and security regulations. <em> <strong>Talent Acquisition:</strong>  Attracting and retaining skilled AI talent to develop and deploy AI solutions. </em> <strong>Investment Risks:</strong>  Assessing the risks associated with investing in AI companies, including technological disruption and competitive pressures.</p>
 <h2>Conclusion</h2><p>AI is a transformative technology with the potential to reshape industries and create significant economic value. Investors who understand the trends, opportunities, and challenges associated with AI can position themselves to benefit from this exciting technological revolution.</p>
 
+            </div>
 
             <!-- Provenance Log (All Tiers) -->
             <div class="provenance-log">
@@ -136,7 +142,7 @@
             <div class="sidebar-widget">
                 <div class="sidebar-title">Detected Entities</div>
                 <div class="tag-cloud">
-                    <a href="market_mayhem_archive.html?search=AI" class="tag" style="text-decoration:none; border-color:#666;">AI</a><a href="market_mayhem_archive.html?search=Cloud" class="tag" style="text-decoration:none; border-color:#666;">Cloud</a><a href="market_mayhem_archive.html?search=EV" class="tag" style="text-decoration:none; border-color:#666;">EV</a><a href="market_mayhem_archive.html?search=Growth" class="tag" style="text-decoration:none; border-color:#666;">Growth</a><a href="market_mayhem_archive.html?search=Quality" class="tag" style="text-decoration:none; border-color:#666;">Quality</a>
+                    <a href="market_mayhem_archive_v24.html?search=AI" class="tag" style="text-decoration:none; border-color:#666;">AI</a><a href="market_mayhem_archive_v24.html?search=Cloud" class="tag" style="text-decoration:none; border-color:#666;">Cloud</a><a href="market_mayhem_archive_v24.html?search=EV" class="tag" style="text-decoration:none; border-color:#666;">EV</a><a href="market_mayhem_archive_v24.html?search=Growth" class="tag" style="text-decoration:none; border-color:#666;">Growth</a><a href="market_mayhem_archive_v24.html?search=Quality" class="tag" style="text-decoration:none; border-color:#666;">Quality</a>
                 </div>
             </div>
 

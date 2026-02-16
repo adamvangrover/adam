@@ -36,8 +36,9 @@
 
     <!-- Virtual Toolbar for High Tier -->
     <div class="doc-toolbar" style="display: flex;">
-        <div class="toolbar-item" onclick="window.location.href='market_mayhem_archive.html'"><strong>FILE</strong></div>
-        <div class="toolbar-item" onclick="showToast('EDIT MODE: READ ONLY (ARCHIVED)')">EDIT</div>
+        <div class="toolbar-item" onclick="window.location.href='market_mayhem_archive_v24.html'"><strong>FILE</strong></div>
+        <div class="toolbar-item" onclick="toggleRedactionMode()">REDACT</div>
+        <div class="toolbar-item" onclick="printReport()">PRINT</div>
         <div class="toolbar-item" onclick="toggleTheme()">VIEW</div>
         <div class="toolbar-item" onclick="showToast('INSERT: PERMISSION DENIED')">INSERT</div>
         <div class="toolbar-item" onclick="showToast('FORMAT: LOCKED')">FORMAT</div>
@@ -47,12 +48,15 @@
     </div>
 
     <div style="max-width: 1400px; margin: 0 auto; padding: 10px 20px; display:flex; justify-content:space-between; align-items:center; display: none;">
-        <a href="market_mayhem_archive.html" class="cyber-btn">&larr; RETURN TO ARCHIVE</a>
+        <a href="market_mayhem_archive_v24.html" class="cyber-btn">&larr; RETURN TO ARCHIVE</a>
         <div style="font-family:'JetBrains Mono'; font-size:0.7rem; color:#666;">SECURE CONNECTION ESTABLISHED</div>
     </div>
 
     <div class="newsletter-wrapper">
         <div class="paper-sheet" id="paper-sheet">
+
+            <!-- Top Secret Stamp -->
+            <div id="top-secret-stamp" class="top-secret-stamp">TOP SECRET</div>
 
             <!-- High Tier Header UI -->
             <div class="doc-header-ui" style="display: flex;">
@@ -79,7 +83,8 @@
                 <canvas id="financialChart"></canvas>
             </div>
 
-            <h2>Executive Summary</h2><p>The enterprise software market is undergoing a period of dynamic growth, fueled by the convergence of cloud computing, artificial intelligence, and the increasing complexity of modern business operations. This report analyzes the key trends shaping the industry, from the rise of SaaS and the transformative power of AI to the critical role of semiconductor technology and the evolving geopolitical landscape.</p>
+            <div id="document-body">
+                <h2>Executive Summary</h2><p>The enterprise software market is undergoing a period of dynamic growth, fueled by the convergence of cloud computing, artificial intelligence, and the increasing complexity of modern business operations. This report analyzes the key trends shaping the industry, from the rise of SaaS and the transformative power of AI to the critical role of semiconductor technology and the evolving geopolitical landscape.</p>
 <p>We forecast continued robust growth in the enterprise software market, driven by increasing demand for automation, digital transformation initiatives, and the need for agile and scalable solutions. However, challenges remain, including integration complexities, cost considerations, and data security concerns.</p>
 <p>This report provides a comprehensive overview of the market, including market size projections, sub-industry analysis, competitive landscape assessment, and forecasts for interest rates and credit spreads. We identify key players and offer both near-term and long-term outlooks, emphasizing the crucial interplay between software, hardware, and the evolving global economy.</p>
 <strong>Key Takeaways:</strong>
@@ -334,6 +339,7 @@
 <li>  [List of references cited in the report]</li>
 </ul>
 
+            </div>
 
             <!-- Provenance Log (All Tiers) -->
             <div class="provenance-log">
@@ -382,7 +388,8 @@
             <div class="sidebar-widget">
                 <div class="sidebar-title">Detected Entities</div>
                 <div class="tag-cloud">
-                    <a href="market_mayhem_archive.html?search=JP_BOJ" class="tag" style="text-decoration:none;">JP_BOJ</a><a href="market_mayhem_archive.html?search=US_FED" class="tag" style="text-decoration:none;">US_FED</a><a href="market_mayhem_archive.html?search=CN_PBOC" class="tag" style="text-decoration:none;">CN_PBOC</a><a href="market_mayhem_archive.html?search=AI" class="tag" style="text-decoration:none; border-color:#666;">AI</a><a href="market_mayhem_archive.html?search=Banks" class="tag" style="text-decoration:none; border-color:#666;">Banks</a><a href="market_mayhem_archive.html?search=Bonds" class="tag" style="text-decoration:none; border-color:#666;">Bonds</a><a href="market_mayhem_archive.html?search=Cloud" class="tag" style="text-decoration:none; border-color:#666;">Cloud</a><a href="market_mayhem_archive.html?search=Cybersecurity" class="tag" style="text-decoration:none; border-color:#666;">Cybersecurity</a>
+                    <a href="market_mayhem_archive.html?search=US_FED" class="tag" style="text-decoration:none;">US_FED</a><a href="market_mayhem_archive.html?search=CN_PBOC" class="tag" style="text-decoration:none;">CN_PBOC</a><a href="market_mayhem_archive.html?search=JP_BOJ" class="tag" style="text-decoration:none;">JP_BOJ</a><a href="market_mayhem_archive.html?search=AI" class="tag" style="text-decoration:none; border-color:#666;">AI</a><a href="market_mayhem_archive.html?search=Banks" class="tag" style="text-decoration:none; border-color:#666;">Banks</a><a href="market_mayhem_archive.html?search=Bonds" class="tag" style="text-decoration:none; border-color:#666;">Bonds</a><a href="market_mayhem_archive.html?search=Cloud" class="tag" style="text-decoration:none; border-color:#666;">Cloud</a><a href="market_mayhem_archive.html?search=Cybersecurity" class="tag" style="text-decoration:none; border-color:#666;">Cybersecurity</a>
+                    <a href="market_mayhem_archive_v24.html?search=US_FED" class="tag" style="text-decoration:none;">US_FED</a><a href="market_mayhem_archive_v24.html?search=JP_BOJ" class="tag" style="text-decoration:none;">JP_BOJ</a><a href="market_mayhem_archive_v24.html?search=CN_PBOC" class="tag" style="text-decoration:none;">CN_PBOC</a><a href="market_mayhem_archive_v24.html?search=AI" class="tag" style="text-decoration:none; border-color:#666;">AI</a><a href="market_mayhem_archive_v24.html?search=Banks" class="tag" style="text-decoration:none; border-color:#666;">Banks</a><a href="market_mayhem_archive_v24.html?search=Bonds" class="tag" style="text-decoration:none; border-color:#666;">Bonds</a><a href="market_mayhem_archive_v24.html?search=Cloud" class="tag" style="text-decoration:none; border-color:#666;">Cloud</a><a href="market_mayhem_archive_v24.html?search=Cybersecurity" class="tag" style="text-decoration:none; border-color:#666;">Cybersecurity</a>
                 </div>
             </div>
 
@@ -429,8 +436,8 @@
     "tickers": [],
     "agents": [],
     "sovereigns": [
-      "JP_BOJ",
       "US_FED",
+      "JP_BOJ",
       "CN_PBOC"
     ],
     "keywords": [

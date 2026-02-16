@@ -36,8 +36,9 @@
 
     <!-- Virtual Toolbar for High Tier -->
     <div class="doc-toolbar" style="display: flex;">
-        <div class="toolbar-item" onclick="window.location.href='market_mayhem_archive.html'"><strong>FILE</strong></div>
-        <div class="toolbar-item" onclick="showToast('EDIT MODE: READ ONLY (ARCHIVED)')">EDIT</div>
+        <div class="toolbar-item" onclick="window.location.href='market_mayhem_archive_v24.html'"><strong>FILE</strong></div>
+        <div class="toolbar-item" onclick="toggleRedactionMode()">REDACT</div>
+        <div class="toolbar-item" onclick="printReport()">PRINT</div>
         <div class="toolbar-item" onclick="toggleTheme()">VIEW</div>
         <div class="toolbar-item" onclick="showToast('INSERT: PERMISSION DENIED')">INSERT</div>
         <div class="toolbar-item" onclick="showToast('FORMAT: LOCKED')">FORMAT</div>
@@ -47,12 +48,15 @@
     </div>
 
     <div style="max-width: 1400px; margin: 0 auto; padding: 10px 20px; display:flex; justify-content:space-between; align-items:center; display: none;">
-        <a href="market_mayhem_archive.html" class="cyber-btn">&larr; RETURN TO ARCHIVE</a>
+        <a href="market_mayhem_archive_v24.html" class="cyber-btn">&larr; RETURN TO ARCHIVE</a>
         <div style="font-family:'JetBrains Mono'; font-size:0.7rem; color:#666;">SECURE CONNECTION ESTABLISHED</div>
     </div>
 
     <div class="newsletter-wrapper">
         <div class="paper-sheet" id="paper-sheet">
+
+            <!-- Top Secret Stamp -->
+            <div id="top-secret-stamp" class="top-secret-stamp">TOP SECRET</div>
 
             <!-- High Tier Header UI -->
             <div class="doc-header-ui" style="display: flex;">
@@ -79,9 +83,11 @@
                 <canvas id="financialChart"></canvas>
             </div>
 
-            <h2>Company Overview</h2><p>Alphabet Inc. is a multinational technology conglomerate holding company headquartered in Mountain View, California. It was created through a restructuring of Google on October 2, 2015, and became the parent company of Google and several former Google subsidiaries. The two co-founders of Google remained as controlling shareholders, board members, and employees at Alphabet. Alphabet's portfolio encompasses a wide range of businesses, including Google's core search and advertising businesses, as well as other ventures such as Waymo (self-driving cars), Verily (life sciences), and Google Fiber (internet service).</p>
+            <div id="document-body">
+                <h2>Company Overview</h2><p>Alphabet Inc. is a multinational technology conglomerate holding company headquartered in Mountain View, California. It was created through a restructuring of Google on October 2, 2015, and became the parent company of Google and several former Google subsidiaries. The two co-founders of Google remained as controlling shareholders, board members, and employees at Alphabet. Alphabet's portfolio encompasses a wide range of businesses, including Google's core search and advertising businesses, as well as other ventures such as Waymo (self-driving cars), Verily (life sciences), and Google Fiber (internet service).</p>
 <h2>Financial Performance</h2><h3>Revenue</h3><h4>2022</h4><p>282.84 billion USD</p><h4>2023</h4><p>300.00 billion USD (estimated)</p><h4>2024</h4><p>320.00 billion USD (estimated)</p><h3>Net Income</h3><h4>2022</h4><p>59.97 billion USD</p><h4>2023</h4><p>65.00 billion USD (estimated)</p><h4>2024</h4><p>70.00 billion USD (estimated)</p><h3>Eps</h3><h4>2022</h4><p>4.56 USD</p><h4>2023</h4><p>4.90 USD (estimated)</p><h4>2024</h4><p>5.30 USD (estimated)</p><h3>P/E Ratio</h3><h4>Current</h4><p>25.00</p><h3>Market Cap</h3><h4>Current</h4><p>1.60 trillion USD</p><h3>Debt-To-Equity Ratio</h3><h4>Current</h4><p>0.10</p><h3>Operating Margin</h3><h4>2022</h4><p>29.00%</p><h4>2023</h4><p>28.00% (estimated)</p><h2>Competitive Landscape</h2><h2>Future Outlook</h2><h2>Investment Thesis</h2><p>Alphabet is a technology behemoth with a dominant market position in search, advertising, and other key areas. Its strong financials, innovative culture, and growth potential make it an attractive investment opportunity. However, investors should be mindful of the regulatory risks and competitive pressures facing the company. Overall, Alphabet remains a compelling investment for those seeking exposure to the growth of the digital economy and the transformative power of technology.</p>
 
+            </div>
 
             <!-- Provenance Log (All Tiers) -->
             <div class="provenance-log">
@@ -130,7 +136,7 @@
             <div class="sidebar-widget">
                 <div class="sidebar-title">Detected Entities</div>
                 <div class="tag-cloud">
-                    <a href="market_mayhem_archive.html?search=US_FED" class="tag" style="text-decoration:none;">US_FED</a><a href="market_mayhem_archive.html?search=AI" class="tag" style="text-decoration:none; border-color:#666;">AI</a><a href="market_mayhem_archive.html?search=EV" class="tag" style="text-decoration:none; border-color:#666;">EV</a><a href="market_mayhem_archive.html?search=Growth" class="tag" style="text-decoration:none; border-color:#666;">Growth</a><a href="market_mayhem_archive.html?search=Tech" class="tag" style="text-decoration:none; border-color:#666;">Tech</a>
+                    <a href="market_mayhem_archive_v24.html?search=US_FED" class="tag" style="text-decoration:none;">US_FED</a><a href="market_mayhem_archive_v24.html?search=AI" class="tag" style="text-decoration:none; border-color:#666;">AI</a><a href="market_mayhem_archive_v24.html?search=EV" class="tag" style="text-decoration:none; border-color:#666;">EV</a><a href="market_mayhem_archive_v24.html?search=Growth" class="tag" style="text-decoration:none; border-color:#666;">Growth</a><a href="market_mayhem_archive_v24.html?search=Tech" class="tag" style="text-decoration:none; border-color:#666;">Tech</a>
                 </div>
             </div>
 
