@@ -17,6 +17,7 @@ class ScenarioEngine:
     def _load_2008_crash(self):
         """Hardcoded 2008 Crash Scenario Data (Lehman Weekend)."""
         return {
+            "id": "2008_CRASH",
             "name": "Lehman Brothers Collapse (Sep 2008)",
             "description": "Global liquidity freeze and massive credit dislocation.",
             "timeline": [
