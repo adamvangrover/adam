@@ -153,6 +153,7 @@ class AdamNavigator {
             { name: 'Credit Analyst', icon: 'fa-user-tie', link: 'credit_memo_v2.html' },
             { name: 'Sovereign Dashboard', icon: 'fa-globe-americas', link: 'sovereign_dashboard.html' },
             { name: 'Market Mayhem', icon: 'fa-newspaper', link: 'market_mayhem_archive_v24.html' },
+            { name: 'Repository', icon: 'fa-server', link: 'market_mayhem_repository.html' },
             { type: 'divider' },
             { name: 'Trading Platform', icon: 'fa-chart-line', link: 'trading.html' },
             { name: 'Robo Advisor', icon: 'fa-robot', link: 'robo_advisor.html' },

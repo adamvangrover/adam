@@ -457,3 +457,121 @@ body.tier-high.dark-mode .doc-metadata-panel {
     color: #fff;
     background: #007acc;
 }
+
+/* --- JSON SYNTAX HIGHLIGHTING --- */
+.json-key { color: #9cdcfe; }
+.json-string { color: #ce9178; }
+.json-number { color: #b5cea8; }
+.json-boolean { color: #569cd6; }
+.json-null { color: #569cd6; }
+
+/* --- PRINT STYLES --- */
+@media print {
+    .doc-toolbar,
+    .cyber-sidebar,
+    .doc-header-ui,
+    .system2-overlay,
+    .raw-source-modal,
+    .cyber-toast-container,
+    .source-jump-btn {
+        display: none !important;
+    }
+
+    body.tier-high {
+        background: white;
+    }
+
+    .tier-high .paper-sheet {
+        box-shadow: none;
+        border: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .tier-high .newsletter-wrapper {
+        margin: 0;
+        max-width: 100%;
+    }
+}
+
+/* --- WATERMARK --- */
+.doc-watermark {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-45deg);
+    font-size: 8rem;
+    font-weight: bold;
+    color: rgba(0, 0, 0, 0.03);
+    pointer-events: none;
+    user-select: none;
+    white-space: nowrap;
+    z-index: 0;
+    font-family: 'Impact', sans-serif;
+    border: 5px solid rgba(0,0,0,0.03);
+    padding: 20px;
+    text-transform: uppercase;
+}
+body.tier-high.dark-mode .doc-watermark {
+    color: rgba(255, 255, 255, 0.03);
+    border-color: rgba(255, 255, 255, 0.03);
+}
+
+/* --- SYSTEM 2 SCANLINE ANIMATION --- */
+.system2-terminal {
+    position: relative;
+    overflow: hidden;
+}
+
+.system2-terminal::before {
+    content: " ";
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+    z-index: 2;
+    background-size: 100% 2px, 3px 100%;
+    pointer-events: none;
+}
+
+.system2-terminal::after {
+    content: " ";
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background: rgba(18, 16, 16, 0.1);
+    opacity: 0;
+    z-index: 2;
+    pointer-events: none;
+    animation: flicker 0.15s infinite;
+}
+
+@keyframes flicker {
+    0% { opacity: 0.02795 }
+    5% { opacity: 0.04828 }
+    10% { opacity: 0.04062 }
+    15% { opacity: 0.07968 }
+    20% { opacity: 0.06325 }
+    25% { opacity: 0.01258 }
+    30% { opacity: 0.04753 }
+    35% { opacity: 0.05739 }
+    40% { opacity: 0.04875 }
+    45% { opacity: 0.07686 }
+    50% { opacity: 0.04899 }
+    55% { opacity: 0.03714 }
+    60% { opacity: 0.08985 }
+    65% { opacity: 0.01597 }
+    70% { opacity: 0.02636 }
+    75% { opacity: 0.04351 }
+    80% { opacity: 0.03357 }
+    85% { opacity: 0.09559 }
+    90% { opacity: 0.02701 }
+    95% { opacity: 0.03323 }
+    100% { opacity: 0.05389 }
+}

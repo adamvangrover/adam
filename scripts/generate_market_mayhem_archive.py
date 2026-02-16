@@ -898,7 +898,8 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         <div class="toolbar-item" onclick="showToast('EDIT MODE: READ ONLY (ARCHIVED)')">EDIT</div>
         <div class="toolbar-item" onclick="toggleTheme()">VIEW</div>
         <div class="toolbar-item" onclick="showToast('INSERT: PERMISSION DENIED')">INSERT</div>
-        <div class="toolbar-item" onclick="showToast('FORMAT: LOCKED')">FORMAT</div>
+        <div class="toolbar-item" onclick="printDocument()">PRINT</div>
+        <div class="toolbar-item" onclick="copyLink()">SHARE</div>
         <div class="toolbar-item" onclick="runVerification()" style="color: #0078d7;"><strong>VERIFY</strong></div>
         <div style="flex-grow:1;"></div>
         <div class="toolbar-item" style="color:#666;">ADAM_V26_EDITOR</div>
@@ -911,6 +912,8 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 
     <div class="newsletter-wrapper">
         <div class="paper-sheet" id="paper-sheet">
+
+            <div class="doc-watermark" style="display: {header_ui_display};">CONFIDENTIAL</div>
 
             <!-- High Tier Header UI -->
             <div class="doc-header-ui" style="display: {header_ui_display};">
@@ -1404,6 +1407,7 @@ def generate_archive():
                     <a href="market_mayhem_conviction.html" class="cyber-btn" style="text-align:center;">CONVICTION PAPER</a>
                     <a href="portfolio_dashboard.html" class="cyber-btn" style="text-align:center; border-color: #33ff00; color: #33ff00;">PORTFOLIO DASHBOARD</a>
                     <a href="macro_glitch_monitor.html" class="cyber-btn" style="text-align:center; border-color: #ff00ff; color: #ff00ff;">GLITCH MONITOR</a>
+                    <a href="market_mayhem_repository.html" class="cyber-btn" style="text-align:center; background:#111; border-color:#888;">ACCESS REPOSITORY</a>
                 </div>
             </div>
 

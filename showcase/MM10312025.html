@@ -40,7 +40,8 @@
         <div class="toolbar-item" onclick="showToast('EDIT MODE: READ ONLY (ARCHIVED)')">EDIT</div>
         <div class="toolbar-item" onclick="toggleTheme()">VIEW</div>
         <div class="toolbar-item" onclick="showToast('INSERT: PERMISSION DENIED')">INSERT</div>
-        <div class="toolbar-item" onclick="showToast('FORMAT: LOCKED')">FORMAT</div>
+        <div class="toolbar-item" onclick="printDocument()">PRINT</div>
+        <div class="toolbar-item" onclick="copyLink()">SHARE</div>
         <div class="toolbar-item" onclick="runVerification()" style="color: #0078d7;"><strong>VERIFY</strong></div>
         <div style="flex-grow:1;"></div>
         <div class="toolbar-item" style="color:#666;">ADAM_V26_EDITOR</div>
@@ -53,6 +54,8 @@
 
     <div class="newsletter-wrapper">
         <div class="paper-sheet" id="paper-sheet">
+
+            <div class="doc-watermark" style="display: flex;">CONFIDENTIAL</div>
 
             <!-- High Tier Header UI -->
             <div class="doc-header-ui" style="display: flex;">
@@ -214,7 +217,7 @@
             <div class="sidebar-widget">
                 <div class="sidebar-title">Detected Entities</div>
                 <div class="tag-cloud">
-                    <a href="market_mayhem_archive.html?search=EU_ECB" class="tag" style="text-decoration:none;">EU_ECB</a><a href="market_mayhem_archive.html?search=US_FED" class="tag" style="text-decoration:none;">US_FED</a><a href="market_mayhem_archive.html?search=CN_PBOC" class="tag" style="text-decoration:none;">CN_PBOC</a><a href="market_mayhem_archive.html?search=AI" class="tag" style="text-decoration:none; border-color:#666;">AI</a><a href="market_mayhem_archive.html?search=Banks" class="tag" style="text-decoration:none; border-color:#666;">Banks</a><a href="market_mayhem_archive.html?search=Bitcoin" class="tag" style="text-decoration:none; border-color:#666;">Bitcoin</a><a href="market_mayhem_archive.html?search=EV" class="tag" style="text-decoration:none; border-color:#666;">EV</a><a href="market_mayhem_archive.html?search=Energy" class="tag" style="text-decoration:none; border-color:#666;">Energy</a>
+                    <a href="market_mayhem_archive.html?search=US_FED" class="tag" style="text-decoration:none;">US_FED</a><a href="market_mayhem_archive.html?search=EU_ECB" class="tag" style="text-decoration:none;">EU_ECB</a><a href="market_mayhem_archive.html?search=CN_PBOC" class="tag" style="text-decoration:none;">CN_PBOC</a><a href="market_mayhem_archive.html?search=AI" class="tag" style="text-decoration:none; border-color:#666;">AI</a><a href="market_mayhem_archive.html?search=Banks" class="tag" style="text-decoration:none; border-color:#666;">Banks</a><a href="market_mayhem_archive.html?search=Bitcoin" class="tag" style="text-decoration:none; border-color:#666;">Bitcoin</a><a href="market_mayhem_archive.html?search=EV" class="tag" style="text-decoration:none; border-color:#666;">EV</a><a href="market_mayhem_archive.html?search=Energy" class="tag" style="text-decoration:none; border-color:#666;">Energy</a>
                 </div>
             </div>
 
@@ -261,8 +264,8 @@
     "tickers": [],
     "agents": [],
     "sovereigns": [
-      "EU_ECB",
       "US_FED",
+      "EU_ECB",
       "CN_PBOC"
     ],
     "keywords": [

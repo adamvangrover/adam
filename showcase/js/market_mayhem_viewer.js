@@ -25,6 +25,32 @@ function toggleTheme() {
     showToast('THEME: ' + (isDark ? 'DARK_MODE' : 'LIGHT_MODE'));
 }
 
+function highlightJSON(json) {
+    if (typeof json !== 'string') {
+        try {
+            json = JSON.stringify(json, undefined, 2);
+        } catch (e) {
+            return json;
+        }
+    }
+    json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+        var cls = 'json-number';
+        if (/^"/.test(match)) {
+            if (/:$/.test(match)) {
+                cls = 'json-key';
+            } else {
+                cls = 'json-string';
+            }
+        } else if (/true|false/.test(match)) {
+            cls = 'json-boolean';
+        } else if (/null/.test(match)) {
+            cls = 'json-null';
+        }
+        return '<span class="' + cls + '">' + match + '</span>';
+    });
+}
+
 function toggleSource() {
     const modal = document.getElementById('raw-source-modal');
     const content = document.getElementById('raw-source-content');
@@ -38,9 +64,28 @@ function toggleSource() {
     if (modal.style.display === 'flex') {
         modal.style.display = 'none';
     } else {
-        content.innerText = rawDataArea.value || "NO SOURCE DATA AVAILABLE.";
+        const rawJson = rawDataArea.value || "{}";
+        try {
+            const jsonObj = JSON.parse(rawJson);
+            content.innerHTML = '<pre>' + highlightJSON(jsonObj) + '</pre>';
+        } catch (e) {
+            content.innerText = rawJson;
+        }
         modal.style.display = 'flex';
     }
+}
+
+function printDocument() {
+    window.print();
+}
+
+function copyLink() {
+    const url = window.location.href;
+    navigator.clipboard.writeText(url).then(() => {
+        showToast('LINK COPIED TO CLIPBOARD');
+    }).catch(err => {
+        showToast('ERROR COPYING LINK: ' + err);
+    });
 }
 
 function runVerification() {
@@ -65,15 +110,44 @@ function runVerification() {
     ];
 
     let i = 0;
-    function addLine() {
+
+    // Helper for "decrypting" text effect
+    function typeLine(text, callback) {
+        const div = document.createElement('div');
+        div.className = 'system2-line';
+        content.appendChild(div);
+
+        let steps = 0;
+        const maxSteps = 15; // Animation frames
+        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*";
+
+        const interval = setInterval(() => {
+            let displayedText = "";
+            for (let j = 0; j < text.length; j++) {
+                if (j < (steps / maxSteps) * text.length) {
+                    displayedText += text[j];
+                } else {
+                    displayedText += chars[Math.floor(Math.random() * chars.length)];
+                }
+            }
+            div.innerText = '> ' + displayedText;
+            steps++;
+
+            if (steps > maxSteps) {
+                clearInterval(interval);
+                div.innerText = '> ' + text;
+                div.style.opacity = 1; // Ensure full opacity
+                if (callback) callback();
+            }
+        }, 30);
+    }
+
+    function processNextLine() {
         if (i < lines.length) {
-            const div = document.createElement('div');
-            div.className = 'system2-line';
-            div.innerText = '> ' + lines[i];
-            div.style.opacity = 1;
-            content.appendChild(div);
-            i++;
-            setTimeout(addLine, 400);
+            typeLine(lines[i], () => {
+                i++;
+                setTimeout(processNextLine, 200);
+            });
         } else {
             setTimeout(() => {
                 overlay.style.display = 'none';
@@ -86,14 +160,26 @@ function runVerification() {
             }, 1000);
         }
     }
-    addLine();
+
+    processNextLine();
 }
+
+// Keyboard Shortcuts
+document.addEventListener('keydown', (e) => {
+    // Only if no modal is open (except source modal which can be closed)
+    // and not typing in an input
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+    if (e.key.toLowerCase() === 'v') {
+        runVerification();
+    } else if (e.key.toLowerCase() === 's') {
+        toggleSource();
+    } else if (e.key.toLowerCase() === 'p') {
+        printDocument();
+    }
+});
 
 // Initialize Chart if data exists
 document.addEventListener('DOMContentLoaded', () => {
-    // Check for metrics data in a global variable or data attribute
-    // The generator injects `const metricsData = ...` in a separate script block usually.
-    // If we move that logic here, we need to read it from DOM.
-    // Ideally, we keep the data injection inline, and the chart rendering here or inline.
-    // For now, let's leave the chart logic inline in the generator as it depends on `metrics_json` insertion.
+    // Chart logic is typically injected inline by the generator
 });
