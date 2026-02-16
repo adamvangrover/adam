@@ -39,8 +39,9 @@
         <div class="toolbar-item" onclick="window.location.href='market_mayhem_archive.html'"><strong>FILE</strong></div>
         <div class="toolbar-item" onclick="showToast('EDIT MODE: READ ONLY (ARCHIVED)')">EDIT</div>
         <div class="toolbar-item" onclick="toggleTheme()">VIEW</div>
-        <div class="toolbar-item" onclick="showToast('INSERT: PERMISSION DENIED')">INSERT</div>
-        <div class="toolbar-item" onclick="showToast('FORMAT: LOCKED')">FORMAT</div>
+        <div class="toolbar-item" onclick="toggleRedactMode()">REDACT</div>
+        <div class="toolbar-item" onclick="printDoc()">PRINT</div>
+        <div class="toolbar-item" onclick="shareDoc()">SHARE</div>
         <div class="toolbar-item" onclick="runVerification()" style="color: #0078d7;"><strong>VERIFY</strong></div>
         <div style="flex-grow:1;"></div>
         <div class="toolbar-item" style="color:#666;">ADAM_V26_EDITOR</div>
@@ -52,6 +53,7 @@
     </div>
 
     <div class="newsletter-wrapper">
+        <div id="watermark">CONFIDENTIAL // TOP SECRET</div>
         <div class="paper-sheet" id="paper-sheet">
 
             <!-- High Tier Header UI -->
@@ -83,6 +85,14 @@
         <p><strong>The Height of Folly.</strong> Today marks the peak of the Dot Com bubble. The NASDAQ has doubled in a year. IPOs are popping 400% on day one. Pets.com, Webvan, eToys—these are the titans of the new economy.</p>
         <p><strong>The Valuation Problem:</strong> Traditional metrics like P/E are considered obsolete. 'Price to Clicks' and 'Eyeballs' are the new currency. But burn rates are accelerating, and the path to profitability is non-existent for many.</p>
         <p><strong>The Turn:</strong> Japan has entered a recession, and the Fed is tightening. Capital is becoming expensive just as these cash-burning machines need it most.</p>
+
+
+            <!-- Advanced Analytics Sections -->
+            <div class="analytics-section"><h3>2. Strategic Risk & Sensitivity Analysis</h3><table class="risk-matrix-table"><thead><tr><th>Risk Factor</th><th>Impact</th><th>Probability</th><th>Strategic Mitigant</th></tr></thead><tbody><tr><td>Inflation Resurgence</td><td class="impact-critical">CRITICAL</td><td>LOW</td><td>Short Duration Bonds (TBT), Long Energy (XLE)</td></tr><tr><td>Geopolitical Escalation</td><td class="impact-high">HIGH</td><td>MED</td><td>Hedge with OTM Puts on SPX, Long Gold</td></tr><tr><td>Consumer Recession</td><td class="impact-high">HIGH</td><td>MED</td><td>Long Staples (XLP), Short Discretionary (XLY)</td></tr><tr><td>AI Capex Disappointment</td><td class="impact-med">MED</td><td>MED</td><td>Rotate into Value/Industrials, Short NVDA/SMH</td></tr></tbody></table></div>
+            <div class="analytics-section"><h3>3. Sector Arbitrage & Alpha Opportunities</h3><div class="arbitrage-grid"><div class="arbitrage-card"><div class="arb-header">Long Real Estate / Short Materials</div><div class="arb-type">SECTOR_ARB | Horizon: 2-4 Weeks</div><div class="arb-thesis">Valuation gap of 3.5σ implies mean reversion. Real Estate showing superior free cash flow yield.</div><div class="arb-conviction">Conviction: 86%</div></div></div></div>
+            <div class="analytics-section"><h3>4. Institutional Positioning (13F & Flows)</h3><div class="flow-heatmap"><div class="flow-item" style="background:rgba(0, 255, 0, 0.43);"><span class="flow-sector">Technology</span><span class="flow-val">43</span></div><div class="flow-item" style="background:rgba(255, 0, 0, 0.25);"><span class="flow-sector">Energy</span><span class="flow-val">-25</span></div><div class="flow-item" style="background:rgba(255, 0, 0, 0.24);"><span class="flow-sector">Financials</span><span class="flow-val">-24</span></div><div class="flow-item" style="background:rgba(0, 255, 0, 1.0);"><span class="flow-sector">Healthcare</span><span class="flow-val">100</span></div><div class="flow-item" style="background:rgba(255, 0, 0, 0.46);"><span class="flow-sector">Discretionary</span><span class="flow-val">-46</span></div><div class="flow-item" style="background:rgba(0, 255, 0, 0.89);"><span class="flow-sector">Staples</span><span class="flow-val">89</span></div><div class="flow-item" style="background:rgba(0, 255, 0, 0.11);"><span class="flow-sector">Utilities</span><span class="flow-val">11</span></div><div class="flow-item" style="background:rgba(0, 255, 0, 0.29);"><span class="flow-sector">Real Estate</span><span class="flow-val">29</span></div><div class="flow-item" style="background:rgba(0, 255, 0, 0.61);"><span class="flow-sector">Materials</span><span class="flow-val">61</span></div><div class="flow-item" style="background:rgba(255, 0, 0, 0.88);"><span class="flow-sector">Comms</span><span class="flow-val">-88</span></div></div></div>
+
+            <!-- Crisis Simulation Section -->
 
 
             <!-- Provenance Log (All Tiers) -->
@@ -132,7 +142,7 @@
             <div class="sidebar-widget">
                 <div class="sidebar-title">Detected Entities</div>
                 <div class="tag-cloud">
-                    <a href="market_mayhem_archive.html?search=JP_BOJ" class="tag" style="text-decoration:none;">JP_BOJ</a><a href="market_mayhem_archive.html?search=US_FED" class="tag" style="text-decoration:none;">US_FED</a><a href="market_mayhem_archive.html?search=EV" class="tag" style="text-decoration:none; border-color:#666;">EV</a><a href="market_mayhem_archive.html?search=IPO" class="tag" style="text-decoration:none; border-color:#666;">IPO</a><a href="market_mayhem_archive.html?search=Recession" class="tag" style="text-decoration:none; border-color:#666;">Recession</a><a href="market_mayhem_archive.html?search=Value" class="tag" style="text-decoration:none; border-color:#666;">Value</a>
+                    <a href="market_mayhem_archive.html?search=US_FED" class="tag" style="text-decoration:none;">US_FED</a><a href="market_mayhem_archive.html?search=JP_BOJ" class="tag" style="text-decoration:none;">JP_BOJ</a><a href="market_mayhem_archive.html?search=EV" class="tag" style="text-decoration:none; border-color:#666;">EV</a><a href="market_mayhem_archive.html?search=IPO" class="tag" style="text-decoration:none; border-color:#666;">IPO</a><a href="market_mayhem_archive.html?search=Recession" class="tag" style="text-decoration:none; border-color:#666;">Recession</a><a href="market_mayhem_archive.html?search=Value" class="tag" style="text-decoration:none; border-color:#666;">Value</a>
                 </div>
             </div>
 
@@ -182,8 +192,8 @@
     "tickers": [],
     "agents": [],
     "sovereigns": [
-      "JP_BOJ",
-      "US_FED"
+      "US_FED",
+      "JP_BOJ"
     ],
     "keywords": [
       "EV",
@@ -197,54 +207,152 @@
   "conviction": 50,
   "semantic_score": 65,
   "probability": 50,
-  "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 85/100. Cross-reference with knowledge graph completed."
+  "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 85/100. Cross-reference with knowledge graph completed.",
+  "analytics": {
+    "risks": [
+      {
+        "risk": "Inflation Resurgence",
+        "impact": "CRITICAL",
+        "prob": "LOW",
+        "mitigant": "Short Duration Bonds (TBT), Long Energy (XLE)"
+      },
+      {
+        "risk": "Geopolitical Escalation",
+        "impact": "HIGH",
+        "prob": "MED",
+        "mitigant": "Hedge with OTM Puts on SPX, Long Gold"
+      },
+      {
+        "risk": "Consumer Recession",
+        "impact": "HIGH",
+        "prob": "MED",
+        "mitigant": "Long Staples (XLP), Short Discretionary (XLY)"
+      },
+      {
+        "risk": "AI Capex Disappointment",
+        "impact": "MED",
+        "prob": "MED",
+        "mitigant": "Rotate into Value/Industrials, Short NVDA/SMH"
+      }
+    ],
+    "arbitrage": [
+      {
+        "type": "SECTOR_ARB",
+        "strategy": "Long Real Estate / Short Materials",
+        "thesis": "Valuation gap of 3.5\u03c3 implies mean reversion. Real Estate showing superior free cash flow yield.",
+        "horizon": "2-4 Weeks",
+        "conviction": "86%"
+      }
+    ],
+    "flows": {
+      "Technology": 43,
+      "Energy": -25,
+      "Financials": -24,
+      "Healthcare": 100,
+      "Discretionary": -46,
+      "Staples": 89,
+      "Utilities": 11,
+      "Real Estate": 29,
+      "Materials": 61,
+      "Comms": -88
+    },
+    "regime": "LATE CYCLE VOLATILITY"
+  },
+  "crisis_sim": null
 }</textarea>
 
     <script>
         // Chart Injection Logic
         const metricsData = {};
+        const flowsData = {"Technology": 43, "Energy": -25, "Financials": -24, "Healthcare": 100, "Discretionary": -46, "Staples": 89, "Utilities": 11, "Real Estate": 29, "Materials": 61, "Comms": -88};
+        const crisisData = {};
 
-        if (metricsData && Object.keys(metricsData).length > 0) {
-            const ctx = document.getElementById('financialChart');
-            const container = document.getElementById('financialChartContainer');
+        document.addEventListener('DOMContentLoaded', () => {
+            if (metricsData && Object.keys(metricsData).length > 0) {
+                const ctx = document.getElementById('financialChart');
+                const container = document.getElementById('financialChartContainer');
 
-            // Basic parsing of metrics structure (assuming flat or Year->Val)
-            let labels = [];
-            let values = [];
-            let labelName = "Metric";
+                // Basic parsing of metrics structure
+                let labels = [];
+                let values = [];
+                let labelName = "Metric";
 
-            // Try to find a timeseries
-            for (const [key, val] of Object.entries(metricsData)) {
-                if (typeof val === 'object') {
-                    // Likely year -> value
-                    labels = Object.keys(val);
-                    values = Object.values(val).map(v => parseFloat(v.replace(/[^0-9.-]/g, '')));
-                    labelName = key;
-                    break;
+                for (const [key, val] of Object.entries(metricsData)) {
+                    if (typeof val === 'object') {
+                        labels = Object.keys(val);
+                        values = Object.values(val).map(v => parseFloat(v.replace(/[^0-9.-]/g, '')));
+                        labelName = key;
+                        break;
+                    }
+                }
+
+                if (labels.length > 0) {
+                    container.style.display = 'block';
+                    new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: labelName,
+                                data: values,
+                                backgroundColor: 'rgba(204, 0, 0, 0.5)',
+                                borderColor: '#cc0000',
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: { legend: { display: true } }
+                        }
+                    });
                 }
             }
 
-            if (labels.length > 0) {
-                container.style.display = 'block';
-                new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            label: labelName,
-                            data: values,
-                            backgroundColor: 'rgba(204, 0, 0, 0.5)',
-                            borderColor: '#cc0000',
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        plugins: { legend: { display: true } }
-                    }
-                });
+            // Crisis Simulation Chart
+            if (crisisData && crisisData.portfolio_values) {
+                const ctx = document.getElementById('crisisSimChart');
+                if (ctx) {
+                    new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: crisisData.dates,
+                            datasets: [
+                                {
+                                    label: 'Portfolio (Simulated)',
+                                    data: crisisData.portfolio_values,
+                                    borderColor: '#00f3ff',
+                                    backgroundColor: 'rgba(0, 243, 255, 0.1)',
+                                    tension: 0.4,
+                                    borderWidth: 2
+                                },
+                                {
+                                    label: 'Benchmark (Simulated)',
+                                    data: crisisData.benchmark_values,
+                                    borderColor: '#cc0000',
+                                    backgroundColor: 'rgba(204, 0, 0, 0.0)',
+                                    borderDash: [5, 5],
+                                    tension: 0.4,
+                                    borderWidth: 2
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            interaction: { mode: 'index', intersect: false },
+                            plugins: {
+                                legend: { labels: { color: '#666' } },
+                                title: { display: true, text: 'Portfolio Resilience: ' + crisisData.scenario }
+                            },
+                            scales: {
+                                y: { display: true, grid: { color: '#eee' } },
+                                x: { display: false }
+                            }
+                        }
+                    });
+                }
             }
-        }
+        });
     </script>
 </body>
 </html>

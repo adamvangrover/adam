@@ -1,50 +1,54 @@
 import os
-import subprocess
 import time
+import subprocess
+import sys
 from playwright.sync_api import sync_playwright
 
-def verify_frontend():
-    # Start server
-    server = subprocess.Popen(["python3", "-m", "http.server", "8000", "--directory", "showcase"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    time.sleep(2) # Wait for start
+def verify_crisis_sim():
+    # Start HTTP Server
+    server_process = subprocess.Popen([sys.executable, "-m", "http.server", "8000"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    print("Started HTTP server on port 8000")
+    time.sleep(2)
 
     try:
         with sync_playwright() as p:
             browser = p.chromium.launch(headless=True)
-            page = browser.new_page()
+            context = browser.new_context(viewport={'width': 1200, 'height': 2000})
+            page = context.new_page()
 
-            # Mock API
-            page.route("**/api/simulation/start", lambda route: route.fulfill(
-                status=200,
-                body='{"status": "started", "state": {"turn": 1, "lcr": 115.0, "cet1": 13.5, "sovereign_spread": 450, "repo_haircut": 2.0, "counterparty_cds": 150, "intraday_liquidity": 5000, "history": ["Simulation Started"], "injects": []}}',
-                content_type="application/json"
-            ))
+            # Navigate to the 2008 report which should have a simulation
+            url = "http://localhost:8000/showcase/newsletter_market_mayhem_sep_2008.html"
+            print(f"Navigating to {url}")
+            page.goto(url)
 
-            page.route("**/api/simulation/state", lambda route: route.fulfill(
-                status=200,
-                body='{"turn": 1, "lcr": 115.0, "cet1": 13.5, "sovereign_spread": 450, "repo_haircut": 2.0, "counterparty_cds": 150, "intraday_liquidity": 5000, "history": ["Simulation Started"], "injects": []}',
-                content_type="application/json"
-            ))
+            # Check for Crisis Simulation Header
+            print("Checking for Crisis Simulation Header...")
+            header = page.get_by_role("heading", name="5. Crisis Simulation:")
+            if header.is_visible():
+                print("PASS: Crisis Simulation Header visible.")
+            else:
+                print("FAIL: Crisis Simulation Header missing.")
 
-            # Load page from server
-            page.goto("http://localhost:8000/crisis_simulator.html")
-
-            # Click Start
-            page.click("text=INITIALIZE SIMULATION")
-
-            # Wait for overlay to hide
-            page.wait_for_selector("#start-overlay", state="hidden")
-
-            # Wait for data update
-            page.wait_for_function("document.getElementById('val-lcr').innerText.includes('115')")
+            # Check for Crisis Chart Canvas
+            print("Checking for Crisis Chart Canvas...")
+            canvas = page.locator("#crisisSimChart")
+            if canvas.is_visible():
+                print("PASS: Crisis Chart Canvas visible.")
+            else:
+                print("FAIL: Crisis Chart Canvas missing.")
 
             # Take Screenshot
-            page.screenshot(path="verification/crisis_sim_updated.png")
-            print("Screenshot saved to verification/crisis_sim_updated.png")
+            screenshot_path = "verification/crisis_sim_verified.png"
+            page.screenshot(path=screenshot_path, full_page=True)
+            print(f"Screenshot saved to {screenshot_path}")
 
             browser.close()
+
+    except Exception as e:
+        print(f"Error: {e}")
     finally:
-        server.kill()
+        server_process.terminate()
+        print("Server stopped.")
 
 if __name__ == "__main__":
-    verify_frontend()
+    verify_crisis_sim()

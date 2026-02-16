@@ -39,8 +39,9 @@
         <div class="toolbar-item" onclick="window.location.href='market_mayhem_archive.html'"><strong>FILE</strong></div>
         <div class="toolbar-item" onclick="showToast('EDIT MODE: READ ONLY (ARCHIVED)')">EDIT</div>
         <div class="toolbar-item" onclick="toggleTheme()">VIEW</div>
-        <div class="toolbar-item" onclick="showToast('INSERT: PERMISSION DENIED')">INSERT</div>
-        <div class="toolbar-item" onclick="showToast('FORMAT: LOCKED')">FORMAT</div>
+        <div class="toolbar-item" onclick="toggleRedactMode()">REDACT</div>
+        <div class="toolbar-item" onclick="printDoc()">PRINT</div>
+        <div class="toolbar-item" onclick="shareDoc()">SHARE</div>
         <div class="toolbar-item" onclick="runVerification()" style="color: #0078d7;"><strong>VERIFY</strong></div>
         <div style="flex-grow:1;"></div>
         <div class="toolbar-item" style="color:#666;">ADAM_V26_EDITOR</div>
@@ -52,6 +53,7 @@
     </div>
 
     <div class="newsletter-wrapper">
+        <div id="watermark">CONFIDENTIAL // TOP SECRET</div>
         <div class="paper-sheet" id="paper-sheet">
 
             <!-- High Tier Header UI -->
@@ -85,6 +87,20 @@
         <p><strong>Oil Shock:</strong> Demand destruction is so severe that WTI crude futures are trading at imminent risk of turning negative due to storage capacity constraints. (Update: They did, hitting -$37.63 in April).</p>
         <p><strong>Central Bank Response:</strong> The Fed has unleashed 'Unlimited QE', buying corporate bonds for the first time in history. The mantra is 'Don't Fight the Fed', but the economic data is catastrophic.</p>
 
+
+            <!-- Advanced Analytics Sections -->
+            <div class="analytics-section"><h3>2. Strategic Risk & Sensitivity Analysis</h3><table class="risk-matrix-table"><thead><tr><th>Risk Factor</th><th>Impact</th><th>Probability</th><th>Strategic Mitigant</th></tr></thead><tbody><tr><td>Inflation Resurgence</td><td class="impact-critical">CRITICAL</td><td>LOW</td><td>Short Duration Bonds (TBT), Long Energy (XLE)</td></tr><tr><td>Consumer Recession</td><td class="impact-high">HIGH</td><td>MED</td><td>Long Staples (XLP), Short Discretionary (XLY)</td></tr><tr><td>Liquidity Crunch</td><td class="impact-high">HIGH</td><td>LOW</td><td>Raise Cash Levels > 15%, Hold T-Bills</td></tr><tr><td>AI Capex Disappointment</td><td class="impact-med">MED</td><td>MED</td><td>Rotate into Value/Industrials, Short NVDA/SMH</td></tr></tbody></table></div>
+            <div class="analytics-section"><h3>3. Sector Arbitrage & Alpha Opportunities</h3><div class="arbitrage-grid"><div class="arbitrage-card"><div class="arb-header">Long Consumer / Short Healthcare</div><div class="arb-type">SECTOR_ARB | Horizon: 2-4 Weeks</div><div class="arb-thesis">Valuation gap of 3.1σ implies mean reversion. Consumer showing superior free cash flow yield.</div><div class="arb-conviction">Conviction: 79%</div></div><div class="arbitrage-card"><div class="arb-header">Short VIX / Long Skew</div><div class="arb-type">VOL_ARB | Horizon: 1 Week</div><div class="arb-thesis">Implied volatility premium is overpriced relative to realized vol. Selling covered calls on index.</div><div class="arb-conviction">Conviction: 73%</div></div></div></div>
+            <div class="analytics-section"><h3>4. Institutional Positioning (13F & Flows)</h3><div class="flow-heatmap"><div class="flow-item" style="background:rgba(255, 0, 0, 0.29);"><span class="flow-sector">Technology</span><span class="flow-val">-29</span></div><div class="flow-item" style="background:rgba(255, 0, 0, 0.15);"><span class="flow-sector">Energy</span><span class="flow-val">-15</span></div><div class="flow-item" style="background:rgba(255, 0, 0, 0.13);"><span class="flow-sector">Financials</span><span class="flow-val">-13</span></div><div class="flow-item" style="background:rgba(0, 255, 0, 0.3);"><span class="flow-sector">Healthcare</span><span class="flow-val">30</span></div><div class="flow-item" style="background:rgba(0, 255, 0, 0.44);"><span class="flow-sector">Discretionary</span><span class="flow-val">44</span></div><div class="flow-item" style="background:rgba(255, 0, 0, 0.08);"><span class="flow-sector">Staples</span><span class="flow-val">-8</span></div><div class="flow-item" style="background:rgba(255, 0, 0, 0.28);"><span class="flow-sector">Utilities</span><span class="flow-val">-28</span></div><div class="flow-item" style="background:rgba(255, 0, 0, 0.3);"><span class="flow-sector">Real Estate</span><span class="flow-val">-30</span></div><div class="flow-item" style="background:rgba(255, 0, 0, 0.36);"><span class="flow-sector">Materials</span><span class="flow-val">-36</span></div><div class="flow-item" style="background:rgba(0, 255, 0, 0.76);"><span class="flow-sector">Comms</span><span class="flow-val">76</span></div></div></div>
+
+            <!-- Crisis Simulation Section -->
+            <div class="analytics-section">
+        <h3>5. Crisis Simulation: 2020 Pandemic Lockdowns</h3>
+        <p><strong>Scenario:</strong> Global economic shutdown followed by fiscal stimulus.</p>
+        <div class="chart-container" style="height: 300px; position: relative;">
+            <canvas id="crisisSimChart"></canvas>
+        </div>
+    </div>
 
             <!-- Provenance Log (All Tiers) -->
             <div class="provenance-log">
@@ -198,54 +214,291 @@
   "conviction": 50,
   "semantic_score": 67,
   "probability": 50,
-  "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 85/100. Cross-reference with knowledge graph completed."
+  "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 85/100. Cross-reference with knowledge graph completed.",
+  "analytics": {
+    "risks": [
+      {
+        "risk": "Inflation Resurgence",
+        "impact": "CRITICAL",
+        "prob": "LOW",
+        "mitigant": "Short Duration Bonds (TBT), Long Energy (XLE)"
+      },
+      {
+        "risk": "Consumer Recession",
+        "impact": "HIGH",
+        "prob": "MED",
+        "mitigant": "Long Staples (XLP), Short Discretionary (XLY)"
+      },
+      {
+        "risk": "Liquidity Crunch",
+        "impact": "HIGH",
+        "prob": "LOW",
+        "mitigant": "Raise Cash Levels > 15%, Hold T-Bills"
+      },
+      {
+        "risk": "AI Capex Disappointment",
+        "impact": "MED",
+        "prob": "MED",
+        "mitigant": "Rotate into Value/Industrials, Short NVDA/SMH"
+      }
+    ],
+    "arbitrage": [
+      {
+        "type": "SECTOR_ARB",
+        "strategy": "Long Consumer / Short Healthcare",
+        "thesis": "Valuation gap of 3.1\u03c3 implies mean reversion. Consumer showing superior free cash flow yield.",
+        "horizon": "2-4 Weeks",
+        "conviction": "79%"
+      },
+      {
+        "type": "VOL_ARB",
+        "strategy": "Short VIX / Long Skew",
+        "thesis": "Implied volatility premium is overpriced relative to realized vol. Selling covered calls on index.",
+        "horizon": "1 Week",
+        "conviction": "73%"
+      }
+    ],
+    "flows": {
+      "Technology": -29,
+      "Energy": -15,
+      "Financials": -13,
+      "Healthcare": 30,
+      "Discretionary": 44,
+      "Staples": -8,
+      "Utilities": -28,
+      "Real Estate": -30,
+      "Materials": -36,
+      "Comms": 76
+    },
+    "regime": "CRISIS / LIQUIDITY SHOCK"
+  },
+  "crisis_sim": {
+    "scenario": "2020 Pandemic Lockdowns",
+    "description": "Global economic shutdown followed by fiscal stimulus.",
+    "dates": [
+      "Day 0",
+      "Day 1",
+      "Day 2",
+      "Day 3",
+      "Day 4",
+      "Day 5",
+      "Day 6",
+      "Day 7",
+      "Day 8",
+      "Day 9",
+      "Day 10",
+      "Day 11",
+      "Day 12",
+      "Day 13",
+      "Day 14",
+      "Day 15",
+      "Day 16",
+      "Day 17",
+      "Day 18",
+      "Day 19",
+      "Day 20",
+      "Day 21",
+      "Day 22",
+      "Day 23",
+      "Day 24",
+      "Day 25",
+      "Day 26",
+      "Day 27",
+      "Day 28",
+      "Day 29",
+      "Day 30",
+      "Day 31",
+      "Day 32",
+      "Day 33",
+      "Day 34",
+      "Day 35",
+      "Day 36",
+      "Day 37",
+      "Day 38",
+      "Day 39",
+      "Day 40"
+    ],
+    "portfolio_values": [
+      1000000,
+      1007745,
+      1003155,
+      972253,
+      973786,
+      979211,
+      949025,
+      974300,
+      1012242,
+      1007420,
+      971894,
+      978831,
+      966550,
+      971184,
+      974154,
+      726892,
+      740016,
+      749239,
+      776982,
+      796481,
+      822706,
+      849813,
+      882500,
+      907384,
+      937107,
+      928587,
+      957307,
+      995097,
+      997214,
+      999943,
+      1019886,
+      1035680,
+      1045806,
+      1099227,
+      1100210,
+      1072898,
+      1093332,
+      1066131,
+      1105546,
+      1081585,
+      1078220
+    ],
+    "benchmark_values": [
+      1000000,
+      943660,
+      970314,
+      934777,
+      920002,
+      909355,
+      914497,
+      918104,
+      940854,
+      919250,
+      915932,
+      930972,
+      923417,
+      933788,
+      918077,
+      548004,
+      567229,
+      576054,
+      583405,
+      625462,
+      636515,
+      657589,
+      655675,
+      686531,
+      743947,
+      785048,
+      800161,
+      830849,
+      887433,
+      937582,
+      984052,
+      941676,
+      988439,
+      1041000,
+      1069726,
+      1060108,
+      1053672,
+      1073697,
+      1071047,
+      1031331,
+      1022916
+    ]
+  }
 }</textarea>
 
     <script>
         // Chart Injection Logic
         const metricsData = {};
+        const flowsData = {"Technology": -29, "Energy": -15, "Financials": -13, "Healthcare": 30, "Discretionary": 44, "Staples": -8, "Utilities": -28, "Real Estate": -30, "Materials": -36, "Comms": 76};
+        const crisisData = {"scenario": "2020 Pandemic Lockdowns", "description": "Global economic shutdown followed by fiscal stimulus.", "dates": ["Day 0", "Day 1", "Day 2", "Day 3", "Day 4", "Day 5", "Day 6", "Day 7", "Day 8", "Day 9", "Day 10", "Day 11", "Day 12", "Day 13", "Day 14", "Day 15", "Day 16", "Day 17", "Day 18", "Day 19", "Day 20", "Day 21", "Day 22", "Day 23", "Day 24", "Day 25", "Day 26", "Day 27", "Day 28", "Day 29", "Day 30", "Day 31", "Day 32", "Day 33", "Day 34", "Day 35", "Day 36", "Day 37", "Day 38", "Day 39", "Day 40"], "portfolio_values": [1000000, 1007745, 1003155, 972253, 973786, 979211, 949025, 974300, 1012242, 1007420, 971894, 978831, 966550, 971184, 974154, 726892, 740016, 749239, 776982, 796481, 822706, 849813, 882500, 907384, 937107, 928587, 957307, 995097, 997214, 999943, 1019886, 1035680, 1045806, 1099227, 1100210, 1072898, 1093332, 1066131, 1105546, 1081585, 1078220], "benchmark_values": [1000000, 943660, 970314, 934777, 920002, 909355, 914497, 918104, 940854, 919250, 915932, 930972, 923417, 933788, 918077, 548004, 567229, 576054, 583405, 625462, 636515, 657589, 655675, 686531, 743947, 785048, 800161, 830849, 887433, 937582, 984052, 941676, 988439, 1041000, 1069726, 1060108, 1053672, 1073697, 1071047, 1031331, 1022916]};
 
-        if (metricsData && Object.keys(metricsData).length > 0) {
-            const ctx = document.getElementById('financialChart');
-            const container = document.getElementById('financialChartContainer');
+        document.addEventListener('DOMContentLoaded', () => {
+            if (metricsData && Object.keys(metricsData).length > 0) {
+                const ctx = document.getElementById('financialChart');
+                const container = document.getElementById('financialChartContainer');
 
-            // Basic parsing of metrics structure (assuming flat or Year->Val)
-            let labels = [];
-            let values = [];
-            let labelName = "Metric";
+                // Basic parsing of metrics structure
+                let labels = [];
+                let values = [];
+                let labelName = "Metric";
 
-            // Try to find a timeseries
-            for (const [key, val] of Object.entries(metricsData)) {
-                if (typeof val === 'object') {
-                    // Likely year -> value
-                    labels = Object.keys(val);
-                    values = Object.values(val).map(v => parseFloat(v.replace(/[^0-9.-]/g, '')));
-                    labelName = key;
-                    break;
+                for (const [key, val] of Object.entries(metricsData)) {
+                    if (typeof val === 'object') {
+                        labels = Object.keys(val);
+                        values = Object.values(val).map(v => parseFloat(v.replace(/[^0-9.-]/g, '')));
+                        labelName = key;
+                        break;
+                    }
+                }
+
+                if (labels.length > 0) {
+                    container.style.display = 'block';
+                    new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: labelName,
+                                data: values,
+                                backgroundColor: 'rgba(204, 0, 0, 0.5)',
+                                borderColor: '#cc0000',
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: { legend: { display: true } }
+                        }
+                    });
                 }
             }
 
-            if (labels.length > 0) {
-                container.style.display = 'block';
-                new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            label: labelName,
-                            data: values,
-                            backgroundColor: 'rgba(204, 0, 0, 0.5)',
-                            borderColor: '#cc0000',
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        plugins: { legend: { display: true } }
-                    }
-                });
+            // Crisis Simulation Chart
+            if (crisisData && crisisData.portfolio_values) {
+                const ctx = document.getElementById('crisisSimChart');
+                if (ctx) {
+                    new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: crisisData.dates,
+                            datasets: [
+                                {
+                                    label: 'Portfolio (Simulated)',
+                                    data: crisisData.portfolio_values,
+                                    borderColor: '#00f3ff',
+                                    backgroundColor: 'rgba(0, 243, 255, 0.1)',
+                                    tension: 0.4,
+                                    borderWidth: 2
+                                },
+                                {
+                                    label: 'Benchmark (Simulated)',
+                                    data: crisisData.benchmark_values,
+                                    borderColor: '#cc0000',
+                                    backgroundColor: 'rgba(204, 0, 0, 0.0)',
+                                    borderDash: [5, 5],
+                                    tension: 0.4,
+                                    borderWidth: 2
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            interaction: { mode: 'index', intersect: false },
+                            plugins: {
+                                legend: { labels: { color: '#666' } },
+                                title: { display: true, text: 'Portfolio Resilience: ' + crisisData.scenario }
+                            },
+                            scales: {
+                                y: { display: true, grid: { color: '#eee' } },
+                                x: { display: false }
+                            }
+                        }
+                    });
+                }
             }
-        }
+        });
     </script>
 </body>
 </html>

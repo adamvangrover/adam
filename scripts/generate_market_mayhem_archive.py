@@ -7,6 +7,8 @@ import hashlib
 from datetime import datetime
 from collections import Counter
 from bs4 import BeautifulSoup
+import market_mayhem_analytics as analytics
+from market_mayhem_crisis_sim import CrisisSimulator
 
 # --- Configuration ---
 OUTPUT_DIR = "showcase"
@@ -154,6 +156,43 @@ def determine_tier(type_, quality):
     return "tier-medium"
 
 # --- Formatting Helpers ---
+
+def format_risk_matrix(risks):
+    """Formats risks list into an HTML table."""
+    html = '<div class="analytics-section"><h3>2. Strategic Risk & Sensitivity Analysis</h3><table class="risk-matrix-table"><thead><tr><th>Risk Factor</th><th>Impact</th><th>Probability</th><th>Strategic Mitigant</th></tr></thead><tbody>'
+    for r in risks:
+        impact_class = f"impact-{r['impact'].lower()}"
+        html += f'<tr><td>{r["risk"]}</td><td class="{impact_class}">{r["impact"]}</td><td>{r["prob"]}</td><td>{r["mitigant"]}</td></tr>'
+    html += '</tbody></table></div>'
+    return html
+
+def format_arbitrage(ideas):
+    """Formats arbitrage ideas into cards."""
+    html = '<div class="analytics-section"><h3>3. Sector Arbitrage & Alpha Opportunities</h3><div class="arbitrage-grid">'
+    for idea in ideas:
+        html += f'<div class="arbitrage-card"><div class="arb-header">{idea["strategy"]}</div><div class="arb-type">{idea["type"]} | Horizon: {idea["horizon"]}</div><div class="arb-thesis">{idea["thesis"]}</div><div class="arb-conviction">Conviction: {idea["conviction"]}</div></div>'
+    html += '</div></div>'
+    return html
+
+def format_flows(flows):
+    """Formats flows into a simple heatmap/list (Chart.js will handle viz)."""
+    html = '<div class="analytics-section"><h3>4. Institutional Positioning (13F & Flows)</h3><div class="flow-heatmap">'
+    for sector, flow in flows.items():
+        color = f"rgba(0, 255, 0, {abs(flow)/100})" if flow > 0 else f"rgba(255, 0, 0, {abs(flow)/100})"
+        html += f'<div class="flow-item" style="background:{color};"><span class="flow-sector">{sector}</span><span class="flow-val">{flow}</span></div>'
+    html += '</div></div>'
+    return html
+
+def format_crisis_sim(sim_data):
+    """Formats crisis simulation results into a section with a chart container."""
+    html = f"""<div class="analytics-section">
+        <h3>5. Crisis Simulation: {sim_data['scenario']}</h3>
+        <p><strong>Scenario:</strong> {sim_data['description']}</p>
+        <div class="chart-container" style="height: 300px; position: relative;">
+            <canvas id="crisisSimChart"></canvas>
+        </div>
+    </div>"""
+    return html
 
 def simple_md_to_html(text):
     """Converts basic Markdown to HTML using Regex."""
@@ -897,8 +936,9 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         <div class="toolbar-item" onclick="window.location.href='market_mayhem_archive.html'"><strong>FILE</strong></div>
         <div class="toolbar-item" onclick="showToast('EDIT MODE: READ ONLY (ARCHIVED)')">EDIT</div>
         <div class="toolbar-item" onclick="toggleTheme()">VIEW</div>
-        <div class="toolbar-item" onclick="showToast('INSERT: PERMISSION DENIED')">INSERT</div>
-        <div class="toolbar-item" onclick="showToast('FORMAT: LOCKED')">FORMAT</div>
+        <div class="toolbar-item" onclick="toggleRedactMode()">REDACT</div>
+        <div class="toolbar-item" onclick="printDoc()">PRINT</div>
+        <div class="toolbar-item" onclick="shareDoc()">SHARE</div>
         <div class="toolbar-item" onclick="runVerification()" style="color: #0078d7;"><strong>VERIFY</strong></div>
         <div style="flex-grow:1;"></div>
         <div class="toolbar-item" style="color:#666;">ADAM_V26_EDITOR</div>
@@ -910,6 +950,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     </div>
 
     <div class="newsletter-wrapper">
+        <div id="watermark">CONFIDENTIAL // TOP SECRET</div>
         <div class="paper-sheet" id="paper-sheet">
 
             <!-- High Tier Header UI -->
@@ -938,6 +979,14 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             </div>
 
             {full_body}
+
+            <!-- Advanced Analytics Sections -->
+            {risk_html}
+            {arbitrage_html}
+            {flows_html}
+
+            <!-- Crisis Simulation Section -->
+            {crisis_sim_html}
 
             <!-- Provenance Log (All Tiers) -->
             <div class="provenance-log">
@@ -1027,54 +1076,104 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     <script>
         // Chart Injection Logic
         const metricsData = {metrics_json};
+        const flowsData = {flows_json};
+        const crisisData = {crisis_sim_json};
 
-        if (metricsData && Object.keys(metricsData).length > 0) {{
-            const ctx = document.getElementById('financialChart');
-            const container = document.getElementById('financialChartContainer');
+        document.addEventListener('DOMContentLoaded', () => {{
+            if (metricsData && Object.keys(metricsData).length > 0) {{
+                const ctx = document.getElementById('financialChart');
+                const container = document.getElementById('financialChartContainer');
 
-            // Basic parsing of metrics structure (assuming flat or Year->Val)
-            let labels = [];
-            let values = [];
-            let labelName = "Metric";
+                // Basic parsing of metrics structure
+                let labels = [];
+                let values = [];
+                let labelName = "Metric";
 
-            // Try to find a timeseries
-            for (const [key, val] of Object.entries(metricsData)) {{
-                if (typeof val === 'object') {{
-                    // Likely year -> value
-                    labels = Object.keys(val);
-                    values = Object.values(val).map(v => parseFloat(v.replace(/[^0-9.-]/g, '')));
-                    labelName = key;
-                    break;
+                for (const [key, val] of Object.entries(metricsData)) {{
+                    if (typeof val === 'object') {{
+                        labels = Object.keys(val);
+                        values = Object.values(val).map(v => parseFloat(v.replace(/[^0-9.-]/g, '')));
+                        labelName = key;
+                        break;
+                    }}
+                }}
+
+                if (labels.length > 0) {{
+                    container.style.display = 'block';
+                    new Chart(ctx, {{
+                        type: 'bar',
+                        data: {{
+                            labels: labels,
+                            datasets: [{{
+                                label: labelName,
+                                data: values,
+                                backgroundColor: 'rgba(204, 0, 0, 0.5)',
+                                borderColor: '#cc0000',
+                                borderWidth: 1
+                            }}]
+                        }},
+                        options: {{
+                            responsive: true,
+                            plugins: {{ legend: {{ display: true }} }}
+                        }}
+                    }});
                 }}
             }}
 
-            if (labels.length > 0) {{
-                container.style.display = 'block';
-                new Chart(ctx, {{
-                    type: 'bar',
-                    data: {{
-                        labels: labels,
-                        datasets: [{{
-                            label: labelName,
-                            data: values,
-                            backgroundColor: 'rgba(204, 0, 0, 0.5)',
-                            borderColor: '#cc0000',
-                            borderWidth: 1
-                        }}]
-                    }},
-                    options: {{
-                        responsive: true,
-                        plugins: {{ legend: {{ display: true }} }}
-                    }}
-                }});
+            // Crisis Simulation Chart
+            if (crisisData && crisisData.portfolio_values) {{
+                const ctx = document.getElementById('crisisSimChart');
+                if (ctx) {{
+                    new Chart(ctx, {{
+                        type: 'line',
+                        data: {{
+                            labels: crisisData.dates,
+                            datasets: [
+                                {{
+                                    label: 'Portfolio (Simulated)',
+                                    data: crisisData.portfolio_values,
+                                    borderColor: '#00f3ff',
+                                    backgroundColor: 'rgba(0, 243, 255, 0.1)',
+                                    tension: 0.4,
+                                    borderWidth: 2
+                                }},
+                                {{
+                                    label: 'Benchmark (Simulated)',
+                                    data: crisisData.benchmark_values,
+                                    borderColor: '#cc0000',
+                                    backgroundColor: 'rgba(204, 0, 0, 0.0)',
+                                    borderDash: [5, 5],
+                                    tension: 0.4,
+                                    borderWidth: 2
+                                }}
+                            ]
+                        }},
+                        options: {{
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            interaction: {{ mode: 'index', intersect: false }},
+                            plugins: {{
+                                legend: {{ labels: {{ color: '#666' }} }},
+                                title: {{ display: true, text: 'Portfolio Resilience: ' + crisisData.scenario }}
+                            }},
+                            scales: {{
+                                y: {{ display: true, grid: {{ color: '#eee' }} }},
+                                x: {{ display: false }}
+                            }}
+                        }}
+                    }});
+                }}
             }}
-        }}
+        }});
     </script>
 </body>
 </html>
 """
 
 # --- Main Generation ---
+
+# Initialize Crisis Simulator
+crisis_sim = CrisisSimulator()
 
 def get_all_data():
     """Gather all newsletter and report data."""
@@ -1211,7 +1310,36 @@ def generate_archive():
         reviewer_match = re.search(r'Agent (\w+)', critique)
         reviewer_agent = reviewer_match.group(1) if reviewer_match else "SYSTEM"
 
-        # Serialize entire item as raw source
+        # --- ADVANCED ANALYTICS GENERATION ---
+        analytics_data = analytics.generate_advanced_analytics(item)
+
+        # --- CRISIS SIMULATION GENERATION ---
+        crisis_sim_data = crisis_sim.get_simulation(item['date'])
+
+        # Only inject full analytics for High Tier to keep Low Tier clean
+        if tier_class == "tier-high":
+            risk_html = format_risk_matrix(analytics_data['risks'])
+            arbitrage_html = format_arbitrage(analytics_data['arbitrage'])
+            flows_html = format_flows(analytics_data['flows'])
+            flows_json = json.dumps(analytics_data['flows'])
+
+            if crisis_sim_data:
+                crisis_sim_html = format_crisis_sim(crisis_sim_data)
+                crisis_sim_json = json.dumps(crisis_sim_data)
+            else:
+                crisis_sim_html = ""
+                crisis_sim_json = "{}"
+        else:
+            risk_html = ""
+            arbitrage_html = ""
+            flows_html = ""
+            flows_json = "{}"
+            crisis_sim_html = ""
+            crisis_sim_json = "{}"
+
+        # Serialize entire item as raw source, including analytics
+        item['analytics'] = analytics_data
+        item['crisis_sim'] = crisis_sim_data
         raw_source = json.dumps(item, default=str, indent=2)
 
         content = HTML_TEMPLATE.format(
@@ -1238,7 +1366,13 @@ def generate_archive():
             metadata_panel_display=metadata_panel_display,
             nav_display=nav_display,
             reviewer_agent=reviewer_agent,
-            raw_source=raw_source
+            raw_source=raw_source,
+            risk_html=risk_html,
+            arbitrage_html=arbitrage_html,
+            flows_html=flows_html,
+            flows_json=flows_json,
+            crisis_sim_html=crisis_sim_html,
+            crisis_sim_json=crisis_sim_json
         )
 
         with open(out_path, "w", encoding='utf-8') as f:

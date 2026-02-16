@@ -39,8 +39,9 @@
         <div class="toolbar-item" onclick="window.location.href='market_mayhem_archive.html'"><strong>FILE</strong></div>
         <div class="toolbar-item" onclick="showToast('EDIT MODE: READ ONLY (ARCHIVED)')">EDIT</div>
         <div class="toolbar-item" onclick="toggleTheme()">VIEW</div>
-        <div class="toolbar-item" onclick="showToast('INSERT: PERMISSION DENIED')">INSERT</div>
-        <div class="toolbar-item" onclick="showToast('FORMAT: LOCKED')">FORMAT</div>
+        <div class="toolbar-item" onclick="toggleRedactMode()">REDACT</div>
+        <div class="toolbar-item" onclick="printDoc()">PRINT</div>
+        <div class="toolbar-item" onclick="shareDoc()">SHARE</div>
         <div class="toolbar-item" onclick="runVerification()" style="color: #0078d7;"><strong>VERIFY</strong></div>
         <div style="flex-grow:1;"></div>
         <div class="toolbar-item" style="color:#666;">ADAM_V26_EDITOR</div>
@@ -52,6 +53,7 @@
     </div>
 
     <div class="newsletter-wrapper">
+        <div id="watermark">CONFIDENTIAL // TOP SECRET</div>
         <div class="paper-sheet" id="paper-sheet">
 
             <!-- High Tier Header UI -->
@@ -82,6 +84,20 @@
             <h2>Company Overview</h2><p>Microsoft is a multinational technology company that develops, manufactures, licenses, supports, and sells computer software, consumer electronics, personal computers, and related services. Its best-known software products are the Microsoft Windows line of operating systems, the Microsoft Office suite, and the Internet Explorer and Edge web browsers. Its flagship hardware products are the Xbox video game consoles and the Microsoft Surface lineup of touchscreen personal computers.</p>
 <h2>Financial Performance</h2><h3>Revenue</h3><h4>2022</h4><p>198.27 billion USD</p><h4>2023</h4><p>214.91 billion USD</p><h4>2024</h4><p>230.00 billion USD (estimated)</p><h3>Net Income</h3><h4>2022</h4><p>72.74 billion USD</p><h4>2023</h4><p>72.44 billion USD</p><h4>2024</h4><p>82.00 billion USD (estimated)</p><h3>Eps</h3><h4>2022</h4><p>9.65 USD</p><h4>2023</h4><p>9.74 USD</p><h4>2024</h4><p>11.00 USD (estimated)</p><h3>P/E Ratio</h3><h4>Current</h4><p>28.50</p><h3>Market Cap</h3><h4>Current</h4><p>2.15 trillion USD</p><h3>Debt-To-Equity Ratio</h3><h4>Current</h4><p>0.45</p><h3>Operating Margin</h3><h4>2022</h4><p>42.00%</p><h4>2023</h4><p>41.00%</p><h2>Valuation</h2><h3>Dcf Valuation</h3><h4>Base Case</h4><p>300 USD</p><h4>Bear Case</h4><p>250 USD</p><h4>Bull Case</h4><p>350 USD</p><h3>Ev/Ebitda Multiple</h3><h4>Current</h4><p>22.00</p><h3>Price/Sales Ratio</h3><h4>Current</h4><p>10.00</p><h2>Risk Assessment</h2><h2>Future Outlook</h2><h2>Investment Thesis</h2><p>Microsoft is a high-quality company with a strong track record of growth and innovation. Its diversified business model and competitive advantages position it well for continued success. However, investors should be mindful of the potential risks and challenges facing the company. Overall, Microsoft remains a compelling investment opportunity for long-term investors, especially those seeking exposure to the technology sector and the growth of cloud computing and AI.</p>
 
+
+            <!-- Advanced Analytics Sections -->
+            <div class="analytics-section"><h3>2. Strategic Risk & Sensitivity Analysis</h3><table class="risk-matrix-table"><thead><tr><th>Risk Factor</th><th>Impact</th><th>Probability</th><th>Strategic Mitigant</th></tr></thead><tbody><tr><td>Credit Spread Widening</td><td class="impact-high">HIGH</td><td>LOW</td><td>Buy CDS Protection (CDX.IG), Short HYG</td></tr><tr><td>Liquidity Crunch</td><td class="impact-high">HIGH</td><td>LOW</td><td>Raise Cash Levels > 15%, Hold T-Bills</td></tr><tr><td>AI Capex Disappointment</td><td class="impact-med">MED</td><td>MED</td><td>Rotate into Value/Industrials, Short NVDA/SMH</td></tr></tbody></table></div>
+            <div class="analytics-section"><h3>3. Sector Arbitrage & Alpha Opportunities</h3><div class="arbitrage-grid"><div class="arbitrage-card"><div class="arb-header">Long Financials / Short Real Estate</div><div class="arb-type">SECTOR_ARB | Horizon: 2-4 Weeks</div><div class="arb-thesis">Valuation gap of 1.5σ implies mean reversion. Financials showing superior free cash flow yield.</div><div class="arb-conviction">Conviction: 92%</div></div></div></div>
+            <div class="analytics-section"><h3>4. Institutional Positioning (13F & Flows)</h3><div class="flow-heatmap"><div class="flow-item" style="background:rgba(0, 255, 0, 0.32);"><span class="flow-sector">Technology</span><span class="flow-val">32</span></div><div class="flow-item" style="background:rgba(255, 0, 0, 0.17);"><span class="flow-sector">Energy</span><span class="flow-val">-17</span></div><div class="flow-item" style="background:rgba(0, 255, 0, 0.14);"><span class="flow-sector">Financials</span><span class="flow-val">14</span></div><div class="flow-item" style="background:rgba(0, 255, 0, 0.32);"><span class="flow-sector">Healthcare</span><span class="flow-val">32</span></div><div class="flow-item" style="background:rgba(0, 255, 0, 0.08);"><span class="flow-sector">Discretionary</span><span class="flow-val">8</span></div><div class="flow-item" style="background:rgba(255, 0, 0, 0.17);"><span class="flow-sector">Staples</span><span class="flow-val">-17</span></div><div class="flow-item" style="background:rgba(255, 0, 0, 0.17);"><span class="flow-sector">Utilities</span><span class="flow-val">-17</span></div><div class="flow-item" style="background:rgba(255, 0, 0, 0.54);"><span class="flow-sector">Real Estate</span><span class="flow-val">-54</span></div><div class="flow-item" style="background:rgba(255, 0, 0, 0.58);"><span class="flow-sector">Materials</span><span class="flow-val">-58</span></div><div class="flow-item" style="background:rgba(0, 255, 0, 0.31);"><span class="flow-sector">Comms</span><span class="flow-val">31</span></div></div></div>
+
+            <!-- Crisis Simulation Section -->
+            <div class="analytics-section">
+        <h3>5. Crisis Simulation: Standard Recession</h3>
+        <p><strong>Scenario:</strong> Cyclical downturn with contracting earnings multiples.</p>
+        <div class="chart-container" style="height: 300px; position: relative;">
+            <canvas id="crisisSimChart"></canvas>
+        </div>
+    </div>
 
             <!-- Provenance Log (All Tiers) -->
             <div class="provenance-log">
@@ -195,54 +211,428 @@
   "conviction": 0,
   "semantic_score": 41,
   "probability": 0,
-  "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 80/100. Cross-reference with knowledge graph completed."
+  "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 80/100. Cross-reference with knowledge graph completed.",
+  "analytics": {
+    "risks": [
+      {
+        "risk": "Credit Spread Widening",
+        "impact": "HIGH",
+        "prob": "LOW",
+        "mitigant": "Buy CDS Protection (CDX.IG), Short HYG"
+      },
+      {
+        "risk": "Liquidity Crunch",
+        "impact": "HIGH",
+        "prob": "LOW",
+        "mitigant": "Raise Cash Levels > 15%, Hold T-Bills"
+      },
+      {
+        "risk": "AI Capex Disappointment",
+        "impact": "MED",
+        "prob": "MED",
+        "mitigant": "Rotate into Value/Industrials, Short NVDA/SMH"
+      }
+    ],
+    "arbitrage": [
+      {
+        "type": "SECTOR_ARB",
+        "strategy": "Long Financials / Short Real Estate",
+        "thesis": "Valuation gap of 1.5\u03c3 implies mean reversion. Financials showing superior free cash flow yield.",
+        "horizon": "2-4 Weeks",
+        "conviction": "92%"
+      }
+    ],
+    "flows": {
+      "Technology": 32,
+      "Energy": -17,
+      "Financials": 14,
+      "Healthcare": 32,
+      "Discretionary": 8,
+      "Staples": -17,
+      "Utilities": -17,
+      "Real Estate": -54,
+      "Materials": -58,
+      "Comms": 31
+    },
+    "regime": "SECULAR GROWTH"
+  },
+  "crisis_sim": {
+    "scenario": "Standard Recession",
+    "description": "Cyclical downturn with contracting earnings multiples.",
+    "dates": [
+      "Day 0",
+      "Day 1",
+      "Day 2",
+      "Day 3",
+      "Day 4",
+      "Day 5",
+      "Day 6",
+      "Day 7",
+      "Day 8",
+      "Day 9",
+      "Day 10",
+      "Day 11",
+      "Day 12",
+      "Day 13",
+      "Day 14",
+      "Day 15",
+      "Day 16",
+      "Day 17",
+      "Day 18",
+      "Day 19",
+      "Day 20",
+      "Day 21",
+      "Day 22",
+      "Day 23",
+      "Day 24",
+      "Day 25",
+      "Day 26",
+      "Day 27",
+      "Day 28",
+      "Day 29",
+      "Day 30",
+      "Day 31",
+      "Day 32",
+      "Day 33",
+      "Day 34",
+      "Day 35",
+      "Day 36",
+      "Day 37",
+      "Day 38",
+      "Day 39",
+      "Day 40",
+      "Day 41",
+      "Day 42",
+      "Day 43",
+      "Day 44",
+      "Day 45",
+      "Day 46",
+      "Day 47",
+      "Day 48",
+      "Day 49",
+      "Day 50",
+      "Day 51",
+      "Day 52",
+      "Day 53",
+      "Day 54",
+      "Day 55",
+      "Day 56",
+      "Day 57",
+      "Day 58",
+      "Day 59",
+      "Day 60",
+      "Day 61",
+      "Day 62",
+      "Day 63",
+      "Day 64",
+      "Day 65",
+      "Day 66",
+      "Day 67",
+      "Day 68",
+      "Day 69",
+      "Day 70",
+      "Day 71",
+      "Day 72",
+      "Day 73",
+      "Day 74",
+      "Day 75",
+      "Day 76",
+      "Day 77",
+      "Day 78",
+      "Day 79",
+      "Day 80",
+      "Day 81",
+      "Day 82",
+      "Day 83",
+      "Day 84",
+      "Day 85",
+      "Day 86",
+      "Day 87",
+      "Day 88",
+      "Day 89",
+      "Day 90"
+    ],
+    "portfolio_values": [
+      1000000,
+      999237,
+      968516,
+      959818,
+      958356,
+      944127,
+      949379,
+      938173,
+      937177,
+      941919,
+      940920,
+      952395,
+      977795,
+      971879,
+      977052,
+      971625,
+      977985,
+      976477,
+      958689,
+      961502,
+      958946,
+      942964,
+      944153,
+      944306,
+      938582,
+      946239,
+      939525,
+      933170,
+      931699,
+      933639,
+      934038,
+      938348,
+      954411,
+      937964,
+      930306,
+      928365,
+      926560,
+      916433,
+      915987,
+      916992,
+      916853,
+      921392,
+      916974,
+      918291,
+      915786,
+      942040,
+      960523,
+      963406,
+      953103,
+      951307,
+      944533,
+      940028,
+      960510,
+      966516,
+      976906,
+      996386,
+      988315,
+      969387,
+      978865,
+      974265,
+      977113,
+      975291,
+      972970,
+      965200,
+      968541,
+      945304,
+      951727,
+      943940,
+      926881,
+      903696,
+      900903,
+      899391,
+      914801,
+      906928,
+      899360,
+      887420,
+      898886,
+      906409,
+      898888,
+      895010,
+      884441,
+      868408,
+      864657,
+      873140,
+      878918,
+      874984,
+      864759,
+      862996,
+      868430,
+      854701,
+      843329
+    ],
+    "benchmark_values": [
+      1000000,
+      997475,
+      1000728,
+      984043,
+      1000331,
+      984729,
+      967003,
+      972001,
+      966685,
+      952437,
+      962483,
+      944034,
+      949976,
+      956107,
+      955813,
+      966167,
+      976739,
+      971735,
+      969488,
+      967928,
+      958270,
+      969666,
+      966062,
+      960236,
+      946545,
+      944678,
+      936350,
+      925286,
+      931484,
+      934634,
+      914961,
+      923474,
+      924972,
+      924734,
+      935843,
+      933616,
+      937914,
+      939755,
+      931726,
+      920833,
+      922344,
+      915705,
+      919376,
+      924536,
+      923080,
+      920893,
+      928627,
+      919661,
+      915290,
+      918355,
+      924467,
+      929044,
+      919328,
+      926975,
+      930039,
+      932484,
+      940189,
+      925976,
+      921469,
+      907422,
+      887383,
+      884379,
+      893990,
+      890453,
+      894904,
+      892163,
+      881937,
+      881752,
+      883515,
+      876366,
+      873548,
+      856790,
+      852720,
+      844262,
+      842670,
+      838666,
+      846453,
+      832372,
+      812069,
+      795683,
+      787965,
+      790381,
+      790141,
+      792437,
+      798006,
+      802153,
+      806560,
+      801891,
+      796569,
+      802301,
+      807479
+    ]
+  }
 }</textarea>
 
     <script>
         // Chart Injection Logic
         const metricsData = {};
+        const flowsData = {"Technology": 32, "Energy": -17, "Financials": 14, "Healthcare": 32, "Discretionary": 8, "Staples": -17, "Utilities": -17, "Real Estate": -54, "Materials": -58, "Comms": 31};
+        const crisisData = {"scenario": "Standard Recession", "description": "Cyclical downturn with contracting earnings multiples.", "dates": ["Day 0", "Day 1", "Day 2", "Day 3", "Day 4", "Day 5", "Day 6", "Day 7", "Day 8", "Day 9", "Day 10", "Day 11", "Day 12", "Day 13", "Day 14", "Day 15", "Day 16", "Day 17", "Day 18", "Day 19", "Day 20", "Day 21", "Day 22", "Day 23", "Day 24", "Day 25", "Day 26", "Day 27", "Day 28", "Day 29", "Day 30", "Day 31", "Day 32", "Day 33", "Day 34", "Day 35", "Day 36", "Day 37", "Day 38", "Day 39", "Day 40", "Day 41", "Day 42", "Day 43", "Day 44", "Day 45", "Day 46", "Day 47", "Day 48", "Day 49", "Day 50", "Day 51", "Day 52", "Day 53", "Day 54", "Day 55", "Day 56", "Day 57", "Day 58", "Day 59", "Day 60", "Day 61", "Day 62", "Day 63", "Day 64", "Day 65", "Day 66", "Day 67", "Day 68", "Day 69", "Day 70", "Day 71", "Day 72", "Day 73", "Day 74", "Day 75", "Day 76", "Day 77", "Day 78", "Day 79", "Day 80", "Day 81", "Day 82", "Day 83", "Day 84", "Day 85", "Day 86", "Day 87", "Day 88", "Day 89", "Day 90"], "portfolio_values": [1000000, 999237, 968516, 959818, 958356, 944127, 949379, 938173, 937177, 941919, 940920, 952395, 977795, 971879, 977052, 971625, 977985, 976477, 958689, 961502, 958946, 942964, 944153, 944306, 938582, 946239, 939525, 933170, 931699, 933639, 934038, 938348, 954411, 937964, 930306, 928365, 926560, 916433, 915987, 916992, 916853, 921392, 916974, 918291, 915786, 942040, 960523, 963406, 953103, 951307, 944533, 940028, 960510, 966516, 976906, 996386, 988315, 969387, 978865, 974265, 977113, 975291, 972970, 965200, 968541, 945304, 951727, 943940, 926881, 903696, 900903, 899391, 914801, 906928, 899360, 887420, 898886, 906409, 898888, 895010, 884441, 868408, 864657, 873140, 878918, 874984, 864759, 862996, 868430, 854701, 843329], "benchmark_values": [1000000, 997475, 1000728, 984043, 1000331, 984729, 967003, 972001, 966685, 952437, 962483, 944034, 949976, 956107, 955813, 966167, 976739, 971735, 969488, 967928, 958270, 969666, 966062, 960236, 946545, 944678, 936350, 925286, 931484, 934634, 914961, 923474, 924972, 924734, 935843, 933616, 937914, 939755, 931726, 920833, 922344, 915705, 919376, 924536, 923080, 920893, 928627, 919661, 915290, 918355, 924467, 929044, 919328, 926975, 930039, 932484, 940189, 925976, 921469, 907422, 887383, 884379, 893990, 890453, 894904, 892163, 881937, 881752, 883515, 876366, 873548, 856790, 852720, 844262, 842670, 838666, 846453, 832372, 812069, 795683, 787965, 790381, 790141, 792437, 798006, 802153, 806560, 801891, 796569, 802301, 807479]};
 
-        if (metricsData && Object.keys(metricsData).length > 0) {
-            const ctx = document.getElementById('financialChart');
-            const container = document.getElementById('financialChartContainer');
+        document.addEventListener('DOMContentLoaded', () => {
+            if (metricsData && Object.keys(metricsData).length > 0) {
+                const ctx = document.getElementById('financialChart');
+                const container = document.getElementById('financialChartContainer');
 
-            // Basic parsing of metrics structure (assuming flat or Year->Val)
-            let labels = [];
-            let values = [];
-            let labelName = "Metric";
+                // Basic parsing of metrics structure
+                let labels = [];
+                let values = [];
+                let labelName = "Metric";
 
-            // Try to find a timeseries
-            for (const [key, val] of Object.entries(metricsData)) {
-                if (typeof val === 'object') {
-                    // Likely year -> value
-                    labels = Object.keys(val);
-                    values = Object.values(val).map(v => parseFloat(v.replace(/[^0-9.-]/g, '')));
-                    labelName = key;
-                    break;
+                for (const [key, val] of Object.entries(metricsData)) {
+                    if (typeof val === 'object') {
+                        labels = Object.keys(val);
+                        values = Object.values(val).map(v => parseFloat(v.replace(/[^0-9.-]/g, '')));
+                        labelName = key;
+                        break;
+                    }
+                }
+
+                if (labels.length > 0) {
+                    container.style.display = 'block';
+                    new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: labelName,
+                                data: values,
+                                backgroundColor: 'rgba(204, 0, 0, 0.5)',
+                                borderColor: '#cc0000',
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: { legend: { display: true } }
+                        }
+                    });
                 }
             }
 
-            if (labels.length > 0) {
-                container.style.display = 'block';
-                new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            label: labelName,
-                            data: values,
-                            backgroundColor: 'rgba(204, 0, 0, 0.5)',
-                            borderColor: '#cc0000',
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        plugins: { legend: { display: true } }
-                    }
-                });
+            // Crisis Simulation Chart
+            if (crisisData && crisisData.portfolio_values) {
+                const ctx = document.getElementById('crisisSimChart');
+                if (ctx) {
+                    new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: crisisData.dates,
+                            datasets: [
+                                {
+                                    label: 'Portfolio (Simulated)',
+                                    data: crisisData.portfolio_values,
+                                    borderColor: '#00f3ff',
+                                    backgroundColor: 'rgba(0, 243, 255, 0.1)',
+                                    tension: 0.4,
+                                    borderWidth: 2
+                                },
+                                {
+                                    label: 'Benchmark (Simulated)',
+                                    data: crisisData.benchmark_values,
+                                    borderColor: '#cc0000',
+                                    backgroundColor: 'rgba(204, 0, 0, 0.0)',
+                                    borderDash: [5, 5],
+                                    tension: 0.4,
+                                    borderWidth: 2
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            interaction: { mode: 'index', intersect: false },
+                            plugins: {
+                                legend: { labels: { color: '#666' } },
+                                title: { display: true, text: 'Portfolio Resilience: ' + crisisData.scenario }
+                            },
+                            scales: {
+                                y: { display: true, grid: { color: '#eee' } },
+                                x: { display: false }
+                            }
+                        }
+                    });
+                }
             }
-        }
+        });
     </script>
 </body>
 </html>

@@ -39,8 +39,9 @@
         <div class="toolbar-item" onclick="window.location.href='market_mayhem_archive.html'"><strong>FILE</strong></div>
         <div class="toolbar-item" onclick="showToast('EDIT MODE: READ ONLY (ARCHIVED)')">EDIT</div>
         <div class="toolbar-item" onclick="toggleTheme()">VIEW</div>
-        <div class="toolbar-item" onclick="showToast('INSERT: PERMISSION DENIED')">INSERT</div>
-        <div class="toolbar-item" onclick="showToast('FORMAT: LOCKED')">FORMAT</div>
+        <div class="toolbar-item" onclick="toggleRedactMode()">REDACT</div>
+        <div class="toolbar-item" onclick="printDoc()">PRINT</div>
+        <div class="toolbar-item" onclick="shareDoc()">SHARE</div>
         <div class="toolbar-item" onclick="runVerification()" style="color: #0078d7;"><strong>VERIFY</strong></div>
         <div style="flex-grow:1;"></div>
         <div class="toolbar-item" style="color:#666;">ADAM_V26_EDITOR</div>
@@ -52,6 +53,7 @@
     </div>
 
     <div class="newsletter-wrapper">
+        <div id="watermark">CONFIDENTIAL // TOP SECRET</div>
         <div class="paper-sheet" id="paper-sheet">
 
             <!-- High Tier Header UI -->
@@ -82,6 +84,20 @@
             <h2>Company Overview</h2><p>Alphabet Inc. is a multinational technology conglomerate holding company headquartered in Mountain View, California. It was created through a restructuring of Google on October 2, 2015, and became the parent company of Google and several former Google subsidiaries. The two co-founders of Google remained as controlling shareholders, board members, and employees at Alphabet. Alphabet's portfolio encompasses a wide range of businesses, including Google's core search and advertising businesses, as well as other ventures such as Waymo (self-driving cars), Verily (life sciences), and Google Fiber (internet service).</p>
 <h2>Financial Performance</h2><h3>Revenue</h3><h4>2022</h4><p>282.84 billion USD</p><h4>2023</h4><p>300.00 billion USD (estimated)</p><h4>2024</h4><p>320.00 billion USD (estimated)</p><h3>Net Income</h3><h4>2022</h4><p>59.97 billion USD</p><h4>2023</h4><p>65.00 billion USD (estimated)</p><h4>2024</h4><p>70.00 billion USD (estimated)</p><h3>Eps</h3><h4>2022</h4><p>4.56 USD</p><h4>2023</h4><p>4.90 USD (estimated)</p><h4>2024</h4><p>5.30 USD (estimated)</p><h3>P/E Ratio</h3><h4>Current</h4><p>25.00</p><h3>Market Cap</h3><h4>Current</h4><p>1.60 trillion USD</p><h3>Debt-To-Equity Ratio</h3><h4>Current</h4><p>0.10</p><h3>Operating Margin</h3><h4>2022</h4><p>29.00%</p><h4>2023</h4><p>28.00% (estimated)</p><h2>Competitive Landscape</h2><h2>Future Outlook</h2><h2>Investment Thesis</h2><p>Alphabet is a technology behemoth with a dominant market position in search, advertising, and other key areas. Its strong financials, innovative culture, and growth potential make it an attractive investment opportunity. However, investors should be mindful of the regulatory risks and competitive pressures facing the company. Overall, Alphabet remains a compelling investment for those seeking exposure to the growth of the digital economy and the transformative power of technology.</p>
 
+
+            <!-- Advanced Analytics Sections -->
+            <div class="analytics-section"><h3>2. Strategic Risk & Sensitivity Analysis</h3><table class="risk-matrix-table"><thead><tr><th>Risk Factor</th><th>Impact</th><th>Probability</th><th>Strategic Mitigant</th></tr></thead><tbody><tr><td>Consumer Recession</td><td class="impact-high">HIGH</td><td>MED</td><td>Long Staples (XLP), Short Discretionary (XLY)</td></tr><tr><td>Credit Spread Widening</td><td class="impact-high">HIGH</td><td>LOW</td><td>Buy CDS Protection (CDX.IG), Short HYG</td></tr><tr><td>AI Capex Disappointment</td><td class="impact-med">MED</td><td>MED</td><td>Rotate into Value/Industrials, Short NVDA/SMH</td></tr><tr><td>Dollar Devaluation</td><td class="impact-med">MED</td><td>MED</td><td>Long Bitcoin, Long Emerging Markets (EEM)</td></tr><tr><td>Regulatory Crackdown</td><td class="impact-med">MED</td><td>HIGH</td><td>Reduce Big Tech Exposure, Long Utilities</td></tr></tbody></table></div>
+            <div class="analytics-section"><h3>3. Sector Arbitrage & Alpha Opportunities</h3><div class="arbitrage-grid"><div class="arbitrage-card"><div class="arb-header">Long Utilities / Short Materials</div><div class="arb-type">SECTOR_ARB | Horizon: 2-4 Weeks</div><div class="arb-thesis">Valuation gap of 4.2σ implies mean reversion. Utilities showing superior free cash flow yield.</div><div class="arb-conviction">Conviction: 95%</div></div><div class="arbitrage-card"><div class="arb-header">Short VIX / Long Skew</div><div class="arb-type">VOL_ARB | Horizon: 1 Week</div><div class="arb-thesis">Implied volatility premium is overpriced relative to realized vol. Selling covered calls on index.</div><div class="arb-conviction">Conviction: 66%</div></div></div></div>
+            <div class="analytics-section"><h3>4. Institutional Positioning (13F & Flows)</h3><div class="flow-heatmap"><div class="flow-item" style="background:rgba(0, 255, 0, 0.26);"><span class="flow-sector">Technology</span><span class="flow-val">26</span></div><div class="flow-item" style="background:rgba(255, 0, 0, 0.52);"><span class="flow-sector">Energy</span><span class="flow-val">-52</span></div><div class="flow-item" style="background:rgba(0, 255, 0, 0.24);"><span class="flow-sector">Financials</span><span class="flow-val">24</span></div><div class="flow-item" style="background:rgba(0, 255, 0, 0.15);"><span class="flow-sector">Healthcare</span><span class="flow-val">15</span></div><div class="flow-item" style="background:rgba(0, 255, 0, 0.15);"><span class="flow-sector">Discretionary</span><span class="flow-val">15</span></div><div class="flow-item" style="background:rgba(255, 0, 0, 0.73);"><span class="flow-sector">Staples</span><span class="flow-val">-73</span></div><div class="flow-item" style="background:rgba(255, 0, 0, 0.02);"><span class="flow-sector">Utilities</span><span class="flow-val">-2</span></div><div class="flow-item" style="background:rgba(255, 0, 0, 0.66);"><span class="flow-sector">Real Estate</span><span class="flow-val">-66</span></div><div class="flow-item" style="background:rgba(255, 0, 0, 0.81);"><span class="flow-sector">Materials</span><span class="flow-val">-81</span></div><div class="flow-item" style="background:rgba(255, 0, 0, 0.88);"><span class="flow-sector">Comms</span><span class="flow-val">-88</span></div></div></div>
+
+            <!-- Crisis Simulation Section -->
+            <div class="analytics-section">
+        <h3>5. Crisis Simulation: Standard Recession</h3>
+        <p><strong>Scenario:</strong> Cyclical downturn with contracting earnings multiples.</p>
+        <div class="chart-container" style="height: 300px; position: relative;">
+            <canvas id="crisisSimChart"></canvas>
+        </div>
+    </div>
 
             <!-- Provenance Log (All Tiers) -->
             <div class="provenance-log">
@@ -194,54 +210,447 @@
   "conviction": 0,
   "semantic_score": 43,
   "probability": 0,
-  "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 100/100. Cross-reference with knowledge graph completed."
+  "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 100/100. Cross-reference with knowledge graph completed.",
+  "analytics": {
+    "risks": [
+      {
+        "risk": "Consumer Recession",
+        "impact": "HIGH",
+        "prob": "MED",
+        "mitigant": "Long Staples (XLP), Short Discretionary (XLY)"
+      },
+      {
+        "risk": "Credit Spread Widening",
+        "impact": "HIGH",
+        "prob": "LOW",
+        "mitigant": "Buy CDS Protection (CDX.IG), Short HYG"
+      },
+      {
+        "risk": "AI Capex Disappointment",
+        "impact": "MED",
+        "prob": "MED",
+        "mitigant": "Rotate into Value/Industrials, Short NVDA/SMH"
+      },
+      {
+        "risk": "Dollar Devaluation",
+        "impact": "MED",
+        "prob": "MED",
+        "mitigant": "Long Bitcoin, Long Emerging Markets (EEM)"
+      },
+      {
+        "risk": "Regulatory Crackdown",
+        "impact": "MED",
+        "prob": "HIGH",
+        "mitigant": "Reduce Big Tech Exposure, Long Utilities"
+      }
+    ],
+    "arbitrage": [
+      {
+        "type": "SECTOR_ARB",
+        "strategy": "Long Utilities / Short Materials",
+        "thesis": "Valuation gap of 4.2\u03c3 implies mean reversion. Utilities showing superior free cash flow yield.",
+        "horizon": "2-4 Weeks",
+        "conviction": "95%"
+      },
+      {
+        "type": "VOL_ARB",
+        "strategy": "Short VIX / Long Skew",
+        "thesis": "Implied volatility premium is overpriced relative to realized vol. Selling covered calls on index.",
+        "horizon": "1 Week",
+        "conviction": "66%"
+      }
+    ],
+    "flows": {
+      "Technology": 26,
+      "Energy": -52,
+      "Financials": 24,
+      "Healthcare": 15,
+      "Discretionary": 15,
+      "Staples": -73,
+      "Utilities": -2,
+      "Real Estate": -66,
+      "Materials": -81,
+      "Comms": -88
+    },
+    "regime": "SECULAR GROWTH"
+  },
+  "crisis_sim": {
+    "scenario": "Standard Recession",
+    "description": "Cyclical downturn with contracting earnings multiples.",
+    "dates": [
+      "Day 0",
+      "Day 1",
+      "Day 2",
+      "Day 3",
+      "Day 4",
+      "Day 5",
+      "Day 6",
+      "Day 7",
+      "Day 8",
+      "Day 9",
+      "Day 10",
+      "Day 11",
+      "Day 12",
+      "Day 13",
+      "Day 14",
+      "Day 15",
+      "Day 16",
+      "Day 17",
+      "Day 18",
+      "Day 19",
+      "Day 20",
+      "Day 21",
+      "Day 22",
+      "Day 23",
+      "Day 24",
+      "Day 25",
+      "Day 26",
+      "Day 27",
+      "Day 28",
+      "Day 29",
+      "Day 30",
+      "Day 31",
+      "Day 32",
+      "Day 33",
+      "Day 34",
+      "Day 35",
+      "Day 36",
+      "Day 37",
+      "Day 38",
+      "Day 39",
+      "Day 40",
+      "Day 41",
+      "Day 42",
+      "Day 43",
+      "Day 44",
+      "Day 45",
+      "Day 46",
+      "Day 47",
+      "Day 48",
+      "Day 49",
+      "Day 50",
+      "Day 51",
+      "Day 52",
+      "Day 53",
+      "Day 54",
+      "Day 55",
+      "Day 56",
+      "Day 57",
+      "Day 58",
+      "Day 59",
+      "Day 60",
+      "Day 61",
+      "Day 62",
+      "Day 63",
+      "Day 64",
+      "Day 65",
+      "Day 66",
+      "Day 67",
+      "Day 68",
+      "Day 69",
+      "Day 70",
+      "Day 71",
+      "Day 72",
+      "Day 73",
+      "Day 74",
+      "Day 75",
+      "Day 76",
+      "Day 77",
+      "Day 78",
+      "Day 79",
+      "Day 80",
+      "Day 81",
+      "Day 82",
+      "Day 83",
+      "Day 84",
+      "Day 85",
+      "Day 86",
+      "Day 87",
+      "Day 88",
+      "Day 89",
+      "Day 90"
+    ],
+    "portfolio_values": [
+      1000000,
+      1001835,
+      1025677,
+      1039966,
+      1049913,
+      1060334,
+      1020093,
+      1042600,
+      1065537,
+      1047873,
+      1045660,
+      1053977,
+      1067476,
+      1082525,
+      1085127,
+      1091983,
+      1085965,
+      1079026,
+      1078985,
+      1057725,
+      1051685,
+      1061086,
+      1047225,
+      1053123,
+      1054898,
+      1067897,
+      1089476,
+      1098914,
+      1094339,
+      1092605,
+      1053619,
+      1031951,
+      1051121,
+      1037835,
+      1035769,
+      1032887,
+      1025148,
+      1028381,
+      1013017,
+      1017005,
+      1033179,
+      1033004,
+      1030136,
+      1036263,
+      1041451,
+      1047320,
+      1079833,
+      1069277,
+      1072861,
+      1053426,
+      1063792,
+      1050921,
+      1048987,
+      1049609,
+      1071546,
+      1075374,
+      1075103,
+      1086323,
+      1077860,
+      1075895,
+      1086280,
+      1088114,
+      1072343,
+      1074202,
+      1085007,
+      1081282,
+      1092058,
+      1081341,
+      1086997,
+      1106481,
+      1142490,
+      1119717,
+      1112727,
+      1124770,
+      1104691,
+      1103387,
+      1095325,
+      1103717,
+      1114845,
+      1108381,
+      1100853,
+      1118037,
+      1127889,
+      1133959,
+      1110660,
+      1107698,
+      1092588,
+      1087139,
+      1078210,
+      1081207,
+      1101956
+    ],
+    "benchmark_values": [
+      1000000,
+      991179,
+      1006008,
+      997115,
+      989898,
+      986810,
+      992523,
+      994599,
+      986335,
+      994040,
+      1008977,
+      1007886,
+      996912,
+      988946,
+      999357,
+      992638,
+      997207,
+      984683,
+      977509,
+      963906,
+      963853,
+      958439,
+      958390,
+      941965,
+      948454,
+      955475,
+      948110,
+      956020,
+      951192,
+      950306,
+      947628,
+      943388,
+      939349,
+      942257,
+      953540,
+      950469,
+      961634,
+      946883,
+      924926,
+      898834,
+      869371,
+      869026,
+      887681,
+      887244,
+      885804,
+      866255,
+      883868,
+      880218,
+      874920,
+      876708,
+      870757,
+      882431,
+      878002,
+      872130,
+      875856,
+      885193,
+      888156,
+      905692,
+      886642,
+      896849,
+      899214,
+      901041,
+      904706,
+      911463,
+      927868,
+      917694,
+      907973,
+      904953,
+      909781,
+      901898,
+      894060,
+      895450,
+      901173,
+      898377,
+      910344,
+      902117,
+      910104,
+      908980,
+      905225,
+      884687,
+      878134,
+      882225,
+      883637,
+      880766,
+      876462,
+      874594,
+      886763,
+      887588,
+      879409,
+      874944,
+      862989
+    ]
+  }
 }</textarea>
 
     <script>
         // Chart Injection Logic
         const metricsData = {};
+        const flowsData = {"Technology": 26, "Energy": -52, "Financials": 24, "Healthcare": 15, "Discretionary": 15, "Staples": -73, "Utilities": -2, "Real Estate": -66, "Materials": -81, "Comms": -88};
+        const crisisData = {"scenario": "Standard Recession", "description": "Cyclical downturn with contracting earnings multiples.", "dates": ["Day 0", "Day 1", "Day 2", "Day 3", "Day 4", "Day 5", "Day 6", "Day 7", "Day 8", "Day 9", "Day 10", "Day 11", "Day 12", "Day 13", "Day 14", "Day 15", "Day 16", "Day 17", "Day 18", "Day 19", "Day 20", "Day 21", "Day 22", "Day 23", "Day 24", "Day 25", "Day 26", "Day 27", "Day 28", "Day 29", "Day 30", "Day 31", "Day 32", "Day 33", "Day 34", "Day 35", "Day 36", "Day 37", "Day 38", "Day 39", "Day 40", "Day 41", "Day 42", "Day 43", "Day 44", "Day 45", "Day 46", "Day 47", "Day 48", "Day 49", "Day 50", "Day 51", "Day 52", "Day 53", "Day 54", "Day 55", "Day 56", "Day 57", "Day 58", "Day 59", "Day 60", "Day 61", "Day 62", "Day 63", "Day 64", "Day 65", "Day 66", "Day 67", "Day 68", "Day 69", "Day 70", "Day 71", "Day 72", "Day 73", "Day 74", "Day 75", "Day 76", "Day 77", "Day 78", "Day 79", "Day 80", "Day 81", "Day 82", "Day 83", "Day 84", "Day 85", "Day 86", "Day 87", "Day 88", "Day 89", "Day 90"], "portfolio_values": [1000000, 1001835, 1025677, 1039966, 1049913, 1060334, 1020093, 1042600, 1065537, 1047873, 1045660, 1053977, 1067476, 1082525, 1085127, 1091983, 1085965, 1079026, 1078985, 1057725, 1051685, 1061086, 1047225, 1053123, 1054898, 1067897, 1089476, 1098914, 1094339, 1092605, 1053619, 1031951, 1051121, 1037835, 1035769, 1032887, 1025148, 1028381, 1013017, 1017005, 1033179, 1033004, 1030136, 1036263, 1041451, 1047320, 1079833, 1069277, 1072861, 1053426, 1063792, 1050921, 1048987, 1049609, 1071546, 1075374, 1075103, 1086323, 1077860, 1075895, 1086280, 1088114, 1072343, 1074202, 1085007, 1081282, 1092058, 1081341, 1086997, 1106481, 1142490, 1119717, 1112727, 1124770, 1104691, 1103387, 1095325, 1103717, 1114845, 1108381, 1100853, 1118037, 1127889, 1133959, 1110660, 1107698, 1092588, 1087139, 1078210, 1081207, 1101956], "benchmark_values": [1000000, 991179, 1006008, 997115, 989898, 986810, 992523, 994599, 986335, 994040, 1008977, 1007886, 996912, 988946, 999357, 992638, 997207, 984683, 977509, 963906, 963853, 958439, 958390, 941965, 948454, 955475, 948110, 956020, 951192, 950306, 947628, 943388, 939349, 942257, 953540, 950469, 961634, 946883, 924926, 898834, 869371, 869026, 887681, 887244, 885804, 866255, 883868, 880218, 874920, 876708, 870757, 882431, 878002, 872130, 875856, 885193, 888156, 905692, 886642, 896849, 899214, 901041, 904706, 911463, 927868, 917694, 907973, 904953, 909781, 901898, 894060, 895450, 901173, 898377, 910344, 902117, 910104, 908980, 905225, 884687, 878134, 882225, 883637, 880766, 876462, 874594, 886763, 887588, 879409, 874944, 862989]};
 
-        if (metricsData && Object.keys(metricsData).length > 0) {
-            const ctx = document.getElementById('financialChart');
-            const container = document.getElementById('financialChartContainer');
+        document.addEventListener('DOMContentLoaded', () => {
+            if (metricsData && Object.keys(metricsData).length > 0) {
+                const ctx = document.getElementById('financialChart');
+                const container = document.getElementById('financialChartContainer');
 
-            // Basic parsing of metrics structure (assuming flat or Year->Val)
-            let labels = [];
-            let values = [];
-            let labelName = "Metric";
+                // Basic parsing of metrics structure
+                let labels = [];
+                let values = [];
+                let labelName = "Metric";
 
-            // Try to find a timeseries
-            for (const [key, val] of Object.entries(metricsData)) {
-                if (typeof val === 'object') {
-                    // Likely year -> value
-                    labels = Object.keys(val);
-                    values = Object.values(val).map(v => parseFloat(v.replace(/[^0-9.-]/g, '')));
-                    labelName = key;
-                    break;
+                for (const [key, val] of Object.entries(metricsData)) {
+                    if (typeof val === 'object') {
+                        labels = Object.keys(val);
+                        values = Object.values(val).map(v => parseFloat(v.replace(/[^0-9.-]/g, '')));
+                        labelName = key;
+                        break;
+                    }
+                }
+
+                if (labels.length > 0) {
+                    container.style.display = 'block';
+                    new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: labelName,
+                                data: values,
+                                backgroundColor: 'rgba(204, 0, 0, 0.5)',
+                                borderColor: '#cc0000',
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: { legend: { display: true } }
+                        }
+                    });
                 }
             }
 
-            if (labels.length > 0) {
-                container.style.display = 'block';
-                new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            label: labelName,
-                            data: values,
-                            backgroundColor: 'rgba(204, 0, 0, 0.5)',
-                            borderColor: '#cc0000',
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        plugins: { legend: { display: true } }
-                    }
-                });
+            // Crisis Simulation Chart
+            if (crisisData && crisisData.portfolio_values) {
+                const ctx = document.getElementById('crisisSimChart');
+                if (ctx) {
+                    new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: crisisData.dates,
+                            datasets: [
+                                {
+                                    label: 'Portfolio (Simulated)',
+                                    data: crisisData.portfolio_values,
+                                    borderColor: '#00f3ff',
+                                    backgroundColor: 'rgba(0, 243, 255, 0.1)',
+                                    tension: 0.4,
+                                    borderWidth: 2
+                                },
+                                {
+                                    label: 'Benchmark (Simulated)',
+                                    data: crisisData.benchmark_values,
+                                    borderColor: '#cc0000',
+                                    backgroundColor: 'rgba(204, 0, 0, 0.0)',
+                                    borderDash: [5, 5],
+                                    tension: 0.4,
+                                    borderWidth: 2
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            interaction: { mode: 'index', intersect: false },
+                            plugins: {
+                                legend: { labels: { color: '#666' } },
+                                title: { display: true, text: 'Portfolio Resilience: ' + crisisData.scenario }
+                            },
+                            scales: {
+                                y: { display: true, grid: { color: '#eee' } },
+                                x: { display: false }
+                            }
+                        }
+                    });
+                }
             }
-        }
+        });
     </script>
 </body>
 </html>

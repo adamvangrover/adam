@@ -39,8 +39,9 @@
         <div class="toolbar-item" onclick="window.location.href='market_mayhem_archive.html'"><strong>FILE</strong></div>
         <div class="toolbar-item" onclick="showToast('EDIT MODE: READ ONLY (ARCHIVED)')">EDIT</div>
         <div class="toolbar-item" onclick="toggleTheme()">VIEW</div>
-        <div class="toolbar-item" onclick="showToast('INSERT: PERMISSION DENIED')">INSERT</div>
-        <div class="toolbar-item" onclick="showToast('FORMAT: LOCKED')">FORMAT</div>
+        <div class="toolbar-item" onclick="toggleRedactMode()">REDACT</div>
+        <div class="toolbar-item" onclick="printDoc()">PRINT</div>
+        <div class="toolbar-item" onclick="shareDoc()">SHARE</div>
         <div class="toolbar-item" onclick="runVerification()" style="color: #0078d7;"><strong>VERIFY</strong></div>
         <div style="flex-grow:1;"></div>
         <div class="toolbar-item" style="color:#666;">ADAM_V26_EDITOR</div>
@@ -52,6 +53,7 @@
     </div>
 
     <div class="newsletter-wrapper">
+        <div id="watermark">CONFIDENTIAL // TOP SECRET</div>
         <div class="paper-sheet" id="paper-sheet">
 
             <!-- High Tier Header UI -->
@@ -134,6 +136,14 @@ The January Jobs Report (released Feb 11) actually printed at 130,000, which tec
 <li><strong>Deep-Dive:</strong> The SoftBank/OpenAI $100B Round. I can break down the "Arm-as-Collateral" strategy SoftBank is using to fund this, and how it impacts the $830B valuation math.</li>
 <li><strong>Volatility Map:</strong> Post-Jobs Report Sector Analysis. Let's look at why the market isn't celebrating the 130k jobs "beat" and which Consumer Discretionary (XLY) names are the most vulnerable to the cooling labor internals.</li>
 </ul>
+
+
+            <!-- Advanced Analytics Sections -->
+
+
+
+
+            <!-- Crisis Simulation Section -->
 
 
             <!-- Provenance Log (All Tiers) -->
@@ -250,54 +260,441 @@ The January Jobs Report (released Feb 11) actually printed at 130,000, which tec
   "critique": "That\u2019s a heavy-hitting briefing, Adam. The \"Bi-Polar Market\" is a sharp read.",
   "quality": 100,
   "semantic_score": 49,
-  "probability": 0
+  "probability": 0,
+  "analytics": {
+    "risks": [
+      {
+        "risk": "Credit Spread Widening",
+        "impact": "HIGH",
+        "prob": "LOW",
+        "mitigant": "Buy CDS Protection (CDX.IG), Short HYG"
+      },
+      {
+        "risk": "AI Capex Disappointment",
+        "impact": "MED",
+        "prob": "MED",
+        "mitigant": "Rotate into Value/Industrials, Short NVDA/SMH"
+      },
+      {
+        "risk": "Supply Chain Shock",
+        "impact": "MED",
+        "prob": "LOW",
+        "mitigant": "Long Commodities (DBC), Long Shipping"
+      },
+      {
+        "risk": "Regulatory Crackdown",
+        "impact": "MED",
+        "prob": "HIGH",
+        "mitigant": "Reduce Big Tech Exposure, Long Utilities"
+      }
+    ],
+    "arbitrage": [
+      {
+        "type": "SECTOR_ARB",
+        "strategy": "Long Consumer / Short Energy",
+        "thesis": "Valuation gap of 1.8\u03c3 implies mean reversion. Consumer showing superior free cash flow yield.",
+        "horizon": "2-4 Weeks",
+        "conviction": "75%"
+      },
+      {
+        "type": "VOL_ARB",
+        "strategy": "Short VIX / Long Skew",
+        "thesis": "Implied volatility premium is overpriced relative to realized vol. Selling covered calls on index.",
+        "horizon": "1 Week",
+        "conviction": "72%"
+      }
+    ],
+    "flows": {
+      "Technology": 25,
+      "Energy": 1,
+      "Financials": -97,
+      "Healthcare": -40,
+      "Discretionary": -27,
+      "Staples": -43,
+      "Utilities": -16,
+      "Real Estate": -16,
+      "Materials": -8,
+      "Comms": 27
+    },
+    "regime": "REFLATION / BOOM"
+  },
+  "crisis_sim": {
+    "scenario": "Standard Recession",
+    "description": "Cyclical downturn with contracting earnings multiples.",
+    "dates": [
+      "Day 0",
+      "Day 1",
+      "Day 2",
+      "Day 3",
+      "Day 4",
+      "Day 5",
+      "Day 6",
+      "Day 7",
+      "Day 8",
+      "Day 9",
+      "Day 10",
+      "Day 11",
+      "Day 12",
+      "Day 13",
+      "Day 14",
+      "Day 15",
+      "Day 16",
+      "Day 17",
+      "Day 18",
+      "Day 19",
+      "Day 20",
+      "Day 21",
+      "Day 22",
+      "Day 23",
+      "Day 24",
+      "Day 25",
+      "Day 26",
+      "Day 27",
+      "Day 28",
+      "Day 29",
+      "Day 30",
+      "Day 31",
+      "Day 32",
+      "Day 33",
+      "Day 34",
+      "Day 35",
+      "Day 36",
+      "Day 37",
+      "Day 38",
+      "Day 39",
+      "Day 40",
+      "Day 41",
+      "Day 42",
+      "Day 43",
+      "Day 44",
+      "Day 45",
+      "Day 46",
+      "Day 47",
+      "Day 48",
+      "Day 49",
+      "Day 50",
+      "Day 51",
+      "Day 52",
+      "Day 53",
+      "Day 54",
+      "Day 55",
+      "Day 56",
+      "Day 57",
+      "Day 58",
+      "Day 59",
+      "Day 60",
+      "Day 61",
+      "Day 62",
+      "Day 63",
+      "Day 64",
+      "Day 65",
+      "Day 66",
+      "Day 67",
+      "Day 68",
+      "Day 69",
+      "Day 70",
+      "Day 71",
+      "Day 72",
+      "Day 73",
+      "Day 74",
+      "Day 75",
+      "Day 76",
+      "Day 77",
+      "Day 78",
+      "Day 79",
+      "Day 80",
+      "Day 81",
+      "Day 82",
+      "Day 83",
+      "Day 84",
+      "Day 85",
+      "Day 86",
+      "Day 87",
+      "Day 88",
+      "Day 89",
+      "Day 90"
+    ],
+    "portfolio_values": [
+      1000000,
+      1004428,
+      995461,
+      978127,
+      983662,
+      979788,
+      976261,
+      973659,
+      966156,
+      965500,
+      983628,
+      986175,
+      982352,
+      977703,
+      984985,
+      1002483,
+      1001864,
+      1016322,
+      1023788,
+      1021371,
+      1017954,
+      1011267,
+      1010439,
+      1023578,
+      1033354,
+      1012556,
+      1023788,
+      1031688,
+      1036603,
+      1047839,
+      1039295,
+      1043494,
+      1030429,
+      1023572,
+      1023192,
+      1020421,
+      1023326,
+      1001573,
+      998531,
+      991023,
+      976661,
+      968807,
+      966915,
+      974992,
+      1001336,
+      1006148,
+      1001805,
+      1019139,
+      1023541,
+      994124,
+      991256,
+      994858,
+      999750,
+      986589,
+      1005165,
+      993570,
+      1017306,
+      1008748,
+      1028374,
+      1025269,
+      1010336,
+      1005735,
+      991661,
+      1006566,
+      1008008,
+      1009875,
+      996807,
+      982517,
+      977279,
+      963645,
+      967037,
+      964867,
+      969325,
+      962052,
+      955478,
+      937417,
+      953645,
+      963827,
+      968036,
+      973957,
+      979801,
+      956031,
+      941010,
+      936310,
+      939453,
+      935800,
+      924957,
+      933062,
+      915264,
+      928247,
+      929314
+    ],
+    "benchmark_values": [
+      1000000,
+      987503,
+      993604,
+      985300,
+      988134,
+      989839,
+      977413,
+      970099,
+      981022,
+      993358,
+      986723,
+      973632,
+      965494,
+      964082,
+      963533,
+      973733,
+      964611,
+      969167,
+      965814,
+      966631,
+      962725,
+      966522,
+      955802,
+      969246,
+      956102,
+      950507,
+      964908,
+      975788,
+      967675,
+      976964,
+      980558,
+      976092,
+      960272,
+      953309,
+      955530,
+      956469,
+      974353,
+      981100,
+      977778,
+      983822,
+      985425,
+      979029,
+      979238,
+      995703,
+      984574,
+      967635,
+      959937,
+      974782,
+      964094,
+      971280,
+      972564,
+      955677,
+      959057,
+      944909,
+      947006,
+      927916,
+      937712,
+      931288,
+      926551,
+      939189,
+      943794,
+      942635,
+      952499,
+      949745,
+      944592,
+      940456,
+      912214,
+      910394,
+      907317,
+      898823,
+      885191,
+      885208,
+      875946,
+      855928,
+      849761,
+      859321,
+      844265,
+      839963,
+      824204,
+      830688,
+      853683,
+      864014,
+      857357,
+      859906,
+      866153,
+      870293,
+      864576,
+      861674,
+      870778,
+      860965,
+      837540
+    ]
+  }
 }</textarea>
 
     <script>
         // Chart Injection Logic
         const metricsData = {};
+        const flowsData = {};
+        const crisisData = {};
 
-        if (metricsData && Object.keys(metricsData).length > 0) {
-            const ctx = document.getElementById('financialChart');
-            const container = document.getElementById('financialChartContainer');
+        document.addEventListener('DOMContentLoaded', () => {
+            if (metricsData && Object.keys(metricsData).length > 0) {
+                const ctx = document.getElementById('financialChart');
+                const container = document.getElementById('financialChartContainer');
 
-            // Basic parsing of metrics structure (assuming flat or Year->Val)
-            let labels = [];
-            let values = [];
-            let labelName = "Metric";
+                // Basic parsing of metrics structure
+                let labels = [];
+                let values = [];
+                let labelName = "Metric";
 
-            // Try to find a timeseries
-            for (const [key, val] of Object.entries(metricsData)) {
-                if (typeof val === 'object') {
-                    // Likely year -> value
-                    labels = Object.keys(val);
-                    values = Object.values(val).map(v => parseFloat(v.replace(/[^0-9.-]/g, '')));
-                    labelName = key;
-                    break;
+                for (const [key, val] of Object.entries(metricsData)) {
+                    if (typeof val === 'object') {
+                        labels = Object.keys(val);
+                        values = Object.values(val).map(v => parseFloat(v.replace(/[^0-9.-]/g, '')));
+                        labelName = key;
+                        break;
+                    }
+                }
+
+                if (labels.length > 0) {
+                    container.style.display = 'block';
+                    new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: labelName,
+                                data: values,
+                                backgroundColor: 'rgba(204, 0, 0, 0.5)',
+                                borderColor: '#cc0000',
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: { legend: { display: true } }
+                        }
+                    });
                 }
             }
 
-            if (labels.length > 0) {
-                container.style.display = 'block';
-                new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            label: labelName,
-                            data: values,
-                            backgroundColor: 'rgba(204, 0, 0, 0.5)',
-                            borderColor: '#cc0000',
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        plugins: { legend: { display: true } }
-                    }
-                });
+            // Crisis Simulation Chart
+            if (crisisData && crisisData.portfolio_values) {
+                const ctx = document.getElementById('crisisSimChart');
+                if (ctx) {
+                    new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: crisisData.dates,
+                            datasets: [
+                                {
+                                    label: 'Portfolio (Simulated)',
+                                    data: crisisData.portfolio_values,
+                                    borderColor: '#00f3ff',
+                                    backgroundColor: 'rgba(0, 243, 255, 0.1)',
+                                    tension: 0.4,
+                                    borderWidth: 2
+                                },
+                                {
+                                    label: 'Benchmark (Simulated)',
+                                    data: crisisData.benchmark_values,
+                                    borderColor: '#cc0000',
+                                    backgroundColor: 'rgba(204, 0, 0, 0.0)',
+                                    borderDash: [5, 5],
+                                    tension: 0.4,
+                                    borderWidth: 2
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            interaction: { mode: 'index', intersect: false },
+                            plugins: {
+                                legend: { labels: { color: '#666' } },
+                                title: { display: true, text: 'Portfolio Resilience: ' + crisisData.scenario }
+                            },
+                            scales: {
+                                y: { display: true, grid: { color: '#eee' } },
+                                x: { display: false }
+                            }
+                        }
+                    });
+                }
             }
-        }
+        });
     </script>
 </body>
 </html>

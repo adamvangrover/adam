@@ -39,8 +39,9 @@
         <div class="toolbar-item" onclick="window.location.href='market_mayhem_archive.html'"><strong>FILE</strong></div>
         <div class="toolbar-item" onclick="showToast('EDIT MODE: READ ONLY (ARCHIVED)')">EDIT</div>
         <div class="toolbar-item" onclick="toggleTheme()">VIEW</div>
-        <div class="toolbar-item" onclick="showToast('INSERT: PERMISSION DENIED')">INSERT</div>
-        <div class="toolbar-item" onclick="showToast('FORMAT: LOCKED')">FORMAT</div>
+        <div class="toolbar-item" onclick="toggleRedactMode()">REDACT</div>
+        <div class="toolbar-item" onclick="printDoc()">PRINT</div>
+        <div class="toolbar-item" onclick="shareDoc()">SHARE</div>
         <div class="toolbar-item" onclick="runVerification()" style="color: #0078d7;"><strong>VERIFY</strong></div>
         <div style="flex-grow:1;"></div>
         <div class="toolbar-item" style="color:#666;">ADAM_V26_EDITOR</div>
@@ -52,6 +53,7 @@
     </div>
 
     <div class="newsletter-wrapper">
+        <div id="watermark">CONFIDENTIAL // TOP SECRET</div>
         <div class="paper-sheet" id="paper-sheet">
 
             <!-- High Tier Header UI -->
@@ -113,6 +115,20 @@ Insert the variables into this structure:
 Display the "Data Source," the "Variables," and the "Final Video Prompt" for confirmation.
 <p>🎬 The "8-Second Insight" Video TemplateTarget Duration: 8-10 SecondsGoal: Self-contained financial briefing with Intro/Outro text anchors.1. The Insight Logic (Pre-Computation)Before pasting the prompt, define these three variables to ensure the video tells a story without needing voiceover:The Catalyst (Visual A): What caused the move? (e.g., Fed Building, CEO Face, Exploding Server Rack).The Metric (Visual B): The hard number. (e.g., +15% Green Arrow, crashing red line).The Sentiment (Reaction): How do the anchors feel? (e.g., Shocked, Triumphant, Skeptical).2. The Master Prompt TemplateCopy and paste the block below into your video generator. Replace the [BRACKETED TERMS] with your specific content.Prompt:"A hyper-dynamic 8-second financial news clip.0:00-0:02 (Intro): A sleek, glossy 3D title card flies in center screen: '[TOPIC TITLE: e.g., NVIDIA SURGE]' with the text 'MARKET MAYHEM' in gold metallic font below it. Background is a blur of stock tickers.0:02-0:06 (The Action): Fast cut to a high-end studio desk. Two anchors, Alex (Male, 40s, sharp suit) and Maya (Female, 30s, intense focus). Between them, a futuristic holographic chart erupts showing [THE METRIC: e.g., a vertical green line smashing a glass ceiling]. To the right, a floating visual of [THE CATALYST: e.g., AI Chips glowing] appears. Maya points at the chart with [THE SENTIMENT: e.g., an impressed nod], Alex looks at the camera with intensity.0:06-0:08 (Outro): The camera zooms into the hologram which morphs into a closing logo card: 'ADAM v22.0 // BRIEFING'.Style: High-velocity Bloomberg meets ESPN. Sharp 4k resolution, motion-blur transitions, deep blue and gold lighting, cinematic depth of field."3. Real-World Examples (Ready to Run)Example A: The Crypto Crash (Bearish)Prompt:"A hyper-dynamic 8-second financial news clip.0:00-0:02: A sleek, glossy 3D title card flies in: 'BITCOIN PLUNGES' with 'MARKET MAYHEM' in red metallic font below.0:02-0:06: Fast cut to studio. Anchors Alex and Maya look concerned. Between them, a holographic red chart jaggedly crashes downward, shattering a virtual floor line. A floating icon of the SEC Logo looms in the background. Alex shakes his head in disbelief.0:06-0:08: Camera zooms into the red chart which morphs into closing logo: 'ADAM v22.0 // BRIEFING'.Style: High-velocity financial news, dramatic red lighting, cinematic 4k."Example B: The Tech Breakout (Bullish)Prompt:"A hyper-dynamic 8-second financial news clip.0:00-0:02: A sleek, glossy 3D title card flies in: 'AI DOMINANCE' with 'MARKET MAYHEM' in electric blue font.0:02-0:06: Fast cut to studio. Anchors Alex and Maya are energetic. A holographic bar graph towers above them, turning bright green. Floating server rack imagery pulses with light. Maya gestures expansively at the gains, Alex smiles confidently at the camera.0:06-0:08: Camera zooms into the green light which morphs into closing logo: 'ADAM v22.0 // BRIEFING'.Style: High-velocity financial news, crisp white and blue lighting, premium broadcast quality."4. Technical constraints for the AIMotion: Set motion score to 6 or 7 (High) to ensure the transition from Title -> Studio -> Outro happens fast enough.Aspect Ratio: 16:9 for YouTube/LinkedIn or 9:16 for TikTok/Reels (The template works for both, just ensure 'Center Subject' is on).Text Rendering: If the model struggles with specific text (like "Adam v22.0"), simplify the prompt to just 'Logo' and add the text in post-production, but keep the timing in the prompt so the visual space is reserved.</p>
 
+
+            <!-- Advanced Analytics Sections -->
+            <div class="analytics-section"><h3>2. Strategic Risk & Sensitivity Analysis</h3><table class="risk-matrix-table"><thead><tr><th>Risk Factor</th><th>Impact</th><th>Probability</th><th>Strategic Mitigant</th></tr></thead><tbody><tr><td>Inflation Resurgence</td><td class="impact-critical">CRITICAL</td><td>LOW</td><td>Short Duration Bonds (TBT), Long Energy (XLE)</td></tr><tr><td>Credit Spread Widening</td><td class="impact-high">HIGH</td><td>LOW</td><td>Buy CDS Protection (CDX.IG), Short HYG</td></tr><tr><td>AI Capex Disappointment</td><td class="impact-med">MED</td><td>MED</td><td>Rotate into Value/Industrials, Short NVDA/SMH</td></tr></tbody></table></div>
+            <div class="analytics-section"><h3>3. Sector Arbitrage & Alpha Opportunities</h3><div class="arbitrage-grid"><div class="arbitrage-card"><div class="arb-header">Long Energy / Short Financials</div><div class="arb-type">SECTOR_ARB | Horizon: 2-4 Weeks</div><div class="arb-thesis">Valuation gap of 4.4σ implies mean reversion. Energy showing superior free cash flow yield.</div><div class="arb-conviction">Conviction: 83%</div></div><div class="arbitrage-card"><div class="arb-header">Short VIX / Long Skew</div><div class="arb-type">VOL_ARB | Horizon: 1 Week</div><div class="arb-thesis">Implied volatility premium is overpriced relative to realized vol. Selling covered calls on index.</div><div class="arb-conviction">Conviction: 84%</div></div></div></div>
+            <div class="analytics-section"><h3>4. Institutional Positioning (13F & Flows)</h3><div class="flow-heatmap"><div class="flow-item" style="background:rgba(255, 0, 0, 0.01);"><span class="flow-sector">Technology</span><span class="flow-val">-1</span></div><div class="flow-item" style="background:rgba(255, 0, 0, 0.71);"><span class="flow-sector">Energy</span><span class="flow-val">-71</span></div><div class="flow-item" style="background:rgba(0, 255, 0, 0.48);"><span class="flow-sector">Financials</span><span class="flow-val">48</span></div><div class="flow-item" style="background:rgba(255, 0, 0, 0.04);"><span class="flow-sector">Healthcare</span><span class="flow-val">-4</span></div><div class="flow-item" style="background:rgba(0, 255, 0, 0.26);"><span class="flow-sector">Discretionary</span><span class="flow-val">26</span></div><div class="flow-item" style="background:rgba(255, 0, 0, 0.37);"><span class="flow-sector">Staples</span><span class="flow-val">-37</span></div><div class="flow-item" style="background:rgba(255, 0, 0, 0.2);"><span class="flow-sector">Utilities</span><span class="flow-val">-20</span></div><div class="flow-item" style="background:rgba(255, 0, 0, 0.04);"><span class="flow-sector">Real Estate</span><span class="flow-val">-4</span></div><div class="flow-item" style="background:rgba(255, 0, 0, 0.51);"><span class="flow-sector">Materials</span><span class="flow-val">-51</span></div><div class="flow-item" style="background:rgba(255, 0, 0, 0.39);"><span class="flow-sector">Comms</span><span class="flow-val">-39</span></div></div></div>
+
+            <!-- Crisis Simulation Section -->
+            <div class="analytics-section">
+        <h3>5. Crisis Simulation: Standard Recession</h3>
+        <p><strong>Scenario:</strong> Cyclical downturn with contracting earnings multiples.</p>
+        <div class="chart-container" style="height: 300px; position: relative;">
+            <canvas id="crisisSimChart"></canvas>
+        </div>
+    </div>
 
             <!-- Provenance Log (All Tiers) -->
             <div class="provenance-log">
@@ -227,54 +243,435 @@ Display the "Data Source," the "Variables," and the "Final Video Prompt" for con
   "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 50/100. Cross-reference with knowledge graph completed.",
   "quality": 100,
   "semantic_score": 37,
-  "probability": 50
+  "probability": 50,
+  "analytics": {
+    "risks": [
+      {
+        "risk": "Inflation Resurgence",
+        "impact": "CRITICAL",
+        "prob": "LOW",
+        "mitigant": "Short Duration Bonds (TBT), Long Energy (XLE)"
+      },
+      {
+        "risk": "Credit Spread Widening",
+        "impact": "HIGH",
+        "prob": "LOW",
+        "mitigant": "Buy CDS Protection (CDX.IG), Short HYG"
+      },
+      {
+        "risk": "AI Capex Disappointment",
+        "impact": "MED",
+        "prob": "MED",
+        "mitigant": "Rotate into Value/Industrials, Short NVDA/SMH"
+      }
+    ],
+    "arbitrage": [
+      {
+        "type": "SECTOR_ARB",
+        "strategy": "Long Energy / Short Financials",
+        "thesis": "Valuation gap of 4.4\u03c3 implies mean reversion. Energy showing superior free cash flow yield.",
+        "horizon": "2-4 Weeks",
+        "conviction": "83%"
+      },
+      {
+        "type": "VOL_ARB",
+        "strategy": "Short VIX / Long Skew",
+        "thesis": "Implied volatility premium is overpriced relative to realized vol. Selling covered calls on index.",
+        "horizon": "1 Week",
+        "conviction": "84%"
+      }
+    ],
+    "flows": {
+      "Technology": -1,
+      "Energy": -71,
+      "Financials": 48,
+      "Healthcare": -4,
+      "Discretionary": 26,
+      "Staples": -37,
+      "Utilities": -20,
+      "Real Estate": -4,
+      "Materials": -51,
+      "Comms": -39
+    },
+    "regime": "CRISIS / LIQUIDITY SHOCK"
+  },
+  "crisis_sim": {
+    "scenario": "Standard Recession",
+    "description": "Cyclical downturn with contracting earnings multiples.",
+    "dates": [
+      "Day 0",
+      "Day 1",
+      "Day 2",
+      "Day 3",
+      "Day 4",
+      "Day 5",
+      "Day 6",
+      "Day 7",
+      "Day 8",
+      "Day 9",
+      "Day 10",
+      "Day 11",
+      "Day 12",
+      "Day 13",
+      "Day 14",
+      "Day 15",
+      "Day 16",
+      "Day 17",
+      "Day 18",
+      "Day 19",
+      "Day 20",
+      "Day 21",
+      "Day 22",
+      "Day 23",
+      "Day 24",
+      "Day 25",
+      "Day 26",
+      "Day 27",
+      "Day 28",
+      "Day 29",
+      "Day 30",
+      "Day 31",
+      "Day 32",
+      "Day 33",
+      "Day 34",
+      "Day 35",
+      "Day 36",
+      "Day 37",
+      "Day 38",
+      "Day 39",
+      "Day 40",
+      "Day 41",
+      "Day 42",
+      "Day 43",
+      "Day 44",
+      "Day 45",
+      "Day 46",
+      "Day 47",
+      "Day 48",
+      "Day 49",
+      "Day 50",
+      "Day 51",
+      "Day 52",
+      "Day 53",
+      "Day 54",
+      "Day 55",
+      "Day 56",
+      "Day 57",
+      "Day 58",
+      "Day 59",
+      "Day 60",
+      "Day 61",
+      "Day 62",
+      "Day 63",
+      "Day 64",
+      "Day 65",
+      "Day 66",
+      "Day 67",
+      "Day 68",
+      "Day 69",
+      "Day 70",
+      "Day 71",
+      "Day 72",
+      "Day 73",
+      "Day 74",
+      "Day 75",
+      "Day 76",
+      "Day 77",
+      "Day 78",
+      "Day 79",
+      "Day 80",
+      "Day 81",
+      "Day 82",
+      "Day 83",
+      "Day 84",
+      "Day 85",
+      "Day 86",
+      "Day 87",
+      "Day 88",
+      "Day 89",
+      "Day 90"
+    ],
+    "portfolio_values": [
+      1000000,
+      1017483,
+      991118,
+      990998,
+      988594,
+      973296,
+      983313,
+      983925,
+      979207,
+      989094,
+      978433,
+      977955,
+      979222,
+      984352,
+      999964,
+      999008,
+      1007511,
+      994381,
+      998052,
+      999637,
+      976352,
+      993623,
+      1000891,
+      985437,
+      968536,
+      981908,
+      984931,
+      989672,
+      985926,
+      988472,
+      985253,
+      1002347,
+      1007531,
+      997172,
+      983006,
+      993409,
+      1004507,
+      983688,
+      972746,
+      982169,
+      967711,
+      959500,
+      950393,
+      943835,
+      940431,
+      925996,
+      922503,
+      905889,
+      903748,
+      902342,
+      892817,
+      877658,
+      893888,
+      903468,
+      900862,
+      910081,
+      906597,
+      913198,
+      923906,
+      910598,
+      912156,
+      931042,
+      911758,
+      928039,
+      934206,
+      955646,
+      952716,
+      952566,
+      959661,
+      965839,
+      946191,
+      943456,
+      948837,
+      944834,
+      950160,
+      945203,
+      934464,
+      932392,
+      950052,
+      955764,
+      958839,
+      954174,
+      944838,
+      950570,
+      933704,
+      938393,
+      920246,
+      921496,
+      930719,
+      926888,
+      935507
+    ],
+    "benchmark_values": [
+      1000000,
+      993642,
+      996198,
+      990718,
+      992832,
+      984626,
+      991268,
+      996785,
+      998905,
+      1011023,
+      1025177,
+      1046092,
+      1054373,
+      1044371,
+      1028045,
+      1049323,
+      1046614,
+      1057074,
+      1041312,
+      1038416,
+      1027728,
+      1034892,
+      1022283,
+      1012409,
+      1019470,
+      1001479,
+      1004185,
+      1008888,
+      1008788,
+      1012290,
+      1011828,
+      1012640,
+      1019225,
+      1018545,
+      1006610,
+      997724,
+      997826,
+      994299,
+      991803,
+      990366,
+      994553,
+      989966,
+      996345,
+      1001169,
+      1025340,
+      1034139,
+      1024393,
+      1006737,
+      1005548,
+      1017580,
+      994430,
+      968799,
+      976322,
+      954518,
+      947469,
+      958099,
+      938292,
+      937364,
+      935762,
+      925177,
+      922934,
+      901819,
+      907559,
+      921790,
+      906846,
+      887072,
+      885941,
+      877166,
+      867588,
+      883490,
+      882989,
+      886912,
+      874109,
+      861305,
+      870458,
+      852278,
+      855744,
+      846937,
+      846041,
+      826851,
+      812537,
+      812630,
+      827166,
+      816022,
+      798433,
+      797371,
+      793476,
+      796738,
+      802351,
+      798623,
+      797490
+    ]
+  }
 }</textarea>
 
     <script>
         // Chart Injection Logic
         const metricsData = {};
+        const flowsData = {"Technology": -1, "Energy": -71, "Financials": 48, "Healthcare": -4, "Discretionary": 26, "Staples": -37, "Utilities": -20, "Real Estate": -4, "Materials": -51, "Comms": -39};
+        const crisisData = {"scenario": "Standard Recession", "description": "Cyclical downturn with contracting earnings multiples.", "dates": ["Day 0", "Day 1", "Day 2", "Day 3", "Day 4", "Day 5", "Day 6", "Day 7", "Day 8", "Day 9", "Day 10", "Day 11", "Day 12", "Day 13", "Day 14", "Day 15", "Day 16", "Day 17", "Day 18", "Day 19", "Day 20", "Day 21", "Day 22", "Day 23", "Day 24", "Day 25", "Day 26", "Day 27", "Day 28", "Day 29", "Day 30", "Day 31", "Day 32", "Day 33", "Day 34", "Day 35", "Day 36", "Day 37", "Day 38", "Day 39", "Day 40", "Day 41", "Day 42", "Day 43", "Day 44", "Day 45", "Day 46", "Day 47", "Day 48", "Day 49", "Day 50", "Day 51", "Day 52", "Day 53", "Day 54", "Day 55", "Day 56", "Day 57", "Day 58", "Day 59", "Day 60", "Day 61", "Day 62", "Day 63", "Day 64", "Day 65", "Day 66", "Day 67", "Day 68", "Day 69", "Day 70", "Day 71", "Day 72", "Day 73", "Day 74", "Day 75", "Day 76", "Day 77", "Day 78", "Day 79", "Day 80", "Day 81", "Day 82", "Day 83", "Day 84", "Day 85", "Day 86", "Day 87", "Day 88", "Day 89", "Day 90"], "portfolio_values": [1000000, 1017483, 991118, 990998, 988594, 973296, 983313, 983925, 979207, 989094, 978433, 977955, 979222, 984352, 999964, 999008, 1007511, 994381, 998052, 999637, 976352, 993623, 1000891, 985437, 968536, 981908, 984931, 989672, 985926, 988472, 985253, 1002347, 1007531, 997172, 983006, 993409, 1004507, 983688, 972746, 982169, 967711, 959500, 950393, 943835, 940431, 925996, 922503, 905889, 903748, 902342, 892817, 877658, 893888, 903468, 900862, 910081, 906597, 913198, 923906, 910598, 912156, 931042, 911758, 928039, 934206, 955646, 952716, 952566, 959661, 965839, 946191, 943456, 948837, 944834, 950160, 945203, 934464, 932392, 950052, 955764, 958839, 954174, 944838, 950570, 933704, 938393, 920246, 921496, 930719, 926888, 935507], "benchmark_values": [1000000, 993642, 996198, 990718, 992832, 984626, 991268, 996785, 998905, 1011023, 1025177, 1046092, 1054373, 1044371, 1028045, 1049323, 1046614, 1057074, 1041312, 1038416, 1027728, 1034892, 1022283, 1012409, 1019470, 1001479, 1004185, 1008888, 1008788, 1012290, 1011828, 1012640, 1019225, 1018545, 1006610, 997724, 997826, 994299, 991803, 990366, 994553, 989966, 996345, 1001169, 1025340, 1034139, 1024393, 1006737, 1005548, 1017580, 994430, 968799, 976322, 954518, 947469, 958099, 938292, 937364, 935762, 925177, 922934, 901819, 907559, 921790, 906846, 887072, 885941, 877166, 867588, 883490, 882989, 886912, 874109, 861305, 870458, 852278, 855744, 846937, 846041, 826851, 812537, 812630, 827166, 816022, 798433, 797371, 793476, 796738, 802351, 798623, 797490]};
 
-        if (metricsData && Object.keys(metricsData).length > 0) {
-            const ctx = document.getElementById('financialChart');
-            const container = document.getElementById('financialChartContainer');
+        document.addEventListener('DOMContentLoaded', () => {
+            if (metricsData && Object.keys(metricsData).length > 0) {
+                const ctx = document.getElementById('financialChart');
+                const container = document.getElementById('financialChartContainer');
 
-            // Basic parsing of metrics structure (assuming flat or Year->Val)
-            let labels = [];
-            let values = [];
-            let labelName = "Metric";
+                // Basic parsing of metrics structure
+                let labels = [];
+                let values = [];
+                let labelName = "Metric";
 
-            // Try to find a timeseries
-            for (const [key, val] of Object.entries(metricsData)) {
-                if (typeof val === 'object') {
-                    // Likely year -> value
-                    labels = Object.keys(val);
-                    values = Object.values(val).map(v => parseFloat(v.replace(/[^0-9.-]/g, '')));
-                    labelName = key;
-                    break;
+                for (const [key, val] of Object.entries(metricsData)) {
+                    if (typeof val === 'object') {
+                        labels = Object.keys(val);
+                        values = Object.values(val).map(v => parseFloat(v.replace(/[^0-9.-]/g, '')));
+                        labelName = key;
+                        break;
+                    }
+                }
+
+                if (labels.length > 0) {
+                    container.style.display = 'block';
+                    new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: labelName,
+                                data: values,
+                                backgroundColor: 'rgba(204, 0, 0, 0.5)',
+                                borderColor: '#cc0000',
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: { legend: { display: true } }
+                        }
+                    });
                 }
             }
 
-            if (labels.length > 0) {
-                container.style.display = 'block';
-                new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            label: labelName,
-                            data: values,
-                            backgroundColor: 'rgba(204, 0, 0, 0.5)',
-                            borderColor: '#cc0000',
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        plugins: { legend: { display: true } }
-                    }
-                });
+            // Crisis Simulation Chart
+            if (crisisData && crisisData.portfolio_values) {
+                const ctx = document.getElementById('crisisSimChart');
+                if (ctx) {
+                    new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: crisisData.dates,
+                            datasets: [
+                                {
+                                    label: 'Portfolio (Simulated)',
+                                    data: crisisData.portfolio_values,
+                                    borderColor: '#00f3ff',
+                                    backgroundColor: 'rgba(0, 243, 255, 0.1)',
+                                    tension: 0.4,
+                                    borderWidth: 2
+                                },
+                                {
+                                    label: 'Benchmark (Simulated)',
+                                    data: crisisData.benchmark_values,
+                                    borderColor: '#cc0000',
+                                    backgroundColor: 'rgba(204, 0, 0, 0.0)',
+                                    borderDash: [5, 5],
+                                    tension: 0.4,
+                                    borderWidth: 2
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            interaction: { mode: 'index', intersect: false },
+                            plugins: {
+                                legend: { labels: { color: '#666' } },
+                                title: { display: true, text: 'Portfolio Resilience: ' + crisisData.scenario }
+                            },
+                            scales: {
+                                y: { display: true, grid: { color: '#eee' } },
+                                x: { display: false }
+                            }
+                        }
+                    });
+                }
             }
-        }
+        });
     </script>
 </body>
 </html>

@@ -39,8 +39,9 @@
         <div class="toolbar-item" onclick="window.location.href='market_mayhem_archive.html'"><strong>FILE</strong></div>
         <div class="toolbar-item" onclick="showToast('EDIT MODE: READ ONLY (ARCHIVED)')">EDIT</div>
         <div class="toolbar-item" onclick="toggleTheme()">VIEW</div>
-        <div class="toolbar-item" onclick="showToast('INSERT: PERMISSION DENIED')">INSERT</div>
-        <div class="toolbar-item" onclick="showToast('FORMAT: LOCKED')">FORMAT</div>
+        <div class="toolbar-item" onclick="toggleRedactMode()">REDACT</div>
+        <div class="toolbar-item" onclick="printDoc()">PRINT</div>
+        <div class="toolbar-item" onclick="shareDoc()">SHARE</div>
         <div class="toolbar-item" onclick="runVerification()" style="color: #0078d7;"><strong>VERIFY</strong></div>
         <div style="flex-grow:1;"></div>
         <div class="toolbar-item" style="color:#666;">ADAM_V26_EDITOR</div>
@@ -52,6 +53,7 @@
     </div>
 
     <div class="newsletter-wrapper">
+        <div id="watermark">CONFIDENTIAL // TOP SECRET</div>
         <div class="paper-sheet" id="paper-sheet">
 
             <!-- High Tier Header UI -->
@@ -312,6 +314,20 @@
 ```</p>
 
 
+            <!-- Advanced Analytics Sections -->
+            <div class="analytics-section"><h3>2. Strategic Risk & Sensitivity Analysis</h3><table class="risk-matrix-table"><thead><tr><th>Risk Factor</th><th>Impact</th><th>Probability</th><th>Strategic Mitigant</th></tr></thead><tbody><tr><td>Inflation Resurgence</td><td class="impact-critical">CRITICAL</td><td>LOW</td><td>Short Duration Bonds (TBT), Long Energy (XLE)</td></tr><tr><td>Consumer Recession</td><td class="impact-high">HIGH</td><td>MED</td><td>Long Staples (XLP), Short Discretionary (XLY)</td></tr><tr><td>Dollar Devaluation</td><td class="impact-med">MED</td><td>MED</td><td>Long Bitcoin, Long Emerging Markets (EEM)</td></tr></tbody></table></div>
+            <div class="analytics-section"><h3>3. Sector Arbitrage & Alpha Opportunities</h3><div class="arbitrage-grid"><div class="arbitrage-card"><div class="arb-header">Long Healthcare / Short Energy</div><div class="arb-type">SECTOR_ARB | Horizon: 2-4 Weeks</div><div class="arb-thesis">Valuation gap of 2.8σ implies mean reversion. Healthcare showing superior free cash flow yield.</div><div class="arb-conviction">Conviction: 65%</div></div></div></div>
+            <div class="analytics-section"><h3>4. Institutional Positioning (13F & Flows)</h3><div class="flow-heatmap"><div class="flow-item" style="background:rgba(255, 0, 0, 0.5);"><span class="flow-sector">Technology</span><span class="flow-val">-50</span></div><div class="flow-item" style="background:rgba(0, 255, 0, 0.69);"><span class="flow-sector">Energy</span><span class="flow-val">69</span></div><div class="flow-item" style="background:rgba(255, 0, 0, 0.44);"><span class="flow-sector">Financials</span><span class="flow-val">-44</span></div><div class="flow-item" style="background:rgba(0, 255, 0, 0.08);"><span class="flow-sector">Healthcare</span><span class="flow-val">8</span></div><div class="flow-item" style="background:rgba(255, 0, 0, 0.43);"><span class="flow-sector">Discretionary</span><span class="flow-val">-43</span></div><div class="flow-item" style="background:rgba(0, 255, 0, 0.43);"><span class="flow-sector">Staples</span><span class="flow-val">43</span></div><div class="flow-item" style="background:rgba(255, 0, 0, 0.01);"><span class="flow-sector">Utilities</span><span class="flow-val">-1</span></div><div class="flow-item" style="background:rgba(0, 255, 0, 0.25);"><span class="flow-sector">Real Estate</span><span class="flow-val">25</span></div><div class="flow-item" style="background:rgba(0, 255, 0, 0.08);"><span class="flow-sector">Materials</span><span class="flow-val">8</span></div><div class="flow-item" style="background:rgba(255, 0, 0, 0.42);"><span class="flow-sector">Comms</span><span class="flow-val">-42</span></div></div></div>
+
+            <!-- Crisis Simulation Section -->
+            <div class="analytics-section">
+        <h3>5. Crisis Simulation: Standard Recession</h3>
+        <p><strong>Scenario:</strong> Cyclical downturn with contracting earnings multiples.</p>
+        <div class="chart-container" style="height: 300px; position: relative;">
+            <canvas id="crisisSimChart"></canvas>
+        </div>
+    </div>
+
             <!-- Provenance Log (All Tiers) -->
             <div class="provenance-log">
                 <div class="log-entry">
@@ -426,54 +442,428 @@
   "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 52/100. Cross-reference with knowledge graph completed.",
   "quality": 100,
   "semantic_score": 35,
-  "probability": 77
+  "probability": 77,
+  "analytics": {
+    "risks": [
+      {
+        "risk": "Inflation Resurgence",
+        "impact": "CRITICAL",
+        "prob": "LOW",
+        "mitigant": "Short Duration Bonds (TBT), Long Energy (XLE)"
+      },
+      {
+        "risk": "Consumer Recession",
+        "impact": "HIGH",
+        "prob": "MED",
+        "mitigant": "Long Staples (XLP), Short Discretionary (XLY)"
+      },
+      {
+        "risk": "Dollar Devaluation",
+        "impact": "MED",
+        "prob": "MED",
+        "mitigant": "Long Bitcoin, Long Emerging Markets (EEM)"
+      }
+    ],
+    "arbitrage": [
+      {
+        "type": "SECTOR_ARB",
+        "strategy": "Long Healthcare / Short Energy",
+        "thesis": "Valuation gap of 2.8\u03c3 implies mean reversion. Healthcare showing superior free cash flow yield.",
+        "horizon": "2-4 Weeks",
+        "conviction": "65%"
+      }
+    ],
+    "flows": {
+      "Technology": -50,
+      "Energy": 69,
+      "Financials": -44,
+      "Healthcare": 8,
+      "Discretionary": -43,
+      "Staples": 43,
+      "Utilities": -1,
+      "Real Estate": 25,
+      "Materials": 8,
+      "Comms": -42
+    },
+    "regime": "REFLATION / BOOM"
+  },
+  "crisis_sim": {
+    "scenario": "Standard Recession",
+    "description": "Cyclical downturn with contracting earnings multiples.",
+    "dates": [
+      "Day 0",
+      "Day 1",
+      "Day 2",
+      "Day 3",
+      "Day 4",
+      "Day 5",
+      "Day 6",
+      "Day 7",
+      "Day 8",
+      "Day 9",
+      "Day 10",
+      "Day 11",
+      "Day 12",
+      "Day 13",
+      "Day 14",
+      "Day 15",
+      "Day 16",
+      "Day 17",
+      "Day 18",
+      "Day 19",
+      "Day 20",
+      "Day 21",
+      "Day 22",
+      "Day 23",
+      "Day 24",
+      "Day 25",
+      "Day 26",
+      "Day 27",
+      "Day 28",
+      "Day 29",
+      "Day 30",
+      "Day 31",
+      "Day 32",
+      "Day 33",
+      "Day 34",
+      "Day 35",
+      "Day 36",
+      "Day 37",
+      "Day 38",
+      "Day 39",
+      "Day 40",
+      "Day 41",
+      "Day 42",
+      "Day 43",
+      "Day 44",
+      "Day 45",
+      "Day 46",
+      "Day 47",
+      "Day 48",
+      "Day 49",
+      "Day 50",
+      "Day 51",
+      "Day 52",
+      "Day 53",
+      "Day 54",
+      "Day 55",
+      "Day 56",
+      "Day 57",
+      "Day 58",
+      "Day 59",
+      "Day 60",
+      "Day 61",
+      "Day 62",
+      "Day 63",
+      "Day 64",
+      "Day 65",
+      "Day 66",
+      "Day 67",
+      "Day 68",
+      "Day 69",
+      "Day 70",
+      "Day 71",
+      "Day 72",
+      "Day 73",
+      "Day 74",
+      "Day 75",
+      "Day 76",
+      "Day 77",
+      "Day 78",
+      "Day 79",
+      "Day 80",
+      "Day 81",
+      "Day 82",
+      "Day 83",
+      "Day 84",
+      "Day 85",
+      "Day 86",
+      "Day 87",
+      "Day 88",
+      "Day 89",
+      "Day 90"
+    ],
+    "portfolio_values": [
+      1000000,
+      1003751,
+      980721,
+      970251,
+      961766,
+      959048,
+      960614,
+      954556,
+      983799,
+      982829,
+      978510,
+      974752,
+      971044,
+      957891,
+      957351,
+      960097,
+      945175,
+      946867,
+      936205,
+      918243,
+      902502,
+      882499,
+      883098,
+      891054,
+      902505,
+      911930,
+      904665,
+      923139,
+      937434,
+      922740,
+      925313,
+      911677,
+      919253,
+      927510,
+      936939,
+      942103,
+      953115,
+      941750,
+      931416,
+      943253,
+      954077,
+      952534,
+      931350,
+      931062,
+      926611,
+      931124,
+      931277,
+      926185,
+      926201,
+      927577,
+      921774,
+      933081,
+      944549,
+      968589,
+      985717,
+      996406,
+      979809,
+      962601,
+      959102,
+      944811,
+      936920,
+      941306,
+      920128,
+      905562,
+      905800,
+      925585,
+      924297,
+      923817,
+      938002,
+      952470,
+      937621,
+      951675,
+      942335,
+      938817,
+      933088,
+      942566,
+      953519,
+      965397,
+      952913,
+      960163,
+      971196,
+      964625,
+      957957,
+      948651,
+      931194,
+      933403,
+      943737,
+      958200,
+      946485,
+      939674,
+      938325
+    ],
+    "benchmark_values": [
+      1000000,
+      1013324,
+      1015942,
+      1027957,
+      1016181,
+      1029021,
+      1021162,
+      1003083,
+      1010646,
+      1003657,
+      991653,
+      990917,
+      969933,
+      968544,
+      965309,
+      978246,
+      973543,
+      966885,
+      973512,
+      975725,
+      969602,
+      949952,
+      949563,
+      966683,
+      963550,
+      953611,
+      960541,
+      952486,
+      945852,
+      945939,
+      949373,
+      941902,
+      925022,
+      910567,
+      897320,
+      900419,
+      886593,
+      880091,
+      878774,
+      867853,
+      874896,
+      868500,
+      871797,
+      879881,
+      881069,
+      884352,
+      896661,
+      904707,
+      903574,
+      885914,
+      866786,
+      857752,
+      859689,
+      854981,
+      850787,
+      858824,
+      856746,
+      864536,
+      854907,
+      837986,
+      835778,
+      827239,
+      831536,
+      828948,
+      830482,
+      822794,
+      814769,
+      822938,
+      817213,
+      806517,
+      813306,
+      814413,
+      820045,
+      821086,
+      818391,
+      822022,
+      822754,
+      815760,
+      796465,
+      798717,
+      804569,
+      782066,
+      784385,
+      787483,
+      789618,
+      785384,
+      788654,
+      783356,
+      781250,
+      790117,
+      787780
+    ]
+  }
 }</textarea>
 
     <script>
         // Chart Injection Logic
         const metricsData = {};
+        const flowsData = {"Technology": -50, "Energy": 69, "Financials": -44, "Healthcare": 8, "Discretionary": -43, "Staples": 43, "Utilities": -1, "Real Estate": 25, "Materials": 8, "Comms": -42};
+        const crisisData = {"scenario": "Standard Recession", "description": "Cyclical downturn with contracting earnings multiples.", "dates": ["Day 0", "Day 1", "Day 2", "Day 3", "Day 4", "Day 5", "Day 6", "Day 7", "Day 8", "Day 9", "Day 10", "Day 11", "Day 12", "Day 13", "Day 14", "Day 15", "Day 16", "Day 17", "Day 18", "Day 19", "Day 20", "Day 21", "Day 22", "Day 23", "Day 24", "Day 25", "Day 26", "Day 27", "Day 28", "Day 29", "Day 30", "Day 31", "Day 32", "Day 33", "Day 34", "Day 35", "Day 36", "Day 37", "Day 38", "Day 39", "Day 40", "Day 41", "Day 42", "Day 43", "Day 44", "Day 45", "Day 46", "Day 47", "Day 48", "Day 49", "Day 50", "Day 51", "Day 52", "Day 53", "Day 54", "Day 55", "Day 56", "Day 57", "Day 58", "Day 59", "Day 60", "Day 61", "Day 62", "Day 63", "Day 64", "Day 65", "Day 66", "Day 67", "Day 68", "Day 69", "Day 70", "Day 71", "Day 72", "Day 73", "Day 74", "Day 75", "Day 76", "Day 77", "Day 78", "Day 79", "Day 80", "Day 81", "Day 82", "Day 83", "Day 84", "Day 85", "Day 86", "Day 87", "Day 88", "Day 89", "Day 90"], "portfolio_values": [1000000, 1003751, 980721, 970251, 961766, 959048, 960614, 954556, 983799, 982829, 978510, 974752, 971044, 957891, 957351, 960097, 945175, 946867, 936205, 918243, 902502, 882499, 883098, 891054, 902505, 911930, 904665, 923139, 937434, 922740, 925313, 911677, 919253, 927510, 936939, 942103, 953115, 941750, 931416, 943253, 954077, 952534, 931350, 931062, 926611, 931124, 931277, 926185, 926201, 927577, 921774, 933081, 944549, 968589, 985717, 996406, 979809, 962601, 959102, 944811, 936920, 941306, 920128, 905562, 905800, 925585, 924297, 923817, 938002, 952470, 937621, 951675, 942335, 938817, 933088, 942566, 953519, 965397, 952913, 960163, 971196, 964625, 957957, 948651, 931194, 933403, 943737, 958200, 946485, 939674, 938325], "benchmark_values": [1000000, 1013324, 1015942, 1027957, 1016181, 1029021, 1021162, 1003083, 1010646, 1003657, 991653, 990917, 969933, 968544, 965309, 978246, 973543, 966885, 973512, 975725, 969602, 949952, 949563, 966683, 963550, 953611, 960541, 952486, 945852, 945939, 949373, 941902, 925022, 910567, 897320, 900419, 886593, 880091, 878774, 867853, 874896, 868500, 871797, 879881, 881069, 884352, 896661, 904707, 903574, 885914, 866786, 857752, 859689, 854981, 850787, 858824, 856746, 864536, 854907, 837986, 835778, 827239, 831536, 828948, 830482, 822794, 814769, 822938, 817213, 806517, 813306, 814413, 820045, 821086, 818391, 822022, 822754, 815760, 796465, 798717, 804569, 782066, 784385, 787483, 789618, 785384, 788654, 783356, 781250, 790117, 787780]};
 
-        if (metricsData && Object.keys(metricsData).length > 0) {
-            const ctx = document.getElementById('financialChart');
-            const container = document.getElementById('financialChartContainer');
+        document.addEventListener('DOMContentLoaded', () => {
+            if (metricsData && Object.keys(metricsData).length > 0) {
+                const ctx = document.getElementById('financialChart');
+                const container = document.getElementById('financialChartContainer');
 
-            // Basic parsing of metrics structure (assuming flat or Year->Val)
-            let labels = [];
-            let values = [];
-            let labelName = "Metric";
+                // Basic parsing of metrics structure
+                let labels = [];
+                let values = [];
+                let labelName = "Metric";
 
-            // Try to find a timeseries
-            for (const [key, val] of Object.entries(metricsData)) {
-                if (typeof val === 'object') {
-                    // Likely year -> value
-                    labels = Object.keys(val);
-                    values = Object.values(val).map(v => parseFloat(v.replace(/[^0-9.-]/g, '')));
-                    labelName = key;
-                    break;
+                for (const [key, val] of Object.entries(metricsData)) {
+                    if (typeof val === 'object') {
+                        labels = Object.keys(val);
+                        values = Object.values(val).map(v => parseFloat(v.replace(/[^0-9.-]/g, '')));
+                        labelName = key;
+                        break;
+                    }
+                }
+
+                if (labels.length > 0) {
+                    container.style.display = 'block';
+                    new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: labelName,
+                                data: values,
+                                backgroundColor: 'rgba(204, 0, 0, 0.5)',
+                                borderColor: '#cc0000',
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: { legend: { display: true } }
+                        }
+                    });
                 }
             }
 
-            if (labels.length > 0) {
-                container.style.display = 'block';
-                new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            label: labelName,
-                            data: values,
-                            backgroundColor: 'rgba(204, 0, 0, 0.5)',
-                            borderColor: '#cc0000',
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        plugins: { legend: { display: true } }
-                    }
-                });
+            // Crisis Simulation Chart
+            if (crisisData && crisisData.portfolio_values) {
+                const ctx = document.getElementById('crisisSimChart');
+                if (ctx) {
+                    new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: crisisData.dates,
+                            datasets: [
+                                {
+                                    label: 'Portfolio (Simulated)',
+                                    data: crisisData.portfolio_values,
+                                    borderColor: '#00f3ff',
+                                    backgroundColor: 'rgba(0, 243, 255, 0.1)',
+                                    tension: 0.4,
+                                    borderWidth: 2
+                                },
+                                {
+                                    label: 'Benchmark (Simulated)',
+                                    data: crisisData.benchmark_values,
+                                    borderColor: '#cc0000',
+                                    backgroundColor: 'rgba(204, 0, 0, 0.0)',
+                                    borderDash: [5, 5],
+                                    tension: 0.4,
+                                    borderWidth: 2
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            interaction: { mode: 'index', intersect: false },
+                            plugins: {
+                                legend: { labels: { color: '#666' } },
+                                title: { display: true, text: 'Portfolio Resilience: ' + crisisData.scenario }
+                            },
+                            scales: {
+                                y: { display: true, grid: { color: '#eee' } },
+                                x: { display: false }
+                            }
+                        }
+                    });
+                }
             }
-        }
+        });
     </script>
 </body>
 </html>

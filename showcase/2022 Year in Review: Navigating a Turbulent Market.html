@@ -39,8 +39,9 @@
         <div class="toolbar-item" onclick="window.location.href='market_mayhem_archive.html'"><strong>FILE</strong></div>
         <div class="toolbar-item" onclick="showToast('EDIT MODE: READ ONLY (ARCHIVED)')">EDIT</div>
         <div class="toolbar-item" onclick="toggleTheme()">VIEW</div>
-        <div class="toolbar-item" onclick="showToast('INSERT: PERMISSION DENIED')">INSERT</div>
-        <div class="toolbar-item" onclick="showToast('FORMAT: LOCKED')">FORMAT</div>
+        <div class="toolbar-item" onclick="toggleRedactMode()">REDACT</div>
+        <div class="toolbar-item" onclick="printDoc()">PRINT</div>
+        <div class="toolbar-item" onclick="shareDoc()">SHARE</div>
         <div class="toolbar-item" onclick="runVerification()" style="color: #0078d7;"><strong>VERIFY</strong></div>
         <div style="flex-grow:1;"></div>
         <div class="toolbar-item" style="color:#666;">ADAM_V26_EDITOR</div>
@@ -52,6 +53,7 @@
     </div>
 
     <div class="newsletter-wrapper">
+        <div id="watermark">CONFIDENTIAL // TOP SECRET</div>
         <div class="paper-sheet" id="paper-sheet">
 
             <!-- High Tier Header UI -->
@@ -85,6 +87,14 @@
 <h2>Top Performers</h2><p>Some of the top-performing companies in 2022 included: <em> <strong>ExxonMobil (XOM):</strong>  Benefited from high oil prices. </em> <strong>Chevron (CVX):</strong>  Another energy giant that profited from the energy crisis. <em> <strong>NextEra Energy (NEE):</strong>  A leading renewable energy company. </em> <strong>PepsiCo (PEP):</strong>  A consumer staples giant with strong brand recognition. * <strong>Dollar General (DG):</strong>  A discount retailer that benefited from value-conscious consumers.</p>
 <h2>Portfolio Construction and Optimization</h2><p>In a volatile and uncertain market like 2022, portfolio construction and optimization are crucial. Investors should consider: <em> <strong>Diversification:</strong>  Diversifying across asset classes, sectors, and geographies to reduce risk. </em> <strong>Risk Management:</strong>  Implementing risk management strategies, such as hedging or position sizing, to mitigate potential losses. <em> <strong>Value Investing:</strong>  Focusing on undervalued companies with strong fundamentals. </em> <strong>Long-Term Perspective:</strong>  Maintaining a long-term perspective and avoiding impulsive decisions based on short-term market fluctuations.</p>
 <h2>Looking Ahead</h2><p>While 2022 presented significant challenges, it also created opportunities for investors. As we move forward, it's essential to stay informed about market trends, assess risks carefully, and maintain a disciplined investment approach. Adam v15.4 can assist investors in navigating the complexities of the market and making informed decisions.</p>
+
+
+            <!-- Advanced Analytics Sections -->
+            <div class="analytics-section"><h3>2. Strategic Risk & Sensitivity Analysis</h3><table class="risk-matrix-table"><thead><tr><th>Risk Factor</th><th>Impact</th><th>Probability</th><th>Strategic Mitigant</th></tr></thead><tbody><tr><td>Consumer Recession</td><td class="impact-high">HIGH</td><td>MED</td><td>Long Staples (XLP), Short Discretionary (XLY)</td></tr><tr><td>Regulatory Crackdown</td><td class="impact-med">MED</td><td>HIGH</td><td>Reduce Big Tech Exposure, Long Utilities</td></tr><tr><td>AI Capex Disappointment</td><td class="impact-med">MED</td><td>MED</td><td>Rotate into Value/Industrials, Short NVDA/SMH</td></tr></tbody></table></div>
+            <div class="analytics-section"><h3>3. Sector Arbitrage & Alpha Opportunities</h3><div class="arbitrage-grid"><div class="arbitrage-card"><div class="arb-header">Long Materials / Short Energy</div><div class="arb-type">SECTOR_ARB | Horizon: 2-4 Weeks</div><div class="arb-thesis">Valuation gap of 4.0σ implies mean reversion. Materials showing superior free cash flow yield.</div><div class="arb-conviction">Conviction: 67%</div></div><div class="arbitrage-card"><div class="arb-header">Short VIX / Long Skew</div><div class="arb-type">VOL_ARB | Horizon: 1 Week</div><div class="arb-thesis">Implied volatility premium is overpriced relative to realized vol. Selling covered calls on index.</div><div class="arb-conviction">Conviction: 61%</div></div></div></div>
+            <div class="analytics-section"><h3>4. Institutional Positioning (13F & Flows)</h3><div class="flow-heatmap"><div class="flow-item" style="background:rgba(255, 0, 0, 0.22);"><span class="flow-sector">Technology</span><span class="flow-val">-22</span></div><div class="flow-item" style="background:rgba(255, 0, 0, 0.02);"><span class="flow-sector">Energy</span><span class="flow-val">-2</span></div><div class="flow-item" style="background:rgba(255, 0, 0, 0.29);"><span class="flow-sector">Financials</span><span class="flow-val">-29</span></div><div class="flow-item" style="background:rgba(0, 255, 0, 0.47);"><span class="flow-sector">Healthcare</span><span class="flow-val">47</span></div><div class="flow-item" style="background:rgba(255, 0, 0, 0.0);"><span class="flow-sector">Discretionary</span><span class="flow-val">0</span></div><div class="flow-item" style="background:rgba(0, 255, 0, 0.25);"><span class="flow-sector">Staples</span><span class="flow-val">25</span></div><div class="flow-item" style="background:rgba(255, 0, 0, 0.24);"><span class="flow-sector">Utilities</span><span class="flow-val">-24</span></div><div class="flow-item" style="background:rgba(255, 0, 0, 0.76);"><span class="flow-sector">Real Estate</span><span class="flow-val">-76</span></div><div class="flow-item" style="background:rgba(255, 0, 0, 0.47);"><span class="flow-sector">Materials</span><span class="flow-val">-47</span></div><div class="flow-item" style="background:rgba(255, 0, 0, 0.01);"><span class="flow-sector">Comms</span><span class="flow-val">-1</span></div></div></div>
+
+            <!-- Crisis Simulation Section -->
 
 
             <!-- Provenance Log (All Tiers) -->
@@ -200,54 +210,153 @@
   "conviction": 60,
   "semantic_score": 44,
   "probability": 80,
-  "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 73/100. Cross-reference with knowledge graph completed."
+  "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 73/100. Cross-reference with knowledge graph completed.",
+  "analytics": {
+    "risks": [
+      {
+        "risk": "Consumer Recession",
+        "impact": "HIGH",
+        "prob": "MED",
+        "mitigant": "Long Staples (XLP), Short Discretionary (XLY)"
+      },
+      {
+        "risk": "Regulatory Crackdown",
+        "impact": "MED",
+        "prob": "HIGH",
+        "mitigant": "Reduce Big Tech Exposure, Long Utilities"
+      },
+      {
+        "risk": "AI Capex Disappointment",
+        "impact": "MED",
+        "prob": "MED",
+        "mitigant": "Rotate into Value/Industrials, Short NVDA/SMH"
+      }
+    ],
+    "arbitrage": [
+      {
+        "type": "SECTOR_ARB",
+        "strategy": "Long Materials / Short Energy",
+        "thesis": "Valuation gap of 4.0\u03c3 implies mean reversion. Materials showing superior free cash flow yield.",
+        "horizon": "2-4 Weeks",
+        "conviction": "67%"
+      },
+      {
+        "type": "VOL_ARB",
+        "strategy": "Short VIX / Long Skew",
+        "thesis": "Implied volatility premium is overpriced relative to realized vol. Selling covered calls on index.",
+        "horizon": "1 Week",
+        "conviction": "61%"
+      }
+    ],
+    "flows": {
+      "Technology": -22,
+      "Energy": -2,
+      "Financials": -29,
+      "Healthcare": 47,
+      "Discretionary": 0,
+      "Staples": 25,
+      "Utilities": -24,
+      "Real Estate": -76,
+      "Materials": -47,
+      "Comms": -1
+    },
+    "regime": "REFLATION / BOOM"
+  },
+  "crisis_sim": null
 }</textarea>
 
     <script>
         // Chart Injection Logic
         const metricsData = {};
+        const flowsData = {"Technology": -22, "Energy": -2, "Financials": -29, "Healthcare": 47, "Discretionary": 0, "Staples": 25, "Utilities": -24, "Real Estate": -76, "Materials": -47, "Comms": -1};
+        const crisisData = {};
 
-        if (metricsData && Object.keys(metricsData).length > 0) {
-            const ctx = document.getElementById('financialChart');
-            const container = document.getElementById('financialChartContainer');
+        document.addEventListener('DOMContentLoaded', () => {
+            if (metricsData && Object.keys(metricsData).length > 0) {
+                const ctx = document.getElementById('financialChart');
+                const container = document.getElementById('financialChartContainer');
 
-            // Basic parsing of metrics structure (assuming flat or Year->Val)
-            let labels = [];
-            let values = [];
-            let labelName = "Metric";
+                // Basic parsing of metrics structure
+                let labels = [];
+                let values = [];
+                let labelName = "Metric";
 
-            // Try to find a timeseries
-            for (const [key, val] of Object.entries(metricsData)) {
-                if (typeof val === 'object') {
-                    // Likely year -> value
-                    labels = Object.keys(val);
-                    values = Object.values(val).map(v => parseFloat(v.replace(/[^0-9.-]/g, '')));
-                    labelName = key;
-                    break;
+                for (const [key, val] of Object.entries(metricsData)) {
+                    if (typeof val === 'object') {
+                        labels = Object.keys(val);
+                        values = Object.values(val).map(v => parseFloat(v.replace(/[^0-9.-]/g, '')));
+                        labelName = key;
+                        break;
+                    }
+                }
+
+                if (labels.length > 0) {
+                    container.style.display = 'block';
+                    new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: labelName,
+                                data: values,
+                                backgroundColor: 'rgba(204, 0, 0, 0.5)',
+                                borderColor: '#cc0000',
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: { legend: { display: true } }
+                        }
+                    });
                 }
             }
 
-            if (labels.length > 0) {
-                container.style.display = 'block';
-                new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            label: labelName,
-                            data: values,
-                            backgroundColor: 'rgba(204, 0, 0, 0.5)',
-                            borderColor: '#cc0000',
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        plugins: { legend: { display: true } }
-                    }
-                });
+            // Crisis Simulation Chart
+            if (crisisData && crisisData.portfolio_values) {
+                const ctx = document.getElementById('crisisSimChart');
+                if (ctx) {
+                    new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: crisisData.dates,
+                            datasets: [
+                                {
+                                    label: 'Portfolio (Simulated)',
+                                    data: crisisData.portfolio_values,
+                                    borderColor: '#00f3ff',
+                                    backgroundColor: 'rgba(0, 243, 255, 0.1)',
+                                    tension: 0.4,
+                                    borderWidth: 2
+                                },
+                                {
+                                    label: 'Benchmark (Simulated)',
+                                    data: crisisData.benchmark_values,
+                                    borderColor: '#cc0000',
+                                    backgroundColor: 'rgba(204, 0, 0, 0.0)',
+                                    borderDash: [5, 5],
+                                    tension: 0.4,
+                                    borderWidth: 2
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            interaction: { mode: 'index', intersect: false },
+                            plugins: {
+                                legend: { labels: { color: '#666' } },
+                                title: { display: true, text: 'Portfolio Resilience: ' + crisisData.scenario }
+                            },
+                            scales: {
+                                y: { display: true, grid: { color: '#eee' } },
+                                x: { display: false }
+                            }
+                        }
+                    });
+                }
             }
-        }
+        });
     </script>
 </body>
 </html>
