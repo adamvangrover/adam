@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM | Modular Data Loader</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/data_manager_modular.js"></script>
+</head>
+<body class="h-screen flex flex-col grid-bg text-slate-200 overflow-hidden">
+    <header class="h-16 border-b border-slate-700/50 flex items-center justify-between px-6 bg-[#0f172a]/90 backdrop-blur-md z-40 shrink-0">
+        <h1 class="text-xl font-bold tracking-tight mono">ADAM <span class="text-amber-400">Modular</span> <span class="text-slate-500 font-normal">| Data Loader POC</span></h1>
+        <div class="flex gap-4">
+             <button onclick="window.modularDataManager.clearCache(); log('Cache cleared.');" class="text-xs text-slate-400 hover:text-white border border-slate-600 px-3 py-1 rounded">Reset Cache</button>
+        </div>
+    </header>
+
+    <main class="flex-1 p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+        <!-- Controls -->
+        <div class="space-y-6">
+            <div class="glass-panel p-6 rounded-lg border border-slate-700">
+                <h2 class="text-lg font-bold text-cyan-400 mb-4 font-mono">1. Verified Historic Info (Reports)</h2>
+                <p class="text-sm text-slate-400 mb-4">Load the 13F and Market Reports subset (~500KB).</p>
+                <button onclick="loadSubset('reports')" class="w-full py-2 bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded text-sm text-white transition font-mono">
+                    <i class="fas fa-download mr-2"></i> LOAD REPORTS
+                </button>
+            </div>
+
+            <div class="glass-panel p-6 rounded-lg border border-slate-700">
+                <h2 class="text-lg font-bold text-purple-400 mb-4 font-mono">2. Simulated Seed (Credit Memos)</h2>
+                <p class="text-sm text-slate-400 mb-4">Load the deep simulated credit memo artifacts (~1MB).</p>
+                <button onclick="loadSubset('creditMemos')" class="w-full py-2 bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded text-sm text-white transition font-mono">
+                    <i class="fas fa-download mr-2"></i> LOAD CREDIT MEMOS
+                </button>
+            </div>
+
+            <div class="glass-panel p-6 rounded-lg border border-slate-700">
+                <h2 class="text-lg font-bold text-emerald-400 mb-4 font-mono">3. Repository Index (Files)</h2>
+                <p class="text-sm text-slate-400 mb-4">Load the full file tree index (~6MB Uncompressed).</p>
+                <button onclick="loadSubset('files')" class="w-full py-2 bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded text-sm text-white transition font-mono">
+                    <i class="fas fa-download mr-2"></i> LOAD FILE INDEX
+                </button>
+            </div>
+        </div>
+
+        <!-- Output -->
+        <div class="glass-panel p-4 rounded-lg border border-slate-700 flex flex-col h-full bg-[#0b1120]">
+            <div class="flex justify-between items-center mb-2 border-b border-slate-800 pb-2">
+                <span class="text-xs font-bold text-slate-500 uppercase">System Log</span>
+                <span class="text-[10px] text-emerald-500 font-mono" id="status-indicator">READY</span>
+            </div>
+            <div id="console-output" class="flex-1 overflow-y-auto font-mono text-xs text-slate-300 space-y-1">
+                <div class="text-slate-500">// Waiting for input...</div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function log(msg, type='info') {
+            const out = document.getElementById('console-output');
+            const div = document.createElement('div');
+            const time = new Date().toLocaleTimeString();
+            let color = 'text-slate-300';
+            if (type === 'success') color = 'text-emerald-400';
+            if (type === 'error') color = 'text-red-400';
+
+            div.innerHTML = `<span class="text-slate-600 mr-2">[${time}]</span> <span class="${color}">${msg}</span>`;
+            out.appendChild(div);
+            out.scrollTop = out.scrollHeight;
+        }
+
+        async function loadSubset(type) {
+            log(`Requesting load for: ${type}...`);
+            const start = performance.now();
+
+            try {
+                let data;
+                if (type === 'reports') data = await window.modularDataManager.loadReports();
+                if (type === 'creditMemos') data = await window.modularDataManager.loadCreditMemos();
+                if (type === 'files') data = await window.modularDataManager.loadFiles();
+
+                const duration = (performance.now() - start).toFixed(2);
+                const count = Array.isArray(data) ? data.length : Object.keys(data).length;
+
+                log(`Successfully loaded ${type}.`, 'success');
+                log(`- Items: ${count}`);
+                log(`- Time: ${duration}ms`);
+
+            } catch (e) {
+                log(`Failed to load ${type}: ${e.message}`, 'error');
+            }
+        }
+    </script>
+</body>
+</html>
