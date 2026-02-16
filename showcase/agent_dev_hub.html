@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM | Agent Dev Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link rel="stylesheet" href="css/style.css">
+
+    <style>
+        body {
+            background-color: #050505;
+            color: #d4d4d8;
+            font-family: 'Inter', sans-serif;
+        }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+
+        .agent-card {
+            background: rgba(20, 20, 25, 0.6);
+            border: 1px solid #333;
+            transition: all 0.2s;
+        }
+        .agent-card:hover {
+            border-color: #00f3ff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0, 243, 255, 0.1);
+        }
+
+        .status-badge {
+            font-size: 0.65rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+        .status-verified { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid #059669; }
+        .status-unverified { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid #b91c1c; }
+
+        .markdown-body h1 { font-size: 1.5rem; font-weight: bold; margin-bottom: 1rem; color: #fff; }
+        .markdown-body h2 { font-size: 1.25rem; font-weight: bold; margin-top: 1.5rem; margin-bottom: 0.5rem; color: #e4e4e7; }
+        .markdown-body p { margin-bottom: 1rem; line-height: 1.6; color: #a1a1aa; }
+        .markdown-body code { background: #27272a; padding: 2px 4px; rounded: 4px; font-family: 'JetBrains Mono'; font-size: 0.85em; color: #00f3ff; }
+        .markdown-body pre { background: #18181b; padding: 1rem; rounded: 0.5rem; overflow-x: auto; margin-bottom: 1rem; border: 1px solid #333; }
+    </style>
+</head>
+<body class="flex flex-col h-screen overflow-hidden">
+
+    <!-- Header -->
+    <header class="h-16 border-b border-zinc-800 flex items-center justify-between px-6 bg-zinc-900/80 backdrop-blur-md z-40">
+        <div class="flex items-center gap-3">
+            <i class="fas fa-code-branch text-purple-500 text-xl"></i>
+            <h1 class="text-lg font-bold tracking-wide text-white">AGENT <span class="text-purple-500">DEV HUB</span></h1>
+        </div>
+        <div class="flex gap-4 text-xs font-mono">
+            <div class="flex items-center gap-2">
+                <span class="text-zinc-500">TOTAL AGENTS:</span>
+                <span class="text-white" id="stat-agents">--</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="text-zinc-500">VERIFIED:</span>
+                <span class="text-green-400" id="stat-verified">--</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex flex-1 overflow-hidden">
+        <!-- Sidebar Navigation -->
+        <aside class="w-64 border-r border-zinc-800 bg-zinc-900/50 flex flex-col">
+            <div class="p-4">
+                <button onclick="showSection('roster')" class="w-full text-left px-4 py-2 rounded hover:bg-zinc-800 text-sm font-medium text-zinc-300 transition-colors mb-1 active-nav bg-zinc-800 text-white" id="btn-roster">
+                    <i class="fas fa-users w-5"></i> Agent Roster
+                </button>
+                <button onclick="showSection('notes')" class="w-full text-left px-4 py-2 rounded hover:bg-zinc-800 text-sm font-medium text-zinc-300 transition-colors" id="btn-notes">
+                    <i class="fas fa-book w-5"></i> Dev Patterns
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 overflow-y-auto bg-black p-8 relative">
+
+            <!-- Agent Roster Section -->
+            <div id="section-roster" class="space-y-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-white">Agent Registry</h2>
+                    <input type="text" id="agent-search" placeholder="Filter agents..." class="bg-zinc-900 border border-zinc-700 px-4 py-2 rounded text-sm text-white w-64 focus:border-purple-500 outline-none">
+                </div>
+
+                <div id="agent-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                    <!-- Cards injected here -->
+                </div>
+            </div>
+
+            <!-- Dev Notes Section -->
+            <div id="section-notes" class="hidden max-w-4xl mx-auto">
+                <div class="markdown-body p-8 bg-zinc-900/50 border border-zinc-800 rounded-lg">
+                    <!-- Markdown injected here -->
+                    <div class="animate-pulse text-zinc-500">Loading documentation...</div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Adam Global Nav -->
+    <script src="js/nav.js" data-root=".."></script>
+
+    <script>
+        let allAgents = [];
+
+        async function init() {
+            try {
+                // Load Metadata
+                const res = await fetch('data/repo_metadata.json');
+                const data = await res.json();
+                allAgents = data.agents;
+
+                renderStats(data);
+                renderAgents(allAgents);
+
+                // Load Documentation
+                const docRes = await fetch('../docs/AGENT_PATTERNS.md');
+                if(docRes.ok) {
+                    const text = await docRes.text();
+                    document.querySelector('.markdown-body').innerHTML = marked.parse(text);
+                } else {
+                    document.querySelector('.markdown-body').innerHTML = "<p class='text-red-500'>Failed to load AGENT_PATTERNS.md</p>";
+                }
+
+            } catch (e) {
+                console.error("Init failed", e);
+            }
+        }
+
+        function renderStats(data) {
+            document.getElementById('stat-agents').innerText = data.agents.length;
+            const verified = data.agents.filter(a => a.verification_script).length;
+            document.getElementById('stat-verified').innerText = verified;
+        }
+
+        function renderAgents(agents) {
+            const container = document.getElementById('agent-grid');
+            container.innerHTML = '';
+
+            agents.forEach(agent => {
+                const hasVerify = !!agent.verification_script;
+
+                const card = document.createElement('div');
+                card.className = 'agent-card p-5 rounded-lg flex flex-col h-full';
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-3">
+                        <h3 class="text-white font-bold mono text-sm truncate" title="${agent.name}">${agent.name}</h3>
+                        <span class="status-badge ${hasVerify ? 'status-verified' : 'status-unverified'}">
+                            ${hasVerify ? 'VERIFIED' : 'UNVERIFIED'}
+                        </span>
+                    </div>
+                    <p class="text-xs text-zinc-500 font-mono mb-4 truncate" title="${agent.file}">${agent.file}</p>
+                    <div class="flex-1 text-sm text-zinc-400 mb-4 line-clamp-3 overflow-hidden text-ellipsis">
+                        ${agent.docstring || '<span class="italic text-zinc-600">No documentation provided.</span>'}
+                    </div>
+
+                    ${hasVerify ? `
+                        <div class="mt-auto pt-3 border-t border-zinc-800">
+                            <div class="text-[10px] text-zinc-500 uppercase mb-1">Verification Script</div>
+                            <div class="text-xs font-mono text-purple-400 truncate" title="${agent.verification_script}">
+                                <i class="fas fa-flask mr-1"></i> ${agent.verification_script.split('/').pop()}
+                            </div>
+                        </div>
+                    ` : ''}
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function showSection(id) {
+            document.getElementById('section-roster').classList.add('hidden');
+            document.getElementById('section-notes').classList.add('hidden');
+
+            document.getElementById(`section-${id}`).classList.remove('hidden');
+
+            // Toggle active state on buttons
+            document.getElementById('btn-roster').classList.remove('bg-zinc-800', 'text-white');
+            document.getElementById('btn-notes').classList.remove('bg-zinc-800', 'text-white');
+
+            document.getElementById(`btn-${id}`).classList.add('bg-zinc-800', 'text-white');
+        }
+
+        // Search Filter
+        document.getElementById('agent-search').addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            const filtered = allAgents.filter(a =>
+                a.name.toLowerCase().includes(query) ||
+                (a.docstring && a.docstring.toLowerCase().includes(query))
+            );
+            renderAgents(filtered);
+        });
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
