@@ -36,8 +36,9 @@
 
     <!-- Virtual Toolbar for High Tier -->
     <div class="doc-toolbar" style="display: none;">
-        <div class="toolbar-item" onclick="window.location.href='market_mayhem_archive.html'"><strong>FILE</strong></div>
-        <div class="toolbar-item" onclick="showToast('EDIT MODE: READ ONLY (ARCHIVED)')">EDIT</div>
+        <div class="toolbar-item" onclick="window.location.href='market_mayhem_archive_v24.html'"><strong>FILE</strong></div>
+        <div class="toolbar-item" onclick="toggleRedactionMode()">REDACT</div>
+        <div class="toolbar-item" onclick="printReport()">PRINT</div>
         <div class="toolbar-item" onclick="toggleTheme()">VIEW</div>
         <div class="toolbar-item" onclick="showToast('INSERT: PERMISSION DENIED')">INSERT</div>
         <div class="toolbar-item" onclick="showToast('FORMAT: LOCKED')">FORMAT</div>
@@ -47,12 +48,15 @@
     </div>
 
     <div style="max-width: 1400px; margin: 0 auto; padding: 10px 20px; display:flex; justify-content:space-between; align-items:center; display: flex;">
-        <a href="market_mayhem_archive.html" class="cyber-btn">&larr; RETURN TO ARCHIVE</a>
+        <a href="market_mayhem_archive_v24.html" class="cyber-btn">&larr; RETURN TO ARCHIVE</a>
         <div style="font-family:'JetBrains Mono'; font-size:0.7rem; color:#666;">SECURE CONNECTION ESTABLISHED</div>
     </div>
 
     <div class="newsletter-wrapper">
         <div class="paper-sheet" id="paper-sheet">
+
+            <!-- Top Secret Stamp -->
+            <div id="top-secret-stamp" class="top-secret-stamp">TOP SECRET</div>
 
             <!-- High Tier Header UI -->
             <div class="doc-header-ui" style="display: none;">
@@ -79,7 +83,8 @@
                 <canvas id="financialChart"></canvas>
             </div>
 
-            <strong>Date:</strong> 2026-02-09
+            <div id="document-body">
+                <strong>Date:</strong> 2026-02-09
 <strong>Conviction:</strong> 75/100
 <strong>Quality Score:</strong> 100/100
 <strong>Critique:</strong> That’s a heavy-hitting briefing, Adam. The "Bi-Polar Market" is a sharp read.
@@ -135,6 +140,7 @@ The January Jobs Report (released Feb 11) actually printed at 130,000, which tec
 <li><strong>Volatility Map:</strong> Post-Jobs Report Sector Analysis. Let's look at why the market isn't celebrating the 130k jobs "beat" and which Consumer Discretionary (XLY) names are the most vulnerable to the cooling labor internals.</li>
 </ul>
 
+            </div>
 
             <!-- Provenance Log (All Tiers) -->
             <div class="provenance-log">
@@ -183,7 +189,7 @@ The January Jobs Report (released Feb 11) actually printed at 130,000, which tec
             <div class="sidebar-widget">
                 <div class="sidebar-title">Detected Entities</div>
                 <div class="tag-cloud">
-                    <a href="market_mayhem_archive.html?search=US_FED" class="tag" style="text-decoration:none;">US_FED</a><a href="market_mayhem_archive.html?search=CN_PBOC" class="tag" style="text-decoration:none;">CN_PBOC</a><a href="market_mayhem_archive.html?search=AI" class="tag" style="text-decoration:none; border-color:#666;">AI</a><a href="market_mayhem_archive.html?search=Banks" class="tag" style="text-decoration:none; border-color:#666;">Banks</a><a href="market_mayhem_archive.html?search=EV" class="tag" style="text-decoration:none; border-color:#666;">EV</a><a href="market_mayhem_archive.html?search=Energy" class="tag" style="text-decoration:none; border-color:#666;">Energy</a><a href="market_mayhem_archive.html?search=Gold" class="tag" style="text-decoration:none; border-color:#666;">Gold</a>
+                    <a href="market_mayhem_archive_v24.html?search=US_FED" class="tag" style="text-decoration:none;">US_FED</a><a href="market_mayhem_archive_v24.html?search=CN_PBOC" class="tag" style="text-decoration:none;">CN_PBOC</a><a href="market_mayhem_archive_v24.html?search=AI" class="tag" style="text-decoration:none; border-color:#666;">AI</a><a href="market_mayhem_archive_v24.html?search=Banks" class="tag" style="text-decoration:none; border-color:#666;">Banks</a><a href="market_mayhem_archive_v24.html?search=EV" class="tag" style="text-decoration:none; border-color:#666;">EV</a><a href="market_mayhem_archive_v24.html?search=Energy" class="tag" style="text-decoration:none; border-color:#666;">Energy</a><a href="market_mayhem_archive_v24.html?search=Gold" class="tag" style="text-decoration:none; border-color:#666;">Gold</a>
                 </div>
             </div>
 

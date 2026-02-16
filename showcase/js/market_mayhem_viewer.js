@@ -43,11 +43,14 @@ function toggleSource() {
     }
 }
 
+// --- Verification Logic ---
+
 function runVerification() {
     const overlay = document.getElementById('system2-overlay');
     const content = document.getElementById('sys2-content');
     const status = document.getElementById('verification-status');
     const provHash = document.querySelector('.provenance-log .log-entry span[style*="terminal-green"]')?.innerText || "UNKNOWN";
+    const stamp = document.getElementById('top-secret-stamp');
 
     if (!overlay || !content) return;
 
@@ -59,12 +62,25 @@ function runVerification() {
         "VERIFYING CRYPTOGRAPHIC SIGNATURE...",
         "HASH: " + provHash,
         "CHECKING CHAIN OF CUSTODY...",
+        "SCANNING FOR ANOMALIES...",
         "ANALYZING SENTIMENT VECTORS...",
         "CROSS-REFERENCING KNOWLEDGE GRAPH...",
         "VERIFICATION COMPLETE."
     ];
 
     let i = 0;
+
+    function addRandomHex() {
+        const hex = Math.random().toString(16).substring(2, 14).toUpperCase();
+        const div = document.createElement('div');
+        div.className = 'system2-line';
+        div.style.color = '#005500';
+        div.style.fontSize = '0.7em';
+        div.innerText = hex + ' ' + hex + ' ' + hex;
+        content.appendChild(div);
+        content.scrollTop = content.scrollHeight;
+    }
+
     function addLine() {
         if (i < lines.length) {
             const div = document.createElement('div');
@@ -72,8 +88,18 @@ function runVerification() {
             div.innerText = '> ' + lines[i];
             div.style.opacity = 1;
             content.appendChild(div);
+            content.scrollTop = content.scrollHeight;
+
+            // Burst of hex codes between lines
+            let hexCount = 0;
+            const hexInterval = setInterval(() => {
+                addRandomHex();
+                hexCount++;
+                if(hexCount > 5) clearInterval(hexInterval);
+            }, 50);
+
             i++;
-            setTimeout(addLine, 400);
+            setTimeout(addLine, 600);
         } else {
             setTimeout(() => {
                 overlay.style.display = 'none';
@@ -83,17 +109,59 @@ function runVerification() {
                     status.style.color = "#aaffaa";
                     status.style.textShadow = "0 0 10px #00ff00";
                 }
+                if (stamp) {
+                    stamp.style.display = 'block';
+                    // Add a slight rubber stamp animation class if we had one
+                }
             }, 1000);
         }
     }
     addLine();
 }
 
-// Initialize Chart if data exists
+// --- Redaction Logic ---
+
+let isRedactionMode = false;
+
+function toggleRedactionMode() {
+    isRedactionMode = !isRedactionMode;
+    if (isRedactionMode) {
+        document.body.classList.add('redaction-mode');
+        showToast('REDACTION MODE: ACTIVE (CLICK TEXT TO REDACT)');
+    } else {
+        document.body.classList.remove('redaction-mode');
+        showToast('REDACTION MODE: DISABLED');
+    }
+}
+
+function handleRedactionClick(e) {
+    if (!isRedactionMode) {
+        // If clicked on an existing redacted element, toggle reveal
+        if (e.target.classList.contains('redacted')) {
+            e.target.classList.toggle('redaction-revealed');
+        }
+        return;
+    }
+
+    // Only redact text containers
+    const validTags = ['P', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'LI', 'SPAN', 'STRONG', 'EM'];
+    if (validTags.includes(e.target.tagName)) {
+        e.target.classList.toggle('redacted');
+    }
+}
+
+// --- Print Logic ---
+
+function printReport() {
+    window.print();
+}
+
+// --- Initialization ---
+
 document.addEventListener('DOMContentLoaded', () => {
-    // Check for metrics data in a global variable or data attribute
-    // The generator injects `const metricsData = ...` in a separate script block usually.
-    // If we move that logic here, we need to read it from DOM.
-    // Ideally, we keep the data injection inline, and the chart rendering here or inline.
-    // For now, let's leave the chart logic inline in the generator as it depends on `metrics_json` insertion.
+    // Attach click listener for redaction
+    const sheet = document.getElementById('paper-sheet');
+    if (sheet) {
+        sheet.addEventListener('click', handleRedactionClick);
+    }
 });

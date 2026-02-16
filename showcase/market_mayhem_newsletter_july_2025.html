@@ -36,8 +36,9 @@
 
     <!-- Virtual Toolbar for High Tier -->
     <div class="doc-toolbar" style="display: flex;">
-        <div class="toolbar-item" onclick="window.location.href='market_mayhem_archive.html'"><strong>FILE</strong></div>
-        <div class="toolbar-item" onclick="showToast('EDIT MODE: READ ONLY (ARCHIVED)')">EDIT</div>
+        <div class="toolbar-item" onclick="window.location.href='market_mayhem_archive_v24.html'"><strong>FILE</strong></div>
+        <div class="toolbar-item" onclick="toggleRedactionMode()">REDACT</div>
+        <div class="toolbar-item" onclick="printReport()">PRINT</div>
         <div class="toolbar-item" onclick="toggleTheme()">VIEW</div>
         <div class="toolbar-item" onclick="showToast('INSERT: PERMISSION DENIED')">INSERT</div>
         <div class="toolbar-item" onclick="showToast('FORMAT: LOCKED')">FORMAT</div>
@@ -47,12 +48,15 @@
     </div>
 
     <div style="max-width: 1400px; margin: 0 auto; padding: 10px 20px; display:flex; justify-content:space-between; align-items:center; display: none;">
-        <a href="market_mayhem_archive.html" class="cyber-btn">&larr; RETURN TO ARCHIVE</a>
+        <a href="market_mayhem_archive_v24.html" class="cyber-btn">&larr; RETURN TO ARCHIVE</a>
         <div style="font-family:'JetBrains Mono'; font-size:0.7rem; color:#666;">SECURE CONNECTION ESTABLISHED</div>
     </div>
 
     <div class="newsletter-wrapper">
         <div class="paper-sheet" id="paper-sheet">
+
+            <!-- Top Secret Stamp -->
+            <div id="top-secret-stamp" class="top-secret-stamp">TOP SECRET</div>
 
             <!-- High Tier Header UI -->
             <div class="doc-header-ui" style="display: flex;">
@@ -79,7 +83,8 @@
                 <canvas id="financialChart"></canvas>
             </div>
 
-            <strong>Your weekly guide to navigating the financial storms and spotting the sunshine!</strong>
+            <div id="document-body">
+                <strong>Your weekly guide to navigating the financial storms and spotting the sunshine!</strong>
 <p>---</p>
 <h2>Market Snapshot (as of July 12, 2025)</h2>
 <ul>
@@ -179,6 +184,7 @@
 <h2>Disclaimer</h2>
 <p>The information and recommendations provided in this newsletter are for informational purposes only and should not be construed as financial advice. Investing involves risk, and you could lose money. Consult with a qualified financial advisor before making any investment decisions.</p>
 
+            </div>
 
             <!-- Provenance Log (All Tiers) -->
             <div class="provenance-log">
@@ -227,7 +233,7 @@
             <div class="sidebar-widget">
                 <div class="sidebar-title">Detected Entities</div>
                 <div class="tag-cloud">
-                    <a href="market_mayhem_archive.html?search=EU_ECB" class="tag" style="text-decoration:none;">EU_ECB</a><a href="market_mayhem_archive.html?search=CN_PBOC" class="tag" style="text-decoration:none;">CN_PBOC</a><a href="market_mayhem_archive.html?search=AI" class="tag" style="text-decoration:none; border-color:#666;">AI</a><a href="market_mayhem_archive.html?search=Banks" class="tag" style="text-decoration:none; border-color:#666;">Banks</a><a href="market_mayhem_archive.html?search=Bitcoin" class="tag" style="text-decoration:none; border-color:#666;">Bitcoin</a><a href="market_mayhem_archive.html?search=Cloud" class="tag" style="text-decoration:none; border-color:#666;">Cloud</a><a href="market_mayhem_archive.html?search=Cybersecurity" class="tag" style="text-decoration:none; border-color:#666;">Cybersecurity</a>
+                    <a href="market_mayhem_archive_v24.html?search=CN_PBOC" class="tag" style="text-decoration:none;">CN_PBOC</a><a href="market_mayhem_archive_v24.html?search=EU_ECB" class="tag" style="text-decoration:none;">EU_ECB</a><a href="market_mayhem_archive_v24.html?search=AI" class="tag" style="text-decoration:none; border-color:#666;">AI</a><a href="market_mayhem_archive_v24.html?search=Banks" class="tag" style="text-decoration:none; border-color:#666;">Banks</a><a href="market_mayhem_archive_v24.html?search=Bitcoin" class="tag" style="text-decoration:none; border-color:#666;">Bitcoin</a><a href="market_mayhem_archive_v24.html?search=Cloud" class="tag" style="text-decoration:none; border-color:#666;">Cloud</a><a href="market_mayhem_archive_v24.html?search=Cybersecurity" class="tag" style="text-decoration:none; border-color:#666;">Cybersecurity</a>
                 </div>
             </div>
 
@@ -274,8 +280,8 @@
     "tickers": [],
     "agents": [],
     "sovereigns": [
-      "EU_ECB",
-      "CN_PBOC"
+      "CN_PBOC",
+      "EU_ECB"
     ],
     "keywords": [
       "AI",
