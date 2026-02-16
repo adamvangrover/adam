@@ -147,20 +147,54 @@
 
             agents.forEach(agent => {
                 const hasVerify = !!agent.verification_script;
+                const methodsCount = agent.methods ? agent.methods.length : 0;
+                const parents = agent.parents && agent.parents.length ? agent.parents.join(', ') : null;
+                const linkedPages = agent.linked_pages && agent.linked_pages.length ? agent.linked_pages : [];
 
                 const card = document.createElement('div');
-                card.className = 'agent-card p-5 rounded-lg flex flex-col h-full';
+                card.className = 'agent-card p-5 rounded-lg flex flex-col h-full relative group';
+
+                // Construct Linked Pages HTML
+                let linkedHtml = '';
+                if(linkedPages.length > 0) {
+                     linkedHtml = `
+                        <div class="mt-2 pt-2 border-t border-zinc-800">
+                             <div class="text-[10px] text-zinc-500 uppercase mb-1">Used In</div>
+                             <div class="flex flex-wrap gap-1">
+                                ${linkedPages.slice(0, 3).map(p => `<a href="${p.split('/').pop()}" class="text-[10px] bg-zinc-800 px-1 rounded text-cyan-500 hover:text-white truncate max-w-[100px] block" title="${p}">${p.split('/').pop()}</a>`).join('')}
+                                ${linkedPages.length > 3 ? `<span class="text-[10px] text-zinc-500">+${linkedPages.length - 3}</span>` : ''}
+                             </div>
+                        </div>
+                     `;
+                }
+
                 card.innerHTML = `
-                    <div class="flex justify-between items-start mb-3">
-                        <h3 class="text-white font-bold mono text-sm truncate" title="${agent.name}">${agent.name}</h3>
+                    <div class="flex justify-between items-start mb-2">
+                        <div>
+                             <h3 class="text-white font-bold mono text-sm truncate" title="${agent.name}">${agent.name}</h3>
+                             ${parents ? `<div class="text-[10px] text-zinc-500 font-mono">extends <span class="text-zinc-400">${parents}</span></div>` : ''}
+                        </div>
                         <span class="status-badge ${hasVerify ? 'status-verified' : 'status-unverified'}">
                             ${hasVerify ? 'VERIFIED' : 'UNVERIFIED'}
                         </span>
                     </div>
-                    <p class="text-xs text-zinc-500 font-mono mb-4 truncate" title="${agent.file}">${agent.file}</p>
+
+                    <p class="text-xs text-zinc-500 font-mono mb-3 truncate" title="${agent.file}">${agent.file}</p>
+
                     <div class="flex-1 text-sm text-zinc-400 mb-4 line-clamp-3 overflow-hidden text-ellipsis">
                         ${agent.docstring || '<span class="italic text-zinc-600">No documentation provided.</span>'}
                     </div>
+
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="text-[10px] bg-zinc-800 text-zinc-400 px-2 py-1 rounded border border-zinc-700" title="Public Methods">
+                            <i class="fas fa-cube mr-1"></i> ${methodsCount}
+                        </span>
+                        <a href="network_map.html" class="text-[10px] bg-zinc-800 text-zinc-400 px-2 py-1 rounded border border-zinc-700 hover:border-cyan-500 hover:text-cyan-400 transition-colors" title="View in Network Map">
+                            <i class="fas fa-project-diagram"></i>
+                        </a>
+                    </div>
+
+                    ${linkedHtml}
 
                     ${hasVerify ? `
                         <div class="mt-auto pt-3 border-t border-zinc-800">
