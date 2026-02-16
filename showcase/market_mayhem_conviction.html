@@ -97,6 +97,7 @@
         let isRedactMode = false;
         let isTerminalMode = false;
         let chartInstance = null;
+        let glitchTimer = null;
 
         // UI Interactions
         function toggleSidebar() {
@@ -137,6 +138,25 @@
             setTimeout(() => {
                 sheet.classList.remove('glitch-effect');
             }, 500); // 0.5s duration
+        }
+
+        function startRandomGlitch() {
+            // Clear any existing timer
+            if (glitchTimer) clearTimeout(glitchTimer);
+
+            // Random interval between 8 and 20 seconds
+            const delay = Math.random() * 12000 + 8000;
+
+            glitchTimer = setTimeout(() => {
+                // Only glitch if modal is closed and not in redaction mode (to avoid annoying user)
+                const modal = document.getElementById('trendModal');
+                const modalOpen = modal.style.display === 'flex';
+
+                if (!modalOpen && !isRedactMode) {
+                    triggerGlitch();
+                }
+                startRandomGlitch(); // Schedule next
+            }, delay);
         }
 
         function toggleRedactMode() {
@@ -441,6 +461,7 @@
 
         // Initialize
         loadData();
+        startRandomGlitch();
 
         // Keyboard Navigation
         document.addEventListener('keydown', (e) => {
