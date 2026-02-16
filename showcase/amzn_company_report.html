@@ -36,8 +36,9 @@
 
     <!-- Virtual Toolbar for High Tier -->
     <div class="doc-toolbar" style="display: flex;">
-        <div class="toolbar-item" onclick="window.location.href='market_mayhem_archive.html'"><strong>FILE</strong></div>
-        <div class="toolbar-item" onclick="showToast('EDIT MODE: READ ONLY (ARCHIVED)')">EDIT</div>
+        <div class="toolbar-item" onclick="window.location.href='market_mayhem_archive_v24.html'"><strong>FILE</strong></div>
+        <div class="toolbar-item" onclick="toggleRedactionMode()">REDACT</div>
+        <div class="toolbar-item" onclick="printReport()">PRINT</div>
         <div class="toolbar-item" onclick="toggleTheme()">VIEW</div>
         <div class="toolbar-item" onclick="showToast('INSERT: PERMISSION DENIED')">INSERT</div>
         <div class="toolbar-item" onclick="showToast('FORMAT: LOCKED')">FORMAT</div>
@@ -47,12 +48,15 @@
     </div>
 
     <div style="max-width: 1400px; margin: 0 auto; padding: 10px 20px; display:flex; justify-content:space-between; align-items:center; display: none;">
-        <a href="market_mayhem_archive.html" class="cyber-btn">&larr; RETURN TO ARCHIVE</a>
+        <a href="market_mayhem_archive_v24.html" class="cyber-btn">&larr; RETURN TO ARCHIVE</a>
         <div style="font-family:'JetBrains Mono'; font-size:0.7rem; color:#666;">SECURE CONNECTION ESTABLISHED</div>
     </div>
 
     <div class="newsletter-wrapper">
         <div class="paper-sheet" id="paper-sheet">
+
+            <!-- Top Secret Stamp -->
+            <div id="top-secret-stamp" class="top-secret-stamp">TOP SECRET</div>
 
             <!-- High Tier Header UI -->
             <div class="doc-header-ui" style="display: flex;">
@@ -79,9 +83,11 @@
                 <canvas id="financialChart"></canvas>
             </div>
 
-            <h2>Company Overview</h2><p>Amazon is a multinational technology company focusing on e-commerce, cloud computing, digital streaming, and artificial intelligence. It has become one of the world's most valuable companies and a leading force in the retail and technology industries. Amazon's vast online marketplace offers a wide range of products and services, including its own branded products and subscription services like Amazon Prime.</p>
+            <div id="document-body">
+                <h2>Company Overview</h2><p>Amazon is a multinational technology company focusing on e-commerce, cloud computing, digital streaming, and artificial intelligence. It has become one of the world's most valuable companies and a leading force in the retail and technology industries. Amazon's vast online marketplace offers a wide range of products and services, including its own branded products and subscription services like Amazon Prime.</p>
 <h2>Financial Performance</h2><h3>Revenue</h3><h4>2022</h4><p>513.98 billion USD</p><h4>2023</h4><p>560.00 billion USD (estimated)</p><h4>2024</h4><p>600.00 billion USD (estimated)</p><h3>Net Income</h3><h4>2022</h4><p>-2.72 billion USD</p><h4>2023</h4><p>10.00 billion USD (estimated)</p><h4>2024</h4><p>15.00 billion USD (estimated)</p><h3>Eps</h3><h4>2022</h4><p>-0.27 USD</p><h4>2023</h4><p>1.00 USD (estimated)</p><h4>2024</h4><p>1.50 USD (estimated)</p><h3>P/E Ratio</h3><h4>Current</h4><p>50.00</p><h3>Market Cap</h3><h4>Current</h4><p>1.50 trillion USD</p><h3>Debt-To-Equity Ratio</h3><h4>Current</h4><p>0.70</p><h3>Operating Margin</h3><h4>2022</h4><p>2.00%</p><h4>2023</h4><p>4.00% (estimated)</p><h2>Competitive Landscape</h2><h2>Future Outlook</h2><h2>Investment Thesis</h2><p>Amazon is a dominant player in the technology and retail industries, with a strong track record of growth and innovation. Its vast scale, customer-centric approach, and diversified business model position it well for continued success. However, investors should be mindful of the potential risks and challenges facing the company, including competition, regulatory scrutiny, and macroeconomic headwinds. Overall, Amazon remains a compelling investment opportunity for long-term investors seeking exposure to the growth of e-commerce, cloud computing, and digital streaming.</p>
 
+            </div>
 
             <!-- Provenance Log (All Tiers) -->
             <div class="provenance-log">
@@ -130,7 +136,7 @@
             <div class="sidebar-widget">
                 <div class="sidebar-title">Detected Entities</div>
                 <div class="tag-cloud">
-                    <a href="market_mayhem_archive.html?search=US_FED" class="tag" style="text-decoration:none;">US_FED</a><a href="market_mayhem_archive.html?search=AI" class="tag" style="text-decoration:none; border-color:#666;">AI</a><a href="market_mayhem_archive.html?search=Cloud" class="tag" style="text-decoration:none; border-color:#666;">Cloud</a><a href="market_mayhem_archive.html?search=EV" class="tag" style="text-decoration:none; border-color:#666;">EV</a><a href="market_mayhem_archive.html?search=Growth" class="tag" style="text-decoration:none; border-color:#666;">Growth</a><a href="market_mayhem_archive.html?search=Retail" class="tag" style="text-decoration:none; border-color:#666;">Retail</a>
+                    <a href="market_mayhem_archive_v24.html?search=US_FED" class="tag" style="text-decoration:none;">US_FED</a><a href="market_mayhem_archive_v24.html?search=AI" class="tag" style="text-decoration:none; border-color:#666;">AI</a><a href="market_mayhem_archive_v24.html?search=Cloud" class="tag" style="text-decoration:none; border-color:#666;">Cloud</a><a href="market_mayhem_archive_v24.html?search=EV" class="tag" style="text-decoration:none; border-color:#666;">EV</a><a href="market_mayhem_archive_v24.html?search=Growth" class="tag" style="text-decoration:none; border-color:#666;">Growth</a><a href="market_mayhem_archive_v24.html?search=Retail" class="tag" style="text-decoration:none; border-color:#666;">Retail</a>
                 </div>
             </div>
 

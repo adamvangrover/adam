@@ -36,8 +36,9 @@
 
     <!-- Virtual Toolbar for High Tier -->
     <div class="doc-toolbar" style="display: flex;">
-        <div class="toolbar-item" onclick="window.location.href='market_mayhem_archive.html'"><strong>FILE</strong></div>
-        <div class="toolbar-item" onclick="showToast('EDIT MODE: READ ONLY (ARCHIVED)')">EDIT</div>
+        <div class="toolbar-item" onclick="window.location.href='market_mayhem_archive_v24.html'"><strong>FILE</strong></div>
+        <div class="toolbar-item" onclick="toggleRedactionMode()">REDACT</div>
+        <div class="toolbar-item" onclick="printReport()">PRINT</div>
         <div class="toolbar-item" onclick="toggleTheme()">VIEW</div>
         <div class="toolbar-item" onclick="showToast('INSERT: PERMISSION DENIED')">INSERT</div>
         <div class="toolbar-item" onclick="showToast('FORMAT: LOCKED')">FORMAT</div>
@@ -47,22 +48,25 @@
     </div>
 
     <div style="max-width: 1400px; margin: 0 auto; padding: 10px 20px; display:flex; justify-content:space-between; align-items:center; display: none;">
-        <a href="market_mayhem_archive.html" class="cyber-btn">&larr; RETURN TO ARCHIVE</a>
+        <a href="market_mayhem_archive_v24.html" class="cyber-btn">&larr; RETURN TO ARCHIVE</a>
         <div style="font-family:'JetBrains Mono'; font-size:0.7rem; color:#666;">SECURE CONNECTION ESTABLISHED</div>
     </div>
 
     <div class="newsletter-wrapper">
         <div class="paper-sheet" id="paper-sheet">
 
+            <!-- Top Secret Stamp -->
+            <div id="top-secret-stamp" class="top-secret-stamp">TOP SECRET</div>
+
             <!-- High Tier Header UI -->
             <div class="doc-header-ui" style="display: flex;">
                 <span id="verification-status">CONFIDENTIAL // SYSTEM 2 REVIEW</span>
-                <span>a64e3ec3</span>
+                <span>55660f6b</span>
             </div>
 
             <div style="display:flex; justify-content:space-between; font-family:'JetBrains Mono'; font-size:0.8rem; color:#666; margin-bottom:20px; margin-top: 20px;">
                 <span>2008-09-19</span>
-                <span>ID: a64e3ec3</span>
+                <span>ID: 55660f6b</span>
             </div>
 
             <h1 class="title">MARKET MAYHEM: THE LEHMAN MOMENT</h1>
@@ -79,17 +83,17 @@
                 <canvas id="financialChart"></canvas>
             </div>
 
-
-        <p><strong>The Week Wall Street Died.</strong> On Monday, September 15th, Lehman Brothers filed for the largest bankruptcy in U.S. history ($600B+ assets). The government let them fail, hoping to reduce moral hazard. The result was global panic.</p>
-        <p>By Tuesday, AIG—the insurer of the world's financial system via CDS—was on the brink. The Fed stepped in with an $85B revolving credit facility, effectively nationalizing the company.</p>
-        <p><strong>The Real Panic:</strong> The Reserve Primary Fund, a money market fund considered 'as good as cash', broke the buck (NAV fell to $0.97) due to Lehman exposure. This triggered a $140B run on money market funds, freezing the commercial paper market. The gears of capitalism have ground to a halt.</p>
-
+            <div id="document-body">
+                <p><strong>The Week Wall Street Died.</strong> On Monday, September 15th, Lehman Brothers filed for the largest bankruptcy in U.S. history ($600B+ assets). The government let them fail, hoping to reduce moral hazard. The result was global panic.</p>
+<p>By Tuesday, AIG—the insurer of the world's financial system via CDS—was on the brink. The Fed stepped in with an $85B revolving credit facility, effectively nationalizing the company.</p>
+<p><strong>The Real Panic:</strong> The Reserve Primary Fund, a money market fund considered 'as good as cash', broke the buck (NAV fell to $0.97) due to Lehman exposure. This triggered a $140B run on money market funds, freezing the commercial paper market. The gears of capitalism have ground to a halt.</p>
+            </div>
 
             <!-- Provenance Log (All Tiers) -->
             <div class="provenance-log">
                 <div class="log-entry">
                     <span>> HASH_CHECK</span>
-                    <span style="color:var(--terminal-green);">a64e3ec3197721e9cf1a7e777740ac1d0840c53fdfc38659666bbf9217138a01</span>
+                    <span style="color:var(--terminal-green);">55660f6b6755a9342acae93f1855cb9dee9bc678b539b8d5aa18dd2954d92b3a</span>
                 </div>
                 <div class="log-entry">
                     <span>> SENTIMENT_SCAN</span>
@@ -118,7 +122,7 @@
                 <div class="stat-row"><span>DATE</span> <span class="stat-val">2008-09-19</span></div>
                 <div class="stat-row"><span>TYPE</span> <span class="stat-val">HISTORICAL</span></div>
                 <div class="stat-row"><span>CLASS</span> <span class="stat-val">UNCLASSIFIED</span></div>
-                <div class="stat-row"><span>PROVENANCE</span> <span class="stat-val" title="a64e3ec3197721e9cf1a7e777740ac1d0840c53fdfc38659666bbf9217138a01">a64e3ec3</span></div>
+                <div class="stat-row"><span>PROVENANCE</span> <span class="stat-val" title="55660f6b6755a9342acae93f1855cb9dee9bc678b539b8d5aa18dd2954d92b3a">55660f6b</span></div>
             </div>
 
             <div class="sidebar-widget">
@@ -132,7 +136,7 @@
             <div class="sidebar-widget">
                 <div class="sidebar-title">Detected Entities</div>
                 <div class="tag-cloud">
-                    <a href="market_mayhem_archive.html?search=US_FED" class="tag" style="text-decoration:none;">US_FED</a><a href="market_mayhem_archive.html?search=AI" class="tag" style="text-decoration:none; border-color:#666;">AI</a><a href="market_mayhem_archive.html?search=EV" class="tag" style="text-decoration:none; border-color:#666;">EV</a>
+                    <a href="market_mayhem_archive_v24.html?search=US_FED" class="tag" style="text-decoration:none;">US_FED</a><a href="market_mayhem_archive_v24.html?search=AI" class="tag" style="text-decoration:none; border-color:#666;">AI</a><a href="market_mayhem_archive_v24.html?search=EV" class="tag" style="text-decoration:none; border-color:#666;">EV</a>
                 </div>
             </div>
 
@@ -175,7 +179,7 @@
   "type": "HISTORICAL",
   "filename": "newsletter_market_mayhem_sep_2008.html",
   "is_sourced": true,
-  "full_body": "\n        <p><strong>The Week Wall Street Died.</strong> On Monday, September 15th, Lehman Brothers filed for the largest bankruptcy in U.S. history ($600B+ assets). The government let them fail, hoping to reduce moral hazard. The result was global panic.</p>\n        <p>By Tuesday, AIG\u2014the insurer of the world's financial system via CDS\u2014was on the brink. The Fed stepped in with an $85B revolving credit facility, effectively nationalizing the company.</p>\n        <p><strong>The Real Panic:</strong> The Reserve Primary Fund, a money market fund considered 'as good as cash', broke the buck (NAV fell to $0.97) due to Lehman exposure. This triggered a $140B run on money market funds, freezing the commercial paper market. The gears of capitalism have ground to a halt.</p>\n        ",
+  "full_body": "<p><strong>The Week Wall Street Died.</strong> On Monday, September 15th, Lehman Brothers filed for the largest bankruptcy in U.S. history ($600B+ assets). The government let them fail, hoping to reduce moral hazard. The result was global panic.</p>\n<p>By Tuesday, AIG\u2014the insurer of the world's financial system via CDS\u2014was on the brink. The Fed stepped in with an $85B revolving credit facility, effectively nationalizing the company.</p>\n<p><strong>The Real Panic:</strong> The Reserve Primary Fund, a money market fund considered 'as good as cash', broke the buck (NAV fell to $0.97) due to Lehman exposure. This triggered a $140B run on money market funds, freezing the commercial paper market. The gears of capitalism have ground to a halt.</p>",
   "source_priority": 3,
   "sentiment_score": 57,
   "entities": {
@@ -189,7 +193,7 @@
       "EV"
     ]
   },
-  "provenance_hash": "a64e3ec3197721e9cf1a7e777740ac1d0840c53fdfc38659666bbf9217138a01",
+  "provenance_hash": "55660f6b6755a9342acae93f1855cb9dee9bc678b539b8d5aa18dd2954d92b3a",
   "metrics_json": "{}",
   "conviction": 50,
   "semantic_score": 62,

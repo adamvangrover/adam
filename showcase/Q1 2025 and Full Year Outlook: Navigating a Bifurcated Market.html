@@ -36,8 +36,9 @@
 
     <!-- Virtual Toolbar for High Tier -->
     <div class="doc-toolbar" style="display: flex;">
-        <div class="toolbar-item" onclick="window.location.href='market_mayhem_archive.html'"><strong>FILE</strong></div>
-        <div class="toolbar-item" onclick="showToast('EDIT MODE: READ ONLY (ARCHIVED)')">EDIT</div>
+        <div class="toolbar-item" onclick="window.location.href='market_mayhem_archive_v24.html'"><strong>FILE</strong></div>
+        <div class="toolbar-item" onclick="toggleRedactionMode()">REDACT</div>
+        <div class="toolbar-item" onclick="printReport()">PRINT</div>
         <div class="toolbar-item" onclick="toggleTheme()">VIEW</div>
         <div class="toolbar-item" onclick="showToast('INSERT: PERMISSION DENIED')">INSERT</div>
         <div class="toolbar-item" onclick="showToast('FORMAT: LOCKED')">FORMAT</div>
@@ -47,12 +48,15 @@
     </div>
 
     <div style="max-width: 1400px; margin: 0 auto; padding: 10px 20px; display:flex; justify-content:space-between; align-items:center; display: none;">
-        <a href="market_mayhem_archive.html" class="cyber-btn">&larr; RETURN TO ARCHIVE</a>
+        <a href="market_mayhem_archive_v24.html" class="cyber-btn">&larr; RETURN TO ARCHIVE</a>
         <div style="font-family:'JetBrains Mono'; font-size:0.7rem; color:#666;">SECURE CONNECTION ESTABLISHED</div>
     </div>
 
     <div class="newsletter-wrapper">
         <div class="paper-sheet" id="paper-sheet">
+
+            <!-- Top Secret Stamp -->
+            <div id="top-secret-stamp" class="top-secret-stamp">TOP SECRET</div>
 
             <!-- High Tier Header UI -->
             <div class="doc-header-ui" style="display: flex;">
@@ -79,12 +83,14 @@
                 <canvas id="financialChart"></canvas>
             </div>
 
-            <h2>Market Overview</h2><p>The first quarter of 2025 has presented a bifurcated market landscape, characterized by diverging trends across sectors and regions. While some sectors, such as technology and healthcare, have shown continued strength, others, such as consumer discretionary and financials, have faced headwinds due to persistent inflation and rising interest rates. This divergence is expected to continue throughout the year, creating both opportunities and challenges for investors.</p>
+            <div id="document-body">
+                <h2>Market Overview</h2><p>The first quarter of 2025 has presented a bifurcated market landscape, characterized by diverging trends across sectors and regions. While some sectors, such as technology and healthcare, have shown continued strength, others, such as consumer discretionary and financials, have faced headwinds due to persistent inflation and rising interest rates. This divergence is expected to continue throughout the year, creating both opportunities and challenges for investors.</p>
 <h2>Major Themes and Trends</h2><p>Several key themes and trends are shaping the market outlook for the remainder of 2025: <em> <strong>Inflation and Interest Rates:</strong> Inflation is expected to remain elevated, albeit moderating gradually. Central banks are likely to continue raising interest rates, albeit at a slower pace, to keep inflation in check. This will create a challenging environment for companies with high debt levels or those sensitive to interest rate changes. </em> <strong>Economic Growth:</strong> Economic growth is projected to slow in 2025, with some regions potentially facing recessionary pressures. However, other regions, particularly those with strong domestic demand and less exposure to global headwinds, are expected to maintain moderate growth. <em> <strong>Geopolitical Risks:</strong> Geopolitical tensions are likely to persist, with ongoing conflicts and trade disputes creating uncertainty. Investors should closely monitor developments in key regions and assess their potential impact on specific sectors and companies. </em> <strong>Energy Transition:</strong> The energy transition will continue to drive investment and innovation, with renewable energy and electric vehicles gaining momentum. However, challenges remain in terms of infrastructure development, supply chain constraints, and regulatory uncertainties. <em> <strong>Artificial Intelligence (AI):</strong> AI is expected to remain a dominant theme, with advancements in various applications driving growth and transforming industries. However, regulatory scrutiny and ethical considerations will also play a significant role in shaping the AI landscape. </em> <strong>Sustainability and ESG:</strong>  Environmental, social, and governance (ESG) factors will continue to gain importance in investment decisions, as investors increasingly seek companies with sustainable business practices and positive social impact.</p>
 <h2>Industry Outlook</h2><p>The industry outlook for 2025 is mixed: <em> <strong>Technology:</strong>  The technology sector is expected to remain a leader, driven by AI, cloud computing, and cybersecurity. However, valuations are high, and regulatory risks are increasing. </em> <strong>Healthcare:</strong>  Healthcare is also expected to perform well, supported by demographic trends, innovation, and strong demand. <em> <strong>Energy:</strong>  The energy sector will likely experience volatility, with renewable energy companies continuing to outperform traditional fossil fuel companies. </em> <strong>Consumer Discretionary:</strong>  Consumer discretionary companies will face challenges due to inflation and slowing economic growth. * <strong>Financials:</strong>  The financials sector will be sensitive to interest rate changes and potential credit risks.</p>
 <h2>Portfolio Construction and Optimization</h2><p>In a bifurcated market like 2025, portfolio construction and optimization require a selective and adaptable approach: <em> <strong>Sector Allocation:</strong>  Carefully allocate investments across sectors, considering growth prospects, valuations, and risk factors. </em> <strong>Stock Selection:</strong>  Focus on companies with strong fundamentals, competitive advantages, and resilience to economic headwinds. <em> <strong>Risk Management:</strong>  Implement risk management strategies to protect against potential market volatility and downturns. </em> <strong>Dynamic Rebalancing:</strong>  Actively rebalance the portfolio to maintain the desired asset allocation and risk profile.</p>
 <h2>Looking Ahead</h2><p>2025 is poised to be a year of continued uncertainty and transition. Investors should remain vigilant, adaptable, and focused on long-term goals. Adam v15.4 can assist investors in navigating this complex landscape, providing insights, managing risks, and optimizing portfolios for success.</p>
 
+            </div>
 
             <!-- Provenance Log (All Tiers) -->
             <div class="provenance-log">
@@ -133,7 +139,7 @@
             <div class="sidebar-widget">
                 <div class="sidebar-title">Detected Entities</div>
                 <div class="tag-cloud">
-                    <a href="market_mayhem_archive.html?search=AI" class="tag" style="text-decoration:none; border-color:#666;">AI</a><a href="market_mayhem_archive.html?search=Banks" class="tag" style="text-decoration:none; border-color:#666;">Banks</a><a href="market_mayhem_archive.html?search=Cloud" class="tag" style="text-decoration:none; border-color:#666;">Cloud</a><a href="market_mayhem_archive.html?search=Cybersecurity" class="tag" style="text-decoration:none; border-color:#666;">Cybersecurity</a><a href="market_mayhem_archive.html?search=ESG" class="tag" style="text-decoration:none; border-color:#666;">ESG</a>
+                    <a href="market_mayhem_archive_v24.html?search=AI" class="tag" style="text-decoration:none; border-color:#666;">AI</a><a href="market_mayhem_archive_v24.html?search=Banks" class="tag" style="text-decoration:none; border-color:#666;">Banks</a><a href="market_mayhem_archive_v24.html?search=Cloud" class="tag" style="text-decoration:none; border-color:#666;">Cloud</a><a href="market_mayhem_archive_v24.html?search=Cybersecurity" class="tag" style="text-decoration:none; border-color:#666;">Cybersecurity</a><a href="market_mayhem_archive_v24.html?search=ESG" class="tag" style="text-decoration:none; border-color:#666;">ESG</a>
                 </div>
             </div>
 

@@ -36,8 +36,9 @@
 
     <!-- Virtual Toolbar for High Tier -->
     <div class="doc-toolbar" style="display: flex;">
-        <div class="toolbar-item" onclick="window.location.href='market_mayhem_archive.html'"><strong>FILE</strong></div>
-        <div class="toolbar-item" onclick="showToast('EDIT MODE: READ ONLY (ARCHIVED)')">EDIT</div>
+        <div class="toolbar-item" onclick="window.location.href='market_mayhem_archive_v24.html'"><strong>FILE</strong></div>
+        <div class="toolbar-item" onclick="toggleRedactionMode()">REDACT</div>
+        <div class="toolbar-item" onclick="printReport()">PRINT</div>
         <div class="toolbar-item" onclick="toggleTheme()">VIEW</div>
         <div class="toolbar-item" onclick="showToast('INSERT: PERMISSION DENIED')">INSERT</div>
         <div class="toolbar-item" onclick="showToast('FORMAT: LOCKED')">FORMAT</div>
@@ -47,12 +48,15 @@
     </div>
 
     <div style="max-width: 1400px; margin: 0 auto; padding: 10px 20px; display:flex; justify-content:space-between; align-items:center; display: none;">
-        <a href="market_mayhem_archive.html" class="cyber-btn">&larr; RETURN TO ARCHIVE</a>
+        <a href="market_mayhem_archive_v24.html" class="cyber-btn">&larr; RETURN TO ARCHIVE</a>
         <div style="font-family:'JetBrains Mono'; font-size:0.7rem; color:#666;">SECURE CONNECTION ESTABLISHED</div>
     </div>
 
     <div class="newsletter-wrapper">
         <div class="paper-sheet" id="paper-sheet">
+
+            <!-- Top Secret Stamp -->
+            <div id="top-secret-stamp" class="top-secret-stamp">TOP SECRET</div>
 
             <!-- High Tier Header UI -->
             <div class="doc-header-ui" style="display: flex;">
@@ -79,7 +83,9 @@
                 <canvas id="financialChart"></canvas>
             </div>
 
-            <h2>Executive Summary</h2><p>Nvidia is a leading designer of graphics processing units (GPUs) with a strong position in gaming, data centers, AI, and automotive.  Despite competitive pressures and geopolitical risks, the company's technological leadership and diversified business model position it for continued growth.</p><h2>Segments</h2><ul><li><strong>name:</strong> Compute & Networking, <strong>revenue_growth:</strong> Strong, <strong>key_drivers:</strong> ['Data center GPUs', 'AI platforms', 'Networking solutions'], <strong>highlights:</strong> ['Rapid growth in data center revenue driven by increasing demand for AI and HPC.', "Strong adoption of Nvidia's AI platforms and software ecosystem.", 'Expanding presence in high-performance networking.']</li><li><strong>name:</strong> Graphics, <strong>revenue_growth:</strong> Moderate, <strong>key_drivers:</strong> ['Gaming GPUs', 'Professional visualization'], <strong>highlights:</strong> ['Continued growth in gaming, driven by new GPU launches and esports.', 'Expanding into professional visualization and creative applications.', "Growing adoption of Nvidia's GeForce NOW cloud gaming service."], <strong>concerns:</strong> ['Potential slowdown in gaming market growth.', 'Competition from AMD in the GPU market.']</li></ul><h2>Competitive Landscape</h2><h3>Data Centers And Ai</h3><h4>Main Competitors</h4><ul><li>AMD</li><li>Intel</li><li>Google</li></ul><h4>Nvidia Differentiators</h4><ul><li>Technological leadership in GPU performance</li><li>CUDA software ecosystem</li><li>Strong partnerships with cloud providers</li></ul><h3>Gaming</h3><h4>Main Competitors</h4><ul><li>AMD</li><li>Intel</li></ul><h4>Nvidia Differentiators</h4><ul><li>Brand recognition and market share</li><li>GeForce NOW cloud gaming service</li><li>Strong relationships with game developers</li></ul><h3>Automotive</h3><h4>Main Competitors</h4><ul><li>Qualcomm</li><li>Mobileye</li><li>Tesla</li></ul><h4>Nvidia Differentiators</h4><ul><li>Full-stack autonomous driving platform</li><li>AI expertise and simulation capabilities</li></ul><h2>Growth Opportunities</h2><ul><li>Continued expansion of AI and HPC applications across industries.</li><li>Growth of cloud gaming and the metaverse.</li><li>Increasing adoption of autonomous driving technology.</li><li>Expansion into new markets such as healthcare and edge computing.</li></ul><h2>Challenges</h2><ul><li>Maintaining technological leadership in a rapidly evolving industry.</li><li>Managing geopolitical risks and supply chain vulnerabilities.</li><li>Navigating regulatory scrutiny and potential antitrust concerns.</li><li>Addressing environmental concerns related to energy consumption of GPUs.</li></ul><h2>Trading Levels</h2><h3>Equity</h3><h4>Outlook</h4><p>Positive</p><h4>Price Target</h4><p>230</p><h4>Potential Upside</h4><p>81.8%</p><h2>Valuation</h2><h3>Model</h3><p>Discounted Cash Flow (DCF)</p><h3>Assumptions</h3><h4>Revenue Growth</h4><p>20% (next 5 years), then tapering to 3%</p><h4>Operating Margin</h4><p>35% (long-term)</p><h4>Discount Rate</h4><p>10%</p><h4>Terminal Growth Rate</h4><p>3%</p><h3>Price Target</h3><p>230</p>
+            <div id="document-body">
+                <h2>Executive Summary</h2><p>Nvidia is a leading designer of graphics processing units (GPUs) with a strong position in gaming, data centers, AI, and automotive.  Despite competitive pressures and geopolitical risks, the company's technological leadership and diversified business model position it for continued growth.</p><h2>Segments</h2><ul><li><strong>name:</strong> Compute & Networking, <strong>revenue_growth:</strong> Strong, <strong>key_drivers:</strong> ['Data center GPUs', 'AI platforms', 'Networking solutions'], <strong>highlights:</strong> ['Rapid growth in data center revenue driven by increasing demand for AI and HPC.', "Strong adoption of Nvidia's AI platforms and software ecosystem.", 'Expanding presence in high-performance networking.']</li><li><strong>name:</strong> Graphics, <strong>revenue_growth:</strong> Moderate, <strong>key_drivers:</strong> ['Gaming GPUs', 'Professional visualization'], <strong>highlights:</strong> ['Continued growth in gaming, driven by new GPU launches and esports.', 'Expanding into professional visualization and creative applications.', "Growing adoption of Nvidia's GeForce NOW cloud gaming service."], <strong>concerns:</strong> ['Potential slowdown in gaming market growth.', 'Competition from AMD in the GPU market.']</li></ul><h2>Competitive Landscape</h2><h3>Data Centers And Ai</h3><h4>Main Competitors</h4><ul><li>AMD</li><li>Intel</li><li>Google</li></ul><h4>Nvidia Differentiators</h4><ul><li>Technological leadership in GPU performance</li><li>CUDA software ecosystem</li><li>Strong partnerships with cloud providers</li></ul><h3>Gaming</h3><h4>Main Competitors</h4><ul><li>AMD</li><li>Intel</li></ul><h4>Nvidia Differentiators</h4><ul><li>Brand recognition and market share</li><li>GeForce NOW cloud gaming service</li><li>Strong relationships with game developers</li></ul><h3>Automotive</h3><h4>Main Competitors</h4><ul><li>Qualcomm</li><li>Mobileye</li><li>Tesla</li></ul><h4>Nvidia Differentiators</h4><ul><li>Full-stack autonomous driving platform</li><li>AI expertise and simulation capabilities</li></ul><h2>Growth Opportunities</h2><ul><li>Continued expansion of AI and HPC applications across industries.</li><li>Growth of cloud gaming and the metaverse.</li><li>Increasing adoption of autonomous driving technology.</li><li>Expansion into new markets such as healthcare and edge computing.</li></ul><h2>Challenges</h2><ul><li>Maintaining technological leadership in a rapidly evolving industry.</li><li>Managing geopolitical risks and supply chain vulnerabilities.</li><li>Navigating regulatory scrutiny and potential antitrust concerns.</li><li>Addressing environmental concerns related to energy consumption of GPUs.</li></ul><h2>Trading Levels</h2><h3>Equity</h3><h4>Outlook</h4><p>Positive</p><h4>Price Target</h4><p>230</p><h4>Potential Upside</h4><p>81.8%</p><h2>Valuation</h2><h3>Model</h3><p>Discounted Cash Flow (DCF)</p><h3>Assumptions</h3><h4>Revenue Growth</h4><p>20% (next 5 years), then tapering to 3%</p><h4>Operating Margin</h4><p>35% (long-term)</p><h4>Discount Rate</h4><p>10%</p><h4>Terminal Growth Rate</h4><p>3%</p><h3>Price Target</h3><p>230</p>
+            </div>
 
             <!-- Provenance Log (All Tiers) -->
             <div class="provenance-log">
@@ -128,7 +134,7 @@
             <div class="sidebar-widget">
                 <div class="sidebar-title">Detected Entities</div>
                 <div class="tag-cloud">
-                    <a href="market_mayhem_archive.html?search=AI" class="tag" style="text-decoration:none; border-color:#666;">AI</a><a href="market_mayhem_archive.html?search=Cloud" class="tag" style="text-decoration:none; border-color:#666;">Cloud</a><a href="market_mayhem_archive.html?search=EV" class="tag" style="text-decoration:none; border-color:#666;">EV</a><a href="market_mayhem_archive.html?search=Energy" class="tag" style="text-decoration:none; border-color:#666;">Energy</a><a href="market_mayhem_archive.html?search=Growth" class="tag" style="text-decoration:none; border-color:#666;">Growth</a>
+                    <a href="market_mayhem_archive_v24.html?search=AI" class="tag" style="text-decoration:none; border-color:#666;">AI</a><a href="market_mayhem_archive_v24.html?search=Cloud" class="tag" style="text-decoration:none; border-color:#666;">Cloud</a><a href="market_mayhem_archive_v24.html?search=EV" class="tag" style="text-decoration:none; border-color:#666;">EV</a><a href="market_mayhem_archive_v24.html?search=Energy" class="tag" style="text-decoration:none; border-color:#666;">Energy</a><a href="market_mayhem_archive_v24.html?search=Growth" class="tag" style="text-decoration:none; border-color:#666;">Growth</a>
                 </div>
             </div>
 
