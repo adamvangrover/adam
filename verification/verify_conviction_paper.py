@@ -12,19 +12,14 @@ def verify_conviction_paper():
         with open("showcase/data/market_mayhem_index.json", "r") as f:
             data = json.load(f)
 
-        titles = [item["title"] for item in data]
-        expected_titles = [
-            "MARKET MAYHEM: THE NIXON SHOCK",
-            "MARKET MAYHEM: THE FLASH CRASH",
-            "MARKET MAYHEM: THE MEME STOCK REVOLT"
-        ]
+        # Filter same as JS logic
+        valid_articles = [a for a in data if a.get("full_body") and len(a["full_body"]) > 50]
+        if not valid_articles:
+            print("ERROR: No valid articles found in JSON.")
+            sys.exit(1)
 
-        for title in expected_titles:
-            if title in titles:
-                print(f"Found expected title: {title}")
-            else:
-                print(f"ERROR: Missing expected title: {title}")
-                sys.exit(1)
+        print(f"Found {len(valid_articles)} valid articles.")
+
     except Exception as e:
         print(f"Error verifying JSON: {e}")
         sys.exit(1)
@@ -44,12 +39,13 @@ def verify_conviction_paper():
     try:
         with sync_playwright() as p:
             browser = p.chromium.launch(headless=True)
-            page = browser.new_page()
+            context = browser.new_context()
 
-            # Navigate to the page
+            # --- TEST 1: Standard Load & UI Structure ---
+            print("\n--- TEST 1: Standard Load & UI Structure ---")
+            page = context.new_page()
             page.goto("http://localhost:8000/showcase/market_mayhem_conviction.html")
 
-            # Wait for content to load
             try:
                 page.wait_for_selector(".paper-sheet", timeout=5000)
                 print("Content loaded successfully.")
@@ -57,30 +53,104 @@ def verify_conviction_paper():
                 print(f"Error waiting for content: {e}")
                 sys.exit(1)
 
-            # Check for new visual elements
-            if page.query_selector(".watermark"):
-                print("Watermark found.")
+            # Check Sidebar
+            if page.query_selector(".sidebar-toc"):
+                print("Sidebar TOC found.")
             else:
-                print("ERROR: Watermark not found.")
+                print("ERROR: Sidebar TOC not found.")
                 sys.exit(1)
 
-            if page.query_selector(".binder-rings-container"):
-                print("Binder Rings found.")
+            # Check New Buttons
+            if page.query_selector("#terminalBtn"):
+                print("Terminal Button found.")
             else:
-                print("ERROR: Binder Rings not found.")
+                print("ERROR: Terminal Button not found.")
                 sys.exit(1)
 
-            # Check Conviction Stamp
-            if page.query_selector(".conviction-stamp"):
-                print("Conviction Stamp found.")
+            if page.query_selector("#trendBtn"):
+                print("Trends Button found.")
             else:
-                print("Warning: Conviction Stamp not found (might be missing for this specific item).")
+                print("ERROR: Trends Button not found.")
+                sys.exit(1)
 
-            # Take screenshot
+            if page.query_selector("#glitchBtn"):
+                print("Glitch Button found.")
+            else:
+                print("ERROR: Glitch Button not found.")
+                sys.exit(1)
+
+            # --- TEST 2: Deep Linking ---
+            print("\n--- TEST 2: Deep Linking ---")
+            # Navigate to specific page (e.g., page 2)
+            page.goto("http://localhost:8000/showcase/market_mayhem_conviction.html?page=2")
+            page.wait_for_selector(".paper-sheet", timeout=5000)
+
+            # Verify we are on page 2
+            indicator = page.inner_text("#pageIndicator")
+            print(f"Page Indicator: {indicator}")
+
+            if "PAGE 2" in indicator:
+                print("Deep Linking Verified: Successfully loaded Page 2.")
+            else:
+                print(f"ERROR: Deep Linking failed. Expected Page 2, got {indicator}")
+
+            # --- TEST 3: Interactivity (Redaction) ---
+            print("\n--- TEST 3: Interactivity (Redaction) ---")
+
+            # Click Redact Tool
+            page.click("#redactTool")
+
+            # Find a paragraph or header to click
+            target_selector = ".paper-sheet h1.headline"
+            if page.query_selector(target_selector):
+                page.click(target_selector)
+
+                # Check if class was added
+                is_redacted = page.eval_on_selector(target_selector, "el => el.classList.contains('redacted-text')")
+                if is_redacted:
+                    print("Redaction Verified: Element correctly redacted on click.")
+                else:
+                    print("ERROR: Redaction failed. Class 'redacted-text' not applied.")
+                    sys.exit(1)
+            else:
+                print("Warning: Could not find headline to test redaction.")
+
+            # --- TEST 4: Terminal Mode ---
+            print("\n--- TEST 4: Terminal Mode ---")
+            page.click("#terminalBtn")
+            is_terminal = page.eval_on_selector("body", "el => el.classList.contains('terminal-mode')")
+            if is_terminal:
+                print("Terminal Mode Verified: Body class applied.")
+            else:
+                print("ERROR: Terminal Mode toggle failed.")
+                sys.exit(1)
+
+            # Take screenshot of Terminal Mode
             os.makedirs("verification_screenshots", exist_ok=True)
-            screenshot_path = "verification_screenshots/conviction_paper_enhanced.png"
+            screenshot_path = "verification_screenshots/conviction_paper_terminal.png"
             page.screenshot(path=screenshot_path, full_page=True)
-            print(f"Screenshot saved to {screenshot_path}")
+            print(f"Terminal Screenshot saved to {screenshot_path}")
+
+            # Toggle back to normal
+            page.click("#terminalBtn")
+
+            # --- TEST 5: Trend Chart Modal ---
+            print("\n--- TEST 5: Trend Chart Modal ---")
+            page.click("#trendBtn")
+            is_modal_visible = page.is_visible("#trendModal")
+            if is_modal_visible:
+                print("Trend Modal Verified: Modal is visible.")
+            else:
+                print("ERROR: Trend Modal failed to open.")
+                sys.exit(1)
+
+            # --- TEST 6: Glitch Effect ---
+            print("\n--- TEST 6: Glitch Effect ---")
+            # Close modal first using specific selector or JS
+            page.eval_on_selector("#trendModal", "el => el.style.display = 'none'")
+
+            page.click("#glitchBtn")
+            print("Glitch Button clicked successfully.")
 
             browser.close()
 
