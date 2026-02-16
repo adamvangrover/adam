@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM v23.5 :: ENTERPRISE SIMULATION</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/market_mayhem_tiers.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/nav.js" defer></script>
+    <style>
+        body { overflow: hidden; background: #050b14; color: #e0e0e0; font-family: 'Inter', sans-serif; }
+        .ent-layout { display: grid; grid-template-columns: 250px 1fr 300px; height: 100vh; }
+
+        /* Sidebar Navigation */
+        .ent-sidebar { background: rgba(10, 20, 35, 0.9); border-right: 1px solid #333; display: flex; flex-direction: column; }
+        .ent-nav-item { padding: 15px 20px; cursor: pointer; border-bottom: 1px solid #222; font-family: 'JetBrains Mono'; font-size: 0.9rem; color: #888; transition: all 0.2s; display: flex; align-items: center; gap: 10px; }
+        .ent-nav-item:hover, .ent-nav-item.active { background: rgba(0, 243, 255, 0.1); color: #00f3ff; border-left: 3px solid #00f3ff; }
+        .ent-nav-item i { width: 20px; text-align: center; }
+
+        /* Main Viewport */
+        .ent-main { padding: 20px; overflow-y: auto; display: grid; grid-template-rows: auto 1fr; gap: 20px; }
+        .ent-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; padding-bottom: 15px; }
+        .ent-title { font-family: 'JetBrains Mono'; font-size: 1.5rem; color: #fff; letter-spacing: 1px; }
+
+        /* Widgets Grid */
+        .ent-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; height: 100%; }
+        .ent-card { background: rgba(0,0,0,0.4); border: 1px solid #333; border-radius: 6px; padding: 15px; display: flex; flex-direction: column; }
+        .ent-card-title { font-size: 0.8rem; text-transform: uppercase; color: #888; margin-bottom: 10px; font-family: 'JetBrains Mono'; border-bottom: 1px solid #222; padding-bottom: 5px; }
+        .ent-card-content { flex-grow: 1; position: relative; }
+
+        /* Right Panel (Timeline & Controls) */
+        .ent-controls { background: rgba(10, 20, 35, 0.9); border-left: 1px solid #333; padding: 20px; display: flex; flex-direction: column; gap: 20px; }
+        .timeline-slider { width: 100%; -webkit-appearance: none; height: 5px; background: #333; outline: none; margin: 15px 0; }
+        .timeline-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 15px; height: 15px; background: #00f3ff; cursor: pointer; border-radius: 50%; }
+
+        .control-btn { background: #111; border: 1px solid #444; color: #fff; padding: 8px; width: 100%; cursor: pointer; font-family: 'JetBrains Mono'; margin-bottom: 5px; transition: all 0.2s; }
+        .control-btn:hover { border-color: #00f3ff; color: #00f3ff; }
+        .control-btn.active { background: #00f3ff; color: #000; }
+
+        .log-stream { font-family: 'JetBrains Mono'; font-size: 0.7rem; height: 300px; overflow-y: auto; background: #000; border: 1px solid #333; padding: 10px; color: #aaa; }
+        .log-entry { margin-bottom: 5px; border-bottom: 1px solid #111; padding-bottom: 2px; }
+        .log-agent { color: #ff00ff; font-weight: bold; }
+        .log-action { color: #00f3ff; }
+
+        /* Status Indicators */
+        .status-pill { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #333; margin-right: 5px; }
+        .status-pill.green { background: #00ff00; box-shadow: 0 0 5px #00ff00; }
+        .status-pill.red { background: #ff0000; box-shadow: 0 0 5px #ff0000; }
+        .status-pill.yellow { background: #ffff00; box-shadow: 0 0 5px #ffff00; }
+
+        /* Hide sections based on active tab */
+        .scenario-view { display: none; height: 100%; }
+        .scenario-view.active { display: block; }
+    </style>
+</head>
+<body>
+
+<div class="ent-layout">
+    <!-- Sidebar -->
+    <aside class="ent-sidebar">
+        <div style="padding: 20px; border-bottom: 1px solid #333; text-align: center;">
+            <div style="color: #00f3ff; font-weight: bold; font-size: 1.2rem;">ADAM v23.5</div>
+            <div style="font-size: 0.7rem; color: #666;">ENTERPRISE SIMULATION</div>
+        </div>
+
+        <div class="ent-nav-item active" onclick="switchView('market')">
+            <i class="fas fa-chart-line"></i> MARKET DYNAMICS
+        </div>
+        <div class="ent-nav-item" onclick="switchView('banking')">
+            <i class="fas fa-university"></i> BANKING TWIN
+        </div>
+        <div class="ent-nav-item" onclick="switchView('risk')">
+            <i class="fas fa-shield-alt"></i> RISK & STRESS
+        </div>
+        <div class="ent-nav-item" onclick="switchView('macro')">
+            <i class="fas fa-globe"></i> MACRO ECONOMIC
+        </div>
+        <div class="ent-nav-item" onclick="switchView('agents')">
+            <i class="fas fa-robot"></i> AGENT SWARM
+        </div>
+
+        <div style="flex-grow: 1;"></div>
+        <div class="ent-nav-item" onclick="window.location.href='market_mayhem_archive.html'">
+            <i class="fas fa-sign-out-alt"></i> EXIT TO ARCHIVE
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="ent-main">
+        <div class="ent-header">
+            <div>
+                <div class="ent-title" id="page-title">MARKET DYNAMICS</div>
+                <div style="font-size: 0.8rem; color: #666;">REAL-TIME SIMULATION STREAM // T-MINUS <span id="sim-step-display">0</span></div>
+            </div>
+            <div>
+                <span class="status-pill green"></span> SYSTEM OPTIMAL
+            </div>
+        </div>
+
+        <!-- VIEWS -->
+        <div id="view-market" class="scenario-view active">
+            <div class="ent-grid">
+                <div class="ent-card" style="grid-column: span 2; height: 400px;">
+                    <div class="ent-card-title">S&P 500 vs NASDAQ Composite</div>
+                    <div class="ent-card-content"><canvas id="marketChart"></canvas></div>
+                </div>
+                <div class="ent-card" style="height: 300px;">
+                    <div class="ent-card-title">Volatility Regime (VIX)</div>
+                    <div class="ent-card-content"><canvas id="vixChart"></canvas></div>
+                </div>
+                <div class="ent-card" style="height: 300px;">
+                    <div class="ent-card-title">Market Regime Heatmap</div>
+                    <div class="ent-card-content" id="regime-display" style="display:flex; align-items:center; justify-content:center; font-size: 2rem; font-family:'JetBrains Mono'; color:#fff;">
+                        --
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-banking" class="scenario-view">
+            <div class="ent-grid">
+                <div class="ent-card" style="grid-column: span 2; height: 350px;">
+                    <div class="ent-card-title">Liquidity Coverage Ratio (LCR)</div>
+                    <div class="ent-card-content"><canvas id="liquidityChart"></canvas></div>
+                </div>
+                <div class="ent-card" style="height: 300px;">
+                    <div class="ent-card-title">CET1 Capital Ratio</div>
+                    <div class="ent-card-content"><canvas id="capitalChart"></canvas></div>
+                </div>
+                <div class="ent-card" style="height: 300px;">
+                    <div class="ent-card-title">Systemic Risk Score</div>
+                    <div class="ent-card-content"><canvas id="systemicRiskChart"></canvas></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-risk" class="scenario-view">
+            <div class="ent-grid">
+                <div class="ent-card" style="grid-column: span 2; height: 400px;">
+                    <div class="ent-card-title">Value at Risk (VaR 95%)</div>
+                    <div class="ent-card-content"><canvas id="varChart"></canvas></div>
+                </div>
+                <div class="ent-card" style="height: 300px;">
+                    <div class="ent-card-title">Stress Test Loss Estimation</div>
+                    <div class="ent-card-content"><canvas id="stressChart"></canvas></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-macro" class="scenario-view">
+            <div class="ent-grid">
+                <div class="ent-card" style="grid-column: span 2; height: 400px;">
+                    <div class="ent-card-title">Macro Indicators (CPI vs Fed Funds)</div>
+                    <div class="ent-card-content"><canvas id="macroChart"></canvas></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-agents" class="scenario-view">
+            <div class="ent-grid">
+                <div class="ent-card" style="grid-column: span 2; height: 500px;">
+                    <div class="ent-card-title">Agent Activity Log</div>
+                    <div class="ent-card-content" id="agent-log-container" style="overflow-y:auto; background:#000; padding:10px; font-family:'JetBrains Mono'; font-size:0.8rem;">
+                        <!-- Agent Logs Here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Right Controls -->
+    <aside class="ent-controls">
+        <div>
+            <div class="ent-card-title">SIMULATION CONTROL</div>
+            <button class="control-btn" onclick="togglePlay()" id="playBtn"><i class="fas fa-play"></i> PLAY</button>
+            <button class="control-btn" onclick="resetSim()"><i class="fas fa-undo"></i> RESET</button>
+
+            <input type="range" min="0" max="99" value="0" class="timeline-slider" id="timelineSlider" oninput="scrubTimeline(this.value)">
+            <div style="display:flex; justify-content:space-between; font-size:0.7rem; color:#666;">
+                <span>START</span>
+                <span>NOW</span>
+                <span>END</span>
+            </div>
+        </div>
+
+        <div style="flex-grow: 1;">
+            <div class="ent-card-title">SYSTEM EVENT STREAM</div>
+            <div class="log-stream" id="system-log">
+                <div class="log-entry">> SYSTEM INITIALIZED</div>
+                <div class="log-entry">> LOADING DATASETS...</div>
+                <div class="log-entry">> READY.</div>
+            </div>
+        </div>
+    </aside>
+</div>
+
+<script src="js/enterprise_viewer.js"></script>
+</body>
+</html>
