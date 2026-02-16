@@ -24,8 +24,32 @@ def verify_conviction_paper():
         print(f"Error verifying JSON: {e}")
         sys.exit(1)
 
-    # 2. Verify UI Elements via Playwright
-    print("Verifying UI elements...")
+    # 2. Verify Site Map
+    print("\nVerifying Site Map...")
+    try:
+        with open("showcase/site_map.json", "r") as f:
+            sitemap = json.load(f)
+
+        found = False
+        for cat in sitemap.get("categories", []):
+            for item in cat.get("items", []):
+                if item.get("link") == "market_mayhem_conviction.html":
+                    found = True
+                    break
+            if found: break
+
+        if found:
+            print("Site Map Verified: 'market_mayhem_conviction.html' found.")
+        else:
+            print("ERROR: 'market_mayhem_conviction.html' not found in site_map.json.")
+            sys.exit(1)
+
+    except Exception as e:
+        print(f"Error verifying Site Map: {e}")
+        sys.exit(1)
+
+    # 3. Verify UI Elements via Playwright
+    print("\nVerifying UI elements...")
 
     # Start HTTP Server
     server_process = subprocess.Popen(
@@ -151,6 +175,15 @@ def verify_conviction_paper():
 
             page.click("#glitchBtn")
             print("Glitch Button clicked successfully.")
+
+            # Verify Random Glitch Initialization
+            print("\n--- TEST 7: Random Glitch Logic ---")
+            is_glitch_timer_set = page.evaluate("() => typeof glitchTimer !== 'undefined' && glitchTimer !== null")
+            if is_glitch_timer_set:
+                print("Random Glitch Logic Verified: glitchTimer is initialized.")
+            else:
+                print("ERROR: glitchTimer not initialized.")
+                sys.exit(1)
 
             browser.close()
 
