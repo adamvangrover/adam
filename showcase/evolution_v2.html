@@ -24,6 +24,11 @@
             background: rgba(5, 11, 20, 0.95); position: sticky; top: 0; z-index: 100;
         }
 
+        .controls {
+            max-width: 1000px; margin: 20px auto 0; padding: 0 20px;
+            display: flex; gap: 10px; justify-content: flex-end;
+        }
+
         .timeline-container {
             max-width: 1000px; margin: 60px auto; padding: 0 20px; position: relative;
         }
@@ -70,8 +75,10 @@
         .cyber-btn {
             font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; padding: 6px 12px;
             border: 1px solid #444; color: var(--text-primary); text-decoration: none; display: inline-block;
+            background: transparent; cursor: pointer;
         }
         .cyber-btn:hover { border-color: var(--accent-cyan); color: var(--accent-cyan); }
+        .cyber-btn.active { background: rgba(0, 243, 255, 0.1); border-color: var(--accent-cyan); color: var(--accent-cyan); }
 
         .constraints-section {
             max-width: 1000px; margin: 60px auto; padding: 40px; border: 1px solid var(--accent-purple);
@@ -80,6 +87,10 @@
         .constraints-title {
             position: absolute; top: -15px; left: 40px; background: var(--bg-color); padding: 0 10px;
             color: var(--accent-purple); font-weight: bold; font-family: 'JetBrains Mono';
+        }
+
+        .log-quote {
+            font-style: italic; color: #888; border-left: 2px solid #444; padding-left: 10px; margin: 10px 0; font-size: 0.9rem;
         }
 
     </style>
@@ -91,6 +102,12 @@
             <a href="mission_control_v2.html" class="cyber-btn">MISSION CONTROL</a>
         </nav>
     </header>
+
+    <!-- Controls -->
+    <div class="controls">
+        <button id="btn-human" class="cyber-btn active" onclick="setMode('human')">HUMAN MODE</button>
+        <button id="btn-ml" class="cyber-btn" onclick="downloadDataset()">ML DATASET (JSON)</button>
+    </div>
 
     <!-- Metrics Header -->
     <div class="metrics-grid">
@@ -110,86 +127,12 @@
 
     <div class="timeline-container">
         <div class="timeline-line"></div>
-
-        <!-- Node: v2.0 Swarm -->
-        <div class="timeline-node">
-            <div class="node-content">
-                <span class="version-tag mono">v2.0 SWARM (CURRENT)</span>
-                <h2 style="margin: 5px 0;">The Agentic Singularity</h2>
-                <p style="font-size: 0.9rem; color: #888;">Transition to hybrid MCP + Swarm Intelligence. Agents are now self-reflective and tool-using.</p>
-                <ul class="capability-list">
-                    <li>Persistent MemoryMatrix</li>
-                    <li>Evolutionary Optimization</li>
-                    <li>Model Context Protocol (MCP)</li>
-                    <li>Distributed Cognition</li>
-                </ul>
-            </div>
-            <div class="node-marker"></div>
-        </div>
-
-        <!-- Node: v23.5 -->
-        <div class="timeline-node">
-            <div class="node-content">
-                <span class="version-tag mono">v23.5 AI PARTNER</span>
-                <h2 style="margin: 5px 0;">Digital Twin Integration</h2>
-                <p style="font-size: 0.9rem; color: #888;">Establishment of high-fidelity "Digital Twins" and the Deep Dive Analyst protocol.</p>
-                <ul class="capability-list">
-                    <li>Deep Dive Protocol (5-Phase)</li>
-                    <li>Quantum Risk Simulation</li>
-                    <li>Deployment Console</li>
-                    <li>Visual Knowledge Graph</li>
-                </ul>
-            </div>
-            <div class="node-marker"></div>
-        </div>
-
-        <!-- Node: v23 -->
-        <div class="timeline-node">
-            <div class="node-content">
-                <span class="version-tag mono">v23.0 GRAPH AWAKENING</span>
-                <h2 style="margin: 5px 0;">Neuro-Symbolic Core</h2>
-                <p style="font-size: 0.9rem; color: #888;">Shift from linear scripts to cyclical graph-based reasoning (LangGraph).</p>
-                <ul class="capability-list">
-                    <li>Unified Knowledge Graph</li>
-                    <li>Cyclical Reasoning Loops</li>
-                    <li>Session Persistence</li>
-                </ul>
-            </div>
-            <div class="node-marker"></div>
-        </div>
-
-        <!-- Node: v22 -->
-        <div class="timeline-node">
-            <div class="node-content">
-                <span class="version-tag mono">v22.0 ODYSSEY</span>
-                <h2 style="margin: 5px 0;">Multi-Agent Hub</h2>
-                <p style="font-size: 0.9rem; color: #888;">Introduction of the "Hub and Spoke" architecture for risk management.</p>
-                <ul class="capability-list">
-                    <li>Risk-Alpha Synthesis</li>
-                    <li>The "Six Pillars" Logic</li>
-                    <li>Counterfactual Analysis</li>
-                </ul>
-            </div>
-            <div class="node-marker"></div>
-        </div>
-
-        <!-- Node: v21 -->
-        <div class="timeline-node">
-            <div class="node-content">
-                <span class="version-tag mono">v21.0 STATIC ERA</span>
-                <h2 style="margin: 5px 0;">Monolithic Scripts</h2>
-                <p style="font-size: 0.9rem; color: #888;">Linear, single-shot execution scripts for basic automation.</p>
-                <ul class="capability-list">
-                    <li>Basic Automation</li>
-                    <li>Ephemeral State</li>
-                    <li>Direct Execution</li>
-                </ul>
-            </div>
-            <div class="node-marker"></div>
+        <div id="timeline-content">
+            <!-- Dynamic Content -->
         </div>
     </div>
 
-    <!-- Constraints Section -->
+    <!-- Constraints Section (Static for now, but could be dynamic) -->
     <div class="constraints-section">
         <div class="constraints-title">SYSTEM CONSTRAINTS & BOUNDARIES</div>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px;">
@@ -213,51 +156,135 @@
     </div>
 
     <script>
-        // Charts
-        const commonOptions = {
-            responsive: true, maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
-            scales: { x: { display: false }, y: { display: false } }
-        };
+        let globalData = null;
+        let charts = {};
 
-        // Gen Chart
-        new Chart(document.getElementById('genChart'), {
-            type: 'line',
-            data: {
-                labels: ['v21', 'v22', 'v23', 'v23.5', 'v2.0'],
-                datasets: [{
-                    data: [1, 5, 20, 50, 100],
-                    borderColor: '#00f3ff', tension: 0.4, borderWidth: 2, pointRadius: 0
-                }]
-            },
-            options: commonOptions
-        });
+        async function loadData() {
+            try {
+                const response = await fetch('data/evolution_data.json');
+                const data = await response.json();
+                globalData = data;
+                renderTimeline(data.timeline);
+                renderCharts(data.timeline);
+            } catch (e) {
+                console.error("Failed to load evolution data", e);
+                document.getElementById('timeline-content').innerHTML = '<p style="text-align:center; color:red;">Failed to load data. Ensure showcase/data/evolution_data.json exists.</p>';
+            }
+        }
 
-        // Agent Complexity
-        new Chart(document.getElementById('agentChart'), {
-            type: 'bar',
-            data: {
-                labels: ['v21', 'v22', 'v23', 'v23.5', 'v2.0'],
-                datasets: [{
-                    data: [2, 5, 12, 18, 35],
-                    backgroundColor: '#bd00ff', borderRadius: 2
-                }]
-            },
-            options: commonOptions
-        });
+        function renderTimeline(timeline) {
+            const container = document.getElementById('timeline-content');
+            container.innerHTML = '';
 
-        // Entropy (Inverse Stability)
-        new Chart(document.getElementById('entropyChart'), {
-            type: 'line',
-            data: {
-                labels: ['v21', 'v22', 'v23', 'v23.5', 'v2.0'],
-                datasets: [{
-                    data: [10, 30, 80, 40, 20], // High entropy during v23 transition
-                    borderColor: '#ffd700', tension: 0.4, borderWidth: 2, pointRadius: 0
-                }]
-            },
-            options: commonOptions
-        });
+            timeline.forEach((node, index) => {
+                const div = document.createElement('div');
+                div.className = 'timeline-node';
+
+                // Construct lists
+                let listsHtml = '';
+                if (node.added && node.added.length > 0) {
+                    listsHtml += `<ul class="capability-list">`;
+                    node.added.slice(0, 3).forEach(item => {
+                        // Strip markdown bold if present for cleaner display
+                        const cleanItem = item.replace(/\*\*(.*?)\*\*/g, '$1').split(' - ')[0]; // Just take the name part if split by dash
+                        listsHtml += `<li>${cleanItem}</li>`;
+                    });
+                    if (node.added.length > 3) listsHtml += `<li>+ ${node.added.length - 3} more...</li>`;
+                    listsHtml += `</ul>`;
+                }
+
+                div.innerHTML = `
+                    <div class="node-content">
+                        <span class="version-tag mono">${node.version}</span>
+                        <h2 style="margin: 5px 0;">${node.title}</h2>
+                        <div style="font-size: 0.8rem; color: #666; margin-bottom: 5px;">${node.date}</div>
+                        ${node.log ? `<div class="log-quote">"${node.log.substring(0, 150)}${node.log.length > 150 ? '...' : ''}"</div>` : ''}
+                        ${listsHtml}
+                    </div>
+                    <div class="node-marker"></div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function renderCharts(timeline) {
+            // Reverse timeline for charts (oldest to newest)
+            const sorted = [...timeline].reverse();
+            const labels = sorted.map(t => t.version);
+            const complexity = sorted.map(t => t.metrics.complexity);
+            const entropy = sorted.map(t => t.metrics.entropy);
+            const generations = sorted.map(t => t.metrics.generations);
+
+            const commonOptions = {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { x: { display: false }, y: { display: false } }
+            };
+
+            // Destroy existing if any
+            if (charts.gen) charts.gen.destroy();
+            if (charts.agent) charts.agent.destroy();
+            if (charts.entropy) charts.entropy.destroy();
+
+            // Gen Chart
+            charts.gen = new Chart(document.getElementById('genChart'), {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: generations,
+                        borderColor: '#00f3ff', tension: 0.4, borderWidth: 2, pointRadius: 0
+                    }]
+                },
+                options: commonOptions
+            });
+
+            // Agent Complexity
+            charts.agent = new Chart(document.getElementById('agentChart'), {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: complexity,
+                        backgroundColor: '#bd00ff', borderRadius: 2
+                    }]
+                },
+                options: commonOptions
+            });
+
+            // Entropy
+            charts.entropy = new Chart(document.getElementById('entropyChart'), {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: entropy,
+                        borderColor: '#ffd700', tension: 0.4, borderWidth: 2, pointRadius: 0
+                    }]
+                },
+                options: commonOptions
+            });
+        }
+
+        function downloadDataset() {
+            if (!globalData) return;
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(globalData, null, 2));
+            const downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            downloadAnchorNode.setAttribute("download", "adam_evolution_dataset.json");
+            document.body.appendChild(downloadAnchorNode);
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+        }
+
+        function setMode(mode) {
+            // Visual toggle only for now, can extend to change view
+            document.getElementById('btn-human').classList.toggle('active', mode === 'human');
+            // document.getElementById('btn-ml').classList.toggle('active', mode === 'ml');
+            // ML mode is just download for now
+        }
+
+        document.addEventListener('DOMContentLoaded', loadData);
     </script>
 <script src="js/command_palette.js"></script></body>
 </html>
