@@ -14495,6 +14495,33 @@ window.MOCK_DATA = {
   ],
   "reports": [
     {
+      "id": "13F_Q4_2025_Flow_Report",
+      "title": "Q4 2025 Institutional Flow Report: The Great Re-Rating",
+      "date": "2026-02-16",
+      "analyst": "Sovereign_AI",
+      "executive_summary": "The fourth quarter of 2025 marks the 'Great Re-Rating,' where the monolithic AI trade has officially fractured. Institutional capital is ruthlessly differentiating between infrastructure utility and application-layer hype.",
+      "content": {
+        "title": "Q4 2025 Institutional Flow Report: The Great Re-Rating",
+        "date": "2026-02-16",
+        "analyst": "Sovereign_AI",
+        "summary": "The fourth quarter of 2025 marks the 'Great Re-Rating,' where the monolithic AI trade has officially fractured.",
+        "smart_money_matrix": [
+          {"manager": "Warren Buffett", "fund": "Berkshire", "buy": "Alphabet (GOOGL)", "sell": "Apple (AAPL)", "strategy": "Value-Tech Rotation"},
+          {"manager": "Michael Burry", "fund": "Scion Asset", "buy": "PFE (Calls), HAL (Calls)", "sell": "PLTR (Puts), NVDA (Puts)", "strategy": "Bearish AI Valuation"},
+          {"manager": "Jim Simons (Est.)", "fund": "RenTech", "buy": "AMZN, Eli Lilly (LLY)", "sell": "NVDA, META", "strategy": "Quantitative Mean Reversion"},
+          {"manager": "Ray Dalio (Est.)", "fund": "Bridgewater", "buy": "AMAT, LRCX, NFLX", "sell": "NVDA, MSFT", "strategy": "Semi-Equipment Pivot"},
+          {"manager": "Ken Griffin", "fund": "Citadel", "buy": "PHM, GOOGL", "sell": "SCHW (Trim)", "strategy": "Market-Making Inventory"},
+          {"manager": "Israel Englander", "fund": "Millennium", "buy": "NVDA (Bullish Gamma)", "sell": "IWM (Straddle)", "strategy": "Volatility Arbitrage"}
+        ],
+        "themes": [
+          "The Quant Signal: Systematic Mean Reversion out of 'Growth' factor.",
+          "The Macro/Value Pivot: Berkshire's record cash and 'Value Tech' trade.",
+          "The Volatility Regime: Michael Burry's 'Big Short 2.0' on AI depreciation.",
+          "Emerging Themes: 'Pick and Shovel' rotation to equipment manufacturers."
+        ]
+      }
+    },
+    {
       "title": "Quantum Computing Market Outlook 2025",
       "path": "core/libraries_and_archives/reports/quantum_computing_outlook_2025.json",
       "date": "2025-10-12",
