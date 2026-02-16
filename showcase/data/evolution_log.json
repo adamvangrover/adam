@@ -1,0 +1,51 @@
+{
+  "events": [
+    {
+      "version": "24.0.0",
+      "date": "2026-02-16",
+      "title": "Module Exporter & Orchestration",
+      "type": "MAJOR",
+      "changes": [
+        "Added scripts/export_module.py for portable subsystems",
+        "Implemented SystemOrchestrator for automated daily cycles",
+        "Added Comprehensive Health Check suite",
+        "New Evolution Dashboard"
+      ]
+    },
+    {
+      "version": "v23.5-patch-security",
+      "date": "2025-05-21",
+      "title": "Update vv23.5-patch-security",
+      "changes": [
+        "Hardening**: Replaced MD5 with SHA-256 for file hashing (`core/data_processing`).",
+        "Web**: Disabled Flask debug mode (`services/ui_backend.py`) and enabled Jinja2 autoescape (`core/newsletter_layout`).",
+        "Network**: Enforced 30s timeouts on external API requests (`government_stats_api`, `market_data_api`).",
+        "SQL**: Added input validation to `MCPRegistry` to prevent SQL injection.",
+        "Fallback**: Implemented graceful degradation for `langgraph` in all `core/engine/*_graph.py` modules. System now boots without graph dependencies.",
+        "Types**: Relaxed `TypedDict` strictness (`total=False`) in `core/engine/states.py` to support partial async updates.",
+        "Documentation**: Added Google-style docstrings to `core/agents/agent_base.py`.",
+        "Fixes**: Corrected indentation syntax error in `core/vertical_risk_agent/tools/mcp_server/server2.py`."
+      ],
+      "type": "RELEASE"
+    },
+    {
+      "version": "Unreleased",
+      "date": "2025-05-20",
+      "title": "Update vUnreleased",
+      "changes": [
+        "Critical:** Resolved `ModuleNotFoundError` for `core.v23_graph_engine.data_pipeline.graph` by implementing the missing graph definition.",
+        "Critical:** Fixed `tests/test_interaction_loop.py` mocking logic to support `AsyncMock` and correct `AgentOrchestrator` patching.",
+        "Core:** Refactored `core/agents/agent_base.py` to safely handle `asyncio` loops in threaded contexts and robustify `update_persona` against None values.",
+        "Core:** Refactored `core/system/interaction_loop.py` to correctly inject `config` into `Echo` and `check_token_limit`, and wrap async agent calls with `asyncio.run`.",
+        "Core:** Fixed `core/agents/query_understanding_agent.py` to call synchronous `LLMPlugin.generate_text` instead of non-existent `get_completion`.",
+        "Ops:** Installed missing dependencies: `pydantic`, `flask`, `torch` (CPU), `textblob`, `langchain-community`, `json-logic`.",
+        "`reproduce_api_error.py` script to debug API endpoint failures.",
+        "`RemediationPlan.json` outlining future steps for 100% system integrity.",
+        "`tests/api/test_service_state.py` fails with 500 error on Adam-mini endpoint (likely optimizer logic).",
+        "Multiple agent tests failing due to strict mocking or logic divergence in v23 transition."
+      ],
+      "type": "RELEASE"
+    }
+  ],
+  "generated_at": "2026-02-16T19:00:38.327274"
+}
