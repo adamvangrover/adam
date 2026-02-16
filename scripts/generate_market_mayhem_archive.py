@@ -67,7 +67,7 @@ def extract_entities(text):
     return {
         "tickers": tickers,
         "agents": agents,
-        "sovereigns": list(set(sovereigns)),
+        "sovereigns": sorted(list(set(sovereigns))),
         "keywords": sorted(list(set(keywords)))[:5]  # Limit to 5 keywords
     }
 
