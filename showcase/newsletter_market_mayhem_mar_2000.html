@@ -36,8 +36,9 @@
 
     <!-- Virtual Toolbar for High Tier -->
     <div class="doc-toolbar" style="display: flex;">
-        <div class="toolbar-item" onclick="window.location.href='market_mayhem_archive.html'"><strong>FILE</strong></div>
-        <div class="toolbar-item" onclick="showToast('EDIT MODE: READ ONLY (ARCHIVED)')">EDIT</div>
+        <div class="toolbar-item" onclick="window.location.href='market_mayhem_archive_v24.html'"><strong>FILE</strong></div>
+        <div class="toolbar-item" onclick="toggleRedactionMode()">REDACT</div>
+        <div class="toolbar-item" onclick="printReport()">PRINT</div>
         <div class="toolbar-item" onclick="toggleTheme()">VIEW</div>
         <div class="toolbar-item" onclick="showToast('INSERT: PERMISSION DENIED')">INSERT</div>
         <div class="toolbar-item" onclick="showToast('FORMAT: LOCKED')">FORMAT</div>
@@ -47,22 +48,25 @@
     </div>
 
     <div style="max-width: 1400px; margin: 0 auto; padding: 10px 20px; display:flex; justify-content:space-between; align-items:center; display: none;">
-        <a href="market_mayhem_archive.html" class="cyber-btn">&larr; RETURN TO ARCHIVE</a>
+        <a href="market_mayhem_archive_v24.html" class="cyber-btn">&larr; RETURN TO ARCHIVE</a>
         <div style="font-family:'JetBrains Mono'; font-size:0.7rem; color:#666;">SECURE CONNECTION ESTABLISHED</div>
     </div>
 
     <div class="newsletter-wrapper">
         <div class="paper-sheet" id="paper-sheet">
 
+            <!-- Top Secret Stamp -->
+            <div id="top-secret-stamp" class="top-secret-stamp">TOP SECRET</div>
+
             <!-- High Tier Header UI -->
             <div class="doc-header-ui" style="display: flex;">
                 <span id="verification-status">CONFIDENTIAL // SYSTEM 2 REVIEW</span>
-                <span>7e874539</span>
+                <span>e915ea09</span>
             </div>
 
             <div style="display:flex; justify-content:space-between; font-family:'JetBrains Mono'; font-size:0.8rem; color:#666; margin-bottom:20px; margin-top: 20px;">
                 <span>2000-03-10</span>
-                <span>ID: 7e874539</span>
+                <span>ID: e915ea09</span>
             </div>
 
             <h1 class="title">MARKET MAYHEM: THE DOT COM PEAK</h1>
@@ -79,17 +83,17 @@
                 <canvas id="financialChart"></canvas>
             </div>
 
-
-        <p><strong>The Height of Folly.</strong> Today marks the peak of the Dot Com bubble. The NASDAQ has doubled in a year. IPOs are popping 400% on day one. Pets.com, Webvan, eToys—these are the titans of the new economy.</p>
-        <p><strong>The Valuation Problem:</strong> Traditional metrics like P/E are considered obsolete. 'Price to Clicks' and 'Eyeballs' are the new currency. But burn rates are accelerating, and the path to profitability is non-existent for many.</p>
-        <p><strong>The Turn:</strong> Japan has entered a recession, and the Fed is tightening. Capital is becoming expensive just as these cash-burning machines need it most.</p>
-
+            <div id="document-body">
+                <p><strong>The Height of Folly.</strong> Today marks the peak of the Dot Com bubble. The NASDAQ has doubled in a year. IPOs are popping 400% on day one. Pets.com, Webvan, eToys—these are the titans of the new economy.</p>
+<p><strong>The Valuation Problem:</strong> Traditional metrics like P/E are considered obsolete. 'Price to Clicks' and 'Eyeballs' are the new currency. But burn rates are accelerating, and the path to profitability is non-existent for many.</p>
+<p><strong>The Turn:</strong> Japan has entered a recession, and the Fed is tightening. Capital is becoming expensive just as these cash-burning machines need it most.</p>
+            </div>
 
             <!-- Provenance Log (All Tiers) -->
             <div class="provenance-log">
                 <div class="log-entry">
                     <span>> HASH_CHECK</span>
-                    <span style="color:var(--terminal-green);">7e87453934eba1dd0ce65c49ddf3c6d06699726f9214871c26032956cf080db0</span>
+                    <span style="color:var(--terminal-green);">e915ea0960f54afa0c6a950f8f4140824247acad1a64c5f7a96a1cba77cbe81a</span>
                 </div>
                 <div class="log-entry">
                     <span>> SENTIMENT_SCAN</span>
@@ -118,7 +122,7 @@
                 <div class="stat-row"><span>DATE</span> <span class="stat-val">2000-03-10</span></div>
                 <div class="stat-row"><span>TYPE</span> <span class="stat-val">HISTORICAL</span></div>
                 <div class="stat-row"><span>CLASS</span> <span class="stat-val">UNCLASSIFIED</span></div>
-                <div class="stat-row"><span>PROVENANCE</span> <span class="stat-val" title="7e87453934eba1dd0ce65c49ddf3c6d06699726f9214871c26032956cf080db0">7e874539</span></div>
+                <div class="stat-row"><span>PROVENANCE</span> <span class="stat-val" title="e915ea0960f54afa0c6a950f8f4140824247acad1a64c5f7a96a1cba77cbe81a">e915ea09</span></div>
             </div>
 
             <div class="sidebar-widget">
@@ -133,6 +137,7 @@
                 <div class="sidebar-title">Detected Entities</div>
                 <div class="tag-cloud">
                     <a href="market_mayhem_archive.html?search=US_FED" class="tag" style="text-decoration:none;">US_FED</a><a href="market_mayhem_archive.html?search=JP_BOJ" class="tag" style="text-decoration:none;">JP_BOJ</a><a href="market_mayhem_archive.html?search=EV" class="tag" style="text-decoration:none; border-color:#666;">EV</a><a href="market_mayhem_archive.html?search=IPO" class="tag" style="text-decoration:none; border-color:#666;">IPO</a><a href="market_mayhem_archive.html?search=Recession" class="tag" style="text-decoration:none; border-color:#666;">Recession</a><a href="market_mayhem_archive.html?search=Value" class="tag" style="text-decoration:none; border-color:#666;">Value</a>
+                    <a href="market_mayhem_archive_v24.html?search=US_FED" class="tag" style="text-decoration:none;">US_FED</a><a href="market_mayhem_archive_v24.html?search=JP_BOJ" class="tag" style="text-decoration:none;">JP_BOJ</a><a href="market_mayhem_archive_v24.html?search=EV" class="tag" style="text-decoration:none; border-color:#666;">EV</a><a href="market_mayhem_archive_v24.html?search=IPO" class="tag" style="text-decoration:none; border-color:#666;">IPO</a><a href="market_mayhem_archive_v24.html?search=Recession" class="tag" style="text-decoration:none; border-color:#666;">Recession</a><a href="market_mayhem_archive_v24.html?search=Value" class="tag" style="text-decoration:none; border-color:#666;">Value</a>
                 </div>
             </div>
 
@@ -175,7 +180,7 @@
   "type": "HISTORICAL",
   "filename": "newsletter_market_mayhem_mar_2000.html",
   "is_sourced": true,
-  "full_body": "\n        <p><strong>The Height of Folly.</strong> Today marks the peak of the Dot Com bubble. The NASDAQ has doubled in a year. IPOs are popping 400% on day one. Pets.com, Webvan, eToys\u2014these are the titans of the new economy.</p>\n        <p><strong>The Valuation Problem:</strong> Traditional metrics like P/E are considered obsolete. 'Price to Clicks' and 'Eyeballs' are the new currency. But burn rates are accelerating, and the path to profitability is non-existent for many.</p>\n        <p><strong>The Turn:</strong> Japan has entered a recession, and the Fed is tightening. Capital is becoming expensive just as these cash-burning machines need it most.</p>\n        ",
+  "full_body": "<p><strong>The Height of Folly.</strong> Today marks the peak of the Dot Com bubble. The NASDAQ has doubled in a year. IPOs are popping 400% on day one. Pets.com, Webvan, eToys\u2014these are the titans of the new economy.</p>\n<p><strong>The Valuation Problem:</strong> Traditional metrics like P/E are considered obsolete. 'Price to Clicks' and 'Eyeballs' are the new currency. But burn rates are accelerating, and the path to profitability is non-existent for many.</p>\n<p><strong>The Turn:</strong> Japan has entered a recession, and the Fed is tightening. Capital is becoming expensive just as these cash-burning machines need it most.</p>",
   "source_priority": 3,
   "sentiment_score": 85,
   "entities": {
@@ -192,7 +197,7 @@
       "Value"
     ]
   },
-  "provenance_hash": "7e87453934eba1dd0ce65c49ddf3c6d06699726f9214871c26032956cf080db0",
+  "provenance_hash": "e915ea0960f54afa0c6a950f8f4140824247acad1a64c5f7a96a1cba77cbe81a",
   "metrics_json": "{}",
   "conviction": 50,
   "semantic_score": 65,

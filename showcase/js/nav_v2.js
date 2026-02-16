@@ -67,14 +67,29 @@ class AdamNavigator {
      * Critical for sub-directory navigation.
      */
     _resolvePaths() {
-        const scriptTag = document.querySelector('script[src*="nav.js"]');
+        // Try to find the script tag that loaded this file
+        let scriptTag = document.querySelector('script[src*="nav_v2.js"]');
+        if (!scriptTag) scriptTag = document.querySelector('script[src*="nav.js"]');
+
         const dataRoot = scriptTag ? scriptTag.getAttribute('data-root') : null;
 
-        this.rootPath = dataRoot || '.';
+        // Fallback: If we are in /showcase/ and no data-root, assume root is ..
+        if (!dataRoot && window.location.pathname.includes('/showcase/')) {
+            this.rootPath = '..';
+        } else {
+            this.rootPath = dataRoot || '.';
+        }
+
         const cleanRoot = this.rootPath.replace(/\/$/, '');
         this.showcasePath = `${cleanRoot}/showcase`;
 
-        console.log(`[AdamNavigator] Environment: ${this.isGitHub ? 'GITHUB' : 'LOCAL'} | Root: ${this.rootPath}`);
+        // Remove double slashes or self-references if needed
+        if (this.showcasePath.startsWith('./showcase') && window.location.pathname.includes('/showcase/')) {
+             // If we are in showcase, ./showcase is wrong. It should be just .
+             // But simpler to just rely on rootPath being correct.
+        }
+
+        console.log(`[AdamNavigator] Environment: ${this.isGitHub ? 'GITHUB' : 'LOCAL'} | Root: ${this.rootPath} | Showcase: ${this.showcasePath}`);
     }
 
     /**
@@ -100,6 +115,13 @@ class AdamNavigator {
                 link.href = this.config.dependencies.fontAwesome;
                 document.head.appendChild(link);
             }
+            // Load Mayhem Overlay CSS
+            if (!document.querySelector('link[href*="mayhem_overlay.css"]')) {
+                const link = document.createElement('link');
+                link.rel = "stylesheet";
+                link.href = this._sanitizePath(`${this.showcasePath}/css/mayhem_overlay.css`);
+                document.head.appendChild(link);
+            }
         }, 0);
     }
 
@@ -107,6 +129,13 @@ class AdamNavigator {
      * Loads Mock Data and App Logic sequentially.
      */
     _bootCoreSystem() {
+        // Load Mayhem Overlay JS
+        if (!window.mayhemOverlay) {
+            const overlayScript = document.createElement('script');
+            overlayScript.src = this._sanitizePath(`${this.showcasePath}/js/mayhem_overlay.js`);
+            document.body.appendChild(overlayScript);
+        }
+
         if (!window.dataManager) {
             const mockScript = document.createElement('script');
             mockScript.src = this._sanitizePath(`${this.showcasePath}/js/mock_data.js`);
@@ -135,6 +164,7 @@ class AdamNavigator {
             { type: 'divider' },
             { name: 'System Evolution', icon: 'fa-history', link: 'evolution_v2.html' },
             { name: 'Market Archive', icon: 'fa-archive', link: 'archive_v2/index.html' },
+            { name: 'Mayhem Neural Link', icon: 'fa-brain', link: 'javascript:window.mayhemOverlay.toggle()' },
             { type: 'divider' },
             { name: 'Trading Platform', icon: 'fa-chart-line', link: 'trading.html' },
             { name: 'Robo Advisor', icon: 'fa-robot', link: 'robo_advisor.html' },
@@ -196,6 +226,8 @@ class AdamNavigator {
 
             if (item.link === 'ROOT') {
                 linkUrl = this._sanitizePath(`${this.rootPath}/index.html`);
+            } else if (item.link.startsWith('javascript:')) {
+                linkUrl = item.link;
             } else {
                 linkUrl = this._sanitizePath(`${this.showcasePath}/${item.link}`);
 

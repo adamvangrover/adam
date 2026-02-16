@@ -36,8 +36,9 @@
 
     <!-- Virtual Toolbar for High Tier -->
     <div class="doc-toolbar" style="display: flex;">
-        <div class="toolbar-item" onclick="window.location.href='market_mayhem_archive.html'"><strong>FILE</strong></div>
-        <div class="toolbar-item" onclick="showToast('EDIT MODE: READ ONLY (ARCHIVED)')">EDIT</div>
+        <div class="toolbar-item" onclick="window.location.href='market_mayhem_archive_v24.html'"><strong>FILE</strong></div>
+        <div class="toolbar-item" onclick="toggleRedactionMode()">REDACT</div>
+        <div class="toolbar-item" onclick="printReport()">PRINT</div>
         <div class="toolbar-item" onclick="toggleTheme()">VIEW</div>
         <div class="toolbar-item" onclick="showToast('INSERT: PERMISSION DENIED')">INSERT</div>
         <div class="toolbar-item" onclick="showToast('FORMAT: LOCKED')">FORMAT</div>
@@ -47,12 +48,15 @@
     </div>
 
     <div style="max-width: 1400px; margin: 0 auto; padding: 10px 20px; display:flex; justify-content:space-between; align-items:center; display: none;">
-        <a href="market_mayhem_archive.html" class="cyber-btn">&larr; RETURN TO ARCHIVE</a>
+        <a href="market_mayhem_archive_v24.html" class="cyber-btn">&larr; RETURN TO ARCHIVE</a>
         <div style="font-family:'JetBrains Mono'; font-size:0.7rem; color:#666;">SECURE CONNECTION ESTABLISHED</div>
     </div>
 
     <div class="newsletter-wrapper">
         <div class="paper-sheet" id="paper-sheet">
+
+            <!-- Top Secret Stamp -->
+            <div id="top-secret-stamp" class="top-secret-stamp">TOP SECRET</div>
 
             <!-- High Tier Header UI -->
             <div class="doc-header-ui" style="display: flex;">
@@ -79,12 +83,14 @@
                 <canvas id="financialChart"></canvas>
             </div>
 
-            <h2>Market Mayhem (Executive Summary)</h2><p>Market sentiment is currently mixed, with investors weighing positive corporate earnings against lingering concerns about inflation and potential interest rate hikes. The S&P 500 is up 0.5% on the day, while the Nasdaq is flat. Key macroeconomic indicators released this morning showed a mixed picture, with GDP growth slightly below expectations and inflation remaining stubbornly high. Geopolitical risks remain elevated, with ongoing tensions in Eastern Europe and the Middle East adding to market uncertainty.</p>
+            <div id="document-body">
+                <h2>Market Mayhem (Executive Summary)</h2><p>Market sentiment is currently mixed, with investors weighing positive corporate earnings against lingering concerns about inflation and potential interest rate hikes. The S&P 500 is up 0.5% on the day, while the Nasdaq is flat. Key macroeconomic indicators released this morning showed a mixed picture, with GDP growth slightly below expectations and inflation remaining stubbornly high. Geopolitical risks remain elevated, with ongoing tensions in Eastern Europe and the Middle East adding to market uncertainty.</p>
 <h2>Key News & Events</h2><ul><li>Tech earnings continue to impress, with strong results from Microsoft and Alphabet.</li><li>Inflation remains a concern, with the CPI rising 0.4% in January.</li><li>The Federal Reserve is expected to announce another interest rate hike next month.</li><li>Geopolitical tensions remain elevated, with no resolution in sight for the conflict in Ukraine.</li><li>OPEC+ agrees to maintain current oil production levels despite pressure from Western nations.</li></ul><h2>Top Investment Ideas</h2><h2>Notable Signals & Rumors</h2><ul><li>Rumors of a potential acquisition of Salesforce by Microsoft are circulating.</li><li>A prominent analyst predicts a market correction in the coming months due to overvaluation in the technology sector.</li><li>Insider buying activity has increased in the healthcare sector, particularly in biotechnology companies.</li></ul><h2>Policy Impact & Geopolitical Outlook</h2><p>The ongoing conflict in Ukraine and tensions in the Middle East are creating significant geopolitical risks, with potential implications for energy prices, supply chains, and global economic growth. Central banks are facing a delicate balancing act, trying to control inflation without triggering a recession. The upcoming Federal Reserve meeting will be closely watched for signals on the future direction of monetary policy. Additionally, upcoming elections in several key countries could impact market sentiment and policy decisions.</p>
 <h2>Deals & Corporate Actions</h2><ul><li>Microsoft (MSFT) is rumored to be in talks to acquire Salesforce (CRM) in a deal that could reshape the cloud computing landscape.</li><li>Apple (AAPL) has announced a new stock buyback program, signaling confidence in its future growth prospects.</li><li>Tesla (TSLA) has announced a stock split, making its shares more accessible to retail investors.</li><li>Berkshire Hathaway (BRK.B) has increased its dividend for the 50th consecutive year, demonstrating its commitment to shareholder value.</li></ul><h2>Earnings Watch</h2><ul><li>Apple (AAPL) is scheduled to report earnings next week, with analysts expecting strong results driven by iPhone sales and services growth.</li><li>Tesla (TSLA) earnings are expected in two weeks, with investors focused on the company's production ramp-up and progress on new models.</li><li>Amazon (AMZN) earnings are anticipated later this month, with the focus on the performance of its cloud computing division, AWS.</li></ul><h2>Thematic Deep Dive</h2><p>Artificial intelligence (AI) is rapidly transforming various industries, from healthcare to finance. This section provides a deep dive into the latest AI trends, including advancements in machine learning, natural language processing, and computer vision. We also explore the potential impact of AI on investment strategies and portfolio management. Key areas of focus include the development of more sophisticated AI models, the increasing adoption of AI in various applications, and the ethical and regulatory considerations surrounding AI.</p>
 <h2>Fun Tidbits & Quotes</h2><ul><li>"The best way to predict the future is to invent it." - Alan Kay</li><li>Did you know that the first computer programmer was a woman? Ada Lovelace, an English mathematician, is considered the first to publish an algorithm intended to be processed by a machine.</li></ul><h2>Quirky Sign-Off</h2><p>Stay curious, stay informed, and may your investments be ever in your favor!</p>
 <h2>Disclaimer</h2><p>The information and recommendations provided in this newsletter are for informational purposes only and should not be construed as financial advice. Investing involves risk, and you could lose money. Consult with a qualified financial advisor before making any investment decisions.</p>
 
+            </div>
 
             <!-- Provenance Log (All Tiers) -->
             <div class="provenance-log">
@@ -134,6 +140,7 @@
                 <div class="sidebar-title">Detected Entities</div>
                 <div class="tag-cloud">
                     <a href="market_mayhem_archive.html?search=US_FED" class="tag" style="text-decoration:none;">US_FED</a><a href="market_mayhem_archive.html?search=EU_ECB" class="tag" style="text-decoration:none;">EU_ECB</a><a href="market_mayhem_archive.html?search=AI" class="tag" style="text-decoration:none; border-color:#666;">AI</a><a href="market_mayhem_archive.html?search=Banks" class="tag" style="text-decoration:none; border-color:#666;">Banks</a><a href="market_mayhem_archive.html?search=Cloud" class="tag" style="text-decoration:none; border-color:#666;">Cloud</a><a href="market_mayhem_archive.html?search=Dividend" class="tag" style="text-decoration:none; border-color:#666;">Dividend</a><a href="market_mayhem_archive.html?search=EV" class="tag" style="text-decoration:none; border-color:#666;">EV</a>
+                    <a href="market_mayhem_archive_v24.html?search=US_FED" class="tag" style="text-decoration:none;">US_FED</a><a href="market_mayhem_archive_v24.html?search=EU_ECB" class="tag" style="text-decoration:none;">EU_ECB</a><a href="market_mayhem_archive_v24.html?search=AI" class="tag" style="text-decoration:none; border-color:#666;">AI</a><a href="market_mayhem_archive_v24.html?search=Banks" class="tag" style="text-decoration:none; border-color:#666;">Banks</a><a href="market_mayhem_archive_v24.html?search=Cloud" class="tag" style="text-decoration:none; border-color:#666;">Cloud</a><a href="market_mayhem_archive_v24.html?search=Dividend" class="tag" style="text-decoration:none; border-color:#666;">Dividend</a><a href="market_mayhem_archive_v24.html?search=EV" class="tag" style="text-decoration:none; border-color:#666;">EV</a>
                 </div>
             </div>
 

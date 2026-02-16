@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM v26.0 :: CREATOR STUDIO</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/library.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&family=Georgia:ital@0;1&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="js/nav.js" data-root=".." defer></script>
+    <script src="js/editor_logic.js" defer></script>
+</head>
+<body>
+
+    <div class="library-main">
+        <header class="library-header">
+            <div style="display: flex; align-items: center; gap: 20px;">
+                <i class="fas fa-pen-nib text-purple-400 text-2xl"></i>
+                <div>
+                    <h1 class="mono text-lg font-bold tracking-widest text-white">CREATOR STUDIO</h1>
+                    <div class="mono text-xs text-slate-400">SECURE WRITING ENVIRONMENT</div>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 10px;">
+                <button id="btnNew" class="btn-cyber secondary">
+                    <i class="fas fa-eraser"></i> CLEAR
+                </button>
+                <button id="btnSave" class="btn-cyber">
+                    <i class="fas fa-save"></i> COMMIT TO ARCHIVE
+                </button>
+                <a href="intelligence_library.html" class="btn-cyber bg-slate-800 border-slate-600 text-slate-400">
+                    <i class="fas fa-times"></i> CLOSE
+                </a>
+            </div>
+        </header>
+
+        <div class="library-content p-6">
+            <div class="editor-container">
+                <!-- Meta Panel -->
+                <aside class="editor-meta">
+                    <div class="sidebar-title">METADATA CONFIG</div>
+
+                    <div class="form-group">
+                        <label class="form-label">TITLE</label>
+                        <input type="text" id="inputTitle" class="form-input" placeholder="e.g. Market Pulse: The Reversal">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">SUMMARY / ABSTRACT</label>
+                        <textarea id="inputSummary" class="form-input h-24" placeholder="Brief executive summary..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">TYPE</label>
+                        <select id="inputType" class="form-input">
+                            <option value="DAILY_BRIEFING">Daily Briefing</option>
+                            <option value="MARKET_PULSE">Market Pulse</option>
+                            <option value="NEWSLETTER">Newsletter</option>
+                            <option value="DEEP_DIVE">Deep Dive</option>
+                            <option value="STRATEGY">Strategy</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">SENTIMENT (0-100)</label>
+                        <input type="number" id="inputSentiment" class="form-input" min="0" max="100" value="50">
+                        <div class="text-[10px] text-slate-500 mt-1 flex justify-between">
+                            <span>BEARISH</span><span>NEUTRAL</span><span>BULLISH</span>
+                        </div>
+                    </div>
+
+                    <div class="sidebar-title mt-8">AI ASSIST</div>
+                    <button class="btn-cyber w-full justify-center mb-2">
+                        <i class="fas fa-magic"></i> GENERATE ABSTRACT
+                    </button>
+                    <button class="btn-cyber w-full justify-center">
+                        <i class="fas fa-spell-check"></i> PROOFREAD
+                    </button>
+                </aside>
+
+                <!-- Editor Panel -->
+                <main class="editor-main">
+                    <div class="editor-toolbar">
+                        <button class="toolbar-btn text-slate-400 hover:text-white p-1" data-command="bold" title="Bold">
+                            <i class="fas fa-bold"></i>
+                        </button>
+                        <button class="toolbar-btn text-slate-400 hover:text-white p-1" data-command="italic" title="Italic">
+                            <i class="fas fa-italic"></i>
+                        </button>
+                        <button class="toolbar-btn text-slate-400 hover:text-white p-1" data-command="underline" title="Underline">
+                            <i class="fas fa-underline"></i>
+                        </button>
+                        <div class="w-px h-4 bg-slate-600 my-auto mx-2"></div>
+                        <button class="toolbar-btn text-slate-400 hover:text-white p-1" data-command="formatBlock" data-value="h2" title="Heading 2">
+                            <span class="font-bold">H2</span>
+                        </button>
+                        <button class="toolbar-btn text-slate-400 hover:text-white p-1" data-command="formatBlock" data-value="h3" title="Heading 3">
+                            <span class="font-bold">H3</span>
+                        </button>
+                        <div class="w-px h-4 bg-slate-600 my-auto mx-2"></div>
+                        <button class="toolbar-btn text-slate-400 hover:text-white p-1" data-command="insertUnorderedList" title="Bullet List">
+                            <i class="fas fa-list-ul"></i>
+                        </button>
+                        <button class="toolbar-btn text-slate-400 hover:text-white p-1" data-command="createLink" title="Link">
+                            <i class="fas fa-link"></i>
+                        </button>
+                    </div>
+
+                    <div id="editorContent" class="wysiwyg-area" contenteditable="true">
+                        <h2>Executive Summary</h2>
+                        <p>Begin typing your analysis here...</p>
+                        <h2>Key Metrics</h2>
+                        <ul>
+                            <li><strong>Metric 1:</strong> Value</li>
+                        </ul>
+                    </div>
+                </main>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

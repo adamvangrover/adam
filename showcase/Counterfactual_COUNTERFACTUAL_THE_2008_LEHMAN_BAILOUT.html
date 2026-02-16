@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM v23.5 :: COUNTERFACTUAL: THE 2008 LEHMAN BAILOUT</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/market_mayhem_tiers.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/nav.js" defer></script>
+    <script src="js/market_mayhem_viewer.js" defer></script>
+</head>
+<body class="tier-high">
+
+    <!-- System 2 Verification Overlay -->
+    <div id="system2-overlay" class="system2-overlay">
+        <div class="system2-terminal">
+            <div id="sys2-content"></div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="cyber-toast-container"></div>
+
+    <!-- Raw Source Modal -->
+    <div id="raw-source-modal" class="raw-source-modal">
+        <div class="raw-source-header">
+            <span>SOURCE_DATA.JSON</span>
+            <span style="cursor:pointer; color:#cc0000;" onclick="toggleSource()">[CLOSE]</span>
+        </div>
+        <div class="raw-source-content" id="raw-source-content"></div>
+    </div>
+
+    <!-- Virtual Toolbar for High Tier -->
+    <div class="doc-toolbar" style="display: flex;">
+        <div class="toolbar-item" onclick="window.location.href='market_mayhem_archive.html'"><strong>FILE</strong></div>
+        <div class="toolbar-item" onclick="showToast('EDIT MODE: READ ONLY (SIMULATION)')">EDIT</div>
+        <div class="toolbar-item" onclick="toggleTheme()">VIEW</div>
+        <div class="toolbar-item" onclick="showToast('INSERT: PERMISSION DENIED')">INSERT</div>
+        <div class="toolbar-item" onclick="showToast('FORMAT: LOCKED')">FORMAT</div>
+        <div class="toolbar-item" onclick="runVerification()" style="color: #0078d7;"><strong>VERIFY</strong></div>
+        <div style="flex-grow:1;"></div>
+        <div class="toolbar-item" style="color:#666;">ADAM_V26_EDITOR</div>
+    </div>
+
+    <div class="newsletter-wrapper">
+        <div class="paper-sheet" id="paper-sheet">
+
+            <!-- High Tier Header UI -->
+            <div class="doc-header-ui" style="display: flex;">
+                <span id="verification-status" style="color: #ffaa00;">SIMULATION // COUNTERFACTUAL</span>
+                <span>2d4e8a4a</span>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; font-family:'JetBrains Mono'; font-size:0.8rem; color:#666; margin-bottom:20px; margin-top: 20px;">
+                <span>2008-09-15</span>
+                <span>ID: 2d4e8a4a</span>
+            </div>
+
+            <h1 class="title">COUNTERFACTUAL: THE 2008 LEHMAN BAILOUT</h1>
+
+            <!-- Metadata Panel for High Tier (Embedded in Doc) -->
+            <div class="doc-metadata-panel" style="display: grid;">
+                <div class="doc-metadata-item"><strong>Classification</strong>RESTRICTED</div>
+                <div class="doc-metadata-item"><strong>Confidence</strong>92/100</div>
+                <div class="doc-metadata-item"><strong>Divergence</strong>85/100</div>
+                <div class="doc-metadata-item"><strong>Simulator</strong>Nexus_Core</div>
+            </div>
+
+            <div id="financialChartContainer" style="display:none; margin-bottom: 30px;">
+                <canvas id="financialChart"></canvas>
+            </div>
+
+            
+        <h3>Scenario Parameters: Intervention</h3>
+        <p><strong>Divergence Point:</strong> September 14, 2008. Treasury Secretary Paulson agrees to a $30 billion backstop for Barclays to acquire Lehman Brothers, citing "systemic risk" over "moral hazard".</p>
+        
+        <h3>Outcome: The 'Soft' Landing?</h3>
+        <p>Markets rallied 4% on the news. The Reserve Primary Fund did not break the buck. The commercial paper market remained liquid. However, the underlying toxic assets (subprime mortgages) remained on balance sheets across the street.</p>
+        
+        <h3>Long-Term Consequence: The Zombie Economy</h3>
+        <p>Without the cleansing fire of a crisis, strict banking regulations (Dodd-Frank equivalent) were never passed. Leverage ratios remained high. By 2011, a larger, more systemic sovereign debt crisis emerged, centering on US Treasuries themselves rather than just mortgage-backed securities.</p>
+        
+        <h3>Metrics: S&P 500 Simulation</h3>
+        <p>The index avoided the 2008 crash low of 666, bottoming instead at 1,100 in 2009. However, growth remained anemia (1.2% GDP) for a decade due to debt overhang.</p>
+        
+
+            <!-- Provenance Log (All Tiers) -->
+            <div class="provenance-log">
+                <div class="log-entry">
+                    <span>> HASH_CHECK</span>
+                    <span style="color:var(--terminal-green);">2d4e8a4a961376c471e90b77470353d282940a94b6db093e3c07dfcc309674b2</span>
+                </div>
+                <div class="log-entry">
+                    <span>> DIVERGENCE_INDEX</span>
+                    <span>85% (BASELINE: 2024_REALITY)</span>
+                </div>
+                <div class="log-entry">
+                    <span>> SCENARIO_LOCK</span>
+                    <span>92%</span>
+                </div>
+                <div class="log-entry">
+                    <span>> CRITIQUE_LOG</span>
+                    <span>"Nexus Simulation Engine verified divergence of 85%. Scenario Plausible."</span>
+                </div>
+            </div>
+
+            <a href="#" class="source-jump-btn" onclick="toggleSource(); return false;" title="View Source JSON">JUMP TO SOURCE</a>
+
+            <div style="margin-top: 40px; border-top: 1px solid #ccc; padding-top: 20px; font-style: italic; color: #666;">
+                End of Simulation.
+            </div>
+        </div>
+
+        <aside class="cyber-sidebar">
+            <div class="sidebar-widget">
+                <div class="sidebar-title">Simulation Metadata</div>
+                <div class="stat-row"><span>DATE</span> <span class="stat-val">2008-09-15</span></div>
+                <div class="stat-row"><span>TYPE</span> <span class="stat-val">COUNTERFACTUAL</span></div>
+                <div class="stat-row"><span>CLASS</span> <span class="stat-val">RESTRICTED</span></div>
+                <div class="stat-row"><span>PROVENANCE</span> <span class="stat-val" title="2d4e8a4a961376c471e90b77470353d282940a94b6db093e3c07dfcc309674b2">2d4e8a4a</span></div>
+            </div>
+
+            <div class="sidebar-widget">
+                <div class="sidebar-title">Sentiment Analysis</div>
+                <div class="stat-row"><span>SCORE</span> <span class="stat-val">45/100</span></div>
+                <div class="sentiment-bar">
+                    <div class="sentiment-fill" style="width: 45%;"></div>
+                </div>
+            </div>
+
+            <div class="sidebar-widget">
+                <div class="sidebar-title">Detected Entities</div>
+                <div class="tag-cloud">
+                    <a href="market_mayhem_archive.html?search=LEH" class="tag ticker" style="text-decoration:none;">$LEH</a><a href="market_mayhem_archive.html?search=XLF" class="tag ticker" style="text-decoration:none;">$XLF</a><a href="market_mayhem_archive.html?search=US_FED" class="tag" style="text-decoration:none;">US_FED</a><a href="market_mayhem_archive.html?search=Moral_Hazard" class="tag" style="text-decoration:none;">Moral_Hazard</a><a href="market_mayhem_archive.html?search=Bailout" class="tag" style="text-decoration:none;">Bailout</a>
+                </div>
+            </div>
+
+             <div class="sidebar-widget">
+                <div class="sidebar-title">Simulation Confidence</div>
+                 <div class="stat-row"><span>CONFIDENCE</span> <span class="stat-val">92/100</span></div>
+                 <div class="sentiment-bar">
+                    <div class="sentiment-fill" style="width: 92%; background: #00ff00;"></div>
+                </div>
+            </div>
+
+             <div class="sidebar-widget" style="border-color: #555;">
+                <div class="sidebar-title">Nexus Agent Log</div>
+                 <div style="font-size: 0.75rem; color: #ccc; font-style: italic;">
+                    "Nexus Simulation Engine verified divergence of 85%. Scenario Plausible."
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Hidden Raw Data -->
+    <textarea id="hidden-raw-data" style="display:none;">{
+  "title": "COUNTERFACTUAL: THE 2008 LEHMAN BAILOUT",
+  "date": "2008-09-15",
+  "summary": "Simulation: What if the US Treasury had backstopped Lehman Brothers? The moral hazard debate vs. systemic collapse.",
+  "full_body": "\n        <h3>Scenario Parameters: Intervention</h3>\n        <p><strong>Divergence Point:</strong> September 14, 2008. Treasury Secretary Paulson agrees to a $30 billion backstop for Barclays to acquire Lehman Brothers, citing \"systemic risk\" over \"moral hazard\".</p>\n        \n        <h3>Outcome: The 'Soft' Landing?</h3>\n        <p>Markets rallied 4% on the news. The Reserve Primary Fund did not break the buck. The commercial paper market remained liquid. However, the underlying toxic assets (subprime mortgages) remained on balance sheets across the street.</p>\n        \n        <h3>Long-Term Consequence: The Zombie Economy</h3>\n        <p>Without the cleansing fire of a crisis, strict banking regulations (Dodd-Frank equivalent) were never passed. Leverage ratios remained high. By 2011, a larger, more systemic sovereign debt crisis emerged, centering on US Treasuries themselves rather than just mortgage-backed securities.</p>\n        \n        <h3>Metrics: S&P 500 Simulation</h3>\n        <p>The index avoided the 2008 crash low of 666, bottoming instead at 1,100 in 2009. However, growth remained anemia (1.2% GDP) for a decade due to debt overhang.</p>\n        ",
+  "metrics": {
+    "S&P_500_Simulated": {
+      "2008": "1250",
+      "2009": "1100",
+      "2010": "1150",
+      "2011": "1050",
+      "2012": "1200"
+    }
+  },
+  "entities": [
+    "$LEH",
+    "$XLF",
+    "US_FED",
+    "Moral_Hazard",
+    "Bailout"
+  ],
+  "sentiment": 45,
+  "divergence": 85,
+  "conviction": 92
+}</textarea>
+
+    <script>
+        const metricsData = {"S&P_500_Simulated": {"2008": "1250", "2009": "1100", "2010": "1150", "2011": "1050", "2012": "1200"}};
+        if (metricsData && Object.keys(metricsData).length > 0) {
+            const ctx = document.getElementById('financialChart');
+            const container = document.getElementById('financialChartContainer');
+            let labels = [];
+            let values = [];
+            let labelName = "Metric";
+            for (const [key, val] of Object.entries(metricsData)) {
+                if (typeof val === 'object') {
+                    labels = Object.keys(val);
+                    values = Object.values(val).map(v => parseFloat(v));
+                    labelName = key;
+                    break;
+                }
+            }
+            if (labels.length > 0) {
+                container.style.display = 'block';
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: labelName,
+                            data: values,
+                            borderColor: '#ffaa00',
+                            backgroundColor: 'rgba(255, 170, 0, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.4,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: { legend: { display: true } }
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+</html>
