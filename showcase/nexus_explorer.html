@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM :: NEXUS EXPLORER</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/cyberpunk-core.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+    <script src="js/nav.js" data-root=".." defer></script>
+    <style>
+        body { background-color: #050505; color: #e0e0e0; font-family: 'JetBrains Mono', monospace; overflow: hidden; }
+        #network-container { width: 100%; height: 100vh; background: radial-gradient(circle at center, #111 0%, #000 100%); }
+
+        .sidebar {
+            position: absolute; top: 0; right: 0; bottom: 0; width: 350px;
+            background: rgba(10, 10, 15, 0.95);
+            border-left: 1px solid #333;
+            transform: translateX(100%);
+            transition: transform 0.3s ease-in-out;
+            z-index: 50;
+            display: flex; flex-direction: column;
+        }
+        .sidebar.active { transform: translateX(0); }
+
+        .control-panel {
+            position: absolute; top: 20px; left: 20px;
+            background: rgba(10, 10, 15, 0.8);
+            border: 1px solid #333;
+            padding: 10px;
+            border-radius: 4px;
+            z-index: 40;
+            display: flex; gap: 10px;
+        }
+
+        .node-tag {
+            font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; border: 1px solid;
+            display: inline-block; margin-right: 4px; margin-bottom: 4px;
+        }
+        .tag-file { border-color: #3b82f6; color: #3b82f6; background: rgba(59, 130, 246, 0.1); }
+        .tag-doc { border-color: #10b981; color: #10b981; background: rgba(16, 185, 129, 0.1); }
+        .tag-code { border-color: #f59e0b; color: #f59e0b; background: rgba(245, 158, 11, 0.1); }
+    </style>
+</head>
+<body class="relative">
+
+    <!-- Controls -->
+    <div class="control-panel">
+        <div class="flex items-center gap-2">
+            <i class="fas fa-project-diagram text-cyan-400"></i>
+            <span class="font-bold text-white tracking-widest">NEXUS EXPLORER</span>
+        </div>
+        <div class="h-6 w-px bg-gray-700 mx-2"></div>
+        <select id="dataset-select" class="bg-black border border-gray-700 text-xs text-white p-1 rounded">
+            <option value="system_knowledge_graph.json">SYSTEM KNOWLEDGE</option>
+            <option value="nexus_simulation.json">GEOPOLITICAL SIM</option>
+        </select>
+        <input type="text" id="search-input" placeholder="SEARCH NODE..." class="bg-black border border-gray-700 text-xs text-white p-1 rounded w-48">
+        <button id="reset-btn" class="bg-slate-800 hover:bg-slate-700 text-white text-xs px-2 rounded"><i class="fas fa-expand"></i> RESET</button>
+        <a href="intelligence_library.html" class="bg-slate-800 hover:bg-slate-700 text-white text-xs px-2 py-1 rounded flex items-center gap-1">
+            <i class="fas fa-arrow-left"></i> LIBRARY
+        </a>
+    </div>
+
+    <!-- Graph Canvas -->
+    <div id="network-container"></div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="p-4 border-b border-gray-800 flex justify-between items-center bg-slate-900/50">
+            <h2 class="text-sm font-bold text-cyan-400" id="node-label">NODE DETAILS</h2>
+            <button onclick="toggleSidebar(false)" class="text-gray-500 hover:text-white"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="p-4 flex-1 overflow-y-auto space-y-4">
+            <div>
+                <div class="text-[10px] text-gray-500 uppercase mb-1">Type</div>
+                <div id="node-type"></div>
+            </div>
+            <div>
+                <div class="text-[10px] text-gray-500 uppercase mb-1">Path / ID</div>
+                <div class="font-mono text-xs text-gray-300 break-all bg-black p-2 rounded border border-gray-800" id="node-path"></div>
+            </div>
+            <div id="preview-section" class="hidden">
+                <div class="text-[10px] text-gray-500 uppercase mb-1">Content Preview</div>
+                <pre class="font-mono text-[10px] text-green-400 bg-black p-2 rounded border border-gray-800 overflow-x-auto whitespace-pre-wrap" id="node-preview"></pre>
+            </div>
+            <div class="pt-4 border-t border-gray-800">
+                <button class="w-full btn-cyber text-xs py-2 mb-2">
+                    <i class="fas fa-code-branch"></i> TRACE DEPENDENCIES
+                </button>
+                <button class="w-full btn-cyber secondary text-xs py-2">
+                    <i class="fas fa-external-link-alt"></i> OPEN SOURCE
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <script>
+        let network = null;
+        let nodes = null;
+        let edges = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadGraph('data/system_knowledge_graph.json');
+
+            document.getElementById('dataset-select').addEventListener('change', (e) => {
+                loadGraph('data/' + e.target.value);
+            });
+
+            document.getElementById('search-input').addEventListener('input', (e) => {
+                const query = e.target.value.toLowerCase();
+                if(!query || !nodes) return;
+
+                const allNodes = nodes.get();
+                const match = allNodes.find(n => n.label.toLowerCase().includes(query));
+                if(match) {
+                    network.focus(match.id, { scale: 1.5, animation: true });
+                    network.selectNodes([match.id]);
+                    showNodeDetails(match);
+                }
+            });
+
+            document.getElementById('reset-btn').addEventListener('click', () => {
+                network.fit({ animation: true });
+                toggleSidebar(false);
+            });
+        });
+
+        async function loadGraph(file) {
+            try {
+                const res = await fetch(file);
+                if(!res.ok) throw new Error("Failed to load");
+                const data = await res.json();
+
+                const container = document.getElementById('network-container');
+
+                // Parse data - handle different formats
+                let nodeData = [];
+                let edgeData = [];
+
+                if(data.nodes) nodeData = data.nodes.map(processNode);
+                if(data.edges) edgeData = data.edges; // Assuming standard format
+                if(data.links) edgeData = data.links; // D3 format often uses links
+
+                nodes = new vis.DataSet(nodeData);
+                edges = new vis.DataSet(edgeData);
+
+                const options = {
+                    nodes: {
+                        shape: 'dot',
+                        size: 16,
+                        font: { face: 'JetBrains Mono', color: '#ccc', size: 12, strokeWidth: 0, background: '#000' },
+                        borderWidth: 1,
+                        shadow: true
+                    },
+                    edges: {
+                        width: 1,
+                        color: { color: '#333', highlight: '#00f3ff' },
+                        smooth: { type: 'continuous' }
+                    },
+                    physics: {
+                        stabilization: true,
+                        barnesHut: { gravitationalConstant: -2000, springConstant: 0.04, springLength: 95 }
+                    },
+                    interaction: { hover: true, tooltipDelay: 200 }
+                };
+
+                network = new vis.Network(container, { nodes, edges }, options);
+
+                network.on("click", function (params) {
+                    if (params.nodes.length > 0) {
+                        const nodeId = params.nodes[0];
+                        const node = nodes.get(nodeId);
+                        showNodeDetails(node);
+                    } else {
+                        toggleSidebar(false);
+                    }
+                });
+
+            } catch (e) {
+                console.error(e);
+                document.getElementById('network-container').innerHTML = `<div class="text-red-500 p-10 text-center">FAILED TO LOAD DATA: ${file}</div>`;
+            }
+        }
+
+        function processNode(node) {
+            // Add visual properties based on group
+            let color = '#666';
+            if (node.group === 'file') color = '#3b82f6'; // Blue
+            if (node.group === 'doc') color = '#10b981'; // Green
+            if (node.group === 'code') color = '#f59e0b'; // Orange
+            if (node.group === 'data') color = '#8b5cf6'; // Purple
+
+            return { ...node, color: { background: '#111', border: color } };
+        }
+
+        function showNodeDetails(node) {
+            document.getElementById('node-label').innerText = node.label || node.id;
+            document.getElementById('node-type').innerHTML = `<span class="node-tag tag-${node.group || 'default'}">${(node.group || 'UNKNOWN').toUpperCase()}</span>`;
+            document.getElementById('node-path').innerText = node.path || node.id;
+
+            const preview = document.getElementById('node-preview');
+            const previewSec = document.getElementById('preview-section');
+
+            if(node.preview || node.docstring) {
+                preview.innerText = (node.preview || node.docstring).substring(0, 1000);
+                previewSec.classList.remove('hidden');
+            } else {
+                previewSec.classList.add('hidden');
+            }
+
+            toggleSidebar(true);
+        }
+
+        window.toggleSidebar = function(show) {
+            const el = document.getElementById('sidebar');
+            if(show) el.classList.add('active');
+            else el.classList.remove('active');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM v26.0 // UNIFIED REPOSITORY</title>
+
+    <!-- Core Dependencies -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/repository_v2.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Scripts -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="js/nav.js" data-root=".." defer></script>
+    <script src="js/repository_v2.js" defer></script>
+</head>
+<body>
+
+    <!-- Nav Overlay -->
+    <div class="scan-line"></div>
+    <div class="scan-glow"></div>
+
+    <div class="repo-layout">
+
+        <!-- Sidebar Controls -->
+        <aside class="repo-sidebar custom-scrollbar">
+            <div class="sidebar-section">
+                <h2 class="mono text-cyan-400 font-bold text-xl mb-1">REPOSITORY</h2>
+                <div class="mono text-xs text-slate-500">SECURE NODE: US-EAST-4</div>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-title">DATA FILTERS</div>
+
+                <div class="filter-group">
+                    <label class="mono text-xs text-slate-400 block mb-1">SEARCH QUERY</label>
+                    <input type="text" id="searchInput" class="search-input" placeholder="Keyword, Hash, Agent...">
+                </div>
+
+                <div class="filter-group">
+                    <label class="mono text-xs text-slate-400 block mb-1">ARTIFACT TYPE</label>
+                    <select id="typeFilter" class="search-input" style="cursor:pointer;">
+                        <option value="ALL">ALL TYPES</option>
+                        <option value="DAILY_BRIEFING">DAILY BRIEFING</option>
+                        <option value="MARKET_PULSE">MARKET PULSE</option>
+                        <option value="NEWSLETTER">NEWSLETTER</option>
+                        <option value="STRATEGY">STRATEGY</option>
+                        <option value="DEEP_DIVE">DEEP DIVE</option>
+                        <option value="HISTORICAL">HISTORICAL ARCHIVE</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-title">COMMANDS</div>
+                <div class="flex flex-col gap-2">
+                    <button id="btnUpload" class="cyber-btn w-full text-left">
+                        <i class="fas fa-upload mr-2"></i> UPLOAD PACKET
+                    </button>
+                    <button id="btnExport" class="cyber-btn w-full text-left">
+                        <i class="fas fa-download mr-2"></i> EXPORT DATASET
+                    </button>
+                    <button class="cyber-btn w-full text-left" style="border-color:#ef4444; color:#ef4444;">
+                        <i class="fas fa-trash mr-2"></i> PURGE CACHE
+                    </button>
+                </div>
+            </div>
+
+            <div class="mt-auto">
+                <div class="sidebar-title">VIEW MODE</div>
+                <div class="flex items-center justify-between bg-slate-900 p-3 rounded border border-slate-700">
+                    <span class="mono text-xs text-slate-400">ANALYST</span>
+                    <label class="toggle-switch relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="viewToggle" class="sr-only peer">
+                        <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-cyan-600"></div>
+                    </label>
+                    <span class="mono text-xs text-green-400">SYSTEM</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Workspace -->
+        <main class="repo-main custom-scrollbar">
+
+            <!-- Dashboard Header -->
+            <div class="repo-dashboard">
+                <div class="metric-card">
+                    <span class="metric-label">TOTAL INTELLIGENCE</span>
+                    <span class="metric-value text-cyan-glow" id="metricTotal">--</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-label">AVG SENTIMENT</span>
+                    <span class="metric-value" id="metricSentiment">--</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-label">HIGH CONVICTION</span>
+                    <span class="metric-value text-purple-400" id="metricHighConviction">--</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-label">SYSTEM LOAD</span>
+                    <span class="metric-value mono text-xs text-slate-400" id="metricSystemLoad">CALCULATING...</span>
+                </div>
+            </div>
+
+            <!-- Content Area -->
+            <div id="gridContainer" class="repo-grid">
+                <!-- Javascript Injected -->
+                <div class="mono text-center text-slate-500 w-full col-span-3 mt-10">INITIALIZING REPOSITORY...</div>
+            </div>
+
+            <div id="machineContainer" class="repo-machine-view">
+                <!-- JSON Injected -->
+            </div>
+
+        </main>
+
+    </div>
+
+</body>
+</html>

@@ -633,7 +633,7 @@ def create_app(config_name='default'):
         scenario_id = request.args.get('id', '2008_CRASH')
 
         if scenario_engine:
-            if scenario_engine.active_scenario is None or scenario_engine.active_scenario['name'] != scenario_id:
+            if scenario_engine.active_scenario is None or scenario_engine.active_scenario.get('id') != scenario_id:
                  scenario_engine.set_scenario(scenario_id)
 
             pulse = scenario_engine.get_pulse()

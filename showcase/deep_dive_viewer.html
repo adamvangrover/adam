@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM :: DEEP DIVE VIEWER</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/cyberpunk-core.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Merriweather:wght@300;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/nav.js" data-root=".." defer></script>
+    <style>
+        body { background-color: #050505; color: #cbd5e1; font-family: 'Merriweather', serif; }
+        .ui-mono { font-family: 'JetBrains Mono', monospace; }
+
+        .sidebar { width: 250px; background: #0f172a; border-right: 1px solid #1e293b; display: flex; flex-direction: column; }
+        .main-content { flex: 1; padding: 40px; overflow-y: auto; max-width: 900px; margin: 0 auto; }
+        .right-panel { width: 300px; background: #0f172a; border-left: 1px solid #1e293b; padding: 20px; }
+
+        .toc-item {
+            padding: 10px 20px; font-size: 0.8rem; color: #94a3b8; cursor: pointer; border-left: 2px solid transparent; transition: all 0.2s;
+        }
+        .toc-item:hover, .toc-item.active { background: #1e293b; color: #fff; border-left-color: #06b6d4; }
+
+        h1 { font-size: 2.5rem; font-weight: 700; color: #fff; margin-bottom: 10px; line-height: 1.2; }
+        h2 { font-size: 1.5rem; font-weight: 700; color: #e2e8f0; margin-top: 30px; margin-bottom: 15px; border-bottom: 1px solid #334155; padding-bottom: 5px; }
+        h3 { font-size: 1.2rem; font-weight: 700; color: #94a3b8; margin-top: 20px; margin-bottom: 10px; }
+        p { margin-bottom: 15px; line-height: 1.8; }
+        ul { list-style-type: disc; margin-left: 20px; margin-bottom: 15px; }
+        li { margin-bottom: 5px; }
+
+        .entity-card { background: #1e293b; border: 1px solid #334155; padding: 10px; margin-bottom: 10px; border-radius: 4px; }
+        .sentiment-Bullish { color: #4ade80; }
+        .sentiment-Bearish { color: #f87171; }
+        .sentiment-Neutral { color: #94a3b8; }
+    </style>
+</head>
+<body class="h-screen flex overflow-hidden">
+
+    <!-- Sidebar TOC -->
+    <aside class="sidebar ui-mono">
+        <div class="p-4 border-b border-slate-700 bg-slate-900">
+            <div class="text-xs text-cyan-400 font-bold tracking-widest">DEEP DIVE PROTOCOL</div>
+            <div class="text-[10px] text-slate-500 mt-1">ID: <span id="report-id">LOADING...</span></div>
+        </div>
+        <nav id="toc-list" class="flex-1 overflow-y-auto py-4">
+            <!-- TOC Injected Here -->
+        </nav>
+        <div class="p-4 border-t border-slate-700">
+            <a href="intelligence_library.html" class="flex items-center gap-2 text-slate-400 hover:text-white text-xs">
+                <i class="fas fa-arrow-left"></i> BACK TO LIBRARY
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main id="content-area" class="main-content custom-scrollbar">
+        <div class="text-center py-20 text-slate-500 ui-mono">LOADING REPORT DATA...</div>
+    </main>
+
+    <!-- Right Panel: Entities & Meta -->
+    <aside class="right-panel ui-mono custom-scrollbar">
+        <div class="mb-6">
+            <h3 class="text-xs font-bold text-slate-400 uppercase mb-2">Metadata</h3>
+            <div class="text-xs text-slate-300 space-y-1">
+                <div class="flex justify-between"><span>AUTHOR:</span> <span class="text-white" id="meta-author">-</span></div>
+                <div class="flex justify-between"><span>DATE:</span> <span class="text-white" id="meta-date">-</span></div>
+                <div class="flex justify-between"><span>CONFIDENCE:</span> <span class="text-green-400">92.4%</span></div>
+            </div>
+        </div>
+
+        <div class="mb-6">
+            <h3 class="text-xs font-bold text-slate-400 uppercase mb-2">Identified Entities</h3>
+            <div id="entity-list">
+                <!-- Entities Injected Here -->
+            </div>
+        </div>
+
+        <div class="mt-auto">
+            <button onclick="downloadData()" class="w-full btn-cyber text-xs py-2 mb-2">
+                <i class="fas fa-download"></i> DOWNLOAD JSON
+            </button>
+            <button class="w-full btn-cyber secondary text-xs py-2">
+                <i class="fas fa-brain"></i> ASK SYSTEM 2
+            </button>
+        </div>
+    </aside>
+
+    <script>
+        let reportData = null;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                // In a real app, we'd get ID from URL param. Here we load the sample.
+                const res = await fetch('data/deep_dive_sample.json');
+                if(!res.ok) throw new Error("Failed to load report");
+                reportData = await res.json();
+                renderReport(reportData);
+            } catch(e) {
+                document.getElementById('content-area').innerHTML = `<div class="text-red-500 text-center mt-20">ERROR: ${e.message}</div>`;
+            }
+        });
+
+        function renderReport(data) {
+            // Meta
+            document.getElementById('report-id').innerText = data.id;
+            document.getElementById('meta-author').innerText = data.author;
+            document.getElementById('meta-date').innerText = data.date;
+
+            // Header
+            const main = document.getElementById('content-area');
+            main.innerHTML = `
+                <div class="mb-10 border-b border-slate-700 pb-6">
+                    <div class="ui-mono text-xs text-cyan-400 mb-2 font-bold tracking-widest">${data.tags.join(' // ').toUpperCase()}</div>
+                    <h1>${data.title}</h1>
+                    <div class="text-xl text-slate-400 italic">${data.subtitle}</div>
+                </div>
+            `;
+
+            // Sections & TOC
+            const toc = document.getElementById('toc-list');
+            toc.innerHTML = '';
+
+            data.sections.forEach((sec, index) => {
+                // TOC Item
+                const link = document.createElement('div');
+                link.className = 'toc-item';
+                link.innerText = sec.title;
+                link.onclick = () => document.getElementById(sec.id).scrollIntoView({ behavior: 'smooth' });
+                toc.appendChild(link);
+
+                // Section Content
+                const secDiv = document.createElement('section');
+                secDiv.id = sec.id;
+                secDiv.className = 'mb-12';
+
+                let contentHtml = '';
+                if(sec.type === 'text') {
+                    contentHtml = sec.content; // Render HTML directly
+                } else if (sec.type === 'chart') {
+                    contentHtml = `
+                        <div class="bg-slate-900 border border-slate-700 p-4 rounded my-4">
+                            <canvas id="canvas-${sec.id}"></canvas>
+                            <div class="text-center text-xs text-slate-500 mt-2 ui-mono">${sec.caption || ''}</div>
+                        </div>
+                    `;
+                }
+
+                secDiv.innerHTML = `
+                    <h2 class="ui-mono text-cyan-500 flex items-center gap-2">
+                        <span class="text-xs text-slate-600">0${index+1}</span> ${sec.title}
+                    </h2>
+                    <div class="text-lg text-slate-300">
+                        ${contentHtml}
+                    </div>
+                `;
+                main.appendChild(secDiv);
+
+                // Render Chart if needed
+                if(sec.type === 'chart' && sec.data) {
+                    const ctx = document.getElementById(`canvas-${sec.id}`).getContext('2d');
+                    new Chart(ctx, {
+                        type: sec.chartType || 'bar',
+                        data: sec.data,
+                        options: {
+                            responsive: true,
+                            plugins: { legend: { labels: { color: '#94a3b8' } } },
+                            scales: {
+                                y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' } },
+                                x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+                            }
+                        }
+                    });
+                }
+            });
+
+            // Entities
+            const entList = document.getElementById('entity-list');
+            data.entities.forEach(ent => {
+                const el = document.createElement('div');
+                el.className = 'entity-card';
+                el.innerHTML = `
+                    <div class="flex justify-between items-center mb-1">
+                        <div class="font-bold text-white">${ent.name}</div>
+                        <div class="text-[10px] text-slate-500">${ent.ticker || 'N/A'}</div>
+                    </div>
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-slate-400">Relevance: ${ent.relevance}%</span>
+                        <span class="sentiment-${ent.sentiment.trim()}">${ent.sentiment}</span>
+                    </div>
+                `;
+                entList.appendChild(el);
+            });
+        }
+
+        function downloadData() {
+            if(!reportData) return;
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(reportData, null, 2));
+            const downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            downloadAnchorNode.setAttribute("download", reportData.id + ".json");
+            document.body.appendChild(downloadAnchorNode);
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+        }
+    </script>
+</body>
+</html>

@@ -134,12 +134,14 @@ Adam unifies three critical domains into a single cognitive architecture:
 ### 3. Agentic Workflow
 *   **Meta-Orchestration:** Dynamic routing of queries to specialized agents.
 *   **Consensus Engine:** Aggregating multi-agent perspectives into a single conviction score.
+*   **Governance Layer:** API Gatekeeper and Structured Narrative Logging for enterprise safety.
 
 ---
 
 ## 🗺️ Roadmap: Path to Autonomy
 
 *   **Phase 1 (Current): The Autonomous Analyst.** Deep Dives, Credit Memos, and Regulatory Grading.
+*   **Phase 1.5 (ADAM-V-NEXT): The Command Center.** Synthesizer Dashboard, Agent Intercom, and War Room.
 *   **Phase 2 (Q3 2025): The Portfolio Manager.** Multi-entity risk aggregation and automated rebalancing.
 *   **Phase 3 (Q3 2026): The Market Maker.** High-frequency sentiment trading and liquidity provision via Quantum RL.
 
