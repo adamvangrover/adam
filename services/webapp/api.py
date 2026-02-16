@@ -3,6 +3,8 @@ from flask import Flask, jsonify, request
 from flask_socketio import SocketIO, emit
 from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, JWTManager, get_jwt_identity, get_jwt
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 from werkzeug.exceptions import HTTPException
 from werkzeug.security import generate_password_hash, check_password_hash
 import sys
@@ -168,6 +170,7 @@ def _validate_asset_symbol(symbol: str) -> bool:
 db = SQLAlchemy()
 socketio = SocketIO()
 jwt = JWTManager()
+limiter = Limiter(key_func=get_remote_address)
 permission_manager = None
 agent_orchestrator = None
 meta_orchestrator = None
@@ -296,6 +299,10 @@ def create_app(config_name='default'):
     # 🛡️ Sentinel: Configured CORS from settings to avoid wildcard access.
     socketio.init_app(app, cors_allowed_origins=app.config.get('CORS_ALLOWED_ORIGINS', []))
     jwt.init_app(app)
+
+    # 🛡️ Sentinel: Initialize Rate Limiter
+    # Reads RATELIMIT_STORAGE_URI from config
+    limiter.init_app(app)
 
     # 🛡️ Governance: Initialize middleware
     # Protocol: ADAM-V-NEXT
@@ -1008,6 +1015,7 @@ def create_app(config_name='default'):
     # ---------------------------------------------------------------------------- #
 
     @app.route('/api/register', methods=['POST'])
+    @limiter.limit("5 per minute")
     def register():
         data = request.get_json()
         username = data.get('username')
