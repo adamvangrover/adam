@@ -82,16 +82,26 @@
     <script>
         async function initMap() {
             try {
-                const res = await fetch('site_map.json');
-                const siteMap = await res.json();
-                renderGraph(siteMap);
+                // Fetch both Site Map and Repo Metadata
+                const [siteRes, repoRes] = await Promise.all([
+                    fetch('site_map.json'),
+                    fetch('data/repo_metadata.json')
+                ]);
+
+                const siteMap = await siteRes.json();
+                let repoData = { agents: [] };
+                if (repoRes.ok) {
+                    repoData = await repoRes.json();
+                }
+
+                renderGraph(siteMap, repoData);
             } catch (e) {
-                console.error("Failed to load site map", e);
-                document.getElementById('network-container').innerHTML = `<div class='text-red-500 p-10 font-mono'>Failed to load site map.</div>`;
+                console.error("Failed to load map data", e);
+                document.getElementById('network-container').innerHTML = `<div class='text-red-500 p-10 font-mono'>Failed to load map data.</div>`;
             }
         }
 
-        function renderGraph(siteMap) {
+        function renderGraph(siteMap, repoData) {
             const nodes = [];
             const edges = [];
             const categories = siteMap.categories;
@@ -99,6 +109,7 @@
             // Center Node
             nodes.push({ id: 'hub', label: 'ADAM\nCORE', shape: 'hexagon', size: 40, color: '#ef4444', font: { color: '#fff', size: 16 } });
 
+            // 1. Render Site Map Structure
             categories.forEach((cat, idx) => {
                 // Category Node
                 const catNodeId = `cat_${cat.id}`;
@@ -109,7 +120,7 @@
                     color: { background: '#1e293b', border: '#0ea5e9' },
                     font: { color: '#38bdf8' }
                 });
-                edges.push({ from: 'hub', to: catNodeId, length: 200, color: { color: '#333', opacity: 0.5 } });
+                edges.push({ from: 'hub', to: catNodeId, length: 250, color: { color: '#333', opacity: 0.5 } });
 
                 // Page Nodes
                 cat.items.forEach(item => {
@@ -120,11 +131,66 @@
                         size: 10,
                         color: '#10b981',
                         title: item.description, // Tooltip
-                        font: { color: '#d1d5db', size: 12, face: 'JetBrains Mono' }
+                        font: { color: '#d1d5db', size: 12, face: 'JetBrains Mono' },
+                        group: 'page'
                     });
-                    edges.push({ from: catNodeId, to: item.link, length: 100, color: '#334155' });
+                    edges.push({ from: catNodeId, to: item.link, length: 150, color: '#334155' });
                 });
             });
+
+            // 2. Render Agents
+            if (repoData && repoData.agents) {
+                // Create an "Agent Swarm" node attached to "System & Agents" category
+                const swarmId = 'agent_swarm';
+                nodes.push({
+                    id: swarmId,
+                    label: 'AGENT\nSWARM',
+                    shape: 'diamond',
+                    size: 25,
+                    color: '#8b5cf6', // Purple
+                    font: { color: '#fff' }
+                });
+
+                // Connect Swarm to System category if it exists, otherwise hub
+                const systemCat = categories.find(c => c.id === 'system');
+                if (systemCat) {
+                    edges.push({ from: `cat_${systemCat.id}`, to: swarmId, length: 150, color: '#8b5cf6' });
+                } else {
+                    edges.push({ from: 'hub', to: swarmId, length: 200 });
+                }
+
+                repoData.agents.forEach(agent => {
+                    const agentId = `agent_${agent.name}`;
+                    // Skip if already exists to prevent duplicate ID errors
+                    if (nodes.find(n => n.id === agentId)) return;
+
+                    const isVerified = !!agent.verification_script;
+
+                    nodes.push({
+                        id: agentId,
+                        label: agent.name,
+                        shape: 'dot',
+                        size: isVerified ? 8 : 5,
+                        color: isVerified ? '#a78bfa' : '#4c1d95', // Lighter purple if verified
+                        title: `Agent: ${agent.name}\n${agent.docstring || ''}`,
+                        group: 'agent'
+                    });
+
+                    // Connect to Swarm
+                    edges.push({ from: swarmId, to: agentId, length: 100, color: { color: '#8b5cf6', opacity: 0.2 } });
+
+                    // Connect to Linked Pages
+                    if (agent.linked_pages) {
+                        agent.linked_pages.forEach(pagePath => {
+                            const pageName = pagePath.split('/').pop();
+                            // Find if page node exists (it uses filename as ID in site map loop above)
+                            if (nodes.find(n => n.id === pageName)) {
+                                edges.push({ from: agentId, to: pageName, color: { color: '#00f3ff', opacity: 0.3, dashes: true } });
+                            }
+                        });
+                    }
+                });
+            }
 
             const container = document.getElementById('network-container');
             const data = {
@@ -158,6 +224,9 @@
                     const nodeId = params.nodes[0];
                     if (nodeId.endsWith('.html')) {
                         window.location.href = nodeId;
+                    }
+                    else if (nodeId.startsWith('agent_')) {
+                        console.log("Clicked Agent:", nodeId);
                     }
                 }
             });
