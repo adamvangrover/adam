@@ -1,0 +1,200 @@
+/* Mayhem Neural Link Overlay */
+#mayhem-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(5, 11, 20, 0.95);
+    backdrop-filter: blur(15px);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    font-family: 'Inter', sans-serif;
+    color: #e0e0e0;
+}
+
+#mayhem-overlay.active {
+    opacity: 1;
+    pointer-events: all;
+}
+
+/* Header / Prompt Area */
+.mayhem-header {
+    padding: 20px 40px;
+    border-bottom: 1px solid rgba(0, 243, 255, 0.2);
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.mayhem-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.2rem;
+    color: #00f3ff;
+    letter-spacing: 2px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.mayhem-close-btn {
+    background: none;
+    border: 1px solid #333;
+    color: #666;
+    padding: 5px 10px;
+    cursor: pointer;
+    font-family: 'JetBrains Mono', monospace;
+    transition: all 0.2s;
+}
+.mayhem-close-btn:hover {
+    border-color: #ff0055;
+    color: #ff0055;
+}
+
+.prompt-container {
+    position: relative;
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+#mayhem-prompt {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid #333;
+    padding: 15px 20px;
+    padding-right: 50px;
+    color: #fff;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1rem;
+    border-radius: 4px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+#mayhem-prompt:focus {
+    border-color: #00f3ff;
+    box-shadow: 0 0 15px rgba(0, 243, 255, 0.1);
+}
+
+.prompt-icon {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #00f3ff;
+    animation: pulse 2s infinite;
+}
+
+/* Grid Layout */
+.mayhem-grid {
+    flex: 1;
+    padding: 40px;
+    overflow-y: auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    align-content: start;
+}
+
+/* Card Styles */
+.mayhem-card {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid #333;
+    border-radius: 6px;
+    padding: 20px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.mayhem-card:hover {
+    transform: translateY(-5px);
+    border-color: #00f3ff;
+    background: rgba(0, 243, 255, 0.05);
+    box-shadow: 0 10px 30px -10px rgba(0, 243, 255, 0.1);
+}
+
+.card-meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    color: #666;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.card-type {
+    color: #00f3ff;
+    font-weight: bold;
+}
+
+.card-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: #eee;
+    line-height: 1.4;
+}
+
+.card-summary {
+    font-size: 0.85rem;
+    color: #aaa;
+    flex-grow: 1;
+    margin-bottom: 15px;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 10px;
+    margin-top: auto;
+}
+
+.sentiment-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #666;
+}
+.sent-high { background: #00ff00; box-shadow: 0 0 5px #00ff00; }
+.sent-mid { background: #ffff00; }
+.sent-low { background: #ff0055; box-shadow: 0 0 5px #ff0055; }
+
+/* Analysis Mode */
+#mayhem-analysis {
+    display: none;
+    padding: 20px;
+    background: rgba(0, 20, 40, 0.8);
+    border-bottom: 1px solid #00f3ff;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.9rem;
+    color: #00f3ff;
+    white-space: pre-wrap;
+}
+
+@keyframes pulse {
+    0% { opacity: 0.5; }
+    50% { opacity: 1; }
+    100% { opacity: 0.5; }
+}
+
+/* Scrollbar */
+.mayhem-grid::-webkit-scrollbar { width: 6px; }
+.mayhem-grid::-webkit-scrollbar-track { background: #050b14; }
+.mayhem-grid::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+.mayhem-grid::-webkit-scrollbar-thumb:hover { background: #00f3ff; }
