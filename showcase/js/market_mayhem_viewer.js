@@ -25,6 +25,28 @@ function toggleTheme() {
     showToast('THEME: ' + (isDark ? 'DARK_MODE' : 'LIGHT_MODE'));
 }
 
+function syntaxHighlight(json) {
+    if (typeof json != 'string') {
+         json = JSON.stringify(json, undefined, 2);
+    }
+    json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+        var cls = 'json-number';
+        if (/^"/.test(match)) {
+            if (/:$/.test(match)) {
+                cls = 'json-key';
+            } else {
+                cls = 'json-string';
+            }
+        } else if (/true|false/.test(match)) {
+            cls = 'json-boolean';
+        } else if (/null/.test(match)) {
+            cls = 'json-null';
+        }
+        return '<span class="' + cls + '">' + match + '</span>';
+    });
+}
+
 function toggleSource() {
     const modal = document.getElementById('raw-source-modal');
     const content = document.getElementById('raw-source-content');
@@ -38,9 +60,40 @@ function toggleSource() {
     if (modal.style.display === 'flex') {
         modal.style.display = 'none';
     } else {
-        content.innerText = rawDataArea.value || "NO SOURCE DATA AVAILABLE.";
+        const rawText = rawDataArea.value || "{}";
+        try {
+            // Re-parse to ensure formatting
+            const jsonObj = JSON.parse(rawText);
+            const formatted = JSON.stringify(jsonObj, null, 2);
+            content.innerHTML = syntaxHighlight(formatted);
+        } catch (e) {
+            content.innerText = rawText || "NO SOURCE DATA AVAILABLE.";
+        }
         modal.style.display = 'flex';
     }
+}
+
+function shareReport() {
+    const url = window.location.href;
+    navigator.clipboard.writeText(url).then(() => {
+        showToast('LINK COPIED TO CLIPBOARD');
+    }).catch(err => {
+        console.error('Failed to copy: ', err);
+        showToast('COPY FAILED');
+    });
+}
+
+function downloadReport() {
+    const title = document.title || 'report';
+    const content = document.getElementById('paper-sheet').innerText;
+    const blob = new Blob([content], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = title.replace(/[^a-z0-9]/gi, '_').toLowerCase() + '.txt';
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast('DOWNLOAD STARTED');
 }
 
 // --- Verification Logic ---
@@ -57,18 +110,18 @@ function runVerification() {
     overlay.style.display = 'flex';
     content.innerHTML = '';
 
-    const lines = [
-        "INITIATING SYSTEM 2 PROTOCOL...",
-        "VERIFYING CRYPTOGRAPHIC SIGNATURE...",
-        "HASH: " + provHash,
-        "CHECKING CHAIN OF CUSTODY...",
-        "SCANNING FOR ANOMALIES...",
-        "ANALYZING SENTIMENT VECTORS...",
-        "CROSS-REFERENCING KNOWLEDGE GRAPH...",
-        "VERIFICATION COMPLETE."
+    const steps = [
+        { text: "INITIATING SYSTEM 2 PROTOCOL...", delay: 500 },
+        { text: "ESTABLISHING SECURE HANDSHAKE...", delay: 800 },
+        { text: "DECRYPTING LAYERS [AES-256]...", delay: 1200 },
+        { text: "VERIFYING CRYPTOGRAPHIC SIGNATURE...", delay: 1500 },
+        { text: "HASH: " + provHash, delay: 1800 },
+        { text: "CHECKING CHAIN OF CUSTODY...", delay: 2200 },
+        { text: "SCANNING FOR ANOMALIES...", delay: 2600 },
+        { text: "ANALYZING SENTIMENT VECTORS...", delay: 3000 },
+        { text: "CROSS-REFERENCING KNOWLEDGE GRAPH...", delay: 3500 },
+        { text: "ACCESS GRANTED.", delay: 4000 }
     ];
-
-    let i = 0;
 
     function addRandomHex() {
         const hex = Math.random().toString(16).substring(2, 14).toUpperCase();
@@ -81,43 +134,40 @@ function runVerification() {
         content.scrollTop = content.scrollHeight;
     }
 
-    function addLine() {
-        if (i < lines.length) {
+    steps.forEach((step, index) => {
+        setTimeout(() => {
             const div = document.createElement('div');
             div.className = 'system2-line';
-            div.innerText = '> ' + lines[i];
+            div.innerText = '> ' + step.text;
             div.style.opacity = 1;
             content.appendChild(div);
             content.scrollTop = content.scrollHeight;
 
-            // Burst of hex codes between lines
-            let hexCount = 0;
+             let hexCount = 0;
             const hexInterval = setInterval(() => {
                 addRandomHex();
                 hexCount++;
-                if(hexCount > 5) clearInterval(hexInterval);
+                if(hexCount > 3) clearInterval(hexInterval);
             }, 50);
 
-            i++;
-            setTimeout(addLine, 600);
-        } else {
-            setTimeout(() => {
-                overlay.style.display = 'none';
-                showToast('DOCUMENT VERIFIED');
-                if(status) {
-                    status.innerText = "VERIFIED // AUTHENTICATED";
-                    status.style.color = "#aaffaa";
-                    status.style.textShadow = "0 0 10px #00ff00";
-                }
-                if (stamp) {
-                    stamp.style.display = 'block';
-                    // Add a slight rubber stamp animation class if we had one
-                }
-            }, 1000);
-        }
-    }
-    addLine();
+            if (index === steps.length - 1) {
+                 setTimeout(() => {
+                    overlay.style.display = 'none';
+                    showToast('DOCUMENT VERIFIED');
+                    if(status) {
+                        status.innerText = "VERIFIED // AUTHENTICATED";
+                        status.style.color = "#aaffaa";
+                        status.style.textShadow = "0 0 10px #00ff00";
+                    }
+                    if (stamp) {
+                        stamp.style.display = 'block';
+                    }
+                }, 1000);
+            }
+        }, step.delay);
+    });
 }
+
 
 // --- Redaction Logic ---
 
