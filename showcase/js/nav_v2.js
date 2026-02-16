@@ -28,7 +28,7 @@ class AdamNavigator {
     /**
      * MASTER BOOT SEQUENCE
      */
-    init() {
+    async init() {
         try {
             console.log(`[AdamNavigator] Initializing v${this.version}...`);
 
@@ -41,17 +41,20 @@ class AdamNavigator {
             // 2. Resolve Environment Paths
             this._resolvePaths();
 
-            // 3. Inject External Dependencies (CSS/Fonts)
+            // 3. Load Site Map
+            await this._fetchSiteMap();
+
+            // 4. Inject External Dependencies (CSS/Fonts)
             this._injectDependencies();
 
-            // 4. Boot Core Application Logic (Mock Data/App.js)
+            // 5. Boot Core Application Logic (Mock Data/App.js)
             this._bootCoreSystem();
 
-            // 5. Render Interface
+            // 6. Render Interface
             this._renderNavigation();
             this._injectGlobalStyles();
 
-            // 6. Bind Human Interaction Events
+            // 7. Bind Human Interaction Events
             this._bindEvents();
 
             console.log("[AdamNavigator] System Online.");
@@ -59,6 +62,18 @@ class AdamNavigator {
         } catch (e) {
             console.error("[AdamNavigator] Critical Failure:", e);
             this._renderSafeMode(e);
+        }
+    }
+
+    async _fetchSiteMap() {
+        try {
+            const response = await fetch(this._sanitizePath(`${this.showcasePath}/site_map.json`));
+            if (response.ok) {
+                this.siteMap = await response.json();
+                console.log("[AdamNavigator] Site Map Loaded");
+            }
+        } catch (e) {
+            console.warn("[AdamNavigator] Site Map Load Failed, using fallback.", e);
         }
     }
 
@@ -82,12 +97,6 @@ class AdamNavigator {
 
         const cleanRoot = this.rootPath.replace(/\/$/, '');
         this.showcasePath = `${cleanRoot}/showcase`;
-
-        // Remove double slashes or self-references if needed
-        if (this.showcasePath.startsWith('./showcase') && window.location.pathname.includes('/showcase/')) {
-             // If we are in showcase, ./showcase is wrong. It should be just .
-             // But simpler to just rely on rootPath being correct.
-        }
 
         console.log(`[AdamNavigator] Environment: ${this.isGitHub ? 'GITHUB' : 'LOCAL'} | Root: ${this.rootPath} | Showcase: ${this.showcasePath}`);
     }
@@ -155,6 +164,24 @@ class AdamNavigator {
      * Returns the Menu Configuration Object
      */
     _getMenuConfig() {
+        if (this.siteMap && this.siteMap.categories) {
+            const menu = [];
+            this.siteMap.categories.forEach((cat, index) => {
+                if (index > 0) menu.push({ type: 'divider' });
+                cat.items.forEach(item => {
+                    menu.push({
+                        name: item.name,
+                        icon: item.icon || 'fa-circle',
+                        link: item.link
+                    });
+                });
+            });
+            menu.push({ type: 'divider' });
+            menu.push({ name: 'Root Directory', icon: 'fa-folder-tree', link: 'ROOT' });
+            return menu;
+        }
+
+        // Fallback
         return [
             { name: 'Mission Control', icon: 'fa-tachometer-alt', link: 'index.html' },
             { name: 'Mission Control v3', icon: 'fa-satellite-dish', link: 'mission_control_v3.html' },
