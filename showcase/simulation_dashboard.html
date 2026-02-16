@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM v23.5 :: SIMULATION RUN</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/market_mayhem_tiers.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/nav.js" defer></script>
+    <style>
+        .sim-container { display: grid; grid-template-columns: 300px 1fr; gap: 20px; padding: 20px; height: calc(100vh - 60px); }
+        .sim-sidebar { background: rgba(0,0,0,0.3); border-right: 1px solid #333; padding: 20px; overflow-y: auto; }
+        .sim-main { overflow-y: auto; }
+        .sim-log-item { font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; margin-bottom: 5px; color: #aaa; border-bottom: 1px solid #222; padding-bottom: 5px; }
+        .sim-log-date { color: #00f3ff; }
+        .sim-log-action { color: #fff; }
+        .chart-wrapper { background: rgba(0,0,0,0.5); border: 1px solid #333; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+        .stat-card { background: rgba(0, 243, 255, 0.05); border: 1px solid #00f3ff; padding: 15px; margin-bottom: 10px; border-radius: 4px; }
+        .stat-label { font-size: 0.7rem; color: #888; text-transform: uppercase; letter-spacing: 1px; }
+        .stat-value { font-size: 1.5rem; font-family: 'JetBrains Mono'; color: #fff; }
+        .controls { display: flex; gap: 10px; margin-bottom: 20px; }
+        .cyber-btn-small { background: transparent; border: 1px solid #00f3ff; color: #00f3ff; padding: 5px 10px; cursor: pointer; font-family: 'JetBrains Mono'; font-size: 0.8rem; transition: all 0.2s; }
+        .cyber-btn-small:hover { background: rgba(0, 243, 255, 0.1); }
+    </style>
+</head>
+<body class="tier-high">
+    <div class="doc-header-ui" style="display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background: #050b14; border-bottom: 1px solid #333;">
+        <span style="color: #00f3ff; font-family: 'JetBrains Mono';">ADAM v23.5 // SIMULATION ENGINE</span>
+        <div>
+            <a href="market_mayhem_archive.html" class="cyber-btn-small" style="text-decoration:none;">EXIT SIMULATION</a>
+        </div>
+    </div>
+
+    <div class="sim-container">
+        <aside class="sim-sidebar">
+            <h3 style="color: #fff; font-family: 'JetBrains Mono'; border-bottom: 1px solid #00f3ff; padding-bottom: 10px;">RUN LOG</h3>
+            <div id="simulation-log">
+                <!-- Logs injected via JS -->
+            </div>
+        </aside>
+
+        <main class="sim-main">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 style="margin: 0;">SIMULATION DASHBOARD: <span id="sim-scenario-name">LOADING...</span></h2>
+                <div class="controls">
+                    <button class="cyber-btn-small" onclick="startReplay()"><i class="fas fa-play"></i> REPLAY</button>
+                    <button class="cyber-btn-small" onclick="pauseReplay()"><i class="fas fa-pause"></i> PAUSE</button>
+                    <button class="cyber-btn-small" onclick="resetReplay()"><i class="fas fa-undo"></i> RESET</button>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px;">
+                <div class="stat-card">
+                    <div class="stat-label">Current Date</div>
+                    <div class="stat-value" id="stat-date">--</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Portfolio Value</div>
+                    <div class="stat-value" id="stat-portfolio">--</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Sentiment</div>
+                    <div class="stat-value" id="stat-sentiment">--</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">S&P 500</div>
+                    <div class="stat-value" id="stat-spx">--</div>
+                </div>
+            </div>
+
+            <div class="chart-wrapper">
+                <canvas id="performanceChart"></canvas>
+            </div>
+
+            <div class="chart-wrapper">
+                <canvas id="sentimentChart"></canvas>
+            </div>
+        </main>
+    </div>
+
+    <!-- Data Injection -->
+    <script id="sim-data" type="application/json">
+        {"metadata": {"simulation_id": "SIM-9186", "start_date": "2026-01-16", "end_date": "2026-02-15", "scenario": "Tech Recovery & Volatility", "agent_version": "v23.5"}, "timeline": [{"date": "2026-01-16", "spx": 5115.27, "ndx": 18256.16, "portfolio_value": 1029244.22, "sentiment": 50.78, "actions": [], "system_status": "OPTIMAL"}, {"date": "2026-01-17", "spx": 5103.78, "ndx": 18514.05, "portfolio_value": 1056277.12, "sentiment": 53.53, "actions": [], "system_status": "OPTIMAL"}, {"date": "2026-01-18", "spx": 5188.9, "ndx": 18156.98, "portfolio_value": 1014741.01, "sentiment": 59.55, "actions": [], "system_status": "OPTIMAL"}, {"date": "2026-01-19", "spx": 5224.73, "ndx": 18173.91, "portfolio_value": 1020752.95, "sentiment": 51.13, "actions": [], "system_status": "OPTIMAL"}, {"date": "2026-01-20", "spx": 5229.91, "ndx": 17847.9, "portfolio_value": 987336.3, "sentiment": 55.07, "actions": [], "system_status": "OPTIMAL"}, {"date": "2026-01-21", "spx": 5286.4, "ndx": 17659.54, "portfolio_value": 969103.37, "sentiment": 51.96, "actions": [], "system_status": "OPTIMAL"}, {"date": "2026-01-22", "spx": 5337.34, "ndx": 17680.12, "portfolio_value": 968933.06, "sentiment": 46.92, "actions": [], "system_status": "OPTIMAL"}, {"date": "2026-01-23", "spx": 5357.05, "ndx": 17587.76, "portfolio_value": 958824.83, "sentiment": 50.87, "actions": [], "system_status": "OPTIMAL"}, {"date": "2026-01-24", "spx": 5293.19, "ndx": 17936.39, "portfolio_value": 996461.76, "sentiment": 59.48, "actions": [], "system_status": "OPTIMAL"}, {"date": "2026-01-25", "spx": 5298.56, "ndx": 17982.68, "portfolio_value": 1003420.45, "sentiment": 43.87, "actions": [], "system_status": "OPTIMAL"}, {"date": "2026-01-26", "spx": 5316.41, "ndx": 18141.93, "portfolio_value": 1024867.47, "sentiment": 53.94, "actions": [], "system_status": "OPTIMAL"}, {"date": "2026-01-27", "spx": 5227.73, "ndx": 18180.13, "portfolio_value": 1026185.11, "sentiment": 65.11, "actions": [], "system_status": "OPTIMAL"}, {"date": "2026-01-28", "spx": 5206.53, "ndx": 18017.12, "portfolio_value": 1005763.59, "sentiment": 60.58, "actions": [], "system_status": "OPTIMAL"}, {"date": "2026-01-29", "spx": 5214.17, "ndx": 18262.18, "portfolio_value": 1032707.02, "sentiment": 67.78, "actions": [], "system_status": "OPTIMAL"}, {"date": "2026-01-30", "spx": 5127.95, "ndx": 18531.32, "portfolio_value": 1069427.3, "sentiment": 62.97, "actions": [], "system_status": "OPTIMAL"}, {"date": "2026-01-31", "spx": 5106.75, "ndx": 18420.7, "portfolio_value": 1057204.78, "sentiment": 59.68, "actions": [], "system_status": "OPTIMAL"}, {"date": "2026-02-01", "spx": 5144.98, "ndx": 18460.99, "portfolio_value": 1059710.97, "sentiment": 57.24, "actions": [], "system_status": "OPTIMAL"}, {"date": "2026-02-02", "spx": 5082.61, "ndx": 18566.97, "portfolio_value": 1071715.97, "sentiment": 55.25, "actions": [], "system_status": "OPTIMAL"}, {"date": "2026-02-03", "spx": 5132.06, "ndx": 17969.12, "portfolio_value": 996959.44, "sentiment": 55.52, "actions": [], "system_status": "OPTIMAL"}, {"date": "2026-02-04", "spx": 5034.34, "ndx": 17740.55, "portfolio_value": 970986.55, "sentiment": 57.89, "actions": [], "system_status": "OPTIMAL"}, {"date": "2026-02-05", "spx": 5087.04, "ndx": 17617.75, "portfolio_value": 957181.87, "sentiment": 69.43, "actions": [], "system_status": "OPTIMAL"}, {"date": "2026-02-06", "spx": 5103.87, "ndx": 17434.01, "portfolio_value": 936809.92, "sentiment": 60.74, "actions": [], "system_status": "OPTIMAL"}, {"date": "2026-02-07", "spx": 5134.59, "ndx": 17169.47, "portfolio_value": 907940.54, "sentiment": 60.7, "actions": [], "system_status": "OPTIMAL"}, {"date": "2026-02-08", "spx": 5098.65, "ndx": 17329.64, "portfolio_value": 924725.7, "sentiment": 72.6, "actions": ["BUY 20 NVDA @ $899.75 (Sentiment High)"], "system_status": "OPTIMAL"}, {"date": "2026-02-09", "spx": 5085.97, "ndx": 17562.16, "portfolio_value": 948891.63, "sentiment": 65.43, "actions": [], "system_status": "OPTIMAL"}, {"date": "2026-02-10", "spx": 5040.38, "ndx": 17927.6, "portfolio_value": 989934.34, "sentiment": 65.86, "actions": [], "system_status": "OPTIMAL"}, {"date": "2026-02-11", "spx": 4969.2, "ndx": 18347.3, "portfolio_value": 1040312.52, "sentiment": 72.44, "actions": ["BUY 13 NVDA @ $233.30 (Sentiment High)"], "system_status": "OPTIMAL"}, {"date": "2026-02-12", "spx": 4985.51, "ndx": 18624.65, "portfolio_value": 1074896.66, "sentiment": 57.79, "actions": [], "system_status": "OPTIMAL"}, {"date": "2026-02-13", "spx": 4900.66, "ndx": 18634.2, "portfolio_value": 1077469.57, "sentiment": 67.95, "actions": [], "system_status": "OPTIMAL"}, {"date": "2026-02-14", "spx": 4876.03, "ndx": 18578.64, "portfolio_value": 1070126.79, "sentiment": 65.22, "actions": [], "system_status": "OPTIMAL"}]}
+    </script>
+
+    <script src="js/simulation_viewer.js"></script>
+</body>
+</html>

@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM v23.5 :: SYSTEM 2 AUDIT: Q1 2026</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/market_mayhem_tiers.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/nav.js" defer></script>
+    <script src="js/market_mayhem_viewer.js" defer></script>
+</head>
+<body class="tier-high">
+
+    <!-- System 2 Verification Overlay -->
+    <div id="system2-overlay" class="system2-overlay">
+        <div class="system2-terminal">
+            <div id="sys2-content"></div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="cyber-toast-container"></div>
+
+    <!-- Raw Source Modal -->
+    <div id="raw-source-modal" class="raw-source-modal">
+        <div class="raw-source-header">
+            <span>SOURCE_DATA.JSON</span>
+            <span style="cursor:pointer; color:#cc0000;" onclick="toggleSource()">[CLOSE]</span>
+        </div>
+        <div class="raw-source-content" id="raw-source-content"></div>
+    </div>
+
+    <!-- Virtual Toolbar for High Tier -->
+    <div class="doc-toolbar" style="display: flex;">
+        <div class="toolbar-item" onclick="window.location.href='market_mayhem_archive.html'"><strong>FILE</strong></div>
+        <div class="toolbar-item" onclick="showToast('EDIT MODE: READ ONLY (AUDIT)')">EDIT</div>
+        <div class="toolbar-item" onclick="toggleTheme()">VIEW</div>
+        <div class="toolbar-item" onclick="showToast('INSERT: PERMISSION DENIED')">INSERT</div>
+        <div class="toolbar-item" onclick="showToast('FORMAT: LOCKED')">FORMAT</div>
+        <div class="toolbar-item" onclick="runVerification()" style="color: #0078d7;"><strong>VERIFY</strong></div>
+        <div style="flex-grow:1;"></div>
+        <div class="toolbar-item" style="color:#666;">ADAM_V26_EDITOR</div>
+    </div>
+
+    <div class="newsletter-wrapper">
+        <div class="paper-sheet" id="paper-sheet">
+
+            <!-- High Tier Header UI -->
+            <div class="doc-header-ui" style="display: flex;">
+                <span id="verification-status" style="color: #ff00ff;">SYSTEM 2 // AUDIT PROTOCOL</span>
+                <span>1456a415</span>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; font-family:'JetBrains Mono'; font-size:0.8rem; color:#666; margin-bottom:20px; margin-top: 20px;">
+                <span>2026-03-31</span>
+                <span>ID: 1456a415</span>
+            </div>
+
+            <h1 class="title">SYSTEM 2 AUDIT: Q1 2026</h1>
+
+            <!-- Metadata Panel for High Tier (Embedded in Doc) -->
+            <div class="doc-metadata-panel" style="display: grid;">
+                <div class="doc-metadata-item"><strong>Classification</strong>INTERNAL_ONLY</div>
+                <div class="doc-metadata-item"><strong>Accuracy</strong>88/100</div>
+                <div class="doc-metadata-item"><strong>Bias</strong>12/100</div>
+                <div class="doc-metadata-item"><strong>Reviewer</strong>Overseer</div>
+            </div>
+
+            <div id="financialChartContainer" style="display:none; margin-bottom: 30px;">
+                <canvas id="financialChart"></canvas>
+            </div>
+
+
+        <h3>Executive Audit Summary: Q1 2026</h3>
+        <p>This report constitutes a meta-analysis of agentic outputs for the period Q1 2026. System 2 Overseer protocols were engaged to evaluate predictive accuracy and detect latent biases in the generative models.</p>
+
+        <h3>Performance Analysis</h3>
+        <p>The aggregate predictive accuracy for this quarter was <strong>88%</strong>. The primary driver of deviation was macro strategy volatility.</p>
+
+        <h3>Bias Detection</h3>
+        <p>Latent optimism bias was detected at a level of <strong>12%</strong>. Corrective weights have been applied to the 'Risk_Engine' and 'Sentiment_Crawler' agents for future iterations.</p>
+
+        <h3>Key Learning</h3>
+        <p>Model correctly anticipated the 'Reflationary Boom' but underestimated the persistence of services inflation (Sticky CPI > 3%). Sovereign AI thesis fully validated.</p>
+
+
+            <!-- Provenance Log (All Tiers) -->
+            <div class="provenance-log">
+                <div class="log-entry">
+                    <span>> HASH_CHECK</span>
+                    <span style="color:var(--terminal-green);">1456a415f44d5159ae6dc2f7944d951a5b3d963281f949f7223b7a9c34ad44c6</span>
+                </div>
+                <div class="log-entry">
+                    <span>> PREDICTION_ACCURACY</span>
+                    <span>88% (DELTA: -12)</span>
+                </div>
+                <div class="log-entry">
+                    <span>> CRITIQUE_LOG</span>
+                    <span>"Model correctly anticipated the 'Reflationary Boom' but underestimated the persistence of services inflation (Sticky CPI > 3%). Sovereign AI thesis fully validated."</span>
+                </div>
+            </div>
+
+            <a href="#" class="source-jump-btn" onclick="toggleSource(); return false;" title="View Source JSON">JUMP TO SOURCE</a>
+
+            <div style="margin-top: 40px; border-top: 1px solid #ccc; padding-top: 20px; font-style: italic; color: #666;">
+                End of Audit.
+            </div>
+        </div>
+
+        <aside class="cyber-sidebar">
+            <div class="sidebar-widget">
+                <div class="sidebar-title">Audit Metadata</div>
+                <div class="stat-row"><span>DATE</span> <span class="stat-val">2026-03-31</span></div>
+                <div class="stat-row"><span>TYPE</span> <span class="stat-val">SYSTEM_AUDIT</span></div>
+                <div class="stat-row"><span>CLASS</span> <span class="stat-val">INTERNAL</span></div>
+                <div class="stat-row"><span>PROVENANCE</span> <span class="stat-val" title="1456a415f44d5159ae6dc2f7944d951a5b3d963281f949f7223b7a9c34ad44c6">1456a415</span></div>
+            </div>
+
+            <div class="sidebar-widget">
+                <div class="sidebar-title">System Accuracy</div>
+                <div class="stat-row"><span>SCORE</span> <span class="stat-val">88/100</span></div>
+                <div class="sentiment-bar">
+                    <div class="sentiment-fill" style="width: 88%; background: #00ff00;"></div>
+                </div>
+            </div>
+
+            <div class="sidebar-widget">
+                <div class="sidebar-title">Detected Entities</div>
+                <div class="tag-cloud">
+                    <a href="market_mayhem_archive.html?search=System_2" class="tag" style="text-decoration:none;">System_2</a><a href="market_mayhem_archive.html?search=Overseer" class="tag" style="text-decoration:none;">Overseer</a><a href="market_mayhem_archive.html?search=Audit" class="tag" style="text-decoration:none;">Audit</a><a href="market_mayhem_archive.html?search=Bias_Check" class="tag" style="text-decoration:none;">Bias_Check</a><a href="market_mayhem_archive.html?search=Accuracy" class="tag" style="text-decoration:none;">Accuracy</a>
+                </div>
+            </div>
+
+             <div class="sidebar-widget">
+                <div class="sidebar-title">Bias Detection</div>
+                 <div class="stat-row"><span>OPTIMISM BIAS</span> <span class="stat-val">12/100</span></div>
+                 <div class="sentiment-bar">
+                    <div class="sentiment-fill" style="width: 12%; background: #ff0000;"></div>
+                </div>
+            </div>
+
+             <div class="sidebar-widget" style="border-color: #555;">
+                <div class="sidebar-title">Audit Log</div>
+                 <div style="font-size: 0.75rem; color: #ccc; font-style: italic;">
+                    "Model correctly anticipated the 'Reflationary Boom' but underestimated the persistence of services inflation (Sticky CPI > 3%). Sovereign AI thesis fully validated."
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Hidden Raw Data -->
+    <textarea id="hidden-raw-data" style="display:none;">{
+  "period": "Q1 2026",
+  "date": "2026-03-31",
+  "focus": "Macro Strategy",
+  "accuracy": 88,
+  "bias": 12,
+  "critique": "Model correctly anticipated the 'Reflationary Boom' but underestimated the persistence of services inflation (Sticky CPI > 3%). Sovereign AI thesis fully validated.",
+  "metrics": {
+    "Prediction_Accuracy": {
+      "Jan": "85",
+      "Feb": "88",
+      "Mar": "92"
+    }
+  }
+}</textarea>
+
+    <script>
+        const metricsData = {"Prediction_Accuracy": {"Jan": "85", "Feb": "88", "Mar": "92"}};
+        if (metricsData && Object.keys(metricsData).length > 0) {
+            const ctx = document.getElementById('financialChart');
+            const container = document.getElementById('financialChartContainer');
+            let labels = [];
+            let values = [];
+            let labelName = "Metric";
+            for (const [key, val] of Object.entries(metricsData)) {
+                if (typeof val === 'object') {
+                    labels = Object.keys(val);
+                    values = Object.values(val).map(v => parseFloat(v));
+                    labelName = key;
+                    break;
+                }
+            }
+            if (labels.length > 0) {
+                container.style.display = 'block';
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: labelName,
+                            data: values,
+                            backgroundColor: 'rgba(255, 0, 255, 0.5)',
+                            borderColor: '#ff00ff',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: { legend: { display: true } }
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+</html>
