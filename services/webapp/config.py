@@ -11,6 +11,11 @@ class Config:
     # Limit maximum request body size to 16MB to prevent memory exhaustion attacks.
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024
 
+    # 🛡️ Sentinel: Rate Limiting
+    # Use Redis if available, otherwise fallback to memory
+    RATELIMIT_STORAGE_URI = os.environ.get('RATELIMIT_STORAGE_URI',
+                                         os.environ.get('CELERY_BROKER_URL', 'memory://'))
+
     @staticmethod
     def init_app(app):
         if not app.config.get('SECRET_KEY'):
