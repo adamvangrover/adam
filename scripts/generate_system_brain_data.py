@@ -1,13 +1,11 @@
 import os
 import json
-import glob
 import psutil
 import random
-from collections import defaultdict
+from collections import defaultdict, Counter
 
-SNAPSHOTS_DIR = "core/libraries_and_archives/snapshots"
-AUDIT_DIR = "core/libraries_and_archives/audit_trails"
-OUTPUT_FILE = "showcase/js/mock_system_brain_data.js"
+GRAPH_FILE = "showcase/data/system_knowledge_graph.json"
+OUTPUT_FILE = "showcase/js/system_brain_data.js"
 
 def get_hardware_metrics():
     """
@@ -32,51 +30,75 @@ def get_hardware_metrics():
         "tpu_memory_used_gb": round(32 * (tpu_load/100), 2)  # Assuming 32GB TPU RAM
     }
 
+def analyze_graph():
+    if not os.path.exists(GRAPH_FILE):
+        return {
+            "node_count": 0,
+            "edge_count": 0,
+            "agents": [],
+            "knowledge_nodes": 0,
+            "top_synapses": []
+        }
+
+    with open(GRAPH_FILE, 'r') as f:
+        graph = json.load(f)
+
+    nodes = graph.get("nodes", [])
+    edges = graph.get("edges", [])
+
+    # 1. Active Agents
+    agents = [n['label'] for n in nodes if n.get('group') == 'agent']
+
+    # 2. Knowledge Base Size
+    knowledge_nodes = sum(1 for n in nodes if n.get('group') in ['knowledge', 'doc', 'strategy'])
+
+    # 3. Connection Density (Synapses)
+    connection_counts = Counter()
+    for e in edges:
+        connection_counts[e['from']] += 1
+        connection_counts[e['to']] += 1
+
+    # Map IDs back to labels/titles
+    node_map = {n['id']: n for n in nodes}
+
+    top_synapses = []
+    for node_id, count in connection_counts.most_common(10):
+        node = node_map.get(node_id)
+        if node:
+            top_synapses.append({
+                "name": node.get('label', 'Unknown'),
+                "type": node.get('group', 'unknown'),
+                "connections": count
+            })
+
+    return {
+        "node_count": len(nodes),
+        "edge_count": len(edges),
+        "agents": agents,
+        "knowledge_nodes": knowledge_nodes,
+        "top_synapses": top_synapses
+    }
+
 def generate_brain_data():
-    # 1. Active Agents (from Snapshots)
-    active_agents = set()
-    memory_usage = defaultdict(int)
-
-    snapshot_files = glob.glob(os.path.join(SNAPSHOTS_DIR, "*.json"))
-    for f in snapshot_files:
-        try:
-            with open(f, 'r') as fp:
-                data = json.load(fp)
-                agent = data.get('agent_id')
-                active_agents.add(agent)
-                # Estimate memory size
-                mem_size = len(json.dumps(data.get('memory_state', {})))
-                memory_usage[agent] += mem_size
-        except:
-            pass
-
-    # 2. Activity Heatmap (from Audit Trails)
-    activity_counts = defaultdict(int)
-    audit_files = glob.glob(os.path.join(AUDIT_DIR, "*.json"))
-    for f in audit_files:
-        try:
-            with open(f, 'r') as fp:
-                data = json.load(fp)
-                agent = data.get('agent_id')
-                activity_counts[agent] += 1
-        except:
-            pass
+    graph_metrics = analyze_graph()
+    hw_metrics = get_hardware_metrics()
 
     # Structure for Frontend
     data = {
-        "active_agents": list(active_agents),
-        "memory_usage_bytes": memory_usage,
-        "activity_metrics": activity_counts,
-        "hardware_telemetry": get_hardware_metrics(),
+        "metrics": {
+            "active_agents_count": len(graph_metrics['agents']),
+            "active_agents_list": graph_metrics['agents'],
+            "knowledge_nodes_count": graph_metrics['knowledge_nodes'],
+            "knowledge_coverage": round((graph_metrics['knowledge_nodes'] / max(1, graph_metrics['node_count'])) * 100, 1),
+            "total_nodes": graph_metrics['node_count'],
+            "total_edges": graph_metrics['edge_count'],
+            "cognitive_load": round((graph_metrics['edge_count'] / max(1, graph_metrics['node_count'])) * 10, 2) # Mock calc
+        },
+        "synapses": graph_metrics['top_synapses'],
+        "hardware": hw_metrics,
         "system_status": "OPERATIONAL",
-        "timestamp": os.path.getmtime(SNAPSHOTS_DIR) if os.path.exists(SNAPSHOTS_DIR) else 0
+        "timestamp": os.path.getmtime(GRAPH_FILE) if os.path.exists(GRAPH_FILE) else 0
     }
-
-    # Mock data if empty
-    if not data["active_agents"]:
-        data["active_agents"] = ["SNCAnalystAgent", "BlackSwanAgent", "DeepSectorAnalyst"]
-        data["memory_usage_bytes"] = {"SNCAnalystAgent": 4500, "BlackSwanAgent": 8200}
-        data["activity_metrics"] = {"SNCAnalystAgent": 12, "BlackSwanAgent": 5}
 
     content = f"window.SYSTEM_BRAIN_DATA = {json.dumps(data, indent=2)};"
 
