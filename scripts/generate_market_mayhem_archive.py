@@ -667,6 +667,11 @@ def parse_html_file(filepath):
                 if content_date:
                     date = parse_date(content_date.group(1))
 
+        summary = "Report content."
+        meta_desc = soup.find('meta', attrs={'name': 'description'})
+        if meta_desc and meta_desc.get('content'):
+            summary = meta_desc['content']
+
         type_ = "NEWSLETTER"
         lower_title = title.lower()
         if "deep dive" in lower_title or "deep_dive" in filename: type_ = "DEEP_DIVE"
@@ -690,7 +695,7 @@ def parse_html_file(filepath):
         item = {
             "title": title,
             "date": date,
-            "summary": "Report content.",
+            "summary": summary,
             "type": type_,
             "full_body": "",
             "sentiment_score": sentiment,
