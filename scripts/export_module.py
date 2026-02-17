@@ -76,6 +76,18 @@ MODULES = {
             "data/market_mayhem_index.json"
         ]
     },
+    "modular_dashboard": {
+        "entry": "modular_dashboard.html",
+        "includes": [
+            "js/data_manager_modular.js",
+            "data/seed_reports.json",
+            "data/seed_credit_memos.json",
+            "data/seed_file_index.json",
+            "data/seed_agents.json",
+            "data/seed_prompts.json",
+            "data/seed_training_data.json"
+        ]
+    },
     "13f_tracker": {
         "entry": "13f_tracker.html",
         "includes": [

@@ -14,46 +14,96 @@
     <header class="h-16 border-b border-slate-700/50 flex items-center justify-between px-6 bg-[#0f172a]/90 backdrop-blur-md z-40 shrink-0">
         <h1 class="text-xl font-bold tracking-tight mono">ADAM <span class="text-amber-400">Modular</span> <span class="text-slate-500 font-normal">| Data Loader POC</span></h1>
         <div class="flex gap-4">
-             <button onclick="window.modularDataManager.clearCache(); log('Cache cleared.');" class="text-xs text-slate-400 hover:text-white border border-slate-600 px-3 py-1 rounded">Reset Cache</button>
+             <button onclick="window.modularDataManager.clearCache(); log('Cache cleared.'); clearVisualizer();" class="text-xs text-slate-400 hover:text-white border border-slate-600 px-3 py-1 rounded">Reset Cache</button>
         </div>
     </header>
 
-    <main class="flex-1 p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
-        <!-- Controls -->
-        <div class="space-y-6">
-            <div class="glass-panel p-6 rounded-lg border border-slate-700">
-                <h2 class="text-lg font-bold text-cyan-400 mb-4 font-mono">1. Verified Historic Info (Reports)</h2>
-                <p class="text-sm text-slate-400 mb-4">Load the 13F and Market Reports subset (~500KB).</p>
-                <button onclick="loadSubset('reports')" class="w-full py-2 bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded text-sm text-white transition font-mono">
-                    <i class="fas fa-download mr-2"></i> LOAD REPORTS
-                </button>
-            </div>
-
-            <div class="glass-panel p-6 rounded-lg border border-slate-700">
-                <h2 class="text-lg font-bold text-purple-400 mb-4 font-mono">2. Simulated Seed (Credit Memos)</h2>
-                <p class="text-sm text-slate-400 mb-4">Load the deep simulated credit memo artifacts (~1MB).</p>
-                <button onclick="loadSubset('creditMemos')" class="w-full py-2 bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded text-sm text-white transition font-mono">
-                    <i class="fas fa-download mr-2"></i> LOAD CREDIT MEMOS
-                </button>
-            </div>
-
-            <div class="glass-panel p-6 rounded-lg border border-slate-700">
-                <h2 class="text-lg font-bold text-emerald-400 mb-4 font-mono">3. Repository Index (Files)</h2>
-                <p class="text-sm text-slate-400 mb-4">Load the full file tree index (~6MB Uncompressed).</p>
-                <button onclick="loadSubset('files')" class="w-full py-2 bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded text-sm text-white transition font-mono">
-                    <i class="fas fa-download mr-2"></i> LOAD FILE INDEX
-                </button>
+    <main class="flex-1 p-8 overflow-y-auto relative">
+        <!-- Detail Modal -->
+        <div id="detail-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div class="bg-[#0f172a] border border-slate-700 rounded-lg shadow-2xl w-full max-w-2xl max-h-[80vh] flex flex-col">
+                <div class="flex justify-between items-center p-4 border-b border-slate-700 bg-slate-800/50">
+                    <h3 id="modal-title" class="text-lg font-bold text-white font-mono truncate">Details</h3>
+                    <button onclick="closeModal()" class="text-slate-400 hover:text-white transition">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div id="modal-body" class="p-6 overflow-y-auto font-mono text-sm text-slate-300 space-y-4">
+                    <!-- Content injected here -->
+                </div>
+                <div class="p-4 border-t border-slate-700 bg-slate-800/50 flex justify-end">
+                    <button onclick="closeModal()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded text-sm transition">Close</button>
+                </div>
             </div>
         </div>
 
-        <!-- Output -->
-        <div class="glass-panel p-4 rounded-lg border border-slate-700 flex flex-col h-full bg-[#0b1120]">
-            <div class="flex justify-between items-center mb-2 border-b border-slate-800 pb-2">
-                <span class="text-xs font-bold text-slate-500 uppercase">System Log</span>
-                <span class="text-[10px] text-emerald-500 font-mono" id="status-indicator">READY</span>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+            <!-- Controls -->
+            <div class="space-y-6">
+                <div class="glass-panel p-6 rounded-lg border border-slate-700">
+                    <h2 class="text-lg font-bold text-cyan-400 mb-4 font-mono">1. Verified Historic Info (Reports)</h2>
+                    <p class="text-sm text-slate-400 mb-4">Load the 13F and Market Reports subset (~500KB).</p>
+                    <button onclick="loadSubset('reports')" class="w-full py-2 bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded text-sm text-white transition font-mono">
+                        <i class="fas fa-download mr-2"></i> LOAD REPORTS
+                    </button>
+                </div>
+
+                <div class="glass-panel p-6 rounded-lg border border-slate-700">
+                    <h2 class="text-lg font-bold text-purple-400 mb-4 font-mono">2. Simulated Seed (Credit Memos)</h2>
+                    <p class="text-sm text-slate-400 mb-4">Load the deep simulated credit memo artifacts (~1MB).</p>
+                    <button onclick="loadSubset('creditMemos')" class="w-full py-2 bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded text-sm text-white transition font-mono">
+                        <i class="fas fa-download mr-2"></i> LOAD CREDIT MEMOS
+                    </button>
+                </div>
+
+                <div class="glass-panel p-6 rounded-lg border border-slate-700">
+                    <h2 class="text-lg font-bold text-emerald-400 mb-4 font-mono">3. Repository Index (Files)</h2>
+                    <p class="text-sm text-slate-400 mb-4">Load the full file tree index (~6MB Uncompressed).</p>
+                    <button onclick="loadSubset('files')" class="w-full py-2 bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded text-sm text-white transition font-mono">
+                        <i class="fas fa-download mr-2"></i> LOAD FILE INDEX
+                    </button>
+                </div>
+
+            <div class="glass-panel p-6 rounded-lg border border-slate-700">
+                <h2 class="text-lg font-bold text-amber-400 mb-4 font-mono">4. Extended Datasets</h2>
+                <p class="text-sm text-slate-400 mb-4">Agents, Prompts, Training Data, Architecture.</p>
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="loadSubset('agents')" class="py-2 bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded text-xs text-white transition font-mono">
+                        LOAD AGENTS
+                    </button>
+                    <button onclick="loadSubset('prompts')" class="py-2 bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded text-xs text-white transition font-mono">
+                        LOAD PROMPTS
+                    </button>
+                    <button onclick="loadSubset('trainingData')" class="py-2 bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded text-xs text-white transition font-mono">
+                        LOAD ML DATA
+                    </button>
+                    <button onclick="loadSubset('architecture')" class="py-2 bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded text-xs text-white transition font-mono">
+                        LOAD ARCH
+                    </button>
+                </div>
             </div>
-            <div id="console-output" class="flex-1 overflow-y-auto font-mono text-xs text-slate-300 space-y-1">
-                <div class="text-slate-500">// Waiting for input...</div>
+            </div>
+
+            <!-- Output -->
+            <div class="glass-panel p-4 rounded-lg border border-slate-700 flex flex-col h-96 md:h-auto bg-[#0b1120]">
+                <div class="flex justify-between items-center mb-2 border-b border-slate-800 pb-2">
+                    <span class="text-xs font-bold text-slate-500 uppercase">System Log</span>
+                    <span class="text-[10px] text-emerald-500 font-mono" id="status-indicator">READY</span>
+                </div>
+                <div id="console-output" class="flex-1 overflow-y-auto font-mono text-xs text-slate-300 space-y-1">
+                    <div class="text-slate-500">// Waiting for input...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Visualizer -->
+        <div class="glass-panel p-6 rounded-lg border border-slate-700">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-lg font-bold text-slate-200 font-mono"><i class="fas fa-eye mr-2 text-sky-400"></i>Data Visualizer</h2>
+                <input type="text" id="search-input" placeholder="Filter data..." onkeyup="filterData(this.value)" class="bg-slate-900 border border-slate-600 rounded px-4 py-2 text-sm text-slate-200 focus:outline-none focus:border-sky-500 w-64 font-mono">
+            </div>
+            <div id="visualizer-content" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[600px] overflow-y-auto pr-2">
+                <div class="text-slate-500 font-mono text-sm col-span-full text-center py-12">No data loaded. Select a dataset above.</div>
             </div>
         </div>
     </main>
@@ -81,17 +131,285 @@
                 if (type === 'reports') data = await window.modularDataManager.loadReports();
                 if (type === 'creditMemos') data = await window.modularDataManager.loadCreditMemos();
                 if (type === 'files') data = await window.modularDataManager.loadFiles();
+                if (type === 'agents') data = await window.modularDataManager.loadAgents();
+                if (type === 'prompts') data = await window.modularDataManager.loadPrompts();
+                if (type === 'trainingData') data = await window.modularDataManager.loadTrainingData();
+                if (type === 'architecture') data = await window.modularDataManager.loadArchitecture();
 
                 const duration = (performance.now() - start).toFixed(2);
-                const count = Array.isArray(data) ? data.length : Object.keys(data).length;
+                const count = Array.isArray(data) ? data.length : (data.nodes ? data.nodes.length : Object.keys(data).length);
 
                 log(`Successfully loaded ${type}.`, 'success');
                 log(`- Items: ${count}`);
                 log(`- Time: ${duration}ms`);
 
+                // Render Data
+                if (type === 'reports') renderReports(data);
+                if (type === 'creditMemos') renderCreditMemos(data);
+                if (type === 'files') renderFiles(data);
+                if (type === 'agents') renderAgents(data);
+                if (type === 'prompts') renderPrompts(data);
+                if (type === 'trainingData') renderTrainingData(data);
+                if (type === 'architecture') renderArchitecture(data);
+
             } catch (e) {
                 log(`Failed to load ${type}: ${e.message}`, 'error');
             }
+        }
+
+        function clearVisualizer() {
+            document.getElementById('visualizer-content').innerHTML = '<div class="text-slate-500 font-mono text-sm col-span-full text-center py-12">No data loaded. Select a dataset above.</div>';
+        }
+
+        function showModal(title, data) {
+            document.getElementById('modal-title').textContent = title;
+            const body = document.getElementById('modal-body');
+            body.innerHTML = ''; // Clear previous content
+
+            if (typeof data === 'object') {
+                const pre = document.createElement('pre');
+                pre.className = 'whitespace-pre-wrap break-all bg-slate-900 p-4 rounded border border-slate-700 text-xs';
+                pre.textContent = JSON.stringify(data, null, 2);
+                body.appendChild(pre);
+            } else {
+                const p = document.createElement('p');
+                p.textContent = data;
+                body.appendChild(p);
+            }
+
+            document.getElementById('detail-modal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('detail-modal').classList.add('hidden');
+        }
+
+        function renderReports(data) {
+            const container = document.getElementById('visualizer-content');
+            container.innerHTML = '';
+
+            data.forEach(report => {
+                const card = document.createElement('div');
+                card.className = 'report-card bg-slate-800/50 p-4 rounded border border-slate-700 hover:border-cyan-500/50 transition cursor-pointer group';
+                card.onclick = () => showModal(report.title, report);
+
+                const dateDiv = document.createElement('div');
+                dateDiv.className = 'text-xs text-cyan-400 font-mono mb-1 group-hover:text-cyan-300';
+                dateDiv.textContent = report.date || 'Unknown Date';
+
+                const titleH3 = document.createElement('h3');
+                titleH3.className = 'text-sm font-bold text-slate-200 mb-2 truncate group-hover:text-white';
+                titleH3.title = report.title;
+                titleH3.textContent = report.title;
+
+                const summaryP = document.createElement('p');
+                summaryP.className = 'text-xs text-slate-400 line-clamp-3';
+                summaryP.textContent = report.executive_summary || 'No summary available.';
+
+                card.appendChild(dateDiv);
+                card.appendChild(titleH3);
+                card.appendChild(summaryP);
+                container.appendChild(card);
+            });
+        }
+
+        function renderCreditMemos(data) {
+            const container = document.getElementById('visualizer-content');
+            container.innerHTML = '';
+
+            // Handle both object and array formats just in case
+            const entries = Array.isArray(data) ? data : Object.entries(data).map(([k, v]) => v);
+
+            entries.forEach(memo => {
+                const riskScore = memo.risk_score || 0;
+                let riskColor = 'text-green-400';
+                if (riskScore > 50) riskColor = 'text-yellow-400';
+                if (riskScore > 75) riskColor = 'text-red-400';
+
+                const card = document.createElement('div');
+                card.className = 'memo-card bg-slate-800/50 p-4 rounded border border-slate-700 hover:border-purple-500/50 transition cursor-pointer group';
+                card.onclick = () => showModal(memo.borrower_name, memo);
+
+                const headerDiv = document.createElement('div');
+                headerDiv.className = 'flex justify-between items-start mb-2';
+
+                const nameH3 = document.createElement('h3');
+                nameH3.className = 'text-sm font-bold text-slate-200 truncate pr-2 group-hover:text-white';
+                nameH3.textContent = memo.borrower_name;
+
+                const scoreSpan = document.createElement('span');
+                scoreSpan.className = `text-xs font-mono ${riskColor} border border-slate-600 px-1 rounded`;
+                scoreSpan.textContent = riskScore;
+
+                headerDiv.appendChild(nameH3);
+                headerDiv.appendChild(scoreSpan);
+
+                const ebitdaDiv = document.createElement('div');
+                ebitdaDiv.className = 'text-xs text-slate-400 mb-1';
+                ebitdaDiv.textContent = `EBITDA: $${memo.financial_ratios?.ebitda || 'N/A'}M`;
+
+                const summaryDiv = document.createElement('div');
+                summaryDiv.className = 'text-xs text-slate-500 line-clamp-2';
+                summaryDiv.textContent = memo.executive_summary || 'No summary.';
+
+                card.appendChild(headerDiv);
+                card.appendChild(ebitdaDiv);
+                card.appendChild(summaryDiv);
+                container.appendChild(card);
+            });
+        }
+
+        function renderFiles(data) {
+            const container = document.getElementById('visualizer-content');
+            container.innerHTML = '';
+
+            data.slice(0, 200).forEach(file => {
+                const card = document.createElement('div');
+                card.className = 'file-item col-span-full bg-slate-800/30 p-2 rounded border border-slate-700/50 flex justify-between items-center font-mono text-xs';
+
+                const pathSpan = document.createElement('span');
+                pathSpan.className = 'text-emerald-400 truncate mr-4';
+                pathSpan.textContent = file.path;
+
+                const sizeSpan = document.createElement('span');
+                sizeSpan.className = 'text-slate-500 whitespace-nowrap';
+                sizeSpan.textContent = `${(file.size / 1024).toFixed(1)} KB`;
+
+                card.appendChild(pathSpan);
+                card.appendChild(sizeSpan);
+                container.appendChild(card);
+            });
+
+            if (data.length > 200) {
+                 const more = document.createElement('div');
+                 more.className = 'col-span-full text-center text-xs text-slate-500 py-2';
+                 more.textContent = `...and ${data.length - 200} more files. Use search to find specific files.`;
+                 container.appendChild(more);
+            }
+        }
+
+        function renderAgents(data) {
+            const container = document.getElementById('visualizer-content');
+            container.innerHTML = '';
+
+            data.forEach(agent => {
+                const card = document.createElement('div');
+                card.className = 'agent-card bg-slate-800/50 p-4 rounded border border-slate-700 hover:border-blue-500/50 transition cursor-pointer group';
+                card.onclick = () => showModal(agent.name, agent);
+
+                const typeDiv = document.createElement('div');
+                typeDiv.className = 'text-xs text-blue-400 font-mono mb-1';
+                typeDiv.textContent = agent.type || 'Agent';
+
+                const nameH3 = document.createElement('h3');
+                nameH3.className = 'text-sm font-bold text-slate-200 mb-2 truncate group-hover:text-white';
+                nameH3.textContent = agent.name;
+
+                const descP = document.createElement('p');
+                descP.className = 'text-xs text-slate-400 line-clamp-3';
+                descP.textContent = agent.description || 'No description.';
+
+                card.appendChild(typeDiv);
+                card.appendChild(nameH3);
+                card.appendChild(descP);
+                container.appendChild(card);
+            });
+        }
+
+        function renderPrompts(data) {
+            const container = document.getElementById('visualizer-content');
+            container.innerHTML = '';
+
+            data.forEach(prompt => {
+                const card = document.createElement('div');
+                card.className = 'prompt-card bg-slate-800/50 p-4 rounded border border-slate-700 hover:border-pink-500/50 transition cursor-pointer group';
+                card.onclick = () => showModal(prompt.name, prompt);
+
+                const fmtDiv = document.createElement('div');
+                fmtDiv.className = 'text-xs text-pink-400 font-mono mb-1';
+                fmtDiv.textContent = prompt.format;
+
+                const nameH3 = document.createElement('h3');
+                nameH3.className = 'text-sm font-bold text-slate-200 mb-2 truncate group-hover:text-white';
+                nameH3.textContent = prompt.name;
+
+                const prevP = document.createElement('p');
+                prevP.className = 'text-xs text-slate-500 line-clamp-3 font-mono';
+                prevP.textContent = prompt.preview;
+
+                card.appendChild(fmtDiv);
+                card.appendChild(nameH3);
+                card.appendChild(prevP);
+                container.appendChild(card);
+            });
+        }
+
+        function renderTrainingData(data) {
+            const container = document.getElementById('visualizer-content');
+            container.innerHTML = '';
+
+            data.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = 'training-card bg-slate-800/50 p-4 rounded border border-slate-700 hover:border-orange-500/50 transition cursor-pointer group';
+                card.onclick = () => showModal(`Sample #${index + 1}`, item);
+
+                const idDiv = document.createElement('div');
+                idDiv.className = 'text-xs text-orange-400 font-mono mb-1';
+                idDiv.textContent = `Sample #${index + 1}`;
+
+                const contentDiv = document.createElement('div');
+                contentDiv.className = 'text-xs text-slate-300 line-clamp-4 font-mono';
+
+                // Try to extract first user message
+                let previewText = "No content";
+                if (item.messages && item.messages.length > 0) {
+                    previewText = item.messages[0].content;
+                }
+                contentDiv.textContent = previewText;
+
+                card.appendChild(idDiv);
+                card.appendChild(contentDiv);
+                container.appendChild(card);
+            });
+        }
+
+        function renderArchitecture(data) {
+            const container = document.getElementById('visualizer-content');
+            container.innerHTML = '';
+
+            // Assuming data has nodes and links
+            const nodes = data.nodes || [];
+
+            nodes.slice(0, 100).forEach(node => {
+                const card = document.createElement('div');
+                card.className = 'arch-card bg-slate-800/50 p-4 rounded border border-slate-700 hover:border-indigo-500/50 transition cursor-pointer group';
+                card.onclick = () => showModal(node.id, node);
+
+                const groupDiv = document.createElement('div');
+                groupDiv.className = 'text-xs text-indigo-400 font-mono mb-1';
+                groupDiv.textContent = `Group: ${node.group || 'N/A'}`;
+
+                const idH3 = document.createElement('h3');
+                idH3.className = 'text-sm font-bold text-slate-200 mb-2 truncate group-hover:text-white';
+                idH3.textContent = node.id;
+
+                card.appendChild(groupDiv);
+                card.appendChild(idH3);
+                container.appendChild(card);
+            });
+        }
+
+        function filterData(query) {
+            const q = query.toLowerCase();
+            const cards = document.querySelectorAll('#visualizer-content > div');
+
+            cards.forEach(card => {
+                if (card.innerText.toLowerCase().includes(q)) {
+                    card.style.display = '';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
         }
     </script>
 </body>

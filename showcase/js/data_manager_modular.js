@@ -13,7 +13,11 @@ class ModularDataManager {
         this.cache = {
             reports: null,
             creditMemos: null,
-            files: null
+            files: null,
+            agents: null,
+            prompts: null,
+            trainingData: null,
+            architecture: null
         };
     }
 
@@ -61,13 +65,45 @@ class ModularDataManager {
     }
 
     /**
+     * Loads the "Agents" subset
+     */
+    async loadAgents() {
+        return this._loadResource('agents', 'seed_agents.json');
+    }
+
+    /**
+     * Loads the "Prompts" subset
+     */
+    async loadPrompts() {
+        return this._loadResource('prompts', 'seed_prompts.json');
+    }
+
+    /**
+     * Loads the "Training Data" subset
+     */
+    async loadTrainingData() {
+        return this._loadResource('trainingData', 'seed_training_data.json');
+    }
+
+    /**
+     * Loads the "Architecture" subset
+     */
+    async loadArchitecture() {
+        return this._loadResource('architecture', 'system_knowledge_graph.json');
+    }
+
+    /**
      * Clears local cache to force re-fetch
      */
     clearCache() {
         this.cache = {
             reports: null,
             creditMemos: null,
-            files: null
+            files: null,
+            agents: null,
+            prompts: null,
+            trainingData: null,
+            architecture: null
         };
         console.log("[ModularDataManager] Cache cleared.");
     }
