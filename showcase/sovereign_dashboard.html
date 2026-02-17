@@ -486,9 +486,24 @@
                 <h3>TARGETS</h3>
                 <span class="badge">LIVE</span>
             </div>
+
+            <div style="padding: 10px; border-bottom: 1px solid #333;">
+                <label style="display: flex; align-items: center; justify-content: space-between; font-size: 0.8rem; color: #aaa; cursor: pointer;">
+                    <span>USE RAG DATA (10-K)</span>
+                    <input type="checkbox" id="useRagToggle" style="accent-color: #00ff9d;">
+                </label>
+            </div>
+
             <ul class="ticker-list" id="tickerList">
                 <!-- Populated by JS -->
             </ul>
+
+            <div style="padding: 15px; border-top: 1px solid #333; font-size: 0.7rem; color: #666; font-family: 'JetBrains Mono';">
+                <div style="margin-bottom: 5px; color: #00ff9d;">RUN LOCAL PIPELINE:</div>
+                <div style="background: #000; padding: 5px; border: 1px solid #333; word-break: break-all; user-select: all;">
+                    python scripts/run_credit_memo_rag.py --ticker AAPL --file data/10k_sample_aapl.txt
+                </div>
+            </div>
         </div>
 
         <!-- Middle Panel: Quantitative Analysis -->
@@ -789,6 +804,8 @@
             document.querySelectorAll('.ticker-item').forEach(el => el.classList.remove('active'));
             element.classList.add('active');
 
+            const useRag = document.getElementById('useRagToggle').checked;
+
             try {
 try {
                 let data = null;
@@ -797,8 +814,8 @@ try {
                 // --- TIER 1: Universal Loader (Main Branch Strategy) ---
                 if (window.universalLoader && typeof window.universalLoader.loadSovereignData === 'function') {
                     try {
-                        console.log(`[System 1] Attempting Universal Loader for ${ticker}...`);
-                        const universalResult = await window.universalLoader.loadSovereignData(ticker);
+                        console.log(`[System 1] Attempting Universal Loader for ${ticker} (RAG=${useRag})...`);
+                        const universalResult = await window.universalLoader.loadSovereignData(ticker, useRag);
                         
                         // Validation: Ensure we actually got the artifacts we need
                         if (universalResult && universalResult.spread && universalResult.memo) {
