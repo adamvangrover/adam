@@ -85,6 +85,30 @@
                 <canvas id="financialChart"></canvas>
             </div>
 
+            <!-- Crisis Simulator (High Tier Only) -->
+            <div id="crisisSimContainer" style="display:none; margin-bottom: 30px; border: 1px solid #cc0000; padding: 20px; background: rgba(50, 0, 0, 0.2);">
+                <h3 style="color: #cc0000; margin-top: 0; font-family: 'JetBrains Mono'; border-bottom: 1px solid #cc0000; padding-bottom: 10px; margin-bottom: 20px;">CRISIS SIMULATOR // STRESS TEST</h3>
+
+                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 20px;">
+                    <div class="crisis-btn" onclick="renderCrisis('2008_LEHMAN')" style="cursor:pointer; text-align:center; padding: 10px; border: 1px solid #666; font-size: 0.8rem; color: #ccc;">
+                        2008 LEHMAN
+                    </div>
+                    <div class="crisis-btn" onclick="renderCrisis('1987_BLACK_MONDAY')" style="cursor:pointer; text-align:center; padding: 10px; border: 1px solid #666; font-size: 0.8rem; color: #ccc;">
+                        1987 BLACK MON
+                    </div>
+                    <div class="crisis-btn" onclick="renderCrisis('2020_COVID')" style="cursor:pointer; text-align:center; padding: 10px; border: 1px solid #666; font-size: 0.8rem; color: #ccc;">
+                        2020 PANDEMIC
+                    </div>
+                </div>
+
+                <div style="height: 300px; position: relative;">
+                    <canvas id="crisisChart"></canvas>
+                </div>
+                <div style="font-size: 0.7rem; color: #888; margin-top: 15px; font-style: italic;">
+                    * Hypothetical performance based on portfolio beta and current risk profile. PAST PERFORMANCE IS NOT INDICATIVE OF FUTURE RESULTS.
+                </div>
+            </div>
+
             <div id="document-body">
                 <h2>Industry Overview</h2><p>The software industry encompasses a vast array of businesses that develop, produce, and distribute software for various purposes, including operating systems, applications, and cloud-based services. This industry is a major driver of technological innovation and plays a critical role in the global economy, transforming how businesses operate and individuals interact with technology.</p>
 <h2>Key Trends</h2><h2>Growth Drivers</h2><h2>Challenges</h2><h2>Opportunities</h2><h2>Peer Group Analysis</h2><ul><li>Revenue Growth</li><li>Profitability (Operating Margin)</li><li>Market Share</li><li>R&D Investment</li><li>Valuation (P/E Ratio)</li></ul><h2>Key Terms and Metrics</h2><h2>Investment Ideas</h2>
@@ -205,7 +229,9 @@
     <script>
         // Chart Injection Logic
         const metricsData = {};
+        const crisisData = {"2008_LEHMAN": {"scenario": "2008_LEHMAN", "labels": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30], "market": [100.0, 99.17, 96.13, 94.67, 92.93, 89.61, 97.81, 99.12, 105.76, 100.31, 93.35, 94.93, 89.71, 88.63, 69.3, 68.31, 67.28, 71.04, 69.44, 68.37, 70.16, 65.14, 68.52, 74.09, 77.81, 75.5, 71.89, 69.65, 71.34, 66.9], "portfolio": [100.0, 94.15, 89.59, 86.57, 84.7, 80.94, 92.06, 95.18, 104.66, 95.59, 84.26, 87.85, 83.82, 80.9, 53.14, 52.46, 51.67, 56.63, 54.15, 52.52, 56.93, 50.07, 52.38, 58.77, 64.92, 62.27, 57.9, 55.48, 57.59, 53.18]}, "1987_BLACK_MONDAY": {"scenario": "1987_BLACK_MONDAY", "labels": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20], "market": [100.0, 100.87, 98.14, 97.91, 97.19, 93.77, 109.56, 114.32, 129.1, 92.89, 84.62, 88.78, 82.92, 83.14, 75.91, 76.23, 76.45, 85.34, 84.58, 84.77], "portfolio": [100.0, 96.7, 92.54, 91.21, 90.74, 86.79, 108.72, 117.31, 139.95, 79.76, 67.95, 74.13, 69.51, 68.63, 58.58, 59.44, 60.15, 71.39, 69.71, 69.47]}, "2020_COVID": {"scenario": "2020_COVID", "labels": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40], "market": [100.0, 99.91, 97.12, 96.23, 94.97, 91.76, 102.66, 105.23, 114.64, 108.58, 100.52, 103.47, 97.57, 97.04, 89.98, 89.25, 88.44, 95.16, 93.45, 81.34, 84.15, 77.17, 82.22, 90.48, 96.2, 93.55, 88.92, 86.31, 89.51, 83.54, 93.51, 91.01, 86.46, 86.46, 90.02, 87.68, 94.55, 100.43, 96.53, 92.97], "portfolio": [100.0, 95.25, 91.04, 88.79, 87.59, 83.94, 98.91, 103.99, 117.85, 107.4, 93.88, 99.63, 94.76, 92.4, 80.84, 80.54, 80.06, 90.17, 86.83, 69.36, 76.04, 65.59, 69.92, 80.47, 90.47, 87.07, 80.74, 77.58, 82.03, 75.2, 87.87, 85.95, 81.16, 82.87, 88.52, 85.78, 96.4, 108.49, 104.06, 97.29]}};
 
+        // --- Metrics Chart ---
         if (metricsData && Object.keys(metricsData).length > 0) {
             const ctx = document.getElementById('financialChart');
             const container = document.getElementById('financialChartContainer');
@@ -242,10 +268,105 @@
                     },
                     options: {
                         responsive: true,
-                        plugins: { legend: { display: true } }
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { labels: { color: '#ccc' } }
+                        },
+                        scales: {
+                            y: { grid: { color: '#333' }, ticks: { color: '#888' } },
+                            x: { grid: { color: '#333' }, ticks: { color: '#888' } }
+                        }
                     }
                 });
             }
+        }
+
+        // --- Crisis Simulation Logic ---
+        let crisisChartInstance = null;
+
+        window.renderCrisis = function(scenarioName) {
+            if (!crisisData || !crisisData[scenarioName]) return;
+
+            // UI Feedback for Buttons
+            document.querySelectorAll('.crisis-btn').forEach(btn => {
+                btn.style.borderColor = btn.innerText.includes(scenarioName.split('_')[1]) ? '#cc0000' : '#666';
+                btn.style.color = btn.innerText.includes(scenarioName.split('_')[1]) ? '#cc0000' : '#ccc';
+            });
+
+            const data = crisisData[scenarioName];
+            const ctx = document.getElementById('crisisChart').getContext('2d');
+
+            if (crisisChartInstance) {
+                crisisChartInstance.destroy();
+            }
+
+            crisisChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.labels,
+                    datasets: [
+                        {
+                            label: 'Your Portfolio (Simulated)',
+                            data: data.portfolio,
+                            borderColor: '#00f3ff',
+                            backgroundColor: 'rgba(0, 243, 255, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.4,
+                            pointRadius: 0
+                        },
+                        {
+                            label: 'Market Benchmark',
+                            data: data.market,
+                            borderColor: '#666',
+                            borderDash: [5, 5],
+                            borderWidth: 1,
+                            pointRadius: 0,
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    plugins: {
+                        legend: { labels: { color: '#ccc', font: { family: 'JetBrains Mono' } } },
+                        title: {
+                            display: true,
+                            text: 'STRESS TEST SCENARIO: ' + scenarioName.replace(/_/g, ' '),
+                            color: '#cc0000',
+                            font: { family: 'JetBrains Mono' }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0,0,0,0.8)',
+                            titleColor: '#cc0000',
+                            bodyColor: '#fff',
+                            borderColor: '#333',
+                            borderWidth: 1
+                        }
+                    },
+                    scales: {
+                        y: {
+                            grid: { color: '#333' },
+                            ticks: { color: '#888', callback: function(value) { return value + '%'; } }
+                        },
+                        x: {
+                            grid: { color: '#333' },
+                            ticks: { display: false }
+                        }
+                    }
+                }
+            });
+        };
+
+        // Auto-Run Default Crisis if Data Available
+        if (crisisData && Object.keys(crisisData).length > 0) {
+            document.getElementById('crisisSimContainer').style.display = 'block';
+            // slight delay to ensure Chart.js loaded
+            setTimeout(() => renderCrisis('2008_LEHMAN'), 100);
         }
     </script>
 </body>

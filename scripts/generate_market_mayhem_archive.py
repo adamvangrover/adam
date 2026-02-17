@@ -8,6 +8,14 @@ from datetime import datetime
 from collections import Counter
 from bs4 import BeautifulSoup
 
+try:
+    from scripts.market_mayhem_crisis_sim import CrisisSimulator
+except ImportError:
+    # Support running from root
+    import sys
+    sys.path.append('.')
+    from scripts.market_mayhem_crisis_sim import CrisisSimulator
+
 # --- Configuration ---
 OUTPUT_DIR = "showcase"
 SOURCE_DIRS = [
@@ -873,6 +881,21 @@ def generate_archive():
         reviewer_match = re.search(r'Agent (\w+)', critique)
         reviewer_agent = reviewer_match.group(1) if reviewer_match else "SYSTEM"
 
+        # Crisis Simulation
+        crisis_sim_json = "{}"
+        if tier_class == "tier-high":
+            try:
+                # Use title as seed, determine risk from sentiment
+                risk = "BALANCED"
+                if item.get("sentiment_score", 50) > 65: risk = "AGGRESSIVE"
+                elif item.get("sentiment_score", 50) < 35: risk = "CONSERVATIVE"
+
+                sim = CrisisSimulator(item["title"], risk)
+                sim_results = sim.run_all_scenarios()
+                crisis_sim_json = json.dumps(sim_results)
+            except Exception as e:
+                print(f"Simulation failed for {item['title']}: {e}")
+
         # Serialize entire item as raw source
         raw_source = json.dumps(item, default=str, indent=2)
 
@@ -900,7 +923,8 @@ def generate_archive():
             metadata_panel_display=metadata_panel_display,
             nav_display=nav_display,
             reviewer_agent=reviewer_agent,
-            raw_source=raw_source
+            raw_source=raw_source,
+            crisis_sim_json=crisis_sim_json
         )
 
         with open(out_path, "w", encoding='utf-8') as f:
