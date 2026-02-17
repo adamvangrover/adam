@@ -53,10 +53,25 @@ class UniversalLoader {
         const cleanId = identifier.replace('.json', '').replace('credit_memo_', '');
 
         try {
-            const path = filename.includes('/') ? filename : `${this.basePath}${filename}`;
-            const res = await fetch(path);
+            // 1. Try Exact Match
+            let path = filename.includes('/') ? filename : `${this.basePath}${filename}`;
+            let res = await fetch(path);
             if (res.ok) return await res.json();
-            throw new Error(`File not found: ${path}`);
+
+            // 2. Try Constructing Filename (if ID provided)
+            if (!filename.endsWith('.json')) {
+                // Try RAG first
+                path = `${this.basePath}credit_memo_${filename}_RAG.json`;
+                res = await fetch(path);
+                if (res.ok) return await res.json();
+
+                // Try Standard
+                path = `${this.basePath}credit_memo_${filename}.json`;
+                res = await fetch(path);
+                if (res.ok) return await res.json();
+            }
+
+            throw new Error(`File not found: ${identifier}`);
         } catch (e) {
             console.warn(`[UniversalLoader] Falling back for ${filename}`);
 

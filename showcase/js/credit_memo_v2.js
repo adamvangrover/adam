@@ -127,13 +127,20 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Header
         const riskColor = memo.risk_score < 60 ? 'red' : (memo.risk_score < 80 ? 'orange' : 'green');
+
+        // Source Badge Logic
+        const isRag = (memo.source && memo.source.includes('RAG')) || (memo.executive_summary && memo.executive_summary.includes('RAG Analysis'));
+        const sourceBadge = isRag
+            ? `<span style="background: #e0f7fa; color: #006064; padding: 2px 6px; border-radius: 4px; border: 1px solid #006064; font-weight: bold;">SOURCE: RAG (10-K)</span>`
+            : `<span style="background: #f5f5f5; color: #999; padding: 2px 6px; border-radius: 4px; border: 1px solid #ddd;">SOURCE: MOCK/HISTORICAL</span>`;
+
         const header = document.createElement('div');
         header.innerHTML = `
             <h1 class="editable-content">${memo.borrower_name}</h1>
-            <div style="display: flex; justify-content: space-between; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 30px; font-family: var(--font-mono); font-size: 0.8rem; color: #666;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 30px; font-family: var(--font-mono); font-size: 0.8rem; color: #666;">
                 <span>DATE: ${new Date(memo.report_date).toLocaleDateString()}</span>
                 <span>RISK SCORE: <b style="color: ${riskColor}">${memo.risk_score}/100</b></span>
-                <span>ID: ${memo.borrower_name.substring(0,3).toUpperCase()}-${Math.floor(Math.random()*10000)}</span>
+                ${sourceBadge}
             </div>
         `;
         contentDiv.appendChild(header);
