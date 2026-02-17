@@ -14,6 +14,7 @@
 *   [**🧠 Agent Knowledge Base**](docs/AGENTS_KNOWLEDGE_BASE.md)
 *   [**📖 Architecture Overview**](docs/architecture.md)
 *   [**🎓 Tutorials**](docs/tutorials.md)
+*   [**📦 Custom Builds**](docs/custom_builds.md)
 
 ---
 
@@ -135,6 +136,30 @@ Adam unifies three critical domains into a single cognitive architecture:
 *   **Meta-Orchestration:** Dynamic routing of queries to specialized agents.
 *   **Consensus Engine:** Aggregating multi-agent perspectives into a single conviction score.
 *   **Governance Layer:** API Gatekeeper and Structured Narrative Logging for enterprise safety.
+
+---
+
+## 📦 Custom Builds & Export
+
+Adam includes a powerful build system to create self-contained, portable environments.
+
+### Interactive Builder
+
+Run the build wizard to create a custom distribution with specific modules, runtime profiles, and Docker support:
+
+```bash
+python scripts/build_adam.py
+```
+
+See [**Custom Builds Documentation**](docs/custom_builds.md) for details.
+
+### Quick Export
+
+To export a single module directly:
+
+```bash
+python scripts/export_module.py market_mayhem --output my_exports
+```
 
 ---
 

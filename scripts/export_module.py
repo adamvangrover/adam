@@ -87,6 +87,78 @@ MODULES = {
             "data/seed_prompts.json",
             "data/seed_training_data.json"
         ]
+    },
+    "13f_tracker": {
+        "entry": "13f_tracker.html",
+        "includes": [
+            "data/13f_data.json"
+        ]
+    },
+    "evolution_v2": {
+        "entry": "evolution_v2.html",
+        "includes": [
+            "data/evolution_data.json",
+            "js/command_palette.js"
+        ]
+    },
+    "intelligence_library": {
+        "entry": "intelligence_library.html",
+        "includes": [
+            "css/library.css",
+            "js/library_logic.js",
+            "data/market_mayhem_index.json"
+        ]
+    },
+    "deep_dive_viewer": {
+        "entry": "deep_dive_viewer.html",
+        "includes": [
+            "data/deep_dive_sample.json",
+            "data/deep_dive_*.json",
+            "css/cyberpunk-core.css"
+        ]
+    },
+    "simulation_dashboard": {
+        "entry": "simulation_dashboard.html",
+        "includes": [
+            "js/simulation_viewer.js",
+            "css/market_mayhem_tiers.css"
+        ]
+    },
+    "research_lab": {
+        "entry": "scenario_lab.html",
+        "includes": [
+            "data/mock_scenario_lab_data.json"
+        ]
+    },
+    "financial_twin": {
+        "entry": "financial_twin.html",
+        "includes": [
+            "data/unified_banking_scenarios.json"
+        ]
+    },
+    "contagion_analysis": {
+        "entry": "risk_topography.html",
+        "includes": [
+            "data/phase3_portfolio_demo.json"
+        ]
+    },
+    "slm_adam": {
+        "entry": "chat.html",
+        "includes": [
+            "js/mock_data.js" # Already in common, but good to be explicit if it relies heavily
+        ]
+    },
+    "optimization": {
+        "entry": "portfolio_dashboard.html",
+        "includes": [
+            "data/portfolio_history.json"
+        ]
+    },
+    "quantum_toolkit": {
+        "entry": "quantum_search.html",
+        "includes": [
+            "data/quantum_search_data.json"
+        ]
     }
 }
 
@@ -107,7 +179,15 @@ def copy_asset(asset_rel_path, target_dir):
     if not src.exists():
         # Try globbing
         if "*" in asset_rel_path:
-            for file in SHOWCASE_DIR.glob(asset_rel_path):
+            # Handle recursive globs manually if needed, but simple glob works for paths relative to CWD.
+            # SHOWCASE_DIR is absolute path.
+            # glob(pattern) on Path object works relative to that path.
+            found_files = list(SHOWCASE_DIR.glob(asset_rel_path))
+            if not found_files:
+                print(f"[!] Warning: No files found for glob pattern: {asset_rel_path}")
+                return
+
+            for file in found_files:
                 rel_path = file.relative_to(SHOWCASE_DIR)
                 dst_path = target_dir / rel_path
                 dst_path.parent.mkdir(parents=True, exist_ok=True)
@@ -217,13 +297,20 @@ def export_module(module_name, output_dir):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Export ADAM repo modules.")
-    parser.add_argument("module", help="Name of the module to export (or 'all')")
+    parser.add_argument("module", nargs='?', help="Name of the module to export (or 'all'). Use --list to see options.")
     parser.add_argument("--output", default="exports", help="Output directory")
+    parser.add_argument("--list", action="store_true", help="List available modules")
 
     args = parser.parse_args()
 
-    if args.module == "all":
+    if args.list:
+        print("Available Modules:")
+        for mod in MODULES.keys():
+            print(f" - {mod}")
+    elif args.module == "all":
         for mod in MODULES:
             export_module(mod, args.output)
-    else:
+    elif args.module:
         export_module(args.module, args.output)
+    else:
+        parser.print_help()
