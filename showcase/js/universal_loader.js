@@ -89,7 +89,7 @@ class UniversalLoader {
      * Loads Sovereign Artifacts (Spread, Memo, Audit)
      * Returns an object { spread, memo, audit }
      */
-    async loadSovereignData(ticker) {
+    async loadSovereignData(ticker, useRag = false) {
         const artifacts = ['spread', 'memo', 'audit'];
         const results = {};
         let failed = false;
@@ -97,7 +97,9 @@ class UniversalLoader {
         // Try Network
         await Promise.all(artifacts.map(async (type) => {
             try {
-                const res = await fetch(`${this.basePath}sovereign_artifacts/${ticker}_${type}.json`);
+                // Construct filename: AAPL_spread.json or AAPL_rag_spread.json
+                const filename = useRag ? `${ticker}_rag_${type}.json` : `${ticker}_${type}.json`;
+                const res = await fetch(`${this.basePath}sovereign_artifacts/${filename}`);
                 if (res.ok) {
                     results[type] = await res.json();
                 } else {
