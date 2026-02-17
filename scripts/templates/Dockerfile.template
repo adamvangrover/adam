@@ -1,0 +1,35 @@
+
+# ========================================================
+# ADAM v26.0 CUSTOM BUILD
+# Built by scripts/build_adam.py
+# ========================================================
+
+# 1. Base Image
+FROM {{ BASE_IMAGE }}
+
+# 2. System Dependencies
+RUN apt-get update && apt-get install -y \
+    curl \
+    git \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+# 3. Work Directory
+WORKDIR /app
+
+# 4. Install Requirements
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# 5. Copy Build Artifacts
+{{ COPY_COMMANDS }}
+
+# 6. Environment Setup
+ENV PORT={{ PORT }}
+ENV ADAM_ENV={{ ENV_TYPE }}
+
+# 7. Expose Port
+EXPOSE {{ PORT }}
+
+# 8. Start Command
+CMD ["python3", "-m", "http.server", "{{ PORT }}"]
