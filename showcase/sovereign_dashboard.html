@@ -482,6 +482,23 @@
     <div class="container">
         <!-- Sidebar: Ticker Selection -->
         <div class="panel sidebar">
+            <!-- Repo Metadata Section -->
+            <div id="repoStats" style="padding: 15px; border-bottom: 1px solid #333; background: rgba(0,0,0,0.3);">
+                <div style="font-size: 0.7em; color: #666; text-transform: uppercase;">REPOSITORY STATUS</div>
+                <div style="display: flex; justify-content: space-between; margin-top: 5px;">
+                    <span style="color: #aaa;">Repo:</span>
+                    <span style="color: #00ff9d;">ADAM v26.6</span>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span style="color: #aaa;">Agents:</span>
+                    <span id="agentCount" style="color: #fff;">--</span>
+                </div>
+                 <div style="display: flex; justify-content: space-between;">
+                    <span style="color: #aaa;">Modules:</span>
+                    <span id="moduleCount" style="color: #fff;">--</span>
+                </div>
+            </div>
+
             <div class="panel-header">
                 <h3>TARGETS</h3>
                 <span class="badge">LIVE</span>
@@ -500,9 +517,10 @@
 
             <div style="padding: 15px; border-top: 1px solid #333; font-size: 0.7rem; color: #666; font-family: 'JetBrains Mono';">
                 <div style="margin-bottom: 5px; color: #00ff9d;">RUN LOCAL PIPELINE:</div>
-                <div style="background: #000; padding: 5px; border: 1px solid #333; word-break: break-all; user-select: all;">
-                    python scripts/run_credit_memo_rag.py --ticker AAPL --file data/10k_sample_aapl.txt
-                </div>
+                <button id="btnRunRag" class="btn-report" style="width:100%; margin-top:5px; border: 1px solid #00ff9d; color: #00ff9d;">
+                    <i class="fas fa-play"></i> EXECUTE ANALYSIS
+                </button>
+                <div id="ragStatus" style="margin-top: 5px; color: #888; font-style: italic;">Ready...</div>
             </div>
         </div>
 
@@ -653,6 +671,11 @@
                 <div id="newsFeed" style="font-family: 'JetBrains Mono', monospace; font-size: 0.8em; color: #888; height: 200px; overflow-y: auto;">
                     <!-- News Items -->
                 </div>
+
+                <h3 style="margin-top: 30px; border-top: 1px solid #333; padding-top: 20px; font-size: 1rem;">SYSTEM EVOLUTION</h3>
+                <div id="evolutionTimeline" style="font-family: 'JetBrains Mono', monospace; font-size: 0.75em; color: #aaa; max-height: 200px; overflow-y: auto;">
+                    <!-- Evolution Items -->
+                </div>
             </div>
         </div>
     </div>
@@ -797,7 +820,88 @@
                 document.getElementById('growthVal').textContent = e.target.value + "%";
                 recalcDCF();
             });
+
+            // Load Repo Stats
+            loadRepoStats();
+            loadEvolutionData();
+
+            // RAG Button Logic
+            document.getElementById('btnRunRag').addEventListener('click', async () => {
+                const ticker = document.querySelector('.ticker-item.active span').textContent;
+                const statusDiv = document.getElementById('ragStatus');
+                statusDiv.textContent = "Processing... (10-K Ingestion)";
+                statusDiv.style.color = "#ffaa00";
+
+                try {
+                    const res = await fetch('/api/run_rag', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            ticker: ticker,
+                            file: `data/10k_sample_${ticker.toLowerCase()}.txt` // Assumption for demo
+                        })
+                    });
+
+                    if (res.ok) {
+                        const json = await res.json();
+                        statusDiv.textContent = "Success: Pipeline Complete";
+                        statusDiv.style.color = "#00ff9d";
+                        // Auto-toggle RAG and reload
+                        document.getElementById('useRagToggle').checked = true;
+                        loadTicker(ticker, document.querySelector('.ticker-item.active'));
+                    } else {
+                        throw new Error("Server returned " + res.status);
+                    }
+                } catch (e) {
+                    console.warn("Server unavailable, running mock simulation.", e);
+                    statusDiv.textContent = "Server Offline. Simulated Run...";
+                    statusDiv.style.color = "#ff5555";
+
+                    // Simulate delay then reload with mock RAG
+                    setTimeout(() => {
+                        document.getElementById('useRagToggle').checked = true;
+                        loadTicker(ticker, document.querySelector('.ticker-item.active'));
+                        statusDiv.textContent = "Simulation Complete (Mock Data)";
+                        statusDiv.style.color = "#aaa";
+                    }, 1500);
+                }
+            });
         });
+
+        async function loadRepoStats() {
+            try {
+                const res = await fetch('data/repo_metadata.json');
+                if(res.ok) {
+                    const data = await res.json();
+                    document.getElementById('agentCount').innerText = data.agents ? data.agents.length : '--';
+                    document.getElementById('moduleCount').innerText = data.verifications ? data.verifications.length : '--';
+                }
+            } catch(e) { console.log("Repo stats load failed"); }
+        }
+
+        async function loadEvolutionData() {
+            try {
+                const res = await fetch('data/evolution_data.json');
+                if(res.ok) {
+                    const data = await res.json();
+                    const container = document.getElementById('evolutionTimeline');
+                    container.innerHTML = '';
+
+                    // Show last 5 entries
+                    data.timeline.slice(0, 5).forEach(item => {
+                        const div = document.createElement('div');
+                        div.style.marginBottom = "10px";
+                        div.style.borderLeft = "2px solid #333";
+                        div.style.paddingLeft = "10px";
+                        div.innerHTML = `
+                            <div style="color: #00ff9d;">${item.version} <span style="color:#666;">// ${item.date}</span></div>
+                            <div style="color: #ccc;">${item.title}</div>
+                        `;
+                        container.appendChild(div);
+                    });
+                }
+            } catch(e) { console.log("Evolution data load failed"); }
+        }
 
         async function loadTicker(ticker, element) {
             // Update UI State
