@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM v23.5 :: MARKET MAYHEM: BLACK MONDAY AFTERMATH</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/market_mayhem_tiers.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/nav.js" defer></script>
+    <script src="js/market_mayhem_viewer.js" defer></script>
+</head>
+<body class="tier-high">
+
+    <!-- System 2 Verification Overlay -->
+    <div id="system2-overlay" class="system2-overlay">
+        <div class="system2-terminal">
+            <div id="sys2-content"></div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="cyber-toast-container"></div>
+
+    <!-- Raw Source Modal -->
+    <div id="raw-source-modal" class="raw-source-modal">
+        <div class="raw-source-header">
+            <span>SOURCE_DATA.JSON</span>
+            <span style="cursor:pointer; color:#cc0000;" onclick="toggleSource()">[CLOSE]</span>
+        </div>
+        <div class="raw-source-content" id="raw-source-content"></div>
+    </div>
+
+    <!-- Virtual Toolbar for High Tier -->
+    <div class="doc-toolbar" style="display: flex;">
+        <div class="toolbar-item" onclick="window.location.href='market_mayhem_archive_v24.html'"><strong>FILE</strong></div>
+        <div class="toolbar-item" onclick="toggleRedactionMode()">REDACT</div>
+        <div class="toolbar-item" onclick="printReport()">PRINT</div>
+        <div class="toolbar-item" onclick="shareReport()">SHARE</div>
+        <div class="toolbar-item" onclick="downloadReport()">DOWNLOAD</div>
+        <div class="toolbar-item" onclick="toggleTheme()">VIEW</div>
+        <div class="toolbar-item" onclick="showToast('INSERT: PERMISSION DENIED')">INSERT</div>
+        <div class="toolbar-item" onclick="showToast('FORMAT: LOCKED')">FORMAT</div>
+        <div class="toolbar-item" onclick="runVerification()" style="color: #0078d7;"><strong>VERIFY</strong></div>
+        <div style="flex-grow:1;"></div>
+        <div class="toolbar-item" style="color:#666;">ADAM_V26_EDITOR</div>
+    </div>
+
+    <div style="max-width: 1400px; margin: 0 auto; padding: 10px 20px; display:flex; justify-content:space-between; align-items:center; display: none;">
+        <a href="market_mayhem_archive_v24.html" class="cyber-btn">&larr; RETURN TO ARCHIVE</a>
+        <div style="font-family:'JetBrains Mono'; font-size:0.7rem; color:#666;">SECURE CONNECTION ESTABLISHED</div>
+    </div>
+
+    <div class="newsletter-wrapper">
+        <div class="paper-sheet" id="paper-sheet">
+
+            <!-- Top Secret Stamp -->
+            <div id="top-secret-stamp" class="top-secret-stamp">TOP SECRET</div>
+
+            <!-- High Tier Header UI -->
+            <div class="doc-header-ui" style="display: flex;">
+                <span id="verification-status">CONFIDENTIAL // SYSTEM 2 REVIEW</span>
+                <span>048235e7</span>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; font-family:'JetBrains Mono'; font-size:0.8rem; color:#666; margin-bottom:20px; margin-top: 20px;">
+                <span>1987-10-23</span>
+                <span>ID: 048235e7</span>
+            </div>
+
+            <h1 class="title">MARKET MAYHEM: BLACK MONDAY AFTERMATH</h1>
+
+            <!-- Metadata Panel for High Tier (Embedded in Doc) -->
+            <div class="doc-metadata-panel" style="display: grid;">
+                <div class="doc-metadata-item"><strong>Classification</strong>UNCLASSIFIED</div>
+                <div class="doc-metadata-item"><strong>Conviction</strong>100/100</div>
+                <div class="doc-metadata-item"><strong>Sentiment</strong>85/100</div>
+                <div class="doc-metadata-item"><strong>Reviewer</strong>Market_Maker</div>
+            </div>
+
+            <div id="financialChartContainer" style="display:none; margin-bottom: 30px;">
+                <canvas id="financialChart"></canvas>
+            </div>
+
+            <div id="document-body">
+                <p><strong>The Crash.</strong> Monday, October 19th, will live in infamy. The Dow Jones Industrial Average collapsed 508 points, losing 22.6% of its value in a single session. Volume on the NYSE reached an unprecedented 604 million shares, leaving the ticker tape hours behind.</p>
+<p><strong>The Culprit:</strong> Program trading. 'Portfolio Insurance' strategies, designed to sell futures as the market falls to hedge portfolios, kicked in simultaneously. This selling pressure crushed the futures market, which dragged down the spot market in a vicious spiral.</p>
+<p><strong>The Aftermath:</strong> Alan Greenspan's Fed has issued a statement: 'The Federal Reserve, consistent with its responsibilities as the Nation's central bank, affirmed today its readiness to serve as a source of liquidity to support the economic and financial system.' The bleeding has stopped, but the scar remains.</p>
+            </div>
+
+            <!-- Provenance Log (All Tiers) -->
+            <div class="provenance-log">
+                <div class="log-entry">
+                    <span>> HASH_CHECK</span>
+                    <span style="color:var(--terminal-green);">048235e76941168181888d57e9ba4a0019a18c589ffcad098f32f950acf9669f</span>
+                </div>
+                <div class="log-entry">
+                    <span>> SENTIMENT_SCAN</span>
+                    <span>85 (DENSITY: 64)</span>
+                </div>
+                <div class="log-entry">
+                    <span>> CONVICTION_LOCK</span>
+                    <span>100%</span>
+                </div>
+                <div class="log-entry">
+                    <span>> CRITIQUE_LOG</span>
+                    <span>"Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 85/100. Cross-reference with knowledge graph completed."</span>
+                </div>
+            </div>
+
+            <a href="#" class="source-jump-btn" onclick="toggleSource(); return false;" title="View Source JSON">JUMP TO SOURCE</a>
+
+            <div style="margin-top: 40px; border-top: 1px solid #ccc; padding-top: 20px; font-style: italic; color: #666;">
+                End of Transmission.
+            </div>
+        </div>
+
+        <aside class="cyber-sidebar">
+            <div class="sidebar-widget">
+                <div class="sidebar-title">Intelligence Metadata</div>
+                <div class="stat-row"><span>DATE</span> <span class="stat-val">1987-10-23</span></div>
+                <div class="stat-row"><span>TYPE</span> <span class="stat-val">HISTORICAL</span></div>
+                <div class="stat-row"><span>CLASS</span> <span class="stat-val">UNCLASSIFIED</span></div>
+                <div class="stat-row"><span>PROVENANCE</span> <span class="stat-val" title="048235e76941168181888d57e9ba4a0019a18c589ffcad098f32f950acf9669f">048235e7</span></div>
+            </div>
+
+            <div class="sidebar-widget">
+                <div class="sidebar-title">Sentiment Analysis</div>
+                <div class="stat-row"><span>SCORE</span> <span class="stat-val">85/100</span></div>
+                <div class="sentiment-bar">
+                    <div class="sentiment-fill" style="width: 85%;"></div>
+                </div>
+            </div>
+
+            <div class="sidebar-widget">
+                <div class="sidebar-title">Detected Entities</div>
+                <div class="tag-cloud">
+                    <a href="market_mayhem_archive_v24.html?search=US_FED" class="tag" style="text-decoration:none;">US_FED</a><a href="market_mayhem_archive_v24.html?search=AI" class="tag" style="text-decoration:none; border-color:#666;">AI</a><a href="market_mayhem_archive_v24.html?search=Value" class="tag" style="text-decoration:none; border-color:#666;">Value</a>
+                </div>
+            </div>
+
+             <div class="sidebar-widget">
+                <div class="sidebar-title">Agent Conviction</div>
+                 <div class="stat-row"><span>CONFIDENCE</span> <span class="stat-val">100/100</span></div>
+                 <div class="sentiment-bar">
+                    <div class="sentiment-fill" style="width: 100%; background: #00ff00;"></div>
+                </div>
+            </div>
+
+            <div class="sidebar-widget">
+                <div class="sidebar-title">Semantic Analysis</div>
+                 <div class="stat-row"><span>DENSITY</span> <span class="stat-val">64/100</span></div>
+                 <div class="stat-row"><span>PROBABILITY</span> <span class="stat-val">100/100</span></div>
+            </div>
+
+             <div class="sidebar-widget" style="border-color: #555;">
+                <div class="sidebar-title">Reviewer Agent Log</div>
+                 <div style="font-size: 0.75rem; color: #ccc; font-style: italic;">
+                    "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 85/100. Cross-reference with knowledge graph completed."
+                </div>
+                <div class="stat-row" style="margin-top:10px;"><span>QUALITY SCORE</span> <span class="stat-val">100/100</span></div>
+            </div>
+
+             <div class="sidebar-widget">
+                <div class="sidebar-title">Contributing Agents</div>
+                 <div style="display:flex; flex-direction:column; gap:5px;">
+                    <div style="font-size:0.75rem; color:#666;">System Core</div>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Hidden Raw Data -->
+    <textarea id="hidden-raw-data" style="display:none;">{
+  "date": "1987-10-23",
+  "title": "MARKET MAYHEM: BLACK MONDAY AFTERMATH",
+  "summary": "\"Shell-Shocked\". On October 19th, the Dow Jones Industrial Average fell 22.6% in a single day. 508 points. It was the largest one-day percentage drop in history.",
+  "type": "HISTORICAL",
+  "filename": "newsletter_market_mayhem_oct_1987.html",
+  "is_sourced": true,
+  "full_body": "<p><strong>The Crash.</strong> Monday, October 19th, will live in infamy. The Dow Jones Industrial Average collapsed 508 points, losing 22.6% of its value in a single session. Volume on the NYSE reached an unprecedented 604 million shares, leaving the ticker tape hours behind.</p>\n<p><strong>The Culprit:</strong> Program trading. 'Portfolio Insurance' strategies, designed to sell futures as the market falls to hedge portfolios, kicked in simultaneously. This selling pressure crushed the futures market, which dragged down the spot market in a vicious spiral.</p>\n<p><strong>The Aftermath:</strong> Alan Greenspan's Fed has issued a statement: 'The Federal Reserve, consistent with its responsibilities as the Nation's central bank, affirmed today its readiness to serve as a source of liquidity to support the economic and financial system.' The bleeding has stopped, but the scar remains.</p>",
+  "source_priority": 3,
+  "sentiment_score": 85,
+  "entities": {
+    "tickers": [],
+    "agents": [],
+    "sovereigns": [
+      "US_FED"
+    ],
+    "keywords": [
+      "AI",
+      "Value"
+    ]
+  },
+  "provenance_hash": "048235e76941168181888d57e9ba4a0019a18c589ffcad098f32f950acf9669f",
+  "metrics_json": "{}",
+  "conviction": 100,
+  "semantic_score": 64,
+  "probability": 100,
+  "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 85/100. Cross-reference with knowledge graph completed."
+}</textarea>
+
+    <script>
+        // Chart Injection Logic
+        const metricsData = {};
+
+        if (metricsData && Object.keys(metricsData).length > 0) {
+            const ctx = document.getElementById('financialChart');
+            const container = document.getElementById('financialChartContainer');
+
+            // Basic parsing of metrics structure (assuming flat or Year->Val)
+            let labels = [];
+            let values = [];
+            let labelName = "Metric";
+
+            // Try to find a timeseries
+            for (const [key, val] of Object.entries(metricsData)) {
+                if (typeof val === 'object') {
+                    // Likely year -> value
+                    labels = Object.keys(val);
+                    values = Object.values(val).map(v => parseFloat(v.replace(/[^0-9.-]/g, '')));
+                    labelName = key;
+                    break;
+                }
+            }
+
+            if (labels.length > 0) {
+                container.style.display = 'block';
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: labelName,
+                            data: values,
+                            backgroundColor: 'rgba(204, 0, 0, 0.5)',
+                            borderColor: '#cc0000',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: { legend: { display: true } }
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+</html>
