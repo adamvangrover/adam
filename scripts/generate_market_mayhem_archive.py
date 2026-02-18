@@ -25,14 +25,16 @@ SOURCE_DIRS = [
     "core/libraries_and_archives/generated_content"
 ]
 SHOWCASE_DIR = "showcase"
-ARCHIVE_FILE = "showcase/market_mayhem_archive_v24.html" # Updated to v24 to match previous file name usage
+ARCHIVE_FILE = "showcase/market_mayhem_archive.html"
 TEMPLATE_FILE = "showcase/templates/market_mayhem_report.html"
 DATA_FILE = "showcase/data/newsletter_data.json"
+CURRENT_SYSTEM_DATE = "2026-02-17"
 
 # --- Analysis Helpers ---
 
 POSITIVE_WORDS = {"growth", "profit", "boom", "bullish", "strong", "gain", "rally", "opportunity", "breakthrough", "resilient", "optimism", "surge", "upward", "recovery"}
 NEGATIVE_WORDS = {"loss", "crash", "recession", "bearish", "weak", "risk", "inflation", "crisis", "downturn", "collapse", "uncertainty", "volatile", "fear", "panic", "decline"}
+OUTLOOK_WORDS = {"forecast", "expect", "project", "target", "outlook", "future", "2026", "2027", "prediction", "estimate", "will", "anticipate", "trajectory", "path", "roadmap", "horizon", "upcoming"}
 
 def analyze_sentiment(text):
     """Calculates a sentiment score (0-100) based on keyword density."""
@@ -51,6 +53,23 @@ def analyze_sentiment(text):
     # Base is 50.
     score = (pos_count / total_matches) * 100
     return int(score)
+
+def analyze_outlook(text):
+    """Calculates an outlook score (0-100) based on future-oriented keyword density."""
+    if not text: return 0
+    text_lower = text.lower()
+    words = re.findall(r'\w+', text_lower)
+    if not words: return 0
+
+    count = sum(1 for w in words if w in OUTLOOK_WORDS)
+    total_matches = len(words)
+    if total_matches == 0: return 0
+
+    # Scale: A few words should trigger a high score if short text, but generally density based.
+    # 2.5% density is high for specific words.
+    density = count / total_matches
+    score = min(int(density * 4000), 100)
+    return score
 
 def extract_entities(text):
     """Extracts Tickers ($AAPL), Agents (@AgentName), Sovereigns, and Keywords."""
@@ -151,7 +170,7 @@ def determine_tier(type_, quality):
     if type_ in ["MARKET_PULSE", "DAILY_BRIEFING", "CYBER_GLITCH", "TECH_WATCH", "AGENT_NOTE"]:
         return "tier-low"
 
-    if type_ in ["DEEP_DIVE", "SPECIAL_EDITION", "STRATEGY", "ANNUAL_STRATEGY", "HISTORICAL", "COUNTERFACTUAL"]:
+    if type_ in ["DEEP_DIVE", "SPECIAL_EDITION", "STRATEGY", "ANNUAL_STRATEGY", "HISTORICAL", "COUNTERFACTUAL", "MARKET_OUTLOOK"]:
         return "tier-high"
 
     # Fallback to quality for standard newsletters
@@ -757,6 +776,7 @@ def get_all_data():
         item['semantic_score'] = calculate_semantic_score(full_text)
         item['probability'] = calculate_probability(full_text)
         item['critique'] = generate_critique(item)
+        item['outlook_score'] = analyze_outlook(full_text)
 
         all_items.append(item)
 
@@ -771,18 +791,28 @@ def get_all_data():
             elif filepath.endswith(".txt"): item = parse_txt_file(filepath)
             elif filepath.endswith(".html"): item = parse_html_file(filepath)
 
-            if item: all_items.append(item)
+            if item:
+                full_text = f"{item['title']} {item['summary']} {item.get('full_body', '')}"
+                item['outlook_score'] = analyze_outlook(full_text)
+                all_items.append(item)
 
     # 3. Scan Showcase
     if os.path.exists(SHOWCASE_DIR):
         files = glob.glob(os.path.join(SHOWCASE_DIR, "*.html"))
         for filepath in files:
             item = parse_html_file(filepath)
-            if item: all_items.append(item)
+            if item:
+                full_text = f"{item['title']} {item['summary']} {item.get('full_body', '')}"
+                item['outlook_score'] = analyze_outlook(full_text)
+                all_items.append(item)
 
     # Deduplicate
     grouped_by_date = {}
     for item in all_items:
+        # Outlook override - CHANGED FROM 2025-06-01 TO 2026-02-17
+        if item['date'] > CURRENT_SYSTEM_DATE and item['type'] not in ['HISTORICAL', 'COUNTERFACTUAL']:
+             item['type'] = 'MARKET_OUTLOOK'
+
         date = item['date']
         if date not in grouped_by_date:
             grouped_by_date[date] = []
@@ -844,9 +874,9 @@ def generate_archive():
 
         # Entity HTML
         entity_html = ""
-        for t in item['entities']['tickers']: entity_html += f'<a href="market_mayhem_archive_v24.html?search={t}" class="tag ticker" style="text-decoration:none;">${t}</a>'
-        for s in item['entities']['sovereigns']: entity_html += f'<a href="market_mayhem_archive_v24.html?search={s}" class="tag" style="text-decoration:none;">{s}</a>'
-        for k in item['entities'].get('keywords', []): entity_html += f'<a href="market_mayhem_archive_v24.html?search={k}" class="tag" style="text-decoration:none; border-color:#666;">{k}</a>'
+        for t in item['entities']['tickers']: entity_html += f'<a href="market_mayhem_archive.html?search={t}" class="tag ticker" style="text-decoration:none;">${t}</a>'
+        for s in item['entities']['sovereigns']: entity_html += f'<a href="market_mayhem_archive.html?search={s}" class="tag" style="text-decoration:none;">{s}</a>'
+        for k in item['entities'].get('keywords', []): entity_html += f'<a href="market_mayhem_archive.html?search={k}" class="tag" style="text-decoration:none; border-color:#666;">{k}</a>'
 
         if not entity_html:
             entity_html = f'<span class="tag" style="border-color:#444;">{item["type"]}</span>'
@@ -938,6 +968,7 @@ def generate_archive():
     dates = [i['date'] for i in chart_items]
     sentiments = [i['sentiment_score'] for i in chart_items]
     convictions = [i.get('conviction', 50) for i in chart_items]
+    outlooks = [i.get('outlook_score', 0) for i in chart_items] # New Outlook Data
 
     window_size = 5
     moving_averages = []
@@ -1045,6 +1076,8 @@ def generate_archive():
 
         .type-badge {{ font-size: 0.6rem; padding: 2px 6px; border-radius: 2px; font-weight: bold; font-family: 'JetBrains Mono'; background: #333; color: white; margin-left: 10px; }}
 
+        .top-rated-badge {{ font-size: 0.6rem; padding: 2px 6px; border-radius: 2px; font-weight: bold; font-family: 'JetBrains Mono'; background: #ffd700; color: #000; margin-left: 10px; }}
+
         /* System Dashboard */
         .system-dashboard {{
             display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
@@ -1070,6 +1103,7 @@ def generate_archive():
         .type-DEEP_DIVE {{ border-left-color: #cc0000; }}
         .type-MARKET_PULSE {{ border-left-color: #00f3ff; }}
         .type-HISTORICAL {{ border-left-color: #666; }}
+        .type-MARKET_OUTLOOK {{ border-left-color: #ff00ff; border-left-width: 5px; }}
     </style>
 </head>
 <body>
@@ -1078,7 +1112,7 @@ def generate_archive():
             <i class="fas fa-archive text-cyan-400"></i>
             <h1 class="mono" style="margin: 0; font-size: 1.2rem; letter-spacing: 1px;">MARKET MAYHEM ARCHIVE</h1>
         </div>
-        <div class="mono" style="font-size: 0.8rem; color: #666;">v24.0.2</div>
+        <div class="mono" style="font-size: 0.8rem; color: #666;">v24.0.3</div>
     </header>
 
     <div class="dashboard-grid">
@@ -1090,6 +1124,7 @@ def generate_archive():
                     <a href="market_mayhem_conviction.html" class="cyber-btn" style="text-align:center;">CONVICTION PAPER</a>
                     <a href="market_mayhem_repository.html" class="cyber-btn" style="text-align:center; border-color: #f59e0b; color: #f59e0b;">VISUAL REPOSITORY</a>
                     <a href="portfolio_dashboard.html" class="cyber-btn" style="text-align:center; border-color: #33ff00; color: #33ff00;">PORTFOLIO DASHBOARD</a>
+                    <a href="13f_tracker.html" class="cyber-btn" style="text-align:center; border-color: #ffff00; color: #ffff00;">13F TRACKER</a>
                     <a href="macro_glitch_monitor.html" class="cyber-btn" style="text-align:center; border-color: #ff00ff; color: #ff00ff;">GLITCH MONITOR</a>
                 </div>
             </div>
@@ -1097,6 +1132,17 @@ def generate_archive():
             <div class="filter-group">
                 <label class="filter-label">Search Intelligence</label>
                 <input type="text" id="searchInput" placeholder="Keywords..." class="filter-select" onkeyup="applyFilters()">
+            </div>
+
+            <div class="filter-group">
+                <label class="filter-label">Sort By</label>
+                <select id="sortFilter" class="filter-select" onchange="applyFilters()">
+                    <option value="DATE_DESC">Date (Newest)</option>
+                    <option value="DATE_ASC">Date (Oldest)</option>
+                    <option value="QUALITY_HIGH">Quality (Highest)</option>
+                    <option value="SENTIMENT_HIGH">Sentiment (High)</option>
+                    <option value="SENTIMENT_LOW">Sentiment (Low)</option>
+                </select>
             </div>
 
             <div class="filter-group">
@@ -1116,6 +1162,7 @@ def generate_archive():
                     <option value="DEEP_DIVE">Deep Dive</option>
                     <option value="COMPANY_REPORT">Company Report</option>
                     <option value="MARKET_PULSE">Market Pulse</option>
+                    <option value="MARKET_OUTLOOK">Market Outlook</option>
                 </select>
             </div>
 
@@ -1155,13 +1202,23 @@ def generate_archive():
             safe_title = item['title'].replace('"', "'").lower()
             safe_summary = item['summary'].replace('"', "'").lower()
             
+            outlook_badge = ""
+            if item['type'] == 'MARKET_OUTLOOK' and item.get('outlook_score', 0) > 0:
+                outlook_badge = f"<span class='mono' style='font-size:0.7rem; color:#ff00ff; margin-left:10px;'>OUTLOOK: {{item['outlook_score']}}</span>"
+
+            quality_badge = ""
+            if item.get('quality', 0) > 90:
+                quality_badge = f"<span class='top-rated-badge'>TOP RATED</span>"
+
             archive_html += f"""
-            <div class="archive-item type-{item['type']}" data-year="{year}" data-type="{item['type']}" data-title="{safe_title} {safe_summary}">
+            <div class="archive-item type-{item['type']}" data-year="{year}" data-type="{item['type']}" data-title="{safe_title} {safe_summary}" data-sentiment="{item['sentiment_score']}" data-quality="{item.get('quality', 0)}" data-date="{item['date']}">
                 <div style="flex-grow: 1;">
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">{item['date']}</span>
                         <span class="type-badge">{item['type']}</span>
+                        {quality_badge}
                         <span class="mono" style="font-size:0.7rem; color:#444;">SENT: {item['sentiment_score']} | CONV: {item.get('conviction', 50)} | SEM: {item.get('semantic_score', 0)}</span>
+                        {outlook_badge}
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">{item['title']}</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">{item['summary']}</p>
@@ -1174,7 +1231,7 @@ def generate_archive():
          safe_title = item['title'].replace('"', "'").lower()
          safe_summary = item['summary'].replace('"', "'").lower()
          archive_html += f"""
-            <div class="archive-item type-HISTORICAL" data-year="HISTORICAL" data-type="HISTORICAL" data-title="{safe_title} {safe_summary}">
+            <div class="archive-item type-HISTORICAL" data-year="HISTORICAL" data-type="HISTORICAL" data-title="{safe_title} {safe_summary}" data-sentiment="{item['sentiment_score']}" data-quality="{item.get('quality', 0)}" data-date="{item['date']}">
                 <div style="flex-grow: 1;">
                      <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">{item['date']}</span>
@@ -1215,6 +1272,15 @@ def generate_archive():
                     hidden: false
                 },
                 {
+                    label: 'Outlook Score',
+                    data: """ + json.dumps(outlooks) + """,
+                    borderColor: '#ffff00',
+                    backgroundColor: 'rgba(255, 255, 0, 0.1)',
+                    borderDash: [2, 2],
+                    tension: 0.4,
+                    hidden: false
+                },
+                {
                     label: 'Moving Average (5p)',
                     data: """ + json.dumps(moving_averages) + """,
                     borderColor: '#ffffff',
@@ -1247,8 +1313,10 @@ def generate_archive():
             const search = document.getElementById('searchInput').value.toLowerCase();
             const year = document.getElementById('yearFilter').value;
             const type = document.getElementById('typeFilter').value;
+            const sortVal = document.getElementById('sortFilter').value;
 
-            const items = document.querySelectorAll('.archive-item');
+            const grid = document.getElementById('archiveGrid');
+            const items = Array.from(document.querySelectorAll('.archive-item'));
 
             items.forEach(item => {
                 const itemYear = item.dataset.year;
@@ -1261,6 +1329,25 @@ def generate_archive():
 
                 item.style.display = (matchSearch && matchYear && matchType) ? 'flex' : 'none';
             });
+
+            // Sorting Logic
+            items.sort((a, b) => {
+                if (sortVal === 'DATE_DESC') {
+                    return new Date(b.dataset.date) - new Date(a.dataset.date);
+                } else if (sortVal === 'DATE_ASC') {
+                    return new Date(a.dataset.date) - new Date(b.dataset.date);
+                } else if (sortVal === 'QUALITY_HIGH') {
+                    return parseInt(b.dataset.quality) - parseInt(a.dataset.quality);
+                } else if (sortVal === 'SENTIMENT_HIGH') {
+                    return parseInt(b.dataset.sentiment) - parseInt(a.dataset.sentiment);
+                } else if (sortVal === 'SENTIMENT_LOW') {
+                    return parseInt(a.dataset.sentiment) - parseInt(b.dataset.sentiment);
+                }
+                return 0;
+            });
+
+            // Re-append sorted items
+            items.forEach(item => grid.appendChild(item));
         }
 
         function setSearch(term) {
