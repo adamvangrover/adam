@@ -89,21 +89,46 @@
             <div id="crisisSimContainer" style="display:none; margin-bottom: 30px; border: 1px solid #cc0000; padding: 20px; background: rgba(50, 0, 0, 0.2);">
                 <h3 style="color: #cc0000; margin-top: 0; font-family: 'JetBrains Mono'; border-bottom: 1px solid #cc0000; padding-bottom: 10px; margin-bottom: 20px;">CRISIS SIMULATOR // STRESS TEST</h3>
 
-                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 20px;">
+                <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-bottom: 20px;">
                     <div class="crisis-btn" onclick="renderCrisis('2008_LEHMAN')" style="cursor:pointer; text-align:center; padding: 10px; border: 1px solid #666; font-size: 0.8rem; color: #ccc;">
                         2008 LEHMAN
                     </div>
                     <div class="crisis-btn" onclick="renderCrisis('1987_BLACK_MONDAY')" style="cursor:pointer; text-align:center; padding: 10px; border: 1px solid #666; font-size: 0.8rem; color: #ccc;">
                         1987 BLACK MON
                     </div>
+                    <div class="crisis-btn" onclick="renderCrisis('2000_DOTCOM_BUBBLE')" style="cursor:pointer; text-align:center; padding: 10px; border: 1px solid #666; font-size: 0.8rem; color: #ccc;">
+                        2000 DOTCOM
+                    </div>
                     <div class="crisis-btn" onclick="renderCrisis('2020_COVID')" style="cursor:pointer; text-align:center; padding: 10px; border: 1px solid #666; font-size: 0.8rem; color: #ccc;">
                         2020 PANDEMIC
+                    </div>
+                    <div class="crisis-btn" onclick="renderCrisis('2022_INFLATION_SHOCK')" style="cursor:pointer; text-align:center; padding: 10px; border: 1px solid #666; font-size: 0.8rem; color: #ccc;">
+                        2022 INFLATION
                     </div>
                 </div>
 
                 <div style="height: 300px; position: relative;">
                     <canvas id="crisisChart"></canvas>
                 </div>
+
+                <!-- Metrics Display -->
+                <div id="crisisMetrics" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; font-family: 'JetBrains Mono'; font-size: 0.8rem; color: #ccc;">
+                    <!-- Portfolio Metrics -->
+                    <div style="border: 1px solid #00f3ff; padding: 10px; background: rgba(0, 243, 255, 0.05);">
+                        <div style="color: #00f3ff; border-bottom: 1px solid #00f3ff; margin-bottom: 10px; padding-bottom: 5px; font-weight: bold;">PORTFOLIO PERFORMANCE</div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;"><span>MAX DRAWDOWN:</span> <span id="port_dd" style="color: #fff;">0.00%</span></div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;"><span>VOLATILITY (ANN):</span> <span id="port_vol" style="color: #fff;">0.00%</span></div>
+                        <div style="display: flex; justify-content: space-between;"><span>TOTAL RETURN:</span> <span id="port_ret" style="color: #fff;">0.00%</span></div>
+                    </div>
+                    <!-- Market Metrics -->
+                    <div style="border: 1px solid #666; padding: 10px; background: rgba(100, 100, 100, 0.1);">
+                        <div style="color: #888; border-bottom: 1px solid #666; margin-bottom: 10px; padding-bottom: 5px; font-weight: bold;">MARKET BENCHMARK</div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;"><span>MAX DRAWDOWN:</span> <span id="mkt_dd" style="color: #ccc;">0.00%</span></div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;"><span>VOLATILITY (ANN):</span> <span id="mkt_vol" style="color: #ccc;">0.00%</span></div>
+                        <div style="display: flex; justify-content: space-between;"><span>TOTAL RETURN:</span> <span id="mkt_ret" style="color: #ccc;">0.00%</span></div>
+                    </div>
+                </div>
+
                 <div style="font-size: 0.7rem; color: #888; margin-top: 15px; font-style: italic;">
                     * Hypothetical performance based on portfolio beta and current risk profile. PAST PERFORMANCE IS NOT INDICATIVE OF FUTURE RESULTS.
                 </div>
@@ -266,6 +291,26 @@
             }});
 
             const data = crisisData[scenarioName];
+
+            // Update Metrics Display
+            if (data.metrics) {{
+                const p = data.metrics.portfolio;
+                const m = data.metrics.market;
+
+                document.getElementById('port_dd').innerText = p.max_drawdown.toFixed(2) + '%';
+                document.getElementById('port_vol').innerText = p.volatility.toFixed(2) + '%';
+                document.getElementById('port_ret').innerText = p.total_return.toFixed(2) + '%';
+
+                // Color code return
+                document.getElementById('port_ret').style.color = p.total_return >= 0 ? '#00f3ff' : '#ff4444';
+
+                document.getElementById('mkt_dd').innerText = m.max_drawdown.toFixed(2) + '%';
+                document.getElementById('mkt_vol').innerText = m.volatility.toFixed(2) + '%';
+                document.getElementById('mkt_ret').innerText = m.total_return.toFixed(2) + '%';
+
+                document.getElementById('mkt_ret').style.color = m.total_return >= 0 ? '#ccc' : '#cc0000';
+            }}
+
             const ctx = document.getElementById('crisisChart').getContext('2d');
 
             if (crisisChartInstance) {{
@@ -337,8 +382,21 @@
         // Auto-Run Default Crisis if Data Available
         if (crisisData && Object.keys(crisisData).length > 0) {{
             document.getElementById('crisisSimContainer').style.display = 'block';
+
+            // Parse URL parameters for ?sim=SCENARIO_NAME
+            const urlParams = new URLSearchParams(window.location.search);
+            const simParam = urlParams.get('sim');
+
             // slight delay to ensure Chart.js loaded
-            setTimeout(() => renderCrisis('2008_LEHMAN'), 100);
+            setTimeout(() => {{
+                if (simParam && crisisData[simParam]) {{
+                    renderCrisis(simParam);
+                    // Scroll to container
+                    document.getElementById('crisisSimContainer').scrollIntoView({{ behavior: 'smooth' }});
+                }} else {{
+                    renderCrisis('2008_LEHMAN');
+                }}
+            }}, 100);
         }}
     </script>
 </body>

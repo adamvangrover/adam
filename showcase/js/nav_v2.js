@@ -145,6 +145,13 @@ class AdamNavigator {
             document.body.appendChild(overlayScript);
         }
 
+        // Load Command Palette
+        if (!window.commandPalette) {
+            const cmdScript = document.createElement('script');
+            cmdScript.src = this._sanitizePath(`${this.showcasePath}/js/command_palette.js`);
+            document.body.appendChild(cmdScript);
+        }
+
         if (!window.dataManager) {
             const mockScript = document.createElement('script');
             mockScript.src = this._sanitizePath(`${this.showcasePath}/js/mock_data.js`);
@@ -230,7 +237,9 @@ class AdamNavigator {
                 <div class="relative group">
                     <input type="text" id="global-search" placeholder="Search Agents, Docs..."
                         class="w-full bg-slate-900/50 border border-slate-700 rounded px-3 py-1.5 text-xs text-white focus:outline-none focus:border-cyan-500 transition-colors font-mono">
-                    <i class="fas fa-search absolute right-3 top-2 text-slate-500 text-xs"></i>
+                    <div class="absolute right-2 top-1.5 flex items-center gap-1 pointer-events-none">
+                         <span class="text-[10px] text-slate-500 bg-slate-800 px-1 rounded border border-slate-700 font-mono">⌘K</span>
+                    </div>
                     <div id="search-results" class="absolute left-0 top-full mt-2 w-64 bg-slate-800 border border-slate-700 rounded shadow-xl hidden z-50 max-h-64 overflow-y-auto"></div>
                 </div>
             </div>

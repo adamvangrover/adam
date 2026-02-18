@@ -369,8 +369,21 @@
         // Auto-Run Default Crisis if Data Available
         if (crisisData && Object.keys(crisisData).length > 0) {
             document.getElementById('crisisSimContainer').style.display = 'block';
+
+            // Parse URL parameters for ?sim=SCENARIO_NAME
+            const urlParams = new URLSearchParams(window.location.search);
+            const simParam = urlParams.get('sim');
+
             // slight delay to ensure Chart.js loaded
-            setTimeout(() => renderCrisis('2008_LEHMAN'), 100);
+            setTimeout(() => {
+                if (simParam && crisisData[simParam]) {
+                    renderCrisis(simParam);
+                    // Scroll to container
+                    document.getElementById('crisisSimContainer').scrollIntoView({ behavior: 'smooth' });
+                } else {
+                    renderCrisis('2008_LEHMAN');
+                }
+            }, 100);
         }
     </script>
 </body>
