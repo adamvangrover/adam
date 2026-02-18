@@ -41,6 +41,24 @@ class RAGRequestHandler(http.server.SimpleHTTPRequestHandler):
                     self.send_error(400, "Missing ticker or file path")
                     return
 
+                # SECURITY: Path Traversal Prevention
+                # Restrict file access to the 'data' directory
+                allowed_dir = os.path.abspath("data")
+                requested_path = os.path.abspath(file_path)
+
+                # Ensure allowed_dir ends with separator to prevent partial matching (e.g. /data matching /database)
+                if not allowed_dir.endswith(os.sep):
+                    allowed_dir += os.sep
+
+                if not requested_path.startswith(allowed_dir):
+                    logger.warning(f"Security Alert: Path traversal attempt blocked. Input: {file_path}")
+                    self.send_error(403, "Access denied: Invalid file path")
+                    return
+
+                if not os.path.exists(requested_path):
+                    self.send_error(404, "File not found")
+                    return
+
                 logger.info(f"Received RAG request for {ticker} using {file_path}")
 
                 # Execute Pipeline
