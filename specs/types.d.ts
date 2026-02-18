@@ -55,3 +55,26 @@ export interface Prompt {
     template: string;
     variables: string[];
 }
+
+export interface CrisisScenario {
+    name: string;
+    duration: number;
+    market_volatility: number;
+    market_trend: number;
+    shock_event_day: number;
+    shock_magnitude: number;
+}
+
+export interface SimulationResult {
+    scenario: string;
+    labels: number[];
+    market: number[];
+    portfolio: number[];
+}
+
+export interface SystemMetric {
+    name: string;
+    value: number;
+    unit: string;
+    timestamp: string; // ISO Date
+}
