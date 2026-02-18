@@ -75,6 +75,47 @@ MODULES = {
             "editor_studio.html",
             "data/market_mayhem_index.json"
         ]
+    },
+    "strategic_intelligence": {
+        "entry": "modular_dashboard.html",
+        "includes": [
+            "js/modular_loader.js",
+            "data/modular/manifest.json",
+            "data/modular/reports.json",
+            "data/modular/market_data.json",
+            "data/modular/system_status.json",
+            "daily_briefings_library.html",
+            "market_pulse_library.html",
+            "house_view_library.html",
+            "js/library_logic.js"
+        ]
+    },
+    "credit_command": {
+        "entry": "credit_analyst_workstation.html",
+        "includes": [
+            "js/modular_loader.js",
+            "data/modular/manifest.json",
+            "data/modular/credit_memos.json",
+            "data/modular/market_data.json",
+            "data/modular/system_status.json",
+            "credit_memo_automation.html",
+            "risk_topography.html",
+            "unified_credit_console.html",
+            "js/credit_memo.js"
+        ]
+    },
+    "simulation_deck": {
+        "entry": "crisis_simulator.html",
+        "includes": [
+            "js/modular_loader.js",
+            "data/modular/manifest.json",
+            "data/modular/market_data.json",
+            "data/modular/system_status.json",
+            "war_room.html",
+            "wargame_dashboard.html",
+            "scenario_lab.html",
+            "js/simulation_viewer.js"
+        ]
     }
 }
 
@@ -121,14 +162,15 @@ def patch_nav_js(target_dir):
         # Replace the showcase path logic
         # Original: this.showcasePath = `${cleanRoot}/showcase`;
         # New:      this.showcasePath = `${cleanRoot}`;
-        new_content = content.replace(
-            "this.showcasePath = `${cleanRoot}/showcase`;",
-            "this.showcasePath = `${cleanRoot}`;"
-        )
+        target_str = "this.showcasePath = `${cleanRoot}/showcase`;"
+        replacement_str = "this.showcasePath = `${cleanRoot}`;"
 
-        # Also handle the specific check for /showcase/ in path
-        # Original: if (window.location.pathname.includes('/showcase/') && !dataRoot)
-        # We can just make it always use cleanRoot (current dir)
+        new_content = content.replace(target_str, replacement_str)
+
+        if new_content == content:
+            print(f"[!] Warning: Failed to patch nav.js. Target string not found: '{target_str}'")
+        else:
+            print("[+] nav.js patched successfully.")
 
         nav_js_path.write_text(new_content)
 
@@ -188,9 +230,16 @@ def export_module(module_name, output_dir):
     # 3. Handle Entry Point
     entry_src = SHOWCASE_DIR / config["entry"]
     if entry_src.exists():
+        # Copy to index.html (Main Entry)
         entry_dst = target_dir / "index.html"
         shutil.copy2(entry_src, entry_dst)
         print(f"[*] Entry point set: {config['entry']} -> index.html")
+
+        # Also copy to original filename (Preserve Links)
+        if config["entry"] != "index.html":
+            orig_dst = target_dir / config["entry"]
+            shutil.copy2(entry_src, orig_dst)
+            print(f"[*] Preserved original entry: {config['entry']}")
     else:
         print(f"[!] Error: Entry point {entry_src} not found!")
 
