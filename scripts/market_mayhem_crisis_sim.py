@@ -1,6 +1,7 @@
 import hashlib
 import random
 import json
+import math
 
 class CrisisSimulator:
     def __init__(self, seed: str, risk_profile: str = "BALANCED"):
@@ -43,7 +44,14 @@ class CrisisSimulator:
                 "market_volatility": 0.03,
                 "market_trend": -0.01,
                 "shock_event_day": 30,
-                "shock_magnitude": -0.05
+                "shock_magnitude": -0.08
+            },
+            "2025_AI_SHOCK": {
+                "duration": 35,
+                "market_volatility": 0.07,
+                "market_trend": -0.03,
+                "shock_event_day": 18,
+                "shock_magnitude": -0.18
             }
         }
 
@@ -94,7 +102,9 @@ class CrisisSimulator:
         if not scenario:
             return None
 
-        random.seed(self.seed)
+        # Seed per scenario to ensure different outcomes for different scenarios with same main seed
+        scenario_seed = self.seed + sum(ord(c) for c in scenario_name)
+        random.seed(scenario_seed)
 
         days = list(range(1, scenario["duration"] + 1))
         market_values = [100.0]
@@ -108,22 +118,38 @@ class CrisisSimulator:
         current_market = 100.0
         current_portfolio = 100.0
 
+        base_vol = scenario["market_volatility"]
+        shock_day = scenario["shock_event_day"]
+
         for day in days[1:]:
+            # Volatility ramps up as we approach shock, spikes at shock, then slowly decays
+            if day < shock_day:
+                # Pre-shock jitter: Volatility increases linearly
+                current_vol = base_vol * (1 + (day / shock_day) * 0.5)
+            elif day == shock_day:
+                 current_vol = base_vol * 3.0 # Spike
+            else:
+                 # Post-shock decay
+                 days_since = day - shock_day
+                 current_vol = base_vol * (1 + 2.0 * math.exp(-days_since / 5.0))
+
             # Market Movement
-            daily_change = random.gauss(scenario["market_trend"], scenario["market_volatility"])
+            daily_change = random.gauss(scenario["market_trend"], current_vol)
 
             # Apply Shock
-            if day == scenario["shock_event_day"]:
+            if day == shock_day:
                 daily_change += scenario["shock_magnitude"]
 
             # Apply Recovery Bounce (simplified)
-            if day > scenario["shock_event_day"] + 5:
+            if day > shock_day + 5:
                 daily_change += 0.005 # Slight recovery bias
 
             current_market *= (1 + daily_change)
 
             # Portfolio Movement (Beta + Alpha/Idiosyncratic)
-            portfolio_change = daily_change * beta + random.gauss(0, 0.02) # Alpha noise
+            # Alpha is random but slightly correlated to volatility (higher vol = more dispersion)
+            alpha = random.gauss(0, 0.02 * (current_vol / base_vol))
+            portfolio_change = daily_change * beta + alpha
             current_portfolio *= (1 + portfolio_change)
 
             market_values.append(round(current_market, 2))

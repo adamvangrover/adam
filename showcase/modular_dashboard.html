@@ -3,112 +3,200 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADAM | Modular Data Loader</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>ADAM v24.0 :: MODULAR ANALYTICS HUB</title>
+    
+    <link rel="stylesheet" href="css/style.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css">
-    <script src="js/data_manager_modular.js"></script>
-</head>
-<body class="h-screen flex flex-col grid-bg text-slate-200 overflow-hidden">
-    <header class="h-16 border-b border-slate-700/50 flex items-center justify-between px-6 bg-[#0f172a]/90 backdrop-blur-md z-40 shrink-0">
-        <h1 class="text-xl font-bold tracking-tight mono">ADAM <span class="text-amber-400">Modular</span> <span class="text-slate-500 font-normal">| Data Loader POC</span></h1>
-        <div class="flex gap-4">
-             <button onclick="window.modularDataManager.clearCache(); log('Cache cleared.'); clearVisualizer();" class="text-xs text-slate-400 hover:text-white border border-slate-600 px-3 py-1 rounded">Reset Cache</button>
-        </div>
-    </header>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <main class="flex-1 p-8 overflow-y-auto relative">
-        <!-- Detail Modal -->
-        <div id="detail-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-            <div class="bg-[#0f172a] border border-slate-700 rounded-lg shadow-2xl w-full max-w-2xl max-h-[80vh] flex flex-col">
-                <div class="flex justify-between items-center p-4 border-b border-slate-700 bg-slate-800/50">
-                    <h3 id="modal-title" class="text-lg font-bold text-white font-mono truncate">Details</h3>
-                    <button onclick="closeModal()" class="text-slate-400 hover:text-white transition">
-                        <i class="fas fa-times"></i>
-                    </button>
+    <script src="js/nav.js" defer></script>
+    <script src="js/modular_loader.js"></script> 
+    <script src="js/data_manager_modular.js"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        
+        /* Dashboard Card Styles */
+        .loader-card {
+            border: 1px solid #334155;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(8px);
+            padding: 20px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        .loader-card.loaded {
+            border-color: #06b6d4; /* Cyan-500 */
+            background: rgba(6, 182, 212, 0.05);
+            box-shadow: 0 0 15px rgba(6, 182, 212, 0.1);
+        }
+        
+        /* Status Indicators */
+        .status-dot {
+            height: 8px; width: 8px; border-radius: 50%; display: inline-block;
+            background: #64748b; margin-right: 8px;
+        }
+        .status-dot.active { background: #06b6d4; box-shadow: 0 0 8px #06b6d4; }
+        
+        /* Scrollbars */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+    </style>
+</head>
+<body class="bg-[#050b14] text-gray-200 overflow-x-hidden">
+
+    <div id="detail-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-[#0f172a] border border-slate-700 rounded-lg shadow-2xl w-full max-w-2xl max-h-[80vh] flex flex-col">
+            <div class="flex justify-between items-center p-4 border-b border-slate-700 bg-slate-800/50">
+                <h3 id="modal-title" class="text-lg font-bold text-white mono truncate">Details</h3>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-white transition">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="modal-body" class="p-6 overflow-y-auto mono text-sm text-slate-300 space-y-4">
                 </div>
-                <div id="modal-body" class="p-6 overflow-y-auto font-mono text-sm text-slate-300 space-y-4">
-                    <!-- Content injected here -->
+            <div class="p-4 border-t border-slate-700 bg-slate-800/50 flex justify-end">
+                <button onclick="closeModal()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded text-sm transition">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="p-4 md:p-8 ml-0 md:ml-64 transition-all duration-300">
+        
+        <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 border-b border-gray-800 pb-4">
+            <div class="mb-4 md:mb-0">
+                <h1 class="text-3xl font-bold text-white tracking-tight">MODULAR ANALYTICS HUB <span class="text-cyan-400 text-sm align-top mono">v24.0</span></h1>
+                <p class="text-gray-400 text-sm mt-1 mono">High-Performance Asynchronous Data Loading Architecture</p>
+            </div>
+            <div class="flex flex-wrap gap-2">
+                <button onclick="loadCombined('reports')" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded text-xs mono transition hover:text-cyan-400">
+                    <i class="fas fa-file-alt mr-2"></i>REPORTS
+                </button>
+                <button onclick="loadCombined('market_data')" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded text-xs mono transition hover:text-cyan-400">
+                    <i class="fas fa-chart-line mr-2"></i>MARKET
+                </button>
+                 <button onclick="loadCombined('credit_memos')" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded text-xs mono transition hover:text-cyan-400">
+                    <i class="fas fa-university mr-2"></i>CREDIT
+                </button>
+                <button onclick="window.modularDataManager.clearCache(); location.reload();" class="px-4 py-2 bg-red-900/20 hover:bg-red-900/40 border border-red-900/50 text-red-400 rounded text-xs mono">
+                    RESET
+                </button>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+            <div class="loader-card" id="card-system_status">
+                <div class="flex justify-between items-start mb-2">
+                    <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider">System Status</h3>
+                    <span class="status-dot" id="dot-system_status"></span>
                 </div>
-                <div class="p-4 border-t border-slate-700 bg-slate-800/50 flex justify-end">
-                    <button onclick="closeModal()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded text-sm transition">Close</button>
+                <div class="text-2xl font-bold text-white mono" id="val-cpu">--</div>
+                <div class="text-xs text-gray-500 mt-1">CPU Load</div>
+            </div>
+
+            <div class="loader-card" id="card-reports">
+                <div class="flex justify-between items-start mb-2">
+                    <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Intelligence</h3>
+                    <span class="status-dot" id="dot-reports"></span>
                 </div>
+                <div class="text-2xl font-bold text-white mono" id="val-reports">--</div>
+                <div class="text-xs text-gray-500 mt-1">Documents Available</div>
+            </div>
+
+            <div class="loader-card" id="card-market_data">
+                <div class="flex justify-between items-start mb-2">
+                    <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Market Data</h3>
+                    <span class="status-dot" id="dot-market_data"></span>
+                </div>
+                <div class="text-2xl font-bold text-white mono" id="val-market">--</div>
+                <div class="text-xs text-gray-500 mt-1">Data Points</div>
+            </div>
+
+            <div class="loader-card" id="card-credit_memos">
+                <div class="flex justify-between items-start mb-2">
+                    <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Credit Memos</h3>
+                    <span class="status-dot" id="dot-credit_memos"></span>
+                </div>
+                <div class="text-2xl font-bold text-white mono" id="val-credit">--</div>
+                <div class="text-xs text-gray-500 mt-1">Active Deals</div>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-            <!-- Controls -->
-            <div class="space-y-6">
-                <div class="glass-panel p-6 rounded-lg border border-slate-700">
-                    <h2 class="text-lg font-bold text-cyan-400 mb-4 font-mono">1. Verified Historic Info (Reports)</h2>
-                    <p class="text-sm text-slate-400 mb-4">Load the 13F and Market Reports subset (~500KB).</p>
-                    <button onclick="loadSubset('reports')" class="w-full py-2 bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded text-sm text-white transition font-mono">
-                        <i class="fas fa-download mr-2"></i> LOAD REPORTS
-                    </button>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            
+            <div class="loader-card lg:col-span-2 h-80 relative flex flex-col">
+                <h3 class="text-xs font-bold text-gray-400 mb-4 uppercase">Market Velocity</h3>
+                <div class="flex-1 relative w-full h-full">
+                    <canvas id="marketChart"></canvas>
+                    <div id="chart-overlay" class="absolute inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm rounded">
+                        <span class="text-sm mono text-gray-400">Waiting for Market Data...</span>
+                    </div>
                 </div>
+            </div>
 
-                <div class="glass-panel p-6 rounded-lg border border-slate-700">
-                    <h2 class="text-lg font-bold text-purple-400 mb-4 font-mono">2. Simulated Seed (Credit Memos)</h2>
-                    <p class="text-sm text-slate-400 mb-4">Load the deep simulated credit memo artifacts (~1MB).</p>
-                    <button onclick="loadSubset('creditMemos')" class="w-full py-2 bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded text-sm text-white transition font-mono">
-                        <i class="fas fa-download mr-2"></i> LOAD CREDIT MEMOS
-                    </button>
-                </div>
-
-                <div class="glass-panel p-6 rounded-lg border border-slate-700">
-                    <h2 class="text-lg font-bold text-emerald-400 mb-4 font-mono">3. Repository Index (Files)</h2>
-                    <p class="text-sm text-slate-400 mb-4">Load the full file tree index (~6MB Uncompressed).</p>
-                    <button onclick="loadSubset('files')" class="w-full py-2 bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded text-sm text-white transition font-mono">
-                        <i class="fas fa-download mr-2"></i> LOAD FILE INDEX
-                    </button>
-                </div>
-
-            <div class="glass-panel p-6 rounded-lg border border-slate-700">
-                <h2 class="text-lg font-bold text-amber-400 mb-4 font-mono">4. Extended Datasets</h2>
-                <p class="text-sm text-slate-400 mb-4">Agents, Prompts, Training Data, Architecture.</p>
-                <div class="grid grid-cols-2 gap-2">
-                    <button onclick="loadSubset('agents')" class="py-2 bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded text-xs text-white transition font-mono">
+            <div class="loader-card flex flex-col">
+                <h3 class="text-xs font-bold text-gray-400 mb-4 uppercase">Extended Datasets</h3>
+                <div class="grid grid-cols-2 gap-3 mb-4">
+                    <button onclick="loadCombined('agents')" class="py-2 bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded text-xs text-blue-200 transition mono">
                         LOAD AGENTS
                     </button>
-                    <button onclick="loadSubset('prompts')" class="py-2 bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded text-xs text-white transition font-mono">
+                    <button onclick="loadCombined('prompts')" class="py-2 bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded text-xs text-pink-200 transition mono">
                         LOAD PROMPTS
                     </button>
-                    <button onclick="loadSubset('trainingData')" class="py-2 bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded text-xs text-white transition font-mono">
+                    <button onclick="loadCombined('trainingData')" class="py-2 bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded text-xs text-orange-200 transition mono">
                         LOAD ML DATA
                     </button>
-                    <button onclick="loadSubset('architecture')" class="py-2 bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded text-xs text-white transition font-mono">
+                    <button onclick="loadCombined('architecture')" class="py-2 bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded text-xs text-indigo-200 transition mono">
                         LOAD ARCH
                     </button>
+                    <button onclick="loadCombined('files')" class="col-span-2 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded text-xs text-emerald-200 transition mono">
+                        LOAD REPO INDEX
+                    </button>
                 </div>
-            </div>
-            </div>
-
-            <!-- Output -->
-            <div class="glass-panel p-4 rounded-lg border border-slate-700 flex flex-col h-96 md:h-auto bg-[#0b1120]">
-                <div class="flex justify-between items-center mb-2 border-b border-slate-800 pb-2">
-                    <span class="text-xs font-bold text-slate-500 uppercase">System Log</span>
-                    <span class="text-[10px] text-emerald-500 font-mono" id="status-indicator">READY</span>
-                </div>
-                <div id="console-output" class="flex-1 overflow-y-auto font-mono text-xs text-slate-300 space-y-1">
-                    <div class="text-slate-500">// Waiting for input...</div>
+                <div class="mt-auto pt-4 border-t border-slate-700">
+                    <div class="flex justify-between items-center mb-1">
+                         <span class="text-[10px] text-gray-500 uppercase">System Log</span>
+                         <span class="text-[10px] text-emerald-500 mono" id="status-indicator">READY</span>
+                    </div>
+                    <div id="console-output" class="h-24 overflow-y-auto mono text-[10px] text-slate-400 space-y-1 bg-black/20 p-2 rounded">
+                        <div>// System initialized...</div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Visualizer -->
-        <div class="glass-panel p-6 rounded-lg border border-slate-700">
+        <div class="loader-card">
             <div class="flex justify-between items-center mb-6">
-                <h2 class="text-lg font-bold text-slate-200 font-mono"><i class="fas fa-eye mr-2 text-sky-400"></i>Data Visualizer</h2>
-                <input type="text" id="search-input" placeholder="Filter data..." onkeyup="filterData(this.value)" class="bg-slate-900 border border-slate-600 rounded px-4 py-2 text-sm text-slate-200 focus:outline-none focus:border-sky-500 w-64 font-mono">
+                <h2 class="text-lg font-bold text-slate-200 mono"><i class="fas fa-eye mr-2 text-cyan-400"></i>Data Visualizer</h2>
+                <input type="text" id="search-input" placeholder="Filter loaded data..." onkeyup="filterData(this.value)" class="bg-slate-900 border border-slate-600 rounded px-4 py-2 text-sm text-slate-200 focus:outline-none focus:border-cyan-500 w-64 mono">
             </div>
-            <div id="visualizer-content" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[600px] overflow-y-auto pr-2">
-                <div class="text-slate-500 font-mono text-sm col-span-full text-center py-12">No data loaded. Select a dataset above.</div>
+            <div id="visualizer-content" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 max-h-[500px] overflow-y-auto pr-2">
+                <div class="text-slate-500 mono text-sm col-span-full text-center py-12">No data loaded. Select a module above.</div>
             </div>
         </div>
-    </main>
+
+    </div>
 
     <script>
+        // Init Loaders
+        // We assume ModularLoader exists from js/modular_loader.js for metric tracking
+        // We assume modularDataManager exists from js/data_manager_modular.js for heavy lifting
+        const dashboardLoader = typeof ModularLoader !== 'undefined' ? new ModularLoader() : null;
+        let marketChart = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if(dashboardLoader) dashboardLoader.init();
+            // Auto-load minimal system status
+            updateSystemMetrics({ cpu_load: Math.floor(Math.random() * 30) + 10 });
+        });
+
+        // --- Logging Utility ---
         function log(msg, type='info') {
             const out = document.getElementById('console-output');
             const div = document.createElement('div');
@@ -122,53 +210,120 @@
             out.scrollTop = out.scrollHeight;
         }
 
-        async function loadSubset(type) {
-            log(`Requesting load for: ${type}...`);
+        // --- Combined Load Logic ---
+        async function loadCombined(moduleName) {
+            log(`Loading module: ${moduleName}...`);
+            const statusDot = document.getElementById(`dot-${moduleName}`);
+            const card = document.getElementById(`card-${moduleName}`);
+            
+            if(statusDot) statusDot.classList.add('animate-pulse', 'bg-yellow-500');
+
             const start = performance.now();
+            let data = null;
 
             try {
-                let data;
-                if (type === 'reports') data = await window.modularDataManager.loadReports();
-                if (type === 'creditMemos') data = await window.modularDataManager.loadCreditMemos();
-                if (type === 'files') data = await window.modularDataManager.loadFiles();
-                if (type === 'agents') data = await window.modularDataManager.loadAgents();
-                if (type === 'prompts') data = await window.modularDataManager.loadPrompts();
-                if (type === 'trainingData') data = await window.modularDataManager.loadTrainingData();
-                if (type === 'architecture') data = await window.modularDataManager.loadArchitecture();
+                // Map button names to DataManager methods (Version B Logic)
+                if (window.modularDataManager) {
+                    switch(moduleName) {
+                        case 'reports': data = await window.modularDataManager.loadReports(); break;
+                        case 'credit_memos': data = await window.modularDataManager.loadCreditMemos(); break;
+                        case 'files': data = await window.modularDataManager.loadFiles(); break;
+                        case 'agents': data = await window.modularDataManager.loadAgents(); break;
+                        case 'prompts': data = await window.modularDataManager.loadPrompts(); break;
+                        case 'trainingData': data = await window.modularDataManager.loadTrainingData(); break;
+                        case 'architecture': data = await window.modularDataManager.loadArchitecture(); break;
+                        case 'market_data': 
+                            // Fallback to dashboard loader for synthetic market data if not in manager
+                            if(dashboardLoader) data = await dashboardLoader.load('market_data');
+                            break;
+                    }
+                } else if (dashboardLoader) {
+                    // Fallback to Version A loader if B is missing
+                    data = await dashboardLoader.load(moduleName);
+                }
 
-                const duration = (performance.now() - start).toFixed(2);
-                const count = Array.isArray(data) ? data.length : (data.nodes ? data.nodes.length : Object.keys(data).length);
+                const end = performance.now();
+                log(`Loaded ${moduleName} in ${(end-start).toFixed(2)}ms`, 'success');
 
-                log(`Successfully loaded ${type}.`, 'success');
-                log(`- Items: ${count}`);
-                log(`- Time: ${duration}ms`);
+                // Update Dashboard Metrics (Version A UI)
+                updateMetricsUI(moduleName, data);
 
-                // Render Data
-                if (type === 'reports') renderReports(data);
-                if (type === 'creditMemos') renderCreditMemos(data);
-                if (type === 'files') renderFiles(data);
-                if (type === 'agents') renderAgents(data);
-                if (type === 'prompts') renderPrompts(data);
-                if (type === 'trainingData') renderTrainingData(data);
-                if (type === 'architecture') renderArchitecture(data);
+                // Update Visualizer Grid (Version B UI)
+                updateVisualizerUI(moduleName, data);
+
+                // Success States
+                if(card) card.classList.add('loaded');
+                if(statusDot) {
+                    statusDot.classList.remove('bg-gray-600', 'bg-yellow-500', 'animate-pulse');
+                    statusDot.classList.add('active');
+                }
 
             } catch (e) {
-                log(`Failed to load ${type}: ${e.message}`, 'error');
+                log(`Error loading ${moduleName}: ${e.message}`, 'error');
+                console.error(e);
             }
         }
 
-        function clearVisualizer() {
-            document.getElementById('visualizer-content').innerHTML = '<div class="text-slate-500 font-mono text-sm col-span-full text-center py-12">No data loaded. Select a dataset above.</div>';
+        // --- Metric UI Updates (Version A Logic) ---
+        function updateSystemMetrics(data) {
+            const cpuEl = document.getElementById('val-cpu');
+            if(cpuEl) cpuEl.innerText = `${data.cpu_load}%`;
+            const dot = document.getElementById('dot-system_status');
+            if(dot) dot.classList.add('active');
         }
 
+        function updateMetricsUI(moduleName, data) {
+            if (!data) return;
+
+            if (moduleName === 'reports') {
+                const count = Array.isArray(data) ? data.length : Object.keys(data).length;
+                document.getElementById('val-reports').innerText = count;
+            }
+            else if (moduleName === 'market_data') {
+                // Handle various data shapes
+                let dataset = [];
+                if (Array.isArray(data)) dataset = data;
+                else if (data.history) dataset = data.history;
+                else if (typeof data === 'object') dataset = Object.values(data)[0] || [];
+
+                document.getElementById('val-market').innerText = dataset.length;
+                renderChart(dataset);
+                document.getElementById('chart-overlay').style.display = 'none';
+            }
+            else if (moduleName === 'credit_memos') {
+                const count = Array.isArray(data) ? data.length : Object.keys(data).length;
+                document.getElementById('val-credit').innerText = count;
+            }
+        }
+
+        // --- Visualizer UI Updates (Version B Logic) ---
+        function updateVisualizerUI(type, data) {
+            const container = document.getElementById('visualizer-content');
+            container.innerHTML = ''; // Clear current view
+
+            // Routing to specific render functions
+            if (type === 'reports') renderReports(data);
+            else if (type === 'credit_memos') renderCreditMemos(data);
+            else if (type === 'files') renderFiles(data);
+            else if (type === 'agents') renderAgents(data);
+            else if (type === 'prompts') renderPrompts(data);
+            else if (type === 'trainingData') renderTrainingData(data);
+            else if (type === 'architecture') renderArchitecture(data);
+            else if (type === 'market_data') {
+                 container.innerHTML = '<div class="col-span-full text-center text-cyan-400 mono">Market data visualized in chart above.</div>';
+            }
+        }
+
+        // --- Render Functions (Adapted from Version B) ---
+        
         function showModal(title, data) {
             document.getElementById('modal-title').textContent = title;
             const body = document.getElementById('modal-body');
-            body.innerHTML = ''; // Clear previous content
-
+            body.innerHTML = ''; 
+            
             if (typeof data === 'object') {
                 const pre = document.createElement('pre');
-                pre.className = 'whitespace-pre-wrap break-all bg-slate-900 p-4 rounded border border-slate-700 text-xs';
+                pre.className = 'whitespace-pre-wrap break-all bg-slate-900 p-4 rounded border border-slate-700 text-xs text-green-400';
                 pre.textContent = JSON.stringify(data, null, 2);
                 body.appendChild(pre);
             } else {
@@ -176,7 +331,6 @@
                 p.textContent = data;
                 body.appendChild(p);
             }
-
             document.getElementById('detail-modal').classList.remove('hidden');
         }
 
@@ -186,40 +340,23 @@
 
         function renderReports(data) {
             const container = document.getElementById('visualizer-content');
-            container.innerHTML = '';
-
-            data.forEach(report => {
+            const items = Array.isArray(data) ? data : Object.values(data);
+            items.forEach(report => {
                 const card = document.createElement('div');
-                card.className = 'report-card bg-slate-800/50 p-4 rounded border border-slate-700 hover:border-cyan-500/50 transition cursor-pointer group';
+                card.className = 'bg-slate-800/50 p-4 rounded border border-slate-700 hover:border-cyan-500/50 transition cursor-pointer group';
                 card.onclick = () => showModal(report.title, report);
-
-                const dateDiv = document.createElement('div');
-                dateDiv.className = 'text-xs text-cyan-400 font-mono mb-1 group-hover:text-cyan-300';
-                dateDiv.textContent = report.date || 'Unknown Date';
-
-                const titleH3 = document.createElement('h3');
-                titleH3.className = 'text-sm font-bold text-slate-200 mb-2 truncate group-hover:text-white';
-                titleH3.title = report.title;
-                titleH3.textContent = report.title;
-
-                const summaryP = document.createElement('p');
-                summaryP.className = 'text-xs text-slate-400 line-clamp-3';
-                summaryP.textContent = report.executive_summary || 'No summary available.';
-
-                card.appendChild(dateDiv);
-                card.appendChild(titleH3);
-                card.appendChild(summaryP);
+                card.innerHTML = `
+                    <div class="text-xs text-cyan-400 mono mb-1">${report.date || 'N/A'}</div>
+                    <h3 class="text-sm font-bold text-slate-200 mb-2 truncate group-hover:text-white">${report.title}</h3>
+                    <p class="text-xs text-slate-400 line-clamp-3">${report.executive_summary || 'No summary available.'}</p>
+                `;
                 container.appendChild(card);
             });
         }
 
         function renderCreditMemos(data) {
             const container = document.getElementById('visualizer-content');
-            container.innerHTML = '';
-
-            // Handle both object and array formats just in case
-            const entries = Array.isArray(data) ? data : Object.entries(data).map(([k, v]) => v);
-
+            const entries = Array.isArray(data) ? data : Object.values(data);
             entries.forEach(memo => {
                 const riskScore = memo.risk_score || 0;
                 let riskColor = 'text-green-400';
@@ -227,182 +364,134 @@
                 if (riskScore > 75) riskColor = 'text-red-400';
 
                 const card = document.createElement('div');
-                card.className = 'memo-card bg-slate-800/50 p-4 rounded border border-slate-700 hover:border-purple-500/50 transition cursor-pointer group';
+                card.className = 'bg-slate-800/50 p-4 rounded border border-slate-700 hover:border-purple-500/50 transition cursor-pointer group';
                 card.onclick = () => showModal(memo.borrower_name, memo);
-
-                const headerDiv = document.createElement('div');
-                headerDiv.className = 'flex justify-between items-start mb-2';
-
-                const nameH3 = document.createElement('h3');
-                nameH3.className = 'text-sm font-bold text-slate-200 truncate pr-2 group-hover:text-white';
-                nameH3.textContent = memo.borrower_name;
-
-                const scoreSpan = document.createElement('span');
-                scoreSpan.className = `text-xs font-mono ${riskColor} border border-slate-600 px-1 rounded`;
-                scoreSpan.textContent = riskScore;
-
-                headerDiv.appendChild(nameH3);
-                headerDiv.appendChild(scoreSpan);
-
-                const ebitdaDiv = document.createElement('div');
-                ebitdaDiv.className = 'text-xs text-slate-400 mb-1';
-                ebitdaDiv.textContent = `EBITDA: $${memo.financial_ratios?.ebitda || 'N/A'}M`;
-
-                const summaryDiv = document.createElement('div');
-                summaryDiv.className = 'text-xs text-slate-500 line-clamp-2';
-                summaryDiv.textContent = memo.executive_summary || 'No summary.';
-
-                card.appendChild(headerDiv);
-                card.appendChild(ebitdaDiv);
-                card.appendChild(summaryDiv);
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="text-sm font-bold text-slate-200 truncate pr-2 group-hover:text-white">${memo.borrower_name}</h3>
+                        <span class="text-xs mono ${riskColor} border border-slate-600 px-1 rounded">${riskScore}</span>
+                    </div>
+                    <div class="text-xs text-slate-400 mb-1">EBITDA: $${memo.financial_ratios?.ebitda || 'N/A'}M</div>
+                    <div class="text-xs text-slate-500 line-clamp-2">${memo.executive_summary || 'No summary.'}</div>
+                `;
                 container.appendChild(card);
             });
         }
 
         function renderFiles(data) {
             const container = document.getElementById('visualizer-content');
-            container.innerHTML = '';
-
-            data.slice(0, 200).forEach(file => {
+            const files = Array.isArray(data) ? data : (data.files || []);
+            files.slice(0, 200).forEach(file => {
                 const card = document.createElement('div');
-                card.className = 'file-item col-span-full bg-slate-800/30 p-2 rounded border border-slate-700/50 flex justify-between items-center font-mono text-xs';
-
-                const pathSpan = document.createElement('span');
-                pathSpan.className = 'text-emerald-400 truncate mr-4';
-                pathSpan.textContent = file.path;
-
-                const sizeSpan = document.createElement('span');
-                sizeSpan.className = 'text-slate-500 whitespace-nowrap';
-                sizeSpan.textContent = `${(file.size / 1024).toFixed(1)} KB`;
-
-                card.appendChild(pathSpan);
-                card.appendChild(sizeSpan);
+                card.className = 'bg-slate-800/30 p-2 rounded border border-slate-700/50 flex justify-between items-center mono text-xs hover:bg-slate-700/50 transition';
+                card.innerHTML = `
+                    <span class="text-emerald-400 truncate mr-4">${file.path || file}</span>
+                    <span class="text-slate-500 whitespace-nowrap">${file.size ? (file.size/1024).toFixed(1)+' KB' : ''}</span>
+                `;
                 container.appendChild(card);
             });
-
-            if (data.length > 200) {
-                 const more = document.createElement('div');
-                 more.className = 'col-span-full text-center text-xs text-slate-500 py-2';
-                 more.textContent = `...and ${data.length - 200} more files. Use search to find specific files.`;
-                 container.appendChild(more);
-            }
         }
 
         function renderAgents(data) {
             const container = document.getElementById('visualizer-content');
-            container.innerHTML = '';
-
             data.forEach(agent => {
                 const card = document.createElement('div');
-                card.className = 'agent-card bg-slate-800/50 p-4 rounded border border-slate-700 hover:border-blue-500/50 transition cursor-pointer group';
+                card.className = 'bg-slate-800/50 p-4 rounded border border-slate-700 hover:border-blue-500/50 transition cursor-pointer group';
                 card.onclick = () => showModal(agent.name, agent);
-
-                const typeDiv = document.createElement('div');
-                typeDiv.className = 'text-xs text-blue-400 font-mono mb-1';
-                typeDiv.textContent = agent.type || 'Agent';
-
-                const nameH3 = document.createElement('h3');
-                nameH3.className = 'text-sm font-bold text-slate-200 mb-2 truncate group-hover:text-white';
-                nameH3.textContent = agent.name;
-
-                const descP = document.createElement('p');
-                descP.className = 'text-xs text-slate-400 line-clamp-3';
-                descP.textContent = agent.description || 'No description.';
-
-                card.appendChild(typeDiv);
-                card.appendChild(nameH3);
-                card.appendChild(descP);
+                card.innerHTML = `
+                    <div class="text-xs text-blue-400 mono mb-1">${agent.type || 'Agent'}</div>
+                    <h3 class="text-sm font-bold text-slate-200 mb-2 truncate group-hover:text-white">${agent.name}</h3>
+                    <p class="text-xs text-slate-400 line-clamp-3">${agent.description || 'No description.'}</p>
+                `;
                 container.appendChild(card);
             });
         }
-
+        
         function renderPrompts(data) {
             const container = document.getElementById('visualizer-content');
-            container.innerHTML = '';
-
             data.forEach(prompt => {
                 const card = document.createElement('div');
-                card.className = 'prompt-card bg-slate-800/50 p-4 rounded border border-slate-700 hover:border-pink-500/50 transition cursor-pointer group';
+                card.className = 'bg-slate-800/50 p-4 rounded border border-slate-700 hover:border-pink-500/50 transition cursor-pointer group';
                 card.onclick = () => showModal(prompt.name, prompt);
-
-                const fmtDiv = document.createElement('div');
-                fmtDiv.className = 'text-xs text-pink-400 font-mono mb-1';
-                fmtDiv.textContent = prompt.format;
-
-                const nameH3 = document.createElement('h3');
-                nameH3.className = 'text-sm font-bold text-slate-200 mb-2 truncate group-hover:text-white';
-                nameH3.textContent = prompt.name;
-
-                const prevP = document.createElement('p');
-                prevP.className = 'text-xs text-slate-500 line-clamp-3 font-mono';
-                prevP.textContent = prompt.preview;
-
-                card.appendChild(fmtDiv);
-                card.appendChild(nameH3);
-                card.appendChild(prevP);
+                card.innerHTML = `
+                     <div class="text-xs text-pink-400 mono mb-1">${prompt.format || 'TXT'}</div>
+                     <h3 class="text-sm font-bold text-slate-200 mb-2 truncate group-hover:text-white">${prompt.name}</h3>
+                     <p class="text-xs text-slate-500 line-clamp-3 mono">${prompt.preview || ''}</p>
+                `;
                 container.appendChild(card);
             });
         }
 
         function renderTrainingData(data) {
             const container = document.getElementById('visualizer-content');
-            container.innerHTML = '';
-
             data.forEach((item, index) => {
+                let preview = item.messages && item.messages.length ? item.messages[0].content : JSON.stringify(item);
                 const card = document.createElement('div');
-                card.className = 'training-card bg-slate-800/50 p-4 rounded border border-slate-700 hover:border-orange-500/50 transition cursor-pointer group';
+                card.className = 'bg-slate-800/50 p-4 rounded border border-slate-700 hover:border-orange-500/50 transition cursor-pointer group';
                 card.onclick = () => showModal(`Sample #${index + 1}`, item);
-
-                const idDiv = document.createElement('div');
-                idDiv.className = 'text-xs text-orange-400 font-mono mb-1';
-                idDiv.textContent = `Sample #${index + 1}`;
-
-                const contentDiv = document.createElement('div');
-                contentDiv.className = 'text-xs text-slate-300 line-clamp-4 font-mono';
-
-                // Try to extract first user message
-                let previewText = "No content";
-                if (item.messages && item.messages.length > 0) {
-                    previewText = item.messages[0].content;
-                }
-                contentDiv.textContent = previewText;
-
-                card.appendChild(idDiv);
-                card.appendChild(contentDiv);
+                card.innerHTML = `
+                    <div class="text-xs text-orange-400 mono mb-1">Sample #${index + 1}</div>
+                    <div class="text-xs text-slate-300 line-clamp-4 mono">${preview}</div>
+                `;
                 container.appendChild(card);
             });
         }
-
+        
         function renderArchitecture(data) {
             const container = document.getElementById('visualizer-content');
-            container.innerHTML = '';
-
-            // Assuming data has nodes and links
             const nodes = data.nodes || [];
-
             nodes.slice(0, 100).forEach(node => {
                 const card = document.createElement('div');
-                card.className = 'arch-card bg-slate-800/50 p-4 rounded border border-slate-700 hover:border-indigo-500/50 transition cursor-pointer group';
+                card.className = 'bg-slate-800/50 p-4 rounded border border-slate-700 hover:border-indigo-500/50 transition cursor-pointer group';
                 card.onclick = () => showModal(node.id, node);
-
-                const groupDiv = document.createElement('div');
-                groupDiv.className = 'text-xs text-indigo-400 font-mono mb-1';
-                groupDiv.textContent = `Group: ${node.group || 'N/A'}`;
-
-                const idH3 = document.createElement('h3');
-                idH3.className = 'text-sm font-bold text-slate-200 mb-2 truncate group-hover:text-white';
-                idH3.textContent = node.id;
-
-                card.appendChild(groupDiv);
-                card.appendChild(idH3);
+                card.innerHTML = `
+                    <div class="text-xs text-indigo-400 mono mb-1">Group: ${node.group || 'N/A'}</div>
+                    <h3 class="text-sm font-bold text-slate-200 mb-2 truncate group-hover:text-white">${node.id}</h3>
+                `;
                 container.appendChild(card);
             });
         }
 
+        // --- Charting Logic (From Version A) ---
+        function renderChart(dataPoints) {
+            const ctx = document.getElementById('marketChart').getContext('2d');
+            // Basic data normalization
+            const cleanData = dataPoints.map(d => d.value !== undefined ? d.value : d);
+            const labels = cleanData.map((_, i) => i);
+
+            if (marketChart) marketChart.destroy();
+
+            marketChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Market Velocity',
+                        data: cleanData,
+                        borderColor: '#00f3ff',
+                        borderWidth: 1,
+                        pointRadius: 0,
+                        tension: 0.4,
+                        fill: true,
+                        backgroundColor: 'rgba(0, 243, 255, 0.1)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { display: false },
+                        y: { grid: { color: '#333' } }
+                    }
+                }
+            });
+        }
+
+        // --- Filter Logic ---
         function filterData(query) {
             const q = query.toLowerCase();
             const cards = document.querySelectorAll('#visualizer-content > div');
-
             cards.forEach(card => {
                 if (card.innerText.toLowerCase().includes(q)) {
                     card.style.display = '';
