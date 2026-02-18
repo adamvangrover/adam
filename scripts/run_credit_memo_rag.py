@@ -60,47 +60,66 @@ class RegexExtractingLLM:
         if "total net sales" in prompt.lower() or "revenue" in prompt.lower():
             # Look for "Total net sales ... $X billion" or similar
             # Pattern: "Total net sales were $394.3 billion"
-            match = re.search(r"total net sales.*?\$([\d,.]+)\s*billion", text)
+            match = re.search(r"total net sales.*?\$(-?[\d,.]+)\s*billion", text)
             if match:
                 val = float(match.group(1).replace(',', '')) * 1000 # Convert to millions
                 return f"{val}"
 
+            # Pattern: "Total net sales were $X million"
+            match = re.search(r"total net sales.*?\$(-?[\d,.]+)\s*million", text)
+            if match:
+                val = float(match.group(1).replace(',', ''))
+                return f"{val}"
+
             # Fallback for table-like data
             # "Total net sales: $394,328" (in millions)
-            match = re.search(r"total net sales:\s*\$([\d,.]+)", text)
+            match = re.search(r"total net sales:?\s*\$(-?[\d,.]+)", text)
             if match:
                 return match.group(1).replace(',', '')
 
         if "net income" in prompt.lower():
-            match = re.search(r"net income.*?\$([\d,.]+)\s*billion", text)
+            match = re.search(r"net income.*?\$(-?[\d,.]+)\s*billion", text)
             if match:
                 val = float(match.group(1).replace(',', '')) * 1000
                 return f"{val}"
-            match = re.search(r"net income:\s*\$([\d,.]+)", text)
+
+            # Pattern: "Net income was $X million"
+            match = re.search(r"net income.*?\$(-?[\d,.]+)\s*million", text)
+            if match:
+                val = float(match.group(1).replace(',', ''))
+                return f"{val}"
+
+            match = re.search(r"net income:?\s*\$(-?[\d,.]+)", text)
             if match:
                 return match.group(1).replace(',', '')
 
         if "total assets" in prompt.lower():
-            match = re.search(r"total assets:\s*\$([\d,.]+)", text)
+            match = re.search(r"total assets:?\s*\$(-?[\d,.]+)", text)
             if match:
                 return match.group(1).replace(',', '')
 
         if "total liabilities" in prompt.lower() and "shareholders" not in prompt.lower():
-            match = re.search(r"total liabilities:\s*\$([\d,.]+)", text)
+            match = re.search(r"total liabilities:?\s*\$(-?[\d,.]+)", text)
             if match:
                 return match.group(1).replace(',', '')
 
         if "total debt" in prompt.lower():
-             match = re.search(r"total debt was\s*\$([\d,.]+)\s*billion", text)
+             match = re.search(r"total debt was\s*\$(-?[\d,.]+)\s*billion", text)
              if match:
                 val = float(match.group(1).replace(',', '')) * 1000
                 return f"{val}"
-             match = re.search(r"term debt:\s*\$([\d,.]+)", text)
+
+             match = re.search(r"total debt was\s*\$(-?[\d,.]+)\s*million", text)
+             if match:
+                val = float(match.group(1).replace(',', ''))
+                return f"{val}"
+
+             match = re.search(r"term debt:?\s*\$(-?[\d,.]+)", text)
              if match:
                  return match.group(1).replace(',', '')
 
         if "cash" in prompt.lower():
-             match = re.search(r"cash and cash equivalents:\s*\$([\d,.]+)", text)
+             match = re.search(r"cash and cash equivalents:?\s*\$(-?[\d,.]+)", text)
              if match:
                  return match.group(1).replace(',', '')
 
