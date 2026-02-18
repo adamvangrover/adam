@@ -42,7 +42,9 @@ def run():
         # Verify header text
         header = memo_content.locator("h1")
         print(f"Memo Header: {header.inner_text()}")
-        assert "Apple Inc." in header.inner_text()
+        # Check for Apple Inc. (case insensitive or uppercase as rendered)
+        header_text = header.inner_text()
+        assert "APPLE INC." in header_text or "Apple Inc." in header_text
 
         # 6. Click a citation
         citation = page.locator(".citation-pin").first
