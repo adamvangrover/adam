@@ -50,6 +50,8 @@ class ModularLoader {
      * @returns {Promise<any>} - The requested data
      */
     async load(moduleName) {
+        const startTime = performance.now();
+
         // 1. Check Cache
         if (this.cache.has(moduleName)) {
             console.log(`[ModularLoader] Returning cached: ${moduleName}`);
@@ -80,6 +82,9 @@ class ModularLoader {
             // Optional: Hydrate global scope for compatibility with legacy scripts
             if (!window.MOCK_DATA) window.MOCK_DATA = {};
             window.MOCK_DATA[moduleName] = data;
+
+            const endTime = performance.now();
+            console.log(`[ModularLoader] Loaded '${moduleName}' in ${(endTime - startTime).toFixed(2)}ms`);
 
             return data;
         } catch (error) {

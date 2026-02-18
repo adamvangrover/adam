@@ -19,6 +19,55 @@ class ModularDataManager {
             trainingData: null,
             architecture: null
         };
+
+        // State Management: Subscribers
+        this.subscribers = {};
+
+        // Performance Metrics
+        this.metrics = {
+            loads: {}, // key: { count, totalTime, avgTime }
+            errors: 0
+        };
+    }
+
+    /**
+     * Subscribe to data changes for a specific key.
+     * @param {string} key - The data key (e.g., 'reports')
+     * @param {function} callback - Function to call when data is loaded/updated
+     */
+    subscribe(key, callback) {
+        if (!this.subscribers[key]) {
+            this.subscribers[key] = [];
+        }
+        this.subscribers[key].push(callback);
+
+        // If data is already cached, notify immediately
+        if (this.cache[key]) {
+            callback(this.cache[key]);
+        }
+    }
+
+    /**
+     * Notify subscribers of a data update.
+     */
+    notify(key, data) {
+        if (this.subscribers[key]) {
+            this.subscribers[key].forEach(cb => cb(data));
+        }
+    }
+
+    /**
+     * Record performance metric
+     */
+    _recordMetric(key, duration) {
+        if (!this.metrics.loads[key]) {
+            this.metrics.loads[key] = { count: 0, totalTime: 0, avgTime: 0 };
+        }
+        const m = this.metrics.loads[key];
+        m.count++;
+        m.totalTime += duration;
+        m.avgTime = m.totalTime / m.count;
+        console.log(`[ModularDataManager] Metric: ${key} loaded in ${duration.toFixed(2)}ms (Avg: ${m.avgTime.toFixed(2)}ms)`);
     }
 
     /**
@@ -31,14 +80,24 @@ class ModularDataManager {
         }
 
         console.log(`[ModularDataManager] Fetching ${key} from ${filename}...`);
+        const startTime = performance.now();
+
         try {
             const res = await fetch(`${this.basePath}${filename}`);
             if (!res.ok) throw new Error(`HTTP ${res.status}`);
             const data = await res.json();
+
             this.cache[key] = data;
+
+            const endTime = performance.now();
+            this._recordMetric(key, endTime - startTime);
+
+            this.notify(key, data);
+
             return data;
         } catch (e) {
             console.error(`[ModularDataManager] Failed to load ${key}:`, e);
+            this.metrics.errors++;
             throw e;
         }
     }
