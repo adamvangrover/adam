@@ -52,3 +52,23 @@ class Prompt(BaseModel):
     name: str
     template: str
     variables: List[str]
+
+class CrisisScenario(BaseModel):
+    name: str
+    duration: int
+    market_volatility: float
+    market_trend: float
+    shock_event_day: int
+    shock_magnitude: float
+
+class SimulationResult(BaseModel):
+    scenario: str
+    labels: List[int]
+    market: List[float]
+    portfolio: List[float]
+
+class SystemMetric(BaseModel):
+    name: str
+    value: float
+    unit: str
+    timestamp: datetime
