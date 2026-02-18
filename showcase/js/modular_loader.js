@@ -50,10 +50,15 @@ class ModularLoader {
      * @returns {Promise<any>} - The requested data
      */
     async load(moduleName) {
-        // 1. Check Cache
+        // 1. Check Cache (Value or Promise)
         if (this.cache.has(moduleName)) {
+            const cached = this.cache.get(moduleName);
+            if (cached instanceof Promise) {
+                console.log(`[ModularLoader] Waiting for pending request: ${moduleName}`);
+                return cached;
+            }
             console.log(`[ModularLoader] Returning cached: ${moduleName}`);
-            return this.cache.get(moduleName);
+            return cached;
         }
 
         // 2. Check Global Fallback (Legacy)
@@ -69,23 +74,51 @@ class ModularLoader {
 
         console.log(`[ModularLoader] Fetching: ${url}`);
 
-        try {
-            const response = await fetch(url);
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}`);
+        // Create Promise to handle race conditions
+        const loadPromise = (async () => {
+            const startTime = performance.now();
+            try {
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                const data = await response.json();
+
+                // Replace Promise with Data in Cache
+                this.cache.set(moduleName, data);
+
+                // Optional: Hydrate global scope for compatibility with legacy scripts
+                if (!window.MOCK_DATA) window.MOCK_DATA = {};
+                window.MOCK_DATA[moduleName] = data;
+
+                const endTime = performance.now();
+                console.log(`[ModularLoader] Loaded '${moduleName}' in ${(endTime - startTime).toFixed(2)}ms`);
+
+                return data;
+            } catch (error) {
+                console.error(`[ModularLoader] Failed to load module '${moduleName}':`, error);
+                this.cache.delete(moduleName); // Remove failed promise so retries are possible
+                return null;
             }
-            const data = await response.json();
-            this.cache.set(moduleName, data);
+        })();
 
-            // Optional: Hydrate global scope for compatibility with legacy scripts
-            if (!window.MOCK_DATA) window.MOCK_DATA = {};
-            window.MOCK_DATA[moduleName] = data;
+        // Store Promise in Cache immediately
+        this.cache.set(moduleName, loadPromise);
+        return loadPromise;
+    }
 
-            return data;
-        } catch (error) {
-            console.error(`[ModularLoader] Failed to load module '${moduleName}':`, error);
-            return null;
-        }
+    /**
+     * Prefetches modules in the background.
+     * @param {string[]} moduleNames
+     */
+    prefetch(moduleNames) {
+        moduleNames.forEach(name => {
+            if (!this.cache.has(name) && (!window.MOCK_DATA || !window.MOCK_DATA[name])) {
+                console.log(`[ModularLoader] Prefetching ${name}...`);
+                // Trigger load but do not await
+                this.load(name).catch(e => console.warn(`[ModularLoader] Prefetch failed for ${name}`, e));
+            }
+        });
     }
 
     /**

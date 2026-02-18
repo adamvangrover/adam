@@ -15,7 +15,6 @@
 <body class="mission-control-v3">
 
     <div class="mc-grid">
-        <!-- HEADER -->
         <header class="mc-header">
             <div style="display:flex; align-items:center; gap:20px;">
                 <h1 class="mono" style="color:#fff; margin:0; font-size:1.2rem;">ADAM <span style="color:var(--mc-neon);">v26.0</span> // GLOBAL COMMAND</h1>
@@ -27,7 +26,6 @@
             </div>
         </header>
 
-        <!-- LEFT PANEL: METRICS -->
         <aside class="mc-panel">
             <div class="mc-panel-header">
                 <span>SYSTEM STATUS</span>
@@ -47,26 +45,33 @@
                     <span class="status-val">14</span>
                 </div>
                 <div class="status-card">
-                    <span style="color:#888; font-size:0.75rem;">PENDING TASKS</span>
-                    <span class="status-val">89</span>
+                    <span style="color:#888; font-size:0.75rem;">CRISIS SIM</span>
+                    <span class="status-val" id="metric-sim-status" style="color:#00f3ff; font-size:0.9rem;">IDLE</span>
                 </div>
             </div>
 
-            <div style="flex-grow:1; background:rgba(0,0,0,0.5); border-top:1px solid var(--mc-border); padding:15px;">
+            <div style="flex-grow:1; background:rgba(0,0,0,0.5); border-top:1px solid var(--mc-border); padding:15px; display: flex; flex-direction: column;">
                 <h4 class="mono" style="color:#fff; font-size:0.8rem; margin-top:0;">CRITICAL ALERTS</h4>
-                <ul style="list-style:none; padding:0; font-size:0.75rem; color:var(--mc-alert);">
+                <ul style="list-style:none; padding:0; font-size:0.75rem; color:var(--mc-alert); margin-bottom: 15px;">
                     <li style="margin-bottom:5px; color:#ff0000;">> AI PREMIUM EXPIRATION DETECTED</li>
                     <li style="margin-bottom:5px; color:#ff0000;">> CREDIT/EQUITY DIVERGENCE: CRITICAL</li>
                     <li style="margin-bottom:5px;">> BITCOIN PEG FLICKERING ($67k)</li>
                     <li style="margin-bottom:5px; opacity:0.7;">> RIVIAN LIQUIDITY VOID</li>
+                    <li style="margin-bottom:5px;">> LATENCY SPIKE DETECTED (USE-1)</li>
+                    <li style="margin-bottom:5px;">> MEMORY PRESSURE: AGENT_04</li>
                 </ul>
-                <div style="margin-top:15px; border-top:1px solid #333; padding-top:10px;">
+                
+                <div style="margin-bottom:20px; border-top:1px solid #333; padding-top:10px;">
                     <a href="Daily_Briefing_2026_02_17.html" style="color:#00f3ff; text-decoration:none; font-size:0.7rem;">>> ACCESS LATEST BRIEFING</a>
+                </div>
+
+                <h4 class="mono" style="color:#fff; font-size:0.8rem; margin-top:0;">LATEST INTELLIGENCE</h4>
+                <div id="latest-intel" style="font-size:0.7rem; color:#aaa; overflow-y: auto; max-height: 150px;">
+                    <div style="padding: 5px; border-bottom: 1px solid #333;">Loading...</div>
                 </div>
             </div>
         </aside>
 
-        <!-- CENTER: MAP / NEXUS -->
         <main class="mc-panel">
             <div class="mc-panel-header">
                 <span>GLOBAL NEXUS VISUALIZATION</span>
@@ -83,14 +88,12 @@
             </div>
         </main>
 
-        <!-- RIGHT: SWARM & LOGS -->
         <aside class="mc-panel">
             <div class="mc-panel-header">
                 <span>ACTIVE SWARM</span>
                 <i class="fas fa-users"></i>
             </div>
             <div class="swarm-list" id="swarm-list">
-                <!-- Dynamically populated by JS -->
                 <div class="agent-row">
                     <div class="agent-status-dot active"></div>
                     <div style="font-weight:bold; color:#fff;">Market_Maker_01</div>
@@ -114,7 +117,6 @@
             </div>
 
             <div class="sys2-log" id="sys2-log">
-                <!-- Logs go here -->
                 <div>> SYSTEM BOOT COMPLETE.</div>
             </div>
         </aside>

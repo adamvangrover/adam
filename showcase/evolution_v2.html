@@ -14,277 +14,315 @@
             --accent-cyan: #00f3ff;
             --accent-purple: #bd00ff;
             --accent-yellow: #ffd700;
+            --accent-red: #ff3333;
+            --panel-bg: rgba(255, 255, 255, 0.02);
+            --panel-border: 1px solid #333;
         }
         body { margin: 0; background: var(--bg-color); color: var(--text-primary); font-family: 'Inter', sans-serif; overflow-x: hidden; }
         .mono { font-family: 'JetBrains Mono', monospace; }
 
+        /* Header */
         .cyber-header {
             height: 60px; display: flex; align-items: center; justify-content: space-between;
             padding: 0 20px; border-bottom: 1px solid var(--accent-cyan);
-            background: rgba(5, 11, 20, 0.95); position: sticky; top: 0; z-index: 100;
+            background: rgba(5, 11, 20, 0.95); position: sticky; top: 0; z-index: 1000;
         }
 
-        .controls {
-            max-width: 1000px; margin: 20px auto 0; padding: 0 20px;
-            display: flex; gap: 10px; justify-content: flex-end;
+        /* Layout Grid */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            height: calc(100vh - 60px);
+            overflow: hidden;
         }
 
-        .timeline-container {
-            max-width: 1000px; margin: 60px auto; padding: 0 20px; position: relative;
-        }
-        .timeline-line {
-            position: absolute; left: 50%; width: 2px; background: #333; top: 0; bottom: 0; transform: translateX(-50%);
-        }
-
-        .timeline-node {
-            display: flex; justify-content: space-between; align-items: center; margin-bottom: 80px; position: relative;
-        }
-        .timeline-node:nth-child(even) { flex-direction: row-reverse; }
-
-        .node-content {
-            width: 45%; background: rgba(255, 255, 255, 0.02); border: 1px solid #333; padding: 20px;
-            backdrop-filter: blur(5px); position: relative; transition: all 0.3s;
-        }
-        .node-content:hover { border-color: var(--accent-cyan); box-shadow: 0 0 20px rgba(0, 243, 255, 0.1); }
-        .node-content::before {
-            content: ''; position: absolute; top: 20px; width: 20px; height: 1px; background: var(--accent-cyan);
-        }
-        .timeline-node:nth-child(odd) .node-content::before { right: -21px; }
-        .timeline-node:nth-child(even) .node-content::before { left: -21px; }
-
-        .node-marker {
-            width: 20px; height: 20px; background: #000; border: 2px solid var(--accent-cyan); border-radius: 50%;
-            position: absolute; left: 50%; transform: translateX(-50%); z-index: 10;
+        /* Left Column: Visualizer + Docs */
+        .left-col {
+            overflow-y: auto;
+            border-right: 1px solid #333;
+            position: relative;
         }
 
-        .version-tag {
-            font-size: 0.8rem; background: rgba(0, 243, 255, 0.1); color: var(--accent-cyan);
-            padding: 2px 6px; border-radius: 4px; display: inline-block; margin-bottom: 10px;
+        /* Visualizer Container */
+        #system-visualizer {
+            height: 500px;
+            width: 100%;
+            background: radial-gradient(circle at center, #0a1420 0%, #050b14 100%);
+            border-bottom: 1px solid var(--accent-cyan);
+            position: relative;
+            overflow: hidden;
         }
 
-        .capability-list { padding-left: 20px; color: #aaa; font-size: 0.9rem; }
-        .capability-list li { margin-bottom: 5px; }
-
-        .metrics-grid {
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; max-width: 1000px; margin: 40px auto; padding: 0 20px;
+        .visualizer-overlay {
+            position: absolute; bottom: 20px; left: 20px; right: 20px;
+            display: flex; justify-content: space-between; align-items: flex-end;
+            pointer-events: none;
         }
-        .metric-card {
-            background: rgba(255, 255, 255, 0.02); border: 1px solid #333; padding: 20px; text-align: center;
+        .visualizer-overlay > * { pointer-events: auto; }
+
+        /* Documentation Sections */
+        .doc-section {
+            padding: 40px;
+            border-bottom: 1px solid #333;
+        }
+        .doc-section h2 {
+            color: var(--accent-cyan);
+            font-family: 'JetBrains Mono', monospace;
+            margin-top: 0;
+            border-left: 3px solid var(--accent-cyan);
+            padding-left: 15px;
+        }
+        .doc-section h3 {
+            color: var(--accent-purple);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1rem;
+            margin-top: 30px;
+        }
+        .doc-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 40px;
+        }
+        .code-block {
+            background: #000; border: 1px solid #333; padding: 15px;
+            font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: #aaa;
+            overflow-x: auto;
+        }
+
+        /* Right Column: History Feed */
+        .right-col {
+            background: rgba(0, 0, 0, 0.3);
+            overflow-y: auto;
+            display: flex; flex-direction: column;
+        }
+
+        .history-header {
+            padding: 20px; border-bottom: 1px solid #333; background: rgba(5, 11, 20, 0.95);
+            position: sticky; top: 0; z-index: 10;
+        }
+
+        .timeline-feed {
+            padding: 20px;
+        }
+
+        .timeline-card {
+            background: var(--panel-bg); border: var(--panel-border);
+            padding: 20px; margin-bottom: 20px; position: relative;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .timeline-card:hover { border-color: var(--accent-cyan); transform: translateX(-5px); }
+        .timeline-card.active { border-color: var(--accent-cyan); background: rgba(0, 243, 255, 0.05); }
+
+        .timeline-card .version {
+            font-family: 'JetBrains Mono'; color: var(--accent-cyan); font-size: 0.9rem;
+            display: flex; justify-content: space-between; margin-bottom: 10px;
+        }
+        .timeline-card .date { color: #666; font-size: 0.8rem; }
+
+        .timeline-card h3 { margin: 0 0 10px 0; font-size: 1rem; color: #fff; }
+        .timeline-card p { font-size: 0.9rem; color: #aaa; line-height: 1.5; margin: 0; }
+
+        .tag-list { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 15px; }
+        .tag {
+            font-size: 0.7rem; padding: 2px 6px; border-radius: 2px; font-family: 'JetBrains Mono';
+            background: rgba(255, 255, 255, 0.1); color: #aaa; border: 1px solid #333;
+        }
+        .tag.added { border-color: var(--accent-cyan); color: var(--accent-cyan); background: rgba(0, 243, 255, 0.1); }
+        .tag.fixed { border-color: var(--accent-red); color: var(--accent-red); background: rgba(255, 51, 51, 0.1); }
+
+        /* Metrics Charts (Small) */
+        .metrics-strip {
+            padding: 20px; border-bottom: 1px solid #333;
+            display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;
+        }
+        .mini-chart { height: 60px; }
+
+        /* Slider */
+        .timeline-scrubber {
+            width: 100%; padding: 10px 20px; background: rgba(0,0,0,0.8); border-top: 1px solid #333;
+            display: flex; align-items: center; gap: 10px;
+        }
+        input[type=range] {
+            flex-grow: 1; -webkit-appearance: none; background: transparent;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%; height: 2px; background: #333;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none; height: 16px; width: 16px; border-radius: 50%;
+            background: var(--accent-cyan); margin-top: -7px; cursor: pointer;
+            box-shadow: 0 0 10px var(--accent-cyan);
         }
 
         .cyber-btn {
             font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; padding: 6px 12px;
             border: 1px solid #444; color: var(--text-primary); text-decoration: none; display: inline-block;
-            background: transparent; cursor: pointer;
+            background: transparent; cursor: pointer; transition: all 0.2s;
         }
-        .cyber-btn:hover { border-color: var(--accent-cyan); color: var(--accent-cyan); }
-        .cyber-btn.active { background: rgba(0, 243, 255, 0.1); border-color: var(--accent-cyan); color: var(--accent-cyan); }
+        .cyber-btn:hover { border-color: var(--accent-cyan); color: var(--accent-cyan); box-shadow: 0 0 10px rgba(0, 243, 255, 0.2); }
 
-        .constraints-section {
-            max-width: 1000px; margin: 60px auto; padding: 40px; border: 1px solid var(--accent-purple);
-            background: rgba(189, 0, 255, 0.02); position: relative;
+        /* Responsive */
+        @media (max-width: 1000px) {
+            .main-grid { grid-template-columns: 1fr; height: auto; overflow: visible; }
+            .left-col { height: auto; border-right: none; overflow: visible; }
+            #system-visualizer { height: 400px; }
+            .right-col { height: 500px; border-top: 1px solid var(--accent-cyan); }
         }
-        .constraints-title {
-            position: absolute; top: -15px; left: 40px; background: var(--bg-color); padding: 0 10px;
-            color: var(--accent-purple); font-weight: bold; font-family: 'JetBrains Mono';
-        }
-
-        .log-quote {
-            font-style: italic; color: #888; border-left: 2px solid #444; padding-left: 10px; margin: 10px 0; font-size: 0.9rem;
-        }
-
     </style>
 </head>
 <body>
     <header class="cyber-header">
-        <h1 class="mono" style="color: var(--accent-cyan); margin: 0;">ADAM EVOLUTION</h1>
+        <h1 class="mono" style="color: var(--accent-cyan); margin: 0; font-size: 1.2rem;">ADAM EVOLUTION :: SYSTEM HISTORY</h1>
         <nav>
-            <a href="mission_control_v2.html" class="cyber-btn">MISSION CONTROL</a>
+            <a href="mission_control_v3.html" class="cyber-btn">MISSION CONTROL</a>
+            <a href="index.html" class="cyber-btn">HOME</a>
         </nav>
     </header>
 
-    <!-- Controls -->
-    <div class="controls">
-        <button id="btn-human" class="cyber-btn active" onclick="setMode('human')">HUMAN MODE</button>
-        <button id="btn-ml" class="cyber-btn" onclick="downloadDataset()">ML DATASET (JSON)</button>
-    </div>
-
-    <!-- Metrics Header -->
-    <div class="metrics-grid">
-        <div class="metric-card">
-            <h3 class="mono" style="color: #666; font-size: 0.8rem;">MODEL GENERATIONS</h3>
-            <canvas id="genChart" height="150"></canvas>
-        </div>
-        <div class="metric-card">
-            <h3 class="mono" style="color: #666; font-size: 0.8rem;">AGENT COMPLEXITY</h3>
-            <canvas id="agentChart" height="150"></canvas>
-        </div>
-        <div class="metric-card">
-            <h3 class="mono" style="color: #666; font-size: 0.8rem;">SYSTEM ENTROPY</h3>
-            <canvas id="entropyChart" height="150"></canvas>
-        </div>
-    </div>
-
-    <div class="timeline-container">
-        <div class="timeline-line"></div>
-        <div id="timeline-content">
-            <!-- Dynamic Content -->
-        </div>
-    </div>
-
-    <!-- Constraints Section (Static for now, but could be dynamic) -->
-    <div class="constraints-section">
-        <div class="constraints-title">SYSTEM CONSTRAINTS & BOUNDARIES</div>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px;">
-            <div>
-                <h3 class="mono" style="color: var(--accent-purple);">COGNITIVE LIMITS</h3>
-                <ul style="color: #aaa; line-height: 1.6;">
-                    <li><strong>Context Window:</strong> 128k Tokens (Soft Limit). Information beyond this requires RAG retrieval.</li>
-                    <li><strong>Temporal Lag:</strong> Knowledge cutoff applies to base model; "NewsBot" bridges the gap but has latency.</li>
-                    <li><strong>Hallucination Risk:</strong> Non-zero probability in creative synthesis tasks. Requires "Red Team" verification.</li>
-                </ul>
-            </div>
-            <div>
-                <h3 class="mono" style="color: var(--accent-purple);">SAFETY PROTOCOLS</h3>
-                <ul style="color: #aaa; line-height: 1.6;">
-                    <li><strong>No Trade Execution:</strong> System is ADVISORY only. Cannot execute real-money transactions.</li>
-                    <li><strong>PII Redaction:</strong> All client data is anonymized before processing in the cloud layer.</li>
-                    <li><strong>Adversarial Mandatory:</strong> Bear cases must be generated for every Bull thesis.</li>
-                </ul>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        let globalData = null;
-        let charts = {};
-
-        async function loadData() {
-            try {
-                const response = await fetch('data/evolution_data.json');
-                const data = await response.json();
-                globalData = data;
-                renderTimeline(data.timeline);
-                renderCharts(data.timeline);
-            } catch (e) {
-                console.error("Failed to load evolution data", e);
-                document.getElementById('timeline-content').innerHTML = '<p style="text-align:center; color:red;">Failed to load data. Ensure showcase/data/evolution_data.json exists.</p>';
-            }
-        }
-
-        function renderTimeline(timeline) {
-            const container = document.getElementById('timeline-content');
-            container.innerHTML = '';
-
-            timeline.forEach((node, index) => {
-                const div = document.createElement('div');
-                div.className = 'timeline-node';
-
-                // Construct lists
-                let listsHtml = '';
-                if (node.added && node.added.length > 0) {
-                    listsHtml += `<ul class="capability-list">`;
-                    node.added.slice(0, 3).forEach(item => {
-                        // Strip markdown bold if present for cleaner display
-                        const cleanItem = item.replace(/\*\*(.*?)\*\*/g, '$1').split(' - ')[0]; // Just take the name part if split by dash
-                        listsHtml += `<li>${cleanItem}</li>`;
-                    });
-                    if (node.added.length > 3) listsHtml += `<li>+ ${node.added.length - 3} more...</li>`;
-                    listsHtml += `</ul>`;
-                }
-
-                div.innerHTML = `
-                    <div class="node-content">
-                        <span class="version-tag mono">${node.version}</span>
-                        <h2 style="margin: 5px 0;">${node.title}</h2>
-                        <div style="font-size: 0.8rem; color: #666; margin-bottom: 5px;">${node.date}</div>
-                        ${node.log ? `<div class="log-quote">"${node.log.substring(0, 150)}${node.log.length > 150 ? '...' : ''}"</div>` : ''}
-                        ${listsHtml}
+    <div class="main-grid">
+        <!-- Left Column: Visuals & Docs -->
+        <div class="left-col">
+            <!-- Interactive Visualizer -->
+            <div id="system-visualizer">
+                <canvas id="vizCanvas"></canvas>
+                <div class="visualizer-overlay">
+                    <div class="mono" style="font-size: 0.8rem; color: #666;">
+                        VISUALIZER::NETWORK_GROWTH<br>
+                        <span id="viz-status" style="color: var(--accent-cyan);">READY</span>
                     </div>
-                    <div class="node-marker"></div>
-                `;
-                container.appendChild(div);
-            });
-        }
+                    <div>
+                        <button class="cyber-btn" id="btn-play">PLAY SEQUENCER</button>
+                        <button class="cyber-btn" id="btn-reset">RESET VIEW</button>
+                    </div>
+                </div>
+            </div>
 
-        function renderCharts(timeline) {
-            // Reverse timeline for charts (oldest to newest)
-            const sorted = [...timeline].reverse();
-            const labels = sorted.map(t => t.version);
-            const complexity = sorted.map(t => t.metrics.complexity);
-            const entropy = sorted.map(t => t.metrics.entropy);
-            const generations = sorted.map(t => t.metrics.generations);
+            <div class="timeline-scrubber">
+                <span class="mono" style="font-size: 0.8rem; color: #666;">TL-START</span>
+                <input type="range" id="timelineSlider" min="0" max="100" value="100">
+                <span class="mono" style="font-size: 0.8rem; color: #666;">TL-END</span>
+            </div>
 
-            const commonOptions = {
-                responsive: true, maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: { x: { display: false }, y: { display: false } }
-            };
+            <!-- Documentation Sections -->
+            <div class="doc-section">
+                <h2>SYSTEM RESTRICTIONS & BOUNDARIES</h2>
+                <div class="doc-grid">
+                    <div>
+                        <h3>THE PRIME DIRECTIVE: BIFURCATION</h3>
+                        <p style="color: #aaa; line-height: 1.6; font-size: 0.9rem;">
+                            The repository strictly separates <strong>Product (Reliability)</strong> from <strong>Lab (Velocity)</strong>.
+                            "Product" code (<code>core/agents/</code>) requires strict typing, defensive coding, and auditability ("Slow is Smooth").
+                            "Lab" code (<code>experimental/</code>) allows for rapid prototyping ("Move Fast and Break Things").
+                        </p>
+                    </div>
+                    <div>
+                        <h3>COGNITIVE ARCHITECTURE</h3>
+                        <p style="color: #aaa; line-height: 1.6; font-size: 0.9rem;">
+                            <strong>System 1 (The Swarm):</strong> Fast, async, event-driven. Handles perception and news monitoring.<br>
+                            <strong>System 2 (The Graph):</strong> Slow, deliberative, DAG-based. Handles reasoning, planning, and critique.
+                        </p>
+                    </div>
+                </div>
+            </div>
 
-            // Destroy existing if any
-            if (charts.gen) charts.gen.destroy();
-            if (charts.agent) charts.agent.destroy();
-            if (charts.entropy) charts.entropy.destroy();
+            <div class="doc-section">
+                <h2>TOOLING & USAGE</h2>
+                <div class="doc-grid">
+                    <div>
+                        <h3>BUILD SYSTEM</h3>
+                        <p style="color: #aaa; line-height: 1.6; font-size: 0.9rem;">
+                            ADAM uses a custom build system to create portable environments.
+                        </p>
+                        <div class="code-block">
+# Interactive Build Wizard
+python scripts/build_adam.py
 
-            // Gen Chart
-            charts.gen = new Chart(document.getElementById('genChart'), {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        data: generations,
-                        borderColor: '#00f3ff', tension: 0.4, borderWidth: 2, pointRadius: 0
-                    }]
-                },
-                options: commonOptions
-            });
+# Export Module
+python scripts/export_module.py market_mayhem
+                        </div>
+                    </div>
+                    <div>
+                        <h3>ENVIRONMENT (uv)</h3>
+                        <p style="color: #aaa; line-height: 1.6; font-size: 0.9rem;">
+                            We strictly use <code>uv</code> for lightning-fast, reproducible Python environment management.
+                        </p>
+                        <div class="code-block">
+curl -LsSf https://astral.sh/uv/install.sh | sh
+uv sync
+source .venv/bin/activate
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-            // Agent Complexity
-            charts.agent = new Chart(document.getElementById('agentChart'), {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        data: complexity,
-                        backgroundColor: '#bd00ff', borderRadius: 2
-                    }]
-                },
-                options: commonOptions
-            });
+            <div class="doc-section">
+                <h2>DEV NOTES & PATTERNS</h2>
+                <div class="doc-grid">
+                    <div>
+                        <h3>MODULAR LOADING</h3>
+                        <p style="color: #aaa; line-height: 1.6; font-size: 0.9rem;">
+                            The <strong>Modular Data Loading Architecture</strong> decouples large datasets from the main application.
+                            <code>ModularDataManager</code> handles async fetching and caching of JSON artifacts (reports, credit memos).
+                        </p>
+                    </div>
+                    <div>
+                        <h3>AGENT PROTOCOLS</h3>
+                        <p style="color: #aaa; line-height: 1.6; font-size: 0.9rem;">
+                            <strong>Communication:</strong> All agents communicate via <code>AgentInput</code> and <code>AgentOutput</code> Pydantic schemas.<br>
+                            <strong>Tool Use:</strong> Agents must prefer Python tools (MCP) over mental math.<br>
+                            <strong>Grounding:</strong> Every claim must cite a source (10-K line item, URL).
+                        </p>
+                    </div>
+                </div>
+            </div>
 
-            // Entropy
-            charts.entropy = new Chart(document.getElementById('entropyChart'), {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        data: entropy,
-                        borderColor: '#ffd700', tension: 0.4, borderWidth: 2, pointRadius: 0
-                    }]
-                },
-                options: commonOptions
-            });
-        }
+            <div class="doc-section">
+                <h2>FUTURE BACKLOG & ROADMAP</h2>
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px;">
+                    <div style="background: rgba(255,255,255,0.05); padding: 15px; border-top: 2px solid var(--accent-cyan);">
+                        <h3 style="margin-top: 0;">PHASE 1.5</h3>
+                        <div class="mono" style="font-size: 0.8rem; color: #888;">THE COMMAND CENTER</div>
+                        <p style="font-size: 0.8rem; color: #aaa;">Synthesizer Dashboard, Agent Intercom, and War Room integration.</p>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.05); padding: 15px; border-top: 2px solid var(--accent-purple);">
+                        <h3 style="margin-top: 0;">PHASE 2 (Q3 2025)</h3>
+                        <div class="mono" style="font-size: 0.8rem; color: #888;">THE PORTFOLIO MANAGER</div>
+                        <p style="font-size: 0.8rem; color: #aaa;">Multi-entity risk aggregation and automated rebalancing engines.</p>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.05); padding: 15px; border-top: 2px solid var(--accent-yellow);">
+                        <h3 style="margin-top: 0;">PHASE 3 (Q3 2026)</h3>
+                        <div class="mono" style="font-size: 0.8rem; color: #888;">THE MARKET MAKER</div>
+                        <p style="font-size: 0.8rem; color: #aaa;">High-frequency sentiment trading and liquidity provision via Quantum RL.</p>
+                    </div>
+                </div>
+            </div>
 
-        function downloadDataset() {
-            if (!globalData) return;
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(globalData, null, 2));
-            const downloadAnchorNode = document.createElement('a');
-            downloadAnchorNode.setAttribute("href", dataStr);
-            downloadAnchorNode.setAttribute("download", "adam_evolution_dataset.json");
-            document.body.appendChild(downloadAnchorNode);
-            downloadAnchorNode.click();
-            downloadAnchorNode.remove();
-        }
+            <div style="padding: 40px; text-align: center; color: #666; font-size: 0.8rem;" class="mono">
+                ADAM v26.0 // SYSTEM EVOLUTION LOG // END OF FILE
+            </div>
+        </div>
 
-        function setMode(mode) {
-            // Visual toggle only for now, can extend to change view
-            document.getElementById('btn-human').classList.toggle('active', mode === 'human');
-            // document.getElementById('btn-ml').classList.toggle('active', mode === 'ml');
-            // ML mode is just download for now
-        }
+        <!-- Right Column: History Feed -->
+        <div class="right-col">
+            <div class="history-header">
+                <div class="mono" style="color: #fff; margin-bottom: 10px;">SYSTEM METRICS</div>
+                <div class="metrics-strip" style="padding: 0; border: none; grid-template-columns: 1fr 1fr;">
+                    <div>
+                        <div class="mono" style="font-size: 0.7rem; color: #888;">COMPLEXITY</div>
+                        <canvas id="chartComplexity" class="mini-chart"></canvas>
+                    </div>
+                    <div>
+                        <div class="mono" style="font-size: 0.7rem; color: #888;">ENTROPY</div>
+                        <canvas id="chartEntropy" class="mini-chart"></canvas>
+                    </div>
+                </div>
+            </div>
 
-        document.addEventListener('DOMContentLoaded', loadData);
-    </script>
+            <div class="timeline-feed" id="timeline-feed-content">
+                <!-- Dynamic Content Populated via JS -->
+            </div>
+        </div>
+    </div>
+
+    <script src="js/evolution_v2.js"></script>
 <script src="js/command_palette.js"></script></body>
 </html>

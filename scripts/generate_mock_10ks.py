@@ -24,7 +24,25 @@ MOCK_DATA = [
             "Cybersecurity threats to Azure infrastructure.",
             "Global PC market slowdown affecting Windows revenue."
         ],
-        "desc": "Microsoft develops, licenses, and supports software, services, devices, and solutions worldwide. Its Productivity and Business Processes segment offers Office, Exchange, SharePoint, Microsoft Teams, Office 365 Security and Compliance, and Skype for Business."
+        "desc": "Microsoft develops, licenses, and supports software, services, devices, and solutions worldwide. Its Productivity and Business Processes segment offers Office, Exchange, SharePoint, Microsoft Teams, Office 365 Security and Compliance, and Skype for Business.",
+        "cap_structure": {
+            "senior_notes": 40000,
+            "revolver_drawn": 2204,
+            "subordinated_debt": 5000
+        },
+        "snc": {
+            "rating": "PASS",
+            "justification": "Strong cash flow and market position.",
+            "facilities": [
+                {"name": "Revolving Credit Facility", "amount": 10000, "drawn": 2204},
+                {"name": "Term Loan A", "amount": 5000, "drawn": 5000}
+            ]
+        },
+        "projections": {
+            "revenue_growth": 12.0,
+            "ebitda_margin": 42.0,
+            "commentary": "We expect double-digit revenue growth driven by Azure and Cloud services."
+        }
     },
     {
         "ticker": "GOOGL",
@@ -42,7 +60,24 @@ MOCK_DATA = [
             "Generative AI disrupting core search business model.",
             "Data privacy regulations (GDPR, CCPA) increasing compliance costs."
         ],
-        "desc": "Alphabet Inc. offers various products and platforms in the United States, Europe, the Middle East, Africa, the Asia-Pacific, Canada, and Latin America. It operates through Google Services, Google Cloud, and Other Bets segments."
+        "desc": "Alphabet Inc. offers various products and platforms in the United States, Europe, the Middle East, Africa, the Asia-Pacific, Canada, and Latin America. It operates through Google Services, Google Cloud, and Other Bets segments.",
+        "cap_structure": {
+            "senior_notes": 12000,
+            "revolver_drawn": 0,
+            "subordinated_debt": 2700
+        },
+        "snc": {
+            "rating": "PASS",
+            "justification": "Robust balance sheet with minimal leverage.",
+            "facilities": [
+                {"name": "Revolving Credit Facility", "amount": 15000, "drawn": 0}
+            ]
+        },
+        "projections": {
+            "revenue_growth": 9.0,
+            "ebitda_margin": 30.0,
+            "commentary": "Growth expected to moderate in search, offset by cloud expansion."
+        }
     },
     {
         "ticker": "AMZN",
@@ -60,7 +95,25 @@ MOCK_DATA = [
             "Regulatory scrutiny on marketplace practices.",
             "Labor unionization efforts and workforce management."
         ],
-        "desc": "Amazon.com, Inc. engages in the retail sale of consumer products and subscriptions in North America and internationally. The company operates through three segments: North America, International, and Amazon Web Services (AWS)."
+        "desc": "Amazon.com, Inc. engages in the retail sale of consumer products and subscriptions in North America and internationally. The company operates through three segments: North America, International, and Amazon Web Services (AWS).",
+        "cap_structure": {
+            "senior_notes": 60000,
+            "revolver_drawn": 0,
+            "subordinated_debt": 7150
+        },
+        "snc": {
+            "rating": "WATCH",
+            "justification": "Recent net loss and high logistics capex.",
+            "facilities": [
+                {"name": "Revolving Credit Facility", "amount": 20000, "drawn": 0},
+                {"name": "Term Loan B", "amount": 10000, "drawn": 10000}
+            ]
+        },
+        "projections": {
+            "revenue_growth": 8.0,
+            "ebitda_margin": 14.0,
+            "commentary": "Focus on cost optimization in fulfillment network."
+        }
     },
     {
         "ticker": "NVDA",
@@ -78,7 +131,24 @@ MOCK_DATA = [
             "Geopolitical tensions restricting sales to China.",
             "Competition from custom AI chips by hyperscalers."
         ],
-        "desc": "NVIDIA Corporation provides graphics, and compute and networking solutions in the United States, Taiwan, China, and internationally. The company's Graphics segment offers GeForce GPUs for gaming and PCs."
+        "desc": "NVIDIA Corporation provides graphics, and compute and networking solutions in the United States, Taiwan, China, and internationally. The company's Graphics segment offers GeForce GPUs for gaming and PCs.",
+        "cap_structure": {
+            "senior_notes": 10950,
+            "revolver_drawn": 0,
+            "subordinated_debt": 0
+        },
+        "snc": {
+            "rating": "PASS",
+            "justification": "Dominant market position in AI silicon.",
+            "facilities": [
+                {"name": "Revolving Credit Facility", "amount": 3000, "drawn": 0}
+            ]
+        },
+        "projections": {
+            "revenue_growth": 50.0,
+            "ebitda_margin": 45.0,
+            "commentary": "Explosive growth anticipated due to data center demand."
+        }
     },
     {
         "ticker": "TSLA",
@@ -96,7 +166,24 @@ MOCK_DATA = [
             "Regulatory scrutiny on Autopilot and FSD features.",
             "CEO reputational risk and distraction."
         ],
-        "desc": "Tesla, Inc. designs, develops, manufactures, leases, and sells electric vehicles, and energy generation and storage systems in the United States, China, and internationally. The company operates in two segments: Automotive, and Energy Generation and Storage."
+        "desc": "Tesla, Inc. designs, develops, manufactures, leases, and sells electric vehicles, and energy generation and storage systems in the United States, China, and internationally. The company operates in two segments: Automotive, and Energy Generation and Storage.",
+        "cap_structure": {
+            "senior_notes": 3000,
+            "revolver_drawn": 0,
+            "subordinated_debt": 2748
+        },
+        "snc": {
+            "rating": "PASS",
+            "justification": "Strong margins relative to auto peers.",
+            "facilities": [
+                {"name": "Revolving Credit Facility", "amount": 5000, "drawn": 0}
+            ]
+        },
+        "projections": {
+            "revenue_growth": 25.0,
+            "ebitda_margin": 18.0,
+            "commentary": "Volume growth targets of 50% CAGR."
+        }
     },
     {
         "ticker": "META",
@@ -114,7 +201,24 @@ MOCK_DATA = [
             "Regulatory scrutiny on content moderation and user privacy.",
             "Competition from TikTok for user attention."
         ],
-        "desc": "Meta Platforms, Inc. engages in the development of products that enable people to connect and share with friends and family through mobile devices, personal computers, virtual reality headsets, and in-home devices worldwide."
+        "desc": "Meta Platforms, Inc. engages in the development of products that enable people to connect and share with friends and family through mobile devices, personal computers, virtual reality headsets, and in-home devices worldwide.",
+        "cap_structure": {
+            "senior_notes": 9920,
+            "revolver_drawn": 0,
+            "subordinated_debt": 0
+        },
+        "snc": {
+            "rating": "PASS",
+            "justification": "High free cash flow generation.",
+            "facilities": [
+                {"name": "Revolving Credit Facility", "amount": 8000, "drawn": 0}
+            ]
+        },
+        "projections": {
+            "revenue_growth": 5.0,
+            "ebitda_margin": 35.0,
+            "commentary": "Year of efficiency to drive margin expansion."
+        }
     },
     {
         "ticker": "JPM",
@@ -132,7 +236,22 @@ MOCK_DATA = [
             "Cybersecurity threats to financial infrastructure.",
             "Regulatory capital requirements (Basel III endgame)."
         ],
-        "desc": "JPMorgan Chase & Co. operates as a financial services company worldwide. It operates through four segments: Consumer & Community Banking (CCB), Corporate & Investment Bank (CIB), Commercial Banking (CB), and Asset & Wealth Management (AWM)."
+        "desc": "JPMorgan Chase & Co. operates as a financial services company worldwide. It operates through four segments: Consumer & Community Banking (CCB), Corporate & Investment Bank (CIB), Commercial Banking (CB), and Asset & Wealth Management (AWM).",
+        "cap_structure": {
+            "senior_notes": 250000,
+            "revolver_drawn": 0,
+            "subordinated_debt": 48450
+        },
+        "snc": {
+            "rating": "N/A",
+            "justification": "Financial Institution - GSIB.",
+            "facilities": []
+        },
+        "projections": {
+            "revenue_growth": 3.0,
+            "ebitda_margin": 35.0,
+            "commentary": "NII expected to normalize."
+        }
     },
     {
         "ticker": "GS",
@@ -150,7 +269,22 @@ MOCK_DATA = [
             "Talent retention in a competitive environment.",
             "Operational risks from complex financial products."
         ],
-        "desc": "The Goldman Sachs Group, Inc., a financial institution, delivers a range of financial services for corporations, financial institutions, governments, and individuals worldwide. It operates through Global Banking & Markets, Asset & Wealth Management, and Platform Solutions segments."
+        "desc": "The Goldman Sachs Group, Inc., a financial institution, delivers a range of financial services for corporations, financial institutions, governments, and individuals worldwide. It operates through Global Banking & Markets, Asset & Wealth Management, and Platform Solutions segments.",
+        "cap_structure": {
+            "senior_notes": 230000,
+            "revolver_drawn": 0,
+            "subordinated_debt": 30500
+        },
+        "snc": {
+            "rating": "N/A",
+            "justification": "Financial Institution - GSIB.",
+            "facilities": []
+        },
+        "projections": {
+            "revenue_growth": 4.0,
+            "ebitda_margin": 28.0,
+            "commentary": "Refocusing on core banking and markets franchise."
+        }
     },
     {
         "ticker": "NFLX",
@@ -168,12 +302,51 @@ MOCK_DATA = [
             "Subscriber growth saturation in mature markets.",
             "Password sharing crackdown implementation risks."
         ],
-        "desc": "Netflix, Inc. provides entertainment services. It offers TV series, documentaries, feature films, and mobile games across various genres and languages. The company provides members the ability to receive streaming content through a host of internet-connected devices."
+        "desc": "Netflix, Inc. provides entertainment services. It offers TV series, documentaries, feature films, and mobile games across various genres and languages. The company provides members the ability to receive streaming content through a host of internet-connected devices.",
+        "cap_structure": {
+            "senior_notes": 14353,
+            "revolver_drawn": 0,
+            "subordinated_debt": 0
+        },
+        "snc": {
+            "rating": "PASS",
+            "justification": "Improving free cash flow profile.",
+            "facilities": [
+                {"name": "Revolving Credit Facility", "amount": 1000, "drawn": 0}
+            ]
+        },
+        "projections": {
+            "revenue_growth": 10.0,
+            "ebitda_margin": 22.0,
+            "commentary": "Ad-supported tier driving ARM growth."
+        }
     }
 ]
 
 def generate_text(data):
     # Template matching the regex patterns in run_credit_memo_rag.py
+
+    # Generate Facilities Text
+    facilities_text = ""
+    if data['snc']['facilities']:
+        facilities_text = "The Company has the following credit facilities:\n"
+        for fac in data['snc']['facilities']:
+            facilities_text += f"- {fac['name']}: Total capacity ${fac['amount']:,.1f} million, with ${fac['drawn']:,.1f} million drawn.\n"
+
+    # Generate SNC/Regulatory Text (Hidden in Liquidity or Risk)
+    snc_text = f"SNC Regulatory Rating: {data['snc']['rating']}.\nJustification: {data['snc']['justification']}"
+
+    # Generate Projections Text
+    proj_text = f"Management expects revenue growth of approximately {data['projections']['revenue_growth']}% for the next fiscal year. "
+    proj_text += f"EBITDA margins are targeted at {data['projections']['ebitda_margin']}%. "
+    proj_text += f"{data['projections']['commentary']}"
+
+    # Generate Cap Structure Text
+    cap_text = "Capital Structure:\n"
+    cap_text += f"Senior Notes: ${data['cap_structure']['senior_notes']:,.1f} million\n"
+    cap_text += f"Revolver Drawn: ${data['cap_structure']['revolver_drawn']:,.1f} million\n"
+    cap_text += f"Subordinated Debt: ${data['cap_structure']['subordinated_debt']:,.1f} million\n"
+
     return f"""
 UNITED STATES SECURITIES AND EXCHANGE COMMISSION
 Washington, D.C. 20549
@@ -202,9 +375,18 @@ Total net sales were ${data['revenue']:,.1f} million for the year ended December
 Net income was ${data['net_income']:,.1f} million.
 Operating income: ${data['op_income']:,.1f} million.
 
+Future Outlook
+{proj_text}
+
 Liquidity and Capital Resources
 Cash and cash equivalents: ${data['cash']:,.1f} million.
 Total debt was ${data['debt']:,.1f} million as of December 31, 2024.
+
+{cap_text}
+
+{facilities_text}
+
+{snc_text}
 
 Item 8. Financial Statements and Supplementary Data
 Consolidated Balance Sheets

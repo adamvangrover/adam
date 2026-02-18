@@ -155,3 +155,8 @@
 **Vulnerability:** The V30 Neural Mesh and Neural Link WebSocket endpoints (`/ws/mesh`, `/ws/stream`) were configured with `allow_origins=["*"]`, permitting any website to connect and hijack the session (Cross-Site WebSocket Hijacking - CSWSH).
 **Learning:** `CORSMiddleware` in FastAPI/Starlette handles HTTP CORS headers but does NOT automatically enforce Origin validation for WebSocket handshakes. Manual validation of the `Origin` header is required within the WebSocket endpoint.
 **Prevention:** Always validate the `Origin` header in WebSocket endpoints against a strict whitelist. Do not rely solely on middleware designed for HTTP.
+
+## 2025-12-30 - Path Traversal in Server Script
+**Vulnerability:** The `scripts/server.py` script exposed an HTTP endpoint `/api/run_rag` that accepted a `file` parameter and passed it directly to `open()`, allowing attackers to read arbitrary files on the system (e.g. `secret.env`).
+**Learning:** Standalone utility scripts that expose HTTP servers are often overlooked in security reviews compared to the main application, but they can be just as dangerous.
+**Prevention:** Always validate file paths in file-serving or file-processing endpoints. Use `os.path.abspath` and ensure the resolved path starts with a specific allowed directory (ending with `os.sep` to prevent sibling directory attacks).

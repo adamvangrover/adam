@@ -1,8 +1,8 @@
 {
   "metadata": {
-    "generated_at": "2026-02-16T20:51:05.173477",
+    "generated_at": "2026-02-17T10:43:09.701070",
     "source": "CHANGELOG.md",
-    "count": 8
+    "count": 10
   },
   "timeline": [
     {
@@ -11,12 +11,14 @@
       "title": "Protocol ARCHITECT_INFINITE (Day 7)",
       "log": "I noticed we lack a specialized mechanism to analyze DeFi liquidity pools, despite having `CryptoAgent`. We were missing insights into Impermanent Loss and Yield Farming opportunities. I researched DeFi liquidity analysis patterns and built `DeFiLiquidityAgent` to bridge this gap, using `web3` to fetch pool reserves and calculate health metrics.",
       "added": [
-        "`core/agents/specialized/defi_liquidity_agent.py` - A specialized agent that analyzes DeFi liquidity pools for Impermanent Loss and Yield potential."
+        "**Dependencies**: Added `web3` to `requirements.txt`.",
+        "`core/agents/specialized/defi_liquidity_agent.py` - A specialized agent that analyzes DeFi liquidity pools for Impermanent Loss and Yield potential.",
+        "**Tests**: `tests/test_defi_liquidity_agent.py` - Unit tests verifying IL calculation and execution logic with mocked Web3 data."
       ],
       "fixed": [],
       "metrics": {
-        "complexity": 162,
-        "entropy": 69,
+        "complexity": 169,
+        "entropy": 55,
         "generations": 73
       },
       "raw_content": "\n### Jules' Log\n> \"I noticed we lack a specialized mechanism to analyze DeFi liquidity pools, despite having `CryptoAgent`. We were missing insights into Impermanent Loss and Yield Farming opportuniti..."
@@ -27,12 +29,16 @@
       "title": "Protocol ARCHITECT_INFINITE (Day 6)",
       "log": "I noticed we lack a specialized mechanism to capitalize on price inefficiencies across the fragmented crypto exchanges. While `CryptoAgent` provides basic analysis, it doesn't actively hunt for arbitrage. I researched high-frequency arbitrage patterns and built `CryptoArbitrageAgent` to bridge this gap, using `ccxt` to scan multiple exchanges for spread opportunities.",
       "added": [
+        "**UI**: Created `showcase/unified_dashboard.html` (Adam Protocol: Unified Command) to bridge Legacy Showcase, Adam OS, and the new WebApp.",
+        "**Widget**: Added `showcase/js/crypto_arbitrage_widget.js` to visualize real-time arbitrage opportunities in the new dashboard.",
+        "**Dependencies**: Added `ccxt` to `requirements.txt`.",
+        "**Tests**: `tests/test_crypto_arbitrage_agent.py` - Unit tests verifying spread calculation and opportunity detection with mocked exchange data.",
         "`core/agents/specialized/crypto_arbitrage_agent.py` - A specialized agent that monitors price spreads across exchanges (e.g., Binance vs Kraken) and identifies arbitrage opportunities."
       ],
       "fixed": [],
       "metrics": {
-        "complexity": 157,
-        "entropy": 56,
+        "complexity": 170,
+        "entropy": 4,
         "generations": 107
       },
       "raw_content": "\n### Jules' Log\n> \"I noticed we lack a specialized mechanism to capitalize on price inefficiencies across the fragmented crypto exchanges. While `CryptoAgent` provides basic analysis, it doesn't activ..."
@@ -43,12 +49,14 @@
       "title": "Protocol ARCHITECT_INFINITE (Day 5)",
       "log": "I noticed we lack a true real-time data ingestion layer in the V30 architecture. The `MarketScanner` was a placeholder emitting random data, which undermined the credibility of downstream agents like `QuantitativeAnalyst` and `RiskGuardian`. I researched efficient market data polling patterns and built `MarketScanner-V2` to bridge this gap, integrating `yfinance` to provide a live pulse of the market to the Neural Mesh.",
       "added": [
-        "`core/v30_architecture/python_intelligence/agents/market_scanner.py` - A specialized V30 agent that fetches real-time market data (Price, Volume, Change %) for a configurable list of tickers using `yfinance`."
+        "**Tests**: `tests/test_v30_market_scanner.py` - Unit tests verifying data fetching logic, multi-ticker support, and correct event emission.",
+        "`core/v30_architecture/python_intelligence/agents/market_scanner.py` - A specialized V30 agent that fetches real-time market data (Price, Volume, Change %) for a configurable list of tickers using `yfinance`.",
+        "**Integration**: Updated `core/v30_architecture/python_intelligence/agents/swarm_runner.py` to replace the simulated scanner with the real-time implementation."
       ],
       "fixed": [],
       "metrics": {
-        "complexity": 152,
-        "entropy": 97,
+        "complexity": 159,
+        "entropy": 4,
         "generations": 98
       },
       "raw_content": "\n### Jules' Log\n> \"I noticed we lack a true real-time data ingestion layer in the V30 architecture. The `MarketScanner` was a placeholder emitting random data, which undermined the credibility of down..."
@@ -59,12 +67,14 @@
       "title": "Protocol ARCHITECT_INFINITE (Day 4)",
       "log": "I noticed we lack a dedicated risk monitoring capability in the V30 architecture. While `QuantitativeAnalyst` provides signals, there was no independent oversight of portfolio exposure. I researched quantitative risk metrics and built `RiskGuardian` to bridge this gap, implementing Value at Risk (VaR), Conditional VaR (CVaR), and Volatility tracking using `numpy` and `scipy`.",
       "added": [
-        "`core/v30_architecture/python_intelligence/agents/risk_guardian.py` - A specialized V30 agent that calculates portfolio risk metrics (VaR, CVaR, Sharpe Ratio) in real-time."
+        "**Tests**: `tests/test_risk_guardian.py` - Unit tests verifying the mathematical accuracy of risk metrics and correct event emission.",
+        "`core/v30_architecture/python_intelligence/agents/risk_guardian.py` - A specialized V30 agent that calculates portfolio risk metrics (VaR, CVaR, Sharpe Ratio) in real-time.",
+        "**Integration**: Updated `core/v30_architecture/python_intelligence/agents/swarm_runner.py` to replace the dummy `RiskGuardian` with the fully implemented agent."
       ],
       "fixed": [],
       "metrics": {
-        "complexity": 147,
-        "entropy": 90,
+        "complexity": 154,
+        "entropy": 32,
         "generations": 90
       },
       "raw_content": "\n### Jules' Log\n> \"I noticed we lack a dedicated risk monitoring capability in the V30 architecture. While `QuantitativeAnalyst` provides signals, there was no independent oversight of portfolio expos..."
@@ -75,12 +85,13 @@
       "title": "Protocol ARCHITECT_INFINITE (Day 3)",
       "log": "I noticed we lack a fundamental analysis capability in the V30 architecture. The current system relies heavily on technicals (QuantitativeAnalyst) and sentiment (NewsBot). I researched 'RAG-Augmented Financial Analysis' and have built `FundamentalAnalyst` to bridge this gap, focusing on earnings call simulation and balance sheet parsing.",
       "added": [
-        "`core/v30_architecture/python_intelligence/agents/fundamental_analyst.py` - A specialized V30 agent that simulates 10-K data fetching and Earnings Call analysis to calculate Intrinsic Value (DCF), Distress (Altman Z), and Quality (Pietroski F)."
+        "`core/v30_architecture/python_intelligence/agents/fundamental_analyst.py` - A specialized V30 agent that simulates 10-K data fetching and Earnings Call analysis to calculate Intrinsic Value (DCF), Distress (Altman Z), and Quality (Pietroski F).",
+        "**Tests**: `tests/test_fundamental_analyst_v30.py` - Unit tests verifying the financial logic and Pydantic schemas."
       ],
       "fixed": [],
       "metrics": {
-        "complexity": 142,
-        "entropy": 97,
+        "complexity": 146,
+        "entropy": 47,
         "generations": 75
       },
       "raw_content": "\n### Jules' Log\n> \"I noticed we lack a fundamental analysis capability in the V30 architecture. The current system relies heavily on technicals (QuantitativeAnalyst) and sentiment (NewsBot). I researc..."
@@ -91,12 +102,15 @@
       "title": "Protocol ARCHITECT_INFINITE (Day 2)",
       "log": "I noticed we lack a real-time quantitative analysis capability in the V30 architecture. The `NewsBot` and other agents were mocked or relied on static data. I researched real-time market data integration patterns and built `QuantitativeAnalyst` to bridge this gap. This agent now fetches live market data using `yfinance` and calculates RSI, SMA, and Bollinger Bands to emit actionable `technical_analysis` signals into the Neural Mesh.",
       "added": [
+        "**Refactor**: `core/v30_architecture/python_intelligence/agents/base_agent.py` - Extracted `BaseAgent` from `swarm_runner.py` to a shared module for reusability.",
+        "**Integration**: Updated `core/v30_architecture/python_intelligence/agents/swarm_runner.py` to include `QuantitativeAnalyst` in the active swarm.",
+        "**Tests**: `tests/test_quantitative_analyst.py` - Unit tests verifying data fetching, indicator calculation, and packet emission using mocked `yfinance` and `NeuralMesh`.",
         "`core/v30_architecture/python_intelligence/agents/quantitative_analyst.py` - A specialized V30 agent that performs real-time technical analysis on market data (SPY, QQQ, BTC-USD, etc.)."
       ],
       "fixed": [],
       "metrics": {
-        "complexity": 137,
-        "entropy": 62,
+        "complexity": 147,
+        "entropy": 89,
         "generations": 115
       },
       "raw_content": "\n### Jules' Log\n> \"I noticed we lack a real-time quantitative analysis capability in the V30 architecture. The `NewsBot` and other agents were mocked or relied on static data. I researched real-time m..."
@@ -107,37 +121,82 @@
       "title": "Protocol ARCHITECT_INFINITE (Day 1)",
       "log": "I noticed we lack a unified understanding of market states across our agent fleet. Our `AlgoTradingAgent` was firing blindly regardless of whether the market was trending or chopping. I researched quantitative finance patterns and found that identifying the 'Market Regime' is a critical first step for any robust strategy. I have built `MarketRegimeAgent` to bridge this gap, using Hurst Exponent and ADX to classify the market environment.",
       "added": [
+        "`core/agents/specialized/macro_liquidity_agent.py` - A specialized agent that calculates a \"Liquidity Stress Index\" using real-time bond yields and spreads.",
+        "**Tests**: `tests/test_macro_liquidity_agent.py` - Unit tests verifying liquidity scoring in Crisis, Neutral, and Expansionary scenarios.",
         "`core/agents/specialized/market_regime_agent.py` - A specialized agent that classifies market conditions into `STRONG_TREND`, `MEAN_REVERSION`, or `HIGH_VOLATILITY_CRASH_RISK` using statistical metrics.",
-        "`core/agents/specialized/macro_liquidity_agent.py` - A specialized agent that calculates a \"Liquidity Stress Index\" using real-time bond yields and spreads."
+        "**Tests**: `tests/test_market_regime_agent.py` - Unit tests verifying regime classification against synthetic data patterns (Sine Wave, Linear Trend, Random Walk Explosion)."
       ],
       "fixed": [],
       "metrics": {
-        "complexity": 134,
-        "entropy": 65,
+        "complexity": 142,
+        "entropy": 28,
         "generations": 118
       },
       "raw_content": "\n### Jules' Log\n> \"I noticed we lack a unified understanding of market states across our agent fleet. Our `AlgoTradingAgent` was firing blindly regardless of whether the market was trending or choppin..."
     },
     {
       "version": "v23.5",
-      "date": "2025-10-27",
+      "date": "2025-05-20",
       "title": "Autonomous Remediation & Enhancement",
       "log": "",
       "added": [
-        "Installed critical missing packages (`fastapi`, `flask`, `celery`, `statsmodels`, `semantic-kernel`, `pandera`, `neo4j`, `flask-socketio`, `flask-jwt-extended`, `flask-sqlalchemy`, `flask-cors`, `tweepy`, `pycoingecko`, `feedparser`).",
-        "Updated `HNASP` schema to support `ExecutionTrace` list and `Optional` fields correctly."
+        "**Dependency Management**: Installed critical missing packages (`fastapi`, `flask`, `celery`, `statsmodels`, `semantic-kernel`, `pandera`, `neo4j`, `flask-socketio`, `flask-jwt-extended`, `flask-sqlalchemy`, `flask-cors`, `tweepy`, `pycoingecko`, `feedparser`).",
+        "**Core Schemas**: Updated `HNASP` schema to support `ExecutionTrace` list and `Optional` fields correctly.",
+        "**Async Migration**: Refactored `NewsBot` to use `httpx` and `asyncio` for non-blocking I/O.",
+        "**Base Agent**: Refactored `AgentBase` to improve type safety, fix `jsonLogic` signature, and handle optional `fundamental_epa`."
       ],
       "fixed": [
-        "Fixed invalid escape sequences in `core/financial_suite/modules/reporting/generator.py` and `core/risk_engine/engine.py`.",
-        "Resolved `ModuleNotFoundError` for `core.v23_graph_engine.data_pipeline.graph` by implementing the missing graph definition.",
-        "Fixed `tests/test_interaction_loop.py` mocking logic to support `AsyncMock` and correct `AgentOrchestrator` patching."
+        "Addressed `bandit` warnings regarding requests without timeout."
+      ],
+      "metrics": {
+        "complexity": 153,
+        "entropy": 87,
+        "generations": 149
+      },
+      "raw_content": "\n### Architecture\n- **Dependency Management**: Installed critical missing packages (`fastapi`, `flask`, `celery`, `statsmodels`, `semantic-kernel`, `pandera`, `neo4j`, `flask-socketio`, `flask-jwt-ext..."
+    },
+    {
+      "version": "v23.5-patch",
+      "date": "2025-05-21",
+      "title": "security -  (Operation Green Light)",
+      "log": "",
+      "added": [],
+      "fixed": [
+        "**Hardening**: Replaced MD5 with SHA-256 for file hashing (`core/data_processing`).",
+        "**Network**: Enforced 30s timeouts on external API requests (`government_stats_api`, `market_data_api`).",
+        "**Web**: Disabled Flask debug mode (`services/ui_backend.py`) and enabled Jinja2 autoescape (`core/newsletter_layout`).",
+        "**SQL**: Added input validation to `MCPRegistry` to prevent SQL injection."
       ],
       "metrics": {
         "complexity": 144,
-        "entropy": 20,
-        "generations": 374
+        "entropy": 18,
+        "generations": 88
       },
-      "raw_content": "\n### Architecture\n- **Dependency Management**: Installed critical missing packages (`fastapi`, `flask`, `celery`, `statsmodels`, `semantic-kernel`, `pandera`, `neo4j`, `flask-socketio`, `flask-jwt-ext..."
+      "raw_content": "\n### Security\n- **Hardening**: Replaced MD5 with SHA-256 for file hashing (`core/data_processing`).\n- **Web**: Disabled Flask debug mode (`services/ui_backend.py`) and enabled Jinja2 autoescape (`core..."
+    },
+    {
+      "version": "Unknown",
+      "date": "2025-05-20",
+      "title": "Unreleased -  (Simulated)",
+      "log": "",
+      "added": [
+        "`reproduce_api_error.py` script to debug API endpoint failures.",
+        "`RemediationPlan.json` outlining future steps for 100% system integrity."
+      ],
+      "fixed": [
+        "**Critical:** Resolved `ModuleNotFoundError` for `core.v23_graph_engine.data_pipeline.graph` by implementing the missing graph definition.",
+        "**Ops:** Installed missing dependencies: `pydantic`, `flask`, `torch` (CPU), `textblob`, `langchain-community`, `json-logic`.",
+        "**Core:** Refactored `core/system/interaction_loop.py` to correctly inject `config` into `Echo` and `check_token_limit`, and wrap async agent calls with `asyncio.run`.",
+        "**Critical:** Fixed `tests/test_interaction_loop.py` mocking logic to support `AsyncMock` and correct `AgentOrchestrator` patching.",
+        "**Core:** Refactored `core/agents/agent_base.py` to safely handle `asyncio` loops in threaded contexts and robustify `update_persona` against None values.",
+        "**Core:** Fixed `core/agents/query_understanding_agent.py` to call synchronous `LLMPlugin.generate_text` instead of non-existent `get_completion`."
+      ],
+      "metrics": {
+        "complexity": 12,
+        "entropy": 90,
+        "generations": 125
+      },
+      "raw_content": "\n### Fixed\n- **Critical:** Resolved `ModuleNotFoundError` for `core.v23_graph_engine.data_pipeline.graph` by implementing the missing graph definition.\n- **Critical:** Fixed `tests/test_interaction_lo..."
     }
   ]
 }

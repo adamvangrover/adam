@@ -159,19 +159,23 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Financial Snapshot & Chart (Merged Feature)
         if (memo.financial_ratios) {
+            const fr = memo.financial_ratios;
             const finDiv = document.createElement('div');
             finDiv.style.marginBottom = '30px';
             finDiv.style.background = '#f9f9f9';
             finDiv.style.padding = '20px';
             finDiv.style.border = '1px solid #ddd';
 
+            window._fr_sources = fr.sources || {};
+            const bind = (key) => window._fr_sources[key] ? `style="cursor:pointer; color:blue; text-decoration:underline;" onclick='window.viewEvidence(window._fr_sources["${key}"])'` : "";
+
             finDiv.innerHTML = `
                 <h3 style="margin-top: 0; font-family: 'Arial'; font-size: 0.9rem; text-transform: uppercase;">Financial Snapshot</h3>
                 <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; font-family: var(--font-mono); font-size: 0.8rem; margin-bottom: 20px;">
-                    <div><b>Leverage:</b> ${memo.financial_ratios.leverage_ratio?.toFixed(2)}x</div>
-                    <div><b>EBITDA:</b> ${formatCurrency(memo.financial_ratios.ebitda)}</div>
-                    <div><b>Revenue:</b> ${formatCurrency(memo.financial_ratios.revenue)}</div>
-                    <div><b>DSCR:</b> ${memo.financial_ratios.dscr?.toFixed(2)}x</div>
+                    <div><b>Leverage:</b> ${fr.leverage_ratio?.toFixed(2)}x</div>
+                    <div><b>EBITDA:</b> <span ${bind('ebitda')}>${formatCurrency(fr.ebitda)}</span></div>
+                    <div><b>Revenue:</b> <span ${bind('revenue')}>${formatCurrency(fr.revenue)}</span></div>
+                    <div><b>DSCR:</b> ${fr.dscr?.toFixed(2)}x</div>
                 </div>
                 <div style="height: 250px; width: 100%;">
                     <canvas id="finChart"></canvas>
@@ -189,6 +193,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (memo.consensus_data) {
              renderConsensus(memo, contentDiv);
         }
+
+        // --- NEW: Capital Structure & SNC ---
+        if (memo.capital_structure) renderCapStructure(memo, contentDiv);
+        if (memo.snc_rating) renderSNC(memo, contentDiv);
+        if (memo.projections) renderProjections(memo, contentDiv);
+
+        // --- NEW: System 2 Audit ---
+        if (memo.system2_audit) renderSystem2Audit(memo.system2_audit, contentDiv);
 
         // Sections
         if (memo.sections) {
@@ -354,6 +366,105 @@ document.addEventListener('DOMContentLoaded', async () => {
         container.appendChild(div);
     }
 
+    function renderCapStructure(memo, container) {
+        const cs = memo.capital_structure;
+        if (!cs) return;
+        const div = document.createElement('div');
+        div.style.marginBottom = "30px";
+
+        window._cs_sources = cs.sources || {};
+        const bind = (key) => window._cs_sources[key] ? `style="cursor:pointer; text-decoration:underline; color:blue;" onclick='window.viewEvidence(window._cs_sources["${key}"])'` : "";
+
+        div.innerHTML = `
+            <h3 style="margin-top: 0; font-family: 'Arial'; font-size: 0.9rem; text-transform: uppercase;">Capital Structure</h3>
+            <div style="background: #fdfdfd; padding: 15px; border: 1px solid #eee;">
+                <table class="fin-table" style="width:100%; font-size:0.8rem;">
+                    <thead>
+                        <tr>
+                            <th>Instrument</th>
+                            <th style="text-align:right">Amount ($M)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Senior Notes</td><td class="num" ${bind('senior_notes')}>${formatCurrency(cs.senior_notes)}</td></tr>
+                        <tr><td>Revolver Drawn</td><td class="num" ${bind('revolver')}>${formatCurrency(cs.revolver)}</td></tr>
+                        <tr><td>Subordinated Debt</td><td class="num" ${bind('subordinated')}>${formatCurrency(cs.subordinated)}</td></tr>
+                        <tr style="border-top:2px solid #000"><td><b>Total Debt</b></td><td class="num"><b>${formatCurrency(cs.senior_notes + cs.revolver + cs.subordinated)}</b></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        `;
+        container.appendChild(div);
+    }
+
+    function renderSNC(memo, container) {
+        const snc = memo.snc_rating;
+        if (!snc) return;
+        const div = document.createElement('div');
+        div.style.marginBottom = "30px";
+        window._snc_sources = snc.sources || {};
+
+        div.innerHTML = `
+            <h3 style="margin-top: 0; font-family: 'Arial'; font-size: 0.9rem; text-transform: uppercase;">SNC Regulatory Rating</h3>
+            <div style="background: #fff3e0; padding: 15px; border-left: 5px solid #ff9800;">
+                <div style="font-size: 1.2rem; font-weight: bold; margin-bottom: 5px;">
+                    <span style="cursor:pointer;" onclick='window.viewEvidence(window._snc_sources.rating)'>${snc.rating}</span>
+                </div>
+                <div style="font-style: italic; color: #555;">
+                    " <span style="cursor:pointer;" onclick='window.viewEvidence(window._snc_sources.justification)'>${snc.justification}</span> "
+                </div>
+            </div>
+        `;
+        container.appendChild(div);
+    }
+
+    function renderProjections(memo, container) {
+        const p = memo.projections;
+        if (!p) return;
+        const div = document.createElement('div');
+        div.style.marginBottom = "30px";
+        window._proj_sources = p.sources || {};
+
+        div.innerHTML = `
+            <h3 style="margin-top: 0; font-family: 'Arial'; font-size: 0.9rem; text-transform: uppercase;">Management Projections (Guidance)</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div style="background: #e8eaf6; padding: 15px; text-align: center;">
+                    <div style="font-size:0.8rem; color:#3f51b5;">Revenue Growth</div>
+                    <div style="font-size:1.5rem; color:#1a237e; cursor:pointer;" onclick='window.viewEvidence(window._proj_sources.revenue_growth)'>${p.revenue_growth.toFixed(1)}%</div>
+                </div>
+                <div style="background: #e8eaf6; padding: 15px; text-align: center;">
+                    <div style="font-size:0.8rem; color:#3f51b5;">EBITDA Margin Target</div>
+                    <div style="font-size:1.5rem; color:#1a237e; cursor:pointer;" onclick='window.viewEvidence(window._proj_sources.ebitda_margin)'>${p.ebitda_margin.toFixed(1)}%</div>
+                </div>
+            </div>
+        `;
+        container.appendChild(div);
+    }
+
+    function renderSystem2Audit(audit, container) {
+        const div = document.createElement('div');
+        div.style.marginBottom = "30px";
+
+        const rows = audit.log.map(l => `
+            <tr>
+                <td>${l.check}</td>
+                <td><span style="color: ${l.status==='PASS'?'green':(l.status==='WARN'?'orange':'red')}">${l.status}</span></td>
+                <td>${l.msg}</td>
+            </tr>
+        `).join('');
+
+        div.innerHTML = `
+             <h3 style="margin-top: 0; font-family: 'Arial'; font-size: 0.9rem; text-transform: uppercase;">System 2 Audit Log</h3>
+             <div style="background: #333; color: #eee; padding: 15px; font-family: monospace; font-size: 0.8rem;">
+                <div style="margin-bottom:10px; border-bottom:1px solid #555;">VERDICT: <span style="color:${audit.verdict==='CLEAN'?'#00e676':'#ff5252'}">${audit.verdict} (Score: ${audit.score})</span></div>
+                <table style="width:100%;">
+                    <tbody>${rows}</tbody>
+                </table>
+             </div>
+        `;
+        container.appendChild(div);
+    }
+
     function renderRiskQuant(memo, container) {
          // Use existing PD model data if available from RAG
          let pd = 0.0, lgd = 0.45, rating = "N/A";
@@ -410,67 +521,89 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // --- Evidence Viewer (Merged) ---
-    window.viewEvidence = (docId, chunkId) => {
+    window.viewEvidence = async function(source) {
         const viewer = elements.evidenceViewer;
-        viewer.innerHTML = ''; // Clear
+        viewer.innerHTML = '<div style="padding:20px; color: #888;">Loading evidence...</div>';
 
-        // 1. Find Data
-        let doc, chunk;
-        if(currentMemoData && currentMemoData.documents) {
-             doc = currentMemoData.documents.find(d => d.doc_id === docId);
-             chunk = doc?.chunks.find(c => c.chunk_id === chunkId);
+        // Support Legacy Call (docId, chunkId) or New Object
+        let docId, start, end;
+        // Check arguments for legacy calls
+        if (arguments.length > 1 || typeof source === 'string') {
+             docId = source;
+             start = 0; end = 0;
+        } else if (source && typeof source === 'object') {
+             docId = source.doc_id;
+             start = source.start;
+             end = source.end;
         }
 
-        // 2. Create Page Container
-        const page = document.createElement('div');
-        page.style.width = '100%';
-        page.style.height = '1000px';
-        page.style.background = '#fff';
-        page.style.position = 'relative';
-        page.style.padding = '40px';
-        page.style.boxSizing = 'border-box';
+        if (!docId) {
+            viewer.innerHTML = '<div style="padding:20px; color: red;">No document ID provided.</div>';
+            return;
+        }
         
-        // 3. Mock Text Background
-        page.innerHTML = `<div style="color: #ddd; font-size: 6px; overflow:hidden; height:100%; word-break: break-all;">
-            ${"CONTENT ".repeat(5000)}
-        </div>`;
+        if(elements.docIdLabel) elements.docIdLabel.innerText = docId;
 
-        // 4. BBox Highlight
-        if (chunk && chunk.bbox) {
-            const [x0, y0, x1, y1] = chunk.bbox;
-            const bbox = document.createElement('div');
-            bbox.className = 'bbox-highlight'; // Uses CSS from previous step
-            bbox.style.left = `${x0}px`;
-            bbox.style.top = `${y0}px`;
-            bbox.style.width = `${x1 - x0}px`;
-            bbox.style.height = `${y1 - y0}px`;
+        try {
+            // Fetch text file
+            const res = await fetch(`data/${docId}`);
+            if (!res.ok) throw new Error(`Document ${docId} not found`);
+            const text = await res.text();
             
-            const label = document.createElement('div');
-            label.className = 'bbox-label';
-            label.innerText = chunk.type.toUpperCase();
-            bbox.appendChild(label);
+            // Render Text
+            const pre = document.createElement('pre');
+            pre.style.whiteSpace = "pre-wrap";
+            pre.style.fontFamily = "monospace";
+            pre.style.fontSize = "11px";
+            pre.style.lineHeight = "1.5";
+            pre.style.padding = "20px";
+            pre.style.color = "#333";
+            pre.style.backgroundColor = "#fff";
+            pre.style.overflowX = "hidden";
+            pre.style.height = "100%";
+            pre.style.margin = "0";
             
-            // Overlay actual text for readability
-            const textOverlay = document.createElement('div');
-            textOverlay.style.background = "rgba(255,255,255,0.9)";
-            textOverlay.style.color = "black";
-            textOverlay.style.fontSize = "12px";
-            textOverlay.style.height = "100%";
-            textOverlay.style.overflow = "hidden";
-            textOverlay.innerText = chunk.content;
-            bbox.appendChild(textOverlay);
+            if (typeof start === 'number' && typeof end === 'number' && end > start) {
+                // Safe Highlight
+                const before = text.substring(0, start);
+                const target = text.substring(start, end);
+                const after = text.substring(end);
 
-            page.appendChild(bbox);
+                const spanBefore = document.createTextNode(before);
+
+                const spanTarget = document.createElement('span');
+                spanTarget.style.backgroundColor = "#ffeb3b"; // Yellow
+                spanTarget.style.color = "#000";
+                spanTarget.style.border = "1px solid #fbc02d";
+                spanTarget.innerText = target;
+                spanTarget.id = "highlight-target";
+
+                const spanAfter = document.createTextNode(after);
+
+                pre.appendChild(spanBefore);
+                pre.appendChild(spanTarget);
+                pre.appendChild(spanAfter);
+            } else {
+                pre.innerText = text;
+            }
             
-            // Scroll to it
-            setTimeout(() => bbox.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
-        } else {
-            // Fallback for missing bbox
-            page.innerHTML += `<div style="position:absolute; top:100px; left:50px; background:yellow; padding:10px; color:black;">Evidence Loaded: ${docId}</div>`;
+            viewer.innerHTML = '';
+            viewer.appendChild(pre);
+
+            // Scroll to highlight
+            setTimeout(() => {
+                const el = document.getElementById('highlight-target');
+                if(el) {
+                    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }, 100);
+
+            log("Frontend", `User viewed evidence ${docId}`, "audit");
+
+        } catch (e) {
+             viewer.innerHTML = `<div style="padding:20px; color: red;">Error: ${e.message}</div>`;
+             console.error(e);
         }
-
-        viewer.appendChild(page);
-        log("Frontend", `User viewed evidence ${docId}`, "audit");
     };
 
     // --- Helpers ---
