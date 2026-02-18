@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         editBtn: document.getElementById('edit-btn'),
         exportBtn: document.getElementById('export-btn'),
         memoContainer: document.getElementById('memo-container'), // Main scrollable area
+        memoPlaceholder: document.getElementById('memo-placeholder'), // Placeholder
         memoContent: document.getElementById('memo-content'),     // Inner content div
         evidenceViewer: document.getElementById('pdf-mock-canvas'),
         terminal: document.getElementById('agent-terminal'),
@@ -39,7 +40,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 // However, updated loader prefers ID or Filename.
                 // Original used item.file. Let's use item.id for cleaner lookup,
                 // but universalLoader.loadCreditMemo handles filename or ID.
-                opt.value = item.id;
+                opt.value = item.file || item.id;
                 opt.innerText = `${item.borrower_name} (Risk: ${item.risk_score})`;
                 opt.dataset.ticker = item.ticker || "UNK";
                 opt.dataset.name = item.borrower_name;
@@ -116,22 +117,45 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // --- Rendering Logic ---
     function renderMemo(memo) {
+        // Toggle visibility
+        elements.memoPlaceholder.style.display = 'none';
+        elements.memoContent.style.display = 'block';
+
         const contentDiv = elements.memoContent;
         contentDiv.innerHTML = '';
         contentDiv.className = "memo-paper"; // Apply the paper CSS class
 
         // Header
         const riskColor = memo.risk_score < 60 ? 'red' : (memo.risk_score < 80 ? 'orange' : 'green');
+
+        // Source Badge Logic
+        const isRag = (memo.source && memo.source.includes('RAG')) || (memo.executive_summary && memo.executive_summary.includes('RAG Analysis'));
+        const sourceBadge = isRag
+            ? `<span style="background: #e0f7fa; color: #006064; padding: 2px 6px; border-radius: 4px; border: 1px solid #006064; font-weight: bold;">SOURCE: RAG (10-K)</span>`
+            : `<span style="background: #f5f5f5; color: #999; padding: 2px 6px; border-radius: 4px; border: 1px solid #ddd;">SOURCE: MOCK/HISTORICAL</span>`;
+
         const header = document.createElement('div');
         header.innerHTML = `
             <h1 class="editable-content">${memo.borrower_name}</h1>
-            <div style="display: flex; justify-content: space-between; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 30px; font-family: var(--font-mono); font-size: 0.8rem; color: #666;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 30px; font-family: var(--font-mono); font-size: 0.8rem; color: #666;">
                 <span>DATE: ${new Date(memo.report_date).toLocaleDateString()}</span>
                 <span>RISK SCORE: <b style="color: ${riskColor}">${memo.risk_score}/100</b></span>
-                <span>ID: ${memo.borrower_name.substring(0,3).toUpperCase()}-${Math.floor(Math.random()*10000)}</span>
+                ${sourceBadge}
             </div>
         `;
         contentDiv.appendChild(header);
+
+        // Executive Summary
+        if (memo.executive_summary) {
+            const execSumDiv = document.createElement('div');
+            execSumDiv.innerHTML = `
+                <h3 style="margin-top: 0; font-family: 'Arial'; font-size: 0.9rem; text-transform: uppercase;">Executive Summary</h3>
+                <div class="editable-content" style="text-align: justify; margin-bottom: 30px; font-family: var(--font-mono); font-size: 0.9rem;">
+                    ${memo.executive_summary}
+                </div>
+            `;
+            contentDiv.appendChild(execSumDiv);
+        }
 
         // Financial Snapshot & Chart (Merged Feature)
         if (memo.financial_ratios) {
@@ -161,6 +185,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             }, 0);
         }
 
+        // --- NEW: Consensus Data ---
+        if (memo.consensus_data) {
+             renderConsensus(memo, contentDiv);
+        }
+
         // Sections
         if (memo.sections) {
             memo.sections.forEach(section => {
@@ -184,7 +213,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             renderDCF(memo.dcf_analysis, contentDiv);
         }
         
-        // Risk Quant
+        // --- NEW: Valuation Scenarios ---
+        if (memo.price_targets) {
+            renderValuationScenarios(memo.price_targets, contentDiv);
+        }
+
+        // Risk Quant (Enhanced)
         renderRiskQuant(memo, contentDiv);
 
         if (isEditMode) applyEditMode();
@@ -248,21 +282,128 @@ document.addEventListener('DOMContentLoaded', async () => {
         container.appendChild(dcfDiv);
     }
     
+    // --- NEW: Consensus Renderer ---
+    function renderConsensus(memo, container) {
+        const c = memo.consensus_data;
+        const div = document.createElement('div');
+        div.style.marginBottom = "30px";
+
+        div.innerHTML = `
+            <h3 style="margin-top: 0; font-family: 'Arial'; font-size: 0.9rem; text-transform: uppercase;">Consensus vs System Model</h3>
+            <div style="background: #fdfdfd; padding: 15px; border: 1px solid #eee;">
+                <table class="fin-table" style="width:100%; font-size:0.8rem;">
+                    <thead>
+                        <tr>
+                            <th>Metric</th>
+                            <th style="text-align:right">Consensus Mean</th>
+                            <th style="text-align:right">Street High</th>
+                            <th style="text-align:right">Street Low</th>
+                            <th style="text-align:right; background: #e0f7fa;">System (RAG)</th>
+                            <th style="text-align:right">Delta %</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><b>Revenue</b></td>
+                            <td class="num">${formatCurrency(c.revenue.mean)}</td>
+                            <td class="num">${formatCurrency(c.revenue.high)}</td>
+                            <td class="num">${formatCurrency(c.revenue.low)}</td>
+                            <td class="num" style="background: #e0f7fa;"><b>${formatCurrency(memo.historical_financials[0].revenue)}</b></td>
+                            <td class="num" style="color:${c.revenue.system_delta_pct > 0 ? 'green':'red'}">${(c.revenue.system_delta_pct * 100).toFixed(1)}%</td>
+                        </tr>
+                         <tr>
+                            <td><b>EBITDA</b></td>
+                            <td class="num">${formatCurrency(c.ebitda.mean)}</td>
+                            <td class="num">${formatCurrency(c.ebitda.high)}</td>
+                            <td class="num">${formatCurrency(c.ebitda.low)}</td>
+                            <td class="num" style="background: #e0f7fa;"><b>${formatCurrency(memo.historical_financials[0].ebitda)}</b></td>
+                            <td class="num" style="color:${c.ebitda.system_delta_pct > 0 ? 'green':'red'}">${(c.ebitda.system_delta_pct * 100).toFixed(1)}%</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div style="margin-top:10px; font-size:0.75rem; color:#666;">
+                    System Sentiment: <b>${c.sentiment}</b> based on variance from consensus.
+                </div>
+            </div>
+        `;
+        container.appendChild(div);
+    }
+
+    // --- NEW: Valuation Scenarios ---
+    function renderValuationScenarios(targets, container) {
+        const div = document.createElement('div');
+        div.style.marginBottom = "30px";
+
+        div.innerHTML = `
+            <h3 style="margin-top: 0; font-family: 'Arial'; font-size: 0.9rem; text-transform: uppercase;">Valuation Scenarios (12M Price Targets)</h3>
+            <div style="display: flex; gap: 10px; justify-content: space-between;">
+                <div style="flex:1; background:#ffebee; border:1px solid #ffcdd2; padding:15px; text-align:center;">
+                    <div style="font-size:0.7rem; color:#b71c1c; text-transform:uppercase; font-weight:bold;">Bear Case</div>
+                    <div style="font-size:1.5rem; font-family:var(--font-mono); color:#b71c1c;">$${targets.bear.toFixed(2)}</div>
+                </div>
+                <div style="flex:1; background:#f3e5f5; border:1px solid #e1bee7; padding:15px; text-align:center;">
+                    <div style="font-size:0.7rem; color:#4a148c; text-transform:uppercase; font-weight:bold;">Base Case</div>
+                    <div style="font-size:1.5rem; font-family:var(--font-mono); color:#4a148c;">$${targets.base.toFixed(2)}</div>
+                </div>
+                <div style="flex:1; background:#e8f5e9; border:1px solid #c8e6c9; padding:15px; text-align:center;">
+                    <div style="font-size:0.7rem; color:#1b5e20; text-transform:uppercase; font-weight:bold;">Bull Case</div>
+                    <div style="font-size:1.5rem; font-family:var(--font-mono); color:#1b5e20;">$${targets.bull.toFixed(2)}</div>
+                </div>
+            </div>
+        `;
+        container.appendChild(div);
+    }
+
     function renderRiskQuant(memo, container) {
-         // Simple PD logic from Left Side
-         const debt = memo.historical_financials?.[0]?.total_liabilities || 0;
-         const equity = memo.historical_financials?.[0]?.total_equity || 0;
-         const assets = debt + equity;
-         const leverage = assets > 0 ? debt / assets : 0;
-         const pd = (leverage * 0.05).toFixed(4);
+         // Use existing PD model data if available from RAG
+         let pd = 0.0, lgd = 0.45, rating = "N/A";
+         let debt = 0;
+
+         if (memo.pd_model) {
+             pd = memo.pd_model.pd_1yr || 0.02;
+             lgd = memo.pd_model.lgd || 0.45;
+             rating = memo.pd_model.regulatory_rating || memo.regulatory_rating || "N/A";
+         } else {
+             // Fallback
+             debt = memo.historical_financials?.[0]?.total_liabilities || 0;
+             const equity = memo.historical_financials?.[0]?.total_equity || 0;
+             const assets = debt + equity;
+             const leverage = assets > 0 ? debt / assets : 0;
+             pd = (leverage * 0.05).toFixed(4);
+         }
+
+         // If debt wasn't set from fallback
+         if (!debt && memo.historical_financials && memo.historical_financials[0]) {
+             debt = memo.historical_financials[0].total_liabilities || memo.historical_financials[0].gross_debt || 0;
+         }
+
+         const el = debt * pd * lgd;
          
          const div = document.createElement('div');
          div.innerHTML = `
-            <h2>Risk Model Output</h2>
-            <div style="font-family: var(--font-mono); font-size: 0.8rem; border: 1px solid #ccc; padding: 10px;">
-                <div>Probability of Default (PD): ${(pd*100).toFixed(2)}%</div>
-                <div>Loss Given Default (LGD): 45%</div>
-                <div>Expected Loss: ${formatCurrency(debt * pd * 0.45)}</div>
+            <h2>Risk Model Output & Regulatory Rating</h2>
+            <div style="font-family: var(--font-mono); font-size: 0.8rem; border: 1px solid #ccc; padding: 20px; background: #fffbf0;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div>
+                        <div style="font-size:0.7rem; color:#666;">Regulatory Rating</div>
+                        <div style="font-size:1.2rem; font-weight:bold; color:#000;">${rating}</div>
+                    </div>
+                    <div>
+                        <div style="font-size:0.7rem; color:#666;">Probability of Default (1Y)</div>
+                        <div style="font-size:1.2rem; font-weight:bold; color:#d32f2f;">${(pd*100).toFixed(2)}%</div>
+                    </div>
+                     <div>
+                        <div style="font-size:0.7rem; color:#666;">Loss Given Default (LGD)</div>
+                        <div style="font-size:1.2rem; font-weight:bold; color:#000;">${(lgd*100).toFixed(0)}%</div>
+                    </div>
+                    <div>
+                        <div style="font-size:0.7rem; color:#666;">Expected Loss ($)</div>
+                        <div style="font-size:1.2rem; font-weight:bold; color:#000;">${formatCurrency(el)}</div>
+                    </div>
+                </div>
+                <div style="margin-top:15px; font-size:0.75rem; color:#666; font-style:italic;">
+                    Rationale: ${memo.pd_model?.rationale || "Automated calculation based on leverage ratios."}
+                </div>
             </div>
          `;
          container.appendChild(div);

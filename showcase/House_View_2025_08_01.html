@@ -85,6 +85,39 @@
                 <canvas id="financialChart"></canvas>
             </div>
 
+            <!-- Crisis Simulator (High Tier Only) -->
+            <div id="crisisSimContainer" style="display:none; margin-bottom: 30px; border: 1px solid #cc0000; padding: 20px; background: rgba(50, 0, 0, 0.2);">
+                <h3 style="color: #cc0000; margin-top: 0; font-family: 'JetBrains Mono'; border-bottom: 1px solid #cc0000; padding-bottom: 10px; margin-bottom: 20px;">CRISIS SIMULATOR // STRESS TEST</h3>
+
+                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 20px;">
+                    <div class="crisis-btn" onclick="renderCrisis('2008_LEHMAN')" style="cursor:pointer; text-align:center; padding: 10px; border: 1px solid #666; font-size: 0.8rem; color: #ccc;">
+                        2008 LEHMAN
+                    </div>
+                    <div class="crisis-btn" onclick="renderCrisis('1987_BLACK_MONDAY')" style="cursor:pointer; text-align:center; padding: 10px; border: 1px solid #666; font-size: 0.8rem; color: #ccc;">
+                        1987 BLACK MON
+                    </div>
+                    <div class="crisis-btn" onclick="renderCrisis('2020_COVID')" style="cursor:pointer; text-align:center; padding: 10px; border: 1px solid #666; font-size: 0.8rem; color: #ccc;">
+                        2020 PANDEMIC
+                    </div>
+                    <div class="crisis-btn" onclick="renderCrisis('2000_DOTCOM')" style="cursor:pointer; text-align:center; padding: 10px; border: 1px solid #666; font-size: 0.8rem; color: #ccc;">
+                        2000 DOTCOM
+                    </div>
+                    <div class="crisis-btn" onclick="renderCrisis('2022_INFLATION')" style="cursor:pointer; text-align:center; padding: 10px; border: 1px solid #666; font-size: 0.8rem; color: #ccc;">
+                        2022 INFLATION
+                    </div>
+                    <div class="crisis-btn" onclick="renderCrisis('2025_AI_SHOCK')" style="cursor:pointer; text-align:center; padding: 10px; border: 1px solid #666; font-size: 0.8rem; color: #ccc;">
+                        2025 AI SHOCK
+                    </div>
+                </div>
+
+                <div style="height: 300px; position: relative;">
+                    <canvas id="crisisChart"></canvas>
+                </div>
+                <div style="font-size: 0.7rem; color: #888; margin-top: 15px; font-style: italic;">
+                    * Hypothetical performance based on portfolio beta and current risk profile. PAST PERFORMANCE IS NOT INDICATIVE OF FUTURE RESULTS.
+                </div>
+            </div>
+
             <div id="document-body">
                 <strong>Date:</strong> 2025-08-01
 <strong>Type:</strong> House_View
@@ -217,7 +250,9 @@ We recommend adjusting exposure based on the Energy Crisis & Geopolitics. The Vo
     <script>
         // Chart Injection Logic
         const metricsData = {};
+        const crisisData = {"2008_LEHMAN": {"scenario": "2008_LEHMAN", "labels": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30], "market": [100.0, 93.16, 97.06, 85.78, 87.65, 82.36, 76.94, 73.34, 81.08, 71.87, 68.41, 68.13, 66.62, 61.71, 38.84, 37.59, 32.63, 34.26, 37.32, 36.48, 32.32, 32.4, 33.77, 33.99, 32.96, 33.13, 34.37, 36.33, 38.18, 37.86], "portfolio": [100.0, 94.07, 96.51, 88.13, 88.52, 87.47, 84.99, 80.15, 82.4, 76.42, 75.62, 73.54, 70.58, 67.75, 53.86, 51.43, 47.75, 46.8, 47.74, 50.02, 47.91, 46.47, 47.22, 47.79, 46.22, 46.57, 47.02, 48.63, 49.87, 49.47]}, "1987_BLACK_MONDAY": {"scenario": "1987_BLACK_MONDAY", "labels": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20], "market": [100.0, 84.8, 80.28, 68.87, 63.69, 72.03, 93.11, 107.15, 101.21, 73.47, 46.88, 42.8, 50.29, 48.77, 47.45, 41.68, 45.93, 48.7, 41.13, 35.67], "portfolio": [100.0, 90.78, 88.55, 80.89, 76.19, 81.31, 96.0, 101.5, 100.23, 80.59, 67.84, 62.7, 76.42, 76.61, 78.76, 72.28, 78.09, 80.84, 72.98, 65.93]}, "2020_COVID": {"scenario": "2020_COVID", "labels": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40], "market": [100.0, 104.0, 100.57, 96.79, 97.0, 94.53, 94.49, 91.63, 112.43, 116.35, 111.0, 106.3, 107.97, 109.98, 113.08, 123.46, 125.53, 122.61, 129.81, 109.71, 98.55, 88.4, 75.06, 68.42, 51.48, 52.29, 54.6, 63.46, 72.02, 68.25, 62.55, 63.38, 64.53, 68.38, 77.47, 78.03, 75.75, 68.94, 65.98, 68.59], "portfolio": [100.0, 103.25, 99.84, 96.49, 97.78, 95.88, 95.17, 95.89, 111.32, 113.02, 115.26, 113.69, 118.7, 119.46, 124.91, 129.18, 135.26, 134.36, 146.4, 146.58, 144.18, 141.46, 130.35, 119.11, 101.82, 107.98, 114.85, 123.1, 136.21, 124.42, 120.8, 117.57, 118.42, 125.32, 133.42, 131.66, 130.97, 122.75, 119.73, 122.75]}, "2000_DOTCOM": {"scenario": "2000_DOTCOM", "labels": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60], "market": [100.0, 102.25, 102.86, 93.59, 100.5, 101.8, 97.67, 93.54, 99.68, 103.24, 99.21, 95.1, 95.62, 90.34, 90.9, 86.75, 85.63, 86.3, 89.85, 87.18, 92.31, 92.69, 87.24, 88.14, 88.67, 81.45, 84.49, 80.96, 84.88, 86.72, 85.94, 82.18, 87.66, 84.19, 78.83, 77.35, 73.85, 76.19, 72.02, 67.42, 64.88, 66.57, 62.79, 65.12, 64.45, 66.73, 68.34, 70.84, 73.85, 75.53, 76.6, 75.0, 76.22, 76.67, 80.85, 81.21, 75.96, 78.95, 83.49, 80.99], "portfolio": [100.0, 98.52, 100.88, 94.37, 97.41, 98.58, 97.82, 95.16, 98.55, 103.43, 98.72, 97.51, 97.35, 92.43, 90.54, 86.56, 87.76, 87.68, 92.41, 86.22, 83.23, 82.31, 79.54, 78.65, 78.37, 76.3, 76.43, 78.09, 79.23, 86.11, 78.36, 77.7, 79.87, 80.28, 78.52, 79.1, 68.3, 71.81, 73.65, 70.62, 67.27, 63.93, 61.87, 64.17, 63.45, 64.05, 64.24, 65.18, 66.57, 67.05, 68.11, 66.26, 69.09, 69.73, 72.26, 72.58, 70.7, 71.96, 73.09, 71.8]}, "2022_INFLATION": {"scenario": "2022_INFLATION", "labels": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50], "market": [100.0, 99.26, 97.28, 95.51, 93.41, 93.44, 90.87, 95.75, 93.59, 90.14, 85.79, 87.45, 93.19, 91.48, 91.66, 96.16, 93.88, 100.55, 99.78, 103.6, 102.43, 106.27, 104.92, 106.03, 83.61, 73.79, 67.95, 61.75, 64.26, 64.38, 65.96, 66.51, 66.64, 63.07, 65.22, 66.04, 68.92, 65.67, 62.18, 60.89, 62.6, 64.29, 61.55, 58.3, 58.09, 60.45, 60.43, 61.42, 63.42, 66.0], "portfolio": [100.0, 97.63, 93.92, 93.1, 95.82, 95.17, 93.91, 97.02, 93.39, 92.56, 93.47, 96.95, 100.35, 97.59, 100.36, 103.44, 97.72, 102.24, 107.91, 112.23, 109.81, 113.33, 109.49, 109.44, 92.47, 81.41, 78.83, 79.28, 81.27, 81.51, 79.99, 78.03, 81.91, 81.1, 82.86, 81.04, 80.11, 76.59, 75.48, 73.14, 72.65, 75.34, 73.05, 74.01, 71.37, 75.5, 75.07, 73.58, 76.14, 78.64]}, "2025_AI_SHOCK": {"scenario": "2025_AI_SHOCK", "labels": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35], "market": [100.0, 108.57, 104.26, 104.85, 105.55, 114.17, 119.1, 113.66, 93.82, 103.79, 94.3, 101.31, 99.03, 107.2, 104.28, 95.33, 94.52, 75.22, 58.96, 54.66, 56.52, 61.89, 57.68, 58.48, 57.91, 57.34, 57.72, 56.54, 58.17, 50.79, 52.08, 45.25, 40.45, 40.01, 43.92], "portfolio": [100.0, 104.36, 100.43, 102.63, 104.29, 105.43, 107.27, 100.76, 94.55, 100.5, 98.34, 103.11, 102.42, 107.66, 102.03, 97.92, 93.4, 77.98, 69.63, 68.59, 71.49, 81.76, 78.25, 81.73, 87.14, 83.6, 83.21, 80.07, 81.67, 76.02, 76.39, 72.66, 67.5, 65.87, 72.18]}};
 
+        // --- Metrics Chart ---
         if (metricsData && Object.keys(metricsData).length > 0) {
             const ctx = document.getElementById('financialChart');
             const container = document.getElementById('financialChartContainer');
@@ -254,10 +289,105 @@ We recommend adjusting exposure based on the Energy Crisis & Geopolitics. The Vo
                     },
                     options: {
                         responsive: true,
-                        plugins: { legend: { display: true } }
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { labels: { color: '#ccc' } }
+                        },
+                        scales: {
+                            y: { grid: { color: '#333' }, ticks: { color: '#888' } },
+                            x: { grid: { color: '#333' }, ticks: { color: '#888' } }
+                        }
                     }
                 });
             }
+        }
+
+        // --- Crisis Simulation Logic ---
+        let crisisChartInstance = null;
+
+        window.renderCrisis = function(scenarioName) {
+            if (!crisisData || !crisisData[scenarioName]) return;
+
+            // UI Feedback for Buttons
+            document.querySelectorAll('.crisis-btn').forEach(btn => {
+                btn.style.borderColor = btn.innerText.includes(scenarioName.split('_')[1]) ? '#cc0000' : '#666';
+                btn.style.color = btn.innerText.includes(scenarioName.split('_')[1]) ? '#cc0000' : '#ccc';
+            });
+
+            const data = crisisData[scenarioName];
+            const ctx = document.getElementById('crisisChart').getContext('2d');
+
+            if (crisisChartInstance) {
+                crisisChartInstance.destroy();
+            }
+
+            crisisChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.labels,
+                    datasets: [
+                        {
+                            label: 'Your Portfolio (Simulated)',
+                            data: data.portfolio,
+                            borderColor: '#00f3ff',
+                            backgroundColor: 'rgba(0, 243, 255, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.4,
+                            pointRadius: 0
+                        },
+                        {
+                            label: 'Market Benchmark',
+                            data: data.market,
+                            borderColor: '#666',
+                            borderDash: [5, 5],
+                            borderWidth: 1,
+                            pointRadius: 0,
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    plugins: {
+                        legend: { labels: { color: '#ccc', font: { family: 'JetBrains Mono' } } },
+                        title: {
+                            display: true,
+                            text: 'STRESS TEST SCENARIO: ' + scenarioName.replace(/_/g, ' '),
+                            color: '#cc0000',
+                            font: { family: 'JetBrains Mono' }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0,0,0,0.8)',
+                            titleColor: '#cc0000',
+                            bodyColor: '#fff',
+                            borderColor: '#333',
+                            borderWidth: 1
+                        }
+                    },
+                    scales: {
+                        y: {
+                            grid: { color: '#333' },
+                            ticks: { color: '#888', callback: function(value) { return value + '%'; } }
+                        },
+                        x: {
+                            grid: { color: '#333' },
+                            ticks: { display: false }
+                        }
+                    }
+                }
+            });
+        };
+
+        // Auto-Run Default Crisis if Data Available
+        if (crisisData && Object.keys(crisisData).length > 0) {
+            document.getElementById('crisisSimContainer').style.display = 'block';
+            // slight delay to ensure Chart.js loaded
+            setTimeout(() => renderCrisis('2008_LEHMAN'), 100);
         }
     </script>
 </body>

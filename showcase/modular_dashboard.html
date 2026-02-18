@@ -4,213 +4,460 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ADAM v24.0 :: MODULAR ANALYTICS HUB</title>
+    
     <link rel="stylesheet" href="css/style.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <!-- Core Navigation (Lightweight) -->
     <script src="js/nav.js" defer></script>
-
-    <!-- Modular Loader -->
-    <script src="js/modular_loader.js"></script>
+    <script src="js/modular_loader.js"></script> 
+    <script src="js/data_manager_modular.js"></script>
 
     <style>
+        body { font-family: 'Inter', sans-serif; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        
+        /* Dashboard Card Styles */
         .loader-card {
-            border: 1px solid #333;
-            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid #334155;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(8px);
             padding: 20px;
             border-radius: 8px;
             transition: all 0.3s ease;
         }
         .loader-card.loaded {
-            border-color: #00f3ff;
-            background: rgba(0, 243, 255, 0.05);
+            border-color: #06b6d4; /* Cyan-500 */
+            background: rgba(6, 182, 212, 0.05);
+            box-shadow: 0 0 15px rgba(6, 182, 212, 0.1);
         }
+        
+        /* Status Indicators */
         .status-dot {
-            height: 10px; width: 10px; border-radius: 50%; display: inline-block;
-            background: #666; margin-right: 8px;
+            height: 8px; width: 8px; border-radius: 50%; display: inline-block;
+            background: #64748b; margin-right: 8px;
         }
-        .status-dot.active { background: #00f3ff; box-shadow: 0 0 10px #00f3ff; }
-        .data-preview {
-            font-family: monospace; font-size: 0.8rem; color: #aaa;
-            background: #000; padding: 10px; border-radius: 4px;
-            height: 150px; overflow-y: auto; margin-top: 10px;
-            display: none;
-        }
+        .status-dot.active { background: #06b6d4; box-shadow: 0 0 8px #06b6d4; }
+        
+        /* Scrollbars */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
     </style>
 </head>
-<body class="bg-[#050b14] text-gray-200 font-sans">
+<body class="bg-[#050b14] text-gray-200 overflow-x-hidden">
 
-    <div class="p-8 ml-0 md:ml-64 transition-all duration-300">
-        <header class="flex justify-between items-center mb-8 border-b border-gray-800 pb-4">
-            <div>
-                <h1 class="text-3xl font-bold text-white tracking-tight">MODULAR ANALYTICS HUB <span class="text-cyan-400 text-sm align-top">v24.0</span></h1>
-                <p class="text-gray-400 text-sm mt-1">High-Performance Asynchronous Data Loading Architecture</p>
+    <div id="detail-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-[#0f172a] border border-slate-700 rounded-lg shadow-2xl w-full max-w-2xl max-h-[80vh] flex flex-col">
+            <div class="flex justify-between items-center p-4 border-b border-slate-700 bg-slate-800/50">
+                <h3 id="modal-title" class="text-lg font-bold text-white mono truncate">Details</h3>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-white transition">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
-            <div class="flex gap-4">
-                <button onclick="loadModule('reports')" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded text-xs font-mono">LOAD REPORTS</button>
-                <button onclick="loadModule('market_data')" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded text-xs font-mono">LOAD MARKET</button>
-                <button onclick="loadAllModules()" class="px-4 py-2 bg-cyan-900/50 hover:bg-cyan-800 border border-cyan-500/50 text-cyan-400 rounded text-xs font-mono">LOAD ALL</button>
+            <div id="modal-body" class="p-6 overflow-y-auto mono text-sm text-slate-300 space-y-4">
+                </div>
+            <div class="p-4 border-t border-slate-700 bg-slate-800/50 flex justify-end">
+                <button onclick="closeModal()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded text-sm transition">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="p-4 md:p-8 ml-0 md:ml-64 transition-all duration-300">
+        
+        <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 border-b border-gray-800 pb-4">
+            <div class="mb-4 md:mb-0">
+                <h1 class="text-3xl font-bold text-white tracking-tight">MODULAR ANALYTICS HUB <span class="text-cyan-400 text-sm align-top mono">v24.0</span></h1>
+                <p class="text-gray-400 text-sm mt-1 mono">High-Performance Asynchronous Data Loading Architecture</p>
+            </div>
+            <div class="flex flex-wrap gap-2">
+                <button onclick="loadCombined('reports')" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded text-xs mono transition hover:text-cyan-400">
+                    <i class="fas fa-file-alt mr-2"></i>REPORTS
+                </button>
+                <button onclick="loadCombined('market_data')" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded text-xs mono transition hover:text-cyan-400">
+                    <i class="fas fa-chart-line mr-2"></i>MARKET
+                </button>
+                 <button onclick="loadCombined('credit_memos')" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded text-xs mono transition hover:text-cyan-400">
+                    <i class="fas fa-university mr-2"></i>CREDIT
+                </button>
+                <button onclick="window.modularDataManager.clearCache(); location.reload();" class="px-4 py-2 bg-red-900/20 hover:bg-red-900/40 border border-red-900/50 text-red-400 rounded text-xs mono">
+                    RESET
+                </button>
             </div>
         </header>
 
-        <!-- Metrics Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-8">
             <div class="loader-card" id="card-system_status">
                 <div class="flex justify-between items-start mb-2">
-                    <h3 class="text-sm font-bold text-gray-400 uppercase">System Status</h3>
+                    <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider">System Status</h3>
                     <span class="status-dot" id="dot-system_status"></span>
                 </div>
-                <div class="text-2xl font-bold text-white font-mono" id="val-cpu">--</div>
+                <div class="text-2xl font-bold text-white mono" id="val-cpu">--</div>
                 <div class="text-xs text-gray-500 mt-1">CPU Load</div>
             </div>
 
             <div class="loader-card" id="card-reports">
                 <div class="flex justify-between items-start mb-2">
-                    <h3 class="text-sm font-bold text-gray-400 uppercase">Intelligence Reports</h3>
+                    <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Intelligence</h3>
                     <span class="status-dot" id="dot-reports"></span>
                 </div>
-                <div class="text-2xl font-bold text-white font-mono" id="val-reports">--</div>
-                <div class="text-xs text-gray-500 mt-1">Available Documents</div>
-                <div id="preview-reports" class="data-preview"></div>
+                <div class="text-2xl font-bold text-white mono" id="val-reports">--</div>
+                <div class="text-xs text-gray-500 mt-1">Documents Available</div>
             </div>
 
             <div class="loader-card" id="card-market_data">
                 <div class="flex justify-between items-start mb-2">
-                    <h3 class="text-sm font-bold text-gray-400 uppercase">Market Data</h3>
+                    <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Market Data</h3>
                     <span class="status-dot" id="dot-market_data"></span>
                 </div>
-                <div class="text-2xl font-bold text-white font-mono" id="val-market">--</div>
+                <div class="text-2xl font-bold text-white mono" id="val-market">--</div>
                 <div class="text-xs text-gray-500 mt-1">Data Points</div>
-                <div id="preview-market_data" class="data-preview"></div>
             </div>
 
             <div class="loader-card" id="card-credit_memos">
                 <div class="flex justify-between items-start mb-2">
-                    <h3 class="text-sm font-bold text-gray-400 uppercase">Credit Memos</h3>
+                    <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Credit Memos</h3>
                     <span class="status-dot" id="dot-credit_memos"></span>
                 </div>
-                <div class="text-2xl font-bold text-white font-mono" id="val-credit">--</div>
+                <div class="text-2xl font-bold text-white mono" id="val-credit">--</div>
                 <div class="text-xs text-gray-500 mt-1">Active Deals</div>
-                <div id="preview-credit_memos" class="data-preview"></div>
             </div>
         </div>
 
-        <!-- Visualization Area -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div class="loader-card h-96 relative">
-                <h3 class="text-sm font-bold text-gray-400 mb-4">MARKET VELOCITY (LAZY LOADED)</h3>
-                <canvas id="marketChart"></canvas>
-                <div id="chart-overlay" class="absolute inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm rounded">
-                    <span class="text-sm font-mono text-gray-400">Waiting for Market Data...</span>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            
+            <div class="loader-card lg:col-span-2 h-80 relative flex flex-col">
+                <h3 class="text-xs font-bold text-gray-400 mb-4 uppercase">Market Velocity</h3>
+                <div class="flex-1 relative w-full h-full">
+                    <canvas id="marketChart"></canvas>
+                    <div id="chart-overlay" class="absolute inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm rounded">
+                        <span class="text-sm mono text-gray-400">Waiting for Market Data...</span>
+                    </div>
                 </div>
             </div>
 
-            <div class="loader-card h-96 overflow-hidden relative">
-                <h3 class="text-sm font-bold text-gray-400 mb-4">LATEST INTELLIGENCE</h3>
-                <div id="intel-feed" class="space-y-3 overflow-y-auto h-full pb-10">
-                    <div class="text-center text-gray-600 font-mono mt-20">No Intelligence Data Loaded</div>
+            <div class="loader-card flex flex-col">
+                <h3 class="text-xs font-bold text-gray-400 mb-4 uppercase">Extended Datasets</h3>
+                <div class="grid grid-cols-2 gap-3 mb-4">
+                    <button onclick="loadCombined('agents')" class="py-2 bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded text-xs text-blue-200 transition mono">
+                        LOAD AGENTS
+                    </button>
+                    <button onclick="loadCombined('prompts')" class="py-2 bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded text-xs text-pink-200 transition mono">
+                        LOAD PROMPTS
+                    </button>
+                    <button onclick="loadCombined('trainingData')" class="py-2 bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded text-xs text-orange-200 transition mono">
+                        LOAD ML DATA
+                    </button>
+                    <button onclick="loadCombined('architecture')" class="py-2 bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded text-xs text-indigo-200 transition mono">
+                        LOAD ARCH
+                    </button>
+                    <button onclick="loadCombined('files')" class="col-span-2 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded text-xs text-emerald-200 transition mono">
+                        LOAD REPO INDEX
+                    </button>
+                </div>
+                <div class="mt-auto pt-4 border-t border-slate-700">
+                    <div class="flex justify-between items-center mb-1">
+                         <span class="text-[10px] text-gray-500 uppercase">System Log</span>
+                         <span class="text-[10px] text-emerald-500 mono" id="status-indicator">READY</span>
+                    </div>
+                    <div id="console-output" class="h-24 overflow-y-auto mono text-[10px] text-slate-400 space-y-1 bg-black/20 p-2 rounded">
+                        <div>// System initialized...</div>
+                    </div>
                 </div>
             </div>
         </div>
+
+        <div class="loader-card">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-lg font-bold text-slate-200 mono"><i class="fas fa-eye mr-2 text-cyan-400"></i>Data Visualizer</h2>
+                <input type="text" id="search-input" placeholder="Filter loaded data..." onkeyup="filterData(this.value)" class="bg-slate-900 border border-slate-600 rounded px-4 py-2 text-sm text-slate-200 focus:outline-none focus:border-cyan-500 w-64 mono">
+            </div>
+            <div id="visualizer-content" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 max-h-[500px] overflow-y-auto pr-2">
+                <div class="text-slate-500 mono text-sm col-span-full text-center py-12">No data loaded. Select a module above.</div>
+            </div>
+        </div>
+
     </div>
 
     <script>
-        const loader = new ModularLoader();
+        // Init Loaders
+        // We assume ModularLoader exists from js/modular_loader.js for metric tracking
+        // We assume modularDataManager exists from js/data_manager_modular.js for heavy lifting
+        const dashboardLoader = typeof ModularLoader !== 'undefined' ? new ModularLoader() : null;
         let marketChart = null;
 
         document.addEventListener('DOMContentLoaded', () => {
-            loader.init();
+            if(dashboardLoader) dashboardLoader.init();
             // Auto-load minimal system status
-            loadModule('system_status');
+            updateSystemMetrics({ cpu_load: Math.floor(Math.random() * 30) + 10 });
         });
 
-        async function loadModule(moduleName) {
-            const card = document.getElementById(`card-${moduleName}`);
-            const dot = document.getElementById(`dot-${moduleName}`);
-            const preview = document.getElementById(`preview-${moduleName}`);
+        // --- Logging Utility ---
+        function log(msg, type='info') {
+            const out = document.getElementById('console-output');
+            const div = document.createElement('div');
+            const time = new Date().toLocaleTimeString();
+            let color = 'text-slate-300';
+            if (type === 'success') color = 'text-emerald-400';
+            if (type === 'error') color = 'text-red-400';
 
-            // Visual loading state
-            if(dot) dot.classList.add('animate-pulse', 'bg-yellow-500');
+            div.innerHTML = `<span class="text-slate-600 mr-2">[${time}]</span> <span class="${color}">${msg}</span>`;
+            out.appendChild(div);
+            out.scrollTop = out.scrollHeight;
+        }
+
+        // --- Combined Load Logic ---
+        async function loadCombined(moduleName) {
+            log(`Loading module: ${moduleName}...`);
+            const statusDot = document.getElementById(`dot-${moduleName}`);
+            const card = document.getElementById(`card-${moduleName}`);
+            
+            if(statusDot) statusDot.classList.add('animate-pulse', 'bg-yellow-500');
 
             const start = performance.now();
-            const data = await loader.load(moduleName);
-            const end = performance.now();
+            let data = null;
 
-            if (data) {
-                // Success State
-                if(card) card.classList.add('loaded');
-                if(dot) {
-                    dot.classList.remove('bg-gray-600', 'bg-yellow-500', 'animate-pulse');
-                    dot.classList.add('active');
+            try {
+                // Map button names to DataManager methods (Version B Logic)
+                if (window.modularDataManager) {
+                    switch(moduleName) {
+                        case 'reports': data = await window.modularDataManager.loadReports(); break;
+                        case 'credit_memos': data = await window.modularDataManager.loadCreditMemos(); break;
+                        case 'files': data = await window.modularDataManager.loadFiles(); break;
+                        case 'agents': data = await window.modularDataManager.loadAgents(); break;
+                        case 'prompts': data = await window.modularDataManager.loadPrompts(); break;
+                        case 'trainingData': data = await window.modularDataManager.loadTrainingData(); break;
+                        case 'architecture': data = await window.modularDataManager.loadArchitecture(); break;
+                        case 'market_data': 
+                            // Fallback to dashboard loader for synthetic market data if not in manager
+                            if(dashboardLoader) data = await dashboardLoader.load('market_data');
+                            break;
+                    }
+                } else if (dashboardLoader) {
+                    // Fallback to Version A loader if B is missing
+                    data = await dashboardLoader.load(moduleName);
                 }
 
-                console.log(`[UI] Loaded ${moduleName} in ${(end-start).toFixed(2)}ms`);
+                const end = performance.now();
+                log(`Loaded ${moduleName} in ${(end-start).toFixed(2)}ms`, 'success');
 
-                // Update UI based on module
-                updateUI(moduleName, data);
+                // Update Dashboard Metrics (Version A UI)
+                updateMetricsUI(moduleName, data);
+
+                // Update Visualizer Grid (Version B UI)
+                updateVisualizerUI(moduleName, data);
+
+                // Success States
+                if(card) card.classList.add('loaded');
+                if(statusDot) {
+                    statusDot.classList.remove('bg-gray-600', 'bg-yellow-500', 'animate-pulse');
+                    statusDot.classList.add('active');
+                }
+
+            } catch (e) {
+                log(`Error loading ${moduleName}: ${e.message}`, 'error');
+                console.error(e);
             }
         }
 
-        async function loadAllModules() {
-            const modules = ['reports', 'market_data', 'credit_memos'];
-            modules.forEach(m => loadModule(m));
+        // --- Metric UI Updates (Version A Logic) ---
+        function updateSystemMetrics(data) {
+            const cpuEl = document.getElementById('val-cpu');
+            if(cpuEl) cpuEl.innerText = `${data.cpu_load}%`;
+            const dot = document.getElementById('dot-system_status');
+            if(dot) dot.classList.add('active');
         }
 
-        function updateUI(moduleName, data) {
-            if (moduleName === 'system_status') {
-                document.getElementById('val-cpu').innerText = `${data.cpu_load}%`;
-            }
+        function updateMetricsUI(moduleName, data) {
+            if (!data) return;
 
             if (moduleName === 'reports') {
-                const count = Object.keys(data).length; // Assuming dict or list
+                const count = Array.isArray(data) ? data.length : Object.keys(data).length;
                 document.getElementById('val-reports').innerText = count;
-
-                // Populate Feed
-                const feed = document.getElementById('intel-feed');
-                feed.innerHTML = '';
-
-                // Handle list or dict
-                const items = Array.isArray(data) ? data : Object.values(data);
-
-                items.slice(0, 10).forEach(item => {
-                    const div = document.createElement('div');
-                    div.className = 'p-3 bg-white/5 border border-slate-700 rounded hover:bg-white/10 transition cursor-pointer';
-                    div.innerHTML = `
-                        <div class="text-xs text-cyan-400 font-mono mb-1">${item.date || '2026-03-27'}</div>
-                        <div class="text-sm font-bold text-white">${item.title || item.name || 'Untitled Report'}</div>
-                    `;
-                    feed.appendChild(div);
-                });
             }
+            else if (moduleName === 'market_data') {
+                // Handle various data shapes
+                let dataset = [];
+                if (Array.isArray(data)) dataset = data;
+                else if (data.history) dataset = data.history;
+                else if (typeof data === 'object') dataset = Object.values(data)[0] || [];
 
-            if (moduleName === 'market_data') {
-                // Assuming structure like { "synthetic_stock_data.csv": [...] }
-                const dataset = Object.values(data)[0]; // Grab first dataset
-                if (dataset && Array.isArray(dataset)) {
-                    document.getElementById('val-market').innerText = dataset.length;
-                    renderChart(dataset);
-                } else {
-                    document.getElementById('val-market').innerText = "N/A";
-                }
+                document.getElementById('val-market').innerText = dataset.length;
+                renderChart(dataset);
                 document.getElementById('chart-overlay').style.display = 'none';
             }
-
-            if (moduleName === 'credit_memos') {
-                const count = Object.keys(data).length;
+            else if (moduleName === 'credit_memos') {
+                const count = Array.isArray(data) ? data.length : Object.keys(data).length;
                 document.getElementById('val-credit').innerText = count;
             }
         }
 
+        // --- Visualizer UI Updates (Version B Logic) ---
+        function updateVisualizerUI(type, data) {
+            const container = document.getElementById('visualizer-content');
+            container.innerHTML = ''; // Clear current view
+
+            // Routing to specific render functions
+            if (type === 'reports') renderReports(data);
+            else if (type === 'credit_memos') renderCreditMemos(data);
+            else if (type === 'files') renderFiles(data);
+            else if (type === 'agents') renderAgents(data);
+            else if (type === 'prompts') renderPrompts(data);
+            else if (type === 'trainingData') renderTrainingData(data);
+            else if (type === 'architecture') renderArchitecture(data);
+            else if (type === 'market_data') {
+                 container.innerHTML = '<div class="col-span-full text-center text-cyan-400 mono">Market data visualized in chart above.</div>';
+            }
+        }
+
+        // --- Render Functions (Adapted from Version B) ---
+        
+        function showModal(title, data) {
+            document.getElementById('modal-title').textContent = title;
+            const body = document.getElementById('modal-body');
+            body.innerHTML = ''; 
+            
+            if (typeof data === 'object') {
+                const pre = document.createElement('pre');
+                pre.className = 'whitespace-pre-wrap break-all bg-slate-900 p-4 rounded border border-slate-700 text-xs text-green-400';
+                pre.textContent = JSON.stringify(data, null, 2);
+                body.appendChild(pre);
+            } else {
+                const p = document.createElement('p');
+                p.textContent = data;
+                body.appendChild(p);
+            }
+            document.getElementById('detail-modal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('detail-modal').classList.add('hidden');
+        }
+
+        function renderReports(data) {
+            const container = document.getElementById('visualizer-content');
+            const items = Array.isArray(data) ? data : Object.values(data);
+            items.forEach(report => {
+                const card = document.createElement('div');
+                card.className = 'bg-slate-800/50 p-4 rounded border border-slate-700 hover:border-cyan-500/50 transition cursor-pointer group';
+                card.onclick = () => showModal(report.title, report);
+                card.innerHTML = `
+                    <div class="text-xs text-cyan-400 mono mb-1">${report.date || 'N/A'}</div>
+                    <h3 class="text-sm font-bold text-slate-200 mb-2 truncate group-hover:text-white">${report.title}</h3>
+                    <p class="text-xs text-slate-400 line-clamp-3">${report.executive_summary || 'No summary available.'}</p>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function renderCreditMemos(data) {
+            const container = document.getElementById('visualizer-content');
+            const entries = Array.isArray(data) ? data : Object.values(data);
+            entries.forEach(memo => {
+                const riskScore = memo.risk_score || 0;
+                let riskColor = 'text-green-400';
+                if (riskScore > 50) riskColor = 'text-yellow-400';
+                if (riskScore > 75) riskColor = 'text-red-400';
+
+                const card = document.createElement('div');
+                card.className = 'bg-slate-800/50 p-4 rounded border border-slate-700 hover:border-purple-500/50 transition cursor-pointer group';
+                card.onclick = () => showModal(memo.borrower_name, memo);
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="text-sm font-bold text-slate-200 truncate pr-2 group-hover:text-white">${memo.borrower_name}</h3>
+                        <span class="text-xs mono ${riskColor} border border-slate-600 px-1 rounded">${riskScore}</span>
+                    </div>
+                    <div class="text-xs text-slate-400 mb-1">EBITDA: $${memo.financial_ratios?.ebitda || 'N/A'}M</div>
+                    <div class="text-xs text-slate-500 line-clamp-2">${memo.executive_summary || 'No summary.'}</div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function renderFiles(data) {
+            const container = document.getElementById('visualizer-content');
+            const files = Array.isArray(data) ? data : (data.files || []);
+            files.slice(0, 200).forEach(file => {
+                const card = document.createElement('div');
+                card.className = 'bg-slate-800/30 p-2 rounded border border-slate-700/50 flex justify-between items-center mono text-xs hover:bg-slate-700/50 transition';
+                card.innerHTML = `
+                    <span class="text-emerald-400 truncate mr-4">${file.path || file}</span>
+                    <span class="text-slate-500 whitespace-nowrap">${file.size ? (file.size/1024).toFixed(1)+' KB' : ''}</span>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function renderAgents(data) {
+            const container = document.getElementById('visualizer-content');
+            data.forEach(agent => {
+                const card = document.createElement('div');
+                card.className = 'bg-slate-800/50 p-4 rounded border border-slate-700 hover:border-blue-500/50 transition cursor-pointer group';
+                card.onclick = () => showModal(agent.name, agent);
+                card.innerHTML = `
+                    <div class="text-xs text-blue-400 mono mb-1">${agent.type || 'Agent'}</div>
+                    <h3 class="text-sm font-bold text-slate-200 mb-2 truncate group-hover:text-white">${agent.name}</h3>
+                    <p class="text-xs text-slate-400 line-clamp-3">${agent.description || 'No description.'}</p>
+                `;
+                container.appendChild(card);
+            });
+        }
+        
+        function renderPrompts(data) {
+            const container = document.getElementById('visualizer-content');
+            data.forEach(prompt => {
+                const card = document.createElement('div');
+                card.className = 'bg-slate-800/50 p-4 rounded border border-slate-700 hover:border-pink-500/50 transition cursor-pointer group';
+                card.onclick = () => showModal(prompt.name, prompt);
+                card.innerHTML = `
+                     <div class="text-xs text-pink-400 mono mb-1">${prompt.format || 'TXT'}</div>
+                     <h3 class="text-sm font-bold text-slate-200 mb-2 truncate group-hover:text-white">${prompt.name}</h3>
+                     <p class="text-xs text-slate-500 line-clamp-3 mono">${prompt.preview || ''}</p>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function renderTrainingData(data) {
+            const container = document.getElementById('visualizer-content');
+            data.forEach((item, index) => {
+                let preview = item.messages && item.messages.length ? item.messages[0].content : JSON.stringify(item);
+                const card = document.createElement('div');
+                card.className = 'bg-slate-800/50 p-4 rounded border border-slate-700 hover:border-orange-500/50 transition cursor-pointer group';
+                card.onclick = () => showModal(`Sample #${index + 1}`, item);
+                card.innerHTML = `
+                    <div class="text-xs text-orange-400 mono mb-1">Sample #${index + 1}</div>
+                    <div class="text-xs text-slate-300 line-clamp-4 mono">${preview}</div>
+                `;
+                container.appendChild(card);
+            });
+        }
+        
+        function renderArchitecture(data) {
+            const container = document.getElementById('visualizer-content');
+            const nodes = data.nodes || [];
+            nodes.slice(0, 100).forEach(node => {
+                const card = document.createElement('div');
+                card.className = 'bg-slate-800/50 p-4 rounded border border-slate-700 hover:border-indigo-500/50 transition cursor-pointer group';
+                card.onclick = () => showModal(node.id, node);
+                card.innerHTML = `
+                    <div class="text-xs text-indigo-400 mono mb-1">Group: ${node.group || 'N/A'}</div>
+                    <h3 class="text-sm font-bold text-slate-200 mb-2 truncate group-hover:text-white">${node.id}</h3>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // --- Charting Logic (From Version A) ---
         function renderChart(dataPoints) {
             const ctx = document.getElementById('marketChart').getContext('2d');
-
-            // Simple decimation for performance
-            const decimated = dataPoints.filter((_, i) => i % 5 === 0);
-
-            const labels = decimated.map((d, i) => i);
-            const values = decimated.map(d => d.value);
+            // Basic data normalization
+            const cleanData = dataPoints.map(d => d.value !== undefined ? d.value : d);
+            const labels = cleanData.map((_, i) => i);
 
             if (marketChart) marketChart.destroy();
 
@@ -220,7 +467,7 @@
                     labels: labels,
                     datasets: [{
                         label: 'Market Velocity',
-                        data: values,
+                        data: cleanData,
                         borderColor: '#00f3ff',
                         borderWidth: 1,
                         pointRadius: 0,
@@ -237,6 +484,19 @@
                         x: { display: false },
                         y: { grid: { color: '#333' } }
                     }
+                }
+            });
+        }
+
+        // --- Filter Logic ---
+        function filterData(query) {
+            const q = query.toLowerCase();
+            const cards = document.querySelectorAll('#visualizer-content > div');
+            cards.forEach(card => {
+                if (card.innerText.toLowerCase().includes(q)) {
+                    card.style.display = '';
+                } else {
+                    card.style.display = 'none';
                 }
             });
         }

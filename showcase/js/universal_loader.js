@@ -53,10 +53,25 @@ class UniversalLoader {
         const cleanId = identifier.replace('.json', '').replace('credit_memo_', '');
 
         try {
-            const path = filename.includes('/') ? filename : `${this.basePath}${filename}`;
-            const res = await fetch(path);
+            // 1. Try Exact Match
+            let path = filename.includes('/') ? filename : `${this.basePath}${filename}`;
+            let res = await fetch(path);
             if (res.ok) return await res.json();
-            throw new Error(`File not found: ${path}`);
+
+            // 2. Try Constructing Filename (if ID provided)
+            if (!filename.endsWith('.json')) {
+                // Try RAG first
+                path = `${this.basePath}credit_memo_${filename}_RAG.json`;
+                res = await fetch(path);
+                if (res.ok) return await res.json();
+
+                // Try Standard
+                path = `${this.basePath}credit_memo_${filename}.json`;
+                res = await fetch(path);
+                if (res.ok) return await res.json();
+            }
+
+            throw new Error(`File not found: ${identifier}`);
         } catch (e) {
             console.warn(`[UniversalLoader] Falling back for ${filename}`);
 
@@ -89,7 +104,7 @@ class UniversalLoader {
      * Loads Sovereign Artifacts (Spread, Memo, Audit)
      * Returns an object { spread, memo, audit }
      */
-    async loadSovereignData(ticker) {
+    async loadSovereignData(ticker, useRag = false) {
         const artifacts = ['spread', 'memo', 'audit'];
         const results = {};
         let failed = false;
@@ -97,7 +112,9 @@ class UniversalLoader {
         // Try Network
         await Promise.all(artifacts.map(async (type) => {
             try {
-                const res = await fetch(`${this.basePath}sovereign_artifacts/${ticker}_${type}.json`);
+                // Construct filename: AAPL_spread.json or AAPL_rag_spread.json
+                const filename = useRag ? `${ticker}_rag_${type}.json` : `${ticker}_${type}.json`;
+                const res = await fetch(`${this.basePath}sovereign_artifacts/${filename}`);
                 if (res.ok) {
                     results[type] = await res.json();
                 } else {
