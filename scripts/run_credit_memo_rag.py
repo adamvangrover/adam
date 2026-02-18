@@ -43,115 +43,154 @@ class RegexExtractingLLM:
     """
     A Dummy LLM that 'reads' the provided context (document text) and extracts
     specific financial data using Regex, simulating a high-performance LLM extraction.
+    Returns structured data with source provenance.
     """
-    def __init__(self, document_text=""):
+    def __init__(self, document_text="", doc_id="unknown"):
         self.document_text = document_text
+        self.doc_id = doc_id
 
-    def update_context(self, text):
+    def update_context(self, text, doc_id):
         self.document_text = text
+        self.doc_id = doc_id
+
+    def _find_match(self, pattern, text, group_idx=1, is_float=False, context_padding=50):
+        match = re.search(pattern, text, re.IGNORECASE)
+        if match:
+            val_str = match.group(group_idx)
+            val = val_str
+            if is_float:
+                try:
+                    clean_val = val_str.replace(',', '').replace('$', '').strip()
+                    val = float(clean_val)
+                    # Check if 'billion' follows
+                    if "billion" in text[match.end():match.end()+15].lower():
+                        val *= 1000
+                except:
+                    pass
+
+            # Context snippet
+            start = match.start()
+            end = match.end()
+            context_start = max(0, start - context_padding)
+            context_end = min(len(text), end + context_padding)
+            context = text[context_start:context_end]
+
+            return {
+                "value": val,
+                "source": {
+                    "doc_id": self.doc_id,
+                    "start": start,
+                    "end": end,
+                    "text": context.strip()
+                }
+            }
+        return None
 
     def generate_response(self, prompt, **kwargs):
         """
         Parses the prompt to identify what is being asked, and scans the document text.
+        Returns { "value": ..., "source": ... } or { "value": "Data not found", "source": None }
         """
-        text = self.document_text.lower()
+        text = self.document_text # Keep original case for extraction if needed, but regex uses IGNORECASE
 
-        # Financials Extraction
+        # --- Priority Extractions (Specifics first) ---
+
+        # Projections
+        if "revenue growth" in prompt.lower():
+             return self._find_match(r"revenue growth of approximately\s*([\d.]+)", text, is_float=True) or {"value": 0, "source": None}
+        if "margin" in prompt.lower():
+             return self._find_match(r"margins are targeted at\s*([\d.]+)", text, is_float=True) or {"value": 0, "source": None}
+
+        # SNC
+        if "snc rating" in prompt.lower():
+             return self._find_match(r"snc regulatory rating:\s*(.+?)\.", text, group_idx=1) or {"value": "N/A", "source": None}
+        if "snc justification" in prompt.lower():
+             return self._find_match(r"justification:\s*(.+)", text, group_idx=1) or {"value": "N/A", "source": None}
+
+        # Cap Structure Extraction
+        if "senior notes" in prompt.lower():
+            return self._find_match(r"senior notes:\s*\$([\d,.]+)", text, is_float=True) or {"value": 0, "source": None}
+        if "revolver" in prompt.lower():
+            return self._find_match(r"revolver drawn:\s*\$([\d,.]+)", text, is_float=True) or {"value": 0, "source": None}
+        if "subordinated" in prompt.lower():
+            return self._find_match(r"subordinated debt:\s*\$([\d,.]+)", text, is_float=True) or {"value": 0, "source": None}
+
+        # --- Generic Financials Extraction ---
+
         if "total net sales" in prompt.lower() or "revenue" in prompt.lower():
-            # Look for "Total net sales ... $X billion" or similar
             # Pattern: "Total net sales were $394.3 billion"
-            match = re.search(r"total net sales.*?\$(-?[\d,.]+)\s*billion", text)
-            if match:
-                val = float(match.group(1).replace(',', '')) * 1000 # Convert to millions
-                return f"{val}"
-
-            # Pattern: "Total net sales were $X million"
-            match = re.search(r"total net sales.*?\$(-?[\d,.]+)\s*million", text)
-            if match:
-                val = float(match.group(1).replace(',', ''))
-                return f"{val}"
-
-            # Fallback for table-like data
-            # "Total net sales: $394,328" (in millions)
-            match = re.search(r"total net sales:?\s*\$(-?[\d,.]+)", text)
-            if match:
-                return match.group(1).replace(',', '')
+            res = self._find_match(r"total net sales.*?\$([\d,.]+)", text, is_float=True)
+            if res: return res
+            res = self._find_match(r"total net sales:\s*\$([\d,.]+)", text, is_float=True)
+            if res: return res
 
         if "net income" in prompt.lower():
-            match = re.search(r"net income.*?\$(-?[\d,.]+)\s*billion", text)
-            if match:
-                val = float(match.group(1).replace(',', '')) * 1000
-                return f"{val}"
-
-            # Pattern: "Net income was $X million"
-            match = re.search(r"net income.*?\$(-?[\d,.]+)\s*million", text)
-            if match:
-                val = float(match.group(1).replace(',', ''))
-                return f"{val}"
-
-            match = re.search(r"net income:?\s*\$(-?[\d,.]+)", text)
-            if match:
-                return match.group(1).replace(',', '')
+            res = self._find_match(r"net income.*?\$([\d,.]+)", text, is_float=True)
+            if res: return res
+            res = self._find_match(r"net income:\s*\$([\d,.]+)", text, is_float=True)
+            if res: return res
 
         if "total assets" in prompt.lower():
-            match = re.search(r"total assets:?\s*\$(-?[\d,.]+)", text)
-            if match:
-                return match.group(1).replace(',', '')
+            res = self._find_match(r"total assets:\s*\$([\d,.]+)", text, is_float=True)
+            if res: return res
 
         if "total liabilities" in prompt.lower() and "shareholders" not in prompt.lower():
-            match = re.search(r"total liabilities:?\s*\$(-?[\d,.]+)", text)
-            if match:
-                return match.group(1).replace(',', '')
+            res = self._find_match(r"total liabilities:\s*\$([\d,.]+)", text, is_float=True)
+            if res: return res
 
         if "total debt" in prompt.lower():
-             match = re.search(r"total debt was\s*\$(-?[\d,.]+)\s*billion", text)
-             if match:
-                val = float(match.group(1).replace(',', '')) * 1000
-                return f"{val}"
-
-             match = re.search(r"total debt was\s*\$(-?[\d,.]+)\s*million", text)
-             if match:
-                val = float(match.group(1).replace(',', ''))
-                return f"{val}"
-
-             match = re.search(r"term debt:?\s*\$(-?[\d,.]+)", text)
-             if match:
-                 return match.group(1).replace(',', '')
+             res = self._find_match(r"total debt was\s*\$([\d,.]+)", text, is_float=True)
+             if res: return res
+             res = self._find_match(r"term debt:\s*\$([\d,.]+)", text, is_float=True)
+             if res: return res
 
         if "cash" in prompt.lower():
-             match = re.search(r"cash and cash equivalents:?\s*\$(-?[\d,.]+)", text)
-             if match:
-                 return match.group(1).replace(',', '')
+             res = self._find_match(r"cash and cash equivalents:\s*\$([\d,.]+)", text, is_float=True)
+             if res: return res
 
         if "ebitda" in prompt.lower():
-            # Estimate EBITDA from Operating Income + D&A (Mocking D&A or just extracting Op Income)
-            # "Operating Income: $125,345"
-            match = re.search(r"operating income:\s*\$([\d,.]+)", text)
-            if match:
-                op_inc = float(match.group(1).replace(',', ''))
-                # Add mock D&A (approx 10% of Op Income for mock)
-                ebitda = op_inc * 1.10
-                return f"{ebitda:.2f}"
+            # Estimate EBITDA
+            res = self._find_match(r"operating income:\s*\$([\d,.]+)", text, is_float=True)
+            if res:
+                # Mocking logic: EBITDA = Op Income * 1.1
+                op_inc = res['value']
+                res['value'] = op_inc * 1.10
+                return res
 
         # Qualitative Extraction
         if "risk factors" in prompt.lower():
-            # Extract bullet points under "Risk Factors"
-            start = text.find("item 1a. risk factors")
-            end = text.find("item 7.")
+            start = text.lower().find("item 1a. risk factors")
+            end = text.lower().find("item 7.")
             if start != -1 and end != -1:
-                section = self.document_text[start:end]
-                # Extract lines starting with "- "
+                section = text[start:end]
+                # Extract bullets
                 risks = re.findall(r"- (.*?)(?=\n|$)", section)
-                return "\n".join(risks[:5]) # Return top 5
-            return "Global Economic Conditions: Macroeconomic conditions, including inflation, interest rates and currency fluctuations, could adversely affect demand."
+                val = "\n".join(risks[:5])
+                return {
+                    "value": val,
+                    "source": {
+                        "doc_id": self.doc_id,
+                        "start": start,
+                        "end": end, # Entire section scope
+                        "text": "Item 1A. Risk Factors..."
+                    }
+                }
 
         if "business description" in prompt.lower():
-            start = text.find("item 1. business")
+            start = text.lower().find("item 1. business")
             if start != -1:
-                return self.document_text[start:start+500] + "..."
-            return "Item 1. Business\nApple Inc. designs, manufactures and markets smartphones, personal computers, tablets, wearables and accessories."
+                val = text[start:start+500] + "..."
+                return {
+                    "value": val,
+                    "source": {
+                        "doc_id": self.doc_id,
+                        "start": start,
+                        "end": start+500,
+                        "text": val
+                    }
+                }
 
-        return "Data not found in document."
+        return {"value": "Data not found in document.", "source": None}
 
 class RAGAgent(AgentBase):
     def __init__(self, config, llm_engine, embedding_model, vector_store):
@@ -195,7 +234,8 @@ class CreditMemoRAGPipeline:
             return None, None
 
         # Update LLM context
-        self.llm.update_context(text)
+        doc_id = os.path.basename(document_path)
+        self.llm.update_context(text, doc_id)
 
         # 2. Ingest
         await self.agent.ingest_document(text)
@@ -203,25 +243,47 @@ class CreditMemoRAGPipeline:
         # 3. Extract Data
         logger.info("Extracting Financials...")
 
-        def get_float(prompt, default=0.0):
+        source_map = {}
+
+        def get_val(prompt, key, default=0.0):
+            res = self.llm.generate_response(prompt)
+            if res['source']:
+                source_map[key] = res['source']
+
             try:
-                val = self.llm.generate_response(prompt)
-                return float(val)
+                return float(res['value'])
             except:
                 return default
 
-        revenue = get_float("What is the total net sales or revenue?")
-        if revenue == 0: revenue = 383285.0 # Fallback default if regex fails completely
+        def get_text(prompt, key):
+            res = self.llm.generate_response(prompt)
+            if res['source']:
+                source_map[key] = res['source']
+            return str(res['value'])
 
-        net_income = get_float("What is the net income?", revenue * 0.25)
-        assets = get_float("What are the total assets?", revenue * 0.9)
-        liabilities = get_float("What are the total liabilities?", assets * 0.8)
-        debt = get_float("What is the total debt?", liabilities * 0.4)
-        cash = get_float("What is the cash and cash equivalents?", 29000.0)
-        ebitda = get_float("What is the EBITDA?", revenue * 0.30)
+        # New Extractions (Do specifics first to avoid pollution, though priority is now handled in class)
+        proj_rev_growth = get_val("What is the revenue growth projection?", "proj_rev_growth", 0)
+        proj_margin = get_val("What is the margin projection?", "proj_margin", 0)
 
-        risks = self.llm.generate_response("What are the key risk factors?")
-        description = self.llm.generate_response("What is the business description?")
+        revenue = get_val("What is the total net sales or revenue?", "revenue")
+        if revenue == 0: revenue = 383285.0
+
+        net_income = get_val("What is the net income?", "net_income", revenue * 0.25)
+        assets = get_val("What are the total assets?", "assets", revenue * 0.9)
+        liabilities = get_val("What are the total liabilities?", "liabilities", assets * 0.8)
+        debt = get_val("What is the total debt?", "total_debt", liabilities * 0.4)
+        cash = get_val("What is the cash and cash equivalents?", "cash", 29000.0)
+        ebitda = get_val("What is the EBITDA?", "ebitda", revenue * 0.30)
+
+        senior_notes = get_val("What are the senior notes?", "senior_notes", 0)
+        revolver = get_val("What is the revolver drawn?", "revolver", 0)
+        sub_debt = get_val("What is the subordinated debt?", "sub_debt", 0)
+
+        snc_rating = get_text("What is the SNC rating?", "snc_rating")
+        snc_justification = get_text("What is the SNC justification?", "snc_justification")
+
+        risks = get_text("What are the key risk factors?", "risk_factors")
+        description = get_text("What is the business description?", "description")
 
         # 4. Generate Advanced Analytics
 
@@ -230,6 +292,17 @@ class CreditMemoRAGPipeline:
 
         # Consensus
         consensus_data = self._generate_consensus(revenue, ebitda)
+
+        # System 2 Review (Audit)
+        extracted_data = {
+            "assets": assets,
+            "liabilities": liabilities,
+            "revenue": revenue,
+            "ebitda": ebitda,
+            "debt": debt,
+            "proj_rev_growth": proj_rev_growth
+        }
+        system2_audit = self._run_system2_review(extracted_data)
 
         # A. Spread Data
         spread_data = {
@@ -249,7 +322,9 @@ class CreditMemoRAGPipeline:
             },
             "valuation": valuation_data,
             "consensus": consensus_data,
-            "source": "RAG Extraction (10-K)"
+            "source": "RAG Extraction (10-K)",
+            "source_map": source_map,
+            "system2_audit": system2_audit
         }
 
         # B. Credit Memo
@@ -258,18 +333,25 @@ class CreditMemoRAGPipeline:
             "ticker": self.ticker,
             "sector": "Technology",
             "report_date": datetime.now().isoformat(),
-            "risk_score": 85.0, # Could link to z-score
+            "risk_score": 85.0,
             "executive_summary": f"RAG Analysis of {self.ticker} based on 10-K ingestion. The company shows strong revenue of ${revenue:,.2f}M and EBITDA of ${ebitda:,.2f}M. The implied valuation suggests a base target of ${valuation_data['dcf']['share_price']:.2f}. Key risks identified include: {risks[:200]}...",
+            "financial_ratios": {
+                "leverage_ratio": debt / ebitda if ebitda else 0,
+                "ebitda": ebitda,
+                "revenue": revenue,
+                "dscr": ebitda / (debt * 0.05) if debt else 0,
+                "sources": source_map
+            },
             "sections": [
                 {
                     "title": "Business Overview",
                     "content": description,
-                    "citations": [{"doc_id": os.path.basename(document_path), "chunk_id": "chunk_001", "page_number": 1}]
+                    "citations": [source_map.get('description')] if source_map.get('description') else []
                 },
                 {
                     "title": "Risk Factors",
                     "content": risks,
-                    "citations": [{"doc_id": os.path.basename(document_path), "chunk_id": "chunk_002", "page_number": 5}]
+                    "citations": [source_map.get('risk_factors')] if source_map.get('risk_factors') else []
                 }
             ],
             "historical_financials": [
@@ -283,14 +365,49 @@ class CreditMemoRAGPipeline:
                     "leverage_ratio": debt / ebitda if ebitda else 0,
                     "total_liabilities": liabilities,
                     "capex": revenue * 0.05,
-                    "interest_expense": debt * 0.05
+                    "interest_expense": debt * 0.05,
+                    "sources": {
+                        "revenue": source_map.get('revenue'),
+                        "ebitda": source_map.get('ebitda'),
+                        "net_income": source_map.get('net_income'),
+                        "gross_debt": source_map.get('total_debt'),
+                        "cash": source_map.get('cash'),
+                        "total_liabilities": source_map.get('liabilities')
+                    }
                 }
             ],
+            "capital_structure": {
+                "senior_notes": senior_notes,
+                "revolver": revolver,
+                "subordinated": sub_debt,
+                "sources": {
+                    "senior_notes": source_map.get('senior_notes'),
+                    "revolver": source_map.get('revolver'),
+                    "subordinated": source_map.get('sub_debt')
+                }
+            },
+            "projections": {
+                "revenue_growth": proj_rev_growth,
+                "ebitda_margin": proj_margin,
+                "sources": {
+                    "revenue_growth": source_map.get('proj_rev_growth'),
+                    "ebitda_margin": source_map.get('proj_margin')
+                }
+            },
+            "snc_rating": {
+                "rating": snc_rating,
+                "justification": snc_justification,
+                "sources": {
+                    "rating": source_map.get('snc_rating'),
+                    "justification": source_map.get('snc_justification')
+                }
+            },
             "dcf_analysis": valuation_data["dcf"],
             "pd_model": valuation_data["risk_model"],
-            "consensus_data": consensus_data, # New Field
-            "regulatory_rating": valuation_data["risk_model"]["regulatory_rating"], # New Field
-            "price_targets": valuation_data["forward_view"]["price_targets"], # New Field
+            "consensus_data": consensus_data,
+            "regulatory_rating": valuation_data["risk_model"]["regulatory_rating"],
+            "price_targets": valuation_data["forward_view"]["price_targets"],
+            "system2_audit": system2_audit,
             "documents": [
                 {
                     "doc_id": os.path.basename(document_path),
@@ -301,6 +418,52 @@ class CreditMemoRAGPipeline:
         }
 
         return spread_data, memo_data
+
+    def _run_system2_review(self, data):
+        """
+        Performs logical integrity checks on extracted data (System 2 thinking).
+        """
+        audit_log = []
+        score = 100
+
+        # Check 1: Balance Sheet Solvency
+        if data['assets'] < data['liabilities']:
+            audit_log.append({"check": "Solvency", "status": "FAIL", "msg": "Total Liabilities exceed Total Assets (Insolvency Risk)."})
+            score -= 20
+        else:
+            audit_log.append({"check": "Solvency", "status": "PASS", "msg": "Assets cover Liabilities."})
+
+        # Check 2: EBITDA Margin
+        if data['revenue'] > 0:
+            margin = data['ebitda'] / data['revenue']
+            if margin > 0.8:
+                audit_log.append({"check": "Margin", "status": "WARN", "msg": f"EBITDA Margin {margin:.1%} seems suspiciously high."})
+                score -= 10
+            elif margin < -0.2:
+                audit_log.append({"check": "Margin", "status": "WARN", "msg": f"Negative EBITDA Margin {margin:.1%} detected."})
+                score -= 5
+            else:
+                audit_log.append({"check": "Margin", "status": "PASS", "msg": f"Margin {margin:.1%} within normal bounds."})
+
+        # Check 3: Leverage sanity
+        if data['ebitda'] > 0:
+            lev = data['debt'] / data['ebitda']
+            if lev > 10:
+                audit_log.append({"check": "Leverage", "status": "WARN", "msg": f"Leverage {lev:.1f}x is extremely high."})
+                score -= 10
+            else:
+                audit_log.append({"check": "Leverage", "status": "PASS", "msg": f"Leverage {lev:.1f}x is logical."})
+
+        # Check 4: Projections sanity
+        if data['proj_rev_growth'] > 50:
+             audit_log.append({"check": "Projections", "status": "WARN", "msg": f"Projected growth {data['proj_rev_growth']}% is very aggressive."})
+             score -= 5
+
+        return {
+            "score": score,
+            "verdict": "CLEAN" if score > 90 else ("REVIEW" if score > 70 else "FLAGGED"),
+            "log": audit_log
+        }
 
     def _generate_consensus(self, revenue, ebitda):
         """Generates mock consensus data around the actuals."""
