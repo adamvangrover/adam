@@ -340,14 +340,14 @@ window.SYSTEM_BRAIN_DATA = {
     }
   ],
   "hardware": {
-    "cpu_usage": 25.0,
-    "memory_usage_pct": 5.1,
-    "memory_available_gb": 7.37,
-    "gpu_usage": 39.7,
-    "tpu_usage": 19.1,
-    "gpu_memory_used_gb": 6.35,
-    "tpu_memory_used_gb": 6.12
+    "cpu_usage": 0.0,
+    "memory_usage_pct": 4.9,
+    "memory_available_gb": 7.39,
+    "gpu_usage": 8.1,
+    "tpu_usage": 3.3,
+    "gpu_memory_used_gb": 1.3,
+    "tpu_memory_used_gb": 1.05
   },
   "system_status": "OPERATIONAL",
-  "timestamp": 1771208448.242687
+  "timestamp": 1771290183.9860733
 };

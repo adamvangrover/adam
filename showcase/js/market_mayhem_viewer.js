@@ -235,13 +235,30 @@ function runVerification() {
         }
         const hex = Math.random().toString(16).substring(2, 14).toUpperCase();
         const div = document.createElement('div');
-        div.className = 'sys-bg-text'; // Ensure CSS handles opacity/position
+        div.className = 'sys-bg-text';
+        div.style.position = 'absolute';
+        div.style.left = Math.random() * 100 + '%';
+        div.style.top = '-20px';
         div.style.color = '#003300';
-        div.style.fontSize = '0.6em';
+        div.style.fontSize = (Math.random() * 10 + 10) + 'px';
         div.style.fontFamily = 'monospace';
-        div.innerText = hex + ' :: ' + hex;
-        // Optional: append to a background container if it existed, otherwise skip
-    }, 100);
+        div.style.opacity = 0.5;
+        div.style.pointerEvents = 'none';
+        div.style.transition = 'top 2s linear, opacity 2s ease-out';
+        div.innerText = hex;
+
+        overlay.appendChild(div);
+
+        // Animate drop
+        requestAnimationFrame(() => {
+             div.style.top = (window.innerHeight + 50) + 'px';
+             div.style.opacity = 0;
+        });
+
+        // Cleanup
+        setTimeout(() => div.remove(), 2000);
+
+    }, 50);
 
     // Execute steps
     steps.forEach((step, index) => {
