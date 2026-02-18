@@ -17,7 +17,8 @@ class ModularDataManager {
             agents: null,
             prompts: null,
             trainingData: null,
-            architecture: null
+            architecture: null,
+            artisanal: null
         };
 
         // State Management: Subscribers
@@ -145,6 +146,46 @@ class ModularDataManager {
     }
 
     /**
+     * Loads the "Artisanal" subset (SLM Fine-tuning data)
+     */
+    async loadArtisanalData() {
+        if (this.cache.artisanal) {
+            console.log(`[ModularDataManager] Returning cached artisanal data.`);
+            return this.cache.artisanal;
+        }
+
+        console.log(`[ModularDataManager] Fetching artisanal data...`);
+        const startTime = performance.now();
+
+        try {
+            const [seedPrompt, trainingData] = await Promise.all([
+                fetch(`${this.basePath}artisanal/slm_seed_prompt.json`).then(r => {
+                     if (!r.ok) throw new Error(`Failed to load seed prompt: ${r.statusText}`);
+                     return r.json();
+                }),
+                fetch(`${this.basePath}artisanal/artisanal_training_data.json`).then(r => {
+                     if (!r.ok) throw new Error(`Failed to load training data: ${r.statusText}`);
+                     return r.json();
+                })
+            ]);
+
+            const data = { seedPrompt, trainingData };
+            this.cache.artisanal = data;
+
+            const endTime = performance.now();
+            this._recordMetric('artisanal', endTime - startTime);
+
+            this.notify('artisanal', data);
+
+            return data;
+        } catch (e) {
+            console.error(`[ModularDataManager] Failed to load artisanal data:`, e);
+            this.metrics.errors++;
+            throw e;
+        }
+    }
+
+    /**
      * Loads the "Architecture" subset
      */
     async loadArchitecture() {
@@ -162,7 +203,8 @@ class ModularDataManager {
             agents: null,
             prompts: null,
             trainingData: null,
-            architecture: null
+            architecture: null,
+            artisanal: null
         };
         console.log("[ModularDataManager] Cache cleared.");
     }
