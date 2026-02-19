@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADAM v23.5 :: {title}</title>
+    <title>ADAM v23.5 :: {{ title }}</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/market_mayhem_tiers.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -13,7 +13,7 @@
     <script src="js/nav.js" defer></script>
     <script src="js/market_mayhem_viewer.js" defer></script>
 </head>
-<body class="{tier_class}">
+<body class="{{ tier_class }}">
 
     <div id="system2-overlay" class="system2-overlay">
         <div class="system2-terminal">
@@ -31,7 +31,7 @@
         <div class="raw-source-content" id="raw-source-content"></div>
     </div>
 
-    <div class="doc-toolbar" style="display: {toolbar_display};">
+    <div class="doc-toolbar" style="display: {{ toolbar_display }};">
         <div class="toolbar-item" onclick="window.location.href='market_mayhem_archive_v24.html'"><strong>FILE</strong></div>
         <div class="toolbar-item" onclick="toggleRedactionMode()">REDACT</div>
         <div class="toolbar-item" onclick="printReport()">PRINT</div>
@@ -45,7 +45,7 @@
         <div class="toolbar-item" style="color:#666;">ADAM_V26_EDITOR</div>
     </div>
 
-    <div style="max-width: 1400px; margin: 0 auto; padding: 10px 20px; display:flex; justify-content:space-between; align-items:center; display: {nav_display};">
+    <div style="max-width: 1400px; margin: 0 auto; padding: 10px 20px; display:flex; justify-content:space-between; align-items:center; display: {{ nav_display }};">
         <a href="market_mayhem_archive_v24.html" class="cyber-btn">&larr; RETURN TO ARCHIVE</a>
         <div style="font-family:'JetBrains Mono'; font-size:0.7rem; color:#666;">SECURE CONNECTION ESTABLISHED</div>
     </div>
@@ -55,23 +55,23 @@
 
             <div id="top-secret-stamp" class="top-secret-stamp">TOP SECRET</div>
 
-            <div class="doc-header-ui" style="display: {header_ui_display};">
+            <div class="doc-header-ui" style="display: {{ header_ui_display }};">
                 <span id="verification-status">CONFIDENTIAL // SYSTEM 2 REVIEW</span>
-                <span>{prov_short}</span>
+                <span>{{ prov_short }}</span>
             </div>
 
             <div style="display:flex; justify-content:space-between; font-family:'JetBrains Mono'; font-size:0.8rem; color:#666; margin-bottom:20px; margin-top: 20px;">
-                <span>{date}</span>
-                <span>ID: {prov_short}</span>
+                <span>{{ date }}</span>
+                <span>ID: {{ prov_short }}</span>
             </div>
 
-            <h1 class="title">{title}</h1>
+            <h1 class="title">{{ title }}</h1>
 
-            <div class="doc-metadata-panel" style="display: {metadata_panel_display};">
+            <div class="doc-metadata-panel" style="display: {{ metadata_panel_display }};">
                 <div class="doc-metadata-item"><strong>Classification</strong>UNCLASSIFIED</div>
-                <div class="doc-metadata-item"><strong>Conviction</strong>{conviction}/100</div>
-                <div class="doc-metadata-item"><strong>Sentiment</strong>{sentiment_score}/100</div>
-                <div class="doc-metadata-item"><strong>Reviewer</strong>{reviewer_agent}</div>
+                <div class="doc-metadata-item"><strong>Conviction</strong>{{ conviction }}/100</div>
+                <div class="doc-metadata-item"><strong>Sentiment</strong>{{ sentiment_score }}/100</div>
+                <div class="doc-metadata-item"><strong>Reviewer</strong>{{ reviewer_agent }}</div>
             </div>
 
             <div id="financialChartContainer" style="display:none; margin-bottom: 30px;">
@@ -127,25 +127,25 @@
             </div>
 
             <div id="document-body">
-                {full_body}
+                {{ full_body }}
             </div>
 
             <div class="provenance-log">
                 <div class="log-entry">
                     <span>> HASH_CHECK</span>
-                    <span style="color:var(--terminal-green);">{prov_hash}</span>
+                    <span style="color:var(--terminal-green);">{{ prov_hash }}</span>
                 </div>
                 <div class="log-entry">
                     <span>> SENTIMENT_SCAN</span>
-                    <span>{sentiment_score} (DENSITY: {semantic_score})</span>
+                    <span>{{ sentiment_score }} (DENSITY: {{ semantic_score }})</span>
                 </div>
                 <div class="log-entry">
                     <span>> CONVICTION_LOCK</span>
-                    <span>{conviction}%</span>
+                    <span>{{ conviction }}%</span>
                 </div>
                 <div class="log-entry">
                     <span>> CRITIQUE_LOG</span>
-                    <span>"{critique}"</span>
+                    <span>"{{ critique }}"</span>
                 </div>
             </div>
 
@@ -159,64 +159,64 @@
         <aside class="cyber-sidebar">
             <div class="sidebar-widget">
                 <div class="sidebar-title">Intelligence Metadata</div>
-                <div class="stat-row"><span>DATE</span> <span class="stat-val">{date}</span></div>
-                <div class="stat-row"><span>TYPE</span> <span class="stat-val">{type}</span></div>
+                <div class="stat-row"><span>DATE</span> <span class="stat-val">{{ date }}</span></div>
+                <div class="stat-row"><span>TYPE</span> <span class="stat-val">{{ type }}</span></div>
                 <div class="stat-row"><span>CLASS</span> <span class="stat-val">UNCLASSIFIED</span></div>
-                <div class="stat-row"><span>PROVENANCE</span> <span class="stat-val" title="{prov_hash}">{prov_short}</span></div>
+                <div class="stat-row"><span>PROVENANCE</span> <span class="stat-val" title="{{ prov_hash }}">{{ prov_short }}</span></div>
             </div>
 
             <div class="sidebar-widget">
                 <div class="sidebar-title">Sentiment Analysis</div>
-                <div class="stat-row"><span>SCORE</span> <span class="stat-val">{sentiment_score}/100</span></div>
+                <div class="stat-row"><span>SCORE</span> <span class="stat-val">{{ sentiment_score }}/100</span></div>
                 <div class="sentiment-bar">
-                    <div class="sentiment-fill" style="width: {sentiment_score}%;"></div>
+                    <div class="sentiment-fill" style="width: {{ sentiment_score }}%;"></div>
                 </div>
             </div>
 
             <div class="sidebar-widget">
                 <div class="sidebar-title">Detected Entities</div>
                 <div class="tag-cloud">
-                    {entity_html}
+                    {{ entity_html }}
                 </div>
             </div>
 
              <div class="sidebar-widget">
                 <div class="sidebar-title">Agent Conviction</div>
-                 <div class="stat-row"><span>CONFIDENCE</span> <span class="stat-val">{conviction}/100</span></div>
+                 <div class="stat-row"><span>CONFIDENCE</span> <span class="stat-val">{{ conviction }}/100</span></div>
                  <div class="sentiment-bar">
-                    <div class="sentiment-fill" style="width: {conviction}%; background: {conviction_color};"></div>
+                    <div class="sentiment-fill" style="width: {{ conviction }}%; background: {{ conviction_color }};"></div>
                 </div>
             </div>
 
             <div class="sidebar-widget">
                 <div class="sidebar-title">Semantic Analysis</div>
-                 <div class="stat-row"><span>DENSITY</span> <span class="stat-val">{semantic_score}/100</span></div>
-                 <div class="stat-row"><span>PROBABILITY</span> <span class="stat-val">{probability}/100</span></div>
+                 <div class="stat-row"><span>DENSITY</span> <span class="stat-val">{{ semantic_score }}/100</span></div>
+                 <div class="stat-row"><span>PROBABILITY</span> <span class="stat-val">{{ probability }}/100</span></div>
             </div>
 
              <div class="sidebar-widget" style="border-color: #555;">
                 <div class="sidebar-title">Reviewer Agent Log</div>
                  <div style="font-size: 0.75rem; color: #ccc; font-style: italic;">
-                    "{critique}"
+                    "{{ critique }}"
                 </div>
-                <div class="stat-row" style="margin-top:10px;"><span>QUALITY SCORE</span> <span class="stat-val">{quality}/100</span></div>
+                <div class="stat-row" style="margin-top:10px;"><span>QUALITY SCORE</span> <span class="stat-val">{{ quality }}/100</span></div>
             </div>
 
              <div class="sidebar-widget">
                 <div class="sidebar-title">Contributing Agents</div>
                  <div style="display:flex; flex-direction:column; gap:5px;">
-                    {agent_html}
+                    {{ agent_html }}
                 </div>
             </div>
         </aside>
     </div>
 
-    <textarea id="hidden-raw-data" style="display:none;">{raw_source}</textarea>
+    <textarea id="hidden-raw-data" style="display:none;">{{ raw_source }}</textarea>
 
     <script>
         // Chart Injection Logic
-        const metricsData = {metrics_json};
-        const crisisData = {crisis_sim_json};
+        const metricsData = {{ metrics_json }};
+        const crisisData = {{ crisis_sim_json }};
 
         // --- Metrics Chart ---
         if (metricsData && Object.keys(metricsData).length > 0) {
