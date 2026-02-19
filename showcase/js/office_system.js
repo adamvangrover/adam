@@ -265,7 +265,7 @@ class AppRegistry {
         const winId = this.os.windowManager.createWindow({
             title: 'Market Monitor',
             icon: 'https://img.icons8.com/color/48/000000/line-chart.png',
-            width: 800,
+            width: 1000,
             height: 600,
             app: 'MarketMonitor'
         });
@@ -282,24 +282,33 @@ class AppRegistry {
         const renderData = (data) => {
              let html = `
                     <h2 style="margin-top:0;">S&P 500 Market Monitor</h2>
-                    <table style="width:100%; border-collapse:collapse; text-align:left;">
+                    <table style="width:100%; border-collapse:collapse; text-align:left; font-size:14px;">
                         <tr style="border-bottom:1px solid #444;">
                             <th style="padding:10px;">Ticker</th>
                             <th style="padding:10px;">Company</th>
                             <th style="padding:10px;">Price</th>
                             <th style="padding:10px;">Change</th>
-                            <th style="padding:10px;">Sector</th>
+                            <th style="padding:10px;">P/E</th>
+                            <th style="padding:10px;">Div %</th>
+                            <th style="padding:10px;">Rating</th>
+                            <th style="padding:10px;">Conviction</th>
                         </tr>
                 `;
                 data.forEach(item => {
                     const color = item.change_pct >= 0 ? '#4caf50' : '#f44336';
+                    const rating = item.outlook ? item.outlook.consensus : 'N/A';
+                    const conviction = item.outlook ? item.outlook.conviction : 'N/A';
+
                     html += `
-                        <tr style="border-bottom:1px solid #333;">
+                        <tr style="border-bottom:1px solid #333; cursor:pointer;" onclick="window.officeOS.appRegistry.launch('Browser', {url: 'data/equity_reports/${item.ticker}_Equity_Report.html', name: '${item.ticker} Equity Report'})">
                             <td style="padding:10px; font-weight:bold;">${item.ticker}</td>
                             <td style="padding:10px;">${item.name}</td>
                             <td style="padding:10px;">$${item.current_price}</td>
                             <td style="padding:10px; color:${color}">${item.change_pct}%</td>
-                            <td style="padding:10px; color:#aaa;">${item.sector}</td>
+                            <td style="padding:10px;">${item.pe_ratio || '-'}</td>
+                            <td style="padding:10px;">${item.dividend_yield || '-'}%</td>
+                            <td style="padding:10px;">${rating}</td>
+                            <td style="padding:10px;">${conviction}</td>
                         </tr>
                     `;
                 });
@@ -330,16 +339,28 @@ class AppRegistry {
 
         const container = document.createElement('div');
         container.style.padding = '20px';
+
+        // Build options dynamically if MARKET_DATA exists
+        let optionsHtml = '';
+        if(window.MARKET_DATA) {
+             window.MARKET_DATA.sort((a,b) => a.ticker.localeCompare(b.ticker)).forEach(c => {
+                 optionsHtml += `<option value="${c.ticker}">${c.name} (${c.ticker})</option>`;
+             });
+        } else {
+            // Fallback
+             optionsHtml = `
+                    <option value="AAPL">Apple Inc. (AAPL)</option>
+                    <option value="MSFT">Microsoft Corp. (MSFT)</option>
+                    <option value="GOOGL">Alphabet Inc. (GOOGL)</option>
+            `;
+        }
+
         container.innerHTML = `
             <h2>Generate New Report</h2>
             <div style="margin-bottom:15px;">
                 <label style="display:block; margin-bottom:5px;">Select Company:</label>
                 <select id="report-ticker-${winId}" style="width:100%; padding:8px;">
-                    <option value="AAPL">Apple Inc. (AAPL)</option>
-                    <option value="MSFT">Microsoft Corp. (MSFT)</option>
-                    <option value="GOOGL">Alphabet Inc. (GOOGL)</option>
-                    <option value="AMZN">Amazon.com Inc. (AMZN)</option>
-                    <option value="NVDA">NVIDIA Corp. (NVDA)</option>
+                    ${optionsHtml}
                 </select>
             </div>
             <div style="margin-bottom:15px;">
@@ -393,18 +414,25 @@ class AppRegistry {
         const renderCreditData = (data) => {
                 let html = `
                     <h2 style="margin-top:0; color:#333;">Credit Risk Monitor</h2>
-                    <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap:15px;">
+                    <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap:15px;">
                 `;
                 data.sort((a,b) => a.risk_score - b.risk_score).forEach(item => {
                     const riskColor = item.risk_score > 90 ? 'green' : item.risk_score > 80 ? 'orange' : 'red';
+                    // Check if new fields exist (backward compatibility)
+                    const pd = item.credit && item.credit.pd_rating ? item.credit.pd_rating : 'N/A';
+                    const reg = item.credit && item.credit.regulatory_rating ? item.credit.regulatory_rating : 'N/A';
+
                     html += `
                         <div style="background:white; padding:15px; border-radius:4px; border:1px solid #ddd; box-shadow:0 2px 5px rgba(0,0,0,0.05); cursor:pointer;"
                              onclick="window.officeOS.appRegistry.launch('Browser', {url: 'data/credit_reports/${item.ticker}_Credit_Memo.html', name: '${item.ticker} Credit Memo'})">
-                            <div style="font-weight:bold; font-size:16px;">${item.ticker}</div>
-                            <div style="font-size:12px; color:#666; margin-bottom:10px;">${item.name}</div>
-                            <div style="display:flex; justify-content:space-between; align-items:center;">
-                                <span>Score:</span>
-                                <span style="font-weight:bold; color:${riskColor}; font-size:18px;">${item.risk_score}</span>
+                            <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                                <span style="font-weight:bold; font-size:16px;">${item.ticker}</span>
+                                <span style="font-weight:bold; color:${riskColor}; font-size:16px;">${item.risk_score}</span>
+                            </div>
+                            <div style="font-size:12px; color:#666; margin-bottom:10px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${item.name}</div>
+                            <div style="font-size:11px; background:#f0f0f0; padding:5px; border-radius:3px;">
+                                <div style="display:flex; justify-content:space-between;"><span>PD:</span> <strong>${pd}</strong></div>
+                                <div style="display:flex; justify-content:space-between; margin-top:3px;"><span>Reg:</span> <strong>${reg}</strong></div>
                             </div>
                         </div>
                     `;
