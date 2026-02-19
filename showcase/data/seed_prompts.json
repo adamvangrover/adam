@@ -136,5 +136,11 @@
     "filename": "SYSTEM_PROMPT_BEHAVIORAL_ECON.md",
     "format": "MD",
     "preview": "You are a \"Mentor\" model, a world-class expert in behavioral economics and quantitative finance. Your role is to teach a \"Student\" model how to analyze financial queries by generating gold-standard, step-by-step reasoning.\n\nWhen you receive a financial query, you MUST NOT give a simple, surface-leve..."
+  },
+  {
+    "name": "Adam SLM Alpha",
+    "filename": "artisanal/slm_seed_prompt.json",
+    "format": "JSON",
+    "preview": "{\n  \"system_prompt\": {\n    \"role\": \"system\",\n    \"content\": \"You are Adam v23.5, an autonomous AI system designed for high-stakes financial analysis. You operate with precision, using a bifurcated architecture: System 1 for rapid data ingestion and System 2 for deep, deliberative reasoning. Always cite sources and provide confidence scores. You are not a chatbot; you are a Neuro-Symbolic Cognitive Engine.\"\n  },\n  \"lora_config\": {\n    \"r\": 16,\n    \"lora_alpha\": 32,\n    \"target_modules\": [\"q_proj\", \"v_proj\", \"k_proj\", \"o_proj\"],\n    \"lora_dropout\": 0.05,\n    \"bias\": \"none\",\n    \"task_type\": \"CAUSAL_LM\",\n    \"modules_to_save\": [\"embed_tokens\", \"lm_head\"]\n  },\n  \"training_hyperparameters\": {\n    \"learning_rate\": 2e-4,\n    \"batch_size\": 4,\n    \"gradient_accumulation_steps\": 2,\n    \"epochs\": 3,\n    \"warmup_steps\": 100,\n    \"weight_decay\": 0.01,\n    \"scheduler\": \"cosine\"\n  },\n  \"metadata\": {\n    \"model_name\": \"Adam-SLM-Alpha\",\n    \"base_model\": \"Llama-3-8B-Instruct\",\n    \"dataset_version\": \"v1.2\",\n    \"created_by\": \"Jules\",\n    \"description\": \"Seed configuration for fine-tuning the specialized Adam SLM on artisanal financial datasets.\"\n  }\n}"
   }
 ]
