@@ -1,5 +1,13 @@
 # Changelog
 
+## v26.7 - Protocol ARCHITECT_INFINITE (Day 8)
+
+### Jules' Log
+> "I noticed we lack a robust mechanism to verify agent behavior under extreme market stress. While `MarketSentimentAgent` has logic for 'Systemic Tremor', it was never tested against simulated Black Swan events. I researched stress testing patterns and built `tests/simulation_panic_room.py` to bridge this gap, ensuring our agents don't hallucinate a bull market during a crash."
+
+### Added
+- **Cortex Expansion**: `tests/simulation_panic_room.py` - A stress test suite that simulates Volmageddon (VIX > 80), Yield Curve Inversion, and Liquidity Traps to verify agent risk overrides.
+
 ## v26.6 - Protocol ARCHITECT_INFINITE (Day 7)
 
 ### Jules' Log

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADAM v26.0 :: Daily Briefing: AI-Debt Reckoning</title>
+    <title>ADAM v23.5 :: Daily Briefing: Sovereign AI & Crypto Supercycle Update</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/market_mayhem_tiers.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -12,29 +12,17 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="js/nav.js" defer></script>
     <script src="js/market_mayhem_viewer.js" defer></script>
-    <script src="js/risk_radar.js" defer></script>
-    <style>
-        .section-header { color: #00f3ff; border-bottom: 1px solid #333; padding-bottom: 5px; margin-bottom: 15px; font-family: 'JetBrains Mono'; letter-spacing: 1px; }
-        .risk-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 30px; }
-        .risk-card { background: rgba(255,255,255,0.05); padding: 10px; cursor: pointer; transition: all 0.2s; border: 1px solid #333; }
-        .risk-card:hover { background: rgba(255,255,255,0.1); transform: translateY(-2px); }
-        .risk-meter { height: 4px; background: #333; margin-top: 5px; width: 100%; }
-        .risk-fill { height: 100%; }
-    </style>
 </head>
-<body class="tier-high">
+<body class="tier-low">
 
-    <!-- System 2 Verification Overlay -->
     <div id="system2-overlay" class="system2-overlay">
         <div class="system2-terminal">
             <div id="sys2-content"></div>
         </div>
     </div>
 
-    <!-- Toast Container -->
     <div id="toast-container" class="cyber-toast-container"></div>
 
-    <!-- Raw Source Modal -->
     <div id="raw-source-modal" class="raw-source-modal">
         <div class="raw-source-header">
             <span>SOURCE_DATA.JSON</span>
@@ -43,9 +31,8 @@
         <div class="raw-source-content" id="raw-source-content"></div>
     </div>
 
-    <!-- Virtual Toolbar for High Tier -->
-    <div class="doc-toolbar" style="display: flex;">
-        <div class="toolbar-item" onclick="window.location.href='daily_briefings_library.html'"><strong>FILE</strong></div>
+    <div class="doc-toolbar" style="display: none;">
+        <div class="toolbar-item" onclick="window.location.href='market_mayhem_archive_v24.html'"><strong>FILE</strong></div>
         <div class="toolbar-item" onclick="toggleRedactionMode()">REDACT</div>
         <div class="toolbar-item" onclick="printReport()">PRINT</div>
         <div class="toolbar-item" onclick="shareReport()">SHARE</div>
@@ -59,90 +46,55 @@
     </div>
 
     <div style="max-width: 1400px; margin: 0 auto; padding: 10px 20px; display:flex; justify-content:space-between; align-items:center; display: flex;">
-        <a href="daily_briefings_library.html" class="cyber-btn">&larr; RETURN TO LIBRARY</a>
+        <a href="market_mayhem_archive_v24.html" class="cyber-btn">&larr; RETURN TO ARCHIVE</a>
         <div style="font-family:'JetBrains Mono'; font-size:0.7rem; color:#666;">SECURE CONNECTION ESTABLISHED</div>
     </div>
 
     <div class="newsletter-wrapper">
         <div class="paper-sheet" id="paper-sheet">
 
-            <!-- Top Secret Stamp -->
             <div id="top-secret-stamp" class="top-secret-stamp">TOP SECRET</div>
 
-            <!-- High Tier Header UI -->
-            <div class="doc-header-ui" style="display: flex;">
+            <div class="doc-header-ui" style="display: none;">
                 <span id="verification-status">CONFIDENTIAL // SYSTEM 2 REVIEW</span>
-                <span>29a7b95d</span>
+                <span>a1be316a</span>
             </div>
 
             <div style="display:flex; justify-content:space-between; font-family:'JetBrains Mono'; font-size:0.8rem; color:#666; margin-bottom:20px; margin-top: 20px;">
                 <span>2026-02-17</span>
-                <span>ID: 29a7b95d</span>
+                <span>ID: a1be316a</span>
             </div>
 
-            <h1 class="title">🟡 SYSTEM STATUS: DEGRADED (AI-Disruption Patch In Progress)</h1>
+            <h1 class="title">Daily Briefing: Sovereign AI & Crypto Supercycle Update</h1>
 
-            <!-- Metadata Panel for High Tier (Embedded in Doc) -->
-            <div class="doc-metadata-panel" style="display: grid;">
+            <div class="doc-metadata-panel" style="display: none;">
                 <div class="doc-metadata-item"><strong>Classification</strong>UNCLASSIFIED</div>
-                <div class="doc-metadata-item"><strong>Conviction</strong>95/100</div>
-                <div class="doc-metadata-item"><strong>Sentiment</strong>20/100</div>
-                <div class="doc-metadata-item"><strong>Reviewer</strong>Overseer</div>
-            </div>
-
-            <!-- Risk Radar Container -->
-            <div id="risk-radar-container" style="margin-bottom: 40px;">
-                <!-- Populated by risk_radar.js -->
+                <div class="doc-metadata-item"><strong>Conviction</strong>50/100</div>
+                <div class="doc-metadata-item"><strong>Sentiment</strong>50/100</div>
+                <div class="doc-metadata-item"><strong>Reviewer</strong>Sovereign_AI</div>
             </div>
 
             <div id="financialChartContainer" style="display:none; margin-bottom: 30px;">
                 <canvas id="financialChart"></canvas>
             </div>
 
-            <div id="document-body">
-                <h3>📡 Signal Integrity: The AI-Debt Reckoning</h3>
-<p>The simulation is struggling to render a convincing recovery. After the holiday-shortened break, the tape came back choppy and fragmented. The S&P 500 managed a microscopic +0.1% lift to 6,836.17, but the surface-level green is a "Liquidity Mirage."</p>
-<p><strong>Credit Dominance:</strong> High-yield signals are diverging from the equity "monument." The ICE BofA High Yield Spread (OAS) widened to 2.94%, up from the 2.84% floor established earlier this month. While stocks tried to bounce, the 10-Year Treasury Yield fell to 4.05%, marking its third consecutive day of decline.</p>
-<p><strong>The Trap:</strong> In a healthy architecture, falling yields and rising stocks signal growth. Today, falling yields are a "Flight to Quality" signal triggered by AI-related disruption fears that knocked the Nasdaq (-0.2%) and legacy tech bigwigs. Credit is whispering that the "soft landing" code is buggy; spreads are widening even as risk-free rates drop. If the plumbing (Credit) is leaking while the facade (S&P) is being painted, you are walking into a trap.</p>
-<h3>🏮 Artifacts</h3>
-<ul>
-<li><strong>Bitcoin ($67,512 | -1.95%):</strong> The "Digital Gold" mask is slipping. Bitcoin has shed roughly 24% year-to-date, officially logging its worst Q1 start in eight years. The $68k support level is flickering; the next hard-coded floor is the $60k–$65k zone.</li>
-<li><strong>VIX ($20.60 | -1.1%):</strong> The fear gauge retreated slightly from its intraday spike to 22.96, but it remains pinned above the 20-handle—a "High Volatility" regime state.</li>
-<li><strong>Rivian (RIVN | -3.13%):</strong> After last week's +26% surge, the "Zombie Rebound" is already being reabsorbed by the void.</li>
-</ul>
-<h3>🌀 The Glitch</h3>
-<p>"We treat 6,800 like a sanctuary, but it’s just a coordinate in a sea of synthetic liquidity. Today's market is a 'Sell First, Ask Questions Later' environment where even a cool CPI (2.4%) couldn't spark a rally. The glitch is the 'AI Premium' finally hitting its expiration date. We built the architecture on the promise of infinite efficiency, only to realize that efficiency kills margins in the transition. Bitcoin is the canary in the server room; when it chokes, the rest of the simulation isn't far behind. Watch the yields—if they hit 4.00% while spreads keep widening, the 'Soft Landing' render is officially corrupted."</p>
-<p><strong>Next Transmission:</strong> Wednesday, Feb 18, 18:00 ET.</p>
+            <div id="crisisSimContainer" style="display:none; margin-bottom: 30px; border: 1px solid #cc0000; padding: 20px; background: rgba(50, 0, 0, 0.2);">
+                <h3 style="color: #cc0000; margin-top: 0; font-family: 'JetBrains Mono'; border-bottom: 1px solid #cc0000; padding-bottom: 10px; margin-bottom: 20px;">CRISIS SIMULATOR // STRESS TEST</h3>
 
-<h3 class="section-header">/// STRUCTURAL DIVERGENCE ANALYSIS</h3>
-<p><strong>Sector Convergence & Divergence (System 2 Assessment):</strong></p>
-<p>The current market architecture is exhibiting extreme bifurcation. In the near term (3-6 months), we expect a violent mean reversion in the "AI Premium" trade. Valuation multiples for semiconductor and hyperscaler stocks (currently >40x P/E) are disconnected from the credit reality (High Yield Spreads >300bps).</p>
-<ul>
-    <li><strong>Near Term (0-6m):</strong> Energy and Utilities will converge with Tech as the "Power Constraint" thesis plays out. Expect defensive rotation into Staples as credit stress manifests.</li>
-    <li><strong>Medium Term (6-18m):</strong> A "capex air pocket" is likely. As hyperscalers digest 2024-2025 spend, equipment providers will face a cyclical contraction. This parallels the 2001 fiber-optic bust—the infrastructure was built, but the applications lagged.</li>
-    <li><strong>Long Term (18m+):</strong> True enterprise adoption will stabilize valuations, but at a lower multiple (20-25x). The winners will be application-layer companies leveraging cheap inference, not just the shovel sellers.</li>
-</ul>
-            </div>
-
-            <!-- Crisis Simulator (Moved to Bottom) -->
-            <div id="crisisSimContainer" style="display:none; margin-top: 40px; margin-bottom: 30px; border: 1px solid #cc0000; padding: 20px; background: rgba(50, 0, 0, 0.2);">
-                <h3 style="color: #cc0000; margin-top: 0; font-family: 'JetBrains Mono'; border-bottom: 1px solid #cc0000; padding-bottom: 10px; margin-bottom: 20px;">CRISIS SIMULATOR // HISTORICAL PARALLELS</h3>
-                <p style="font-size: 0.9rem; color: #ccc; margin-bottom: 20px;">Comparing current "AI-Debt" divergence against historical crash cycles. Current trajectory (White Line) suggests a deviation from the 2020 V-shaped recovery pattern, aligning more closely with the 2000 Dot-Com unwind.</p>
-
-                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 20px;">
+                <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-bottom: 20px;">
                     <div class="crisis-btn" onclick="renderCrisis('2008_LEHMAN')" style="cursor:pointer; text-align:center; padding: 10px; border: 1px solid #666; font-size: 0.8rem; color: #ccc;">
                         2008 LEHMAN
                     </div>
                     <div class="crisis-btn" onclick="renderCrisis('1987_BLACK_MONDAY')" style="cursor:pointer; text-align:center; padding: 10px; border: 1px solid #666; font-size: 0.8rem; color: #ccc;">
                         1987 BLACK MON
                     </div>
+                    <div class="crisis-btn" onclick="renderCrisis('2000_DOTCOM_BUBBLE')" style="cursor:pointer; text-align:center; padding: 10px; border: 1px solid #666; font-size: 0.8rem; color: #ccc;">
+                        2000 DOTCOM
+                    </div>
                     <div class="crisis-btn" onclick="renderCrisis('2020_COVID')" style="cursor:pointer; text-align:center; padding: 10px; border: 1px solid #666; font-size: 0.8rem; color: #ccc;">
                         2020 PANDEMIC
                     </div>
-                    <div class="crisis-btn" onclick="renderCrisis('2000_DOTCOM')" style="cursor:pointer; text-align:center; padding: 10px; border: 1px solid #666; font-size: 0.8rem; color: #ccc;">
-                        2000 DOTCOM
-                    </div>
-                    <div class="crisis-btn" onclick="renderCrisis('2022_INFLATION')" style="cursor:pointer; text-align:center; padding: 10px; border: 1px solid #666; font-size: 0.8rem; color: #ccc;">
+                    <div class="crisis-btn" onclick="renderCrisis('2022_INFLATION_SHOCK')" style="cursor:pointer; text-align:center; padding: 10px; border: 1px solid #666; font-size: 0.8rem; color: #ccc;">
                         2022 INFLATION
                     </div>
                     <div class="crisis-btn" onclick="renderCrisis('2025_AI_SHOCK')" style="cursor:pointer; text-align:center; padding: 10px; border: 1px solid #666; font-size: 0.8rem; color: #ccc;">
@@ -153,28 +105,61 @@
                 <div style="height: 300px; position: relative;">
                     <canvas id="crisisChart"></canvas>
                 </div>
+
+                <div id="crisisMetrics" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; font-family: 'JetBrains Mono'; font-size: 0.8rem; color: #ccc;">
+                    <div style="border: 1px solid #00f3ff; padding: 10px; background: rgba(0, 243, 255, 0.05);">
+                        <div style="color: #00f3ff; border-bottom: 1px solid #00f3ff; margin-bottom: 10px; padding-bottom: 5px; font-weight: bold;">PORTFOLIO PERFORMANCE</div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;"><span>MAX DRAWDOWN:</span> <span id="port_dd" style="color: #fff;">0.00%</span></div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;"><span>VOLATILITY (ANN):</span> <span id="port_vol" style="color: #fff;">0.00%</span></div>
+                        <div style="display: flex; justify-content: space-between;"><span>TOTAL RETURN:</span> <span id="port_ret" style="color: #fff;">0.00%</span></div>
+                    </div>
+                    <div style="border: 1px solid #666; padding: 10px; background: rgba(100, 100, 100, 0.1);">
+                        <div style="color: #888; border-bottom: 1px solid #666; margin-bottom: 10px; padding-bottom: 5px; font-weight: bold;">MARKET BENCHMARK</div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;"><span>MAX DRAWDOWN:</span> <span id="mkt_dd" style="color: #ccc;">0.00%</span></div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;"><span>VOLATILITY (ANN):</span> <span id="mkt_vol" style="color: #ccc;">0.00%</span></div>
+                        <div style="display: flex; justify-content: space-between;"><span>TOTAL RETURN:</span> <span id="mkt_ret" style="color: #ccc;">0.00%</span></div>
+                    </div>
+                </div>
+
                 <div style="font-size: 0.7rem; color: #888; margin-top: 15px; font-style: italic;">
-                    * Historical data vs. Projected Portfolio Beta (System 2 Sim).
+                    * Hypothetical performance based on portfolio beta and current risk profile. PAST PERFORMANCE IS NOT INDICATIVE OF FUTURE RESULTS.
                 </div>
             </div>
 
-            <!-- Provenance Log (All Tiers) -->
+            <div id="document-body">
+                <strong>Date:</strong> 2026-02-17
+<strong>Type:</strong> Daily_Briefing
+<strong>Agent:</strong> MarketScanner
+<h2>Executive Summary</h2>
+Quick update on Sovereign AI & Crypto Supercycle and market movements.
+<h2>Analysis</h2>
+Markets are moving fast. Key levels to watch: S&P 500 support at 4500, resistance at 5200.
+<h2>Key Metrics</h2>
+<ul>
+<li><strong>S&P 500:</strong> 5875</li>
+<li><strong>VIX:</strong> 19.74</li>
+<li><strong>10Y Treasury:</strong> 3.76%</li>
+</ul>
+<em>Generated by Adam v30.0 System Intelligence</em>
+
+            </div>
+
             <div class="provenance-log">
                 <div class="log-entry">
                     <span>> HASH_CHECK</span>
-                    <span style="color:var(--terminal-green);">29a7b95df531a4994bd20816bcaf3508900af273811e4f49fe256dd774434872</span>
+                    <span style="color:var(--terminal-green);">a1be316a4b72bd2d45f2b8b8cb99b2934974cfbd7cd12ef6ad64f68b93dd20e3</span>
                 </div>
                 <div class="log-entry">
                     <span>> SENTIMENT_SCAN</span>
-                    <span>20 (DENSITY: 55)</span>
+                    <span>50 (DENSITY: 91)</span>
                 </div>
                 <div class="log-entry">
                     <span>> CONVICTION_LOCK</span>
-                    <span>95%</span>
+                    <span>50%</span>
                 </div>
                 <div class="log-entry">
                     <span>> CRITIQUE_LOG</span>
-                    <span>"Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 20/100. Cross-reference with knowledge graph completed."</span>
+                    <span>"Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 50/100. Cross-reference with knowledge graph completed."</span>
                 </div>
             </div>
 
@@ -191,42 +176,42 @@
                 <div class="stat-row"><span>DATE</span> <span class="stat-val">2026-02-17</span></div>
                 <div class="stat-row"><span>TYPE</span> <span class="stat-val">DAILY_BRIEFING</span></div>
                 <div class="stat-row"><span>CLASS</span> <span class="stat-val">UNCLASSIFIED</span></div>
-                <div class="stat-row"><span>PROVENANCE</span> <span class="stat-val" title="29a7b95df531a4994bd20816bcaf3508900af273811e4f49fe256dd774434872">29a7b95d</span></div>
+                <div class="stat-row"><span>PROVENANCE</span> <span class="stat-val" title="a1be316a4b72bd2d45f2b8b8cb99b2934974cfbd7cd12ef6ad64f68b93dd20e3">a1be316a</span></div>
             </div>
 
             <div class="sidebar-widget">
                 <div class="sidebar-title">Sentiment Analysis</div>
-                <div class="stat-row"><span>SCORE</span> <span class="stat-val">20/100</span></div>
+                <div class="stat-row"><span>SCORE</span> <span class="stat-val">50/100</span></div>
                 <div class="sentiment-bar">
-                    <div class="sentiment-fill" style="width: 20%; background: #ff0000;"></div>
+                    <div class="sentiment-fill" style="width: 50%;"></div>
                 </div>
             </div>
 
             <div class="sidebar-widget">
                 <div class="sidebar-title">Detected Entities</div>
                 <div class="tag-cloud">
-                    <a href="market_mayhem_archive_v24.html?search=US_FED" class="tag" style="text-decoration:none;">US_FED</a><a href="market_mayhem_archive_v24.html?search=AI" class="tag" style="text-decoration:none; border-color:#666;">AI</a><a href="market_mayhem_archive_v24.html?search=Bitcoin" class="tag" style="text-decoration:none; border-color:#666;">Bitcoin</a><a href="market_mayhem_archive_v24.html?search=EV" class="tag" style="text-decoration:none; border-color:#666;">EV</a><a href="market_mayhem_archive_v24.html?search=Gold" class="tag" style="text-decoration:none; border-color:#666;">Gold</a><a href="market_mayhem_archive_v24.html?search=Growth" class="tag" style="text-decoration:none; border-color:#666;">Growth</a>
+                    <a href="market_mayhem_archive_v24.html?search=AI" class="tag" style="text-decoration:none; border-color:#666;">AI</a><a href="market_mayhem_archive_v24.html?search=Crypto" class="tag" style="text-decoration:none; border-color:#666;">Crypto</a><a href="market_mayhem_archive_v24.html?search=EV" class="tag" style="text-decoration:none; border-color:#666;">EV</a>
                 </div>
             </div>
 
              <div class="sidebar-widget">
                 <div class="sidebar-title">Agent Conviction</div>
-                 <div class="stat-row"><span>CONFIDENCE</span> <span class="stat-val">95/100</span></div>
+                 <div class="stat-row"><span>CONFIDENCE</span> <span class="stat-val">50/100</span></div>
                  <div class="sentiment-bar">
-                    <div class="sentiment-fill" style="width: 95%; background: #00ff00;"></div>
+                    <div class="sentiment-fill" style="width: 50%; background: #ffff00;"></div>
                 </div>
             </div>
 
             <div class="sidebar-widget">
                 <div class="sidebar-title">Semantic Analysis</div>
-                 <div class="stat-row"><span>DENSITY</span> <span class="stat-val">55/100</span></div>
-                 <div class="stat-row"><span>PROBABILITY</span> <span class="stat-val">95/100</span></div>
+                 <div class="stat-row"><span>DENSITY</span> <span class="stat-val">91/100</span></div>
+                 <div class="stat-row"><span>PROBABILITY</span> <span class="stat-val">50/100</span></div>
             </div>
 
              <div class="sidebar-widget" style="border-color: #555;">
                 <div class="sidebar-title">Reviewer Agent Log</div>
                  <div style="font-size: 0.75rem; color: #ccc; font-style: italic;">
-                    "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 20/100. Cross-reference with knowledge graph completed."
+                    "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 50/100. Cross-reference with knowledge graph completed."
                 </div>
                 <div class="stat-row" style="margin-top:10px;"><span>QUALITY SCORE</span> <span class="stat-val">100/100</span></div>
             </div>
@@ -240,43 +225,40 @@
         </aside>
     </div>
 
-    <!-- Hidden Raw Data -->
     <textarea id="hidden-raw-data" style="display:none;">{
+  "title": "Daily Briefing: Sovereign AI & Crypto Supercycle Update",
   "date": "2026-02-17",
-  "title": "\ud83d\udfe1 SYSTEM STATUS: DEGRADED (AI-Disruption Patch In Progress)",
-  "summary": "The simulation is struggling to render a convincing recovery. After the holiday-shortened break, the tape came back choppy and fragmented.",
+  "summary": "Quick update on Sovereign AI & Crypto Supercycle and market movements....",
   "type": "DAILY_BRIEFING",
-  "filename": "Daily_Briefing_2026_02_17.html",
-  "is_sourced": true,
-  "full_body": "<h3>\ud83d\udce1 Signal Integrity: The AI-Debt Reckoning</h3>\n<p>The simulation is struggling to render a convincing recovery. After the holiday-shortened break, the tape came back choppy and fragmented. The S&P 500 managed a microscopic +0.1% lift to 6,836.17, but the surface-level green is a \"Liquidity Mirage.\"</p>\n<p><strong>Credit Dominance:</strong> High-yield signals are diverging from the equity \"monument.\" The ICE BofA High Yield Spread (OAS) widened to 2.94%, up from the 2.84% floor established earlier this month. While stocks tried to bounce, the 10-Year Treasury Yield fell to 4.05%, marking its third consecutive day of decline.</p>\n<p><strong>The Trap:</strong> In a healthy architecture, falling yields and rising stocks signal growth. Today, falling yields are a \"Flight to Quality\" signal triggered by AI-related disruption fears that knocked the Nasdaq (-0.2%) and legacy tech bigwigs. Credit is whispering that the \"soft landing\" code is buggy; spreads are widening even as risk-free rates drop. If the plumbing (Credit) is leaking while the facade (S&P) is being painted, you are walking into a trap.</p>\n<h3>\ud83c\udfee Artifacts</h3>\n<ul>\n<li><strong>Bitcoin ($67,512 | -1.95%):</strong> The \"Digital Gold\" mask is slipping. Bitcoin has shed roughly 24% year-to-date, officially logging its worst Q1 start in eight years. The $68k support level is flickering; the next hard-coded floor is the $60k\u2013$65k zone.</li>\n<li><strong>VIX ($20.60 | -1.1%):</strong> The fear gauge retreated slightly from its intraday spike to 22.96, but it remains pinned above the 20-handle\u2014a \"High Volatility\" regime state.</li>\n<li><strong>Rivian (RIVN | -3.13%):</strong> After last week's +26% surge, the \"Zombie Rebound\" is already being reabsorbed by the void.</li>\n</ul>\n<h3>\ud83c\udf00 The Glitch</h3>\n<p>\"We treat 6,800 like a sanctuary, but it\u2019s just a coordinate in a sea of synthetic liquidity. Today's market is a 'Sell First, Ask Questions Later' environment where even a cool CPI (2.4%) couldn't spark a rally. The glitch is the 'AI Premium' finally hitting its expiration date. We built the architecture on the promise of infinite efficiency, only to realize that efficiency kills margins in the transition. Bitcoin is the canary in the server room; when it chokes, the rest of the simulation isn't far behind. Watch the yields\u2014if they hit 4.00% while spreads keep widening, the 'Soft Landing' render is officially corrupted.\"</p>\n<p><strong>Next Transmission:</strong> Wednesday, Feb 18, 18:00 ET.</p>",
-  "source_priority": 3,
-  "conviction": 95,
-  "sentiment_score": 20,
+  "full_body": "<strong>Date:</strong> 2026-02-17\n<strong>Type:</strong> Daily_Briefing\n<strong>Agent:</strong> MarketScanner\n<h2>Executive Summary</h2>\nQuick update on Sovereign AI & Crypto Supercycle and market movements.\n<h2>Analysis</h2>\nMarkets are moving fast. Key levels to watch: S&P 500 support at 4500, resistance at 5200.\n<h2>Key Metrics</h2>\n<ul>\n<li><strong>S&P 500:</strong> 5875</li>\n<li><strong>VIX:</strong> 19.74</li>\n<li><strong>10Y Treasury:</strong> 3.76%</li>\n</ul>\n<em>Generated by Adam v30.0 System Intelligence</em>\n",
+  "sentiment_score": 50,
   "entities": {
     "tickers": [],
     "agents": [],
-    "sovereigns": [
-      "US_FED"
-    ],
+    "sovereigns": [],
     "keywords": [
       "AI",
-      "Bitcoin",
-      "EV",
-      "Gold",
-      "Growth"
+      "Crypto",
+      "EV"
     ]
   },
-  "provenance_hash": "29a7b95df531a4994bd20816bcaf3508900af273811e4f49fe256dd774434872",
+  "provenance_hash": "a1be316a4b72bd2d45f2b8b8cb99b2934974cfbd7cd12ef6ad64f68b93dd20e3",
+  "filename": "Daily_Briefing_2026_02_17.html",
+  "is_sourced": true,
   "metrics_json": "{}",
-  "semantic_score": 55,
+  "source_priority": 2,
+  "conviction": 50,
+  "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 50/100. Cross-reference with knowledge graph completed.",
+  "quality": 100,
+  "semantic_score": 91,
   "probability": 50,
-  "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 20/100. Cross-reference with knowledge graph completed."
+  "outlook_score": 34
 }</textarea>
 
     <script>
         // Chart Injection Logic
         const metricsData = {};
-        const crisisData = {"2008_LEHMAN": {"scenario": "2008_LEHMAN", "labels": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30], "market": [100.0, 94.22, 100.68, 91.29, 91.42, 81.86, 82.6, 89.69, 85.4, 79.56, 78.39, 71.47, 66.31, 64.6, 61.71, 56.7, 57.83, 56.88, 47.98, 47.83, 43.66, 40.97, 40.82, 42.33, 45.81, 43.4, 45.4, 46.97, 44.32, 49.65], "portfolio": [100.0, 91.04, 100.23, 84.08, 81.49, 67.09, 69.25, 77.71, 69.95, 61.44, 60.37, 53.56, 50.2, 49.18, 48.83, 48.83, 53.17, 50.16, 39.36, 38.18, 32.09, 28.61, 28.75, 28.7, 33.31, 32.71, 35.22, 36.91, 32.8, 38.35]}, "1987_BLACK_MONDAY": {"scenario": "1987_BLACK_MONDAY", "labels": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20], "market": [100.0, 76.53, 76.3, 81.73, 75.29, 82.25, 87.56, 87.28, 102.16, 62.53, 56.33, 58.15, 50.32, 44.79, 46.22, 44.78, 47.68, 41.75, 40.89, 37.21], "portfolio": [100.0, 63.2, 61.69, 68.76, 60.13, 67.08, 76.54, 77.1, 95.93, 35.18, 32.32, 31.03, 23.93, 20.83, 20.56, 19.78, 21.16, 17.14, 16.67, 14.31]}, "2020_COVID": {"scenario": "2020_COVID", "labels": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40], "market": [100.0, 98.97, 99.25, 99.53, 102.57, 104.03, 116.47, 109.82, 98.14, 102.61, 85.87, 86.46, 94.16, 93.08, 88.87, 81.97, 88.99, 98.08, 91.3, 72.69, 80.54, 71.4, 74.73, 73.36, 68.24, 72.63, 76.94, 80.02, 84.0, 85.35, 87.16, 92.2, 84.57, 79.45, 84.03, 87.87, 92.87, 92.78, 99.0, 107.58], "portfolio": [100.0, 99.09, 99.27, 95.51, 98.42, 102.62, 122.51, 111.32, 96.58, 103.65, 80.72, 81.1, 90.36, 88.42, 77.92, 64.77, 73.46, 86.98, 78.99, 62.01, 74.78, 68.82, 72.13, 69.02, 63.26, 66.78, 72.41, 76.82, 86.61, 89.76, 96.17, 105.29, 90.33, 84.13, 95.15, 102.78, 115.25, 113.12, 123.25, 139.44]}, "2000_DOTCOM": {"scenario": "2000_DOTCOM", "labels": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60], "market": [100.0, 100.14, 96.78, 98.6, 98.43, 94.74, 91.32, 90.92, 86.13, 85.46, 83.91, 77.63, 74.42, 73.77, 71.79, 70.67, 65.2, 63.59, 62.48, 61.06, 56.32, 53.34, 51.48, 46.8, 44.01, 43.02, 41.85, 40.91, 38.22, 33.33, 25.68, 28.01, 30.52, 29.09, 31.22, 32.53, 33.49, 32.46, 30.81, 30.05, 30.39, 29.7, 31.23, 31.6, 31.9, 33.31, 32.85, 35.08, 35.8, 34.79, 35.23, 36.25, 33.68, 34.4, 33.49, 32.22, 32.01, 31.68, 32.9, 33.93], "portfolio": [100.0, 100.01, 95.47, 98.56, 96.09, 91.22, 84.86, 82.39, 78.03, 77.67, 75.44, 64.54, 60.09, 58.44, 58.73, 56.63, 50.78, 50.68, 49.33, 49.3, 43.18, 38.21, 36.84, 32.4, 28.9, 30.4, 28.67, 28.94, 27.57, 22.49, 17.23, 18.32, 21.6, 20.13, 22.46, 24.35, 26.26, 25.56, 22.98, 22.94, 23.26, 22.51, 24.45, 24.38, 25.34, 26.75, 25.58, 28.36, 29.27, 29.04, 28.74, 30.07, 26.06, 27.47, 25.06, 24.23, 24.39, 24.66, 26.24, 27.09]}, "2022_INFLATION": {"scenario": "2022_INFLATION", "labels": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50], "market": [100.0, 95.44, 93.0, 95.07, 94.38, 94.58, 95.05, 93.45, 86.57, 81.87, 83.94, 83.97, 79.98, 73.96, 76.72, 70.64, 69.63, 75.68, 77.8, 79.27, 79.39, 80.38, 78.06, 75.72, 72.72, 72.79, 68.02, 62.9, 61.59, 57.33, 57.5, 58.19, 60.65, 61.35, 60.55, 58.57, 56.68, 57.25, 53.48, 51.77, 52.25, 51.77, 51.94, 53.13, 54.21, 54.72, 55.02, 52.97, 51.95, 51.0], "portfolio": [100.0, 88.92, 87.93, 92.78, 88.29, 86.42, 85.96, 79.61, 66.39, 59.77, 60.58, 59.98, 55.32, 49.97, 53.52, 45.4, 44.62, 48.92, 50.17, 51.7, 53.5, 54.29, 52.6, 49.4, 48.22, 50.19, 47.95, 44.46, 45.01, 39.87, 40.38, 40.26, 40.56, 40.51, 38.37, 37.11, 34.66, 34.48, 31.0, 29.22, 28.69, 28.62, 29.26, 30.07, 29.96, 30.31, 30.22, 28.22, 27.5, 26.06]}, "2025_AI_SHOCK": {"scenario": "2025_AI_SHOCK", "labels": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35], "market": [100.0, 94.89, 101.99, 91.27, 76.61, 73.05, 69.73, 80.47, 71.37, 67.48, 64.15, 61.83, 65.63, 61.43, 51.98, 45.01, 35.76, 35.48, 31.67, 22.32, 15.84, 17.36, 17.75, 19.37, 18.4, 15.67, 16.76, 14.36, 15.02, 13.8, 15.15, 14.22, 13.35, 14.11, 15.91], "portfolio": [100.0, 92.08, 104.31, 85.56, 62.94, 58.67, 55.15, 70.94, 57.55, 53.58, 49.73, 48.24, 53.69, 49.67, 38.27, 29.4, 21.23, 21.25, 17.47, 10.1, 6.19, 6.76, 7.22, 8.01, 7.21, 5.61, 6.24, 4.82, 5.24, 4.59, 5.27, 4.76, 4.27, 4.63, 5.48]}};
+        const crisisData = {};
 
         // --- Metrics Chart ---
         if (metricsData && Object.keys(metricsData).length > 0) {
@@ -341,6 +323,26 @@
             });
 
             const data = crisisData[scenarioName];
+
+            // Update Metrics Display
+            if (data.metrics) {
+                const p = data.metrics.portfolio;
+                const m = data.metrics.market;
+
+                document.getElementById('port_dd').innerText = p.max_drawdown.toFixed(2) + '%';
+                document.getElementById('port_vol').innerText = p.volatility.toFixed(2) + '%';
+                document.getElementById('port_ret').innerText = p.total_return.toFixed(2) + '%';
+
+                // Color code return
+                document.getElementById('port_ret').style.color = p.total_return >= 0 ? '#00f3ff' : '#ff4444';
+
+                document.getElementById('mkt_dd').innerText = m.max_drawdown.toFixed(2) + '%';
+                document.getElementById('mkt_vol').innerText = m.volatility.toFixed(2) + '%';
+                document.getElementById('mkt_ret').innerText = m.total_return.toFixed(2) + '%';
+
+                document.getElementById('mkt_ret').style.color = m.total_return >= 0 ? '#ccc' : '#cc0000';
+            }
+
             const ctx = document.getElementById('crisisChart').getContext('2d');
 
             if (crisisChartInstance) {
@@ -412,8 +414,21 @@
         // Auto-Run Default Crisis if Data Available
         if (crisisData && Object.keys(crisisData).length > 0) {
             document.getElementById('crisisSimContainer').style.display = 'block';
+
+            // Parse URL parameters for ?sim=SCENARIO_NAME
+            const urlParams = new URLSearchParams(window.location.search);
+            const simParam = urlParams.get('sim');
+
             // slight delay to ensure Chart.js loaded
-            setTimeout(() => renderCrisis('2008_LEHMAN'), 100);
+            setTimeout(() => {
+                if (simParam && crisisData[simParam]) {
+                    renderCrisis(simParam);
+                    // Scroll to container
+                    document.getElementById('crisisSimContainer').scrollIntoView({ behavior: 'smooth' });
+                } else {
+                    renderCrisis('2008_LEHMAN');
+                }
+            }, 100);
         }
     </script>
 </body>

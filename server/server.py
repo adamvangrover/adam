@@ -60,6 +60,12 @@ try:
 except ImportError:
     CONSTITUTION_AVAILABLE = False
 
+try:
+    from core.security.governance import GovernanceEnforcer, GovernanceError, ApprovalRequired
+    GOVERNANCE_AVAILABLE = True
+except ImportError:
+    GOVERNANCE_AVAILABLE = False
+
 
 # Global Orchestrator Singleton
 _orchestrator = None
@@ -288,12 +294,29 @@ def execute_python_sandbox(code: str) -> str:
     Executes Python code in a secure, isolated sandbox.
 
     Security Features:
+    - Governance Enforcer: Checks for risk patterns (recursion, loops, imports).
     - Static Analysis (AST) prevents dangerous imports and access to private attributes.
     - Process Isolation contains memory and crashes.
     - Restricted Globals limits accessible functions to safe subsets (math, json, pandas).
     - Timeouts prevent infinite loops.
     """
     try:
+        # 🛡️ Sentinel: Governance Enforcement
+        if GOVERNANCE_AVAILABLE:
+            try:
+                GovernanceEnforcer.validate(code, context="mcp_tool")
+            except ApprovalRequired as ae:
+                return json.dumps({
+                    "status": "approval_required",
+                    "error": str(ae),
+                    "score": GovernanceEnforcer.analyze_risk(code).get("score")
+                })
+            except GovernanceError as ge:
+                return json.dumps({
+                    "status": "blocked",
+                    "error": str(ge)
+                })
+
         from core.security.sandbox import SecureSandbox
         result = SecureSandbox.execute(code)
         return json.dumps(result)
