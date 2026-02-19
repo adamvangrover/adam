@@ -18,7 +18,8 @@ class ModularDataManager {
             prompts: null,
             trainingData: null,
             architecture: null,
-            artisanal: null
+            artisanal: null,        // From main branch
+            artisanalData: null     // From feature branch
         };
 
         // State Management: Subscribers
@@ -146,6 +147,13 @@ class ModularDataManager {
     }
 
     /**
+     * Loads the "Architecture" subset
+     */
+    async loadArchitecture() {
+        return this._loadResource('architecture', 'system_knowledge_graph.json');
+    }
+
+    /**
      * Loads the "Artisanal" subset (SLM Fine-tuning data)
      */
     async loadArtisanalData() {
@@ -186,10 +194,10 @@ class ModularDataManager {
     }
 
     /**
-     * Loads the "Architecture" subset
+     * Loads the "Artisanal Data Batch" subset (RENAMED TO PREVENT COLLISION)
      */
-    async loadArchitecture() {
-        return this._loadResource('architecture', 'system_knowledge_graph.json');
+    async loadArtisanalBatchData() {
+        return this._loadResource('artisanalData', 'artisanal/synthetic_batch_001.json');
     }
 
     /**
@@ -204,7 +212,8 @@ class ModularDataManager {
             prompts: null,
             trainingData: null,
             architecture: null,
-            artisanal: null
+            artisanal: null,
+            artisanalData: null
         };
         console.log("[ModularDataManager] Cache cleared.");
     }
