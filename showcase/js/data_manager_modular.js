@@ -17,7 +17,8 @@ class ModularDataManager {
             agents: null,
             prompts: null,
             trainingData: null,
-            architecture: null
+            architecture: null,
+            artisanalData: null
         };
 
         // State Management: Subscribers
@@ -152,6 +153,13 @@ class ModularDataManager {
     }
 
     /**
+     * Loads the "Artisanal Data" subset
+     */
+    async loadArtisanalData() {
+        return this._loadResource('artisanalData', 'artisanal/synthetic_batch_001.json');
+    }
+
+    /**
      * Clears local cache to force re-fetch
      */
     clearCache() {
@@ -162,7 +170,8 @@ class ModularDataManager {
             agents: null,
             prompts: null,
             trainingData: null,
-            architecture: null
+            architecture: null,
+            artisanalData: null
         };
         console.log("[ModularDataManager] Cache cleared.");
     }
