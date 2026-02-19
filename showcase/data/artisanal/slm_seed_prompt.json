@@ -6,14 +6,22 @@
   "lora_config": {
     "r": 16,
     "lora_alpha": 32,
-    "target_modules": ["q_proj", "v_proj", "k_proj", "o_proj"],
+    "target_modules": [
+      "q_proj",
+      "v_proj",
+      "k_proj",
+      "o_proj"
+    ],
     "lora_dropout": 0.05,
     "bias": "none",
     "task_type": "CAUSAL_LM",
-    "modules_to_save": ["embed_tokens", "lm_head"]
+    "modules_to_save": [
+      "embed_tokens",
+      "lm_head"
+    ]
   },
   "training_hyperparameters": {
-    "learning_rate": 2e-4,
+    "learning_rate": 0.0002,
     "batch_size": 4,
     "gradient_accumulation_steps": 2,
     "epochs": 3,
@@ -26,6 +34,8 @@
     "base_model": "Llama-3-8B-Instruct",
     "dataset_version": "v1.2",
     "created_by": "Jules",
+    "author": "System Architect",
+    "last_updated": "2025-05-15T14:30:00Z",
     "description": "Seed configuration for fine-tuning the specialized Adam SLM on artisanal financial datasets."
   }
 }

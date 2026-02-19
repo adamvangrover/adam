@@ -7,6 +7,7 @@ import hashlib
 from datetime import datetime
 from collections import Counter
 from bs4 import BeautifulSoup
+import jinja2
 
 try:
     from scripts.market_mayhem_crisis_sim import CrisisSimulator
@@ -120,6 +121,30 @@ def calculate_probability(text):
         return max(conviction - 20, 1)
 
     return conviction
+
+def calculate_outlook_score(text):
+    """Calculates an outlook score based on future-oriented keyword density."""
+    if not text: return 50
+    text_lower = text.lower()
+
+    # Keywords associated with future outlooks and projections
+    outlook_keywords = {
+        "future", "forecast", "projection", "expect", "outlook", "2026", "2027", "2028", "2030",
+        "prediction", "estimate", "target", "roadmap", "horizon", "upcoming", "anticipate",
+        "trend", "trajectory", "path", "scenario", "model", "probability", "likelihood"
+    }
+
+    words = re.findall(r'\w+', text_lower)
+    if not words: return 50
+
+    keyword_count = sum(1 for w in words if w in outlook_keywords)
+
+    # Normalize density. 5% keyword density is very high for these specific terms.
+    # We want a score between 0 and 100.
+    density = keyword_count / len(words)
+    score = min(int(density * 2000), 100) # 0.05 * 2000 = 100
+
+    return max(score, 10) # Minimum score of 10
 
 def generate_critique(item):
     """Generates a structured critique if missing."""
@@ -401,6 +426,7 @@ def parse_json_file(filepath):
         conviction = calculate_conviction(full_text)
         semantic_score = calculate_semantic_score(full_text)
         probability = calculate_probability(full_text)
+        outlook_score = calculate_outlook_score(full_text)
 
         item = {
             "title": title,
@@ -417,7 +443,8 @@ def parse_json_file(filepath):
             "source_priority": 2,
             "conviction": conviction,
             "semantic_score": semantic_score,
-            "probability": probability
+            "probability": probability,
+            "outlook_score": outlook_score
         }
 
         item["critique"] = generate_critique(item)
@@ -456,6 +483,7 @@ def parse_txt_file(filepath):
         conviction = calculate_conviction(content)
         semantic_score = calculate_semantic_score(content)
         probability = calculate_probability(content)
+        outlook_score = calculate_outlook_score(content)
 
         item = {
             "title": title,
@@ -472,7 +500,8 @@ def parse_txt_file(filepath):
             "source_priority": 2,
             "conviction": conviction,
             "semantic_score": semantic_score,
-            "probability": probability
+            "probability": probability,
+            "outlook_score": outlook_score
         }
         item["critique"] = generate_critique(item)
         return item
@@ -547,6 +576,7 @@ def parse_markdown_file(filepath):
 
         semantic_score = calculate_semantic_score(content)
         probability = calculate_probability(content)
+        outlook_score = calculate_outlook_score(content)
 
         if conviction_score == 50:
              conviction_score = calculate_conviction(content)
@@ -568,7 +598,8 @@ def parse_markdown_file(filepath):
             "critique": critique_text,
             "quality": quality_score,
             "semantic_score": semantic_score,
-            "probability": probability
+            "probability": probability,
+            "outlook_score": outlook_score
         }
 
         if critique_text == "No automated critique available.":
@@ -637,6 +668,7 @@ def parse_html_file(filepath):
             conviction = calculate_conviction(full_text)
             semantic_score = calculate_semantic_score(full_text)
             probability = calculate_probability(full_text)
+            outlook_score = calculate_outlook_score(full_text)
 
             item = {
                 "title": title,
@@ -653,7 +685,8 @@ def parse_html_file(filepath):
                 "source_priority": 1,
                 "conviction": conviction,
                 "semantic_score": semantic_score,
-                "probability": probability
+                "probability": probability,
+                "outlook_score": outlook_score
             }
             item["critique"] = generate_critique(item)
             return item
@@ -699,6 +732,7 @@ def parse_html_file(filepath):
         conviction = calculate_conviction(content)
         semantic_score = calculate_semantic_score(content)
         probability = calculate_probability(content)
+        outlook_score = calculate_outlook_score(content)
 
         item = {
             "title": title,
@@ -714,7 +748,8 @@ def parse_html_file(filepath):
             "metrics_json": "{}",
             "conviction": conviction,
             "semantic_score": semantic_score,
-            "probability": probability
+            "probability": probability,
+            "outlook_score": outlook_score
         }
         item["critique"] = generate_critique(item)
         return item
@@ -756,6 +791,7 @@ def get_all_data():
         item['conviction'] = calculate_conviction(full_text)
         item['semantic_score'] = calculate_semantic_score(full_text)
         item['probability'] = calculate_probability(full_text)
+        item['outlook_score'] = calculate_outlook_score(full_text)
         item['critique'] = generate_critique(item)
 
         all_items.append(item)
@@ -822,6 +858,11 @@ def generate_archive():
         return
 
     sorted_items = get_all_data()
+
+    # Post-process: Force MARKET_OUTLOOK for items after 2026-02-17
+    for item in sorted_items:
+        if item.get("date", "") > "2026-02-17" and item.get("type") == "NEWSLETTER":
+            item["type"] = "MARKET_OUTLOOK"
 
     # Dump JSON Index
     json_path = os.path.join("showcase/data", "market_mayhem_index.json")
@@ -899,7 +940,8 @@ def generate_archive():
         # Serialize entire item as raw source
         raw_source = json.dumps(item, default=str, indent=2)
 
-        content = HTML_TEMPLATE.format(
+        template = jinja2.Template(HTML_TEMPLATE)
+        content = template.render(
             title=item["title"],
             date=item["date"],
             summary=item["summary"],
@@ -938,6 +980,7 @@ def generate_archive():
     dates = [i['date'] for i in chart_items]
     sentiments = [i['sentiment_score'] for i in chart_items]
     convictions = [i.get('conviction', 50) for i in chart_items]
+    outlook_scores = [i.get('outlook_score', 0) for i in chart_items]
 
     window_size = 5
     moving_averages = []
@@ -1100,6 +1143,17 @@ def generate_archive():
             </div>
 
             <div class="filter-group">
+                <label class="filter-label">Sort By</label>
+                <select id="sortFilter" class="filter-select" onchange="applyFilters()">
+                    <option value="DATE_DESC">Date (Newest)</option>
+                    <option value="DATE_ASC">Date (Oldest)</option>
+                    <option value="QUALITY_DESC">Quality (Highest)</option>
+                    <option value="SENTIMENT_DESC">Sentiment (Highest)</option>
+                    <option value="SENTIMENT_ASC">Sentiment (Lowest)</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
                 <label class="filter-label">Fiscal Year</label>
                 <select id="yearFilter" class="filter-select" onchange="applyFilters()">
                     <option value="ALL">ALL YEARS</option>
@@ -1154,13 +1208,22 @@ def generate_archive():
         for item in grouped[year]:
             safe_title = item['title'].replace('"', "'").lower()
             safe_summary = item['summary'].replace('"', "'").lower()
+            quality = item.get('quality', 0)
             
+            # Badge Logic
+            badges = f'<span class="type-badge">{item["type"]}</span>'
+            if quality >= 90:
+                badges += '<span class="type-badge" style="background:#f59e0b; color:#000;">TOP RATED</span>'
+            if item.get("type") == "MARKET_OUTLOOK":
+                badges += '<span class="type-badge" style="background:#00f3ff; color:#000;">OUTLOOK</span>'
+
             archive_html += f"""
-            <div class="archive-item type-{item['type']}" data-year="{year}" data-type="{item['type']}" data-title="{safe_title} {safe_summary}">
+            <div class="archive-item type-{item['type']}" data-year="{year}" data-type="{item['type']}" data-title="{safe_title} {safe_summary}"
+                 data-date="{item['date']}" data-quality="{quality}" data-sentiment="{item['sentiment_score']}">
                 <div style="flex-grow: 1;">
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">{item['date']}</span>
-                        <span class="type-badge">{item['type']}</span>
+                        {badges}
                         <span class="mono" style="font-size:0.7rem; color:#444;">SENT: {item['sentiment_score']} | CONV: {item.get('conviction', 50)} | SEM: {item.get('semantic_score', 0)}</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">{item['title']}</h3>
@@ -1215,6 +1278,15 @@ def generate_archive():
                     hidden: false
                 },
                 {
+                    label: 'Outlook Score',
+                    data: """ + json.dumps(outlook_scores) + """,
+                    borderColor: '#ffff00',
+                    backgroundColor: 'rgba(255, 255, 0, 0.1)',
+                    borderDash: [2, 2],
+                    tension: 0.4,
+                    hidden: false
+                },
+                {
                     label: 'Moving Average (5p)',
                     data: """ + json.dumps(moving_averages) + """,
                     borderColor: '#ffffff',
@@ -1247,8 +1319,10 @@ def generate_archive():
             const search = document.getElementById('searchInput').value.toLowerCase();
             const year = document.getElementById('yearFilter').value;
             const type = document.getElementById('typeFilter').value;
+            const sort = document.getElementById('sortFilter') ? document.getElementById('sortFilter').value : 'DATE_DESC';
 
-            const items = document.querySelectorAll('.archive-item');
+            const container = document.getElementById('archiveGrid');
+            const items = Array.from(document.querySelectorAll('.archive-item'));
 
             items.forEach(item => {
                 const itemYear = item.dataset.year;
@@ -1261,6 +1335,25 @@ def generate_archive():
 
                 item.style.display = (matchSearch && matchYear && matchType) ? 'flex' : 'none';
             });
+
+            // Sorting
+            const visibleItems = items.filter(i => i.style.display !== 'none');
+            visibleItems.sort((a, b) => {
+                if (sort === 'DATE_DESC') {
+                    return b.dataset.date.localeCompare(a.dataset.date);
+                } else if (sort === 'DATE_ASC') {
+                    return a.dataset.date.localeCompare(b.dataset.date);
+                } else if (sort === 'QUALITY_DESC') {
+                    return parseInt(b.dataset.quality) - parseInt(a.dataset.quality);
+                } else if (sort === 'SENTIMENT_DESC') {
+                    return parseInt(b.dataset.sentiment) - parseInt(a.dataset.sentiment);
+                } else if (sort === 'SENTIMENT_ASC') {
+                    return parseInt(a.dataset.sentiment) - parseInt(b.dataset.sentiment);
+                }
+                return 0;
+            });
+
+            visibleItems.forEach(item => container.appendChild(item));
         }
 
         function setSearch(term) {
