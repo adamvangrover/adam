@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if(elements.closeEvidenceBtn) elements.closeEvidenceBtn.addEventListener('click', hideEvidence);
     
     window.switchTab = (tabName) => {
-        document.querySelectorAll('#tab-memo, #tab-annex-a, #tab-annex-b, #tab-annex-c, #tab-risk-quant, #tab-system-2').forEach(el => {
+        document.querySelectorAll('#tab-memo, #tab-annex-a, #tab-annex-b, #tab-annex-c, #tab-risk-quant, #tab-forecast, #tab-system-2').forEach(el => {
             el.classList.add('hidden');
         });
         
@@ -217,6 +217,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         const riskContainer = document.getElementById('risk-quant-container');
         if(riskContainer) riskContainer.innerHTML = generateRiskQuantHtml(memo);
 
+        const forecastContainer = document.getElementById('forecast-container');
+        if(forecastContainer) forecastContainer.innerHTML = generateForecastHtml(memo);
+
         const sys2Container = document.getElementById('system-2-container');
         if(sys2Container) sys2Container.innerHTML = generateSystemTwoHtml(memo);
 
@@ -232,7 +235,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Generator 1: Main Narrative
     function generateMemoHtml(memo) {
         const name = memo.borrower_name || memo.borrower_details?.name;
-        const rating = (memo.credit_ratings && memo.credit_ratings.length > 0) ? memo.credit_ratings[0].rating : (memo.rating || "N/A");
+
+        const ratingObj = (memo.credit_ratings && memo.credit_ratings.length > 0) ? memo.credit_ratings[0] : null;
+        const rating = ratingObj ? ratingObj.rating : (memo.rating || "N/A");
+        const agency = ratingObj ? ratingObj.agency : "";
+        const ratingDisplay = agency ? `${agency} ${rating}` : rating;
+
         const sector = memo.sector || memo.borrower_details?.sector || "General";
         const scoreColor = memo.risk_score < 60 ? 'text-red-500' : (memo.risk_score < 80 ? 'text-yellow-500' : 'text-emerald-500');
 
@@ -241,7 +249,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <div>
                     <h1 class="text-3xl font-serif text-slate-900 mb-2">${name}</h1>
                     <div class="text-sm text-slate-500">
-                        Rating: <span class="font-bold text-slate-700">${rating}</span> | Sector: ${sector}
+                        Rating: <span class="font-bold text-slate-700">${ratingDisplay}</span> | Sector: ${sector}
                     </div>
                 </div>
                 <div class="text-right">
@@ -622,7 +630,87 @@ document.addEventListener('DOMContentLoaded', async () => {
         return html;
     }
 
-    // Generator 6: System 2 Critique
+    // Generator 6: Forecast
+    function generateForecastHtml(memo) {
+        let html = '';
+
+        // 1. Financial Forecast
+        if (memo.financial_forecast && memo.financial_forecast.length > 0) {
+            html += `<h3 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4">Financial Projections (5-Year)</h3>`;
+            html += `<div class="overflow-x-auto mb-8"><table class="w-full text-left font-mono text-sm border-collapse">`;
+
+            // Header
+            const years = memo.financial_forecast.map(f => f.fiscal_year || f.period);
+            html += `<thead class="text-slate-500 border-b border-slate-700"><tr><th class="p-2">Metric</th>${years.map(y => `<th class="p-2 text-right">${y}</th>`).join('')}</tr></thead>`;
+
+            // Rows
+            const metrics = [
+                { k: 'revenue', l: 'Revenue' },
+                { k: 'ebitda', l: 'EBITDA' },
+                { k: 'net_income', l: 'Net Income' },
+                { k: 'cash_equivalents', l: 'Cash' },
+                { k: 'gross_debt', l: 'Total Debt' },
+                { k: 'leverage_ratio', l: 'Lev (x)', fmt: v => v.toFixed(2)+'x' }
+            ];
+
+            html += `<tbody class="divide-y divide-slate-800/50">`;
+            metrics.forEach(m => {
+                html += `<tr><td class="p-2 text-white font-bold">${m.l}</td>`;
+                memo.financial_forecast.forEach(f => {
+                    let val = f[m.k] !== undefined ? f[m.k] : (f.ratios && f.ratios[m.k] ? f.ratios[m.k] : 0);
+                    // Handle fallback
+                    if(m.k === 'cash_equivalents' && f.cash) val = f.cash;
+
+                    const display = m.fmt ? m.fmt(val) : formatCurrency(val);
+                    html += `<td class="p-2 text-right text-slate-300">${display}</td>`;
+                });
+                html += `</tr>`;
+            });
+            html += `</tbody></table></div>`;
+        } else {
+            html += `<p class="text-slate-500 italic mb-8">No financial forecasts available.</p>`;
+        }
+
+        // 2. Debt Repayment
+        if (memo.debt_repayment_forecast && memo.debt_repayment_forecast.length > 0) {
+            html += `<h3 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4 border-t border-slate-700 pt-6">Debt Repayment Schedule</h3>`;
+            html += `<table class="w-full text-left font-mono text-sm border-collapse">`;
+            html += `<thead class="text-slate-500 border-b border-slate-700">
+                        <tr>
+                            <th class="p-2">Year</th>
+                            <th class="p-2 text-right">Principal</th>
+                            <th class="p-2 text-right">Interest</th>
+                            <th class="p-2 text-right">Total Debt Service</th>
+                            <th class="p-2">Breakdown</th>
+                        </tr>
+                     </thead><tbody class="divide-y divide-slate-800/50">`;
+
+            memo.debt_repayment_forecast.forEach(r => {
+                const total = r.total_principal + r.total_interest;
+                let breakdownStr = Object.entries(r.facilities_breakdown)
+                    .map(([k,v]) => `${k}: ${formatCurrency(v)}`)
+                    .join(', ');
+                if(!breakdownStr) breakdownStr = "-";
+
+                html += `
+                    <tr>
+                        <td class="p-2 text-white font-bold">${r.fiscal_year}</td>
+                        <td class="p-2 text-right text-emerald-400">${formatCurrency(r.total_principal)}</td>
+                        <td class="p-2 text-right text-yellow-400">${formatCurrency(r.total_interest)}</td>
+                        <td class="p-2 text-right text-white font-bold">${formatCurrency(total)}</td>
+                        <td class="p-2 text-xs text-slate-500 truncate max-w-xs" title="${breakdownStr}">${breakdownStr}</td>
+                    </tr>
+                `;
+            });
+            html += `</tbody></table>`;
+        } else {
+             html += `<p class="text-slate-500 italic">No debt repayment schedule available.</p>`;
+        }
+
+        return html;
+    }
+
+    // Generator 7: System 2 Critique
     function generateSystemTwoHtml(memo) {
         if (!memo.system_two_critique) return '<p class="text-slate-500 italic">No System 2 critique available.</p>';
         const s2 = memo.system_two_critique;

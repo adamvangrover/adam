@@ -1,5 +1,5 @@
 from typing import Dict, List, Any
-from .model import FinancialSpread, DCFAnalysis, CreditRating, DebtFacility, EquityMarketData, PDModel, LGDAnalysis, Scenario, ScenarioAnalysis, SystemTwoCritique, CreditMemo, PeerComp, AuditLogEntry
+from .model import FinancialSpread, DCFAnalysis, CreditRating, DebtFacility, EquityMarketData, PDModel, LGDAnalysis, Scenario, ScenarioAnalysis, SystemTwoCritique, CreditMemo, PeerComp, AuditLogEntry, RepaymentScheduleItem
 import random
 import uuid
 from datetime import datetime, timedelta
@@ -534,6 +534,119 @@ class SpreadingEngine:
             )
 
     # --- New Methods for Advanced Credit Features ---
+
+    def generate_financial_forecast(self, current_spread: FinancialSpread, ticker: str = None) -> List[Dict[str, Any]]:
+        """
+        Generates 5-year financial projections (2025-2029).
+        Uses MockEdgar projections if available, otherwise applies growth assumptions.
+        """
+        forecasts = []
+
+        # 1. Try to fetch from MockEdgar if ticker is provided
+        if ticker:
+            try:
+                from ...pipelines.mock_edgar import MockEdgar
+                projections = MockEdgar.get_projected_financials(ticker)
+                if projections:
+                    return projections
+            except ImportError:
+                pass
+
+        # 2. Fallback: Growth-based projection
+        base_rev = current_spread.revenue
+        base_ebitda = current_spread.ebitda
+        base_ni = current_spread.net_income
+        base_cash = current_spread.cash if current_spread.cash else 0.0
+
+        # Determine start year
+        current_year = datetime.now().year
+        start_year = current_year
+        if "FY" in current_spread.period:
+            try:
+                # e.g. "FY2024" -> 2024
+                # If current spread is 2024, forecast starts 2025
+                sy = int(current_spread.period[2:6])
+                start_year = sy + 1
+            except:
+                pass
+
+        for i in range(5):
+            year = start_year + i
+            growth = 0.05 # 5% growth assumption
+            factor = (1 + growth) ** (i + 1)
+
+            # Simple projection logic
+            forecasts.append({
+                "fiscal_year": year,
+                "revenue": base_rev * factor,
+                "ebitda": base_ebitda * factor,
+                "net_income": base_ni * factor,
+                "gross_debt": current_spread.gross_debt, # Assume constant debt for simplicity unless schedule says otherwise
+                "cash_equivalents": base_cash * factor,
+                "interest_expense": current_spread.interest_expense, # Assume constant interest
+                "total_assets": current_spread.total_assets * factor,
+                "total_liabilities": current_spread.total_liabilities * factor, # Simplification
+                "total_equity": current_spread.total_equity * factor,
+                "source": "Growth Projection (5%)"
+            })
+
+        return forecasts
+
+    def generate_debt_repayment_forecast(self, debt_facilities: List[DebtFacility]) -> List[RepaymentScheduleItem]:
+        """
+        Generates annual repayment obligations.
+        """
+        schedule = []
+        start_year = datetime.now().year
+
+        for i in range(5):
+            year = start_year + i
+            total_principal = 0.0
+            total_interest = 0.0
+            breakdown = {}
+
+            for fac in debt_facilities:
+                # Interest Calculation
+                rate_val = 0.05 # Default 5%
+                if "%" in fac.interest_rate:
+                    try:
+                        # Handle "SOFR + 1.50%" or "3.25%"
+                        # Simple parser
+                        clean_rate = fac.interest_rate.replace("%", "").split("+")[-1].strip()
+                        rate_val = float(clean_rate) / 100.0
+                        if "SOFR" in fac.interest_rate or "Prime" in fac.interest_rate:
+                             rate_val += 0.05 # Base rate assumption
+                    except:
+                        pass
+
+                # Assume fully drawn for interest calc
+                interest = fac.amount_drawn * rate_val
+                total_interest += interest
+
+                # Principal Repayment (Bullet at maturity)
+                principal = 0.0
+                try:
+                    # Maturity date format "YYYY-MM-DD"
+                    mat_year = int(fac.maturity_date.split("-")[0])
+                    if mat_year == year:
+                        principal = fac.amount_drawn
+                except:
+                    pass
+
+                total_principal += principal
+
+                # Breakdown
+                if principal > 0 or interest > 0:
+                    breakdown[fac.facility_type] = principal + interest
+
+            schedule.append(RepaymentScheduleItem(
+                fiscal_year=year,
+                total_principal=total_principal,
+                total_interest=total_interest,
+                facilities_breakdown=breakdown
+            ))
+
+        return schedule
 
     def calculate_pd_model(self, spread: FinancialSpread, sector: str = "General") -> PDModel:
         """

@@ -70,6 +70,11 @@ class CreditMemoOrchestrator:
         # 3.4 Advanced Quant: Peer Comps (New)
         peer_comps = spreading_engine.get_peer_comps(borrower_name)
 
+        # 3.4.1 Advanced Quant: Forecasts (New)
+        # Note: We pass borrower_name as ticker, assuming SpreadingEngine/MockEdgar might resolve common names or use fallback
+        fin_forecast = spreading_engine.generate_financial_forecast(spread, ticker=borrower_name)
+        repay_forecast = spreading_engine.generate_debt_repayment_forecast(debt)
+
         # 3.5 Agent Workflow Log (New)
         agent_log = spreading_engine.get_agent_log(borrower_name)
 
@@ -126,6 +131,8 @@ class CreditMemoOrchestrator:
                 "net_income": spread.net_income
             },
             historical_financials=[h.model_dump() for h in historicals],
+            financial_forecast=fin_forecast,
+            debt_repayment_forecast=repay_forecast,
             dcf_analysis=dcf,
             pd_model=pd_model,
             lgd_analysis=lgd,

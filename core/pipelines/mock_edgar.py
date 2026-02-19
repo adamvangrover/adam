@@ -76,6 +76,7 @@ class MockEdgar:
 
     # --- Source 2: Verified Financial Data (Golden Record) ---
     # MERGE NOTE: Consolidated 'feature-sovereign' depth with 'main' recency (NVDA 2024).
+    # UPDATED: Added projected history for 2024-2026 to support Current System View.
     FINANCIALS_DB = {
         "AAPL": {
             "company_name": "Apple Inc.",
@@ -84,6 +85,11 @@ class MockEdgar:
                 {"fiscal_year": 2021, "revenue": 365817, "ebitda": 120233, "total_debt": 124719, "cash_equivalents": 34940, "interest_expense": 2645, "total_assets": 351002, "total_liabilities": 287912, "total_equity": 63090},
                 {"fiscal_year": 2022, "revenue": 394328, "ebitda": 130541, "total_debt": 120069, "cash_equivalents": 23646, "interest_expense": 2931, "total_assets": 352755, "total_liabilities": 302083, "total_equity": 50672},
                 {"fiscal_year": 2023, "revenue": 383285, "ebitda": 114301, "total_debt": 111088, "cash_equivalents": 29965, "interest_expense": 3933, "total_assets": 352583, "total_liabilities": 290437, "total_equity": 62146}
+            ],
+            "projected_history": [
+                {"fiscal_year": 2024, "revenue": 391000, "ebitda": 132000, "total_debt": 105000, "cash_equivalents": 60000, "interest_expense": 3900, "total_assets": 379300, "total_liabilities": 291100, "total_equity": 88200},
+                {"fiscal_year": 2025, "revenue": 405000, "ebitda": 138000, "total_debt": 100000, "cash_equivalents": 65000, "interest_expense": 3800, "total_assets": 400000, "total_liabilities": 280000, "total_equity": 120000},
+                {"fiscal_year": 2026, "revenue": 425000, "ebitda": 145000, "total_debt": 95000, "cash_equivalents": 70000, "interest_expense": 3600, "total_assets": 420000, "total_liabilities": 270000, "total_equity": 150000}
             ]
         },
         "MSFT": {
@@ -93,6 +99,11 @@ class MockEdgar:
                 {"fiscal_year": 2021, "revenue": 168088, "ebitda": 80816, "total_debt": 58120, "cash_equivalents": 14224, "interest_expense": 2346, "total_assets": 333779, "total_liabilities": 191791, "total_equity": 141988},
                 {"fiscal_year": 2022, "revenue": 198270, "ebitda": 97843, "total_debt": 49751, "cash_equivalents": 13931, "interest_expense": 2063, "total_assets": 364840, "total_liabilities": 198298, "total_equity": 166542},
                 {"fiscal_year": 2023, "revenue": 211915, "ebitda": 102384, "total_debt": 47204, "cash_equivalents": 34704, "interest_expense": 1968, "total_assets": 411976, "total_liabilities": 205753, "total_equity": 206223}
+            ],
+            "projected_history": [
+                {"fiscal_year": 2024, "revenue": 245000, "ebitda": 120000, "total_debt": 45000, "cash_equivalents": 40000, "interest_expense": 1800, "total_assets": 450000, "total_liabilities": 210000, "total_equity": 240000},
+                {"fiscal_year": 2025, "revenue": 280000, "ebitda": 140000, "total_debt": 42000, "cash_equivalents": 50000, "interest_expense": 1700, "total_assets": 500000, "total_liabilities": 220000, "total_equity": 280000},
+                {"fiscal_year": 2026, "revenue": 320000, "ebitda": 165000, "total_debt": 40000, "cash_equivalents": 60000, "interest_expense": 1600, "total_assets": 550000, "total_liabilities": 230000, "total_equity": 320000}
             ]
         },
         "GOOGL": {
@@ -102,6 +113,11 @@ class MockEdgar:
                 {"fiscal_year": 2021, "revenue": 257637, "ebitda": 91155, "total_debt": 14817, "cash_equivalents": 20945, "interest_expense": 346, "total_assets": 359268, "total_liabilities": 107633, "total_equity": 251635},
                 {"fiscal_year": 2022, "revenue": 282836, "ebitda": 74842, "total_debt": 14701, "cash_equivalents": 21879, "interest_expense": 357, "total_assets": 365264, "total_liabilities": 109120, "total_equity": 256144},
                 {"fiscal_year": 2023, "revenue": 307394, "ebitda": 88164, "total_debt": 13253, "cash_equivalents": 24048, "interest_expense": 321, "total_assets": 402392, "total_liabilities": 119048, "total_equity": 283344}
+            ],
+            "projected_history": [
+                {"fiscal_year": 2024, "revenue": 330000, "ebitda": 105000, "total_debt": 12000, "cash_equivalents": 28000, "interest_expense": 300, "total_assets": 430000, "total_liabilities": 125000, "total_equity": 305000},
+                {"fiscal_year": 2025, "revenue": 360000, "ebitda": 120000, "total_debt": 11000, "cash_equivalents": 32000, "interest_expense": 280, "total_assets": 460000, "total_liabilities": 130000, "total_equity": 330000},
+                {"fiscal_year": 2026, "revenue": 395000, "ebitda": 135000, "total_debt": 10000, "cash_equivalents": 38000, "interest_expense": 250, "total_assets": 490000, "total_liabilities": 135000, "total_equity": 355000}
             ]
         },
         "AMZN": {
@@ -111,6 +127,11 @@ class MockEdgar:
                 {"fiscal_year": 2021, "revenue": 469822, "ebitda": 59175, "total_debt": 48744, "cash_equivalents": 36220, "interest_expense": 1809, "total_assets": 420549, "total_liabilities": 282304, "total_equity": 138245},
                 {"fiscal_year": 2022, "revenue": 513983, "ebitda": 54169, "total_debt": 67150, "cash_equivalents": 53888, "interest_expense": 2367, "total_assets": 462675, "total_liabilities": 316632, "total_equity": 146043},
                 {"fiscal_year": 2023, "revenue": 574785, "ebitda": 85515, "total_debt": 58316, "cash_equivalents": 73387, "interest_expense": 3178, "total_assets": 527854, "total_liabilities": 326084, "total_equity": 201770}
+            ],
+            "projected_history": [
+                {"fiscal_year": 2024, "revenue": 640000, "ebitda": 105000, "total_debt": 55000, "cash_equivalents": 80000, "interest_expense": 3000, "total_assets": 580000, "total_liabilities": 340000, "total_equity": 240000},
+                {"fiscal_year": 2025, "revenue": 710000, "ebitda": 125000, "total_debt": 52000, "cash_equivalents": 90000, "interest_expense": 2800, "total_assets": 640000, "total_liabilities": 360000, "total_equity": 280000},
+                {"fiscal_year": 2026, "revenue": 790000, "ebitda": 145000, "total_debt": 50000, "cash_equivalents": 100000, "interest_expense": 2600, "total_assets": 700000, "total_liabilities": 380000, "total_equity": 320000}
             ]
         },
         "NVDA": {
@@ -121,6 +142,10 @@ class MockEdgar:
                 {"fiscal_year": 2022, "revenue": 26914, "ebitda": 11216, "total_debt": 10946, "cash_equivalents": 1991, "interest_expense": 236, "total_assets": 44187, "total_liabilities": 17575, "total_equity": 26612},
                 {"fiscal_year": 2023, "revenue": 26974, "ebitda": 5600, "total_debt": 11130, "cash_equivalents": 3389, "interest_expense": 272, "total_assets": 41182, "total_liabilities": 19081, "total_equity": 22101},
                 {"fiscal_year": 2024, "revenue": 60922, "ebitda": 34480, "total_debt": 8461, "cash_equivalents": 25984, "interest_expense": 257, "total_assets": 65728, "total_liabilities": 22750, "total_equity": 42978}
+            ],
+            "projected_history": [
+                {"fiscal_year": 2025, "revenue": 120000, "ebitda": 75000, "total_debt": 8000, "cash_equivalents": 40000, "interest_expense": 250, "total_assets": 90000, "total_liabilities": 25000, "total_equity": 65000},
+                {"fiscal_year": 2026, "revenue": 160000, "ebitda": 105000, "total_debt": 7500, "cash_equivalents": 60000, "interest_expense": 240, "total_assets": 120000, "total_liabilities": 30000, "total_equity": 90000}
             ]
         },
         "TSLA": {
@@ -130,6 +155,11 @@ class MockEdgar:
                 {"fiscal_year": 2021, "revenue": 53823, "ebitda": 9600, "total_debt": 6834, "cash_equivalents": 17576, "interest_expense": 371, "total_assets": 62131, "total_liabilities": 30548, "total_equity": 30189},
                 {"fiscal_year": 2022, "revenue": 81462, "ebitda": 17660, "total_debt": 3099, "cash_equivalents": 22185, "interest_expense": 191, "total_assets": 82338, "total_liabilities": 36440, "total_equity": 44704},
                 {"fiscal_year": 2023, "revenue": 96773, "ebitda": 14997, "total_debt": 4350, "cash_equivalents": 29072, "interest_expense": 156, "total_assets": 106618, "total_liabilities": 43009, "total_equity": 62634}
+            ],
+            "projected_history": [
+                {"fiscal_year": 2024, "revenue": 115000, "ebitda": 18000, "total_debt": 4200, "cash_equivalents": 32000, "interest_expense": 150, "total_assets": 120000, "total_liabilities": 45000, "total_equity": 75000},
+                {"fiscal_year": 2025, "revenue": 145000, "ebitda": 25000, "total_debt": 4000, "cash_equivalents": 38000, "interest_expense": 140, "total_assets": 140000, "total_liabilities": 50000, "total_equity": 90000},
+                {"fiscal_year": 2026, "revenue": 180000, "ebitda": 35000, "total_debt": 3800, "cash_equivalents": 45000, "interest_expense": 130, "total_assets": 165000, "total_liabilities": 55000, "total_equity": 110000}
             ]
         },
         "META": {
@@ -139,6 +169,11 @@ class MockEdgar:
                 {"fiscal_year": 2021, "revenue": 117929, "ebitda": 54720, "total_debt": 13876, "cash_equivalents": 16601, "interest_expense": 0, "total_assets": 165987, "total_liabilities": 41108, "total_equity": 124879},
                 {"fiscal_year": 2022, "revenue": 116609, "ebitda": 40380, "total_debt": 26402, "cash_equivalents": 14681, "interest_expense": 109, "total_assets": 185727, "total_liabilities": 60014, "total_equity": 125713},
                 {"fiscal_year": 2023, "revenue": 134902, "ebitda": 62310, "total_debt": 37043, "cash_equivalents": 41862, "interest_expense": 371, "total_assets": 229623, "total_liabilities": 76016, "total_equity": 153607}
+            ],
+            "projected_history": [
+                {"fiscal_year": 2024, "revenue": 155000, "ebitda": 75000, "total_debt": 35000, "cash_equivalents": 45000, "interest_expense": 350, "total_assets": 250000, "total_liabilities": 80000, "total_equity": 170000},
+                {"fiscal_year": 2025, "revenue": 180000, "ebitda": 90000, "total_debt": 32000, "cash_equivalents": 55000, "interest_expense": 320, "total_assets": 280000, "total_liabilities": 85000, "total_equity": 195000},
+                {"fiscal_year": 2026, "revenue": 210000, "ebitda": 110000, "total_debt": 30000, "cash_equivalents": 65000, "interest_expense": 300, "total_assets": 320000, "total_liabilities": 90000, "total_equity": 230000}
             ]
         }
     }
@@ -153,6 +188,16 @@ class MockEdgar:
         if not data:
             raise ValueError(f"Ticker {ticker} not found in Mock EDGAR Source.")
         return data
+
+    @classmethod
+    def get_projected_financials(cls, ticker: str) -> List[Dict[str, Any]]:
+        """
+        Retrieves projected financial data if available.
+        """
+        data = cls.FINANCIALS_DB.get(ticker.upper())
+        if data and "projected_history" in data:
+            return data["projected_history"]
+        return []
 
     @staticmethod
     def _calculate_ratios(fin: Dict[str, float]) -> Dict[str, float]:

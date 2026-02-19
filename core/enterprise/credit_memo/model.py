@@ -157,6 +157,12 @@ class AuditLogEntry(BaseModel):
     validation_status: str  # PASS/FAIL/WARNING
     validation_errors: List[str] = []
 
+class RepaymentScheduleItem(BaseModel):
+    fiscal_year: int
+    total_principal: float
+    total_interest: float
+    facilities_breakdown: Dict[str, float]
+
 class CreditMemo(BaseModel):
     """
     The complete Credit Memo document.
@@ -170,6 +176,8 @@ class CreditMemo(BaseModel):
     mitigants: List[str] = []
     financial_ratios: Dict[str, float] = {}
     historical_financials: List[Dict[str, Any]] = [] # List of FinancialSpread dictionaries
+    financial_forecast: List[Dict[str, Any]] = [] # Projected FinancialSpread dictionaries
+    debt_repayment_forecast: List[RepaymentScheduleItem] = []
     dcf_analysis: Optional[DCFAnalysis] = None
     pd_model: Optional[PDModel] = None
     lgd_analysis: Optional[LGDAnalysis] = None

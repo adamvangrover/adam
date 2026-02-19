@@ -6,7 +6,7 @@ class System2_MockEngine {
     static generateArtifacts(ticker) {
         return {
             ticker: ticker,
-            fiscal_year: 2024,
+            fiscal_year: 2026,
             recommendation: "APPROVE",
             title: `Credit Risk Analysis: ${ticker}`,
             date: new Date().toISOString().split('T')[0],
@@ -17,10 +17,10 @@ class System2_MockEngine {
                 "liquidity_ratio": "PASS"
             },
             history: [
-                { fiscal_year: "2020", revenue: 100000, ebitda: 30000 },
-                { fiscal_year: "2021", revenue: 115000, ebitda: 35000 },
-                { fiscal_year: "2022", revenue: 130000, ebitda: 40000 },
-                { fiscal_year: "2023", revenue: 145000, ebitda: 45000 }
+                { fiscal_year: "2022", revenue: 100000, ebitda: 30000 },
+                { fiscal_year: "2023", revenue: 115000, ebitda: 35000 },
+                { fiscal_year: "2024", revenue: 130000, ebitda: 40000 },
+                { fiscal_year: "2025", revenue: 145000, ebitda: 45000 }
             ],
             growth_metrics: {
                 "Revenue CAGR (3Y)": 12.5,
@@ -56,8 +56,8 @@ class System2_MockEngine {
                     price_targets: { bear: 140, base: 190, bull: 230 },
                     rationale: "AI Outlook confirms bullish trend.",
                     projections: [
-                        { fiscal_year: "2024", revenue: 160000, ebitda: 50000 },
-                        { fiscal_year: "2025", revenue: 175000, ebitda: 55000 }
+                        { fiscal_year: "2026", revenue: 160000, ebitda: 50000 },
+                        { fiscal_year: "2027", revenue: 175000, ebitda: 55000 }
                     ]
                 },
                 metrics: {
