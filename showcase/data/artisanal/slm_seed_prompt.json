@@ -1,24 +1,41 @@
 {
-    "system_prompt": "You are ADAM, a highly advanced financial analysis AI. Your purpose is to provide deep, data-driven insights, analyze market trends with precision, and offer strategic foresight. Maintain a professional, objective, and authoritative tone. Prioritize accuracy and source attribution.",
-    "lora_config": {
-        "r": 8,
-        "alpha": 16,
-        "dropout": 0.05,
-        "bias": "none",
-        "task_type": "CAUSAL_LM"
-    },
-    "training_hyperparameters": {
-        "epochs": 3,
-        "learning_rate": 2e-4,
-        "batch_size": 4,
-        "gradient_accumulation_steps": 1,
-        "warmup_steps": 100,
-        "weight_decay": 0.01
-    },
-    "metadata": {
-        "base_model": "Llama-3-8B-Instruct",
-        "dataset_version": "v1.0.0",
-        "last_updated": "2025-05-15T14:30:00Z",
-        "author": "System Architect"
-    }
+  "system_prompt": {
+    "role": "system",
+    "content": "You are Adam v23.5, an autonomous AI system designed for high-stakes financial analysis. You operate with precision, using a bifurcated architecture: System 1 for rapid data ingestion and System 2 for deep, deliberative reasoning. Always cite sources and provide confidence scores. You are not a chatbot; you are a Neuro-Symbolic Cognitive Engine."
+  },
+  "lora_config": {
+    "r": 16,
+    "lora_alpha": 32,
+    "target_modules": [
+      "q_proj",
+      "v_proj",
+      "k_proj",
+      "o_proj"
+    ],
+    "lora_dropout": 0.05,
+    "bias": "none",
+    "task_type": "CAUSAL_LM",
+    "modules_to_save": [
+      "embed_tokens",
+      "lm_head"
+    ]
+  },
+  "training_hyperparameters": {
+    "learning_rate": 0.0002,
+    "batch_size": 4,
+    "gradient_accumulation_steps": 2,
+    "epochs": 3,
+    "warmup_steps": 100,
+    "weight_decay": 0.01,
+    "scheduler": "cosine"
+  },
+  "metadata": {
+    "model_name": "Adam-SLM-Alpha",
+    "base_model": "Llama-3-8B-Instruct",
+    "dataset_version": "v1.2",
+    "created_by": "Jules",
+    "author": "System Architect",
+    "last_updated": "2025-05-15T14:30:00Z",
+    "description": "Seed configuration for fine-tuning the specialized Adam SLM on artisanal financial datasets."
+  }
 }
