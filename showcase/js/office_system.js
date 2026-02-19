@@ -244,9 +244,263 @@ class AppRegistry {
             case 'Terminal':
                 this.launchTerminal(args);
                 break;
+            case 'MarketMonitor':
+                this.launchMarketMonitor(args);
+                break;
+            case 'ReportGenerator':
+                this.launchReportGenerator(args);
+                break;
+            case 'CreditSentinel':
+                this.launchCreditSentinel(args);
+                break;
+            case 'Spreadsheet':
+                this.launchSpreadsheet(args);
+                break;
             default:
                 console.error('Unknown app:', appName);
         }
+    }
+
+    launchMarketMonitor(args) {
+        const winId = this.os.windowManager.createWindow({
+            title: 'Market Monitor',
+            icon: 'https://img.icons8.com/color/48/000000/line-chart.png',
+            width: 800,
+            height: 600,
+            app: 'MarketMonitor'
+        });
+
+        const container = document.createElement('div');
+        container.style.padding = '20px';
+        container.style.backgroundColor = '#1e1e1e';
+        container.style.color = '#fff';
+        container.style.height = '100%';
+        container.style.overflowY = 'auto';
+        container.innerHTML = '<h3>Loading Market Data...</h3>';
+        this.os.windowManager.setWindowContent(winId, container);
+
+        const renderData = (data) => {
+             let html = `
+                    <h2 style="margin-top:0;">S&P 500 Market Monitor</h2>
+                    <table style="width:100%; border-collapse:collapse; text-align:left;">
+                        <tr style="border-bottom:1px solid #444;">
+                            <th style="padding:10px;">Ticker</th>
+                            <th style="padding:10px;">Company</th>
+                            <th style="padding:10px;">Price</th>
+                            <th style="padding:10px;">Change</th>
+                            <th style="padding:10px;">Sector</th>
+                        </tr>
+                `;
+                data.forEach(item => {
+                    const color = item.change_pct >= 0 ? '#4caf50' : '#f44336';
+                    html += `
+                        <tr style="border-bottom:1px solid #333;">
+                            <td style="padding:10px; font-weight:bold;">${item.ticker}</td>
+                            <td style="padding:10px;">${item.name}</td>
+                            <td style="padding:10px;">$${item.current_price}</td>
+                            <td style="padding:10px; color:${color}">${item.change_pct}%</td>
+                            <td style="padding:10px; color:#aaa;">${item.sector}</td>
+                        </tr>
+                    `;
+                });
+                html += '</table>';
+                container.innerHTML = html;
+        };
+
+        if (window.MARKET_DATA) {
+            renderData(window.MARKET_DATA);
+        } else {
+            fetch('data/sp500_market_data.json')
+                .then(res => res.json())
+                .then(data => renderData(data))
+                .catch(err => {
+                    container.innerHTML = `<h3 style="color:red">Error loading market data: ${err}</h3><p>Make sure scripts/generate_sp500_micro_build.py has been run.</p>`;
+                });
+        }
+    }
+
+    launchReportGenerator(args) {
+        const winId = this.os.windowManager.createWindow({
+            title: 'Report Generator',
+            icon: 'https://img.icons8.com/color/48/000000/print.png',
+            width: 500,
+            height: 400,
+            app: 'ReportGenerator'
+        });
+
+        const container = document.createElement('div');
+        container.style.padding = '20px';
+        container.innerHTML = `
+            <h2>Generate New Report</h2>
+            <div style="margin-bottom:15px;">
+                <label style="display:block; margin-bottom:5px;">Select Company:</label>
+                <select id="report-ticker-${winId}" style="width:100%; padding:8px;">
+                    <option value="AAPL">Apple Inc. (AAPL)</option>
+                    <option value="MSFT">Microsoft Corp. (MSFT)</option>
+                    <option value="GOOGL">Alphabet Inc. (GOOGL)</option>
+                    <option value="AMZN">Amazon.com Inc. (AMZN)</option>
+                    <option value="NVDA">NVIDIA Corp. (NVDA)</option>
+                </select>
+            </div>
+            <div style="margin-bottom:15px;">
+                <label style="display:block; margin-bottom:5px;">Report Type:</label>
+                <select id="report-type-${winId}" style="width:100%; padding:8px;">
+                    <option value="equity">Equity Research Report</option>
+                    <option value="credit">Credit Memo</option>
+                </select>
+            </div>
+            <button id="generate-btn-${winId}" class="cyber-btn" style="width:100%; padding:10px; background:#0078d7; color:white; border:none; cursor:pointer;">Generate Report</button>
+            <p id="status-${winId}" style="margin-top:10px; color:#666;"></p>
+        `;
+        this.os.windowManager.setWindowContent(winId, container);
+
+        const btn = container.querySelector(`#generate-btn-${winId}`);
+        btn.addEventListener('click', () => {
+            const ticker = container.querySelector(`#report-ticker-${winId}`).value;
+            const type = container.querySelector(`#report-type-${winId}`).value;
+            const status = container.querySelector(`#status-${winId}`);
+
+            status.innerText = 'Generating...';
+            setTimeout(() => {
+                status.innerText = 'Done! Opening report...';
+                let path = '';
+                if(type === 'equity') path = `data/equity_reports/${ticker}_Equity_Report.html`;
+                else path = `data/credit_reports/${ticker}_Credit_Memo.html`;
+
+                this.os.appRegistry.launch('Browser', { url: path, name: `${ticker} Report` });
+                this.os.windowManager.closeWindow(winId);
+            }, 1000);
+        });
+    }
+
+    launchCreditSentinel(args) {
+        const winId = this.os.windowManager.createWindow({
+            title: 'Credit Sentinel',
+            icon: 'https://img.icons8.com/color/48/000000/security-checked--v1.png',
+            width: 800,
+            height: 600,
+            app: 'CreditSentinel'
+        });
+
+        const container = document.createElement('div');
+        container.style.padding = '20px';
+        container.style.backgroundColor = '#f5f5f5';
+        container.style.height = '100%';
+        container.style.overflowY = 'auto';
+        container.innerHTML = '<h3>Loading Credit Data...</h3>';
+        this.os.windowManager.setWindowContent(winId, container);
+
+        const renderCreditData = (data) => {
+                let html = `
+                    <h2 style="margin-top:0; color:#333;">Credit Risk Monitor</h2>
+                    <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap:15px;">
+                `;
+                data.sort((a,b) => a.risk_score - b.risk_score).forEach(item => {
+                    const riskColor = item.risk_score > 90 ? 'green' : item.risk_score > 80 ? 'orange' : 'red';
+                    html += `
+                        <div style="background:white; padding:15px; border-radius:4px; border:1px solid #ddd; box-shadow:0 2px 5px rgba(0,0,0,0.05); cursor:pointer;"
+                             onclick="window.officeOS.appRegistry.launch('Browser', {url: 'data/credit_reports/${item.ticker}_Credit_Memo.html', name: '${item.ticker} Credit Memo'})">
+                            <div style="font-weight:bold; font-size:16px;">${item.ticker}</div>
+                            <div style="font-size:12px; color:#666; margin-bottom:10px;">${item.name}</div>
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <span>Score:</span>
+                                <span style="font-weight:bold; color:${riskColor}; font-size:18px;">${item.risk_score}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+                container.innerHTML = html;
+        };
+
+        if (window.MARKET_DATA) {
+            renderCreditData(window.MARKET_DATA);
+        } else {
+            fetch('data/sp500_market_data.json')
+                .then(res => res.json())
+                .then(data => renderCreditData(data))
+                .catch(err => {
+                    container.innerHTML = `<h3 style="color:red">Error: ${err}</h3>`;
+                });
+        }
+    }
+
+    launchSpreadsheet(args) {
+        const winId = this.os.windowManager.createWindow({
+            title: args.name || 'Spreadsheet',
+            icon: 'https://img.icons8.com/color/48/000000/microsoft-excel-2019.png',
+            width: 900,
+            height: 600,
+            app: 'Spreadsheet'
+        });
+
+        const container = document.createElement('div');
+        container.style.display = 'flex';
+        container.style.flexDirection = 'column';
+        container.style.height = '100%';
+
+        container.innerHTML = `
+            <div style="background:#217346; color:white; padding:5px 10px; font-size:12px;">Spreadsheet View - ${args.name || 'Untitled'}</div>
+            <div id="sheet-content-${winId}" style="flex-grow:1; overflow:auto; background:white; padding:10px;">Loading...</div>
+        `;
+        this.os.windowManager.setWindowContent(winId, container);
+
+        fetch(args.path)
+            .then(res => res.text())
+            .then(text => {
+                const contentDiv = container.querySelector(`#sheet-content-${winId}`);
+                try {
+                    // Try JSON first
+                    const data = JSON.parse(text);
+                    if(Array.isArray(data)) {
+                        this.renderJsonTable(contentDiv, data);
+                    } else {
+                        contentDiv.innerText = JSON.stringify(data, null, 2);
+                    }
+                } catch(e) {
+                    // Fallback to basic CSV rendering (very simple)
+                    const rows = text.split('\n');
+                    let html = '<table style="border-collapse:collapse; width:100%;">';
+                    rows.forEach((row, i) => {
+                        html += '<tr>';
+                        const cells = row.split(',');
+                        cells.forEach(cell => {
+                            if(i === 0) html += `<th style="border:1px solid #ddd; padding:5px; background:#f0f0f0;">${cell}</th>`;
+                            else html += `<td style="border:1px solid #ddd; padding:5px;">${cell}</td>`;
+                        });
+                        html += '</tr>';
+                    });
+                    html += '</table>';
+                    contentDiv.innerHTML = html;
+                }
+            });
+    }
+
+    renderJsonTable(container, data) {
+        if(data.length === 0) {
+            container.innerText = 'Empty Data';
+            return;
+        }
+        const headers = Object.keys(data[0]);
+        let html = '<table style="border-collapse:collapse; width:100%; font-family: sans-serif; font-size:12px;">';
+
+        // Header
+        html += '<thead><tr>';
+        headers.forEach(h => html += `<th style="border:1px solid #ccc; padding:6px; background:#f3f3f3; text-align:left;">${h}</th>`);
+        html += '</tr></thead><tbody>';
+
+        // Body
+        data.forEach(row => {
+            html += '<tr>';
+            headers.forEach(h => {
+                let val = row[h];
+                if(typeof val === 'object') val = JSON.stringify(val);
+                html += `<td style="border:1px solid #ccc; padding:6px;">${val}</td>`;
+            });
+            html += '</tr>';
+        });
+        html += '</tbody></table>';
+        container.innerHTML = html;
     }
 
     launchExplorer(args) {
@@ -525,6 +779,9 @@ class OfficeOS {
             { name: 'Explorer', icon: 'https://img.icons8.com/color/48/000000/folder-invoices--v1.png', action: () => this.appRegistry.launch('Explorer') },
             { name: 'Terminal', icon: 'https://img.icons8.com/color/48/000000/console.png', action: () => this.appRegistry.launch('Terminal') },
             { name: 'Notepad', icon: 'https://img.icons8.com/color/48/000000/notepad.png', action: () => this.appRegistry.launch('Notepad', {name:'Untitled', content:''}) },
+            { name: 'Market Monitor', icon: 'https://img.icons8.com/color/48/000000/line-chart.png', action: () => this.appRegistry.launch('MarketMonitor') },
+            { name: 'Credit Sentinel', icon: 'https://img.icons8.com/color/48/000000/security-checked--v1.png', action: () => this.appRegistry.launch('CreditSentinel') },
+            { name: 'Report Gen', icon: 'https://img.icons8.com/color/48/000000/print.png', action: () => this.appRegistry.launch('ReportGenerator') },
             // Add shortcut to specific dashboards
             { name: 'Mission Ctrl', icon: 'https://img.icons8.com/color/48/000000/monitor.png', action: () => this.appRegistry.launch('Browser', {url:'showcase/mission_control.html', name:'Mission Control'}) },
             { name: 'Archive', icon: 'https://img.icons8.com/color/48/000000/archive.png', action: () => this.appRegistry.launch('Browser', {url:'showcase/market_mayhem_archive.html', name:'Archive'}) }
@@ -546,7 +803,9 @@ class OfficeOS {
         const desktop = document.getElementById('desktop');
         const icons = [
             { name: 'My Computer', icon: 'https://img.icons8.com/color/48/000000/workstation.png', action: () => this.appRegistry.launch('Explorer', {path: './'}) },
-            { name: 'Recycle Bin', icon: 'https://img.icons8.com/color/48/000000/trash.png', action: () => alert('Recycle Bin is empty') },
+            { name: 'Market Monitor', icon: 'https://img.icons8.com/color/48/000000/line-chart.png', action: () => this.appRegistry.launch('MarketMonitor') },
+            { name: 'Credit Sentinel', icon: 'https://img.icons8.com/color/48/000000/security-checked--v1.png', action: () => this.appRegistry.launch('CreditSentinel') },
+            { name: 'Report Generator', icon: 'https://img.icons8.com/color/48/000000/print.png', action: () => this.appRegistry.launch('ReportGenerator') },
             { name: 'System Logs', icon: 'https://img.icons8.com/color/48/000000/txt.png', action: () => this.appRegistry.launch('Explorer', {path: './logs'}) },
             { name: 'Showcase', icon: 'https://img.icons8.com/color/48/000000/presentation.png', action: () => this.appRegistry.launch('Explorer', {path: './showcase'}) }
         ];
@@ -599,8 +858,15 @@ class OfficeOS {
         const ext = file.name.split('.').pop().toLowerCase();
         if (['html', 'htm'].includes(ext)) {
             this.appRegistry.launch('Browser', { url: file.path, name: file.name });
+        } else if (['csv', 'xls', 'xlsx'].includes(ext)) {
+             this.appRegistry.launch('Spreadsheet', { path: file.path, name: file.name });
         } else if (['txt', 'md', 'json', 'py', 'js', 'css', 'yaml', 'yml', 'xml', 'log'].includes(ext)) {
-            this.appRegistry.launch('Notepad', { path: file.path, name: file.name });
+            // Check if json is meant for spreadsheet
+            if(ext === 'json' && (file.name.includes('data') || file.name.includes('market'))) {
+                this.appRegistry.launch('Spreadsheet', { path: file.path, name: file.name });
+            } else {
+                this.appRegistry.launch('Notepad', { path: file.path, name: file.name });
+            }
         } else if (['png', 'jpg', 'jpeg', 'gif', 'svg'].includes(ext)) {
             this.appRegistry.launch('ImageViewer', { path: file.path, name: file.name });
         } else {
