@@ -1,0 +1,40 @@
+{
+  "types": [
+    {
+      "id": "Agent",
+      "description": "An autonomous software entity that performs tasks."
+    },
+    {
+      "id": "Artifact",
+      "description": "A generated document or data object."
+    },
+    {
+      "id": "Source",
+      "description": "Raw data or external document used as input."
+    },
+    {
+      "id": "Process",
+      "description": "A transformative action performed by an agent."
+    }
+  ],
+  "relationships": [
+    {
+      "id": "generated_by",
+      "source": "Artifact",
+      "target": "Agent",
+      "description": "Indicates which agent created the artifact."
+    },
+    {
+      "id": "derived_from",
+      "source": "Artifact",
+      "target": "Source",
+      "description": "Indicates the source data used to create the artifact."
+    },
+    {
+      "id": "reviewed_by",
+      "source": "Artifact",
+      "target": "Agent",
+      "description": "Indicates which agent reviewed the artifact."
+    }
+  ]
+}
