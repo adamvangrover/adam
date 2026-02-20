@@ -11,13 +11,10 @@ async def analyze_task(
     request: AnalysisRequest,
     orchestrator: MetaOrchestrator = Depends(get_orchestrator)
 ):
-    try:
-        # Route the request through the MetaOrchestrator brain
-        result = await orchestrator.route_request(request.query, context=request.context)
-        return AnalysisResponse(status="success", result=result)
-
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    # Route the request through the MetaOrchestrator brain
+    # 🛡️ Sentinel: Let exceptions propagate to global handler to prevent info leakage
+    result = await orchestrator.route_request(request.query, context=request.context)
+    return AnalysisResponse(status="success", result=result)
 
 
 @router.get("/status")
