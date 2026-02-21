@@ -48,6 +48,7 @@ from core.engine.swarm.hive_mind import HiveMind
 from core.engine.semantic_router import SemanticRouter
 from core.utils.logging_utils import SwarmLogger
 from core.utils.repo_context import RepoContextManager
+from core.utils.proof_of_thought import ProofOfThoughtLogger
 
 # --- v23.5 Deep Dive Agents (Legacy Support & Fallback) ---
 from core.agents.specialized.management_assessment_agent import ManagementAssessmentAgent
@@ -75,6 +76,9 @@ class MetaOrchestrator:
         """
         self.swarm_logger = SwarmLogger()
         self.swarm_logger.log_event("SYSTEM_BOOT", "MetaOrchestrator", {"version": "v24.0.1-Alpha"})
+
+        # Project OMEGA: Trust Engine
+        self.pot_logger = ProofOfThoughtLogger()
 
         # 1. Cognitive Engines
         self.planner = NeuroSymbolicPlanner()
@@ -117,6 +121,12 @@ class MetaOrchestrator:
         
         logger.info("MetaOrchestrator initialized with Dynamic Routing Registry.")
 
+        # Project OMEGA Roadmap Note:
+        # Phase 1 of AdamOS migration will involve replacing this Python class with a Rust-based Kernel
+        # (see core/experimental/adamos_kernel/). The `route_registry` will eventually be
+        # handled by the WASM plugin system.
+        # Current status: PROTOTYPING.
+
     async def route_request(self, query: str, context: Optional[Dict[str, Any]] = None) -> Any:
         """
         The Central Nervous System: Analyzes query complexity, injects context, 
@@ -136,6 +146,7 @@ class MetaOrchestrator:
 
         logger.info(f"MetaOrchestrator: Query routed to [{complexity}]")
         self.swarm_logger.log_thought("MetaOrchestrator", f"Assessed complexity as {complexity}. Dispatching to engine.")
+        self.pot_logger.log_thought("MetaOrchestrator", f"ROUTING_DECISION: {complexity}", metadata={"query": query})
 
         # 3. Execution via Registry
         result = None
@@ -168,6 +179,9 @@ class MetaOrchestrator:
         # Only reflect on complex outputs or if explicitly requested
         if complexity in ["DEEP_DIVE", "HIGH", "CRISIS", "RED_TEAM", "CODE_GEN"] or context.get("force_reflection"):
             result = await self._reflect_on_result(result, query)
+
+        # Log final outcome hash
+        self.pot_logger.log_thought("MetaOrchestrator", "EXECUTION_COMPLETE", metadata={"status": "success", "complexity": complexity})
 
         return result
 
