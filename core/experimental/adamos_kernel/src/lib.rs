@@ -50,6 +50,7 @@ impl Kernel {
     }
 
     /// Registers a new agent (e.g., loaded from WASM)
+    #[wasm_bindgen(js_name = registerAgent)]
     pub fn register_agent(&self, name: String, capabilities: Vec<String>) -> String {
         let id = Uuid::new_v4().to_string();
         // Simple mapping for capabilities from Vec<String> to internal logic if needed
@@ -67,6 +68,7 @@ impl Kernel {
     }
 
     /// Routes a message
+    #[wasm_bindgen(js_name = sendMessage)]
     pub fn send_message(&self, sender_id: &str, recipient_id: &str, content: String) {
         let msg = Message {
             id: Uuid::new_v4().to_string(),
@@ -114,7 +116,7 @@ fn norm_cdf(x: f64) -> f64 {
 /// T: Time to Maturity (in years)
 /// r: Risk-free Interest Rate
 /// sigma: Volatility
-#[wasm_bindgen]
+#[wasm_bindgen(js_name = calculateOptionPrice)]
 pub fn calculate_option_price(s: f64, k: f64, t: f64, r: f64, sigma: f64, is_call: bool) -> f64 {
     if t <= 0.0 {
         return if is_call { (s - k).max(0.0) } else { (k - s).max(0.0) };

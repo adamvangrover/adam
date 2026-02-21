@@ -62,6 +62,7 @@
         <p>Active Nodes: <span id="env-count">--</span></p>
         <p>Atmosphere: <span id="env-weather">CLEAR</span></p>
         <p>Neural Time: <span id="env-time">--</span></p>
+        <p>Kernel: <span id="kernel-status">INIT</span></p>
     </div>
 
     <div id="selected-asset" class="hud-panel">
@@ -197,9 +198,17 @@
 
             renderer.setAnimationLoop(render);
 
-            // Clock
+            // Clock & Kernel Status
             setInterval(() => {
                 document.getElementById('env-time').innerText = new Date().toLocaleTimeString();
+
+                if (window.AdamOS) {
+                    const mode = window.AdamOS.mode === 'WASM_NATIVE' ? 'WASM (RUST)' : 'JS (FALLBACK)';
+                    const color = window.AdamOS.mode === 'WASM_NATIVE' ? '#00ffcc' : '#ff9900';
+                    const el = document.getElementById('kernel-status');
+                    el.innerText = mode;
+                    el.style.color = color;
+                }
             }, 1000);
         }
 
