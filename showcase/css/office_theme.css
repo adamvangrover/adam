@@ -1,31 +1,30 @@
 :root {
-    --bg-color: #004e98;
-    --taskbar-bg: rgba(22, 22, 22, 0.85);
-    --window-bg: #ffffff;
-    --window-border: #cccccc;
-    --title-bar-bg: #f0f0f0;
-    --title-bar-text: #333333;
-    --highlight-color: #0078d7;
-    --text-color: #000000;
+    --bg-color: #0b0c15;
+    --taskbar-bg: rgba(10, 15, 30, 0.85);
+    --window-bg: rgba(20, 25, 40, 0.95);
+    --window-border: #334466;
+    --title-bar-bg: #1a2035;
+    --title-bar-text: #00a8ff;
+    --highlight-color: #00e5ff;
+    --text-color: #e0e0e0;
     --icon-text-color: #ffffff;
-    --start-menu-bg: rgba(30, 30, 30, 0.95);
+    --start-menu-bg: rgba(15, 20, 35, 0.95);
 }
 
 body {
     margin: 0;
     padding: 0;
     overflow: hidden;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Segoe UI', 'Roboto', sans-serif;
     user-select: none;
     background-color: var(--bg-color);
-    /* Simple geometric wallpaper effect */
-    background-image: linear-gradient(135deg, #0060c0 25%, transparent 25%),
-                      linear-gradient(225deg, #0060c0 25%, transparent 25%),
-                      linear-gradient(45deg, #0060c0 25%, transparent 25%),
-                      linear-gradient(315deg, #0060c0 25%, transparent 25%);
-    background-position: 10px 0, 10px 0, 0 0, 0 0;
-    background-size: 20px 20px;
-    background-repeat: repeat;
+    /* Cyberpunk Grid Background */
+    background-image:
+        linear-gradient(rgba(0, 255, 255, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 255, 255, 0.05) 1px, transparent 1px),
+        radial-gradient(circle at 50% 50%, rgba(0, 100, 255, 0.2) 0%, transparent 80%);
+    background-size: 40px 40px, 40px 40px, 100% 100%;
+    background-position: center;
 }
 
 #desktop {
@@ -54,13 +53,15 @@ body {
 }
 
 .desktop-icon:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.2);
+    background-color: rgba(0, 229, 255, 0.1);
+    border: 1px solid rgba(0, 229, 255, 0.3);
+    box-shadow: 0 0 10px rgba(0, 229, 255, 0.2);
 }
 
 .desktop-icon.selected {
-    background-color: rgba(255, 255, 255, 0.2);
-    border-color: rgba(255, 255, 255, 0.4);
+    background-color: rgba(0, 229, 255, 0.2);
+    border: 1px solid rgba(0, 229, 255, 0.6);
+    box-shadow: 0 0 15px rgba(0, 229, 255, 0.4);
 }
 
 .desktop-icon img {
@@ -232,14 +233,21 @@ body {
     position: absolute;
     background-color: var(--window-bg);
     border: 1px solid var(--window-border);
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5), 0 0 5px rgba(0, 229, 255, 0.1);
     display: flex;
     flex-direction: column;
-    border-radius: 6px;
+    border-radius: 4px;
     overflow: hidden;
     min-width: 200px;
     min-height: 100px;
-    resize: both; /* Allow CSS resizing as fallback/enhancement */
+    backdrop-filter: blur(10px);
+    resize: both;
+    transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+.window.active-window {
+    border-color: var(--highlight-color);
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.6), 0 0 10px rgba(0, 229, 255, 0.3);
 }
 
 .window.minimized {
@@ -262,7 +270,7 @@ body {
     justify-content: space-between;
     padding: 0 10px;
     user-select: none;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid #334466;
 }
 
 .title-bar-title {
@@ -309,7 +317,8 @@ body {
     flex-grow: 1;
     overflow: auto;
     position: relative;
-    background-color: #fff;
+    background-color: transparent;
+    color: var(--text-color);
 }
 
 /* File Explorer App */
