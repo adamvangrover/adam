@@ -256,5 +256,103 @@ class LiveMockEngine:
             "stability_delta": impact
         }
 
+    def generate_credit_memo(self, ticker, name="Unknown", sector="Unknown"):
+        """
+        Generates a high-fidelity synthetic credit memo for simulation/fallback modes.
+        Uses deterministic randomness based on the ticker to ensure stable results.
+        """
+        # Seed based on ticker to make it deterministic per entity
+        seed = sum(ord(c) for c in ticker) if ticker else 0
+        rng = random.Random(seed)
+
+        revenue = rng.randint(10000, 500000)
+        ebitda_margin = rng.uniform(0.10, 0.40)
+        ebitda = revenue * ebitda_margin
+        leverage = rng.uniform(1.5, 5.5)
+        total_debt = ebitda * leverage
+        interest_coverage = rng.uniform(2.0, 8.0)
+
+        # Generate Synthetic Risk Factors
+        risks = [
+            "Supply chain concentration in APAC region.",
+            "Regulatory headwinds regarding data privacy.",
+            "Inflationary pressure on input costs.",
+            "Rising interest rate environment impacting refinancing.",
+            "Geopolitical instability in key markets."
+        ]
+        selected_risks = rng.sample(risks, 3)
+
+        # Generate Markdown Memo
+        recommendation = "APPROVE" if leverage < 3.5 else "WATCH"
+        if leverage > 5.0: recommendation = "DECLINE"
+
+        memo = f"""# Credit Memo: {name} ({ticker})
+
+## Executive Summary
+{name} operates in the {sector} sector. This automated assessment ({recommendation}) reflects a leverage profile of {leverage:.2f}x and strong EBITDA margins of {ebitda_margin*100:.1f}%.
+
+## Financial Overview (Simulated)
+*   **Revenue:** ${revenue:,.0f} MM
+*   **EBITDA:** ${ebitda:,.0f} MM
+*   **Total Debt:** ${total_debt:,.0f} MM
+*   **Net Leverage:** {leverage:.2f}x
+*   **Interest Coverage:** {interest_coverage:.2f}x
+
+## Key Risk Factors
+{chr(10).join([f'*   {r}' for r in selected_risks])}
+
+## System Conclusion
+The system recommends **{recommendation}** based on the current credit cycle and simulated stress tests.
+"""
+
+        return {
+            "status": "success",
+            "mode": "simulation_fallback",
+            "data": {
+                "financials": {
+                    "revenue": revenue,
+                    "ebitda": ebitda,
+                    "total_debt": total_debt,
+                    "leverage": leverage
+                },
+                "risks": selected_risks
+            },
+            "memo": memo
+        }
+
+    def generate_crisis_report(self, scenario_id="UNKNOWN", prompt=""):
+        """
+        Generates a synthetic Crisis Response for unauthenticated users (Virtual Pipeline).
+        """
+        scenario = scenario_id if scenario_id else "GENERIC_CRISIS"
+
+        # Determine sentiment/outcome based on scenario name
+        is_severe = "crash" in scenario.lower() or "cyber" in scenario.lower()
+
+        score = 15 if is_severe else 65
+        decision = "REVIEW" if is_severe else "MONITOR"
+
+        # Synthetic Analysis
+        analysis = [
+            {"asset": "SPY", "prompt": f"Scenario {scenario} Impact", "insight": "MACRO: Volatility expansion expected.", "score": score},
+            {"asset": "BTC", "prompt": f"Scenario {scenario} Impact", "insight": "CRYPTO: Risk-off correlation spike.", "score": score - 10},
+            {"asset": "GLD", "prompt": f"Scenario {scenario} Impact", "insight": "COMMODITIES: Safe haven inflow likely.", "score": score + 20}
+        ]
+
+        return {
+            "simulation_result": {
+                "score": score / 100.0,
+                "decision": decision,
+                "rationale": f"System Confidence: {score}%. Virtual Pipeline Simulation for scenario: {scenario}. Real-time engine access requires authentication."
+            },
+            "detailed_analysis": analysis,
+            "consensus_meta": {"divergence": 12.5, "label": "Simulated Consensus"},
+            "market_context": {"VIX": 25.4, "Liquidity": "Constrained"},
+            "contagion_log": ["Event Triggered", "Sector Correlation > 0.8", "Circuit Breakers Monitored"],
+            "fibo_matches": [{"term": "Crisis", "fibo_id": "fibo-sys-risk"}],
+            "mode": "simulation_fallback",
+            "fallback": True
+        }
+
 # Global singleton access
 live_engine = LiveMockEngine()

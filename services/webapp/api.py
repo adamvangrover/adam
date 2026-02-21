@@ -1,8 +1,8 @@
 from __future__ import annotations
 from flask import Flask, jsonify, request
-from flask_socketio import SocketIO, emit
+from flask_socketio import SocketIO, emit, disconnect
 from flask_sqlalchemy import SQLAlchemy
-from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, JWTManager, get_jwt_identity, get_jwt
+from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, JWTManager, get_jwt_identity, get_jwt, decode_token
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from werkzeug.exceptions import HTTPException
@@ -22,6 +22,7 @@ from .celery_app import celery
 from .governance import GovernanceMiddleware
 from services.webapp.blueprints.quantum_blueprint import quantum_bp
 from core.security.permission_manager import PermissionManager, Permission, Role
+from core.security.shield import InputShield
 
 # Import the Live Mock Engine for dynamic simulation data
 try:
@@ -406,16 +407,35 @@ def create_app(config_name='default'):
     # ---------------------------------------------------------------------------- #
 
     @app.route('/api/credit/generate', methods=['POST'])
-    @jwt_required(optional=True) # Optional for demo convenience, typically required
+    @jwt_required(optional=True) # Optional for demo convenience
+    @limiter.limit("5 per minute")
     def generate_credit_memo():
         """
         Triggers the Live Credit Pipeline for a given ticker.
-        If the pipeline fails, returns an error status allowing frontend fallback.
+        If the pipeline fails (or user is unauthenticated), returns a fallback status.
         """
+        # 🛡️ Sentinel: Adaptive Security - Block heavy compute for unauthenticated users
         data = request.get_json()
         ticker = data.get('ticker')
         name = data.get('name', 'Unknown')
         sector = data.get('sector', 'Technology')
+
+        current_user = get_jwt_identity()
+        if not current_user:
+            app.logger.info("Unauthenticated credit request. Returning simulation signal.")
+            # Use LiveMockEngine to generate a realistic fallback
+            if live_engine:
+                simulation_result = live_engine.generate_credit_memo(ticker, name, sector)
+                response = jsonify(simulation_result)
+                response.headers['X-Adam-Mode'] = 'Simulation'
+                return response
+            else:
+                return jsonify({
+                    "status": "simulation",
+                    "mode": "client_side_simulation",
+                    "message": "Authentication required for live pipeline. Switching to client-side simulation.",
+                    "fallback": True
+                })
 
         if not ticker:
             return jsonify({'error': 'Ticker required'}), 400
@@ -772,7 +792,7 @@ def create_app(config_name='default'):
             return jsonify({'status': 'Mock Result', 'analysis': 'Core not integrated or MetaOrchestrator not ready.'})
 
     @app.route('/api/v23/crisis_response', methods=['POST'])
-    @jwt_required()
+    @jwt_required(optional=True)
     def crisis_response():
         """
         Crisis Risk Response Module Endpoint.
@@ -782,6 +802,18 @@ def create_app(config_name='default'):
         prompt_text = request.form.get('prompt', '')
         scenario_id = request.form.get('scenario', None)
         file = request.files.get('file')
+
+        # 🛡️ Sentinel: Virtual Pipeline for Unauthenticated Users
+        current_user = get_jwt_identity()
+        if not current_user:
+            app.logger.info("Unauthenticated crisis response request. Switching to Virtual Pipeline.")
+            if live_engine:
+                simulation = live_engine.generate_crisis_report(scenario_id, prompt_text)
+                response = jsonify(simulation)
+                response.headers['X-Adam-Mode'] = 'Simulation'
+                return response
+            else:
+                return jsonify({'status': 'simulation', 'fallback': True})
 
         # 1. Parse Input
         extracted_text = prompt_text
@@ -1022,7 +1054,7 @@ def create_app(config_name='default'):
         password = data.get('password')
 
         # 🛡️ Sentinel: Validate username format
-        if not _validate_username(username):
+        if not InputShield.validate_username(username):
             return jsonify({
                 'error': 'Invalid username format. Must be 4-30 characters, alphanumeric, underscores, or hyphens.'
             }), 400
@@ -1145,8 +1177,38 @@ def create_app(config_name='default'):
     # ---------------------------------------------------------------------------- #
 
     @socketio.on('connect')
-    def test_connect():
-        emit('my response', {'data': 'Connected'})
+    def handle_connect(auth=None):
+        """
+        🛡️ Sentinel: Authenticated WebSocket Connection.
+        Expects auth token in 'token' query param or 'Authorization' header in handshake.
+        """
+        token = request.args.get('token')
+
+        # Also check socketio auth payload if available (client dependent)
+        if not token and auth:
+            token = auth.get('token')
+
+        if not token:
+            # Fallback check for Authorization header in request
+            auth_header = request.headers.get('Authorization')
+            if auth_header and auth_header.startswith('Bearer '):
+                token = auth_header.split(' ')[1]
+
+        if not token:
+            app.logger.warning(f"SocketIO connection rejected: No token from {request.remote_addr}")
+            disconnect()
+            return False
+
+        try:
+            # Verify token
+            decoded = decode_token(token)
+            user_id = decoded['sub']
+            # Optionally check against DB/Blocklist here
+            emit('connection_ack', {'data': f'Connected as {user_id}'})
+        except Exception as e:
+            app.logger.warning(f"SocketIO connection rejected: Invalid token ({e}) from {request.remote_addr}")
+            disconnect()
+            return False
 
     @socketio.on('test event')
     def handle_test_event(json):
@@ -1336,8 +1398,8 @@ def create_app(config_name='default'):
             return jsonify({'error': 'Missing name in request body'}), 400
 
         # 🛡️ Sentinel: Validate portfolio name
-        if not _validate_portfolio_name(data['name']):
-             return jsonify({'error': 'Invalid portfolio name. Must be 1-120 characters and contain no dangerous characters.'}), 400
+        if not InputShield.validate_portfolio_name(data['name']):
+             return jsonify({'error': 'Invalid portfolio name. Must be 1-64 characters and contain no dangerous characters.'}), 400
 
         current_user_id = get_jwt_identity()
         new_portfolio = Portfolio(name=data['name'], user_id=current_user_id)
@@ -1369,7 +1431,7 @@ def create_app(config_name='default'):
         portfolio = Portfolio.query.filter_by(id=id, user_id=current_user_id).first_or_404()
 
         # 🛡️ Sentinel: Validate portfolio name
-        if 'name' in data and not _validate_portfolio_name(data['name']):
+        if 'name' in data and not InputShield.validate_portfolio_name(data['name']):
              return jsonify({'error': 'Invalid portfolio name.'}), 400
 
         portfolio.name = data['name']
@@ -1393,7 +1455,7 @@ def create_app(config_name='default'):
         portfolio = Portfolio.query.filter_by(id=portfolio_id, user_id=current_user_id).first_or_404()
 
         # 🛡️ Sentinel: Validate input
-        if not _validate_asset_symbol(data.get('symbol')):
+        if not InputShield.validate_ticker(data.get('symbol')):
              return jsonify({'error': 'Invalid symbol.'}), 400
 
         try:
@@ -1427,7 +1489,7 @@ def create_app(config_name='default'):
 
         # 🛡️ Sentinel: Validate input
         if 'symbol' in data:
-            if not _validate_asset_symbol(data['symbol']):
+            if not InputShield.validate_ticker(data['symbol']):
                 return jsonify({'error': 'Invalid symbol.'}), 400
             asset.symbol = data['symbol']
 
