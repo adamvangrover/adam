@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MARKET MAYHEM: MULTIPLAYER</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/cyber_glitch.css">
+    <style>
+        body {
+            background-color: #050505;
+            color: #e0e0e0;
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+        }
+        .builder-container {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            height: 100vh;
+        }
+        .sidebar {
+            background: #0a0a0a;
+            border-right: 1px solid #333;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .main-stage {
+            background: #050505;
+            padding: 40px;
+            overflow-y: auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        label {
+            font-family: 'JetBrains Mono';
+            font-size: 0.75em;
+            color: #888;
+            text-transform: uppercase;
+        }
+        input, select, button {
+            background: #111;
+            border: 1px solid #333;
+            color: #fff;
+            padding: 10px;
+            font-family: 'JetBrains Mono';
+            font-size: 0.9em;
+            outline: none;
+        }
+        select:focus, input:focus { border-color: #00ff9d; }
+
+        button.primary {
+            background: #cc0000;
+            border: none;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        button.primary:hover { background: #ff0000; box-shadow: 0 0 10px #ff0000; }
+
+        button.blue-team {
+            background: #0044cc;
+        }
+        button.blue-team:hover { background: #0066ff; box-shadow: 0 0 10px #0066ff; }
+
+        .team-selector {
+            display: flex;
+            gap: 10px;
+        }
+        .team-btn {
+            flex: 1;
+            padding: 20px;
+            border: 1px solid #333;
+            cursor: pointer;
+            text-align: center;
+            opacity: 0.5;
+        }
+        .team-btn.selected {
+            opacity: 1;
+            border-color: #fff;
+        }
+        .team-red.selected { background: rgba(200, 0, 0, 0.2); border-color: #ff0000; }
+        .team-blue.selected { background: rgba(0, 0, 200, 0.2); border-color: #0088ff; }
+
+        #game-board {
+            width: 800px;
+            height: 600px;
+            background: #111;
+            border: 2px solid #333;
+            position: relative;
+            display: none; /* Hidden until game starts */
+        }
+
+        .chart-container {
+            height: 400px;
+            border-bottom: 1px solid #333;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .vix-line {
+            position: absolute;
+            left: 0;
+            height: 2px;
+            background: #00ff9d;
+            width: 100%;
+            top: 50%; /* Start at 50% */
+            transition: top 0.1s linear;
+        }
+
+        .team-stats {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px;
+        }
+        .stat-box {
+            text-align: center;
+        }
+        .stat-val { font-size: 2em; font-weight: bold; font-family: 'JetBrains Mono'; }
+
+        #lobby-message {
+            font-size: 1.5em;
+            color: #666;
+            font-family: 'JetBrains Mono';
+            text-align: center;
+        }
+
+        .log-feed {
+            height: 150px;
+            overflow-y: auto;
+            font-family: 'JetBrains Mono';
+            font-size: 0.8em;
+            padding: 10px;
+            background: #000;
+            border-top: 1px solid #333;
+            color: #00ff9d;
+        }
+        .log-entry { margin-bottom: 5px; }
+        .log-entry.red { color: #ff3333; }
+        .log-entry.blue { color: #0088ff; }
+
+    </style>
+</head>
+<body>
+
+    <div class="builder-container">
+        <!-- Controls -->
+        <aside class="sidebar">
+            <div style="margin-bottom: 20px;">
+                <h2 style="font-family:'JetBrains Mono'; color:#cc0000; margin:0;"><i class="fas fa-gamepad"></i> WAR ROOM</h2>
+                <div style="font-size:0.7em; color:#666;">MULTIPLAYER SIMULATION PROTOCOL</div>
+            </div>
+
+            <div id="login-panel">
+                <div class="control-group">
+                    <label>Operator Name</label>
+                    <input type="text" id="playerName" placeholder="Enter Callsign">
+                </div>
+
+                <div class="control-group">
+                    <label>Allegiance</label>
+                    <div class="team-selector">
+                        <div class="team-btn team-red" onclick="selectTeam('red')">
+                            <i class="fas fa-skull"></i><br>CHAOS<br>(Short)
+                        </div>
+                        <div class="team-btn team-blue" onclick="selectTeam('blue')">
+                            <i class="fas fa-shield-alt"></i><br>ORDER<br>(Long)
+                        </div>
+                    </div>
+                </div>
+
+                <button class="primary" id="btnJoin" style="margin-top: 20px; width: 100%;">INITIALIZE UPLINK</button>
+            </div>
+
+            <div id="game-controls" style="display:none;">
+                <div class="control-group">
+                    <label>Available Actions</label>
+                    <button class="primary" id="btnAction1" onclick="sendAction('attack')">SHORT LADDER ATTACK</button>
+                    <button class="blue-team" id="btnAction2" onclick="sendAction('defend')" style="display:none;">INJECT LIQUIDITY</button>
+                </div>
+                <div style="margin-top: 20px; font-size: 0.8em; color: #666;">
+                    COOLDOWN: <span id="cooldown">READY</span>
+                </div>
+            </div>
+
+            <div style="margin-top:auto; font-size:0.7em; color:#444; border-top:1px solid #222; padding-top:10px;">
+                SERVER STATUS: <span id="statusText" style="color:#666">OFFLINE</span>
+            </div>
+        </aside>
+
+        <!-- Stage -->
+        <main class="main-stage">
+            <div id="lobby-message">
+                AWAITING CONNECTION...<br>
+                <span style="font-size:0.6em; color:#444;">Select Team to Begin</span>
+            </div>
+
+            <div id="game-board">
+                <div style="padding: 10px; background: #222; border-bottom: 1px solid #444; display: flex; justify-content: space-between;">
+                    <span style="color: #ff3333; font-weight: bold;">TEAM CHAOS</span>
+                    <span style="color: #fff;">GLOBAL VIX: <span id="vix-val">20.00</span></span>
+                    <span style="color: #0088ff; font-weight: bold;">TEAM ORDER</span>
+                </div>
+
+                <div class="chart-container">
+                    <!-- Simple visualization of VIX level -->
+                    <div style="position: absolute; top: 10%; left: 10px; color: #666; font-size: 0.7em;">100 (CRASH)</div>
+                    <div style="position: absolute; bottom: 10%; left: 10px; color: #666; font-size: 0.7em;">0 (STAGNATION)</div>
+                    <div class="vix-line" id="vix-line"></div>
+                </div>
+
+                <div class="team-stats">
+                    <div class="stat-box">
+                        <div class="stat-val" style="color: #ff3333;" id="score-red">0</div>
+                        <div style="font-size: 0.7em; color: #888;">PNL (B)</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-val" style="color: #0088ff;" id="score-blue">0</div>
+                        <div style="font-size: 0.7em; color: #888;">STABILITY</div>
+                    </div>
+                </div>
+
+                <div class="log-feed" id="log-feed">
+                    <div class="log-entry">> System Initialized.</div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/mayhem_multiplayer.js"></script>
+    <script>
+        let selectedTeam = null;
+
+        function selectTeam(team) {
+            selectedTeam = team;
+            document.querySelectorAll('.team-btn').forEach(b => b.classList.remove('selected'));
+            document.querySelector(`.team-${team}`).classList.add('selected');
+        }
+    </script>
+</body>
+</html>

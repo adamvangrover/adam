@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE FIDUCIARY AVATAR</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f0f2f5;
+            color: #1c1e21;
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .phone-frame {
+            width: 375px;
+            height: 812px;
+            background: #fff;
+            border-radius: 40px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+            overflow: hidden;
+            position: relative;
+            border: 10px solid #111;
+        }
+        .notch {
+            position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+            width: 150px; height: 30px; background: #111;
+            border-bottom-left-radius: 20px; border-bottom-right-radius: 20px;
+            z-index: 10;
+        }
+        .app-header {
+            padding: 50px 20px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+        }
+        .avatar-container {
+            height: 300px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #f8f9fa;
+            position: relative;
+        }
+        .avatar {
+            font-size: 100px;
+            transition: all 0.5s ease;
+        }
+        .controls {
+            padding: 20px;
+        }
+        .slider-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            font-size: 0.8em;
+            color: #666;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        input[type="range"] {
+            width: 100%;
+        }
+        .intervention-toast {
+            position: absolute;
+            top: 60px;
+            left: 20px; right: 20px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 0.9em;
+            display: none;
+            animation: slideDown 0.3s ease;
+        }
+        @keyframes slideDown {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .status-pill {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            background: #e2e8f0;
+            font-size: 0.8em;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="phone-frame">
+        <div class="notch"></div>
+        <div class="app-header">
+            <h2 style="margin:0;">Fiduciary</h2>
+            <div class="status-pill" id="health-status">OPTIMAL</div>
+        </div>
+
+        <div class="avatar-container">
+            <div class="avatar" id="avatar-face">😎</div>
+            <div class="intervention-toast" id="toast">
+                Netflix subscription cancelled. You're welcome.
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="slider-group">
+                <label>Monthly Savings Rate (% of Income)</label>
+                <input type="range" id="savingsRange" min="0" max="50" value="20">
+                <span id="savingsVal">20%</span>
+            </div>
+
+            <div class="slider-group">
+                <label>Discretionary Spending ($)</label>
+                <input type="range" id="spendingRange" min="0" max="5000" value="1000">
+                <span id="spendingVal">$1000</span>
+            </div>
+
+            <div class="slider-group">
+                <label>Credit Card Debt ($)</label>
+                <input type="range" id="debtRange" min="0" max="20000" value="0">
+                <span id="debtVal">$0</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/fiduciary_avatar.js"></script>
+</body>
+</html>

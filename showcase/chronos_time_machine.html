@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PROJECT CHRONOS: TIME MACHINE</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #000;
+            color: #00ff9d;
+            font-family: 'JetBrains Mono', monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+        .container {
+            width: 800px;
+            border: 1px solid #333;
+            padding: 40px;
+            box-shadow: 0 0 50px rgba(0, 255, 157, 0.1);
+            position: relative;
+        }
+        h1 { margin-top: 0; border-bottom: 2px solid #333; padding-bottom: 20px; }
+        .clock-display {
+            font-size: 4em;
+            margin: 40px 0;
+            text-shadow: 0 0 20px #00ff9d;
+        }
+        .controls {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        input[type="date"] {
+            background: #111;
+            border: 1px solid #333;
+            color: #fff;
+            font-family: inherit;
+            padding: 10px;
+            font-size: 1.2em;
+        }
+        button {
+            background: #004433;
+            border: 1px solid #00ff9d;
+            color: #00ff9d;
+            padding: 10px 20px;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        button:hover {
+            background: #00ff9d;
+            color: #000;
+            box-shadow: 0 0 20px #00ff9d;
+        }
+        .newspaper {
+            background: #e0e0e0;
+            color: #111;
+            padding: 20px;
+            font-family: 'Times New Roman', serif;
+            transform: rotate(-1deg);
+            box-shadow: 5px 5px 10px rgba(0,0,0,0.5);
+            transition: all 0.5s;
+        }
+        .newspaper h2 {
+            font-size: 2.5em;
+            margin: 0 0 10px 0;
+            text-transform: uppercase;
+            border-bottom: 2px solid #111;
+        }
+        .butterfly-log {
+            margin-top: 20px;
+            font-size: 0.8em;
+            color: #888;
+            height: 100px;
+            overflow-y: auto;
+        }
+        .glitch {
+            animation: glitch 0.2s infinite;
+        }
+        @keyframes glitch {
+            0% { transform: translate(0) }
+            20% { transform: translate(-2px, 2px) }
+            40% { transform: translate(-2px, -2px) }
+            60% { transform: translate(2px, 2px) }
+            80% { transform: translate(2px, -2px) }
+            100% { transform: translate(0) }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>PROJECT CHRONOS // v30.0</h1>
+
+        <div class="clock-display" id="clock">2026-03-12</div>
+
+        <div class="controls">
+            <input type="date" id="dateInput" value="2026-03-12">
+            <button onclick="jumpToDate()">INITIATE JUMP</button>
+            <button onclick="leakRumor()" style="border-color: #ff3333; color: #ff3333;">LEAK REGULATORY RUMOR</button>
+        </div>
+
+        <div class="newspaper" id="newspaper">
+            <h2 id="headline">AI WINTER ARRIVES</h2>
+            <p id="subhead">Compute demand collapses as ROI fails to materialize. Nvidia falls 40%.</p>
+        </div>
+
+        <div class="butterfly-log" id="log">
+            > System Online. Timeline: PRIME.<br>
+        </div>
+    </div>
+
+    <script>
+        const headlines = {
+            "1929": { h: "WALL STREET CRASHES!", s: "Billions lost in panic selling." },
+            "2000": { h: "NASDAQ PEAKS", s: "Tech stocks reach dizzying heights." },
+            "2008": { h: "LEHMAN FILE FOR BANKRUPTCY", s: "Credit markets freeze globally." },
+            "2020": { h: "GLOBAL LOCKDOWN", s: "Markets plunge as virus spreads." },
+            "2024": { h: "AI MANIA CONTINUES", s: "Generative AI creates massive wealth." },
+            "2026": { h: "AI WINTER ARRIVES", s: "Compute demand collapses as ROI fails to materialize." },
+            "2030": { h: "CLIMATE ACCORD SIGNED", s: "Carbon tax implemented globally." }
+        };
+
+        const altHeadlines = {
+            "2008": { h: "LEHMAN BAILED OUT!", s: "Fed intervenes, crisis averted... for now." },
+            "2024": { h: "AI REGULATION ACT PASSES", s: "Compute capped at 100 Petaflops. Tech stocks crash." }
+        };
+
+        function jumpToDate() {
+            const date = document.getElementById('dateInput').value;
+            const year = date.split('-')[0];
+
+            document.getElementById('clock').innerText = date;
+
+            // Glitch effect
+            const paper = document.getElementById('newspaper');
+            paper.classList.add('glitch');
+            setTimeout(() => paper.classList.remove('glitch'), 500);
+
+            // Find closest headline
+            let bestYear = "2026";
+            let minDiff = 1000;
+            for (let y in headlines) {
+                if (Math.abs(y - year) < minDiff) {
+                    minDiff = Math.abs(y - year);
+                    bestYear = y;
+                }
+            }
+
+            const news = headlines[bestYear];
+            document.getElementById('headline').innerText = news.h;
+            document.getElementById('subhead').innerText = news.s;
+
+            log(`Jumped to ${date}. Timeline coherence: 100%.`);
+        }
+
+        function leakRumor() {
+            const date = document.getElementById('dateInput').value;
+            const year = date.split('-')[0];
+
+            if (altHeadlines[year]) {
+                const news = altHeadlines[year];
+                document.getElementById('headline').innerText = news.h;
+                document.getElementById('subhead').innerText = news.s;
+                document.getElementById('headline').style.color = "#cc0000";
+
+                log(`WARNING: BUTTERFLY EFFECT TRIGGERED. TIMELINE DIVERGENCE DETECTED.`);
+            } else {
+                log(`No divergent path available for this node.`);
+            }
+        }
+
+        function log(msg) {
+            const div = document.getElementById('log');
+            div.innerHTML += `> ${msg}<br>`;
+            div.scrollTop = div.scrollHeight;
+        }
+    </script>
+</body>
+</html>

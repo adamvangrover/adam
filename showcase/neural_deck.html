@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Singularity: The Neural Deck</title>
+    <style>
+        body { margin: 0; overflow: hidden; background-color: #000; color: white; font-family: 'Courier New', monospace; }
+        #info { position: absolute; top: 10px; width: 100%; text-align: center; pointer-events: none; z-index: 100; text-shadow: 0 0 10px #00ffcc; letter-spacing: 2px; }
+        #vr-button { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 100; }
+        .hud-panel { position: absolute; background: rgba(0, 10, 20, 0.90); border: 1px solid #00ffcc; padding: 15px; border-radius: 4px; pointer-events: none; box-shadow: 0 0 20px rgba(0, 255, 204, 0.2); transition: all 0.2s; }
+        #market-status { top: 60px; right: 20px; width: 250px; }
+        #selected-asset { top: 60px; left: 20px; width: 250px; display: none; }
+        #loading { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 24px; color: #00ffcc; text-shadow: 0 0 10px #00ffcc; animation: pulse 1s infinite; }
+
+        /* Lobby Overlay */
+        #lobby-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 200;
+            pointer-events: auto;
+        }
+        .lobby-content {
+            background: #001122;
+            border: 2px solid #00ffcc;
+            padding: 40px;
+            width: 600px;
+            color: #fff;
+            box-shadow: 0 0 50px #00ffcc;
+            text-align: center;
+        }
+        .lobby-content h2 { margin: 0 0 20px 0; color: #00ffcc; font-size: 2em; }
+        .lobby-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; text-align: left; margin-bottom: 20px; }
+        .stat-box { background: rgba(0,255,204,0.1); padding: 10px; border: 1px solid #004433; }
+        .stat-label { font-size: 0.8em; color: #888; }
+        .stat-val { font-size: 1.2em; font-weight: bold; }
+        button.close-btn {
+            background: transparent; border: 1px solid #ff3333; color: #ff3333; padding: 10px 20px; cursor: pointer; font-family: inherit; margin-top: 20px;
+        }
+        button.close-btn:hover { background: #ff3333; color: white; }
+
+        h3 { margin-top: 0; color: #00ffcc; border-bottom: 1px solid #004433; padding-bottom: 5px; font-size: 16px; text-transform: uppercase; }
+        p { font-size: 14px; margin: 5px 0; color: #aaffdd; }
+        span { color: #fff; font-weight: bold; }
+        @keyframes pulse { 0% { opacity: 0.5; } 100% { opacity: 1; } }
+    </style>
+</head>
+<body>
+    <div id="info">
+        <h1>PROJECT SINGULARITY: THE NEURAL DECK</h1>
+        <p>Spatial Financial Metaverse // v30.0 Prototype</p>
+    </div>
+
+    <div id="loading">INITIALIZING NEURAL LINK...</div>
+
+    <div id="market-status" class="hud-panel">
+        <h3>DATA CITY STATUS</h3>
+        <p>System Risk: <span id="env-risk">--</span></p>
+        <p>Active Nodes: <span id="env-count">--</span></p>
+        <p>Atmosphere: <span id="env-weather">CLEAR</span></p>
+        <p>Neural Time: <span id="env-time">--</span></p>
+    </div>
+
+    <div id="selected-asset" class="hud-panel">
+        <h3 id="asset-name">--</h3>
+        <p>Price: <span id="asset-price">--</span></p>
+        <p>Change: <span id="asset-change">--</span></p>
+        <p>Cap: <span id="asset-cap">--</span></p>
+        <p>Structure: <span id="asset-risk">--</span></p>
+        <p style="font-size:0.8em; color:#888;">Double-click to enter Lobby</p>
+    </div>
+
+    <div id="lobby-overlay">
+        <div class="lobby-content">
+            <h2 id="lobby-title">COMPANY LOBBY</h2>
+            <div class="lobby-stats">
+                <div class="stat-box">
+                    <div class="stat-label">Current Price</div>
+                    <div class="stat-val" id="lobby-price">--</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Sentiment Score</div>
+                    <div class="stat-val" id="lobby-sentiment">--</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Credit Integrity</div>
+                    <div class="stat-val" id="lobby-risk">--</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Real-time Option (Call)</div>
+                    <div class="stat-val" id="lobby-option">--</div>
+                    <div style="font-size:0.6em; color:#666;">Calc via AdamOS Kernel (WASM)</div>
+                </div>
+            </div>
+            <p id="lobby-desc">You are now inside the corporate data structure. The Concierge AI is currently offline.</p>
+            <button class="close-btn" onclick="document.getElementById('lobby-overlay').style.display='none'">EXIT LOBBY</button>
+        </div>
+    </div>
+
+    <!-- AdamOS Kernel Bridge -->
+    <script src="js/adamos_bridge.js"></script>
+
+    <!-- Three.js Import -->
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { VRButton } from 'three/addons/webxr/VRButton.js';
+
+        let camera, scene, renderer, controls;
+        let raycaster, pointer;
+        let INTERSECTED;
+        const buildings = [];
+        let marketData = [];
+
+        init();
+
+        async function init() {
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x000205);
+            scene.fog = new THREE.FogExp2(0x000205, 0.0015);
+
+            camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 2000);
+            camera.position.set(0, 150, 250);
+
+            // Lights
+            const ambientLight = new THREE.AmbientLight(0x222222);
+            scene.add(ambientLight);
+
+            const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            dirLight.position.set(50, 200, 100);
+            scene.add(dirLight);
+
+            // Cyberpunk Grid
+            const gridHelper = new THREE.GridHelper(2000, 100, 0x0044ff, 0x001122);
+            scene.add(gridHelper);
+
+            // Stars
+            const starGeo = new THREE.BufferGeometry();
+            const starCount = 1000;
+            const starPos = new Float32Array(starCount * 3);
+            for(let i=0; i<starCount*3; i++) {
+                starPos[i] = (Math.random() - 0.5) * 1000;
+                if (i % 3 === 1) starPos[i] = Math.abs(starPos[i]) + 50;
+            }
+            starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+            const starMat = new THREE.PointsMaterial({color: 0x00ffcc, size: 2, transparent: true, opacity: 0.6});
+            const stars = new THREE.Points(starGeo, starMat);
+            scene.add(stars);
+
+            // Fetch Data
+            try {
+                const response = await fetch('data/sp500_market_data.json');
+                marketData = await response.json();
+                document.getElementById('loading').style.display = 'none';
+                buildCity(marketData);
+            } catch (e) {
+                console.error("Failed to load data", e);
+                document.getElementById('loading').innerText = "DATA UPLINK FAILED: " + e.message;
+            }
+
+            // Renderer
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.xr.enabled = true;
+            document.body.appendChild(renderer.domElement);
+            document.body.appendChild(VRButton.createButton(renderer));
+
+            // Controls
+            controls = new OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.maxDistance = 800;
+            controls.autoRotate = true;
+            controls.autoRotateSpeed = 0.2;
+
+            // Interaction
+            raycaster = new THREE.Raycaster();
+            pointer = new THREE.Vector2();
+
+            window.addEventListener('resize', onWindowResize);
+            document.addEventListener('mousemove', onPointerMove);
+            document.addEventListener('dblclick', onDoubleClick);
+            document.addEventListener('mousedown', () => controls.autoRotate = false);
+
+            renderer.setAnimationLoop(render);
+
+            // Clock
+            setInterval(() => {
+                document.getElementById('env-time').innerText = new Date().toLocaleTimeString();
+            }, 1000);
+        }
+
+        function buildCity(data) {
+            let totalRisk = 0;
+            const displayData = data.slice(0, 500);
+            const size = Math.ceil(Math.sqrt(displayData.length));
+            const spacing = 20;
+            const offset = (size * spacing) / 2;
+
+            displayData.forEach((asset, i) => {
+                totalRisk += (asset.risk_score || 50);
+
+                // Height based on Market Cap
+                let capVal = parseFloat(asset.market_cap) || 1;
+                if (asset.market_cap && asset.market_cap.includes('T')) capVal *= 10;
+                const height = Math.max(10, Math.min(capVal * 10, 300));
+
+                // Color based on Sentiment/Change
+                let color = 0x888888;
+                let emissive = 0x000000;
+                if (asset.change_pct > 0) {
+                    color = 0x00ffcc; // Green
+                    emissive = 0x004433;
+                } else if (asset.change_pct < 0) {
+                    color = 0xff3333; // Red
+                    emissive = 0x440000;
+                }
+
+                // Opacity/Wireframe based on Risk (Structural Integrity)
+                let opacity = 0.9;
+                let wireframe = false;
+                if (asset.risk_score > 70) {
+                    wireframe = true; // Crumbling/Hollow
+                    opacity = 0.5;
+                }
+
+                const geometry = new THREE.BoxGeometry(10, height, 10);
+                const material = new THREE.MeshStandardMaterial({
+                    color: color,
+                    emissive: emissive,
+                    emissiveIntensity: 0.5,
+                    roughness: 0.2,
+                    metalness: 0.8,
+                    transparent: true,
+                    opacity: opacity,
+                    wireframe: wireframe
+                });
+
+                const building = new THREE.Mesh(geometry, material);
+
+                // Grid layout
+                const row = Math.floor(i / size);
+                const col = i % size;
+
+                building.position.x = (col * spacing) - offset;
+                building.position.z = (row * spacing) - offset;
+                building.position.y = height / 2;
+
+                building.userData = asset;
+                scene.add(building);
+                buildings.push(building);
+            });
+
+            // Update Environment HUD
+            const avgRisk = totalRisk / displayData.length;
+            document.getElementById('env-count').innerText = displayData.length;
+            document.getElementById('env-risk').innerText = avgRisk.toFixed(1);
+
+            if (avgRisk > 60) {
+                document.getElementById('env-weather').innerText = "STORM WARNING";
+                document.getElementById('env-weather').style.color = "#ff3333";
+                scene.fog.color.setHex(0x220505);
+            } else {
+                document.getElementById('env-weather').style.color = "#00ffcc";
+            }
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        function onPointerMove(event) {
+            pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
+            pointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
+        }
+
+        function onDoubleClick(event) {
+            raycaster.setFromCamera(pointer, camera);
+            const intersects = raycaster.intersectObjects(buildings);
+
+            if (intersects.length > 0) {
+                const object = intersects[0].object;
+                const data = object.userData;
+
+                // Fly In
+                // In a real app we would tween camera position.
+                // Here we just show the Lobby Overlay
+                showLobby(data);
+            }
+        }
+
+        function showLobby(data) {
+            document.getElementById('lobby-overlay').style.display = 'flex';
+            document.getElementById('lobby-title').innerText = (data.ticker || "UNKNOWN") + " LOBBY";
+            document.getElementById('lobby-price').innerText = "$" + (data.current_price || "0.00");
+            document.getElementById('lobby-sentiment').innerText = (data.sentiment_score || "50") + "/100";
+            document.getElementById('lobby-risk').innerText = (100 - (data.risk_score || 50)) + "%";
+
+            // Use AdamOS Kernel to calculate option price
+            // S=price, K=price*1.05 (OTM), T=0.25 (3 mo), r=0.05, sigma=0.3
+            const S = parseFloat(data.current_price) || 100;
+            const K = S * 1.05;
+            if (window.AdamOS) {
+                const price = window.AdamOS.calculateOptionPrice(S, K, 0.25, 0.05, 0.3, true);
+                document.getElementById('lobby-option').innerText = "$" + price.toFixed(2);
+            } else {
+                document.getElementById('lobby-option').innerText = "KERNEL ERROR";
+            }
+        }
+
+        function render() {
+            controls.update();
+
+            raycaster.setFromCamera(pointer, camera);
+            const intersects = raycaster.intersectObjects(buildings);
+
+            if (intersects.length > 0) {
+                if (INTERSECTED != intersects[0].object) {
+                    if (INTERSECTED) INTERSECTED.material.emissiveIntensity = 0.5;
+
+                    INTERSECTED = intersects[0].object;
+                    INTERSECTED.material.emissiveIntensity = 2.0;
+
+                    const d = INTERSECTED.userData;
+                    const hud = document.getElementById('selected-asset');
+                    hud.style.display = 'block';
+                    document.getElementById('asset-name').innerText = d.ticker || "UNKNOWN";
+                    document.getElementById('asset-price').innerText = '$' + (d.current_price || "0.00");
+                    document.getElementById('asset-change').innerText = (d.change_pct || 0) + '%';
+                    document.getElementById('asset-change').style.color = (d.change_pct >= 0) ? '#00ffcc' : '#ff3333';
+                    document.getElementById('asset-cap').innerText = d.market_cap || "--";
+                    document.getElementById('asset-risk').innerText = d.risk_score ? (d.risk_score > 70 ? "CRITICAL" : "STABLE") : "--";
+                }
+            } else {
+                if (INTERSECTED) INTERSECTED.material.emissiveIntensity = 0.5;
+                INTERSECTED = null;
+                document.getElementById('selected-asset').style.display = 'none';
+            }
+
+            renderer.render(scene, camera);
+        }
+    </script>
+</body>
+</html>
