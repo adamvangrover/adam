@@ -24,6 +24,8 @@ class FileSystem {
             console.log('FileSystem initialized with ' + Object.keys(this.index).length + ' files.');
         } catch (e) {
             console.error('Failed to load filesystem manifest:', e);
+            // Fallback for demo purposes if both fail
+            this.root = [];
             alert('Error loading filesystem. Please run scripts/generate_filesystem_manifest.py');
         }
     }
@@ -51,6 +53,62 @@ class FileSystem {
 
     stat(path) {
         return this.index[path] || null;
+    }
+
+    findFiles(extension) {
+        const results = [];
+        const traverse = (nodes) => {
+            nodes.forEach(node => {
+                if (node.type === 'file' && node.name.toLowerCase().endsWith(extension.toLowerCase())) {
+                    results.push(node);
+                } else if (node.type === 'directory' && node.children) {
+                    traverse(node.children);
+                }
+            });
+        };
+        traverse(this.root);
+        return results;
+    }
+}
+
+class ThemeManager {
+    constructor(os) {
+        this.os = os;
+        this.currentThemeId = 'cyberpunk'; // Default
+    }
+
+    init() {
+        const saved = localStorage.getItem('nexus_theme');
+        if (saved && window.THEME_LIBRARY && window.THEME_LIBRARY[saved]) {
+            this.applyTheme(saved);
+        } else {
+            // Apply default from library if available, else CSS fallback
+            if (window.THEME_LIBRARY) this.applyTheme('cyberpunk');
+        }
+    }
+
+    applyTheme(themeId) {
+        if (!window.THEME_LIBRARY || !window.THEME_LIBRARY[themeId]) {
+            console.error(`Theme ${themeId} not found.`);
+            return;
+        }
+
+        const theme = window.THEME_LIBRARY[themeId];
+        const root = document.documentElement;
+
+        for (const [key, value] of Object.entries(theme.variables)) {
+            root.style.setProperty(key, value);
+        }
+
+        this.currentThemeId = themeId;
+        localStorage.setItem('nexus_theme', themeId);
+        console.log(`Applied theme: ${theme.name}`);
+    }
+
+    exportTheme() {
+        if (!window.THEME_LIBRARY) return "{}";
+        const theme = window.THEME_LIBRARY[this.currentThemeId];
+        return JSON.stringify(theme, null, 2);
     }
 }
 
@@ -256,9 +314,71 @@ class AppRegistry {
             case 'Spreadsheet':
                 this.launchSpreadsheet(args);
                 break;
+            case 'Settings':
+                this.launchSettings(args);
+                break;
             default:
                 console.error('Unknown app:', appName);
         }
+    }
+
+    launchSettings(args) {
+        const winId = this.os.windowManager.createWindow({
+            title: 'System Settings',
+            icon: 'https://img.icons8.com/color/48/000000/settings.png',
+            width: 500,
+            height: 400,
+            app: 'Settings'
+        });
+
+        const container = document.createElement('div');
+        container.style.padding = '20px';
+        container.style.height = '100%';
+        container.style.color = 'var(--text-color)';
+
+        let content = `<h2>Theme Selection</h2><div style="display:flex; flex-direction:column; gap:10px; margin-bottom:20px;">`;
+
+        if (window.THEME_LIBRARY) {
+            Object.keys(window.THEME_LIBRARY).forEach(key => {
+                const theme = window.THEME_LIBRARY[key];
+                content += `
+                    <button class="cyber-btn theme-btn" data-theme="${key}" style="text-align:left; padding:10px; background:rgba(255,255,255,0.05); border:1px solid var(--window-border); color:var(--text-color); cursor:pointer;">
+                        <strong>${theme.name}</strong><br>
+                        <span style="font-size:11px; opacity:0.7;">${theme.description}</span>
+                    </button>
+                `;
+            });
+        } else {
+            content += `<p>Theme library not loaded.</p>`;
+        }
+
+        content += `</div>`;
+        content += `
+            <div style="border-top:1px solid var(--window-border); padding-top:15px;">
+                <h3>Theme Actions</h3>
+                <button id="export-theme-${winId}" class="cyber-btn" style="padding:8px 15px; background:var(--highlight-color); color:var(--bg-color); border:none; cursor:pointer;">Export Current Theme</button>
+            </div>
+        `;
+
+        container.innerHTML = content;
+        this.os.windowManager.setWindowContent(winId, container);
+
+        // Event Listeners
+        const themeBtns = container.querySelectorAll('.theme-btn');
+        themeBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const themeId = btn.getAttribute('data-theme');
+                this.os.themeManager.applyTheme(themeId);
+            });
+        });
+
+        const exportBtn = container.querySelector(`#export-theme-${winId}`);
+        exportBtn.addEventListener('click', () => {
+            const json = this.os.themeManager.exportTheme();
+            navigator.clipboard.writeText(json).then(() => {
+                alert('Theme JSON copied to clipboard!');
+            });
+        });
     }
 
     launchMarketMonitor(args) {
@@ -682,19 +802,120 @@ class AppRegistry {
             app: 'Notepad'
         });
 
-        const contentDiv = document.createElement('div');
-        contentDiv.className = 'text-viewer-content';
-        contentDiv.innerText = 'Loading...';
-        this.os.windowManager.setWindowContent(winId, contentDiv);
+        const container = document.createElement('div');
+        container.style.display = 'flex';
+        container.style.flexDirection = 'column';
+        container.style.height = '100%';
 
-        fetch(args.path)
-            .then(res => res.text())
-            .then(text => {
-                contentDiv.innerText = text;
-            })
-            .catch(err => {
-                contentDiv.innerText = 'Error loading file: ' + err;
+        const toolbar = document.createElement('div');
+        toolbar.style.padding = '5px';
+        toolbar.style.borderBottom = '1px solid #ddd';
+        toolbar.style.backgroundColor = '#f9f9f9';
+        toolbar.style.display = 'flex';
+        toolbar.style.gap = '5px';
+
+        const saveBtn = document.createElement('button');
+        saveBtn.innerText = 'Save';
+        saveBtn.className = 'cyber-btn';
+        saveBtn.style.padding = '2px 10px';
+        saveBtn.style.fontSize = '12px';
+
+        // Template Dropdown
+        const templateSelect = document.createElement('select');
+        templateSelect.style.padding = '2px';
+        templateSelect.style.fontSize = '12px';
+        templateSelect.innerHTML = '<option value="">Load Template...</option>';
+        if (window.TEMPLATE_LIBRARY) {
+            Object.keys(window.TEMPLATE_LIBRARY).forEach(key => {
+                templateSelect.innerHTML += `<option value="${key}">${window.TEMPLATE_LIBRARY[key].name}</option>`;
             });
+        }
+
+        // Prompt Dropdown
+        const promptSelect = document.createElement('select');
+        promptSelect.style.padding = '2px';
+        promptSelect.style.fontSize = '12px';
+        promptSelect.innerHTML = '<option value="">Insert Prompt...</option>';
+        if (window.PROMPT_LIBRARY) {
+            Object.keys(window.PROMPT_LIBRARY).forEach(key => {
+                promptSelect.innerHTML += `<option value="${key}">${window.PROMPT_LIBRARY[key].name}</option>`;
+            });
+        }
+
+        const status = document.createElement('span');
+        status.style.marginLeft = '10px';
+        status.style.fontSize = '11px';
+        status.style.color = '#888';
+        status.style.alignSelf = 'center';
+
+        toolbar.appendChild(saveBtn);
+        toolbar.appendChild(templateSelect);
+        toolbar.appendChild(promptSelect);
+        toolbar.appendChild(status);
+
+        const textarea = document.createElement('textarea');
+        textarea.style.flexGrow = '1';
+        textarea.style.width = '100%';
+        textarea.style.border = 'none';
+        textarea.style.padding = '10px';
+        textarea.style.resize = 'none';
+        textarea.style.fontFamily = 'Consolas, monospace';
+        textarea.style.fontSize = '14px';
+        textarea.style.outline = 'none';
+        textarea.value = 'Loading...';
+
+        container.appendChild(toolbar);
+        container.appendChild(textarea);
+
+        this.os.windowManager.setWindowContent(winId, container);
+
+        if(args.path) {
+            fetch(args.path)
+                .then(res => res.text())
+                .then(text => {
+                    textarea.value = text;
+                })
+                .catch(err => {
+                    textarea.value = 'Error loading file: ' + err;
+                });
+        } else {
+            textarea.value = args.content || '';
+        }
+
+        saveBtn.addEventListener('click', () => {
+            console.log(`Saving file ${args.name || 'Untitled'}:`, textarea.value);
+            status.innerText = 'Saved to console.';
+            setTimeout(() => status.innerText = '', 2000);
+
+            // Mock file system write
+            // In a real app, this would POST to a backend or update the FS object
+        });
+
+        templateSelect.addEventListener('change', () => {
+            const key = templateSelect.value;
+            if (key && window.TEMPLATE_LIBRARY[key]) {
+                if (confirm('Overwrite current content with template?')) {
+                    textarea.value = window.TEMPLATE_LIBRARY[key].content;
+                    // Simple placeholder replacement for Date
+                    textarea.value = textarea.value.replace('[Date]', new Date().toLocaleDateString());
+                }
+                templateSelect.value = ""; // Reset
+            }
+        });
+
+        promptSelect.addEventListener('change', () => {
+            const key = promptSelect.value;
+            if (key && window.PROMPT_LIBRARY[key]) {
+                const promptText = window.PROMPT_LIBRARY[key].text;
+                // Insert at cursor position
+                const startPos = textarea.selectionStart;
+                const endPos = textarea.selectionEnd;
+                textarea.value = textarea.value.substring(0, startPos)
+                    + promptText
+                    + textarea.value.substring(endPos, textarea.value.length);
+                promptSelect.value = ""; // Reset
+            }
+        });
     }
 
     launchImageViewer(args) {
@@ -736,13 +957,140 @@ class AppRegistry {
         const term = document.createElement('div');
         term.style.backgroundColor = 'black';
         term.style.color = '#0f0';
-        term.style.fontFamily = 'monospace';
+        term.style.fontFamily = 'Consolas, monospace';
         term.style.padding = '10px';
         term.style.height = '100%';
         term.style.overflowY = 'auto';
-        term.innerHTML = 'Microsoft Windows [Version 10.0.19045.3693]<br>(c) Microsoft Corporation. All rights reserved.<br><br>C:\\Users\\Admin>';
+        term.style.display = 'flex';
+        term.style.flexDirection = 'column';
+
+        const history = document.createElement('div');
+        history.innerHTML = 'AdamOS Kernel v25.0<br>Copyright (c) 2026 Omega Corp. All rights reserved.<br><br>';
+        term.appendChild(history);
+
+        const inputLine = document.createElement('div');
+        inputLine.style.display = 'flex';
+        inputLine.innerHTML = '<span style="margin-right: 5px;">user@nexus:~$</span>';
+
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.style.backgroundColor = 'transparent';
+        input.style.border = 'none';
+        input.style.color = '#0f0';
+        input.style.fontFamily = 'inherit';
+        input.style.flexGrow = '1';
+        input.style.outline = 'none';
+
+        inputLine.appendChild(input);
+        term.appendChild(inputLine);
 
         this.os.windowManager.setWindowContent(winId, term);
+        input.focus();
+
+        // Keep focus on click
+        term.addEventListener('click', () => input.focus());
+
+        let currentDir = './';
+
+        input.addEventListener('keydown', async (e) => {
+            if (e.key === 'Enter') {
+                const cmd = input.value.trim();
+                const line = document.createElement('div');
+                line.textContent = `user@nexus:~$ ${cmd}`;
+                history.appendChild(line);
+                input.value = '';
+
+                if (cmd) {
+                    const output = document.createElement('div');
+                    output.style.whiteSpace = 'pre-wrap';
+                    output.style.marginBottom = '10px';
+                    output.style.color = '#ccc';
+
+                    const args = cmd.split(' ');
+                    const command = args[0].toLowerCase();
+
+                    switch (command) {
+                        case 'help':
+                            output.textContent = 'Available commands: help, ls, clear, echo, cat, open, whoami, date';
+                            break;
+                        case 'clear':
+                            history.innerHTML = '';
+                            output.remove(); // Don't append empty output
+                            break;
+                        case 'ls':
+                            const files = this.os.fs.readDir(currentDir);
+                            if (files.length === 0) {
+                                output.textContent = '(empty)';
+                            } else {
+                                output.innerHTML = files.map(f => {
+                                    const color = f.type === 'directory' ? '#4e94ce' : '#fff';
+                                    return `<span style="color:${color}; margin-right: 15px;">${f.name}${f.type === 'directory' ? '/' : ''}</span>`;
+                                }).join('');
+                            }
+                            break;
+                        case 'echo':
+                            output.textContent = args.slice(1).join(' ');
+                            break;
+                        case 'whoami':
+                            output.textContent = 'Administrator (Level 10 Clearance)';
+                            break;
+                        case 'date':
+                            output.textContent = new Date().toString();
+                            break;
+                        case 'cat':
+                            if (args[1]) {
+                                const target = this.os.fs.index[args[1]] || this.os.fs.index['./' + args[1]];
+                                if (target && target.type === 'file') {
+                                    try {
+                                        // Adjust path for fetch if needed
+                                        let fetchPath = target.path;
+                                        if (fetchPath.startsWith('./')) {
+                                             fetchPath = '../' + fetchPath.substring(2);
+                                        }
+                                        const res = await fetch(fetchPath);
+                                        if (res.ok) {
+                                            output.textContent = await res.text();
+                                        } else {
+                                            output.style.color = 'red';
+                                            output.textContent = `Error reading file: ${res.status}`;
+                                        }
+                                    } catch (err) {
+                                        output.style.color = 'red';
+                                        output.textContent = `Error: ${err.message}`;
+                                    }
+                                } else {
+                                    output.style.color = 'red';
+                                    output.textContent = `File not found: ${args[1]}`;
+                                }
+                            } else {
+                                output.textContent = 'Usage: cat <filename>';
+                            }
+                            break;
+                        case 'open':
+                            if (args[1]) {
+                                const targetFile = this.os.fs.index[args[1]] || this.os.fs.index['./' + args[1]];
+                                if (targetFile) {
+                                    this.os.openFile(targetFile);
+                                    output.textContent = `Opening ${args[1]}...`;
+                                } else {
+                                    output.style.color = 'red';
+                                    output.textContent = `File not found: ${args[1]}`;
+                                }
+                            } else {
+                                output.textContent = 'Usage: open <filename>';
+                            }
+                            break;
+                        default:
+                            output.style.color = 'red';
+                            output.textContent = `Command not found: ${command}`;
+                    }
+                    if(command !== 'clear') history.appendChild(output);
+                }
+
+                // Scroll to bottom
+                term.scrollTop = term.scrollHeight;
+            }
+        });
     }
 }
 
@@ -751,6 +1099,7 @@ class OfficeOS {
         this.fs = new FileSystem();
         this.windowManager = new WindowManager(this);
         this.appRegistry = new AppRegistry(this);
+        this.themeManager = new ThemeManager(this);
         this.taskbarItems = {}; // WinID -> Element
     }
 
@@ -760,6 +1109,9 @@ class OfficeOS {
 
         // Initialize FS
         await this.fs.init();
+
+        // Initialize Theme
+        this.themeManager.init();
 
         // Setup UI
         this.setupTaskbar();
@@ -810,6 +1162,7 @@ class OfficeOS {
             { name: 'Market Monitor', icon: 'https://img.icons8.com/color/48/000000/line-chart.png', action: () => this.appRegistry.launch('MarketMonitor') },
             { name: 'Credit Sentinel', icon: 'https://img.icons8.com/color/48/000000/security-checked--v1.png', action: () => this.appRegistry.launch('CreditSentinel') },
             { name: 'Report Gen', icon: 'https://img.icons8.com/color/48/000000/print.png', action: () => this.appRegistry.launch('ReportGenerator') },
+            { name: 'Settings', icon: 'https://img.icons8.com/color/48/000000/settings.png', action: () => this.appRegistry.launch('Settings') },
             // Add shortcut to specific dashboards
             { name: 'Mission Ctrl', icon: 'https://img.icons8.com/color/48/000000/monitor.png', action: () => this.appRegistry.launch('Browser', {url:'mission_control.html', name:'Mission Control'}) },
             { name: 'Archive', icon: 'https://img.icons8.com/color/48/000000/archive.png', action: () => this.appRegistry.launch('Browser', {url:'market_mayhem_archive.html', name:'Archive'}) },
@@ -832,18 +1185,48 @@ class OfficeOS {
 
     setupDesktop() {
         const desktop = document.getElementById('desktop');
+        desktop.innerHTML = ''; // Clear existing
+
         const icons = [
             { name: 'My Computer', icon: 'https://img.icons8.com/color/48/000000/workstation.png', action: () => this.appRegistry.launch('Explorer', {path: './'}) },
             { name: 'Market Monitor', icon: 'https://img.icons8.com/color/48/000000/line-chart.png', action: () => this.appRegistry.launch('MarketMonitor') },
             { name: 'Credit Sentinel', icon: 'https://img.icons8.com/color/48/000000/security-checked--v1.png', action: () => this.appRegistry.launch('CreditSentinel') },
             { name: 'Report Generator', icon: 'https://img.icons8.com/color/48/000000/print.png', action: () => this.appRegistry.launch('ReportGenerator') },
-            { name: 'System Logs', icon: 'https://img.icons8.com/color/48/000000/txt.png', action: () => this.appRegistry.launch('Explorer', {path: './logs'}) },
-            { name: 'Showcase', icon: 'https://img.icons8.com/color/48/000000/presentation.png', action: () => this.appRegistry.launch('Explorer', {path: './showcase'}) },
-            { name: 'System Brain', icon: 'https://img.icons8.com/color/48/000000/brain--v1.png', action: () => this.appRegistry.launch('Browser', {url:'system_brain.html', name:'System Brain'}) },
-            { name: 'Unified DB', icon: 'https://img.icons8.com/color/48/000000/dashboard.png', action: () => this.appRegistry.launch('Browser', {url:'unified_dashboard.html', name:'Unified DB'}) },
-            { name: 'War Room', icon: 'https://img.icons8.com/color/48/000000/strategy-board.png', action: () => this.appRegistry.launch('Browser', {url:'war_room_v2.html', name:'War Room'}) },
-            { name: 'Q-Search', icon: 'https://img.icons8.com/color/48/000000/search--v1.png', action: () => this.appRegistry.launch('Browser', {url:'quantum_search.html', name:'Q-Search'}) }
         ];
+
+        // Dynamic App Discovery
+        const htmlFiles = this.fs.findFiles('.html');
+
+        // Priority Apps mapping
+        const appMap = {
+            'neural_deck.html': { name: 'Neural Deck', icon: 'https://img.icons8.com/color/48/000000/augmented-reality.png' },
+            'holodeck.html': { name: 'Holodeck', icon: 'https://img.icons8.com/color/48/000000/virtual-reality.png' },
+            'war_room_v2.html': { name: 'War Room', icon: 'https://img.icons8.com/color/48/000000/strategy-board.png' },
+            'mission_control.html': { name: 'Mission Ctrl', icon: 'https://img.icons8.com/color/48/000000/monitor.png' },
+            'sovereign_dashboard.html': { name: 'Sovereign DB', icon: 'https://img.icons8.com/color/48/000000/museum.png' },
+            'quantum_search.html': { name: 'Q-Search', icon: 'https://img.icons8.com/color/48/000000/search--v1.png' },
+            'system_brain.html': { name: 'System Brain', icon: 'https://img.icons8.com/color/48/000000/brain--v1.png' },
+            'unified_dashboard.html': { name: 'Unified DB', icon: 'https://img.icons8.com/color/48/000000/dashboard.png' },
+            'nexus_explorer.html': { name: 'Nexus Explorer', icon: 'https://img.icons8.com/color/48/000000/galaxy.png' }
+        };
+
+        htmlFiles.forEach(file => {
+            if(appMap[file.name]) {
+                const config = appMap[file.name];
+                let path = file.path;
+                if (path.startsWith('./')) {
+                    path = '../' + path.substring(2);
+                }
+                icons.push({
+                    name: config.name,
+                    icon: config.icon,
+                    action: () => this.appRegistry.launch('Browser', {url: path, name: config.name})
+                });
+            }
+        });
+
+        // Add System logs folder
+        icons.push({ name: 'System Logs', icon: 'https://img.icons8.com/color/48/000000/txt.png', action: () => this.appRegistry.launch('Explorer', {path: './logs'}) });
 
         icons.forEach(icon => {
             const el = document.createElement('div');
