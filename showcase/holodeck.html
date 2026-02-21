@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project OMEGA: The Holodeck</title>
+    <style>
+        body { margin: 0; overflow: hidden; background-color: #000; color: white; font-family: monospace; }
+        #info { position: absolute; top: 10px; width: 100%; text-align: center; pointer-events: none; z-index: 100; text-shadow: 0 0 10px #00ffcc; }
+        #vr-button { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 100; }
+        .hud-panel { position: absolute; background: rgba(0, 10, 20, 0.8); border: 1px solid #00ffcc; padding: 15px; border-radius: 5px; pointer-events: none; box-shadow: 0 0 15px rgba(0, 255, 204, 0.2); }
+        #market-status { top: 50px; right: 20px; width: 220px; }
+        #selected-asset { top: 50px; left: 20px; width: 220px; display: none; }
+        #loading { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 24px; color: #00ffcc; }
+        h3 { margin-top: 0; color: #00ffcc; border-bottom: 1px solid #333; padding-bottom: 5px; }
+    </style>
+</head>
+<body>
+    <div id="info">
+        <h1>PROJECT OMEGA: THE HOLODECK</h1>
+        <p>Live S&P 500 Spatial Visualization</p>
+    </div>
+
+    <div id="loading">INITIALIZING HOLODECK...</div>
+
+    <div id="market-status" class="hud-panel">
+        <h3>ENVIRONMENT</h3>
+        <p>System Risk: <span id="env-risk">--</span></p>
+        <p>Active Tickers: <span id="env-count">--</span></p>
+        <p>Weather: <span id="env-weather">CLEAR</span></p>
+    </div>
+
+    <div id="selected-asset" class="hud-panel">
+        <h3 id="asset-name">--</h3>
+        <p>Price: <span id="asset-price">--</span></p>
+        <p>Change: <span id="asset-change">--</span></p>
+        <p>Cap: <span id="asset-cap">--</span></p>
+        <p>Risk Score: <span id="asset-risk">--</span></p>
+    </div>
+
+    <!-- Three.js Import -->
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { VRButton } from 'three/addons/webxr/VRButton.js';
+
+        let camera, scene, renderer, controls;
+        let raycaster, pointer;
+        let INTERSECTED;
+        const buildings = [];
+        let marketData = [];
+
+        init();
+
+        async function init() {
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x000510);
+            scene.fog = new THREE.FogExp2(0x000510, 0.002);
+
+            camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 2000);
+            camera.position.set(0, 100, 200);
+
+            // Lights
+            const ambientLight = new THREE.AmbientLight(0x404040);
+            scene.add(ambientLight);
+
+            const dirLight = new THREE.DirectionalLight(0xffffff, 1);
+            dirLight.position.set(50, 100, 50);
+            scene.add(dirLight);
+
+            // Grid
+            const gridHelper = new THREE.GridHelper(1000, 100, 0x0044ff, 0x001133);
+            scene.add(gridHelper);
+
+            // Fetch Data
+            try {
+                const response = await fetch('data/sp500_market_data.json');
+                marketData = await response.json();
+                document.getElementById('loading').style.display = 'none';
+                buildCity(marketData);
+            } catch (e) {
+                console.error("Failed to load data", e);
+                document.getElementById('loading').innerText = "DATA UPLINK FAILED";
+            }
+
+            // Renderer
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.xr.enabled = true;
+            document.body.appendChild(renderer.domElement);
+            document.body.appendChild(VRButton.createButton(renderer));
+
+            // Controls
+            controls = new OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.maxDistance = 500;
+
+            // Interaction
+            raycaster = new THREE.Raycaster();
+            pointer = new THREE.Vector2();
+
+            window.addEventListener('resize', onWindowResize);
+            document.addEventListener('mousemove', onPointerMove);
+
+            renderer.setAnimationLoop(render);
+        }
+
+        function buildCity(data) {
+            let totalRisk = 0;
+            const size = Math.ceil(Math.sqrt(data.length));
+            const spacing = 15;
+            const offset = (size * spacing) / 2;
+
+            data.forEach((asset, i) => {
+                totalRisk += (asset.risk_score || 50);
+
+                // Parse Market Cap (e.g. "2.8T")
+                let capVal = parseFloat(asset.market_cap) || 1;
+                if (asset.market_cap.includes('T')) capVal *= 10;
+
+                const height = Math.max(5, capVal * 5); // Scale height
+                const color = asset.change_pct >= 0 ? 0x00ffcc : 0xff3333; // Green/Red
+
+                const geometry = new THREE.BoxGeometry(8, height, 8);
+                const material = new THREE.MeshPhongMaterial({
+                    color: color,
+                    transparent: true,
+                    opacity: 0.8,
+                    shininess: 100
+                });
+
+                const building = new THREE.Mesh(geometry, material);
+
+                // Grid layout
+                const row = Math.floor(i / size);
+                const col = i % size;
+
+                building.position.x = (col * spacing) - offset;
+                building.position.z = (row * spacing) - offset;
+                building.position.y = height / 2;
+
+                building.userData = asset;
+                scene.add(building);
+                buildings.push(building);
+            });
+
+            // Update Environment HUD
+            const avgRisk = totalRisk / data.length;
+            document.getElementById('env-count').innerText = data.length;
+            document.getElementById('env-risk').innerText = avgRisk.toFixed(1);
+
+            if (avgRisk > 80) {
+                document.getElementById('env-weather').innerText = "HURRICANE";
+                document.getElementById('env-weather').style.color = "red";
+                scene.fog.color.setHex(0x330000); // Red fog
+                scene.background.setHex(0x220000);
+            } else {
+                document.getElementById('env-weather').style.color = "#00ffcc";
+            }
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        function onPointerMove(event) {
+            pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
+            pointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
+        }
+
+        function render() {
+            controls.update();
+
+            raycaster.setFromCamera(pointer, camera);
+            const intersects = raycaster.intersectObjects(buildings);
+
+            if (intersects.length > 0) {
+                if (INTERSECTED != intersects[0].object) {
+                    if (INTERSECTED) INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex);
+
+                    INTERSECTED = intersects[0].object;
+                    INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
+                    INTERSECTED.material.emissive.setHex(0xffffff);
+
+                    // Update HUD
+                    const d = INTERSECTED.userData;
+                    const hud = document.getElementById('selected-asset');
+                    hud.style.display = 'block';
+                    document.getElementById('asset-name').innerText = d.ticker;
+                    document.getElementById('asset-price').innerText = '$' + d.current_price;
+                    document.getElementById('asset-change').innerText = d.change_pct + '%';
+                    document.getElementById('asset-change').style.color = d.change_pct >= 0 ? '#00ffcc' : '#ff3333';
+                    document.getElementById('asset-cap').innerText = d.market_cap;
+                    document.getElementById('asset-risk').innerText = d.risk_score;
+                }
+            } else {
+                if (INTERSECTED) INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex);
+                INTERSECTED = null;
+                document.getElementById('selected-asset').style.display = 'none';
+            }
+
+            renderer.render(scene, camera);
+        }
+    </script>
+</body>
+</html>
