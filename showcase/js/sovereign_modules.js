@@ -53,9 +53,12 @@ class SovereignModules {
         `;
 
         panel.innerHTML = `
-            <div class="panel-header" style="background: rgba(255, 0, 255, 0.1); border-bottom: 1px solid #555;">
-                <h3 style="color: #ff00ff;"><i class="fas fa-comments"></i> SYSTEM 2 DEBATE: BULL vs BEAR</h3>
-                <span class="badge" style="background: #ff00ff; color: #000;">ACTIVE</span>
+            <div class="panel-header" style="background: rgba(255, 0, 255, 0.1); border-bottom: 1px solid #555; display:flex; justify-content:space-between; align-items:center; padding-right:10px;">
+                <h3 style="color: #ff00ff; margin:0;"><i class="fas fa-comments"></i> SYSTEM 2 DEBATE: BULL vs BEAR</h3>
+                <div style="font-size:0.7em; font-family:'JetBrains Mono';">
+                    <span style="color:#aaa;">GEOPOLITICAL RISK:</span>
+                    <span id="geo-risk-badge" style="color:#ff0055; font-weight:bold;">CALCULATING...</span>
+                </div>
             </div>
             <div class="panel-content" style="display: flex; gap: 20px; overflow: hidden; height: 100%;">
                 <div style="flex: 1; border-right: 1px dashed #333; padding-right: 10px;">
@@ -82,7 +85,67 @@ class SovereignModules {
         bullDiv.innerHTML = '';
         bearDiv.innerHTML = '';
 
+        // Update Geo Risk Badge based on ticker
+        const riskBadge = document.getElementById('geo-risk-badge');
+        if (riskBadge) {
+            const riskMap = {
+                "AAPL": "HIGH (China)", "TSLA": "MED (China)", "NVDA": "CRITICAL (Export)",
+                "MSFT": "LOW", "AMZN": "LOW", "GOOGL": "MED (EU Regs)", "META": "MED (EU Regs)"
+            };
+            const risk = riskMap[ticker] || "LOW";
+            riskBadge.innerText = risk;
+            riskBadge.style.color = risk.includes("HIGH") || risk.includes("CRITICAL") ? "#ff0000" : (risk.includes("MED") ? "#f59e0b" : "#00ff9d");
+        }
+
         const INSIGHTS = {
+            "AMZN": {
+                bull: [
+                    "AWS re-acceleration is confirmed by backlog growth.",
+                    "Retail margins are expanding due to regional fulfillment model.",
+                    "Advertising business is a $50B high-margin juggernaut.",
+                    "Prime Video ads provide new free cash flow stream.",
+                    "Kuiper satellite internet adds long-term optionality."
+                ],
+                bear: [
+                    "Cloud competition from Azure is eroding market share.",
+                    "FTC antitrust lawsuit threatens to break up the company.",
+                    "Consumer spending slowdown impacts e-commerce volume.",
+                    "GenAI capex is skyrocketing without clear ROI yet.",
+                    "International retail segment remains structurally low margin."
+                ]
+            },
+            "GOOGL": {
+                bull: [
+                    "Search dominance remains intact despite GenAI fears.",
+                    "YouTube Shorts monetization is ramping up effectively.",
+                    "Gemini Ultra is closing the gap with GPT-4.",
+                    "Waymo is the only scalable autonomous driving leader.",
+                    "Valuation is the most attractive of the Mag 7."
+                ],
+                bear: [
+                    "Perplexity and ChatGPT are stealing navigational search queries.",
+                    "DOJ trial outcome could force divestiture of Ad Manager.",
+                    "Search Generative Experience (SGE) cannibalizes ad inventory.",
+                    "Cloud unit is a distant third behind AWS and Azure.",
+                    "Cultural inertia is slowing down AI product velocity."
+                ]
+            },
+            "META": {
+                bull: [
+                    "Llama 3 is the standard for open-source AI, creating ecosystem lock-in.",
+                    "Reels monetization has reached parity with Feed.",
+                    "Advantage+ AI tools are driving massive ROAS for advertisers.",
+                    "Cost discipline 'Year of Efficiency' has permanently improved margins.",
+                    "WhatsApp monetization is finally unlocking."
+                ],
+                bear: [
+                    "Reality Labs burn rate of $15B/year is value destructive.",
+                    "TikTok remains a formidable competitor for time share.",
+                    "Regulatory scrutiny on child safety is intensifying globally.",
+                    "Apple's privacy changes have permanently impaired targeting signal.",
+                    "Mark Zuckerberg's voting control ignores shareholder wishes."
+                ]
+            },
             "AAPL": {
                 bull: [
                     "Services revenue is compounding at 14% annually.",
@@ -236,6 +299,15 @@ class SovereignModules {
 
         const ctx = canvas.getContext('2d');
 
+        // Mouse interaction
+        let mouseX = -1000;
+        let mouseY = -1000;
+        canvas.addEventListener('mousemove', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            mouseX = e.clientX - rect.left;
+            mouseY = e.clientY - rect.top;
+        });
+
         // Draw Animation Loop
         const particles = [];
         for(let j=0; j<20; j++) {
@@ -263,6 +335,18 @@ class SovereignModules {
             particles.forEach(p => {
                 p.x += p.vx;
                 p.y += p.vy;
+
+                // Mouse Repel/Attract
+                const dx = p.x - mouseX;
+                const dy = p.y - mouseY;
+                const dist = Math.sqrt(dx*dx + dy*dy);
+                if (dist < 100) {
+                    const angle = Math.atan2(dy, dx);
+                    const force = (100 - dist) / 100;
+                    // Repel
+                    p.vx += Math.cos(angle) * force * 0.5;
+                    p.vy += Math.sin(angle) * force * 0.5;
+                }
 
                 // Bounce
                 if(p.x < 0 || p.x > canvas.width) p.vx *= -1;

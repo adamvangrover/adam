@@ -7,9 +7,16 @@
 
 document.addEventListener('DOMContentLoaded', () => {
     const btn = document.getElementById('btnGenerate');
+    const btnDownload = document.getElementById('btnDownload');
     const status = document.getElementById('statusText');
     const paper = document.getElementById('paper');
     const content = document.getElementById('contentArea');
+
+    if(btnDownload) {
+        btnDownload.addEventListener('click', () => {
+            window.print();
+        });
+    }
 
     const SCENARIOS = {
         "1929": {
@@ -22,6 +29,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 "Bankers attempted to stem the tide, but the wave of selling was too powerful. This is not just a correction; it is a fundamental breakage of the financial machine. {TARGET} shares plummeted 40% in early trading, a bellwether for the carnage."
             ]
         },
+        "1973": {
+            title: "OIL SHOCK",
+            subhead: "OPEC embargo strangles global growth. Stagflation nightmare begins.",
+            date: "OCTOBER 17, 1973",
+            body: [
+                "The era of cheap energy is over. As OPEC turns off the taps, Western economies are plunging into darkness—literally and metaphorically. Gas lines stretch for miles, and industrial output is grinding to a halt.",
+                "Inflation is soaring while growth collapses, birthing the dreaded 'stagflation' beast. {TARGET} shares are down 25% as input costs skyrocket.",
+                "The geopolitical order has been upended. The market is pricing in a decade of misery as the petrodollar recycling mechanism strains under the pressure."
+            ]
+        },
         "1987": {
             title: "BLACK MONDAY",
             subhead: "Dow plunges 22.6% in single session. Program trading blamed for cascade.",
@@ -30,6 +47,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 "The screens turned red and never looked back. In a display of volatility never before seen, the Dow Jones Industrial Average shed nearly a quarter of its value in six and a half hours.",
                 "Portfolio insurance, designed to protect capital, instead acted as an accelerant, triggering automatic sell orders that overwhelmed buyers. The market mechanism itself failed. {TARGET}, previously a stalwart, saw no bids for forty-five minutes.",
                 "Traders on the floor described a scene of absolute pandemonium. 'It was a free fall,' said one specialist. 'There were no bids. The market just disappeared.'"
+            ]
+        },
+        "1997": {
+            title: "ASIAN CONTAGION",
+            subhead: "Thai Baht collapse triggers emerging market domino effect.",
+            date: "JULY 2, 1997",
+            body: [
+                "The Asian Tigers have lost their roar. What began as a currency devaluation in Thailand has metastasized into a regional financial meltdown, threatening global stability.",
+                "Currencies are cratering from Jakarta to Seoul. The IMF is preparing massive bailouts, but the damage to {TARGET} exposure in the region is severe.",
+                "Capital flight is rampant. The 'economic miracle' was fueled by hot money and dollar-denominated debt. Now, the bill is due."
             ]
         },
         "2000": {
@@ -70,6 +97,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 "The exponential curve has broken. After years of trillion-dollar capex spend, the ROI on Generative AI has failed to materialize, triggering a massive repricing of the tech sector.",
                 "Data centers are sitting idle. The 'infinite demand' narrative for compute was a hallucination. As the hyperscalers cut guidance, the entire semiconductor supply chain is imploding. {TARGET} announced a 30% reduction in capex, sending shockwaves through the supply chain.",
                 "It is the Dot Com bust with bigger numbers. The market built a Ferrari engine for a go-kart economy. Now, the bill has come due."
+            ]
+        },
+        "2030": {
+            title: "THE CLIMATE CRASH",
+            subhead: "Insurance markets fail as 'uninsurable' zones expand globally.",
+            date: "SEPTEMBER 21, 2030",
+            body: [
+                "The physical risk has become financial risk. Major insurers have pulled out of Florida, California, and Southeast Asia, triggering a real estate collapse of biblical proportions.",
+                "Mortgage-backed securities are being repriced to zero. {TARGET} faces massive write-downs on stranded assets.",
+                "Central banks are powerless against physics. The 'carbon bubble' has finally popped, taking the global financial system with it."
             ]
         }
     };
