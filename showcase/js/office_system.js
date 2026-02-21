@@ -811,8 +811,11 @@ class OfficeOS {
             { name: 'Credit Sentinel', icon: 'https://img.icons8.com/color/48/000000/security-checked--v1.png', action: () => this.appRegistry.launch('CreditSentinel') },
             { name: 'Report Gen', icon: 'https://img.icons8.com/color/48/000000/print.png', action: () => this.appRegistry.launch('ReportGenerator') },
             // Add shortcut to specific dashboards
-            { name: 'Mission Ctrl', icon: 'https://img.icons8.com/color/48/000000/monitor.png', action: () => this.appRegistry.launch('Browser', {url:'showcase/mission_control.html', name:'Mission Control'}) },
-            { name: 'Archive', icon: 'https://img.icons8.com/color/48/000000/archive.png', action: () => this.appRegistry.launch('Browser', {url:'showcase/market_mayhem_archive.html', name:'Archive'}) }
+            { name: 'Mission Ctrl', icon: 'https://img.icons8.com/color/48/000000/monitor.png', action: () => this.appRegistry.launch('Browser', {url:'mission_control.html', name:'Mission Control'}) },
+            { name: 'Archive', icon: 'https://img.icons8.com/color/48/000000/archive.png', action: () => this.appRegistry.launch('Browser', {url:'market_mayhem_archive.html', name:'Archive'}) },
+            { name: 'Neural Deck', icon: 'https://img.icons8.com/color/48/000000/augmented-reality.png', action: () => this.appRegistry.launch('Browser', {url:'neural_deck.html', name:'Neural Deck'}) },
+            { name: 'Holodeck', icon: 'https://img.icons8.com/color/48/000000/virtual-reality.png', action: () => this.appRegistry.launch('Browser', {url:'holodeck.html', name:'Holodeck'}) },
+            { name: 'Sovereign', icon: 'https://img.icons8.com/color/48/000000/museum.png', action: () => this.appRegistry.launch('Browser', {url:'sovereign_dashboard.html', name:'Sovereign'}) }
         ];
 
         apps.forEach(app => {
@@ -835,7 +838,11 @@ class OfficeOS {
             { name: 'Credit Sentinel', icon: 'https://img.icons8.com/color/48/000000/security-checked--v1.png', action: () => this.appRegistry.launch('CreditSentinel') },
             { name: 'Report Generator', icon: 'https://img.icons8.com/color/48/000000/print.png', action: () => this.appRegistry.launch('ReportGenerator') },
             { name: 'System Logs', icon: 'https://img.icons8.com/color/48/000000/txt.png', action: () => this.appRegistry.launch('Explorer', {path: './logs'}) },
-            { name: 'Showcase', icon: 'https://img.icons8.com/color/48/000000/presentation.png', action: () => this.appRegistry.launch('Explorer', {path: './showcase'}) }
+            { name: 'Showcase', icon: 'https://img.icons8.com/color/48/000000/presentation.png', action: () => this.appRegistry.launch('Explorer', {path: './showcase'}) },
+            { name: 'System Brain', icon: 'https://img.icons8.com/color/48/000000/brain--v1.png', action: () => this.appRegistry.launch('Browser', {url:'system_brain.html', name:'System Brain'}) },
+            { name: 'Unified DB', icon: 'https://img.icons8.com/color/48/000000/dashboard.png', action: () => this.appRegistry.launch('Browser', {url:'unified_dashboard.html', name:'Unified DB'}) },
+            { name: 'War Room', icon: 'https://img.icons8.com/color/48/000000/strategy-board.png', action: () => this.appRegistry.launch('Browser', {url:'war_room_v2.html', name:'War Room'}) },
+            { name: 'Q-Search', icon: 'https://img.icons8.com/color/48/000000/search--v1.png', action: () => this.appRegistry.launch('Browser', {url:'quantum_search.html', name:'Q-Search'}) }
         ];
 
         icons.forEach(icon => {
@@ -883,22 +890,28 @@ class OfficeOS {
     }
 
     openFile(file) {
+        let path = file.path;
+        if (path.startsWith('./')) {
+            // Adjust for being in showcase/ subdirectory
+            path = '../' + path.substring(2);
+        }
+
         const ext = file.name.split('.').pop().toLowerCase();
         if (['html', 'htm'].includes(ext)) {
-            this.appRegistry.launch('Browser', { url: file.path, name: file.name });
+            this.appRegistry.launch('Browser', { url: path, name: file.name });
         } else if (['csv', 'xls', 'xlsx'].includes(ext)) {
-             this.appRegistry.launch('Spreadsheet', { path: file.path, name: file.name });
+             this.appRegistry.launch('Spreadsheet', { path: path, name: file.name });
         } else if (['txt', 'md', 'json', 'py', 'js', 'css', 'yaml', 'yml', 'xml', 'log'].includes(ext)) {
             // Check if json is meant for spreadsheet
             if(ext === 'json' && (file.name.includes('data') || file.name.includes('market'))) {
-                this.appRegistry.launch('Spreadsheet', { path: file.path, name: file.name });
+                this.appRegistry.launch('Spreadsheet', { path: path, name: file.name });
             } else {
-                this.appRegistry.launch('Notepad', { path: file.path, name: file.name });
+                this.appRegistry.launch('Notepad', { path: path, name: file.name });
             }
         } else if (['png', 'jpg', 'jpeg', 'gif', 'svg'].includes(ext)) {
-            this.appRegistry.launch('ImageViewer', { path: file.path, name: file.name });
+            this.appRegistry.launch('ImageViewer', { path: path, name: file.name });
         } else {
-            this.appRegistry.launch('Notepad', { path: file.path, name: file.name });
+            this.appRegistry.launch('Notepad', { path: path, name: file.name });
         }
     }
 }
