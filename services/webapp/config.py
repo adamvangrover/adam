@@ -39,6 +39,7 @@ class TestingConfig(Config):
     TESTING = True
     SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
     CORE_INTEGRATION = False
+    RATELIMIT_ENABLED = False
 
 
 class ProductionConfig(Config):
