@@ -1,5 +1,15 @@
 # Changelog
 
+## v26.9 - Protocol ARCHITECT_INFINITE (Day 10)
+
+### Jules' Log
+> "I noticed we lack a standardized mechanism to backtest trading strategies proposed by our agents. The existing `AlgoTradingAgent` was isolated and didn't adhere to the core Agent architecture. I researched event-driven backtesting patterns and built `StrategyBacktestAgent` to bridge this gap, enabling the swarm to systematically validate strategies like SMA Crossover and Mean Reversion before deployment."
+
+### Added
+- **New Organ**: `core/agents/strategy_backtest_agent.py` - A dedicated agent for backtesting strategies with Pydantic-validated I/O, supporting `SMA_CROSSOVER` and `MEAN_REVERSION` with pluggable parameters.
+- **Tests**: `tests/test_strategy_backtest_agent.py` - Unit tests verifying strategy execution, metric calculation (Sharpe, Drawdown), and V-shape recovery scenarios.
+- **Dependencies**: Verified `pandas` and `numpy` integration for vectorized calculation.
+
 ## v26.8 - Protocol ARCHITECT_INFINITE (Day 9)
 
 ### Jules' Log
