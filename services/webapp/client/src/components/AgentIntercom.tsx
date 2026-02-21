@@ -35,8 +35,24 @@ const AgentIntercom: React.FC = () => {
           const data = await res.json();
           // Bolt Optimization: data is Thought[] with stable IDs
           setThoughts(prev => {
-             // Avoid duplicates if possible or just replace if it's a window
-             // For simplicity, we just take the new list if different
+             // Bolt ⚡: Check for equality by comparing length and the ID of the newest thought.
+             // This avoids expensive JSON.stringify calls (O(N)) on every poll.
+
+             // 1. Length Check
+             if (prev.length !== data.length) return data;
+
+             // 2. ID Check
+             if (prev.length > 0 && data.length > 0) {
+                 // If the newest thought (index 0) has the same ID, the list is effectively unchanged
+                 // (assuming sliding window behavior).
+                 if (prev[0].id === data[0]?.id) {
+                     return prev;
+                 }
+             } else if (prev.length === 0 && data.length === 0) {
+                 return prev;
+             }
+
+             // 3. Fallback / Safety
              if (JSON.stringify(prev) !== JSON.stringify(data)) return data;
              return prev;
           });
