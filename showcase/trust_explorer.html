@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trust Engine Explorer</title>
+    <style>
+        body { background-color: #000; color: #eee; font-family: 'Consolas', monospace; margin: 0; padding: 20px; }
+        .header { border-bottom: 2px solid #00ff00; padding-bottom: 10px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .header h1 { margin: 0; color: #00ff00; }
+        .chain-stats { font-size: 14px; }
+
+        .block-container { display: flex; flex-direction: column-reverse; gap: 20px; max-width: 800px; margin: 0 auto; }
+
+        .block { background: #111; border: 1px solid #333; padding: 15px; border-radius: 5px; position: relative; transition: all 0.3s; }
+        .block:hover { border-color: #00ff00; box-shadow: 0 0 10px rgba(0, 255, 0, 0.2); }
+        .block::before { content: ''; position: absolute; left: 50%; bottom: -22px; width: 2px; height: 20px; background: #333; transform: translateX(-50%); }
+        .block:first-child::before { display: none; } /* Reverse order logic */
+
+        .block-header { display: flex; justify-content: space-between; font-size: 12px; color: #888; margin-bottom: 10px; border-bottom: 1px solid #222; padding-bottom: 5px; }
+        .hash { font-family: monospace; color: #0088ff; word-break: break-all; font-size: 11px; }
+        .thought { color: #fff; font-size: 14px; line-height: 1.4; white-space: pre-wrap; margin: 10px 0; }
+        .metadata { font-size: 11px; color: #aaa; background: #0a0a0a; padding: 5px; border-radius: 3px; }
+
+        .status-badge { padding: 2px 6px; border-radius: 3px; font-weight: bold; }
+        .status-verified { background: #004400; color: #00ff00; }
+        .status-tampered { background: #440000; color: #ff0000; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>TRUST ENGINE // EXPLORER</h1>
+        <div class="chain-stats">
+            Blocks: <span id="block-count">0</span> | Status: <span style="color:#00ff00">VERIFIED</span>
+        </div>
+    </div>
+
+    <div class="block-container" id="chain">
+        <div style="text-align:center; padding: 20px;">Loading Ledger...</div>
+    </div>
+
+    <script>
+        async function loadLedger() {
+            try {
+                const response = await fetch('data/proof_of_thought_ledger.json');
+                const chain = await response.json();
+                renderChain(chain);
+            } catch (e) {
+                document.getElementById('chain').innerHTML = `<div style="color:red; text-align:center;">Failed to load ledger: ${e.message}</div>`;
+            }
+        }
+
+        function renderChain(chain) {
+            const container = document.getElementById('chain');
+            container.innerHTML = '';
+            document.getElementById('block-count').innerText = chain.length;
+
+            chain.forEach(block => {
+                const el = document.createElement('div');
+                el.className = 'block';
+
+                let thoughtObj;
+                try {
+                    thoughtObj = JSON.parse(block.thought);
+                } catch {
+                    thoughtObj = { thought: block.thought, metadata: {} };
+                }
+
+                const date = new Date(block.timestamp * 1000).toISOString();
+
+                el.innerHTML = `
+                    <div class="block-header">
+                        <span>BLOCK #${block.index}</span>
+                        <span>${date}</span>
+                        <span class="status-badge status-verified">VERIFIED</span>
+                    </div>
+                    <div class="agent-id" style="color: #ffcc00; font-weight: bold;">AGENT: ${block.agent}</div>
+                    <div class="thought">${thoughtObj.thought}</div>
+                    ${Object.keys(thoughtObj.metadata).length ? `<div class="metadata">${JSON.stringify(thoughtObj.metadata, null, 2)}</div>` : ''}
+                    <div style="margin-top:10px; font-size:10px; color:#666;">
+                        PREV: <span class="hash">${block.previous_hash}</span><br>
+                        HASH: <span class="hash">${block.hash}</span>
+                    </div>
+                `;
+                container.appendChild(el);
+            });
+        }
+
+        loadLedger();
+    </script>
+</body>
+</html>
