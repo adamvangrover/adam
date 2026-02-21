@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM v26.0 :: LIVE MARKET</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #00f3ff;
+            --accent-color: #0aff60;
+            --bg-color: #050b14;
+            --panel-bg: rgba(5, 11, 20, 0.8);
+            --text-primary: #e0e0e0;
+            --text-muted: #888;
+            --panel-border: #333;
+            --danger-color: #ff3333;
+        }
+        body { margin: 0; background: var(--bg-color); color: var(--text-primary); font-family: 'Inter', sans-serif; overflow-x: hidden; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+
+        /* Header Styling */
+        .cyber-header {
+            height: 60px; display: flex; align-items: center; justify-content: space-between;
+            padding: 0 20px; border-bottom: 1px solid var(--primary-color);
+            background: rgba(5, 11, 20, 0.95); position: sticky; top: 0; z-index: 100;
+        }
+
+        .cyber-btn {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            padding: 6px 12px;
+            border: 1px solid #444;
+            color: var(--text-primary);
+            background: rgba(0,0,0,0.3);
+            border-radius: 2px;
+            text-transform: uppercase;
+            text-decoration: none;
+        }
+        .cyber-btn:hover { border-color: var(--primary-color); color: var(--primary-color); }
+
+        .ticker-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            padding: 20px;
+        }
+
+        .ticker-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--panel-border);
+            padding: 15px;
+            border-radius: 4px;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+        .ticker-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--primary-color);
+        }
+
+        .price-up { color: var(--accent-color); }
+        .price-down { color: var(--danger-color); }
+
+        .last-updated {
+            padding: 10px 20px;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+    <header class="cyber-header">
+        <div style="display: flex; align-items: center; gap: 20px;">
+            <h1 class="mono" style="margin: 0; font-size: 1.5rem; color: var(--primary-color); letter-spacing: 2px;">ADAM v26.0</h1>
+            <div class="mono" style="font-size: 0.8rem; color: #666; border-left: 1px solid #333; padding-left: 10px;">LIVE MARKET TERMINAL</div>
+        </div>
+        <nav style="display: flex; gap: 10px;">
+            <a href="index.html" class="cyber-btn">&larr; BACK TO DASHBOARD</a>
+        </nav>
+    </header>
+
+    <div class="last-updated mono" id="last-updated">Loading...</div>
+
+    <div class="ticker-grid" id="ticker-grid">
+        <!-- Tickers will be injected here -->
+    </div>
+
+    <script>
+        async function fetchMarketData() {
+            try {
+                const response = await fetch('data/market_live.json');
+                const data = await response.json();
+
+                document.getElementById('last-updated').textContent = `LAST UPDATE: ${data.timestamp} | STATUS: ${data.market_status}`;
+
+                const grid = document.getElementById('ticker-grid');
+                grid.innerHTML = ''; // Clear existing
+
+                Object.keys(data.tickers).forEach(ticker => {
+                    const info = data.tickers[ticker];
+                    const changeClass = info.change >= 0 ? 'price-up' : 'price-down';
+                    const changeSign = info.change >= 0 ? '+' : '';
+
+                    const card = document.createElement('div');
+                    card.className = 'ticker-card';
+                    card.innerHTML = `
+                        <div class="mono" style="font-size: 1.2rem; font-weight: bold; margin-bottom: 5px;">${ticker}</div>
+                        <div class="mono" style="font-size: 1.5rem;">${info.price.toFixed(2)}</div>
+                        <div class="mono ${changeClass}" style="font-size: 0.9rem;">
+                            ${changeSign}${info.change.toFixed(2)} (${changeSign}${info.change_pct.toFixed(2)}%)
+                        </div>
+                        <div class="mono" style="font-size: 0.7rem; color: #666; margin-top: 10px;">VOL: ${info.volume.toLocaleString()}</div>
+                    `;
+                    grid.appendChild(card);
+                });
+
+            } catch (error) {
+                console.error('Error fetching market data:', error);
+                document.getElementById('last-updated').textContent = 'ERROR FETCHING DATA';
+            }
+        }
+
+        // Fetch immediately and then every 5 seconds (simulated live)
+        fetchMarketData();
+        setInterval(fetchMarketData, 5000);
+    </script>
+</body>
+</html>

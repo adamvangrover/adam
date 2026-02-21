@@ -41,11 +41,11 @@ The era of the "LLM Wrapper" is over. Institutional finance faces an **Epistemol
 
 ```mermaid
 graph TD
-    User["User / Analyst"] -->|HTTP| Web["Web App (React/Flask)"]
+    User["User Analyst"] -->|HTTP| Web["Web App (React/Flask)"]
     Web -->|MCP| Server["MCP Server (Python)"]
     Server -->|Router| Orchestrator["Meta Orchestrator"]
-    Orchestrator -->|Fast Path| Swarm["System 1: Async Swarm"]
-    Orchestrator -->|Slow Path| Planner["System 2: Neuro-Symbolic Planner"]
+    Orchestrator -->|Fast Path| Swarm["System 1 Async Swarm"]
+    Orchestrator -->|Slow Path| Planner["System 2 Neuro-Symbolic Planner"]
     Planner -->|Task| AgentA["Fundamental Agent"]
     Planner -->|Task| AgentB["Risk Agent"]
     AgentA -->|Data| Sentinel["Credit Sentinel"]
