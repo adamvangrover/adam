@@ -4,7 +4,7 @@
  * Connects to the War Room Server and renders the battlefield.
  */
 
-const SERVER_URL = 'ws://localhost:8080';
+const SERVER_URL = 'ws://localhost:8765';
 let socket;
 let isConnected = false;
 let myTeam = null;
