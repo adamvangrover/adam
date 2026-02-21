@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MARKET MAYHEM // GRAPH V2.0</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/cyber_glitch.css">
+
+    <!-- Three.js Import Map -->
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #050505;
+            color: #e0e0e0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        #canvas-container {
+            width: 100vw;
+            height: 100vh;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+
+        .hud-panel {
+            position: absolute;
+            z-index: 10;
+            background: rgba(5, 5, 5, 0.85);
+            border: 1px solid #333;
+            backdrop-filter: blur(5px);
+            padding: 15px;
+            pointer-events: auto;
+        }
+
+        /* Top Narrative HUD */
+        #narrative-hud {
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 2px solid #cc0000;
+        }
+
+        .narrative-section {
+            flex: 1;
+            padding: 0 15px;
+            border-right: 1px solid #333;
+        }
+        .narrative-section:last-child { border-right: none; }
+        .narrative-title {
+            font-family: 'JetBrains Mono';
+            font-size: 0.8em;
+            color: #cc0000;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+        .narrative-content { font-size: 0.9em; }
+
+        /* Control Deck (Bottom Center) */
+        #control-deck {
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 600px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            border-top: 2px solid #00ff9d;
+        }
+
+        .control-row { display: flex; align-items: center; gap: 15px; }
+
+        input[type="range"] {
+            flex: 1;
+            background: #222;
+            height: 5px;
+            -webkit-appearance: none;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 15px;
+            height: 15px;
+            background: #00ff9d;
+            cursor: pointer;
+        }
+
+        button.cyber-btn {
+            background: #111;
+            border: 1px solid #00ff9d;
+            color: #00ff9d;
+            padding: 5px 15px;
+            font-family: 'JetBrains Mono';
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        button.cyber-btn:hover { background: #00ff9d; color: #000; }
+
+        select {
+            background: #111;
+            color: #ccc;
+            border: 1px solid #444;
+            padding: 5px;
+            font-family: 'JetBrains Mono';
+        }
+
+        /* System 2 Terminal (Bottom Right) */
+        #system2-terminal {
+            bottom: 20px;
+            right: 20px;
+            width: 300px;
+            height: 200px;
+            font-family: 'JetBrains Mono';
+            font-size: 0.7em;
+            overflow-y: auto;
+            border: 1px solid #444;
+            color: #00ff9d;
+            background: rgba(0,0,0,0.9);
+            padding: 10px;
+        }
+        .log-entry { margin-bottom: 4px; }
+        .log-warn { color: #ff9900; }
+        .log-error { color: #ff0000; }
+
+        /* Attribution Panel (Left Side) */
+        #attribution-panel {
+            top: 100px;
+            left: 20px;
+            width: 280px;
+            height: auto;
+            border-left: 2px solid #00ccff;
+            display: none; /* Hidden by default */
+        }
+
+        .agent-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+        }
+
+        /* Tooltip */
+        #tooltip {
+            position: absolute;
+            background: rgba(0,0,0,0.9);
+            border: 1px solid #fff;
+            padding: 10px;
+            pointer-events: none;
+            z-index: 100;
+            display: none;
+            font-family: 'JetBrains Mono';
+            font-size: 0.8em;
+            max-width: 250px;
+        }
+
+        /* Loading Overlay */
+        #loading-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #000;
+            z-index: 999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            color: #00ff9d;
+            font-family: 'JetBrains Mono';
+        }
+    </style>
+</head>
+<body>
+
+    <div id="loading-overlay">
+        <h1>INITIALIZING NEURAL LINK...</h1>
+        <div id="loading-text">Loading Assets...</div>
+    </div>
+
+    <!-- 3D Canvas -->
+    <div id="canvas-container"></div>
+
+    <!-- Narrative HUD -->
+    <div id="narrative-hud" class="hud-panel">
+        <div class="narrative-section">
+            <div class="narrative-title"><i class="fas fa-eye"></i> Broad Outlook</div>
+            <div class="narrative-content" id="narrative-outlook">Loading...</div>
+        </div>
+        <div class="narrative-section">
+            <div class="narrative-title"><i class="fas fa-bolt"></i> Core Drivers</div>
+            <div class="narrative-content" id="narrative-drivers">--</div>
+        </div>
+        <div class="narrative-section">
+            <div class="narrative-title"><i class="fas fa-exclamation-triangle"></i> Risks to Watch</div>
+            <div class="narrative-content" id="narrative-risks">--</div>
+        </div>
+    </div>
+
+    <!-- Control Deck -->
+    <div id="control-deck" class="hud-panel">
+        <div class="control-row" style="justify-content: space-between;">
+            <div style="font-family:'JetBrains Mono'; font-size:0.8em; color:#888;">TIMELINE CONTROL</div>
+            <div id="time-display" style="font-family:'JetBrains Mono'; color:#fff;">DAY 0</div>
+        </div>
+        <div class="control-row">
+            <button id="btn-play" class="cyber-btn"><i class="fas fa-play"></i></button>
+            <input type="range" id="time-slider" min="0" max="100" value="0">
+        </div>
+        <div class="control-row" style="margin-top:10px;">
+            <select id="filter-sector">
+                <option value="ALL">ALL SECTORS</option>
+                <option value="TECH">Technology</option>
+                <option value="FIN">Financials</option>
+                <option value="HEALTH">Healthcare</option>
+                <option value="ENERGY">Energy</option>
+                <option value="CRYPTO">Crypto Assets</option>
+            </select>
+            <select id="sort-metric">
+                <option value="DEFAULT">Sort: Default</option>
+                <option value="SENTIMENT">Color: Sentiment</option>
+                <option value="CONVICTION">Color: Conviction</option>
+                <option value="TREND">Color: Trend</option>
+            </select>
+            <div style="font-size:0.7em; color:#666;">
+                X: Time | Y: Price | Z: Risk
+            </div>
+        </div>
+        <div class="control-row" style="margin-top:5px; border-top:1px solid #333; padding-top:10px;">
+            <label style="font-size:0.8em; display:flex; align-items:center; gap:5px;">
+                <input type="checkbox" id="toggle-cone" checked>
+                Show Monte Carlo Projections
+            </label>
+        </div>
+    </div>
+
+    <!-- Attribution Panel -->
+    <div id="attribution-panel" class="hud-panel">
+        <div style="display:flex; align-items:center; margin-bottom:15px;">
+            <div class="agent-avatar"><i class="fas fa-user-secret"></i></div>
+            <div>
+                <div style="font-family:'JetBrains Mono'; color:#00ccff; font-weight:bold;" id="attr-agent-name">AGENT UNKNOWN</div>
+                <div style="font-size:0.7em; color:#888;">PROVENANCE ID: <span id="attr-prov-id">--</span></div>
+            </div>
+        </div>
+        <div style="font-size:0.8em; margin-bottom:10px;">
+            <strong>THESIS:</strong>
+            <p id="attr-thesis" style="color:#ddd; margin-top:5px;">--</p>
+        </div>
+        <div style="font-size:0.7em; color:#aaa; border-top:1px solid #333; padding-top:10px;">
+            <div>BACKTEST ACCURACY: <span id="attr-accuracy" style="color:#00ff9d">--%</span></div>
+            <div>IMPLIED DIRECTION: <span id="attr-direction">--</span></div>
+            <div>MODEL: <span id="attr-model">GPT-4-Turbo (Finetuned)</span></div>
+        </div>
+    </div>
+
+    <!-- System 2 Terminal -->
+    <div id="system2-terminal">
+        <div class="log-entry">> SYSTEM 2 INITIALIZED</div>
+        <div class="log-entry">> CONNECTING TO RUNTIME...</div>
+    </div>
+
+    <!-- Tooltip -->
+    <div id="tooltip">
+        <div id="tt-title" style="font-weight:bold; color:#00ff9d; margin-bottom:5px;">TITLE</div>
+        <div id="tt-val1">Val 1</div>
+        <div id="tt-val2">Val 2</div>
+    </div>
+
+    <script type="module" src="js/market_mayhem_graph.js"></script>
+    <script src="js/nav.js"></script>
+    <script src="js/nav_swarm.js"></script>
+
+</body>
+</html>
