@@ -3,36 +3,105 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dream Viewer // Nightmare Simulation</title>
+    <title>OMEGA Dream Cycle</title>
     <style>
-        body { background-color: #050510; color: #ccf; font-family: 'Courier New', monospace; margin: 0; padding: 20px; }
-        h1 { color: #aaddff; border-bottom: 2px solid #336699; padding-bottom: 10px; }
-
-        .dream-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; margin-top: 20px; }
-
-        .dream-card { background: #0a0a1a; border: 1px solid #223355; padding: 15px; border-radius: 8px; transition: transform 0.2s; }
-        .dream-card:hover { transform: translateY(-5px); border-color: #4488ff; box-shadow: 0 0 15px rgba(68, 136, 255, 0.2); }
-
-        .scenario-title { font-size: 18px; font-weight: bold; color: #fff; margin-bottom: 5px; }
-        .scenario-type { font-size: 12px; color: #ff5555; text-transform: uppercase; letter-spacing: 1px; border: 1px solid #552222; padding: 2px 5px; display: inline-block; margin-bottom: 10px; }
-
-        .outcome { font-weight: bold; margin: 10px 0; font-size: 20px; }
-        .outcome.survived { color: #00ff88; }
-        .outcome.failed { color: #ff3333; }
-
-        .steps { margin-top: 10px; border-top: 1px dashed #334466; padding-top: 10px; font-size: 13px; color: #8899aa; }
-        .step-item { margin-bottom: 5px; padding-left: 10px; border-left: 2px solid #334466; }
-
-        .prob-bar { background: #112233; height: 5px; width: 100%; margin-top: 10px; border-radius: 2px; overflow: hidden; }
-        .prob-fill { height: 100%; background: #00ff88; width: 0%; transition: width 1s; }
+        body {
+            background-color: #050010;
+            color: #d0b0ff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-image: radial-gradient(circle at 50% 30%, #220044 0%, #050010 70%);
+            min-height: 100vh;
+        }
+        h1 {
+            text-align: center;
+            font-weight: 300;
+            letter-spacing: 8px;
+            text-transform: uppercase;
+            border-bottom: 1px solid #440088;
+            padding-bottom: 20px;
+            margin-bottom: 40px;
+            text-shadow: 0 0 10px #8800ff;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .dream-card {
+            background: rgba(20, 0, 40, 0.6);
+            border: 1px solid #440088;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .dream-card:hover {
+            background: rgba(40, 0, 80, 0.8);
+            border-color: #aa00ff;
+            transform: scale(1.01);
+            box-shadow: 0 0 20px rgba(170, 0, 255, 0.2);
+        }
+        .scenario {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #fff;
+        }
+        .outcome {
+            font-weight: bold;
+            padding: 5px 10px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            font-size: 0.8em;
+            width: 100px;
+            text-align: center;
+        }
+        .survived {
+            background: rgba(0, 255, 100, 0.2);
+            color: #00ff66;
+            border: 1px solid #00ff66;
+        }
+        .liquidated {
+            background: rgba(255, 0, 50, 0.2);
+            color: #ff3333;
+            border: 1px solid #ff3333;
+        }
+        .details {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #440088;
+            font-size: 0.9em;
+            color: #ccc;
+            display: none;
+            width: 100%;
+        }
+        .details.visible {
+            display: block;
+        }
+        .meta {
+            font-size: 0.8em;
+            color: #8866aa;
+            margin-bottom: 5px;
+        }
+        .strategy {
+            color: #aaddff;
+        }
+        .learning {
+            color: #ffcc00;
+            font-style: italic;
+            margin-top: 5px;
+        }
     </style>
 </head>
 <body>
-    <h1>PROJECT OMEGA // DREAM CYCLE</h1>
-    <p>Adversarial Simulation Journal | Status: <span style="color:#00ff88">ONLINE</span></p>
+    <h1>Nocturnal Adversarial Simulation</h1>
 
-    <div class="dream-container" id="dreams">
-        <div>Loading nightmares...</div>
+    <div class="container" id="dream-log">
+        <div style="text-align:center; opacity:0.7;">Accessing Subconscious...</div>
     </div>
 
     <script>
@@ -40,48 +109,48 @@
             try {
                 const response = await fetch('data/dream_journal.json');
                 const dreams = await response.json();
-                renderDreams(dreams.reverse()); // Newest first
+                renderDreams(dreams);
             } catch (e) {
-                document.getElementById('dreams').innerHTML = `Error: ${e.message}`;
+                console.error(e);
+                document.getElementById('dream-log').innerHTML = `<div style="text-align:center; color:red;">Connection to Subconscious Lost</div>`;
             }
         }
 
         function renderDreams(dreams) {
-            const container = document.getElementById('dreams');
+            const container = document.getElementById('dream-log');
             container.innerHTML = '';
 
             dreams.forEach(dream => {
-                const sc = dream.scenario;
-                const sol = dream.solution;
-                const date = new Date(dream.timestamp * 1000).toLocaleString();
-                const prob = (sol.survival_probability * 100).toFixed(1);
+                const card = document.createElement('div');
+                card.className = 'dream-card';
+                card.style.flexWrap = 'wrap';
 
-                const el = document.createElement('div');
-                el.className = 'dream-card';
-                el.innerHTML = `
-                    <div class="scenario-type">${sc.type}</div>
-                    <div class="scenario-title">${sc.name}</div>
-                    <div style="font-size:12px; margin-bottom:10px;">${sc.description}</div>
+                const outcomeClass = dream.outcome.toLowerCase() === 'survived' ? 'survived' : 'liquidated';
 
-                    <div class="outcome ${dream.outcome.toLowerCase()}">
-                        ${dream.outcome}
+                const header = `
+                    <div style="flex:1;">
+                        <div class="meta">${new Date(dream.timestamp * 1000).toLocaleString()}</div>
+                        <div class="scenario">${dream.scenario}</div>
                     </div>
+                    <div class="outcome ${outcomeClass}">${dream.outcome}</div>
+                `;
 
-                    <div>Survival Probability: ${prob}%</div>
-                    <div class="prob-bar">
-                        <div class="prob-fill" style="width: ${prob}%; background-color: ${dream.outcome === 'FAILED' ? '#ff3333' : '#00ff88'}"></div>
-                    </div>
-
-                    <div class="steps">
-                        <strong>Strategy:</strong><br>
-                        ${sol.steps.map(s => `<div class="step-item">${s}</div>`).join('')}
-                    </div>
-
-                    <div style="font-size:10px; color:#556677; margin-top:10px; text-align:right;">
-                        ${date} | Duration: ${dream.duration.toFixed(2)}s
+                const details = `
+                    <div class="details">
+                        <div><strong>Strategy:</strong> <span class="strategy">${dream.strategy}</span></div>
+                        <div><strong>PnL Impact:</strong> ${dream.pnl}</div>
+                        <div class="learning">" ${dream.learning_point} "</div>
                     </div>
                 `;
-                container.appendChild(el);
+
+                card.innerHTML = header + details;
+
+                card.addEventListener('click', () => {
+                    const detailEl = card.querySelector('.details');
+                    detailEl.classList.toggle('visible');
+                });
+
+                container.appendChild(card);
             });
         }
 

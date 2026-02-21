@@ -9,7 +9,7 @@ class ProofOfThoughtLogger:
     Project OMEGA: Pillar 2 - The Trust Engine.
     Implements 'Proof of Thought' (PoT) by hashing analytical steps into an immutable chain.
     """
-    def __init__(self, ledger_path: str = "logs/proof_of_thought_ledger.json"):
+    def __init__(self, ledger_path: str = "showcase/data/proof_of_thought_ledger.json"):
         self.ledger_path = ledger_path
         self._ensure_ledger()
 
