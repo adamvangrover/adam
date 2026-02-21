@@ -6,89 +6,279 @@
     <title>Pocket Sovereign</title>
     <style>
         body {
-            background-color: #000; color: #fff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            margin: 0; padding: 20px; display: flex; flex-direction: column; min-height: 100vh;
+            background-color: #f5f5f7;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .phone-frame {
+            width: 375px;
+            height: 812px;
+            background: #fff;
+            border-radius: 40px;
+            box-shadow: 0 0 50px rgba(0,0,0,0.1);
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+        .header {
+            padding: 40px 20px 20px;
+            background: #fff;
+        }
+        .title {
+            font-size: 28px;
+            font-weight: 800;
+            color: #1d1d1f;
+        }
+        .subtitle {
+            font-size: 14px;
+            color: #86868b;
+            margin-top: 5px;
+        }
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: #f5f5f7;
+        }
+        .card {
+            background: #fff;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            transition: transform 0.2s;
+        }
+        .card:active {
+            transform: scale(0.98);
+        }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .card-title {
+            font-weight: 600;
+            font-size: 16px;
+        }
+        .card-icon {
+            font-size: 20px;
+        }
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1d1d1f;
+        }
+        .stat-label {
+            font-size: 13px;
+            color: #86868b;
+        }
+        .action-btn {
+            background: #007aff;
+            color: #fff;
+            border: none;
+            padding: 12px;
+            border-radius: 12px;
+            width: 100%;
+            font-weight: 600;
+            margin-top: 15px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .action-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .alert-card {
+            background: #ff3b30;
+            color: #fff;
+            transition: opacity 0.5s ease;
+        }
+        .alert-card .stat-label { color: rgba(255,255,255,0.8); }
+        .alert-card .stat-value { color: #fff; }
+
+        .notification {
+            background: rgba(0,0,0,0.8);
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 20px;
+            position: absolute;
+            top: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            font-size: 12px;
+            backdrop-filter: blur(10px);
+            z-index: 100;
+            display: none;
+            text-align: center;
         }
 
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
-        .logo { font-weight: 900; letter-spacing: -1px; font-size: 24px; background: linear-gradient(90deg, #fff, #888); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .avatar { width: 32px; height: 32px; background: #333; border-radius: 50%; }
+        .nav-bar {
+            background: #fff;
+            height: 60px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border-top: 1px solid #eee;
+        }
+        .nav-item {
+            color: #86868b;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        .nav-item.active {
+            color: #007aff;
+        }
 
-        .card { background: #111; border-radius: 20px; padding: 20px; margin-bottom: 20px; position: relative; overflow: hidden; }
-        .card-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(255,255,255,0.05), transparent); z-index: 0; }
-        .card-content { position: relative; z-index: 1; }
-
-        .label { font-size: 12px; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
-        .value { font-size: 32px; font-weight: 700; margin-bottom: 5px; }
-        .sub-value { font-size: 14px; color: #00ff88; display: flex; align-items: center; gap: 5px; }
-
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-
-        .action-btn { background: #222; border: none; color: #fff; padding: 15px; border-radius: 12px; font-weight: 600; width: 100%; cursor: pointer; transition: background 0.2s; }
-        .action-btn:active { background: #333; }
-
-        .notification { background: #221111; border: 1px solid #552222; padding: 15px; border-radius: 12px; margin-bottom: 20px; display: flex; gap: 15px; align-items: center; }
-        .notif-icon { font-size: 20px; }
-
-        .nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #0a0a0a; border-top: 1px solid #222; padding: 15px 0; display: flex; justify-content: space-around; z-index: 100; }
-        .nav-item { color: #555; font-size: 24px; cursor: pointer; }
-        .nav-item.active { color: #fff; }
+        /* Spinner */
+        .spinner {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 5px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
-    <div class="header">
-        <div class="logo">ADAM.pocket</div>
-        <div class="avatar"></div>
-    </div>
 
-    <div class="notification">
-        <div class="notif-icon">⚠️</div>
-        <div>
-            <div style="font-weight: bold; font-size: 14px;">Spending Alert</div>
-            <div style="font-size: 12px; color: #aaa;">$5.50 Latte violates 'House 2026' goal.</div>
-        </div>
-    </div>
+    <div class="phone-frame">
+        <div class="notification" id="notif">Action Complete</div>
 
-    <div class="card" style="background: linear-gradient(135deg, #1a1a2e, #16213e);">
-        <div class="card-bg"></div>
-        <div class="card-content">
-            <div class="label">Total Net Worth</div>
-            <div class="value">$1,240,500</div>
-            <div class="sub-value">▲ $12,400 (1.0%) Today</div>
+        <div class="header">
+            <div class="title">Good Morning, Jules</div>
+            <div class="subtitle">Your Net Worth: $1,240,500 (+2.4%)</div>
         </div>
-    </div>
 
-    <div class="grid">
-        <div class="card">
-            <div class="label">Sovereign Debt</div>
-            <div class="value" style="font-size: 24px;">$0</div>
-            <div class="sub-value" style="color:#aaa;">Fully Paid</div>
-        </div>
-        <div class="card">
-            <div class="label">Liquidity</div>
-            <div class="value" style="font-size: 24px;">$85k</div>
-            <div class="sub-value">6mo Runway</div>
-        </div>
-    </div>
-
-    <div class="card">
-        <div class="label">Bill Negotiator</div>
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
-            <div>
-                <div style="font-weight:bold;">Comcast Internet</div>
-                <div style="font-size:12px; color:#aaa;">Rate increased by $15</div>
+        <div class="content">
+            <!-- Alert -->
+            <div class="card alert-card" id="card-spending">
+                <div class="card-header">
+                    <span class="card-title">Spending Governance</span>
+                    <span class="card-icon">⚠️</span>
+                </div>
+                <div class="stat-value">$8.50</div>
+                <div class="stat-label">Coffee Purchase Detected at 09:41 AM</div>
+                <div style="margin-top:10px; font-size:13px; opacity:0.9;">
+                    This violates your goal "House Downpayment 2026".
+                </div>
+                <div style="display:flex; gap:10px; margin-top:15px;">
+                    <button class="action-btn" style="background:rgba(255,255,255,0.2);" onclick="handleSpending('DENY')">Deny</button>
+                    <button class="action-btn" style="background:#fff; color:#ff3b30;" onclick="handleSpending('OVERRIDE')">Override</button>
+                </div>
             </div>
-            <button class="action-btn" style="width: auto; padding: 8px 15px; font-size: 12px; background: #334466;">Auto-Negotiate</button>
+
+            <!-- Portfolio -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">Portfolio Sentinel</span>
+                    <span class="card-icon">🛡️</span>
+                </div>
+                <div class="stat-value" id="port-status">Safe</div>
+                <div class="stat-label" id="port-details">Tech Exposure: 28% (Optimal)</div>
+                <div style="margin-top:10px; height: 4px; background: #eee; border-radius: 2px;">
+                    <div style="width: 28%; height: 100%; background: #34c759; border-radius: 2px;" id="port-bar"></div>
+                </div>
+                <button class="action-btn" id="btn-stress" onclick="handleStressTest()">Run Stress Test</button>
+            </div>
+
+            <!-- Negotiator -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">Bill Negotiator</span>
+                    <span class="card-icon">🤖</span>
+                </div>
+                <div class="stat-value" id="neg-count">2 Actions</div>
+                <div class="stat-label">Pending Review</div>
+                <div style="margin-top:10px; font-size:14px;" id="neg-list">
+                    • Cancel "Gym Membership" (Unused 3mo)<br>
+                    • Negotiate "Comcast Internet"
+                </div>
+                <button class="action-btn" id="btn-neg" onclick="handleNegotiation()">Auto-Execute</button>
+            </div>
+        </div>
+
+        <div class="nav-bar">
+            <div class="nav-item active">🏠</div>
+            <div class="nav-item">💳</div>
+            <div class="nav-item">📈</div>
+            <div class="nav-item">⚙️</div>
         </div>
     </div>
 
-    <div style="height: 80px;"></div>
+    <!-- Load Mock API -->
+    <script src="js/pocket_api.js"></script>
+    <script>
+        function showNotif(msg, duration=3000) {
+            const n = document.getElementById('notif');
+            n.innerText = msg;
+            n.style.display = 'block';
+            setTimeout(() => n.style.display = 'none', duration);
+        }
 
-    <div class="nav">
-        <div class="nav-item active">☗</div> <!-- Home -->
-        <div class="nav-item">⚛</div> <!-- Portfolio -->
-        <div class="nav-item">⚡</div> <!-- Actions -->
-        <div class="nav-item">⚙</div> <!-- Settings -->
-    </div>
+        async function handleSpending(decision) {
+            const card = document.getElementById('card-spending');
+
+            // Call API
+            const res = await pocketAPI.governSpending("tx_123", decision);
+
+            if (res.status === "APPROVED") {
+                showNotif("⚠️ Overridden. Impact Logged.");
+            } else {
+                showNotif("✅ Transaction Blocked. Saved $8.50.");
+            }
+
+            // Animate removal
+            card.style.opacity = '0';
+            setTimeout(() => card.style.display = 'none', 500);
+        }
+
+        async function handleNegotiation() {
+            const btn = document.getElementById('btn-neg');
+            const count = document.getElementById('neg-count');
+
+            btn.disabled = true;
+            btn.innerHTML = '<div class="spinner"></div> Negotiating...';
+
+            const res = await pocketAPI.executeNegotiation("Comcast");
+
+            btn.innerHTML = "Complete";
+            count.innerText = "0 Actions";
+            document.getElementById('neg-list').innerHTML = `<span style='color:#34c759'>Saved $${res.annual_impact}/yr via AI Negotiation</span>`;
+
+            showNotif(`Success! Saved $${res.savings_monthly}/mo`);
+        }
+
+        async function handleStressTest() {
+            const btn = document.getElementById('btn-stress');
+            const status = document.getElementById('port-status');
+            const details = document.getElementById('port-details');
+
+            btn.disabled = true;
+            btn.innerHTML = '<div class="spinner"></div> Simulating...';
+
+            const res = await pocketAPI.runStressTest("p1");
+
+            btn.innerHTML = "Simulation Complete";
+            btn.style.background = "#34c759";
+
+            status.innerText = res.survival_probability;
+            status.style.fontSize = "24px";
+            details.innerText = `Scenario: ${res.scenario}`;
+
+            showNotif(`Rec: ${res.recommendation}`, 5000);
+        }
+    </script>
+
 </body>
 </html>

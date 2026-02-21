@@ -121,6 +121,12 @@ class MetaOrchestrator:
         
         logger.info("MetaOrchestrator initialized with Dynamic Routing Registry.")
 
+        # Project OMEGA Roadmap Note:
+        # Phase 1 of AdamOS migration will involve replacing this Python class with a Rust-based Kernel
+        # (see core/experimental/adamos_kernel/). The `route_registry` will eventually be
+        # handled by the WASM plugin system.
+        # Current status: PROTOTYPING.
+
     async def route_request(self, query: str, context: Optional[Dict[str, Any]] = None) -> Any:
         """
         The Central Nervous System: Analyzes query complexity, injects context, 

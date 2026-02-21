@@ -5,29 +5,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Project OMEGA: The Holodeck</title>
     <style>
-        body { margin: 0; overflow: hidden; background-color: #000; color: white; font-family: monospace; }
-        #info { position: absolute; top: 10px; width: 100%; text-align: center; pointer-events: none; z-index: 100; text-shadow: 0 0 10px #00ffcc; }
+        body { margin: 0; overflow: hidden; background-color: #000; color: white; font-family: 'Courier New', monospace; }
+        #info { position: absolute; top: 10px; width: 100%; text-align: center; pointer-events: none; z-index: 100; text-shadow: 0 0 10px #00ffcc; letter-spacing: 2px; }
         #vr-button { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 100; }
-        .hud-panel { position: absolute; background: rgba(0, 10, 20, 0.8); border: 1px solid #00ffcc; padding: 15px; border-radius: 5px; pointer-events: none; box-shadow: 0 0 15px rgba(0, 255, 204, 0.2); }
-        #market-status { top: 50px; right: 20px; width: 220px; }
-        #selected-asset { top: 50px; left: 20px; width: 220px; display: none; }
-        #loading { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 24px; color: #00ffcc; }
-        h3 { margin-top: 0; color: #00ffcc; border-bottom: 1px solid #333; padding-bottom: 5px; }
+        .hud-panel { position: absolute; background: rgba(0, 10, 20, 0.85); border: 1px solid #00ffcc; padding: 15px; border-radius: 2px; pointer-events: none; box-shadow: 0 0 20px rgba(0, 255, 204, 0.1); }
+        #market-status { top: 60px; right: 20px; width: 250px; }
+        #selected-asset { top: 60px; left: 20px; width: 250px; display: none; }
+        #loading { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 24px; color: #00ffcc; text-shadow: 0 0 10px #00ffcc; animation: pulse 1s infinite; }
+        h3 { margin-top: 0; color: #00ffcc; border-bottom: 1px solid #004433; padding-bottom: 5px; font-size: 16px; text-transform: uppercase; }
+        p { font-size: 14px; margin: 5px 0; color: #aaffdd; }
+        span { color: #fff; font-weight: bold; }
+        @keyframes pulse { 0% { opacity: 0.5; } 100% { opacity: 1; } }
     </style>
 </head>
 <body>
     <div id="info">
         <h1>PROJECT OMEGA: THE HOLODECK</h1>
-        <p>Live S&P 500 Spatial Visualization</p>
+        <p>Live S&P 500 Spatial Visualization // v25.0</p>
     </div>
 
-    <div id="loading">INITIALIZING HOLODECK...</div>
+    <div id="loading">INITIALIZING HOLODECK PROTOCOL...</div>
 
     <div id="market-status" class="hud-panel">
-        <h3>ENVIRONMENT</h3>
+        <h3>ENVIRONMENT STATUS</h3>
         <p>System Risk: <span id="env-risk">--</span></p>
         <p>Active Tickers: <span id="env-count">--</span></p>
         <p>Weather: <span id="env-weather">CLEAR</span></p>
+        <p>Time: <span id="env-time">--</span></p>
     </div>
 
     <div id="selected-asset" class="hud-panel">
@@ -36,6 +40,7 @@
         <p>Change: <span id="asset-change">--</span></p>
         <p>Cap: <span id="asset-cap">--</span></p>
         <p>Risk Score: <span id="asset-risk">--</span></p>
+        <p>Sector: <span id="asset-sector">--</span></p>
     </div>
 
     <!-- Three.js Import -->
@@ -63,23 +68,36 @@
 
         async function init() {
             scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x000510);
-            scene.fog = new THREE.FogExp2(0x000510, 0.002);
+            scene.background = new THREE.Color(0x000205);
+            scene.fog = new THREE.FogExp2(0x000205, 0.0015);
 
             camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 2000);
-            camera.position.set(0, 100, 200);
+            camera.position.set(0, 150, 250);
 
             // Lights
-            const ambientLight = new THREE.AmbientLight(0x404040);
+            const ambientLight = new THREE.AmbientLight(0x222222);
             scene.add(ambientLight);
 
-            const dirLight = new THREE.DirectionalLight(0xffffff, 1);
-            dirLight.position.set(50, 100, 50);
+            const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            dirLight.position.set(50, 200, 100);
             scene.add(dirLight);
 
-            // Grid
-            const gridHelper = new THREE.GridHelper(1000, 100, 0x0044ff, 0x001133);
+            // Cyberpunk Grid
+            const gridHelper = new THREE.GridHelper(2000, 100, 0x0044ff, 0x001122);
             scene.add(gridHelper);
+
+            // Add some random "stars" or data points
+            const starGeo = new THREE.BufferGeometry();
+            const starCount = 1000;
+            const starPos = new Float32Array(starCount * 3);
+            for(let i=0; i<starCount*3; i++) {
+                starPos[i] = (Math.random() - 0.5) * 1000;
+                if (i % 3 === 1) starPos[i] = Math.abs(starPos[i]) + 50; // Keep above ground mostly
+            }
+            starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+            const starMat = new THREE.PointsMaterial({color: 0x00ffcc, size: 2, transparent: true, opacity: 0.6});
+            const stars = new THREE.Points(starGeo, starMat);
+            scene.add(stars);
 
             // Fetch Data
             try {
@@ -89,7 +107,9 @@
                 buildCity(marketData);
             } catch (e) {
                 console.error("Failed to load data", e);
-                document.getElementById('loading').innerText = "DATA UPLINK FAILED";
+                document.getElementById('loading').innerText = "DATA UPLINK FAILED: " + e.message;
+                // Fallback Mock Data if fetch fails (e.g. local file restriction)
+                // buildCity(generateMockData());
             }
 
             // Renderer
@@ -104,7 +124,9 @@
             controls = new OrbitControls(camera, renderer.domElement);
             controls.enableDamping = true;
             controls.dampingFactor = 0.05;
-            controls.maxDistance = 500;
+            controls.maxDistance = 800;
+            controls.autoRotate = true;
+            controls.autoRotateSpeed = 0.5;
 
             // Interaction
             raycaster = new THREE.Raycaster();
@@ -112,32 +134,56 @@
 
             window.addEventListener('resize', onWindowResize);
             document.addEventListener('mousemove', onPointerMove);
+            document.addEventListener('mousedown', () => controls.autoRotate = false);
 
             renderer.setAnimationLoop(render);
+
+            // Clock
+            setInterval(() => {
+                document.getElementById('env-time').innerText = new Date().toLocaleTimeString();
+            }, 1000);
         }
 
         function buildCity(data) {
             let totalRisk = 0;
-            const size = Math.ceil(Math.sqrt(data.length));
-            const spacing = 15;
+            // Limit to 500 items for performance if needed
+            const displayData = data.slice(0, 500);
+
+            const size = Math.ceil(Math.sqrt(displayData.length));
+            const spacing = 20; // More spacing
             const offset = (size * spacing) / 2;
 
-            data.forEach((asset, i) => {
+            displayData.forEach((asset, i) => {
                 totalRisk += (asset.risk_score || 50);
 
                 // Parse Market Cap (e.g. "2.8T")
                 let capVal = parseFloat(asset.market_cap) || 1;
-                if (asset.market_cap.includes('T')) capVal *= 10;
+                if (asset.market_cap && asset.market_cap.includes('T')) capVal *= 10;
 
-                const height = Math.max(5, capVal * 5); // Scale height
-                const color = asset.change_pct >= 0 ? 0x00ffcc : 0xff3333; // Green/Red
+                // Height based on Market Cap
+                const height = Math.max(10, Math.min(capVal * 10, 300));
 
-                const geometry = new THREE.BoxGeometry(8, height, 8);
-                const material = new THREE.MeshPhongMaterial({
+                // Color based on % Change
+                let color = 0x888888;
+                let emissive = 0x000000;
+
+                if (asset.change_pct > 0) {
+                    color = 0x00ffcc;
+                    emissive = 0x004433;
+                } else if (asset.change_pct < 0) {
+                    color = 0xff3333;
+                    emissive = 0x440000;
+                }
+
+                const geometry = new THREE.BoxGeometry(10, height, 10);
+                const material = new THREE.MeshStandardMaterial({
                     color: color,
+                    emissive: emissive,
+                    emissiveIntensity: 0.5,
+                    roughness: 0.2,
+                    metalness: 0.8,
                     transparent: true,
-                    opacity: 0.8,
-                    shininess: 100
+                    opacity: 0.9
                 });
 
                 const building = new THREE.Mesh(geometry, material);
@@ -156,15 +202,14 @@
             });
 
             // Update Environment HUD
-            const avgRisk = totalRisk / data.length;
-            document.getElementById('env-count').innerText = data.length;
+            const avgRisk = totalRisk / displayData.length;
+            document.getElementById('env-count').innerText = displayData.length;
             document.getElementById('env-risk').innerText = avgRisk.toFixed(1);
 
-            if (avgRisk > 80) {
-                document.getElementById('env-weather').innerText = "HURRICANE";
-                document.getElementById('env-weather').style.color = "red";
-                scene.fog.color.setHex(0x330000); // Red fog
-                scene.background.setHex(0x220000);
+            if (avgRisk > 60) { // Lower threshold for visual effect
+                document.getElementById('env-weather').innerText = "HIGH VOLATILITY";
+                document.getElementById('env-weather').style.color = "#ff3333";
+                scene.fog.color.setHex(0x220505); // Red tint fog
             } else {
                 document.getElementById('env-weather').style.color = "#00ffcc";
             }
@@ -189,25 +234,25 @@
 
             if (intersects.length > 0) {
                 if (INTERSECTED != intersects[0].object) {
-                    if (INTERSECTED) INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex);
+                    if (INTERSECTED) INTERSECTED.material.emissiveIntensity = 0.5;
 
                     INTERSECTED = intersects[0].object;
-                    INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
-                    INTERSECTED.material.emissive.setHex(0xffffff);
+                    INTERSECTED.material.emissiveIntensity = 2.0; // Glow brighter
 
                     // Update HUD
                     const d = INTERSECTED.userData;
                     const hud = document.getElementById('selected-asset');
                     hud.style.display = 'block';
-                    document.getElementById('asset-name').innerText = d.ticker;
-                    document.getElementById('asset-price').innerText = '$' + d.current_price;
-                    document.getElementById('asset-change').innerText = d.change_pct + '%';
-                    document.getElementById('asset-change').style.color = d.change_pct >= 0 ? '#00ffcc' : '#ff3333';
-                    document.getElementById('asset-cap').innerText = d.market_cap;
-                    document.getElementById('asset-risk').innerText = d.risk_score;
+                    document.getElementById('asset-name').innerText = d.ticker || d.symbol || "UNKNOWN";
+                    document.getElementById('asset-price').innerText = '$' + (d.current_price || d.price || "0.00");
+                    document.getElementById('asset-change').innerText = (d.change_pct || 0) + '%';
+                    document.getElementById('asset-change').style.color = (d.change_pct >= 0) ? '#00ffcc' : '#ff3333';
+                    document.getElementById('asset-cap').innerText = d.market_cap || "--";
+                    document.getElementById('asset-risk').innerText = d.risk_score || "--";
+                    document.getElementById('asset-sector').innerText = d.sector || "--";
                 }
             } else {
-                if (INTERSECTED) INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex);
+                if (INTERSECTED) INTERSECTED.material.emissiveIntensity = 0.5;
                 INTERSECTED = null;
                 document.getElementById('selected-asset').style.display = 'none';
             }
