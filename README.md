@@ -14,6 +14,7 @@
 *   [**🧠 Agent Knowledge Base**](docs/AGENTS_KNOWLEDGE_BASE.md)
 *   [**📖 Architecture Overview**](docs/architecture.md)
 *   [**🎓 Tutorials**](docs/tutorials.md)
+*   [**🎓 Office Nexus Tutorial**](docs/TUTORIAL_OFFICE_NEXUS.md)
 *   [**📦 Custom Builds**](docs/custom_builds.md)
 
 ---
