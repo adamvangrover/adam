@@ -25,6 +25,10 @@ This repository supports two conflicting goals: **Reliability** and **Velocity**
 ### Path A: The Product (Reliability)
 *   **Locations:** `core/agents/`, `core/credit_sentinel/`
 *   **Philosophy:** "Slow is Smooth, Smooth is Fast."
+*   **Specialized Mandates:**
+    *   **Fundamental Agent:** Forward-looking cash flow modeling, Enterprise Value (EV), and Base/Bull/Bear scenarios.
+    *   **Risk Agent:** Probability of Default, Liquidity Runway (Months), and Recovery Rate (% of Assets).
+    *   **Credit Sentinel:** Continuous monitoring via System 1 Swarm for covenant breaches and distress signals.
 *   **Requirements:**
     *   **Strict Typing:** Pydantic models for ALL inputs/outputs.
     *   **Defensive Coding:** `try/except` blocks around every external call.

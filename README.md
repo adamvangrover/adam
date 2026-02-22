@@ -25,15 +25,17 @@ The era of the "LLM Wrapper" is over. Institutional finance faces an **Epistemol
 
 **Adam v26.0** solves this by implementing a **Hybrid Cognitive Engine** rooted in the principles of **Leveraged Finance** and **Distressed Debt**:
 
-### System 1: The Swarm (Fast)
-*   **Role:** The Body. Handles perception, data ingestion, and news monitoring.
-*   **Architecture:** Asynchronous Event Loop (Pub/Sub).
-*   **Use Case:** "Monitor AAPL for breaking news."
+### System 1: The Swarm (The Reflexes)
+*   **Role:** High-velocity, unstructured data parsing.
+*   **Focus:** Earnings call transcripts, ARR momentum, and baseline financial ratios.
+*   **Architecture:** Asynchronous Hive Mind with `SentinelWorker` for anomaly detection.
+*   **Use Case:** "Monitor TMT sector for cash burn spikes."
 
-### System 2: The Graph (Slow)
-*   **Role:** The Brain. Handles reasoning, planning, and criticism.
-*   **Architecture:** Directed Acyclic Graph (DAG) with feedback loops.
-*   **Use Case:** "Write a 30-page investment memo on the solvency of distressed debt."
+### System 2: The Graph (The Deep Thinker)
+*   **Role:** Downside scenario stress testing, capital structure analysis, and covenant compliance.
+*   **Focus:** "Logic as Data" enforcement of underwriting policies.
+*   **Architecture:** Neuro-Symbolic Planner (DAG) with feedback loops.
+*   **Use Case:** "Generate a deep-dive credit memo with Base/Bull/Bear DCF scenarios."
 
 **Result:** Adam "thinks before he speaks," drafting, critiquing, and refining analysis before presenting it to the user.
 
