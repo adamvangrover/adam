@@ -1002,6 +1002,17 @@ agents:  # This top-level 'agents' key is REQUIRED
     negative_keywords:
       - "\\b(high risk|underperform|bearish|downward trend|low confidence|negative outlook|risky)\\b"
 
+  BlindspotAgent:
+    <<: *defaults
+    persona: "Blindspot Monitor"
+    description: "A meta-cognitive agent scanning for disconnected nodes, contradictions, and unknown unknowns."
+    expertise:
+      - "graph analysis"
+      - "anomaly detection"
+      - "meta-cognition"
+    alerting_thresholds:
+      anomaly_detected: 0.8
+
 # Skill-based Configuration (Example)
 skills:
   data_analysis:

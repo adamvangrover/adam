@@ -10,6 +10,11 @@ import websockets
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
+# --- Constants ---
+MAX_NAME_LENGTH = 20
+ALLOWED_TEAMS = {"red", "blue", "spectator"}
+ALLOWED_ACTIONS = {"attack", "rumor", "defend", "qe"}
+
 # --- Game State ---
 
 @dataclass
@@ -102,8 +107,18 @@ async def handler(websocket):
 
                 if msg_type == "JOIN":
                     player_id = str(id(websocket)) # Simple ID
-                    name = payload.get("name", "Anonymous")
-                    team = payload.get("team", "spectator")
+
+                    # Validate Name
+                    raw_name = str(payload.get("name", "Anonymous")).strip()
+                    # Truncate to MAX_NAME_LENGTH
+                    name = raw_name[:MAX_NAME_LENGTH]
+                    if not name:
+                        name = "Anonymous"
+
+                    # Validate Team
+                    raw_team = str(payload.get("team", "spectator")).lower()
+                    team = raw_team if raw_team in ALLOWED_TEAMS else "spectator"
+
                     STATE.players[player_id] = {"name": name, "team": team}
                     log_event(f"{name} joined Team {team.upper()}", team)
                     # Send welcome
@@ -114,7 +129,10 @@ async def handler(websocket):
                     player = STATE.players.get(player_id)
                     if not player: continue
 
-                    action = payload.get("action")
+                    action = str(payload.get("action", "")).lower()
+                    if action not in ALLOWED_ACTIONS:
+                         continue # Invalid action
+
                     team = player["team"]
                     log_event(f"{player['name']} used {action.upper()}", team)
 
