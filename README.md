@@ -41,48 +41,64 @@ The era of the "LLM Wrapper" is over. Institutional finance faces an **Epistemol
 
 ```mermaid
 graph TD
-    subgraph Client_Layer [Client Layer]
-        User([User / PM]) -->|HTTP/REST| API_Gateway[API Gateway]
-        API_Gateway -->|Auth| Sec_Module[Security Module]
+    %% 1. Client & Immersive Layer
+    subgraph Client_Layer [Client & Immersive Layer]
+        UserNode(["User / PM"]) -->|HTTP/WSS| WebApp["React / Vite Dashboard"]
+        UserNode -->|WebXR| VRDeck["Neural Deck (VR / Holodeck)"]
+        WebApp -->|MCP| MCPServer["MCP API Gateway"]
+        VRDeck -->|MCP| MCPServer
+        MCPServer -->|Auth/RBAC| SecModule["Security & Governance Gatekeeper"]
     end
 
-    subgraph Orchestration_Layer [Orchestration Layer]
-        Sec_Module -->|Request| Meta_Orch[Meta-Orchestrator]
-        Meta_Orch -->|Route| System1[System 1: Neural Swarm]
-        Meta_Orch -->|Route| System2[System 2: Neuro-Symbolic Planner]
+    %% 2. Orchestration Layer
+    subgraph Orchestration_Layer [Cognitive Routing]
+        SecModule -->|Validated Request| MetaOrchestrator["Meta-Orchestrator (Python)"]
     end
 
-    subgraph System_1_Swarm [System 1: High-Velocity Perception]
-        System1 -->|Async| News_Monitor[News Monitor]
-        System1 -->|Async| Sentiment_Engine[Sentiment Engine]
-        System1 -->|Async| Market_Data[Market Data Feed]
+    %% 3. System 1: Fast Perception
+    subgraph System_1_Swarm [System 1: Neural Swarms & Perception]
+        MetaOrchestrator -->|Event/PubSub| SwarmManager["Async Hive Mind"]
+        SwarmManager -->|Spawn| MarketScanner["Market Scanner & News"]
+        SwarmManager -->|Spawn| SentimentEngine["Sentiment Engine"]
+        SwarmManager -->|Isolate| DevSwarm["Independent Dev/Tinker Swarm"]
     end
 
-    subgraph System_2_Reasoning [System 2: Deep Credit Analysis]
-        System2 -->|Plan| Credit_Sentinel[Credit Sentinel]
-
-        Credit_Sentinel -->|Task| Risk_Analyst[Risk Analyst]
-        Credit_Sentinel -->|Task| Ratio_Calc[Ratio Calculator]
-        Credit_Sentinel -->|Task| SNC_Analyst[SNC Analyst]
-
-        Risk_Analyst -->|Data| Distressed_Db[(Distressed Debt DB)]
-        Ratio_Calc -->|Model| ICAT_Engine[ICAT Valuation Engine]
-        SNC_Analyst -->|Regs| Shared_Review[Shared National Credit Review]
+    %% 4. System 2: Deep Reasoning
+    subgraph System_2_Reasoning [System 2: Neuro-Symbolic Graph]
+        MetaOrchestrator -->|Complex Query| Planner["DAG Reasoning Planner"]
+        Planner -->|Credit| CreditSentinel["Credit Sentinel (SNC & ICAT)"]
+        Planner -->|Wealth| RoboAdvisor["Robo Advisor"]
+        Planner -->|Alpha| StratEngine["Strategy Engine"]
     end
 
-    subgraph Logic_Layer [Logic as Data]
-        Credit_Sentinel -->|Trace| POT_Logger[ProofOfThought Logger]
-        POT_Logger -->|Hash| Immutable_Ledger[Immutable Ledger (JSON)]
+    %% 5. System 3: World Modeling
+    subgraph System_3_Simulation [System 3: Simulation & Quantum]
+        MetaOrchestrator -->|Forecast| WorldModel["OSWM (World Model)"]
+        WorldModel -->|Scenario| QuantumEngine["Quantum Monte Carlo (QMC)"]
+        QuantumEngine -->|Stress Test| RiskGuardian["Risk Guardian"]
     end
-UserNode["User / Analyst"] -->|HTTP| WebApp["Web App (React/Flask)"]
-    WebApp -->|MCP| MCPServer["MCP Server (Python)"]
-    MCPServer -->|Router| MetaOrchestrator["Meta Orchestrator"]
-    MetaOrchestrator -->|Fast Path| NeuralSwarm["System 1: Async Swarm"]
-    MetaOrchestrator -->|Slow Path| NeuroPlanner["System 2: Neuro-Symbolic Planner"]
-    NeuroPlanner -->|Task| FundAgent["Fundamental Agent"]
-    NeuroPlanner -->|Task| RiskAgent["Risk Agent"]
-    FundAgent -->|Data| CredSentinel["Credit Sentinel"]
-    RiskAgent -->|Data| CredSentinel
+
+    %% 6. Deterministic & Execution (Rust)
+    subgraph Rust_Execution_Layer [Algorithmic & Deterministic Execution]
+        StratEngine -->|Trade Signal| AlgoEngine["Algorithmic Trading Engine"]
+        MarketScanner -->|Tick Data| AlgoEngine
+        AlgoEngine -->|Order| MatchingEngine["Matching Engine (Rust)"]
+        MatchingEngine -->|Compute| PricingEngine["Pricing Engine (Rust)"]
+    end
+
+    %% 7. Foundation & OS Layer
+    subgraph OS_Foundation_Layer [Foundation & Memory]
+        PricingEngine -->|Syscall| AdamOS["AdamOS Kernel (Rust)"]
+        CreditSentinel -->|Trace| POTLogger["ProofOfThought Logger"]
+        POTLogger -->|Hash| Ledger[("Immutable Ledger")]
+        AdamOS -->|State| Ledger
+        WorldModel <-->|Context| KnowledgeGraph[("Unified Knowledge Graph")]
+    end
+
+    %% 8. Experimental Sandbox
+    subgraph Experimental_Lab [Experimental / Sandbox]
+        TinkerLab["Tinker Lab & Federated Learning"] -.->|Promote Models| MetaOrchestrator
+    end
 ```
 
 ## 🧬 Logic as Data: The Audit Trail
