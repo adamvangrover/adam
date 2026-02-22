@@ -1,4 +1,4 @@
-# Adam v26.0: The Neuro-Symbolic Financial Sovereign
+# Adam v26.0: The Institutional-Grade Neuro-Symbolic Financial Sovereign
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/) [![Docker Image](https://img.shields.io/badge/docker-ready-blue)](https://hub.docker.com/) [![FinanceBench](https://img.shields.io/badge/FinanceBench-99%25-green)](https://arxiv.org/abs/2311.11944)
 
@@ -23,7 +23,7 @@
 
 The era of the "LLM Wrapper" is over. Institutional finance faces an **Epistemological Crisis**: stochastic models hallucinate, making them dangerous for due diligence.
 
-**Adam v26.0** solves this by implementing a **Hybrid Cognitive Engine**:
+**Adam v26.0** solves this by implementing a **Hybrid Cognitive Engine** rooted in the principles of **Leveraged Finance** and **Distressed Debt**:
 
 ### System 1: The Swarm (Fast)
 *   **Role:** The Body. Handles perception, data ingestion, and news monitoring.
@@ -106,6 +106,14 @@ graph TD
         TinkerLab["Tinker Lab & Federated Learning"] -.->|Promote Models| MetaOrchestrator
     end
 ```
+
+## 🧬 Logic as Data: The Audit Trail
+
+Adam treats reasoning as a first-class citizen. Every logical step, from EBITDA adjustment to covenant stress-testing, is serialized as a data artifact via the `ProofOfThoughtLogger`. This ensures:
+
+*   **Traceability:** Every conclusion can be traced back to its source (e.g., specific line items in a 10-K).
+*   **Reproducibility:** Analysis can be re-run with different assumptions to test sensitivity.
+*   **Auditability:** A complete ledger of the agent's "thought process" is preserved in an immutable JSON ledger for compliance and review.
 
 ---
 

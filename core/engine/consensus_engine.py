@@ -12,6 +12,7 @@ from core.utils.logging_utils import NarrativeLogger
 class ConsensusEngine:
     """
     Protocol: ADAM-V-NEXT
+    Verified by Jules.
     A generic decision-making engine that aggregates signals from multiple agents
     to form a cohesive 'Executive Decision'.
     """
@@ -118,3 +119,9 @@ class ConsensusEngine:
 
     def get_log(self) -> List[Dict[str, Any]]:
         return self.decision_log
+
+    def get_decision_history(self, limit: int = 10) -> List[Dict[str, Any]]:
+        """
+        Retrieve the most recent decisions.
+        """
+        return self.decision_log[-limit:]
