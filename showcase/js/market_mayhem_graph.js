@@ -34,7 +34,8 @@ const State = {
     sortBy: 'DEFAULT',
     showCone: true,
     useSystemBias: true,
-    selectedEntity: null
+    selectedEntity: null,
+    interactiveNodes: []
 };
 
 // --- MONTE CARLO ENGINE ---
@@ -165,8 +166,11 @@ let scene, camera, renderer, controls;
 let entityGroup = new THREE.Group();
 let raycaster, mouse;
 
+const _tempVec = new THREE.Vector3();
+const _tempInteractionVec = new THREE.Vector3();
+
 // Helper to convert (Step, Price, Z) to Vector3
-function getVector(entity, step) {
+function getVector(entity, step, target) {
     // X Axis: Time (-50 to +50)
     const x = ((step / State.totalSteps) * 100) - 50;
 
@@ -198,6 +202,10 @@ function getVector(entity, step) {
     // Z Axis: Risk
     const z = entity.zPos;
 
+    if (target) {
+        target.set(x, y, z);
+        return target;
+    }
     return new THREE.Vector3(x, y, z);
 }
 
@@ -271,6 +279,7 @@ async function init() {
 
 function createVisuals() {
     entityGroup.clear();
+    State.interactiveNodes = [];
 
     State.data.forEach(entity => {
         // --- 1. The Head Node (Sphere) ---
@@ -284,6 +293,7 @@ function createVisuals() {
         sphere.userData = { type: 'node', entity: entity };
         entityGroup.add(sphere);
         entity.mesh = sphere; // Link for updates
+        State.interactiveNodes.push(sphere);
 
         // --- 2. Historical Trail (Line) ---
         const historyPoints = [];
@@ -367,8 +377,7 @@ function updatePositions() {
         if (!isVisible) return;
 
         // Move Head Node
-        const pos = getVector(entity, State.currentStep);
-        entity.mesh.position.copy(pos);
+        getVector(entity, State.currentStep, entity.mesh.position);
 
         // Highlight
         if (State.selectedEntity && State.selectedEntity.id === entity.id) {
@@ -460,8 +469,7 @@ function onMouseMove(event) {
 function onMouseClick(event) {
     raycaster.setFromCamera(mouse, camera);
     // Raycast against Spheres only
-    const nodes = entityGroup.children.filter(c => c.userData.type === 'node');
-    const intersects = raycaster.intersectObjects(nodes);
+    const intersects = raycaster.intersectObjects(State.interactiveNodes);
 
     if (intersects.length > 0) {
         const entity = intersects[0].object.userData.entity;
@@ -474,13 +482,12 @@ function onMouseClick(event) {
 
 function updateInteraction() {
     raycaster.setFromCamera(mouse, camera);
-    const nodes = entityGroup.children.filter(c => c.userData.type === 'node' && c.visible);
-    const intersects = raycaster.intersectObjects(nodes);
+    const intersects = raycaster.intersectObjects(State.interactiveNodes);
     const tooltip = document.getElementById('tooltip');
 
     if (intersects.length > 0) {
         const entity = intersects[0].object.userData.entity;
-        const vec = getVector(entity, State.currentStep); // Get current price from math, not just mesh pos
+        const vec = getVector(entity, State.currentStep, _tempInteractionVec); // Get current price from math, not just mesh pos
 
         // Denormalize price approximation
         // y = (price * norm) - 10  => price = (y+10)/norm
