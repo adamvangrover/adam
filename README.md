@@ -2,7 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/) [![Docker Image](https://img.shields.io/badge/docker-ready-blue)](https://hub.docker.com/) [![FinanceBench](https://img.shields.io/badge/FinanceBench-99%25-green)](https://arxiv.org/abs/2311.11944)
 
-> **Adam v26.0 upgrades financial AI from a conversational chatbot to a fiduciary architect. By fusing the intuitive speed of a Neural Swarm (System 1) with the deliberate logic of a Neuro-Symbolic Graph (System 2), Adam delivers calculated conviction for high-stakes capital allocation.**
+> **Adam v26.0 upgrades financial AI from a conversational chatbot to a fiduciary architect, explicitly engineered for Leveraged Finance, Distressed Debt, and Deep Credit Risk Underwriting. By fusing the intuitive speed of a Neural Swarm (System 1) with the deliberate logic of a Neuro-Symbolic Graph (System 2), Adam delivers calculated conviction for high-stakes capital allocation.**
 
 ---
 
@@ -37,19 +37,74 @@ The era of the "LLM Wrapper" is over. Institutional finance faces an **Epistemol
 
 **Result:** Adam "thinks before he speaks," drafting, critiquing, and refining analysis before presenting it to the user.
 
+### Logic as Data
+Adam v26.0 treats business logic as first-class data. Using a JSON-based rule engine (`jsonLogic`), risk thresholds, trading triggers, and compliance rules are decoupled from the core codebase. This allows for:
+*   **Dynamic Policy Updates:** Modify risk parameters without redeploying code.
+*   **Auditability:** Rules are stored as JSON artifacts, making them human-readable and easy to version control.
+*   **Safety:** The logic layer is evaluated before agent execution, acting as a deterministic guardrail.
+
 ### System Architecture
 
 ```mermaid
 graph TD
-UserNode["User / Analyst"] -->|HTTP| WebApp["Web App (React/Flask)"]
-    WebApp -->|MCP| MCPServer["MCP Server (Python)"]
-    MCPServer -->|Router| MetaOrchestrator["Meta Orchestrator"]
-    MetaOrchestrator -->|Fast Path| NeuralSwarm["System 1: Async Swarm"]
-    MetaOrchestrator -->|Slow Path| NeuroPlanner["System 2: Neuro-Symbolic Planner"]
-    NeuroPlanner -->|Task| FundAgent["Fundamental Agent"]
-    NeuroPlanner -->|Task| RiskAgent["Risk Agent"]
-    FundAgent -->|Data| CredSentinel["Credit Sentinel"]
-    RiskAgent -->|Data| CredSentinel
+    %% 1. Client & Immersive Layer
+    subgraph Client_Layer [Client & Immersive Layer]
+        UserNode(["User / PM"]) -->|HTTP/WSS| WebApp["React / Vite Dashboard"]
+        UserNode -->|WebXR| VRDeck["Neural Deck (VR / Holodeck)"]
+        WebApp -->|MCP| MCPServer["MCP API Gateway"]
+        VRDeck -->|MCP| MCPServer
+        MCPServer -->|Auth/RBAC| SecModule["Security & Governance Gatekeeper"]
+    end
+
+    %% 2. Orchestration Layer
+    subgraph Orchestration_Layer [Cognitive Routing]
+        SecModule -->|Validated Request| MetaOrchestrator["Meta-Orchestrator (Python)"]
+    end
+
+    %% 3. System 1: Fast Perception
+    subgraph System_1_Swarm [System 1: Neural Swarms & Perception]
+        MetaOrchestrator -->|Event/PubSub| SwarmManager["Async Hive Mind"]
+        SwarmManager -->|Spawn| MarketScanner["Market Scanner & News"]
+        SwarmManager -->|Spawn| SentimentEngine["Sentiment Engine"]
+        SwarmManager -->|Isolate| DevSwarm["Independent Dev/Tinker Swarm"]
+    end
+
+    %% 4. System 2: Deep Reasoning
+    subgraph System_2_Reasoning [System 2: Neuro-Symbolic Graph]
+        MetaOrchestrator -->|Complex Query| Planner["DAG Reasoning Planner"]
+        Planner -->|Credit| CreditSentinel["Credit Sentinel (SNC & ICAT)"]
+        Planner -->|Wealth| RoboAdvisor["Robo Advisor"]
+        Planner -->|Alpha| StratEngine["Strategy Engine"]
+    end
+
+    %% 5. System 3: World Modeling
+    subgraph System_3_Simulation [System 3: Simulation & Quantum]
+        MetaOrchestrator -->|Forecast| WorldModel["OSWM (World Model)"]
+        WorldModel -->|Scenario| QuantumEngine["Quantum Monte Carlo (QMC)"]
+        QuantumEngine -->|Stress Test| RiskGuardian["Risk Guardian"]
+    end
+
+    %% 6. Deterministic & Execution (Rust)
+    subgraph Rust_Execution_Layer [Algorithmic & Deterministic Execution]
+        StratEngine -->|Trade Signal| AlgoEngine["Algorithmic Trading Engine"]
+        MarketScanner -->|Tick Data| AlgoEngine
+        AlgoEngine -->|Order| MatchingEngine["Matching Engine (Rust)"]
+        MatchingEngine -->|Compute| PricingEngine["Pricing Engine (Rust)"]
+    end
+
+    %% 7. Foundation & OS Layer
+    subgraph OS_Foundation_Layer [Foundation & Memory]
+        PricingEngine -->|Syscall| AdamOS["AdamOS Kernel (Rust)"]
+        CreditSentinel -->|Trace| POTLogger["ProofOfThought Logger"]
+        POTLogger -->|Hash| Ledger[("Immutable Ledger")]
+        AdamOS -->|State| Ledger
+        WorldModel <-->|Context| KnowledgeGraph[("Unified Knowledge Graph")]
+    end
+
+    %% 8. Experimental Sandbox
+    subgraph Experimental_Lab [Experimental / Sandbox]
+        TinkerLab["Tinker Lab & Federated Learning"] -.->|Promote Models| MetaOrchestrator
+    end
 ```
 
 ---
