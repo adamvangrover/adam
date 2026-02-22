@@ -52,7 +52,7 @@
 1.  **Duplicate Knowledge Graph Classes**
     *   **Finding:** `core/engine/unified_knowledge_graph.py` and `core/v23_graph_engine/unified_knowledge_graph.py` are distinct but similar.
     *   **Status:** **ACTIVE RISK.**
-    *   **Directive:** Always check imports. Prefer `core/v23_graph_engine/` (check latest `README` or `AGENTS.md` for current standard). **Do not edit one without checking the other.**
+    *   **Directive:** Always check imports. Prefer `core/engine` (check latest `README` or `AGENTS.md` for current standard). **Do not edit one without checking the other.**
 
 2.  **Duplicate Logic (Scrubbers)**
     *   **Finding:** `core/data_processing/utils.py` and `core/data_processing/universal_ingestor.py` duplicate text cleaning logic.

@@ -92,14 +92,14 @@ def entity_resolution_node(state: OmniscientState) -> Dict[str, Any]:
     # Update State
     legal_entity["sector"] = "Technology"  # Default or extracted
 
-    state["v23_knowledge_graph"]["nodes"]["entity_ecosystem"] = {
+    state["v26_knowledge_graph"]["nodes"]["entity_ecosystem"] = {
         "legal_entity": legal_entity,
         "management_assessment": mgmt,
         "competitive_positioning": comp
     }
 
     return {
-        "v23_knowledge_graph": state["v23_knowledge_graph"],
+        "v26_knowledge_graph": state["v26_knowledge_graph"],
         "human_readable_status": "Phase 1 Complete: Entity & Management Assessed."
     }
 
@@ -142,7 +142,7 @@ def deep_fundamental_node(state: OmniscientState) -> Dict[str, Any]:
         "verdict": "Undervalued"  # Mock logic or derived
     }
 
-    state["v23_knowledge_graph"]["nodes"]["equity_analysis"] = {
+    state["v26_knowledge_graph"]["nodes"]["equity_analysis"] = {
         "fundamentals": fund_summary,
         "valuation_engine": {
             "dcf_model": dcf_res_adapter,
@@ -152,7 +152,7 @@ def deep_fundamental_node(state: OmniscientState) -> Dict[str, Any]:
     }
 
     return {
-        "v23_knowledge_graph": state["v23_knowledge_graph"],
+        "v26_knowledge_graph": state["v26_knowledge_graph"],
         "human_readable_status": "Phase 2 Complete: Valuation Models Run."
     }
 
@@ -193,14 +193,14 @@ def credit_snc_node(state: OmniscientState) -> Dict[str, Any]:
         "headroom_assessment": "Low" if leverage > 4.0 else "High"
     }
 
-    state["v23_knowledge_graph"]["nodes"]["credit_analysis"] = {
+    state["v26_knowledge_graph"]["nodes"]["credit_analysis"] = {
         "snc_rating_model": snc_model,
         "cds_market_implied_rating": "BB-",  # Mock
         "covenant_risk_analysis": covenant_risk
     }
 
     return {
-        "v23_knowledge_graph": state["v23_knowledge_graph"],
+        "v26_knowledge_graph": state["v26_knowledge_graph"],
         "human_readable_status": "Phase 3 Complete: Credit Rating Assigned."
     }
 
@@ -242,10 +242,10 @@ def risk_simulation_node(state: OmniscientState) -> Dict[str, Any]:
         }
     }
 
-    state["v23_knowledge_graph"]["nodes"]["simulation_engine"] = simulation_engine
+    state["v26_knowledge_graph"]["nodes"]["simulation_engine"] = simulation_engine
 
     return {
-        "v23_knowledge_graph": state["v23_knowledge_graph"],
+        "v26_knowledge_graph": state["v26_knowledge_graph"],
         "human_readable_status": "Phase 4 Complete: Stress Tests Run."
     }
 
@@ -256,7 +256,7 @@ def strategic_synthesis_node(state: OmniscientState) -> Dict[str, Any]:
     """
     logger.info("Phase 5: Final Synthesis")
     data = fetch_financial_context(state["ticker"])
-    kg = state["v23_knowledge_graph"]["nodes"]
+    kg = state["v26_knowledge_graph"]["nodes"]
 
     # Extract inputs for synthesis
     val_verdict = kg["equity_analysis"]["valuation_engine"]["multiples_analysis"]
@@ -286,7 +286,7 @@ def strategic_synthesis_node(state: OmniscientState) -> Dict[str, Any]:
         ma_posture=ma_posture
     )
 
-    state["v23_knowledge_graph"]["nodes"]["strategic_synthesis"] = {
+    state["v26_knowledge_graph"]["nodes"]["strategic_synthesis"] = {
         "m_and_a_posture": ma_posture,
         "final_verdict": verdict
     }
@@ -294,7 +294,7 @@ def strategic_synthesis_node(state: OmniscientState) -> Dict[str, Any]:
     human_msg = f"Analysis Complete. Recommendation: {verdict['recommendation']} (Conviction {verdict['conviction_level']}/10)."
 
     return {
-        "v23_knowledge_graph": state["v23_knowledge_graph"],
+        "v26_knowledge_graph": state["v26_knowledge_graph"],
         "human_readable_status": human_msg
     }
 

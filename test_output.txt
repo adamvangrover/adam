@@ -1,0 +1,172 @@
+/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/requests/__init__.py:113: RequestsDependencyWarning: urllib3 (2.6.3) or chardet (6.0.0dev0)/charset_normalizer (3.4.4) doesn't match a supported version!
+  warnings.warn(
+============================= test session starts ==============================
+platform linux -- Python 3.12.12, pytest-9.0.2, pluggy-1.6.0 -- /home/jules/.pyenv/versions/3.12.12/bin/python
+cachedir: .pytest_cache
+rootdir: /app
+configfile: pyproject.toml
+plugins: asyncio-1.3.0, langsmith-0.7.6, anyio-4.12.1
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 1 item
+
+tests/test_v23_5_pipeline.py::test_deep_dive_pipeline FAILED             [100%]
+
+=================================== FAILURES ===================================
+___________________________ test_deep_dive_pipeline ____________________________
+
+    @pytest.mark.asyncio
+    async def test_deep_dive_pipeline():
+        # Mock LLMPlugin to avoid API key requirements and AgentOrchestrator initialization issues
+        with patch('core.system.agent_orchestrator.LLMPlugin') as MockLLM:
+            orchestrator = MetaOrchestrator()
+
+            # We trigger the "Deep Dive" path
+            query = "Perform a deep dive analysis on TestCorp"
+            context = {"simulation_depth": "Deep"}
+
+            result = await orchestrator.route_request(query, context)
+
+            assert result is not None
+            if "error" in result:
+                pytest.fail(f"Pipeline returned error: {result['error']}")
+
+            assert "v26_knowledge_graph" in result
+
+            kg = result["v26_knowledge_graph"]
+            # The mock logic in MetaOrchestrator defaults to AAPL if not specified
+            # or uses the query. Let's check what it actually does.
+            # In _run_deep_dive_flow: ticker = "AAPL" by default.
+            # init_omniscient_state uses this ticker as the target.
+            # Fallback uses query or extracted name.
+            target = kg["meta"]["target"]
+>           assert target in ["AAPL", "TestCorp", query, "MockString"]
+E           AssertionError: assert 'SPY' in ['AAPL', 'TestCorp', 'Perform a deep dive analysis on TestCorp', 'MockString']
+
+tests/test_v23_5_pipeline.py:32: AssertionError
+----------------------------- Captured stdout call -----------------------------
+NOTICE: 'feedparser' not found. RSS features disabled.
+NOTICE: PyTorch/Transformers not found. AI Sentiment/Summarization disabled (using fallbacks).
+------------------------------ Captured log call -------------------------------
+WARNING  core.llm_plugin:llm_plugin.py:820 GEMINI_API_KEY not found. Defaulting to Mock behavior for Gemini.
+WARNING  root:config_utils.py:53 Configuration file is empty: config/config.yaml
+WARNING  root:agent_orchestrator.py:578 Workflows configuration file (config/workflows.yaml) not found.  Workflows will not be available.
+WARNING  root:agent_orchestrator.py:346 Agent class not found for: market_sentiment_agent
+WARNING  root:agent_orchestrator.py:346 Agent class not found for: macroeconomic_analysis_agent
+WARNING  root:agent_orchestrator.py:346 Agent class not found for: geopolitical_risk_agent
+WARNING  root:agent_orchestrator.py:346 Agent class not found for: industry_specialist_agent
+WARNING  root:agent_orchestrator.py:346 Agent class not found for: fundamental_analyst_agent
+WARNING  root:agent_orchestrator.py:346 Agent class not found for: technical_analyst_agent
+WARNING  root:agent_orchestrator.py:346 Agent class not found for: risk_assessment_agent
+WARNING  root:agent_orchestrator.py:346 Agent class not found for: newsletter_layout_specialist_agent
+WARNING  root:agent_orchestrator.py:346 Agent class not found for: data_verification_agent
+WARNING  root:agent_orchestrator.py:346 Agent class not found for: lexica_agent
+WARNING  root:agent_orchestrator.py:346 Agent class not found for: archive_manager_agent
+ERROR    root:agent_orchestrator.py:348 Failed to load agent echo_agent: Can't instantiate abstract class AgentBase without an implementation for abstract method 'execute'
+Traceback (most recent call last):
+  File "/app/core/system/agent_orchestrator.py", line 339, in load_agents
+    self.agents[agent_name] = agent_class(
+                              ^^^^^^^^^^^^
+TypeError: Can't instantiate abstract class AgentBase without an implementation for abstract method 'execute'
+WARNING  root:agent_orchestrator.py:346 Agent class not found for: portfolio_optimization_agent
+WARNING  root:agent_orchestrator.py:346 Agent class not found for: agent_forge
+WARNING  root:agent_orchestrator.py:346 Agent class not found for: prompt_tuner
+WARNING  root:agent_orchestrator.py:346 Agent class not found for: code_alchemist
+WARNING  root:agent_orchestrator.py:346 Agent class not found for: lingua_maestro
+WARNING  root:agent_orchestrator.py:346 Agent class not found for: sense_weaver
+ERROR    root:agent_orchestrator.py:348 Failed to load agent data_visualization_agent: Can't instantiate abstract class AgentBase without an implementation for abstract method 'execute'
+Traceback (most recent call last):
+  File "/app/core/system/agent_orchestrator.py", line 339, in load_agents
+    self.agents[agent_name] = agent_class(
+                              ^^^^^^^^^^^^
+TypeError: Can't instantiate abstract class AgentBase without an implementation for abstract method 'execute'
+ERROR    root:agent_orchestrator.py:348 Failed to load agent natural_language_generation_agent: Can't instantiate abstract class AgentBase without an implementation for abstract method 'execute'
+Traceback (most recent call last):
+  File "/app/core/system/agent_orchestrator.py", line 339, in load_agents
+    self.agents[agent_name] = agent_class(
+                              ^^^^^^^^^^^^
+TypeError: Can't instantiate abstract class AgentBase without an implementation for abstract method 'execute'
+ERROR    root:agent_orchestrator.py:348 Failed to load agent machine_learning_model_training_agent: Can't instantiate abstract class AgentBase without an implementation for abstract method 'execute'
+Traceback (most recent call last):
+  File "/app/core/system/agent_orchestrator.py", line 339, in load_agents
+    self.agents[agent_name] = agent_class(
+                              ^^^^^^^^^^^^
+TypeError: Can't instantiate abstract class AgentBase without an implementation for abstract method 'execute'
+ERROR    root:agent_orchestrator.py:348 Failed to load agent legal_agent: Can't instantiate abstract class AgentBase without an implementation for abstract method 'execute'
+Traceback (most recent call last):
+  File "/app/core/system/agent_orchestrator.py", line 339, in load_agents
+    self.agents[agent_name] = agent_class(
+                              ^^^^^^^^^^^^
+TypeError: Can't instantiate abstract class AgentBase without an implementation for abstract method 'execute'
+WARNING  root:agent_orchestrator.py:346 Agent class not found for: financial_modeling_agent
+ERROR    root:agent_orchestrator.py:348 Failed to load agent supply_chain_risk_agent: Can't instantiate abstract class AgentBase without an implementation for abstract method 'execute'
+Traceback (most recent call last):
+  File "/app/core/system/agent_orchestrator.py", line 339, in load_agents
+    self.agents[agent_name] = agent_class(
+                              ^^^^^^^^^^^^
+TypeError: Can't instantiate abstract class AgentBase without an implementation for abstract method 'execute'
+ERROR    root:agent_orchestrator.py:348 Failed to load agent algo_trading_agent: Can't instantiate abstract class AgentBase without an implementation for abstract method 'execute'
+Traceback (most recent call last):
+  File "/app/core/system/agent_orchestrator.py", line 339, in load_agents
+    self.agents[agent_name] = agent_class(
+                              ^^^^^^^^^^^^
+TypeError: Can't instantiate abstract class AgentBase without an implementation for abstract method 'execute'
+ERROR    root:agent_orchestrator.py:348 Failed to load agent discussion_chair_agent: Can't instantiate abstract class AgentBase without an implementation for abstract method 'execute'
+Traceback (most recent call last):
+  File "/app/core/system/agent_orchestrator.py", line 339, in load_agents
+    self.agents[agent_name] = agent_class(
+                              ^^^^^^^^^^^^
+TypeError: Can't instantiate abstract class AgentBase without an implementation for abstract method 'execute'
+ERROR    root:agent_orchestrator.py:348 Failed to load agent anomaly_detection_agent: Can't instantiate abstract class AgentBase without an implementation for abstract method 'execute'
+Traceback (most recent call last):
+  File "/app/core/system/agent_orchestrator.py", line 339, in load_agents
+    self.agents[agent_name] = agent_class(
+                              ^^^^^^^^^^^^
+TypeError: Can't instantiate abstract class AgentBase without an implementation for abstract method 'execute'
+ERROR    root:agent_orchestrator.py:348 Failed to load agent regulatory_compliance_agent: Can't instantiate abstract class AgentBase without an implementation for abstract method 'execute'
+Traceback (most recent call last):
+  File "/app/core/system/agent_orchestrator.py", line 339, in load_agents
+    self.agents[agent_name] = agent_class(
+                              ^^^^^^^^^^^^
+TypeError: Can't instantiate abstract class AgentBase without an implementation for abstract method 'execute'
+WARNING  root:agent_orchestrator.py:346 Agent class not found for: snc_analyst_agent
+WARNING  root:agent_orchestrator.py:346 Agent class not found for: NewsDesk_Orchestrator
+WARNING  root:agent_orchestrator.py:346 Agent class not found for: news_bot_agent
+ERROR    root:agent_orchestrator.py:348 Failed to load agent credit_sentry_agents: Can't instantiate abstract class AgentBase without an implementation for abstract method 'execute'
+Traceback (most recent call last):
+  File "/app/core/system/agent_orchestrator.py", line 339, in load_agents
+    self.agents[agent_name] = agent_class(
+                              ^^^^^^^^^^^^
+TypeError: Can't instantiate abstract class AgentBase without an implementation for abstract method 'execute'
+WARNING  root:agent_orchestrator.py:346 Agent class not found for: behavioral_economics_agent
+WARNING  root:agent_orchestrator.py:346 Agent class not found for: meta_cognitive_agent
+ERROR    root:agent_orchestrator.py:348 Failed to load agent BlindspotAgent: BlindspotAgent.__init__() got an unexpected keyword argument 'constitution'
+Traceback (most recent call last):
+  File "/app/core/system/agent_orchestrator.py", line 339, in load_agents
+    self.agents[agent_name] = agent_class(
+                              ^^^^^^^^^^^^
+TypeError: BlindspotAgent.__init__() got an unexpected keyword argument 'constitution'
+ERROR    root:agent_orchestrator.py:246 Failed to initialize and add OpenAI service to Semantic Kernel: OpenAIChatCompletion.__init__() got an unexpected keyword argument 'model_id'
+WARNING  core.engine.meta_orchestrator:meta_orchestrator.py:204 Context enrichment failed: 'RepoContextManager' object has no attribute 'get_context_for_query'
+WARNING  core.llm_plugin:llm_plugin.py:820 GEMINI_API_KEY not found. Defaulting to Mock behavior for Gemini.
+WARNING  core.vertical_risk_agent.generative_risk:generative_risk.py:161 PyTorch not found. Initializing VAE Stub.
+WARNING  core.vertical_risk_agent.generative_risk:generative_risk.py:111 Correlation matrix is not symmetric. Symmetrizing...
+WARNING  core.engine.meta_orchestrator:meta_orchestrator.py:278 Reflection Score Low. Marking for Human Review.
+=============================== warnings summary ===============================
+../home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/websockets/legacy/__init__.py:6
+  /home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/websockets/legacy/__init__.py:6: DeprecationWarning: websockets.legacy is deprecated; see https://websockets.readthedocs.io/en/stable/howto/upgrade.html for upgrade instructions
+    warnings.warn(  # deprecated in 14.0 - 2024-11-09
+
+../home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/pydantic/_internal/_generate_schema.py:2371
+  /home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/pydantic/_internal/_generate_schema.py:2371: PydanticDeprecatedSince211: The `__get_pydantic_core_schema__` method of the `BaseModel` class is deprecated. If you are calling `super().__get_pydantic_core_schema__` when overriding the method on a Pydantic model, consider using `handler(source)` instead. However, note that overriding this method on models can lead to unexpected side effects. Deprecated in Pydantic V2.11 to be removed in V3.0.
+    schema = annotation_get_schema(source, get_inner_schema)
+
+tests/test_v23_5_pipeline.py::test_deep_dive_pipeline
+tests/test_v23_5_pipeline.py::test_deep_dive_pipeline
+tests/test_v23_5_pipeline.py::test_deep_dive_pipeline
+  /app/core/utils/logging_utils.py:144: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    "timestamp": datetime.utcnow().isoformat(),
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_v23_5_pipeline.py::test_deep_dive_pipeline - AssertionError...
+======================== 1 failed, 5 warnings in 9.44s =========================
