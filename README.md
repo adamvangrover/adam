@@ -243,6 +243,15 @@ We are building the open-source standard for institutional AI.
 *   **Directives:** Please read [AGENTS.md](AGENTS.md) and the [Agent Knowledge Base](docs/AGENTS_KNOWLEDGE_BASE.md) before writing a single line of code.
 *   **Process:** Read [CONTRIBUTING.md](CONTRIBUTING.md) for pull request guidelines.
 
+## 📖 Documentation & Examples
+
+We have significantly expanded our documentation for v26.0:
+
+*   [**Documentation Hub**](docs/index.md): The central index.
+*   [**Architecture Deep Dive**](docs/architecture/adam_v26_neuro_symbolic.md)
+*   [**Tutorials**](docs/tutorials/): Learn to build Agents and Graphs.
+*   [**Examples**](examples/): Runnable Python scripts for Agents and Workflows.
+
 ### License
 
 Distributed under the MIT License. See `LICENSE` for more information.

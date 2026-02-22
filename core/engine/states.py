@@ -383,7 +383,7 @@ class ReflectorState(TypedDict, total=False):
     iteration_count: int
     human_readable_status: str
 
-# --- Omniscient State (v23.5) ---
+# --- Omniscient State (v26.0) ---
 
 
 class EntityEcosystem(TypedDict, total=False):
@@ -436,22 +436,22 @@ class OmniscientMeta(TypedDict, total=False):
 
 
 class OmniscientKnowledgeGraph(TypedDict, total=False):
-    """The v23.5 Hyper-Dimensional Knowledge Graph structure."""
+    """The v26.0 Hyper-Dimensional Knowledge Graph structure."""
     meta: OmniscientMeta
     nodes: OmniscientNodes
 
 
 class OmniscientState(TypedDict, total=False):
     """
-    State for the v23.5 'AI Partner' Omniscient Workflow.
+    State for the v26.0 'AI Partner' Omniscient Workflow.
 
     Attributes:
         ticker (str): The target ticker symbol.
-        v23_knowledge_graph (OmniscientKnowledgeGraph): The output graph.
+        v26_knowledge_graph (OmniscientKnowledgeGraph): The output graph.
         human_readable_status (str): Status message.
     """
     ticker: str  # Input
-    v23_knowledge_graph: OmniscientKnowledgeGraph  # Output
+    v26_knowledge_graph: OmniscientKnowledgeGraph  # Output
     human_readable_status: str
 
 # --- Initializers ---
@@ -591,7 +591,7 @@ def init_reflector_state(content: str, context: Optional[Dict[str, Any]] = None)
 
 
 def init_omniscient_state(ticker: str) -> OmniscientState:
-    """Initializes the Omniscient State (v23.5)."""
+    """Initializes the Omniscient State (v26.0)."""
     empty_nodes: OmniscientNodes = {
         "entity_ecosystem": {},
         "equity_analysis": {},
@@ -603,12 +603,12 @@ def init_omniscient_state(ticker: str) -> OmniscientState:
     empty_meta: OmniscientMeta = {
         "target": ticker,
         "generated_at": datetime.now().isoformat(),
-        "model_version": "Adam-v23.5"
+        "model_version": "Adam-v26.0"
     }
 
     return {
         "ticker": ticker,
-        "v23_knowledge_graph": {
+        "v26_knowledge_graph": {
             "meta": empty_meta,
             "nodes": empty_nodes
         },

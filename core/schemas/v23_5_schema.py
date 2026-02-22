@@ -25,7 +25,7 @@ class IntentCategory(str, Enum):
 class Meta(BaseModel):
     target: str
     generated_at: str
-    model_version: Literal["Adam-v23.5-Apex-Architect"]
+    model_version: Literal["Adam-v26.0-Apex-Architect"]
 
 # ==============================================================================
 # SECTION 2: AGENTIC INFRASTRUCTURE & WORKFLOW
@@ -243,9 +243,9 @@ class GraphEdge(BaseModel):
     relation_type: str
     properties: Dict[str, Any] = Field(default_factory=dict)
 
-class V23KnowledgeGraph(BaseModel):
+class V26KnowledgeGraph(BaseModel):
     """
-    The merged Core Knowledge Graph.
+    The merged Core Knowledge Graph (v26.0).
     It combines the strict 'Nodes' structure from Source 2 with the 
     flexible 'Edges' and metadata capabilities from Source 1.
     """
@@ -272,4 +272,4 @@ class HyperDimensionalKnowledgeGraph(BaseModel):
     """
     model_config = ConfigDict(populate_by_name=True, extra='allow')
     
-    v23_knowledge_graph: V23KnowledgeGraph
+    v26_knowledge_graph: V26KnowledgeGraph
