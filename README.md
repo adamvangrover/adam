@@ -2,7 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/) [![Docker Image](https://img.shields.io/badge/docker-ready-blue)](https://hub.docker.com/) [![FinanceBench](https://img.shields.io/badge/FinanceBench-99%25-green)](https://arxiv.org/abs/2311.11944)
 
-> **Adam v26.0 upgrades financial AI from a conversational chatbot to a fiduciary architect. Designed for high-stakes capital allocation, it fuses the intuitive speed of a Neural Swarm (System 1) with the deliberate logic of a Neuro-Symbolic Graph (System 2), delivering calculated conviction for institutional investors.**
+> **Adam v26.0 upgrades financial AI from a conversational chatbot to a fiduciary architect, explicitly engineered for Leveraged Finance, Distressed Debt, and Deep Credit Risk Underwriting. By fusing the intuitive speed of a Neural Swarm (System 1) with the deliberate logic of a Neuro-Symbolic Graph (System 2), Adam delivers calculated conviction for high-stakes capital allocation.**
 
 ---
 
@@ -36,6 +36,12 @@ The era of the "LLM Wrapper" is over. Institutional finance faces an **Epistemol
 *   **Use Case:** "Write a 30-page investment memo on the solvency of distressed debt."
 
 **Result:** Adam "thinks before he speaks," drafting, critiquing, and refining analysis before presenting it to the user.
+
+### Logic as Data
+Adam v26.0 treats business logic as first-class data. Using a JSON-based rule engine (`jsonLogic`), risk thresholds, trading triggers, and compliance rules are decoupled from the core codebase. This allows for:
+*   **Dynamic Policy Updates:** Modify risk parameters without redeploying code.
+*   **Auditability:** Rules are stored as JSON artifacts, making them human-readable and easy to version control.
+*   **Safety:** The logic layer is evaluated before agent execution, acting as a deterministic guardrail.
 
 ### System Architecture
 
