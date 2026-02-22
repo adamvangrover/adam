@@ -1,8 +1,8 @@
-# Adam v26.0: The Neuro-Symbolic Financial Sovereign
+# Adam v26.0: The Institutional-Grade Neuro-Symbolic Financial Sovereign
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/) [![Docker Image](https://img.shields.io/badge/docker-ready-blue)](https://hub.docker.com/) [![FinanceBench](https://img.shields.io/badge/FinanceBench-99%25-green)](https://arxiv.org/abs/2311.11944)
 
-> **Adam v26.0 upgrades financial AI from a conversational chatbot to a fiduciary architect. By fusing the intuitive speed of a Neural Swarm (System 1) with the deliberate logic of a Neuro-Symbolic Graph (System 2), Adam delivers calculated conviction for high-stakes capital allocation.**
+> **Adam v26.0 upgrades financial AI from a conversational chatbot to a fiduciary architect. Designed for high-stakes capital allocation, it fuses the intuitive speed of a Neural Swarm (System 1) with the deliberate logic of a Neuro-Symbolic Graph (System 2), delivering calculated conviction for institutional investors.**
 
 ---
 
@@ -23,7 +23,7 @@
 
 The era of the "LLM Wrapper" is over. Institutional finance faces an **Epistemological Crisis**: stochastic models hallucinate, making them dangerous for due diligence.
 
-**Adam v26.0** solves this by implementing a **Hybrid Cognitive Engine**:
+**Adam v26.0** solves this by implementing a **Hybrid Cognitive Engine** rooted in the principles of **Leveraged Finance** and **Distressed Debt**:
 
 ### System 1: The Swarm (Fast)
 *   **Role:** The Body. Handles perception, data ingestion, and news monitoring.
@@ -41,6 +41,39 @@ The era of the "LLM Wrapper" is over. Institutional finance faces an **Epistemol
 
 ```mermaid
 graph TD
+    subgraph Client_Layer [Client Layer]
+        User([User / PM]) -->|HTTP/REST| API_Gateway[API Gateway]
+        API_Gateway -->|Auth| Sec_Module[Security Module]
+    end
+
+    subgraph Orchestration_Layer [Orchestration Layer]
+        Sec_Module -->|Request| Meta_Orch[Meta-Orchestrator]
+        Meta_Orch -->|Route| System1[System 1: Neural Swarm]
+        Meta_Orch -->|Route| System2[System 2: Neuro-Symbolic Planner]
+    end
+
+    subgraph System_1_Swarm [System 1: High-Velocity Perception]
+        System1 -->|Async| News_Monitor[News Monitor]
+        System1 -->|Async| Sentiment_Engine[Sentiment Engine]
+        System1 -->|Async| Market_Data[Market Data Feed]
+    end
+
+    subgraph System_2_Reasoning [System 2: Deep Credit Analysis]
+        System2 -->|Plan| Credit_Sentinel[Credit Sentinel]
+
+        Credit_Sentinel -->|Task| Risk_Analyst[Risk Analyst]
+        Credit_Sentinel -->|Task| Ratio_Calc[Ratio Calculator]
+        Credit_Sentinel -->|Task| SNC_Analyst[SNC Analyst]
+
+        Risk_Analyst -->|Data| Distressed_Db[(Distressed Debt DB)]
+        Ratio_Calc -->|Model| ICAT_Engine[ICAT Valuation Engine]
+        SNC_Analyst -->|Regs| Shared_Review[Shared National Credit Review]
+    end
+
+    subgraph Logic_Layer [Logic as Data]
+        Credit_Sentinel -->|Trace| POT_Logger[ProofOfThought Logger]
+        POT_Logger -->|Hash| Immutable_Ledger[Immutable Ledger (JSON)]
+    end
 UserNode["User / Analyst"] -->|HTTP| WebApp["Web App (React/Flask)"]
     WebApp -->|MCP| MCPServer["MCP Server (Python)"]
     MCPServer -->|Router| MetaOrchestrator["Meta Orchestrator"]
@@ -51,6 +84,14 @@ UserNode["User / Analyst"] -->|HTTP| WebApp["Web App (React/Flask)"]
     FundAgent -->|Data| CredSentinel["Credit Sentinel"]
     RiskAgent -->|Data| CredSentinel
 ```
+
+## 🧬 Logic as Data: The Audit Trail
+
+Adam treats reasoning as a first-class citizen. Every logical step, from EBITDA adjustment to covenant stress-testing, is serialized as a data artifact via the `ProofOfThoughtLogger`. This ensures:
+
+*   **Traceability:** Every conclusion can be traced back to its source (e.g., specific line items in a 10-K).
+*   **Reproducibility:** Analysis can be re-run with different assumptions to test sensitivity.
+*   **Auditability:** A complete ledger of the agent's "thought process" is preserved in an immutable JSON ledger for compliance and review.
 
 ---
 
