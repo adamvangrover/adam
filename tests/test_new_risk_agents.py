@@ -22,7 +22,7 @@ async def test_market_risk_agent():
     result = await agent.execute(data)
 
     assert "volatility_annualized" in result
-    assert "var_95" in result
+    assert "var_95_pct" in result # Updated key
     assert "beta" in result
     assert isinstance(result["beta"], float)
 
@@ -53,7 +53,8 @@ async def test_liquidity_risk_agent():
         "financial_data": {
             "current_assets": 200,
             "current_liabilities": 100,
-            "inventory": 50
+            "inventory": 50,
+            "cash_and_equivalents": 50 # Added for LCR
         },
         "market_data": {
             "avg_daily_volume": 5000000,
@@ -98,7 +99,8 @@ async def test_industry_risk_agent():
 
     result = await agent.execute("Technology")
     assert result["risk_level"] == "High"
-    assert "High Disruption" in result["key_factors"]
+    # assert "High Disruption" in result["key_factors"] # Removed key_factors
+    assert "forces_breakdown" in result
 
 @pytest.mark.asyncio
 async def test_economic_risk_agent():
@@ -112,7 +114,7 @@ async def test_economic_risk_agent():
     }
 
     result = await agent.execute(data)
-    assert result["scenario"] == "Stagflation"
+    assert result["macro_scenario"] == "Stagflation" # Updated key
     assert result["risk_level"] in ["High", "Medium"]
 
 @pytest.mark.asyncio
@@ -128,12 +130,16 @@ async def test_currency_risk_agent():
     agent = CurrencyRiskAgent(config={"agent_id": "test_fx_risk"})
 
     # High exposure
+    # Converted old input style to new style
+    # foreign_revenue + foreign_debt -> exposures
+    # Assume Portfolio Value 1000
     data = {
-        "foreign_revenue_pct": 0.4,
-        "foreign_debt_pct": 0.2,
+        "portfolio_value": 1000,
+        "exposures": {"EUR": 400, "JPY": 200}, # 60% exposure
         "hedging_ratio": 0.1
     }
 
     result = await agent.execute(data)
-    assert result["net_exposure_pct"] > 0.5
+    # result["net_exposure_pct"] is now in result["exposure_metrics"]["exposure_pct_of_portfolio"]
+    assert result["exposure_metrics"]["exposure_pct_of_portfolio"] > 0.5
     assert result["risk_level"] == "High"
