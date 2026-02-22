@@ -11,7 +11,7 @@ from core.settings import settings
 
 async def async_main():
     """
-    Main execution logic for Adam v23.0 (Adaptive System).
+    Main execution logic for Adam v26.0 (Neuro-Symbolic Sovereign).
 
     This function handles:
     1. Parsing command line arguments.
@@ -25,7 +25,7 @@ async def async_main():
     Returns:
         None
     """
-    parser = argparse.ArgumentParser(description="Adam v23.0 Execution")
+    parser = argparse.ArgumentParser(description="Adam v26.0 Execution")
     parser.add_argument("--query", type=str, help="Single query to execute")
     parser.add_argument("--system_prompt", type=str, help="System Prompt to inject (String)")
     parser.add_argument("--system_prompt_path", type=str, help="System Prompt to inject (File Path)")

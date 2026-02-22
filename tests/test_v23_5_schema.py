@@ -1,4 +1,4 @@
-from core.schemas.v23_5_schema import HyperDimensionalKnowledgeGraph, V23KnowledgeGraph
+from core.schemas.v23_5_schema import HyperDimensionalKnowledgeGraph, V26KnowledgeGraph
 import json
 
 
@@ -7,11 +7,11 @@ def test_schema_validity():
     try:
         # Validate the JSON example from the new prompt
         example_json = {
-            "v23_knowledge_graph": {
+            "v26_knowledge_graph": {
                 "meta": {
                     "target": "TEST",
                     "generated_at": "2023-10-27",
-                    "model_version": "Adam-v23.5-Apex-Architect"
+                    "model_version": "Adam-v26.0-Apex-Architect"
                 },
                 "nodes": {
                     "entity_ecosystem": {
