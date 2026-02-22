@@ -86,5 +86,21 @@
     <script src="js/nexus_apps_investment.js"></script>
     <script src="js/nexus_apps_system.js"></script>
     <script src="js/nexus_apps_terminal.js"></script>
+    <script src="js/nexus_apps_extras.js"></script>
+    <script>
+        // Boot Animation Trigger
+        document.body.classList.add('booting');
+        setTimeout(() => document.body.classList.remove('booting'), 1000);
+
+        // Welcome Notification (First Run)
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!localStorage.getItem('nexus_welcome_shown')) {
+                setTimeout(() => {
+                    alert("Welcome to Office Nexus v26.0\n\n- Access core dashboards via Nexus Hub.\n- Use Terminal for deep dives.\n- Customize your experience in Theme Studio.");
+                    localStorage.setItem('nexus_welcome_shown', 'true');
+                }, 2000);
+            }
+        });
+    </script>
 </body>
 </html>

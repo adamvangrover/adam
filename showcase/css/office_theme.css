@@ -429,6 +429,34 @@ body {
     max-width: 100%;
 }
 
+/* Scrollbars */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #0b0c15;
+}
+::-webkit-scrollbar-thumb {
+    background: #334466;
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: var(--highlight-color);
+}
+
+/* Boot Animation */
+@keyframes crt-turn-on {
+    0% { transform: scale(1, 0.002); opacity: 0; filter: brightness(30); }
+    30% { transform: scale(1, 0.002); opacity: 1; filter: brightness(10); }
+    50% { transform: scale(1, 1); opacity: 1; filter: brightness(1); }
+    100% { transform: scale(1, 1); opacity: 1; filter: brightness(1); }
+}
+
+body.booting #desktop, body.booting #taskbar {
+    animation: crt-turn-on 0.2s cubic-bezier(0.230, 1.000, 0.320, 1.000);
+}
+
 /* Text Viewer */
 .text-viewer-content {
     padding: 20px;
