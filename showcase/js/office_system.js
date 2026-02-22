@@ -230,6 +230,16 @@ class WindowManager {
         }
     }
 
+    cascadeWindows() {
+        this.windows.forEach((win, i) => {
+            if (win.config.state !== 'minimized') {
+                win.el.style.left = (50 + i * 30) + 'px';
+                win.el.style.top = (50 + i * 30) + 'px';
+                this.focusWindow(win.id);
+            }
+        });
+    }
+
     maximizeWindow(id) {
         const win = this.windows.find(w => w.id === id);
         if (win) {
@@ -1188,6 +1198,7 @@ class OfficeOS {
         desktop.innerHTML = ''; // Clear existing
 
         const icons = [
+            { name: 'Nexus Hub', icon: 'https://img.icons8.com/color/48/000000/module.png', action: () => this.appRegistry.launch('NexusHub') },
             { name: 'My Computer', icon: 'https://img.icons8.com/color/48/000000/workstation.png', action: () => this.appRegistry.launch('Explorer', {path: './'}) },
             { name: 'Market Monitor', icon: 'https://img.icons8.com/color/48/000000/line-chart.png', action: () => this.appRegistry.launch('MarketMonitor') },
             { name: 'Credit Sentinel', icon: 'https://img.icons8.com/color/48/000000/security-checked--v1.png', action: () => this.appRegistry.launch('CreditSentinel') },
@@ -1272,6 +1283,15 @@ class OfficeOS {
         delete this.taskbarItems[id];
     }
 
+    getSystemState() {
+        return {
+            windows: this.windowManager.windows.map(w => ({ id: w.id, title: w.config.title, app: w.config.app })),
+            activeWindow: this.windowManager.activeWindow,
+            theme: this.themeManager.currentThemeId,
+            uptime: Math.floor(performance.now() / 1000)
+        };
+    }
+
     openFile(file) {
         let path = file.path;
         if (path.startsWith('./')) {
@@ -1284,7 +1304,9 @@ class OfficeOS {
             this.appRegistry.launch('Browser', { url: path, name: file.name });
         } else if (['csv', 'xls', 'xlsx'].includes(ext)) {
              this.appRegistry.launch('Spreadsheet', { path: path, name: file.name });
-        } else if (['txt', 'md', 'json', 'py', 'js', 'css', 'yaml', 'yml', 'xml', 'log'].includes(ext)) {
+        } else if (['log'].includes(ext)) {
+             this.appRegistry.launch('LogViewer', { path: path, name: file.name });
+        } else if (['txt', 'md', 'json', 'py', 'js', 'css', 'yaml', 'yml', 'xml'].includes(ext)) {
             // Check if json is meant for spreadsheet
             if(ext === 'json' && (file.name.includes('data') || file.name.includes('market'))) {
                 this.appRegistry.launch('Spreadsheet', { path: path, name: file.name });

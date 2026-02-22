@@ -210,58 +210,78 @@
                         print(`[Agent:PeerSet] Identifying peer set for ${ticker}...`);
                         await new Promise(r => setTimeout(r, 800));
 
-                        // Mock Logic matching Python Agent (Simulating Semantic Analysis)
-                        const mockPeers = {
-                            "AAPL": [
-                                { t: "DELL", s: 0.85, i: "Hardware" },
-                                { t: "HPQ", s: 0.82, i: "Hardware" },
-                                { t: "MSFT", s: 0.65, i: "Software" }
-                            ],
-                            "MSFT": [
-                                { t: "ORCL", s: 0.78, i: "Software" },
-                                { t: "ADBE", s: 0.75, i: "Software" },
-                                { t: "AMZN", s: 0.60, i: "Cloud" }
-                            ],
-                            "GOOGL": [
-                                { t: "META", s: 0.88, i: "Interactive Media" },
-                                { t: "AMZN", s: 0.70, i: "Cloud/Ads" },
-                                { t: "MSFT", s: 0.65, i: "Cloud" }
-                            ],
-                            "AMZN": [
-                                { t: "BABA", s: 0.85, i: "Retail" },
-                                { t: "WMT", s: 0.70, i: "Retail" },
-                                { t: "MSFT", s: 0.60, i: "Cloud" }
-                            ],
-                            "TSLA": [
-                                { t: "BYD", s: 0.88, i: "Auto" },
-                                { t: "F", s: 0.75, i: "Auto" },
-                                { t: "GM", s: 0.72, i: "Auto" }
-                            ],
-                            "NVDA": [
-                                { t: "AMD", s: 0.92, i: "Semis" },
-                                { t: "INTC", s: 0.80, i: "Semis" },
-                                { t: "TSM", s: 0.70, i: "Foundry" }
-                            ],
-                            "JPM": [
-                                { t: "BAC", s: 0.95, i: "Banks" },
-                                { t: "C", s: 0.90, i: "Banks" },
-                                { t: "WFC", s: 0.88, i: "Banks" }
-                            ],
-                            "V": [
-                                { t: "MA", s: 0.98, i: "Payments" },
-                                { t: "AXP", s: 0.85, i: "Payments" },
-                                { t: "PYPL", s: 0.70, i: "Fintech" }
-                            ],
-                            "PG": [
-                                { t: "CL", s: 0.90, i: "Household" },
-                                { t: "KO", s: 0.60, i: "Beverages" },
-                                { t: "PEP", s: 0.55, i: "Beverages" }
-                            ]
-                        };
+                        let peers = [];
 
-                        const peers = mockPeers[ticker];
+                        // Try to find dynamically from MARKET_DATA if available
+                        if (window.MARKET_DATA) {
+                            const target = window.MARKET_DATA.find(d => d.ticker === ticker);
+                            if (target && target.sector) {
+                                // Find others in same sector
+                                peers = window.MARKET_DATA
+                                    .filter(d => d.sector === target.sector && d.ticker !== ticker)
+                                    .slice(0, 5) // Top 5
+                                    .map(d => ({
+                                        t: d.ticker,
+                                        s: 0.7 + (Math.random() * 0.25), // Simulating score
+                                        i: d.industry || target.sector
+                                    }))
+                                    .sort((a,b) => b.s - a.s);
+                            }
+                        }
 
-                        if(peers) {
+                        // Fallback to Mock Logic matching Python Agent
+                        if (!peers || peers.length === 0) {
+                            const mockPeers = {
+                                "AAPL": [
+                                    { t: "DELL", s: 0.85, i: "Hardware" },
+                                    { t: "HPQ", s: 0.82, i: "Hardware" },
+                                    { t: "MSFT", s: 0.65, i: "Software" }
+                                ],
+                                "MSFT": [
+                                    { t: "ORCL", s: 0.78, i: "Software" },
+                                    { t: "ADBE", s: 0.75, i: "Software" },
+                                    { t: "AMZN", s: 0.60, i: "Cloud" }
+                                ],
+                                "GOOGL": [
+                                    { t: "META", s: 0.88, i: "Interactive Media" },
+                                    { t: "AMZN", s: 0.70, i: "Cloud/Ads" },
+                                    { t: "MSFT", s: 0.65, i: "Cloud" }
+                                ],
+                                "AMZN": [
+                                    { t: "BABA", s: 0.85, i: "Retail" },
+                                    { t: "WMT", s: 0.70, i: "Retail" },
+                                    { t: "MSFT", s: 0.60, i: "Cloud" }
+                                ],
+                                "TSLA": [
+                                    { t: "BYD", s: 0.88, i: "Auto" },
+                                    { t: "F", s: 0.75, i: "Auto" },
+                                    { t: "GM", s: 0.72, i: "Auto" }
+                                ],
+                                "NVDA": [
+                                    { t: "AMD", s: 0.92, i: "Semis" },
+                                    { t: "INTC", s: 0.80, i: "Semis" },
+                                    { t: "TSM", s: 0.70, i: "Foundry" }
+                                ],
+                                "JPM": [
+                                    { t: "BAC", s: 0.95, i: "Banks" },
+                                    { t: "C", s: 0.90, i: "Banks" },
+                                    { t: "WFC", s: 0.88, i: "Banks" }
+                                ],
+                                "V": [
+                                    { t: "MA", s: 0.98, i: "Payments" },
+                                    { t: "AXP", s: 0.85, i: "Payments" },
+                                    { t: "PYPL", s: 0.70, i: "Fintech" }
+                                ],
+                                "PG": [
+                                    { t: "CL", s: 0.90, i: "Household" },
+                                    { t: "KO", s: 0.60, i: "Beverages" },
+                                    { t: "PEP", s: 0.55, i: "Beverages" }
+                                ]
+                            };
+                            peers = mockPeers[ticker];
+                        }
+
+                        if(peers && peers.length > 0) {
                             print(`Peer Set Analysis for ${ticker}`);
                             print(`Method: Semantic Similarity (TF-IDF on Business Summary)`);
                             print(`------------------------------------------------------`);
@@ -274,6 +294,11 @@
                             print(`No peers found for ${ticker} in local cache.`, "red");
                         }
                     }
+                    break;
+
+                case 'dashboard':
+                    print("Launching Nexus Hub...");
+                    setTimeout(() => window.officeOS.appRegistry.launch('NexusHub'), 500);
                     break;
 
                 case 'analyze':
