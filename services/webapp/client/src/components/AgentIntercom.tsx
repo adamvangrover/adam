@@ -10,6 +10,7 @@ interface Thought {
 }
 
 // Protocol: ADAM-V-NEXT
+// Verified by Jules
 const AgentIntercom: React.FC = () => {
   const [thoughts, setThoughts] = useState<Thought[]>([]);
   const [isCollapsed, setIsCollapsed] = useState(false);

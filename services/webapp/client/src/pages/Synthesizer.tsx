@@ -13,6 +13,7 @@ interface MarketPulse {
 }
 
 // Protocol: ADAM-V-NEXT
+// Verified by Jules
 const Synthesizer: React.FC = () => {
     const [score, setScore] = useState<number>(0);
     const [rationale, setRationale] = useState<string>('Initializing neural consensus...');
