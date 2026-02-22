@@ -9,7 +9,7 @@ import asyncio
 import logging
 from typing import List, Dict, Any
 from core.engine.swarm.pheromone_board import PheromoneBoard
-from core.engine.swarm.worker_node import SwarmWorker, AnalysisWorker, CoderWorker, ReviewerWorker, TesterWorker
+from core.engine.swarm.worker_node import SwarmWorker, AnalysisWorker, CoderWorker, ReviewerWorker, TesterWorker, SentinelWorker
 
 logger = logging.getLogger(__name__)
 
@@ -48,6 +48,10 @@ class HiveMind:
         # Spawn Testers
         for _ in range(count_tester):
             self._spawn_worker(TesterWorker, "tester")
+
+        # Spawn Sentinel (Credit Sentinel - System 1 Monitor)
+        # Always spawn at least one sentinel to watch for credit events
+        self._spawn_worker(SentinelWorker, "sentinel")
 
     def _spawn_worker(self, worker_class, role):
         worker = worker_class(self.board, role=role)

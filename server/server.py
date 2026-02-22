@@ -54,6 +54,12 @@ except ImportError as e:
     print(f"Warning: Credit Sentinel import failed: {e}")
     CREDIT_SENTINEL_AVAILABLE = False
 
+# NEW IMPORT
+try:
+    from core.agents.risk_assessment_agent import RiskAssessmentAgent as System2RiskAgent
+except ImportError:
+    System2RiskAgent = None
+
 try:
     from core.governance.constitution import Constitution
     CONSTITUTION_AVAILABLE = True
@@ -187,14 +193,11 @@ def get_architecture_docs() -> str:
 # --- Tools ---
 
 @mcp.tool()
-def analyze_distressed_debt(ticker: str) -> str:
+async def analyze_distressed_debt(ticker: str) -> str:
     """
     Analyzes a company for signs of financial distress using the Credit Sentinel module.
     Returns a comprehensive JSON report including ratios, distress probability, and qualitative analysis.
     """
-    if not CREDIT_SENTINEL_AVAILABLE:
-        return json.dumps({"error": "Credit Sentinel module not available."})
-
     try:
         # 1. Mock Data Fetch (Replace with UniversalIngestor in prod)
         financials = {
@@ -206,8 +209,28 @@ def analyze_distressed_debt(ticker: str) -> str:
             'total_equity': 2000,
             'current_assets': 1000,
             'current_liabilities': 800,
-            'net_income': 100
+            'net_income': 100,
+            'cash': 200,
+            'monthly_burn_rate': 20,
+            'industry': 'Technology',
+            'credit_rating': 'B-'
         }
+
+        # Upgrade: Use System 2 RiskAssessmentAgent if available
+        if System2RiskAgent:
+            agent = System2RiskAgent(config={"persona": "Credit Underwriter"})
+            target_data = {
+                "company_name": ticker,
+                "financial_data": financials,
+                "market_data": {"price_data": [100, 90, 80], "trading_volume": 500000}
+            }
+            # Execute Async
+            result = await agent.execute(target_data, risk_type="investment")
+            return json.dumps(result, indent=2, default=str)
+
+        # Fallback to Legacy CreditSentinel
+        if not CREDIT_SENTINEL_AVAILABLE:
+            return json.dumps({"error": "Credit Sentinel module not available."})
 
         # 2. Calculate Ratios
         calc = RatioCalculator()
@@ -231,6 +254,38 @@ def analyze_distressed_debt(ticker: str) -> str:
 
     except Exception as e:
         return json.dumps({"error": str(e)})
+
+@mcp.tool()
+async def run_stress_test(portfolio_id: str, scenario: str) -> str:
+    """
+    Triggers a System 2 Stress Test via MetaOrchestrator.
+    """
+    orchestrator = get_orchestrator_instance()
+    if not orchestrator:
+        return "Error: MetaOrchestrator not available."
+
+    query = f"Run stress test for {portfolio_id} under {scenario} scenario."
+    # We force the route to CRISIS or HIGH
+    context = {"force_route": "CRISIS", "portfolio_id": portfolio_id}
+
+    try:
+        result = await orchestrator.route_request(query, context)
+        return str(result)
+    except Exception as e:
+        return f"Error running stress test: {str(e)}"
+
+@mcp.tool()
+def query_historical_defaults(industry: str, rating: str) -> str:
+    """
+    Queries historical default rates from the 'Logic as Data' repository.
+    """
+    # Mock Database
+    defaults = {
+        "Technology": {"AAA": 0.0, "BBB": 0.05, "CCC": 0.25, "B-": 0.15},
+        "Energy": {"AAA": 0.01, "BBB": 0.08, "CCC": 0.35, "B-": 0.20}
+    }
+    rate = defaults.get(industry, {}).get(rating, "N/A")
+    return json.dumps({"industry": industry, "rating": rating, "historical_default_rate": rate})
 
 
 @mcp.tool()
@@ -506,140 +561,6 @@ async def run_crisis_simulation(macro_shock: str) -> str:
             "gdp_growth": "-1.2%"
         }
     }, indent=2)
-
-
-@mcp.tool()
-def get_snc_rating(borrower_id: str) -> str:
-    """
-    Retrieves the Shared National Credit (SNC) rating for a borrower.
-    Returns a mock rating if not found.
-    """
-    mock_db = {
-        "AAPL": "Pass",
-        "TSLA": "Pass",
-        "AMC": "Substandard",
-        "GME": "Special Mention"
-    }
-    return mock_db.get(borrower_id.upper(), "Not Rated")
-
-
-@mcp.tool()
-def get_esg_score(company: str) -> str:
-    """
-    Retrieves the ESG score for a company.
-    """
-    return json.dumps({
-        "company": company,
-        "environment": 85,
-        "social": 78,
-        "governance": 90,
-        "total": 84
-    })
-
-
-@mcp.tool()
-def list_active_agents() -> str:
-    """
-    Lists all agents currently loaded in the orchestrator.
-    """
-    orch = get_orchestrator_instance()
-    if not orch or not orch.legacy_orchestrator:
-        return "Orchestrator not initialized."
-
-    agents = list(orch.legacy_orchestrator.agents.keys())
-    return f"Active Agents ({len(agents)}): {', '.join(agents)}"
-
-
-@mcp.tool()
-def get_agent_status(agent_name: str) -> str:
-    """
-    Checks if a specific agent is loaded.
-    """
-    orch = get_orchestrator_instance()
-    if not orch or not orch.legacy_orchestrator:
-        return "Orchestrator not initialized."
-
-    agent = orch.legacy_orchestrator.get_agent(agent_name)
-    if agent:
-        return f"Agent '{agent_name}' is ACTIVE. Type: {type(agent).__name__}"
-    else:
-        return f"Agent '{agent_name}' is NOT FOUND."
-
-@mcp.tool()
-def check_governance_compliance(action: str, context: str) -> str:
-    """
-    Checks if an action complies with the governance constitution.
-    Args:
-        action: The action name.
-        context: A JSON string representing the context (e.g., '{"risk_score": 0.5}').
-    """
-    if not CONSTITUTION_AVAILABLE:
-        return json.dumps({"status": "ERROR", "message": "Constitution module not available."})
-
-    try:
-        context_dict = json.loads(context)
-    except json.JSONDecodeError:
-        return json.dumps({"status": "ERROR", "message": "Invalid JSON context."})
-
-    constitution = Constitution()
-    is_allowed = constitution.check_action(action, context_dict)
-
-    return json.dumps({
-        "action": action,
-        "allowed": is_allowed,
-        "audit_log": constitution.get_audit_log()
-    }, indent=2)
-
-# --- Prompts ---
-
-@mcp.prompt("analyze-risk")
-def analyze_risk_prompt(entity_id: str) -> str:
-    """
-    Returns a prompt template for analyzing risk for an entity.
-    """
-    return f"""Please analyze the credit risk for {entity_id} using the following methodology:
-    1. Retrieve market data using retrieve_market_data('{entity_id}').
-    2. Calculate credit exposure using calculate_credit_exposure('{entity_id}', 1000000).
-    3. Assess the covenants if available.
-    4. Provide a recommendation based on Adam's risk-averse profile."""
-
-
-@mcp.prompt("deep-dive")
-def deep_dive_prompt(entity: str) -> str:
-    """
-    Returns a prompt template for initiating a Deep Dive analysis.
-    """
-    return f"""Initiate the Adam v23.5 Deep Dive Protocol for {entity}.
-    Required Phases:
-    1. Entity Ecosystem & Management Assessment
-    2. Deep Fundamental & Valuation (DCF, Multiples)
-    3. Credit, Covenants & SNC Ratings
-    4. Risk, Simulation & Quantum Modeling
-    5. Strategic Synthesis & Conviction
-
-    Execute using 'run_deep_dive_analysis' tool."""
-
-
-@mcp.prompt("red-team-attack")
-def red_team_prompt(strategy: str) -> str:
-    return f"""Execute a Red Team adversarial attack on the following strategy: '{strategy}'.
-    Identify:
-    1. Correlation breakdowns
-    2. Liquidity cliffs
-    3. Regulatory tail risks
-
-    Use 'run_red_team_attack' tool."""
-
-
-@mcp.prompt("crisis-simulation")
-def crisis_sim_prompt(event: str) -> str:
-    return f"""Simulate the macroeconomic impact of: '{event}'.
-    Assess impact on:
-    1. S&P 500
-    2. High Yield Spreads
-    3. GDP Growth
-
-    Use 'run_crisis_simulation' tool."""
 
 if __name__ == "__main__":
     # Ensure DB exists

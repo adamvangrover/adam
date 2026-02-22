@@ -2,7 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/) [![Docker Image](https://img.shields.io/badge/docker-ready-blue)](https://hub.docker.com/) [![FinanceBench](https://img.shields.io/badge/FinanceBench-99%25-green)](https://arxiv.org/abs/2311.11944)
 
-> **Adam v26.0 upgrades financial AI from a conversational chatbot to a fiduciary architect. By fusing the intuitive speed of a Neural Swarm (System 1) with the deliberate logic of a Neuro-Symbolic Graph (System 2), Adam delivers calculated conviction for high-stakes capital allocation.**
+> **Adam v26.0 upgrades financial AI from a conversational chatbot to a fiduciary architect. By fusing the intuitive speed of a Neural Swarm (System 1) with the deliberate logic of a Neuro-Symbolic Graph (System 2), Adam delivers calculated conviction for institutional-grade leveraged finance and deep credit risk underwriting.**
 
 ---
 
@@ -25,15 +25,17 @@ The era of the "LLM Wrapper" is over. Institutional finance faces an **Epistemol
 
 **Adam v26.0** solves this by implementing a **Hybrid Cognitive Engine**:
 
-### System 1: The Swarm (Fast)
-*   **Role:** The Body. Handles perception, data ingestion, and news monitoring.
-*   **Architecture:** Asynchronous Event Loop (Pub/Sub).
-*   **Use Case:** "Monitor AAPL for breaking news."
+### System 1: The Swarm (The Reflexes)
+*   **Role:** High-velocity, unstructured data parsing.
+*   **Focus:** Earnings call transcripts, ARR momentum, and baseline financial ratios.
+*   **Architecture:** Asynchronous Hive Mind with `SentinelWorker` for anomaly detection.
+*   **Use Case:** "Monitor TMT sector for cash burn spikes."
 
-### System 2: The Graph (Slow)
-*   **Role:** The Brain. Handles reasoning, planning, and criticism.
-*   **Architecture:** Directed Acyclic Graph (DAG) with feedback loops.
-*   **Use Case:** "Write a 30-page investment memo on the solvency of distressed debt."
+### System 2: The Graph (The Deep Thinker)
+*   **Role:** Downside scenario stress testing, capital structure analysis, and covenant compliance.
+*   **Focus:** "Logic as Data" enforcement of underwriting policies.
+*   **Architecture:** Neuro-Symbolic Planner (DAG) with feedback loops.
+*   **Use Case:** "Generate a deep-dive credit memo with Base/Bull/Bear DCF scenarios."
 
 **Result:** Adam "thinks before he speaks," drafting, critiquing, and refining analysis before presenting it to the user.
 
@@ -46,10 +48,10 @@ graph TD
     MCPServer -->|Router| MetaOrchestrator["Meta Orchestrator"]
     MetaOrchestrator -->|Fast Path| NeuralSwarm["System 1: Async Swarm"]
     MetaOrchestrator -->|Slow Path| NeuroPlanner["System 2: Neuro-Symbolic Planner"]
-    NeuroPlanner -->|Task| FundAgent["Fundamental Agent"]
-    NeuroPlanner -->|Task| RiskAgent["Risk Agent"]
-    FundAgent -->|Data| CredSentinel["Credit Sentinel"]
-    RiskAgent -->|Data| CredSentinel
+    NeuroPlanner -->|Task| FundAgent["Fundamental Agent (Cash Flow/EV)"]
+    NeuroPlanner -->|Task| RiskAgent["Risk Agent (Default/Liquidity/Recovery)"]
+    NeuralSwarm -->|Alert| CredSentinel["Credit Sentinel Worker"]
+    CredSentinel -->|Trigger| MetaOrchestrator
 ```
 
 ---

@@ -174,3 +174,47 @@ class TesterWorker(SwarmWorker):
             "worker": self.id
         }
         await self.board.deposit("TEST_RESULT", result, intensity=10.0, source=self.id)
+
+class SentinelWorker(SwarmWorker):
+    """
+    Credit Sentinel (System 1 -> System 2 Bridge).
+    Passively monitors swarm outputs for high-risk anomalies.
+    """
+    async def run(self):
+        logger.info(f"SentinelWorker {self.id} starting watch...")
+        while self.is_active:
+            # Sniff for ANALYSIS_RESULT
+            # Note: We do NOT consume, to allow other components (like HiveMind aggregator) to also see it.
+            # But PheromoneBoard.sniff doesn't consume.
+            results = await self.board.sniff(signal_type="ANALYSIS_RESULT")
+
+            for signal in results:
+                # We use a simple in-memory cache to avoid re-alerting on the same signal ID
+                # In a real system, we'd check if we've processed this signal.id
+                # Here, we assume signals are transient or we just check content.
+
+                data = signal.data
+                risk_score = data.get("risk_score", 0)
+                target = data.get("target", "Unknown")
+
+                # Check for Anomaly (e.g., Risk > 50)
+                # In the mock AnalysisWorker, score = len(target) * 10
+                # So "distressed_co" (13 chars) -> 130 score.
+
+                if risk_score > 50:
+                    logger.warning(f"Sentinel {self.id} detected ANOMALY: {target} (Score: {risk_score}). Triggering System 2.")
+
+                    alert_payload = {
+                        "target": target,
+                        "risk_score": risk_score,
+                        "anomaly_type": "High Risk Score",
+                        "detected_by": self.id
+                    }
+
+                    # Deposit RISK_ALERT which MetaOrchestrator can pick up
+                    await self.board.deposit("RISK_ALERT", alert_payload, intensity=20.0, source=self.id)
+
+                    # Optional: We could also deposit TASK_PLANNER directly if we wanted to bypass orchestrator logic
+                    # await self.board.deposit("TASK_PLANNER", {"intent": "DEEP_DIVE", "target": target}, intensity=50.0)
+
+            await asyncio.sleep(0.5)

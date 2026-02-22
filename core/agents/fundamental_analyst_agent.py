@@ -142,7 +142,12 @@ class FundamentalAnalystAgent(AgentBase):
             logging.debug(f"FAA_XAI:EXECUTE_COMPANY_DATA_KEYS: {list(company_data.keys())}")
 
             financial_ratios = self.calculate_financial_ratios(company_data)
-            dcf_valuation_result = self.calculate_dcf_valuation(company_data)
+
+            # --- Scenario Analysis (Base/Bull/Bear) ---
+            # We now calculate DCF for multiple scenarios to provide a range of intrinsic values.
+            dcf_valuation_result = self.calculate_dcf_valuation(company_data) # Base Case (Legacy)
+            dcf_scenarios = self.calculate_dcf_scenarios(company_data)
+
             comps_valuation = self.calculate_comps_valuation(company_data)  # Placeholder
             enterprise_value_result = self.calculate_enterprise_value(company_data)
             financial_health = self.assess_financial_health(financial_ratios)
@@ -171,14 +176,16 @@ class FundamentalAnalystAgent(AgentBase):
                 financial_health,
                 enterprise_value_result,
                 history_context=history_context,
-                gemini_insights=gemini_insights
+                gemini_insights=gemini_insights,
+                dcf_scenarios=dcf_scenarios
             )
 
             # Save to Memory
             self.memory_manager.save_analysis(company_id, analysis_summary, {
                 "dcf": dcf_valuation_result,
                 "health": financial_health,
-                "ev": enterprise_value_result
+                "ev": enterprise_value_result,
+                "scenarios": dcf_scenarios
             })
 
             result_package = {
@@ -186,6 +193,7 @@ class FundamentalAnalystAgent(AgentBase):
                 "financial_ratios": financial_ratios,
                 "raw_metrics": raw_metrics,
                 "dcf_valuation": dcf_valuation_result,
+                "dcf_valuation_scenarios": dcf_scenarios,
                 "comps_valuation": comps_valuation,
                 "enterprise_value": enterprise_value_result,
                 "financial_health": financial_health,
@@ -372,7 +380,8 @@ class FundamentalAnalystAgent(AgentBase):
     async def generate_analysis_summary(self, company_id: str, financial_ratios: Dict[str, float],
                                         dcf_valuation: Optional[float], comps_valuation: Optional[float],
                                         financial_health: str, enterprise_value: Optional[float],
-                                        history_context: str = "", gemini_insights: Optional[Dict] = None) -> str:
+                                        history_context: str = "", gemini_insights: Optional[Dict] = None,
+                                        dcf_scenarios: Optional[Dict[str, float]] = None) -> str:
         # ... (existing summary generation logic, SK or fallback) ...
         # This method's logging is mostly for SK call, fallback summary is straightforward
         # For XAI, the inputs to this are already logged by `execute` and prior calc methods.
@@ -438,10 +447,17 @@ class FundamentalAnalystAgent(AgentBase):
         else:
             summary += "  Financial ratios could not be calculated.\n"
         summary += f"Financial Health: {financial_health}\n"
-        if dcf_valuation is not None:
+
+        # Scenario Analysis Section
+        if dcf_scenarios:
+            summary += "Valuation Scenarios (DCF):\n"
+            for scenario, val in dcf_scenarios.items():
+                 summary += f"  - {scenario}: {val:,.2f}\n"
+        elif dcf_valuation is not None:
             summary += f"DCF Valuation: {dcf_valuation:.2f}\n"
         else:
             summary += "DCF Valuation: Not available\n"
+
         if comps_valuation is not None:
             summary += f"Comps Valuation: {comps_valuation:.2f}\n"
         else:
@@ -507,17 +523,73 @@ class FundamentalAnalystAgent(AgentBase):
         # ... (existing code) ...
         pass
 
-    def calculate_dcf_valuation(self, company_data: Dict[str, Any]) -> Optional[float]:
+    def calculate_dcf_scenarios(self, company_data: Dict[str, Any]) -> Dict[str, float]:
+        """
+        Calculates DCF valuation under Base, Bull, and Bear scenarios.
+        """
+        scenarios = {}
+
+        # Base Case (Default)
+        base = self.calculate_dcf_valuation(company_data)
+        if base is not None:
+            scenarios["Base Case"] = base
+
+            # Assumptions for sensitivity
+            # We assume the base calculation succeeded, so we can access dcf_assumptions safely inside
+            # However, calculate_dcf_valuation accesses them internally.
+            # We need to pass overrides.
+
+            # Simple Heuristic Sensitivity:
+            # Bull: +2% growth
+            # Bear: -2% growth (or half)
+
+            # To do this correctly, we need to extract the base rates first to modify them,
+            # but calculate_dcf_valuation encapsulates extraction.
+            # We will rely on the optional overrides added to calculate_dcf_valuation.
+
+            # We need to know the base rates to offset them.
+            # Let's peek at the data again (safe here as base succeeded)
+            try:
+                dcf_assumptions = company_data.get('financial_data_detailed', {}).get('dcf_assumptions', {})
+                base_high_growth = dcf_assumptions.get('initial_high_growth_rate', 0.10)
+                base_term_growth = dcf_assumptions.get('terminal_growth_rate', 0.025)
+
+                # Bull Case
+                bull_high = base_high_growth + 0.03
+                bull_term = base_term_growth + 0.005
+                scenarios["Bull Case"] = self.calculate_dcf_valuation(
+                    company_data,
+                    growth_rate_override=bull_high,
+                    terminal_growth_override=bull_term
+                )
+
+                # Bear Case
+                bear_high = max(0.0, base_high_growth - 0.05)
+                bear_term = max(0.0, base_term_growth - 0.01)
+                scenarios["Bear Case"] = self.calculate_dcf_valuation(
+                    company_data,
+                    growth_rate_override=bear_high,
+                    terminal_growth_override=bear_term
+                )
+            except Exception as e:
+                logging.warning(f"Failed to calculate scenarios: {e}")
+
+        return scenarios
+
+    def calculate_dcf_valuation(self, company_data: Dict[str, Any],
+                                growth_rate_override: Optional[float] = None,
+                                terminal_growth_override: Optional[float] = None) -> Optional[float]:
         """
         Calculates the Discounted Cash Flow (DCF) valuation of the company using a two-stage FCF projection model.
 
         Args:
-            company_data (Dict[str, Any]): The comprehensive data package for the company,
-                                         expected to contain 'financial_data_detailed'.
+            company_data (Dict[str, Any]): The comprehensive data package for the company.
+            growth_rate_override (float): Optional override for the initial high growth rate.
+            terminal_growth_override (float): Optional override for the terminal growth rate.
         """
         company_name_for_log = company_data.get('company_info', {}).get('name', 'Unknown')
-        logging.debug(
-            f"FAA_XAI:DCF_INPUT: company_id='{company_name_for_log}', company_data keys: {list(company_data.keys())}")
+        # logging.debug(
+        #     f"FAA_XAI:DCF_INPUT: company_id='{company_name_for_log}', company_data keys: {list(company_data.keys())}")
         try:
             financial_details = company_data.get('financial_data_detailed', {})
             cash_flow_statement = financial_details.get('cash_flow_statement', {})
@@ -537,14 +609,17 @@ class FundamentalAnalystAgent(AgentBase):
 
             # Core rates from existing assumptions
             discount_rate = dcf_assumptions.get('discount_rate')
+
             # Terminal growth rate for perpetuity calculation (after explicit projection period)
-            terminal_growth_rate_perpetuity = dcf_assumptions.get('terminal_growth_rate')
+            terminal_growth_rate_perpetuity = terminal_growth_override if terminal_growth_override is not None else dcf_assumptions.get('terminal_growth_rate')
 
             # New parameters for two-stage growth model
             fcf_projection_years_total = int(dcf_assumptions.get('fcf_projection_years_total', 10))  # Default 10 years
             initial_high_growth_period_years = int(dcf_assumptions.get(
                 'initial_high_growth_period_years', 5))  # Default 5 years
-            initial_high_growth_rate = dcf_assumptions.get('initial_high_growth_rate', 0.10)  # Default 10%
+
+            initial_high_growth_rate = growth_rate_override if growth_rate_override is not None else dcf_assumptions.get('initial_high_growth_rate', 0.10)
+
             stable_growth_rate = dcf_assumptions.get('stable_growth_rate', 0.05)  # Default 5% for second stage
 
             # Ensure initial_high_growth_period_years is not more than fcf_projection_years_total
