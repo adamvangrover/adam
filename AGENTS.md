@@ -65,19 +65,35 @@ This document aggregates critical lessons from Sentinel (Security), Bolt (Archit
 
 ## Architecture: System 1 vs. System 2
 
-Understanding where your agent fits is crucial.
+Understanding where your agent fits is crucial. Adam v26.0 employs a "Hybrid Cognitive Engine" inspired by Daniel Kahneman's *Thinking, Fast and Slow*.
 
-### System 1: The Swarm (Async)
-*   **Pattern:** Fire-and-Forget.
+### ⚡ System 1: The Neural Swarm (Fast & Intuitive)
+*   **Role:** The Autonomic Nervous System. Handles perception, reflexes, and continuous monitoring.
+*   **Architecture:** Event-Driven, Asynchronous Pub/Sub (Event Loop).
 *   **Base Class:** `AsyncAgentBase`
-*   **Use Case:** Fetching data, monitoring news feeds, simple classification.
-*   **Example:** `NewsWatcherAgent` sees a headline and pushes it to the queue.
+*   **Key Characteristics:**
+    *   **Low Latency:** Reacts in milliseconds.
+    *   **High Concurrency:** Thousands of agents running in parallel.
+    *   **No Global State:** Agents act on local information (Pheromones).
+*   **Use Cases:**
+    *   Ingesting live market data via WebSocket.
+    *   Sentiment analysis of breaking news.
+    *   Anomaly detection (e.g., "Volume spike detected").
+*   **Example:** `SentinelWorker` observes a data stream and deposits a `RISK_ALERT` token if a threshold is breached.
 
-### System 2: The Graph (Sync)
-*   **Pattern:** State Machine (LangGraph).
-*   **Base Class:** `TemplateAgentV26`
-*   **Use Case:** Complex reasoning, multi-step planning, report generation.
-*   **Example:** `FundamentalAnalyst` receives a ticker, plans a research path, fetches 10-Ks, analyzes them, and writes a memo.
+### 🧠 System 2: The Neuro-Symbolic Graph (Slow & Deliberate)
+*   **Role:** The Prefrontal Cortex. Handles reasoning, planning, complex analysis, and synthesis.
+*   **Architecture:** Directed Acyclic Graph (DAG) or Cyclic State Machine (LangGraph).
+*   **Base Class:** `TemplateAgentV26` (inherits from `OmegaAgent`)
+*   **Key Characteristics:**
+    *   **Stateful:** Maintains context across multiple steps (Memory).
+    *   **Reflective:** Can critique its own outputs and loop back to correct errors.
+    *   **Tool-Augmented:** Uses MCP tools for deterministic calculations.
+*   **Use Cases:**
+    *   Generating a 30-page "Deep Dive" credit memo.
+    *   Conducting a DCF valuation with sensitivity analysis.
+    *   Reconciling conflicting data from multiple sources.
+*   **Example:** `FundamentalAnalyst` receives a ticker, drafts a research plan, executes multiple searches, compiles financial ratios, and writes a structured report.
 
 ---
 
