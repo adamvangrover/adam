@@ -59,6 +59,58 @@ class SecureSandbox:
     # --------------------------------------------------------------------------
 
     @staticmethod
+    def _sanitize_modules(safe_globals: Dict[str, Any]):
+        """
+        Removes dangerous functions from imported modules in safe_globals.
+        This is a Defense-in-Depth measure against library gadgets.
+        """
+        # Pandas Sanitization
+        if 'pd' in safe_globals:
+            pd = safe_globals['pd']
+            # Dangerous IO and Top-level functions
+            for attr in dir(pd):
+                # Remove read_* and to_* (except safe conversions)
+                if attr.startswith("read_") or attr.startswith("to_"):
+                    if attr in {'to_datetime', 'to_numeric', 'to_timedelta'}:
+                        continue
+                    try:
+                        delattr(pd, attr)
+                    except AttributeError:
+                        pass
+
+            # Remove dangerous submodules/attributes if exposed
+            for attr in ['io', 'testing', 'api']:
+                if hasattr(pd, attr):
+                    try:
+                        delattr(pd, attr)
+                    except AttributeError:
+                        pass
+
+            # Disable dangerous methods on DataFrame/Series classes
+            # Since we are in an isolated process, monkey-patching is safe and effective
+            for cls_name in ['DataFrame', 'Series']:
+                if hasattr(pd, cls_name):
+                    cls_obj = getattr(pd, cls_name)
+                    for attr in ['to_csv', 'to_pickle', 'to_sql', 'to_clipboard', 'to_excel', 'to_json', 'to_html']:
+                        # We block all to_* file export methods to prevent data exfiltration or overwriting
+                        if hasattr(cls_obj, attr):
+                            try:
+                                setattr(cls_obj, attr, None)
+                            except (AttributeError, TypeError) as e:
+                                logger.error(f"Failed to disable {cls_name}.{attr}: {e}")
+                                print(f"DEBUG: Failed to disable {cls_name}.{attr}: {e}")
+
+        # Numpy Sanitization
+        if 'np' in safe_globals:
+            np = safe_globals['np']
+            for attr in ['load', 'save', 'savez', 'savez_compressed', 'fromfile', 'loadtxt', 'genfromtxt']:
+                if hasattr(np, attr):
+                    try:
+                        delattr(np, attr)
+                    except AttributeError:
+                        pass
+
+    @staticmethod
     def _get_safe_globals() -> Dict[str, Any]:
         """Returns the dictionary of globals allowed in the sandbox."""
         safe_globals = {
@@ -223,6 +275,9 @@ class SecureSandbox:
 
         output_buffer = io.StringIO()
         safe_globals = cls._get_safe_globals()
+
+        # 🛡️ Sentinel: Sanitize modules to prevent library gadget attacks
+        cls._sanitize_modules(safe_globals)
 
         # Explicitly define an empty local scope to prevent leaking implementation details
         # unless necessary for specific execution contexts
