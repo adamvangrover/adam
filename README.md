@@ -74,6 +74,15 @@ graph TD
         Credit_Sentinel -->|Trace| POT_Logger[ProofOfThought Logger]
         POT_Logger -->|Hash| Immutable_Ledger[Immutable Ledger (JSON)]
     end
+UserNode["User / Analyst"] -->|HTTP| WebApp["Web App (React/Flask)"]
+    WebApp -->|MCP| MCPServer["MCP Server (Python)"]
+    MCPServer -->|Router| MetaOrchestrator["Meta Orchestrator"]
+    MetaOrchestrator -->|Fast Path| NeuralSwarm["System 1: Async Swarm"]
+    MetaOrchestrator -->|Slow Path| NeuroPlanner["System 2: Neuro-Symbolic Planner"]
+    NeuroPlanner -->|Task| FundAgent["Fundamental Agent"]
+    NeuroPlanner -->|Task| RiskAgent["Risk Agent"]
+    FundAgent -->|Data| CredSentinel["Credit Sentinel"]
+    RiskAgent -->|Data| CredSentinel
 ```
 
 ## 🧬 Logic as Data: The Audit Trail
