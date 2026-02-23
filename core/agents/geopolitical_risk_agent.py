@@ -28,6 +28,14 @@ class GeopoliticalRiskAgent(AgentBase):
             "EM": ["CN", "US"]
         }
 
+        # Enhanced Supply Chain Dependency Map (Region -> Dependency Weight)
+        self.supply_chain_dependency = {
+            "US": {"CN": 0.4, "EU": 0.3},
+            "EU": {"CN": 0.3, "RU": 0.4}, # Energy dependency on RU
+            "CN": {"US": 0.3, "EM": 0.4},
+            "EM": {"CN": 0.5, "US": 0.3}
+        }
+
         # Economic weight for global impact
         self.global_weights = {
             "US": 0.25, "CN": 0.18, "EU": 0.17,
@@ -68,11 +76,18 @@ class GeopoliticalRiskAgent(AgentBase):
         for region in regions_list:
             factors = detailed_data.get(region)
             score = self.calculate_risk_score(region, factors)
+
+            # Apply Event Specific Impacts (e.g. "Sanctions")
+            event_impact = self._apply_event_impacts(factors)
+            score += event_impact
+            score = min(100.0, score)
+
             key_risks = self.identify_key_risks(region, score, factors)
 
             risk_assessments[region] = {
                 "risk_score": score,
                 "key_risks": key_risks,
+                "event_impact_adjustment": event_impact,
                 "level": "High" if score > 70 else "Medium" if score > 40 else "Low"
             }
 
@@ -170,13 +185,15 @@ class GeopoliticalRiskAgent(AgentBase):
 
     def calculate_contagion(self, assessments: Dict[str, Dict]) -> Dict[str, Any]:
         """
-        Analyzes contagion risk.
-        If a connected region has High Risk (>70), it imposes a 'contagion penalty' on this region.
+        Analyzes contagion risk using Connectivity and Supply Chain Dependency.
+        If a connected region has High Risk (>60), it imposes a 'contagion penalty' on this region.
         """
         contagion_map = {}
 
         for region in assessments:
             neighbors = self.connectivity_map.get(region, [])
+            dependencies = self.supply_chain_dependency.get(region, {})
+
             incoming_contagion = 0.0
             sources = []
 
@@ -184,8 +201,14 @@ class GeopoliticalRiskAgent(AgentBase):
                 if neighbor in assessments:
                     neighbor_score = assessments[neighbor]['risk_score']
                     if neighbor_score > 60:
-                        # Contagion Intensity: 20% of the excess risk over 60
-                        impact = (neighbor_score - 60) * 0.20
+                        # Base Contagion Intensity: 15% of the excess risk over 60
+                        base_factor = 0.15
+
+                        # Boost factor if there is high supply chain dependency
+                        dep_weight = dependencies.get(neighbor, 0.0)
+                        factor = base_factor + (dep_weight * 0.20) # Up to +20% more impact
+
+                        impact = (neighbor_score - 60) * factor
                         incoming_contagion += impact
                         sources.append(f"{neighbor}({impact:.1f})")
 
@@ -195,6 +218,20 @@ class GeopoliticalRiskAgent(AgentBase):
             }
 
         return contagion_map
+
+    def _apply_event_impacts(self, factors: Optional[Dict[str, Any]]) -> float:
+        """Applies score adjustments based on boolean flags or keywords."""
+        if not factors: return 0.0
+
+        impact = 0.0
+
+        # Check for specific flags
+        if factors.get("active_conflict", False): impact += 25
+        if factors.get("sanctions_imposed", False): impact += 15
+        if factors.get("upcoming_election_uncertainty", False): impact += 10
+        if factors.get("supply_chain_disruption", False): impact += 10
+
+        return impact
 
     def assess_geopolitical_risks(self) -> Dict[str, Any]:
         """Legacy wrapper."""

@@ -52,6 +52,16 @@ class OperationalRiskAgent(AgentBase):
 
         if mgmt_tenure < 2: risk_score += 15
 
+        # 1b. Key Risk Indicators (KRIs) - Enhanced Logic
+        kri_score, kris = self._evaluate_kris(company_profile)
+        risk_score += kri_score
+
+        # 1c. Scenario Analysis - Impact adjustments
+        scenario_impact, scenarios = self._evaluate_scenarios(company_profile, revenue)
+        # Add a scaled portion of scenario impact to risk score (capped)
+        if scenario_impact > 0:
+            risk_score += 15 # Penalty for active negative scenarios
+
         risk_score = min(100.0, risk_score)
 
         # 2. Loss Distribution Approach (LDA) Simulation
@@ -85,6 +95,8 @@ class OperationalRiskAgent(AgentBase):
                 "expected_annual_loss": lda_results["expected_loss"],
                 "max_simulated_loss": lda_results["max_loss_simulation"]
             },
+            "kri_analysis": kris,
+            "scenario_analysis": scenarios,
             "factors": {
                 "stability": "Low" if years < 5 else "High",
                 "compliance_history": "Clean" if incidents == 0 else "Issues",
@@ -132,3 +144,50 @@ class OperationalRiskAgent(AgentBase):
             "expected_loss": float(expected_loss),
             "max_loss_simulation": float(np.max(total_losses))
         }
+
+    def _evaluate_kris(self, profile: Dict[str, Any]) -> tuple[float, Dict[str, Any]]:
+        """Evaluates Key Risk Indicators (KRIs)."""
+        score = 0.0
+        kris = {}
+
+        # Cyber Incidents
+        cyber = profile.get("kri_cyber_incidents", 0)
+        if cyber > 0:
+            score += 10 + (cyber * 5)
+            kris["cyber_security"] = f"Warning: {cyber} incidents detected"
+        else:
+            kris["cyber_security"] = "Stable"
+
+        # System Uptime (IT Risk)
+        uptime = profile.get("kri_system_uptime", 100.0)
+        if uptime < 99.0:
+            score += 10
+            kris["it_systems"] = f"Critical: Low Uptime ({uptime}%)"
+        elif uptime < 99.9:
+            score += 5
+            kris["it_systems"] = f"Concern: Moderate Uptime ({uptime}%)"
+        else:
+            kris["it_systems"] = "Stable"
+
+        return score, kris
+
+    def _evaluate_scenarios(self, profile: Dict[str, Any], revenue: float) -> tuple[float, Dict[str, Any]]:
+        """Evaluates specific stress scenarios."""
+        impact = 0.0
+        scenarios = {}
+
+        # Cyber Attack Scenario
+        if profile.get("scenario_cyber_attack", False):
+            # Assume 2% revenue loss + reputation damage
+            loss = revenue * 0.02
+            impact += loss
+            scenarios["cyber_attack_sim"] = {"estimated_loss": loss, "impact": "High"}
+
+        # Regulatory Fine Scenario
+        if profile.get("scenario_regulatory_fine", False):
+            # Assume 1% revenue fine
+            loss = revenue * 0.01
+            impact += loss
+            scenarios["regulatory_fine_sim"] = {"estimated_loss": loss, "impact": "Medium"}
+
+        return impact, scenarios

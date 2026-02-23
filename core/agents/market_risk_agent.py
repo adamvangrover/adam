@@ -74,6 +74,10 @@ class MarketRiskAgent(AgentBase):
             # 6. Stress Testing
             stress_impacts = self._run_stress_test(returns)
 
+            # 7. Additional Metrics (Sortino, Max Drawdown)
+            sortino = self._calculate_sortino_ratio(returns)
+            max_dd = self._calculate_max_drawdown(prices)
+
             # Format Monetary Values if portfolio value is provided
             portfolio_value = market_data.get("portfolio_value")
             monetary_metrics = {}
@@ -89,6 +93,8 @@ class MarketRiskAgent(AgentBase):
                 "var_95_pct": float(var_95_pct),
                 "cvar_95_pct": float(cvar_95_pct),
                 "beta": float(beta) if beta is not None else "N/A",
+                "sortino_ratio": float(sortino),
+                "max_drawdown": float(max_dd),
                 "stress_tests_impact_pct": stress_impacts,
                 "monetary_risk": monetary_metrics,
                 "risk_level": "High" if annual_vol > 0.3 else "Medium" if annual_vol > 0.15 else "Low"
@@ -191,5 +197,41 @@ class MarketRiskAgent(AgentBase):
             "historical_covid_crash": 0.30, # 30% loss
             "hypothetical_mild_recession": 0.15,
             "statistical_3_sigma_shock": abs(sigma_3_shock),
-            "statistical_6_sigma_shock": abs(sigma_6_shock)
+            "statistical_6_sigma_shock": abs(sigma_6_shock),
+            "correlation_breakdown_shock": 0.25 # Assumption: diversification fails
         }
+
+    def _calculate_sortino_ratio(self, returns: np.ndarray, target_return: float = 0.0) -> float:
+        """Calculates Sortino Ratio (Return / Downside Deviation)."""
+        mean_return = np.mean(returns)
+
+        # Downside deviation: only consider returns below target
+        downside_returns = returns[returns < target_return]
+
+        if len(downside_returns) == 0:
+            return 0.0 # No downside risk?
+
+        downside_deviation = np.std(downside_returns)
+
+        if downside_deviation == 0:
+            return 0.0
+
+        # Annualized Sortino (assuming daily returns)
+        sortino = (mean_return - target_return) / downside_deviation
+        return float(sortino * np.sqrt(252))
+
+    def _calculate_max_drawdown(self, prices: np.ndarray) -> float:
+        """Calculates Maximum Drawdown from peak."""
+        if len(prices) < 2:
+            return 0.0
+
+        # Calculate running maximum
+        running_max = np.maximum.accumulate(prices)
+
+        # Calculate drawdown for each point
+        drawdowns = (prices - running_max) / running_max
+
+        # Max drawdown is the minimum (most negative) value
+        max_dd = np.min(drawdowns)
+
+        return float(abs(max_dd))

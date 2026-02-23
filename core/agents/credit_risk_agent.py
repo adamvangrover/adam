@@ -88,6 +88,15 @@ class CreditRiskAgent(AgentBase):
                     implied_pd = self._pd_from_dd(merton_dd)
                     credit_rating = self._map_pd_to_rating(implied_pd)
 
+            # 3. Fundamental Credit Ratios
+            # DSCR, Interest Coverage, Debt/EBITDA
+            ebitda = financial_data.get("ebitda", ebit) # Fallback to EBIT if no EBITDA
+            interest_expense = financial_data.get("interest_expense", 0)
+            debt_service = financial_data.get("debt_service", interest_expense) # Fallback
+            total_debt = financial_data.get("total_debt", tl) # Fallback to TL
+
+            ratios = self._calculate_fundamental_ratios(ebitda, ebit, interest_expense, debt_service, total_debt)
+
             result = {
                 "z_score": float(z_score),
                 "z_score_model": "Manufacturing (Z)" if industry == "Manufacturing" else "Non-Manufacturing (Z'')",
@@ -96,6 +105,7 @@ class CreditRiskAgent(AgentBase):
                 "merton_distance_to_default": float(merton_dd) if merton_dd is not None else None,
                 "implied_probability_of_default": float(implied_pd) if implied_pd is not None else None,
                 "estimated_credit_rating": credit_rating,
+                "fundamental_ratios": ratios,
                 "components": {
                     "A_Liquidity": float(A),
                     "B_Leverage": float(B),
@@ -199,3 +209,33 @@ class CreditRiskAgent(AgentBase):
         if pd <= 0.5000: return "CCC"
         if pd <= 0.6000: return "CCC-"
         return "D"
+
+    def _calculate_fundamental_ratios(self, ebitda, ebit, interest_expense, debt_service, total_debt):
+        """Calculates key credit ratios."""
+        ratios = {}
+
+        # Interest Coverage Ratio = EBIT / Interest Expense
+        if interest_expense > 0:
+            icr = ebit / interest_expense
+            ratios["interest_coverage_ratio"] = float(icr)
+            ratios["icr_assessment"] = "Healthy" if icr > 3.0 else "Weak" if icr < 1.5 else "Adequate"
+        else:
+            ratios["interest_coverage_ratio"] = None
+
+        # DSCR = EBITDA / Debt Service
+        if debt_service > 0:
+            dscr = ebitda / debt_service
+            ratios["dscr"] = float(dscr)
+            ratios["dscr_assessment"] = "Strong" if dscr > 1.25 else "Breakeven" if dscr >= 1.0 else "Deficit"
+        else:
+            ratios["dscr"] = None
+
+        # Leverage Ratio = Total Debt / EBITDA
+        if ebitda > 0:
+            lev = total_debt / ebitda
+            ratios["debt_to_ebitda"] = float(lev)
+            ratios["leverage_assessment"] = "Low" if lev < 2.0 else "High" if lev > 4.0 else "Moderate"
+        else:
+             ratios["debt_to_ebitda"] = None
+
+        return ratios

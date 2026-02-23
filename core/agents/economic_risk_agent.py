@@ -37,6 +37,28 @@ class EconomicRiskAgent(AgentBase):
 
         risk_score, scenario, misery_index = self._analyze_macro_scenario(gdp, inflation, unemp, inverted_yield)
 
+        # 4. Sahm Rule (Recession Indicator)
+        unemp_history = macro_data.get("unemployment_history_12m", [])
+        sahm_signal, sahm_val = self._apply_sahm_rule(unemp, unemp_history)
+        if sahm_signal:
+            risk_score += 25
+            if "Recession" not in scenario:
+                 scenario += " (Sahm Rule Triggered)"
+
+        # 5. Taylor Rule (Monetary Policy Gap)
+        fed_funds = macro_data.get("fed_funds_rate", 0.05)
+        target_inflation = macro_data.get("target_inflation", 0.02)
+        r_star = macro_data.get("natural_interest_rate", 0.005) # 0.5% real neutral rate
+
+        taylor_rate = self._calculate_taylor_rule(inflation, gdp, target_inflation, r_star)
+        policy_gap = fed_funds - taylor_rate
+
+        # If policy is too loose (gap negative) -> Inflation Risk
+        # If policy is too tight (gap positive) -> Recession Risk
+        if abs(policy_gap) > 0.02:
+            risk_score += 10 # Policy error risk
+
+        risk_score = min(100.0, risk_score)
         level = "High" if risk_score > 60 else "Medium" if risk_score > 30 else "Low"
 
         result = {
@@ -46,7 +68,15 @@ class EconomicRiskAgent(AgentBase):
             "metrics": {
                 "misery_index": float(misery_index),
                 "misery_classification": self._classify_misery(misery_index),
-                "yield_curve_signal": "Warning" if inverted_yield else "Normal"
+                "yield_curve_signal": "Warning" if inverted_yield else "Normal",
+                "sahm_rule_indicator": float(sahm_val),
+                "sahm_signal": sahm_signal
+            },
+            "monetary_policy_analysis": {
+                "actual_rate": float(fed_funds),
+                "taylor_rule_rate": float(taylor_rate),
+                "policy_gap": float(policy_gap),
+                "interpretation": "Too Tight" if policy_gap > 0.01 else "Too Loose" if policy_gap < -0.01 else "Neutral"
             },
             "input_data": {
                 "gdp_growth": gdp,
@@ -114,3 +144,57 @@ class EconomicRiskAgent(AgentBase):
         if misery_index < 0.10: return "Moderate"
         if misery_index < 0.15: return "High"
         return "Severe"
+
+    def _apply_sahm_rule(self, current_unemp: float, unemp_history: list[float]) -> tuple[bool, float]:
+        """
+        Sahm Rule: Recession signaled when 3-month moving average of national unemployment rate
+        rises by 0.50 percentage points or more relative to its low during the previous 12 months.
+        """
+        if not unemp_history or len(unemp_history) < 12:
+            return False, 0.0
+
+        # Combine current with history to get full series
+        # Assume history is chronological [t-12, ..., t-1]
+        full_series = unemp_history + [current_unemp]
+
+        # Get last 3 months
+        recent_3m = full_series[-3:]
+        current_3m_avg = sum(recent_3m) / len(recent_3m)
+
+        # Get lowest 3m average in previous 12 months
+        # We need rolling 3m averages for the last 12 months
+        rolling_avgs = []
+        for i in range(len(full_series) - 2):
+            window = full_series[i:i+3]
+            rolling_avgs.append(sum(window)/3.0)
+
+        if not rolling_avgs: return False, 0.0
+
+        # Current is the last one
+        curr_val = rolling_avgs[-1]
+
+        # Previous ones (excluding current)
+        prev_vals = rolling_avgs[:-1]
+        if not prev_vals: prev_vals = [curr_val]
+
+        min_val = min(prev_vals)
+
+        diff = curr_val - min_val
+
+        return (diff >= 0.005), float(diff)
+
+    def _calculate_taylor_rule(self, inflation: float, gdp_growth: float, target_inflation: float = 0.02, r_star: float = 0.005) -> float:
+        """
+        Standard Taylor Rule: i = r* + pi + 0.5(pi - pi*) + 0.5(y - y*)
+        Here we use GDP growth deviation from trend (approx 2%) as output gap proxy.
+        """
+        # Assumptions
+        trend_growth = 0.02
+        output_gap = gdp_growth - trend_growth # Rough proxy
+
+        # Taylor Rule Formula
+        # i = r_star + inflation + 0.5 * (inflation - target_inflation) + 0.5 * output_gap
+
+        i_taylor = r_star + inflation + 0.5 * (inflation - target_inflation) + 0.5 * output_gap
+
+        return float(i_taylor)
