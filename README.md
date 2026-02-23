@@ -12,7 +12,7 @@
 *   [**⚡ Setup Guide**](docs/setup_guide.md)
 *   [**🤖 Agent Developer Bible**](AGENTS.md)
 *   [**🧠 Agent Knowledge Base**](docs/AGENTS_KNOWLEDGE_BASE.md)
-*   [**📖 Architecture Overview**](docs/architecture.md)
+*   [**📖 Architecture Overview**](docs/ARCHITECTURE.md)
 *   [**🎓 Tutorials**](docs/tutorials.md)
 *   [**🎓 Office Nexus Tutorial**](docs/TUTORIAL_OFFICE_NEXUS.md)
 *   [**📦 Custom Builds**](docs/custom_builds.md)
@@ -245,14 +245,16 @@ We are building the open-source standard for institutional AI.
 *   **Directives:** Please read [AGENTS.md](AGENTS.md) and the [Agent Knowledge Base](docs/AGENTS_KNOWLEDGE_BASE.md) before writing a single line of code.
 *   **Process:** Read [CONTRIBUTING.md](CONTRIBUTING.md) for pull request guidelines.
 
-## 📖 Documentation & Examples
+## 📖 Documentation & Guides
 
 We have significantly expanded our documentation for v26.0:
 
+*   [**Architecture & Design**](docs/ARCHITECTURE.md): The Neuro-Symbolic 3-Layer Architecture.
+*   [**Production Setup**](docs/PRODUCTION.md): Deployment, Security, and Ops.
+*   [**Versioning Strategy**](docs/VERSIONING.md): Release cycle and branching.
+*   [**Agent Creation**](docs/AGENT_CREATION.md): How to build and register new agents.
+*   [**Graph Workflows**](docs/GRAPH_WORKFLOWS.md): Building DAG-based reasoning loops.
 *   [**Documentation Hub**](docs/index.md): The central index.
-*   [**Architecture Deep Dive**](docs/architecture/adam_v26_neuro_symbolic.md)
-*   [**Tutorials**](docs/tutorials/): Learn to build Agents and Graphs.
-*   [**Examples**](examples/): Runnable Python scripts for Agents and Workflows.
 
 ### License
 
@@ -260,4 +262,4 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 ---
 
-**For AI Agents and LLMs,** please see [llms.txt](llms.txt) (optimized) or [llms-full.txt](llms-full.txt) (comprehensive) for context.*
+**For AI Agents and LLMs,** please see [llms.txt](llms.txt) (optimized) or [llms-full.txt](llms-full.txt) (comprehensive) for context.
