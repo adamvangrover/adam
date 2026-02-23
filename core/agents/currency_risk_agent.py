@@ -86,12 +86,16 @@ class CurrencyRiskAgent(AgentBase):
         # 3. Interest Rate Parity (IRP) Check
         market_rates = fx_data.get("market_rates", {})
         irp_deviations = {}
+        ppp_analysis = {}
+        carry_scores = {}
 
         for ccy, rates in market_rates.items():
             spot = rates.get("spot")
             fwd_mkt = rates.get("forward_1y")
             rd = rates.get("rate_domestic")
             rf = rates.get("rate_foreign")
+            cpi_d = rates.get("cpi_domestic")
+            cpi_f = rates.get("cpi_foreign")
 
             if all(v is not None for v in [spot, fwd_mkt, rd, rf]):
                 # Theoretical Forward F = S * (1+rd)/(1+rf)
@@ -108,6 +112,18 @@ class CurrencyRiskAgent(AgentBase):
                 if abs(diff_pct) > 0.02: # Significant deviation
                     risk_score += 10 # Market dislocation risk
 
+            # 4. PPP (Purchasing Power Parity) Check
+            # Relative PPP: Change in Spot should equal inflation differential
+            # Absolute PPP hard without basket price, so using inflation differential as pressure gauge
+            if cpi_d and cpi_f:
+                 ppp_signal, valuation = self._check_ppp(cpi_d, cpi_f, spot) # Simplified
+                 ppp_analysis[ccy] = {"valuation": valuation, "signal": ppp_signal}
+
+            # 5. Carry Trade Score
+            if rd is not None and rf is not None:
+                carry_score = self._calculate_carry_score(rd, rf, vol_assumption) # Using portfolio vol assumption
+                carry_scores[ccy] = carry_score
+
         risk_score = min(100.0, risk_score)
         level = "High" if risk_score > 60 else "Medium" if risk_score > 30 else "Low"
 
@@ -120,8 +136,45 @@ class CurrencyRiskAgent(AgentBase):
                 "portfolio_fx_var_95": float(fx_var_95),
                 "portfolio_fx_var_pct": float(fx_var_pct)
             },
-            "irp_analysis": irp_deviations
+            "irp_analysis": irp_deviations,
+            "ppp_analysis": ppp_analysis,
+            "carry_trade_attractiveness": carry_scores
         }
 
         logger.info(f"Currency Risk Assessment Complete: {result}")
         return result
+
+    def _check_ppp(self, cpi_domestic: float, cpi_foreign: float, spot: float) -> tuple[str, str]:
+        """
+        Simplified PPP check.
+        If Inflation Domestic > Inflation Foreign, Domestic Currency should depreciate (Spot rate go up if defined as Dom/For?).
+        Wait, standard quote is usually Base/Quote or Quote/Base.
+        Assuming Spot is Domestic per Foreign Unit (e.g. 150 JPY/USD, if we report in JPY).
+
+        If CPI_Dom (105) > CPI_For (102), then Domestic purchasing power eroded faster.
+        Domestic currency should weaken -> Spot (Dom/For) should rise.
+        """
+        # We assume indices started at 100 same time.
+        # Theoretical Spot = Spot_0 * (CPI_Dom / CPI_For)
+        # We don't have Spot_0.
+
+        # We just return the inflation differential signal.
+        inflation_diff = (cpi_domestic - cpi_foreign)
+
+        if inflation_diff > 5:
+            return "High Inflation Differential", "Domestic Currency Overvalued (Pressure to Depreciate)"
+        elif inflation_diff < -5:
+             return "Low Inflation Differential", "Domestic Currency Undervalued (Pressure to Appreciate)"
+        else:
+             return "Stable", "Neutral"
+
+    def _calculate_carry_score(self, r_dom: float, r_for: float, vol: float) -> float:
+        """
+        Carry Score = (r_foreign - r_domestic) / Volatility
+        Assumes we are Long Foreign, Short Domestic.
+        If we hold foreign currency, we earn r_for, pay r_dom.
+        """
+        carry = r_for - r_dom
+        if vol == 0: return 0.0
+
+        return float(carry / vol)

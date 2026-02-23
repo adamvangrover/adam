@@ -117,6 +117,24 @@ class IndustryRiskAgent(AgentBase):
         # Determine Cyclicality Label
         cyclicality_label = "Cyclical" if beta > 1.1 else "Defensive" if beta < 0.9 else "Neutral"
 
+        # Additional Industry Metrics
+        hhi = None
+        lifecycle = "Mature"
+
+        if isinstance(input_data, dict):
+            # Calculate HHI if market shares provided
+            market_shares = input_data.get("market_shares", [])
+            hhi = self._calculate_hhi(market_shares)
+
+            # Assess Lifecycle
+            growth_rate = input_data.get("revenue_growth_3y", 0.05)
+            lifecycle = self._assess_lifecycle_stage(growth_rate)
+
+            # Adjust score for Decline phase
+            if lifecycle == "Decline":
+                final_score += 10
+                final_score = min(100, final_score)
+
         result = {
             "sector": sector_name,
             "industry_risk_score": float(final_score),
@@ -127,8 +145,41 @@ class IndustryRiskAgent(AgentBase):
                 "beta": float(beta),
                 "label": cyclicality_label,
                 "risk_adjustment": float(cyclicality_adj)
-            }
+            },
+            "concentration_analysis": {
+                "hhi_index": float(hhi) if hhi is not None else None,
+                "concentration_level": "High" if hhi and hhi > 2500 else "Moderate" if hhi and hhi > 1500 else "Low"
+            },
+            "lifecycle_stage": lifecycle
         }
 
         logger.info(f"Industry Risk Assessment Complete: {result}")
         return result
+
+    def _calculate_hhi(self, market_shares: list[float]) -> Optional[float]:
+        """Calculates Herfindahl-Hirschman Index (HHI). Sum of squared market shares * 10000."""
+        if not market_shares:
+            return None
+
+        # Ensure shares are decimals summing to roughly 1.0 (or just sum of squares if percentages)
+        # We assume input is like [0.30, 0.20] for 30%, 20%
+
+        total = sum(market_shares)
+        if total > 10: # Likely passed as whole numbers 30, 20
+            shares = [s/100.0 for s in market_shares]
+        else:
+            shares = market_shares
+
+        hhi = sum([s**2 for s in shares]) * 10000
+        return float(hhi)
+
+    def _assess_lifecycle_stage(self, growth_rate: float) -> str:
+        """Determines industry lifecycle stage based on 3-year CAGR."""
+        if growth_rate > 0.15:
+            return "Growth"
+        elif growth_rate > 0.02:
+            return "Mature"
+        elif growth_rate > -0.05:
+            return "Stagnant"
+        else:
+            return "Decline"

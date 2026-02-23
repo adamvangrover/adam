@@ -57,11 +57,19 @@ class LiquidityRiskAgent(AgentBase):
             # LCR Approximation
             lcr = self._calculate_lcr(financial_data)
 
+            # Cash Conversion Cycle (CCC)
+            ccc = self._calculate_ccc(financial_data)
+
+            # NSFR Approximation
+            nsfr = self._calculate_nsfr(financial_data)
+
             result["financial_liquidity"] = {
                 "current_ratio": float(current_ratio),
                 "quick_ratio": float(quick_ratio),
                 "liquidity_coverage_ratio_approx": float(lcr),
-                "assessment": "Good" if lcr > 1.0 else "Concern" if lcr < 0.8 else "Adequate"
+                "cash_conversion_cycle_days": ccc,
+                "net_stable_funding_ratio_approx": float(nsfr),
+                "assessment": "Good" if lcr > 1.0 and (ccc is None or ccc < 90) else "Concern" if lcr < 0.8 else "Adequate"
             }
         except Exception as e:
             logger.error(f"Error calculating financial liquidity: {e}")
@@ -79,11 +87,15 @@ class LiquidityRiskAgent(AgentBase):
             # Market Impact Cost
             impact_cost = self._calculate_impact_cost(market_data, trade_size)
 
+            # Spread Volatility (if history available)
+            spread_vol = self._calculate_spread_volatility(market_data)
+
             result["market_liquidity"] = {
                 "avg_daily_volume": float(avg_volume),
                 "bid_ask_spread_pct": float(spread_pct),
                 "simulated_impact_cost_pct": float(impact_cost),
                 "simulated_trade_size": float(trade_size),
+                "bid_ask_spread_volatility": float(spread_vol),
                 "assessment": "Liquid" if impact_cost < 0.01 else "Illiquid" if impact_cost > 0.05 else "Moderate"
             }
         except Exception as e:
@@ -141,3 +153,68 @@ class LiquidityRiskAgent(AgentBase):
         market_impact_pct = volatility * np.sqrt(ratio)
 
         return float(half_spread_pct + market_impact_pct)
+
+    def _calculate_ccc(self, financial_data: Dict[str, Any]) -> Optional[float]:
+        """Calculates Cash Conversion Cycle (CCC) = DSO + DIO - DPO."""
+        sales = financial_data.get("sales", 0)
+        cogs = financial_data.get("cogs", 0)
+        receivables = financial_data.get("receivables", 0)
+        inventory = financial_data.get("inventory", 0)
+        payables = financial_data.get("payables", 0)
+
+        if sales == 0 or cogs == 0:
+            return None
+
+        # Days Sales Outstanding (DSO)
+        dso = (receivables / sales) * 365
+
+        # Days Inventory Outstanding (DIO)
+        dio = (inventory / cogs) * 365
+
+        # Days Payable Outstanding (DPO)
+        dpo = (payables / cogs) * 365 # Often uses COGS or Purch (approx COGS)
+
+        return float(dso + dio - dpo)
+
+    def _calculate_nsfr(self, financial_data: Dict[str, Any]) -> float:
+        """Approximates Net Stable Funding Ratio (Available Stable Funding / Required Stable Funding)."""
+        # ASF Factors (Simplified Basel III)
+        # Capital + Liabilities > 1yr: 100%
+        # Stable Deposits: 95% (Not usually broken out, assume 0 for generic)
+        # Wholesale Funding < 1yr: 0% or 50%
+
+        equity = financial_data.get("market_value_equity", 0) # Proxy for capital
+        long_term_debt = financial_data.get("long_term_debt", 0)
+
+        asf = equity + long_term_debt # Conservative proxy
+
+        # RSF Factors
+        # Assets that need funding
+        # Cash: 0%
+        # Govt Bonds: 5%
+        # Corp Bonds: 15-50%
+        # Loans < 1yr: 50%
+        # Loans > 1yr / Physical Assets: 100%
+
+        # We use Total Assets - Cash - Govt Bonds as a proxy for "Illiquid Assets" needing funding
+        total_assets = financial_data.get("total_assets", 0)
+        cash = financial_data.get("cash_and_equivalents", 0)
+        govt_bonds = financial_data.get("government_bonds", 0)
+
+        illiquid_assets = total_assets - cash - govt_bonds
+        if illiquid_assets < 0: illiquid_assets = 0
+
+        # Rough RSF: 100% of Illiquid + 0% of Liquid
+        rsf = illiquid_assets
+
+        if rsf == 0: return 2.0 # Very safe
+
+        return asf / rsf
+
+    def _calculate_spread_volatility(self, market_data: Dict[str, Any]) -> float:
+        """Calculates volatility of the bid-ask spread if history is provided."""
+        spread_history = market_data.get("spread_history", [])
+        if not spread_history or len(spread_history) < 2:
+            return 0.0
+
+        return float(np.std(spread_history))

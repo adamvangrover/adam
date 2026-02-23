@@ -95,6 +95,16 @@ class VolatilityRiskAgent(AgentBase):
         elif garch_forecast_annual < prev_annual_vol * 0.95:
             vol_trend = "Falling"
 
+        # 4. Volatility Cone Analysis (Percentile Ranking)
+        hist_vol_data = vol_data.get("historical_vol_30d", [])
+        vol_cone = self._analyze_volatility_cone(rv, hist_vol_data)
+
+        # Adjust score if current vol is extremely low (reversion risk) or extremely high
+        if vol_cone.get("percentile", 50) < 10:
+             risk_score += 15 # Risk of explosion from low vol
+        elif vol_cone.get("percentile", 50) > 90:
+             risk_score += 10 # Already extreme
+
         risk_score = min(100.0, risk_score)
         level = "High" if risk_score > 60 else "Medium" if risk_score > 30 else "Low"
 
@@ -113,8 +123,39 @@ class VolatilityRiskAgent(AgentBase):
                 "next_period_volatility_annualized": float(garch_forecast_annual),
                 "trend": vol_trend,
                 "model": "GARCH(1,1) Daily Step"
-            }
+            },
+            "volatility_cone_analysis": vol_cone
         }
 
         logger.info(f"Volatility Risk Assessment Complete: {result}")
         return result
+
+    def _analyze_volatility_cone(self, current_vol: float, historical_vols: list[float]) -> Dict[str, Any]:
+        """Analyzes where current volatility sits relative to historical distribution."""
+        if not historical_vols or len(historical_vols) < 5:
+            return {"percentile": 50, "status": "Insufficient Data"}
+
+        # Sort historical data
+        sorted_vols = sorted(historical_vols)
+        n = len(sorted_vols)
+
+        # Calculate Percentile
+        # Number of items less than current_vol
+        below_count = sum(1 for v in sorted_vols if v < current_vol)
+        percentile = (below_count / n) * 100.0
+
+        # Determine status
+        if percentile < 10: status = "Extremely Low (Reversion Risk)"
+        elif percentile < 25: status = "Low"
+        elif percentile < 75: status = "Normal"
+        elif percentile < 90: status = "High"
+        else: status = "Extremely High"
+
+        return {
+            "current_vol": float(current_vol),
+            "percentile": float(percentile),
+            "min_historical": float(sorted_vols[0]),
+            "max_historical": float(sorted_vols[-1]),
+            "median_historical": float(np.median(sorted_vols)),
+            "status": status
+        }
