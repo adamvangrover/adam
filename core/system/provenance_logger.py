@@ -8,6 +8,8 @@ import uuid
 import datetime
 import os
 import hashlib
+import psutil
+import subprocess
 from typing import Dict, Any, Optional
 from enum import Enum
 
@@ -27,6 +29,14 @@ class ProvenanceLogger:
         self.jsonl_path = os.path.join(log_dir, "provenance_stream.jsonl")
         os.makedirs(self.log_dir, exist_ok=True)
         self.session_id = str(uuid.uuid4())
+        self.git_revision = self._get_git_revision()
+        self.version = "23.5.0" # Should match setup.py/pyproject.toml
+
+    def _get_git_revision(self):
+        try:
+            return subprocess.check_output(['git', 'rev-parse', 'HEAD']).decode('ascii').strip()
+        except Exception:
+            return "unknown"
 
     def _generate_hash(self, data: Dict[str, Any]) -> str:
         try:
@@ -34,6 +44,16 @@ class ProvenanceLogger:
             return hashlib.sha256(dump.encode('utf-8')).hexdigest()
         except TypeError:
             return str(hash(str(data)))
+
+    def _get_compute_metrics(self) -> Dict[str, Any]:
+        try:
+            return {
+                "cpu_percent": psutil.cpu_percent(interval=None),
+                "memory_percent": psutil.virtual_memory().percent,
+                "process_memory_mb": psutil.Process(os.getpid()).memory_info().rss / 1024 / 1024
+            }
+        except Exception:
+            return {}
 
     def log_activity(self,
                      agent_id: str,
@@ -61,6 +81,11 @@ class ProvenanceLogger:
             "timestamp": timestamp,
             "agent_id": agent_id,
             "activity_type": act_type,
+            "build_provenance": {
+                "version": self.version,
+                "git_hash": self.git_revision
+            },
+            "compute_metrics": self._get_compute_metrics(),
             "data_lineage": {
                 "source": data_source or "unknown",
                 "input_hash": self._generate_hash(input_data),
