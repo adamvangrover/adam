@@ -10304,7 +10304,7 @@ window.MOCK_DATA = {
       "last_modified": 1768266823.306207
     },
     {
-      "path": "docs/setup.md",
+      "path": "docs/alternative_setup.md",
       "type": "file",
       "size": 1987,
       "last_modified": 1768266823.3423834

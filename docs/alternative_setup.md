@@ -1,6 +1,9 @@
-# Alternative Setup & Installation Guides
+# Alternative Setup & Installation Guides (Legacy)
 
-This document covers alternative methods for setting up Adam v23.5, including Docker, legacy scripts, and manual pip installation. For the recommended modern setup using `uv`, please refer to the main [README](../README.md).
+> **⚠️ NOTE:** This document covers alternative and legacy methods for setting up older versions of Adam (e.g., v23.5).
+> For the **recommended modern setup** (v26.0+) using `uv`, please refer to the [**Official Setup Guide**](setup_guide.md).
+
+This document covers alternative methods for setting up Adam, including Docker, legacy scripts, and manual pip installation.
 
 ## 1. Docker Deployment ("Mission Control")
 
