@@ -25,6 +25,13 @@ except ImportError:
 BUILD_DIR = Path("builds")
 TEMPLATES_DIR = Path(__file__).resolve().parent / "templates"
 
+# Import System Logger
+try:
+    from core.utils.system_logger import SystemLogger
+except ImportError:
+    sys.path.append(str(Path(__file__).resolve().parent.parent))
+    from core.utils.system_logger import SystemLogger
+
 def print_header():
     print("\033[1;36m" + "=" * 60)
     print("   ADAM v26.0 - Custom Environment Builder")
@@ -184,6 +191,9 @@ except KeyboardInterrupt:
     print("[*] Generated Universal Launcher (run_module.py)")
 
 def main():
+    # Log Build Start
+    SystemLogger().log_event("SERVER_BUILD", {"status": "START"})
+
     print_header()
 
     # 1. Select Modules

@@ -20,6 +20,7 @@ from pydantic import BaseModel, Field
 
 # Pillar 2 Integration
 from core.utils.proof_of_thought import ProofOfThoughtLogger
+from core.utils.system_logger import SystemLogger
 
 logger = logging.getLogger(__name__)
 
@@ -45,6 +46,7 @@ class OmegaAgent(abc.ABC):
         self.name = name
         self.version = version
         self.pot_logger = ProofOfThoughtLogger()
+        self.system_logger = SystemLogger()
         self.logger = logging.getLogger(f"OmegaAgent.{name}")
 
     async def execute(self, input_data: AgentInput) -> AgentOutput:
@@ -64,6 +66,14 @@ class OmegaAgent(abc.ABC):
             {"request_id": input_data.request_id}
         )
 
+        # System Log: Agent Interaction
+        self.system_logger.log_event("AGENT_INTERACTION", {
+            "type": "INPUT",
+            "agent": self.name,
+            "query": input_data.query,
+            "request_id": input_data.request_id
+        })
+
         try:
             # 2. Execution (User Implementation)
             self.logger.info(f"Executing logic for {input_data.request_id}...")
@@ -75,6 +85,14 @@ class OmegaAgent(abc.ABC):
                 f"OUTPUT_GENERATED",
                 {"request_id": input_data.request_id, "status": "SUCCESS"}
             )
+
+            # System Log: Agent Interaction (Output)
+            self.system_logger.log_event("AGENT_INTERACTION", {
+                "type": "OUTPUT",
+                "agent": self.name,
+                "status": "SUCCESS",
+                "request_id": input_data.request_id
+            })
 
             return AgentOutput(
                 request_id=input_data.request_id,
@@ -92,6 +110,14 @@ class OmegaAgent(abc.ABC):
                 f"EXECUTION_FAILED: {str(e)}",
                 {"request_id": input_data.request_id, "status": "ERROR"}
             )
+
+            # System Log: Agent Interaction (Error)
+            self.system_logger.log_event("AGENT_INTERACTION", {
+                "type": "ERROR",
+                "agent": self.name,
+                "error": str(e),
+                "request_id": input_data.request_id
+            })
 
             return AgentOutput(
                 request_id=input_data.request_id,
