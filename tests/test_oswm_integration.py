@@ -4,6 +4,7 @@ import torch
 from core.oswm.trainer import OSWMTrainer
 from core.oswm.inference import OSWMInference
 
+@pytest.mark.integration
 def test_oswm_integration():
     """
     Verifies that OSWM Trainer and Inference can be initialized and run one step.

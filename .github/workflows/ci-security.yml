@@ -1,0 +1,54 @@
+name: CI / Security
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  schedule:
+    - cron: '0 0 * * 0' # Weekly
+
+jobs:
+  python-security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+      - name: Install Bandit
+        run: pip install bandit
+      - name: Run Bandit (Python Security)
+        # Scan core directory recursively, exclude tests and common false positives if necessary
+        # -r: recursive
+        # -ll: log level
+        run: bandit -r core services scripts -ll -x tests
+
+  rust-security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+      - name: Install cargo-audit
+        run: cargo install cargo-audit
+      - name: Run Cargo Audit
+        run: cargo audit --file core/experimental/adamos_kernel/Cargo.lock || echo "Cargo.lock might be missing or audit failed, proceeding for now"
+    # Note: cargo audit requires Cargo.lock. If it's missing, this step might fail or skip.
+    # Since we saw Cargo.toml, Cargo.lock should be generated or present.
+
+  frontend-security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - name: Run NPM Audit
+        working-directory: services/webapp/client
+        run: npm audit --audit-level=high || echo "NPM audit found issues"

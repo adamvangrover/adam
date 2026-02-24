@@ -6,6 +6,8 @@ from core.research.federated_learning.fl_client import FinGraphFLClient
 from core.research.federated_learning.privacy import MSGuard
 from core.research.oswm.priors import NeuralNetworkPrior, MomentumPrior
 
+pytestmark = pytest.mark.integration
+
 def test_gat_forward():
     # Test GAT model forward pass
     model = GAT(nfeat=10, nhid=8, nclass=1, nheads=2)

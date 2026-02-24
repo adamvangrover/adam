@@ -4,6 +4,7 @@ from unittest.mock import MagicMock, patch
 from core.engine.meta_orchestrator import MetaOrchestrator
 
 
+@pytest.mark.integration
 @pytest.mark.asyncio
 async def test_deep_dive_pipeline():
     # Mock LLMPlugin to avoid API key requirements and AgentOrchestrator initialization issues
