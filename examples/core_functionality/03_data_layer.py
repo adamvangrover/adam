@@ -2,6 +2,7 @@
 Example 03: Data Layer Standalone
 ---------------------------------
 Demonstrates the Data Layer (Ingestion & ETL) operating independently.
+Uses the SemanticChunker to process raw text, preparing it for the Intelligence Layer.
 """
 
 import sys
@@ -10,40 +11,48 @@ import os
 # Add repo root to path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
 
+from core.ingestion.semantic_chunker import SemanticChunker
 from core.system.provenance_logger import ProvenanceLogger, ActivityType
 
-# Mock Ingestor to demonstrate pattern without needing heavy PDF libs
-class DataLayerIngestor:
-    def __init__(self):
-        self.logger = ProvenanceLogger()
+def run_data_layer():
+    print(">>> Initializing Data Layer (SemanticChunker)...")
 
-    def ingest_document(self, filepath: str, source_type: str):
-        print(f"[{source_type}] Ingesting: {filepath}")
+    chunker = SemanticChunker()
+    logger = ProvenanceLogger()
 
-        # 1. Read (Mock)
-        raw_content = "Simulated content from file..."
+    # 1. Simulate Raw Data Ingestion (e.g., from SEC 10-K)
+    print("[DataLayer] Ingesting raw document...")
+    raw_document = """
+    ITEM 7. MANAGEMENT'S DISCUSSION AND ANALYSIS OF FINANCIAL CONDITION AND RESULTS OF OPERATIONS
 
-        # 2. Chunk
-        chunks = [raw_content[i:i+10] for i in range(0, len(raw_content), 10)]
-        print(f"Generated {len(chunks)} chunks.")
+    The following discussion and analysis of our financial condition and results of operations should be read in conjunction with our consolidated financial statements and the related notes included elsewhere in this Annual Report on Form 10-K.
 
-        # 3. Log Provenance
-        self.logger.log_activity(
-            agent_id="UniversalIngestor",
-            activity_type=ActivityType.INGESTION,
-            input_data={"filepath": filepath, "size": len(raw_content)},
-            output_data={"chunks_count": len(chunks)},
-            data_source=source_type,
-            capture_full_io=True
-        )
+    Overview
+    We are a leading provider of technology solutions. Our revenue increased by 15% year-over-year due to strong demand for our cloud services.
 
-        return chunks
+    Liquidity and Capital Resources
+    As of December 31, 2023, we had cash and cash equivalents of $5.2 billion. We believe our existing cash and cash equivalents will be sufficient to meet our working capital and capital expenditure needs for at least the next 12 months.
+    """
+
+    # 2. Process Data (ETL)
+    print(f"[DataLayer] Processing document (Length: {len(raw_document)} chars)...")
+    chunks = chunker.split_text(raw_document)
+
+    print(f"[DataLayer] Generated {len(chunks)} semantic chunks.")
+    for i, chunk in enumerate(chunks):
+        print(f"--- Chunk {i+1} ---\n{chunk[:50]}...\n")
+
+    # 3. Log Provenance (Data Lineage)
+    logger.log_activity(
+        agent_id="SemanticIngestor",
+        activity_type=ActivityType.INGESTION,
+        input_data={"source": "10-K_Form_Item7", "length": len(raw_document)},
+        output_data={"chunks_count": len(chunks), "chunk_sizes": [len(c) for c in chunks]},
+        data_source="SEC_EDGAR_Simulated",
+        capture_full_io=True
+    )
+
+    print(">>> Data Layer processing complete. Provenance logs generated.")
 
 if __name__ == "__main__":
-    print(">>> Starting Data Layer ETL...")
-    ingestor = DataLayerIngestor()
-
-    ingestor.ingest_document("data/10k/aapl_2025.pdf", "SEC_EDGAR")
-    ingestor.ingest_document("data/news/bloomberg_wire.txt", "BloombergTerminal")
-
-    print(">>> Ingestion complete.")
+    run_data_layer()

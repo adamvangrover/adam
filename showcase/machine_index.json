@@ -2,42 +2,57 @@
   "api_version": "v26.0",
   "system_status": "ONLINE",
   "description": "Adam v26.0 Machine Interface Index",
+  "environments": {
+    "supported": ["SIMULATION", "LIVE", "BACKTEST"],
+    "current": "SIMULATION",
+    "factory_path": "core.engine.factory.EngineFactory"
+  },
   "endpoints": {
     "intelligence_layer": {
       "planner": "/api/v1/planner",
       "swarm": "/api/v1/swarm",
-      "consensus": "/api/v1/consensus"
+      "consensus": "/api/v1/consensus",
+      "risk_assessment": "/api/v1/risk/assess"
     },
     "compute_layer": {
       "simulation": "/api/v1/simulation",
       "risk_engine": "/api/v1/risk",
-      "pricing": "/api/v1/pricing"
+      "pricing": "/api/v1/pricing",
+      "credit_memo": "/api/v1/compute/credit_memo"
     },
     "data_layer": {
       "ingest": "/api/v1/ingest",
       "knowledge_graph": "/api/v1/graph",
-      "vector_store": "/api/v1/vector"
+      "vector_store": "/api/v1/vector",
+      "semantic_chunking": "/api/v1/data/chunk"
     }
   },
   "agents": [
     {
       "id": "risk_officer",
       "role": "Risk Management",
-      "capabilities": ["var_calculation", "stress_test"]
+      "capabilities": ["var_calculation", "stress_test", "raroc_analysis"]
     },
     {
       "id": "market_scanner",
       "role": "Data Ingestion",
       "capabilities": ["news_fetch", "sentiment_analysis"]
+    },
+    {
+      "id": "compute_engine",
+      "role": "Simulation",
+      "capabilities": ["monte_carlo", "scenario_generation"]
     }
   ],
   "resources": {
     "documentation": "/docs/index.md",
     "architecture": "/docs/ARCHITECTURE.md",
+    "layers": "/docs/LAYERS.md",
     "openapi_spec": "/api/openapi.json"
   },
   "telemetry": {
     "logs": "/logs/stream",
-    "metrics": "/metrics"
+    "metrics": "/metrics",
+    "provenance": "/logs/provenance"
   }
 }

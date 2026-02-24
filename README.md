@@ -16,6 +16,7 @@
 *   [**🎓 Tutorials**](docs/tutorials.md)
 *   [**🎓 Office Nexus Tutorial**](docs/TUTORIAL_OFFICE_NEXUS.md)
 *   [**📦 Custom Builds**](docs/custom_builds.md)
+*   [**🏗️ Three-Layer Architecture**](docs/LAYERS.md)
 
 ---
 
@@ -250,6 +251,7 @@ We are building the open-source standard for institutional AI.
 We have significantly expanded our documentation for v26.0:
 
 *   [**Architecture & Design**](docs/ARCHITECTURE.md): The Neuro-Symbolic 3-Layer Architecture.
+*   [**Layer Documentation**](docs/LAYERS.md): Detailed breakdown of Intelligence, Compute, and Data layers.
 *   [**Production Setup**](docs/PRODUCTION.md): Deployment, Security, and Ops.
 *   [**Versioning Strategy**](docs/VERSIONING.md): Release cycle and branching.
 *   [**Agent Creation**](docs/AGENT_CREATION.md): How to build and register new agents.
