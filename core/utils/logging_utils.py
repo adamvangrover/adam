@@ -5,7 +5,7 @@ import logging.config
 import os
 import yaml
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 import uuid
 
 # Handle missing pythonjsonlogger for lightweight environments
@@ -24,7 +24,8 @@ class CustomJsonFormatter(jsonlogger.JsonFormatter):
         super(CustomJsonFormatter, self).add_fields(log_record, record, message_dict)
         if not log_record.get('timestamp'):
             # this doesn't use record.created, so it is slightly off
-            now = datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%fZ')
+            # Updated to use timezone-aware UTC timestamp for precision and modernization
+            now = datetime.now(timezone.utc).isoformat()
             log_record['timestamp'] = now
         if log_record.get('level'):
             log_record['level'] = log_record['level'].upper()
@@ -103,7 +104,7 @@ class TraceLogger:
     def log_step(self, agent_name: str, step_name: str, inputs: dict, outputs: dict, metadata: dict = None):
         entry = {
             "trace_id": self.trace_id,
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "agent": agent_name,
             "step": step_name,
             "inputs": inputs,
@@ -141,7 +142,7 @@ class SwarmLogger:
             details (Dict[str, Any]): Payload of the event.
         """
         entry = {
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "event_type": event_type,
             "agent_id": agent_id,
             "details": details
