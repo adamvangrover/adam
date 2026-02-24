@@ -2,6 +2,7 @@
 Example 02: Compute Layer Standalone
 ------------------------------------
 Demonstrates running the simulation/compute engine (Compute Layer) in isolation.
+Uses the EngineFactory to provision a computational backend (System 3).
 """
 
 import sys
@@ -11,43 +12,49 @@ import json
 # Add repo root to path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
 
-from core.engine.live_mock_engine import LiveMockEngine
+from core.engine.factory import EngineFactory
 from core.system.provenance_logger import ProvenanceLogger, ActivityType
 
 def run_compute_cycle():
     logger = ProvenanceLogger()
-    engine = LiveMockEngine()
 
-    print(">>> Initializing Compute Layer (LiveMockEngine)...")
+    # 1. Provision Compute Engine (Simulation Mode)
+    # The compute layer is responsible for world modeling and simulation.
+    print(">>> Initializing Compute Layer (EngineFactory: SIMULATION)...")
+    engine = EngineFactory.get_engine("SIMULATION")
 
-    # 1. Get Market Pulse (Simulation Step)
+    # 2. Execute Simulation Step (Market Pulse)
     pulse = engine.get_market_pulse()
-    print(f"SPX Price: {pulse['indices']['SPX']['price']}")
+    spx_price = pulse['indices']['SPX']['price']
+    print(f"[{engine.__class__.__name__}] Market Pulse: SPX @ {spx_price}")
 
     logger.log_activity(
-        agent_id="LiveMockEngine",
+        agent_id="ComputeLayer",
         activity_type=ActivityType.SIMULATION,
         input_data={"command": "get_market_pulse"},
-        output_data=pulse,
+        output_data={"spx_price": spx_price, "timestamp": pulse['timestamp']},
         data_source="SimulatedMarketData"
     )
 
-    # 2. Generate Credit Memo (Compute Intensive)
-    print(">>> Generating Synthetic Credit Memo...")
-    ticker = "TSLA"
-    memo = engine.generate_credit_memo(ticker, name="Tesla Inc", sector="Auto")
+    # 3. Execute Deep Compute (Credit Memo Generation)
+    # This simulates a heavy computational task (ICAT Engine)
+    print(">>> Generating Synthetic Credit Memo (Compute Job)...")
+    ticker = "AMZN"
+    memo = engine.generate_credit_memo(ticker, name="Amazon.com Inc", sector="Consumer Discretionary")
 
-    print(f"Memo Leverage: {memo['data']['financials']['leverage']}x")
-    print(f"Memo Recommendation: {memo['memo'].split('System Conclusion')[1].strip()}")
+    leverage = memo['data']['financials']['leverage']
+    print(f"[{engine.__class__.__name__}] Compute Result: Leverage {leverage:.2f}x")
+    print(f"[{engine.__class__.__name__}] Memo Conclusion: {memo['memo'].split('System Conclusion')[1].strip()}")
 
     logger.log_activity(
-        agent_id="CreditComputer",
+        agent_id="ComputeLayer",
         activity_type=ActivityType.CALCULATION,
-        input_data={"ticker": ticker, "model": "ICAT-Lite"},
+        input_data={"ticker": ticker, "task": "credit_memo_generation"},
         output_data=memo['data'],
-        data_source="InternalCompute"
+        data_source="InternalCompute",
+        capture_full_io=True
     )
 
 if __name__ == "__main__":
     run_compute_cycle()
-    print(">>> Compute cycle complete. Logs generated.")
+    print(">>> Compute cycle complete. Provenance logs generated.")

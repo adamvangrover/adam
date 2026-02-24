@@ -7,8 +7,9 @@ import uuid
 from copy import deepcopy
 from core.engine.consensus_engine import ConsensusEngine
 from core.utils.narrative_weaver import NarrativeWeaver
+from core.engine.interfaces import EngineInterface
 
-class LiveMockEngine:
+class LiveMockEngine(EngineInterface):
     """
     A simulation engine that loads seed data and generates infinite,
     evolving market signals to mimic a live runtime environment.
