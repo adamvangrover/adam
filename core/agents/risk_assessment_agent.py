@@ -268,18 +268,95 @@ class RiskAssessmentAgent(AgentBase):
         logger.info(f"Assessing loan risk...")
         risk_factors = {}
 
-        risk_factors["credit_risk"] = self._calculate_credit_risk(borrower_data)
+        pd = self._calculate_credit_risk(borrower_data)
+        risk_factors["credit_risk"] = pd
         risk_factors["liquidity_risk"] = self._assess_borrower_liquidity(borrower_data)
+
+        # Extract inputs for LGD/RWA
+        seniority = loan_details.get("seniority", "Senior Unsecured")
+        collateral_value = loan_details.get("collateral_value", 0)
+        loan_amount = loan_details.get("loan_amount", 1)
+        collateral_coverage = collateral_value / loan_amount if loan_amount > 0 else 0
+
         risk_factors["collateral_risk"] = self._assess_collateral_risk(loan_details)
         risk_factors["economic_risk"] = self._assess_economic_risk()
         risk_factors["interest_rate_risk"] = self._assess_interest_rate_risk(loan_details)
 
         overall_risk_score = self._calculate_overall_risk_score(risk_factors)
 
+        # --- Quantitative Metrics (New) ---
+        lgd = self.calculate_lgd(seniority, collateral_coverage)
+
+        interest_rate = loan_details.get("interest_rate", 0.05) # Default 5%
+        if isinstance(interest_rate, str) and '%' in interest_rate:
+             try:
+                 interest_rate = float(interest_rate.strip('%')) / 100
+             except:
+                 interest_rate = 0.05
+
+        rwa = self.calculate_rwa(pd, lgd, loan_amount)
+        # Ratio for RAROC calc
+        rwa_ratio = rwa / loan_amount if loan_amount > 0 else 1.0
+
+        expected_return = self.calculate_expected_return(interest_rate, pd, lgd, capital_cost=0.10, rwa_ratio=rwa_ratio)
+
         return {
             "overall_risk_score": overall_risk_score,
-            "risk_factors": risk_factors
+            "risk_factors": risk_factors,
+            "risk_quant_metrics": {
+                "PD": pd,
+                "LGD": lgd,
+                "EAD": loan_amount,
+                "RWA": rwa,
+                "Expected_Loss": pd * lgd * loan_amount,
+                "RAROC": expected_return
+            }
         }
+
+    def calculate_lgd(self, seniority: str, collateral_coverage: float) -> float:
+        """
+        Estimates Loss Given Default (LGD).
+        """
+        # Base LGD by seniority
+        base_lgd = {
+            "Senior Secured": 0.35,
+            "Senior Unsecured": 0.50,
+            "Subordinated": 0.75,
+            "Equity": 1.00
+        }.get(seniority, 0.50)
+
+        # Adjust for collateral
+        # LGD = Base * (1 - min(1, collateral_coverage))
+        # We'll assume a minimum floor of 5% even with full collateral
+        adjusted_lgd = base_lgd * (1 - min(1.0, collateral_coverage))
+        return max(0.05, adjusted_lgd)
+
+    def calculate_rwa(self, pd: float, lgd: float, ead: float) -> float:
+        """
+        Estimates Risk-Weighted Assets (RWA) using a simplified heuristic.
+        """
+        # Heuristic: RW = 20% + (PD * 20) + (LGD * 1.5)
+        # This is a mock function for demonstration purposes
+        rw_percentage = 0.20 + (pd * 20) + (lgd * 1.5)
+        rw_percentage = min(15.0, max(0.0, rw_percentage)) # Cap at 1500%
+
+        rwa = ead * rw_percentage
+        return rwa
+
+    def calculate_expected_return(self, interest_rate: float, pd: float, lgd: float, capital_cost: float, rwa_ratio: float = 1.0) -> float:
+        """
+        Calculates Risk-Adjusted Return on Capital (RAROC).
+        """
+        expected_loss = pd * lgd
+        risk_adjusted_income = interest_rate - expected_loss
+
+        economic_capital = rwa_ratio * 0.08 # Assumes Basel standard 8% capital
+
+        if economic_capital <= 0:
+            return 0.0
+
+        raroc = (risk_adjusted_income - (economic_capital * capital_cost)) / economic_capital
+        return raroc
 
     def assess_project_risk(self, project_details: Dict, context: Dict) -> Dict:
         """

@@ -64,6 +64,7 @@
                     <button id="btn-tab-annex-b" class="tab-btn h-full px-4 text-xs font-bold text-slate-400 hover:text-slate-200 uppercase tracking-widest transition border-b-2 border-transparent" onclick="switchTab('annex-b')"><i class="fas fa-chart-line mr-2"></i>Annex B: Valuation</button>
                     <button id="btn-tab-annex-c" class="tab-btn h-full px-4 text-xs font-bold text-slate-400 hover:text-slate-200 uppercase tracking-widest transition border-b-2 border-transparent" onclick="switchTab('annex-c')"><i class="fas fa-landmark mr-2"></i>Annex C: Cap Structure</button>
                     <button id="btn-tab-risk-quant" class="tab-btn h-full px-4 text-xs font-bold text-slate-400 hover:text-slate-200 uppercase tracking-widest transition border-b-2 border-transparent" onclick="switchTab('risk-quant')"><i class="fas fa-chart-pie mr-2"></i>Risk Quant</button>
+                    <button id="btn-tab-interlock" class="tab-btn h-full px-4 text-xs font-bold text-slate-400 hover:text-slate-200 uppercase tracking-widest transition border-b-2 border-transparent" onclick="switchTab('interlock')"><i class="fas fa-handshake mr-2"></i>Risk & Legal</button>
                     <button id="btn-tab-system-2" class="tab-btn h-full px-4 text-xs font-bold text-slate-400 hover:text-slate-200 uppercase tracking-widest transition border-b-2 border-transparent" onclick="switchTab('system-2')"><i class="fas fa-brain mr-2"></i>System 2</button>
                 </div>
                 <div class="flex gap-2">
@@ -141,6 +142,46 @@
                         <!-- Content Container -->
                         <div id="risk-quant-container" class="space-y-8">
                             <!-- JS Injected -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab: Risk & Legal Interlock -->
+                <div id="tab-interlock" class="hidden p-8 h-full">
+                    <div class="max-w-4xl mx-auto bg-[#1e293b] rounded-lg border border-slate-700 p-6 shadow-xl h-full flex flex-col">
+                         <div class="flex justify-between items-center mb-6">
+                            <h2 class="text-lg font-bold text-white font-mono"><i class="fas fa-handshake text-indigo-400 mr-2"></i>System Interlock</h2>
+                            <span class="text-xs text-slate-500 font-mono">Agent Collaboration: RiskBot <> LegalAI</span>
+                        </div>
+
+                        <div class="flex-1 flex gap-6 overflow-hidden">
+                            <!-- Left: Interaction Log -->
+                            <div class="flex-1 flex flex-col bg-slate-900/50 rounded border border-slate-700/50">
+                                <div class="p-3 border-b border-slate-700/50 text-xs font-bold text-slate-400 uppercase tracking-widest">
+                                    Live Negotiation Stream
+                                </div>
+                                <div class="flex-1 overflow-y-auto p-4 space-y-4" id="interlock-log">
+                                    <!-- JS Injected Messages -->
+                                    <div class="text-center text-slate-600 italic mt-10">Select a borrower to initiate interlock sequence...</div>
+                                </div>
+                            </div>
+
+                            <!-- Right: Highlights -->
+                            <div class="w-1/3 flex flex-col gap-4">
+                                <div class="bg-slate-800/50 rounded border border-slate-700/50 p-4">
+                                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Key Highlights</h3>
+                                    <div id="interlock-highlights" class="space-y-2">
+                                        <!-- JS Injected Highlights -->
+                                    </div>
+                                </div>
+
+                                <div class="bg-slate-800/50 rounded border border-slate-700/50 p-4 flex-1">
+                                     <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Final Consensus</h3>
+                                     <div id="interlock-consensus" class="text-sm text-slate-300">
+                                         Pending...
+                                     </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
