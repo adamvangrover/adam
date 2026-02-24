@@ -4,7 +4,9 @@ Welcome to the Adam v26.0 documentation hub.
 
 ## 🏛️ Architecture
 *   [**The Neuro-Symbolic Architecture**](architecture/adam_v26_neuro_symbolic.md): System 1 vs. System 2, Logic as Data.
+*   [**Environment Setup**](setup_guide.md): Standard local installation using `uv`.
 *   [**Production Setup**](runtime/production_setup.md): Deployment guide for Docker and Bare Metal.
+*   [**Alternative Setup**](alternative_setup.md): Legacy and manual installation methods.
 
 ## 🎓 Tutorials
 *   [**Create Your First Agent**](tutorials/01_create_custom_agent.md): Subclassing `AgentBase`.
@@ -16,7 +18,7 @@ Welcome to the Adam v26.0 documentation hub.
 ## 🤖 Reference
 *   [**Agent Catalog**](agents/v26_agent_catalog.md): Directory of core agents.
 *   [**Developer Notes**](dev_notes/patterns_and_anti_patterns.md): Coding standards and "Golden Patterns".
-*   [**Agent Knowledge Base**](../docs/AGENTS_KNOWLEDGE_BASE.md): Historical learnings and security mandates.
+*   [**Agent Knowledge Base**](AGENTS_KNOWLEDGE_BASE.md): Historical learnings and security mandates.
 
 ## 📂 Examples
 Check the `examples/` directory in the root for executable code:

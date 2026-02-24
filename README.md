@@ -135,6 +135,7 @@ adam/
 │   └── webapp/             # React/Flask "Neural Dashboard"
 ├── showcase/               # Static HTML visualizers and demos
 ├── docs/                   # Documentation, tutorials, and guides
+│   └── archive/            # Legacy documentation and migration guides
 ├── scripts/                # Utility scripts for running and testing
 ├── prompt_library/         # The "Mind" (AOPL v26.0 Prompts)
 └── server/                 # MCP Server implementation
