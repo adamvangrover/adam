@@ -70,6 +70,7 @@ cd adam
 ### 3. Sync Dependencies
 This command creates the virtual environment (`.venv`) and installs all locked dependencies.
 ```bash
+# This will install dependencies from pyproject.toml/requirements.txt
 uv sync
 ```
 
@@ -127,3 +128,7 @@ The Web Interface will be available at `http://localhost:80` (or `http://localho
 ### 4. LLM "Rate Limit Exceeded"
 *   **Cause:** You ran out of OpenAI credits.
 *   **Fix:** Check your billing status or switch to a local model in `config/models.yaml`.
+
+### 5. Missing Modules (e.g., `yaml`, `pydantic_settings`)
+*   **Cause:** The virtual environment is not activated or dependencies are out of sync.
+*   **Fix:** Ensure you ran `uv sync` and `source .venv/bin/activate`.

@@ -2,7 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/) [![Docker Image](https://img.shields.io/badge/docker-ready-blue)](https://hub.docker.com/) [![FinanceBench](https://img.shields.io/badge/FinanceBench-99%25-green)](https://arxiv.org/abs/2311.11944)
 
-> **Adam v26.0 upgrades financial AI from a conversational chatbot to a fiduciary architect. Designed for high-stakes capital allocation, it fuses the intuitive speed of a Neural Swarm (System 1) with the deliberate logic of a Neuro-Symbolic Graph (System 2), delivering calculated conviction for institutional investors.**
+> **Adam v26.0 upgrades financial AI from a conversational chatbot to a fiduciary architect, explicitly engineered for Leveraged Finance, Distressed Debt, and Deep Credit Risk Underwriting. By fusing the intuitive speed of a Neural Swarm (System 1) with the deliberate logic of a Neuro-Symbolic Graph (System 2), Adam delivers calculated conviction for high-stakes capital allocation.**
 
 ---
 
@@ -12,10 +12,11 @@
 *   [**⚡ Setup Guide**](docs/setup_guide.md)
 *   [**🤖 Agent Developer Bible**](AGENTS.md)
 *   [**🧠 Agent Knowledge Base**](docs/AGENTS_KNOWLEDGE_BASE.md)
-*   [**📖 Architecture Overview**](docs/architecture.md)
+*   [**📖 Architecture Overview**](docs/ARCHITECTURE.md)
 *   [**🎓 Tutorials**](docs/tutorials.md)
 *   [**🎓 Office Nexus Tutorial**](docs/TUTORIAL_OFFICE_NEXUS.md)
 *   [**📦 Custom Builds**](docs/custom_builds.md)
+*   [**🏗️ Three-Layer Architecture**](docs/LAYERS.md)
 
 ---
 
@@ -25,17 +26,25 @@ The era of the "LLM Wrapper" is over. Institutional finance faces an **Epistemol
 
 **Adam v26.0** solves this by implementing a **Hybrid Cognitive Engine** rooted in the principles of **Leveraged Finance** and **Distressed Debt**:
 
-### System 1: The Swarm (Fast)
-*   **Role:** The Body. Handles perception, data ingestion, and news monitoring.
-*   **Architecture:** Asynchronous Event Loop (Pub/Sub).
-*   **Use Case:** "Monitor AAPL for breaking news."
+### System 1: The Swarm (The Reflexes)
+*   **Role:** High-velocity, unstructured data parsing.
+*   **Focus:** Earnings call transcripts, ARR momentum, and baseline financial ratios.
+*   **Architecture:** Asynchronous Hive Mind with `SentinelWorker` for anomaly detection.
+*   **Use Case:** "Monitor TMT sector for cash burn spikes."
 
-### System 2: The Graph (Slow)
-*   **Role:** The Brain. Handles reasoning, planning, and criticism.
-*   **Architecture:** Directed Acyclic Graph (DAG) with feedback loops.
-*   **Use Case:** "Write a 30-page investment memo on the solvency of distressed debt."
+### System 2: The Graph (The Deep Thinker)
+*   **Role:** Downside scenario stress testing, capital structure analysis, and covenant compliance.
+*   **Focus:** "Logic as Data" enforcement of underwriting policies.
+*   **Architecture:** Neuro-Symbolic Planner (DAG) with feedback loops.
+*   **Use Case:** "Generate a deep-dive credit memo with Base/Bull/Bear DCF scenarios."
 
 **Result:** Adam "thinks before he speaks," drafting, critiquing, and refining analysis before presenting it to the user.
+
+### Logic as Data
+Adam v26.0 treats business logic as first-class data. Using a JSON-based rule engine (`jsonLogic`), risk thresholds, trading triggers, and compliance rules are decoupled from the core codebase. This allows for:
+*   **Dynamic Policy Updates:** Modify risk parameters without redeploying code.
+*   **Auditability:** Rules are stored as JSON artifacts, making them human-readable and easy to version control.
+*   **Safety:** The logic layer is evaluated before agent execution, acting as a deterministic guardrail.
 
 ### System Architecture
 
@@ -126,6 +135,7 @@ adam/
 │   └── webapp/             # React/Flask "Neural Dashboard"
 ├── showcase/               # Static HTML visualizers and demos
 ├── docs/                   # Documentation, tutorials, and guides
+│   └── archive/            # Legacy documentation and migration guides
 ├── scripts/                # Utility scripts for running and testing
 ├── prompt_library/         # The "Mind" (AOPL v26.0 Prompts)
 └── server/                 # MCP Server implementation
@@ -237,10 +247,22 @@ We are building the open-source standard for institutional AI.
 *   **Directives:** Please read [AGENTS.md](AGENTS.md) and the [Agent Knowledge Base](docs/AGENTS_KNOWLEDGE_BASE.md) before writing a single line of code.
 *   **Process:** Read [CONTRIBUTING.md](CONTRIBUTING.md) for pull request guidelines.
 
+## 📖 Documentation & Guides
+
+We have significantly expanded our documentation for v26.0:
+
+*   [**Architecture & Design**](docs/ARCHITECTURE.md): The Neuro-Symbolic 3-Layer Architecture.
+*   [**Layer Documentation**](docs/LAYERS.md): Detailed breakdown of Intelligence, Compute, and Data layers.
+*   [**Production Setup**](docs/PRODUCTION.md): Deployment, Security, and Ops.
+*   [**Versioning Strategy**](docs/VERSIONING.md): Release cycle and branching.
+*   [**Agent Creation**](docs/AGENT_CREATION.md): How to build and register new agents.
+*   [**Graph Workflows**](docs/GRAPH_WORKFLOWS.md): Building DAG-based reasoning loops.
+*   [**Documentation Hub**](docs/index.md): The central index.
+
 ### License
 
 Distributed under the MIT License. See `LICENSE` for more information.
 
 ---
 
-**For AI Agents and LLMs,** please see [llms.txt](llms.txt) (optimized) or [llms-full.txt](llms-full.txt) (comprehensive) for context.*
+**For AI Agents and LLMs,** please see [llms.txt](llms.txt) (optimized) or [llms-full.txt](llms-full.txt) (comprehensive) for context.

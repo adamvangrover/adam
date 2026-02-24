@@ -183,29 +183,83 @@ class RiskAssessmentAgent(AgentBase):
     def assess_investment_risk(self, company_name: str, financial_data: Dict, market_data: Dict) -> Dict:
         """
         Assesses the risk associated with a potential investment.
+        REFACTORED v26.0: Focus on Institutional Credit Risk & Distressed Debt.
         """
         logger.info(f"Assessing investment risk for {company_name}...")
-        risk_factors = {}
 
-        risk_factors["market_risk"] = self._calculate_market_risk(market_data)
-        risk_factors["credit_risk"] = self._calculate_credit_risk(financial_data)
-        risk_factors["liquidity_risk"] = self._calculate_liquidity_risk(market_data)
-        risk_factors["operational_risk"] = self._assess_operational_risk(company_name)
-        risk_factors["geopolitical_risk"] = self._assess_geopolitical_risks(company_name)
+        # 1. Metrics Calculation
+        default_prob = self._calculate_credit_risk(financial_data)
+        runway_months = self._assess_liquidity_runway(financial_data)
+        recovery_rate = self._estimate_recovery_rate(financial_data)
+        market_risk = self._calculate_market_risk(market_data)
 
-        industry = financial_data.get("industry", "Unknown")
-        risk_factors["industry_risk"] = self._assess_industry_risk(industry)
+        # 2. Risk Scores for Calculation (0=Safe, 1=Risky)
+        # Default Prob is already 0-1
 
-        risk_factors["economic_risk"] = self._assess_economic_risk()
-        risk_factors["volatility_risk"] = self._assess_volatility_risk()
-        risk_factors["currency_risk"] = self._assess_currency_risk()
+        # Runway score: < 6 months = 1.0, > 24 months = 0.0
+        score_runway = max(0.0, min(1.0, (24 - runway_months) / 18)) if runway_months < 24 else 0.1
 
-        overall_risk_score = self._calculate_overall_risk_score(risk_factors)
+        # Recovery score: 100% recovery = 0.0 risk, 0% recovery = 1.0 risk
+        score_recovery = 1.0 - recovery_rate
+
+        risk_scores_for_calc = {
+            "default_risk": default_prob,
+            "liquidity_risk": score_runway,
+            "recovery_risk": score_recovery,
+            "market_risk": market_risk
+        }
+
+        overall_risk_score = self._calculate_overall_risk_score(risk_scores_for_calc)
+
+        # 3. Output Factors (Raw values for the report)
+        final_factors = {
+            "default_probability": default_prob,
+            "liquidity_runway": runway_months,
+            "recovery_rate": recovery_rate,
+            "market_risk_score": market_risk,
+            "geopolitical_risk": self._assess_geopolitical_risks(company_name) # Keep for context
+        }
 
         return {
             "overall_risk_score": overall_risk_score,
-            "risk_factors": risk_factors
+            "risk_factors": final_factors
         }
+
+    def _assess_liquidity_runway(self, financial_data: Dict) -> float:
+        """
+        Estimates liquidity runway in months.
+        """
+        cash = financial_data.get("cash", 0)
+        burn_rate = financial_data.get("monthly_burn_rate", 0)
+
+        # Fallback if burn rate not available: use liquidity ratio
+        if burn_rate == 0:
+            l_ratio = financial_data.get("liquidity_ratio", 0)
+            if l_ratio > 1.5: return 24.0
+            if l_ratio > 1.0: return 12.0
+            return 6.0
+
+        if burn_rate < 0:
+             # Net positive cash flow
+             return 999.0
+
+        return cash / burn_rate
+
+    def _estimate_recovery_rate(self, financial_data: Dict) -> float:
+        """
+        Estimates recovery rate based on Asset Coverage.
+        Recovery = Total Assets / Total Debt (Capped at 1.0)
+        """
+        assets = financial_data.get("total_assets", 0)
+        debt = financial_data.get("total_debt", 1) # Avoid div/0
+
+        if debt == 0:
+            return 1.0
+
+        coverage = assets / debt
+        # Simple heuristic: Senior secured often gets 70-100% if coverage > 1.
+        # Unsecured gets less. We'll use a conservative estimate (80% of coverage).
+        return min(1.0, coverage * 0.8)
 
     def assess_loan_risk(self, loan_details: Dict, borrower_data: Dict) -> Dict:
         """

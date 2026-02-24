@@ -12859,9 +12859,9 @@
       "id": 1160,
       "label": "setup.md",
       "group": "knowledge",
-      "title": "docs/setup.md",
+      "title": "Alternative Setup Guide",
       "value": 11.987,
-      "path": "docs/setup.md",
+      "path": "docs/alternative_setup.md",
       "level": "file",
       "preview": "# Alternative Setup & Installation Guides\n\nThis document covers alternative methods for setting up Adam v23.5, including Docker, legacy scripts, and manual pip installation. For the recommended modern setup using `uv`, please refer to the main [README](../README.md).\n\n## 1. Docker Deployment (\"Mission Control\")\n\nThis is the preferred method for full system demonstrations and UI validation, as it isolates the environment and ensures all dependencies (including Redis) are correctly configured.\n\n### Prerequisites\n* Docker & Docker Compose\n* NVIDIA Container Toolkit (optional, for GPU support)\n\n### Steps\n1. **Build the Container**\n   ```bash\n   # Build the optimized modern container\n   docker build -f Dockerfile.modern -t adam-v23 .\n   ```\n\n2. **Run the Container**\n   ```bash\n   # Run with port forwarding\n   docker run -p 3000:3000 -p 8000:8000 \\\n     -e OPENAI_API_KEY=sk-... \\\n     adam-v23\n   ```\n   \n   If you have a GPU available:\n   ```bash\n   docker run --gpus all -p 3000:3000 -p 8000"
     },
@@ -12939,9 +12939,9 @@
       "id": 1168,
       "label": "SETUP_GUIDE.md",
       "group": "knowledge",
-      "title": "docs/SETUP_GUIDE.md",
+      "title": "Legacy Setup Guide (v23)",
       "value": 10.968,
-      "path": "docs/SETUP_GUIDE.md",
+      "path": "docs/archive/SETUP_GUIDE_v23.md",
       "level": "file",
       "preview": "# Setup Guide\n\nThis guide describes how to set up the Adam v23.5 Financial Intelligence System.\n\n## Prerequisites\n\n- Python 3.10+\n- `uv` or `pip` for package management\n\n## Installation\n\n1.  **Clone the repository:**\n    ```bash\n    git clone <repository_url>\n    cd <repository_name>\n    ```\n\n2.  **Install dependencies:**\n    Using `pip`:\n    ```bash\n    pip install -r requirements.txt\n    ```\n\n    Or using `uv`:\n    ```bash\n    uv pip install -r requirements.txt\n    ```\n\n3.  **Environment Variables:**\n    Copy `.env.example` to `.env` and configure your API keys (e.g., OpenAI, Anthropic, Financial Data Providers).\n\n## Running the System\n\n### MCP Server\nTo run the Model Context Protocol (MCP) server:\n```bash\npython server/server.py\n```\n\n### Running Tests\nTo ensure the system is working correctly:\n```bash\npytest\n```\n\n## Troubleshooting\n\n- **Import Errors:** Ensure `PYTHONPATH` includes the root directory.\n  ```bash\n  export PYTHONPATH=$PYTHONPATH:.\n  ```\n"
     },

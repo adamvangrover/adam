@@ -2,7 +2,7 @@
 core/engine/meta_orchestrator.py
 
 Agent Notes (Meta-Commentary):
-The MetaOrchestrator is the supreme controller of the Adam system (v24.0 Architecture).
+The MetaOrchestrator is the supreme controller of the Adam system (v26.0 Architecture).
 It implements the "Brain" of the architecture, deciding which cognitive path a user query should take.
 
 Architectural Evolution:
@@ -62,7 +62,7 @@ from core.agents.specialized.portfolio_manager_agent import PortfolioManagerAgen
 
 # --- Schemas ---
 from core.schemas.v23_5_schema import (
-    V23KnowledgeGraph, Meta, Nodes, HyperDimensionalKnowledgeGraph, 
+    V26KnowledgeGraph, Meta, Nodes, HyperDimensionalKnowledgeGraph,
     EquityAnalysis, Fundamentals, ValuationEngine, DCFModel, PriceTargets, 
     CreditAnalysis, CovenantRiskAnalysis
 )
@@ -75,7 +75,7 @@ class MetaOrchestrator:
         Initialize the MetaOrchestrator with all sub-engines and the routing registry.
         """
         self.swarm_logger = SwarmLogger()
-        self.swarm_logger.log_event("SYSTEM_BOOT", "MetaOrchestrator", {"version": "v24.0.1-Alpha"})
+        self.swarm_logger.log_event("SYSTEM_BOOT", "MetaOrchestrator", {"version": "v26.0.0-Beta"})
 
         # Project OMEGA: Trust Engine
         self.pot_logger = ProofOfThoughtLogger()
@@ -293,11 +293,11 @@ class MetaOrchestrator:
         """
         The "Apex" Analysis Flow.
         Architecture: Waterfall Resilience.
-        1. Attempt v23.5 Graph (Preferred).
+        1. Attempt v26.0 Graph (Preferred).
         2. Fallback to Native Gemini (Path 3).
         3. Fallback to Legacy Agents (Manual Orchestration).
         """
-        logger.info("Engaging v24 Deep Dive Protocol...")
+        logger.info("Engaging v26 Deep Dive Protocol...")
         
         # 0. Swarm Reconnaissance (Parallel Data Gathering)
         # We launch this regardless of the subsequent path to warm up data caches
@@ -433,12 +433,12 @@ class MetaOrchestrator:
                 simulation_engine=sim_engine
             )
 
-            kg = V23KnowledgeGraph(
-                meta=Meta(target=query, model_version="Adam-v24-Legacy-Fallback"),
+            kg = V26KnowledgeGraph(
+                meta=Meta(target=query, model_version="Adam-v26-Legacy-Fallback"),
                 nodes=nodes
             )
 
-            return HyperDimensionalKnowledgeGraph(v23_knowledge_graph=kg).model_dump(by_alias=True)
+            return HyperDimensionalKnowledgeGraph(v26_knowledge_graph=kg).model_dump(by_alias=True)
 
         except Exception as e:
             logger.critical(f"All Deep Dive methods failed. {e}", exc_info=True)
