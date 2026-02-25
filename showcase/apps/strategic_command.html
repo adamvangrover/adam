@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM | Strategic Command</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --bg-dark: #020408;
+            --panel-glass: rgba(10, 15, 30, 0.7);
+            --cyan-glow: #22d3ee;
+            --red-glow: #ef4444;
+            --green-glow: #22c55e;
+            --grid-line: rgba(34, 211, 238, 0.05);
+        }
+        body {
+            background-color: var(--bg-dark);
+            color: #e2e8f0;
+            font-family: 'Courier New', Courier, monospace;
+            background-image:
+                linear-gradient(var(--grid-line) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+            background-size: 30px 30px;
+        }
+        .glass-panel {
+            background: var(--panel-glass);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(34, 211, 238, 0.1);
+        }
+        .bullish { color: var(--green-glow); text-shadow: 0 0 10px rgba(34, 197, 94, 0.5); }
+        .bearish { color: var(--red-glow); text-shadow: 0 0 10px rgba(239, 68, 68, 0.5); }
+        .neutral { color: #94a3b8; }
+    </style>
+</head>
+<body class="h-screen flex flex-col p-6 text-sm overflow-hidden">
+
+    <!-- Header -->
+    <header class="flex justify-between items-center mb-6 border-b border-gray-800 pb-4">
+        <h1 class="text-2xl font-bold tracking-widest flex items-center gap-3">
+            <i data-lucide="shield-alert" class="w-6 h-6 text-cyan-400"></i>
+            STRATEGIC COMMAND
+        </h1>
+        <div class="flex items-center gap-4 text-xs">
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                <span class="text-green-400">ONLINE</span>
+            </div>
+            <div class="text-gray-500" id="last-updated">Last Updated: --</div>
+        </div>
+    </header>
+
+    <!-- Main Grid -->
+    <div class="grid grid-cols-12 gap-6 flex-grow overflow-hidden">
+
+        <!-- House View (Left Panel) -->
+        <div class="col-span-4 flex flex-col gap-6">
+            <div class="glass-panel p-6 rounded-lg flex flex-col items-center justify-center flex-grow">
+                <h2 class="text-xs uppercase tracking-widest text-gray-500 mb-4">Current House View</h2>
+                <div id="house-view-display" class="text-6xl font-bold mb-2 transition-all duration-500">--</div>
+                <div id="sentiment-score" class="text-xl font-mono opacity-70">Score: --</div>
+            </div>
+
+            <div class="glass-panel p-6 rounded-lg h-1/3">
+                 <h2 class="text-xs uppercase tracking-widest text-gray-500 mb-4 flex items-center gap-2">
+                    <i data-lucide="brain-circuit" class="w-4 h-4"></i> Active Drivers
+                </h2>
+                <ul id="active-topics" class="space-y-2 text-cyan-400 font-mono text-xs">
+                    <li>Loading...</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Strategic Directives & Plans (Right Panel) -->
+        <div class="col-span-8 flex flex-col gap-6">
+
+            <!-- Narrative -->
+            <div class="glass-panel p-6 rounded-lg min-h-[150px]">
+                <h2 class="text-xs uppercase tracking-widest text-gray-500 mb-2 flex items-center gap-2">
+                    <i data-lucide="scroll-text" class="w-4 h-4"></i> Strategic Narrative
+                </h2>
+                <p id="narrative-text" class="text-lg leading-relaxed text-gray-300 font-serif italic border-l-2 border-cyan-500/30 pl-4">
+                    Initializing neural link...
+                </p>
+            </div>
+
+            <!-- Actionable Plans -->
+            <div class="glass-panel p-6 rounded-lg flex-grow overflow-y-auto">
+                <h2 class="text-xs uppercase tracking-widest text-gray-500 mb-4 flex items-center gap-2">
+                    <i data-lucide="crosshair" class="w-4 h-4"></i> Actionable Directives
+                </h2>
+                <div id="plans-container" class="grid grid-cols-1 gap-4">
+                    <!-- Plans injected here -->
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        async function loadData() {
+            try {
+                const response = await fetch('../data/strategic_command.json');
+                const data = await response.json();
+                render(data);
+            } catch (e) {
+                console.error("Failed to load strategic command data", e);
+                document.getElementById('narrative-text').innerText = "CONNECTION LOST: Unable to retrieve consensus data.";
+            }
+        }
+
+        function render(data) {
+            const directives = data.strategic_directives;
+            const meta = data.meta;
+            const plans = data.actionable_plans;
+
+            // Update Timestamp
+            document.getElementById('last-updated').innerText = `Last Updated: ${new Date(meta.generated_at).toLocaleTimeString()}`;
+
+            // House View
+            const houseViewEl = document.getElementById('house-view-display');
+            houseViewEl.innerText = directives.house_view;
+            houseViewEl.className = 'text-6xl font-bold mb-2 transition-all duration-500';
+
+            if (directives.house_view === 'BULLISH') houseViewEl.classList.add('bullish');
+            else if (directives.house_view === 'BEARISH') houseViewEl.classList.add('bearish');
+            else houseViewEl.classList.add('neutral');
+
+            document.getElementById('sentiment-score').innerText = `Score: ${directives.score}`;
+
+            // Narrative
+            document.getElementById('narrative-text').innerText = directives.narrative;
+
+            // Topics
+            const topicsList = document.getElementById('active-topics');
+            topicsList.innerHTML = '';
+            data.insights.active_topics.forEach(topic => {
+                const li = document.createElement('li');
+                li.className = 'border-b border-gray-700/50 pb-1';
+                li.innerText = `> ${topic}`;
+                topicsList.appendChild(li);
+            });
+
+            // Plans
+            const plansContainer = document.getElementById('plans-container');
+            plansContainer.innerHTML = '';
+
+            plans.forEach(plan => {
+                const div = document.createElement('div');
+                div.className = 'bg-gray-900/50 p-4 rounded border-l-4 border-cyan-500 flex justify-between items-center hover:bg-gray-800 transition-colors cursor-default';
+
+                div.innerHTML = `
+                    <div>
+                        <div class="text-cyan-400 font-bold text-xs mb-1">${plan.action.replace(/_/g, ' ')}</div>
+                        <div class="text-gray-300 text-sm">${plan.rationale}</div>
+                    </div>
+                    <div class="text-right">
+                        <span class="bg-gray-800 text-gray-400 px-2 py-1 rounded text-[10px] font-bold tracking-wider">${plan.target}</span>
+                    </div>
+                `;
+                plansContainer.appendChild(div);
+            });
+        }
+
+        // Auto-refresh every 30s
+        loadData();
+        setInterval(loadData, 30000);
+    </script>
+</body>
+</html>
