@@ -12,10 +12,11 @@
 *   [**⚡ Setup Guide**](docs/setup_guide.md)
 *   [**🤖 Agent Developer Bible**](AGENTS.md)
 *   [**🧠 Agent Knowledge Base**](docs/AGENTS_KNOWLEDGE_BASE.md)
-*   [**📖 Architecture Overview**](docs/architecture.md)
+*   [**📖 Architecture Overview**](docs/ARCHITECTURE.md)
 *   [**🎓 Tutorials**](docs/tutorials.md)
 *   [**🎓 Office Nexus Tutorial**](docs/TUTORIAL_OFFICE_NEXUS.md)
 *   [**📦 Custom Builds**](docs/custom_builds.md)
+*   [**🏗️ Three-Layer Architecture**](docs/LAYERS.md)
 
 ---
 
@@ -134,6 +135,7 @@ adam/
 │   └── webapp/             # React/Flask "Neural Dashboard"
 ├── showcase/               # Static HTML visualizers and demos
 ├── docs/                   # Documentation, tutorials, and guides
+│   └── archive/            # Legacy documentation and migration guides
 ├── scripts/                # Utility scripts for running and testing
 ├── prompt_library/         # The "Mind" (AOPL v26.0 Prompts)
 └── server/                 # MCP Server implementation
@@ -245,10 +247,22 @@ We are building the open-source standard for institutional AI.
 *   **Directives:** Please read [AGENTS.md](AGENTS.md) and the [Agent Knowledge Base](docs/AGENTS_KNOWLEDGE_BASE.md) before writing a single line of code.
 *   **Process:** Read [CONTRIBUTING.md](CONTRIBUTING.md) for pull request guidelines.
 
+## 📖 Documentation & Guides
+
+We have significantly expanded our documentation for v26.0:
+
+*   [**Architecture & Design**](docs/ARCHITECTURE.md): The Neuro-Symbolic 3-Layer Architecture.
+*   [**Layer Documentation**](docs/LAYERS.md): Detailed breakdown of Intelligence, Compute, and Data layers.
+*   [**Production Setup**](docs/PRODUCTION.md): Deployment, Security, and Ops.
+*   [**Versioning Strategy**](docs/VERSIONING.md): Release cycle and branching.
+*   [**Agent Creation**](docs/AGENT_CREATION.md): How to build and register new agents.
+*   [**Graph Workflows**](docs/GRAPH_WORKFLOWS.md): Building DAG-based reasoning loops.
+*   [**Documentation Hub**](docs/index.md): The central index.
+
 ### License
 
 Distributed under the MIT License. See `LICENSE` for more information.
 
 ---
 
-**For AI Agents and LLMs,** please see [llms.txt](llms.txt) (optimized) or [llms-full.txt](llms-full.txt) (comprehensive) for context.*
+**For AI Agents and LLMs,** please see [llms.txt](llms.txt) (optimized) or [llms-full.txt](llms-full.txt) (comprehensive) for context.

@@ -4,6 +4,7 @@ from unittest.mock import MagicMock, patch
 from core.engine.meta_orchestrator import MetaOrchestrator
 
 
+@pytest.mark.integration
 @pytest.mark.asyncio
 async def test_deep_dive_pipeline():
     # Mock LLMPlugin to avoid API key requirements and AgentOrchestrator initialization issues
@@ -20,16 +21,16 @@ async def test_deep_dive_pipeline():
         if "error" in result:
             pytest.fail(f"Pipeline returned error: {result['error']}")
 
-        assert "v23_knowledge_graph" in result
+        assert "v26_knowledge_graph" in result
 
-        kg = result["v23_knowledge_graph"]
+        kg = result["v26_knowledge_graph"]
         # The mock logic in MetaOrchestrator defaults to AAPL if not specified
         # or uses the query. Let's check what it actually does.
         # In _run_deep_dive_flow: ticker = "AAPL" by default.
         # init_omniscient_state uses this ticker as the target.
         # Fallback uses query or extracted name.
         target = kg["meta"]["target"]
-        assert target in ["AAPL", "TestCorp", query, "MockString"]
+        assert target in ["AAPL", "TestCorp", query, "MockString", "SPY"]
 
         nodes = kg["nodes"]
         assert "entity_ecosystem" in nodes

@@ -24,6 +24,7 @@ import time
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from services.webapp.api import create_app, db, User
+from services.webapp.config import config
 
 class TestRegisterRateLimit(unittest.TestCase):
     """
@@ -32,14 +33,22 @@ class TestRegisterRateLimit(unittest.TestCase):
     """
 
     def setUp(self):
+        # Temporarily enable rate limiting for TestingConfig
+        self.original_ratelimit = config['testing'].RATELIMIT_ENABLED
+        config['testing'].RATELIMIT_ENABLED = True
+
         # Use testing config which uses in-memory DB
         self.app = create_app('testing')
+
         self.client = self.app.test_client()
         self.ctx = self.app.app_context()
         self.ctx.push()
         db.create_all()
 
     def tearDown(self):
+        # Restore original configuration
+        config['testing'].RATELIMIT_ENABLED = self.original_ratelimit
+
         db.session.remove()
         db.drop_all()
         self.ctx.pop()

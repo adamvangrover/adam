@@ -1,0 +1,399 @@
+Metadata-Version: 2.4
+Name: adam-project
+Version: 23.5.0
+Summary: Adam: Autonomous Financial Analyst Agent Platform
+Author: ADAM Contributors
+Author-email: ADAM <adamvangrover@gmail.com>
+License: MIT
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Financial and Insurance Industry
+Classifier: Topic :: Office/Business :: Financial
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: fastapi==0.128.0
+Requires-Dist: uvicorn==0.34.0
+Requires-Dist: Flask==3.1.2
+Requires-Dist: Flask-Cors==6.0.2
+Requires-Dist: Flask-SocketIO==5.6.0
+Requires-Dist: Flask-JWT-Extended==4.7.1
+Requires-Dist: Flask-SQLAlchemy>=3.1.1
+Requires-Dist: aiohttp==3.13.3
+Requires-Dist: aiofiles==25.1.0
+Requires-Dist: anyio==4.12.0
+Requires-Dist: asyncer==0.0.8
+Requires-Dist: requests==2.32.5
+Requires-Dist: httpx==0.28.1
+Requires-Dist: websockets==15.0.1
+Requires-Dist: gunicorn>=23.0.0
+Requires-Dist: numpy==2.4.0
+Requires-Dist: pandas==2.3.3
+Requires-Dist: scipy==1.16.3
+Requires-Dist: scikit-learn==1.8.0
+Requires-Dist: networkx==3.6.1
+Requires-Dist: sympy
+Requires-Dist: statsmodels==0.14.6
+Requires-Dist: optuna==4.6.0
+Requires-Dist: torch==2.6.0
+Requires-Dist: nvidia-cudnn-cu12
+Requires-Dist: triton
+Requires-Dist: openai==1.98.0
+Requires-Dist: anthropic>=0.40.0
+Requires-Dist: azure-ai-agents==1.2.0b6
+Requires-Dist: azure-ai-projects==1.0.0
+Requires-Dist: transformers==4.48.2
+Requires-Dist: sentence-transformers==3.4.1
+Requires-Dist: tiktoken==0.12.0
+Requires-Dist: tokenizers
+Requires-Dist: litellm
+Requires-Dist: langchain==1.2.0
+Requires-Dist: langchain-community==0.4.1
+Requires-Dist: langchain-core==1.2.6
+Requires-Dist: langgraph==1.0.5
+Requires-Dist: langgraph-checkpoint==3.0.1
+Requires-Dist: semantic-kernel==1.39.0
+Requires-Dist: dspy==3.0.4
+Requires-Dist: dspy-ai==3.0.4
+Requires-Dist: mesa>=3.0.0
+Requires-Dist: yfinance==1.1.0
+Requires-Dist: ta==0.11.0
+Requires-Dist: pandas_market_calendars>=4.3.0
+Requires-Dist: PyPortfolioOpt>=1.5.5
+Requires-Dist: edgartools==5.8.1
+Requires-Dist: qiskit>=1.2.0
+Requires-Dist: qiskit-finance>=0.4.0
+Requires-Dist: qiskit-aer>=0.14.0
+Requires-Dist: SQLAlchemy==2.0.45
+Requires-Dist: alembic==1.17.2
+Requires-Dist: neo4j==6.0.3
+Requires-Dist: redis==7.1.0
+Requires-Dist: azure-storage-blob==12.27.1
+Requires-Dist: psycopg2-binary>=2.9.9
+Requires-Dist: celery==5.6.2
+Requires-Dist: kombu==5.6.2
+Requires-Dist: billiard==4.2.4
+Requires-Dist: amqp==5.3.1
+Requires-Dist: mcp>=1.0.0
+Requires-Dist: fastmcp>=0.1.0
+Requires-Dist: opentelemetry-api==1.39.1
+Requires-Dist: opentelemetry-sdk==1.39.1
+Requires-Dist: python-json-logger==4.0.0
+Requires-Dist: colorlog==6.10.1
+Requires-Dist: cryptography==46.0.3
+Requires-Dist: pyOpenSSL==25.3.0
+Requires-Dist: python-dotenv==1.2.1
+Requires-Dist: psutil==6.1.1
+Requires-Dist: pydantic==2.11.10
+Requires-Dist: pydantic-settings==2.12.0
+Requires-Dist: beautifulsoup4==4.14.3
+Requires-Dist: lxml==6.0.2
+Requires-Dist: fsspec==2025.12.0
+Requires-Dist: pyarrow==22.0.0
+Requires-Dist: json-logic>=0.6.0
+Requires-Dist: rich==14.2.0
+Requires-Dist: tqdm==4.67.1
+Requires-Dist: click==8.3.1
+Requires-Dist: uuid_utils==0.12.0
+Requires-Dist: pytest==9.0.2
+Requires-Dist: pytest-asyncio==1.3.0
+Requires-Dist: black==25.12.0
+Requires-Dist: flake8==7.3.0
+Requires-Dist: mypy==1.19.1
+Requires-Dist: ruff==0.14.10
+Requires-Dist: PyYAML>=6.0
+Requires-Dist: playwright
+Requires-Dist: ccxt>=4.5.0
+Requires-Dist: web3>=6.0.0
+Requires-Dist: flask-limiter
+Requires-Dist: tweepy>=4.16.0
+Requires-Dist: textblob>=0.17.0
+Requires-Dist: vaderSentiment>=3.3.2
+Requires-Dist: googlemaps>=4.10.0
+Requires-Dist: pycoingecko>=3.2.0
+Requires-Dist: nltk>=3.9.0
+Provides-Extra: dev
+Requires-Dist: pytest; extra == "dev"
+Requires-Dist: black; extra == "dev"
+Requires-Dist: flake8; extra == "dev"
+Requires-Dist: mypy; extra == "dev"
+Provides-Extra: docs
+Requires-Dist: mkdocs; extra == "docs"
+Requires-Dist: mkdocs-material; extra == "docs"
+Provides-Extra: ui
+Requires-Dist: streamlit; extra == "ui"
+Dynamic: license-file
+Dynamic: provides-extra
+Dynamic: requires-dist
+Dynamic: requires-python
+
+# Adam v26.0: The Institutional-Grade Neuro-Symbolic Financial Sovereign
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/) [![Docker Image](https://img.shields.io/badge/docker-ready-blue)](https://hub.docker.com/) [![FinanceBench](https://img.shields.io/badge/FinanceBench-99%25-green)](https://arxiv.org/abs/2311.11944)
+
+> **Adam v26.0 upgrades financial AI from a conversational chatbot to a fiduciary architect, explicitly engineered for Leveraged Finance, Distressed Debt, and Deep Credit Risk Underwriting. By fusing the intuitive speed of a Neural Swarm (System 1) with the deliberate logic of a Neuro-Symbolic Graph (System 2), Adam delivers calculated conviction for high-stakes capital allocation.**
+
+---
+
+## 📚 Quick Links
+
+*   [**🚀 Launch Neural Dashboard**](showcase/index.html)
+*   [**⚡ Setup Guide**](docs/setup_guide.md)
+*   [**🤖 Agent Developer Bible**](AGENTS.md)
+*   [**🧠 Agent Knowledge Base**](docs/AGENTS_KNOWLEDGE_BASE.md)
+*   [**📖 Architecture Overview**](docs/ARCHITECTURE.md)
+*   [**🎓 Tutorials**](docs/tutorials.md)
+*   [**🎓 Office Nexus Tutorial**](docs/TUTORIAL_OFFICE_NEXUS.md)
+*   [**📦 Custom Builds**](docs/custom_builds.md)
+*   [**🏗️ Three-Layer Architecture**](docs/LAYERS.md)
+
+---
+
+## 🧠 Why Adam? The "System 2" Revolution
+
+The era of the "LLM Wrapper" is over. Institutional finance faces an **Epistemological Crisis**: stochastic models hallucinate, making them dangerous for due diligence.
+
+**Adam v26.0** solves this by implementing a **Hybrid Cognitive Engine** rooted in the principles of **Leveraged Finance** and **Distressed Debt**:
+
+### System 1: The Swarm (The Reflexes)
+*   **Role:** High-velocity, unstructured data parsing.
+*   **Focus:** Earnings call transcripts, ARR momentum, and baseline financial ratios.
+*   **Architecture:** Asynchronous Hive Mind with `SentinelWorker` for anomaly detection.
+*   **Use Case:** "Monitor TMT sector for cash burn spikes."
+
+### System 2: The Graph (The Deep Thinker)
+*   **Role:** Downside scenario stress testing, capital structure analysis, and covenant compliance.
+*   **Focus:** "Logic as Data" enforcement of underwriting policies.
+*   **Architecture:** Neuro-Symbolic Planner (DAG) with feedback loops.
+*   **Use Case:** "Generate a deep-dive credit memo with Base/Bull/Bear DCF scenarios."
+
+**Result:** Adam "thinks before he speaks," drafting, critiquing, and refining analysis before presenting it to the user.
+
+### Logic as Data
+Adam v26.0 treats business logic as first-class data. Using a JSON-based rule engine (`jsonLogic`), risk thresholds, trading triggers, and compliance rules are decoupled from the core codebase. This allows for:
+*   **Dynamic Policy Updates:** Modify risk parameters without redeploying code.
+*   **Auditability:** Rules are stored as JSON artifacts, making them human-readable and easy to version control.
+*   **Safety:** The logic layer is evaluated before agent execution, acting as a deterministic guardrail.
+
+### System Architecture
+
+```mermaid
+graph TD
+    %% 1. Client & Immersive Layer
+    subgraph Client_Layer [Client & Immersive Layer]
+        UserNode(["User / PM"]) -->|HTTP/WSS| WebApp["React / Vite Dashboard"]
+        UserNode -->|WebXR| VRDeck["Neural Deck (VR / Holodeck)"]
+        WebApp -->|MCP| MCPServer["MCP API Gateway"]
+        VRDeck -->|MCP| MCPServer
+        MCPServer -->|Auth/RBAC| SecModule["Security & Governance Gatekeeper"]
+    end
+
+    %% 2. Orchestration Layer
+    subgraph Orchestration_Layer [Cognitive Routing]
+        SecModule -->|Validated Request| MetaOrchestrator["Meta-Orchestrator (Python)"]
+    end
+
+    %% 3. System 1: Fast Perception
+    subgraph System_1_Swarm [System 1: Neural Swarms & Perception]
+        MetaOrchestrator -->|Event/PubSub| SwarmManager["Async Hive Mind"]
+        SwarmManager -->|Spawn| MarketScanner["Market Scanner & News"]
+        SwarmManager -->|Spawn| SentimentEngine["Sentiment Engine"]
+        SwarmManager -->|Isolate| DevSwarm["Independent Dev/Tinker Swarm"]
+    end
+
+    %% 4. System 2: Deep Reasoning
+    subgraph System_2_Reasoning [System 2: Neuro-Symbolic Graph]
+        MetaOrchestrator -->|Complex Query| Planner["DAG Reasoning Planner"]
+        Planner -->|Credit| CreditSentinel["Credit Sentinel (SNC & ICAT)"]
+        Planner -->|Wealth| RoboAdvisor["Robo Advisor"]
+        Planner -->|Alpha| StratEngine["Strategy Engine"]
+    end
+
+    %% 5. System 3: World Modeling
+    subgraph System_3_Simulation [System 3: Simulation & Quantum]
+        MetaOrchestrator -->|Forecast| WorldModel["OSWM (World Model)"]
+        WorldModel -->|Scenario| QuantumEngine["Quantum Monte Carlo (QMC)"]
+        QuantumEngine -->|Stress Test| RiskGuardian["Risk Guardian"]
+    end
+
+    %% 6. Deterministic & Execution (Rust)
+    subgraph Rust_Execution_Layer [Algorithmic & Deterministic Execution]
+        StratEngine -->|Trade Signal| AlgoEngine["Algorithmic Trading Engine"]
+        MarketScanner -->|Tick Data| AlgoEngine
+        AlgoEngine -->|Order| MatchingEngine["Matching Engine (Rust)"]
+        MatchingEngine -->|Compute| PricingEngine["Pricing Engine (Rust)"]
+    end
+
+    %% 7. Foundation & OS Layer
+    subgraph OS_Foundation_Layer [Foundation & Memory]
+        PricingEngine -->|Syscall| AdamOS["AdamOS Kernel (Rust)"]
+        CreditSentinel -->|Trace| POTLogger["ProofOfThought Logger"]
+        POTLogger -->|Hash| Ledger[("Immutable Ledger")]
+        AdamOS -->|State| Ledger
+        WorldModel <-->|Context| KnowledgeGraph[("Unified Knowledge Graph")]
+    end
+
+    %% 8. Experimental Sandbox
+    subgraph Experimental_Lab [Experimental / Sandbox]
+        TinkerLab["Tinker Lab & Federated Learning"] -.->|Promote Models| MetaOrchestrator
+    end
+```
+
+## 🧬 Logic as Data: The Audit Trail
+
+Adam treats reasoning as a first-class citizen. Every logical step, from EBITDA adjustment to covenant stress-testing, is serialized as a data artifact via the `ProofOfThoughtLogger`. This ensures:
+
+*   **Traceability:** Every conclusion can be traced back to its source (e.g., specific line items in a 10-K).
+*   **Reproducibility:** Analysis can be re-run with different assumptions to test sensitivity.
+*   **Auditability:** A complete ledger of the agent's "thought process" is preserved in an immutable JSON ledger for compliance and review.
+
+---
+
+## 📂 Directory Structure
+
+A high-level overview of the repository layout:
+
+```text
+adam/
+├── core/                   # The "Brain" (See core/README.md)
+│   ├── agents/             # Specialized autonomous agents
+│   ├── engine/             # Neuro-Symbolic Planner & Orchestrator
+│   ├── credit_sentinel/    # Distressed Debt Analysis Module
+│   └── system/             # "System 1" Async Swarm infrastructure
+├── services/
+│   └── webapp/             # React/Flask "Neural Dashboard"
+├── showcase/               # Static HTML visualizers and demos
+├── docs/                   # Documentation, tutorials, and guides
+├── scripts/                # Utility scripts for running and testing
+├── prompt_library/         # The "Mind" (AOPL v26.0 Prompts)
+└── server/                 # MCP Server implementation
+```
+
+---
+
+## ⚡ Getting Started
+
+We strictly use **`uv`** for lightning-fast, reproducible Python environment management.
+
+### Prerequisites
+
+*   **OS:** Linux, macOS, or Windows (WSL2 recommended)
+*   **Tooling:** `uv` (Modern Python Package Manager)
+*   **API Keys:** OpenAI (GPT-4), Anthropic (Claude 3.5), or local LLM.
+
+### Quick Start
+
+1.  **Install `uv` (if not installed):**
+    ```bash
+    curl -LsSf https://astral.sh/uv/install.sh | sh
+    ```
+
+2.  **Clone the Repository:**
+    ```bash
+    git clone https://github.com/adamvangrover/adam.git
+    cd adam
+    ```
+
+3.  **Sync Dependencies:**
+    ```bash
+    # This installs Python and all dependencies in seconds
+    uv sync
+    ```
+
+4.  **Activate Environment:**
+    ```bash
+    source .venv/bin/activate
+    ```
+
+5.  **Launch the System:**
+    ```bash
+    # Run the interactive CLI
+    python scripts/run_adam.py
+    ```
+
+For detailed instructions, see the [Setup Guide](docs/setup_guide.md).
+
+---
+
+## 🏰 Platform Capabilities
+
+Adam unifies three critical domains into a single cognitive architecture:
+
+### 1. Distressed Debt & Credit (Credit Sentinel)
+*   **ICAT Engine:** Python-based 3-statement modeling and DCF valuation.
+*   **SNC Rating:** Automating regulatory grading (Pass vs. Substandard).
+*   **Covenant Analysis:** Extracting and stress-testing debt covenants.
+
+### 2. Quantitative Engineering
+*   **Risk Modeling:** Deterministic calculation of VaR, Sharpe, and Sortino ratios.
+*   **Factor Analysis:** Regression against Fama-French factors.
+
+### 3. Agentic Workflow
+*   **Meta-Orchestration:** Dynamic routing of queries to specialized agents.
+*   **Consensus Engine:** Aggregating multi-agent perspectives into a single conviction score.
+*   **Governance Layer:** API Gatekeeper and Structured Narrative Logging for enterprise safety.
+
+---
+
+## 📦 Custom Builds & Export
+
+Adam includes a powerful build system to create self-contained, portable environments.
+
+### Interactive Builder
+
+Run the build wizard to create a custom distribution with specific modules, runtime profiles, and Docker support:
+
+```bash
+python scripts/build_adam.py
+```
+
+See [**Custom Builds Documentation**](docs/custom_builds.md) for details.
+
+### Quick Export
+
+To export a single module directly:
+
+```bash
+python scripts/export_module.py market_mayhem --output my_exports
+```
+
+---
+
+## 🗺️ Roadmap: Path to Autonomy
+
+*   **Phase 1 (Current): The Autonomous Analyst.** Deep Dives, Credit Memos, and Regulatory Grading.
+*   **Phase 1.5 (ADAM-V-NEXT): The Command Center.** Synthesizer Dashboard, Agent Intercom, and War Room.
+*   **Phase 2 (Q3 2025): The Portfolio Manager.** Multi-entity risk aggregation and automated rebalancing.
+*   **Phase 3 (Q3 2026): The Market Maker.** High-frequency sentiment trading and liquidity provision via Quantum RL.
+
+---
+
+## 🤝 Contributing
+
+We are building the open-source standard for institutional AI.
+
+*   **Directives:** Please read [AGENTS.md](AGENTS.md) and the [Agent Knowledge Base](docs/AGENTS_KNOWLEDGE_BASE.md) before writing a single line of code.
+*   **Process:** Read [CONTRIBUTING.md](CONTRIBUTING.md) for pull request guidelines.
+
+## 📖 Documentation & Guides
+
+We have significantly expanded our documentation for v26.0:
+
+*   [**Architecture & Design**](docs/ARCHITECTURE.md): The Neuro-Symbolic 3-Layer Architecture.
+*   [**Layer Documentation**](docs/LAYERS.md): Detailed breakdown of Intelligence, Compute, and Data layers.
+*   [**Production Setup**](docs/PRODUCTION.md): Deployment, Security, and Ops.
+*   [**Versioning Strategy**](docs/VERSIONING.md): Release cycle and branching.
+*   [**Agent Creation**](docs/AGENT_CREATION.md): How to build and register new agents.
+*   [**Graph Workflows**](docs/GRAPH_WORKFLOWS.md): Building DAG-based reasoning loops.
+*   [**Documentation Hub**](docs/index.md): The central index.
+
+### License
+
+Distributed under the MIT License. See `LICENSE` for more information.
+
+---
+
+**For AI Agents and LLMs,** please see [llms.txt](llms.txt) (optimized) or [llms-full.txt](llms-full.txt) (comprehensive) for context.

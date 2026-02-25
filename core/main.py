@@ -5,13 +5,14 @@ import logging
 import argparse
 from core.utils.config_utils import load_app_config
 from core.utils.logging_utils import setup_logging
+from core.utils.system_logger import SystemLogger
 from core.system.bootstrap import Bootstrap
 from core.settings import settings
 
 
 async def async_main():
     """
-    Main execution logic for Adam v23.0 (Adaptive System).
+    Main execution logic for Adam v26.0 (Neuro-Symbolic Sovereign).
 
     This function handles:
     1. Parsing command line arguments.
@@ -25,7 +26,7 @@ async def async_main():
     Returns:
         None
     """
-    parser = argparse.ArgumentParser(description="Adam v23.0 Execution")
+    parser = argparse.ArgumentParser(description="Adam v26.0 Execution")
     parser.add_argument("--query", type=str, help="Single query to execute")
     parser.add_argument("--system_prompt", type=str, help="System Prompt to inject (String)")
     parser.add_argument("--system_prompt_path", type=str, help="System Prompt to inject (File Path)")
@@ -37,6 +38,9 @@ async def async_main():
         if not Bootstrap.run():
             print("System Bootstrap Failed. See logs for details.")
             return
+
+        # System Log: Runtime Start
+        SystemLogger().log_event("RUNTIME", {"status": "START", "args": sys.argv})
 
         # Load configuration (Legacy YAML)
         try:
@@ -137,6 +141,9 @@ async def async_main():
 
     except Exception as e:
         print(f"Fatal Error: {e}")
+        SystemLogger().log_event("RUNTIME", {"status": "ERROR", "error": str(e)})
+    finally:
+        SystemLogger().log_event("RUNTIME", {"status": "STOP"})
 
 
 def main():

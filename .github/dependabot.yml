@@ -1,0 +1,28 @@
+version: 2
+updates:
+  # Maintain dependencies for Python
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+
+  # Maintain dependencies for Frontend
+  - package-ecosystem: "npm"
+    directory: "/services/webapp/client"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+
+  # Maintain dependencies for Rust
+  - package-ecosystem: "cargo"
+    directory: "/core/experimental/adamos_kernel"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+
+  # Maintain GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"

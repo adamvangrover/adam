@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if(elements.closeEvidenceBtn) elements.closeEvidenceBtn.addEventListener('click', hideEvidence);
     
     window.switchTab = (tabName) => {
-        document.querySelectorAll('#tab-memo, #tab-annex-a, #tab-annex-b, #tab-annex-c, #tab-risk-quant, #tab-system-2').forEach(el => {
+        document.querySelectorAll('#tab-memo, #tab-annex-a, #tab-annex-b, #tab-annex-c, #tab-risk-quant, #tab-system-2, #tab-interlock').forEach(el => {
             el.classList.add('hidden');
         });
         
@@ -78,8 +78,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             if (memo.historical_financials && Array.isArray(memo.historical_financials)) {
                  renderFullMemoUI(memo);
+                 loadInteractionLog(memo.borrower_name || identifier.replace('.json', '').replace('credit_memo_', ''));
             } else {
                  renderMemoFromMock(memo);
+                 loadInteractionLog(memo.borrower_name || identifier);
             }
 
             // NEW: Render Persistent Agent Log
@@ -916,5 +918,252 @@ document.addEventListener('DOMContentLoaded', async () => {
     function renderMemoFromMock(data) {
         currentMemo = data;
         renderFullMemoUI(data);
+    }
+
+    // --- 10. Risk & Legal Interaction Renderer ---
+    window.loadInteractionLog = async function(borrowerName) {
+        // Handle name variations (spaces vs underscores)
+        const cleanName = borrowerName.replace(/_/g, ' ');
+        const fileKey = borrowerName.replace(/ /g, '_');
+
+        try {
+            const res = await fetch('data/risk_legal_interaction.json');
+            if(!res.ok) throw new Error("Interaction log missing");
+            const data = await res.json();
+
+            // Find key
+            let entry = data[fileKey] || data[cleanName];
+            if (!entry) {
+                // Try fuzzy match
+                const key = Object.keys(data).find(k => k.includes(fileKey) || fileKey.includes(k));
+                if(key) entry = data[key];
+            }
+
+            if(entry) {
+                // Render Chat Log
+                renderInteractionUI(entry);
+
+                // NEW: Play Visual Choreography
+                if(entry.ui_events && entry.ui_events.length > 0) {
+                    playAgentInteraction(entry.ui_events);
+                }
+            } else {
+                console.warn("No interaction log found for", borrowerName);
+                const logContainer = document.getElementById('interlock-log');
+                if(logContainer) logContainer.innerHTML = '<div class="text-slate-500 italic text-center p-4">No interaction logs available for this entity.</div>';
+            }
+        } catch(e) {
+            console.error("Failed to load interaction log", e);
+        }
+    }
+
+    // --- 11. Visual Agent Choreography (Cursors) ---
+
+    // Inject Styles
+    const style = document.createElement('style');
+    style.textContent = `
+        .agent-cursor {
+            position: fixed;
+            z-index: 9999;
+            pointer-events: none;
+            transition: all 0.5s ease-out;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .agent-cursor i {
+            font-size: 24px;
+            filter: drop-shadow(0 0 5px rgba(0,0,0,0.5));
+        }
+        .agent-cursor .cursor-label {
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            white-space: nowrap;
+            font-family: monospace;
+            border: 1px solid rgba(255,255,255,0.2);
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .agent-cursor.active .cursor-label {
+            opacity: 1;
+        }
+        .agent-highlight {
+            position: relative;
+        }
+        .agent-highlight::after {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border: 2px solid;
+            border-radius: 4px;
+            animation: pulse-highlight 1.5s infinite;
+            pointer-events: none;
+            z-index: 50;
+        }
+        @keyframes pulse-highlight {
+            0% { opacity: 0.8; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(1.02); }
+            100% { opacity: 0.8; transform: scale(1); }
+        }
+    `;
+    document.head.appendChild(style);
+
+    class CursorManager {
+        constructor() {
+            this.cursors = {};
+        }
+
+        getCursor(actor) {
+            if (this.cursors[actor]) return this.cursors[actor];
+
+            const el = document.createElement('div');
+            el.className = 'agent-cursor';
+
+            let color = '#fff';
+            let icon = 'fa-mouse-pointer';
+            if (actor === 'RiskBot') { color = '#a855f7'; icon = 'fa-chart-line'; } // Purple
+            if (actor === 'LegalAI') { color = '#6366f1'; icon = 'fa-gavel'; } // Indigo
+
+            el.innerHTML = `
+                <i class="fas ${icon}" style="color: ${color}"></i>
+                <div class="cursor-label" style="border-left: 2px solid ${color}">${actor}</div>
+            `;
+
+            document.body.appendChild(el);
+
+            // Start off-screen
+            el.style.left = '-100px';
+            el.style.top = '-100px';
+
+            this.cursors[actor] = { el, color };
+            return this.cursors[actor];
+        }
+
+        move(actor, targetSelector, message) {
+            const cursorObj = this.getCursor(actor);
+            const target = document.querySelector(targetSelector);
+
+            if (target) {
+                const rect = target.getBoundingClientRect();
+                // Center of element
+                const x = rect.left + (rect.width / 2);
+                const y = rect.top + (rect.height / 2);
+
+                cursorObj.el.style.left = `${x}px`;
+                cursorObj.el.style.top = `${y}px`;
+                cursorObj.el.classList.add('active');
+                cursorObj.el.querySelector('.cursor-label').innerText = message || actor;
+
+                // Highlight Effect
+                this.highlight(target, cursorObj.color);
+            } else {
+                console.warn(`Target ${targetSelector} not found for ${actor}`);
+            }
+        }
+
+        highlight(element, color) {
+            // Remove old highlight logic if any (simplified: we just add class and set style)
+            element.classList.add('agent-highlight');
+            element.style.borderColor = color; // Hacky
+
+            // Create a specific style rule for this element's pseudo-element if needed,
+            // but for now relying on the class and inline color border is tricky.
+            // Better: Set a CSS variable on the element
+            element.style.setProperty('--highlight-color', color);
+
+            // Custom highlight visualization via overlay might be cleaner, but let's try basic border
+            element.style.boxShadow = `0 0 15px ${color}`;
+
+            setTimeout(() => {
+                element.classList.remove('agent-highlight');
+                element.style.boxShadow = 'none';
+                element.style.removeProperty('--highlight-color');
+            }, 2000);
+        }
+    }
+
+    const cursorMgr = new CursorManager();
+
+    async function playAgentInteraction(events) {
+        console.log("Starting Agent Interaction Playback...", events);
+
+        for (const event of events) {
+            // 1. Execute Action Immediately
+            if(event.tab) {
+                window.switchTab(event.tab);
+                // Give a slight buffer for tab switch to render DOM
+                await new Promise(r => setTimeout(r, 100));
+            }
+
+            if(event.target) {
+                cursorMgr.move(event.actor, event.target, event.message);
+            }
+
+            // 2. Wait for the duration (simulating "reading" or "working")
+            await new Promise(resolve => setTimeout(resolve, event.duration || 2000));
+        }
+
+        // Final cleanup: hide cursors? Or leave them? Leave them is fine.
+        console.log("Playback Complete.");
+    }
+
+    function renderInteractionUI(entry) {
+        const logContainer = document.getElementById('interlock-log');
+        const highlightContainer = document.getElementById('interlock-highlights');
+        const consensusContainer = document.getElementById('interlock-consensus');
+
+        if(logContainer) {
+            logContainer.innerHTML = '';
+            entry.logs.forEach((log, index) => {
+                setTimeout(() => {
+                    const div = document.createElement('div');
+                    // Style based on actor
+                    let actorColor = 'text-slate-400';
+                    let borderColor = 'border-slate-700/50';
+                    let icon = 'fa-terminal';
+
+                    if(log.actor === 'RiskBot') { actorColor = 'text-purple-400'; borderColor = 'border-purple-500/30'; icon = 'fa-chart-line'; }
+                    if(log.actor === 'LegalAI') { actorColor = 'text-indigo-400'; borderColor = 'border-indigo-500/30'; icon = 'fa-gavel'; }
+                    if(log.actor === 'System') { actorColor = 'text-emerald-400'; borderColor = 'border-emerald-500/30'; icon = 'fa-check-circle'; }
+
+                    div.className = `p-3 bg-black/20 rounded border ${borderColor} text-sm animate-fade-in`;
+                    div.innerHTML = `
+                        <div class="flex items-center gap-2 mb-1">
+                            <i class="fas ${icon} ${actorColor}"></i>
+                            <span class="font-bold ${actorColor} text-xs uppercase">${log.actor}</span>
+                            <span class="text-slate-600 text-[10px] ml-auto">${new Date(log.timestamp).toLocaleTimeString()}</span>
+                        </div>
+                        <div class="text-slate-300 leading-relaxed">${log.message}</div>
+                    `;
+                    logContainer.appendChild(div);
+                    logContainer.scrollTop = logContainer.scrollHeight;
+                }, index * 200); // Staggered rendering for "live" feel
+            });
+        }
+
+        if(highlightContainer && entry.highlights) {
+            highlightContainer.innerHTML = '';
+            entry.highlights.forEach(h => {
+                const div = document.createElement('div');
+                let colorClass = 'bg-slate-700/50 text-slate-300';
+                if(h.status === 'Critical') colorClass = 'bg-red-900/30 text-red-300 border-red-500/30';
+                if(h.status === 'Protected') colorClass = 'bg-emerald-900/30 text-emerald-300 border-emerald-500/30';
+
+                div.className = `p-2 rounded text-xs border border-transparent ${colorClass} flex justify-between items-center`;
+                div.innerHTML = `
+                    <span>${h.label}</span>
+                    <span class="font-bold text-[10px] uppercase opacity-70">${h.type}</span>
+                `;
+                highlightContainer.appendChild(div);
+            });
+        }
+
+        if(consensusContainer) {
+            consensusContainer.innerText = "Consensus Reached. Integration Complete.";
+            consensusContainer.className = "text-sm text-emerald-400 font-bold";
+        }
     }
 });
