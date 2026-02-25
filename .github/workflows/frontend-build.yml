@@ -3,8 +3,12 @@ name: Adam CI / frontend-build
 on:
   push:
     branches: [ main, master ]
+    paths:
+      - 'services/webapp/client/**'
   pull_request:
     branches: [ main, master ]
+    paths:
+      - 'services/webapp/client/**'
 
 jobs:
   frontend-build:
@@ -20,8 +24,18 @@ jobs:
     - name: Install Frontend Dependencies
       run: |
         cd services/webapp/client
-        npm install --legacy-peer-deps
+        # Use ci for clean, deterministic installs if lockfile exists
+        if [ -f package-lock.json ]; then
+          npm ci --legacy-peer-deps
+        else
+          npm install --legacy-peer-deps
+        fi
     - name: Build Frontend
       run: |
         cd services/webapp/client
         npm run build --if-present
+    - name: Upload Build Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: frontend-build
+        path: services/webapp/client/build/
