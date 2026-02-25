@@ -37,8 +37,8 @@ MOCK_LIBRARY = {
             "year": [2021, 2022, 2023]
         },
         "forecast_assumptions": {
-            "revenue_growth": 0.05,
-            "ebitda_margin": 0.32,
+            "revenue_growth": [0.05] * 5,
+            "ebitda_margin": [0.32] * 5,
             "discount_rate": 0.09,
             "terminal_growth_rate": 0.03
         },
@@ -72,8 +72,8 @@ MOCK_LIBRARY = {
             "year": [2021, 2022, 2023]
         },
         "forecast_assumptions": {
-            "revenue_growth": 0.15,
-            "ebitda_margin": 0.18,
+            "revenue_growth": [0.15] * 5,
+            "ebitda_margin": [0.18] * 5,
             "discount_rate": 0.12,
             "terminal_growth_rate": 0.04
         },
@@ -107,8 +107,8 @@ MOCK_LIBRARY = {
             "year": [2021, 2022, 2023]
         },
         "forecast_assumptions": {
-            "revenue_growth": 0.02,
-            "ebitda_margin": 0.03,
+            "revenue_growth": [0.02] * 5,
+            "ebitda_margin": [0.03] * 5,
             "discount_rate": 0.15,
             "terminal_growth_rate": 0.01
         },
@@ -142,8 +142,8 @@ MOCK_LIBRARY = {
             "year": [2021, 2022, 2023]
         },
         "forecast_assumptions": {
-            "revenue_growth": 0.03,
-            "ebitda_margin": 0.35,
+            "revenue_growth": [0.03] * 5,
+            "ebitda_margin": [0.35] * 5,
             "discount_rate": 0.10,
             "terminal_growth_rate": 0.02
         },
@@ -177,8 +177,8 @@ MOCK_LIBRARY = {
             "year": [2021, 2022, 2023]
         },
         "forecast_assumptions": {
-            "revenue_growth": 0.25,
-            "ebitda_margin": 0.55,
+            "revenue_growth": [0.25] * 5,
+            "ebitda_margin": [0.55] * 5,
             "discount_rate": 0.11,
             "terminal_growth_rate": 0.04
         },
@@ -212,8 +212,8 @@ MOCK_LIBRARY = {
             "year": [2021, 2022, 2023]
         },
         "forecast_assumptions": {
-            "revenue_growth": 0.02,
-            "ebitda_margin": 0.18,
+            "revenue_growth": [0.02] * 5,
+            "ebitda_margin": [0.18] * 5,
             "discount_rate": 0.08,
             "terminal_growth_rate": 0.01
         },
@@ -247,8 +247,8 @@ MOCK_LIBRARY = {
             "year": [2021, 2022, 2023]
         },
         "forecast_assumptions": {
-            "revenue_growth": 0.10,
-            "ebitda_margin": 0.45,
+            "revenue_growth": [0.10] * 5,
+            "ebitda_margin": [0.45] * 5,
             "discount_rate": 0.10,
             "terminal_growth_rate": 0.03
         },
@@ -282,8 +282,8 @@ MOCK_LIBRARY = {
             "year": [2021, 2022, 2023]
         },
         "forecast_assumptions": {
-            "revenue_growth": 0.01,
-            "ebitda_margin": 0.10,
+            "revenue_growth": [0.01] * 5,
+            "ebitda_margin": [0.10] * 5,
             "discount_rate": 0.14,
             "terminal_growth_rate": 0.00
         },
@@ -317,8 +317,8 @@ MOCK_LIBRARY = {
             "year": [2021, 2022, 2023]
         },
         "forecast_assumptions": {
-            "revenue_growth": 0.03,
-            "ebitda_margin": 0.35,
+            "revenue_growth": [0.03] * 5,
+            "ebitda_margin": [0.35] * 5,
             "discount_rate": 0.08,
             "terminal_growth_rate": 0.02
         },
@@ -352,8 +352,8 @@ MOCK_LIBRARY = {
             "year": [2021, 2022, 2023]
         },
         "forecast_assumptions": {
-            "revenue_growth": 0.03,
-            "ebitda_margin": 0.06,
+            "revenue_growth": [0.03] * 5,
+            "ebitda_margin": [0.06] * 5,
             "discount_rate": 0.07,
             "terminal_growth_rate": 0.02
         },
@@ -385,37 +385,49 @@ class CreditMemoPipeline:
     def run_pipeline(self):
         logger.info("Starting Credit Memo Generation Pipeline...")
 
+        # 1. Process Fixed Library
         for key, data in MOCK_LIBRARY.items():
-            result = self.orchestrator.process_entity(key, data)
-            if not result:
-                continue
+            self._process_and_save(key, data)
 
-            memo = result["memo"]
-            logs = result["interaction_log"]
-
-            # Save Memo
-            filename = f"credit_memo_{key}.json"
-            with open(os.path.join(self.output_dir, filename), 'w') as f:
-                json.dump(memo, f, indent=2)
-
-            # Update Index
-            self.library_index.append({
-                "id": key,
-                "borrower_name": data['name'],
-                "ticker": data['ticker'],
-                "sector": data['sector'],
-                "report_date": memo['report_date'],
-                "risk_score": memo['risk_score'],
-                "file": filename,
-                "summary": f"{data['name']} ({data['sector']}). Risk Score: {memo['risk_score']}."
-            })
-
-            # Update Interaction Logs
-            self.interaction_logs[key] = logs
+        # 2. Process Synthetic Examples (Demonstration of Runtime Capability)
+        synthetic_targets = ["Salesforce_Inc", "Chevron_Corp", "Boeing_Co"]
+        logger.info(f"Generating Synthetic Profiles for: {synthetic_targets}")
+        for key in synthetic_targets:
+            # Pass data=None to trigger synthetic generation
+            self._process_and_save(key, data=None)
 
         self.save_library_index()
         self.save_interaction_logs()
         logger.info("Pipeline Complete.")
+
+    def _process_and_save(self, key, data):
+        """Helper to process a single entity and save results."""
+        result = self.orchestrator.process_entity(key, data)
+        if not result:
+            return
+
+        memo = result["memo"]
+        logs = result["interaction_log"]
+
+        # Save Memo
+        filename = f"credit_memo_{key}.json"
+        with open(os.path.join(self.output_dir, filename), 'w') as f:
+            json.dump(memo, f, indent=2)
+
+        # Update Index
+        self.library_index.append({
+            "id": key,
+            "borrower_name": memo['borrower_name'], # Use memo name as it might be generated
+            "ticker": memo['borrower_details'].get('ticker', key),
+            "sector": memo['borrower_details']['sector'],
+            "report_date": memo['report_date'],
+            "risk_score": memo['risk_score'],
+            "file": filename,
+            "summary": f"{memo['borrower_name']} ({memo['borrower_details']['sector']}). Risk Score: {memo['risk_score']}."
+        })
+
+        # Update Interaction Logs
+        self.interaction_logs[key] = logs
 
     def save_library_index(self):
         with open(os.path.join(self.output_dir, "credit_memo_library.json"), 'w') as f:

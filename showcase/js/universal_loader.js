@@ -3,7 +3,7 @@
  * -----------------------------------------------------------------------------
  * Architect: System Core
  * Context:   Centralized data fetching for Credit & Sovereign applications.
- * Strategy:  Network First -> Mock Data Fallback
+ * Strategy:  Network First -> Mock Data Fallback -> Synthetic Generation
  * -----------------------------------------------------------------------------
  */
 
@@ -89,15 +89,89 @@ class UniversalLoader {
 
             if (fuzzyKey) return memos[fuzzyKey];
 
-            // 3. Fallback to first available (demo mode)
-            const firstKey = Object.keys(memos)[0];
-            if (firstKey) {
-                console.log(`[UniversalLoader] Returning default mock for ${identifier}`);
-                return memos[firstKey];
-            }
-
-            return null;
+            // 3. Fallback to Synthetic Generation (Runtime Simulation)
+            console.log(`[UniversalLoader] Generating synthetic memo for ${cleanId}`);
+            return this.generateSyntheticMemo(cleanId);
         }
+    }
+
+    /**
+     * Generates a synthetic credit memo for any unknown ticker/name.
+     * Mimics backend logic for client-side demo.
+     */
+    generateSyntheticMemo(name) {
+        const cleanName = name.replace(/_/g, ' ');
+        // Deterministic-ish random based on name length
+        const seed = name.length;
+        const riskScore = 60 + (seed % 30); // 60-90
+
+        const sector = seed % 2 === 0 ? "Technology" : "Industrial";
+        const revenueBase = 1000 * seed;
+
+        const hist = [
+            { period: "2023", revenue: revenueBase, ebitda: revenueBase * 0.2, net_income: revenueBase * 0.1, total_debt: revenueBase * 0.5 },
+            { period: "2024", revenue: revenueBase * 1.05, ebitda: revenueBase * 0.22, net_income: revenueBase * 0.12, total_debt: revenueBase * 0.45 },
+            { period: "2025", revenue: revenueBase * 1.1, ebitda: revenueBase * 0.25, net_income: revenueBase * 0.15, total_debt: revenueBase * 0.4 }
+        ].reverse(); // Descending order usually
+
+        return {
+            "borrower_name": cleanName,
+            "borrower_details": { "name": cleanName, "sector": sector },
+            "report_date": new Date().toISOString(),
+            "risk_score": riskScore,
+            "historical_financials": hist,
+            "sections": [
+                {
+                    "title": "Executive Summary",
+                    "content": `Synthetic analysis generated for ${cleanName}. The company operates in the ${sector} sector with stable margins.\n\nKey Metrics:\n- Revenue: $${(revenueBase/1000).toFixed(1)}B\n- EBITDA Margin: ~20%`,
+                    "citations": [],
+                    "author_agent": "Client-Side Sim"
+                },
+                {
+                    "title": "Risk Analysis",
+                    "content": "Automated Risk Assessment:\n1. Market Competition\n2. Supply Chain dependencies\n3. Rate sensitivity",
+                    "citations": [],
+                    "author_agent": "Risk Assessment Agent"
+                }
+            ],
+            "key_strengths": ["Projected Growth", "Market Position"],
+            "key_weaknesses": ["Leverage Ratio", "Sector Volatility"],
+            "dcf_analysis": {
+                "enterprise_value": revenueBase * 2.5,
+                "share_price": 120.50,
+                "wacc": 0.09,
+                "growth_rate": 0.03,
+                "terminal_value": revenueBase * 3.0,
+                "free_cash_flow": [revenueBase*0.1, revenueBase*0.11, revenueBase*0.12, revenueBase*0.13, revenueBase*0.14]
+            },
+            "pd_model": {
+                "model_score": riskScore,
+                "implied_rating": riskScore > 80 ? "A-" : (riskScore > 60 ? "BBB" : "BB"),
+                "one_year_pd": 0.02,
+                "five_year_pd": 0.08,
+                "input_factors": { "Leverage": "2.5x", "Z-Score": "2.8" }
+            },
+            "system_two_critique": {
+                "critique_points": ["Synthetic generation successful.", "Data is simulated."],
+                "conviction_score": 0.75,
+                "verification_status": "PASS",
+                "author_agent": "System 2"
+            },
+            "equity_data": {
+                "share_price": 120.50,
+                "market_cap": revenueBase * 2.0,
+                "beta": 1.1,
+                "pe_ratio": 20.0
+            },
+            "debt_facilities": [
+                 {"facility_type": "Revolver", "amount_committed": revenueBase * 0.2, "amount_drawn": 0, "interest_rate": "S+200", "snc_rating": "Pass", "ltv": 0.0},
+                 {"facility_type": "Term Loan", "amount_committed": revenueBase * 0.5, "amount_drawn": revenueBase * 0.5, "interest_rate": "S+350", "snc_rating": "Pass", "ltv": 0.4}
+            ],
+            "repayment_schedule": [
+                {"year": "2026", "amount": revenueBase * 0.1, "source": "Amortization"},
+                {"year": "2027", "amount": revenueBase * 0.4, "source": "Maturity"}
+            ]
+        };
     }
 
     /**

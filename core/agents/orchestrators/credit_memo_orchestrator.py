@@ -31,11 +31,25 @@ class CreditMemoOrchestrator:
         self.icat_engine = ICATEngine(mock_data_path="showcase/data/icat_mock_data.json")
         self.icat_engine.mock_db = self.mock_library
 
-    def process_entity(self, key: str, data: Dict[str, Any]) -> Dict[str, Any]:
+    def process_entity(self, key: str, data: Dict[str, Any] = None) -> Dict[str, Any]:
         """
         Full processing pipeline for a single entity.
+        If 'data' is not provided, it attempts to load from library or generate synthetic data.
         """
+        # If data is missing, try to find in library
+        if not data:
+            if key in self.mock_library:
+                data = self.mock_library[key]
+            else:
+                # Runtime Generation: Create synthetic profile
+                logger.info(f"Ticker {key} not found in library. Generating synthetic profile...")
+                data = self.generate_synthetic_profile(key)
+
         logger.info(f"Orchestrator processing {data['name']}...")
+
+        # Update ICAT mock db for this run if needed
+        if key not in self.icat_engine.mock_db:
+             self.icat_engine.mock_db[key] = data
 
         # 1. Financial Analysis
         icat_output = self._run_financials(key, data)
@@ -53,7 +67,7 @@ class CreditMemoOrchestrator:
         logs, ui_events = self.run_interlock(data['name'], icat_output, risk_output, legal_output, fraud_check)
 
         # 5. RAG Simulation (Citation Generation)
-        rag_citations = self.simulate_rag(data['docs']['10-K'], "risk factors")
+        rag_citations = self.simulate_rag(data['docs']['10-K'], data['sector'])
 
         # 6. Construct Final Memo
         memo_data = self.construct_memo(data, icat_output, risk_output, legal_output, logs, rag_citations)
@@ -67,6 +81,102 @@ class CreditMemoOrchestrator:
                 "ui_events": ui_events
             }
         }
+
+    def generate_synthetic_profile(self, ticker: str, sector: str = None) -> Dict[str, Any]:
+        """
+        Generates a plausible synthetic financial profile for an unknown ticker.
+        """
+        sectors = ["Technology", "Healthcare", "Energy", "Consumer Cyclical", "Financial Services", "Industrials"]
+        if not sector:
+            sector = random.choice(sectors)
+
+        # Base multiplier logic (randomize slightly)
+        scale_factor = random.uniform(0.5, 5.0) # Scale of company size (billions)
+
+        # Financial Templates
+        if sector == "Technology":
+            margin = 0.35
+            growth = 0.15
+            leverage = 1.5
+            pe = 35.0
+        elif sector == "Energy":
+            margin = 0.18
+            growth = 0.02
+            leverage = 2.5
+            pe = 12.0
+        else: # General
+            margin = 0.20
+            growth = 0.05
+            leverage = 3.0
+            pe = 18.0
+
+        # Generate History (3 years)
+        base_rev = 10000 * scale_factor
+        revenue = [base_rev * (1 - growth), base_rev, base_rev * (1 + growth)]
+        ebitda = [r * margin for r in revenue]
+        net_income = [e * 0.6 for e in ebitda] # Simple tax/interest proxy
+
+        total_debt = [e * leverage for e in ebitda]
+        cash = [d * 0.2 for d in total_debt]
+        total_assets = [d * 2.5 for d in total_debt] # 40% debt to assets
+        total_liabilities = [a * 0.6 for a in total_assets]
+        interest_expense = [d * 0.06 for d in total_debt]
+        capex = [r * 0.05 for r in revenue]
+
+        share_price = random.uniform(50, 200)
+        shares_out = (net_income[-1] * pe) / share_price
+        market_cap = shares_out * share_price
+
+        return {
+            "ticker": ticker,
+            "name": f"{ticker} Inc.",
+            "sector": sector,
+            "description": f"Generated synthetic profile for {ticker}, a leading player in the {sector} sector.",
+            "historical": {
+                "revenue": revenue,
+                "ebitda": ebitda,
+                "net_income": net_income,
+                "total_assets": total_assets,
+                "total_liabilities": total_liabilities,
+                "total_debt": total_debt,
+                "cash": cash,
+                "interest_expense": interest_expense,
+                "capex": capex,
+                "year": [2023, 2024, 2025]
+            },
+            "forecast_assumptions": {
+                "revenue_growth": [growth] * 5,
+                "ebitda_margin": [margin] * 5,
+                "discount_rate": 0.10,
+                "terminal_growth_rate": 0.03
+            },
+            "market_data": {
+                "share_price": share_price,
+                "market_cap": market_cap,
+                "beta": random.uniform(0.8, 1.5),
+                "pe_ratio": pe,
+                "price_data": [share_price * (1 + random.uniform(-0.1, 0.1)) for _ in range(6)]
+            },
+            "docs": {
+                "10-K": self._generate_synthetic_docs(sector, "10-K"),
+                "Credit_Agreement": self._generate_synthetic_docs(sector, "Credit_Agreement")
+            }
+        }
+
+    def _generate_synthetic_docs(self, sector: str, doc_type: str) -> str:
+        """Generates mock text for RAG simulation."""
+        if doc_type == "10-K":
+            common = "The company faces significant competition. Global economic conditions may affect results. "
+            if sector == "Technology":
+                return common + "Rapid technological changes could render products obsolete. Cybersecurity risks are elevated. Intellectual property protection is critical."
+            elif sector == "Energy":
+                return common + "Commodity price volatility significantly impacts margins. Environmental regulations are becoming stricter. Geopolitical instability in production regions is a risk."
+            elif sector == "Healthcare":
+                return common + "Regulatory approval for new products is uncertain. Patent expirations may lead to generic competition. Healthcare policy reform could impact pricing."
+            else:
+                return common + "Supply chain disruptions could increase costs. Labor shortages may impact operations."
+        else: # Credit Agreement
+            return "Standard LSTA terms. Negative Pledge on significant assets. Cross-Default threshold $50M. Change of Control trigger. Financial covenants: Net Leverage < 4.5x, Interest Coverage > 2.5x."
 
     def _run_financials(self, key: str, data: Dict[str, Any]) -> Optional[ICATOutput]:
         # LBO Logic
@@ -187,26 +297,30 @@ class CreditMemoOrchestrator:
 
         return logs, ui_events
 
-    def simulate_rag(self, doc_text: str, query: str) -> List[Dict[str, Any]]:
+    def simulate_rag(self, doc_text: str, sector: str = "General") -> List[Dict[str, Any]]:
         """
-        Simulates Retrieval Augmented Generation by extracting chunks.
-        In a real system, this would query a Vector DB.
+        Simulates Retrieval Augmented Generation with context awareness.
         """
         sentences = doc_text.split('. ')
         citations = []
 
-        # Simple extraction strategy: random sentence or keyword match
-        # Logic: find sentences with keywords relevant to credit
+        # Keywords logic enhanced
         keywords = ["risk", "debt", "revenue", "competition", "regulation", "growth"]
+        if sector == "Technology":
+            keywords.extend(["cybersecurity", "intellectual property", "obsolete"])
+        elif sector == "Energy":
+             keywords.extend(["commodity", "environmental", "geopolitical"])
+        elif sector == "Healthcare":
+             keywords.extend(["patent", "approval", "reform"])
 
         candidates = [s for s in sentences if any(k in s.lower() for k in keywords)]
 
-        # Fallback if no keywords
+        # Fallback
         if not candidates:
-            candidates = sentences[:2]
+            candidates = sentences[:3]
 
-        # Select 1-2 chunks
-        selected = candidates[:2]
+        # Select up to 3 chunks
+        selected = candidates[:3]
 
         for i, text in enumerate(selected):
             citations.append({
@@ -234,7 +348,7 @@ class CreditMemoOrchestrator:
         hist.sort(key=lambda x: x['period'], reverse=True)
 
         # Sections with Citations
-        risk_content = f"Primary Risk Factors:\n1. {risk['risk_factors'].get('geopolitical_risk', ['N/A'])[0]}\n2. Market Volatility (Beta: {data['market_data']['beta']})\n\nQuantitative Model:\nProbability of Default: {risk['risk_quant_metrics']['PD']*100:.2f}%\nLoss Given Default: {risk['risk_quant_metrics']['LGD']*100:.2f}%"
+        risk_content = f"Primary Risk Factors:\n1. {risk['risk_factors'].get('geopolitical_risk', ['N/A'])[0]}\n2. Market Volatility (Beta: {data['market_data']['beta']:.2f})\n\nQuantitative Model:\nProbability of Default: {risk['risk_quant_metrics']['PD']*100:.2f}%\nLoss Given Default: {risk['risk_quant_metrics']['LGD']*100:.2f}%"
 
         # Inject simulated citations into Executive Summary
         exec_summary = f"{data['description']}\n\nKey Credit Stats:\n- Net Leverage: {icat.credit_metrics.net_leverage:.2f}x\n- Interest Coverage: {icat.credit_metrics.interest_coverage:.2f}x\n- Z-Score: {icat.credit_metrics.z_score:.2f}"
@@ -262,6 +376,33 @@ class CreditMemoOrchestrator:
             }
         ]
 
+        # Peer Comps Generation (if not present)
+        peer_comps = []
+        if 'peer_comps' not in data:
+            # Generate synthetic peers
+            for i in range(3):
+                peer_name = f"{data['sector']} Peer {i+1}"
+                peer_comps.append({
+                    "ticker": f"PEER{i+1}",
+                    "name": peer_name,
+                    "ev_ebitda": random.uniform(8, 20),
+                    "pe_ratio": random.uniform(15, 40),
+                    "leverage_ratio": random.uniform(1, 4),
+                    "market_cap": data['market_data']['market_cap'] * random.uniform(0.5, 1.5)
+                })
+        else:
+            peer_comps = data['peer_comps']
+
+        # Debt Facilities Generation (if not present)
+        debt_facilities = []
+        if 'debt_facilities' not in data:
+             debt_facilities = [
+                 {"facility_type": "Revolver", "amount_committed": 2000, "amount_drawn": 500, "interest_rate": "S+200", "snc_rating": "Pass", "ltv": 0.2},
+                 {"facility_type": "Term Loan B", "amount_committed": 5000, "amount_drawn": 5000, "interest_rate": "S+350", "snc_rating": "Pass", "ltv": 0.5}
+             ]
+        else:
+             debt_facilities = data['debt_facilities']
+
         return {
             "borrower_name": data['name'],
             "borrower_details": {"name": data['name'], "sector": data['sector']},
@@ -273,11 +414,11 @@ class CreditMemoOrchestrator:
             "key_weaknesses": ["Cyclical Industry", "Regulatory Risk"],
             "dcf_analysis": {
                 "enterprise_value": icat.valuation_metrics.enterprise_value,
-                "share_price": icat.valuation_metrics.dcf_value / (data['market_data']['market_cap'] / data['market_data']['share_price']),
+                "share_price": icat.valuation_metrics.dcf_value / (data['market_data']['market_cap'] / data['market_data']['share_price']) if data['market_data']['market_cap'] else 0,
                 "wacc": data['forecast_assumptions']['discount_rate'],
                 "growth_rate": data['forecast_assumptions']['terminal_growth_rate'],
                 "terminal_value": icat.valuation_metrics.dcf_value * 0.4,
-                "free_cash_flow": [1000, 1100, 1200, 1300, 1400]
+                "free_cash_flow": [1000, 1100, 1200, 1300, 1400] # Should ideally be calculated
             },
             "pd_model": {
                 "model_score": int((1 - risk['risk_quant_metrics']['PD']) * 100),
@@ -297,7 +438,14 @@ class CreditMemoOrchestrator:
                     "dcf_validation": "WACC within range"
                 }
             },
-            "equity_data": data['market_data']
+            "equity_data": data['market_data'],
+            "peer_comps": peer_comps,
+            "debt_facilities": debt_facilities,
+            "repayment_schedule": [
+                {"year": "2025", "amount": 500, "source": "Amortization"},
+                {"year": "2026", "amount": 500, "source": "Amortization"},
+                {"year": "2027", "amount": 4000, "source": "Maturity Wall"}
+            ]
         }
 
     def _extract_highlights(self, legal, fraud):
