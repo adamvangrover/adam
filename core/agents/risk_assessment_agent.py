@@ -134,6 +134,10 @@ class RiskAssessmentAgent(AgentBase):
             result = self.assess_loan_risk(target_data.get("loan_details", {}), target_data.get("borrower_data", {}))
         elif risk_type == "project":
             result = self.assess_project_risk(target_data.get("project_details", {}), context)
+        elif risk_type == "leveraged_finance":
+            result = self.assess_leveraged_finance_risk(company_name, target_data.get("financial_data", {}), target_data.get("deal_structure", {}))
+        elif risk_type == "distressed_debt":
+            result = self.assess_distressed_debt_risk(company_name, target_data.get("financial_data", {}), target_data.get("market_data", {}))
         else:
             logger.warning(f"Unknown risk type: {risk_type}")
             return {"error": "Unknown risk type."}
@@ -310,6 +314,122 @@ class RiskAssessmentAgent(AgentBase):
                 "RWA": rwa,
                 "Expected_Loss": pd * lgd * loan_amount,
                 "RAROC": expected_return
+            }
+        }
+
+    def assess_leveraged_finance_risk(self, company_name: str, financial_data: Dict, deal_structure: Dict) -> Dict:
+        """
+        Specialized risk assessment for Leveraged Finance (LBOs, M&A financing).
+        Focuses on Cash Flow, De-leveraging ability, and Covenant headroom.
+        """
+        logger.info(f"Assessing LevFin risk for {company_name}...")
+
+        # 1. Key Metrics
+        ebitda = financial_data.get("ebitda", 1.0)
+        total_debt = financial_data.get("total_debt", 0.0)
+        cash_flow_available_for_debt = financial_data.get("fcf", 0.0)
+        interest_expense = financial_data.get("interest_expense", 1.0)
+
+        # Ratios
+        if ebitda > 0:
+            leverage_ratio = total_debt / ebitda
+        else:
+            # Negative or zero EBITDA implies extremely high leverage risk
+            leverage_ratio = 99.0
+
+        interest_coverage = ebitda / interest_expense if interest_expense else 99.0
+        dscr = cash_flow_available_for_debt / interest_expense if interest_expense else 0.0 # Debt Service Coverage
+
+        # 2. Risk Scoring (Institutional Grade thresholds)
+        # Leverage: > 6.0x is High Risk (Speculative), < 3.0x is Low Risk
+        # If leverage_ratio is 99.0 (distressed), risk is 1.0
+        risk_leverage = min(1.0, max(0.0, (leverage_ratio - 3.0) / 4.0))
+
+        # Interest Coverage: < 2.0x is High Risk, > 5.0x is Low Risk
+        risk_coverage = min(1.0, max(0.0, (5.0 - interest_coverage) / 3.0))
+
+        # DSCR: < 1.0 is Critical Risk, > 1.5 is Safe
+        risk_dscr = min(1.0, max(0.0, (1.5 - dscr) / 0.5))
+
+        # 3. Structural Risk (Covenants)
+        covenant_cushion = deal_structure.get("covenant_cushion", 0.15) # 15% default
+        risk_covenant = min(1.0, max(0.0, (0.25 - covenant_cushion) / 0.25))
+
+        risk_factors = {
+            "leverage_risk": risk_leverage,
+            "coverage_risk": risk_coverage,
+            "cash_flow_risk": risk_dscr,
+            "structural_risk": risk_covenant
+        }
+
+        overall_score = self._calculate_overall_risk_score(risk_factors)
+
+        return {
+            "overall_risk_score": overall_score,
+            "risk_factors": risk_factors,
+            "metrics": {
+                "leverage_ratio": leverage_ratio,
+                "interest_coverage": interest_coverage,
+                "dscr": dscr
+            }
+        }
+
+    def assess_distressed_debt_risk(self, company_name: str, financial_data: Dict, market_data: Dict) -> Dict:
+        """
+        Specialized assessment for Distressed Debt / Special Situations.
+        Focuses on Recovery Rates, Liquidation Value, and Legal/Process risk.
+        """
+        logger.info(f"Assessing Distressed Debt risk for {company_name}...")
+
+        # 1. Asset Coverage & Liquidation Value
+        total_assets = financial_data.get("total_assets", 0.0)
+        secured_debt = financial_data.get("secured_debt", 0.0)
+        unsecured_debt = financial_data.get("unsecured_debt", 0.0)
+
+        # Haircuts for liquidation (Simulated)
+        # Cash: 100%, Receivables: 75%, Inventory: 50%, PP&E: 40%, Intangibles: 0%
+        # Simplified: weighted average haircut of 50% on total assets
+        liquidation_value = total_assets * 0.5
+
+        # 2. Recovery Waterfall
+        remaining_value = liquidation_value
+
+        # Senior / Secured
+        if secured_debt > 0:
+            secured_recovery = min(1.0, remaining_value / secured_debt)
+            remaining_value = max(0.0, remaining_value - secured_debt)
+        else:
+            secured_recovery = 1.0 # No secured debt
+
+        # Unsecured
+        if unsecured_debt > 0:
+            unsecured_recovery = min(1.0, remaining_value / unsecured_debt)
+        else:
+            unsecured_recovery = 1.0 if remaining_value > 0 else 0.0
+
+        # 3. Market Pricing vs Intrinsic Recovery
+        # If bond trades at 40c and we model 60c recovery, that's "Low Risk" (Opportunity)
+        # If bond trades at 80c and we model 60c recovery, that's "High Risk"
+        market_price = market_data.get("bond_price", 0.5) # % of par
+        model_recovery = unsecured_recovery # Assuming we look at unsecured for distressed
+
+        upside_cushion = model_recovery - market_price
+        # Risk score: High if Price > Recovery (Negative cushion)
+        # Score 0.5 is neutral (Fairly priced).
+        # Score 1.0 is Overpriced (Risk of loss).
+        # Score 0.0 is Underpriced (Margin of safety).
+        valuation_risk = min(1.0, max(0.0, 0.5 - upside_cushion)) # Inverted logic
+
+        return {
+            "overall_risk_score": valuation_risk,
+            "recovery_analysis": {
+                "liquidation_value": liquidation_value,
+                "secured_recovery": secured_recovery,
+                "unsecured_recovery": unsecured_recovery
+            },
+            "risk_factors": {
+                "valuation_risk": valuation_risk,
+                "liquidation_risk": 1.0 - unsecured_recovery
             }
         }
 

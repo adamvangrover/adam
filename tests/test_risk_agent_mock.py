@@ -37,7 +37,8 @@ async def test_investment_risk(agent):
     assert result["overall_risk_score"] >= 0.0
     assert result["overall_risk_score"] <= 1.0
     assert "risk_factors" in result
-    assert "market_risk" in result["risk_factors"]
+    # Updated to match actual key in agent
+    assert "market_risk_score" in result["risk_factors"]
 
 @pytest.mark.asyncio
 async def test_cached_risk(agent):

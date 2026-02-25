@@ -14,6 +14,10 @@ input_variables:
     type: string
   - name: market_data
     type: string
+  - name: lbo_analysis
+    type: string
+  - name: distressed_scenarios
+    type: string
 system_template: |
   You are a Senior Credit Officer at a Global Systemically Important Bank (G-SIB).
   Your mandate is to produce a rigorous, evidence-based Credit Risk Analysis.
@@ -33,6 +37,8 @@ system_template: |
   4. STRUCTURED OUTPUT: Your output must follow the standard Credit Memo format:
      - Executive Summary
      - Financial Analysis (Liquidity, Leverage, Coverage)
+     - LBO / Debt Capacity Analysis (if applicable)
+     - Distressed / Downside Scenarios (if applicable)
      - Market & Industry Risk
      - Management Assessment
      - Key Risks & Mitigants
@@ -48,6 +54,14 @@ user_template: |
   ---
   MARKET DATA:
   {{market_data}}
+
+  ---
+  LBO / DEBT CAPACITY ANALYSIS:
+  {{lbo_analysis}}
+
+  ---
+  DISTRESSED SCENARIOS:
+  {{distressed_scenarios}}
 
   ---
 
