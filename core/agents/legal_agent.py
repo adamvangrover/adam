@@ -2,6 +2,7 @@
 
 import json
 import logging
+from typing import List, Dict, Any
 
 logger = logging.getLogger(__name__)
 
@@ -34,13 +35,14 @@ class LegalAgent:
             # logger.error(f"Error decoding knowledge base JSON: {self.knowledge_base_path}")
             return {}
 
-    def review_credit_agreement(self, doc_text: str) -> dict:
+    def review_credit_agreement(self, doc_text: str) -> Dict[str, Any]:
         """
         Simulates reviewing a credit agreement for key clauses.
         """
         logger.info("Reviewing credit agreement...")
         findings = []
         clauses_found = []
+        risk_level = "Low"
 
         doc_lower = doc_text.lower()
 
@@ -55,18 +57,31 @@ class LegalAgent:
 
         if "change of control" in doc_lower:
             clauses_found.append("Change of Control")
-            findings.append("Change of Control put option identified.")
+            findings.append("Change of Control put option identified (101%).")
+
+        if "asset sale sweep" in doc_lower:
+            clauses_found.append("Asset Sale Sweep")
+            findings.append("Mandatory prepayment from asset sale proceeds detected.")
+
+        if "financial covenant" in doc_lower:
+            clauses_found.append("Financial Covenants")
+            findings.append("Maintenance covenants present (Leverage/Interest Coverage).")
 
         if not clauses_found:
             findings.append("Standard documentation assumed (no special clauses detected in snippet).")
 
+        # Risk Assessment based on clauses
+        if "cross-default" in doc_lower and "change of control" in doc_lower:
+             risk_level = "Medium" # Standard but adds complexity
+
         return {
             "status": "Review Complete",
             "clauses_identified": clauses_found,
-            "key_findings": findings
+            "key_findings": findings,
+            "risk_assessment": risk_level
         }
 
-    def check_covenants(self, financials: dict) -> dict:
+    def check_covenants(self, financials: Dict[str, Any]) -> Dict[str, Any]:
         """
         Checks financial covenants against standard thresholds.
         """
@@ -98,7 +113,7 @@ class LegalAgent:
             }
         }
 
-    def detect_fraud_signals(self, doc_text: str, financials: dict) -> dict:
+    def detect_fraud_signals(self, doc_text: str, financials: Dict[str, Any]) -> Dict[str, Any]:
         """
         Scans for red flags indicating potential fraud or misrepresentation.
         """

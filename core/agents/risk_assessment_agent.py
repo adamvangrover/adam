@@ -526,6 +526,19 @@ class RiskAssessmentAgent(AgentBase):
         credit_rating = financial_data.get("credit_rating")
         if credit_rating:
             return self._estimate_default_probability(credit_rating)
+
+        # Use Altman Z-Score if available
+        z_score = financial_data.get("z_score")
+        if z_score is not None:
+            # Map Z-Score to PD
+            # > 3.0 Safe (<0.1%)
+            # 1.8 - 3.0 Grey (1-5%)
+            # < 1.8 Distress (>10%)
+            if z_score > 3.0: return 0.001
+            if z_score > 2.5: return 0.01
+            if z_score > 1.8: return 0.05
+            return 0.15
+
         return 0.1
 
     def _calculate_liquidity_risk(self, market_data: Dict) -> float:
