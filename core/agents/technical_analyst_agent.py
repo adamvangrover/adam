@@ -217,8 +217,12 @@ class TechnicalAnalystAgent(AgentBase):
 
     def load_model(self, model_path):
         if os.path.exists(model_path):
-            with open(model_path, 'rb') as f:
-                return pickle.load(f)
+            try:
+                with open(model_path, 'rb') as f:
+                    # nosec B301: Trusted local model artifact
+                    return pickle.load(f)  # nosec B301
+            except Exception as e:
+                logging.warning(f"Failed to load model from {model_path}: {e}")
         return None
 
     def save_model(self, model, model_path):

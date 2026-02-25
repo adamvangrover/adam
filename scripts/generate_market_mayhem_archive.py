@@ -154,7 +154,8 @@ def generate_critique(item):
     # Mock Critique Generation
     agents = ["Overseer", "Risk_Engine", "Sovereign_AI", "Market_Maker"]
     # Pick agent based on title hash to be deterministic
-    h = int(hashlib.md5(item["title"].encode()).hexdigest(), 16)
+    # Using sha256 for security compliance
+    h = int(hashlib.sha256(item["title"].encode()).hexdigest(), 16)
     agent = agents[h % len(agents)]
 
     verdicts = ["VALIDATED", "REVIEW_REQUIRED", "HIGH_CONFIDENCE", "SPECULATIVE"]

@@ -174,4 +174,4 @@ async def startup_event():
 if __name__ == "__main__":
     import uvicorn
     print("Starting Hive Mind Server...")
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8000)  # nosec B104

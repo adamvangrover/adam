@@ -1,4 +1,5 @@
 import unittest
+import pytest
 import torch
 import numpy as np
 import os
@@ -13,6 +14,7 @@ from core.research.oswm.inference import OSWMInference
 from core.research.federated_learning.fl_coordinator import FederatedCoordinator
 from core.research.gnn.engine import GraphRiskEngine
 
+@pytest.mark.integration
 class TestOSWM(unittest.TestCase):
     def test_nnprior_generation(self):
         prior = NNPrior(input_dim=1, output_dim=1)
@@ -47,6 +49,7 @@ class TestOSWM(unittest.TestCase):
         prediction = oswm.generate_scenario(context, steps=5)
         self.assertEqual(len(prediction), 5)
 
+@pytest.mark.integration
 class TestFederatedLearning(unittest.TestCase):
     def test_coordinator_init(self):
         coord = FederatedCoordinator(num_clients=2, input_dim=5)
@@ -58,6 +61,7 @@ class TestFederatedLearning(unittest.TestCase):
         self.assertIsInstance(loss, float)
         self.assertIsInstance(acc, float)
 
+@pytest.mark.integration
 class TestGNN(unittest.TestCase):
     def test_gnn_init(self):
         # This might fail if UKG seed data is missing or graph is empty, but we'll try

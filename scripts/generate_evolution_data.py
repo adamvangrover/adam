@@ -120,7 +120,8 @@ def parse_changelog(filepath):
         except:
             complexity = 10 + len(added)
 
-        entropy = int(hashlib.md5((title + str(len(content_text))).encode()).hexdigest(), 16) % 100
+        # Using sha256 instead of md5 for bandit compliance, though not security critical here
+        entropy = int(hashlib.sha256((title + str(len(content_text))).encode()).hexdigest(), 16) % 100
         generations = len(content_text) // 10
 
         parsed_data.append({

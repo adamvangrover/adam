@@ -180,7 +180,7 @@ except KeyboardInterrupt:
     sys.exit(0)
 """
     launcher_path.write_text(content.strip())
-    os.chmod(launcher_path, 0o755)
+    os.chmod(launcher_path, 0o700)
     print("[*] Generated Universal Launcher (run_module.py)")
 
 def main():

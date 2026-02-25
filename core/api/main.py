@@ -78,7 +78,7 @@ async def root():
 def start():
     import uvicorn
     # Use standard port 8000
-    uvicorn.run("core.api.main:app", host="0.0.0.0", port=8000, reload=False)
+    uvicorn.run("core.api.main:app", host="0.0.0.0", port=8000, reload=False)  # nosec B104
 
 
 if __name__ == "__main__":

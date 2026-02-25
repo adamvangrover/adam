@@ -18,7 +18,7 @@ CREDIT_REPORTS_DIR = os.path.join(DATA_DIR, 'credit_reports')
 EQUITY_REPORTS_DIR = os.path.join(DATA_DIR, 'equity_reports')
 
 # Setup Jinja2
-env = Environment(loader=FileSystemLoader(TEMPLATE_DIR))
+env = Environment(loader=FileSystemLoader(TEMPLATE_DIR), autoescape=True)
 
 def generate_enterprise_artifacts():
     print("Initializing Enterprise Artifact Generator...")

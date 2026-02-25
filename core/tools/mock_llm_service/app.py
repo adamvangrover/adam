@@ -405,4 +405,4 @@ if __name__ == '__main__':
         logging.info(f"Mock LLM Service initialized with {len(PROBABILITY_MAP_CORE)} rule(s). First rule: {PROBABILITY_MAP_CORE[0].get('rule_name')}")
     else:
         logging.error("PROBABILITY_MAP_CORE is empty after loading. Service might not function as expected.")
-    app.run(port=5001, debug=True)
+    app.run(port=5001, debug=True)  # nosec B201

@@ -1,42 +1,71 @@
-# core/agents/geopolitical_risk_agent.py
+from core.agents.agent_base import AgentBase
+import logging
+from typing import Dict, Any, List
+import asyncio
 
-from core.utils.data_utils import send_message
+# Setup logger
+logger = logging.getLogger(__name__)
 
 
-class GeopoliticalRiskAgent:
-    def __init__(self, config):
-        self.data_sources = config.get('data_sources', {})
+class GeopoliticalRiskAgent(AgentBase):
+    """
+    Evaluates global geopolitical stability, potential conflicts, and their
+    impact on market sectors (Energy, Defense, Tech).
+    """
 
-    def assess_geopolitical_risks(self):
-        print("Assessing geopolitical risks...")
+    def __init__(self, config: Dict[str, Any] = None):
+        super().__init__(config)
+        self.name = "GeopoliticalRiskAgent"
+        self.risk_regions = ["Middle East", "Eastern Europe", "Asia-Pacific"]
+        self.impact_sectors = ["Energy", "Defense", "Semiconductors"]
 
-        # Fetch data from relevant sources (e.g., news articles, political databases)
-        # ... (use self.data_sources to access data sources)
+    async def execute(self, inputs: List[Any]) -> Dict[str, Any]:
+        """
+        Analyzes geopolitical news/events to determine risk premiums.
+        Input: list of region names or "Global"
+        Output: Risk score (0-100) and qualitative analysis.
+        """
+        if not inputs:
+            inputs = ["Global"]
 
-        # Analyze geopolitical events and trends (example)
-        risk_index = self.calculate_political_risk_index()
-        key_risks = self.identify_key_risks()
-        # ... (add more analysis)
+        region = inputs[0]
+        logger.info(f"Analyzing geopolitical risk for: {region}")
 
-        # Generate risk assessments
-        risk_assessments = {
-            'political_risk_index': risk_index,
-            'key_risks': key_risks,
-            # ... (add more risk assessments)
+        # In a real scenario, this would query news APIs (e.g., GDELT, ACLED)
+        # For now, we simulate a risk assessment logic.
+
+        # Determine risk score based on region
+        risk_score = 50  # Baseline
+        details = []
+
+        if region == "Middle East":
+            risk_score = 75
+            details.append("Elevated tension impacting crude oil supply routes.")
+        elif region == "Eastern Europe":
+            risk_score = 80
+            details.append("Ongoing conflict risks spreading; impact on EU energy.")
+        elif region == "Asia-Pacific":
+            risk_score = 65
+            details.append("Trade lane friction; semiconductor supply chain watch.")
+        else:
+            risk_score = 45
+            details.append("Stable global baseline, monitoring election cycles.")
+
+        # Simulate async processing
+        await asyncio.sleep(0.1)
+
+        result = {
+            "region": region,
+            "risk_score": risk_score,
+            "impact_sectors": self.impact_sectors,
+            "details": "; ".join(details),
+            "status": "success"
         }
 
-        # Send risk assessments to message queue
-        message = {'agent': 'geopolitical_risk_agent', 'risk_assessments': risk_assessments}
-        send_message(message)
+        return result
 
-        return risk_assessments
-
-    def calculate_political_risk_index(self):
-        # ... (implement logic to calculate political risk index)
-        return 75  # Example
-
-    def identify_key_risks(self):
-        # ... (implement logic to identify key risks)
-        return ['trade_war', 'regional_conflict']  # Example
-
-    # ... (add other analysis functions as needed)
+    def run_synchronous(self):
+        """
+        Wrapper to run execute in a synchronous context if needed.
+        """
+        return asyncio.run(self.execute(["Global"]))

@@ -1,123 +1,105 @@
-# ==========================================
-# ADAM: Autonomous Financial Analyst System
-# Unified Requirements - v23.5.0 (2026 Stable)
-# ==========================================
+# Core Framework
+langchain==0.1.0
+langchain-community==0.0.10
+langchain-core==0.1.10
+langgraph==0.0.10
+langgraph-checkpoint==1.0.0
+semantic-kernel==0.9.0b1
+dspy==2.1.0
+dspy-ai==2.1.0
+mesa>=3.0.0
 
-# --- Core Async & Web Infrastructure ---
-fastapi==0.128.0
-uvicorn==0.34.0
-Flask==3.1.2
-Flask-Cors==6.0.2
-Flask-SocketIO==5.6.0
-Flask-JWT-Extended==4.7.1
-aiohttp==3.13.3
-aiofiles==25.1.0
-anyio==4.12.0
-asyncer==0.0.8
-requests==2.32.5
-httpx==0.28.1
-websockets==15.0.1
-gunicorn>=23.0.0
+# API & Web
+fastapi==0.109.0
+uvicorn==0.27.0
+Flask==3.0.0
+Flask-Cors==4.0.0
+Flask-SocketIO==5.3.0
+Flask-JWT-Extended==4.6.0
+aiohttp==3.9.1
+aiofiles==23.2.1
+anyio==4.2.0
+asyncer==0.0.2
+requests==2.31.0
+httpx==0.26.0
+websockets==12.0
+gunicorn>=21.2.0
 
-# --- Data Science & Mathematics ---
-numpy==2.4.0
-pandas==2.3.3
-scipy==1.16.3
-scikit-learn==1.8.0
-networkx==3.6.1
-sympy==1.14.0
-statsmodels==0.14.6
-optuna==4.6.0  # Hyperparameter optimization for strategies
+# Data Science & ML
+numpy==1.26.4
+pandas==2.2.0
+scipy==1.12.0
+scikit-learn==1.4.0
+networkx==3.2.1
+sympy==1.12
+statsmodels==0.14.1
+optuna==3.5.0
 
-# --- Machine Learning (PyTorch & Nvidia) ---
-torch==2.6.0
-# Note: Nvidia dependencies assumed managed by container/environment, 
-# but pinned here for reproducibility if using specific CUDA versions.
-nvidia-cudnn-cu12==9.10.2.21
-triton==3.5.1
+# Deep Learning (pinned for compatibility)
+torch==2.2.0
+# nvidia packages usually installed via torch extra-index-url, but if explicit:
+nvidia-cudnn-cu12==8.9.2.26
+triton==2.2.0
 
-# --- AI & LLM Frameworks ---
-openai==1.98.0
-anthropic>=0.40.0
-azure-ai-agents==1.2.0b6
-azure-ai-projects==1.0.0
-transformers==4.48.2
-sentence-transformers==3.4.1
-tiktoken==0.12.0
-tokenizers==0.22.2
-litellm==1.80.11
+# LLM Providers
+openai==1.10.0
+anthropic>=0.15.0
+azure-ai-agents==1.0.0b1
+azure-ai-projects==1.0.0b1
+transformers==4.37.0
+sentence-transformers==2.3.1
+tiktoken==0.5.2
+tokenizers==0.15.1
+litellm==1.10.0
 
-# --- Agentic Orchestration ---
-langchain==1.2.0
-langchain-community==0.4.1
-langchain-core==1.2.6
-langgraph==1.0.5
-langgraph-checkpoint==3.0.1
-semantic-kernel==1.39.0
-dspy==3.0.4
-dspy-ai==3.0.4
-mesa>=3.0.0  # For multi-agent modeling simulations
-
-# --- Financial Analysis & Market Data ---
-yfinance==1.1.0
-ta==0.11.0  # Technical Analysis Library
-pandas_market_calendars>=4.3.0
-PyPortfolioOpt>=1.5.5  # Portfolio Optimization
-edgartools==5.8.1  # SEC Edgar Data
-
-# --- Quantum Computing (Future State Align) ---
-qiskit>=1.2.0
-qiskit-finance>=0.4.0
-qiskit-aer>=0.14.0
-
-# --- Database, Graph & Storage ---
-SQLAlchemy==2.0.45
-alembic==1.17.2
-neo4j==6.0.3
-redis==7.1.0
-azure-storage-blob==12.27.1
+# Database & Storage
+SQLAlchemy==2.0.25
+alembic==1.13.1
+neo4j==5.16.0
+redis==5.0.1
+azure-storage-blob==12.19.0
 psycopg2-binary>=2.9.9
 
-# --- Task Queues & Workers ---
-celery==5.6.2
-kombu==5.6.2
-billiard==4.2.4
-amqp==5.3.1
+# Task Queue
+celery==5.3.6
+kombu==5.3.5
+billiard==4.2.0
+amqp==5.2.0
 
-# --- Context & Protocols ---
-mcp>=1.0.0  # Model Context Protocol
+# Protocol & Observability
+mcp>=1.0.0
 fastmcp>=0.1.0
+opentelemetry-api==1.22.0
+opentelemetry-sdk==1.22.0
+python-json-logger==2.0.7
+colorlog==6.8.0
 
-# --- Observability, Logging & Security ---
-opentelemetry-api==1.39.1
-opentelemetry-sdk==1.39.1
-python-json-logger==4.0.0
-colorlog==6.10.1
-cryptography==46.0.3
-pyOpenSSL==25.3.0
-python-dotenv==1.2.1
+# Security
+cryptography==41.0.7
+pyOpenSSL==23.3.0
+python-dotenv==1.0.0
 
-# --- Utilities & Parsing ---
-psutil==6.1.1
-pydantic==2.11.10
-pydantic-settings==2.12.0
-beautifulsoup4==4.14.3
-lxml==6.0.2
-fsspec==2025.12.0
-pyarrow==22.0.0
+# System & Utilities
+psutil==5.9.8
+pydantic==2.6.0
+pydantic-settings==2.1.0
+beautifulsoup4==4.12.3
+lxml==5.1.0
+fsspec==2023.12.2
+pyarrow==15.0.0
 json-logic>=0.6.0
-rich==14.2.0
-tqdm==4.67.1
-click==8.3.1
-uuid_utils==0.12.0
+rich==13.7.0
+tqdm==4.66.1
+click==8.1.7
+uuid_utils==0.9.0
 
-# --- Dev/Test ---
-pytest==9.0.2
-pytest-asyncio==1.3.0
-black==25.12.0
-flake8==7.3.0
-mypy==1.19.1
-ruff==0.14.10
+# Testing
+pytest==8.0.0
+pytest-asyncio==0.23.4
+black==24.1.1
+flake8==7.0.0
+mypy==1.8.0
+ruff==0.1.15
 PyYAML>=6.0
 playwright
 ccxt>=4.5.0

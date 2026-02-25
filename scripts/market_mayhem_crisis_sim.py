@@ -8,7 +8,8 @@ class CrisisSimulator:
         """
         Initializes the Crisis Simulator with a deterministic seed.
         """
-        self.seed = int(hashlib.md5(seed.encode()).hexdigest(), 16)
+        # Using sha256 for bandit compliance
+        self.seed = int(hashlib.sha256(seed.encode()).hexdigest(), 16)
         self.risk_profile = risk_profile.upper()
         self.scenarios = {
             "2008_LEHMAN": {

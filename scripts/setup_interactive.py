@@ -7,7 +7,6 @@ Helps users configure the environment, API keys, and Docker settings.
 import os
 import sys
 import getpass
-import shutil
 
 def print_header():
     print("=" * 60)
@@ -65,7 +64,7 @@ def create_startup_script():
         f.write("#!/bin/bash\n")
         f.write("python3 scripts/run_adam.py \"$@\"\n")
 
-    os.chmod("adam", 0o755)
+    os.chmod("adam", 0o700)
     print("    Created './adam' script. You can run './adam --help'")
 
 def main():
