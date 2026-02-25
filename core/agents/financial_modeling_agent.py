@@ -1,11 +1,12 @@
 # core/agents/financial_modeling_agent.py
 
 import numpy as np
+import numpy_financial as npf
 import pandas as pd
 import logging
 from typing import Dict, Any, Tuple, List, Optional
 from core.agents.agent_base import AgentBase
-from core.financial_data.modeling_schema import FinancialAssumptions, ValuationResult, ValuationMethod, FinancialGlossary, DiscountedCashFlowModel
+from core.financial_data.modeling_schema import FinancialAssumptions, ValuationResult, ValuationMethod, FinancialGlossary, DiscountedCashFlowModel, LBOAssumptions, LBOResult, LBOModel
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -101,6 +102,35 @@ class FinancialModelingAgent(AgentBase):
                     "company_id": company_id,
                     "task": "ratios",
                     "ratios": ratios,
+                    "status": "success"
+                }
+
+            elif task == 'lbo':
+                lbo_assumptions = kwargs.get('lbo_assumptions')
+                if lbo_assumptions:
+                    if isinstance(lbo_assumptions, dict):
+                         # If dict passed, convert to Pydantic
+                        self.lbo_assumptions = LBOAssumptions(**lbo_assumptions)
+                    else:
+                        self.lbo_assumptions = lbo_assumptions
+                else:
+                     # Use default or error? Let's use mock defaults for now if not provided
+                    self.lbo_assumptions = LBOAssumptions(
+                        entry_multiple=10.0,
+                        exit_multiple=10.0,
+                        initial_ebitda=kwargs.get('initial_ebitda', 100.0),
+                        debt_amount=kwargs.get('debt_amount', 500.0),
+                        interest_rate=kwargs.get('interest_rate', 0.08),
+                        equity_contribution=kwargs.get('equity_contribution', 500.0)
+                    )
+
+                lbo_result = self.calculate_lbo()
+
+                return {
+                    "company_id": company_id,
+                    "task": "lbo",
+                    "result": lbo_result.model_dump(),
+                    "assumptions": self.lbo_assumptions.model_dump(),
                     "status": "success"
                 }
 
@@ -458,3 +488,85 @@ class FinancialModelingAgent(AgentBase):
             ratios['ROA'] = ebit / assets # Simplified (using EBIT)
 
         return {k: round(v, 4) for k, v in ratios.items()}
+
+    def calculate_lbo(self) -> LBOResult:
+        """
+        Calculates LBO returns (IRR, MoM) based on assumptions.
+        Simplified model:
+        - EBITDA grows annually.
+        - CapEx and WC are subtracted.
+        - Tax is applied to EBIT.
+        - FCF pays down debt (cash sweep).
+        - Exit at end of holding period.
+        """
+        assumptions = self.lbo_assumptions
+        years = assumptions.holding_period
+
+        # Initialize State
+        current_debt = assumptions.debt_amount
+        current_ebitda = assumptions.initial_ebitda
+        current_revenue = current_ebitda / assumptions.ebitda_margin # inferred revenue
+
+        cash_flows_to_equity = []
+
+        # Year 0: Investment
+        cash_flows_to_equity.append(-assumptions.equity_contribution)
+
+        # Forecast Years
+        for year in range(1, years + 1):
+            # Grow Operations
+            current_revenue *= (1 + assumptions.revenue_growth)
+            current_ebitda = current_revenue * assumptions.ebitda_margin
+
+            # Expenses
+            depreciation = current_revenue * assumptions.capex_percent_revenue # Steady state
+            ebit = current_ebitda - depreciation
+            interest = current_debt * assumptions.interest_rate
+
+            # Tax
+            taxable_income = max(0, ebit - interest)
+            taxes = taxable_income * assumptions.tax_rate
+
+            # Free Cash Flow
+            # FCF = EBITDA - Interest - Taxes - CapEx - Change in WC
+            capex = current_revenue * assumptions.capex_percent_revenue
+            wc_change = current_revenue * assumptions.working_capital_percent_revenue
+
+            fcf = current_ebitda - interest - taxes - capex - wc_change
+
+            # Debt Paydown
+            paydown = max(0, fcf * assumptions.debt_paydown_percent)
+            current_debt = max(0, current_debt - paydown)
+
+            # Cash flow to equity holders (dividends) - typically 0 in LBO until exit,
+            # but let's assume remaining FCF is distributed or accumulated (value accretive)
+            # For IRR calc, we usually only care about entry and exit unless there are dividends.
+            # We will treat this as 0 for intermediate years for simplicity of typical LBO.
+            cash_flows_to_equity.append(0.0)
+
+        # Exit Year
+        exit_enterprise_value = current_ebitda * assumptions.exit_multiple
+        exit_equity_value = exit_enterprise_value - current_debt
+
+        # Add exit proceeds to last year
+        cash_flows_to_equity[-1] += exit_equity_value
+
+        # Calculate MoM
+        total_in = assumptions.equity_contribution
+        total_out = exit_equity_value # + sum(dividends) if any
+        mom = total_out / total_in if total_in > 0 else 0.0
+
+        # Calculate IRR
+        try:
+            irr = npf.irr(cash_flows_to_equity)
+            if np.isnan(irr): irr = 0.0
+        except:
+            irr = 0.0
+
+        return LBOResult(
+            irr=irr,
+            mom_multiple=mom,
+            exit_equity_value=exit_equity_value,
+            final_debt=current_debt,
+            cash_flows=cash_flows_to_equity
+        )
