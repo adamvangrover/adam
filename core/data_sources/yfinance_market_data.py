@@ -29,9 +29,13 @@ class YFinanceMarketData:
                 logger.warning(f"No info found for symbol {symbol}")
                 return {}
 
+            current_price = info.get("currentPrice")
+            if current_price is None:
+                current_price = info.get("regularMarketPrice")
+
             snapshot = {
                 "symbol": symbol,
-                "current_price": info.get("currentPrice"),
+                "current_price": current_price,
                 "open": info.get("open"),
                 "high": info.get("dayHigh"),
                 "low": info.get("dayLow"),
