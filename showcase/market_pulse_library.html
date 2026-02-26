@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ADAM :: MARKET PULSE LIBRARY</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
@@ -16,129 +15,113 @@
         .serif {
             font-family: 'Playfair Display', serif;
         }
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
+        .paper-card {
+            background-color: #fff;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: all 0.3s ease;
         }
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
+        .paper-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
         }
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
+        .accent-bar {
+            height: 4px;
+            background: linear-gradient(90deg, #ef4444, #f59e0b);
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col bg-gray-50">
+<body class="min-h-screen flex flex-col">
 
-    <!-- Header -->
-    <header class="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
+    <header class="bg-white border-b border-gray-200 sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            <div class="flex items-center gap-6">
-                <a href="market_mayhem_archive.html" class="text-gray-400 hover:text-gray-900 transition flex items-center gap-2 text-sm font-medium">
-                    <i class="fas fa-arrow-left"></i> <span class="hidden sm:inline">Archives</span>
-                </a>
-                <div class="h-6 w-px bg-gray-200"></div>
-                <h1 class="text-xl font-bold serif tracking-tight flex items-center gap-2">
-                    <i class="fas fa-bolt text-blue-600"></i> MARKET PULSE
-                </h1>
-            </div>
-
             <div class="flex items-center gap-4">
-                <div class="relative hidden sm:block">
-                    <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-xs"></i>
-                    <input type="text" id="search-input" placeholder="Search Intel..."
-                        class="pl-8 pr-4 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 w-64 bg-gray-50 transition-all">
-                </div>
-                <div class="text-xs text-gray-500 font-mono hidden md:block">
-                    <span id="report-count" class="bg-gray-100 px-2 py-1 rounded">Loading...</span>
-                </div>
+                <a href="market_mayhem_archive.html" class="text-gray-500 hover:text-gray-900 transition"><i class="fas fa-arrow-left"></i> Archive</a>
+                <h1 class="text-2xl font-bold serif tracking-tight">MARKET PULSE</h1>
+            </div>
+            <div class="text-xs text-gray-500 font-mono uppercase tracking-wider">
+                System Intelligence Feed
             </div>
         </div>
     </header>
 
-    <!-- Filters & Sort (Mobile Friendly) -->
-    <div class="bg-white border-b border-gray-200 py-3 sm:hidden">
-        <div class="max-w-7xl mx-auto px-4 flex gap-2">
-            <input type="text" id="search-input-mobile" placeholder="Search..." class="flex-1 border border-gray-300 rounded px-3 py-1 text-sm">
-            <select id="sort-select-mobile" class="border border-gray-300 rounded px-2 py-1 text-sm bg-white">
-                <option value="newest">Newest</option>
-                <option value="oldest">Oldest</option>
-            </select>
-        </div>
-    </div>
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full">
 
-    <!-- Main Content -->
-    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
-
-        <div class="flex justify-between items-center mb-6">
-            <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wider">Latest Transmissions</h2>
-
-            <div class="flex items-center gap-2">
-                <label for="sort-select" class="text-xs text-gray-500 font-medium hidden sm:block">Sort By:</label>
-                <select id="sort-select" class="border-gray-300 border rounded-md text-sm py-1 pl-2 pr-8 bg-white focus:ring-blue-500 focus:border-blue-500 hidden sm:block">
-                    <option value="newest">Newest First</option>
-                    <option value="oldest">Oldest First</option>
-                </select>
-            </div>
+        <div class="mb-8">
+            <h2 class="text-lg font-semibold text-gray-700 mb-2">Latest Transmissions</h2>
+            <div class="h-1 w-20 bg-red-500"></div>
         </div>
 
-        <div id="grid-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div id="grid-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <!-- Loading State -->
-            <div class="col-span-full flex flex-col items-center justify-center py-20 text-gray-400">
-                <i class="fas fa-circle-notch fa-spin text-3xl mb-4 text-blue-200"></i>
-                <span class="animate-pulse">Accessing Secure Archives...</span>
+            <div class="col-span-full text-center py-20 text-gray-400 animate-pulse">
+                Loading Intelligence Stream...
             </div>
         </div>
 
     </main>
 
-    <footer class="bg-gray-900 text-white py-12 mt-auto border-t border-gray-800">
-        <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-6">
-            <div class="text-center md:text-left">
-                <div class="text-lg font-bold serif mb-1">ADAM v23.5</div>
-                <div class="text-xs text-gray-500">Financial Intelligence System</div>
-            </div>
-            <div class="text-xs text-gray-600 font-mono text-center md:text-right">
-                SECURE CONNECTION ESTABLISHED<br>
-                256-BIT ENCRYPTION ACTIVE
-            </div>
+    <footer class="bg-gray-900 text-white py-8 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 text-center text-sm text-gray-400">
+            ADAM v23.5 Financial Intelligence System
         </div>
     </footer>
 
-    <!-- Library Engine -->
-    <script src="js/report_library.js"></script>
     <script>
-        // Initialize Library
-        document.addEventListener('DOMContentLoaded', () => {
-            new ReportLibrary({
-                containerId: 'grid-container',
-                filterType: ['MARKET_PULSE', 'MARKET_MAYHEM'], // Pulse + Mayhem often go together
-                searchId: 'search-input',
-                sortId: 'sort-select'
-            });
+        async function loadManifest() {
+            try {
+                const response = await fetch('data/report_manifest.json');
+                const data = await response.json();
 
-            // Sync Mobile Inputs (Simple hack for responsiveness)
-            const searchMobile = document.getElementById('search-input-mobile');
-            const sortMobile = document.getElementById('sort-select-mobile');
+                const container = document.getElementById('grid-container');
+                container.innerHTML = '';
 
-            if(searchMobile) {
-                searchMobile.addEventListener('input', (e) => {
-                    document.getElementById('search-input').value = e.target.value;
-                    document.getElementById('search-input').dispatchEvent(new Event('input'));
+                // Filter for Market Pulse and Market Mayhem
+                const reports = data.filter(item =>
+                    item.type === 'MARKET_PULSE' || item.type === 'MARKET_MAYHEM'
+                );
+
+                if (reports.length === 0) {
+                    container.innerHTML = '<div class="col-span-full text-center text-gray-500">No reports found.</div>';
+                    return;
+                }
+
+                reports.forEach(item => {
+                    const isMayhem = item.type === 'MARKET_MAYHEM';
+                    const badgeColor = isMayhem ? 'bg-red-100 text-red-800 border-red-200' : 'bg-blue-100 text-blue-800 border-blue-200';
+                    const typeLabel = isMayhem ? 'MARKET MAYHEM' : 'MARKET PULSE';
+                    const dateDisplay = item.date !== 'Unknown' ? item.date : 'ARCHIVED';
+
+                    const card = document.createElement('a');
+                    card.href = item.path;
+                    card.className = 'paper-card block p-6 rounded-lg group text-left';
+
+                    card.innerHTML = `
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${badgeColor}">
+                                ${typeLabel}
+                            </span>
+                            <span class="text-xs text-gray-400 font-mono">${dateDisplay}</span>
+                        </div>
+                        <h3 class="text-xl font-bold serif text-gray-900 mb-3 group-hover:text-red-600 transition-colors leading-tight">
+                            ${item.title}
+                        </h3>
+                        <div class="text-sm text-gray-500 line-clamp-3 mb-4">
+                            Click to access full market intelligence report and analysis.
+                        </div>
+                        <div class="accent-bar opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    `;
+                    container.appendChild(card);
                 });
-            }
 
-            if(sortMobile) {
-                sortMobile.addEventListener('change', (e) => {
-                    document.getElementById('sort-select').value = e.target.value;
-                    document.getElementById('sort-select').dispatchEvent(new Event('change'));
-                });
+            } catch (error) {
+                console.error(error);
+                document.getElementById('grid-container').innerHTML =
+                    '<div class="col-span-full text-center text-red-500">Failed to load library data.</div>';
             }
-        });
+        }
+
+        loadManifest();
     </script>
 </body>
 </html>
