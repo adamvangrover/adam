@@ -3,59 +3,101 @@ import sys
 import os
 import json
 import logging
-from datetime import datetime
+import argparse
+from typing import Dict, Any
 
 # Add repo root to path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from core.enterprise.credit_memo.orchestrator import CreditMemoOrchestrator
-from core.enterprise.credit_memo.audit_logger import audit_logger
+from core.agents.orchestrators.credit_memo_orchestrator import CreditMemoOrchestrator
+
+# Configure Logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger("RuntimePipeline")
 
 def main():
-    logging.basicConfig(level=logging.INFO)
-    logger = logging.getLogger("CreditMemoPipeline")
+    parser = argparse.ArgumentParser(description="Run Credit Memo Pipeline for a specific ticker.")
+    parser.add_argument("--ticker", type=str, required=True, help="Ticker symbol (e.g., MSFT)")
+    parser.add_argument("--sector", type=str, default=None, help="Sector (optional, for synthetic data)")
+    parser.add_argument("--output-dir", type=str, default="showcase/data", help="Output directory")
+    args = parser.parse_args()
 
-    logger.info("Initializing Enterprise Credit Memo System...")
-    orchestrator = CreditMemoOrchestrator()
+    # Initialize Orchestrator (empty mock library, we rely on synthetic generation)
+    orchestrator = CreditMemoOrchestrator(mock_library={}, output_dir=args.output_dir)
 
-    borrower = "TechCorp Inc."
-    query = "Semiconductor market risk"
+    logger.info(f"Generating Credit Memo for {args.ticker}...")
 
-    logger.info(f"Generating Credit Memo for {borrower}...")
-    memo = orchestrator.generate_credit_memo(borrower, query)
+    # Process Entity (triggers synthetic generation if not in library)
+    # We pass None for data to force lookup/generation
+    result = orchestrator.process_entity(args.ticker, data=None)
 
-    logger.info("Generation Complete.")
+    if not result:
+        logger.error("Failed to generate credit memo.")
+        sys.exit(1)
 
-    # 1. Save Memo Output
-    showcase_dir = os.path.join("showcase", "data")
-    if not os.path.exists(showcase_dir):
-        os.makedirs(showcase_dir, exist_ok=True)
+    memo = result["memo"]
+    logs = result["interaction_log"]
 
-    memo_file = os.path.join(showcase_dir, "credit_memo_output.json")
-    with open(memo_file, "w") as f:
-        f.write(memo.model_dump_json(indent=2))
-    logger.info(f"Saved Credit Memo to {memo_file}")
+    # Ensure output dir exists
+    os.makedirs(args.output_dir, exist_ok=True)
 
-    # 2. Extract Audit Log (Latest Entry)
-    # The audit_logger writes to a file in core/data/audit_logs/
-    # We will read the latest file and copy it to showcase data
-    latest_log_file = audit_logger.log_file
-    audit_entries = []
+    # Save Memo
+    filename = f"credit_memo_{args.ticker}.json"
+    output_path = os.path.join(args.output_dir, filename)
+    with open(output_path, 'w') as f:
+        json.dump(memo, f, indent=2)
 
-    if os.path.exists(latest_log_file):
-        with open(latest_log_file, "r") as f:
-            for line in f:
-                try:
-                    entry = json.loads(line)
-                    # Filter for this transaction? Or just take all for demo
-                    audit_entries.append(entry)
-                except json.JSONDecodeError:
-                    continue
+    logger.info(f"Credit Memo saved to {output_path}")
 
-    audit_output_file = os.path.join(showcase_dir, "credit_memo_audit_log.json")
-    with open(audit_output_file, "w") as f:
-        json.dump(audit_entries, f, indent=2)
-    logger.info(f"Saved Audit Log to {audit_output_file}")
+    # Update Library Index (Append or Update)
+    index_path = os.path.join(args.output_dir, "credit_memo_library.json")
+    library_index = []
+    if os.path.exists(index_path):
+        try:
+            with open(index_path, 'r') as f:
+                library_index = json.load(f)
+        except Exception:
+            pass
+
+    # Check if entry exists
+    existing_entry = next((item for item in library_index if item["id"] == args.ticker), None)
+
+    new_entry = {
+        "id": args.ticker,
+        "borrower_name": memo['borrower_name'],
+        "ticker": args.ticker,
+        "sector": memo['borrower_details']['sector'],
+        "report_date": memo['report_date'],
+        "risk_score": memo['risk_score'],
+        "file": filename,
+        "summary": f"{memo['borrower_name']} ({memo['borrower_details']['sector']}). Risk Score: {memo['risk_score']}."
+    }
+
+    if existing_entry:
+        library_index.remove(existing_entry)
+
+    library_index.append(new_entry)
+
+    with open(index_path, 'w') as f:
+        json.dump(library_index, f, indent=2)
+
+    logger.info(f"Library index updated.")
+
+    # Update Interaction Logs
+    log_path = os.path.join(args.output_dir, "risk_legal_interaction.json")
+    interaction_logs = {}
+    if os.path.exists(log_path):
+        try:
+            with open(log_path, 'r') as f:
+                interaction_logs = json.load(f)
+        except Exception:
+            pass
+
+    interaction_logs[args.ticker] = logs
+    with open(log_path, 'w') as f:
+        json.dump(interaction_logs, f, indent=2)
+
+    logger.info("Pipeline Execution Complete.")
 
 if __name__ == "__main__":
     main()
