@@ -3,108 +3,130 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADAM :: HOUSE VIEW LIBRARY</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>ADAM :: HOUSE VIEW STRATEGY</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
-            background-color: #f3f4f6;
-            color: #1f2937;
+            background-color: #0f172a;
+            color: #e2e8f0;
             font-family: 'Inter', sans-serif;
         }
-        .serif {
-            font-family: 'Playfair Display', serif;
+        .strategy-card {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(148, 163, 184, 0.1);
+            backdrop-filter: blur(10px);
+            transition: all 0.2s ease;
+        }
+        .strategy-card:hover {
+            border-color: rgba(56, 189, 248, 0.5);
+            background: rgba(30, 41, 59, 0.8);
+        }
+        .status-dot {
+            width: 8px; height: 8px; border-radius: 50%;
+            box-shadow: 0 0 8px currentColor;
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col bg-gray-50">
+<body class="min-h-screen flex flex-col">
 
-    <header class="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
+    <!-- Navbar -->
+    <nav class="border-b border-slate-800 bg-slate-900/80 backdrop-blur-md sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             <div class="flex items-center gap-6">
-                <a href="market_mayhem_archive.html" class="text-gray-400 hover:text-gray-900 transition flex items-center gap-2 text-sm font-medium">
-                    <i class="fas fa-arrow-left"></i> <span class="hidden sm:inline">Archives</span>
-                </a>
-                <div class="h-6 w-px bg-gray-200"></div>
-                <h1 class="text-xl font-bold serif tracking-tight flex items-center gap-2">
-                    <i class="fas fa-chess-rook text-purple-600"></i> HOUSE VIEW
-                </h1>
-            </div>
-
-            <div class="flex items-center gap-4">
-                <div class="relative hidden sm:block">
-                    <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-xs"></i>
-                    <input type="text" id="search-input" placeholder="Search Strategy..."
-                        class="pl-8 pr-4 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 w-64 bg-gray-50 transition-all">
-                </div>
-                <div class="text-xs text-gray-500 font-mono hidden md:block">
-                    <span id="report-count" class="bg-gray-100 px-2 py-1 rounded">Loading...</span>
+                <div class="text-xl font-bold tracking-tighter text-white">ADAM <span class="text-cyan-400">STRATEGY</span></div>
+                <div class="hidden md:flex space-x-4 text-sm font-medium text-slate-400">
+                    <a href="market_mayhem_archive.html" class="hover:text-white transition">Library</a>
+                    <a href="portfolio_dashboard.html" class="hover:text-white transition">Portfolios</a>
                 </div>
             </div>
-        </div>
-    </header>
-
-    <div class="bg-white border-b border-gray-200 py-3 sm:hidden">
-        <div class="max-w-7xl mx-auto px-4 flex gap-2">
-            <input type="text" id="search-input-mobile" placeholder="Search..." class="flex-1 border border-gray-300 rounded px-3 py-1 text-sm">
-            <select id="sort-select-mobile" class="border border-gray-300 rounded px-2 py-1 text-sm bg-white">
-                <option value="newest">Newest</option>
-                <option value="oldest">Oldest</option>
-            </select>
-        </div>
-    </div>
-
-    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
-        <div class="flex justify-between items-center mb-6">
-            <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wider">Strategic Directives</h2>
-            <div class="flex items-center gap-2">
-                <select id="sort-select" class="border-gray-300 border rounded-md text-sm py-1 pl-2 pr-8 bg-white focus:ring-purple-500 focus:border-purple-500 hidden sm:block">
-                    <option value="newest">Newest First</option>
-                    <option value="oldest">Oldest First</option>
-                </select>
+            <div class="text-xs font-mono text-cyan-500 bg-cyan-950/30 px-3 py-1 rounded-full border border-cyan-900">
+                HOUSE VIEW ACTIVE
             </div>
         </div>
+    </nav>
 
-        <div id="grid-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div class="col-span-full flex flex-col items-center justify-center py-20 text-gray-400">
-                <i class="fas fa-circle-notch fa-spin text-3xl mb-4 text-purple-200"></i>
-                <span class="animate-pulse">Loading Strategic Outlook...</span>
-            </div>
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full">
+
+        <div class="mb-10 text-center">
+            <h1 class="text-3xl md:text-4xl font-bold text-white mb-4">Strategic Allocation & Outlook</h1>
+            <p class="text-slate-400 max-w-2xl mx-auto">
+                The Adam House View represents our highest conviction tactical and strategic asset allocation guidance, synthesized from macro-quantitative models.
+            </p>
         </div>
+
+        <div class="grid grid-cols-1 gap-4" id="list-container">
+            <!-- Loading -->
+            <div class="text-center py-10 text-slate-500 animate-pulse">Initializing Strategy Engine...</div>
+        </div>
+
     </main>
 
-    <footer class="bg-gray-900 text-white py-12 mt-auto border-t border-gray-800">
-        <div class="max-w-7xl mx-auto px-4 text-center">
-            <div class="text-xs text-gray-600 font-mono">
-                ADAM v23.5 // HOUSE VIEW LIBRARY
-            </div>
-        </div>
-    </footer>
-
-    <script src="js/report_library.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            new ReportLibrary({
-                containerId: 'grid-container',
-                filterType: 'HOUSE_VIEW',
-                searchId: 'search-input',
-                sortId: 'sort-select'
-            });
+        async function loadManifest() {
+            try {
+                const response = await fetch('data/report_manifest.json');
+                const data = await response.json();
 
-            const searchMobile = document.getElementById('search-input-mobile');
-            const sortMobile = document.getElementById('sort-select-mobile');
-            if(searchMobile) searchMobile.addEventListener('input', (e) => {
-                const el = document.getElementById('search-input');
-                el.value = e.target.value;
-                el.dispatchEvent(new Event('input'));
-            });
-            if(sortMobile) sortMobile.addEventListener('change', (e) => {
-                const el = document.getElementById('sort-select');
-                el.value = e.target.value;
-                el.dispatchEvent(new Event('change'));
-            });
-        });
+                const container = document.getElementById('list-container');
+                container.innerHTML = '';
+
+                // Filter for House View
+                const reports = data.filter(item => item.type === 'HOUSE_VIEW');
+
+                if (reports.length === 0) {
+                    container.innerHTML = '<div class="text-center text-slate-500">No House View documents published.</div>';
+                    return;
+                }
+
+                reports.forEach(item => {
+                    const date = item.date !== 'Unknown' ? item.date : 'LEGACY';
+
+                    const el = document.createElement('a');
+                    el.href = item.path;
+                    el.className = 'strategy-card flex flex-col md:flex-row items-start md:items-center p-6 rounded-xl gap-6 hover:shadow-lg hover:shadow-cyan-900/20 block';
+
+                    el.innerHTML = `
+                        <div class="flex-shrink-0 flex flex-col items-center justify-center bg-slate-800 rounded-lg w-16 h-16 border border-slate-700">
+                            <i class="fas fa-chess-king text-2xl text-cyan-400"></i>
+                        </div>
+
+                        <div class="flex-grow">
+                            <div class="flex items-center gap-3 mb-1">
+                                <span class="text-xs font-mono text-slate-500">${date}</span>
+                                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-cyan-900/50 text-cyan-300 border border-cyan-800">OFFICIAL STANCE</span>
+                            </div>
+                            <h3 class="text-lg font-semibold text-white group-hover:text-cyan-400 transition">
+                                ${item.title}
+                            </h3>
+                            <p class="text-sm text-slate-400 mt-1 line-clamp-1">
+                                Tactical asset allocation updates and core convictions for the period.
+                            </p>
+                        </div>
+
+                        <div class="flex-shrink-0 self-center">
+                            <span class="text-sm font-medium text-cyan-400 hover:underline">Read Analysis &rarr;</span>
+                        </div>
+                    `;
+                    container.appendChild(el);
+                });
+
+            } catch (error) {
+                console.error(error);
+                document.getElementById('list-container').innerHTML =
+                    '<div class="text-center text-red-400">System Error: Unable to load strategy manifest.</div>';
+            }
+        }
+
+        // FontAwesome Injection
+        if (!document.querySelector('link[href*="font-awesome"]')) {
+            const link = document.createElement('link');
+            link.rel = "stylesheet";
+            link.href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css";
+            document.head.appendChild(link);
+        }
+
+        loadManifest();
     </script>
 </body>
 </html>
