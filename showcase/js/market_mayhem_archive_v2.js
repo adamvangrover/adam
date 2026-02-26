@@ -374,9 +374,28 @@ class MarketMayhemController {
         `;
 
         // Populate Sidebar Critique
+        const sentimentColor = (report.sentiment_score || 50) > 60 ? '#0aff60' : ((report.sentiment_score || 50) < 40 ? '#ff3333' : '#f59e0b');
+        const convictionColor = (report.conviction || 0) > 75 ? '#0aff60' : '#f59e0b';
+
+        const gaugesHTML = `
+            <div style="margin-top: 15px;">
+                <div style="margin-bottom: 5px; font-size: 0.7rem; color: #888;">SENTIMENT: ${report.sentiment_score || 50}/100</div>
+                <div style="width: 100%; background: rgba(255,255,255,0.1); height: 4px; border-radius: 2px; overflow: hidden;">
+                    <div style="width: ${report.sentiment_score || 50}%; background: ${sentimentColor}; height: 100%;"></div>
+                </div>
+            </div>
+            <div style="margin-top: 10px;">
+                <div style="margin-bottom: 5px; font-size: 0.7rem; color: #888;">CONVICTION: ${report.conviction || 0}%</div>
+                <div style="width: 100%; background: rgba(255,255,255,0.1); height: 4px; border-radius: 2px; overflow: hidden;">
+                    <div style="width: ${report.conviction || 0}%; background: ${convictionColor}; height: 100%;"></div>
+                </div>
+            </div>
+        `;
+
         document.getElementById('modalCritique').innerHTML = `
-            <div style="margin-bottom:10px;"><strong>VERDICT:</strong> ${report.conviction > 75 ? 'HIGH CONVICTION' : 'REVIEW REQUIRED'}</div>
-            <div style="font-size:0.75rem;">${report.critique || 'System 2 analysis pending...'}</div>
+            <div style="margin-bottom:10px;"><strong>VERDICT:</strong> ${(report.conviction || 0) > 75 ? 'HIGH CONVICTION' : 'REVIEW REQUIRED'}</div>
+            <div style="font-size:0.75rem; margin-bottom: 10px;">${report.critique || 'System 2 analysis pending...'}</div>
+            ${gaugesHTML}
         `;
 
         // Alpha Calculation
@@ -494,43 +513,52 @@ class MarketMayhemController {
         // Global Filter Function
         window.applyFilters = () => {
             const search = document.getElementById('searchInput').value.toLowerCase();
-            const year = document.getElementById('typeFilter').value === 'ALL' ? 'ALL' : null; // Simplified logic, reuse Select?
-            // Actually the HTML has distinct Year and Type selects? Check HTML...
-            // In HTML provided: typeFilter, sortFilter. No yearFilter shown in the snippet provided in WriteFile?
-            // Let's rely on what IS in the HTML.
 
+            const yearSelect = document.getElementById('yearFilter');
             const typeSelect = document.getElementById('typeFilter');
-            const sortSelect = document.getElementById('sortFilter');
+            const sortSelect = document.getElementById('sortOrder');
 
-            const typeValue = typeSelect ? typeSelect.value : 'ALL';
-            const sortValue = sortSelect ? sortSelect.value : 'NEWEST';
+            const yearValue = yearSelect ? yearSelect.value : 'all';
+            const typeValue = typeSelect ? typeSelect.value : 'all';
+            const sortValue = sortSelect ? sortSelect.value : 'newest';
 
             const grid = document.getElementById('archiveGrid');
             const items = Array.from(grid.getElementsByClassName('archive-item'));
 
             // Sort
             items.sort((a, b) => {
-                if (sortValue === 'NEWEST') return b.dataset.year.localeCompare(a.dataset.year);
-                if (sortValue === 'OLDEST') return a.dataset.year.localeCompare(b.dataset.year);
-                if (sortValue === 'CONVICTION') return b.dataset.conviction - a.dataset.conviction;
-                if (sortValue === 'SENTIMENT') return b.dataset.sentiment - a.dataset.sentiment;
+                if (sortValue === 'newest') return b.dataset.year.localeCompare(a.dataset.year);
+                if (sortValue === 'oldest') return a.dataset.year.localeCompare(b.dataset.year);
+                // For conviction/sentiment, handle descending
+                if (sortValue === 'conviction') return (b.dataset.conviction || 0) - (a.dataset.conviction || 0);
+                if (sortValue === 'sentiment') return (b.dataset.sentiment || 0) - (a.dataset.sentiment || 0);
                 return 0;
             });
 
-            // Re-append
+            // Re-append to update DOM order
             items.forEach(item => grid.appendChild(item));
 
             // Filter
             items.forEach(item => {
                 const itemType = item.dataset.type;
+                const itemYear = item.dataset.year;
                 const itemTitle = item.dataset.title.toLowerCase();
 
                 let matchSearch = itemTitle.includes(search);
-                let matchType = typeValue === 'ALL' || itemType === typeValue;
+                let matchType = typeValue === 'all' || itemType === typeValue;
+                let matchYear = yearValue === 'all' || itemYear === yearValue;
 
-                item.style.display = (matchSearch && matchType) ? 'flex' : 'none';
+                item.style.display = (matchSearch && matchType && matchYear) ? 'flex' : 'none';
             });
         };
+
+        // Attach listeners to selects
+        ['yearFilter', 'typeFilter', 'sortOrder', 'searchInput'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                el.addEventListener(id === 'searchInput' ? 'input' : 'change', window.applyFilters);
+            }
+        });
     }
 }
 

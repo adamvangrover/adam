@@ -2,7 +2,7 @@
  * report_library.js
  *
  * robust, shared logic for rendering report libraries (Market Pulse, Daily Briefing, etc.)
- * supports filtering, sorting, search, and graceful error handling.
+ * supports filtering, sorting, search, pagination, and graceful error handling.
  */
 
 class ReportLibrary {
@@ -13,6 +13,10 @@ class ReportLibrary {
         this.searchId = config.searchId || 'search-input';
         this.sortId = config.sortId || 'sort-select';
 
+        // Pagination Config
+        this.itemsPerPage = 20;
+        this.currentPage = 1;
+
         this.data = [];
         this.filteredData = [];
 
@@ -20,9 +24,26 @@ class ReportLibrary {
     }
 
     async init() {
+        this.injectStyles();
         await this.loadData();
         this.setupEventListeners();
         this.render();
+    }
+
+    injectStyles() {
+        if (document.getElementById('report-library-styles')) return;
+        const style = document.createElement('style');
+        style.id = 'report-library-styles';
+        style.innerHTML = `
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translateY(10px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+            .fade-in {
+                animation: fadeIn 0.5s ease-out forwards;
+            }
+        `;
+        document.head.appendChild(style);
     }
 
     async loadData() {
@@ -86,6 +107,9 @@ class ReportLibrary {
             const matchDate = item.date.includes(lowerQuery);
             return matchTitle || matchDate;
         });
+
+        // Reset pagination on filter
+        this.currentPage = 1;
         this.render();
     }
 
@@ -97,14 +121,28 @@ class ReportLibrary {
 
             return order === 'oldest' ? dateA - dateB : dateB - dateA;
         });
+
+        // Reset pagination on sort
+        this.currentPage = 1;
         this.render();
     }
 
-    render() {
+    loadMore() {
+        this.currentPage++;
+        this.render(true); // true = append mode
+    }
+
+    render(append = false) {
         const container = document.getElementById(this.containerId);
         if (!container) return;
 
-        container.innerHTML = '';
+        if (!append) {
+            container.innerHTML = '';
+        }
+
+        // Remove existing "Load More" button if it exists (so we can move it to bottom)
+        const existingBtn = document.getElementById('load-more-btn');
+        if (existingBtn) existingBtn.remove();
 
         if (this.filteredData.length === 0) {
             container.innerHTML = `
@@ -116,10 +154,15 @@ class ReportLibrary {
             return;
         }
 
-        this.filteredData.forEach(item => {
+        const start = (this.currentPage - 1) * this.itemsPerPage;
+        const end = start + this.itemsPerPage;
+        const pageItems = this.filteredData.slice(start, end);
+
+        pageItems.forEach((item, index) => {
             const card = document.createElement('a');
             card.href = item.path;
-            card.className = 'paper-card block p-6 rounded-lg group text-left relative overflow-hidden bg-white hover:bg-gray-50 transition-all duration-300 border border-gray-200';
+            card.className = 'paper-card block p-6 rounded-lg group text-left relative overflow-hidden bg-white hover:bg-gray-50 transition-all duration-300 border border-gray-200 fade-in';
+            card.style.animationDelay = `${index * 50}ms`; // Staggered animation
 
             // Badge color logic
             let badgeColor = 'bg-gray-100 text-gray-800 border-gray-200';
@@ -130,6 +173,9 @@ class ReportLibrary {
             if (item.type === 'DEEP_DIVE') badgeColor = 'bg-indigo-100 text-indigo-800 border-indigo-200';
 
             const displayDate = item.date === 'Unknown' ? 'ARCHIVED' : item.date;
+
+            // Check for description or summary
+            const description = item.description || item.summary || 'CONFIDENTIAL // ADAM SYSTEM GENERATED REPORT';
 
             card.innerHTML = `
                 <div class="flex justify-between items-start mb-4">
@@ -146,13 +192,29 @@ class ReportLibrary {
                 </h3>
 
                 <div class="text-sm text-gray-500 line-clamp-2 mb-4">
-                    CONFIDENTIAL // ADAM SYSTEM GENERATED REPORT
+                    ${description}
                 </div>
 
                 <div class="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-gray-200 to-transparent group-hover:via-blue-400 transition-all duration-500"></div>
             `;
             container.appendChild(card);
         });
+
+        // Add "Load More" button if there are more items
+        if (this.filteredData.length > end) {
+            const btnContainer = document.createElement('div');
+            btnContainer.id = 'load-more-btn';
+            btnContainer.className = 'col-span-full flex justify-center py-8';
+            btnContainer.innerHTML = `
+                <button class="px-6 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-md font-medium text-sm transition-colors">
+                    Load More Reports (${this.filteredData.length - end} remaining)
+                </button>
+            `;
+            btnContainer.querySelector('button').addEventListener('click', () => {
+                this.loadMore();
+            });
+            container.appendChild(btnContainer);
+        }
 
         // Update stats if element exists
         const countEl = document.getElementById('report-count');
