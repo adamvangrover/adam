@@ -3,118 +3,124 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADAM v26.0 :: INTELLIGENCE LIBRARY</title>
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/library.css">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <title>ADAM :: INTELLIGENCE LIBRARY</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Core Navigation -->
-    <script src="js/nav.js" data-root=".." defer></script>
-    <!-- Logic -->
-    <script src="js/library_logic.js" defer></script>
+    <style>
+        body {
+            background-color: #0f172a;
+            color: #e2e8f0;
+            font-family: 'Inter', sans-serif;
+        }
+        .serif {
+            font-family: 'Playfair Display', serif;
+        }
+        .paper-card {
+            background-color: #1e293b !important;
+            border-color: #334155 !important;
+        }
+        .paper-card h3 {
+            color: #f8fafc !important;
+        }
+        .paper-card:hover {
+            border-color: #60a5fa !important;
+        }
+        input, select {
+            background-color: #1e293b !important;
+            border-color: #334155 !important;
+            color: white !important;
+        }
+    </style>
 </head>
-<body>
+<body class="min-h-screen flex flex-col">
 
-    <div class="library-main">
-        <!-- Header -->
-        <header class="library-header">
-            <div style="display: flex; align-items: center; gap: 20px;">
-                <i class="fas fa-book-journal-whills text-cyan-400 text-2xl"></i>
-                <div>
-                    <h1 class="mono text-lg font-bold tracking-widest text-white">INTELLIGENCE LIBRARY</h1>
-                    <div class="mono text-xs text-slate-400" id="countDisplay">LOADING DATA...</div>
-                </div>
+    <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-6">
+                <a href="market_mayhem_archive.html" class="text-slate-400 hover:text-white transition flex items-center gap-2 text-sm font-medium">
+                    <i class="fas fa-arrow-left"></i> <span class="hidden sm:inline">Archives</span>
+                </a>
+                <div class="h-6 w-px bg-slate-700"></div>
+                <h1 class="text-xl font-bold serif tracking-tight flex items-center gap-2 text-white">
+                    <i class="fas fa-book-open text-blue-500"></i> INTELLIGENCE LIBRARY
+                </h1>
             </div>
 
-            <div style="display: flex; align-items: center; gap: 30px;">
-                <!-- View Toggle -->
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    <span class="mono text-xs text-slate-400">ANALYST</span>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="viewToggle" class="toggle-input">
-                        <span class="toggle-slider"></span>
-                    </label>
-                    <span class="mono text-xs text-green-400">SYSTEM</span>
+            <div class="flex items-center gap-4">
+                <div class="relative hidden sm:block">
+                    <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 text-xs"></i>
+                    <input type="text" id="search-input" placeholder="Search Global Index..."
+                        class="pl-8 pr-4 py-1.5 text-sm border border-slate-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 w-64 transition-all">
                 </div>
-
-                <!-- Actions -->
-                <div style="display: flex; gap: 10px;">
-                    <button id="btnUpload" class="btn-cyber">
-                        <i class="fas fa-upload"></i> UPLOAD
-                    </button>
-                    <button id="btnExport" class="btn-cyber secondary">
-                        <i class="fas fa-download"></i> EXPORT
-                    </button>
-                    <a href="editor_studio.html" class="btn-cyber bg-cyan-900/30">
-                        <i class="fas fa-plus"></i> NEW REPORT
-                    </a>
-                    <a href="nexus_explorer.html" class="btn-cyber bg-purple-900/30">
-                        <i class="fas fa-project-diagram"></i> GRAPH
-                    </a>
+                <div class="text-xs text-slate-500 font-mono hidden md:block">
+                    <span id="report-count" class="bg-slate-800 px-2 py-1 rounded border border-slate-700">Loading...</span>
                 </div>
             </div>
-        </header>
+        </div>
+    </header>
 
-        <div class="library-layout">
-            <!-- Sidebar -->
-            <aside class="library-sidebar">
-                <div class="sidebar-section">
-                    <div class="sidebar-title">SEARCH & QUERY</div>
-                    <input type="text" id="searchInput" class="form-input" placeholder="Keyword or Hash...">
-                </div>
-
-                <div class="sidebar-section">
-                    <div class="sidebar-title">ARTIFACT TYPE</div>
-                    <select id="typeFilter" class="form-input">
-                        <option value="ALL">ALL TYPES</option>
-                        <option value="DAILY_BRIEFING">Daily Briefing</option>
-                        <option value="NEWSLETTER">Newsletter</option>
-                        <option value="MARKET_PULSE">Market Pulse</option>
-                        <option value="DEEP_DIVE">Deep Dive</option>
-                        <option value="STRATEGY">Strategy</option>
-                        <option value="COUNTERFACTUAL">Counterfactual</option>
-                    </select>
-                </div>
-
-                <div class="sidebar-section">
-                    <div class="sidebar-title">SENTIMENT ALIGNMENT</div>
-                    <select id="sentimentFilter" class="form-input">
-                        <option value="ALL">ANY SENTIMENT</option>
-                        <option value="POSITIVE">BULLISH (>60)</option>
-                        <option value="NEUTRAL">NEUTRAL (40-60)</option>
-                        <option value="NEGATIVE">BEARISH (<40)</option>
-                    </select>
-                </div>
-
-                <div class="sidebar-section">
-                    <div class="sidebar-title">QUICK ACTIONS</div>
-                    <div class="flex flex-col gap-2">
-                        <button class="text-left text-xs text-slate-400 hover:text-white transition"><i class="fas fa-history"></i> Recent Changes</button>
-                        <button class="text-left text-xs text-slate-400 hover:text-white transition"><i class="fas fa-star"></i> Favorites</button>
-                        <button class="text-left text-xs text-slate-400 hover:text-white transition"><i class="fas fa-trash"></i> Trash</button>
-                    </div>
-                </div>
-
-                <div class="mt-auto pt-10 text-center">
-                    <div class="mono text-[10px] text-slate-600">
-                        SECURE STORAGE: ENCRYPTED<br>
-                        NODE: US-EAST-4
-                    </div>
-                </div>
-            </aside>
-
-            <!-- Main Content Area -->
-            <main class="library-content custom-scrollbar">
-                <div id="humanView" class="view-human">
-                    <!-- Cards Injected Here -->
-                </div>
-                <div id="machineView" class="view-machine">
-                    <!-- JSON Injected Here -->
-                </div>
-            </main>
+    <div class="bg-slate-900 border-b border-slate-800 py-3 sm:hidden">
+        <div class="max-w-7xl mx-auto px-4 flex gap-2">
+            <input type="text" id="search-input-mobile" placeholder="Search..." class="flex-1 border border-slate-700 rounded px-3 py-1 text-sm">
+            <select id="sort-select-mobile" class="border border-slate-700 rounded px-2 py-1 text-sm">
+                <option value="newest">Newest</option>
+                <option value="oldest">Oldest</option>
+            </select>
         </div>
     </div>
 
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-sm font-semibold text-slate-500 uppercase tracking-wider">Unrestricted Access</h2>
+            <div class="flex items-center gap-2">
+                <select id="sort-select" class="border-slate-700 border rounded-md text-sm py-1 pl-2 pr-8 focus:ring-blue-500 focus:border-blue-500 hidden sm:block">
+                    <option value="newest">Newest First</option>
+                    <option value="oldest">Oldest First</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="grid-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="col-span-full flex flex-col items-center justify-center py-20 text-slate-600">
+                <i class="fas fa-circle-notch fa-spin text-3xl mb-4 text-blue-900"></i>
+                <span class="animate-pulse">Decrypting Index...</span>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-slate-950 text-slate-400 py-12 mt-auto border-t border-slate-900">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <div class="text-xs font-mono">
+                ADAM v23.5 // MASTER INTELLIGENCE REPOSITORY
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/report_library.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            new ReportLibrary({
+                containerId: 'grid-container',
+                filterType: null, // ALL types
+                searchId: 'search-input',
+                sortId: 'sort-select'
+            });
+
+            // Mobile sync
+            const searchMobile = document.getElementById('search-input-mobile');
+            const sortMobile = document.getElementById('sort-select-mobile');
+            if(searchMobile) searchMobile.addEventListener('input', (e) => {
+                const el = document.getElementById('search-input');
+                el.value = e.target.value;
+                el.dispatchEvent(new Event('input'));
+            });
+            if(sortMobile) sortMobile.addEventListener('change', (e) => {
+                const el = document.getElementById('sort-select');
+                el.value = e.target.value;
+                el.dispatchEvent(new Event('change'));
+            });
+        });
+    </script>
 </body>
 </html>
