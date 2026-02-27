@@ -1,7 +1,7 @@
 // Verified for Adam v25.5
 // Verified by Jules
 // Protocol Verified: ADAM-V-NEXT (Updated)
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Activity, Radio, ShieldAlert, Cpu, TrendingUp, Users } from 'lucide-react';
 import AgentIntercom from '../components/AgentIntercom';
 import NarrativeDashboard from '../components/NarrativeDashboard';
@@ -23,24 +23,96 @@ const Synthesizer: React.FC = () => {
     const [forecastData, setForecastData] = useState<any>(null);
     const [dataSource, setDataSource] = useState<string>('LIVE'); // 'LIVE' or 'SCENARIO_2008'
 
-    // Initial Data Fetch
+    // Bolt ⚡: Track last data to prevent unnecessary re-renders
+    const lastDataRef = useRef<string>("");
+
+    // Bolt ⚡: Memoize Forecast Chart Points to avoid expensive recalculation on every render
+    const forecastChartPoints = useMemo(() => {
+        if (!forecastData || !forecastData.forecast) return null;
+
+        const allVals = [...forecastData.forecast.upper_95, ...forecastData.forecast.lower_95];
+        const min = Math.min(...allVals) * 0.99;
+        const max = Math.max(...allVals) * 1.01;
+        const range = max - min;
+        const w = 1000 / forecastData.forecast.dates.length;
+
+        const upper = forecastData.forecast.upper_95.map((v:number, i:number) =>
+            `${i*w},${300 - ((v - min)/range)*300}`
+        ).join(' ');
+
+        const lower = forecastData.forecast.lower_95.map((v:number, i:number) =>
+            `${i*w},${300 - ((v - min)/range)*300}`
+        ).reverse().join(' ');
+
+        const mean = forecastData.forecast.mean.map((v:number, i:number) =>
+            `${i*w},${300 - ((v - min)/range)*300}`
+        ).join(' ');
+
+        return {
+            polyPoints: `${upper} ${lower}`,
+            linePoints: mean
+        };
+    }, [forecastData]);
+
+    // Initial Data Fetch (One-time)
     useEffect(() => {
-        const fetchAll = async () => {
+        const fetchInitial = async () => {
             const token = localStorage.getItem('token');
             const headers: any = {};
             if (token) headers['Authorization'] = `Bearer ${token}`;
 
-            // 1. Confidence (Polled)
-            const fetchConfidence = async () => {
-                try {
-                    // Switch endpoint based on source
-                    const endpoint = dataSource === 'SCENARIO_2008'
-                        ? '/api/synthesizer/scenario?id=2008_CRASH'
-                        : '/api/synthesizer/confidence';
+            // 2. Conviction (Initial)
+            try {
+                const res = await fetch('/api/synthesizer/conviction', { headers });
+                if (res.ok) {
+                    const data = await res.json();
+                    setConviction(data.scores);
+                }
+            } catch(e) {}
 
-                    const res = await fetch(endpoint, { headers });
-                    if (res.ok) {
-                        const data = await res.json();
+            // 3. Forecast (Initial - SPX)
+            try {
+                const res = await fetch('/api/synthesizer/forecast/SPX', { headers });
+                if (res.ok) {
+                    const data = await res.json();
+                    setForecastData(data);
+                }
+            } catch(e) {}
+        };
+        fetchInitial();
+    }, []);
+
+    // Polling Effect for Confidence Score
+    useEffect(() => {
+        let isMounted = true;
+        let timeoutId: ReturnType<typeof setTimeout>;
+
+        const fetchConfidence = async () => {
+            const token = localStorage.getItem('token');
+            const headers: any = {};
+            if (token) headers['Authorization'] = `Bearer ${token}`;
+
+            try {
+                // Switch endpoint based on source
+                const endpoint = dataSource === 'SCENARIO_2008'
+                    ? '/api/synthesizer/scenario?id=2008_CRASH'
+                    : '/api/synthesizer/confidence';
+
+                const res = await fetch(endpoint, { headers });
+                if (isMounted && res.ok) {
+                    const data = await res.json();
+
+                    // Bolt ⚡: Check if critical data changed before updating state
+                    // This prevents re-renders on every poll (ignoring the changing API timestamp)
+                    const compareObj = {
+                        score: data.score,
+                        pulse: data.pulse,
+                        rationale: data.consensus?.rationale
+                    };
+                    const compareStr = JSON.stringify(compareObj);
+
+                    if (compareStr !== lastDataRef.current) {
+                        lastDataRef.current = compareStr;
                         setScore(data.score);
                         setPulse(data.pulse);
                         if (data.consensus && data.consensus.rationale) {
@@ -48,40 +120,24 @@ const Synthesizer: React.FC = () => {
                         }
                         setLastUpdate(new Date().toLocaleTimeString());
                     }
-                } catch(e) {}
-            };
-
-            // 2. Conviction (Initial)
-            const fetchConviction = async () => {
-                try {
-                    const res = await fetch('/api/synthesizer/conviction', { headers });
-                    if (res.ok) {
-                        const data = await res.json();
-                        setConviction(data.scores);
-                    }
-                } catch(e) {}
-            };
-
-            // 3. Forecast (Initial - SPX)
-            const fetchForecast = async () => {
-                try {
-                    const res = await fetch('/api/synthesizer/forecast/SPX', { headers });
-                    if (res.ok) {
-                        const data = await res.json();
-                        setForecastData(data);
-                    }
-                } catch(e) {}
-            };
-
-            fetchConfidence();
-            fetchConviction();
-            fetchForecast();
-
-            const interval = setInterval(fetchConfidence, 1000);
-            return () => clearInterval(interval);
+                }
+            } catch(e) {
+                // Silent catch for polling
+            } finally {
+                if (isMounted) {
+                    // Bolt ⚡: Use recursive setTimeout instead of setInterval to prevent request pile-up
+                    timeoutId = setTimeout(fetchConfidence, 1000);
+                }
+            }
         };
-        fetchAll();
-    }, []);
+
+        fetchConfidence();
+
+        return () => {
+            isMounted = false;
+            if (timeoutId) clearTimeout(timeoutId);
+        };
+    }, [dataSource]); // Re-run when dataSource changes to switch endpoints
 
     // Helper for color coding score
     const getScoreColor = (s: number) => {
@@ -247,7 +303,7 @@ const Synthesizer: React.FC = () => {
                      <h3 style={{ borderBottom: '1px solid #444', paddingBottom: '10px', display: 'flex', alignItems: 'center', gap: '10px' }}>
                         <TrendingUp size={20} color="#00f3ff" /> Predictive Horizon (SPX 30-Day)
                     </h3>
-                    {forecastData ? (
+                    {forecastData && forecastChartPoints ? (
                         <div style={{ marginTop: '20px', height: '300px', position: 'relative' }}>
                              {/* Simple SVG Chart */}
                              <svg
@@ -273,47 +329,13 @@ const Synthesizer: React.FC = () => {
 
                                 {/* 95% Confidence Band (Poly) */}
                                 <polygon
-                                    points={
-                                        (() => {
-                                            // Map Y values to 0-300 range based on min/max of 95 bounds
-                                            const allVals = [...forecastData.forecast.upper_95, ...forecastData.forecast.lower_95];
-                                            const min = Math.min(...allVals) * 0.99;
-                                            const max = Math.max(...allVals) * 1.01;
-                                            const range = max - min;
-
-                                            const w = 1000 / forecastData.forecast.dates.length;
-
-                                            // Upper points L->R
-                                            const upper = forecastData.forecast.upper_95.map((v:number, i:number) =>
-                                                `${i*w},${300 - ((v - min)/range)*300}`
-                                            ).join(' ');
-
-                                            // Lower points R->L
-                                            const lower = forecastData.forecast.lower_95.map((v:number, i:number) =>
-                                                `${i*w},${300 - ((v - min)/range)*300}`
-                                            ).reverse().join(' ');
-
-                                            return `${upper} ${lower}`;
-                                        })()
-                                    }
+                                    points={forecastChartPoints.polyPoints}
                                     fill="url(#fanGradient)"
                                 />
 
                                  {/* Mean Line */}
                                  <polyline
-                                     points={
-                                        (() => {
-                                            const allVals = [...forecastData.forecast.upper_95, ...forecastData.forecast.lower_95];
-                                            const min = Math.min(...allVals) * 0.99;
-                                            const max = Math.max(...allVals) * 1.01;
-                                            const range = max - min;
-                                            const w = 1000 / forecastData.forecast.dates.length;
-
-                                            return forecastData.forecast.mean.map((v:number, i:number) =>
-                                                `${i*w},${300 - ((v - min)/range)*300}`
-                                            ).join(' ');
-                                        })()
-                                     }
+                                     points={forecastChartPoints.linePoints}
                                      fill="none" stroke="#fff" strokeWidth="2"
                                  />
                              </svg>
