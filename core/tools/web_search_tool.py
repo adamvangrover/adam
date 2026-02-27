@@ -1,24 +1,17 @@
 import logging
-from typing import Any
-from core.tools.base_tool import BaseTool
-
-# This tool will use the sandbox's view_text_website tool.
-# We need a way to make that available here.
-# For now, we'll assume it's passed in or globally available via a helper.
-# This is a simplification for this context.
-from J鏟J_sandbox_tools import view_text_website
-
-
+import requests
+from bs4 import BeautifulSoup
+from typing import Optional, List
+from duckduckgo_search import DDGS
+from googlesearch import search as google_search
 from semantic_kernel.functions.kernel_function_decorator import kernel_function
-
+from core.tools.base_tool import BaseTool
 
 class WebSearchTool(BaseTool):
     name: str = "web_search"
     description: str = "Performs a web search for a given query or fetches content from a direct URL."
 
     def _get_parameters_schema(self) -> dict:
-        # This schema is for the BaseTool's get_schema method.
-        # Semantic Kernel will infer from the @kernel_function decorated method's signature.
         return {
             "type": "object",
             "properties": {
@@ -30,39 +23,73 @@ class WebSearchTool(BaseTool):
 
     @kernel_function(
         name="fetch_web_content",
-        description="Fetches text content from a given URL. If URL is not provided, it can conceptually use a query (though direct URL is preferred in simulation)."
+        description="Fetches text content from a given URL or performs a search query."
     )
-    async def execute(self, query: str = None, url: str = None) -> str:  # SK will see 'query' and 'url' as parameters
+    async def execute(self, query: str = None, url: str = None) -> str:
         """
-        Executes a web search.
-        If a URL is provided, it fetches content from that URL.
-        Otherwise, it would ideally use the query to find a relevant URL (simulated here).
+        Executes a web search or fetches a URL.
         """
         if not url and not query:
-            return "Error: Either a query or a direct URL must be provided to the web search tool."
+            return "Error: Either a query or a direct URL must be provided."
 
         if url:
-            logging.info(f"WebSearchTool: Fetching content directly from URL: {url}")
-            try:
-                content = view_text_website(url)
-                return content[:2000]  # Truncate for brevity
-            except Exception as e:
-                logging.error(f"WebSearchTool: Error fetching URL {url}: {e}")
-                return f"Error: Could not fetch content from {url}. Details: {str(e)}"
+            return self._fetch_url(url)
 
         if query:
-            # In a real scenario, this would involve:
-            # 1. Using the query with a search engine API to get a list of URLs.
-            # 2. Picking a top URL.
-            # For this example, we'll simulate this by requiring a URL or using a placeholder.
-            # Or, if we had a way to call out to an actual search provider, we'd do it here.
-            # For now, we'll just indicate that a direct URL is preferred for this simulation.
-            logging.info(
-                f"WebSearchTool: Received query '{query}'. In a real tool, this would use a search engine API to find relevant URLs. This simulated tool prioritizes direct URL fetching.")
-            # Placeholder: if you had a way to map query to URL:
-            # simulated_url = f"https://www.google.com/search?q={query.replace(' ', '+')}"
-            # logging.info(f"WebSearchTool: Simulated search for '{query}', would fetch e.g. {simulated_url}")
-            # For now, returning a message indicating how to use it effectively in this sandbox
-            return "Info: Web search with query is conceptual in this simulated tool. Please provide a direct URL to fetch content, or integrate a full search provider."
+            logging.info(f"WebSearchTool: Searching for '{query}'...")
+            try:
+                # 1. Try DuckDuckGo
+                with DDGS() as ddgs:
+                    results = list(ddgs.text(query, max_results=1))
+                    if results:
+                        top_url = results[0]['href']
+                        logging.info(f"WebSearchTool: Found URL via DDG: {top_url}")
+                        return self._fetch_url(top_url)
+            except Exception as e:
+                logging.warning(f"WebSearchTool: DuckDuckGo failed: {e}")
 
-        return "Error: Unexpected state in WebSearchTool."
+            try:
+                # 2. Fallback to Google Search
+                # googlesearch.search returns an iterator of URLs
+                results = list(google_search(query, num_results=1))
+                if results:
+                    top_url = results[0]
+                    logging.info(f"WebSearchTool: Found URL via Google: {top_url}")
+                    return self._fetch_url(top_url)
+            except Exception as e:
+                logging.error(f"WebSearchTool: Google Search failed: {e}")
+
+            return "Error: No search results found or search failed."
+
+        return "Error: Unexpected state."
+
+    def _fetch_url(self, url: str) -> str:
+        logging.info(f"WebSearchTool: Fetching content from {url}")
+        try:
+            # Add headers to mimic a browser
+            headers = {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+            }
+            response = requests.get(url, headers=headers, timeout=10)
+            response.raise_for_status()
+
+            soup = BeautifulSoup(response.text, 'html.parser')
+
+            # Remove script and style elements
+            for script in soup(["script", "style"]):
+                script.decompose()
+
+            text = soup.get_text()
+
+            # Break into lines and remove leading/trailing space on each
+            lines = (line.strip() for line in text.splitlines())
+            # Break multi-headlines into a line each
+            chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
+            # Drop blank lines
+            text = '\n'.join(chunk for chunk in chunks if chunk)
+
+            return text[:5000]  # Return first 5000 chars
+
+        except Exception as e:
+            logging.error(f"WebSearchTool: Error fetching URL {url}: {e}")
+            return f"Error: Could not fetch content from {url}. Details: {str(e)}"
