@@ -16,6 +16,7 @@ class MarketMayhemController {
         };
         this.dom = {
             strategicPanel: document.getElementById('strategicPanel'),
+            outlookPanel: document.getElementById('outlookPanel'),
             convictionPanel: document.getElementById('convictionPanel'),
             watchListPanel: document.getElementById('watchListPanel'),
             sectorRiskPanel: document.getElementById('sectorRiskPanel'),
@@ -37,6 +38,7 @@ class MarketMayhemController {
         try {
             await this.loadData();
             this.renderSidebar();
+            this.renderOutlook();
             this.renderChart();
             this.renderFeatured();
             this.renderArchive();
@@ -50,14 +52,14 @@ class MarketMayhemController {
 
     async loadData() {
         const [strategic, market, archive] = await Promise.all([
-            fetch('data/strategic_command.json').then(r => r.json()),
-            fetch('data/sp500_market_data.json').then(r => r.json()),
-            fetch('data/market_mayhem_index.json').then(r => r.json())
+            fetch('data/strategic_command.json').then(r => r.json()).catch(() => null),
+            fetch('data/sp500_market_data.json').then(r => r.json()).catch(() => []),
+            fetch('data/market_mayhem_index.json').then(r => r.json()).catch(() => [])
         ]);
 
         this.data.strategic = strategic;
-        this.data.market = market;
-        this.data.archive = archive;
+        this.data.market = market || [];
+        this.data.archive = archive || [];
     }
 
     // --- Sidebar Rendering ---
@@ -86,7 +88,7 @@ class MarketMayhemController {
         }
 
         // 2. Top Conviction
-        if (this.data.market) {
+        if (this.data.market.length > 0) {
             const convictions = this.data.market
                 .filter(item => item.outlook && item.outlook.conviction === 'High')
                 .sort((a, b) => b.risk_score - a.risk_score)
@@ -107,7 +109,7 @@ class MarketMayhemController {
         }
 
         // 3. Watch List
-        if (this.data.market) {
+        if (this.data.market.length > 0) {
             const watchlist = this.data.market
                 .filter(item => item.outlook && item.outlook.conviction === 'Medium')
                 .slice(0, 5);
@@ -127,7 +129,7 @@ class MarketMayhemController {
         }
 
         // 4. Sector Risk
-        if (this.data.market) {
+        if (this.data.market.length > 0) {
             const sectorRisk = {};
             const sectorCount = {};
 
@@ -165,6 +167,50 @@ class MarketMayhemController {
         }
     }
 
+    renderOutlook() {
+        if (!this.data.market || this.data.market.length === 0) return;
+
+        // Calculate Advancers/Decliners
+        const advancers = this.data.market.filter(m => m.change_pct > 0).length;
+        const decliners = this.data.market.filter(m => m.change_pct < 0).length;
+        const breadth = (advancers / (advancers + decliners) * 100).toFixed(0);
+
+        // Calculate Avg P/E
+        const peRatios = this.data.market.map(m => m.pe_ratio).filter(pe => pe > 0);
+        const avgPE = (peRatios.reduce((a, b) => a + b, 0) / peRatios.length).toFixed(1);
+
+        // Implied S&P Target (Mock logic: using average upside of top 10 weights)
+        const top10 = this.data.market.sort((a,b) => parseFloat(b.market_cap) - parseFloat(a.market_cap)).slice(0, 10);
+        const avgUpside = top10.reduce((acc, stock) => {
+            const target = stock.outlook && stock.outlook.price_target ? stock.outlook.price_target : stock.current_price;
+            return acc + ((target - stock.current_price) / stock.current_price);
+        }, 0) / 10;
+        
+        // Mock current S&P
+        const currentSPX = 6890; 
+        const impliedTarget = Math.round(currentSPX * (1 + avgUpside));
+
+
+        this.dom.outlookPanel.innerHTML = `
+            <h3>
+                <span>FORWARD OUTLOOK</span>
+                <i class="fas fa-binoculars"></i>
+            </h3>
+            <div class="metric-row">
+                <span class="metric-label">Implied S&P Target</span>
+                <span class="metric-val" style="color: #d946ef;">${impliedTarget}</span>
+            </div>
+            <div class="metric-row">
+                <span class="metric-label">Market Breadth</span>
+                <span class="metric-val ${breadth > 50 ? 'val-green' : 'val-red'}">${breadth}% Bullish</span>
+            </div>
+             <div class="metric-row">
+                <span class="metric-label">Avg P/E Ratio</span>
+                <span class="metric-val">${avgPE}x</span>
+            </div>
+        `;
+    }
+
     // --- Charting ---
 
     renderChart() {
@@ -184,8 +230,8 @@ class MarketMayhemController {
         const projectionSteps = Math.round(dataPoints / 3);
         const projections = [];
         let drift = 0;
-        if (houseView === 'BULLISH') drift = 1.0;
-        if (houseView === 'BEARISH') drift = -1.0;
+        if (houseView === 'BULLISH') drift = 0.5;
+        if (houseView === 'BEARISH') drift = -0.5;
 
         let current = lastVal;
         for(let i=0; i<projectionSteps; i++) {
@@ -242,7 +288,7 @@ class MarketMayhemController {
 
     generateSentimentHistory(points) {
         // Try to build from real data if available
-        if (!this.data.archive) return Array.from({length: points}, () => 50);
+        if (!this.data.archive || this.data.archive.length === 0) return Array.from({length: points}, () => 50);
 
         // Sort archive by date ascending
         const sorted = [...this.data.archive]
@@ -253,14 +299,18 @@ class MarketMayhemController {
 
         // Take the last N points or interpolate
         const result = [];
-        const step = Math.max(1, Math.floor(sorted.length / points));
-
-        for (let i = 0; i < sorted.length; i += step) {
-            result.push(sorted[i].sentiment_score);
+        
+        // Simple downsampling or picking logic
+        if (sorted.length <= points) {
+            return sorted.map(i => i.sentiment_score);
+        } else {
+             const step = Math.floor(sorted.length / points);
+             for(let i=0; i<points; i++) {
+                 const index = Math.min(i * step, sorted.length - 1);
+                 result.push(sorted[index].sentiment_score);
+             }
+             return result;
         }
-
-        // Pad or Trim
-        return result.slice(-points);
     }
 
     // --- Featured Section ---
@@ -268,11 +318,11 @@ class MarketMayhemController {
     renderFeatured() {
         if (!this.data.archive) return;
 
-        // Rank by (Quality + Conviction + Sentiment)
+        // Rank by (Quality + Conviction + Sentiment Variance)
         const featured = this.data.archive
             .map(item => ({
                 ...item,
-                score: (item.quality || 0) + (item.conviction || 0) + (Math.abs(item.sentiment_score - 50))
+                score: (item.quality || 0) + (item.conviction || 0) + (Math.abs((item.sentiment_score || 50) - 50))
             }))
             .sort((a, b) => b.score - a.score)
             .slice(0, 3);
@@ -280,12 +330,12 @@ class MarketMayhemController {
         this.dom.featuredGrid.innerHTML = featured.map(item => `
             <div class="featured-card" onclick="window.controller.openModal('${item.filename}')">
                 <span class="featured-badge">TOP INTEL</span>
-                <div style="font-size:0.9rem; font-weight:bold; margin-bottom:5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                <div style="font-size:0.9rem; font-weight:bold; margin-bottom:5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color: #fff;">
                     ${item.title}
                 </div>
                 <div style="font-size:0.7rem; color:#888; display:flex; justify-content:space-between;">
-                    <span>${item.date}</span>
-                    <span style="color:var(--accent-green);">CONV: ${item.conviction}%</span>
+                    <span class="mono">${item.date}</span>
+                    <span style="color:var(--secondary-color);">CONV: ${item.conviction}%</span>
                 </div>
             </div>
         `).join('');
@@ -308,7 +358,7 @@ class MarketMayhemController {
         const sortedTags = Object.keys(counts)
             .map(key => ({ text: key, count: counts[key] }))
             .sort((a, b) => b.count - a.count)
-            .slice(0, 15);
+            .slice(0, 20);
 
         this.dom.semanticCloud.innerHTML = sortedTags.map(tag => `
             <span class="tag" onclick="document.getElementById('searchInput').value='${tag.text}'; window.applyFilters();">
@@ -329,14 +379,16 @@ class MarketMayhemController {
 
             el.dataset.year = item.date ? item.date.substring(0, 4) : 'HISTORICAL';
             el.dataset.type = item.type || 'NEWSLETTER';
-            el.dataset.title = item.title;
+            el.dataset.title = item.title ? item.title.toLowerCase() : '';
+            el.dataset.keywords = item.entities && item.entities.keywords ? item.entities.keywords.join(' ').toLowerCase() : '';
+            el.dataset.date = item.date;
             el.dataset.conviction = item.conviction || 0;
             el.dataset.sentiment = item.sentiment_score || 50;
 
-            const sentimentColor = item.sentiment_score > 60 ? 'var(--accent-green)' : (item.sentiment_score < 40 ? 'var(--accent-red)' : '#888');
+            const sentimentColor = (item.sentiment_score || 50) > 60 ? 'var(--secondary-color)' : ((item.sentiment_score || 50) < 40 ? 'var(--danger-color)' : '#888');
 
             el.innerHTML = `
-                <div style="flex-grow: 1;" onclick="window.controller.openModal('${item.filename}')">
+                <div style="flex-grow: 1; cursor: pointer;" onclick="window.controller.openModal('${item.filename}')">
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">${item.date || 'Unknown'}</span>
                         <span class="type-badge">${item.type || 'ARCHIVE'}</span>
@@ -364,7 +416,7 @@ class MarketMayhemController {
         // Populate Main Content
         const modalMain = document.getElementById('modalMain');
         modalMain.innerHTML = `
-            <h2 style="margin-top:0; color:var(--accent-blue);">${report.title}</h2>
+            <h2 style="margin-top:0; color:var(--primary-color); font-family: 'JetBrains Mono';">${report.title}</h2>
             <div style="margin-bottom:20px; border-bottom:1px solid #333; padding-bottom:10px; font-family:var(--font-mono); font-size:0.8rem; color:#666;">
                 DATE: ${report.date} | AGENT: ${report.type} | HASH: ${report.provenance_hash ? report.provenance_hash.substring(0,12) : 'N/A'}...
             </div>
@@ -393,8 +445,8 @@ class MarketMayhemController {
         `;
 
         document.getElementById('modalCritique').innerHTML = `
-            <div style="margin-bottom:10px;"><strong>VERDICT:</strong> ${(report.conviction || 0) > 75 ? 'HIGH CONVICTION' : 'REVIEW REQUIRED'}</div>
-            <div style="font-size:0.75rem; margin-bottom: 10px;">${report.critique || 'System 2 analysis pending...'}</div>
+            <div style="margin-bottom:10px; color: #fff;"><strong>VERDICT:</strong> ${(report.conviction || 0) > 75 ? 'HIGH CONVICTION' : 'REVIEW REQUIRED'}</div>
+            <div style="font-size:0.75rem; margin-bottom: 10px; color: #aaa;">${report.critique || 'System 2 analysis pending...'}</div>
             ${gaugesHTML}
         `;
 
@@ -404,9 +456,9 @@ class MarketMayhemController {
         // Metadata
         const metaHTML = `
             <div style="margin-top:20px;">
-                <h4 style="color:#888; font-size:0.8rem;">ENTITIES</h4>
-                <div style="display:flex; flex-wrap:wrap; gap:5px;">
-                    ${report.entities && report.entities.keywords ? report.entities.keywords.map(k => `<span class="tag">${k}</span>`).join('') : ''}
+                <h4 style="color:#888; font-size:0.8rem; border-bottom: 1px solid #444; padding-bottom:5px;">ENTITIES</h4>
+                <div style="display:flex; flex-wrap:wrap; gap:5px; margin-top: 10px;">
+                    ${report.entities && report.entities.keywords ? report.entities.keywords.map(k => `<span class="tag">${k}</span>`).join('') : '<span style="color:#666; font-size:0.7rem;">None Detected</span>'}
                 </div>
             </div>
         `;
@@ -439,7 +491,7 @@ class MarketMayhemController {
             this.state.alphaChartInstance = new Chart(ctx, {
                 type: 'line',
                 data: { labels: ['Start', 'End'], datasets: [] },
-                options: { plugins: { legend: { display: false } } }
+                options: { plugins: { legend: { display: false } }, scales: { x: { display:false }, y: { display:false } } }
             });
             return;
         }
@@ -465,7 +517,7 @@ class MarketMayhemController {
         const color = returnPct >= 0 ? '#0aff60' : '#ff3333';
 
         document.getElementById('alphaStats').innerHTML = `
-            ${primaryTicker}: <span style="color:${color}">${returnPct > 0 ? '+' : ''}${returnPct}%</span> (30d Realized)
+            <span style="color: #fff; font-weight: bold;">${primaryTicker}</span>: <span style="color:${color}">${returnPct > 0 ? '+' : ''}${returnPct}%</span> (30d Realized)
         `;
 
         this.state.alphaChartInstance = new Chart(ctx, {
@@ -487,7 +539,13 @@ class MarketMayhemController {
                 plugins: { legend: { display: false } },
                 scales: {
                     x: { display: false },
-                    y: { display: false } // Sparkline style
+                    y: { 
+                        display: false,
+                        grid: { display: false } 
+                    } 
+                },
+                elements: {
+                    point: { radius: 0 }
                 }
             }
         });
@@ -527,11 +585,11 @@ class MarketMayhemController {
 
             // Sort
             items.sort((a, b) => {
-                if (sortValue === 'newest') return b.dataset.year.localeCompare(a.dataset.year);
-                if (sortValue === 'oldest') return a.dataset.year.localeCompare(b.dataset.year);
+                if (sortValue === 'newest') return b.dataset.date.localeCompare(a.dataset.date);
+                if (sortValue === 'oldest') return a.dataset.date.localeCompare(b.dataset.date);
                 // For conviction/sentiment, handle descending
-                if (sortValue === 'conviction') return (b.dataset.conviction || 0) - (a.dataset.conviction || 0);
-                if (sortValue === 'sentiment') return (b.dataset.sentiment || 0) - (a.dataset.sentiment || 0);
+                if (sortValue === 'conviction') return (parseInt(b.dataset.conviction) || 0) - (parseInt(a.dataset.conviction) || 0);
+                if (sortValue === 'sentiment') return (parseInt(b.dataset.sentiment) || 0) - (parseInt(a.dataset.sentiment) || 0);
                 return 0;
             });
 
@@ -542,11 +600,17 @@ class MarketMayhemController {
             items.forEach(item => {
                 const itemType = item.dataset.type;
                 const itemYear = item.dataset.year;
-                const itemTitle = item.dataset.title.toLowerCase();
+                const itemTitle = item.dataset.title;
+                const itemKeywords = item.dataset.keywords;
 
-                let matchSearch = itemTitle.includes(search);
+                let matchSearch = itemTitle.includes(search) || itemKeywords.includes(search);
                 let matchType = typeValue === 'all' || itemType === typeValue;
                 let matchYear = yearValue === 'all' || itemYear === yearValue;
+
+                // Handle Historical Special Case
+                if (yearValue === 'HISTORICAL' && itemYear === 'HISTORICAL') {
+                    matchYear = true;
+                }
 
                 item.style.display = (matchSearch && matchType && matchYear) ? 'flex' : 'none';
             });
