@@ -516,7 +516,7 @@ class MarketMayhemController {
             
             const yearSelect = document.getElementById('yearFilter');
             const typeSelect = document.getElementById('typeFilter');
-            const sortSelect = document.getElementById('sortOrder');
+            const sortSelect = document.getElementById('sortFilter');
 
             const yearValue = yearSelect ? yearSelect.value : 'all';
             const typeValue = typeSelect ? typeSelect.value : 'all';
@@ -553,7 +553,7 @@ class MarketMayhemController {
         };
 
         // Attach listeners to selects
-        ['yearFilter', 'typeFilter', 'sortOrder', 'searchInput'].forEach(id => {
+        ['yearFilter', 'typeFilter', 'sortFilter', 'searchInput'].forEach(id => {
             const el = document.getElementById(id);
             if (el) {
                 el.addEventListener(id === 'searchInput' ? 'input' : 'change', window.applyFilters);
