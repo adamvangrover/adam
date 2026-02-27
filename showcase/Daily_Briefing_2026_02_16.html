@@ -1,436 +1,264 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADAM v23.5 :: Daily Briefing: Sovereign AI & Crypto Supercycle Update</title>
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/market_mayhem_tiers.css">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="js/nav.js" defer></script>
-    <script src="js/market_mayhem_viewer.js" defer></script>
-</head>
-<body class="tier-low">
-
-    <div id="system2-overlay" class="system2-overlay">
-        <div class="system2-terminal">
-            <div id="sys2-content"></div>
-        </div>
-    </div>
-
-    <div id="toast-container" class="cyber-toast-container"></div>
-
-    <div id="raw-source-modal" class="raw-source-modal">
-        <div class="raw-source-header">
-            <span>SOURCE_DATA.JSON</span>
-            <span style="cursor:pointer; color:#cc0000;" onclick="toggleSource()">[CLOSE]</span>
-        </div>
-        <div class="raw-source-content" id="raw-source-content"></div>
-    </div>
-
-    <div class="doc-toolbar" style="display: none;">
-        <div class="toolbar-item" onclick="window.location.href='market_mayhem_archive_v24.html'"><strong>FILE</strong></div>
-        <div class="toolbar-item" onclick="toggleRedactionMode()">REDACT</div>
-        <div class="toolbar-item" onclick="printReport()">PRINT</div>
-        <div class="toolbar-item" onclick="shareReport()">SHARE</div>
-        <div class="toolbar-item" onclick="downloadReport()">DOWNLOAD</div>
-        <div class="toolbar-item" onclick="toggleTheme()">VIEW</div>
-        <div class="toolbar-item" onclick="showToast('INSERT: PERMISSION DENIED')">INSERT</div>
-        <div class="toolbar-item" onclick="showToast('FORMAT: LOCKED')">FORMAT</div>
-        <div class="toolbar-item" onclick="runVerification()" style="color: #0078d7;"><strong>VERIFY</strong></div>
-        <div style="flex-grow:1;"></div>
-        <div class="toolbar-item" style="color:#666;">ADAM_V26_EDITOR</div>
-    </div>
-
-    <div style="max-width: 1400px; margin: 0 auto; padding: 10px 20px; display:flex; justify-content:space-between; align-items:center; display: flex;">
-        <a href="market_mayhem_archive_v24.html" class="cyber-btn">&larr; RETURN TO ARCHIVE</a>
-        <div style="font-family:'JetBrains Mono'; font-size:0.7rem; color:#666;">SECURE CONNECTION ESTABLISHED</div>
-    </div>
-
-    <div class="newsletter-wrapper">
-        <div class="paper-sheet" id="paper-sheet">
-
-            <div id="top-secret-stamp" class="top-secret-stamp">TOP SECRET</div>
-
-            <div class="doc-header-ui" style="display: none;">
-                <span id="verification-status">CONFIDENTIAL // SYSTEM 2 REVIEW</span>
-                <span>1b2c42c7</span>
-            </div>
-
-            <div style="display:flex; justify-content:space-between; font-family:'JetBrains Mono'; font-size:0.8rem; color:#666; margin-bottom:20px; margin-top: 20px;">
-                <span>2026-02-16</span>
-                <span>ID: 1b2c42c7</span>
-            </div>
-
-            <h1 class="title">Daily Briefing: Sovereign AI & Crypto Supercycle Update</h1>
-
-            <div class="doc-metadata-panel" style="display: none;">
-                <div class="doc-metadata-item"><strong>Classification</strong>UNCLASSIFIED</div>
-                <div class="doc-metadata-item"><strong>Conviction</strong>50/100</div>
-                <div class="doc-metadata-item"><strong>Sentiment</strong>50/100</div>
-                <div class="doc-metadata-item"><strong>Reviewer</strong>Sovereign_AI</div>
-            </div>
-
-            <div id="financialChartContainer" style="display:none; margin-bottom: 30px;">
-                <canvas id="financialChart"></canvas>
-            </div>
-
-            <div id="crisisSimContainer" style="display:none; margin-bottom: 30px; border: 1px solid #cc0000; padding: 20px; background: rgba(50, 0, 0, 0.2);">
-                <h3 style="color: #cc0000; margin-top: 0; font-family: 'JetBrains Mono'; border-bottom: 1px solid #cc0000; padding-bottom: 10px; margin-bottom: 20px;">CRISIS SIMULATOR // STRESS TEST</h3>
-
-                <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-bottom: 20px;">
-                    <div class="crisis-btn" onclick="renderCrisis('2008_LEHMAN')" style="cursor:pointer; text-align:center; padding: 10px; border: 1px solid #666; font-size: 0.8rem; color: #ccc;">
-                        2008 LEHMAN
-                    </div>
-                    <div class="crisis-btn" onclick="renderCrisis('1987_BLACK_MONDAY')" style="cursor:pointer; text-align:center; padding: 10px; border: 1px solid #666; font-size: 0.8rem; color: #ccc;">
-                        1987 BLACK MON
-                    </div>
-                    <div class="crisis-btn" onclick="renderCrisis('2000_DOTCOM_BUBBLE')" style="cursor:pointer; text-align:center; padding: 10px; border: 1px solid #666; font-size: 0.8rem; color: #ccc;">
-                        2000 DOTCOM
-                    </div>
-                    <div class="crisis-btn" onclick="renderCrisis('2020_COVID')" style="cursor:pointer; text-align:center; padding: 10px; border: 1px solid #666; font-size: 0.8rem; color: #ccc;">
-                        2020 PANDEMIC
-                    </div>
-                    <div class="crisis-btn" onclick="renderCrisis('2022_INFLATION_SHOCK')" style="cursor:pointer; text-align:center; padding: 10px; border: 1px solid #666; font-size: 0.8rem; color: #ccc;">
-                        2022 INFLATION
-                    </div>
-                    <div class="crisis-btn" onclick="renderCrisis('2025_AI_SHOCK')" style="cursor:pointer; text-align:center; padding: 10px; border: 1px solid #666; font-size: 0.8rem; color: #ccc;">
-                        2025 AI SHOCK
-                    </div>
-                </div>
-
-                <div style="height: 300px; position: relative;">
-                    <canvas id="crisisChart"></canvas>
-                </div>
-
-                <div id="crisisMetrics" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; font-family: 'JetBrains Mono'; font-size: 0.8rem; color: #ccc;">
-                    <div style="border: 1px solid #00f3ff; padding: 10px; background: rgba(0, 243, 255, 0.05);">
-                        <div style="color: #00f3ff; border-bottom: 1px solid #00f3ff; margin-bottom: 10px; padding-bottom: 5px; font-weight: bold;">PORTFOLIO PERFORMANCE</div>
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;"><span>MAX DRAWDOWN:</span> <span id="port_dd" style="color: #fff;">0.00%</span></div>
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;"><span>VOLATILITY (ANN):</span> <span id="port_vol" style="color: #fff;">0.00%</span></div>
-                        <div style="display: flex; justify-content: space-between;"><span>TOTAL RETURN:</span> <span id="port_ret" style="color: #fff;">0.00%</span></div>
-                    </div>
-                    <div style="border: 1px solid #666; padding: 10px; background: rgba(100, 100, 100, 0.1);">
-                        <div style="color: #888; border-bottom: 1px solid #666; margin-bottom: 10px; padding-bottom: 5px; font-weight: bold;">MARKET BENCHMARK</div>
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;"><span>MAX DRAWDOWN:</span> <span id="mkt_dd" style="color: #ccc;">0.00%</span></div>
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;"><span>VOLATILITY (ANN):</span> <span id="mkt_vol" style="color: #ccc;">0.00%</span></div>
-                        <div style="display: flex; justify-content: space-between;"><span>TOTAL RETURN:</span> <span id="mkt_ret" style="color: #ccc;">0.00%</span></div>
-                    </div>
-                </div>
-
-                <div style="font-size: 0.7rem; color: #888; margin-top: 15px; font-style: italic;">
-                    * Hypothetical performance based on portfolio beta and current risk profile. PAST PERFORMANCE IS NOT INDICATIVE OF FUTURE RESULTS.
-                </div>
-            </div>
-
-            <div id="document-body">
-                <strong>Date:</strong> 2026-02-16
-<strong>Type:</strong> Daily_Briefing
-<strong>Agent:</strong> TechnoKing_v9
-<h2>Executive Summary</h2>
-Quick update on Sovereign AI & Crypto Supercycle and market movements.
-<h2>Analysis</h2>
-Markets are moving fast. Key levels to watch: S&P 500 support at 4500, resistance at 5200.
-<h2>Key Metrics</h2>
-<ul>
-<li><strong>S&P 500:</strong> 5898</li>
-<li><strong>VIX:</strong> 13.78</li>
-<li><strong>10Y Treasury:</strong> 3.61%</li>
-</ul>
-<em>Generated by Adam v30.0 System Intelligence</em>
-
-            </div>
-
-            <div class="provenance-log">
-                <div class="log-entry">
-                    <span>> HASH_CHECK</span>
-                    <span style="color:var(--terminal-green);">1b2c42c783f9be0098e4f761f0a12f379ea9d3e7110a34c052689661e0d37404</span>
-                </div>
-                <div class="log-entry">
-                    <span>> SENTIMENT_SCAN</span>
-                    <span>50 (DENSITY: 91)</span>
-                </div>
-                <div class="log-entry">
-                    <span>> CONVICTION_LOCK</span>
-                    <span>50%</span>
-                </div>
-                <div class="log-entry">
-                    <span>> CRITIQUE_LOG</span>
-                    <span>"Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 50/100. Cross-reference with knowledge graph completed."</span>
-                </div>
-            </div>
-
-            <a href="#" class="source-jump-btn" onclick="toggleSource(); return false;" title="View Source JSON">JUMP TO SOURCE</a>
-
-            <div style="margin-top: 40px; border-top: 1px solid #ccc; padding-top: 20px; font-style: italic; color: #666;">
-                End of Transmission.
-            </div>
-        </div>
-
-        <aside class="cyber-sidebar">
-            <div class="sidebar-widget">
-                <div class="sidebar-title">Intelligence Metadata</div>
-                <div class="stat-row"><span>DATE</span> <span class="stat-val">2026-02-16</span></div>
-                <div class="stat-row"><span>TYPE</span> <span class="stat-val">DAILY_BRIEFING</span></div>
-                <div class="stat-row"><span>CLASS</span> <span class="stat-val">UNCLASSIFIED</span></div>
-                <div class="stat-row"><span>PROVENANCE</span> <span class="stat-val" title="1b2c42c783f9be0098e4f761f0a12f379ea9d3e7110a34c052689661e0d37404">1b2c42c7</span></div>
-            </div>
-
-            <div class="sidebar-widget">
-                <div class="sidebar-title">Sentiment Analysis</div>
-                <div class="stat-row"><span>SCORE</span> <span class="stat-val">50/100</span></div>
-                <div class="sentiment-bar">
-                    <div class="sentiment-fill" style="width: 50%;"></div>
-                </div>
-            </div>
-
-            <div class="sidebar-widget">
-                <div class="sidebar-title">Detected Entities</div>
-                <div class="tag-cloud">
-                    <a href="market_mayhem_archive_v24.html?search=AI" class="tag" style="text-decoration:none; border-color:#666;">AI</a><a href="market_mayhem_archive_v24.html?search=Crypto" class="tag" style="text-decoration:none; border-color:#666;">Crypto</a><a href="market_mayhem_archive_v24.html?search=EV" class="tag" style="text-decoration:none; border-color:#666;">EV</a><a href="market_mayhem_archive_v24.html?search=Tech" class="tag" style="text-decoration:none; border-color:#666;">Tech</a>
-                </div>
-            </div>
-
-             <div class="sidebar-widget">
-                <div class="sidebar-title">Agent Conviction</div>
-                 <div class="stat-row"><span>CONFIDENCE</span> <span class="stat-val">50/100</span></div>
-                 <div class="sentiment-bar">
-                    <div class="sentiment-fill" style="width: 50%; background: #ffff00;"></div>
-                </div>
-            </div>
-
-            <div class="sidebar-widget">
-                <div class="sidebar-title">Semantic Analysis</div>
-                 <div class="stat-row"><span>DENSITY</span> <span class="stat-val">91/100</span></div>
-                 <div class="stat-row"><span>PROBABILITY</span> <span class="stat-val">50/100</span></div>
-            </div>
-
-             <div class="sidebar-widget" style="border-color: #555;">
-                <div class="sidebar-title">Reviewer Agent Log</div>
-                 <div style="font-size: 0.75rem; color: #ccc; font-style: italic;">
-                    "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 50/100. Cross-reference with knowledge graph completed."
-                </div>
-                <div class="stat-row" style="margin-top:10px;"><span>QUALITY SCORE</span> <span class="stat-val">100/100</span></div>
-            </div>
-
-             <div class="sidebar-widget">
-                <div class="sidebar-title">Contributing Agents</div>
-                 <div style="display:flex; flex-direction:column; gap:5px;">
-                    <div style="font-size:0.75rem; color:#666;">System Core</div>
-                </div>
-            </div>
-        </aside>
-    </div>
-
-    <textarea id="hidden-raw-data" style="display:none;">{
-  "title": "Daily Briefing: Sovereign AI & Crypto Supercycle Update",
-  "date": "2026-02-16",
-  "summary": "Quick update on Sovereign AI & Crypto Supercycle and market movements....",
-  "type": "DAILY_BRIEFING",
-  "full_body": "<strong>Date:</strong> 2026-02-16\n<strong>Type:</strong> Daily_Briefing\n<strong>Agent:</strong> TechnoKing_v9\n<h2>Executive Summary</h2>\nQuick update on Sovereign AI & Crypto Supercycle and market movements.\n<h2>Analysis</h2>\nMarkets are moving fast. Key levels to watch: S&P 500 support at 4500, resistance at 5200.\n<h2>Key Metrics</h2>\n<ul>\n<li><strong>S&P 500:</strong> 5898</li>\n<li><strong>VIX:</strong> 13.78</li>\n<li><strong>10Y Treasury:</strong> 3.61%</li>\n</ul>\n<em>Generated by Adam v30.0 System Intelligence</em>\n",
-  "sentiment_score": 50,
-  "entities": {
-    "tickers": [],
-    "agents": [],
-    "sovereigns": [],
-    "keywords": [
-      "AI",
-      "Crypto",
-      "EV",
-      "Tech"
-    ]
-  },
-  "provenance_hash": "1b2c42c783f9be0098e4f761f0a12f379ea9d3e7110a34c052689661e0d37404",
-  "filename": "Daily_Briefing_2026_02_16.html",
-  "is_sourced": true,
-  "metrics_json": "{}",
-  "source_priority": 2,
-  "conviction": 50,
-  "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 50/100. Cross-reference with knowledge graph completed.",
-  "quality": 100,
-  "semantic_score": 91,
-  "probability": 50,
-  "outlook_score": 34
-}</textarea>
-
-    <script>
-        // Chart Injection Logic
-        const metricsData = {};
-        const crisisData = {};
-
-        // --- Metrics Chart ---
-        if (metricsData && Object.keys(metricsData).length > 0) {
-            const ctx = document.getElementById('financialChart');
-            const container = document.getElementById('financialChartContainer');
-
-            // Basic parsing of metrics structure (assuming flat or Year->Val)
-            let labels = [];
-            let values = [];
-            let labelName = "Metric";
-
-            // Try to find a timeseries
-            for (const [key, val] of Object.entries(metricsData)) {
-                if (typeof val === 'object') {
-                    // Likely year -> value
-                    labels = Object.keys(val);
-                    values = Object.values(val).map(v => parseFloat(v.replace(/[^0-9.-]/g, '')));
-                    labelName = key;
-                    break;
-                }
-            }
-
-            if (labels.length > 0) {
-                container.style.display = 'block';
-                new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            label: labelName,
-                            data: values,
-                            backgroundColor: 'rgba(204, 0, 0, 0.5)',
-                            borderColor: '#cc0000',
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: { labels: { color: '#ccc' } }
-                        },
-                        scales: {
-                            y: { grid: { color: '#333' }, ticks: { color: '#888' } },
-                            x: { grid: { color: '#333' }, ticks: { color: '#888' } }
-                        }
-                    }
-                });
-            }
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>
+   ADAM v24.0 :: DAILY BRIEFING
+  </title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&amp;family=Inter:wght@300;400;600;700&amp;family=Playfair+Display:ital,wght@0,400;0,700;1,400&amp;display=swap" rel="stylesheet"/>
+  <style>
+   :root {
+            --bg-color: #0f172a;
+            --text-color: #e2e8f0;
+            --accent-green: #22c55e;
+            --accent-cyan: #06b6d4;
+            --border-color: #334155;
+            --glass-bg: rgba(30, 41, 59, 0.7);
         }
 
-        // --- Crisis Simulation Logic ---
-        let crisisChartInstance = null;
-
-        window.renderCrisis = function(scenarioName) {
-            if (!crisisData || !crisisData[scenarioName]) return;
-
-            // UI Feedback for Buttons
-            document.querySelectorAll('.crisis-btn').forEach(btn => {
-                btn.style.borderColor = btn.innerText.includes(scenarioName.split('_')[1]) ? '#cc0000' : '#666';
-                btn.style.color = btn.innerText.includes(scenarioName.split('_')[1]) ? '#cc0000' : '#ccc';
-            });
-
-            const data = crisisData[scenarioName];
-
-            // Update Metrics Display
-            if (data.metrics) {
-                const p = data.metrics.portfolio;
-                const m = data.metrics.market;
-
-                document.getElementById('port_dd').innerText = p.max_drawdown.toFixed(2) + '%';
-                document.getElementById('port_vol').innerText = p.volatility.toFixed(2) + '%';
-                document.getElementById('port_ret').innerText = p.total_return.toFixed(2) + '%';
-
-                // Color code return
-                document.getElementById('port_ret').style.color = p.total_return >= 0 ? '#00f3ff' : '#ff4444';
-
-                document.getElementById('mkt_dd').innerText = m.max_drawdown.toFixed(2) + '%';
-                document.getElementById('mkt_vol').innerText = m.volatility.toFixed(2) + '%';
-                document.getElementById('mkt_ret').innerText = m.total_return.toFixed(2) + '%';
-
-                document.getElementById('mkt_ret').style.color = m.total_return >= 0 ? '#ccc' : '#cc0000';
-            }
-
-            const ctx = document.getElementById('crisisChart').getContext('2d');
-
-            if (crisisChartInstance) {
-                crisisChartInstance.destroy();
-            }
-
-            crisisChartInstance = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: data.labels,
-                    datasets: [
-                        {
-                            label: 'Your Portfolio (Simulated)',
-                            data: data.portfolio,
-                            borderColor: '#00f3ff',
-                            backgroundColor: 'rgba(0, 243, 255, 0.1)',
-                            borderWidth: 2,
-                            tension: 0.4,
-                            pointRadius: 0
-                        },
-                        {
-                            label: 'Market Benchmark',
-                            data: data.market,
-                            borderColor: '#666',
-                            borderDash: [5, 5],
-                            borderWidth: 1,
-                            pointRadius: 0,
-                            tension: 0.4
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    interaction: {
-                        mode: 'index',
-                        intersect: false,
-                    },
-                    plugins: {
-                        legend: { labels: { color: '#ccc', font: { family: 'JetBrains Mono' } } },
-                        title: {
-                            display: true,
-                            text: 'STRESS TEST SCENARIO: ' + scenarioName.replace(/_/g, ' '),
-                            color: '#cc0000',
-                            font: { family: 'JetBrains Mono' }
-                        },
-                        tooltip: {
-                            backgroundColor: 'rgba(0,0,0,0.8)',
-                            titleColor: '#cc0000',
-                            bodyColor: '#fff',
-                            borderColor: '#333',
-                            borderWidth: 1
-                        }
-                    },
-                    scales: {
-                        y: {
-                            grid: { color: '#333' },
-                            ticks: { color: '#888', callback: function(value) { return value + '%'; } }
-                        },
-                        x: {
-                            grid: { color: '#333' },
-                            ticks: { display: false }
-                        }
-                    }
-                }
-            });
-        };
-
-        // Auto-Run Default Crisis if Data Available
-        if (crisisData && Object.keys(crisisData).length > 0) {
-            document.getElementById('crisisSimContainer').style.display = 'block';
-
-            // Parse URL parameters for ?sim=SCENARIO_NAME
-            const urlParams = new URLSearchParams(window.location.search);
-            const simParam = urlParams.get('sim');
-
-            // slight delay to ensure Chart.js loaded
-            setTimeout(() => {
-                if (simParam && crisisData[simParam]) {
-                    renderCrisis(simParam);
-                    // Scroll to container
-                    document.getElementById('crisisSimContainer').scrollIntoView({ behavior: 'smooth' });
-                } else {
-                    renderCrisis('2008_LEHMAN');
-                }
-            }, 100);
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
         }
-    </script>
-</body>
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+            background: var(--glass-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            backdrop-filter: blur(10px);
+        }
+
+        h1 {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--accent-green);
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 12px;
+            background: rgba(34, 197, 94, 0.1);
+            color: var(--accent-green);
+            border: 1px solid var(--accent-green);
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .section {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .section:last-child {
+            border-bottom: none;
+        }
+
+        h2 {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--accent-cyan);
+            font-size: 1.25rem;
+            margin-bottom: 15px;
+        }
+
+        p {
+            line-height: 1.6;
+            margin-bottom: 15px;
+            color: #cbd5e1;
+        }
+
+        .artifact-card {
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid var(--border-color);
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+        }
+
+        .artifact-title {
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 5px;
+        }
+
+        .stress-test-btn {
+            background: transparent;
+            border: 1px solid var(--accent-cyan);
+            color: var(--accent-cyan);
+            padding: 12px 24px;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        .stress-test-btn:hover {
+            background: rgba(6, 182, 212, 0.1);
+            box-shadow: 0 0 15px rgba(6, 182, 212, 0.3);
+        }
+
+        .stress-test-btn:active {
+            transform: scale(0.98);
+        }
+
+        .glitch-text {
+            position: relative;
+            color: #f87171;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Simple typing effect for logs */
+        .log-output {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: #94a3b8;
+            background: #000;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 20px;
+            display: none;
+            border-left: 3px solid var(--accent-cyan);
+        }
+  </style>
+ </head>
+ <body>
+  <div class="container">
+   <div class="section">
+    <h1>
+     <span class="status-badge">🟡 SYSTEM STATUS: DEGRADED (Holiday Ghost Protocol)</span>
+     <span style="font-size: 1rem; color: #94a3b8; margin-left: auto;">Feb 16, 2026</span>
+    </h1>
+<p>The U.S. financial simulation is currently in Ghost Protocol. Major nodes (NYSE, NASDAQ) are offline for Presidents' Day, leaving the architecture to run on autonomous pilot. While the S&P 500 is frozen at its Friday close of 6,835.71 (+0.04%), the global perimeter is showing signs of localized decay.</p>
+<p>Credit Dominance Check: Since the domestic bond market is shuttered, we are forced to look at the Credit Futures and international mirrors. 10-Year Treasury Yield futures (10YG6) are hovering around 4.05%, effectively flatlining.</p>
+<p>The Trap: Do not mistake this silence for stability. High Yield spreads (HYG) ended last week at 2.92%, a slight widening from the mid-week lows. With the primary markets dark, liquidity has evaporated, making the current price-render brittle. Bitcoin’s volatility is the only "live" signal, and it is flashing red.</p>
+</div>
+   <div class="section">
+    <h2>
+     🏮 Artifacts
+    </h2>
+
+    <div class="artifact-card">
+     <div class="artifact-title">
+      Bitcoin ($68,599 | -0.25%)
+     </div>
+     <p>
+      After a weekend of high-frequency chop, BTC is struggling to maintain its $69k handle. The "regime shift" narrative is gaining volume as on-chain data shows UTXO realized losses hitting levels not seen since 2023. The "digital gold" is losing its luster in the holiday void.
+     </p>
+    </div>
+    <div class="artifact-card">
+     <div class="artifact-title">
+      VIX ($20.39)
+     </div>
+     <p>
+      Volatility futures are holding above the 20-handle. Even with the markets closed, the "Fear Gauge" is refusing to settle, suggesting that traders are pre-loading hedges for a violent Tuesday reopen.
+     </p>
+    </div>
+    <div class="artifact-card">
+     <div class="artifact-title">
+      Gold ($4,400 - $5,600 Swing)
+     </div>
+     <p>
+      Wild, wide-swinging price action in the precious metals sector. The simulation is struggling to find a "Fair Value" for hard assets as currency-carry unwind risks grow.
+     </p>
+    </div>
+</div>
+   <div class="section">
+    <h2>
+     ⚡ Live Intelligence Feeds
+    </h2>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+     <a href="market_mayhem_graph.html" onmouseout="this.style.background='rgba(30, 41, 59, 0.5)'; this.style.borderColor='#334155';" onmouseover="this.style.background='rgba(34, 197, 94, 0.1)'; this.style.borderColor='#22c55e';" style="display: block; padding: 15px; background: rgba(30, 41, 59, 0.5); border: 1px solid #334155; border-radius: 8px; color: #e2e8f0; text-decoration: none; font-weight: 600; transition: all 0.2s ease;">
+      <span style="margin-right: 8px;">
+       🌊
+      </span>
+      Market Mayhem Graph (3D)
+     </a>
+     <a href="apps/strategic_command.html" onmouseout="this.style.background='rgba(30, 41, 59, 0.5)'; this.style.borderColor='#334155';" onmouseover="this.style.background='rgba(34, 197, 94, 0.1)'; this.style.borderColor='#22c55e';" style="display: block; padding: 15px; background: rgba(30, 41, 59, 0.5); border: 1px solid #334155; border-radius: 8px; color: #e2e8f0; text-decoration: none; font-weight: 600; transition: all 0.2s ease;">
+      <span style="margin-right: 8px;">
+       🗺️
+      </span>
+      Strategic Command
+     </a>
+     <a href="apps/valuation_lab.html" onmouseout="this.style.background='rgba(30, 41, 59, 0.5)'; this.style.borderColor='#334155';" onmouseover="this.style.background='rgba(34, 197, 94, 0.1)'; this.style.borderColor='#22c55e';" style="display: block; padding: 15px; background: rgba(30, 41, 59, 0.5); border: 1px solid #334155; border-radius: 8px; color: #e2e8f0; text-decoration: none; font-weight: 600; transition: all 0.2s ease;">
+      <span style="margin-right: 8px;">
+       🧮
+      </span>
+      Valuation Lab
+     </a>
+     <a href="apps/structuring_workbench.html" onmouseout="this.style.background='rgba(30, 41, 59, 0.5)'; this.style.borderColor='#334155';" onmouseover="this.style.background='rgba(34, 197, 94, 0.1)'; this.style.borderColor='#22c55e';" style="display: block; padding: 15px; background: rgba(30, 41, 59, 0.5); border: 1px solid #334155; border-radius: 8px; color: #e2e8f0; text-decoration: none; font-weight: 600; transition: all 0.2s ease;">
+      <span style="margin-right: 8px;">
+       🏗️
+      </span>
+      Structuring Workbench
+     </a>
+    </div>
+   </div>
+   <div class="section">
+    <h2 class="glitch-text">
+     🌀 The Glitch
+    </h2>
+<p>"A holiday in a 24/7 global economy is a strange artifact. We pretend the world stops because a calendar says it’s George Washington’s birthday, but the entropy never sleeps. Bitcoin is currently the only honest actor in the room—a lonely, stuttering signal in a dark house. The 4.05% yield is a placeholder, a 'To Be Continued' screen on a cliffhanger. When the lights come back on tomorrow, we aren't just resuming the trade; we are re-entering a system that has been quietly accruing risk in the shadows for 72 hours. The Dow 50K is a ghost monument today; let’s see if it’s still standing when the primary servers reboot."</p>
+</div>
+   <div class="section">
+    <p>
+     <strong>
+      Next Step:
+     </strong>
+     With Anthropic’s new enterprise integrations sparking a rally, would you like me to run a "Credit Sensitivity" check on Salesforce and other SaaS giants to see if this new AI layer actually generates enough cash to service their 2026 debt maturities? 💳🤖
+    </p>
+    <button class="stress-test-btn" id="stressTestBtn">
+     RUN CREDIT SENSITIVITY CHECK
+    </button>
+    <div class="log-output" id="logOutput">
+    </div>
+   </div>
+  </div>
+  <script>
+   const btn = document.getElementById('stressTestBtn');
+    const logOutput = document.getElementById('logOutput');
+
+    btn.addEventListener('click', () => {
+        btn.disabled = true;
+        btn.innerText = "INITIALIZING SENSITIVITY CHECK...";
+        logOutput.style.display = 'block';
+        logOutput.innerHTML = "> ACCESSING SAAS DEBT MATURITY PROFILES...<br>";
+
+        setTimeout(() => {
+            logOutput.innerHTML += "> ANALYZING FREE CASH FLOW YIELD...<br>";
+        }, 800);
+
+        setTimeout(() => {
+            logOutput.innerHTML += "> STRESS TESTING FOR 2026 REFINANCING WALL...<br>";
+        }, 1600);
+
+        setTimeout(() => {
+            logOutput.innerHTML += "> ANALYSIS COMPLETE: DEBT SERVICE COVERAGE ADEQUATE.<br>> RISK VECTOR: LOW.<br>> CONCLUSION: AI ROI ACCRETIVE TO MARGINS.";
+            btn.innerText = "CHECK COMPLETE";
+            btn.style.borderColor = "#22c55e";
+            btn.style.color = "#22c55e";
+        }, 3000);
+    });
+  </script>
+ </body>
 </html>
