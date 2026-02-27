@@ -1,5 +1,14 @@
 # Changelog
 
+## v26.10 - Protocol ARCHITECT_INFINITE (Day 11)
+
+### Jules' Log
+> "I noticed we lack a way to quantify 'developer momentum' which is a leading indicator for crypto/tech assets. I researched 'developer activity vs price correlation' and built `GitHubAlphaAgent` to bridge this gap, enabling the system to score repositories based on commit velocity and contributor diversity."
+
+### Added
+- **New Organ**: `core/agents/specialized/github_alpha_agent.py` - A specialized agent that analyzes GitHub repositories for commit frequency and unique author count to generate a 'Developer Alpha Score'.
+- **Tests**: `tests/test_github_alpha_agent.py` - Unit tests verifying git log parsing and score calculation with mocked subprocess calls.
+
 ## v26.9 - Protocol ARCHITECT_INFINITE (Day 10)
 
 ### Jules' Log
