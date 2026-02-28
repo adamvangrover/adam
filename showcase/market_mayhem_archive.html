@@ -200,23 +200,6 @@
         .type-HISTORICAL { border-left-color: #666; }
         .type-DAILY_BRIEFING { border-left-color: #0aff60; }
 
-        /* Modal */
-        .modal { position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
-        .modal-content { background-color: #050b14; border: 1px solid var(--primary-color); width: 90%; max-width: 1100px; height: 85%; overflow-y: auto; display: flex; box-shadow: 0 0 30px rgba(0, 243, 255, 0.15); }
-        .close-modal { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; position: absolute; top: 15px; right: 20px; z-index: 10; }
-        .close-modal:hover { color: #fff; }
-        .modal-main { flex: 2; padding: 30px; border-right: 1px solid #333; overflow-y: auto; }
-        .modal-sidebar { flex: 1; padding: 30px; background: rgba(0,0,0,0.2); overflow-y: auto; }
-        
-        /* Tags */
-        .tag { display: inline-block; background: #111; border: 1px solid #333; color: #aaa; padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; margin-right: 5px; margin-bottom: 5px; cursor: pointer; transition: all 0.2s; }
-        .tag:hover { border-color: var(--primary-color); color: var(--primary-color); }
-        
-        /* Featured Card */
-        .featured-card { background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(0,0,0,0.2) 100%); border: 1px solid #333; padding: 15px; border-radius: 4px; cursor: pointer; transition: all 0.2s; position: relative; overflow: hidden; }
-        .featured-card:hover { border-color: var(--primary-color); transform: translateY(-3px); }
-        .featured-badge { position: absolute; top: 5px; right: 5px; font-size: 0.6rem; color: #000; background: var(--primary-color); padding: 2px 4px; border-radius: 2px; font-weight: bold; }
-
     </style>
 </head>
 <body>
@@ -239,23 +222,159 @@
     <div class="app-container">
         <!-- Left Sidebar -->
         <aside class="sidebar mono">
+
             <!-- Strategic Command -->
-            <div id="strategicPanel" class="sidebar-panel"></div>
+            <div class="sidebar-panel">
+
+                <div class="sidebar-title">
+                    <span>STRATEGIC COMMAND</span>
+                    <i class="fas fa-chess-king"></i>
+                </div>
+                <div style="margin-bottom: 10px;">
+                    <span style="color: #666; font-size: 0.7rem;">HOUSE VIEW</span>
+                    <div style="font-size: 1.1rem; color: #f59e0b; font-weight: bold;">NEUTRAL</div>
+                </div>
+                <div style="font-size: 0.75rem; line-height: 1.4; color: #ccc;">
+                    🟢 SYSTEM STATUS: NOMINAL (Intraday Patch Successful)
+The Supreme Court struck down emergency tari...
+                </div>
+
+            </div>
 
             <!-- Forward Outlook -->
-            <div id="outlookPanel" class="sidebar-panel"></div>
+            <div class="sidebar-panel">
+
+                <div class="sidebar-title">
+                    <span>FORWARD OUTLOOK</span>
+                    <i class="fas fa-binoculars"></i>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">S&P 500 Target</span>
+                    <span class="metric-val" style="color: #f59e0b;">6,200</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">10Y Yield</span>
+                    <span class="metric-val val-red">4.45%</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">VIX</span>
+                    <span class="metric-val val-green">14.2</span>
+                </div>
+
+            </div>
 
             <!-- Top Conviction -->
-            <div id="convictionPanel" class="sidebar-panel"></div>
+            <div class="sidebar-panel">
+
+                <div class="sidebar-title">
+                    <span>TOP CONVICTION</span>
+                    <i class="fas fa-star"></i>
+                </div>
+
+                <div class="metric-row">
+                    <span class="metric-label">INTC <span style="font-size:0.6rem; color:#555;">Techn</span></span>
+                    <span class="metric-val val-green">35.12</span>
+                </div>
+
+                <div class="metric-row">
+                    <span class="metric-label">PFE <span style="font-size:0.6rem; color:#555;">Healt</span></span>
+                    <span class="metric-val val-green">28.71</span>
+                </div>
+
+                <div class="metric-row">
+                    <span class="metric-label">XOM <span style="font-size:0.6rem; color:#555;">Energ</span></span>
+                    <span class="metric-val val-green">118.73</span>
+                </div>
+
+                <div class="metric-row">
+                    <span class="metric-label">CRM <span style="font-size:0.6rem; color:#555;">Techn</span></span>
+                    <span class="metric-val val-green">307.64</span>
+                </div>
+
+                <div class="metric-row">
+                    <span class="metric-label">COST <span style="font-size:0.6rem; color:#555;">Consu</span></span>
+                    <span class="metric-val val-green">765.75</span>
+                </div>
+
+            </div>
 
             <!-- Watch List -->
-            <div id="watchListPanel" class="sidebar-panel"></div>
+            <div class="sidebar-panel">
+
+                <div class="sidebar-title">
+                    <span>WATCH LIST</span>
+                    <i class="fas fa-eye"></i>
+                </div>
+
+                <div class="metric-row">
+                    <span class="metric-label">ADBE</span>
+                    <span class="metric-val val-red">-2.83%</span>
+                </div>
+
+                <div class="metric-row">
+                    <span class="metric-label">WMT</span>
+                    <span class="metric-val val-red">-2.68%</span>
+                </div>
+
+                <div class="metric-row">
+                    <span class="metric-label">PM</span>
+                    <span class="metric-val val-red">-2.5%</span>
+                </div>
+
+                <div class="metric-row">
+                    <span class="metric-label">PEP</span>
+                    <span class="metric-val val-red">-2.24%</span>
+                </div>
+
+                <div class="metric-row">
+                    <span class="metric-label">JPM</span>
+                    <span class="metric-val val-red">-2.21%</span>
+                </div>
+
+            </div>
 
             <!-- Risk Matrix -->
-            <div id="sectorRiskPanel" class="sidebar-panel"></div>
+            <div class="sidebar-panel">
 
-            <!-- Semantic Cloud -->
-            <div id="semanticCloud" class="sidebar-panel" style="display: flex; flex-wrap: wrap; gap: 5px;"></div>
+                <div class="sidebar-title">
+                    <span>SECTOR RISK</span>
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div class="risk-grid">
+
+                    <div class="risk-cell risk-high">
+                        <div>Cons</div>
+                        <div style="font-size: 1rem; font-weight: bold;">93</div>
+                    </div>
+
+                    <div class="risk-cell risk-high">
+                        <div>Util</div>
+                        <div style="font-size: 1rem; font-weight: bold;">90</div>
+                    </div>
+
+                    <div class="risk-cell risk-high">
+                        <div>Heal</div>
+                        <div style="font-size: 1rem; font-weight: bold;">89</div>
+                    </div>
+
+                    <div class="risk-cell risk-high">
+                        <div>Fina</div>
+                        <div style="font-size: 1rem; font-weight: bold;">87</div>
+                    </div>
+
+                    <div class="risk-cell risk-high">
+                        <div>Ener</div>
+                        <div style="font-size: 1rem; font-weight: bold;">84</div>
+                    </div>
+
+                    <div class="risk-cell risk-high">
+                        <div>Indu</div>
+                        <div style="font-size: 1rem; font-weight: bold;">83</div>
+                    </div>
+                </div>
+
+            </div>
+
         </aside>
 
         <!-- Main Content -->
@@ -266,11 +385,8 @@
                 <div style="position: absolute; top: 15px; left: 15px; z-index: 10;">
                     <div class="mono" style="color: #00f3ff; font-size: 0.9rem;">SENTIMENT & FORWARD PROJECTION</div>
                 </div>
-                <div style="position: absolute; top: 15px; right: 15px; z-index: 10; display: flex; gap: 10px;" id="timePeriodControls">
-                     <button class="cyber-btn" data-period="1M" style="padding: 2px 6px; font-size: 0.6rem;">1M</button>
-                     <button class="cyber-btn" data-period="3M" style="padding: 2px 6px; font-size: 0.6rem;">3M</button>
-                     <button class="cyber-btn" data-period="1Y" style="padding: 2px 6px; font-size: 0.6rem;">1Y</button>
-                     <button class="cyber-btn active" data-period="ALL" style="padding: 2px 6px; font-size: 0.6rem;">ALL</button>
+                <div style="position: absolute; top: 15px; right: 15px; z-index: 10;">
+                     <div class="mono" style="color: #666; font-size: 0.7rem;">AI MODEL: ADAM-v23.5</div>
                 </div>
                 <canvas id="sentimentChart"></canvas>
             </div>
@@ -303,20 +419,18 @@
                 </div>
                  <div>
                      <div class="mono" style="color: #888; font-size: 0.8rem; margin-bottom: 5px;">SORT</div>
-                    <select id="sortOrder" class="control-input" onchange="applyFilters()">
-                        <option value="newest">Newest First</option>
-                        <option value="oldest">Oldest First</option>
-                        <option value="conviction">Conviction</option>
-                        <option value="sentiment">Sentiment</option>
+                    <select id="sortFilter" class="control-input" onchange="applyFilters()">
+                        <option value="NEWEST">Newest First</option>
+                        <option value="OLDEST">Oldest First</option>
                     </select>
                 </div>
             </div>
 
-            <!-- Featured Grid -->
-            <div id="featuredGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; margin-bottom: 20px;"></div>
-
             <!-- Archive Items Grid (Injected) -->
             <div id="archiveGrid" style="padding-bottom: 50px;">
+
+
+            <div class="archive-item type-DAILY_BRIEFING" data-year="2026" data-type="DAILY_BRIEFING" data-title="daily briefing: sovereign ai & crypto supercycle update quick update on sovereign ai & crypto supercycle and market movements....">
                 <div style="flex-grow: 1;">
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2026-03-27</span>
@@ -347,7 +461,7 @@
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2026-03-27</span>
                         <span class="type-badge">MARKET_OUTLOOK</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 73 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 75 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: Sovereign AI & Crypto Supercycle Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -373,7 +487,7 @@
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2026-03-26</span>
                         <span class="type-badge">MARKET_OUTLOOK</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 73 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 75 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: Sovereign AI & Crypto Supercycle Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -399,7 +513,7 @@
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2026-03-23</span>
                         <span class="type-badge">MARKET_OUTLOOK</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 73 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 75 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: Sovereign AI & Crypto Supercycle Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -438,7 +552,7 @@
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2026-03-20</span>
                         <span class="type-badge">MARKET_OUTLOOK</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 73 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 75 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: Sovereign AI & Crypto Supercycle Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -464,7 +578,7 @@
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2026-03-16</span>
                         <span class="type-badge">MARKET_OUTLOOK</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 73 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 75 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: Sovereign AI & Crypto Supercycle Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -529,7 +643,7 @@
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2026-03-12</span>
                         <span class="type-badge">MARKET_OUTLOOK</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 73 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 75 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: Sovereign AI & Crypto Supercycle Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -568,7 +682,7 @@
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2026-03-06</span>
                         <span class="type-badge">MARKET_OUTLOOK</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 73 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 75 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: Sovereign AI & Crypto Supercycle Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -607,7 +721,7 @@
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2026-03-03</span>
                         <span class="type-badge">MARKET_OUTLOOK</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 73 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 75 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: Sovereign AI & Crypto Supercycle Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -633,7 +747,7 @@
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2026-03-01</span>
                         <span class="type-badge">STRATEGY</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 74 | CONV: 50 | SEM: 19</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 76 | CONV: 50 | SEM: 18</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">House View: Sovereign AI & Crypto Supercycle Outlook</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -691,6 +805,19 @@
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Weekly analysis covering the Sovereign AI & Crypto Supercycle theme. Sentiment is currently Euphoric....</p>
                 </div>
                 <a href="Market_Pulse_2026_02_27.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
+            </div>
+
+            <div class="archive-item type-MARKET_OUTLOOK" data-year="2026" data-type="MARKET_OUTLOOK" data-title="daily briefing report content.">
+                <div style="flex-grow: 1;">
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
+                        <span class="mono" style="font-size:0.7rem; color:#888;">2026-02-25</span>
+                        <span class="type-badge">MARKET_OUTLOOK</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 90 | CONV: 50 | SEM: 35</span>
+                    </div>
+                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">daily briefing</h3>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
+                </div>
+                <a href="daily_briefing.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
             </div>
 
             <div class="archive-item type-DAILY_BRIEFING" data-year="2026" data-type="DAILY_BRIEFING" data-title="signal integrity: the adp artifact the simulation has regained its luster today, bolstered by an &quot;adp artifact&quot;—a robust private jobs report (+12,750 weekly avg.) that served as a stabi...">
@@ -758,6 +885,19 @@
                 <a href="conviction_s_feb26.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
             </div>
 
+            <div class="archive-item type-DAILY_BRIEFING" data-year="2026" data-type="DAILY_BRIEFING" data-title="🟢 system status: nominal (intraday patch successful) the simulation experienced a violent mid-session re-render today. what began as a 'mixed macro' decay was overwritten by a legal shockwave.">
+                <div style="flex-grow: 1;">
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
+                        <span class="mono" style="font-size:0.7rem; color:#888;">2026-02-20</span>
+                        <span class="type-badge">DAILY_BRIEFING</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 90 | CONV: 50 | SEM: 55</span>
+                    </div>
+                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">🟢 SYSTEM STATUS: NOMINAL (Intraday Patch Successful)</h3>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">The simulation experienced a violent mid-session re-render today. What began as a 'Mixed Macro' decay was overwritten by a legal shockwave.</p>
+                </div>
+                <a href="Daily_Briefing_2026_02_20.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
+            </div>
+
             <div class="archive-item type-MARKET_PULSE" data-year="2026" data-type="MARKET_PULSE" data-title="market pulse: the roaring 20s are back weekly analysis covering the sovereign ai & crypto supercycle theme. sentiment is currently euphoric....">
                 <div style="flex-grow: 1;">
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
@@ -782,6 +922,19 @@
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
                 </div>
                 <a href="market_pulse_2026_02_20.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
+            </div>
+
+            <div class="archive-item type-MARKET_OUTLOOK" data-year="2026" data-type="MARKET_OUTLOOK" data-title="🟢 system status: nominal (intraday patch successful) report content.">
+                <div style="flex-grow: 1;">
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
+                        <span class="mono" style="font-size:0.7rem; color:#888;">2026-02-20</span>
+                        <span class="type-badge">MARKET_OUTLOOK</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 76 | CONV: 50 | SEM: 23</span>
+                    </div>
+                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">🟢 SYSTEM STATUS: NOMINAL (Intraday Patch Successful)</h3>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
+                </div>
+                <a href="Daily_Briefing_2026_02_20.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
             </div>
 
             <div class="archive-item type-DAILY_BRIEFING" data-year="2026" data-type="DAILY_BRIEFING" data-title="signal integrity: the supreme court reversal the simulation experienced a violent mid-session re-render today. what began as a &quot;mixed macro&quot; decay—with q4 gdp stalling at 1.4% and government shut...">
@@ -810,14 +963,27 @@
                 <a href="conviction_owl_feb26.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
             </div>
 
-            <div class="archive-item type-DAILY_BRIEFING" data-year="2026" data-type="DAILY_BRIEFING" data-title="signal integrity: the &quot;war premium&quot; corruption the structural integrity of the &quot;soft landing&quot; simulation is under severe stress. after a weak attempt at a recovery patch earlier this week, the tape...">
+            <div class="archive-item type-DAILY_BRIEFING" data-year="2026" data-type="DAILY_BRIEFING" data-title="🔴 system status: degraded (volatility spike detected) the structural integrity of the 'soft landing' simulation is under severe stress. after a weak attempt at a recovery patch earlier this week, the tape has turned a deep shade of crimson.">
+                <div style="flex-grow: 1;">
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
+                        <span class="mono" style="font-size:0.7rem; color:#888;">2026-02-19</span>
+                        <span class="type-badge">DAILY_BRIEFING</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 66 | CONV: 50 | SEM: 57</span>
+                    </div>
+                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">🔴 SYSTEM STATUS: DEGRADED (Volatility Spike Detected)</h3>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">The structural integrity of the 'Soft Landing' simulation is under severe stress. After a weak attempt at a recovery patch earlier this week, the tape has turned a deep shade of crimson.</p>
+                </div>
+                <a href="Daily_Briefing_2026_02_19.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
+            </div>
+
+            <div class="archive-item type-DAILY_BRIEFING" data-year="2026" data-type="DAILY_BRIEFING" data-title="daily briefing: sovereign ai & crypto supercycle update the structural integrity of the &quot;soft landing&quot; simulation is under severe stress. after a weak attempt at a recovery patch earlier this week, the tape...">
                 <div style="flex-grow: 1;">
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2026-02-19</span>
                         <span class="type-badge">DAILY_BRIEFING</span>
                         <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 25 | CONV: 50 | SEM: 91</span>
                     </div>
-                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Signal Integrity: The &quot;War Premium&quot; Corruption</h3>
+                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: Sovereign AI & Crypto Supercycle Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">The structural integrity of the &quot;Soft Landing&quot; simulation is under severe stress. After a weak attempt at a recovery patch earlier this week, the tape...</p>
                 </div>
                 <a href="Daily_Briefing_2026_02_19.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
@@ -828,12 +994,38 @@
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2026-02-19</span>
                         <span class="type-badge">MARKET_OUTLOOK</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 73 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 75 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: Sovereign AI & Crypto Supercycle Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
                 </div>
                 <a href="Daily_Briefing_2026_02_19.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
+            </div>
+
+            <div class="archive-item type-DAILY_BRIEFING" data-year="2026" data-type="DAILY_BRIEFING" data-title="🟡 system status: degraded (structural inversion detected) the market's attempt at a 'recovery patch' is hitting a hardware bottleneck. after a three-day streak of falling yields, the architecture snapped back today.">
+                <div style="flex-grow: 1;">
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
+                        <span class="mono" style="font-size:0.7rem; color:#888;">2026-02-18</span>
+                        <span class="type-badge">DAILY_BRIEFING</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 83 | CONV: 0 | SEM: 54</span>
+                    </div>
+                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">🟡 SYSTEM STATUS: DEGRADED (Structural Inversion Detected)</h3>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">The market's attempt at a 'recovery patch' is hitting a hardware bottleneck. After a three-day streak of falling yields, the architecture snapped back today.</p>
+                </div>
+                <a href="Daily_Briefing_2026_02_18.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
+            </div>
+
+            <div class="archive-item type-MARKET_OUTLOOK" data-year="2026" data-type="MARKET_OUTLOOK" data-title="🟡 system status: degraded (structural inversion detected) report content.">
+                <div style="flex-grow: 1;">
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
+                        <span class="mono" style="font-size:0.7rem; color:#888;">2026-02-18</span>
+                        <span class="type-badge">MARKET_OUTLOOK</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 71 | CONV: 0 | SEM: 23</span>
+                    </div>
+                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">🟡 SYSTEM STATUS: DEGRADED (Structural Inversion Detected)</h3>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
+                </div>
+                <a href="Daily_Briefing_2026_02_18.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
             </div>
 
             <div class="archive-item type-DAILY_BRIEFING" data-year="2026" data-type="DAILY_BRIEFING" data-title="signal integrity: the yield-wall rebound the market's attempt at a &quot;recovery patch&quot; is hitting a hardware bottleneck. after a three-day streak of falling yields, the architecture snapped back...">
@@ -849,17 +1041,17 @@
                 <a href="Daily_Briefing_2026_02_18.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
             </div>
 
-            <div class="archive-item type-SPECIAL_EDITION" data-year="2026" data-type="SPECIAL_EDITION" data-title="🟡 system status: degraded (ai-disruption patch in progress) the simulation is struggling to render a convincing recovery. after the holiday-shortened break, the tape came back choppy and fragmented.">
+            <div class="archive-item type-DAILY_BRIEFING" data-year="2026" data-type="DAILY_BRIEFING" data-title="🟡 system status: degraded (ai-disruption patch in progress) the simulation is struggling to render a convincing recovery. after the holiday-shortened break, the tape came back choppy and fragmented.">
                 <div style="flex-grow: 1;">
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2026-02-17</span>
-                        <span class="type-badge">SPECIAL_EDITION</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 85 | CONV: 50 | SEM: 55</span>
+                        <span class="type-badge">DAILY_BRIEFING</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 85 | CONV: 50 | SEM: 54</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">🟡 SYSTEM STATUS: DEGRADED (AI-Disruption Patch In Progress)</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">The simulation is struggling to render a convincing recovery. After the holiday-shortened break, the tape came back choppy and fragmented.</p>
                 </div>
-                <a href="newsletter_market_mayhem_feb_2026.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
+                <a href="Daily_Briefing_2026_02_17.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
             </div>
 
             <div class="archive-item type-DAILY_BRIEFING" data-year="2026" data-type="DAILY_BRIEFING" data-title="signal integrity: the ai-debt reckoning the simulation is struggling to render a convincing recovery. after the holiday-shortened break, the tape came back choppy and fragmented. the s&p 500...">
@@ -875,17 +1067,30 @@
                 <a href="Daily_Briefing_2026_02_17.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
             </div>
 
-            <div class="archive-item type-NEWSLETTER" data-year="2026" data-type="NEWSLETTER" data-title="adam v26.0 :: daily briefing: ai-debt reckoning report content.">
+            <div class="archive-item type-NEWSLETTER" data-year="2026" data-type="NEWSLETTER" data-title="daily briefing: sovereign ai & crypto supercycle update report content.">
                 <div style="flex-grow: 1;">
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2026-02-17</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 68 | CONV: 100 | SEM: 20</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 75 | CONV: 50 | SEM: 22</span>
                     </div>
-                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">ADAM v26.0 :: Daily Briefing: AI-Debt Reckoning</h3>
+                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: Sovereign AI & Crypto Supercycle Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
                 </div>
                 <a href="Daily_Briefing_2026_02_17.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
+            </div>
+
+            <div class="archive-item type-DAILY_BRIEFING" data-year="2026" data-type="DAILY_BRIEFING" data-title="🟡 system status: degraded (holiday ghost protocol) the u.s. financial simulation is currently in ghost protocol. major nodes (nyse, nasdaq) are offline for presidents' day.">
+                <div style="flex-grow: 1;">
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
+                        <span class="mono" style="font-size:0.7rem; color:#888;">2026-02-16</span>
+                        <span class="type-badge">DAILY_BRIEFING</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 85 | CONV: 100 | SEM: 58</span>
+                    </div>
+                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">🟡 SYSTEM STATUS: DEGRADED (Holiday Ghost Protocol)</h3>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">The U.S. financial simulation is currently in Ghost Protocol. Major nodes (NYSE, NASDAQ) are offline for Presidents' Day.</p>
+                </div>
+                <a href="Daily_Briefing_2026_02_16.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
             </div>
 
             <div class="archive-item type-NEWSLETTER" data-year="2026" data-type="NEWSLETTER" data-title="q4 2025 institutional flow report: the great re-rating market analysis and strategic insights.">
@@ -919,7 +1124,7 @@
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2026-02-16</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 73 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 75 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: Sovereign AI & Crypto Supercycle Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -940,14 +1145,27 @@
                 <a href="newsletter_market_mayhem_feb_14_2026.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
             </div>
 
-            <div class="archive-item type-DAILY_BRIEFING" data-year="2026" data-type="DAILY_BRIEFING" data-title="signal integrity: the cpi sedative the simulation has stopped its violent descent, but the recovery feels like a low-resolution patch rather than a full reboot. the s&p 500 managed a fa...">
+            <div class="archive-item type-DAILY_BRIEFING" data-year="2026" data-type="DAILY_BRIEFING" data-title="🟢 system status: nominal (stablization protocol engaged) the simulation has stopped its violent descent, but the recovery feels like a low-resolution patch rather than a full reboot.">
+                <div style="flex-grow: 1;">
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
+                        <span class="mono" style="font-size:0.7rem; color:#888;">2026-02-13</span>
+                        <span class="type-badge">DAILY_BRIEFING</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 80 | CONV: 50 | SEM: 55</span>
+                    </div>
+                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">🟢 SYSTEM STATUS: NOMINAL (Stablization Protocol Engaged)</h3>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">The simulation has stopped its violent descent, but the recovery feels like a low-resolution patch rather than a full reboot.</p>
+                </div>
+                <a href="Daily_Briefing_2026_02_13.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
+            </div>
+
+            <div class="archive-item type-DAILY_BRIEFING" data-year="2026" data-type="DAILY_BRIEFING" data-title="daily briefing: sovereign ai & crypto supercycle update the simulation has stopped its violent descent, but the recovery feels like a low-resolution patch rather than a full reboot. the s&p 500 managed a fa...">
                 <div style="flex-grow: 1;">
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2026-02-13</span>
                         <span class="type-badge">DAILY_BRIEFING</span>
                         <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 60 | CONV: 50 | SEM: 91</span>
                     </div>
-                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Signal Integrity: The CPI Sedative</h3>
+                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: Sovereign AI & Crypto Supercycle Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">The simulation has stopped its violent descent, but the recovery feels like a low-resolution patch rather than a full reboot. The S&P 500 managed a fa...</p>
                 </div>
                 <a href="Daily_Briefing_2026_02_13.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
@@ -971,12 +1189,38 @@
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2026-02-13</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 73 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 75 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: Sovereign AI & Crypto Supercycle Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
                 </div>
                 <a href="Daily_Briefing_2026_02_13.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
+            </div>
+
+            <div class="archive-item type-DAILY_BRIEFING" data-year="2026" data-type="DAILY_BRIEFING" data-title="🔴 system status: degraded (structural integrity failing) the simulation has hit a massive bottleneck. what began as a 'too-hot' jobs report echo has mutated into a full-scale ai-sector hardware failure.">
+                <div style="flex-grow: 1;">
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
+                        <span class="mono" style="font-size:0.7rem; color:#888;">2026-02-12</span>
+                        <span class="type-badge">DAILY_BRIEFING</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 83 | CONV: 50 | SEM: 54</span>
+                    </div>
+                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">🔴 SYSTEM STATUS: DEGRADED (Structural Integrity Failing)</h3>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">The simulation has hit a massive bottleneck. What began as a 'too-hot' jobs report echo has mutated into a full-scale AI-sector hardware failure.</p>
+                </div>
+                <a href="Daily_Briefing_2026_02_12.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
+            </div>
+
+            <div class="archive-item type-NEWSLETTER" data-year="2026" data-type="NEWSLETTER" data-title="🔴 system status: degraded (structural integrity failing) report content.">
+                <div style="flex-grow: 1;">
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
+                        <span class="mono" style="font-size:0.7rem; color:#888;">2026-02-12</span>
+                        <span class="type-badge">NEWSLETTER</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 70 | CONV: 50 | SEM: 23</span>
+                    </div>
+                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">🔴 SYSTEM STATUS: DEGRADED (Structural Integrity Failing)</h3>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
+                </div>
+                <a href="Daily_Briefing_2026_02_12.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
             </div>
 
             <div class="archive-item type-DAILY_BRIEFING" data-year="2026" data-type="DAILY_BRIEFING" data-title="signal integrity: the speculative unwind the simulation has hit a massive bottleneck. what began as a &quot;too-hot&quot; jobs report echo has mutated into a full-scale ai-sector hardware failure. the ...">
@@ -1049,7 +1293,7 @@
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2026-02-09</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 73 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 75 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: Sovereign AI & Crypto Supercycle Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -1088,7 +1332,7 @@
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2026-02-05</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 73 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 75 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: Sovereign AI & Crypto Supercycle Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -1114,7 +1358,7 @@
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2026-02-04</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 73 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 75 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: Sovereign AI & Crypto Supercycle Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -1153,7 +1397,7 @@
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2026-02-02</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 73 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 75 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: Sovereign AI & Crypto Supercycle Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -1192,7 +1436,7 @@
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2026-02-01</span>
                         <span class="type-badge">STRATEGY</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 74 | CONV: 50 | SEM: 19</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 76 | CONV: 50 | SEM: 18</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">House View: Sovereign AI & Crypto Supercycle Outlook</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -1244,7 +1488,7 @@
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2026-01-30</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 73 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 75 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: Sovereign AI & Crypto Supercycle Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -1296,7 +1540,7 @@
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2026-01-26</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 73 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 75 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: Sovereign AI & Crypto Supercycle Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -1335,7 +1579,7 @@
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2026-01-23</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 73 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 75 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: Sovereign AI & Crypto Supercycle Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -1361,7 +1605,7 @@
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2026-01-20</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 73 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 75 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: Sovereign AI & Crypto Supercycle Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -1452,7 +1696,7 @@
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2026-01-12</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 73 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 75 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: Sovereign AI & Crypto Supercycle Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -1465,12 +1709,12 @@
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2026-01-12</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 55 | CONV: 40 | SEM: 2</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 55 | CONV: 33 | SEM: 2</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">MARKET MAYHEM ARCHIVE</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
                 </div>
-                <a href="market_mayhem_archive_v23.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
+                <a href="mkt_myhm.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
             </div>
 
             <div class="archive-item type-MARKET_PULSE" data-year="2026" data-type="MARKET_PULSE" data-title="market pulse: the roaring 20s are back weekly analysis covering the sovereign ai & crypto supercycle theme. sentiment is currently euphoric....">
@@ -1517,7 +1761,7 @@
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2026-01-01</span>
                         <span class="type-badge">STRATEGY</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 74 | CONV: 50 | SEM: 19</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 76 | CONV: 50 | SEM: 18</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">House View: Sovereign AI & Crypto Supercycle Outlook</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -1556,7 +1800,7 @@
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-12-23</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 76 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 77 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: Rate Cuts & Holiday Rally Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -1595,7 +1839,7 @@
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-12-15</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 76 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 77 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: Rate Cuts & Holiday Rally Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -1634,7 +1878,7 @@
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-12-12</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 80 | CONV: 100 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 80 | CONV: 100 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Agent Alignment Log: Protocol v23.5 (December 12, 2025)</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -1811,7 +2055,7 @@ While the broader indices are taking a breather, the internal rotation is v...</
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-12-09</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 76 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 77 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: Rate Cuts & Holiday Rally Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -1893,7 +2137,7 @@ Welcome to the &quot;Great Calibration&quot; of late 2025. The markets are curre
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-12-01</span>
                         <span class="type-badge">STRATEGY</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 78 | CONV: 50 | SEM: 19</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 80 | CONV: 50 | SEM: 17</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">House View: Rate Cuts & Holiday Rally Outlook</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -1945,7 +2189,7 @@ Welcome to the &quot;Great Calibration&quot; of late 2025. The markets are curre
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-11-27</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 76 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 77 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: Rate Cuts & Holiday Rally Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -1971,7 +2215,7 @@ Welcome to the &quot;Great Calibration&quot; of late 2025. The markets are curre
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-11-25</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 76 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 77 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: Rate Cuts & Holiday Rally Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -2010,7 +2254,7 @@ Welcome to the &quot;Great Calibration&quot; of late 2025. The markets are curre
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-11-19</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 76 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 77 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: Rate Cuts & Holiday Rally Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -2090,7 +2334,7 @@ Welcome to the &quot;Great Calibration&quot; of late 2025. The markets are curre
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-11-10</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 76 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 77 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: Rate Cuts & Holiday Rally Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -2129,7 +2373,7 @@ Welcome to the &quot;Great Calibration&quot; of late 2025. The markets are curre
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-11-06</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 76 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 77 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: Rate Cuts & Holiday Rally Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -2155,7 +2399,7 @@ Welcome to the &quot;Great Calibration&quot; of late 2025. The markets are curre
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-11-04</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 76 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 77 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: Rate Cuts & Holiday Rally Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -2194,7 +2438,7 @@ Welcome to the &quot;Great Calibration&quot; of late 2025. The markets are curre
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-11-01</span>
                         <span class="type-badge">STRATEGY</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 78 | CONV: 50 | SEM: 19</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 80 | CONV: 50 | SEM: 17</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">House View: Rate Cuts & Holiday Rally Outlook</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -2263,7 +2507,7 @@ Happy Halloween, traders! The market decided to dress up as a Bear this week, gi
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-10-28</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 76 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 77 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: Rate Cuts & Holiday Rally Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -2315,7 +2559,7 @@ Happy Halloween, traders! The market decided to dress up as a Bear this week, gi
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-10-16</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 76 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 77 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: Rate Cuts & Holiday Rally Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -2367,7 +2611,7 @@ Happy Halloween, traders! The market decided to dress up as a Bear this week, gi
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-10-15</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 76 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 77 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: Rate Cuts & Holiday Rally Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -2434,7 +2678,7 @@ Happy Halloween, traders! The market decided to dress up as a Bear this week, gi
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-10-01</span>
                         <span class="type-badge">STRATEGY</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 78 | CONV: 50 | SEM: 19</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 80 | CONV: 50 | SEM: 17</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">House View: Rate Cuts & Holiday Rally Outlook</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -2460,7 +2704,7 @@ Happy Halloween, traders! The market decided to dress up as a Bear this week, gi
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-09-29</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 65 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 66 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: Energy Crisis & Geopolitics Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -2538,7 +2782,7 @@ Happy Halloween, traders! The market decided to dress up as a Bear this week, gi
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-09-19</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 65 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 66 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: Energy Crisis & Geopolitics Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -2564,7 +2808,7 @@ Happy Halloween, traders! The market decided to dress up as a Bear this week, gi
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-09-17</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 65 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 66 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: Energy Crisis & Geopolitics Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -2603,7 +2847,7 @@ Happy Halloween, traders! The market decided to dress up as a Bear this week, gi
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-09-08</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 65 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 66 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: Energy Crisis & Geopolitics Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -2642,7 +2886,7 @@ Happy Halloween, traders! The market decided to dress up as a Bear this week, gi
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-09-03</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 65 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 66 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: Energy Crisis & Geopolitics Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -2681,7 +2925,7 @@ Happy Halloween, traders! The market decided to dress up as a Bear this week, gi
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-09-01</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 65 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 66 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: Energy Crisis & Geopolitics Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -2694,7 +2938,7 @@ Happy Halloween, traders! The market decided to dress up as a Bear this week, gi
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-09-01</span>
                         <span class="type-badge">STRATEGY</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 62 | CONV: 50 | SEM: 19</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 63 | CONV: 50 | SEM: 17</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">House View: Energy Crisis & Geopolitics Outlook</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -2763,7 +3007,7 @@ The &quot;Summer Slump&quot; never really arrived, did it? As we wrap up August,
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-08-27</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 65 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 66 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: Energy Crisis & Geopolitics Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -2802,7 +3046,7 @@ The &quot;Summer Slump&quot; never really arrived, did it? As we wrap up August,
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-08-22</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 65 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 66 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: Energy Crisis & Geopolitics Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -2828,7 +3072,7 @@ The &quot;Summer Slump&quot; never really arrived, did it? As we wrap up August,
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-08-20</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 65 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 66 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: Energy Crisis & Geopolitics Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -2854,7 +3098,7 @@ The &quot;Summer Slump&quot; never really arrived, did it? As we wrap up August,
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-08-18</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 65 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 66 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: Energy Crisis & Geopolitics Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -2893,7 +3137,7 @@ The &quot;Summer Slump&quot; never really arrived, did it? As we wrap up August,
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-08-15</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 65 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 66 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: Energy Crisis & Geopolitics Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -2932,7 +3176,7 @@ The &quot;Summer Slump&quot; never really arrived, did it? As we wrap up August,
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-08-07</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 65 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 66 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: Energy Crisis & Geopolitics Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -2958,7 +3202,7 @@ The &quot;Summer Slump&quot; never really arrived, did it? As we wrap up August,
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-08-05</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 65 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 66 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: Energy Crisis & Geopolitics Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -3010,7 +3254,7 @@ The &quot;Summer Slump&quot; never really arrived, did it? As we wrap up August,
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-08-01</span>
                         <span class="type-badge">STRATEGY</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 62 | CONV: 50 | SEM: 19</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 63 | CONV: 50 | SEM: 18</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">House View: Energy Crisis & Geopolitics Outlook</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -3023,7 +3267,7 @@ The &quot;Summer Slump&quot; never really arrived, did it? As we wrap up August,
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-08-01</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 65 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 66 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: Energy Crisis & Geopolitics Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -3049,7 +3293,7 @@ The &quot;Summer Slump&quot; never really arrived, did it? As we wrap up August,
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-07-30</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 65 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 66 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: Energy Crisis & Geopolitics Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -3088,7 +3332,7 @@ The &quot;Summer Slump&quot; never really arrived, did it? As we wrap up August,
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-07-25</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 65 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 66 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: Energy Crisis & Geopolitics Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -3114,7 +3358,7 @@ The &quot;Summer Slump&quot; never really arrived, did it? As we wrap up August,
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-07-24</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 65 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 66 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: Energy Crisis & Geopolitics Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -3140,7 +3384,7 @@ The &quot;Summer Slump&quot; never really arrived, did it? As we wrap up August,
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-07-22</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 65 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 66 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: Energy Crisis & Geopolitics Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -3179,7 +3423,7 @@ The &quot;Summer Slump&quot; never really arrived, did it? As we wrap up August,
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-07-18</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 65 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 66 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: Energy Crisis & Geopolitics Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -3205,7 +3449,7 @@ The &quot;Summer Slump&quot; never really arrived, did it? As we wrap up August,
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-07-15</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 65 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 66 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: Energy Crisis & Geopolitics Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -3270,7 +3514,7 @@ The &quot;Summer Slump&quot; never really arrived, did it? As we wrap up August,
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-07-09</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 65 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 66 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: Energy Crisis & Geopolitics Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -3309,7 +3553,7 @@ The &quot;Summer Slump&quot; never really arrived, did it? As we wrap up August,
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-07-04</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 65 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 66 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: Energy Crisis & Geopolitics Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -3335,7 +3579,7 @@ The &quot;Summer Slump&quot; never really arrived, did it? As we wrap up August,
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-07-01</span>
                         <span class="type-badge">STRATEGY</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 62 | CONV: 50 | SEM: 19</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 63 | CONV: 50 | SEM: 18</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">House View: Energy Crisis & Geopolitics Outlook</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -3400,7 +3644,7 @@ The &quot;Summer Slump&quot; never really arrived, did it? As we wrap up August,
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-06-24</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 76 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 77 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: AI Application Boom Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -3439,7 +3683,7 @@ The &quot;Summer Slump&quot; never really arrived, did it? As we wrap up August,
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-06-18</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 76 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 77 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: AI Application Boom Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -3465,7 +3709,7 @@ The &quot;Summer Slump&quot; never really arrived, did it? As we wrap up August,
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-06-16</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 76 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 77 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: AI Application Boom Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -3504,7 +3748,7 @@ The &quot;Summer Slump&quot; never really arrived, did it? As we wrap up August,
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-06-13</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 76 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 77 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: AI Application Boom Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -3530,7 +3774,7 @@ The &quot;Summer Slump&quot; never really arrived, did it? As we wrap up August,
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-06-10</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 76 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 77 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: AI Application Boom Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -3569,7 +3813,7 @@ The &quot;Summer Slump&quot; never really arrived, did it? As we wrap up August,
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-06-06</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 76 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 77 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: AI Application Boom Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -3595,7 +3839,7 @@ The &quot;Summer Slump&quot; never really arrived, did it? As we wrap up August,
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-06-02</span>
                         <span class="type-badge">MARKET_PULSE</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 83 | CONV: 50 | SEM: 20</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 83 | CONV: 50 | SEM: 17</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">MARKET PULSE // 2025-06-02</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -3621,7 +3865,7 @@ The &quot;Summer Slump&quot; never really arrived, did it? As we wrap up August,
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-06-01</span>
                         <span class="type-badge">STRATEGY</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 78 | CONV: 50 | SEM: 19</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 80 | CONV: 50 | SEM: 18</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">House View: AI Application Boom Outlook</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -3660,7 +3904,7 @@ The &quot;Summer Slump&quot; never really arrived, did it? As we wrap up August,
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-05-26</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 76 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 77 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: AI Application Boom Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -3699,7 +3943,7 @@ The &quot;Summer Slump&quot; never really arrived, did it? As we wrap up August,
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-05-20</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 76 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 77 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: AI Application Boom Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -3725,7 +3969,7 @@ The &quot;Summer Slump&quot; never really arrived, did it? As we wrap up August,
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-05-19</span>
                         <span class="type-badge">MARKET_PULSE</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 85 | CONV: 50 | SEM: 19</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 86 | CONV: 50 | SEM: 17</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">MARKET PULSE // 2025-05-19</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -3764,7 +4008,7 @@ The &quot;Summer Slump&quot; never really arrived, did it? As we wrap up August,
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-05-15</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 76 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 77 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: AI Application Boom Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -3803,7 +4047,7 @@ The &quot;Summer Slump&quot; never really arrived, did it? As we wrap up August,
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-05-07</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 76 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 77 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: AI Application Boom Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -3872,7 +4116,7 @@ The age-old Wall Street adage &quot;Sell in May and Go Away&quot; is being teste
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-05-02</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 76 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 77 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: AI Application Boom Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -3911,7 +4155,7 @@ The age-old Wall Street adage &quot;Sell in May and Go Away&quot; is being teste
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-05-01</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 76 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 77 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: AI Application Boom Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -3924,7 +4168,7 @@ The age-old Wall Street adage &quot;Sell in May and Go Away&quot; is being teste
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-05-01</span>
                         <span class="type-badge">STRATEGY</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 78 | CONV: 50 | SEM: 19</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 80 | CONV: 50 | SEM: 18</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">House View: AI Application Boom Outlook</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -3963,7 +4207,7 @@ The age-old Wall Street adage &quot;Sell in May and Go Away&quot; is being teste
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-04-22</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 76 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 77 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: AI Application Boom Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -4002,7 +4246,7 @@ The age-old Wall Street adage &quot;Sell in May and Go Away&quot; is being teste
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-04-17</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 76 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 77 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: AI Application Boom Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -4028,7 +4272,7 @@ The age-old Wall Street adage &quot;Sell in May and Go Away&quot; is being teste
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-04-16</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 76 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 77 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: AI Application Boom Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -4067,7 +4311,7 @@ The age-old Wall Street adage &quot;Sell in May and Go Away&quot; is being teste
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-04-08</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 76 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 77 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: AI Application Boom Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -4149,7 +4393,7 @@ Hello Q2! The first quarter is in the books, and the bulls are clearly in charge
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-04-01</span>
                         <span class="type-badge">STRATEGY</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 78 | CONV: 50 | SEM: 19</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 80 | CONV: 50 | SEM: 18</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">House View: AI Application Boom Outlook</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -4188,7 +4432,7 @@ Hello Q2! The first quarter is in the books, and the bulls are clearly in charge
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-03-26</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 73 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 75 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: Tech Correction Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -4214,7 +4458,7 @@ Hello Q2! The first quarter is in the books, and the bulls are clearly in charge
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-03-25</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 73 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 75 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: Tech Correction Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -4253,7 +4497,7 @@ Hello Q2! The first quarter is in the books, and the bulls are clearly in charge
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-03-18</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 73 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 75 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: Tech Correction Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -4333,7 +4577,7 @@ Hello Q2! The first quarter is in the books, and the bulls are clearly in charge
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-03-12</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 73 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 75 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: Tech Correction Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -4385,7 +4629,7 @@ Hello Q2! The first quarter is in the books, and the bulls are clearly in charge
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-03-11</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 73 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 75 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: Tech Correction Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -4502,7 +4746,7 @@ Hello Q2! The first quarter is in the books, and the bulls are clearly in charge
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-03-03</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 73 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 75 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: Tech Correction Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -4528,7 +4772,7 @@ Hello Q2! The first quarter is in the books, and the bulls are clearly in charge
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-03-01</span>
                         <span class="type-badge">STRATEGY</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 71 | CONV: 50 | SEM: 18</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 73 | CONV: 50 | SEM: 17</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">House View: Tech Correction Outlook</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -4567,7 +4811,7 @@ Hello Q2! The first quarter is in the books, and the bulls are clearly in charge
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-02-28</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 73 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 75 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: Tech Correction Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -4593,7 +4837,7 @@ Hello Q2! The first quarter is in the books, and the bulls are clearly in charge
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-02-27</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 73 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 75 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: Tech Correction Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -4619,7 +4863,7 @@ Hello Q2! The first quarter is in the books, and the bulls are clearly in charge
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-02-26</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 88 | CONV: 0 | SEM: 17</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 89 | CONV: 0 | SEM: 16</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Nvidia Corporation (NVDA) Report</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -4671,7 +4915,7 @@ Hello Q2! The first quarter is in the books, and the bulls are clearly in charge
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-02-25</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 85 | CONV: 0 | SEM: 17</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 86 | CONV: 0 | SEM: 17</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Nvidia Corporation (NVDA) Report</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -4736,7 +4980,7 @@ Hello Q2! The first quarter is in the books, and the bulls are clearly in charge
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-02-24</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 84 | CONV: 0 | SEM: 17</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 85 | CONV: 0 | SEM: 16</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Microsoft Corporation (MSFT) Report</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -4866,7 +5110,7 @@ Hello Q2! The first quarter is in the books, and the bulls are clearly in charge
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-02-17</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 73 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 75 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: Tech Correction Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -4931,7 +5175,7 @@ Hello Q2! The first quarter is in the books, and the bulls are clearly in charge
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-02-14</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 73 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 75 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: Tech Correction Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -4957,7 +5201,7 @@ Hello Q2! The first quarter is in the books, and the bulls are clearly in charge
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-02-13</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 73 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 75 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: Tech Correction Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -5009,7 +5253,7 @@ Hello Q2! The first quarter is in the books, and the bulls are clearly in charge
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-02-06</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 73 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 75 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: Tech Correction Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -5035,7 +5279,7 @@ Hello Q2! The first quarter is in the books, and the bulls are clearly in charge
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-02-01</span>
                         <span class="type-badge">STRATEGY</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 71 | CONV: 50 | SEM: 18</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 73 | CONV: 50 | SEM: 17</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">House View: Tech Correction Outlook</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -5074,7 +5318,7 @@ Hello Q2! The first quarter is in the books, and the bulls are clearly in charge
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-01-30</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 73 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 75 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: Tech Correction Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -5100,7 +5344,7 @@ Hello Q2! The first quarter is in the books, and the bulls are clearly in charge
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-01-28</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 73 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 75 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: Tech Correction Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -5126,7 +5370,7 @@ Hello Q2! The first quarter is in the books, and the bulls are clearly in charge
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-01-27</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 73 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 75 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: Tech Correction Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -5165,7 +5409,7 @@ Hello Q2! The first quarter is in the books, and the bulls are clearly in charge
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-01-21</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 73 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 75 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: Tech Correction Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -5217,7 +5461,7 @@ Hello Q2! The first quarter is in the books, and the bulls are clearly in charge
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-01-14</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 73 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 75 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: Tech Correction Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -5243,7 +5487,7 @@ Hello Q2! The first quarter is in the books, and the bulls are clearly in charge
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-01-13</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 73 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 75 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: Tech Correction Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -5282,7 +5526,7 @@ Hello Q2! The first quarter is in the books, and the bulls are clearly in charge
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-01-08</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 73 | CONV: 50 | SEM: 24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 75 | CONV: 50 | SEM: 22</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Daily Briefing: Tech Correction Update</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -5719,6 +5963,32 @@ Hello Q2! The first quarter is in the books, and the bulls are clearly in charge
                 <a href="2023 Year in Review: A Year of Recovery and Resilience.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
             </div>
 
+            <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="adam v26.0 :: live market report content.">
+                <div style="flex-grow: 1;">
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
+                        <span class="mono" style="font-size:0.7rem; color:#888;">2025-01-01</span>
+                        <span class="type-badge">NEWSLETTER</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 91 | CONV: 100 | SEM: 19</span>
+                    </div>
+                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">ADAM v26.0 :: LIVE MARKET</h3>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
+                </div>
+                <a href="market_live.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
+            </div>
+
+            <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="market mayhem: brexit shock report content.">
+                <div style="flex-grow: 1;">
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
+                        <span class="mono" style="font-size:0.7rem; color:#888;">2025-01-01</span>
+                        <span class="type-badge">NEWSLETTER</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 60 | CONV: 50 | SEM: 18</span>
+                    </div>
+                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">MARKET MAYHEM: BREXIT SHOCK</h3>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
+                </div>
+                <a href="newsletter_market_mayhem_jun_2016.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
+            </div>
+
             <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="analytics hub report content.">
                 <div style="flex-grow: 1;">
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
@@ -5789,7 +6059,7 @@ Hello Q2! The first quarter is in the books, and the bulls are clearly in charge
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-01-01</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 69 | CONV: 60 | SEM: 18</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 70 | CONV: 60 | SEM: 17</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">2022 Year in Review: Navigating a Turbulent Market</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -5802,7 +6072,7 @@ Hello Q2! The first quarter is in the books, and the bulls are clearly in charge
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-01-01</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 59 | CONV: 50 | SEM: 19</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 61 | CONV: 50 | SEM: 18</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Untitled Report</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -5932,12 +6202,25 @@ Hello Q2! The first quarter is in the books, and the bulls are clearly in charge
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-01-01</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 63 | CONV: 0 | SEM: 18</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 65 | CONV: 0 | SEM: 17</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Amazon.com, Inc. (AMZN) Report</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
                 </div>
                 <a href="amzn_company_report.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
+            </div>
+
+            <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="adam | artisanal studio report content.">
+                <div style="flex-grow: 1;">
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
+                        <span class="mono" style="font-size:0.7rem; color:#888;">2025-01-01</span>
+                        <span class="type-badge">NEWSLETTER</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 50 | CONV: 50 | SEM: 24</span>
+                    </div>
+                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">ADAM | Artisanal Studio</h3>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
+                </div>
+                <a href="artisanal_studio.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
             </div>
 
             <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="system brain | cognitive core report content.">
@@ -5971,7 +6254,7 @@ Hello Q2! The first quarter is in the books, and the bulls are clearly in charge
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-01-01</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 57 | CONV: 50 | SEM: 19</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 58 | CONV: 50 | SEM: 18</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">MARKET MAYHEM: THE DOT COM PEAK</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -6003,6 +6286,19 @@ Hello Q2! The first quarter is in the books, and the bulls are clearly in charge
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
                 </div>
                 <a href="crisis_response.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
+            </div>
+
+            <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="the fiduciary avatar report content.">
+                <div style="flex-grow: 1;">
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
+                        <span class="mono" style="font-size:0.7rem; color:#888;">2025-01-01</span>
+                        <span class="type-badge">NEWSLETTER</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 50 | CONV: 50 | SEM: 43</span>
+                    </div>
+                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">THE FIDUCIARY AVATAR</h3>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
+                </div>
+                <a href="fiduciary_avatar.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
             </div>
 
             <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="adam | workflows report content.">
@@ -6057,6 +6353,19 @@ Hello Q2! The first quarter is in the books, and the bulls are clearly in charge
                 <a href="monte_carlo_visualizer.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
             </div>
 
+            <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="pocket sovereign report content.">
+                <div style="flex-grow: 1;">
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
+                        <span class="mono" style="font-size:0.7rem; color:#888;">2025-01-01</span>
+                        <span class="type-badge">NEWSLETTER</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 50 | CONV: 50 | SEM: 31</span>
+                    </div>
+                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Pocket Sovereign</h3>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
+                </div>
+                <a href="pocket.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
+            </div>
+
             <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="adam v26 :: crisis simulator report content.">
                 <div style="flex-grow: 1;">
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
@@ -6096,6 +6405,19 @@ Hello Q2! The first quarter is in the books, and the bulls are clearly in charge
                 <a href="bridge.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
             </div>
 
+            <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="market mayhem: asian contagion report content.">
+                <div style="flex-grow: 1;">
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
+                        <span class="mono" style="font-size:0.7rem; color:#888;">2025-01-01</span>
+                        <span class="type-badge">NEWSLETTER</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 66 | CONV: 50 | SEM: 18</span>
+                    </div>
+                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">MARKET MAYHEM: ASIAN CONTAGION</h3>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
+                </div>
+                <a href="newsletter_market_mayhem_jul_1997.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
+            </div>
+
             <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="adam system | research lab report content.">
                 <div style="flex-grow: 1;">
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
@@ -6127,7 +6449,7 @@ Hello Q2! The first quarter is in the books, and the bulls are clearly in charge
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-01-01</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 70 | CONV: 0 | SEM: 22</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 71 | CONV: 0 | SEM: 21</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">MARKET MAYHEM: The Weekly Briefing</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -6226,6 +6548,19 @@ Hello Q2! The first quarter is in the books, and the bulls are clearly in charge
                 <a href="top_10_meme_coins.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
             </div>
 
+            <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="omega trust engine report content.">
+                <div style="flex-grow: 1;">
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
+                        <span class="mono" style="font-size:0.7rem; color:#888;">2025-01-01</span>
+                        <span class="type-badge">NEWSLETTER</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 100 | CONV: 33 | SEM: 35</span>
+                    </div>
+                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">OMEGA Trust Engine</h3>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
+                </div>
+                <a href="trust_explorer.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
+            </div>
+
             <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="flash: fed emergency meeting rumors report content.">
                 <div style="flex-grow: 1;">
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
@@ -6265,12 +6600,25 @@ Hello Q2! The first quarter is in the books, and the bulls are clearly in charge
                 <a href="newsletter_market_mayhem_jan_2025.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
             </div>
 
+            <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="omega dream cycle report content.">
+                <div style="flex-grow: 1;">
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
+                        <span class="mono" style="font-size:0.7rem; color:#888;">2025-01-01</span>
+                        <span class="type-badge">NEWSLETTER</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 100 | CONV: 50 | SEM: 41</span>
+                    </div>
+                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">OMEGA Dream Cycle</h3>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
+                </div>
+                <a href="dream_viewer.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
+            </div>
+
             <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="artificial intelligence: reshaping industries and creating opportunities report content.">
                 <div style="flex-grow: 1;">
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-01-01</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 76 | CONV: 0 | SEM: 19</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 77 | CONV: 0 | SEM: 17</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Artificial Intelligence: Reshaping Industries and Creating Opportunities</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -6335,7 +6683,7 @@ Hello Q2! The first quarter is in the books, and the bulls are clearly in charge
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-01-01</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 85 | CONV: 100 | SEM: 19</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 86 | CONV: 100 | SEM: 18</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Model Performance Review: Q3 2025</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -6374,7 +6722,7 @@ Hello Q2! The first quarter is in the books, and the bulls are clearly in charge
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-01-01</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 75 | CONV: 16 | SEM: 18</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 76 | CONV: 16 | SEM: 18</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">2024 Year in Review: Navigating Uncertainty and Transition</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -6395,6 +6743,19 @@ Hello Q2! The first quarter is in the books, and the bulls are clearly in charge
                 <a href="wargame_dashboard.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
             </div>
 
+            <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="market mayhem builder report content.">
+                <div style="flex-grow: 1;">
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
+                        <span class="mono" style="font-size:0.7rem; color:#888;">2025-01-01</span>
+                        <span class="type-badge">NEWSLETTER</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 0 | CONV: 50 | SEM: 36</span>
+                    </div>
+                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">MARKET MAYHEM BUILDER</h3>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
+                </div>
+                <a href="market_mayhem_builder.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
+            </div>
+
             <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="adam v23.5 - risk topography report content.">
                 <div style="flex-grow: 1;">
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
@@ -6406,6 +6767,19 @@ Hello Q2! The first quarter is in the books, and the bulls are clearly in charge
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
                 </div>
                 <a href="risk_topography.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
+            </div>
+
+            <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="market mayhem: regional banking crisis report content.">
+                <div style="flex-grow: 1;">
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
+                        <span class="mono" style="font-size:0.7rem; color:#888;">2025-01-01</span>
+                        <span class="type-badge">NEWSLETTER</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 51 | CONV: 50 | SEM: 19</span>
+                    </div>
+                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">MARKET MAYHEM: REGIONAL BANKING CRISIS</h3>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
+                </div>
+                <a href="newsletter_market_mayhem_mar_2023.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
             </div>
 
             <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="crypto institutionalization 2026: the new treasury standard report content.">
@@ -6543,7 +6917,7 @@ Hello Q2! The first quarter is in the books, and the bulls are clearly in charge
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-01-01</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 57 | CONV: 50 | SEM: 21</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 58 | CONV: 50 | SEM: 19</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">MARKET MAYHEM: BLACK TUESDAY</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -6668,6 +7042,19 @@ Hello Q2! The first quarter is in the books, and the bulls are clearly in charge
                 <a href="newsletter_weekly_sep_21_2025.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
             </div>
 
+            <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="project chronos: time machine report content.">
+                <div style="flex-grow: 1;">
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
+                        <span class="mono" style="font-size:0.7rem; color:#888;">2025-01-01</span>
+                        <span class="type-badge">NEWSLETTER</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 0 | CONV: 50 | SEM: 43</span>
+                    </div>
+                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">PROJECT CHRONOS: TIME MACHINE</h3>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
+                </div>
+                <a href="chronos_time_machine.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
+            </div>
+
             <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="adam v23.5 | agent registry & orchestration report content.">
                 <div style="flex-grow: 1;">
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
@@ -6759,6 +7146,19 @@ Hello Q2! The first quarter is in the books, and the bulls are clearly in charge
                 <a href="macro_glitch_monitor.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
             </div>
 
+            <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="market mayhem // graph v2.0 report content.">
+                <div style="flex-grow: 1;">
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
+                        <span class="mono" style="font-size:0.7rem; color:#888;">2025-01-01</span>
+                        <span class="type-badge">NEWSLETTER</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 66 | CONV: 50 | SEM: 26</span>
+                    </div>
+                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">MARKET MAYHEM // GRAPH V2.0</h3>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
+                </div>
+                <a href="market_mayhem_graph.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
+            </div>
+
             <div class="archive-item type-SYSTEM_AUDIT" data-year="2025" data-type="SYSTEM_AUDIT" data-title="system 2 audit: q3 2025 report content.">
                 <div style="flex-grow: 1;">
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
@@ -6770,6 +7170,19 @@ Hello Q2! The first quarter is in the books, and the bulls are clearly in charge
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
                 </div>
                 <a href="System_2_Audit_Q3_2025.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
+            </div>
+
+            <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="market mayhem: the nixon shock report content.">
+                <div style="flex-grow: 1;">
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
+                        <span class="mono" style="font-size:0.7rem; color:#888;">2025-01-01</span>
+                        <span class="type-badge">NEWSLETTER</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 55 | CONV: 50 | SEM: 18</span>
+                    </div>
+                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">MARKET MAYHEM: THE NIXON SHOCK</h3>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
+                </div>
+                <a href="newsletter_market_mayhem_aug_1971.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
             </div>
 
             <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="evolution hub report content.">
@@ -6863,12 +7276,38 @@ Hello Q2! The first quarter is in the books, and the bulls are clearly in charge
                 <a href="unified_credit_console.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
             </div>
 
+            <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="market mayhem: the meme stock revolt report content.">
+                <div style="flex-grow: 1;">
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
+                        <span class="mono" style="font-size:0.7rem; color:#888;">2025-01-01</span>
+                        <span class="type-badge">NEWSLETTER</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 63 | CONV: 50 | SEM: 18</span>
+                    </div>
+                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">MARKET MAYHEM: THE MEME STOCK REVOLT</h3>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
+                </div>
+                <a href="newsletter_market_mayhem_jan_2021.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
+            </div>
+
+            <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="market mayhem: multiplayer report content.">
+                <div style="flex-grow: 1;">
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
+                        <span class="mono" style="font-size:0.7rem; color:#888;">2025-01-01</span>
+                        <span class="type-badge">NEWSLETTER</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 0 | CONV: 50 | SEM: 30</span>
+                    </div>
+                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">MARKET MAYHEM: MULTIPLAYER</h3>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
+                </div>
+                <a href="market_mayhem_multiplayer.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
+            </div>
+
             <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="q4 2025 institutional flow report: the great re-rating report content.">
                 <div style="flex-grow: 1;">
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-01-01</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 67 | CONV: 33 | SEM: 19</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 68 | CONV: 33 | SEM: 19</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Q4 2025 Institutional Flow Report: The Great Re-Rating</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -6881,7 +7320,7 @@ Hello Q2! The first quarter is in the books, and the bulls are clearly in charge
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-01-01</span>
                         <span class="type-badge">STRATEGY</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 71 | CONV: 50 | SEM: 18</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 73 | CONV: 50 | SEM: 17</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">House View: Tech Correction Outlook</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -6902,12 +7341,25 @@ Hello Q2! The first quarter is in the books, and the bulls are clearly in charge
                 <a href="system2_critique_bifurcation.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
             </div>
 
+            <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="market mayhem: volmageddon report content.">
+                <div style="flex-grow: 1;">
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
+                        <span class="mono" style="font-size:0.7rem; color:#888;">2025-01-01</span>
+                        <span class="type-badge">NEWSLETTER</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 63 | CONV: 50 | SEM: 18</span>
+                    </div>
+                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">MARKET MAYHEM: VOLMAGEDDON</h3>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
+                </div>
+                <a href="newsletter_market_mayhem_feb_2018.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
+            </div>
+
             <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="market mayhem: crypto winter & celsius freeze report content.">
                 <div style="flex-grow: 1;">
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-01-01</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 58 | CONV: 50 | SEM: 19</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 60 | CONV: 50 | SEM: 18</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">MARKET MAYHEM: CRYPTO WINTER & CELSIUS FREEZE</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -6920,7 +7372,7 @@ Hello Q2! The first quarter is in the books, and the bulls are clearly in charge
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-01-01</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 60 | CONV: 0 | SEM: 18</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 62 | CONV: 0 | SEM: 17</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Microsoft (MSFT) Report</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -6933,7 +7385,7 @@ Hello Q2! The first quarter is in the books, and the bulls are clearly in charge
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-01-01</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 0 | CONV: 50 | SEM: 19</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 0 | CONV: 50 | SEM: 17</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Enterprise Credit Memo Automation</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -6993,6 +7445,19 @@ Hello Q2! The first quarter is in the books, and the bulls are clearly in charge
                 <a href="intelligence_library.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
             </div>
 
+            <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="project singularity: the neural deck report content.">
+                <div style="flex-grow: 1;">
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
+                        <span class="mono" style="font-size:0.7rem; color:#888;">2025-01-01</span>
+                        <span class="type-badge">NEWSLETTER</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 0 | CONV: 50 | SEM: 27</span>
+                    </div>
+                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Project Singularity: The Neural Deck</h3>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
+                </div>
+                <a href="neural_deck.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
+            </div>
+
             <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="adam // neural nexus report content.">
                 <div style="flex-grow: 1;">
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
@@ -7004,6 +7469,19 @@ Hello Q2! The first quarter is in the books, and the bulls are clearly in charge
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
                 </div>
                 <a href="neural_nexus.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
+            </div>
+
+            <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="project omega report content.">
+                <div style="flex-grow: 1;">
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
+                        <span class="mono" style="font-size:0.7rem; color:#888;">2025-01-01</span>
+                        <span class="type-badge">NEWSLETTER</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 0 | CONV: 50 | SEM: 46</span>
+                    </div>
+                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Project OMEGA</h3>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
+                </div>
+                <a href="omega.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
             </div>
 
             <div class="archive-item type-GUIDE" data-year="2025" data-type="GUIDE" data-title="snc credit stress map report content.">
@@ -7037,7 +7515,7 @@ Hello Q2! The first quarter is in the books, and the bulls are clearly in charge
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-01-01</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 55 | CONV: 0 | SEM: 18</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 55 | CONV: 0 | SEM: 17</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Geopolitics and Financial Markets: Navigating Uncertainty and Risk</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -7123,6 +7601,19 @@ Hello Q2! The first quarter is in the books, and the bulls are clearly in charge
                 <a href="system_terminal.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
             </div>
 
+            <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="project omega: the holodeck report content.">
+                <div style="flex-grow: 1;">
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
+                        <span class="mono" style="font-size:0.7rem; color:#888;">2025-01-01</span>
+                        <span class="type-badge">NEWSLETTER</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 0 | CONV: 50 | SEM: 32</span>
+                    </div>
+                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Project OMEGA: The Holodeck</h3>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
+                </div>
+                <a href="holodeck.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
+            </div>
+
             <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="adam v23.5 | app deploy report content.">
                 <div style="flex-grow: 1;">
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
@@ -7149,12 +7640,25 @@ Hello Q2! The first quarter is in the books, and the bulls are clearly in charge
                 <a href="repository_v2.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
             </div>
 
+            <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="market mayhem: the flash crash report content.">
+                <div style="flex-grow: 1;">
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
+                        <span class="mono" style="font-size:0.7rem; color:#888;">2025-01-01</span>
+                        <span class="type-badge">NEWSLETTER</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 58 | CONV: 50 | SEM: 18</span>
+                    </div>
+                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">MARKET MAYHEM: THE FLASH CRASH</h3>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
+                </div>
+                <a href="newsletter_market_mayhem_may_2010.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
+            </div>
+
             <div class="archive-item type-STRATEGY" data-year="2025" data-type="STRATEGY" data-title="q1 2025 and full year outlook: navigating a bifurcated market report content.">
                 <div style="flex-grow: 1;">
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-01-01</span>
                         <span class="type-badge">STRATEGY</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 72 | CONV: 70 | SEM: 18</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 73 | CONV: 70 | SEM: 17</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Q1 2025 and Full Year Outlook: Navigating a Bifurcated Market</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -7245,7 +7749,7 @@ Hello Q2! The first quarter is in the books, and the bulls are clearly in charge
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-01-01</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 40 | CONV: 0 | SEM: 29</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 33 | CONV: 0 | SEM: 29</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">ADAM v25.5 :: WAR ROOM</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -7381,6 +7885,19 @@ Hello Q2! The first quarter is in the books, and the bulls are clearly in charge
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
                 </div>
                 <a href="FE25.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
+            </div>
+
+            <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="office nexus | system overlay report content.">
+                <div style="flex-grow: 1;">
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
+                        <span class="mono" style="font-size:0.7rem; color:#888;">2025-01-01</span>
+                        <span class="type-badge">NEWSLETTER</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 50 | CONV: 50 | SEM: 42</span>
+                    </div>
+                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Office Nexus | System Overlay</h3>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
+                </div>
+                <a href="office_nexus.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
             </div>
 
             <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="adam | network map report content.">
@@ -7561,7 +8078,7 @@ Hello Q2! The first quarter is in the books, and the bulls are clearly in charge
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2015-10-02</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 63 | CONV: 0 | SEM: 19</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 65 | CONV: 0 | SEM: 17</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Alphabet Inc. (GOOGL) Report</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
@@ -7811,28 +8328,261 @@ Hello Q2! The first quarter is in the books, and the bulls are clearly in charge
                 <a href="mm05022025.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
             </div>
 
+            <div class="archive-item type-NEWSLETTER" data-year="HISTORICAL" data-type="NEWSLETTER" data-title="market mayhem newsletter - april 4, 2025 report content.">
+                <div style="flex-grow: 1;">
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
+                        <span class="mono" style="font-size:0.7rem; color:#888;">0404-20-25</span>
+                        <span class="type-badge">NEWSLETTER</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: 94 | CONV: 50 | SEM: 39</span>
+                    </div>
+                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Market Mayhem Newsletter - April 4, 2025</h3>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
+                </div>
+                <a href="mm04042025.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
+            </div>
+
             </div>
 
         </main>
     </div>
 
-    <!-- Report Modal -->
-    <div id="reportModal" class="modal">
-        <div class="modal-content">
-            <span class="close-modal" onclick="document.getElementById('reportModal').style.display='none'">&times;</span>
-            <div id="modalMain" class="modal-main"></div>
-            <div class="modal-sidebar">
-                <div id="modalCritique"></div>
-                <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #333;">
-                    <h4 class="mono" style="color: var(--primary-color); margin-bottom: 10px;">ALPHA CALCULATION</h4>
-                    <div id="alphaStats" class="mono" style="font-size: 0.8rem; margin-bottom: 10px;"></div>
-                    <canvas id="alphaChart" height="150"></canvas>
-                </div>
-                <div id="modalMeta"></div>
-            </div>
-        </div>
-    </div>
+    <script>
+        // Data Handling
 
-    <script src="js/market_mayhem_archive_v2.js"></script>
+        const chartData = {
+            labels: ["0404-20-25", "0502-20-25", "0829-20-25", "1031-20-25", "1113-20-25", "1202-20-25", "1929-10-29", "1929-10-29", "1971-08-15", "1987-10-23", "1987-10-23", "1997-07-02", "2000-03-10", "2000-03-14", "2000-12-12", "2008-09-14", "2008-09-19", "2008-09-19", "2010-05-06", "2015-10-02", "2016-06-24", "2018-02-05", "2020-03-20", "2020-03-20", "2021-01-28", "2022-06-13", "2022-06-15", "2023-01-01", "2023-03-10", "2024-01-01", "2024-11-12", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-03", "2025-01-08", "2025-01-08", "2025-01-10", "2025-01-13", "2025-01-13", "2025-01-14", "2025-01-14", "2025-01-14", "2025-01-17", "2025-01-21", "2025-01-21", "2025-01-24", "2025-01-27", "2025-01-27", "2025-01-28", "2025-01-28", "2025-01-30", "2025-01-30", "2025-01-31", "2025-02-01", "2025-02-01", "2025-02-06", "2025-02-06", "2025-02-07", "2025-02-07", "2025-02-13", "2025-02-13", "2025-02-14", "2025-02-14", "2025-02-14", "2025-02-14", "2025-02-14", "2025-02-17", "2025-02-17", "2025-02-21", "2025-02-21", "2025-02-21", "2025-02-21", "2025-02-21", "2025-02-21", "2025-02-21", "2025-02-21", "2025-02-24", "2025-02-24", "2025-02-24", "2025-02-24", "2025-02-24", "2025-02-25", "2025-02-25", "2025-02-25", "2025-02-25", "2025-02-26", "2025-02-26", "2025-02-27", "2025-02-27", "2025-02-28", "2025-02-28", "2025-02-28", "2025-03-01", "2025-03-01", "2025-03-03", "2025-03-03", "2025-03-03", "2025-03-03", "2025-03-03", "2025-03-03", "2025-03-07", "2025-03-09", "2025-03-09", "2025-03-11", "2025-03-11", "2025-03-11", "2025-03-11", "2025-03-12", "2025-03-12", "2025-03-14", "2025-03-14", "2025-03-15", "2025-03-15", "2025-03-18", "2025-03-18", "2025-03-21", "2025-03-25", "2025-03-25", "2025-03-26", "2025-03-26", "2025-03-28", "2025-04-01", "2025-04-01", "2025-04-01", "2025-04-04", "2025-04-04", "2025-04-04", "2025-04-08", "2025-04-08", "2025-04-11", "2025-04-16", "2025-04-16", "2025-04-17", "2025-04-17", "2025-04-18", "2025-04-22", "2025-04-22", "2025-04-25", "2025-05-01", "2025-05-01", "2025-05-01", "2025-05-01", "2025-05-02", "2025-05-02", "2025-05-02", "2025-05-02", "2025-05-02", "2025-05-07", "2025-05-07", "2025-05-09", "2025-05-15", "2025-05-15", "2025-05-16", "2025-05-19", "2025-05-19", "2025-05-20", "2025-05-20", "2025-05-23", "2025-05-26", "2025-05-26", "2025-05-30", "2025-06-01", "2025-06-01", "2025-06-02", "2025-06-02", "2025-06-06", "2025-06-06", "2025-06-06", "2025-06-10", "2025-06-10", "2025-06-13", "2025-06-13", "2025-06-13", "2025-06-16", "2025-06-16", "2025-06-18", "2025-06-18", "2025-06-20", "2025-06-24", "2025-06-24", "2025-06-27", "2025-06-27", "2025-06-29", "2025-07-01", "2025-07-01", "2025-07-04", "2025-07-04", "2025-07-04", "2025-07-09", "2025-07-09", "2025-07-11", "2025-07-14", "2025-07-14", "2025-07-15", "2025-07-15", "2025-07-18", "2025-07-18", "2025-07-18", "2025-07-22", "2025-07-22", "2025-07-24", "2025-07-24", "2025-07-25", "2025-07-25", "2025-07-25", "2025-07-30", "2025-07-30", "2025-08-01", "2025-08-01", "2025-08-01", "2025-08-01", "2025-08-01", "2025-08-05", "2025-08-05", "2025-08-07", "2025-08-07", "2025-08-08", "2025-08-15", "2025-08-15", "2025-08-15", "2025-08-18", "2025-08-18", "2025-08-20", "2025-08-20", "2025-08-22", "2025-08-22", "2025-08-22", "2025-08-27", "2025-08-27", "2025-08-29", "2025-08-29", "2025-08-29", "2025-09-01", "2025-09-01", "2025-09-01", "2025-09-01", "2025-09-03", "2025-09-03", "2025-09-05", "2025-09-08", "2025-09-08", "2025-09-12", "2025-09-17", "2025-09-17", "2025-09-19", "2025-09-19", "2025-09-19", "2025-09-19", "2025-09-21", "2025-09-26", "2025-09-29", "2025-09-29", "2025-10-01", "2025-10-01", "2025-10-03", "2025-10-10", "2025-10-14", "2025-10-15", "2025-10-15", "2025-10-15", "2025-10-15", "2025-10-16", "2025-10-16", "2025-10-17", "2025-10-24", "2025-10-28", "2025-10-28", "2025-10-31", "2025-10-31", "2025-10-31", "2025-11-01", "2025-11-01", "2025-11-01", "2025-11-04", "2025-11-04", "2025-11-06", "2025-11-06", "2025-11-07", "2025-11-10", "2025-11-10", "2025-11-13", "2025-11-13", "2025-11-14", "2025-11-14", "2025-11-19", "2025-11-19", "2025-11-21", "2025-11-25", "2025-11-25", "2025-11-27", "2025-11-27", "2025-11-28", "2025-12-01", "2025-12-01", "2025-12-01", "2025-12-01", "2025-12-02", "2025-12-02", "2025-12-05", "2025-12-09", "2025-12-09", "2025-12-09", "2025-12-10", "2025-12-10", "2025-12-10", "2025-12-10", "2025-12-10", "2025-12-10", "2025-12-10", "2025-12-10", "2025-12-10", "2025-12-10", "2025-12-12", "2025-12-12", "2025-12-12", "2025-12-15", "2025-12-15", "2025-12-19", "2025-12-23", "2025-12-23", "2025-12-26", "2026-01-01", "2026-01-01", "2026-01-02", "2026-01-09", "2026-01-12", "2026-01-12", "2026-01-12", "2026-01-12", "2026-01-12", "2026-01-14", "2026-01-15", "2026-01-16", "2026-01-20", "2026-01-20", "2026-01-23", "2026-01-23", "2026-01-23", "2026-01-26", "2026-01-26", "2026-01-30", "2026-01-30", "2026-01-30", "2026-01-30", "2026-01-30", "2026-01-31", "2026-02-01", "2026-02-01", "2026-02-01", "2026-02-02", "2026-02-02", "2026-02-02", "2026-02-04", "2026-02-04", "2026-02-05", "2026-02-05", "2026-02-06", "2026-02-09", "2026-02-09", "2026-02-09", "2026-02-10", "2026-02-11", "2026-02-12", "2026-02-12", "2026-02-12", "2026-02-13", "2026-02-13", "2026-02-13", "2026-02-13", "2026-02-14", "2026-02-16", "2026-02-16", "2026-02-16", "2026-02-16", "2026-02-17", "2026-02-17", "2026-02-17", "2026-02-18", "2026-02-18", "2026-02-18", "2026-02-19", "2026-02-19", "2026-02-19", "2026-02-20", "2026-02-20", "2026-02-20", "2026-02-20", "2026-02-20", "2026-02-20", "2026-02-25", "2026-02-25", "2026-02-25", "2026-02-25", "2026-02-25", "2026-02-25", "2026-02-27", "2026-02-28", "2026-03-01", "2026-03-01", "2026-03-01", "2026-03-01", "2026-03-03", "2026-03-03", "2026-03-05", "2026-03-06", "2026-03-06", "2026-03-06", "2026-03-12", "2026-03-12", "2026-03-13", "2026-03-15", "2026-03-15", "2026-03-16", "2026-03-16", "2026-03-20", "2026-03-20", "2026-03-20", "2026-03-23", "2026-03-23", "2026-03-26", "2026-03-26", "2026-03-27", "2026-03-27", "2026-03-27"],
+            datasets: [
+                {
+                    label: 'Sentiment Score',
+                    data: [94, 90, 93, 90, 92, 87, 0, 66, 75, 25, 85, 87, 85, 66, 80, 66, 22, 57, 75, 65, 75, 85, 40, 85, 85, 75, 0, 73, 54, 91, 44, 50, 50, 50, 34, 94, 50, 50, 66, 50, 40, 0, 75, 69, 33, 50, 0, 50, 60, 100, 8, 73, 58, 50, 50, 0, 50, 50, 100, 92, 50, 50, 55, 83, 50, 0, 50, 0, 50, 100, 33, 100, 0, 62, 60, 63, 66, 73, 68, 0, 63, 100, 0, 27, 22, 0, 16, 0, 55, 81, 66, 0, 78, 100, 0, 0, 25, 0, 0, 66, 0, 0, 50, 85, 80, 77, 88, 50, 58, 0, 100, 94, 34, 25, 100, 50, 75, 88, 94, 51, 0, 0, 50, 76, 50, 60, 86, 50, 84, 0, 0, 77, 100, 50, 100, 66, 100, 50, 33, 0, 50, 50, 100, 95, 71, 80, 0, 66, 0, 33, 0, 50, 0, 66, 50, 0, 50, 0, 0, 58, 50, 0, 50, 65, 0, 50, 0, 50, 100, 86, 0, 75, 77, 61, 70, 83, 50, 66, 76, 50, 60, 91, 84, 82, 50, 50, 45, 0, 9, 12, 40, 100, 50, 50, 100, 88, 75, 50, 50, 0, 60, 77, 66, 66, 85, 90, 100, 66, 85, 75, 100, 50, 82, 50, 0, 75, 50, 0, 75, 50, 75, 25, 50, 0, 75, 50, 0, 75, 50, 75, 50, 75, 50, 0, 73, 50, 75, 50, 0, 12, 75, 50, 75, 0, 0, 50, 42, 75, 50, 0, 60, 100, 94, 80, 100, 100, 42, 85, 50, 50, 97, 0, 86, 96, 98, 100, 89, 100, 75, 50, 75, 50, 0, 73, 50, 75, 50, 50, 50, 50, 50, 0, 50, 50, 75, 50, 50, 50, 75, 50, 0, 0, 94, 50, 75, 50, 0, 75, 50, 75, 50, 0, 80, 100, 78, 50, 100, 66, 77, 100, 100, 77, 100, 77, 100, 100, 77, 100, 100, 80, 77, 100, 100, 77, 50, 100, 100, 38, 77, 100, 100, 77, 100, 100, 86, 0, 77, 100, 100, 77, 100, 100, 80, 100, 83, 50, 77, 100, 100, 77, 100, 77, 100, 100, 77, 100, 77, 100, 100, 77, 100, 58, 100, 55, 63, 25, 66, 0, 0, 66, 0, 0, 50, 54, 66, 0, 66, 0, 0, 66, 0, 66, 0, 66, 0, 0, 66, 0, 66, 63, 25, 0, 0, 66, 0, 66, 0, 0, 66, 0, 0, 66, 0, 66, 0, 66, 0, 0, 66, 0, 0, 0, 16, 63, 66, 0, 25, 66, 0, 0, 66, 0, 0, 66, 0, 66, 22, 0, 0, 0, 0, 66, 0, 80, 100, 100, 100, 0, 77, 33, 100, 0, 77, 100, 100, 100, 77, 100, 33, 100, 50, 80, 0, 100, 77, 100, 77, 100, 100, 77, 100, 50, 52, 20, 100, 77, 100, 100, 77, 100, 77, 100, 100, 46, 80, 100, 45, 0, 40, 100, 77, 100, 50, 92, 96, 96, 100, 100, 50, 0, 42, 50, 50, 80, 100, 0, 77, 100, 100, 77, 100, 100, 76, 100, 50, 50, 55, 75, 75, 50, 77, 40, 66, 50, 75, 50, 75, 50, 50, 75, 50, 62, 80, 75, 50, 50, 33, 76, 92, 100, 75, 90, 50, 75, 50, 75, 50, 50, 75, 50, 43, 83, 85, 20, 70, 83, 75, 50, 60, 80, 71, 75, 40, 57, 85, 75, 30, 85, 35, 71, 83, 75, 25, 66, 10, 65, 76, 100, 50, 90, 75, 85, 20, 65, 70, 90, 50, 100, 100, 80, 76, 100, 75, 50, 100, 75, 50, 50, 75, 50, 50, 20, 0, 75, 50, 75, 50, 50, 75, 50, 75, 50, 75, 50, 50],
+                    borderColor: '#00f3ff',
+                    backgroundColor: 'rgba(0, 243, 255, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }
+            ]
+        }
+
+        // Add Simulated Projections to Data
+        // We will extend the chart logic here
+
+        function initChart() {
+            const ctx = document.getElementById('sentimentChart').getContext('2d');
+
+            // Generate some forward looking mock data based on the last point
+            const labels = chartData.labels;
+            const sentimentData = chartData.datasets[0].data;
+            const lastVal = sentimentData[sentimentData.length - 1] || 50;
+
+            // Create projection labels (next 6 months)
+            const projectionLabels = ['Q1 26', 'Q2 26', 'Q3 26', 'Q4 26', '2027'];
+            const allLabels = [...labels, ...projectionLabels];
+
+            // Pad original data with nulls for projection slots
+            const paddedSentiment = [...sentimentData, null, null, null, null, null];
+
+            // Create Projection Datasets
+            const startVal = lastVal;
+            const bullPath = [null, ...Array(labels.length-1).fill(null), startVal, startVal+10, startVal+20, startVal+25, startVal+30];
+            const bearPath = [null, ...Array(labels.length-1).fill(null), startVal, startVal-15, startVal-30, startVal-40, startVal-45];
+            const simPath = [null, ...Array(labels.length-1).fill(null), startVal, startVal-5, startVal+5, startVal-2, startVal+8];
+            const consensus = [null, ...Array(labels.length-1).fill(null), startVal, startVal+2, startVal+5, startVal+8, startVal+12];
+
+            // New Datasets: Rates & Price Levels (Mock Data aligned to labels)
+            // S&P 500 Mock: Start ~5800, Trend up
+            const fullLen = allLabels.length;
+            const sp500Data = Array.from({length: fullLen}, (_, i) => 5800 + (i * 5) + (Math.random() * 100 - 50));
+            const yieldData = Array.from({length: fullLen}, (_, i) => 4.2 + (Math.cos(i/5) * 0.3) + (Math.random() * 0.1));
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: allLabels,
+                    datasets: [
+                        {
+                            label: 'Historical Sentiment',
+                            data: paddedSentiment,
+                            borderColor: '#00f3ff',
+                            backgroundColor: 'rgba(0, 243, 255, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.4,
+                            fill: true,
+                            pointRadius: 2,
+                            yAxisID: 'y'
+                        },
+                         {
+                            label: 'Bullish Scenario',
+                            data: bullPath,
+                            borderColor: '#0aff60',
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            tension: 0.4,
+                            pointRadius: 0,
+                            yAxisID: 'y'
+                        },
+                         {
+                            label: 'Bearish Scenario',
+                            data: bearPath,
+                            borderColor: '#ff3333',
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            tension: 0.4,
+                            pointRadius: 0,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: 'Simulated Path',
+                            data: simPath,
+                            borderColor: '#ffffff',
+                            backgroundColor: 'rgba(255,255,255,0.05)',
+                            borderWidth: 1,
+                            borderDash: [2, 2],
+                            tension: 0.4,
+                            pointRadius: 0,
+                            fill: '-1', // Fill to previous dataset (Bearish)
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: 'Projected Outlook (Consensus)',
+                            data: consensus,
+                            borderColor: '#d946ef', // Fuchsia
+                            borderWidth: 2,
+                            borderDash: [10, 5],
+                            tension: 0.4,
+                            pointRadius: 3,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: 'S&P 500 Outlook',
+                            data: sp500Data,
+                            borderColor: '#f59e0b', // Orange
+                            borderWidth: 2,
+                            tension: 0.4,
+                            pointRadius: 0,
+                            yAxisID: 'y1',
+                            hidden: true // Hidden by default to avoid clutter
+                        },
+                        {
+                            label: '10Y Yield Outlook',
+                            data: yieldData,
+                            borderColor: '#888', // Grey
+                            borderWidth: 2,
+                            borderDash: [2, 2],
+                            tension: 0.4,
+                            pointRadius: 0,
+                            yAxisID: 'y2',
+                            hidden: true
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    plugins: {
+                        legend: {
+                            labels: { color: '#ccc', font: { family: 'JetBrains Mono', size: 10 }, boxWidth: 10 },
+                            position: 'top',
+                            align: 'end'
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0,0,0,0.9)',
+                            titleFont: { family: 'JetBrains Mono' },
+                            bodyFont: { family: 'JetBrains Mono' },
+                            borderColor: '#333',
+                            borderWidth: 1,
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        label += context.parsed.y.toFixed(2);
+                                        if (context.dataset.yAxisID === 'y2') label += '%';
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            grid: { color: '#222' },
+                            ticks: { color: '#666', font: { family: 'JetBrains Mono', size: 9 } },
+                            title: { display: true, text: 'Sentiment', color: '#00f3ff', font: { size: 9 } }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: false,
+                            position: 'right',
+                            grid: { drawOnChartArea: false },
+                            ticks: { color: '#f59e0b', font: { family: 'JetBrains Mono', size: 9 } }
+                        },
+                        y2: {
+                            type: 'linear',
+                            display: false,
+                            position: 'right',
+                            grid: { drawOnChartArea: false },
+                            ticks: { color: '#888', font: { family: 'JetBrains Mono', size: 9 } }
+                        },
+                        x: {
+                            grid: { color: '#222' },
+                            ticks: { color: '#666', maxTicksLimit: 12, font: { family: 'JetBrains Mono', size: 9 } }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Search & Filter Logic
+        function applyFilters() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const year = document.getElementById('yearFilter').value;
+            const type = document.getElementById('typeFilter').value;
+            const sort = document.getElementById('sortFilter').value;
+
+            const grid = document.getElementById('archiveGrid');
+            const items = Array.from(grid.getElementsByClassName('archive-item'));
+
+            // Sort First
+            items.sort((a, b) => {
+                const dateA = a.querySelector('.mono').innerText.trim();
+                const dateB = b.querySelector('.mono').innerText.trim();
+                return sort === 'NEWEST' ? dateB.localeCompare(dateA) : dateA.localeCompare(dateB);
+            });
+
+            // Re-append in order
+            items.forEach(item => grid.appendChild(item));
+
+            // Then Filter
+            items.forEach(item => {
+                const itemYear = item.dataset.year;
+                const itemType = item.dataset.type;
+                const itemText = item.dataset.title.toLowerCase();
+
+                let matchSearch = itemText.includes(search);
+                let matchYear = year === 'ALL' || itemYear === year;
+                let matchType = type === 'ALL' || itemType === type;
+
+                // Handle Historical Special Case
+                if (year === 'HISTORICAL' && (itemYear === 'HISTORICAL' || parseInt(itemYear) < 2024)) {
+                    matchYear = true;
+                }
+
+                item.style.display = (matchSearch && matchYear && matchType) ? 'flex' : 'none';
+            });
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            initChart();
+        });
+    </script>
 </body>
 </html>
