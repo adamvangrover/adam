@@ -25,6 +25,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         log("System", "Initializing CreditOS v2.4...", "info");
 
         try {
+            // Check if universalLoader is available
+            if (!window.universalLoader) {
+                console.warn("Universal Loader not found, attempting to load fallback data.");
+                // Create a mock loader or handle error gracefully
+                window.universalLoader = {
+                    loadLibrary: async () => [],
+                    loadCreditMemo: async () => null
+                };
+            }
+
             // Load Library via Universal Loader
             const libArray = await window.universalLoader.loadLibrary();
 

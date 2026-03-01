@@ -202,6 +202,15 @@ function getVector(entity, step, target) {
     // Z Axis: Risk
     const z = entity.zPos;
 
+    if (isNaN(x) || isNaN(y) || isNaN(z)) {
+        console.warn("NaN vector detected", {x, y, z, step, entity});
+        if (target) {
+            target.set(0, 0, 0);
+            return target;
+        }
+        return new THREE.Vector3(0, 0, 0);
+    }
+
     if (target) {
         target.set(x, y, z);
         return target;
