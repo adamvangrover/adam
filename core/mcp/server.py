@@ -181,13 +181,15 @@ def rebalance_portfolio(portfolio_id: str, target_allocation: str) -> str:
     })
 
 
+from core.security.sql_validator import SQLValidator
+
 @mcp.tool()
 def query_sql(query: str) -> str:
     """
     Executes a read-only SQL query against the local financial database.
     Restricted to specific tables for security.
     """
-    if not query.strip().upper().startswith("SELECT"):
+    if not SQLValidator.validate_read_only(query):
         raise ValueError("Only SELECT queries are allowed.")
 
     # Whitelist of allowed tables to prevent accessing secrets or system tables
