@@ -380,6 +380,7 @@
 
             // 2. Projections
             const projections = useMemo(() => {
+                if (!historical.revenue || historical.revenue.length < 3) return { rev: [], ebitda: [], fcf: [], debts: [] };
                 let lastRev = historical.revenue[2];
                 let proj = { rev: [], ebitda: [], fcf: [], debts: [] };
 
@@ -442,7 +443,7 @@
             const upside = (impliedSharePrice - inputs.price) / inputs.price;
 
             // 4. Ratios
-            const ltmEbitda = historical.revenue[2] * historical.margin[2];
+            const ltmEbitda = (historical.revenue && historical.revenue.length >= 3 && historical.margin && historical.margin.length >= 3) ? historical.revenue[2] * historical.margin[2] : 1;
             const leverageRatio = totalDebt / ltmEbitda;
 
             const getRating = (lev) => {
