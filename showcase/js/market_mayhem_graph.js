@@ -1,8 +1,9 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
 
 /**
- * MARKET MAYHEM GRAPH V2.5 (HYBRID REALITY)
+ * MARKET MAYHEM GRAPH V3.0 (HYBRID REALITY)
  * -----------------------------------------------------------------------------
  * 3D Visualization of Real Market Data + Monte Carlo Projections.
  * Features: Historical Replay, Stochastic Forecasting, System 2 Bias.
@@ -34,6 +35,7 @@ const State = {
     sortBy: 'DEFAULT',
     showCone: true,
     useSystemBias: true,
+    isStressMode: false,
     selectedEntity: null,
     interactiveNodes: []
 };
@@ -122,6 +124,8 @@ class DataManager {
                     mc: mc, // { paths, meanPath, stats }
                     outlook: item.outlook,
                     risk: item.risk_score,
+                    financials: item.financials,
+                    credit: item.credit,
                     // Normalize positions for 3D space
                     // X: Time (handled by loop), Y: Price (Normalized), Z: Risk/Conviction
                     normFactor: 10 / history[0], // Scale initial price to ~10
@@ -162,7 +166,7 @@ class DataManager {
 }
 
 // --- VISUALIZATION ENGINE ---
-let scene, camera, renderer, controls;
+let scene, camera, renderer, labelRenderer, controls;
 let entityGroup = new THREE.Group();
 let raycaster, mouse;
 
@@ -223,6 +227,14 @@ async function init() {
     renderer.setPixelRatio(window.devicePixelRatio);
     document.getElementById('canvas-container').appendChild(renderer.domElement);
 
+    // CSS2D Renderer for Labels
+    labelRenderer = new CSS2DRenderer();
+    labelRenderer.setSize(window.innerWidth, window.innerHeight);
+    labelRenderer.domElement.style.position = 'absolute';
+    labelRenderer.domElement.style.top = '0px';
+    labelRenderer.domElement.style.pointerEvents = 'none'; // Allow clicking through text
+    document.getElementById('canvas-container').appendChild(labelRenderer.domElement);
+
     controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.autoRotate = false;
@@ -272,6 +284,9 @@ async function init() {
     window.addEventListener('click', onMouseClick);
     window.addEventListener('resize', onWindowResize);
 
+    // System 2 Feed Loop
+    setInterval(updateNewsFeed, 4000);
+
     // 6. Start Loop
     document.getElementById('loading-overlay').style.display = 'none';
     animate();
@@ -282,6 +297,11 @@ function createVisuals() {
     State.interactiveNodes = [];
 
     State.data.forEach(entity => {
+        // Create a Group for the Entity
+        const group = new THREE.Group();
+        entity.group = group; // Store reference
+        entityGroup.add(group);
+
         // --- 1. The Head Node (Sphere) ---
         const geometry = new THREE.SphereGeometry(0.4, 16, 16);
         const material = new THREE.MeshStandardMaterial({
@@ -291,9 +311,22 @@ function createVisuals() {
         });
         const sphere = new THREE.Mesh(geometry, material);
         sphere.userData = { type: 'node', entity: entity };
-        entityGroup.add(sphere);
+        group.add(sphere);
         entity.mesh = sphere; // Link for updates
         State.interactiveNodes.push(sphere);
+
+        // --- 1b. Label (CSS2D) ---
+        const div = document.createElement('div');
+        div.className = 'label-3d';
+        div.textContent = entity.ticker;
+        div.style.marginTop = '-1em';
+        div.style.color = '#' + entity.color.toString(16);
+        const label = new CSS2DObject(div);
+        label.position.set(0, 1, 0); // Above sphere
+        sphere.add(label);
+        entity.label = label;
+        // Show labels for high conviction by default, else hide
+        label.visible = entity.outlook.conviction === 'High';
 
         // --- 2. Historical Trail (Line) ---
         const historyPoints = [];
@@ -303,9 +336,9 @@ function createVisuals() {
         const histGeo = new THREE.BufferGeometry().setFromPoints(historyPoints);
         const histMat = new THREE.LineBasicMaterial({ color: entity.color, transparent: true, opacity: 0.3 });
         const histLine = new THREE.Line(histGeo, histMat);
-        entityGroup.add(histLine);
+        group.add(histLine);
 
-        // --- 3. Monte Carlo Cone (Group of Lines) ---
+        // --- 3. Monte Carlo Cone (Group of Lines + Tube) ---
         // Only created if needed, toggled by visibility
         const coneGroup = new THREE.Group();
         coneGroup.visible = State.showCone;
@@ -318,14 +351,13 @@ function createVisuals() {
         const norm = entity.normFactor;
         const z = entity.zPos;
 
-        // Render subset of paths to save FPS
-        const pathsToRender = entity.mc.paths.slice(0, 10);
+        // Render subset of paths to save FPS (Lines)
+        const pathsToRender = entity.mc.paths.slice(0, 5);
 
         pathsToRender.forEach(path => {
             const points = [startVec]; // Start at last known
             for (let t = 1; t < path.length; t++) {
                 // Calculate position relative to start
-                // Time advances from todayX
                 const stepAbs = (State.historyLength - 1) + t;
                 const x = ((stepAbs / State.totalSteps) * 100) - 50;
                 const y = (path[t] * norm) - 10;
@@ -359,34 +391,79 @@ function createVisuals() {
         const meanLine = new THREE.Line(meanGeo, meanMat);
         coneGroup.add(meanLine);
 
-        entityGroup.add(coneGroup);
+        // --- Confidence Tube ---
+        // Create a tube around the mean path to show variance
+        const tubePath = new THREE.CatmullRomCurve3(meanPoints);
+        // Radius scales with time (t) to show increasing uncertainty
+        const tubeGeo = new THREE.TubeGeometry(tubePath, 30, 0.1, 8, false);
+        // Custom radius requires modifying geometry or using shader, here we use simple transparent mesh
+        // To make it expand, we'd need a custom geometry generator, but for simplicity:
+        // We'll just use a low-opacity mesh for visual flair
+        const tubeMat = new THREE.MeshBasicMaterial({
+            color: entity.color,
+            transparent: true,
+            opacity: 0.05,
+            wireframe: true
+        });
+        const tubeMesh = new THREE.Mesh(tubeGeo, tubeMat);
+        coneGroup.add(tubeMesh);
+
+        group.add(coneGroup);
     });
 }
 
 function updatePositions() {
+    const time = Date.now() * 0.005;
+
     State.data.forEach(entity => {
         // Filter Check
         const isVisible = (State.filter === 'ALL' || entity.sector === State.filter);
-        entity.mesh.visible = isVisible;
-        entity.coneGroup.visible = isVisible && State.showCone;
-        // Also hide history lines if filtered? (Assuming yes for clarity)
-        // Note: history lines are separate objects in group, simpler to just hide group or rebuild.
-        // For performance, we'll just scale the node to 0 if hidden or use visible property if linked properly.
-        // For this prototype, we just toggle the head node. Ideally we toggle the trails too.
-
+        
+        // Hide entire group if filtered out
+        if (entity.group) {
+            entity.group.visible = isVisible;
+        }
+        
         if (!isVisible) return;
+
+        // Toggle Cone visibility based on state
+        if (entity.coneGroup) {
+            entity.coneGroup.visible = State.showCone;
+        }
 
         // Move Head Node
         getVector(entity, State.currentStep, entity.mesh.position);
 
-        // Highlight
+        // Highlight & Stress Mode
+        let baseEmissive = 0.5;
+        let scale = 1;
+
         if (State.selectedEntity && State.selectedEntity.id === entity.id) {
-            entity.mesh.scale.set(1.5, 1.5, 1.5);
-            entity.mesh.material.emissiveIntensity = 1.0;
+            scale = 1.5;
+            baseEmissive = 1.0;
+            if(entity.label) entity.label.visible = true;
         } else {
-            entity.mesh.scale.set(1, 1, 1);
-            entity.mesh.material.emissiveIntensity = 0.5;
+            // Revert label visibility unless high conviction
+            if(entity.label) entity.label.visible = entity.outlook.conviction === 'High';
+
+            // Stress Mode Logic
+            if (State.isStressMode && entity.risk > 80) {
+                // Pulse red
+                const pulse = (Math.sin(time) + 1) * 0.5; // 0 to 1
+                entity.mesh.material.color.setHex(0xff0000);
+                entity.mesh.material.emissive.setHex(0xff0000);
+                baseEmissive = 0.5 + (pulse * 0.5);
+                scale = 1 + (pulse * 0.2);
+                if(entity.label) entity.label.visible = true; // Show label on stress
+            } else {
+                // Reset color if not stressed
+                entity.mesh.material.color.setHex(entity.color);
+                entity.mesh.material.emissive.setHex(entity.color);
+            }
         }
+
+        entity.mesh.scale.set(scale, scale, scale);
+        entity.mesh.material.emissiveIntensity = baseEmissive;
     });
 }
 
@@ -407,9 +484,22 @@ function animate() {
         }
     }
 
+    // Camera Focus Logic
+    if (State.selectedEntity) {
+        // Find target position (head node)
+        const targetPos = State.selectedEntity.mesh.position.clone();
+        
+        // Offset for camera
+        // const offset = new THREE.Vector3(0, 5, 20); 
+        // Simple lerp for smooth follow
+        controls.target.lerp(targetPos, 0.05);
+        // We don't force camera position to allow user rotation, just target
+    }
+
     updatePositions();
     controls.update();
     renderer.render(scene, camera);
+    labelRenderer.render(scene, camera);
     updateInteraction();
 }
 
@@ -452,13 +542,41 @@ function setupUI() {
         State.filter = e.target.value;
     });
 
-    // New Toggles (Will be added to HTML next step)
+    // New Toggles
     const toggleCone = document.getElementById('toggle-cone');
     if (toggleCone) {
         toggleCone.addEventListener('change', (e) => {
             State.showCone = e.target.checked;
         });
     }
+
+    const toggleStress = document.getElementById('toggle-stress');
+    if (toggleStress) {
+        toggleStress.addEventListener('change', (e) => {
+            State.isStressMode = e.target.checked;
+        });
+    }
+
+    // Panel Tabs
+    document.querySelectorAll('.panel-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            document.querySelectorAll('.panel-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.panel-content').forEach(c => c.classList.remove('active'));
+            tab.classList.add('active');
+            const target = tab.getAttribute('data-tab');
+            document.getElementById(`tab-${target}`).classList.add('active');
+        });
+    });
+
+    // Deep Dive Button
+    document.getElementById('btn-deep-dive').addEventListener('click', () => {
+        if (State.selectedEntity) {
+            const ticker = State.selectedEntity.ticker.toLowerCase();
+            // Try specific file first or fallback to query param logic (simulated here)
+            const url = `${ticker}_company_report.html`; // Simple mapping
+            window.open(url, '_blank');
+        }
+    });
 }
 
 function onMouseMove(event) {
@@ -512,18 +630,98 @@ function selectEntity(entity) {
     const panel = document.getElementById('attribution-panel');
     panel.style.display = 'block';
 
-    document.getElementById('attr-agent-name').innerText = "SYSTEM ORACLE";
-    document.getElementById('attr-prov-id').innerText = `RISK: ${entity.risk}/100`;
+    // Overview Tab
+    document.getElementById('attr-ticker').innerText = entity.ticker;
+    document.getElementById('attr-name').innerText = "SECTOR: " + entity.sector.toUpperCase();
     document.getElementById('attr-thesis').innerText = entity.outlook.rationale;
-    document.getElementById('attr-accuracy').innerText = `Bias: ${entity.outlook.conviction}`;
-    document.getElementById('attr-direction').innerText = entity.outlook.consensus.toUpperCase();
-    document.getElementById('attr-model').innerText = "Monte Carlo (Geometric Brownian)";
+    document.getElementById('attr-conviction').innerText = entity.outlook.conviction;
+    document.getElementById('attr-consensus').innerText = entity.outlook.consensus;
+    document.getElementById('attr-risk').innerText = entity.risk + "/100";
+
+    // Financials Tab
+    const finContainer = document.getElementById('fin-container');
+    if (entity.financials) {
+        const years = entity.financials.years || [];
+        const rev = entity.financials.revenue || [];
+        const eps = entity.financials.eps || [];
+        
+        let html = '<table style="width:100%; font-size:0.9em; border-collapse:collapse;">';
+        html += '<tr style="border-bottom:1px solid #444; color:#888;"><th>Year</th><th>Rev ($B)</th><th>EPS</th></tr>';
+        
+        // Show last 3 years
+        const start = Math.max(0, years.length - 3);
+        for (let i = start; i < years.length; i++) {
+            html += `<tr>
+                <td style="padding:4px;">${years[i]}</td>
+                <td style="color:#00ccff;">${rev[i]}</td>
+                <td style="color:#00ff9d;">${eps[i]}</td>
+            </tr>`;
+        }
+        html += '</table>';
+        finContainer.innerHTML = html;
+    } else {
+        finContainer.innerHTML = '<div style="color:#666; font-style:italic;">Data Unavailable</div>';
+    }
+
+    // Credit Tab
+    const creditContainer = document.getElementById('credit-container');
+    if (entity.credit) {
+        creditContainer.innerHTML = `
+            <div class="data-row"><span>Rating:</span> <span style="color:#ffaa00;">${entity.credit.rating}</span></div>
+            <div class="data-row"><span>Leverage:</span> <span>${entity.credit.leverage}x</span></div>
+            <div class="data-row"><span>Coverage:</span> <span>${entity.credit.interest_coverage}x</span></div>
+            <div class="data-row"><span>Liquidity:</span> <span>${entity.credit.liquidity_score}/100</span></div>
+            <div style="margin-top:10px; font-size:0.7em; color:#666;">
+                PD: ${entity.credit.pd_rating}<br>
+                Reg: ${entity.credit.regulatory_rating}
+            </div>
+        `;
+    } else {
+        creditContainer.innerHTML = '<div style="color:#666; font-style:italic;">Credit Profile Unavailable</div>';
+    }
+}
+
+function updateNewsFeed() {
+    const feed = document.getElementById('news-feed');
+    if (!feed || !State.data.length) return;
+
+    // Pick random visible entity
+    const visibleEntities = State.data.filter(e => e.mesh.visible);
+    if (!visibleEntities.length) return;
+
+    const entity = visibleEntities[Math.floor(Math.random() * visibleEntities.length)];
+    
+    // Use Real Data
+    const change = ((entity.history[entity.history.length-1] - entity.history[entity.history.length-2])/entity.history[entity.history.length-2]*100).toFixed(2);
+    const sign = change >= 0 ? '+' : '';
+    
+    const templates = [
+        `> UPDATE: ${entity.ticker} ${sign}${change}% today. Outlook: ${entity.outlook.consensus}.`,
+        `> RISK ALERT: ${entity.ticker} score at ${entity.risk}. ${entity.outlook.rationale.substring(0, 50)}...`,
+        `> CONVICTION: System holds ${entity.outlook.conviction} view on ${entity.ticker}.`,
+        `> SECTOR SCAN: ${entity.sector} moving. ${entity.ticker} implied volatility rising.`
+    ];
+    const text = templates[Math.floor(Math.random() * templates.length)];
+
+    const entry = document.createElement('div');
+    entry.className = 'log-entry';
+    entry.style.borderLeft = `2px solid #${entity.color.toString(16)}`;
+    entry.style.paddingLeft = '5px';
+    entry.innerText = text;
+    
+    feed.insertBefore(entry, feed.firstChild);
+    
+    // Keep only last 20
+    if (feed.children.length > 20) {
+        feed.removeChild(feed.lastChild);
+    }
 }
 
 function onWindowResize() {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
+    labelRenderer.setSize(window.innerWidth, window.innerHeight);
 }
 
 // --- BOOTSTRAP ---
