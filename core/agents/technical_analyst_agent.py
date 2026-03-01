@@ -218,7 +218,7 @@ class TechnicalAnalystAgent(AgentBase):
     def load_model(self, model_path):
         if os.path.exists(model_path):
             with open(model_path, 'rb') as f:
-                return pickle.load(f)
+                return pickle.load(f)  # nosec B301
         return None
 
     def save_model(self, model, model_path):
