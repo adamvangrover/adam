@@ -293,6 +293,7 @@ core/credit_sentinel/models/__init__.py
 core/credit_sentinel/models/distress_classifier.py
 core/data/historical_loader.py
 core/data/market_history_simulator.py
+core/data/realtime_fetcher.py
 core/data_access/api_source.py
 core/data_access/base_data_source.py
 core/data_access/bigquery_connector.py
@@ -866,8 +867,21 @@ src/adam/api/models.py
 src/adam/core/__init__.py
 src/adam/core/optimizers.py
 src/adam/core/state_manager.py
+src/api/main.py
+src/api/routers/ingest.py
+src/core/config.py
+src/core/logging.py
+src/ingestion/base.py
+src/ingestion/plugin_manager.py
+src/ingestion/plugins/__init__.py
+src/ingestion/plugins/excel_parser.py
+src/ingestion/plugins/pdf_parser.py
+src/llm/agent.py
+src/llm/schemas.py
 src/market_mayhem/__init__.py
 src/market_mayhem/scanners.py
+src/orchestration/celery_app.py
+src/orchestration/tasks.py
 tests/test_acceptance_conviction.py
 tests/test_adam_phase_two.py
 tests/test_adam_v24_logic.py
@@ -949,6 +963,7 @@ tests/test_legacy_api_security.py
 tests/test_live_data_fetcher.py
 tests/test_macro_liquidity_agent.py
 tests/test_market_regime_agent.py
+tests/test_market_sentiment_agent.py
 tests/test_market_sentiment_v2.py
 tests/test_memory_integration.py
 tests/test_memory_mixin.py
