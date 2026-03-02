@@ -1,102 +1,73 @@
 # core/agents/industry_specialists/technology.py
 
-import pandas as pd
-from textblob import TextBlob
+import logging
 
+# Configure logging
+logger = logging.getLogger(__name__)
 
 class TechnologySpecialist:
     def __init__(self, config):
+        self.config = config
         self.data_sources = config.get('data_sources', {})
 
     def analyze_industry_trends(self):
         """
-        Analyzes industry trends specific to the technology sector.
+        Analyzes the trends in the technology industry.
 
         Returns:
-            dict: A dictionary containing key trends and insights.
+            dict: A dictionary containing industry trends and insights.
         """
-
-        # 1. Fetch data from relevant sources
-        news_headlines = self.data_sources['financial_news_api'].get_financial_news_headlines(
-            keywords=["technology", "AI", "cloud", "semiconductor"], sentiment=None
-        )
-        social_media_posts = self.data_sources['social_media_api'].get_tweets(
-            query="technology OR AI OR cloud OR semiconductor"
-        )
-
-        # 2. Analyze sentiment and trends
-        sentiment_scores = [TextBlob(headline['text']).sentiment.polarity for headline in news_headlines]
-        avg_sentiment = sum(sentiment_scores) / len(sentiment_scores) if sentiment_scores else 0
-        # ... (analyze social media sentiment and trends)
-
         trends = {
-            'AI adoption': self.analyze_ai_adoption(news_headlines, social_media_posts),
-            'cloud_computing_market': self.analyze_cloud_market(news_headlines, social_media_posts),
-            'semiconductor_shortage': self.analyze_semiconductor_shortage(news_headlines, social_media_posts),
-            'overall_sentiment': avg_sentiment,
-            # ... (add more trends and insights)
+            'emerging_technologies': [],
+            'market_growth': {},
+            'competitive_landscape': {}
         }
+
+        # 1. Analyze emerging technologies
+        # Check if financial_news_api is available before accessing it
+        if 'financial_news_api' in self.data_sources:
+            try:
+                news_headlines = self.data_sources['financial_news_api'].get_financial_news_headlines(
+                    sector='technology'
+                )
+                # ... (analyze headlines to identify emerging technologies)
+                # Placeholder:
+                trends['emerging_technologies'] = ['AI', 'Cloud Computing', 'Blockchain']
+            except Exception as e:
+                logger.warning(f"Error accessing financial_news_api: {e}")
+                trends['emerging_technologies'] = ['Unknown (Data Source Error)']
+        else:
+             logger.info("financial_news_api not configured for TechnologySpecialist.")
+             trends['emerging_technologies'] = ['Data source not available']
+
+        # 2. Analyze market growth
+        if 'technology_market_data' in self.data_sources:
+             # ...
+             pass
+
+        # Placeholder data
+        trends['market_growth'] = {'global': '5%', 'AI_sector': '20%'}
+
         return trends
 
     def analyze_company(self, company_data):
         """
-        Analyzes a company within the technology sector.
+        Analyzes a technology company.
 
         Args:
-            company_data (dict): Data about the company, including financials, products, and news.
+            company_data (dict): Data about the company.
 
         Returns:
-            dict: A dictionary containing analysis results and insights.
+            dict: A dictionary containing company analysis results.
         """
-
-        # 1. Analyze financial health
-        financial_health = self.analyze_financial_health(company_data['financial_statements'])
-
-        # 2. Analyze innovation (example: R&D spending)
-        research_and_development = company_data.get('research_and_development', 0)
-        innovation_score = research_and_development / 1000000  # Example calculation
-
-        # 3. Analyze competitive landscape
-        competitive_advantage = self.analyze_competitive_landscape(company_data, self.data_sources)
-
         analysis_results = {
-            'financial_health': financial_health,
-            'innovation_score': innovation_score,
-            'competitive_advantage': competitive_advantage,
-            # ... (add more analysis results)
+            'technological_capabilities': {},
+            'market_position': {},
+            'innovation_potential': {}
         }
+
+        # ... (analyze company data using specialized knowledge)
+
+        # Placeholder
+        analysis_results['technological_capabilities'] = 'High'
         return analysis_results
-
-    def analyze_ai_adoption(self, news_headlines, social_media_posts):
-        # ... (analyze news and social media data to assess AI adoption trends)
-        return "increasing"  # Example
-
-    def analyze_cloud_market(self, news_headlines, social_media_posts):
-        # ... (analyze news and social media data to assess cloud market trends)
-        return "consolidating"  # Example
-
-    def analyze_semiconductor_shortage(self, news_headlines, social_media_posts):
-        # ... (analyze news and social media data to assess semiconductor shortage trends)
-        return "easing"  # Example
-
-    def analyze_financial_health(self, financial_statements):
-        # ... (analyze financial data to assess financial health)
-        return "stable"  # Example
-
-    def analyze_competitive_landscape(self, company_data, data_sources):
-        # ... (analyze news and social media sentiment about the company and its competitors)
-        return "strong"  # Example
-
-    def generate_outlook(self):
-        """
-        Generates a standardized sector outlook for the Sector Swarm Showcase.
-        """
-        return {
-            "sector": "Technology",
-            "rating": "OVERWEIGHT",
-            "outlook": "Bullish",
-            "thesis": "AI is not a bubble; it is the new electricity. We are in the early stages of a 10-year capex supercycle.",
-            "top_picks": ["NVDA", "MSFT", "PLTR"],
-            "risks": ["Regulatory Antitrust", "Supply Chain Taiwan"],
-            "sentiment_score": 0.85
-        }

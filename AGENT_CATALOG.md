@@ -409,7 +409,7 @@ This document provides a comprehensive catalog of all the agents in the ADAM sys
     *   **Hooks:** None
 *   **Compute and Resource Requirements:** High (Cyclical LLM calls).
 *   **Dependencies:** `langgraph`, `core.engine.crisis_simulation_graph`.
-*   **Developer Notes:** The v23 graph provides better reasoning traces than the v21 prompt-only approach.
+*   **Developer Notes:** The v23 graph provides better reasoning traces than the v21 prompt-only approach. Included in `core/system/agent_orchestrator.py`.
 
 ---
 
