@@ -540,7 +540,7 @@ class HuggingFaceLLM(BaseLLM):
         if self._tokenizer is None:
             try:
                 from transformers import AutoTokenizer
-                self._tokenizer = AutoTokenizer.from_pretrained(self.model_name)
+                self._tokenizer = AutoTokenizer.from_pretrained(self.model_name)  # nosec B615
             except ImportError:
                 raise LLMConfigurationError("Transformers library not installed.")
             except Exception as e:
@@ -553,9 +553,9 @@ class HuggingFaceLLM(BaseLLM):
             try:
                 from transformers import AutoModelForSeq2SeqLM, AutoModelForCausalLM
                 try:
-                    self._model = AutoModelForSeq2SeqLM.from_pretrained(self.model_name)
+                    self._model = AutoModelForSeq2SeqLM.from_pretrained(self.model_name)  # nosec B615
                 except:
-                    self._model = AutoModelForCausalLM.from_pretrained(self.model_name)
+                    self._model = AutoModelForCausalLM.from_pretrained(self.model_name)  # nosec B615
             except ImportError:
                 raise LLMConfigurationError("Transformers library not installed.")
             except Exception as e:

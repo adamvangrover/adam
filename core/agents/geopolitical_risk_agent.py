@@ -1,5 +1,6 @@
 # core/agents/geopolitical_risk_agent.py
 
+import asyncio
 from __future__ import annotations
 from typing import Any, Dict, Optional, List, Union
 import logging
