@@ -2,7 +2,7 @@ import os
 import json
 import time
 import random
-from flask import Flask, send_from_directory, jsonify, request
+from flask import Flask, send_from_directory, jsonify
 from flask_cors import CORS
 
 # Define the showcase directory relative to this script
@@ -68,6 +68,16 @@ def get_agents():
         with open(DATA_FILE, 'r') as f:
             data = json.load(f)
         return jsonify(data['agents'])
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route('/api/market_mayhem/latest')
+def get_market_mayhem_latest():
+    """Retrieves the latest market mayhem data for the viewer."""
+    try:
+        # For now, just serve the static data file
+        return send_from_directory(os.path.join(SHOWCASE_DIR, 'data'), 'market_mayhem_index.json')
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 

@@ -106,6 +106,7 @@ class DataManager {
     async load() {
         try {
             const response = await fetch('data/sp500_market_data.json');
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
             const rawData = await response.json();
 
             // Process Entities

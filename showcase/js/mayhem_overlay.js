@@ -56,14 +56,16 @@ class MayhemOverlay {
             let mayhemData = [];
             try {
                 const response = await fetch('data/market_mayhem_index.json');
-                if (response.ok) mayhemData = await response.json();
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                mayhemData = await response.json();
             } catch (e) { console.warn("Failed to load market_mayhem_index.json", e); }
 
             // 2. Fetch Credit Memos
             let creditData = [];
             try {
                 const response = await fetch('data/credit_memo_library.json');
-                if (response.ok) creditData = await response.json();
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                creditData = await response.json();
             } catch (e) { console.warn("Failed to load credit_memo_library.json", e); }
 
             // 3. Define Static Dashboards/Tools
