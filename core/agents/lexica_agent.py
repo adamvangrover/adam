@@ -74,12 +74,12 @@ class LexicaAgent(AgentBase):
         engine_id = self.api_keys.get('google_search_engine_id')
 
         if not api_key or not engine_id:
-            logger.warning("Google Search API keys missing.")
-            return []
+            logger.warning("Google Search API keys missing. Skipping web search.")
+            return results
 
         url = f"https://www.googleapis.com/customsearch/v1?key={api_key}&cx={engine_id}&q={query}"
         try:
-            response = requests.get(url, timeout=5)
+            response = requests.get(url, timeout=10)
             if response.status_code == 200:
                 data = response.json()
                 results = [
@@ -87,7 +87,7 @@ class LexicaAgent(AgentBase):
                     for item in data.get('items', [])
                 ]
             else:
-                logger.error(f"Error searching the web: {response.status_code}")
+                logger.error(f"Error searching the web: {response.status_code} - {response.text}")
         except Exception as e:
             logger.error(f"Web search exception: {e}")
 
@@ -101,12 +101,12 @@ class LexicaAgent(AgentBase):
         api_key = self.api_keys.get('news_api_key')
 
         if not api_key:
-            logger.warning("NewsAPI key missing.")
-            return []
+            logger.warning("NewsAPI key missing. Skipping news fetch.")
+            return articles
 
         url = f"https://newsapi.org/v2/everything?q={query}&apiKey={api_key}"
         try:
-            response = requests.get(url, timeout=5)
+            response = requests.get(url, timeout=10)
             if response.status_code == 200:
                 data = response.json()
                 articles = [
@@ -114,7 +114,7 @@ class LexicaAgent(AgentBase):
                     for item in data.get('articles', [])
                 ]
             else:
-                logger.error(f"Error fetching news articles: {response.status_code}")
+                logger.error(f"Error fetching news articles: {response.status_code} - {response.text}")
         except Exception as e:
             logger.error(f"News fetch exception: {e}")
 
@@ -128,16 +128,16 @@ class LexicaAgent(AgentBase):
         api_key = self.api_keys.get('iex_api_key')
 
         if not api_key:
-            logger.warning("IEX Cloud API key missing.")
-            return {}
+            logger.warning("IEX Cloud API key missing. Skipping financial data fetch.")
+            return data
 
         url = f"https://cloud.iexapis.com/stable/stock/{query}/quote?token={api_key}"
         try:
-            response = requests.get(url, timeout=5)
+            response = requests.get(url, timeout=10)
             if response.status_code == 200:
                 data = response.json()
             else:
-                logger.error(f"Error fetching financial data: {response.status_code}")
+                logger.error(f"Error fetching financial data: {response.status_code} - {response.text}")
         except Exception as e:
             logger.error(f"Financial data fetch exception: {e}")
 

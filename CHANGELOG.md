@@ -58,6 +58,15 @@
 - **UI**: Created `showcase/unified_dashboard.html` (Adam Protocol: Unified Command) to bridge Legacy Showcase, Adam OS, and the new WebApp.
 - **Widget**: Added `showcase/js/crypto_arbitrage_widget.js` to visualize real-time arbitrage opportunities in the new dashboard.
 
+## v26.5 - Protocol ARCHITECT_INFINITE (Day 6)
+
+### Jules' Log
+> "I noticed we have a `CryptoArbitrageAgent` that detects high arbitrage spreads but its output was siloed. High arbitrage spread indicates irregular market plumbing and stress across liquidity pools. I integrated `CryptoArbitrageAgent` into `MarketSentimentAgent` to bridge this gap. Now, when the spread hits a critical threshold, it triggers a 'Systemic Tremor' warning, overriding naive sentiment indicators and accurately reflecting underlying systemic risk."
+
+### Added
+- **Integration**: Connected `CryptoArbitrageAgent` to `MarketSentimentAgent`'s Credit Dominance Rule. High arbitrage spreads now act as a systemic risk signal.
+- **Tests**: `tests/test_market_sentiment_agent.py` - Unit tests verifying standard execution and the new 'Systemic Tremor' logic overrides.
+
 ## v26.4 - Protocol ARCHITECT_INFINITE (Day 5)
 
 ### Jules' Log

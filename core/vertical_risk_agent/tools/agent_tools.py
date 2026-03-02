@@ -68,7 +68,8 @@ class AgentTools:
         Executes a read-only SQL query against the local financial database.
         Restricted to specific tables for security.
         """
-        if not query.strip().upper().startswith("SELECT"):
+        from core.security.sql_validator import SQLValidator
+        if not SQLValidator.validate_read_only(query):
             raise ValueError("Only SELECT queries are allowed.")
 
         # Whitelist of allowed tables to prevent accessing secrets or system tables

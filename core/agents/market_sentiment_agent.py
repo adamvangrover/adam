@@ -9,6 +9,7 @@ from core.data_sources.prediction_market_api import SimulatedPredictionMarketAPI
 from core.data_sources.social_media_api import SimulatedSocialMediaAPI
 from core.data_sources.web_traffic_api import SimulatedWebTrafficAPI
 from core.data_sources.data_fetcher import DataFetcher
+from core.agents.specialized.crypto_arbitrage_agent import CryptoArbitrageAgent
 
 
 class MarketSentimentAgent(AgentBase):
@@ -32,6 +33,7 @@ class MarketSentimentAgent(AgentBase):
         self.social_media_api = SimulatedSocialMediaAPI(self.config)
         self.web_traffic_api = SimulatedWebTrafficAPI()
         self.data_fetcher = DataFetcher()
+        self.crypto_arbitrage_agent = CryptoArbitrageAgent(config)
 
     async def execute(self, input_data: Union[str, AgentInput, Dict[str, Any]] = None, **kwargs) -> Union[Dict[str, Any], AgentOutput]:
         """
@@ -192,6 +194,8 @@ class MarketSentimentAgent(AgentBase):
         def fetch(func, *args):
             return loop.run_in_executor(None, func, *args)
 
+        arbitrage_data = None
+
         # Launch tasks
         try:
             t_spy = fetch(self.data_fetcher.fetch_market_data, "SPY")
@@ -201,10 +205,11 @@ class MarketSentimentAgent(AgentBase):
             t_crypto = fetch(self.data_fetcher.fetch_crypto_metrics)
             t_treasury = fetch(self.data_fetcher.fetch_treasury_metrics)
             t_liquidity = fetch(self.data_fetcher.fetch_macro_liquidity)
+            t_arbitrage = self.crypto_arbitrage_agent.execute(symbols=["BTC/USDT", "ETH/USDT"], exchanges=["binance", "kraken"], min_spread=2.0)
 
             # Await all
-            spy_data, qqq_data, credit_data, vol_data, crypto_data, treasury_data, liquidity_data = await asyncio.gather(
-                t_spy, t_qqq, t_credit, t_vol, t_crypto, t_treasury, t_liquidity
+            spy_data, qqq_data, credit_data, vol_data, crypto_data, treasury_data, liquidity_data, arbitrage_data = await asyncio.gather(
+                t_spy, t_qqq, t_credit, t_vol, t_crypto, t_treasury, t_liquidity, t_arbitrage
             )
         except Exception as e:
             logging.error(f"Error fetching data for Credit Dominance Rule: {e}")
@@ -280,7 +285,12 @@ class MarketSentimentAgent(AgentBase):
 
         curve_inverted = (curve_slope is not None and curve_slope < 0)
 
-        systemic_tremor = (vix_inverted or curve_inverted)
+        high_arbitrage_spread = False
+        if arbitrage_data and arbitrage_data.get("opportunities"):
+            high_arbitrage_spread = True
+            details["arbitrage_opportunities"] = len(arbitrage_data["opportunities"])
+
+        systemic_tremor = (vix_inverted or curve_inverted or high_arbitrage_spread)
 
         # Condition C: Risk-On Decoupling
         # BTC < -3% while Nasdaq > +0.5%

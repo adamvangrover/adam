@@ -142,7 +142,7 @@
         #attribution-panel {
             top: 100px;
             left: 20px;
-            width: 280px;
+            width: 320px;
             height: auto;
             border-left: 2px solid #00ccff;
             display: none; /* Hidden by default */
@@ -157,6 +157,48 @@
             align-items: center;
             justify-content: center;
             margin-right: 10px;
+        }
+
+        .panel-tabs {
+            display: flex;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #333;
+        }
+        .panel-tab {
+            flex: 1;
+            padding: 5px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 0.7em;
+            color: #888;
+            background: rgba(0,0,0,0.5);
+        }
+        .panel-tab.active {
+            color: #00ccff;
+            border-bottom: 2px solid #00ccff;
+            background: rgba(0,204,255,0.1);
+        }
+        .panel-content {
+            display: none;
+            font-size: 0.8em;
+        }
+        .panel-content.active { display: block; }
+
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 4px;
+            border-bottom: 1px dashed #222;
+        }
+
+        .label-3d {
+            color: #fff;
+            font-family: 'JetBrains Mono';
+            font-size: 10px;
+            background: rgba(0,0,0,0.6);
+            padding: 2px 4px;
+            border: 1px solid #333;
+            pointer-events: none;
         }
 
         /* Tooltip */
@@ -248,6 +290,10 @@
                 <input type="checkbox" id="toggle-cone" checked>
                 Show Monte Carlo Projections
             </label>
+            <label style="font-size:0.8em; display:flex; align-items:center; gap:5px; color:#ff0055;">
+                <input type="checkbox" id="toggle-stress">
+                STRESS MODE
+            </label>
         </div>
     </div>
 
@@ -256,18 +302,36 @@
         <div style="display:flex; align-items:center; margin-bottom:15px;">
             <div class="agent-avatar"><i class="fas fa-user-secret"></i></div>
             <div>
-                <div style="font-family:'JetBrains Mono'; color:#00ccff; font-weight:bold;" id="attr-agent-name">AGENT UNKNOWN</div>
-                <div style="font-size:0.7em; color:#888;">PROVENANCE ID: <span id="attr-prov-id">--</span></div>
+                <div style="font-family:'JetBrains Mono'; color:#00ccff; font-weight:bold;" id="attr-ticker">UNKNOWN</div>
+                <div style="font-size:0.7em; color:#888;" id="attr-name">--</div>
+            </div>
+            <div style="margin-left:auto;">
+                <button id="btn-deep-dive" class="cyber-btn" style="font-size:0.7em;">DEEP DIVE</button>
             </div>
         </div>
-        <div style="font-size:0.8em; margin-bottom:10px;">
-            <strong>THESIS:</strong>
-            <p id="attr-thesis" style="color:#ddd; margin-top:5px;">--</p>
+
+        <div class="panel-tabs">
+            <div class="panel-tab active" data-tab="overview">OVERVIEW</div>
+            <div class="panel-tab" data-tab="financials">FINANCIALS</div>
+            <div class="panel-tab" data-tab="credit">CREDIT</div>
         </div>
-        <div style="font-size:0.7em; color:#aaa; border-top:1px solid #333; padding-top:10px;">
-            <div>BACKTEST ACCURACY: <span id="attr-accuracy" style="color:#00ff9d">--%</span></div>
-            <div>IMPLIED DIRECTION: <span id="attr-direction">--</span></div>
-            <div>MODEL: <span id="attr-model">GPT-4-Turbo (Finetuned)</span></div>
+
+        <div id="tab-overview" class="panel-content active">
+            <div style="margin-bottom:10px;">
+                <strong>THESIS:</strong>
+                <p id="attr-thesis" style="color:#ddd; margin-top:5px; max-height:100px; overflow-y:auto;">--</p>
+            </div>
+            <div class="data-row"><span>Conviction:</span> <span id="attr-conviction" style="color:#00ff9d">--</span></div>
+            <div class="data-row"><span>Consensus:</span> <span id="attr-consensus">--</span></div>
+            <div class="data-row"><span>Risk Score:</span> <span id="attr-risk">--</span></div>
+        </div>
+
+        <div id="tab-financials" class="panel-content">
+            <div id="fin-container">--</div>
+        </div>
+
+        <div id="tab-credit" class="panel-content">
+            <div id="credit-container">--</div>
         </div>
     </div>
 
@@ -275,6 +339,7 @@
     <div id="system2-terminal">
         <div class="log-entry">> SYSTEM 2 INITIALIZED</div>
         <div class="log-entry">> CONNECTING TO RUNTIME...</div>
+        <div id="news-feed" style="margin-top: 10px; border-top: 1px dashed #444; padding-top: 5px;"></div>
     </div>
 
     <!-- Tooltip -->

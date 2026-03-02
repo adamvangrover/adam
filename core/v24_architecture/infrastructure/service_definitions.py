@@ -19,7 +19,7 @@ class InfrastructureConfig:
     SERVICES = {
         ServiceType.CORE_BRAIN: ServiceConfig(
             service_name=ServiceType.CORE_BRAIN,
-            host="0.0.0.0",
+            host="0.0.0.0",  # nosec B104
             port=8000
         ),
         ServiceType.INGESTION_ENGINE: ServiceConfig(
