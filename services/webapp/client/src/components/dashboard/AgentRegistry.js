@@ -40,10 +40,13 @@ const AgentRegistry = () => {
         return sortableAgents;
     }, [agents, sortConfig]);
 
-    const filteredAgents = sortedAgents.filter(agent =>
-        agent.name.toLowerCase().includes(filter.toLowerCase()) ||
-        agent.task.toLowerCase().includes(filter.toLowerCase())
-    );
+    const filteredAgents = React.useMemo(() => {
+        const lowerFilter = filter.toLowerCase();
+        return sortedAgents.filter(agent =>
+            agent.name.toLowerCase().includes(lowerFilter) ||
+            agent.task.toLowerCase().includes(lowerFilter)
+        );
+    }, [sortedAgents, filter]);
 
     return (
         <div className="space-y-6">
