@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM :: Strategic Report: The Iranian Collapse</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg-color: #0d0f12;
+            --panel-bg: #1a1e24;
+            --text-primary: #e2e8f0;
+            --text-secondary: #94a3b8;
+            --border-color: #2d3748;
+            --accent-blue: #3b82f6;
+            --accent-red: #ef4444;
+            --accent-yellow: #f59e0b;
+            --font-mono: 'JetBrains Mono', monospace;
+            --font-sans: 'Inter', sans-serif;
+            --nav-width: 280px;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            width: var(--nav-width);
+            background-color: var(--panel-bg);
+            border-right: 1px solid var(--border-color);
+            padding: 30px 20px;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            box-sizing: border-box;
+        }
+
+        .sys-logo {
+            font-family: var(--font-mono);
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--accent-blue);
+            margin-bottom: 40px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-item {
+            display: block;
+            padding: 10px 15px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 6px;
+            margin-bottom: 5px;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background-color: rgba(59, 130, 246, 0.1);
+            color: var(--accent-blue);
+        }
+
+        .nav-header {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: #64748b;
+            text-transform: uppercase;
+            margin: 25px 0 10px 15px;
+            letter-spacing: 1px;
+        }
+
+        /* Main Content Area */
+        .main-content {
+            margin-left: var(--nav-width);
+            padding: 40px 60px;
+            max-width: 1200px;
+            box-sizing: border-box;
+            flex-grow: 1;
+        }
+
+        .report-header {
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .report-meta {
+            display: flex;
+            gap: 20px;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 15px;
+        }
+
+        .meta-tag {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--accent-red);
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            line-height: 1.2;
+            margin: 0 0 20px 0;
+            font-weight: 700;
+        }
+
+        h2 {
+            font-family: var(--font-mono);
+            font-size: 1.4rem;
+            color: var(--accent-blue);
+            margin: 40px 0 20px 0;
+            padding-bottom: 10px;
+            border-bottom: 1px dashed var(--border-color);
+        }
+
+        h3 {
+            font-size: 1.2rem;
+            color: #cbd5e1;
+            margin: 30px 0 15px 0;
+        }
+
+        p {
+            line-height: 1.7;
+            color: #94a3b8;
+            margin-bottom: 20px;
+        }
+
+        /* Callouts / Highlights */
+        .highlight-box {
+            background: rgba(59, 130, 246, 0.05);
+            border-left: 4px solid var(--accent-blue);
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .highlight-box p {
+            margin: 0;
+            color: #e2e8f0;
+        }
+
+        /* Data Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 30px 0;
+            font-size: 0.95rem;
+        }
+
+        th {
+            background: rgba(255,255,255,0.02);
+            font-family: var(--font-mono);
+            text-align: left;
+            padding: 15px;
+            color: var(--text-secondary);
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid var(--border-color);
+            color: #cbd5e1;
+            vertical-align: top;
+        }
+
+        tr:hover td {
+            background: rgba(255,255,255,0.01);
+        }
+
+        .risk-high { color: var(--accent-red); font-weight: bold; }
+        .risk-med { color: var(--accent-yellow); font-weight: bold; }
+        .risk-low { color: var(--accent-blue); font-weight: bold; }
+
+        /* Chart Container */
+        .chart-container {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 40px 0;
+            height: 400px;
+        }
+
+        ul {
+            color: #94a3b8;
+            line-height: 1.7;
+            margin-bottom: 20px;
+        }
+
+        li {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar Navigation -->
+    <div class="sidebar">
+        <div class="sys-logo">
+            <i class="fas fa-satellite-dish"></i> ADAM O.S.
+        </div>
+        
+        <div class="nav-header">Document Navigation</div>
+        <a href="#exec-summary" class="nav-item active">1. Executive Summary</a>
+        <a href="#geopolitics" class="nav-item">2. The Geopolitical Catalyst</a>
+        <a href="#price-shocks" class="nav-item">3. Energy Price Shocks</a>
+        <a href="#macro" class="nav-item">4. Macro Transmission</a>
+        <a href="#structural" class="nav-item">5. Structural Fragility</a>
+        <a href="#credit" class="nav-item">6. Credit Quality Trajectories</a>
+        <a href="#sectoral" class="nav-item">7. Sectoral Bifurcation</a>
+        <a href="#clos" class="nav-item">8. CLO Stress Points</a>
+        <a href="#conclusion" class="nav-item">9. Conclusion & Implications</a>
+        
+        <div style="margin-top: 40px; padding: 20px; border: 1px dashed var(--border-color); border-radius: 8px; font-family: var(--font-mono); font-size: 0.8rem; color: #64748b;">
+            <div style="margin-bottom: 10px; color: var(--accent-red);"><i class="fas fa-shield-alt"></i> CLASSIFIED</div>
+            <div>DISTRIBUTION: TIER 1</div>
+            <div>ID: MACRO-2026-03-02</div>
+            <div>VER: 4.2.1 FINAL</div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="report-header">
+            <div class="report-meta">
+                <span class="meta-tag"><i class="fas fa-exclamation-triangle"></i> SEVERE IMPACT</span>
+                <span>SYSTEM_DATE: MAR 02 2026</span>
+                <span>ANALYST: ARCHITECT_INFINITE</span>
+            </div>
+            <h1>The Geopolitical and Economic Reverberations of the 2026 Iranian Collapse: Cascading Impacts on Global Energy Markets and United States Leveraged Credit</h1>
+        </div>
+
+        <div id="exec-summary">
+            <h2>1. Executive Summary</h2>
+            <p>The abrupt escalation of military hostilities in the Middle East in March 2026, culminating in direct United States and Israeli kinetic strikes on Iranian nuclear and military infrastructure, has fundamentally destabilized the global macroeconomic baseline. The subsequent retaliatory maneuvering by Iran's Islamic Revolutionary Guard Corps (IRGC) to restrict maritime traffic through the Strait of Hormuz has paralyzed the world's most critical artery for global energy commerce. With upwards of 150 tankers carrying crude oil, liquefied natural gas (LNG), and refined petroleum products forced to drop anchor in open waters, the disruption threatens to orchestrate a severe, structural energy price shock across global markets.</p>
+            
+            <div class="highlight-box">
+                <p><strong>Critical Transmission Mechanism:</strong> Surging energy input costs relentlessly compress operating margins, particularly for transportation and heavy manufacturing. Concurrently, the inflationary impulse generated by the energy shock, compounded by 17-18% US tariffs, threatens to permanently stall the Federal Reserve's easing cycle. This geometrically degrades corporate debt service coverage ratios (DSCR) across the $1.2 trillion leveraged loan ecosystem.</p>
+            </div>
+        </div>
+
+        <div id="geopolitics">
+            <h2>2. The Geopolitical Catalyst: The Strait of Hormuz</h2>
+            <p>The strategic geography of the Strait of Hormuz establishes it as the ultimate maritime chokepoint. The immediate physical disruption encompasses roughly 20% of global seaborne oil supplies, equivalent to approximately one-fifth of global daily consumption.</p>
+            <h3>The Iranian Economic Paradox</h3>
+            <p>Over 90% of Iranian oil exports flow through the Strait of Hormuz, predominantly destined for the People's Republic of China. Closing the Strait operates as a double-edged sword; it inflicts maximum economic damage on Western economies but effectively self-embargoes the Iranian economy and severely strains relations with Beijing, forcing China to aggressively compete in global spot markets.</p>
+        </div>
+
+        <div id="price-shocks">
+            <h2>3. Global Energy Price Shocks: Scenario Modeling</h2>
+            <p>Rather than a linear, predictable price increase, commodities markets exhibit asymmetric upside volatility driven by precautionary hoarding, algorithmic momentum trading, and physical panic buying.</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Scenario</th>
+                        <th>Duration</th>
+                        <th>Projected Brent Peak</th>
+                        <th>Macroeconomic Impact</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Base Case</strong></td>
+                        <td>1 to 3 Weeks</td>
+                        <td>$85 - $100 / bbl</td>
+                        <td>Temporary inflation bump; manageable margin compression; Fed cuts delayed 1 quarter.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Prolonged Shock</strong></td>
+                        <td>1 to 3 Months</td>
+                        <td><span class="risk-med">$120 - $150 / bbl</span></td>
+                        <td>Severe stagflationary pressures; transportation distress; Fed forced to hold rates.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Systemic Crisis</strong></td>
+                        <td>6+ Months</td>
+                        <td><span class="risk-high">$150 - $200+ / bbl</span></td>
+                        <td>Structural repricing of sovereign risk; deep global recession; widespread corporate defaults.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Interactive Chart Container -->
+            <div class="chart-container">
+                <canvas id="oilProjectionChart"></canvas>
+            </div>
+        </div>
+
+        <div id="macro">
+            <h2>4. Macroeconomic Transmission: Inflation & Monetary Policy</h2>
+            <p>The kinetic events intersect with a highly complex pre-existing domestic macroeconomic environment defined by sticky services inflation, record-high peacetime sovereign debt burdens, and a highly aggressive protectionist trade regime (tariffs averaging 17-18%).</p>
+            <h3>The Federal Reserve's Dilemma</h3>
+            <p>A prolonged crisis obliterates the baseline assumption of Fed rate cuts down to 3.00%. If headline inflation surges, the Fed will be forced into a defensive, hawkish posture. For the $1.2 trillion leveraged loan market (floating-rate instruments), the continuation of higher-for-longer interest rates is catastrophic.</p>
+        </div>
+
+        <div id="structural">
+            <h2>5. Structural Fragility in the Leveraged Loan Market</h2>
+            <p>The modern leveraged loan ecosystem is fundamentally different from 2008. The most critical vulnerability is the ubiquity of covenant-lite ("cov-lite") loan structures, accounting for over 86% of outstanding volume.</p>
+            <h3>The "90/10 Rule" and LMEs</h3>
+            <p>The bottom 10% of issuers—primarily highly leveraged, sponsor-backed entities facing imminent maturity walls—are highly toxic. Private equity sponsors are increasingly resorting to aggressive Liability Management Exercises (LMEs) rather than traditional Chapter 11 filings. Tactics such as "drop-downs" and "up-tiering" result in highly adversarial "creditor-on-creditor" violence.</p>
+        </div>
+
+        <div id="credit">
+            <h2>6. Credit Quality and Default Trajectories</h2>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Default Scenario</th>
+                        <th>Macroeconomic Drivers</th>
+                        <th>Projected US Spec-Grade Default Rate</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Optimistic</strong></td>
+                        <td>De-escalation; Fed executes 3 rate cuts.</td>
+                        <td class="risk-low">3.00%</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Pre-Crisis Baseline</strong></td>
+                        <td>Moderate slowing; Fed executes 1-2 cuts.</td>
+                        <td class="risk-med">3.75% - 4.00%</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Pessimistic / Shock</strong></td>
+                        <td>Sustained Hormuz closure; Fed holds rates.</td>
+                        <td class="risk-high">5.50%+</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div id="sectoral">
+            <h2>7. Sectoral Bifurcation</h2>
+            <ul>
+                <li><strong>Transportation & Logistics:</strong> The absolute tip of the spear. A sudden spike in diesel and aviation fuel directly attacks gross margins, driving the forecasted spike in defaults.</li>
+                <li><strong>Domestic Shale (E&P):</strong> Mathematically generating cash flow, but gains are friction-heavy due to rising breakevens ($45-$47), supply chain constraints, 18% tariffs on equipment, and elevated cost of capital for RBL facilities.</li>
+                <li><strong>Tech/Software:</strong> Facing acute secondary risks. Tech enterprise valuations are highly sensitive to the cost of capital. Any delay in Fed rate cuts directly harms the highly leveraged software sector, threatening distressed exchanges as debt walls approach.</li>
+            </ul>
+        </div>
+
+        <div id="clos">
+            <h2>8. CLO Stress Points</h2>
+            <p>CLOs purchase roughly 60-70% of newly issued institutional leveraged loans. However, they are governed by strict portfolio parameters like the Weighted Average Rating Factor (WARF) and the CCC-bucket limitation (typically 7.5%).</p>
+            <p>A wave of corporate credit downgrades from the B- tier into the CCC tier triggers mark-to-market haircuts on excess CCC loans, reducing Overcollateralization (OC) ratios. This forces proactive selling into a plunging secondary market, creating a vicious, pro-cyclical cycle of liquidity destruction.</p>
+        </div>
+
+        <div id="conclusion">
+            <h2>9. Conclusion and Strategic Portfolio Implications</h2>
+            <p>The global macroeconomic environment in 2026 is governed by exogenous geopolitical shocks. The closure of the Strait of Hormuz acts as a profound deflationary force on global economic growth and a highly inflationary force on global input prices.</p>
+            <p>Portfolio resilience requires immediate divestment from unhedged entities in logistics, transportation, and heavy manufacturing. For the US leveraged loan market, stripped of traditional creditor protections, this stagflationary environment represents the ultimate stress test. Survival depends entirely on pricing power and robust liquidity runways.</p>
+        </div>
+    </div>
+
+    <!-- Chart Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const ctx = document.getElementById('oilProjectionChart').getContext('2d');
+            
+            // Generate some rough projection data based on the text
+            const labels = ['Week 1', 'Week 2', 'Month 1', 'Month 2', 'Month 3', 'Month 4', 'Month 5', 'Month 6+'];
+            
+            const baseCaseData = [75, 80, 85, 90, 85, 80, 75, 75];
+            const prolongedData = [75, 95, 120, 130, 140, 135, 125, 120];
+            const systemicData = [80, 110, 150, 175, 190, 205, 210, 220];
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Base Case (Diplomatic Off-ramp)',
+                            data: baseCaseData,
+                            borderColor: '#3b82f6',
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Prolonged Shock (1-3 Months)',
+                            data: prolongedData,
+                            borderColor: '#f59e0b',
+                            backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Systemic Crisis (6+ Months)',
+                            data: systemicData,
+                            borderColor: '#ef4444',
+                            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                            borderWidth: 3,
+                            borderDash: [5, 5],
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#94a3b8',
+                                font: { family: "'JetBrains Mono', monospace" }
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Brent Crude Oil Price Projections ($/bbl)',
+                            color: '#e2e8f0',
+                            font: { family: "'Inter', sans-serif", size: 16 }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            min: 50,
+                            max: 250,
+                            grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                            ticks: {
+                                color: '#94a3b8',
+                                callback: function(value) { return '$' + value; }
+                            }
+                        },
+                        x: {
+                            grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                            ticks: { color: '#94a3b8' }
+                        }
+                    }
+                }
+            });
+
+            // Smooth scrolling for sidebar links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+                    this.classList.add('active');
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+</html>
