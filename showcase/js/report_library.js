@@ -87,10 +87,20 @@ class ReportLibrary {
         const searchInput = document.getElementById(this.searchId);
         const sortSelect = document.getElementById(this.sortId);
 
+        // Utility debounce function to prevent excessive filtering/rendering
+        function debounce(func, wait) {
+            let timeout;
+            return function(...args) {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(this, args), wait);
+            };
+        }
+
         if (searchInput) {
-            searchInput.addEventListener('input', (e) => {
+            const debouncedFilter = debounce((e) => {
                 this.filter(e.target.value);
-            });
+            }, 300);
+            searchInput.addEventListener('input', debouncedFilter);
         }
 
         if (sortSelect) {
