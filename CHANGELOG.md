@@ -1,5 +1,16 @@
 # Changelog
 
+## v26.11 - Protocol ARCHITECT_INFINITE (Day 12)
+
+### Jules' Log
+> "I noticed we lack a way to gauge options market positioning, a leading indicator for market sentiment and potential price movement. I researched options flow indicators like unusual volume and put/call ratios and built `OptionsFlowAgent` to bridge this gap, integrating it directly into `MarketSentimentAgent` to influence the 'Overall Market Sentiment' score."
+
+### Added
+- **New Organ**: `core/agents/options_flow_agent.py` - A new specialized agent that monitors unusual volume and put/call ratios to derive a sentiment score.
+- **Neural Pathway**: Integrated `OptionsFlowAgent` into `core/agents/market_sentiment_agent.py` by updating the `combine_sentiment` function to weigh options flow alongside news, prediction markets, social media, and web traffic.
+- **Tests**: `tests/test_options_flow_agent.py` - Unit tests verifying the extraction and metric conversion logic to compute sentiment scores for both bullish and bearish options setups.
+- **Core Optimization**: Fixed the fallback mock logic in `daily_ritual.py` to ensure it successfully applies simulated LLM output using `_save_and_apply_output(simulated_response)`.
+
 ## v26.10 - Protocol ARCHITECT_INFINITE (Day 11)
 
 ### Jules' Log
