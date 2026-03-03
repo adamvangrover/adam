@@ -128,7 +128,7 @@ def run_architect_infinite(model: str = "gpt-4-turbo-preview"):
         if not os.environ.get("OPENAI_API_KEY") and not os.environ.get("ANTHROPIC_API_KEY") and not os.environ.get("GEMINI_API_KEY"):
             logging.warning("No API key found in environment variables. Falling back to simulated output.")
             simulated_response = _simulate_llm_response()
-            _save_output(simulated_response)
+            _save_and_apply_output(simulated_response)
             return
 
         response = litellm.completion(
