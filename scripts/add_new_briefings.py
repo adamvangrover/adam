@@ -2,8 +2,12 @@ import json
 import os
 from datetime import datetime
 
-# Input text blocks
-daily_briefing_text = """<h3>📡 Signal Integrity: The Middle East War-Patch</h3>
+NEWSLETTER_DATA_PATH = "showcase/data/newsletter_data.json"
+
+# ==========================================
+# Input text blocks (Branch 1: Kinetic Conflict)
+# ==========================================
+kinetic_briefing_text = """<h3>📡 Signal Integrity: The Middle East War-Patch</h3>
 <p>The simulation has entered a high-volatility state following a kinetic escalation in the Middle East over the weekend. The architecture is struggling to reconcile a "soft landing" narrative with a sudden "War Premium" re-render.</p>
 <p>The S&P 500 slipped -0.43% to 6,878.88, but the headline number hides the internal packet loss. This was a classic "Gap-and-Trap" session where early losses of -1% were partially bought back, yet the underlying plumbing remains under extreme tension.</p>
 <p><strong>Credit Dominance Check:</strong> We are seeing a Systemic Inversion. While equities attempted to find a floor, the 10-Year Treasury Yield surged to 4.05% (+9bps). This is a "Hawkish Flight-to-Safety" anomaly; safe-haven demand for bonds was completely overwhelmed by the fear that $90+ oil will hard-code a new wave of inflation.</p>
@@ -306,6 +310,98 @@ market_pulse_text = """<h2>Phase 2: Sentiment & Synthesis</h2>
 <p>The immediate financial damage appears staggering for a supposedly localized entity. MFS borrowed in excess of £2 billion from a syndicate of major global financial institutions. The exposure list reads exactly like a roster of systemically important banks and prime brokers. Barclays faces a potential loss of £600 million. Jefferies saw its stock plummet 10.7% in US trading upon the revelation of its exposure to the lender. Apollo Global Management—specifically operating through its Atlas SP Partners unit—fell 7%. Santander dropped nearly 5%, and Wells Fargo declined 4% as the extent of potential losses became apparent.</p>
 """
 
+# ==========================================
+# Input text blocks (Branch 2: Growth Glitch)
+# ==========================================
+growth_glitch_text = """<h3>📡 Signal Integrity: The Growth Glitch</h3>
+<p>March begins with a sudden structural failure. The <a href="../market_mayhem_graph.html" style="color: #22d3ee;">S&P 500</a> gap-down opened today, ultimately shedding 1.8% as the ISM Manufacturing PMI printed an unexpected 52.4—the highest expansionary read in over a year.</p>
+<p><strong>Credit Dominance Check:</strong> The "good news is bad news" algorithm is back online. Stronger factory orders instantly repainted the rate-cut horizon, causing the 10-Year yield to violently spike 14bps to 4.59%.</p>
+<h3>🏮 Artifacts</h3>
+<ul>
+<li><strong><a href="../market_mayhem_graph.html" style="color: #22d3ee;">Bitcoin</a> ($62,100 | -4.2%):</strong> Risk-off flows bled heavily into the crypto sector.</li>
+<li><strong>Semiconductors (-3.1%):</strong> The hardware layer took the brunt of the rate shock.</li>
+</ul>
+<p><strong>The Glitch:</strong> We are trapped in a feedback loop. Until the economy actually shows signs of breaking, the cost of capital will continue to choke off the valuation multiples of the future.</p>"""
+
+reversion_patch_text = """<h3>📡 Signal Integrity: The Reversion Patch</h3>
+<p>The simulation stabilized today. The <a href="../market_mayhem_graph.html" style="color: #22d3ee;">S&P 500</a> recovered 0.9%, finding technical support right at the 6,100 node.</p>
+<p><strong>Credit Dominance Check:</strong> Yields paused their ascent. The 10-Year held flat at 4.58%, allowing equity algorithms to safely execute buy-the-dip subroutines.</p>
+<h3>🏮 Artifacts</h3>
+<ul>
+<li><strong>Utilities (+2.1%):</strong> Defensive sectors lead the way, proving this is a nervous recovery, not a bullish breakout.</li>
+<li><strong>Tesla (TSLA | +4.5%):</strong> An outlier today after announcing a new factory timeline in India.</li>
+</ul>
+<p><strong>The Glitch:</strong> This is a low-conviction patch. Volume is light. The system is merely resting before the Non-Farm Payrolls data drop later this week.</p>"""
+
+
+# ==========================================
+# Combined Article Entries
+# ==========================================
+all_new_entries = [
+    # ---- Branch 1: Kinetic Conflict Reports ----
+    {
+        "date": "2026-03-02",
+        "title": "🔴 SYSTEM STATUS: DEGRADED (Kinetic Conflict Injection)",
+        "summary": "The simulation has entered a high-volatility state following a kinetic escalation in the Middle East over the weekend.",
+        "type": "DAILY_BRIEFING",
+        "filename": "Daily_Briefing_2026_03_02_Kinetic.html",  # Suffix appended to prevent conflict
+        "is_sourced": True,
+        "full_body": kinetic_briefing_text,
+        "source_priority": 3,
+        "conviction": 85,
+        "sentiment_score": 15
+    },
+    {
+        "date": "2026-03-02",
+        "title": "Deep Dive: The Geopolitical and Economic Reverberations of the 2026 Iranian Collapse",
+        "summary": "Cascading Impacts on Global Energy Markets and United States Leveraged Credit.",
+        "type": "DEEP_DIVE",
+        "filename": "Deep_Dive_Iranian_Collapse_2026.html",
+        "is_sourced": True,
+        "full_body": deep_dive_text,
+        "source_priority": 1,
+        "conviction": 90,
+        "sentiment_score": 10
+    },
+    {
+        "date": "2026-02-27",
+        "title": "Market Pulse: The Adam Financial System Intelligence Briefing",
+        "summary": "The global financial ecosystem currently executes a violent rotation from artificial intelligence exuberance to aggressive risk hedging.",
+        "type": "MARKET_PULSE",
+        "filename": "Market_Pulse_2026_02_27_Vibe.html",
+        "is_sourced": True,
+        "full_body": market_pulse_text,
+        "source_priority": 2,
+        "conviction": 70,
+        "sentiment_score": 30
+    },
+    # ---- Branch 2: Growth Glitch Reports ----
+    {
+        "date": "2026-03-02",
+        "title": "🔴 SYSTEM STATUS: DEGRADED (Volatility Spike)",
+        "summary": "Markets open March with significant friction. Manufacturing PMI comes in hot, triggering algorithmic selling.",
+        "type": "DAILY_BRIEFING",
+        "filename": "Daily_Briefing_2026_03_02_Vol.html", # Suffix appended to prevent conflict
+        "is_sourced": True,
+        "full_body": growth_glitch_text,
+        "source_priority": 3,
+        "conviction": 90,
+        "sentiment_score": 15
+    },
+    {
+        "date": "2026-03-03",
+        "title": "🟡 SYSTEM STATUS: NOMINAL (Mean Reversion)",
+        "summary": "The algorithm finds support. Yesterday's panic yields a tentative dead-cat bounce.",
+        "type": "DAILY_BRIEFING",
+        "filename": "Daily_Briefing_2026_03_03.html",
+        "is_sourced": True,
+        "full_body": reversion_patch_text,
+        "source_priority": 3,
+        "conviction": 50,
+        "sentiment_score": 55
+    }
+]
+
 
 def generate_html(title, date_str, type_label, content, output_filename, sentiment_score, conviction_score):
     html_template = f"""<!DOCTYPE html>
@@ -370,103 +466,59 @@ def generate_html(title, date_str, type_label, content, output_filename, sentime
 </body>
 </html>"""
 
+    # Create directory if it doesn't exist to avoid OS errors
+    os.makedirs("showcase", exist_ok=True)
     filepath = os.path.join("showcase", output_filename)
+    
     with open(filepath, 'w', encoding='utf-8') as f:
         f.write(html_template)
     print(f"Generated {filepath}")
 
-def update_newsletter_data():
-    data_path = "showcase/data/newsletter_data.json"
-    if os.path.exists(data_path):
-        with open(data_path, 'r', encoding='utf-8') as f:
+
+def add_entries_and_update_json():
+    if os.path.exists(NEWSLETTER_DATA_PATH):
+        with open(NEWSLETTER_DATA_PATH, 'r', encoding='utf-8') as f:
             data = json.load(f)
     else:
+        # Avoid failure if the file doesn't exist yet
         data = []
 
-    new_entries = [
-        {
-            "date": "2026-03-02",
-            "title": "🔴 SYSTEM STATUS: DEGRADED (Kinetic Conflict Injection)",
-            "summary": "The simulation has entered a high-volatility state following a kinetic escalation in the Middle East over the weekend.",
-            "type": "DAILY_BRIEFING",
-            "filename": "Daily_Briefing_2026_03_02.html",
-            "is_sourced": True,
-            "full_body": daily_briefing_text,
-            "source_priority": 3,
-            "conviction": 85,
-            "sentiment_score": 15
-        },
-        {
-            "date": "2026-03-02",
-            "title": "Deep Dive: The Geopolitical and Economic Reverberations of the 2026 Iranian Collapse",
-            "summary": "Cascading Impacts on Global Energy Markets and United States Leveraged Credit.",
-            "type": "DEEP_DIVE",
-            "filename": "Deep_Dive_Iranian_Collapse_2026.html",
-            "is_sourced": True,
-            "full_body": deep_dive_text,
-            "source_priority": 1,
-            "conviction": 90,
-            "sentiment_score": 10
-        },
-        {
-            "date": "2026-02-27",
-            "title": "Market Pulse: The Adam Financial System Intelligence Briefing",
-            "summary": "The global financial ecosystem currently executes a violent rotation from artificial intelligence exuberance to aggressive risk hedging.",
-            "type": "MARKET_PULSE",
-            "filename": "Market_Pulse_2026_02_27_Vibe.html",
-            "is_sourced": True,
-            "full_body": market_pulse_text,
-            "source_priority": 2,
-            "conviction": 70,
-            "sentiment_score": 30
-        }
-    ]
+    # Use a tuple of (date, title) as a unique composite key to prevent duplicates
+    existing_keys = {(item.get('date'), item.get('title')) for item in data}
+    added_count = 0
 
-    # Avoid duplicates
-    existing_keys = set((item.get('date'), item.get('title')) for item in data)
-
-    for entry in new_entries:
+    for entry in all_new_entries:
         if (entry['date'], entry['title']) not in existing_keys:
-            data.insert(0, entry)
-            print(f"Added {entry['title']} to newsletter_data.json")
+            data.insert(0, entry)  # Add new entries at the top of the collection
+            added_count += 1
+            print(f"Added entry for {entry['date']}: {entry['title']}")
 
-    # Sort descending by date
+    # Ensure chronological order (descending)
     data.sort(key=lambda x: x.get('date', ''), reverse=True)
 
-    with open(data_path, 'w', encoding='utf-8') as f:
+    # Ensure target directory path exists to avoid FileNotFoundError
+    os.makedirs(os.path.dirname(NEWSLETTER_DATA_PATH), exist_ok=True)
+    
+    with open(NEWSLETTER_DATA_PATH, 'w', encoding='utf-8') as f:
         json.dump(data, f, indent=4)
 
-    print("Updated showcase/data/newsletter_data.json")
+    print(f"\nNewsletter data updated successfully. Added {added_count} new entries.")
+
 
 if __name__ == "__main__":
-    generate_html(
-        "🔴 SYSTEM STATUS: DEGRADED (Kinetic Conflict Injection)",
-        "2026-03-02",
-        "DAILY_BRIEFING",
-        daily_briefing_text,
-        "Daily_Briefing_2026_03_02.html",
-        15,
-        85
-    )
+    print("Generating HTML artifacts...")
+    
+    # Dynamically generate an HTML file for every entry using the template engine
+    for entry in all_new_entries:
+        generate_html(
+            title=entry["title"],
+            date_str=entry["date"],
+            type_label=entry["type"],
+            content=entry["full_body"],
+            output_filename=entry["filename"],
+            sentiment_score=entry["sentiment_score"],
+            conviction_score=entry["conviction"]
+        )
 
-    generate_html(
-        "Deep Dive: The Geopolitical and Economic Reverberations of the 2026 Iranian Collapse",
-        "2026-03-02",
-        "DEEP_DIVE",
-        deep_dive_text,
-        "Deep_Dive_Iranian_Collapse_2026.html",
-        10,
-        90
-    )
-
-    generate_html(
-        "Market Pulse: The Adam Financial System Intelligence Briefing",
-        "2026-02-27",
-        "MARKET_PULSE",
-        market_pulse_text,
-        "Market_Pulse_2026_02_27_Vibe.html",
-        30,
-        70
-    )
-
-    update_newsletter_data()
+    print("\nUpdating JSON tracking data...")
+    add_entries_and_update_json()

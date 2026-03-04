@@ -10,6 +10,7 @@ from core.data_sources.social_media_api import SimulatedSocialMediaAPI
 from core.data_sources.web_traffic_api import SimulatedWebTrafficAPI
 from core.data_sources.data_fetcher import DataFetcher
 from core.agents.specialized.crypto_arbitrage_agent import CryptoArbitrageAgent
+from core.agents.options_flow_agent import OptionsFlowAgent
 
 
 class MarketSentimentAgent(AgentBase):
@@ -34,6 +35,7 @@ class MarketSentimentAgent(AgentBase):
         self.web_traffic_api = SimulatedWebTrafficAPI()
         self.data_fetcher = DataFetcher()
         self.crypto_arbitrage_agent = CryptoArbitrageAgent(config)
+        self.options_flow_agent = OptionsFlowAgent(config)
 
     async def execute(self, input_data: Union[str, AgentInput, Dict[str, Any]] = None, **kwargs) -> Union[Dict[str, Any], AgentOutput]:
         """
@@ -104,10 +106,11 @@ class MarketSentimentAgent(AgentBase):
         answer += f"- Prediction Markets: {details.get('prediction_market_sentiment', 'N/A')}\n"
         answer += f"- Social Media: {details.get('social_media_sentiment', 'N/A')}\n"
         answer += f"- Web Traffic: {details.get('web_traffic_sentiment', 'N/A')}\n"
+        answer += f"- Options Flow: {details.get('options_flow_sentiment', 'N/A')}\n"
 
         return AgentOutput(
             answer=answer,
-            sources=["SimulatedFinancialNewsAPI", "SimulatedPredictionMarketAPI", "SimulatedSocialMediaAPI"],
+            sources=["SimulatedFinancialNewsAPI", "SimulatedPredictionMarketAPI", "SimulatedSocialMediaAPI", "OptionsFlowAgent"],
             confidence=0.8, # Placeholder confidence
             metadata=result
         )
@@ -152,18 +155,29 @@ class MarketSentimentAgent(AgentBase):
 
         logging.info(f"Web Traffic Sentiment: {web_sentiment}")
 
-        # 5. Combine
-        overall = self.combine_sentiment(news_sentiment, pred_sentiment, social_sentiment, web_sentiment)
+        # 5. Options Flow
+        try:
+            options_result = await self.options_flow_agent.execute(input_data=None)
+            options_sentiment = options_result.get("sentiment_score", 0.5)
+        except Exception as e:
+            logging.error(f"Error fetching options flow data: {e}")
+            options_sentiment = 0.5
+
+        logging.info(f"Options Flow Sentiment: {options_sentiment}")
+
+        # 6. Combine
+        overall = self.combine_sentiment(news_sentiment, pred_sentiment, social_sentiment, web_sentiment, options_sentiment)
         logging.info(f"Overall Market Sentiment: {overall}")
 
         details = {
             "news_sentiment": news_sentiment,
             "prediction_market_sentiment": pred_sentiment,
             "social_media_sentiment": social_sentiment,
-            "web_traffic_sentiment": web_sentiment
+            "web_traffic_sentiment": web_sentiment,
+            "options_flow_sentiment": options_sentiment
         }
 
-        # 6. Credit Dominance Logic Gate (Adam v24.1)
+        # 7. Credit Dominance Logic Gate (Adam v24.1)
         credit_override, credit_details = await self.check_credit_dominance_rule()
         if credit_override:
             logging.warning(f"Credit Dominance Rule Triggered: {credit_override}")
@@ -306,16 +320,17 @@ class MarketSentimentAgent(AgentBase):
 
         return trigger, details
 
-    def combine_sentiment(self, news: float, pred: float, social: float, web: float) -> float:
+    def combine_sentiment(self, news: float, pred: float, social: float, web: float, options: float = 0.5) -> float:
         """
         Combines sentiment from different sources into an overall sentiment score.
         """
         # Simple weighted average
         weights = {
-            'news': 0.4,
-            'prediction': 0.3,
+            'news': 0.3,
+            'prediction': 0.2,
             'social': 0.2,
-            'web': 0.1
+            'web': 0.1,
+            'options': 0.2
         }
 
         # Ensure inputs are floats (mock APIs might return None or ints)
@@ -330,7 +345,8 @@ class MarketSentimentAgent(AgentBase):
             clean(news) * weights['news'] +
             clean(pred) * weights['prediction'] +
             clean(social) * weights['social'] +
-            clean(web) * weights['web']
+            clean(web) * weights['web'] +
+            clean(options) * weights['options']
         )
         return score
 
