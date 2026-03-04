@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useMemo } from 'react';
 import GlassCard from '../common/GlassCard';
 import { Activity, Cpu, Database, Server, AlertTriangle } from 'lucide-react';
 import { dataManager } from '../../utils/DataManager';
@@ -49,6 +49,7 @@ const MissionControl = () => {
     const [health, setHealth] = useState(null);
     const [agents, setAgents] = useState([]);
     const [logs, setLogs] = useState([]);
+    const [loadHistory, setLoadHistory] = useState([30, 45, 55, 60, 40, 75, 50]);
 
     const addLog = (message, type = 'info') => {
         const timestamp = new Date().toLocaleTimeString();
@@ -88,26 +89,43 @@ const MissionControl = () => {
              const actions = ["Scanning news feeds...", "Re-calibrating risk models...", "Optimizing knowledge graph...", "Fetching SEC filings..."];
              const randomAction = actions[Math.floor(Math.random() * actions.length)];
              if (Math.random() > 0.7) addLog(randomAction);
+
+             // Dynamic System Load Simulation
+             setLoadHistory(prev => {
+                 const currentLoad = prev[prev.length - 1];
+                 const jitter = (Math.random() - 0.5) * 15; // Random fluctuation
+                 let newLoad = currentLoad + jitter;
+                 if (newLoad < 5) newLoad = 5;
+                 if (newLoad > 95) newLoad = 95;
+
+                 // Keep history length fixed to 7 points to match the labels
+                 return [...prev.slice(1), Math.round(newLoad)];
+             });
         }, 3000);
 
         return () => clearInterval(interval);
     }, []);
 
-    const chartData = {
+    // Bolt Optimization ⚡: Wrapped chartData and chartOptions in useMemo.
+    // This component re-renders every 3 seconds due to the log polling simulation.
+    // Wrapping in useMemo preserves object reference equality, preventing
+    // react-chartjs-2 from needlessly re-parsing options and re-drawing the canvas
+    // every 3 seconds unless loadHistory actual array reference changes.
+    const chartData = useMemo(() => ({
         labels: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00', '24:00'],
         datasets: [
           {
             label: 'System Load',
-            data: [30, 45, 55, 60, 40, 75, 50],
+            data: loadHistory,
             fill: true,
             borderColor: '#06b6d4',
             backgroundColor: 'rgba(6, 182, 212, 0.1)',
             tension: 0.4,
           },
         ],
-    };
+    }), [loadHistory]);
 
-    const chartOptions = {
+    const chartOptions = useMemo(() => ({
         responsive: true,
         plugins: {
             legend: { display: false },
@@ -117,7 +135,7 @@ const MissionControl = () => {
             x: { grid: { display: false, drawBorder: false }, ticks: { color: '#64748b' } }
         },
         maintainAspectRatio: false
-    };
+    }), []);
 
     return (
         <div className="space-y-6">
