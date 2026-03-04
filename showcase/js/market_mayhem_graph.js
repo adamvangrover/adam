@@ -418,12 +418,12 @@ function updatePositions() {
     State.data.forEach(entity => {
         // Filter Check
         const isVisible = (State.filter === 'ALL' || entity.sector === State.filter);
-        
+
         // Hide entire group if filtered out
         if (entity.group) {
             entity.group.visible = isVisible;
         }
-        
+
         if (!isVisible) return;
 
         // Toggle Cone visibility based on state
@@ -488,9 +488,9 @@ function animate() {
     if (State.selectedEntity) {
         // Find target position (head node)
         const targetPos = State.selectedEntity.mesh.position.clone();
-        
+
         // Offset for camera
-        // const offset = new THREE.Vector3(0, 5, 20); 
+        // const offset = new THREE.Vector3(0, 5, 20);
         // Simple lerp for smooth follow
         controls.target.lerp(targetPos, 0.05);
         // We don't force camera position to allow user rotation, just target
@@ -644,10 +644,10 @@ function selectEntity(entity) {
         const years = entity.financials.years || [];
         const rev = entity.financials.revenue || [];
         const eps = entity.financials.eps || [];
-        
+
         let html = '<table style="width:100%; font-size:0.9em; border-collapse:collapse;">';
         html += '<tr style="border-bottom:1px solid #444; color:#888;"><th>Year</th><th>Rev ($B)</th><th>EPS</th></tr>';
-        
+
         // Show last 3 years
         const start = Math.max(0, years.length - 3);
         for (let i = start; i < years.length; i++) {
@@ -690,11 +690,11 @@ function updateNewsFeed() {
     if (!visibleEntities.length) return;
 
     const entity = visibleEntities[Math.floor(Math.random() * visibleEntities.length)];
-    
+
     // Use Real Data
     const change = ((entity.history[entity.history.length-1] - entity.history[entity.history.length-2])/entity.history[entity.history.length-2]*100).toFixed(2);
     const sign = change >= 0 ? '+' : '';
-    
+
     const templates = [
         `> UPDATE: ${entity.ticker} ${sign}${change}% today. Outlook: ${entity.outlook.consensus}.`,
         `> RISK ALERT: ${entity.ticker} score at ${entity.risk}. ${entity.outlook.rationale.substring(0, 50)}...`,
@@ -708,9 +708,9 @@ function updateNewsFeed() {
     entry.style.borderLeft = `2px solid #${entity.color.toString(16)}`;
     entry.style.paddingLeft = '5px';
     entry.innerText = text;
-    
+
     feed.insertBefore(entry, feed.firstChild);
-    
+
     // Keep only last 20
     if (feed.children.length > 20) {
         feed.removeChild(feed.lastChild);
