@@ -292,3 +292,4 @@ def build_snc_team_graph():
 
 
 snc_graph_app = build_snc_team_graph()
+build_snc_graph = build_snc_team_graph
