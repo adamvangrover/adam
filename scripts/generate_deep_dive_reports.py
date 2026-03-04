@@ -23,6 +23,19 @@ TICKERS = [
     {"symbol": "V", "sector": "Financials", "name": "Visa Inc."},
     {"symbol": "JNJ", "sector": "Healthcare", "name": "Johnson & Johnson"},
     {"symbol": "XOM", "sector": "Energy", "name": "Exxon Mobil Corporation"},
+    {"symbol": "WMT", "sector": "Consumer Defensive", "name": "Walmart Inc."},
+    {"symbol": "PG", "sector": "Consumer Defensive", "name": "Procter & Gamble"},
+    {"symbol": "KO", "sector": "Consumer Defensive", "name": "Coca-Cola Company"},
+    {"symbol": "PEP", "sector": "Consumer Defensive", "name": "PepsiCo Inc."},
+    {"symbol": "COST", "sector": "Consumer Defensive", "name": "Costco Wholesale"},
+    {"symbol": "AVGO", "sector": "Technology", "name": "Broadcom Inc."},
+    {"symbol": "ORCL", "sector": "Technology", "name": "Oracle Corporation"},
+    {"symbol": "CRM", "sector": "Technology", "name": "Salesforce Inc."},
+    {"symbol": "AMD", "sector": "Technology", "name": "Advanced Micro Devices"},
+    {"symbol": "INTC", "sector": "Technology", "name": "Intel Corporation"},
+    {"symbol": "GS", "sector": "Financials", "name": "Goldman Sachs Group"},
+    {"symbol": "BAC", "sector": "Financials", "name": "Bank of America"},
+    {"symbol": "CVX", "sector": "Energy", "name": "Chevron Corporation"},
 ]
 
 class ReportGenerator:

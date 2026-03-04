@@ -2,38 +2,78 @@
 
 import json
 import logging
-from typing import List, Dict, Any
+import asyncio
+from typing import List, Dict, Any, Optional
+from core.agents.agent_base import AgentBase
 
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-class LegalAgent:
-    def __init__(self, knowledge_base_path="knowledge_base/Knowledge_Graph.json"):
+class LegalAgent(AgentBase):
+    """
+    Agent responsible for legal reasoning, covenant checking, and document review.
+    """
+
+    def __init__(self, config: Dict[str, Any], kernel: Optional[Any] = None):
         """
-        Initializes the Legal Agent with access to legal knowledge
-        and reasoning capabilities.
+        Initializes the Legal Agent.
 
         Args:
-            knowledge_base_path (str): Path to the knowledge base file.
+            config (dict): Configuration dictionary.
+            kernel (Optional[Any]): Semantic Kernel instance.
         """
-        self.knowledge_base_path = knowledge_base_path
+        super().__init__(config, kernel=kernel)
+        self.knowledge_base_path = self.config.get("knowledge_base_path", "knowledge_base/Knowledge_Graph.json")
         self.knowledge_base = self._load_knowledge_base()
 
     def _load_knowledge_base(self):
         """
         Loads the knowledge base from the JSON file.
-
-        Returns:
-            dict: The knowledge base data.
         """
         try:
             with open(self.knowledge_base_path, 'r') as file:
                 return json.load(file)
         except FileNotFoundError:
-            # logger.error(f"Knowledge base file not found: {self.knowledge_base_path}")
+            logger.warning(f"Knowledge base file not found: {self.knowledge_base_path}")
             return {}
         except json.JSONDecodeError:
-            # logger.error(f"Error decoding knowledge base JSON: {self.knowledge_base_path}")
+            logger.error(f"Error decoding knowledge base JSON: {self.knowledge_base_path}")
             return {}
+
+    async def execute(self, *args, **kwargs):
+        """
+        Executes legal analysis tasks.
+
+        Tasks:
+        - "review_agreement": Reviews credit agreements or legal docs.
+        - "check_covenants": Checks financial covenants.
+        - "detect_fraud": Scans for fraud signals.
+        - "suggest_strategy": Suggests restructuring strategy.
+        """
+        task = kwargs.get('task')
+        logger.info(f"LegalAgent executing task: {task}")
+
+        if task == "review_agreement":
+            doc_text = kwargs.get("document_text", "")
+            return self.review_credit_agreement(doc_text)
+
+        elif task == "check_covenants":
+            financials = kwargs.get("financials", {})
+            return self.check_covenants(financials)
+
+        elif task == "detect_fraud":
+            doc_text = kwargs.get("document_text", "")
+            financials = kwargs.get("financials", {})
+            return self.detect_fraud_signals(doc_text, financials)
+
+        elif task == "suggest_strategy":
+            distress_level = kwargs.get("distress_level", "Low")
+            return {"strategy": self.suggest_restructuring_strategy(distress_level)}
+
+        else:
+            logger.warning(f"Unknown task: {task}")
+            return {"error": f"Unknown task: {task}"}
 
     def review_credit_agreement(self, doc_text: str) -> Dict[str, Any]:
         """
@@ -171,3 +211,10 @@ class LegalAgent:
 
     def provide_legal_advice(self, query):
         return "Consult outside counsel."
+
+if __name__ == "__main__":
+    agent = LegalAgent({})
+    async def main():
+        res = await agent.execute(task="review_agreement", document_text="This agreement contains a negative pledge and cross-default clause.")
+        print(res)
+    asyncio.run(main())

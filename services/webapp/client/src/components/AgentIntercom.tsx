@@ -4,9 +4,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Loader2, MessageSquare, Minimize2 } from 'lucide-react';
 
+// Ensure TypeScript interface matches Python Pydantic model exactly (Thought in neural_link.py)
 interface Thought {
   id: string;
-  text: string;
+  timestamp: string;
+  agent_name: string;
+  content: string;
+  conviction_score: number;
 }
 
 // Protocol: ADAM-V-NEXT
@@ -15,7 +19,13 @@ const AgentIntercom: React.FC = () => {
   const [thoughts, setThoughts] = useState<Thought[]>([]);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
+  const [filterText, setFilterText] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  const filteredThoughts = thoughts.filter((t) =>
+      t.agent_name.toLowerCase().includes(filterText.toLowerCase()) ||
+      t.content.toLowerCase().includes(filterText.toLowerCase())
+  );
 
   useEffect(() => {
     // Bolt Optimization: Use recursive setTimeout instead of setInterval to prevent
@@ -118,24 +128,38 @@ const AgentIntercom: React.FC = () => {
       {/* Header */}
       <div style={{
           padding: '10px', background: 'rgba(0,255,255,0.1)',
-          borderBottom: '1px solid #333', display: 'flex', justifyContent: 'space-between', alignItems: 'center'
+          borderBottom: '1px solid #333', display: 'flex', flexDirection: 'column', gap: '8px'
       }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ fontSize: '0.9rem', color: '#0ff', fontWeight: 'bold' }}>AGENT INTERCOM</span>
-              <div style={{
-                  width: '8px', height: '8px', borderRadius: '50%',
-                  background: isConnected ? '#0f0' : '#f00',
-                  boxShadow: isConnected ? '0 0 5px #0f0' : 'none'
-              }}></div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ fontSize: '0.9rem', color: '#0ff', fontWeight: 'bold' }}>AGENT INTERCOM</span>
+                  <div style={{
+                      width: '8px', height: '8px', borderRadius: '50%',
+                      background: isConnected ? '#0f0' : '#f00',
+                      boxShadow: isConnected ? '0 0 5px #0f0' : 'none'
+                  }}></div>
+              </div>
+              <button
+                onClick={() => setIsCollapsed(true)}
+                aria-label="Minimize Agent Intercom"
+                title="Minimize Agent Intercom"
+                style={{ background: 'none', border: 'none', color: '#666', cursor: 'pointer' }}
+              >
+                  <Minimize2 size={16} />
+              </button>
           </div>
-          <button
-            onClick={() => setIsCollapsed(true)}
-            aria-label="Minimize Agent Intercom"
-            title="Minimize Agent Intercom"
-            style={{ background: 'none', border: 'none', color: '#666', cursor: 'pointer' }}
-          >
-              <Minimize2 size={16} />
-          </button>
+
+          <input
+              type="text"
+              placeholder="Filter thoughts (e.g. 'RiskOfficer')..."
+              value={filterText}
+              onChange={(e) => setFilterText(e.target.value)}
+              style={{
+                  width: '100%', background: 'rgba(0,0,0,0.4)', border: '1px solid #444',
+                  color: '#fff', fontSize: '0.75rem', padding: '4px 8px', borderRadius: '4px',
+                  fontFamily: 'inherit', boxSizing: 'border-box'
+              }}
+          />
       </div>
 
       {/* Feed */}
@@ -151,10 +175,25 @@ const AgentIntercom: React.FC = () => {
                   <Loader2 className="animate-spin" style={{ margin: '0 auto 10px' }} />
                   <div>ESTABLISHING NEURAL LINK...</div>
               </div>
+          ) : filteredThoughts.length === 0 ? (
+              <div style={{ textAlign: 'center', color: '#666', marginTop: '50px', fontStyle: 'italic' }}>
+                  No thoughts matching '{filterText}'
+              </div>
           ) : (
-              thoughts.map((t) => (
-                  <div key={t.id} style={{ marginBottom: '10px', borderLeft: '2px solid #333', paddingLeft: '8px', opacity: 0.8 }}>
-                      <span style={{ color: '#00f3ff' }}>&gt;</span> {t.text}
+              filteredThoughts.map((t) => (
+                  <div key={t.id} style={{ marginBottom: '12px', borderLeft: `2px solid ${t.conviction_score > 0.8 ? '#0f0' : t.conviction_score > 0.5 ? '#ff0' : '#f00'}`, paddingLeft: '8px', opacity: 0.9, background: 'rgba(255,255,255,0.02)', borderRadius: '0 4px 4px 0', padding: '5px 8px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', color: '#888', marginBottom: '2px' }}>
+                          <span style={{ color: '#0ff', fontWeight: 'bold' }}>[{t.agent_name}]</span>
+                          <span>{new Date(t.timestamp).toLocaleTimeString()}</span>
+                      </div>
+                      <div style={{ color: '#e0e0e0' }}>
+                          <span style={{ color: '#00f3ff', marginRight: '5px' }}>&gt;</span>{t.content}
+                      </div>
+                      {t.conviction_score !== undefined && (
+                          <div style={{ fontSize: '0.65rem', color: t.conviction_score > 0.8 ? '#0f0' : '#aaa', marginTop: '4px', textAlign: 'right' }}>
+                              Conviction: {(t.conviction_score * 100).toFixed(0)}%
+                          </div>
+                      )}
                   </div>
               ))
           )}

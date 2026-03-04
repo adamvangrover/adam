@@ -2,32 +2,84 @@
 
 import requests
 import logging
+import asyncio
 from bs4 import BeautifulSoup
 import folium
 from geopy.geocoders import Nominatim
 from urllib.parse import urlparse
 import ipaddress
+from typing import Dict, Any, List, Optional
+import os
 
+from core.agents.agent_base import AgentBase
 
-class SupplyChainRiskAgent:
-    def __init__(self, news_api_key, supplier_data, transportation_routes, geopolitical_data, web_scraping_urls=None):
-        self.news_api_key = news_api_key
-        self.supplier_data = supplier_data  # List of suppliers with location information (latitude, longitude)
-        self.transportation_routes = transportation_routes  # List of transportation routes with locations
-        self.geopolitical_data = geopolitical_data  # Geopolitical factors affecting supply chains
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+class SupplyChainRiskAgent(AgentBase):
+    """
+    Agent responsible for assessing supply chain risks using news and scraping.
+    """
+
+    def __init__(self, config: Dict[str, Any], kernel: Optional[Any] = None):
+        """
+        Initializes the SupplyChainRiskAgent.
+
+        Args:
+            config (dict): Configuration dictionary.
+            kernel (Optional[Any]): Semantic Kernel instance.
+        """
+        super().__init__(config, kernel=kernel)
+        self.news_api_key = self.config.get('news_api_key') or os.environ.get('NEWS_API_KEY')
+        self.supplier_data = self.config.get('supplier_data', [])
+        self.transportation_routes = self.config.get('transportation_routes', [])
+        self.geopolitical_data = self.config.get('geopolitical_data', [])
+        self.web_scraping_urls = self.config.get('web_scraping_urls', [])
         self.base_url = "https://newsapi.org/v2/everything"
-        self.web_scraping_urls = web_scraping_urls or []
         self.logger = logging.getLogger(__name__)
-        logging.basicConfig(level=logging.INFO)
+
+        if not self.news_api_key:
+            self.logger.warning("NEWS_API_KEY is not set. News fetching will fail.")
+
+    async def execute(self, *args, **kwargs):
+        """
+        Executes the supply chain risk assessment.
+
+        Returns:
+            dict: A report of supply chain risks.
+        """
+        self.logger.info("Starting supply chain risk assessment...")
+
+        # Optionally update data from kwargs if provided
+        if 'supplier_data' in kwargs: self.supplier_data = kwargs['supplier_data']
+        if 'transportation_routes' in kwargs: self.transportation_routes = kwargs['transportation_routes']
+
+        loop = asyncio.get_running_loop()
+
+        # Run synchronous network operations in a thread pool
+        risks = await loop.run_in_executor(None, self.report_risks)
+
+        # Generate map if requested
+        if kwargs.get('generate_map', False):
+             risk_map = await loop.run_in_executor(None, self.generate_risk_map)
+             # Saving map logic could be moved here or kept in method
+             # For now, just return status
+             map_path = "supply_chain_risk_map.html"
+             risk_map.save(map_path)
+             risks['map_generated'] = map_path
+
+        self.display_risk_report(risks)
+        self.send_alert(risks)
+
+        return risks
 
     def fetch_news(self, query, language='en', page_size=5):
         """
         Fetches news articles related to the query (supply chain, geopolitical risks, etc.).
-        :param query: Search query (keywords related to supply chain risks).
-        :param language: Language of the articles (default: 'en').
-        :param page_size: Number of articles to fetch per page (default: 5).
-        :return: A list of articles.
         """
+        if not self.news_api_key:
+            return []
+
         params = {
             'q': query,
             'language': language,
@@ -39,7 +91,7 @@ class SupplyChainRiskAgent:
         try:
             response = requests.get(self.base_url, params=params, timeout=10)
             if response.status_code == 200:
-                return response.json()['articles']
+                return response.json().get('articles', [])
             else:
                 self.logger.error(f"Failed to fetch news. Status code: {response.status_code}")
                 return []
@@ -50,9 +102,6 @@ class SupplyChainRiskAgent:
     def _is_safe_url(self, url):
         """
         Validates the URL to prevent SSRF attacks.
-        Checks for:
-        - Allowed schemes (http, https)
-        - Private/Loopback IP addresses
         """
         try:
             parsed = urlparse(url)
@@ -71,10 +120,7 @@ class SupplyChainRiskAgent:
                     self.logger.warning(f"Blocked private IP: {hostname}")
                     return False
             except ValueError:
-                # Not an IP address, proceed to check if it resolves to private IP (optional but recommended)
-                # Note: DNS resolution can be slow or manipulated (DNS Rebinding), but it's a layer of defense.
-                # For this environment, we'll skip DNS resolution to avoid network issues or flakiness,
-                # relying on the fact that most SSRF payloads use direct IPs or 'localhost'.
+                # Hostname check
                 if hostname in ('localhost', '127.0.0.1', '::1'):
                     self.logger.warning(f"Blocked localhost: {hostname}")
                     return False
@@ -88,7 +134,6 @@ class SupplyChainRiskAgent:
     def fetch_web_scraped_data(self):
         """
         Fetches additional data through web scraping from the provided URLs.
-        :return: A list of scraped articles or summaries.
         """
         scraped_data = []
         for url in self.web_scraping_urls:
@@ -116,8 +161,6 @@ class SupplyChainRiskAgent:
     def analyze_impact(self, articles):
         """
         Analyze the fetched articles for keywords and return a summary of the supply chain risks.
-        :param articles: List of news articles.
-        :return: A summary of the potential risks.
         """
         risk_summary = {'disruptions': [], 'geopolitical_risks': [], 'transportation_risks': []}
 
@@ -140,52 +183,59 @@ class SupplyChainRiskAgent:
     def generate_risk_map(self):
         """
         Generate a simple risk map to visualize supplier and transportation risk locations.
-        :return: A map displaying high-risk locations.
         """
         geolocator = Nominatim(user_agent="supply_chain_risk_agent")
         risk_map = folium.Map(location=[20, 0], zoom_start=2)  # Start with a global view
 
         # Add supplier locations to map
         for supplier in self.supplier_data:
-            location = geolocator.geocode(supplier['location'])
-            if location:
-                folium.Marker(
-                    [location.latitude, location.longitude],
-                    popup=f"Supplier: {supplier['name']}",
-                    icon=folium.Icon(color='blue')
-                ).add_to(risk_map)
+            try:
+                location = geolocator.geocode(supplier['location'])
+                if location:
+                    folium.Marker(
+                        [location.latitude, location.longitude],
+                        popup=f"Supplier: {supplier['name']}",
+                        icon=folium.Icon(color='blue')
+                    ).add_to(risk_map)
+            except Exception as e:
+                self.logger.error(f"Geocoding failed for supplier {supplier}: {e}")
 
         # Add transportation routes to map
         for route in self.transportation_routes:
-            location = geolocator.geocode(route['location'])
-            if location:
-                folium.Marker(
-                    [location.latitude, location.longitude],
-                    popup=f"Transportation Route: {route['name']}",
-                    icon=folium.Icon(color='green')
-                ).add_to(risk_map)
+            try:
+                location = geolocator.geocode(route['location'])
+                if location:
+                    folium.Marker(
+                        [location.latitude, location.longitude],
+                        popup=f"Transportation Route: {route['name']}",
+                        icon=folium.Icon(color='green')
+                    ).add_to(risk_map)
+            except Exception as e:
+                self.logger.error(f"Geocoding failed for route {route}: {e}")
 
         # Add geopolitical risk zones
         for risk_area in self.geopolitical_data:
-            location = geolocator.geocode(risk_area['location'])
-            if location:
-                folium.Marker(
-                    [location.latitude, location.longitude],
-                    popup=f"Geopolitical Risk: {risk_area['risk_type']}",
-                    icon=folium.Icon(color='red')
-                ).add_to(risk_map)
+            try:
+                location = geolocator.geocode(risk_area['location'])
+                if location:
+                    folium.Marker(
+                        [location.latitude, location.longitude],
+                        popup=f"Geopolitical Risk: {risk_area['risk_type']}",
+                        icon=folium.Icon(color='red')
+                    ).add_to(risk_map)
+            except Exception as e:
+                self.logger.error(f"Geocoding failed for risk area {risk_area}: {e}")
 
         return risk_map
 
     def send_alert(self, risks):
         """
         Send alerts based on detected risks.
-        :param risks: The analyzed risk data.
         """
         alert_level = 0
         for risk_type, articles in risks.items():
             if articles:
-                alert_level += 1  # Increase alert level for each risk detected
+                alert_level += 1
 
         if alert_level >= 3:
             self.logger.warning("High supply chain risk detected! Immediate attention needed!")
@@ -197,7 +247,6 @@ class SupplyChainRiskAgent:
     def report_risks(self):
         """
         Fetches news articles and analyzes the risks, generating a report.
-        :return: A report of the supply chain risks.
         """
         all_risks = {'disruptions': [], 'geopolitical_risks': [], 'transportation_risks': []}
 
@@ -214,16 +263,15 @@ class SupplyChainRiskAgent:
         # Fetch additional data via web scraping
         scraped_data = self.fetch_web_scraped_data()
         if scraped_data:
-            self.logger.info("Web scraping provided additional information:")
-            for item in scraped_data:
-                self.logger.info(item)
+            self.logger.info("Web scraping provided additional information (summary):")
+            self.logger.info(f"Scraped {len(scraped_data)} items.")
+            # Optionally analyze scraped data here
 
         return all_risks
 
     def display_risk_report(self, risks):
         """
         Displays a summarized risk report.
-        :param risks: The analyzed risk data.
         """
         self.logger.info("\nSupply Chain Risk Report:")
         for risk_type, articles in risks.items():
@@ -236,49 +284,19 @@ class SupplyChainRiskAgent:
 
 
 if __name__ == "__main__":
-    # Example of usage
-    import os
-    import sys
+    import asyncio
 
-    # 🛡️ Sentinel: Enforce secure configuration
-    API_KEY = os.environ.get('NEWS_API_KEY')
-    if not API_KEY or API_KEY.startswith("YOUR_"):
-        print("Error: NEWS_API_KEY environment variable not set or valid.")
-        print("Please export NEWS_API_KEY='your-actual-api-key' before running.")
-        sys.exit(1)
+    # Example Config
+    config = {
+        'news_api_key': os.environ.get('NEWS_API_KEY', 'mock_key'),
+        'supplier_data': [{'name': 'Supplier A', 'location': 'New York, USA'}],
+        'transportation_routes': [{'name': 'Route 1', 'location': 'Panama Canal'}],
+        'geopolitical_data': [{'location': 'Ukraine', 'risk_type': 'Geopolitical Risk'}]
+    }
 
-    SUPPLIER_DATA = [
-        {'name': 'Supplier A', 'location': 'New York, USA'},
-        {'name': 'Supplier B', 'location': 'Shanghai, China'}
-    ]
-    TRANSPORTATION_ROUTES = [
-        {'name': 'Route 1', 'location': 'Panama Canal'},
-        {'name': 'Route 2', 'location': 'Suez Canal'}
-    ]
-    GEOPOLITICAL_DATA = [
-        {'location': 'Ukraine', 'risk_type': 'Geopolitical Risk'},
-        {'location': 'Taiwan', 'risk_type': 'Geopolitical Risk'}
-    ]
-    WEB_SCRAPING_URLS = [
-        'https://www.example.com/supply-chain-news',  # Replace with actual URLs to scrape data
-        'https://www.example.com/transportation-issues'
-    ]
+    agent = SupplyChainRiskAgent(config)
 
-    # Instantiate the Supply Chain Risk Agent
-    agent = SupplyChainRiskAgent(
-        news_api_key=API_KEY,
-        supplier_data=SUPPLIER_DATA,
-        transportation_routes=TRANSPORTATION_ROUTES,
-        geopolitical_data=GEOPOLITICAL_DATA,
-        web_scraping_urls=WEB_SCRAPING_URLS
-    )
+    async def main():
+        await agent.execute()
 
-    # Generate the risk report
-    risks = agent.report_risks()
-    agent.display_risk_report(risks)
-    agent.send_alert(risks)
-
-    # Generate and display risk map
-    risk_map = agent.generate_risk_map()
-    risk_map.save("supply_chain_risk_map.html")  # Save the map as an HTML file
-    agent.logger.info("Risk map generated: supply_chain_risk_map.html")
+    asyncio.run(main())

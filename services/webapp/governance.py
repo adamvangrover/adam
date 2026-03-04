@@ -65,10 +65,41 @@ class GovernanceMiddleware:
         if request.method == 'OPTIONS' or request.path.startswith('/static'):
             return
 
+        # 0. Global Rate Limiting Simulation (Audit Check)
+        # Using a simple tracking mechanism to enforce bounds additively without breaking core execution.
+        if not hasattr(self, '_rate_limit_cache'):
+            self._rate_limit_cache = {}
+
+        rate_limits = self.policy.get('rate_limits', {})
+        if rate_limits:
+            limit_rule = rate_limits.get(request.path, rate_limits.get('default', "100/minute"))
+            limit_parts = limit_rule.split('/')
+            if len(limit_parts) == 2:
+                max_req = int(limit_parts[0])
+                # Note: this is a highly simplified sliding window/reset for demonstration purposes.
+                # In production, this would use Redis.
+                client_ip = request.remote_addr
+                cache_key = f"{client_ip}:{request.path}"
+
+                now = time.time()
+                req_history = self._rate_limit_cache.get(cache_key, [])
+                # Prune old requests (> 60s)
+                req_history = [t for t in req_history if now - t < 60]
+
+                if len(req_history) >= max_req:
+                    logging.warning(f"Governance Block: Rate limit exceeded for IP {client_ip} on {request.path}. Limit: {limit_rule}")
+                    abort(429, description="Too Many Requests. Rate limit exceeded.")
+
+                req_history.append(now)
+                self._rate_limit_cache[cache_key] = req_history
+
         # 1. IP Blacklist Check
         client_ip = request.remote_addr
         if client_ip in self.policy.get('blacklisted_ips', []):
             logging.warning(f"Governance Block: IP {client_ip} is blacklisted.")
+            # Record detailed audit log before abort
+            if hasattr(self, 'ledger') and self.ledger:
+                 self.ledger.log_entry(actor=client_ip, action="BLACKLISTED_ACCESS_ATTEMPT", details={"path": request.path})
             abort(403, description="Access denied by governance policy.")
 
         # 2. Endpoint/Method Check

@@ -183,15 +183,18 @@ class NarrativeLogger:
     def __init__(self, logger_name: str = "Narrative"):
         self.logger = logging.getLogger(logger_name)
 
-    def log_narrative(self, event: str, analysis: str, decision: str, outcome: str):
+    def log_narrative(self, event: str, analysis: str, decision: str, outcome: str, metadata: dict = None):
         """
-        Log a complete narrative arc.
+        Log a complete narrative arc with optional metadata (e.g., latency, trace ID).
         """
         story = {
             "chapter": "Execution Arc",
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "trace_id": str(uuid.uuid4()),
             "1_Event": event,
             "2_Analysis": analysis,
             "3_Decision": decision,
-            "4_Outcome": outcome
+            "4_Outcome": outcome,
+            "5_Metadata": metadata or {}
         }
         self.logger.info(f"NARRATIVE: {json.dumps(story, indent=2)}")

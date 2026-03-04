@@ -42,6 +42,7 @@ from core.agents.quantitative_risk_agent import QuantitativeRiskAgent
 from core.agents.black_swan_agent import BlackSwanAgent
 from core.agents.quantum_monte_carlo_agent import QuantumMonteCarloAgent
 from core.agents.specialized.blindspot_agent import BlindspotAgent
+from core.agents.meta_agents.crisis_simulation_agent import CrisisSimulationMetaAgent
 
 from pydantic import ValidationError
 from core.schemas.config_schema import AgentsYamlConfig
@@ -99,6 +100,7 @@ AGENT_CLASSES = {
     "BlackSwanAgent": BlackSwanAgent,
     "NewsBotAgent": "core.agents.news_bot",
     "NexusAgent": NexusAgent,
+    "CrisisSimulationAgent": CrisisSimulationMetaAgent,
     "IngestionAgent": AgentBase,  # Using AgentBase as a placeholder
     "AuditorAgent": AgentBase,  # Using AgentBase as a placeholder
 
@@ -135,6 +137,7 @@ AGENT_CLASSES = {
     "BlindspotAgent": BlindspotAgent,
     "blindspot_agent": BlindspotAgent,
     "news_bot_agent": "core.agents.news_bot",
+    "crisis_simulation_agent": CrisisSimulationMetaAgent,
 
     # Placeholders for agents that might be missing or under development but referenced in config
     "echo_agent": AgentBase,

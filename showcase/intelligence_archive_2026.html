@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2026 Intelligence Archive // ADAM O.S.</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --bg-color: #050505;
+            --text-main: #e5e5e5;
+            --text-muted: #888888;
+            --accent: #4ade80;
+            --border: #333333;
+            --card-bg: #111111;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
+            margin: 0;
+            padding: 40px;
+        }
+
+        .header {
+            border-bottom: 2px solid var(--accent);
+            padding-bottom: 20px;
+            margin-bottom: 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: normal;
+        }
+
+        .header .meta {
+            color: var(--accent);
+            font-size: 0.9rem;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 8px 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            font-family: inherit;
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            border-color: var(--accent);
+            color: var(--accent);
+            background: rgba(74, 222, 128, 0.05);
+        }
+
+        .masonry-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            padding: 25px;
+            transition: all 0.3s;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .card:hover {
+            border-color: var(--accent);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 3px;
+            height: 0;
+            background-color: var(--accent);
+            transition: height 0.3s;
+        }
+
+        .card:hover::before {
+            height: 100%;
+        }
+
+        .card-type {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            margin: 0 0 15px 0;
+            font-weight: normal;
+            line-height: 1.4;
+        }
+
+        .card-desc {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+            flex-grow: 1;
+        }
+
+        .card-footer {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px dashed var(--border);
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div>
+            <h1>Intelligence Archive</h1>
+            <div style="color: var(--text-muted); margin-top: 10px;">Consolidated strategic reports, briefings, and terminal dashboards.</div>
+        </div>
+        <div class="meta">
+            INDEX: 2026 // KINETIC ERA
+        </div>
+    </div>
+
+    <div class="controls" id="filterControls">
+        <button class="filter-btn active" data-filter="all">All Intel</button>
+        <button class="filter-btn" data-filter="dashboard">Dashboards / Terminals</button>
+        <button class="filter-btn" data-filter="report">Strategic Reports</button>
+        <button class="filter-btn" data-filter="briefing">Daily Briefings</button>
+        <button class="filter-btn" data-filter="strategy">Mandates</button>
+    </div>
+
+    <div class="masonry-grid" id="archiveGrid">
+
+        <!-- Dashboards -->
+        <a href="global_macro_dashboard_2026.html" class="card" data-category="dashboard">
+            <div class="card-type">Macro Terminal</div>
+            <h2 class="card-title">Global Macro Dashboard (Kinetic)</h2>
+            <div class="card-desc">Real-time data visualization of the "Systemic Inversion" tracking Brent Crude ($90+), 10-Year Yields (4.05%), and VIX (23.5).</div>
+            <div class="card-footer">
+                <span>SYS.VIEW</span>
+                <span>MAR 03, 2026</span>
+            </div>
+        </a>
+
+        <a href="crisis_control_panel.html" class="card" data-category="dashboard">
+            <div class="card-type">Mission Control</div>
+            <h2 class="card-title">Crisis Control Panel</h2>
+            <div class="card-desc">Tactical command interface detailing the UK Shadow Banking £930M Collateral Shortfall and Sector DSCR Degradation.</div>
+            <div class="card-footer">
+                <span>CRT_TERMINAL</span>
+                <span>MAR 03, 2026</span>
+            </div>
+        </a>
+
+        <!-- Reports -->
+        <a href="report_iran_collapse_2026.html" class="card" data-category="report">
+            <div class="card-type">Deep Analysis</div>
+            <h2 class="card-title">The Geopolitical & Economic Reverberations of the Iranian Collapse</h2>
+            <div class="card-desc">Comprehensive modeling of the global energy market and United States leveraged credit impacts following kinetic strikes and Strait of Hormuz closure.</div>
+            <div class="card-footer">
+                <span>TIER_1_RESTRICTED</span>
+                <span>MAR 02, 2026</span>
+            </div>
+        </a>
+
+        <a href="house_view_q1_2026.html" class="card" data-category="report">
+            <div class="card-type">House View</div>
+            <h2 class="card-title">Q1 2026: The End of the Soft Landing</h2>
+            <div class="card-desc">Synthesis of the compounding effects of 18% US tariffs, the OBBBA fiscal shock, and sustained $150 oil projections into a stagflationary macro outlook.</div>
+            <div class="card-footer">
+                <span>MACRO_OUTLOOK</span>
+                <span>MAR 03, 2026</span>
+            </div>
+        </a>
+
+        <!-- Briefings -->
+        <a href="daily_briefing_2026_03_02.html" class="card" data-category="briefing">
+            <div class="card-type">Flash Briefing</div>
+            <h2 class="card-title">SYSTEM STATUS: DEGRADED</h2>
+            <div class="card-desc">Morning intel on the Middle East War-Patch. The "Digital Gold" render operational as BTC reclaims $69k while the fiat architecture glitches.</div>
+            <div class="card-footer">
+                <span>CYBER_ALERT</span>
+                <span>MAR 02, 2026</span>
+            </div>
+        </a>
+
+        <a href="newsletter_market_mayhem_mar_02_2026.html" class="card" data-category="briefing">
+            <div class="card-type">Newsletter</div>
+            <h2 class="card-title">Market Mayhem: Phase 2 Synthesis</h2>
+            <div class="card-desc">The Adam Financial System Intelligence Briefing covering Silicon Sovereignty, the 28% AI Skill Premium, and the MFS Shadow Banking glitch.</div>
+            <div class="card-footer">
+                <span>PULSE_REPORT</span>
+                <span>MAR 02, 2026</span>
+            </div>
+        </a>
+
+        <!-- Strategies -->
+        <a href="strategy_kinetic_adaptation.html" class="card" data-category="strategy">
+            <div class="card-type">Strategic Mandate</div>
+            <h2 class="card-title">Kinetic Adaptation 2026</h2>
+            <div class="card-desc">Actionable portfolio allocation directives detailing the Venezuelan Arbitrage (Long VLO/PSX) and Demographic Deflation trade mechanics.</div>
+            <div class="card-footer">
+                <span>ALPHA_GENERATION</span>
+                <span>MAR 03, 2026</span>
+            </div>
+        </a>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const filterBtns = document.querySelectorAll('.filter-btn');
+            const cards = document.querySelectorAll('.card');
+
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    // Remove active class from all
+                    filterBtns.forEach(b => b.classList.remove('active'));
+                    // Add active class to clicked
+                    btn.classList.add('active');
+
+                    const filterValue = btn.getAttribute('data-filter');
+
+                    cards.forEach(card => {
+                        // Reset animation
+                        card.style.animation = 'none';
+                        card.offsetHeight; // trigger reflow
+                        card.style.animation = null;
+
+                        if (filterValue === 'all' || card.getAttribute('data-category') === filterValue) {
+                            card.classList.remove('hidden');
+                        } else {
+                            card.classList.add('hidden');
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+</html>

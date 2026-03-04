@@ -65,18 +65,46 @@ class ConsensusEngine:
         # Final normalized score (-1.0 to 1.0)
         final_score = total_score / total_weight if total_weight > 0 else 0.0
 
-        # Determine Outcome
+        # Implement System 2 Critique mechanism
+        critique = "No contradictory signals found."
+        controversy_score = 0.0
+
+        # Simple controversy detection: high weights pulling in opposite directions
+        pos_weight = sum(s.get('weight', 1.0) for s in signals if s.get('vote', '').upper() in ['APPROVE', 'BUY'])
+        neg_weight = sum(s.get('weight', 1.0) for s in signals if s.get('vote', '').upper() in ['REJECT', 'SELL'])
+
+        if pos_weight > 0 and neg_weight > 0:
+            controversy_score = min(pos_weight, neg_weight) / max(pos_weight, neg_weight)
+            if controversy_score > 0.5:
+                critique = "High divergence detected between risk mitigation and alpha generation."
+
+        # Determine Outcome with more nuance
         decision = "HOLD"
-        if final_score > self.threshold:
+        if controversy_score > 0.8:
+            decision = "ABSTAIN/REVIEW"
+            final_score = 0.0  # Force neutral if highly conflicted
+        elif final_score > self.threshold:
             decision = "BUY/APPROVE"
         elif final_score < -self.threshold:
             decision = "SELL/REJECT"
 
-        rationale = f"Consensus score {final_score:.2f} (Threshold: +/-{self.threshold}). " + " | ".join(narrative_parts)
+        rationale = f"Consensus score {final_score:.2f} (Threshold: +/-{self.threshold}). Controversy: {controversy_score:.2f}. Critique: {critique}. " + " | ".join(narrative_parts)
+
+        # Structured details for MetaCognitiveAgent processing down the line
+        critique_details = {
+            "is_controversial": controversy_score > 0.5,
+            "controversy_metric": round(controversy_score, 2),
+            "positive_weight": pos_weight,
+            "negative_weight": neg_weight,
+            "summary": critique
+        }
 
         result = {
             "decision": decision,
             "score": round(final_score, 2),
+            "controversy": round(controversy_score, 2),
+            "critique": critique,
+            "critique_details": critique_details,
             "rationale": rationale,
             "timestamp": datetime.utcnow().isoformat()
         }
