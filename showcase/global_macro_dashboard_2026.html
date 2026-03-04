@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global Macro Dashboard 2026 - Kinetic Conflict Scenario</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --cyber-bg: #0a0a0f;
+            --cyber-panel: #13131c;
+            --cyber-accent: #00ffcc;
+            --cyber-danger: #ff3366;
+            --cyber-warn: #ffcc00;
+            --cyber-text: #e0e0e0;
+            --cyber-muted: #666688;
+        }
+
+        body {
+            background-color: var(--cyber-bg);
+            color: var(--cyber-text);
+            font-family: 'Inter', -apple-system, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .panel {
+            background-color: var(--cyber-panel);
+            border: 1px solid #2a2a35;
+            border-radius: 8px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--cyber-accent), transparent);
+            opacity: 0.5;
+        }
+
+        .panel.danger::before {
+            background: linear-gradient(90deg, transparent, var(--cyber-danger), transparent);
+        }
+
+        .metric-title {
+            font-size: 0.85rem;
+            color: var(--cyber-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--cyber-text);
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+        }
+
+        .metric-change {
+            font-size: 1rem;
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        .change-up { color: var(--cyber-danger); background: rgba(255, 51, 102, 0.1); }
+        .change-down { color: var(--cyber-accent); background: rgba(0, 255, 204, 0.1); }
+
+        /* BTC exception */
+        .btc-panel .change-up { color: var(--cyber-accent); background: rgba(0, 255, 204, 0.1); }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+
+        .wide-panel {
+            grid-column: span 2;
+        }
+
+        .alert-banner {
+            background: rgba(255, 51, 102, 0.1);
+            border-left: 4px solid var(--cyber-danger);
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .alert-banner h2 {
+            color: var(--cyber-danger);
+            margin: 0 0 5px 0;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .glitch-text {
+            animation: glitch 2s infinite;
+        }
+
+        @keyframes glitch {
+            0% { opacity: 1; }
+            48% { opacity: 1; }
+            50% { opacity: 0.8; transform: translateX(-2px); color: var(--cyber-accent); }
+            52% { opacity: 1; transform: translateX(0); color: inherit; }
+            100% { opacity: 1; }
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #2a2a35;
+            padding-bottom: 20px;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 2rem;
+            font-weight: 300;
+            letter-spacing: -1px;
+        }
+
+        .timestamp {
+            color: var(--cyber-accent);
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div>
+            <h1>Global Macro Dashboard <span style="color: var(--cyber-muted)">// 2026 Kinetic</span></h1>
+            <p style="color: var(--cyber-muted); margin-top: 5px;">Tracking structural dislocation and asset bifurcation.</p>
+        </div>
+        <div class="timestamp" id="clock">SYS.TIME: 00:00:00 UTC</div>
+    </div>
+
+    <div class="alert-banner">
+        <div>
+            <h2 class="glitch-text">⚠️ SYSTEMIC INVERSION DETECTED</h2>
+            <p style="margin: 0; color: #ff99aa;">Hawkish Flight-to-Safety anomaly active. 10-Year Yield surging alongside VIX.</p>
+        </div>
+        <div style="text-align: right; color: var(--cyber-danger); font-weight: bold;">
+            CORRELATION BREAK
+        </div>
+    </div>
+
+    <div class="dashboard-grid">
+        <div class="panel danger">
+            <div class="metric-title">Brent Crude (WTI)</div>
+            <div class="metric-value">$90.45 <span class="metric-change change-up">+7.0%</span></div>
+            <p style="color: var(--cyber-muted); font-size: 0.8rem; margin-top: 10px;">Supply-chain virus injected. Strait of Hormuz maritime disruption.</p>
+        </div>
+        <div class="panel danger">
+            <div class="metric-title">10-Year Treasury Yield</div>
+            <div class="metric-value">4.05% <span class="metric-change change-up">+9bps</span></div>
+            <p style="color: var(--cyber-muted); font-size: 0.8rem; margin-top: 10px;">Safe-haven demand overwhelmed by "War Premium" inflation fears.</p>
+        </div>
+        <div class="panel danger">
+            <div class="metric-title">VIX Index</div>
+            <div class="metric-value">23.50 <span class="metric-change change-up">+18.4%</span></div>
+            <p style="color: var(--cyber-muted); font-size: 0.8rem; margin-top: 10px;">Intraday spike. Foundation cracking beneath SPX liquidity artifacts.</p>
+        </div>
+        <div class="panel btc-panel">
+            <div class="metric-title">Bitcoin (BTC)</div>
+            <div class="metric-value">$69,483 <span class="metric-change change-up">+6.3%</span></div>
+            <p style="color: var(--cyber-muted); font-size: 0.8rem; margin-top: 10px;">Digital Gold render operational. Decoupling from traditional fiat architecture.</p>
+        </div>
+    </div>
+
+    <div class="dashboard-grid">
+        <div class="panel wide-panel">
+            <div class="metric-title" style="display: flex; justify-content: space-between;">
+                <span>S&P 500 Intraday - "The Gap-and-Trap"</span>
+                <span style="color: var(--cyber-danger)">6,878.88 (-0.43%)</span>
+            </div>
+            <div class="chart-container">
+                <canvas id="spxChart"></canvas>
+            </div>
+        </div>
+        <div class="panel wide-panel">
+            <div class="metric-title" style="display: flex; justify-content: space-between;">
+                <span>Sector Spread Volatility (Logistics vs Energy)</span>
+                <span style="color: var(--cyber-warn)">High Tension</span>
+            </div>
+            <div class="chart-container">
+                <canvas id="sectorChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Clock
+        setInterval(() => {
+            const now = new Date();
+            document.getElementById('clock').innerText = `SYS.TIME: ${now.toISOString().replace('T', ' ').substring(0, 19)} UTC`;
+        }, 1000);
+
+        // Chart.js defaults
+        Chart.defaults.color = '#666688';
+        Chart.defaults.font.family = 'Inter';
+        Chart.defaults.plugins.tooltip.backgroundColor = 'rgba(19, 19, 28, 0.9)';
+        Chart.defaults.plugins.tooltip.titleColor = '#fff';
+        Chart.defaults.plugins.tooltip.borderColor = '#2a2a35';
+        Chart.defaults.plugins.tooltip.borderWidth = 1;
+
+        // SPX Chart (Gap and Trap visualization)
+        const ctxSpx = document.getElementById('spxChart').getContext('2d');
+        const spxData = [6908, 6838, 6845, 6850, 6862, 6865, 6870, 6875, 6885, 6878.88];
+        const spxLabels = ['9:30', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '15:30', '15:50', '16:00'];
+
+        new Chart(ctxSpx, {
+            type: 'line',
+            data: {
+                labels: spxLabels,
+                datasets: [{
+                    label: 'SPX',
+                    data: spxData,
+                    borderColor: '#ff3366',
+                    backgroundColor: 'rgba(255, 51, 102, 0.05)',
+                    borderWidth: 2,
+                    tension: 0.4,
+                    fill: true,
+                    pointRadius: 0,
+                    pointHitRadius: 10
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { grid: { color: '#2a2a35', drawBorder: false } },
+                    y: {
+                        grid: { color: '#2a2a35', drawBorder: false },
+                        min: 6830,
+                        max: 6920
+                    }
+                },
+                interaction: { intersect: false, mode: 'index' },
+            }
+        });
+
+        // Sector Chart (Airlines plunging, Domestic E&P rising)
+        const ctxSector = document.getElementById('sectorChart').getContext('2d');
+        const timeLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
+
+        new Chart(ctxSector, {
+            type: 'line',
+            data: {
+                labels: timeLabels,
+                datasets: [
+                    {
+                        label: 'US Refiners (VLO/PSX)',
+                        data: [100, 102, 105, 108, 112],
+                        borderColor: '#00ffcc',
+                        borderWidth: 2,
+                        tension: 0.3,
+                        pointBackgroundColor: '#00ffcc'
+                    },
+                    {
+                        label: 'Airlines & Logistics',
+                        data: [100, 98, 95, 90, 84],
+                        borderColor: '#ff3366',
+                        borderWidth: 2,
+                        tension: 0.3,
+                        pointBackgroundColor: '#ff3366'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { usePointStyle: true, padding: 20 }
+                    }
+                },
+                scales: {
+                    x: { grid: { color: '#2a2a35', drawBorder: false } },
+                    y: {
+                        grid: { color: '#2a2a35', drawBorder: false },
+                        title: { display: true, text: 'Relative Performance (Base 100)' }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
