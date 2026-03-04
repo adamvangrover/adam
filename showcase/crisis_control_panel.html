@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crisis Control Panel // ADAMO.S.</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --term-bg: #000000;
+            --term-fg: #00ff00;
+            --term-err: #ff0000;
+            --term-warn: #ffff00;
+            --term-dim: #004400;
+        }
+
+        body {
+            background-color: var(--term-bg);
+            color: var(--term-fg);
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        .crt-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .ticker-wrap {
+            width: 100%;
+            overflow: hidden;
+            background-color: var(--term-fg);
+            color: var(--term-bg);
+            white-space: nowrap;
+            padding: 5px 0;
+            font-weight: bold;
+            border-bottom: 2px solid var(--term-fg);
+        }
+
+        .ticker {
+            display: inline-block;
+            white-space: nowrap;
+            padding-right: 100%;
+            animation: ticker 25s linear infinite;
+        }
+
+        @keyframes ticker {
+            0% { transform: translate3d(0, 0, 0); }
+            100% { transform: translate3d(-100%, 0, 0); }
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            grid-template-rows: 1fr;
+            gap: 20px;
+            padding: 20px;
+            flex-grow: 1;
+            height: calc(100vh - 40px);
+        }
+
+        .panel {
+            border: 1px solid var(--term-fg);
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .panel-header {
+            border-bottom: 1px solid var(--term-fg);
+            padding-bottom: 5px;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .log-container {
+            flex-grow: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .log-entry {
+            border-left: 2px solid var(--term-dim);
+            padding-left: 10px;
+        }
+
+        .log-time {
+            color: var(--term-dim);
+            font-size: 0.8em;
+            margin-right: 10px;
+        }
+
+        .log-err { color: var(--term-err); border-left-color: var(--term-err); }
+        .log-warn { color: var(--term-warn); border-left-color: var(--term-warn); }
+
+        .sector-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .sector-card {
+            border: 1px solid var(--term-dim);
+            padding: 10px;
+            text-align: center;
+        }
+
+        .sector-card.critical { border-color: var(--term-err); color: var(--term-err); animation: pulse 2s infinite; }
+        .sector-card.stable { border-color: var(--term-fg); color: var(--term-fg); }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--term-bg); border-left: 1px solid var(--term-dim); }
+        ::-webkit-scrollbar-thumb { background: var(--term-dim); }
+        ::-webkit-scrollbar-thumb:hover { background: var(--term-fg); }
+
+        .blink { animation: blinker 1s linear infinite; }
+        @keyframes blinker { 50% { opacity: 0; } }
+
+        .map-mockup {
+            border: 1px dashed var(--term-dim);
+            height: 200px;
+            margin-top: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0,255,0,0.05) 10px, rgba(0,255,0,0.05) 20px);
+            position: relative;
+        }
+
+        .radar-sweep {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: conic-gradient(from 0deg, transparent 70%, rgba(0, 255, 0, 0.4) 100%);
+            border-radius: 50%;
+            animation: spin 4s linear infinite;
+        }
+
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+    <div class="crt-overlay"></div>
+
+    <div class="ticker-wrap">
+        <div class="ticker">
+            > [ALERT] BRENT CRUDE BREAKS $90/BBL | > [ALERT] 10Y TREASURY YIELD SURGES TO 4.05% | > [STATUS] S&P 500 LIQUIDITY ARTIFACT DETECTED (VIX 23.5) | > [INTEL] MICROSTRATEGY BUYS 3,015 BTC AT $69K | > [CRITICAL] UK SHADOW BANKING £930M COLLATERAL SHORTFALL CONFIRMED (MFS INSOLVENCY) | > [WARNING] AIRLINES & LOGISTICS DSCR DEGRADING EXPONENTIALLY
+        </div>
+    </div>
+
+    <div class="main-grid">
+        <div class="panel">
+            <div class="panel-header">
+                <span>SYSTEM_LOG::STREAM</span>
+                <span class="blink">_REC</span>
+            </div>
+            <div class="log-container" id="sysLog">
+                <div class="log-entry">
+                    <span class="log-time">[16:01:04]</span> Initiating automated damage assessment protocol.
+                </div>
+                <div class="log-entry log-err">
+                    <span class="log-time">[16:01:05]</span> KINETIC EVENT: Middle East War-Patch activated.
+                </div>
+                <div class="log-entry">
+                    <span class="log-time">[16:02:11]</span> Analyzing Strait of Hormuz maritime traffic. 150+ tankers anchored.
+                </div>
+                <div class="log-entry log-warn">
+                    <span class="log-time">[16:05:42]</span> MARGIN COMPRESSION DETECTED: 18% US Tariffs compounding with $90+ oil input costs.
+                </div>
+                <div class="log-entry log-err">
+                    <span class="log-time">[16:08:19]</span> COLLATERAL FAILURE: Market Financial Solutions (UK) double-pledging fraud confirmed. Prime broker exposure identified: Barclays, Jefferies, Apollo.
+                </div>
+                <div class="log-entry">
+                    <span class="log-time">[16:12:00]</span> Executing Credit Default Sensitivity scan on SPX cohorts...
+                </div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-header">
+                <span>SECTOR_RISK_MATRIX</span>
+                <span>DSCR SCAN</span>
+            </div>
+
+            <div class="sector-grid">
+                <div class="sector-card critical">
+                    <div>AIRLINES</div>
+                    <div style="font-size: 0.8em; margin-top: 5px;">DSCR < 1.0x</div>
+                    <div style="font-size: 0.7em;">INSOLVENT</div>
+                </div>
+                <div class="sector-card critical">
+                    <div>LOGISTICS</div>
+                    <div style="font-size: 0.8em; margin-top: 5px;">MARGIN CRUSH</div>
+                    <div style="font-size: 0.7em;">LME IMMINENT</div>
+                </div>
+                <div class="sector-card stable">
+                    <div>DOMESTIC E&P</div>
+                    <div style="font-size: 0.8em; margin-top: 5px;">$50 ARBITRAGE</div>
+                    <div style="font-size: 0.7em;">HEDGED (PSX/VLO)</div>
+                </div>
+                <div class="sector-card stable">
+                    <div>DIGITAL ASSETS</div>
+                    <div style="font-size: 0.8em; margin-top: 5px;">CRISIS ALPHA</div>
+                    <div style="font-size: 0.7em;">DECOUPLED</div>
+                </div>
+            </div>
+
+            <div class="map-mockup" style="margin-top: 20px;">
+                <div class="radar-sweep" style="width: 150px; height: 150px;"></div>
+                <div style="position: absolute; font-size: 0.8em; color: var(--term-dim);">STRAIT OF HORMUZ MARITIME LOCKDOWN</div>
+                <div style="position: absolute; width: 4px; height: 4px; background: red; border-radius: 50%; top: 40%; left: 60%; box-shadow: 0 0 10px red;" class="blink"></div>
+                <div style="position: absolute; width: 4px; height: 4px; background: red; border-radius: 50%; top: 45%; left: 55%; box-shadow: 0 0 10px red;" class="blink"></div>
+                <div style="position: absolute; width: 4px; height: 4px; background: red; border-radius: 50%; top: 50%; left: 62%; box-shadow: 0 0 10px red;" class="blink"></div>
+            </div>
+
+            <button style="margin-top: 20px; background: var(--term-bg); border: 1px solid var(--term-err); color: var(--term-err); padding: 10px; cursor: pointer; font-family: inherit; font-weight: bold; width: 100%; transition: all 0.2s;" onmouseover="this.style.background='var(--term-err)'; this.style.color='var(--term-bg)'" onmouseout="this.style.background='var(--term-bg)'; this.style.color='var(--term-err)'">
+                INITIATE PORTFOLIO DIVESTMENT
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const logs = [
+            "[16:15:22] Federal Reserve probability matrix updated. Rate cuts delayed 3 quarters.",
+            "[ERR] [16:18:04] Leverage loan 'Cov-Lite' structures failing to trigger maintenance covenants.",
+            "[WARN] [16:21:19] CLO Overcollateralization (OC) test failure imminent for bottom-quartile managers.",
+            "[16:25:33] Rebalancing capital to Skills Intelligence platforms (Demographic Deflation trade)."
+        ];
+
+        let logIndex = 0;
+        const sysLog = document.getElementById('sysLog');
+
+        setInterval(() => {
+            if(logIndex < logs.length) {
+                const text = logs[logIndex];
+                const div = document.createElement('div');
+                div.className = 'log-entry';
+                if(text.includes('[ERR]')) div.classList.add('log-err');
+                if(text.includes('[WARN]')) div.classList.add('log-warn');
+
+                // remove the prefix for display
+                const cleanText = text.replace('[ERR] ', '').replace('[WARN] ', '');
+
+                // extract time
+                const timeMatch = cleanText.match(/\[\d{2}:\d{2}:\d{2}\]/);
+                const timeStr = timeMatch ? timeMatch[0] : '[--:--:--]';
+                const msgStr = cleanText.replace(timeStr, '').trim();
+
+                div.innerHTML = `<span class="log-time">${timeStr}</span> ${msgStr}`;
+                sysLog.appendChild(div);
+                sysLog.scrollTop = sysLog.scrollHeight;
+                logIndex++;
+            }
+        }, 5000);
+    </script>
+</body>
+</html>
