@@ -179,18 +179,27 @@ class RealtimeFetcher:
             hist_price = t.history(period="6mo")
             price_series = hist_price["Close"].tolist() if not hist_price.empty else []
             
-            # Return aligned financials
+            # Find min length to avoid DataFrame alignment errors
+            min_len = min(len(years), len(revenue), len(ebitda), len(net_income),
+                          len(total_assets), len(total_liabilities), len(total_debt),
+                          len(cash), len(interest_expense), len(capex))
+
+            if min_len == 0:
+                logger.warning(f"Insufficient aligned financial data for {ticker}")
+                return {}
+
+            # Trim arrays to min_len to avoid "All arrays must be of the same length"
             return {
-                "revenue": revenue,
-                "ebitda": ebitda,
-                "net_income": net_income,
-                "total_assets": total_assets,
-                "total_liabilities": total_liabilities,
-                "total_debt": total_debt,
-                "cash": cash,
-                "interest_expense": interest_expense,
-                "capex": capex,
-                "year": years,
+                "revenue": revenue[:min_len],
+                "ebitda": ebitda[:min_len],
+                "net_income": net_income[:min_len],
+                "total_assets": total_assets[:min_len],
+                "total_liabilities": total_liabilities[:min_len],
+                "total_debt": total_debt[:min_len],
+                "cash": cash[:min_len],
+                "interest_expense": interest_expense[:min_len],
+                "capex": capex[:min_len],
+                "year": years[:min_len],
                 "_price_history": price_series # Underscore to indicate auxiliary
             }
 

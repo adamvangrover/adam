@@ -371,6 +371,9 @@ MOCK_LIBRARY = {
     }
 }
 
+import argparse
+from core.data.realtime_fetcher import RealtimeFetcher
+
 # --- 2. Pipeline Wrapper ---
 
 class CreditMemoPipeline:
@@ -382,10 +385,78 @@ class CreditMemoPipeline:
         self.library_index = []
         self.interaction_logs = {}
 
-    def run_pipeline(self):
+    def fetch_live_data(self, ticker: str, base_data: Dict[str, Any] = None) -> Dict[str, Any]:
+        """Fetches live data for a single ticker, preserving base docs if available."""
+        fetcher = RealtimeFetcher()
+        logger.info(f"Fetching live data for {ticker}...")
+
+        market_data = fetcher.fetch_market_data(ticker)
+        historical_data = fetcher.fetch_historical_data(ticker)
+        assumptions = fetcher.fetch_forecast_assumptions(ticker)
+
+        # Build structure matching MOCK_LIBRARY
+        name = base_data.get("name", f"{ticker} Inc.") if base_data else f"{ticker} Inc."
+        sector = base_data.get("sector", "General") if base_data else "General"
+        description = base_data.get("description", f"Live generated data for {ticker}.") if base_data else f"Live generated data for {ticker}."
+        docs = base_data.get("docs", {
+            "10-K": "Standard competitive risks and regulatory scrutiny.",
+            "Credit_Agreement": "Standard terms. No major covenants breached."
+        }) if base_data else {
+            "10-K": "Standard competitive risks and regulatory scrutiny.",
+            "Credit_Agreement": "Standard terms. No major covenants breached."
+        }
+
+        return {
+            "ticker": ticker,
+            "name": name,
+            "sector": sector,
+            "description": description,
+            "historical": historical_data,
+            "forecast_assumptions": assumptions,
+            "market_data": market_data,
+            "docs": docs
+        }
+
+    def run_pipeline(self, live: bool = False, target_ticker: str = None):
         logger.info("Starting Credit Memo Generation Pipeline...")
 
-        for key, data in MOCK_LIBRARY.items():
+        items_to_process = []
+        if live:
+            if target_ticker:
+                # Find base data if it exists
+                base_data = None
+                for k, v in MOCK_LIBRARY.items():
+                    if v["ticker"] == target_ticker:
+                        base_data = v
+                        break
+
+                live_data = self.fetch_live_data(target_ticker, base_data)
+                key = f"{target_ticker}_Live"
+                MOCK_LIBRARY[key] = live_data
+                items_to_process.append((key, live_data))
+            else:
+                # Process all names in MOCK_LIBRARY live
+                for k, v in list(MOCK_LIBRARY.items()):
+                    ticker = v["ticker"]
+                    live_data = self.fetch_live_data(ticker, v)
+                    key = f"{k}_Live"
+                    MOCK_LIBRARY[key] = live_data
+                    items_to_process.append((key, live_data))
+        elif target_ticker:
+            # Try to find target ticker in MOCK_LIBRARY
+            found = False
+            for k, v in MOCK_LIBRARY.items():
+                if v["ticker"] == target_ticker:
+                    items_to_process.append((k, v))
+                    found = True
+                    break
+            if not found:
+                logger.error(f"Ticker {target_ticker} not found in MOCK_LIBRARY.")
+                return
+        else:
+            items_to_process = list(MOCK_LIBRARY.items())
+
+        for key, data in items_to_process:
             result = self.orchestrator.process_entity(key, data)
             if not result:
                 continue
@@ -418,13 +489,43 @@ class CreditMemoPipeline:
         logger.info("Pipeline Complete.")
 
     def save_library_index(self):
-        with open(os.path.join(self.output_dir, "credit_memo_library.json"), 'w') as f:
-            json.dump(self.library_index, f, indent=2)
+        index_path = os.path.join(self.output_dir, "credit_memo_library.json")
+        existing_index = []
+        if os.path.exists(index_path):
+            with open(index_path, 'r') as f:
+                try:
+                    existing_index = json.load(f)
+                except json.JSONDecodeError:
+                    pass
+
+        # Update existing index with new entries
+        new_ids = {item['id'] for item in self.library_index}
+        updated_index = [item for item in existing_index if item['id'] not in new_ids]
+        updated_index.extend(self.library_index)
+
+        with open(index_path, 'w') as f:
+            json.dump(updated_index, f, indent=2)
 
     def save_interaction_logs(self):
-        with open(os.path.join(self.output_dir, "risk_legal_interaction.json"), 'w') as f:
-            json.dump(self.interaction_logs, f, indent=2)
+        logs_path = os.path.join(self.output_dir, "risk_legal_interaction.json")
+        existing_logs = {}
+        if os.path.exists(logs_path):
+            with open(logs_path, 'r') as f:
+                try:
+                    existing_logs = json.load(f)
+                except json.JSONDecodeError:
+                    pass
+
+        existing_logs.update(self.interaction_logs)
+
+        with open(logs_path, 'w') as f:
+            json.dump(existing_logs, f, indent=2)
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Generate Credit Memos")
+    parser.add_argument("--ticker", type=str, help="Specific ticker to generate memo for")
+    parser.add_argument("--live", action="store_true", help="Fetch live data from yfinance")
+    args = parser.parse_args()
+
     pipeline = CreditMemoPipeline()
-    pipeline.run_pipeline()
+    pipeline.run_pipeline(live=args.live, target_ticker=args.ticker)

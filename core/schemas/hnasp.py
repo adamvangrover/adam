@@ -16,6 +16,8 @@ class Meta(BaseModel):
     agent_id: str
     trace_id: str
     security_context: SecurityContext
+    timestamp: Optional[datetime] = None
+    model_config_data: Optional[Dict[str, Any]] = Field(default=None, alias="model_config")
 
 class EPAVector(BaseModel):
     E: float
@@ -33,6 +35,7 @@ class PersonaIdentities(BaseModel):
 
 class PersonaDynamics(BaseModel):
     current_deflection: float = 0.0
+    target_behavior_epa: Optional[EPAVector] = None
 
 class PersonaState(BaseModel):
     identities: PersonaIdentities
@@ -58,6 +61,7 @@ class Turn(BaseModel):
 
 class ContextStream(BaseModel):
     turns: List[Turn] = Field(default_factory=list)
+    window_id: Optional[int] = None
 
 class ModelConfig(BaseModel):
     """Configuration for the HNASP model."""

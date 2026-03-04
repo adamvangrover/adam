@@ -13,4 +13,4 @@ Modules:
 """
 
 from .cyclical_reasoning_graph import cyclical_reasoning_app, build_cyclical_reasoning_graph
-from .snc_graph import snc_graph_app, build_snc_graph
+from .snc_graph import snc_graph_app, build_snc_team_graph

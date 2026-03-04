@@ -4,21 +4,23 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import random
+import logging
+from typing import Dict, Any, List
 
+from core.agents.agent_base import AgentBase
 
-class AlgoTradingAgent:
-    def __init__(self, data, strategies=None, initial_balance=10000):
+logger = logging.getLogger(__name__)
+
+class AlgoTradingAgent(AgentBase):
+    def __init__(self, config: Dict[str, Any] = None, **kwargs):
         """
         Initializes the trading agent.
-
-        Args:
-            data (pd.DataFrame): Historical market data (e.g., price history).
-            strategies (list, optional): List of strategies to be simulated. Defaults to None.
-            initial_balance (float, optional): The starting balance for the simulation. Defaults to 10000.
         """
-        self.data = data
-        self.strategies = strategies or ['momentum', 'mean_reversion', 'arbitrage']
-        self.initial_balance = initial_balance
+        super().__init__(config=config or {}, **kwargs)
+
+        self.strategies = self.config.get("strategies", ['momentum', 'mean_reversion', 'arbitrage'])
+        self.initial_balance = self.config.get("initial_balance", 10000)
+        self.data = None
         self.results = {}
 
     def run_simulation(self, strategy):
@@ -38,7 +40,7 @@ class AlgoTradingAgent:
         elif strategy == 'arbitrage':
             return self.arbitrage_trading()
         else:
-            print("Unknown strategy.")
+            logger.warning(f"Unknown strategy: {strategy}")
             return {}
 
     def momentum_trading(self):
@@ -197,30 +199,29 @@ class AlgoTradingAgent:
         """
         Plots the performance of all strategies.
         """
-        plt.figure(figsize=(10, 6))
+        logger.warning("Plotting performance requires interactive backend, returning skipped.")
+        return
 
-        for strategy, result in self.results.items():
-            plt.plot(result['Final Balance'], label=f'{strategy} (Total Return: {result["Total Return"]*100:.2f}%)')
+    async def execute(self, data: pd.DataFrame = None, strategies: List[str] = None, **kwargs) -> Dict[str, Any]:
+        """
+        Executes the trading simulations for given strategies on the provided data.
+        """
+        if data is None:
+            if 'target_data' in kwargs:
+                data = kwargs['target_data']
+            else:
+                logger.error("No data provided for AlgoTradingAgent.")
+                return {"status": "error", "message": "No data provided"}
 
-        plt.title('Strategy Performance Comparison')
-        plt.xlabel('Time')
-        plt.ylabel('Portfolio Value')
-        plt.legend(loc='upper left')
-        plt.show()
+        self.data = data
+        if strategies:
+            self.strategies = strategies
 
+        logger.info(f"Evaluating strategies: {self.strategies}")
+        results = self.evaluate_strategies()
 
-# Example usage
-if __name__ == "__main__":
-    # Simulate market data (replace with actual market data)
-    dates = pd.date_range('2023-01-01', '2023-12-31', freq='D')
-    prices = np.random.normal(100, 5, len(dates))  # Simulating daily closing prices
-    market_data = pd.DataFrame({'Date': dates, 'Close': prices})
-
-    # Initialize the agent
-    agent = AlgoTradingAgent(data=market_data)
-
-    # Run and evaluate the strategies
-    agent.evaluate_strategies()
-
-    # Plot performance comparison
-    agent.plot_performance()
+        return {
+            "status": "completed",
+            "results": results,
+            "strategies_evaluated": self.strategies
+        }

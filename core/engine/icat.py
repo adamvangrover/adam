@@ -150,7 +150,9 @@ class ICATEngine:
         Clean and normalize data into a DataFrame.
         """
         hist = raw_data.get('historical', {})
-        df = pd.DataFrame(hist)
+        # Filter out auxiliary data like _price_history that might have a different length
+        filtered_hist = {k: v for k, v in hist.items() if not k.startswith('_')}
+        df = pd.DataFrame(filtered_hist)
         if 'year' in df.columns:
             df.set_index('year', inplace=True)
         return df.sort_index()
@@ -353,8 +355,8 @@ class ICATEngine:
         years = len(assumptions.revenue_growth)
 
         for i in range(years):
-            g = assumptions.revenue_growth[i] if i < len(assumptions.revenue_growth) else assumptions.revenue_growth[-1]
-            m = assumptions.ebitda_margin[i] if i < len(assumptions.ebitda_margin) else assumptions.ebitda_margin[-1]
+            g = float(assumptions.revenue_growth[i] if i < len(assumptions.revenue_growth) else assumptions.revenue_growth[-1])
+            m = float(assumptions.ebitda_margin[i] if i < len(assumptions.ebitda_margin) else assumptions.ebitda_margin[-1])
 
             current_revenue *= (1 + g)
             proj_ebitda = current_revenue * m
@@ -430,8 +432,8 @@ class ICATEngine:
 
         # Simulation
         for i in range(years):
-            g = assumptions.revenue_growth[i] if i < len(assumptions.revenue_growth) else assumptions.revenue_growth[-1]
-            m = assumptions.ebitda_margin[i] if i < len(assumptions.ebitda_margin) else assumptions.ebitda_margin[-1]
+            g = float(assumptions.revenue_growth[i] if i < len(assumptions.revenue_growth) else assumptions.revenue_growth[-1])
+            m = float(assumptions.ebitda_margin[i] if i < len(assumptions.ebitda_margin) else assumptions.ebitda_margin[-1])
 
             current_revenue *= (1 + g)
             current_ebitda = current_revenue * m

@@ -10,8 +10,14 @@ class AdaptiveAlgoTradingAgent(AlgoTradingAgent):
     to dynamically select the best trading strategy based on market conditions.
     """
     def __init__(self, data: pd.DataFrame, strategies=None, initial_balance=10000,
-                 learning_rate=0.1, discount_factor=0.95, epsilon=1.0):
-        super().__init__(data, strategies, initial_balance)
+                 learning_rate=0.1, discount_factor=0.95, epsilon=1.0, **kwargs):
+        # Package args into config for AgentBase compatibility
+        config = kwargs.get('config', {})
+        if strategies: config['strategies'] = strategies
+        if initial_balance: config['initial_balance'] = initial_balance
+
+        super().__init__(config=config, **kwargs)
+        self.data = data
 
         # Define actions: 0=Momentum, 1=Mean Reversion, 2=Arbitrage (simulated)
         self.action_space = len(self.strategies)

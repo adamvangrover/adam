@@ -48,8 +48,9 @@ def calculate_dcf(financials: Dict[str, Any], risk_free_rate: float = 0.04, scen
     # 2. Project FCF (5 years)
     projected_fcf = []
     current_fcf = fcf
-    for _ in range(5):
-        current_fcf *= (1 + growth_rate)
+    for i in range(5):
+        g = float(growth_rate[i]) if isinstance(growth_rate, list) and i < len(growth_rate) else float(growth_rate[-1]) if isinstance(growth_rate, list) else float(growth_rate)
+        current_fcf *= (1 + g)
         projected_fcf.append(current_fcf)
 
     # 3. Terminal Value
