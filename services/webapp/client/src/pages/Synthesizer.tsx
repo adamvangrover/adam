@@ -2,7 +2,7 @@
 // Verified by Jules
 // Protocol Verified: ADAM-V-NEXT (Updated)
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { Activity, Radio, ShieldAlert, Cpu, TrendingUp, Users } from 'lucide-react';
+import { Activity, Radio, ShieldAlert, Cpu, TrendingUp, Users, Loader2 } from 'lucide-react';
 import AgentIntercom from '../components/AgentIntercom';
 import NarrativeDashboard from '../components/NarrativeDashboard';
 
@@ -209,6 +209,13 @@ const Synthesizer: React.FC = () => {
                             <span style={{ color: 'var(--primary-color)' }}>&gt; MISSION BRIEF:</span> {rationale}
                         </div>
                     </div>
+                    {/* Optional System 2 Critique Area (if available) */}
+                    {pulse && (pulse as any)?.critique && (
+                        <div style={{ marginTop: '20px', padding: '15px', border: '1px solid #ff3333', background: 'rgba(255, 0, 0, 0.05)', borderRadius: '4px' }}>
+                            <div style={{ fontSize: '0.8rem', color: '#ff3333', fontWeight: 'bold', marginBottom: '5px' }}>SYSTEM 2 CRITIQUE:</div>
+                            <div style={{ fontSize: '0.9rem', color: '#e0e0e0' }}>{(pulse as any).critique}</div>
+                        </div>
+                    )}
                 </div>
 
                 {/* 2. Signal Inputs */}
@@ -290,12 +297,24 @@ const Synthesizer: React.FC = () => {
                     </h3>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: '10px', marginTop: '20px' }}>
                         {Object.entries(conviction).map(([agent, val]) => (
-                            <div key={agent} style={{ textAlign: 'center', padding: '10px', background: `rgba(0, 255, 0, ${val * 0.3})`, border: `1px solid rgba(0,255,0,${val})`, borderRadius: '4px' }}>
+                            <div key={agent} style={{ textAlign: 'center', padding: '10px', background: `rgba(0, 255, 0, ${val * 0.3})`, border: `1px solid rgba(0,255,0,${val})`, borderRadius: '4px', position: 'relative', overflow: 'hidden' }}>
+                                {/* Animated scanning bar */}
+                                <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '2px', background: 'rgba(255,255,255,0.5)', animation: 'scan 3s linear infinite' }}></div>
                                 <div style={{ fontSize: '0.7rem', fontWeight: 'bold' }}>{agent}</div>
                                 <div style={{ fontSize: '1.2rem', color: '#fff' }}>{(val * 100).toFixed(0)}%</div>
+                                {val > 0.8 && <div style={{ fontSize: '0.55rem', color: '#000', background: '#0f0', padding: '2px', marginTop: '5px', borderRadius: '2px' }}>HIGH CONVICTION</div>}
+                                {val < 0.3 && <div style={{ fontSize: '0.55rem', color: '#000', background: '#f00', padding: '2px', marginTop: '5px', borderRadius: '2px' }}>LOW CONVICTION</div>}
                             </div>
                         ))}
                     </div>
+                    {/* Add keyframes globally for scanning bar */}
+                    <style>{`
+                        @keyframes scan {
+                            0% { transform: translateY(-100%); opacity: 0; }
+                            50% { opacity: 1; }
+                            100% { transform: translateY(1000%); opacity: 0; }
+                        }
+                    `}</style>
                 </div>
 
                 {/* 7. Forecast Chart (SVG) */}
@@ -304,7 +323,10 @@ const Synthesizer: React.FC = () => {
                         <TrendingUp size={20} color="#00f3ff" /> Predictive Horizon (SPX 30-Day)
                     </h3>
                     {forecastData && forecastChartPoints ? (
-                        <div style={{ marginTop: '20px', height: '300px', position: 'relative' }}>
+                        <div style={{ marginTop: '20px', height: '300px', position: 'relative', overflow: 'hidden', borderRadius: '8px' }}>
+                             {/* Grid Lines */}
+                             <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundImage: 'linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px)', backgroundSize: '20px 20px', pointerEvents: 'none' }}></div>
+
                              {/* Simple SVG Chart */}
                              <svg
                                 width="100%"
@@ -337,14 +359,22 @@ const Synthesizer: React.FC = () => {
                                  <polyline
                                      points={forecastChartPoints.linePoints}
                                      fill="none" stroke="#fff" strokeWidth="2"
+                                     style={{ filter: 'drop-shadow(0 0 5px rgba(255,255,255,0.8))' }}
                                  />
+
+                                 {/* Current Price Marker */}
+                                 <circle cx="0" cy={forecastChartPoints.linePoints.split(' ')[0].split(',')[1]} r="4" fill="#0ff" style={{ filter: 'drop-shadow(0 0 5px #0ff)' }} />
                              </svg>
-                             <div style={{ position: 'absolute', top: 10, right: 10, fontSize: '0.8rem', color: '#0ff' }}>
-                                 CONFIDENCE BAND: 95%
+
+                             <div style={{ position: 'absolute', top: 10, right: 10, background: 'rgba(0,0,0,0.6)', padding: '5px 10px', borderRadius: '4px', fontSize: '0.7rem', color: '#0ff', border: '1px solid #0ff' }}>
+                                 CONFIDENCE BAND: 95% | HORIZON: 30D
                              </div>
                         </div>
                     ) : (
-                        <div style={{ padding: '20px', textAlign: 'center', color: '#666' }}>LOADING FORECAST MODEL...</div>
+                        <div style={{ padding: '50px 20px', textAlign: 'center', color: '#666', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '15px' }}>
+                            <Loader2 className="animate-spin" size={32} color="#0ff" />
+                            <div style={{ letterSpacing: '2px', fontSize: '0.9rem' }}>INITIALIZING PREDICTIVE MATRIX...</div>
+                        </div>
                     )}
                 </div>
 

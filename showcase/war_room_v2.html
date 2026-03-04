@@ -293,11 +293,21 @@
             const mem = Math.floor(40 + Math.random() * 20);
             const coh = Math.floor(85 + Math.random() * 10);
 
-            document.getElementById('cpu-val').innerText = cpu + '%';
-            document.getElementById('cpu-bar').style.width = cpu + '%';
+            // Change colors based on load
+            const cpuColor = cpu > 80 ? '#f00' : cpu > 60 ? '#ffa500' : '#0ff';
+            const memColor = mem > 80 ? '#f00' : mem > 60 ? '#ffa500' : '#0ff';
 
+            const cpuBar = document.getElementById('cpu-bar');
+            document.getElementById('cpu-val').innerText = cpu + '%';
+            document.getElementById('cpu-val').style.color = cpuColor;
+            cpuBar.style.width = cpu + '%';
+            cpuBar.style.background = cpuColor;
+
+            const memBar = document.getElementById('mem-bar');
             document.getElementById('mem-val').innerText = mem + '%';
-            document.getElementById('mem-bar').style.width = mem + '%';
+            document.getElementById('mem-val').style.color = memColor;
+            memBar.style.width = mem + '%';
+            memBar.style.background = memColor;
 
             document.getElementById('coh-val').innerText = coh + '%';
             document.getElementById('coh-bar').style.width = coh + '%';
@@ -305,13 +315,69 @@
 
         function renderAgents() {
             const list = document.getElementById('agent-list');
-            const agents = ['RiskOfficer', 'TechAnalyst', 'MacroSentinel', 'Blindspot', 'ConsensusEngine'];
+            const agents = ['RiskOfficer', 'TechAnalyst', 'MacroSentinel', 'BlindspotMonitor', 'ConsensusEngine'];
             list.innerHTML = agents.map(a => `
-                <div style="display:flex; align-items:center; gap:5px;">
-                    <div style="width:6px; height:6px; background:#0f0; border-radius:50%; box-shadow:0 0 5px #0f0;"></div>
+                <div onclick="showLogModal('${a}')" style="cursor: pointer; display:flex; align-items:center; gap:5px; padding: 5px; background: rgba(0, 255, 0, 0.05); border-radius: 4px; border: 1px solid rgba(0,255,0,0.2); transition: background 0.3s;" onmouseover="this.style.background='rgba(0, 255, 0, 0.15)'" onmouseout="this.style.background='rgba(0, 255, 0, 0.05)'">
+                    <div style="width:8px; height:8px; background:#0f0; border-radius:50%; box-shadow:0 0 8px #0f0; animation: pulse 2s infinite;"></div>
                     ${a}
                 </div>
             `).join('');
+
+            // Add pulse animation and modal styles
+            const style = document.createElement('style');
+            style.innerHTML = `
+                @keyframes pulse {
+                    0% { opacity: 1; transform: scale(1); }
+                    50% { opacity: 0.5; transform: scale(0.8); }
+                    100% { opacity: 1; transform: scale(1); }
+                }
+                .log-modal {
+                    display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+                    width: 400px; height: 300px; background: rgba(10, 20, 30, 0.95); border: 1px solid #00f3ff;
+                    box-shadow: 0 0 20px rgba(0,0,0,0.8); z-index: 1000; padding: 20px; border-radius: 8px;
+                    flex-direction: column; font-family: 'JetBrains Mono', monospace;
+                }
+                .modal-close {
+                    position: absolute; top: 10px; right: 10px; cursor: pointer; color: #ff3333; font-weight: bold;
+                }
+            `;
+            document.head.appendChild(style);
+
+            // Create modal container if not exists
+            if (!document.getElementById('agent-modal')) {
+                const modal = document.createElement('div');
+                modal.id = 'agent-modal';
+                modal.className = 'log-modal';
+                modal.innerHTML = `
+                    <div class="modal-close" onclick="document.getElementById('agent-modal').style.display='none'">[X]</div>
+                    <div id="modal-title" style="color: #0ff; font-weight: bold; margin-bottom: 15px; border-bottom: 1px solid #333; padding-bottom: 5px;"></div>
+                    <div id="modal-content" style="flex: 1; overflow-y: auto; font-size: 0.8rem; color: #aaa; white-space: pre-wrap;"></div>
+                `;
+                document.body.appendChild(modal);
+            }
+        }
+
+        function showLogModal(agentName) {
+            const modal = document.getElementById('agent-modal');
+            document.getElementById('modal-title').innerText = \`\${agentName} // NEURAL LOGS\`;
+
+            // Mock dynamic logs
+            const actions = [
+                "[INFO] Analyzing target sector...",
+                "[WARN] Volatility spike detected in primary asset.",
+                "[DEBUG] Recalculating correlation matrix...",
+                "[INFO] Consolidating sub-agent inputs...",
+                "[SUCCESS] Model alignment verified."
+            ];
+
+            let content = "";
+            for (let i=0; i<5; i++) {
+                content += \`> \${actions[Math.floor(Math.random() * actions.length)]}\\n\`;
+            }
+            content += \`> Awaiting new instructions...\\n\`;
+
+            document.getElementById('modal-content').innerText = content;
+            modal.style.display = 'flex';
         }
 
         // Init & Loops

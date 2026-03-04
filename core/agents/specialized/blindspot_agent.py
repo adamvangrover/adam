@@ -141,7 +141,47 @@ class BlindspotAgent(AgentBase):
         circular_deps = self._detect_circular_dependencies()
         found_anomalies.extend(circular_deps)
 
+        # Cross-reference with recent news headlines (simulated macro events)
+        from core.engine.live_mock_engine import live_engine
+        pulse = live_engine.get_market_pulse()
+        headlines = pulse.get('headlines', [])
+
+        # Check if headlines suggest a macro risk that the model isn't pricing in
+        macro_risks = ['war', 'pandemic', 'default', 'cyberattack', 'embargo', 'escalation', 'tariff']
+        for headline in headlines:
+            title_lower = headline.get('title', '').lower()
+            detected_risks = [risk for risk in macro_risks if risk in title_lower]
+            if detected_risks and headline.get('sentiment') != 'negative':
+                # Calculate estimated impact radius (how many sectors might be affected)
+                impact_radius = len(detected_risks) * 3
+                found_anomalies.append({
+                    "type": "MACRO_PRICING_DISCONNECT",
+                    "severity": "CRITICAL",
+                    "description": f"Headline '{headline.get('title')}' suggests systemic risk ({', '.join(detected_risks)}), but sentiment is not negative. Market may be complacent.",
+                    "impact_radius": impact_radius
+                })
+
         self.anomalies = found_anomalies
+
+        # Emit thought for the Agent Intercom
+        try:
+            from core.v30_architecture.python_intelligence.bridge.neural_link import emit_thought, Thought
+            from datetime import datetime
+
+            if len(found_anomalies) > 0:
+                highest_severity = "CRITICAL" if any(a['severity'] == "CRITICAL" for a in found_anomalies) else "HIGH"
+                content = f"Detected {len(found_anomalies)} blindspots. Highest severity: {highest_severity}. " + found_anomalies[0]['description']
+
+                asyncio.create_task(emit_thought(Thought(
+                    id=f"bs_{int(datetime.now().timestamp())}",
+                    timestamp=datetime.utcnow().isoformat(),
+                    agent_name="BlindspotMonitor",
+                    content=content,
+                    conviction_score=0.95
+                )))
+        except ImportError:
+            logging.debug("Neural link not available for thought emission")
+
         return {
             "status": "SCAN_COMPLETE",
             "anomalies_detected": len(found_anomalies),
@@ -153,4 +193,9 @@ class BlindspotAgent(AgentBase):
         Detect circular dependencies in the knowledge graph (simulated).
         """
         # In a real scenario, we would run a cycle detection algo on Neo4j
-        return []
+        # Simulating a common financial risk cycle
+        return [{
+            "type": "CIRCULAR_DEPENDENCY",
+            "severity": "MEDIUM",
+            "description": "Risk Loop Detected: Sovereign Debt Yields -> Currency Devaluation -> Import Inflation -> Central Bank Rate Hike -> Sovereign Debt Yields."
+        }]
