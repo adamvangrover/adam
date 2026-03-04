@@ -4,6 +4,7 @@ from typing import Any, Dict, List, Optional
 import logging
 import re
 from core.agents.agent_base import AgentBase
+from core.agents.system_health_agent import SystemHealthAgent
 
 logger = logging.getLogger(__name__)
 
@@ -17,6 +18,7 @@ class MetaCognitiveAgent(AgentBase):
     def __init__(self, config: Dict[str, Any], kernel: Optional[Any] = None):
         super().__init__(config, kernel=kernel)
         self.agent_performance = {}
+        self.system_health_agent = SystemHealthAgent(config={"agent_id": "meta_cognitive_health_monitor"}, kernel=kernel)
 
         # Load specific configurations for fallacy detection
         self.logical_fallacies = self.config.get("logical_fallacies", {
@@ -79,13 +81,17 @@ class MetaCognitiveAgent(AgentBase):
         if coherence_score < 7.0:
             verification_status = "NEEDS_REVISION"
 
+        # Check system health
+        health_metrics = await self.system_health_agent.execute()
+
         return {
             "agent_analyzed": agent_name,
             "original_content_snippet": content_to_analyze[:150] + "...",
             "detected_fallacies": detected_fallacies,
             "contradictions_detected": contradictions,
             "coherence_score": coherence_score,
-            "verification_status": verification_status
+            "verification_status": verification_status,
+            "system_health": health_metrics
         }
 
     def _detect_logical_fallacies(self, text: str) -> List[Dict[str, str]]:
