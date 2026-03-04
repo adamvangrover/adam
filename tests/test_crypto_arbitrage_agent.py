@@ -1,80 +1,88 @@
-
 import pytest
 import asyncio
-from unittest.mock import AsyncMock, patch, MagicMock
-from core.agents.specialized.crypto_arbitrage_agent import CryptoArbitrageAgent
+from unittest.mock import MagicMock, AsyncMock, patch
+from core.agents.crypto_arbitrage_agent import CryptoArbitrageAgent
+from core.schemas.agent_schema import AgentInput, AgentOutput
+
+# Mock ccxt
+@pytest.fixture
+def mock_ccxt():
+    with patch('core.agents.crypto_arbitrage_agent.ccxt') as mock:
+        yield mock
 
 @pytest.mark.asyncio
-async def test_arbitrage_detection_success():
-    """Test that arbitrage is correctly identified."""
-    config = {"agent_id": "crypto_arb_test"}
+async def test_crypto_arbitrage_agent_init(mock_ccxt):
+    config = {'exchanges': ['binance', 'coinbase'], 'symbols': ['BTC/USDT']}
     agent = CryptoArbitrageAgent(config)
-
-    # Mock _fetch_price to return controlled values
-    # BTC on binance: 50000
-    # BTC on kraken: 51000 (2% spread)
-    async def mock_fetch_price(exchange_id, symbol):
-        if symbol == "BTC/USDT":
-            if exchange_id == "binance": return 50000.0
-            if exchange_id == "kraken": return 51000.0
-        return None
-
-    # Patch _fetch_price instead of ccxt to test the logic core
-    with patch.object(agent, '_fetch_price', side_effect=mock_fetch_price):
-        # Also mock _init_exchanges and _close_exchanges to avoid CCXT calls
-        with patch.object(agent, '_init_exchanges', new_callable=AsyncMock), \
-             patch.object(agent, '_close_exchanges', new_callable=AsyncMock):
-
-            result = await agent.execute(symbols=["BTC/USDT"], exchanges=["binance", "kraken"], min_spread=1.0)
-
-            assert result["status"] == "success"
-            opps = result["opportunities"]
-            assert len(opps) == 1
-            opp = opps[0]
-            assert opp["symbol"] == "BTC/USDT"
-            assert opp["buy_exchange"] == "binance"
-            assert opp["sell_exchange"] == "kraken"
-            assert opp["spread_percentage"] == 2.0
-            assert opp["estimated_profit"] == 1000.0
+    assert agent.exchanges == ['binance', 'coinbase']
+    assert agent.symbols == ['BTC/USDT']
+    assert agent.min_profit_threshold == 0.5
 
 @pytest.mark.asyncio
-async def test_no_arbitrage():
-    """Test that small spreads are ignored."""
-    config = {"agent_id": "crypto_arb_test"}
+async def test_crypto_arbitrage_execution_no_arb(mock_ccxt):
+    # Setup mocks
+    mock_binance = AsyncMock()
+    mock_binance.fetch_ticker.return_value = {'last': 50000.0}
+
+    mock_coinbase = AsyncMock()
+    mock_coinbase.fetch_ticker.return_value = {'last': 50010.0} # Small difference
+
+    # Mock the exchange classes
+    mock_ccxt.binance.return_value = mock_binance
+    mock_ccxt.coinbase.return_value = mock_coinbase
+
+    config = {'exchanges': ['binance', 'coinbase'], 'symbols': ['BTC/USDT'], 'min_profit_threshold': 0.5}
     agent = CryptoArbitrageAgent(config)
 
-    # Spread is only 0.2%
-    async def mock_fetch_price(exchange_id, symbol):
-        if symbol == "ETH/USDT":
-            if exchange_id == "binance": return 3000.0
-            if exchange_id == "kraken": return 3006.0
-        return None
+    result = await agent.execute("Scan")
 
-    with patch.object(agent, '_fetch_price', side_effect=mock_fetch_price):
-        with patch.object(agent, '_init_exchanges', new_callable=AsyncMock), \
-             patch.object(agent, '_close_exchanges', new_callable=AsyncMock):
-
-            result = await agent.execute(symbols=["ETH/USDT"], exchanges=["binance", "kraken"], min_spread=1.0)
-
-            assert result["status"] == "no_opportunities_found"
-            assert len(result["opportunities"]) == 0
+    assert isinstance(result, AgentOutput)
+    assert "No arbitrage opportunities" in result.answer
+    assert len(result.metadata['opportunities']) == 0
 
 @pytest.mark.asyncio
-async def test_missing_data():
-    """Test handling of missing price data."""
-    config = {"agent_id": "crypto_arb_test"}
+async def test_crypto_arbitrage_execution_with_arb(mock_ccxt):
+    # Setup mocks for arbitrage opportunity
+    # Binance: 50000, Coinbase: 51000 (2% diff)
+    mock_binance = AsyncMock()
+    mock_binance.fetch_ticker.return_value = {'last': 50000.0}
+
+    mock_coinbase = AsyncMock()
+    mock_coinbase.fetch_ticker.return_value = {'last': 51000.0}
+
+    mock_ccxt.binance.return_value = mock_binance
+    mock_ccxt.coinbase.return_value = mock_coinbase
+
+    config = {'exchanges': ['binance', 'coinbase'], 'symbols': ['BTC/USDT'], 'min_profit_threshold': 1.0}
     agent = CryptoArbitrageAgent(config)
 
-    # One exchange fails to return data
-    async def mock_fetch_price(exchange_id, symbol):
-        if exchange_id == "binance": return 50000.0
-        return None
+    result = await agent.execute("Scan")
 
-    with patch.object(agent, '_fetch_price', side_effect=mock_fetch_price):
-        with patch.object(agent, '_init_exchanges', new_callable=AsyncMock), \
-             patch.object(agent, '_close_exchanges', new_callable=AsyncMock):
+    assert isinstance(result, AgentOutput)
+    assert "Found" in result.answer
+    assert len(result.metadata['opportunities']) == 1
 
-            result = await agent.execute(symbols=["BTC/USDT"], exchanges=["binance", "kraken"], min_spread=1.0)
+    op = result.metadata['opportunities'][0]
+    assert op['buy_exchange'] == 'binance'
+    assert op['sell_exchange'] == 'coinbase'
+    assert op['profit_pct'] == 2.0
 
-            # Should be empty because we need at least 2 prices
-            assert len(result["opportunities"]) == 0
+@pytest.mark.asyncio
+async def test_crypto_arbitrage_error_handling(mock_ccxt):
+    # Setup mocks to raise exception
+    mock_binance = AsyncMock()
+    mock_binance.fetch_ticker.side_effect = Exception("Network Error")
+
+    mock_coinbase = AsyncMock()
+    mock_coinbase.fetch_ticker.return_value = {'last': 50000.0}
+
+    mock_ccxt.binance.return_value = mock_binance
+    mock_ccxt.coinbase.return_value = mock_coinbase
+
+    config = {'exchanges': ['binance', 'coinbase'], 'symbols': ['BTC/USDT']}
+    agent = CryptoArbitrageAgent(config)
+
+    result = await agent.execute("Scan")
+
+    # Should handle error gracefully and return 0 ops (since we need 2 prices)
+    assert len(result.metadata['opportunities']) == 0

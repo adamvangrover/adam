@@ -1,5 +1,17 @@
 # Changelog
 
+## v26.11 - Protocol ARCHITECT_INFINITE (Day 12)
+
+### Jules' Log
+> "I noticed we lack a direct mechanism to capitalize on market inefficiencies and panic, and our sentiment analysis was somewhat disconnected from quantitative reality. I researched high-frequency arbitrage and market microstructure signals, and built `CryptoArbitrageAgent` to bridge this gap. This new organ detects price discrepancies across exchanges, and I integrated it into `MarketSentimentAgent` to serve as a 'Systemic Tremor' signal—if arbitrage spreads widen, it indicates market dislocation, dampening the overall sentiment score."
+
+### Added
+- **New Organ**: `core/agents/crypto_arbitrage_agent.py` - A specialized agent that uses `ccxt` to scan multiple exchanges (Binance, Coinbase) for price arbitrage opportunities.
+- **Integration**: Updated `core/agents/market_sentiment_agent.py` to ingest signals from `CryptoArbitrageAgent`. High arbitrage activity now triggers a "Crypto Inefficiency Detected" warning and lowers the sentiment score.
+- **Tests**:
+    - `tests/test_crypto_arbitrage_agent.py` - Verifies arbitrage detection logic and error handling with mocked exchanges.
+    - `tests/test_market_sentiment_agent.py` - Verifies that high arbitrage activity correctly impacts the sentiment analysis.
+
 ## v26.10 - Protocol ARCHITECT_INFINITE (Day 11)
 
 ### Jules' Log

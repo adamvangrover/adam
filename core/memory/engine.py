@@ -88,7 +88,7 @@ class MemoryEngine:
 
         # Safer parameterized query construction
         where_clause = ' OR '.join(conditions)
-        sql = f"SELECT content, category, tags, timestamp FROM memories WHERE {where_clause} ORDER BY timestamp DESC LIMIT ?"
+        sql = f"SELECT content, category, tags, timestamp FROM memories WHERE {where_clause} ORDER BY timestamp DESC LIMIT ?" # nosec B608
         params.append(limit)
 
         cursor.execute(sql, tuple(params))

@@ -9,6 +9,7 @@ from core.data_sources.prediction_market_api import SimulatedPredictionMarketAPI
 from core.data_sources.social_media_api import SimulatedSocialMediaAPI
 from core.data_sources.web_traffic_api import SimulatedWebTrafficAPI
 from core.data_sources.data_fetcher import DataFetcher
+from core.agents.crypto_arbitrage_agent import CryptoArbitrageAgent
 
 
 class MarketSentimentAgent(AgentBase):
@@ -32,6 +33,9 @@ class MarketSentimentAgent(AgentBase):
         self.social_media_api = SimulatedSocialMediaAPI(self.config)
         self.web_traffic_api = SimulatedWebTrafficAPI()
         self.data_fetcher = DataFetcher()
+
+        # New: Crypto Arbitrage Integration
+        self.crypto_arb_agent = CryptoArbitrageAgent(config)
 
     async def execute(self, input_data: Union[str, AgentInput, Dict[str, Any]] = None, **kwargs) -> Union[Dict[str, Any], AgentOutput]:
         """
@@ -97,15 +101,22 @@ class MarketSentimentAgent(AgentBase):
             answer += f"WARNING: Credit Dominance Rule Triggered: {details['credit_override']}\n"
             answer += "Sentiment has been overridden to reflect systemic risk.\n\n"
 
+        if "arbitrage_override" in details:
+             answer += f"WARNING: Crypto Inefficiency Detected: {details['arbitrage_override']}\n"
+             answer += "Sentiment adjusted due to market dislocation.\n\n"
+
         answer += "Breakdown:\n"
         answer += f"- News: {details.get('news_sentiment', 'N/A')}\n"
         answer += f"- Prediction Markets: {details.get('prediction_market_sentiment', 'N/A')}\n"
         answer += f"- Social Media: {details.get('social_media_sentiment', 'N/A')}\n"
         answer += f"- Web Traffic: {details.get('web_traffic_sentiment', 'N/A')}\n"
 
+        if details.get("crypto_arbitrage_opportunities"):
+            answer += f"- Crypto Arbitrage: {details.get('crypto_arbitrage_opportunities')} opportunities found.\n"
+
         return AgentOutput(
             answer=answer,
-            sources=["SimulatedFinancialNewsAPI", "SimulatedPredictionMarketAPI", "SimulatedSocialMediaAPI"],
+            sources=["SimulatedFinancialNewsAPI", "SimulatedPredictionMarketAPI", "SimulatedSocialMediaAPI", "CryptoArbitrageAgent"],
             confidence=0.8, # Placeholder confidence
             metadata=result
         )
@@ -161,7 +172,32 @@ class MarketSentimentAgent(AgentBase):
             "web_traffic_sentiment": web_sentiment
         }
 
-        # 6. Credit Dominance Logic Gate (Adam v24.1)
+        # 6. Crypto Arbitrage Check (Market Inefficiency/Panic Indicator)
+        try:
+             # We invoke the agent directly (in a real system, might use orchestrator)
+             # Passing simple string input as it supports it
+             arb_result = await self.crypto_arb_agent.execute("scan")
+             # arb_result is either dict or AgentOutput
+             if isinstance(arb_result, AgentOutput):
+                 arb_data = arb_result.metadata
+             else:
+                 arb_data = arb_result
+
+             opportunities = arb_data.get("opportunities", [])
+             details["crypto_arbitrage_opportunities"] = len(opportunities)
+
+             # If significant arbitrage exists, it implies market dislocation/panic
+             if len(opportunities) > 2:
+                 logging.warning("High Crypto Arbitrage detected. Market dislocation likely.")
+                 details["arbitrage_override"] = "High Dislocation"
+                 # Dampen sentiment
+                 overall = max(0.0, overall - 0.2)
+
+        except Exception as e:
+            logging.error(f"Error running CryptoArbitrageAgent: {e}")
+
+
+        # 7. Credit Dominance Logic Gate (Adam v24.1)
         credit_override, credit_details = await self.check_credit_dominance_rule()
         if credit_override:
             logging.warning(f"Credit Dominance Rule Triggered: {credit_override}")

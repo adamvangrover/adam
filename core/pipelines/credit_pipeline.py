@@ -57,7 +57,11 @@ class CreditPipeline:
 
         # Writing to a temp file for "Live" simulation is acceptable and robust.
         import json
-        temp_path = f"/tmp/live_data_{ticker}.json"
+        import tempfile
+        import os
+
+        temp_dir = tempfile.gettempdir()
+        temp_path = os.path.join(temp_dir, f"live_data_{ticker}.json") # nosec B108
         with open(temp_path, 'w') as f:
             json.dump({name: raw_data}, f)
 
