@@ -2,7 +2,7 @@ import unittest
 import json
 import asyncio
 from datetime import datetime
-from core.schemas.hnasp import HNASP, Meta, PersonaState, LogicLayer, ContextStream, Turn
+from core.schemas.hnasp import HNASPState as HNASP, Meta, PersonaState, LogicLayer, ContextStream, Turn
 from core.hnasp.logic_engine import LogicEngine
 from core.hnasp.personality import BayesACTEngine
 from core.agents.hnasp_agent import HNASPAgent

@@ -16,6 +16,7 @@ class Meta(BaseModel):
     agent_id: str
     trace_id: str
     security_context: SecurityContext
+    timestamp: Optional[datetime] = Field(default_factory=datetime.now)
 
 class EPAVector(BaseModel):
     E: float
@@ -33,6 +34,7 @@ class PersonaIdentities(BaseModel):
 
 class PersonaDynamics(BaseModel):
     current_deflection: float = 0.0
+    target_behavior_epa: Optional[EPAVector] = None
 
 class PersonaState(BaseModel):
     identities: PersonaIdentities
