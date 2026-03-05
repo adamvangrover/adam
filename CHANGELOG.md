@@ -1,5 +1,15 @@
 # Changelog
 
+## v26.12 - Protocol ARCHITECT_INFINITE (Day 13)
+
+### Jules' Log
+> "I noticed we lack a mechanism to track corporate insider activity, which provides strong signals about management's internal conviction. I researched SEC Form 4 filings and built `InsiderActivityAgent` to bridge this gap, integrating its buy/sell ratio and cluster buying logic directly into the `MarketSentimentAgent` to further contextualize overall sentiment."
+
+### Added
+- **New Organ**: `core/agents/insider_activity_agent.py` - A new specialized agent that monitors SEC Form 4 data to generate sentiment scores based on insider buy/sell ratios and cluster buying.
+- **Neural Pathway**: Integrated `InsiderActivityAgent` into `core/agents/market_sentiment_agent.py` by updating the `combine_sentiment` function to weigh insider flow alongside news, prediction markets, social media, web traffic, and options flow.
+- **Tests**: `tests/test_insider_activity_agent.py` - Unit tests verifying the sentiment calculation logic for insider activity.
+
 ## v26.11 - Protocol ARCHITECT_INFINITE (Day 12)
 
 ### Jules' Log
