@@ -5,14 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>2026 Intelligence Archive // ADAM O.S.</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
-            --bg-color: #050505;
-            --text-main: #e5e5e5;
-            --text-muted: #888888;
-            --accent: #4ade80;
-            --border: #333333;
-            --card-bg: #111111;
+            --bg-color: #050b14;
+            --text-main: #e0e0e0;
+            --text-muted: #888;
+            --accent: #00f3ff;
+            --accent-secondary: #0aff60;
+            --accent-danger: #ff3333;
+            --border: #333;
+            --card-bg: rgba(255, 255, 255, 0.02);
         }
 
         body {
@@ -24,25 +27,45 @@
         }
 
         .header {
-            border-bottom: 2px solid var(--accent);
+            border-bottom: 1px solid var(--border);
             padding-bottom: 20px;
-            margin-bottom: 40px;
+            margin-bottom: 30px;
             display: flex;
             justify-content: space-between;
             align-items: flex-end;
+            background: rgba(0,0,0,0.3);
+            padding: 20px;
+            border-radius: 8px;
         }
 
         .header h1 {
-            font-size: 2.5rem;
+            font-size: 2.2rem;
             margin: 0;
             text-transform: uppercase;
             letter-spacing: 2px;
-            font-weight: normal;
+            font-weight: bold;
+            color: var(--text-main);
+            text-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
         }
 
         .header .meta {
             color: var(--accent);
-            font-size: 0.9rem;
+            font-size: 0.8rem;
+            background: rgba(0, 243, 255, 0.1);
+            padding: 5px 10px;
+            border-radius: 4px;
+            border: 1px solid var(--accent);
+        }
+
+        .timeline-container {
+            width: 100%;
+            height: 250px;
+            background: rgba(0,0,0,0.4);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 40px;
+            position: relative;
         }
 
         .controls {
@@ -91,7 +114,8 @@
         .card:hover {
             border-color: var(--accent);
             transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 10px 20px rgba(0, 243, 255, 0.1);
+            background: rgba(0, 243, 255, 0.05);
         }
 
         .card::before {
@@ -99,7 +123,7 @@
             position: absolute;
             top: 0;
             left: 0;
-            width: 3px;
+            width: 4px;
             height: 0;
             background-color: var(--accent);
             transition: height 0.3s;
@@ -167,12 +191,17 @@
         </div>
     </div>
 
+    <div class="timeline-container">
+        <div style="position: absolute; top: 10px; left: 15px; color: var(--accent); font-size: 0.8rem; z-index: 10;">2026 SENTIMENT & REGIME EVOLUTION</div>
+        <canvas id="timelineChart"></canvas>
+    </div>
+
     <div class="controls" id="filterControls">
-        <button class="filter-btn active" data-filter="all">All Intel</button>
-        <button class="filter-btn" data-filter="dashboard">Dashboards / Terminals</button>
-        <button class="filter-btn" data-filter="report">Strategic Reports</button>
-        <button class="filter-btn" data-filter="briefing">Daily Briefings</button>
-        <button class="filter-btn" data-filter="strategy">Mandates</button>
+        <button class="filter-btn active" data-filter="all">ALL INTEL</button>
+        <button class="filter-btn" data-filter="dashboard">DASHBOARDS</button>
+        <button class="filter-btn" data-filter="report">REPORTS</button>
+        <button class="filter-btn" data-filter="briefing">BRIEFINGS</button>
+        <button class="filter-btn" data-filter="strategy">STRATEGY</button>
     </div>
 
     <div class="masonry-grid" id="archiveGrid">
@@ -254,7 +283,83 @@
     </div>
 
     <script>
+        function initChart() {
+            const ctx = document.getElementById('timelineChart').getContext('2d');
+
+            // Mock data for 2026 timeline
+            const labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+            const sentimentData = [75, 60, 40, 55, 30, 20]; // Declining sentiment (Iranian collapse)
+            const volatilityData = [15, 22, 35, 28, 45, 55]; // Rising volatility
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Market Sentiment',
+                            data: sentimentData,
+                            borderColor: '#00f3ff',
+                            backgroundColor: 'rgba(0, 243, 255, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.4,
+                            fill: true,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: 'System Volatility (VIX)',
+                            data: volatilityData,
+                            borderColor: '#ff3333',
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            tension: 0.4,
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    plugins: {
+                        legend: {
+                            labels: { color: '#888', font: { family: 'JetBrains Mono', size: 10 } },
+                            position: 'top',
+                            align: 'end'
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { color: '#333' },
+                            ticks: { color: '#888', font: { family: 'JetBrains Mono' } }
+                        },
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            grid: { color: '#222' },
+                            ticks: { color: '#00f3ff', font: { family: 'JetBrains Mono' } },
+                            title: { display: true, text: 'Sentiment (0-100)', color: '#00f3ff', font: {size: 10} }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            grid: { drawOnChartArea: false },
+                            ticks: { color: '#ff3333', font: { family: 'JetBrains Mono' } },
+                            title: { display: true, text: 'Volatility', color: '#ff3333', font: {size: 10} }
+                        }
+                    }
+                }
+            });
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
+            initChart();
+
             const filterBtns = document.querySelectorAll('.filter-btn');
             const cards = document.querySelectorAll('.card');
 
