@@ -3,10 +3,18 @@ try:
 except ImportError:
     # Fallback for environments without MCP installed
     class FastMCP:
-        def __init__(self, name): self.name = name
-        def resource(self, path): return lambda f: f
-        def tool(self): return lambda f: f
-        def run(self): print("MCP Server Mock Run (Dependencies missing)")
+        def __init__(self, name):
+            self.name = name
+
+        def resource(self, path):
+            return lambda f: f
+
+        def tool(self):
+            return lambda f: f
+
+        def run(self):
+            print("MCP Server Mock Run (Dependencies missing)")
+
 
 import sqlite3
 import pandas as pd
@@ -71,7 +79,7 @@ def get_order_book(symbol: str) -> str:
         "symbol": symbol,
         "timestamp": 1698765432,
         "bids": [{"price": 150.23, "size": 500}, {"price": 150.22, "size": 1200}],
-        "asks": [{"price": 150.26, "size": 400}, {"price": 150.27, "size": 800}]
+        "asks": [{"price": 150.26, "size": 400}, {"price": 150.27, "size": 800}],
     }
     return json.dumps(book, indent=2)
 
@@ -82,13 +90,16 @@ def get_portfolio_risk(id: str) -> str:
     Returns real-time risk metrics (VaR, Beta).
     Resource URI: financial://portfolio/123/risk
     """
-    return json.dumps({
-        "portfolio_id": id,
-        "VaR_95": "1.4%",
-        "Beta": 1.2,
-        "Sharpe": 2.1,
-        "Drawdown": "0.5%"
-    }, indent=2)
+    return json.dumps(
+        {
+            "portfolio_id": id,
+            "VaR_95": "1.4%",
+            "Beta": 1.2,
+            "Sharpe": 2.1,
+            "Drawdown": "0.5%",
+        },
+        indent=2,
+    )
 
 
 @mcp.resource("finance://{ticker}/{year}/10k")
@@ -120,6 +131,7 @@ def get_repo_assessment() -> str:
     except FileNotFoundError:
         return "Assessment not found."
 
+
 # --- Tools ---
 
 
@@ -132,11 +144,13 @@ def execute_market_order(symbol: str, quantity: int, side: str) -> str:
     # 1. Validate against risk limits (Pre-Trade Check)
     # 2. Pop a confirmation dialog to the user via the UI
     # 3. Send to OEMS
-    return json.dumps({
-        "status": "SENT_TO_CONFIRMATION",
-        "order": {"symbol": symbol, "quantity": quantity, "side": side},
-        "message": "Please confirm execution in the UI."
-    })
+    return json.dumps(
+        {
+            "status": "SENT_TO_CONFIRMATION",
+            "order": {"symbol": symbol, "quantity": quantity, "side": side},
+            "message": "Please confirm execution in the UI.",
+        }
+    )
 
 
 @mcp.tool()
@@ -145,14 +159,16 @@ def run_backtest(strategy_id: str, start_date: str, end_date: str) -> str:
     Runs a backtest for a given strategy ID over a time range.
     """
     # Simulates spinning up a sandbox container
-    return json.dumps({
-        "status": "COMPLETED",
-        "strategy": strategy_id,
-        "pnl_pct": 12.5,
-        "sharpe": 1.8,
-        "max_drawdown": 0.15,
-        "report_url": f"/reports/backtest_{strategy_id}_{start_date}.html"
-    })
+    return json.dumps(
+        {
+            "status": "COMPLETED",
+            "strategy": strategy_id,
+            "pnl_pct": 12.5,
+            "sharpe": 1.8,
+            "max_drawdown": 0.15,
+            "report_url": f"/reports/backtest_{strategy_id}_{start_date}.html",
+        }
+    )
 
 
 @mcp.tool()
@@ -170,18 +186,21 @@ def rebalance_portfolio(portfolio_id: str, target_allocation: str) -> str:
     Calculates and proposes a rebalancing plan.
     target_allocation should be a JSON string like '{"AAPL": 0.5, "GOOG": 0.5}'
     """
-    return json.dumps({
-        "plan_id": "PLAN-999",
-        "trades": [
-            {"action": "SELL", "symbol": "MSFT", "quantity": 50},
-            {"action": "BUY", "symbol": "AAPL", "quantity": 20}
-        ],
-        "estimated_commission": 10.00,
-        "action": "CONFIRM_REQUIRED"
-    })
+    return json.dumps(
+        {
+            "plan_id": "PLAN-999",
+            "trades": [
+                {"action": "SELL", "symbol": "MSFT", "quantity": 50},
+                {"action": "BUY", "symbol": "AAPL", "quantity": 20},
+            ],
+            "estimated_commission": 10.00,
+            "action": "CONFIRM_REQUIRED",
+        }
+    )
 
 
 from core.security.sql_validator import SQLValidator
+
 
 @mcp.tool()
 def query_sql(query: str) -> str:
@@ -193,7 +212,7 @@ def query_sql(query: str) -> str:
         raise ValueError("Only SELECT queries are allowed.")
 
     # Whitelist of allowed tables to prevent accessing secrets or system tables
-    ALLOWED_TABLES = {'financials', 'sqlite_sequence'}
+    ALLOWED_TABLES = {"financials", "sqlite_sequence"}
 
     def authorizer(action, arg1, arg2, dbname, source):
         # Allow SELECT statements
@@ -236,7 +255,9 @@ def get_covenant_definitions(doc_id: str) -> str:
 
 
 @mcp.tool()
-def simulate_quantum_merton_model(asset_value: float, debt: float, volatility: float, horizon: float) -> str:
+def simulate_quantum_merton_model(
+    asset_value: float, debt: float, volatility: float, horizon: float
+) -> str:
     """
     Runs an End-to-End Quantum Monte Carlo simulation for credit risk (Merton Model).
     """
@@ -289,7 +310,7 @@ def get_snc_rating(borrower_id: str) -> str:
         "AAPL": "Pass",
         "TSLA": "Pass",
         "AMC": "Substandard",
-        "GME": "Special Mention"
+        "GME": "Special Mention",
     }
     return mock_db.get(borrower_id.upper(), "Not Rated")
 
@@ -299,13 +320,15 @@ def get_esg_score(company: str) -> str:
     """
     Retrieves the ESG score for a company.
     """
-    return json.dumps({
-        "company": company,
-        "environment": 85,
-        "social": 78,
-        "governance": 90,
-        "total": 84
-    })
+    return json.dumps(
+        {
+            "company": company,
+            "environment": 85,
+            "social": 78,
+            "governance": 90,
+            "total": 84,
+        }
+    )
 
 
 @mcp.tool()
@@ -336,11 +359,13 @@ def get_agent_status(agent_name: str) -> str:
     else:
         return f"Agent '{agent_name}' is NOT FOUND."
 
+
 # --- Dynamic Tool Exposure ---
 @mcp.resource("system://tools/registry")
 def get_tool_registry() -> str:
     """Returns a list of dynamically registered agent skills."""
     return json.dumps(tool_registry.list_tools(), indent=2)
+
 
 @mcp.tool()
 def execute_dynamic_tool(tool_name: str, args_json: str) -> str:
@@ -355,13 +380,16 @@ def execute_dynamic_tool(tool_name: str, args_json: str) -> str:
     except Exception as e:
         return f"Error executing {tool_name}: {str(e)}"
 
+
 if __name__ == "__main__":
     # Ensure DB exists
     if not os.path.exists(DB_PATH):
         conn = sqlite3.connect(DB_PATH)
         c = conn.cursor()
-        c.execute('''CREATE TABLE IF NOT EXISTS financials
-                     (ticker text, year int, revenue real, ebitda real)''')
+        c.execute(
+            """CREATE TABLE IF NOT EXISTS financials
+                     (ticker text, year int, revenue real, ebitda real)"""
+        )
         c.execute("INSERT INTO financials VALUES ('AAPL', 2023, 383285, 114301)")
         conn.commit()
         conn.close()
