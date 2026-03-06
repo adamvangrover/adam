@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio Attribution Engine</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body { background: #020408; color: #e2e8f0; font-family: 'Courier New', monospace; overflow-x: hidden; }
+        .glass-panel { background: rgba(10, 15, 30, 0.7); border: 1px solid rgba(0, 240, 255, 0.1); border-radius: 8px; backdrop-filter: blur(10px); }
+        .data-table th { color: #64748b; text-transform: uppercase; font-size: 0.7rem; letter-spacing: 0.05em; padding-bottom: 0.5rem; text-align: left; }
+        .data-table td { font-size: 0.8rem; padding: 0.5rem 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #020617; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 3px; }
+    </style>
+</head>
+<body class="p-4">
+
+    <div class="flex justify-between items-center mb-6 border-b border-gray-800 pb-2">
+        <h1 class="text-xl font-bold text-white flex items-center gap-2">
+            <i data-lucide="pie-chart" class="text-blue-500 w-6 h-6"></i>
+            PORTFOLIO ATTRIBUTION <span class="text-[10px] bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded border border-blue-500/50">PRO</span>
+        </h1>
+        <div class="flex gap-4 text-xs font-mono">
+            <span class="text-gray-400">Total AUM: <span class="text-white font-bold">$12.4B</span></span>
+            <span class="text-gray-400">Benchmark: <span class="text-white font-bold">S&P 500</span></span>
+            <span class="text-green-400">+14.2% YTD</span>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-12 gap-4">
+        <!-- Main Chart Area -->
+        <div class="col-span-8 space-y-4">
+            <div class="glass-panel p-4 h-80 relative flex flex-col">
+                <h2 class="text-xs text-gray-400 uppercase tracking-widest mb-2 flex items-center justify-between">
+                    Cumulative Return vs Benchmark
+                    <select class="bg-transparent border border-gray-700 rounded px-2 py-1 text-[10px] outline-none text-white">
+                        <option>1Y</option><option>YTD</option><option>3Y</option>
+                    </select>
+                </h2>
+                <div class="flex-grow relative">
+                    <canvas id="perfChart"></canvas>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div class="glass-panel p-4">
+                    <h2 class="text-xs text-gray-400 uppercase tracking-widest mb-4">Risk Metrics</h2>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div><div class="text-[10px] text-gray-500">Sharpe Ratio</div><div class="text-lg text-white font-bold">1.85</div></div>
+                        <div><div class="text-[10px] text-gray-500">Tracking Error</div><div class="text-lg text-white font-bold">3.2%</div></div>
+                        <div><div class="text-[10px] text-gray-500">Beta</div><div class="text-lg text-white font-bold">1.05</div></div>
+                        <div><div class="text-[10px] text-gray-500">Max Drawdown</div><div class="text-lg text-red-400 font-bold">-12.4%</div></div>
+                    </div>
+                </div>
+                <div class="glass-panel p-4 relative">
+                     <h2 class="text-xs text-gray-400 uppercase tracking-widest mb-2">Asset Allocation</h2>
+                     <div class="h-32 relative">
+                         <canvas id="allocChart"></canvas>
+                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Attribution Panel -->
+        <div class="col-span-4 glass-panel p-4 flex flex-col">
+            <h2 class="text-xs text-gray-400 uppercase tracking-widest mb-4 border-b border-gray-800 pb-2">Brinson-Fachler Attribution</h2>
+
+            <div class="flex-grow overflow-y-auto">
+                <table class="w-full data-table">
+                    <thead>
+                        <tr>
+                            <th>Sector</th>
+                            <th class="text-right">Alloc %</th>
+                            <th class="text-right">Select %</th>
+                            <th class="text-right">Total %</th>
+                        </tr>
+                    </thead>
+                    <tbody id="attrib-body">
+                        <!-- Populated via JS -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="mt-4 pt-4 border-t border-gray-800 grid grid-cols-2 gap-2 text-center text-[10px]">
+                <div class="bg-gray-900/50 p-2 rounded">
+                    <div class="text-gray-500 mb-1">Total Active Return</div>
+                    <div class="text-green-400 font-bold text-sm">+2.45%</div>
+                </div>
+                <div class="bg-gray-900/50 p-2 rounded">
+                    <div class="text-gray-500 mb-1">Information Ratio</div>
+                    <div class="text-white font-bold text-sm">0.76</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        // Dummy Data
+        const labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        const portData = [100, 102, 105, 103, 108, 112, 110, 115, 114, 118, 122, 125];
+        const benchData = [100, 101, 103, 102, 105, 107, 108, 110, 109, 112, 115, 118];
+
+        // Performance Chart
+        const ctxPerf = document.getElementById('perfChart').getContext('2d');
+        new Chart(ctxPerf, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [
+                    { label: 'Portfolio', data: portData, borderColor: '#3b82f6', tension: 0.4, borderWidth: 2 },
+                    { label: 'Benchmark', data: benchData, borderColor: '#64748b', tension: 0.4, borderDash: [5,5], borderWidth: 2 }
+                ]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { labels: { color: '#94a3b8', font: {size: 10} } } },
+                scales: {
+                    x: { grid: { display: false }, ticks: { color: '#64748b' } },
+                    y: { grid: { color: '#1e293b' }, ticks: { color: '#64748b' } }
+                }
+            }
+        });
+
+        // Allocation Chart
+        const ctxAlloc = document.getElementById('allocChart').getContext('2d');
+        new Chart(ctxAlloc, {
+            type: 'doughnut',
+            data: {
+                labels: ['Equities', 'Fixed Income', 'Alternatives', 'Cash'],
+                datasets: [{
+                    data: [60, 25, 10, 5],
+                    backgroundColor: ['#3b82f6', '#10b981', '#a855f7', '#64748b'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false, cutout: '70%',
+                plugins: { legend: { position: 'right', labels: { color: '#94a3b8', font: {size: 9}, boxWidth: 10 } } }
+            }
+        });
+
+        // Attribution Table
+        const attribData = [
+            { sector: 'Technology', alloc: 0.45, sel: 1.20, tot: 1.65 },
+            { sector: 'Financials', alloc: -0.20, sel: 0.50, tot: 0.30 },
+            { sector: 'Healthcare', alloc: 0.15, sel: -0.10, tot: 0.05 },
+            { sector: 'Consumer Dis.', alloc: 0.30, sel: 0.40, tot: 0.70 },
+            { sector: 'Energy', alloc: -0.10, sel: -0.15, tot: -0.25 },
+            { sector: 'Industrials', alloc: 0.05, sel: -0.05, tot: 0.00 }
+        ];
+
+        const tbody = document.getElementById('attrib-body');
+        attribData.forEach(d => {
+            const tr = document.createElement('tr');
+            const fmt = (v) => {
+                const s = v > 0 ? '+' : '';
+                const c = v > 0 ? 'text-green-400' : (v < 0 ? 'text-red-400' : 'text-gray-500');
+                return `<span class="${c}">${s}${v.toFixed(2)}%</span>`;
+            };
+            tr.innerHTML = `
+                <td class="text-gray-300">${d.sector}</td>
+                <td class="text-right font-mono">${fmt(d.alloc)}</td>
+                <td class="text-right font-mono">${fmt(d.sel)}</td>
+                <td class="text-right font-mono font-bold">${fmt(d.tot)}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+    </script>
+</body>
+</html>
