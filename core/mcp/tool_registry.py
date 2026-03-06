@@ -1,11 +1,13 @@
 from typing import Dict, Any, Callable, List
 from pydantic import BaseModel
 
+
 class MCPTool(BaseModel):
     name: str
     description: str
     input_schema: Dict[str, Any]
     handler: Callable
+
 
 class ToolRegistry:
     """
@@ -15,12 +17,18 @@ class ToolRegistry:
     def __init__(self):
         self._tools: Dict[str, MCPTool] = {}
 
-    def register_tool(self, name: str, description: str, input_schema: Dict[str, Any], handler: Callable):
+    def register_tool(
+        self,
+        name: str,
+        description: str,
+        input_schema: Dict[str, Any],
+        handler: Callable,
+    ):
         tool = MCPTool(
             name=name,
             description=description,
             input_schema=input_schema,
-            handler=handler
+            handler=handler,
         )
         self._tools[name] = tool
 
@@ -29,7 +37,7 @@ class ToolRegistry:
             {
                 "name": t.name,
                 "description": t.description,
-                "input_schema": t.input_schema
+                "input_schema": t.input_schema,
             }
             for t in self._tools.values()
         ]
