@@ -1,5 +1,3 @@
-# core/agents/meta_cognitive_agent.py
-
 from typing import Any, Dict, List, Optional
 import logging
 import re
