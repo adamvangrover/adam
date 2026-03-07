@@ -63,3 +63,7 @@
 ## 2026-10-26 - [DOM Traversal Optimization]
 **Learning:** `TreeWalker` in `showcase/js/dashboard-logic.js` was traversing the entire document and running regex matching on every text node, even though only the first 20 matches were used. This caused unnecessary processing on large pages (~58ms vs ~0.3ms for 5000 nodes).
 **Action:** Always implement an early exit condition when scanning the DOM for a limited number of matches.
+
+## 2024-05-19 - React Memoization on Global Store Subscriptions
+**Learning:** In dashboards subscribing to global store states (like Zustand), changes to root metrics (e.g., `networkLoad`) cause the entire component to re-render, including mapping over lists. Wrapping list child items (like `AgentCell`) in `React.memo` effectively isolates them, ensuring they only re-render if their direct prop ref changes.
+**Action:** Always verify if a parent component maps over items and subscribes to unrelated state. Use `React.memo` on the list items to avoid O(N) re-renders.
