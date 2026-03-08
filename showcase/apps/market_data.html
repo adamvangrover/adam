@@ -80,27 +80,45 @@
         <aside class="col-span-4 lg:col-span-3 flex flex-col gap-3 overflow-hidden">
 
             <div class="glass-panel p-3 rounded flex-grow flex flex-col">
-                <div class="text-[10px] text-gray-500 mb-2 uppercase font-bold flex justify-between">
+                <div class="text-[10px] text-gray-500 mb-2 uppercase font-bold flex justify-between items-center">
                     <span>Input Data (CSV)</span>
-                    <button onclick="loadSample()" class="text-green-500 hover:text-white">Load Sample</button>
+                    <button onclick="loadSample()" class="text-green-500 hover:text-white border border-green-500/30 px-1 py-0.5 rounded">Load Sample</button>
                 </div>
                 <textarea id="csvInput" class="w-full flex-grow p-2 rounded" placeholder="Ticker, Price, PE_Ratio&#10;AAPL, 150.00, 28.5&#10;GOOG, 2800.00, 25.0"></textarea>
-                <button onclick="parseData()" class="mt-2 w-full py-2 bg-green-900/20 border border-green-500/30 text-green-400 rounded hover:bg-green-500/30 font-bold">
-                    INGEST DATA
-                </button>
+                <div class="flex gap-2 mt-2">
+                    <button onclick="parseData()" class="flex-grow py-2 bg-green-900/20 border border-green-500/30 text-green-400 rounded hover:bg-green-500/30 font-bold transition-colors">
+                        INGEST
+                    </button>
+                    <button onclick="runMLScrub()" class="flex-grow py-2 bg-purple-900/20 border border-purple-500/30 text-purple-400 rounded hover:bg-purple-500/30 font-bold flex justify-center items-center gap-1 transition-colors relative group">
+                        <i data-lucide="sparkles" class="w-3 h-3"></i> ML SCRUB
+                        <span class="absolute -top-8 left-1/2 -translate-x-1/2 bg-black text-white text-[9px] py-1 px-2 rounded opacity-0 group-hover:opacity-100 whitespace-nowrap pointer-events-none transition-opacity">Detect anomalies & clean</span>
+                    </button>
+                </div>
             </div>
 
             <div class="glass-panel p-3 rounded">
-                <div class="text-[10px] text-gray-500 mb-2 uppercase font-bold">Vault Status</div>
+                <div class="text-[10px] text-gray-500 mb-2 uppercase font-bold flex justify-between">
+                    Vault Status
+                    <span id="quality-badge" class="hidden text-[9px] bg-purple-500/20 text-purple-400 px-1 py-0.5 rounded border border-purple-500/50">SCRUBBED</span>
+                </div>
                 <div class="flex justify-between items-center mb-1">
                     <span class="text-gray-400">Records</span>
                     <span class="text-white font-mono" id="stat-records">0</span>
                 </div>
-                <div class="flex justify-between items-center">
+                <div class="flex justify-between items-center mb-1">
                     <span class="text-gray-400">Last Update</span>
                     <span class="text-white font-mono" id="stat-update">-</span>
                 </div>
-                <button onclick="clearData()" class="mt-2 text-[10px] text-red-500 hover:text-red-400 w-full text-right">Clear Vault</button>
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-gray-400">Data Quality Score</span>
+                    <div class="flex items-center gap-2">
+                        <div class="w-16 h-1.5 bg-gray-800 rounded-full overflow-hidden">
+                            <div id="quality-bar" class="h-full bg-red-500 transition-all duration-1000" style="width: 0%"></div>
+                        </div>
+                        <span class="text-white font-mono text-[10px]" id="stat-quality">--%</span>
+                    </div>
+                </div>
+                <button onclick="clearData()" class="mt-2 text-[10px] text-red-500 hover:text-red-400 w-full text-right border-t border-gray-800 pt-2">Clear Vault</button>
             </div>
 
         </aside>
@@ -134,13 +152,52 @@
         lucide.createIcons();
         let chartInstance = null;
         let marketData = [];
+        let isScrubbed = false;
+        let lastHeaders = [];
 
         function loadSample() {
-            const sample = "Ticker, Price, PE\nAAPL, 175.50, 28.5\nMSFT, 320.10, 32.1\nGOOGL, 135.20, 24.8\nAMZN, 128.90, 45.2\nNVDA, 460.15, 65.0\nTSLA, 245.50, 70.2\nJPM, 145.20, 10.5\nBAC, 28.50, 8.9";
+            // Include intentional anomalies for ML Scrubbing demonstration
+            const sample = "Ticker, Price, PE\nAAPL, 175.50, 28.5\nMSFT, 320.10, 32.1\nGOOGL, 135.20, 24.8\nAMZN, 128.90, 45.2\nNVDA, 460.15, 65.0\nTSLA, 245.50, 70.2\nJPM, 145.20, 10.5\nBAC, -28.50, NaN\nXYZ, 0.00, 0\nBAD_TICKER123, 9999.99, 999";
             document.getElementById('csvInput').value = sample;
         }
 
+        function runMLScrub() {
+            if(!marketData.length) return;
+
+            // Mock ML Scrubbing delay
+            const btn = document.querySelector('button[onclick="runMLScrub()"]');
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = `<i data-lucide="loader-2" class="w-3 h-3 animate-spin"></i> ANALYZING...`;
+            btn.disabled = true;
+
+            setTimeout(() => {
+                // Rule 1: Remove negative prices or zeroes
+                // Rule 2: Remove NaN or extreme outlier values
+                // Rule 3: Validate ticker formats (alphabetic only, max 5 chars)
+
+                const tickerRegex = /^[A-Z]{1,5}$/i;
+
+                marketData = marketData.filter(d => {
+                    if(d.price <= 0) return false;
+                    if(isNaN(d.val) || d.val > 200 || d.val < 0) return false;
+                    if(!tickerRegex.test(d.ticker)) return false;
+                    return true;
+                });
+
+                isScrubbed = true;
+                renderTable(lastHeaders);
+                renderChart(lastHeaders);
+                saveVault();
+                updateStats();
+
+                btn.innerHTML = originalHTML;
+                btn.disabled = false;
+                lucide.createIcons();
+            }, 1200);
+        }
+
         function parseData() {
+            isScrubbed = false;
             const raw = document.getElementById('csvInput').value.trim();
             if(!raw) return;
 
@@ -158,12 +215,13 @@
 
                 let item = {
                     ticker: cols[0], // Keep as string, sanitize on render
-                    price: parseFloat(cols[1]) || 0,
-                    val: parseFloat(cols[2]) || parseFloat(cols[1]) || 0 // Fallback if no 3rd col
+                    price: parseFloat(cols[1]),
+                    val: parseFloat(cols[2]) !== undefined ? parseFloat(cols[2]) : parseFloat(cols[1]) // Preserve NaN for scrubbing logic
                 };
                 marketData.push(item);
             }
 
+            lastHeaders = headers;
             renderTable(headers);
             renderChart(headers);
             saveVault();
@@ -280,6 +338,27 @@
             document.getElementById('stat-records').innerText = marketData.length;
             const now = new Date();
             document.getElementById('stat-update').innerText = now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+
+            const badge = document.getElementById('quality-badge');
+            const qualityBar = document.getElementById('quality-bar');
+            const qualityText = document.getElementById('stat-quality');
+
+            if(marketData.length === 0) {
+                badge.classList.add('hidden');
+                qualityBar.style.width = '0%';
+                qualityBar.className = 'h-full bg-red-500 transition-all duration-1000';
+                qualityText.innerText = '--%';
+            } else if(isScrubbed) {
+                badge.classList.remove('hidden');
+                qualityBar.style.width = '98%';
+                qualityBar.className = 'h-full bg-green-500 transition-all duration-1000';
+                qualityText.innerText = '98%';
+            } else {
+                badge.classList.add('hidden');
+                qualityBar.style.width = '65%';
+                qualityBar.className = 'h-full bg-yellow-500 transition-all duration-1000';
+                qualityText.innerText = '65%';
+            }
         }
 
         function exportCSV() {

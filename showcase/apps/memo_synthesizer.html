@@ -57,6 +57,15 @@
         <div class="col-span-3 flex flex-col gap-4 overflow-y-auto">
             <div class="glass-panel p-4">
                 <h3 class="text-xs uppercase text-gray-400 font-bold mb-3 border-b border-gray-700 pb-1">Context Sources</h3>
+                <div class="mb-4">
+                    <div class="flex justify-between items-center text-[10px] text-gray-400 mb-1">
+                        <span>Data Quality Score</span>
+                        <span id="quality-score" class="text-emerald-400 font-bold">50%</span>
+                    </div>
+                    <div class="w-full bg-gray-900 rounded-full h-1.5">
+                        <div id="quality-bar" class="bg-emerald-500 h-1.5 rounded-full transition-all duration-1000 ease-out" style="width: 50%"></div>
+                    </div>
+                </div>
                 <div class="space-y-2 text-[10px]">
                     <label class="flex items-center gap-2 text-gray-300 cursor-pointer hover:text-white">
                         <input type="checkbox" checked class="accent-emerald-500 bg-gray-900 border-gray-700"> Earnings Transcripts Q3
@@ -146,27 +155,91 @@
                 if (focus === 'risk') {
                     expansionHTML = `
                         <div class="ai-expansion" contenteditable="false">
-                            <h3 class="text-sm font-bold text-white mb-2">Expanded Risk Analysis (Auto-Generated)</h3>
-                            <p class="text-xs text-gray-300">While the DoD contract provides revenue stability, it introduces significant concentration risk (now 45% of total backlog). Furthermore, supply chain dependencies on rare earth metals from restricted regions could impact the 22% margin improvement realized this quarter if geopolitical tensions escalate.</p>
+                            <div class="flex justify-between items-start mb-2 border-b border-cyan-500/30 pb-2">
+                                <h3 class="text-sm font-bold text-white">Expanded Risk Analysis</h3>
+                                <div class="text-[10px] bg-red-500/20 text-red-400 border border-red-500/50 px-2 py-0.5 rounded flex items-center gap-1">
+                                    <i data-lucide="alert-triangle" class="w-3 h-3"></i> CRITICAL RISK FLAG
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4 mb-3">
+                                <div class="bg-black/40 p-2 rounded border border-gray-800">
+                                    <div class="text-[10px] text-gray-500">Concentration Risk</div>
+                                    <div class="text-sm font-bold text-white">45% of Backlog</div>
+                                </div>
+                                <div class="bg-black/40 p-2 rounded border border-gray-800">
+                                    <div class="text-[10px] text-gray-500">Supply Chain Vuln.</div>
+                                    <div class="text-sm font-bold text-rose-400">High (Rare Earths)</div>
+                                </div>
+                            </div>
+                            <p class="text-xs text-gray-300 leading-relaxed">While the DoD contract provides revenue stability, ML context analysis reveals it introduces significant concentration risk. Furthermore, cross-referencing global supply chain data indicates dependencies on rare earth metals from restricted regions. This could directly impact the 22% margin improvement realized this quarter if geopolitical tensions in the APAC region escalate.</p>
+                            <div class="mt-3 text-[10px] text-cyan-400 flex items-center gap-1"><i data-lucide="check-circle" class="w-3 h-3"></i> Synthesis Engine Confidence: 92%</div>
                         </div>
                     `;
                 } else if (focus === 'moat') {
                      expansionHTML = `
                         <div class="ai-expansion" contenteditable="false">
-                            <h3 class="text-sm font-bold text-white mb-2">Competitive Moat Deep-Dive (Auto-Generated)</h3>
-                            <p class="text-xs text-gray-300">The neural net processor architecture is protected by 14 newly granted patents, effectively locking out competitors for the next 5-7 years. The proprietary manufacturing process mentioned is highly capital intensive, creating a formidable barrier to entry for new market participants.</p>
+                            <div class="flex justify-between items-start mb-2 border-b border-cyan-500/30 pb-2">
+                                <h3 class="text-sm font-bold text-white">Competitive Moat Deep-Dive</h3>
+                                <div class="text-[10px] bg-green-500/20 text-green-400 border border-green-500/50 px-2 py-0.5 rounded flex items-center gap-1">
+                                    <i data-lucide="shield" class="w-3 h-3"></i> WIDE MOAT
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4 mb-3">
+                                <div class="bg-black/40 p-2 rounded border border-gray-800">
+                                    <div class="text-[10px] text-gray-500">IP Protection</div>
+                                    <div class="text-sm font-bold text-emerald-400">14 New Patents</div>
+                                </div>
+                                <div class="bg-black/40 p-2 rounded border border-gray-800">
+                                    <div class="text-[10px] text-gray-500">Entry Barrier</div>
+                                    <div class="text-sm font-bold text-white">Capital Intensive</div>
+                                </div>
+                            </div>
+                            <p class="text-xs text-gray-300 leading-relaxed">Systematic analysis of recent USPTO filings confirms the neural net processor architecture is protected by 14 newly granted patents, effectively locking out tier-1 competitors for the next 5-7 years. The proprietary manufacturing process mentioned is highly capital intensive, creating a formidable barrier to entry for new market participants and securing pricing power.</p>
+                            <div class="mt-3 text-[10px] text-cyan-400 flex items-center gap-1"><i data-lucide="check-circle" class="w-3 h-3"></i> Synthesis Engine Confidence: 88%</div>
+                        </div>
+                    `;
+                } else if (focus === 'valuation') {
+                    expansionHTML = `
+                        <div class="ai-expansion" contenteditable="false">
+                            <div class="flex justify-between items-start mb-2 border-b border-cyan-500/30 pb-2">
+                                <h3 class="text-sm font-bold text-white">Valuation Expansion Matrix</h3>
+                                <div class="text-[10px] bg-purple-500/20 text-purple-400 border border-purple-500/50 px-2 py-0.5 rounded flex items-center gap-1">
+                                    <i data-lucide="trending-up" class="w-3 h-3"></i> MULTIPLE EXPANSION
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4 mb-3">
+                                <div class="bg-black/40 p-2 rounded border border-gray-800">
+                                    <div class="text-[10px] text-gray-500">Implied Fwd Multiple</div>
+                                    <div class="text-sm font-bold text-purple-400">18.5x (Target)</div>
+                                </div>
+                                <div class="bg-black/40 p-2 rounded border border-gray-800">
+                                    <div class="text-[10px] text-gray-500">Margin Expansion</div>
+                                    <div class="text-sm font-bold text-white">+350 bps</div>
+                                </div>
+                            </div>
+                            <p class="text-xs text-gray-300 leading-relaxed">Our ML pricing model suggests the market is underestimating the operating leverage generated by the new manufacturing process. If the 22% unit cost reduction scales to 80% of production volume by Q4, we forecast a 350 bps margin expansion, justifying a re-rating from 14x to 18.5x forward EBITDA.</p>
+                            <div class="mt-3 text-[10px] text-cyan-400 flex items-center gap-1"><i data-lucide="check-circle" class="w-3 h-3"></i> Synthesis Engine Confidence: 85%</div>
                         </div>
                     `;
                 } else {
                     expansionHTML = `
                         <div class="ai-expansion" contenteditable="false">
-                            <p class="text-xs text-gray-300"><em>Synthesis complete based on available context streams. Additional modeling data required for deeper fundamental expansion.</em></p>
+                            <div class="flex justify-between items-start mb-2 border-b border-cyan-500/30 pb-2">
+                                <h3 class="text-sm font-bold text-white">Executive Synthesis</h3>
+                            </div>
+                            <p class="text-xs text-gray-300 leading-relaxed">Synthesis compiled from 4 active data streams. The core thesis remains intact, supported by strong Q3 prints and protective moats. Recommended action: <strong>Overweight</strong>.</p>
+                            <div class="mt-3 text-[10px] text-cyan-400 flex items-center gap-1"><i data-lucide="check-circle" class="w-3 h-3"></i> Synthesis Engine Confidence: 95%</div>
                         </div>
                     `;
                 }
 
+                // Update Quality Score
+                document.getElementById('quality-score').innerText = '95%';
+                document.getElementById('quality-bar').style.width = '95%';
+
                 // Append to editor
                 editor.innerHTML += expansionHTML;
+                lucide.createIcons();
 
                 // Scroll to bottom
                 editor.scrollTop = editor.scrollHeight;
