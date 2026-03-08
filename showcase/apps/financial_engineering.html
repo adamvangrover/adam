@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM | Financial Engineering Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --bg-dark: #020408;
+            --panel-glass: rgba(10, 15, 30, 0.7);
+            --cyan-glow: #00f0ff;
+            --grid-line: rgba(0, 240, 255, 0.05);
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: #e2e8f0;
+            font-family: 'Courier New', Courier, monospace;
+            background-image:
+                linear-gradient(var(--grid-line) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+            background-size: 30px 30px;
+            overflow: hidden;
+        }
+
+        .glass-panel {
+            background: var(--panel-glass);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 240, 255, 0.1);
+        }
+
+        input[type="number"] {
+            background: #050a14;
+            border: 1px solid #1e293b;
+            color: var(--cyan-glow);
+            font-family: 'Courier New', monospace;
+            font-size: 0.75rem;
+            padding: 4px;
+            width: 100%;
+            outline: none;
+        }
+        input[type="number"]:focus {
+            border-color: var(--cyan-glow);
+            box-shadow: 0 0 8px rgba(0, 240, 255, 0.3);
+        }
+    </style>
+</head>
+<body class="h-screen flex flex-col p-4 text-xs">
+    <div class="flex justify-between items-center mb-4 border-b border-gray-800 pb-2">
+        <h1 class="text-lg font-bold text-white tracking-widest flex items-center">
+            <i data-lucide="cpu" class="w-5 h-5 mr-2 text-cyan-400"></i>
+            STRUCTURAL ENGINEERING <span class="text-[10px] ml-2 px-2 py-0.5 border border-cyan-500/50 rounded text-cyan-300">PRO</span>
+        </h1>
+        <div class="text-[10px] text-gray-500 self-center">LOCAL_MODE</div>
+    </div>
+
+    <div class="grid grid-cols-12 gap-4 flex-grow overflow-hidden">
+        <aside class="col-span-4 space-y-3">
+            <div class="glass-panel p-3 rounded">
+                <div class="text-[10px] text-gray-500 mb-2 uppercase font-bold flex justify-between">
+                    <span>Parameters</span>
+                    <i data-lucide="settings" class="w-3 h-3"></i>
+                </div>
+                <div class="space-y-2">
+                    <div>
+                        <label class="block text-gray-400 text-[10px] mb-1">Base Asset Value ($M)</label>
+                        <input type="number" id="baseValue" value="1000" oninput="calcEngineering()">
+                    </div>
+                    <div>
+                        <label class="block text-gray-400 text-[10px] mb-1">Interest Rate (%)</label>
+                        <input type="number" id="interestRate" value="5.0" step="0.1" oninput="calcEngineering()">
+                    </div>
+                    <div>
+                        <label class="block text-gray-400 text-[10px] mb-1">Leverage Ratio (x)</label>
+                        <input type="number" id="leverage" value="2.0" step="0.1" oninput="calcEngineering()">
+                    </div>
+                    <div>
+                        <label class="block text-gray-400 text-[10px] mb-1">Volatility (%)</label>
+                        <input type="number" id="volatility" value="15.0" step="0.5" oninput="calcEngineering()">
+                    </div>
+                    <div>
+                        <label class="block text-gray-400 text-[10px] mb-1">Time Horizon (Years)</label>
+                        <input type="number" id="horizon" value="3.0" step="0.5" oninput="calcEngineering()">
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <main class="col-span-8 flex flex-col gap-3">
+            <div class="grid grid-cols-3 gap-3">
+                <div class="glass-panel p-3 rounded flex flex-col justify-center">
+                    <div class="text-[10px] text-gray-500 uppercase">Expected Return</div>
+                    <div class="text-2xl font-bold text-white mt-1 font-mono" id="outRet">0.0%</div>
+                </div>
+                <div class="glass-panel p-3 rounded flex flex-col justify-center">
+                    <div class="text-[10px] text-gray-500 uppercase">Structural Risk</div>
+                    <div class="text-2xl font-bold text-red-400 mt-1 font-mono" id="outRisk">0.0%</div>
+                </div>
+                <div class="glass-panel p-3 rounded flex flex-col justify-center">
+                    <div class="text-[10px] text-gray-500 uppercase">Margin of Safety</div>
+                    <div class="text-2xl font-bold text-green-400 mt-1 font-mono" id="outMargin">0.0%</div>
+                </div>
+            </div>
+
+            <div class="glass-panel p-4 rounded flex-grow">
+                <h3 class="text-xs font-bold text-cyan-400 mb-3 flex items-center gap-2">
+                    <i data-lucide="activity" class="w-3 h-3"></i> Projection Details
+                </h3>
+                <div class="text-gray-400 font-mono space-y-2" id="detailsBox">
+                    Awaiting calculations...
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        function calcEngineering() {
+            const baseValue = parseFloat(document.getElementById('baseValue').value) || 0;
+            const interestRate = parseFloat(document.getElementById('interestRate').value) / 100 || 0;
+            const leverage = parseFloat(document.getElementById('leverage').value) || 0;
+            const volatility = parseFloat(document.getElementById('volatility').value) / 100 || 0;
+            const horizon = parseFloat(document.getElementById('horizon').value) || 0;
+
+            const assetReturn = 0.08; // Assumed 8% base asset return
+            const costOfDebt = interestRate;
+
+            const expectedReturn = assetReturn + (assetReturn - costOfDebt) * leverage;
+            const structuralRisk = volatility * Math.sqrt(horizon) * (1 + leverage);
+            const marginOfSafety = 1 - (structuralRisk / expectedReturn);
+
+            document.getElementById('outRet').innerText = (expectedReturn * 100).toFixed(2) + '%';
+            document.getElementById('outRisk').innerText = (structuralRisk * 100).toFixed(2) + '%';
+            document.getElementById('outMargin').innerText = (marginOfSafety * 100).toFixed(2) + '%';
+
+            document.getElementById('detailsBox').innerHTML = `
+                <div>> Base Asset Return Assumed: 8.0%</div>
+                <div>> Total Levered Exposure: $${(baseValue * (1 + leverage)).toFixed(2)}M</div>
+                <div>> Est. Debt Cost over Horizon: $${(baseValue * leverage * costOfDebt * horizon).toFixed(2)}M</div>
+                <div>> 1-Sigma Value at Risk: $${(baseValue * structuralRisk).toFixed(2)}M</div>
+            `;
+        }
+
+        calcEngineering();
+    </script>
+</body>
+</html>
