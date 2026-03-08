@@ -623,7 +623,9 @@ def parse_html_file(filepath):
 
         if filename in ["index.html", "market_mayhem_archive.html", "market_mayhem_archive_v24.html", "daily_briefings_library.html",
                         "market_pulse_library.html", "house_view_library.html", "portfolio_dashboard.html",
-                        "data.html", "reports.html", "agents.html", "chat.html", "market_mayhem_rebuild.html", "market_mayhem_conviction.html"]:
+                        "data.html", "reports.html", "agents.html", "chat.html", "market_mayhem_rebuild.html", "market_mayhem_conviction.html",
+                        "live_market_pulse.html", "macro_glitch_monitor.html", "financial_twin.html", "war_room.html",
+                        "sovereign_os.html", "analyst_os.html", "credit_analyst_workstation.html", "fiduciary_avatar.html", "financial_engineering.html"]:
             return None
 
         container = soup.find('div', class_='newsletter-container')
