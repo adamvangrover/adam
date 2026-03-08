@@ -12,7 +12,161 @@ def create_app(orchestrator: SymphonyOrchestrator) -> Flask:
 
     @app.route("/")
     def dashboard():
-        return "Symphony Orchestrator is running. View API at /api/v1/state", 200
+        return """<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Symphony Orchestrator</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #121212; color: #e0e0e0; margin: 0; padding: 20px; }
+        h1, h2 { color: #00ffcc; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 20px; }
+        .card { background-color: #1e1e1e; padding: 20px; border-radius: 8px; border: 1px solid #333; }
+        .stat { font-size: 2em; font-weight: bold; margin: 10px 0; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { text-align: left; padding: 12px; border-bottom: 1px solid #333; }
+        th { color: #888; text-transform: uppercase; font-size: 0.85em; }
+        .badge { display: inline-block; padding: 4px 8px; border-radius: 12px; font-size: 0.8em; font-weight: bold; }
+        .badge-running { background-color: #1e3a8a; color: #93c5fd; }
+        .badge-retrying { background-color: #78350f; color: #fcd34d; }
+        pre { background-color: #000; padding: 10px; border-radius: 4px; overflow-x: auto; font-size: 0.9em; border: 1px solid #333; }
+        .refresh-btn { background-color: #00ffcc; color: #000; border: none; padding: 10px 20px; border-radius: 4px; font-weight: bold; cursor: pointer; float: right; }
+        .refresh-btn:hover { background-color: #00cca3; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <button class="refresh-btn" onclick="triggerRefresh()">Trigger Poll</button>
+        <h1>Symphony Orchestrator</h1>
+        <p>Last updated: <span id="last-updated">...</span></p>
+
+        <div class="grid">
+            <div class="card">
+                <h2>Active Sessions</h2>
+                <div class="stat" id="count-running">0</div>
+            </div>
+            <div class="card">
+                <h2>Queued Retries</h2>
+                <div class="stat" id="count-retrying">0</div>
+            </div>
+            <div class="card">
+                <h2>Total Tokens (All Time)</h2>
+                <div class="stat" id="count-tokens">0</div>
+            </div>
+            <div class="card">
+                <h2>Total Runtime (Seconds)</h2>
+                <div class="stat" id="count-runtime">0.0</div>
+            </div>
+        </div>
+
+        <div class="card" style="margin-bottom: 20px;">
+            <h2>Running Issues</h2>
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Identifier</th>
+                            <th>State</th>
+                            <th>Session ID</th>
+                            <th>Turn</th>
+                            <th>Last Event</th>
+                            <th>Tokens (In/Out/Total)</th>
+                            <th>Running Since</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-running">
+                        <tr><td colspan="7" style="text-align:center">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Retry Queue</h2>
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Identifier</th>
+                            <th>Attempt</th>
+                            <th>Due At</th>
+                            <th>Error</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-retrying">
+                        <tr><td colspan="4" style="text-align:center">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function formatTime(isoString) {
+            if (!isoString) return 'N/A';
+            return new Date(isoString).toLocaleTimeString();
+        }
+
+        async function triggerRefresh() {
+            try {
+                await fetch('/api/v1/refresh', { method: 'POST' });
+                fetchState();
+            } catch (e) {
+                console.error('Refresh failed', e);
+            }
+        }
+
+        async function fetchState() {
+            try {
+                const res = await fetch('/api/v1/state');
+                const data = await res.json();
+
+                document.getElementById('last-updated').textContent = new Date(data.generated_at).toLocaleString();
+                document.getElementById('count-running').textContent = data.counts.running;
+                document.getElementById('count-retrying').textContent = data.counts.retrying;
+                document.getElementById('count-tokens').textContent = data.codex_totals.total_tokens.toLocaleString();
+                document.getElementById('count-runtime').textContent = data.codex_totals.seconds_running.toFixed(1);
+
+                const runningHtml = data.running.length === 0 ?
+                    '<tr><td colspan="7" style="text-align:center;color:#888;">No active sessions</td></tr>' :
+                    data.running.map(r => `
+                        <tr>
+                            <td><strong>${r.issue_identifier}</strong></td>
+                            <td><span class="badge badge-running">${r.state}</span></td>
+                            <td style="font-family:monospace;font-size:0.9em">${r.session_id || 'Starting...'}</td>
+                            <td>${r.turn_count}</td>
+                            <td>${r.last_event || '-'}</td>
+                            <td>${r.tokens.input_tokens} / ${r.tokens.output_tokens} / ${r.tokens.total_tokens}</td>
+                            <td>${formatTime(r.started_at)}</td>
+                        </tr>
+                    `).join('');
+                document.getElementById('table-running').innerHTML = runningHtml;
+
+                const retryingHtml = data.retrying.length === 0 ?
+                    '<tr><td colspan="4" style="text-align:center;color:#888;">No queued retries</td></tr>' :
+                    data.retrying.map(r => `
+                        <tr>
+                            <td><strong>${r.issue_identifier}</strong></td>
+                            <td>${r.attempt}</td>
+                            <td>${formatTime(r.due_at)}</td>
+                            <td style="color:#ef4444">${r.error || 'N/A'}</td>
+                        </tr>
+                    `).join('');
+                document.getElementById('table-retrying').innerHTML = retryingHtml;
+            } catch (e) {
+                console.error('Failed to fetch state', e);
+            }
+        }
+
+        // Fetch immediately and then every 5 seconds
+        fetchState();
+        setInterval(fetchState, 5000);
+    </script>
+</body>
+</html>
+""", 200
 
     @app.route("/api/v1/state")
     def get_state():

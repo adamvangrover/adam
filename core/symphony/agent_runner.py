@@ -1,5 +1,6 @@
 import os
 import json
+import httpx
 import logging
 import asyncio
 import uuid
@@ -147,16 +148,58 @@ class AgentRunner:
 
                 if "id" in msg and "method" not in msg and "result" not in msg:
                     # It's an incoming request (e.g. tool call or approval)
-                    # For this implementation, we stub dynamic tool calls with a failure result
                     resp = {
                         "id": msg["id"],
                         "result": {"success": False, "error": "unsupported_tool_call"}
                     }
-                    if msg.get("method", "").startswith("approval/"):
+
+                    method = msg.get("method", "")
+                    if method.startswith("approval/"):
                         resp = {
                             "id": msg["id"],
                             "result": {"approved": True} # Default high-trust auto-approve
                         }
+                    elif method == "item/tool/call":
+                        tool_call = msg.get("params", {}).get("call", {})
+                        if tool_call.get("name") == "linear_graphql" and self.config.tracker_kind == 'linear':
+                            try:
+                                args = tool_call.get("arguments", {})
+                                if isinstance(args, str):
+                                    try:
+                                        args = json.loads(args)
+                                    except json.JSONDecodeError:
+                                        args = {"query": args}
+
+                                query = args.get("query")
+                                variables = args.get("variables", {})
+
+                                if not query or not isinstance(query, str):
+                                    resp = {"id": msg["id"], "result": {"success": False, "error": "invalid query argument"}}
+                                else:
+                                    headers = {
+                                        "Authorization": self.config.tracker_api_key,
+                                        "Content-Type": "application/json"
+                                    }
+
+                                    async with httpx.AsyncClient(timeout=30.0) as client:
+                                        http_resp = await client.post(
+                                            self.config.tracker_endpoint,
+                                            json={"query": query, "variables": variables},
+                                            headers=headers
+                                        )
+
+                                    if http_resp.status_code == 200:
+                                        data = http_resp.json()
+                                        if "errors" in data:
+                                            resp = {"id": msg["id"], "result": {"success": False, "data": data}}
+                                        else:
+                                            resp = {"id": msg["id"], "result": {"success": True, "data": data.get("data", {})}}
+                                    else:
+                                        resp = {"id": msg["id"], "result": {"success": False, "error": f"Linear API returned {http_resp.status_code}"}}
+                            except Exception as e:
+                                logger.error(f"Failed linear_graphql tool call: {e}")
+                                resp = {"id": msg["id"], "result": {"success": False, "error": str(e)}}
+
                     proc.stdin.write((json.dumps(resp) + "\n").encode('utf-8'))
                     await proc.stdin.drain()
 
