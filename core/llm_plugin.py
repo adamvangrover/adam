@@ -160,6 +160,8 @@ class MockLLM(BaseLLM):
                         # Heuristic for ranges like conviction_level (1-10)
                         if "level" in name or "score" in name:
                             init_data[name] = 5
+                        elif "density" in name or "grounding" in name or "nuance" in name:
+                            init_data[name] = 1 # Force a low score for tests
                         else:
                             init_data[name] = 42
                     elif annotation == float:

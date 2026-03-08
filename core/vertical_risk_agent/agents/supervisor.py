@@ -100,7 +100,8 @@ def critique_node(state: VerticalRiskGraphState):
         verifier = SymbolicVerifier()
 
         # 1. Layer 1: LLM-as-a-Judge (Rubric Scoring)
-        audit_logs = auditor.evaluate(state)
+        combined_text = (state.get("quant_analysis") or "") + "\n" + (state.get("legal_analysis") or "")
+        audit_logs = auditor.evaluate(state, combined_text)
 
         # 2. Layer 2: Symbolic Verification (Ontology Check)
         combined_text = (state.get("quant_analysis") or "") + "\n" + (state.get("legal_analysis") or "")

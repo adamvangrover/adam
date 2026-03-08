@@ -2,6 +2,7 @@ import yfinance as yf
 import pandas as pd
 import pandera as pa
 import os
+from typing import List, Optional
 from core.schemas.market_data_schema import MarketDataSchema
 from core.utils.logging_utils import get_logger
 

@@ -7,7 +7,15 @@ Description: Quality Assurance for WhaleScanner logic.
 
 import pytest
 import pandas as pd
+import sys
 from unittest.mock import MagicMock, patch
+
+# Patch httpxthrottlecache.ratelimiter before edgartools is loaded
+mock_limiter_module = MagicMock()
+sys.modules['httpxthrottlecache.ratelimiter'] = mock_limiter_module
+sys.modules['httpxthrottlecache'] = mock_limiter_module
+sys.modules['pyrate_limiter'] = mock_limiter_module
+
 from src.market_mayhem.scanners import WhaleScanner, WhaleSignal
 
 # Mock Data for 13F Information Table

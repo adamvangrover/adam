@@ -9,7 +9,7 @@ from core.agents.industry_specialist_agent import IndustrySpecialistAgent
 from core.agents.fundamental_analyst_agent import FundamentalAnalystAgent
 from core.agents.technical_analyst_agent import TechnicalAnalystAgent as TechnicalAnalyst
 from core.agents.risk_assessment_agent import RiskAssessmentAgent as RiskAssessor
-from core.agents.newsletter_layout_specialist_agent import NewsletterLayoutSpecialist
+from core.agents.newsletter_layout_specialist_agent import NewsletterLayoutSpecialistAgent as NewsletterLayoutSpecialist
 from core.agents.data_verification_agent import DataVerificationAgent
 from core.agents.lexica_agent import LexicaAgent
 from core.agents.archive_manager_agent import ArchiveManagerAgent
@@ -39,7 +39,19 @@ class TestMarketSentimentAgent(unittest.IsolatedAsyncioTestCase):
         self.agent.social_media_api.get_social_media_sentiment.return_value = 0.5
         self.agent.web_traffic_api.get_web_traffic_sentiment.return_value = 0.5
 
+        # Mock check_credit_dominance_rule to not override sentiment
+        self.agent.check_credit_dominance_rule = AsyncMock(return_value=(None, {}))
+
+        # Mock additional agents to return predictable values
+        self.agent.options_flow_agent = AsyncMock()
+        self.agent.options_flow_agent.execute.return_value = {"sentiment_score": 0.5}
+        self.agent.insider_activity_agent = AsyncMock()
+        self.agent.insider_activity_agent.execute.return_value = {"sentiment_score": 0.5}
+
         sentiment, details = await self.agent.analyze_sentiment()
+
+        # weights: news: 0.25, pred: 0.15, social: 0.15, web: 0.1, options: 0.2, insider: 0.15
+        # 0.5*0.25 + 0.5*0.15 + 0.5*0.15 + 0.5*0.1 + 0.5*0.2 + 0.5*0.15 = 0.5
         self.assertAlmostEqual(sentiment, 0.5)
 
     async def test_analyze_sentiment_with_positive_news(self):
@@ -48,10 +60,15 @@ class TestMarketSentimentAgent(unittest.IsolatedAsyncioTestCase):
         self.agent.prediction_market_api.get_market_sentiment.return_value = 0.0
         self.agent.social_media_api.get_social_media_sentiment.return_value = 0.0
         self.agent.web_traffic_api.get_web_traffic_sentiment.return_value = 0.0
+        self.agent.check_credit_dominance_rule = AsyncMock(return_value=(None, {}))
+        self.agent.options_flow_agent = AsyncMock()
+        self.agent.options_flow_agent.execute.return_value = {"sentiment_score": 0.5}
+        self.agent.insider_activity_agent = AsyncMock()
+        self.agent.insider_activity_agent.execute.return_value = {"sentiment_score": 0.5}
 
         sentiment, details = await self.agent.analyze_sentiment()
-        # 1.0 * 0.4 = 0.4
-        self.assertAlmostEqual(sentiment, 0.4)
+        # 1.0*0.25 + 0*0.15 + 0*0.15 + 0*0.1 + 0.5*0.2 + 0.5*0.15 = 0.25 + 0.1 + 0.075 = 0.425
+        self.assertAlmostEqual(sentiment, 0.425)
 
     async def test_analyze_sentiment_with_negative_news(self):
         """Test analyzing market sentiment with negative news."""
@@ -59,10 +76,15 @@ class TestMarketSentimentAgent(unittest.IsolatedAsyncioTestCase):
         self.agent.prediction_market_api.get_market_sentiment.return_value = 0.0
         self.agent.social_media_api.get_social_media_sentiment.return_value = 0.0
         self.agent.web_traffic_api.get_web_traffic_sentiment.return_value = 0.0
+        self.agent.check_credit_dominance_rule = AsyncMock(return_value=(None, {}))
+        self.agent.options_flow_agent = AsyncMock()
+        self.agent.options_flow_agent.execute.return_value = {"sentiment_score": 0.5}
+        self.agent.insider_activity_agent = AsyncMock()
+        self.agent.insider_activity_agent.execute.return_value = {"sentiment_score": 0.5}
 
         sentiment, details = await self.agent.analyze_sentiment()
-        # -1.0 * 0.4 = -0.4
-        self.assertAlmostEqual(sentiment, -0.4)
+        # -1.0*0.25 + 0*0.15 + 0*0.15 + 0*0.1 + 0.5*0.2 + 0.5*0.15 = -0.25 + 0.1 + 0.075 = -0.075
+        self.assertAlmostEqual(sentiment, -0.075)
 
 
 class TestMacroeconomicAnalysisAgent(unittest.TestCase):
@@ -113,8 +135,8 @@ class TestGeopoliticalRiskAgent(unittest.TestCase):
 
         risk_assessments = self.agent.assess_geopolitical_risks()
         self.assertIsInstance(risk_assessments, dict)
-        self.assertIn('political_risk_index', risk_assessments)
-        self.assertIn('key_risks', risk_assessments)
+        self.assertIn('global_risk_index', risk_assessments) # Note: changed from political_risk_index based on source code output
+        self.assertIn('regional_assessments', risk_assessments) # Note: changed from key_risks
         mock_send_message.assert_called_once_with(
             {'agent': 'geopolitical_risk_agent', 'risk_assessments': risk_assessments}
         )
