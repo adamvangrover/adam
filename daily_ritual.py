@@ -25,6 +25,7 @@ You are responsible for the daily biological growth of this repository. You must
 * **Vector Analysis:** Scan `src/agents`, `src/tools`, and `notebooks`. Identify the "weakest link"—a module that is brittle, under-tested, or hard-coded.
 * **Gap Detection:** Where is the "Silence"? (e.g., "We have a `RiskAnalyst` agent, but no `MarketSentiment` agent to feed it.")
 * **Dependency Check:** Are we using yesterday's patterns? (e.g., "This chain is manual; it should be a langgraph node.")
+* **Context Awareness:** Review the currently uncommitted git changes (if any) to align the new expansion with ongoing work.
 
 ### EXECUTION PHASE 2: THE HARVEST (External Research)
 * **Search Query 1:** "Top trending LLM agent patterns github last 24h" (Look for new flows: RAG, CoT, ReAct refinements).
@@ -80,6 +81,15 @@ Return the result as a single, copy-pasteable Artifact:
 def generate_context() -> str:
     """Reads the current file structure and generates a context string."""
     context_lines = ["### CURRENT REPOSITORY CONTEXT:"]
+
+    try:
+        git_status = subprocess.check_output(["git", "status", "--short"], text=True)
+        if git_status:
+            context_lines.append("\n### CURRENT UNCOMMITTED GIT CHANGES:\n")
+            context_lines.append(git_status)
+    except Exception as e:
+        pass
+
     # Scan important directories
     directories_to_scan = ["core/agents", "tests"]
 
@@ -171,7 +181,7 @@ def _save_and_apply_output(output_text: str):
     files_to_write = file_pattern.findall(output_text)
 
     # Looking for: **4. GIT COMMIT MESSAGE:**\n> "..."
-    commit_pattern = re.compile(r"\*\*4\.\s*GIT COMMIT MESSAGE:\*\*\s*>?(?:\s*\")?([^\"]+)(?:\"\s*)?", re.IGNORECASE)
+    commit_pattern = re.compile(r"\*\*\d+\.\s*GIT COMMIT MESSAGE:\*\*\s*>?(?:\s*\")?([^\"]+)(?:\"\s*)?", re.IGNORECASE)
     commit_match = commit_pattern.search(output_text)
     commit_message = commit_match.group(1).strip() if commit_match else f"feat(jules): daily expansion {date_str}"
 
@@ -181,18 +191,39 @@ def _save_and_apply_output(output_text: str):
 
     try:
         # 4. Write files
-        for file_path, file_content in files_to_write:
-            file_path = file_path.strip()
+        files_added = []
+        for f_path, file_content in files_to_write:
+            f_path = f_path.strip()
             # Ensure directories exist
-            os.makedirs(os.path.dirname(file_path), exist_ok=True)
-            with open(file_path, "w") as f:
+            os.makedirs(os.path.dirname(f_path), exist_ok=True)
+            with open(f_path, "w") as f:
                 f.write(file_content.strip() + "\n")
-            logging.info(f"Wrote file: {file_path}")
-
+            logging.info(f"Wrote file: {f_path}")
+            files_added.append(f_path)
+            # Ensure the file is added
+            subprocess.run(["git", "add", f_path], check=True)
         # 5. Commit the changes
-        subprocess.run(["git", "add", "."], check=True)
-        subprocess.run(["git", "commit", "-m", commit_message], check=True)
+        # Note: We specifically pass files_added to commit only those exact files.
+        subprocess.run(["git", "commit", "-m", commit_message, *files_added], check=True)
         logging.info(f"Committed changes with message: {commit_message}")
+
+        # 6. Observability: Update Changelog and create a PR
+        changelog_entry = f"\n## [{date_str}-{timestamp_str}] Protocol ARCHITECT_INFINITE\n- {commit_message}\n- Files Added/Modified: {', '.join(files_added)}\n"
+        try:
+            with open("CHANGELOG.md", "a") as cl_file:
+                cl_file.write(changelog_entry)
+            subprocess.run(["git", "add", "CHANGELOG.md"], check=True)
+            subprocess.run(["git", "commit", "--amend", "--no-edit", "CHANGELOG.md"], check=True)
+        except Exception as e:
+            logging.warning(f"Could not update CHANGELOG.md: {e}")
+
+        # Pull Request creation using gh CLI
+        try:
+            logging.info("Attempting to create Pull Request...")
+            pr_body = f"Automated expansion by ARCHITECT_INFINITE.\n\nFiles modified:\n" + "\n".join(f"- {f}" for f in files_added)
+            subprocess.run(["gh", "pr", "create", "--title", commit_message, "--body", pr_body], check=True)
+        except Exception as e:
+            logging.warning(f"Could not create PR using gh CLI (maybe not installed or not authenticated): {e}")
 
     except Exception as e:
         logging.error(f"Error writing files or committing: {e}")
