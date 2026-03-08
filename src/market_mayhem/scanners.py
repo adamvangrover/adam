@@ -5,17 +5,18 @@ Description: Core logic for detecting institutional accumulation of distressed a
              via 13F filings, utilizing edgartools and robust error handling.
 """
 
+import logging
+from typing import List, Optional
+
 import pandas as pd
 from edgar import Company, Filing, set_identity
-from typing import List, Dict, Optional
-from pydantic import BaseModel, Field, field_validator, ConfigDict
-from tenacity import retry, wait_exponential, stop_after_attempt, retry_if_exception_type
-import logging
-import time
+from pydantic import BaseModel, ConfigDict, Field, field_validator
+from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential
 
 # Configure Logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
 
 # --- Pydantic Models for Type Safety ---
 class Holding(BaseModel):
@@ -23,6 +24,7 @@ class Holding(BaseModel):
     Represents a single position in a 13F filing.
     Strict typing prevents data corruption from XML parsing artifacts.
     """
+
     issuer: str = Field(..., alias="nameOfIssuer")
     cusip: str
     ticker: Optional[str] = None
@@ -33,26 +35,29 @@ class Holding(BaseModel):
 
     model_config = ConfigDict(populate_by_name=True)
 
-    @field_validator('cusip')
+    @field_validator("cusip")
     @classmethod
     def validate_cusip(cls, v):
-        if len(v)!= 9:
+        if len(v) != 9:
             raise ValueError(f"Invalid CUSIP length: {v}")
         return v
+
 
 class WhaleSignal(BaseModel):
     """
     Represents a detected signal of activity (Entry, Exit, Accumulation).
     """
+
     fund_name: str
     ticker: str
     signal_type: str  # 'NEW_ENTRY', 'ACCUMULATION', 'LIQUIDATION'
     change_pct: float
     conviction_score: float  # Value / Total Portfolio (Simplified)
     description: str
-    share_type: str # Critical for distinguishing Debt (PRN) from Equity (SH)
+    share_type: str  # Critical for distinguishing Debt (PRN) from Equity (SH)
 
     model_config = ConfigDict(populate_by_name=True)
+
 
 # --- Core Logic Class ---
 class WhaleScanner:
@@ -70,13 +75,13 @@ class WhaleScanner:
             "APOLLO": "0001411494",
             "CENTERBRIDGE": "0001484836",
             "BAUPOST": "0001061768",
-            "ARES": "0001176948"
+            "ARES": "0001176948",
         }
 
     @retry(
         wait=wait_exponential(multiplier=1, min=2, max=10),
         stop=stop_after_attempt(3),
-        retry=retry_if_exception_type(Exception)
+        retry=retry_if_exception_type(Exception),
     )
     def _fetch_filings(self, cik: str, limit: int = 2) -> List[Filing]:
         """
@@ -94,8 +99,8 @@ class WhaleScanner:
 
         # edgartools returns an EntityFilings object which is iterable
         # Convert to list of Filing objects
-        if hasattr(filings, '__iter__'):
-             return list(filings)
+        if hasattr(filings, "__iter__"):
+            return list(filings)
 
         # If it returns a single Filing object
         return [filings]
@@ -118,15 +123,17 @@ class WhaleScanner:
 
             # Normalize column names to match our internal schema
             # Edgartools dataframe columns are typically: Issuer, CUSIP, Value, Shares, etc.
-            df = df.rename(columns={
-                "Issuer": "issuer",
-                "Cusip": "cusip",
-                "Value": "value",
-                "Shares": "shares",
-                "Type": "share_type", # maps to sshPrnamtType
-                "InvestmentDiscretion": "discretion",
-                "Ticker": "ticker" # edgartools attempts resolution
-            })
+            df = df.rename(
+                columns={
+                    "Issuer": "issuer",
+                    "Cusip": "cusip",
+                    "Value": "value",
+                    "Shares": "shares",
+                    "Type": "share_type",  # maps to sshPrnamtType
+                    "InvestmentDiscretion": "discretion",
+                    "Ticker": "ticker",  # edgartools attempts resolution
+                }
+            )
 
             return df
         except Exception as e:
@@ -160,54 +167,67 @@ class WhaleScanner:
 
         # Merge on CUSIP to compare positions
         # Using CUSIP is more reliable than Ticker for distressed/delisted assets
-        merged = pd.merge(
-            q0_df,
-            q1_df,
-            on='cusip',
-            how='outer',
-            suffixes=('_q0', '_q1'),
-            indicator=True
+        merged = pd.merge(q0_df, q1_df, on="cusip", how="outer", suffixes=("_q0", "_q1"), indicator=True)
+
+        if merged.empty:
+            return signals
+
+        # Vectorized field resolution
+        # Combine Q0 > Q1 > CUSIP fallback
+        merged["calc_ticker"] = (
+            merged.get("ticker_q0", pd.Series(dtype=object))
+            .combine_first(merged.get("ticker_q1", pd.Series(dtype=object)))
+            .combine_first(merged["cusip"])
         )
 
-        for _, row in merged.iterrows():
-            # Resolve Ticker: Q0 > Q1 > CUSIP fallback
-            ticker = row.get('ticker_q0') or row.get('ticker_q1') or row['cusip']
-            val_q0 = row.get('value_q0', 0)
-            share_type = row.get('share_type_q0') or row.get('share_type_q1')
-            issuer = row.get('issuer_q0') or row.get('issuer_q1')
+        merged["calc_val_q0"] = merged.get("value_q0", pd.Series(0, index=merged.index)).fillna(0)
 
-            # 1. Detect New Entries (Vulture Entering)
-            if row['_merge'] == 'left_only':
-                desc = f"New Position: {issuer}"
-                if share_type == 'PRN':
-                    desc += " (DEBT/CONVERTIBLE - HIGH CONVICTION)"
+        merged["calc_share_type"] = merged.get("share_type_q0", pd.Series(dtype=object)).combine_first(
+            merged.get("share_type_q1", pd.Series(dtype=object))
+        )
 
-                signals.append(WhaleSignal(
+        merged["calc_issuer"] = merged.get("issuer_q0", pd.Series(dtype=object)).combine_first(
+            merged.get("issuer_q1", pd.Series(dtype=object))
+        )
+
+        # 1. Detect New Entries (Vulture Entering)
+        left_only = merged[merged["_merge"] == "left_only"]
+        for row in left_only.to_dict("records"):
+            desc = f"New Position: {row['calc_issuer']}"
+            if row["calc_share_type"] == "PRN":
+                desc += " (DEBT/CONVERTIBLE - HIGH CONVICTION)"
+
+            signals.append(
+                WhaleSignal(
                     fund_name=fund_key,
-                    ticker=str(ticker),
+                    ticker=str(row["calc_ticker"]),
                     signal_type="VULTURE_ENTRY",
                     change_pct=100.0,
-                    conviction_score=float(val_q0),
+                    conviction_score=float(row["calc_val_q0"]),
                     description=desc,
-                    share_type=str(share_type)
-                ))
+                    share_type=str(row["calc_share_type"]),
+                )
+            )
 
-            # 2. Detect Aggressive Accumulation
-            elif row['_merge'] == 'both':
-                shares_q0 = row['shares_q0']
-                shares_q1 = row['shares_q1']
+        # 2. Detect Aggressive Accumulation
+        both = merged[merged["_merge"] == "both"].copy()
+        if not both.empty:
+            both = both[both["shares_q1"] > 0].copy()
+            if not both.empty:
+                both["pct_change"] = ((both["shares_q0"] - both["shares_q1"]) / both["shares_q1"]) * 100
+                accum = both[both["pct_change"] > 20]  # 20% Threshold for "Aggressive"
 
-                if shares_q1 > 0:
-                    pct_change = ((shares_q0 - shares_q1) / shares_q1) * 100
-                    if pct_change > 20: # 20% Threshold for "Aggressive"
-                        signals.append(WhaleSignal(
+                for row in accum.to_dict("records"):
+                    signals.append(
+                        WhaleSignal(
                             fund_name=fund_key,
-                            ticker=str(ticker),
+                            ticker=str(row["calc_ticker"]),
                             signal_type="ACCUMULATION",
-                            change_pct=pct_change,
-                            conviction_score=float(val_q0),
-                            description=f"Increased position by {pct_change:.1f}%",
-                            share_type=str(share_type)
-                        ))
+                            change_pct=row["pct_change"],
+                            conviction_score=float(row["calc_val_q0"]),
+                            description=f"Increased position by {row['pct_change']:.1f}%",
+                            share_type=str(row["calc_share_type"]),
+                        )
+                    )
 
         return signals
