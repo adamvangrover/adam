@@ -48,8 +48,8 @@ describe('AgentIntercom', () => {
 
   test('fetches and renders thoughts', async () => {
     const mockThoughts = [
-      { id: '1', content: 'Thought 1', agent_name: 'AgentA', timestamp: new Date().toISOString() },
-      { id: '2', content: 'Thought 2', agent_name: 'AgentB', timestamp: new Date().toISOString() }
+      { id: '1', timestamp: new Date().toISOString(), agent_name: 'RiskOfficer', content: 'Thought 1', conviction_score: 0.9 },
+      { id: '2', timestamp: new Date().toISOString(), agent_name: 'MarketAnalyst', content: 'Thought 2', conviction_score: 0.5 }
     ];
 
     (global.fetch as jest.Mock).mockResolvedValue({
@@ -66,8 +66,8 @@ describe('AgentIntercom', () => {
   });
 
   test('updates with new thoughts', async () => {
-      const initialThoughts = [{ id: '1', content: 'Initial Thought', agent_name: 'AgentA', timestamp: new Date().toISOString() }];
-      const newThoughts = [{ id: '2', content: 'New Thought', agent_name: 'AgentB', timestamp: new Date().toISOString() }, { id: '1', content: 'Initial Thought', agent_name: 'AgentA', timestamp: new Date().toISOString() }];
+      const initialThoughts = [{ id: '1', timestamp: new Date().toISOString(), agent_name: 'RiskOfficer', content: 'Initial Thought', conviction_score: 0.9 }];
+      const newThoughts = [{ id: '2', timestamp: new Date().toISOString(), agent_name: 'MarketAnalyst', content: 'New Thought', conviction_score: 0.5 }, { id: '1', timestamp: new Date().toISOString(), agent_name: 'RiskOfficer', content: 'Initial Thought', conviction_score: 0.9 }];
 
       (global.fetch as jest.Mock)
           .mockResolvedValueOnce({
