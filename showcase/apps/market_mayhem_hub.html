@@ -177,6 +177,32 @@
                         <span class="text-gray-200">VIX futures term structure backwardation continues.</span>
                     </div>
                 </div>
+
+                <div class="mt-6 border-t border-gray-800 pt-4">
+                    <h2 class="text-xs font-mono text-gray-500 mb-3 uppercase tracking-widest flex items-center gap-2">
+                        <i data-lucide="cpu" class="w-3 h-3 text-brand-purple"></i> Agent Telemetry
+                    </h2>
+                    <div class="space-y-4">
+                        <div>
+                            <div class="flex justify-between text-[10px] mb-1 font-mono">
+                                <span class="text-gray-400">Data Throughput</span>
+                                <span class="text-brand-blue font-bold">142 TB/s</span>
+                            </div>
+                            <div class="h-1.5 w-full bg-gray-800 rounded overflow-hidden">
+                                <div class="h-full bg-brand-blue w-[92%]"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-[10px] mb-1 font-mono">
+                                <span class="text-gray-400">Anomaly Detection Rate</span>
+                                <span class="text-brand-purple">98.5%</span>
+                            </div>
+                            <div class="h-1.5 w-full bg-gray-800 rounded overflow-hidden">
+                                <div class="h-full bg-brand-purple w-[98%]"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </aside>
 
@@ -466,6 +492,7 @@
             const baseVol = 15;
             const data1 = labels.map((_, i) => baseVol + Math.sin(i/3)*4 + Math.random()*2 + (i>20 ? i*0.5 : 0));
             const data2 = labels.map((_, i) => baseVol + 2 + Math.cos(i/4)*3 + Math.random()*1);
+            const data3 = labels.map((_, i) => baseVol + 5 + Math.sin(i/2)*5 + Math.random()*3 + (i>20 ? i*1.2 : 0)); // Projected Volatility
 
             new Chart(ctx, {
                 type: 'line',
@@ -489,6 +516,15 @@
                             borderColor: '#4a5568',
                             borderWidth: 1,
                             borderDash: [5, 5],
+                            tension: 0.3,
+                            pointRadius: 0
+                        },
+                        {
+                            label: 'Projected Volatility',
+                            data: data3,
+                            borderColor: '#b026ff',
+                            borderWidth: 2,
+                            borderDash: [3, 3],
                             tension: 0.3,
                             pointRadius: 0
                         }
