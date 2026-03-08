@@ -4,7 +4,6 @@ from __future__ import annotations
 from typing import Any, Dict, List, Optional
 import logging
 from core.agents.agent_base import AgentBase
-from core.utils.data_utils import send_message
 
 
 class MacroeconomicAnalysisAgent(AgentBase):
@@ -91,7 +90,6 @@ class MacroeconomicAnalysisAgent(AgentBase):
         # In v23, the return value is used by the orchestrator/graph.
         try:
             message = {'agent': 'macroeconomic_analysis_agent', 'insights': insights}
-            send_message(message)
         except Exception as e:
             logging.warning(f"Legacy send_message failed: {e}")
 

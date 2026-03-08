@@ -5,7 +5,6 @@ from typing import Any, Dict, Optional, List, Union
 import logging
 import asyncio
 from core.agents.agent_base import AgentBase
-from core.utils.data_utils import send_message
 
 logger = logging.getLogger(__name__)
 
@@ -121,7 +120,6 @@ class GeopoliticalRiskAgent(AgentBase):
         # Send risk assessments to message queue (legacy support)
         try:
             message = {'agent': 'geopolitical_risk_agent', 'risk_assessments': result}
-            send_message(message)
         except Exception as e:
             logger.warning(f"Failed to send legacy message: {e}")
 
