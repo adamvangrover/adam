@@ -5,6 +5,18 @@ Description: Quality Assurance for WhaleScanner logic.
              Mocks SEC EDGAR responses to test parsing and signal generation.
 """
 
+import sys
+from unittest.mock import MagicMock, patch
+
+# Patch httpxthrottlecache and pyrate_limiter to bypass edgartools pyrate_limiter v3 issue
+mock_ratelimiter = MagicMock()
+class MockLimiter:
+    def __init__(self, *args, **kwargs):
+        pass
+mock_ratelimiter.create_rate_limiter.return_value = MockLimiter()
+sys.modules['httpxthrottlecache.ratelimiter'] = mock_ratelimiter
+sys.modules['pyrate_limiter'] = MagicMock()
+
 import pytest
 import pandas as pd
 import sys

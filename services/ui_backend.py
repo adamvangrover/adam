@@ -2,7 +2,7 @@ import os
 import json
 import time
 import random
-from flask import Flask, send_from_directory, jsonify, request
+from flask import Flask, send_from_directory, jsonify
 from flask_cors import CORS
 
 # Define the showcase directory relative to this script
@@ -11,7 +11,17 @@ SHOWCASE_DIR = os.path.join(BASE_DIR, 'showcase')
 DATA_FILE = os.path.join(SHOWCASE_DIR, 'data', 'ui_data.json')
 
 app = Flask(__name__, static_folder=SHOWCASE_DIR)
-CORS(app)
+
+# 🛡️ Sentinel: Secure CORS Configuration
+# Default to localhost for development. In production, set ALLOWED_ORIGINS env var.
+allowed_origins_str = os.environ.get(
+    "ALLOWED_ORIGINS",
+    "http://localhost:3000,http://localhost:5000,"
+    "http://127.0.0.1:3000,http://127.0.0.1:5000"
+)
+allowed_origins = [origin.strip() for origin in allowed_origins_str.split(",")]
+
+CORS(app, resources={r"/*": {"origins": allowed_origins}})
 
 
 @app.route('/')

@@ -165,6 +165,11 @@ def _save_and_apply_output(output_text: str):
 
     logging.info(f"Raw output saved to {file_path}")
 
+    # Extract JULES' RATIONALE for the CHANGELOG
+    rationale_pattern = re.compile(r"\*\*1\.\s*JULES' RATIONALE:\*\*\s*>?(?:\s*\")?([^\"]+)(?:\"\s*)?", re.IGNORECASE)
+    rationale_match = rationale_pattern.search(output_text)
+    rationale = rationale_match.group(1).strip() if rationale_match else "Daily expansion based on ARCHITECT_INFINITE."
+
     # 2. Parse the output to extract files and commit message
     # Looking for: **2. FILE: path/to/new_file.py**\n```python\n...\n```
     file_pattern = re.compile(r"\*\*\d+\.\s*FILE:\s*([^*]+)\*\*\s*```(?:python)?\s*(.*?)\s*```", re.DOTALL)
@@ -189,10 +194,62 @@ def _save_and_apply_output(output_text: str):
                 f.write(file_content.strip() + "\n")
             logging.info(f"Wrote file: {file_path}")
 
+        # 4.5 Update CHANGELOG.md
+        changelog_path = "CHANGELOG.md"
+        if os.path.exists(changelog_path):
+            with open(changelog_path, "r") as f:
+                changelog_content = f.read()
+
+            new_entry = f"## [{date_str}] - Protocol ARCHITECT_INFINITE Expansion\n\n### Jules' Log\n> \"{rationale}\"\n\n### Added\n"
+            for file_path, _ in files_to_write:
+                new_entry += f"- Created/Updated `{file_path.strip()}`\n"
+            new_entry += "\n"
+
+            # Insert after the first "# Changelog" or at top
+            if "# Changelog" in changelog_content:
+                changelog_content = changelog_content.replace("# Changelog\n", f"# Changelog\n\n{new_entry}", 1)
+            else:
+                changelog_content = new_entry + changelog_content
+
+            with open(changelog_path, "w") as f:
+                f.write(changelog_content)
+            logging.info(f"Updated {changelog_path}")
+        else:
+            with open(changelog_path, "w") as f:
+                f.write(f"# Changelog\n\n## [{date_str}] - Protocol ARCHITECT_INFINITE Expansion\n\n### Jules' Log\n> \"{rationale}\"\n\n### Added\n")
+                for file_path, _ in files_to_write:
+                    f.write(f"- Created/Updated `{file_path.strip()}`\n")
+                f.write("\n")
+            logging.info(f"Created {changelog_path}")
+
         # 5. Commit the changes
-        subprocess.run(["git", "add", "."], check=True)
+        files_to_commit = [fp.strip() for fp, _ in files_to_write]
+        files_to_commit.append("CHANGELOG.md")
+
+        # Add only the targeted files
+        subprocess.run(["git", "add"] + files_to_commit, check=True)
+        # Commit using the targeted files explicitly (or just commit since they are added, but explicitly passed just in case)
         subprocess.run(["git", "commit", "-m", commit_message], check=True)
         logging.info(f"Committed changes with message: {commit_message}")
+
+        # 6. Push the branch and create a PR
+        try:
+            logging.info(f"Pushing branch {branch_name} to origin...")
+            subprocess.run(["git", "push", "-u", "origin", branch_name], check=True)
+
+            logging.info("Creating Pull Request...")
+            pr_title = commit_message
+            pr_body = f"{rationale}\n\nAutomated via Protocol ARCHITECT_INFINITE."
+            subprocess.run([
+                "gh", "pr", "create",
+                "--title", pr_title,
+                "--body", pr_body,
+                "--head", branch_name,
+                "--base", "main"
+            ], check=True)
+            logging.info("Pull Request created successfully.")
+        except subprocess.CalledProcessError as e:
+            logging.error(f"Failed to push or create PR. Ensure 'gh' CLI is authenticated and remote is configured. Error: {e}")
 
     except Exception as e:
         logging.error(f"Error writing files or committing: {e}")
