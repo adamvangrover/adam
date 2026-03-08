@@ -142,8 +142,40 @@
         <!-- Windows injected here -->
     </div>
 
+    <!-- Start Menu -->
+    <div id="start-menu" class="absolute bottom-24 left-1/2 transform -translate-x-1/2 w-80 bg-slate-900 border border-slate-700 rounded-lg shadow-2xl p-4 hidden z-[150] glass-panel transition-all duration-200 opacity-0 translate-y-4">
+        <div class="text-xs text-gray-400 font-bold uppercase tracking-widest mb-3 border-b border-slate-700 pb-2 flex justify-between">
+            <span>System Matrix</span>
+            <i data-lucide="layers" class="w-4 h-4 text-cyan-500"></i>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+            <button onclick="openWindow('market_data', 'Market Data Scrubber', 'apps/market_data.html', 1000, 700); toggleStartMenu()" class="flex flex-col items-center justify-center p-3 bg-slate-800 hover:bg-slate-700 rounded border border-slate-700 transition">
+                <i data-lucide="database" class="w-6 h-6 text-green-400 mb-2"></i>
+                <span class="text-[10px] text-gray-300">Data Scrubber</span>
+            </button>
+            <button onclick="openWindow('port_opt', 'Portfolio Optimizer', 'apps/portfolio.html', 1100, 800); toggleStartMenu()" class="flex flex-col items-center justify-center p-3 bg-slate-800 hover:bg-slate-700 rounded border border-slate-700 transition">
+                <i data-lucide="pie-chart" class="w-6 h-6 text-purple-400 mb-2"></i>
+                <span class="text-[10px] text-gray-300">Port Optimizer</span>
+            </button>
+            <button onclick="openWindow('terminal', 'Neural Terminal', 'terminal_profile.html', 800, 500); toggleStartMenu()" class="flex flex-col items-center justify-center p-3 bg-slate-800 hover:bg-slate-700 rounded border border-slate-700 transition">
+                <i data-lucide="terminal-square" class="w-6 h-6 text-gray-400 mb-2"></i>
+                <span class="text-[10px] text-gray-300">Terminal</span>
+            </button>
+            <button onclick="openWindow('mission', 'Mission Control', 'index.html', 1200, 800); toggleStartMenu()" class="flex flex-col items-center justify-center p-3 bg-slate-800 hover:bg-slate-700 rounded border border-slate-700 transition">
+                <i data-lucide="layout-dashboard" class="w-6 h-6 text-blue-400 mb-2"></i>
+                <span class="text-[10px] text-gray-300">Mission Control</span>
+            </button>
+        </div>
+    </div>
+
     <!-- Dock -->
     <div class="dock">
+        <button class="dock-item" type="button" aria-label="Start Menu" onclick="toggleStartMenu()" data-title="System Matrix">
+            <i data-lucide="grid" class="text-white w-6 h-6 hover:text-cyan-400 transition-colors"></i>
+        </button>
+
+        <div class="w-[1px] h-8 bg-white/10 mx-2"></div>
+
         <button class="dock-item" type="button" aria-label="Portfolio Attribution" onclick="openWindow('portfolio', 'Portfolio Attribution', 'apps/portfolio_attribution.html', 1100, 750)" data-title="Portfolio Attribution">
             <i data-lucide="pie-chart" class="text-blue-500 w-6 h-6"></i>
             <div class="app-dot" id="dot-portfolio"></div>
@@ -284,10 +316,52 @@
             let x = e.clientX - dragOffset.x;
             let y = e.clientY - dragOffset.y;
 
+            // Snapping to top bar
             if(y < 32) y = 32;
+
+            // Screen boundaries
+            const maxW = window.innerWidth;
+            const maxH = window.innerHeight;
+            const winW = currentWindow.offsetWidth;
+            const winH = currentWindow.offsetHeight;
+
+            // Edge Snapping
+            const snapThreshold = 20;
+            if (x < snapThreshold) x = 0;
+            if (x + winW > maxW - snapThreshold) x = maxW - winW;
+            if (y + winH > maxH - snapThreshold) y = maxH - winH;
 
             currentWindow.style.left = x + 'px';
             currentWindow.style.top = y + 'px';
+        });
+
+        function toggleStartMenu() {
+            const menu = document.getElementById('start-menu');
+            if (menu.classList.contains('hidden')) {
+                menu.classList.remove('hidden');
+                // reflow
+                void menu.offsetWidth;
+                menu.classList.remove('opacity-0', 'translate-y-4');
+                menu.classList.add('opacity-100', 'translate-y-0');
+            } else {
+                menu.classList.remove('opacity-100', 'translate-y-0');
+                menu.classList.add('opacity-0', 'translate-y-4');
+                setTimeout(() => {
+                    menu.classList.add('hidden');
+                }, 200);
+            }
+        }
+
+        // Close start menu when clicking outside
+        document.addEventListener('click', (e) => {
+            const menu = document.getElementById('start-menu');
+            const dockItem = document.querySelector('[data-title="System Matrix"]');
+
+            if (menu && !menu.classList.contains('hidden') &&
+                !menu.contains(e.target) &&
+                !(dockItem && dockItem.contains(e.target))) {
+                toggleStartMenu();
+            }
         });
 
         document.addEventListener('mouseup', () => {
