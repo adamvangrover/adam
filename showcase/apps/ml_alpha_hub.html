@@ -59,7 +59,7 @@
                     <div class="signal-card cursor-pointer">
                         <div class="flex justify-between items-start mb-2">
                             <div>
-                                <div class="text-white font-bold text-sm">NVDA Momentum Reversal</div>
+                                <div class="text-white font-bold text-sm">NVDA Momentum Reversal <span class="text-[9px] bg-green-500/20 text-green-400 px-1 py-0.5 rounded border border-green-500/50 ml-1">🟢 ACTIVE</span></div>
                                 <div class="text-[10px] text-gray-500">Model: LSTM-Transformer Hybrid</div>
                             </div>
                             <span class="bg-green-500/20 text-green-400 px-2 py-0.5 rounded text-[10px] border border-green-500/50">LONG</span>
@@ -73,7 +73,7 @@
                     <div class="signal-card cursor-pointer border-red-500/30">
                         <div class="flex justify-between items-start mb-2">
                             <div>
-                                <div class="text-white font-bold text-sm">TSLA Volatility Breakout</div>
+                                <div class="text-white font-bold text-sm">TSLA Volatility Breakout <span class="text-[9px] bg-yellow-500/20 text-yellow-400 px-1 py-0.5 rounded border border-yellow-500/50 ml-1">🟡 RETRAINING</span></div>
                                 <div class="text-[10px] text-gray-500">Model: GARCH-NeuralNet</div>
                             </div>
                             <span class="bg-red-500/20 text-red-400 px-2 py-0.5 rounded text-[10px] border border-red-500/50">SHORT</span>
@@ -87,7 +87,7 @@
                     <div class="signal-card cursor-pointer">
                         <div class="flex justify-between items-start mb-2">
                             <div>
-                                <div class="text-white font-bold text-sm">AMZN Supply Chain Sentiment</div>
+                                <div class="text-white font-bold text-sm">AMZN Supply Chain Sentiment <span class="text-[9px] bg-green-500/20 text-green-400 px-1 py-0.5 rounded border border-green-500/50 ml-1">🟢 ACTIVE</span></div>
                                 <div class="text-[10px] text-gray-500">Model: NLP Extractor (FinBERT)</div>
                             </div>
                             <span class="bg-green-500/20 text-green-400 px-2 py-0.5 rounded text-[10px] border border-green-500/50">LONG</span>
@@ -97,6 +97,14 @@
                             <span class="text-purple-400">Exp. Ret: +2.1%</span>
                         </div>
                     </div>
+                </div>
+            </div>
+
+            <!-- Drawdown Profile -->
+            <div class="glass-panel p-4 h-48 flex flex-col mt-4">
+                <h2 class="text-xs text-purple-400 uppercase tracking-widest mb-2 border-b border-purple-500/30 pb-2">Drawdown Profile</h2>
+                <div class="flex-grow relative">
+                    <canvas id="drawdownChart"></canvas>
                 </div>
             </div>
 
@@ -241,6 +249,43 @@
                 scales: {
                     x: { grid: { display: false }, ticks: { color: '#64748b', maxTicksLimit: 10 } },
                     y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#64748b' } }
+                }
+            }
+        });
+
+        // Drawdown Chart
+        const drawdownData = actualData.map(val => {
+            // Mock drawdown logic: diff from rolling max
+            let maxSoFar = 100;
+            return Math.min(0, (val / maxSoFar) - 1) * 100;
+        });
+
+        const ctxDrawdown = document.getElementById('drawdownChart').getContext('2d');
+        new Chart(ctxDrawdown, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Drawdown %',
+                    data: drawdownData,
+                    backgroundColor: 'rgba(239, 68, 68, 0.2)',
+                    borderColor: '#ef4444',
+                    borderWidth: 1,
+                    fill: true,
+                    tension: 0.1,
+                    pointRadius: 0
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { grid: { display: false }, ticks: { display: false } },
+                    y: {
+                        grid: { color: 'rgba(255,255,255,0.05)' },
+                        ticks: { color: '#64748b', font: {size: 9} },
+                        max: 0
+                    }
                 }
             }
         });

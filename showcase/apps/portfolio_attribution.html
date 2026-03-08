@@ -137,6 +137,14 @@
                     ML models account for <span class="text-white font-bold">100%</span> of active return generation this period.
                 </div>
             </div>
+
+            <!-- Factor Exposures -->
+            <div class="glass-panel p-4 flex flex-col flex-grow">
+                <h2 class="text-xs text-gray-400 uppercase tracking-widest mb-2 border-b border-gray-800 pb-2">Factor Exposures</h2>
+                <div class="flex-grow relative h-40">
+                    <canvas id="factorRadarChart"></canvas>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -213,6 +221,69 @@
                 <td class="text-right font-mono font-bold">${fmt(d.tot)}</td>
             `;
             tbody.appendChild(tr);
+        });
+
+        // Factor Exposures Radar Chart
+        const ctxRadar = document.getElementById('factorRadarChart').getContext('2d');
+        new Chart(ctxRadar, {
+            type: 'radar',
+            data: {
+                labels: ['Value', 'Momentum', 'Quality', 'Size', 'Low Vol'],
+                datasets: [{
+                    label: 'Portfolio',
+                    data: [0.8, 1.2, 0.9, -0.4, 0.5],
+                    backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                    borderColor: '#3b82f6',
+                    pointBackgroundColor: '#3b82f6',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: '#3b82f6'
+                }, {
+                    label: 'Benchmark',
+                    data: [0.0, 0.0, 0.0, 0.0, 0.0],
+                    backgroundColor: 'rgba(100, 116, 139, 0.1)',
+                    borderColor: '#64748b',
+                    pointBackgroundColor: '#64748b',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: '#64748b',
+                    borderDash: [5, 5]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    r: {
+                        angleLines: {
+                            color: 'rgba(255, 255, 255, 0.1)'
+                        },
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.1)'
+                        },
+                        pointLabels: {
+                            color: '#94a3b8',
+                            font: {
+                                size: 10
+                            }
+                        },
+                        ticks: {
+                            display: false, // hide the values
+                            min: -1.5,
+                            max: 1.5,
+                            stepSize: 0.5
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: '#94a3b8',
+                            font: { size: 9 }
+                        }
+                    }
+                }
+            }
         });
 
     </script>
