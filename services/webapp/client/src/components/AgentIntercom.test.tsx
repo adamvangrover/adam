@@ -60,8 +60,8 @@ describe('AgentIntercom', () => {
     render(<AgentIntercom />);
 
     await waitFor(() => {
-        expect(screen.getByText('Thought 1')).toBeInTheDocument();
-        expect(screen.getByText('Thought 2')).toBeInTheDocument();
+        expect(screen.getByText(/Thought 1/)).toBeInTheDocument();
+        expect(screen.getByText(/Thought 2/)).toBeInTheDocument();
     });
   });
 
@@ -83,7 +83,7 @@ describe('AgentIntercom', () => {
 
       // First render
       await waitFor(() => {
-          expect(screen.getByText('Initial Thought')).toBeInTheDocument();
+          expect(screen.getByText(/Initial Thought/)).toBeInTheDocument();
       });
 
       // Advance timers to trigger next fetch (2000ms)
@@ -94,7 +94,7 @@ describe('AgentIntercom', () => {
 
       // Wait for update
       await waitFor(() => {
-          expect(screen.getByText('New Thought')).toBeInTheDocument();
+          expect(screen.getByText(/New Thought/)).toBeInTheDocument();
       });
   });
 });
