@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Market Mayhem Terminal</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        dark: {
+                            900: '#0a0a0f',
+                            800: '#111116',
+                            700: '#1a1a24'
+                        },
+                        brand: {
+                            red: '#ff2a2a',
+                            orange: '#ff7300',
+                            blue: '#00e5ff',
+                            purple: '#b026ff',
+                            green: '#00ff66'
+                        }
+                    },
+                    fontFamily: {
+                        mono: ['JetBrains Mono', 'Fira Code', 'Courier New', 'monospace'],
+                        sans: ['Inter', 'system-ui', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            background-color: #050508;
+            color: #e2e8f0;
+            overflow: hidden;
+            background-image: radial-gradient(circle at 50% 0%, #1a1a24 0%, transparent 70%);
+        }
+
+        .glass-panel {
+            background: rgba(17, 17, 22, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 42, 42, 0.15);
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+        }
+
+        .cyber-header {
+            border-bottom: 1px solid rgba(255, 42, 42, 0.3);
+            background: linear-gradient(90deg, rgba(255, 42, 42, 0.05) 0%, transparent 100%);
+        }
+
+        .mayhem-card {
+            transition: all 0.2s ease-in-out;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .mayhem-card:hover {
+            border-color: rgba(255, 42, 42, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(255, 42, 42, 0.1);
+        }
+
+        .grid-bg {
+            background-image:
+                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 30px 30px;
+            background-position: center center;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
+        ::-webkit-scrollbar-thumb { background: rgba(255, 42, 42, 0.3); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255, 42, 42, 0.6); }
+
+        .crt-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%);
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 50;
+            opacity: 0.15;
+        }
+
+        .nav-item {
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+        }
+        .nav-item.active {
+            border-bottom: 2px solid #ff2a2a;
+            color: #ff2a2a;
+        }
+    </style>
+</head>
+<body class="font-sans h-screen flex flex-col antialiased grid-bg">
+    <div class="crt-overlay"></div>
+
+    <!-- Top Navigation -->
+    <header class="cyber-header glass-panel h-14 flex items-center justify-between px-6 flex-shrink-0 z-10 relative">
+        <div class="flex items-center gap-3">
+            <i data-lucide="flame" class="text-brand-red w-6 h-6"></i>
+            <h1 class="text-lg font-mono font-bold tracking-wider text-white">MARKET<span class="text-brand-red">MAYHEM</span> HUB</h1>
+        </div>
+
+        <div class="flex items-center gap-6 font-mono text-sm text-gray-400">
+            <div class="nav-item active pb-1 transition-colors hover:text-white" onclick="switchTab('dashboard')">DASHBOARD</div>
+            <div class="nav-item pb-1 transition-colors hover:text-white" onclick="switchTab('timelines')">TIMELINES</div>
+            <div class="nav-item pb-1 transition-colors hover:text-white" onclick="switchTab('newsletters')">REPORTS</div>
+            <div class="nav-item pb-1 transition-colors hover:text-white" onclick="switchTab('archive')">CRASH ARCHIVE</div>
+        </div>
+
+        <div class="flex items-center gap-4 text-xs font-mono">
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-brand-red animate-pulse"></span>
+                <span class="text-brand-red">VIX: <span id="vix-ticker">18.4</span></span>
+            </div>
+            <div class="text-gray-500" id="clock">00:00:00 UTC</div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <div class="flex-1 overflow-hidden flex relative z-10">
+        <!-- Sidebar: Quick Intel -->
+        <aside class="w-72 glass-panel border-r border-t-0 flex flex-col h-full flex-shrink-0">
+            <div class="p-4 border-b border-gray-800">
+                <h2 class="text-xs font-mono text-gray-500 mb-3 uppercase tracking-widest flex items-center gap-2">
+                    <i data-lucide="activity" class="w-3 h-3 text-brand-orange"></i> Live Sentiment
+                </h2>
+                <div class="space-y-4">
+                    <div>
+                        <div class="flex justify-between text-xs mb-1 font-mono">
+                            <span class="text-gray-400">Fear & Greed</span>
+                            <span class="text-brand-red font-bold">12 (Extreme Fear)</span>
+                        </div>
+                        <div class="h-1.5 w-full bg-gray-800 rounded overflow-hidden">
+                            <div class="h-full bg-brand-red w-[12%]"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-xs mb-1 font-mono">
+                            <span class="text-gray-400">Systemic Stress</span>
+                            <span class="text-brand-orange">84%</span>
+                        </div>
+                        <div class="h-1.5 w-full bg-gray-800 rounded overflow-hidden">
+                            <div class="h-full bg-brand-orange w-[84%]"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-4 flex-1 overflow-y-auto">
+                <h2 class="text-xs font-mono text-gray-500 mb-3 uppercase tracking-widest flex items-center gap-2">
+                    <i data-lucide="radio" class="w-3 h-3 text-brand-blue"></i> Tactical Alerts
+                </h2>
+                <div class="space-y-3 font-mono text-xs">
+                    <div class="p-2 bg-dark-800 border-l-2 border-brand-red rounded shadow-sm">
+                        <span class="text-gray-500 block mb-1">10:42 AM</span>
+                        <span class="text-gray-200">Liquidity drain detected in ON RRP. Yield curve un-inversion accelerating.</span>
+                    </div>
+                    <div class="p-2 bg-dark-800 border-l-2 border-brand-orange rounded shadow-sm">
+                        <span class="text-gray-500 block mb-1">09:15 AM</span>
+                        <span class="text-gray-200">Options skew extremely biased to puts (SPY). Dealer gamma positioning short.</span>
+                    </div>
+                    <div class="p-2 bg-dark-800 border-l-2 border-gray-600 rounded shadow-sm">
+                        <span class="text-gray-500 block mb-1">08:00 AM</span>
+                        <span class="text-gray-200">VIX futures term structure backwardation continues.</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Dynamic Content Pane -->
+        <main class="flex-1 overflow-y-auto p-6 relative" id="main-content">
+            <!-- Dashboard View -->
+            <div id="view-dashboard" class="space-y-6">
+                <!-- Top Row: Metrics -->
+                <div class="grid grid-cols-4 gap-4">
+                    <div class="glass-panel p-4 rounded-lg flex flex-col justify-between h-28 border-t-2 border-t-brand-red">
+                        <span class="text-xs font-mono text-gray-400">Market Regime</span>
+                        <div class="text-xl font-bold text-white tracking-wide">STAGFLATION</div>
+                        <div class="text-xs text-brand-red font-mono flex items-center gap-1 mt-1">
+                            <i data-lucide="trending-down" class="w-3 h-3"></i> Growth slowing
+                        </div>
+                    </div>
+                    <div class="glass-panel p-4 rounded-lg flex flex-col justify-between h-28 border-t-2 border-t-brand-orange">
+                        <span class="text-xs font-mono text-gray-400">S&P 500 Forward P/E</span>
+                        <div class="text-xl font-bold text-white font-mono">23.4x</div>
+                        <div class="text-xs text-brand-orange font-mono flex items-center gap-1 mt-1">
+                            <i data-lucide="alert-triangle" class="w-3 h-3"></i> +1.5σ over avg
+                        </div>
+                    </div>
+                    <div class="glass-panel p-4 rounded-lg flex flex-col justify-between h-28 border-t-2 border-t-brand-blue">
+                        <span class="text-xs font-mono text-gray-400">US 10Y Yield</span>
+                        <div class="text-xl font-bold text-white font-mono">4.85%</div>
+                        <div class="text-xs text-brand-blue font-mono flex items-center gap-1 mt-1">
+                            <i data-lucide="arrow-up-right" class="w-3 h-3"></i> +12 bps (WTD)
+                        </div>
+                    </div>
+                    <div class="glass-panel p-4 rounded-lg flex flex-col justify-between h-28 border-t-2 border-t-brand-purple">
+                        <span class="text-xs font-mono text-gray-400">Default Risk Index</span>
+                        <div class="text-xl font-bold text-white font-mono">Elevated</div>
+                        <div class="text-xs text-brand-purple font-mono flex items-center gap-1 mt-1">
+                            <i data-lucide="activity" class="w-3 h-3"></i> Spread widening
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Middle Row: Charts & Intelligence -->
+                <div class="grid grid-cols-3 gap-6">
+                    <!-- Chart -->
+                    <div class="col-span-2 glass-panel p-5 rounded-lg border border-gray-800 flex flex-col h-[400px]">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-sm font-mono text-gray-300 flex items-center gap-2">
+                                <i data-lucide="bar-chart-2" class="w-4 h-4 text-brand-blue"></i> Volatility Surface (SPX)
+                            </h3>
+                            <span class="text-xs bg-dark-800 px-2 py-1 rounded text-gray-400 font-mono">LIVE</span>
+                        </div>
+                        <div class="flex-1 w-full h-full relative">
+                            <canvas id="volChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Strategic Command Output -->
+                    <div class="col-span-1 glass-panel p-5 rounded-lg border border-gray-800 flex flex-col h-[400px]">
+                        <h3 class="text-sm font-mono text-gray-300 flex items-center gap-2 mb-4">
+                            <i data-lucide="cpu" class="w-4 h-4 text-brand-purple"></i> Consensus Engine V2
+                        </h3>
+                        <div class="flex-1 overflow-y-auto pr-2 space-y-4 font-mono text-sm">
+                            <div class="bg-dark-800 p-3 rounded border border-gray-700">
+                                <span class="text-xs text-brand-orange mb-1 block">HOUSE VIEW</span>
+                                <span class="text-white font-bold">DEFENSIVE POSTURE</span>
+                            </div>
+                            <div>
+                                <span class="text-xs text-gray-500 mb-1 block">NARRATIVE</span>
+                                <p class="text-gray-300 leading-relaxed text-xs">High duration assets highly sensitive to incoming CPI print. Positioning skewed short gamma below 4500. Cash remains optimal hedge.</p>
+                            </div>
+                            <div>
+                                <span class="text-xs text-gray-500 mb-2 block">ACTIONABLE PLANS</span>
+                                <ul class="space-y-2 text-xs">
+                                    <li class="flex items-start gap-2">
+                                        <i data-lucide="shield" class="w-3 h-3 text-brand-blue mt-0.5"></i>
+                                        <span class="text-gray-300">Increase short-term treasury allocation by 5%</span>
+                                    </li>
+                                    <li class="flex items-start gap-2">
+                                        <i data-lucide="scissors" class="w-3 h-3 text-brand-red mt-0.5"></i>
+                                        <span class="text-gray-300">Trim high-beta tech exposure</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bottom Row: Recent Reports Grid -->
+                <div>
+                    <h3 class="text-sm font-mono text-gray-300 flex items-center gap-2 mb-4 mt-2">
+                        <i data-lucide="file-text" class="w-4 h-4 text-brand-green"></i> Latest Dispatches
+                    </h3>
+                    <div class="grid grid-cols-3 gap-4" id="recent-reports-grid">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Newsletters / Reports View (Hidden by default) -->
+            <div id="view-newsletters" class="hidden h-full flex flex-col">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-xl font-mono text-white">Market Mayhem Reports</h2>
+                    <div class="flex gap-2">
+                        <input type="text" placeholder="Search reports..." class="bg-dark-800 border border-gray-700 text-sm font-mono text-white px-3 py-1.5 rounded focus:outline-none focus:border-brand-blue">
+                        <button class="bg-dark-800 hover:bg-dark-700 border border-gray-700 px-3 py-1.5 rounded text-sm font-mono transition-colors">
+                            <i data-lucide="filter" class="w-4 h-4 text-gray-400"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="grid grid-cols-4 gap-4 overflow-y-auto pb-6" id="all-reports-grid">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <!-- Timelines View -->
+             <div id="view-timelines" class="hidden h-full flex flex-col">
+                <h2 class="text-xl font-mono text-white mb-6">Crisis Event Timelines</h2>
+                <div class="grid grid-cols-2 gap-6" id="timelines-grid">
+                     <div class="glass-panel mayhem-card p-5 rounded cursor-pointer" onclick="openReport('../market_mayhem_iran_conflict.html')">
+                        <div class="flex justify-between items-start mb-3">
+                            <h4 class="font-bold text-white text-lg font-mono">Geopolitical Escalation</h4>
+                            <span class="text-xs font-mono text-brand-orange border border-brand-orange/30 px-2 py-1 rounded bg-brand-orange/10">ACTIVE</span>
+                        </div>
+                        <p class="text-sm text-gray-400 mb-4 line-clamp-2">Timeline of the 2024-2025 Middle East escalations and corresponding market liquidity shocks.</p>
+                        <div class="flex items-center text-xs font-mono text-gray-500 gap-4">
+                            <span class="flex items-center gap-1"><i data-lucide="clock" class="w-3 h-3"></i> Live Tracking</span>
+                        </div>
+                    </div>
+                    <div class="glass-panel mayhem-card p-5 rounded cursor-pointer" onclick="openReport('../market_mayhem_builder.html')">
+                        <div class="flex justify-between items-start mb-3">
+                            <h4 class="font-bold text-white text-lg font-mono">Scenario Builder</h4>
+                            <span class="text-xs font-mono text-brand-blue border border-brand-blue/30 px-2 py-1 rounded bg-brand-blue/10">TOOL</span>
+                        </div>
+                        <p class="text-sm text-gray-400 mb-4 line-clamp-2">Construct and simulate future market crisis timelines based on macroeconomic variables.</p>
+                        <div class="flex items-center text-xs font-mono text-gray-500 gap-4">
+                            <span class="flex items-center gap-1"><i data-lucide="settings" class="w-3 h-3"></i> Interactive</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Archive View -->
+            <div id="view-archive" class="hidden h-full flex flex-col">
+                <h2 class="text-xl font-mono text-white mb-6">Historical Crash Archive</h2>
+                <div class="grid grid-cols-3 gap-4" id="archive-grid">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+        </main>
+
+        <!-- Iframe Viewer Overlay (Hidden by default) -->
+        <div id="iframe-viewer" class="absolute inset-0 z-50 bg-dark-900 hidden flex flex-col">
+            <div class="h-12 border-b border-gray-800 bg-dark-800 flex items-center justify-between px-4">
+                <div class="flex items-center gap-3">
+                    <button onclick="closeReport()" class="text-gray-400 hover:text-white transition-colors flex items-center gap-1 text-sm font-mono">
+                        <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Hub
+                    </button>
+                    <div class="h-4 w-px bg-gray-700"></div>
+                    <span id="iframe-title" class="text-sm font-mono text-gray-300 truncate w-96">Loading...</span>
+                </div>
+                <div class="flex gap-2">
+                    <button class="p-1.5 text-gray-400 hover:text-white rounded hover:bg-gray-700" title="Open in new tab" onclick="window.open(document.getElementById('report-frame').src, '_blank')">
+                        <i data-lucide="external-link" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </div>
+            <iframe id="report-frame" class="flex-1 w-full border-none bg-white" src=""></iframe>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        // Clock Update
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('clock').textContent = now.toISOString().substring(11, 19) + ' UTC';
+
+            // Randomly fluctuate VIX ticker for effect
+            if(Math.random() > 0.7) {
+                const vix = document.getElementById('vix-ticker');
+                let val = parseFloat(vix.textContent);
+                val += (Math.random() * 0.4 - 0.2);
+                vix.textContent = val.toFixed(2);
+                vix.className = val > 18.4 ? 'text-brand-red font-bold' : 'text-brand-orange';
+            }
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // View Switching Logic
+        function switchTab(tabId) {
+            // Update nav styling
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+
+            // Hide all views
+            document.getElementById('view-dashboard').classList.add('hidden');
+            document.getElementById('view-newsletters').classList.add('hidden');
+            document.getElementById('view-timelines').classList.add('hidden');
+            document.getElementById('view-archive').classList.add('hidden');
+
+            // Show selected view
+            document.getElementById('view-' + tabId).classList.remove('hidden');
+        }
+
+        // Iframe Viewer Logic
+        function openReport(url, title = 'Document Viewer') {
+            const viewer = document.getElementById('iframe-viewer');
+            const frame = document.getElementById('report-frame');
+            const titleEl = document.getElementById('iframe-title');
+
+            titleEl.textContent = title;
+            frame.src = url;
+            viewer.classList.remove('hidden');
+        }
+
+        function closeReport() {
+            const viewer = document.getElementById('iframe-viewer');
+            const frame = document.getElementById('report-frame');
+
+            viewer.classList.add('hidden');
+            setTimeout(() => { frame.src = ''; }, 300); // clear after transition
+        }
+
+        // Data Loading Simulation
+        const mockReports = [
+            { title: "Market Mayhem: Feb 16, 2026", date: "2026-02-16", file: "../newsletter_market_mayhem_feb_16_2026.html", type: "Newsletter", risk: "HIGH" },
+            { title: "Market Mayhem: Mar 10, 2026", date: "2026-03-10", file: "../newsletter_market_mayhem_mar_10_2026.html", type: "Newsletter", risk: "ELEVATED" },
+            { title: "Sovereign AI Supercycle", date: "2026-03-27", file: "../market_mayhem_20251210.html", type: "Daily Briefing", risk: "MEDIUM" },
+            { title: "Market Mayhem: Jan 31, 2026", date: "2026-01-31", file: "../newsletter_market_mayhem_jan_31_2026.html", type: "Newsletter", risk: "HIGH" },
+            { title: "Special Edition: Rates Shock", date: "2025-09-19", file: "../newsletter_market_mayhem_special_edition.html", type: "Deep Dive", risk: "CRITICAL" },
+            { title: "Market Mayhem: Dec 2025 Wrap", date: "2025-12-31", file: "../market_mayhem_newsletter_july_2025.html", type: "Wrap-up", risk: "LOW" }
+        ];
+
+        const archiveReports = [
+            { title: "Black Monday", date: "1987-10-23", file: "../1987-10-23_market_mayhem.html", type: "Historical" },
+            { title: "Dot Com Bubble Peak", date: "2000-03-15", file: "../newsletter_market_mayhem_mar_2000.html", type: "Historical" },
+            { title: "Lehman Collapse", date: "2008-09-19", file: "../2008-09-19_market_mayhem.html", type: "Historical" },
+            { title: "COVID Crash Bottom", date: "2020-03-20", file: "../2020-03-20_market_mayhem.html", type: "Historical" },
+            { title: "Great Crash", date: "1929-10-29", file: "../newsletter_market_mayhem_oct_1929.html", type: "Historical" }
+        ];
+
+        function createCard(report) {
+            let riskColor = "text-gray-400";
+            if(report.risk === "CRITICAL") riskColor = "text-brand-purple font-bold";
+            if(report.risk === "HIGH") riskColor = "text-brand-red";
+            if(report.risk === "ELEVATED") riskColor = "text-brand-orange";
+
+            return `
+                <div class="glass-panel mayhem-card p-4 rounded cursor-pointer h-full flex flex-col justify-between" onclick="openReport('${report.file}', '${report.title}')">
+                    <div>
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="text-xs font-mono px-2 py-0.5 rounded bg-dark-800 border border-gray-700 text-gray-300">${report.type}</span>
+                            ${report.risk ? `<span class="text-xs font-mono ${riskColor}">[${report.risk}]</span>` : ''}
+                        </div>
+                        <h4 class="font-bold text-white text-sm mb-1 line-clamp-2">${report.title}</h4>
+                    </div>
+                    <div class="text-xs font-mono text-gray-500 mt-3 flex items-center gap-1">
+                        <i data-lucide="calendar" class="w-3 h-3"></i> ${report.date}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderGrids() {
+            // Dashboard recent
+            const recentGrid = document.getElementById('recent-reports-grid');
+            recentGrid.innerHTML = mockReports.slice(0,3).map(createCard).join('');
+
+            // All reports
+            const allGrid = document.getElementById('all-reports-grid');
+            allGrid.innerHTML = [...mockReports, ...mockReports].map(createCard).join(''); // Duplicate for volume demo
+
+            // Archive
+            const archGrid = document.getElementById('archive-grid');
+            archGrid.innerHTML = archiveReports.map(createCard).join('');
+
+            lucide.createIcons();
+        }
+
+        // Initialize Volatility Chart
+        function initChart() {
+            const ctx = document.getElementById('volChart').getContext('2d');
+
+            // Generative data
+            const labels = Array.from({length: 30}, (_, i) => `T-${30-i}`);
+            const baseVol = 15;
+            const data1 = labels.map((_, i) => baseVol + Math.sin(i/3)*4 + Math.random()*2 + (i>20 ? i*0.5 : 0));
+            const data2 = labels.map((_, i) => baseVol + 2 + Math.cos(i/4)*3 + Math.random()*1);
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'SPX 30D Implied Vol',
+                            data: data1,
+                            borderColor: '#ff2a2a',
+                            backgroundColor: 'rgba(255, 42, 42, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.3,
+                            fill: true,
+                            pointRadius: 0,
+                            pointHoverRadius: 4
+                        },
+                        {
+                            label: 'Realized Vol (20D)',
+                            data: data2,
+                            borderColor: '#4a5568',
+                            borderWidth: 1,
+                            borderDash: [5, 5],
+                            tension: 0.3,
+                            pointRadius: 0
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            align: 'end',
+                            labels: {
+                                color: '#a0aec0',
+                                font: { family: 'JetBrains Mono', size: 10 },
+                                boxWidth: 12
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(17, 17, 22, 0.9)',
+                            titleColor: '#fff',
+                            bodyColor: '#a0aec0',
+                            borderColor: 'rgba(255, 42, 42, 0.3)',
+                            borderWidth: 1,
+                            font: { family: 'JetBrains Mono' }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                            ticks: { color: '#718096', font: { family: 'JetBrains Mono', size: 10 } }
+                        },
+                        y: {
+                            grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                            ticks: { color: '#718096', font: { family: 'JetBrains Mono', size: 10 } }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Boot
+        document.addEventListener('DOMContentLoaded', () => {
+            renderGrids();
+            initChart();
+        });
+    </script>
+</body>
+</html>

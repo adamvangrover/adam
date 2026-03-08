@@ -60,7 +60,6 @@ class MCPRegistry:
             "plan_wealth_goal": self.fo_service.plan_wealth_goal,
             "screen_deal": self.fo_service.screen_deal,
             "aggregate_family_risk": self.fo_service.aggregate_family_risk,
-
             # Optimized AWO Tools
             "universal_ingestor_scrub": self.ingest_url,
             "azure_ai_search": self.ingestor_mcp.execute,
@@ -72,7 +71,7 @@ class MCPRegistry:
             "get_asset_history": self.get_historical_data,
             "query_universal_memory": self.provo.get_ips,
             "log_provenance": self.provo.log_activity,
-            "submit_workflow_plan": self.submit_plan
+            "submit_workflow_plan": self.submit_plan,
         }
         return tools
 
@@ -99,6 +98,7 @@ class MCPRegistry:
 
             # Use Ingestor's scrubber
             from core.data_processing.universal_ingestor import GoldStandardScrubber
+
             clean_text = GoldStandardScrubber.clean_text(text)
             metadata = GoldStandardScrubber.extract_metadata(clean_text, "html")
             conviction = GoldStandardScrubber.assess_conviction(clean_text, "html")
@@ -108,24 +108,36 @@ class MCPRegistry:
                 "content": clean_text[:10000],  # Truncate for now
                 "metadata": metadata,
                 "conviction": conviction,
-                "status": "Verified"
+                "status": "Verified",
             }
         except Exception as e:
             return {"error": f"Ingestion failed: {e}"}
 
-    def run_dcf(self, free_cash_flows: list, discount_rate: float, terminal_value: float) -> Dict[str, Any]:
+    def run_dcf(
+        self, free_cash_flows: list, discount_rate: float, terminal_value: float
+    ) -> Dict[str, Any]:
         """Runs the Financial Engineering Engine DCF."""
         try:
-            val = FinancialEngineeringEngine.calculate_dcf(free_cash_flows, discount_rate, terminal_value)
+            val = FinancialEngineeringEngine.calculate_dcf(
+                free_cash_flows, discount_rate, terminal_value
+            )
             return {"present_value": val}
         except Exception as e:
             return {"error": f"DCF Calculation failed: {e}"}
 
-    def run_wacc(self, market_cap: float, total_debt: float, cost_of_equity: float, cost_of_debt: float, tax_rate: float) -> Dict[str, Any]:
+    def run_wacc(
+        self,
+        market_cap: float,
+        total_debt: float,
+        cost_of_equity: float,
+        cost_of_debt: float,
+        tax_rate: float,
+    ) -> Dict[str, Any]:
         """Runs the Financial Engineering Engine WACC."""
         try:
             val = FinancialEngineeringEngine.calculate_wacc(
-                market_cap, total_debt, cost_of_equity, cost_of_debt, tax_rate)
+                market_cap, total_debt, cost_of_equity, cost_of_debt, tax_rate
+            )
             return {"wacc": val}
         except Exception as e:
             return {"error": f"WACC Calculation failed: {e}"}
@@ -133,7 +145,9 @@ class MCPRegistry:
     def run_beta(self, asset_returns: list, market_returns: list) -> Dict[str, Any]:
         """Runs the Financial Engineering Engine Beta."""
         try:
-            val = FinancialEngineeringEngine.calculate_beta(asset_returns, market_returns)
+            val = FinancialEngineeringEngine.calculate_beta(
+                asset_returns, market_returns
+            )
             return {"beta": val}
         except Exception as e:
             return {"error": f"Beta failed: {e}"}
@@ -141,7 +155,9 @@ class MCPRegistry:
     def run_sharpe(self, returns: list, risk_free_rate: float) -> Dict[str, Any]:
         """Runs the Financial Engineering Engine Sharpe Ratio."""
         try:
-            val = FinancialEngineeringEngine.calculate_sharpe_ratio(returns, risk_free_rate)
+            val = FinancialEngineeringEngine.calculate_sharpe_ratio(
+                returns, risk_free_rate
+            )
             return {"sharpe_ratio": val}
         except Exception as e:
             return {"error": f"Sharpe failed: {e}"}
@@ -159,7 +175,9 @@ class MCPRegistry:
         # Use parameterized query equivalent via f-string since we validated inputs
         # But for full safety, if LakehouseConnector supports parameters, we should use them.
         # Assuming LakehouseConnector.execute accepts params:
-        query = "SELECT * FROM financials WHERE ticker = :ticker AND year >= :start_year"
+        query = (
+            "SELECT * FROM financials WHERE ticker = :ticker AND year >= :start_year"
+        )
         params = {"ticker": ticker, "start_year": start_year}
         return self.lakehouse.execute(query, params=params)
 
@@ -180,8 +198,8 @@ class MCPRegistry:
                     "properties": {
                         "free_cash_flows": {"type": "array"},
                         "discount_rate": {"type": "number"},
-                        "terminal_value": {"type": "number"}
-                    }
-                }
-            }
+                        "terminal_value": {"type": "number"},
+                    },
+                },
+            },
         }

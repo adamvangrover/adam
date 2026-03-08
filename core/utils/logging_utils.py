@@ -1,15 +1,23 @@
-# Verified for Adam v25.5
-# Reviewed by Jules
+"""
+Core Logging Utilities for ADAM OS.
+Provides structured, JSON-based, and narrative logging mechanisms.
+"""
 import logging
 import logging.config
 import os
 import yaml
 import json
-from datetime import datetime, timezone
+import threading
 import uuid
-from typing import Dict, Any, Optional
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Any
+from contextvars import ContextVar
 
-# Handle missing pythonjsonlogger for lightweight environments
+# Centralized Context for Trace IDs
+current_trace_id: ContextVar[str | None] = ContextVar("current_trace_id", default=None)
+
+# Handle missing pythonjsonlogger gracefully
 try:
     from pythonjsonlogger import jsonlogger
     JSON_LOGGER_AVAILABLE = True
@@ -25,27 +33,37 @@ class CustomJsonFormatter(jsonlogger.JsonFormatter):
     """
     Custom JSON formatter ensuring UTC ISO timestamps and standard log levels.
     """
-    def add_fields(self, log_record: Dict[str, Any], record: logging.LogRecord, message_dict: Dict[str, Any]) -> None:
+    def add_fields(self, log_record: dict[str, Any], record: logging.LogRecord, message_dict: dict[str, Any]) -> None:
         super().add_fields(log_record, record, message_dict)
         if not log_record.get('timestamp'):
             log_record['timestamp'] = datetime.now(timezone.utc).isoformat()
         log_record['level'] = log_record.get('level', record.levelname).upper()
 
-def setup_logging(config: Optional[Dict[str, Any]] = None, default_path: str = 'config/logging.yaml', default_level: int = logging.INFO, env_key: str = 'LOG_CFG') -> None:
+        # Innovator: Auto-inject trace ID if present in context
+        trace_id = current_trace_id.get()
+        if trace_id and 'trace_id' not in log_record:
+            log_record['trace_id'] = trace_id
+
+def setup_logging(config: dict[str, Any] | None = None, default_path: str = 'config/logging.yaml', default_level: int = logging.INFO, env_key: str = 'LOG_CFG') -> None:
     """
     Configure application logging via YAML config file or fallback to sensible defaults.
     """
-    path = os.getenv(env_key, default_path)
+    path = Path(os.getenv(env_key, default_path))
 
-    if os.path.exists(path):
+    if config:
+        logging.config.dictConfig(config)
+        logging.info("Logging configured from provided dictionary.")
+        return
+
+    if path.exists():
         try:
-            with open(path, 'rt') as f:
+            with path.open('rt') as f:
                 config_data = yaml.safe_load(f)
-                logging.config.dictConfig(config_data)
-                logging.info(f"Logging configured from {path}")
+            logging.config.dictConfig(config_data)
+            logging.info(f"Logging configured from {path}")
         except Exception as e:
-            print(f"Error loading logging config from {path}: {e}")
             logging.basicConfig(level=default_level)
+            logging.error(f"Failed to load logging config from {path}: {e}. Defaulting to basic config.")
     else:
         root_logger = logging.getLogger()
         root_logger.setLevel(default_level)
@@ -70,7 +88,7 @@ class MilestoneLogger(logging.LoggerAdapter):
     """
     Logger adapter to visually highlight key execution milestones.
     """
-    def milestone(self, msg: str, *args, **kwargs) -> None:
+    def milestone(self, msg: str, *args: Any, **kwargs: Any) -> None:
         """Log a milestone message as INFO level with a checkmark."""
         self.info(f"✅ Milestone: {msg}", *args, **kwargs)
 
@@ -82,15 +100,15 @@ def get_milestone_logger(name: str) -> MilestoneLogger:
 
 class TraceLogger:
     """
-    Specialized logger for recording agent reasoning traces and state transitions.
+    Specialized in-memory logger for recording reasoning traces and agent state transitions.
     Provides auditability and 'Thought Process' visualization capabilities.
     """
-    def __init__(self, trace_id: Optional[str] = None):
-        self.trace_id = trace_id or str(uuid.uuid4())
+    def __init__(self, trace_id: str | None = None):
+        self.trace_id = trace_id or current_trace_id.get() or str(uuid.uuid4())
         self.logger = logging.getLogger("TraceLogger")
-        self.steps = []
+        self.steps: list[dict[str, Any]] = []
 
-    def log_step(self, agent_name: str, step_name: str, inputs: Dict[str, Any], outputs: Dict[str, Any], metadata: Optional[Dict[str, Any]] = None) -> None:
+    def log_step(self, agent_name: str, step_name: str, inputs: dict[str, Any], outputs: dict[str, Any], metadata: dict[str, Any] | None = None) -> None:
         """
         Record a single execution step within the current trace.
         """
@@ -106,25 +124,32 @@ class TraceLogger:
         self.steps.append(entry)
         self.logger.info("Agent Step", extra=entry)
 
-    def get_trace(self) -> list:
+    def get_trace(self) -> list[dict[str, Any]]:
         """Retrieve the sequence of logged steps."""
         return self.steps
 
+    def clear_trace(self) -> None:
+        """Optimizer: Clear memory to prevent leaks in long-running processes."""
+        self.steps.clear()
+
 class SwarmLogger:
     """
-    Singleton structured telemetry logger for Agent Swarm execution.
-    Persists JSONL events to disk for analysis and UI visualization.
+    Singleton thread-safe structured telemetry logger for Agent Swarm execution.
+    Persists JSONL events to disk for downstream analysis and UI visualization.
     """
     _instance = None
+    _lock = threading.Lock()
 
-    def __new__(cls, log_file: str = "logs/swarm_telemetry.jsonl"):
-        if cls._instance is None:
-            cls._instance = super(SwarmLogger, cls).__new__(cls)
-            cls._instance.log_file = log_file
-            os.makedirs(os.path.dirname(log_file), exist_ok=True)
-        return cls._instance
+    def __new__(cls, log_file: str | Path = "logs/swarm_telemetry.jsonl"):
+        with cls._lock:
+            if cls._instance is None:
+                cls._instance = super(SwarmLogger, cls).__new__(cls)
+                cls._instance.log_file = Path(log_file)
+                cls._instance.log_file.parent.mkdir(parents=True, exist_ok=True)
+                cls._instance._write_lock = threading.Lock()
+            return cls._instance
 
-    def _default_serializer(self, obj: Any) -> Any:
+    def _serialize(self, obj: Any) -> Any:
         """Fallback serializer for complex objects like Pydantic models."""
         if hasattr(obj, "model_dump"):
             return obj.model_dump()
@@ -132,7 +157,7 @@ class SwarmLogger:
             return obj.dict()
         return str(obj)
 
-    def log_event(self, event_type: str, agent_id: str, details: Dict[str, Any]) -> None:
+    def log_event(self, event_type: str, agent_id: str, details: dict[str, Any]) -> None:
         """
         Record and persist a structured agent event to the telemetry log.
         """
@@ -140,14 +165,16 @@ class SwarmLogger:
             "timestamp": datetime.now(timezone.utc).isoformat(),
             "event_type": event_type,
             "agent_id": agent_id,
-            "details": details
+            "details": details,
+            "trace_id": current_trace_id.get()
         }
 
         try:
-            with open(self.log_file, "a") as f:
-                f.write(json.dumps(entry, default=self._default_serializer) + "\n")
-
-            logging.info(f"[{event_type}] {agent_id}: {json.dumps(details, default=self._default_serializer)}")
+            line = json.dumps(entry, default=self._serialize)
+            with self._write_lock:
+                with self.log_file.open("a") as f:
+                    f.write(line + "\n")
+            logging.info(f"[{event_type}] {agent_id}: {line}")
         except Exception as e:
             logging.error(f"Failed to write swarm telemetry event: {e}")
 
@@ -155,30 +182,31 @@ class SwarmLogger:
         """Helper to log internal agent reasoning (THOUGHT_TRACE)."""
         self.log_event("THOUGHT_TRACE", agent_id, {"content": thought})
 
-    def log_tool(self, agent_id: str, tool_name: str, params: Dict[str, Any]) -> None:
+    def log_tool(self, agent_id: str, tool_name: str, params: dict[str, Any]) -> None:
         """Helper to log tool execution (TOOL_EXECUTION)."""
         self.log_event("TOOL_EXECUTION", agent_id, {"tool": tool_name, "parameters": params})
 
 class NarrativeLogger:
     """
     Protocol: ADAM-V-NEXT
+    Logs events as a cohesive story for System 2 human-readable audits.
     Enforces 'Narrative Logging' structure: Event -> Analysis -> Decision -> Outcome.
     """
     def __init__(self, logger_name: str = "Narrative"):
         self.logger = logging.getLogger(logger_name)
 
-    def log_narrative(self, event: str, analysis: str, decision: str, outcome: str, metadata: Optional[Dict[str, Any]] = None) -> None:
+    def log_narrative(self, event: str, analysis: str, decision: str, outcome: str, metadata: dict[str, Any] | None = None) -> None:
         """
         Log a complete, structured narrative execution arc.
         """
         story = {
             "chapter": "Execution Arc",
             "timestamp": datetime.now(timezone.utc).isoformat(),
-            "trace_id": str(uuid.uuid4()),
-            "Event": event,
-            "Analysis": analysis,
-            "Decision": decision,
-            "Outcome": outcome,
-            "Metadata": metadata or {}
+            "trace_id": current_trace_id.get() or str(uuid.uuid4()),
+            "1_Event": event,
+            "2_Analysis": analysis,
+            "3_Decision": decision,
+            "4_Outcome": outcome,
+            "5_Metadata": metadata or {}
         }
         self.logger.info(f"NARRATIVE:\n{json.dumps(story, indent=2)}")
