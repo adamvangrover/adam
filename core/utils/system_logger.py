@@ -1,54 +1,78 @@
 import json
-import os
 import sys
 from datetime import datetime, timezone
-
-try:
-    from zoneinfo import ZoneInfo
-except ImportError:
-    # Fallback for environments without zoneinfo
-    # Returns UTC timezone object which is a valid tzinfo
-    def ZoneInfo(key):
-        return timezone.utc
+from pathlib import Path
+from typing import Any, Dict, List, Optional
+from zoneinfo import ZoneInfo
 
 class SystemLogger:
-    def __init__(self, log_file="logs/system_events.jsonl"):
-        self.log_file = log_file
-        # Ensure directory exists
-        if os.path.dirname(log_file):
-            os.makedirs(os.path.dirname(log_file), exist_ok=True)
+    """
+    A robust system logger designed to record and consolidate system events.
 
-    def log_event(self, tag: str, details: dict):
+    This logger manages a JSON Lines file where each line represents a distinct event.
+    It provides capabilities to log structured data and later consolidate these logs
+    into a comprehensive system state representation.
+    """
+    def __init__(self, log_file: str = "logs/system_events.jsonl") -> None:
         """
-        Log an event with a specific tag (BRANCH, PUSH, PULL, DELETION, CREATION, AGENT_INTERACTION, RUNTIME, SERVER_BUILD).
+        Initializes the SystemLogger.
+
+        Args:
+            log_file: The path to the log file. Defaults to 'logs/system_events.jsonl'.
+        """
+        self.log_file = Path(log_file)
+        self.log_file.parent.mkdir(parents=True, exist_ok=True)
+
+    def log_event(self, tag: str, details: Dict[str, Any]) -> None:
+        """
+        Logs a specific event with a given tag and details.
+
+        Args:
+            tag: A string categorizing the event (e.g., 'BRANCH', 'AGENT_INTERACTION').
+            details: A dictionary containing the specific details of the event.
         """
         entry = {
             "timestamp": datetime.now(timezone.utc).isoformat(),
             "tag": tag,
             "details": details
         }
-        with open(self.log_file, "a") as f:
+
+        with self.log_file.open("a", encoding="utf-8") as f:
             f.write(json.dumps(entry) + "\n")
 
-        # If running as script, output to stdout too
+        # Output to stdout if running as main script
         if __name__ == "__main__":
             print(json.dumps(entry))
 
-    def consolidate_logs(self):
+    def _read_events(self) -> List[Dict[str, Any]]:
         """
-        Consolidate logs into a single immutable system state file using the provided logic.
+        Internal helper to read and parse all valid JSON events from the log file.
+
+        Returns:
+            A list of dictionary objects representing the events.
         """
-        # Read events
-        events = []
-        if os.path.exists(self.log_file):
-            with open(self.log_file, "r") as f:
+        events: List[Dict[str, Any]] = []
+        if self.log_file.exists():
+            with self.log_file.open("r", encoding="utf-8") as f:
                 for line in f:
-                    try:
-                        line = line.strip()
-                        if line:
+                    line = line.strip()
+                    if line:
+                        try:
                             events.append(json.loads(line))
-                    except json.JSONDecodeError:
-                        continue
+                        except json.JSONDecodeError:
+                            # Skip malformed lines to ensure resilience
+                            continue
+        return events
+
+    def consolidate_logs(self) -> None:
+        """
+        Consolidates all logged events into a master system state file.
+
+        This method retrieves all valid events and wraps them, along with
+        simulated market data payloads, into a comprehensive JSON file representing
+        the system's current state.
+        """
+        events = self._read_events()
 
         # Create mock payload structure if real data isn't provided (for demonstration of structure)
         # In a real scenario, this might load current state from other files.
@@ -59,11 +83,16 @@ class SystemLogger:
             "system_events": events
         }
 
-        # Use provided logic
         create_timestamped_system_file(payload)
 
-def create_timestamped_system_file(input_data: dict, output_filename: str = None):
-    # Set current time (Feb 21, 2026 13:53 EST / 18:53 UTC)
+def create_timestamped_system_file(input_data: Dict[str, Any], output_filename: Optional[str] = None) -> None:
+    """
+    Wraps input data into a master system payload with current timestamps and saves it to a file.
+
+    Args:
+        input_data: A dictionary containing the system state data to be timestamped and saved.
+        output_filename: The desired output filename. If not provided, it generates one based on the timestamp.
+    """
     try:
         est_zone = ZoneInfo("America/New_York")
     except Exception:
@@ -75,22 +104,18 @@ def create_timestamped_system_file(input_data: dict, output_filename: str = None
 
     # 1. Update Market Mayhem Metadata
     if "market_mayhem_dec_2025.json" in input_data:
-        # Update the timestamp
-        if "v23_knowledge_graph" not in input_data["market_mayhem_dec_2025.json"]:
-             input_data["market_mayhem_dec_2025.json"]["v23_knowledge_graph"] = {}
-        if "meta" not in input_data["market_mayhem_dec_2025.json"]["v23_knowledge_graph"]:
-             input_data["market_mayhem_dec_2025.json"]["v23_knowledge_graph"]["meta"] = {}
+        market_mayhem = input_data.setdefault("market_mayhem_dec_2025.json", {})
+        knowledge_graph = market_mayhem.setdefault("v23_knowledge_graph", {})
+        meta = knowledge_graph.setdefault("meta", {})
 
-        input_data["market_mayhem_dec_2025.json"]["v23_knowledge_graph"]["meta"]["generated_at"] = current_time_utc_iso
-
-        # Rename the key to reflect the current system state
+        meta["generated_at"] = current_time_utc_iso
         input_data["market_mayhem_current.json"] = input_data.pop("market_mayhem_dec_2025.json")
 
     # 2. Update Market State Metadata
     if "market_state.json" in input_data:
-        if "metadata" not in input_data["market_state.json"]:
-            input_data["market_state.json"]["metadata"] = {}
-        input_data["market_state.json"]["metadata"]["generated_at"] = current_time_utc_iso
+        market_state = input_data.setdefault("market_state.json", {})
+        metadata = market_state.setdefault("metadata", {})
+        metadata["generated_at"] = current_time_utc_iso
 
     # 3. Update Retail Alpha Timestamp
     if "retail_alpha.json" in input_data:
@@ -112,7 +137,9 @@ def create_timestamped_system_file(input_data: dict, output_filename: str = None
         output_filename = f"system_state_{timestamp_str}.json"
 
     # Write to disk
-    with open(output_filename, 'w') as f:
+    output_path = Path(output_filename)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    with output_path.open('w', encoding="utf-8") as f:
         json.dump(system_payload, f, indent=2)
 
     print(f"Successfully generated populated system file: {output_filename}")
