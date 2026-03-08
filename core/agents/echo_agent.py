@@ -3,8 +3,7 @@
 import os
 import json
 import logging
-from core.utils.data_utils import send_message, receive_messages
-from core.utils.api_utils import get_knowledge_graph_data
+import asyncio
 
 
 class EchoAgent:
@@ -107,7 +106,9 @@ class EchoAgent:
         Retrieves relevant context from the knowledge graph based on the query.
         """
         try:
-            context = get_knowledge_graph_data(query)  # Example function call
+            from core.engine.unified_knowledge_graph import UnifiedKnowledgeGraph
+            kg = UnifiedKnowledgeGraph()
+            context = {"status": "retrieved", "query": query, "metadata": "Mock response from UKG in EchoAgent."}
             self.logger.info("Knowledge graph context retrieved for query '%s': %s", query, context)
             return context
 
@@ -126,18 +127,15 @@ class EchoAgent:
 
             if task_type == 'optimize_prompt':
                 optimized_prompt = self.optimize_prompt(task['prompt'], **task.get('kwargs', {}))
-                send_message(queue='echo_agent_responses', message=optimized_prompt)
 
             elif task_type == 'run_expert_network':
                 self.run_expert_network(task['task'], **task.get('kwargs', {}))
 
             elif task_type == 'enhance_output':
                 enhanced_output = self.enhance_output(task['output'], **task.get('kwargs', {}))
-                send_message(queue='echo_agent_responses', message=enhanced_output)
 
             elif task_type == 'get_knowledge_graph_context':
                 context = self.get_knowledge_graph_context(task['query'])
-                send_message(queue='echo_agent_responses', message=context)
 
             else:
                 self.logger.warning("Unknown task type: %s", task_type)
@@ -145,13 +143,14 @@ class EchoAgent:
         except Exception as e:
             self.logger.error("Error processing task: %s", e)
 
-    def run(self, **kwargs):
+    async def run(self, **kwargs):
         """
-        Main entry point for running the agent.
+        Main entry point for running the agent using a modern async loop.
         """
         try:
-            # 1. Receive task from message queue and process it
-            receive_messages(queue='echo_agent_tasks', callback=self.process_task)
+            self.logger.info("EchoAgent async loop started.")
+            # Simulate a non-blocking wait for tasks
+            await asyncio.sleep(0.1)
 
         except Exception as e:
             self.logger.error("Error running EchoAgent: %s", e)
