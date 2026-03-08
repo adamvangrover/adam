@@ -2,7 +2,7 @@ import unittest
 import json
 import asyncio
 from datetime import datetime
-from core.schemas.hnasp import HNASP, Meta, PersonaState, LogicLayer, ContextStream, Turn
+from core.schemas.hnasp import HNASPState as HNASP, Meta, PersonaState, LogicLayer, ContextStream, Turn
 from core.hnasp.logic_engine import LogicEngine
 from core.hnasp.personality import BayesACTEngine
 from core.agents.hnasp_agent import HNASPAgent
@@ -25,7 +25,7 @@ class TestHNASP(unittest.TestCase):
     def test_bayes_act_engine(self):
         engine = BayesACTEngine()
         state = HNASP(
-            meta=Meta(agent_id="test", trace_id="1", timestamp=datetime.now(), model_config={
+            meta=Meta(agent_id="test", trace_id="1", timestamp=datetime.now(), model_config_meta={
                       "model": "test"}, security_context={"user_id": "u", "clearance": "low"}),
             persona_state=PersonaState(
                 identities={
