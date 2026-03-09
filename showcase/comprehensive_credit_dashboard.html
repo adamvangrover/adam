@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comprehensive Credit Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #121212; color: #e0e0e0; margin: 0; padding: 20px; }
+        .container { max-width: 1400px; margin: 0 auto; }
+        .header { border-bottom: 1px solid #333; padding-bottom: 20px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: flex-end; }
+        .header h1 { margin: 0; color: #fff; font-size: 28px; }
+        .header p { margin: 5px 0 0 0; color: #9ca3af; }
+        .card { background: #1e1e1e; border: 1px solid #333; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        .card h2 { margin-top: 0; color: #4ade80; border-bottom: 1px solid #333; padding-bottom: 10px; font-size: 18px; text-transform: uppercase; letter-spacing: 0.05em; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+        .stat { display: flex; justify-content: space-between; border-bottom: 1px dashed #333; padding: 8px 0; }
+        .stat:last-child { border-bottom: none; }
+        .stat-label { color: #9ca3af; font-size: 14px; }
+        .stat-value { font-weight: bold; color: #fff; font-size: 14px; text-align: right; }
+        .section-content { margin-top: 10px; white-space: pre-wrap; font-family: "JetBrains Mono", monospace; font-size: 13px; color: #d1d5db; background: #000; padding: 15px; border-radius: 4px; border: 1px solid #333; overflow-x: auto; }
+        .tabs { display: flex; border-bottom: 1px solid #333; margin-bottom: 15px; }
+        .tab { padding: 10px 20px; cursor: pointer; color: #9ca3af; font-size: 14px; font-weight: 500; transition: all 0.2s; }
+        .tab:hover { color: #fff; }
+        .tab.active { color: #4ade80; border-bottom: 2px solid #4ade80; }
+        .facility { background: #2a2a2a; padding: 15px; border-radius: 4px; margin-bottom: 10px; border-left: 3px solid #3b82f6; }
+        .facility-title { font-size: 16px; font-weight: bold; color: #fff; margin-bottom: 10px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
+        th, td { text-align: right; padding: 10px; border-bottom: 1px solid #333; }
+        th:first-child, td:first-child { text-align: left; }
+        th { color: #9ca3af; font-weight: 600; text-transform: uppercase; font-size: 11px; letter-spacing: 0.05em; }
+        tbody tr:hover { background-color: #2a2a2a; }
+        .positive { color: #4ade80; }
+        .negative { color: #ef4444; }
+        .memo-selector { width: 100%; padding: 12px; background: #000; color: #4ade80; border: 1px solid #333; border-radius: 4px; margin-bottom: 20px; font-size: 16px; font-family: "JetBrains Mono", monospace; outline: none; }
+        .memo-selector:focus { border-color: #4ade80; box-shadow: 0 0 0 1px #4ade80; }
+
+        .sensitivity-table th, .sensitivity-table td { text-align: center; border: 1px solid #444; }
+        .sensitivity-table th { background: #2a2a2a; color: #fff; }
+        .critique-box { background: rgba(59, 130, 246, 0.1); border: 1px solid #3b82f6; border-radius: 4px; padding: 15px; margin-top: 15px; }
+        .critique-title { color: #60a5fa; font-weight: bold; margin-bottom: 10px; display: flex; align-items: center; }
+        .critique-title::before { content: "⚡"; margin-right: 8px; }
+        .chart-container { position: relative; height: 250px; width: 100%; margin-top: 15px; }
+
+        @media (max-width: 1024px) {
+            .grid-3 { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1>Comprehensive Credit Console</h1>
+                <p>Unified Intelligent Credit Assessment Terminal (v2.0)</p>
+            </div>
+            <div style="text-align: right; font-family: monospace; color: #4ade80;">
+                <div>STATUS: <span style="color: #fff">ONLINE</span></div>
+                <div>SECURE: <span style="color: #fff">ENCRYPTED</span></div>
+            </div>
+        </div>
+
+        <select id="memoSelect" class="memo-selector">
+            <option value="">INITIALIZING TERMINAL... SELECT ENTITY</option>
+        </select>
+
+        <div id="dashboardContent" style="display: none;">
+            <!-- Top Row Stats -->
+            <div class="grid" style="grid-template-columns: 1fr 1fr 1.5fr;">
+                <div class="card">
+                    <h2 id="borrowerName">ENTITY IDENTIFIER</h2>
+                    <div class="stat"><span class="stat-label">Sector</span><span class="stat-value" id="sector"></span></div>
+                    <div class="stat"><span class="stat-label">Risk Score</span><span class="stat-value" id="riskScore" style="color: #4ade80; font-size: 18px;"></span></div>
+                    <div class="stat"><span class="stat-label">Report Date</span><span class="stat-value" id="reportDate"></span></div>
+                    <div class="stat"><span class="stat-label">Implied Rating</span><span class="stat-value" id="impliedRating"></span></div>
+                </div>
+
+                <div class="card">
+                    <h2>Market Context</h2>
+                    <div class="stat"><span class="stat-label">Market Cap</span><span class="stat-value" id="marketCap"></span></div>
+                    <div class="stat"><span class="stat-label">Share Price</span><span class="stat-value" id="sharePrice"></span></div>
+                    <div class="stat"><span class="stat-label">P/E Ratio</span><span class="stat-value" id="peRatio"></span></div>
+                    <div class="stat"><span class="stat-label">Beta</span><span class="stat-value" id="beta"></span></div>
+                </div>
+
+                <div class="card">
+                    <h2>System 2 Critique</h2>
+                    <div class="critique-box">
+                        <div class="critique-title">Verification Engine</div>
+                        <div id="sys2CritiquePoints" style="font-size: 13px; color: #e2e8f0; margin-bottom: 10px; line-height: 1.5;"></div>
+                        <div class="stat" style="border-bottom: none; padding-bottom: 0;"><span class="stat-label">Conviction Score</span><span class="stat-value" id="convictionScore" style="color: #fbbf24;"></span></div>
+                        <div class="stat" style="border-bottom: none; padding-top: 5px;"><span class="stat-label">Variance Flag</span><span class="stat-value" id="varianceFlag" style="font-size: 11px;"></span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Interactive Area -->
+            <div class="card">
+                <h2>Intelligence Modules</h2>
+                <div class="tabs" id="moduleTabs">
+                    <!-- Tabs will be generated here -->
+                </div>
+                <div id="moduleContent" class="section-content">
+                    Loading module data...
+                </div>
+            </div>
+
+            <!-- Financials & Charts -->
+            <div class="grid-3">
+                <div class="card" style="grid-column: span 2;">
+                    <h2>Historical & Forecast Financials (EBITDA vs FCF)</h2>
+                    <div class="chart-container">
+                        <canvas id="financialChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>Consensus Estimates (N+3)</h2>
+                    <div style="overflow-x: auto;">
+                        <table id="consensusTable">
+                            <thead>
+                                <tr>
+                                    <th>Year</th>
+                                    <th>Rev (Mean)</th>
+                                    <th>EBITDA (Mean)</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Valuation & Sensitivity -->
+            <div class="grid">
+                <div class="card">
+                    <h2>DCF Valuation Summary</h2>
+                    <div class="stat"><span class="stat-label">Enterprise Value</span><span class="stat-value" id="dcfEv"></span></div>
+                    <div class="stat"><span class="stat-label">Implied Share Price</span><span class="stat-value" id="dcfSharePrice" style="color: #3b82f6; font-size: 16px;"></span></div>
+                    <div class="stat"><span class="stat-label">WACC (Base)</span><span class="stat-value" id="wacc"></span></div>
+                    <div class="stat"><span class="stat-label">Term. Growth Rate</span><span class="stat-value" id="growthRate"></span></div>
+
+                    <h3 style="color: #9ca3af; font-size: 14px; margin-top: 20px; border-bottom: 1px solid #333; padding-bottom: 5px;">Monte Carlo Scenarios (FCF Yr 5)</h3>
+                    <div id="mcScenarios"></div>
+                </div>
+
+                <div class="card">
+                    <h2>DCF Sensitivity Matrix (Implied Price)</h2>
+                    <div style="overflow-x: auto;">
+                        <table id="sensitivityTable" class="sensitivity-table">
+                            <!-- Generated via JS -->
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Debt Facilities & Peers -->
+            <div class="grid">
+                <div class="card">
+                    <h2>Debt Facilities (Capital Structure)</h2>
+                    <div id="facilitiesContainer"></div>
+                </div>
+
+                <div class="card">
+                    <h2>Peer Set Comparison</h2>
+                    <div style="overflow-x: auto;">
+                        <table id="peerTable">
+                            <thead>
+                                <tr>
+                                    <th>Peer</th>
+                                    <th>Mkt Cap</th>
+                                    <th>EV/EBITDA</th>
+                                    <th>Leverage</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let allMemos = [];
+        let currentMemo = null;
+        let finChart = null;
+
+        async function init() {
+            try {
+                const response = await fetch('data/unified_credit_memos.json');
+                allMemos = await response.json();
+
+                const select = document.getElementById('memoSelect');
+                select.innerHTML = '<option value="">[AWAITING SELECTION] SELECT TARGET ENTITY...</option>';
+
+                allMemos.forEach((memo, index) => {
+                    const option = document.createElement('option');
+                    option.value = index;
+                    option.textContent = `> ${memo.ticker || memo.borrower_name} | ${memo.borrower_name} | RSK: ${memo.risk_score}`;
+                    select.appendChild(option);
+                });
+
+                select.addEventListener('change', (e) => {
+                    if (e.target.value !== "") {
+                        renderDashboard(allMemos[e.target.value]);
+                    } else {
+                        document.getElementById('dashboardContent').style.display = 'none';
+                    }
+                });
+
+            } catch (err) {
+                console.error("Failed to load memos:", err);
+                document.getElementById('memoSelect').innerHTML = '<option>CRITICAL ERROR: FAILED TO LOAD DATA STREAM</option>';
+            }
+        }
+
+        function formatCurrency(num) {
+            if (num === undefined || num === null) return 'N/A';
+            if (num >= 1000000) return '$' + (num / 1000000).toFixed(2) + 'T';
+            if (num >= 1000) return '$' + (num / 1000).toFixed(2) + 'B';
+            return '$' + num.toLocaleString();
+        }
+
+        function renderDashboard(memo) {
+            currentMemo = memo;
+            document.getElementById('dashboardContent').style.display = 'block';
+
+            // Top Level Stats
+            document.getElementById('borrowerName').textContent = memo.borrower_name;
+            document.getElementById('sector').textContent = memo.borrower_details?.sector || 'N/A';
+            document.getElementById('riskScore').textContent = memo.risk_score || 'N/A';
+            document.getElementById('reportDate').textContent = memo.report_date ? new Date(memo.report_date).toLocaleDateString() : 'N/A';
+
+            let impliedRating = memo.pd_model?.implied_rating || 'N/A';
+            document.getElementById('impliedRating').textContent = impliedRating;
+            document.getElementById('impliedRating').style.color = (impliedRating.includes('A') || impliedRating.includes('B')) && !impliedRating.includes('C') ? '#4ade80' : '#fbbf24';
+
+            // System 2 Critique
+            const sys2 = memo.system_two_critique || {};
+            const points = sys2.critique_points || [];
+            document.getElementById('sys2CritiquePoints').innerHTML = points.map(p => `• ${p}`).join('<br>');
+            document.getElementById('convictionScore').textContent = sys2.conviction_score ? (sys2.conviction_score * 100).toFixed(0) + '%' : 'N/A';
+            document.getElementById('varianceFlag').textContent = sys2.quantitative_analysis?.variance_analysis || 'No flags.';
+
+            // Market Data
+            const mkt = memo.equity_data || {};
+            document.getElementById('marketCap').textContent = formatCurrency(mkt.market_cap);
+            document.getElementById('sharePrice').textContent = mkt.share_price ? `$${mkt.share_price.toFixed(2)}` : 'N/A';
+            document.getElementById('peRatio').textContent = mkt.pe_ratio ? mkt.pe_ratio.toFixed(1) : 'N/A';
+            document.getElementById('beta').textContent = mkt.beta ? mkt.beta.toFixed(2) : 'N/A';
+
+            // DCF
+            const dcf = memo.dcf_analysis || {};
+            document.getElementById('dcfEv').textContent = formatCurrency(dcf.enterprise_value);
+            document.getElementById('dcfSharePrice').textContent = dcf.share_price ? `$${dcf.share_price.toFixed(2)}` : 'N/A';
+            document.getElementById('wacc').textContent = dcf.wacc ? `${(dcf.wacc * 100).toFixed(1)}%` : 'N/A';
+            document.getElementById('growthRate').textContent = dcf.growth_rate ? `${(dcf.growth_rate * 100).toFixed(1)}%` : 'N/A';
+
+            // Modules (Tabs)
+            const tabsContainer = document.getElementById('moduleTabs');
+            tabsContainer.innerHTML = '';
+            const sections = memo.sections || [];
+
+            if (sections.length > 0) {
+                sections.forEach((sec, idx) => {
+                    const tab = document.createElement('div');
+                    tab.className = `tab ${idx === 0 ? 'active' : ''}`;
+                    tab.textContent = sec.title;
+                    tab.onclick = () => {
+                        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                        tab.classList.add('active');
+                        document.getElementById('moduleContent').textContent = sec.content;
+                    };
+                    tabsContainer.appendChild(tab);
+                });
+                document.getElementById('moduleContent').textContent = sections[0].content;
+            } else {
+                document.getElementById('moduleContent').textContent = "NO MODULE DATA AVAILABLE FOR THIS ENTITY.";
+            }
+
+            // Facilities
+            const facContainer = document.getElementById('facilitiesContainer');
+            facContainer.innerHTML = '';
+            const facilities = memo.debt_facilities || [];
+            if (facilities.length > 0) {
+                facilities.forEach(fac => {
+                    const div = document.createElement('div');
+                    div.className = 'facility';
+                    div.innerHTML = `
+                        <div class="facility-title">${fac.facility_type}</div>
+                        <div class="stat"><span class="stat-label">Committed</span><span class="stat-value">${formatCurrency(fac.amount_committed)}</span></div>
+                        <div class="stat"><span class="stat-label">LGD / Recovery</span><span class="stat-value">${fac.lgd ? (fac.lgd * 100).toFixed(1) + '%' : 'N/A'} / ${fac.recovery_rate ? (fac.recovery_rate * 100).toFixed(1) + '%' : 'N/A'}</span></div>
+                        <div class="stat"><span class="stat-label">Agent Conviction</span><span class="stat-value">${fac.conviction_score ? (fac.conviction_score * 100).toFixed(0) + '%' : 'N/A'}</span></div>
+                    `;
+                    facContainer.appendChild(div);
+                });
+            } else {
+                facContainer.innerHTML = '<p style="color: #9ca3af; font-family: monospace;">No facility data extracted.</p>';
+            }
+
+            // Peers
+            const peerTbody = document.querySelector('#peerTable tbody');
+            peerTbody.innerHTML = '';
+            const peers = memo.peer_comps || [];
+            peers.forEach(peer => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${peer.name || peer.ticker}</strong></td>
+                    <td>${formatCurrency(peer.market_cap)}</td>
+                    <td>${peer.ev_ebitda ? peer.ev_ebitda.toFixed(1) + 'x' : 'N/A'}</td>
+                    <td>${peer.leverage_ratio ? peer.leverage_ratio.toFixed(1) + 'x' : 'N/A'}</td>
+                `;
+                peerTbody.appendChild(tr);
+            });
+
+            // --- Render Enriched Data ---
+            const enriched = memo.enriched_data || {};
+
+            // Render Chart
+            renderFinancialChart(enriched.historical_series || []);
+
+            // Render Consensus
+            const consTbody = document.querySelector('#consensusTable tbody');
+            consTbody.innerHTML = '';
+            const ests = enriched.consensus_estimates || [];
+            ests.forEach(est => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${est.year}E</td>
+                    <td>${formatCurrency(est.revenue?.mean)}</td>
+                    <td>${formatCurrency(est.ebitda?.mean)}</td>
+                `;
+                consTbody.appendChild(tr);
+            });
+
+            // Render Monte Carlo summary
+            const mcContainer = document.getElementById('mcScenarios');
+            mcContainer.innerHTML = '';
+            const mc = enriched.monte_carlo_simulations || [];
+            mc.forEach(scenario => {
+                const finalYearFcf = scenario.fcf_trajectory ? scenario.fcf_trajectory[scenario.fcf_trajectory.length - 1].value : 0;
+                let color = '#fff';
+                if(scenario.scenario === 'Bull Case') color = '#4ade80';
+                if(scenario.scenario === 'Bear Case') color = '#ef4444';
+
+                const div = document.createElement('div');
+                div.className = 'stat';
+                div.style.borderBottom = 'none';
+                div.style.padding = '4px 0';
+                div.innerHTML = `<span class="stat-label">${scenario.scenario}</span><span class="stat-value" style="color:${color}">${formatCurrency(finalYearFcf)}</span>`;
+                mcContainer.appendChild(div);
+            });
+
+            // Render Sensitivity Matrix
+            const sensTable = document.getElementById('sensitivityTable');
+            sensTable.innerHTML = '';
+            const dcfSens = enriched.dcf_sensitivity || {};
+            if (dcfSens.wacc_range && dcfSens.tgr_range && dcfSens.matrix) {
+                // Header row (TGRs)
+                let headerHTML = '<thead><tr><th>WACC \\ TGR</th>';
+                dcfSens.tgr_range.forEach(tgr => {
+                    headerHTML += `<th>${(tgr * 100).toFixed(1)}%</th>`;
+                });
+                headerHTML += '</tr></thead><tbody>';
+
+                // Body rows (WACCs)
+                let bodyHTML = '';
+                dcfSens.matrix.forEach(row => {
+                    bodyHTML += `<tr><th>${(row.wacc * 100).toFixed(1)}%</th>`;
+                    row.values.forEach(val => {
+                        const basePrice = mkt.share_price || 100;
+                        let cellColor = '#fff';
+                        if (val.implied_price > basePrice * 1.1) cellColor = '#4ade80';
+                        if (val.implied_price < basePrice * 0.9) cellColor = '#ef4444';
+
+                        bodyHTML += `<td style="color:${cellColor}">$${val.implied_price.toFixed(2)}</td>`;
+                    });
+                    bodyHTML += `</tr>`;
+                });
+                bodyHTML += '</tbody>';
+                sensTable.innerHTML = headerHTML + bodyHTML;
+            } else {
+                sensTable.innerHTML = '<tr><td style="text-align:left; border:none;">Sensitivity data unavailable.</td></tr>';
+            }
+        }
+
+        function renderFinancialChart(historicalData) {
+            const ctx = document.getElementById('financialChart').getContext('2d');
+
+            if (finChart) {
+                finChart.destroy();
+            }
+
+            if (!historicalData || historicalData.length === 0) return;
+
+            const labels = historicalData.map(d => d.year.toString());
+            const ebitdaData = historicalData.map(d => d.ebitda);
+            const fcfData = historicalData.map(d => d.fcf);
+
+            Chart.defaults.color = '#9ca3af';
+            Chart.defaults.font.family = 'system-ui, sans-serif';
+
+            finChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'EBITDA',
+                            data: ebitdaData,
+                            backgroundColor: 'rgba(59, 130, 246, 0.7)',
+                            borderColor: '#3b82f6',
+                            borderWidth: 1,
+                            borderRadius: 4
+                        },
+                        {
+                            label: 'Free Cash Flow',
+                            data: fcfData,
+                            type: 'line',
+                            borderColor: '#4ade80',
+                            backgroundColor: '#4ade80',
+                            borderWidth: 2,
+                            pointBackgroundColor: '#121212',
+                            pointBorderColor: '#4ade80',
+                            pointBorderWidth: 2,
+                            pointRadius: 4,
+                            tension: 0.3
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: { usePointStyle: true, boxWidth: 8 }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleColor: '#fff',
+                            bodyColor: '#e0e0e0',
+                            borderColor: '#333',
+                            borderWidth: 1,
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        label += formatCurrency(context.parsed.y);
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: '#333', drawBorder: false },
+                            ticks: {
+                                callback: function(value) {
+                                    if(value >= 1000) return '$' + value/1000 + 'k';
+                                    return '$' + value;
+                                }
+                            }
+                        },
+                        x: {
+                            grid: { display: false, drawBorder: false }
+                        }
+                    }
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
