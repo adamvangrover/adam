@@ -10,6 +10,7 @@ import pickle
 import os
 
 from core.agents.agent_base import AgentBase
+from core.security.safe_unpickler import SafeUnpickler
 from core.schemas.agent_schema import AgentInput, AgentOutput
 from core.data_sources.data_fetcher import DataFetcher
 
@@ -218,7 +219,7 @@ class TechnicalAnalystAgent(AgentBase):
     def load_model(self, model_path):
         if os.path.exists(model_path):
             with open(model_path, 'rb') as f:
-                return pickle.load(f)  # nosec B301
+                return SafeUnpickler(f).load()
         return None
 
     def save_model(self, model, model_path):
