@@ -1,5 +1,6 @@
 let memosData = [];
 let chartInstance = null;
+let monteCarloChartInstance = null;
 
 document.addEventListener('DOMContentLoaded', () => {
     fetch('data/unified_credit_memos.json')
@@ -111,8 +112,32 @@ function selectMemo(memo) {
     }
     document.getElementById('mc-core-metrics').innerHTML = metricsHtml;
 
+    // Sections
+    let sectionsHtml = '';
+    if (memo.sections && memo.sections.length > 0) {
+        memo.sections.forEach(sec => {
+            let icon = 'fa-file-alt';
+            let color = 'text-slate-500';
+            if (sec.title.includes('Valuation')) { icon = 'fa-calculator'; color = 'text-blue-500'; }
+            if (sec.title.includes('Regulatory')) { icon = 'fa-balance-scale'; color = 'text-green-500'; }
+            if (sec.title.includes('System 2')) { icon = 'fa-brain'; color = 'text-purple-500'; }
+            if (sec.title.includes('Risk')) { icon = 'fa-exclamation-triangle'; color = 'text-orange-500'; }
+
+            sectionsHtml += `
+                <div class="section-box">
+                    <h3 class="text-sm font-bold text-slate-300 uppercase tracking-widest mb-3 flex items-center gap-2">
+                        <i class="fas ${icon} ${color}"></i> ${sec.title}
+                    </h3>
+                    <div class="text-sm text-slate-400 whitespace-pre-wrap">${sec.content}</div>
+                </div>
+            `;
+        });
+    }
+    document.getElementById('mc-sections').innerHTML = sectionsHtml;
+
     // Financials Chart
     renderChart(memo);
+    renderMonteCarloChart(memo);
 
     // DCF
     let dcfHtml = '';
@@ -163,6 +188,30 @@ function selectMemo(memo) {
          dcfHtml = '<div class="italic text-slate-500">No DCF model available.</div>';
     }
     document.getElementById('mc-dcf-content').innerHTML = dcfHtml;
+
+    // Sensitivity Heatmap
+    let sensHtml = '';
+    if (memo.dcf_analysis && memo.dcf_analysis.sensitivity) {
+        const sens = memo.dcf_analysis.sensitivity;
+        sensHtml = `<table class="w-full text-center text-xs mono border-collapse">`;
+        sensHtml += `<thead><tr><th class="p-2 border border-slate-700 bg-slate-800 text-slate-400">WACC \\ Growth</th>`;
+        sens.growth_range.forEach(g => {
+            sensHtml += `<th class="p-2 border border-slate-700 bg-slate-800 text-slate-300">${(g*100).toFixed(1)}%</th>`;
+        });
+        sensHtml += `</tr></thead><tbody>`;
+
+        sens.wacc_range.forEach((w, i) => {
+            sensHtml += `<tr><td class="p-2 border border-slate-700 bg-slate-800 text-slate-300 font-bold">${(w*100).toFixed(1)}%</td>`;
+            sens.implied_prices[i].forEach(price => {
+                sensHtml += `<td class="p-2 border border-slate-700 text-cyan-400 font-bold">$${price.toFixed(2)}</td>`;
+            });
+            sensHtml += `</tr>`;
+        });
+        sensHtml += `</tbody></table>`;
+    } else {
+        sensHtml = '<div class="italic text-slate-500">No sensitivity matrix available.</div>';
+    }
+    document.getElementById('mc-sensitivity-content').innerHTML = sensHtml;
 
     // PD/LGD
     let pdHtml = '';
@@ -288,6 +337,58 @@ function renderChart(memo) {
             scales: {
                 y: {
                     beginAtZero: true,
+                    grid: { color: 'rgba(51, 65, 85, 0.5)' },
+                    ticks: { color: '#94a3b8', callback: function(value) { return '$' + value; } }
+                },
+                x: {
+                    grid: { display: false },
+                    ticks: { color: '#94a3b8' }
+                }
+            }
+        }
+    });
+}
+
+function renderMonteCarloChart(memo) {
+    const ctx = document.getElementById('monteCarloChart');
+    if (monteCarloChartInstance) {
+        monteCarloChartInstance.destroy();
+    }
+
+    if (!memo.dcf_analysis || !memo.dcf_analysis.monte_carlo_forecasts || memo.dcf_analysis.monte_carlo_forecasts.length === 0) {
+        ctx.style.display = 'none';
+        return;
+    }
+    ctx.style.display = 'block';
+
+    const forecasts = memo.dcf_analysis.monte_carlo_forecasts;
+    const labels = ["Year 1", "Year 2", "Year 3", "Year 4", "Year 5"];
+
+    // Create datasets - just show a subset (e.g., 20) to avoid overloading the chart
+    const datasets = forecasts.slice(0, 20).map((f, i) => ({
+        label: `Sim ${i+1}`,
+        data: f,
+        borderColor: `rgba(192, 132, 252, ${0.1 + (Math.random() * 0.3)})`, // purple-400 with varying opacity
+        borderWidth: 1,
+        fill: false,
+        pointRadius: 0, // hide points for cleaner look
+        tension: 0.4
+    }));
+
+    monteCarloChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: datasets
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false } // hide legend
+            },
+            scales: {
+                y: {
                     grid: { color: 'rgba(51, 65, 85, 0.5)' },
                     ticks: { color: '#94a3b8', callback: function(value) { return '$' + value; } }
                 },
