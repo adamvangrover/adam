@@ -10,10 +10,6 @@ logger.warning("Please use services/webapp/api.py or core/api/main.py instead.")
 warnings.warn("core/api.py is deprecated and will be removed.", DeprecationWarning, stacklevel=2)
 from core.system.agent_orchestrator import AgentOrchestrator
 from core.system.echo import Echo
-from core.utils.api_utils import (
-    get_knowledge_graph_data,
-    update_knowledge_graph_node,
-)
 from core.settings import settings
 
 app = Flask(__name__)
@@ -52,14 +48,7 @@ def api_endpoint():
         action = data.get("action")
         parameters = data.get("parameters")
 
-        if module == "knowledge_graph":
-            if action == "get_data":
-                results = get_knowledge_graph_data(**parameters)
-            elif action == "update_node":
-                results = update_knowledge_graph_node(**parameters)
-            else:
-                return jsonify({"error": "Invalid action for knowledge_graph module."}), 400
-        elif module == "agent_orchestrator":
+        if module == "agent_orchestrator":
             if action == "run_analysis":
                 results = agent_orchestrator.run_analysis(**parameters)
             else:

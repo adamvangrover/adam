@@ -3,8 +3,8 @@
 import os
 import json
 import logging
+import asyncio
 from core.utils.data_utils import send_message, receive_messages
-from core.utils.api_utils import get_knowledge_graph_data
 
 
 class EchoAgent:
@@ -107,7 +107,7 @@ class EchoAgent:
         Retrieves relevant context from the knowledge graph based on the query.
         """
         try:
-            context = get_knowledge_graph_data(query)  # Example function call
+            context = {}
             self.logger.info("Knowledge graph context retrieved for query '%s': %s", query, context)
             return context
 

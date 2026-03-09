@@ -5,7 +5,6 @@ import logging
 import asyncio
 from typing import Dict, Any, Optional
 from core.agents.agent_base import AgentBase
-from core.utils.data_utils import send_message
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -81,12 +80,6 @@ class IndustrySpecialistAgent(AgentBase):
         """
         if self.specialist:
             trends = self.specialist.analyze_industry_trends()
-            # Send trends to message queue (Legacy support)
-            try:
-                message = {'agent': 'industry_specialist_agent', 'sector': self.sector, 'trends': trends}
-                send_message(message)
-            except Exception as e:
-                logger.warning(f"Failed to send legacy message: {e}")
             return trends
         else:
             logger.warning(f"No specialist loaded for sector: {self.sector}")
@@ -104,16 +97,6 @@ class IndustrySpecialistAgent(AgentBase):
         """
         if self.specialist:
             analysis_results = self.specialist.analyze_company(company_data)
-            # Send analysis results to message queue (Legacy support)
-            try:
-                message = {
-                    'agent': 'industry_specialist_agent',
-                    'sector': self.sector,
-                    'company_analysis': analysis_results
-                }
-                send_message(message)
-            except Exception as e:
-                logger.warning(f"Failed to send legacy message: {e}")
             return analysis_results
         else:
             logger.warning(f"No specialist loaded for sector: {self.sector}")
