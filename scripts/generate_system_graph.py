@@ -344,6 +344,49 @@ def generate_graph():
                 if normalized_name in f["path"].lower():
                      edges.append({"from": agent_id, "to": f["id"], "color": "#10b981"})
 
+    # 6. Inject Consolidated Credit Memos
+    logger.info("Injecting Consolidated Credit Memos...")
+    unified_memos_path = "showcase/data/unified_credit_memos.json"
+    if os.path.exists(unified_memos_path):
+        try:
+            with open(unified_memos_path, 'r') as f:
+                memos = json.load(f)
+
+            for memo in memos:
+                ticker = memo.get("_metadata", {}).get("ticker", "UNKNOWN")
+                borrower = memo.get("borrower_name", ticker)
+                score = memo.get("_metadata", {}).get("risk_score", "N/A")
+
+                memo_id = next_id
+                next_id += 1
+
+                preview = f"Borrower: {borrower}\nTicker: {ticker}\nRisk Score: {score}"
+
+                if "pd_model" in memo and memo["pd_model"]:
+                    pd_info = memo["pd_model"]
+                    preview += f"\nImplied Rating: {pd_info.get('implied_rating')}"
+                    preview += f"\n1Y PD: {pd_info.get('one_year_pd', 0)*100:.2f}%"
+
+                if "dcf_analysis" in memo and memo["dcf_analysis"]:
+                    dcf = memo["dcf_analysis"]
+                    preview += f"\nImplied Price: ${dcf.get('share_price', 0):.2f}"
+
+                nodes.append({
+                    "id": memo_id,
+                    "label": f"MEMO: {ticker}",
+                    "group": "strategy",
+                    "shape": "box",
+                    "size": 30,
+                    "color": "#f59e0b",
+                    "level": "concept",
+                    "preview": preview
+                })
+
+                # Link to House View
+                edges.append({"from": house_view_root, "to": memo_id, "color": "#f59e0b", "dashes": True})
+        except Exception as e:
+            logger.error(f"Failed to inject unified credit memos: {e}")
+
     output = {
         "nodes": nodes,
         "edges": edges
