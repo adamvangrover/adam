@@ -75,3 +75,7 @@
 ## 2025-06-12 - [Vectorized pandas DataFrame logic in WhaleScanner]
 **Learning:** `merged.iterrows()` inside `WhaleScanner.calculate_fund_sentiment` is notoriously slow because it converts each row to a Series. Refactoring the iteration loop into a vectorized approach (`combine_first`, `fillna`, mapping columns, and `to_dict('records')`) achieves a roughly 5x performance boost with no functional changes.
 **Action:** Always prefer `to_dict(orient="records")` on filtered or mapped DataFrame subsets over `.iterrows()` when generating parsed domain models from external tabular data.
+
+## 2025-06-13 - [Vectorized historical data fetching in DataFetcher]
+**Learning:** `history_reset.iterrows()` inside `DataFetcher.fetch_historical_data` was a significant bottleneck when fetching years of daily data, taking ~0.38 seconds for 1 year of AAPL data. Refactoring to a vectorized approach mapping columns and formatting datetime natively, then using `to_dict(orient="records")`, reduced this to ~0.04 seconds (~10x speedup).
+**Action:** Consistently avoid `df.iterrows()` in data pipeline and ingestion methods. Use vectorized pandas operations and `to_dict(orient="records")` to build dictionaries.
