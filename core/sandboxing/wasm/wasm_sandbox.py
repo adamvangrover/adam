@@ -52,8 +52,31 @@ class WebAssemblySandbox:
         logger.debug(
             f"Invoking `{function_name}` in module `{module_id}` with args {args}"
         )
-        # Simulated isolated execution
+
+        # Track simulated memory allocation footprint
+        simulated_alloc_mb = 1.5 * len(args) if args else 1.0
+        self._instances[module_id]["memory_usage"] += simulated_alloc_mb
+
+        if self._instances[module_id]["memory_usage"] > self.memory_limit_mb:
+            logger.error(
+                f"Wasm module {module_id} exceeded memory limit ({self.memory_limit_mb}MB)."
+            )
+            self.terminate_module(module_id)
+            raise MemoryError("Wasm sandbox memory limit exceeded.")
+
         return 0  # Simulated return value from Wasm
+
+    def terminate_module(self, module_id: str) -> bool:
+        """
+        Forcefully stops execution of a module to prevent memory leaks or infinite loops.
+        """
+        if module_id not in self._instances:
+            logger.warning(f"Cannot terminate missing Wasm module: {module_id}")
+            return False
+
+        self._instances[module_id]["status"] = "TERMINATED"
+        logger.info(f"Terminated execution of Wasm module {module_id}.")
+        return True
 
     def get_sandbox_metrics(self) -> Dict[str, Dict[str, Any]]:
         return self._instances

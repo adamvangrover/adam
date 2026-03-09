@@ -69,3 +69,13 @@ class HardwareKillSwitch:
         """Carefully disarms the switch (usually for graceful shutdown only)."""
         self._is_active = True  # Stops the loop
         logger.info("Hardware Kill Switch DISARMED.")
+
+    def get_status(self) -> dict:
+        """
+        Retrieves the current activation and heartbeat status of the kill switch.
+        """
+        return {
+            "is_active": self._is_active,
+            "last_heartbeat": self._last_heartbeat_time,
+            "timeout_ms": self.heartbeat_timeout_ms,
+        }
