@@ -11,7 +11,8 @@ class AdaptiveAlgoTradingAgent(AlgoTradingAgent):
     """
     def __init__(self, data: pd.DataFrame, strategies=None, initial_balance=10000,
                  learning_rate=0.1, discount_factor=0.95, epsilon=1.0):
-        super().__init__(data, strategies, initial_balance)
+        super().__init__({"strategies": strategies, "initial_balance": initial_balance})
+        self.data = data
 
         # Define actions: 0=Momentum, 1=Mean Reversion, 2=Arbitrage (simulated)
         self.action_space = len(self.strategies)

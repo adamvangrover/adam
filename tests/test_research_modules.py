@@ -8,7 +8,7 @@ import sys
 # Add repo root to path
 sys.path.append(os.getcwd())
 
-from core.research.oswm.priors import NNPrior, MomentumPrior, PriorSampler
+from core.research.oswm.priors import NeuralNetworkPrior as NNPrior, MomentumPrior, PriorSampler
 from core.research.oswm.model import WorldModelTransformer
 from core.research.oswm.inference import OSWMInference
 from core.research.federated_learning.fl_coordinator import FederatedCoordinator

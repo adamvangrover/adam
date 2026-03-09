@@ -11,6 +11,7 @@ from collections import OrderedDict
 # -------------------------------------------------------------------------
 try:
     import yfinance as yf
+
     YFINANCE_AVAILABLE = True
 except ImportError:
     YFINANCE_AVAILABLE = False
@@ -20,7 +21,9 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("MarketDataService")
 
 if not YFINANCE_AVAILABLE:
-    logger.warning("yfinance library not found. Service operating in SYNTHETIC ONLY mode.")
+    logger.warning(
+        "yfinance library not found. Service operating in SYNTHETIC ONLY mode."
+    )
 
 
 class LRUCache:
@@ -28,7 +31,7 @@ class LRUCache:
     Least Recently Used (LRU) Cache.
 
     Why: Financial APIs have strict rate limits.
-    How: Keeps the 'capacity' most recent items. When full, drops the oldest 
+    How: Keeps the 'capacity' most recent items. When full, drops the oldest
     accessed item to make room for the new one.
     """
 
@@ -98,16 +101,20 @@ class MarketDataService:
         # 3. Fallback to Synthetic (if live failed or disabled)
         if not quote:
             if not self.use_synthetic_only:
-                logger.warning(f"Live fetch failed for {symbol}. Generating synthetic data.")
+                logger.warning(
+                    f"Live fetch failed for {symbol}. Generating synthetic data."
+                )
             quote = self._generate_synthetic_quote(symbol)
 
         # 4. Update Cache
         self.cache.put(symbol, quote)
         return quote
 
-    def get_historical_data(self, symbol: str, start_date: str, end_date: str) -> List[Dict[str, Any]]:
+    def get_historical_data(
+        self, symbol: str, start_date: str, end_date: str
+    ) -> List[Dict[str, Any]]:
         """
-        Fetches historical OHLCV candles. 
+        Fetches historical OHLCV candles.
         Note: We do NOT cache history in this version due to memory size constraints.
         """
         if not self.use_synthetic_only:
@@ -126,7 +133,9 @@ class MarketDataService:
     # INTERNAL HELPERS
     # -------------------------------------------------------------------------
 
-    def _fetch_yfinance_with_retry(self, symbol: str, retries: int = 3) -> Optional[Dict[str, Any]]:
+    def _fetch_yfinance_with_retry(
+        self, symbol: str, retries: int = 3
+    ) -> Optional[Dict[str, Any]]:
         """
         Fetches data with Exponential Backoff.
 
@@ -153,11 +162,13 @@ class MarketDataService:
                     "last": round(last_price, 2),
                     "volume": info.last_volume,
                     "timestamp": datetime.datetime.now().isoformat(),
-                    "source": "yfinance"
+                    "source": "yfinance",
                 }
             except Exception as e:
-                wait_time = (2 ** i) * 0.5
-                logger.warning(f"Attempt {i+1} failed for {symbol}: {e}. Retrying in {wait_time}s...")
+                wait_time = (2**i) * 0.5
+                logger.warning(
+                    f"Attempt {i+1} failed for {symbol}: {e}. Retrying in {wait_time}s..."
+                )
                 time.sleep(wait_time)
 
         return None
@@ -182,10 +193,12 @@ class MarketDataService:
             "last": round(price, 2),
             "volume": random.randint(100000, 5000000),
             "timestamp": datetime.datetime.now().isoformat(),
-            "source": "synthetic_fallback"
+            "source": "synthetic_fallback",
         }
 
-    def _generate_synthetic_history(self, symbol: str, start_date: str, end_date: str) -> List[Dict[str, Any]]:
+    def _generate_synthetic_history(
+        self, symbol: str, start_date: str, end_date: str
+    ) -> List[Dict[str, Any]]:
         """Generates a Random Walk (Brownian Motion) price path."""
         data = []
         try:
@@ -204,14 +217,16 @@ class MarketDataService:
             price += change
             price = max(0.01, price)  # Prevent negative prices
 
-            data.append({
-                "date": current.isoformat(),
-                "open": round(price - random.random(), 2),
-                "high": round(price + random.random(), 2),
-                "low": round(price - random.random(), 2),
-                "close": round(price, 2),
-                "volume": random.randint(1000, 10000)
-            })
+            data.append(
+                {
+                    "date": current.isoformat(),
+                    "open": round(price - random.random(), 2),
+                    "high": round(price + random.random(), 2),
+                    "low": round(price - random.random(), 2),
+                    "close": round(price, 2),
+                    "volume": random.randint(1000, 10000),
+                }
+            )
             current += datetime.timedelta(days=1)
 
         return data

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM | Fiduciary Avatar</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --bg-dark: #020408;
+            --panel-glass: rgba(10, 15, 30, 0.7);
+            --cyan-glow: #00f0ff;
+            --grid-line: rgba(0, 240, 255, 0.05);
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: #e2e8f0;
+            font-family: 'Inter', sans-serif;
+            background-image:
+                linear-gradient(var(--grid-line) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+            background-size: 30px 30px;
+            overflow: hidden;
+        }
+
+        .glass-panel {
+            background: var(--panel-glass);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 240, 255, 0.1);
+        }
+
+        .chat-bubble {
+            max-width: 80%;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            font-size: 0.8rem;
+        }
+        .chat-bubble.user {
+            background: #1e293b;
+            color: #fff;
+            align-self: flex-end;
+            border-bottom-right-radius: 0;
+        }
+        .chat-bubble.avatar {
+            background: rgba(0, 240, 255, 0.1);
+            color: var(--cyan-glow);
+            align-self: flex-start;
+            border-bottom-left-radius: 0;
+            border: 1px solid rgba(0, 240, 255, 0.3);
+        }
+
+        .custom-scroll::-webkit-scrollbar { width: 6px; }
+        .custom-scroll::-webkit-scrollbar-track { background: transparent; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+
+    </style>
+</head>
+<body class="h-screen flex flex-col p-4">
+    <div class="flex justify-between items-center mb-4 border-b border-gray-800 pb-2">
+        <h1 class="text-lg font-bold text-white tracking-widest flex items-center">
+            <i data-lucide="user-check" class="w-5 h-5 mr-2 text-cyan-400"></i>
+            FIDUCIARY AVATAR
+        </h1>
+    </div>
+
+    <div class="glass-panel flex flex-col flex-grow rounded overflow-hidden">
+        <div id="chatBox" class="flex-grow p-4 flex flex-col custom-scroll overflow-y-auto">
+            <div class="chat-bubble avatar">
+                <strong>System:</strong> I am your AI Fiduciary Avatar. I am programmed to simulate risk profiles and prioritize capital preservation. How may I advise you today?
+            </div>
+        </div>
+
+        <div class="p-3 border-t border-gray-800 flex gap-2 bg-black/50">
+            <input type="text" id="chatInput" placeholder="Ask about portfolio risk..." class="flex-grow bg-[#050a14] border border-[#1e293b] text-white p-2 rounded outline-none focus:border-cyan-500 text-sm" onkeydown="if(event.key === 'Enter') sendMessage()">
+            <button onclick="sendMessage()" class="bg-cyan-900/30 text-cyan-400 border border-cyan-500/50 px-4 rounded hover:bg-cyan-900/50 transition">
+                <i data-lucide="send" class="w-4 h-4"></i>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const msg = input.value.trim();
+            if(!msg) return;
+
+            appendMsg('user', msg);
+            input.value = '';
+
+            setTimeout(() => {
+                const replies = [
+                    "Based on your current risk tolerance, increasing leverage here is not advised. We must prioritize capital preservation.",
+                    "I have run a Monte Carlo simulation on that strategy. It exceeds our VaR limits. I recommend diversifying into low-beta assets.",
+                    "While the expected return is attractive, the structural risk poses a fiduciary hazard. Let's reconsider the asset mix.",
+                    "My models indicate a 35% probability of a drawdown exceeding your stated limits within the next 12 months."
+                ];
+                const reply = replies[Math.floor(Math.random() * replies.length)];
+                appendMsg('avatar', `<strong>Avatar:</strong> ${reply}`);
+            }, 800);
+        }
+
+        function appendMsg(type, text) {
+            const box = document.getElementById('chatBox');
+            const div = document.createElement('div');
+            div.className = `chat-bubble ${type}`;
+            div.innerHTML = text;
+            box.appendChild(div);
+            box.scrollTop = box.scrollHeight;
+        }
+    </script>
+</body>
+</html>

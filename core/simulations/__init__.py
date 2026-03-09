@@ -7,3 +7,4 @@ from .Regulatory_Compliance_Simulation import RegulatoryComplianceSimulation
 from .Stress_Testing_Simulation import StressTestingSimulation
 from .adam_van_grover_search import AdamVanGroverSearch
 from .distressed_credit_pricing_simulation import DistressedCreditPricingSimulation
+from .avg_search import AVGSearch, AdamOptimizer

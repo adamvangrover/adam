@@ -19,6 +19,13 @@ class NeuralNetworkPrior(Prior):
         self.output_dim = output_dim
         self.hidden_dim = hidden_dim
 
+    def generate_trajectory(self, steps, start_val=0.0):
+        # Fallback for old tests
+        # sample_batch returns (steps, batch, feature) -> (steps, 1, 1)
+        res = self.sample_batch(1, steps)
+        # flatten it out
+        return res[:, 0, 0].tolist()
+
     def sample_batch(self, batch_size, seq_len):
         """
         Generates a batch of trajectories from random dynamical systems using vectorized operations.
@@ -66,6 +73,11 @@ class MomentumPrior(Prior):
     """
     def __init__(self, dim=1):
         self.dim = dim
+
+    def generate_trajectory(self, steps, start_pos=0.0):
+        # Fallback for old tests
+        res = self.sample_batch(1, steps)
+        return res[:, 0, 0].tolist()
 
     def sample_batch(self, batch_size, seq_len):
         # Initial Position and Velocity
@@ -144,7 +156,11 @@ class PriorSampler:
         self.momentum_prior = MomentumPrior()
         self.ou_prior = OrnsteinUhlenbeckPrior()
 
-    def sample(self, batch_size=1, steps=50):
+    @classmethod
+    def sample(cls, batch_size=1, steps=50):
+        return cls().sample_mixed(batch_size, steps)
+
+    def sample_mixed(self, batch_size=1, steps=50):
         """
         Samples a mixed batch of trajectories.
         Distribution: 40% NN, 30% Momentum, 30% OU.
