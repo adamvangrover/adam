@@ -16,25 +16,56 @@
             --text-muted: #888;
             --panel-border: #333;
         }
-        body { margin: 0; background: var(--bg-color); color: var(--text-primary); font-family: 'Inter', sans-serif; overflow-x: hidden; }
+        
+        body { 
+            margin: 0; 
+            background: var(--bg-color); 
+            color: var(--text-primary); 
+            font-family: 'Inter', sans-serif; 
+            overflow-x: hidden; 
+        }
+        
         .mono { font-family: 'JetBrains Mono', monospace; }
         
         /* Header Styling */
         .cyber-header {
-            height: 60px; display: flex; align-items: center; justify-content: space-between;
-            padding: 0 20px; border-bottom: 1px solid var(--primary-color);
-            background: rgba(5, 11, 20, 0.95); position: sticky; top: 0; z-index: 100;
+            height: 60px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between;
+            padding: 0 20px; 
+            border-bottom: 1px solid var(--primary-color);
+            background: rgba(5, 11, 20, 0.95); 
+            position: sticky; 
+            top: 0; 
+            z-index: 100;
         }
         
         /* Effects */
-        .scan-line { position: fixed; top: 0; left: 0; width: 100%; height: 2px; background: rgba(0, 243, 255, 0.1); animation: scan 3s linear infinite; pointer-events: none; z-index: 999; }
+        .scan-line { 
+            position: fixed; 
+            top: 0; left: 0; width: 100%; height: 2px; 
+            background: rgba(0, 243, 255, 0.1); 
+            animation: scan 3s linear infinite; 
+            pointer-events: none; 
+            z-index: 999; 
+        }
+        
         @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
 
         a { text-decoration: none; color: inherit; transition: color 0.2s; }
         a:hover { color: var(--primary-color); }
 
         /* Components */
-        .mode-badge { padding: 4px 8px; border: 1px solid #ffa500; color: #ffa500; font-size: 0.75rem; border-radius: 4px; font-weight: bold; white-space: nowrap; }
+        .mode-badge { 
+            padding: 4px 8px; 
+            border: 1px solid #ffa500; 
+            color: #ffa500; 
+            font-size: 0.75rem; 
+            border-radius: 4px; 
+            font-weight: bold; 
+            white-space: nowrap; 
+        }
         
         .cyber-btn {
             font-family: 'JetBrains Mono', monospace;
@@ -46,12 +77,49 @@
             border-radius: 2px;
             text-transform: uppercase;
         }
-        .cyber-btn:hover { border-color: var(--primary-color); color: var(--primary-color); }
+        
+        .cyber-btn:hover { 
+            border-color: var(--primary-color); 
+            color: var(--primary-color); 
+        }
         
         .glass-panel {
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid var(--panel-border);
             backdrop-filter: blur(5px);
+        }
+
+        /* Layout & Grid Components */
+        .layout-container { display: flex; min-height: calc(100vh - 60px); }
+        .sidebar { width: 260px; border-right: 1px solid var(--panel-border); padding: 20px; font-size: 0.9rem; flex-shrink: 0; }
+        .main-content { flex-grow: 1; padding: 40px; }
+        
+        .grid-container {
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); 
+            gap: 20px;
+        }
+
+        .module-card {
+            border: 1px solid #333; 
+            padding: 20px; 
+            background: rgba(0,0,0,0.2);
+            position: relative;
+        }
+        
+        .module-card h3 { margin-top: 0; font-size: 1rem; }
+        .module-card p { font-size: 0.8rem; color: #ccc; }
+        .module-card a { color: var(--primary-color); font-size: 0.8rem; }
+        
+        .tag-new {
+            position: absolute; 
+            top: 10px; right: -25px; 
+            background: #ff3333; 
+            color: white; 
+            font-size: 0.6rem; 
+            padding: 2px 25px; 
+            transform: rotate(45deg); 
+            font-weight: bold;
         }
     </style>
 </head>
@@ -75,8 +143,8 @@
         </div>
     </header>
 
-    <div style="display: flex; min-height: calc(100vh - 60px);">
-        <aside class="glass-panel" style="width: 260px; border-right: 1px solid var(--panel-border); padding: 20px; font-size: 0.9rem; flex-shrink: 0;">
+    <div class="layout-container">
+        <aside class="sidebar glass-panel">
             <h3 class="mono" style="margin-top: 0; font-size: 0.8rem; color: var(--primary-color); border-bottom: 1px solid var(--panel-border); padding-bottom: 10px; margin-bottom: 15px;">
                 /// DIRECTORY INDEX
             </h3>
@@ -95,10 +163,9 @@
             </ul>
         </aside>
 
-        <main style="flex-grow: 1; padding: 40px;">
+        <main class="main-content">
             <h2 class="mono" style="color: var(--primary-color); border-bottom: 1px solid #333; padding-bottom: 10px;">SYSTEM ARCHIVE</h2>
 
-            <!-- Interface Selection (High Speed Lane) -->
             <div style="display: flex; gap: 20px; margin-bottom: 30px; border-bottom: 1px dashed #333; padding-bottom: 20px;">
                 <div style="flex: 1; border: 1px solid var(--primary-color); padding: 20px; background: linear-gradient(135deg, rgba(0, 243, 255, 0.1) 0%, rgba(5, 11, 20, 0.8) 100%);">
                     <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -139,179 +206,185 @@
                 </div>
             </div>
 
-            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px;">
-                <div style="border: 1px solid #333; padding: 20px; background: rgba(0,0,0,0.2);">
-                    <h3 class="mono" style="margin-top: 0; font-size: 1rem; color: var(--accent-color);">CREDIT & VALUATION</h3>
-                    <p style="font-size: 0.8rem; color: #ccc;">Analyst OS Architect v6.2</p>
-                    <a href="credit_valuation_architect.html" style="color: var(--primary-color); font-size: 0.8rem;">LAUNCH ARCHITECT &rarr;</a>
+            <div class="grid-container">
+                <div class="module-card">
+                    <h3 class="mono" style="color: var(--accent-color);">CREDIT & VALUATION</h3>
+                    <p>Analyst OS Architect v6.2</p>
+                    <a href="credit_valuation_architect.html">LAUNCH ARCHITECT &rarr;</a>
                 </div>
 
-                <div style="border: 1px solid #333; padding: 20px; background: rgba(0,0,0,0.2);">
-                    <h3 class="mono" style="margin-top: 0; font-size: 1rem; color: var(--primary-color);">COMPREHENSIVE CREDIT</h3>
-                    <p style="font-size: 0.8rem; color: #ccc;">Unified Enterprise Dashboard</p>
-                    <a href="comprehensive_credit_dashboard.html" style="color: var(--primary-color); font-size: 0.8rem;">LAUNCH DASHBOARD &rarr;</a>
+                <div class="module-card">
+                    <h3 class="mono" style="color: var(--primary-color);">COMPREHENSIVE CREDIT</h3>
+                    <p>Unified Enterprise Dashboard</p>
+                    <a href="comprehensive_credit_dashboard.html">LAUNCH DASHBOARD &rarr;</a>
                 </div>
 
-                <div style="border: 1px solid #333; padding: 20px; background: rgba(0,0,0,0.2);">
-                    <h3 class="mono" style="margin-top: 0; font-size: 1rem; color: #cc0000;">MARKET MAYHEM</h3>
-                    <p style="font-size: 0.8rem; color: #ccc;">Strategic Intelligence Archive</p>
-                    <a href="market_mayhem_archive.html" style="color: var(--primary-color); font-size: 0.8rem;">ACCESS ARCHIVE &rarr;</a>
+                <div class="module-card">
+                    <h3 class="mono" style="color: #cc0000;">MARKET MAYHEM</h3>
+                    <p>Strategic Intelligence Archive</p>
+                    <a href="market_mayhem_archive.html">ACCESS ARCHIVE &rarr;</a>
                 </div>
 
-                <div style="border: 1px solid #333; padding: 20px; background: rgba(0,0,0,0.2);">
-                    <h3 class="mono" style="margin-top: 0; font-size: 1rem;">LATEST ARTIFACT</h3>
-                    <p style="font-size: 0.8rem; color: #888;">market_mayhem_dec_2025.json</p>
-                    <a href="data/market_mayhem_dec_2025.json" target="_blank" style="color: var(--primary-color); font-size: 0.8rem;">VIEW JSON &rarr;</a>
+                <div class="module-card">
+                    <h3 class="mono" style="color: #0aff60;">ADAM OS ENVIRONMENT</h3>
+                    <p>Unified Desktop Workspace</p>
+                    <a href="adam_os.html">ENTER HUB &rarr;</a>
+                </div>
+
+                <div class="module-card">
+                    <h3 class="mono">LATEST ARTIFACT</h3>
+                    <p class="mono" style="color: #888;">market_mayhem_dec_2025.json</p>
+                    <a href="data/market_mayhem_dec_2025.json" target="_blank">VIEW JSON &rarr;</a>
                 </div>
                 
-                <div style="border: 1px solid #333; padding: 20px; background: rgba(0,0,0,0.2);">
-                    <h3 class="mono" style="margin-top: 0; font-size: 1rem;">ACTIVE NODES</h3>
-                    <p style="font-size: 0.8rem; color: #888;">Knowledge Graph: 12,405 Entities</p>
-                    <a href="graph.html" style="color: var(--primary-color); font-size: 0.8rem;">EXPLORE MAP &rarr;</a>
+                <div class="module-card">
+                    <h3 class="mono">ACTIVE NODES</h3>
+                    <p>Knowledge Graph: 12,405 Entities</p>
+                    <a href="graph.html">EXPLORE MAP &rarr;</a>
                 </div>
 
-                <div style="border: 1px solid #333; padding: 20px; background: rgba(0,0,0,0.2);">
-                    <h3 class="mono" style="margin-top: 0; font-size: 1rem;">INSTITUTIONAL RADAR</h3>
-                    <p style="font-size: 0.8rem; color: #888;">13F Trend Monitor & Synthesis</p>
-                    <a href="institutional_radar.html" style="color: var(--primary-color); font-size: 0.8rem;">LAUNCH RADAR &rarr;</a>
+                <div class="module-card">
+                    <h3 class="mono">INSTITUTIONAL RADAR</h3>
+                    <p>13F Trend Monitor & Synthesis</p>
+                    <a href="institutional_radar.html">LAUNCH RADAR &rarr;</a>
                 </div>
 
-                <div style="border: 1px solid #333; padding: 20px; background: rgba(0,0,0,0.2);">
-                    <h3 class="mono" style="margin-top: 0; font-size: 1rem; color: #cc0000;">WORLD MODEL</h3>
-                    <p style="font-size: 0.8rem; color: #ccc;">Unified Banking Digital Twin</p>
-                    <a href="unified_banking.html" style="color: var(--primary-color); font-size: 0.8rem;">LAUNCH TWIN &rarr;</a>
+                <div class="module-card">
+                    <h3 class="mono" style="color: #cc0000;">WORLD MODEL</h3>
+                    <p>Unified Banking Digital Twin</p>
+                    <a href="unified_banking.html">LAUNCH TWIN &rarr;</a>
                 </div>
 
-                <div style="border: 1px solid #333; padding: 20px; background: rgba(20, 5, 5, 0.4); position: relative; overflow: hidden;">
-                    <div style="position: absolute; top: 10px; right: -25px; background: #ff3333; color: white; font-size: 0.6rem; padding: 2px 25px; transform: rotate(45deg); font-weight: bold;">NEW</div>
-                    <h3 class="mono" style="margin-top: 0; font-size: 1rem; color: #ff3333;">STRATEGIC WAR ROOM</h3>
-                    <p style="font-size: 0.8rem; color: #ccc;">Sovereign Conflict Simulation</p>
-                    <a href="war_room.html" style="color: var(--primary-color); font-size: 0.8rem;">ENTER DEFCON &rarr;</a>
+                <div class="module-card" style="background: rgba(20, 5, 5, 0.4); overflow: hidden;">
+                    <div class="tag-new">NEW</div>
+                    <h3 class="mono" style="color: #ff3333;">STRATEGIC WAR ROOM</h3>
+                    <p>Sovereign Conflict Simulation</p>
+                    <a href="war_room.html">ENTER DEFCON &rarr;</a>
                 </div>
 
-                <div style="border: 1px solid #333; padding: 20px; background: rgba(0,0,0,0.2);">
-                    <h3 class="mono" style="margin-top: 0; font-size: 1rem; color: #a855f7;">SYSTEM BRAIN</h3>
-                    <p style="font-size: 0.8rem; color: #ccc;">Self-Aware Repository Graph</p>
-                    <a href="system_brain.html" style="color: var(--primary-color); font-size: 0.8rem;">LAUNCH BRAIN &rarr;</a>
+                <div class="module-card">
+                    <h3 class="mono" style="color: #a855f7;">SYSTEM BRAIN</h3>
+                    <p>Self-Aware Repository Graph</p>
+                    <a href="system_brain.html">LAUNCH BRAIN &rarr;</a>
                 </div>
 
-                <div style="border: 1px solid #333; padding: 20px; background: rgba(0,0,0,0.2);">
-                    <h3 class="mono" style="margin-top: 0; font-size: 1rem; color: #f59e0b;">NEXUS SIMULATION</h3>
-                    <p style="font-size: 0.8rem; color: #ccc;">Geopolitical & Sovereign Minds</p>
-                    <a href="nexus.html" style="color: var(--primary-color); font-size: 0.8rem;">ENTER NEXUS &rarr;</a>
+                <div class="module-card">
+                    <h3 class="mono" style="color: #f59e0b;">NEXUS SIMULATION</h3>
+                    <p>Geopolitical & Sovereign Minds</p>
+                    <a href="nexus.html">ENTER NEXUS &rarr;</a>
                 </div>
 
-                <div style="border: 1px solid #333; padding: 20px; background: rgba(0,0,0,0.2);">
-                    <h3 class="mono" style="margin-top: 0; font-size: 1rem; color: #f59e0b;">MACRO STRATEGY</h3>
-                    <p style="font-size: 0.8rem; color: #ccc;">2026 Reflationary Agentic Boom</p>
-                    <a href="macro_strategy.html" style="color: var(--primary-color); font-size: 0.8rem;">VIEW THESIS &rarr;</a>
+                <div class="module-card">
+                    <h3 class="mono" style="color: #f59e0b;">MACRO STRATEGY</h3>
+                    <p>2026 Reflationary Agentic Boom</p>
+                    <a href="macro_strategy.html">VIEW THESIS &rarr;</a>
                 </div>
 
-                <div style="border: 1px solid #333; padding: 20px; background: rgba(0,0,0,0.2);">
-                    <h3 class="mono" style="margin-top: 0; font-size: 1rem; color: #10b981;">SECTOR SWARM</h3>
-                    <p style="font-size: 0.8rem; color: #ccc;">Multi-Agent Industry Roundtable</p>
-                    <a href="sector_swarm.html" style="color: var(--primary-color); font-size: 0.8rem;">JOIN SESSION &rarr;</a>
-                    <h3 class="mono" style="margin-top: 0; font-size: 1rem; color: #f59e0b;">PROMPT LIBRARY</h3>
-                    <p style="font-size: 0.8rem; color: #ccc;">AOPL v1.0 Repository</p>
-                    <a href="prompts.html" style="color: var(--primary-color); font-size: 0.8rem;">VIEW TEMPLATES &rarr;</a>
+                <div class="module-card">
+                    <h3 class="mono" style="color: #10b981;">SECTOR SWARM</h3>
+                    <p>Multi-Agent Industry Roundtable</p>
+                    <a href="sector_swarm.html">JOIN SESSION &rarr;</a>
                 </div>
 
-                <div style="border: 1px solid #333; padding: 20px; background: rgba(0,0,0,0.2);">
-                    <h3 class="mono" style="margin-top: 0; font-size: 1rem; color: #00f3ff;">QUANTUM INFRA</h3>
-                    <p style="font-size: 0.8rem; color: #ccc;">Hybrid Multi-Cloud Runtime</p>
-                    <a href="quantum_infrastructure.html" style="color: var(--primary-color); font-size: 0.8rem;">INITIALIZE &rarr;</a>
+                <div class="module-card">
+                    <h3 class="mono" style="color: #f59e0b;">PROMPT LIBRARY</h3>
+                    <p>AOPL v1.0 Repository</p>
+                    <a href="prompts.html">VIEW TEMPLATES &rarr;</a>
                 </div>
 
-                <div style="border: 1px solid #333; padding: 20px; background: rgba(0,0,0,0.2);">
-                    <h3 class="mono" style="margin-top: 0; font-size: 1rem; color: #10b981;">PROMPT ALPHA</h3>
-                    <p style="font-size: 0.8rem; color: #ccc;">High-Frequency Prompt Terminal</p>
-                    <a href="apps/prompt_alpha.html" style="color: var(--primary-color); font-size: 0.8rem;">LAUNCH TERMINAL &rarr;</a>
+                <div class="module-card">
+                    <h3 class="mono" style="color: #00f3ff;">QUANTUM INFRA</h3>
+                    <p>Hybrid Multi-Cloud Runtime</p>
+                    <a href="quantum_infrastructure.html">INITIALIZE &rarr;</a>
                 </div>
 
-                <!-- New Additive Modules -->
-
-                <div style="border: 1px solid #333; padding: 20px; background: rgba(10, 255, 96, 0.05);">
-                    <h3 class="mono" style="margin-top: 0; font-size: 1rem; color: var(--accent-color);">LIVE MARKET</h3>
-                    <p style="font-size: 0.8rem; color: #ccc;">Real-time Swarm Telemetry</p>
-                    <a href="market_live.html" style="color: var(--primary-color); font-size: 0.8rem;">LAUNCH TERMINAL &rarr;</a>
+                <div class="module-card">
+                    <h3 class="mono" style="color: #10b981;">PROMPT ALPHA</h3>
+                    <p>High-Frequency Prompt Terminal</p>
+                    <a href="apps/prompt_alpha.html">LAUNCH TERMINAL &rarr;</a>
                 </div>
 
-                <div style="border: 1px solid #333; padding: 20px; background: rgba(0,243,255,0.05);">
-                    <h3 class="mono" style="margin-top: 0; font-size: 1rem; color: #00f3ff;">MARKET LIVE</h3>
-                    <p style="font-size: 0.8rem; color: #ccc;">Real-time Neural Exchange</p>
-                    <a href="market_live.html" style="color: var(--primary-color); font-size: 0.8rem;">VIEW STREAM &rarr;</a>
+                <div class="module-card" style="background: rgba(10, 255, 96, 0.05);">
+                    <h3 class="mono" style="color: var(--accent-color);">LIVE MARKET</h3>
+                    <p>Real-time Swarm Telemetry</p>
+                    <a href="market_live.html">LAUNCH TERMINAL &rarr;</a>
                 </div>
 
-                <div style="border: 1px solid #333; padding: 20px; background: rgba(0,243,255,0.05);">
-                    <h3 class="mono" style="margin-top: 0; font-size: 1rem; color: #00f3ff;">INTELLIGENCE LIBRARY</h3>
-                    <p style="font-size: 0.8rem; color: #ccc;">Centralized Artifact Repository</p>
-                    <a href="intelligence_library.html" style="color: var(--primary-color); font-size: 0.8rem;">OPEN LIBRARY &rarr;</a>
+                <div class="module-card" style="background: rgba(0,243,255,0.05);">
+                    <h3 class="mono" style="color: #00f3ff;">MARKET LIVE</h3>
+                    <p>Real-time Neural Exchange</p>
+                    <a href="market_live.html">VIEW STREAM &rarr;</a>
                 </div>
 
-                <div style="border: 1px solid #333; padding: 20px; background: rgba(0,243,255,0.05);">
-                    <h3 class="mono" style="margin-top: 0; font-size: 1rem; color: #ff00ff;">CREATOR STUDIO</h3>
-                    <p style="font-size: 0.8rem; color: #ccc;">Secure Report Editor</p>
-                    <a href="editor_studio.html" style="color: var(--primary-color); font-size: 0.8rem;">LAUNCH EDITOR &rarr;</a>
+                <div class="module-card" style="background: rgba(0,243,255,0.05);">
+                    <h3 class="mono" style="color: #00f3ff;">INTELLIGENCE LIBRARY</h3>
+                    <p>Centralized Artifact Repository</p>
+                    <a href="intelligence_library.html">OPEN LIBRARY &rarr;</a>
                 </div>
 
-                <div style="border: 1px solid #333; padding: 20px; background: rgba(0,0,0,0.2);">
-                    <h3 class="mono" style="margin-top: 0; font-size: 1rem; color: #22c55e;">DAILY BRIEFING</h3>
-                    <p style="font-size: 0.8rem; color: #ccc;">Live Situation Report</p>
-                    <a href="daily_briefing.html" style="color: var(--primary-color); font-size: 0.8rem;">READ BRIEF &rarr;</a>
+                <div class="module-card" style="background: rgba(0,243,255,0.05);">
+                    <h3 class="mono" style="color: #ff00ff;">CREATOR STUDIO</h3>
+                    <p>Secure Report Editor</p>
+                    <a href="editor_studio.html">LAUNCH EDITOR &rarr;</a>
                 </div>
 
-                <div style="border: 1px solid #333; padding: 20px; background: rgba(0,0,0,0.2);">
-                    <h3 class="mono" style="margin-top: 0; font-size: 1rem; color: #e11d48;">WARGAME CONSOLE</h3>
-                    <p style="font-size: 0.8rem; color: #ccc;">Red Team vs Blue Team Sim</p>
-                    <a href="wargame_dashboard.html" style="color: var(--primary-color); font-size: 0.8rem;">ENTER WARGAME &rarr;</a>
+                <div class="module-card">
+                    <h3 class="mono" style="color: #22c55e;">DAILY BRIEFING</h3>
+                    <p>Live Situation Report</p>
+                    <a href="daily_briefing.html">READ BRIEF &rarr;</a>
                 </div>
 
-                <div style="border: 1px solid #333; padding: 20px; background: rgba(0,0,0,0.2);">
-                    <h3 class="mono" style="margin-top: 0; font-size: 1rem; color: #2563eb;">AGENT GALLERY</h3>
-                    <p style="font-size: 0.8rem; color: #ccc;">The Specialized Swarm Roster</p>
-                    <a href="agent_gallery.html" style="color: var(--primary-color); font-size: 0.8rem;">VIEW ROSTER &rarr;</a>
+                <div class="module-card">
+                    <h3 class="mono" style="color: #e11d48;">WARGAME CONSOLE</h3>
+                    <p>Red Team vs Blue Team Sim</p>
+                    <a href="wargame_dashboard.html">ENTER WARGAME &rarr;</a>
                 </div>
 
-                <div style="border: 1px solid #333; padding: 20px; background: rgba(0,0,0,0.2);">
-                    <h3 class="mono" style="margin-top: 0; font-size: 1rem; color: #db2777;">SCENARIO LAB</h3>
-                    <p style="font-size: 0.8rem; color: #ccc;">Generative Risk & VAE Explorer</p>
-                    <a href="scenario_lab.html" style="color: var(--primary-color); font-size: 0.8rem;">OPEN LAB &rarr;</a>
+                <div class="module-card">
+                    <h3 class="mono" style="color: #2563eb;">AGENT GALLERY</h3>
+                    <p>The Specialized Swarm Roster</p>
+                    <a href="agent_gallery.html">VIEW ROSTER &rarr;</a>
                 </div>
 
-                <div style="border: 1px solid #333; padding: 20px; background: rgba(0,0,0,0.2);">
-                    <h3 class="mono" style="margin-top: 0; font-size: 1rem; color: #4b5563;">POLICY CENTER</h3>
-                    <p style="font-size: 0.8rem; color: #ccc;">Governance & Compliance Rules</p>
-                    <a href="policy_center.html" style="color: var(--primary-color); font-size: 0.8rem;">VIEW POLICIES &rarr;</a>
+                <div class="module-card">
+                    <h3 class="mono" style="color: #db2777;">SCENARIO LAB</h3>
+                    <p>Generative Risk & VAE Explorer</p>
+                    <a href="scenario_lab.html">OPEN LAB &rarr;</a>
                 </div>
 
-                <div style="border: 1px solid #333; padding: 20px; background: rgba(0,0,0,0.2);">
-                    <h3 class="mono" style="margin-top: 0; font-size: 1rem; color: #a855f7;">AVG SEARCH</h3>
-                    <p style="font-size: 0.8rem; color: #ccc;">AVG Optimization Engine</p>
-                    <a href="avg_search.html" style="color: var(--primary-color); font-size: 0.8rem;">INITIATE SEARCH &rarr;</a>
+                <div class="module-card">
+                    <h3 class="mono" style="color: #4b5563;">POLICY CENTER</h3>
+                    <p>Governance & Compliance Rules</p>
+                    <a href="policy_center.html">VIEW POLICIES &rarr;</a>
                 </div>
 
-                <div style="border: 1px solid #333; padding: 20px; background: rgba(0,0,0,0.2);">
-                    <h3 class="mono" style="margin-top: 0; font-size: 1rem; color: #a855f7;">SYSTEM GRAPH</h3>
-                    <p style="font-size: 0.8rem; color: #ccc;">Interactive Codebase Visualizer</p>
-                    <a href="system_knowledge_graph.html" style="color: var(--primary-color); font-size: 0.8rem;">LAUNCH GRAPH &rarr;</a>
+                <div class="module-card">
+                    <h3 class="mono" style="color: #a855f7;">AVG SEARCH</h3>
+                    <p>AVG Optimization Engine</p>
+                    <a href="avg_search.html">INITIATE SEARCH &rarr;</a>
                 </div>
 
-                <div style="border: 1px solid #333; padding: 20px; background: rgba(0,0,0,0.2);">
-                    <h3 class="mono" style="margin-top: 0; font-size: 1rem; color: #ff3333;">RISK ENGINE</h3>
-                    <p style="font-size: 0.8rem; color: #ccc;">Monte Carlo Path Visualizer</p>
-                    <a href="monte_carlo_visualizer.html" style="color: var(--primary-color); font-size: 0.8rem;">LAUNCH SIM &rarr;</a>
+                <div class="module-card">
+                    <h3 class="mono" style="color: #a855f7;">SYSTEM GRAPH</h3>
+                    <p>Interactive Codebase Visualizer</p>
+                    <a href="system_knowledge_graph.html">LAUNCH GRAPH &rarr;</a>
                 </div>
 
-                <div style="border: 1px solid #333; padding: 20px; background: rgba(0,0,0,0.2);">
-                    <h3 class="mono" style="margin-top: 0; font-size: 1rem; color: #00F5FF;">NEURAL LINK</h3>
-                    <p style="font-size: 0.8rem; color: #ccc;">Live Neural Convergence Showcase</p>
-                    <a href="adam_convergence_live_neural_link.html" style="color: var(--primary-color); font-size: 0.8rem;">OPEN LINK &rarr;</a>
+                <div class="module-card">
+                    <h3 class="mono" style="color: #ff3333;">RISK ENGINE</h3>
+                    <p>Monte Carlo Path Visualizer</p>
+                    <a href="monte_carlo_visualizer.html">LAUNCH SIM &rarr;</a>
+                </div>
+
+                <div class="module-card">
+                    <h3 class="mono" style="color: #00F5FF;">NEURAL LINK</h3>
+                    <p>Live Neural Convergence Showcase</p>
+                    <a href="adam_convergence_live_neural_link.html">OPEN LINK &rarr;</a>
                 </div>
             </div>
         </main>
     </div>
 
-    <!-- Adam Global Nav -->
     <script src="../showcase/js/nav.js" data-root=".."></script>
     <script src="js/hud.js"></script>
 </body>

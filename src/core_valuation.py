@@ -1,41 +1,67 @@
 # src/core_valuation.py
-import numpy as np
 import pandas as pd
+from typing import List, Tuple
 from .config import DEFAULT_ASSUMPTIONS
 
 class ValuationEngine:
-    def __init__(self, ebitda_base, capex_percent, nwc_percent, debt_cost, equity_percent):
-        self.ebitda = ebitda_base
-        self.capex_pct = capex_percent
-        self.nwc_pct = nwc_percent
-        self.kd = debt_cost
-        self.we = equity_percent
-        self.wd = 1 - equity_percent
-        self.t = DEFAULT_ASSUMPTIONS['tax_rate']
+    """
+    Computes enterprise value using a Discounted Cash Flow (DCF) model.
+    """
+    def __init__(self, ebitda_base: float, capex_percent: float, nwc_percent: float, debt_cost: float, equity_percent: float):
+        if not (0 <= equity_percent <= 1):
+            raise ValueError("equity_percent must be between 0 and 1.")
+        if ebitda_base <= 0:
+            raise ValueError("EBITDA must be greater than zero for valuation.")
 
-    def calculate_wacc(self):
-        rf = DEFAULT_ASSUMPTIONS['risk_free_rate']
-        rm = DEFAULT_ASSUMPTIONS['market_risk_premium']
-        beta = DEFAULT_ASSUMPTIONS['beta']
+        self.ebitda = float(ebitda_base)
+        self.capex_pct = float(capex_percent)
+        self.nwc_pct = float(nwc_percent)
+        self.kd = float(debt_cost)
+        self.we = float(equity_percent)
+        self.wd = 1.0 - self.we
+        self.t = float(DEFAULT_ASSUMPTIONS['tax_rate'])
 
-        ke = rf + beta * (rm)
+    def calculate_wacc(self) -> float:
+        """
+        Calculates the Weighted Average Cost of Capital (WACC).
+        """
+        rf = float(DEFAULT_ASSUMPTIONS['risk_free_rate'])
+        rm = float(DEFAULT_ASSUMPTIONS['market_risk_premium'])
+        beta = float(DEFAULT_ASSUMPTIONS['beta'])
+
+        ke = rf + beta * rm
         wacc = (self.we * ke) + (self.wd * self.kd * (1 - self.t))
         return wacc
 
-    def run_dcf(self, growth_rates):
+    def run_dcf(self, growth_rates: List[float]) -> Tuple[pd.DataFrame, float, float]:
         """
-        Generates Free Cash Flow (FCF) projections.
+        Generates Free Cash Flow (FCF) projections and calculates Enterprise Value.
+
+        Args:
+            growth_rates: A list of growth rates for each projection year.
+
+        Returns:
+            A tuple containing:
+                - A pandas DataFrame with the projections.
+                - The calculated Enterprise Value.
+                - The calculated WACC.
         """
+        years = int(DEFAULT_ASSUMPTIONS['projection_years'])
+        if len(growth_rates) != years:
+            raise ValueError(f"Expected exactly {years} growth rates, got {len(growth_rates)}.")
+
         wacc = self.calculate_wacc()
-        years = DEFAULT_ASSUMPTIONS['projection_years']
-        g = DEFAULT_ASSUMPTIONS['terminal_growth_rate']
+        g = float(DEFAULT_ASSUMPTIONS['terminal_growth_rate'])
+
+        if wacc <= g:
+            raise ValueError(f"WACC ({wacc:.4f}) must be greater than terminal growth rate ({g:.4f}) to calculate terminal value.")
 
         projections = []
         current_ebitda = self.ebitda
 
         for i, gr in enumerate(growth_rates):
             current_ebitda *= (1 + gr)
-            tax = current_ebitda * self.t # Simplified EBIT proxy
+            tax = current_ebitda * self.t  # Simplified EBIT proxy
             capex = current_ebitda * self.capex_pct
             nwc_change = current_ebitda * self.nwc_pct
             fcf = current_ebitda - tax - capex - nwc_change
@@ -44,7 +70,7 @@ class ValuationEngine:
             pv_fcf = fcf * df
 
             projections.append({
-                "Year": i+1,
+                "Year": i + 1,
                 "EBITDA": current_ebitda,
                 "FCF": fcf,
                 "PV_FCF": pv_fcf

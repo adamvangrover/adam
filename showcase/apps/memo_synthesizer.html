@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memo Synthesizer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body { background: #020408; color: #e2e8f0; font-family: 'Courier New', monospace; overflow: hidden; }
+        .glass-panel { background: rgba(10, 15, 30, 0.7); border: 1px solid rgba(0, 240, 255, 0.1); border-radius: 8px; backdrop-filter: blur(10px); }
+        .editor-content { outline: none; min-height: 400px; padding: 1rem; font-family: sans-serif; line-height: 1.6; }
+        .editor-content h1 { font-size: 1.5rem; font-weight: bold; margin-bottom: 0.5rem; color: #fff; }
+        .editor-content h2 { font-size: 1.25rem; font-weight: bold; margin-top: 1rem; margin-bottom: 0.5rem; color: #e2e8f0; }
+        .editor-content p { margin-bottom: 1rem; color: #cbd5e1; }
+        .editor-content ul { list-style-type: disc; padding-left: 2rem; margin-bottom: 1rem; color: #cbd5e1; }
+
+        .ai-expansion {
+            border-left: 3px solid #00f0ff;
+            background: rgba(0, 240, 255, 0.05);
+            padding: 1rem;
+            margin: 1rem 0;
+            position: relative;
+        }
+        .ai-expansion::before {
+            content: "AI SYNTHESIS";
+            position: absolute; top: -10px; left: 10px;
+            background: #020408; color: #00f0ff; font-size: 0.6rem; font-weight: bold; padding: 0 4px;
+            border: 1px solid #00f0ff; border-radius: 2px;
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #020617; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 3px; }
+    </style>
+</head>
+<body class="p-4 flex flex-col h-screen">
+
+    <div class="flex justify-between items-center mb-4 border-b border-gray-800 pb-2">
+        <h1 class="text-xl font-bold text-white flex items-center gap-2">
+            <i data-lucide="file-edit" class="text-emerald-400 w-6 h-6"></i>
+            MEMO SYNTHESIZER
+        </h1>
+        <div class="flex gap-2">
+            <button onclick="synthesize()" class="bg-emerald-600/20 border border-emerald-500/50 text-emerald-400 px-3 py-1 rounded text-xs font-bold hover:bg-emerald-600/40 transition-colors flex items-center gap-1">
+                <i data-lucide="wand-2" class="w-4 h-4"></i> EXPAND & SYNTHESIZE
+            </button>
+            <button onclick="saveMemo()" class="bg-gray-800 border border-gray-600 text-gray-300 px-3 py-1 rounded text-xs hover:bg-gray-700 transition-colors flex items-center gap-1">
+                <i data-lucide="save" class="w-4 h-4"></i> SAVE
+            </button>
+        </div>
+    </div>
+
+    <div class="flex-grow grid grid-cols-12 gap-4 overflow-hidden">
+
+        <!-- Left Panel: Context & Tools -->
+        <div class="col-span-3 flex flex-col gap-4 overflow-y-auto">
+            <div class="glass-panel p-4">
+                <h3 class="text-xs uppercase text-gray-400 font-bold mb-3 border-b border-gray-700 pb-1">Context Sources</h3>
+                <div class="mb-4">
+                    <div class="flex justify-between items-center text-[10px] text-gray-400 mb-1">
+                        <span>Data Quality Score</span>
+                        <span id="quality-score" class="text-emerald-400 font-bold">50%</span>
+                    </div>
+                    <div class="w-full bg-gray-900 rounded-full h-1.5">
+                        <div id="quality-bar" class="bg-emerald-500 h-1.5 rounded-full transition-all duration-1000 ease-out" style="width: 50%"></div>
+                    </div>
+                </div>
+                <div class="space-y-2 text-[10px]">
+                    <label class="flex items-center gap-2 text-gray-300 cursor-pointer hover:text-white">
+                        <input type="checkbox" checked class="accent-emerald-500 bg-gray-900 border-gray-700"> Earnings Transcripts Q3
+                    </label>
+                    <label class="flex items-center gap-2 text-gray-300 cursor-pointer hover:text-white">
+                        <input type="checkbox" checked class="accent-emerald-500 bg-gray-900 border-gray-700"> Recent SEC Filings
+                    </label>
+                    <label class="flex items-center gap-2 text-gray-300 cursor-pointer hover:text-white">
+                        <input type="checkbox" class="accent-emerald-500 bg-gray-900 border-gray-700"> Competitor Analysis
+                    </label>
+                     <label class="flex items-center gap-2 text-gray-300 cursor-pointer hover:text-white">
+                        <input type="checkbox" class="accent-emerald-500 bg-gray-900 border-gray-700"> Macro Economic Data
+                    </label>
+                </div>
+            </div>
+
+            <div class="glass-panel p-4 flex-grow">
+                 <h3 class="text-xs uppercase text-gray-400 font-bold mb-3 border-b border-gray-700 pb-1">Synthesis Focus</h3>
+                 <select id="focus-area" class="w-full bg-gray-900 border border-gray-700 text-gray-300 p-2 rounded text-xs mb-4 outline-none focus:border-emerald-500">
+                     <option value="risk">Risk Factors & Mitigation</option>
+                     <option value="valuation">Valuation & Growth Drivers</option>
+                     <option value="moat">Competitive Moat Analysis</option>
+                     <option value="summary">Executive Summary</option>
+                 </select>
+
+                 <h3 class="text-xs uppercase text-gray-400 font-bold mb-3 border-b border-gray-700 pb-1 mt-4">Tone/Style</h3>
+                 <select id="tone-style" class="w-full bg-gray-900 border border-gray-700 text-gray-300 p-2 rounded text-xs mb-4 outline-none focus:border-emerald-500">
+                     <option value="Neutral">Neutral / Objective</option>
+                     <option value="Aggressive">Aggressive / Bullish</option>
+                     <option value="Conservative">Conservative / Bearish</option>
+                 </select>
+
+                 <div class="text-[10px] text-gray-500 italic">
+                     Select an area of focus to guide the AI synthesis engine when expanding the current document. Highlight text in the editor to target specific sections.
+                 </div>
+            </div>
+        </div>
+
+        <!-- Right Panel: Editor -->
+        <div class="col-span-9 glass-panel flex flex-col relative overflow-hidden">
+            <!-- Toolbar -->
+            <div class="bg-gray-900/80 border-b border-gray-800 p-2 flex gap-2">
+                 <button class="p-1 hover:bg-gray-700 rounded text-gray-400 transition" title="Bold"><i data-lucide="bold" class="w-4 h-4"></i></button>
+                 <button class="p-1 hover:bg-gray-700 rounded text-gray-400 transition" title="Italic"><i data-lucide="italic" class="w-4 h-4"></i></button>
+                 <button class="p-1 hover:bg-gray-700 rounded text-gray-400 transition" title="List"><i data-lucide="list" class="w-4 h-4"></i></button>
+                 <div class="w-px bg-gray-700 mx-1"></div>
+                 <button onclick="clearFormatting()" class="p-1 hover:bg-gray-700 rounded text-gray-400 transition" title="Clear Formatting"><i data-lucide="remove-formatting" class="w-4 h-4"></i></button>
+            </div>
+
+            <!-- Content Editable Area -->
+            <div id="editor" class="editor-content flex-grow overflow-y-auto" contenteditable="true" spellcheck="false">
+<h1>Investment Memo: Cyberdyne Systems (CYB)</h1>
+<p><strong>Date:</strong> October 24, 2025</p>
+<p><strong>Recommendation:</strong> STRONG BUY</p>
+
+<h2>Overview</h2>
+<p>Cyberdyne Systems presents a compelling opportunity in the advanced robotics and AI infrastructure space. Recent developments in their neural net processor line have shown significant margin expansion.</p>
+
+<h2>Key Drivers</h2>
+<ul>
+    <li>Strong Q3 earnings beat (+15% YoY).</li>
+    <li>New Department of Defense contract awarded last week.</li>
+    <li>Proprietary manufacturing process reduces unit cost by 22%.</li>
+</ul>
+
+<h2>Valuation</h2>
+<p>Trading at 14x forward EBITDA, CYB is undervalued relative to peers (avg 22x) given its dominant market position and high barriers to entry.</p>
+            </div>
+
+            <!-- Loading Overlay -->
+            <div id="loading" class="absolute inset-0 bg-black/50 backdrop-blur-sm hidden flex-col items-center justify-center z-10">
+                <i data-lucide="loader-2" class="w-8 h-8 text-emerald-500 animate-spin mb-2"></i>
+                <div class="text-emerald-400 text-xs font-bold tracking-widest animate-pulse">SYNTHESIZING CONTEXT...</div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        function synthesize() {
+            const editor = document.getElementById('editor');
+            const loading = document.getElementById('loading');
+            const focus = document.getElementById('focus-area').value;
+            const tone = document.getElementById('tone-style').value;
+
+            loading.classList.remove('hidden');
+            loading.classList.add('flex');
+
+            // Simulate API call
+            setTimeout(() => {
+                let expansionHTML = '';
+                const toneLabel = `<div class="text-[10px] text-gray-500 mb-2 uppercase tracking-widest">[Style: ${tone}]</div>`;
+
+                if (focus === 'risk') {
+                    expansionHTML = `
+                        <div class="ai-expansion" contenteditable="false">
+                            <div class="flex justify-between items-start mb-2 border-b border-cyan-500/30 pb-2">
+                                <h3 class="text-sm font-bold text-white">Expanded Risk Analysis</h3>
+                                <div class="text-[10px] bg-red-500/20 text-red-400 border border-red-500/50 px-2 py-0.5 rounded flex items-center gap-1">
+                                    <i data-lucide="alert-triangle" class="w-3 h-3"></i> CRITICAL RISK FLAG
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4 mb-3">
+                                <div class="bg-black/40 p-2 rounded border border-gray-800">
+                                    <div class="text-[10px] text-gray-500">Concentration Risk</div>
+                                    <div class="text-sm font-bold text-white">45% of Backlog</div>
+                                </div>
+                                <div class="bg-black/40 p-2 rounded border border-gray-800">
+                                    <div class="text-[10px] text-gray-500">Supply Chain Vuln.</div>
+                                    <div class="text-sm font-bold text-rose-400">High (Rare Earths)</div>
+                                </div>
+                            </div>
+                            <p class="text-xs text-gray-300 leading-relaxed">While the DoD contract provides revenue stability, ML context analysis reveals it introduces significant concentration risk. Furthermore, cross-referencing global supply chain data indicates dependencies on rare earth metals from restricted regions. This could directly impact the 22% margin improvement realized this quarter if geopolitical tensions in the APAC region escalate.</p>
+                            <div class="mt-3 text-[10px] text-cyan-400 flex items-center gap-1"><i data-lucide="check-circle" class="w-3 h-3"></i> Synthesis Engine Confidence: 92%</div>
+                        </div>
+                    `;
+                } else if (focus === 'moat') {
+                     expansionHTML = `
+                        <div class="ai-expansion" contenteditable="false">
+                            <div class="flex justify-between items-start mb-2 border-b border-cyan-500/30 pb-2">
+                                <h3 class="text-sm font-bold text-white">Competitive Moat Deep-Dive</h3>
+                                <div class="text-[10px] bg-green-500/20 text-green-400 border border-green-500/50 px-2 py-0.5 rounded flex items-center gap-1">
+                                    <i data-lucide="shield" class="w-3 h-3"></i> WIDE MOAT
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4 mb-3">
+                                <div class="bg-black/40 p-2 rounded border border-gray-800">
+                                    <div class="text-[10px] text-gray-500">IP Protection</div>
+                                    <div class="text-sm font-bold text-emerald-400">14 New Patents</div>
+                                </div>
+                                <div class="bg-black/40 p-2 rounded border border-gray-800">
+                                    <div class="text-[10px] text-gray-500">Entry Barrier</div>
+                                    <div class="text-sm font-bold text-white">Capital Intensive</div>
+                                </div>
+                            </div>
+                            <p class="text-xs text-gray-300 leading-relaxed">Systematic analysis of recent USPTO filings confirms the neural net processor architecture is protected by 14 newly granted patents, effectively locking out tier-1 competitors for the next 5-7 years. The proprietary manufacturing process mentioned is highly capital intensive, creating a formidable barrier to entry for new market participants and securing pricing power.</p>
+                            <div class="mt-3 text-[10px] text-cyan-400 flex items-center gap-1"><i data-lucide="check-circle" class="w-3 h-3"></i> Synthesis Engine Confidence: 88%</div>
+                        </div>
+                    `;
+                } else if (focus === 'valuation') {
+                    expansionHTML = `
+                        <div class="ai-expansion" contenteditable="false">
+                            <div class="flex justify-between items-start mb-2 border-b border-cyan-500/30 pb-2">
+                                <h3 class="text-sm font-bold text-white">Valuation Expansion Matrix</h3>
+                                <div class="text-[10px] bg-purple-500/20 text-purple-400 border border-purple-500/50 px-2 py-0.5 rounded flex items-center gap-1">
+                                    <i data-lucide="trending-up" class="w-3 h-3"></i> MULTIPLE EXPANSION
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4 mb-3">
+                                <div class="bg-black/40 p-2 rounded border border-gray-800">
+                                    <div class="text-[10px] text-gray-500">Implied Fwd Multiple</div>
+                                    <div class="text-sm font-bold text-purple-400">18.5x (Target)</div>
+                                </div>
+                                <div class="bg-black/40 p-2 rounded border border-gray-800">
+                                    <div class="text-[10px] text-gray-500">Margin Expansion</div>
+                                    <div class="text-sm font-bold text-white">+350 bps</div>
+                                </div>
+                            </div>
+                            <p class="text-xs text-gray-300 leading-relaxed">Our ML pricing model suggests the market is underestimating the operating leverage generated by the new manufacturing process. If the 22% unit cost reduction scales to 80% of production volume by Q4, we forecast a 350 bps margin expansion, justifying a re-rating from 14x to 18.5x forward EBITDA.</p>
+                            <div class="mt-3 text-[10px] text-cyan-400 flex items-center gap-1"><i data-lucide="check-circle" class="w-3 h-3"></i> Synthesis Engine Confidence: 85%</div>
+                        </div>
+                    `;
+                } else {
+                    expansionHTML = `
+                        <div class="ai-expansion" contenteditable="false">
+                            <div class="flex justify-between items-start mb-2 border-b border-cyan-500/30 pb-2">
+                                <h3 class="text-sm font-bold text-white">Executive Synthesis</h3>
+                            </div>
+                            <p class="text-xs text-gray-300 leading-relaxed">Synthesis compiled from 4 active data streams. The core thesis remains intact, supported by strong Q3 prints and protective moats. Recommended action: <strong>Overweight</strong>.</p>
+                            <div class="mt-3 text-[10px] text-cyan-400 flex items-center gap-1"><i data-lucide="check-circle" class="w-3 h-3"></i> Synthesis Engine Confidence: 95%</div>
+                        </div>
+                    `;
+                }
+
+                // Prepend tone label
+                expansionHTML = expansionHTML.replace('class="ai-expansion"', 'class="ai-expansion"').replace('<div class="flex', toneLabel + '<div class="flex');
+
+                // Update Quality Score
+                document.getElementById('quality-score').innerText = '95%';
+                document.getElementById('quality-bar').style.width = '95%';
+
+                // Append to editor
+                editor.innerHTML += expansionHTML;
+                lucide.createIcons();
+
+                // Scroll to bottom
+                editor.scrollTop = editor.scrollHeight;
+
+                loading.classList.add('hidden');
+                loading.classList.remove('flex');
+            }, 1500);
+        }
+
+        function clearFormatting() {
+            document.execCommand('removeFormat', false, null);
+        }
+
+        function saveMemo() {
+            const btn = document.querySelector('button[onclick="saveMemo()"]');
+            const originalHTML = btn.innerHTML;
+
+            btn.innerHTML = '<i data-lucide="check" class="w-4 h-4 text-green-400"></i> SAVED';
+            lucide.createIcons();
+
+            setTimeout(() => {
+                btn.innerHTML = originalHTML;
+                lucide.createIcons();
+            }, 2000);
+        }
+    </script>
+</body>
+</html>

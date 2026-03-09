@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM v24 :: FINANCIAL INTELLIGENCE HUB</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --theme: #10b981;
+            --primary: #00f3ff;
+            --bg: #050b14;
+            --panel: rgba(5, 11, 20, 0.95);
+            --border: #333;
+            --text: #e0e0e0;
+            --muted: #888;
+            --high: #0aff60;
+            --med: #f59e0b;
+            --low: #ff3333;
+        }
+        body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+
+        /* Universal Top Nav */
+        .top-nav { height: 50px; background: rgba(0,0,0,0.8); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 20px; justify-content: space-between; position: sticky; top: 0; z-index: 1000; backdrop-filter: blur(10px); }
+        .nav-brand { font-size: 1.1rem; color: var(--primary); font-weight: bold; letter-spacing: 2px; text-decoration: none; display: flex; align-items: center; gap: 10px; }
+        .nav-links { display: flex; gap: 20px; }
+        .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; transition: color 0.2s; }
+        .nav-links a:hover, .nav-links a.active { color: var(--primary); }
+
+        header { border-bottom: 1px solid var(--theme); padding: 30px 40px; display: flex; justify-content: space-between; align-items: flex-end; background: linear-gradient(180deg, rgba(255,255,255,0.02) 0%, transparent 100%); }
+        .hub-title { font-size: 2rem; color: #fff; margin: 0; letter-spacing: 2px; text-transform: uppercase; text-shadow: 0 0 15px var(--theme); font-weight: 800; display: flex; align-items: center; gap: 15px; }
+        .hub-title i { color: var(--theme); }
+
+        /* Controls */
+        .controls { display: flex; gap: 15px; background: rgba(0,0,0,0.5); padding: 15px 40px; border-bottom: 1px solid var(--border); align-items: center; }
+        .search-box { flex: 1; position: relative; }
+        .search-box i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--muted); }
+        .search-box input { width: 100%; background: #111; border: 1px solid var(--border); color: #fff; padding: 10px 10px 10px 40px; border-radius: 4px; font-family: 'JetBrains Mono'; font-size: 0.9rem; box-sizing: border-box; outline: none; transition: border-color 0.2s; }
+        .search-box input:focus { border-color: var(--theme); }
+
+        .sort-box select { background: #111; border: 1px solid var(--border); color: #fff; padding: 10px; border-radius: 4px; font-family: 'JetBrains Mono'; font-size: 0.9rem; outline: none; cursor: pointer; }
+        .sort-box select:focus { border-color: var(--theme); }
+
+        .container { padding: 40px; max-width: 1600px; margin: 0 auto; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; }
+
+        .card { border: 1px solid var(--border); background: rgba(255,255,255,0.02); padding: 25px; transition: 0.3s; position: relative; overflow: hidden; display: flex; flex-direction: column; border-radius: 6px; }
+        .card:hover { border-color: var(--theme); transform: translateY(-3px); box-shadow: 0 5px 20px rgba(0,0,0,0.3); background: rgba(255,255,255,0.04); }
+        .card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--theme); opacity: 0.5; transition: opacity 0.3s; }
+        .card:hover::before { opacity: 1; }
+
+        .card-title { font-size: 1.1rem; margin: 0 0 5px 0; color: #fff; word-break: break-word; line-height: 1.4; }
+        .metrics { display: flex; gap: 15px; margin: 20px 0; border-top: 1px dashed var(--border); border-bottom: 1px dashed var(--border); padding: 15px 0; font-size: 0.8rem; background: rgba(0,0,0,0.2); border-radius: 4px; }
+        .metric { display: flex; flex-direction: column; align-items: center; flex: 1; }
+        .metric-val { font-size: 1.3rem; font-weight: bold; font-family: 'JetBrains Mono'; margin-top: 5px; text-shadow: 0 0 10px currentColor; }
+
+        .val-high { color: var(--high); }
+        .val-med { color: var(--med); }
+        .val-low { color: var(--low); }
+
+        .card-link { margin-top: auto; display: inline-block; padding: 10px 0; text-align: center; background: rgba(255,255,255,0.05); color: #fff; text-decoration: none; font-size: 0.8rem; font-weight: bold; text-transform: uppercase; transition: 0.3s; border-radius: 4px; letter-spacing: 1px; }
+        .card-link:hover { background: var(--theme); color: #000; }
+        .critique-badge { position: absolute; top: 15px; right: 15px; font-size: 0.7rem; padding: 3px 8px; border-radius: 20px; border: 1px solid var(--muted); color: var(--muted); background: rgba(0,0,0,0.5); font-weight: bold; }
+    </style>
+</head>
+<body>
+    <nav class="top-nav mono">
+        <a href="index.html" class="nav-brand"><i class="fas fa-layer-group"></i> ADAM OS</a>
+        <div class="nav-links">
+            <a href="intelligence_hub.html" class="active">Intelligence Hub</a>
+            <a href="mission_control_v3.html">Mission Control</a>
+            <a href="terminal.html">Terminal</a>
+        </div>
+    </nav>
+
+    <header>
+        <div>
+            <h1 class="hub-title mono"><i class="fas fa-coins"></i> FINANCIAL INTELLIGENCE</h1>
+            <p class="mono" style="color: var(--muted); font-size: 0.9rem; margin: 10px 0 0 0;">Valuation, Credit & Distressed Pricing</p>
+        </div>
+        <div class="mono" style="text-align: right;">
+            <div style="color: var(--theme); font-size: 1.5rem; font-weight: bold;">12</div>
+            <div style="color: var(--muted); font-size: 0.7rem; text-transform: uppercase;">Active Modules</div>
+        </div>
+    </header>
+
+    <div class="controls mono">
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" id="searchInput" placeholder="Search financial intelligence modules by name or keyword...">
+        </div>
+        <div class="sort-box">
+            <select id="sortSelect">
+                <option value="name_asc">Sort by: Name (A-Z)</option>
+                <option value="name_desc">Sort by: Name (Z-A)</option>
+                <option value="sent_desc">Sort by: Highest Sentiment</option>
+                <option value="sent_asc">Sort by: Lowest Sentiment</option>
+                <option value="conv_desc">Sort by: Highest Conviction</option>
+                <option value="sys2_desc">Sort by: Highest Sys-2 Critique</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="grid" id="cardGrid">
+            <!-- Cards injected by JS -->
+        </div>
+    </div>
+
+    <script>
+        const rawData = [{"file": "unified_credit_console.html", "title": "unified credit console", "sent": 48, "conv": 44, "sys2": 69}, {"file": "unified_banking_dashboard.html", "title": "unified banking dashboard", "sent": 75, "conv": 61, "sys2": 77}, {"file": "unified_banking.html", "title": "unified banking", "sent": 46, "conv": 71, "sys2": 93}, {"file": "snc_credit_heatmap.html", "title": "snc credit heatmap", "sent": 54, "conv": 59, "sys2": 79}, {"file": "financial_twin.html", "title": "financial twin", "sent": 94, "conv": 43, "sys2": 71}, {"file": "financial_engineering.html", "title": "financial engineering", "sent": 14, "conv": 81, "sys2": 78}, {"file": "distressed_lbo.html", "title": "distressed lbo", "sent": 68, "conv": 55, "sys2": 95}, {"file": "credit_valuation_architect.html", "title": "credit valuation architect", "sent": 65, "conv": 71, "sys2": 69}, {"file": "credit_sentinel.html", "title": "credit sentinel", "sent": 68, "conv": 52, "sys2": 72}, {"file": "credit_architect.html", "title": "credit architect", "sent": 48, "conv": 84, "sys2": 95}, {"file": "credit_analyst_workstation.html", "title": "credit analyst workstation", "sent": 53, "conv": 40, "sys2": 83}, {"file": "analyst_os_vCredit.html", "title": "analyst os vCredit", "sent": 59, "conv": 98, "sys2": 72}];
+        const grid = document.getElementById('cardGrid');
+        const searchInput = document.getElementById('searchInput');
+        const sortSelect = document.getElementById('sortSelect');
+
+        function getColorClass(val, thresholdHigh, thresholdMed) {
+            if (val >= thresholdHigh) return 'val-high';
+            if (val >= thresholdMed) return 'val-med';
+            return 'val-low';
+        }
+
+        function renderCards(data) {
+            grid.innerHTML = '';
+            if (data.length === 0) {
+                grid.innerHTML = '<div style="color: #888; font-family: monospace; grid-column: 1/-1; padding: 40px; text-align: center; border: 1px dashed #333;">NO MODULES MATCH QUERY.</div>';
+                return;
+            }
+
+            data.forEach(item => {
+                const sentClass = getColorClass(item.sent, 60, 30);
+                const convClass = getColorClass(item.conv, 75, 50);
+                const sys2Class = getColorClass(item.sys2, 80, 70);
+
+                // For sys2 badge specifically
+                let sys2BadgeStyle = 'border-color: #ff3333; color: #ff3333;';
+                if(item.sys2 >= 80) sys2BadgeStyle = 'border-color: #0aff60; color: #0aff60;';
+                else if (item.sys2 >= 70) sys2BadgeStyle = 'border-color: #f59e0b; color: #f59e0b;';
+
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <div class="critique-badge mono" style="${sys2BadgeStyle}">SYS-2: ${item.sys2}</div>
+                    <h3 class="card-title">${item.title}</h3>
+                    <div class="mono" style="font-size: 0.65rem; color: #666; margin-bottom: 5px;">FILE: ${item.file}</div>
+                    <div class="metrics mono">
+                        <div class="metric">
+                            <span style="color: #888;">SENTIMENT</span>
+                            <span class="metric-val ${sentClass}">${item.sent}</span>
+                        </div>
+                        <div class="metric">
+                            <span style="color: #888;">CONVICTION</span>
+                            <span class="metric-val ${convClass}">${item.conv}</span>
+                        </div>
+                    </div>
+                    <a href="${item.file}" class="card-link mono">Access Module &rarr;</a>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function updateView() {
+            const query = searchInput.value.toLowerCase();
+            const sortBy = sortSelect.value;
+
+            // Filter
+            let filtered = rawData.filter(item =>
+                item.title.toLowerCase().includes(query) ||
+                item.file.toLowerCase().includes(query)
+            );
+
+            // Sort
+            filtered.sort((a, b) => {
+                if (sortBy === 'name_asc') return a.title.localeCompare(b.title);
+                if (sortBy === 'name_desc') return b.title.localeCompare(a.title);
+                if (sortBy === 'sent_desc') return b.sent - a.sent;
+                if (sortBy === 'sent_asc') return a.sent - b.sent;
+                if (sortBy === 'conv_desc') return b.conv - a.conv;
+                if (sortBy === 'sys2_desc') return b.sys2 - a.sys2;
+                return 0;
+            });
+
+            renderCards(filtered);
+        }
+
+        searchInput.addEventListener('input', updateView);
+        sortSelect.addEventListener('change', updateView);
+
+        // Initial render
+        updateView();
+    </script>
+</body>
+</html>

@@ -16,6 +16,8 @@ class Meta(BaseModel):
     agent_id: str
     trace_id: str
     security_context: SecurityContext
+    timestamp: Optional[datetime] = None
+    model_config_meta: Optional[Dict[str, Any]] = None
 
 class EPAVector(BaseModel):
     E: float
@@ -33,6 +35,7 @@ class PersonaIdentities(BaseModel):
 
 class PersonaDynamics(BaseModel):
     current_deflection: float = 0.0
+    target_behavior_epa: Optional[EPAVector] = None
 
 class PersonaState(BaseModel):
     identities: PersonaIdentities
@@ -57,6 +60,7 @@ class Turn(BaseModel):
     logic_eval: Optional[Dict[str, Any]] = None
 
 class ContextStream(BaseModel):
+    window_id: Optional[int] = None
     turns: List[Turn] = Field(default_factory=list)
 
 class ModelConfig(BaseModel):

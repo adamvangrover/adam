@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM v24 :: UNIFIED INTELLIGENCE HUB</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #00f3ff;
+            --secondary: #0aff60;
+            --danger: #ff3333;
+            --bg: #050b14;
+            --panel: rgba(5, 11, 20, 0.95);
+            --border: #333;
+            --text: #e0e0e0;
+            --muted: #888;
+        }
+        body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; overflow-x: hidden; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+
+        /* Universal Top Nav */
+        .top-nav {
+            height: 50px;
+            background: rgba(0,0,0,0.8);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+        .nav-brand { font-size: 1.1rem; color: var(--primary); font-weight: bold; letter-spacing: 2px; text-decoration: none; display: flex; align-items: center; gap: 10px; }
+        .nav-links { display: flex; gap: 20px; }
+        .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; transition: color 0.2s; }
+        .nav-links a:hover, .nav-links a.active { color: var(--primary); }
+
+        .scan-line { position: fixed; top: 0; left: 0; width: 100%; height: 2px; background: rgba(0, 243, 255, 0.1); animation: scan 3s linear infinite; pointer-events: none; z-index: 999; }
+        @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
+
+        header { padding: 60px 30px; text-align: center; background: radial-gradient(circle at center, rgba(0,243,255,0.05) 0%, transparent 70%); }
+        .hub-title { font-size: 3rem; color: #fff; margin: 0; letter-spacing: 4px; text-transform: uppercase; text-shadow: 0 0 20px rgba(0,243,255,0.5); font-weight: 800; }
+        .hub-subtitle { color: var(--primary); margin-top: 15px; font-size: 1.1rem; letter-spacing: 2px; }
+
+        .container { padding: 40px; max-width: 1400px; margin: 0 auto; }
+        .section-title { font-size: 1.5rem; color: #fff; border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: flex-end; }
+
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; margin-bottom: 60px; }
+
+        /* Category Cards */
+        .hub-card { border: 1px solid var(--border); background: rgba(255,255,255,0.02); padding: 30px; text-align: center; transition: all 0.3s ease; text-decoration: none; color: inherit; display: block; position: relative; overflow: hidden; border-radius: 8px; }
+        .hub-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 3px; background: var(--card-color, var(--primary)); transform: scaleX(0); transition: transform 0.3s ease; transform-origin: left; }
+        .hub-card:hover::before { transform: scaleX(1); }
+        .hub-card:hover { border-color: var(--card-color, var(--primary)); background: rgba(255,255,255,0.05); transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .hub-icon { font-size: 3rem; color: var(--card-color, var(--primary)); margin-bottom: 20px; transition: transform 0.3s ease; }
+        .hub-card:hover .hub-icon { transform: scale(1.1); text-shadow: 0 0 15px var(--card-color, var(--primary)); }
+        .hub-name { font-size: 1.2rem; margin: 0 0 10px 0; letter-spacing: 1px; color: #fff; }
+        .hub-desc { font-size: 0.85rem; color: var(--muted); margin: 0; line-height: 1.5; }
+        .count-badge { position: absolute; top: 15px; right: 15px; background: rgba(0,0,0,0.5); border: 1px solid var(--border); color: #aaa; padding: 4px 8px; font-size: 0.7rem; border-radius: 4px; backdrop-filter: blur(4px); }
+
+        /* App Cards */
+        .app-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; margin-bottom: 60px; }
+        .app-card { border: 1px solid var(--border); background: linear-gradient(135deg, rgba(255,255,255,0.02) 0%, rgba(0,0,0,0.5) 100%); padding: 20px; border-radius: 6px; text-decoration: none; color: inherit; transition: all 0.2s; display: flex; align-items: center; gap: 15px; }
+        .app-card:hover { border-color: var(--app-color, var(--primary)); background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(0,0,0,0.8) 100%); }
+        .app-icon-wrap { width: 50px; height: 50px; border-radius: 8px; background: rgba(0,0,0,0.5); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: var(--app-color, var(--primary)); }
+        .app-card:hover .app-icon-wrap { border-color: var(--app-color, var(--primary)); box-shadow: 0 0 15px rgba(0,0,0,0.5) inset; }
+    </style>
+</head>
+<body>
+    <div class="scan-line"></div>
+
+    <nav class="top-nav mono">
+        <a href="index.html" class="nav-brand"><i class="fas fa-layer-group"></i> ADAM OS</a>
+        <div class="nav-links">
+            <a href="intelligence_hub.html" class="active">Intelligence Hub</a>
+            <a href="mission_control_v3.html">Mission Control</a>
+            <a href="terminal.html">Terminal</a>
+            <a href="network_map.html">System Map</a>
+        </div>
+    </nav>
+
+    <header>
+        <h1 class="hub-title">Unified Intelligence Hub</h1>
+        <p class="hub-subtitle mono">Central Access Matrix for ADAM v24 Subsystems</p>
+    </header>
+
+    <div class="container">
+
+        <div class="section-title mono">
+            <span><i class="fas fa-desktop" style="color: var(--primary); margin-right: 10px;"></i> MAJOR CONSOLES & DASHBOARDS</span>
+        </div>
+        <div class="app-grid">
+
+            <a href="mission_control_v3.html" class="app-card" style="--app-color: #00f3ff;">
+                <div class="app-icon-wrap">
+                    <i class="fas fa-satellite-dish"></i>
+                </div>
+                <div>
+                    <h3 class="mono" style="margin: 0 0 5px 0; font-size: 1rem; color: #fff;">Mission Control v3</h3>
+                    <p style="margin: 0; font-size: 0.75rem; color: var(--muted);">Global Command Center</p>
+                </div>
+            </a>
+
+            <a href="terminal.html" class="app-card" style="--app-color: #eab308;">
+                <div class="app-icon-wrap">
+                    <i class="fas fa-terminal"></i>
+                </div>
+                <div>
+                    <h3 class="mono" style="margin: 0 0 5px 0; font-size: 1rem; color: #fff;">System Terminal</h3>
+                    <p style="margin: 0; font-size: 0.75rem; color: var(--muted);">Command Line Interface</p>
+                </div>
+            </a>
+
+            <a href="war_room_v2.html" class="app-card" style="--app-color: #ff3333;">
+                <div class="app-icon-wrap">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <div>
+                    <h3 class="mono" style="margin: 0 0 5px 0; font-size: 1rem; color: #fff;">War Room V2</h3>
+                    <p style="margin: 0; font-size: 0.75rem; color: var(--muted);">Sovereign Conflict Simulation</p>
+                </div>
+            </a>
+
+            <a href="http://localhost:3000/synthesizer" target="_blank" rel="noopener noreferrer" class="app-card" style="--app-color: #0aff60;">
+                <div class="app-icon-wrap">
+                    <i class="fas fa-wave-square"></i>
+                </div>
+                <div>
+                    <h3 class="mono" style="margin: 0 0 5px 0; font-size: 1rem; color: #fff;">Synthesizer</h3>
+                    <p style="margin: 0; font-size: 0.75rem; color: var(--muted);">Neural Consensus Dashboard</p>
+                </div>
+            </a>
+
+            <a href="nexus_explorer.html" class="app-card" style="--app-color: #a855f7;">
+                <div class="app-icon-wrap">
+                    <i class="fas fa-project-diagram"></i>
+                </div>
+                <div>
+                    <h3 class="mono" style="margin: 0 0 5px 0; font-size: 1rem; color: #fff;">Nexus Explorer</h3>
+                    <p style="margin: 0; font-size: 0.75rem; color: var(--muted);">Neural Node Map</p>
+                </div>
+            </a>
+
+            <a href="credit_analyst_workstation.html" class="app-card" style="--app-color: #3b82f6;">
+                <div class="app-icon-wrap">
+                    <i class="fas fa-chart-pie"></i>
+                </div>
+                <div>
+                    <h3 class="mono" style="margin: 0 0 5px 0; font-size: 1rem; color: #fff;">Credit Workstation</h3>
+                    <p style="margin: 0; font-size: 0.75rem; color: var(--muted);">Enterprise Credit Engine</p>
+                </div>
+            </a>
+
+            <a href="financial_twin.html" class="app-card" style="--app-color: #00ff00;">
+                <div class="app-icon-wrap">
+                    <i class="fas fa-globe"></i>
+                </div>
+                <div>
+                    <h3 class="mono" style="margin: 0 0 5px 0; font-size: 1rem; color: #fff;">Financial Twin</h3>
+                    <p style="margin: 0; font-size: 0.75rem; color: var(--muted);">Unified Banking World Model</p>
+                </div>
+            </a>
+
+            <a href="live_market_pulse.html" class="app-card" style="--app-color: #ff9900;">
+                <div class="app-icon-wrap">
+                    <i class="fas fa-bolt"></i>
+                </div>
+                <div>
+                    <h3 class="mono" style="margin: 0 0 5px 0; font-size: 1rem; color: #fff;">Live Market Pulse</h3>
+                    <p style="margin: 0; font-size: 0.75rem; color: var(--muted);">Real-time Activity Stream</p>
+                </div>
+            </a>
+
+            <a href="macro_glitch_monitor.html" class="app-card" style="--app-color: #ff00ff;">
+                <div class="app-icon-wrap">
+                    <i class="fas fa-bug"></i>
+                </div>
+                <div>
+                    <h3 class="mono" style="margin: 0 0 5px 0; font-size: 1rem; color: #fff;">Macro Glitch</h3>
+                    <p style="margin: 0; font-size: 0.75rem; color: var(--muted);">Anomaly Detection Panel</p>
+                </div>
+            </a>
+
+        </div>
+
+        <div class="section-title mono">
+            <span><i class="fas fa-database" style="color: var(--secondary); margin-right: 10px;"></i> INTELLIGENCE CATEGORIES</span>
+        </div>
+        <div class="grid">
+
+            <a href="hub_agents.html" class="hub-card" style="--card-color: #00f3ff;">
+                <div class="count-badge mono">9 MODULES</div>
+                <i class="fas fa-robot hub-icon"></i>
+                <h2 class="hub-name mono">Agents</h2>
+                <p class="hub-desc">Autonomous AI Agents & Orchestration</p>
+            </a>
+
+            <a href="hub_newsletters.html" class="hub-card" style="--card-color: #eab308;">
+                <div class="count-badge mono">257 MODULES</div>
+                <i class="fas fa-envelope-open-text hub-icon"></i>
+                <h2 class="hub-name mono">Newsletters</h2>
+                <p class="hub-desc">Daily Briefings & Market Mayhem Updates</p>
+            </a>
+
+            <a href="hub_reports.html" class="hub-card" style="--card-color: #3b82f6;">
+                <div class="count-badge mono">50 MODULES</div>
+                <i class="fas fa-file-alt hub-icon"></i>
+                <h2 class="hub-name mono">Reports</h2>
+                <p class="hub-desc">Corporate, Industry & House View Reports</p>
+            </a>
+
+            <a href="hub_deep_dives.html" class="hub-card" style="--card-color: #a855f7;">
+                <div class="count-badge mono">10 MODULES</div>
+                <i class="fas fa-water hub-icon"></i>
+                <h2 class="hub-name mono">Deep Dives</h2>
+                <p class="hub-desc">Extensive Thematic & Macro Explorations</p>
+            </a>
+
+            <a href="hub_market_signals.html" class="hub-card" style="--card-color: #f97316;">
+                <div class="count-badge mono">5 MODULES</div>
+                <i class="fas fa-broadcast-tower hub-icon"></i>
+                <h2 class="hub-name mono">Market Signals</h2>
+                <p class="hub-desc">Real-time Alerts & Glitch Monitors</p>
+            </a>
+
+            <a href="hub_trading_intelligence.html" class="hub-card" style="--card-color: #ef4444;">
+                <div class="count-badge mono">11 MODULES</div>
+                <i class="fas fa-chart-line hub-icon"></i>
+                <h2 class="hub-name mono">Trading Intelligence</h2>
+                <p class="hub-desc">Conviction Ratings & Alpha Generation</p>
+            </a>
+
+            <a href="hub_financial_intelligence.html" class="hub-card" style="--card-color: #10b981;">
+                <div class="count-badge mono">12 MODULES</div>
+                <i class="fas fa-coins hub-icon"></i>
+                <h2 class="hub-name mono">Financial Intelligence</h2>
+                <p class="hub-desc">Valuation, Credit & Distressed Pricing</p>
+            </a>
+
+            <a href="hub_system_intelligence.html" class="hub-card" style="--card-color: #6366f1;">
+                <div class="count-badge mono">112 MODULES</div>
+                <i class="fas fa-network-wired hub-icon"></i>
+                <h2 class="hub-name mono">System Intelligence</h2>
+                <p class="hub-desc">System 2 Critiques, OS & Infrastructure</p>
+            </a>
+
+            <a href="intelligence_archive_2026.html" class="hub-card" style="--card-color: #555; border-style: dashed;">
+                <div class="count-badge mono">ARCHIVE</div>
+                <i class="fas fa-archive hub-icon" style="color: #666;"></i>
+                <h2 class="hub-name mono" style="color: #888;">INTELLIGENCE ARCHIVE 2026</h2>
+                <p class="hub-desc">Consolidated strategic reports, briefings, and terminal dashboards.</p>
+            </a>
+
+            <a href="market_mayhem_archive.html" class="hub-card" style="--card-color: #555; border-style: dashed;">
+                <div class="count-badge mono">ARCHIVE</div>
+                <i class="fas fa-archive hub-icon" style="color: #666;"></i>
+                <h2 class="hub-name mono" style="color: #888;">MARKET MAYHEM ARCHIVE</h2>
+                <p class="hub-desc">Market mayhem related files back into user experience.</p>
+            </a>
+        </div>
+    </div>
+</body>
+</html>

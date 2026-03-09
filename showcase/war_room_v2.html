@@ -1,398 +1,496 @@
-<!-- Verified for Adam v25.5 -->
-<!-- Reviewed by Jules -->
-<!-- Protocol Verified: ADAM-V-NEXT (Updated) -->
-<!-- Verified functionality for live market data and risk radar integration -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Protocol: ADAM-V-NEXT -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADAM v25.5 :: WAR ROOM</title>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <title>The War Room - ADAM-V-NEXT</title>
     <style>
         :root {
-            --bg-color: #050505;
-            --primary: #00f3ff;
-            --secondary: #ff00ff;
-            --alert: #ff3333;
-            --panel-bg: rgba(10, 15, 20, 0.95);
-            --border: 1px solid #333;
+            --primary-color: #0ff;
+            --secondary-color: #f0f;
+            --bg-color: #050a0f;
+            --panel-bg: rgba(10, 20, 30, 0.85);
+            --text-color: #e0e0e0;
+            --border-color: #333;
+            --alert-color: #f00;
+            --success-color: #0f0;
+            --font-family: 'JetBrains Mono', monospace;
         }
-        body { margin: 0; background: var(--bg-color); color: #e0e0e0; font-family: 'JetBrains Mono', monospace; overflow: hidden; }
+
+        body {
+            margin: 0;
+            padding: 20px;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: var(--font-family);
+            background-image:
+                linear-gradient(rgba(0, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            height: 100vh;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        h1 {
+            margin-top: 0;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            font-size: 2rem;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .status-badge {
+            font-size: 1rem;
+            background: rgba(0, 255, 0, 0.1);
+            color: var(--success-color);
+            padding: 5px 15px;
+            border: 1px solid var(--success-color);
+            border-radius: 4px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(0, 255, 0, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(0, 255, 0, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 255, 0, 0); }
+        }
 
         .grid-container {
             display: grid;
             grid-template-columns: 1fr 1fr;
             grid-template-rows: 1fr 1fr;
-            height: 100vh;
-            gap: 2px;
-            background: #222; /* Gap color */
+            gap: 20px;
+            height: calc(100vh - 80px); /* Adjust based on header */
         }
 
-        .quadrant {
-            background: var(--bg-color);
-            position: relative;
+        .panel {
+            background: var(--panel-bg);
+            border: 1px solid var(--primary-color);
+            border-radius: 8px;
             padding: 20px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(0, 255, 255, 0.05);
+            display: flex;
+            flex-direction: column;
             overflow: hidden;
-            border: 1px solid #111;
+            position: relative;
         }
 
-        .quadrant-header {
-            position: absolute; top: 10px; left: 10px;
-            font-size: 0.8rem; color: var(--primary);
-            background: rgba(0, 243, 255, 0.1);
-            padding: 2px 8px;
-            border-left: 2px solid var(--primary);
+        .panel::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
         }
 
-        /* Q1: Ticker */
-        .ticker-row { display: flex; justify-content: space-between; border-bottom: 1px solid #333; padding: 15px 0; }
-        .ticker-symbol { font-size: 1.5rem; font-weight: bold; }
-        .ticker-price { font-size: 1.5rem; }
-        .pos { color: #0f0; } .neg { color: #f00; }
+        .panel-header {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--secondary-color);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            display: flex;
+            align-items: center;
+        }
 
-        /* Q2: News */
-        .news-item { margin-bottom: 15px; border-left: 2px solid #333; padding-left: 10px; transition: all 0.3s; }
-        .news-item:hover { border-left-color: var(--secondary); background: rgba(255,0,255,0.05); }
-        .news-source { font-size: 0.7rem; color: #888; text-transform: uppercase; }
-        .news-title { font-size: 0.95rem; margin: 2px 0; }
-        .news-meta { font-size: 0.7rem; display: flex; gap: 10px; }
+        .panel-header span {
+            margin-right: 10px;
+            font-size: 1.5rem;
+        }
 
-        /* Q3: Radar */
-        canvas { display: block; margin: 40px auto; }
+        /* 1. Live Ticker Styles */
+        .ticker-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            overflow-y: auto;
+            flex-grow: 1;
+        }
 
-        /* Q4: System Health */
-        .health-metric { margin-bottom: 20px; }
-        .bar-container { height: 10px; background: #333; margin-top: 5px; width: 100%; }
-        .bar-fill { height: 100%; background: var(--primary); width: 0%; transition: width 0.5s; }
+        .ticker-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            font-size: 1.1rem;
+        }
 
-        .scan-line { position: fixed; top: 0; left: 0; width: 100%; height: 2px; background: rgba(0, 243, 255, 0.2); animation: scan 6s linear infinite; pointer-events: none; z-index: 99; }
-        @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
+        .ticker-up { color: var(--success-color); }
+        .ticker-down { color: var(--alert-color); }
 
-        .blink { animation: blink 1s infinite; }
-        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+        /* 2. News Feed Styles */
+        .news-feed {
+            overflow-y: auto;
+            flex-grow: 1;
+            padding-right: 10px;
+        }
+
+        .news-item {
+            margin-bottom: 15px;
+            padding: 10px;
+            background: rgba(255,255,255,0.02);
+            border-left: 3px solid var(--primary-color);
+        }
+
+        .news-time {
+            font-size: 0.8rem;
+            color: #888;
+            margin-bottom: 5px;
+        }
+
+        .news-title {
+            font-size: 1rem;
+            line-height: 1.4;
+        }
+
+        .news-critical {
+            border-left-color: var(--alert-color);
+        }
+
+        /* 3. Risk Radar Styles */
+        .radar-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-grow: 1;
+            position: relative;
+        }
+
+        .radar-svg {
+            width: 100%;
+            height: 100%;
+            max-width: 300px;
+            max-height: 300px;
+            filter: drop-shadow(0 0 10px rgba(0, 255, 255, 0.3));
+        }
+
+        /* 4. System Health Styles */
+        .health-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            flex-grow: 1;
+            align-content: start;
+        }
+
+        .health-node {
+            background: rgba(0,0,0,0.5);
+            border: 1px solid #444;
+            padding: 15px;
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .node-name {
+            font-weight: bold;
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+
+        .node-bar-container {
+            height: 6px;
+            background: #222;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .node-bar {
+            height: 100%;
+            background: var(--primary-color);
+            transition: width 0.5s ease;
+        }
+
+        .node-status {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
+        ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--primary-color); }
+
+        /* Responsive adjustments for extremely large/small screens */
+        @media (max-width: 1200px) {
+            .grid-container {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto auto auto;
+                height: auto;
+                overflow-y: auto;
+            }
+            body { overflow-y: auto; height: auto; }
+            .panel { min-height: 350px; }
+        }
     </style>
 </head>
 <body>
-    <div class="scan-line"></div>
+
+    <h1>
+        <span>The War Room <span style={{color: '#888', fontSize: '1rem'}}>// SYNTHESIZER V2</span></span>
+        <div class="status-badge">SYSTEM OPTIMAL</div>
+    </h1>
+
     <div class="grid-container">
 
-        <!-- QUADRANT 1: MARKET TICKER -->
-        <div class="quadrant" id="q1">
-            <div class="quadrant-header">LIVE MARKET DATA // S&P 500</div>
-            <div style="margin-top: 30px;" id="ticker-feed">
-                <!-- JS Populated -->
+        <!-- Quadrant 1: Live Ticker -->
+        <div class="panel">
+            <div class="panel-header"><span>⚡</span> Live Market Pulse</div>
+            <ul class="ticker-list" id="tickerList">
+                <!-- Populated by JS -->
+            </ul>
+        </div>
+
+        <!-- Quadrant 2: News Feed -->
+        <div class="panel">
+            <div class="panel-header"><span>📰</span> Global Intelligence Feed</div>
+            <div class="news-feed" id="newsFeed">
+                <!-- Populated by JS -->
             </div>
         </div>
 
-        <!-- QUADRANT 2: INTELLIGENCE FEED -->
-        <div class="quadrant" id="q2">
-            <div class="quadrant-header">GLOBAL INTELLIGENCE STREAM</div>
-            <div style="margin-top: 30px;" id="news-feed">
-                <!-- JS Populated -->
+        <!-- Quadrant 3: Risk Radar -->
+        <div class="panel">
+            <div class="panel-header"><span>🎯</span> Multidimensional Risk Radar</div>
+            <div class="radar-container">
+                <svg viewBox="-120 -120 240 240" class="radar-svg">
+                    <!-- Concentric circles -->
+                    <circle cx="0" cy="0" r="100" fill="none" stroke="#333" stroke-width="1" />
+                    <circle cx="0" cy="0" r="75" fill="none" stroke="#333" stroke-width="1" />
+                    <circle cx="0" cy="0" r="50" fill="none" stroke="#333" stroke-width="1" />
+                    <circle cx="0" cy="0" r="25" fill="none" stroke="#333" stroke-width="1" />
+
+                    <!-- Axes -->
+                    <line x1="0" y1="-100" x2="0" y2="100" stroke="#444" stroke-width="1" />
+                    <line x1="-100" y1="0" x2="100" y2="0" stroke="#444" stroke-width="1" />
+                    <line x1="-70.7" y1="-70.7" x2="70.7" y2="70.7" stroke="#444" stroke-width="1" />
+                    <line x1="-70.7" y1="70.7" x2="70.7" y2="-70.7" stroke="#444" stroke-width="1" />
+
+                    <!-- Labels -->
+                    <text x="0" y="-110" fill="#888" font-size="8" text-anchor="middle">Volatility</text>
+                    <text x="110" y="0" fill="#888" font-size="8" text-anchor="start" alignment-baseline="middle">Credit</text>
+                    <text x="0" y="115" fill="#888" font-size="8" text-anchor="middle">Liquidity</text>
+                    <text x="-110" y="0" fill="#888" font-size="8" text-anchor="end" alignment-baseline="middle">Macro</text>
+
+                    <text x="80" y="-80" fill="#888" font-size="8" text-anchor="middle">Geopolitics</text>
+                    <text x="80" y="80" fill="#888" font-size="8" text-anchor="middle">Regulatory</text>
+                    <text x="-80" y="80" fill="#888" font-size="8" text-anchor="middle">Contagion</text>
+                    <text x="-80" y="-80" fill="#888" font-size="8" text-anchor="middle">Sentiment</text>
+
+                    <!-- Radar Polygon -->
+                    <polygon id="radarPolygon" points="" fill="rgba(0, 255, 255, 0.2)" stroke="var(--primary-color)" stroke-width="2" />
+                </svg>
             </div>
         </div>
 
-        <!-- QUADRANT 3: RISK RADAR -->
-        <div class="quadrant" id="q3">
-            <div class="quadrant-header">MULTIVARIATE RISK RADAR</div>
-            <canvas id="riskCanvas" width="400" height="400"></canvas>
-            <div style="text-align: center; font-size: 0.8rem; color: #888;">
-                RISK PROFILE: <span style="color: #ffa500; font-weight: bold;">MODERATE-HIGH</span>
-            </div>
-        </div>
-
-        <!-- QUADRANT 4: SYSTEM HEALTH -->
-        <div class="quadrant" id="q4">
-            <div class="quadrant-header">SYSTEM HEALTH & AGENT STATUS</div>
-            <div style="margin-top: 40px; padding: 0 20px;">
-                <div class="health-metric">
-                    <div style="display: flex; justify-content: space-between;">
-                        <span>CPU LOAD</span>
-                        <span id="cpu-val">0%</span>
-                    </div>
-                    <div class="bar-container"><div class="bar-fill" id="cpu-bar"></div></div>
-                </div>
-                <div class="health-metric">
-                    <div style="display: flex; justify-content: space-between;">
-                        <span>MEMORY ALLOCATION</span>
-                        <span id="mem-val">0%</span>
-                    </div>
-                    <div class="bar-container"><div class="bar-fill" id="mem-bar"></div></div>
-                </div>
-                <div class="health-metric">
-                    <div style="display: flex; justify-content: space-between;">
-                        <span>NEURAL COHERENCE</span>
-                        <span id="coh-val">0%</span>
-                    </div>
-                    <div class="bar-container"><div class="bar-fill" id="coh-bar" style="background: var(--secondary);"></div></div>
-                </div>
-
-                <div style="margin-top: 40px; border-top: 1px solid #333; padding-top: 20px;">
-                    <div style="font-size: 0.8rem; color: #666; margin-bottom: 10px;">ACTIVE AGENTS</div>
-                    <div id="agent-list" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 0.8rem;">
-                        <!-- JS populated -->
-                    </div>
-                </div>
+        <!-- Quadrant 4: System Health -->
+        <div class="panel">
+            <div class="panel-header"><span>🧠</span> Neural Swarm Telemetry</div>
+            <div class="health-grid" id="healthGrid">
+                <!-- Populated by JS -->
             </div>
         </div>
 
     </div>
 
     <script>
-        // EMBEDDED SEED DATA (Simulating the LiveMockEngine)
-        const SEED_DATA = {
-          "market_data": {
-            "indices": {
-              "SPX": { "price": 5842.10, "change_percent": 0.45 },
-              "NDX": { "price": 20105.30, "change_percent": 0.88 },
-              "VIX": { "price": 14.20, "change_percent": -2.10 },
-              "BTC": { "price": 64200.00, "change_percent": 1.20 },
-              "EUR/USD": { "price": 1.08, "change_percent": -0.15 }
-            }
-          },
-          "headlines": [
-            { "source": "Bloomberg", "title": "Tech Rally Extends as AI Demand Outstrips Supply", "sentiment": "positive" },
-            { "source": "Reuters", "title": "Fed Minutes Show Consensus on 'Patient' Approach", "sentiment": "neutral" },
-            { "source": "WSJ", "title": "Oil Prices Dip Below $75 on Demand Concerns", "sentiment": "negative" },
-            { "source": "CNBC", "title": "Chipmakers Surge in Pre-market Trading", "sentiment": "positive" },
-            { "source": "FT", "title": "European Markets Close Higher on Earnings Beat", "sentiment": "positive" }
-          ]
-        };
+        // --- 1. Live Ticker Logic ---
+        const tickers = [
+            { symbol: 'SPX', price: 5120.50, change: 0.00, vol: 2.5 },
+            { symbol: 'NDX', price: 18050.25, change: 0.00, vol: 5.0 },
+            { symbol: 'VIX', price: 14.20, change: 0.00, vol: 1.2 },
+            { symbol: 'US10Y', price: 4.25, change: 0.00, vol: 0.05 },
+            { symbol: 'BTC', price: 65000, change: 0.00, vol: 150 },
+            { symbol: 'OIL', price: 82.50, change: 0.00, vol: 0.8 },
+            { symbol: 'GLD', price: 2150.80, change: 0.00, vol: 1.5 }
+        ];
 
-        // --- API Integration ---
-        async function fetchLiveData() {
-            try {
-                const res = await fetch('/api/synthesizer/confidence');
-                if (res.ok) {
-                    const data = await res.json();
+        function updateTickers() {
+            const list = document.getElementById('tickerList');
+            list.innerHTML = '';
 
-                    // Update internal data model with live pulse
-                    if(data.pulse && data.pulse.indices) {
-                         SEED_DATA.market_data.indices = data.pulse.indices;
-                    }
+            tickers.forEach(t => {
+                // Simulate price movement
+                const move = (Math.random() - 0.5) * t.vol;
+                t.price += move;
+                t.change = move;
+                const pctChange = (t.change / t.price) * 100;
 
-                    // Update System Health Coherence based on Score
-                    if(data.score) {
-                         document.getElementById('coh-val').innerText = data.score + '%';
-                         document.getElementById('coh-bar').style.width = data.score + '%';
-                    }
+                const item = document.createElement('li');
+                item.className = 'ticker-item';
 
-                    console.log("WarRoom: Live Data Sync Complete");
-                }
-            } catch(e) {
-                console.log("WarRoom: Live Data Offline, using simulation.");
-            }
-        }
+                const colorClass = t.change >= 0 ? 'ticker-up' : 'ticker-down';
+                const sign = t.change >= 0 ? '+' : '';
 
-        // --- Q1: Ticker Logic ---
-        function renderTicker() {
-            const container = document.getElementById('ticker-feed');
-            container.innerHTML = '';
-            for (const [sym, data] of Object.entries(SEED_DATA.market_data.indices)) {
-                // Apply random drift
-                const drift = (Math.random() - 0.5) * 0.1;
-                const price = (data.price + (Math.random() * 10 - 5)).toFixed(2);
-                const change = (data.change_percent + drift).toFixed(2);
-                const isPos = change >= 0;
-
-                const div = document.createElement('div');
-                div.className = 'ticker-row';
-                div.innerHTML = `
-                    <div class="ticker-symbol">${sym}</div>
-                    <div style="text-align: right;">
-                        <div class="ticker-price">${price}</div>
-                        <div style="font-size: 1rem;" class="${isPos ? 'pos' : 'neg'}">
-                            ${isPos ? '▲' : '▼'} ${change}%
-                        </div>
-                    </div>
+                item.innerHTML = `
+                    <span style="font-weight: bold; width: 60px; display: inline-block;">${t.symbol}</span>
+                    <span style="font-family: monospace;">${t.price.toFixed(2)}</span>
+                    <span class="${colorClass}" style="width: 80px; text-align: right;">${sign}${pctChange.toFixed(2)}%</span>
                 `;
-                container.appendChild(div);
-            }
-        }
-
-        // --- Q2: News Logic ---
-        function renderNews() {
-            const container = document.getElementById('news-feed');
-            container.innerHTML = '';
-            SEED_DATA.headlines.forEach(news => {
-                const div = document.createElement('div');
-                div.className = 'news-item';
-                div.innerHTML = `
-                    <div class="news-source">${news.source}</div>
-                    <div class="news-title">${news.title}</div>
-                    <div class="news-meta">
-                        <span style="color: ${news.sentiment==='positive'?'#0f0':news.sentiment==='negative'?'#f00':'#aaa'}">
-                            ${news.sentiment.toUpperCase()}
-                        </span>
-                        <span>:: LIVE</span>
-                    </div>
-                `;
-                container.appendChild(div);
+                list.appendChild(item);
             });
         }
 
-        // --- Q3: Radar Logic (Canvas) ---
-        function drawRadar() {
-            const canvas = document.getElementById('riskCanvas');
-            const ctx = canvas.getContext('2d');
-            const cx = 200, cy = 200, radius = 150;
+        // --- 2. News Feed Logic ---
+        const newsItems = [
+            { title: "Central Bank signals potential rate cut in Q3.", crit: false },
+            { title: "Tech sector rally continues amidst AI chip shortage.", crit: false },
+            { title: "Geopolitical tensions escalate in key transit corridor.", crit: true },
+            { title: "Major sovereign debt downgrade rocks European markets.", crit: true },
+            { title: "Retail sales data beats expectations.", crit: false },
+            { title: "New regulatory framework proposed for digital assets.", crit: false }
+        ];
 
-            // Clear
-            ctx.clearRect(0,0,400,400);
+        function addNews() {
+            const feed = document.getElementById('newsFeed');
+            const item = newsItems[Math.floor(Math.random() * newsItems.length)];
+            const time = new Date().toLocaleTimeString();
 
-            // Draw Web
-            ctx.strokeStyle = '#333';
-            ctx.beginPath();
-            for(let r=30; r<=radius; r+=30) {
-                ctx.arc(cx, cy, r, 0, Math.PI*2);
-            }
-            ctx.stroke();
-
-            // Axes
-            const axes = 5;
-            const labels = ['Liquidity', 'Volatility', 'Geopolitical', 'Cyber', 'Credit'];
-            const angles = [];
-            for(let i=0; i<axes; i++) {
-                const ang = (Math.PI*2/axes)*i - Math.PI/2;
-                angles.push(ang);
-                ctx.beginPath();
-                ctx.moveTo(cx, cy);
-                ctx.lineTo(cx + Math.cos(ang)*radius, cy + Math.sin(ang)*radius);
-                ctx.stroke();
-
-                // Labels
-                ctx.fillStyle = '#888';
-                ctx.font = '12px JetBrains Mono';
-                ctx.fillText(labels[i], cx + Math.cos(ang)*(radius+20) - 20, cy + Math.sin(ang)*(radius+20));
-            }
-
-            // Data Polygon (Dynamic)
-            const values = labels.map(() => 0.3 + Math.random()*0.5); // Random values 0.3 - 0.8
-            ctx.fillStyle = 'rgba(0, 243, 255, 0.2)';
-            ctx.strokeStyle = '#00f3ff';
-            ctx.lineWidth = 2;
-
-            ctx.beginPath();
-            values.forEach((v, i) => {
-                const r = v * radius;
-                const x = cx + Math.cos(angles[i]) * r;
-                const y = cy + Math.sin(angles[i]) * r;
-                if(i===0) ctx.moveTo(x,y);
-                else ctx.lineTo(x,y);
-            });
-            ctx.closePath();
-            ctx.fill();
-            ctx.stroke();
-        }
-
-        // --- Q4: System Health ---
-        function updateHealth() {
-            const cpu = Math.floor(20 + Math.random() * 40);
-            const mem = Math.floor(40 + Math.random() * 20);
-            const coh = Math.floor(85 + Math.random() * 10);
-
-            // Change colors based on load
-            const cpuColor = cpu > 80 ? '#f00' : cpu > 60 ? '#ffa500' : '#0ff';
-            const memColor = mem > 80 ? '#f00' : mem > 60 ? '#ffa500' : '#0ff';
-
-            const cpuBar = document.getElementById('cpu-bar');
-            document.getElementById('cpu-val').innerText = cpu + '%';
-            document.getElementById('cpu-val').style.color = cpuColor;
-            cpuBar.style.width = cpu + '%';
-            cpuBar.style.background = cpuColor;
-
-            const memBar = document.getElementById('mem-bar');
-            document.getElementById('mem-val').innerText = mem + '%';
-            document.getElementById('mem-val').style.color = memColor;
-            memBar.style.width = mem + '%';
-            memBar.style.background = memColor;
-
-            document.getElementById('coh-val').innerText = coh + '%';
-            document.getElementById('coh-bar').style.width = coh + '%';
-        }
-
-        function renderAgents() {
-            const list = document.getElementById('agent-list');
-            const agents = ['RiskOfficer', 'TechAnalyst', 'MacroSentinel', 'BlindspotMonitor', 'ConsensusEngine'];
-            list.innerHTML = agents.map(a => `
-                <div onclick="showLogModal('${a}')" style="cursor: pointer; display:flex; align-items:center; gap:5px; padding: 5px; background: rgba(0, 255, 0, 0.05); border-radius: 4px; border: 1px solid rgba(0,255,0,0.2); transition: background 0.3s;" onmouseover="this.style.background='rgba(0, 255, 0, 0.15)'" onmouseout="this.style.background='rgba(0, 255, 0, 0.05)'">
-                    <div style="width:8px; height:8px; background:#0f0; border-radius:50%; box-shadow:0 0 8px #0f0; animation: pulse 2s infinite;"></div>
-                    ${a}
-                </div>
-            `).join('');
-
-            // Add pulse animation and modal styles
-            const style = document.createElement('style');
-            style.innerHTML = `
-                @keyframes pulse {
-                    0% { opacity: 1; transform: scale(1); }
-                    50% { opacity: 0.5; transform: scale(0.8); }
-                    100% { opacity: 1; transform: scale(1); }
-                }
-                .log-modal {
-                    display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-                    width: 400px; height: 300px; background: rgba(10, 20, 30, 0.95); border: 1px solid #00f3ff;
-                    box-shadow: 0 0 20px rgba(0,0,0,0.8); z-index: 1000; padding: 20px; border-radius: 8px;
-                    flex-direction: column; font-family: 'JetBrains Mono', monospace;
-                }
-                .modal-close {
-                    position: absolute; top: 10px; right: 10px; cursor: pointer; color: #ff3333; font-weight: bold;
-                }
+            const div = document.createElement('div');
+            div.className = `news-item ${item.crit ? 'news-critical' : ''}`;
+            div.innerHTML = `
+                <div class="news-time">${time} ${item.crit ? '<span style="color:#f00; font-weight:bold;">[CRITICAL]</span>' : ''}</div>
+                <div class="news-title">${item.title}</div>
             `;
-            document.head.appendChild(style);
 
-            // Create modal container if not exists
-            if (!document.getElementById('agent-modal')) {
-                const modal = document.createElement('div');
-                modal.id = 'agent-modal';
-                modal.className = 'log-modal';
-                modal.innerHTML = `
-                    <div class="modal-close" onclick="document.getElementById('agent-modal').style.display='none'">[X]</div>
-                    <div id="modal-title" style="color: #0ff; font-weight: bold; margin-bottom: 15px; border-bottom: 1px solid #333; padding-bottom: 5px;"></div>
-                    <div id="modal-content" style="flex: 1; overflow-y: auto; font-size: 0.8rem; color: #aaa; white-space: pre-wrap;"></div>
-                `;
-                document.body.appendChild(modal);
+            feed.insertBefore(div, feed.firstChild);
+
+            // Keep only latest 10
+            if(feed.children.length > 10) {
+                feed.removeChild(feed.lastChild);
             }
         }
 
-        function showLogModal(agentName) {
-            const modal = document.getElementById('agent-modal');
-            document.getElementById('modal-title').innerText = \`\${agentName} // NEURAL LOGS\`;
+        // --- 3. Risk Radar Logic ---
+        // 8 axes corresponding to the labels above
+        let radarValues = [50, 40, 60, 30, 70, 45, 20, 55]; // 0-100 scale
 
-            // Mock dynamic logs
-            const actions = [
-                "[INFO] Analyzing target sector...",
-                "[WARN] Volatility spike detected in primary asset.",
-                "[DEBUG] Recalculating correlation matrix...",
-                "[INFO] Consolidating sub-agent inputs...",
-                "[SUCCESS] Model alignment verified."
+        function updateRadar() {
+            // Jitter values
+            radarValues = radarValues.map(v => {
+                let nv = v + (Math.random() - 0.5) * 10;
+                return Math.max(10, Math.min(100, nv));
+            });
+
+            const angles = [
+                -Math.PI/2,        // Top
+                -Math.PI/4,        // Top Right
+                0,                 // Right
+                Math.PI/4,         // Bottom Right
+                Math.PI/2,         // Bottom
+                3*Math.PI/4,       // Bottom Left
+                Math.PI,           // Left
+                -3*Math.PI/4       // Top Left
             ];
 
-            let content = "";
-            for (let i=0; i<5; i++) {
-                content += \`> \${actions[Math.floor(Math.random() * actions.length)]}\\n\`;
+            let points = "";
+            for(let i=0; i<8; i++) {
+                const r = radarValues[i];
+                const x = r * Math.cos(angles[i]);
+                const y = r * Math.sin(angles[i]);
+                points += `${x},${y} `;
             }
-            content += \`> Awaiting new instructions...\\n\`;
 
-            document.getElementById('modal-content').innerText = content;
-            modal.style.display = 'flex';
+            const poly = document.getElementById('radarPolygon');
+            poly.setAttribute('points', points.trim());
+
+            // Change color based on overall risk (avg area approx)
+            const avg = radarValues.reduce((a,b)=>a+b, 0) / 8;
+            if(avg > 70) {
+                poly.setAttribute('stroke', '#f00');
+                poly.setAttribute('fill', 'rgba(255, 0, 0, 0.2)');
+            } else if (avg > 50) {
+                poly.setAttribute('stroke', '#ffa500');
+                poly.setAttribute('fill', 'rgba(255, 165, 0, 0.2)');
+            } else {
+                poly.setAttribute('stroke', '#0ff');
+                poly.setAttribute('fill', 'rgba(0, 255, 255, 0.2)');
+            }
         }
 
-        // Init & Loops
-        fetchLiveData(); // Initial fetch
-        renderTicker();
-        renderNews();
-        renderAgents();
-        drawRadar(); // Draw once, maybe animate later
-        updateHealth();
+        // --- 4. System Health Logic ---
+        const nodes = [
+            { id: 'n1', name: 'MetaOrchestrator', load: 45 },
+            { id: 'n2', name: 'RiskEngine_v2', load: 80 },
+            { id: 'n3', name: 'ConsensusEngine', load: 30 },
+            { id: 'n4', name: 'BlindspotMonitor', load: 15 },
+            { id: 'n5', name: 'MarketDataFeeds', load: 60 },
+            { id: 'n6', name: 'GraphMemoryDB', load: 90 }
+        ];
 
-        setInterval(fetchLiveData, 5000); // Sync with backend every 5s
-        setInterval(renderTicker, 2000); // Fast ticker updates (interp)
-        setInterval(drawRadar, 3000); // Radar fluctuations
-        setInterval(updateHealth, 1000); // Health heartbeat
+        function initHealth() {
+            const grid = document.getElementById('healthGrid');
+            grid.innerHTML = '';
+            nodes.forEach(n => {
+                const div = document.createElement('div');
+                div.className = 'health-node';
+                div.innerHTML = `
+                    <div class="node-name">${n.name}</div>
+                    <div class="node-bar-container">
+                        <div class="node-bar" id="bar-${n.id}" style="width: ${n.load}%"></div>
+                    </div>
+                    <div class="node-status">
+                        <span>CPU / MEM</span>
+                        <span id="val-${n.id}">${n.load}%</span>
+                    </div>
+                `;
+                grid.appendChild(div);
+            });
+        }
 
+        function updateHealth() {
+            nodes.forEach(n => {
+                n.load += (Math.random() - 0.5) * 15;
+                n.load = Math.max(5, Math.min(98, n.load));
+
+                const bar = document.getElementById(`bar-${n.id}`);
+                const val = document.getElementById(`val-${n.id}`);
+
+                if(bar && val) {
+                    bar.style.width = `${n.load}%`;
+                    val.innerText = `${n.load.toFixed(0)}%`;
+
+                    if(n.load > 85) {
+                        bar.style.background = 'var(--alert-color)';
+                        val.style.color = 'var(--alert-color)';
+                    } else if (n.load > 60) {
+                        bar.style.background = '#ffa500';
+                        val.style.color = '#ffa500';
+                    } else {
+                        bar.style.background = 'var(--primary-color)';
+                        val.style.color = 'var(--text-color)';
+                    }
+                }
+            });
+        }
+
+        // --- Initialization and Loops ---
+        window.onload = () => {
+            initHealth();
+            updateTickers();
+            updateRadar();
+
+            // Initial news
+            for(let i=0; i<3; i++) addNews();
+
+            // Set intervals
+            setInterval(updateTickers, 1000);
+            setInterval(updateRadar, 2000);
+            setInterval(updateHealth, 3000);
+            setInterval(addNews, 8000);
+        };
     </script>
 </body>
 </html>

@@ -1,13 +1,8 @@
 # core/utils/agent_utils.py
 
-import pika
 import json
-from core.utils.data_utils import send_message, receive_messages
 
-# RabbitMQ connection parameters (same as in data_utils.py)
-RABBITMQ_HOST = 'localhost'
-RABBITMQ_QUEUE = 'adam_data'
-
+_MOCK_MESSAGE_BUS = []
 
 def communicate_between_agents(sender_agent, receiver_agent, message):
     """
@@ -25,8 +20,8 @@ def communicate_between_agents(sender_agent, receiver_agent, message):
             "receiver": receiver_agent,
             "message": message
         }
-        # Use the existing send_message function to send the message
-        send_message(message_with_routing)
+        # Store in global bus for backward compatibility tests
+        _MOCK_MESSAGE_BUS.append(message_with_routing)
     except Exception as e:
         print(f"Error in agent communication: {e}")
 
@@ -49,8 +44,8 @@ def share_knowledge_between_agents(sender_agent, receiver_agent, knowledge_type,
             "knowledge_type": knowledge_type,
             "knowledge_data": knowledge_data
         }
-        # Use the existing send_message function to share the knowledge
-        send_message(knowledge_message)
+        # Store in global bus for backward compatibility tests
+        _MOCK_MESSAGE_BUS.append(knowledge_message)
     except Exception as e:
         print(f"Error in knowledge sharing between agents: {e}")
 

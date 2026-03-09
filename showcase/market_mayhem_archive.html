@@ -112,6 +112,22 @@
         .risk-med { color: #f59e0b; border-color: #553300; background: rgba(245, 158, 11, 0.1); }
         .risk-low { color: var(--secondary-color); border-color: #005522; background: rgba(10, 255, 96, 0.1); }
 
+        /* Word Bubble / Tags */
+        .tag-cloud { display: flex; flex-wrap: wrap; gap: 5px; }
+        .tag-cloud span {
+            background: rgba(0, 243, 255, 0.1); border: 1px solid var(--border-color);
+            color: var(--text-muted); font-size: 0.7rem; padding: 4px 8px;
+            border-radius: 4px; cursor: pointer; transition: all 0.2s;
+        }
+        .tag-cloud span:hover { border-color: var(--primary-color); color: var(--primary-color); }
+
+        /* Scenario Analysis */
+        .scenario-box { margin-bottom: 10px; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 0.75rem; }
+        .scenario-box.bull { border-left: 3px solid var(--secondary-color); background: rgba(10, 255, 96, 0.05); }
+        .scenario-box.bear { border-left: 3px solid var(--danger-color); background: rgba(255, 51, 51, 0.05); }
+        .scenario-box.base { border-left: 3px solid #f59e0b; background: rgba(245, 158, 11, 0.05); }
+        .scenario-title { font-weight: bold; margin-bottom: 5px; }
+
         /* Main Content */
         .main-content {
             padding: 20px;
@@ -376,6 +392,43 @@ However, private credit redemptions are halting.
                     </div>
                 </div>
 
+            </div>
+
+            <!-- Market Themes -->
+            <div class="sidebar-panel">
+                <div class="sidebar-title">
+                    <span>MARKET THEMES</span>
+                    <i class="fas fa-cloud"></i>
+                </div>
+                <div class="tag-cloud">
+                    <span style="font-size: 0.9rem; color: #fff;">AI Infrastructure</span>
+                    <span>Shadow Banking</span>
+                    <span style="font-size: 0.8rem; color: #ccc;">Tariff Wars</span>
+                    <span>Sovereign Compute</span>
+                    <span style="font-size: 0.85rem; color: #ddd;">Stagflation</span>
+                    <span>Energy Shock</span>
+                    <span style="font-size: 0.75rem;">De-dollarization</span>
+                </div>
+            </div>
+
+            <!-- Scenario Analysis -->
+            <div class="sidebar-panel">
+                <div class="sidebar-title">
+                    <span>SCENARIO ANALYSIS</span>
+                    <i class="fas fa-project-diagram"></i>
+                </div>
+                <div class="scenario-box base">
+                    <div class="scenario-title" style="color: #f59e0b;">Base Case: Soft Landing 2.0</div>
+                    <div>Inflation stabilizes ~3%, Fed cuts slowly, AI capex continues.</div>
+                </div>
+                <div class="scenario-box bear">
+                    <div class="scenario-title" style="color: var(--danger-color);">Bear Case: Kinetic Shock</div>
+                    <div>Geopolitical escalation disrupts oil ($120+), supply chains break, stagflation sets in.</div>
+                </div>
+                <div class="scenario-box bull">
+                    <div class="scenario-title" style="color: var(--secondary-color);">Bull Case: AGI Productivity</div>
+                    <div>AI investments yield sudden massive GDP gains, deflationary tech boom.</div>
+                </div>
             </div>
 
         </aside>
@@ -8515,7 +8568,7 @@ Hello Q2! The first quarter is in the books, and the bulls are clearly in charge
                             tension: 0.4,
                             pointRadius: 0,
                             yAxisID: 'y1',
-                            hidden: true // Hidden by default to avoid clutter
+                            hidden: false // Show by default
                         },
                         {
                             label: '10Y Yield Outlook',
@@ -8575,10 +8628,11 @@ Hello Q2! The first quarter is in the books, and the bulls are clearly in charge
                         },
                         y1: {
                             type: 'linear',
-                            display: false,
+                            display: true,
                             position: 'right',
                             grid: { drawOnChartArea: false },
-                            ticks: { color: '#f59e0b', font: { family: 'JetBrains Mono', size: 9 } }
+                            ticks: { color: '#f59e0b', font: { family: 'JetBrains Mono', size: 9 } },
+                            title: { display: true, text: 'S&P 500', color: '#f59e0b', font: { size: 9 } }
                         },
                         y2: {
                             type: 'linear',
