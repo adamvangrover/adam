@@ -625,7 +625,7 @@ def parse_html_file(filepath):
                         "market_pulse_library.html", "house_view_library.html", "portfolio_dashboard.html",
                         "data.html", "reports.html", "agents.html", "chat.html", "market_mayhem_rebuild.html", "market_mayhem_conviction.html",
                         "live_market_pulse.html", "macro_glitch_monitor.html", "financial_twin.html", "war_room.html",
-                        "sovereign_os.html", "analyst_os.html", "credit_analyst_workstation.html", "fiduciary_avatar.html", "financial_engineering.html"]:
+                        "sovereign_os.html", "analyst_os.html", "credit_analyst_workstation.html", "fiduciary_avatar.html", "financial_engineering.html", "war_room_v2.html"]:
             return None
 
         container = soup.find('div', class_='newsletter-container')

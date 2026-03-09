@@ -209,4 +209,4 @@ class NarrativeLogger:
             "4_Outcome": outcome,
             "5_Metadata": metadata or {}
         }
-        self.logger.info(f"NARRATIVE:\n{json.dumps(story, indent=2)}")
+        self.logger.info(f"NARRATIVE:\n{json.dumps(story, indent=2)}")# ADAM-V-NEXT expansion

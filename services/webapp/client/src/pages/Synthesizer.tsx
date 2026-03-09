@@ -389,3 +389,4 @@ const Synthesizer: React.FC = () => {
 };
 
 export default Synthesizer;
+// ADAM-V-NEXT expansion
