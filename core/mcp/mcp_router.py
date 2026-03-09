@@ -5,6 +5,8 @@ and the Python-based AI agent layer. Standardizes interaction paradigms and
 secures complex language model workflows with strict schema validation.
 """
 
+import json
+import asyncio
 import logging
 from typing import Dict, Any, Callable
 
@@ -52,7 +54,7 @@ class ModelContextProtocolRouter:
             logger.error(f"MCP execution failed for `{method}`: {e}")
             return {"error": "ExecutionFailed", "message": str(e)}
 
-    def start_sse_stream(self, agent_id: str):
+    async def start_sse_stream(self, agent_id: str):
         """
         Initiates Server-Sent Events (SSE) to push continuous market updates directly
         to an agent's context window.
@@ -61,3 +63,10 @@ class ModelContextProtocolRouter:
             raise ValueError("SSE streaming requires `sse` transport initialized.")
 
         logger.info(f"Started continuous Server-Sent Event stream for agent `{agent_id}`.")
+
+        # Simulate continuous pushing of market deltas
+        for i in range(3):
+            await asyncio.sleep(0.1)
+            event_payload = {"event": "price_update", "symbol": "BTC_USD", "data": 64500.0 + i}
+            logger.debug(f"SSE [{agent_id}]: {json.dumps(event_payload)}")
+            yield f"data: {json.dumps(event_payload)}\n\n"

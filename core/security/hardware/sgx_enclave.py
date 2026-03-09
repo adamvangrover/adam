@@ -5,6 +5,7 @@ to cryptographically isolate transaction signing processes and protect private k
 from OS-level compromise.
 """
 
+import hashlib
 import logging
 from typing import Optional
 
@@ -46,6 +47,20 @@ class SecureEnclaveSigner:
         logger.debug(
             f"Routing payload to secure memory for signing: {transaction_hash}"
         )
-        # Simulated hardware signature generation
-        mock_signature = f"sgx_sig_{transaction_hash[-8:]}"
+
+        # Simulated hardware signature generation via SHA-256
+        signature_base = f"{self.enclave_id}:{transaction_hash}".encode("utf-8")
+        mock_signature = hashlib.sha256(signature_base).hexdigest()
+        logger.info(f"Generated secure enclave signature: {mock_signature[:16]}...")
+
         return mock_signature
+
+    def get_enclave_status(self) -> dict:
+        """
+        Retrieves the current attestation state and enclave metadata.
+        """
+        return {
+            "enclave_id": self.enclave_id,
+            "is_attested": self._is_attested,
+            "attestation_url": self.attestation_url,
+        }
