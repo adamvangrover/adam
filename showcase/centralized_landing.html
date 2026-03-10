@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM v26.0 :: SYSTEM INTELLIGENCE TERMINAL</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --primary-color: #00f3ff;
+            --accent-color: #0aff60;
+            --alert-color: #ff3333;
+            --bg-color: #050b14;
+            --panel-bg: rgba(15, 23, 42, 0.7);
+            --text-primary: #e0e0e0;
+            --border-color: #333;
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg-color);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+
+        .mono { font-family: 'JetBrains Mono', monospace; }
+
+        /* Ticker Tape */
+        .ticker-wrap {
+            width: 100%;
+            overflow: hidden;
+            background-color: #000;
+            border-bottom: 1px solid var(--border-color);
+            padding: 5px 0;
+            display: flex;
+            align-items: center;
+            height: 35px;
+        }
+        .ticker {
+            display: inline-flex;
+            white-space: nowrap;
+            animation: ticker 30s linear infinite;
+        }
+        @keyframes ticker {
+            0% { transform: translate3d(0, 0, 0); }
+            100% { transform: translate3d(-100%, 0, 0); }
+        }
+        .ticker-item {
+            padding: 0 2rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+        .tick-up { color: var(--accent-color); }
+        .tick-down { color: var(--alert-color); }
+
+        /* Terminal Header */
+        .terminal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background: linear-gradient(90deg, rgba(5,11,20,1) 0%, rgba(15,23,42,1) 100%);
+            border-bottom: 2px solid var(--primary-color);
+        }
+
+        /* Layout */
+        .layout-grid {
+            display: grid;
+            grid-template-columns: 260px 1fr 320px;
+            gap: 20px;
+            padding: 20px;
+            min-height: calc(100vh - 100px);
+        }
+
+        .panel {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 15px;
+            backdrop-filter: blur(5px);
+        }
+        .panel-header {
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            color: var(--primary-color);
+            text-transform: uppercase;
+        }
+
+        /* Hero Article */
+        .hero-article {
+            background: linear-gradient(135deg, rgba(0,243,255,0.05) 0%, rgba(0,0,0,0.4) 100%);
+            border: 1px solid var(--primary-color);
+            padding: 30px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero-article::before {
+            content: 'SYSTEM 2 SYNTHESIS';
+            position: absolute;
+            top: 10px; right: -30px;
+            background: var(--primary-color);
+            color: #000;
+            font-family: 'JetBrains Mono';
+            font-size: 0.65rem;
+            font-weight: bold;
+            padding: 2px 30px;
+            transform: rotate(45deg);
+        }
+
+        /* Navigation Sidebar */
+        .nav-list { list-style: none; padding: 0; margin: 0; }
+        .nav-item {
+            margin-bottom: 10px;
+            padding: 8px 12px;
+            border-left: 2px solid transparent;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+        }
+        .nav-item:hover {
+            border-left-color: var(--primary-color);
+            background: rgba(0,243,255,0.05);
+            cursor: pointer;
+        }
+        .nav-item a { text-decoration: none; color: inherit; display: block; }
+        .nav-item i { margin-right: 10px; color: #888; width: 16px; text-align: center; }
+
+        /* News & Reports Grid */
+        .news-list { display: flex; flex-direction: column; gap: 15px; }
+        .news-item {
+            border-left: 3px solid #666;
+            padding: 10px 15px;
+            background: rgba(255,255,255,0.02);
+            transition: all 0.2s;
+        }
+        .news-item:hover {
+            border-left-color: var(--primary-color);
+            transform: translateX(3px);
+            background: rgba(0,243,255,0.05);
+        }
+        .news-meta { font-size: 0.7rem; color: #888; font-family: 'JetBrains Mono'; margin-bottom: 5px; }
+        .news-title { font-size: 0.95rem; font-weight: 600; margin: 0 0 5px 0; }
+
+        /* Pricing Grid */
+        .pricing-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .price-card {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid #333;
+            padding: 10px;
+            text-align: center;
+            border-radius: 4px;
+        }
+        .price-symbol { font-family: 'JetBrains Mono'; color: #aaa; font-size: 0.8rem; }
+        .price-value { font-size: 1.2rem; font-weight: bold; margin: 5px 0; }
+
+        .cyber-btn {
+            display: inline-block;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            padding: 8px 16px;
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+            background: rgba(0,243,255,0.05);
+            text-decoration: none;
+            text-transform: uppercase;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .cyber-btn:hover { background: var(--primary-color); color: #000; }
+    </style>
+</head>
+<body>
+    <div class="ticker-wrap">
+        <div class="ticker">
+            <div class="ticker-item tick-down">S&P 500: 6,856.00 (-0.77%)</div>
+            <div class="ticker-item tick-down">NASDAQ: 24,855.33 (-0.63%)</div>
+            <div class="ticker-item tick-down">DOW: 48,977.92 (-1.30%)</div>
+            <div class="ticker-item tick-down">BTC/USD: $65,700.00 (-5.00%)</div>
+            <div class="ticker-item tick-up">BRENT: $72.55 (+1.75%)</div>
+            <div class="ticker-item tick-up">GOLD: $5,277.24 (+3.86%)</div>
+            <div class="ticker-item tick-up">US10Y: 4.59% (+14bps)</div>
+            <div class="ticker-item tick-down">NVDA: $128.50 (-2.74%)</div>
+            <div class="ticker-item tick-up">VLO: $145.20 (+3.20%)</div>
+            <div class="ticker-item tick-up">LMT: $485.60 (+2.15%)</div>
+        </div>
+    </div>
+
+    <header class="terminal-header">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <i class="fas fa-network-wired text-cyan-400 text-2xl"></i>
+            <div>
+                <h1 class="mono text-xl text-cyan-400 m-0 tracking-widest">ADAM TERMINAL v26.0</h1>
+                <div class="text-xs text-gray-500 mono">INSTITUTIONAL INTELLIGENCE HUB</div>
+            </div>
+        </div>
+        <div class="flex gap-4">
+            <div class="mono text-xs text-right">
+                <div class="text-gray-400">SYSTEM STATUS</div>
+                <div class="text-green-400 font-bold">NOMINAL / SECURE</div>
+            </div>
+            <div class="mono text-xs text-right border-l border-gray-700 pl-4">
+                <div class="text-gray-400">MARKET REGIME</div>
+                <div class="text-red-500 font-bold">HEDGING / VOLATILE</div>
+            </div>
+        </div>
+    </header>
+
+    <div class="layout-grid">
+        <!-- LEFT: Navigation & Tutorial -->
+        <aside class="panel">
+            <div class="panel-header"><i class="fas fa-compass"></i> SYSTEM NAVIGATOR</div>
+            <p class="text-xs text-gray-400 mb-4 pb-4 border-b border-gray-800">
+                Explore the neuro-symbolic artifacts generated by the Adam OS ecosystem.
+            </p>
+
+            <div class="mb-6">
+                <div class="text-xs text-cyan-500 mono mb-2 font-bold">CORE DASHBOARDS</div>
+                <ul class="nav-list">
+                    <li class="nav-item"><a href="analyst_os.html"><i class="fas fa-desktop"></i> Analyst OS</a></li>
+                    <li class="nav-item"><a href="comprehensive_credit_dashboard.html"><i class="fas fa-chart-pie"></i> Credit Memo Console</a></li>
+                    <li class="nav-item"><a href="war_room.html"><i class="fas fa-shield-alt"></i> Strategic War Room</a></li>
+                    <li class="nav-item"><a href="institutional_radar.html"><i class="fas fa-satellite-dish"></i> Institutional Radar</a></li>
+                </ul>
+            </div>
+
+            <div class="mb-6">
+                <div class="text-xs text-cyan-500 mono mb-2 font-bold">INTELLIGENCE ARCHIVES</div>
+                <ul class="nav-list">
+                    <li class="nav-item"><a href="market_mayhem_archive_v24.html"><i class="fas fa-newspaper"></i> Market Mayhem Reports</a></li>
+                    <li class="nav-item"><a href="daily_briefings_library.html"><i class="fas fa-bolt"></i> Daily Briefings</a></li>
+                    <li class="nav-item"><a href="deep_dive.html"><i class="fas fa-search-dollar"></i> Deep Dive Memos</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <div class="text-xs text-cyan-500 mono mb-2 font-bold">SYSTEM MAPS</div>
+                <ul class="nav-list">
+                    <li class="nav-item"><a href="network_map.html"><i class="fas fa-project-diagram"></i> Architecture Map</a></li>
+                    <li class="nav-item"><a href="system_knowledge_graph.html"><i class="fas fa-brain"></i> Knowledge Graph</a></li>
+                </ul>
+            </div>
+        </aside>
+
+        <!-- CENTER: Main Feed & Intelligence -->
+        <main style="display: flex; flex-direction: column; gap: 20px;">
+            <!-- Hero Article -->
+            <div class="hero-article">
+                <div class="mono text-xs text-cyan-500 mb-2">TOP STORY // ARCHITECTURAL BLUEPRINT</div>
+                <h2 class="text-2xl font-bold mb-3 mt-0">Market Mayhem: The Unified Compendium and JSONL Architectural Blueprint</h2>
+                <p class="text-sm text-gray-300 mb-6 leading-relaxed">
+                    The contemporary global financial landscape is increasingly defined by a profound structural phenomenon designated as the "Great Divergence". Legacy financial intelligence systems have failed. To survive and extract alpha within this highly volatile regime, institutional analytical frameworks must undergo a radical transition to a "Financial Digital Twin".
+                </p>
+                <div class="flex gap-4">
+                    <a href="market_mayhem_unified_compendium.html" class="cyber-btn">READ FULL COMPENDIUM</a>
+                    <a href="market_mayhem_archive_v24.html" class="cyber-btn" style="border-color: #555; color: #aaa; background: transparent;">VIEW ARCHIVE</a>
+                </div>
+            </div>
+
+            <!-- Grid for News and Scenarios -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div class="panel">
+                    <div class="panel-header"><i class="fas fa-rss"></i> LATEST MARKET PULSE</div>
+                    <div class="news-list">
+                        <div class="news-item" style="border-left-color: #ff3333;">
+                            <div class="news-meta">2026-03-02 // VOLATILITY SPIKE</div>
+                            <h4 class="news-title"><a href="Daily_Briefing_2026_03_02_Volatility.html">SYSTEM STATUS: DEGRADED</a></h4>
+                            <p class="text-xs text-gray-400 m-0">Markets open March with significant friction. Manufacturing PMI triggers algorithmic selling.</p>
+                        </div>
+                        <div class="news-item" style="border-left-color: #ff3333;">
+                            <div class="news-meta">2026-03-02 // KINETIC CONFLICT</div>
+                            <h4 class="news-title"><a href="Daily_Briefing_2026_03_02_Kinetic.html">The Middle East War-Patch</a></h4>
+                            <p class="text-xs text-gray-400 m-0">Architecture struggling to reconcile soft landing narrative with sudden War Premium re-render.</p>
+                        </div>
+                        <div class="news-item" style="border-left-color: #0aff60;">
+                            <div class="news-meta">2026-03-27 // SUPER CYCLE</div>
+                            <h4 class="news-title"><a href="Daily_Briefing_2026_03_27.html">Sovereign AI & Crypto Update</a></h4>
+                            <p class="text-xs text-gray-400 m-0">Quick update on Sovereign AI & Crypto Supercycle and market movements.</p>
+                        </div>
+                        <div class="news-item" style="border-left-color: #00f3ff;">
+                            <div class="news-meta">2026-03-15 // STRATEGY</div>
+                            <h4 class="news-title"><a href="newsletter_market_mayhem_mar_15_2026.html">THE GREAT BIFURCATION</a></h4>
+                            <p class="text-xs text-gray-400 m-0">Capital is fleeing Promise and seeking Providence. The reality gap widens.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-header"><i class="fas fa-flask"></i> SCENARIO RUNS & MODELS</div>
+                    <div class="news-list">
+                        <div class="news-item">
+                            <div class="news-meta">CREDIT STRESS TEST</div>
+                            <h4 class="news-title"><a href="snc_credit_heatmap.html">SNC Credit Stress Map</a></h4>
+                            <p class="text-xs text-gray-400 m-0">Regulatory heatmap visualizing portfolio vulnerabilities to covenant breaches.</p>
+                        </div>
+                        <div class="news-item">
+                            <div class="news-meta">VALUATION MODEL</div>
+                            <h4 class="news-title"><a href="credit_valuation_architect.html">Credit & Valuation Architect v6.2</a></h4>
+                            <p class="text-xs text-gray-400 m-0">Interactive DCF and capital structure analysis engine.</p>
+                        </div>
+                        <div class="news-item">
+                            <div class="news-meta">MONTE CARLO</div>
+                            <h4 class="news-title"><a href="monte_carlo_visualizer.html">Risk Engine Visualizer</a></h4>
+                            <p class="text-xs text-gray-400 m-0">Stochastic probability paths for asset price trajectories.</p>
+                        </div>
+                        <div class="news-item">
+                            <div class="news-meta">COUNTERFACTUAL</div>
+                            <h4 class="news-title"><a href="Counterfactual_COUNTERFACTUAL_THE_2008_LEHMAN_BAILOUT.html">The 2008 Lehman Bailout</a></h4>
+                            <p class="text-xs text-gray-400 m-0">System 3 simulation of alternative historical timelines.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- RIGHT: Pricing & Targets -->
+        <aside style="display: flex; flex-direction: column; gap: 20px;">
+            <div class="panel">
+                <div class="panel-header"><i class="fas fa-crosshairs"></i> HUNT MANDATE TARGETS</div>
+                <div class="pricing-grid">
+                    <div class="price-card">
+                        <div class="price-symbol">VOLT</div>
+                        <div class="price-value text-green-400">$195.00</div>
+                        <div class="text-xs text-gray-500">Solid-State EV</div>
+                    </div>
+                    <div class="price-card">
+                        <div class="price-symbol">CRML</div>
+                        <div class="price-value text-green-400">$52.00</div>
+                        <div class="text-xs text-gray-500">Rare Earths</div>
+                    </div>
+                    <div class="price-card">
+                        <div class="price-symbol">BK</div>
+                        <div class="price-value text-green-400">$105.00</div>
+                        <div class="text-xs text-gray-500">Op Alpha</div>
+                    </div>
+                    <div class="price-card">
+                        <div class="price-symbol">AWAV</div>
+                        <div class="price-value text-green-400">$420.00</div>
+                        <div class="text-xs text-gray-500">Cybersecurity</div>
+                    </div>
+                    <div class="price-card">
+                        <div class="price-symbol">PLTR</div>
+                        <div class="price-value text-green-400">$65.00</div>
+                        <div class="text-xs text-gray-500">Defense AI</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel flex-grow">
+                <div class="panel-header"><i class="fas fa-file-invoice-dollar"></i> ACTIVE DEEP DIVES</div>
+                <ul class="nav-list">
+                    <li class="nav-item"><a href="report_iran_collapse_2026.html"><i class="fas fa-book"></i> 2026 Iranian Collapse Impact</a></li>
+                    <li class="nav-item"><a href="deep_dive_ghost_gdp_2026.html"><i class="fas fa-book"></i> Ghost GDP & Labor Markets</a></li>
+                    <li class="nav-item"><a href="msft_company_report.html"><i class="fas fa-book"></i> Microsoft (MSFT) Coverage</a></li>
+                    <li class="nav-item"><a href="conviction_btc_feb26.html"><i class="fas fa-book"></i> Bitcoin Conviction Memo</a></li>
+                </ul>
+            </div>
+        </aside>
+    </div>
+
+    <script>
+        // Simple script to ensure dates on dynamic elements look fresh if needed
+    </script>
+</body>
+</html>
