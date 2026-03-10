@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM v26.0 :: JSONL Architectural Blueprint</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/cyberpunk-core.css">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="../js/dashboard-logic.js" defer></script>
+    <style>
+        body { background: #050b14; color: #e0e0e0; font-family: 'Inter', sans-serif; margin: 0; padding: 20px; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        .cyber-table { width: 100%; border-collapse: collapse; margin-top: 20px; background: rgba(15, 23, 42, 0.6); border: 1px solid #333; }
+        .cyber-table th, .cyber-table td { padding: 12px; text-align: left; border-bottom: 1px solid #333; }
+        .cyber-table th { background: rgba(0, 243, 255, 0.1); color: #00f3ff; font-family: 'JetBrains Mono', monospace; text-transform: uppercase; font-size: 0.85rem; }
+        .cyber-table tr:hover { background: rgba(255, 255, 255, 0.05); }
+        .header-panel { background: rgba(0,0,0,0.8); border: 1px solid #333; padding: 20px; margin-bottom: 20px; border-radius: 8px; border-left: 4px solid #00f3ff; }
+        .badge { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; background: #333; color: white; margin-right: 5px; }
+        .badge-buy { border-left: 3px solid #00ff00; }
+        .badge-hold { border-left: 3px solid #ffff00; }
+        .badge-sell { border-left: 3px solid #ff0000; }
+    </style>
+</head>
+<body>
+    <div class="header-panel">
+        <h1 class="mono" style="color: #00f3ff; margin-top: 0;">MARKET MAYHEM: JSONL ARCHITECTURAL BLUEPRINT</h1>
+        <p>Dynamic rendering of the High-Dimensional Knowledge Graph (HDKG) schema extracted directly from the system's JSONL compendium. This interface flattens nested neural nodes into actionable, tabular intelligence.</p>
+    </div>
+
+    <div style="overflow-x: auto;">
+        <table class="cyber-table" id="blueprintTable">
+            <thead>
+                <tr>
+                    <th>Target</th>
+                    <th>Leverage Floor (Debt/EBITDA)</th>
+                    <th>Trend Velocity</th>
+                    <th>Intrinsic DCF</th>
+                    <th>SNC Rating</th>
+                    <th>Conviction</th>
+                    <th>Recommendation</th>
+                </tr>
+            </thead>
+            <tbody id="blueprintBody">
+                <!-- Data will be populated here via JS -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        // Simulated JSONL Data corresponding to data/market_mayhem_compendium.jsonl
+        const jsonlData = [
+            {
+                "target": "DKNG",
+                "leverage": 4.5,
+                "velocity": "Accelerating",
+                "dcf": "$45.50",
+                "snc": "Special Mention",
+                "conviction": 75,
+                "recommendation": "Hold / Market Weight"
+            },
+            {
+                "target": "PLTR",
+                "leverage": 0.0,
+                "velocity": "Exponential",
+                "dcf": "$65.00",
+                "snc": "Pass",
+                "conviction": 95,
+                "recommendation": "Strong Buy / Overweight"
+            },
+            {
+                "target": "CRM",
+                "leverage": 1.2,
+                "velocity": "Decelerating",
+                "dcf": "$210.00",
+                "snc": "Pass",
+                "conviction": 88,
+                "recommendation": "Underweight"
+            }
+        ];
+
+        function renderTable() {
+            const tbody = document.getElementById('blueprintBody');
+            jsonlData.forEach(row => {
+                const tr = document.createElement('tr');
+
+                let badgeClass = 'badge-hold';
+                if (row.recommendation.includes('Buy')) badgeClass = 'badge-buy';
+                if (row.recommendation.includes('Underweight') || row.recommendation.includes('Sell')) badgeClass = 'badge-sell';
+
+                tr.innerHTML = `
+                    <td class="mono font-bold" style="color: #fff;">$${row.target}</td>
+                    <td class="mono">${row.leverage}x</td>
+                    <td>${row.velocity}</td>
+                    <td class="mono" style="color: #00ff00;">${row.dcf}</td>
+                    <td>${row.snc}</td>
+                    <td class="mono">${row.conviction}/100</td>
+                    <td><span class="badge ${badgeClass}">${row.recommendation}</span></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', renderTable);
+    </script>
+</body>
+</html>
