@@ -2366,7 +2366,7 @@ window.MOCK_DATA = {
       "last_modified": 1768266823.6076777
     },
     {
-      "path": "showcase/apps/dcf.html",
+      "path": "showcase/apps/valuation_lab.html",
       "type": "file",
       "size": 37528,
       "last_modified": 1768266823.6076777
@@ -2420,7 +2420,7 @@ window.MOCK_DATA = {
       "last_modified": 1768266823.6076777
     },
     {
-      "path": "showcase/apps/capital_stack.html",
+      "path": "showcase/apps/structuring_workbench.html",
       "type": "file",
       "size": 20700,
       "last_modified": 1768266823.603658
