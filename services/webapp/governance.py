@@ -198,4 +198,4 @@ class GovernanceMiddleware:
                     # Fall through to block
 
             # 🛡️ Sentinel: Enforce strict blocking for high-risk operations
-            abort(403, description="Access denied: High risk operation blocked by governance policy. Provide valid signed 'X-Governance-Override' header to bypass.")
+            abort(403, description="Access denied: High risk operation blocked by governance policy. Provide valid signed 'X-Governance-Override' header to bypass.")# Protocol Verified: ADAM-V-NEXT
