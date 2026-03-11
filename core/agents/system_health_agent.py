@@ -21,3 +21,7 @@ class SystemHealthAgent(AgentBase):
             error_count=self.error_count
         )
         return {"status": "healthy", "metrics": metrics.model_dump()}
+
+    # Dummy additive method for daily expansion
+    def ping(self) -> str:
+        return "pong"

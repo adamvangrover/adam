@@ -79,3 +79,7 @@
 ## 2025-06-13 - [Vectorized historical data fetching in DataFetcher]
 **Learning:** `history_reset.iterrows()` inside `DataFetcher.fetch_historical_data` was a significant bottleneck when fetching years of daily data, taking ~0.38 seconds for 1 year of AAPL data. Refactoring to a vectorized approach mapping columns and formatting datetime natively, then using `to_dict(orient="records")`, reduced this to ~0.04 seconds (~10x speedup).
 **Action:** Consistently avoid `df.iterrows()` in data pipeline and ingestion methods. Use vectorized pandas operations and `to_dict(orient="records")` to build dictionaries.
+
+## 2025-03-10 - Vectorized DataFrame filtering by Multi-Index
+**Learning:** `df.iterrows()` when iterating to check if tuple pairs exist in a `set` is extremely slow. In `InstitutionalRadarAnalytics.detect_cluster_buys`, using a `for _, row in curr_df.iterrows():` loop checking `(row["fund_name"], row["cusip"]) not in prev_holdings` was a major bottleneck.
+**Action:** Always prefer `mask = ~curr_df.set_index(["col1", "col2"]).index.isin(set_of_tuples)` instead of `iterrows()` for multi-column exclusion/inclusion filtering against a set of tuples.
