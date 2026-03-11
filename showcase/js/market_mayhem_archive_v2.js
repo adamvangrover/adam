@@ -49,6 +49,14 @@ class MarketMayhemController {
     }
 
     async loadData() {
+        if (window.MARKET_MAYHEM_DATA) {
+            console.log("[MarketMayhem] Loaded data from window.MARKET_MAYHEM_DATA");
+            this.data.strategic = window.MARKET_MAYHEM_DATA.strategic;
+            this.data.market = window.MARKET_MAYHEM_DATA.market;
+            this.data.archive = window.MARKET_MAYHEM_DATA.archive;
+            return;
+        }
+
         const [strategic, market, archive] = await Promise.all([
             fetch('data/strategic_command.json').then(r => r.json()),
             fetch('data/sp500_market_data.json').then(r => r.json()),
@@ -65,16 +73,42 @@ class MarketMayhemController {
     renderSidebar() {
         // 1. Strategic Command
         if (this.data.strategic) {
-            const { house_view, score, narrative } = this.data.strategic.strategic_directives;
+            const directives = this.data.strategic.strategic_directives || {};
+            const house_view = directives.house_view || 'NEUTRAL';
+            const narrative = directives.narrative || 'Awaiting strategic input...';
+
+            const insights = this.data.strategic.insights || {};
+            const active_topics = insights.active_topics || [];
+
+            const plans = this.data.strategic.actionable_plans || [];
+
             let color = '#f59e0b'; // Neutral
             if (house_view === 'BULLISH') color = '#0aff60';
             if (house_view === 'BEARISH') color = '#ff3333';
 
+            let plansHtml = plans.length > 0 ? `
+                <div style="margin-top: 15px; border-top: 1px solid #222; padding-top: 10px;">
+                    <span style="color: #666; font-size: 0.7rem;">ACTIONABLE PLANS</span>
+                    ${plans.map(p => `
+                        <div style="margin-top: 5px; font-size: 0.75rem;">
+                            <div style="color: #00f3ff;">${p.action}</div>
+                            <div style="color: #aaa; font-style: italic;">${p.target}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            ` : '';
+
+            let topicsHtml = active_topics.length > 0 ? `
+                <div style="margin-top: 10px; display: flex; flex-wrap: wrap; gap: 5px;">
+                    ${active_topics.slice(0,3).map(t => `<span class="tag" style="font-size: 0.6rem; padding: 2px 6px;">${t}</span>`).join('')}
+                </div>
+            ` : '';
+
             this.dom.strategicPanel.innerHTML = `
-                <h3>
+                <div class="sidebar-title">
                     <span>STRATEGIC COMMAND</span>
                     <i class="fas fa-chess-king"></i>
-                </h3>
+                </div>
                 <div style="margin-bottom: 10px;">
                     <span style="color: #666; font-size: 0.7rem;">HOUSE VIEW</span>
                     <div style="font-size: 1.1rem; color: ${color}; font-weight: bold;">${house_view}</div>
@@ -82,6 +116,8 @@ class MarketMayhemController {
                 <div style="font-size: 0.75rem; line-height: 1.4; color: #ccc;">
                     ${narrative}
                 </div>
+                ${topicsHtml}
+                ${plansHtml}
             `;
         }
 
@@ -93,10 +129,10 @@ class MarketMayhemController {
                 .slice(0, 5);
 
             this.dom.convictionPanel.innerHTML = `
-                <h3>
+                <div class="sidebar-title">
                     <span>TOP CONVICTION</span>
                     <i class="fas fa-star"></i>
-                </h3>
+                </div>
                 ${convictions.map(item => `
                     <div class="metric-row">
                         <span class="metric-label">${item.ticker} <span style="font-size:0.6rem; color:#555;">${item.sector ? item.sector.substring(0,8) : ''}</span></span>
@@ -113,14 +149,14 @@ class MarketMayhemController {
                 .slice(0, 5);
 
             this.dom.watchListPanel.innerHTML = `
-                <h3>
+                <div class="sidebar-title">
                     <span>WATCH LIST</span>
                     <i class="fas fa-eye"></i>
-                </h3>
+                </div>
                 ${watchlist.map(item => `
                     <div class="metric-row">
                         <span class="metric-label">${item.ticker}</span>
-                        <span class="metric-val ${item.change_pct >= 0 ? 'val-green' : 'val-red'}">${item.change_pct}%</span>
+                        <span class="metric-val ${item.change_pct >= 0 ? 'val-green' : 'val-red'}">${item.change_pct > 0 ? '+' : ''}${item.change_pct}%</span>
                     </div>
                 `).join('')}
             `;
@@ -149,17 +185,21 @@ class MarketMayhemController {
                 .slice(0, 6);
 
             this.dom.sectorRiskPanel.innerHTML = `
-                <h3>
+                <div class="sidebar-title">
                     <span>SECTOR RISK</span>
                     <i class="fas fa-exclamation-triangle"></i>
-                </h3>
-                <div class="risk-grid" style="display:grid; grid-template-columns: 1fr 1fr; gap:5px;">
-                    ${sortedSectors.map(item => `
-                        <div style="background:rgba(255,255,255,0.05); padding:5px; border-radius:3px; text-align:center;">
-                            <div style="color: ${item.avgRisk > 80 ? '#ff3333' : '#f59e0b'}; font-size:0.7rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${item.sector ? item.sector.split(' ')[0] : 'Unknown'}</div>
-                            <div style="font-size: 0.9rem; font-weight: bold;">${item.avgRisk}</div>
+                </div>
+                <div class="risk-grid">
+                    ${sortedSectors.map(item => {
+                        let riskClass = 'risk-med';
+                        if (item.avgRisk > 80) riskClass = 'risk-high';
+                        if (item.avgRisk < 50) riskClass = 'risk-low';
+                        return `
+                        <div class="risk-cell ${riskClass}">
+                            <div style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${item.sector ? item.sector.split(' ')[0] : 'Unknown'}</div>
+                            <div style="font-size: 1rem; font-weight: bold;">${item.avgRisk}</div>
                         </div>
-                    `).join('')}
+                    `}).join('')}
                 </div>
             `;
         }
@@ -169,7 +209,7 @@ class MarketMayhemController {
 
     renderChart() {
         const ctx = document.getElementById('sentimentChart').getContext('2d');
-        const houseView = this.data.strategic ? this.data.strategic.strategic_directives.house_view : 'NEUTRAL';
+        const houseView = this.data.strategic && this.data.strategic.strategic_directives ? this.data.strategic.strategic_directives.house_view : 'NEUTRAL';
 
         let dataPoints = 30;
         if (this.state.timePeriod === '1M') dataPoints = 30;
@@ -178,23 +218,39 @@ class MarketMayhemController {
 
         // Synthetic History based on filtered Archive Sentiment
         const history = this.generateSentimentHistory(dataPoints);
-        const lastVal = history[history.length - 1];
+        const lastVal = history[history.length - 1] || 50;
 
         // Projections
         const projectionSteps = Math.round(dataPoints / 3);
-        const projections = [];
-        let drift = 0;
-        if (houseView === 'BULLISH') drift = 1.0;
-        if (houseView === 'BEARISH') drift = -1.0;
+        const bullPath = [];
+        const bearPath = [];
+        const simPath = [];
+        const consensus = [];
 
-        let current = lastVal;
-        for(let i=0; i<projectionSteps; i++) {
-            current += drift + (Math.random() * 4 - 2);
-            // Bounds check
-            if (current > 100) current = 100;
-            if (current < 0) current = 0;
-            projections.push(current);
+        let startVal = lastVal;
+
+        // S&P 500 Mock: Start ~5800, Trend up
+        const sp500Data = [];
+        const yieldData = [];
+
+        for(let i=0; i<history.length; i++) {
+            sp500Data.push(5800 + (i * 5) + (Math.random() * 100 - 50));
+            yieldData.push(4.2 + (Math.cos(i/5) * 0.3) + (Math.random() * 0.1));
         }
+
+        for(let i=0; i<projectionSteps; i++) {
+            let offset = i * (100 / projectionSteps);
+            bullPath.push(Math.min(100, startVal + (offset * 1.5)));
+            bearPath.push(Math.max(0, startVal - (offset * 1.5)));
+            simPath.push(startVal + (Math.random() * 10 - 5) + (houseView === 'BULLISH' ? 2 : (houseView === 'BEARISH' ? -2 : 0)));
+            consensus.push(startVal + (offset * 0.5));
+
+            sp500Data.push(5800 + ((history.length + i) * 5) + (Math.random() * 100 - 50));
+            yieldData.push(4.2 + (Math.cos((history.length + i)/5) * 0.3) + (Math.random() * 0.1));
+        }
+
+        // Padded history for projection alignment
+        const paddedSentiment = [...history, ...Array(projectionSteps).fill(null)];
 
         // Config
         if (this.state.mainChartInstance) this.state.mainChartInstance.destroy();
@@ -202,39 +258,145 @@ class MarketMayhemController {
         this.state.mainChartInstance = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: [...Array(history.length).fill('').map((_,i)=>i), ...Array(projections.length).fill('').map((_,i)=>'Proj')],
+                labels: [...Array(history.length).fill('').map((_,i)=>i), ...Array(projectionSteps).fill('').map((_,i)=>'Proj')],
                 datasets: [
                     {
                         label: 'Historical Sentiment',
-                        data: [...history, ...Array(projections.length).fill(null)],
+                        data: paddedSentiment,
                         borderColor: '#00f3ff',
                         backgroundColor: 'rgba(0, 243, 255, 0.1)',
                         borderWidth: 2,
                         tension: 0.4,
                         fill: true,
-                        pointRadius: 0
+                        pointRadius: 2,
+                        yAxisID: 'y'
                     },
-                    {
-                        label: 'Projected Outlook',
-                        data: [...Array(history.length).fill(null), lastVal, ...projections],
-                        borderColor: '#d946ef',
+                     {
+                        label: 'Bullish Scenario',
+                        data: [...Array(history.length - 1).fill(null), startVal, ...bullPath],
+                        borderColor: '#0aff60',
                         borderWidth: 2,
                         borderDash: [5, 5],
                         tension: 0.4,
-                        pointRadius: 0
+                        pointRadius: 0,
+                        yAxisID: 'y'
+                    },
+                     {
+                        label: 'Bearish Scenario',
+                        data: [...Array(history.length - 1).fill(null), startVal, ...bearPath],
+                        borderColor: '#ff3333',
+                        borderWidth: 2,
+                        borderDash: [5, 5],
+                        tension: 0.4,
+                        pointRadius: 0,
+                        yAxisID: 'y'
+                    },
+                    {
+                        label: 'Simulated Path',
+                        data: [...Array(history.length - 1).fill(null), startVal, ...simPath],
+                        borderColor: '#ffffff',
+                        backgroundColor: 'rgba(255,255,255,0.05)',
+                        borderWidth: 1,
+                        borderDash: [2, 2],
+                        tension: 0.4,
+                        pointRadius: 0,
+                        fill: '-1',
+                        yAxisID: 'y'
+                    },
+                    {
+                        label: 'Projected Outlook (Consensus)',
+                        data: [...Array(history.length - 1).fill(null), startVal, ...consensus],
+                        borderColor: '#d946ef',
+                        borderWidth: 2,
+                        borderDash: [10, 5],
+                        tension: 0.4,
+                        pointRadius: 3,
+                        yAxisID: 'y'
+                    },
+                    {
+                        label: 'S&P 500 Outlook',
+                        data: sp500Data,
+                        borderColor: '#f59e0b',
+                        borderWidth: 2,
+                        tension: 0.4,
+                        pointRadius: 0,
+                        yAxisID: 'y1',
+                        hidden: true
+                    },
+                    {
+                        label: '10Y Yield Outlook',
+                        data: yieldData,
+                        borderColor: '#888',
+                        borderWidth: 2,
+                        borderDash: [2, 2],
+                        tension: 0.4,
+                        pointRadius: 0,
+                        yAxisID: 'y2',
+                        hidden: true
                     }
                 ]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                interaction: { intersect: false, mode: 'index' },
+                interaction: {
+                    mode: 'index',
+                    intersect: false,
+                },
                 plugins: {
-                    legend: { labels: { color: '#ccc', font: { family: 'JetBrains Mono' } } }
+                    legend: {
+                        labels: { color: '#ccc', font: { family: 'JetBrains Mono', size: 10 }, boxWidth: 10 },
+                        position: 'top',
+                        align: 'end'
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0,0,0,0.9)',
+                        titleFont: { family: 'JetBrains Mono' },
+                        bodyFont: { family: 'JetBrains Mono' },
+                        borderColor: '#333',
+                        borderWidth: 1,
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed.y !== null) {
+                                    label += context.parsed.y.toFixed(2);
+                                    if (context.dataset.yAxisID === 'y2') label += '%';
+                                }
+                                return label;
+                            }
+                        }
+                    }
                 },
                 scales: {
-                    y: { grid: { color: '#222' }, ticks: { color: '#666' }, min: 0, max: 100 },
-                    x: { grid: { color: '#222' }, ticks: { display: false } }
+                    y: {
+                        type: 'linear',
+                        display: true,
+                        position: 'left',
+                        grid: { color: '#222' },
+                        ticks: { color: '#666', font: { family: 'JetBrains Mono', size: 9 } },
+                        title: { display: true, text: 'Sentiment', color: '#00f3ff', font: { size: 9 } }
+                    },
+                    y1: {
+                        type: 'linear',
+                        display: false,
+                        position: 'right',
+                        grid: { drawOnChartArea: false },
+                        ticks: { color: '#f59e0b', font: { family: 'JetBrains Mono', size: 9 } }
+                    },
+                    y2: {
+                        type: 'linear',
+                        display: false,
+                        position: 'right',
+                        grid: { drawOnChartArea: false },
+                        ticks: { color: '#888', font: { family: 'JetBrains Mono', size: 9 } }
+                    },
+                    x: {
+                        grid: { color: '#222' },
+                        ticks: { color: '#666', maxTicksLimit: 12, font: { family: 'JetBrains Mono', size: 9 } }
+                    }
                 }
             }
         });

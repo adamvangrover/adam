@@ -9,6 +9,8 @@
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script src="js/mock_data.js"></script>
+    <script src="js/mock_data_v2.js"></script>
     <style>
         body {
             background-color: #050b14;
@@ -74,6 +76,12 @@
                 if (window.ADAM_STATE) {
                     console.log("Loading state from window.ADAM_STATE");
                     // Logic to parse ADAM_STATE would go here
+                    if (window.ADAM_STATE.agents) {
+                        setAgents(window.ADAM_STATE.agents);
+                    }
+                    if (window.ADAM_STATE.logs) {
+                        setLogs(window.ADAM_STATE.logs);
+                    }
                 }
             }, []);
 
