@@ -17,6 +17,7 @@ class ModularDataManager {
             agents: null,
             prompts: null,
             trainingData: null,
+            artisanal: null,
             architecture: null
         };
 
@@ -71,9 +72,23 @@ class ModularDataManager {
     }
 
     /**
-     * Generic loader helper
+     * Generic loader helper for JSON
      */
     async _loadResource(key, filename) {
+        return this._loadGeneric(key, filename, async (res) => await res.json());
+    }
+
+    /**
+     * Generic loader helper for Text
+     */
+    async _loadResourceText(key, filename) {
+        return this._loadGeneric(key, filename, async (res) => await res.text());
+    }
+
+    /**
+     * Core loader logic
+     */
+    async _loadGeneric(key, filename, parser) {
         if (this.cache[key]) {
             console.log(`[ModularDataManager] Returning cached ${key}.`);
             return this.cache[key];
@@ -85,7 +100,7 @@ class ModularDataManager {
         try {
             const res = await fetch(`${this.basePath}${filename}`);
             if (!res.ok) throw new Error(`HTTP ${res.status}`);
-            const data = await res.json();
+            const data = await parser(res);
 
             this.cache[key] = data;
 
@@ -145,6 +160,31 @@ class ModularDataManager {
     }
 
     /**
+     * Loads the "Artisanal" subset (Synthetic Data)
+     */
+    async loadArtisanalData() {
+        // Ensure tools are loaded
+        if (!window.ArtisanalTools) {
+            await new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = 'js/artisanal_tools.js';
+                script.onload = resolve;
+                script.onerror = reject;
+                document.head.appendChild(script);
+            });
+        }
+
+        const text = await this._loadResourceText('artisanal_raw', 'artisanal/synthetic_batch_001.jsonl');
+        const parsed = window.ArtisanalTools.parseJSONL(text);
+
+        // Cache the parsed version under the main key
+        this.cache['artisanal'] = parsed;
+        this.notify('artisanal', parsed);
+
+        return parsed;
+    }
+
+    /**
      * Loads the "Architecture" subset
      */
     async loadArchitecture() {
@@ -162,6 +202,7 @@ class ModularDataManager {
             agents: null,
             prompts: null,
             trainingData: null,
+            artisanal: null,
             architecture: null
         };
         console.log("[ModularDataManager] Cache cleared.");
