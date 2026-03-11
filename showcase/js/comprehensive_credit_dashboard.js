@@ -228,11 +228,22 @@ function selectMemo(memo) {
                     <div class="text-xl font-bold text-white mono">${pd.model_score || pd.z_score || '--'}</div>
                 </div>
             </div>
-            <div class="grid grid-cols-2 gap-2 text-xs">
+            <div class="grid grid-cols-2 gap-2 text-xs mb-3">
                 <div class="bg-slate-800 p-2 rounded"><span class="text-slate-400 block mb-1">1Y PD</span> <span class="font-bold">${((pd.one_year_pd || pd.pd_1yr || 0) * 100).toFixed(2)}%</span></div>
                 <div class="bg-slate-800 p-2 rounded"><span class="text-slate-400 block mb-1">5Y PD</span> <span class="font-bold">${((pd.five_year_pd || 0) * 100).toFixed(2)}%</span></div>
             </div>
         `;
+
+        if (memo.lgd_analysis && memo.lgd_analysis.el_simulation) {
+            const el = memo.lgd_analysis.el_simulation;
+            pdHtml += `
+                <div class="text-xs font-bold text-slate-300 uppercase tracking-widest mb-2 mt-2 border-t border-slate-700 pt-2">EL Simulation</div>
+                <div class="grid grid-cols-2 gap-2 text-xs">
+                    <div class="bg-slate-800 p-2 rounded border border-orange-900/50"><span class="text-slate-400 block mb-1">Expected Loss (Amt)</span> <span class="font-bold text-orange-400 mono">$${el.expected_loss_amount.toFixed(2)}M</span></div>
+                    <div class="bg-slate-800 p-2 rounded border border-orange-900/50"><span class="text-slate-400 block mb-1">Expected Loss (%)</span> <span class="font-bold text-orange-400 mono">${(el.expected_loss_percent * 100).toFixed(3)}%</span></div>
+                </div>
+            `;
+        }
     } else {
         pdHtml = '<div class="italic text-slate-500">No Regulatory PD model available.</div>';
     }

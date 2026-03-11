@@ -195,8 +195,28 @@ def fetch_real_data(ticker_symbol):
                 "five_year_pd": 0.012
             },
             "lgd_analysis": {
-                "loss_given_default": 0.35
+                "loss_given_default": 0.35,
+                "el_simulation": {
+                    "expected_loss_amount": (0.0015 * 0.35 * (debt / 1e6)) if debt else 0,
+                    "expected_loss_percent": (0.0015 * 0.35)
+                }
             },
+            "debt_facilities": [
+                {
+                    "facility_type": "Term Loan B",
+                    "amount_committed": debt * 0.6 / 1e6 if debt else 500,
+                    "interest_rate": "SOFR + 350 bps",
+                    "maturity_date": "2028-12-31",
+                    "regulatory_rating": "Pass" if (debt/ebitda if ebitda > 0 else 0) < 3 else "Special Mention"
+                },
+                {
+                    "facility_type": "Revolving Credit Facility",
+                    "amount_committed": debt * 0.4 / 1e6 if debt else 250,
+                    "interest_rate": "SOFR + 200 bps",
+                    "maturity_date": "2027-06-30",
+                    "regulatory_rating": "Pass"
+                }
+            ],
             "peer_comps": [
                 {"ticker": "PEER1", "name": f"{sector} Peer A", "ev_ebitda": 15.0, "pe_ratio": pe * 0.9 if pe else 15, "leverage_ratio": 1.5, "market_cap": market_cap * 0.8 / 1e6},
                 {"ticker": "PEER2", "name": f"{sector} Peer B", "ev_ebitda": 12.0, "pe_ratio": pe * 1.1 if pe else 15, "leverage_ratio": 2.1, "market_cap": market_cap * 0.5 / 1e6}
@@ -241,6 +261,82 @@ def fetch_real_data(ticker_symbol):
         print(f"Failed to fetch data for {ticker_symbol}: {e}")
         return None
 
+def update_knowledge_graph(memos):
+    graph_file = os.path.join(DATA_DIR, "system_knowledge_graph.json")
+    if not os.path.exists(graph_file):
+        print(f"Knowledge graph file {graph_file} not found. Skipping update.")
+        return
+
+    try:
+        with open(graph_file, 'r') as f:
+            graph_data = json.load(f)
+
+        if "nodes" not in graph_data:
+            graph_data["nodes"] = []
+        if "edges" not in graph_data:
+            graph_data["edges"] = []
+
+        max_id = 0
+        for node in graph_data["nodes"]:
+            if isinstance(node.get("id"), int) and node["id"] > max_id:
+                max_id = node["id"]
+
+        for memo in memos:
+            ticker = memo["_metadata"]["ticker"]
+            name = memo["borrower_name"]
+
+            # Check if node already exists
+            existing_node = next((n for n in graph_data["nodes"] if n.get("title") == name and n.get("group") == "entity"), None)
+            if existing_node:
+                node_id = existing_node["id"]
+            else:
+                max_id += 1
+                node_id = max_id
+                graph_data["nodes"].append({
+                    "id": node_id,
+                    "label": ticker,
+                    "group": "entity",
+                    "title": name,
+                    "value": 20,
+                    "path": f"entity/{ticker}",
+                    "level": "entity",
+                    "preview": f"Credit Memo for {name}"
+                })
+
+            # Check if report node exists
+            report_title = f"Credit Memo: {ticker}"
+            existing_report = next((n for n in graph_data["nodes"] if n.get("title") == report_title and n.get("group") == "report"), None)
+            if existing_report:
+                report_id = existing_report["id"]
+            else:
+                max_id += 1
+                report_id = max_id
+                graph_data["nodes"].append({
+                    "id": report_id,
+                    "label": f"Memo: {ticker}",
+                    "group": "report",
+                    "title": report_title,
+                    "value": 15,
+                    "path": f"reports/credit_memo_{ticker}.json",
+                    "level": "file",
+                    "preview": memo["executive_summary"][:100]
+                })
+
+                # Add edge between entity and report
+                graph_data["edges"].append({
+                    "from": node_id,
+                    "to": report_id,
+                    "arrows": "to",
+                    "color": {"opacity": 0.5}
+                })
+
+        with open(graph_file, 'w') as f:
+            json.dump(graph_data, f, indent=2)
+        print(f"Successfully updated knowledge graph with {len(memos)} entities.")
+
+    except Exception as e:
+        print(f"Error updating knowledge graph: {e}")
+
 def build_real_memos():
     print("Starting generation of real data credit memos...")
     results = []
@@ -255,6 +351,8 @@ def build_real_memos():
     with open(OUTPUT_FILE, 'w') as f:
         json.dump(results, f, indent=2)
     print(f"Wrote outputs to {OUTPUT_FILE}")
+
+    update_knowledge_graph(results)
 
 if __name__ == "__main__":
     build_real_memos()
