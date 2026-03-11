@@ -4,22 +4,57 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import random
+import logging
+from typing import Dict, Any, Optional, List
+from core.agents.agent_base import AgentBase
 
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-class AlgoTradingAgent:
-    def __init__(self, data, strategies=None, initial_balance=10000):
+class AlgoTradingAgent(AgentBase):
+    """
+    Agent responsible for executing algorithmic trading strategies.
+    """
+
+    def __init__(self, config: Dict[str, Any], kernel: Optional[Any] = None):
         """
         Initializes the trading agent.
 
         Args:
-            data (pd.DataFrame): Historical market data (e.g., price history).
-            strategies (list, optional): List of strategies to be simulated. Defaults to None.
-            initial_balance (float, optional): The starting balance for the simulation. Defaults to 10000.
+            config (dict): Configuration dictionary.
+            kernel (Optional[Any]): Semantic Kernel instance.
         """
-        self.data = data
-        self.strategies = strategies or ['momentum', 'mean_reversion', 'arbitrage']
-        self.initial_balance = initial_balance
+        super().__init__(config, kernel=kernel)
+        self.strategies = self.config.get('strategies', ['momentum', 'mean_reversion', 'arbitrage'])
+        self.initial_balance = self.config.get('initial_balance', 10000)
         self.results = {}
+        # Data is not stored in __init__ anymore, but passed during execution
+
+    async def execute(self, *args, **kwargs):
+        """
+        Evaluates strategies by running simulations.
+
+        Args:
+            data (pd.DataFrame): Historical market data (e.g., price history). Passed via kwargs.
+
+        Returns:
+            dict: A dictionary of performance metrics for each strategy.
+        """
+        data = kwargs.get('data')
+
+        if data is None:
+            logging.error("No data provided for execution.")
+            return {"error": "No data provided."}
+
+        if not isinstance(data, pd.DataFrame):
+             logging.error("Data must be a pandas DataFrame.")
+             return {"error": "Data must be a pandas DataFrame."}
+
+        self.data = data
+        logging.info("Starting evaluation of trading strategies...")
+
+        results = self.evaluate_strategies()
+        return results
 
     def run_simulation(self, strategy):
         """
@@ -38,7 +73,7 @@ class AlgoTradingAgent:
         elif strategy == 'arbitrage':
             return self.arbitrage_trading()
         else:
-            print("Unknown strategy.")
+            logging.warning(f"Unknown strategy: {strategy}")
             return {}
 
     def momentum_trading(self):
@@ -56,6 +91,10 @@ class AlgoTradingAgent:
 
         short_window = 20  # short-term moving average
         long_window = 50  # long-term moving average
+
+        if len(self.data) < long_window:
+             logging.warning("Not enough data for momentum strategy.")
+             return {}
 
         for i in range(long_window, len(self.data)):
             short_ma = self.data['Close'][i - short_window:i].mean()
@@ -88,6 +127,11 @@ class AlgoTradingAgent:
         trade_log = []
 
         window_size = 20  # Lookback period for moving average
+
+        if len(self.data) < window_size:
+             logging.warning("Not enough data for mean reversion strategy.")
+             return {}
+
         for i in range(window_size, len(self.data)):
             mean = self.data['Close'][i - window_size:i].mean()
             price = self.data['Close'][i]
@@ -149,7 +193,16 @@ class AlgoTradingAgent:
             dict: The performance metrics.
         """
         trade_df = pd.DataFrame(trade_log)
-        trade_df['Cumulative Balance'] = trade_df['Balance'].cumsum() + trade_df['Position'] * self.data['Close']
+        if trade_df.empty:
+             return {
+                'Final Balance': self.initial_balance,
+                'Total Return': 0.0,
+                'Win Rate': 0.0,
+                'Max Drawdown': 0.0,
+                'Sharpe Ratio': 0.0
+            }
+
+        trade_df['Cumulative Balance'] = trade_df['Balance'] + trade_df['Position'] * self.data['Close'].reset_index(drop=True).iloc[len(self.data)-len(trade_df):].values
 
         total_return = (trade_df['Cumulative Balance'].iloc[-1] - self.initial_balance) / self.initial_balance
         win_rate = np.mean(trade_df['Cumulative Balance'] > 0) * 100
@@ -189,6 +242,7 @@ class AlgoTradingAgent:
             dict: A dictionary of performance metrics for each strategy.
         """
         for strategy in self.strategies:
+            logging.info(f"Running simulation for strategy: {strategy}")
             self.results[strategy] = self.run_simulation(strategy)
 
         return self.results
@@ -200,27 +254,41 @@ class AlgoTradingAgent:
         plt.figure(figsize=(10, 6))
 
         for strategy, result in self.results.items():
-            plt.plot(result['Final Balance'], label=f'{strategy} (Total Return: {result["Total Return"]*100:.2f}%)')
+            if 'Final Balance' in result:
+                 # Note: Ideally we would plot the equity curve, but result currently only has summary metrics
+                 # To plot equity curve, run_simulation needs to return the time series.
+                 # For now, we keep this method but it might not plot a line graph as intended in original code
+                 # unless we change run_simulation return type.
+                 # Given refactor scope, let's just log that plotting needs time series data.
+                 logging.info(f"Strategy {strategy}: Final Balance {result['Final Balance']}")
+            else:
+                 logging.warning(f"No results for {strategy}")
 
-        plt.title('Strategy Performance Comparison')
-        plt.xlabel('Time')
-        plt.ylabel('Portfolio Value')
-        plt.legend(loc='upper left')
-        plt.show()
+        # Original code plotted result['Final Balance'] which suggests result was a time series?
+        # Looking at original code:
+        # result = self.run_simulation(strategy) -> returns dict with 'Final Balance' (scalar).
+        # plt.plot(result['Final Balance']) -> plotting a scalar? That doesn't make sense for a line plot.
+        # It seems the original code might have been pseudocode or broken regarding plotting.
+        # I will leave this method as is but comment out the plotting to avoid errors.
+        logging.info("Plotting not implemented in this version (requires equity curve data).")
+        # plt.show()
 
 
 # Example usage
 if __name__ == "__main__":
+    import asyncio
     # Simulate market data (replace with actual market data)
     dates = pd.date_range('2023-01-01', '2023-12-31', freq='D')
     prices = np.random.normal(100, 5, len(dates))  # Simulating daily closing prices
     market_data = pd.DataFrame({'Date': dates, 'Close': prices})
 
     # Initialize the agent
-    agent = AlgoTradingAgent(data=market_data)
+    config = {'strategies': ['momentum', 'mean_reversion'], 'initial_balance': 10000}
+    agent = AlgoTradingAgent(config=config)
 
     # Run and evaluate the strategies
-    agent.evaluate_strategies()
+    async def main():
+        results = await agent.execute(data=market_data)
+        print("Results:", results)
 
-    # Plot performance comparison
-    agent.plot_performance()
+    asyncio.run(main())

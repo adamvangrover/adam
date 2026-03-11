@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sovereign File System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body { background: #020408; color: #e2e8f0; font-family: 'Courier New', monospace; overflow: hidden; }
+        .glass-panel { background: rgba(10, 15, 30, 0.7); border: 1px solid rgba(234, 179, 8, 0.2); border-radius: 8px; backdrop-filter: blur(10px); }
+        .file-item { display: flex; align-items: center; padding: 0.5rem; border-radius: 4px; cursor: pointer; transition: background 0.2s; border: 1px solid transparent; }
+        .file-item:hover { background: rgba(255,255,255,0.05); border-color: rgba(234, 179, 8, 0.3); }
+        .file-item.selected { background: rgba(234, 179, 8, 0.1); border-color: rgba(234, 179, 8, 0.5); }
+
+        .tree-line { border-left: 1px dashed #334155; padding-left: 1rem; margin-left: 0.5rem; }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #020617; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+    </style>
+</head>
+<body class="p-4 flex flex-col h-screen">
+
+    <div class="flex justify-between items-center mb-6 border-b border-gray-800 pb-2">
+        <h1 class="text-xl font-bold text-white flex items-center gap-2">
+            <i data-lucide="folder-open" class="text-yellow-500 w-6 h-6"></i>
+            SOVEREIGN ARCHIVE <span class="text-[10px] bg-yellow-500/20 text-yellow-400 px-2 py-0.5 rounded border border-yellow-500/50">READ-ONLY</span>
+        </h1>
+        <div class="relative w-64">
+             <i data-lucide="search" class="absolute left-2 top-1.5 w-4 h-4 text-gray-500"></i>
+             <input type="text" placeholder="Search knowledge base..." class="w-full bg-gray-900 border border-gray-700 rounded pl-8 pr-2 py-1 text-xs text-white focus:outline-none focus:border-yellow-500 transition-colors">
+        </div>
+    </div>
+
+    <div class="flex-grow grid grid-cols-12 gap-4 overflow-hidden">
+
+        <!-- Left Panel: Directory Tree -->
+        <div class="col-span-3 glass-panel p-4 flex flex-col overflow-y-auto">
+             <div class="text-xs text-yellow-500 uppercase font-bold tracking-widest mb-4 border-b border-yellow-500/30 pb-2 flex items-center gap-2">
+                 <i data-lucide="hard-drive" class="w-4 h-4"></i> Root Volume
+             </div>
+
+             <!-- Simulated Directory Structure -->
+             <div class="space-y-1 text-sm font-sans">
+                 <div class="flex items-center gap-2 text-gray-300 hover:text-white cursor-pointer py-1 font-bold">
+                     <i data-lucide="chevron-down" class="w-3 h-3"></i><i data-lucide="folder" class="w-4 h-4 text-yellow-400"></i> /showcase
+                 </div>
+
+                 <div class="tree-line space-y-1">
+                     <div class="flex items-center gap-2 text-gray-400 hover:text-white cursor-pointer py-1">
+                         <i data-lucide="chevron-right" class="w-3 h-3"></i><i data-lucide="folder" class="w-4 h-4 text-yellow-400"></i> /apps
+                     </div>
+                     <div class="flex items-center gap-2 text-white cursor-pointer py-1 font-bold bg-white/5 rounded px-1">
+                         <i data-lucide="chevron-down" class="w-3 h-3"></i><i data-lucide="folder-open" class="w-4 h-4 text-yellow-400"></i> /data
+                     </div>
+
+                     <div class="tree-line space-y-1 text-[12px]">
+                         <div class="flex items-center gap-2 text-gray-400 hover:text-white cursor-pointer py-1">
+                             <i data-lucide="file-json" class="w-3 h-3 text-green-400"></i> agent_portfolio.json
+                         </div>
+                         <div class="flex items-center gap-2 text-gray-400 hover:text-white cursor-pointer py-1">
+                             <i data-lucide="file-json" class="w-3 h-3 text-green-400"></i> credit_mock_data.json
+                         </div>
+                         <div class="flex items-center gap-2 text-yellow-200 cursor-pointer py-1 font-bold">
+                             <i data-lucide="file-json" class="w-3 h-3 text-green-400"></i> strategic_command.json
+                         </div>
+                         <div class="flex items-center gap-2 text-gray-400 hover:text-white cursor-pointer py-1">
+                             <i data-lucide="file-text" class="w-3 h-3 text-gray-300"></i> 10k_sample_msft.txt
+                         </div>
+                     </div>
+
+                     <div class="flex items-center gap-2 text-gray-400 hover:text-white cursor-pointer py-1 mt-1">
+                         <i data-lucide="chevron-right" class="w-3 h-3"></i><i data-lucide="folder" class="w-4 h-4 text-yellow-400"></i> /js
+                     </div>
+                 </div>
+             </div>
+        </div>
+
+        <!-- Middle Panel: File List / Metadata -->
+        <div class="col-span-4 glass-panel flex flex-col overflow-hidden">
+            <div class="bg-gray-900/80 p-2 border-b border-gray-800 flex justify-between items-center text-xs text-gray-400 font-bold uppercase">
+                <span>File Metadata</span>
+                <span>Size</span>
+            </div>
+
+            <div class="flex-grow p-4 flex flex-col justify-center items-center text-center space-y-4">
+                 <i data-lucide="file-json" class="w-16 h-16 text-green-400 opacity-80"></i>
+                 <div>
+                     <h3 class="text-white font-bold text-lg">strategic_command.json</h3>
+                     <p class="text-gray-500 text-xs mt-1">Type: JSON Data File</p>
+                 </div>
+
+                 <div class="w-full bg-gray-900/50 rounded p-4 border border-gray-800 text-left text-xs font-mono space-y-2">
+                     <div class="flex justify-between"><span class="text-gray-500">Size:</span> <span class="text-gray-300">4.2 KB</span></div>
+                     <div class="flex justify-between"><span class="text-gray-500">Modified:</span> <span class="text-gray-300">Today, 08:14 AM</span></div>
+                     <div class="flex justify-between"><span class="text-gray-500">Permissions:</span> <span class="text-gray-300">rwxr-xr-x</span></div>
+                     <div class="flex justify-between"><span class="text-gray-500">Hash (SHA-1):</span> <span class="text-yellow-400 truncate w-32 ml-2">8f9b2...4c1a</span></div>
+                 </div>
+
+                 <div class="text-[10px] text-gray-500 italic mt-4 max-w-xs">
+                     This file contains the core outputs from the Consensus Engine V2, driving the dashboard directives. It is verified and immutable in this environment.
+                 </div>
+            </div>
+        </div>
+
+        <!-- Right Panel: Preview -->
+        <div class="col-span-5 glass-panel flex flex-col relative overflow-hidden">
+             <div class="bg-gray-900/80 p-2 border-b border-gray-800 text-xs text-gray-400 font-bold uppercase flex justify-between">
+                 <span class="flex items-center gap-2"><i data-lucide="eye" class="w-3 h-3"></i> Preview</span>
+                 <button class="hover:text-white transition"><i data-lucide="external-link" class="w-3 h-3"></i></button>
+             </div>
+
+             <!-- Code Preview Container -->
+             <div class="flex-grow bg-[#1e1e1e] p-4 overflow-auto text-xs font-mono whitespace-pre text-[#d4d4d4] leading-relaxed">
+<span class="text-[#569cd6]">{</span>
+  <span class="text-[#9cdcfe]">"meta"</span>: <span class="text-[#569cd6]">{</span>
+    <span class="text-[#9cdcfe]">"engine"</span>: <span class="text-[#ce9178]">"ConsensusEngineV2"</span>,
+    <span class="text-[#9cdcfe]">"version"</span>: <span class="text-[#ce9178]">"2.0"</span>,
+    <span class="text-[#9cdcfe]">"generated_at"</span>: <span class="text-[#ce9178]">"2026-03-02T00:41:36.310822"</span>
+  <span class="text-[#569cd6]">}</span>,
+  <span class="text-[#9cdcfe]">"strategic_directives"</span>: <span class="text-[#569cd6]">{</span>
+    <span class="text-[#9cdcfe]">"house_view"</span>: <span class="text-[#ce9178]">"NEUTRAL"</span>,
+    <span class="text-[#9cdcfe]">"score"</span>: <span class="text-[#b5cea8]">0.65</span>,
+    <span class="text-[#9cdcfe]">"narrative"</span>: <span class="text-[#ce9178]">"<strong>SYSTEM STATUS: NOMINAL</strong><br>The Supreme Court struck down emergency tariff powers, sparking a 'Relief Rally'..."</span>
+  <span class="text-[#569cd6]">}</span>,
+  <span class="text-[#9cdcfe]">"actionable_plans"</span>: <span class="text-[#569cd6]">[</span>
+    <span class="text-[#569cd6]">{</span>
+      <span class="text-[#9cdcfe]">"action"</span>: <span class="text-[#ce9178]">"MAINTAIN_BALANCE"</span>,
+      <span class="text-[#9cdcfe]">"target"</span>: <span class="text-[#ce9178]">"Current Allocation"</span>,
+      <span class="text-[#9cdcfe]">"rationale"</span>: <span class="text-[#ce9178]">"No clear directional signal."</span>
+    <span class="text-[#569cd6]">}</span>
+  <span class="text-[#569cd6]">]</span>
+<span class="text-[#569cd6]">}</span></div>
+        </div>
+
+    </div>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

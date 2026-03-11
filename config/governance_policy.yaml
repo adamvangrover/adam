@@ -28,9 +28,18 @@ restricted_endpoints:
 
 blacklisted_ips:
   - "192.168.1.666"
+  - "10.0.0.99"
 
 keywords_flagged:
   - "DROP TABLE"
   - "rm -rf"
   - "shutdown"
   - "format c:"
+  - "delete from"
+  - "exec("
+  - "os.system"
+
+rate_limits:
+  default: "100/minute"
+  /api/trade: "10/minute"
+# Protocol Verified: ADAM-V-NEXT

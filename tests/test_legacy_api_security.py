@@ -27,11 +27,11 @@ class TestCoreApiSecurity(unittest.TestCase):
         # Arrange
         error_message = "Sensitive internal detail: /var/www/html/secret.key"
 
-        with patch.object(legacy_api, 'get_knowledge_graph_data', side_effect=Exception(error_message)):
+        with patch.object(legacy_api.agent_orchestrator, 'run_analysis', side_effect=Exception(error_message)):
             payload = {
-                "module": "knowledge_graph",
-                "action": "get_data",
-                "parameters": {"module": "test", "concept": "test"}
+                "module": "agent_orchestrator",
+                "action": "run_analysis",
+                "parameters": {"query": "test"}
             }
             headers = {"X-API-Key": "default-insecure-key-change-me"}
 
@@ -51,9 +51,9 @@ class TestCoreApiSecurity(unittest.TestCase):
     def test_unauthorized_access(self):
         """Test that requests without a valid API key are rejected."""
         payload = {
-            "module": "knowledge_graph",
-            "action": "get_data",
-            "parameters": {"module": "test", "concept": "test"}
+            "module": "agent_orchestrator",
+            "action": "run_analysis",
+            "parameters": {"query": "test"}
         }
 
         # Case 1: No API Key

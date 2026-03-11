@@ -10,11 +10,11 @@ import os
 sys.path.append(os.getcwd())
 
 # Mock heavy dependencies to ensure test speed and stability
-for mod in ["neo4j", "tensorflow", "torch", "transformers", "spacy", "pandas", "numpy", "networkx",
+for mod in ["neo4j", "tensorflow", "torch", "transformers", "spacy", "networkx",
             "dotenv", "semantic_kernel", "semantic_kernel.connectors", "semantic_kernel.connectors.ai",
             "semantic_kernel.connectors.ai.open_ai", "pika", "redis", "boto3", "google.cloud", "tiktoken",
             "textblob", "shap", "lime", "dowhy", "matplotlib", "seaborn", "matplotlib.pyplot",
-            "tweepy", "scipy", "scipy.stats", "sklearn", "sklearn.ensemble", "sklearn.model_selection", "sklearn.metrics",
+            "tweepy", "scipy", "scipy.stats",
             "ta", "talib", "bs4", "reportlab", "reportlab.lib.pagesizes", "reportlab.pdfgen", "fpdf",
             "aiohttp", "feedparser", "mesa", "psycopg2", "rdflib", "prometheus_client", "flask", "flask_socketio",
             "langchain.utilities", "langchain_community", "langchain_community.utilities"]:

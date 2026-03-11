@@ -9,6 +9,9 @@ from core.data_sources.prediction_market_api import SimulatedPredictionMarketAPI
 from core.data_sources.social_media_api import SimulatedSocialMediaAPI
 from core.data_sources.web_traffic_api import SimulatedWebTrafficAPI
 from core.data_sources.data_fetcher import DataFetcher
+from core.agents.specialized.crypto_arbitrage_agent import CryptoArbitrageAgent
+from core.agents.options_flow_agent import OptionsFlowAgent
+from core.agents.insider_activity_agent import InsiderActivityAgent
 
 
 class MarketSentimentAgent(AgentBase):
@@ -32,6 +35,9 @@ class MarketSentimentAgent(AgentBase):
         self.social_media_api = SimulatedSocialMediaAPI(self.config)
         self.web_traffic_api = SimulatedWebTrafficAPI()
         self.data_fetcher = DataFetcher()
+        self.crypto_arbitrage_agent = CryptoArbitrageAgent(config)
+        self.options_flow_agent = OptionsFlowAgent(config)
+        self.insider_activity_agent = InsiderActivityAgent(config)
 
     async def execute(self, input_data: Union[str, AgentInput, Dict[str, Any]] = None, **kwargs) -> Union[Dict[str, Any], AgentOutput]:
         """
@@ -102,10 +108,12 @@ class MarketSentimentAgent(AgentBase):
         answer += f"- Prediction Markets: {details.get('prediction_market_sentiment', 'N/A')}\n"
         answer += f"- Social Media: {details.get('social_media_sentiment', 'N/A')}\n"
         answer += f"- Web Traffic: {details.get('web_traffic_sentiment', 'N/A')}\n"
+        answer += f"- Options Flow: {details.get('options_flow_sentiment', 'N/A')}\n"
+        answer += f"- Insider Activity: {details.get('insider_activity_sentiment', 'N/A')}\n"
 
         return AgentOutput(
             answer=answer,
-            sources=["SimulatedFinancialNewsAPI", "SimulatedPredictionMarketAPI", "SimulatedSocialMediaAPI"],
+            sources=["SimulatedFinancialNewsAPI", "SimulatedPredictionMarketAPI", "SimulatedSocialMediaAPI", "OptionsFlowAgent", "InsiderActivityAgent"],
             confidence=0.8, # Placeholder confidence
             metadata=result
         )
@@ -150,18 +158,40 @@ class MarketSentimentAgent(AgentBase):
 
         logging.info(f"Web Traffic Sentiment: {web_sentiment}")
 
-        # 5. Combine
-        overall = self.combine_sentiment(news_sentiment, pred_sentiment, social_sentiment, web_sentiment)
+        # 5. Options Flow
+        try:
+            options_result = await self.options_flow_agent.execute(input_data=None)
+            options_sentiment = options_result.get("sentiment_score", 0.5)
+        except Exception as e:
+            logging.error(f"Error fetching options flow data: {e}")
+            options_sentiment = 0.5
+
+        logging.info(f"Options Flow Sentiment: {options_sentiment}")
+
+        # 6. Insider Activity
+        try:
+            insider_result = await self.insider_activity_agent.execute(input_data=None)
+            insider_sentiment = insider_result.get("sentiment_score", 0.5)
+        except Exception as e:
+            logging.error(f"Error fetching insider activity data: {e}")
+            insider_sentiment = 0.5
+
+        logging.info(f"Insider Activity Sentiment: {insider_sentiment}")
+
+        # 7. Combine
+        overall = self.combine_sentiment(news_sentiment, pred_sentiment, social_sentiment, web_sentiment, options_sentiment, insider_sentiment)
         logging.info(f"Overall Market Sentiment: {overall}")
 
         details = {
             "news_sentiment": news_sentiment,
             "prediction_market_sentiment": pred_sentiment,
             "social_media_sentiment": social_sentiment,
-            "web_traffic_sentiment": web_sentiment
+            "web_traffic_sentiment": web_sentiment,
+            "options_flow_sentiment": options_sentiment,
+            "insider_activity_sentiment": insider_sentiment
         }
 
-        # 6. Credit Dominance Logic Gate (Adam v24.1)
+        # 8. Credit Dominance Logic Gate (Adam v24.1)
         credit_override, credit_details = await self.check_credit_dominance_rule()
         if credit_override:
             logging.warning(f"Credit Dominance Rule Triggered: {credit_override}")
@@ -192,6 +222,8 @@ class MarketSentimentAgent(AgentBase):
         def fetch(func, *args):
             return loop.run_in_executor(None, func, *args)
 
+        arbitrage_data = None
+
         # Launch tasks
         try:
             t_spy = fetch(self.data_fetcher.fetch_market_data, "SPY")
@@ -201,10 +233,11 @@ class MarketSentimentAgent(AgentBase):
             t_crypto = fetch(self.data_fetcher.fetch_crypto_metrics)
             t_treasury = fetch(self.data_fetcher.fetch_treasury_metrics)
             t_liquidity = fetch(self.data_fetcher.fetch_macro_liquidity)
+            t_arbitrage = self.crypto_arbitrage_agent.execute(symbols=["BTC/USDT", "ETH/USDT"], exchanges=["binance", "kraken"], min_spread=2.0)
 
             # Await all
-            spy_data, qqq_data, credit_data, vol_data, crypto_data, treasury_data, liquidity_data = await asyncio.gather(
-                t_spy, t_qqq, t_credit, t_vol, t_crypto, t_treasury, t_liquidity
+            spy_data, qqq_data, credit_data, vol_data, crypto_data, treasury_data, liquidity_data, arbitrage_data = await asyncio.gather(
+                t_spy, t_qqq, t_credit, t_vol, t_crypto, t_treasury, t_liquidity, t_arbitrage
             )
         except Exception as e:
             logging.error(f"Error fetching data for Credit Dominance Rule: {e}")
@@ -280,7 +313,12 @@ class MarketSentimentAgent(AgentBase):
 
         curve_inverted = (curve_slope is not None and curve_slope < 0)
 
-        systemic_tremor = (vix_inverted or curve_inverted)
+        high_arbitrage_spread = False
+        if arbitrage_data and arbitrage_data.get("opportunities"):
+            high_arbitrage_spread = True
+            details["arbitrage_opportunities"] = len(arbitrage_data["opportunities"])
+
+        systemic_tremor = (vix_inverted or curve_inverted or high_arbitrage_spread)
 
         # Condition C: Risk-On Decoupling
         # BTC < -3% while Nasdaq > +0.5%
@@ -296,16 +334,18 @@ class MarketSentimentAgent(AgentBase):
 
         return trigger, details
 
-    def combine_sentiment(self, news: float, pred: float, social: float, web: float) -> float:
+    def combine_sentiment(self, news: float, pred: float, social: float, web: float, options: float = 0.5, insider: float = 0.5) -> float:
         """
         Combines sentiment from different sources into an overall sentiment score.
         """
         # Simple weighted average
         weights = {
-            'news': 0.4,
-            'prediction': 0.3,
-            'social': 0.2,
-            'web': 0.1
+            'news': 0.25,
+            'prediction': 0.15,
+            'social': 0.15,
+            'web': 0.1,
+            'options': 0.2,
+            'insider': 0.15
         }
 
         # Ensure inputs are floats (mock APIs might return None or ints)
@@ -320,7 +360,9 @@ class MarketSentimentAgent(AgentBase):
             clean(news) * weights['news'] +
             clean(pred) * weights['prediction'] +
             clean(social) * weights['social'] +
-            clean(web) * weights['web']
+            clean(web) * weights['web'] +
+            clean(options) * weights['options'] +
+            clean(insider) * weights['insider']
         )
         return score
 

@@ -3,10 +3,11 @@ import { NavLink } from 'react-router-dom';
 
 const navItems = [
   { path: '/', label: 'Mission Control', icon: '🚀' },
-  { path: '/prompt-alpha', label: 'Prompt Alpha', icon: '🧠' },
   { path: '/synthesizer', label: 'Synthesizer', icon: '🎛️' },
-  { path: '/terminal', label: 'UFOs Terminal', icon: '💻' },
   { path: '/prompt-alpha', label: 'Prompt Alpha', icon: '⚡' },
+  { path: '/market-mayhem', label: 'Market Mayhem', icon: '🌋' },
+  { path: '/trading-terminal', label: 'Trading Terminal', icon: '📊' },
+  { path: '/terminal', label: 'UFOs Terminal', icon: '💻' },
   { path: '/market-data', label: 'Market Intelligence', icon: '📈' },
   { path: '/knowledge-graph', label: 'Knowledge Graph', icon: '🕸️' },
   { path: '/agents', label: 'Agent Status', icon: '🤖' },
@@ -41,7 +42,7 @@ const Sidebar: React.FC = () => {
         </ul>
       </nav>
       <div className="p-5 border-t border-[#333] text-xs text-[#666] font-mono">
-        <div>Build: v23.5.0-RC1</div>
+        <div>Build: v26.0.0-ADAM-V-NEXT</div>
         <div>Env: {process.env.NODE_ENV?.toUpperCase()}</div>
         <div className="mt-1 text-[var(--primary-color)]">System: ONLINE</div>
       </div>

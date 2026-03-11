@@ -1,8 +1,7 @@
+import logging
+from typing import Any, Dict, List
 
 import yfinance as yf
-import pandas as pd
-import logging
-from typing import Dict, List, Optional, Any
 
 logger = logging.getLogger(__name__)
 
@@ -29,9 +28,13 @@ class YFinanceMarketData:
                 logger.warning(f"No info found for symbol {symbol}")
                 return {}
 
+            current_price = info.get("currentPrice")
+            if current_price is None:
+                current_price = info.get("regularMarketPrice")
+
             snapshot = {
                 "symbol": symbol,
-                "current_price": info.get("currentPrice"),
+                "current_price": current_price,
                 "open": info.get("open"),
                 "high": info.get("dayHigh"),
                 "low": info.get("dayLow"),
@@ -57,16 +60,13 @@ class YFinanceMarketData:
             # Valid intervals: 1m, 2m, 5m, 15m, 30m, 60m, 90m, 1h, 1d, 5d, 1wk, 1mo, 3mo
             df = ticker.history(period=period, interval=interval)
 
-            data = []
-            for index, row in df.iterrows():
-                data.append({
-                    "timestamp": index.isoformat(),
-                    "open": row["Open"],
-                    "high": row["High"],
-                    "low": row["Low"],
-                    "close": row["Close"],
-                    "volume": row["Volume"]
-                })
+            df = df.rename(
+                columns={"Open": "open", "High": "high", "Low": "low", "Close": "close", "Volume": "volume"}
+            )
+            df.index = df.index.map(lambda x: x.isoformat())
+            data = df.reset_index(names="timestamp")[
+                ["timestamp", "open", "high", "low", "close", "volume"]
+            ].to_dict(orient="records")
             return data
         except Exception as e:
             logger.error(f"Error fetching intraday data for {symbol}: {e}")
@@ -80,18 +80,13 @@ class YFinanceMarketData:
             ticker = yf.Ticker(symbol)
             df = ticker.history(period=period)
 
-            data = []
-            for index, row in df.iterrows():
-                # index is Date (usually just date, not datetime for daily)
-                # But yfinance returns datetime index even for daily
-                data.append({
-                    "date": index.strftime('%Y-%m-%d'),
-                    "open": row["Open"],
-                    "high": row["High"],
-                    "low": row["Low"],
-                    "close": row["Close"],
-                    "volume": row["Volume"]
-                })
+            df = df.rename(
+                columns={"Open": "open", "High": "high", "Low": "low", "Close": "close", "Volume": "volume"}
+            )
+            df.index = df.index.strftime("%Y-%m-%d")
+            data = df.reset_index(names="date")[
+                ["date", "open", "high", "low", "close", "volume"]
+            ].to_dict(orient="records")
             return data
         except Exception as e:
             logger.error(f"Error fetching historical data for {symbol}: {e}")
@@ -106,16 +101,13 @@ class YFinanceMarketData:
             ticker = yf.Ticker(symbol)
             df = ticker.history(period="max", interval="1mo")
 
-            data = []
-            for index, row in df.iterrows():
-                data.append({
-                    "date": index.strftime('%Y-%m-%d'),
-                    "open": row["Open"],
-                    "high": row["High"],
-                    "low": row["Low"],
-                    "close": row["Close"],
-                    "volume": row["Volume"]
-                })
+            df = df.rename(
+                columns={"Open": "open", "High": "high", "Low": "low", "Close": "close", "Volume": "volume"}
+            )
+            df.index = df.index.strftime("%Y-%m-%d")
+            data = df.reset_index(names="date")[
+                ["date", "open", "high", "low", "close", "volume"]
+            ].to_dict(orient="records")
             return data
         except Exception as e:
             logger.error(f"Error fetching long-term data for {symbol}: {e}")

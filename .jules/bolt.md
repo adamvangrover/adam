@@ -63,3 +63,23 @@
 ## 2026-10-26 - [DOM Traversal Optimization]
 **Learning:** `TreeWalker` in `showcase/js/dashboard-logic.js` was traversing the entire document and running regex matching on every text node, even though only the first 20 matches were used. This caused unnecessary processing on large pages (~58ms vs ~0.3ms for 5000 nodes).
 **Action:** Always implement an early exit condition when scanning the DOM for a limited number of matches.
+
+## 2024-05-19 - React Memoization on Global Store Subscriptions
+**Learning:** In dashboards subscribing to global store states (like Zustand), changes to root metrics (e.g., `networkLoad`) cause the entire component to re-render, including mapping over lists. Wrapping list child items (like `AgentCell`) in `React.memo` effectively isolates them, ensuring they only re-render if their direct prop ref changes.
+**Action:** Always verify if a parent component maps over items and subscribes to unrelated state. Use `React.memo` on the list items to avoid O(N) re-renders.
+
+## 2025-05-28 - [Vectorized pandas DataFrame to dict conversion]
+**Learning:** `df.iterrows()` inside pandas is notoriously slow because it converts each row to a Series. The iteration inside `YFinanceMarketData` methods introduced a massive overhead. Refactoring the iteration loop into a vectorized approach (`df.rename`, modifying `df.index`, followed by `df.reset_index(names="date")[cols].to_dict(orient="records")`) achieves roughly a 4-12x performance boost with no functional changes.
+**Action:** Always prefer `to_dict(orient="records")` for DataFrame iterations that construct output object lists, particularly when fetching and returning large blocks of market data APIs.
+
+## 2025-06-12 - [Vectorized pandas DataFrame logic in WhaleScanner]
+**Learning:** `merged.iterrows()` inside `WhaleScanner.calculate_fund_sentiment` is notoriously slow because it converts each row to a Series. Refactoring the iteration loop into a vectorized approach (`combine_first`, `fillna`, mapping columns, and `to_dict('records')`) achieves a roughly 5x performance boost with no functional changes.
+**Action:** Always prefer `to_dict(orient="records")` on filtered or mapped DataFrame subsets over `.iterrows()` when generating parsed domain models from external tabular data.
+
+## 2025-06-13 - [Vectorized historical data fetching in DataFetcher]
+**Learning:** `history_reset.iterrows()` inside `DataFetcher.fetch_historical_data` was a significant bottleneck when fetching years of daily data, taking ~0.38 seconds for 1 year of AAPL data. Refactoring to a vectorized approach mapping columns and formatting datetime natively, then using `to_dict(orient="records")`, reduced this to ~0.04 seconds (~10x speedup).
+**Action:** Consistently avoid `df.iterrows()` in data pipeline and ingestion methods. Use vectorized pandas operations and `to_dict(orient="records")` to build dictionaries.
+
+## 2025-03-10 - Vectorized DataFrame filtering by Multi-Index
+**Learning:** `df.iterrows()` when iterating to check if tuple pairs exist in a `set` is extremely slow. In `InstitutionalRadarAnalytics.detect_cluster_buys`, using a `for _, row in curr_df.iterrows():` loop checking `(row["fund_name"], row["cusip"]) not in prev_holdings` was a major bottleneck.
+**Action:** Always prefer `mask = ~curr_df.set_index(["col1", "col2"]).index.isin(set_of_tuples)` instead of `iterrows()` for multi-column exclusion/inclusion filtering against a set of tuples.

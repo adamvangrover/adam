@@ -1,5 +1,46 @@
 # Changelog
 
+## [2026-mar-10] - Protocol ARCHITECT_INFINITE Expansion
+
+### Jules' Log
+> "I noticed we lack a centralized way to track agent 'health' and execution latency. I researched observability patterns for multi-agent swarms and built `SystemHealthAgent` to bridge this gap, ensuring we can monitor token usage and error rates across the network. Furthermore, I integrated this into `MetaCognitiveAgent` as required by ARCHITECT_INFINITE Option A."
+
+### Added
+- Created/Updated `core/agents/system_health_agent.py`
+- Created/Updated `tests/test_system_health_agent.py`
+- Created/Updated `core/agents/meta_cognitive_agent.py`
+
+
+## v26.12 - Protocol ARCHITECT_INFINITE (Day 13)
+
+### Jules' Log
+> "I noticed we lack a mechanism to track corporate insider activity, which provides strong signals about management's internal conviction. I researched SEC Form 4 filings and built `InsiderActivityAgent` to bridge this gap, integrating its buy/sell ratio and cluster buying logic directly into the `MarketSentimentAgent` to further contextualize overall sentiment."
+
+### Added
+- **New Organ**: `core/agents/insider_activity_agent.py` - A new specialized agent that monitors SEC Form 4 data to generate sentiment scores based on insider buy/sell ratios and cluster buying.
+- **Neural Pathway**: Integrated `InsiderActivityAgent` into `core/agents/market_sentiment_agent.py` by updating the `combine_sentiment` function to weigh insider flow alongside news, prediction markets, social media, web traffic, and options flow.
+- **Tests**: `tests/test_insider_activity_agent.py` - Unit tests verifying the sentiment calculation logic for insider activity.
+
+## v26.11 - Protocol ARCHITECT_INFINITE (Day 12)
+
+### Jules' Log
+> "I noticed we lack a way to gauge options market positioning, a leading indicator for market sentiment and potential price movement. I researched options flow indicators like unusual volume and put/call ratios and built `OptionsFlowAgent` to bridge this gap, integrating it directly into `MarketSentimentAgent` to influence the 'Overall Market Sentiment' score."
+
+### Added
+- **New Organ**: `core/agents/options_flow_agent.py` - A new specialized agent that monitors unusual volume and put/call ratios to derive a sentiment score.
+- **Neural Pathway**: Integrated `OptionsFlowAgent` into `core/agents/market_sentiment_agent.py` by updating the `combine_sentiment` function to weigh options flow alongside news, prediction markets, social media, and web traffic.
+- **Tests**: `tests/test_options_flow_agent.py` - Unit tests verifying the extraction and metric conversion logic to compute sentiment scores for both bullish and bearish options setups.
+- **Core Optimization**: Fixed the fallback mock logic in `daily_ritual.py` to ensure it successfully applies simulated LLM output using `_save_and_apply_output(simulated_response)`.
+
+## v26.10 - Protocol ARCHITECT_INFINITE (Day 11)
+
+### Jules' Log
+> "I noticed we lack a way to quantify 'developer momentum' which is a leading indicator for crypto/tech assets. I researched 'developer activity vs price correlation' and built `GitHubAlphaAgent` to bridge this gap, enabling the system to score repositories based on commit velocity and contributor diversity."
+
+### Added
+- **New Organ**: `core/agents/specialized/github_alpha_agent.py` - A specialized agent that analyzes GitHub repositories for commit frequency and unique author count to generate a 'Developer Alpha Score'.
+- **Tests**: `tests/test_github_alpha_agent.py` - Unit tests verifying git log parsing and score calculation with mocked subprocess calls.
+
 ## v26.9 - Protocol ARCHITECT_INFINITE (Day 10)
 
 ### Jules' Log
@@ -48,6 +89,15 @@
 - **Dependencies**: Added `ccxt` to `requirements.txt`.
 - **UI**: Created `showcase/unified_dashboard.html` (Adam Protocol: Unified Command) to bridge Legacy Showcase, Adam OS, and the new WebApp.
 - **Widget**: Added `showcase/js/crypto_arbitrage_widget.js` to visualize real-time arbitrage opportunities in the new dashboard.
+
+## v26.5 - Protocol ARCHITECT_INFINITE (Day 6)
+
+### Jules' Log
+> "I noticed we have a `CryptoArbitrageAgent` that detects high arbitrage spreads but its output was siloed. High arbitrage spread indicates irregular market plumbing and stress across liquidity pools. I integrated `CryptoArbitrageAgent` into `MarketSentimentAgent` to bridge this gap. Now, when the spread hits a critical threshold, it triggers a 'Systemic Tremor' warning, overriding naive sentiment indicators and accurately reflecting underlying systemic risk."
+
+### Added
+- **Integration**: Connected `CryptoArbitrageAgent` to `MarketSentimentAgent`'s Credit Dominance Rule. High arbitrage spreads now act as a systemic risk signal.
+- **Tests**: `tests/test_market_sentiment_agent.py` - Unit tests verifying standard execution and the new 'Systemic Tremor' logic overrides.
 
 ## v26.4 - Protocol ARCHITECT_INFINITE (Day 5)
 

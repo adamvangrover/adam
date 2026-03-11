@@ -1,6 +1,9 @@
 # core/agents/lingua_maestro.py
 
 import logging
+import asyncio
+from typing import Dict, Any, Optional
+from core.agents.agent_base import AgentBase
 
 try:
     from langchain.utilities import GoogleSearchAPIWrapper
@@ -20,16 +23,29 @@ try:
 except ImportError:
     SentimentIntensityAnalyzer = None
 
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
-class LinguaMaestro:
-    def __init__(self, config):
-        self.config = config
-        self.logger = logging.getLogger(__name__)
+class LinguaMaestro(AgentBase):
+    """
+    Agent specializing in Natural Language Processing, Translation, and Communication Adaptation.
+    """
+
+    def __init__(self, config: Dict[str, Any], kernel: Optional[Any] = None):
+        """
+        Initializes LinguaMaestro.
+
+        Args:
+            config (dict): Configuration dictionary.
+            kernel (Optional[Any]): Semantic Kernel instance.
+        """
+        super().__init__(config, kernel=kernel)
 
         try:
             self.search_api = GoogleSearchAPIWrapper() if GoogleSearchAPIWrapper else None
         except Exception as e:
-            self.logger.warning(f"Failed to init GoogleSearchAPIWrapper: {e}")
+            logger.warning(f"Failed to init GoogleSearchAPIWrapper: {e}")
             self.search_api = None
 
         try:
@@ -39,14 +55,42 @@ class LinguaMaestro:
             else:
                 self.translator = None
         except Exception as e:
-            self.logger.warning(f"Failed to init translation pipeline: {e}")
+            logger.warning(f"Failed to init translation pipeline: {e}")
             self.translator = None
 
         try:
             self.sentiment_analyzer = SentimentIntensityAnalyzer() if SentimentIntensityAnalyzer else None
         except Exception as e:
-            self.logger.warning(f"Failed to init SentimentIntensityAnalyzer: {e}")
+            logger.warning(f"Failed to init SentimentIntensityAnalyzer: {e}")
             self.sentiment_analyzer = None
+
+    async def execute(self, *args, **kwargs):
+        """
+        Executes NLP tasks.
+
+        Tasks:
+        - "translate": Translates text.
+        - "analyze_tone": Analyzes text tone.
+        - "adapt_style": Adapts communication style.
+        """
+        task = kwargs.get('task')
+        text = kwargs.get('text', '')
+
+        logger.info(f"LinguaMaestro executing task: {task}")
+
+        if task == "translate":
+            target_lang = kwargs.get('target_language', 'fr')
+            return self.translate_text(text, target_lang)
+
+        elif task == "analyze_tone":
+            return self.analyze_tone(text)
+
+        elif task == "adapt_style":
+            recipient = kwargs.get('recipient')
+            return self.adapt_communication(text, recipient)
+
+        else:
+            return {"error": f"Unknown task: {task}"}
 
     def detect_language(self, text, **kwargs):
         return "en"
@@ -56,7 +100,7 @@ class LinguaMaestro:
             try:
                 return self.translator(text)[0]['translation_text']
             except Exception as e:
-                self.logger.error(f"Translation failed: {e}")
+                logger.error(f"Translation failed: {e}")
         return f"[MOCK TRANSLATION to {target_language}]: {text}"
 
     def adapt_communication(self, message, recipient, **kwargs):
@@ -87,5 +131,9 @@ class LinguaMaestro:
     def adapt_behavior(self, tone, persona, preferences, **kwargs):
         pass
 
-    def run(self):
-        pass
+if __name__ == "__main__":
+    agent = LinguaMaestro({})
+    async def main():
+        res = await agent.execute(task="translate", text="Hello world")
+        print(res)
+    asyncio.run(main())
