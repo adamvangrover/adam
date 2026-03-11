@@ -229,7 +229,7 @@ def _save_and_apply_output(output_text: str):
         # Add only the targeted files
         subprocess.run(["git", "add"] + files_to_commit, check=True)
         # Commit using the targeted files explicitly (or just commit since they are added, but explicitly passed just in case)
-        subprocess.run(["git", "commit", "-m", commit_message], check=True)
+        subprocess.run(["git", "commit", "-m", commit_message] + files_to_commit, check=True)
         logging.info(f"Committed changes with message: {commit_message}")
 
         # 6. Push the branch and create a PR
@@ -289,6 +289,10 @@ class SystemHealthAgent(AgentBase):
             error_count=self.error_count
         )
         return {"status": "healthy", "metrics": metrics.model_dump()}
+
+    # Dummy additive method for daily expansion
+    def ping(self) -> str:
+        return "pong"
 ```
 
 **3. FILE: tests/test_system_health_agent.py**
@@ -302,6 +306,11 @@ async def test_health_metrics():
     result = await agent.execute()
     assert result["status"] == "healthy"
     assert "metrics" in result
+
+@pytest.mark.asyncio
+async def test_ping():
+    agent = SystemHealthAgent({"agent_id": "test_agent"})
+    assert agent.ping() == "pong"
 ```
 
 **4. FILE: core/agents/meta_cognitive_agent.py**
@@ -452,6 +461,9 @@ class MetaCognitiveAgent(AgentBase):
 
         # Optional: Log trend if accumulating history
         logger.debug(f"Recorded {metric}={value} for {agent_name}")
+
+    def ping_health(self) -> str:
+        return self.system_health_agent.ping()
 ```
 
 **5. GIT COMMIT MESSAGE:**
