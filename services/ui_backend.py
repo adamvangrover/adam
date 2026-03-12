@@ -1,8 +1,9 @@
-import os
 import json
-import time
+import os
 import random
-from flask import Flask, send_from_directory, jsonify
+import time
+
+from flask import Flask, jsonify, send_from_directory
 from flask_cors import CORS
 
 # Define the showcase directory relative to this script

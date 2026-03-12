@@ -1,25 +1,24 @@
 # core/mcp/registry.py
 
-from typing import Dict, Any, Callable
-from core.pricing_engine import PricingEngine
-from core.market_data import MarketDataService
+from typing import Any, Callable, Dict
+
+import requests
+
+from core.data_access.lakehouse_connector import LakehouseConnector
+from core.data_processing.universal_ingestor import UniversalIngestor
+from core.engine.neuro_symbolic_planner import NeuroSymbolicPlanner
 from core.execution_router import ExecutionRouter
-from core.risk_engine import RiskEngine
-from core.strategy import StrategyManager
-from core.memory.engine import MemoryEngine
 from core.family_office import FamilyOfficeService
+from core.market_data import MarketDataService
+from core.memory.engine import MemoryEngine
+from core.memory.provo_graph import ProvoGraph
+from core.pricing_engine import PricingEngine
 
 # New Tools
 from core.product.core_valuation import FinancialEngineeringEngine
-from core.memory.provo_graph import ProvoGraph
-from core.data_processing.universal_ingestor import UniversalIngestor
-from core.engine.neuro_symbolic_planner import NeuroSymbolicPlanner
+from core.risk_engine import RiskEngine
+from core.strategy import StrategyManager
 from core.tools.universal_ingestor_mcp import UniversalIngestorMCP
-from core.data_access.lakehouse_connector import LakehouseConnector
-import requests
-import json
-import os
-import shlex
 
 
 class MCPRegistry:
@@ -170,7 +169,7 @@ class MCPRegistry:
         try:
             start_year = int(start_year)
         except ValueError:
-            raise ValueError("start_year must be an integer.")
+            raise ValueError("start_year must be an integer.") from None
 
         # Use parameterized query equivalent via f-string since we validated inputs
         # But for full safety, if LakehouseConnector supports parameters, we should use them.

@@ -73,7 +73,7 @@ Activate the environment and run a quick test to ensure everything is connected.
 source .venv/bin/activate
 # Windows: .venv\Scripts\activate
 
-python scripts/run_adam.py --query "Hello, Adam."
+uv run python scripts/run_adam.py --query "Hello, Adam."
 ```
 
 **Expected Output:**
@@ -92,7 +92,7 @@ To see Adam in action, we recommend launching the showcase dashboard.
 2.  **Run the Live Backend (Optional):**
     For live interaction, you can start the Flask server:
     ```bash
-    python app.py
+    uv run python app.py
     ```
 
 ### Option B: Command Line Interface (CLI)
@@ -101,10 +101,10 @@ You can interact with agents directly via the CLI for quick queries or debugging
 
 ```bash
 # Interactive Mode
-python scripts/run_adam.py
+uv run python scripts/run_adam.py
 
 # Single Shot
-python scripts/run_adam.py --query "Analyze the credit risk of Tesla"
+uv run python scripts/run_adam.py --query "Analyze the credit risk of Tesla"
 ```
 
 ## Next Steps
