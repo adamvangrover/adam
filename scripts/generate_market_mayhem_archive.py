@@ -1392,55 +1392,6 @@ def generate_archive():
 
             <!-- Archive Items Grid (Injected) -->
             <div id="archiveGrid" style="padding-bottom: 50px;">
-    """
-
-    for year in sorted(grouped.keys(), reverse=True):
-        for item in grouped[year]:
-            safe_title = item['title'].replace('"', "'").lower()
-            safe_summary = item['summary'].replace('"', "'").lower()
-            quality = item.get('quality', 0)
-            
-            # Badge Logic
-            badges = f'<span class="type-badge">{item["type"]}</span>'
-            if quality >= 90:
-                badges += '<span class="type-badge" style="background:#f59e0b; color:#000;">TOP RATED</span>'
-            if item.get("type") == "MARKET_OUTLOOK":
-                badges += '<span class="type-badge" style="background:#00f3ff; color:#000;">OUTLOOK</span>'
-
-            archive_html += f"""
-            <div class="archive-item type-{item['type']}" data-year="{year}" data-type="{item['type']}" data-title="{safe_title} {safe_summary}"
-                 data-date="{item['date']}" data-quality="{quality}" data-sentiment="{item['sentiment_score']}">
-                <div style="flex-grow: 1; cursor: pointer;" onclick="window.controller && window.controller.openModal('{item['filename']}')">
-                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
-                        <span class="mono" style="font-size:0.7rem; color:#888;">{item['date']}</span>
-                        {badges}
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: {item['sentiment_score']} | CONV: {item.get('conviction', 50)} | SEM: {item.get('semantic_score', 0)}</span>
-                    </div>
-                    <h3 style="margin:0 0 5px 0; font-size:1.1rem; color:#fff;">{item['title']}</h3>
-                    <p style="margin:0; font-size:0.85rem; color:#aaa;">{item['summary']}</p>
-                </div>
-                <button onclick="window.controller && window.controller.openModal('{item['filename']}')" class="cyber-btn" style="align-self:center;">ACCESS</button>
-            </div>
-            """
-
-    for item in historical:
-         safe_title = item['title'].replace('"', "'").lower()
-         safe_summary = item['summary'].replace('"', "'").lower()
-         archive_html += f"""
-            <div class="archive-item type-HISTORICAL" data-year="HISTORICAL" data-type="HISTORICAL" data-title="{safe_title} {safe_summary}">
-                <div style="flex-grow: 1; cursor: pointer;" onclick="window.controller && window.controller.openModal('{item['filename']}')">
-                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
-                        <span class="mono" style="font-size:0.7rem; color:#888;">{item['date']}</span>
-                        <span class="type-badge">HISTORICAL</span>
-                    </div>
-                    <h3 style="margin:0 0 5px 0; font-size:1.1rem; color:#fff;">{item['title']}</h3>
-                    <p style="margin:0; font-size:0.85rem; color:#aaa;">{item['summary']}</p>
-                </div>
-                 <button onclick="window.controller && window.controller.openModal('{item['filename']}')" class="cyber-btn" style="align-self:center;">ACCESS</button>
-            </div>
-            """
-
-    archive_html += """
             </div>
 
         </main>
