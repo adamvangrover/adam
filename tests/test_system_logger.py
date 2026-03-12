@@ -16,6 +16,7 @@ def temp_log_file():
         path.unlink()
 
 
+
 def test_system_logger_init(temp_log_file):
     logger = SystemLogger(log_file=str(temp_log_file))
     assert logger.log_file == str(temp_log_file)
