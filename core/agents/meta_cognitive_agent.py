@@ -144,3 +144,6 @@ class MetaCognitiveAgent(AgentBase):
 
         # Optional: Log trend if accumulating history
         logger.debug(f"Recorded {metric}={value} for {agent_name}")
+
+    def ping_health(self) -> str:
+        return self.system_health_agent.ping()

@@ -69,8 +69,8 @@ The **Explorer** app mimics a standard file manager.
 If apps fail to load data:
 1.  Ensure you have run the data generation scripts:
     ```bash
-    python scripts/generate_sp500_micro_build.py
-    python scripts/generate_filesystem_manifest.py
+    uv run python scripts/generate_sp500_micro_build.py
+    uv run python scripts/generate_filesystem_manifest.py
     ```
 2.  Check the browser console (F12) for errors.
 

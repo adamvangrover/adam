@@ -118,10 +118,16 @@
 
         <!-- Main Chart -->
         <main class="col-span-8 lg:col-span-9 flex flex-col gap-4">
-            <div class="glass-panel p-4 rounded flex-grow relative w-full h-full flex flex-col">
+            <div class="glass-panel p-4 rounded relative w-full flex flex-col h-[50%]">
                 <h3 class="text-xs font-bold text-rose-400 mb-2">Option Value vs. Stock Price</h3>
                  <div class="flex-grow relative">
                      <canvas id="bs-chart"></canvas>
+                 </div>
+            </div>
+            <div class="glass-panel p-4 rounded relative w-full flex flex-col h-[50%]">
+                <h3 class="text-xs font-bold text-rose-400 mb-2">Greeks (Call) vs. Stock Price</h3>
+                 <div class="flex-grow relative">
+                     <canvas id="greeks-chart"></canvas>
                  </div>
             </div>
         </main>
@@ -130,6 +136,7 @@
     <script>
         lucide.createIcons();
         let chartInstance = null;
+        let greeksChartInstance = null;
 
         const inputs = document.querySelectorAll('input');
         inputs.forEach(i => i.addEventListener('change', runModel));
@@ -139,8 +146,8 @@
         }
 
         function cdf(x) {
-            var k = 1 / (1 + 0.2316419 * Math.abs(x));
-            var w = 1 - 1 / Math.sqrt(2 * Math.PI) * Math.exp(-x * x / 2) * (0.319381530 * k + -0.356563782 * k * k + 1.781477937 * k * k * k + -1.821255978 * k * k * k * k + 1.330274429 * k * k * k * k * k);
+            const k = 1 / (1 + 0.2316419 * Math.abs(x));
+            const w = 1 - 1 / Math.sqrt(2 * Math.PI) * Math.exp(-x * x / 2) * (0.319381530 * k + -0.356563782 * k * k + 1.781477937 * k * k * k + -1.821255978 * k * k * k * k + 1.330274429 * k * k * k * k * k);
             return (x < 0) ? 1.0 - w : w;
         }
 
@@ -187,6 +194,13 @@
             let labels = [];
             let calls = [];
             let puts = [];
+            let intrinsicCalls = [];
+            let intrinsicPuts = [];
+
+            let deltas = [];
+            let gammas = [];
+            let thetas = [];
+            let vegas = [];
 
             for(let i=0; i<=range; i++) {
                 let s = start + i;
@@ -198,6 +212,13 @@
                 labels.push(s);
                 calls.push(c);
                 puts.push(p);
+                intrinsicCalls.push(Math.max(0, s - K));
+                intrinsicPuts.push(Math.max(0, K - s));
+
+                deltas.push(cdf(d1));
+                gammas.push(pdf(d1) / (s * v * Math.sqrt(T)));
+                thetas.push((- (s * pdf(d1) * v) / (2 * Math.sqrt(T)) - r * K * Math.exp(-r*T) * cdf(d2)) / 365);
+                vegas.push(s * pdf(d1) * Math.sqrt(T) / 100);
             }
 
             if(chartInstance) chartInstance.destroy();
@@ -208,14 +229,67 @@
                     labels: labels,
                     datasets: [
                         { label: 'Call Value', data: calls, borderColor: '#10b981', borderWidth: 2, pointRadius: 0 },
-                        { label: 'Put Value', data: puts, borderColor: '#f43f5e', borderWidth: 2, pointRadius: 0 }
+                        { label: 'Put Value', data: puts, borderColor: '#f43f5e', borderWidth: 2, pointRadius: 0 },
+                        { label: 'Call Intrinsic', data: intrinsicCalls, borderColor: 'rgba(16, 185, 129, 0.3)', borderWidth: 1, borderDash: [5, 5], pointRadius: 0 },
+                        { label: 'Put Intrinsic', data: intrinsicPuts, borderColor: 'rgba(244, 63, 94, 0.3)', borderWidth: 1, borderDash: [5, 5], pointRadius: 0 }
                     ]
                 },
                 options: {
                     responsive: true, maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
                     scales: {
-                        y: { grid: { color: '#1e293b' }, title: { display: true, text: 'Option Price' } },
-                        x: { grid: { display: false }, title: { display: true, text: 'Stock Price' } }
+                        y: { grid: { color: '#1e293b' }, title: { display: true, text: 'Option Price ($)' } },
+                        x: { grid: { display: false }, title: { display: true, text: 'Stock Price ($)' } }
+                    },
+                    plugins: {
+                        legend: { labels: { color: '#cbd5e1' } },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        label += new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(context.parsed.y);
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            if(greeksChartInstance) greeksChartInstance.destroy();
+            const gCtx = document.getElementById('greeks-chart').getContext('2d');
+            greeksChartInstance = new Chart(gCtx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        { label: 'Delta', data: deltas, borderColor: '#3b82f6', borderWidth: 2, pointRadius: 0, yAxisID: 'y' },
+                        { label: 'Vega', data: vegas, borderColor: '#a855f7', borderWidth: 2, pointRadius: 0, yAxisID: 'y' },
+                        { label: 'Gamma', data: gammas, borderColor: '#f59e0b', borderWidth: 2, pointRadius: 0, yAxisID: 'y1' },
+                        { label: 'Theta', data: thetas, borderColor: '#ef4444', borderWidth: 2, pointRadius: 0, yAxisID: 'y1' }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    scales: {
+                        y: {
+                            type: 'linear', display: true, position: 'left',
+                            grid: { color: '#1e293b' }, title: { display: true, text: 'Delta / Vega' }
+                        },
+                        y1: {
+                            type: 'linear', display: true, position: 'right',
+                            grid: { display: false }, title: { display: true, text: 'Gamma / Theta' }
+                        },
+                        x: { grid: { display: false }, title: { display: true, text: 'Stock Price ($)' } }
                     },
                     plugins: { legend: { labels: { color: '#cbd5e1' } } }
                 }

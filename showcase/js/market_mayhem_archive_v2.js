@@ -41,7 +41,7 @@ class MarketMayhemController {
             this.renderOutlook();
             this.renderChart();
             this.renderFeatured();
-            this.renderArchive();
+            this.renderArchive(); // Dynamic JS rendering activated
             this.renderSemanticCloud();
             this.setupEventHandlers();
             console.log("[MarketMayhem] Initialization Complete.");
@@ -51,15 +51,22 @@ class MarketMayhemController {
     }
 
     async loadData() {
-        const [strategic, market, archive] = await Promise.all([
-            fetch('data/strategic_command.json').then(r => r.json()).catch(() => null),
-            fetch('data/sp500_market_data.json').then(r => r.json()).catch(() => []),
-            fetch('data/market_mayhem_index.json').then(r => r.json()).catch(() => [])
-        ]);
+        try {
+            const [strategic, market, archive] = await Promise.all([
+                fetch('data/strategic_command.json').then(r => r.json()).catch(() => null),
+                fetch('data/sp500_market_data.json').then(r => r.json()).catch(() => null),
+                fetch('data/market_mayhem_index.json').then(r => r.json()).catch(() => null)
+            ]);
 
-        this.data.strategic = strategic;
-        this.data.market = market || [];
-        this.data.archive = archive || [];
+            this.data.strategic = strategic || window.STRATEGIC_COMMAND_DATA || null;
+            this.data.market = market || window.SP500_MARKET_DATA || [];
+            this.data.archive = archive || window.MARKET_MAYHEM_DATA || [];
+        } catch (e) {
+            console.warn("[MarketMayhem] Fetch failed, using static fallback data.", e);
+            this.data.strategic = window.STRATEGIC_COMMAND_DATA || null;
+            this.data.market = window.SP500_MARKET_DATA || [];
+            this.data.archive = window.MARKET_MAYHEM_DATA || [];
+        }
     }
 
     // --- Sidebar Rendering ---
@@ -190,17 +197,34 @@ class MarketMayhemController {
         const currentSPX = 6890; 
         const impliedTarget = Math.round(currentSPX * (1 + avgUpside));
 
+        // Mock Macro Data
+        const treasury10y = 4.12;
+        const bslIndex = 98.45;
+        const bslSpread = "+350 bps";
+
 
         this.dom.outlookPanel.innerHTML = `
             <h3>
-                <span>FORWARD OUTLOOK</span>
-                <i class="fas fa-binoculars"></i>
+                <span>MACRO ENVIRONMENT</span>
+                <i class="fas fa-globe"></i>
             </h3>
+            <div class="metric-row">
+                <span class="metric-label">S&P 500 Level</span>
+                <span class="metric-val" style="color: #00f3ff;">${currentSPX}</span>
+            </div>
             <div class="metric-row">
                 <span class="metric-label">Implied S&P Target</span>
                 <span class="metric-val" style="color: #d946ef;">${impliedTarget}</span>
             </div>
             <div class="metric-row">
+                <span class="metric-label">10Y Treasury</span>
+                <span class="metric-val ${treasury10y > 4.5 ? 'val-red' : 'val-green'}">${treasury10y}%</span>
+            </div>
+            <div class="metric-row">
+                <span class="metric-label">BSL Index Level</span>
+                <span class="metric-val">${bslIndex} <span style="font-size:0.6rem;color:#888;">(${bslSpread})</span></span>
+            </div>
+            <div class="metric-row" style="margin-top: 10px; border-top: 1px solid #333; padding-top: 5px;">
                 <span class="metric-label">Market Breadth</span>
                 <span class="metric-val ${breadth > 50 ? 'val-green' : 'val-red'}">${breadth}% Bullish</span>
             </div>
@@ -371,7 +395,36 @@ class MarketMayhemController {
 
     renderArchive() {
         if (!this.data.archive) return;
-        this.dom.archiveGrid.innerHTML = '';
+
+        // Add Layout Toggles
+        const layoutControls = `
+            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-bottom: 10px;">
+                <button class="cyber-btn" id="btn-list-view" style="padding: 4px 8px; font-size: 0.7rem;"><i class="fas fa-list"></i> LIST</button>
+                <button class="cyber-btn" id="btn-grid-view" style="padding: 4px 8px; font-size: 0.7rem;"><i class="fas fa-th-large"></i> GRID</button>
+            </div>
+            <style>
+                .archive-grid-layout {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                    gap: 15px;
+                }
+                .archive-grid-layout .archive-item {
+                    flex-direction: column;
+                    align-items: flex-start;
+                    height: 100%;
+                }
+                .archive-grid-layout .cyber-btn {
+                    align-self: flex-start !important;
+                    margin-top: 10px;
+                }
+            </style>
+        `;
+
+        this.dom.archiveGrid.innerHTML = layoutControls;
+
+        const container = document.createElement('div');
+        container.id = 'archive-items-container';
+        this.dom.archiveGrid.appendChild(container);
 
         this.data.archive.forEach(item => {
             const el = document.createElement('div');
@@ -403,7 +456,15 @@ class MarketMayhemController {
                 </button>
             `;
 
-            this.dom.archiveGrid.appendChild(el);
+            container.appendChild(el);
+        });
+
+        // Event listeners for Layout Toggles
+        document.getElementById('btn-list-view').addEventListener('click', () => {
+            container.className = '';
+        });
+        document.getElementById('btn-grid-view').addEventListener('click', () => {
+            container.className = 'archive-grid-layout';
         });
     }
 
@@ -413,15 +474,52 @@ class MarketMayhemController {
         const report = this.data.archive.find(r => r.filename === filename);
         if (!report) return;
 
-        // Populate Main Content
+        // Populate Main Content with Tabs
         const modalMain = document.getElementById('modalMain');
         modalMain.innerHTML = `
-            <h2 style="margin-top:0; color:var(--primary-color); font-family: 'JetBrains Mono';">${report.title}</h2>
-            <div style="margin-bottom:20px; border-bottom:1px solid #333; padding-bottom:10px; font-family:var(--font-mono); font-size:0.8rem; color:#666;">
-                DATE: ${report.date} | AGENT: ${report.type} | HASH: ${report.provenance_hash ? report.provenance_hash.substring(0,12) : 'N/A'}...
+            <div style="display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px;">
+                <button class="cyber-btn modal-tab-btn active" onclick="window.controller.switchModalTab('read')" style="flex-grow: 1;">READ</button>
+                <button class="cyber-btn modal-tab-btn" onclick="window.controller.switchModalTab('edit')" style="flex-grow: 1;">EDIT</button>
+                <button class="cyber-btn modal-tab-btn" onclick="window.controller.switchModalTab('simulate')" style="flex-grow: 1;">SIMULATE</button>
             </div>
-            <div style="line-height:1.6; color:#ddd;">
-                ${report.full_body || report.summary}
+
+            <div id="modal-tab-read" class="modal-tab-content">
+                <h2 style="margin-top:0; color:var(--primary-color); font-family: 'JetBrains Mono';">${report.title}</h2>
+                <div style="margin-bottom:20px; border-bottom:1px solid #333; padding-bottom:10px; font-family:var(--font-mono); font-size:0.8rem; color:#666;">
+                    DATE: ${report.date} | AGENT: ${report.type} | HASH: ${report.provenance_hash ? report.provenance_hash.substring(0,12) : 'N/A'}...
+                </div>
+                <div style="line-height:1.6; color:#ddd; font-family: 'Inter', sans-serif;">
+                    ${report.full_body || report.summary}
+                </div>
+            </div>
+
+            <div id="modal-tab-edit" class="modal-tab-content" style="display: none; height: calc(100% - 60px);">
+                <div style="margin-bottom: 10px; font-size: 0.8rem; color: #888;">RAW MARKDOWN / HTML SOURCE</div>
+                <textarea style="width: 100%; height: 90%; background: #000; color: #00f3ff; border: 1px solid #333; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; padding: 10px; resize: none; outline: none;">${report.full_body || report.summary}</textarea>
+            </div>
+
+            <div id="modal-tab-simulate" class="modal-tab-content" style="display: none;">
+                <h3 style="color: #0aff60; font-family: 'JetBrains Mono'; margin-top: 0;">CRISIS & ALPHA SIMULATION</h3>
+                <p style="color: #aaa; font-size: 0.85rem;">Run deterministic scenarios based on report sentiment and extracted entities.</p>
+                <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 4px; margin-bottom: 20px;">
+                    <div class="metric-row"><span>SCENARIO TARGET:</span><span class="val-green">${report.entities && report.entities.tickers && report.entities.tickers.length > 0 ? report.entities.tickers.join(', ') : 'BROAD MARKET'}</span></div>
+                    <div class="metric-row"><span>BASE SENTIMENT:</span><span>${report.sentiment_score}/100</span></div>
+                    <div class="metric-row"><span>RISK BIAS:</span><span style="color: ${(report.sentiment_score || 50) < 40 ? '#ff3333' : '#0aff60'};">${(report.sentiment_score || 50) < 40 ? 'BEARISH (CRISIS)' : 'BULLISH (MELT-UP)'}</span></div>
+                </div>
+                <button class="cyber-btn" onclick="window.controller.runSimulation(this, ${report.sentiment_score})" style="width: 100%; padding: 15px; font-size: 1rem;"><i class="fas fa-play"></i> EXECUTE SIMULATION</button>
+                <div id="sim-results" style="margin-top: 20px; display: none;">
+                    <div style="color: #00f3ff; font-family: 'JetBrains Mono'; margin-bottom: 10px;">SIMULATION COMPLETE</div>
+                    <div class="risk-grid">
+                         <div class="risk-cell risk-med">
+                            <div>FWD PROJECTION (30D)</div>
+                            <div id="sim-fwd-return" style="font-size: 1rem; font-weight: bold; color: #fff;">...</div>
+                        </div>
+                        <div class="risk-cell risk-med">
+                            <div>MAX DRAWDOWN</div>
+                            <div id="sim-max-dd" style="font-size: 1rem; font-weight: bold; color: #ff3333;">...</div>
+                        </div>
+                    </div>
+                </div>
             </div>
         `;
 
@@ -465,6 +563,47 @@ class MarketMayhemController {
         document.getElementById('modalMeta').innerHTML = metaHTML;
 
         this.dom.modal.style.display = 'flex';
+    }
+
+    switchModalTab(tabName) {
+        const tabs = document.getElementsByClassName('modal-tab-content');
+        const btns = document.getElementsByClassName('modal-tab-btn');
+
+        Array.from(tabs).forEach(t => t.style.display = 'none');
+        Array.from(btns).forEach(b => b.classList.remove('active'));
+
+        const el = document.getElementById(`modal-tab-${tabName}`);
+        if(el) el.style.display = 'block';
+
+        // Find the button and set active
+        Array.from(btns).forEach(b => {
+             if(b.innerText.toLowerCase() === tabName) b.classList.add('active');
+        });
+    }
+
+    runSimulation(btn, sentiment) {
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> CALCULATING ALPHA...';
+        btn.disabled = true;
+
+        setTimeout(() => {
+            btn.style.display = 'none';
+            const results = document.getElementById('sim-results');
+            results.style.display = 'block';
+
+            // Generate mock metrics based on sentiment
+            const baseReturn = (sentiment - 50) / 10; // -5% to +5%
+            const volatility = Math.random() * 10 + 5;
+
+            const fwdReturn = (baseReturn + (Math.random() * 4 - 2)).toFixed(2);
+            const maxDd = (volatility * (Math.random() * 0.5 + 0.5)).toFixed(2);
+
+            const fwdEl = document.getElementById('sim-fwd-return');
+            fwdEl.innerText = `${fwdReturn > 0 ? '+' : ''}${fwdReturn}%`;
+            fwdEl.style.color = fwdReturn >= 0 ? '#0aff60' : '#ff3333';
+
+            document.getElementById('sim-max-dd').innerText = `-${maxDd}%`;
+
+        }, 1500);
     }
 
     renderAlphaChart(report) {
@@ -580,8 +719,8 @@ class MarketMayhemController {
             const typeValue = typeSelect ? typeSelect.value : 'all';
             const sortValue = sortSelect ? sortSelect.value : 'newest';
 
-            const grid = document.getElementById('archiveGrid');
-            const items = Array.from(grid.getElementsByClassName('archive-item'));
+            const gridContainer = document.getElementById('archive-items-container') || document.getElementById('archiveGrid');
+            const items = Array.from(gridContainer.getElementsByClassName('archive-item'));
 
             // Sort
             items.sort((a, b) => {
@@ -594,7 +733,7 @@ class MarketMayhemController {
             });
 
             // Re-append to update DOM order
-            items.forEach(item => grid.appendChild(item));
+            items.forEach(item => gridContainer.appendChild(item));
 
             // Filter
             items.forEach(item => {

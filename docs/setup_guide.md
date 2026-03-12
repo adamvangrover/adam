@@ -82,7 +82,7 @@ source .venv/bin/activate
 ### 5. Verify Installation
 Run the help command to ensure the CLI is working.
 ```bash
-python scripts/run_adam.py --help
+uv run python scripts/run_adam.py --help
 ```
 
 ---

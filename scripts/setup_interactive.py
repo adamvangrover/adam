@@ -4,10 +4,10 @@ Interactive Setup Script for Adam v2.0
 Helps users configure the environment, API keys, and Docker settings.
 """
 
+import getpass
 import os
 import sys
-import getpass
-import shutil
+
 
 def print_header():
     print("=" * 60)

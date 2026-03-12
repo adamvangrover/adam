@@ -1,8 +1,7 @@
-from typing import List, Dict, Any, Optional
 import json
-import sqlite3
-import datetime
 import os
+import sqlite3
+from typing import Any, Dict, List
 
 
 class MemoryEngine:
@@ -21,7 +20,7 @@ class MemoryEngine:
         self.db_path = db_path
         self.conn = None
 
-        # Keep connection open if memory, otherwise open/close on demand or keep open (sqlite handles concurrency poorly if multi-threaded, but here we are single threaded mostly)
+        # Keep connection open if memory, otherwise open/close on demand or keep open (sqlite concurrency issues)
         if self.db_path == ":memory:":
             self.conn = sqlite3.connect(self.db_path, check_same_thread=False)
 

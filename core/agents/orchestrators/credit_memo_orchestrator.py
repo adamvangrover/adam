@@ -1,16 +1,17 @@
 from __future__ import annotations
-import logging
-import datetime
-import uuid
-import random
-from typing import Dict, Any, List, Optional
 
-from core.engine.icat import ICATEngine
-from core.agents.risk_assessment_agent import RiskAssessmentAgent
+import datetime
+import logging
+import random
+import uuid
+from typing import Any, Dict, List, Optional
+
+import core.engine.valuation_utils as valuation_utils
 from core.agents.legal_agent import LegalAgent
 from core.agents.regulatory_compliance_agent import RegulatoryComplianceAgent
-from core.financial_data.icat_schema import LBOParameters, DebtTranche, ICATOutput
-import core.engine.valuation_utils as valuation_utils
+from core.agents.risk_assessment_agent import RiskAssessmentAgent
+from core.engine.icat import ICATEngine
+from core.financial_data.icat_schema import DebtTranche, ICATOutput, LBOParameters
 
 logger = logging.getLogger("CreditMemoOrchestrator")
 
@@ -362,7 +363,7 @@ class CreditMemoOrchestrator:
         # Select 1-2 chunks
         selected = candidates[:2]
 
-        for i, text in enumerate(selected):
+        for _i, text in enumerate(selected):
             citations.append(
                 {
                     "doc_id": "10-K_FY2025.pdf",
@@ -515,6 +516,50 @@ class CreditMemoOrchestrator:
                 },
             },
             "equity_data": data["market_data"],
+            "financials": {
+                "historicals": {
+                    "revenue_2023": hist[1]["revenue"] if len(hist) > 1 else 0,
+                    "revenue_2024": hist[0]["revenue"] if len(hist) > 0 else 0,
+                    "ebitda_margin": (hist[0].get("ebitda", 0) / hist[0].get("revenue", 1)) if hist else 0,
+                    "net_debt_to_ebitda": icat.credit_metrics.net_leverage,
+                    "fcf_conversion": 0.85
+                },
+                "consensus_estimates": {
+                    "revenue_2025": data["historical"]["revenue"][-1] * 1.05,
+                    "revenue_2026": data["historical"]["revenue"][-1] * 1.10,
+                    "eps_2025": 5.50,
+                    "eps_2026": 6.10
+                },
+                "monte_carlo_forecasts": {
+                    "iterations": 1000,
+                    "metrics": {
+                        "revenue_2025": {"p10": data["historical"]["revenue"][-1]*0.9, "p50": data["historical"]["revenue"][-1]*1.05, "p90": data["historical"]["revenue"][-1]*1.15},
+                        "fcf_2025": {"p10": 1000, "p50": 1200, "p90": 1500}
+                    }
+                }
+            },
+            "valuation": {
+                "baseCaseEV": icat.valuation_metrics.enterprise_value,
+                "dcfSensitivityMatrix": [
+                    {"wacc": data["forecast_assumptions"]["discount_rate"] - 0.01, "tgr": data["forecast_assumptions"]["terminal_growth_rate"], "implied_price": icat.valuation_metrics.dcf_value * 1.1},
+                    {"wacc": data["forecast_assumptions"]["discount_rate"], "tgr": data["forecast_assumptions"]["terminal_growth_rate"], "implied_price": icat.valuation_metrics.dcf_value},
+                    {"wacc": data["forecast_assumptions"]["discount_rate"] + 0.01, "tgr": data["forecast_assumptions"]["terminal_growth_rate"], "implied_price": icat.valuation_metrics.dcf_value * 0.9}
+                ]
+            },
+            "regulatoryAnalysis": {
+                "facilityRatings": [
+                    {
+                        "facility": "Mock Senior Debt",
+                        "internalRating": "BBB",
+                        "pd": risk["risk_quant_metrics"]["PD"],
+                        "lgd": risk["risk_quant_metrics"]["LGD"],
+                        "el": risk["risk_quant_metrics"]["PD"] * risk["risk_quant_metrics"]["LGD"],
+                        "rr": "RR2"
+                    }
+                ],
+                "basel_iii_rwa_impact": "Standard Mock Impact"
+            },
+            "peers": [f"{data['sector'][:3].upper()}-A", f"{data['sector'][:3].upper()}-B"]
         }
 
     def _extract_highlights(self, legal, fraud):

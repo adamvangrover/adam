@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ADAM | Bond Pricer</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
 
     <style>
@@ -129,18 +130,27 @@
                 </div>
             </div>
 
-            <div class="glass-panel p-3 rounded flex-grow overflow-auto">
-                 <table class="w-full text-xs font-mono">
-                     <thead class="sticky top-0 bg-[#020408]">
-                         <tr class="text-gray-500 border-b border-gray-700">
-                             <th class="text-left py-2">Period</th>
-                             <th class="text-right">Time (Yrs)</th>
-                             <th class="text-right">Cash Flow</th>
-                             <th class="text-right">PV of CF</th>
-                         </tr>
-                     </thead>
-                     <tbody id="cf-body"></tbody>
-                 </table>
+            <div class="grid grid-cols-2 gap-4 flex-grow">
+                <div class="glass-panel p-3 rounded overflow-auto" style="max-height: 250px;">
+                    <table class="w-full text-xs font-mono">
+                        <thead class="sticky top-0 bg-[#020408]">
+                            <tr class="text-gray-500 border-b border-gray-700">
+                                <th class="text-left py-2">Period</th>
+                                <th class="text-right">Time (Yrs)</th>
+                                <th class="text-right">Cash Flow</th>
+                                <th class="text-right">PV of CF</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cf-body"></tbody>
+                    </table>
+                </div>
+
+                <div class="glass-panel p-3 rounded flex flex-col justify-center relative min-h-[250px]">
+                    <h3 class="text-xs font-bold text-indigo-400 mb-2 absolute top-3 left-3">Price-Yield Profile</h3>
+                    <div class="flex-grow w-full h-full pt-6">
+                        <canvas id="yield-chart"></canvas>
+                    </div>
+                </div>
             </div>
         </main>
     </div>
@@ -149,6 +159,7 @@
         lucide.createIcons();
         let exportData = {};
         let cashFlows = [];
+        let yieldChartInstance = null;
 
         const inputs = document.querySelectorAll('input');
         inputs.forEach(i => i.addEventListener('change', calc));
@@ -201,16 +212,10 @@
             // Metrics
             const macDur = macDurationSum / price;
             const modDur = macDur / (1 + r);
-            const convexity = (convexitySum / (Math.pow(freq, 2))) / price; // Approx adjustment for freq?
-            // Standard Conv formula: (1/P) * sum( CFt / (1+y)^t * (t^2 + t) / (1+y)^2 )
-            // Wait, manual sum is sum( t*(t+1)*CF / (1+r)^(t+2) ). Correct for discrete periods?
-            // Let's stick to standard approx: 1/P * sum [ CFt / (1+y)^t * t*(t+1) ] / (1+y)^2 * (1/freq^2)
-            // The logic above: convexitySum accumulated term is CF / (1+r)^(i+2) * i*(i+1).
-            // Need to adjust for freq. t = i/freq.
-            // Let's use simpler discrete approx or just keep "Convexity" as "Bond Convexity".
-            // Actually, Convexity = [1 / (P * (1+y)^2)] * Sum [ CFt / (1+y)^t * (t^2 + t) ] where t is period number.
-            // My sum uses i (period number). So Result needs to be divided by freq^2.
-            const convFinal = convexitySum / (price * Math.pow(freq, 2)); // Rough check
+
+            // Refined Convexity Formula: [1 / (P * (1+y)^2)] * Sum [ CFt / (1+y)^t * (t^2 + t) ]
+            // where t is period number, and we adjust by freq^2
+            const convFinal = convexitySum / (price * Math.pow(1+r, 2) * Math.pow(freq, 2));
 
             const dv01 = (modDur * price * 0.0001);
 
@@ -227,6 +232,71 @@
             document.getElementById('res-curr-yld').innerText = ((F*C_rate)/price * 100).toFixed(2) + '%';
 
             exportData = { price, macDur, modDur, convexity: convFinal, dv01 };
+
+            drawYieldChart(F, C_rate, freq, periods, r * freq);
+        }
+
+        function drawYieldChart(F, C_rate, freq, periods, currentYtm) {
+            const yields = [];
+            const prices = [];
+            const coupon = (F * C_rate) / freq;
+
+            for (let y = 0.01; y <= 0.15; y += 0.005) {
+                let p = 0;
+                let rTest = y / freq;
+                for (let i = 1; i <= periods; i++) {
+                    let cf = coupon;
+                    if (i === periods) cf += F;
+                    p += cf / Math.pow(1 + rTest, i);
+                }
+                yields.push((y * 100).toFixed(1));
+                prices.push(p);
+            }
+
+            if (yieldChartInstance) yieldChartInstance.destroy();
+            const ctx = document.getElementById('yield-chart').getContext('2d');
+
+            yieldChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: yields,
+                    datasets: [{
+                        label: 'Bond Price',
+                        data: prices,
+                        borderColor: '#6366f1',
+                        borderWidth: 2,
+                        pointRadius: 0,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            grid: { color: '#1e293b' },
+                            title: { display: true, text: 'Price ($)' }
+                        },
+                        x: {
+                            grid: { display: false },
+                            title: { display: true, text: 'YTM (%)' }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `Price: $${context.parsed.y.toFixed(2)}`;
+                                },
+                                title: function(context) {
+                                    return `YTM: ${context[0].label}%`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
         }
 
         function exportCSV() {
@@ -253,5 +323,8 @@
             calc();
         };
     </script>
+
+    <!-- Adam Global Nav -->
+    <script src="../../showcase/js/nav.js" data-root="../.."></script>
 </body>
 </html>
