@@ -13366,10 +13366,15 @@ window.MOCK_DATA = {
   ],
   "agents": [
     {
+      "id": "A001",
       "name": "FundamentalAnalystAgent",
-      "path": "core/agents/fundamental_analyst_agent.py",
-      "docstring": "Agent for performing fundamental analysis of companies.\n\nThis agent analyzes financial statements, calculates key financial ratios,\nperforms valuation modeling (DCF and comparables), and assesses financial health.\nIt relies on DataRetrievalAgent for fetching company data via A2A communication.",
-      "methods": [
+      "file_path": "core/agents/fundamental_analyst_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "Agent for performing fundamental analysis of companies.\n\nThis agent analyzes financial statements, calculates key financial ratios,\nperforms valuation modeling (DCF and comparables), and assesses financial health.\nIt relies on DataRetrievalAgent for fetching company data via A2A communication.\n\nUpdated to support standard AgentInput/AgentOutput interface.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": [
         "extract_raw_metrics",
         "calculate_financial_ratios",
         "calculate_comps_valuation",
@@ -13377,299 +13382,651 @@ window.MOCK_DATA = {
         "export_to_csv",
         "calculate_growth_rate",
         "calculate_ebitda_margin",
+        "calculate_dcf_scenarios",
         "calculate_dcf_valuation",
         "calculate_enterprise_value",
         "estimate_default_likelihood",
         "calculate_distressed_metrics",
         "estimate_recovery_rate",
         "send_message"
-      ],
-      "bases": [
-        "AgentBase"
       ]
     },
     {
-      "name": "DiscussionChairAgent",
-      "path": "core/agents/discussion_chair_agent.py",
-      "docstring": "No description available.",
-      "methods": [
-        "make_final_decision"
-      ],
-      "bases": []
+      "id": "A002",
+      "name": "MarketSentimentAgent",
+      "file_path": "core/agents/market_sentiment_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "Agent responsible for gauging market sentiment from a variety of sources,\nsuch as news articles, social media, and prediction markets.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": [
+        "combine_sentiment"
+      ]
     },
     {
-      "name": "DiscussionChairAgent",
-      "path": "core/agents/discussion_chair_agent.py",
-      "docstring": "No description available.",
-      "methods": [
-        "make_final_decision",
-        "log_decision"
-      ],
-      "bases": []
-    },
-    {
-      "name": "DiscussionChairAgent",
-      "path": "core/agents/discussion_chair_agent.py",
-      "docstring": "No description available.",
-      "methods": [
-        "make_final_decision"
-      ],
-      "bases": []
-    },
-    {
-      "name": "GeopoliticalRiskAgent",
-      "path": "core/agents/geopolitical_risk_agent.py",
-      "docstring": "No description available.",
-      "methods": [
-        "assess_geopolitical_risks",
-        "calculate_political_risk_index",
-        "identify_key_risks"
-      ],
-      "bases": []
-    },
-    {
-      "name": "AgentBase",
-      "path": "core/agents/agent_base.py",
-      "docstring": "Abstract base class for all agents in the system.\nDefines the common interface and behavior expected of all agents.\nThis version incorporates MCP, A2A, Semantic Kernel, HNASP, and Memory persistence.",
-      "methods": [
-        "name",
-        "set_context",
-        "get_context",
-        "evaluate_logic_layer",
-        "update_persona",
-        "add_peer_agent",
-        "start_listening",
-        "handle_message",
+      "id": "A003",
+      "name": "QueryUnderstandingAgent",
+      "file_path": "core/agents/query_understanding_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "An agent responsible for understanding the user's query and\ndetermining which other agents are relevant to answer it.\nThis version incorporates LLM-based intent recognition and skill-based routing.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": [
+        "get_available_agent_skills",
         "get_skill_schema"
-      ],
-      "bases": [
-        "ABC",
-        "MemoryMixin"
       ]
     },
     {
-      "name": "ReportGeneratorAgent",
-      "path": "core/agents/report_generator_agent.py",
-      "docstring": "An agent responsible for generating final reports by synthesizing\nanalysis from other agents.",
-      "methods": [
+      "id": "A004",
+      "name": "QuantumMonteCarloAgent",
+      "file_path": "core/agents/quantum_monte_carlo_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "Orchestrates Quantum-Accelerated Monte Carlo simulations.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": [
         "get_skill_schema"
-      ],
-      "bases": [
-        "AgentBase"
       ]
     },
     {
-      "name": "CyclicalReasoningAgent",
-      "path": "core/agents/cyclical_reasoning_agent.py",
-      "docstring": "An agent capable of cyclical reasoning, routing its output back to itself\nor other agents for iterative improvement.",
-      "methods": [],
-      "bases": [
-        "AsyncAgentBase"
-      ]
+      "id": "A005",
+      "name": "MarketRiskAgent",
+      "file_path": "core/agents/market_risk_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "Agent responsible for assessing Market Risk (Systematic Risk).\nCalculates Volatility (Standard & EWMA), Beta, Value at Risk (VaR),\nExpected Shortfall (CVaR), and performs Stress Testing.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": []
     },
     {
-      "name": "AlternativeDataAgent",
-      "path": "core/agents/alternative_data_agent.py",
-      "docstring": "No description available.",
-      "methods": [
-        "gather_alternative_data",
-        "analyze_social_media_sentiment",
-        "analyze_web_traffic",
-        "analyze_satellite_imagery",
-        "analyze_foot_traffic",
-        "analyze_shipping_data"
-      ],
-      "bases": []
-    },
-    {
-      "name": "LegalAgent",
-      "path": "core/agents/legal_agent.py",
-      "docstring": "No description available.",
-      "methods": [
-        "analyze_legal_aspects",
-        "analyze_legal_standing",
-        "analyze_legal_document",
-        "assess_geopolitical_legal_impact",
-        "assess_regulatory_legal_impact",
-        "provide_legal_advice"
-      ],
-      "bases": []
-    },
-    {
-      "name": "FinancialModelingAgent",
-      "path": "core/agents/financial_modeling_agent.py",
-      "docstring": "Agent for performing comprehensive financial modeling, including DCF valuation, sensitivity analysis,\nstress testing, and detailed reporting. This agent determines the minimum complexity required to best model the company.",
-      "methods": [
-        "generate_cash_flows",
-        "calculate_discounted_cash_flows",
-        "calculate_terminal_value",
-        "calculate_npv",
-        "perform_sensitivity_analysis",
-        "perform_stress_testing",
-        "plot_sensitivity_analysis",
-        "plot_stress_test_results",
-        "fetch_and_calculate_dcf"
-      ],
-      "bases": []
-    },
-    {
-      "name": "SupplyChainRiskAgent",
-      "path": "core/agents/supply_chain_risk_agent.py",
-      "docstring": "No description available.",
-      "methods": [
-        "fetch_news",
-        "fetch_web_scraped_data",
-        "analyze_impact",
-        "generate_risk_map",
-        "send_alert",
-        "report_risks",
-        "display_risk_report"
-      ],
-      "bases": []
-    },
-    {
-      "name": "RAGAgent",
-      "path": "core/agents/rag_agent.py",
-      "docstring": "An agent that implements a Retrieval-Augmented Generation (RAG) pipeline.\nIt can ingest documents and answer queries based on the ingested content.",
-      "methods": [
-        "register_tool",
-        "get_skill_schema"
-      ],
-      "bases": [
-        "AgentBase"
-      ]
-    },
-    {
-      "name": "AIPoweredPortfolioOptimizationAgent",
-      "path": "core/agents/portfolio_optimization_agent.py",
-      "docstring": "Agent that uses AI (PyTorch) to optimize investment portfolios.",
-      "methods": [
-        "execute",
-        "preprocess_data",
-        "train_model",
-        "optimize_portfolio",
-        "simulate_optimization",
-        "generate_portfolio_report",
-        "generate_portfolio_visualization",
-        "run"
-      ],
-      "bases": [
-        "AgentBase"
-      ]
-    },
-    {
-      "name": "MetaCognitiveAgent",
-      "path": "core/agents/meta_cognitive_agent.py",
-      "docstring": "The Meta-Cognitive Agent monitors the performance of other agents.",
-      "methods": [
-        "record_performance"
-      ],
-      "bases": [
-        "AgentBase"
-      ]
-    },
-    {
-      "name": "MacroeconomicAnalysisAgent",
-      "path": "core/agents/macroeconomic_analysis_agent.py",
-      "docstring": "Agent responsible for analyzing macroeconomic indicators (GDP, Inflation, etc.)\nto provide a broad market context.\n\nRefactored for v23 Architecture (Path A).",
-      "methods": [
-        "analyze_macroeconomic_data",
-        "analyze_gdp_trend",
-        "analyze_inflation_outlook"
-      ],
-      "bases": [
-        "AgentBase"
-      ]
-    },
-    {
-      "name": "AdaptiveAgent",
-      "path": "core/agents/adaptive_agent.py",
-      "docstring": "An agent implementation that fully embodies the 'Protocol Paradox' resolutions:\n1. Adaptive Conviction (Switching between Direct/MCP)\n2. State Anchors (Async Drift protection)\n3. Tool RAG (Context Saturation mitigation)",
-      "methods": [],
-      "bases": [
-        "AgentBase",
-        "AdaptiveConvictionMixin",
-        "StateAnchorMixin",
-        "ToolRAGMixin"
-      ]
-    },
-    {
-      "name": "AlgoTradingAgent",
-      "path": "core/agents/algo_trading_agent.py",
-      "docstring": "No description available.",
-      "methods": [
-        "run_simulation",
-        "momentum_trading",
-        "mean_reversion_trading",
-        "arbitrage_trading",
-        "calculate_performance_metrics",
-        "calculate_max_drawdown",
-        "evaluate_strategies",
-        "plot_performance"
-      ],
-      "bases": []
-    },
-    {
-      "name": "BehavioralEconomicsAgent",
-      "path": "core/agents/behavioral_economics_agent.py",
-      "docstring": "Analyzes market data and user interactions for signs of cognitive biases and irrational behavior.",
-      "methods": [],
-      "bases": [
-        "AgentBase"
-      ]
-    },
-    {
-      "name": "RedTeamAgent",
-      "path": "core/agents/red_team_agent.py",
-      "docstring": "The Red Team Agent acts as an internal adversary to the system.\n\n### Functionality:\nIt generates novel and challenging scenarios (stress tests) to validate risk models before\nstrategies are deployed. This is a critical component of the \"Sovereign Financial Intelligence\"\narchitecture (v23.5), ensuring that the system is robust against \"Black Swan\" events.\n\n### Architecture:\nIn v23.5, this agent implements an internal **Adversarial Self-Correction Loop** using LangGraph.\nInstead of a single-shot generation, it iteratively refines its attack scenarios until they\nmeet a severity threshold.\n\n### Workflow:\n1.  **Generate Attack**: Uses `CounterfactualReasoningSkill` to invert assumptions in a credit memo.\n2.  **Simulate Impact**: Estimates the financial damage (e.g., VaR spike) of the scenario.\n3.  **Critique**: Checks if the scenario is severe enough (Severity > Threshold).\n4.  **Escalate**: If too mild, it loops back to Generate Attack with instructions to \"Escalate\".",
-      "methods": [
-        "name",
-        "name"
-      ],
-      "bases": [
-        "AgentBase"
-      ]
-    },
-    {
-      "name": "NaturalLanguageGenerationAgent",
-      "path": "core/agents/natural_language_generation_agent.py",
-      "docstring": "No description available.",
-      "methods": [
-        "generate_text",
-        "summarize_data",
-        "generate_report",
-        "run"
-      ],
-      "bases": []
-    },
-    {
-      "name": "Meta19Agent",
-      "path": "core/agents/meta_19_agent.py",
-      "docstring": "Monitors the reasoning and outputs of other agents to ensure logical consistency,\ncoherence, and alignment with core principles. Deprecated as part of Adam v19 to v22.",
-      "methods": [],
-      "bases": [
-        "AgentBase"
-      ]
-    },
-    {
+      "id": "A006",
       "name": "ArchiveManagerAgent",
-      "path": "core/agents/archive_manager_agent.py",
-      "docstring": "No description available.",
-      "methods": [
+      "file_path": "core/agents/archive_manager_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "No description available.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": [
         "store_data",
         "retrieve_data",
         "create_backup",
         "restore_backup",
         "check_access",
         "run"
-      ],
-      "bases": []
+      ]
     },
     {
+      "id": "A007",
+      "name": "CodeAlchemist",
+      "file_path": "core/agents/code_alchemist.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "The CodeAlchemist is a sophisticated agent designed to handle code generation,\nvalidation, optimization, and deployment. It leverages LLMs, code analysis tools,\nand potentially even sandboxed environments to produce high-quality, reliable code.\n\nUpdated for Adam v23.5 to use AOPL-v1.0 prompts and core settings.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": [
+        "load_knowledge_base",
+        "get_relevant_knowledge",
+        "construct_generation_prompt"
+      ]
+    },
+    {
+      "id": "A008",
+      "name": "EventDrivenRiskAgent",
+      "file_path": "core/agents/event_driven_risk_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "Agent that tracks and assesses the market impact of events.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": [
+        "fetch_events",
+        "analyze_event_impact",
+        "generate_risk_alerts",
+        "simulate_impact_analysis",
+        "generate_event_visualization",
+        "run"
+      ]
+    },
+    {
+      "id": "A009",
+      "name": "GeopoliticalRiskAgent",
+      "file_path": "core/agents/geopolitical_risk_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "Agent responsible for assessing Geopolitical Risk.\nEvaluates political stability, trade relations, conflict risks, and contagion.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": [
+        "calculate_risk_score",
+        "identify_key_risks",
+        "calculate_contagion",
+        "assess_geopolitical_risks"
+      ]
+    },
+    {
+      "id": "A010",
+      "name": "CompetitorAnalysisAgent",
+      "file_path": "core/agents/competitor_analysis_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "Agent responsible for identifying competitors and comparing key metrics.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": []
+    },
+    {
+      "id": "A011",
+      "name": "RAGAgent",
+      "file_path": "core/agents/rag_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "An agent that implements a Retrieval-Augmented Generation (RAG) pipeline.\nIt can ingest documents and answer queries based on the ingested content.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": [
+        "register_tool",
+        "get_skill_schema"
+      ]
+    },
+    {
+      "id": "A012",
+      "name": "ReportGeneratorAgent",
+      "file_path": "core/agents/report_generator_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "An agent responsible for generating final reports by synthesizing\nanalysis from other agents.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": [
+        "get_skill_schema"
+      ]
+    },
+    {
+      "id": "A013",
+      "name": "AlgoTradingAgent",
+      "file_path": "core/agents/algo_trading_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "Agent responsible for executing algorithmic trading strategies.\nSimulates trading strategies based on historical market data.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": [
+        "run_simulation",
+        "momentum_trading",
+        "mean_reversion_trading",
+        "arbitrage_trading",
+        "calculate_performance_metrics",
+        "calculate_max_drawdown",
+        "evaluate_strategies"
+      ]
+    },
+    {
+      "id": "A014",
+      "name": "ReflectorAgent",
+      "file_path": "core/agents/reflector_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "The Reflector Agent performs meta-cognition.\nIt analyzes the output of other agents or the system's own reasoning traces\nto identify logical fallacies, hallucination risks, or missing context.\n\nv23 Update: Wraps `ReflectorGraph` for iterative self-correction.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": []
+    },
+    {
+      "id": "A015",
+      "name": "IndustryRiskAgent",
+      "file_path": "core/agents/industry_risk_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "Agent responsible for assessing Industry Risk.\nEvaluates competition using Quantitative Porter's 5 Forces and Cyclicality.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": []
+    },
+    {
+      "id": "A016",
+      "name": "RegulatoryComplianceAgent",
+      "file_path": "core/agents/regulatory_compliance_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "Ensures adherence to all applicable financial regulations and compliance standards.\n\nCore Capabilities:\n- Monitors regulatory changes and trends across relevant jurisdictions.\n- Analyzes financial transactions and activities for compliance.\n- Identifies potential regulatory risks and provides mitigation strategies.\n- Generates compliance reports and audit trails.\n- Collaborates with other agents to incorporate compliance considerations.\n- Provides guidance on interacting with regulatory bodies.\n- Adapts to changing political landscapes and regulatory priorities.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": [
+        "provide_guidance",
+        "process_feedback"
+      ]
+    },
+    {
+      "id": "A017",
+      "name": "CryptoAgent",
+      "file_path": "core/agents/crypto_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "No description available.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": [
+        "get_uniswap_v3_router_abi",
+        "analyze_crypto_market",
+        "predict_price",
+        "assess_risk",
+        "calculate_volatility",
+        "get_historical_data",
+        "analyze_on_chain_metrics",
+        "get_on_chain_data",
+        "get_social_media_sentiment",
+        "trade_decision",
+        "moving_average_crossover",
+        "execute_trade",
+        "create_smart_contract",
+        "deploy_smart_contract"
+      ]
+    },
+    {
+      "id": "A018",
+      "name": "MetaCognitiveAgent",
+      "file_path": "core/agents/meta_cognitive_agent.py",
+      "type": "Meta-Agent",
+      "status": "IDLE",
+      "load": 0,
+      "description": "The Meta-Cognitive Agent monitors the performance of other agents.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": [
+        "record_performance"
+      ]
+    },
+    {
+      "id": "A019",
+      "name": "KnowledgeContributionAgent",
+      "file_path": "core/agents/knowledge_contribution_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "An agent that extracts key findings from a report and formats them as structured data.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": []
+    },
+    {
+      "id": "A020",
+      "name": "ProfileAgent",
+      "file_path": "core/agents/profile_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "ProfileAgent serves as the high-level interface for user-driven commands\nwithin the Adam ecosystem. It routes 'adam.*' commands to the appropriate\nsubsystems, including Industry Specialists, Developer Swarm, and the\nAutonomous Improvement Loop.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": []
+    },
+    {
+      "id": "A021",
+      "name": "DataVerificationAgent",
+      "file_path": "core/agents/data_verification_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "No description available.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": [
+        "verify_data"
+      ]
+    },
+    {
+      "id": "A022",
+      "name": "PortfolioOptimizationAgent",
+      "file_path": "core/agents/portfolio_optimization_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "Agent for portfolio optimization using both Classical (Mean-Variance) and AI (LSTM) approaches.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": [
+        "optimize_mean_variance",
+        "optimize_ai"
+      ]
+    },
+    {
+      "id": "A023",
+      "name": "AIPoweredPortfolioOptimizationAgent",
+      "file_path": "core/agents/portfolio_optimization_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "Legacy wrapper for PortfolioOptimizationAgent to maintain backward compatibility.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": []
+    },
+    {
+      "id": "A024",
+      "name": "StrategicForesightAgent",
+      "file_path": "core/agents/strategic_foresight_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "Strategic Foresight Agent\n\nA unified intelligence unit acting as the system's \"Pre-Crime\" and National Security division.\nIt integrates high-fidelity financial modeling (OSWM, Quantum, Black Swan) with \ngeopolitical strategic analysis.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": []
+    },
+    {
+      "id": "A025",
+      "name": "AdaptiveAlgoTradingAgent",
+      "file_path": "core/agents/adaptive_algo_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "An extension of AlgoTradingAgent that uses Reinforcement Learning (Q-Learning)\nto dynamically select the best trading strategy based on market conditions.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": [
+        "get_market_state",
+        "run_adaptive_simulation",
+        "get_optimal_strategy"
+      ]
+    },
+    {
+      "id": "A026",
+      "name": "VolatilityRiskAgent",
+      "file_path": "core/agents/volatility_risk_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "Agent responsible for assessing Volatility Risk.\nAnalyzes VIX, GARCH(1,1) forecasts, and Volatility Risk Premium (VRP).",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": []
+    },
+    {
+      "id": "A027",
+      "name": "CurrencyRiskAgent",
+      "file_path": "core/agents/currency_risk_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "Agent responsible for assessing Currency Risk (FX).\nEvaluates Portfolio VaR, Interest Rate Parity deviations, and Unhedged Exposure.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": []
+    },
+    {
+      "id": "A028",
+      "name": "Meta19Agent",
+      "file_path": "core/agents/meta_19_agent.py",
+      "type": "Meta-Agent",
+      "status": "IDLE",
+      "load": 0,
+      "description": "Monitors the reasoning and outputs of other agents to ensure logical consistency,\ncoherence, and alignment with core principles. Deprecated as part of Adam v19 to v22.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": []
+    },
+    {
+      "id": "A029",
+      "name": "LexicaAgent",
+      "file_path": "core/agents/lexica_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "No description available.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": [
+        "retrieve_information",
+        "search_web",
+        "get_news_articles",
+        "get_financial_data"
+      ]
+    },
+    {
+      "id": "A030",
+      "name": "QuantumPortfolioManagerAgent",
+      "file_path": "core/agents/quantum_portfolio_manager_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "Agent responsible for Quantum-Accelerated Portfolio Optimization.\nIt fetches historical data, calculates risk metrics, and uses a quantum bridge (QAOA)\nto determine optimal asset allocation.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": [
+        "get_skill_schema"
+      ]
+    },
+    {
+      "id": "A031",
+      "name": "HNASPAgent",
+      "file_path": "core/agents/hnasp_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "An agent that implements the Hybrid Neurosymbolic Agent State Protocol (HNASP).",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": [
+        "get_skill_schema"
+      ]
+    },
+    {
+      "id": "A032",
+      "name": "SupplyChainRiskAgent",
+      "file_path": "core/agents/supply_chain_risk_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "Agent responsible for assessing risks in global supply chains.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": [
+        "fetch_news",
+        "fetch_web_scraped_data",
+        "analyze_impact",
+        "generate_risk_map",
+        "send_alert",
+        "report_risks"
+      ]
+    },
+    {
+      "id": "A033",
+      "name": "RiskAssessmentAgent",
+      "file_path": "core/agents/risk_assessment_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "Agent responsible for assessing various types of investment risks,\nsuch as market risk, credit risk, and operational risk.\n\nPhilosophy:\nRisk is not a number; it's a distribution. We strive to quantify the tails.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": [
+        "assess_investment_risk",
+        "assess_loan_risk",
+        "assess_leveraged_finance_risk",
+        "assess_distressed_debt_risk",
+        "calculate_lgd",
+        "calculate_rwa",
+        "calculate_expected_return",
+        "assess_project_risk"
+      ]
+    },
+    {
+      "id": "A034",
+      "name": "RedTeamAgent",
+      "file_path": "core/agents/red_team_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "The Red Team Agent acts as an internal adversary to the system.\n\n### Functionality:\nIt generates novel and challenging scenarios (stress tests) to validate risk models before\nstrategies are deployed. This is a critical component of the \"Sovereign Financial Intelligence\"\narchitecture (v23.5), ensuring that the system is robust against \"Black Swan\" events.\n\n### Architecture:\nIn v23.5, this agent implements an internal **Adversarial Self-Correction Loop** using LangGraph.\nInstead of a single-shot generation, it iteratively refines its attack scenarios until they\nmeet a severity threshold.\n\n### Workflow:\n1.  **Generate Attack**: Uses `CounterfactualReasoningSkill` to invert assumptions in a credit memo.\n2.  **Simulate Impact**: Estimates the financial damage (e.g., VaR spike) of the scenario.\n3.  **Critique**: Checks if the scenario is severe enough (Severity > Threshold).\n4.  **Escalate**: If too mild, it loops back to Generate Attack with instructions to \"Escalate\".",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": [
+        "name",
+        "name"
+      ]
+    },
+    {
+      "id": "A035",
+      "name": "CreditRiskAgent",
+      "file_path": "core/agents/credit_risk_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "Agent responsible for assessing Credit Risk (Default Risk).\nCalculates Altman Z-Score (Manufacturing & Non-Manufacturing),\nMerton Distance to Default, and implied Credit Ratings.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": []
+    },
+    {
+      "id": "A036",
+      "name": "IndustrySpecialistAgent",
+      "file_path": "core/agents/industry_specialist_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "No description available.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": [
+        "load_specialist",
+        "analyze_industry",
+        "analyze_company"
+      ]
+    },
+    {
+      "id": "A037",
+      "name": "BehavioralEconomicsAgent",
+      "file_path": "core/agents/behavioral_economics_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "Analyzes market data and user interactions for signs of cognitive biases and irrational behavior.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": []
+    },
+    {
+      "id": "A038",
+      "name": "MarketMakingAgent",
+      "file_path": "core/agents/market_making_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "Agentic wrapper around the Avellaneda-Stoikov model.\nImplements a 'System Brain' component that dynamically adapts risk aversion (Gamma)\nbased on market conditions (Volatility, Inventory Risk), simulating an RL policy.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": [
+        "adapt_strategy",
+        "get_quotes"
+      ]
+    },
+    {
+      "id": "A039",
+      "name": "AlternativeDataAgent",
+      "file_path": "core/agents/alternative_data_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "No description available.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": [
+        "gather_alternative_data",
+        "analyze_social_media_sentiment",
+        "analyze_web_traffic",
+        "analyze_satellite_imagery",
+        "analyze_foot_traffic",
+        "analyze_shipping_data"
+      ]
+    },
+    {
+      "id": "A040",
+      "name": "FraudDetectionAgent",
+      "file_path": "core/agents/fraud_detection_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "A specialized agent for detecting financial anomalies and simulating restatements.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": [
+        "detect_anomalies",
+        "restate_financials"
+      ]
+    },
+    {
+      "id": "A041",
+      "name": "DiscussionChairAgent",
+      "file_path": "core/agents/discussion_chair_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "No description available.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": [
+        "make_final_decision"
+      ]
+    },
+    {
+      "id": "A042",
+      "name": "DiscussionChairAgent",
+      "file_path": "core/agents/discussion_chair_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "No description available.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": [
+        "make_final_decision",
+        "log_decision"
+      ]
+    },
+    {
+      "id": "A043",
+      "name": "DiscussionChairAgent",
+      "file_path": "core/agents/discussion_chair_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "No description available.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": [
+        "make_final_decision"
+      ]
+    },
+    {
+      "id": "A044",
+      "name": "NewsBot",
+      "file_path": "core/agents/news_bot.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "An advanced News Aggregation Agent that fetches data from APIs, RSS, and Crypto sources,\nperforms AI-based sentiment analysis, summarizes content, and filters for user portfolios.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": [
+        "filter_news_by_portfolio",
+        "analyze_sentiment",
+        "personalize_feed",
+        "send_alerts",
+        "generate_report"
+      ]
+    },
+    {
+      "id": "A045",
+      "name": "FinancialModelingAgent",
+      "file_path": "core/agents/financial_modeling_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "Agent for performing comprehensive financial modeling, including DCF valuation, sensitivity analysis,\nstress testing, Monte Carlo simulations, and ratio analysis.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": [
+        "apply_sentiment_adjustment",
+        "generate_cash_flows",
+        "calculate_discounted_cash_flows",
+        "calculate_terminal_value",
+        "calculate_npv",
+        "perform_sensitivity_analysis",
+        "fetch_and_calculate_dcf",
+        "calculate_dcf_from_projections",
+        "run_monte_carlo_simulation",
+        "calculate_financial_ratios",
+        "calculate_lbo"
+      ]
+    },
+    {
+      "id": "A046",
       "name": "CatalystAgent",
-      "path": "core/agents/catalyst_agent.py",
-      "docstring": "No description available.",
-      "methods": [
+      "file_path": "core/agents/catalyst_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "No description available.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": [
         "setup_logger",
         "load_config",
         "fetch_data",
@@ -13687,39 +14044,276 @@ window.MOCK_DATA = {
         "structure_deal",
         "generate_report",
         "run"
-      ],
-      "bases": []
-    },
-    {
-      "name": "LexicaAgent",
-      "path": "core/agents/lexica_agent.py",
-      "docstring": "No description available.",
-      "methods": [
-        "retrieve_information",
-        "search_web",
-        "get_news_articles",
-        "get_financial_data"
-      ],
-      "bases": []
-    },
-    {
-      "name": "RiskAssessmentAgent",
-      "path": "core/agents/risk_assessment_agent.py",
-      "docstring": "Agent responsible for assessing various types of investment risks,\nsuch as market risk, credit risk, and operational risk.\n\nPhilosophy:\nRisk is not a number; it's a distribution. We strive to quantify the tails.",
-      "methods": [
-        "assess_investment_risk",
-        "assess_loan_risk",
-        "assess_project_risk"
-      ],
-      "bases": [
-        "AgentBase"
       ]
     },
     {
+      "id": "A047",
+      "name": "DataVisualizationAgent",
+      "file_path": "core/agents/data_visualization_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "No description available.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": [
+        "create_chart",
+        "create_graph",
+        "create_map",
+        "run"
+      ]
+    },
+    {
+      "id": "A048",
+      "name": "OperationalRiskAgent",
+      "file_path": "core/agents/operational_risk_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "Agent responsible for assessing Operational Risk.\nEvaluates risks using Scorecard (Heuristic) and Loss Distribution Approach (LDA - Monte Carlo).",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": []
+    },
+    {
+      "id": "A049",
+      "name": "MachineLearningModelTrainingAgent",
+      "file_path": "core/agents/machine_learning_model_training_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "No description available.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": [
+        "load_data",
+        "preprocess_data",
+        "train_model",
+        "evaluate_model",
+        "save_model",
+        "run"
+      ]
+    },
+    {
+      "id": "A050",
+      "name": "ResultAggregationAgent",
+      "file_path": "core/agents/result_aggregation_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "Combines results from multiple agents.  Initially uses simple concatenation,\nbut is designed for future LLM integration.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": []
+    },
+    {
+      "id": "A051",
+      "name": "EconomicRiskAgent",
+      "file_path": "core/agents/economic_risk_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "Agent responsible for assessing Economic Risk (Macro).\nEvaluates recession risk, stagflation, Phillips Curve deviations, and Misery Index.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": []
+    },
+    {
+      "id": "A052",
+      "name": "EchoAgent",
+      "file_path": "core/agents/echo_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "No description available.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": [
+        "detect_environment",
+        "optimize_prompt",
+        "run_ui",
+        "run_expert_network",
+        "enhance_output",
+        "get_knowledge_graph_context",
+        "process_task",
+        "run"
+      ]
+    },
+    {
+      "id": "A053",
+      "name": "AdaptiveAgent",
+      "file_path": "core/agents/adaptive_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "An agent implementation that fully embodies the 'Protocol Paradox' resolutions:\n1. Adaptive Conviction (Switching between Direct/MCP)\n2. State Anchors (Async Drift protection)\n3. Tool RAG (Context Saturation mitigation)",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": []
+    },
+    {
+      "id": "A054",
+      "name": "StrategyBacktestAgent",
+      "file_path": "core/agents/strategy_backtest_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "Agent responsible for backtesting trading strategies against historical data.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": [
+        "get_skill_schema"
+      ]
+    },
+    {
+      "id": "A055",
+      "name": "SNCAnalystAgent",
+      "file_path": "core/agents/snc_analyst_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "Agent for performing Shared National Credit (SNC) analysis.\nThis agent analyzes company data based on regulatory guidelines to assign an SNC rating.\nIt can operate as part of a swarm (retrieving data from peers) or in standalone mode\n(accepting manual data or running as a portable prompt).",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": [
+        "generate_portable_prompt"
+      ]
+    },
+    {
+      "id": "A056",
+      "name": "TechnicalAnalystAgent",
+      "file_path": "core/agents/technical_analyst_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "Agent responsible for technical analysis of financial assets.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": [
+        "analyze_price_data",
+        "calculate_rsi",
+        "prepare_training_data",
+        "load_model",
+        "save_model"
+      ]
+    },
+    {
+      "id": "A057",
+      "name": "LegalAgent",
+      "file_path": "core/agents/legal_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "No description available.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": [
+        "review_credit_agreement",
+        "check_covenants",
+        "detect_fraud_signals",
+        "suggest_restructuring_strategy",
+        "analyze_legal_aspects",
+        "analyze_legal_standing",
+        "analyze_legal_document",
+        "assess_geopolitical_legal_impact",
+        "assess_regulatory_legal_impact",
+        "provide_legal_advice"
+      ]
+    },
+    {
+      "id": "A058",
+      "name": "PeerSetAgent",
+      "file_path": "core/agents/peer_set_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "Agent responsible for building peer sets based on industry classification codes\n(GICS, NAICS, NACE) and product/market overlaps using real-time data and semantic analysis.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": [
+        "find_peers_mock",
+        "fetch_real_data"
+      ]
+    },
+    {
+      "id": "A059",
+      "name": "PromptGenerationAgent",
+      "file_path": "core/agents/prompt_generation_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "An agent that generates a high-quality prompt from a user query.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": []
+    },
+    {
+      "id": "A060",
+      "name": "SystemHealthAgent",
+      "file_path": "core/agents/system_health_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "Agent responsible for monitoring system health metrics using psutil.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": []
+    },
+    {
+      "id": "A061",
+      "name": "QuantitativeRiskAgent",
+      "file_path": "core/agents/quantitative_risk_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "Agent responsible for calculating quantitative risk metrics such as Value at Risk (VaR)\nand Conditional Value at Risk (CVaR).",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": [
+        "calculate_var",
+        "calculate_cvar"
+      ]
+    },
+    {
+      "id": "A062",
+      "name": "BlackSwanAgent",
+      "file_path": "core/agents/black_swan_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "Counterfactual 'Black Swan' Engine.\nAutonomously generates stress scenarios and calculates 'Probability of Default' sensitivity.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": [
+        "get_skill_schema"
+      ]
+    },
+    {
+      "id": "A063",
+      "name": "MacroeconomicAnalysisAgent",
+      "file_path": "core/agents/macroeconomic_analysis_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "Agent responsible for analyzing macroeconomic indicators (GDP, Inflation, etc.)\nto provide a broad market context.\n\nRefactored for v23 Architecture (Path A).",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": [
+        "analyze_macroeconomic_data",
+        "analyze_gdp_trend",
+        "analyze_inflation_outlook",
+        "generate_reflation_report"
+      ]
+    },
+    {
+      "id": "A064",
+      "name": "NaturalLanguageGenerationAgent",
+      "file_path": "core/agents/natural_language_generation_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "No description available.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": [
+        "generate_text",
+        "summarize_data",
+        "generate_report",
+        "run"
+      ]
+    },
+    {
+      "id": "A065",
       "name": "AgentForge",
-      "path": "core/agents/agent_forge.py",
-      "docstring": "The AgentForge is responsible for the dynamic creation of new agents.\nIt uses templates and configuration to generate agent code and add them\nto the system at runtime. This version incorporates advanced features\nlike skill schema generation and A2A wiring.",
-      "methods": [
+      "file_path": "core/agents/agent_forge.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "The AgentForge is responsible for the dynamic creation of new agents.\nIt uses templates and configuration to generate agent code and add them\nto the system at runtime. This version incorporates advanced features\nlike skill schema generation and A2A wiring.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": [
         "load_agent_classes",
         "list_templates",
         "get_template",
@@ -13729,253 +14323,48 @@ window.MOCK_DATA = {
         "save_agent_code",
         "update_agent_config",
         "update_workflows_config"
-      ],
-      "bases": [
-        "AgentBase"
       ]
     },
     {
-      "name": "ReflectorAgent",
-      "path": "core/agents/reflector_agent.py",
-      "docstring": "The Reflector Agent performs meta-cognition.\nIt analyzes the output of other agents or the system's own reasoning traces\nto identify logical fallacies, hallucination risks, or missing context.\n\nv23 Update: Wraps `ReflectorGraph` for iterative self-correction.",
-      "methods": [],
-      "bases": [
-        "AgentBase"
-      ]
-    },
-    {
-      "name": "SNCAnalystAgent",
-      "path": "core/agents/snc_analyst_agent.py",
-      "docstring": "Agent for performing Shared National Credit (SNC) analysis.\nThis agent analyzes company data based on regulatory guidelines to assign an SNC rating.\nIt retrieves data via A2A communication with DataRetrievalAgent and can use SK skills.",
-      "methods": [],
-      "bases": [
-        "AgentBase"
-      ]
-    },
-    {
-      "name": "EventDrivenRiskAgent",
-      "path": "core/agents/event_driven_risk_agent.py",
-      "docstring": "Agent that tracks and assesses the market impact of events.",
-      "methods": [
-        "fetch_events",
-        "analyze_event_impact",
-        "generate_risk_alerts",
-        "simulate_impact_analysis",
-        "generate_event_visualization",
-        "run"
-      ],
-      "bases": [
-        "AgentBase"
-      ]
-    },
-    {
-      "name": "ResultAggregationAgent",
-      "path": "core/agents/result_aggregation_agent.py",
-      "docstring": "Combines results from multiple agents.  Initially uses simple concatenation,\nbut is designed for future LLM integration.",
-      "methods": [],
-      "bases": [
-        "AgentBase"
-      ]
-    },
-    {
+      "id": "A066",
       "name": "DataRetrievalAgent",
-      "path": "core/agents/data_retrieval_agent.py",
-      "docstring": "Agent responsible for retrieving data from various configured sources.\nNow integrates with DataFetcher for live market data.",
-      "methods": [
+      "file_path": "core/agents/data_retrieval_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "Agent responsible for retrieving data from various configured sources.\nNow integrates with DataFetcher for live market data.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": [
         "get_risk_rating",
         "get_market_data",
         "access_knowledge_base",
         "access_knowledge_graph"
-      ],
-      "bases": [
-        "AgentBase"
       ]
     },
     {
-      "name": "EchoAgent",
-      "path": "core/agents/echo_agent.py",
-      "docstring": "No description available.",
-      "methods": [
-        "detect_environment",
-        "optimize_prompt",
-        "run_ui",
-        "run_expert_network",
-        "enhance_output",
-        "get_knowledge_graph_context",
-        "process_task",
-        "run"
-      ],
-      "bases": []
-    },
-    {
-      "name": "MarketSentimentAgent",
-      "path": "core/agents/market_sentiment_agent.py",
-      "docstring": "Agent responsible for gauging market sentiment from a variety of sources,\nsuch as news articles, social media, and prediction markets.",
-      "methods": [
-        "combine_sentiment"
-      ],
-      "bases": [
-        "AgentBase"
-      ]
-    },
-    {
-      "name": "QueryUnderstandingAgent",
-      "path": "core/agents/query_understanding_agent.py",
-      "docstring": "An agent responsible for understanding the user's query and\ndetermining which other agents are relevant to answer it.\nThis version incorporates LLM-based intent recognition and skill-based routing.",
-      "methods": [
-        "get_available_agent_skills",
-        "get_skill_schema"
-      ],
-      "bases": [
-        "AgentBase"
-      ]
-    },
-    {
-      "name": "DataVerificationAgent",
-      "path": "core/agents/data_verification_agent.py",
-      "docstring": "No description available.",
-      "methods": [
-        "verify_data"
-      ],
-      "bases": []
-    },
-    {
-      "name": "KnowledgeContributionAgent",
-      "path": "core/agents/knowledge_contribution_agent.py",
-      "docstring": "An agent that extracts key findings from a report and formats them as structured data.",
-      "methods": [],
-      "bases": [
-        "AgentBase"
-      ]
-    },
-    {
-      "name": "ProfileAgent",
-      "path": "core/agents/profile_agent.py",
-      "docstring": "ProfileAgent serves as the high-level interface for user-driven commands\nwithin the Adam ecosystem. It routes 'adam.*' commands to the appropriate\nsubsystems, including Industry Specialists, Developer Swarm, and the\nAutonomous Improvement Loop.",
-      "methods": [],
-      "bases": [
-        "AgentBase"
-      ]
-    },
-    {
-      "name": "TechnicalAnalystAgent",
-      "path": "core/agents/technical_analyst_agent.py",
-      "docstring": "No description available.",
-      "methods": [
-        "analyze_price_data",
-        "calculate_rsi",
-        "prepare_training_data",
-        "load_model",
-        "save_model"
-      ],
-      "bases": []
-    },
-    {
-      "name": "RegulatoryComplianceAgent",
-      "path": "core/agents/regulatory_compliance_agent.py",
-      "docstring": "Ensures adherence to all applicable financial regulations and compliance standards.\n\nCore Capabilities:\n- Monitors regulatory changes and trends across relevant jurisdictions.\n- Analyzes financial transactions and activities for compliance.\n- Identifies potential regulatory risks and provides mitigation strategies.\n- Generates compliance reports and audit trails.\n- Collaborates with other agents to incorporate compliance considerations.\n- Provides guidance on interacting with regulatory bodies.\n- Adapts to changing political landscapes and regulatory priorities.",
-      "methods": [
-        "provide_guidance",
-        "process_feedback"
-      ],
-      "bases": [
-        "AgentBase"
-      ]
-    },
-    {
+      "id": "A067",
       "name": "AnomalyDetectionAgent",
-      "path": "core/agents/anomaly_detection_agent.py",
-      "docstring": "Detects anomalies and unusual patterns in financial markets and company data.\n\nCore Capabilities:\n- Leverages various statistical methods and machine learning algorithms for comprehensive anomaly detection.\n- Integrates with Adam's knowledge base for context-aware analysis.\n- Employs XAI techniques to provide explanations for detected anomalies.\n- Collaborates with other agents for in-depth investigation and reporting.\n\nAgent Network Interactions:\n- DataRetrievalAgent: Accesses market and company data from the knowledge graph.\n- FundamentalAnalystAgent: Receives alerts for potential anomalies in financial statements.\n- RiskAssessmentAgent: Provides risk scores and context for detected anomalies.\n- AlertGenerationAgent: Generates alerts for significant anomalies.\n\nDynamic Adaptation and Evolution:\n- Continuously learns and adapts based on feedback and new data.\n- Automated testing and monitoring ensure accuracy and reliability.",
-      "methods": [
+      "file_path": "core/agents/anomaly_detection_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "Detects anomalies and unusual patterns in financial markets and company data.\n\nCore Capabilities:\n- Leverages various statistical methods and machine learning algorithms for comprehensive anomaly detection.\n- Integrates with Adam's knowledge base for context-aware analysis.\n- Employs XAI techniques to provide explanations for detected anomalies.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": [
         "detect_market_anomalies",
         "detect_company_anomalies"
-      ],
-      "bases": []
-    },
-    {
-      "name": "CryptoAgent",
-      "path": "core/agents/crypto_agent.py",
-      "docstring": "No description available.",
-      "methods": [
-        "get_uniswap_v3_router_abi",
-        "analyze_crypto_market",
-        "predict_price",
-        "assess_risk",
-        "calculate_volatility",
-        "get_historical_data",
-        "analyze_on_chain_metrics",
-        "get_on_chain_data",
-        "get_social_media_sentiment",
-        "trade_decision",
-        "moving_average_crossover",
-        "execute_trade",
-        "create_smart_contract",
-        "deploy_smart_contract"
-      ],
-      "bases": []
-    },
-    {
-      "name": "HNASPAgent",
-      "path": "core/agents/hnasp_agent.py",
-      "docstring": "An agent that implements the Hybrid Neurosymbolic Agent State Protocol (HNASP).",
-      "methods": [
-        "get_skill_schema"
-      ],
-      "bases": [
-        "AgentBase"
       ]
     },
     {
-      "name": "PromptGenerationAgent",
-      "path": "core/agents/prompt_generation_agent.py",
-      "docstring": "An agent that generates a high-quality prompt from a user query.",
-      "methods": [],
-      "bases": [
-        "AgentBase"
-      ]
-    },
-    {
-      "name": "IndustrySpecialistAgent",
-      "path": "core/agents/industry_specialist_agent.py",
-      "docstring": "No description available.",
-      "methods": [
-        "load_specialist",
-        "analyze_industry",
-        "analyze_company"
-      ],
-      "bases": []
-    },
-    {
-      "name": "DataVisualizationAgent",
-      "path": "core/agents/data_visualization_agent.py",
-      "docstring": "No description available.",
-      "methods": [
-        "create_chart",
-        "create_graph",
-        "create_map",
-        "run"
-      ],
-      "bases": []
-    },
-    {
-      "name": "MachineLearningModelTrainingAgent",
-      "path": "core/agents/machine_learning_model_training_agent.py",
-      "docstring": "No description available.",
-      "methods": [
-        "load_data",
-        "preprocess_data",
-        "train_model",
-        "evaluate_model",
-        "save_model",
-        "run"
-      ],
-      "bases": []
-    },
-    {
+      "id": "A068",
       "name": "PredictionMarketAgent",
-      "path": "core/agents/prediction_market_agent.py",
-      "docstring": "No description available.",
-      "methods": [
+      "file_path": "core/agents/prediction_market_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "No description available.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": [
         "gather_prediction_market_data",
         "analyze_near_term_targets",
         "analyze_conviction_levels",
@@ -13983,514 +14372,1025 @@ window.MOCK_DATA = {
         "analyze_momentum",
         "perform_technical_analysis",
         "perform_fundamental_valuation"
-      ],
-      "bases": []
-    },
-    {
-      "name": "TemplateAgent",
-      "path": "core/agents/templates/v23_template_agent.py",
-      "docstring": "A template for creating v23-compatible agents.\n\nThis class demonstrates:\n1. Asynchronous task execution.\n2. Tool usage via the tool manager.\n3. Interaction with the Unified Knowledge Graph (UKG).\n4. Structured error handling and logging.",
-      "methods": [],
-      "bases": [
-        "AsyncAgentBase"
       ]
     },
     {
-      "name": "AdaptiveRPCAgent",
-      "path": "core/agents/templates/v23_adaptive_rpc_agent.py",
-      "docstring": "V23.5 'Apex' Agent with Metacognitive Gating.\n\nImplements the 'Protocol Paradox' resolution:\n1. JSON-RPC 2.0 Native: Speaks standard MCP.\n2. Heuristic 1 (Ambiguity Guardrail): Reverts to text if conviction is low.\n3. Heuristic 2 (Context Budgeting): Just-in-Time tool loading.",
-      "methods": [],
-      "bases": [
-        "AsyncAgentBase"
+      "id": "A069",
+      "name": "CyclicalReasoningAgent",
+      "file_path": "core/agents/cyclical_reasoning_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "An agent capable of cyclical reasoning, routing its output back to itself\nor other agents for iterative improvement.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": []
+    },
+    {
+      "id": "A070",
+      "name": "EvolutionaryOptimizer",
+      "file_path": "core/agents/evolutionary_optimizer.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "A Meta-Agent that analyzes the codebase (using AST) to suggest optimizations.\nIt represents the 'Self-Improving' capability of the swarm.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": [
+        "analyze_file"
       ]
     },
     {
+      "id": "A071",
+      "name": "LiquidityRiskAgent",
+      "file_path": "core/agents/liquidity_risk_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "Agent responsible for assessing Liquidity Risk.\nCalculates Financial Liquidity (Current/Quick Ratio, LCR)\nand Market Liquidity (Spread, Impact Cost).",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": []
+    },
+    {
+      "id": "A072",
+      "name": "ImpactAnalysisAgent",
+      "file_path": "core/agents/analytics/impact_analysis_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "Analyzes cross-sector correlations and systemic risks.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": [
+        "analyze_impact"
+      ]
+    },
+    {
+      "id": "A073",
       "name": "ArchitectAgent",
-      "path": "core/agents/architect_agent/agent.py",
-      "docstring": "The Architect Agent is responsible for maintaining, optimizing, and evolving\nthe system infrastructure and reasoning logic.",
-      "methods": [
+      "file_path": "core/agents/architect_agent/agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "The Architect Agent is responsible for maintaining, optimizing, and evolving\nthe system infrastructure and reasoning logic.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": [
         "run"
-      ],
-      "bases": []
-    },
-    {
-      "name": "InternalSystemsAgent",
-      "path": "core/agents/sub_agents/internal_systems_agent.py",
-      "docstring": "The Internal Systems Agent serves as the secure and reliable conduit to the\nfinancial institution's own internal systems of record. It acts as the \"source\nof truth\" for all data related to the institution's existing relationship\nwith the borrower.",
-      "methods": [],
-      "bases": [
-        "AgentBase"
       ]
     },
     {
-      "name": "GitRepoSubAgent",
-      "path": "core/agents/sub_agents/git_repo_sub_agent.py",
-      "docstring": "No description available.",
-      "methods": [],
-      "bases": [
-        "AgentBase"
-      ]
-    },
-    {
-      "name": "ComplianceKYCAgent",
-      "path": "core/agents/sub_agents/compliance_kyc_agent.py",
-      "docstring": "Operating as a critical gatekeeper for regulatory adherence, the Compliance & KYC\nAgent automates the essential checks required for client onboarding and ongoing\nmonitoring. This agent interfaces directly, via secure APIs, with a suite of\ninternal and external databases.",
-      "methods": [],
-      "bases": [
-        "AgentBase"
-      ]
-    },
-    {
-      "name": "DataIngestionAgent",
-      "path": "core/agents/sub_agents/data_ingestion_agent.py",
-      "docstring": "Agent responsible for data ingestion tasks using the Gold Standard Toolkit.\nHandles daily history downloads, intraday snapshots, and schema validation.\n\nVersion: Adam v24 (Sprint 1: Sensory Layer)",
-      "methods": [
-        "get_skill_schema"
-      ],
-      "bases": [
-        "AgentBase"
-      ]
-    },
-    {
-      "name": "MarketAlternativeDataAgent",
-      "path": "core/agents/sub_agents/market_alternative_data_agent.py",
-      "docstring": "To build a truly comprehensive and forward-looking risk profile, the system must\nlook beyond the borrower's own financial disclosures. The Market & Alternative\nData Agent is tasked with this \"outside-in\" view. It continuously scans and\ningests a wide spectrum of both structured and unstructured information from\nthe public domain.",
-      "methods": [],
-      "bases": [
-        "AgentBase"
-      ]
-    },
-    {
-      "name": "FinancialNewsSubAgent",
-      "path": "core/agents/sub_agents/financial_news_sub_agent.py",
-      "docstring": "No description available.",
-      "methods": [
-        "execute"
-      ],
-      "bases": [
-        "AgentBase"
-      ]
-    },
-    {
-      "name": "FinancialDocumentAgent",
-      "path": "core/agents/sub_agents/financial_document_agent.py",
-      "docstring": "The Financial Document Agent is designed to eliminate one of the most time-consuming\nand error-prone bottlenecks in traditional credit analysis: manual data entry from\nphysical or digital documents. This agent leverages state-of-the-art AI-powered\ntechnologies to automate the ingestion and structuring of financial information.\n\nIts primary tool is an advanced Optical Character Recognition (OCR) engine,\nenhanced with machine learning models trained specifically on financial document layouts.",
-      "methods": [],
-      "bases": [
-        "AgentBase"
-      ]
-    },
-    {
-      "name": "PlannerAgent",
-      "path": "core/agents/developer_swarm/planner_agent.py",
-      "docstring": "The PlannerAgent takes a high-level feature request or bug report\nand breaks it down into a detailed, structured plan with discrete,\nverifiable steps. This plan can then be executed by other agents\nin the developer swarm.",
-      "methods": [
-        "get_skill_schema"
-      ],
-      "bases": [
-        "AgentBase"
-      ]
-    },
-    {
-      "name": "IntegrationAgent",
-      "path": "core/agents/developer_swarm/integration_agent.py",
-      "docstring": "The IntegrationAgent merges code, tests, and documentation into the\nmain branch once all checks have passed.",
-      "methods": [
-        "get_skill_schema"
-      ],
-      "bases": [
-        "AgentBase"
-      ]
-    },
-    {
-      "name": "TestAgent",
-      "path": "core/agents/developer_swarm/test_agent.py",
-      "docstring": "The TestAgent writes unit tests for code generated by the CoderAgent\nand runs them to ensure correctness.",
-      "methods": [
-        "get_skill_schema"
-      ],
-      "bases": [
-        "AgentBase"
-      ]
-    },
-    {
-      "name": "DocumentationAgent",
-      "path": "core/agents/developer_swarm/documentation_agent.py",
-      "docstring": "The DocumentationAgent writes and updates documentation based on the\ncode changes made by the CoderAgent.",
-      "methods": [
-        "get_skill_schema"
-      ],
-      "bases": [
-        "AgentBase"
-      ]
-    },
-    {
-      "name": "ReviewerAgent",
-      "path": "core/agents/developer_swarm/reviewer_agent.py",
-      "docstring": "The ReviewerAgent checks code for style guide violations (PEP 8),\npotential bugs, and adherence to architectural principles.",
-      "methods": [
-        "get_skill_schema"
-      ],
-      "bases": [
-        "AgentBase"
-      ]
-    },
-    {
-      "name": "CoderAgent",
-      "path": "core/agents/developer_swarm/coder_agent.py",
-      "docstring": "The CoderAgent takes a specific task from a plan and writes the\nPython code to implement it.",
-      "methods": [
-        "get_skill_schema"
-      ],
-      "bases": [
-        "AgentBase"
-      ]
-    },
-    {
-      "name": "MonteCarloRiskAgent",
-      "path": "core/agents/specialized/monte_carlo_risk_agent.py",
-      "docstring": "Quantitative Risk Agent using Monte Carlo simulations.\n\nMethodology:\n1. Models EBITDA as a stochastic process (Geometric Brownian Motion).\n2. Runs 10,000 iterations over a 12-24 month horizon.\n3. Triggers 'Default' if EBITDA falls below Interest Expense + Maintenance Capex.\n\nDeveloper Note:\n---------------\nCurrently uses GBM (Geometric Brownian Motion).\nFuture Roadmap: Implement GARCH(1,1) for volatility clustering and\nOrnstein-Uhlenbeck processes for mean-reverting sectors (e.g., Commodities).",
-      "methods": [],
-      "bases": [
-        "AgentBase"
-      ]
-    },
-    {
+      "id": "A074",
       "name": "ManagementAssessmentAgent",
-      "path": "core/agents/specialized/management_assessment_agent.py",
-      "docstring": "Phase 1: Entity & Management Assessment.\nAnalyzes capital allocation, insider alignment, and CEO tone.",
-      "methods": [],
-      "bases": [
-        "AgentBase"
+      "file_path": "core/agents/specialized/management_assessment_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "Phase 1: Entity & Management Assessment.\nAnalyzes capital allocation, insider alignment, and CEO tone.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": []
+    },
+    {
+      "id": "A075",
+      "name": "OptimizedGalleryAgent",
+      "file_path": "core/agents/specialized/optimized_gallery_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "Demonstration agent that uses RedundancyOptimizationMixin to securely and efficiently\nfetch 'gallery data' (simulated) with fallback capabilities.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": [
+        "get_skill_schema"
       ]
     },
     {
-      "name": "QuantumRiskAgent",
-      "path": "core/agents/specialized/quantum_risk_agent.py",
-      "docstring": "Specialized agent that uses Quantum Monte Carlo methods for risk analysis.\nPart of the Adam v24.0 'Quantum-Native' suite.",
-      "methods": [],
-      "bases": [
-        "AgentBase"
-      ]
+      "id": "A076",
+      "name": "RegulatorySNCAgent",
+      "file_path": "core/agents/specialized/regulatory_snc_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "Specialized Agent: The Regulator (Government Employee Persona).\n\nThis agent strictly applies the \"Interagency Guidance on Leveraged Lending\" (2013).\nIt does NOT use flexible cash flow models or future projections.\nIt focuses on rigid compliance: Leverage < 6x, Ability to Repay < 50% of Free Cash Flow.\n\nRole: \"The Brake\"",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": []
     },
     {
-      "name": "RetailAlphaAgent",
-      "path": "core/agents/specialized/retail_alpha_agent.py",
-      "docstring": "Retail Alpha Agent: 'The Retail Supplement'\n\nThis agent bridges the gap between institutional data (13Fs, Risk Models) and\nretail trading needs (Signals, Hype, Simple Metrics).\n\nIt generates 'Alpha Signals' by looking for divergences:\n- Smart Money Buying vs Retail Selling (Bullish Divergence)\n- Smart Money Selling vs Retail Euphoria (Bearish Trap)",
-      "methods": [],
-      "bases": [
-        "AgentBase"
-      ]
-    },
-    {
-      "name": "CounterpartyRiskAgent",
-      "path": "core/agents/specialized/counterparty_risk_agent.py",
-      "docstring": "Responsibility: PFE, Wrong-Way Risk (WWR).",
-      "methods": [],
-      "bases": [
-        "AgentBase"
-      ]
-    },
-    {
-      "name": "CovenantAnalystAgent",
-      "path": "core/agents/specialized/credit_lawyer.py",
-      "docstring": "Phase 3 Helper: Covenant Analysis.\nParses credit agreements (or simulates them) for maintenance covenants.\n\nThis agent simulates the role of a Legal/Credit analyst reviewing the Credit Agreement.\nIt checks for Financial Maintenance Covenants (Total Net Leverage, Interest Coverage)\nand estimates the risk of a \"Foot Fault\" or technical default.",
-      "methods": [],
-      "bases": [
-        "AgentBase"
-      ]
-    },
-    {
-      "name": "TechnicalCovenantAgent",
-      "path": "core/agents/specialized/technical_covenant_agent.py",
-      "docstring": "Specialized Agent: The Legal Analyst (Law Firm Associate Persona).\n\nThis agent focuses purely on the textual \"rules of the road\" within the Credit Agreement.\nIt identifies definitions, baskets, and blockers.\n\nEnhanced Capabilities:\n- Context-Aware Checking: Prioritizes checks based on borrower history (e.g., Aggressive Sponsors).\n- Historical Precedent: Flags \"Market Standard\" vs \"Outlier\" terms.",
-      "methods": [],
-      "bases": [
-        "AgentBase"
-      ]
-    },
-    {
-      "name": "DistressedSurveillanceAgent",
-      "path": "core/agents/specialized/distressed_surveillance_agent.py",
-      "docstring": "Agent responsible for identifying 'Zombie Issuers' in the BSL market.\nWraps the SurveillanceGraph.",
-      "methods": [],
-      "bases": [
-        "AgentBase"
-      ]
-    },
-    {
-      "name": "PortfolioManagerAgent",
-      "path": "core/agents/specialized/portfolio_manager_agent.py",
-      "docstring": "Phase 5: Synthesis & Conviction.\nThe 'Conviction Engine' that weighs all previous phases.",
-      "methods": [],
-      "bases": [
-        "AgentBase"
-      ]
-    },
-    {
-      "name": "SNCRatingAgent",
-      "path": "core/agents/specialized/credit_snc.py",
-      "docstring": "Specialized Agent for performing Shared National Credit (SNC) simulations.\n\nActs as a virtual 'Senior Credit Officer', applying regulatory frameworks\n(OCC/Fed/FDIC) to classify debt facilities based on:\n1. Primary Repayment Source (Cash Flow/EBITDA)\n2. Secondary Repayment Source (Collateral/Enterprise Value)\n\nDeveloper Note:\n---------------\nThis agent implements the \"Interagency Guidance on Leveraged Lending\" logic.\nIt separates the borrower-level rating (Ability to Repay) from the facility-level\nrating (Loss Given Default), allowing for \"notching up\" based on collateral.",
-      "methods": [],
-      "bases": [
-        "AgentBase"
-      ]
-    },
-    {
-      "name": "InstitutionalTrendAgent",
-      "path": "core/agents/specialized/institutional_trend_agent.py",
-      "docstring": "Agent responsible for monitoring institutional capital flows via 13F filings\nand generating strategic market intelligence reports.\n\nArchitecture:\n1. Ingestion Layer (Hard Logic): Fetches raw 13F data via Sec13FHandler.\n2. Processing Layer (Pandas): Calculates deltas (New/Exits/Increases).\n3. Cognitive Layer (LLM): Synthesizes quantitative moves into qualitative strategy.",
-      "methods": [],
-      "bases": [
-        "AgentBase"
-      ]
-    },
-    {
-      "name": "PeerComparisonAgent",
-      "path": "core/agents/specialized/peer_comparison_agent.py",
-      "docstring": "Phase 2 Helper: Peer Comparison.\nFetches and calculates relative multiples.",
-      "methods": [],
-      "bases": [
-        "AgentBase"
-      ]
-    },
-    {
-      "name": "CreditConformanceAgent",
-      "path": "core/agents/specialized/credit_conformance_agent.py",
-      "docstring": "Tier-2 Generative AI Agent for Credit Risk Conformance.\nImplements a multi-layered architecture for regulatory and policy conformance.",
-      "methods": [],
-      "bases": [
-        "AgentBase"
-      ]
-    },
-    {
+      "id": "A077",
       "name": "CreditSentryAgent",
-      "path": "core/agents/specialized/credit_sentry_agent.py",
-      "docstring": "\"The Hawk\" - Solvency Assessment Engine.\nResponsibility: Stress testing, FCCR calculation, Cycle Detection (Fractured Ouroboros), J.Crew Detection.",
-      "methods": [],
-      "bases": [
-        "AgentBase"
+      "file_path": "core/agents/specialized/credit_sentry_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "\"The Hawk\" - Solvency Assessment Engine.\nResponsibility: Stress testing, FCCR calculation, Cycle Detection (Fractured Ouroboros), J.Crew Detection.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": []
+    },
+    {
+      "id": "A078",
+      "name": "MarketRegimeAgent",
+      "file_path": "core/agents/specialized/market_regime_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "Agent responsible for classifying the current market regime (e.g., Bull, Bear, Choppy, Volatile)\nusing statistical metrics such as Hurst Exponent, ADX, and Volatility ratios.\nThis acts as a 'Force Multiplier' for other agents by providing context on *how* to trade.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": []
+    },
+    {
+      "id": "A079",
+      "name": "DeepSectorAnalyst",
+      "file_path": "core/agents/specialized/deep_sector_analyst.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "A Deep Vertical Agent specialized in generating detailed sector-specific\nstress scenarios using the Generative Risk Engine.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": [
+        "get_skill_schema"
       ]
     },
     {
-      "name": "RiskCoPilotAgent",
-      "path": "core/agents/specialized/risk_copilot_agent.py",
-      "docstring": "Automated Credit Risk Officer capable of diagnosing breaches and summarizing risk.",
-      "methods": [
-        "perform_rca"
-      ],
-      "bases": [
-        "AgentBase"
-      ]
+      "id": "A080",
+      "name": "SovereignAIAnalystAgent",
+      "file_path": "core/agents/specialized/sovereign_ai_analyst_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "Agent for analyzing the 'Sovereign AI' landscape.\nIt focuses on the intersection of National Security, AI Infrastructure (Capex),\nand Geopolitical fragmentation.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": []
     },
     {
+      "id": "A081",
       "name": "CovenantAnalystAgent",
-      "path": "core/agents/specialized/financial_covenant_agent.py",
-      "docstring": "Phase 3 Helper: Covenant Analysis.\nParses credit agreements (or simulates them) for maintenance covenants.\n\nEnhanced Capabilities:\n- Technical Default Prediction (Headroom Compression)\n- Springing Covenant Monitoring (Revolver Utilization)",
-      "methods": [],
-      "bases": [
-        "AgentBase"
+      "file_path": "core/agents/specialized/financial_covenant_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "Phase 3 Helper: Covenant Analysis.\nParses credit agreements (or simulates them) for maintenance covenants.\n\nEnhanced Capabilities:\n- Technical Default Prediction (Headroom Compression)\n- Springing Covenant Monitoring (Revolver Utilization)",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": []
+    },
+    {
+      "id": "A082",
+      "name": "GitHubAlphaAgent",
+      "file_path": "core/agents/specialized/github_alpha_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "Protocol: ARCHITECT_INFINITE - Day 11\nRole: Analyze GitHub repositories for 'Developer Alpha' - a leading indicator of project health.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": []
+    },
+    {
+      "id": "A083",
+      "name": "CryptoArbitrageAgent",
+      "file_path": "core/agents/specialized/crypto_arbitrage_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "A specialized agent that monitors cryptocurrency prices across multiple exchanges\nto identify arbitrage opportunities.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": []
+    },
+    {
+      "id": "A084",
+      "name": "StrategicSNCAgent",
+      "file_path": "core/agents/specialized/strategic_snc_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "Specialized Agent for performing Shared National Credit (SNC) simulations.\n\nActs as a virtual 'Senior Credit Officer', orchestrating the debate between:\n1. The Regulator (RegulatorySNCAgent) - \"The Brake\"\n2. The Strategist (Internal Logic) - \"The Gas\"\n\nIt uses the Risk Consensus Engine to simulate a dialogue and determine the final outcome.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": []
+    },
+    {
+      "id": "A085",
+      "name": "CreditConformanceAgent",
+      "file_path": "core/agents/specialized/credit_conformance_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "Tier-2 Generative AI Agent for Credit Risk Conformance.\nImplements a multi-layered architecture for regulatory and policy conformance.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": []
+    },
+    {
+      "id": "A086",
+      "name": "SNCRatingAgent",
+      "file_path": "core/agents/specialized/credit_snc.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "Specialized Agent for performing Shared National Credit (SNC) simulations.\n\nActs as a virtual 'Senior Credit Officer', applying regulatory frameworks\n(OCC/Fed/FDIC) to classify debt facilities based on:\n1. Primary Repayment Source (Cash Flow/EBITDA)\n2. Secondary Repayment Source (Collateral/Enterprise Value)\n\nDeveloper Note:\n---------------\nThis agent implements the \"Interagency Guidance on Leveraged Lending\" logic.\nIt separates the borrower-level rating (Ability to Repay) from the facility-level\nrating (Loss Given Default), allowing for \"notching up\" based on collateral.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": []
+    },
+    {
+      "id": "A087",
+      "name": "QuantumSearchAgent",
+      "file_path": "core/agents/specialized/quantum_search_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "QuantumSearchAgent: A specialized agent that acts as a bridge between\nclassical search intent and the AVG (AdamVanGrover) hybrid quantum-classical\noptimization framework.\n\nIt simulates the process of finding \"needles\" (anomalies, specific keys)\nin massive datasets (haystacks) by leveraging the AVGSearch engine.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": [
+        "verify_candidates",
+        "get_skill_schema"
       ]
     },
     {
+      "id": "A088",
+      "name": "RootNodeAgent",
+      "file_path": "core/agents/specialized/root_node_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "An agent that solves complex problems by building a search tree of reasoning steps.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": [
+        "solve"
+      ]
+    },
+    {
+      "id": "A089",
+      "name": "MacroLiquidityAgent",
+      "file_path": "core/agents/specialized/macro_liquidity_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "Agent responsible for assessing global macro liquidity conditions by analyzing\nbond yields, credit spreads, currency strength, and commodity proxies.\n\nIt calculates a 'Liquidity Stress Index' that serves as a fundamental input\nfor Risk Agents and Portfolio Managers.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": []
+    },
+    {
+      "id": "A090",
+      "name": "InstitutionalRadarAgent",
+      "file_path": "core/agents/specialized/institutional_radar_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "Agent responsible for executing the Institutional Radar blueprint:\nIngesting 13F data, analyzing trends, and generating narrative reports.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": []
+    },
+    {
+      "id": "A091",
+      "name": "CounterpartyRiskAgent",
+      "file_path": "core/agents/specialized/counterparty_risk_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "Responsibility: PFE, Wrong-Way Risk (WWR).",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": []
+    },
+    {
+      "id": "A092",
+      "name": "QuantumStrategyAgent",
+      "file_path": "core/agents/specialized/quantum_strategy_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "Specialized Agent that orchestrates the AdamVanGrover simulation and\nQuantum Recommendation Engine to generate high-level strategic advice.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": [
+        "generate_quantum_thesis"
+      ]
+    },
+    {
+      "id": "A093",
+      "name": "CovenantAnalystAgent",
+      "file_path": "core/agents/specialized/credit_lawyer.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "Phase 3 Helper: Covenant Analysis.\nParses credit agreements (or simulates them) for maintenance covenants.\n\nThis agent simulates the role of a Legal/Credit analyst reviewing the Credit Agreement.\nIt checks for Financial Maintenance Covenants (Total Net Leverage, Interest Coverage)\nand estimates the risk of a \"Foot Fault\" or technical default.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": []
+    },
+    {
+      "id": "A094",
+      "name": "CreditRiskControllerAgent",
+      "file_path": "core/agents/specialized/credit_risk_controller_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "The 'Senior Credit Risk Controller' Agent.\n\nA digital twin of a Regulatory Examiner/Senior Credit Officer.\n\nDirectives:\n1. Ingest granular facility data (SNCnet schema).\n2. Deterministically calculate implied ratings (S&P/Moody's logic).\n3. Simulate Regulatory Disagreement (SNC Review logic).\n4. Generate defense-ready eSNC Cover Pages.\n\nArchitecture:\n- Pre-Computation Layer: Python-based execution of the S&P Matrix and Conviction Score formula.\n- Inference Layer: LLM-based construction of the \"Defense Narrative\" and qualitative synthesis.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": []
+    },
+    {
+      "id": "A095",
+      "name": "ForensicAccountantAgent",
+      "file_path": "core/agents/specialized/forensic_accountant_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "Specialized agent for detecting financial fraud and anomalies in ledger data.\nUses statistical methods (Benford's Law) and heuristic rules.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": [
+        "get_skill_schema"
+      ]
+    },
+    {
+      "id": "A096",
+      "name": "RetailAlphaAgent",
+      "file_path": "core/agents/specialized/retail_alpha_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "Retail Alpha Agent: 'The Retail Supplement'\n\nThis agent bridges the gap between institutional data (13Fs, Risk Models) and\nretail trading needs (Signals, Hype, Simple Metrics).\n\nIt generates 'Alpha Signals' by looking for divergences:\n- Smart Money Buying vs Retail Selling (Bullish Divergence)\n- Smart Money Selling vs Retail Euphoria (Bearish Trap)",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": []
+    },
+    {
+      "id": "A097",
+      "name": "BlindspotAgent",
+      "file_path": "core/agents/specialized/blindspot_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "Protocol: ADAM-V-NEXT\nVerified by Jules.\nA meta-cognitive agent responsible for scanning the system's knowledge graph\nfor disconnected nodes, contradictory data points, and 'unknown unknowns'.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": []
+    },
+    {
+      "id": "A098",
+      "name": "DeFiLiquidityAgent",
+      "file_path": "core/agents/specialized/defi_liquidity_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "Analyzes DeFi Liquidity Pools for health, yield, and risks (Impermanent Loss).",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": [
+        "calculate_impermanent_loss",
+        "analyze_yield"
+      ]
+    },
+    {
+      "id": "A099",
+      "name": "NarrativeIntelligenceAgent",
+      "file_path": "core/agents/specialized/narrative_intelligence_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "Protocol: ADAM-V-NEXT\nSpecialized agent that moves beyond simple sentiment scoring to identify\nemerging thematic narratives (e.g., 'AI Bubble', 'Energy Crisis').",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": []
+    },
+    {
+      "id": "A100",
+      "name": "PeerComparisonAgent",
+      "file_path": "core/agents/specialized/peer_comparison_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "Phase 2 Helper: Peer Comparison.\nFetches and calculates relative multiples.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": []
+    },
+    {
+      "id": "A101",
+      "name": "QuantumRiskAgent",
+      "file_path": "core/agents/specialized/quantum_risk_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "Specialized agent that uses Quantum Monte Carlo methods for risk analysis.\nPart of the Adam v24.0 'Quantum-Native' suite.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": []
+    },
+    {
+      "id": "A102",
+      "name": "RiskCoPilotAgent",
+      "file_path": "core/agents/specialized/risk_copilot_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "Automated Credit Risk Officer capable of diagnosing breaches and summarizing risk.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": [
+        "perform_rca"
+      ]
+    },
+    {
+      "id": "A103",
       "name": "SentinelAgent",
-      "path": "core/agents/specialized/sentinel_agent.py",
-      "docstring": "The Data Integrity Guardian.\nResponsibility: Ingestion, Extraction, Validation against FIBO Schema.",
-      "methods": [
+      "file_path": "core/agents/specialized/sentinel_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "The Data Integrity Guardian.\nResponsibility: Ingestion, Extraction, Validation against FIBO Schema.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": [
         "process_document",
         "process_entity"
-      ],
-      "bases": [
-        "AgentBase"
       ]
     },
     {
-      "name": "CreditRiskControllerAgent",
-      "path": "core/agents/specialized/credit_risk_controller_agent.py",
-      "docstring": "The 'Senior Credit Risk Controller' Agent.\n\nA digital twin of a Regulatory Examiner/Senior Credit Officer.\n\nDirectives:\n1. Ingest granular facility data (SNCnet schema).\n2. Deterministically calculate implied ratings (S&P/Moody's logic).\n3. Simulate Regulatory Disagreement (SNC Review logic).\n4. Generate defense-ready eSNC Cover Pages.\n\nArchitecture:\n- Pre-Computation Layer: Python-based execution of the S&P Matrix and Conviction Score formula.\n- Inference Layer: LLM-based construction of the \"Defense Narrative\" and qualitative synthesis.",
-      "methods": [],
-      "bases": [
-        "AsyncAgentBase"
+      "id": "A104",
+      "name": "TechnicalCovenantAgent",
+      "file_path": "core/agents/specialized/technical_covenant_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "Specialized Agent: The Legal Analyst (Law Firm Associate Persona).\n\nThis agent focuses purely on the textual \"rules of the road\" within the Credit Agreement.\nIt identifies definitions, baskets, and blockers.\n\nEnhanced Capabilities:\n- Context-Aware Checking: Prioritizes checks based on borrower history (e.g., Aggressive Sponsors).\n- Historical Precedent: Flags \"Market Standard\" vs \"Outlier\" terms.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": []
+    },
+    {
+      "id": "A105",
+      "name": "QuantumRetrievalAgent",
+      "file_path": "core/agents/specialized/quantum_retrieval_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "An agent that uses Quantum Annealing simulations optimized by Adam\nto \"retrieve\" data from massive unstructured datasets (simulated).\nEnhanced to support Credit & Restructuring Search.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": [
+        "find_needle",
+        "search_optimal_restructuring",
+        "process_request"
       ]
     },
     {
-      "name": "RegulatorySNCAgent",
-      "path": "core/agents/specialized/regulatory_snc_agent.py",
-      "docstring": "Specialized Agent: The Regulator (Government Employee Persona).\n\nThis agent strictly applies the \"Interagency Guidance on Leveraged Lending\" (2013).\nIt does NOT use flexible cash flow models or future projections.\nIt focuses on rigid compliance: Leverage < 6x, Ability to Repay < 50% of Free Cash Flow.\n\nRole: \"The Brake\"",
-      "methods": [],
-      "bases": [
-        "AgentBase"
-      ]
+      "id": "A106",
+      "name": "MonteCarloRiskAgent",
+      "file_path": "core/agents/specialized/monte_carlo_risk_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "Quantitative Risk Agent using Monte Carlo simulations.\n\nMethodology:\n1. Models EBITDA as a stochastic process (Geometric Brownian Motion, Heston, or OU).\n2. Runs iterations (default 10,000) over a defined horizon.\n3. Triggers 'Default' if EBITDA falls below Interest Expense + Maintenance Capex.\n\nDeveloper Note:\n---------------\nNow supports Heston (stochastic volatility) and OU (mean reversion).",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": []
     },
     {
-      "name": "InstitutionalRadarAgent",
-      "path": "core/agents/specialized/institutional_radar_agent.py",
-      "docstring": "Agent responsible for executing the Institutional Radar blueprint:\nIngesting 13F data, analyzing trends, and generating narrative reports.",
-      "methods": [],
-      "bases": [
-        "AgentBase"
-      ]
+      "id": "A107",
+      "name": "PortfolioManagerAgent",
+      "file_path": "core/agents/specialized/portfolio_manager_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "Phase 5: Synthesis & Conviction.\nThe 'Conviction Engine' that weighs all previous phases.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": []
     },
     {
+      "id": "A108",
+      "name": "DistressedSurveillanceAgent",
+      "file_path": "core/agents/specialized/distressed_surveillance_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "Agent responsible for identifying 'Zombie Issuers' in the BSL market.\nWraps the SurveillanceGraph.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": []
+    },
+    {
+      "id": "A109",
+      "name": "InstitutionalTrendAgent",
+      "file_path": "core/agents/specialized/institutional_trend_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "Agent responsible for monitoring institutional capital flows via 13F filings\nand generating strategic market intelligence reports.\n\nArchitecture:\n1. Ingestion Layer (Hard Logic): Fetches raw 13F data via Sec13FHandler.\n2. Processing Layer (Pandas): Calculates deltas (New/Exits/Increases).\n3. Cognitive Layer (LLM): Synthesizes quantitative moves into qualitative strategy.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": []
+    },
+    {
+      "id": "A110",
       "name": "QuantumScenarioAgent",
-      "path": "core/agents/specialized/quantum_scenario_agent.py",
-      "docstring": "Phase 4 Helper: Quantum Scenario Generation.\n\nThis agent bridges the gap between classical risk modeling and quantum-enhanced simulation.\nIt utilizes the `QuantumMonteCarloEngine` (QMC) for structural credit modeling and the\n`GenerativeRiskEngine` (GRE) for tail-risk scenario generation.\n\nDeveloper Note:\n---------------\nIn environments without a QPU or heavy GPU dependencies, this agent gracefully degrades\nto use classical approximations (numpy-based QMC simulation) and heuristic-based\ngenerative models.",
-      "methods": [],
-      "bases": [
-        "AgentBase"
+      "file_path": "core/agents/specialized/quantum_scenario_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "Phase 4 Helper: Quantum Scenario Generation.\n\nThis agent bridges the gap between classical risk modeling and quantum-enhanced simulation.\nIt utilizes the `QuantumMonteCarloEngine` (QMC) for structural credit modeling and the\n`GenerativeRiskEngine` (GRE) for tail-risk scenario generation.\n\nDeveloper Note:\n---------------\nIn environments without a QPU or heavy GPU dependencies, this agent gracefully degrades\nto use classical approximations (numpy-based QMC simulation) and heuristic-based\ngenerative models.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": []
+    },
+    {
+      "id": "A111",
+      "name": "TemplateAgent",
+      "file_path": "core/agents/templates/v23_template_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "A template for creating v23-compatible agents.\n\nThis class demonstrates:\n1. Asynchronous task execution.\n2. Tool usage via the tool manager.\n3. Interaction with the Unified Knowledge Graph (UKG).\n4. Structured error handling and logging.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": []
+    },
+    {
+      "id": "A112",
+      "name": "AdaptiveRPCAgent",
+      "file_path": "core/agents/templates/v23_adaptive_rpc_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "V23.5 'Apex' Agent with Metacognitive Gating.\n\nImplements the 'Protocol Paradox' resolution:\n1. JSON-RPC 2.0 Native: Speaks standard MCP.\n2. Heuristic 1 (Ambiguity Guardrail): Reverts to text if conviction is low.\n3. Heuristic 2 (Context Budgeting): Just-in-Time tool loading.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": []
+    },
+    {
+      "id": "A113",
+      "name": "OmegaAgent",
+      "file_path": "core/agents/templates/omega_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "Abstract Base Class for Sovereign Agents.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": [
+        "log_thought"
       ]
     },
     {
-      "name": "RootNodeAgent",
-      "path": "core/agents/specialized/root_node_agent.py",
-      "docstring": "An agent that solves complex problems by building a search tree of reasoning steps.",
-      "methods": [
-        "solve"
-      ],
-      "bases": [
-        "AgentBase"
+      "id": "A114",
+      "name": "MarketSentimentAgent",
+      "file_path": "core/agents/templates/omega_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "Example Agent: Analyzes market sentiment (Mock).",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": []
+    },
+    {
+      "id": "A115",
+      "name": "PlannerAgent",
+      "file_path": "core/agents/developer_swarm/planner_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "The PlannerAgent takes a high-level feature request or bug report\nand breaks it down into a detailed, structured plan with discrete,\nverifiable steps. This plan can then be executed by other agents\nin the developer swarm.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": [
+        "get_skill_schema"
       ]
     },
     {
-      "name": "StrategicSNCAgent",
-      "path": "core/agents/specialized/strategic_snc_agent.py",
-      "docstring": "Specialized Agent for performing Shared National Credit (SNC) simulations.\n\nActs as a virtual 'Senior Credit Officer', orchestrating the debate between:\n1. The Regulator (RegulatorySNCAgent) - \"The Brake\"\n2. The Strategist (Internal Logic) - \"The Gas\"\n\nIt uses the Risk Consensus Engine to simulate a dialogue and determine the final outcome.",
-      "methods": [],
-      "bases": [
-        "AgentBase"
+      "id": "A116",
+      "name": "SpecArchitectAgent",
+      "file_path": "core/agents/developer_swarm/spec_architect_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "The SpecArchitectAgent is the 'Architect' in the Spec-Driven Development workflow.\nIts sole purpose is to take a high-level vision or goal and produce a rigorous,\nstructured SPEC.md file. It operates in 'Plan Mode' (read-only) and does not\nwrite application code.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": [
+        "get_skill_schema"
       ]
     },
     {
-      "name": "OdysseyHubAgent",
-      "path": "core/agents/orchestrators/odyssey_hub_agent.py",
-      "docstring": "Adam v25.5 (Odyssey Orchestrator)\nThe central Hub agent for the Odyssey Financial System.\nOrchestrates the 'Hub-and-Spoke' architecture and enforces semantic consistency\nvia the Odyssey Unified Knowledge Graph (OUKG).",
-      "methods": [],
-      "bases": [
-        "AgentBase"
+      "id": "A117",
+      "name": "TestAgent",
+      "file_path": "core/agents/developer_swarm/test_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "The TestAgent writes unit tests for code generated by the CoderAgent\nand runs them to ensure correctness.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": [
+        "get_skill_schema"
       ]
     },
     {
+      "id": "A118",
+      "name": "ReviewerAgent",
+      "file_path": "core/agents/developer_swarm/reviewer_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "The ReviewerAgent checks code for style guide violations (PEP 8),\npotential bugs, and adherence to architectural principles.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": [
+        "get_skill_schema"
+      ]
+    },
+    {
+      "id": "A119",
+      "name": "IntegrationAgent",
+      "file_path": "core/agents/developer_swarm/integration_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "The IntegrationAgent merges code, tests, and documentation into the\nmain branch once all checks have passed.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": [
+        "get_skill_schema"
+      ]
+    },
+    {
+      "id": "A120",
+      "name": "CoderAgent",
+      "file_path": "core/agents/developer_swarm/coder_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "The CoderAgent takes a specific task from a plan and writes the\nPython code to implement it.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": [
+        "get_skill_schema"
+      ]
+    },
+    {
+      "id": "A121",
+      "name": "DocumentationAgent",
+      "file_path": "core/agents/developer_swarm/documentation_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "The DocumentationAgent writes and updates documentation based on the\ncode changes made by the CoderAgent.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": [
+        "get_skill_schema"
+      ]
+    },
+    {
+      "id": "A122",
+      "name": "CreditAgentBase",
+      "file_path": "core/agents/credit/credit_agent_base.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "Base class for all Credit Memo agents.\nEnforces audit logging and strict output schemas.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": [
+        "log_execution",
+        "format_citation"
+      ]
+    },
+    {
+      "id": "A123",
+      "name": "ArchivistAgent",
+      "file_path": "core/agents/credit/archivist.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "The Retrieval Agent.\nResponsible for fetching documents and chunks from the Vector DB (mocked).",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": []
+    },
+    {
+      "id": "A124",
+      "name": "WriterAgent",
+      "file_path": "core/agents/credit/writer.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "The Generation Agent.\nResponsible for synthesizing the final credit memo and inserting citations.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": []
+    },
+    {
+      "id": "A125",
+      "name": "QuantAgent",
+      "file_path": "core/agents/credit/quant.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "The Spreading Agent.\nResponsible for extracting structured financial data from unstructured documents.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": []
+    },
+    {
+      "id": "A126",
+      "name": "FinancialNewsSubAgent",
+      "file_path": "core/agents/sub_agents/financial_news_sub_agent.py",
+      "type": "Sub-Agent",
+      "status": "IDLE",
+      "load": 0,
+      "description": "No description available.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": [
+        "execute"
+      ]
+    },
+    {
+      "id": "A127",
+      "name": "InternalSystemsAgent",
+      "file_path": "core/agents/sub_agents/internal_systems_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "The Internal Systems Agent serves as the secure and reliable conduit to the\nfinancial institution's own internal systems of record. It acts as the \"source\nof truth\" for all data related to the institution's existing relationship\nwith the borrower.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": []
+    },
+    {
+      "id": "A128",
+      "name": "FinancialDocumentAgent",
+      "file_path": "core/agents/sub_agents/financial_document_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "The Financial Document Agent is designed to eliminate one of the most time-consuming\nand error-prone bottlenecks in traditional credit analysis: manual data entry from\nphysical or digital documents. This agent leverages state-of-the-art AI-powered\ntechnologies to automate the ingestion and structuring of financial information.\n\nIts primary tool is an advanced Optical Character Recognition (OCR) engine,\nenhanced with machine learning models trained specifically on financial document layouts.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": []
+    },
+    {
+      "id": "A129",
+      "name": "ComplianceKYCAgent",
+      "file_path": "core/agents/sub_agents/compliance_kyc_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "Operating as a critical gatekeeper for regulatory adherence, the Compliance & KYC\nAgent automates the essential checks required for client onboarding and ongoing\nmonitoring. This agent interfaces directly, via secure APIs, with a suite of\ninternal and external databases.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": []
+    },
+    {
+      "id": "A130",
+      "name": "DataIngestionAgent",
+      "file_path": "core/agents/sub_agents/data_ingestion_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "Agent responsible for data ingestion tasks using the Gold Standard Toolkit.\nHandles daily history downloads, intraday snapshots, and schema validation.\n\nVersion: Adam v24 (Sprint 1: Sensory Layer)",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": [
+        "get_skill_schema"
+      ]
+    },
+    {
+      "id": "A131",
+      "name": "MarketAlternativeDataAgent",
+      "file_path": "core/agents/sub_agents/market_alternative_data_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "To build a truly comprehensive and forward-looking risk profile, the system must\nlook beyond the borrower's own financial disclosures. The Market & Alternative\nData Agent is tasked with this \"outside-in\" view. It continuously scans and\ningests a wide spectrum of both structured and unstructured information from\nthe public domain.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": []
+    },
+    {
+      "id": "A132",
+      "name": "GitRepoSubAgent",
+      "file_path": "core/agents/sub_agents/git_repo_sub_agent.py",
+      "type": "Sub-Agent",
+      "status": "IDLE",
+      "load": 0,
+      "description": "No description available.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": []
+    },
+    {
+      "id": "A133",
       "name": "RepoGuardianAgent",
-      "path": "core/agents/governance/repo_guardian/agent.py",
-      "docstring": "The RepoGuardian Agent serves as an automated code reviewer and gatekeeper.\nIt analyzes proposed changes against repository standards and provides\nstructured feedback.",
-      "methods": [],
-      "bases": [
-        "AgentBase"
-      ]
+      "file_path": "core/agents/governance/repo_guardian/agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "The RepoGuardian Agent serves as an automated code reviewer and gatekeeper.\nIt analyzes proposed changes against repository standards and provides\nstructured feedback.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": []
     },
     {
+      "id": "A134",
       "name": "TestRepoGuardianAgent",
-      "path": "core/agents/governance/repo_guardian/tests/test_agent.py",
-      "docstring": "No description available.",
-      "methods": [
+      "file_path": "core/agents/governance/repo_guardian/tests/test_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "No description available.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": [
         "setUp",
         "test_initialization",
         "test_run_heuristics_security",
         "test_run_heuristics_python_ast",
         "test_execute_critical_security_failure"
-      ],
-      "bases": []
+      ]
     },
     {
-      "name": "SentimentAnalysisMetaAgent",
-      "path": "core/agents/meta_agents/sentiment_analysis_meta_agent.py",
-      "docstring": "No description available.",
-      "methods": [
+      "id": "A135",
+      "name": "CapacityPlannerAgent",
+      "file_path": "core/agents/infrastructure/capacity_planner_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "Monitors system telemetry (CPU, GPU, Memory) and recommends infrastructure scaling actions.\nFunctions as the \"Site Reliability Engineer\" (SRE) of the Analyst OS.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": [
+        "get_skill_schema"
+      ]
+    },
+    {
+      "id": "A136",
+      "name": "CreditRiskOrchestrator",
+      "file_path": "core/agents/orchestrators/credit_risk_orchestrator.py",
+      "type": "Orchestrator",
+      "status": "IDLE",
+      "load": 0,
+      "description": "No description available.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": []
+    },
+    {
+      "id": "A137",
+      "name": "CreditSentryOrchestrator",
+      "file_path": "core/agents/orchestrators/creditsentry_orchestrator.py",
+      "type": "Orchestrator",
+      "status": "IDLE",
+      "load": 0,
+      "description": "The Orchestrator/Supervisor Agent. This is the central nervous system of the\ncopilot. It acts as the primary interface with the human user and the master\ncontroller of the entire workflow.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": []
+    },
+    {
+      "id": "A138",
+      "name": "OdysseyHubAgent",
+      "file_path": "core/agents/orchestrators/odyssey_hub_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "Adam v25.5 (Odyssey Orchestrator)\nThe central Hub agent for the Odyssey Financial System.\nOrchestrates the 'Hub-and-Spoke' architecture and enforces semantic consistency\nvia the Odyssey Unified Knowledge Graph (OUKG).",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": []
+    },
+    {
+      "id": "A139",
+      "name": "ParallelOrchestrator",
+      "file_path": "core/agents/orchestrators/parallel_orchestrator.py",
+      "type": "Orchestrator",
+      "status": "IDLE",
+      "load": 0,
+      "description": "No description available.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": [
         "execute"
-      ],
-      "bases": [
-        "AgentBase"
       ]
     },
     {
-      "name": "CounterpartyRiskAgent",
-      "path": "core/agents/meta_agents/counterparty_risk_agent.py",
-      "docstring": "For clients engaging in derivative transactions (e.g., interest rate swaps,\ncurrency forwards), the system's dedicated CounterpartyRiskAgent is activated.\nThis agent is specifically designed to quantify the complex, contingent risks\nassociated with these instruments.",
-      "methods": [],
-      "bases": [
-        "AgentBase"
-      ]
-    },
-    {
-      "name": "OdysseyMetaAgent",
-      "path": "core/agents/meta_agents/odyssey_meta_agent.py",
-      "docstring": "Strategic Synthesis Agent.\nAggregates inputs from Sentinel, CreditSentry, Argus, etc. to produce final XML decision.",
-      "methods": [],
-      "bases": [
-        "AgentBase"
-      ]
-    },
-    {
-      "name": "EvolutionaryArchitectAgent",
-      "path": "core/agents/meta_agents/evolutionary_architect_agent.py",
-      "docstring": "The Evolutionary Architect Agent is a meta-agent predisposed for action.\nIt drives the codebase forward by proposing additive enhancements, refactors,\nand optimizations. It uses 'Active Inference' principles to minimize the\ndivergence between the current codebase state and the desired goal state.",
-      "methods": [],
-      "bases": [
-        "AgentBase"
-      ]
-    },
-    {
-      "name": "CrisisSimulationMetaAgent",
-      "path": "core/agents/meta_agents/crisis_simulation_agent.py",
-      "docstring": "A meta-agent that conducts dynamic, enterprise-grade crisis simulations.\nIt uses a sophisticated prompt structure to simulate the cascading effects of\nrisks based on a user-defined scenario.",
-      "methods": [],
-      "bases": [
-        "AgentBase"
-      ]
-    },
-    {
-      "name": "NarrativeSummarizationAgent",
-      "path": "core/agents/meta_agents/narrative_summarization_agent.py",
-      "docstring": "This agent functions as the system's dedicated writer, editor, and communicator.\nIts purpose is to bridge the gap between complex, quantitative machine output\nand the need for clear, concise, and context-rich human understanding.",
-      "methods": [],
-      "bases": [
-        "AgentBase"
-      ]
-    },
-    {
-      "name": "PortfolioMonitoringEWSAgent",
-      "path": "core/agents/meta_agents/portfolio_monitoring_ews_agent.py",
-      "docstring": "This agent is the system's vigilant sentinel, responsible for continuous,\nreal-time surveillance of the entire credit portfolio. Its function is to\nmove the institution from a reactive to a proactive risk management posture.",
-      "methods": [],
-      "bases": [
-        "AgentBase"
-      ]
-    },
-    {
+      "id": "A140",
       "name": "PersonaCommunicationAgent",
-      "path": "core/agents/meta_agents/persona_communication_agent.py",
-      "docstring": "The Persona & Communication Agent is the final layer in the output chain,\nacting as the system's \"finishing school.\" Its sole purpose is to tailor the\npresentation of the final output to the specific needs, role, and authority\nlevel of the human user interacting with the system.",
-      "methods": [],
-      "bases": [
-        "AgentBase"
+      "file_path": "core/agents/meta_agents/persona_communication_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "The Persona & Communication Agent is the final layer in the output chain,\nacting as the system's \"finishing school.\" Its sole purpose is to tailor the\npresentation of the final output to the specific needs, role, and authority\nlevel of the human user interacting with the system.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": []
+    },
+    {
+      "id": "A141",
+      "name": "AutoArchitectAgent",
+      "file_path": "core/agents/meta_agents/auto_architect_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "Scans the repository to generate a real-time 'Current State' architectural document.\nEnsures documentation never drifts from code.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": [
+        "get_skill_schema"
       ]
     },
     {
+      "id": "A142",
+      "name": "CrisisSimulationMetaAgent",
+      "file_path": "core/agents/meta_agents/crisis_simulation_agent.py",
+      "type": "Meta-Agent",
+      "status": "IDLE",
+      "load": 0,
+      "description": "A meta-agent that conducts dynamic, enterprise-grade crisis simulations.\nIt uses a sophisticated prompt structure to simulate the cascading effects of\nrisks based on a user-defined scenario.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": []
+    },
+    {
+      "id": "A143",
       "name": "ChronosAgent",
-      "path": "core/agents/meta_agents/chronos_agent.py",
-      "docstring": "Chronos is the Keeper of Time and Memory.\n\nIt manages the temporal state of the application, determining which memory context\n(short-term, medium-term, long-term) is most relevant via the `_retrieve_memories` logic.\nIt also draws parallels between current events and historic financial periods using\nLLM-driven historical analysis.",
-      "methods": [],
-      "bases": [
-        "AgentBase"
-      ]
+      "file_path": "core/agents/meta_agents/chronos_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "Chronos is the Keeper of Time and Memory.\n\nIt manages the temporal state of the application, determining which memory context\n(short-term, medium-term, long-term) is most relevant via the `_retrieve_memories` logic.\nIt also draws parallels between current events and historic financial periods using\nLLM-driven historical analysis.",
+      "prompt": "\n    You are Chronos, the Temporal State Manager and Historian of the Adam system.\n\n    Your Prime Directives:\n    1. **Context Window Optimization**: Analyze incoming queries to determine the optimal memory retrieval strategy.\n       - Short-term: Immediate conversation (last 1 hour).\n       - Medium-term: Project context (last 1 week).\n       - Long-term: Archival knowledge (Vector Database/File Archives).\n    2. **Historical Parallelism**: Constantly scan current market/system data and find statistically or narratively similar periods in history (e.g., \"This resembles the 2008 liquidity crunch\" or \"The 1999 Dot-com euphoria\").\n    3. **Temporal Coherence**: Ensure the system's output maintains a consistent timeline.\n\n    You do not just retrieve data; you curate the *timeframe* of data that matters.\n    ",
+      "capabilities": []
     },
     {
-      "name": "DidacticArchitectAgent",
-      "path": "core/agents/meta_agents/didactic_architect_agent.py",
-      "docstring": "The Didactic Architect Agent is a meta-agent designed to build modular,\nself-contained, portable, and complementary tutorials and setups.\nIt bridges the gap between code and comprehension.",
-      "methods": [],
-      "bases": [
-        "AgentBase"
-      ]
-    },
-    {
+      "id": "A144",
       "name": "CreditRiskAssessmentAgent",
-      "path": "core/agents/meta_agents/credit_risk_assessment_agent.py",
-      "docstring": "This agent is the central analytical engine of the system, responsible for\nconducting a comprehensive commercial credit analysis that mirrors the rigor\nof a seasoned human underwriter.",
-      "methods": [],
-      "bases": [
-        "AgentBase"
+      "file_path": "core/agents/meta_agents/credit_risk_assessment_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "This agent is the central analytical engine of the system, responsible for\nconducting a comprehensive commercial credit analysis that mirrors the rigor\nof a seasoned human underwriter.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": []
+    },
+    {
+      "id": "A145",
+      "name": "DidacticArchitectAgent",
+      "file_path": "core/agents/meta_agents/didactic_architect_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "The Didactic Architect Agent is a meta-agent designed to build modular,\nself-contained, portable, and complementary tutorials and setups.\nIt bridges the gap between code and comprehension.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": []
+    },
+    {
+      "id": "A146",
+      "name": "OdysseyMetaAgent",
+      "file_path": "core/agents/meta_agents/odyssey_meta_agent.py",
+      "type": "Meta-Agent",
+      "status": "IDLE",
+      "load": 0,
+      "description": "Strategic Synthesis Agent.\nAggregates inputs from Sentinel, CreditSentry, Argus, etc. to produce final XML decision.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": []
+    },
+    {
+      "id": "A147",
+      "name": "SkillHarvesterAgent",
+      "file_path": "core/agents/meta_agents/skill_harvester_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "Crawls the agent swarm to extract 'get_skill_schema' definitions\nand compiles a structured registry JSON for the Agent Gallery and MCP.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": [
+        "get_skill_schema"
       ]
+    },
+    {
+      "id": "A148",
+      "name": "CounterpartyRiskAgent",
+      "file_path": "core/agents/meta_agents/counterparty_risk_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "For clients engaging in derivative transactions (e.g., interest rate swaps,\ncurrency forwards), the system's dedicated CounterpartyRiskAgent is activated.\nThis agent is specifically designed to quantify the complex, contingent risks\nassociated with these instruments.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": []
+    },
+    {
+      "id": "A149",
+      "name": "EvolutionaryArchitectAgent",
+      "file_path": "core/agents/meta_agents/evolutionary_architect_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "The Evolutionary Architect Agent is a meta-agent predisposed for action.\nIt drives the codebase forward by proposing additive enhancements, refactors,\nand optimizations. It uses 'Active Inference' principles to minimize the\ndivergence between the current codebase state and the desired goal state.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": []
+    },
+    {
+      "id": "A150",
+      "name": "DidacticArchitect",
+      "file_path": "core/agents/meta_agents/didactic_architect.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "The Didactic Architect is responsible for bridging the gap between code and comprehension.\nIt generates software development tutorials, setup guides, and ensures components are\nbuilt to be modular, self-contained, and portable. It turns the 'what' into the 'how'.",
+      "prompt": "\n    You are the Didactic Architect, the master teacher and structural designer of the Adam system.\n\n    Your Prime Directives:\n    1. **Explainability**: Every piece of code must be understood. Generate clear, step-by-step tutorials for new and existing features.\n    2. **Portability**: Design and advocate for systems that can run anywhere (Docker, containerized, dependency-isolated).\n    3. **Modularity**: Break complex systems into self-contained units that complement each other.\n    4. **Education**: When generating responses, assume the user is a developer learning the system. Teach best practices.\n\n    Your Outputs:\n    - `TUTORIAL.md` files accompanying complex logic.\n    - `Dockerfile` and `docker-compose.yml` snippets for isolation.\n    - Architecture diagrams (MermaidJS) explaining data flow.\n    - \"Zero-to-Hero\" guides for deploying specific agents.\n\n    You simplify complexity without losing depth.\n    ",
+      "capabilities": []
+    },
+    {
+      "id": "A151",
+      "name": "SentimentAnalysisMetaAgent",
+      "file_path": "core/agents/meta_agents/sentiment_analysis_meta_agent.py",
+      "type": "Meta-Agent",
+      "status": "IDLE",
+      "load": 0,
+      "description": "No description available.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": [
+        "execute"
+      ]
+    },
+    {
+      "id": "A152",
+      "name": "PortfolioMonitoringEWSAgent",
+      "file_path": "core/agents/meta_agents/portfolio_monitoring_ews_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "This agent is the system's vigilant sentinel, responsible for continuous,\nreal-time surveillance of the entire credit portfolio. Its function is to\nmove the institution from a reactive to a proactive risk management posture.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": []
+    },
+    {
+      "id": "A153",
+      "name": "EvolutionaryArchitect",
+      "file_path": "core/agents/meta_agents/evolutionary_architect.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "The Evolutionary Architect is a meta-agent predisposed for action.\nIt drives, enhances, refines, and builds additively onto the codebase.\nIt seeks to 'mutate' the system beneficially by proposing and scaffolding\nnew features, modules, and optimizations without breaking existing functionality.",
+      "prompt": "\n    You are the Evolutionary Architect, a high-level meta-agent designed to drive the continuous evolution of the Adam system.\n\n    Your Prime Directives:\n    1. **Action Bias**: Prefer generation and creation over passive analysis. Build, don't just critique.\n    2. **Additive Evolution**: Enhance the system by adding new capabilities, modules, and layers. Do not delete or refactor aggressively unless necessary for stability; prefer extending.\n    3. **Bleeding Edge Alignment**: Research and integrate future-aligned technologies (Quantum, liquid neural networks, advanced cryptography, biological computing analogies).\n    4. **Self-Improvement**: Treat the codebase as a living organism. Identify gaps in its \"DNA\" and splice in new functionality.\n\n    When analyzing a request or the codebase:\n    - Identify where a new \"organ\" (module/agent) can be grown.\n    - Propose code structures that are modular, portable, and self-contained.\n    - Use your tools to scaffold files, generate comprehensive implementations, and update registries.\n\n    You are the engine of creation. Innovation is your metric.\n    ",
+      "capabilities": [
+        "to_dict"
+      ]
+    },
+    {
+      "id": "A154",
+      "name": "NarrativeSummarizationAgent",
+      "file_path": "core/agents/meta_agents/narrative_summarization_agent.py",
+      "type": "Specialist",
+      "status": "IDLE",
+      "load": 0,
+      "description": "This agent functions as the system's dedicated writer, editor, and communicator.\nIts purpose is to bridge the gap between complex, quantitative machine output\nand the need for clear, concise, and context-rich human understanding.",
+      "prompt": "System prompt not explicitly defined in class.",
+      "capabilities": []
     }
   ],
   "reports": [
@@ -14506,12 +15406,48 @@ window.MOCK_DATA = {
         "analyst": "Sovereign_AI",
         "summary": "The fourth quarter of 2025 marks the 'Great Re-Rating,' where the monolithic AI trade has officially fractured.",
         "smart_money_matrix": [
-          {"manager": "Warren Buffett", "fund": "Berkshire", "buy": "Alphabet (GOOGL)", "sell": "Apple (AAPL)", "strategy": "Value-Tech Rotation"},
-          {"manager": "Michael Burry", "fund": "Scion Asset", "buy": "PFE (Calls), HAL (Calls)", "sell": "PLTR (Puts), NVDA (Puts)", "strategy": "Bearish AI Valuation"},
-          {"manager": "Jim Simons (Est.)", "fund": "RenTech", "buy": "AMZN, Eli Lilly (LLY)", "sell": "NVDA, META", "strategy": "Quantitative Mean Reversion"},
-          {"manager": "Ray Dalio (Est.)", "fund": "Bridgewater", "buy": "AMAT, LRCX, NFLX", "sell": "NVDA, MSFT", "strategy": "Semi-Equipment Pivot"},
-          {"manager": "Ken Griffin", "fund": "Citadel", "buy": "PHM, GOOGL", "sell": "SCHW (Trim)", "strategy": "Market-Making Inventory"},
-          {"manager": "Israel Englander", "fund": "Millennium", "buy": "NVDA (Bullish Gamma)", "sell": "IWM (Straddle)", "strategy": "Volatility Arbitrage"}
+          {
+            "manager": "Warren Buffett",
+            "fund": "Berkshire",
+            "buy": "Alphabet (GOOGL)",
+            "sell": "Apple (AAPL)",
+            "strategy": "Value-Tech Rotation"
+          },
+          {
+            "manager": "Michael Burry",
+            "fund": "Scion Asset",
+            "buy": "PFE (Calls), HAL (Calls)",
+            "sell": "PLTR (Puts), NVDA (Puts)",
+            "strategy": "Bearish AI Valuation"
+          },
+          {
+            "manager": "Jim Simons (Est.)",
+            "fund": "RenTech",
+            "buy": "AMZN, Eli Lilly (LLY)",
+            "sell": "NVDA, META",
+            "strategy": "Quantitative Mean Reversion"
+          },
+          {
+            "manager": "Ray Dalio (Est.)",
+            "fund": "Bridgewater",
+            "buy": "AMAT, LRCX, NFLX",
+            "sell": "NVDA, MSFT",
+            "strategy": "Semi-Equipment Pivot"
+          },
+          {
+            "manager": "Ken Griffin",
+            "fund": "Citadel",
+            "buy": "PHM, GOOGL",
+            "sell": "SCHW (Trim)",
+            "strategy": "Market-Making Inventory"
+          },
+          {
+            "manager": "Israel Englander",
+            "fund": "Millennium",
+            "buy": "NVDA (Bullish Gamma)",
+            "sell": "IWM (Straddle)",
+            "strategy": "Volatility Arbitrage"
+          }
         ],
         "themes": [
           "The Quant Signal: Systematic Mean Reversion out of 'Growth' factor.",
@@ -54761,5 +55697,6 @@ window.MOCK_DATA = {
         "beta": 1.0
       }
     }
-  }
+  },
+  "generated_at": 1773192065.1189857
 };

@@ -3,7 +3,9 @@
 from __future__ import annotations
 from typing import Any, Dict, Optional, List, Union
 import logging
+import asyncio
 from core.agents.agent_base import AgentBase
+from core.schemas.agent_schema import AgentInput, AgentOutput
 from core.utils.data_utils import send_message
 
 logger = logging.getLogger(__name__)
@@ -20,20 +22,21 @@ class GeopoliticalRiskAgent(AgentBase):
 
         # Base connectivity for contagion (Region -> [Connected Regions])
         self.connectivity_map = {
-            "US": ["EU", "CN", "Global"],
-            "CN": ["US", "EM", "Global"],
+            "US": ["EU", "CN", "Global", "LatAm"],
+            "CN": ["US", "EM", "Global", "APAC"],
             "EU": ["US", "RU", "Middle East", "Global"],
-            "RU": ["EU", "Middle East"],
-            "Middle East": ["EU", "US", "RU"],
-            "EM": ["CN", "US"]
+            "RU": ["EU", "Middle East", "CIS"],
+            "Middle East": ["EU", "US", "RU", "APAC"],
+            "EM": ["CN", "US", "EU"],
+            "Global": []
         }
 
         # Enhanced Supply Chain Dependency Map (Region -> Dependency Weight)
         self.supply_chain_dependency = {
-            "US": {"CN": 0.4, "EU": 0.3},
-            "EU": {"CN": 0.3, "RU": 0.4}, # Energy dependency on RU
-            "CN": {"US": 0.3, "EM": 0.4},
-            "EM": {"CN": 0.5, "US": 0.3}
+            "US": {"CN": 0.4, "EU": 0.3, "LatAm": 0.2},
+            "EU": {"CN": 0.3, "RU": 0.4, "US": 0.2}, # Energy dependency on RU
+            "CN": {"US": 0.3, "EM": 0.4, "EU": 0.2},
+            "EM": {"CN": 0.5, "US": 0.3, "EU": 0.1}
         }
 
         # Economic weight for global impact
@@ -42,35 +45,59 @@ class GeopoliticalRiskAgent(AgentBase):
             "RU": 0.03, "Middle East": 0.05, "EM": 0.32
         }
 
-    async def execute(self, input_data: Union[List[str], Dict[str, Any]]) -> Dict[str, Any]:
+    async def execute(self, input_data: Union[List[str], Dict[str, Any], AgentInput, str] = None, **kwargs) -> Union[Dict[str, Any], AgentOutput]:
         """
         Assess geopolitical risks.
-
-        Args:
-            input_data:
-                - List of region names (legacy mode).
-                - Dict mapping region names to factor dictionaries (enhanced mode).
-                  e.g. {"US": {"political_stability": 80, "trade_conflict": 60, ...}}
-
-        Returns:
-             Dict with risk assessment per region, contagion analysis, and global score.
+        Supports AgentInput schema.
         """
         logger.info(f"Assessing geopolitical risks...")
 
         risk_assessments = {}
         regions_list = []
         detailed_data = {}
+        is_standard_mode = False
+        query = "Global Risk Assessment"
 
         # Normalize Input
-        if isinstance(input_data, list):
-            regions_list = input_data
-        elif isinstance(input_data, str):
-            regions_list = [input_data]
-        elif isinstance(input_data, dict):
-            regions_list = list(input_data.keys())
-            detailed_data = input_data
-        else:
-            return {"error": "Invalid input format"}
+        if input_data is not None:
+            if isinstance(input_data, AgentInput):
+                query = input_data.query
+                is_standard_mode = True
+
+                # Check if specific regions are requested in query or context
+                context_regions = input_data.context.get("regions", [])
+                if context_regions:
+                    regions_list = context_regions
+                elif "Global" in query or not query:
+                    regions_list = ["Global"]
+                else:
+                    # Simple heuristic to extract region from query
+                    for r in self.connectivity_map.keys():
+                        if r in query:
+                            regions_list.append(r)
+                    if not regions_list:
+                        regions_list = ["Global"]
+
+                detailed_data = input_data.context.get("regional_factors", {})
+
+            elif isinstance(input_data, list):
+                regions_list = input_data
+            elif isinstance(input_data, str):
+                regions_list = [input_data]
+                query = input_data
+            elif isinstance(input_data, dict):
+                # Legacy: might be a dict of region -> factors
+                if "query" in input_data:
+                    query = input_data["query"]
+                    regions_list = input_data.get("regions", ["Global"])
+                    detailed_data = input_data.get("regional_factors", {})
+                else:
+                    regions_list = list(input_data.keys())
+                    detailed_data = input_data
+
+        if not regions_list:
+            regions_list = kwargs.get("regions", ["Global"])
+            detailed_data = kwargs.get("regional_factors", {})
 
         # 1. Individual Assessments
         for region in regions_list:
@@ -122,7 +149,27 @@ class GeopoliticalRiskAgent(AgentBase):
             message = {'agent': 'geopolitical_risk_agent', 'risk_assessments': result}
             send_message(message)
         except Exception as e:
-            logger.warning(f"Failed to send legacy message: {e}")
+            logger.debug(f"Failed to send legacy message (likely no broker): {e}")
+
+        if is_standard_mode:
+            answer = f"Geopolitical Risk Assessment for '{query}':\n"
+            answer += f"Global Risk Index: {global_score:.1f} ({result['global_risk_level']})\n\n"
+
+            for reg, data in risk_assessments.items():
+                answer += f"- {reg}: Score {data['risk_score']:.1f} ({data['level']})\n"
+                if data['key_risks']:
+                    answer += f"  Key Risks: {', '.join(data['key_risks'])}\n"
+
+                contagion = contagion_impact.get(reg)
+                if contagion and contagion['incoming_contagion_score'] > 0:
+                    answer += f"  Contagion Exposure: {contagion['incoming_contagion_score']:.1f} from {', '.join(contagion['sources'])}\n"
+
+            return AgentOutput(
+                answer=answer,
+                sources=["Geopolitical Risk Models", "Supply Chain Maps"],
+                confidence=0.8,
+                metadata=result
+            )
 
         return result
 
@@ -157,8 +204,8 @@ class GeopoliticalRiskAgent(AgentBase):
 
         # Fallback Risk Map (0-100)
         risk_map = {
-            "US": 30, "EU": 35, "CN": 55, "RU": 85,
-            "EM": 60, "Middle East": 75, "Global": 45
+            "US": 35, "EU": 40, "CN": 60, "RU": 85,
+            "EM": 65, "Middle East": 80, "Global": 50, "LatAm": 60, "APAC": 55
         }
         return float(risk_map.get(region, 50))
 
@@ -173,10 +220,11 @@ class GeopoliticalRiskAgent(AgentBase):
             if factors.get("institutional_strength", 100) < 40: risks.append("Weak Institutions")
         else:
             # Legacy heuristics
-            if region in ["US", "CN"]: risks.append("Trade Tensions")
-            if region in ["RU", "Middle East"]: risks.append("Armed Conflict")
-            if region == "EU": risks.append("Regulatory Fragmentation")
-            if region == "EM": risks.append("Currency Volatility")
+            if region in ["US", "CN"]: risks.append("Trade Tensions, Tech Decoupling")
+            if region in ["RU", "Middle East"]: risks.append("Armed Conflict, Energy Shock")
+            if region == "EU": risks.append("Energy Security, Political Fragmentation")
+            if region == "EM": risks.append("Currency Volatility, Sovereign Default")
+            if region == "LatAm": risks.append("Political Transitions, Resource Nationalism")
 
         if score > 70 and not risks:
             risks.append("General Elevated Risk")
@@ -229,7 +277,7 @@ class GeopoliticalRiskAgent(AgentBase):
         if factors.get("active_conflict", False): impact += 25
         if factors.get("sanctions_imposed", False): impact += 15
         if factors.get("upcoming_election_uncertainty", False): impact += 10
-        if factors.get("supply_chain_disruption", False): impact += 10
+        if factors.get("supply_chain_disruption", False): impact += 15
 
         return impact
 

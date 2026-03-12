@@ -2,38 +2,105 @@
 
 import json
 import logging
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Union
+
+from core.agents.agent_base import AgentBase
+from core.schemas.agent_schema import AgentInput, AgentOutput
 
 logger = logging.getLogger(__name__)
 
-class LegalAgent:
-    def __init__(self, knowledge_base_path="knowledge_base/Knowledge_Graph.json"):
+class LegalAgent(AgentBase):
+    def __init__(self, config: Dict[str, Any] = None, knowledge_base_path="knowledge_base/Knowledge_Graph.json", **kwargs):
         """
         Initializes the Legal Agent with access to legal knowledge
         and reasoning capabilities.
-
-        Args:
-            knowledge_base_path (str): Path to the knowledge base file.
         """
+        super().__init__(config or {}, **kwargs)
         self.knowledge_base_path = knowledge_base_path
         self.knowledge_base = self._load_knowledge_base()
 
     def _load_knowledge_base(self):
         """
         Loads the knowledge base from the JSON file.
-
-        Returns:
-            dict: The knowledge base data.
         """
         try:
             with open(self.knowledge_base_path, 'r') as file:
                 return json.load(file)
         except FileNotFoundError:
-            # logger.error(f"Knowledge base file not found: {self.knowledge_base_path}")
             return {}
         except json.JSONDecodeError:
-            # logger.error(f"Error decoding knowledge base JSON: {self.knowledge_base_path}")
             return {}
+
+    async def execute(self, input_data: Union[str, AgentInput, Dict[str, Any]] = None, **kwargs) -> Union[Dict[str, Any], AgentOutput]:
+        """
+        Executes legal analysis. Supports checking credit agreements, covenants, and fraud signals.
+        """
+        logger.info("Executing Legal Analysis...")
+
+        is_standard_mode = False
+        query = "Legal Analysis"
+        doc_text = ""
+        financials = {}
+        task = "review_agreement"
+
+        if input_data is not None:
+            if isinstance(input_data, AgentInput):
+                query = input_data.query
+                is_standard_mode = True
+
+                context = input_data.context
+                doc_text = context.get("document_text", query)
+                financials = context.get("financials", {})
+                task = context.get("task", "review_agreement")
+            elif isinstance(input_data, dict):
+                doc_text = input_data.get("document_text", "")
+                financials = input_data.get("financials", {})
+                task = input_data.get("task", "review_agreement")
+                kwargs.update(input_data)
+            elif isinstance(input_data, str):
+                doc_text = input_data
+                query = input_data
+
+        # Fallback to kwargs
+        if not doc_text: doc_text = kwargs.get("document_text", "")
+        if not financials: financials = kwargs.get("financials", {})
+        task = kwargs.get("task", task)
+
+        result = {}
+
+        if task == "review_agreement":
+            result = self.review_credit_agreement(doc_text)
+        elif task == "check_covenants":
+            result = self.check_covenants(financials)
+        elif task == "detect_fraud":
+            result = self.detect_fraud_signals(doc_text, financials)
+        else:
+            result = {"error": f"Unknown legal task: {task}"}
+
+        if is_standard_mode:
+            answer = f"Legal Analysis Report ({task}):\n\n"
+            if "error" in result:
+                answer += f"Error: {result['error']}"
+            elif task == "review_agreement":
+                answer += f"Risk Level: {result.get('risk_assessment')}\n"
+                answer += "Key Findings:\n" + "\n".join([f"- {f}" for f in result.get('key_findings', [])])
+            elif task == "check_covenants":
+                answer += f"Status: {result.get('covenant_status')}\n"
+                if result.get("violations"):
+                    answer += "Violations:\n" + "\n".join([f"- {v}" for v in result['violations']])
+            elif task == "detect_fraud":
+                answer += f"Fraud Risk Level: {result.get('fraud_risk_level')}\n"
+                if result.get("signals_detected"):
+                    answer += "Signals:\n" + "\n".join([f"- {s}" for s in result['signals_detected']])
+
+            return AgentOutput(
+                answer=answer,
+                sources=["Legal Knowledge Base", "Contract Logic"],
+                confidence=0.85 if "error" not in result else 0.0,
+                metadata=result
+            )
+
+        return result
 
     def review_credit_agreement(self, doc_text: str) -> Dict[str, Any]:
         """
@@ -160,7 +227,6 @@ class LegalAgent:
         return {"status": "Not implemented"}
 
     def analyze_legal_document(self, document_text):
-        # Forward to new method
         return self.review_credit_agreement(document_text)
 
     def assess_geopolitical_legal_impact(self, geopolitical_event):

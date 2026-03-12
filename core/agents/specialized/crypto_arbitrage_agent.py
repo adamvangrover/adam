@@ -1,7 +1,7 @@
 
 import asyncio
 import logging
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Union
 from pydantic import BaseModel, Field
 from datetime import datetime
 
@@ -13,6 +13,7 @@ except ImportError:
     logging.warning("CCXT not available. CryptoArbitrageAgent will operate in mock mode.")
 
 from core.agents.agent_base import AgentBase
+from core.schemas.agent_schema import AgentInput, AgentOutput
 
 # Pydantic Models
 class ArbitrageOpportunity(BaseModel):
@@ -85,29 +86,34 @@ class CryptoArbitrageAgent(AgentBase):
             logging.warning(f"Error fetching {symbol} from {exchange_id}: {e}")
             return None
 
-    async def execute(self, *args, **kwargs) -> Dict[str, Any]:
+    async def execute(self, input_data: Union[str, AgentInput, Dict[str, Any]] = None, **kwargs) -> Union[Dict[str, Any], AgentOutput]:
         """
         Executes the arbitrage scan.
-
-        Args:
-            symbols (List[str]): List of trading pairs (e.g. ['BTC/USDT']).
-            exchanges (List[str]): List of exchange IDs (e.g. ['binance', 'kraken']).
-            min_spread (float): Minimum spread % to report.
-
-        Returns:
-            Dict containing found opportunities.
+        Supports AgentInput.
         """
-        # Parse inputs using Pydantic
-        request_data = kwargs.copy()
-        # Handle case where args might pass a dict or object
-        if args and isinstance(args[0], dict):
-            request_data.update(args[0])
+        is_standard_mode = False
+        query = ""
+        request_data = {}
+
+        if input_data is not None:
+            if isinstance(input_data, AgentInput):
+                query = input_data.query
+                is_standard_mode = True
+                request_data = input_data.context
+            elif isinstance(input_data, dict):
+                request_data = input_data
+                kwargs.update(input_data)
+            elif isinstance(input_data, str):
+                query = input_data
+
+        # Merge kwargs
+        request_data.update(kwargs)
 
         try:
             request = ArbitrageRequest(**request_data)
         except Exception as e:
-            logging.error(f"Invalid input for CryptoArbitrageAgent: {e}")
-            return {"error": str(e)}
+            logging.error(f"Invalid input for CryptoArbitrageAgent: {e}. Using defaults.")
+            request = ArbitrageRequest()
 
         await self._init_exchanges(request.exchanges)
 
@@ -154,11 +160,28 @@ class CryptoArbitrageAgent(AgentBase):
 
         await self._close_exchanges()
 
-        return {
+        result = {
             "opportunities": [opp.model_dump() for opp in opportunities],
             "scan_timestamp": datetime.utcnow().isoformat(),
             "status": "success" if opportunities else "no_opportunities_found"
         }
+
+        if is_standard_mode:
+            answer = f"Crypto Arbitrage Scan Complete ({len(opportunities)} opportunities found):\n"
+            for opp in opportunities:
+                answer += f"- {opp.symbol}: Buy {opp.buy_exchange} ({opp.buy_price:.2f}) -> Sell {opp.sell_exchange} ({opp.sell_price:.2f}) | Spread: {opp.spread_percentage:.2f}%\n"
+
+            if not opportunities:
+                answer += "No opportunities found matching criteria."
+
+            return AgentOutput(
+                answer=answer,
+                sources=["CCXT" if CCXT_AVAILABLE else "Mock Data"],
+                confidence=1.0,
+                metadata=result
+            )
+
+        return result
 
     async def _fetch_price_wrapper(self, exchange_id: str, symbol: str):
         """Helper to unpack results for gather."""

@@ -61,10 +61,6 @@ class MarketSentimentAgent(AgentBase):
                 # Merge input_data into kwargs for backward compatibility if needed
                 kwargs.update(input_data)
 
-        # Fallback: Check kwargs for legacy usage where execute(param=val) was called
-        # The agent base wraps execute, so args/kwargs are passed through.
-        # But if input_data matches one of the expected types, we used it.
-
         logging.info(f"MarketSentimentAgent execution started. Mode: {'Standard' if is_standard_mode else 'Legacy'}")
 
         overall_sentiment, details = await self.analyze_sentiment()
@@ -77,7 +73,7 @@ class MarketSentimentAgent(AgentBase):
 
         # Optionally send to message broker if configured
         if hasattr(self, 'message_broker') and self.message_broker:
-            await self.send_message("system_monitor", result)  # Example target
+            await self.send_message("system_monitor", result)
 
         if is_standard_mode:
             return self._format_output(result, query)
@@ -106,7 +102,7 @@ class MarketSentimentAgent(AgentBase):
         return AgentOutput(
             answer=answer,
             sources=["SimulatedFinancialNewsAPI", "SimulatedPredictionMarketAPI", "SimulatedSocialMediaAPI"],
-            confidence=0.8, # Placeholder confidence
+            confidence=0.8,
             metadata=result
         )
 
@@ -339,10 +335,10 @@ if __name__ == "__main__":
         print("--- Test Standard Mode ---")
         input_obj = AgentInput(query="Market Check")
         result = await agent.execute(input_obj)
-        print(f"Result (Standard): {result}")
+        print(f"Result (Standard): {result.answer}")
 
         print("\n--- Test Legacy Mode ---")
-        result_legacy = await agent.execute() # Using default None input, relies on internal logic (or lack of kwargs)
-        print(f"Result (Legacy): {result_legacy}")
+        result_legacy = await agent.execute()
+        print(f"Result (Legacy): {result_legacy.get('sentiment_score')}")
 
     asyncio.run(main())

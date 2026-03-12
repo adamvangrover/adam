@@ -1,11 +1,14 @@
 # core/agents/macroeconomic_analysis_agent.py
 
 from __future__ import annotations
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 import logging
+import asyncio
 from core.agents.agent_base import AgentBase
+from core.schemas.agent_schema import AgentInput, AgentOutput
 from core.utils.data_utils import send_message
 
+logger = logging.getLogger(__name__)
 
 class MacroeconomicAnalysisAgent(AgentBase):
     """
@@ -16,50 +19,73 @@ class MacroeconomicAnalysisAgent(AgentBase):
     """
 
     def __init__(self, config: Dict[str, Any], **kwargs):
-        """
-        Initializes the MacroeconomicAnalysisAgent.
-
-        Args:
-            config: Configuration dictionary containing data sources and indicators.
-            **kwargs: Additional arguments for AgentBase (e.g., kernel).
-        """
         super().__init__(config, **kwargs)
-        # Defensive access to config
         self.data_sources = config.get('data_sources', {})
-        self.indicators = config.get('indicators', ['GDP', 'inflation'])  # Default indicators
+        self.indicators = config.get('indicators', ['GDP', 'inflation', 'unemployment'])
 
-    async def execute(self, **kwargs) -> Dict[str, Any]:
+    async def execute(self, input_data: Union[str, AgentInput, Dict[str, Any]] = None, **kwargs) -> Union[Dict[str, Any], AgentOutput]:
         """
         Executes the macroeconomic analysis workflow.
-
-        Args:
-            **kwargs: Context arguments (e.g. specific country or period).
-
-        Returns:
-            Dict[str, Any]: A dictionary containing insights and trend analysis.
+        Supports standard AgentInput schema.
         """
-        logging.info(f"MacroeconomicAnalysisAgent executing with context: {kwargs.keys()}")
+        logger.info("Executing MacroeconomicAnalysisAgent...")
 
-        # Delegate to the core analysis logic
-        # In a real async world, data fetching should be awaited.
-        # For now, we wrap the synchronous method.
-        insights = self.analyze_macroeconomic_data()
+        is_standard_mode = False
+        query = "Macroeconomic Analysis"
+        country = "US"
+        period = "current"
+
+        if input_data is not None:
+            if isinstance(input_data, AgentInput):
+                query = input_data.query
+                country = input_data.context.get("country", country)
+                period = input_data.context.get("period", period)
+                is_standard_mode = True
+            elif isinstance(input_data, dict):
+                country = input_data.get("country", country)
+                period = input_data.get("period", period)
+                kwargs.update(input_data)
+            elif isinstance(input_data, str):
+                query = input_data
+
+        country = kwargs.get("country", country)
+        period = kwargs.get("period", period)
+
+        insights = self.analyze_macroeconomic_data(country, period)
+
+        # Check if the user is asking for the specific 2026 Reflation thesis
+        if "reflation" in query.lower() or "2026" in query.lower():
+            insights["strategic_report"] = self.generate_reflation_report()
+
+        if is_standard_mode:
+            answer = f"Macroeconomic Analysis for {country} ({period}):\n\n"
+            answer += f"- GDP Trend: {insights.get('GDP_growth_trend', 'Unknown').title()}\n"
+            answer += f"- Inflation Outlook: {insights.get('inflation_outlook', 'Unknown').title()}\n"
+
+            if "strategic_report" in insights:
+                report = insights["strategic_report"]
+                answer += f"\n--- Strategic Outlook: {report['regime']} ---\n"
+                answer += f"Thesis: {report['core_thesis']}\n"
+                answer += "Drivers:\n"
+                for d in report['key_drivers']:
+                    answer += f"  - {d['factor']} ({d['impact']}): {d['mechanism']}\n"
+                answer += f"Implication: {report['strategic_implication']}\n"
+
+            return AgentOutput(
+                answer=answer,
+                sources=["Government Stats API", "Internal Economic Models"],
+                confidence=0.8,
+                metadata=insights
+            )
 
         return insights
 
-    def analyze_macroeconomic_data(self) -> Dict[str, Any]:
+    def analyze_macroeconomic_data(self, country: str = "US", period: str = "current") -> Dict[str, Any]:
         """
         Performs the analysis of macroeconomic data.
-
-        Returns:
-            Dict[str, Any]: Analysis results.
         """
-        logging.info("Analyzing macroeconomic data...")
+        logger.info(f"Analyzing macroeconomic data for {country}...")
 
-        insights = {}
-
-        # Fetch and analyze GDP
-        # Check if data source exists (Defensive Coding)
         stats_api = self.data_sources.get('government_stats_api')
 
         gdp_trend = "neutral"
@@ -67,44 +93,44 @@ class MacroeconomicAnalysisAgent(AgentBase):
 
         if stats_api:
             try:
-                # Fetch macroeconomic data
-                # Assuming these methods exist on the API object
-                gdp_growth = stats_api.get_gdp(country="US", period="quarterly")
-                inflation_rate = stats_api.get_inflation(country="US", period="monthly")
+                gdp_growth = stats_api.get_gdp(country=country, period="quarterly")
+                inflation_rate = stats_api.get_inflation(country=country, period="monthly")
 
-                # Analyze trends
                 gdp_trend = self.analyze_gdp_trend(gdp_growth)
                 inflation_outlook = self.analyze_inflation_outlook(inflation_rate)
             except Exception as e:
-                logging.error(f"Error fetching/analyzing stats: {e}")
+                logger.error(f"Error fetching/analyzing stats: {e}")
         else:
-            logging.warning("government_stats_api not configured. Using default/mock values.")
+            logger.warning("government_stats_api not configured. Using default/mock heuristic values.")
+            # Heuristic/Mock values for standard testing
+            if country == "US":
+                gdp_trend = "positive"
+                inflation_outlook = "sticky"
+            elif country == "EU":
+                gdp_trend = "neutral"
+                inflation_outlook = "cooling"
+            elif country == "CN":
+                gdp_trend = "slowing"
+                inflation_outlook = "deflationary"
 
-        # Generate insights
         insights = {
+            'country': country,
             'GDP_growth_trend': gdp_trend,
             'inflation_outlook': inflation_outlook,
-            'timestamp': "2024-Q1"  # Placeholder
+            'timestamp': "2025-Q1"
         }
 
-        # Send insights to message queue (Legacy support)
-        # In v23, the return value is used by the orchestrator/graph.
         try:
             message = {'agent': 'macroeconomic_analysis_agent', 'insights': insights}
             send_message(message)
         except Exception as e:
-            logging.warning(f"Legacy send_message failed: {e}")
+            logger.debug(f"Legacy send_message failed (no broker): {e}")
 
         return insights
 
     def analyze_gdp_trend(self, gdp_growth: Any) -> str:
-        """
-        Analyzes the trend of GDP growth.
-        """
-        # Placeholder logic
         if not gdp_growth:
             return "neutral"
-        # If gdp_growth is a dict with 'value' (as in test mocks)
         if isinstance(gdp_growth, dict) and 'value' in gdp_growth:
             val = gdp_growth['value']
             if val > 2.0:
@@ -114,19 +140,17 @@ class MacroeconomicAnalysisAgent(AgentBase):
         return "stable"
 
     def analyze_inflation_outlook(self, inflation_rate: Any) -> str:
-        """
-        Analyzes the inflation outlook.
-        """
-        # Placeholder logic
+        if not inflation_rate:
+             return "stable"
+        if isinstance(inflation_rate, dict) and 'value' in inflation_rate:
+             val = inflation_rate['value']
+             if val > 3.0: return "sticky/high"
+             if val < 1.0: return "cooling/deflationary"
         return "stable"
 
     def generate_reflation_report(self) -> Dict[str, Any]:
         """
         Generates the 'Reflationary Agentic Boom' narrative report.
-
-        This method serves as the logic core for the 2026 Strategy Showcase.
-        It synthesizes the conflict between AI-driven deflation (productivity)
-        and Sovereign-driven inflation (fiscal dominance/tariffs).
         """
         return {
             "regime": "Reflationary Agentic Boom",

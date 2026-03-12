@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 import logging
 from pydantic import BaseModel, Field
 from web3 import Web3
@@ -7,14 +7,9 @@ import math
 import asyncio
 
 from core.agents.agent_base import AgentBase
+from core.schemas.agent_schema import AgentInput, AgentOutput
 
 logger = logging.getLogger(__name__)
-
-class DeFiLiquidityAgentInput(BaseModel):
-    pool_address: str = Field(..., description="The address of the liquidity pool (e.g., Uniswap V2/V3 Pair).")
-    chain_id: int = Field(default=1, description="The Chain ID (1 for Ethereum Mainnet).")
-    initial_price: Optional[float] = Field(None, description="The price when liquidity was provided (for IL calc).")
-    current_price: Optional[float] = Field(None, description="The current price (for IL calc).")
 
 class DeFiLiquidityAgentOutput(BaseModel):
     pool_address: str
@@ -95,11 +90,53 @@ class DeFiLiquidityAgent(AgentBase):
             "liquidity_score": liquidity_score
         }
 
-    async def execute(self, pool_address: str, chain_id: int = 1, initial_price: Optional[float] = None, current_price: Optional[float] = None, **kwargs) -> Dict[str, Any]:
+    async def execute(self, input_data: Union[str, AgentInput, Dict[str, Any]] = None, **kwargs) -> Union[Dict[str, Any], AgentOutput]:
         """
         Executes the analysis logic.
+        Supports AgentInput.
         """
+        # Input Normalization
+        pool_address = ""
+        chain_id = 1
+        initial_price = None
+        current_price = None
+        is_standard_mode = False
+        query = ""
+
+        if input_data is not None:
+            if isinstance(input_data, AgentInput):
+                query = input_data.query
+                # Assume query contains address or context does
+                pool_address = query if query.startswith("0x") else ""
+                if input_data.context:
+                    pool_address = input_data.context.get("pool_address", pool_address)
+                    chain_id = input_data.context.get("chain_id", 1)
+                    initial_price = input_data.context.get("initial_price")
+                    current_price = input_data.context.get("current_price")
+                is_standard_mode = True
+            elif isinstance(input_data, dict):
+                pool_address = input_data.get("pool_address", "")
+                chain_id = input_data.get("chain_id", 1)
+                initial_price = input_data.get("initial_price")
+                current_price = input_data.get("current_price")
+                kwargs.update(input_data)
+            elif isinstance(input_data, str):
+                pool_address = input_data
+
+        # Fallback to kwargs
+        if not pool_address:
+            pool_address = kwargs.get("pool_address", "")
+        chain_id = kwargs.get("chain_id", chain_id)
+        if initial_price is None: initial_price = kwargs.get("initial_price")
+        if current_price is None: current_price = kwargs.get("current_price")
+
         logger.info(f"Analyzing liquidity pool: {pool_address} on chain {chain_id}")
+
+        if not pool_address:
+            msg = "No pool address provided."
+            if is_standard_mode:
+                return AgentOutput(answer=msg, confidence=0.0, metadata={"error": msg})
+            return {"error": msg}
 
         # 1. Get Reserves
         reserves = await self.get_pool_reserves(pool_address)
@@ -119,7 +156,7 @@ class DeFiLiquidityAgent(AgentBase):
         elif yield_data["estimated_apy"] > 0.10:
             recommendation = "DEPOSIT (Good Yield)"
 
-        output = DeFiLiquidityAgentOutput(
+        output_model = DeFiLiquidityAgentOutput(
             pool_address=pool_address,
             liquidity_metrics=reserves,
             impermanent_loss_pct=il_pct,
@@ -127,4 +164,20 @@ class DeFiLiquidityAgent(AgentBase):
             recommendation=recommendation
         )
 
-        return output.model_dump()
+        result_dict = output_model.model_dump()
+
+        if is_standard_mode:
+            answer = f"DeFi Liquidity Analysis for {pool_address}:\n"
+            answer += f"Recommendation: {recommendation}\n"
+            answer += f"Estimated APY: {yield_data['estimated_apy']*100:.2f}%\n"
+            if il_pct:
+                answer += f"Impermanent Loss: {il_pct:.2f}%\n"
+
+            return AgentOutput(
+                answer=answer,
+                sources=["On-Chain Data", "Internal Models"],
+                confidence=0.9,
+                metadata=result_dict
+            )
+
+        return result_dict

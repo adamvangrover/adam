@@ -1,9 +1,17 @@
 # core/agents/behavioral_economics_agent.py
 from core.agents.agent_base import AgentBase
-from typing import Any, Dict, List, Optional
+from core.schemas.agent_schema import AgentInput, AgentOutput
+from typing import Any, Dict, List, Optional, Union
 import logging
-from transformers import pipeline
 
+try:
+    from transformers import pipeline
+    TRANSFORMERS_AVAILABLE = True
+except ImportError:
+    TRANSFORMERS_AVAILABLE = False
+    logging.warning("Transformers library not available. BehavioralEconomicsAgent will use fallback logic.")
+
+logger = logging.getLogger(__name__)
 
 class BehavioralEconomicsAgent(AgentBase):
     """
@@ -12,25 +20,65 @@ class BehavioralEconomicsAgent(AgentBase):
 
     def __init__(self, config: Dict[str, Any], **kwargs):
         super().__init__(config, **kwargs)
-        # Initialization specific to this agent, e.g., loading bias models or patterns
-        self.bias_patterns = self.config.get("bias_patterns", {})
-        logging.info(f"BehavioralEconomicsAgent initialized with {len(self.bias_patterns)} bias patterns.")
-        # Load a pre-trained sentiment analysis model
-        self.sentiment_analyzer = pipeline(
-            "sentiment-analysis", model="distilbert-base-uncased-finetuned-sst-2-english")
 
-    async def execute(self, analysis_content: str, user_query_history: Optional[List[str]] = None) -> Dict[str, Any]:
+        # Expanded Bias Patterns
+        self.bias_patterns = self.config.get("bias_patterns", {
+            "market": {
+                "Herd Mentality": ["everyone is buying", "FOMO", "can't miss out", "moon"],
+                "Panic Selling": ["capitulation", "dumping", "get out now", "bloodbath"],
+                "Confirmation Bias": ["as I predicted", "told you so", "ignoring the FUD"],
+                "Anchoring": ["still down from ATH", "waiting for breakeven", "bounce back to 100"]
+            },
+            "user": {
+                "Overconfidence": ["guaranteed", "100% sure", "can't lose"],
+                "Loss Aversion": ["hold until green", "not a loss until you sell"],
+                "Recency Bias": ["it's been going up all week", "trend will continue forever"]
+            }
+        })
+
+        logger.info(f"BehavioralEconomicsAgent initialized with {len(self.bias_patterns.get('market', {})) + len(self.bias_patterns.get('user', {}))} bias patterns.")
+
+        if TRANSFORMERS_AVAILABLE:
+            try:
+                # Limit model instantiation if testing or low resource
+                self.sentiment_analyzer = pipeline("sentiment-analysis", model="distilbert-base-uncased-finetuned-sst-2-english", truncation=True, max_length=512)
+            except Exception as e:
+                logger.error(f"Failed to load sentiment model: {e}")
+                self.sentiment_analyzer = None
+        else:
+            self.sentiment_analyzer = None
+
+    async def execute(self, input_data: Union[str, AgentInput, Dict[str, Any]] = None, **kwargs) -> Union[Dict[str, Any], AgentOutput]:
         """
         Executes the behavioral analysis.
-
-        Args:
-            analysis_content (str): The content to analyze for market biases (e.g., news, social media text).
-            user_query_history (Optional[List[str]]): A list of recent user queries to analyze for user bias.
-
-        Returns:
-            Dict[str, Any]: A dictionary containing identified biases and insights.
+        Supports standard AgentInput.
         """
-        logging.info("Executing behavioral economics analysis...")
+        logger.info("Executing behavioral economics analysis...")
+
+        is_standard_mode = False
+        analysis_content = ""
+        user_query_history = []
+        query = "Behavioral Analysis"
+
+        if input_data is not None:
+            if isinstance(input_data, AgentInput):
+                query = input_data.query
+                analysis_content = input_data.context.get("analysis_content", query)
+                user_query_history = input_data.context.get("user_query_history", [])
+                is_standard_mode = True
+            elif isinstance(input_data, dict):
+                analysis_content = input_data.get("analysis_content", "")
+                user_query_history = input_data.get("user_query_history", [])
+                kwargs.update(input_data)
+            elif isinstance(input_data, str):
+                analysis_content = input_data
+
+        # Fallbacks to kwargs
+        if not analysis_content:
+            analysis_content = kwargs.get("analysis_content", "")
+        if not user_query_history:
+            user_query_history = kwargs.get("user_query_history", [])
+
         results = {
             "market_biases": [],
             "user_biases": [],
@@ -48,32 +96,47 @@ class BehavioralEconomicsAgent(AgentBase):
         # 3. Generate insights based on findings
         results["insights"] = self._generate_insights(results)
 
-        logging.info(
-            f"Behavioral economics analysis complete. Found {len(results['market_biases'])} market biases and {len(results['user_biases'])} user biases.")
+        logger.info(f"Behavioral economics analysis complete. Found {len(results['market_biases'])} market biases and {len(results['user_biases'])} user biases.")
+
+        if is_standard_mode:
+            answer = f"Behavioral Economics Analysis for '{query}':\n\n"
+            answer += results["insights"]
+
+            return AgentOutput(
+                answer=answer,
+                sources=["Sentiment Analysis", "Heuristic Bias Patterns"],
+                confidence=0.85 if self.sentiment_analyzer else 0.5,
+                metadata=results
+            )
+
         return results
 
     def _identify_market_biases(self, content: str) -> List[Dict[str, str]]:
         """
-        Identifies common market biases in a given text using sentiment analysis.
+        Identifies common market biases in a given text using sentiment analysis and patterns.
         """
         identified_biases = []
-        # Use the sentiment analyzer to get the sentiment of the text
-        sentiment_result = self.sentiment_analyzer(content)
-        sentiment_label = sentiment_result[0]['label']
-        sentiment_score = sentiment_result[0]['score']
 
-        if sentiment_label == 'NEGATIVE' and sentiment_score > 0.8:
-            identified_biases.append({
-                "bias": "Fear/Panic",
-                "evidence": f"High negative sentiment (score: {sentiment_score:.2f})"
-            })
-        elif sentiment_label == 'POSITIVE' and sentiment_score > 0.8:
-            identified_biases.append({
-                "bias": "Greed/Irrational Exuberance",
-                "evidence": f"High positive sentiment (score: {sentiment_score:.2f})"
-            })
+        if self.sentiment_analyzer:
+            try:
+                sentiment_result = self.sentiment_analyzer(content)
+                sentiment_label = sentiment_result[0]['label']
+                sentiment_score = sentiment_result[0]['score']
 
-        # Also run the simple pattern matching for other biases
+                if sentiment_label == 'NEGATIVE' and sentiment_score > 0.8:
+                    identified_biases.append({
+                        "bias": "Fear/Panic",
+                        "evidence": f"High negative sentiment (score: {sentiment_score:.2f})"
+                    })
+                elif sentiment_label == 'POSITIVE' and sentiment_score > 0.8:
+                    identified_biases.append({
+                        "bias": "Greed/Irrational Exuberance",
+                        "evidence": f"High positive sentiment (score: {sentiment_score:.2f})"
+                    })
+            except Exception as e:
+                logger.warning(f"Sentiment analysis failed during execution: {e}")
+
+        # Pattern matching
         for bias, patterns in self.bias_patterns.get("market", {}).items():
             for pattern in patterns:
                 if pattern.lower() in content.lower():
@@ -81,12 +144,14 @@ class BehavioralEconomicsAgent(AgentBase):
                         "bias": bias,
                         "evidence": f"Found pattern '{pattern}'"
                     })
-        return identified_biases
+
+        # Deduplicate
+        unique_biases = {v['bias']:v for v in identified_biases}.values()
+        return list(unique_biases)
 
     def _identify_user_biases(self, queries: List[str]) -> List[Dict[str, str]]:
         """
         Identifies cognitive biases in user query patterns.
-        Placeholder implementation.
         """
         identified_biases = []
         full_query_text = " ".join(queries).lower()
@@ -97,19 +162,20 @@ class BehavioralEconomicsAgent(AgentBase):
                         "bias": bias,
                         "evidence": f"Found pattern '{pattern}' in query history."
                     })
-        return identified_biases
+
+        unique_biases = {v['bias']:v for v in identified_biases}.values()
+        return list(unique_biases)
 
     def _generate_insights(self, analysis_results: Dict[str, Any]) -> str:
         """
         Generates a summary of insights based on the identified biases.
-        Placeholder implementation.
         """
         if not analysis_results["market_biases"] and not analysis_results["user_biases"]:
-            return "No significant cognitive biases detected."
+            return "No significant cognitive biases detected in the provided text or history."
 
         insight_text = "Behavioral Analysis Insights:\n"
         if analysis_results["market_biases"]:
-            insight_text += "- Market sentiment may be influenced by: "
+            insight_text += "- Market sentiment exhibits signs of: "
             insight_text += ", ".join(list(set([b["bias"] for b in analysis_results["market_biases"]]))) + ".\n"
         if analysis_results["user_biases"]:
             insight_text += "- User interaction patterns suggest potential for: "
