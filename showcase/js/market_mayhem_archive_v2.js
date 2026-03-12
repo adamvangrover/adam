@@ -41,7 +41,7 @@ class MarketMayhemController {
             this.renderOutlook();
             this.renderChart();
             this.renderFeatured();
-            this.renderArchive();
+            // this.renderArchive(); // Handled statically via Python generation for better SEO/Load
             this.renderSemanticCloud();
             this.setupEventHandlers();
             console.log("[MarketMayhem] Initialization Complete.");
@@ -51,15 +51,22 @@ class MarketMayhemController {
     }
 
     async loadData() {
-        const [strategic, market, archive] = await Promise.all([
-            fetch('data/strategic_command.json').then(r => r.json()).catch(() => null),
-            fetch('data/sp500_market_data.json').then(r => r.json()).catch(() => []),
-            fetch('data/market_mayhem_index.json').then(r => r.json()).catch(() => [])
-        ]);
+        try {
+            const [strategic, market, archive] = await Promise.all([
+                fetch('data/strategic_command.json').then(r => r.json()).catch(() => null),
+                fetch('data/sp500_market_data.json').then(r => r.json()).catch(() => null),
+                fetch('data/market_mayhem_index.json').then(r => r.json()).catch(() => null)
+            ]);
 
-        this.data.strategic = strategic;
-        this.data.market = market || [];
-        this.data.archive = archive || [];
+            this.data.strategic = strategic || window.STRATEGIC_COMMAND_DATA || null;
+            this.data.market = market || window.SP500_MARKET_DATA || [];
+            this.data.archive = archive || window.MARKET_MAYHEM_DATA || [];
+        } catch (e) {
+            console.warn("[MarketMayhem] Fetch failed, using static fallback data.", e);
+            this.data.strategic = window.STRATEGIC_COMMAND_DATA || null;
+            this.data.market = window.SP500_MARKET_DATA || [];
+            this.data.archive = window.MARKET_MAYHEM_DATA || [];
+        }
     }
 
     // --- Sidebar Rendering ---
