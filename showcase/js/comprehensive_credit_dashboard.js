@@ -1,6 +1,7 @@
 let memosData = [];
 let chartInstance = null;
 let monteCarloChartInstance = null;
+let consensusChartInstance = null;
 
 document.addEventListener('DOMContentLoaded', () => {
     fetch('data/unified_credit_memos.json')
@@ -13,8 +14,8 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('search-input').addEventListener('input', (e) => {
                 const term = e.target.value.toLowerCase();
                 const filtered = memosData.filter(m => {
-                    const name = (m.borrower_name || '').toLowerCase();
-                    const ticker = (m._metadata?.ticker || '').toLowerCase();
+                    const name = (m.borrower_name || m.companyName || '').toLowerCase();
+                    const ticker = (m._metadata?.ticker || m.ticker || '').toLowerCase();
                     return name.includes(term) || ticker.includes(term);
                 });
                 renderSidebar(filtered);
@@ -41,8 +42,8 @@ function renderSidebar(data = memosData) {
     }
 
     data.forEach(memo => {
-        const ticker = memo._metadata?.ticker || memo.borrower_name;
-        const name = memo.borrower_name;
+        const ticker = memo._metadata?.ticker || memo.ticker || memo.borrower_name || 'N/A';
+        const name = memo.borrower_name || memo.companyName || 'Unknown';
 
         const item = document.createElement('div');
         item.className = 'nav-item px-3 py-2 cursor-pointer hover:bg-slate-800 rounded transition text-sm flex justify-between items-center';
@@ -66,13 +67,13 @@ function selectMemo(memo) {
     document.getElementById('memo-container').classList.remove('hidden');
 
     // Header
-    document.getElementById('mc-name').textContent = memo.borrower_name || 'Unknown';
-    document.getElementById('mc-ticker').textContent = memo._metadata?.ticker || 'N/A';
-    document.getElementById('mc-sector').textContent = memo._metadata?.sector || memo.borrower_details?.sector || 'Unknown';
-    document.getElementById('mc-risk-score').textContent = memo._metadata?.risk_score || memo.risk_score || '--';
+    document.getElementById('mc-name').textContent = memo.borrower_name || memo.companyName || 'Unknown';
+    document.getElementById('mc-ticker').textContent = memo._metadata?.ticker || memo.ticker || 'N/A';
+    document.getElementById('mc-sector').textContent = memo._metadata?.sector || memo.sector || memo.borrower_details?.sector || 'Unknown';
+    document.getElementById('mc-risk-score').textContent = memo._metadata?.risk_score || memo.risk_score || (memo.financials?.historicals?.net_debt_to_ebitda < 2 ? 85 : 60) || '--';
 
     // Exec Summary
-    document.getElementById('mc-summary').innerHTML = (memo.executive_summary || 'No summary available.').replace(/\n/g, '<br>');
+    document.getElementById('mc-summary').innerHTML = (memo.executive_summary || memo.companyName + ' operates in ' + (memo.sector || 'the market') + ' sector.').replace(/\n/g, '<br>');
 
     // System 2
     const sys2 = memo.system_two_critique;
@@ -89,9 +90,19 @@ function selectMemo(memo) {
     }
     document.getElementById('mc-system2').innerHTML = sys2Html;
 
+
     // Core Metrics
     let metricsHtml = '';
-    if (memo.financial_ratios) {
+    if (memo.financials && memo.financials.historicals) {
+        const h = memo.financials.historicals;
+        metricsHtml += `
+            <div class="metric-card"><div class="text-slate-500 text-[10px] uppercase font-bold mb-1">Net Debt / EBITDA</div><div class="text-lg text-white mono">${h.net_debt_to_ebitda !== undefined ? h.net_debt_to_ebitda.toFixed(2) + 'x' : 'N/A'}</div></div>
+            <div class="metric-card"><div class="text-slate-500 text-[10px] uppercase font-bold mb-1">EBITDA Margin</div><div class="text-lg text-white mono">${h.ebitda_margin !== undefined ? (h.ebitda_margin * 100).toFixed(1) + '%' : 'N/A'}</div></div>
+            <div class="metric-card"><div class="text-slate-500 text-[10px] uppercase font-bold mb-1">FCF Conversion</div><div class="text-lg text-white mono">${h.fcf_conversion !== undefined ? (h.fcf_conversion * 100).toFixed(1) + '%' : 'N/A'}</div></div>
+            <div class="metric-card"><div class="text-slate-500 text-[10px] uppercase font-bold mb-1">Revenue 2024 (M)</div><div class="text-lg text-white mono">$${h.revenue_2024 ? h.revenue_2024.toLocaleString() : 'N/A'}</div></div>
+        `;
+    } else if (memo.financial_ratios) {
+
         const fr = memo.financial_ratios;
         metricsHtml += `
             <div class="metric-card"><div class="text-slate-500 text-[10px] uppercase font-bold mb-1">Leverage Ratio</div><div class="text-lg text-white mono">${fr.leverage_ratio ? fr.leverage_ratio.toFixed(2) + 'x' : 'N/A'}</div></div>
@@ -114,14 +125,21 @@ function selectMemo(memo) {
 
     // Sections
     let sectionsHtml = '';
+    let sectionChartIds = [];
     if (memo.sections && memo.sections.length > 0) {
         memo.sections.forEach(sec => {
             let icon = 'fa-file-alt';
             let color = 'text-slate-500';
             if (sec.title.includes('Valuation')) { icon = 'fa-calculator'; color = 'text-blue-500'; }
             if (sec.title.includes('Regulatory')) { icon = 'fa-balance-scale'; color = 'text-green-500'; }
-            if (sec.title.includes('System 2')) { icon = 'fa-brain'; color = 'text-purple-500'; }
+            if (sec.title.includes('System 2') || sec.title.includes('System 2 Critique')) { icon = 'fa-brain'; color = 'text-purple-500'; }
             if (sec.title.includes('Risk')) { icon = 'fa-exclamation-triangle'; color = 'text-orange-500'; }
+
+            // Extract canvas IDs for later chart rendering
+            const canvasMatch = sec.content.match(/<canvas id=['"]([^'"]+)['"]/);
+            if (canvasMatch) {
+                sectionChartIds.push(canvasMatch[1]);
+            }
 
             sectionsHtml += `
                 <div class="section-box">
@@ -134,14 +152,55 @@ function selectMemo(memo) {
         });
     }
     document.getElementById('mc-sections').innerHTML = sectionsHtml;
-
     // Financials Chart
     renderChart(memo);
     renderMonteCarloChart(memo);
+    renderConsensusChart(memo);
+
+    // Initialize custom section charts if they exist
+    sectionChartIds.forEach(id => {
+        const ctx = document.getElementById(id);
+        if (ctx) {
+            // Draw a simple chart to fill it based on dcfSensitivityMatrix
+            if (id.includes('dcf-chart') && memo.valuation && memo.valuation.dcfSensitivityMatrix) {
+                const dataPoints = memo.valuation.dcfSensitivityMatrix.map(m => m.implied_price);
+                const labels = memo.valuation.dcfSensitivityMatrix.map(m => `W:${(m.wacc*100).toFixed(1)}% TGR:${(m.tgr*100).toFixed(1)}%`);
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Implied Price',
+                            data: dataPoints,
+                            borderColor: 'rgba(59, 130, 246, 1)',
+                            backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                            fill: true,
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: { grid: { color: 'rgba(51, 65, 85, 0.5)' }, ticks: { color: '#94a3b8' } },
+                            x: { display: false }
+                        }
+                    }
+                });
+            }
+        }
+    });
 
     // DCF
     let dcfHtml = '';
-    if (memo.dcf_analysis) {
+    if (memo.valuation) {
+        const dcf = memo.valuation;
+        dcfHtml += `<div class="grid grid-cols-2 gap-2 text-xs mb-3">
+            <div class="bg-slate-800 p-2 rounded border border-slate-700"><span class="text-slate-400 block mb-1">Base Case EV</span> <span class="text-white font-bold mono">$${dcf.baseCaseEV.toLocaleString()}M</span></div>
+            <div class="bg-slate-800 p-2 rounded border border-slate-700"><span class="text-slate-400 block mb-1">Implied Value</span> <span class="text-blue-400 font-bold mono">$${dcf.dcfSensitivityMatrix[1]?.implied_price || '--'}</span></div>
+        </div>`;
+    } else if (memo.dcf_analysis) {
         const dcf = memo.dcf_analysis;
         dcfHtml = `
             <div class="grid grid-cols-2 gap-4 mb-4">
@@ -215,7 +274,30 @@ function selectMemo(memo) {
 
     // PD/LGD
     let pdHtml = '';
-    if (memo.pd_model) {
+    if (memo.regulatoryAnalysis && memo.regulatoryAnalysis.facilityRatings) {
+        const pd = memo.regulatoryAnalysis.facilityRatings[0];
+        pdHtml += `
+            <div class="flex justify-between items-center mb-3 border-b border-slate-700 pb-2">
+                <div>
+                    <div class="text-xs text-slate-400">Internal Rating</div>
+                    <div class="text-xl font-bold ${pd.internalRating?.includes('A') ? 'text-green-400' : 'text-orange-400'}">${pd.internalRating || 'N/A'}</div>
+                </div>
+                <div class="text-right">
+                    <div class="text-xs text-slate-400">Recovery Rating</div>
+                    <div class="text-xl font-bold text-white mono">${pd.rr || '--'}</div>
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-2 text-xs mb-3">
+                <div class="bg-slate-800 p-2 rounded"><span class="text-slate-400 block mb-1">PD</span> <span class="font-bold">${((pd.pd || 0) * 100).toFixed(4)}%</span></div>
+                <div class="bg-slate-800 p-2 rounded"><span class="text-slate-400 block mb-1">LGD</span> <span class="font-bold">${((pd.lgd || 0) * 100).toFixed(1)}%</span></div>
+            </div>
+            <div class="text-xs font-bold text-slate-300 uppercase tracking-widest mb-2 mt-2 border-t border-slate-700 pt-2">EL Simulation</div>
+            <div class="grid grid-cols-2 gap-2 text-xs">
+                <div class="bg-slate-800 p-2 rounded border border-orange-900/50"><span class="text-slate-400 block mb-1">Expected Loss</span> <span class="font-bold text-orange-400 mono">${((pd.el || 0) * 100).toFixed(4)}%</span></div>
+                <div class="bg-slate-800 p-2 rounded border border-orange-900/50"><span class="text-slate-400 block mb-1">RWA Impact</span> <span class="font-bold text-orange-400 text-[10px] leading-tight">${memo.regulatoryAnalysis.basel_iii_rwa_impact || 'N/A'}</span></div>
+            </div>
+        `;
+    } else if (memo.pd_model) {
         const pd = memo.pd_model;
         pdHtml += `
             <div class="flex justify-between items-center mb-3 border-b border-slate-700 pb-2">
@@ -251,7 +333,25 @@ function selectMemo(memo) {
 
     // Debt Facilities
     let debtHtml = '';
-    if (memo.debt_facilities && memo.debt_facilities.length > 0) {
+    if (memo.regulatoryAnalysis && memo.regulatoryAnalysis.facilityRatings) {
+        debtHtml = `<div class="space-y-2 max-h-48 overflow-y-auto custom-scrollbar pr-2">`;
+        memo.regulatoryAnalysis.facilityRatings.forEach(fac => {
+            debtHtml += `
+                <div class="bg-slate-800/50 border border-slate-700 p-2 rounded">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="font-bold text-slate-200 text-xs">${fac.facility || 'Facility'}</span>
+                        <span class="text-[10px] text-green-400 border border-green-800 px-1 rounded">${fac.internalRating || 'N/A'}</span>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2 text-[10px]">
+                        <div><span class="text-slate-500 block">PD</span><span class="mono">${(fac.pd * 100).toFixed(4)}%</span></div>
+                        <div><span class="text-slate-500 block">LGD</span><span class="mono">${(fac.lgd * 100).toFixed(1)}%</span></div>
+                        <div><span class="text-slate-500 block">EL</span><span class="mono">${(fac.el * 100).toFixed(4)}%</span></div>
+                    </div>
+                </div>
+            `;
+        });
+        debtHtml += `</div>`;
+    } else if (memo.debt_facilities && memo.debt_facilities.length > 0) {
         debtHtml = `<div class="space-y-2 max-h-48 overflow-y-auto custom-scrollbar pr-2">`;
         memo.debt_facilities.forEach(fac => {
             debtHtml += `
@@ -276,7 +376,20 @@ function selectMemo(memo) {
 
     // Peer Comps
     let peerHtml = '';
-    if (memo.peer_comps && memo.peer_comps.length > 0) {
+    if (memo.peers && memo.peers.length > 0) {
+        memo.peers.forEach(peer => {
+            peerHtml += `
+                <tr class="border-b border-slate-800 hover:bg-slate-800/50">
+                    <td class="p-2 text-cyan-400">${peer}</td>
+                    <td class="p-2 text-slate-300 truncate max-w-[120px]">--</td>
+                    <td class="p-2">--</td>
+                    <td class="p-2">--</td>
+                    <td class="p-2">--</td>
+                    <td class="p-2">--</td>
+                </tr>
+            `;
+        });
+    } else if (memo.peer_comps && memo.peer_comps.length > 0) {
         memo.peer_comps.forEach(peer => {
             peerHtml += `
                 <tr class="border-b border-slate-800 hover:bg-slate-800/50">
@@ -299,6 +412,48 @@ function renderChart(memo) {
     const ctx = document.getElementById('financialsChart');
     if (chartInstance) {
         chartInstance.destroy();
+    }
+
+    if (memo.financials && memo.financials.historicals) {
+        ctx.style.display = 'block';
+        const h = memo.financials.historicals;
+        const labels = ['2023', '2024'];
+        const revs = [h.revenue_2023 || 0, h.revenue_2024 || 0];
+
+        chartInstance = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Revenue',
+                        data: revs,
+                        backgroundColor: 'rgba(34, 211, 238, 0.2)',
+                        borderColor: 'rgba(34, 211, 238, 1)',
+                        borderWidth: 1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { labels: { color: '#94a3b8', font: { family: 'JetBrains Mono' } } }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(51, 65, 85, 0.5)' },
+                        ticks: { color: '#94a3b8', callback: function(value) { return '$' + value; } }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: '#94a3b8' }
+                    }
+                }
+            }
+        });
+        return;
     }
 
     if (!memo.historical_financials || memo.historical_financials.length === 0) {
@@ -366,6 +521,53 @@ function renderMonteCarloChart(memo) {
         monteCarloChartInstance.destroy();
     }
 
+    if (memo.financials && memo.financials.monte_carlo_forecasts && memo.financials.monte_carlo_forecasts.metrics) {
+        ctx.style.display = 'block';
+        const metrics = memo.financials.monte_carlo_forecasts.metrics;
+        const rev = metrics.revenue_2025;
+        const fcf = metrics.fcf_2025;
+
+        monteCarloChartInstance = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Revenue 2025', 'FCF 2025'],
+                datasets: [
+                    {
+                        label: 'P10',
+                        data: [rev.p10, fcf.p10],
+                        backgroundColor: 'rgba(255, 99, 132, 0.5)'
+                    },
+                    {
+                        label: 'P50',
+                        data: [rev.p50, fcf.p50],
+                        backgroundColor: 'rgba(54, 162, 235, 0.5)'
+                    },
+                    {
+                        label: 'P90',
+                        data: [rev.p90, fcf.p90],
+                        backgroundColor: 'rgba(75, 192, 192, 0.5)'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(51, 65, 85, 0.5)' },
+                        ticks: { color: '#94a3b8', callback: function(value) { return '$' + value; } }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: '#94a3b8' }
+                    }
+                }
+            }
+        });
+        return;
+    }
+
     if (!memo.dcf_analysis || !memo.dcf_analysis.monte_carlo_forecasts || memo.dcf_analysis.monte_carlo_forecasts.length === 0) {
         ctx.style.display = 'none';
         return;
@@ -410,4 +612,77 @@ function renderMonteCarloChart(memo) {
             }
         }
     });
+}
+
+function renderConsensusChart(memo) {
+    const ctx = document.getElementById('consensusChart');
+    const container = document.getElementById('mc-consensus-container');
+
+    if (consensusChartInstance) {
+        consensusChartInstance.destroy();
+    }
+
+    if (memo.financials && memo.financials.consensus_estimates) {
+        container.classList.remove('hidden');
+        const est = memo.financials.consensus_estimates;
+
+        // Assume est has revenue_2025, revenue_2026, eps_2025, eps_2026
+        const labels = ['2025E', '2026E'];
+        const revs = [est.revenue_2025 || 0, est.revenue_2026 || 0];
+        const eps = [est.eps_2025 || 0, est.eps_2026 || 0];
+
+        consensusChartInstance = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Revenue Est.',
+                        data: revs,
+                        backgroundColor: 'rgba(250, 204, 21, 0.4)',
+                        borderColor: 'rgba(250, 204, 21, 1)',
+                        borderWidth: 1,
+                        yAxisID: 'y'
+                    },
+                    {
+                        label: 'EPS Est.',
+                        data: eps,
+                        type: 'line',
+                        borderColor: 'rgba(244, 114, 182, 1)',
+                        backgroundColor: 'rgba(244, 114, 182, 0.2)',
+                        borderWidth: 2,
+                        yAxisID: 'y1'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { labels: { color: '#94a3b8', font: { family: 'JetBrains Mono' } } },
+                    tooltip: { mode: 'index', intersect: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        grid: { color: 'rgba(51, 65, 85, 0.5)' },
+                        ticks: { color: 'rgba(250, 204, 21, 0.8)', callback: function(value) { return '$' + value; } },
+                        position: 'left'
+                    },
+                    y1: {
+                        beginAtZero: false,
+                        grid: { display: false },
+                        ticks: { color: 'rgba(244, 114, 182, 0.8)', callback: function(value) { return '$' + value; } },
+                        position: 'right'
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: '#94a3b8' }
+                    }
+                }
+            }
+        });
+    } else {
+        container.classList.add('hidden');
+    }
 }

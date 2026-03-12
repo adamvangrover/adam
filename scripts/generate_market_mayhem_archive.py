@@ -26,7 +26,7 @@ SOURCE_DIRS = [
     "core/libraries_and_archives/generated_content"
 ]
 SHOWCASE_DIR = "showcase"
-ARCHIVE_FILE = "showcase/market_mayhem_archive_v24.html" # Updated to v24 to match previous file name usage
+ARCHIVE_FILE = "showcase/market_mayhem_archive.html"
 TEMPLATE_FILE = "showcase/templates/market_mayhem_report.html"
 DATA_FILE = "showcase/data/newsletter_data.json"
 
@@ -1033,345 +1033,396 @@ def generate_archive():
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ADAM v23.5 :: MARKET MAYHEM ARCHIVE</title>
     <link rel="stylesheet" href="css/style.css">
+    <!-- FontAwesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="js/nav.js" defer></script>
+    <script src="js/nav.js" defer data-root=".."></script>
+    <script src="js/market_mayhem_data_static.js"></script>
+    <script src="js/market_mayhem_archive_v2.js" defer></script>
+
     <style>
         :root {{
             --primary-color: #00f3ff;
-            --accent-color: #cc0000;
+            --secondary-color: #0aff60;
+            --danger-color: #ff3333;
             --bg-color: #050b14;
-            --panel-bg: rgba(15, 23, 42, 0.6);
+            --panel-bg: rgba(5, 11, 20, 0.95);
+            --border-color: #333;
             --text-primary: #e0e0e0;
+            --text-muted: #888;
         }}
-        body {{ margin: 0; background: var(--bg-color); color: var(--text-primary); font-family: 'Inter', sans-serif; overflow-x: hidden; }}
+
+        body {{
+            margin: 0;
+            background: var(--bg-color);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            overflow: hidden; /* App-like feel */
+        }}
+
         .mono {{ font-family: 'JetBrains Mono', monospace; }}
 
-        .cyber-header {{
-            height: 60px; display: flex; align-items: center; justify-content: space-between;
-            padding: 0 20px; border-bottom: 1px solid #333;
-            background: rgba(5, 11, 20, 0.95); position: sticky; top: 0; z-index: 100;
+        /* Top Navigation */
+        .top-nav {{
+            height: 50px;
+            background: rgba(0,0,0,0.8);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            justify-content: space-between;
+            z-index: 100;
         }}
 
-        .dashboard-grid {{
+        .nav-links a {{
+            color: var(--text-muted);
+            text-decoration: none;
+            margin-left: 20px;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: color 0.2s;
+        }}
+        .nav-links a:hover, .nav-links a.active {{ color: var(--primary-color); }}
+
+        /* Main Layout */
+        .app-container {{
             display: grid;
-            grid-template-columns: 250px 1fr;
-            min-height: calc(100vh - 60px);
+            grid-template-columns: 280px 1fr; /* Sidebar | Main */
+            height: calc(100vh - 50px);
         }}
 
-        .filters-panel {{
-            background: var(--panel-bg);
-            border-right: 1px solid #333;
-            padding: 20px;
-        }}
-
-        .content-panel {{
-            padding: 30px;
-            overflow-y: auto;
-        }}
-
-        .chart-container {{
+        /* Sidebar */
+        .sidebar {{
             background: rgba(0,0,0,0.3);
-            border: 1px solid #333;
-            border-radius: 8px;
+            border-right: 1px solid var(--border-color);
             padding: 20px;
-            margin-bottom: 30px;
-            height: 300px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
         }}
 
+        .sidebar-panel {{
+            border: 1px solid var(--border-color);
+            background: rgba(255,255,255,0.02);
+            padding: 15px;
+            border-radius: 4px;
+        }}
+
+        .sidebar-title {{
+            color: var(--primary-color);
+            font-size: 0.75rem;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #222;
+            padding-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+        }}
+
+        /* Metrics Grid */
+        .metric-row {{ display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.8rem; }}
+        .metric-label {{ color: var(--text-muted); }}
+        .metric-val {{ font-weight: bold; }}
+        .val-green {{ color: var(--secondary-color); }}
+        .val-red {{ color: var(--danger-color); }}
+
+        /* Risk Matrix */
+        .risk-grid {{ display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }}
+        .risk-cell {{
+            background: #111; border: 1px solid #333; padding: 8px;
+            text-align: center; font-size: 0.7rem; cursor: pointer;
+            transition: all 0.2s;
+        }}
+        .risk-cell:hover {{ border-color: var(--primary-color); transform: translateY(-2px); }}
+        .risk-high {{ color: var(--danger-color); border-color: #500; background: rgba(255, 51, 51, 0.1); }}
+        .risk-med {{ color: #f59e0b; border-color: #553300; background: rgba(245, 158, 11, 0.1); }}
+        .risk-low {{ color: var(--secondary-color); border-color: #005522; background: rgba(10, 255, 96, 0.1); }}
+
+        /* Main Content */
+        .main-content {{
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }}
+
+        /* Chart Section */
+        .chart-section {{
+            height: 350px;
+            background: rgba(0,0,0,0.2);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 15px;
+            position: relative;
+        }}
+
+        /* Featured & Cloud */
+        .featured-grid {{
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }}
+        .featured-card {{
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border-color);
+            padding: 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+        }}
+        .featured-card:hover {{
+            border-color: var(--primary-color);
+            background: rgba(0, 243, 255, 0.05);
+        }}
+        .featured-badge {{
+            position: absolute; top: 0; right: 0;
+            background: var(--primary-color); color: #000;
+            font-size: 0.6rem; padding: 2px 6px; font-weight: bold;
+        }}
+
+        .semantic-cloud {{
+            display: flex; flex-wrap: wrap; gap: 8px;
+            padding: 10px; background: rgba(0,0,0,0.2); border-radius: 4px;
+        }}
+        .tag {{
+            background: #111; border: 1px solid #333; color: #aaa;
+            padding: 4px 8px; font-size: 0.7rem; cursor: pointer;
+            border-radius: 10px; transition: all 0.2s;
+        }}
+        .tag:hover {{ border-color: var(--primary-color); color: #fff; }}
+
+        /* Archive Grid */
+        .archive-controls {{
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            align-items: center;
+        }}
+
+        .control-input {{
+            background: #000;
+            border: 1px solid var(--border-color);
+            color: white;
+            padding: 8px 12px;
+            font-family: 'JetBrains Mono';
+            font-size: 0.8rem;
+            border-radius: 4px;
+        }}
+
+        .control-input:focus {{ outline: none; border-color: var(--primary-color); }}
+
+        /* Archive Items */
         .archive-item {{
-            border: 1px solid #333; background: rgba(255, 255, 255, 0.03); padding: 20px;
-            display: flex; gap: 20px; transition: all 0.2s ease; margin-bottom: 15px;
+            border: 1px solid var(--border-color);
+            background: rgba(255, 255, 255, 0.02);
+            padding: 15px;
+            display: flex;
+            gap: 15px;
+            margin-bottom: 10px;
+            transition: all 0.2s ease;
             border-left: 3px solid #666;
+            align-items: center;
         }}
-        .archive-item:hover {{ border-color: var(--primary-color); background: rgba(0, 243, 255, 0.05); transform: translateX(5px); }}
-
-        .type-badge {{ font-size: 0.6rem; padding: 2px 6px; border-radius: 2px; font-weight: bold; font-family: 'JetBrains Mono'; background: #333; color: white; margin-left: 10px; }}
-
-        /* System Dashboard */
-        .system-dashboard {{
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
-            margin-bottom: 30px; background: rgba(0,0,0,0.4); border: 1px solid #333; padding: 20px; border-radius: 8px;
+        .archive-item:hover {{
+            border-color: var(--primary-color);
+            background: rgba(0, 243, 255, 0.05);
+            transform: translateX(2px);
         }}
-        .metric {{ display: flex; flex-direction: column; align-items: center; border-right: 1px solid #333; }}
-        .metric:last-child {{ border-right: none; }}
-        .metric .label {{ font-size: 0.7rem; color: #888; margin-bottom: 5px; letter-spacing: 1px; }}
-        .metric .value {{ font-size: 1.2rem; font-weight: bold; color: #fff; font-family: 'JetBrains Mono'; }}
 
-        .filter-group {{ margin-bottom: 20px; }}
-        .filter-label {{ font-size: 0.7rem; color: #888; text-transform: uppercase; margin-bottom: 8px; display: block; }}
-        .filter-select {{ width: 100%; background: #111; color: #fff; border: 1px solid #444; padding: 8px; font-family: 'JetBrains Mono'; border-radius: 4px; }}
-
-        .tag-cloud-item {{
-            display: inline-block; font-size: 0.75rem; color: #aaa; margin: 2px; padding: 2px 6px;
-            border: 1px solid #333; border-radius: 4px; cursor: pointer;
+        .type-badge {{
+            font-size: 0.6rem; padding: 2px 6px; border-radius: 2px;
+            font-weight: bold; font-family: 'JetBrains Mono';
+            background: #333; color: white; margin-left: 10px;
         }}
-        .tag-cloud-item:hover {{ border-color: var(--primary-color); color: var(--primary-color); }}
 
-        /* Types Colors */
+        .cyber-btn {{
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            padding: 6px 12px;
+            border: 1px solid #444;
+            color: var(--primary-color);
+            background: rgba(0,0,0,0.3);
+            text-decoration: none;
+            display: inline-block;
+            cursor: pointer;
+        }}
+        .cyber-btn:hover {{ border-color: var(--primary-color); background: rgba(0, 243, 255, 0.1); }}
+
+        /* Type Colors */
         .type-NEWSLETTER {{ border-left-color: #ffff00; }}
         .type-DEEP_DIVE {{ border-left-color: #cc0000; }}
         .type-MARKET_PULSE {{ border-left-color: #00f3ff; }}
         .type-HISTORICAL {{ border-left-color: #666; }}
+        .type-DAILY_BRIEFING {{ border-left-color: #0aff60; }}
+
+        /* Modal */
+        .modal-overlay {{
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85); backdrop-filter: blur(5px);
+            z-index: 1000; display: none; align-items: center; justify-content: center;
+        }}
+        .modal-content {{
+            width: 80%; max-width: 900px; height: 80%;
+            background: #0a0f18; border: 1px solid var(--primary-color);
+            display: grid; grid-template-columns: 2fr 1fr;
+            box-shadow: 0 0 30px rgba(0,243,255,0.2);
+        }}
+        .modal-main {{ padding: 30px; overflow-y: auto; border-right: 1px solid #333; }}
+        .modal-sidebar {{ padding: 20px; background: rgba(0,0,0,0.3); display: flex; flex-direction: column; gap: 20px; }}
+
     </style>
 </head>
 <body>
-    <header class="cyber-header">
-        <div style="display: flex; align-items: center; gap: 20px;">
-            <i class="fas fa-archive text-cyan-400"></i>
-            <h1 class="mono" style="margin: 0; font-size: 1.2rem; letter-spacing: 1px;">MARKET MAYHEM ARCHIVE</h1>
+    <!-- Top Nav -->
+    <nav class="top-nav">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <i class="fas fa-bars" style="color: #666;"></i>
+            <h1 class="mono" style="margin:0; font-size:1.1rem; letter-spacing: 2px;">MARKET MAYHEM ARCHIVE</h1>
         </div>
-        <div class="mono" style="font-size: 0.8rem; color: #666;">v24.0.2</div>
-    </header>
+        <div class="nav-links mono">
+            <a href="dashboard.html">DASHBOARD</a>
+            <a href="nexus.html">NEXUS</a>
+            <a href="terminal.html">TERMINAL</a>
+            <a href="#" class="active">ARCHIVE</a>
+            <a href="reports.html">REPORTS</a>
+        </div>
+        <div class="mono" style="font-size: 0.7rem; color: #444;">v24.2.0</div>
+    </nav>
 
-    <div class="dashboard-grid">
-        <aside class="filters-panel">
-            <div class="filter-group">
-                <label class="filter-label">Special Collections</label>
-                <div style="display: flex; flex-direction: column; gap: 5px;">
-                    <a href="market_mayhem_rebuild.html" class="cyber-btn" style="text-align:center; border-color: #00f3ff; color: #00f3ff;">SYSTEM 2 HUB</a>
-                    <a href="market_mayhem_conviction.html" class="cyber-btn" style="text-align:center;">CONVICTION PAPER</a>
-                    <a href="market_mayhem_repository.html" class="cyber-btn" style="text-align:center; border-color: #f59e0b; color: #f59e0b;">VISUAL REPOSITORY</a>
-                    <a href="portfolio_dashboard.html" class="cyber-btn" style="text-align:center; border-color: #33ff00; color: #33ff00;">PORTFOLIO DASHBOARD</a>
-                    <a href="macro_glitch_monitor.html" class="cyber-btn" style="text-align:center; border-color: #ff00ff; color: #ff00ff;">GLITCH MONITOR</a>
-                </div>
+    <div class="app-container">
+        <!-- Left Sidebar -->
+        <aside class="sidebar mono">
+
+            <!-- Strategic Command -->
+            <div id="strategicPanel" class="sidebar-panel">
+                <!-- Injected via JS -->
+                <div style="text-align:center; color:#666;">Loading Strategic Command...</div>
             </div>
 
-            <div class="filter-group">
-                <label class="filter-label">Search Intelligence</label>
-                <input type="text" id="searchInput" placeholder="Keywords..." class="filter-select" onkeyup="applyFilters()">
+            <!-- Top Conviction -->
+            <div id="convictionPanel" class="sidebar-panel">
+                <!-- Injected via JS -->
             </div>
 
-            <div class="filter-group">
-                <label class="filter-label">Sort By</label>
-                <select id="sortFilter" class="filter-select" onchange="applyFilters()">
-                    <option value="DATE_DESC">Date (Newest)</option>
-                    <option value="DATE_ASC">Date (Oldest)</option>
-                    <option value="QUALITY_DESC">Quality (Highest)</option>
-                    <option value="SENTIMENT_DESC">Sentiment (Highest)</option>
-                    <option value="SENTIMENT_ASC">Sentiment (Lowest)</option>
-                </select>
+            <!-- Watch List -->
+            <div id="watchListPanel" class="sidebar-panel">
+                <!-- Injected via JS -->
             </div>
 
-            <div class="filter-group">
-                <label class="filter-label">Fiscal Year</label>
-                <select id="yearFilter" class="filter-select" onchange="applyFilters()">
-                    <option value="ALL">ALL YEARS</option>
-                    {"".join([f'<option value="{y}">{y}</option>' for y in sorted(grouped.keys(), reverse=True)])}
-                    <option value="HISTORICAL">HISTORICAL</option>
-                </select>
+            <!-- Risk Matrix -->
+            <div id="sectorRiskPanel" class="sidebar-panel">
+                <!-- Injected via JS -->
             </div>
 
-            <div class="filter-group">
-                <label class="filter-label">Report Type</label>
-                <select id="typeFilter" class="filter-select" onchange="applyFilters()">
-                    <option value="ALL">ALL TYPES</option>
-                    <option value="NEWSLETTER">Newsletter</option>
-                    <option value="DEEP_DIVE">Deep Dive</option>
-                    <option value="COMPANY_REPORT">Company Report</option>
-                    <option value="MARKET_PULSE">Market Pulse</option>
-                </select>
-            </div>
-
-            <div class="filter-group">
-                <label class="filter-label">Top Entities</label>
-                <div>
-                    {tags_html}
-                </div>
-            </div>
         </aside>
 
-        <main class="content-panel">
-            <div class="system-dashboard">
-                <div class="metric">
-                    <span class="label">MARKET REGIME</span>
-                    <span class="value" style="color: {regime_color}">{market_regime}</span>
-                </div>
-                <div class="metric">
-                    <span class="label">SYSTEM HEALTH</span>
-                    <span class="value">OPTIMAL</span>
-                </div>
-                <div class="metric">
-                    <span class="label">ACTIVE AGENTS</span>
-                    <span class="value">{active_agents_count}</span>
-                </div>
-            </div>
+        <!-- Main Content -->
+        <main class="main-content">
 
-            <div class="chart-container">
+            <!-- Chart -->
+            <div class="chart-section">
+                <div style="position: absolute; top: 15px; left: 15px; z-index: 10;">
+                    <div class="mono" style="color: #00f3ff; font-size: 0.9rem;">SENTIMENT & FORWARD PROJECTION</div>
+                </div>
+                <div id="timePeriodControls" style="position: absolute; top: 15px; right: 15px; z-index: 10; display: flex; gap: 5px;">
+                     <button class="cyber-btn" data-period="1M">1M</button>
+                     <button class="cyber-btn" data-period="3M">3M</button>
+                     <button class="cyber-btn active" data-period="ALL">ALL</button>
+                </div>
                 <canvas id="sentimentChart"></canvas>
             </div>
 
-            <div id="archiveGrid">
-    """
-
-    for year in sorted(grouped.keys(), reverse=True):
-        for item in grouped[year]:
-            safe_title = item['title'].replace('"', "'").lower()
-            safe_summary = item['summary'].replace('"', "'").lower()
-            quality = item.get('quality', 0)
-            
-            # Badge Logic
-            badges = f'<span class="type-badge">{item["type"]}</span>'
-            if quality >= 90:
-                badges += '<span class="type-badge" style="background:#f59e0b; color:#000;">TOP RATED</span>'
-            if item.get("type") == "MARKET_OUTLOOK":
-                badges += '<span class="type-badge" style="background:#00f3ff; color:#000;">OUTLOOK</span>'
-
-            archive_html += f"""
-            <div class="archive-item type-{item['type']}" data-year="{year}" data-type="{item['type']}" data-title="{safe_title} {safe_summary}"
-                 data-date="{item['date']}" data-quality="{quality}" data-sentiment="{item['sentiment_score']}">
-                <div style="flex-grow: 1;">
-                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
-                        <span class="mono" style="font-size:0.7rem; color:#888;">{item['date']}</span>
-                        {badges}
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: {item['sentiment_score']} | CONV: {item.get('conviction', 50)} | SEM: {item.get('semantic_score', 0)}</span>
+            <!-- Featured & Cloud -->
+            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px;">
+                <div>
+                    <div class="mono" style="color: #888; font-size: 0.8rem; margin-bottom: 10px;">FEATURED INTELLIGENCE</div>
+                    <div id="featuredGrid" class="featured-grid">
+                        <!-- Injected via JS -->
                     </div>
-                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">{item['title']}</h3>
-                    <p style="margin:0; font-size:0.85rem; color:#aaa;">{item['summary']}</p>
                 </div>
-                <a href="{item['filename']}" class="cyber-btn" style="align-self:center;">ACCESS</a>
-            </div>
-            """
-
-    for item in historical:
-         safe_title = item['title'].replace('"', "'").lower()
-         safe_summary = item['summary'].replace('"', "'").lower()
-         archive_html += f"""
-            <div class="archive-item type-HISTORICAL" data-year="HISTORICAL" data-type="HISTORICAL" data-title="{safe_title} {safe_summary}">
-                <div style="flex-grow: 1;">
-                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
-                        <span class="mono" style="font-size:0.7rem; color:#888;">{item['date']}</span>
-                        <span class="type-badge">HISTORICAL</span>
+                <div>
+                    <div class="mono" style="color: #888; font-size: 0.8rem; margin-bottom: 10px;">SEMANTIC CLOUD</div>
+                    <div id="semanticCloud" class="semantic-cloud">
+                        <!-- Injected via JS -->
                     </div>
-                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">{item['title']}</h3>
-                    <p style="margin:0; font-size:0.85rem; color:#aaa;">{item['summary']}</p>
                 </div>
-                 <a href="{item['filename']}" class="cyber-btn" style="align-self:center;">ACCESS</a>
             </div>
-            """
 
-    archive_html += """
+            <!-- Filters -->
+            <div class="archive-controls">
+                <div style="flex-grow: 1;">
+                     <div class="mono" style="color: #00f3ff; font-size: 0.8rem; margin-bottom: 5px;">ARCHIVE FILTERS</div>
+                     <input type="text" id="searchInput" placeholder="Search Archives..." class="control-input" style="width: 100%;">
+                </div>
+                <div>
+                    <div class="mono" style="color: #888; font-size: 0.8rem; margin-bottom: 5px;">YEAR</div>
+                    <select id="yearFilter" class="control-input">
+                        <option value="all">All Years</option>
+                        {"".join([f'<option value="{y}">{y}</option>' for y in sorted(grouped.keys(), reverse=True)])}
+                        <option value="HISTORICAL">Historical</option>
+                    </select>
+                </div>
+                <div>
+                     <div class="mono" style="color: #888; font-size: 0.8rem; margin-bottom: 5px;">TYPE</div>
+                    <select id="typeFilter" class="control-input">
+                        <option value="all">All Types</option>
+                        <option value="NEWSLETTER">Newsletter</option>
+                        <option value="DAILY_BRIEFING">Daily Briefing</option>
+                        <option value="MARKET_PULSE">Market Pulse</option>
+                        <option value="HISTORICAL">Historical</option>
+                    </select>
+                </div>
+                 <div>
+                     <div class="mono" style="color: #888; font-size: 0.8rem; margin-bottom: 5px;">SORT</div>
+                    <select id="sortOrder" class="control-input">
+                        <option value="newest">Newest First</option>
+                        <option value="oldest">Oldest First</option>
+                        <option value="conviction">Highest Conviction</option>
+                        <option value="sentiment">Highest Sentiment</option>
+                    </select>
+                </div>
             </div>
+
+            <!-- Archive Items Grid (Injected) -->
+            <div id="archiveGrid" style="padding-bottom: 50px;">
+            </div>
+
         </main>
     </div>
 
-    <script>
-        const ctx = document.getElementById('sentimentChart').getContext('2d');
-        const chartData = {
-            labels: """ + json.dumps(dates) + """,
-            datasets: [
-                {
-                    label: 'Sentiment Score',
-                    data: """ + json.dumps(sentiments) + """,
-                    borderColor: '#00f3ff',
-                    backgroundColor: 'rgba(0, 243, 255, 0.1)',
-                    tension: 0.4,
-                    fill: true
-                },
-                {
-                    label: 'Conviction Score',
-                    data: """ + json.dumps(convictions) + """,
-                    borderColor: '#ff00ff',
-                    backgroundColor: 'rgba(255, 0, 255, 0.1)',
-                    borderDash: [5, 5],
-                    tension: 0.4,
-                    hidden: false
-                },
-                {
-                    label: 'Outlook Score',
-                    data: """ + json.dumps(outlook_scores) + """,
-                    borderColor: '#ffff00',
-                    backgroundColor: 'rgba(255, 255, 0, 0.1)',
-                    borderDash: [2, 2],
-                    tension: 0.4,
-                    hidden: false
-                },
-                {
-                    label: 'Moving Average (5p)',
-                    data: """ + json.dumps(moving_averages) + """,
-                    borderColor: '#ffffff',
-                    borderWidth: 2,
-                    pointRadius: 0,
-                    tension: 0.4,
-                    fill: false
-                }
-            ]
-        };
+    <!-- Report Modal -->
+    <div id="reportModal" class="modal-overlay">
+        <div class="modal-content">
+            <div id="modalMain" class="modal-main">
+                <!-- Content Injected Here -->
+            </div>
+            <div class="modal-sidebar">
+                <button class="cyber-btn" onclick="document.getElementById('reportModal').style.display='none'" style="align-self: flex-end;">CLOSE <i class="fas fa-times"></i></button>
 
-        new Chart(ctx, {
-            type: 'line',
-            data: chartData,
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { labels: { color: '#ccc', font: { family: 'JetBrains Mono' } } },
-                    title: { display: true, text: 'SENTIMENT TIMELINE', color: '#888', font: { family: 'JetBrains Mono' } }
-                },
-                scales: {
-                    y: { grid: { color: '#333' }, ticks: { color: '#666' } },
-                    x: { grid: { color: '#333' }, ticks: { display: false } }
-                }
-            }
-        });
+                <div class="sidebar-panel">
+                    <div class="sidebar-title">SYSTEM 2 CRITIQUE</div>
+                    <div id="modalCritique"></div>
+                </div>
 
-        function applyFilters() {
-            const search = document.getElementById('searchInput').value.toLowerCase();
-            const year = document.getElementById('yearFilter').value;
-            const type = document.getElementById('typeFilter').value;
-            const sort = document.getElementById('sortFilter') ? document.getElementById('sortFilter').value : 'DATE_DESC';
+                <div class="sidebar-panel">
+                    <div class="sidebar-title">ALPHA GENERATION (Simulated)</div>
+                    <div id="alphaStats" style="font-size:0.8rem; margin-bottom:10px;"></div>
+                    <div style="height: 100px;">
+                        <canvas id="alphaChart"></canvas>
+                    </div>
+                </div>
 
-            const container = document.getElementById('archiveGrid');
-            const items = Array.from(document.querySelectorAll('.archive-item'));
-
-            items.forEach(item => {
-                const itemYear = item.dataset.year;
-                const itemType = item.dataset.type;
-                const itemText = item.dataset.title;
-
-                let matchSearch = itemText.includes(search);
-                let matchYear = year === 'ALL' || itemYear === year;
-                let matchType = type === 'ALL' || itemType === type;
-
-                item.style.display = (matchSearch && matchYear && matchType) ? 'flex' : 'none';
-            });
-
-            // Sorting
-            const visibleItems = items.filter(i => i.style.display !== 'none');
-            visibleItems.sort((a, b) => {
-                if (sort === 'DATE_DESC') {
-                    return b.dataset.date.localeCompare(a.dataset.date);
-                } else if (sort === 'DATE_ASC') {
-                    return a.dataset.date.localeCompare(b.dataset.date);
-                } else if (sort === 'QUALITY_DESC') {
-                    return parseInt(b.dataset.quality) - parseInt(a.dataset.quality);
-                } else if (sort === 'SENTIMENT_DESC') {
-                    return parseInt(b.dataset.sentiment) - parseInt(a.dataset.sentiment);
-                } else if (sort === 'SENTIMENT_ASC') {
-                    return parseInt(a.dataset.sentiment) - parseInt(b.dataset.sentiment);
-                }
-                return 0;
-            });
-
-            visibleItems.forEach(item => container.appendChild(item));
-        }
-
-        function setSearch(term) {
-            document.getElementById('searchInput').value = term;
-            applyFilters();
-        }
-
-        // Initialize from URL params
-        window.addEventListener('DOMContentLoaded', () => {
-            const params = new URLSearchParams(window.location.search);
-            const search = params.get('search');
-            if (search) {
-                setSearch(search);
-            }
-        });
-    </script>
+                <div id="modalMeta"></div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
     """
