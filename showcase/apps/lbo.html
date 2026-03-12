@@ -292,7 +292,7 @@
              const exitEquity = exitVal - exitNetDebt;
 
              const moic = exitEquity / sponsorEquity;
-             const irr = Math.pow(moic, 1/5) - 1;
+             const irr = Math.pow(Math.max(0, moic), 1/5) - 1; // Prevent NaN on total wipeout
 
              return { irr, moic, proj, sponsorEquity, totalUses, ev };
         }
@@ -337,8 +337,10 @@
             document.getElementById('src-equity-pct').innerText = fmtPct(res.sponsorEquity/res.totalUses);
 
             // KPIs
-            document.getElementById('kpi-irr').innerText = fmtPct(res.irr);
+            document.getElementById('kpi-irr').innerText = res.irr > -1 ? fmtPct(res.irr) : "WIPEOUT";
+            document.getElementById('kpi-irr').className = `text-2xl font-bold mt-1 font-mono ${res.irr > 0.20 ? 'text-green-400' : (res.irr > 0.10 ? 'text-yellow-400' : 'text-red-500')}`;
             document.getElementById('kpi-moic').innerText = fmtX(res.moic);
+            document.getElementById('kpi-moic').className = `text-xl font-bold mt-1 font-mono ${res.moic > 2.0 ? 'text-green-400' : (res.moic > 1.0 ? 'text-yellow-400' : 'text-red-500')}`;
 
             // Table
             const tbody = document.getElementById('lbo-body');
@@ -346,7 +348,7 @@
                 <tr><td>EBITDA</td>${lastProj.map(p=>`<td class="text-right text-gray-400">${fmtMoney(p.ebitda)}</td>`).join('')}</tr>
                 <tr><td>Senior Debt</td>${lastProj.map(p=>`<td class="text-right text-red-300">${fmtMoney(p.senior)}</td>`).join('')}</tr>
                 <tr><td>Sub Debt (PIK)</td>${lastProj.map(p=>`<td class="text-right text-red-400">${fmtMoney(p.sub)}</td>`).join('')}</tr>
-                <tr class="font-bold text-purple-400"><td>Equity Val</td>${lastProj.map(p=>`<td class="text-right">${fmtMoney(p.equity)}</td>`).join('')}</tr>
+                <tr class="font-bold bg-purple-900/10"><td class="text-purple-400 pl-1">Equity Val</td>${lastProj.map(p=>`<td class="text-right ${p.equity > 0 ? 'text-purple-300' : 'text-red-500'}">${fmtMoney(p.equity)}</td>`).join('')}</tr>
             `;
 
             // Chart

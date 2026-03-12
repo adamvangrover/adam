@@ -138,14 +138,29 @@
         lucide.createIcons();
 
         let comps = [
-            { id: 1, ticker: 'COMP A', price: 50.0, shares: 100, netDebt: 500, ebitda: 600, eps: 4.5 },
-            { id: 2, ticker: 'COMP B', price: 120.0, shares: 50, netDebt: 200, ebitda: 400, eps: 8.0 },
-            { id: 3, ticker: 'COMP C', price: 25.0, shares: 200, netDebt: 1000, ebitda: 800, eps: 2.0 },
+            { id: 1, ticker: 'AAPL', price: 185.00, shares: 15300, netDebt: 55000, ebitda: 125000, eps: 6.13 },
+            { id: 2, ticker: 'MSFT', price: 401.72, shares: 7430, netDebt: 30346, ebitda: 160165, eps: 11.06 },
+            { id: 3, ticker: 'GOOGL', price: 140.00, shares: 12500, netDebt: -90000, ebitda: 95000, eps: 5.80 },
         ];
         let nextId = 4;
 
         function fmtMoney(n) { return n.toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1}); }
         function fmtMult(n) { return isFinite(n) ? n.toFixed(1) + 'x' : '-'; }
+
+        async function fetchSimulatedData(ticker) {
+            // Simulate an API call to a market data provider
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    const seed = ticker.charCodeAt(0) + ticker.charCodeAt(ticker.length-1);
+                    const price = 50 + (seed % 200) + Math.random() * 20;
+                    const shares = 100 + (seed % 1000) * 10;
+                    const netDebt = (seed % 500) * 100 * (Math.random() > 0.5 ? 1 : -0.2);
+                    const ebitda = (seed % 300) * 50 + 100;
+                    const eps = price / (15 + Math.random() * 15); // P/E between 15-30
+                    resolve({ price, shares, netDebt, ebitda, eps });
+                }, 400); // 400ms delay
+            });
+        }
 
         function render() {
             const tbody = document.getElementById('comps-body');
@@ -199,9 +214,24 @@
             lucide.createIcons();
         }
 
-        function addRow() {
-            comps.push({ id: nextId++, ticker: 'NEW', price: 10, shares: 100, netDebt: 0, ebitda: 50, eps: 1 });
+        async function addRow() {
+            const newId = nextId++;
+            const ticker = prompt("Enter Ticker Symbol (e.g., NVDA, AMZN):", "NEW");
+            if (!ticker) return;
+
+            // Add placeholder row
+            comps.push({ id: newId, ticker: ticker.toUpperCase(), price: 0, shares: 0, netDebt: 0, ebitda: 0, eps: 0, _loading: true });
             render();
+
+            // Fetch data
+            const data = await fetchSimulatedData(ticker);
+
+            // Update row
+            const idx = comps.findIndex(c => c.id === newId);
+            if (idx > -1) {
+                comps[idx] = { id: newId, ticker: ticker.toUpperCase(), ...data };
+                render();
+            }
         }
 
         function deleteRow(id) {
@@ -221,6 +251,18 @@
         function exportCSV() {
             let csv = "Ticker,Price,Shares,Net Debt,EBITDA,EPS,Market Cap,EV,EV/EBITDA,P/E\n";
             comps.forEach(c => {
+                if (c._loading) {
+                    const tr = document.createElement('tr');
+                    tr.className = 'animate-pulse bg-blue-900/10';
+                    tr.innerHTML = `
+                        <td class="text-center"><i data-lucide="loader-2" class="w-3 h-3 text-blue-400 animate-spin mx-auto"></i></td>
+                        <td class="text-white font-bold pl-1">${c.ticker}</td>
+                        <td colspan="9" class="text-center text-gray-500 text-[10px]">Fetching real-time market data...</td>
+                    `;
+                    tbody.appendChild(tr);
+                    return;
+                }
+
                 const mktCap = c.price * c.shares;
                 const ev = mktCap + c.netDebt;
                 const evEbitda = c.ebitda ? ev / c.ebitda : 0;

@@ -12,6 +12,8 @@
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="js/nav.js" defer></script>
+    <script src="js/market_mayhem_data_static.js" defer></script>
+    <script src="js/market_mayhem_archive_v2.js" defer></script>
 
     <style>
         :root {
@@ -223,6 +225,26 @@
         <!-- Left Sidebar -->
         <aside class="sidebar mono">
 
+            <!-- Real-time Pipeline Status -->
+            <div class="sidebar-panel">
+                <div class="sidebar-title">
+                    <span>LIVE PIPELINE STATUS</span>
+                    <i class="fas fa-satellite-dish" style="color: var(--secondary-color);"></i>
+                </div>
+                <div style="font-size: 0.8rem; margin-bottom: 8px; display: flex; justify-content: space-between;">
+                    <span style="color: #888;">Data Ingestion</span>
+                    <span style="color: var(--secondary-color);">ONLINE</span>
+                </div>
+                <div style="font-size: 0.8rem; margin-bottom: 8px; display: flex; justify-content: space-between;">
+                    <span style="color: #888;">Risk Models</span>
+                    <span style="color: var(--secondary-color);">SYNCED</span>
+                </div>
+                <div style="font-size: 0.8rem; display: flex; justify-content: space-between;">
+                    <span style="color: #888;">System 2 Reflector</span>
+                    <span style="color: var(--primary-color);">ACTIVE</span>
+                </div>
+            </div>
+
             <!-- Strategic Command -->
             <div class="sidebar-panel">
                 <div class="sidebar-title">
@@ -353,15 +375,31 @@
         <!-- Main Content -->
         <main class="main-content">
 
-            <!-- Chart -->
+            <!-- Chart & Widgets -->
             <div class="chart-section">
                 <div style="position: absolute; top: 15px; left: 15px; z-index: 10;">
                     <div class="mono" style="color: #00f3ff; font-size: 0.9rem;">SENTIMENT & FORWARD PROJECTION</div>
+                    <div class="mono" style="color: #888; font-size: 0.7rem; margin-top: 4px;">System 2 Reflector: Alpha Assessment Active</div>
                 </div>
-                <div style="position: absolute; top: 15px; right: 15px; z-index: 10;">
-                     <div class="mono" style="color: #666; font-size: 0.7rem;">AI MODEL: ADAM-v23.5</div>
+                <div style="position: absolute; top: 15px; right: 15px; z-index: 10; display: flex; gap: 15px; text-align: right;">
+                    <div class="chart-controls" id="timePeriodControls" style="margin-right: 20px;">
+                        <button class="active" data-period="1M">1M</button>
+                        <button data-period="3M">3M</button>
+                        <button data-period="1Y">1Y</button>
+                        <button data-period="ALL">ALL</button>
+                    </div>
+                    <div>
+                        <div class="mono" style="color: #0aff60; font-size: 0.7rem;">SYSTEM CONFIDENCE</div>
+                        <div class="mono" style="color: #fff; font-size: 1rem; font-weight: bold;" id="systemConfidenceValue">87.4%</div>
+                    </div>
+                    <div>
+                        <div class="mono" style="color: #ff3366; font-size: 0.7rem;">MACRO VOLATILITY</div>
+                        <div class="mono" style="color: #fff; font-size: 1rem; font-weight: bold;">ELEVATED</div>
+                    </div>
                 </div>
-                <canvas id="sentimentChart"></canvas>
+                <div style="padding-top: 50px;">
+                    <canvas id="sentimentChart"></canvas>
+                </div>
             </div>
 
             <!-- Filters -->

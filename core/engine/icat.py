@@ -175,7 +175,22 @@ class ICATEngine:
 
         # Forecast Assumptions
         if forecast_assumptions is None and 'forecast_assumptions' in raw_data:
-            forecast_assumptions = ForecastAssumptions(**raw_data['forecast_assumptions'])
+            # Ensure lists and convert numpy types if needed
+            fa_data = raw_data['forecast_assumptions'].copy() # Copy to avoid mutation issues
+
+            def ensure_list(val, length=5):
+                if isinstance(val, (float, int, np.floating, np.integer)):
+                    return [float(val)] * length
+                if isinstance(val, list):
+                    if len(val) < length:
+                        return val + [val[-1]] * (length - len(val))
+                    return [float(x) for x in val[:length]]
+                return [0.05] * length # Default
+
+            fa_data['revenue_growth'] = ensure_list(fa_data.get('revenue_growth'), 5)
+            fa_data['ebitda_margin'] = ensure_list(fa_data.get('ebitda_margin'), 5)
+
+            forecast_assumptions = ForecastAssumptions(**fa_data)
         elif forecast_assumptions is None:
             # Default fallback if missing
             forecast_assumptions = ForecastAssumptions(
@@ -329,6 +344,12 @@ class ICATEngine:
         current_revenue = latest.get('revenue', ebitda/0.25 if ebitda else 100)
 
         dcf_sum = 0.0
+        # If assumptions provided as single floats, create list
+        if isinstance(assumptions.revenue_growth, float):
+             assumptions.revenue_growth = [assumptions.revenue_growth] * 5
+        if isinstance(assumptions.ebitda_margin, float):
+             assumptions.ebitda_margin = [assumptions.ebitda_margin] * 5
+
         years = len(assumptions.revenue_growth)
 
         for i in range(years):

@@ -132,7 +132,7 @@
         <main class="col-span-8 flex flex-col gap-4 overflow-y-auto pr-2 custom-scroll">
 
              <!-- Summary Cards -->
-             <div class="grid grid-cols-3 gap-3">
+             <div class="grid grid-cols-4 gap-3">
                  <div class="glass-panel p-3 rounded text-center">
                      <div class="text-gray-500 text-[9px] uppercase">Total Capitalization</div>
                      <div class="text-xl font-bold text-white mt-1" id="total-cap">$0.0M</div>
@@ -145,19 +145,30 @@
                      <div class="text-gray-500 text-[9px] uppercase">Annual Interest (Cash)</div>
                      <div class="text-xl font-bold text-green-400 mt-1" id="annual-int">$0.0M</div>
                  </div>
+                 <div class="glass-panel p-3 rounded text-center border-red-500/20 bg-red-900/10">
+                     <div class="text-red-400 text-[9px] uppercase font-bold">Total Expected Loss</div>
+                     <div class="text-xl font-bold text-red-300 mt-1" id="expected-loss">$0.0M</div>
+                 </div>
              </div>
 
              <!-- Charts Row -->
              <div class="grid grid-cols-2 gap-3 h-64">
                  <div class="glass-panel p-3 rounded flex flex-col">
-                     <div class="text-[10px] text-gray-400 mb-2 font-bold uppercase">Capital Structure</div>
+                     <div class="text-[10px] text-gray-400 mb-2 font-bold uppercase flex justify-between items-center">
+                         <span>Capital Structure Stack</span>
+                         <i data-lucide="bar-chart-horizontal" class="w-3 h-3 text-blue-500"></i>
+                     </div>
                      <div class="flex-grow relative">
                          <canvas id="chart-stack"></canvas>
                      </div>
                  </div>
-                 <div class="glass-panel p-3 rounded flex flex-col">
-                     <div class="text-[10px] text-gray-400 mb-2 font-bold uppercase">LGD Waterfall (Recovery Analysis)</div>
-                     <div class="flex-grow relative">
+                 <div class="glass-panel p-3 rounded flex flex-col relative overflow-hidden">
+                     <div class="absolute -right-10 -top-10 w-32 h-32 bg-red-500/10 blur-3xl rounded-full pointer-events-none"></div>
+                     <div class="text-[10px] text-red-400 mb-2 font-bold uppercase flex justify-between items-center z-10">
+                         <span>Recovery vs Claim (LGD)</span>
+                         <i data-lucide="trending-down" class="w-3 h-3 text-red-500"></i>
+                     </div>
+                     <div class="flex-grow relative z-10">
                          <canvas id="chart-waterfall"></canvas>
                      </div>
                  </div>
@@ -315,6 +326,10 @@
                 // Equity Recovery
                 let equityRecAmt = remainingCollateral;
                 let equityRecPct = equityAmt > 0 ? (equityRecAmt / equityAmt) : 0;
+
+                // Calculate Total Loss
+                const totalLoss = totalCap - netCollateral;
+                document.getElementById('expected-loss').innerText = `$${Math.max(0, totalLoss).toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1})}M`;
 
                 // Update Table
                 const tbody = document.getElementById('stats-body');

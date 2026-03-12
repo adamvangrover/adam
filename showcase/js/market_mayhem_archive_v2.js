@@ -168,7 +168,9 @@ class MarketMayhemController {
     // --- Charting ---
 
     renderChart() {
-        const ctx = document.getElementById('sentimentChart').getContext('2d');
+        const canvas = document.getElementById('sentimentChart');
+        if (!canvas) return; // Additive guard
+        const ctx = canvas.getContext('2d');
         const houseView = this.data.strategic ? this.data.strategic.strategic_directives.house_view : 'NEUTRAL';
 
         let dataPoints = 30;
@@ -257,6 +259,12 @@ class MarketMayhemController {
 
         for (let i = 0; i < sorted.length; i += step) {
             result.push(sorted[i].sentiment_score);
+        }
+
+        // If we don't have enough points, pad with the first value
+        if (result.length < points) {
+            const padding = Array.from({length: points - result.length}, () => result[0]);
+            return padding.concat(result);
         }
 
         // Pad or Trim
@@ -416,7 +424,9 @@ class MarketMayhemController {
     }
 
     renderAlphaChart(report) {
-        const ctx = document.getElementById('alphaChart').getContext('2d');
+        const canvas = document.getElementById('alphaChart');
+        if (!canvas) return; // Additive guard
+        const ctx = canvas.getContext('2d');
         if (this.state.alphaChartInstance) this.state.alphaChartInstance.destroy();
 
         // 1. Identify Tickers mentioned
@@ -497,18 +507,28 @@ class MarketMayhemController {
 
     setupEventHandlers() {
         // Time Period Buttons
-        const buttons = document.getElementById('timePeriodControls').getElementsByTagName('button');
-        Array.from(buttons).forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                // Toggle active class
-                Array.from(buttons).forEach(b => b.classList.remove('active'));
-                e.target.classList.add('active');
+        const controls = document.getElementById('timePeriodControls');
+        if (controls) {
+            const buttons = controls.getElementsByTagName('button');
+            Array.from(buttons).forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    // Toggle active class
+                    Array.from(buttons).forEach(b => b.classList.remove('active'));
+                    e.target.classList.add('active');
 
-                // Update State & Chart
-                this.state.timePeriod = e.target.dataset.period;
-                this.renderChart();
+                    // Update State & Chart
+                    this.state.timePeriod = e.target.dataset.period;
+                    this.renderChart();
+
+                    // Update mock confidence based on period
+                    const confEl = document.getElementById('systemConfidenceValue');
+                    if (confEl) {
+                        const vals = {'1M': '92.1%', '3M': '87.4%', '1Y': '76.2%', 'ALL': '65.8%'};
+                        confEl.innerText = vals[this.state.timePeriod] || '80.0%';
+                    }
+                });
             });
-        });
+        }
 
         // Global Filter Function
         window.applyFilters = () => {

@@ -5,6 +5,7 @@ import os
 import sys
 import logging
 import datetime
+import argparse
 from typing import Dict, Any, List
 
 # Add repo root to path
@@ -37,8 +38,8 @@ MOCK_LIBRARY = {
             "year": [2021, 2022, 2023]
         },
         "forecast_assumptions": {
-            "revenue_growth": 0.05,
-            "ebitda_margin": 0.32,
+            "revenue_growth": [0.05] * 5,
+            "ebitda_margin": [0.32] * 5,
             "discount_rate": 0.09,
             "terminal_growth_rate": 0.03
         },
@@ -72,8 +73,8 @@ MOCK_LIBRARY = {
             "year": [2021, 2022, 2023]
         },
         "forecast_assumptions": {
-            "revenue_growth": 0.15,
-            "ebitda_margin": 0.18,
+            "revenue_growth": [0.15] * 5,
+            "ebitda_margin": [0.18] * 5,
             "discount_rate": 0.12,
             "terminal_growth_rate": 0.04
         },
@@ -107,8 +108,8 @@ MOCK_LIBRARY = {
             "year": [2021, 2022, 2023]
         },
         "forecast_assumptions": {
-            "revenue_growth": 0.02,
-            "ebitda_margin": 0.03,
+            "revenue_growth": [0.02] * 5,
+            "ebitda_margin": [0.03] * 5,
             "discount_rate": 0.15,
             "terminal_growth_rate": 0.01
         },
@@ -142,8 +143,8 @@ MOCK_LIBRARY = {
             "year": [2021, 2022, 2023]
         },
         "forecast_assumptions": {
-            "revenue_growth": 0.03,
-            "ebitda_margin": 0.35,
+            "revenue_growth": [0.03] * 5,
+            "ebitda_margin": [0.35] * 5,
             "discount_rate": 0.10,
             "terminal_growth_rate": 0.02
         },
@@ -177,8 +178,8 @@ MOCK_LIBRARY = {
             "year": [2021, 2022, 2023]
         },
         "forecast_assumptions": {
-            "revenue_growth": 0.25,
-            "ebitda_margin": 0.55,
+            "revenue_growth": [0.25] * 5,
+            "ebitda_margin": [0.55] * 5,
             "discount_rate": 0.11,
             "terminal_growth_rate": 0.04
         },
@@ -212,8 +213,8 @@ MOCK_LIBRARY = {
             "year": [2021, 2022, 2023]
         },
         "forecast_assumptions": {
-            "revenue_growth": 0.02,
-            "ebitda_margin": 0.18,
+            "revenue_growth": [0.02] * 5,
+            "ebitda_margin": [0.18] * 5,
             "discount_rate": 0.08,
             "terminal_growth_rate": 0.01
         },
@@ -247,8 +248,8 @@ MOCK_LIBRARY = {
             "year": [2021, 2022, 2023]
         },
         "forecast_assumptions": {
-            "revenue_growth": 0.10,
-            "ebitda_margin": 0.45,
+            "revenue_growth": [0.10] * 5,
+            "ebitda_margin": [0.45] * 5,
             "discount_rate": 0.10,
             "terminal_growth_rate": 0.03
         },
@@ -282,8 +283,8 @@ MOCK_LIBRARY = {
             "year": [2021, 2022, 2023]
         },
         "forecast_assumptions": {
-            "revenue_growth": 0.01,
-            "ebitda_margin": 0.10,
+            "revenue_growth": [0.01] * 5,
+            "ebitda_margin": [0.10] * 5,
             "discount_rate": 0.14,
             "terminal_growth_rate": 0.00
         },
@@ -317,8 +318,8 @@ MOCK_LIBRARY = {
             "year": [2021, 2022, 2023]
         },
         "forecast_assumptions": {
-            "revenue_growth": 0.03,
-            "ebitda_margin": 0.35,
+            "revenue_growth": [0.03] * 5,
+            "ebitda_margin": [0.35] * 5,
             "discount_rate": 0.08,
             "terminal_growth_rate": 0.02
         },
@@ -352,8 +353,8 @@ MOCK_LIBRARY = {
             "year": [2021, 2022, 2023]
         },
         "forecast_assumptions": {
-            "revenue_growth": 0.03,
-            "ebitda_margin": 0.06,
+            "revenue_growth": [0.03] * 5,
+            "ebitda_margin": [0.06] * 5,
             "discount_rate": 0.07,
             "terminal_growth_rate": 0.02
         },
@@ -374,18 +375,37 @@ MOCK_LIBRARY = {
 # --- 2. Pipeline Wrapper ---
 
 class CreditMemoPipeline:
-    """Wrapper for the Credit Memo Orchestrator to run the full library."""
-    def __init__(self, output_dir="showcase/data"):
+    """Wrapper for the Credit Memo Orchestrator to run the full library or specific live cases."""
+    def __init__(self, output_dir="showcase/data", mode="mock"):
         self.output_dir = output_dir
+        self.mode = mode
         os.makedirs(output_dir, exist_ok=True)
-        self.orchestrator = CreditMemoOrchestrator(mock_library=MOCK_LIBRARY, output_dir=output_dir)
+        self.orchestrator = CreditMemoOrchestrator(mock_library=MOCK_LIBRARY, output_dir=output_dir, mode=mode)
         self.library_index = []
         self.interaction_logs = {}
 
-    def run_pipeline(self):
-        logger.info("Starting Credit Memo Generation Pipeline...")
+    def run_pipeline(self, target_ticker=None):
+        logger.info(f"Starting Credit Memo Generation Pipeline (Mode: {self.mode})...")
 
-        for key, data in MOCK_LIBRARY.items():
+        targets = {}
+        if target_ticker:
+            # If live mode, we might not have it in Mock Library. Create a skeleton.
+            if target_ticker not in MOCK_LIBRARY and self.mode == "live":
+                targets[target_ticker] = {
+                    "ticker": target_ticker,
+                    "name": f"{target_ticker} (Live)",
+                    "sector": "Unknown", # Will be enriched
+                    "docs": {}
+                }
+            elif target_ticker in MOCK_LIBRARY:
+                targets[target_ticker] = MOCK_LIBRARY[target_ticker]
+            else:
+                logger.error(f"Ticker {target_ticker} not found in library and mode is not live.")
+                return
+        else:
+            targets = MOCK_LIBRARY
+
+        for key, data in targets.items():
             result = self.orchestrator.process_entity(key, data)
             if not result:
                 continue
@@ -402,12 +422,12 @@ class CreditMemoPipeline:
             self.library_index.append({
                 "id": key,
                 "borrower_name": data['name'],
-                "ticker": data['ticker'],
-                "sector": data['sector'],
+                "ticker": data.get('ticker', key),
+                "sector": data.get('sector', 'Unknown'),
                 "report_date": memo['report_date'],
                 "risk_score": memo['risk_score'],
                 "file": filename,
-                "summary": f"{data['name']} ({data['sector']}). Risk Score: {memo['risk_score']}."
+                "summary": f"{data['name']} ({data.get('sector', '')}). Risk Score: {memo['risk_score']}."
             })
 
             # Update Interaction Logs
@@ -418,6 +438,8 @@ class CreditMemoPipeline:
         logger.info("Pipeline Complete.")
 
     def save_library_index(self):
+        # Load existing if available to append? For now, overwrite or merge.
+        # Simple overwrite for demo.
         with open(os.path.join(self.output_dir, "credit_memo_library.json"), 'w') as f:
             json.dump(self.library_index, f, indent=2)
 
@@ -426,5 +448,11 @@ class CreditMemoPipeline:
             json.dump(self.interaction_logs, f, indent=2)
 
 if __name__ == "__main__":
-    pipeline = CreditMemoPipeline()
-    pipeline.run_pipeline()
+    parser = argparse.ArgumentParser(description="Generate Credit Memos")
+    parser.add_argument("--mode", choices=["mock", "live"], default="mock", help="Execution mode")
+    parser.add_argument("--ticker", help="Specific ticker to process (required for live mode if not in library)")
+
+    args = parser.parse_args()
+
+    pipeline = CreditMemoPipeline(mode=args.mode)
+    pipeline.run_pipeline(target_ticker=args.ticker)
