@@ -335,7 +335,7 @@ class LLMClient:
                     "stream": True
                 }
 
-                with requests.post(url, json=payload, stream=True) as r:
+                with requests.post(url, json=payload, stream=True, timeout=60) as r:
                     r.raise_for_status()
                     for line in r.iter_lines():
                         if line:

@@ -6,6 +6,8 @@ thread execution, memory allocation, and neuro-symbolic agent decisions.
 
 import logging
 import time
+import os
+import tempfile
 from typing import Any, Dict
 
 logger = logging.getLogger(__name__)
@@ -17,7 +19,9 @@ class MicroscopicTelemetry:
     and deploy complex financial algorithms with absolute confidence.
     """
 
-    def __init__(self, log_dir: str = "/tmp/adam_telemetry"):
+    def __init__(self, log_dir: str = None):
+        if log_dir is None:
+            log_dir = os.path.join(tempfile.gettempdir(), "adam_telemetry")
         self.log_dir = log_dir
         self.metrics_buffer = []
         logger.info(f"Initialized Microscopic Telemetry framework (Dir: {log_dir})")

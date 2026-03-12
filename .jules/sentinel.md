@@ -170,3 +170,9 @@
 **Vulnerability:** The `TechnicalAnalystAgent` used `pickle.load()` directly with a `# nosec B301` comment to bypass bandit checks, allowing Arbitrary Code Execution (RCE) via insecure deserialization.
 **Learning:** Security tools can be bypassed with inline comments (`# nosec`), which creates a false sense of security and hides vulnerabilities from static analysis.
 **Prevention:** Remove `# nosec` bypasses for critical vulnerabilities and always enforce the use of `SafeUnpickler` (`core.security.safe_unpickler.safe_load`) when deserializing objects from potentially untrusted storage.
+## 2024-03-11 - [B108/B113] Add security timeout to requests and fix insecure temporary directory usage
+**Vulnerability:**
+1. In `core/devx/telemetry/microscopic_logger.py`, the default telemetry path is hardcoded to `/tmp/adam_telemetry`, which introduces an insecure temporary directory usage vulnerability.
+2. In `scripts/repo_chat.py`, `requests.post` is used without a timeout parameter, which can lead to hanging requests and denial of service.
+**Learning:** Hardcoded temporary directories, especially in global locations like `/tmp`, can be subject to race conditions and predictable path vulnerabilities. HTTP requests without timeouts can cause infinite blocking.
+**Prevention:** Use standard tempfile utilities like `tempfile.gettempdir()` for temporary directory resolution and always provide a `timeout` argument to `requests` operations.
