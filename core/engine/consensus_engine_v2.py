@@ -6,6 +6,7 @@ from typing import Dict, Any, List, Optional
 from textblob import TextBlob
 import statistics
 import hashlib
+import re
 
 from core.swarms.memory_matrix import MemoryMatrix
 from core.utils.narrative_weaver import NarrativeWeaver
@@ -191,11 +192,15 @@ class ConsensusEngineV2:
                 if "agent modules" in content:
                     try:
                         # Extract number: "Detected X agent modules..."
-                        health_status["agent_count"] = int([s for s in content.split() if s.isdigit()][0])
+                        match = re.search(r'\d+', content)
+                        if match:
+                            health_status["agent_count"] = int(match.group())
                     except: pass
                 if "Core system footprint" in content:
                     try:
-                        health_status["core_modules"] = int([s for s in content.split() if s.isdigit()][0])
+                        match = re.search(r'\d+', content)
+                        if match:
+                            health_status["core_modules"] = int(match.group())
                     except: pass
 
         comp_node = get_topic_node("Compliance")
