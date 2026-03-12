@@ -10,6 +10,16 @@ class NarrativeWeaver:
 
     def __init__(self):
         self.templates = {
+            "RISK": [
+                "CRITICAL ALERT: System has detected {risk_factor} in {driver}. Immediate defensive positioning recommended.",
+                "Red lights flashing. {risk_factor} poses a systemic threat. Agents advise maximum caution.",
+                "Structural integrity compromised by {risk_factor}. Sentiment override: BEARISH."
+            ],
+            "CONFLICT": [
+                "Consensus fracture detected. Agents are split on {driver}. Volatility spike imminent.",
+                "Battleground sector: {sector}. Bulls and Bears are clashing over {driver} valuation.",
+                "Divergence in signal processing. High uncertainty regarding {driver}. Awaiting resolution."
+            ],
             "BULLISH": [
                 "Market sentiment is surging, driven by {driver}. {risk_agent} advises caution, but the momentum is undeniable.",
                 "Green shoots detected in {sector}, fueled by {driver}. Despite {risk_factor}, the consensus leans towards accumulation.",
@@ -32,16 +42,28 @@ class NarrativeWeaver:
         Weaves a narrative from the provided context.
 
         Args:
-            context: Dict containing 'sentiment' (BULLISH/BEARISH/NEUTRAL),
-                     'driver' (e.g. 'AI Tech'),
-                     'risk_factor' (e.g. 'Yield Inversion'),
-                     'sector' (e.g. 'Technology')
+            context: Dict containing 'sentiment', 'driver', 'risk_factor', 'sector',
+                     plus optional 'conflicts' and 'risks' lists.
         """
-        sentiment = context.get('sentiment', 'NEUTRAL').upper()
-        if sentiment not in self.templates:
-            sentiment = "NEUTRAL"
 
-        template = random.choice(self.templates[sentiment])
+        # Determine dominance hierarchy
+        mode = "NEUTRAL"
+
+        risks = context.get('risks', [])
+        conflicts = context.get('conflicts', [])
+        sentiment = context.get('sentiment', 'NEUTRAL').upper()
+
+        if risks:
+            mode = "RISK"
+        elif conflicts:
+            mode = "CONFLICT"
+        else:
+            mode = sentiment
+
+        if mode not in self.templates:
+            mode = "NEUTRAL"
+
+        template = random.choice(self.templates[mode])
 
         # Safe formatting (Graceful Degradation)
         try:

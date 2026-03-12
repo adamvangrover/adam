@@ -14,6 +14,7 @@ from core.utils.logging_utils import SwarmLogger
 from core.schemas.hnasp import HNASPState, Meta, PersonaState, LogicLayer, ContextStream, PersonaDynamics, SecurityContext, PersonaIdentities, Identity, EPAVector
 from core.agents.mixins.memory_mixin import MemoryMixin
 from core.system.boot_protocol import BootProtocol
+from core.swarms.memory_matrix import MemoryMatrix
 
 # JsonLogic
 try:
@@ -82,6 +83,9 @@ class AgentBase(ABC, MemoryMixin, BootProtocol):
 
         self.peer_agents: Dict[str, AgentBase] = {}  # For A2A
         self.pending_requests: Dict[str, asyncio.Future] = {}  # For Async A2A responses
+
+        # Swarm Memory (Consensus)
+        self.swarm_memory = MemoryMatrix()
 
         # Updated log message to reflect potential kernel presence
         log_message = f"Agent {type(self).__name__} initialized with config: {config}"
@@ -459,3 +463,20 @@ class AgentBase(ABC, MemoryMixin, BootProtocol):
 
         self.report_boot_status(agent_id, prompt, conviction)
         logging.info(f"Agent {agent_id} booted successfully.")
+
+    def publish_insight(self, topic: str, insight: str, confidence: float):
+        """
+        Publishes a high-conviction insight to the persistent Swarm Memory (MemoryMatrix).
+        This contributes to the system-wide 'Consensus'.
+
+        Args:
+            topic (str): The subject of the insight (e.g., 'Inflation', 'AI Tech').
+            insight (str): The narrative content.
+            confidence (float): The agent's confidence score (0.0 to 1.0).
+        """
+        agent_id = self.config.get("agent_id", self.name)
+        try:
+            self.swarm_memory.write_consensus(topic, insight, agent_id, confidence)
+            logging.info(f"Agent {agent_id} published insight on '{topic}' to Swarm Consensus.")
+        except Exception as e:
+            logging.error(f"Agent {agent_id} failed to publish insight: {e}")

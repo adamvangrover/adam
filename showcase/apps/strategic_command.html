@@ -33,6 +33,12 @@
         .bullish { color: var(--green-glow); text-shadow: 0 0 10px rgba(34, 197, 94, 0.5); }
         .bearish { color: var(--red-glow); text-shadow: 0 0 10px rgba(239, 68, 68, 0.5); }
         .neutral { color: #94a3b8; }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #334155; }
     </style>
 </head>
 <body class="h-screen flex flex-col p-6 text-sm overflow-hidden">
@@ -44,9 +50,9 @@
             STRATEGIC COMMAND
         </h1>
         <div class="flex items-center gap-4 text-xs">
-            <div class="flex items-center gap-2">
-                <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-                <span class="text-green-400">ONLINE</span>
+            <div id="sys-status-indicator" class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-gray-500 animate-pulse"></span>
+                <span class="text-gray-400">CONNECTING...</span>
             </div>
             <div class="text-gray-500" id="last-updated">Last Updated: --</div>
         </div>
@@ -57,16 +63,55 @@
 
         <!-- House View (Left Panel) -->
         <div class="col-span-4 flex flex-col gap-6">
-            <div class="glass-panel p-6 rounded-lg flex flex-col items-center justify-center flex-grow">
+            <div class="glass-panel p-6 rounded-lg flex flex-col items-center justify-center min-h-[200px]">
                 <h2 class="text-xs uppercase tracking-widest text-gray-500 mb-4">Current House View</h2>
                 <div id="house-view-display" class="text-6xl font-bold mb-2 transition-all duration-500">--</div>
                 <div id="sentiment-score" class="text-xl font-mono opacity-70">Score: --</div>
             </div>
 
-            <div class="glass-panel p-6 rounded-lg h-1/3">
-                 <h2 class="text-xs uppercase tracking-widest text-gray-500 mb-4 flex items-center gap-2">
-                    <i data-lucide="brain-circuit" class="w-4 h-4"></i> Active Drivers
+            <!-- System Health Panel -->
+            <div class="glass-panel p-4 rounded-lg">
+                 <h2 class="text-xs uppercase tracking-widest text-gray-500 mb-3 flex items-center gap-2">
+                    <i data-lucide="server" class="w-4 h-4"></i> System Architecture
                 </h2>
+                <div class="grid grid-cols-2 gap-4 text-xs">
+                    <div>
+                        <div class="text-gray-500 mb-1">Active Agents</div>
+                        <div id="health-agents" class="text-xl font-bold text-cyan-400">--</div>
+                    </div>
+                    <div>
+                        <div class="text-gray-500 mb-1">Core Modules</div>
+                        <div id="health-modules" class="text-xl font-bold text-cyan-400">--</div>
+                    </div>
+                    <div class="col-span-2 border-t border-gray-800 pt-2 flex justify-between items-center">
+                        <span class="text-gray-500">Governance Protocol</span>
+                        <span id="health-compliance" class="px-2 py-0.5 bg-gray-800 rounded text-[10px] text-gray-400">UNKNOWN</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-panel p-6 rounded-lg flex-grow overflow-y-auto">
+                 <h2 class="text-xs uppercase tracking-widest text-gray-500 mb-4 flex items-center gap-2">
+                    <i data-lucide="brain-circuit" class="w-4 h-4"></i> Swarm Intelligence
+                </h2>
+
+                <!-- Risks -->
+                <div id="risk-section" class="mb-6 hidden">
+                    <h3 class="text-red-500 font-bold text-xs mb-2 flex items-center gap-2 border-b border-red-900/50 pb-1">
+                        <i data-lucide="alert-triangle" class="w-3 h-3"></i> SYSTEMIC RISKS
+                    </h3>
+                    <ul id="risk-list" class="space-y-2 text-xs text-red-400 font-mono"></ul>
+                </div>
+
+                <!-- Conflicts -->
+                <div id="conflict-section" class="mb-6 hidden">
+                    <h3 class="text-yellow-500 font-bold text-xs mb-2 flex items-center gap-2 border-b border-yellow-900/50 pb-1">
+                        <i data-lucide="shuffle" class="w-3 h-3"></i> CONFLICT ZONES
+                    </h3>
+                    <ul id="conflict-list" class="space-y-2 text-xs text-yellow-400 font-mono"></ul>
+                </div>
+
+                <h3 class="text-cyan-500 font-bold text-xs mb-2 border-b border-cyan-900/50 pb-1">ACTIVE DRIVERS</h3>
                 <ul id="active-topics" class="space-y-2 text-cyan-400 font-mono text-xs">
                     <li>Loading...</li>
                 </ul>
@@ -104,12 +149,13 @@
 
         async function loadData() {
             try {
-                const response = await fetch('../data/strategic_command.json');
+                // Add timestamp to prevent caching
+                const response = await fetch('../data/strategic_command.json?t=' + new Date().getTime());
                 const data = await response.json();
                 render(data);
             } catch (e) {
                 console.error("Failed to load strategic command data", e);
-                document.getElementById('narrative-text').innerText = "CONNECTION LOST: Unable to retrieve consensus data.";
+                // Don't overwrite if it's just a momentary glitch, but maybe show status
             }
         }
 
@@ -117,6 +163,8 @@
             const directives = data.strategic_directives;
             const meta = data.meta;
             const plans = data.actionable_plans;
+            const insights = data.insights;
+            const health = insights.system_health || {};
 
             // Update Timestamp
             document.getElementById('last-updated').innerText = `Last Updated: ${new Date(meta.generated_at).toLocaleTimeString()}`;
@@ -135,13 +183,63 @@
             // Narrative
             document.getElementById('narrative-text').innerHTML = directives.narrative;
 
-            // Topics
+            // --- System Health ---
+            document.getElementById('health-agents').innerText = health.agent_count || "--";
+            document.getElementById('health-modules').innerText = health.core_modules || "--";
+
+            const compEl = document.getElementById('health-compliance');
+            compEl.innerText = health.compliance || "UNKNOWN";
+            if (health.compliance === "ACTIVE") compEl.className = "px-2 py-0.5 bg-green-900 rounded text-[10px] text-green-400 font-bold";
+            else if (health.compliance === "CRITICAL") compEl.className = "px-2 py-0.5 bg-red-900 rounded text-[10px] text-red-400 font-bold animate-pulse";
+            else compEl.className = "px-2 py-0.5 bg-gray-800 rounded text-[10px] text-gray-400";
+
+            // Status Indicator
+            const statusDiv = document.getElementById('sys-status-indicator');
+            if (health.status === "OPERATIONAL") {
+                statusDiv.innerHTML = '<span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span><span class="text-green-400">SYSTEM OPERATIONAL</span>';
+            } else {
+                statusDiv.innerHTML = '<span class="w-2 h-2 rounded-full bg-yellow-500 animate-pulse"></span><span class="text-yellow-400">INITIALIZING...</span>';
+            }
+
+            // --- Risks ---
+            const riskSection = document.getElementById('risk-section');
+            const riskList = document.getElementById('risk-list');
+            if (insights.risks && insights.risks.length > 0) {
+                riskSection.classList.remove('hidden');
+                riskList.innerHTML = '';
+                insights.risks.forEach(risk => {
+                    const li = document.createElement('li');
+                    li.className = "flex justify-between items-center bg-red-900/20 p-2 rounded";
+                    li.innerHTML = `<span>${risk.term}</span> <span class="text-[10px] bg-red-900 px-1 rounded">${risk.severity}</span>`;
+                    riskList.appendChild(li);
+                });
+            } else {
+                riskSection.classList.add('hidden');
+            }
+
+            // --- Conflicts ---
+            const conflictSection = document.getElementById('conflict-section');
+            const conflictList = document.getElementById('conflict-list');
+            if (insights.conflicts && insights.conflicts.length > 0) {
+                conflictSection.classList.remove('hidden');
+                conflictList.innerHTML = '';
+                insights.conflicts.forEach(conflict => {
+                    const li = document.createElement('li');
+                    li.className = "flex justify-between items-center bg-yellow-900/20 p-2 rounded";
+                    li.innerHTML = `<span>${conflict.topic}</span> <span class="text-[10px] bg-yellow-900 px-1 rounded">VAR: ${conflict.variance}</span>`;
+                    conflictList.appendChild(li);
+                });
+            } else {
+                conflictSection.classList.add('hidden');
+            }
+
+            // --- Active Topics ---
             const topicsList = document.getElementById('active-topics');
             topicsList.innerHTML = '';
-            data.insights.active_topics.forEach(topic => {
+            insights.active_topics.forEach(topic => {
                 const li = document.createElement('li');
-                li.className = 'border-b border-gray-700/50 pb-1';
-                li.innerText = `> ${topic}`;
+                li.className = 'border-b border-gray-700/50 pb-1 flex justify-between';
+                li.innerHTML = `<span>> ${topic}</span>`;
                 topicsList.appendChild(li);
             });
 
@@ -152,6 +250,10 @@
             plans.forEach(plan => {
                 const div = document.createElement('div');
                 div.className = 'bg-gray-900/50 p-4 rounded border-l-4 border-cyan-500 flex justify-between items-center hover:bg-gray-800 transition-colors cursor-default';
+
+                // Dynamic Border Color based on Action Type
+                if (plan.action.startsWith('MITIGATE')) div.classList.replace('border-cyan-500', 'border-red-500');
+                if (plan.action.startsWith('ARBITRAGE')) div.classList.replace('border-cyan-500', 'border-yellow-500');
 
                 div.innerHTML = `
                     <div>
@@ -164,11 +266,13 @@
                 `;
                 plansContainer.appendChild(div);
             });
+
+            lucide.createIcons();
         }
 
-        // Auto-refresh every 30s
+        // Auto-refresh every 5s for real-time feel (since backend loop is 5s)
         loadData();
-        setInterval(loadData, 30000);
+        setInterval(loadData, 5000);
     </script>
 </body>
 </html>
