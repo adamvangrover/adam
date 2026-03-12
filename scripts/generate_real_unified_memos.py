@@ -154,6 +154,33 @@ def fetch_real_data(ticker_symbol):
             ]
         }
 
+        # Expected Loss calculations
+        pd_1yr = 0.0015 if (debt/ebitda if ebitda > 0 else 0) < 2 else 0.008
+        lgd = 0.35
+        expected_loss_pct = pd_1yr * lgd
+        expected_loss_dollar = (debt / 1e6) * expected_loss_pct
+
+        debt_facilities = []
+        if debt > 0:
+            debt_facilities = [
+                {
+                    "facility_type": "Term Loan B",
+                    "amount_committed": round((debt / 1e6) * 0.6, 2),
+                    "interest_rate": "SOFR + 350bps",
+                    "maturity_date": "2029-12-31",
+                    "snc_rating": "Pass" if pd_1yr < 0.005 else "Special Mention",
+                    "regulatory_rating": "Pass" if pd_1yr < 0.005 else "Special Mention"
+                },
+                {
+                    "facility_type": "Revolving Credit Facility",
+                    "amount_committed": round((debt / 1e6) * 0.4, 2),
+                    "interest_rate": "SOFR + 200bps",
+                    "maturity_date": "2028-06-30",
+                    "snc_rating": "Pass" if pd_1yr < 0.005 else "Special Mention",
+                    "regulatory_rating": "Pass" if pd_1yr < 0.005 else "Special Mention"
+                }
+            ]
+
         # Build the final object
         memo = {
             "_metadata": {
@@ -191,12 +218,17 @@ def fetch_real_data(ticker_symbol):
             "pd_model": {
                 "implied_rating": "A" if (debt/ebitda if ebitda > 0 else 0) < 2 else "BBB",
                 "model_score": 92,
-                "one_year_pd": 0.0015,
-                "five_year_pd": 0.012
+                "one_year_pd": pd_1yr,
+                "five_year_pd": pd_1yr * 8
             },
             "lgd_analysis": {
-                "loss_given_default": 0.35
+                "loss_given_default": lgd
             },
+            "expected_loss": {
+                "expected_loss_pct": expected_loss_pct,
+                "expected_loss_dollar": expected_loss_dollar
+            },
+            "debt_facilities": debt_facilities,
             "peer_comps": [
                 {"ticker": "PEER1", "name": f"{sector} Peer A", "ev_ebitda": 15.0, "pe_ratio": pe * 0.9 if pe else 15, "leverage_ratio": 1.5, "market_cap": market_cap * 0.8 / 1e6},
                 {"ticker": "PEER2", "name": f"{sector} Peer B", "ev_ebitda": 12.0, "pe_ratio": pe * 1.1 if pe else 15, "leverage_ratio": 2.1, "market_cap": market_cap * 0.5 / 1e6}

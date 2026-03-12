@@ -371,6 +371,11 @@ def generate_graph():
                     dcf = memo["dcf_analysis"]
                     preview += f"\nImplied Price: ${dcf.get('share_price', 0):.2f}"
 
+                if "expected_loss" in memo and memo["expected_loss"]:
+                    el = memo["expected_loss"]
+                    preview += f"\nExpected Loss: {el.get('expected_loss_pct', 0)*100:.2f}%"
+                    preview += f"\nExpected Loss ($): ${el.get('expected_loss_dollar', 0):.2f}M"
+
                 nodes.append({
                     "id": memo_id,
                     "label": f"MEMO: {ticker}",
@@ -384,6 +389,30 @@ def generate_graph():
 
                 # Link to House View
                 edges.append({"from": house_view_root, "to": memo_id, "color": "#f59e0b", "dashes": True})
+
+                # Create and link debt facilities as nodes if any
+                if "debt_facilities" in memo and memo["debt_facilities"]:
+                    for fac in memo["debt_facilities"]:
+                        fac_id = next_id
+                        next_id += 1
+
+                        fac_preview = f"Facility: {fac.get('facility_type')}\n"
+                        fac_preview += f"Amount: ${fac.get('amount_committed', 0):.2f}M\n"
+                        fac_preview += f"Interest: {fac.get('interest_rate')}\n"
+                        fac_preview += f"Maturity: {fac.get('maturity_date')}\n"
+                        fac_preview += f"Regulatory Rating: {fac.get('regulatory_rating')}"
+
+                        nodes.append({
+                            "id": fac_id,
+                            "label": f"FAC: {ticker}",
+                            "group": "simulation",
+                            "shape": "dot",
+                            "size": 15,
+                            "color": "#eab308",
+                            "level": "data",
+                            "preview": fac_preview
+                        })
+                        edges.append({"from": memo_id, "to": fac_id, "color": "#eab308"})
         except Exception as e:
             logger.error(f"Failed to inject unified credit memos: {e}")
 

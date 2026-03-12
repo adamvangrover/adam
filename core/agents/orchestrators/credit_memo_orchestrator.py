@@ -500,6 +500,31 @@ class CreditMemoOrchestrator:
                     "Z-Score": icat.credit_metrics.z_score,
                 },
             },
+            "lgd_analysis": {
+                "loss_given_default": risk["risk_quant_metrics"]["LGD"]
+            },
+            "expected_loss": {
+                "expected_loss_pct": risk["risk_quant_metrics"]["PD"] * risk["risk_quant_metrics"]["LGD"],
+                "expected_loss_dollar": (data["historical"]["revenue"][-1] * 0.3 * icat.credit_metrics.net_leverage) * (risk["risk_quant_metrics"]["PD"] * risk["risk_quant_metrics"]["LGD"])
+            },
+            "debt_facilities": [
+                {
+                    "facility_type": "Term Loan B",
+                    "amount_committed": round((data["historical"]["revenue"][-1] * 0.3 * icat.credit_metrics.net_leverage) * 0.6, 2),
+                    "interest_rate": "SOFR + 350bps",
+                    "maturity_date": "2029-12-31",
+                    "snc_rating": "Pass" if risk["risk_quant_metrics"]["PD"] < 0.005 else "Special Mention",
+                    "regulatory_rating": "Pass" if risk["risk_quant_metrics"]["PD"] < 0.005 else "Special Mention"
+                },
+                {
+                    "facility_type": "Revolving Credit Facility",
+                    "amount_committed": round((data["historical"]["revenue"][-1] * 0.3 * icat.credit_metrics.net_leverage) * 0.4, 2),
+                    "interest_rate": "SOFR + 200bps",
+                    "maturity_date": "2028-06-30",
+                    "snc_rating": "Pass" if risk["risk_quant_metrics"]["PD"] < 0.005 else "Special Mention",
+                    "regulatory_rating": "Pass" if risk["risk_quant_metrics"]["PD"] < 0.005 else "Special Mention"
+                }
+            ],
             "system_two_critique": {
                 "critique_points": [
                     "Valuation aligns with sector.",
