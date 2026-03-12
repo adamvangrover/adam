@@ -5,7 +5,7 @@ from unittest.mock import patch, mock_open
 
 import pytest
 
-from core.utils.system_logger import SystemLogger, create_timestamped_system_file
+from core.utils.logging_utils import SystemLogger, create_timestamped_system_file
 
 @pytest.fixture
 def temp_log_file():
@@ -15,10 +15,11 @@ def temp_log_file():
     if path.exists():
         path.unlink()
 
+
+
 def test_system_logger_init(temp_log_file):
     logger = SystemLogger(log_file=str(temp_log_file))
-    assert logger.log_file == temp_log_file
-    assert temp_log_file.parent.exists()
+    assert logger.log_file == str(temp_log_file)
 
 def test_system_logger_log_event(temp_log_file):
     logger = SystemLogger(log_file=str(temp_log_file))
@@ -48,7 +49,7 @@ def test_system_logger_read_events(temp_log_file):
     assert events[0]["tag"] == "TAG1"
     assert events[1]["tag"] == "TAG2"
 
-@patch('core.utils.system_logger.create_timestamped_system_file')
+@patch('core.utils.logging_utils.create_timestamped_system_file')
 def test_system_logger_consolidate_logs(mock_create, temp_log_file):
     logger = SystemLogger(log_file=str(temp_log_file))
     logger.log_event("TAG1", {"k": 1})

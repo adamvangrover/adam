@@ -12,7 +12,7 @@ It orchestrates the analysis of complex syndicated loans by stringing together s
 
 import logging
 from typing import Dict, Any
-from core.utils.graph_utils import StateGraph, END, START, MemorySaver, HAS_LANGGRAPH
+from core.utils.agent_utils import StateGraph, END, START, MemorySaver, HAS_LANGGRAPH
 from core.engine.states import SNCAnalysisState
 from core.agents.specialized.regulatory_snc_agent import RegulatorySNCAgent
 from core.engine.risk_consensus_engine import RiskConsensusEngine
