@@ -10,7 +10,7 @@ In this tutorial, you will use the **Fundamental Analyst Agent** to generate an 
 Open your terminal and ensure your environment is active:
 ```bash
 source .venv/bin/activate
-python scripts/run_adam.py
+uv run python scripts/run_adam.py
 ```
 
 ### 2. Submit a Request
@@ -86,7 +86,7 @@ Add your agent to the `NeuroSymbolicPlanner` registry in `core/engine/neuro_symb
 ### 3. Test It
 Run the agent directly via the CLI:
 ```bash
-python scripts/run_adam.py --agent "CryptoAnalyst" --query "Check Bitcoin price"
+uv run python scripts/run_adam.py --agent "CryptoAnalyst" --query "Check Bitcoin price"
 ```
 
 ---
@@ -99,7 +99,7 @@ If an agent fails or "hallucinates", follow these steps to diagnose the issue.
 Run the system with the `--debug` flag to see full tracebacks and raw LLM inputs/outputs.
 
 ```bash
-python scripts/run_adam.py --debug --query "Complex query that fails"
+uv run python scripts/run_adam.py --debug --query "Complex query that fails"
 ```
 
 ### 2. Inspect the "Thought Trace"
@@ -120,7 +120,7 @@ If an agent returns a generic answer, check the `confidence` score in the JSON o
 Create a reproduction test case in `tests/repro_issue.py` to isolate the failure without running the full system.
 
 ```bash
-python scripts/run_adam.py --mode replay --log-id <ID>
+uv run python scripts/run_adam.py --mode replay --log-id <ID>
 ```
 *(Note: Replay mode requires a saved log file)*
 
@@ -173,5 +173,5 @@ Restart the MCP server to load the new tool.
 docker-compose restart app
 
 # If running locally
-python server/server.py
+uv run python server/server.py
 ```

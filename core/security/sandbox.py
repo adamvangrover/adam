@@ -1,13 +1,11 @@
 # core/security/sandbox.py
 
 import ast
-import multiprocessing
-import queue
-import time
-import json
 import logging
-from typing import Dict, Any, Optional
-from core.security.governance import GovernanceEnforcer, ApprovalRequired
+import multiprocessing
+from typing import Any, Dict
+
+from core.security.governance import ApprovalRequired, GovernanceEnforcer
 
 logger = logging.getLogger(__name__)
 
@@ -163,7 +161,13 @@ class SecureSandbox:
     # --------------------------------------------------------------------------
 
     @classmethod
-    def execute(cls, code: str, timeout: float = 5.0, security_level: str = "standard", memory_limit_mb: int = 512) -> Dict[str, Any]:
+    def execute(
+        cls,
+        code: str,
+        timeout: float = 5.0,
+        security_level: str = "standard",
+        memory_limit_mb: int = 512,
+    ) -> Dict[str, Any]:
         """
         Executes the provided code in a secure sandbox.
 
@@ -262,7 +266,7 @@ class SecureSandbox:
         The function running inside the isolated process.
         """
         import io
-        from contextlib import redirect_stdout, redirect_stderr
+        from contextlib import redirect_stderr, redirect_stdout
         try:
             import resource
             # Limit memory usage (RLIMIT_AS is virtual memory size)

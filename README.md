@@ -180,7 +180,7 @@ We strictly use **`uv`** for lightning-fast, reproducible Python environment man
 5.  **Launch the System:**
     ```bash
     # Run the interactive CLI
-    python scripts/run_adam.py
+    uv run python scripts/run_adam.py
     ```
 
 For detailed instructions, see the [Setup Guide](docs/setup_guide.md).
@@ -216,7 +216,7 @@ Adam includes a powerful build system to create self-contained, portable environ
 Run the build wizard to create a custom distribution with specific modules, runtime profiles, and Docker support:
 
 ```bash
-python scripts/build_adam.py
+uv run python scripts/build_adam.py
 ```
 
 See [**Custom Builds Documentation**](docs/custom_builds.md) for details.
@@ -226,7 +226,7 @@ See [**Custom Builds Documentation**](docs/custom_builds.md) for details.
 To export a single module directly:
 
 ```bash
-python scripts/export_module.py market_mayhem --output my_exports
+uv run python scripts/export_module.py market_mayhem --output my_exports
 ```
 
 ---
