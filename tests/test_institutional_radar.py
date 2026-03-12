@@ -2,16 +2,20 @@ import unittest
 import os
 import shutil
 import asyncio
+os.environ["RADAR_DB_URL"] = "sqlite:///:memory:"
+
 from core.institutional_radar.ingestion import SECEdgarScraper
 from core.institutional_radar.analytics import InstitutionalRadarAnalytics
-from core.institutional_radar.database import init_db, SessionLocal, FundMasterDB, SecurityMasterDB, engine
+from core.institutional_radar.database import init_db, SessionLocal, FundMasterDB, SecurityMasterDB, engine, Base
 from core.institutional_radar.schema import HoldingDetail
 
 
 class TestInstitutionalRadar(unittest.TestCase):
     def setUp(self):
-        # Initialize DB
-        init_db()
+        # Recreate tables in the in-memory db
+        Base.metadata.drop_all(engine)
+        Base.metadata.create_all(engine)
+
         self.session = SessionLocal()
 
         # Populate Seed Data (Fund Master, Security Master)

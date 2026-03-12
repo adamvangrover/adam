@@ -93,8 +93,11 @@ class SecurityMasterDB(Base):
     industry: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
 
 
+import os
+
 # Database Setup
-engine = create_engine("sqlite:///core/institutional_radar/radar.db", echo=False)
+db_url = os.environ.get("RADAR_DB_URL", "sqlite:///core/institutional_radar/radar.db")
+engine = create_engine(db_url, echo=False)
 
 
 def init_db():
