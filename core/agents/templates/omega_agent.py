@@ -20,7 +20,7 @@ from pydantic import BaseModel, Field
 
 # Pillar 2 Integration
 from core.utils.proof_of_thought import ProofOfThoughtLogger
-from core.utils.system_logger import SystemLogger
+from core.utils.logging_utils import SystemLogger
 
 logger = logging.getLogger(__name__)
 

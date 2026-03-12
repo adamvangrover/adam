@@ -15,7 +15,7 @@ It uses a recursive approach:
 import logging
 import random
 from typing import Literal, Dict, Any, List
-from core.utils.graph_utils import StateGraph, END, START, MemorySaver, HAS_LANGGRAPH
+from core.utils.agent_utils import StateGraph, END, START, MemorySaver, HAS_LANGGRAPH
 from core.engine.sector_impact_engine import SectorImpactEngine
 from core.engine.states import CrisisSimulationState
 

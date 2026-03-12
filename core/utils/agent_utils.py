@@ -121,3 +121,82 @@ def log_agent_action(agent_name, action, details):
     pass  # Placeholder for actual implementation
 
 # Add more agent utility functions as needed
+
+"""
+Graph Utilities for Adam v23.5
+
+This module provides a unified interface for LangGraph components,
+handling fallback logic for environments where langgraph is not installed.
+"""
+
+import logging
+
+logger = logging.getLogger(__name__)
+
+try:
+    from langgraph.graph import StateGraph, END, START
+    from langgraph.checkpoint.memory import MemorySaver
+    HAS_LANGGRAPH = True
+except ImportError:
+    HAS_LANGGRAPH = False
+    logger.warning("LangGraph not installed. Graph features will be disabled or mocked.")
+
+    class StateGraph:
+        """Mock StateGraph for environments without langgraph."""
+        def __init__(self, state_schema, *args, **kwargs):
+            self.state_schema = state_schema
+
+        def add_node(self, node_name, action):
+            pass
+
+        def add_edge(self, start_node, end_node):
+            pass
+
+        def set_entry_point(self, node_name):
+            pass
+
+        def add_conditional_edges(self, source, path, path_map=None):
+            pass
+
+        def compile(self, checkpointer=None):
+            return CompiledGraphMock()
+
+    class CompiledGraphMock:
+        """Mock for a compiled graph."""
+        def invoke(self, inputs, config=None):
+            logger.info(f"Mock graph invoked with inputs: {inputs}")
+            return inputs
+
+    class MemorySaver:
+        """Mock MemorySaver."""
+        pass
+
+    END = "END"
+    START = "START"
+import time
+import logging
+from functools import wraps
+import random
+
+logger = logging.getLogger(__name__)
+
+
+def retry_with_backoff(retries=3, backoff_in_seconds=1):
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            x = 0
+            while True:
+                try:
+                    return func(*args, **kwargs)
+                except Exception as e:
+                    if x == retries:
+                        logger.error(f"Function {func.__name__} failed after {retries} retries: {e}")
+                        raise
+                    else:
+                        sleep = (backoff_in_seconds * 2 ** x) + random.uniform(0, 1)
+                        logger.warning(f"Function {func.__name__} failed: {e}. Retrying in {sleep:.2f}s...")
+                        time.sleep(sleep)
+                        x += 1
+        return wrapper
+    return decorator

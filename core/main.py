@@ -5,7 +5,7 @@ import logging
 import argparse
 from core.utils.config_utils import load_app_config
 from core.utils.logging_utils import setup_logging
-from core.utils.system_logger import SystemLogger
+from core.utils.logging_utils import SystemLogger
 from core.system.bootstrap import Bootstrap
 from core.settings import settings
 

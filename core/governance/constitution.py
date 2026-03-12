@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from typing import List, Dict, Any
 import time
-from core.utils.logger import setup_logger
+from core.utils.logging_utils import setup_logger
 
 logger = setup_logger("GovernanceConstitution")
 

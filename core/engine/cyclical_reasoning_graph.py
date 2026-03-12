@@ -21,7 +21,7 @@ from core.utils.logging_utils import get_logger
 
 logger = get_logger(__name__)
 
-from core.utils.graph_utils import StateGraph, END, START, MemorySaver, HAS_LANGGRAPH
+from core.utils.agent_utils import StateGraph, END, START, MemorySaver, HAS_LANGGRAPH
 
 # v23.5 Integration: APEX Generative Risk Engine
 try:

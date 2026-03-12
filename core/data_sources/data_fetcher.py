@@ -12,7 +12,7 @@ except ImportError:
 import time
 from typing import Dict, List, Any, Optional
 from core.utils.logging_utils import get_logger
-from core.utils.retry_utils import retry_with_backoff
+from core.utils.agent_utils import retry_with_backoff
 
 logger = get_logger(__name__)
 
