@@ -1,0 +1,120 @@
+/*
+=========================================================
+ADAM Sovereign OS Core UI Components
+=========================================================
+*/
+/* Window Styling */
+.os-window {
+    position: absolute;
+    background: #020408;
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    display: flex;
+    flex-direction: column;
+    border-radius: 6px;
+    overflow: hidden;
+    resize: both;
+    min-width: 400px;
+    min-height: 300px;
+    animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.os-window.active {
+    border-color: var(--cyan-glow);
+    z-index: 50;
+    box-shadow: 0 0 20px rgba(0, 240, 255, 0.15);
+}
+
+.window-bar {
+    background: #0f172a;
+    padding: 6px 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: move;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    user-select: none;
+}
+
+.window-content { flex-grow: 1; position: relative; }
+iframe { width: 100%; height: 100%; border: none; background: #020408; }
+
+/* Dock Styling */
+.dock {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--dock-glass);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 16px;
+    padding: 10px 20px;
+    display: flex;
+    gap: 16px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    z-index: 100;
+}
+
+.dock-item {
+    width: 48px;
+    height: 48px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    border: none;
+    padding: 0;
+    outline: none;
+}
+.dock-item:hover, .dock-item:focus {
+    transform: translateY(-5px) scale(1.1);
+    background: rgba(255,255,255,0.1);
+    box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
+}
+
+/* Tooltip */
+.dock-item::after {
+    content: attr(data-title);
+    position: absolute;
+    bottom: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.8);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+    white-space: nowrap;
+}
+.dock-item:hover::after, .dock-item:focus::after { opacity: 1; }
+
+.app-dot {
+    width: 4px;
+    height: 4px;
+    background: var(--cyan-glow);
+    border-radius: 50%;
+    position: absolute;
+    bottom: -6px;
+    opacity: 0;
+}
+.app-dot.running { opacity: 1; }
+
+@keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+/* Background Overlays */
+.bg-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(2, 4, 8, 0.90);
+    z-index: -1;
+    background-image: radial-gradient(rgba(0, 240, 255, 0.05) 1px, transparent 1px);
+    background-size: 20px 20px;
+}

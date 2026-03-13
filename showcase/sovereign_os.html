@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="adam-module-type" content="core-os">
     <title>ADAM Sovereign OS</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.tailwindcss.com" defer></script>
+    <script src="https://unpkg.com/lucide@latest" defer></script>
 
     <style>
         :root {
@@ -116,7 +117,7 @@
         @keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
     </style>
 </head>
-<body>
+<body data-ai-state="os-ready">
 
     <div class="bg-overlay"></div>
 
@@ -138,12 +139,12 @@
     </div>
 
     <!-- Desktop Area -->
-    <div id="desktop" class="w-full h-full pt-8 pb-24 relative">
+    <main id="desktop" class="w-full h-full pt-8 pb-24 relative">
         <!-- Windows injected here -->
-    </div>
+    </main>
 
     <!-- Start Menu -->
-    <div id="start-menu" class="absolute bottom-24 left-1/2 transform -translate-x-1/2 w-80 bg-slate-900 border border-slate-700 rounded-lg shadow-2xl p-4 hidden z-[150] glass-panel transition-all duration-200 opacity-0 translate-y-4">
+    <nav id="start-menu" class="absolute bottom-24 left-1/2 transform -translate-x-1/2 w-80 bg-slate-900 border border-slate-700 rounded-lg shadow-2xl p-4 hidden z-[150] glass-panel transition-all duration-200 opacity-0 translate-y-4">
         <div class="text-xs text-gray-400 font-bold uppercase tracking-widest mb-3 border-b border-slate-700 pb-2 flex justify-between">
             <span>System Matrix</span>
             <i data-lucide="layers" class="w-4 h-4 text-cyan-500"></i>
@@ -169,7 +170,7 @@
     </div>
 
     <!-- Dock -->
-    <div class="dock">
+    <nav class="dock" aria-label="System Dock">
         <button class="dock-item" type="button" aria-label="Start Menu" onclick="toggleStartMenu()" data-title="System Matrix">
             <i data-lucide="grid" class="text-white w-6 h-6 hover:text-cyan-400 transition-colors"></i>
         </button>
@@ -384,6 +385,6 @@
         }
     </script>
 
-    <script src="../showcase/js/nav.js" data-root=".."></script>
+    <script src="../showcase/js/nav.js" data-root=".." defer></script>
 </body>
 </html>

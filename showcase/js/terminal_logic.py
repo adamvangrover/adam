@@ -1,8 +1,9 @@
-import js
-from pyodide.ffi import create_proxy
-import sys
 import asyncio
 import json
+
+import js
+from pyodide.ffi import create_proxy
+
 
 # Terminal Interface
 class TerminalInterface:
