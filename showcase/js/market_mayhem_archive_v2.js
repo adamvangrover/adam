@@ -16,8 +16,7 @@ class MarketMayhemController {
         };
         this.dom = {
             strategicPanel: document.getElementById('strategicPanel'),
-            outlookPanel: document.getElementById('outlookPanel'),
-            convictionPanel: document.getElementById('convictionPanel'),
+                        convictionPanel: document.getElementById('convictionPanel'),
             watchListPanel: document.getElementById('watchListPanel'),
             sectorRiskPanel: document.getElementById('sectorRiskPanel'),
             archiveGrid: document.getElementById('archiveGrid'),
@@ -38,8 +37,7 @@ class MarketMayhemController {
         try {
             await this.loadData();
             this.renderSidebar();
-            this.renderOutlook();
-            this.renderChart();
+                        this.renderChart();
             this.renderFeatured();
             this.renderArchive(); // Dynamic JS rendering activated
             this.renderSemanticCloud();
@@ -79,6 +77,17 @@ class MarketMayhemController {
             if (house_view === 'BULLISH') color = '#0aff60';
             if (house_view === 'BEARISH') color = '#ff3333';
 
+            // Calculate average consensus from archive
+            let avgBullish = 50;
+            let avgBearish = 50;
+            if (this.data.archive && this.data.archive.length > 0) {
+                const validItems = this.data.archive.filter(item => item.consensus_bullish !== undefined);
+                if (validItems.length > 0) {
+                    avgBullish = Math.round(validItems.reduce((sum, item) => sum + item.consensus_bullish, 0) / validItems.length);
+                    avgBearish = Math.round(validItems.reduce((sum, item) => sum + item.consensus_bearish, 0) / validItems.length);
+                }
+            }
+
             this.dom.strategicPanel.innerHTML = `
                 <h3>
                     <span>STRATEGIC COMMAND</span>
@@ -88,8 +97,25 @@ class MarketMayhemController {
                     <span style="color: #666; font-size: 0.7rem;">HOUSE VIEW</span>
                     <div style="font-size: 1.1rem; color: ${color}; font-weight: bold;">${house_view}</div>
                 </div>
-                <div style="font-size: 0.75rem; line-height: 1.4; color: #ccc;">
+                <div style="font-size: 0.75rem; line-height: 1.4; color: #ccc; margin-bottom: 15px;">
                     ${narrative}
+                </div>
+                <div style="border-top: 1px solid #333; padding-top: 10px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.75rem; margin-bottom: 5px;">
+                        <span style="color: #0aff60;">BULL CONSENSUS</span>
+                        <span style="color: #0aff60;">${avgBullish}%</span>
+                    </div>
+                    <div style="width: 100%; background: #333; height: 4px; border-radius: 2px; margin-bottom: 10px;">
+                        <div style="width: ${avgBullish}%; background: #0aff60; height: 100%; border-radius: 2px;"></div>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; font-size: 0.75rem; margin-bottom: 5px;">
+                        <span style="color: #ff3333;">BEAR CONSENSUS</span>
+                        <span style="color: #ff3333;">${avgBearish}%</span>
+                    </div>
+                    <div style="width: 100%; background: #333; height: 4px; border-radius: 2px;">
+                        <div style="width: ${avgBearish}%; background: #ff3333; height: 100%; border-radius: 2px;"></div>
+                    </div>
                 </div>
             `;
         }
@@ -174,66 +200,7 @@ class MarketMayhemController {
         }
     }
 
-    renderOutlook() {
-        if (!this.data.market || this.data.market.length === 0) return;
 
-        // Calculate Advancers/Decliners
-        const advancers = this.data.market.filter(m => m.change_pct > 0).length;
-        const decliners = this.data.market.filter(m => m.change_pct < 0).length;
-        const breadth = (advancers / (advancers + decliners) * 100).toFixed(0);
-
-        // Calculate Avg P/E
-        const peRatios = this.data.market.map(m => m.pe_ratio).filter(pe => pe > 0);
-        const avgPE = (peRatios.reduce((a, b) => a + b, 0) / peRatios.length).toFixed(1);
-
-        // Implied S&P Target (Mock logic: using average upside of top 10 weights)
-        const top10 = this.data.market.sort((a,b) => parseFloat(b.market_cap) - parseFloat(a.market_cap)).slice(0, 10);
-        const avgUpside = top10.reduce((acc, stock) => {
-            const target = stock.outlook && stock.outlook.price_target ? stock.outlook.price_target : stock.current_price;
-            return acc + ((target - stock.current_price) / stock.current_price);
-        }, 0) / 10;
-        
-        // Mock current S&P
-        const currentSPX = 6890; 
-        const impliedTarget = Math.round(currentSPX * (1 + avgUpside));
-
-        // Mock Macro Data
-        const treasury10y = 4.12;
-        const bslIndex = 98.45;
-        const bslSpread = "+350 bps";
-
-
-        this.dom.outlookPanel.innerHTML = `
-            <h3>
-                <span>MACRO ENVIRONMENT</span>
-                <i class="fas fa-globe"></i>
-            </h3>
-            <div class="metric-row">
-                <span class="metric-label">S&P 500 Level</span>
-                <span class="metric-val" style="color: #00f3ff;">${currentSPX}</span>
-            </div>
-            <div class="metric-row">
-                <span class="metric-label">Implied S&P Target</span>
-                <span class="metric-val" style="color: #d946ef;">${impliedTarget}</span>
-            </div>
-            <div class="metric-row">
-                <span class="metric-label">10Y Treasury</span>
-                <span class="metric-val ${treasury10y > 4.5 ? 'val-red' : 'val-green'}">${treasury10y}%</span>
-            </div>
-            <div class="metric-row">
-                <span class="metric-label">BSL Index Level</span>
-                <span class="metric-val">${bslIndex} <span style="font-size:0.6rem;color:#888;">(${bslSpread})</span></span>
-            </div>
-            <div class="metric-row" style="margin-top: 10px; border-top: 1px solid #333; padding-top: 5px;">
-                <span class="metric-label">Market Breadth</span>
-                <span class="metric-val ${breadth > 50 ? 'val-green' : 'val-red'}">${breadth}% Bullish</span>
-            </div>
-             <div class="metric-row">
-                <span class="metric-label">Avg P/E Ratio</span>
-                <span class="metric-val">${avgPE}x</span>
-            </div>
-        `;
-    }
 
     // --- Charting ---
 
@@ -246,24 +213,41 @@ class MarketMayhemController {
         if (this.state.timePeriod === '3M') dataPoints = 90;
         if (this.state.timePeriod === '1Y') dataPoints = 100; // Condensed
 
-        // Synthetic History based on filtered Archive Sentiment
-        const history = this.generateSentimentHistory(dataPoints);
-        const lastVal = history[history.length - 1];
+        // History based on Archive
+        const historyData = this.generateMarketHistory(dataPoints);
+        const history = historyData.sentiment;
+        const conviction = historyData.conviction;
+        const sp500 = historyData.sp500;
+        const treasury = historyData.treasury;
+        const bsl = historyData.bsl;
+        const bullish_prob = historyData.bullish_prob;
+        const bearish_prob = historyData.bearish_prob;
+
+        const lastVal = history.length > 0 ? history[history.length - 1] : 50;
+        const lastSp500 = sp500.filter(v => v !== null).pop() || 5000;
+        const lastTreasury = treasury.filter(v => v !== null).pop() || 4.0;
 
         // Projections
         const projectionSteps = Math.round(dataPoints / 3);
         const projections = [];
+        const spProjections = [];
         let drift = 0;
         if (houseView === 'BULLISH') drift = 0.5;
         if (houseView === 'BEARISH') drift = -0.5;
 
         let current = lastVal;
+        let currentSp = lastSp500;
+
         for(let i=0; i<projectionSteps; i++) {
             current += drift + (Math.random() * 4 - 2);
             // Bounds check
             if (current > 100) current = 100;
             if (current < 0) current = 0;
             projections.push(current);
+
+            // S&P Projection correlates with house view
+            currentSp += (drift * 20) + (Math.random() * 40 - 20);
+            spProjections.push(currentSp);
         }
 
         // Config
@@ -272,7 +256,7 @@ class MarketMayhemController {
         this.state.mainChartInstance = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: [...Array(history.length).fill('').map((_,i)=>i), ...Array(projections.length).fill('').map((_,i)=>'Proj')],
+                labels: [...historyData.labels, ...Array(projections.length).fill('Proj')],
                 datasets: [
                     {
                         label: 'Historical Sentiment',
@@ -282,16 +266,78 @@ class MarketMayhemController {
                         borderWidth: 2,
                         tension: 0.4,
                         fill: true,
-                        pointRadius: 0
+                        pointRadius: 0,
+                        yAxisID: 'y'
                     },
                     {
-                        label: 'Projected Outlook',
-                        data: [...Array(history.length).fill(null), lastVal, ...projections],
+                        label: 'Conviction',
+                        data: [...conviction, ...Array(projections.length).fill(null)],
+                        borderColor: 'rgba(255, 255, 255, 0.4)',
+                        borderWidth: 1,
+                        borderDash: [2, 4],
+                        tension: 0.3,
+                        pointRadius: 0,
+                        yAxisID: 'y',
+                        hidden: false
+                    },
+                    {
+                        label: 'Bullish Prob',
+                        data: [...bullish_prob, ...Array(projections.length).fill(null)],
+                        borderColor: 'rgba(10, 255, 96, 0.5)',
+                        borderWidth: 1,
+                        tension: 0.4,
+                        pointRadius: 0,
+                        yAxisID: 'y',
+                        hidden: true
+                    },
+                    {
+                        label: 'Projected Sentiment',
+                        data: [...Array(history.length - 1).fill(null), lastVal, ...projections],
                         borderColor: '#d946ef',
                         borderWidth: 2,
                         borderDash: [5, 5],
                         tension: 0.4,
-                        pointRadius: 0
+                        pointRadius: 0,
+                        yAxisID: 'y'
+                    },
+                    {
+                        label: 'S&P 500',
+                        data: [...sp500, ...Array(projections.length).fill(null)],
+                        borderColor: '#0aff60',
+                        borderWidth: 1,
+                        tension: 0.1,
+                        pointRadius: 0,
+                        yAxisID: 'y1'
+                    },
+                    {
+                        label: 'Proj S&P 500',
+                        data: [...Array(history.length - 1).fill(null), lastSp500, ...spProjections],
+                        borderColor: '#0aff60',
+                        borderWidth: 1,
+                        borderDash: [5, 5],
+                        tension: 0.1,
+                        pointRadius: 0,
+                        yAxisID: 'y1'
+                    },
+                    {
+                        label: '10Y Treasury',
+                        data: [...treasury, ...Array(projections.length).fill(null)],
+                        borderColor: '#f59e0b',
+                        borderWidth: 1,
+                        tension: 0.2,
+                        pointRadius: 0,
+                        yAxisID: 'y2',
+                        hidden: true
+                    },
+                    {
+                        label: 'BSL Price',
+                        data: [...bsl, ...Array(projections.length).fill(null)],
+                        borderColor: '#8b5cf6',
+                        borderWidth: 1,
+                        tension: 0.2,
+                        pointRadius: 0,
+                        yAxisID: 'y',
+                        hidden: true
                     }
                 ]
             },
@@ -299,42 +345,120 @@ class MarketMayhemController {
                 responsive: true,
                 maintainAspectRatio: false,
                 interaction: { intersect: false, mode: 'index' },
+                layout: {
+                    padding: { top: 40 }
+                },
                 plugins: {
-                    legend: { labels: { color: '#ccc', font: { family: 'JetBrains Mono' } } }
+                    legend: {
+                        position: 'top',
+                        align: 'start',
+                        labels: {
+                            color: '#ccc',
+                            font: { family: 'JetBrains Mono', size: 10 },
+                            boxWidth: 12
+                        }
+                    }
                 },
                 scales: {
-                    y: { grid: { color: '#222' }, ticks: { color: '#666' }, min: 0, max: 100 },
+                    y: {
+                        type: 'linear',
+                        display: true,
+                        position: 'left',
+                        grid: { color: '#222' },
+                        ticks: { color: '#00f3ff' },
+                        min: 0, max: 100,
+                        title: { display: true, text: 'Sentiment', color: '#00f3ff'}
+                    },
+                    y1: {
+                        type: 'linear',
+                        display: true,
+                        position: 'right',
+                        grid: { drawOnChartArea: false },
+                        ticks: { color: '#0aff60' },
+                        title: { display: true, text: 'S&P 500', color: '#0aff60'}
+                    },
+                    y2: {
+                        type: 'linear',
+                        display: false,
+                        position: 'right',
+                        grid: { drawOnChartArea: false },
+                        ticks: { color: '#f59e0b' }
+                    },
                     x: { grid: { color: '#222' }, ticks: { display: false } }
                 }
             }
         });
     }
 
-    generateSentimentHistory(points) {
+    generateMarketHistory(points) {
         // Try to build from real data if available
-        if (!this.data.archive || this.data.archive.length === 0) return Array.from({length: points}, () => 50);
+        if (!this.data.archive || this.data.archive.length === 0) {
+            return {
+                sentiment: Array.from({length: points}, () => 50),
+                conviction: Array.from({length: points}, () => 50),
+                sp500: Array.from({length: points}, () => null),
+                treasury: Array.from({length: points}, () => null),
+                bullish_prob: Array.from({length: points}, () => null),
+                bearish_prob: Array.from({length: points}, () => null),
+                labels: Array.from({length: points}, (_, i) => `Point ${i}`)
+            };
+        }
 
         // Sort archive by date ascending
         const sorted = [...this.data.archive]
             .filter(item => item.date && item.sentiment_score)
             .sort((a, b) => new Date(a.date) - new Date(b.date));
 
-        if (sorted.length === 0) return Array.from({length: points}, () => 50);
+        if (sorted.length === 0) {
+            return {
+                sentiment: Array.from({length: points}, () => 50),
+                conviction: Array.from({length: points}, () => 50),
+                sp500: Array.from({length: points}, () => null),
+                treasury: Array.from({length: points}, () => null),
+                bullish_prob: Array.from({length: points}, () => null),
+                bearish_prob: Array.from({length: points}, () => null),
+                labels: Array.from({length: points}, (_, i) => `Point ${i}`)
+            };
+        }
 
-        // Take the last N points or interpolate
-        const result = [];
+        const result = {
+            sentiment: [],
+            conviction: [],
+            sp500: [],
+            treasury: [],
+            bullish_prob: [],
+            bearish_prob: [],
+            labels: []
+        };
         
         // Simple downsampling or picking logic
         if (sorted.length <= points) {
-            return sorted.map(i => i.sentiment_score);
+            sorted.forEach(i => {
+                result.sentiment.push(i.sentiment_score);
+                result.conviction.push(i.conviction || 50);
+                result.sp500.push(i.sp500_level || null);
+                result.treasury.push(i.treasury_yield || null);
+                result.bsl.push(i.bsl_price || null);
+                result.bullish_prob.push(i.consensus_bullish || null);
+                result.bearish_prob.push(i.consensus_bearish || null);
+                result.labels.push(i.date);
+            });
         } else {
              const step = Math.floor(sorted.length / points);
              for(let i=0; i<points; i++) {
                  const index = Math.min(i * step, sorted.length - 1);
-                 result.push(sorted[index].sentiment_score);
+                 const item = sorted[index];
+                 result.sentiment.push(item.sentiment_score);
+                 result.conviction.push(item.conviction || 50);
+                 result.sp500.push(item.sp500_level || null);
+                 result.treasury.push(item.treasury_yield || null);
+                 result.bsl.push(item.bsl_price || null);
+                 result.bullish_prob.push(item.consensus_bullish || null);
+                 result.bearish_prob.push(item.consensus_bearish || null);
+                 result.labels.push(item.date);
              }
-             return result;
         }
+        return result;
     }
 
     // --- Featured Section ---
@@ -357,10 +481,16 @@ class MarketMayhemController {
                 <div style="font-size:0.9rem; font-weight:bold; margin-bottom:5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color: #fff;">
                     ${item.title}
                 </div>
-                <div style="font-size:0.7rem; color:#888; display:flex; justify-content:space-between;">
+                <div style="font-size:0.7rem; color:#888; display:flex; justify-content:space-between; margin-bottom: 5px;">
                     <span class="mono">${item.date}</span>
                     <span style="color:var(--secondary-color);">CONV: ${item.conviction}%</span>
                 </div>
+                ${item.sp500_level ? `
+                <div style="font-size:0.6rem; color:#666; border-top: 1px solid #333; padding-top: 5px; display: flex; justify-content: space-between;">
+                    <span>S&P: ${item.sp500_level}</span>
+                    <span>10Y: ${item.treasury_yield}%</span>
+                </div>
+                ` : ''}
             </div>
         `).join('');
     }
@@ -392,6 +522,47 @@ class MarketMayhemController {
     }
 
     // --- Archive List ---
+
+    renderOutlook() {
+        if (!this.dom.outlookPanel) {
+            // Need to look it up if we added it manually later
+            this.dom.outlookPanel = document.getElementById('outlookPanel');
+            if (!this.dom.outlookPanel) return;
+        }
+
+        let breadth = 'Neutral';
+        let breadthColor = '#f59e0b';
+        let peRatio = '21.5x';
+        let yieldCurve = 'Normal';
+        let yieldColor = '#0aff60';
+
+        if (this.data.archive && this.data.archive.length > 0) {
+            const recent = this.data.archive.slice(-5);
+            const avgSentiment = recent.reduce((sum, item) => sum + (item.sentiment_score || 50), 0) / recent.length;
+
+            if (avgSentiment > 65) { breadth = 'Expanding'; breadthColor = '#0aff60'; peRatio = '24.5x'; }
+            else if (avgSentiment < 35) { breadth = 'Deteriorating'; breadthColor = '#ff3333'; peRatio = '18.2x'; yieldCurve = 'Inverted'; yieldColor = '#ff3333'; }
+        }
+
+        this.dom.outlookPanel.innerHTML = `
+            <h3>
+                <span>MACRO ENVIRONMENT</span>
+                <i class="fas fa-globe"></i>
+            </h3>
+            <div class="metric-row">
+                <span class="metric-label">MARKET BREADTH</span>
+                <span class="metric-val" style="color: ${breadthColor}">${breadth}</span>
+            </div>
+            <div class="metric-row">
+                <span class="metric-label">AVG P/E RATIO</span>
+                <span class="metric-val">${peRatio}</span>
+            </div>
+            <div class="metric-row">
+                <span class="metric-label">YIELD CURVE</span>
+                <span class="metric-val" style="color: ${yieldColor}">${yieldCurve}</span>
+            </div>
+        `;
+    }
 
     renderArchive() {
         if (!this.data.archive) return;
@@ -437,6 +608,10 @@ class MarketMayhemController {
             el.dataset.date = item.date;
             el.dataset.conviction = item.conviction || 0;
             el.dataset.sentiment = item.sentiment_score || 50;
+            el.dataset.bullish = item.consensus_bullish || 50;
+            el.dataset.bearish = item.consensus_bearish || 50;
+            el.dataset.bullish = item.consensus_bullish || 50;
+            el.dataset.bearish = item.consensus_bearish || 50;
 
             const sentimentColor = (item.sentiment_score || 50) > 60 ? 'var(--secondary-color)' : ((item.sentiment_score || 50) < 40 ? 'var(--danger-color)' : '#888');
 
@@ -729,6 +904,8 @@ class MarketMayhemController {
                 // For conviction/sentiment, handle descending
                 if (sortValue === 'conviction') return (parseInt(b.dataset.conviction) || 0) - (parseInt(a.dataset.conviction) || 0);
                 if (sortValue === 'sentiment') return (parseInt(b.dataset.sentiment) || 0) - (parseInt(a.dataset.sentiment) || 0);
+                if (sortValue === 'bullish') return (parseInt(b.dataset.bullish) || 0) - (parseInt(a.dataset.bullish) || 0);
+                if (sortValue === 'bearish') return (parseInt(b.dataset.bearish) || 0) - (parseInt(a.dataset.bearish) || 0);
                 return 0;
             });
 

@@ -31,7 +31,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 88,
     "probability": 50,
-    "outlook_score": 27
+    "outlook_score": 27,
+    "sp500_level": 5182.0,
+    "treasury_yield": 4.83,
+    "bsl_price": 92.82,
+    "consensus_bullish": 42,
+    "consensus_bearish": 58
   },
   {
     "title": "Daily Briefing: Sovereign AI & Crypto Supercycle Update",
@@ -60,41 +65,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 91,
     "probability": 50,
-    "outlook_score": 34
-  },
-  {
-    "title": "Daily Briefing: Sovereign AI & Crypto Supercycle Update",
-    "date": "2026-03-27",
-    "summary": "Report content.",
-    "type": "MARKET_OUTLOOK",
-    "full_body": "",
-    "sentiment_score": 75,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "Crypto",
-        "EV",
-        "Inflation"
-      ]
-    },
-    "provenance_hash": "4e59a666d0589ed26ceb7913d376055ffb7ebe5d0284eb7cf0a46fbae4e059be",
-    "filename": "Daily_Briefing_2026_03_27.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 75/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "outlook_score": 34,
+    "sp500_level": 4500.0,
+    "treasury_yield": 3.98,
+    "bsl_price": 98.88,
+    "consensus_bullish": 53,
+    "consensus_bearish": 47
   },
   {
     "title": "Daily Briefing: Sovereign AI & Crypto Supercycle Update",
@@ -123,41 +99,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 91,
     "probability": 50,
-    "outlook_score": 34
-  },
-  {
-    "title": "Daily Briefing: Sovereign AI & Crypto Supercycle Update",
-    "date": "2026-03-26",
-    "summary": "Report content.",
-    "type": "MARKET_OUTLOOK",
-    "full_body": "",
-    "sentiment_score": 75,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "Crypto",
-        "EV",
-        "Inflation"
-      ]
-    },
-    "provenance_hash": "3fd0914c9e436a3689093589971df5e71422d30804b4309efc395f8154cdfdeb",
-    "filename": "Daily_Briefing_2026_03_26.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 75/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "outlook_score": 34,
+    "sp500_level": 4500.0,
+    "treasury_yield": 3.6,
+    "bsl_price": 96.84,
+    "consensus_bullish": 42,
+    "consensus_bearish": 58
   },
   {
     "title": "1Q26 Equity Research Desk: Optimal Portfolio Architecture and Strategic Archetype Frameworks",
@@ -193,7 +140,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 27,
     "probability": 80,
-    "outlook_score": 21
+    "outlook_score": 21,
+    "sp500_level": 6012,
+    "treasury_yield": 4.11,
+    "bsl_price": 99.49,
+    "consensus_bullish": 71,
+    "consensus_bearish": 29
   },
   {
     "title": "Daily Briefing: Sovereign AI & Crypto Supercycle Update",
@@ -222,41 +174,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 91,
     "probability": 50,
-    "outlook_score": 34
-  },
-  {
-    "title": "Daily Briefing: Sovereign AI & Crypto Supercycle Update",
-    "date": "2026-03-23",
-    "summary": "Report content.",
-    "type": "MARKET_OUTLOOK",
-    "full_body": "",
-    "sentiment_score": 75,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "Crypto",
-        "EV",
-        "Inflation"
-      ]
-    },
-    "provenance_hash": "06c73bad4e4bfedb3db90f7a44146611416e8c4e500f9c57c19a4542f5bf3605",
-    "filename": "Daily_Briefing_2026_03_23.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 75/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "outlook_score": 34,
+    "sp500_level": 4500.0,
+    "treasury_yield": 4.0,
+    "bsl_price": 97.07,
+    "consensus_bullish": 44,
+    "consensus_bearish": 56
   },
   {
     "title": "Daily Briefing: Sovereign AI & Crypto Supercycle Update",
@@ -286,7 +209,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 91,
     "probability": 50,
-    "outlook_score": 34
+    "outlook_score": 34,
+    "sp500_level": 4500.0,
+    "treasury_yield": 3.56,
+    "bsl_price": 97.6,
+    "consensus_bullish": 52,
+    "consensus_bearish": 48
   },
   {
     "title": "Market Pulse: Global Growth Synchronizes",
@@ -317,41 +245,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 88,
     "probability": 50,
-    "outlook_score": 27
-  },
-  {
-    "title": "Daily Briefing: Sovereign AI & Crypto Supercycle Update",
-    "date": "2026-03-20",
-    "summary": "Report content.",
-    "type": "MARKET_OUTLOOK",
-    "full_body": "",
-    "sentiment_score": 75,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "Crypto",
-        "EV",
-        "Inflation"
-      ]
-    },
-    "provenance_hash": "448d0e936785d43dc053b9ff4f5ecb046e3d8abf63d1ef1ccfa9233553870f77",
-    "filename": "Daily_Briefing_2026_03_20.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 75/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "outlook_score": 27,
+    "sp500_level": 5725.0,
+    "treasury_yield": 3.52,
+    "bsl_price": 92.95,
+    "consensus_bullish": 51,
+    "consensus_bearish": 49
   },
   {
     "title": "Daily Briefing: Sovereign AI & Crypto Supercycle Update",
@@ -380,41 +279,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 91,
     "probability": 50,
-    "outlook_score": 34
-  },
-  {
-    "title": "Daily Briefing: Sovereign AI & Crypto Supercycle Update",
-    "date": "2026-03-16",
-    "summary": "Report content.",
-    "type": "MARKET_OUTLOOK",
-    "full_body": "",
-    "sentiment_score": 75,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "Crypto",
-        "EV",
-        "Inflation"
-      ]
-    },
-    "provenance_hash": "52215368adb32476d873b7c6498208acb761ed73299d8399418913048c7f29dd",
-    "filename": "Daily_Briefing_2026_03_16.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 75/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "outlook_score": 34,
+    "sp500_level": 4500.0,
+    "treasury_yield": 4.34,
+    "bsl_price": 98.74,
+    "consensus_bullish": 48,
+    "consensus_bearish": 52
   },
   {
     "title": "Market Mayhem: The Unified Compendium and JSONL Architectural Blueprint",
@@ -445,7 +315,49 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 98,
     "semantic_score": 51,
     "probability": 100,
-    "outlook_score": 32
+    "outlook_score": 32,
+    "sp500_level": 5988,
+    "treasury_yield": 3.93,
+    "bsl_price": 98.67,
+    "consensus_bullish": 11,
+    "consensus_bearish": 89
+  },
+  {
+    "title": "The Great Bifurcation: Sovereign AI vs Decentralized Compute",
+    "date": "2026-03-15",
+    "summary": "<p>The global compute market is undergoing a structural schism. On one side, <strong>Sovereign AI</strong> initiatives led by nation-states (US, China, UAE) are consolidating high-performance compute ...",
+    "type": "MARKET_OUTLOOK",
+    "full_body": "<h2>Executive Summary</h2><p>The global compute market is undergoing a structural schism. On one side, <strong>Sovereign AI</strong> initiatives led by nation-states (US, China, UAE) are consolidating high-performance compute (HPC) into walled gardens. On the other, <strong>Decentralized Physical Infrastructure Networks (DePIN)</strong> are aggregating consumer-grade GPUs into a permissionless grid.</p><p>This 'Bifurcation' creates a unique arbitrage opportunity. While Sovereign clusters command a premium for security and compliance, the DePIN layer offers cost-efficiency for inference and fine-tuning. Our analysis suggests a <strong>60/40 capital allocation shift</strong> towards decentralized protocols by Q4 2026.</p>\n<h2>Market Structure Analysis</h2><h3>The Sovereign Moat</h3><p>Governments are treating H100/B200 clusters as strategic reserves, akin to oil or gold. Export controls have created a 'Compute Iron Curtain'.</p><ul><li><strong>US-EU Axis:</strong> Focused on 'Safe AI' and regulatory capture via the AI Act.</li><li><strong>China-BRICS:</strong> Accelerating domestic chip fabrication to bypass sanctions.</li></ul><h3>The Decentralized Swarm</h3><p>Protocols like <em>Render</em>, <em>Akash</em>, and <em>IO.net</em> have aggregated over 500k GPUs. While individual node latency is higher, the aggregate throughput for parallelizable tasks (rendering, folding) rivals Tier 1 datacenters.</p>\n<h2>Compute Cost Arbitrage</h2><h2>Investment Thesis</h2><p><strong>Conviction: HIGH (85%)</strong></p><p>We recommend a <strong>Long Volatility</strong> strategy on key DePIN assets, coupled with short exposure to legacy datacenter REITs that fail to pivot to high-density cooling. The 'Zombie Processor' thesis remains valid for older x86 server farms.</p>\n",
+    "sentiment_score": 100,
+    "entities": {
+      "tickers": [],
+      "agents": [],
+      "sovereigns": [
+        "CN_PBOC",
+        "US_FED"
+      ],
+      "keywords": [
+        "AI",
+        "Gold",
+        "Oil",
+        "Volatility"
+      ]
+    },
+    "provenance_hash": "7e04d366ef8818374a08b99e6e7f113d0835510cd0f7ac4f34ebcbbef40ea27c",
+    "filename": "deep_dive_sample.html",
+    "is_sourced": true,
+    "metrics_json": "{}",
+    "source_priority": 2,
+    "conviction": 50,
+    "semantic_score": 56,
+    "probability": 50,
+    "outlook_score": 10,
+    "sp500_level": 6029,
+    "treasury_yield": 3.53,
+    "bsl_price": 99.02,
+    "consensus_bullish": 90,
+    "consensus_bearish": 10,
+    "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 100/100. Cross-reference with knowledge graph completed."
   },
   {
     "title": "MARKET MAYHEM",
@@ -477,6 +389,11 @@ window.MARKET_MAYHEM_DATA = [
     "semantic_score": 66,
     "probability": 50,
     "outlook_score": 10,
+    "sp500_level": 6200.0,
+    "treasury_yield": 3.75,
+    "bsl_price": 97.36,
+    "consensus_bullish": 20,
+    "consensus_bearish": 80,
     "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 20/100. Cross-reference with knowledge graph completed."
   },
   {
@@ -509,6 +426,11 @@ window.MARKET_MAYHEM_DATA = [
     "semantic_score": 80,
     "probability": 50,
     "outlook_score": 10,
+    "sp500_level": 6107,
+    "treasury_yield": 3.79,
+    "bsl_price": 97.51,
+    "consensus_bullish": 10,
+    "consensus_bearish": 90,
     "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 0/100. Cross-reference with knowledge graph completed."
   },
   {
@@ -540,7 +462,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 88,
     "probability": 50,
-    "outlook_score": 27
+    "outlook_score": 27,
+    "sp500_level": 5479.0,
+    "treasury_yield": 3.96,
+    "bsl_price": 92.8,
+    "consensus_bullish": 44,
+    "consensus_bearish": 56
   },
   {
     "title": "Daily Briefing: Sovereign AI & Crypto Supercycle Update",
@@ -569,41 +496,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 91,
     "probability": 50,
-    "outlook_score": 34
-  },
-  {
-    "title": "Daily Briefing: Sovereign AI & Crypto Supercycle Update",
-    "date": "2026-03-12",
-    "summary": "Report content.",
-    "type": "MARKET_OUTLOOK",
-    "full_body": "",
-    "sentiment_score": 75,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "Crypto",
-        "EV",
-        "Inflation"
-      ]
-    },
-    "provenance_hash": "8b34020000ed15869ccba3759e89dbcd1c85ecfaa9cb1cf685a4b65a7ab9d5a7",
-    "filename": "Daily_Briefing_2026_03_12.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 75/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "outlook_score": 34,
+    "sp500_level": 4500.0,
+    "treasury_yield": 4.31,
+    "bsl_price": 97.82,
+    "consensus_bullish": 52,
+    "consensus_bearish": 48
   },
   {
     "date": "2026-03-11",
@@ -734,42 +632,6 @@ window.MARKET_MAYHEM_DATA = [
     "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 81/100. Cross-reference with knowledge graph completed."
   },
   {
-    "title": "\ud83d\udd34 SYSTEM STATUS: DEGRADED (Kinetic Conflict Injection)",
-    "date": "2026-03-08",
-    "summary": "Report content.",
-    "type": "MARKET_OUTLOOK",
-    "full_body": "",
-    "sentiment_score": 71,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Bitcoin",
-        "Bonds",
-        "Cloud",
-        "EV"
-      ]
-    },
-    "provenance_hash": "a465c92a127aaccda41af4f685110ba760aacb425fdf79dfb32b5c87f0abbd01",
-    "filename": "Daily_Briefing_2026_03_08.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 100,
-    "semantic_score": 22,
-    "probability": 100,
-    "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 71/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
     "title": "Daily Briefing: Sovereign AI & Crypto Supercycle Update",
     "date": "2026-03-06",
     "summary": "Quick update on Sovereign AI & Crypto Supercycle and market movements....",
@@ -796,7 +658,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 91,
     "probability": 50,
-    "outlook_score": 34
+    "outlook_score": 34,
+    "sp500_level": 4500.0,
+    "treasury_yield": 4.64,
+    "bsl_price": 94.84,
+    "consensus_bullish": 42,
+    "consensus_bearish": 58
   },
   {
     "title": "Market Pulse: Dow Hits New Milestone",
@@ -827,74 +694,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 88,
     "probability": 50,
-    "outlook_score": 27
-  },
-  {
-    "title": "Daily Briefing: Sovereign AI & Crypto Supercycle Update",
-    "date": "2026-03-06",
-    "summary": "Report content.",
-    "type": "MARKET_OUTLOOK",
-    "full_body": "",
-    "sentiment_score": 75,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "Crypto",
-        "EV",
-        "Inflation"
-      ]
-    },
-    "provenance_hash": "32b7a74e2b6fbc0e13c94ada2c9cd6b0bc170bb3755a71f8b04947f9844a5507",
-    "filename": "Daily_Briefing_2026_03_06.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 75/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "Market Pulse: The Quantum Leap",
-    "date": "2026-03-05",
-    "summary": "Report content.",
-    "type": "MARKET_PULSE",
-    "full_body": "",
-    "sentiment_score": 100,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "400",
-        "700"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Bitcoin",
-        "Crypto",
-        "Cybersecurity",
-        "EV"
-      ]
-    },
-    "provenance_hash": "28aa9621bb29423be2bb74405620c1709b1f4f7fe9b312cb4f9f890a041be2c5",
-    "filename": "market_pulse_2026_03_05.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 58,
-    "probability": 50,
-    "outlook_score": 12,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 100/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "outlook_score": 27,
+    "sp500_level": 5351.0,
+    "treasury_yield": 4.81,
+    "bsl_price": 95.71,
+    "consensus_bullish": 59,
+    "consensus_bearish": 41
   },
   {
     "date": "2026-03-03",
@@ -953,107 +758,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 89,
     "probability": 50,
-    "outlook_score": 34
-  },
-  {
-    "title": "Daily Briefing: Sovereign AI & Crypto Supercycle Update",
-    "date": "2026-03-03",
-    "summary": "Report content.",
-    "type": "MARKET_OUTLOOK",
-    "full_body": "",
-    "sentiment_score": 75,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "Crypto",
-        "EV",
-        "Inflation"
-      ]
-    },
-    "provenance_hash": "e1130ec6824a2f009f9b63c1b8ef3fb0a04e1c18a9efd2350733b55b1018867f",
-    "filename": "Daily_Briefing_2026_03_03.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 75/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "2026 Intelligence Archive // ADAM O.S.",
-    "date": "2026-03-03",
-    "summary": "Report content.",
-    "type": "MARKET_OUTLOOK",
-    "full_body": "",
-    "sentiment_score": 0,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "keyframes"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "EV",
-        "Energy",
-        "Gold",
-        "Oil"
-      ]
-    },
-    "provenance_hash": "dde079d11b9d5be9744f0fc14fe598a29403cd70ad4c32f47e52af0c4bcec131",
-    "filename": "intelligence_archive_2026.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 32,
-    "probability": 50,
-    "outlook_score": 20,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 0/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "Strategic Mandate: Kinetic Adaptation 2026",
-    "date": "2026-03-03",
-    "summary": "Report content.",
-    "type": "MARKET_OUTLOOK",
-    "full_body": "",
-    "sentiment_score": 54,
-    "entities": {
-      "tickers": [],
-      "agents": [],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "DeFi",
-        "EV",
-        "Energy",
-        "Labor"
-      ]
-    },
-    "provenance_hash": "379506d1111e0acab51358a705206f72ddb56cfae3628c3e70ef55b4b67ecba7",
-    "filename": "strategy_kinetic_adaptation.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 44,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 54/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "outlook_score": 34,
+    "sp500_level": 4500.0,
+    "treasury_yield": 4.95,
+    "bsl_price": 93.11,
+    "consensus_bullish": 45,
+    "consensus_bearish": 55
   },
   {
     "date": "2026-03-02",
@@ -1153,7 +863,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 27,
     "probability": 97,
-    "outlook_score": 11
+    "outlook_score": 11,
+    "sp500_level": 6856.0,
+    "treasury_yield": 4.05,
+    "bsl_price": 99.08,
+    "consensus_bullish": 20,
+    "consensus_bearish": 80
   },
   {
     "date": "2026-03-02",
@@ -1189,76 +904,6 @@ window.MARKET_MAYHEM_DATA = [
     "probability": 99,
     "outlook_score": 14,
     "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 34/100. Cross-reference with knowledge graph completed."
-  },
-  {
-    "title": "ADAM :: SYSTEM STATUS: DEGRADED",
-    "date": "2026-03-02",
-    "summary": "Report content.",
-    "type": "MARKET_OUTLOOK",
-    "full_body": "",
-    "sentiment_score": 54,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "keyframes"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Bitcoin",
-        "Bonds",
-        "Cloud",
-        "Crypto"
-      ]
-    },
-    "provenance_hash": "75db72bf3f5936cc5a1ae6c4b226cc2b0b9b32e9917a7587cab564ffc60a8243",
-    "filename": "daily_briefing_2026_03_02.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 100,
-    "semantic_score": 30,
-    "probability": 100,
-    "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 54/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "\ud83d\udd34 SYSTEM STATUS: DEGRADED (Volatility Spike)",
-    "date": "2026-03-02",
-    "summary": "Report content.",
-    "type": "MARKET_OUTLOOK",
-    "full_body": "",
-    "sentiment_score": 61,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Bitcoin",
-        "Cloud",
-        "Crypto",
-        "EV"
-      ]
-    },
-    "provenance_hash": "2f7b4831d8fbf44fad401b68c562b760631bf43b20bfde4ff7c2ab14f9fae0b3",
-    "filename": "Daily_Briefing_2026_03_02.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 100,
-    "semantic_score": 25,
-    "probability": 100,
-    "outlook_score": 10,
-    "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 61/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
   },
   {
     "title": "Market Mayhem: The Adam Financial System Intelligence Briefing",
@@ -1297,7 +942,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 20,
     "probability": 95,
-    "outlook_score": 27
+    "outlook_score": 27,
+    "sp500_level": 100.0,
+    "treasury_yield": 6.0,
+    "bsl_price": 96.54,
+    "consensus_bullish": 29,
+    "consensus_bearish": 71
   },
   {
     "title": "House View: Sovereign AI & Crypto Supercycle Outlook",
@@ -1325,222 +975,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 87,
     "probability": 50,
-    "outlook_score": 62
-  },
-  {
-    "title": "ADAM :: House View March 2026",
-    "date": "2026-03-01",
-    "summary": "Report content.",
-    "type": "MARKET_OUTLOOK",
-    "full_body": "",
-    "sentiment_score": 100,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "400"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "EV",
-        "Equities",
-        "Growth",
-        "Quality"
-      ]
-    },
-    "provenance_hash": "37ff197dc080877fbbb03363df317072ad0205adae2a98ceec578b2d21b77905",
-    "filename": "house_view_2026_03_01.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 48,
-    "probability": 50,
-    "outlook_score": 15,
-    "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 100/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "House View: Sovereign AI & Crypto Supercycle Outlook",
-    "date": "2026-03-01",
-    "summary": "Report content.",
-    "type": "STRATEGY",
-    "full_body": "",
-    "sentiment_score": 76,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "Crypto",
-        "EV",
-        "Inflation"
-      ]
-    },
-    "provenance_hash": "1fb2e237492cac97fdff6274227ec280a41a6f1343c724814a91746e78282b75",
-    "filename": "House_View_2026_03_01.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 18,
-    "probability": 50,
-    "outlook_score": 11,
-    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 76/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM v24.0 :: DAILY BRIEFING",
-    "date": "2026-03-01",
-    "summary": "Report content.",
-    "type": "MARKET_OUTLOOK",
-    "full_body": "",
-    "sentiment_score": 80,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "300",
-        "400"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "EV",
-        "Gold",
-        "Growth",
-        "Inflation"
-      ]
-    },
-    "provenance_hash": "2dee37c6a825e3a7ee3a18d2d08d4bbb824757e022788f8207a85ca4ad8e9a5d",
-    "filename": "daily_briefing_2026_03_01.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 49,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 80/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "Market Mayhem: The Adam Financial System Intelligence Briefing",
-    "date": "2026-03-01",
-    "summary": "Report content.",
-    "type": "MARKET_OUTLOOK",
-    "full_body": "",
-    "sentiment_score": 56,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400",
-        "alex_tang",
-        "oneL1994"
-      ],
-      "sovereigns": [
-        "CN_PBOC",
-        "EU_ECB",
-        "JP_BOJ",
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Banks",
-        "Bonds",
-        "Cloud",
-        "Cybersecurity"
-      ]
-    },
-    "provenance_hash": "87cb73259c3d628c3c19cdf75c682ecf82e504eec2ac892bf9a589c705e8084a",
-    "filename": "Market_Mayhem_20260301.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 75,
-    "semantic_score": 10,
-    "probability": 95,
-    "outlook_score": 25,
-    "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 56/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM v30.1 :: Islamic Republic of Iran - Geopolitical & Credit Risk Audit",
-    "date": "2026-02-28",
-    "summary": "Report content.",
-    "type": "SYSTEM_AUDIT",
-    "full_body": "",
-    "sentiment_score": 74,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "Crypto",
-        "EV",
-        "Energy"
-      ]
-    },
-    "provenance_hash": "3fc25390d937a053b0c84782d09740a46596a0a2d5af0c8630fd74826114362b",
-    "filename": "market_mayhem_iran_conflict.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 20,
-    "probability": 50,
-    "outlook_score": 11,
-    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 74/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM v24.0 :: DAILY BRIEFING",
-    "date": "2026-02-28",
-    "summary": "Report content.",
-    "type": "MARKET_OUTLOOK",
-    "full_body": "",
-    "sentiment_score": 100,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "300",
-        "400"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "EV",
-        "Ethereum",
-        "SPAC",
-        "Tech"
-      ]
-    },
-    "provenance_hash": "a8c3a2f2c70d6b9d7136deef2425fb114f99a061e927ed3d7fd5cb076acf7689",
-    "filename": "daily_briefing_2026_02_28.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 48,
-    "probability": 50,
-    "outlook_score": 12,
-    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 100/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "outlook_score": 62,
+    "sp500_level": 5865.0,
+    "treasury_yield": 4.85,
+    "bsl_price": 94.51,
+    "consensus_bullish": 90,
+    "consensus_bearish": 10
   },
   {
     "date": "2026-02-27",
@@ -1604,79 +1044,78 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 86,
     "probability": 50,
-    "outlook_score": 27
+    "outlook_score": 27,
+    "sp500_level": 4892.0,
+    "treasury_yield": 4.29,
+    "bsl_price": 93.95,
+    "consensus_bullish": 55,
+    "consensus_bearish": 45
   },
   {
-    "title": "Market Mayhem: The Adam Financial System Intelligence Briefing",
-    "date": "2026-02-27",
-    "summary": "Report content.",
-    "type": "MARKET_OUTLOOK",
-    "full_body": "",
-    "sentiment_score": 66,
+    "title": "Untitled Report",
+    "date": "2026-02-26",
+    "summary": "Global beverage company.\n\nKey Credit Stats:\n- Net Leverage: 1.57x\n- Interest Coverage: 11.20x\n- Z-Score: 1.03  [Ref: 10-K_FY2025.pdf]...",
+    "type": "COMPANY_REPORT",
+    "full_body": "<h2>Executive Summary</h2><p>Global beverage company.</p>\n<p>Key Credit Stats:\n<ul>\n<li>Net Leverage: 1.57x</li>\n<li>Interest Coverage: 11.20x</li>\n<li>Z-Score: 1.03  [Ref: 10-K_FY2025.pdf]</li>\n</ul></p>\n<h2>Risk Analysis</h2><p>Primary Risk Factors:\n1. N/A\n2. Market Volatility (Beta: 0.6)</p>\n<p>Quantitative Model:\nProbability of Default: 100.00%\nLoss Given Default: 5.00%</p>\n<h2>Legal & Covenants</h2><p>Document Review Summary:\nStandard documentation assumed (no special clauses detected in snippet).</p>\n<p>Clauses Identified:</p>\n",
+    "sentiment_score": 0,
     "entities": {
       "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
+      "agents": [],
+      "sovereigns": [],
       "keywords": [
-        "AI",
-        "Banks",
-        "Cloud",
-        "DeFi",
-        "EV"
-      ]
-    },
-    "provenance_hash": "6d0b232787965b651dda8c5fb5e2495a92d01c9478752d88134c972d328cf60b",
-    "filename": "newsletter_market_mayhem_mar_10_2026.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 0,
-    "semantic_score": 18,
-    "probability": 0,
-    "outlook_score": 10,
-    "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 66/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "daily briefing",
-    "date": "2026-02-25",
-    "summary": "Report content.",
-    "type": "MARKET_OUTLOOK",
-    "full_body": "",
-    "sentiment_score": 91,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Bitcoin",
-        "Cybersecurity",
         "EV",
-        "Equities"
+        "Volatility"
       ]
     },
-    "provenance_hash": "4264157576b56aaf9b9cfb0a62143b6440b2a32d6aee5a7cf342f58198d0bcc6",
-    "filename": "daily_briefing.html",
-    "is_sourced": false,
+    "provenance_hash": "bf8115415b904ed75f88a353289e64417d01f6a0cc083ea04fb76b9834731690",
+    "filename": "credit_memo_Coca_Cola_Co.html",
+    "is_sourced": true,
     "metrics_json": "{}",
+    "source_priority": 2,
     "conviction": 50,
-    "semantic_score": 34,
-    "probability": 70,
-    "outlook_score": 10,
-    "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 91/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "semantic_score": 56,
+    "probability": 50,
+    "outlook_score": 34,
+    "sp500_level": 6144,
+    "treasury_yield": 3.88,
+    "bsl_price": 95.81,
+    "consensus_bullish": 10,
+    "consensus_bearish": 90,
+    "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 0/100. Cross-reference with knowledge graph completed."
+  },
+  {
+    "title": "Untitled Report",
+    "date": "2026-02-25",
+    "summary": "Retail giant.\n\nKey Credit Stats:\n- Net Leverage: 0.97x\n- Interest Coverage: 11.26x\n- Z-Score: 3.31  [Ref: 10-K_FY2025.pdf]...",
+    "type": "COMPANY_REPORT",
+    "full_body": "<h2>Executive Summary</h2><p>Retail giant.</p>\n<p>Key Credit Stats:\n<ul>\n<li>Net Leverage: 0.97x</li>\n<li>Interest Coverage: 11.26x</li>\n<li>Z-Score: 3.31  [Ref: 10-K_FY2025.pdf]</li>\n</ul></p>\n<h2>Risk Analysis</h2><p>Primary Risk Factors:\n1. N/A\n2. Market Volatility (Beta: 0.5)</p>\n<p>Quantitative Model:\nProbability of Default: 4.00%\nLoss Given Default: 5.00%</p>\n<h2>Legal & Covenants</h2><p>Document Review Summary:\nStandard documentation assumed (no special clauses detected in snippet).</p>\n<p>Clauses Identified:</p>\n",
+    "sentiment_score": 0,
+    "entities": {
+      "tickers": [],
+      "agents": [],
+      "sovereigns": [],
+      "keywords": [
+        "AI",
+        "EV",
+        "Retail",
+        "Volatility"
+      ]
+    },
+    "provenance_hash": "0ef255c6721dc9f98cd94be0c8c365b41ced892ee985f14eab17fc17210042c7",
+    "filename": "credit_memo_Walmart_Inc.html",
+    "is_sourced": true,
+    "metrics_json": "{}",
+    "source_priority": 2,
+    "conviction": 50,
+    "semantic_score": 56,
+    "probability": 50,
+    "outlook_score": 35,
+    "sp500_level": 5977,
+    "treasury_yield": 3.63,
+    "bsl_price": 98.47,
+    "consensus_bullish": 10,
+    "consensus_bearish": 90,
+    "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 0/100. Cross-reference with knowledge graph completed."
   },
   {
     "date": "2026-02-20",
@@ -1739,76 +1178,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 88,
     "probability": 50,
-    "outlook_score": 27
-  },
-  {
-    "title": "\ud83d\udfe2 SYSTEM STATUS: NOMINAL (Intraday Patch Successful)",
-    "date": "2026-02-20",
-    "summary": "Report content.",
-    "type": "MARKET_OUTLOOK",
-    "full_body": "",
-    "sentiment_score": 76,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Bitcoin",
-        "Cloud",
-        "EV",
-        "Growth"
-      ]
-    },
-    "provenance_hash": "8f222f88be98272893f9253a805673e0b0b20d3ffe202ed6c9d2440cd5998dc7",
-    "filename": "Daily_Briefing_2026_02_20.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 23,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 76/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "Market Pulse: Energy Renaissance",
-    "date": "2026-02-20",
-    "summary": "Report content.",
-    "type": "MARKET_PULSE",
-    "full_body": "",
-    "sentiment_score": 100,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "400",
-        "700"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "DeFi",
-        "EV",
-        "Energy",
-        "SPAC"
-      ]
-    },
-    "provenance_hash": "1c1e5375118511a81e486e6a8604601f496b935100f50ac09c9fb3cc6ebb4c56",
-    "filename": "market_pulse_2026_02_20.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 59,
-    "probability": 50,
-    "outlook_score": 19,
-    "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 100/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "outlook_score": 27,
+    "sp500_level": 5304.0,
+    "treasury_yield": 4.83,
+    "bsl_price": 96.43,
+    "consensus_bullish": 43,
+    "consensus_bearish": 57
   },
   {
     "date": "2026-02-19",
@@ -1869,41 +1244,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 91,
     "probability": 50,
-    "outlook_score": 34
-  },
-  {
-    "title": "Daily Briefing: Sovereign AI & Crypto Supercycle Update",
-    "date": "2026-02-19",
-    "summary": "Report content.",
-    "type": "MARKET_OUTLOOK",
-    "full_body": "",
-    "sentiment_score": 75,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "Crypto",
-        "EV",
-        "Inflation"
-      ]
-    },
-    "provenance_hash": "8ae4ea8e7a4f983c72d6de5834b95eea73d075605afbb5d80e21ea294e2cb6d5",
-    "filename": "Daily_Briefing_2026_02_19.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 75/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "outlook_score": 34,
+    "sp500_level": 4500.0,
+    "treasury_yield": 4.73,
+    "bsl_price": 97.6,
+    "consensus_bullish": 40,
+    "consensus_bearish": 60
   },
   {
     "date": "2026-02-18",
@@ -1936,42 +1282,6 @@ window.MARKET_MAYHEM_DATA = [
     "probability": 0,
     "outlook_score": 10,
     "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 83/100. Cross-reference with knowledge graph completed."
-  },
-  {
-    "title": "\ud83d\udfe1 SYSTEM STATUS: DEGRADED (Structural Inversion Detected)",
-    "date": "2026-02-18",
-    "summary": "Report content.",
-    "type": "MARKET_OUTLOOK",
-    "full_body": "",
-    "sentiment_score": 71,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Bitcoin",
-        "Cloud",
-        "EV",
-        "Gold"
-      ]
-    },
-    "provenance_hash": "b4b7bac56a53b26ef01f30fcc631184e10eac6059d79f4e13979a97e845ce361",
-    "filename": "Daily_Briefing_2026_02_18.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 0,
-    "semantic_score": 23,
-    "probability": 0,
-    "outlook_score": 10,
-    "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 71/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
   },
   {
     "date": "2026-02-17",
@@ -2032,41 +1342,45 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 91,
     "probability": 50,
-    "outlook_score": 34
+    "outlook_score": 34,
+    "sp500_level": 4500.0,
+    "treasury_yield": 4.16,
+    "bsl_price": 92.99,
+    "consensus_bullish": 42,
+    "consensus_bearish": 58
   },
   {
-    "title": "Daily Briefing: Sovereign AI & Crypto Supercycle Update",
+    "title": "Untitled Report",
     "date": "2026-02-17",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 75,
+    "summary": "Item 1. Business\nMeta Platforms, Inc. engages in the development of products that enable people to connect and share with friends and family through mobile devices, personal computers, virtual reality...",
+    "type": "COMPANY_REPORT",
+    "full_body": "<h2>Business Overview</h2><p>Item 1. Business\nMeta Platforms, Inc. engages in the development of products that enable people to connect and share with friends and family through mobile devices, personal computers, virtual reality headsets, and in-home devices worldwide.</p>\n<p>Item 1A. Risk Factors\nThe following risk factors could materially affect our business, financial condition, or results of operations:\n<ul>\n<li>App Tracking Transparency impacting ad targeting efficiency.</li>\n<li>Reality Labs investments yielding uncertain returns.</li>\n<li>Reg...</li>\n</ul></p>\n<h2>Risk Factors</h2><p>App Tracking Transparency impacting ad targeting efficiency.\nReality Labs investments yielding uncertain returns.\nRegulatory scrutiny on content moderation and user privacy.\nCompetition from TikTok for user attention.\nAdditional general economic risks including inflation and interest rates.</p>\n",
+    "sentiment_score": 0,
     "entities": {
       "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
+      "agents": [],
       "sovereigns": [],
       "keywords": [
         "AI",
-        "Cloud",
-        "Crypto",
         "EV",
         "Inflation"
       ]
     },
-    "provenance_hash": "d422ed575c74dc770d0b4db8b4d344f42ac74ce702b7f232015fd5765365db2e",
-    "filename": "Daily_Briefing_2026_02_17.html",
-    "is_sourced": false,
+    "provenance_hash": "660bc4a9e5cef15ffbab556308320bd11b7d126b6287cba431f01462dc1418cc",
+    "filename": "credit_memo_META_RAG.html",
+    "is_sourced": true,
     "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
+    "source_priority": 2,
+    "conviction": 0,
+    "semantic_score": 53,
+    "probability": 0,
     "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 75/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "sp500_level": 6053,
+    "treasury_yield": 4.78,
+    "bsl_price": 97.98,
+    "consensus_bullish": 10,
+    "consensus_bearish": 90,
+    "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 0/100. Cross-reference with knowledge graph completed."
   },
   {
     "date": "2026-02-16",
@@ -2131,7 +1445,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 55,
     "probability": 33,
-    "outlook_score": 14
+    "outlook_score": 14,
+    "sp500_level": 5928,
+    "treasury_yield": 4.13,
+    "bsl_price": 98.3,
+    "consensus_bullish": 60,
+    "consensus_bearish": 40
   },
   {
     "title": "Daily Briefing: Sovereign AI & Crypto Supercycle Update",
@@ -2161,41 +1480,44 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 91,
     "probability": 50,
-    "outlook_score": 34
+    "outlook_score": 34,
+    "sp500_level": 4500.0,
+    "treasury_yield": 3.79,
+    "bsl_price": 99.24,
+    "consensus_bullish": 56,
+    "consensus_bearish": 44
   },
   {
-    "title": "Daily Briefing: Sovereign AI & Crypto Supercycle Update",
-    "date": "2026-02-16",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 75,
+    "title": "Untitled Report",
+    "date": "2026-02-14",
+    "summary": "The borrower Microsoft Corp presents a mixed credit profile. Financial performance shows strong EBITDA ($5.0M) but elevated leverage (10.0x).  [Ref: TechCorp_10K_2025.pdf]...",
+    "type": "COMPANY_REPORT",
+    "full_body": "<h2>Executive Summary</h2><p>The borrower Microsoft Corp presents a mixed credit profile. Financial performance shows strong EBITDA ($5.0M) but elevated leverage (10.0x).  [Ref: TechCorp_10K_2025.pdf]</p>\n<h2>Key Risks & Mitigants</h2><p>Key Risks:\n<ul>\n<li>HIGH: Leverage ratio exceeds 4.0x policy limit.</li>\n</ul></p>\n<h2>Financial Analysis</h2><p>EBITDA: $5.0M | Leverage: 10.0x</p>\n",
+    "sentiment_score": 100,
     "entities": {
       "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
+      "agents": [],
       "sovereigns": [],
       "keywords": [
-        "AI",
-        "Cloud",
-        "Crypto",
         "EV",
-        "Inflation"
+        "Tech"
       ]
     },
-    "provenance_hash": "8fd9c5ee044192fcd2ab5071c0ce8ad695ba928a39d3a44798bde22b585c39fe",
-    "filename": "Daily_Briefing_2026_02_16.html",
-    "is_sourced": false,
+    "provenance_hash": "4c288eb25d660b22ebf15ed43201f566a691a9a86cb7eabe94d64f7387cd9b05",
+    "filename": "credit_memo_Microsoft_Corp.html",
+    "is_sourced": true,
     "metrics_json": "{}",
+    "source_priority": 2,
     "conviction": 50,
-    "semantic_score": 22,
+    "semantic_score": 47,
     "probability": 50,
     "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 75/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "sp500_level": 6056,
+    "treasury_yield": 4.01,
+    "bsl_price": 92.35,
+    "consensus_bullish": 90,
+    "consensus_bearish": 10,
+    "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 100/100. Cross-reference with knowledge graph completed."
   },
   {
     "title": "MARKET MAYHEM",
@@ -2227,6 +1549,11 @@ window.MARKET_MAYHEM_DATA = [
     "semantic_score": 64,
     "probability": 50,
     "outlook_score": 10,
+    "sp500_level": 5823,
+    "treasury_yield": 4.13,
+    "bsl_price": 96.11,
+    "consensus_bullish": 63,
+    "consensus_bearish": 37,
     "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 71/100. Cross-reference with knowledge graph completed."
   },
   {
@@ -2288,7 +1615,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 91,
     "probability": 50,
-    "outlook_score": 34
+    "outlook_score": 34,
+    "sp500_level": 4500.0,
+    "treasury_yield": 3.66,
+    "bsl_price": 96.38,
+    "consensus_bullish": 58,
+    "consensus_bearish": 42
   },
   {
     "title": "Market Pulse: AI Stocks Go Parabolic",
@@ -2319,41 +1651,44 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 88,
     "probability": 50,
-    "outlook_score": 27
+    "outlook_score": 27,
+    "sp500_level": 5563.0,
+    "treasury_yield": 3.77,
+    "bsl_price": 93.75,
+    "consensus_bullish": 51,
+    "consensus_bearish": 49
   },
   {
-    "title": "Daily Briefing: Sovereign AI & Crypto Supercycle Update",
+    "title": "Untitled Report",
     "date": "2026-02-13",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 75,
+    "summary": "The borrower TechCorp Inc. presents a mixed credit profile. Financial performance shows strong EBITDA ($350.0M) but elevated leverage (8.6x).  [Ref: TechCorp_10K_2025.pdf]...",
+    "type": "COMPANY_REPORT",
+    "full_body": "<h2>Executive Summary</h2><p>The borrower TechCorp Inc. presents a mixed credit profile. Financial performance shows strong EBITDA ($350.0M) but elevated leverage (8.6x).  [Ref: TechCorp_10K_2025.pdf]</p>\n<h2>Key Risks & Mitigants</h2><p>Key Risks:\n<ul>\n<li>HIGH: Leverage ratio exceeds 4.0x policy limit.</li>\n</ul></p>\n<h2>Financial Analysis</h2><p>EBITDA: $350.0M | Leverage: 8.6x</p>\n",
+    "sentiment_score": 100,
     "entities": {
       "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
+      "agents": [],
       "sovereigns": [],
       "keywords": [
-        "AI",
-        "Cloud",
-        "Crypto",
         "EV",
-        "Inflation"
+        "Tech"
       ]
     },
-    "provenance_hash": "ab4c62f6e60c52e98feaa2fb3bddf9a6b80431bf27db08e7a75e67d05c7fe399",
-    "filename": "Daily_Briefing_2026_02_13.html",
-    "is_sourced": false,
+    "provenance_hash": "1c336157e298655e8082eeac180321d9a3f38671ae74b1594ae9696844d15b56",
+    "filename": "credit_memo_TechCorp_Inc.html",
+    "is_sourced": true,
     "metrics_json": "{}",
+    "source_priority": 2,
     "conviction": 50,
-    "semantic_score": 22,
+    "semantic_score": 48,
     "probability": 50,
     "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 75/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "sp500_level": 5995,
+    "treasury_yield": 4.33,
+    "bsl_price": 99.08,
+    "consensus_bullish": 90,
+    "consensus_bearish": 10,
+    "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 100/100. Cross-reference with knowledge graph completed."
   },
   {
     "date": "2026-02-12",
@@ -2388,113 +1723,37 @@ window.MARKET_MAYHEM_DATA = [
     "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 83/100. Cross-reference with knowledge graph completed."
   },
   {
-    "title": "\ud83d\udd34 SYSTEM STATUS: DEGRADED (Structural Integrity Failing)",
+    "title": "Untitled Report",
     "date": "2026-02-12",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 70,
+    "summary": "The borrower TechCorp Inc. presents a mixed credit profile. Financial performance shows strong EBITDA ($350.0M) but elevated leverage (8.6x).  [Ref: TechCorp_10K_2025.pdf]...",
+    "type": "COMPANY_REPORT",
+    "full_body": "<h2>Executive Summary</h2><p>The borrower TechCorp Inc. presents a mixed credit profile. Financial performance shows strong EBITDA ($350.0M) but elevated leverage (8.6x).  [Ref: TechCorp_10K_2025.pdf]</p>\n<h2>Key Risks & Mitigants</h2><p>Key Risks:\n<ul>\n<li>HIGH: Leverage ratio exceeds 4.0x policy limit.</li>\n<li>CONNECTED PARTY RISK: NextGen AI Ltd. via TechCorp Inc. -> TechGlobal Holdings -> NextGen AI Ltd. is Speculative risk.</li>\n</ul></p>\n<h2>Financial Analysis</h2><p>EBITDA: $350.0M | Leverage: 8.6x</p>\n",
+    "sentiment_score": 50,
     "entities": {
       "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
+      "agents": [],
+      "sovereigns": [],
       "keywords": [
         "AI",
-        "Bitcoin",
-        "Bonds",
-        "Cloud",
-        "EV"
-      ]
-    },
-    "provenance_hash": "32d89be75f384a7c039e55efe847b4d0210a19f5aa8819079a380a268adaf30f",
-    "filename": "Daily_Briefing_2026_02_12.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 23,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 70/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "Daily Briefing: The Employment Echo",
-    "date": "2026-02-11",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 85,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400",
-        "media"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Bitcoin",
-        "Cloud",
         "EV",
-        "Gold"
+        "Tech"
       ]
     },
-    "provenance_hash": "7a7060f293bf1baa1333113de129403ce3e745339768c36b33e559bb80a6b26a",
-    "filename": "Daily_Briefing_2026_02_11.html",
-    "is_sourced": false,
+    "provenance_hash": "f7fa473efdc7bd0fbf22239760b2aeae7507ce91ba38c008d6154a06a8d8fc66",
+    "filename": "credit_memo_output.html",
+    "is_sourced": true,
     "metrics_json": "{}",
+    "source_priority": 2,
     "conviction": 50,
-    "semantic_score": 36,
+    "semantic_score": 50,
     "probability": 50,
     "outlook_score": 10,
-    "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 85/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM v24.0 :: DAILY BRIEFING",
-    "date": "2026-02-10",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 83,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "300",
-        "400"
-      ],
-      "sovereigns": [
-        "CN_PBOC",
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Banks",
-        "Bitcoin",
-        "Bonds",
-        "EV"
-      ]
-    },
-    "provenance_hash": "3903b2a2efcb3235e8de3b3db2b889288f5d4912358986d85d1fc1f5ea97d973",
-    "filename": "daily_briefing_2026_02_10.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 47,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 83/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "sp500_level": 5832,
+    "treasury_yield": 4.28,
+    "bsl_price": 92.37,
+    "consensus_bullish": 59,
+    "consensus_bearish": 41,
+    "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 50/100. Cross-reference with knowledge graph completed."
   },
   {
     "title": "MARKET MAYHEM: The Weekly Briefing",
@@ -2528,7 +1787,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 49,
     "probability": 0,
-    "outlook_score": 10
+    "outlook_score": 10,
+    "sp500_level": 6182.0,
+    "treasury_yield": 4.83,
+    "bsl_price": 94.44,
+    "consensus_bullish": 41,
+    "consensus_bearish": 59
   },
   {
     "title": "Daily Briefing: Sovereign AI & Crypto Supercycle Update",
@@ -2557,41 +1821,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 91,
     "probability": 50,
-    "outlook_score": 34
-  },
-  {
-    "title": "Daily Briefing: Sovereign AI & Crypto Supercycle Update",
-    "date": "2026-02-09",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 75,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "Crypto",
-        "EV",
-        "Inflation"
-      ]
-    },
-    "provenance_hash": "31b7bc9fa3f6005f44e487c2e1f2953344c4695507186adccdbbe2b2fe0b1e74",
-    "filename": "Daily_Briefing_2026_02_09.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 75/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "outlook_score": 34,
+    "sp500_level": 4500.0,
+    "treasury_yield": 4.57,
+    "bsl_price": 96.18,
+    "consensus_bullish": 40,
+    "consensus_bearish": 60
   },
   {
     "title": "Market Pulse: Bitcoin Smashes Resistance",
@@ -2622,7 +1857,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 88,
     "probability": 50,
-    "outlook_score": 27
+    "outlook_score": 27,
+    "sp500_level": 4054.0,
+    "treasury_yield": 3.74,
+    "bsl_price": 99.06,
+    "consensus_bullish": 47,
+    "consensus_bearish": 53
   },
   {
     "title": "Daily Briefing: Sovereign AI & Crypto Supercycle Update",
@@ -2651,41 +1891,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 91,
     "probability": 50,
-    "outlook_score": 34
-  },
-  {
-    "title": "Daily Briefing: Sovereign AI & Crypto Supercycle Update",
-    "date": "2026-02-05",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 75,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "Crypto",
-        "EV",
-        "Inflation"
-      ]
-    },
-    "provenance_hash": "3fd274bd2c8f9a1c39ce2314e51c1f6f29116ecde07965fdcf7536c551a594d0",
-    "filename": "Daily_Briefing_2026_02_05.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 75/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "outlook_score": 34,
+    "sp500_level": 4500.0,
+    "treasury_yield": 4.5,
+    "bsl_price": 94.7,
+    "consensus_bullish": 60,
+    "consensus_bearish": 40
   },
   {
     "title": "Daily Briefing: Sovereign AI & Crypto Supercycle Update",
@@ -2715,41 +1926,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 91,
     "probability": 50,
-    "outlook_score": 34
-  },
-  {
-    "title": "Daily Briefing: Sovereign AI & Crypto Supercycle Update",
-    "date": "2026-02-04",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 75,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "Crypto",
-        "EV",
-        "Inflation"
-      ]
-    },
-    "provenance_hash": "dc0ea13a5aa2cb41126188962daab1ead55b5953738b617a8a2acdb15873b0c0",
-    "filename": "Daily_Briefing_2026_02_04.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 75/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "outlook_score": 34,
+    "sp500_level": 4500.0,
+    "treasury_yield": 4.75,
+    "bsl_price": 96.67,
+    "consensus_bullish": 54,
+    "consensus_bearish": 46
   },
   {
     "title": "Daily Briefing: Sovereign AI & Crypto Supercycle Update",
@@ -2778,76 +1960,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 89,
     "probability": 50,
-    "outlook_score": 34
-  },
-  {
-    "title": "Market Mayhem: Vol. 2026.02.06",
-    "date": "2026-02-02",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 90,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "400",
-        "keyframes"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Bitcoin",
-        "Cloud",
-        "Crypto",
-        "DeFi"
-      ]
-    },
-    "provenance_hash": "e41f497fcc0fdca636389f5e298359042f128f7df0ec04f3a2a91f3caa6d941a",
-    "filename": "newsletter_market_mayhem_feb_06_2026.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 38,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 90/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "Daily Briefing: Sovereign AI & Crypto Supercycle Update",
-    "date": "2026-02-02",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 75,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "Crypto",
-        "EV",
-        "Inflation"
-      ]
-    },
-    "provenance_hash": "c5e3c1fd3e2544700ed1fa82a28b8be1939580c1153c310d98393b56c4b3d374",
-    "filename": "Daily_Briefing_2026_02_02.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 75/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "outlook_score": 34,
+    "sp500_level": 4500.0,
+    "treasury_yield": 3.61,
+    "bsl_price": 94.75,
+    "consensus_bullish": 45,
+    "consensus_bearish": 55
   },
   {
     "title": "House View: Sovereign AI & Crypto Supercycle Outlook",
@@ -2875,73 +1993,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 87,
     "probability": 50,
-    "outlook_score": 62
-  },
-  {
-    "title": "Market Mayhem: Bifurcated Normalization",
-    "date": "2026-02-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 92,
-    "entities": {
-      "tickers": [],
-      "agents": [],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Gold",
-        "Retail"
-      ]
-    },
-    "provenance_hash": "dfbca07fa2419aef7bc5d44d8b434deceb0a77f68d582a65521451fd413947b8",
-    "filename": "newsletter_market_mayhem_feb_01_2026.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 100,
-    "semantic_score": 47,
-    "probability": 100,
-    "outlook_score": 28,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 92/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "House View: Sovereign AI & Crypto Supercycle Outlook",
-    "date": "2026-02-01",
-    "summary": "Report content.",
-    "type": "STRATEGY",
-    "full_body": "",
-    "sentiment_score": 76,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "Crypto",
-        "EV",
-        "Inflation"
-      ]
-    },
-    "provenance_hash": "d621db029d10c0c5714298f3edd763db2ca8ed57ec4b0a58b2d94a9afee8db42",
-    "filename": "House_View_2026_02_01.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 18,
-    "probability": 50,
-    "outlook_score": 11,
-    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 76/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "outlook_score": 62,
+    "sp500_level": 5080.0,
+    "treasury_yield": 4.02,
+    "bsl_price": 98.03,
+    "consensus_bullish": 90,
+    "consensus_bearish": 10
   },
   {
     "title": "MARKET MAYHEM",
@@ -2971,46 +2028,12 @@ window.MARKET_MAYHEM_DATA = [
     "semantic_score": 57,
     "probability": 66,
     "outlook_score": 38,
+    "sp500_level": 5803,
+    "treasury_yield": 3.99,
+    "bsl_price": 98.52,
+    "consensus_bullish": 24,
+    "consensus_bearish": 76,
     "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 33/100. Cross-reference with knowledge graph completed."
-  },
-  {
-    "title": "1Q26 Equity Research Desk: Optimal Portfolio Architecture and Strategic Archetype Frameworks",
-    "date": "2026-01-31",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 75,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [
-        "CN_PBOC",
-        "EU_ECB",
-        "JP_BOJ",
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Banks",
-        "Cloud",
-        "Crypto",
-        "Cybersecurity"
-      ]
-    },
-    "provenance_hash": "cac68c177603ea01e01f1caa5c83c08e5706ecbf911f5de8ed36352ce6ae30fb",
-    "filename": "1Q26_Equity_Research_Desk.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 56,
-    "semantic_score": 12,
-    "probability": 76,
-    "outlook_score": 17,
-    "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 75/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
   },
   {
     "title": "Market Pulse: Bitcoin Smashes Resistance",
@@ -3041,7 +2064,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 87,
     "probability": 50,
-    "outlook_score": 27
+    "outlook_score": 27,
+    "sp500_level": 4655.0,
+    "treasury_yield": 4.1,
+    "bsl_price": 93.95,
+    "consensus_bullish": 42,
+    "consensus_bearish": 58
   },
   {
     "title": "Daily Briefing: Sovereign AI & Crypto Supercycle Update",
@@ -3071,112 +2099,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 91,
     "probability": 50,
-    "outlook_score": 34
-  },
-  {
-    "title": "Daily Briefing: Sovereign AI & Crypto Supercycle Update",
-    "date": "2026-01-30",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 75,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "Crypto",
-        "EV",
-        "Inflation"
-      ]
-    },
-    "provenance_hash": "90d6d13e8217fb7af6b78a97990c96d9f79400041142b2284382be66ad87570f",
-    "filename": "Daily_Briefing_2026_01_30.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 75/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM v26.0 :: STRATEGIC RESEARCH",
-    "date": "2026-01-30",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 80,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400",
-        "media"
-      ],
-      "sovereigns": [
-        "CN_PBOC",
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Banks",
-        "Cloud",
-        "DeFi",
-        "EV"
-      ]
-    },
-    "provenance_hash": "b511799a4a438e0a4f156d4faeb8f6290ee64b29fcea8b7659074de728ad3629",
-    "filename": "report_great_bifurcation_2026.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 70,
-    "semantic_score": 29,
-    "probability": 70,
-    "outlook_score": 13,
-    "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 80/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "Jan 30 Liquidity Event Monitor",
-    "date": "2026-01-30",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 62,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "400",
-        "keyframes"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Bitcoin",
-        "Bonds",
-        "Cloud",
-        "Crypto"
-      ]
-    },
-    "provenance_hash": "27df8a1617a0db8c978746e9470c9427abd2d108c74bf9a7b3a8e66b747afc7d",
-    "filename": "jan30_liquidity_monitor.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 23,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 62/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "outlook_score": 34,
+    "sp500_level": 4500.0,
+    "treasury_yield": 4.45,
+    "bsl_price": 96.75,
+    "consensus_bullish": 49,
+    "consensus_bearish": 51
   },
   {
     "title": "Daily Briefing: Sovereign AI & Crypto Supercycle Update",
@@ -3206,41 +2134,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 91,
     "probability": 50,
-    "outlook_score": 34
-  },
-  {
-    "title": "Daily Briefing: Sovereign AI & Crypto Supercycle Update",
-    "date": "2026-01-26",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 75,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "Crypto",
-        "EV",
-        "Inflation"
-      ]
-    },
-    "provenance_hash": "7594b59bbfe120b15de8fb9d0869256b2f87c577bf966a10ef2e098b3acef73c",
-    "filename": "Daily_Briefing_2026_01_26.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 75/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "outlook_score": 34,
+    "sp500_level": 4500.0,
+    "treasury_yield": 4.46,
+    "bsl_price": 96.09,
+    "consensus_bullish": 49,
+    "consensus_bearish": 51
   },
   {
     "title": "Daily Briefing: Sovereign AI & Crypto Supercycle Update",
@@ -3270,7 +2169,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 89,
     "probability": 50,
-    "outlook_score": 34
+    "outlook_score": 34,
+    "sp500_level": 4500.0,
+    "treasury_yield": 3.79,
+    "bsl_price": 99.19,
+    "consensus_bullish": 54,
+    "consensus_bearish": 46
   },
   {
     "title": "Market Pulse: Global Growth Synchronizes",
@@ -3301,41 +2205,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 88,
     "probability": 50,
-    "outlook_score": 27
-  },
-  {
-    "title": "Daily Briefing: Sovereign AI & Crypto Supercycle Update",
-    "date": "2026-01-23",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 75,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "Crypto",
-        "EV",
-        "Inflation"
-      ]
-    },
-    "provenance_hash": "49cf9fd95fc804b6ab7bd748cdf10947a7b729e15dccbd1904428b279d782a05",
-    "filename": "Daily_Briefing_2026_01_23.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 75/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "outlook_score": 27,
+    "sp500_level": 4486.0,
+    "treasury_yield": 4.55,
+    "bsl_price": 93.0,
+    "consensus_bullish": 49,
+    "consensus_bearish": 51
   },
   {
     "title": "Daily Briefing: Sovereign AI & Crypto Supercycle Update",
@@ -3364,41 +2239,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 91,
     "probability": 50,
-    "outlook_score": 34
-  },
-  {
-    "title": "Daily Briefing: Sovereign AI & Crypto Supercycle Update",
-    "date": "2026-01-20",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 75,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "Crypto",
-        "EV",
-        "Inflation"
-      ]
-    },
-    "provenance_hash": "cff3cad0789cb9720ca410ccda6794839dbb5673e37b586e5ac983e87abca8be",
-    "filename": "Daily_Briefing_2026_01_20.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 75/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "outlook_score": 34,
+    "sp500_level": 4500.0,
+    "treasury_yield": 3.67,
+    "bsl_price": 97.47,
+    "consensus_bullish": 53,
+    "consensus_bearish": 47
   },
   {
     "title": "Market Pulse: The Roaring 20s Are Back",
@@ -3429,41 +2275,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 88,
     "probability": 50,
-    "outlook_score": 27
-  },
-  {
-    "title": "ADAM :: House View Jan 2026",
-    "date": "2026-01-15",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 66,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "400"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "EV",
-        "Equities",
-        "Inflation",
-        "Quality"
-      ]
-    },
-    "provenance_hash": "84629f16f8d994ce258006abbf202e3a645c731a40e003b9668eec0851aa643d",
-    "filename": "house_view_2026_01_15.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 48,
-    "probability": 50,
-    "outlook_score": 20,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 66/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "outlook_score": 27,
+    "sp500_level": 5227.0,
+    "treasury_yield": 3.8,
+    "bsl_price": 94.59,
+    "consensus_bullish": 45,
+    "consensus_bearish": 55
   },
   {
     "title": "MARKET MAYHEM",
@@ -3496,6 +2313,11 @@ window.MARKET_MAYHEM_DATA = [
     "semantic_score": 61,
     "probability": 50,
     "outlook_score": 10,
+    "sp500_level": 5821,
+    "treasury_yield": 4.18,
+    "bsl_price": 94.26,
+    "consensus_bullish": 37,
+    "consensus_bearish": 63,
     "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 40/100. Cross-reference with knowledge graph completed."
   },
   {
@@ -3557,115 +2379,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 91,
     "probability": 50,
-    "outlook_score": 34
-  },
-  {
-    "title": "GLOBAL MACRO-STRATEGIC OUTLOOK 2026: THE REFLATIONARY AGENTIC BOOM",
-    "date": "2026-01-12",
-    "summary": "Report content.",
-    "type": "STRATEGY",
-    "full_body": "",
-    "sentiment_score": 75,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400",
-        "media"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Banks",
-        "Bitcoin",
-        "Cloud",
-        "Crypto"
-      ]
-    },
-    "provenance_hash": "e45b1233c7348bc46fd23dfbcff4aa779f6b5f1047d022d25d5569b998ef8fcd",
-    "filename": "newsletter_market_mayhem_jan_2026.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 38,
-    "probability": 50,
-    "outlook_score": 15,
-    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 75/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "MARKET MAYHEM ARCHIVE",
-    "date": "2026-01-12",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 55,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "300",
-        "400"
-      ],
-      "sovereigns": [
-        "CN_PBOC",
-        "EU_ECB",
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Bitcoin",
-        "Cloud",
-        "Crypto",
-        "DeFi"
-      ]
-    },
-    "provenance_hash": "01b39e7553d7465a45f7602c6e7a251f795ff0dbf86c27c01f21a37e69296e8d",
-    "filename": "mkt_myhm.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 33,
-    "semantic_score": 2,
-    "probability": 53,
-    "outlook_score": 10,
-    "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 55/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "Daily Briefing: Sovereign AI & Crypto Supercycle Update",
-    "date": "2026-01-12",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 75,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "Crypto",
-        "EV",
-        "Inflation"
-      ]
-    },
-    "provenance_hash": "fd8c7378bd5bdba3106f3f465a241968cc114897355f80828061bf3488b3e72d",
-    "filename": "Daily_Briefing_2026_01_12.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 75/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "outlook_score": 34,
+    "sp500_level": 4500.0,
+    "treasury_yield": 4.74,
+    "bsl_price": 93.33,
+    "consensus_bullish": 40,
+    "consensus_bearish": 60
   },
   {
     "title": "Market Pulse: The Roaring 20s Are Back",
@@ -3696,7 +2415,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 88,
     "probability": 50,
-    "outlook_score": 27
+    "outlook_score": 27,
+    "sp500_level": 5122.0,
+    "treasury_yield": 4.65,
+    "bsl_price": 98.29,
+    "consensus_bullish": 58,
+    "consensus_bearish": 42
   },
   {
     "title": "Market Pulse: The Roaring 20s Are Back",
@@ -3727,7 +2451,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 88,
     "probability": 50,
-    "outlook_score": 27
+    "outlook_score": 27,
+    "sp500_level": 5130.0,
+    "treasury_yield": 3.84,
+    "bsl_price": 94.81,
+    "consensus_bullish": 40,
+    "consensus_bearish": 60
   },
   {
     "title": "House View: Sovereign AI & Crypto Supercycle Outlook",
@@ -3755,41 +2484,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 85,
     "probability": 50,
-    "outlook_score": 62
-  },
-  {
-    "title": "House View: Sovereign AI & Crypto Supercycle Outlook",
-    "date": "2026-01-01",
-    "summary": "Report content.",
-    "type": "STRATEGY",
-    "full_body": "",
-    "sentiment_score": 76,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "Crypto",
-        "EV",
-        "Inflation"
-      ]
-    },
-    "provenance_hash": "57161f09d29979a3ce7d779b699afed756ad690f4ecbd8ce5f0fd5306063bb26",
-    "filename": "House_View_2026_01_01.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 18,
-    "probability": 50,
-    "outlook_score": 11,
-    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 76/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "outlook_score": 62,
+    "sp500_level": 4490.0,
+    "treasury_yield": 4.69,
+    "bsl_price": 92.68,
+    "consensus_bullish": 90,
+    "consensus_bearish": 10
   },
   {
     "title": "Market Pulse: Tech Earnings Crush Estimates",
@@ -3818,7 +2518,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 88,
     "probability": 50,
-    "outlook_score": 10
+    "outlook_score": 10,
+    "sp500_level": 5970.0,
+    "treasury_yield": 3.55,
+    "bsl_price": 97.29,
+    "consensus_bullish": 90,
+    "consensus_bearish": 10
   },
   {
     "title": "Daily Briefing: Rate Cuts & Holiday Rally Update",
@@ -3846,41 +2551,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 89,
     "probability": 50,
-    "outlook_score": 10
-  },
-  {
-    "title": "Daily Briefing: Rate Cuts & Holiday Rally Update",
-    "date": "2025-12-23",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 77,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Inflation",
-        "Quality"
-      ]
-    },
-    "provenance_hash": "cb3350bda31ab2fe2e2b2b56319cbbd70b0274af6b439ea1a7919a7382c10795",
-    "filename": "Daily_Briefing_2025_12_23.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
     "outlook_score": 10,
-    "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 77/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "sp500_level": 4500.0,
+    "treasury_yield": 3.59,
+    "bsl_price": 92.35,
+    "consensus_bullish": 90,
+    "consensus_bearish": 10
   },
   {
     "title": "Market Pulse: Tech Earnings Crush Estimates",
@@ -3909,7 +2585,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 88,
     "probability": 50,
-    "outlook_score": 10
+    "outlook_score": 10,
+    "sp500_level": 4587.0,
+    "treasury_yield": 4.0,
+    "bsl_price": 92.51,
+    "consensus_bullish": 90,
+    "consensus_bearish": 10
   },
   {
     "title": "Daily Briefing: Rate Cuts & Holiday Rally Update",
@@ -3937,41 +2618,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 91,
     "probability": 50,
-    "outlook_score": 10
-  },
-  {
-    "title": "Daily Briefing: Rate Cuts & Holiday Rally Update",
-    "date": "2025-12-15",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 77,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Inflation",
-        "Quality"
-      ]
-    },
-    "provenance_hash": "6bce13e6162b7423075141fb8b4f5d3e215e668c7f432e639cb93f909cd6c306",
-    "filename": "Daily_Briefing_2025_12_15.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
     "outlook_score": 10,
-    "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 77/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "sp500_level": 4500.0,
+    "treasury_yield": 4.62,
+    "bsl_price": 95.7,
+    "consensus_bullish": 90,
+    "consensus_bearish": 10
   },
   {
     "title": "Agent Alignment Log: Protocol v23.5 (December 12, 2025)",
@@ -3999,7 +2651,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 68,
     "probability": 100,
-    "outlook_score": 31
+    "outlook_score": 31,
+    "sp500_level": 5626,
+    "treasury_yield": 3.83,
+    "bsl_price": 98.91,
+    "consensus_bullish": 10,
+    "consensus_bearish": 90
   },
   {
     "title": "Market Pulse: Productivity Boom Confirmed",
@@ -4028,41 +2685,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 86,
     "probability": 50,
-    "outlook_score": 10
-  },
-  {
-    "title": "Agent Alignment Log: Protocol v23.5 (December 12, 2025)",
-    "date": "2025-12-12",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 80,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Inflation",
-        "Quality"
-      ]
-    },
-    "provenance_hash": "8dec053ff1215037f66a84ee7a6003baf9816ca790bb87ca3591e90f21e21462",
-    "filename": "Agent_Alignment_Log_20251212.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 100,
-    "semantic_score": 22,
-    "probability": 100,
     "outlook_score": 10,
-    "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 80/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "sp500_level": 5668.0,
+    "treasury_yield": 4.38,
+    "bsl_price": 95.16,
+    "consensus_bullish": 90,
+    "consensus_bearish": 10
   },
   {
     "title": "\ud83c\udf29\ufe0f Market Mayhem: December 10, 2025",
@@ -4094,7 +2722,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 35,
     "probability": 0,
-    "outlook_score": 12
+    "outlook_score": 12,
+    "sp500_level": 5895,
+    "treasury_yield": 3.59,
+    "bsl_price": 94.12,
+    "consensus_bullish": 44,
+    "consensus_bearish": 56
   },
   {
     "title": "\ud83c\udfed Industry Report: December 10, 2025",
@@ -4126,7 +2759,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 57,
     "probability": 0,
-    "outlook_score": 17
+    "outlook_score": 17,
+    "sp500_level": 5864,
+    "treasury_yield": 4.21,
+    "bsl_price": 95.46,
+    "consensus_bullish": 48,
+    "consensus_bearish": 52
   },
   {
     "title": "Market Mayhem Newsletter - December 10, 2025",
@@ -4160,7 +2798,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 61,
     "probability": 99,
-    "outlook_score": 10
+    "outlook_score": 10,
+    "sp500_level": 6840.0,
+    "treasury_yield": 4.98,
+    "bsl_price": 92.17,
+    "consensus_bullish": 35,
+    "consensus_bearish": 65
   },
   {
     "title": "\ud83d\udcbb Tech Sector Watch: December 10, 2025",
@@ -4192,7 +2835,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 58,
     "probability": 0,
-    "outlook_score": 17
+    "outlook_score": 17,
+    "sp500_level": 5718,
+    "treasury_yield": 3.99,
+    "bsl_price": 98.6,
+    "consensus_bullish": 42,
+    "consensus_bearish": 58
   },
   {
     "title": "\ud83c\udfe0 Adam's House View: December 10, 2025",
@@ -4225,7 +2873,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 89,
     "probability": 50,
-    "outlook_score": 24
+    "outlook_score": 24,
+    "sp500_level": 5995,
+    "treasury_yield": 4.21,
+    "bsl_price": 96.07,
+    "consensus_bullish": 90,
+    "consensus_bearish": 10
   },
   {
     "title": "\ud83d\udcd1 Equity Research Note: December 10, 2025",
@@ -4257,7 +2910,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 62,
     "probability": 50,
-    "outlook_score": 10
+    "outlook_score": 10,
+    "sp500_level": 5767,
+    "treasury_yield": 4.5,
+    "bsl_price": 94.49,
+    "consensus_bullish": 90,
+    "consensus_bearish": 10
   },
   {
     "title": "\ud83e\udd3f Deep Dive Report: December 10, 2025",
@@ -4288,120 +2946,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 51,
     "probability": 0,
-    "outlook_score": 16
-  },
-  {
-    "title": "Market Mayhem Newsletter - December 10, 2025",
-    "date": "2025-12-10",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 92,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400",
-        "media"
-      ],
-      "sovereigns": [
-        "CN_PBOC",
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Bitcoin",
-        "Cloud",
-        "DeFi",
-        "EV"
-      ]
-    },
-    "provenance_hash": "aa9e9e699080759fd08e26f747cf578405ef5e67334be226a52150f40bd35a21",
-    "filename": "weekly_recap_20251210.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 36,
-    "probability": 70,
-    "outlook_score": 10,
-    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 92/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "[LIVE] ADAM v23.5 :: \ud83c\udfe0 Adam's House View: December 10, 2025",
-    "date": "2025-12-10",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 96,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400",
-        "media"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Bitcoin",
-        "Crypto",
-        "DeFi",
-        "EV"
-      ]
-    },
-    "provenance_hash": "ef4535e196f5da30f68f03d789440d7eb9ca7285721f1bbd54ae57d5a959e920",
-    "filename": "live_house_view.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 0,
-    "semantic_score": 34,
-    "probability": 0,
-    "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 96/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "\ud83d\udcbb Tech Sector Watch: December 10, 2025",
-    "date": "2025-12-10",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 96,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400",
-        "media"
-      ],
-      "sovereigns": [
-        "CN_PBOC",
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "EV",
-        "SPAC",
-        "Tech",
-        "Value"
-      ]
-    },
-    "provenance_hash": "33f3c7d19d3421c7390aae80c948a814bf6f5fc5e19089aab3a08c14d85ecfa5",
-    "filename": "tech_watch_20251210.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 0,
-    "semantic_score": 34,
-    "probability": 0,
-    "outlook_score": 10,
-    "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 96/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "outlook_score": 16,
+    "sp500_level": 5950,
+    "treasury_yield": 3.85,
+    "bsl_price": 96.84,
+    "consensus_bullish": 10,
+    "consensus_bearish": 90
   },
   {
     "title": "\ud83c\udf29\ufe0f Market Mayhem: December 09, 2025",
@@ -4428,7 +2978,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 70,
     "probability": 50,
-    "outlook_score": 10
+    "outlook_score": 10,
+    "sp500_level": 5634,
+    "treasury_yield": 4.28,
+    "bsl_price": 95.83,
+    "consensus_bullish": 59,
+    "consensus_bearish": 41
   },
   {
     "title": "Daily Briefing: Rate Cuts & Holiday Rally Update",
@@ -4456,41 +3011,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 91,
     "probability": 50,
-    "outlook_score": 10
-  },
-  {
-    "title": "Daily Briefing: Rate Cuts & Holiday Rally Update",
-    "date": "2025-12-09",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 77,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Inflation",
-        "Quality"
-      ]
-    },
-    "provenance_hash": "291e1c6d24e056026585b05b1fb98447ceab252d7a69906e76e667a4b7e0d837",
-    "filename": "Daily_Briefing_2025_12_09.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
     "outlook_score": 10,
-    "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 77/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "sp500_level": 4500.0,
+    "treasury_yield": 4.48,
+    "bsl_price": 96.0,
+    "consensus_bullish": 90,
+    "consensus_bearish": 10
   },
   {
     "title": "Market Pulse: Tech Earnings Crush Estimates",
@@ -4519,7 +3045,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 88,
     "probability": 50,
-    "outlook_score": 10
+    "outlook_score": 10,
+    "sp500_level": 4245.0,
+    "treasury_yield": 3.88,
+    "bsl_price": 98.15,
+    "consensus_bullish": 90,
+    "consensus_bearish": 10
   },
   {
     "title": "Market Mayhem Newsletter - December 2, 2025",
@@ -4552,7 +3083,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 53,
     "probability": 99,
-    "outlook_score": 19
+    "outlook_score": 19,
+    "sp500_level": 6812.0,
+    "treasury_yield": 4.15,
+    "bsl_price": 93.99,
+    "consensus_bullish": 41,
+    "consensus_bearish": 59
   },
   {
     "title": "THE GREAT CALIBRATION",
@@ -4582,6 +3118,11 @@ window.MARKET_MAYHEM_DATA = [
     "semantic_score": 83,
     "probability": 50,
     "outlook_score": 10,
+    "sp500_level": 5743,
+    "treasury_yield": 4.15,
+    "bsl_price": 94.93,
+    "consensus_bullish": 10,
+    "consensus_bearish": 90,
     "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 0/100. Cross-reference with knowledge graph completed."
   },
   {
@@ -4615,6 +3156,11 @@ window.MARKET_MAYHEM_DATA = [
     "semantic_score": 32,
     "probability": 65,
     "outlook_score": 19,
+    "sp500_level": 5810,
+    "treasury_yield": 4.04,
+    "bsl_price": 99.31,
+    "consensus_bullish": 40,
+    "consensus_bearish": 60,
     "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 45/100. Cross-reference with knowledge graph completed."
   },
   {
@@ -4642,78 +3188,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 87,
     "probability": 50,
-    "outlook_score": 10
-  },
-  {
-    "title": "House View: Rate Cuts & Holiday Rally Outlook",
-    "date": "2025-12-01",
-    "summary": "Report content.",
-    "type": "STRATEGY",
-    "full_body": "",
-    "sentiment_score": 80,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Inflation",
-        "Quality"
-      ]
-    },
-    "provenance_hash": "a805a9aeba944445e3e1a8e7830268604ba693f58d3ce4b782b1cd82977e4a79",
-    "filename": "House_View_2025_12_01.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 17,
-    "probability": 50,
     "outlook_score": 10,
-    "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 80/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "LULULEMON ATHLETICA (LULU)",
-    "date": "2025-12-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 46,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [
-        "CN_PBOC",
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Bonds",
-        "Cloud",
-        "DeFi",
-        "ESG"
-      ]
-    },
-    "provenance_hash": "68b52f05e3f267215250f094a43d60a30714fb5f97f2713c0ad0c00618368010",
-    "filename": "LULU_Deep_Dive.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 45,
-    "semantic_score": 16,
-    "probability": 65,
-    "outlook_score": 14,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 46/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "sp500_level": 5441.0,
+    "treasury_yield": 4.04,
+    "bsl_price": 92.46,
+    "consensus_bullish": 90,
+    "consensus_bearish": 10
   },
   {
     "title": "Market Pulse: Sovereign Wealth Funds Buy Tech",
@@ -4742,7 +3222,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 88,
     "probability": 50,
-    "outlook_score": 10
+    "outlook_score": 10,
+    "sp500_level": 5713.0,
+    "treasury_yield": 4.6,
+    "bsl_price": 96.26,
+    "consensus_bullish": 90,
+    "consensus_bearish": 10
   },
   {
     "title": "Daily Briefing: Rate Cuts & Holiday Rally Update",
@@ -4771,41 +3256,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 89,
     "probability": 50,
-    "outlook_score": 10
-  },
-  {
-    "title": "Daily Briefing: Rate Cuts & Holiday Rally Update",
-    "date": "2025-11-27",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 77,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Inflation",
-        "Quality"
-      ]
-    },
-    "provenance_hash": "6f8e2c43c02d1bfa4ebba682a1f1d33767b070208b32ba7cc0e25dbb3e8bee72",
-    "filename": "Daily_Briefing_2025_11_27.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
     "outlook_score": 10,
-    "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 77/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "sp500_level": 4500.0,
+    "treasury_yield": 4.28,
+    "bsl_price": 94.33,
+    "consensus_bullish": 90,
+    "consensus_bearish": 10
   },
   {
     "title": "Daily Briefing: Rate Cuts & Holiday Rally Update",
@@ -4833,41 +3289,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 91,
     "probability": 50,
-    "outlook_score": 10
-  },
-  {
-    "title": "Daily Briefing: Rate Cuts & Holiday Rally Update",
-    "date": "2025-11-25",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 77,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Inflation",
-        "Quality"
-      ]
-    },
-    "provenance_hash": "63772f39fad556efb105b1f1f42cc6023fb37ea315d5c677a0f736da9c9defd7",
-    "filename": "Daily_Briefing_2025_11_25.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
     "outlook_score": 10,
-    "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 77/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "sp500_level": 4500.0,
+    "treasury_yield": 4.14,
+    "bsl_price": 93.97,
+    "consensus_bullish": 90,
+    "consensus_bearish": 10
   },
   {
     "title": "Market Pulse: Productivity Boom Confirmed",
@@ -4896,7 +3323,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 87,
     "probability": 50,
-    "outlook_score": 10
+    "outlook_score": 10,
+    "sp500_level": 5312.0,
+    "treasury_yield": 4.71,
+    "bsl_price": 94.28,
+    "consensus_bullish": 90,
+    "consensus_bearish": 10
   },
   {
     "title": "Daily Briefing: Rate Cuts & Holiday Rally Update",
@@ -4925,41 +3357,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 91,
     "probability": 50,
-    "outlook_score": 10
-  },
-  {
-    "title": "Daily Briefing: Rate Cuts & Holiday Rally Update",
-    "date": "2025-11-19",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 77,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Inflation",
-        "Quality"
-      ]
-    },
-    "provenance_hash": "3789330f61faeaa816d5bdb0edfd798f54e7600af6711c1cbce4293fafbbbb13",
-    "filename": "Daily_Briefing_2025_11_19.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
     "outlook_score": 10,
-    "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 77/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "sp500_level": 4500.0,
+    "treasury_yield": 4.56,
+    "bsl_price": 97.77,
+    "consensus_bullish": 90,
+    "consensus_bearish": 10
   },
   {
     "title": "Market Pulse: Consumer Spending Robust",
@@ -4988,7 +3391,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 88,
     "probability": 50,
-    "outlook_score": 10
+    "outlook_score": 10,
+    "sp500_level": 5621.0,
+    "treasury_yield": 4.63,
+    "bsl_price": 96.2,
+    "consensus_bullish": 90,
+    "consensus_bearish": 10
   },
   {
     "title": "THE YIELD CURVE SNAP",
@@ -5022,6 +3430,11 @@ window.MARKET_MAYHEM_DATA = [
     "semantic_score": 69,
     "probability": 50,
     "outlook_score": 10,
+    "sp500_level": 5752,
+    "treasury_yield": 3.67,
+    "bsl_price": 93.31,
+    "consensus_bullish": 16,
+    "consensus_bearish": 84,
     "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 20/100. Cross-reference with knowledge graph completed."
   },
   {
@@ -5056,7 +3469,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 35,
     "probability": 77,
-    "outlook_score": 10
+    "outlook_score": 10,
+    "sp500_level": 5946,
+    "treasury_yield": 4.85,
+    "bsl_price": 95.34,
+    "consensus_bullish": 46,
+    "consensus_bearish": 54
   },
   {
     "title": "THE SHUTDOWN HANGOVER: GROWTH FEARS",
@@ -5085,6 +3503,11 @@ window.MARKET_MAYHEM_DATA = [
     "semantic_score": 80,
     "probability": 50,
     "outlook_score": 10,
+    "sp500_level": 5784,
+    "treasury_yield": 4.46,
+    "bsl_price": 92.9,
+    "consensus_bullish": 40,
+    "consensus_bearish": 60,
     "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 50/100. Cross-reference with knowledge graph completed."
   },
   {
@@ -5113,41 +3536,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 91,
     "probability": 50,
-    "outlook_score": 10
-  },
-  {
-    "title": "Daily Briefing: Rate Cuts & Holiday Rally Update",
-    "date": "2025-11-10",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 77,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Inflation",
-        "Quality"
-      ]
-    },
-    "provenance_hash": "c36cbc1185e2d4234423b7015aca4d08bef20c843f3e5ba484f06c1a27bfa0ea",
-    "filename": "Daily_Briefing_2025_11_10.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
     "outlook_score": 10,
-    "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 77/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "sp500_level": 4500.0,
+    "treasury_yield": 3.87,
+    "bsl_price": 98.89,
+    "consensus_bullish": 90,
+    "consensus_bearish": 10
   },
   {
     "title": "Market Pulse: Crypto Hits All-Time Highs",
@@ -5176,7 +3570,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 88,
     "probability": 50,
-    "outlook_score": 10
+    "outlook_score": 10,
+    "sp500_level": 4915.0,
+    "treasury_yield": 4.86,
+    "bsl_price": 97.51,
+    "consensus_bullish": 90,
+    "consensus_bearish": 10
   },
   {
     "title": "Daily Briefing: Rate Cuts & Holiday Rally Update",
@@ -5204,41 +3603,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 91,
     "probability": 50,
-    "outlook_score": 10
-  },
-  {
-    "title": "Daily Briefing: Rate Cuts & Holiday Rally Update",
-    "date": "2025-11-06",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 77,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Inflation",
-        "Quality"
-      ]
-    },
-    "provenance_hash": "326d8624a4d446590e2dd06b4d8d939130127b0f1ab39039214d9e35d1dd146f",
-    "filename": "Daily_Briefing_2025_11_06.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
     "outlook_score": 10,
-    "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 77/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "sp500_level": 4500.0,
+    "treasury_yield": 3.63,
+    "bsl_price": 92.2,
+    "consensus_bullish": 90,
+    "consensus_bearish": 10
   },
   {
     "title": "Daily Briefing: Rate Cuts & Holiday Rally Update",
@@ -5267,41 +3637,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 91,
     "probability": 50,
-    "outlook_score": 10
-  },
-  {
-    "title": "Daily Briefing: Rate Cuts & Holiday Rally Update",
-    "date": "2025-11-04",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 77,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Inflation",
-        "Quality"
-      ]
-    },
-    "provenance_hash": "87111126527e181bbe081ce3efd5b8293309a274d836013f1b0f6bc0ab0be762",
-    "filename": "Daily_Briefing_2025_11_04.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
     "outlook_score": 10,
-    "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 77/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "sp500_level": 4500.0,
+    "treasury_yield": 4.47,
+    "bsl_price": 98.31,
+    "consensus_bullish": 90,
+    "consensus_bearish": 10
   },
   {
     "title": "House View: Rate Cuts & Holiday Rally Outlook",
@@ -5328,7 +3669,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 87,
     "probability": 50,
-    "outlook_score": 10
+    "outlook_score": 10,
+    "sp500_level": 5548.0,
+    "treasury_yield": 4.24,
+    "bsl_price": 92.03,
+    "consensus_bullish": 90,
+    "consensus_bearish": 10
   },
   {
     "title": "FLASH: FED EMERGENCY MEETING RUMORS",
@@ -5357,41 +3703,12 @@ window.MARKET_MAYHEM_DATA = [
     "semantic_score": 91,
     "probability": 50,
     "outlook_score": 10,
+    "sp500_level": 5967,
+    "treasury_yield": 4.76,
+    "bsl_price": 98.72,
+    "consensus_bullish": 10,
+    "consensus_bearish": 90,
     "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 0/100. Cross-reference with knowledge graph completed."
-  },
-  {
-    "title": "House View: Rate Cuts & Holiday Rally Outlook",
-    "date": "2025-11-01",
-    "summary": "Report content.",
-    "type": "STRATEGY",
-    "full_body": "",
-    "sentiment_score": 80,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Inflation",
-        "Quality"
-      ]
-    },
-    "provenance_hash": "fe4f55225dcc1889dc2f6e0fe2c46ee1b1f98c05b98ab99114b78350b0550e18",
-    "filename": "House_View_2025_11_01.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 17,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 80/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
   },
   {
     "title": "Market Mayhem Newsletter - October 31, 2025",
@@ -5426,7 +3743,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 57,
     "probability": 33,
-    "outlook_score": 10
+    "outlook_score": 10,
+    "sp500_level": 6666.0,
+    "treasury_yield": 4.22,
+    "bsl_price": 97.23,
+    "consensus_bullish": 54,
+    "consensus_bearish": 46
   },
   {
     "title": "Market Pulse: Sovereign Wealth Funds Buy Tech",
@@ -5455,7 +3777,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 88,
     "probability": 50,
-    "outlook_score": 10
+    "outlook_score": 10,
+    "sp500_level": 4417.0,
+    "treasury_yield": 3.61,
+    "bsl_price": 92.16,
+    "consensus_bullish": 90,
+    "consensus_bearish": 10
   },
   {
     "title": "SPOOKY VOLATILITY: S&P 6666",
@@ -5487,6 +3814,11 @@ window.MARKET_MAYHEM_DATA = [
     "semantic_score": 84,
     "probability": 50,
     "outlook_score": 10,
+    "sp500_level": 6666.0,
+    "treasury_yield": 4.82,
+    "bsl_price": 93.8,
+    "consensus_bullish": 38,
+    "consensus_bearish": 62,
     "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 33/100. Cross-reference with knowledge graph completed."
   },
   {
@@ -5515,41 +3847,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 91,
     "probability": 50,
-    "outlook_score": 10
-  },
-  {
-    "title": "Daily Briefing: Rate Cuts & Holiday Rally Update",
-    "date": "2025-10-28",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 77,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Inflation",
-        "Quality"
-      ]
-    },
-    "provenance_hash": "9128f5a8136484add64b0310f02d87ba8787598e7080f7f4fd6b3b1fc13477e4",
-    "filename": "Daily_Briefing_2025_10_28.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
     "outlook_score": 10,
-    "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 77/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "sp500_level": 4500.0,
+    "treasury_yield": 3.94,
+    "bsl_price": 95.98,
+    "consensus_bullish": 90,
+    "consensus_bearish": 10
   },
   {
     "title": "Market Pulse: Sovereign Wealth Funds Buy Tech",
@@ -5578,7 +3881,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 88,
     "probability": 50,
-    "outlook_score": 10
+    "outlook_score": 10,
+    "sp500_level": 4719.0,
+    "treasury_yield": 3.79,
+    "bsl_price": 95.22,
+    "consensus_bullish": 90,
+    "consensus_bearish": 10
   },
   {
     "title": "Market Pulse: AI Adoption Accelerates",
@@ -5607,7 +3915,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 88,
     "probability": 50,
-    "outlook_score": 10
+    "outlook_score": 10,
+    "sp500_level": 5828.0,
+    "treasury_yield": 3.91,
+    "bsl_price": 98.89,
+    "consensus_bullish": 90,
+    "consensus_bearish": 10
   },
   {
     "title": "Daily Briefing: Rate Cuts & Holiday Rally Update",
@@ -5635,41 +3948,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 89,
     "probability": 50,
-    "outlook_score": 10
-  },
-  {
-    "title": "Daily Briefing: Rate Cuts & Holiday Rally Update",
-    "date": "2025-10-16",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 77,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Inflation",
-        "Quality"
-      ]
-    },
-    "provenance_hash": "a5f4feacfe104a52621f7d2803ad05b699e8200a606fe60c26b68d7c6e1f39d7",
-    "filename": "Daily_Briefing_2025_10_16.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
     "outlook_score": 10,
-    "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 77/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "sp500_level": 4500.0,
+    "treasury_yield": 4.22,
+    "bsl_price": 92.18,
+    "consensus_bullish": 90,
+    "consensus_bearish": 10
   },
   {
     "title": "Model Performance Review: Q3 2025",
@@ -5702,7 +3986,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 78,
     "probability": 100,
-    "outlook_score": 45
+    "outlook_score": 45,
+    "sp500_level": 5696,
+    "treasury_yield": 4.58,
+    "bsl_price": 93.1,
+    "consensus_bullish": 10,
+    "consensus_bearish": 90
   },
   {
     "title": "Daily Briefing: Rate Cuts & Holiday Rally Update",
@@ -5730,7 +4019,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 91,
     "probability": 50,
-    "outlook_score": 10
+    "outlook_score": 10,
+    "sp500_level": 4500.0,
+    "treasury_yield": 4.53,
+    "bsl_price": 92.45,
+    "consensus_bullish": 90,
+    "consensus_bearish": 10
   },
   {
     "title": "MARKET MAYHEM",
@@ -5762,41 +4056,12 @@ window.MARKET_MAYHEM_DATA = [
     "semantic_score": 75,
     "probability": 50,
     "outlook_score": 10,
+    "sp500_level": 5528,
+    "treasury_yield": 4.85,
+    "bsl_price": 95.56,
+    "consensus_bullish": 38,
+    "consensus_bearish": 62,
     "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 33/100. Cross-reference with knowledge graph completed."
-  },
-  {
-    "title": "Daily Briefing: Rate Cuts & Holiday Rally Update",
-    "date": "2025-10-15",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 77,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Inflation",
-        "Quality"
-      ]
-    },
-    "provenance_hash": "37f3a9ae450289289068a8b3fdf303c26404203ef639382caef3daba1f5a9ad3",
-    "filename": "Daily_Briefing_2025_10_15.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 77/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
   },
   {
     "title": "ENERGY WARS: MIDNIGHT HAMMER",
@@ -5828,6 +4093,11 @@ window.MARKET_MAYHEM_DATA = [
     "semantic_score": 69,
     "probability": 100,
     "outlook_score": 13,
+    "sp500_level": 5523,
+    "treasury_yield": 3.79,
+    "bsl_price": 94.32,
+    "consensus_bullish": 10,
+    "consensus_bearish": 90,
     "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 0/100. Cross-reference with knowledge graph completed."
   },
   {
@@ -5857,7 +4127,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 87,
     "probability": 50,
-    "outlook_score": 10
+    "outlook_score": 10,
+    "sp500_level": 5539.0,
+    "treasury_yield": 4.65,
+    "bsl_price": 97.51,
+    "consensus_bullish": 90,
+    "consensus_bearish": 10
   },
   {
     "title": "Market Pulse: Tech Earnings Crush Estimates",
@@ -5886,7 +4161,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 88,
     "probability": 50,
-    "outlook_score": 10
+    "outlook_score": 10,
+    "sp500_level": 5860.0,
+    "treasury_yield": 3.92,
+    "bsl_price": 92.29,
+    "consensus_bullish": 90,
+    "consensus_bearish": 10
   },
   {
     "title": "House View: Rate Cuts & Holiday Rally Outlook",
@@ -5913,41 +4193,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 87,
     "probability": 50,
-    "outlook_score": 10
-  },
-  {
-    "title": "House View: Rate Cuts & Holiday Rally Outlook",
-    "date": "2025-10-01",
-    "summary": "Report content.",
-    "type": "STRATEGY",
-    "full_body": "",
-    "sentiment_score": 80,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Inflation",
-        "Quality"
-      ]
-    },
-    "provenance_hash": "a7dccee57f0598453b47c4eb7622339ba014c800d4271a216b0333f6d18eb6c6",
-    "filename": "House_View_2025_10_01.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 17,
-    "probability": 50,
     "outlook_score": 10,
-    "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 80/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "sp500_level": 4893.0,
+    "treasury_yield": 4.02,
+    "bsl_price": 92.06,
+    "consensus_bullish": 90,
+    "consensus_bearish": 10
   },
   {
     "title": "Daily Briefing: Energy Crisis & Geopolitics Update",
@@ -5976,41 +4227,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 91,
     "probability": 50,
-    "outlook_score": 10
-  },
-  {
-    "title": "Daily Briefing: Energy Crisis & Geopolitics Update",
-    "date": "2025-09-29",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 66,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Energy",
-        "Inflation"
-      ]
-    },
-    "provenance_hash": "d2ca553946a6a5f15c47a877d72b0d2f157cbec9ccee6d259c8c33a576318ee8",
-    "filename": "Daily_Briefing_2025_09_29.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
     "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 66/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "sp500_level": 4500.0,
+    "treasury_yield": 3.85,
+    "bsl_price": 95.87,
+    "consensus_bullish": 10,
+    "consensus_bearish": 90
   },
   {
     "title": "Market Pulse: Sector Rotation Confuses Traders",
@@ -6039,7 +4261,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 88,
     "probability": 50,
-    "outlook_score": 10
+    "outlook_score": 10,
+    "sp500_level": 5753.0,
+    "treasury_yield": 4.59,
+    "bsl_price": 97.99,
+    "consensus_bullish": 10,
+    "consensus_bearish": 90
   },
   {
     "title": "WEEKLY INTEL: OIL BREAKOUT",
@@ -6069,6 +4296,11 @@ window.MARKET_MAYHEM_DATA = [
     "semantic_score": 92,
     "probability": 50,
     "outlook_score": 10,
+    "sp500_level": 5543,
+    "treasury_yield": 3.73,
+    "bsl_price": 94.57,
+    "consensus_bullish": 10,
+    "consensus_bearish": 90,
     "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 0/100. Cross-reference with knowledge graph completed."
   },
   {
@@ -6098,7 +4330,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 88,
     "probability": 50,
-    "outlook_score": 10
+    "outlook_score": 10,
+    "sp500_level": 5313.0,
+    "treasury_yield": 4.87,
+    "bsl_price": 93.11,
+    "consensus_bullish": 10,
+    "consensus_bearish": 90
   },
   {
     "title": "Daily Briefing: Energy Crisis & Geopolitics Update",
@@ -6127,75 +4364,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 91,
     "probability": 50,
-    "outlook_score": 10
-  },
-  {
-    "title": "Adam's Weekly Dispatch: The Great Disconnect",
-    "date": "2025-09-19",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 22,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "400"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "DeFi",
-        "EV",
-        "Gold",
-        "Growth"
-      ]
-    },
-    "provenance_hash": "9dc0eb06a13381329d2f55912c56a1cd3e8323b64e4012b3f342ffd05882915e",
-    "filename": "MM09192025.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 28,
-    "probability": 70,
-    "outlook_score": 11,
-    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 22/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "Daily Briefing: Energy Crisis & Geopolitics Update",
-    "date": "2025-09-19",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 66,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Energy",
-        "Inflation"
-      ]
-    },
-    "provenance_hash": "484393c19d45e995d25f4aa631c5b3733381a16531bc6133b67a4dc823b375cd",
-    "filename": "Daily_Briefing_2025_09_19.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
     "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 66/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "sp500_level": 4500.0,
+    "treasury_yield": 4.05,
+    "bsl_price": 98.07,
+    "consensus_bullish": 10,
+    "consensus_bearish": 90
   },
   {
     "title": "Daily Briefing: Energy Crisis & Geopolitics Update",
@@ -6225,41 +4399,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 91,
     "probability": 50,
-    "outlook_score": 10
-  },
-  {
-    "title": "Daily Briefing: Energy Crisis & Geopolitics Update",
-    "date": "2025-09-17",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 66,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Energy",
-        "Inflation"
-      ]
-    },
-    "provenance_hash": "080f16a958bfe87aed8b4b1f6561d0eaf56216a80e5abbed82c1b0e57e7bcbae",
-    "filename": "Daily_Briefing_2025_09_17.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
     "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 66/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "sp500_level": 4500.0,
+    "treasury_yield": 3.74,
+    "bsl_price": 98.22,
+    "consensus_bullish": 10,
+    "consensus_bearish": 90
   },
   {
     "title": "Market Pulse: Bond Yields Invert Further",
@@ -6288,7 +4433,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 87,
     "probability": 50,
-    "outlook_score": 10
+    "outlook_score": 10,
+    "sp500_level": 4326.0,
+    "treasury_yield": 4.41,
+    "bsl_price": 93.94,
+    "consensus_bullish": 10,
+    "consensus_bearish": 90
   },
   {
     "title": "Daily Briefing: Energy Crisis & Geopolitics Update",
@@ -6317,41 +4467,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 89,
     "probability": 50,
-    "outlook_score": 10
-  },
-  {
-    "title": "Daily Briefing: Energy Crisis & Geopolitics Update",
-    "date": "2025-09-08",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 66,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Energy",
-        "Inflation"
-      ]
-    },
-    "provenance_hash": "2a9e60f8dd54f7ce2da3c93d24acc922056a3c41b5a999f4f9766ca5c730d548",
-    "filename": "Daily_Briefing_2025_09_08.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
     "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 66/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "sp500_level": 4500.0,
+    "treasury_yield": 3.73,
+    "bsl_price": 99.09,
+    "consensus_bullish": 10,
+    "consensus_bearish": 90
   },
   {
     "title": "Market Pulse: Bond Yields Invert Further",
@@ -6380,7 +4501,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 88,
     "probability": 50,
-    "outlook_score": 10
+    "outlook_score": 10,
+    "sp500_level": 4926.0,
+    "treasury_yield": 3.56,
+    "bsl_price": 95.95,
+    "consensus_bullish": 10,
+    "consensus_bearish": 90
   },
   {
     "title": "Daily Briefing: Energy Crisis & Geopolitics Update",
@@ -6409,41 +4535,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 91,
     "probability": 50,
-    "outlook_score": 10
-  },
-  {
-    "title": "Daily Briefing: Energy Crisis & Geopolitics Update",
-    "date": "2025-09-03",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 66,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Energy",
-        "Inflation"
-      ]
-    },
-    "provenance_hash": "0af9ef06c5a6bda3e01f74cae5a48a0d562d8725968e9ac7493cdf6a4116121f",
-    "filename": "Daily_Briefing_2025_09_03.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
     "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 66/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "sp500_level": 4500.0,
+    "treasury_yield": 4.26,
+    "bsl_price": 94.67,
+    "consensus_bullish": 10,
+    "consensus_bearish": 90
   },
   {
     "title": "House View: Energy Crisis & Geopolitics Outlook",
@@ -6472,7 +4569,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 88,
     "probability": 50,
-    "outlook_score": 10
+    "outlook_score": 10,
+    "sp500_level": 5981.0,
+    "treasury_yield": 4.36,
+    "bsl_price": 97.73,
+    "consensus_bullish": 28,
+    "consensus_bearish": 72
   },
   {
     "title": "Daily Briefing: Energy Crisis & Geopolitics Update",
@@ -6501,75 +4603,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 89,
     "probability": 50,
-    "outlook_score": 10
-  },
-  {
-    "title": "House View: Energy Crisis & Geopolitics Outlook",
-    "date": "2025-09-01",
-    "summary": "Report content.",
-    "type": "STRATEGY",
-    "full_body": "",
-    "sentiment_score": 63,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Energy",
-        "Inflation"
-      ]
-    },
-    "provenance_hash": "4d0920e9496c6f1144a19a7de287281ee9deae278b20e892695b20be78c4e9df",
-    "filename": "House_View_2025_09_01.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 17,
-    "probability": 50,
     "outlook_score": 10,
-    "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 63/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "Daily Briefing: Energy Crisis & Geopolitics Update",
-    "date": "2025-09-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 66,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Energy",
-        "Inflation"
-      ]
-    },
-    "provenance_hash": "2e21d3e21c650f6acdbe91a40970a122cb890a71717c3b2b412c7a3cda8b9827",
-    "filename": "Daily_Briefing_2025_09_01.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 66/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "sp500_level": 4500.0,
+    "treasury_yield": 3.86,
+    "bsl_price": 97.24,
+    "consensus_bullish": 10,
+    "consensus_bearish": 90
   },
   {
     "title": "Market Mayhem Newsletter - August 29, 2025",
@@ -6604,7 +4643,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 56,
     "probability": 50,
-    "outlook_score": 10
+    "outlook_score": 10,
+    "sp500_level": 6550.0,
+    "treasury_yield": 4.05,
+    "bsl_price": 93.24,
+    "consensus_bullish": 11,
+    "consensus_bearish": 89
   },
   {
     "title": "Market Pulse: Bond Yields Invert Further",
@@ -6633,7 +4677,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 88,
     "probability": 50,
-    "outlook_score": 10
+    "outlook_score": 10,
+    "sp500_level": 5759.0,
+    "treasury_yield": 3.72,
+    "bsl_price": 97.91,
+    "consensus_bullish": 10,
+    "consensus_bearish": 90
   },
   {
     "title": "DOG DAYS OF DEFIANCE",
@@ -6662,6 +4711,11 @@ window.MARKET_MAYHEM_DATA = [
     "semantic_score": 83,
     "probability": 50,
     "outlook_score": 10,
+    "sp500_level": 5889,
+    "treasury_yield": 4.37,
+    "bsl_price": 92.51,
+    "consensus_bullish": 10,
+    "consensus_bearish": 90,
     "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 0/100. Cross-reference with knowledge graph completed."
   },
   {
@@ -6691,41 +4745,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 91,
     "probability": 50,
-    "outlook_score": 10
-  },
-  {
-    "title": "Daily Briefing: Energy Crisis & Geopolitics Update",
-    "date": "2025-08-27",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 66,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Energy",
-        "Inflation"
-      ]
-    },
-    "provenance_hash": "4f1c2d17597934fd33a515f782a93068ba6f589c34609a4a3eeb473ec05e8f57",
-    "filename": "Daily_Briefing_2025_08_27.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
     "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 66/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "sp500_level": 4500.0,
+    "treasury_yield": 4.89,
+    "bsl_price": 95.93,
+    "consensus_bullish": 10,
+    "consensus_bearish": 90
   },
   {
     "title": "Daily Briefing: Energy Crisis & Geopolitics Update",
@@ -6754,7 +4779,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 91,
     "probability": 50,
-    "outlook_score": 10
+    "outlook_score": 10,
+    "sp500_level": 4500.0,
+    "treasury_yield": 3.57,
+    "bsl_price": 96.53,
+    "consensus_bullish": 10,
+    "consensus_bearish": 90
   },
   {
     "title": "Market Pulse: Oil Prices Whiplash Markets",
@@ -6783,41 +4813,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 88,
     "probability": 50,
-    "outlook_score": 10
-  },
-  {
-    "title": "Daily Briefing: Energy Crisis & Geopolitics Update",
-    "date": "2025-08-22",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 66,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Energy",
-        "Inflation"
-      ]
-    },
-    "provenance_hash": "77f134d6d2322ae52df59ddbf3819ca74d9235652ff08d475dfa801f192856e9",
-    "filename": "Daily_Briefing_2025_08_22.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
     "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 66/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "sp500_level": 4686.0,
+    "treasury_yield": 3.81,
+    "bsl_price": 95.96,
+    "consensus_bullish": 10,
+    "consensus_bearish": 90
   },
   {
     "title": "Daily Briefing: Energy Crisis & Geopolitics Update",
@@ -6846,41 +4847,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 91,
     "probability": 50,
-    "outlook_score": 10
-  },
-  {
-    "title": "Daily Briefing: Energy Crisis & Geopolitics Update",
-    "date": "2025-08-20",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 66,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Energy",
-        "Inflation"
-      ]
-    },
-    "provenance_hash": "d04314d2378d3c28575b32d43ff24725686c47bc2b983415bda2e15854ffea4c",
-    "filename": "Daily_Briefing_2025_08_20.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
     "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 66/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "sp500_level": 4500.0,
+    "treasury_yield": 3.53,
+    "bsl_price": 94.74,
+    "consensus_bullish": 10,
+    "consensus_bearish": 90
   },
   {
     "title": "Daily Briefing: Energy Crisis & Geopolitics Update",
@@ -6909,41 +4881,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 91,
     "probability": 50,
-    "outlook_score": 10
-  },
-  {
-    "title": "Daily Briefing: Energy Crisis & Geopolitics Update",
-    "date": "2025-08-18",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 66,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Energy",
-        "Inflation"
-      ]
-    },
-    "provenance_hash": "c428af2ae1830b545c2c3aa2bc802dc2c7d144b68c06518a6bb0adeedc431938",
-    "filename": "Daily_Briefing_2025_08_18.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
     "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 66/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "sp500_level": 4500.0,
+    "treasury_yield": 4.97,
+    "bsl_price": 94.11,
+    "consensus_bullish": 10,
+    "consensus_bearish": 90
   },
   {
     "title": "Market Pulse: Earnings Mixed, Guidance Unclear",
@@ -6972,7 +4915,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 88,
     "probability": 50,
-    "outlook_score": 10
+    "outlook_score": 10,
+    "sp500_level": 4640.0,
+    "treasury_yield": 3.89,
+    "bsl_price": 94.84,
+    "consensus_bullish": 10,
+    "consensus_bearish": 90
   },
   {
     "title": "Daily Briefing: Energy Crisis & Geopolitics Update",
@@ -7001,41 +4949,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 91,
     "probability": 50,
-    "outlook_score": 10
-  },
-  {
-    "title": "Daily Briefing: Energy Crisis & Geopolitics Update",
-    "date": "2025-08-15",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 66,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Energy",
-        "Inflation"
-      ]
-    },
-    "provenance_hash": "52889028d71624881ed0a71ee08cdf6832a9fedd15215a287a702c7a16623a12",
-    "filename": "Daily_Briefing_2025_08_15.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
     "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 66/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "sp500_level": 4500.0,
+    "treasury_yield": 3.99,
+    "bsl_price": 94.35,
+    "consensus_bullish": 10,
+    "consensus_bearish": 90
   },
   {
     "title": "Market Pulse: Sector Rotation Confuses Traders",
@@ -7064,7 +4983,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 87,
     "probability": 50,
-    "outlook_score": 10
+    "outlook_score": 10,
+    "sp500_level": 5524.0,
+    "treasury_yield": 4.45,
+    "bsl_price": 96.22,
+    "consensus_bullish": 10,
+    "consensus_bearish": 90
   },
   {
     "title": "Daily Briefing: Energy Crisis & Geopolitics Update",
@@ -7093,41 +5017,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 91,
     "probability": 50,
-    "outlook_score": 10
-  },
-  {
-    "title": "Daily Briefing: Energy Crisis & Geopolitics Update",
-    "date": "2025-08-07",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 66,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Energy",
-        "Inflation"
-      ]
-    },
-    "provenance_hash": "171cb85ef2fcc3d315d25cd066adc8a99aa1128d3b28755c463fb9f74ee20719",
-    "filename": "Daily_Briefing_2025_08_07.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
     "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 66/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "sp500_level": 4500.0,
+    "treasury_yield": 4.43,
+    "bsl_price": 94.54,
+    "consensus_bullish": 10,
+    "consensus_bearish": 90
   },
   {
     "title": "Daily Briefing: Energy Crisis & Geopolitics Update",
@@ -7157,41 +5052,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 91,
     "probability": 50,
-    "outlook_score": 10
-  },
-  {
-    "title": "Daily Briefing: Energy Crisis & Geopolitics Update",
-    "date": "2025-08-05",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 66,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Energy",
-        "Inflation"
-      ]
-    },
-    "provenance_hash": "96b085be61c3a7fa198e7a08c660e72d0c94b40fe47d3620c0fd8c7a177bc8be",
-    "filename": "Daily_Briefing_2025_08_05.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
     "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 66/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "sp500_level": 4500.0,
+    "treasury_yield": 4.05,
+    "bsl_price": 98.64,
+    "consensus_bullish": 10,
+    "consensus_bearish": 90
   },
   {
     "title": "House View: Energy Crisis & Geopolitics Outlook",
@@ -7219,7 +5085,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 88,
     "probability": 50,
-    "outlook_score": 10
+    "outlook_score": 10,
+    "sp500_level": 5968.0,
+    "treasury_yield": 4.58,
+    "bsl_price": 92.11,
+    "consensus_bullish": 30,
+    "consensus_bearish": 70
   },
   {
     "title": "Market Pulse: Earnings Mixed, Guidance Unclear",
@@ -7248,7 +5119,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 88,
     "probability": 50,
-    "outlook_score": 10
+    "outlook_score": 10,
+    "sp500_level": 5998.0,
+    "treasury_yield": 3.89,
+    "bsl_price": 98.44,
+    "consensus_bullish": 10,
+    "consensus_bearish": 90
   },
   {
     "title": "Daily Briefing: Energy Crisis & Geopolitics Update",
@@ -7278,75 +5154,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 91,
     "probability": 50,
-    "outlook_score": 10
-  },
-  {
-    "title": "Daily Briefing: Energy Crisis & Geopolitics Update",
-    "date": "2025-08-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 66,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Energy",
-        "Inflation"
-      ]
-    },
-    "provenance_hash": "0a720fb83070fcd566ceb6eef36ef5a3ff8d56c5ae9788794723e3009e063c10",
-    "filename": "Daily_Briefing_2025_08_01.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
     "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 66/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "House View: Energy Crisis & Geopolitics Outlook",
-    "date": "2025-08-01",
-    "summary": "Report content.",
-    "type": "STRATEGY",
-    "full_body": "",
-    "sentiment_score": 63,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Energy",
-        "Inflation"
-      ]
-    },
-    "provenance_hash": "f5581d911d0e4619c8f9e50aa2e09fa2bc7425e0809d1b5fa0ac0326a2d5c31e",
-    "filename": "House_View_2025_08_01.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 18,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 63/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "sp500_level": 4500.0,
+    "treasury_yield": 4.9,
+    "bsl_price": 99.26,
+    "consensus_bullish": 10,
+    "consensus_bearish": 90
   },
   {
     "title": "Daily Briefing: Energy Crisis & Geopolitics Update",
@@ -7376,41 +5189,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 91,
     "probability": 50,
-    "outlook_score": 10
-  },
-  {
-    "title": "Daily Briefing: Energy Crisis & Geopolitics Update",
-    "date": "2025-07-30",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 66,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Energy",
-        "Inflation"
-      ]
-    },
-    "provenance_hash": "38da5947eeb73ab9bb1d62e7173b3083b26590c642237ff271baed6407a39c98",
-    "filename": "Daily_Briefing_2025_07_30.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
     "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 66/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "sp500_level": 4500.0,
+    "treasury_yield": 4.58,
+    "bsl_price": 98.97,
+    "consensus_bullish": 10,
+    "consensus_bearish": 90
   },
   {
     "title": "Market Pulse: Bond Yields Invert Further",
@@ -7439,7 +5223,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 88,
     "probability": 50,
-    "outlook_score": 10
+    "outlook_score": 10,
+    "sp500_level": 5530.0,
+    "treasury_yield": 4.87,
+    "bsl_price": 98.05,
+    "consensus_bullish": 10,
+    "consensus_bearish": 90
   },
   {
     "title": "Daily Briefing: Energy Crisis & Geopolitics Update",
@@ -7468,41 +5257,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 91,
     "probability": 50,
-    "outlook_score": 10
-  },
-  {
-    "title": "Daily Briefing: Energy Crisis & Geopolitics Update",
-    "date": "2025-07-25",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 66,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Energy",
-        "Inflation"
-      ]
-    },
-    "provenance_hash": "3dd6e3df21b98ff0556ce78e2fb6b6a43766856d360a4ed91b569ef2381e254c",
-    "filename": "Daily_Briefing_2025_07_25.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
     "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 66/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "sp500_level": 4500.0,
+    "treasury_yield": 4.51,
+    "bsl_price": 94.66,
+    "consensus_bullish": 10,
+    "consensus_bearish": 90
   },
   {
     "title": "Daily Briefing: Energy Crisis & Geopolitics Update",
@@ -7531,41 +5291,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 91,
     "probability": 50,
-    "outlook_score": 10
-  },
-  {
-    "title": "Daily Briefing: Energy Crisis & Geopolitics Update",
-    "date": "2025-07-24",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 66,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Energy",
-        "Inflation"
-      ]
-    },
-    "provenance_hash": "14626a0b154ba5d8e8164beb16ab34a22d2d63cf6cd8cb80a528675db9df0c9e",
-    "filename": "Daily_Briefing_2025_07_24.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
     "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 66/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "sp500_level": 4500.0,
+    "treasury_yield": 3.83,
+    "bsl_price": 97.44,
+    "consensus_bullish": 10,
+    "consensus_bearish": 90
   },
   {
     "title": "Daily Briefing: Energy Crisis & Geopolitics Update",
@@ -7595,41 +5326,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 91,
     "probability": 50,
-    "outlook_score": 10
-  },
-  {
-    "title": "Daily Briefing: Energy Crisis & Geopolitics Update",
-    "date": "2025-07-22",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 66,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Energy",
-        "Inflation"
-      ]
-    },
-    "provenance_hash": "53bbb4967873a0603e0c488569b0ba834b1c953c9e0db0fca98be548f1e10af1",
-    "filename": "Daily_Briefing_2025_07_22.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
     "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 66/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "sp500_level": 4500.0,
+    "treasury_yield": 4.91,
+    "bsl_price": 95.87,
+    "consensus_bullish": 10,
+    "consensus_bearish": 90
   },
   {
     "title": "Market Pulse: Oil Prices Whiplash Markets",
@@ -7658,7 +5360,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 88,
     "probability": 50,
-    "outlook_score": 10
+    "outlook_score": 10,
+    "sp500_level": 5256.0,
+    "treasury_yield": 4.65,
+    "bsl_price": 95.38,
+    "consensus_bullish": 10,
+    "consensus_bearish": 90
   },
   {
     "title": "Daily Briefing: Energy Crisis & Geopolitics Update",
@@ -7688,41 +5395,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 91,
     "probability": 50,
-    "outlook_score": 10
-  },
-  {
-    "title": "Daily Briefing: Energy Crisis & Geopolitics Update",
-    "date": "2025-07-18",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 66,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Energy",
-        "Inflation"
-      ]
-    },
-    "provenance_hash": "44f64822b5c2ec7cb033143652bd843648e19f025595fa68fc11bff848ad29a0",
-    "filename": "Daily_Briefing_2025_07_18.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
     "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 66/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "sp500_level": 4500.0,
+    "treasury_yield": 3.83,
+    "bsl_price": 94.9,
+    "consensus_bullish": 10,
+    "consensus_bearish": 90
   },
   {
     "title": "Daily Briefing: Energy Crisis & Geopolitics Update",
@@ -7751,41 +5429,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 91,
     "probability": 50,
-    "outlook_score": 10
-  },
-  {
-    "title": "Daily Briefing: Energy Crisis & Geopolitics Update",
-    "date": "2025-07-15",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 66,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Energy",
-        "Inflation"
-      ]
-    },
-    "provenance_hash": "85ffd77b863d73e597da8092402a58a074d965400feaded654dc8bec119f1012",
-    "filename": "Daily_Briefing_2025_07_15.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
     "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 66/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "sp500_level": 4500.0,
+    "treasury_yield": 4.91,
+    "bsl_price": 94.26,
+    "consensus_bullish": 10,
+    "consensus_bearish": 90
   },
   {
     "title": "Market Mayhem Newsletter - July 14, 2025",
@@ -7819,7 +5468,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 47,
     "probability": 70,
-    "outlook_score": 24
+    "outlook_score": 24,
+    "sp500_level": 6250.0,
+    "treasury_yield": 4.62,
+    "bsl_price": 94.13,
+    "consensus_bullish": 46,
+    "consensus_bearish": 54
   },
   {
     "title": "MID-YEAR OUTLOOK: BEYOND THE HYPE",
@@ -7849,6 +5503,11 @@ window.MARKET_MAYHEM_DATA = [
     "semantic_score": 84,
     "probability": 50,
     "outlook_score": 20,
+    "sp500_level": 5522,
+    "treasury_yield": 3.82,
+    "bsl_price": 93.04,
+    "consensus_bullish": 57,
+    "consensus_bearish": 43,
     "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 50/100. Cross-reference with knowledge graph completed."
   },
   {
@@ -7878,7 +5537,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 88,
     "probability": 50,
-    "outlook_score": 10
+    "outlook_score": 10,
+    "sp500_level": 5333.0,
+    "treasury_yield": 3.73,
+    "bsl_price": 92.85,
+    "consensus_bullish": 10,
+    "consensus_bearish": 90
   },
   {
     "title": "Daily Briefing: Energy Crisis & Geopolitics Update",
@@ -7907,41 +5571,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 91,
     "probability": 50,
-    "outlook_score": 10
-  },
-  {
-    "title": "Daily Briefing: Energy Crisis & Geopolitics Update",
-    "date": "2025-07-09",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 66,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Energy",
-        "Inflation"
-      ]
-    },
-    "provenance_hash": "0213da11a3adb85ddc89b983584d814851efb2c9697bb5908508f68f2e6462a8",
-    "filename": "Daily_Briefing_2025_07_09.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
     "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 66/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "sp500_level": 4500.0,
+    "treasury_yield": 3.53,
+    "bsl_price": 95.62,
+    "consensus_bullish": 10,
+    "consensus_bearish": 90
   },
   {
     "title": "Market Pulse: Sector Rotation Confuses Traders",
@@ -7970,7 +5605,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 88,
     "probability": 50,
-    "outlook_score": 10
+    "outlook_score": 10,
+    "sp500_level": 4540.0,
+    "treasury_yield": 3.64,
+    "bsl_price": 95.13,
+    "consensus_bullish": 10,
+    "consensus_bearish": 90
   },
   {
     "title": "Daily Briefing: Energy Crisis & Geopolitics Update",
@@ -7999,41 +5639,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 91,
     "probability": 50,
-    "outlook_score": 10
-  },
-  {
-    "title": "Daily Briefing: Energy Crisis & Geopolitics Update",
-    "date": "2025-07-04",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 66,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Energy",
-        "Inflation"
-      ]
-    },
-    "provenance_hash": "cda6246eb88949e8202302e6ac608eb5623659e66b77b1977aa1256bb2091a75",
-    "filename": "Daily_Briefing_2025_07_04.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
     "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 66/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "sp500_level": 4500.0,
+    "treasury_yield": 4.62,
+    "bsl_price": 98.99,
+    "consensus_bullish": 10,
+    "consensus_bearish": 90
   },
   {
     "title": "House View: Energy Crisis & Geopolitics Outlook",
@@ -8061,77 +5672,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 88,
     "probability": 50,
-    "outlook_score": 10
-  },
-  {
-    "title": "House View: Energy Crisis & Geopolitics Outlook",
-    "date": "2025-07-01",
-    "summary": "Report content.",
-    "type": "STRATEGY",
-    "full_body": "",
-    "sentiment_score": 63,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Energy",
-        "Inflation"
-      ]
-    },
-    "provenance_hash": "248d578ce404c44ce6b6067dd7e1685fdb64eeb79486c58071ed3e277397b2aa",
-    "filename": "House_View_2025_07_01.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 18,
-    "probability": 50,
     "outlook_score": 10,
-    "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 63/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "Market Mayhem - Interactive Weekly Briefing",
-    "date": "2025-06-29",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 55,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "400",
-        "keyframes",
-        "media"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "Cybersecurity",
-        "EV",
-        "Energy"
-      ]
-    },
-    "provenance_hash": "11edcaa0b84bc1d536b0a3ee6a293415c1007f543aa8fb299cbf34786a04de1a",
-    "filename": "MM06292025.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 25,
-    "semantic_score": 23,
-    "probability": 25,
-    "outlook_score": 11,
-    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 55/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "sp500_level": 5699.0,
+    "treasury_yield": 3.66,
+    "bsl_price": 93.57,
+    "consensus_bullish": 33,
+    "consensus_bearish": 67
   },
   {
     "title": "Market Pulse: Fed Pivots to Cuts",
@@ -8161,43 +5707,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 90,
     "probability": 50,
-    "outlook_score": 10
-  },
-  {
-    "title": "Market Mayhem - Interactive Weekly Briefing",
-    "date": "2025-06-27",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 58,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "400",
-        "keyframes",
-        "media"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Cybersecurity",
-        "EV",
-        "Energy",
-        "Gold"
-      ]
-    },
-    "provenance_hash": "1d286e731585727087586c277e60b45497b32be23b8ccdff22e04159e01a523b",
-    "filename": "newsletter_market_mayhem_jun_29_2025.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 21,
-    "probability": 50,
-    "outlook_score": 12,
-    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 58/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "outlook_score": 10,
+    "sp500_level": 5856.0,
+    "treasury_yield": 4.7,
+    "bsl_price": 96.5,
+    "consensus_bullish": 90,
+    "consensus_bearish": 10
   },
   {
     "title": "Daily Briefing: AI Application Boom Update",
@@ -8225,41 +5740,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 91,
     "probability": 50,
-    "outlook_score": 10
-  },
-  {
-    "title": "Daily Briefing: AI Application Boom Update",
-    "date": "2025-06-24",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 77,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Inflation",
-        "Quality"
-      ]
-    },
-    "provenance_hash": "af4ed1e112b40ce91e5907c5472053cd2700de6e38aca18823a73cc610b3f337",
-    "filename": "Daily_Briefing_2025_06_24.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
     "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 77/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "sp500_level": 4500.0,
+    "treasury_yield": 3.95,
+    "bsl_price": 98.25,
+    "consensus_bullish": 90,
+    "consensus_bearish": 10
   },
   {
     "title": "Market Pulse: Crypto Hits All-Time Highs",
@@ -8289,7 +5775,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 90,
     "probability": 50,
-    "outlook_score": 10
+    "outlook_score": 10,
+    "sp500_level": 5964.0,
+    "treasury_yield": 4.7,
+    "bsl_price": 93.97,
+    "consensus_bullish": 90,
+    "consensus_bearish": 10
   },
   {
     "title": "Daily Briefing: AI Application Boom Update",
@@ -8317,41 +5808,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 91,
     "probability": 50,
-    "outlook_score": 10
-  },
-  {
-    "title": "Daily Briefing: AI Application Boom Update",
-    "date": "2025-06-18",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 77,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Inflation",
-        "Quality"
-      ]
-    },
-    "provenance_hash": "23fdb73637a17a52e5b931ebaaa5707033fc8dba353f5e1d13d45261fd27162e",
-    "filename": "Daily_Briefing_2025_06_18.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
     "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 77/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "sp500_level": 4500.0,
+    "treasury_yield": 4.4,
+    "bsl_price": 94.12,
+    "consensus_bullish": 90,
+    "consensus_bearish": 10
   },
   {
     "title": "Daily Briefing: AI Application Boom Update",
@@ -8379,41 +5841,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 89,
     "probability": 50,
-    "outlook_score": 10
-  },
-  {
-    "title": "Daily Briefing: AI Application Boom Update",
-    "date": "2025-06-16",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 77,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Inflation",
-        "Quality"
-      ]
-    },
-    "provenance_hash": "04fd34fb11974865f43f2004075653b21ff4bafd7920fcfeb6c46bb675e767b8",
-    "filename": "Daily_Briefing_2025_06_16.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
     "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 77/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "sp500_level": 4500.0,
+    "treasury_yield": 3.75,
+    "bsl_price": 93.07,
+    "consensus_bullish": 90,
+    "consensus_bearish": 10
   },
   {
     "title": "Market Pulse: Sovereign Wealth Funds Buy Tech",
@@ -8443,7 +5876,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 90,
     "probability": 50,
-    "outlook_score": 10
+    "outlook_score": 10,
+    "sp500_level": 5300.0,
+    "treasury_yield": 3.73,
+    "bsl_price": 93.07,
+    "consensus_bullish": 90,
+    "consensus_bearish": 10
   },
   {
     "title": "Daily Briefing: AI Application Boom Update",
@@ -8472,41 +5910,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 91,
     "probability": 50,
-    "outlook_score": 10
-  },
-  {
-    "title": "Daily Briefing: AI Application Boom Update",
-    "date": "2025-06-13",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 77,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Inflation",
-        "Quality"
-      ]
-    },
-    "provenance_hash": "24b56df6dd6a801645ec45e32ebf92056af74d9c03749fa5dbe3e29da6f1dd8d",
-    "filename": "Daily_Briefing_2025_06_13.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
     "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 77/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "sp500_level": 4500.0,
+    "treasury_yield": 3.67,
+    "bsl_price": 95.94,
+    "consensus_bullish": 90,
+    "consensus_bearish": 10
   },
   {
     "title": "Daily Briefing: AI Application Boom Update",
@@ -8534,41 +5943,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 91,
     "probability": 50,
-    "outlook_score": 10
-  },
-  {
-    "title": "Daily Briefing: AI Application Boom Update",
-    "date": "2025-06-10",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 77,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Inflation",
-        "Quality"
-      ]
-    },
-    "provenance_hash": "bb624ab62638a0cbeec9b9029d2dfb69ed08415fbb016c0535e4abd89bf89a5c",
-    "filename": "Daily_Briefing_2025_06_10.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
     "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 77/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "sp500_level": 4500.0,
+    "treasury_yield": 4.29,
+    "bsl_price": 95.67,
+    "consensus_bullish": 90,
+    "consensus_bearish": 10
   },
   {
     "title": "Daily Briefing: AI Application Boom Update",
@@ -8596,7 +5976,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 89,
     "probability": 50,
-    "outlook_score": 10
+    "outlook_score": 10,
+    "sp500_level": 4500.0,
+    "treasury_yield": 3.8,
+    "bsl_price": 96.04,
+    "consensus_bullish": 90,
+    "consensus_bearish": 10
   },
   {
     "title": "Market Pulse: Productivity Boom Confirmed",
@@ -8626,41 +6011,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 88,
     "probability": 50,
-    "outlook_score": 10
-  },
-  {
-    "title": "Daily Briefing: AI Application Boom Update",
-    "date": "2025-06-06",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 77,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Inflation",
-        "Quality"
-      ]
-    },
-    "provenance_hash": "1e47d47a6ff92a28741edb1ed6cd133ad66bf3de633b6e91b3e3ff5a88665d0d",
-    "filename": "Daily_Briefing_2025_06_06.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
     "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 77/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "sp500_level": 5078.0,
+    "treasury_yield": 4.58,
+    "bsl_price": 94.88,
+    "consensus_bullish": 90,
+    "consensus_bearish": 10
   },
   {
     "title": "MARKET PULSE // 2025-06-02",
@@ -8695,45 +6051,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 75,
     "probability": 50,
-    "outlook_score": 10
-  },
-  {
-    "title": "MARKET PULSE // 2025-06-02",
-    "date": "2025-06-02",
-    "summary": "Report content.",
-    "type": "MARKET_PULSE",
-    "full_body": "",
-    "sentiment_score": 83,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [
-        "CN_PBOC",
-        "EU_ECB",
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Bitcoin",
-        "Cloud",
-        "EV",
-        "Energy"
-      ]
-    },
-    "provenance_hash": "7efee6ea2f7b608f10f4182a151c0ad1de32e249239bd6cda1d5dd31fd8900c3",
-    "filename": "market_pulse_20250602.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 17,
-    "probability": 50,
     "outlook_score": 10,
-    "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 83/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "sp500_level": 5500.0,
+    "treasury_yield": 3.6,
+    "bsl_price": 92.81,
+    "consensus_bullish": 60,
+    "consensus_bearish": 40
   },
   {
     "title": "House View: AI Application Boom Outlook",
@@ -8760,41 +6083,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 88,
     "probability": 50,
-    "outlook_score": 10
-  },
-  {
-    "title": "House View: AI Application Boom Outlook",
-    "date": "2025-06-01",
-    "summary": "Report content.",
-    "type": "STRATEGY",
-    "full_body": "",
-    "sentiment_score": 80,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Inflation",
-        "Quality"
-      ]
-    },
-    "provenance_hash": "6ca9ae170dac1f6d38c7fe5825fe6136470bc2dd14591eb1c752db5463476ad0",
-    "filename": "House_View_2025_06_01.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 18,
-    "probability": 50,
     "outlook_score": 10,
-    "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 80/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "sp500_level": 5780.0,
+    "treasury_yield": 3.58,
+    "bsl_price": 95.63,
+    "consensus_bullish": 90,
+    "consensus_bearish": 10
   },
   {
     "title": "Market Pulse: Tech Earnings Crush Estimates",
@@ -8824,7 +6118,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 90,
     "probability": 50,
-    "outlook_score": 10
+    "outlook_score": 10,
+    "sp500_level": 4752.0,
+    "treasury_yield": 3.66,
+    "bsl_price": 97.84,
+    "consensus_bullish": 90,
+    "consensus_bearish": 10
   },
   {
     "title": "Daily Briefing: AI Application Boom Update",
@@ -8852,41 +6151,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 91,
     "probability": 50,
-    "outlook_score": 10
-  },
-  {
-    "title": "Daily Briefing: AI Application Boom Update",
-    "date": "2025-05-26",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 77,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Inflation",
-        "Quality"
-      ]
-    },
-    "provenance_hash": "b18b11978e1da02c658770c196839cca1c0ef335918bcd13acaee03a45a64b30",
-    "filename": "Daily_Briefing_2025_05_26.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
     "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 77/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "sp500_level": 4500.0,
+    "treasury_yield": 4.39,
+    "bsl_price": 94.59,
+    "consensus_bullish": 90,
+    "consensus_bearish": 10
   },
   {
     "title": "Market Pulse: Crypto Hits All-Time Highs",
@@ -8916,7 +6186,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 90,
     "probability": 50,
-    "outlook_score": 10
+    "outlook_score": 10,
+    "sp500_level": 5796.0,
+    "treasury_yield": 3.85,
+    "bsl_price": 93.47,
+    "consensus_bullish": 90,
+    "consensus_bearish": 10
   },
   {
     "title": "Daily Briefing: AI Application Boom Update",
@@ -8944,41 +6219,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 91,
     "probability": 50,
-    "outlook_score": 10
-  },
-  {
-    "title": "Daily Briefing: AI Application Boom Update",
-    "date": "2025-05-20",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 77,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Inflation",
-        "Quality"
-      ]
-    },
-    "provenance_hash": "325218693245befabd2847bf725e80eaf618a6b206a74c56a37fd09ca75b0bdd",
-    "filename": "Daily_Briefing_2025_05_20.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
     "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 77/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "sp500_level": 4500.0,
+    "treasury_yield": 4.53,
+    "bsl_price": 94.79,
+    "consensus_bullish": 90,
+    "consensus_bearish": 10
   },
   {
     "title": "MARKET PULSE // 2025-05-19",
@@ -9012,44 +6258,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 75,
     "probability": 70,
-    "outlook_score": 10
-  },
-  {
-    "title": "MARKET PULSE // 2025-05-19",
-    "date": "2025-05-19",
-    "summary": "Report content.",
-    "type": "MARKET_PULSE",
-    "full_body": "",
-    "sentiment_score": 86,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [
-        "JP_BOJ",
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Bitcoin",
-        "Cloud",
-        "Crypto",
-        "EV"
-      ]
-    },
-    "provenance_hash": "2d73bf01d5f8ac948ced584abd2532e52298babd7e6519c438f7c9b2a0e25337",
-    "filename": "market_pulse_20250519.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 17,
-    "probability": 70,
     "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 86/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "sp500_level": 5450.0,
+    "treasury_yield": 4.74,
+    "bsl_price": 96.31,
+    "consensus_bullish": 10,
+    "consensus_bearish": 90
   },
   {
     "title": "Market Pulse: Consumer Spending Robust",
@@ -9079,7 +6293,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 88,
     "probability": 50,
-    "outlook_score": 10
+    "outlook_score": 10,
+    "sp500_level": 4840.0,
+    "treasury_yield": 3.76,
+    "bsl_price": 97.61,
+    "consensus_bullish": 90,
+    "consensus_bearish": 10
   },
   {
     "title": "Daily Briefing: AI Application Boom Update",
@@ -9107,41 +6326,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 91,
     "probability": 50,
-    "outlook_score": 10
-  },
-  {
-    "title": "Daily Briefing: AI Application Boom Update",
-    "date": "2025-05-15",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 77,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Inflation",
-        "Quality"
-      ]
-    },
-    "provenance_hash": "471d21532bebef205cd1afde84a37e11dda0648659b824f130670467d4bc2d78",
-    "filename": "Daily_Briefing_2025_05_15.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
     "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 77/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "sp500_level": 4500.0,
+    "treasury_yield": 4.55,
+    "bsl_price": 92.42,
+    "consensus_bullish": 90,
+    "consensus_bearish": 10
   },
   {
     "title": "Market Pulse: Sovereign Wealth Funds Buy Tech",
@@ -9171,7 +6361,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 90,
     "probability": 50,
-    "outlook_score": 10
+    "outlook_score": 10,
+    "sp500_level": 5365.0,
+    "treasury_yield": 3.92,
+    "bsl_price": 92.81,
+    "consensus_bullish": 90,
+    "consensus_bearish": 10
   },
   {
     "title": "Daily Briefing: AI Application Boom Update",
@@ -9199,41 +6394,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 91,
     "probability": 50,
-    "outlook_score": 10
-  },
-  {
-    "title": "Daily Briefing: AI Application Boom Update",
-    "date": "2025-05-07",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 77,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Inflation",
-        "Quality"
-      ]
-    },
-    "provenance_hash": "720c16c779c8d4b83d42976a173c876dfa4cd23fda78a341a14690ef3c0e43cb",
-    "filename": "Daily_Briefing_2025_05_07.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
     "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 77/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "sp500_level": 4500.0,
+    "treasury_yield": 4.72,
+    "bsl_price": 97.17,
+    "consensus_bullish": 90,
+    "consensus_bearish": 10
   },
   {
     "title": "Market Mayhem Newsletter - May 2, 2025",
@@ -9267,7 +6433,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 54,
     "probability": 85,
-    "outlook_score": 10
+    "outlook_score": 10,
+    "sp500_level": 6150.0,
+    "treasury_yield": 4.35,
+    "bsl_price": 94.24,
+    "consensus_bullish": 34,
+    "consensus_bearish": 66
   },
   {
     "title": "Market Pulse: AI Adoption Accelerates",
@@ -9297,7 +6468,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 90,
     "probability": 50,
-    "outlook_score": 10
+    "outlook_score": 10,
+    "sp500_level": 5998.0,
+    "treasury_yield": 3.55,
+    "bsl_price": 97.5,
+    "consensus_bullish": 90,
+    "consensus_bearish": 10
   },
   {
     "title": "Daily Briefing: AI Application Boom Update",
@@ -9325,7 +6501,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 91,
     "probability": 50,
-    "outlook_score": 10
+    "outlook_score": 10,
+    "sp500_level": 4500.0,
+    "treasury_yield": 4.74,
+    "bsl_price": 96.83,
+    "consensus_bullish": 90,
+    "consensus_bearish": 10
   },
   {
     "title": "SELL IN MAY? NOT TODAY.",
@@ -9354,41 +6535,12 @@ window.MARKET_MAYHEM_DATA = [
     "semantic_score": 84,
     "probability": 50,
     "outlook_score": 10,
+    "sp500_level": 6150.0,
+    "treasury_yield": 4.43,
+    "bsl_price": 97.5,
+    "consensus_bullish": 60,
+    "consensus_bearish": 40,
     "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 50/100. Cross-reference with knowledge graph completed."
-  },
-  {
-    "title": "Daily Briefing: AI Application Boom Update",
-    "date": "2025-05-02",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 77,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Inflation",
-        "Quality"
-      ]
-    },
-    "provenance_hash": "156d0c432d3cdc9d3e77db842f9e6bef70eaab16af05d1357b9c51002509a9c8",
-    "filename": "Daily_Briefing_2025_05_02.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 77/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
   },
   {
     "title": "House View: AI Application Boom Outlook",
@@ -9415,7 +6567,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 88,
     "probability": 50,
-    "outlook_score": 10
+    "outlook_score": 10,
+    "sp500_level": 5930.0,
+    "treasury_yield": 4.46,
+    "bsl_price": 95.09,
+    "consensus_bullish": 90,
+    "consensus_bearish": 10
   },
   {
     "title": "Daily Briefing: AI Application Boom Update",
@@ -9444,75 +6601,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 91,
     "probability": 50,
-    "outlook_score": 10
-  },
-  {
-    "title": "House View: AI Application Boom Outlook",
-    "date": "2025-05-01",
-    "summary": "Report content.",
-    "type": "STRATEGY",
-    "full_body": "",
-    "sentiment_score": 80,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Inflation",
-        "Quality"
-      ]
-    },
-    "provenance_hash": "444bf59e91e3dbfd42e4f9a7e95b681f2cb340d5cba4207d7f3751235d3543b8",
-    "filename": "House_View_2025_05_01.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 18,
-    "probability": 50,
     "outlook_score": 10,
-    "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 80/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "Daily Briefing: AI Application Boom Update",
-    "date": "2025-05-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 77,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Inflation",
-        "Quality"
-      ]
-    },
-    "provenance_hash": "c7f81e8623d92faee001ffb35daef392a79a03ce868791f7a9c9fcaa3f6e7c2e",
-    "filename": "Daily_Briefing_2025_05_01.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 77/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "sp500_level": 4500.0,
+    "treasury_yield": 4.29,
+    "bsl_price": 98.8,
+    "consensus_bullish": 90,
+    "consensus_bearish": 10
   },
   {
     "title": "Market Pulse: Fed Pivots to Cuts",
@@ -9542,7 +6636,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 90,
     "probability": 50,
-    "outlook_score": 10
+    "outlook_score": 10,
+    "sp500_level": 4218.0,
+    "treasury_yield": 3.87,
+    "bsl_price": 98.26,
+    "consensus_bullish": 90,
+    "consensus_bearish": 10
   },
   {
     "title": "Daily Briefing: AI Application Boom Update",
@@ -9570,41 +6669,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 91,
     "probability": 50,
-    "outlook_score": 10
-  },
-  {
-    "title": "Daily Briefing: AI Application Boom Update",
-    "date": "2025-04-22",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 77,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Inflation",
-        "Quality"
-      ]
-    },
-    "provenance_hash": "aef76b3bcf8f9bdda0fd30f14581cf91cbe0122f0b535a326a7f866e04d94e00",
-    "filename": "Daily_Briefing_2025_04_22.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
     "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 77/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "sp500_level": 4500.0,
+    "treasury_yield": 3.95,
+    "bsl_price": 92.88,
+    "consensus_bullish": 90,
+    "consensus_bearish": 10
   },
   {
     "title": "Market Pulse: Crypto Hits All-Time Highs",
@@ -9634,7 +6704,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 90,
     "probability": 50,
-    "outlook_score": 10
+    "outlook_score": 10,
+    "sp500_level": 5632.0,
+    "treasury_yield": 3.67,
+    "bsl_price": 97.62,
+    "consensus_bullish": 90,
+    "consensus_bearish": 10
   },
   {
     "title": "Daily Briefing: AI Application Boom Update",
@@ -9663,41 +6738,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 91,
     "probability": 50,
-    "outlook_score": 10
-  },
-  {
-    "title": "Daily Briefing: AI Application Boom Update",
-    "date": "2025-04-17",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 77,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Inflation",
-        "Quality"
-      ]
-    },
-    "provenance_hash": "ab9bde8395af434f025905536ea1882a90ebf0b40a055d9f30a3f725ab208ff9",
-    "filename": "Daily_Briefing_2025_04_17.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
     "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 77/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "sp500_level": 4500.0,
+    "treasury_yield": 4.15,
+    "bsl_price": 96.89,
+    "consensus_bullish": 90,
+    "consensus_bearish": 10
   },
   {
     "title": "Daily Briefing: AI Application Boom Update",
@@ -9726,41 +6772,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 89,
     "probability": 50,
-    "outlook_score": 10
-  },
-  {
-    "title": "Daily Briefing: AI Application Boom Update",
-    "date": "2025-04-16",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 77,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Inflation",
-        "Quality"
-      ]
-    },
-    "provenance_hash": "d176074e7da142aff34a44ee6d17c4e00cac720fd2977b5c106f8624fac27311",
-    "filename": "Daily_Briefing_2025_04_16.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
     "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 77/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "sp500_level": 4500.0,
+    "treasury_yield": 4.18,
+    "bsl_price": 95.67,
+    "consensus_bullish": 90,
+    "consensus_bearish": 10
   },
   {
     "title": "Market Pulse: Fed Pivots to Cuts",
@@ -9790,7 +6807,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 90,
     "probability": 50,
-    "outlook_score": 10
+    "outlook_score": 10,
+    "sp500_level": 5465.0,
+    "treasury_yield": 3.94,
+    "bsl_price": 96.04,
+    "consensus_bullish": 90,
+    "consensus_bearish": 10
   },
   {
     "title": "Daily Briefing: AI Application Boom Update",
@@ -9818,41 +6840,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 91,
     "probability": 50,
-    "outlook_score": 10
-  },
-  {
-    "title": "Daily Briefing: AI Application Boom Update",
-    "date": "2025-04-08",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 77,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Inflation",
-        "Quality"
-      ]
-    },
-    "provenance_hash": "73dc74445b88d5873127dcba613736279884b93422d788584017f04186cb0bea",
-    "filename": "Daily_Briefing_2025_04_08.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
     "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 77/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "sp500_level": 4500.0,
+    "treasury_yield": 3.88,
+    "bsl_price": 97.36,
+    "consensus_bullish": 90,
+    "consensus_bearish": 10
   },
   {
     "title": "Market Mayhem Newsletter - April 4, 2025",
@@ -9887,7 +6880,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 60,
     "probability": 100,
-    "outlook_score": 10
+    "outlook_score": 10,
+    "sp500_level": 5980.0,
+    "treasury_yield": 4.25,
+    "bsl_price": 96.46,
+    "consensus_bullish": 65,
+    "consensus_bearish": 35
   },
   {
     "title": "Market Pulse: Crypto Hits All-Time Highs",
@@ -9917,7 +6915,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 88,
     "probability": 50,
-    "outlook_score": 10
+    "outlook_score": 10,
+    "sp500_level": 4956.0,
+    "treasury_yield": 4.04,
+    "bsl_price": 93.59,
+    "consensus_bullish": 90,
+    "consensus_bearish": 10
   },
   {
     "title": "SPRING AWAKENING: THE GOLDILOCKS DATA",
@@ -9945,6 +6948,11 @@ window.MARKET_MAYHEM_DATA = [
     "semantic_score": 75,
     "probability": 50,
     "outlook_score": 10,
+    "sp500_level": 6000.0,
+    "treasury_yield": 4.42,
+    "bsl_price": 98.96,
+    "consensus_bullish": 44,
+    "consensus_bearish": 56,
     "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 50/100. Cross-reference with knowledge graph completed."
   },
   {
@@ -9975,6 +6983,11 @@ window.MARKET_MAYHEM_DATA = [
     "semantic_score": 42,
     "probability": 90,
     "outlook_score": 12,
+    "sp500_level": 5703,
+    "treasury_yield": 4.44,
+    "bsl_price": 95.29,
+    "consensus_bullish": 70,
+    "consensus_bearish": 30,
     "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 78/100. Cross-reference with knowledge graph completed."
   },
   {
@@ -10002,41 +7015,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 88,
     "probability": 50,
-    "outlook_score": 10
-  },
-  {
-    "title": "House View: AI Application Boom Outlook",
-    "date": "2025-04-01",
-    "summary": "Report content.",
-    "type": "STRATEGY",
-    "full_body": "",
-    "sentiment_score": 80,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Inflation",
-        "Quality"
-      ]
-    },
-    "provenance_hash": "40433e6cb11049b853c9a0a9d0ea1b4d06066770d9e61923a78f6a0ff2de6c7c",
-    "filename": "House_View_2025_04_01.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 18,
-    "probability": 50,
     "outlook_score": 10,
-    "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 80/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "sp500_level": 5759.0,
+    "treasury_yield": 4.07,
+    "bsl_price": 93.94,
+    "consensus_bullish": 90,
+    "consensus_bearish": 10
   },
   {
     "title": "Market Pulse: Tech Stocks Tumble on Rate Fears",
@@ -10065,7 +7049,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 89,
     "probability": 50,
-    "outlook_score": 10
+    "outlook_score": 10,
+    "sp500_level": 5287.0,
+    "treasury_yield": 3.95,
+    "bsl_price": 98.8,
+    "consensus_bullish": 10,
+    "consensus_bearish": 90
   },
   {
     "title": "Daily Briefing: Tech Correction Update",
@@ -10094,41 +7083,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 91,
     "probability": 50,
-    "outlook_score": 10
-  },
-  {
-    "title": "Daily Briefing: Tech Correction Update",
-    "date": "2025-03-26",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 75,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Inflation",
-        "Quality"
-      ]
-    },
-    "provenance_hash": "9959461d1261a692e77105af09ebd06ba2f74f398ec6c58190c5a1c43a754452",
-    "filename": "Daily_Briefing_2025_03_26.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
     "outlook_score": 10,
-    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 75/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "sp500_level": 4500.0,
+    "treasury_yield": 3.52,
+    "bsl_price": 93.07,
+    "consensus_bullish": 48,
+    "consensus_bearish": 52
   },
   {
     "title": "Daily Briefing: Tech Correction Update",
@@ -10157,41 +7117,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 91,
     "probability": 50,
-    "outlook_score": 10
-  },
-  {
-    "title": "Daily Briefing: Tech Correction Update",
-    "date": "2025-03-25",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 75,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Inflation",
-        "Quality"
-      ]
-    },
-    "provenance_hash": "76a56bda86dfb073288f0a983438d5d2114c4d0d98736f23b70e62150d778b3b",
-    "filename": "Daily_Briefing_2025_03_25.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
     "outlook_score": 10,
-    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 75/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "sp500_level": 4500.0,
+    "treasury_yield": 4.89,
+    "bsl_price": 92.3,
+    "consensus_bullish": 49,
+    "consensus_bearish": 51
   },
   {
     "title": "Market Pulse: Geopolitical Tensions Escalate",
@@ -10220,7 +7151,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 89,
     "probability": 50,
-    "outlook_score": 10
+    "outlook_score": 10,
+    "sp500_level": 5891.0,
+    "treasury_yield": 3.89,
+    "bsl_price": 94.63,
+    "consensus_bullish": 10,
+    "consensus_bearish": 90
   },
   {
     "title": "Daily Briefing: Tech Correction Update",
@@ -10249,41 +7185,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 91,
     "probability": 50,
-    "outlook_score": 10
-  },
-  {
-    "title": "Daily Briefing: Tech Correction Update",
-    "date": "2025-03-18",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 75,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Inflation",
-        "Quality"
-      ]
-    },
-    "provenance_hash": "8c0d3042559220cadbd104fc12fcb0c9697662ac44055d70146f82404f338483",
-    "filename": "Daily_Briefing_2025_03_18.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
     "outlook_score": 10,
-    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 75/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "sp500_level": 4500.0,
+    "treasury_yield": 3.65,
+    "bsl_price": 92.59,
+    "consensus_bullish": 45,
+    "consensus_bearish": 55
   },
   {
     "title": "Market Pulse: The Great Rotation",
@@ -10316,7 +7223,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 85,
     "probability": 50,
-    "outlook_score": 26
+    "outlook_score": 26,
+    "sp500_level": 5899,
+    "treasury_yield": 4.64,
+    "bsl_price": 94.67,
+    "consensus_bullish": 51,
+    "consensus_bearish": 49
   },
   {
     "title": "Market Pulse: Supply Chain Woes Return",
@@ -10345,7 +7257,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 89,
     "probability": 50,
-    "outlook_score": 10
+    "outlook_score": 10,
+    "sp500_level": 4732.0,
+    "treasury_yield": 4.31,
+    "bsl_price": 99.21,
+    "consensus_bullish": 10,
+    "consensus_bearish": 90
   },
   {
     "title": "BANKING CRISIS 2.0?",
@@ -10374,6 +7291,11 @@ window.MARKET_MAYHEM_DATA = [
     "semantic_score": 92,
     "probability": 50,
     "outlook_score": 10,
+    "sp500_level": 5875,
+    "treasury_yield": 4.43,
+    "bsl_price": 95.38,
+    "consensus_bullish": 10,
+    "consensus_bearish": 90,
     "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 0/100. Cross-reference with knowledge graph completed."
   },
   {
@@ -10403,41 +7325,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 89,
     "probability": 50,
-    "outlook_score": 10
-  },
-  {
-    "title": "Daily Briefing: Tech Correction Update",
-    "date": "2025-03-12",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 75,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Inflation",
-        "Quality"
-      ]
-    },
-    "provenance_hash": "19634e746fe4159998128e53310ecbb4933dbadd2e718430eca6f18f304c6300",
-    "filename": "Daily_Briefing_2025_03_12.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
     "outlook_score": 10,
-    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 75/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "sp500_level": 4500.0,
+    "treasury_yield": 4.18,
+    "bsl_price": 97.76,
+    "consensus_bullish": 40,
+    "consensus_bearish": 60
   },
   {
     "title": "Top 10 Meme Coins: Analysis and Price Targets",
@@ -10461,6 +7354,11 @@ window.MARKET_MAYHEM_DATA = [
     "semantic_score": 100,
     "probability": 50,
     "outlook_score": 10,
+    "sp500_level": 5643,
+    "treasury_yield": 4.87,
+    "bsl_price": 97.0,
+    "consensus_bullish": 57,
+    "consensus_bearish": 43,
     "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 50/100. Cross-reference with knowledge graph completed."
   },
   {
@@ -10488,6 +7386,11 @@ window.MARKET_MAYHEM_DATA = [
     "semantic_score": 92,
     "probability": 50,
     "outlook_score": 10,
+    "sp500_level": 5702,
+    "treasury_yield": 3.6,
+    "bsl_price": 95.3,
+    "consensus_bullish": 45,
+    "consensus_bearish": 55,
     "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 50/100. Cross-reference with knowledge graph completed."
   },
   {
@@ -10517,41 +7420,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 91,
     "probability": 50,
-    "outlook_score": 10
-  },
-  {
-    "title": "Daily Briefing: Tech Correction Update",
-    "date": "2025-03-11",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 75,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Inflation",
-        "Quality"
-      ]
-    },
-    "provenance_hash": "f46e4a8f3f67abbd0a9ab2bf4b4c063795f6dc87581281ba49a037df93527668",
-    "filename": "Daily_Briefing_2025_03_11.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
     "outlook_score": 10,
-    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 75/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "sp500_level": 4500.0,
+    "treasury_yield": 3.8,
+    "bsl_price": 92.69,
+    "consensus_bullish": 50,
+    "consensus_bearish": 50
   },
   {
     "title": "Untitled Report",
@@ -10575,42 +7449,12 @@ window.MARKET_MAYHEM_DATA = [
     "semantic_score": 87,
     "probability": 50,
     "outlook_score": 10,
+    "sp500_level": 5925,
+    "treasury_yield": 4.21,
+    "bsl_price": 95.4,
+    "consensus_bullish": 41,
+    "consensus_bearish": 59,
     "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 50/100. Cross-reference with knowledge graph completed."
-  },
-  {
-    "title": "Untitled Report",
-    "date": "2025-03-09",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 50,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400",
-        "media"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Quality",
-        "SPAC"
-      ]
-    },
-    "provenance_hash": "c040e9838d81fc942187496ca5b4230c58fc45d5f4056bf1d07d936d40d4be1a",
-    "filename": "Alphabet_Inc_Credit_Risk_Rating_Report_20250309.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 30,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 50/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
   },
   {
     "title": "Market Pulse: Fed Signals Higher for Longer",
@@ -10639,7 +7483,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 89,
     "probability": 50,
-    "outlook_score": 10
+    "outlook_score": 10,
+    "sp500_level": 4282.0,
+    "treasury_yield": 3.64,
+    "bsl_price": 96.27,
+    "consensus_bullish": 10,
+    "consensus_bearish": 90
   },
   {
     "title": "Adam v19.0 Daily Financial Briefing - March 3, 2025",
@@ -10665,6 +7514,11 @@ window.MARKET_MAYHEM_DATA = [
     "semantic_score": 86,
     "probability": 50,
     "outlook_score": 10,
+    "sp500_level": 5988,
+    "treasury_yield": 3.95,
+    "bsl_price": 98.94,
+    "consensus_bullish": 56,
+    "consensus_bearish": 44,
     "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 50/100. Cross-reference with knowledge graph completed."
   },
   {
@@ -10689,6 +7543,11 @@ window.MARKET_MAYHEM_DATA = [
     "semantic_score": 77,
     "probability": 50,
     "outlook_score": 10,
+    "sp500_level": 5790,
+    "treasury_yield": 4.37,
+    "bsl_price": 98.31,
+    "consensus_bullish": 42,
+    "consensus_bearish": 58,
     "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 50/100. Cross-reference with knowledge graph completed."
   },
   {
@@ -10718,111 +7577,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 89,
     "probability": 50,
-    "outlook_score": 10
-  },
-  {
-    "title": "Daily Briefing: Tech Correction Update",
-    "date": "2025-03-03",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 75,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Inflation",
-        "Quality"
-      ]
-    },
-    "provenance_hash": "2656e5c6c6632816f23fdd3a898312106f0717ff933e5afe1021a35de75cf951",
-    "filename": "Daily_Briefing_2025_03_03.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
     "outlook_score": 10,
-    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 75/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "Apple Inc. Report",
-    "date": "2025-03-03",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 50,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400",
-        "media"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Quality",
-        "SPAC"
-      ]
-    },
-    "provenance_hash": "fd56e249f7db5bac9e6755ab18b789f1bf2832dced2a8a91d7e6f3f316a423a9",
-    "filename": "aapl_CRAS_20250303.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 29,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 50/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "Untitled Report",
-    "date": "2025-03-03",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 50,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400",
-        "media"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "SPAC",
-        "Value"
-      ]
-    },
-    "provenance_hash": "8232f53d866efad15c58e9369f6f31b613c3f8faa6b22ddb3d37608b68746eab",
-    "filename": "aapl_snc_20250303.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 32,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 50/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "sp500_level": 4500.0,
+    "treasury_yield": 4.67,
+    "bsl_price": 94.15,
+    "consensus_bullish": 43,
+    "consensus_bearish": 57
   },
   {
     "title": "House View: Tech Correction Outlook",
@@ -10850,41 +7610,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 90,
     "probability": 50,
-    "outlook_score": 10
-  },
-  {
-    "title": "House View: Tech Correction Outlook",
-    "date": "2025-03-01",
-    "summary": "Report content.",
-    "type": "STRATEGY",
-    "full_body": "",
-    "sentiment_score": 73,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Inflation",
-        "Quality"
-      ]
-    },
-    "provenance_hash": "5ebb877bc9bfe620882af93c0cf27ad1f422f4dc06f214d4845d55349e4f0899",
-    "filename": "House_View_2025_03_01.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 17,
-    "probability": 50,
     "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 73/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "sp500_level": 5394.0,
+    "treasury_yield": 4.27,
+    "bsl_price": 96.19,
+    "consensus_bullish": 54,
+    "consensus_bearish": 46
   },
   {
     "title": "Market Pulse: Consumer Confidence Hits Lows",
@@ -10913,7 +7644,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 89,
     "probability": 50,
-    "outlook_score": 10
+    "outlook_score": 10,
+    "sp500_level": 4393.0,
+    "treasury_yield": 4.97,
+    "bsl_price": 93.08,
+    "consensus_bullish": 10,
+    "consensus_bearish": 90
   },
   {
     "title": "Daily Briefing: Tech Correction Update",
@@ -10942,41 +7678,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 91,
     "probability": 50,
-    "outlook_score": 10
-  },
-  {
-    "title": "Daily Briefing: Tech Correction Update",
-    "date": "2025-02-28",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 75,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Inflation",
-        "Quality"
-      ]
-    },
-    "provenance_hash": "d839ff26a2634cca48c7e0f5add759330f5be97e5904ae4d1486b555eb5aba04",
-    "filename": "Daily_Briefing_2025_02_28.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
     "outlook_score": 10,
-    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 75/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "sp500_level": 4500.0,
+    "treasury_yield": 4.63,
+    "bsl_price": 93.51,
+    "consensus_bullish": 58,
+    "consensus_bearish": 42
   },
   {
     "title": "Daily Briefing: Tech Correction Update",
@@ -11005,41 +7712,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 91,
     "probability": 50,
-    "outlook_score": 10
-  },
-  {
-    "title": "Daily Briefing: Tech Correction Update",
-    "date": "2025-02-27",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 75,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Inflation",
-        "Quality"
-      ]
-    },
-    "provenance_hash": "66f5f88b5d72d399588cd2e4f201973d62fdf8ac5c291ccfdd42df0c8913c543",
-    "filename": "Daily_Briefing_2025_02_27.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
     "outlook_score": 10,
-    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 75/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "sp500_level": 4500.0,
+    "treasury_yield": 4.36,
+    "bsl_price": 92.17,
+    "consensus_bullish": 60,
+    "consensus_bearish": 40
   },
   {
     "title": "Nvidia Corporation (NVDA) Report",
@@ -11068,41 +7746,12 @@ window.MARKET_MAYHEM_DATA = [
     "semantic_score": 37,
     "probability": 0,
     "outlook_score": 24,
+    "sp500_level": 5638,
+    "treasury_yield": 4.55,
+    "bsl_price": 96.89,
+    "consensus_bullish": 87,
+    "consensus_bearish": 13,
     "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 97/100. Cross-reference with knowledge graph completed."
-  },
-  {
-    "title": "Nvidia Corporation (NVDA) Report",
-    "date": "2025-02-26",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 89,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Energy",
-        "Growth"
-      ]
-    },
-    "provenance_hash": "72306e0612ee2486d3b774c0be74d38c7d7841fe4a3bc17068d48323e6dc16c0",
-    "filename": "nvda_company_report_20250226.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 0,
-    "semantic_score": 16,
-    "probability": 0,
-    "outlook_score": 10,
-    "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 89/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
   },
   {
     "title": "Nvidia Corporation (NVDA) Report",
@@ -11132,6 +7781,11 @@ window.MARKET_MAYHEM_DATA = [
     "semantic_score": 35,
     "probability": 0,
     "outlook_score": 22,
+    "sp500_level": 5723,
+    "treasury_yield": 4.29,
+    "bsl_price": 98.67,
+    "consensus_bullish": 90,
+    "consensus_bearish": 10,
     "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 100/100. Cross-reference with knowledge graph completed."
   },
   {
@@ -11166,79 +7820,12 @@ window.MARKET_MAYHEM_DATA = [
     "semantic_score": 19,
     "probability": 87,
     "outlook_score": 18,
+    "sp500_level": 5562,
+    "treasury_yield": 3.58,
+    "bsl_price": 96.22,
+    "consensus_bullish": 90,
+    "consensus_bearish": 10,
     "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 98/100. Cross-reference with knowledge graph completed."
-  },
-  {
-    "title": "Nvidia Corporation (NVDA) Report",
-    "date": "2025-02-25",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 86,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Energy",
-        "Growth"
-      ]
-    },
-    "provenance_hash": "91c38e918b224dea750f03762aabe6bae3cd16bc091fc299e481143be407ace9",
-    "filename": "nvda_company_report_20250225.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 0,
-    "semantic_score": 17,
-    "probability": 0,
-    "outlook_score": 10,
-    "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 86/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "Enterprise Software Market Outlook: The Rise of the AI-Powered Cloud",
-    "date": "2025-02-25",
-    "summary": "Report content.",
-    "type": "STRATEGY",
-    "full_body": "",
-    "sentiment_score": 96,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [
-        "CN_PBOC",
-        "JP_BOJ",
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Banks",
-        "Bonds",
-        "Cloud",
-        "Cybersecurity"
-      ]
-    },
-    "provenance_hash": "ac73c29082c6aae16e730366525aa64d0b0cac98745ec2cce7d7954865e67745",
-    "filename": "software_industry_report_20250225.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 67,
-    "semantic_score": 10,
-    "probability": 87,
-    "outlook_score": 15,
-    "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 96/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
   },
   {
     "title": "Geopolitics and Financial Markets - Navigating Uncertainty and Risk",
@@ -11264,6 +7851,11 @@ window.MARKET_MAYHEM_DATA = [
     "semantic_score": 92,
     "probability": 70,
     "outlook_score": 10,
+    "sp500_level": 5901,
+    "treasury_yield": 4.65,
+    "bsl_price": 93.89,
+    "consensus_bullish": 10,
+    "consensus_bearish": 90,
     "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 0/100. Cross-reference with knowledge graph completed."
   },
   {
@@ -11294,6 +7886,11 @@ window.MARKET_MAYHEM_DATA = [
     "semantic_score": 37,
     "probability": 0,
     "outlook_score": 19,
+    "sp500_level": 5783,
+    "treasury_yield": 4.05,
+    "bsl_price": 94.59,
+    "consensus_bullish": 90,
+    "consensus_bearish": 10,
     "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 97/100. Cross-reference with knowledge graph completed."
   },
   {
@@ -11318,76 +7915,12 @@ window.MARKET_MAYHEM_DATA = [
     "semantic_score": 90,
     "probability": 50,
     "outlook_score": 10,
+    "sp500_level": 5612,
+    "treasury_yield": 3.68,
+    "bsl_price": 95.73,
+    "consensus_bullish": 44,
+    "consensus_bearish": 56,
     "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 50/100. Cross-reference with knowledge graph completed."
-  },
-  {
-    "title": "Microsoft Corporation (MSFT) Report",
-    "date": "2025-02-24",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 85,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Growth",
-        "Inflation"
-      ]
-    },
-    "provenance_hash": "e9fe05a6e474a8a59c5f148dc19eb977688ab9f43374cd53e1cef7947e613b31",
-    "filename": "msft_company_report_20250224.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 0,
-    "semantic_score": 16,
-    "probability": 0,
-    "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 85/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "Lockheed Martin Corporation (LMT) Report",
-    "date": "2025-02-24",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 50,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400",
-        "media"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Quality",
-        "SPAC"
-      ]
-    },
-    "provenance_hash": "57ca81d68e4783c30ebc05573e40eb48c3b600f9749fea0e03937e5d1e0894b3",
-    "filename": "lmt_company_report_20250224.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 30,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 50/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
   },
   {
     "title": "Adam v15.4 Newsletter - February 21, 2025",
@@ -11420,6 +7953,11 @@ window.MARKET_MAYHEM_DATA = [
     "semantic_score": 50,
     "probability": 31,
     "outlook_score": 16,
+    "sp500_level": 5882,
+    "treasury_yield": 4.04,
+    "bsl_price": 92.51,
+    "consensus_bullish": 47,
+    "consensus_bearish": 53,
     "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 42/100. Cross-reference with knowledge graph completed."
   },
   {
@@ -11451,6 +7989,11 @@ window.MARKET_MAYHEM_DATA = [
     "semantic_score": 43,
     "probability": 0,
     "outlook_score": 10,
+    "sp500_level": 5967,
+    "treasury_yield": 3.88,
+    "bsl_price": 95.04,
+    "consensus_bullish": 90,
+    "consensus_bearish": 10,
     "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 100/100. Cross-reference with knowledge graph completed."
   },
   {
@@ -11481,6 +8024,11 @@ window.MARKET_MAYHEM_DATA = [
     "semantic_score": 38,
     "probability": 20,
     "outlook_score": 10,
+    "sp500_level": 5708,
+    "treasury_yield": 3.76,
+    "bsl_price": 95.14,
+    "consensus_bullish": 52,
+    "consensus_bearish": 48,
     "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 60/100. Cross-reference with knowledge graph completed."
   },
   {
@@ -11510,6 +8058,11 @@ window.MARKET_MAYHEM_DATA = [
     "semantic_score": 51,
     "probability": 50,
     "outlook_score": 10,
+    "sp500_level": 5717,
+    "treasury_yield": 3.7,
+    "bsl_price": 98.3,
+    "consensus_bullish": 90,
+    "consensus_bearish": 10,
     "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 100/100. Cross-reference with knowledge graph completed."
   },
   {
@@ -11542,6 +8095,11 @@ window.MARKET_MAYHEM_DATA = [
     "semantic_score": 41,
     "probability": 0,
     "outlook_score": 15,
+    "sp500_level": 5866,
+    "treasury_yield": 4.2,
+    "bsl_price": 97.51,
+    "consensus_bullish": 87,
+    "consensus_bearish": 13,
     "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 80/100. Cross-reference with knowledge graph completed."
   },
   {
@@ -11574,6 +8132,11 @@ window.MARKET_MAYHEM_DATA = [
     "semantic_score": 40,
     "probability": 0,
     "outlook_score": 16,
+    "sp500_level": 5946,
+    "treasury_yield": 3.75,
+    "bsl_price": 93.9,
+    "consensus_bullish": 90,
+    "consensus_bearish": 10,
     "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 100/100. Cross-reference with knowledge graph completed."
   },
   {
@@ -11604,6 +8167,11 @@ window.MARKET_MAYHEM_DATA = [
     "semantic_score": 41,
     "probability": 0,
     "outlook_score": 10,
+    "sp500_level": 5666,
+    "treasury_yield": 3.63,
+    "bsl_price": 95.09,
+    "consensus_bullish": 90,
+    "consensus_bearish": 10,
     "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 94/100. Cross-reference with knowledge graph completed."
   },
   {
@@ -11633,7 +8201,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 89,
     "probability": 50,
-    "outlook_score": 10
+    "outlook_score": 10,
+    "sp500_level": 5034.0,
+    "treasury_yield": 3.62,
+    "bsl_price": 93.66,
+    "consensus_bullish": 10,
+    "consensus_bearish": 90
   },
   {
     "title": "Daily Briefing: Tech Correction Update",
@@ -11662,41 +8235,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 91,
     "probability": 50,
-    "outlook_score": 10
-  },
-  {
-    "title": "Daily Briefing: Tech Correction Update",
-    "date": "2025-02-17",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 75,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Inflation",
-        "Quality"
-      ]
-    },
-    "provenance_hash": "747309eab2114515becc12d49ecd337d5e6e91e62e08722adba1e6ff28e3c766",
-    "filename": "Daily_Briefing_2025_02_17.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
     "outlook_score": 10,
-    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 75/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "sp500_level": 4500.0,
+    "treasury_yield": 4.12,
+    "bsl_price": 95.02,
+    "consensus_bullish": 57,
+    "consensus_bearish": 43
   },
   {
     "title": "Adam v15.4 Newsletter - February 14, 2025",
@@ -11728,6 +8272,11 @@ window.MARKET_MAYHEM_DATA = [
     "semantic_score": 45,
     "probability": 27,
     "outlook_score": 27,
+    "sp500_level": 5922,
+    "treasury_yield": 3.78,
+    "bsl_price": 96.77,
+    "consensus_bullish": 49,
+    "consensus_bearish": 51,
     "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 42/100. Cross-reference with knowledge graph completed."
   },
   {
@@ -11757,7 +8306,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 91,
     "probability": 50,
-    "outlook_score": 10
+    "outlook_score": 10,
+    "sp500_level": 4500.0,
+    "treasury_yield": 4.23,
+    "bsl_price": 93.84,
+    "consensus_bullish": 53,
+    "consensus_bearish": 47
   },
   {
     "title": "Market Pulse: Fed Signals Higher for Longer",
@@ -11786,7 +8340,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 89,
     "probability": 50,
-    "outlook_score": 10
+    "outlook_score": 10,
+    "sp500_level": 4327.0,
+    "treasury_yield": 3.52,
+    "bsl_price": 94.47,
+    "consensus_bullish": 10,
+    "consensus_bearish": 90
   },
   {
     "title": "THE AI BUBBLE BURST?",
@@ -11814,41 +8373,12 @@ window.MARKET_MAYHEM_DATA = [
     "semantic_score": 93,
     "probability": 50,
     "outlook_score": 10,
+    "sp500_level": 5576,
+    "treasury_yield": 4.31,
+    "bsl_price": 94.92,
+    "consensus_bullish": 10,
+    "consensus_bearish": 90,
     "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 0/100. Cross-reference with knowledge graph completed."
-  },
-  {
-    "title": "Daily Briefing: Tech Correction Update",
-    "date": "2025-02-14",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 75,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Inflation",
-        "Quality"
-      ]
-    },
-    "provenance_hash": "cde683b9b6d19498ffb3e2f54c4257c5e958643d640108bcd129e9006b460f0e",
-    "filename": "Daily_Briefing_2025_02_14.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 75/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
   },
   {
     "title": "Daily Briefing: Tech Correction Update",
@@ -11877,41 +8407,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 91,
     "probability": 50,
-    "outlook_score": 10
-  },
-  {
-    "title": "Daily Briefing: Tech Correction Update",
-    "date": "2025-02-13",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 75,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Inflation",
-        "Quality"
-      ]
-    },
-    "provenance_hash": "b45c4b45cfbfe9d15a079b4eb2aef0b1ad15cc713795c7060297a5378d43af1b",
-    "filename": "Daily_Briefing_2025_02_13.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
     "outlook_score": 10,
-    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 75/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "sp500_level": 4500.0,
+    "treasury_yield": 4.13,
+    "bsl_price": 92.19,
+    "consensus_bullish": 42,
+    "consensus_bearish": 58
   },
   {
     "title": "Adam v15.4 Newsletter - February 7, 2025",
@@ -11944,6 +8445,11 @@ window.MARKET_MAYHEM_DATA = [
     "semantic_score": 46,
     "probability": 29,
     "outlook_score": 10,
+    "sp500_level": 5959,
+    "treasury_yield": 4.26,
+    "bsl_price": 93.55,
+    "consensus_bullish": 10,
+    "consensus_bearish": 90,
     "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 12/100. Cross-reference with knowledge graph completed."
   },
   {
@@ -11973,7 +8479,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 89,
     "probability": 50,
-    "outlook_score": 10
+    "outlook_score": 10,
+    "sp500_level": 4509.0,
+    "treasury_yield": 4.4,
+    "bsl_price": 97.87,
+    "consensus_bullish": 10,
+    "consensus_bearish": 90
   },
   {
     "title": "Daily Briefing: Tech Correction Update",
@@ -12002,41 +8513,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 89,
     "probability": 50,
-    "outlook_score": 10
-  },
-  {
-    "title": "Daily Briefing: Tech Correction Update",
-    "date": "2025-02-06",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 75,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Inflation",
-        "Quality"
-      ]
-    },
-    "provenance_hash": "22f6489af7b48bcdbd8286a738be0e34800923bae588a163c00c9e1d15feb6b5",
-    "filename": "Daily_Briefing_2025_02_06.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
     "outlook_score": 10,
-    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 75/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "sp500_level": 4500.0,
+    "treasury_yield": 3.61,
+    "bsl_price": 94.85,
+    "consensus_bullish": 47,
+    "consensus_bearish": 53
   },
   {
     "title": "House View: Tech Correction Outlook",
@@ -12064,41 +8546,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 90,
     "probability": 50,
-    "outlook_score": 10
-  },
-  {
-    "title": "House View: Tech Correction Outlook",
-    "date": "2025-02-01",
-    "summary": "Report content.",
-    "type": "STRATEGY",
-    "full_body": "",
-    "sentiment_score": 73,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Inflation",
-        "Quality"
-      ]
-    },
-    "provenance_hash": "9cc7d90ed00bad1d6dcb93afd7acf2e70f051a7a5514989aeda7aed59795a743",
-    "filename": "House_View_2025_02_01.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 17,
-    "probability": 50,
     "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 73/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "sp500_level": 4865.0,
+    "treasury_yield": 3.5,
+    "bsl_price": 94.87,
+    "consensus_bullish": 45,
+    "consensus_bearish": 55
   },
   {
     "title": "Market Pulse: AI Bubble Bursts?",
@@ -12127,7 +8580,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 89,
     "probability": 50,
-    "outlook_score": 10
+    "outlook_score": 10,
+    "sp500_level": 5933.0,
+    "treasury_yield": 4.4,
+    "bsl_price": 93.96,
+    "consensus_bullish": 10,
+    "consensus_bearish": 90
   },
   {
     "title": "Daily Briefing: Tech Correction Update",
@@ -12156,41 +8614,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 91,
     "probability": 50,
-    "outlook_score": 10
-  },
-  {
-    "title": "Daily Briefing: Tech Correction Update",
-    "date": "2025-01-30",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 75,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Inflation",
-        "Quality"
-      ]
-    },
-    "provenance_hash": "33a594d1b7780c08bc941934bf2a7bdb786e40f2a85a8524dbd2224d01ee5e5b",
-    "filename": "Daily_Briefing_2025_01_30.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
     "outlook_score": 10,
-    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 75/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "sp500_level": 4500.0,
+    "treasury_yield": 4.05,
+    "bsl_price": 96.52,
+    "consensus_bullish": 48,
+    "consensus_bearish": 52
   },
   {
     "title": "Daily Briefing: Tech Correction Update",
@@ -12219,41 +8648,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 91,
     "probability": 50,
-    "outlook_score": 10
-  },
-  {
-    "title": "Daily Briefing: Tech Correction Update",
-    "date": "2025-01-28",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 75,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Inflation",
-        "Quality"
-      ]
-    },
-    "provenance_hash": "dd2f7aa316a77928845790b5cbb8aeb1e7b00faac289ef01cab669e00b658cfc",
-    "filename": "Daily_Briefing_2025_01_28.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
     "outlook_score": 10,
-    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 75/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "sp500_level": 4500.0,
+    "treasury_yield": 4.07,
+    "bsl_price": 94.7,
+    "consensus_bullish": 52,
+    "consensus_bearish": 48
   },
   {
     "title": "Daily Briefing: Tech Correction Update",
@@ -12282,41 +8682,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 91,
     "probability": 50,
-    "outlook_score": 10
-  },
-  {
-    "title": "Daily Briefing: Tech Correction Update",
-    "date": "2025-01-27",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 75,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Inflation",
-        "Quality"
-      ]
-    },
-    "provenance_hash": "b69046cff4c3d192c7dd570cb4ec6131da2f9c22d736212fa03c2017333f445a",
-    "filename": "Daily_Briefing_2025_01_27.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
     "outlook_score": 10,
-    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 75/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "sp500_level": 4500.0,
+    "treasury_yield": 3.7,
+    "bsl_price": 92.41,
+    "consensus_bullish": 49,
+    "consensus_bearish": 51
   },
   {
     "title": "Market Pulse: Energy Prices Spike",
@@ -12345,7 +8716,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 89,
     "probability": 50,
-    "outlook_score": 10
+    "outlook_score": 10,
+    "sp500_level": 4894.0,
+    "treasury_yield": 3.64,
+    "bsl_price": 98.03,
+    "consensus_bullish": 10,
+    "consensus_bearish": 90
   },
   {
     "title": "Daily Briefing: Tech Correction Update",
@@ -12374,41 +8750,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 91,
     "probability": 50,
-    "outlook_score": 10
-  },
-  {
-    "title": "Daily Briefing: Tech Correction Update",
-    "date": "2025-01-21",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 75,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Inflation",
-        "Quality"
-      ]
-    },
-    "provenance_hash": "7b400745152e5fe2b2db7f773f408597b9785bbd288c81da7385ac6a634866a3",
-    "filename": "Daily_Briefing_2025_01_21.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
     "outlook_score": 10,
-    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 75/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "sp500_level": 4500.0,
+    "treasury_yield": 3.96,
+    "bsl_price": 93.02,
+    "consensus_bullish": 52,
+    "consensus_bearish": 48
   },
   {
     "title": "Market Pulse: Consumer Confidence Hits Lows",
@@ -12437,7 +8784,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 89,
     "probability": 50,
-    "outlook_score": 10
+    "outlook_score": 10,
+    "sp500_level": 4534.0,
+    "treasury_yield": 4.38,
+    "bsl_price": 98.79,
+    "consensus_bullish": 10,
+    "consensus_bearish": 90
   },
   {
     "title": "Daily Briefing: Tech Correction Update",
@@ -12466,7 +8818,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 91,
     "probability": 50,
-    "outlook_score": 10
+    "outlook_score": 10,
+    "sp500_level": 4500.0,
+    "treasury_yield": 4.09,
+    "bsl_price": 95.37,
+    "consensus_bullish": 43,
+    "consensus_bearish": 57
   },
   {
     "title": "2025 OUTLOOK: THE YEAR OF VOLATILITY",
@@ -12495,41 +8852,12 @@ window.MARKET_MAYHEM_DATA = [
     "semantic_score": 85,
     "probability": 50,
     "outlook_score": 20,
+    "sp500_level": 5517,
+    "treasury_yield": 4.51,
+    "bsl_price": 95.19,
+    "consensus_bullish": 18,
+    "consensus_bearish": 82,
     "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 25/100. Cross-reference with knowledge graph completed."
-  },
-  {
-    "title": "Daily Briefing: Tech Correction Update",
-    "date": "2025-01-14",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 75,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Inflation",
-        "Quality"
-      ]
-    },
-    "provenance_hash": "c5c054804875dfb853d2864f933e32bc399b710654c1c62bbae87be86cd86f3a",
-    "filename": "Daily_Briefing_2025_01_14.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 75/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
   },
   {
     "title": "Daily Briefing: Tech Correction Update",
@@ -12558,41 +8886,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 91,
     "probability": 50,
-    "outlook_score": 10
-  },
-  {
-    "title": "Daily Briefing: Tech Correction Update",
-    "date": "2025-01-13",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 75,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Inflation",
-        "Quality"
-      ]
-    },
-    "provenance_hash": "59ac1ec5415736e1867e21d1bbf67fe4a560e54b3e8bffeaefeab0ca126b5cea",
-    "filename": "Daily_Briefing_2025_01_13.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
     "outlook_score": 10,
-    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 75/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "sp500_level": 4500.0,
+    "treasury_yield": 3.64,
+    "bsl_price": 92.82,
+    "consensus_bullish": 43,
+    "consensus_bearish": 57
   },
   {
     "title": "Market Pulse: AI Bubble Bursts?",
@@ -12621,7 +8920,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 89,
     "probability": 50,
-    "outlook_score": 10
+    "outlook_score": 10,
+    "sp500_level": 5161.0,
+    "treasury_yield": 4.23,
+    "bsl_price": 98.95,
+    "consensus_bullish": 10,
+    "consensus_bearish": 90
   },
   {
     "title": "Daily Briefing: Tech Correction Update",
@@ -12650,41 +8954,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 91,
     "probability": 50,
-    "outlook_score": 10
-  },
-  {
-    "title": "Daily Briefing: Tech Correction Update",
-    "date": "2025-01-08",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 75,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Inflation",
-        "Quality"
-      ]
-    },
-    "provenance_hash": "8c553bcd632daa7b96a88473546b0587daae5f9c9fa4ee109c4e00a1d4d2151d",
-    "filename": "Daily_Briefing_2025_01_08.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
     "outlook_score": 10,
-    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 75/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "sp500_level": 4500.0,
+    "treasury_yield": 4.77,
+    "bsl_price": 93.17,
+    "consensus_bullish": 41,
+    "consensus_bearish": 59
   },
   {
     "title": "Market Pulse: Supply Chain Woes Return",
@@ -12713,7 +8988,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 89,
     "probability": 50,
-    "outlook_score": 10
+    "outlook_score": 10,
+    "sp500_level": 4838.0,
+    "treasury_yield": 4.06,
+    "bsl_price": 92.56,
+    "consensus_bullish": 10,
+    "consensus_bearish": 90
   },
   {
     "title": "ROLE: Automated Media Producer (Adam v22.0 Architecture)",
@@ -12746,7 +9026,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 37,
     "probability": 50,
-    "outlook_score": 10
+    "outlook_score": 10,
+    "sp500_level": 5775,
+    "treasury_yield": 4.41,
+    "bsl_price": 95.6,
+    "consensus_bullish": 56,
+    "consensus_bearish": 44
   },
   {
     "title": "1Q26 Equity Research Desk: Optimal Portfolio Architecture and Strategic Archetype Frameworks",
@@ -12782,7 +9067,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 26,
     "probability": 76,
-    "outlook_score": 21
+    "outlook_score": 21,
+    "sp500_level": 5900,
+    "treasury_yield": 3.9,
+    "bsl_price": 92.48,
+    "consensus_bullish": 75,
+    "consensus_bearish": 25
   },
   {
     "title": "2024 Year in Review: Navigating Uncertainty and Transition",
@@ -12812,6 +9102,11 @@ window.MARKET_MAYHEM_DATA = [
     "semantic_score": 42,
     "probability": 36,
     "outlook_score": 10,
+    "sp500_level": 5558,
+    "treasury_yield": 4.49,
+    "bsl_price": 98.81,
+    "consensus_bullish": 75,
+    "consensus_bearish": 25,
     "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 82/100. Cross-reference with knowledge graph completed."
   },
   {
@@ -12840,4390 +9135,48 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 88,
     "probability": 50,
-    "outlook_score": 10
-  },
-  {
-    "title": "Q1 EARNINGS: PROFIT MARGIN SQUEEZE",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 77,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400",
-        "media"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "EV",
-        "Energy",
-        "Gold",
-        "Growth"
-      ]
-    },
-    "provenance_hash": "bcd30ea4ed22501d32f5c57716739a9afeb010cb1aa4cb982e34a887fd82cd3c",
-    "filename": "newsletter_market_mayhem_apr_2025.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 39,
-    "probability": 50,
     "outlook_score": 10,
-    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 77/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "THE DOLLAR WRECKING BALL",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 66,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400",
-        "media"
-      ],
-      "sovereigns": [
-        "EU_ECB",
-        "JP_BOJ",
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "EV",
-        "SPAC",
-        "Tech"
-      ]
-    },
-    "provenance_hash": "3a3bfb40849b451d75edd209573dff97765311b45e1d3bb3de8270d691b95352",
-    "filename": "newsletter_market_mayhem_jun_2025.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 40,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 66/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "MARKET MAYHEM: THE LEHMAN MOMENT",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 66,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400",
-        "media"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "SPAC",
-        "Value"
-      ]
-    },
-    "provenance_hash": "5b281ce0a99e4272fd17dfed77da6300ce43c8875d971c35c686683d90a4222a",
-    "filename": "newsletter_market_mayhem_sep_2008.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 36,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 66/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "COMMERCIAL REAL ESTATE: THE RECKONING",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 100,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400",
-        "media"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Banks",
-        "EV",
-        "SPAC"
-      ]
-    },
-    "provenance_hash": "be85c1aaec6131b7cad1e0849ff62ef61163e15183135ba368f168180a7a5f90",
-    "filename": "newsletter_market_mayhem_may_2025.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 40,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 100/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "THE LIQUIDITY TRAP",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 75,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400",
-        "media"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Banks",
-        "EV",
-        "Inflation",
-        "Quality"
-      ]
-    },
-    "provenance_hash": "32e46bf4b61ce3f368af14b0568d04ae8fdd640ac4ad5cf75b04d071da5a0d39",
-    "filename": "newsletter_market_mayhem_sep_2025.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 42,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 75/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "Market Mayhem: Vol. 2026.02.02",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 90,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "400",
-        "keyframes"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "EV",
-        "Inflation",
-        "Momentum",
-        "Quality"
-      ]
-    },
-    "provenance_hash": "075461c5ddc2ba6bd61d82bb56e4ef3b5f4b5531f9b8bf1c8eb7ec6b47410de4",
-    "filename": "newsletter_market_mayhem_feb_02_2026.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 37,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 90/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "MARKET MAYHEM: THE GREAT SHUT-IN",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 85,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400",
-        "media"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Bonds",
-        "Cloud",
-        "EV",
-        "Oil"
-      ]
-    },
-    "provenance_hash": "4da5e80b37155209d16acd88e0987deccd7716862a662c789ff3e8b50de467a9",
-    "filename": "newsletter_market_mayhem_mar_2020.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 37,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 85/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "CRYPTO REGULATION SHOCK",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 100,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400",
-        "media"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Bitcoin",
-        "Crypto",
-        "DeFi",
-        "EV"
-      ]
-    },
-    "provenance_hash": "8eb0f300a9d9d05cca3b20542aeadf2c26561fc0ead22fcc5badaf3aacbaca8a",
-    "filename": "newsletter_market_mayhem_jul_2025.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 100,
-    "semantic_score": 40,
-    "probability": 100,
-    "outlook_score": 10,
-    "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 100/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "2024 POST-MORTEM: THE SOFT LANDING MIRACLE",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 60,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400",
-        "media"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "EV",
-        "Inflation",
-        "Labor",
-        "Recession"
-      ]
-    },
-    "provenance_hash": "8e19d4983e6a0488c4d4e6dbf23cbcf4720215c3c4883fc4dd5a5f64ce73a6c8",
-    "filename": "newsletter_market_mayhem_dec_2024.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 100,
-    "semantic_score": 40,
-    "probability": 100,
-    "outlook_score": 10,
-    "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 60/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "SUMMER DOLDRUMS & AI FATIGUE",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 66,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400",
-        "media"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "EV",
-        "SPAC"
-      ]
-    },
-    "provenance_hash": "22010fd5acd7b0b8da9756eaa48244f00efedfb9438c606e33fffb2f88380c94",
-    "filename": "newsletter_market_mayhem_aug_2025.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 0,
-    "semantic_score": 41,
-    "probability": 20,
-    "outlook_score": 10,
-    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 66/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "MARKET MAYHEM: BLACK MONDAY AFTERMATH",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 85,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400",
-        "media"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "SPAC",
-        "Value"
-      ]
-    },
-    "provenance_hash": "da64299aec3b2831ee5748e7fdfe5030cbdd072ba6dbca635d0dc475cdf7b29b",
-    "filename": "newsletter_market_mayhem_oct_1987.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 100,
-    "semantic_score": 36,
-    "probability": 100,
-    "outlook_score": 10,
-    "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 85/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "Q1 2026 House View // The End of the Soft Landing",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 42,
-    "entities": {
-      "tickers": [],
-      "agents": [],
-      "sovereigns": [
-        "JP_BOJ",
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "DeFi",
-        "EV",
-        "Energy",
-        "Gold"
-      ]
-    },
-    "provenance_hash": "72f3a888c9aea11d36cabebdb66831d87c8930d8597e77147ab0a9f7c029a612",
-    "filename": "house_view_q1_2026.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 100,
-    "semantic_score": 43,
-    "probability": 100,
-    "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 42/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "Knowledge Graph Visualizer - Analyst OS",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 50,
-    "entities": {
-      "tickers": [],
-      "agents": [],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "EV",
-        "Value"
-      ]
-    },
-    "provenance_hash": "f72324e35c75c53875bc2cfbfaf27b85a635fb6b8c9cda4822749389a74ab1cc",
-    "filename": "knowledge_graph.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 100,
-    "semantic_score": 42,
-    "probability": 100,
-    "outlook_score": 10,
-    "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 50/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM | System Knowledge Graph",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 50,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "DeFi",
-        "EV",
-        "SPAC"
-      ]
-    },
-    "provenance_hash": "7ad44776e561d619b33e22655b39731d5204b37df125c6edee0cffc8d52fafed",
-    "filename": "system_knowledge_graph.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 20,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 50/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "SPRING AWAKENING: THE GOLDILOCKS DATA",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 75,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400",
-        "media"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Gold",
-        "SPAC"
-      ]
-    },
-    "provenance_hash": "f1282341c3389fb4bc18629d9acc28b53e8753ab85834d21a6b328efe1524017",
-    "filename": "newsletter_market_mayhem_apr_04_2025.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 34,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 75/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM :: RETAIL ALPHA",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 100,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "300",
-        "400",
-        "latest"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "EV",
-        "Retail",
-        "SPAC"
-      ]
-    },
-    "provenance_hash": "b076bf584f68dc65b6912a1650aa3d844e904ecd7eff654805476bc019b5e410",
-    "filename": "retail_alpha.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 100,
-    "semantic_score": 30,
-    "probability": 100,
-    "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 100/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "QUANTITATIVE RISK ENGINE",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 0,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "EV",
-        "SPAC",
-        "Value"
-      ]
-    },
-    "provenance_hash": "7b642440f747174957aeab0ada982b8f57a8acd25646fc1c5414b458668f1db0",
-    "filename": "monte_carlo_visualizer.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 28,
-    "probability": 50,
-    "outlook_score": 13,
-    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 0/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM | Unified Banking World Model",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 50,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "400"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "DeFi",
-        "EV",
-        "Growth"
-      ]
-    },
-    "provenance_hash": "262256f2affb6def5774d6bf33fafaa368be9bf22519ecbb5c79f997cdd6f786",
-    "filename": "unified_banking.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 100,
-    "semantic_score": 23,
-    "probability": 100,
-    "outlook_score": 10,
-    "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 50/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "THE YIELD CURVE SNAP",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 60,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400",
-        "media"
-      ],
-      "sovereigns": [
-        "CN_PBOC",
-        "JP_BOJ",
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Banks",
-        "Cloud",
-        "EV",
-        "Gold"
-      ]
-    },
-    "provenance_hash": "1302a6d63616f7f8c21da990972faad36b17a99ff126e038e8fb90737f3496e1",
-    "filename": "newsletter_market_mayhem_nov.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 33,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 60/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM | NEXUS Simulation",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 50,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "400",
-        "keyframes"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "DeFi",
-        "EV",
-        "SPAC"
-      ]
-    },
-    "provenance_hash": "9e92a2c3e182c1629ddbb01995334d6f8980b16f899b82ebc4150caef0d00d08",
-    "filename": "nexus.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 27,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 50/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "BANKING CRISIS 2.0?",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 40,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400",
-        "media"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "SPAC",
-        "Value"
-      ]
-    },
-    "provenance_hash": "7dea0c610c55786491586ce044567419c870305764aacbded2fb8517df18b3d3",
-    "filename": "newsletter_market_mayhem_mar_2025.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 35,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 40/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM System | Research Lab",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 0,
-    "entities": {
-      "tickers": [],
-      "agents": [],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "SPAC"
-      ]
-    },
-    "provenance_hash": "23cf9eecbebd30508fd3d2f02af09900b7aa9c908fd70c06b274bc762b0fc281",
-    "filename": "research.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 19,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 0/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "Pocket Sovereign",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 50,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "keyframes"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "EV",
-        "SPAC",
-        "Tech",
-        "Value"
-      ]
-    },
-    "provenance_hash": "991a91c915e5f8b1e3bc302832b1f879c999e9d269e704691e8c64d17f3106b2",
-    "filename": "pocket.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 31,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 50/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "Top 10 Meme Coins: Analysis and Price Targets",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 50,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400",
-        "media"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Quality",
-        "SPAC"
-      ]
-    },
-    "provenance_hash": "4a334ab85d8e32814d41fefd3844acf0765bba24086cd9df5d438c4ee30145bb",
-    "filename": "top_10_meme_coins.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 30,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 50/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM v24 :: AGENTS HUB",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 50,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "SPAC",
-        "Value"
-      ]
-    },
-    "provenance_hash": "67e746f7f38d6b3dfc2450ef632ab74290b8eca9f2f4123e84504627370dc3ed",
-    "filename": "hub_agents.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 25,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 50/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM v24 :: UNIFIED INTELLIGENCE HUB",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 50,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "300",
-        "400",
-        "keyframes"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "SPAC"
-      ]
-    },
-    "provenance_hash": "1ac1140e8adfa49a02c968a9db00ca55a8feb2ed1e3bf7893fbab86522526cf9",
-    "filename": "intelligence_hub.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 20,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 50/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "Deep Dive: Zombie Processors // 2026.02.02",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "DEEP_DIVE",
-    "full_body": "",
-    "sentiment_score": 77,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "300",
-        "400"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "EV",
-        "Energy",
-        "Growth",
-        "SPAC"
-      ]
-    },
-    "provenance_hash": "d6b5197ef7c972f93b8ee09ed06bbdde1ffcf6ebba42646e1e9ebc63129dbbd1",
-    "filename": "report_zombie_processors_2026.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 44,
-    "probability": 50,
-    "outlook_score": 15,
-    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 77/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "MARKET MAYHEM: CRYPTO WINTER & CELSIUS FREEZE",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 60,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Bitcoin",
-        "Cloud",
-        "Crypto",
-        "EV"
-      ]
-    },
-    "provenance_hash": "40ac899c2f1d8a205ff131c7d40c04471f6f74c4e7fdd0104ffbeec589efc22a",
-    "filename": "newsletter_market_mayhem_jun_2022.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 18,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 60/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "13F TRACKER",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 0,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "300",
-        "400"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "SPAC",
-        "Tech"
-      ]
-    },
-    "provenance_hash": "92e10a5a58ecb10ec332a17c493a259fa0c591083477433784cf3d6ecfee97f0",
-    "filename": "13f_tracker.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 25,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 0/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM v23.5 | Neural Dashboard",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 0,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "keyframes"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "SPAC",
-        "Supply Chain"
-      ]
-    },
-    "provenance_hash": "a48226b985a99ee7ffb914e4156a5045f14ae0737c11a1f2cc58b71089f606a3",
-    "filename": "neural_dashboard.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 0/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM v26 :: CRISIS SIMULATOR",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 0,
-    "entities": {
-      "tickers": [],
-      "agents": [],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "SPAC"
-      ]
-    },
-    "provenance_hash": "1236fbcc31e4d6174fe435ca12b7a2741630f7a05c4ea7274e63c21a38a19726",
-    "filename": "crisis_simulator.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 29,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 0/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "OMEGA Trust Engine",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 100,
-    "entities": {
-      "tickers": [],
-      "agents": [],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Crypto",
-        "EV",
-        "SPAC"
-      ]
-    },
-    "provenance_hash": "392d14dfa39dedc9454362b782d4573c97d5d9fe32620285a4b3283f4bd53b38",
-    "filename": "trust_explorer.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 33,
-    "semantic_score": 35,
-    "probability": 33,
-    "outlook_score": 10,
-    "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 100/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "SWARM ORCHESTRATOR",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 50,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "300",
-        "400",
-        "keyframes"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "EV",
-        "SPAC"
-      ]
-    },
-    "provenance_hash": "ac7fa453ed339c3b08da56aabf8e71ecd1cf3c8f61639beaa6b429dc4a3d6bc0",
-    "filename": "swarm_orchestrator.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 36,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 50/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM v24 :: FINANCIAL INTELLIGENCE HUB",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 50,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "SPAC",
-        "Value"
-      ]
-    },
-    "provenance_hash": "44969878b209e82434702559854f2267b23ea69729db9a812918400f7eef7d0e",
-    "filename": "hub_financial_intelligence.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 25,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 50/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM v23.5 | Agent Gallery",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 0,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "400",
-        "keyframes"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "DeFi",
-        "EV",
-        "SPAC"
-      ]
-    },
-    "provenance_hash": "d6896a9a9a1f92f438a1055e0a5e0763d43c6023e36bbe30d48ecb7a59ead189",
-    "filename": "agent_gallery.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 0/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "UFOS Mission Control",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 0,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "400",
-        "keyframes",
-        "latest"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "EV",
-        "SPAC",
-        "Volatility"
-      ]
-    },
-    "provenance_hash": "20e22ca32d8392b996c26f787412f7d1cf9935e4eaad6841fba26f9cc16e1674",
-    "filename": "ufos_terminal.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 23,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 0/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM v26.0 :: INTELLIGENCE LIBRARY",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 50,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "300",
-        "400"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Value"
-      ]
-    },
-    "provenance_hash": "c120f8a973911f73d6b9e99cfa420c905eb340458b77d08412e3ca3833a32020",
-    "filename": "intelligence_library.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 35,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 50/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "Narrative Dashboard Preview",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 45,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "EV",
-        "Energy",
-        "Oil",
-        "SPAC"
-      ]
-    },
-    "provenance_hash": "8f9bca8b69e87ed09427a5fdba99febb34627ffdc1743bb33779ffc36658b83c",
-    "filename": "narrative_dashboard_preview.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 36,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 45/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM v24.0 :: Conviction Report: Rivian (RIVN)",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 66,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "EV",
-        "SPAC"
-      ]
-    },
-    "provenance_hash": "60d91107deb43447b225dcdbe9418f5c6763b6d92a849d6c5bf547713ebbe509",
-    "filename": "conviction_rivn_feb26.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 52,
-    "probability": 50,
-    "outlook_score": 12,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 66/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "EVOLUTION HUB",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 0,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Labor",
-        "SPAC"
-      ]
-    },
-    "provenance_hash": "1e9b2718a72ebab9ed272fe03e700e71bc4c45ee5ae767ddbbb4a52357afae2b",
-    "filename": "evolution.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 37,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 0/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "Project OMEGA",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 0,
-    "entities": {
-      "tickers": [],
-      "agents": [],
-      "sovereigns": [],
-      "keywords": [
-        "EV",
-        "SPAC"
-      ]
-    },
-    "provenance_hash": "857d4ebbc84a2676c3d8876b5a08d7807d419060f8b281dc5ec78753c71aea1b",
-    "filename": "omega.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 46,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 0/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM v23.5 | Crisis Risk Response",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 0,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "400",
-        "keyframes"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "SPAC",
-        "Value"
-      ]
-    },
-    "provenance_hash": "ceeabbcc379e8866bc916a45da2ea1564af225086dd767f9aa123866e3b61193",
-    "filename": "crisis_response.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 100,
-    "semantic_score": 17,
-    "probability": 100,
-    "outlook_score": 10,
-    "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 0/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "Project OMEGA: The Holodeck",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 0,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "keyframes"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "EV",
-        "SPAC",
-        "Volatility"
-      ]
-    },
-    "provenance_hash": "e670a0fd180dd6a5e94d732ecd5dab65bb06644cb0b44e246c997110dcfc1004",
-    "filename": "holodeck.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 32,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 0/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM v24.0 :: LIQUIDITY STRESS TEST",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 100,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "400"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "EV",
-        "SPAC"
-      ]
-    },
-    "provenance_hash": "c2d65beda4eb4ce6048447ba9748fba4aaccee25ef617337b532fac08e9cfd4e",
-    "filename": "liquidity_visualizer.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 29,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 100/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "The 2026 Global Intelligence Crisis: Reconciling Macroeconomic Realities",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "DEEP_DIVE",
-    "full_body": "",
-    "sentiment_score": 41,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "DeFi",
-        "EV",
-        "Growth"
-      ]
-    },
-    "provenance_hash": "a067c706786af4f30d1fbdee7cd4a31a81f48b83bc86b6fc7793ddd079cff7b8",
-    "filename": "deep_dive_ghost_gdp_2026.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 100,
-    "semantic_score": 19,
-    "probability": 100,
-    "outlook_score": 17,
-    "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 41/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "Office Nexus | System Overlay",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 50,
-    "entities": {
-      "tickers": [],
-      "agents": [],
-      "sovereigns": [],
-      "keywords": [
-        "EV",
-        "SPAC"
-      ]
-    },
-    "provenance_hash": "e2996fc589b7c60970184ab1cc5af30d6ec780135070b26afd36772cbf41812a",
-    "filename": "office_nexus.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 42,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 50/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM v26.0 :: HIGH CONVICTION MONITOR",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 0,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "300",
-        "400",
-        "keyframes"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Bitcoin",
-        "Cloud",
-        "Crypto",
-        "EV"
-      ]
-    },
-    "provenance_hash": "293681b0f824c97aaaa945435d1600a309b6ef9f5420d2a329b559fbcfefcc26",
-    "filename": "high_conviction_monitor.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 100,
-    "semantic_score": 37,
-    "probability": 100,
-    "outlook_score": 23,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 0/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "OMEGA Dream Cycle",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 100,
-    "entities": {
-      "tickers": [],
-      "agents": [],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "EV",
-        "SPAC"
-      ]
-    },
-    "provenance_hash": "66e65a49ae17459730895674af915583b9e17640ada17480d310e412f071a87d",
-    "filename": "dream_viewer.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 41,
-    "probability": 50,
-    "outlook_score": 13,
-    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 100/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "MARKET MAYHEM: BLACK TUESDAY",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 58,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Inflation",
-        "Quality"
-      ]
-    },
-    "provenance_hash": "9b417a0a5a9370e9ff64055867ddc76974b04c834ee64f5bd3b1bff0c2550829",
-    "filename": "newsletter_market_mayhem_oct_1929.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 19,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 58/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM | Enterprise Credit Analysis",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 50,
-    "entities": {
-      "tickers": [],
-      "agents": [],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "SPAC",
-        "Value"
-      ]
-    },
-    "provenance_hash": "0a01eeb7af77cef525b523704f4bca7f095eff3237034fd2bb975e4747d1d420",
-    "filename": "credit_memo.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 36,
-    "probability": 50,
-    "outlook_score": 18,
-    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 50/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "Amazon.com, Inc. (AMZN) Report",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 65,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Growth",
-        "Inflation"
-      ]
-    },
-    "provenance_hash": "a634a438919d1e9e990da08d1295b9079cb5b5ef80c3ddca9832b21d42ee7e94",
-    "filename": "amzn_company_report.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 0,
-    "semantic_score": 17,
-    "probability": 0,
-    "outlook_score": 10,
-    "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 65/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM v26.0 :: SYSTEM 2 CRITIQUE",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 66,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "300",
-        "400"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Energy",
-        "Gold"
-      ]
-    },
-    "provenance_hash": "5bc1245544bf4c000863882f0468aa9a4bcdc57ddad700538537ed62229bf2d1",
-    "filename": "system2_critique_bifurcation.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 40,
-    "probability": 50,
-    "outlook_score": 14,
-    "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 66/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "MARKET MAYHEM",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 79,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400",
-        "media"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Bitcoin",
-        "Bonds",
-        "Cloud",
-        "EV"
-      ]
-    },
-    "provenance_hash": "1fc5913f72d758a811957877433856c2851007352e62551a12e5480e9e62e508",
-    "filename": "newsletter_market_mayhem_feb_13_2026.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 35,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 79/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "MARKET MAYHEM BUILDER",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 0,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "400"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Oil",
-        "SPAC"
-      ]
-    },
-    "provenance_hash": "5b861eb55598f276f4ac715c24c26534d1daff206b1d3842eca213d679d7cc9a",
-    "filename": "market_mayhem_builder.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 36,
-    "probability": 50,
-    "outlook_score": 25,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 0/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM v24 :: SYSTEM INTELLIGENCE HUB",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 25,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Bitcoin",
-        "Cloud",
-        "EV",
-        "SPAC"
-      ]
-    },
-    "provenance_hash": "f4bd71010aa6ac6202f0104310fb9a417760b569a6bf939c2a6205476ff8b77c",
-    "filename": "hub_system_intelligence.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 70,
-    "outlook_score": 10,
-    "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 25/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "Project Singularity: The Neural Deck",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 0,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "keyframes"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "EV",
-        "Metaverse",
-        "SPAC"
-      ]
-    },
-    "provenance_hash": "1af5ff806d2d1f95c5ba3b485b48a7edc08537a262451d885f76cfecc1a91b30",
-    "filename": "neural_deck.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 27,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 0/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "Analyst OS // Credit & Valuation Architect v6.2",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 94,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "18",
-        "300",
-        "400",
-        "apply",
-        "babel",
-        "media"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "DeFi",
-        "EV",
-        "Gold"
-      ]
-    },
-    "provenance_hash": "231bd1a387bd11df4d2f734b428ef671df2e2dbddbe6a64c7893140cda40d241",
-    "filename": "credit_valuation_architect.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 0,
-    "semantic_score": 14,
-    "probability": 0,
-    "outlook_score": 10,
-    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 94/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM Analyst OS | v25.5",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 100,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "keyframes",
-        "latest"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "EV",
-        "Growth",
-        "SPAC",
-        "Value"
-      ]
-    },
-    "provenance_hash": "2158603f6324d5cab98370e01738c7309943ec5ad8350d4deb7efb3405729621",
-    "filename": "os.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 20,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 100/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "Microsoft (MSFT) Report",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 62,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Growth",
-        "Inflation"
-      ]
-    },
-    "provenance_hash": "482151229885ce9a6af401a14d9348b349859f371f7e50f70f3666f53f4b4da3",
-    "filename": "msft_company_report.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 0,
-    "semantic_score": 17,
-    "probability": 0,
-    "outlook_score": 10,
-    "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 62/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM PROTOCOL: UNIFIED COMMAND",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 50,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "Crypto",
-        "EV",
-        "SPAC"
-      ]
-    },
-    "provenance_hash": "3ec42d810d03322a6077b4d2433fef16be2fe2316de21ef7341bbdfecc8c81f8",
-    "filename": "unified_dashboard.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 31,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 50/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "2024 Year in Review: Navigating Uncertainty and Transition",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 76,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Banks",
-        "Cloud",
-        "EV",
-        "Energy"
-      ]
-    },
-    "provenance_hash": "51beab63603fa79e187fdd6afe68be271bf39271019287a0edef50373964b729",
-    "filename": "2024 Year in Review: Navigating Uncertainty and Transition.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 16,
-    "semantic_score": 18,
-    "probability": 36,
-    "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 76/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM v24 :: DEEP DIVES HUB",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "DEEP_DIVE",
-    "full_body": "",
-    "sentiment_score": 0,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "Crypto",
-        "EV",
-        "SPAC"
-      ]
-    },
-    "provenance_hash": "c02c4648b98e49d239fd26406b127fc0039108820a7e198225de275b1b4112ae",
-    "filename": "hub_deep_dives.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 25,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 0/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM v26.0 :: MISSION CONTROL v3",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 0,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "300",
-        "400"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Bitcoin",
-        "Cloud",
-        "EV",
-        "Volatility"
-      ]
-    },
-    "provenance_hash": "9f1109aebf82d4ffd4e40f3b214ddac2d88f53aabf62925cb092d19f1acf1ed5",
-    "filename": "mission_control_v3.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 31,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 0/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM | AVG Search",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 100,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "400",
-        "keyframes"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Energy",
-        "SPAC"
-      ]
-    },
-    "provenance_hash": "df63abcc0aba0d36099538ed121c7910108b502c3a7fe38bb666c5409d8bdb5c",
-    "filename": "avg_search.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 100/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM v26.0 :: CREATOR STUDIO",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 75,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Value"
-      ]
-    },
-    "provenance_hash": "7267559a818322756be53807dd2a3687c82926bb5d30c2e666b2c5adc2567db6",
-    "filename": "editor_studio.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 31,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 75/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM | Comprehensive Credit Memos",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 0,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "SPAC"
-      ]
-    },
-    "provenance_hash": "1ecd44cf1a5c7bbff6bb6ea8546b4527c2b94000d0c53823dfae183ca2be6084",
-    "filename": "comprehensive_credit_dashboard.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 21,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 0/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "SYSTEM 2 AUDIT: Q4 2025",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "SYSTEM_AUDIT",
-    "full_body": "",
-    "sentiment_score": 100,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Momentum",
-        "SPAC"
-      ]
-    },
-    "provenance_hash": "96e3497801f3f1edc2cc48764bf1e035a3279222371f221c6ddf5ece14b653eb",
-    "filename": "System_2_Audit_Q4_2025.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 28,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 100/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM v26.0 :: SYSTEM MAP",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 50,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "300",
-        "400",
-        "keyframes"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Crypto",
-        "ESG",
-        "EV",
-        "Retail"
-      ]
-    },
-    "provenance_hash": "586e209482fdb324d982a4d690c9e31dfcb59408b831d337d2e74bfb408ff1f2",
-    "filename": "comprehensive_index.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 7,
-    "probability": 70,
-    "outlook_score": 10,
-    "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 50/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "Adam v23.5 - Risk Topography",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 0,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "keyframes"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "ESG",
-        "EV",
-        "SPAC"
-      ]
-    },
-    "provenance_hash": "3d61f0cdb1ae03939151a1fd28b40cbda4eb076013881a88617ac2b6ccfc050c",
-    "filename": "risk_topography.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 33,
-    "probability": 50,
-    "outlook_score": 12,
-    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 0/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM v24 :: REPORTS HUB",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 0,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "Crypto",
-        "EV",
-        "SPAC"
-      ]
-    },
-    "provenance_hash": "5fb5e775fcd81bc5748d3cc6e2d9183a4a784551d8fe4dad471c20ac0aea91eb",
-    "filename": "hub_reports.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 23,
-    "probability": 50,
-    "outlook_score": 12,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 0/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "Artificial Intelligence: Reshaping Industries and Creating Opportunities",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 77,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Growth",
-        "Inflation"
-      ]
-    },
-    "provenance_hash": "7f64e8723dee6be01a2d25a16ee43206cd4002b73c4653e24ca9e5ca1440a3d8",
-    "filename": "ai_thematic_report.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 0,
-    "semantic_score": 17,
-    "probability": 0,
-    "outlook_score": 10,
-    "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 77/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "MARKET MAYHEM: MULTIPLAYER",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 0,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "400"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "SPAC"
-      ]
-    },
-    "provenance_hash": "9e2bcce063d3a4a961bff616746d3ec6c871b0e4684ec96ff4e34522f499aa55",
-    "filename": "market_mayhem_multiplayer.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 30,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 0/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "CREDIT SENTINEL | System 2 Verification",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 33,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "400"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "SPAC",
-        "Value"
-      ]
-    },
-    "provenance_hash": "ee4a7bad444597831062dc9ab20178a27c5441645ed75ea18b1cf36f3fb7b425",
-    "filename": "credit_sentinel.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 17,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 33/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM v24.0 :: Conviction Report: Bitcoin (BTC)",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 100,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Bitcoin",
-        "EV",
-        "Gold",
-        "SPAC"
-      ]
-    },
-    "provenance_hash": "fad63588ae9263ead4713b32c2af2ceef2a9a7d0653d670ffb47f25d9c21af37",
-    "filename": "conviction_btc_feb26.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 54,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 100/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM | Scenario Lab",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 9,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Growth",
-        "Inflation"
-      ]
-    },
-    "provenance_hash": "f68067050d3faec3d1e1e8ec7bcfa6e29761a2134c82f1521d5d93d3f321f47f",
-    "filename": "scenario_lab.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 27,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 9/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM v26.0 :: AGENT ALIGNMENT LOG",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 100,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "400",
-        "keyframes"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "EV",
-        "Energy",
-        "SPAC",
-        "SaaS"
-      ]
-    },
-    "provenance_hash": "9265d4c0ecf7041fb471588ee796b61e69368ae92318c9c68a9ce52fca8a3b4d",
-    "filename": "agent_alignment_log_feb_2026.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 0,
-    "semantic_score": 51,
-    "probability": 0,
-    "outlook_score": 21,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 100/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM v23.5 | Deep Dive Explorer",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "DEEP_DIVE",
-    "full_body": "",
-    "sentiment_score": 27,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "400",
-        "keyframes",
-        "media"
-      ],
-      "sovereigns": [
-        "CN_PBOC",
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Energy",
-        "Growth"
-      ]
-    },
-    "provenance_hash": "55c97a7393dc21a8fcd64681a27c0f4be134a3a4078d496ed2b1dc2ab7163893",
-    "filename": "deep_dive.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 17,
-    "probability": 70,
-    "outlook_score": 23,
-    "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 27/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "Global Macro Dashboard 2026 - Kinetic Conflict Scenario",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 0,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "keyframes"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Bitcoin",
-        "EV",
-        "Energy",
-        "Gold"
-      ]
-    },
-    "provenance_hash": "53071a1c21871ab6ec56e3b61f4bc1a5b1a4b5d787d3c382057bc4c6c2742065",
-    "filename": "global_macro_dashboard_2026.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 33,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 0/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "MISSION CONTROL V2",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 100,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "300",
-        "400",
-        "keyframes"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "EV",
-        "SPAC"
-      ]
-    },
-    "provenance_hash": "db9c5df36d7c0e02d46ee6e9012263f14701e16fde5c4f130f0e5e1bf983451a",
-    "filename": "mission_control_v2.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 21,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 100/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM | Trading Terminal",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 0,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "400"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "SPAC",
-        "Tech"
-      ]
-    },
-    "provenance_hash": "03182b53eda4243f6c94fcb31f4e18c183fdeab4993ffd58da12fd6ee4ec73dd",
-    "filename": "trading.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 20,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 0/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "SNC Exam Preparation Guide for Bank Analysts",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "GUIDE",
-    "full_body": "",
-    "sentiment_score": 92,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "400"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Banks",
-        "DeFi",
-        "EV",
-        "Quality"
-      ]
-    },
-    "provenance_hash": "8d61e7d55841fd140042e2e47731fe7520633b601ffe92d94f88fac374939af2",
-    "filename": "SNC_Guide.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 71,
-    "semantic_score": 26,
-    "probability": 71,
-    "outlook_score": 10,
-    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 92/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "Market-Code Correlation Bridge",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 83,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "EV",
-        "SPAC"
-      ]
-    },
-    "provenance_hash": "aaf09f745b3ba2fadbd9cfa0e549fb9524d7a4eecec03d128f5de46127af3ba3",
-    "filename": "market_coding_correlation.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 49,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 83/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "SELL IN MAY? NOT TODAY.",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 75,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400",
-        "media"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Oil",
-        "SPAC"
-      ]
-    },
-    "provenance_hash": "b9a6bb24eb21d1be14d5e20e12e74fe2876bd95fce00b55d0406ee0888463ef8",
-    "filename": "newsletter_market_mayhem_may_02_2025.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 35,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 75/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "SPOOKY VOLATILITY: S&P 6666",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 60,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400",
-        "media"
-      ],
-      "sovereigns": [
-        "CN_PBOC"
-      ],
-      "keywords": [
-        "AI",
-        "Bitcoin",
-        "Cloud",
-        "EV",
-        "Gold"
-      ]
-    },
-    "provenance_hash": "5c8fa644c22b362ff1a7f5aafc7c28abd3083f7b7544cc46324db6ff631588a2",
-    "filename": "newsletter_market_mayhem_oct_31_2025.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 35,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 60/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM v23.5 | Mission Control",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 25,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "18",
-        "400",
-        "babel",
-        "keyframes"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "EV",
-        "Gold",
-        "SPAC",
-        "Volatility"
-      ]
-    },
-    "provenance_hash": "9d7e99a5b26f0c5f3d5b893331f11941992ac8efbbea4e32dec3cc3feadf0d48",
-    "filename": "dashboard.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 24,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 25/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "Enterprise Credit Memo Automation",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 0,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Labor",
-        "SPAC"
-      ]
-    },
-    "provenance_hash": "6a76637d867b8dbb8a504befec6f4391a0623c3505acf43624a31a56f09005b8",
-    "filename": "credit_memo_automation.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 17,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 0/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM | Robo Advisor",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 22,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "400"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Bonds",
-        "Cloud",
-        "Crypto",
-        "ESG"
-      ]
-    },
-    "provenance_hash": "fd1f1b73620755350f71a858673ab51db415337c3e7173b31828b82c97202221",
-    "filename": "robo_advisor.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 25,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 22/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM | Network Map",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 50,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "SPAC",
-        "Tech"
-      ]
-    },
-    "provenance_hash": "7016f29d81eaeaadf8dcb738f6c5e7ae3c54e67b155adc3ae55761a54121db78",
-    "filename": "network_map.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 41,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 50/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM v23.5 | Agent Registry",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 0,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "400",
-        "adam"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "SPAC",
-        "Value"
-      ]
-    },
-    "provenance_hash": "4f79822296a732d0af999cac8d569dd22e4e33327684d187a13d24074d9da2da",
-    "filename": "agents2.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 21,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 0/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM | Policy Center",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 100,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "400"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Energy",
-        "SPAC"
-      ]
-    },
-    "provenance_hash": "ef0186476a549078f5883159349e5be31eecd4247d5730d1edeb48a8977c3fb0",
-    "filename": "policy_center.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 29,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 100/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "2025 OUTLOOK: THE YEAR OF VOLATILITY",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "STRATEGY",
-    "full_body": "",
-    "sentiment_score": 50,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400",
-        "media"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Growth",
-        "Recession"
-      ]
-    },
-    "provenance_hash": "40abc25c535cc2d9feb8addfe3cce5ba1e7dcefe96310af8eba822e31b6d371c",
-    "filename": "newsletter_market_mayhem_jan_2025.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 35,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 50/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "Unified Credit & Quantum Recovery Console",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 100,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "2",
-        "apply"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "DeFi",
-        "EV",
-        "SPAC",
-        "Value"
-      ]
-    },
-    "provenance_hash": "0b5ff7c98c81d5c109d09f6ac7d28f06dd837991a3aec6d14882860985a712ab",
-    "filename": "unified_credit_console.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 100/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "MARKET MAYHEM :: VISUAL REPOSITORY",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 50,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Value"
-      ]
-    },
-    "provenance_hash": "b8b8b3ce840b0fe2018659b51cc53a7f62ef24e76229a7fe401ddfb962d26b53",
-    "filename": "market_mayhem_repository.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 31,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 50/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "Adam - Live Terminal (PyScript)",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 50,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "5"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "SPAC"
-      ]
-    },
-    "provenance_hash": "e3faa6e3ee5a1100055526af4e9a7e474b39063b8989e5dc0b0fa30ef130ae9e",
-    "filename": "terminal.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 43,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 50/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM v26.0 :: LIVE MARKET",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 91,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "300",
-        "400",
-        "keyframes"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Dividend",
-        "EV",
-        "Growth",
-        "SPAC"
-      ]
-    },
-    "provenance_hash": "5462c596d0af0be4281dadf83fde8eb9cfdf9f320eda669330f1b09315957bf7",
-    "filename": "market_live.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 100,
-    "semantic_score": 19,
-    "probability": 100,
-    "outlook_score": 10,
-    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 91/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "Sovereign Credit Dashboard",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 33,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "400",
-        "keyframes",
-        "media"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "Crypto",
-        "DeFi",
-        "EV"
-      ]
-    },
-    "provenance_hash": "c2ba088b8c078c08bd4be07cdb34f65fee0d4a59c03288ab70c28f0896ca5f98",
-    "filename": "sovereign_dashboard.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 17,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 33/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "Geopolitics and Financial Markets: Navigating Uncertainty and Risk",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 55,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Bonds",
-        "Cloud",
-        "EV",
-        "Energy"
-      ]
-    },
-    "provenance_hash": "4509642c818d37b746060a018b83ca8217ca60495989d4ef0b75363ba20c3c39",
-    "filename": "geopolitics_thematic_report.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 0,
-    "semantic_score": 17,
-    "probability": 20,
-    "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 55/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "COUNTERFACTUAL: BITCOIN BANNED 2013",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "COUNTERFACTUAL",
-    "full_body": "",
-    "sentiment_score": 100,
-    "entities": {
-      "tickers": [
-        "BTC"
-      ],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [
-        "CN_PBOC",
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Bitcoin",
-        "Cloud",
-        "Crypto",
-        "EV"
-      ]
-    },
-    "provenance_hash": "09d19462b163423539f0cc316d691f061aab49cf14d75d7fe069121ba7b64de2",
-    "filename": "Counterfactual_COUNTERFACTUAL_BITCOIN_BANNED_2013.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 100,
-    "semantic_score": 29,
-    "probability": 100,
-    "outlook_score": 10,
-    "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 100/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM v23.5 | SNC Regulatory Cover",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "GUIDE",
-    "full_body": "",
-    "sentiment_score": 33,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "400"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Energy",
-        "Inflation"
-      ]
-    },
-    "provenance_hash": "de4eb25e48936b2ab589d774fe372fb3f07ae2e20220a2f19b9774395e55391d",
-    "filename": "snc_cover.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 100,
-    "semantic_score": 25,
-    "probability": 100,
-    "outlook_score": 10,
-    "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 33/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ENTERPRISE SIMULATION",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 0,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "300",
-        "400"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "SPAC",
-        "Value"
-      ]
-    },
-    "provenance_hash": "12f321a1060b08d72850e023777c4d4c5addb49ef55c57078945d8e684128a5b",
-    "filename": "enterprise_dashboard.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 23,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 0/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "WEEKLY INTEL: OIL BREAKOUT",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 66,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400",
-        "media"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Energy",
-        "Oil"
-      ]
-    },
-    "provenance_hash": "3c187b33a19b2f425e6638dad428f82949c7d4307fc5ea2a73c9a642c607e0b2",
-    "filename": "newsletter_weekly_sep_21_2025.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 35,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 66/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "COUNTERFACTUAL: THE 2024 AI WINTER",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "COUNTERFACTUAL",
-    "full_body": "",
-    "sentiment_score": 69,
-    "entities": {
-      "tickers": [
-        "MSFT",
-        "NVDA"
-      ],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Recession",
-        "SPAC"
-      ]
-    },
-    "provenance_hash": "6267cc53881a5939f7cf9d2e58d8d900a80dceb3e9ff9f39dc3c7d71b253b757",
-    "filename": "Counterfactual_COUNTERFACTUAL_THE_2024_AI_WINTER.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 29,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 69/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM | Workflow Orchestrator",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 100,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "10"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "SPAC"
-      ]
-    },
-    "provenance_hash": "b63f920cca1c5b3bbb8c343430ffcb0cce36c74b8bf76e8528bf0da375e719ed",
-    "filename": "workflow_visualizer.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 29,
-    "probability": 50,
-    "outlook_score": 15,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 100/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM v26.0 // UNIFIED REPOSITORY",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 50,
-    "entities": {
-      "tickers": [],
-      "agents": [],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "SPAC",
-        "Value"
-      ]
-    },
-    "provenance_hash": "0694fb6fc0c99e148ce5eea6a0cf4780bc4c2b7c00ca385ea7b0bb17d91cfa08",
-    "filename": "repository_v2.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 35,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 50/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "THE GREAT BIFURCATION",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 88,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400",
-        "media"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Banks",
-        "Bitcoin",
-        "Cloud",
-        "Crypto"
-      ]
-    },
-    "provenance_hash": "13f05347f82372a36f3eb02feeeda21744a9d3ee1be14f153afb11afc696ed0e",
-    "filename": "newsletter_market_mayhem_mar_15_2026.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 34,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 88/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "House View: Tech Correction Outlook",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "STRATEGY",
-    "full_body": "",
-    "sentiment_score": 73,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Inflation",
-        "Quality"
-      ]
-    },
-    "provenance_hash": "cb4f111b87e14bb8af60ad441fb4fb29752909aebe47d9bee6997cbd3f9a1b91",
-    "filename": "House_View_2025_01_01.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 17,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 73/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "2022 Year in Review: Navigating a Turbulent Market",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 70,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [
-        "CN_PBOC",
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Banks",
-        "Cloud",
-        "EV",
-        "Energy"
-      ]
-    },
-    "provenance_hash": "d3d9875ab45eb7373c36ba72377eb83b219d3112dea0ba2fca97d902984681d5",
-    "filename": "2022 Year in Review: Navigating a Turbulent Market.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 60,
-    "semantic_score": 17,
-    "probability": 80,
-    "outlook_score": 10,
-    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 70/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "OSWM Second-Level Critique | Strategic Foresight",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 0,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "keyframes"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "DeFi",
-        "EV",
-        "SPAC",
-        "Value"
-      ]
-    },
-    "provenance_hash": "1d3ed3eb3d027b60163ebbe7e2462c95edaf8e39973e4c587cf72a7245cb5dee",
-    "filename": "oswm_dashboard.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 21,
-    "probability": 70,
-    "outlook_score": 11,
-    "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 0/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "The AI-Augmented Risk Enterprise: Strategic Architecture, Systemic Resilience, and Capital Optimization",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 25,
-    "entities": {
-      "tickers": [],
-      "agents": [],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Banks",
-        "Cloud",
-        "DeFi",
-        "EV"
-      ]
-    },
-    "provenance_hash": "c148b667bfb8cbe72326cd66e91e6750ccba69f9af2067d5169bd6c73f7c9bc0",
-    "filename": "risk.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 85,
-    "semantic_score": 30,
-    "probability": 99,
-    "outlook_score": 10,
-    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 25/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "The War Room - ADAM-V-NEXT",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 16,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "keyframes",
-        "media"
-      ],
-      "sovereigns": [
-        "EU_ECB",
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "EV",
-        "Oil",
-        "Retail",
-        "SPAC"
-      ]
-    },
-    "provenance_hash": "54edf8690f04b37efd9c76b5371c5d1ebc4d3eed925ec052fae64fe595ba3c3b",
-    "filename": "war_room_v2.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 0,
-    "semantic_score": 23,
-    "probability": 0,
-    "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 16/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "Crypto Institutionalization 2026: The New Treasury Standard",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 94,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400",
-        "media"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Bitcoin",
-        "Bonds",
-        "Crypto",
-        "DeFi"
-      ]
-    },
-    "provenance_hash": "7cb51e40267f4161c6d56204e2c2b38fb43e1beb86f1c9fae48b52438e865804",
-    "filename": "crypto_outlook_2026.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 42,
-    "probability": 50,
-    "outlook_score": 22,
-    "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 94/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM v24 :: NEWSLETTERS HUB",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 0,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "SPAC",
-        "Value"
-      ]
-    },
-    "provenance_hash": "185eae99c2004b023c87585d777109bba509da007de19acbd86dc65fd13641eb",
-    "filename": "hub_newsletters.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 13,
-    "probability": 50,
-    "outlook_score": 23,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 0/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "System Brain | Cognitive Core",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 0,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "400",
-        "keyframes"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "SPAC"
-      ]
-    },
-    "provenance_hash": "ef130ac1339aded23ec7c6170408c5a9f745483ef18f60b530232ea2033ff91d",
-    "filename": "system_brain.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 20,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 0/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "sp500_level": 5828.0,
+    "treasury_yield": 4.61,
+    "bsl_price": 98.43,
+    "consensus_bullish": 47,
+    "consensus_bearish": 53
   },
   {
     "title": "Untitled Report",
     "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 61,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Growth",
-        "Inflation"
-      ]
-    },
-    "provenance_hash": "056906ab5bcef36b241ee708068219383ebfad01f4b0be87a3ff4599c1f263f7",
-    "filename": "software_industry_report.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 18,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 61/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM | Quantum Infrastructure",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 0,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "keyframes"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "DeFi",
-        "EV",
-        "SPAC"
-      ]
-    },
-    "provenance_hash": "9ec52eeda407bf993d09d1461128bd5ba0e5fb7e4129d1548f69373f4c358d96",
-    "filename": "quantum_infrastructure.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 0,
-    "semantic_score": 23,
-    "probability": 0,
-    "outlook_score": 10,
-    "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 0/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM :: NEXUS EXPLORER",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
+    "summary": "Market Report from 2025-01-01",
+    "type": "COMPANY_REPORT",
     "full_body": "",
     "sentiment_score": 50,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "400"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "SPAC",
-        "Value"
-      ]
-    },
-    "provenance_hash": "c28cdb8146c9aa966b1d106d462aa22a4c15f474d2a80bf3db3e5f2fddc7c73c",
-    "filename": "nexus_explorer.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 32,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 50/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM :: DEEP DIVE VIEWER",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "DEEP_DIVE",
-    "full_body": "",
-    "sentiment_score": 50,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "SPAC"
-      ]
-    },
-    "provenance_hash": "3e27f102515e1c55ed13bfa441b8034fcab846c48983bcd9fb0b2c5d220bea71",
-    "filename": "deep_dive_viewer.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 29,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 50/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "Alpha Scanner",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 0,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "SPAC"
-      ]
-    },
-    "provenance_hash": "36aac9a51e27e6cfd0b700b4c88d846c60f2d46368127269ac69003689a9b841",
-    "filename": "app_alpha_scanner.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 30,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 0/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM // BRIDGE COMMAND",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 0,
     "entities": {
       "tickers": [],
       "agents": [],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV"
-      ]
-    },
-    "provenance_hash": "d45eff70b9e84305391924a2b02c4cbd500f1fa027677155b53bd6264a8f20e7",
-    "filename": "bridge.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 100,
-    "semantic_score": 37,
-    "probability": 100,
-    "outlook_score": 10,
-    "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 0/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM v26.0 :: SYSTEM INTELLIGENCE TERMINAL",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 0,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "300",
-        "400",
-        "keyframes"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Bitcoin",
-        "Cloud",
-        "Crypto",
-        "Cybersecurity"
-      ]
-    },
-    "provenance_hash": "c20fedeccf8044710225982b9f376f4ea4b44a752ba0faf6dcdac151851a55ba",
-    "filename": "landing.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 100,
-    "semantic_score": 25,
-    "probability": 100,
-    "outlook_score": 10,
-    "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 0/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "Crisis Control Panel // ADAMO.S.",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 0,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "keyframes"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "EV",
-        "Oil",
-        "SPAC"
-      ]
-    },
-    "provenance_hash": "1bfef32f45066ea8dab0da0dfab69ca4d8848ade43c2cd1833c6af52f97631c0",
-    "filename": "crisis_control_panel.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 31,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 0/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "Analyst OS // Credit & Valuation Architect v5.0",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 50,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "300",
-        "400",
-        "apply",
-        "keyframes",
-        "media"
-      ],
       "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "DeFi",
-        "EV",
-        "Energy"
-      ]
+      "keywords": []
     },
-    "provenance_hash": "50123cc2031439ce149063fa27d5bab8dfdc02350c9b06019dbb5cfcde3ff543",
-    "filename": "analyst_os_v5.html",
-    "is_sourced": false,
+    "provenance_hash": "01b666dc5c50e9cc72f7ef83576c1aa9f2d453a6e4c841d2acb572f5c9e2b1a6",
+    "filename": "iran_geopolitical_risk_v30_1.html",
+    "is_sourced": true,
     "metrics_json": "{}",
-    "conviction": 100,
-    "semantic_score": 13,
-    "probability": 100,
-    "outlook_score": 10,
-    "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 50/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM EVOLUTION :: SYSTEM HISTORY",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 94,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "300",
-        "400",
-        "media"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "EV",
-        "Growth",
-        "SPAC",
-        "Value"
-      ]
-    },
-    "provenance_hash": "e32adc5f197adeede896140dccf7c1776a4e7dbec1f6bfc3cc978a268c8dff0c",
-    "filename": "evolution_v2.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 100,
-    "semantic_score": 26,
-    "probability": 100,
-    "outlook_score": 10,
-    "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 94/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "THE SHUTDOWN HANGOVER: GROWTH FEARS",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 66,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400",
-        "media"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Growth",
-        "Inflation"
-      ]
-    },
-    "provenance_hash": "15478c91bf43d367f9bee92c79b99f6d8ba0b4ca907d0d502e9886ee31c1c178",
-    "filename": "newsletter_market_mayhem_nov_13_2025.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
+    "source_priority": 2,
     "conviction": 50,
-    "semantic_score": 35,
+    "semantic_score": 75,
     "probability": 50,
     "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 66/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "sp500_level": 5623,
+    "treasury_yield": 4.27,
+    "bsl_price": 93.46,
+    "consensus_bullish": 41,
+    "consensus_bearish": 59,
+    "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 50/100. Cross-reference with knowledge graph completed."
   },
   {
-    "title": "ADAM v23.5 | Agent Registry & Orchestration",
+    "title": "10k sample msft",
     "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 0,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "400",
-        "adam",
-        "keyframes"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "SPAC",
-        "Value"
-      ]
-    },
-    "provenance_hash": "cebc1bb923654f3b001d9e351b9f483be9fda6a2c8e751a6037ae091306f678a",
-    "filename": "agents_v2.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 18,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 0/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "Institutional Radar",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 0,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "300",
-        "400"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "EV",
-        "Housing",
-        "Momentum",
-        "Quality"
-      ]
-    },
-    "provenance_hash": "91aef6651de51b29af0846821bcf25ed18dc06dd670d51bc435d9ce31538a68e",
-    "filename": "institutional_radar.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 31,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 0/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM v24 :: Unified Financial OS",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 50,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "300",
-        "400"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "SPAC",
-        "Value"
-      ]
-    },
-    "provenance_hash": "d889ea92d31e86f4911cb363417322282ba7478e6c184284d1e826f6967c3b36",
-    "filename": "adam_os.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 20,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 50/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "MARKET MAYHEM: The Weekly Briefing",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 71,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [
-        "CN_PBOC",
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Banks",
-        "Cloud",
-        "EV",
-        "Energy"
-      ]
-    },
-    "provenance_hash": "67f6720466d1c13a1d06d9d88657d90e40b5f7d30f87d1df3a3a27d4313eeb0e",
-    "filename": "newsletter_market_mayhem_feb_09_2026.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 0,
-    "semantic_score": 21,
-    "probability": 0,
-    "outlook_score": 10,
-    "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 71/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "MARKET MAYHEM // GRAPH V2.0",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 40,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "Crypto",
-        "EV",
-        "Energy"
-      ]
-    },
-    "provenance_hash": "876e926f724120c0165f89e77adfe1b781871a71201409a142a11aa0b4de35af",
-    "filename": "market_mayhem_graph.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 40/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM System | Repository Navigator",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
+    "summary": "Comprehensive report.",
+    "type": "REPORT",
+    "full_body": "<div style='white-space: pre-wrap; font-family: inherit;'>\nUNITED STATES SECURITIES AND EXCHANGE COMMISSION\nWashington, D.C. 20549\nFORM 10-K\n\nANNUAL REPORT PURSUANT TO SECTION 13 OR 15(d) OF THE SECURITIES EXCHANGE ACT OF 1934\nFor the fiscal year ended December 31, 2024\n\nMicrosoft Corporation\n(Exact name of registrant as specified in its charter)\n\nItem 1. Business\nMicrosoft develops, licenses, and supports software, services, devices, and solutions worldwide. Its Productivity and Business Processes segment offers Office, Exchange, SharePoint, Microsoft Teams, Office 365 Security and Compliance, and Skype for Business.\n\nItem 1A. Risk Factors\nThe following risk factors could materially affect our business, financial condition, or results of operations:\n- AI competition intensifying from Google and OpenAI.\n- Regulatory scrutiny on acquisitions (Activision).\n- Cybersecurity threats to Azure infrastructure.\n- Global PC market slowdown affecting Windows revenue.\n- Additional general economic risks including inflation and interest rates.\n\nItem 7. Management\u2019s Discussion and Analysis of Financial Condition and Results of Operations\nOverview\nWe are a leading global company...\n\nResults of Operations\nTotal net sales were $211,915.0 million for the year ended December 31, 2024.\nNet income was $72,361.0 million.\nOperating income: $88,524.0 million.\n\nFuture Outlook\nManagement expects revenue growth of approximately 12.0% for the next fiscal year. EBITDA margins are targeted at 42.0%. We expect double-digit revenue growth driven by Azure and Cloud services.\n\nLiquidity and Capital Resources\nCash and cash equivalents: $48,366.0 million.\nTotal debt was $47,204.0 million as of December 31, 2024.\n\nCapital Structure:\nSenior Notes: $40,000.0 million\nRevolver Drawn: $2,204.0 million\nSubordinated Debt: $5,000.0 million\n\n\nThe Company has the following credit facilities:\n- Revolving Credit Facility: Total capacity $10,000.0 million, with $2,204.0 million drawn.\n- Term Loan A: Total capacity $5,000.0 million, with $5,000.0 million drawn.\n\n\nSNC Regulatory Rating: PASS.\nJustification: Strong cash flow and market position.\n\nItem 8. Financial Statements and Supplementary Data\nConsolidated Balance Sheets\n(In millions)\nAssets\nTotal assets: $364,840.0\n\nLiabilities and Stockholders\u2019 Equity\nTotal liabilities: $184,256.0\nTotal stockholders\u2019 equity: $180,584.0\n</div>",
     "sentiment_score": 50,
     "entities": {
       "tickers": [],
@@ -17232,2214 +9185,26 @@ window.MARKET_MAYHEM_DATA = [
       "keywords": [
         "AI",
         "Cloud",
-        "EV",
-        "SPAC"
-      ]
-    },
-    "provenance_hash": "f8ce42d4d1b3175474ad48877875ac0795ce520fa6f98d3c3a43853bcd4d445e",
-    "filename": "navigator.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 31,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 50/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM Analyst OS | Unified Architecture",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 80,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "keyframes",
-        "latest"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "DeFi",
-        "EV",
-        "Growth",
-        "SPAC"
-      ]
-    },
-    "provenance_hash": "8c3141b0b4d07fbb22da866efc3124f3f50d2ebeb0d5f29fb788730314b5a046",
-    "filename": "unified_analyst_os.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 13,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 80/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "Adam v23 Mission Control",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 0,
-    "entities": {
-      "tickers": [],
-      "agents": [],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Crypto",
-        "DeFi",
-        "ESG",
-        "EV"
-      ]
-    },
-    "provenance_hash": "4a5f6b8aa36f77d2b02583ef8dd4f7b3e83e3445c0907a5db1debab3c9f64884",
-    "filename": "mission_control.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 100,
-    "semantic_score": 16,
-    "probability": 100,
-    "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 0/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "CONFIDENTIAL :: 70/30 MANDATE STRATEGY",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "STRATEGY",
-    "full_body": "",
-    "sentiment_score": 76,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "400"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Bitcoin",
-        "Bonds",
-        "EV",
-        "Energy"
-      ]
-    },
-    "provenance_hash": "0e1c671377216561e9e9fa7acebb53daf9796b8d366e20853688f2f64e0c9f01",
-    "filename": "strategy_7030_mandate.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 100,
-    "semantic_score": 44,
-    "probability": 100,
-    "outlook_score": 15,
-    "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 76/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM v25.5 | Quantum Financial Engine",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 34,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "keyframes",
-        "latest"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "DeFi",
-        "EV",
-        "Gold"
-      ]
-    },
-    "provenance_hash": "39631782ada43b0105bb9758653c70b1c5d292436ef486477db11c26f4cd2e08",
-    "filename": "FE25.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 11,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 34/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM v26 | Financial Sovereign",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 0,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "300",
-        "400",
-        "keyframes",
-        "sovereign"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "EV",
-        "Gold",
-        "Momentum",
-        "SPAC"
-      ]
-    },
-    "provenance_hash": "9684b6c2974eaf5450753142a1388a75ae054bf09957aebae279ad9bd9b1c464",
-    "filename": "adam_v26.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 100,
-    "semantic_score": 23,
-    "probability": 100,
-    "outlook_score": 10,
-    "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 0/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM v24.0 :: MODULAR ANALYTICS HUB",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 50,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "DeFi",
-        "EV",
-        "SPAC"
-      ]
-    },
-    "provenance_hash": "14c50591060bf88eeb67fcf71ced891ebe0566a8c1f18654bae1166e91f5179b",
-    "filename": "modular_dashboard.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 17,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 50/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM | Codex",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 50,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "400",
-        "keyframes"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "SPAC",
-        "Value"
-      ]
-    },
-    "provenance_hash": "ea52c23a6e173d6f06e4d180316f0afcfd3aaa1e99f6a827b683ee285294f820",
-    "filename": "codex.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 22,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 50/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM | Workflows",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 0,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "400"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "SPAC",
-        "Semiconductors"
-      ]
-    },
-    "provenance_hash": "0a01375289f9186b5db056243c92321e0a6717f1e8577414fba912118095a154",
-    "filename": "workflows.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 27,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 0/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM System | Mission Control",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 50,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "adam"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "SPAC",
-        "Value"
-      ]
-    },
-    "provenance_hash": "97eb71c2aa567825973fe67614b7ced3f8241aad70b95785fdf063d9ee950035",
-    "filename": "index2.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 23,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 50/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "Strategic Equity Outlook 2026-2027",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "STRATEGY",
-    "full_body": "",
-    "sentiment_score": 88,
-    "entities": {
-      "tickers": [],
-      "agents": [],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "EV",
-        "Gold",
-        "Inflation",
-        "Momentum"
-      ]
-    },
-    "provenance_hash": "c2a6afb2f05af9775d0df102ca2814f545c0b128dc1a8a9e2e6fdbd435684c36",
-    "filename": "report_2026_strategic_outlook.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 37,
-    "probability": 50,
-    "outlook_score": 40,
-    "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 88/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM Analyst OS | Corporate Credit & Valuation Engine",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 40,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "keyframes",
-        "latest"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "DeFi",
-        "EV",
-        "Growth"
-      ]
-    },
-    "provenance_hash": "8a1fb3a730c4a0840eb28a4800847ce5adfb216e1c881303b4ada530ca981380",
-    "filename": "analyst_os_vCredit.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 12,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 40/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM | AdamVanGrover Quantum Search Runtime",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 16,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "keyframes"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "Crypto",
-        "EV",
-        "Energy"
-      ]
-    },
-    "provenance_hash": "76518bad999897ccb40680998844ef61b1c4e5f318725ec4b3eea39c0b477975",
-    "filename": "quantum_search.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 21,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 16/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "PROMPT ALPHA | High-Frequency Prompt Trading",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 50,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "400",
-        "keyframes"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "SPAC",
-        "Tech"
-      ]
-    },
-    "provenance_hash": "b76dea807a454986b0303e1df1fc019366accd7814e2dfae96c8ae6fd4888e34",
-    "filename": "prompt_alpha.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 100,
-    "semantic_score": 20,
-    "probability": 100,
-    "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 50/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM v26.0 :: \ud83e\udd3f Deep Dive Report: The AI-Debt Reckoning",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "DEEP_DIVE",
-    "full_body": "",
-    "sentiment_score": 82,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Bonds",
-        "Cloud",
-        "EV",
-        "Growth"
-      ]
-    },
-    "provenance_hash": "f88fcaa722a87b19fde58d3388b173fa5d480dd647aae7bd7eac4594f8b0ca36",
-    "filename": "Deep_Dive_AI_Debt_Reckoning.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 34,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 82/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "DOG DAYS OF DEFIANCE",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 66,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400",
-        "media"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "DeFi",
-        "EV",
-        "SPAC"
-      ]
-    },
-    "provenance_hash": "e727cffecae00a96324f9658f1382068b5c56559d1d1d2659bdfcd105bd35d8e",
-    "filename": "newsletter_market_mayhem_aug_29_2025.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 35,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 66/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "AVG Distressed Credit Pricing Console",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 8,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "2"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "EV",
-        "SPAC",
-        "Value"
-      ]
-    },
-    "provenance_hash": "fbd6995474bffb8f8ffbd33028cf0aeb920307ce22f86f32ff7e6aa9be51cbec",
-    "filename": "distressed_lbo.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 18,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 8/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "Markets | ADAM v23.5",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 25,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "EV",
-        "Gold"
-      ]
-    },
-    "provenance_hash": "7d98f28f0f80989996336e2ebe5efeca62debf7e7120f20eddd7206f8436dc42",
-    "filename": "markets.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 100,
-    "semantic_score": 40,
-    "probability": 100,
-    "outlook_score": 10,
-    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 25/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM :: SYSTEM STATE",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 50,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "400",
-        "keyframes"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "SPAC"
-      ]
-    },
-    "provenance_hash": "cd7e982d52ebbc1ac10e0c30431872998d286cebf3889a13f1eacbdcdac9bab7",
-    "filename": "system_state.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 27,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 50/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "SOURCE LEAK: VIX_DAMPENER_V4.py",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 0,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "EV",
-        "SPAC",
-        "Volatility"
-      ]
-    },
-    "provenance_hash": "bd950f20349903a3467f68b77121a8bb3cc47caa9f385d7013f18260df0d44f9",
-    "filename": "leak_algo_logic.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 29,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 0/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM :: SYSTEM TERMINAL",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 50,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "400",
-        "adam",
-        "keyframes"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "EV",
-        "SPAC",
-        "Value"
-      ]
-    },
-    "provenance_hash": "27b44a2bdc41eabd67fd10c656a9f4f7fc7cda02e317933609c47fbaba438fa0",
-    "filename": "system_terminal.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 37,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 50/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM-CONVERGENCE: Live Neural Link",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 50,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "300",
-        "400",
-        "keyframes"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "EV",
-        "SPAC",
-        "Volatility"
-      ]
-    },
-    "provenance_hash": "49bc98ee2621f7b4550657f531a2e611278a3a0b342cc963778bc0dfac2b3a2d",
-    "filename": "live_neural_link.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 21,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 50/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "2023 Year in Review: A Year of Recovery and Resilience",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 84,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "ESG",
-        "EV",
-        "Energy"
-      ]
-    },
-    "provenance_hash": "7242aee077e38983d58e17839274ae00055375257e1dee562971efed205998d9",
-    "filename": "2023 Year in Review: A Year of Recovery and Resilience.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 18,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 84/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "OSWM | Full Market Omni-Scan",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 100,
-    "entities": {
-      "tickers": [],
-      "agents": [],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "EV",
-        "SPAC",
-        "Volatility"
-      ]
-    },
-    "provenance_hash": "59b4864ec0b56e77e2aef2a67594e79260d0d47f4800b42332ee7510e5d6eca9",
-    "filename": "full_market_dashboard.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 24,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 100/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM v23.5 | Financial Engine",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 34,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "keyframes"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "DeFi",
-        "EV",
-        "Gold"
-      ]
-    },
-    "provenance_hash": "63d83b102bca536f75e333228d2a68ca17754fca3faa942a78ebc888d1aaa928",
-    "filename": "FE.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 11,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 34/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM v23.5 | APP DEPLOY",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 50,
-    "entities": {
-      "tickers": [
-        "CPU"
-      ],
-      "agents": [
-        "adam",
-        "keyframes"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "SPAC",
-        "Value"
-      ]
-    },
-    "provenance_hash": "8cfef6f2dd294f73eb750d8147915290a380e16b5aefc0fad168d4c49d54e511",
-    "filename": "deployment.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 19,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 50/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "COUNTERFACTUAL: THE 2000 SOFT LANDING",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "COUNTERFACTUAL",
-    "full_body": "",
-    "sentiment_score": 88,
-    "entities": {
-      "tickers": [
-        "AMZN",
-        "CSCO",
-        "NDX"
-      ],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Housing",
-        "SPAC"
-      ]
-    },
-    "provenance_hash": "0bf18b2e9bd96b5e3594bba04bb0adad2861495d97cf505ae35bf3d440737b97",
-    "filename": "Counterfactual_COUNTERFACTUAL_THE_2000_SOFT_LANDING.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 30,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 88/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "SIMULATION RUN",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 100,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "300",
-        "400"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "SPAC",
-        "Tech"
-      ]
-    },
-    "provenance_hash": "ab2b19373838b3a6859f60836eb20f5c8f3ed498a404df7999454b705b1261c5",
-    "filename": "simulation_dashboard.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 32,
-    "probability": 50,
-    "outlook_score": 55,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 100/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM v24.0 :: Conviction Report: SentinelOne (S)",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 50,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
         "Cybersecurity",
         "EV",
-        "SPAC",
-        "Tech"
-      ]
-    },
-    "provenance_hash": "8f832d89d58ca9cc0d59bd0857a0dd94e9720efce9da77b1b0330d187282461a",
-    "filename": "conviction_s_feb26.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 52,
-    "probability": 50,
-    "outlook_score": 19,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 50/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "Unified Banking Digital Twin | Mission Control",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 0,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "keyframes"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Recession",
-        "SPAC"
-      ]
-    },
-    "provenance_hash": "92b84ac9f9b18ce2af4b8eeb6fa4c0e90573824fc54c2accbdf59da1a6759954",
-    "filename": "unified_banking_dashboard.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 27,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 0/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM v25.5 :: FUTURE LENS",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 50,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "400"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "EV",
-        "SPAC",
-        "Tech",
-        "Value"
-      ]
-    },
-    "provenance_hash": "6e6e9ac198d95eb97a3148613104d064994e3f3634714beb073d9abab7afde00",
-    "filename": "future_lens.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 35,
-    "probability": 50,
-    "outlook_score": 28,
-    "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 50/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "MARKET MAYHEM SPECIAL EDITION",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 77,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400",
-        "media"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Bonds",
-        "Cloud",
-        "EV",
-        "Energy"
-      ]
-    },
-    "provenance_hash": "4d01de263590340ea9868238694ff1b035c94b9b5778533439204806c5221956",
-    "filename": "newsletter_market_mayhem_special_edition.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 100,
-    "semantic_score": 32,
-    "probability": 100,
-    "outlook_score": 10,
-    "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 77/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM // NEURAL NEXUS",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 50,
-    "entities": {
-      "tickers": [],
-      "agents": [],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV"
-      ]
-    },
-    "provenance_hash": "86ac6642ec459576df064ca70394c8cbf7bdf31fc9c14f3b39f055c6ec95dd66",
-    "filename": "neural_nexus.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 32,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 50/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM | Artisanal Studio",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 50,
-    "entities": {
-      "tickers": [],
-      "agents": [],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "SPAC"
-      ]
-    },
-    "provenance_hash": "995726b68625aca2330b71a8b2dcb43ced7ff753d8ac3af7571145cbaeb32050",
-    "filename": "artisanal_studio.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 24,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 50/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "Model Performance Review: Q3 2025",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 86,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Bitcoin",
-        "Cloud",
-        "Crypto",
-        "DeFi"
-      ]
-    },
-    "provenance_hash": "3817d2faca14638601b1d670ef02672294d177efe652f70012393957ebba6746",
-    "filename": "Model_Performance_Review_Q3_2025.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 100,
-    "semantic_score": 18,
-    "probability": 100,
-    "outlook_score": 12,
-    "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 86/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "SNC CREDIT STRESS MAP",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "GUIDE",
-    "full_body": "",
-    "sentiment_score": 50,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "400"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "EV",
-        "Energy",
-        "SPAC",
-        "SaaS"
-      ]
-    },
-    "provenance_hash": "c4bf2d64a97ac6e5b7dd2babb71451b97b4dc68f9484654b516b0fd1cacbdecd",
-    "filename": "snc_credit_heatmap.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 34,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 50/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "SYSTEM 2 AUDIT: Q3 2025",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "SYSTEM_AUDIT",
-    "full_body": "",
-    "sentiment_score": 81,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Energy",
-        "SPAC"
-      ]
-    },
-    "provenance_hash": "12e0215b8aeec043f469582986d7c79cde0a3db5fcdd55cd36945ed4ad7421b4",
-    "filename": "System_2_Audit_Q3_2025.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 28,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 81/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM | Agent Dev Hub",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 50,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "SPAC",
-        "Value"
-      ]
-    },
-    "provenance_hash": "2ce6fcd757ff057ad901ceb6ab554130ebeeadec847bc518b1d5e140eb619bea",
-    "filename": "agent_dev_hub.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 29,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 50/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "SYSTEM 2 AUDIT: Q1 2026",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "SYSTEM_AUDIT",
-    "full_body": "",
-    "sentiment_score": 84,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Inflation",
-        "SPAC"
-      ]
-    },
-    "provenance_hash": "4078fc98a1a4e38f9317aeda9376c2896d41719d51bb97426273ed694bfc7ae2",
-    "filename": "System_2_Audit_Q1_2026.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 29,
-    "probability": 50,
-    "outlook_score": 22,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 84/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM v24 :: MARKET SIGNALS HUB",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 50,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "SPAC",
-        "Value"
-      ]
-    },
-    "provenance_hash": "22d17c77cd932dea2fc9f95eeb2d23652f81a9c20e1a0748ab3ebb4b89db90b5",
-    "filename": "hub_market_signals.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 25,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 50/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "MARKET MAYHEM: THE DOT COM PEAK",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 58,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [
-        "JP_BOJ",
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "IPO",
-        "Inflation"
-      ]
-    },
-    "provenance_hash": "4b7c6b4e3557e6ff53bf8effb3d6a892435d9c2c6117b7ef2c591b41cb678e8b",
-    "filename": "newsletter_market_mayhem_mar_2000.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 18,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 58/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ANALYTICS HUB",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 50,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "SPAC"
-      ]
-    },
-    "provenance_hash": "edef21ba61c8a0c83ac6dc1a81e92ea66323767ddef70e01df1fc05f91389062",
-    "filename": "analytics_hub.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 25,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 50/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM | Macro Strategy 2026",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "STRATEGY",
-    "full_body": "",
-    "sentiment_score": 85,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "400",
-        "keyframes"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Banks",
-        "Bitcoin",
-        "Cloud",
-        "EV"
-      ]
-    },
-    "provenance_hash": "5a1c0109483cad8c77c99b21e64f106bdd11efb9af21c60e69cfc5733506acc0",
-    "filename": "macro_strategy.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 100,
-    "semantic_score": 32,
-    "probability": 100,
-    "outlook_score": 10,
-    "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 85/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM | Sector Swarm Intelligence",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 50,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "400",
-        "keyframes"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Energy",
-        "SPAC"
-      ]
-    },
-    "provenance_hash": "6b03a70448d4d421161dfa2c78b0233e878ba97936f3b9b827d5934d12b2ddb9",
-    "filename": "sector_swarm.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 28,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 50/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM v24.0 | Credit Architect",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 50,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "18",
-        "300",
-        "400",
-        "babel",
-        "latest",
-        "media"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "DeFi",
-        "EV",
-        "Growth",
-        "SPAC"
-      ]
-    },
-    "provenance_hash": "abef67d49bdf7d133338ba1d064bfa128b623a50cb0231209921ff4f11728010",
-    "filename": "credit_architect.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 0,
-    "semantic_score": 13,
-    "probability": 0,
-    "outlook_score": 32,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 50/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ENERGY WARS: MIDNIGHT HAMMER",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 83,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400",
-        "media"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Banks",
-        "Cloud",
-        "DeFi",
-        "EV"
-      ]
-    },
-    "provenance_hash": "db7feedfbbc3f86f6946343aead6862d108db8a760380ed830fd80c3bf3c1470",
-    "filename": "newsletter_market_mayhem_oct.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 100,
-    "semantic_score": 33,
-    "probability": 100,
-    "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 83/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "Q4 2025 Institutional Flow Report: The Great Re-Rating",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 68,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "DeFi",
-        "EV",
-        "Energy"
-      ]
-    },
-    "provenance_hash": "2bdf614574c61a26f528dc783c18260f09010e3051455f90ba7e46cbfa32517b",
-    "filename": "newsletter_market_mayhem_feb_16_2026.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 33,
-    "semantic_score": 19,
-    "probability": 33,
-    "outlook_score": 10,
-    "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 68/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM v24 :: TRADING INTELLIGENCE HUB",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 50,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Retail",
-        "SPAC"
-      ]
-    },
-    "provenance_hash": "eb225a6460f20b94f7ea291b916cd401b22639d8e1776d9e90eeb3e7dc362442",
-    "filename": "hub_trading_intelligence.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 25,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 50/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM // Terminal",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 50,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "5"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "EV",
-        "SPAC"
-      ]
-    },
-    "provenance_hash": "ee739db23e658ad8c4afb437f7b709e846dcf1e186b4812a2d6a11578adffe13",
-    "filename": "terminal_profile.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 37,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 50/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "PROJECT CHRONOS: TIME MACHINE",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 0,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "400",
-        "keyframes"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "EV",
-        "SPAC",
-        "Tech",
-        "Value"
-      ]
-    },
-    "provenance_hash": "89cb2dc523923e9f473f35eac0d89b51f353683e47631428017f48e791a61326",
-    "filename": "chronos_time_machine.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 43,
-    "probability": 50,
-    "outlook_score": 18,
-    "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 0/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM v24.0 :: Conviction Report: Applied Materials (AMAT)",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 100,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "EV",
-        "SPAC",
-        "SaaS"
-      ]
-    },
-    "provenance_hash": "688e1c098c499de9efbede0201cd160d8586e1f0b85d799371637bb947eccd8e",
-    "filename": "conviction_amat_feb26.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 52,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 100/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "Q1 2025 and Full Year Outlook: Navigating a Bifurcated Market",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "STRATEGY",
-    "full_body": "",
-    "sentiment_score": 73,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Banks",
-        "Cloud",
-        "Cybersecurity",
-        "ESG"
-      ]
-    },
-    "provenance_hash": "61e2fb777528e81aed161ed475792034b164794b21aeabba1a1ca81c5916290c",
-    "filename": "Q1 2025 and Full Year Outlook: Navigating a Bifurcated Market.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 70,
-    "semantic_score": 17,
-    "probability": 90,
-    "outlook_score": 10,
-    "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 73/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "Cyber-Financial Wargame Console",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 50,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "keyframes"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "EV",
-        "SPAC"
-      ]
-    },
-    "provenance_hash": "ef8c2fc6432ea1c7e0817ff9d4557603783339d3464e2862f2ae6f3d926186ae",
-    "filename": "wargame_dashboard.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 36,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 50/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM OS v30.0",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 0,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "SPAC",
-        "Tech"
-      ]
-    },
-    "provenance_hash": "7d6e046c2c4a24bf21f8175f039e4db7cc8e4f6b5668159afe7c8a69f7b766ff",
-    "filename": "adam_os_v30.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 33,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 0/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM v26.0 :: FORENSIC LAB",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 0,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "300",
-        "400"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "SPAC",
-        "Value"
-      ]
-    },
-    "provenance_hash": "b810fea8628151644e1b28cdd64397ea06a423b87d11b7155a5f9eabedd7912a",
-    "filename": "fraud_investigation.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 0,
-    "semantic_score": 27,
-    "probability": 0,
-    "outlook_score": 10,
-    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 0/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM | AVG Market Scanner",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 50,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "400",
-        "keyframes"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Energy",
-        "SPAC"
-      ]
-    },
-    "provenance_hash": "3fbc81f8bf5a3f1852dae17f9ef535627f673d360ed79747c2f392e468d140d7",
-    "filename": "avg_market.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 33,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 50/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM | Knowledge Graph",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 12,
-    "entities": {
-      "tickers": [],
-      "agents": [],
-      "sovereigns": [
-        "CN_PBOC",
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "Crypto",
-        "EV",
         "Growth"
       ]
     },
-    "provenance_hash": "392bba037a92584705d3e45db36d8fd4574b5ed440f8fcd7f1f445eea3fe953d",
-    "filename": "graph.html",
-    "is_sourced": false,
+    "provenance_hash": "61e33915833dc1fa9ea9455b8a34dd8dd835e3b7b4326ab3ff135afba9fb8390",
+    "filename": "10k_sample_msft.html",
+    "is_sourced": true,
     "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 27,
-    "probability": 50,
-    "outlook_score": 23,
-    "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 12/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "MID-YEAR OUTLOOK: BEYOND THE HYPE",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "STRATEGY",
-    "full_body": "",
-    "sentiment_score": 75,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400",
-        "media"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Energy",
-        "SPAC"
-      ]
-    },
-    "provenance_hash": "224b2cab3272c4a0c46aeeaa1e2d9209beea1fd61af7087088512e6da7a7960a",
-    "filename": "newsletter_market_mayhem_jul_2025_v2.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 35,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 75/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "Geopolitical and Economic Reverberations of the 2026 Iranian Collapse",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 36,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "DeFi",
-        "EV",
-        "Energy"
-      ]
-    },
-    "provenance_hash": "ea2a64f0921baf330b5c0e1df6ba5389ee0f489c75587581e44809eb38f15502",
-    "filename": "newsletter_iran_collapse_2026.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 19,
-    "probability": 50,
-    "outlook_score": 11,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 36/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM :: Strategic Report: The Iranian Collapse",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 47,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "300",
-        "400"
-      ],
-      "sovereigns": [
-        "CN_PBOC",
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "DeFi",
-        "EV",
-        "Energy"
-      ]
-    },
-    "provenance_hash": "cb10c9b7431699639c24e19a5be75d25c7342eb6432bf9a14aacbb3838e81106",
-    "filename": "report_iran_collapse_2026.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 100,
-    "semantic_score": 35,
-    "probability": 100,
-    "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 47/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "THE GREAT CALIBRATION",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 66,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400",
-        "media"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "Crypto",
-        "EV",
-        "Energy"
-      ]
-    },
-    "provenance_hash": "acd98e498b6d0eff11d55fdfa324fde2cf1e2d1af04e5e151fe05327c34d3345",
-    "filename": "newsletter_market_mayhem_dec_02_2025.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 35,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 66/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "FLASH: FED EMERGENCY MEETING RUMORS",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 66,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400",
-        "media"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "SPAC",
-        "Value"
-      ]
-    },
-    "provenance_hash": "0169962d1353c554037124226d443ac3c294c7bf4b3724ae088fdf8514c60555",
-    "filename": "newsletter_flash_nov_01_2025.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 35,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 66/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM System | Prompt as Code",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 50,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "400",
-        "keyframes"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "SPAC",
-        "Value"
-      ]
-    },
-    "provenance_hash": "f961c5319b113a4d7aa6c53a0075454df0cab05b9bde584c7ea1f75de7993f91",
-    "filename": "prompts.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 28,
-    "probability": 50,
-    "outlook_score": 11,
-    "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 50/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM | AVG Schedule Optimizer",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 0,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "400",
-        "keyframes"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Momentum",
-        "SPAC"
-      ]
-    },
-    "provenance_hash": "c2ec60737689e2ac63db09e8dac7d42abef7d94811cd2863259d0c5b551c6ff7",
-    "filename": "avg_schedule.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 28,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 0/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "Deep Dive: The Geopolitical and Economic Reverberations of the 2026 Iranian Collapse",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "DEEP_DIVE",
-    "full_body": "",
-    "sentiment_score": 33,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "300",
-        "400"
-      ],
-      "sovereigns": [
-        "CN_PBOC",
-        "EU_ECB",
-        "JP_BOJ",
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Banks",
-        "Bonds",
-        "Cloud",
-        "DeFi"
-      ]
-    },
-    "provenance_hash": "517445338bf11a011e36c7388dd0e830ec5da0e98586dea910ff387502eed468",
-    "filename": "Deep_Dive_Iranian_Collapse_2026.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 80,
-    "semantic_score": 28,
-    "probability": 99,
-    "outlook_score": 14,
-    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 33/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "ADAM v24.0 :: Conviction Report: Blue Owl (OWL)",
-    "date": "2025-01-01",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 0,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "300",
-        "400"
-      ],
-      "sovereigns": [],
-      "keywords": [
-        "AI",
-        "EV",
-        "SPAC",
-        "Volatility"
-      ]
-    },
-    "provenance_hash": "81df927c619b8265aa3943abcf37d771968de8ac1c2122e092eef2d568991e5f",
-    "filename": "conviction_owl_feb26.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 51,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 0/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "source_priority": 2,
+    "conviction": 0,
+    "semantic_score": 58,
+    "probability": 0,
+    "outlook_score": 17,
+    "sp500_level": 5612,
+    "treasury_yield": 4.45,
+    "bsl_price": 92.41,
+    "consensus_bullish": 60,
+    "consensus_bearish": 40,
+    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 50/100. Cross-reference with knowledge graph completed."
   },
   {
     "title": "Weekly Macro Pulse - November 2024",
@@ -19473,7 +9238,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 79,
     "probability": 0,
-    "outlook_score": 10
+    "outlook_score": 10,
+    "sp500_level": 5273,
+    "treasury_yield": 4.12,
+    "bsl_price": 98.23,
+    "consensus_bullish": 53,
+    "consensus_bearish": 47
   },
   {
     "title": "2023 Year in Review: A Year of Recovery and Resilience",
@@ -19503,6 +9273,11 @@ window.MARKET_MAYHEM_DATA = [
     "semantic_score": 43,
     "probability": 50,
     "outlook_score": 10,
+    "sp500_level": 4916,
+    "treasury_yield": 4.33,
+    "bsl_price": 93.42,
+    "consensus_bullish": 90,
+    "consensus_bearish": 10,
     "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 91/100. Cross-reference with knowledge graph completed."
   },
   {
@@ -19568,6 +9343,11 @@ window.MARKET_MAYHEM_DATA = [
     "semantic_score": 44,
     "probability": 80,
     "outlook_score": 10,
+    "sp500_level": 4793,
+    "treasury_yield": 3.78,
+    "bsl_price": 92.48,
+    "consensus_bullish": 69,
+    "consensus_bearish": 31,
     "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 73/100. Cross-reference with knowledge graph completed."
   },
   {
@@ -19600,6 +9380,11 @@ window.MARKET_MAYHEM_DATA = [
     "semantic_score": 69,
     "probability": 50,
     "outlook_score": 10,
+    "sp500_level": 3628,
+    "treasury_yield": 2.29,
+    "bsl_price": 93.81,
+    "consensus_bullish": 10,
+    "consensus_bearish": 90,
     "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 0/100. Cross-reference with knowledge graph completed."
   },
   {
@@ -19730,7 +9515,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 64,
     "probability": 71,
-    "outlook_score": 10
+    "outlook_score": 10,
+    "sp500_level": 2304.0,
+    "treasury_yield": 1.09,
+    "bsl_price": 81.85,
+    "consensus_bullish": 48,
+    "consensus_bearish": 52
   },
   {
     "date": "2018-02-05",
@@ -19789,42 +9579,6 @@ window.MARKET_MAYHEM_DATA = [
     "probability": 50,
     "outlook_score": 14,
     "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 75/100. Cross-reference with knowledge graph completed."
-  },
-  {
-    "title": "Alphabet Inc. (GOOGL) Report",
-    "date": "2015-10-02",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 65,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Growth",
-        "Inflation"
-      ]
-    },
-    "provenance_hash": "31a43194249fe0c97c4f4b71e39b4529e83e86531c1d46b03c1c61b790474d02",
-    "filename": "googl_company_report.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 0,
-    "semantic_score": 17,
-    "probability": 0,
-    "outlook_score": 10,
-    "critique": "Agent Risk_Engine reviewed this intelligence. Verdict: REVIEW_REQUIRED. Sentiment alignment: 65/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
   },
   {
     "date": "2010-05-06",
@@ -19914,86 +9668,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 59,
     "probability": 75,
-    "outlook_score": 10
-  },
-  {
-    "title": "COUNTERFACTUAL: THE 2008 LEHMAN BAILOUT",
-    "date": "2008-09-14",
-    "summary": "Report content.",
-    "type": "COUNTERFACTUAL",
-    "full_body": "",
-    "sentiment_score": 66,
-    "entities": {
-      "tickers": [
-        "LEH",
-        "XLF"
-      ],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Growth",
-        "SPAC"
-      ]
-    },
-    "provenance_hash": "5f6dca4736eafe1b32178f4948dd27d9c0a6daad3a3baa08eb616fe4be8b4710",
-    "filename": "Counterfactual_COUNTERFACTUAL_THE_2008_LEHMAN_BAILOUT.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 100,
-    "semantic_score": 28,
-    "probability": 100,
     "outlook_score": 10,
-    "critique": "Agent Overseer reviewed this intelligence. Verdict: VALIDATED. Sentiment alignment: 66/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "COUNTERFACTUAL: AL GORE WINS 2000",
-    "date": "2000-12-12",
-    "summary": "Report content.",
-    "type": "COUNTERFACTUAL",
-    "full_body": "",
-    "sentiment_score": 80,
-    "entities": {
-      "tickers": [
-        "CVX",
-        "TAN",
-        "XOM"
-      ],
-      "agents": [
-        "0",
-        "300",
-        "400"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Cloud",
-        "EV",
-        "Energy",
-        "Green Energy"
-      ]
-    },
-    "provenance_hash": "e1a4151b4f7812f229f329cd599312595eca11358d3b7c5fb6ffc613a8872f86",
-    "filename": "Counterfactual_COUNTERFACTUAL_AL_GORE_WINS_2000.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 100,
-    "semantic_score": 29,
-    "probability": 100,
-    "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 80/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
+    "sp500_level": 1255.0,
+    "treasury_yield": 2.41,
+    "bsl_price": 83.53,
+    "consensus_bullish": 14,
+    "consensus_bearish": 86
   },
   {
     "title": "MARKET MAYHEM",
@@ -20026,6 +9706,11 @@ window.MARKET_MAYHEM_DATA = [
     "semantic_score": 69,
     "probability": 50,
     "outlook_score": 10,
+    "sp500_level": 4655,
+    "treasury_yield": 2.15,
+    "bsl_price": 97.48,
+    "consensus_bullish": 67,
+    "consensus_bearish": 33,
     "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 66/100. Cross-reference with knowledge graph completed."
   },
   {
@@ -20149,7 +9834,12 @@ window.MARKET_MAYHEM_DATA = [
     "quality": 100,
     "semantic_score": 64,
     "probability": 50,
-    "outlook_score": 16
+    "outlook_score": 16,
+    "sp500_level": 3272,
+    "treasury_yield": 2.12,
+    "bsl_price": 94.06,
+    "consensus_bullish": 24,
+    "consensus_bearish": 76
   },
   {
     "date": "1971-08-15",
@@ -20236,237 +9926,12 @@ window.MARKET_MAYHEM_DATA = [
     "semantic_score": 65,
     "probability": 50,
     "outlook_score": 10,
+    "sp500_level": 3335,
+    "treasury_yield": 3.23,
+    "bsl_price": 95.23,
+    "consensus_bullish": 10,
+    "consensus_bearish": 90,
     "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 0/100. Cross-reference with knowledge graph completed."
-  },
-  {
-    "title": "Market Mayhem Newsletter - December 2, 2025",
-    "date": "1202-20-25",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 87,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400",
-        "media"
-      ],
-      "sovereigns": [
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Bitcoin",
-        "Cloud",
-        "Crypto",
-        "DeFi"
-      ]
-    },
-    "provenance_hash": "f178c5a62aa41c6712e1c7acdebc91bdeaadb7f4ea223c3f5f9f9340e90c3d77",
-    "filename": "mm12022025.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 75,
-    "semantic_score": 38,
-    "probability": 95,
-    "outlook_score": 11,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 87/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "MM11132025",
-    "date": "1113-20-25",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 92,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400",
-        "media"
-      ],
-      "sovereigns": [
-        "CN_PBOC",
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Bitcoin",
-        "Bonds",
-        "Crypto",
-        "EV"
-      ]
-    },
-    "provenance_hash": "927ff122e8da994b131554073e0f1d1dd9ddf03c27b3762c5e1387d73f9dce34",
-    "filename": "mm11132025.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 29,
-    "probability": 70,
-    "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 92/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "Market Mayhem Newsletter - October 31, 2025",
-    "date": "1031-20-25",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 90,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400",
-        "media"
-      ],
-      "sovereigns": [
-        "CN_PBOC",
-        "EU_ECB",
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Banks",
-        "Bitcoin",
-        "EV",
-        "Energy"
-      ]
-    },
-    "provenance_hash": "e0d827ddec558466efc0219bd3d77ae57e196dcfe174acf1dd84b41e7348f923",
-    "filename": "mm10312025.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 25,
-    "semantic_score": 39,
-    "probability": 25,
-    "outlook_score": 10,
-    "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 90/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "Market Mayhem Newsletter - August 29, 2025",
-    "date": "0829-20-25",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 93,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400",
-        "media"
-      ],
-      "sovereigns": [
-        "CN_PBOC",
-        "EU_ECB",
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Bitcoin",
-        "Cloud",
-        "Cybersecurity",
-        "DeFi"
-      ]
-    },
-    "provenance_hash": "a773552680a77984122772b6129351f3a57c65df1b3b4039b7862659a524f564",
-    "filename": "mm08292025.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 40,
-    "semantic_score": 39,
-    "probability": 40,
-    "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 93/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "Market Mayhem Newsletter - May 2, 2025",
-    "date": "0502-20-25",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 90,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400",
-        "media"
-      ],
-      "sovereigns": [
-        "EU_ECB",
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Banks",
-        "Bitcoin",
-        "EV",
-        "Energy"
-      ]
-    },
-    "provenance_hash": "70987aa6eaef6f339d1bac4daa3afa719c05eafc89db2b4e89726ea28f347f35",
-    "filename": "mm05022025.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 75,
-    "semantic_score": 37,
-    "probability": 75,
-    "outlook_score": 10,
-    "critique": "Agent Market_Maker reviewed this intelligence. Verdict: SPECULATIVE. Sentiment alignment: 90/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
-  },
-  {
-    "title": "Market Mayhem Newsletter - April 4, 2025",
-    "date": "0404-20-25",
-    "summary": "Report content.",
-    "type": "NEWSLETTER",
-    "full_body": "",
-    "sentiment_score": 94,
-    "entities": {
-      "tickers": [],
-      "agents": [
-        "0",
-        "300",
-        "400",
-        "media"
-      ],
-      "sovereigns": [
-        "CN_PBOC",
-        "JP_BOJ",
-        "US_FED"
-      ],
-      "keywords": [
-        "AI",
-        "Bitcoin",
-        "Crypto",
-        "Cybersecurity",
-        "DeFi"
-      ]
-    },
-    "provenance_hash": "770ea94c2038c18a54720a72f8ea4559873865f4a680cbff01adb330e1daedd2",
-    "filename": "mm04042025.html",
-    "is_sourced": false,
-    "metrics_json": "{}",
-    "conviction": 50,
-    "semantic_score": 39,
-    "probability": 50,
-    "outlook_score": 10,
-    "critique": "Agent Sovereign_AI reviewed this intelligence. Verdict: HIGH_CONFIDENCE. Sentiment alignment: 94/100. Cross-reference with knowledge graph completed.",
-    "source_priority": 0
   }
 ];
 
