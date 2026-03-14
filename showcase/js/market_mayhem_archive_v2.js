@@ -49,15 +49,28 @@ class MarketMayhemController {
     }
 
     async loadData() {
-        const [strategic, market, archive] = await Promise.all([
-            fetch('data/strategic_command.json').then(r => r.json()),
-            fetch('data/sp500_market_data.json').then(r => r.json()),
-            fetch('data/market_mayhem_index.json').then(r => r.json())
-        ]);
+        // Check for static data injection first (for file:// protocol compatibility)
+        if (window.MARKET_MAYHEM_DATA) {
+            console.log("[MarketMayhem] Loading from Static Data Source");
+            this.data.strategic = window.MARKET_MAYHEM_DATA.strategic;
+            this.data.market = window.MARKET_MAYHEM_DATA.market;
+            this.data.archive = window.MARKET_MAYHEM_DATA.archive;
+            return;
+        }
 
-        this.data.strategic = strategic;
-        this.data.market = market;
-        this.data.archive = archive;
+        try {
+            const [strategic, market, archive] = await Promise.all([
+                fetch('data/strategic_command.json').then(r => r.json()),
+                fetch('data/sp500_market_data.json').then(r => r.json()),
+                fetch('data/market_mayhem_index.json').then(r => r.json())
+            ]);
+
+            this.data.strategic = strategic;
+            this.data.market = market;
+            this.data.archive = archive;
+        } catch (e) {
+            console.warn("[MarketMayhem] Fetch failed, likely due to CORS/file:// protocol. Ensure market_mayhem_data_static.js is loaded.");
+        }
     }
 
     // --- Sidebar Rendering ---

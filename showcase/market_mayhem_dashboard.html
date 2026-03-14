@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM :: MARKET MAYHEM COMMAND CENTER</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/nav.js" defer></script>
+    <style>
+        :root {
+            --primary-color: #00f3ff;
+            --secondary-color: #0aff60;
+            --danger-color: #ff3333;
+            --bg-color: #050b14;
+            --panel-bg: rgba(10, 15, 25, 0.8);
+            --border-color: #333;
+            --text-primary: #e0e0e0;
+            --font-mono: 'JetBrains Mono', monospace;
+            --font-sans: 'Inter', sans-serif;
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg-color);
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            overflow-x: hidden;
+            background-image:
+                linear-gradient(rgba(0, 243, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 243, 255, 0.03) 1px, transparent 1px);
+            background-size: 30px 30px;
+        }
+
+        .mono { font-family: var(--font-mono); }
+
+        /* Top Navigation */
+        .top-nav {
+            height: 60px;
+            background: rgba(0,0,0,0.9);
+            border-bottom: 1px solid var(--primary-color);
+            display: flex;
+            align-items: center;
+            padding: 0 30px;
+            justify-content: space-between;
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: #fff;
+            text-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
+        }
+
+        .nav-links a {
+            color: #888;
+            text-decoration: none;
+            margin-left: 25px;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            font-family: var(--font-mono);
+        }
+        .nav-links a:hover, .nav-links a.active {
+            color: var(--primary-color);
+            text-shadow: 0 0 8px var(--primary-color);
+        }
+
+        /* Dashboard Container */
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .header-section {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .header-section h1 {
+            font-size: 3rem;
+            margin: 0 0 10px 0;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            color: #fff;
+        }
+
+        .header-section p {
+            color: #aaa;
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Grid Layout */
+        .module-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+        }
+
+        /* Module Cards */
+        .module-card {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .module-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary-color);
+            box-shadow: 0 10px 30px rgba(0, 243, 255, 0.1);
+        }
+
+        .module-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 4px; height: 100%;
+            background: #333;
+            transition: background 0.3s ease;
+        }
+
+        .module-card:hover::before {
+            background: var(--primary-color);
+        }
+
+        .module-icon {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            opacity: 0.8;
+        }
+
+        .module-title {
+            font-family: var(--font-mono);
+            font-size: 1.4rem;
+            color: #fff;
+            margin: 0 0 15px 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .module-desc {
+            color: #999;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 25px;
+            flex-grow: 1;
+        }
+
+        .module-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            padding-top: 15px;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: #666;
+        }
+
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            background: rgba(10, 255, 96, 0.1);
+            color: var(--secondary-color);
+            border: 1px solid rgba(10, 255, 96, 0.3);
+        }
+
+        /* Specific Card Variants */
+        .card-archive:hover::before { background: #00f3ff; }
+        .card-archive .module-icon { color: #00f3ff; }
+
+        .card-graph:hover::before { background: #d946ef; }
+        .card-graph .module-icon { color: #d946ef; }
+        .card-graph .status-badge { color: #d946ef; background: rgba(217, 70, 239, 0.1); border-color: rgba(217, 70, 239, 0.3); }
+
+        .card-builder:hover::before { background: #f59e0b; }
+        .card-builder .module-icon { color: #f59e0b; }
+        .card-builder .status-badge { color: #f59e0b; background: rgba(245, 158, 11, 0.1); border-color: rgba(245, 158, 11, 0.3); }
+
+        .card-multiplayer:hover::before { background: #ff3333; }
+        .card-multiplayer .module-icon { color: #ff3333; }
+        .card-multiplayer .status-badge { color: #ff3333; background: rgba(255, 51, 51, 0.1); border-color: rgba(255, 51, 51, 0.3); }
+
+        .card-conviction:hover::before { background: #fff; }
+        .card-conviction .module-icon { color: #fff; }
+        .card-conviction .status-badge { color: #fff; background: rgba(255, 255, 255, 0.1); border-color: rgba(255, 255, 255, 0.3); }
+
+        /* System Status Bar */
+        .system-status-bar {
+            background: rgba(0,0,0,0.8);
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 40px;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+        }
+
+        .sys-metric { display: flex; align-items: center; gap: 10px; }
+        .sys-label { color: #666; }
+        .sys-val { color: #fff; font-weight: bold; }
+        .sys-val.positive { color: var(--secondary-color); }
+        .sys-val.negative { color: var(--danger-color); }
+
+        /* Scanline Overlay */
+        .scanlines {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.1));
+            background-size: 100% 4px;
+            z-index: 9999;
+            pointer-events: none;
+            opacity: 0.3;
+        }
+    </style>
+</head>
+<body>
+    <div class="scanlines"></div>
+
+    <nav class="top-nav">
+        <div class="nav-brand mono">
+            <i class="fas fa-bolt" style="color: var(--primary-color);"></i>
+            MARKET MAYHEM SUITE
+        </div>
+        <div class="nav-links mono">
+            <a href="dashboard.html">System Hub</a>
+            <a href="terminal.html">Terminal</a>
+            <a href="#" class="active">Mayhem Command</a>
+        </div>
+    </nav>
+
+    <div class="dashboard-container">
+
+        <div class="header-section">
+            <h1 class="mono">Strategic Intelligence Suite</h1>
+            <p>Access specialized modules for historical analysis, 3D visualization, scenario generation, and tactical simulations.</p>
+        </div>
+
+        <div class="system-status-bar">
+            <div class="sys-metric">
+                <span class="sys-label">CORE ENGINE:</span>
+                <span class="sys-val positive">ONLINE V24.2</span>
+            </div>
+            <div class="sys-metric">
+                <span class="sys-label">MARKET SENTIMENT:</span>
+                <span class="sys-val" style="color: #f59e0b;">ELEVATED VOLATILITY</span>
+            </div>
+            <div class="sys-metric">
+                <span class="sys-label">ACTIVE THREATS:</span>
+                <span class="sys-val negative">2 CRITICAL</span>
+            </div>
+            <div class="sys-metric">
+                <span class="sys-label">DATA SYNC:</span>
+                <span class="sys-val positive">REAL-TIME</span>
+            </div>
+        </div>
+
+        <div class="module-grid">
+
+            <!-- V2 Dashboard -->
+            <a href="market_mayhem_archive.html" class="module-card card-archive">
+                <i class="fas fa-chart-line module-icon"></i>
+                <h2 class="module-title">Analytics Dashboard</h2>
+                <p class="module-desc">The central hub for tracking market sentiment, top conviction plays, sector risks, and accessing the complete library of historical and live intelligence reports.</p>
+                <div class="module-footer">
+                    <span>v2.0 Integration</span>
+                    <span class="status-badge">ACTIVE</span>
+                </div>
+            </a>
+
+            <!-- 3D Graph -->
+            <a href="market_mayhem_graph.html" class="module-card card-graph">
+                <i class="fas fa-cubes module-icon"></i>
+                <h2 class="module-title">Neural Graph Visualizer</h2>
+                <p class="module-desc">Immersive 3D representation of market entities, sentiment clusters, and risk contagion pathways. Navigate the financial network in real-time.</p>
+                <div class="module-footer">
+                    <span>Three.js Engine</span>
+                    <span class="status-badge">ONLINE</span>
+                </div>
+            </a>
+
+            <!-- Conviction Viewer -->
+            <a href="market_mayhem_conviction.html" class="module-card card-conviction">
+                <i class="fas fa-file-contract module-icon"></i>
+                <h2 class="module-title">Conviction Papers</h2>
+                <p class="module-desc">Deep-dive reading environment for high-conviction thematic reports and counterfactuals. Features redaction mode and system critique overlays.</p>
+                <div class="module-footer">
+                    <span>Document Interface</span>
+                    <span class="status-badge">STABLE</span>
+                </div>
+            </a>
+
+            <!-- Scenario Builder -->
+            <a href="market_mayhem_builder.html" class="module-card card-builder">
+                <i class="fas fa-hammer module-icon"></i>
+                <h2 class="module-title">Scenario Builder</h2>
+                <p class="module-desc">Forge alternative realities and stress-test portfolios against synthetic shocks. Generate custom 'Mayhem' artifacts based on historical templates.</p>
+                <div class="module-footer">
+                    <span>Simulation Sandbox</span>
+                    <span class="status-badge">STANDBY</span>
+                </div>
+            </a>
+
+            <!-- Multiplayer War Room -->
+            <a href="market_mayhem_multiplayer.html" class="module-card card-multiplayer">
+                <i class="fas fa-gamepad module-icon"></i>
+                <h2 class="module-title">War Room (Multiplayer)</h2>
+                <p class="module-desc">Live wargaming environment. Assume the role of 'Chaos' (Short) or 'Order' (Long) and battle for control of the market narrative in a simulated liquidity crisis.</p>
+                <div class="module-footer">
+                    <span>Live Protocol</span>
+                    <span class="status-badge">READY</span>
+                </div>
+            </a>
+
+        </div>
+    </div>
+
+</body>
+</html>
