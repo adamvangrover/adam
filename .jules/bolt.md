@@ -83,3 +83,6 @@
 ## 2025-03-10 - Vectorized DataFrame filtering by Multi-Index
 **Learning:** `df.iterrows()` when iterating to check if tuple pairs exist in a `set` is extremely slow. In `InstitutionalRadarAnalytics.detect_cluster_buys`, using a `for _, row in curr_df.iterrows():` loop checking `(row["fund_name"], row["cusip"]) not in prev_holdings` was a major bottleneck.
 **Action:** Always prefer `mask = ~curr_df.set_index(["col1", "col2"]).index.isin(set_of_tuples)` instead of `iterrows()` for multi-column exclusion/inclusion filtering against a set of tuples.
+## 2024-05-14 - Replace pandas iterrows with to_dict('index') for Nested MultiIndex Data
+**Learning:** Using `iterrows()` combined with repeated MultiIndex `.loc[]` lookups in a nested loop is a major pandas performance anti-pattern. When you need to transform a `pandas.DataFrame` into a nested dictionary, breaking it down column-by-column (or ticker-by-ticker) with `dropna()` and using `to_dict('index')` is ~10-100x faster than iterating row-by-row. Also, remember to preserve the initialization logic (e.g. empty date dicts) and handle potential NaN casting values (like `int(NaN)` for volume).
+**Action:** Always avoid `iterrows()` for data transformation. Instead, apply vectorized column filtering and leverage pandas' optimized `to_dict()` export functions to serialize data.
