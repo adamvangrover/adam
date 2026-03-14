@@ -38,8 +38,10 @@
         <div class="toolbar-item" onclick="shareReport()">SHARE</div>
         <div class="toolbar-item" onclick="downloadReport()">DOWNLOAD</div>
         <div class="toolbar-item" onclick="toggleTheme()">VIEW</div>
+        <div class="toolbar-item" onclick="changeFontSize(1)">A+</div>
+        <div class="toolbar-item" onclick="changeFontSize(-1)">A-</div>
         <div class="toolbar-item" onclick="showToast('INSERT: PERMISSION DENIED')">INSERT</div>
-        <div class="toolbar-item" onclick="showToast('FORMAT: LOCKED')">FORMAT</div>
+        <div class="toolbar-item" onclick="toggleFontFamily()">FONT</div>
         <div class="toolbar-item" onclick="runVerification()" style="color: #0078d7;"><strong>VERIFY</strong></div>
         <div style="flex-grow:1;"></div>
         <div class="toolbar-item" style="color:#666;">ADAM_V26_EDITOR</div>
@@ -127,43 +129,77 @@
             </div>
 
             <div id="document-body">
-                <strong>Status:</strong> ONLINE
-<strong>Clearance:</strong> PUBLIC
-<strong>Tone:</strong> CYBER-MINIMALIST
-<p>---</p>
-<h2>< SYSTEM_OVERVIEW ></h2>
-<p>The S&P 500 is testing key resistance at 5,450 as the "AI Rotation" trade broadens beyond semiconductors into software and utilities. Volatility (VIX) remains suppressed (13.2), suggesting complacency or a structured calm before the next macro catalyst (June FOMC).</p>
-<h2>< NODES_IN_FOCUS ></h2>
+                <p><strong>Status:</strong> ONLINE<br />
+<strong>Clearance:</strong> PUBLIC<br />
+<strong>Tone:</strong> CYBER-MINIMALIST</p>
+<hr />
+<h2>&lt; SYSTEM_OVERVIEW &gt;</h2>
+<p>The S&amp;P 500 is testing key resistance at 5,450 as the "AI Rotation" trade broadens beyond semiconductors into software and utilities. Volatility (VIX) remains suppressed (13.2), suggesting complacency or a structured calm before the next macro catalyst (June FOMC).</p>
+<h2>&lt; NODES_IN_FOCUS &gt;</h2>
 <ul>
-<li>  <strong>SECTOR: UTILITIES (XLU)</strong></li>
-<li>  <strong>Signal:</strong> +4.2% WTD.</li>
-<li>  <strong>Thesis:</strong> "Power is the new Oil." Data center energy demand is driving re-rating of regulated utilities with nuclear exposure.</li>
-<li>  <strong>Conviction:</strong> HIGH.</li>
-</ul>
+<li>
+<p><strong>SECTOR: UTILITIES (XLU)</strong></p>
 <ul>
-<li>  <strong>CRYPTO: BITCOIN (BTC)</strong></li>
-<li>  <strong>Signal:</strong> Range-bound ($88k - $92k).</li>
-<li>  <strong>Thesis:</strong> Institutional accumulation via ETF inflows is offsetting miner capitulation post-halving. Expect breakout if CPI prints < 2.8%.</li>
-<li>  <strong>Conviction:</strong> MEDIUM.</li>
+<li><strong>Signal:</strong> +4.2% WTD.</li>
+<li><strong>Thesis:</strong> "Power is the new Oil." Data center energy demand is driving re-rating of regulated utilities with nuclear exposure.</li>
+<li><strong>Conviction:</strong> HIGH.</li>
 </ul>
+</li>
+<li>
+<p><strong>CRYPTO: BITCOIN (BTC)</strong></p>
 <ul>
-<li>  <strong>MACRO: JAPAN (USD/JPY)</strong></li>
-<li>  <strong>Signal:</strong> 158.50 (Intervention Watch).</li>
-<li>  <strong>Thesis:</strong> BOJ is cornered. Further yield curve control adjustments are inevitable. Short JGBs remains the "Widowmaker" trade, but the risk/reward is tilting.</li>
-<li>  <strong>Conviction:</strong> LOW (High Volatility).</li>
+<li><strong>Signal:</strong> Range-bound ($88k - $92k).</li>
+<li><strong>Thesis:</strong> Institutional accumulation via ETF inflows is offsetting miner capitulation post-halving. Expect breakout if CPI prints &lt; 2.8%.</li>
+<li><strong>Conviction:</strong> MEDIUM.</li>
 </ul>
-<h2>< DATA_STREAM ></h2>
-<p>| METRIC | VALUE | DELTA (YoY) |
-| :--- | :--- | :--- |
-| <strong>US 10Y Yield</strong> | 4.35% | -12bps |
-| <strong>Brent Crude</strong> | $82.40 | +3.5% |
-| <strong>Gold</strong> | $2,410 | +15.2% |
-| <strong>Global Liquidity</strong> | $98.5T | +2.1% |</p>
-<h2>< SYNTHESIS ></h2>
+</li>
+<li>
+<p><strong>MACRO: JAPAN (USD/JPY)</strong></p>
+<ul>
+<li><strong>Signal:</strong> 158.50 (Intervention Watch).</li>
+<li><strong>Thesis:</strong> BOJ is cornered. Further yield curve control adjustments are inevitable. Short JGBs remains the "Widowmaker" trade, but the risk/reward is tilting.</li>
+<li><strong>Conviction:</strong> LOW (High Volatility).</li>
+</ul>
+</li>
+</ul>
+<h2>&lt; DATA_STREAM &gt;</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">METRIC</th>
+<th style="text-align: left;">VALUE</th>
+<th style="text-align: left;">DELTA (YoY)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>US 10Y Yield</strong></td>
+<td style="text-align: left;">4.35%</td>
+<td style="text-align: left;">-12bps</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Brent Crude</strong></td>
+<td style="text-align: left;">$82.40</td>
+<td style="text-align: left;">+3.5%</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Gold</strong></td>
+<td style="text-align: left;">$2,410</td>
+<td style="text-align: left;">+15.2%</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Global Liquidity</strong></td>
+<td style="text-align: left;">$98.5T</td>
+<td style="text-align: left;">+2.1%</td>
+</tr>
+</tbody>
+</table>
+<h2>&lt; SYNTHESIS &gt;</h2>
 <p>Markets are pricing in a "Goldilocks" soft landing, but the divergence between equity valuations (21x fwd P/E) and real rates (2.0%) is expanding. We recommend a barbell strategy: Long AI infrastructure (Hardware/Energy) and Short Consumer Discretionary (High-end retail showing cracks).</p>
-<p>> "In the age of information, silence is the most expensive luxury. In the age of AI, compute is the new currency."</p>
-<strong>END_TRANSMISSION</strong>
-
+<blockquote>
+<p>"In the age of information, silence is the most expensive luxury. In the age of AI, compute is the new currency."</p>
+</blockquote>
+<p><strong>END_TRANSMISSION</strong></p>
             </div>
 
             <div class="provenance-log">
@@ -252,7 +288,7 @@
   "date": "2025-05-19",
   "summary": "Market analysis and strategic insights.",
   "type": "NEWSLETTER",
-  "full_body": "<strong>Status:</strong> ONLINE\n<strong>Clearance:</strong> PUBLIC\n<strong>Tone:</strong> CYBER-MINIMALIST\n<p>---</p>\n<h2>< SYSTEM_OVERVIEW ></h2>\n<p>The S&P 500 is testing key resistance at 5,450 as the \"AI Rotation\" trade broadens beyond semiconductors into software and utilities. Volatility (VIX) remains suppressed (13.2), suggesting complacency or a structured calm before the next macro catalyst (June FOMC).</p>\n<h2>< NODES_IN_FOCUS ></h2>\n<ul>\n<li>  <strong>SECTOR: UTILITIES (XLU)</strong></li>\n<li>  <strong>Signal:</strong> +4.2% WTD.</li>\n<li>  <strong>Thesis:</strong> \"Power is the new Oil.\" Data center energy demand is driving re-rating of regulated utilities with nuclear exposure.</li>\n<li>  <strong>Conviction:</strong> HIGH.</li>\n</ul>\n<ul>\n<li>  <strong>CRYPTO: BITCOIN (BTC)</strong></li>\n<li>  <strong>Signal:</strong> Range-bound ($88k - $92k).</li>\n<li>  <strong>Thesis:</strong> Institutional accumulation via ETF inflows is offsetting miner capitulation post-halving. Expect breakout if CPI prints < 2.8%.</li>\n<li>  <strong>Conviction:</strong> MEDIUM.</li>\n</ul>\n<ul>\n<li>  <strong>MACRO: JAPAN (USD/JPY)</strong></li>\n<li>  <strong>Signal:</strong> 158.50 (Intervention Watch).</li>\n<li>  <strong>Thesis:</strong> BOJ is cornered. Further yield curve control adjustments are inevitable. Short JGBs remains the \"Widowmaker\" trade, but the risk/reward is tilting.</li>\n<li>  <strong>Conviction:</strong> LOW (High Volatility).</li>\n</ul>\n<h2>< DATA_STREAM ></h2>\n<p>| METRIC | VALUE | DELTA (YoY) |\n| :--- | :--- | :--- |\n| <strong>US 10Y Yield</strong> | 4.35% | -12bps |\n| <strong>Brent Crude</strong> | $82.40 | +3.5% |\n| <strong>Gold</strong> | $2,410 | +15.2% |\n| <strong>Global Liquidity</strong> | $98.5T | +2.1% |</p>\n<h2>< SYNTHESIS ></h2>\n<p>Markets are pricing in a \"Goldilocks\" soft landing, but the divergence between equity valuations (21x fwd P/E) and real rates (2.0%) is expanding. We recommend a barbell strategy: Long AI infrastructure (Hardware/Energy) and Short Consumer Discretionary (High-end retail showing cracks).</p>\n<p>> \"In the age of information, silence is the most expensive luxury. In the age of AI, compute is the new currency.\"</p>\n<strong>END_TRANSMISSION</strong>\n",
+  "full_body": "<p><strong>Status:</strong> ONLINE<br />\n<strong>Clearance:</strong> PUBLIC<br />\n<strong>Tone:</strong> CYBER-MINIMALIST</p>\n<hr />\n<h2>&lt; SYSTEM_OVERVIEW &gt;</h2>\n<p>The S&amp;P 500 is testing key resistance at 5,450 as the \"AI Rotation\" trade broadens beyond semiconductors into software and utilities. Volatility (VIX) remains suppressed (13.2), suggesting complacency or a structured calm before the next macro catalyst (June FOMC).</p>\n<h2>&lt; NODES_IN_FOCUS &gt;</h2>\n<ul>\n<li>\n<p><strong>SECTOR: UTILITIES (XLU)</strong></p>\n<ul>\n<li><strong>Signal:</strong> +4.2% WTD.</li>\n<li><strong>Thesis:</strong> \"Power is the new Oil.\" Data center energy demand is driving re-rating of regulated utilities with nuclear exposure.</li>\n<li><strong>Conviction:</strong> HIGH.</li>\n</ul>\n</li>\n<li>\n<p><strong>CRYPTO: BITCOIN (BTC)</strong></p>\n<ul>\n<li><strong>Signal:</strong> Range-bound ($88k - $92k).</li>\n<li><strong>Thesis:</strong> Institutional accumulation via ETF inflows is offsetting miner capitulation post-halving. Expect breakout if CPI prints &lt; 2.8%.</li>\n<li><strong>Conviction:</strong> MEDIUM.</li>\n</ul>\n</li>\n<li>\n<p><strong>MACRO: JAPAN (USD/JPY)</strong></p>\n<ul>\n<li><strong>Signal:</strong> 158.50 (Intervention Watch).</li>\n<li><strong>Thesis:</strong> BOJ is cornered. Further yield curve control adjustments are inevitable. Short JGBs remains the \"Widowmaker\" trade, but the risk/reward is tilting.</li>\n<li><strong>Conviction:</strong> LOW (High Volatility).</li>\n</ul>\n</li>\n</ul>\n<h2>&lt; DATA_STREAM &gt;</h2>\n<table>\n<thead>\n<tr>\n<th style=\"text-align: left;\">METRIC</th>\n<th style=\"text-align: left;\">VALUE</th>\n<th style=\"text-align: left;\">DELTA (YoY)</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td style=\"text-align: left;\"><strong>US 10Y Yield</strong></td>\n<td style=\"text-align: left;\">4.35%</td>\n<td style=\"text-align: left;\">-12bps</td>\n</tr>\n<tr>\n<td style=\"text-align: left;\"><strong>Brent Crude</strong></td>\n<td style=\"text-align: left;\">$82.40</td>\n<td style=\"text-align: left;\">+3.5%</td>\n</tr>\n<tr>\n<td style=\"text-align: left;\"><strong>Gold</strong></td>\n<td style=\"text-align: left;\">$2,410</td>\n<td style=\"text-align: left;\">+15.2%</td>\n</tr>\n<tr>\n<td style=\"text-align: left;\"><strong>Global Liquidity</strong></td>\n<td style=\"text-align: left;\">$98.5T</td>\n<td style=\"text-align: left;\">+2.1%</td>\n</tr>\n</tbody>\n</table>\n<h2>&lt; SYNTHESIS &gt;</h2>\n<p>Markets are pricing in a \"Goldilocks\" soft landing, but the divergence between equity valuations (21x fwd P/E) and real rates (2.0%) is expanding. We recommend a barbell strategy: Long AI infrastructure (Hardware/Energy) and Short Consumer Discretionary (High-end retail showing cracks).</p>\n<blockquote>\n<p>\"In the age of information, silence is the most expensive luxury. In the age of AI, compute is the new currency.\"</p>\n</blockquote>\n<p><strong>END_TRANSMISSION</strong></p>",
   "sentiment_score": 0,
   "entities": {
     "tickers": [],

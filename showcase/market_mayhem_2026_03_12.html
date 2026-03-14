@@ -38,8 +38,10 @@
         <div class="toolbar-item" onclick="shareReport()">SHARE</div>
         <div class="toolbar-item" onclick="downloadReport()">DOWNLOAD</div>
         <div class="toolbar-item" onclick="toggleTheme()">VIEW</div>
+        <div class="toolbar-item" onclick="changeFontSize(1)">A+</div>
+        <div class="toolbar-item" onclick="changeFontSize(-1)">A-</div>
         <div class="toolbar-item" onclick="showToast('INSERT: PERMISSION DENIED')">INSERT</div>
-        <div class="toolbar-item" onclick="showToast('FORMAT: LOCKED')">FORMAT</div>
+        <div class="toolbar-item" onclick="toggleFontFamily()">FONT</div>
         <div class="toolbar-item" onclick="runVerification()" style="color: #0078d7;"><strong>VERIFY</strong></div>
         <div style="flex-grow:1;"></div>
         <div class="toolbar-item" style="color:#666;">ADAM_V26_EDITOR</div>
@@ -128,32 +130,83 @@
 
             <div id="document-body">
                 <h3>1. The Daily Briefing</h3>
-<strong>Macro Overlay:</strong> Broad equity markets exhibit resilience as the S&P 500 continues to hold steady despite mixed signals from recent economic prints, with market participants looking ahead for directional catalysts.
-<strong>Credit & TMT Desk:</strong> Leveraged loan markets remain robust, fueled by strong liquidity and selective high-yield issuance. The TMT sector maintains steady momentum, with tech mega-caps sustaining index levels despite sector-specific rotations.
-<strong>The Risk Signal:</strong> Bitcoin (BTC) continues to trade with high volatility, acting as a prime barometer for institutional risk appetite. Current price action suggests a sustained risk-on environment, underpinning speculative flows across broader asset classes.
-<h3>2. Sentiment & Conviction Chart</h3>
-<p>| Sector | Conviction Score (1-10) |
-| :--- | :--- |
-| Broad Equities | 7 |
-| High-Yield Credit | 6 |
-| TMT Sector | 8 |
-| Crypto/Risk (BTC) | 9 |</p>
-<p>```mermaid
-pie title Conviction Levels
-    "Broad Equities (7)" : 7
-    "High-Yield Credit (6)" : 6
-    "TMT Sector (8)" : 8
-    "Crypto/Risk (9)" : 9
-```</p>
-<h3>3. Historic Pricing & Trading Levels</h3>
-<p>| Asset | Current Price | 30-Day Avg | 1-Year Avg | % Deviation from 30D Mean | Momentum (Bull/Bear) |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| S&P 500 | 6775.80 | 6878.67 | 6389.57 | -1.50% | Neutral |
-| Nasdaq | 22716.13 | 22909.63 | 21207.32 | -0.84% | Bull |
-| BTC | 70130.36 | 67913.58 | 98197.15 | +3.26% | Bull |</p>
+<p><strong>Macro Overlay:</strong> Broad equity markets exhibit resilience as the S&amp;P 500 continues to hold steady despite mixed signals from recent economic prints, with market participants looking ahead for directional catalysts.<br />
+<strong>Credit &amp; TMT Desk:</strong> Leveraged loan markets remain robust, fueled by strong liquidity and selective high-yield issuance. The TMT sector maintains steady momentum, with tech mega-caps sustaining index levels despite sector-specific rotations.<br />
+<strong>The Risk Signal:</strong> Bitcoin (BTC) continues to trade with high volatility, acting as a prime barometer for institutional risk appetite. Current price action suggests a sustained risk-on environment, underpinning speculative flows across broader asset classes.</p>
+<h3>2. Sentiment &amp; Conviction Chart</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Sector</th>
+<th style="text-align: left;">Conviction Score (1-10)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Broad Equities</td>
+<td style="text-align: left;">7</td>
+</tr>
+<tr>
+<td style="text-align: left;">High-Yield Credit</td>
+<td style="text-align: left;">6</td>
+</tr>
+<tr>
+<td style="text-align: left;">TMT Sector</td>
+<td style="text-align: left;">8</td>
+</tr>
+<tr>
+<td style="text-align: left;">Crypto/Risk (BTC)</td>
+<td style="text-align: left;">9</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="language-mermaid">pie title Conviction Levels
+    &quot;Broad Equities (7)&quot; : 7
+    &quot;High-Yield Credit (6)&quot; : 6
+    &quot;TMT Sector (8)&quot; : 8
+    &quot;Crypto/Risk (9)&quot; : 9
+</code></pre>
+<h3>3. Historic Pricing &amp; Trading Levels</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Asset</th>
+<th style="text-align: left;">Current Price</th>
+<th style="text-align: left;">30-Day Avg</th>
+<th style="text-align: left;">1-Year Avg</th>
+<th style="text-align: left;">% Deviation from 30D Mean</th>
+<th style="text-align: left;">Momentum (Bull/Bear)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">S&amp;P 500</td>
+<td style="text-align: left;">6775.80</td>
+<td style="text-align: left;">6878.67</td>
+<td style="text-align: left;">6389.57</td>
+<td style="text-align: left;">-1.50%</td>
+<td style="text-align: left;">Neutral</td>
+</tr>
+<tr>
+<td style="text-align: left;">Nasdaq</td>
+<td style="text-align: left;">22716.13</td>
+<td style="text-align: left;">22909.63</td>
+<td style="text-align: left;">21207.32</td>
+<td style="text-align: left;">-0.84%</td>
+<td style="text-align: left;">Bull</td>
+</tr>
+<tr>
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">70130.36</td>
+<td style="text-align: left;">67913.58</td>
+<td style="text-align: left;">98197.15</td>
+<td style="text-align: left;">+3.26%</td>
+<td style="text-align: left;">Bull</td>
+</tr>
+</tbody>
+</table>
 <h3>4. Forward Outlook</h3>
-Over the next 5 days, we project a sideways-to-bullish consolidation phase across major indices. The primary catalysts will be upcoming inflation prints and key tech earnings releases. A sustained break in BTC above current resistance levels could signal a broader liquidity injection, driving a renewed wave of speculative capital into both TMT equities and high-yield credit structures. Conversely, unexpected hawkish shifts could rapidly reverse recent gains in risk assets.
-
+<p>Over the next 5 days, we project a sideways-to-bullish consolidation phase across major indices. The primary catalysts will be upcoming inflation prints and key tech earnings releases. A sustained break in BTC above current resistance levels could signal a broader liquidity injection, driving a renewed wave of speculative capital into both TMT equities and high-yield credit structures. Conversely, unexpected hawkish shifts could rapidly reverse recent gains in risk assets.</p>
             </div>
 
             <div class="provenance-log">
@@ -242,7 +295,7 @@ Over the next 5 days, we project a sideways-to-bullish consolidation phase acros
   "date": "2026-03-12",
   "summary": "Market analysis and strategic insights.",
   "type": "MARKET_OUTLOOK",
-  "full_body": "<h3>1. The Daily Briefing</h3>\n<strong>Macro Overlay:</strong> Broad equity markets exhibit resilience as the S&P 500 continues to hold steady despite mixed signals from recent economic prints, with market participants looking ahead for directional catalysts.\n<strong>Credit & TMT Desk:</strong> Leveraged loan markets remain robust, fueled by strong liquidity and selective high-yield issuance. The TMT sector maintains steady momentum, with tech mega-caps sustaining index levels despite sector-specific rotations.\n<strong>The Risk Signal:</strong> Bitcoin (BTC) continues to trade with high volatility, acting as a prime barometer for institutional risk appetite. Current price action suggests a sustained risk-on environment, underpinning speculative flows across broader asset classes.\n<h3>2. Sentiment & Conviction Chart</h3>\n<p>| Sector | Conviction Score (1-10) |\n| :--- | :--- |\n| Broad Equities | 7 |\n| High-Yield Credit | 6 |\n| TMT Sector | 8 |\n| Crypto/Risk (BTC) | 9 |</p>\n<p>```mermaid\npie title Conviction Levels\n    \"Broad Equities (7)\" : 7\n    \"High-Yield Credit (6)\" : 6\n    \"TMT Sector (8)\" : 8\n    \"Crypto/Risk (9)\" : 9\n```</p>\n<h3>3. Historic Pricing & Trading Levels</h3>\n<p>| Asset | Current Price | 30-Day Avg | 1-Year Avg | % Deviation from 30D Mean | Momentum (Bull/Bear) |\n| :--- | :--- | :--- | :--- | :--- | :--- |\n| S&P 500 | 6775.80 | 6878.67 | 6389.57 | -1.50% | Neutral |\n| Nasdaq | 22716.13 | 22909.63 | 21207.32 | -0.84% | Bull |\n| BTC | 70130.36 | 67913.58 | 98197.15 | +3.26% | Bull |</p>\n<h3>4. Forward Outlook</h3>\nOver the next 5 days, we project a sideways-to-bullish consolidation phase across major indices. The primary catalysts will be upcoming inflation prints and key tech earnings releases. A sustained break in BTC above current resistance levels could signal a broader liquidity injection, driving a renewed wave of speculative capital into both TMT equities and high-yield credit structures. Conversely, unexpected hawkish shifts could rapidly reverse recent gains in risk assets.\n",
+  "full_body": "<h3>1. The Daily Briefing</h3>\n<p><strong>Macro Overlay:</strong> Broad equity markets exhibit resilience as the S&amp;P 500 continues to hold steady despite mixed signals from recent economic prints, with market participants looking ahead for directional catalysts.<br />\n<strong>Credit &amp; TMT Desk:</strong> Leveraged loan markets remain robust, fueled by strong liquidity and selective high-yield issuance. The TMT sector maintains steady momentum, with tech mega-caps sustaining index levels despite sector-specific rotations.<br />\n<strong>The Risk Signal:</strong> Bitcoin (BTC) continues to trade with high volatility, acting as a prime barometer for institutional risk appetite. Current price action suggests a sustained risk-on environment, underpinning speculative flows across broader asset classes.</p>\n<h3>2. Sentiment &amp; Conviction Chart</h3>\n<table>\n<thead>\n<tr>\n<th style=\"text-align: left;\">Sector</th>\n<th style=\"text-align: left;\">Conviction Score (1-10)</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td style=\"text-align: left;\">Broad Equities</td>\n<td style=\"text-align: left;\">7</td>\n</tr>\n<tr>\n<td style=\"text-align: left;\">High-Yield Credit</td>\n<td style=\"text-align: left;\">6</td>\n</tr>\n<tr>\n<td style=\"text-align: left;\">TMT Sector</td>\n<td style=\"text-align: left;\">8</td>\n</tr>\n<tr>\n<td style=\"text-align: left;\">Crypto/Risk (BTC)</td>\n<td style=\"text-align: left;\">9</td>\n</tr>\n</tbody>\n</table>\n<pre><code class=\"language-mermaid\">pie title Conviction Levels\n    &quot;Broad Equities (7)&quot; : 7\n    &quot;High-Yield Credit (6)&quot; : 6\n    &quot;TMT Sector (8)&quot; : 8\n    &quot;Crypto/Risk (9)&quot; : 9\n</code></pre>\n<h3>3. Historic Pricing &amp; Trading Levels</h3>\n<table>\n<thead>\n<tr>\n<th style=\"text-align: left;\">Asset</th>\n<th style=\"text-align: left;\">Current Price</th>\n<th style=\"text-align: left;\">30-Day Avg</th>\n<th style=\"text-align: left;\">1-Year Avg</th>\n<th style=\"text-align: left;\">% Deviation from 30D Mean</th>\n<th style=\"text-align: left;\">Momentum (Bull/Bear)</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td style=\"text-align: left;\">S&amp;P 500</td>\n<td style=\"text-align: left;\">6775.80</td>\n<td style=\"text-align: left;\">6878.67</td>\n<td style=\"text-align: left;\">6389.57</td>\n<td style=\"text-align: left;\">-1.50%</td>\n<td style=\"text-align: left;\">Neutral</td>\n</tr>\n<tr>\n<td style=\"text-align: left;\">Nasdaq</td>\n<td style=\"text-align: left;\">22716.13</td>\n<td style=\"text-align: left;\">22909.63</td>\n<td style=\"text-align: left;\">21207.32</td>\n<td style=\"text-align: left;\">-0.84%</td>\n<td style=\"text-align: left;\">Bull</td>\n</tr>\n<tr>\n<td style=\"text-align: left;\">BTC</td>\n<td style=\"text-align: left;\">70130.36</td>\n<td style=\"text-align: left;\">67913.58</td>\n<td style=\"text-align: left;\">98197.15</td>\n<td style=\"text-align: left;\">+3.26%</td>\n<td style=\"text-align: left;\">Bull</td>\n</tr>\n</tbody>\n</table>\n<h3>4. Forward Outlook</h3>\n<p>Over the next 5 days, we project a sideways-to-bullish consolidation phase across major indices. The primary catalysts will be upcoming inflation prints and key tech earnings releases. A sustained break in BTC above current resistance levels could signal a broader liquidity injection, driving a renewed wave of speculative capital into both TMT equities and high-yield credit structures. Conversely, unexpected hawkish shifts could rapidly reverse recent gains in risk assets.</p>",
   "sentiment_score": 22,
   "entities": {
     "tickers": [],

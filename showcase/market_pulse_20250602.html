@@ -38,8 +38,10 @@
         <div class="toolbar-item" onclick="shareReport()">SHARE</div>
         <div class="toolbar-item" onclick="downloadReport()">DOWNLOAD</div>
         <div class="toolbar-item" onclick="toggleTheme()">VIEW</div>
+        <div class="toolbar-item" onclick="changeFontSize(1)">A+</div>
+        <div class="toolbar-item" onclick="changeFontSize(-1)">A-</div>
         <div class="toolbar-item" onclick="showToast('INSERT: PERMISSION DENIED')">INSERT</div>
-        <div class="toolbar-item" onclick="showToast('FORMAT: LOCKED')">FORMAT</div>
+        <div class="toolbar-item" onclick="toggleFontFamily()">FONT</div>
         <div class="toolbar-item" onclick="runVerification()" style="color: #0078d7;"><strong>VERIFY</strong></div>
         <div style="flex-grow:1;"></div>
         <div class="toolbar-item" style="color:#666;">ADAM_V26_EDITOR</div>
@@ -127,43 +129,77 @@
             </div>
 
             <div id="document-body">
-                <strong>Status:</strong> ONLINE
-<strong>Clearance:</strong> PUBLIC
-<strong>Tone:</strong> CYBER-MINIMALIST
-<p>---</p>
-<h2>< SYSTEM_OVERVIEW ></h2>
-<p>The "Summer Doldrums" have arrived early. Trading volumes are thinning as the S&P 500 consolidates near highs (5,500). The narrative has shifted from "Inflation Fear" to "Growth Scare" following softer-than-expected ISM Manufacturing data (48.2).</p>
-<h2>< NODES_IN_FOCUS ></h2>
+                <p><strong>Status:</strong> ONLINE<br />
+<strong>Clearance:</strong> PUBLIC<br />
+<strong>Tone:</strong> CYBER-MINIMALIST</p>
+<hr />
+<h2>&lt; SYSTEM_OVERVIEW &gt;</h2>
+<p>The "Summer Doldrums" have arrived early. Trading volumes are thinning as the S&amp;P 500 consolidates near highs (5,500). The narrative has shifted from "Inflation Fear" to "Growth Scare" following softer-than-expected ISM Manufacturing data (48.2).</p>
+<h2>&lt; NODES_IN_FOCUS &gt;</h2>
 <ul>
-<li>  <strong>SECTOR: ENERGY (XLE)</strong></li>
-<li>  <strong>Signal:</strong> -2.1% WTD.</li>
-<li>  <strong>Thesis:</strong> Demand destruction fears in China are capping crude prices despite OPEC+ cuts. Tactical short opportunity.</li>
-<li>  <strong>Conviction:</strong> MEDIUM.</li>
-</ul>
+<li>
+<p><strong>SECTOR: ENERGY (XLE)</strong></p>
 <ul>
-<li>  <strong>TECH: SOFTWARE (IGV)</strong></li>
-<li>  <strong>Signal:</strong> +3.5% WTD.</li>
-<li>  <strong>Thesis:</strong> "Platform Consolidation" is the theme. CIOs are cutting vendors but spending more with winners (CRWD, PANW, NOW).</li>
-<li>  <strong>Conviction:</strong> HIGH.</li>
+<li><strong>Signal:</strong> -2.1% WTD.</li>
+<li><strong>Thesis:</strong> Demand destruction fears in China are capping crude prices despite OPEC+ cuts. Tactical short opportunity.</li>
+<li><strong>Conviction:</strong> MEDIUM.</li>
 </ul>
+</li>
+<li>
+<p><strong>TECH: SOFTWARE (IGV)</strong></p>
 <ul>
-<li>  <strong>MACRO: EUROZONE (EUR/USD)</strong></li>
-<li>  <strong>Signal:</strong> 1.0850.</li>
-<li>  <strong>Thesis:</strong> ECB cuts rates ahead of the Fed (Divergence Trade). Short EUR against USD remains a carry-positive play.</li>
-<li>  <strong>Conviction:</strong> MEDIUM.</li>
+<li><strong>Signal:</strong> +3.5% WTD.</li>
+<li><strong>Thesis:</strong> "Platform Consolidation" is the theme. CIOs are cutting vendors but spending more with winners (CRWD, PANW, NOW).</li>
+<li><strong>Conviction:</strong> HIGH.</li>
 </ul>
-<h2>< DATA_STREAM ></h2>
-<p>| METRIC | VALUE | DELTA (MoM) |
-| :--- | :--- | :--- |
-| <strong>US Unemployment</strong> | 4.1% | +0.2% |
-| <strong>VIX Index</strong> | 12.8 | -0.5 |
-| <strong>Bitcoin</strong> | $94,500 | +3.2% |
-| <strong>Copper</strong> | $4.45/lb | -1.5% |</p>
-<h2>< SYNTHESIS ></h2>
+</li>
+<li>
+<p><strong>MACRO: EUROZONE (EUR/USD)</strong></p>
+<ul>
+<li><strong>Signal:</strong> 1.0850.</li>
+<li><strong>Thesis:</strong> ECB cuts rates ahead of the Fed (Divergence Trade). Short EUR against USD remains a carry-positive play.</li>
+<li><strong>Conviction:</strong> MEDIUM.</li>
+</ul>
+</li>
+</ul>
+<h2>&lt; DATA_STREAM &gt;</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">METRIC</th>
+<th style="text-align: left;">VALUE</th>
+<th style="text-align: left;">DELTA (MoM)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>US Unemployment</strong></td>
+<td style="text-align: left;">4.1%</td>
+<td style="text-align: left;">+0.2%</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>VIX Index</strong></td>
+<td style="text-align: left;">12.8</td>
+<td style="text-align: left;">-0.5</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Bitcoin</strong></td>
+<td style="text-align: left;">$94,500</td>
+<td style="text-align: left;">+3.2%</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Copper</strong></td>
+<td style="text-align: left;">$4.45/lb</td>
+<td style="text-align: left;">-1.5%</td>
+</tr>
+</tbody>
+</table>
+<h2>&lt; SYNTHESIS &gt;</h2>
 <p>Liquidity is plentiful, but breadth is narrowing. The market is becoming a "Stock Picker's Paradise" where dispersion between winners (high quality, cash flow) and losers (unprofitable tech) is extreme. Avoid "Story Stocks" with no near-term earnings.</p>
-<p>> "Volatility is the price of admission. Liquidity is the exit door."</p>
-<strong>END_TRANSMISSION</strong>
-
+<blockquote>
+<p>"Volatility is the price of admission. Liquidity is the exit door."</p>
+</blockquote>
+<p><strong>END_TRANSMISSION</strong></p>
             </div>
 
             <div class="provenance-log">
@@ -252,7 +288,7 @@
   "date": "2025-06-02",
   "summary": "Market analysis and strategic insights.",
   "type": "NEWSLETTER",
-  "full_body": "<strong>Status:</strong> ONLINE\n<strong>Clearance:</strong> PUBLIC\n<strong>Tone:</strong> CYBER-MINIMALIST\n<p>---</p>\n<h2>< SYSTEM_OVERVIEW ></h2>\n<p>The \"Summer Doldrums\" have arrived early. Trading volumes are thinning as the S&P 500 consolidates near highs (5,500). The narrative has shifted from \"Inflation Fear\" to \"Growth Scare\" following softer-than-expected ISM Manufacturing data (48.2).</p>\n<h2>< NODES_IN_FOCUS ></h2>\n<ul>\n<li>  <strong>SECTOR: ENERGY (XLE)</strong></li>\n<li>  <strong>Signal:</strong> -2.1% WTD.</li>\n<li>  <strong>Thesis:</strong> Demand destruction fears in China are capping crude prices despite OPEC+ cuts. Tactical short opportunity.</li>\n<li>  <strong>Conviction:</strong> MEDIUM.</li>\n</ul>\n<ul>\n<li>  <strong>TECH: SOFTWARE (IGV)</strong></li>\n<li>  <strong>Signal:</strong> +3.5% WTD.</li>\n<li>  <strong>Thesis:</strong> \"Platform Consolidation\" is the theme. CIOs are cutting vendors but spending more with winners (CRWD, PANW, NOW).</li>\n<li>  <strong>Conviction:</strong> HIGH.</li>\n</ul>\n<ul>\n<li>  <strong>MACRO: EUROZONE (EUR/USD)</strong></li>\n<li>  <strong>Signal:</strong> 1.0850.</li>\n<li>  <strong>Thesis:</strong> ECB cuts rates ahead of the Fed (Divergence Trade). Short EUR against USD remains a carry-positive play.</li>\n<li>  <strong>Conviction:</strong> MEDIUM.</li>\n</ul>\n<h2>< DATA_STREAM ></h2>\n<p>| METRIC | VALUE | DELTA (MoM) |\n| :--- | :--- | :--- |\n| <strong>US Unemployment</strong> | 4.1% | +0.2% |\n| <strong>VIX Index</strong> | 12.8 | -0.5 |\n| <strong>Bitcoin</strong> | $94,500 | +3.2% |\n| <strong>Copper</strong> | $4.45/lb | -1.5% |</p>\n<h2>< SYNTHESIS ></h2>\n<p>Liquidity is plentiful, but breadth is narrowing. The market is becoming a \"Stock Picker's Paradise\" where dispersion between winners (high quality, cash flow) and losers (unprofitable tech) is extreme. Avoid \"Story Stocks\" with no near-term earnings.</p>\n<p>> \"Volatility is the price of admission. Liquidity is the exit door.\"</p>\n<strong>END_TRANSMISSION</strong>\n",
+  "full_body": "<p><strong>Status:</strong> ONLINE<br />\n<strong>Clearance:</strong> PUBLIC<br />\n<strong>Tone:</strong> CYBER-MINIMALIST</p>\n<hr />\n<h2>&lt; SYSTEM_OVERVIEW &gt;</h2>\n<p>The \"Summer Doldrums\" have arrived early. Trading volumes are thinning as the S&amp;P 500 consolidates near highs (5,500). The narrative has shifted from \"Inflation Fear\" to \"Growth Scare\" following softer-than-expected ISM Manufacturing data (48.2).</p>\n<h2>&lt; NODES_IN_FOCUS &gt;</h2>\n<ul>\n<li>\n<p><strong>SECTOR: ENERGY (XLE)</strong></p>\n<ul>\n<li><strong>Signal:</strong> -2.1% WTD.</li>\n<li><strong>Thesis:</strong> Demand destruction fears in China are capping crude prices despite OPEC+ cuts. Tactical short opportunity.</li>\n<li><strong>Conviction:</strong> MEDIUM.</li>\n</ul>\n</li>\n<li>\n<p><strong>TECH: SOFTWARE (IGV)</strong></p>\n<ul>\n<li><strong>Signal:</strong> +3.5% WTD.</li>\n<li><strong>Thesis:</strong> \"Platform Consolidation\" is the theme. CIOs are cutting vendors but spending more with winners (CRWD, PANW, NOW).</li>\n<li><strong>Conviction:</strong> HIGH.</li>\n</ul>\n</li>\n<li>\n<p><strong>MACRO: EUROZONE (EUR/USD)</strong></p>\n<ul>\n<li><strong>Signal:</strong> 1.0850.</li>\n<li><strong>Thesis:</strong> ECB cuts rates ahead of the Fed (Divergence Trade). Short EUR against USD remains a carry-positive play.</li>\n<li><strong>Conviction:</strong> MEDIUM.</li>\n</ul>\n</li>\n</ul>\n<h2>&lt; DATA_STREAM &gt;</h2>\n<table>\n<thead>\n<tr>\n<th style=\"text-align: left;\">METRIC</th>\n<th style=\"text-align: left;\">VALUE</th>\n<th style=\"text-align: left;\">DELTA (MoM)</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td style=\"text-align: left;\"><strong>US Unemployment</strong></td>\n<td style=\"text-align: left;\">4.1%</td>\n<td style=\"text-align: left;\">+0.2%</td>\n</tr>\n<tr>\n<td style=\"text-align: left;\"><strong>VIX Index</strong></td>\n<td style=\"text-align: left;\">12.8</td>\n<td style=\"text-align: left;\">-0.5</td>\n</tr>\n<tr>\n<td style=\"text-align: left;\"><strong>Bitcoin</strong></td>\n<td style=\"text-align: left;\">$94,500</td>\n<td style=\"text-align: left;\">+3.2%</td>\n</tr>\n<tr>\n<td style=\"text-align: left;\"><strong>Copper</strong></td>\n<td style=\"text-align: left;\">$4.45/lb</td>\n<td style=\"text-align: left;\">-1.5%</td>\n</tr>\n</tbody>\n</table>\n<h2>&lt; SYNTHESIS &gt;</h2>\n<p>Liquidity is plentiful, but breadth is narrowing. The market is becoming a \"Stock Picker's Paradise\" where dispersion between winners (high quality, cash flow) and losers (unprofitable tech) is extreme. Avoid \"Story Stocks\" with no near-term earnings.</p>\n<blockquote>\n<p>\"Volatility is the price of admission. Liquidity is the exit door.\"</p>\n</blockquote>\n<p><strong>END_TRANSMISSION</strong></p>",
   "sentiment_score": 50,
   "entities": {
     "tickers": [],
