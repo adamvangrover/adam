@@ -1,9 +1,18 @@
 import sys
 import os
+import re
 
 def generate_html_from_markdown(md_filepath, html_filepath):
+    if not os.path.exists(md_filepath):
+        print(f"Error: Could not find {md_filepath}")
+        sys.exit(1)
+
     with open(md_filepath, 'r', encoding='utf-8') as f:
         md_content = f.read()
+
+    # Pre-process the markdown to insert --- as a slide separator
+    # This prevents the slide titles from being eaten by reveal.js's data-separator regex
+    processed_md = re.sub(r'^(Slide [0-9]+:.*)$', r'---\n\1', md_content, flags=re.MULTILINE)
 
     html_content = f"""<!doctype html>
 <html lang="en">
@@ -19,10 +28,10 @@ def generate_html_from_markdown(md_filepath, html_filepath):
     <div class="reveal">
       <div class="slides">
         <section data-markdown
-                 data-separator="^Slide [0-9]+:.*"
+                 data-separator="^---$"
                  data-separator-notes="^Speaker Notes \\(CRO\\):">
           <textarea data-template>
-{md_content}
+{processed_md}
           </textarea>
         </section>
       </div>
