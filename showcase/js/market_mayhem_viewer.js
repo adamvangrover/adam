@@ -143,6 +143,36 @@ function generateMockData() {
 // 3. INTERACTIVE FEATURES
 // ==========================================
 
+let currentFontSize = 1;
+const fontFamilies = [
+    "'Helvetica Neue', Helvetica, Arial, sans-serif",
+    "'Georgia', serif",
+    "'Consolas', 'Courier New', monospace"
+];
+let currentFontIndex = 0;
+
+function changeFontSize(direction) {
+    currentFontSize += direction * 0.1;
+    if (currentFontSize < 0.8) currentFontSize = 0.8;
+    if (currentFontSize > 1.5) currentFontSize = 1.5;
+
+    const docBody = document.getElementById('document-body');
+    if (docBody) {
+        docBody.style.fontSize = currentFontSize + 'em';
+        showToast(`FONT SIZE: ${Math.round(currentFontSize * 100)}%`);
+    }
+}
+
+function toggleFontFamily() {
+    currentFontIndex = (currentFontIndex + 1) % fontFamilies.length;
+    const docBody = document.getElementById('document-body');
+    if (docBody) {
+        docBody.style.fontFamily = fontFamilies[currentFontIndex];
+        const fontName = fontFamilies[currentFontIndex].split(',')[0].replace(/['"]/g, '');
+        showToast(`FONT FAMILY: ${fontName}`);
+    }
+}
+
 /**
  * Toggles visual theme. Merges 'tier' concept with 'dark-mode'.
  */

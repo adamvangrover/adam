@@ -4,6 +4,7 @@ import glob
 import json
 import yaml
 import hashlib
+import markdown
 from datetime import datetime
 from collections import Counter
 from bs4 import BeautifulSoup
@@ -191,51 +192,9 @@ def determine_tier(type_, quality):
 # --- Formatting Helpers ---
 
 def simple_md_to_html(text):
-    """Converts basic Markdown to HTML using Regex."""
+    """Converts basic Markdown to HTML using the python-markdown library."""
     if not text: return ""
-
-    # Headers
-    text = re.sub(r'^# (.*?)$', r'<h1 class="title">\1</h1>', text, flags=re.MULTILINE)
-    text = re.sub(r'^## (.*?)$', r'<h2>\1</h2>', text, flags=re.MULTILINE)
-    text = re.sub(r'^### (.*?)$', r'<h3>\1</h3>', text, flags=re.MULTILINE)
-
-    # Bold/Italic
-    text = re.sub(r'\*\*(.*?)\*\*', r'<strong>\1</strong>', text)
-    text = re.sub(r'\*(.*?)\*', r'<em>\1</em>', text)
-
-    # Lists
-    lines = text.split('\n')
-    new_lines = []
-    in_list = False
-
-    for line in lines:
-        if line.strip().startswith('* ') or line.strip().startswith('- '):
-            if not in_list:
-                new_lines.append('<ul>')
-                in_list = True
-            content = line.strip()[2:]
-            new_lines.append(f'<li>{content}</li>')
-        else:
-            if in_list:
-                new_lines.append('</ul>')
-                in_list = False
-            new_lines.append(line)
-
-    if in_list: new_lines.append('</ul>')
-    text = '\n'.join(new_lines)
-
-    # Paragraphs (double newline) - skip if line starts with < (html tag)
-    paragraphs = text.split('\n\n')
-    final_html = ""
-    for p in paragraphs:
-        p = p.strip()
-        if not p: continue
-        if p.startswith('<'):
-            final_html += p + "\n"
-        else:
-            final_html += f"<p>{p}</p>\n"
-
-    return final_html
+    return markdown.markdown(text, extensions=['tables', 'fenced_code', 'sane_lists', 'nl2br'])
 
 def parse_date(date_str):
     """Attempts to parse various date formats into YYYY-MM-DD."""
