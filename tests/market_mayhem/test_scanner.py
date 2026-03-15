@@ -31,27 +31,27 @@ sys.modules['pyrate_limiter'] = mock_limiter_module
 from src.market_mayhem.scanners import WhaleScanner, WhaleSignal
 
 # Mock Data for 13F Information Table
-# Represents Quarter 0 (Current)
-MOCK_INFOTABLE_Q0 = pd.DataFrame({
-    'issuer': ['CONVERTIBLE CO', 'DISTRESSED INC'],
-    'cusip': ['123456789', '987654321'],
-    'ticker': ['CNVT', 'DSTR'],
-    'value': [5000, 1000],
-    'shares': [1000, 1000],
-    'share_type': ['PRN', 'SH'],
-    'discretion': ['SOLE', 'SOLE']
-})
+def get_mock_infotable_q0():
+    return pd.DataFrame({
+        'issuer': ['CONVERTIBLE CO', 'DISTRESSED INC'],
+        'cusip': ['123456789', '987654321'],
+        'ticker': ['CNVT', 'DSTR'],
+        'value': [5000, 1000],
+        'shares': [1000, 1000],
+        'share_type': ['PRN', 'SH'],
+        'discretion': ['SOLE', 'SOLE']
+    })
 
-# Represents Quarter 1 (Previous)
-MOCK_INFOTABLE_Q1 = pd.DataFrame({
-    'issuer': ['DISTRESSED INC'],
-    'cusip': ['987654321'],
-    'ticker': ['DSTR'],
-    'value': [800],
-    'shares': [800],
-    'share_type': ['SH'],
-    'discretion': ['SOLE']
-})
+def get_mock_infotable_q1():
+    return pd.DataFrame({
+        'issuer': ['DISTRESSED INC'],
+        'cusip': ['987654321'],
+        'ticker': ['DSTR'],
+        'value': [800],
+        'shares': [800],
+        'share_type': ['SH'],
+        'discretion': ['SOLE']
+    })
 
 @pytest.fixture
 def mock_scanner():
@@ -72,7 +72,7 @@ def test_vulture_entry_signal(mock_parse, mock_fetch, mock_scanner):
 
     # Mock parse to return our DataFrames
     # First call returns Q0, second call returns Q1
-    mock_parse.side_effect = [MOCK_INFOTABLE_Q0, MOCK_INFOTABLE_Q1]
+    mock_parse.side_effect = [get_mock_infotable_q0(), get_mock_infotable_q1()]
 
     # Execute
     signals = mock_scanner.calculate_fund_sentiment("OAKTREE")
@@ -95,7 +95,7 @@ def test_accumulation_signal(mock_parse, mock_fetch, mock_scanner):
     """
     # Setup Mocks
     mock_fetch.return_value = [MagicMock(), MagicMock()]
-    mock_parse.side_effect = [MOCK_INFOTABLE_Q0, MOCK_INFOTABLE_Q1]
+    mock_parse.side_effect = [get_mock_infotable_q0(), get_mock_infotable_q1()]
 
     # Execute
     signals = mock_scanner.calculate_fund_sentiment("OAKTREE")
