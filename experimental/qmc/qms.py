@@ -2,8 +2,15 @@ import json
 import math
 import random
 import os
+import sys
 from datetime import datetime
 from collections import defaultdict
+import asyncio
+
+# Setup paths for LangGraph Engine imports
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from core.engine.system2_state import System2State
+from core.engine.system2_graph import system2_app
 
 # ---------------------------------------------------------------------------
 # THE QUANTUM-NEURAL MARKET SIMULATOR (ADAM v26.1 RESEARCH BUILD)
@@ -165,6 +172,24 @@ def run_simulation():
     # is extremely high (> 15% per tick), we have low consistency (a fragmented market).
     consistency_state = "HIGH (Correlated Growth)" if avg_dispersion < 0.15 else "LOW (Fragmented/Dislocated Market)"
     
+    print("\n--- INJECTING DATA INTO SYSTEM 2 NEURO-SYMBOLIC GRAPH FOR VALIDATION ---")
+    
+    # For demonstration of the System 2 Upgrade, we will invoke the LangGraph for the lead company (NVDA)
+    initial_state: System2State = {
+        "company_ticker": "NVDA",
+        "historical_data": {"note": "Simulated MC Cones", "base_wacc": engine.companies[0].wacc},
+        "iteration_count": 0,
+        "max_iterations": 3,
+        "generated_dcf": None,
+        "validation_feedback": [],
+        "is_valid": False,
+        "final_report": ""
+    }
+    
+    # Run the graph synchronously in this script envelope
+    final_state = asyncio.run(system2_app.ainvoke(initial_state))
+    print(f"Graph Validation Complete. Valid: {final_state['is_valid']}. Iterations required: {final_state['iteration_count']}")
+    
     output_data = {
         "metadata": {
             "timestamp": datetime.now().isoformat(),
@@ -172,10 +197,13 @@ def run_simulation():
             "simulation_paths": SIM_COUNT,
             "horizon_months": 24,
             "macro_micro_consistency": consistency_state,
-            "avg_dispersion_index": avg_dispersion
+            "avg_dispersion_index": avg_dispersion,
+            "system2_validation": final_state['is_valid'],
+            "system2_feedback_trace": final_state['validation_feedback']
         },
         "macro_index_projections": macro_cones,
-        "micro_company_projections": micro_cones
+        "micro_company_projections": micro_cones,
+        "system2_validated_dcf": final_state.get('generated_dcf', {})
     }
     
     # Ensure data dir exists
