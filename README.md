@@ -1,8 +1,43 @@
-# Adam v26.0: The Institutional-Grade Neuro-Symbolic Financial Sovereign
+<div align="center">
+  <a href="https://adamvangrover.github.io/adam/">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset=".github/images/logo-dark.svg">
+      <source media="(prefers-color-scheme: light)" srcset=".github/images/logo-light.svg">
+      <img alt="Adam OS Logo" src=".github/images/logo-dark.svg" width="50%">
+    </picture>
+  </a>
+</div>
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/) [![Docker Image](https://img.shields.io/badge/docker-ready-blue)](https://hub.docker.com/) [![FinanceBench](https://img.shields.io/badge/FinanceBench-99%25-green)](https://arxiv.org/abs/2311.11944)
+<div align="center">
+  <h3>The Institutional-Grade Neuro-Symbolic Financial Sovereign.</h3>
+</div>
+
+<div align="center">
+  <a href="https://opensource.org/licenses/MIT" target="_blank"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License"></a>
+  <a href="https://www.python.org/downloads/" target="_blank"><img src="https://img.shields.io/badge/python-3.10+-blue.svg" alt="Python 3.10+"></a>
+  <a href="https://hub.docker.com/" target="_blank"><img src="https://img.shields.io/badge/docker-ready-blue" alt="Docker Ready"></a>
+  <a href="https://arxiv.org/abs/2311.11944" target="_blank"><img src="https://img.shields.io/badge/FinanceBench-99%25-green" alt="FinanceBench"></a>
+</div>
+
+<br>
+
+Adam v26.0 is an opinionated, ready-to-run financial agent out of the box. Instead of wiring up prompts, tools, and context management yourself, you get a working institutional-grade sovereign immediately and customize what you need.
+
+**What's included:**
+
+- **Distressed Debt & Credit** — `Credit Sentinel` for python-based 3-statement modeling, DCF valuation, SNC Rating, and Covenant Analysis
+- **Quantitative Engineering** — `Risk Modeling` and `Factor Analysis` for deterministic calculation of VaR, Sharpe, and Sortino ratios
+- **Agentic Workflow** — `Meta-Orchestrator` for dynamic routing, `Consensus Engine` for conviction scoring, and `Governance Layer` for API Gatekeeping
+- **Logic as Data** — Uses `jsonLogic` for decoupled risk thresholds, trading triggers, and compliance rules
+- **System Architecture** — Fuses a high-velocity Neural Swarm (System 1) with a deliberate Neuro-Symbolic Graph (System 2)
+- **Rust Execution Layer** — Algorithmic trading engine, matching engine, and pricing engine powered by Rust for deterministic execution
+
+> [!NOTE]
+> Looking for the web interface? Check out the [Neural Dashboard](showcase/index.html).
 
 > **Adam v26.0 upgrades financial AI from a conversational chatbot to a fiduciary architect, explicitly engineered for Leveraged Finance, Distressed Debt, and Deep Credit Risk Underwriting. By fusing the intuitive speed of a Neural Swarm (System 1) with the deliberate logic of a Neuro-Symbolic Graph (System 2), Adam delivers calculated conviction for high-stakes capital allocation.**
+
+
 
 ---
 
