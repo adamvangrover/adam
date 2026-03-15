@@ -38,3 +38,39 @@ Create files for agents that exist in the catalog or concept but are missing or 
 ## Phase 5: Verification (Completed)
 - [x] Run basic import tests to ensure no syntax errors.
 - [x] Run `tests/verify_agents_refactor.py` or create a simple verification script.
+
+# ROADMAP: ENTERPRISE FINANCIAL OPERATING SYSTEM UPGRADE
+
+This master roadmap supersedes the previous agent expansion plan. It focuses on the Top 5 priority upgrades required to transition the ADAM repository into a fully autonomous, enterprise-grade system.
+
+## Priority 1: The System 2 Upgrade (LangGraph State Machine)
+Current predictive scripts run linearly. We must wrap reasoning agents in a cyclic state machine to introduce "Reflexion Loops" (self-correction).
+- [ ] Initialize `core/engine/state_machine.py` (LangGraph implementation).
+- [ ] Refactor `quantum_market_simulator.py` to function as an invocable graph node.
+- [ ] Create a `FinancialValidationReflector` node to validate DCF accounting constraints and force recalculation loops if violated.
+
+## Priority 2: Active Memory Engine (Vector + Live Graph Database)
+Transition away from reliant, static flat JSON files (`knowledge_graph.json`).
+- [ ] Implement `core/system/vector_memory.py` (e.g., ChromaDB integration) for semantic RAG of text nodes and historical intelligence.
+- [ ] Implement `core/system/graph_memory.py` (e.g., Neo4j/NetworkX) for executing dynamic relationship queries (e.g., Supply Chain linkages).
+- [ ] Upgrade the `Orchestrator` to natively query these dynamic databases to build context prior to agent invocation.
+
+## Priority 3: System 1 Reality (Asynchronous WebSocket Ecosystem)
+Implement the "Neural Swarm" of high-speed micro-workers dropping "Pheromones" on anomalies to automatically trigger the heavy System 2 LangGraphs.
+- [ ] Deploy `core/system1/event_loop.py` using `asyncio` and a Pub/Sub mock architecture (e.g., Redis).
+- [ ] Build `core/system1/pheromone_engine.py` to aggregate event signals.
+- [ ] Create `core/system1/workers/market_stream_worker.py` to simulate WebSocket anomaly detection.
+
+## Priority 4: The Consensus Arbitrator (Conflict Resolution)
+Multiple agents will predictably disagree (e.g., Macro Bearish vs. Algo Bullish). The system must algorithmically judge these conflicts.
+- [ ] Build `core/engine/consensus_engine.py`.
+- [ ] Implement logic to evaluate conflicting `AgentOutput.confidence` scores.
+- [ ] Implement Human-In-The-Loop (HITL) escalation for high-conviction, diametrically opposed outputs.
+
+## Priority 5: Eradicating Technical Debt (Agent Standardization)
+Enforce the "Product" bifurcation rule. All core agents must inherit from `AgentBase` and use Pydantic validation to fail safely.
+- [ ] `core/agents/red_team_agent.py`
+- [ ] `core/agents/reflector_agent.py`
+- [ ] `core/agents/meta_cognitive_agent.py`
+- [ ] `core/agents/behavioral_economics_agent.py`
+- [ ] `core/agents/meta_agents/crisis_simulation_agent.py`
