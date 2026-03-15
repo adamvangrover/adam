@@ -3,7 +3,8 @@ from semantic_kernel import Kernel
 from unittest.mock import patch
 import json
 from core.agents.agent_base import AgentBase
-from typing import Dict, Any, Optional, Tuple
+from core.schemas.agent_schema import AgentInput, AgentOutput
+from typing import Dict, Any, Optional, Tuple, Union
 from enum import Enum
 import asyncio
 import os  # For os.path.exists and os.remove
@@ -75,12 +76,31 @@ class SNCAnalystAgent(AgentBase):
         except Exception as e:
             logging.error(f"Failed to generate defense file: {e}")
 
-    async def execute(self, **kwargs) -> Optional[Tuple[Optional[SNCRating], str]]:
+    async def execute(self, input_data: Union[str, AgentInput, Dict[str, Any]] = None, **kwargs) -> Union[Optional[Tuple[Optional[SNCRating], str]], AgentOutput]:
+        """
+        Executes the SNC analysis.
+        Supports both legacy kwargs input and new AgentInput schema.
+        """
         # Reset audit log for new execution to prevent state pollution
         self.audit_log = []
 
+        # --- INPUT NORMALIZATION FOR PYDANTIC STANDARDIZATION ---
+        is_standard_mode = False
         company_id = kwargs.get('company_id')
-        logging.info(f"Executing SNC analysis for company_id: {company_id}")
+
+        if input_data is not None:
+            if isinstance(input_data, AgentInput):
+                is_standard_mode = True
+                company_id = input_data.query.strip()
+                if input_data.context:
+                    company_id = input_data.context.get("company_id", company_id)
+            elif isinstance(input_data, str):
+                company_id = input_data.strip()
+            elif isinstance(input_data, dict):
+                company_id = input_data.get("company_id", company_id)
+                kwargs.update(input_data)
+
+        logging.info(f"Executing SNC analysis for company_id: {company_id}. Mode: {'Standard' if is_standard_mode else 'Legacy'}")
         logging.debug(f"SNC_ANALYSIS_EXECUTE_INPUT: company_id='{company_id}', all_kwargs={kwargs}")
 
         self._log_audit_event("SNC_ANALYSIS_START", {"company_id": company_id})
@@ -89,6 +109,13 @@ class SNCAnalystAgent(AgentBase):
             error_msg = "Company ID not provided for SNC analysis."
             logging.error(error_msg)
             self._log_audit_event("ERROR", {"message": error_msg})
+            
+            if is_standard_mode:
+                return AgentOutput(
+                    answer=error_msg,
+                    confidence=0.0,
+                    metadata={"error": error_msg}
+                )
             return None, error_msg
 
         if 'DataRetrievalAgent' not in self.peer_agents:
@@ -150,6 +177,18 @@ class SNCAnalystAgent(AgentBase):
 
         logging.debug(
             f"SNC_ANALYSIS_EXECUTE_OUTPUT: Rating='{rating.value if rating else 'N/A'}', Rationale='{rationale}'")
+            
+        if is_standard_mode:
+            return AgentOutput(
+                answer=rationale,
+                sources=[],
+                confidence=0.85 if rating else 0.0,
+                metadata={
+                    "rating": rating.value if rating else None,
+                    "company_id": company_id
+                }
+            )
+            
         return rating, rationale
 
     def _prepare_financial_inputs_for_sk(self, financial_data_detailed: Dict[str, Any]) -> Dict[str, str]:
