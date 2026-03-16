@@ -37,24 +37,24 @@ class QuantumCompany:
         self.volatility = volatility
         # Represented as a complex amplitude defining probability of "hyper-growth" vs "stagnation"
         self.state_amplitude = state_amplitude
-        
+
     def simulate_month(self, macro_shock):
         """Simulates FCF growth over 1 month, heavily influenced by its quantum state and macro shocks."""
         # Calculate real probability from complex amplitude (P = |A|^2)
         prob_hyper_growth = abs(self.state_amplitude)**2
-        
+
         # Determine growth regime randomly weighted by quantum probability
         if random.random() < prob_hyper_growth:
             growth = random.uniform(0.01, self.volatility) # High growth
         else:
             growth = random.uniform(-self.volatility/2, 0.01) # Stagnation / Contraction
-            
+
         # Apply systemic macro shock (representing supply chain disruptions, energy spikes)
         actual_growth = growth + macro_shock
-        
+
         # Update FCF
         self.fcf = self.fcf * (1 + actual_growth)
-        
+
         # Calculate trailing generic EV based on updated FCF
         # Continuous terminal value approximation: EV = FCF / (WACC - TG)
         ev = self.fcf / (self.wacc - self.tg)
@@ -72,67 +72,67 @@ class NeuralMarketEngine:
             QuantumCompany("JPM",  initial_fcf=50e9, wacc=0.10, terminal_growth=0.02, volatility=0.03, state_amplitude=complex(0.6, 0.4)), # 52% hyper-growth prob
             QuantumCompany("PLTR", initial_fcf=1.5e9, wacc=0.14, terminal_growth=0.05, volatility=0.15, state_amplitude=complex(0.7, 0.5)) # 74% hyper-growth prob
         ]
-        
+
     def generate_cones(self, months=24, simulations=500000):
         print(f"Executing {simulations:,} Monte Carlo simulated paths...")
         # To save memory, only track the specific milestone months
         target_months = [6, 12, 18, 24]
-        
+
         macro_milestone_data = {m: [] for m in target_months}
         micro_milestone_data = {c.ticker: {m: [] for m in target_months} for c in self.companies}
-        
+
         # Pre-assign base company templates
         base_companies = self.companies
-        
+
         # For consistency check, track the average dispersion between best and worst performer per run
         consistency_scores = []
-        
+
         for sim in range(simulations):
             if sim % 100000 == 0 and sim > 0:
                 print(f"   ... completed {sim:,} paths")
-                
+
             current_index = self.index_value
             sim_companies = [
-                QuantumCompany(c.ticker, c.fcf, c.wacc, c.tg, c.volatility, c.state_amplitude) 
+                QuantumCompany(c.ticker, c.fcf, c.wacc, c.tg, c.volatility, c.state_amplitude)
                 for c in base_companies
             ]
-            
+
             for m in range(1, months + 1):
                 # Sample systemic macro shock
                 u = random.uniform(0.01, 0.99)
-                macro_shock = math.copysign((abs(u - 0.5)**1.5) * 0.1, u - 0.5) 
-                
+                macro_shock = math.copysign((abs(u - 0.5)**1.5) * 0.1, u - 0.5)
+
                 total_ev_change = 0
                 max_ev_change = -100
                 min_ev_change = 100
-                
+
                 for comp in sim_companies:
                     old_ev = comp.fcf / (comp.wacc - comp.tg)
                     _, new_ev = comp.simulate_month(macro_shock)
                     ev_pct_change = (new_ev - old_ev) / old_ev if old_ev > 0 else 0
-                    
+
                     if ev_pct_change > max_ev_change: max_ev_change = ev_pct_change
                     if ev_pct_change < min_ev_change: min_ev_change = ev_pct_change
-                        
+
                     total_ev_change += ev_pct_change
-                
+
                 # Update aggregate index
                 avg_micro_change = total_ev_change / len(sim_companies)
                 current_index = current_index * (1 + avg_micro_change)
-                
+
                 if m == 24: # Check final month spread to gauge consistency
                     consistency_scores.append(max_ev_change - min_ev_change)
-                
+
                 if m in target_months:
                     macro_milestone_data[m].append(current_index)
                     for comp in sim_companies:
                         micro_milestone_data[comp.ticker][m].append(comp.fcf / (comp.wacc - comp.tg))
 
         return self._calculate_percentiles_optimized(macro_milestone_data, micro_milestone_data, target_months), consistency_scores
-        
+
     def _calculate_percentiles_optimized(self, macro_data, micro_data, target_months):
         results = {"macro": {}, "micro": {}}
-        
+
         # Macro
         for m in target_months:
             values = sorted(macro_data[m])
@@ -141,7 +141,7 @@ class NeuralMarketEngine:
                 "base_p50": values[int(len(values) * 0.50)],
                 "bull_p90": values[int(len(values) * 0.90)],
             }
-            
+
         # Micro
         for ticker, m_data in micro_data.items():
             results["micro"][ticker] = {}
@@ -152,13 +152,13 @@ class NeuralMarketEngine:
                     "base_p50": values[int(len(values) * 0.50)],
                     "bull_p90": values[int(len(values) * 0.90)],
                 }
-                
+
         return results
 
 def run_simulation():
     print("INITIALIZING QUANTUM-NEURAL MARKET SIMULATOR...")
     engine = NeuralMarketEngine(start_index_value=6000)
-    
+
     SIM_COUNT = 500000
     print(f"RUNNING {SIM_COUNT:,} QUANTUM MONTE CARLO PATHS (24 MONTHS)....")
     results, consistency_scores = engine.generate_cones(months=24, simulations=SIM_COUNT)
@@ -210,9 +210,9 @@ def run_simulation():
     os.makedirs(os.path.dirname(OUTPUT_FILE), exist_ok=True)
     with open(OUTPUT_FILE, 'w') as f:
         json.dump(output_data, f, indent=4)
-        
+
     print(f"Simulation data saved to: {OUTPUT_FILE}")
-    
+
     # Generate Markdown Report
     report = f"""# ADAM v26.1: QUANTUM-NEURAL MARKET FORECAST (24-MONTH HORIZON)
 **Run Date:** {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
@@ -254,13 +254,12 @@ This forecast utilizes a proprietary quantum-state simulation architecture. Rath
 ---
 *OUTPUT GENERATED BY ADAM EXPERIMENTAL LAB (VELOCITY DIRECTIVE)*
 """
-    
+
     os.makedirs(os.path.dirname(REPORT_FILE), exist_ok=True)
     with open(REPORT_FILE, 'w') as f:
         f.write(report)
-        
+
     print(f"Markdown report saved to: {REPORT_FILE}")
 
 if __name__ == "__main__":
     run_simulation()
-    
