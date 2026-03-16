@@ -3,7 +3,21 @@ from typing import Any, Dict, List, Optional
 import logging
 import json
 import asyncio
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+import uuid
+import warnings
+from datetime import datetime
+
+class AgentInput(BaseModel):
+    query: str = Field(..., description="The specific question or objective.")
+    context: Dict[str, Any] = Field(default_factory=dict, description="Shared graph state (RAG data, previous results).")
+    tools: List[str] = Field(default_factory=list, description="List of allowed tool names.")
+
+class AgentOutput(BaseModel):
+    answer: str = Field(..., description="The final synthesized answer.")
+    sources: List[str] = Field(default_factory=list, description="List of citations (filenames, URLs).")
+    confidence: float = Field(..., ge=0.0, le=1.0, description="Conviction score (0.0 to 1.0).")
+    metadata: Dict[str, Any] = Field(default_factory=dict, description="Debug info, token usage, etc.")
 import uuid
 import warnings
 from datetime import datetime
