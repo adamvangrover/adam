@@ -1,7 +1,10 @@
-from typing import Dict, Any, Optional, Tuple
-from core.agents.agent_base import AgentBase
 import logging
+from typing import Any, Dict, Optional
+
 from semantic_kernel import Kernel
+
+from core.agents.agent_base import AgentBase
+
 
 class SovereignAIAnalystAgent(AgentBase):
     """

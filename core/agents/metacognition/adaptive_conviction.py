@@ -1,7 +1,7 @@
 # core/agents/metacognition/adaptive_conviction.py
-from typing import Optional, Dict, List, Any, Tuple
-import logging
 import math
+from typing import Any, Dict, List, Optional, Tuple
+
 
 class ConvictionRouter:
     """

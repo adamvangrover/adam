@@ -3,19 +3,19 @@
 CLI entry point for the RepoGuardian Agent.
 Allows running the agent against a local git repo or a simulated PR.
 """
-import asyncio
 import argparse
-import sys
+import asyncio
 import json
 import logging
-from typing import Dict, Any
 
 # Ensure we can import core
 import os
+import sys
+
 sys.path.append(os.getcwd())
 
 from core.agents.governance.repo_guardian.agent import RepoGuardianAgent
-from core.agents.governance.repo_guardian.schemas import PullRequest, FileDiff
+from core.agents.governance.repo_guardian.schemas import FileDiff, PullRequest
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')

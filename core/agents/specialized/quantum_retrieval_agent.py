@@ -1,10 +1,12 @@
+import logging
+
+import numpy as np
+
 from core.agents.agent_base import AgentBase
+from core.agents.mixins.audit_mixin import AuditMixin
 from core.quantum.adam_optimizer import AdamOptimizer
 from core.quantum.schrodinger_solver import SchrodingerSolver
-from core.agents.mixins.audit_mixin import AuditMixin
-from core.simulations.comprehensive_credit_simulation import ComprehensiveCreditSimulation, LoanTranche, CollateralAsset
-import numpy as np
-import logging
+from core.simulations.comprehensive_credit_simulation import ComprehensiveCreditSimulation
 
 logger = logging.getLogger(__name__)
 

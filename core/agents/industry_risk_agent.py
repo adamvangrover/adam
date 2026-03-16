@@ -1,6 +1,8 @@
 from __future__ import annotations
-from typing import Any, Dict, Optional, Union
+
 import logging
+from typing import Any, Dict, Optional, Union
+
 from core.agents.agent_base import AgentBase
 
 logger = logging.getLogger(__name__)

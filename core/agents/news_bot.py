@@ -1,13 +1,11 @@
-import sys
-import os
-import json
-import time
-import random
-import asyncio
 import argparse
-from typing import Dict, Any, Optional, List, Union, Set
-from collections import defaultdict
+import asyncio
+import json
+import os
+import sys
+import time
 from datetime import datetime, timezone
+from typing import Any, Dict, List, Optional, Set
 
 # --- Dependency Management ---
 
@@ -34,9 +32,10 @@ except ImportError:
 
 # 4. NLP & Machine Learning (Optional)
 import nltk
+
 try:
     import torch
-    from transformers import AutoTokenizer, AutoModelForSequenceClassification, AutoModelForSeq2SeqLM
+    from transformers import AutoModelForSeq2SeqLM, AutoModelForSequenceClassification, AutoTokenizer
     TORCH_AVAILABLE = True
 except ImportError:
     print("NOTICE: PyTorch/Transformers not found. AI Sentiment/Summarization disabled (using fallbacks).")
@@ -46,6 +45,7 @@ except ImportError:
 # 5. Core Framework (Optional - for integration context)
 try:
     from semantic_kernel import Kernel
+
     from core.agents.agent_base import AgentBase
 except ImportError:
     # Stub for standalone mode

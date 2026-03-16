@@ -1,10 +1,11 @@
 # core/agents/metacognition/state_anchor.py
-import uuid
-import json
-import time
 import hashlib
-from typing import Dict, Any, Optional
+import json
 import logging
+import time
+import uuid
+from typing import Any, Dict
+
 
 class StateAnchorMixin:
     """

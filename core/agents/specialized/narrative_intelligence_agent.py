@@ -1,8 +1,10 @@
-from typing import Any, Dict, List, Tuple
 import logging
-from collections import Counter
 import re
+from collections import Counter
+from typing import Any, Dict, List
+
 from core.agents.market_sentiment_agent import MarketSentimentAgent
+
 
 class NarrativeIntelligenceAgent(MarketSentimentAgent):
     """

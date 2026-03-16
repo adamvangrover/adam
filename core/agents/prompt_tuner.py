@@ -8,11 +8,11 @@ except ImportError:
     except ImportError:
         PromptTemplate = None
 
-from typing import List, Dict, Any, Optional
-import re
-import logging
 import asyncio
-import json
+import logging
+import re
+from typing import Any, Dict, List, Optional
+
 from core.agents.agent_base import AgentBase
 
 try:

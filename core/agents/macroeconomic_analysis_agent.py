@@ -1,8 +1,10 @@
 # core/agents/macroeconomic_analysis_agent.py
 
 from __future__ import annotations
-from typing import Any, Dict, List, Optional
+
 import logging
+from typing import Any, Dict
+
 from core.agents.agent_base import AgentBase
 
 

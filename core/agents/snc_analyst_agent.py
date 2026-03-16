@@ -1,18 +1,19 @@
 # core/agents/snc_analyst_agent.py
-from semantic_kernel import Kernel
-from unittest.mock import patch
-import json
-from core.agents.agent_base import AgentBase
-from core.schemas.agent_schema import AgentInput, AgentOutput
-from typing import Dict, Any, Optional, Tuple, Union
-from enum import Enum
 import asyncio
-import os  # For os.path.exists and os.remove
+import json
 import logging
+import os  # For os.path.exists and os.remove
 import sys
 from datetime import datetime, timezone
+from enum import Enum
+from typing import Any, Dict, Optional, Tuple, Union
+from unittest.mock import patch
 
-from core.compliance.snc_validators import evaluate_compliance, RiskLevel
+from semantic_kernel import Kernel
+
+from core.agents.agent_base import AgentBase
+from core.compliance.snc_validators import evaluate_compliance
+from core.schemas.agent_schema import AgentInput, AgentOutput
 
 # Add the project root to sys.path to allow imports like 'from core...'
 # when running this script directly for its __main__ block.

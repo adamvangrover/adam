@@ -1,7 +1,10 @@
 import time
-from typing import Dict, Any
+from typing import Any, Dict
+
 from pydantic import BaseModel
+
 from core.agents.agent_base import AgentBase
+
 
 class HealthMetrics(BaseModel):
     agent_id: str

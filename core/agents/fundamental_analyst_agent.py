@@ -1,26 +1,22 @@
 # core/agents/fundamental_analyst_agent.py
 
-import csv
-import os
-import logging
-import pandas as pd
-import numpy as np
-from scipy import stats  # For statistical calculations (e.g., for DCF)
-from typing import Dict, Any, Optional, Union, List
-from core.agents.agent_base import AgentBase
-from core.system.memory_manager import VectorMemoryManager
-from core.analysis.gemini_analyzer import GeminiFinancialReportAnalyzer  # Import the new analyzer
-from semantic_kernel import Kernel  # Added for type hinting
 import asyncio  # Added import
-import yaml  # Added for example usage block
 import json
+import logging
+from typing import Any, Dict, List, Optional, Union
 
 # Placeholder for message queue interaction (replace with real implementation later)
 # from core.system.message_queue import MessageQueue
 from unittest.mock import patch  # Added for example usage
 
+from semantic_kernel import Kernel  # Added for type hinting
+
+from core.agents.agent_base import AgentBase
+from core.analysis.gemini_analyzer import GeminiFinancialReportAnalyzer  # Import the new analyzer
+
 # New Imports
 from core.schemas.agent_schema import AgentInput, AgentOutput
+from core.system.memory_manager import VectorMemoryManager
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -471,7 +467,7 @@ class FundamentalAnalystAgent(AgentBase):
         if default_likelihood is not None:
             summary += f"Estimated Default Likelihood: {default_likelihood:.2%}\n"
         else:
-            summary += f"Estimated Default Likelihood: N/A\n"
+            summary += "Estimated Default Likelihood: N/A\n"
 
         distressed_metrics = self.calculate_distressed_metrics(financial_ratios if financial_ratios else {})
         if distressed_metrics:

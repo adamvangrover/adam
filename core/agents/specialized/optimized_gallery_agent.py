@@ -5,6 +5,7 @@ from typing import Any, Dict
 from core.agents.agent_base import AgentBase
 from core.agents.mixins.redundancy_optimization_mixin import RedundancyOptimizationMixin
 
+
 class OptimizedGalleryAgent(AgentBase, RedundancyOptimizationMixin):
     """
     Demonstration agent that uses RedundancyOptimizationMixin to securely and efficiently

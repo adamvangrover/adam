@@ -1,8 +1,11 @@
-from core.agents.algo_trading_agent import AlgoTradingAgent
-from core.learning.adaptive_learning import QLearningAgent, LearningMemory
+import random
+
 import numpy as np
 import pandas as pd
-import random
+
+from core.agents.algo_trading_agent import AlgoTradingAgent
+from core.learning.adaptive_learning import LearningMemory, QLearningAgent
+
 
 class AdaptiveAlgoTradingAgent(AlgoTradingAgent):
     """

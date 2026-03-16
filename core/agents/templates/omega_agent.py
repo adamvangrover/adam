@@ -12,10 +12,11 @@ Features:
 """
 
 import abc
-import time
 import logging
+import time
 import uuid
-from typing import Dict, Any, Type, Optional
+from typing import Any, Dict
+
 from pydantic import BaseModel, Field
 
 # Pillar 2 Integration
@@ -82,7 +83,7 @@ class OmegaAgent(abc.ABC):
             # 3. Proof of Result
             self.pot_logger.log_thought(
                 self.name,
-                f"OUTPUT_GENERATED",
+                "OUTPUT_GENERATED",
                 {"request_id": input_data.request_id, "status": "SUCCESS"}
             )
 

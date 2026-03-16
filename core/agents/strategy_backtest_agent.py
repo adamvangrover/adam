@@ -1,9 +1,12 @@
-from core.agents.agent_base import AgentBase
-from pydantic import BaseModel, Field
-from typing import Dict, List, Any, Optional
-import pandas as pd
-import numpy as np
 import logging
+from typing import Any, Dict, List, Optional
+
+import numpy as np
+import pandas as pd
+from pydantic import BaseModel, Field
+
+from core.agents.agent_base import AgentBase
+
 
 class BacktestInput(BaseModel):
     """

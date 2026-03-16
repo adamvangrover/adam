@@ -1,11 +1,13 @@
-from typing import Dict, Any, List
-import logging
-import json
-import os
 import importlib
 import inspect
+import json
+import logging
+import os
+from typing import Any, Dict, List
+
 from core.agents.agent_base import AgentBase
 from core.agents.mixins.audit_mixin import AuditMixin
+
 
 class SkillHarvesterAgent(AgentBase, AuditMixin):
     """
@@ -64,7 +66,7 @@ class SkillHarvesterAgent(AgentBase, AuditMixin):
                         for name, obj in inspect.getmembers(module):
                             if inspect.isclass(obj) and issubclass(obj, AgentBase) and obj is not AgentBase:
                                 found_agents.append(obj)
-                    except Exception as e:
+                    except Exception:
                         pass
 
         return list(set(found_agents))

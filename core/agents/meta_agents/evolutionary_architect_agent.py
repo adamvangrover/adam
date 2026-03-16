@@ -1,18 +1,21 @@
 from __future__ import annotations
-from typing import Any, Dict, List, Optional
-import logging
-import uuid
+
 import ast
-import random
 import copy
+import logging
+import random
+import uuid
+from typing import Any, Dict, List
+
 from core.agents.agent_base import AgentBase
 from core.agents.mixins.audit_mixin import AuditMixin
 from core.schemas.meta_agent_schemas import (
     EvolutionaryArchitectInput,
     EvolutionaryArchitectOutput,
+    EvolutionGoal,
     ProposedChange,
-    EvolutionGoal
 )
+
 
 class EvolutionaryArchitectAgent(AgentBase, AuditMixin):
     """
@@ -164,7 +167,7 @@ class EvolutionaryArchitectAgent(AgentBase, AuditMixin):
             for file in input_data.target_files:
                 changes.append(ProposedChange(
                     file_path=file,
-                    diff=f"<<<<<<< SEARCH\n# Old Code\n=======\n# Optimized Code by EvolutionaryAgent\n>>>>>>> REPLACE",
+                    diff="<<<<<<< SEARCH\n# Old Code\n=======\n# Optimized Code by EvolutionaryAgent\n>>>>>>> REPLACE",
                     rationale=f"Refactoring {file} for performance."
                 ))
         else:

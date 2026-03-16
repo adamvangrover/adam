@@ -1,5 +1,6 @@
 import logging
-from typing import Dict, Any
+from typing import Any, Dict
+
 from core.agents.agent_base import AgentBase
 from core.risk_engine.quantum_monte_carlo import QuantumMonteCarloEngine
 

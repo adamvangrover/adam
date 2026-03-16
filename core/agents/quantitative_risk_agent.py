@@ -1,8 +1,10 @@
 
+import logging
+from typing import Any, Dict
+
 import numpy as np
 import pandas as pd
-import logging
-from typing import Dict, Any, List
+
 from core.agents.agent_base import AgentBase
 
 try:

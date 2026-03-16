@@ -1,17 +1,20 @@
 from __future__ import annotations
-from typing import Any, Dict, List
+
 import logging
 import os
+from typing import Any, Dict, List
+
 from jinja2 import Template
+
 from core.agents.agent_base import AgentBase
 from core.agents.mixins.audit_mixin import AuditMixin
 from core.schemas.meta_agent_schemas import (
     DidacticArchitectInput,
     DidacticArchitectOutput,
-    TutorialSection,
     PortableConfig,
-    AudienceLevel
+    TutorialSection,
 )
+
 
 class DidacticArchitectAgent(AgentBase, AuditMixin):
     """
@@ -99,7 +102,7 @@ class DidacticArchitectAgent(AgentBase, AuditMixin):
             failure_count = content.count("Status: FAILURE") + content.count("status': 'FAILURE'")
             warning_count = content.count("WARNING")
 
-            report = f"# Self-Improvement Analysis\n\n"
+            report = "# Self-Improvement Analysis\n\n"
             report += f"Analyzed {audit_file_path}\n"
             report += f"- Failures Detected: {failure_count}\n"
             report += f"- Warnings Detected: {warning_count}\n\n"

@@ -1,5 +1,7 @@
 import unittest
+
 from core.agents.governance.repo_guardian.tools import SecurityScanner, StaticAnalyzer
+
 
 class TestSecurityScanner(unittest.TestCase):
     def setUp(self):

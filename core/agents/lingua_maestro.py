@@ -1,8 +1,9 @@
 # core/agents/lingua_maestro.py
 
-import logging
 import asyncio
-from typing import Dict, Any, Optional
+import logging
+from typing import Any, Dict, Optional
+
 from core.agents.agent_base import AgentBase
 
 try:

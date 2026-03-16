@@ -1,6 +1,5 @@
 # core/agents/industry_specialists/materials.py
 
-import pandas as pd
 from textblob import TextBlob
 
 

@@ -1,10 +1,13 @@
+import logging
+import math
+from typing import Any, Dict
+
+from pydantic import BaseModel
+
 from core.agents.agent_base import AgentBase
 from core.infrastructure.semantic_cache import SemanticCache
 from core.system.state_manager import StateManager
-from typing import Dict, Any, List, Optional
-import logging
-import math
-from pydantic import BaseModel, Field
+
 
 class Scenario(BaseModel):
     name: str
@@ -69,7 +72,7 @@ class BlackSwanAgent(AgentBase):
             financial_data: Dict containing 'key_ratios', 'total_debt', 'ebitda', 'interest_expense', 'revenue'
             scenarios: Optional List[Scenario]
         """
-        logging.info(f"BlackSwanAgent execution started.")
+        logging.info("BlackSwanAgent execution started.")
 
         financial_data = kwargs.get('financial_data', {})
         scenarios_input = kwargs.get('scenarios')

@@ -1,9 +1,11 @@
 # core/agents/geopolitical_risk_agent.py
 
 from __future__ import annotations
-from typing import Any, Dict, Optional, List, Union
-import logging
+
 import asyncio
+import logging
+from typing import Any, Dict, List, Optional, Union
+
 from core.agents.agent_base import AgentBase
 
 logger = logging.getLogger(__name__)
@@ -55,7 +57,7 @@ class GeopoliticalRiskAgent(AgentBase):
         Returns:
              Dict with risk assessment per region, contagion analysis, and global score.
         """
-        logger.info(f"Assessing geopolitical risks...")
+        logger.info("Assessing geopolitical risks...")
 
         risk_assessments = {}
         regions_list = []

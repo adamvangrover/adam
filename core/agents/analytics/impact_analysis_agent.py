@@ -1,5 +1,6 @@
-from typing import Dict, List, Any
 import logging
+from typing import Any, Dict
+
 
 class ImpactAnalysisAgent:
     """

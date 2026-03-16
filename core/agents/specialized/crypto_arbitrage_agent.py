@@ -1,9 +1,10 @@
 
 import asyncio
 import logging
-from typing import List, Dict, Any, Optional
-from pydantic import BaseModel, Field
 from datetime import datetime
+from typing import Any, Dict, List, Optional
+
+from pydantic import BaseModel, Field
 
 try:
     import ccxt.async_support as ccxt
@@ -13,6 +14,7 @@ except ImportError:
     logging.warning("CCXT not available. CryptoArbitrageAgent will operate in mock mode.")
 
 from core.agents.agent_base import AgentBase
+
 
 # Pydantic Models
 class ArbitrageOpportunity(BaseModel):

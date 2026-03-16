@@ -1,7 +1,8 @@
 import logging
-import numpy as np
-from typing import Dict, Any, Tuple
+from typing import Any, Dict, Tuple
+
 from core.quantitative.pricing import AvellanedaStoikovModel
+
 
 class MarketMakingAgent:
     """

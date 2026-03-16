@@ -1,5 +1,6 @@
-from typing import Dict, List, Any, Optional
 import logging
+from typing import Any, Dict, List, Optional
+
 from core.agents.agent_base import AgentBase
 
 logger = logging.getLogger(__name__)

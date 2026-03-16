@@ -1,12 +1,21 @@
 # core/agents/financial_modeling_agent.py
 
+import logging
+from typing import Any, Dict, List, Tuple
+
 import numpy as np
 import numpy_financial as npf
 import pandas as pd
-import logging
-from typing import Dict, Any, Tuple, List, Optional
+
 from core.agents.agent_base import AgentBase
-from core.financial_data.modeling_schema import FinancialAssumptions, ValuationResult, ValuationMethod, FinancialGlossary, DiscountedCashFlowModel, LBOAssumptions, LBOResult, LBOModel
+from core.financial_data.modeling_schema import (
+    FinancialAssumptions,
+    FinancialGlossary,
+    LBOAssumptions,
+    LBOResult,
+    ValuationMethod,
+    ValuationResult,
+)
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')

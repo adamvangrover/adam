@@ -1,9 +1,8 @@
-import os
-import subprocess
 import ast
-import re
-from typing import List, Dict, Any, Optional, Set
 import logging
+import re
+import subprocess
+from typing import Any, Dict, List
 
 logger = logging.getLogger(__name__)
 

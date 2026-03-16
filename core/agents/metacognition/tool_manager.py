@@ -1,6 +1,7 @@
 # core/agents/metacognition/tool_manager.py
-from typing import List, Dict, Any, Optional
 import logging
+from typing import Any, Dict, List
+
 
 class ToolRAGMixin:
     """

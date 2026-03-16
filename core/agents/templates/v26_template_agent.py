@@ -1,6 +1,7 @@
-from typing import Dict, Any, List, Optional
-from pydantic import BaseModel, Field
 import logging
+from typing import Any, Dict, List
+
+from pydantic import BaseModel, Field
 
 # Mock imports for LangGraph/LangChain - in production use actual imports
 # from langgraph.graph import StateGraph

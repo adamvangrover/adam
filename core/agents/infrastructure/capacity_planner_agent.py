@@ -1,7 +1,8 @@
-from typing import Dict, Any, List
-import logging
+from typing import Any, Dict
+
 from core.agents.agent_base import AgentBase
 from core.agents.mixins.audit_mixin import AuditMixin
+
 
 class CapacityPlannerAgent(AgentBase, AuditMixin):
     """

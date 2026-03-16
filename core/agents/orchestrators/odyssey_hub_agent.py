@@ -1,7 +1,8 @@
-from typing import Any, Dict, Optional
 import json
 import logging
 import os
+from typing import Any, Dict, Optional
+
 from core.agents.agent_base import AgentBase
 from core.v23_graph_engine.unified_knowledge_graph import UnifiedKnowledgeGraph
 

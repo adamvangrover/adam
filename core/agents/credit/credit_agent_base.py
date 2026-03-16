@@ -1,10 +1,10 @@
-from typing import Any, Dict, List, Optional
 import logging
-import asyncio
 from abc import abstractmethod
+from typing import Any, Dict, List
 
 from core.agents.agent_base import AgentBase
-from core.audit.audit_logger import AuditLogger, AuditLog
+from core.audit.audit_logger import AuditLog, AuditLogger
+
 
 class CreditAgentBase(AgentBase):
     """

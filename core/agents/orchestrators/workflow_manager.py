@@ -1,8 +1,9 @@
+import asyncio
 import concurrent.futures
 from threading import RLock
+
 from .workflow import Workflow
-import asyncio
-import inspect
+
 
 class WorkflowManager:
     def __init__(self, max_workers=10):

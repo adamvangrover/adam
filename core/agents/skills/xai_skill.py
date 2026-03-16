@@ -1,7 +1,7 @@
 # core/agents/skills/xai_skill.py
 
-from semantic_kernel.skill_definition import sk_function, sk_description
 from core.analysis.xai.explainer import Explainer
+from semantic_kernel.skill_definition import sk_function
 
 # Developer Note: This skill provides an interface to the XAI capabilities
 # of the system. Agents can use this skill to request explanations for

@@ -1,8 +1,6 @@
-import asyncio
-import logging
 import json
-import uuid
-from typing import Optional, Dict, Any, List
+import logging
+from typing import Any, Dict, List, Optional
 
 from core.agents.agent_base import AgentBase
 from core.agents.mixins.audit_mixin import AuditMixin
@@ -14,12 +12,16 @@ except ImportError:
     Kernel = Any
     KernelArguments = Any
 
+from core.agents.governance.repo_guardian.prompts import REVIEW_PROMPT_TEMPLATE, SYSTEM_PROMPT
 from core.agents.governance.repo_guardian.schemas import (
-    PullRequest, FileDiff, ReviewDecision, CodeReviewParams, ReviewDecisionStatus, ReviewComment, AnalysisResult
+    AnalysisResult,
+    CodeReviewParams,
+    PullRequest,
+    ReviewComment,
+    ReviewDecision,
+    ReviewDecisionStatus,
 )
-from core.agents.governance.repo_guardian.prompts import SYSTEM_PROMPT, REVIEW_PROMPT_TEMPLATE
-from core.agents.governance.repo_guardian.tools import GitTools, StaticAnalyzer, SecurityScanner
-from core.prompting.base_prompt_plugin import BasePromptPlugin
+from core.agents.governance.repo_guardian.tools import GitTools, SecurityScanner, StaticAnalyzer
 
 # Initialize logger
 logger = logging.getLogger(__name__)

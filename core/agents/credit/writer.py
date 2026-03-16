@@ -1,9 +1,9 @@
 import logging
-import asyncio
-from typing import Dict, Any, List
+from typing import Any, Dict, List
 
 from core.agents.credit.credit_agent_base import CreditAgentBase
 from core.utils.prompt_loader import PromptLoader
+
 
 class WriterAgent(CreditAgentBase):
     """

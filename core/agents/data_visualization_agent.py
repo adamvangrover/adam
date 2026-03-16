@@ -1,11 +1,11 @@
 # core/agents/data_visualization_agent.py
 
-import matplotlib.pyplot as plt
-import seaborn as sns
-import plotly.express as px
-import logging
 import asyncio
-from typing import Dict, Any, Optional
+import logging
+from typing import Any, Dict, Optional
+
+import seaborn as sns
+
 from core.agents.agent_base import AgentBase
 
 # Configure logging

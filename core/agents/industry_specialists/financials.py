@@ -1,6 +1,5 @@
 # core/agents/industry_specialists/financials.py
 
-import pandas as pd
 from textblob import TextBlob
 
 

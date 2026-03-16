@@ -1,8 +1,10 @@
-from typing import Dict, Any, List
-import os
 import logging
+import os
+from typing import Any, Dict, List
+
 from core.agents.agent_base import AgentBase
 from core.agents.mixins.audit_mixin import AuditMixin
+
 
 class AutoArchitectAgent(AgentBase, AuditMixin):
     """

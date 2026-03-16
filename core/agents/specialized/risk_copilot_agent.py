@@ -5,10 +5,9 @@ This agent implements the 'Risk Intelligence Layer' described in the F2B schema.
 It uses specialized prompts to perform Root Cause Analysis (RCA) on credit events.
 """
 
-import json
 import logging
-from typing import Dict, Any, Optional
 from datetime import datetime
+from typing import Any, Dict
 
 # Mocking AgentBase/LLMPlugin
 try:
@@ -95,7 +94,7 @@ class RiskCoPilotAgent(AgentBase):
 
 # Example usage
 if __name__ == "__main__":
-    from core.schemas.f2b_schema import Trade, FinancialInstrument
+    from core.schemas.f2b_schema import FinancialInstrument, Trade
 
     # Mock Data
     inst = FinancialInstrument(id="US123", type="swap", symbol="USD-IRS-10Y", notional_value=1000000)

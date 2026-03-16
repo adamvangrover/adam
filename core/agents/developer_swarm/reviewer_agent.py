@@ -5,6 +5,7 @@ performing static analysis on code to ensure quality and consistency.
 """
 
 from typing import Any, Dict
+
 from core.agents.agent_base import AgentBase
 
 

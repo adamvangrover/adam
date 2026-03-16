@@ -1,15 +1,16 @@
 # core/agents/supply_chain_risk_agent.py
 
-import requests
-import logging
 import asyncio
-from bs4 import BeautifulSoup
-import folium
-from geopy.geocoders import Nominatim
-from urllib.parse import urlparse
 import ipaddress
-from typing import Dict, Any, List, Optional
+import logging
 import os
+from typing import Any, Dict, Optional
+from urllib.parse import urlparse
+
+import folium
+import requests
+from bs4 import BeautifulSoup
+from geopy.geocoders import Nominatim
 
 from core.agents.agent_base import AgentBase
 

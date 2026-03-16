@@ -1,5 +1,6 @@
-from core.agents.agent_base import AgentBase
 from textblob import TextBlob
+
+from core.agents.agent_base import AgentBase
 
 
 class SentimentAnalysisMetaAgent(AgentBase):

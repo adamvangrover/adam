@@ -1,4 +1,4 @@
-from typing import Callable, List, Dict, Any
+from typing import Any, Callable, Dict, List
 
 
 class Task:

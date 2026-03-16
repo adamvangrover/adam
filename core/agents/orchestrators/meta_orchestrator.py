@@ -2,16 +2,17 @@
 import asyncio
 from typing import Any, Dict, Union
 
-# v21 Synchronous imports
-from .workflow import Workflow
-from .workflow_manager import WorkflowManager
+# v23 Graph-based imports
+from langgraph.graph import StateGraph
+
+from core.system.v22_async.async_workflow_manager import AsyncWorkflowManager
 
 # v22 Asynchronous imports
 from core.system.v22_async.workflow import AsyncWorkflow
-from core.system.v22_async.async_workflow_manager import AsyncWorkflowManager
 
-# v23 Graph-based imports
-from langgraph.graph import StateGraph
+# v21 Synchronous imports
+from .workflow import Workflow
+from .workflow_manager import WorkflowManager
 
 
 class MetaOrchestrator:

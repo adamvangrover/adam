@@ -1,11 +1,9 @@
 import logging
-import json
-from typing import Dict, Any, List, Optional
+from typing import Any, Dict
 
 # Adjust imports based on actual project structure
 from core.system.v22_async.async_agent_base import AsyncAgentBase
 from core.system.v22_async.async_task import AsyncTask
-from core.utils.agent_utils import parse_json_garbage
 
 logger = logging.getLogger(__name__)
 

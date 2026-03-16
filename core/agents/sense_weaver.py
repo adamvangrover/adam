@@ -1,8 +1,9 @@
 # core/agents/sense_weaver.py
 
-import logging
 import asyncio
-from typing import Dict, Any, Optional
+import logging
+from typing import Any, Dict, Optional
+
 from core.agents.agent_base import AgentBase
 
 try:
@@ -13,7 +14,6 @@ except ImportError:
     except ImportError:
         GoogleSearchAPIWrapper = None
 
-from transformers import pipeline
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')

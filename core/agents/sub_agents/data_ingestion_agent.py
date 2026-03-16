@@ -1,5 +1,6 @@
-from typing import Any, Dict, List, Optional
 import logging
+from typing import Any, Dict, Optional
+
 from core.agents.agent_base import AgentBase
 from core.gold_standard.ingestion import IngestionEngine
 from core.gold_standard.storage import StorageEngine

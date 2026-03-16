@@ -1,8 +1,6 @@
-import asyncio
 import logging
-from typing import Dict, Any, List
+from typing import Any, Dict
 
-from core.agents.credit.credit_agent_base import CreditAgentBase
 # Assuming these will be created in the next step
 # from core.agents.credit.archivist import ArchivistAgent
 # from core.agents.credit.quant import QuantAgent

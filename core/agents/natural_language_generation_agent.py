@@ -1,9 +1,11 @@
 # core/agents/natural_language_generation_agent.py
 
-import logging
 import asyncio
-from typing import Dict, Any, Optional
+import logging
+from typing import Any, Dict, Optional
+
 from transformers import pipeline
+
 from core.agents.agent_base import AgentBase
 
 # Configure logging

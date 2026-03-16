@@ -1,16 +1,16 @@
 # core/agents/machine_learning_model_training_agent.py
 
-import pandas as pd
-import logging
 import asyncio
-from typing import Dict, Any, Optional
-from core.agents.agent_base import AgentBase
+import logging
+import os
+import pickle
+from typing import Any, Dict, Optional
 
-from sklearn.model_selection import train_test_split
+import pandas as pd
 from sklearn.linear_model import LinearRegression
 from sklearn.tree import DecisionTreeRegressor
-import pickle
-import os
+
+from core.agents.agent_base import AgentBase
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')

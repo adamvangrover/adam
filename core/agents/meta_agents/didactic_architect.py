@@ -1,5 +1,6 @@
 import logging
-from typing import Dict, Any, List
+from typing import Any, Dict, List
+
 from core.agents.agent_base import AgentBase
 from core.llm.base_llm_engine import BaseLLMEngine
 from core.tools.base_tool import BaseTool
@@ -49,7 +50,7 @@ class DidacticArchitect(AgentBase):
         """
         context = kwargs if kwargs else (args[0] if args and isinstance(args[0], dict) else {})
 
-        logger.info(f"Didactic Architect analyzing context for documentation/setup generation.")
+        logger.info("Didactic Architect analyzing context for documentation/setup generation.")
 
         target_content = context.get("target_content", "")
         request_type = context.get("type", "tutorial") # tutorial, setup, architecture

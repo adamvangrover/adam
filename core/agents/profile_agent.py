@@ -1,6 +1,8 @@
-from typing import Any, Dict, Optional
-from core.agents.agent_base import AgentBase
 import logging
+from typing import Any, Dict
+
+from core.agents.agent_base import AgentBase
+
 
 class ProfileAgent(AgentBase):
     """

@@ -1,17 +1,19 @@
 from __future__ import annotations
-from typing import Any, Dict, Tuple, Optional, Union, List
-import logging
+
 import asyncio
+import logging
+from typing import Any, Dict, Optional, Tuple, Union
+
 from core.agents.agent_base import AgentBase
-from core.schemas.agent_schema import AgentInput, AgentOutput
+from core.agents.insider_activity_agent import InsiderActivityAgent
+from core.agents.options_flow_agent import OptionsFlowAgent
+from core.agents.specialized.crypto_arbitrage_agent import CryptoArbitrageAgent
+from core.data_sources.data_fetcher import DataFetcher
 from core.data_sources.financial_news_api import SimulatedFinancialNewsAPI
 from core.data_sources.prediction_market_api import SimulatedPredictionMarketAPI
 from core.data_sources.social_media_api import SimulatedSocialMediaAPI
 from core.data_sources.web_traffic_api import SimulatedWebTrafficAPI
-from core.data_sources.data_fetcher import DataFetcher
-from core.agents.specialized.crypto_arbitrage_agent import CryptoArbitrageAgent
-from core.agents.options_flow_agent import OptionsFlowAgent
-from core.agents.insider_activity_agent import InsiderActivityAgent
+from core.schemas.agent_schema import AgentInput, AgentOutput
 
 
 class MarketSentimentAgent(AgentBase):

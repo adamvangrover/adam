@@ -1,10 +1,13 @@
 from __future__ import annotations
-from typing import Any, Dict
-from core.agents.agent_base import AgentBase
-from core.prompting.plugins.crisis_simulation_plugin import CrisisSimulationPlugin
-from core.schemas.crisis_simulation import CrisisSimulationInput, CrisisSimulationOutput, CrisisLogEntry
-from core.engine.states import init_crisis_state
+
 import logging
+from typing import Any, Dict
+
+from core.agents.agent_base import AgentBase
+from core.engine.states import init_crisis_state
+from core.prompting.plugins.crisis_simulation_plugin import CrisisSimulationPlugin
+from core.schemas.agent_schema import AgentInput, AgentOutput
+from core.schemas.crisis_simulation import CrisisLogEntry, CrisisSimulationInput
 
 # Try to import v23 Graph logic
 try:
@@ -47,7 +50,7 @@ class CrisisSimulationMetaAgent(AgentBase):
             logging.error(f"Error initializing CrisisSimulationPlugin: {e}")
             self.simulation_plugin = None
 
-    async def execute(self, simulation_input: CrisisSimulationInput) -> CrisisSimulationOutput:
+    async def execute(self, input_data: AgentInput) -> AgentOutput:
         """
         Executes the crisis simulation.
 
@@ -55,13 +58,21 @@ class CrisisSimulationMetaAgent(AgentBase):
         Otherwise, falls back to v21 Prompt-as-Code logic.
 
         Args:
-            simulation_input: A Pydantic model containing the risk portfolio,
-                              current date, and the user's crisis scenario.
+            input_data: AgentInput object containing the query and context.
 
         Returns:
-            A Pydantic model containing the structured simulation output.
+            AgentOutput: Containing the structured simulation output.
         """
         logging.info("Starting crisis simulation...")
+
+        from datetime import datetime
+        current_date = input_data.context.get("current_date", datetime.now().strftime("%Y-%m-%d"))
+
+        simulation_input = CrisisSimulationInput(
+            user_scenario=input_data.query,
+            risk_portfolio=input_data.context.get("risk_portfolio", {}),
+            current_date=current_date
+        )
 
         # --- v23 Path: Cyclical Graph ---
         if GRAPH_AVAILABLE and crisis_simulation_app:
@@ -110,10 +121,14 @@ class CrisisSimulationMetaAgent(AgentBase):
                         )
                     ]
 
-                return CrisisSimulationOutput(
-                    executive_summary=final_report,
-                    crisis_simulation_log=structured_log,
-                    recommendations="Review the detailed graph trace in 'final_report' for mitigation strategies."
+                return AgentOutput(
+                    answer=final_report,
+                    sources=[],
+                    confidence=1.0,
+                    metadata={
+                        "crisis_simulation_log": [entry.model_dump() if hasattr(entry, 'model_dump') else entry for entry in structured_log],
+                        "recommendations": "Review the detailed graph trace in 'final_report' for mitigation strategies."
+                    }
                 )
             except Exception as e:
                 logging.error(f"CrisisSimulationGraph execution failed: {e}. Falling back to v21 logic.")
@@ -139,7 +154,15 @@ class CrisisSimulationMetaAgent(AgentBase):
         parsed_output = self.simulation_plugin.parse_response(llm_response_str)
 
         logging.info("Crisis simulation finished.")
-        return parsed_output
+        return AgentOutput(
+            answer=parsed_output.executive_summary,
+            sources=[],
+            confidence=1.0,
+            metadata={
+                "crisis_simulation_log": [entry.model_dump() if hasattr(entry, 'model_dump') else entry for entry in parsed_output.crisis_simulation_log],
+                "recommendations": parsed_output.recommendations
+            }
+        )
 
     def _mock_llm_call(self, messages: list[dict[str, str]]) -> str:
         """

@@ -1,7 +1,9 @@
-import os
 import logging
-from typing import Any, Dict, List
+import os
+from typing import Any, Dict
+
 from core.agents.agent_base import AgentBase
+
 
 class RepoKnowledgeAgent(AgentBase):
     """

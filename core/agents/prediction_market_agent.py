@@ -1,12 +1,12 @@
 # core/agents/prediction_market_agent.py
 
-import json
-import numpy as np
-import pandas as pd
-import logging
 import asyncio
-from typing import Dict, Any, Optional
+import json
+import logging
+from typing import Any, Dict, Optional
+
 from web3 import Web3
+
 from core.agents.agent_base import AgentBase
 
 # Placeholder for external libraries (replace with actual imports)

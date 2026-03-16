@@ -1,11 +1,13 @@
 # core/agents/algo_trading_agent.py
 
+import logging
+import random
+from typing import Any, Dict, Union
+
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-import random
-import logging
-from typing import Dict, Any, Union, Optional
+
 from core.agents.agent_base import AgentBase
 from core.schemas.agent_schema import AgentInput, AgentOutput
 

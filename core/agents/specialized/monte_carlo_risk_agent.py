@@ -1,9 +1,11 @@
 import logging
+from typing import Any, Dict, Literal
+
 import numpy as np
-from typing import Dict, Any, List, Optional, Literal
-from pydantic import BaseModel, Field, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
+
 from core.agents.agent_base import AgentBase
-from core.schemas.v23_5_schema import SimulationEngine, TradingDynamics, QuantumScenario
+from core.schemas.v23_5_schema import QuantumScenario, SimulationEngine, TradingDynamics
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -77,7 +79,7 @@ class MonteCarloRiskAgent(AgentBase):
         Returns:
             SimulationEngine: Schema object with default probability and scenario placeholders.
         """
-        logger.info(f"Running Monte Carlo Simulation...")
+        logger.info("Running Monte Carlo Simulation...")
 
         # Map legacy keys to new schema if necessary, or rely on caller passing correct keys.
         # Support alias 'ebitda_volatility' -> 'volatility'

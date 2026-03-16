@@ -1,9 +1,11 @@
 # core/agents/lexica_agent.py
 
-import requests
-import logging
 import asyncio
-from typing import Dict, Any, Optional
+import logging
+from typing import Any, Dict, Optional
+
+import requests
+
 from core.agents.agent_base import AgentBase
 
 # Configure logging

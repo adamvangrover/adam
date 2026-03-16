@@ -1,7 +1,9 @@
+import logging
+from typing import Any, Dict
+
 from core.agents.agent_base import AgentBase
 from core.simulations.quantum_monte_carlo import QuantumMonteCarloBridge
-from typing import Dict, Any
-import logging
+
 
 class QuantumMonteCarloAgent(AgentBase):
     """

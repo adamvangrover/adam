@@ -1,7 +1,9 @@
+import logging
+from typing import Any, Dict, Optional
+
 from core.agents.agent_base import AgentBase
 from core.agents.metacognition import AdaptiveConvictionMixin, StateAnchorMixin, ToolRAGMixin
-from typing import Dict, Any, Optional
-import logging
+
 
 class AdaptiveAgent(AgentBase, AdaptiveConvictionMixin, StateAnchorMixin, ToolRAGMixin):
     """

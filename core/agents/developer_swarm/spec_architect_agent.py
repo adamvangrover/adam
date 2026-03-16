@@ -6,7 +6,9 @@ Spec-Driven Agent Protocol (SDAP).
 """
 
 from typing import Any, Dict, List, Optional
+
 from core.agents.agent_base import AgentBase
+
 
 class SpecArchitectAgent(AgentBase):
     """

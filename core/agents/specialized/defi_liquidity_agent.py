@@ -1,10 +1,9 @@
-from typing import Any, Dict, List, Optional
 import logging
+import math
+from typing import Any, Dict, Optional
+
 from pydantic import BaseModel, Field
 from web3 import Web3
-from decimal import Decimal
-import math
-import asyncio
 
 from core.agents.agent_base import AgentBase
 

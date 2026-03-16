@@ -1,9 +1,10 @@
 # core/agents/industry_specialist_agent.py
 
+import asyncio
 import importlib
 import logging
-import asyncio
-from typing import Dict, Any, Optional
+from typing import Any, Dict, Optional
+
 from core.agents.agent_base import AgentBase
 
 # Configure logging

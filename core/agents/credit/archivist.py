@@ -1,8 +1,9 @@
 import json
 import logging
-from typing import Dict, Any, List
+from typing import Any, Dict
 
 from core.agents.credit.credit_agent_base import CreditAgentBase
+
 
 class ArchivistAgent(CreditAgentBase):
     """

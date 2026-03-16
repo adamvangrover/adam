@@ -1,11 +1,12 @@
 import json
+import logging
 import os
 import uuid
-import logging
 from datetime import datetime
-from typing import Dict, Any, Optional
+from typing import Any, Dict
 
 from core.system.state_manager import StateManager
+
 
 class AuditMixin:
     """

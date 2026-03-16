@@ -1,7 +1,9 @@
 from typing import Any, Dict
 
 from core.agents.agent_base import AgentBase
+
 from .upgrade_prompts import PROMPTS
+
 
 class BaseUpgradeAgent(AgentBase):
     """Base class for all upgrade agents in the 7-phase cycle."""

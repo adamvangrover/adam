@@ -1,11 +1,13 @@
-from typing import Dict, Any, List
 import logging
+from typing import Any, Dict
+
 from core.agents.agent_base import AgentBase
-from core.vertical_risk_agent.generative_risk import GenerativeRiskEngine
+
 # Import MarketScenario from state to ensure consistency across the repo
-from core.vertical_risk_agent.state import MarketScenario
 from core.agents.mixins.audit_mixin import AuditMixin
 from core.infrastructure.semantic_cache import SemanticCache
+from core.vertical_risk_agent.generative_risk import GenerativeRiskEngine
+
 
 class DeepSectorAnalyst(AgentBase, AuditMixin):
     """

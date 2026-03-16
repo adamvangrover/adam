@@ -1,9 +1,11 @@
-from typing import Dict, Any, List
 import logging
 import math
 from collections import Counter
+from typing import Any, Dict, List
+
 from core.agents.agent_base import AgentBase
 from core.agents.mixins.audit_mixin import AuditMixin
+
 
 class ForensicAccountantAgent(AgentBase, AuditMixin):
     """

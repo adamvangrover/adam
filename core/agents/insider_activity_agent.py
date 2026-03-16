@@ -1,7 +1,8 @@
 import logging
-from typing import Any, Dict, Union
-from pydantic import BaseModel, Field
 import random
+from typing import Any, Dict, Union
+
+from pydantic import BaseModel, Field
 
 from core.agents.agent_base import AgentBase
 from core.schemas.agent_schema import AgentInput, AgentOutput

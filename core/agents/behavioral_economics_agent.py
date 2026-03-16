@@ -1,8 +1,11 @@
 # core/agents/behavioral_economics_agent.py
-from core.agents.agent_base import AgentBase
-from typing import Any, Dict, List, Optional
 import logging
+from typing import Any, Dict, List
+
 from transformers import pipeline
+
+from core.agents.agent_base import AgentBase
+from core.schemas.agent_schema import AgentInput, AgentOutput
 
 
 class BehavioralEconomicsAgent(AgentBase):
@@ -19,18 +22,19 @@ class BehavioralEconomicsAgent(AgentBase):
         self.sentiment_analyzer = pipeline(
             "sentiment-analysis", model="distilbert-base-uncased-finetuned-sst-2-english")
 
-    async def execute(self, analysis_content: str, user_query_history: Optional[List[str]] = None) -> Dict[str, Any]:
+    async def execute(self, input_data: AgentInput) -> AgentOutput:
         """
         Executes the behavioral analysis.
 
         Args:
-            analysis_content (str): The content to analyze for market biases (e.g., news, social media text).
-            user_query_history (Optional[List[str]]): A list of recent user queries to analyze for user bias.
+            input_data (AgentInput): Input data.
 
         Returns:
-            Dict[str, Any]: A dictionary containing identified biases and insights.
+            AgentOutput: A dictionary containing identified biases and insights.
         """
         logging.info("Executing behavioral economics analysis...")
+        analysis_content = input_data.query
+        user_query_history = input_data.context.get("user_query_history", [])
         results = {
             "market_biases": [],
             "user_biases": [],
@@ -50,7 +54,16 @@ class BehavioralEconomicsAgent(AgentBase):
 
         logging.info(
             f"Behavioral economics analysis complete. Found {len(results['market_biases'])} market biases and {len(results['user_biases'])} user biases.")
-        return results
+
+        return AgentOutput(
+            answer=results["insights"],
+            sources=[],
+            confidence=1.0,  # Default neutral baseline
+            metadata={
+                "market_biases": results["market_biases"],
+                "user_biases": results["user_biases"]
+            }
+        )
 
     def _identify_market_biases(self, content: str) -> List[Dict[str, str]]:
         """

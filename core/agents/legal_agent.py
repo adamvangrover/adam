@@ -1,9 +1,10 @@
 # core/agents/legal_agent.py
 
+import asyncio
 import json
 import logging
-import asyncio
-from typing import List, Dict, Any, Optional
+from typing import Any, Dict, Optional
+
 from core.agents.agent_base import AgentBase
 
 # Configure logging

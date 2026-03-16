@@ -1,8 +1,10 @@
-from core.agents.agent_base import AgentBase
-from .workflow_manager import WorkflowManager
-from .workflow import Workflow
-from .task import Task
 import time
+
+from core.agents.agent_base import AgentBase
+
+from .task import Task
+from .workflow import Workflow
+from .workflow_manager import WorkflowManager
 
 # A simple function to simulate a long-running task
 

@@ -1,8 +1,9 @@
 import json
 import logging
 import os
-from typing import Dict, Any, Optional
 from datetime import datetime
+from typing import Any, Dict
+
 
 class MemoryMixin:
     """

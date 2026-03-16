@@ -1,9 +1,9 @@
 # core/agents/catalyst_agent.py
 
 import json
-import requests
-from datetime import datetime
 import logging
+
+import requests
 
 
 class CatalystAgent:

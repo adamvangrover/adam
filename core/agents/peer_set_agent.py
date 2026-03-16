@@ -1,6 +1,7 @@
-from typing import Any, Dict, List, Union, Optional
-import logging
 import asyncio
+import logging
+from typing import Any, Dict, List, Optional, Union
+
 from core.agents.agent_base import AgentBase
 from core.schemas.agent_schema import AgentInput, AgentOutput
 

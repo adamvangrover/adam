@@ -1,9 +1,11 @@
-from typing import Any, Dict, List, Optional, Tuple
 import logging
+from typing import Any, Dict, Optional
+
 import numpy as np
 import pandas as pd
-from core.agents.agent_base import AgentBase
 import yfinance as yf
+
+from core.agents.agent_base import AgentBase
 
 # Configure logging
 logger = logging.getLogger("MarketRegimeAgent")

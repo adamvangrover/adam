@@ -1,12 +1,15 @@
 from __future__ import annotations
-from typing import Any, Dict, Optional, List, Union
-import logging
-import json
-import numpy as np
+
 import datetime
-import asyncio
+import json
+import logging
+from typing import Any, Dict, List, Optional, Union
+
+import numpy as np
+
 from core.agents.agent_base import AgentBase
 from core.schemas.agent_schema import AgentInput, AgentOutput
+
 try:
     from scipy.stats import norm
     SCIPY_AVAILABLE = True
@@ -287,7 +290,7 @@ class RiskAssessmentAgent(AgentBase):
         """
         Assesses the risk associated with a loan.
         """
-        logger.info(f"Assessing loan risk...")
+        logger.info("Assessing loan risk...")
         risk_factors = {}
 
         pd = self._calculate_credit_risk(borrower_data)
@@ -500,7 +503,7 @@ class RiskAssessmentAgent(AgentBase):
         """
         Assesses the risk associated with a project.
         """
-        logger.info(f"Assessing project risk...")
+        logger.info("Assessing project risk...")
         risk_factors = {}
 
         risk_factors["project_management_risk"] = self._assess_project_management_risk(project_details)

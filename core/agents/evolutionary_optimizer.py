@@ -1,6 +1,7 @@
 import ast
 import logging
-from typing import List, Dict, Any
+from typing import Any, Dict
+
 from core.agents.agent_base import AgentBase
 
 logger = logging.getLogger(__name__)

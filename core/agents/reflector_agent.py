@@ -1,8 +1,11 @@
 from __future__ import annotations
-from typing import Dict, Any, List, Union
+
 import logging
+from typing import Any, Dict
+
 from core.agents.agent_base import AgentBase
 from core.engine.states import init_reflector_state
+from core.schemas.agent_schema import AgentInput, AgentOutput
 
 logger = logging.getLogger(__name__)
 
@@ -24,12 +27,15 @@ class ReflectorAgent(AgentBase):
     v23 Update: Wraps `ReflectorGraph` for iterative self-correction.
     """
 
-    async def execute(self, content_to_analyze: Union[str, Dict[str, Any]], context: Dict[str, Any] = None) -> Dict[str, Any]:
+    async def execute(self, content_to_analyze: AgentInput, context: Dict[str, Any] = None) -> AgentOutput:
         """
         Analyzes the provided content (reasoning trace, report, etc.) and provides a critique.
         """
-        if isinstance(content_to_analyze, dict):
-             content_to_analyze = content_to_analyze.get("content") or content_to_analyze.get("payload") or str(content_to_analyze)
+        text = content_to_analyze.query
+        ctx = content_to_analyze.context
+
+        # Backward compatibility for content_to_analyze name within function
+        content_to_analyze = text
 
         logger.info("ReflectorAgent: Analyzing content for self-correction...")
 
@@ -37,7 +43,7 @@ class ReflectorAgent(AgentBase):
         if GRAPH_AVAILABLE and reflector_app:
             logging.info("ReflectorAgent: Delegating to v23 ReflectorGraph.")
 
-            initial_state = init_reflector_state(content_to_analyze, context)
+            initial_state = init_reflector_state(text, ctx)
             config = {"configurable": {"thread_id": "1"}}
 
             try:
@@ -46,13 +52,16 @@ class ReflectorAgent(AgentBase):
                 else:
                     result = reflector_app.invoke(initial_state, config=config)
 
-                return {
-                    "original_content_snippet": content_to_analyze[:100] + "...",
-                    "critique_notes": result.get("critique_notes", []),
-                    "quality_score": result.get("score", 0.0) * 10,  # Scale 0-1 to 0-10
-                    "verification_status": "PASS" if result.get("is_valid") else "NEEDS_REVISION",
-                    "refined_content": result.get("refined_content")
-                }
+                return AgentOutput(
+                    answer=result.get("refined_content", ""),
+                    sources=[],
+                    confidence=float(result.get("score", 0.0)),
+                    metadata={
+                        "original_content_snippet": text[:100] + "...",
+                        "critique_notes": result.get("critique_notes", []),
+                        "verification_status": "PASS" if result.get("is_valid") else "NEEDS_REVISION"
+                    }
+                )
             except Exception as e:
                 logging.error(f"ReflectorGraph execution failed: {e}. Falling back to heuristics.")
 
@@ -75,9 +84,13 @@ class ReflectorAgent(AgentBase):
             critique.append("No explicit sources cited. Risk of hallucination.")
             score -= 1.5
 
-        return {
-            "original_content_snippet": content_to_analyze[:100] + "...",
-            "critique_notes": critique,
-            "quality_score": score,
-            "verification_status": "PASS" if score > 7.0 else "NEEDS_REVISION"
-        }
+        return AgentOutput(
+            answer="\n".join(critique) if critique else "No issues found.",
+            sources=[],
+            confidence=float(score) / 10.0,
+            metadata={
+                "original_content_snippet": text[:100] + "...",
+                "critique_notes": critique,
+                "verification_status": "PASS" if score > 7.0 else "NEEDS_REVISION"
+            }
+        )

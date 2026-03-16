@@ -1,16 +1,17 @@
-from typing import Dict, Any, List, Optional
-import logging
-import json
-import os
 import asyncio
+import json
+import logging
+import os
 from datetime import datetime
-import numpy as np
-import pandas as pd
+from typing import Any, Dict, List, Optional
+
 import networkx as nx
+import numpy as np
 
 # --- Core & Model Imports ---
 try:
     import torch
+
     from core.oswm.inference import OSWMInference
     from core.oswm.model import OSWMConfig, OSWMTransformer
 except ImportError:
@@ -29,10 +30,10 @@ except ImportError:
         def __init__(self, config, kernel=None): self.config = config
         async def execute(self, **kwargs): pass
 
-from core.agents.market_sentiment_agent import MarketSentimentAgent
 from core.agents.black_swan_agent import BlackSwanAgent
-from core.agents.specialized.quantum_risk_agent import QuantumRiskAgent
 from core.agents.critique_swarm import CritiqueSwarm
+from core.agents.market_sentiment_agent import MarketSentimentAgent
+from core.agents.specialized.quantum_risk_agent import QuantumRiskAgent
 from core.data_sources.data_fetcher import DataFetcher
 from core.engine.unified_knowledge_graph import UnifiedKnowledgeGraph
 

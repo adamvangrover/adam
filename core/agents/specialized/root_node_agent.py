@@ -9,8 +9,9 @@ Simulation, and Backpropagation phases, and utilizing a simplified GRPO
 
 import logging
 import random
+from typing import Any, Dict, List, Optional
+
 import numpy as np
-from typing import List, Dict, Any, Optional
 from pydantic import BaseModel, Field
 
 # Mocking AgentBase for standalone capability if needed, but inheriting is better

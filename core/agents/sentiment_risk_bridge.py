@@ -1,7 +1,9 @@
-from typing import Any, Dict, Optional
 import logging
-from core.agents.agent_base import AgentBase
+from typing import Any, Dict, Optional
+
 from pydantic import BaseModel
+
+from core.agents.agent_base import AgentBase
 
 logger = logging.getLogger(__name__)
 

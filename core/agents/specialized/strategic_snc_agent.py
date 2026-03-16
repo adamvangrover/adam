@@ -1,11 +1,11 @@
 import logging
-import asyncio
-from typing import Dict, Any, List, Optional
+from typing import Any, Dict, List
+
 from core.agents.agent_base import AgentBase
-from core.schemas.v23_5_schema import SNCRatingModel, PrimaryFacilityAssessment
-from core.system.aof_guardrail import AgenticOversightFramework
-from core.engine.risk_consensus_engine import RiskConsensusEngine
 from core.agents.specialized.regulatory_snc_agent import RegulatorySNCAgent
+from core.engine.risk_consensus_engine import RiskConsensusEngine
+from core.schemas.v23_5_schema import PrimaryFacilityAssessment, SNCRatingModel
+from core.system.aof_guardrail import AgenticOversightFramework
 
 # Configure logging
 logger = logging.getLogger(__name__)

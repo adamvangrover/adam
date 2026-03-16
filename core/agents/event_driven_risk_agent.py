@@ -1,15 +1,16 @@
 # core/agents/event_driven_risk_agent.py
 
-import os
 import datetime
-import requests
 import json
 import logging
-from typing import List, Dict
-from core.agents.agent_base import AgentBase
+import os
+from typing import Dict, List
+
+import requests
 from utils.data_validation import validate_event_data
 from utils.visualization_tools import generate_event_impact_chart
 
+from core.agents.agent_base import AgentBase
 
 # 🛡️ Sentinel: Enforce timeout on external requests to prevent DoS
 REQUEST_TIMEOUT = 10  # seconds

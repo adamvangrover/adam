@@ -1,10 +1,11 @@
 from __future__ import annotations
-import os
+
+import asyncio
+import datetime
 import json
 import logging
-import datetime
-import asyncio
-from typing import Dict, Any, List
+import os
+from typing import Any, Dict
 
 # Imports from existing modules
 # We wrap them in try-except blocks to allow the agent to run even if dependencies are missing (mocking behavior)
@@ -263,7 +264,7 @@ class NewsDeskOrchestrator:
 
         # Assemble Markdown
         md = f"# 🌩️ Market Mayhem: {today}\n\n"
-        md += f"**\"Navigating financial storms and spotting the sunshine.\"**\n\n"
+        md += "**\"Navigating financial storms and spotting the sunshine.\"**\n\n"
         md += f"### Executive Summary: The {data['vibe']} Vibe\n"
         md += f"{data['summary']}\n\n"
 

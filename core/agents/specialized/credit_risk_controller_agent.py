@@ -1,9 +1,9 @@
 
-import logging
 import json
-from typing import Dict, Any, List, Optional, Tuple
+import logging
+from typing import Any, Dict, List, Tuple
+
 # Core imports based on v23 architecture
-from core.agents.agent_base import AgentBase
 from core.system.v22_async.async_agent_base import AsyncAgentBase
 from core.system.v22_async.async_task import AsyncTask
 

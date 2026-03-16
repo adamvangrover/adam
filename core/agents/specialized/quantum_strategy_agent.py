@@ -1,6 +1,7 @@
-from core.simulations.adam_van_grover_search import AdamVanGroverSearch
-from core.engine.quantum_recommendation_engine import QuantumRecommendationEngine
 import logging
+
+from core.engine.quantum_recommendation_engine import QuantumRecommendationEngine
+from core.simulations.adam_van_grover_search import AdamVanGroverSearch
 
 # Configure logging
 logger = logging.getLogger("QuantumStrategyAgent")

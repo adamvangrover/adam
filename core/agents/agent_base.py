@@ -1,20 +1,28 @@
-from abc import ABC, abstractmethod
-from typing import Any, Dict, List, Optional
-import logging
-import json
 import asyncio
-from pydantic import BaseModel
+import json
+import logging
 import uuid
-import warnings
+from abc import ABC, abstractmethod
 from datetime import datetime
+from typing import Any, Dict, List, Optional
 
-from core.utils.logging_utils import SwarmLogger
+from core.agents.mixins.memory_mixin import MemoryMixin
 
 # HNASP Imports
-from core.schemas.hnasp import HNASPState, Meta, PersonaState, LogicLayer, ContextStream, PersonaDynamics, SecurityContext, PersonaIdentities, Identity, EPAVector
-from core.agents.mixins.memory_mixin import MemoryMixin
-from core.system.boot_protocol import BootProtocol
+from core.schemas.hnasp import (
+    ContextStream,
+    EPAVector,
+    HNASPState,
+    Identity,
+    LogicLayer,
+    Meta,
+    PersonaIdentities,
+    PersonaState,
+    SecurityContext,
+)
 from core.swarms.memory_matrix import MemoryMatrix
+from core.system.boot_protocol import BootProtocol
+from core.utils.logging_utils import SwarmLogger
 
 # JsonLogic
 try:
@@ -171,7 +179,7 @@ class AgentBase(ABC, MemoryMixin, BootProtocol):
             if not active_rules:
                 return
 
-            from core.schemas.hnasp import ExecutionTrace # Import locally to avoid circulars if any
+            from core.schemas.hnasp import ExecutionTrace  # Import locally to avoid circulars if any
 
             results: List[ExecutionTrace] = []
             for rule_id, rule in active_rules.items():

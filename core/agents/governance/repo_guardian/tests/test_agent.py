@@ -1,8 +1,10 @@
-import unittest
 import asyncio
-from unittest.mock import MagicMock, patch
+import unittest
+from unittest.mock import patch
+
 from core.agents.governance.repo_guardian.agent import RepoGuardianAgent
-from core.agents.governance.repo_guardian.schemas import PullRequest, FileDiff, ReviewDecisionStatus
+from core.agents.governance.repo_guardian.schemas import FileDiff, PullRequest, ReviewDecisionStatus
+
 
 class TestRepoGuardianAgent(unittest.TestCase):
     def setUp(self):

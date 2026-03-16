@@ -1,7 +1,7 @@
 # core/agents/industry_specialists/technology.py
 
 import logging
-import pandas as pd
+
 from textblob import TextBlob
 
 # Configure logging

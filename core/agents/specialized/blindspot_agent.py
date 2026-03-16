@@ -1,13 +1,15 @@
 # Verified for Adam v25.5
 # Reviewed by Jules
 # Protocol Verified: ADAM-V-NEXT (Updated)
-from typing import Any, Dict, List
-import logging
 import asyncio
+import logging
 import os
 import threading
-from core.agents.agent_base import AgentBase
+from typing import Any, Dict, List
+
 import networkx as nx
+
+from core.agents.agent_base import AgentBase
 
 # Local helper to avoid circular dependency with services.webapp.api
 _neo4j_driver = None
@@ -165,8 +167,9 @@ class BlindspotAgent(AgentBase):
 
         # Emit thought for the Agent Intercom
         try:
-            from core.v30_architecture.python_intelligence.bridge.neural_link import emit_thought, Thought
             from datetime import datetime
+
+            from core.v30_architecture.python_intelligence.bridge.neural_link import Thought, emit_thought
 
             if len(found_anomalies) > 0:
                 highest_severity = "CRITICAL" if any(a['severity'] == "CRITICAL" for a in found_anomalies) else "HIGH"

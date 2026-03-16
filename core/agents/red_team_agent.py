@@ -1,13 +1,14 @@
 from __future__ import annotations
-from typing import Any, Dict, List, Optional, Literal
+
 import logging
-import random
-import asyncio
+from typing import Any, Dict, Literal
+
+from langgraph.graph import END, StateGraph
 
 from core.agents.agent_base import AgentBase
-from langgraph.graph import StateGraph, END
-from core.engine.states import RedTeamState, GraphState
 from core.agents.skills.counterfactual_reasoning_skill import CounterfactualReasoningSkill
+from core.engine.states import RedTeamState
+from core.schemas.agent_schema import AgentInput, AgentOutput
 
 logger = logging.getLogger(__name__)
 
@@ -48,7 +49,7 @@ class RedTeamAgent(AgentBase):
     def name(self, value: str):
         self._name = value
 
-    async def execute(self, state: Dict[str, Any]) -> Dict[str, Any]:
+    async def execute(self, state: AgentInput) -> AgentOutput:
         """
         Main entry point. compatible with AdaptiveSystemGraph.
 
@@ -61,19 +62,8 @@ class RedTeamAgent(AgentBase):
         logger.info(f"[{self.name}] Executing Adversarial Stress Test...")
 
         # Determine target from input state
-        target_entity = "General Portfolio"
-        credit_memo = {}
-
-        if isinstance(state, dict):
-            # Handle GraphState input (from AdaptiveSystemGraph)
-            if "request" in state:
-                target_entity = state.get("request", "Unknown Target")
-            # Handle direct dictionary input (legacy)
-            elif "target_portfolio_id" in state:
-                target_entity = state["target_portfolio_id"]
-
-            # Extract memo if available
-            credit_memo = state.get("credit_memo", {"assumptions": {"revenue_growth": 0.05, "interest_rate": 0.04}})
+        target_entity = state.query if state.query else "General Portfolio"
+        credit_memo = state.context.get("credit_memo", {"assumptions": {"revenue_growth": 0.05, "interest_rate": 0.04}})
 
         # Initialize RedTeamState
         initial_state: RedTeamState = {
@@ -94,15 +84,20 @@ class RedTeamAgent(AgentBase):
         final_state = await self.graph_app.ainvoke(initial_state)
 
         # Format output for the parent graph (AdaptiveSystemGraph)
-        return {
-            "critique": {
-                "feedback": final_state.get("current_scenario_description"),
-                "meets_standards": final_state.get("is_sufficiently_severe"),
-                "impact_score": final_state.get("simulated_impact_score"),
-                "skill_output": final_state.get("skill_output", {})
-            },
-            "human_readable_status": final_state.get("human_readable_status")
-        }
+        return AgentOutput(
+            answer=final_state.get("current_scenario_description", ""),
+            sources=[],
+            confidence=float(final_state.get("simulated_impact_score", 0.0)) / 10.0,
+            metadata={
+                "critique": {
+                    "feedback": final_state.get("current_scenario_description"),
+                    "meets_standards": final_state.get("is_sufficiently_severe"),
+                    "impact_score": final_state.get("simulated_impact_score"),
+                    "skill_output": final_state.get("skill_output", {})
+                },
+                "human_readable_status": final_state.get("human_readable_status")
+            }
+        )
 
     # --- Internal Graph Nodes ---
 

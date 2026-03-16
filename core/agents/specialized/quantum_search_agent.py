@@ -1,6 +1,6 @@
-from typing import Any, Dict, Optional, List
 import logging
-import asyncio
+from typing import Any, Dict, List, Optional
+
 from core.agents.agent_base import AgentBase
 from core.simulations.avg_search import AVGSearch
 from core.simulations.market_oracle import MarketOracle
