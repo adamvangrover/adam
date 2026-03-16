@@ -59,9 +59,11 @@ class TestSNCCompliance(unittest.TestCase):
         agent.run_semantic_kernel_skill = MagicMock(return_value=asyncio.Future())
         agent.run_semantic_kernel_skill.return_value.set_result("Confused AI")
 
-        rating, rationale = await agent.execute(company_id="RISKY_CORP")
+        result = await agent.execute(company_id="RISKY_CORP")
+        rating = result.get("final_rating")
+        rationale = result.get("report", "")
 
-        self.assertEqual(rating, SNCRating.SUBSTANDARD)
+        self.assertEqual(rating, SNCRating.SUBSTANDARD.value)
         self.assertIn("Compliance Validation Failed", rationale)
         self.assertIn("Leverage Breach", rationale)
 
@@ -108,9 +110,11 @@ class TestSNCCompliance(unittest.TestCase):
         agent.run_semantic_kernel_skill = MagicMock(return_value=asyncio.Future())
         agent.run_semantic_kernel_skill.return_value.set_result("Confused AI")
 
-        rating, rationale = await agent.execute(company_id="SAFE_CORP")
+        result = await agent.execute(company_id="SAFE_CORP")
+        rating = result.get("final_rating")
+        rationale = result.get("report", "")
 
-        self.assertEqual(rating, SNCRating.PASS)
+        self.assertEqual(rating, SNCRating.PASS.value)
 
         agent.generate_defense_file(self.defense_file)
         with open(self.defense_file, 'r') as f:
@@ -171,10 +175,12 @@ class TestSNCCompliance(unittest.TestCase):
         # Assign method to instance
         agent.run_semantic_kernel_skill = mock_run_sk_pass
 
-        rating, rationale = await agent.execute(company_id="HALLUCINATION_CORP")
+        result = await agent.execute(company_id="HALLUCINATION_CORP")
+        rating = result.get("final_rating")
+        rationale = result.get("report", "")
 
         # Should be downgraded to SUBSTANDARD
-        self.assertEqual(rating, SNCRating.SUBSTANDARD)
+        self.assertEqual(rating, SNCRating.SUBSTANDARD.value)
         self.assertIn("CRITICAL COMPLIANCE VIOLATION", rationale)
         self.assertIn("Leverage Breach", rationale)
 

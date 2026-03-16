@@ -2,7 +2,8 @@
 from semantic_kernel import Kernel
 from unittest.mock import patch
 import json
-from core.agents.agent_base import AgentBase
+from core.agents.pydantic_agent_base import PydanticAgentBase
+from core.schemas.agent_schema import AgentInput, AgentOutput
 from typing import Dict, Any, Optional, Tuple
 from enum import Enum
 import asyncio
@@ -33,7 +34,7 @@ class SNCRating(Enum):
     LOSS = "Loss"
 
 
-class SNCAnalystAgent(AgentBase):
+class SNCAnalystAgent(PydanticAgentBase):
     """
     Agent for performing Shared National Credit (SNC) analysis.
     This agent analyzes company data based on regulatory guidelines to assign an SNC rating.
@@ -75,13 +76,16 @@ class SNCAnalystAgent(AgentBase):
         except Exception as e:
             logging.error(f"Failed to generate defense file: {e}")
 
-    async def execute(self, **kwargs) -> Optional[Tuple[Optional[SNCRating], str]]:
+    async def execute_pydantic(self, input_data: AgentInput) -> AgentOutput:
         # Reset audit log for new execution to prevent state pollution
         self.audit_log = []
 
-        company_id = kwargs.get('company_id')
+        company_id = input_data.query.strip()
+        if not company_id:
+            company_id = input_data.context.get('company_id', '')
+
         logging.info(f"Executing SNC analysis for company_id: {company_id}")
-        logging.debug(f"SNC_ANALYSIS_EXECUTE_INPUT: company_id='{company_id}', all_kwargs={kwargs}")
+        logging.debug(f"SNC_ANALYSIS_EXECUTE_INPUT: company_id='{company_id}', input_data={input_data}")
 
         self._log_audit_event("SNC_ANALYSIS_START", {"company_id": company_id})
 
@@ -89,12 +93,20 @@ class SNCAnalystAgent(AgentBase):
             error_msg = "Company ID not provided for SNC analysis."
             logging.error(error_msg)
             self._log_audit_event("ERROR", {"message": error_msg})
-            return None, error_msg
+            return AgentOutput(
+                answer=error_msg,
+                confidence=0.0,
+                metadata={"error": error_msg}
+            )
 
         if 'DataRetrievalAgent' not in self.peer_agents:
             error_msg = "DataRetrievalAgent not found in peer agents for snc_analyst_agent."
             logging.error(error_msg)
-            return None, error_msg
+            return AgentOutput(
+                answer=error_msg,
+                confidence=0.0,
+                metadata={"error": error_msg}
+            )
 
         dra_request = {'data_type': 'get_company_financials', 'company_id': company_id}
         logging.debug(f"SNC_ANALYSIS_A2A_REQUEST: Requesting data from DataRetrievalAgent: {dra_request}")
@@ -104,7 +116,11 @@ class SNCAnalystAgent(AgentBase):
         if not company_data_package:
             error_msg = f"Failed to retrieve company data package for {company_id} from DataRetrievalAgent."
             logging.error(error_msg)
-            return None, error_msg
+            return AgentOutput(
+                answer=error_msg,
+                confidence=0.0,
+                metadata={"error": error_msg}
+            )
 
         company_info = company_data_package.get('company_info', {})
         financial_data_detailed = company_data_package.get('financial_data_detailed', {})
@@ -150,7 +166,24 @@ class SNCAnalystAgent(AgentBase):
 
         logging.debug(
             f"SNC_ANALYSIS_EXECUTE_OUTPUT: Rating='{rating.value if rating else 'N/A'}', Rationale='{rationale}'")
-        return rating, rationale
+
+        # Emit pheromone if rating is Doubtful or Loss
+        if rating in [SNCRating.DOUBTFUL, SNCRating.LOSS]:
+            self.emit_pheromone("credit_alert", f"Critical SNC Rating generated for {company_id}: {rating.value}", urgency=0.9)
+
+        confidence_score = 0.9 if rating in [SNCRating.PASS, SNCRating.SPECIAL_MENTION] else 0.75
+        metadata = {
+            "final_rating": rating.value if rating else None,
+            "report": rationale,
+            "audit_log": self.audit_log
+        }
+
+        return AgentOutput(
+            answer=rationale,
+            sources=[f"SNC Guidelines", f"Credit Memo for {company_id}"],
+            confidence=confidence_score,
+            metadata=metadata
+        )
 
     def _prepare_financial_inputs_for_sk(self, financial_data_detailed: Dict[str, Any]) -> Dict[str, str]:
         """Prepares stringified financial inputs required by SK skills."""
