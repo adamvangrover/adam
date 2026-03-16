@@ -37,24 +37,24 @@ class QuantumCompany:
         self.volatility = volatility
         # Represented as a complex amplitude defining probability of "hyper-growth" vs "stagnation"
         self.state_amplitude = state_amplitude
-        
+
     def simulate_month(self, macro_shock):
         """Simulates FCF growth over 1 month, heavily influenced by its quantum state and macro shocks."""
         # Calculate real probability from complex amplitude (P = |A|^2)
         prob_hyper_growth = abs(self.state_amplitude)**2
-        
+
         # Determine growth regime randomly weighted by quantum probability
         if random.random() < prob_hyper_growth:
             growth = random.uniform(0.01, self.volatility) # High growth
         else:
             growth = random.uniform(-self.volatility/2, 0.01) # Stagnation / Contraction
-            
+
         # Apply systemic macro shock (representing supply chain disruptions, energy spikes)
         actual_growth = growth + macro_shock
-        
+
         # Update FCF
         self.fcf = self.fcf * (1 + actual_growth)
-        
+
         # Calculate trailing generic EV based on updated FCF
         # Continuous terminal value approximation: EV = FCF / (WACC - TG)
         ev = self.fcf / (self.wacc - self.tg)
@@ -263,4 +263,3 @@ This forecast utilizes a proprietary quantum-state simulation architecture. Rath
 
 if __name__ == "__main__":
     run_simulation()
-    
