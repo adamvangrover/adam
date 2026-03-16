@@ -1,12 +1,48 @@
-# core/utils/token_utils.py
+"""
+core/utils/token_utils.py
+
+Architecture & Usage:
+This module provides a suite of utilities for accurate token counting and dynamic context window management.
+It utilizes the `tiktoken` library for precise token calculation compatible with OpenAI models,
+augmented with an LRU cache (`_get_encoding`) to eliminate redundant encoding initializations
+and improve execution speed.
+
+It provides functions to verify text against configuration-defined token limits (`check_token_limit`),
+and introduces a novel AI integration (`trim_to_token_limit_with_ai`) that leverages `litellm`
+to intelligently summarize verbose text blocks when limits are exceeded, falling back to safe
+hard truncation if the LLM is unavailable.
+
+Typical Usage Example:
+    from core.utils.token_utils import count_tokens, trim_to_token_limit_with_ai
+
+    token_count = count_tokens("Hello world")
+    config = {"token_limit": 100}
+    safe_text = trim_to_token_limit_with_ai(large_text, config)
+
+Dependencies:
+    - Built-ins: functools, logging, typing
+    - External: tiktoken, litellm (optional)
+"""
+
+import logging
+from functools import lru_cache
+from typing import Any, Dict
 
 import tiktoken  # Use tiktoken for accurate token counting
-import logging
-import yaml
-import os
 
-# Configure logging (consider moving to a central location)
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
+
+
+@lru_cache(maxsize=4)
+def _get_encoding(encoding_name: str) -> tiktoken.Encoding:
+    """
+    Cached helper to retrieve tiktoken encoding.
+    """
+    try:
+        return tiktoken.get_encoding(encoding_name)
+    except (KeyError, ValueError):
+        logger.warning(f"Encoding '{encoding_name}' not found, using 'cl100k_base' as fallback.")
+        return tiktoken.get_encoding("cl100k_base")
 
 
 def count_tokens(text: str, encoding_name: str = "cl100k_base") -> int:
@@ -22,20 +58,15 @@ def count_tokens(text: str, encoding_name: str = "cl100k_base") -> int:
         The number of tokens in the string.
     """
     try:
-        encoding = tiktoken.get_encoding(encoding_name)
-        num_tokens = len(encoding.encode(text))
-        return num_tokens
-    except KeyError:
-        logging.warning(f"Encoding '{encoding_name}' not found, using 'cl100k_base' as fallback.")
-        encoding = tiktoken.get_encoding("cl100k_base")  # Default to cl100k_base
+        encoding = _get_encoding(encoding_name)
         num_tokens = len(encoding.encode(text))
         return num_tokens
     except Exception as e:
-        logging.error(f"Error counting tokens: {e}")
+        logger.error(f"Error counting tokens: {e}")
         return 0  # Return 0 on error
 
 
-def get_token_limit(config: dict) -> int:
+def get_token_limit(config: Dict[str, Any]) -> int:
     """
     Retrieves the token limit from the system configuration.
 
@@ -48,7 +79,7 @@ def get_token_limit(config: dict) -> int:
     return config.get("token_limit", 4096)  # Default to 4096
 
 
-def check_token_limit(text: str, config: dict, margin: int = 0) -> bool:
+def check_token_limit(text: str, config: Dict[str, Any], margin: int = 0) -> bool:
     """
     Checks if the number of tokens in a string is within the configured limit.
 
@@ -66,33 +97,74 @@ def check_token_limit(text: str, config: dict, margin: int = 0) -> bool:
     return num_tokens <= (token_limit - margin)
 
 
-# Example Usage (and testing)
-if __name__ == '__main__':
-    from core.utils.config_utils import load_config  # Import load_config
+def trim_to_token_limit_with_ai(text: str, config: Dict[str, Any], margin: int = 0) -> str:
+    """
+    Intelligently summarizes or truncates text using litellm if it exceeds the token limit.
+    If the text is within the limit, it is returned unmodified.
 
-    # Create a dummy config for testing
-    dummy_config = {"token_limit": 100}  # Set a low limit for testing
-    with open("test_config.yaml", "w") as f:
-        yaml.dump(dummy_config, f)
-    test_config = load_config("test_config.yaml")
+    Args:
+        text: The string to check and potentially summarize.
+        config: The system configuration dictionary.
+        margin: An optional margin to subtract from the token limit.
 
-    test_string = "This is a test string to count tokens."
-    print(f"'{test_string}' has {count_tokens(test_string)} tokens.")
+    Returns:
+        The text, summarized if it exceeded the token limit.
+    """
+    import os
+    try:
+        import litellm
+    except ImportError:
+        logger.warning("litellm not installed, falling back to truncation")
+        litellm = None
 
-    if check_token_limit(test_string, test_config):
-        print("Test string is within the token limit.")
+    token_limit = get_token_limit(config)
+    target_limit = token_limit - margin
+    num_tokens = count_tokens(text)
+
+    if num_tokens <= target_limit:
+        return text
+
+    if litellm is not None and os.environ.get("OPENAI_API_KEY"):
+        try:
+            logger.info(f"Text exceeds limit ({num_tokens} > {target_limit}), attempting AI summarization.")
+            response = litellm.completion(
+                model="gpt-3.5-turbo",
+                messages=[
+                    {"role": "system", "content": f"Summarize the following text so that it is less than "
+                                                  f"{target_limit} tokens while retaining key information."},
+                    {"role": "user", "content": text}
+                ],
+                max_tokens=target_limit
+            )
+            summarized_text = response.choices[0].message.content
+            if summarized_text:
+                return summarized_text
+        except Exception as e:
+            logger.error(f"AI summarization failed: {e}. Falling back to hard truncation.")
+
+    # Fallback: Graceful compaction using tiktoken
+    logger.info(f"Falling back to graceful compaction to {target_limit} tokens.")
+    import re
+
+    # Step 1: Whitespace Compaction
+    compacted_text = re.sub(r'\s+', ' ', text).strip()
+    num_tokens = count_tokens(compacted_text)
+
+    if num_tokens <= target_limit:
+        return compacted_text
+
+    # Step 2: Middle-out Truncation
+    encoding = _get_encoding("cl100k_base")
+    encoded = encoding.encode(compacted_text)
+
+    half_limit = target_limit // 2
+    if half_limit > 3:
+        # Keep the beginning and end, inserting an ellipsis token sequence if there's room
+        ellipsis = encoding.encode(" ... ")
+        half_limit = (target_limit - len(ellipsis)) // 2
+        truncated_encoded = encoded[:half_limit] + ellipsis + encoded[-half_limit:]
     else:
-        print("Test string exceeds the token limit.")
+        # If target limit is too small, just hard truncate the beginning
+        truncated_encoded = encoded[:target_limit]
 
-    long_string = "This is a very long string. " * 50  # Create a string that exceeds the limit
-    if check_token_limit(long_string, test_config):
-        print("Long string is within the token limit.")
-    else:
-        print("Long string exceeds the token limit.")
-
-    if check_token_limit(long_string, test_config, margin=20):
-        print("Long string is within the token limit (with margin).")
-    else:
-        print("Long string exceeds the token limit (with margin).")
-    # Clean up
-    os.remove("test_config.yaml")
+    return encoding.decode(truncated_encoded)
