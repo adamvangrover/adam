@@ -52,6 +52,12 @@ class RoutingResult(BaseModel):
     confidence_score: float
     routing_metadata: Dict[str, Any] = Field(default_factory=dict)
 
+class GraphNode(BaseModel):
+    """Represents a node in the Knowledge Graph."""
+    id: str
+    label: str
+    properties: Dict[str, Any] = Field(default_factory=dict)
+
 class PlanStep(BaseModel):
     """A single step in a Neuro-Symbolic Plan."""
     step_id: str
