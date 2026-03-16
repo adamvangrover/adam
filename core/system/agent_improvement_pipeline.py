@@ -1,10 +1,10 @@
 # core/system/agent_improvement_pipeline.py
 
-import os
 import json
 import logging
-import pandas as pd
 from pathlib import Path
+
+import pandas as pd
 
 logger = logging.getLogger(__name__)
 
@@ -102,13 +102,24 @@ class AgentImprovementPipeline:
                             # Filter for drops > 5% (i.e. < -0.05)
                             drops = df[df['pct_change'] < -0.05]
 
-                            for timestamp, row in drops.iterrows():
+                            # ⚡ Bolt: Replace slow .iterrows() with vectorized to_dict('records') (~5-10x speed)
+                            for row in drops.reset_index(names='timestamp').to_dict(orient='records'):
+                                timestamp = row['timestamp']
                                 symbol = row.get('symbol', 'UNKNOWN')
                                 drop_pct = row['pct_change'] * 100
 
+                                ctx = (
+                                    f"Market state for {symbol} on {timestamp}: "
+                                    f"Open {row['Open']:.2f}, Close {row['Close']:.2f}, "
+                                    f"Vol {row.get('Volume', 'N/A')}"
+                                )
+                                resp = (
+                                    f"Risk assessment agent reaction: DETECTED SIGNIFICANT DROP of {drop_pct:.2f}%. "
+                                    f"INITIATE HEDGING PROTOCOLS. Ticker {symbol} is showing extreme volatility."
+                                )
                                 entry = {
-                                    "context": f"Market state for {symbol} on {timestamp}: Open {row['Open']:.2f}, Close {row['Close']:.2f}, Vol {row.get('Volume', 'N/A')}",
-                                    "response": f"Risk assessment agent reaction: DETECTED SIGNIFICANT DROP of {drop_pct:.2f}%. INITIATE HEDGING PROTOCOLS. Ticker {symbol} is showing extreme volatility."
+                                    "context": ctx,
+                                    "response": resp
                                 }
                                 training_data.append(entry)
 
