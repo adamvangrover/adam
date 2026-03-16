@@ -28,14 +28,40 @@ class MarketMayhemBridge:
 
     def generate_chaos_data(self):
         """
-        Simulates the generation of Market Mayhem data.
+        Simulates the generation of Market Mayhem data, influenced by System State.
         Returns a dictionary with system metrics and a narrative summary.
         """
+        # Load System State
+        system_state = {}
+        try:
+            with open("showcase/data/system_state.json", "r") as f:
+                system_state = json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError):
+            print("System State not found or invalid, using random baseline.")
+
+        regime = system_state.get("regime", "Neutral")
+        avg_sent = system_state.get("average_sentiment", 50)
+        avg_conv = system_state.get("average_conviction", 50)
+
         scenario = random.choice(self.scenarios)
-        volatility = round(random.uniform(15.0, 45.0), 2)
+
+        # Bias Generation based on Regime
+        if regime == "Bullish Expansion":
+             volatility = round(random.uniform(10.0, 20.0), 2)
+             trend = "Upward"
+        elif regime == "Bearish Capitulation":
+             volatility = round(random.uniform(30.0, 60.0), 2)
+             trend = "Downward"
+        elif regime == "Fear & Uncertainty":
+             volatility = round(random.uniform(25.0, 45.0), 2)
+             trend = "Choppy"
+        else:
+             volatility = round(random.uniform(15.0, 30.0), 2)
+             trend = "Sideways"
+
         liquidity_stress = round(random.uniform(0.0, 100.0), 1)
         system_load = round(random.uniform(20.0, 95.0), 1)
-        active_agents = random.randint(5, 50)
+        active_agents = system_state.get("active_agents", random.randint(5, 50))
 
         # Simulated metrics for charts
         metrics = {
@@ -43,17 +69,21 @@ class MarketMayhemBridge:
             "Liquidity Stress Index": liquidity_stress,
             "System Load (%)": system_load,
             "Active Agents": active_agents,
-            "Scenario Impact Score": round(random.uniform(1.0, 10.0), 1)
+            "Scenario Impact Score": round(random.uniform(1.0, 10.0), 1),
+            "Conviction": int(avg_conv + random.randint(-5, 5)),
+            "Sentiment": int(avg_sent + random.randint(-5, 5)),
+            "Probability": random.randint(60, 95)
         }
 
         # Simulated narrative
         narrative = f"""
         <h2>Executive Summary (LIVE)</h2>
         <ul>
-        <li><strong>Scenario:</strong> {scenario}</li>
-        <li><strong>Alert:</strong> System volatility is at {volatility}. Immediate attention required.</li>
+        <li><strong>Scenario:</strong> {scenario} <span style="color:#888;">[{regime}]</span></li>
+        <li><strong>Alert:</strong> System volatility is at {volatility}. Trend is {trend}.</li>
         <li><strong>Liquidity:</strong> Stress levels at {liquidity_stress}/100. Monitoring banking sector.</li>
-        <li><strong>Agent Activity:</strong> {active_agents} autonomous agents deployed to mitigate risks.</li>
+        <li><strong>Agent Activity:</strong> {active_agents} autonomous agents deployed. Consensus: {metrics['Conviction']}/100.</li>
+        <li><strong>Probability:</strong> {metrics['Probability']}% likelihood of regime continuity.</li>
         </ul>
         """
 

@@ -122,7 +122,7 @@
             <div class="glass-panel" style="margin-bottom: 40px; padding: 15px; border-top: 2px solid #bd00ff; display:flex; justify-content:space-between; align-items:center;">
                 <div>
                     <h4 class="mono" style="margin:0; color:#bd00ff;">SYSTEM EVOLUTION STATUS</h4>
-                    <span style="font-size:0.8rem; color:#888;">Current Version: v2.0 (Swarm) | Active Agents: 35+</span>
+                    <span id="system-status-text" style="font-size:0.8rem; color:#888;">Current Version: v2.0 (Swarm) | Active Agents: 35+</span>
                 </div>
                 <a href="evolution_v2.html" class="cyber-btn" style="border-color:#bd00ff; color:#bd00ff;">VIEW TIMELINE &rarr;</a>
             </div>
@@ -163,5 +163,23 @@
 
     <!-- Adam Global Nav -->
     <script src="../showcase/js/nav_v2.js" data-root=".."></script>
-<script src="js/command_palette.js"></script></body>
+<script src="js/command_palette.js"></script>
+<script>
+    async function updateSystemStatus() {
+        try {
+            const response = await fetch('data/system_state.json');
+            if (!response.ok) throw new Error("Failed to load system state");
+            const data = await response.json();
+
+            const statusSpan = document.getElementById('system-status-text');
+            if (statusSpan && data.regime) {
+                statusSpan.innerHTML = `Current Version: v2.0 (Swarm) | Regime: <span style="color:#bd00ff">${data.regime}</span> | Active Agents: ${data.active_agents}`;
+            }
+        } catch (e) {
+            console.warn("System Status Update Failed:", e);
+        }
+    }
+    updateSystemStatus();
+</script>
+</body>
 </html>

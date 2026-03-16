@@ -42,6 +42,83 @@ def analyze_sentiment(text):
     score = (pos_count / total_matches) * 100
     return int(score)
 
+def calculate_conviction(text):
+    """Calculates conviction score (0-100) based on modal verb density."""
+    if not text: return 50
+    text_lower = text.lower()
+
+    strong_modals = {"will", "must", "definitely", "certainly", "undoubtedly", "always", "never", "critical", "essential", "guaranteed"}
+    weak_modals = {"might", "could", "possibly", "maybe", "perhaps", "likely", "unlikely", "potential", "seems", "appears"}
+
+    words = re.findall(r'\w+', text_lower)
+    if not words: return 50
+
+    strong_count = sum(1 for w in words if w in strong_modals)
+    weak_count = sum(1 for w in words if w in weak_modals)
+
+    total_modals = strong_count + weak_count
+    if total_modals == 0: return 50
+
+    # Bias towards 50, pull up for strong, down for weak
+    base = 50
+    score = base + (strong_count * 5) - (weak_count * 3)
+    return max(0, min(100, int(score)))
+
+def enhance_entity_links(text):
+    """Replaces $TICKER and @Agent with clickable links."""
+    if not text: return ""
+
+    # Replace $TICKER with link to KG
+    # Use negative lookbehind/ahead if needed to avoid double linking if run multiple times,
+    # but for now we assume raw text input.
+
+    def repl_ticker(match):
+        ticker = match.group(1)
+        return f'<a href="system_knowledge_graph.html?focus={ticker}" class="entity-link ticker" target="_blank">${ticker}</a>'
+
+    def repl_agent(match):
+        agent = match.group(1)
+        return f'<a href="agent_gallery.html?agent={agent}" class="entity-link agent" target="_blank">@{agent}</a>'
+
+    text = re.sub(r'\$([A-Z]{2,5})\b', repl_ticker, text)
+    text = re.sub(r'@([A-Za-z0-9_]+)\b', repl_agent, text)
+
+    return text
+
+def calculate_semantic_score(text):
+    """Calculates semantic complexity score (0-100) based on lexical density."""
+    if not text: return 50
+    words = re.findall(r'\w+', text.lower())
+    if not words: return 0
+
+    unique_words = set(words)
+    # Lexical density proxy: ratio of unique words to total words
+    # Adjusted for length: longer texts naturally have lower TTR (Type-Token Ratio)
+    ttr = len(unique_words) / len(words)
+
+    # Normalize: typical TTR for these reports might be 0.3 to 0.6
+    # Map 0.2 -> 0, 0.7 -> 100
+    score = (ttr - 0.2) * 200
+    return max(0, min(100, int(score)))
+
+def generate_critique(text, sentiment, conviction):
+    """Generates a synthetic critique if one is missing."""
+    if conviction > 75:
+        tone = "High confidence signal detected."
+    elif conviction < 40:
+        tone = "Low conviction signal; significant uncertainty detected."
+    else:
+        tone = "Moderate conviction; standard volatility expected."
+
+    if sentiment < 30:
+        insight = "Risk parameters are elevated. Defensive positioning recommended."
+    elif sentiment > 70:
+        insight = "Strong bullish momentum identified. Momentum strategies favored."
+    else:
+        insight = "Market conditions appear neutral to mixed."
+
+    return f"ReviewerAgent: {tone} {insight} [Confidence: {conviction}%]"
+
 def extract_entities(text):
     """Extracts Tickers ($AAPL) and Agents (@AgentName) and potential Sovereigns."""
     tickers = sorted(list(set(re.findall(r'\$([A-Z]{2,5})', text))))
@@ -109,6 +186,9 @@ def simple_md_to_html(text):
             final_html += p + "\n"
         else:
             final_html += f"<p>{p}</p>\n"
+
+    # Apply Entity Linking to the final HTML
+    final_html = enhance_entity_links(final_html)
 
     return final_html
 
@@ -295,6 +375,9 @@ def parse_json_file(filepath):
                  if k not in ['title', 'date', 'summary', 'file_name', 'company', 'analyst'] and isinstance(v, str):
                      body_html += f"<h3>{k.replace('_', ' ').title()}</h3><p>{v}</p>"
 
+        # Apply Entity Linking
+        body_html = enhance_entity_links(body_html)
+
         if not summary: summary = f"Market Report from {date_str}"
 
         # Determine Type
@@ -318,6 +401,11 @@ def parse_json_file(filepath):
         entities = extract_entities(full_text)
         prov_hash = calculate_provenance(full_text)
 
+        # New Scoring & Critique
+        conviction = calculate_conviction(full_text)
+        semantic_score = calculate_semantic_score(full_text)
+        critique = generate_critique(full_text, sentiment, conviction)
+
         return {
             "title": title,
             "date": date_str,
@@ -330,7 +418,11 @@ def parse_json_file(filepath):
             "filename": out_filename,
             "is_sourced": True,
             "metrics_json": metrics_json,
-            "source_priority": 2  # Higher priority than restored HTML
+            "source_priority": 2, # Higher priority than restored HTML
+            "conviction": conviction,
+            "semantic_score": semantic_score,
+            "critique": critique,
+            "quality": 100
         }
     except Exception as e:
         print(f"Error processing {filepath}: {e}")
@@ -352,7 +444,7 @@ def parse_txt_file(filepath):
         type_ = "REPORT"
         if "Deep Dive" in content or "DEEP DIVE" in content: type_ = "DEEP_DIVE"
 
-        body_html = f"<div style='white-space: pre-wrap; font-family: inherit;'>{content}</div>"
+        body_html = f"<div style='white-space: pre-wrap; font-family: inherit;'>{enhance_entity_links(content)}</div>"
 
         summary = "Comprehensive report."
         summary_match = re.search(r'EXECUTIVE SUMMARY.*?\n\n(.*?)\n', content, re.DOTALL)
@@ -363,6 +455,11 @@ def parse_txt_file(filepath):
         sentiment = analyze_sentiment(content)
         entities = extract_entities(content)
         prov_hash = calculate_provenance(content)
+
+        # New Scoring
+        conviction = calculate_conviction(content)
+        semantic_score = calculate_semantic_score(content)
+        critique = generate_critique(content, sentiment, conviction)
 
         return {
             "title": title,
@@ -376,7 +473,11 @@ def parse_txt_file(filepath):
             "filename": filename.replace('.txt', '.html'),
             "is_sourced": True,
             "metrics_json": "{}",
-            "source_priority": 2
+            "source_priority": 2,
+            "conviction": conviction,
+            "semantic_score": semantic_score,
+            "critique": critique,
+            "quality": 100
         }
     except Exception as e:
         print(f"Error parsing TXT {filepath}: {e}")
@@ -434,12 +535,27 @@ def parse_markdown_file(filepath):
         else:
             summary = "Market analysis and strategic insights."
 
-        # Extract New Metadata (Conviction/Critique)
-        conviction_match = re.search(r'\*\*Conviction:\*\* .*?(\d+)/100', content)
-        conviction_score = int(conviction_match.group(1)) if conviction_match else 50
+        # Analysis
+        sentiment = analyze_sentiment(content)
+        entities = extract_entities(content)
+        prov_hash = calculate_provenance(content)
 
+        # New Scoring & Extraction
+        semantic_score = calculate_semantic_score(content)
+
+        # Extract or Calculate Conviction
+        conviction_match = re.search(r'\*\*Conviction:\*\* .*?(\d+)/100', content)
+        if conviction_match:
+             conviction_score = int(conviction_match.group(1))
+        else:
+             conviction_score = calculate_conviction(content)
+
+        # Extract or Generate Critique
         critique_match = re.search(r'\*\*Critique:\*\* (.*?)\n', content)
-        critique_text = critique_match.group(1) if critique_match else "No automated critique available."
+        if critique_match:
+             critique_text = critique_match.group(1)
+        else:
+             critique_text = generate_critique(content, sentiment, conviction_score)
 
         quality_match = re.search(r'\*\*Quality Score:\*\* (\d+)/100', content)
         quality_score = int(quality_match.group(1)) if quality_match else 100
@@ -448,11 +564,6 @@ def parse_markdown_file(filepath):
              content = content.replace(title_match.group(0), "", 1).strip()
 
         body_html = simple_md_to_html(content)
-
-        # Analysis
-        sentiment = analyze_sentiment(content)
-        entities = extract_entities(content)
-        prov_hash = calculate_provenance(content)
 
         return {
             "title": title,
@@ -468,6 +579,7 @@ def parse_markdown_file(filepath):
             "metrics_json": "{}",
             "source_priority": 2,
             "conviction": conviction_score,
+            "semantic_score": semantic_score,
             "critique": critique_text,
             "quality": quality_score
         }
@@ -532,11 +644,17 @@ def parse_html_file(filepath):
             for disc in disclaimers: disc.decompose()
             
             body_html = "".join([str(x) for x in container.contents])
+            body_html = enhance_entity_links(body_html)
             
             full_text = soup.get_text()
             sentiment = analyze_sentiment(full_text)
             entities = extract_entities(full_text)
             prov_hash = calculate_provenance(full_text)
+
+            # New Scoring
+            conviction = calculate_conviction(full_text)
+            semantic_score = calculate_semantic_score(full_text)
+            critique = generate_critique(full_text, sentiment, conviction)
 
             return {
                 "title": title,
@@ -550,7 +668,11 @@ def parse_html_file(filepath):
                 "filename": filename,
                 "is_sourced": True, # Recovered content can be treated as sourced
                 "metrics_json": "{}",
-                "source_priority": 1 # Lower priority than MD/JSON
+                "source_priority": 1, # Lower priority than MD/JSON
+                "conviction": conviction,
+                "semantic_score": semantic_score,
+                "critique": critique,
+                "quality": 100
             }
 
         # --- Strategy 2: Extract from Generated/Generic HTML ---
@@ -593,6 +715,11 @@ def parse_html_file(filepath):
         entities = extract_entities(content)
         prov_hash = calculate_provenance(content)
 
+        # New Scoring
+        conviction = calculate_conviction(content)
+        semantic_score = calculate_semantic_score(content)
+        critique = generate_critique(content, sentiment, conviction)
+
         return {
             "title": title,
             "date": date,
@@ -604,7 +731,11 @@ def parse_html_file(filepath):
             "provenance_hash": prov_hash,
             "filename": filename,
             "is_sourced": False, # Do not overwrite existing HTML unless it was the legacy kind
-            "metrics_json": "{}"
+            "metrics_json": "{}",
+            "conviction": conviction,
+            "semantic_score": semantic_score,
+            "critique": critique,
+            "quality": 100
         }
 
     except Exception as e:
@@ -896,6 +1027,10 @@ def get_all_data():
         item['entities'] = extract_entities(full_text)
         item['provenance_hash'] = calculate_provenance(full_text)
         item['metrics_json'] = "{}"
+        item['conviction'] = calculate_conviction(full_text)
+        item['semantic_score'] = calculate_semantic_score(full_text)
+        item['critique'] = generate_critique(full_text, item['sentiment_score'], item['conviction'])
+        item['quality'] = 100
         all_items.append(item)
 
     # 2. Scan Directories (Source)
@@ -964,10 +1099,63 @@ def get_all_data():
     sorted_items = sorted(final_items, key=lambda x: x['date'], reverse=True)
     return sorted_items
 
+def calculate_moving_average(data, window_size):
+    if not data: return []
+    ma = []
+    for i in range(len(data)):
+        start = max(0, i - window_size + 1)
+        subset = data[start:i+1]
+        ma.append(int(sum(subset) / len(subset)))
+    return ma
+
 def generate_archive():
     print("Starting Enhanced Archive Generation...")
 
     sorted_items = get_all_data()
+
+    # --- Aggregation & Regime Logic ---
+    chronological_items = sorted([i for i in sorted_items if i['date'] != "2025-01-01"], key=lambda x: x['date'])
+
+    sent_scores = [i.get('sentiment_score', 50) for i in chronological_items]
+    conv_scores = [i.get('conviction', 50) for i in chronological_items]
+
+    sent_ma = calculate_moving_average(sent_scores, 7)
+    conv_ma = calculate_moving_average(conv_scores, 7)
+
+    latest_sent = sent_ma[-1] if sent_ma else 50
+    latest_conv = conv_ma[-1] if conv_ma else 50
+
+    if latest_sent > 55 and latest_conv > 55:
+        regime = "Bullish Expansion"
+    elif latest_sent < 45 and latest_conv > 55:
+        regime = "Bearish Capitulation"
+    elif latest_sent < 45 and latest_conv < 45:
+        regime = "Fear & Uncertainty"
+    elif latest_sent > 55 and latest_conv < 45:
+        regime = "Speculative Bubble"
+    else:
+        regime = "Neutral / Transition"
+
+    print(f"System State: {regime} (Sent: {latest_sent}, Conv: {latest_conv})")
+
+    # Export System State
+    unique_agents = set()
+    for item in sorted_items:
+        unique_agents.update(item.get('entities', {}).get('agents', []))
+
+    system_state = {
+        "regime": regime,
+        "average_sentiment": latest_sent,
+        "average_conviction": latest_conv,
+        "active_agents": len(unique_agents) if unique_agents else 35,
+        "latest_critique": sorted_items[0].get('critique', "System nominal."),
+        "last_updated": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    }
+
+    os.makedirs("showcase/data", exist_ok=True)
+    with open("showcase/data/system_state.json", "w") as f:
+        json.dump(system_state, f, indent=4)
+    print(f"Exported system state to showcase/data/system_state.json")
 
     # 3. Generate HTML Reports (Only for sourced items that need generation)
     print(f"Generating report pages for sourced items...")
@@ -1032,6 +1220,7 @@ def generate_archive():
     
     dates = [i['date'] for i in chart_items]
     sentiments = [i['sentiment_score'] for i in chart_items]
+    convictions = [i.get('conviction', 50) for i in chart_items]
 
     # Top Entities
     all_tickers = []
@@ -1209,6 +1398,7 @@ def generate_archive():
                         <span class="mono" style="font-size:0.7rem; color:#888;">{item['date']}</span>
                         <span class="type-badge">{item['type']}</span>
                         <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: {item['sentiment_score']}</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444; margin-left: 10px;">CONVICTION: {item.get('conviction', 50)}</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">{item['title']}</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">{item['summary']}</p>
@@ -1246,12 +1436,21 @@ def generate_archive():
         const chartData = {
             labels: """ + json.dumps(dates) + """,
             datasets: [{
-                label: 'Market Sentiment Index',
+                label: 'Market Sentiment',
                 data: """ + json.dumps(sentiments) + """,
                 borderColor: '#00f3ff',
                 backgroundColor: 'rgba(0, 243, 255, 0.1)',
                 tension: 0.4,
-                fill: true
+                fill: false,
+                borderWidth: 1
+            }, {
+                label: 'Agent Conviction',
+                data: """ + json.dumps(convictions) + """,
+                borderColor: '#cc0000',
+                backgroundColor: 'rgba(204, 0, 0, 0.1)',
+                tension: 0.4,
+                fill: false,
+                borderWidth: 1
             }]
         };
 
