@@ -978,10 +978,16 @@ def generate_archive():
     historical = []
     for item in sorted_items:
         year = item["date"].split("-")[0]
-        if int(year) < 2021: historical.append(item)
-        else:
-            if year not in grouped: grouped[year] = []
-            grouped[year].append(item)
+        try:
+            year_int = int(year)
+            if year_int < 2021:
+                historical.append(item)
+            else:
+                if str(year_int) not in grouped: grouped[str(year_int)] = []
+                grouped[str(year_int)].append(item)
+        except ValueError:
+            if "UNKNOWN" not in grouped: grouped["UNKNOWN"] = []
+            grouped["UNKNOWN"].append(item)
 
     tags_html = "".join([f'<span class="tag-cloud-item" onclick="setSearch(\'{t[0]}\')">{t[0]}</span>' for t in ticker_counts])
 
@@ -1246,7 +1252,7 @@ def generate_archive():
             <h1 class="mono" style="margin:0; font-size:1.1rem; letter-spacing: 2px;">MARKET MAYHEM ARCHIVE</h1>
         </div>
         <div class="nav-links mono">
-            <a href="dashboard.html">DASHBOARD</a>
+            <a href="market_mayhem_dashboard.html">DASHBOARD</a>
             <a href="nexus.html">NEXUS</a>
             <a href="terminal.html">TERMINAL</a>
             <a href="#" class="active">ARCHIVE</a>

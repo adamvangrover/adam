@@ -98,7 +98,7 @@
         }
 
         // Central Hub Link (Library)
-        let hubLink = 'market_mayhem_archive.html';
+        let hubLink = 'market_mayhem_dashboard.html';
         if (type === 'DAILY_BRIEFING') hubLink = 'daily_briefings_library.html';
         if (type === 'MARKET_PULSE') hubLink = 'market_pulse_library.html';
         if (type === 'HOUSE_VIEW') hubLink = 'house_view_library.html';

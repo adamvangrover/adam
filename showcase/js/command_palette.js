@@ -6,7 +6,7 @@ class CommandPalette {
             { title: "Go to Mission Control", url: "mission_control_v3.html", icon: "🚀", tag: "NAV" },
             { title: "Go to Crisis Simulator", url: "crisis_simulator.html", icon: "📉", tag: "NAV" },
             { title: "Go to Agent Registry", url: "agents.html", icon: "👥", tag: "NAV" },
-            { title: "Go to Market Archive", url: "market_mayhem_archive.html", icon: "📚", tag: "NAV" },
+            { title: "Go to Market Archive", url: "market_mayhem_dashboard.html", icon: "📚", tag: "NAV" },
             { title: "Go to Neural Dashboard", url: "neural_dashboard.html", icon: "🧠", tag: "NAV" },
             { title: "Toggle Dark/Light Theme", action: "toggleTheme", icon: "🌓", tag: "ACTION" },
             { title: "Toggle API Mode (Live/Mock)", action: "toggleApi", icon: "🔌", tag: "ACTION" }

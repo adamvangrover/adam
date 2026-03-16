@@ -37,7 +37,7 @@
             { name: "Mayhem Graph (Beta)", link: "market_mayhem_graph.html", icon: "fa-project-diagram", color: "text-red-500" },
             { name: "Sovereign Dash (Live)", link: "sovereign_dashboard.html", icon: "fa-globe-americas", color: "text-emerald-400" },
             { name: "Credit Auto (Enhanced)", link: "credit_memo_automation.html", icon: "fa-robot", color: "text-blue-400" },
-            { name: "Archive Search", link: "market_mayhem_archive.html", icon: "fa-search", color: "text-purple-400" },
+            { name: "Archive Search", link: "market_mayhem_dashboard.html", icon: "fa-search", color: "text-purple-400" },
             { name: "Agent Gallery", link: "agent_gallery.html", icon: "fa-id-card", color: "text-pink-400" }
         ];
 

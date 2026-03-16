@@ -1175,7 +1175,7 @@ class OfficeOS {
             { name: 'Settings', icon: 'https://img.icons8.com/color/48/000000/settings.png', action: () => this.appRegistry.launch('Settings') },
             // Add shortcut to specific dashboards
             { name: 'Mission Ctrl', icon: 'https://img.icons8.com/color/48/000000/monitor.png', action: () => this.appRegistry.launch('Browser', {url:'mission_control.html', name:'Mission Control'}) },
-            { name: 'Archive', icon: 'https://img.icons8.com/color/48/000000/archive.png', action: () => this.appRegistry.launch('Browser', {url:'market_mayhem_archive.html', name:'Archive'}) },
+            { name: 'Archive', icon: 'https://img.icons8.com/color/48/000000/archive.png', action: () => this.appRegistry.launch('Browser', {url:'market_mayhem_dashboard.html', name:'Archive'}) },
             { name: 'Neural Deck', icon: 'https://img.icons8.com/color/48/000000/augmented-reality.png', action: () => this.appRegistry.launch('Browser', {url:'neural_deck.html', name:'Neural Deck'}) },
             { name: 'Holodeck', icon: 'https://img.icons8.com/color/48/000000/virtual-reality.png', action: () => this.appRegistry.launch('Browser', {url:'holodeck.html', name:'Holodeck'}) },
             { name: 'Sovereign', icon: 'https://img.icons8.com/color/48/000000/museum.png', action: () => this.appRegistry.launch('Browser', {url:'sovereign_dashboard.html', name:'Sovereign'}) }

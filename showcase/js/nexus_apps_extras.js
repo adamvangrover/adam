@@ -92,7 +92,7 @@
             { id: 'war', title: 'War Room', desc: 'Strategic command center for high-stakes decision making and crisis management.', file: 'war_room.html', icon: 'https://img.icons8.com/color/96/000000/strategy-board.png', color: '#f44336' },
             { id: 'neural', title: 'Neural Deck', desc: 'Immersive 3D visualization of system neural pathways and data flow.', file: 'neural_deck.html', icon: 'https://img.icons8.com/color/96/000000/augmented-reality.png', color: '#9c27b0' },
             { id: 'holodeck', title: 'Holodeck', desc: 'Virtual reality environment for market data simulation and visualization.', file: 'holodeck.html', icon: 'https://img.icons8.com/color/96/000000/virtual-reality.png', color: '#4caf50' },
-            { id: 'archive', title: 'Market Archive', desc: 'Comprehensive historical records of market mayhem events.', file: 'market_mayhem_archive.html', icon: 'https://img.icons8.com/color/96/000000/archive.png', color: '#ff9800' },
+            { id: 'archive', title: 'Market Archive', desc: 'Comprehensive historical records of market mayhem events.', file: 'market_mayhem_dashboard.html', icon: 'https://img.icons8.com/color/96/000000/archive.png', color: '#ff9800' },
             { id: 'sovereign', title: 'Sovereign DB', desc: 'Financial sovereignty and portfolio management suite.', file: 'sovereign_dashboard.html', icon: 'https://img.icons8.com/color/96/000000/museum.png', color: '#ffd700' }
         ];
 
