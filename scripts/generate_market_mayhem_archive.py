@@ -494,7 +494,7 @@ def parse_markdown_file(filepath):
                      else:
                          raw_date = "2025-01-01"
         else:
-            raw_date = date_match.group(1)
+            raw_date = date_match.group(1).split('|')[0].strip()
 
         date = parse_date(raw_date)
 
