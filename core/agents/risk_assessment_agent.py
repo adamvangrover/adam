@@ -6,8 +6,7 @@ import numpy as np
 import datetime
 import asyncio
 from core.agents.agent_base import AgentBase
-
-# Quantitative Rigor: Import Scipy for probability distributions
+from core.schemas.agent_schema import AgentInput, AgentOutput
 try:
     from scipy.stats import norm
     SCIPY_AVAILABLE = True
@@ -60,19 +59,29 @@ class RiskAssessmentAgent(AgentBase):
             logger.error(f"Error decoding knowledge base JSON: {self.knowledge_base_path}")
             return {}
 
-    async def execute(self, target_data: Dict[str, Any], risk_type: str = "investment", context: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    async def execute(self, target_data: Union[Dict[str, Any], AgentInput] = None, risk_type: str = "investment", context: Optional[Dict[str, Any]] = None, **kwargs) -> Union[Dict[str, Any], AgentOutput]:
         """
         Executes the risk assessment.
-
-        Args:
-            target_data (dict): Data related to the target being assessed.
-            risk_type (str): Type of risk assessment (e.g., "investment", "loan", "project").
-            context (dict): Additional context for the risk assessment.
-
-        Returns:
-            dict: Risk assessment results.
+        Supports both legacy target_data input and new AgentInput schema.
         """
-        logger.info(f"Starting risk assessment for type: {risk_type}")
+        # --- INPUT NORMALIZATION FOR PYDANTIC STANDARDIZATION ---
+        is_standard_mode = False
+        query = ""
+
+        if isinstance(target_data, AgentInput):
+            is_standard_mode = True
+            query = target_data.query
+            if target_data.context:
+                context = target_data.context
+            # Attempt to extract implied variables from context if using AgentInput mode
+            _actual_target = context.get("target_data", kwargs.get("target_data", {}))
+            risk_type = context.get("risk_type", kwargs.get("risk_type", risk_type))
+            target_data = _actual_target
+            
+        if target_data is None:
+            target_data = {}
+
+        logger.info(f"Starting risk assessment for type: {risk_type}. Mode: {'Standard' if is_standard_mode else 'Legacy'}")
 
         if context is None:
             context = {}
@@ -171,6 +180,15 @@ class RiskAssessmentAgent(AgentBase):
         self._update_cache(cache_key, result)
 
         logger.info(f"Risk assessment completed. Score: {result.get('overall_risk_score', 'N/A')}")
+        
+        if is_standard_mode:
+            return AgentOutput(
+                answer=f"Risk Assessment for {company_name} complete. Score: {result.get('overall_risk_score', 'N/A')}",
+                sources=[],
+                confidence=0.9,
+                metadata=result
+            )
+            
         return result
 
     def _update_cache(self, key: str, value: Any) -> None:
