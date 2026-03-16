@@ -3,29 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADAM v26 | Market Mayhem</title>
-    <!-- Fonts -->
+    <title>ADAM v26 | Market Mayhem: Live Control Panel</title>
+    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
-    <!-- Chart.js -->
+    
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Icons (Lucide) -->
     <script src="https://unpkg.com/lucide@latest"></script>
     
     <style>
         :root {
-            /* Colors matching the screenshot */
-            --bg-master: #0a0e17; /* Very dark blue/grey background */
-            --bg-panel: #111827; /* Slightly lighter panel bg */
+            /* Core Palette */
+            --bg-master: #0a0e17; 
+            --bg-panel: #111827; 
             --border-panel: #1f2937;
             --text-main: #f3f4f6;
             --text-muted: #9ca3af;
             
+            /* Accents */
             --accent-cyan: #06b6d4;
             --accent-green: #10b981;
             --accent-red: #ef4444;
             --accent-amber: #f59e0b;
             --accent-blue: #3b82f6;
 
+            /* Typography */
             --font-sans: 'Inter', sans-serif;
             --font-mono: 'JetBrains Mono', monospace;
         }
@@ -41,6 +42,8 @@
             overflow: hidden;
         }
 
+        .mono { font-family: var(--font-mono); }
+
         /* --- Scrollbar --- */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: var(--bg-master); }
@@ -50,11 +53,12 @@
         /* --- Sidebar Navigation --- */
         .sidebar {
             width: 260px;
-            background-color: #0d121c; /* Darker sidebar */
+            background-color: #0d121c; 
             border-right: 1px solid var(--border-panel);
             display: flex;
             flex-direction: column;
             flex-shrink: 0;
+            z-index: 10;
         }
 
         .brand {
@@ -79,6 +83,7 @@
             padding: 8px 12px;
             border-radius: 4px;
             font-size: 0.85rem;
+            font-family: var(--font-mono);
         }
 
         .nav-menu {
@@ -97,6 +102,7 @@
             font-size: 0.9rem;
             cursor: pointer;
             transition: all 0.2s;
+            text-decoration: none;
         }
         
         .nav-item i { width: 18px; height: 18px; }
@@ -104,7 +110,7 @@
         .nav-item:hover, .nav-item.active {
             background: rgba(6, 182, 212, 0.1);
             color: var(--accent-cyan);
-            border-left: 2px solid var(--accent-cyan);
+            border-left: 3px solid var(--accent-cyan);
         }
 
         .user-profile {
@@ -131,12 +137,19 @@
         .user-role { color: var(--accent-cyan); font-family: var(--font-mono); font-size: 0.7rem; }
 
         /* --- Main Content Area --- */
-        .main-content {
+        .main-wrapper {
             flex-grow: 1;
             display: flex;
             flex-direction: column;
             overflow: hidden;
             position: relative;
+        }
+
+        .main-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
         }
 
         /* Top Header */
@@ -149,6 +162,7 @@
             padding: 0 24px;
             background: rgba(13, 18, 28, 0.8);
             backdrop-filter: blur(10px);
+            flex-shrink: 0;
         }
 
         .header-title {
@@ -188,10 +202,10 @@
             border-radius: 50%;
             background: var(--accent-red);
             box-shadow: 0 0 8px var(--accent-red);
-            animation: pulse 2s infinite;
+            animation: pulse-dot 2s infinite;
         }
         
-        @keyframes pulse {
+        @keyframes pulse-dot {
             0% { opacity: 1; }
             50% { opacity: 0.4; }
             100% { opacity: 1; }
@@ -206,10 +220,16 @@
             grid-template-columns: minmax(350px, 1fr) 2fr 1fr;
             grid-template-rows: auto auto;
             gap: 20px;
-            /* Layout based on screenshot */
             grid-template-areas: 
                 "synthesis chart pulse"
                 "portfolio archive pulse";
+        }
+
+        @media (max-width: 1400px) {
+            .dashboard-container { 
+                grid-template-columns: 1fr 1fr; 
+                grid-template-areas: "synthesis chart" "portfolio archive" "pulse pulse"; 
+            }
         }
 
         /* Panel Common Styles */
@@ -262,9 +282,7 @@
             margin-bottom: 25px;
         }
 
-        .ewi-section {
-            margin-top: auto;
-        }
+        .ewi-section { margin-top: auto; }
         
         .ewi-header {
             font-size: 0.8rem;
@@ -331,9 +349,10 @@
 
         .chart-container {
             position: relative;
-            height: 300px; /* Base height, flex will stretch it if needed */
+            height: 300px;
             width: 100%;
             margin-bottom: 15px;
+            flex-grow: 1;
         }
         
         .legend-overlay {
@@ -519,9 +538,9 @@
         }
         
         .news-item:hover { background: rgba(255,255,255,0.05); }
-        .news-item.source-bloomberg { border-left-color: #8b5cf6; } /* Purple */
-        .news-item.source-reuters { border-left-color: #ec4899; } /* Pink */
-        .news-item.source-wsj { border-left-color: #64748b; } /* Slate */
+        .news-item.source-bloomberg { border-left-color: #8b5cf6; }
+        .news-item.source-reuters { border-left-color: #ec4899; }
+        .news-item.source-wsj { border-left-color: #64748b; }
         
         .news-meta { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 6px; }
         .news-source { display: flex; align-items: center; gap: 6px; font-weight: 500;}
@@ -531,8 +550,40 @@
         .bg-slate { background: #64748b; }
         
         .news-title { font-size: 0.85rem; line-height: 1.4; color: var(--text-main); font-weight: 500;}
-        .news-desc { font-size: 0.8rem; line-height: 1.4; color: var(--text-muted); margin-top: 4px; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;}
-        
+
+        /* --- Ticker Bar (Merged Feature) --- */
+        .ticker-bar {
+            height: 30px;
+            background: #000;
+            border-top: 1px solid var(--border-panel);
+            display: flex;
+            align-items: center;
+            padding: 0 10px;
+            overflow: hidden;
+            flex-shrink: 0;
+            z-index: 20;
+        }
+
+        .ticker-content {
+            white-space: nowrap;
+            animation: ticker 30s linear infinite;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        @keyframes ticker {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+
+        .ticker-item {
+            display: inline-block;
+            margin-right: 40px;
+        }
+
+        .ticker-up { color: var(--accent-green); }
+        .ticker-down { color: var(--accent-red); }
+
         /* Modal for Archives */
         #archiveModal {
             display: none;
@@ -584,30 +635,26 @@
         .ali-meta { font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-muted); display:flex; gap: 15px;}
         .ali-snippet { font-size: 0.9rem; color: #d1d5db; line-height: 1.5; }
 
-        @media (max-width: 1400px) {
-            .dashboard-container { grid-template-columns: 1fr 1fr; grid-template-areas: "synthesis chart" "portfolio archive" "pulse pulse"; }
-        }
     </style>
 </head>
 <body>
 
-    <!-- Sidebar -->
     <aside class="sidebar">
         <div class="brand">ADAM v26.1</div>
         <div class="search-nav">
             <input type="text" placeholder="Search Agents, Docs... (Cmd+K)">
         </div>
         <ul class="nav-menu">
-            <li class="nav-item"><i data-lucide="layout-dashboard"></i> Mission Control</li>
-            <li class="nav-item"><i data-lucide="message-square"></i> Chat Portal</li>
-            <li class="nav-item"><i data-lucide="terminal"></i> Terminal</li>
-            <li class="nav-item"><i data-lucide="network"></i> Workflow Orchestrator</li>
-            <li class="nav-item"><i data-lucide="zap"></i> Credit Automation</li>
-            <li class="nav-item"><i data-lucide="pie-chart"></i> Sovereign Dashboard</li>
-            <li class="nav-item active"><i data-lucide="activity"></i> Market Mayhem</li>
-            <li class="nav-item"><i data-lucide="bar-chart-2"></i> Trading Platform</li>
-            <li class="nav-item"><i data-lucide="bot"></i> Robo Adviser</li>
-            <li class="nav-item"><i data-lucide="flask-conical"></i> Research Lab</li>
+            <a href="#" class="nav-item"><i data-lucide="layout-dashboard"></i> Mission Control</a>
+            <a href="#" class="nav-item"><i data-lucide="message-square"></i> Chat Portal</a>
+            <a href="terminal.html" class="nav-item"><i data-lucide="terminal"></i> Terminal</a>
+            <a href="nexus.html" class="nav-item"><i data-lucide="network"></i> Workflow Orchestrator</a>
+            <a href="#" class="nav-item"><i data-lucide="zap"></i> Credit Automation</a>
+            <a href="#" class="nav-item"><i data-lucide="pie-chart"></i> Sovereign Dashboard</a>
+            <a href="#" class="nav-item active"><i data-lucide="activity"></i> Market Mayhem</a>
+            <a href="#" class="nav-item"><i data-lucide="bar-chart-2"></i> Trading Platform</a>
+            <a href="#" class="nav-item"><i data-lucide="bot"></i> Robo Adviser</a>
+            <a href="reports.html" class="nav-item"><i data-lucide="flask-conical"></i> Research Lab</a>
         </ul>
         <div class="user-profile">
             <div class="avatar">OP</div>
@@ -618,205 +665,205 @@
         </div>
     </aside>
 
-    <!-- Main Content -->
-    <main class="main-content">
-        <!-- Top Header -->
-        <header class="top-header">
-            <div class="header-title">
-                <i data-lucide="menu"></i> MARKET MAYHEM
-            </div>
-            <div class="top-nav">
-                <span class="active">DASHBOARD</span>
-                <span>NEXUS</span>
-                <span style="color:var(--accent-cyan);">TERMINAL</span>
-                <span>ARCHIVE</span>
-                <span>REPORTS</span>
-            </div>
-            <div class="status-badge" id="currentDateTime">
-                OCT 27, 2026 | 09:30 EST | <span style="color:var(--text-main);">LIVE</span>
-                <div class="status-dot"></div>
-            </div>
-        </header>
+    <div class="main-wrapper">
+        <main class="main-content">
+            <header class="top-header">
+                <div class="header-title">
+                    <i data-lucide="activity"></i> MARKET MAYHEM
+                </div>
+                <div class="top-nav mono">
+                    <span class="active">DASHBOARD</span>
+                    <span>NEXUS</span>
+                    <span style="color:var(--accent-cyan);">TERMINAL</span>
+                    <span>ARCHIVE</span>
+                    <span>REPORTS</span>
+                </div>
+                <div class="status-badge" id="currentDateTime">
+                    </div>
+            </header>
 
-        <!-- Dashboard Grid -->
-        <div class="dashboard-container">
-            
-            <!-- Global Strategic Synthesis -->
-            <div class="panel area-synthesis">
-                <div class="panel-header">
-                    GLOBAL STRATEGIC SYNTHESIS
-                    <i data-lucide="more-vertical" style="width:16px; color:var(--text-muted)"></i>
-                </div>
-                <div class="panel-body" style="display:flex; flex-direction:column;">
-                    <div class="synthesis-status">
-                        <div class="synthesis-dot" id="synthDot"></div>
-                        STATUS: <span id="synthStatusText">LOADING...</span> (ACTIVE MONITORING)
+            <div class="dashboard-container">
+                
+                <div class="panel area-synthesis">
+                    <div class="panel-header mono">
+                        GLOBAL STRATEGIC SYNTHESIS
+                        <i data-lucide="more-vertical" style="width:16px; color:var(--text-muted)"></i>
                     </div>
-                    <div class="synthesis-text" id="synthNarrative">
-                        Initializing AI synthesis narrative engines...
-                    </div>
-                    
-                    <div class="ewi-section">
-                        <div class="ewi-header">EARLY WARNING INDICATORS</div>
-                        <!-- Populated via JS -->
-                        <div id="ewiContainer"></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Deep Charting & Forward Outlook -->
-            <div class="panel area-chart">
-                <div class="panel-header">
-                    MULTI-ASSET DEEP CHARTING & FORWARD OUTLOOK
-                    <i data-lucide="more-vertical" style="width:16px; color:var(--text-muted)"></i>
-                </div>
-                <div class="panel-body" style="display:flex; flex-direction:column;">
-                    <div class="chart-controls">
-                        <select><option>Timeframe</option><option>1Y</option><option>5Y</option></select>
-                        <select><option>Asset Class</option><option>Equities</option><option>Credit</option></select>
-                        <select><option>Indicators</option><option>MACD</option></select>
-                        <select><option>Overlays</option><option>Conviction</option></select>
-                        <select style="margin-left:auto;"><option>All</option></select>
-                    </div>
-                    
-                    <div class="chart-container">
-                        <canvas id="mainChart"></canvas>
-                        
-                        <div class="legend-overlay">
-                            <div class="legend-title">FORWARD OUTLOOK</div>
-                            <div class="legend-item"><div class="legend-color" style="background:#06b6d4;"></div> Historic S&P 500</div>
-                            <div class="legend-item"><div class="legend-color" style="border-top: 1px dashed #ffffff; background:transparent;"></div> Projected Cone (Base)</div>
-                            <div class="legend-item"><div class="legend-color" style="background:#10b981;"></div> Projected Cone (Bull)</div>
-                            <div class="legend-item"><div class="legend-color" style="background:#ef4444;"></div> Projected Cone (Bear)</div>
-                            <div class="legend-item"><div style="width:6px; height:6px; background:#fff; border-radius:50%;"></div> Key Events</div>
+                    <div class="panel-body" style="display:flex; flex-direction:column;">
+                        <div class="synthesis-status mono">
+                            <div class="synthesis-dot" id="synthDot"></div>
+                            STATUS: <span id="synthStatusText">LOADING...</span> (ACTIVE MONITORING)
                         </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Portfolio Tracking -->
-            <div class="panel area-portfolio">
-                <div class="panel-header">
-                    PORTFOLIO TRACKING & ACTIVE POSITIONS
-                    <i data-lucide="more-vertical" style="width:16px; color:var(--text-muted)"></i>
-                </div>
-                <div class="panel-body">
-                    <table class="portfolio-table">
-                        <thead>
-                            <tr>
-                                <th>Asset</th><th>Size</th><th>Entry</th><th>Current</th><th>P&L (%)</th><th>Risk Metric</th>
-                            </tr>
-                        </thead>
-                        <tbody id="portfolioBody">
-                            <!-- Populated via JS -->
-                        </tbody>
-                    </table>
-                    
-                    <div class="metrics-row">
-                        <div class="metric-box">
-                            <div class="metric-title">WATCH LIST <i data-lucide="eye" style="width:12px;"></i></div>
-                            <div style="display:flex; justify-content:space-between; margin-bottom:4px;"><span style="color:var(--text-muted)">NSFT</span><span class="val-positive">0%</span></div>
-                            <div style="display:flex; justify-content:space-between; margin-bottom:4px;"><span style="color:var(--text-muted)">META</span><span class="val-positive">1.44%</span></div>
-                            <div style="display:flex; justify-content:space-between;"><span style="color:var(--text-muted)">AVGO</span><span class="val-negative">-0.35%</span></div>
-                        </div>
-                        <div class="metric-box">
-                            <div class="metric-title">SENTIMENT INDEX <br>(ACTIVE)</div>
-                            <div style="display:flex; justify-content:space-between; align-items:flex-end;">
-                                <span class="metric-val" id="sentimentValText" style="color:var(--accent-green); font-size:1.5rem;">--</span>
-                                <span style="font-size:0.8rem; color:var(--text-muted);" id="sentimentLabelText">--</span>
-                            </div>
-                            <div class="sentiment-bar">
-                                <div class="sentiment-marker" id="sentimentMarker" style="left: 0%;"></div>
-                            </div>
-                            <div style="display:flex; justify-content:space-between; font-size:0.7rem; color:var(--text-muted); margin-top:4px;">
-                                <span>20</span><span>70</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Archive Traversal -->
-            <div class="panel area-archive">
-                <div class="panel-header">
-                    REFINED INTELLIGENCE & ARCHIVE TRAVERSAL
-                </div>
-                <div class="panel-body">
-                    <div class="path-title">FEATURED INTELLIGENCE</div>
-                    <div class="archive-grid" id="featuredIntel">
-                        <!-- Populated via JS -->
-                    </div>
-                    
-                    <div class="traversal-path">
-                        <div class="path-title">TRAVERSAL PATH</div>
-                        <div class="path-nodes">
-                            <span class="path-node">AI 221</span>
-                            <span class="path-node">EV 166</span>
-                            <span class="path-node">Crypto 32</span>
-                            <span class="path-node">Bitcoin 31</span>
-                            <span class="path-node">Bonds 182</span>
-                            <span class="path-node">Cybersecurity 57</span>
-                        </div>
-                    </div>
-                    
-                    <div class="path-title">ARCHIVE FILTERS</div>
-                    <div class="archive-controls">
-                        <input type="text" placeholder="Search Archives..." id="searchInput">
-                        <select><option>All Years</option></select>
-                    </div>
-                    
-                    <button class="btn-full-width" onclick="document.getElementById('archiveModal').style.display='flex'">VIEW FULL HISTORIC ARCHIVE</button>
-                </div>
-            </div>
-
-            <!-- Real-Time Pulse -->
-            <div class="panel area-pulse">
-                <div class="panel-header">
-                    REAL-TIME MARKET PULSE
-                    <i data-lucide="more-vertical" style="width:16px; color:var(--text-muted)"></i>
-                </div>
-                <div class="panel-body">
-                    <div class="pulse-ticker">
-                        Bloomberg: FED TARIFF REVISION UPDATE | WJC NEWS: REALTIME FLASH...
-                    </div>
-                    
-                    <div class="news-feed">
-                        <div class="news-item source-bloomberg">
-                            <div class="news-meta">
-                                <div class="news-source"><div class="source-icon bg-purple">B</div> Bloomberg</div>
-                                <span>19:39 EST</span>
-                            </div>
-                            <div class="news-title">FED TARIFF REVISION UPDATE, writes ens S&P 500 on conns-nast update</div>
+                        <div class="synthesis-text" id="synthNarrative">
+                            Initializing AI synthesis narrative engines...
                         </div>
                         
-                        <div class="news-item source-reuters">
-                            <div class="news-meta">
-                                <div class="news-source"><div class="source-icon bg-pink" style="border-radius:50%">R</div> Reuters</div>
-                                <span>13:34 AST</span>
-                            </div>
-                            <div class="news-title">Reuters: Geo-political Flashpoint at Suez, scatters geo-political nominees in fire...</div>
-                        </div>
-                        
-                        <div class="news-item source-wsj">
-                            <div class="news-meta">
-                                <div class="news-source"><div class="source-icon bg-slate" style="font-family:serif">W</div> WSJ</div>
-                                <span>19:27 EST</span>
-                            </div>
-                            <div class="news-title">WSJ: Big Tech Earnings Beat expectations across the board amidst AI boom.</div>
+                        <div class="ewi-section">
+                            <div class="ewi-header mono">EARLY WARNING INDICATORS</div>
+                            <div id="ewiContainer">
+                                </div>
                         </div>
                     </div>
                 </div>
+
+                <div class="panel area-chart">
+                    <div class="panel-header mono">
+                        MULTI-ASSET DEEP CHARTING & FORWARD OUTLOOK
+                        <i data-lucide="more-vertical" style="width:16px; color:var(--text-muted)"></i>
+                    </div>
+                    <div class="panel-body" style="display:flex; flex-direction:column;">
+                        <div class="chart-controls mono">
+                            <select><option>Timeframe</option><option>1Y</option><option>5Y</option></select>
+                            <select><option>Asset Class</option><option>Equities</option><option>Credit</option></select>
+                            <select><option>Indicators</option><option>MACD</option></select>
+                            <select><option>Overlays</option><option>Conviction</option></select>
+                            <select style="margin-left:auto;"><option>All</option></select>
+                        </div>
+                        
+                        <div class="chart-container">
+                            <canvas id="mainChart"></canvas>
+                            <div class="legend-overlay mono">
+                                <div class="legend-title">FORWARD OUTLOOK</div>
+                                <div class="legend-item"><div class="legend-color" style="background:#06b6d4;"></div> Historic S&P 500</div>
+                                <div class="legend-item"><div class="legend-color" style="border-top: 1px dashed #ffffff; background:transparent;"></div> Projected Cone (Base)</div>
+                                <div class="legend-item"><div class="legend-color" style="background:#10b981;"></div> Projected Cone (Bull)</div>
+                                <div class="legend-item"><div class="legend-color" style="background:#ef4444;"></div> Projected Cone (Bear)</div>
+                                <div class="legend-item"><div style="width:6px; height:6px; background:#fff; border-radius:50%;"></div> Key Events</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel area-portfolio">
+                    <div class="panel-header mono">
+                        PORTFOLIO TRACKING & ACTIVE POSITIONS
+                        <i data-lucide="more-vertical" style="width:16px; color:var(--text-muted)"></i>
+                    </div>
+                    <div class="panel-body">
+                        <table class="portfolio-table">
+                            <thead>
+                                <tr>
+                                    <th>Asset</th><th>Size</th><th>Entry</th><th>Current</th><th>P&L (%)</th><th>Risk Metric</th>
+                                </tr>
+                            </thead>
+                            <tbody id="portfolioBody">
+                                <tr><td colspan="6" style="text-align:center; padding: 20px;">Loading portfolio data...</td></tr>
+                            </tbody>
+                        </table>
+                        
+                        <div class="metrics-row">
+                            <div class="metric-box">
+                                <div class="metric-title mono">WATCH LIST <i data-lucide="eye" style="width:12px;"></i></div>
+                                <div style="display:flex; justify-content:space-between; margin-bottom:4px;"><span style="color:var(--text-muted)">NSFT</span><span class="val-positive mono">0%</span></div>
+                                <div style="display:flex; justify-content:space-between; margin-bottom:4px;"><span style="color:var(--text-muted)">META</span><span class="val-positive mono">1.44%</span></div>
+                                <div style="display:flex; justify-content:space-between;"><span style="color:var(--text-muted)">AVGO</span><span class="val-negative mono">-0.35%</span></div>
+                            </div>
+                            <div class="metric-box">
+                                <div class="metric-title mono">SENTIMENT INDEX <br>(ACTIVE)</div>
+                                <div style="display:flex; justify-content:space-between; align-items:flex-end;">
+                                    <span class="metric-val" id="sentimentValText" style="color:var(--accent-green); font-size:1.5rem;">--</span>
+                                    <span style="font-size:0.8rem; color:var(--text-muted);" id="sentimentLabelText" class="mono">--</span>
+                                </div>
+                                <div class="sentiment-bar">
+                                    <div class="sentiment-marker" id="sentimentMarker" style="left: 0%;"></div>
+                                </div>
+                                <div class="mono" style="display:flex; justify-content:space-between; font-size:0.7rem; color:var(--text-muted); margin-top:4px;">
+                                    <span>20</span><span>70</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel area-archive">
+                    <div class="panel-header mono">
+                        REFINED INTELLIGENCE & ARCHIVE TRAVERSAL
+                    </div>
+                    <div class="panel-body">
+                        <div class="path-title mono">FEATURED INTELLIGENCE</div>
+                        <div class="archive-grid" id="featuredIntel">
+                            <div style="color:var(--text-muted); font-size: 0.8rem;">Initializing archive index...</div>
+                        </div>
+                        
+                        <div class="traversal-path">
+                            <div class="path-title mono">TRAVERSAL PATH</div>
+                            <div class="path-nodes mono">
+                                <span class="path-node">AI 221</span>
+                                <span class="path-node">EV 166</span>
+                                <span class="path-node">Crypto 32</span>
+                                <span class="path-node">Bitcoin 31</span>
+                                <span class="path-node">Bonds 182</span>
+                                <span class="path-node">Cybersecurity 57</span>
+                            </div>
+                        </div>
+                        
+                        <div class="path-title mono">ARCHIVE FILTERS</div>
+                        <div class="archive-controls mono">
+                            <input type="text" placeholder="Search Archives..." id="searchInput">
+                            <select><option>All Years</option></select>
+                        </div>
+                        
+                        <button class="btn-full-width mono" onclick="document.getElementById('archiveModal').style.display='flex'">VIEW FULL HISTORIC ARCHIVE</button>
+                    </div>
+                </div>
+
+                <div class="panel area-pulse">
+                    <div class="panel-header mono">
+                        REAL-TIME MARKET PULSE
+                        <i data-lucide="more-vertical" style="width:16px; color:var(--text-muted)"></i>
+                    </div>
+                    <div class="panel-body">
+                        <div class="pulse-ticker">
+                            Bloomberg: FED TARIFF REVISION UPDATE | WJC NEWS: REALTIME FLASH...
+                        </div>
+                        
+                        <div class="news-feed">
+                            <div class="news-item source-bloomberg">
+                                <div class="news-meta">
+                                    <div class="news-source"><div class="source-icon bg-purple">B</div> Bloomberg</div>
+                                    <span class="mono">19:39 EST</span>
+                                </div>
+                                <div class="news-title">FED TARIFF REVISION UPDATE, writes ens S&P 500 on conns-nast update</div>
+                            </div>
+                            
+                            <div class="news-item source-reuters">
+                                <div class="news-meta">
+                                    <div class="news-source"><div class="source-icon bg-pink" style="border-radius:50%">R</div> Reuters</div>
+                                    <span class="mono">13:34 AST</span>
+                                </div>
+                                <div class="news-title">Reuters: Geo-political Flashpoint at Suez, scatters geo-political nominees in fire...</div>
+                            </div>
+                            
+                            <div class="news-item source-wsj">
+                                <div class="news-meta">
+                                    <div class="news-source"><div class="source-icon bg-slate" style="font-family:serif">W</div> WSJ</div>
+                                    <span class="mono">19:27 EST</span>
+                                </div>
+                                <div class="news-title">WSJ: Big Tech Earnings Beat expectations across the board amidst AI boom.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div> </main>
+        
+        <div class="ticker-bar mono">
+            <div class="ticker-content" id="market-ticker">
+                <span class="ticker-item">SPX <span class="ticker-up">5120.45 (+1.2%)</span></span>
+                <span class="ticker-item">US10Y <span class="ticker-down">4.15% (-0.05)</span></span>
+                <span class="ticker-item">VIX <span class="ticker-down">13.20 (-5.4%)</span></span>
+                <span class="ticker-item">BTC <span class="ticker-up">65,400 (+3.1%)</span></span>
+                <span class="ticker-item">OIL <span class="ticker-up">82.50 (+0.8%)</span></span>
+                <span class="ticker-item">SYSTEM ALERT: Volatility compression detected in tech sector.</span>
             </div>
+        </div>
+    </div>
 
-        </div> <!-- End Grid -->
-    </main>
-
-    <!-- Full Archive Modal -->
     <div id="archiveModal">
         <div class="modal-content">
             <div class="modal-header">
                 <h2 style="color:var(--accent-cyan); font-family:var(--font-mono)">MARKET MAYHEM: HISTORIC ARCHIVE</h2>
-                <i data-lucide="x" style="cursor:pointer;" onclick="document.getElementById('archiveModal').style.display='none'"></i>
+                <i data-lucide="x" style="cursor:pointer; color:var(--text-main);" onclick="document.getElementById('archiveModal').style.display='none'"></i>
             </div>
             <div class="modal-body" id="archiveModalList">
                 <div style="text-align:center; padding:50px; color:var(--text-muted)">Loading Archive...</div>
@@ -824,7 +871,6 @@
         </div>
     </div>
 
-    <!-- Scripts -->
     <script>
         // Initialize Icons
         lucide.createIcons();
@@ -834,68 +880,80 @@
             const now = new Date();
             const dateStr = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).toUpperCase();
             const timeStr = now.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute:'2-digit' });
-            document.getElementById('currentDateTime').innerHTML = `${dateStr} | ${timeStr} EST | <span style="color:var(--accent-red);">LIVE</span> <div class="status-dot"></div>`;
+            document.getElementById('currentDateTime').innerHTML = `${dateStr} | ${timeStr} EST | <span style="color:var(--text-main);">LIVE</span> <div class="status-dot"></div>`;
         }
-        setInterval(updateTime, 10000);
+        setInterval(updateTime, 1000); // Updated to 1s for real-time clock feel
         updateTime();
 
         // Fetch Data and Render
         async function initDashboard() {
             try {
-                // Fetch Simulation Data
-                const response = await fetch('../data/market_mayhem_data.json');
+                // Fetch Simulation Data (Updated to local ./data path for better portability)
+                const response = await fetch('./data/market_mayhem_data.json');
                 const data = await response.json();
                 
                 // Fetch Archive Data
-                const archiveResponse = await fetch('../data/market_mayhem_archive.json');
+                const archiveResponse = await fetch('./data/market_mayhem_archive.json');
                 const archiveData = await archiveResponse.json();
 
-                renderSynthesis(data.synthesis, data.indicators);
+                renderSynthesis(data.synthesis, data.indicators || data.synthesis.early_warning_indicators);
                 renderPortfolio(data.portfolio);
-                renderSentiment(data.sentiment_index);
-                renderChart(data.chart_data);
+                if (data.sentiment_index) renderSentiment(data.sentiment_index);
+                renderChart(data.chart_data || data.outlook);
                 renderFeaturedIntel(archiveData);
                 renderArchiveModal(archiveData);
 
             } catch (err) {
-                console.error("Error loading dashboard data:", err);
+                console.error("Data integration fallback active. JSON endpoints unreachable:", err);
+                document.getElementById('synthStatusText').innerText = "STANDBY";
             }
         }
 
         function renderSynthesis(synthesis, indicators) {
-            document.getElementById('synthStatusText').innerText = synthesis.status;
+            document.getElementById('synthStatusText').innerText = synthesis.status || synthesis.sentiment.toUpperCase();
             document.getElementById('synthNarrative').innerText = synthesis.narrative;
             
-            if(synthesis.status === 'NEUTRAL') document.getElementById('synthDot').style.background = 'var(--accent-amber)';
-            else if(synthesis.status === 'BULLISH') document.getElementById('synthDot').style.background = 'var(--accent-green)';
-            else document.getElementById('synthDot').style.background = 'var(--accent-red)';
+            const dot = document.getElementById('synthDot');
+            if(synthesis.status === 'NEUTRAL' || synthesis.sentiment === 'baseline') dot.style.background = 'var(--accent-amber)';
+            else if(synthesis.status === 'BULLISH' || synthesis.sentiment === 'bullish') dot.style.background = 'var(--accent-green)';
+            else dot.style.background = 'var(--accent-red)';
 
             const ewiContainer = document.getElementById('ewiContainer');
             ewiContainer.innerHTML = '';
             
-            const mapping = {
-                'oil_volatility': { icon: 'droplet', label: 'Oil Volatility' },
-                'bond_yield_spread': { icon: 'activity', label: 'Bond Yield Spread' },
-                'supply_chain_disruption': { icon: 'truck', label: 'Supply Chain Disruption' }
-            };
+            // Handle both object maps and array lists safely
+            if (Array.isArray(indicators)) {
+                indicators.forEach(ind => {
+                    ewiContainer.innerHTML += `
+                        <div class="ewi-row">
+                            <div class="ewi-label"><i data-lucide="alert-circle" style="width:14px; color:var(--text-muted)"></i> ${ind}</div>
+                            <div class="ewi-state state-red">
+                                <div style="width:8px; height:8px; border-radius:50%; background:currentColor;"></div> ALERT
+                            </div>
+                        </div>`;
+                });
+            } else if (typeof indicators === 'object') {
+                const mapping = {
+                    'oil_volatility': { icon: 'droplet', label: 'Oil Volatility' },
+                    'bond_yield_spread': { icon: 'activity', label: 'Bond Yield Spread' },
+                    'supply_chain_disruption': { icon: 'truck', label: 'Supply Chain Disruption' }
+                };
 
-            for (const [key, val] of Object.entries(indicators)) {
-                let stateClass = '';
-                if(val.status.toLowerCase().includes('red')) stateClass = 'state-red';
-                else if(val.status.toLowerCase().includes('green')) stateClass = 'state-green';
-                else stateClass = 'state-amber';
+                for (const [key, val] of Object.entries(indicators)) {
+                    let stateClass = 'state-amber';
+                    if(val.status.toLowerCase().includes('red')) stateClass = 'state-red';
+                    else if(val.status.toLowerCase().includes('green')) stateClass = 'state-green';
 
-                const map = mapping[key] || { icon: 'alert-circle', label: key.replace(/_/g, ' ') };
+                    const map = mapping[key] || { icon: 'alert-circle', label: key.replace(/_/g, ' ') };
 
-                ewiContainer.innerHTML += `
-                    <div class="ewi-row">
-                        <div class="ewi-label"><i data-lucide="${map.icon}" style="width:14px; color:var(--text-muted)"></i> ${map.label}</div>
-                        <div class="ewi-state ${stateClass}">
-                            <div style="width:8px; height:8px; border-radius:50%; background:currentColor;"></div>
-                            ${val.status}
-                        </div>
-                    </div>
-                `;
+                    ewiContainer.innerHTML += `
+                        <div class="ewi-row">
+                            <div class="ewi-label"><i data-lucide="${map.icon}" style="width:14px; color:var(--text-muted)"></i> ${map.label}</div>
+                            <div class="ewi-state ${stateClass}">
+                                <div style="width:8px; height:8px; border-radius:50%; background:currentColor;"></div> ${val.status}
+                            </div>
+                        </div>`;
+                }
             }
             lucide.createIcons();
         }
@@ -904,21 +962,24 @@
             const tbody = document.getElementById('portfolioBody');
             tbody.innerHTML = '';
             portfolio.forEach(pos => {
-                const pnlClass = pos.pnl_pct >= 0 ? 'val-positive' : 'val-negative';
+                // Ensure mapping works for both data structures
+                const pnl = pos.pnl_pct !== undefined ? pos.pnl_pct : pos.pos;
+                const pnlClass = pnl >= 0 ? 'val-positive' : 'val-negative';
+                
                 let riskClass = 'risk-med';
-                if(pos.risk === 'high') riskClass = 'risk-high';
-                if(pos.risk === 'low') riskClass = 'risk-low';
+                if(pos.risk === 'high' || pos.conviction > 70) riskClass = 'risk-high';
+                if(pos.risk === 'low' || pos.conviction < 30) riskClass = 'risk-low';
 
                 tbody.innerHTML += `
                     <tr>
                         <td style="color:var(--text-main)">${pos.asset}</td>
-                        <td style="color:var(--text-muted)">${pos.size}</td>
-                        <td>$${pos.entry.toFixed(2)}</td>
-                        <td>$${pos.current.toFixed(2)}</td>
-                        <td class="${pnlClass}">${pos.pnl_pct}%</td>
+                        <td style="color:var(--text-muted)">${pos.size || '-'}</td>
+                        <td>$${pos.entry ? pos.entry.toFixed(2) : '-'}</td>
+                        <td>$${pos.current ? pos.current.toFixed(2) : '-'}</td>
+                        <td class="${pnlClass}">${pnl > 0 ? '+' : ''}${pnl}%</td>
                         <td>
                             <div class="risk-bar-container">
-                                <div class="risk-fill ${riskClass}"></div>
+                                <div class="risk-fill ${riskClass}" style="width: ${pos.conviction || 50}%"></div>
                             </div>
                         </td>
                     </tr>
@@ -927,6 +988,7 @@
         }
 
         function renderSentiment(sentiment) {
+            if(!sentiment) return;
             document.getElementById('sentimentValText').innerText = sentiment.value;
             document.getElementById('sentimentLabelText').innerText = sentiment.label;
             document.getElementById('sentimentMarker').style.left = `${sentiment.value}%`;
@@ -941,7 +1003,6 @@
             const container = document.getElementById('featuredIntel');
             container.innerHTML = '';
             
-            // Just take the first two for featured
             archiveData.slice(0, 2).forEach(item => {
                 container.innerHTML += `
                     <div class="intel-card">
@@ -949,11 +1010,10 @@
                         <div class="intel-title">${item.title}</div>
                         <div class="intel-stats">
                             <span>${item.date}</span>
-                            <span class="intel-conv">CONV: ${item.conviction}%</span>
+                            <span class="intel-conv">CONV: ${item.conviction || 90}%</span>
                         </div>
                         <div class="intel-stats" style="color:#6b7280;">
-                            <span>S&P: 6060</span>
-                            <span>10Y: 4.77%</span>
+                            <span>TYPE: ${item.type || 'REPORT'}</span>
                         </div>
                     </div>
                 `;
@@ -961,19 +1021,20 @@
         }
 
         function renderArchiveModal(archiveData) {
+            if(!archiveData || archiveData.length === 0) return;
             const container = document.getElementById('archiveModalList');
             container.innerHTML = '';
             
             archiveData.forEach(item => {
                 container.innerHTML += `
                     <div class="archive-list-item">
-                        <a href="../${item.path}" target="_blank" class="ali-title">${item.title}</a>
+                        <a href="${item.path || item.url || '#'}" target="_blank" class="ali-title">${item.title}</a>
                         <div class="ali-meta">
                             <span>[DATE: ${item.date}]</span>
-                            <span>[TYPE: ${item.type.toUpperCase()}]</span>
-                            <span style="color:var(--accent-green)">[CONVICTION: ${item.conviction}%]</span>
+                            <span>[TYPE: ${(item.type || 'REPORT').toUpperCase()}]</span>
+                            <span style="color:var(--accent-green)">[CONVICTION: ${item.conviction || 90}%]</span>
                         </div>
-                        <div class="ali-snippet">${item.snippet}</div>
+                        <div class="ali-snippet">${item.snippet || item.summary || 'Encrypted record...'}</div>
                     </div>
                 `;
             });
@@ -987,7 +1048,7 @@
                     el.style.display = text.includes(term) ? 'flex' : 'none';
                 });
                 
-                // Also trigger modal if typing
+                // Open modal automatically on valid search
                 if(term.length > 2 && document.getElementById('archiveModal').style.display !== 'flex') {
                     document.getElementById('archiveModal').style.display = 'flex';
                 }
@@ -995,55 +1056,20 @@
         }
 
         function renderChart(chartData) {
+            if(!chartData) return;
             const ctx = document.getElementById('mainChart').getContext('2d');
             
-            const historic = chartData.historic_sp500;
-            const base = chartData.forward_base;
-            const bull = chartData.forward_bull;
-            const bear = chartData.forward_bear;
+            // Handle both data map structures dynamically
+            const labels = chartData.labels || [];
+            const dataHistoric = chartData.historical_spx || chartData.historic_sp500?.map(d => d.value) || [];
+            const dataBase = chartData.base_cone || chartData.forward_base?.map(d => d.value) || [];
+            const dataBull = chartData.bull_cone || chartData.forward_bull?.map(d => d.value) || [];
+            const dataBear = chartData.bear_cone || chartData.forward_bear?.map(d => d.value) || [];
 
-            // Colors
-            const colorHistoric = '#06b6d4'; // Cyan
-            const colorBull = '#10b981'; // Emerald
-            const colorBear = '#ef4444'; // Red
-
-            // Create gradient for historic
+            // Gradients
             const gradHistoric = ctx.createLinearGradient(0, 0, 0, 300);
             gradHistoric.addColorStop(0, 'rgba(6, 182, 212, 0.4)');
             gradHistoric.addColorStop(1, 'rgba(6, 182, 212, 0.0)');
-
-            // Combine dates for labels
-            const labels = [];
-            historic.forEach(d => labels.push(d.date));
-            base.forEach(d => { if(!labels.includes(d.date)) labels.push(d.date); });
-            labels.sort();
-
-            // Map data arrays
-            const dataHistoric = labels.map(l => {
-                const pt = historic.find(d => d.date === l);
-                return pt ? pt.value : null;
-            });
-            
-            // Connect the cones to the last historic point
-            const lastHistoricPoint = historic[historic.length-1];
-
-            const dataBull = labels.map(l => {
-                if(l === lastHistoricPoint.date) return lastHistoricPoint.value;
-                const pt = bull.find(d => d.date === l);
-                return pt ? pt.value : null;
-            });
-            
-            const dataBase = labels.map(l => {
-                if(l === lastHistoricPoint.date) return lastHistoricPoint.value;
-                const pt = base.find(d => d.date === l);
-                return pt ? pt.value : null;
-            });
-
-            const dataBear = labels.map(l => {
-                if(l === lastHistoricPoint.date) return lastHistoricPoint.value;
-                const pt = bear.find(d => d.date === l);
-                return pt ? pt.value : null;
-            });
 
             new Chart(ctx, {
                 type: 'line',
@@ -1053,7 +1079,7 @@
                         {
                             label: 'Historic S&P 500',
                             data: dataHistoric,
-                            borderColor: colorHistoric,
+                            borderColor: '#06b6d4',
                             borderWidth: 2,
                             backgroundColor: gradHistoric,
                             fill: true,
@@ -1063,10 +1089,11 @@
                         {
                             label: 'Forward Bull',
                             data: dataBull,
-                            borderColor: colorBull,
+                            borderColor: '#10b981',
                             borderWidth: 2,
                             borderDash: [5, 5],
-                            fill: false,
+                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                            fill: '-1',
                             pointRadius: 0,
                             tension: 0.4
                         },
@@ -1074,8 +1101,8 @@
                             label: 'Forward Base',
                             data: dataBase,
                             borderColor: '#ffffff',
-                            borderWidth: 1,
-                            borderDash: [2, 4],
+                            borderWidth: 2,
+                            borderDash: [5, 5],
                             fill: false,
                             pointRadius: 0,
                             tension: 0.4
@@ -1083,10 +1110,11 @@
                         {
                             label: 'Forward Bear',
                             data: dataBear,
-                            borderColor: colorBear,
+                            borderColor: '#ef4444',
                             borderWidth: 2,
                             borderDash: [5, 5],
-                            fill: false,
+                            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                            fill: '-1',
                             pointRadius: 0,
                             tension: 0.4
                         }
@@ -1111,10 +1139,7 @@
                             ticks: { 
                                 color: '#6b7280', 
                                 maxTicksLimit: 8,
-                                callback: function(val, index) {
-                                  // Just show year
-                                  return labels[index].substring(0,4);
-                                }
+                                font: { family: 'JetBrains Mono' }
                             }
                         },
                         y: {
