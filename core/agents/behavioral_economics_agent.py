@@ -1,5 +1,4 @@
-# core/agents/behavioral_economics_agent.py
-from core.agents.agent_base import AgentBase
+from core.agents.agent_base import AgentBase, AgentInput, AgentOutput
 from typing import Any, Dict, List, Optional
 import logging
 from transformers import pipeline
@@ -19,17 +18,13 @@ class BehavioralEconomicsAgent(AgentBase):
         self.sentiment_analyzer = pipeline(
             "sentiment-analysis", model="distilbert-base-uncased-finetuned-sst-2-english")
 
-    async def execute(self, analysis_content: str, user_query_history: Optional[List[str]] = None) -> Dict[str, Any]:
+    async def execute(self, input_data: AgentInput) -> AgentOutput:
         """
         Executes the behavioral analysis.
-
-        Args:
-            analysis_content (str): The content to analyze for market biases (e.g., news, social media text).
-            user_query_history (Optional[List[str]]): A list of recent user queries to analyze for user bias.
-
-        Returns:
-            Dict[str, Any]: A dictionary containing identified biases and insights.
         """
+        analysis_content = input_data.query
+        user_query_history = input_data.context.get("user_query_history", [])
+
         logging.info("Executing behavioral economics analysis...")
         results = {
             "market_biases": [],
@@ -50,7 +45,13 @@ class BehavioralEconomicsAgent(AgentBase):
 
         logging.info(
             f"Behavioral economics analysis complete. Found {len(results['market_biases'])} market biases and {len(results['user_biases'])} user biases.")
-        return results
+            
+        return AgentOutput(
+            answer=results["insights"],
+            sources=["SentimentAnalyzer"],
+            confidence=0.85 if results["market_biases"] else 0.5,
+            metadata=results
+        )
 
     def _identify_market_biases(self, content: str) -> List[Dict[str, str]]:
         """
