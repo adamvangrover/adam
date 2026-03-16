@@ -45,32 +45,31 @@ This master roadmap supersedes the previous agent expansion plan. It focuses on 
 
 ## Priority 1: The System 2 Upgrade (LangGraph State Machine)
 Current predictive scripts run linearly. We must wrap reasoning agents in a cyclic state machine to introduce "Reflexion Loops" (self-correction).
-- [ ] Initialize `core/engine/state_machine.py` (LangGraph implementation).
-- [ ] Refactor `quantum_market_simulator.py` to function as an invocable graph node.
-- [ ] Create a `FinancialValidationReflector` node to validate DCF accounting constraints and force recalculation loops if violated.
+- [x] Initialize `core/engine/state_machine.py` (LangGraph implementation).
+- [x] Refactor `quantum_market_simulator.py` to function as an invocable graph node.
+- [x] Create a `FinancialValidationReflector` node to validate DCF accounting constraints and force recalculation loops if violated.
 
 ## Priority 2: Active Memory Engine (Vector + Live Graph Database)
 Transition away from reliant, static flat JSON files (`knowledge_graph.json`).
-- [ ] Implement `core/system/vector_memory.py` (e.g., ChromaDB integration) for semantic RAG of text nodes and historical intelligence.
-- [ ] Implement `core/system/graph_memory.py` (e.g., Neo4j/NetworkX) for executing dynamic relationship queries (e.g., Supply Chain linkages).
-- [ ] Upgrade the `Orchestrator` to natively query these dynamic databases to build context prior to agent invocation.
+- [x] Implement `core/system/vector_memory.py` (e.g., ChromaDB integration) for semantic RAG of text nodes and historical intelligence.
+- [x] Implement `core/system/graph_memory.py` (e.g., Neo4j/NetworkX) for executing dynamic relationship queries (e.g., Supply Chain linkages).
+- [x] Upgrade the `Orchestrator` to natively query these dynamic databases to build context prior to agent invocation.
 
 ## Priority 3: System 1 Reality (Asynchronous WebSocket Ecosystem)
 Implement the "Neural Swarm" of high-speed micro-workers dropping "Pheromones" on anomalies to automatically trigger the heavy System 2 LangGraphs.
-- [ ] Deploy `core/system1/event_loop.py` using `asyncio` and a Pub/Sub mock architecture (e.g., Redis).
-- [ ] Build `core/system1/pheromone_engine.py` to aggregate event signals.
-- [ ] Create `core/system1/workers/market_stream_worker.py` to simulate WebSocket anomaly detection.
+- [x] Deploy an `asyncio` event loop and Redis Pub/Sub framework for continuous background processing.
+- [x] Build light async micro-workers that subscribe to simulated market data.
+- [x] Implement the `PheromoneEngine` to aggregate alert signals and trigger a System 2 deep-dive when thresholds are breached.t_stream_worker.py` to simulate WebSocket anomaly detection.
 
 ## Priority 4: The Consensus Arbitrator (Conflict Resolution)
 Multiple agents will predictably disagree (e.g., Macro Bearish vs. Algo Bullish). The system must algorithmically judge these conflicts.
-- [ ] Build `core/engine/consensus_engine.py`.
-- [ ] Implement logic to evaluate conflicting `AgentOutput.confidence` scores.
-- [ ] Implement Human-In-The-Loop (HITL) escalation for high-conviction, diametrically opposed outputs.
+- [x] Create a `ConsensusEngine` module to arbitrate conflicting outputs based on historical accuracy and user-defined risk profiles.
+- [x] Implement Human-In-The-Loop (HITL) deadlocks for uniformly high-confidence opposing viewpoints.rically opposed outputs.
 
 ## Priority 5: Eradicating Technical Debt (Agent Standardization)
 Enforce the "Product" bifurcation rule. All core agents must inherit from `AgentBase` and use Pydantic validation to fail safely.
-- [ ] `core/agents/red_team_agent.py`
-- [ ] `core/agents/reflector_agent.py`
-- [ ] `core/agents/meta_cognitive_agent.py`
-- [ ] `core/agents/behavioral_economics_agent.py`
-- [ ] `core/agents/meta_agents/crisis_simulation_agent.py`
+- [x] `core/agents/red_team_agent.py`
+- [x] `core/agents/reflector_agent.py`
+- [x] `core/agents/meta_cognitive_agent.py`
+- [x] `core/agents/behavioral_economics_agent.py`
+- [x] `core/agents/meta_agents/crisis_simulation_agent.py`
