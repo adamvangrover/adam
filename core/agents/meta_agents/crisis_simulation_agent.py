@@ -1,6 +1,6 @@
 from __future__ import annotations
 from typing import Any, Dict
-from core.agents.agent_base import AgentBase
+from core.agents.agent_base import AgentBase, AgentInput, AgentOutput
 from core.prompting.plugins.crisis_simulation_plugin import CrisisSimulationPlugin
 from core.schemas.crisis_simulation import CrisisSimulationInput, CrisisSimulationOutput, CrisisLogEntry
 from core.engine.states import init_crisis_state
@@ -47,7 +47,7 @@ class CrisisSimulationMetaAgent(AgentBase):
             logging.error(f"Error initializing CrisisSimulationPlugin: {e}")
             self.simulation_plugin = None
 
-    async def execute(self, simulation_input: CrisisSimulationInput) -> CrisisSimulationOutput:
+    async def execute(self, input_data: AgentInput) -> AgentOutput:
         """
         Executes the crisis simulation.
 
@@ -55,13 +55,19 @@ class CrisisSimulationMetaAgent(AgentBase):
         Otherwise, falls back to v21 Prompt-as-Code logic.
 
         Args:
-            simulation_input: A Pydantic model containing the risk portfolio,
-                              current date, and the user's crisis scenario.
+            input_data: A Pydantic AgentInput containing the query and context.
 
         Returns:
-            A Pydantic model containing the structured simulation output.
+            An AgentOutput containing the structured simulation output.
         """
         logging.info("Starting crisis simulation...")
+        
+        # Parse AgentInput back into CrisisSimulationInput for legacy compat
+        # In a full refactor, CrisisSimulationInput would be deprecated entirely.
+        scenario = input_data.query if input_data.query else "General Crisis Scenario"
+        portfolio = input_data.context.get("risk_portfolio", {})
+        
+        simulation_input = CrisisSimulationInput(user_scenario=scenario, risk_portfolio=portfolio)
 
         # --- v23 Path: Cyclical Graph ---
         if GRAPH_AVAILABLE and crisis_simulation_app:
@@ -110,10 +116,17 @@ class CrisisSimulationMetaAgent(AgentBase):
                         )
                     ]
 
-                return CrisisSimulationOutput(
+                crisis_out = CrisisSimulationOutput(
                     executive_summary=final_report,
                     crisis_simulation_log=structured_log,
                     recommendations="Review the detailed graph trace in 'final_report' for mitigation strategies."
+                )
+                
+                return AgentOutput(
+                    answer=crisis_out.executive_summary,
+                    sources=["CrisisSimulationGraph"],
+                    confidence=0.85,
+                    metadata={"crisis_data": crisis_out.model_dump()}
                 )
             except Exception as e:
                 logging.error(f"CrisisSimulationGraph execution failed: {e}. Falling back to v21 logic.")
@@ -139,7 +152,12 @@ class CrisisSimulationMetaAgent(AgentBase):
         parsed_output = self.simulation_plugin.parse_response(llm_response_str)
 
         logging.info("Crisis simulation finished.")
-        return parsed_output
+        return AgentOutput(
+            answer=parsed_output.executive_summary,
+            sources=["StaticHeuristics"],
+            confidence=0.75,
+            metadata={"crisis_data": parsed_output.model_dump()}
+        )
 
     def _mock_llm_call(self, messages: list[dict[str, str]]) -> str:
         """
