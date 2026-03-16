@@ -2066,7 +2066,7 @@ window.MOCK_DATA = {
       "last_modified": 1768267149.8944957
     },
     {
-      "path": "showcase/market_mayhem_archive.html",
+      "path": "showcase/market_mayhem_dashboard.html",
       "type": "file",
       "size": 15441,
       "last_modified": 1768267662.125425
