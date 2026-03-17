@@ -170,3 +170,7 @@
 **Vulnerability:** The `TechnicalAnalystAgent` used `pickle.load()` directly with a `# nosec B301` comment to bypass bandit checks, allowing Arbitrary Code Execution (RCE) via insecure deserialization.
 **Learning:** Security tools can be bypassed with inline comments (`# nosec`), which creates a false sense of security and hides vulnerabilities from static analysis.
 **Prevention:** Remove `# nosec` bypasses for critical vulnerabilities and always enforce the use of `SafeUnpickler` (`core.security.safe_unpickler.safe_load`) when deserializing objects from potentially untrusted storage.
+## 2026-03-16 - [Fix code injection in framer.py]
+**Vulnerability:** Code injection vulnerability caused by using `eval()` to execute rules defined as strings in `condition_code`. Even with restricted `__builtins__`, using `eval` on dynamic execution rules opens paths to arbitrary code execution if rule strings can be controlled or tampered with.
+**Learning:** `eval({"__builtins__": None})` is not sufficiently sandboxed against determined injection or object traversal if input is untrusted. Hard-coded rules that execute as text strings are inherently fragile.
+**Prevention:** Rather than using `eval`, utilize the `ast` module (`ast.parse()`) and walk the AST directly for a whitelist of explicitly permitted operations (e.g., specific mathematical comparators, simple constants, and specific attribute resolutions) via an implementation like `_safe_eval_condition`.

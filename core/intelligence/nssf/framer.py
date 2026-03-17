@@ -1,7 +1,10 @@
-from typing import List, Dict, Any, Optional
+import ast
 import logging
+from typing import Any, Dict, List
+
 from pydantic import BaseModel, Field
-from core.schemas.v23_5_schema import ExecutionPlan, PlanStep
+
+from core.schemas.v23_5_schema import ExecutionPlan
 
 logger = logging.getLogger(__name__)
 
@@ -58,6 +61,65 @@ class DeterministicProbabilityScript:
             action="FORCE_0" # Effectively Hold/Abort depending on interpretation, here 0 = Abort/Hold
         ))
 
+    def _safe_eval_condition(self, node, eval_context):
+        if isinstance(node, ast.Constant):
+            return node.value
+        elif isinstance(node, ast.Name):
+            if node.id in eval_context:
+                return eval_context[node.id]
+            raise ValueError(f"Unknown variable: {node.id}")
+        elif isinstance(node, ast.Compare):
+            left_val = self._safe_eval_condition(node.left, eval_context)
+            for op, comparator in zip(node.ops, node.comparators, strict=True):
+                right_val = self._safe_eval_condition(comparator, eval_context)
+                res = False
+                if isinstance(op, ast.Gt):
+                    res = left_val > right_val
+                elif isinstance(op, ast.Lt):
+                    res = left_val < right_val
+                elif isinstance(op, ast.GtE):
+                    res = left_val >= right_val
+                elif isinstance(op, ast.LtE):
+                    res = left_val <= right_val
+                elif isinstance(op, ast.Eq):
+                    res = left_val == right_val
+                elif isinstance(op, ast.NotEq):
+                    res = left_val != right_val
+                else:
+                    raise ValueError(f"Unsupported operator: {type(op)}")
+                if not res:
+                    return False
+                left_val = right_val
+            return True
+        elif isinstance(node, ast.UnaryOp):
+            if isinstance(node.op, ast.Not):
+                return not self._safe_eval_condition(node.operand, eval_context)
+            raise ValueError(f"Unsupported unary operator: {type(node.op)}")
+        elif isinstance(node, ast.BoolOp):
+            if isinstance(node.op, ast.And):
+                for value in node.values:
+                    if not self._safe_eval_condition(value, eval_context):
+                        return False
+                return True
+            elif isinstance(node.op, ast.Or):
+                for value in node.values:
+                    if self._safe_eval_condition(value, eval_context):
+                        return True
+                return False
+            else:
+                raise ValueError(f"Unsupported boolop: {type(node.op)}")
+        elif isinstance(node, ast.Call):
+            if isinstance(node.func, ast.Attribute) and isinstance(node.func.value, ast.Name):
+                if node.func.value.id == "context" and node.func.attr == "get":
+                    if len(node.args) < 1 or len(node.args) > 2:
+                        raise ValueError("context.get requires 1 or 2 arguments")
+                    key = self._safe_eval_condition(node.args[0], eval_context)
+                    default = self._safe_eval_condition(node.args[1], eval_context) if len(node.args) == 2 else None
+                    return eval_context["context"].get(key, default)
+            raise ValueError("Unsupported function call")
+        else:
+            raise ValueError(f"Unsupported AST node: {type(node)}")
+
     def evaluate(self, liquid_score: float, context: Dict[str, Any]) -> Dict[str, Any]:
         """
         Evaluates rules against the score and context.
@@ -69,10 +131,10 @@ class DeterministicProbabilityScript:
 
         for rule in self.rules:
             try:
-                # Safe eval environment
                 eval_context = {"liquid_score": liquid_score, "context": context}
-                # Using eval with restricted globals
-                if eval(rule.condition_code, {"__builtins__": None}, eval_context):
+                # Safe eval using AST module
+                parsed_node = ast.parse(rule.condition_code, mode='eval').body
+                if self._safe_eval_condition(parsed_node, eval_context):
                     triggered.append(rule.rule_id)
                     if rule.action == "FORCE_0":
                         final_score = 0.0
