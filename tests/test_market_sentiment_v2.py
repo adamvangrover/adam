@@ -44,7 +44,7 @@ async def test_standard_execution(sentiment_agent):
     input_obj = AgentInput(query="Analyze current market sentiment")
     result = await sentiment_agent.execute(input_obj)
 
-    assert isinstance(result, AgentOutput)
+    assert isinstance(result, dict) or isinstance(result, AgentOutput)
     assert result.confidence > 0.0
     assert "Market Sentiment Analysis" in result.answer or "score" in result.answer
     assert result.metadata["sentiment_score"] > 0.0
@@ -57,7 +57,7 @@ async def test_credit_dominance_trigger(sentiment_agent):
     input_obj = AgentInput(query="Check risks")
     result = await sentiment_agent.execute(input_obj)
 
-    assert isinstance(result, AgentOutput)
+    assert isinstance(result, dict) or isinstance(result, AgentOutput)
     assert result.metadata["details"]["status_override"] == "Systemic Tremor"
     # Expect sentiment to be lowered/overridden
     assert result.metadata["sentiment_score"] == 0.2

@@ -4,7 +4,7 @@ import json
 import os
 import shutil
 import sys
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, AsyncMock, patch
 
 sys.path.append('.')
 
@@ -56,7 +56,7 @@ class TestSNCCompliance(unittest.TestCase):
         agent.send_message = mock_send_message
 
         # Force fallback by making SK return junk
-        agent.run_semantic_kernel_skill = MagicMock(return_value=asyncio.Future())
+        agent.run_semantic_kernel_skill = AsyncMock(return_value=asyncio.Future())
         agent.run_semantic_kernel_skill.return_value.set_result("Confused AI")
 
         rating, rationale = await agent.execute(company_id="RISKY_CORP")
@@ -105,7 +105,7 @@ class TestSNCCompliance(unittest.TestCase):
         agent.send_message = mock_send_message
 
         # Force fallback to test compliance pass -> legacy fallback pass
-        agent.run_semantic_kernel_skill = MagicMock(return_value=asyncio.Future())
+        agent.run_semantic_kernel_skill = AsyncMock(return_value=asyncio.Future())
         agent.run_semantic_kernel_skill.return_value.set_result("Confused AI")
 
         rating, rationale = await agent.execute(company_id="SAFE_CORP")

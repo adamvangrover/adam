@@ -1,11 +1,7 @@
-import logging
+from typing import TypedDict, Annotated, Sequence, Any, Dict
 import operator
-from typing import Annotated, Any, Dict, Sequence, TypedDict
-
-from langgraph.graph import END, StateGraph
-
-from core.engine.financial_reflector import financial_validation_reflector, should_recalculate
-from scripts.quantum_market_simulator import quantum_simulator_node
+from langgraph.graph import StateGraph, END
+import logging
 
 logger = logging.getLogger(__name__)
 
@@ -40,24 +36,4 @@ def get_financial_state_machine():
     # Initialize the graph
     workflow = StateGraph(FinancialState)
 
-    # Add Nodes
-    workflow.add_node("quantum_simulation", quantum_simulator_node)
-    workflow.add_node("financial_validation", financial_validation_reflector)
-
-    # Set entry point
-    workflow.set_entry_point("quantum_simulation")
-
-    # Add edges
-    workflow.add_edge("quantum_simulation", "financial_validation")
-
-    # Conditional edge for Reflexion Loop
-    workflow.add_conditional_edges(
-        "financial_validation",
-        should_recalculate,
-        {
-            "recalculate": "quantum_simulation",
-            "finalize": END
-        }
-    )
-
-    return workflow.compile()
+    return workflow

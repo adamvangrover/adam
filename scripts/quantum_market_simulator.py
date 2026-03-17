@@ -1,9 +1,9 @@
 import json
 import math
-import os
 import random
-from collections import defaultdict
+import os
 from datetime import datetime
+from collections import defaultdict
 
 # ---------------------------------------------------------------------------
 # THE QUANTUM-NEURAL MARKET SIMULATOR (ADAM v26.1 RESEARCH BUILD)
