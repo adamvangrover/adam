@@ -8,6 +8,7 @@ import os
 import yaml
 import json
 import threading
+import asyncio
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
@@ -185,6 +186,21 @@ class SwarmLogger:
     def log_tool(self, agent_id: str, tool_name: str, params: dict[str, Any]) -> None:
         """Helper to log tool execution (TOOL_EXECUTION)."""
         self.log_event("TOOL_EXECUTION", agent_id, {"tool": tool_name, "parameters": params})
+
+    async def async_log_event(self, event_type: str, agent_id: str, details: dict[str, Any]) -> None:
+        """
+        Async version of log_event to prevent blocking the event loop.
+        """
+        await asyncio.to_thread(self.log_event, event_type, agent_id, details)
+
+    async def async_log_thought(self, agent_id: str, thought: str) -> None:
+        """Async helper to log internal agent reasoning (THOUGHT_TRACE)."""
+        await self.async_log_event("THOUGHT_TRACE", agent_id, {"content": thought})
+
+    async def async_log_tool(self, agent_id: str, tool_name: str, params: dict[str, Any]) -> None:
+        """Async helper to log tool execution (TOOL_EXECUTION)."""
+        await self.async_log_event("TOOL_EXECUTION", agent_id, {"tool": tool_name, "parameters": params})
+
 
 class NarrativeLogger:
     """

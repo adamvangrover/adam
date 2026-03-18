@@ -18,10 +18,11 @@ class TestCyclicalAgents(unittest.TestCase):
                 agent = ReflectorAgent(config={})
 
                 # Define a task
-                task = {'payload': 'test'}
+                task = AgentInput(query='test')
 
                 # Execute the agent
                 result = await agent.execute(task)
+                result = result.model_dump()
 
                 # Assert the result
                 self.assertIn("quality_score", result)

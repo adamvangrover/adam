@@ -1,7 +1,8 @@
 from __future__ import annotations
 from typing import Dict, Any, List, Union
 import logging
-from core.agents.agent_base import AgentBase, AgentInput, AgentOutput
+from core.agents.agent_base import AgentBase
+from core.schemas.agent_schema import AgentInput, AgentOutput
 from core.engine.states import init_reflector_state
 
 logger = logging.getLogger(__name__)
