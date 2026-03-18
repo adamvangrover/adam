@@ -9,6 +9,7 @@ import yaml
 import json
 import threading
 import uuid
+import asyncio
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -178,13 +179,25 @@ class SwarmLogger:
         except Exception as e:
             logging.error(f"Failed to write swarm telemetry event: {e}")
 
+    async def async_log_event(self, event_type: str, agent_id: str, details: dict[str, Any]) -> None:
+        """Non-blocking helper to log structured events via asyncio.to_thread."""
+        await asyncio.to_thread(self.log_event, event_type, agent_id, details)
+
     def log_thought(self, agent_id: str, thought: str) -> None:
         """Helper to log internal agent reasoning (THOUGHT_TRACE)."""
         self.log_event("THOUGHT_TRACE", agent_id, {"content": thought})
 
+    async def async_log_thought(self, agent_id: str, thought: str) -> None:
+        """Non-blocking helper to log internal agent reasoning via asyncio.to_thread."""
+        await asyncio.to_thread(self.log_thought, agent_id, thought)
+
     def log_tool(self, agent_id: str, tool_name: str, params: dict[str, Any]) -> None:
         """Helper to log tool execution (TOOL_EXECUTION)."""
         self.log_event("TOOL_EXECUTION", agent_id, {"tool": tool_name, "parameters": params})
+
+    async def async_log_tool(self, agent_id: str, tool_name: str, params: dict[str, Any]) -> None:
+        """Non-blocking helper to log tool execution via asyncio.to_thread."""
+        await asyncio.to_thread(self.log_tool, agent_id, tool_name, params)
 
 class NarrativeLogger:
     """
