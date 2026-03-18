@@ -41,6 +41,7 @@ class ReflectorAgent(AgentBase):
         if GRAPH_AVAILABLE and reflector_app:
             logging.info("ReflectorAgent: Delegating to v23 ReflectorGraph.")
 
+            context = input_data.context if hasattr(input_data, "context") else None
             initial_state = init_reflector_state(content_to_analyze, context)
             config = {"configurable": {"thread_id": "1"}}
 
