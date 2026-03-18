@@ -102,7 +102,8 @@ class AgentImprovementPipeline:
                             # Filter for drops > 5% (i.e. < -0.05)
                             drops = df[df['pct_change'] < -0.05]
 
-                            for timestamp, row in drops.iterrows():
+                            # ⚡ Bolt: Replace slow .iterrows() with a vectorized approach using zip and to_dict
+                            for timestamp, row in zip(drops.index, drops.to_dict(orient="records")):
                                 symbol = row.get('symbol', 'UNKNOWN')
                                 drop_pct = row['pct_change'] * 100
 
