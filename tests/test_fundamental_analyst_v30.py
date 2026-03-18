@@ -1,14 +1,15 @@
-import pytest
-import asyncio
-from unittest.mock import AsyncMock, MagicMock
-from datetime import datetime
+import os
 
 # Adjust path if necessary
 import sys
-import os
+from unittest.mock import AsyncMock
+
+import pytest
+
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from core.v30_architecture.python_intelligence.agents.fundamental_analyst import FundamentalAnalyst, FundamentalInput
+
 
 @pytest.mark.asyncio
 async def test_fundamental_analyst_initialization():

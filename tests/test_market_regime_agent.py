@@ -1,9 +1,12 @@
+import asyncio
 import unittest
 from unittest.mock import MagicMock, patch
-import pandas as pd
+
 import numpy as np
-import asyncio
+import pandas as pd
+
 from core.agents.specialized.market_regime_agent import MarketRegimeAgent
+
 
 class TestMarketRegimeAgent(unittest.TestCase):
 

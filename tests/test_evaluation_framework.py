@@ -1,14 +1,14 @@
-import pytest
-import sys
 import os
+import sys
 
 # Ensure core is in path
 sys.path.append(os.getcwd())
 
-from core.evaluation.red_team import ZombieFactory
 from core.evaluation.judge import AuditorAgent
+from core.evaluation.red_team import ZombieFactory
 from core.evaluation.symbolic import SymbolicVerifier
 from core.vertical_risk_agent.agents.supervisor import critique_node
+
 
 def test_zombie_factory():
     """Test that ZombieFactory generates high-risk data."""

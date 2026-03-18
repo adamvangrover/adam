@@ -1,10 +1,11 @@
-import unittest
-import sys
 import os
+import sys
+import unittest
 
 # Bypass core.simulations.__init__ to avoid dependencies
 sys.path.append(os.path.join(os.getcwd(), 'core', 'simulations'))
 import distressed_credit_pricing_simulation as sim_mod
+
 
 class TestDistressedCreditPricing(unittest.TestCase):
 

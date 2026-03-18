@@ -1,13 +1,14 @@
-import unittest
-import sys
 import os
 import re
+import sys
+import unittest
 
 # Add repo root to sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from core.ingestion.semantic_chunker import SemanticChunker
 from core.evaluation.llm_judge import ConvictionScorer
+from core.ingestion.semantic_chunker import SemanticChunker
+
 
 # Helper function from the script to test independently
 def clean_html(text):

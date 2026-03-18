@@ -1,6 +1,8 @@
-import pytest
 import numpy as np
+import pytest
+
 from core.quantum.schrodinger_solver import SchrodingerSolver
+
 
 @pytest.fixture
 def solver():

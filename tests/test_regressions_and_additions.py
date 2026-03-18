@@ -1,7 +1,10 @@
-import unittest
-import numpy as np
 import asyncio
+import unittest
+
+import numpy as np
+
 from core.agents.quantitative_risk_agent import QuantitativeRiskAgent
+
 
 class TestQuantitativeRiskAgent(unittest.TestCase):
     def setUp(self):

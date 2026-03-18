@@ -1,6 +1,7 @@
-import pytest
 import sys
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
+
+import pytest
 
 # We need to be able to import from core
 sys.path.append(".")

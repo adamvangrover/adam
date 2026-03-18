@@ -1,9 +1,8 @@
-import unittest
 import os
-import shutil
-import json
+import unittest
+
 from core.agents.mixins.memory_mixin import MemoryMixin
-from datetime import datetime
+
 
 class TestMemoryMixin(unittest.TestCase):
     def setUp(self):

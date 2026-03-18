@@ -1,15 +1,15 @@
 import asyncio
 import logging
-import sys
 import os
+import sys
 import unittest
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 # Ensure repo root is in path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from core.system.temporal_engine import TemporalEngine, PulseTask
 from core.procedures.autonomous_update import RoutineMaintenance
+from core.system.temporal_engine import PulseTask, TemporalEngine
 
 # Mock AgentOrchestrator to avoid heavy initialization during unit test
 # But we can try to import it to ensure no syntax errors

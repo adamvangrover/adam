@@ -1,8 +1,9 @@
-import unittest
-import shutil
 import os
-import time
+import shutil
+import unittest
+
 from core.infrastructure.semantic_cache import SemanticCache
+
 
 class TestSemanticCache(unittest.TestCase):
 

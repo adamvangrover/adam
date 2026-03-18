@@ -1,5 +1,7 @@
 import unittest
+
 from core.security.sql_validator import SQLValidator
+
 
 class TestSQLValidatorAdvanced(unittest.TestCase):
     """

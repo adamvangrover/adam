@@ -1,7 +1,8 @@
-import unittest
-from pydantic import ValidationError
-from core.settings import Settings
 import os
+import unittest
+
+from core.settings import Settings
+
 
 class TestSettingsSecurity(unittest.TestCase):
     def test_development_mode_allows_default_key(self):

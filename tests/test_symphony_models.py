@@ -1,6 +1,5 @@
-import pytest
-from datetime import datetime, timezone
-from core.symphony.models import Issue, BlockerRef, OrchestratorRuntimeState
+from core.symphony.models import BlockerRef, Issue, OrchestratorRuntimeState
+
 
 def test_issue_model():
     issue = Issue(

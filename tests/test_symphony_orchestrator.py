@@ -1,10 +1,11 @@
-import pytest
 import asyncio
-from unittest.mock import patch, MagicMock
-from datetime import datetime, timezone
-from core.symphony.orchestrator import SymphonyOrchestrator
+from unittest.mock import MagicMock, patch
+
+import pytest
+
 from core.symphony.models import Issue, WorkflowDefinition
-from core.symphony.config import SymphonyConfig
+from core.symphony.orchestrator import SymphonyOrchestrator
+
 
 @pytest.fixture
 def orchestrator(tmp_path):

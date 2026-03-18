@@ -1,19 +1,11 @@
 # tests/test_agents.py
 
 import unittest
-from unittest.mock import patch, Mock, AsyncMock
-from core.agents.market_sentiment_agent import MarketSentimentAgent
-from core.agents.macroeconomic_analysis_agent import MacroeconomicAnalysisAgent
+from unittest.mock import AsyncMock, Mock, patch
+
 from core.agents.geopolitical_risk_agent import GeopoliticalRiskAgent
-from core.agents.industry_specialist_agent import IndustrySpecialistAgent
-from core.agents.fundamental_analyst_agent import FundamentalAnalystAgent
-from core.agents.technical_analyst_agent import TechnicalAnalystAgent as TechnicalAnalyst
-from core.agents.risk_assessment_agent import RiskAssessmentAgent as RiskAssessor
-from core.agents.newsletter_layout_specialist_agent import NewsletterLayoutSpecialistAgent as NewsletterLayoutSpecialist
-from core.agents.data_verification_agent import DataVerificationAgent
-from core.agents.lexica_agent import LexicaAgent
-from core.agents.archive_manager_agent import ArchiveManagerAgent
-from core.agents.echo_agent import EchoAgent
+from core.agents.macroeconomic_analysis_agent import MacroeconomicAnalysisAgent
+from core.agents.market_sentiment_agent import MarketSentimentAgent
 
 # ... (other imports)
 
@@ -96,7 +88,7 @@ class TestMacroeconomicAnalysisAgent(unittest.TestCase):
         }
         self.agent = MacroeconomicAnalysisAgent(config)
 
-    @patch('core.agents.macroeconomic_analysis_agent.send_message')
+    @patch('core.agents.agent_base.AgentBase.send_message')
     def test_analyze_macroeconomic_data(self, mock_send_message):
         """Test analyzing macroeconomic data."""
         # Mock the data source's responses
@@ -111,7 +103,7 @@ class TestMacroeconomicAnalysisAgent(unittest.TestCase):
             {'agent': 'macroeconomic_analysis_agent', 'insights': insights}
         )
 
-    @patch('core.agents.macroeconomic_analysis_agent.send_message')
+    @patch('core.agents.agent_base.AgentBase.send_message')
     def test_analyze_macroeconomic_data_with_high_gdp_growth(self, mock_send_message):
         """Test analyzing macroeconomic data with high GDP growth."""
         # Mock the data source's responses with high GDP growth
@@ -128,7 +120,7 @@ class TestGeopoliticalRiskAgent(unittest.TestCase):
         config = {'data_sources': {'news_api': Mock(), 'political_database': Mock()}}
         self.agent = GeopoliticalRiskAgent(config)
 
-    @patch('core.agents.geopolitical_risk_agent.send_message')
+    @patch('core.agents.agent_base.AgentBase.send_message')
     def test_assess_geopolitical_risks(self, mock_send_message):
         """Test assessing geopolitical risks."""
         # ... (mock data sources and their responses)

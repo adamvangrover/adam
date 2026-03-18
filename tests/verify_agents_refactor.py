@@ -1,22 +1,23 @@
 import asyncio
 import logging
+
 import pandas as pd
+
 from core.agents.algo_trading_agent import AlgoTradingAgent
-from core.agents.supply_chain_risk_agent import SupplyChainRiskAgent
-from core.agents.legal_agent import LegalAgent
-from core.agents.industry_specialist_agent import IndustrySpecialistAgent
 from core.agents.data_visualization_agent import DataVisualizationAgent
-from core.agents.prediction_market_agent import PredictionMarketAgent
+from core.agents.industry_specialist_agent import IndustrySpecialistAgent
+from core.agents.legal_agent import LegalAgent
 from core.agents.lexica_agent import LexicaAgent
 from core.agents.lingua_maestro import LinguaMaestro
-from core.agents.sense_weaver import SenseWeaver
+from core.agents.machine_learning_model_training_agent import MachineLearningModelTrainingAgent
+from core.agents.meta_agents.crisis_simulation_agent import CrisisSimulationMetaAgent
+from core.agents.meta_cognitive_agent import MetaCognitiveAgent
 from core.agents.natural_language_generation_agent import NaturalLanguageGenerationAgent
 from core.agents.newsletter_layout_specialist_agent import NewsletterLayoutSpecialistAgent
-from core.agents.machine_learning_model_training_agent import MachineLearningModelTrainingAgent
+from core.agents.prediction_market_agent import PredictionMarketAgent
 from core.agents.prompt_tuner import PromptTuner
-from core.agents.meta_cognitive_agent import MetaCognitiveAgent
-from core.agents.meta_agents.crisis_simulation_agent import CrisisSimulationMetaAgent
-from core.schemas.crisis_simulation import CrisisSimulationInput
+from core.agents.sense_weaver import SenseWeaver
+from core.agents.supply_chain_risk_agent import SupplyChainRiskAgent
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)

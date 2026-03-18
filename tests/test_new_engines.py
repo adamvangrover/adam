@@ -1,7 +1,8 @@
 import asyncio
 import logging
-from core.engine.consensus_engine import ConsensusEngine
+
 from core.agents.specialized.blindspot_agent import BlindspotAgent
+from core.engine.consensus_engine import ConsensusEngine
 
 # Setup basic logging to see output
 logging.basicConfig(level=logging.INFO)

@@ -1,6 +1,8 @@
 import unittest
 from unittest.mock import MagicMock, patch
+
 from core.data_sources.data_fetcher import DataFetcher
+
 
 class TestDataFetcher(unittest.TestCase):
     @patch('core.data_sources.data_fetcher.yf')

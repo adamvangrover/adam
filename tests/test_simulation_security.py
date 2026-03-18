@@ -1,6 +1,7 @@
-import unittest
 import json
-from services.webapp.api import create_app, db, User
+import unittest
+
+from services.webapp.api import User, create_app, db
 
 
 class SimulationSecurityTestCase(unittest.TestCase):

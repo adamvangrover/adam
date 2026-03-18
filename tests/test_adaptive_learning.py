@@ -1,8 +1,11 @@
 import unittest
+
 import numpy as np
 import pandas as pd
-from core.learning.adaptive_learning import LearningMemory, QLearningAgent
+
 from core.agents.adaptive_algo_agent import AdaptiveAlgoTradingAgent
+from core.learning.adaptive_learning import LearningMemory, QLearningAgent
+
 
 class TestAdaptiveLearning(unittest.TestCase):
 

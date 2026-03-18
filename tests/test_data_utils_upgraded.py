@@ -1,10 +1,10 @@
-import pytest
-import json
-import csv
-import yaml
 from pathlib import Path
-from core.utils.data_utils import DataLoader, load_data
+
+import pytest
+
 from core.system.error_handler import FileReadError, InvalidInputError
+from core.utils.data_utils import DataLoader, load_data
+
 
 @pytest.fixture
 def temp_files(tmp_path):

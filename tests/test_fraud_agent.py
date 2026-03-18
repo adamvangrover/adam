@@ -1,6 +1,8 @@
+
 import pytest
-import asyncio
+
 from core.agents.fraud_detection_agent import FraudDetectionAgent
+
 
 @pytest.mark.asyncio
 async def test_fraud_detection():

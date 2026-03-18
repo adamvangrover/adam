@@ -1,8 +1,10 @@
-import pytest
 import numpy as np
+import pytest
 import torch
-from core.oswm.trainer import OSWMTrainer
+
 from core.oswm.inference import OSWMInference
+from core.oswm.trainer import OSWMTrainer
+
 
 @pytest.mark.integration
 def test_oswm_integration():

@@ -1,12 +1,12 @@
 import json
 import os
 import sys
-import pytest
 
 # Adjust path to find scripts/report_generation.py
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'scripts'))
 
 from report_generation import generate_integration_report
+
 
 def test_integration_log_structure():
     """Test that the integration log file exists and has the expected structure."""

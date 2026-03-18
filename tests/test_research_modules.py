@@ -1,18 +1,20 @@
-import unittest
-import pytest
-import torch
-import numpy as np
 import os
 import sys
+import unittest
+
+import pytest
+import torch
 
 # Add repo root to path
 sys.path.append(os.getcwd())
 
-from core.research.oswm.priors import NeuralNetworkPrior as NNPrior, MomentumPrior, PriorSampler
-from core.research.oswm.model import WorldModelTransformer
-from core.research.oswm.inference import OSWMInference
 from core.research.federated_learning.fl_coordinator import FederatedCoordinator
 from core.research.gnn.engine import GraphRiskEngine
+from core.research.oswm.inference import OSWMInference
+from core.research.oswm.model import WorldModelTransformer
+from core.research.oswm.priors import MomentumPrior, PriorSampler
+from core.research.oswm.priors import NeuralNetworkPrior as NNPrior
+
 
 @pytest.mark.integration
 class TestOSWM(unittest.TestCase):

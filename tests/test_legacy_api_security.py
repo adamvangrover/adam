@@ -1,9 +1,9 @@
-import unittest
-from unittest.mock import patch, MagicMock
-import json
-import sys
 import importlib.util
+import json
 import os
+import sys
+import unittest
+from unittest.mock import MagicMock, patch
 
 # Mock AgentOrchestrator and Echo to avoid initialization issues during import
 sys.modules['core.system.agent_orchestrator'] = MagicMock()
@@ -17,6 +17,7 @@ sys.modules["legacy_api"] = legacy_api
 spec.loader.exec_module(legacy_api)
 
 from legacy_api import app
+
 
 class TestCoreApiSecurity(unittest.TestCase):
     def setUp(self):

@@ -1,10 +1,11 @@
-from src.config import DEFAULT_ASSUMPTIONS
-from src.credit_risk import CreditSponsorModel
-from src.core_valuation import ValuationEngine
-import unittest
-import sys
 import os
+import sys
+import unittest
+
 import pandas as pd
+
+from src.core_valuation import ValuationEngine
+from src.credit_risk import CreditSponsorModel
 
 # Add root to sys.path to import src
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))

@@ -2,6 +2,7 @@
 
 import unittest
 from unittest.mock import patch
+
 from core.agents.query_understanding_agent import QueryUnderstandingAgent
 from core.system.error_handler import InvalidInputError
 

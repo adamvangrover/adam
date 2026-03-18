@@ -1,6 +1,8 @@
 import pytest
-from src.credit_risk import CreditSponsorModel
+
 from src.config import RATING_MAP
+from src.credit_risk import CreditSponsorModel
+
 
 def test_credit_sponsor_initialization():
     model = CreditSponsorModel(enterprise_value=1000.0, total_debt=500.0, ebitda=100.0, interest_expense=20.0)

@@ -1,9 +1,8 @@
-import unittest
-from unittest.mock import MagicMock, patch
 import asyncio
-import sys
 import os
+import sys
 import types
+import unittest
 
 # --- MOCKING DEPENDENCIES FOR ISOLATION ---
 # Mock core.agents.agent_base
@@ -39,6 +38,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 # Direct import via file path to avoid triggering core.agents.__init__
 import importlib.util
+
 agent_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../core/agents/competitor_analysis_agent.py'))
 spec = importlib.util.spec_from_file_location("competitor_analysis_agent", agent_path)
 caa_module = importlib.util.module_from_spec(spec)

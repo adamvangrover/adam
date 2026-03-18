@@ -1,7 +1,9 @@
-import pytest
 import json
 import os
 import sys
+
+import pytest
+
 # Ensure core can be imported
 sys.path.append(os.getcwd())
 

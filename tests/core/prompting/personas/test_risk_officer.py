@@ -1,6 +1,8 @@
-import unittest
 import json
+import unittest
+
 from core.prompting.personas.risk_officer import RiskOfficerPersona
+
 
 class TestRiskOfficerPersona(unittest.TestCase):
     def test_rendering_without_optional_fields(self):

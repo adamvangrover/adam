@@ -1,10 +1,9 @@
 
+import importlib
+import os
+import sys
 import unittest
 from unittest.mock import MagicMock, patch
-import sys
-import os
-import logging
-import importlib
 
 # Ensure the project root is in the python path
 sys.path.append(os.getcwd())
@@ -38,7 +37,7 @@ class TestAgentLoadingBug(unittest.TestCase):
         # Specifically set up MarketSentimentAgent
         mock_ms_module = MagicMock()
         mock_ms_class = MagicMock()
-        setattr(mock_ms_module, 'MarketSentimentAgent', mock_ms_class)
+        mock_ms_module.MarketSentimentAgent = mock_ms_class
         self.modules_to_patch['core.agents.market_sentiment_agent'] = mock_ms_module
 
     @patch('core.system.agent_orchestrator.MessageBroker')

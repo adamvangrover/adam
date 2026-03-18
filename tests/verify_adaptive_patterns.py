@@ -1,7 +1,7 @@
 
 import asyncio
 import logging
-from typing import Any, Dict
+from typing import Any
 
 from core.system.v22_async.async_agent_base import AsyncAgentBase
 

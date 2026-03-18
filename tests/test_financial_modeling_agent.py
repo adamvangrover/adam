@@ -1,8 +1,9 @@
 
-import unittest
-import numpy as np
 import asyncio
+import unittest
+
 from core.agents.financial_modeling_agent import FinancialModelingAgent
+
 
 class TestFinancialModelingAgent(unittest.TestCase):
     def setUp(self):

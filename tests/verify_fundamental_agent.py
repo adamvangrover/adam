@@ -1,7 +1,8 @@
 import asyncio
-import logging
 import json
+import logging
 from unittest.mock import MagicMock, patch
+
 from core.agents.fundamental_analyst_agent import FundamentalAnalystAgent
 from core.schemas.agent_schema import AgentInput, AgentOutput
 

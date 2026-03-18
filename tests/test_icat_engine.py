@@ -1,8 +1,9 @@
+from unittest.mock import patch
+
 import pytest
-import os
-from unittest.mock import MagicMock, patch
+
 from core.engine.icat import ICATEngine
-from core.financial_data.icat_schema import LBOParameters, DebtTranche, CarveOutParameters
+from core.financial_data.icat_schema import CarveOutParameters, DebtTranche, LBOParameters
 
 # Mock data path
 MOCK_DATA_PATH = "showcase/data/icat_mock_data.json"

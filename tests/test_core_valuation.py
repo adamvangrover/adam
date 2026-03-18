@@ -1,6 +1,8 @@
-import pytest
 import pandas as pd
+import pytest
+
 from src.core_valuation import ValuationEngine
+
 
 def test_valuation_engine_initialization():
     engine = ValuationEngine(ebitda_base=100.0, capex_percent=0.1, nwc_percent=0.05, debt_cost=0.06, equity_percent=0.4)

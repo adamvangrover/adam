@@ -1,10 +1,11 @@
-import unittest
-import sys
 import os
+import sys
+import unittest
 
 # Bypass core.simulations.__init__ to avoid heavy dependencies for this unit test
 sys.path.append(os.path.join(os.getcwd(), 'core', 'simulations'))
 import adam_van_grover_search
+
 
 class TestAdamVanGroverSearch(unittest.TestCase):
 

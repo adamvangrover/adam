@@ -1,7 +1,10 @@
-import pytest
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
+
 import networkx as nx
+import pytest
+
 from core.engine.unified_knowledge_graph import UnifiedKnowledgeGraph
+
 
 @pytest.fixture
 def clean_ukg():

@@ -1,5 +1,7 @@
 import unittest
+
 from core.credit_sentinel.agents.ratio_calculator import RatioCalculator
+
 
 class TestRatioCalculator(unittest.TestCase):
     def setUp(self):

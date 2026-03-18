@@ -1,7 +1,8 @@
-from core.engine.neuro_symbolic_planner import NeuroSymbolicPlanner
-import unittest
-import sys
 import os
+import sys
+import unittest
+
+from core.engine.neuro_symbolic_planner import NeuroSymbolicPlanner
 
 # Ensure root is in path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))

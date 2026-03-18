@@ -1,7 +1,9 @@
 import unittest
-from core.simulation.sovereign import Sovereign, Resource, Military
-from core.simulation.economy import EconomyEngine
+
 from core.simulation.demographics import DemographicsEngine, PopulationSegment
+from core.simulation.economy import EconomyEngine
+from core.simulation.sovereign import Resource, Sovereign
+
 
 class TestSimulation(unittest.TestCase):
     def setUp(self):

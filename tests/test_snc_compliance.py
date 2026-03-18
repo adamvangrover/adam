@@ -1,14 +1,14 @@
-import unittest
 import asyncio
 import json
 import os
-import shutil
 import sys
-from unittest.mock import MagicMock, AsyncMock, patch
+import unittest
+from unittest.mock import AsyncMock, MagicMock
 
 sys.path.append('.')
 
 from core.agents.snc_analyst_agent import SNCAnalystAgent, SNCRating
+
 
 class TestSNCCompliance(unittest.TestCase):
     def setUp(self):

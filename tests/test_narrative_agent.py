@@ -1,7 +1,9 @@
-import unittest
 import asyncio
+import unittest
+
 from core.agents.specialized.narrative_intelligence_agent import NarrativeIntelligenceAgent
 from core.utils.narrative_weaver import NarrativeWeaver
+
 
 class TestNarrativeIntelligence(unittest.TestCase):
 

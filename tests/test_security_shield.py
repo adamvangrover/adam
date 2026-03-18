@@ -1,5 +1,7 @@
 import unittest
+
 from core.security.shield import InputShield
+
 
 class TestInputShield(unittest.TestCase):
 

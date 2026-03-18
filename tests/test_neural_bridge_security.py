@@ -1,15 +1,17 @@
 
-import pytest
-import sys
 import os
+import sys
+
+import pytest
 from fastapi.testclient import TestClient
 
 # Ensure core is in path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../')))
 
 # Import apps
-from core.v30_architecture.python_intelligence.bridge.neural_mesh import app as mesh_app
 from core.v30_architecture.python_intelligence.bridge.neural_link import app as link_app
+from core.v30_architecture.python_intelligence.bridge.neural_mesh import app as mesh_app
+
 
 @pytest.fixture
 def mesh_client():
@@ -34,7 +36,7 @@ def test_mesh_websocket_cors_blocked(mesh_client):
         with mesh_client.websocket_connect("/ws/mesh", headers={"Origin": "http://evil.com"}) as websocket:
             # If we connect successfully, fail the test
             pytest.fail("Should have rejected connection from evil.com")
-    except Exception as e:
+    except Exception:
         # Expected failure (connection rejected)
         pass
 
@@ -52,5 +54,5 @@ def test_link_websocket_cors_blocked(link_client):
     try:
         with link_client.websocket_connect("/ws/stream", headers={"Origin": "http://evil.com"}) as websocket:
             pytest.fail("Should have rejected connection from evil.com")
-    except Exception as e:
+    except Exception:
         pass

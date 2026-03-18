@@ -1,5 +1,7 @@
 import pytest
+
 from core.agents.options_flow_agent import OptionsFlowAgent
+
 
 @pytest.mark.asyncio
 async def test_options_flow_bullish():

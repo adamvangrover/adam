@@ -1,5 +1,6 @@
 import sys
 from unittest.mock import MagicMock
+
 from flask import Blueprint
 
 # Mock dependencies to avoid ImportErrors
@@ -14,14 +15,14 @@ sys.modules['core.simulations'] = MagicMock()
 sys.modules['core.simulations.Credit_Rating_Assessment_Simulation'] = MagicMock()
 sys.modules['core.agents.specialized.quantum_retrieval_agent'] = MagicMock()
 
-import unittest
 import os
-import json
+import unittest
 
 # Add root to sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from services.webapp.api import create_app, db
+
 
 class TestAPIHealth(unittest.TestCase):
     """

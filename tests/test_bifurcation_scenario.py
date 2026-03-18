@@ -1,12 +1,13 @@
-import unittest
-import sys
-import os
 import json
+import os
+import sys
+import unittest
 
 # Add project root to path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from core.engine.sector_impact_engine import SectorImpactEngine
+
 
 class TestBifurcationScenario(unittest.TestCase):
     def setUp(self):

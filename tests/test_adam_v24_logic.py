@@ -1,8 +1,10 @@
-import unittest
-from unittest.mock import MagicMock, patch
 import asyncio
+import unittest
+from unittest.mock import patch
+
 from core.agents.market_sentiment_agent import MarketSentimentAgent
 from core.prompting.personas.adam_risk_architect import AdamRiskArchitect
+
 
 class TestAdamV24Logic(unittest.TestCase):
     def setUp(self):

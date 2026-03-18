@@ -1,19 +1,14 @@
 # tests/test_config_utils.py
 
-import os
-import yaml
 import logging
-from pathlib import Path
+import os
 from unittest.mock import patch
-import pytest
 
-from core.utils.config_utils import (
-    load_config,
-    load_app_config,
-    deep_update,
-    _substitute_env_vars,
-    save_config
-)
+import pytest
+import yaml
+
+from core.utils.config_utils import _substitute_env_vars, deep_update, load_app_config, load_config, save_config
+
 
 @pytest.fixture
 def temp_yaml_file(tmp_path):

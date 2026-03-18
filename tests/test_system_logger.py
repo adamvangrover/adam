@@ -1,11 +1,12 @@
 import json
 import tempfile
 from pathlib import Path
-from unittest.mock import patch, mock_open
+from unittest.mock import patch
 
 import pytest
 
 from core.utils.system_logger import SystemLogger, create_timestamped_system_file
+
 
 @pytest.fixture
 def temp_log_file():

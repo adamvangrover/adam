@@ -1,6 +1,7 @@
-import unittest
-import os
 import json
+import os
+import unittest
+
 
 class TestDataVerification(unittest.TestCase):
     def setUp(self):

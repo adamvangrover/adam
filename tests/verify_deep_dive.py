@@ -1,9 +1,10 @@
-from core.engine.states import init_omniscient_state
-from core.engine.deep_dive_graph import deep_dive_app
-import sys
-import os
 import asyncio
 import logging
+import os
+import sys
+
+from core.engine.deep_dive_graph import deep_dive_app
+from core.engine.states import init_omniscient_state
 
 # Add project root to path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))

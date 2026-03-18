@@ -1,12 +1,13 @@
 
-import unittest
-import sys
 import os
+import sys
+import unittest
 
 # Ensure importability
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from core.data_processing.utils import GoldStandardScrubber, FileHandlers
+from core.data_processing.utils import FileHandlers, GoldStandardScrubber
+
 
 class TestCoreDataProcessingUtils(unittest.TestCase):
 

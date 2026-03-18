@@ -1,6 +1,8 @@
 import unittest
-from unittest.mock import patch, Mock
+from unittest.mock import Mock, patch
+
 from core.agents.geopolitical_risk_agent import GeopoliticalRiskAgent
+
 
 class TestGeopoliticalRiskAgent(unittest.TestCase):
     def setUp(self):
@@ -8,7 +10,7 @@ class TestGeopoliticalRiskAgent(unittest.TestCase):
         config = {'data_sources': {'news_api': Mock(), 'political_database': Mock()}}
         self.agent = GeopoliticalRiskAgent(config)
 
-    @patch('core.agents.geopolitical_risk_agent.send_message')
+    @patch('core.agents.agent_base.AgentBase.send_message')
     def test_assess_geopolitical_risks(self, mock_send_message):
         """Test assessing geopolitical risks."""
         # ... (mock data sources and their responses)

@@ -1,6 +1,7 @@
 import io
-import pandas as pd
+
 from src.ingestion.plugins.excel_parser import ExcelParser
+
 
 def test_excel_parser_parse_csv():
     # Setup mock CSV

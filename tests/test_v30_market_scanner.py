@@ -1,8 +1,10 @@
-import pytest
-import asyncio
+from unittest.mock import AsyncMock
+
 import pandas as pd
-from unittest.mock import MagicMock, patch, AsyncMock
+import pytest
+
 from core.v30_architecture.python_intelligence.agents.market_scanner import MarketScanner
+
 
 @pytest.mark.asyncio
 async def test_market_scanner_fetch_and_emit():

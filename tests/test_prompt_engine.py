@@ -1,8 +1,9 @@
-import unittest
 import os
 import shutil
-from pathlib import Path
+import unittest
+
 from backend.intelligence.prompt_engine import PromptEngine
+
 
 class TestPromptEngine(unittest.TestCase):
     def setUp(self):

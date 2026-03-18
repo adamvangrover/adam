@@ -1,6 +1,9 @@
-import pytest
 from unittest.mock import MagicMock, patch
+
+import pytest
+
 from core.agents.risk_assessment_agent import RiskAssessmentAgent
+
 
 @pytest.fixture
 def risk_agent():

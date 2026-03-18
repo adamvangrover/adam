@@ -1,9 +1,10 @@
+import asyncio
+import os
+import sys
+import types
 import unittest
 from unittest.mock import MagicMock, patch
-import asyncio
-import sys
-import os
-import types
+
 import numpy as np
 
 # --- MOCKING DEPENDENCIES FOR ISOLATION ---
@@ -62,6 +63,7 @@ sys.modules["sklearn"] = MagicMock()
 
 # Now import the agent under test
 import importlib.util
+
 agent_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../core/agents/peer_set_agent.py'))
 spec = importlib.util.spec_from_file_location("peer_set_agent_test", agent_path)
 psa_module = importlib.util.module_from_spec(spec)

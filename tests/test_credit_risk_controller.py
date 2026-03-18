@@ -1,7 +1,7 @@
 import unittest
-import asyncio
+
 from core.agents.specialized.credit_risk_controller_agent import CreditRiskControllerAgent
-from core.system.v22_async.async_task import AsyncTask
+
 
 class TestCreditRiskControllerAgent(unittest.IsolatedAsyncioTestCase):
     async def test_deterministic_logic(self):

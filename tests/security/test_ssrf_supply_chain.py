@@ -8,7 +8,9 @@ sys.modules['geopy.geocoders'] = MagicMock()
 
 import unittest
 from unittest.mock import patch
+
 from core.agents.supply_chain_risk_agent import SupplyChainRiskAgent
+
 
 class TestSupplyChainRiskAgentSSRF(unittest.TestCase):
     @patch('requests.get')

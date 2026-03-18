@@ -1,10 +1,11 @@
 import unittest
-from unittest.mock import MagicMock, AsyncMock
-import asyncio
-from core.agents.meta_agents.evolutionary_architect import EvolutionaryArchitect
-from core.agents.meta_agents.didactic_architect import DidacticArchitect
+from unittest.mock import AsyncMock, MagicMock
+
 from core.agents.meta_agents.chronos_agent import Chronos
+from core.agents.meta_agents.didactic_architect import DidacticArchitect
+from core.agents.meta_agents.evolutionary_architect import EvolutionaryArchitect
 from core.llm.base_llm_engine import BaseLLMEngine
+
 
 class TestV24Agents(unittest.IsolatedAsyncioTestCase):
     async def asyncSetUp(self):

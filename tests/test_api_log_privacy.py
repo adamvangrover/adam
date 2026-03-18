@@ -1,10 +1,11 @@
-from core.api.server import app, setup_log_capture
-import sys
-import os
-import unittest
-import logging
 import json
-from unittest.mock import MagicMock, patch
+import logging
+import os
+import sys
+import unittest
+from unittest.mock import MagicMock
+
+from core.api.server import app, setup_log_capture
 
 # Adjust path to find core
 sys.path.append(os.path.abspath(os.getcwd()))

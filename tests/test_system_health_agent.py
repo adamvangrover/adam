@@ -1,5 +1,7 @@
 import pytest
+
 from core.agents.system_health_agent import SystemHealthAgent
+
 
 @pytest.mark.asyncio
 async def test_health_metrics():

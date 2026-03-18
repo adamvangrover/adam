@@ -1,6 +1,9 @@
 import unittest
+
 import networkx as nx
+
 from core.engine.simulation_engine import CrisisSimulationEngine
+
 
 class TestCrisisSimulationEngine(unittest.TestCase):
     def setUp(self):

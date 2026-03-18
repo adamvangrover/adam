@@ -1,12 +1,12 @@
-import time
-import sys
 import os
-import networkx as nx
+import sys
+import time
 
 # Add repo root to path
 sys.path.append(os.getcwd())
 
 from core.v23_graph_engine.unified_knowledge_graph import UnifiedKnowledgeGraph
+
 
 def benchmark():
     ukg = UnifiedKnowledgeGraph()
@@ -28,7 +28,7 @@ def benchmark():
     ukg.ingest_risk_state(risk_state)
 
     # Verify nodes
-    facility_id = f"CreditFacility::AAPL::General"
+    facility_id = "CreditFacility::AAPL::General"
     if not ukg.graph.has_node(facility_id):
         print("FAIL: CreditFacility node missing!")
         sys.exit(1)

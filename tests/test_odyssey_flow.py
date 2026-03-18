@@ -1,9 +1,10 @@
-from core.v23_graph_engine.odyssey_knowledge_graph import OdysseyKnowledgeGraph
-from core.system.nexus_zero_orchestrator import NexusZeroOrchestrator
-import unittest
 import asyncio
-import sys
 import os
+import sys
+import unittest
+
+from core.system.nexus_zero_orchestrator import NexusZeroOrchestrator
+from core.v23_graph_engine.odyssey_knowledge_graph import OdysseyKnowledgeGraph
 
 # Ensure core is in path
 sys.path.append(os.getcwd())

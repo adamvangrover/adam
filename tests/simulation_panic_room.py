@@ -1,8 +1,9 @@
-import pytest
-import asyncio
 from unittest.mock import MagicMock, patch
+
+import pytest
+
 from core.agents.market_sentiment_agent import MarketSentimentAgent
-from core.schemas.agent_schema import AgentInput, AgentOutput
+from core.schemas.agent_schema import AgentInput
 
 # Simulation Parameters
 CRISIS_VIX_LEVEL = 80.0

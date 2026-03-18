@@ -1,8 +1,9 @@
-from core.agents.regulatory_compliance_agent import RegulatoryComplianceAgent
+import os
+import sys
 import unittest
 from unittest.mock import MagicMock, patch
-import sys
-import os
+
+from core.agents.regulatory_compliance_agent import RegulatoryComplianceAgent
 
 # Set python path
 sys.path.append(os.getcwd())

@@ -1,9 +1,12 @@
-import pytest
 import asyncio
-import pandas as pd
+from unittest.mock import AsyncMock, MagicMock, patch
+
 import numpy as np
-from unittest.mock import MagicMock, patch, AsyncMock
+import pandas as pd
+import pytest
+
 from core.v30_architecture.python_intelligence.agents.risk_guardian import RiskGuardian
+
 
 # Helper for async return
 def async_return(result):

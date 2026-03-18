@@ -1,8 +1,11 @@
-import unittest
-import pandas as pd
-import numpy as np
 import asyncio
+import unittest
+
+import numpy as np
+import pandas as pd
+
 from core.agents.portfolio_optimization_agent import PortfolioOptimizationAgent
+
 
 class TestPortfolioOptimizationAgent(unittest.TestCase):
     def setUp(self):

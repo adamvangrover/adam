@@ -1,8 +1,10 @@
 
+from unittest.mock import AsyncMock, patch
+
 import pytest
-import asyncio
-from unittest.mock import AsyncMock, patch, MagicMock
+
 from core.agents.specialized.crypto_arbitrage_agent import CryptoArbitrageAgent
+
 
 @pytest.mark.asyncio
 async def test_arbitrage_detection_success():

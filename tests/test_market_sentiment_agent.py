@@ -1,8 +1,9 @@
+from unittest.mock import AsyncMock, MagicMock, patch
+
 import pytest
-from unittest.mock import AsyncMock, patch, MagicMock
+
 from core.agents.market_sentiment_agent import MarketSentimentAgent
-from core.schemas.agent_schema import AgentInput
-from core.agents.specialized.crypto_arbitrage_agent import CryptoArbitrageAgent
+
 
 @pytest.fixture
 def agent_config():

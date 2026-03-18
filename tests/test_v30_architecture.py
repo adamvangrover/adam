@@ -1,10 +1,11 @@
+import os
+import sys
+import unittest
+
 from core.v30_architecture.python_intelligence.agents.code_weaver import CodeWeaverAgent
 from core.v30_architecture.python_intelligence.agents.news_bot import NewsBotAgent
-from core.v30_architecture.python_intelligence.orchestrator.v30_orchestrator import orchestrator
 from core.v30_architecture.python_intelligence.mcp.server import mcp_server
-import unittest
-import sys
-import os
+from core.v30_architecture.python_intelligence.orchestrator.v30_orchestrator import orchestrator
 
 # Add repo root to path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))

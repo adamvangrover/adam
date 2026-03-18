@@ -1,7 +1,9 @@
 
-import unittest
 import asyncio
+import unittest
+
 from core.agents.specialized.sovereign_ai_analyst_agent import SovereignAIAnalystAgent
+
 
 class TestSovereignAIAnalystAgent(unittest.TestCase):
     def setUp(self):

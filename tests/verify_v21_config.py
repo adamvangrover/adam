@@ -1,7 +1,8 @@
-from core.utils.config_utils import load_app_config
-import unittest
-import sys
 import os
+import sys
+import unittest
+
+from core.utils.config_utils import load_app_config
 
 # Add the project root to the Python path to allow for absolute imports
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))

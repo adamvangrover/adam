@@ -1,15 +1,19 @@
-import pytest
-import os
 import json
 import logging
-from pathlib import Path
-from datetime import datetime
-from unittest.mock import patch, mock_open, MagicMock
+from unittest.mock import mock_open, patch
+
+import pytest
 
 from core.utils.logging_utils import (
-    setup_logging, get_logger, get_milestone_logger,
-    TraceLogger, SwarmLogger, NarrativeLogger, current_trace_id, JSON_LOGGER_AVAILABLE
+    NarrativeLogger,
+    SwarmLogger,
+    TraceLogger,
+    current_trace_id,
+    get_logger,
+    get_milestone_logger,
+    setup_logging,
 )
+
 
 @pytest.fixture
 def temp_log_file(tmp_path):

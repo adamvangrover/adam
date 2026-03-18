@@ -4,12 +4,14 @@ tests/test_ingestion_scaling.py
 Verifies the scalable ingestion pipeline across different data sizes and strategies.
 """
 
-import os
-import pytest
-import shutil
 import json
-from core.data_processing.ingestion_engine import IngestionEngine
+import os
+import shutil
+
+import pytest
+
 from core.data_processing.chunking_engine import ChunkingEngine
+from core.data_processing.ingestion_engine import IngestionEngine
 
 TEST_DATA_DIR = "tests/data/ingestion_test"
 

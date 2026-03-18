@@ -1,7 +1,9 @@
-import pytest
-import asyncio
 from unittest.mock import MagicMock, patch
+
+import pytest
+
 from core.agents.risk_assessment_agent import RiskAssessmentAgent
+
 
 # Mock dependencies
 class MockKnowledgeBase:

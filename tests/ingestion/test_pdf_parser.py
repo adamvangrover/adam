@@ -1,7 +1,10 @@
-import pytest
 import io
+
 import fitz
+import pytest
+
 from src.ingestion.plugins.pdf_parser import PDFParser
+
 
 def test_pdf_parser_supported_extensions():
     parser = PDFParser()

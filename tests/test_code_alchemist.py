@@ -1,9 +1,9 @@
-from core.agents.code_alchemist import CodeAlchemist
-import sys
 import os
+import sys
 import unittest
-from unittest.mock import MagicMock, patch, AsyncMock
-import json
+from unittest.mock import AsyncMock, patch
+
+from core.agents.code_alchemist import CodeAlchemist
 
 # Add project root to sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))

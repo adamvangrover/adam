@@ -1,6 +1,8 @@
 # tests/test_spec_architect_agent.py
 import pytest
+
 from core.agents.developer_swarm.spec_architect_agent import SpecArchitectAgent
+
 
 @pytest.mark.asyncio
 async def test_spec_architect_initialization():

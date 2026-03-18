@@ -1,7 +1,8 @@
 import unittest
-import numpy as np
+
 from core.agents.financial_modeling_agent import FinancialModelingAgent
 from core.financial_data.modeling_schema import LBOAssumptions
+
 
 class TestLBOModeling(unittest.TestCase):
     def setUp(self):

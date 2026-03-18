@@ -1,12 +1,12 @@
+from unittest.mock import MagicMock, patch
+
 import pytest
-import asyncio
-from unittest.mock import AsyncMock, MagicMock, patch
-import pandas as pd
-from typing import Any, Dict
+
 # Import the class (it might fail if dependencies are missing, so we might need to patch imports if this was running in a strict env without deps)
 # Assuming deps are present or we mock them.
 from core.agents.technical_analyst_agent import TechnicalAnalystAgent
 from core.schemas.agent_schema import AgentInput, AgentOutput
+
 
 @pytest.fixture
 def technical_agent():

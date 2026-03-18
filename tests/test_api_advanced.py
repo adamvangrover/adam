@@ -1,6 +1,9 @@
 import unittest
-from services.webapp.api import create_app, db
+
 from flask_jwt_extended import create_access_token
+
+from services.webapp.api import create_app, db
+
 
 class TestAPIAdvancedEndpoints(unittest.TestCase):
     def setUp(self):

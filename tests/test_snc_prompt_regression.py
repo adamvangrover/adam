@@ -1,12 +1,13 @@
-import unittest
 import json
-import sys
 import os
+import sys
+import unittest
 
 # Ensure core is importable
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from core.agents.snc_analyst_agent import SNCAnalystAgent
+
 
 class TestSNCPromptRegression(unittest.TestCase):
     """

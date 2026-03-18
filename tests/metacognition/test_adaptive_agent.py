@@ -1,6 +1,7 @@
 import unittest
-import asyncio
+
 from core.agents.adaptive_agent import AdaptiveAgent
+
 
 class TestAdaptiveAgent(unittest.TestCase):
     def setUp(self):

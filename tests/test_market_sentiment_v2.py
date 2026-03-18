@@ -1,9 +1,10 @@
-import pytest
-import asyncio
 from unittest.mock import AsyncMock, MagicMock, patch
-from typing import Any, Dict
+
+import pytest
+
 from core.agents.market_sentiment_agent import MarketSentimentAgent
 from core.schemas.agent_schema import AgentInput, AgentOutput
+
 
 @pytest.fixture
 def sentiment_agent():

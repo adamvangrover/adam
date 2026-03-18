@@ -1,14 +1,14 @@
-import unittest
-import sys
 import os
-import json
+import sys
+import unittest
 
 # Add repo root to path
 sys.path.append(os.getcwd())
 
 from core.agents.specialized.blindspot_agent import BlindspotAgent
 from core.engine.consensus_engine import ConsensusEngine
-from core.system.agent_orchestrator import AgentOrchestrator, AGENT_CLASSES
+from core.system.agent_orchestrator import AGENT_CLASSES
+
 
 class TestVNext(unittest.TestCase):
     def test_blindspot_agent_registration(self):

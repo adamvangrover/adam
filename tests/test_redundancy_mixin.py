@@ -1,7 +1,9 @@
 import asyncio
-import unittest
 import time
+import unittest
+
 from core.agents.mixins.redundancy_optimization_mixin import RedundancyOptimizationMixin
+
 
 class TestRedundancyMixin(unittest.TestCase):
     def test_caching(self):

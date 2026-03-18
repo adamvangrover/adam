@@ -1,6 +1,7 @@
 import unittest
+
 from core.data_access.lakehouse_connector import LakehouseConnector
-from core.security.sql_validator import SQLValidator
+
 
 class TestLakehouseSecurity(unittest.TestCase):
     def setUp(self):

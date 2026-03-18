@@ -1,7 +1,7 @@
-import pytest
-import asyncio
 from unittest.mock import AsyncMock, MagicMock, patch
-from typing import Any
+
+import pytest
+
 from core.agents.fundamental_analyst_agent import FundamentalAnalystAgent
 from core.schemas.agent_schema import AgentInput, AgentOutput
 

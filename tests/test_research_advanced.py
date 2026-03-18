@@ -1,10 +1,10 @@
 import pytest
 import torch
-import torch.nn as nn
-from core.research.gnn.model import GAT, GraphSAGE
+
 from core.research.federated_learning.fl_client import FinGraphFLClient
 from core.research.federated_learning.privacy import MSGuard
-from core.research.oswm.priors import NeuralNetworkPrior, MomentumPrior
+from core.research.gnn.model import GAT, GraphSAGE
+from core.research.oswm.priors import MomentumPrior, NeuralNetworkPrior
 
 pytestmark = pytest.mark.integration
 

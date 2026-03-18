@@ -1,7 +1,8 @@
 # tests/test_data_retrieval_agent.py
 
 import unittest
-from unittest.mock import patch, mock_open
+from unittest.mock import patch
+
 from core.agents.data_retrieval_agent import DataRetrievalAgent
 from core.system.error_handler import DataNotFoundError, FileReadError, InvalidInputError
 from core.system.knowledge_base import KnowledgeBase

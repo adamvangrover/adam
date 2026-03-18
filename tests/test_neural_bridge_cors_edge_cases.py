@@ -1,16 +1,18 @@
 
-import pytest
-import sys
 import os
+import sys
 from unittest.mock import patch
+
+import pytest
 from fastapi.testclient import TestClient
 
 # Ensure core is in path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../')))
 
 # Import apps
-from core.v30_architecture.python_intelligence.bridge.neural_mesh import app as mesh_app
 from core.v30_architecture.python_intelligence.bridge.neural_link import app as link_app
+from core.v30_architecture.python_intelligence.bridge.neural_mesh import app as mesh_app
+
 
 @pytest.fixture
 def mesh_client():

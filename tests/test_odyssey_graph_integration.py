@@ -1,6 +1,7 @@
-from core.v23_graph_engine.unified_knowledge_graph import UnifiedKnowledgeGraph
-import sys
 import os
+import sys
+
+from core.v23_graph_engine.unified_knowledge_graph import UnifiedKnowledgeGraph
 
 # Add root to path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))

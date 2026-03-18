@@ -1,7 +1,9 @@
-import unittest
 import asyncio
-from unittest.mock import MagicMock, patch
+import unittest
+from unittest.mock import patch
+
 from core.agents.specialized.macro_liquidity_agent import MacroLiquidityAgent
+
 
 class TestMacroLiquidityAgent(unittest.TestCase):
     def setUp(self):

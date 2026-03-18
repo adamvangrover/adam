@@ -1,7 +1,9 @@
-import pytest
-import pandas as pd
 import numpy as np
+import pandas as pd
+import pytest
+
 from core.agents.strategy_backtest_agent import StrategyBacktestAgent
+
 
 @pytest.mark.asyncio
 async def test_input_validation():

@@ -1,14 +1,15 @@
 import pytest
-import numpy as np
-from core.agents.market_risk_agent import MarketRiskAgent
+
 from core.agents.credit_risk_agent import CreditRiskAgent
-from core.agents.liquidity_risk_agent import LiquidityRiskAgent
-from core.agents.operational_risk_agent import OperationalRiskAgent
+from core.agents.currency_risk_agent import CurrencyRiskAgent
+from core.agents.economic_risk_agent import EconomicRiskAgent
 from core.agents.geopolitical_risk_agent import GeopoliticalRiskAgent
 from core.agents.industry_risk_agent import IndustryRiskAgent
-from core.agents.economic_risk_agent import EconomicRiskAgent
+from core.agents.liquidity_risk_agent import LiquidityRiskAgent
+from core.agents.market_risk_agent import MarketRiskAgent
+from core.agents.operational_risk_agent import OperationalRiskAgent
 from core.agents.volatility_risk_agent import VolatilityRiskAgent
-from core.agents.currency_risk_agent import CurrencyRiskAgent
+
 
 @pytest.mark.asyncio
 async def test_market_risk_agent():

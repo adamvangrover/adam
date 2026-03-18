@@ -1,7 +1,10 @@
 
 import asyncio
+
 import pytest
-from core.trading.crypto.deployer import CryptoDeployer, DeploymentRequest, Network, DeploymentType
+
+from core.trading.crypto.deployer import CryptoDeployer, DeploymentRequest, DeploymentType, Network
+
 
 @pytest.mark.asyncio
 async def test_crypto_deployer():

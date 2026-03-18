@@ -1,8 +1,8 @@
-import pytest
-from unittest.mock import patch, MagicMock
 import subprocess
+from unittest.mock import MagicMock, patch
 
 from scripts.benchmark_adam import BenchmarkRunner, get_git_revision_hash
+
 
 @patch("subprocess.check_output")
 def test_get_git_revision_hash_success(mock_check_output):

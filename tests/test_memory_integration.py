@@ -1,10 +1,9 @@
 import asyncio
 import logging
 import os
-import json
-from unittest.mock import MagicMock
-from core.agents.fundamental_analyst_agent import FundamentalAnalystAgent
+
 from core.agents.data_retrieval_agent import DataRetrievalAgent
+from core.agents.fundamental_analyst_agent import FundamentalAnalystAgent
 from core.system.memory_manager import VectorMemoryManager
 
 # Configure logging

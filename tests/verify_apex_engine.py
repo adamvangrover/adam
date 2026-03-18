@@ -1,9 +1,9 @@
+import os
+import sys
+import unittest
+
 from core.engine.cyclical_reasoning_graph import cyclical_reasoning_app
 from core.engine.states import init_risk_state
-import sys
-import os
-import unittest
-from unittest.mock import MagicMock
 
 # Add root to path
 sys.path.append(os.getcwd())

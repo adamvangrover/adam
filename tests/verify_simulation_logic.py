@@ -2,16 +2,17 @@
 Verification Script for Simulation Logic and Provenance Logging.
 """
 
-import sys
 import os
+import sys
+
 import networkx as nx
-import json
 
 # Add root to path
 sys.path.append(os.getcwd())
 
-from core.v23_graph_engine.simulation_engine import CrisisSimulationEngine
 from core.system.provenance_logger import ProvenanceLogger
+from core.v23_graph_engine.simulation_engine import CrisisSimulationEngine
+
 
 def test_simulation_workflow():
     print(">>> 1. Setting up Environment")

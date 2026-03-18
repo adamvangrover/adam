@@ -1,7 +1,8 @@
 import os
-import pytest
 from unittest.mock import patch
-from core.symphony.config import SymphonyConfig, load_workflow, validate_config, ConfigError
+
+from core.symphony.config import SymphonyConfig, load_workflow, validate_config
+
 
 def test_config_defaults():
     config = SymphonyConfig({})

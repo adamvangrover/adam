@@ -1,8 +1,10 @@
-import pytest
-import asyncio
 from unittest.mock import MagicMock, patch
+
+import pytest
+
 from core.agents.credit.quant import QuantAgent
 from core.agents.credit.writer import WriterAgent
+
 
 @pytest.mark.asyncio
 async def test_quant_agent_lbo_extraction():

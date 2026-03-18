@@ -1,6 +1,7 @@
+from unittest.mock import patch
+
 import pytest
-import asyncio
-from unittest.mock import MagicMock, patch
+
 from core.engine.meta_orchestrator import MetaOrchestrator
 
 

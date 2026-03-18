@@ -1,9 +1,10 @@
 # tests/verify_v23_remediation.py
 
-import unittest
 import logging
+import unittest
+
+from core.engine.agent_adapters import YFINANCE_AVAILABLE, V23DataRetrieverAdapter
 from core.engine.neuro_symbolic_planner import NeuroSymbolicPlanner, PlannerIntent
-from core.engine.agent_adapters import V23DataRetrieverAdapter, YFINANCE_AVAILABLE
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)

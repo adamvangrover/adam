@@ -1,6 +1,9 @@
 import unittest
+
 import numpy as np
+
 from core.risk_engine.quantum_monte_carlo import QuantumMonteCarloEngine, SimulatorBackend
+
 
 class TestRiskEngineQMC(unittest.TestCase):
     def test_simulation_runs(self):

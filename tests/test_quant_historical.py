@@ -1,7 +1,10 @@
 import unittest
-import pandas as pd
+
 import numpy as np
+import pandas as pd
+
 from core.v30_architecture.python_intelligence.agents.quantitative_analyst import QuantitativeAnalyst
+
 
 class TestQuantHistorical(unittest.TestCase):
     def setUp(self):

@@ -1,6 +1,9 @@
 import unittest
+
 import numpy as np
-from core.simulations.avg_search import AVGSearch, AdamOptimizer
+
+from core.simulations.avg_search import AdamOptimizer, AVGSearch
+
 
 class TestAVGSearch(unittest.TestCase):
     def setUp(self):

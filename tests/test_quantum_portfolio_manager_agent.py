@@ -1,10 +1,12 @@
-import unittest
-from unittest.mock import MagicMock, patch, AsyncMock
 import asyncio
-import pandas as pd
+import unittest
+from unittest.mock import patch
+
 import numpy as np
+
 from core.agents.quantum_portfolio_manager_agent import QuantumPortfolioManagerAgent
 from core.schemas.agent_schema import AgentInput, AgentOutput
+
 
 class TestQuantumPortfolioManagerAgent(unittest.TestCase):
 

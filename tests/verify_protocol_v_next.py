@@ -1,18 +1,17 @@
-import sys
-import os
-import unittest
-import json
-from unittest.mock import MagicMock, patch
 import asyncio
+import os
+import sys
+import unittest
+from unittest.mock import MagicMock, patch
 
 # Ensure core is in path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 try:
-    from core.engine.consensus_engine import ConsensusEngine
     from core.agents.specialized.blindspot_agent import BlindspotAgent
-    from services.webapp.governance import GovernanceMiddleware
+    from core.engine.consensus_engine import ConsensusEngine
     from core.utils.logging_utils import NarrativeLogger
+    from services.webapp.governance import GovernanceMiddleware
 except ImportError as e:
     print(f"Import failed: {e}")
     sys.exit(1)

@@ -1,5 +1,7 @@
 import os
+
 from playwright.sync_api import sync_playwright
+
 
 def verify_new_content():
     with sync_playwright() as p:

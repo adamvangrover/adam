@@ -1,5 +1,7 @@
 import pytest
+
 from src.early_stage_valuation import EarlyStageModel
+
 
 def test_early_stage_model_initialization():
     model = EarlyStageModel(

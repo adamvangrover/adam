@@ -1,7 +1,6 @@
-import unittest
-import sys
 import os
-import shutil
+import sys
+import unittest
 
 # Add root to sys.path
 sys.path.append(os.getcwd())

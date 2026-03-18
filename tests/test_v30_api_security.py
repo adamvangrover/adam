@@ -1,7 +1,7 @@
-import pytest
 import sys
-import os
-from unittest.mock import MagicMock, AsyncMock
+from unittest.mock import MagicMock
+
+import pytest
 from fastapi.testclient import TestClient
 
 # Mock dependencies before importing core.api.main
@@ -16,6 +16,7 @@ sys.modules['core.engine.meta_orchestrator'].MetaOrchestrator = MagicMock
 # Import app after mocks
 from core.api.main import app
 from core.settings import settings
+
 
 @pytest.fixture
 def client():

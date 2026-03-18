@@ -1,7 +1,10 @@
-import pytest
 from unittest.mock import MagicMock, patch
+
 import networkx as nx
+import pytest
+
 from core.engine.neuro_symbolic_planner import NeuroSymbolicPlanner, PlannerIntent
+
 
 @pytest.fixture
 def planner():

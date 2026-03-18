@@ -1,6 +1,8 @@
+
 import pytest
-import asyncio
+
 from core.agents.specialized.defi_liquidity_agent import DeFiLiquidityAgent
+
 
 @pytest.mark.asyncio
 async def test_impermanent_loss_calculation():

@@ -17,10 +17,11 @@ mock_ratelimiter.create_rate_limiter.return_value = MockLimiter()
 sys.modules['httpxthrottlecache.ratelimiter'] = mock_ratelimiter
 sys.modules['pyrate_limiter'] = MagicMock()
 
-import pytest
-import pandas as pd
 import sys
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
+
+import pandas as pd
+import pytest
 
 # Patch httpxthrottlecache.ratelimiter before edgartools is loaded
 mock_limiter_module = MagicMock()
@@ -28,7 +29,7 @@ sys.modules['httpxthrottlecache.ratelimiter'] = mock_limiter_module
 sys.modules['httpxthrottlecache'] = mock_limiter_module
 sys.modules['pyrate_limiter'] = mock_limiter_module
 
-from src.market_mayhem.scanners import WhaleScanner, WhaleSignal
+from src.market_mayhem.scanners import WhaleScanner
 
 # Mock Data for 13F Information Table
 # Represents Quarter 0 (Current)

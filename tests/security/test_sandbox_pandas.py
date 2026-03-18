@@ -1,12 +1,13 @@
 
-import unittest
 import os
 import sys
+import unittest
 
 # Ensure core is importable
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 
 from core.security.sandbox import SecureSandbox
+
 
 class TestSandboxPandas(unittest.TestCase):
     def setUp(self):

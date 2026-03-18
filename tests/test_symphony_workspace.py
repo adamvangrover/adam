@@ -1,8 +1,10 @@
 import os
-import shutil
+
 import pytest
+
 from core.symphony.config import SymphonyConfig
-from core.symphony.workspace import WorkspaceManager, WorkspaceError
+from core.symphony.workspace import WorkspaceError, WorkspaceManager
+
 
 @pytest.fixture
 def config(tmp_path):

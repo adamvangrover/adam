@@ -1,11 +1,11 @@
 # tests/test_system.py
 
-from core.system.agent_orchestrator import AgentOrchestrator
-import unittest
-import yaml
-import sys
 import asyncio
-from unittest.mock import patch, Mock, AsyncMock, MagicMock
+import sys
+import unittest
+from unittest.mock import AsyncMock, MagicMock, patch
+
+from core.system.agent_orchestrator import AgentOrchestrator
 
 # Patch heavy dependencies globally to avoid import-time costs/errors
 sys.modules['spacy'] = MagicMock()

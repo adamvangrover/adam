@@ -1,11 +1,12 @@
-import unittest
-import sys
 import os
+import sys
+import unittest
 
 # Add root to path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../')))
 
 from core.prompting.scanner import PromptScanner
+
 
 class TestPromptScanner(unittest.TestCase):
     def test_scan_returns_list(self):

@@ -1,5 +1,5 @@
-import unittest
 import sys
+import unittest
 
 # Mock numpy if missing
 try:
@@ -10,6 +10,7 @@ except ImportError:
     sys.modules['numpy'] = np
 
 from core.credit_sentinel.models.distress_classifier import DistressClassifier
+
 
 class TestDistressClassifier(unittest.TestCase):
     def test_predict_healthy(self):

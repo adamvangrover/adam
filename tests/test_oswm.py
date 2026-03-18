@@ -1,5 +1,7 @@
 import unittest
+
 from core.oswm.model import OSWMTransformer
+
 
 class TestOSWM(unittest.TestCase):
     def test_forward_shape(self):

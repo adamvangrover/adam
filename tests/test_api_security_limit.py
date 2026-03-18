@@ -1,12 +1,12 @@
-import unittest
 import os
 import sys
-import json
+import unittest
 
 # Add root to sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from services.webapp.api import create_app, db, User
+from services.webapp.api import User, create_app, db
+
 
 class TestAPISecurityLimit(unittest.TestCase):
     """

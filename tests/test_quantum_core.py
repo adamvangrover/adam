@@ -1,7 +1,10 @@
 import unittest
+
 import numpy as np
+
 from core.quantum.adam_optimizer import AdamOptimizer
 from core.quantum.schrodinger_solver import SchrodingerSolver
+
 
 class TestQuantumCore(unittest.TestCase):
 

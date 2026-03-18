@@ -1,9 +1,9 @@
-import pytest
-import pandas as pd
-import asyncio
-from unittest.mock import MagicMock, patch, AsyncMock
-import sys
 import os
+import sys
+from unittest.mock import AsyncMock, MagicMock, patch
+
+import pandas as pd
+import pytest
 
 # Add repo root to path so we can import the module
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../')))
@@ -22,6 +22,7 @@ sys.modules["core.v30_architecture.python_intelligence.bridge.neural_mesh"] = mo
 # Now import the module under test
 import core.v30_architecture.python_intelligence.agents.quantitative_analyst as quant_module
 from core.v30_architecture.python_intelligence.agents.quantitative_analyst import QuantitativeAnalyst
+
 
 @pytest.mark.asyncio
 async def test_quantitative_analyst_analysis():

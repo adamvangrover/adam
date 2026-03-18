@@ -1,7 +1,8 @@
 # tests/test_data_sources.py
 
 import unittest
-from unittest.mock import patch, Mock
+from unittest.mock import Mock, patch
+
 from core.data_sources.data_sources import DataSources
 
 

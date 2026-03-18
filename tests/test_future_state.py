@@ -1,14 +1,13 @@
 import unittest
-from core.future_state.ubc import ComputeWallet, ComputeCredit
-from core.future_state.ssi import DigitalIdentity, VerifiableCredential
-from core.future_state.entropy import ThermodynamicSystem, MaxwellDemon
-from core.future_state.governance import QuadraticVoting, Proposal, PoliticalCompass
+
+from core.future_state.drivers import DecayDriver, ExponentialDriver
+from core.future_state.engine import AlgocraticCouncil, EnergyMarket, SingularityEngine, WorldState
+from core.future_state.entropy import MaxwellDemon, ThermodynamicSystem
+from core.future_state.governance import Proposal, QuadraticVoting
 from core.future_state.monitor import SignalMonitor, SignPost
-from core.future_state.philosophy import AlignmentScore, EthicalFramework, ConsciousnessMetric
-from core.future_state.ops import ComputeSubstrate, AutonomousPipeline
-from core.future_state.drivers import ExponentialDriver, DecayDriver
-from core.future_state.assumptions import SimulationAssumptions
-from core.future_state.engine import SingularityEngine, WorldState, EnergyMarket, AlgocraticCouncil
+from core.future_state.ssi import DigitalIdentity, VerifiableCredential
+from core.future_state.ubc import ComputeWallet
+
 
 class TestFutureState(unittest.TestCase):
 

@@ -1,10 +1,8 @@
 
-import unittest
-import sys
-import os
 import logging
-import json
-from datetime import datetime
+import os
+import sys
+import unittest
 
 # Add root to sys.path
 sys.path.append(os.getcwd())
@@ -54,8 +52,9 @@ class TestAdamVNext(unittest.TestCase):
     def test_governance_middleware(self):
         """Test the GovernanceMiddleware initialization."""
         try:
-            from services.webapp.governance import GovernanceMiddleware
             from flask import Flask
+
+            from services.webapp.governance import GovernanceMiddleware
         except ImportError:
             self.fail("Could not import GovernanceMiddleware or Flask")
 

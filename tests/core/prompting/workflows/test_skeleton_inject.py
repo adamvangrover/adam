@@ -1,13 +1,13 @@
-import sys
-import os
-import unittest
 import json
-from unittest.mock import MagicMock
+import os
+import sys
+import unittest
 
 # Ensure repo root is in python path
 sys.path.append(os.getcwd())
 
-from core.prompting.workflows.skeleton_inject import SkeletonInjectWorkflow, JSONFileFetcher
+from core.prompting.workflows.skeleton_inject import JSONFileFetcher, SkeletonInjectWorkflow
+
 
 class MockLLMClient:
     def generate(self, messages):

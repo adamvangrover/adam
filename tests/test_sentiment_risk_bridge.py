@@ -1,5 +1,7 @@
 import pytest
+
 from core.agents.sentiment_risk_bridge import SentimentRiskBridge, SentimentRiskInput
+
 
 @pytest.mark.asyncio
 async def test_sentiment_risk_bridge():

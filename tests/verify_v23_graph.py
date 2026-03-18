@@ -1,8 +1,9 @@
-from core.engine.states import init_risk_state
-from core.engine.cyclical_reasoning_graph import cyclical_reasoning_app
-import sys
-import os
 import json
+import os
+import sys
+
+from core.engine.cyclical_reasoning_graph import cyclical_reasoning_app
+from core.engine.states import init_risk_state
 
 # Add project root to path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))

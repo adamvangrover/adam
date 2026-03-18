@@ -1,5 +1,7 @@
 import unittest
-from core.financial_data.modeling_schema import FinancialAssumptions, DiscountedCashFlowModel, ValuationResult, ValuationMethod
+
+from core.financial_data.modeling_schema import DiscountedCashFlowModel, FinancialAssumptions, ValuationMethod, ValuationResult
+
 
 class TestFinancialModelingSchema(unittest.TestCase):
     def test_financial_assumptions_validation(self):

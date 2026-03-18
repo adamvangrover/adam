@@ -1,7 +1,10 @@
-import pytest
 from unittest.mock import patch
+
+import pytest
+
 from core.symphony.config import SymphonyConfig
 from core.symphony.tracker import LinearTrackerClient, TrackerError
+
 
 @pytest.fixture
 def config():

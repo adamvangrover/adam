@@ -1,5 +1,7 @@
 import unittest
+
 from core.v30_architecture.python_intelligence.agents.reviewer_agent import ReviewerAgent
+
 
 class TestReviewerAgent(unittest.TestCase):
     def setUp(self):

@@ -1,8 +1,10 @@
-import pytest
-import os
-from unittest.mock import MagicMock, patch, ANY
 from datetime import datetime, timedelta
-from core.agents.specialized.github_alpha_agent import GitHubAlphaAgent, AgentOutput
+from unittest.mock import patch
+
+import pytest
+
+from core.agents.specialized.github_alpha_agent import GitHubAlphaAgent
+
 
 # Mock subprocess result
 class MockSubprocessResult:

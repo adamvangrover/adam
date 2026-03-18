@@ -1,5 +1,7 @@
 import unittest
+
 from scripts.market_mayhem_crisis_sim import CrisisSimulator
+
 
 class TestCrisisSimulator(unittest.TestCase):
     def test_scenarios_exist(self):
