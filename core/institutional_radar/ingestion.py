@@ -211,7 +211,8 @@ class SECEdgarScraper:
 
             logger.info(f"Found {len(target_filings)} filings to process.")
 
-            for _, row in target_filings.iterrows():
+            # ⚡ Bolt: Replace slow .iterrows() with vectorized to_dict("records")
+            for row in target_filings.to_dict(orient="records"):
                 cik = row['CIK']
                 filename = row['Filename']
                 date_filed = row['Date Filed']
