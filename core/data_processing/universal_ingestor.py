@@ -2,6 +2,8 @@ import ast
 import json
 import re
 import uuid
+import asyncio
+import aiofiles
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
@@ -291,6 +293,72 @@ class UniversalIngestor:
             except Exception:
                 pass
 
+    async def scan_directory_async(self, root_path: str, recursive: bool = True, max_concurrent: int = 50):
+        """
+        Asynchronously walks a directory and routes all permitted files to the processing pipeline.
+        Uses a semaphore to limit concurrent file descriptors.
+        """
+        root = Path(root_path)
+        if not root.exists():
+            print(f"Warning: Path {root_path} does not exist.")
+            return
+
+        print(f"Async Scanning {root_path}...")
+
+        semaphore = asyncio.Semaphore(max_concurrent)
+
+        pattern = "**/*" if recursive else "*"
+        tasks = []
+        for filepath in root.glob(pattern):
+            if filepath.is_file():
+                if any(part.startswith('.') for part in filepath.parts):
+                    continue
+                tasks.append(self._process_with_semaphore(semaphore, str(filepath)))
+
+        if tasks:
+            await asyncio.gather(*tasks)
+
+    async def _process_with_semaphore(self, semaphore: asyncio.Semaphore, filepath: str):
+        async with semaphore:
+            await self.process_file_async(filepath)
+
+    async def process_file_async(self, filepath: str):
+        """
+        Asynchronously routes the path to the correct internal processor.
+        """
+        path = Path(filepath)
+        filename = path.name
+
+        if filename.startswith('.') or filename == "__init__.py":
+            return
+
+        if "gold_standard" in filepath or "ui_data.json" in filepath:
+            return
+
+        try:
+            if path.stat().st_size > 10 * 1024 * 1024:
+                print(f"Skipping large file: {filepath} (>10MB)")
+                return
+        except OSError:
+            return
+
+        ext = path.suffix.lower()
+        processor_map = {
+            '.json': self._process_json_async,
+            '.jsonl': self._process_jsonl_async,
+            '.md': self._process_markdown_async,
+            '.txt': self._process_text_async,
+            '.log': self._process_text_async,
+            '.py': self._process_python_async,
+        }
+
+        processor = processor_map.get(ext)
+        if processor:
+            try:
+                await processor(path)
+            except Exception:
+                pass
+
     def _process_json(self, filepath: Path):
         with filepath.open('r', encoding='utf-8', errors='ignore') as f:
             try:
@@ -406,6 +474,156 @@ class UniversalIngestor:
         try:
             with filepath.open('r', encoding='utf-8', errors='ignore') as f:
                 source = f.read()
+
+            tree = ast.parse(source)
+            docstring = ast.get_docstring(tree)
+
+            classes = [node.name for node in ast.walk(tree) if isinstance(node, ast.ClassDef)]
+            functions = [node.name for node in ast.walk(tree) if isinstance(node, ast.FunctionDef)]
+
+            content = f"Module: {filepath.name}\n"
+            if docstring:
+                content += f"Docstring: {docstring}\n"
+            if classes:
+                content += f"Classes: {', '.join(classes)}\n"
+            if functions:
+                content += f"Functions: {', '.join(functions)}\n"
+
+            metadata = {
+                "classes": classes,
+                "functions": functions,
+                "has_docstring": bool(docstring)
+            }
+
+            artifact = GoldStandardArtifact(
+                source_path=str(filepath),
+                content=content,
+                artifact_type=ArtifactType.CODE_DOC,
+                title=f"Doc: {filepath.name}",
+                metadata=metadata
+            )
+            self.artifacts.append(artifact)
+
+        except Exception:
+            pass
+
+    async def _process_json_async(self, filepath: Path):
+        async with aiofiles.open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
+            try:
+                content = await f.read()
+                clean_content = GoldStandardScrubber.clean_text(content)
+                data = json.loads(clean_content)
+            except json.JSONDecodeError:
+                return  # Skip invalid JSON
+
+        artifact_type = ArtifactType.DATA
+        title = filepath.name
+
+        if "reports" in str(filepath):
+            artifact_type = ArtifactType.REPORT
+            title = data.get("title", data.get("company_name", title))
+        elif "prompt" in str(filepath):
+            artifact_type = ArtifactType.PROMPT
+
+        metadata = GoldStandardScrubber.extract_metadata(data, artifact_type.value)
+        if "original_keys" not in metadata:
+            metadata["original_keys"] = list(data.keys()) if isinstance(data, dict) else []
+
+        artifact = GoldStandardArtifact(
+            source_path=str(filepath),
+            content=data,
+            artifact_type=artifact_type,
+            title=title,
+            metadata=metadata
+        )
+        self.artifacts.append(artifact)
+
+    async def _process_jsonl_async(self, filepath: Path):
+        content = []
+        async with aiofiles.open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
+            async for line in f:
+                try:
+                    content.append(json.loads(line))
+                except Exception:
+                    continue
+
+        title = filepath.name
+        artifact = GoldStandardArtifact(
+            source_path=str(filepath),
+            content=content,
+            artifact_type=ArtifactType.DATA,
+            title=title,
+            metadata={"record_count": len(content)}
+        )
+        self.artifacts.append(artifact)
+
+    async def _process_markdown_async(self, filepath: Path):
+        async with aiofiles.open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
+            raw_text = await f.read()
+            text = GoldStandardScrubber.clean_text(raw_text)
+
+        lines = text.split('\n')
+        title = filepath.name
+        chunks = []
+        current_chunk = []
+
+        # Innovative Markdown Chunking (Semantic Simulation)
+        for line in lines:
+            if line.strip().startswith('# '):
+                title = line.strip().replace('# ', '')
+
+            # Start a new chunk at any header level
+            if line.strip().startswith('#'):
+                if current_chunk:
+                    chunks.append("\n".join(current_chunk))
+                current_chunk = [line]
+            else:
+                current_chunk.append(line)
+
+        if current_chunk:
+            chunks.append("\n".join(current_chunk))
+
+        artifact_type = ArtifactType.CODE_DOC
+        if "prompt" in str(filepath):
+            artifact_type = ArtifactType.PROMPT
+        elif "newsletter" in str(filepath) or "Fortress" in str(filepath):
+            artifact_type = ArtifactType.NEWSLETTER
+
+        metadata = GoldStandardScrubber.extract_metadata(text, artifact_type.value)
+
+        # Innovator Payload: Simulated Vector Database / RAG embedding prep
+        metadata["semantic_chunks"] = len(chunks)
+        metadata["chunk_preview"] = chunks[0][:100] + "..." if chunks else ""
+
+        artifact = GoldStandardArtifact(
+            source_path=str(filepath),
+            content={"full_text": text, "chunks": chunks},
+            artifact_type=artifact_type,
+            title=title,
+            metadata=metadata
+        )
+        self.artifacts.append(artifact)
+
+    async def _process_text_async(self, filepath: Path):
+        async with aiofiles.open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
+            raw_text = await f.read()
+            text = GoldStandardScrubber.clean_text(raw_text)
+
+        metadata = GoldStandardScrubber.extract_metadata(text, ArtifactType.UNKNOWN.value)
+
+        artifact = GoldStandardArtifact(
+            source_path=str(filepath),
+            content=text,
+            artifact_type=ArtifactType.UNKNOWN,
+            title=filepath.name,
+            metadata=metadata
+        )
+        self.artifacts.append(artifact)
+
+    async def _process_python_async(self, filepath: Path):
+        try:
+            async with aiofiles.open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
+                source = await f.read()
 
             tree = ast.parse(source)
             docstring = ast.get_docstring(tree)

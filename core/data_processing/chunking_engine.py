@@ -14,6 +14,14 @@ import logging
 import re
 from typing import List, Dict, Any, Optional
 
+try:
+    import sentence_transformers
+    import numpy as np
+    from sklearn.metrics.pairwise import cosine_similarity
+    SENTENCE_TRANSFORMERS_AVAILABLE = True
+except ImportError:
+    SENTENCE_TRANSFORMERS_AVAILABLE = False
+
 logger = logging.getLogger(__name__)
 
 class ChunkingEngine:
@@ -38,6 +46,17 @@ class ChunkingEngine:
         if strategy not in ["recursive", "token", "semantic"]:
             raise ValueError(f"Unknown strategy: {strategy}")
 
+        self.model = None
+        if self.strategy == "semantic":
+            if SENTENCE_TRANSFORMERS_AVAILABLE:
+                try:
+                    self.model = sentence_transformers.SentenceTransformer('all-MiniLM-L6-v2')
+                    logger.info("Initialized semantic chunking model: all-MiniLM-L6-v2")
+                except Exception as e:
+                    logger.error(f"Failed to load sentence_transformers model: {e}")
+            else:
+                logger.warning("sentence_transformers not available. Semantic chunking will fallback to recursive.")
+
     def chunk(self, text: str, metadata: Optional[Dict[str, Any]] = None) -> List[Dict[str, Any]]:
         """
         Splits text into chunks based on the configured strategy.
@@ -60,9 +79,7 @@ class ChunkingEngine:
         elif self.strategy == "token":
             raw_chunks = self._token_split(text)
         elif self.strategy == "semantic":
-            # Fallback to recursive for now until embeddings are integrated
-            logger.warning("Semantic chunking not fully implemented. Falling back to recursive.")
-            raw_chunks = self._recursive_character_split(text)
+            raw_chunks = self._semantic_split(text)
         else:
             raw_chunks = [text]
 
@@ -93,6 +110,76 @@ class ChunkingEngine:
         self._split_text(text, separators, final_chunks)
 
         return final_chunks
+
+    def _semantic_split(self, text: str) -> List[str]:
+        """
+        Splits text into chunks using sentence embeddings to detect topic boundaries.
+        """
+        if not self.model:
+            return self._recursive_character_split(text)
+
+        # Basic sentence splitting (naive regex for speed and simplicity)
+        sentences = re.split(r'(?<=[.!?])\s+', text)
+        sentences = [s.strip() for s in sentences if s.strip()]
+
+        if not sentences:
+            return []
+
+        if len(sentences) == 1:
+            return self._recursive_character_split(text)
+
+        try:
+            # Embed all sentences
+            embeddings = self.model.encode(sentences)
+
+            # Calculate cosine similarities between adjacent sentences
+            similarities = []
+            for i in range(len(embeddings) - 1):
+                sim = cosine_similarity([embeddings[i]], [embeddings[i+1]])[0][0]
+                similarities.append(sim)
+
+            chunks = []
+            current_chunk = []
+            current_length = 0
+
+            # Threshold for splitting (can be dynamic, but static is fine for now)
+            threshold = 0.4
+
+            for i, sentence in enumerate(sentences):
+                sentence_len = len(sentence) + 1 # +1 for space
+
+                # Check length limit first
+                if current_length + sentence_len > self.chunk_size and current_chunk:
+                    chunks.append(" ".join(current_chunk))
+                    current_chunk = [sentence]
+                    current_length = sentence_len
+                else:
+                    current_chunk.append(sentence)
+                    current_length += sentence_len
+
+                # If similarity drops, it's a boundary
+                if i < len(similarities) and similarities[i] < threshold and current_chunk:
+                    # Flush chunk
+                    chunks.append(" ".join(current_chunk))
+                    current_chunk = []
+                    current_length = 0
+
+            if current_chunk:
+                chunks.append(" ".join(current_chunk))
+
+            # If any chunk is still over the limit, recursively split it
+            final_chunks = []
+            for chunk in chunks:
+                if len(chunk) > self.chunk_size:
+                    final_chunks.extend(self._recursive_character_split(chunk))
+                else:
+                    final_chunks.append(chunk)
+
+            return final_chunks
+
+        except Exception as e:
+            logger.error(f"Semantic split failed: {e}. Falling back to recursive.")
+            return self._recursive_character_split(text)
 
     def _split_text(self, text: str, separators: List[str], final_chunks: List[str]):
         """
