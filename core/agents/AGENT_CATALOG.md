@@ -1011,3 +1011,17 @@ This document provides a comprehensive catalog of all the agents in the ADAM sys
 *   **Compute and Resource Requirements:** Medium (Database I/O, LLM context).
 *   **Dependencies:** None.
 *   **Developer Notes:** Critical for maintaining persona and context over long time horizons.
+
+---
+
+## `omega_meta_orchestrator`
+
+*   **File:** `core/agents/meta_agents/omega_meta_orchestrator.py`
+*   **Description:** The Omega Meta-Orchestrator serves as the root system orchestrator for ADAM v26.1, enforcing a strict directed acyclic graph (DAG) routing JSON output via Pydantic.
+*   **Configuration:** `config/agents.yaml`
+*   **Architecture and Base Agent:** Inherits from `core.agents.pydantic_agent_base.PydanticAgentBase`.
+*   **Agent Forge and Lifecycle:** Runs continuously to orchestrate System 2 logic.
+*   **Model Context Protocol (MCP):** Exposes core routing to systemic components.
+*   **Tools and Hooks:** None currently.
+*   **Compute and Resource Requirements:** Medium.
+*   **Dependencies:** `pydantic`.
