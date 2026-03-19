@@ -16,11 +16,13 @@ Dependencies:
     - Built-ins: csv, json, pathlib, typing
     - External: yaml
 """
+
+
 import csv
 import json
 import logging
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any
 
 import yaml
 
@@ -48,7 +50,7 @@ class DataLoader:
         self.use_cache = use_cache
         self._data_cache = {}
 
-    def load(self, source_config: Dict[str, Any]) -> Optional[Union[Dict[str, Any], List[Any]]]:
+    def load(self, source_config: dict[str, Any]) -> dict[str, Any] | list[Any] | None:
         """
         Loads data based on the provided source configuration.
 
@@ -56,11 +58,11 @@ class DataLoader:
         utilizes the cache if requested, and falls back to actual file reading/API querying.
 
         Args:
-            source_config (Dict[str, Any]): A dictionary containing 'type' and 'path' keys.
+            source_config (dict[str, Any]): A dictionary containing 'type' and 'path' keys.
                                             Example: {"type": "json", "path": "/path/to/file.json"}
 
         Returns:
-            Optional[Union[Dict[str, Any], List[Any]]]: The loaded data structure, or None if load fails.
+            dict[str, Any] | list[Any] | None: The loaded data structure, or None if load fails.
 
         Raises:
             InvalidInputError: If 'type' or 'path' are missing or invalid.
@@ -100,7 +102,8 @@ class DataLoader:
             self._data_cache[cache_key] = data
         return data
 
-    def _read_file(self, file_path: Path, data_type: str) -> Optional[Union[Dict[str, Any], List[Any]]]:
+    @staticmethod
+    def _read_file(file_path: Path, data_type: str) -> dict[str, Any] | list[Any] | None:
         """
         Internal method to handle the routing and parsing of specific file types.
 
@@ -111,18 +114,18 @@ class DataLoader:
         Returns:
             The parsed data structure depending on the file type.
         """
+        parsers = {
+            "json": DataLoader._load_json,
+            "csv": DataLoader._load_csv,
+            "yaml": DataLoader._load_yaml,
+            "smart_text": DataLoader._load_smart_text,
+        }
+
+        parser = parsers.get(data_type)
         try:
-            match data_type:
-                case "json":
-                    return self._load_json(file_path)
-                case "csv":
-                    return self._load_csv(file_path)
-                case "yaml":
-                    return self._load_yaml(file_path)
-                case "smart_text":
-                    return self._load_smart_text(file_path)
-                case _:
-                    raise ValueError(f"Unhandled data type in _read_file: {data_type}")
+            if not parser:
+                raise ValueError(f"Unhandled data type in _read_file: {data_type}")
+            return parser(file_path)
         except (json.JSONDecodeError, FileNotFoundError, IOError, yaml.YAMLError) as e:
             logger.exception(f"Error loading data from {file_path}: {e}")
             raise FileReadError(str(file_path), str(e)) from e
@@ -130,21 +133,24 @@ class DataLoader:
             logger.exception(f"Unexpected error loading data from {file_path}: {e}")
             raise FileReadError(str(file_path), str(e)) from e
 
-    def _load_json(self, file_path: Path) -> Dict[str, Any]:
-        with file_path.open('r') as f:
+    @staticmethod
+    def _load_json(file_path: Path) -> dict[str, Any]:
+        with file_path.open('r', encoding='utf-8') as f:
             return json.load(f)
 
-    def _load_csv(self, file_path: Path) -> List[Dict[str, Any]]:
-        with file_path.open('r', newline='') as f:
+    @staticmethod
+    def _load_csv(file_path: Path) -> list[dict[str, Any]]:
+        with file_path.open('r', newline='', encoding='utf-8') as f:
             reader = csv.DictReader(f)
             return list(reader)
 
-
-    def _load_yaml(self, file_path: Path) -> Dict[str, Any]:
-        with file_path.open('r') as f:
+    @staticmethod
+    def _load_yaml(file_path: Path) -> dict[str, Any]:
+        with file_path.open('r', encoding='utf-8') as f:
             return yaml.safe_load(f)
 
-    def _load_smart_text(self, file_path: Path) -> Dict[str, Any]:
+    @staticmethod
+    def _load_smart_text(file_path: Path) -> dict[str, Any]:
         """
         AI Feature: Parses unstructured text into a structured JSON representation
         using a mock LLM extraction pipeline. In production, this would call
@@ -155,15 +161,21 @@ class DataLoader:
             raw_text = f.read()
 
         # Mock LLM API extraction logic
+        # Here we simulate an advanced RAG feature extracting complex insights
         mock_extracted_data = {
             "source_file": str(file_path),
             "text_length": len(raw_text),
             "extracted_entities": ["MockCompany Inc.", "CEO John Doe", "Q3 Revenue $50M"],
-            "summary": "This is a mock AI-generated summary of the unstructured text."
+            "summary": "This is a mock AI-generated summary of the unstructured text.",
+            "rag_context": {
+                "vector_db_matches": 3,
+                "confidence_score": 0.92,
+                "keywords": ["finance", "revenue", "growth"]
+            }
         }
         return mock_extracted_data
 
-    def _load_api(self, source_config: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    def _load_api(self, source_config: dict[str, Any]) -> dict[str, Any] | None:
         """Provides placeholder data for API calls."""
         logger.warning("API data source not yet implemented. Returning placeholder data.")
         provider = source_config.get("provider")
@@ -194,10 +206,17 @@ class DataLoader:
             return None
 
 
-def load_data(source_config: Dict[str, Any], cache: bool = True) -> Optional[Union[Dict[str, Any], List[Any]]]:
+def load_data(source_config: dict[str, Any], cache: bool = True) -> dict[str, Any] | list[Any] | None:
     """
     Wrapper for DataLoader to maintain backward compatibility.
     Loads data from a file (JSON or CSV) or a placeholder for an API, based on configuration.
+
+    Args:
+        source_config (dict[str, Any]): The configuration dictionary specifying 'type' and 'path'.
+        cache (bool): Whether to use in-memory caching. Defaults to True.
+
+    Returns:
+        dict[str, Any] | list[Any] | None: The loaded data or None on failure.
     """
     loader = DataLoader(use_cache=cache)
     return loader.load(source_config)
