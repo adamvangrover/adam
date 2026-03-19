@@ -1,7 +1,8 @@
 from __future__ import annotations
 from typing import Dict, Any, List, Union
 import logging
-from core.agents.agent_base import AgentBase, AgentInput, AgentOutput
+from core.agents.agent_base import AgentBase
+from core.schemas.agent_schema import AgentInput, AgentOutput
 from core.engine.states import init_reflector_state
 
 logger = logging.getLogger(__name__)
@@ -41,7 +42,7 @@ class ReflectorAgent(AgentBase):
         if GRAPH_AVAILABLE and reflector_app:
             logging.info("ReflectorAgent: Delegating to v23 ReflectorGraph.")
 
-            initial_state = init_reflector_state(content_to_analyze, context)
+            initial_state = init_reflector_state(content_to_analyze, input_data.context)
             config = {"configurable": {"thread_id": "1"}}
 
             try:
