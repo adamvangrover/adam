@@ -1,12 +1,11 @@
-import os
-import json
-import uuid
-import glob
 import ast
-from typing import List, Dict, Any, Optional
-from enum import Enum
-from datetime import datetime
+import json
 import re
+import uuid
+from datetime import datetime
+from enum import Enum
+from pathlib import Path
+from typing import Any
 
 # --- EMBEDDED SCRUBBER (Merged for stability) ---
 
@@ -115,7 +114,7 @@ class GoldStandardScrubber:
         return False
 
     @staticmethod
-    def extract_metadata(content: Any, artifact_type: str) -> Dict[str, Any]:
+    def extract_metadata(content: Any, artifact_type: str) -> dict[str, Any]:
         """Extracts useful metadata for indexing using an adaptive scan strategy."""
         metadata = {
             "processed_at": str(datetime.now()),
@@ -163,13 +162,29 @@ class ArtifactType(Enum):
 
 
 class GoldStandardArtifact:
+    """
+    Architecture & Usage:
+    A standardized container for data artifacts ingested by the system.
+    This class enforces a consistent schema across various data modalities (JSON, Markdown, Python)
+    ensuring downstream pipelines (e.g., Vector DBs, LangGraph models) have predictable inputs.
+
+    Attributes:
+        id (str): A unique UUID for the artifact.
+        source_path (str): The original file path.
+        content (Any): The parsed data payload.
+        type (str): The enum string representation of the ArtifactType.
+        title (str): The inferred title.
+        metadata (dict): Extracted metadata.
+        conviction_score (float): A heuristic-based quality score (0.0 - 1.0).
+        ingestion_timestamp (str): ISO 8601 formatted timestamp of processing.
+    """
     def __init__(self,
                  source_path: str,
                  content: Any,
                  artifact_type: ArtifactType,
                  title: str,
-                 metadata: Dict[str, Any] = None,
-                 conviction_score: float = None):
+                 metadata: dict[str, Any] | None = None,
+                 conviction_score: float | None = None):
         self.id = str(uuid.uuid4())
         self.source_path = source_path
         self.content = content
@@ -185,7 +200,8 @@ class GoldStandardArtifact:
 
         self.ingestion_timestamp = datetime.now().isoformat()
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
+        """Serializes the artifact into a JSON-compatible dictionary format."""
         return {
             "id": self.id,
             "source_path": self.source_path,
@@ -200,74 +216,83 @@ class GoldStandardArtifact:
 
 class UniversalIngestor:
     """
-    The Gold Standard Scrubbing Process.
-    Ingests data from various sources, standardizes it, and assesses conviction.
+    Architecture & Usage:
+    The Universal Ingestor handles the 'Gold Standard' data processing pipeline.
+    It recurses through file directories, delegates to the appropriate parser based on file extension,
+    extracts meaningful metadata and heuristic conviction scores, and serializes the
+    normalized outputs into a standardized JSONL format for the knowledge base.
     """
 
     def __init__(self):
-        self.artifacts: List[GoldStandardArtifact] = []
+        self.artifacts: list[GoldStandardArtifact] = []
 
     def scan_directory(self, root_path: str, recursive: bool = True):
-        """Scans a directory for ingestible content."""
-        if not os.path.exists(root_path):
+        """
+        Walks a directory and routes all permitted files to the processing pipeline.
+
+        Args:
+            root_path (str): The starting directory path.
+            recursive (bool): Whether to traverse subdirectories. Defaults to True.
+        """
+        root = Path(root_path)
+        if not root.exists():
             print(f"Warning: Path {root_path} does not exist.")
             return
 
         print(f"Scanning {root_path}...")
 
-        # Walk through directory
-        for root, dirs, files in os.walk(root_path):
-            # Skip hidden dirs
-            dirs[:] = [d for d in dirs if not d.startswith('.')]
-
-            for file in files:
-                filepath = os.path.join(root, file)
-                self.process_file(filepath)
-            if not recursive:
-                break
+        pattern = "**/*" if recursive else "*"
+        for filepath in root.glob(pattern):
+            if filepath.is_file():
+                if any(part.startswith('.') for part in filepath.parts):
+                    continue
+                self.process_file(str(filepath))
 
     def process_file(self, filepath: str):
-        """Determines file type and processes it."""
-        filename = os.path.basename(filepath)
+        """
+        Determines file type, enforces safety constraints (e.g., file size limits),
+        and routes the path to the correct internal processor.
 
-        # Skip hidden files
-        if filename.startswith('.'):
+        Args:
+            filepath (str): The absolute or relative path to the file.
+        """
+        path = Path(filepath)
+        filename = path.name
+
+        if filename.startswith('.') or filename == "__init__.py":
             return
-
-        # Skip init files unless we are specifically targeting them? No, usually skip.
-        if filename == "__init__.py":
-            pass  # We might want to read init for package docs, but let's skip for now.
 
         # Skip this file itself and generated files to avoid loops
         if "gold_standard" in filepath or "ui_data.json" in filepath:
             return
 
         # ROBUSTNESS: Safe Mode Check
-        # Skip files larger than 10MB to avoid MemoryError in constrained environments
         try:
-            if os.path.getsize(filepath) > 10 * 1024 * 1024:
+            if path.stat().st_size > 10 * 1024 * 1024:
                 print(f"Skipping large file: {filepath} (>10MB)")
                 return
         except OSError:
             return
 
-        try:
-            if filepath.endswith('.json'):
-                self._process_json(filepath)
-            elif filepath.endswith('.jsonl'):
-                self._process_jsonl(filepath)
-            elif filepath.endswith('.md'):
-                self._process_markdown(filepath)
-            elif filepath.endswith('.txt') or filepath.endswith('.log'):
-                self._process_text(filepath)
-            elif filepath.endswith('.py'):
-                self._process_python(filepath)
-        except Exception as e:
-            # print(f"Error processing {filepath}: {e}")
-            pass
+        ext = path.suffix.lower()
+        processor_map = {
+            '.json': self._process_json,
+            '.jsonl': self._process_jsonl,
+            '.md': self._process_markdown,
+            '.txt': self._process_text,
+            '.log': self._process_text,
+            '.py': self._process_python,
+        }
 
-    def _process_json(self, filepath: str):
-        with open(filepath, 'r', encoding='utf-8') as f:
+        processor = processor_map.get(ext)
+        if processor:
+            try:
+                processor(path)
+            except Exception:
+                pass
+
+    def _process_json(self, filepath: Path):
+        with filepath.open('r', encoding='utf-8', errors='ignore') as f:
             try:
                 content = f.read()
                 clean_content = GoldStandardScrubber.clean_text(content)
@@ -275,24 +300,21 @@ class UniversalIngestor:
             except json.JSONDecodeError:
                 return  # Skip invalid JSON
 
-        # Determine type based on path or content
         artifact_type = ArtifactType.DATA
-        title = os.path.basename(filepath)
+        title = filepath.name
 
-        if "reports" in filepath:
+        if "reports" in str(filepath):
             artifact_type = ArtifactType.REPORT
             title = data.get("title", data.get("company_name", title))
-        elif "prompt" in filepath:
+        elif "prompt" in str(filepath):
             artifact_type = ArtifactType.PROMPT
 
-        # Extract metadata
         metadata = GoldStandardScrubber.extract_metadata(data, artifact_type.value)
         if "original_keys" not in metadata:
             metadata["original_keys"] = list(data.keys()) if isinstance(data, dict) else []
 
-        # Create artifact
         artifact = GoldStandardArtifact(
-            source_path=filepath,
+            source_path=str(filepath),
             content=data,
             artifact_type=artifact_type,
             title=title,
@@ -300,19 +322,18 @@ class UniversalIngestor:
         )
         self.artifacts.append(artifact)
 
-    def _process_jsonl(self, filepath: str):
-        # Treat the whole file as a dataset artifact
+    def _process_jsonl(self, filepath: Path):
         content = []
-        with open(filepath, 'r', encoding='utf-8') as f:
+        with filepath.open('r', encoding='utf-8', errors='ignore') as f:
             for line in f:
                 try:
                     content.append(json.loads(line))
-                except:
+                except Exception:
                     continue
 
-        title = os.path.basename(filepath)
+        title = filepath.name
         artifact = GoldStandardArtifact(
-            source_path=filepath,
+            source_path=str(filepath),
             content=content,
             artifact_type=ArtifactType.DATA,
             title=title,
@@ -320,54 +341,70 @@ class UniversalIngestor:
         )
         self.artifacts.append(artifact)
 
-    def _process_markdown(self, filepath: str):
-        with open(filepath, 'r', encoding='utf-8') as f:
+    def _process_markdown(self, filepath: Path):
+        with filepath.open('r', encoding='utf-8', errors='ignore') as f:
             text = GoldStandardScrubber.clean_text(f.read())
 
-        # Extract title from first line if possible
         lines = text.split('\n')
-        title = os.path.basename(filepath)
+        title = filepath.name
+        chunks = []
+        current_chunk = []
+
+        # Innovative Markdown Chunking (Semantic Simulation)
         for line in lines:
             if line.strip().startswith('# '):
                 title = line.strip().replace('# ', '')
-                break
+
+            # Start a new chunk at any header level
+            if line.strip().startswith('#'):
+                if current_chunk:
+                    chunks.append("\n".join(current_chunk))
+                current_chunk = [line]
+            else:
+                current_chunk.append(line)
+
+        if current_chunk:
+            chunks.append("\n".join(current_chunk))
 
         artifact_type = ArtifactType.CODE_DOC
-        if "prompt" in filepath:
+        if "prompt" in str(filepath):
             artifact_type = ArtifactType.PROMPT
-        elif "newsletter" in filepath or "Fortress" in filepath:
+        elif "newsletter" in str(filepath) or "Fortress" in str(filepath):
             artifact_type = ArtifactType.NEWSLETTER
 
         metadata = GoldStandardScrubber.extract_metadata(text, artifact_type.value)
 
+        # Innovator Payload: Simulated Vector Database / RAG embedding prep
+        metadata["semantic_chunks"] = len(chunks)
+        metadata["chunk_preview"] = chunks[0][:100] + "..." if chunks else ""
+
         artifact = GoldStandardArtifact(
-            source_path=filepath,
-            content=text,
+            source_path=str(filepath),
+            content={"full_text": text, "chunks": chunks},
             artifact_type=artifact_type,
             title=title,
             metadata=metadata
         )
         self.artifacts.append(artifact)
 
-    def _process_text(self, filepath: str):
-        with open(filepath, 'r', encoding='utf-8') as f:
+    def _process_text(self, filepath: Path):
+        with filepath.open('r', encoding='utf-8', errors='ignore') as f:
             text = GoldStandardScrubber.clean_text(f.read())
 
         metadata = GoldStandardScrubber.extract_metadata(text, ArtifactType.UNKNOWN.value)
 
         artifact = GoldStandardArtifact(
-            source_path=filepath,
+            source_path=str(filepath),
             content=text,
             artifact_type=ArtifactType.UNKNOWN,
-            title=os.path.basename(filepath),
+            title=filepath.name,
             metadata=metadata
         )
         self.artifacts.append(artifact)
 
-    def _process_python(self, filepath: str):
-        """Extracts docstrings and class/function signatures from Python files."""
+    def _process_python(self, filepath: Path):
         try:
-            with open(filepath, 'r', encoding='utf-8') as f:
+            with filepath.open('r', encoding='utf-8', errors='ignore') as f:
                 source = f.read()
 
             tree = ast.parse(source)
@@ -376,7 +413,7 @@ class UniversalIngestor:
             classes = [node.name for node in ast.walk(tree) if isinstance(node, ast.ClassDef)]
             functions = [node.name for node in ast.walk(tree) if isinstance(node, ast.FunctionDef)]
 
-            content = f"Module: {os.path.basename(filepath)}\n"
+            content = f"Module: {filepath.name}\n"
             if docstring:
                 content += f"Docstring: {docstring}\n"
             if classes:
@@ -391,37 +428,35 @@ class UniversalIngestor:
             }
 
             artifact = GoldStandardArtifact(
-                source_path=filepath,
+                source_path=str(filepath),
                 content=content,
                 artifact_type=ArtifactType.CODE_DOC,
-                title=f"Doc: {os.path.basename(filepath)}",
+                title=f"Doc: {filepath.name}",
                 metadata=metadata
             )
             self.artifacts.append(artifact)
 
-        except Exception as e:
-            # Parse error or other issue
+        except Exception:
             pass
 
     def save_to_jsonl(self, output_path: str):
-        """Saves all artifacts to a JSONL file."""
-        with open(output_path, 'w', encoding='utf-8') as f:
+        """Saves all artifacts to a JSONL file safely handling directories."""
+        out_path = Path(output_path)
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        with out_path.open('w', encoding='utf-8') as f:
             for artifact in self.artifacts:
                 f.write(json.dumps(artifact.to_dict()) + '\n')
         print(f"Saved {len(self.artifacts)} artifacts to {output_path}")
 
-    def get_artifacts_by_type(self, artifact_type: ArtifactType) -> List[Dict]:
+    def get_artifacts_by_type(self, artifact_type: ArtifactType) -> list[dict]:
         return [a.to_dict() for a in self.artifacts if a.type == artifact_type.value]
 
 
 if __name__ == "__main__":
-    # Example usage
     ingestor = UniversalIngestor()
     ingestor.scan_directory("core")  # Scan core for code docs
     ingestor.scan_directory("prompt_library")
     ingestor.scan_directory("data")
     ingestor.scan_directory("docs")
 
-    # Create output directory if it doesn't exist
-    os.makedirs("data/gold_standard", exist_ok=True)
     ingestor.save_to_jsonl("data/gold_standard/knowledge_artifacts.jsonl")
