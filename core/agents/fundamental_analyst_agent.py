@@ -1,26 +1,23 @@
 # core/agents/fundamental_analyst_agent.py
 
-import csv
-import os
-import logging
-import pandas as pd
-import numpy as np
-from scipy import stats  # For statistical calculations (e.g., for DCF)
-from typing import Dict, Any, Optional, Union, List
-from core.agents.agent_base import AgentBase
-from core.system.memory_manager import VectorMemoryManager
-from core.analysis.gemini_analyzer import GeminiFinancialReportAnalyzer  # Import the new analyzer
-from semantic_kernel import Kernel  # Added for type hinting
 import asyncio  # Added import
-import yaml  # Added for example usage block
 import json
+import logging
+from typing import Any, Dict, List, Optional, Union
 
 # Placeholder for message queue interaction (replace with real implementation later)
 # from core.system.message_queue import MessageQueue
 from unittest.mock import patch  # Added for example usage
 
+from semantic_kernel import Kernel  # Added for type hinting
+
+from core.agents.pydantic_agent_base import PydanticAgentBase
+from core.analysis.gemini_analyzer import GeminiFinancialReportAnalyzer  # Import the new analyzer
+
 # New Imports
-from core.schemas.agent_schema import AgentInput, AgentOutput
+from core.schemas.agent_schema import AgentInput, AgentOutput, FundamentalReport
+from core.system.memory_manager import VectorMemoryManager
+from src.mcp_server import DCFInputs, calculate_dcf
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -33,7 +30,7 @@ class DCFCalculator:
     Helper class for DCF calculations.
     """
     @staticmethod
-    def calculate_intrinsic_value(wacc: float, terminal_growth: float, last_fcf: float, projection_years: int = 5, growth_rate: float = 0.05) -> float:
+    def calculate_intrinsic_value(wacc: float, terminal_growth: float, last_fcf: float, projection_years: int = 5, growth_rate: float = 0.05) -> float:  # noqa: E501
         """
         Calculates intrinsic value using a simplified DCF model.
         """
@@ -55,7 +52,7 @@ class DCFCalculator:
         return present_value + pv_terminal_value
 
 
-class FundamentalAnalystAgent(AgentBase):
+class FundamentalAnalystAgent(PydanticAgentBase):
     """
     Agent for performing fundamental analysis of companies.
 
@@ -83,33 +80,15 @@ class FundamentalAnalystAgent(AgentBase):
         # The 'peers' key in self.config (e.g., ['DataRetrievalAgent']) is used by AgentOrchestrator
         # to set up connections via self.add_peer_agent(peer_instance)
 
-    async def execute(self, input_data: Union[str, AgentInput, Dict[str, Any]]) -> Union[Dict[str, Any], AgentOutput]:
+    async def execute_pydantic(self, input_data: AgentInput) -> AgentOutput:
         """
         Performs fundamental analysis on a given company.
         Supports both legacy string/dict input and new AgentInput schema.
         """
         # 1. Input Normalization
-        company_id = ""
-        is_standard_mode = False
+        company_id = input_data.query.strip()
+        context = input_data.context
 
-        if isinstance(input_data, AgentInput):
-            company_id = input_data.query.strip() # Assuming query contains the ticker/company
-            is_standard_mode = True
-            # Update context if provided
-            if input_data.context:
-                self.set_context(input_data.context)
-        elif isinstance(input_data, str):
-            company_id = input_data.strip()
-        elif isinstance(input_data, dict):
-             # Handle dict input (e.g. from legacy orchestrator passing dict)
-             company_id = input_data.get("company_id") or input_data.get("company_name") or input_data.get("query", "")
-             if not company_id:
-                 logging.warning(f"Could not extract company_id from dict input: {input_data}")
-                 return {"error": "Invalid input format"}
-        else:
-            error_msg = f"Unsupported input type: {type(input_data)}"
-            logging.error(error_msg)
-            return {"error": error_msg}
 
         logging.info(f"Executing fundamental analysis for company_id: {company_id}")
         logging.debug(f"FAA_XAI:EXECUTE_INPUT: company_id='{company_id}'")
@@ -129,7 +108,7 @@ class FundamentalAnalystAgent(AgentBase):
                 similar_docs = [d for d in similar_docs if d['company_id'] != company_id]
                 if similar_docs:
                     similar_context = "\nSimilar Past Analyses (Peers/Context):\n" + "\n".join(
-                        [f"- {d['company_id']} ({d.get('similarity_score', 0):.2f}): {d['analysis_summary'][:200]}..." for d in similar_docs])
+                        [f"- {d['company_id']} ({d.get('similarity_score', 0):.2f}): {d['analysis_summary'][:200]}..." for d in similar_docs])  # noqa: E501
                     history_context += similar_context
 
             logging.info(f"Retrieved {len(history)} past analysis records for {company_id}")
@@ -137,16 +116,42 @@ class FundamentalAnalystAgent(AgentBase):
             company_data = await self.retrieve_company_data(company_id)
             if company_data is None:
                 logging.error(f"Failed to retrieve company data for {company_id} via A2A.")
-                return self._format_output({"error": f"Could not retrieve data for company {company_id}"}, is_standard_mode, company_id)
+                return AgentOutput(answer=f"Analysis failed: Could not retrieve data for company {company_id}", confidence=0.0, metadata={"error": f"Could not retrieve data for company {company_id}"})  # noqa: E501
 
             logging.debug(f"FAA_XAI:EXECUTE_COMPANY_DATA_KEYS: {list(company_data.keys())}")
 
             financial_ratios = self.calculate_financial_ratios(company_data)
 
-            # --- Scenario Analysis (Base/Bull/Bear) ---
-            # We now calculate DCF for multiple scenarios to provide a range of intrinsic values.
-            dcf_valuation_result = self.calculate_dcf_valuation(company_data) # Base Case (Legacy)
-            dcf_scenarios = self.calculate_dcf_scenarios(company_data)
+            # Context-based macro regime for terminal growth
+            macro_regime = context.get("MACRO_REGIME_STATE", "stable")
+            terminal_growth_rates = {"bull": 0.035, "bear": 0.01, "stable": 0.02}
+            terminal_growth = terminal_growth_rates.get(macro_regime.lower(), 0.02)
+
+            financial_details = company_data.get("financial_data_detailed", {})
+            income_statement = financial_details.get("income_statement", {})
+            ebitda_list = income_statement.get("ebitda", [])
+            ebitda_base = float(ebitda_list[-1]) if ebitda_list else 100.0
+
+            dcf_valuation_result = 0.0
+            dcf_scenarios = {}
+            wacc_result = 0.0
+            if ebitda_base > 0:
+                dcf_inputs = DCFInputs(
+                    ebitda_base=ebitda_base,
+                    capex_percent=0.1,
+                    nwc_percent=0.05,
+                    debt_cost=0.06,
+                    equity_percent=0.6,
+                    growth_rates=[0.05, 0.05, 0.05, 0.05, 0.05],
+                    terminal_growth_rate=terminal_growth
+                )
+                try:
+                    dcf_output = calculate_dcf(dcf_inputs)
+                    dcf_valuation_result = dcf_output.enterprise_value
+                    wacc_result = dcf_output.wacc
+                    dcf_scenarios["Base Case"] = dcf_valuation_result
+                except Exception as e:
+                    logging.warning(f"MCP calculate_dcf failed: {e}")
 
             comps_valuation = self.calculate_comps_valuation(company_data)  # Placeholder
             enterprise_value_result = self.calculate_enterprise_value(company_data)
@@ -163,7 +168,7 @@ class FundamentalAnalystAgent(AgentBase):
                 if len(report_text) > 20: # Arbitrary check for content
                      logging.info(f"Running Gemini analysis for {company_id}...")
                      # Use await for the async method call
-                     gemini_analysis_result = await self.gemini_analyzer.analyze_report(report_text, context=f"Company: {company_id}")
+                     gemini_analysis_result = await self.gemini_analyzer.analyze_report(report_text, context=f"Company: {company_id}")  # noqa: E501
                      gemini_insights = gemini_analysis_result.model_dump()
                 else:
                     logging.info("Not enough qualitative data for Gemini analysis.")
@@ -188,6 +193,17 @@ class FundamentalAnalystAgent(AgentBase):
                 "scenarios": dcf_scenarios
             })
 
+            # Create FundamentalReport
+            report = FundamentalReport(
+                company_id=company_id,
+                enterprise_value=dcf_valuation_result,
+                wacc=wacc_result,
+                terminal_growth_rate=terminal_growth,
+                financial_health=financial_health,
+                dcf_scenarios=dcf_scenarios,
+                analysis_summary=analysis_summary
+            )
+
             result_package = {
                 "company_id": company_id,
                 "financial_ratios": financial_ratios,
@@ -199,17 +215,23 @@ class FundamentalAnalystAgent(AgentBase):
                 "financial_health": financial_health,
                 "analysis_summary": analysis_summary,
                 "gemini_insights": gemini_insights,
-                "error": None
+                "error": None,
+                "report": report.model_dump()
             }
             logging.debug(f"FAA_XAI:EXECUTE_OUTPUT: {result_package}")
 
-            return self._format_output(result_package, is_standard_mode, company_id)
+            return AgentOutput(
+                answer=report.model_dump_json(),
+                sources=[f"Company Data for {company_id}"],
+                confidence=0.9 if financial_ratios else 0.5,
+                metadata=result_package
+            )
 
         except Exception as e:
             logging.exception(f"Error during fundamental analysis of {company_id}: {e}")
-            return self._format_output({"error": f"An error occurred during analysis: {e}"}, is_standard_mode, company_id)
+            return AgentOutput(answer=f"Analysis failed: {e}", confidence=0.0, metadata={"error": f"An error occurred during analysis: {e}"})  # noqa: E501
 
-    def _format_output(self, result: Dict[str, Any], is_standard_mode: bool, company_id: str) -> Union[Dict[str, Any], AgentOutput]:
+    def _format_output(self, result: Dict[str, Any], is_standard_mode: bool, company_id: str) -> Union[Dict[str, Any], AgentOutput]:  # noqa: E501
         """Helper to format output based on input mode."""
         if not is_standard_mode:
             return result
@@ -325,7 +347,7 @@ class FundamentalAnalystAgent(AgentBase):
             shareholders_equity = shareholders_equity_list[-1] if shareholders_equity_list else 0
 
             logging.debug(
-                f"FAA_XAI:CALC_RATIOS_VALUES: Revenue={revenue}, NetIncome={net_income}, EBITDA={ebitda}, Assets={total_assets}, Liab={total_liabilities}, Equity={shareholders_equity}")
+                f"FAA_XAI:CALC_RATIOS_VALUES: Revenue={revenue}, NetIncome={net_income}, EBITDA={ebitda}, Assets={total_assets}, Liab={total_liabilities}, Equity={shareholders_equity}")  # noqa: E501
 
             ratios["revenue_growth"] = (revenue / revenue_list[-2] -
                                         1) if len(revenue_list) > 1 and revenue_list[-2] != 0 else None
@@ -399,7 +421,7 @@ class FundamentalAnalystAgent(AgentBase):
 
                 dcf_summary = f"Value: {dcf_valuation:.2f}" if dcf_valuation is not None else "Not available"
                 comps_summary = f"Value: {comps_valuation:.2f}" if comps_valuation is not None else "Not available"
-                enterprise_value_summary_str = f"Value: {enterprise_value:.2f}" if enterprise_value is not None else "Not available"
+                enterprise_value_summary_str = f"Value: {enterprise_value:.2f}" if enterprise_value is not None else "Not available"  # noqa: E501
 
                 user_prompt_for_conclusion = self.config.get(
                     "summarize_analysis_user_prompt",
@@ -408,7 +430,7 @@ class FundamentalAnalystAgent(AgentBase):
 
                 gemini_summary = ""
                 if gemini_insights:
-                    gemini_summary = f"\nAI Insights (Gemini):\n{gemini_insights.get('executive_summary', '')}\nSentiment: {gemini_insights.get('management_sentiment', '')}"
+                    gemini_summary = f"\nAI Insights (Gemini):\n{gemini_insights.get('executive_summary', '')}\nSentiment: {gemini_insights.get('management_sentiment', '')}"  # noqa: E501
 
                 input_vars = {
                     "company_id": company_id,
@@ -422,7 +444,7 @@ class FundamentalAnalystAgent(AgentBase):
                 }
 
                 logging.info(
-                    f"Attempting to generate summary for {company_id} using Semantic Kernel skill 'FundamentalAnalysisSkill.SummarizeAnalysis'.")
+                    f"Attempting to generate summary for {company_id} using Semantic Kernel skill 'FundamentalAnalysisSkill.SummarizeAnalysis'.")  # noqa: E501
                 logging.debug(f"FAA_XAI:GEN_SUMMARY_SK_INPUT: {input_vars}")
                 summary = await self.run_semantic_kernel_skill("FundamentalAnalysisSkill", "SummarizeAnalysis", input_vars)
                 logging.debug(f"FAA_XAI:GEN_SUMMARY_SK_OUTPUT: '{summary}'")
@@ -430,13 +452,13 @@ class FundamentalAnalystAgent(AgentBase):
                 return summary
             except AttributeError as e:
                 logging.warning(
-                    f"Semantic Kernel or skill method not available, or attribute error: {e}. Falling back to string formatting for summary.")
+                    f"Semantic Kernel or skill method not available, or attribute error: {e}. Falling back to string formatting for summary.")  # noqa: E501
             except ValueError as e:
                 logging.warning(
-                    f"Semantic Kernel skill 'FundamentalAnalysisSkill.SummarizeAnalysis' execution failed: {e}. Falling back to string formatting.")
+                    f"Semantic Kernel skill 'FundamentalAnalysisSkill.SummarizeAnalysis' execution failed: {e}. Falling back to string formatting.")  # noqa: E501
             except Exception as e:
                 logging.error(
-                    f"An unexpected error occurred while using Semantic Kernel for summary: {e}. Falling back to string formatting.")
+                    f"An unexpected error occurred while using Semantic Kernel for summary: {e}. Falling back to string formatting.")  # noqa: E501
 
         logging.warning(f"Generating summary for {company_id} using fallback string formatting.")
         summary = f"Fundamental Analysis for {company_id}:\n\n"
@@ -471,7 +493,7 @@ class FundamentalAnalystAgent(AgentBase):
         if default_likelihood is not None:
             summary += f"Estimated Default Likelihood: {default_likelihood:.2%}\n"
         else:
-            summary += f"Estimated Default Likelihood: N/A\n"
+            summary += "Estimated Default Likelihood: N/A\n"
 
         distressed_metrics = self.calculate_distressed_metrics(financial_ratios if financial_ratios else {})
         if distressed_metrics:
@@ -505,7 +527,7 @@ class FundamentalAnalystAgent(AgentBase):
 
              if gemini_insights.get('esg_analysis'):
                  esg = gemini_insights['esg_analysis']
-                 summary += f"ESG Scorecard: Env={esg.get('environmental_score')}, Soc={esg.get('social_score')}, Gov={esg.get('governance_score')}\n"
+                 summary += f"ESG Scorecard: Env={esg.get('environmental_score')}, Soc={esg.get('social_score')}, Gov={esg.get('governance_score')}\n"  # noqa: E501
 
         summary += "\n(Summary generated using fallback string formatting.)"
         logging.debug(f"FAA_XAI:GEN_SUMMARY_FALLBACK_OUTPUT: '{summary}'")
@@ -602,7 +624,7 @@ class FundamentalAnalystAgent(AgentBase):
             last_historical_fcf = historical_fcf[-1]
             if not isinstance(last_historical_fcf, (int, float)):  # Ensure last FCF is usable
                 logging.warning(
-                    f"FAA_XAI:DCF_ABORT: Last historical FCF for {company_name_for_log} ('{last_historical_fcf}') is not numeric.")
+                    f"FAA_XAI:DCF_ABORT: Last historical FCF for {company_name_for_log} ('{last_historical_fcf}') is not numeric.")  # noqa: E501
                 return None
 
             dcf_assumptions = financial_details.get('dcf_assumptions', {})
@@ -611,14 +633,14 @@ class FundamentalAnalystAgent(AgentBase):
             discount_rate = dcf_assumptions.get('discount_rate')
 
             # Terminal growth rate for perpetuity calculation (after explicit projection period)
-            terminal_growth_rate_perpetuity = terminal_growth_override if terminal_growth_override is not None else dcf_assumptions.get('terminal_growth_rate')
+            terminal_growth_rate_perpetuity = terminal_growth_override if terminal_growth_override is not None else dcf_assumptions.get('terminal_growth_rate')  # noqa: E501
 
             # New parameters for two-stage growth model
             fcf_projection_years_total = int(dcf_assumptions.get('fcf_projection_years_total', 10))  # Default 10 years
             initial_high_growth_period_years = int(dcf_assumptions.get(
                 'initial_high_growth_period_years', 5))  # Default 5 years
 
-            initial_high_growth_rate = growth_rate_override if growth_rate_override is not None else dcf_assumptions.get('initial_high_growth_rate', 0.10)
+            initial_high_growth_rate = growth_rate_override if growth_rate_override is not None else dcf_assumptions.get('initial_high_growth_rate', 0.10)  # noqa: E501
 
             stable_growth_rate = dcf_assumptions.get('stable_growth_rate', 0.05)  # Default 5% for second stage
 
@@ -627,8 +649,8 @@ class FundamentalAnalystAgent(AgentBase):
 
             logging.debug(
                 f"FAA_XAI:DCF_PARAMS_TWO_STAGE: LastHistFCF={last_historical_fcf}, DiscountRate={discount_rate}, "
-                f"TerminalGrowthRatePerpetuity={terminal_growth_rate_perpetuity}, TotalProjectionYears={fcf_projection_years_total}, "
-                f"HighGrowthYears={initial_high_growth_period_years}, HighGrowthRate={initial_high_growth_rate}, StableGrowthRate={stable_growth_rate}"
+                f"TerminalGrowthRatePerpetuity={terminal_growth_rate_perpetuity}, TotalProjectionYears={fcf_projection_years_total}, "  # noqa: E501
+                f"HighGrowthYears={initial_high_growth_period_years}, HighGrowthRate={initial_high_growth_rate}, StableGrowthRate={stable_growth_rate}"  # noqa: E501
             )
 
             # Validate core rates and growth rates
@@ -637,15 +659,15 @@ class FundamentalAnalystAgent(AgentBase):
             # Allow None for rates not used if logic handles it
             if not all(isinstance(rate, (int, float)) for rate in essential_rates if rate is not None):
                 logging.warning(
-                    f"FAA_XAI:DCF_ABORT: One or more DCF rates are non-numeric for {company_name_for_log}. Rates: DR={discount_rate}, TGR_P={terminal_growth_rate_perpetuity}, IHGR={initial_high_growth_rate}, SGR={stable_growth_rate}")
+                    f"FAA_XAI:DCF_ABORT: One or more DCF rates are non-numeric for {company_name_for_log}. Rates: DR={discount_rate}, TGR_P={terminal_growth_rate_perpetuity}, IHGR={initial_high_growth_rate}, SGR={stable_growth_rate}")  # noqa: E501
                 return None
             if discount_rate is None or terminal_growth_rate_perpetuity is None:  # These are always needed
                 logging.warning(
-                    f"FAA_XAI:DCF_ABORT: Discount rate or terminal perpetuity growth rate is missing for {company_name_for_log}.")
+                    f"FAA_XAI:DCF_ABORT: Discount rate or terminal perpetuity growth rate is missing for {company_name_for_log}.")  # noqa: E501
                 return None
             if discount_rate <= terminal_growth_rate_perpetuity:  # Check against perpetuity growth rate
                 logging.warning(
-                    f"FAA_XAI:DCF_ABORT: Discount rate ({discount_rate}) not > terminal perpetuity growth rate ({terminal_growth_rate_perpetuity}) for {company_name_for_log}.")
+                    f"FAA_XAI:DCF_ABORT: Discount rate ({discount_rate}) not > terminal perpetuity growth rate ({terminal_growth_rate_perpetuity}) for {company_name_for_log}.")  # noqa: E501
                 return None
 
             projected_cash_flows = []
@@ -654,9 +676,9 @@ class FundamentalAnalystAgent(AgentBase):
             for year_num in range(1, fcf_projection_years_total + 1):
                 growth_rate_for_year = 0.0
                 if year_num <= initial_high_growth_period_years:
-                    if initial_high_growth_rate is None:  # Should be caught by all() check above if strictly required for all years
+                    if initial_high_growth_rate is None:  # Should be caught by all() check above if strictly required for all years  # noqa: E501
                         logging.warning(
-                            f"FAA_XAI:DCF_WARN: Missing initial_high_growth_rate for year {year_num}, using 0 growth for this year.")
+                            f"FAA_XAI:DCF_WARN: Missing initial_high_growth_rate for year {year_num}, using 0 growth for this year.")  # noqa: E501
                     else:
                         growth_rate_for_year = initial_high_growth_rate
                 else:  # Stable growth period (years > initial_high_growth_period_years up to fcf_projection_years_total)
@@ -727,7 +749,7 @@ class FundamentalAnalystAgent(AgentBase):
                 market_cap = share_price * shares_outstanding
             else:
                 logging.warning(
-                    f"FAA_XAI:EV_WARN: Market Cap could not be calculated for {company_name_for_log} due to missing/invalid share_price or shares_outstanding.")
+                    f"FAA_XAI:EV_WARN: Market Cap could not be calculated for {company_name_for_log} due to missing/invalid share_price or shares_outstanding.")  # noqa: E501
 
             short_term_debt_values = balance_sheet_info.get('short_term_debt', [0])
             short_term_debt = short_term_debt_values[-1] if short_term_debt_values else 0
@@ -746,7 +768,7 @@ class FundamentalAnalystAgent(AgentBase):
                 return enterprise_value
             else:
                 logging.warning(
-                    f"FAA_XAI:EV_ABORT: Enterprise Value cannot be calculated as Market Cap is unavailable for {company_name_for_log}.")
+                    f"FAA_XAI:EV_ABORT: Enterprise Value cannot be calculated as Market Cap is unavailable for {company_name_for_log}.")  # noqa: E501
                 return None
 
         except Exception as e:
@@ -792,7 +814,7 @@ if __name__ == '__main__':
                               "short_term_debt": [50, 50, 50], "long_term_debt": [500, 450, 400]},
             "cash_flow_statement": {"operating_cash_flow": [180, 200, 230], "investing_cash_flow": [-50, -60, -70],
                                     "financing_cash_flow": [-30, -40, -50], "free_cash_flow": [130, 140, 160]},
-            "key_ratios": {"debt_to_equity_ratio": 0.58, "net_profit_margin": 0.20, "current_ratio": 2.95, "interest_coverage_ratio": 13.6},
+            "key_ratios": {"debt_to_equity_ratio": 0.58, "net_profit_margin": 0.20, "current_ratio": 2.95, "interest_coverage_ratio": 13.6},  # noqa: E501
             "dcf_assumptions": {
                 "fcf_projection_years_total": 10,
                 "initial_high_growth_period_years": 5,
@@ -826,7 +848,7 @@ if __name__ == '__main__':
             class MockSKResult:
                 def __init__(self, value_str): self._value = value_str
                 def __str__(self): return self._value
-            return MockSKResult(f"SK Summary for {variables['company_id']}: Health {variables['financial_health']}. EV: {variables['enterprise_value_summary']}.")
+            return MockSKResult(f"SK Summary for {variables['company_id']}: Health {variables['financial_health']}. EV: {variables['enterprise_value_summary']}.")  # noqa: E501
 
     class MockSKSkillsCollection:
         def get_function(self, skill_collection_name, skill_name):
