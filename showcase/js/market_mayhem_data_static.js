@@ -149,7 +149,7 @@ window.MARKET_MAYHEM_DATA = [
         "Inflation"
       ]
     },
-    "provenance_hash": "fcd8d64c7a0c55705ce30af9d3c49dee977a74273dbd9382d36aaa8901ead40f",
+    "provenance_hash": "8f0ceb0893af956fe60465d91c70b0da16c0f9fc3bbb81cfa57c190aab53260c",
     "filename": "Daily_Briefing_2026_03_27.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -212,7 +212,7 @@ window.MARKET_MAYHEM_DATA = [
         "Inflation"
       ]
     },
-    "provenance_hash": "fa09af07ee4494f82d94a3efcce1cd535e62ffdf7ad1cc4ccf04b519c7313b7e",
+    "provenance_hash": "1765af7a38a7f06849eeb2ad7f85bbc7800e4f254fee72c67734d78d45a85607",
     "filename": "Daily_Briefing_2026_03_26.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -311,7 +311,7 @@ window.MARKET_MAYHEM_DATA = [
         "Inflation"
       ]
     },
-    "provenance_hash": "598b5519f1b3d022fde7b2e16a4360d920d2a047919ef9e020749d710350cec4",
+    "provenance_hash": "6b1f628d7dc320a42077aff737a1716172d3932b12d6864fc9dfe746adfc62bf",
     "filename": "Daily_Briefing_2026_03_23.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -406,7 +406,7 @@ window.MARKET_MAYHEM_DATA = [
         "Inflation"
       ]
     },
-    "provenance_hash": "519a9dee23a2608d6380ff1cd981166ef84764ecfe9e3cfd357a15b3d4de5980",
+    "provenance_hash": "2fb954261db37880fa457c9c0c55ae2d21c015b7d278431dfd6e768f9af6820d",
     "filename": "Daily_Briefing_2026_03_20.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -504,7 +504,7 @@ window.MARKET_MAYHEM_DATA = [
         "Inflation"
       ]
     },
-    "provenance_hash": "d34a50d49a8348aed5d605593658933f923e8bc691157b4ea3d830188fb92123",
+    "provenance_hash": "23f2b32aff617a70f98418d50439f5fc664d447168085f729d14645b92cdbce6",
     "filename": "Daily_Briefing_2026_03_16.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -703,7 +703,7 @@ window.MARKET_MAYHEM_DATA = [
         "Inflation"
       ]
     },
-    "provenance_hash": "2039233c67aacc1a0319c5e82d6502665fe4e0f723b5e582522f7d78033e48b9",
+    "provenance_hash": "e5e49ff088b48f09f9132137d84b6a0f79cbe71fcdbe64fd31cd16b07d532ca0",
     "filename": "Global_Macro_Update_2026.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -898,7 +898,7 @@ window.MARKET_MAYHEM_DATA = [
         "Inflation"
       ]
     },
-    "provenance_hash": "3eb33b0ffd0e431b880e9cbf8e7e2774dd10933d1c1cf837c7b45920c9d90b73",
+    "provenance_hash": "a09bbd793c370ac2164a4766fe5bbe45cf94894ce0f01780e215c8762743a11a",
     "filename": "Daily_Briefing_2026_03_12.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -1062,7 +1062,7 @@ window.MARKET_MAYHEM_DATA = [
         "EV"
       ]
     },
-    "provenance_hash": "955f2bb106f44fce680c52440cb05a96aac7b85e00299a9c4170f55dc1edd5d3",
+    "provenance_hash": "030edaab72ab4c0bca2410f6d25ce72d943724ebce79fe31467ef037dda9c826",
     "filename": "Daily_Briefing_2026_03_08.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -1156,7 +1156,7 @@ window.MARKET_MAYHEM_DATA = [
         "Inflation"
       ]
     },
-    "provenance_hash": "61984bd129c019171e8433a66bd614c59b80beeee2c931060fc759a049d34e3c",
+    "provenance_hash": "7078441a019ad341a9fa3da0f0a28cf25e33fc0431ef0998da2f1412252c4ec0",
     "filename": "Daily_Briefing_2026_03_06.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -1282,7 +1282,7 @@ window.MARKET_MAYHEM_DATA = [
         "Inflation"
       ]
     },
-    "provenance_hash": "ebd5f79d6dc61a4a241f68cbc507dda831d12cb03b9d17c1f3f1b12e93b35053",
+    "provenance_hash": "fabb5b5160f92dea8aad8848af43ef9fcb3f21160f5c7233f984fe0795ff71d8",
     "filename": "Daily_Briefing_2026_03_03.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -1519,7 +1519,7 @@ window.MARKET_MAYHEM_DATA = [
         "EV"
       ]
     },
-    "provenance_hash": "5ee886987ee701e7356c99c4d72d6fd2ddf20fc13faadb87e1f8598b38daf077",
+    "provenance_hash": "befb03962cf498b0f5c42d78c82d3b67d64cf0c319778bf063b855dcba0e58a1",
     "filename": "Daily_Briefing_2026_03_02_Volatility.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -1555,7 +1555,7 @@ window.MARKET_MAYHEM_DATA = [
         "EV"
       ]
     },
-    "provenance_hash": "f5d8c1d6874c5a9ea8cc7aeba29b7d63177396a45cff861a9141f62ff4bd5550",
+    "provenance_hash": "6b9b016abc7f59436851f0b290453aad4c5a48b5e8788af45e8a2fbf966c5d64",
     "filename": "Daily_Briefing_2026_03_02_Kinetic.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -1724,7 +1724,7 @@ window.MARKET_MAYHEM_DATA = [
         "Inflation"
       ]
     },
-    "provenance_hash": "44ae20089eef990e246b8027b2f39186c944ee4a47c1b53ac6320daac2f0ea12",
+    "provenance_hash": "961ae76c8cea44bb01276aeb556c0e1cf1cc1a7fa714d971f0aaf41b87d762ba",
     "filename": "House_View_2026_03_01.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -1800,7 +1800,7 @@ window.MARKET_MAYHEM_DATA = [
         "Cybersecurity"
       ]
     },
-    "provenance_hash": "198ce77189097b874082e0a336ad31e53f9888ee60a8683ae50cc59fe57cf2a5",
+    "provenance_hash": "3650dc96d932053a5f9e09bf13f233dff5c06cedf4e802e67aa920581292a318",
     "filename": "Market_Mayhem_20260301.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -1836,7 +1836,7 @@ window.MARKET_MAYHEM_DATA = [
         "Energy"
       ]
     },
-    "provenance_hash": "3fc25390d937a053b0c84782d09740a46596a0a2d5af0c8630fd74826114362b",
+    "provenance_hash": "55a2577ef9ba4fa778f109981fadfd8d24d6a453e8af7c41dcbeb296d921cd9a",
     "filename": "market_mayhem_iran_conflict.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -1971,7 +1971,7 @@ window.MARKET_MAYHEM_DATA = [
         "EV"
       ]
     },
-    "provenance_hash": "a711a9e1c123188040420efd18c86b9081cbbe12b4ecd811625762f8e03048c8",
+    "provenance_hash": "1cc0fd618aa339d02b03163021a356c3301e053b205f57dfd757f1c195374ac6",
     "filename": "newsletter_market_mayhem_mar_10_2026.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -2106,7 +2106,7 @@ window.MARKET_MAYHEM_DATA = [
         "Growth"
       ]
     },
-    "provenance_hash": "7f89ad7668491f7d1821b0c922041594a4363ec6bffc75c16247bf4c3ff86a37",
+    "provenance_hash": "5fdc1e7f689710c33f4cabe47c0ce91629867b45217a24bfa304da880a46d2ef",
     "filename": "Daily_Briefing_2026_02_20.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -2234,7 +2234,7 @@ window.MARKET_MAYHEM_DATA = [
         "Inflation"
       ]
     },
-    "provenance_hash": "5c142161747497e37c1d0ad08ed6b0e1a2e7b7e896e7aa84a523ebf5f35f3fb5",
+    "provenance_hash": "be1573092f4d503563fd90a31b96f2b427cad1a884b59374739ba843049a3ce8",
     "filename": "Daily_Briefing_2026_02_19.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -2302,7 +2302,7 @@ window.MARKET_MAYHEM_DATA = [
         "Gold"
       ]
     },
-    "provenance_hash": "130c78f42331906f29bac4bd100967e3b7204bc62f83642f3f9e4377fa3dfd69",
+    "provenance_hash": "d9c2cfd2467bff392a2a5d95c10c7321e59547d839ec6b07af74094be47e8dee",
     "filename": "Daily_Briefing_2026_02_18.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -2397,7 +2397,7 @@ window.MARKET_MAYHEM_DATA = [
         "Inflation"
       ]
     },
-    "provenance_hash": "9fefde766ba351146acd03d1978b4cadc7361195c81642f6ca737c72ef2f5afd",
+    "provenance_hash": "62000133093fc648a7cedd3c6a0775777fa13bd2b577e369bb7eb458f397a1e4",
     "filename": "Daily_Briefing_2026_02_17.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -2526,7 +2526,7 @@ window.MARKET_MAYHEM_DATA = [
         "Inflation"
       ]
     },
-    "provenance_hash": "46d0432e4cfb4f3e7ea4a5790f7fd8abc5d8de04d69238b0fb8973454a273e58",
+    "provenance_hash": "42a422551709876aadd95d116910b59f40f814041c08c1205fc332ad676fac9e",
     "filename": "Daily_Briefing_2026_02_16.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -2684,7 +2684,7 @@ window.MARKET_MAYHEM_DATA = [
         "Inflation"
       ]
     },
-    "provenance_hash": "f1c8a60c1109217d5c4d8be40b802488ce41623e225540321e06a16fd6d497de",
+    "provenance_hash": "f2d16f2918d8af7bb95a45962edf4837cf4281722855d77da00e570eac422910",
     "filename": "Daily_Briefing_2026_02_13.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -2752,7 +2752,7 @@ window.MARKET_MAYHEM_DATA = [
         "EV"
       ]
     },
-    "provenance_hash": "e0bb286ca6c09de67e1a59cc2dec9a3f1e5157635c2842d14d06c93f5cfbc290",
+    "provenance_hash": "1b27bb86f901b09aa1f257565f67bb01989d8cc15581d426396adc7f40d8ff15",
     "filename": "Daily_Briefing_2026_02_12.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -2922,7 +2922,7 @@ window.MARKET_MAYHEM_DATA = [
         "Inflation"
       ]
     },
-    "provenance_hash": "0586d110ddad5b19db76b89ac06f1ac4ebbbb59ea5df48f334a82c1c794377f6",
+    "provenance_hash": "9a316dc6a53011bb5e98dd7a22eb5bb1de1d28d634471285a34375109d8f527d",
     "filename": "Daily_Briefing_2026_02_09.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -3016,7 +3016,7 @@ window.MARKET_MAYHEM_DATA = [
         "Inflation"
       ]
     },
-    "provenance_hash": "6c4074a92fa16d8708115d2c4f4985515668d9a0ffe82f6294fa53103f530df5",
+    "provenance_hash": "0f3e7a4e16757fcdd1efe0c44a1ff2d18da526db374d15bcf2c446311778ab1d",
     "filename": "Daily_Briefing_2026_02_05.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -3080,7 +3080,7 @@ window.MARKET_MAYHEM_DATA = [
         "Inflation"
       ]
     },
-    "provenance_hash": "1f139ed2d68c1253d32af1bf5c3105e829007f17bdafd9ea0ce4564b11f53e48",
+    "provenance_hash": "80a95b93571ed071cf81844c5a988e36782a3c7ccd742beca10d1f5ecf7b4d6d",
     "filename": "Daily_Briefing_2026_02_04.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -3178,7 +3178,7 @@ window.MARKET_MAYHEM_DATA = [
         "Inflation"
       ]
     },
-    "provenance_hash": "ae69e7c86bb64062e7cd596b8f79568a04f9e2809f76ca2e0045e45585a78327",
+    "provenance_hash": "ed9418e7551326d2ea9e2f8129c854df20f7217fe9cd94d62ffc41ff8bd72165",
     "filename": "Daily_Briefing_2026_02_02.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -3272,7 +3272,7 @@ window.MARKET_MAYHEM_DATA = [
         "Inflation"
       ]
     },
-    "provenance_hash": "fac10e9c5c3a80279b2e3dd7307d682fd7ce57dfae6da89fb227cd0a6561856d",
+    "provenance_hash": "e6c6aee3b808cd5cb4ec7e17ea163a7f1c1d6ab2843ca8861180cb92d559b8e3",
     "filename": "House_View_2026_02_01.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -3341,7 +3341,7 @@ window.MARKET_MAYHEM_DATA = [
         "Cybersecurity"
       ]
     },
-    "provenance_hash": "f90e19a1a7af52521153e59336a7e199f54a023082a3962a22253f29f47aa8b8",
+    "provenance_hash": "0841595972787d99a1fedb21d5a6843ce920d0d84431efb0cabb866b0151c16d",
     "filename": "1Q26_Equity_Research_Desk.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -3436,7 +3436,7 @@ window.MARKET_MAYHEM_DATA = [
         "Inflation"
       ]
     },
-    "provenance_hash": "e8fac2185a9279c4e2f7a69cc9d747607bc8f1d363a2a12dbf1a1187bdf06d77",
+    "provenance_hash": "d113e8f2d776f0408e643bd654198b8e238650922d8ea9b05bc9e683738ca8c9",
     "filename": "Daily_Briefing_2026_01_30.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -3571,7 +3571,7 @@ window.MARKET_MAYHEM_DATA = [
         "Inflation"
       ]
     },
-    "provenance_hash": "feac03b1b8b3549482d69028b6a7c304b1d687adfbdfe1d39e2291e711440964",
+    "provenance_hash": "2d69da243fd1fb30d18e09613f680f006d7c0a1ac2f7126c8ed3f43a67a4e87f",
     "filename": "Daily_Briefing_2026_01_26.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -3666,7 +3666,7 @@ window.MARKET_MAYHEM_DATA = [
         "Inflation"
       ]
     },
-    "provenance_hash": "835547785dc263e4ee17d2094344c12f797386e85f2306c3fe99c914ab5ad012",
+    "provenance_hash": "98c6598b8c5e1aaa07f806a48cba4f7b43a736643307ef00fc7cae43c6ebeda3",
     "filename": "Daily_Briefing_2026_01_23.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -3729,7 +3729,7 @@ window.MARKET_MAYHEM_DATA = [
         "Inflation"
       ]
     },
-    "provenance_hash": "5a85038ca64d6ade8d9a34fa70940beec5914688e30aa97c5744cfd9ee437e10",
+    "provenance_hash": "7e38ae48fd7f66a480c3406490c817cfbd7fc1185006e91b4b56200ff9ad002b",
     "filename": "Daily_Briefing_2026_01_20.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -3996,7 +3996,7 @@ window.MARKET_MAYHEM_DATA = [
         "Inflation"
       ]
     },
-    "provenance_hash": "b6693486dd52edc8729b82ad6ee11cacdee0b1f28a7cc8ebc5dc424f9c33e839",
+    "provenance_hash": "71ac573a8ecf389c7bb3eefd6200bfc71867278a8f1376bcf5108784177f24a2",
     "filename": "Daily_Briefing_2026_01_12.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -4120,7 +4120,7 @@ window.MARKET_MAYHEM_DATA = [
         "Inflation"
       ]
     },
-    "provenance_hash": "8d3282d7f937c5c79f269e5318a4bfc455093ab03fe018cc40aed60f1841e94a",
+    "provenance_hash": "df85fc3159f3bc165ad83c82e99f14e2949a9917b164c299de983a1f10552ecf",
     "filename": "House_View_2026_01_01.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -4211,7 +4211,7 @@ window.MARKET_MAYHEM_DATA = [
         "Quality"
       ]
     },
-    "provenance_hash": "7124581907900d1b1d7ba5cd2b06c743e6d46c65102d572ca85425480b3e2f53",
+    "provenance_hash": "77b492eb05cabe678315bcc42ce938cdb74d9e637d62cd0389f4cf6f8bbbbd21",
     "filename": "Daily_Briefing_2025_12_23.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -4302,7 +4302,7 @@ window.MARKET_MAYHEM_DATA = [
         "Quality"
       ]
     },
-    "provenance_hash": "6db94508eeb28b52989d82f6fe6f5149b1fc62bd3b937ed8d29381b920f25a92",
+    "provenance_hash": "f1e3e46a25b7302d1ee210eb59f7115a40586cf64fbf5a20186f46d5b422580d",
     "filename": "Daily_Briefing_2025_12_15.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -4393,7 +4393,7 @@ window.MARKET_MAYHEM_DATA = [
         "Quality"
       ]
     },
-    "provenance_hash": "170947f59bc4376f32c51f97d03037be42f50f841baa0a1c94d6efdaefd577cd",
+    "provenance_hash": "70da0c159db5d482183c8d27a03df3edbf43abe336cad03a2e6f1e5fe82ca380",
     "filename": "Agent_Alignment_Log_20251212.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -4821,7 +4821,7 @@ window.MARKET_MAYHEM_DATA = [
         "Quality"
       ]
     },
-    "provenance_hash": "b616ff42f65a1f0b764c8e9d4b417d3b9524c9380868b908bb548b6d03176c87",
+    "provenance_hash": "68fdf5834c9ffb902a6255c859c6c2f7e6dd042d15214160cc5520ad57ff82b4",
     "filename": "Daily_Briefing_2025_12_09.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -5007,7 +5007,7 @@ window.MARKET_MAYHEM_DATA = [
         "Quality"
       ]
     },
-    "provenance_hash": "3c11a06e69fd4c537b39bd2c8a92a3eccc4235e37c0c028ccd09692223440598",
+    "provenance_hash": "380263e55bd3eae8260857bd7a3d99a8238b1c9980e39083c29ff62f02e1b968",
     "filename": "House_View_2025_12_01.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -5044,7 +5044,7 @@ window.MARKET_MAYHEM_DATA = [
         "ESG"
       ]
     },
-    "provenance_hash": "31c3b4ed287a54b6d028d6f2f376a8f843465edaeaf4239093c23f2dd447208f",
+    "provenance_hash": "c5b94c344057f798d00ee1bb25922afdf48efc13433c0e38fcb2946b73bad7e6",
     "filename": "LULU_Deep_Dive.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -5136,7 +5136,7 @@ window.MARKET_MAYHEM_DATA = [
         "Quality"
       ]
     },
-    "provenance_hash": "4d3180356a6731c77e84fb0424c327e0841952c6dbdbc96b48ecfab2bea387e7",
+    "provenance_hash": "8abea237b0c37e09c5b8b9475e893014b3701da24cdb1326892f2664b26c001a",
     "filename": "Daily_Briefing_2025_11_27.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -5198,7 +5198,7 @@ window.MARKET_MAYHEM_DATA = [
         "Quality"
       ]
     },
-    "provenance_hash": "56b4b3155589f86f51be1fca9df1f7e5b9294524f49559b1fb13890e932d5a6b",
+    "provenance_hash": "3781038cd2a688ae467f224a04ac8161462d5cf9301b08531308c8ddef0c7f4a",
     "filename": "Daily_Briefing_2025_11_25.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -5290,7 +5290,7 @@ window.MARKET_MAYHEM_DATA = [
         "Quality"
       ]
     },
-    "provenance_hash": "ac62c37451161e053f02402c4e776658ea25b02a64e174dd7814d15a18859a5a",
+    "provenance_hash": "424c3fa0f3982ed9411fa2b59c11cf6d8cf46f2bc7bbb30a3fd7d5a5ec0efd34",
     "filename": "Daily_Briefing_2025_11_19.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -5478,7 +5478,7 @@ window.MARKET_MAYHEM_DATA = [
         "Quality"
       ]
     },
-    "provenance_hash": "f54ac819486cfb3c0936b1e30e4e8afc1e5c8c5d56a5e48a283d1128cadadb22",
+    "provenance_hash": "789991dde40bec77f8872dea95544f1fdd9bc5bbc743f287e88a052ab44fe453",
     "filename": "Daily_Briefing_2025_11_10.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -5569,7 +5569,7 @@ window.MARKET_MAYHEM_DATA = [
         "Quality"
       ]
     },
-    "provenance_hash": "d8a1bd1cb0f683ac7c8ed691e59b27ee32fdde7b5c6afa27b07763c99cf1e71e",
+    "provenance_hash": "132dd1153fd5e6eddee463e0b26e9652b0fbd447a71747b635a04fa847665e59",
     "filename": "Daily_Briefing_2025_11_06.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -5632,7 +5632,7 @@ window.MARKET_MAYHEM_DATA = [
         "Quality"
       ]
     },
-    "provenance_hash": "d7f417c1e4d6e817ba658cb1aa16b213b0ac492e839eba82081e92fe6f9a6287",
+    "provenance_hash": "1908b9ff63dae156e2bcb4c0d5e6087df93eb5777ae9c6c3cc5c04baf9c8fb01",
     "filename": "Daily_Briefing_2025_11_04.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -5722,7 +5722,7 @@ window.MARKET_MAYHEM_DATA = [
         "Quality"
       ]
     },
-    "provenance_hash": "9156ebaf241a08876877fd8edd284edd9ae8c1ff5f564a28851764a4c6c92444",
+    "provenance_hash": "bb92ada2ae670dcb7660e141e258a24d750174ed2bf09cd43da672851514c149",
     "filename": "House_View_2025_11_01.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -5880,7 +5880,7 @@ window.MARKET_MAYHEM_DATA = [
         "Quality"
       ]
     },
-    "provenance_hash": "8db0590907ab556424f32c3d07bf619a0ca056bae6e8d9334d6501682e170d43",
+    "provenance_hash": "ef88ba05117a778604afb056d5b772f9f10585c33930fbd58cc2e8a74ed51a9e",
     "filename": "Daily_Briefing_2025_10_28.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -6000,7 +6000,7 @@ window.MARKET_MAYHEM_DATA = [
         "Quality"
       ]
     },
-    "provenance_hash": "701c0c26c1cc1cfd8891f9b6b664d692fee537fe6dc8494382cd81b2eb364783",
+    "provenance_hash": "d9deae8a1582963c55878c07df04e5db83e4aa4d4824cc004d10ad963abd7231",
     "filename": "Daily_Briefing_2025_10_16.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -6127,7 +6127,7 @@ window.MARKET_MAYHEM_DATA = [
         "Quality"
       ]
     },
-    "provenance_hash": "1271246135b168141537bb650f30e72bdf95f714afce6be0cb9f37590292c21e",
+    "provenance_hash": "90a3fc8328b904f6b45ecb36633b9bb2265037821a397854c1dd52c5998f91a2",
     "filename": "Daily_Briefing_2025_10_15.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -6278,7 +6278,7 @@ window.MARKET_MAYHEM_DATA = [
         "Quality"
       ]
     },
-    "provenance_hash": "0e4d8b85f18b883d4f9e6947ac5eb0535e6e183da135523fa47740dcf8e5a8f9",
+    "provenance_hash": "fa40261989c3ae754fe61784087e6bab6677ddac1606d541ff8f1623c4d25c58",
     "filename": "House_View_2025_10_01.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -6341,7 +6341,7 @@ window.MARKET_MAYHEM_DATA = [
         "Inflation"
       ]
     },
-    "provenance_hash": "833c6be93885077e944b11491af4d15248860f6e9d7d322feb09e6a288967804",
+    "provenance_hash": "f6c58fccf2f287161c57dbb71af26383ea5d8fe57f57d959cc46adcb7762968d",
     "filename": "Daily_Briefing_2025_09_29.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -6526,7 +6526,7 @@ window.MARKET_MAYHEM_DATA = [
         "Inflation"
       ]
     },
-    "provenance_hash": "cc8ec2eac1605f2695ef2658b9832b3f86fd0e1eda69a0dd23e5ebef0da12b80",
+    "provenance_hash": "2fe47a9a528994d13b48b1d7bb413733c9bf84871414aa19e79ee5934bf0e6de",
     "filename": "Daily_Briefing_2025_09_19.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -6590,7 +6590,7 @@ window.MARKET_MAYHEM_DATA = [
         "Inflation"
       ]
     },
-    "provenance_hash": "4b429631e995c39ce2c6a1fca967617531c66e0e5a2426d1653f2a0c6e1bac33",
+    "provenance_hash": "b54d99028196730d6832bb7fe1419aafcac611b0e25af4631b98f04333952f8c",
     "filename": "Daily_Briefing_2025_09_17.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -6682,7 +6682,7 @@ window.MARKET_MAYHEM_DATA = [
         "Inflation"
       ]
     },
-    "provenance_hash": "99c11d30ccc50b633f7f37dc13229346182b09bd848e5d8b8150824958ff7e70",
+    "provenance_hash": "597e940eda79caff2af6db140c14cfd1dae426bd42b4084bccf2260fe4aa77f5",
     "filename": "Daily_Briefing_2025_09_08.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -6774,7 +6774,7 @@ window.MARKET_MAYHEM_DATA = [
         "Inflation"
       ]
     },
-    "provenance_hash": "e23063ed9ae687e2203b5ee9d4cd182f76f823b0facc4f7e770ebcee9038637f",
+    "provenance_hash": "7777a8e0708536b8a34ad244f2b047141690b9c583ec7639dc0282343713261a",
     "filename": "Daily_Briefing_2025_09_03.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -6866,7 +6866,7 @@ window.MARKET_MAYHEM_DATA = [
         "Inflation"
       ]
     },
-    "provenance_hash": "b4b97a25c3d117f51bce0765919d4185da0e4f286c7c0eaa44891211a6fb54b5",
+    "provenance_hash": "b07e84e6753b2de4bdc72a7e0c26483a63bd91a587263e04ece49f87be5bf809",
     "filename": "House_View_2025_09_01.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -6900,7 +6900,7 @@ window.MARKET_MAYHEM_DATA = [
         "Inflation"
       ]
     },
-    "provenance_hash": "3cf1c1816a7fd225682bed2035670deeaed802fd47e5156373d237508fee042f",
+    "provenance_hash": "d13ab39528c1ca255dbfc89eaa150d6ed06db5197fb3771b9cf44f0b7b401a62",
     "filename": "Daily_Briefing_2025_09_01.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -7056,7 +7056,7 @@ window.MARKET_MAYHEM_DATA = [
         "Inflation"
       ]
     },
-    "provenance_hash": "0a90cb1aa92c1ab7a96e966ffcffdfbb13524f12bfb32f4ce392df111924c8a4",
+    "provenance_hash": "080dc7709d071da70f5d6666aa81a04555abd410db08ea1ba77c2a1fe0eabcd8",
     "filename": "Daily_Briefing_2025_08_27.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -7148,7 +7148,7 @@ window.MARKET_MAYHEM_DATA = [
         "Inflation"
       ]
     },
-    "provenance_hash": "9f4449102edd874c8e167c385d2cf3d092f2f59093b5a274e5a67d62ceb8b5e3",
+    "provenance_hash": "35880665073059d5a721bfc28172d624a7929621385dc764d7e4bcca1ddbdb80",
     "filename": "Daily_Briefing_2025_08_22.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -7211,7 +7211,7 @@ window.MARKET_MAYHEM_DATA = [
         "Inflation"
       ]
     },
-    "provenance_hash": "328c09b88800ca84078bc002dc6cc09871614a25e974dea09cea556c41567bb4",
+    "provenance_hash": "a5ccbe338e8c7ea7ec0558a44d0f5d680eb7bc1c4753b2df41bad6515511e2df",
     "filename": "Daily_Briefing_2025_08_20.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -7274,7 +7274,7 @@ window.MARKET_MAYHEM_DATA = [
         "Inflation"
       ]
     },
-    "provenance_hash": "70603969adef20d6f43ce48c308876a6b854b864e94b09cb75ed87bceea947a6",
+    "provenance_hash": "1a8b325815d98f4c87910836db2779537725fb92523d6367629c35c4bab29876",
     "filename": "Daily_Briefing_2025_08_18.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -7366,7 +7366,7 @@ window.MARKET_MAYHEM_DATA = [
         "Inflation"
       ]
     },
-    "provenance_hash": "c2e2a8279fba0dc9f2565684d2cc5d576a7cf79bc46b333a056493bb589d8de9",
+    "provenance_hash": "fb905731c5242de53621e38feebc0323d5ef79572d8ed0fcfba05ca2c01c1052",
     "filename": "Daily_Briefing_2025_08_15.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -7458,7 +7458,7 @@ window.MARKET_MAYHEM_DATA = [
         "Inflation"
       ]
     },
-    "provenance_hash": "69af5d4ca5533e6d48e4604be47a283a1e38e35dbea1b40e149c769ec669d2b4",
+    "provenance_hash": "6cc6cdb98a6bfb97f1c2489b168fe65aed20ad7d7b5f65dcb22bd3c485ee4745",
     "filename": "Daily_Briefing_2025_08_07.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -7522,7 +7522,7 @@ window.MARKET_MAYHEM_DATA = [
         "Inflation"
       ]
     },
-    "provenance_hash": "3a659ff57a658a71fbde2378ad6bd5776beb8bd71497464ab8abfdbd56d1fcc3",
+    "provenance_hash": "56112f7f4d886081be4db6be26ee172416bcf7793fe47cea0f8ef83863ab1a7a",
     "filename": "Daily_Briefing_2025_08_05.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -7643,7 +7643,7 @@ window.MARKET_MAYHEM_DATA = [
         "Inflation"
       ]
     },
-    "provenance_hash": "dbbfcb6bd7a413e16121fa5aceaefb4728b15602865dbcad3a52aca9b4a2cad3",
+    "provenance_hash": "c6c0b4e18972451c52c8f88fc298907a2a0d18e471943efb9f6c03c1facb8f69",
     "filename": "Daily_Briefing_2025_08_01.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -7677,7 +7677,7 @@ window.MARKET_MAYHEM_DATA = [
         "Inflation"
       ]
     },
-    "provenance_hash": "00a8e9734e8579fb9cb53107fea4d5ae055129eb06ddd801ca9933cb211b413a",
+    "provenance_hash": "38d485e694a4b723c6808ffa20499f9eea3631e760211a120652be1dbdd0cbd3",
     "filename": "House_View_2025_08_01.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -7741,7 +7741,7 @@ window.MARKET_MAYHEM_DATA = [
         "Inflation"
       ]
     },
-    "provenance_hash": "11dc7a480567d5ecb6f533f0c79d8bb3257c99a4f8a6e1fa64519656900a2b72",
+    "provenance_hash": "c7413c5d09595628d0b500463a328831fbc784cb1653724eeebd25d83b94a1ac",
     "filename": "Daily_Briefing_2025_07_30.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -7833,7 +7833,7 @@ window.MARKET_MAYHEM_DATA = [
         "Inflation"
       ]
     },
-    "provenance_hash": "cc6b343d7eaf07653e64180427a32703f3d85325b98d3b659131ba423026cdab",
+    "provenance_hash": "5904ff60d01b02591c4508701b01e4521c501ff47fcce99c707ab999667bac89",
     "filename": "Daily_Briefing_2025_07_25.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -7896,7 +7896,7 @@ window.MARKET_MAYHEM_DATA = [
         "Inflation"
       ]
     },
-    "provenance_hash": "fa15dee2081967a76fe17ccfa5f872a6a3021f787cf2138367a8e1c4388ca9f4",
+    "provenance_hash": "f632ba236d3828c90fca9067758567de51f1d73407df32eab95bf08786914a0f",
     "filename": "Daily_Briefing_2025_07_24.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -7960,7 +7960,7 @@ window.MARKET_MAYHEM_DATA = [
         "Inflation"
       ]
     },
-    "provenance_hash": "0e1649b0d68df9cea32685ea6ea68bb5ab050706ee044922f779180ea5125473",
+    "provenance_hash": "563f99187f594095087601eb0dffe2f22f8a37fa6b23f370490942b7aedce4af",
     "filename": "Daily_Briefing_2025_07_22.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -8053,7 +8053,7 @@ window.MARKET_MAYHEM_DATA = [
         "Inflation"
       ]
     },
-    "provenance_hash": "992c2be86fa36a6b576525a8534a9c48242cfac8544295f1b4af16878e5b168c",
+    "provenance_hash": "9a4ddd65967dbff362a618b153f3c71b65604b6dfb08f78d3c91389779e79a85",
     "filename": "Daily_Briefing_2025_07_18.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -8116,7 +8116,7 @@ window.MARKET_MAYHEM_DATA = [
         "Inflation"
       ]
     },
-    "provenance_hash": "169d76cc583244a2fb685c141b9649cfab8af42a8232414ef950227320a68f8e",
+    "provenance_hash": "5b58dede10089162183d302ea6ada6a57b1710a6727456f726fbd6b641ffccab",
     "filename": "Daily_Briefing_2025_07_15.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -8272,7 +8272,7 @@ window.MARKET_MAYHEM_DATA = [
         "Inflation"
       ]
     },
-    "provenance_hash": "08339ebda0c011c4346796a5777d7b222db8cc19bab8e302c954f8087b043c9d",
+    "provenance_hash": "2ab4d6024cb4b4b017659825e43eb806240940e199521e1692d8163e4f17ec6e",
     "filename": "Daily_Briefing_2025_07_09.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -8364,7 +8364,7 @@ window.MARKET_MAYHEM_DATA = [
         "Inflation"
       ]
     },
-    "provenance_hash": "92b789f30dbd9caa809371bf6d8276c3558822d324c502bec3a28d175a4ec288",
+    "provenance_hash": "61638e009594528fe7079febb1d8c7b485fe045df8a72723520fab55fc1dee64",
     "filename": "Daily_Briefing_2025_07_04.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -8426,7 +8426,7 @@ window.MARKET_MAYHEM_DATA = [
         "Inflation"
       ]
     },
-    "provenance_hash": "b0b25c40771fa1d4cbda08eb11a2d9db3757ba5435895a0d2e607bfb99083433",
+    "provenance_hash": "42d7363ff9a0e396a54de94d6e89ca6e1aafdd6ed9ab2db69e3e1102ef4e9a58",
     "filename": "House_View_2025_07_01.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -8590,7 +8590,7 @@ window.MARKET_MAYHEM_DATA = [
         "Quality"
       ]
     },
-    "provenance_hash": "588543ca52fe8b9b717e5144230f3ad2dfbde4eb6038b28defb3579abcd1b75a",
+    "provenance_hash": "191494f380ca416e9c6b10156e03fc870b93ef165cfadc7fc9f75ca818813df6",
     "filename": "Daily_Briefing_2025_06_24.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -8682,7 +8682,7 @@ window.MARKET_MAYHEM_DATA = [
         "Quality"
       ]
     },
-    "provenance_hash": "5ed97263ffc6c9edb2b41c433d76620173232e2b34be31c810bbb7266604f237",
+    "provenance_hash": "47f1e9b56d65dac334fa2952aef8033e7382631d9e908603f501302429111b46",
     "filename": "Daily_Briefing_2025_06_18.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -8744,7 +8744,7 @@ window.MARKET_MAYHEM_DATA = [
         "Quality"
       ]
     },
-    "provenance_hash": "5c7770f010455939935ddd513dd75b8b3815345672c3d0cf6669b85505ecf128",
+    "provenance_hash": "fbd276b842230542d97c732436a6b73af2ffd268b52a5f227c2c4a86ecbeaba8",
     "filename": "Daily_Briefing_2025_06_16.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -8837,7 +8837,7 @@ window.MARKET_MAYHEM_DATA = [
         "Quality"
       ]
     },
-    "provenance_hash": "b72eb9ac51520d8a746731b7d32473765aca46076fa5f336c0be212181de2183",
+    "provenance_hash": "1a1fc682ed8ed458fc7fc6cb66cb2475b2891e2f5f6a67d7f5a48c607d59a634",
     "filename": "Daily_Briefing_2025_06_13.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -8899,7 +8899,7 @@ window.MARKET_MAYHEM_DATA = [
         "Quality"
       ]
     },
-    "provenance_hash": "5def8a1b2e4b2b1785073e3454001c8442af6e7a137d5fba2f68778928b31d1d",
+    "provenance_hash": "1011647d5dbf4bde1a5ffce5724dc3107f951dd1a72395c23316afc5df7ac4b1",
     "filename": "Daily_Briefing_2025_06_10.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -8991,7 +8991,7 @@ window.MARKET_MAYHEM_DATA = [
         "Quality"
       ]
     },
-    "provenance_hash": "f1da006b23fde9458b53103b76c6d43feb2ce8dab78c5c321f7f09352533395c",
+    "provenance_hash": "1c04b943455d5db48979750699d81433e90f7aa9d994426e4d1f56261700749d",
     "filename": "Daily_Briefing_2025_06_06.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -9064,7 +9064,7 @@ window.MARKET_MAYHEM_DATA = [
         "Energy"
       ]
     },
-    "provenance_hash": "da9873d126ed35ee04ca30b69de8dd5a0dcca47cdad05bd6b3b15ce1376241d7",
+    "provenance_hash": "edd201678f39406edb5426eb593fde8fc3b2ff57e870f1a6927d722cf87b3fa5",
     "filename": "market_pulse_20250602.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -9125,7 +9125,7 @@ window.MARKET_MAYHEM_DATA = [
         "Quality"
       ]
     },
-    "provenance_hash": "ae480c491d9aa599209ae604242c077793484ed68fc04eb3799d820287dffc97",
+    "provenance_hash": "8e07826a2c510b5fdf53bbbbf8e4095fad760bfd16838b2416aa14b2f3e6cd34",
     "filename": "House_View_2025_06_01.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -9217,7 +9217,7 @@ window.MARKET_MAYHEM_DATA = [
         "Quality"
       ]
     },
-    "provenance_hash": "fc72966fcf7d24c03c8000437d9dceedd957b181367360e56a39f0d0aec719ff",
+    "provenance_hash": "eae1a251f358a17315a2163007ae157e0619c6ca4147d7a35b5c6306a643106e",
     "filename": "Daily_Briefing_2025_05_26.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -9309,7 +9309,7 @@ window.MARKET_MAYHEM_DATA = [
         "Quality"
       ]
     },
-    "provenance_hash": "82ee07b94a60e831cdf025349be77720a26353b196f66c4424605d8d55988f87",
+    "provenance_hash": "617232ddabed6e1e369f3d7769f145658bbed31755c49d87d9969bc6e5f77b6c",
     "filename": "Daily_Briefing_2025_05_20.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -9380,7 +9380,7 @@ window.MARKET_MAYHEM_DATA = [
         "EV"
       ]
     },
-    "provenance_hash": "3e7fb22f03d89c4e07d5c72ded35ae42af22805aeb978c6f5c5f30096b3e7ed7",
+    "provenance_hash": "5af6dc8eca957de1d7d8f3253b8b89ba49b494fbbb0a2dc2302387af9beac935",
     "filename": "market_pulse_20250519.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -9472,7 +9472,7 @@ window.MARKET_MAYHEM_DATA = [
         "Quality"
       ]
     },
-    "provenance_hash": "6f13a59d95ce47098b790a333bc7e01319eb2106e4ab6019c42f2f734447f176",
+    "provenance_hash": "06752010e0a02405eb134ec24348e64e04579c9afa0046f22673de47f1a3df40",
     "filename": "Daily_Briefing_2025_05_15.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -9564,7 +9564,7 @@ window.MARKET_MAYHEM_DATA = [
         "Quality"
       ]
     },
-    "provenance_hash": "56fc8852325c1106867886ccaf99f0686486ce6a959fb31b89c58ad911b65d5e",
+    "provenance_hash": "7ac209598441a3516cca59bb87e3b55dcca1fcac815c6e5f0725b2d224c2589a",
     "filename": "Daily_Briefing_2025_05_07.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -9719,7 +9719,7 @@ window.MARKET_MAYHEM_DATA = [
         "Quality"
       ]
     },
-    "provenance_hash": "5e668c631770fcab89f45a9a61f742f014b842be95378b3061547cd71c2cc02c",
+    "provenance_hash": "8ba1f76623417815923a3b0ca2c9555bbf7e1806eb952510f70ace3520b05bd3",
     "filename": "Daily_Briefing_2025_05_02.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -9809,7 +9809,7 @@ window.MARKET_MAYHEM_DATA = [
         "Quality"
       ]
     },
-    "provenance_hash": "bebb453b41f9bf99936240aea9c0b36313f0690035c52fbb7e51d95e81069a43",
+    "provenance_hash": "9af4032f86be722ebe4d338309dd2e1d5db954344f35f6840699644f0088d692",
     "filename": "House_View_2025_05_01.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -9843,7 +9843,7 @@ window.MARKET_MAYHEM_DATA = [
         "Quality"
       ]
     },
-    "provenance_hash": "dc376698b03fc9fa6d35206907ab7098d57acccb8d90c05fe440d1bb253e4fda",
+    "provenance_hash": "1be87e8cc727127e735d0630dd3c5c1dfb8e60b4ad5eea87c9dea960d556872e",
     "filename": "Daily_Briefing_2025_05_01.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -9935,7 +9935,7 @@ window.MARKET_MAYHEM_DATA = [
         "Quality"
       ]
     },
-    "provenance_hash": "948b834daa9657658f4b275ae47d1881e4069b2205f805457cde289c57102395",
+    "provenance_hash": "7d1b315b14eb85806a482fac2766180c84b2d529b4be429aac5f36c15b5539b1",
     "filename": "Daily_Briefing_2025_04_22.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -10028,7 +10028,7 @@ window.MARKET_MAYHEM_DATA = [
         "Quality"
       ]
     },
-    "provenance_hash": "863beaca6381bf87d383bcf351e623083560788b26c77d0a91ca07bcb24edf97",
+    "provenance_hash": "cc9e560061bf6fa9bea7a8f3e3baf4bcd021d8e4c33e51268aad5f879e4e5fa8",
     "filename": "Daily_Briefing_2025_04_17.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -10091,7 +10091,7 @@ window.MARKET_MAYHEM_DATA = [
         "Quality"
       ]
     },
-    "provenance_hash": "5f6ec88410ee8a2785857ad7519f869b818ef2be60b0f578e7fb59061b3c2cab",
+    "provenance_hash": "864db5723ca8e741b469da7532964ebd4a8a6dd07cd09bc11ba85421c4ea97c0",
     "filename": "Daily_Briefing_2025_04_16.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -10183,7 +10183,7 @@ window.MARKET_MAYHEM_DATA = [
         "Quality"
       ]
     },
-    "provenance_hash": "52d34865f5e66155c4aacf3ca66051ec3af7d294ae17c9d6d53502d79c467d41",
+    "provenance_hash": "1be5c4a4a7550f1f1ea7d7c50333b35df937aaac41429ae0355a33c7b6a7db58",
     "filename": "Daily_Briefing_2025_04_08.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -10367,7 +10367,7 @@ window.MARKET_MAYHEM_DATA = [
         "Quality"
       ]
     },
-    "provenance_hash": "eba7838b1c51da391a4fe4c63f87864a73c6758d673da73085c713ee4b22ca5a",
+    "provenance_hash": "151ba57f7e0d26fece53224ac180134c60556f2f38af9be3f9abd3a68b817da6",
     "filename": "House_View_2025_04_01.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -10459,7 +10459,7 @@ window.MARKET_MAYHEM_DATA = [
         "Quality"
       ]
     },
-    "provenance_hash": "eed895a59d1d27cce93c4c8c0564595042c870d48724e2238c2bcd61886a2917",
+    "provenance_hash": "e39f628da6a0fd0fb3ad11ac3ff3d9d1984f4c6f56b7c9b89d5f2565536ae31d",
     "filename": "Daily_Briefing_2025_03_26.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -10522,7 +10522,7 @@ window.MARKET_MAYHEM_DATA = [
         "Quality"
       ]
     },
-    "provenance_hash": "242e31ecd632bd06c321601eba66ed7424420aef310d1a38a4a08305469f791b",
+    "provenance_hash": "af7524f133b4b4310f319b0dbf634625b4da835afd5f21a1536a87c12d722fc8",
     "filename": "Daily_Briefing_2025_03_25.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -10614,7 +10614,7 @@ window.MARKET_MAYHEM_DATA = [
         "Quality"
       ]
     },
-    "provenance_hash": "d9e9e882d07a371735e6c38ed02a1be3ec6ae34677b9c00aece69f96f0508be4",
+    "provenance_hash": "00db5e1c6a0b895831fcc99d3759871ee0a8d2fbc575382cd36c756c8321df07",
     "filename": "Daily_Briefing_2025_03_18.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -10768,7 +10768,7 @@ window.MARKET_MAYHEM_DATA = [
         "Quality"
       ]
     },
-    "provenance_hash": "70375bd1e4b68412531c681041476cfec1fec563e3a27783770ea2b97b2757d2",
+    "provenance_hash": "41e5465ec15949543fe15f57dd6577e928531364bba5ea807b304a97c48de0d9",
     "filename": "Daily_Briefing_2025_03_12.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -10882,7 +10882,7 @@ window.MARKET_MAYHEM_DATA = [
         "Quality"
       ]
     },
-    "provenance_hash": "37721f5959e35b8d7217c39ee35d291bd23b3b7365a62dba9bf337174dba8625",
+    "provenance_hash": "43555c393e2588c1a5d7ab4098c893f4cd62e66555aa95f5f987d9d596c7d572",
     "filename": "Daily_Briefing_2025_03_11.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -11083,7 +11083,7 @@ window.MARKET_MAYHEM_DATA = [
         "Quality"
       ]
     },
-    "provenance_hash": "dd56b95f91b52709101c9cd60127160310bd5a590902d9097d22a08a39f08d77",
+    "provenance_hash": "b558330d447e41dcf721b8d376d13c2b94096ae5f5eefb6b52d6875bc3f5e200",
     "filename": "Daily_Briefing_2025_03_03.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -11215,7 +11215,7 @@ window.MARKET_MAYHEM_DATA = [
         "Quality"
       ]
     },
-    "provenance_hash": "f6c64aa3e78acb2ef4f17ae74b94d2aba01f4f7e3fa10f062a44f42a58597a2c",
+    "provenance_hash": "4a5c3a000724ad3886296376b88f6dd2d5e31c5344c91ccb972b991672b81d95",
     "filename": "House_View_2025_03_01.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -11307,7 +11307,7 @@ window.MARKET_MAYHEM_DATA = [
         "Quality"
       ]
     },
-    "provenance_hash": "b102060897055c52e0b873463061f6112430ec49dffd718593481d9d6893d5a1",
+    "provenance_hash": "999eacebd046f3f38f485ded99ab148f5f3d6aa9ecc8228cf982046fb0f0295f",
     "filename": "Daily_Briefing_2025_02_28.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -11370,7 +11370,7 @@ window.MARKET_MAYHEM_DATA = [
         "Quality"
       ]
     },
-    "provenance_hash": "73fea362589a91d5a17561eb63b5e77bdc78b5ce1062ad3a775177cca87812b4",
+    "provenance_hash": "eb538dde8f6f47c32ead75dd9f81039fb5eb3a6003b170eddb6a3a34483f26d0",
     "filename": "Daily_Briefing_2025_02_27.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -11433,7 +11433,7 @@ window.MARKET_MAYHEM_DATA = [
         "Growth"
       ]
     },
-    "provenance_hash": "72306e0612ee2486d3b774c0be74d38c7d7841fe4a3bc17068d48323e6dc16c0",
+    "provenance_hash": "92105515cde9769179236824593160ba7c327ba9d104763ed1db9f7f56440fe2",
     "filename": "nvda_company_report_20250226.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -11531,7 +11531,7 @@ window.MARKET_MAYHEM_DATA = [
         "Growth"
       ]
     },
-    "provenance_hash": "db698dce06fff53aae06b7baf9e47825e5b429722988f836917006ecd715159e",
+    "provenance_hash": "fc9f247663bf6144f9892ca437b55532d8193322e0d4aded52f1135863276739",
     "filename": "nvda_company_report_20250225.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -11569,7 +11569,7 @@ window.MARKET_MAYHEM_DATA = [
         "Cybersecurity"
       ]
     },
-    "provenance_hash": "33348ab1e5815d43a3dced60cf896f8ced94174b08af9f089df245f9d4ca3e8c",
+    "provenance_hash": "fb5d2c7c530380a13c7df84a67194323dbf145fff920f30e0716b11527b24315",
     "filename": "software_industry_report_20250225.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -11683,7 +11683,7 @@ window.MARKET_MAYHEM_DATA = [
         "Inflation"
       ]
     },
-    "provenance_hash": "d6882cc3c30ae1bca7812708bd1028afc56ad71748ea234d7c06ad6be6fae06e",
+    "provenance_hash": "7d3e11455422e6b51bd02c42a79915538307c92c858e6a74132f30c653301efe",
     "filename": "msft_company_report_20250224.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -12027,7 +12027,7 @@ window.MARKET_MAYHEM_DATA = [
         "Quality"
       ]
     },
-    "provenance_hash": "78b8c8ec08f185d8f8c30f1ee999c7af872bfe1643c1d230ca09df78bc61e75e",
+    "provenance_hash": "b29c5f1c5bb79db9cdf2678113ba492f3424f5656c7725f3d7bc2c4ca3b7a76a",
     "filename": "Daily_Briefing_2025_02_17.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -12179,7 +12179,7 @@ window.MARKET_MAYHEM_DATA = [
         "Quality"
       ]
     },
-    "provenance_hash": "ca96d05e13bc532fd5ce9093849166547c56b612905552fbfb93c611b7ebfb9b",
+    "provenance_hash": "cd34e4d68ac98f7a3ff75aedbdca32ff5aa433d9ec91e918e952ccf9a9e2c2ef",
     "filename": "Daily_Briefing_2025_02_14.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -12242,7 +12242,7 @@ window.MARKET_MAYHEM_DATA = [
         "Quality"
       ]
     },
-    "provenance_hash": "c6ffea99d3ca916de30fbc5ab6964c4f7757f1e27460831a55b6e98dcf718b9f",
+    "provenance_hash": "f79687be57dca104d63be8632209626530c721a9d9df2e311b045aa7666b5467",
     "filename": "Daily_Briefing_2025_02_13.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -12367,7 +12367,7 @@ window.MARKET_MAYHEM_DATA = [
         "Quality"
       ]
     },
-    "provenance_hash": "0facb4c60763d3fd005b443e41dd8141fd8ad67fe5f9c967aba1c11e9ba05746",
+    "provenance_hash": "2f7c3cd96199ecc30cc8694e97fa2dadf2c0ebc08db99a1e3be1944030fd5b71",
     "filename": "Daily_Briefing_2025_02_06.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -12429,7 +12429,7 @@ window.MARKET_MAYHEM_DATA = [
         "Quality"
       ]
     },
-    "provenance_hash": "87301a12332b4553c0c6b5aba28a13fefe943039bcfba945c7696929ef9e429d",
+    "provenance_hash": "4a785acd66b5c46f17daf74c7280f259b6fac14e9a7725a9d16828ad974738b8",
     "filename": "House_View_2025_02_01.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -12521,7 +12521,7 @@ window.MARKET_MAYHEM_DATA = [
         "Quality"
       ]
     },
-    "provenance_hash": "3275f4729633a2c78f1eb26522d3e545c06471d45fe6ebd8e39130ad86c8d955",
+    "provenance_hash": "ad8f3db1ea8159040be13985287b18c37809bb1dbfbb7c67e50fed82bfbfe8ce",
     "filename": "Daily_Briefing_2025_01_30.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -12584,7 +12584,7 @@ window.MARKET_MAYHEM_DATA = [
         "Quality"
       ]
     },
-    "provenance_hash": "7e73734813b362f466baefb564687ac895b2953386a7634b5d5dc6791e6e94e3",
+    "provenance_hash": "0b400c77058466d34289e65ca45b568ddd6de2fcd97a984ca8bec7869ce500ef",
     "filename": "Daily_Briefing_2025_01_28.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -12647,7 +12647,7 @@ window.MARKET_MAYHEM_DATA = [
         "Quality"
       ]
     },
-    "provenance_hash": "db3abe2e2d1acc145fb589c6df3afe9d192a1e5e9cd143bd0b9aaf751104af82",
+    "provenance_hash": "25ef85a087c8e237bc6216671913df94091985d2403b56c29f9fc4b7db4c4ab8",
     "filename": "Daily_Briefing_2025_01_27.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -12739,7 +12739,7 @@ window.MARKET_MAYHEM_DATA = [
         "Quality"
       ]
     },
-    "provenance_hash": "dfa4f5ffeafc7aa1c32c667ed5434c54d37c50cdb2016db497587797da6ced35",
+    "provenance_hash": "2da4d7055eb13c6d7eccaffe811ef44f3c398e6a92f73602a2a536ec4268c0ce",
     "filename": "Daily_Briefing_2025_01_21.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -12860,7 +12860,7 @@ window.MARKET_MAYHEM_DATA = [
         "Quality"
       ]
     },
-    "provenance_hash": "4c8631b47a9f8e23877c20ab1891bce25c3668197397aac73b37c1d9aed86a74",
+    "provenance_hash": "6557d7bb9da5c39d828e60b7a813c68c1fdef5e40237c1b64e04f0874f5565e1",
     "filename": "Daily_Briefing_2025_01_14.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -12923,7 +12923,7 @@ window.MARKET_MAYHEM_DATA = [
         "Quality"
       ]
     },
-    "provenance_hash": "14c2e053ea745d84b7b757077340557e55cd30cef8c0ef7aa4d020fbd65f2b2b",
+    "provenance_hash": "82431fab36741f88014a8c69a74853fbdc5cc284f54b9276776dfbb337f05ca2",
     "filename": "Daily_Briefing_2025_01_13.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -13015,7 +13015,7 @@ window.MARKET_MAYHEM_DATA = [
         "Quality"
       ]
     },
-    "provenance_hash": "43956b9db05b397b9624e9eeb928b765e912e1bea460a4a3553781bb0a693b8d",
+    "provenance_hash": "290b823022e0da7b053507f5a97b3039f54a62a564b7fc679121ef715e551589",
     "filename": "Daily_Briefing_2025_01_08.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -14169,7 +14169,7 @@ window.MARKET_MAYHEM_DATA = [
         "EV"
       ]
     },
-    "provenance_hash": "f0cc611ca8c80982f16e92b999f5f659bb120770be737faf64aa2a80a581befd",
+    "provenance_hash": "52924815fe415f9fdd3c25940608e51ee47091001ebe329b55fa9b5160d789be",
     "filename": "newsletter_market_mayhem_jun_2022.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -14366,7 +14366,7 @@ window.MARKET_MAYHEM_DATA = [
         "Inflation"
       ]
     },
-    "provenance_hash": "cdce560c08e2fc514d47ab657ad747f19fe07a9117cc2d5d9faaa789245f1058",
+    "provenance_hash": "c6ee89b41c892e7587d0ad70c15958463fa3332838345332bb53082324c60544",
     "filename": "newsletter_market_mayhem_jan_2021.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -14759,7 +14759,7 @@ window.MARKET_MAYHEM_DATA = [
         "Growth"
       ]
     },
-    "provenance_hash": "aea80a78da6e770af0f4d3827061c37f6c5dea396a55b3793a41a9661abe20c7",
+    "provenance_hash": "18c6daf5c04b5de6243c8f1bf198c3a31efe6c9cd6554a418ce4249d6f7e6c39",
     "filename": "deep_dive_ghost_gdp_2026.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -14882,7 +14882,7 @@ window.MARKET_MAYHEM_DATA = [
         "Quality"
       ]
     },
-    "provenance_hash": "2aac462587b14053e5063c602c73ca175909b4062cd4da9fcf9a3c447867c981",
+    "provenance_hash": "7c7a8db56ef0e56a10239c57d817948f0006dd30d69a2246a1284c40013e3c28",
     "filename": "newsletter_market_mayhem_oct_1929.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -14948,7 +14948,7 @@ window.MARKET_MAYHEM_DATA = [
         "Inflation"
       ]
     },
-    "provenance_hash": "af23a98314325802d6d9f8afc03ebf4cf7c4451ae159552904f6d3b8353f421c",
+    "provenance_hash": "07e82cdd1a14daeef732d2731734a2da48628daa3f725d9adbcf0b90386b989e",
     "filename": "amzn_company_report.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -15227,7 +15227,7 @@ window.MARKET_MAYHEM_DATA = [
         "Inflation"
       ]
     },
-    "provenance_hash": "092d8b8a6d7a41fc01e4bb755e8fcc9c93b3a753e043bf9c804867442ab146d6",
+    "provenance_hash": "e9237022196050b9c771b1d11a8b0ef799f1955468580ddb2b3d640e5c9981e1",
     "filename": "msft_company_report.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -15293,7 +15293,7 @@ window.MARKET_MAYHEM_DATA = [
         "Energy"
       ]
     },
-    "provenance_hash": "7dda0e89867f25692e9a28da83a84ac04f2238ef7a009500c92397712dcfd1b0",
+    "provenance_hash": "2702af3325b50bad47ce1847eb5c8e60ae6ff2f877ea06e6ede29a347a21b248",
     "filename": "2024 Year in Review: Navigating Uncertainty and Transition.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -15625,7 +15625,7 @@ window.MARKET_MAYHEM_DATA = [
         "Inflation"
       ]
     },
-    "provenance_hash": "ec109687059ff01bfd03d5b6f94ec641606e3fdac744935b26b5f8b69657a3fb",
+    "provenance_hash": "78603d7122580515dc79429eb453607783c3dd863c25bd709b296312d9acb1fb",
     "filename": "ai_thematic_report.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -16512,7 +16512,7 @@ window.MARKET_MAYHEM_DATA = [
         "Energy"
       ]
     },
-    "provenance_hash": "906d161ef5b7315e77ddcb990e2b1092a4fc468e49e3183182c999806e90f969",
+    "provenance_hash": "8d66b2c10902d8548c5d80a4e9755fcc00ba1633ab39ff1cebc29d32e94ce380",
     "filename": "geopolitics_thematic_report.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -16828,7 +16828,7 @@ window.MARKET_MAYHEM_DATA = [
         "Quality"
       ]
     },
-    "provenance_hash": "3466635a616bd62acef9d3fee93435f57c41e92028fdfc6ba23b53a2ec4386b2",
+    "provenance_hash": "2c7469e2e1899c926bcdd40f4885e79ed9df59ad4d7c83579de2a7c942c9b689",
     "filename": "House_View_2025_01_01.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -16865,7 +16865,7 @@ window.MARKET_MAYHEM_DATA = [
         "Energy"
       ]
     },
-    "provenance_hash": "7337dc919a5de653d733f70af8d9dab7b6b6234366187baa126181b96521dc5f",
+    "provenance_hash": "69932587424318a31686e2987aeeaddc948152379ee5354c5264f75a45710e46",
     "filename": "2022 Year in Review: Navigating a Turbulent Market.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -17069,7 +17069,7 @@ window.MARKET_MAYHEM_DATA = [
         "Quality"
       ]
     },
-    "provenance_hash": "f7546c3c3fce6ab3d333298cc374e5bfe1ef32b0e7fe28655cccb5f746f01fe9",
+    "provenance_hash": "b5f11a11a07fd3f2521126024c68e00eb5bf6725672679a2f10e992ccec94285",
     "filename": "newsletter_market_mayhem_jul_1997.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -17135,7 +17135,7 @@ window.MARKET_MAYHEM_DATA = [
         "Inflation"
       ]
     },
-    "provenance_hash": "d38e831b7a094c3d7ed3ec7eda78f6fc830750f8e22b7ed894c6da241746a530",
+    "provenance_hash": "397fb58d7cf551fa3ce8f99dfa6efe676bd3d6ddb7c735d2bc405fa938ee7ef8",
     "filename": "software_industry_report.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -17331,7 +17331,7 @@ window.MARKET_MAYHEM_DATA = [
         "Cybersecurity"
       ]
     },
-    "provenance_hash": "c20fedeccf8044710225982b9f376f4ea4b44a752ba0faf6dcdac151851a55ba",
+    "provenance_hash": "2fcff09c590eb0aba4ad08cc00b678e479319e3b72f19d6d4b8b17ec8cf65165",
     "filename": "landing.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -17614,7 +17614,7 @@ window.MARKET_MAYHEM_DATA = [
         "Energy"
       ]
     },
-    "provenance_hash": "ce07edd09e3ae237d83fce605c3d6482ce18df8cb89faa1e9a7e343ae7e51bfa",
+    "provenance_hash": "4cf9fb4c19ef26befe7505703ed7a87ae9cc3faa93cb2a12e8247d84d4e0859f",
     "filename": "newsletter_market_mayhem_feb_09_2026.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -17813,7 +17813,7 @@ window.MARKET_MAYHEM_DATA = [
         "Quality"
       ]
     },
-    "provenance_hash": "1ad3c3560e82ff0f7190825175dc3ebbf33c7503a018a69810f1e09d604b7884",
+    "provenance_hash": "3b6483935aaa3b53088cb7d6dd478de5a12582ef55dc7a53a99fa673a9130754",
     "filename": "newsletter_market_mayhem_may_2010.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -18149,7 +18149,7 @@ window.MARKET_MAYHEM_DATA = [
         "Cybersecurity"
       ]
     },
-    "provenance_hash": "39ef9f53d03f0d178898130363819a3b5811438554f52206656bed1eab875495",
+    "provenance_hash": "07bd050a3b956c4110a702a5f4619991b5c15c1cd212a5659c672a1bbcabfe35",
     "filename": "market_mayhem_dashboard.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -18220,7 +18220,7 @@ window.MARKET_MAYHEM_DATA = [
         "Growth"
       ]
     },
-    "provenance_hash": "f88fcaa722a87b19fde58d3388b173fa5d480dd647aae7bd7eac4594f8b0ca36",
+    "provenance_hash": "cb5276926aee8d468e7300456d15cf0f45efabf87f20ce2802918f9b0c1c1606",
     "filename": "Deep_Dive_AI_Debt_Reckoning.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -18481,7 +18481,7 @@ window.MARKET_MAYHEM_DATA = [
         "Energy"
       ]
     },
-    "provenance_hash": "e2fb3f51a581e358b617ec58fae086311e2d648c630b0a3305d456601decb435",
+    "provenance_hash": "a9791262dda15d0e77c72841cea8ddc9cfc41a40b4252015bc0bf993885a7d43",
     "filename": "2023 Year in Review: A Year of Recovery and Resilience.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -18690,7 +18690,7 @@ window.MARKET_MAYHEM_DATA = [
         "Equities"
       ]
     },
-    "provenance_hash": "3349059cf809c26850b0a74b054701d9aedc34a9c56071ae6271851d316ac2e4",
+    "provenance_hash": "bed436392e7ace4f7027f99b0579efad865c6be9e242d1fe18367b263aa21bd2",
     "filename": "newsletter_market_mayhem_jun_2016.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -18824,7 +18824,7 @@ window.MARKET_MAYHEM_DATA = [
         "Energy"
       ]
     },
-    "provenance_hash": "4d01de263590340ea9868238694ff1b035c94b9b5778533439204806c5221956",
+    "provenance_hash": "0b27af412be782a777168fc407803ebd93f42c8336af42dab988d93785081993",
     "filename": "newsletter_market_mayhem_special_edition.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -18921,7 +18921,7 @@ window.MARKET_MAYHEM_DATA = [
         "DeFi"
       ]
     },
-    "provenance_hash": "f50313373d720268c4a654a6103aca69f41c50457050f5f2c7ff3cc4619de642",
+    "provenance_hash": "d9e10d5766d1194a87cedb8bceec6012e7f828dfc5dd8fe41b6f104aa0b8716e",
     "filename": "Model_Performance_Review_Q3_2025.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -19125,7 +19125,7 @@ window.MARKET_MAYHEM_DATA = [
         "Inflation"
       ]
     },
-    "provenance_hash": "ae6cca99fc720eb3fdb60c354ad0d0acd5c9feacdd2ee93f919709ab4372312e",
+    "provenance_hash": "ac4a6d5ba71a4385ef6919b3f6f70edb4d9a68df90b0e7e4af858557232f0674",
     "filename": "newsletter_market_mayhem_mar_2000.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -19224,7 +19224,7 @@ window.MARKET_MAYHEM_DATA = [
         "Quality"
       ]
     },
-    "provenance_hash": "6b7528eac98dbb484244f5c07d765c4969cd983dd2f1d5c8ed4f340075de0b39",
+    "provenance_hash": "95f4f2df204fc38e5594a005bd6374ae5006aedca55b52b38ae86aeeb2b1fada",
     "filename": "newsletter_market_mayhem_feb_2018.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -19369,7 +19369,7 @@ window.MARKET_MAYHEM_DATA = [
         "Energy"
       ]
     },
-    "provenance_hash": "8de83114aa20dd1139b8ceb80a832a23c47b525a097f174e4bd7b654f80a10d6",
+    "provenance_hash": "4a1b8f3cd76840ab2cc84827b212531eec951e52d6c5f923a05b896275f6b2f0",
     "filename": "newsletter_market_mayhem_feb_16_2026.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -19534,7 +19534,7 @@ window.MARKET_MAYHEM_DATA = [
         "ESG"
       ]
     },
-    "provenance_hash": "fe21d130e4ae90d3a00be527288207258c00190cf1961da2362f2c587a1c2ee6",
+    "provenance_hash": "c7837fb2d03e3ccd58102112e12631833d1cfb3490154fecd0afa32a0ad3310b",
     "filename": "Q1 2025 and Full Year Outlook: Navigating a Bifurcated Market.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -19600,7 +19600,7 @@ window.MARKET_MAYHEM_DATA = [
         "EV"
       ]
     },
-    "provenance_hash": "03ca91a90fb5816f0ad48aa01dddf5ddac2bbc06787e34dba6b3657c0072e1b6",
+    "provenance_hash": "3a27e175d12c23a1c45d1391bcb3d01269f0dba0bd2955519542fbe42d6f5669",
     "filename": "newsletter_market_mayhem_mar_2023.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -19806,7 +19806,7 @@ window.MARKET_MAYHEM_DATA = [
         "Energy"
       ]
     },
-    "provenance_hash": "0d1fe5c17f5b551a0093feefc9f26af12d3755ea10a22c3eca020bbe65817aaa",
+    "provenance_hash": "a2b19b48972adbaba4710ae49668f44fb7a7efd7fafcca5947f547cd461a6dc9",
     "filename": "newsletter_iran_collapse_2026.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -19878,7 +19878,7 @@ window.MARKET_MAYHEM_DATA = [
         "Inflation"
       ]
     },
-    "provenance_hash": "90250528d6d73ffa61b74b8722e72fa6afa22cfba1eb353064e3a028ffe4c8b1",
+    "provenance_hash": "1174e2e4b037dfd4dee19c7a15bc6dff2d24906da946d37a1c727cce20ac6f19",
     "filename": "newsletter_market_mayhem_aug_1971.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -20471,7 +20471,7 @@ window.MARKET_MAYHEM_DATA = [
         "Inflation"
       ]
     },
-    "provenance_hash": "4306b98d547485b03d80e52ad7863ab3b3cf71e08a8c7f3ded1e651dd70a4051",
+    "provenance_hash": "18bcd0e5fda74d0cda4ac96ebc4428b26dd83d8b6c5b3ba8b36e1eff45df6a93",
     "filename": "googl_company_report.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -21147,7 +21147,7 @@ window.MARKET_MAYHEM_DATA = [
         "EV"
       ]
     },
-    "provenance_hash": "6b48aa209a203c186a573d34ad67bd47e00b78797315b0318b4ab79497dc490f",
+    "provenance_hash": "eac8ea1a9450a402fdf644c16e6836940aba58adca5b1256eee12810986532fa",
     "filename": "market_mayhem_cro_ib_week_ahead_03152026.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -21184,7 +21184,7 @@ window.MARKET_MAYHEM_DATA = [
         "Equities"
       ]
     },
-    "provenance_hash": "65192e5ce3c073f97e6858577890e16734760a3435cf6b68749048ee29dc8950",
+    "provenance_hash": "a43951c5628f73048bdbaa197171e9e8ad822d7a4891674529817f7fd03c63de",
     "filename": "market_mayhem_current_outlook_03142026.html",
     "is_sourced": false,
     "metrics_json": "{}",
@@ -21220,7 +21220,7 @@ window.MARKET_MAYHEM_DATA = [
         "DeFi"
       ]
     },
-    "provenance_hash": "19df5f0522160d56f977826092d3ede2440def3b72ce526127ac7e263b29ba00",
+    "provenance_hash": "ae91a39d3ccbeedcf7f6bf584a66999a00592eefd73b6178e3b39477b0318f07",
     "filename": "market_mayhem_historical_report_03142026.html",
     "is_sourced": false,
     "metrics_json": "{}",

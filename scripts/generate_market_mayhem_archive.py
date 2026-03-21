@@ -866,6 +866,10 @@ def generate_archive():
 
         out_path = os.path.join(OUTPUT_DIR, item['filename'])
 
+        # Calculate relative path depth
+        depth = item['filename'].count('/')
+        rel_prefix = '../' * depth if depth > 0 else ''
+
         conviction = item.get("conviction", 50)
         conviction_color = "#00ff00" if conviction > 70 else ("#ffff00" if conviction > 40 else "#ff0000")
 
@@ -929,6 +933,19 @@ def generate_archive():
             raw_source=raw_source,
             crisis_sim_json=crisis_sim_json
         )
+
+        # Fix paths dynamically
+        if depth > 0:
+            content = content.replace('href="css/', f'href="{rel_prefix}css/')
+            content = content.replace('src="js/', f'src="{rel_prefix}js/')
+            content = content.replace('href="market_mayhem_dashboard.html"', f'href="{rel_prefix}market_mayhem_dashboard.html"')
+            content = content.replace('href="market_mayhem_archive.html"', f'href="{rel_prefix}market_mayhem_archive.html"')
+            content = content.replace('href="nexus.html"', f'href="{rel_prefix}nexus.html"')
+            content = content.replace('href="terminal.html"', f'href="{rel_prefix}terminal.html"')
+            content = content.replace('href="reports.html"', f'href="{rel_prefix}reports.html"')
+
+        # Ensure directories exist
+        os.makedirs(os.path.dirname(out_path), exist_ok=True)
 
         with open(out_path, "w", encoding='utf-8') as f:
             f.write(content)
@@ -996,7 +1013,7 @@ def generate_archive():
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADAM v23.5 :: MARKET MAYHEM ARCHIVE</title>
+    <title>ADAM v26 | MARKET MAYHEM ARCHIVE</title>
     <link rel="stylesheet" href="css/style.css">
     <!-- FontAwesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -1258,7 +1275,7 @@ def generate_archive():
             <a href="#" class="active">ARCHIVE</a>
             <a href="reports.html">REPORTS</a>
         </div>
-        <div class="mono" style="font-size: 0.7rem; color: #444;">v24.2.0</div>
+        <div class="mono" style="font-size: 0.7rem; color: #444;">v26.1.0</div>
     </nav>
 
     <div class="app-container">
