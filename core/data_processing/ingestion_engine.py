@@ -15,8 +15,16 @@ import logging
 import os
 import json
 import uuid
+import asyncio
+import aiofiles
 from typing import List, Dict, Any, Optional, Protocol
 from abc import abstractmethod
+
+try:
+    from sentence_transformers import SentenceTransformer
+    SENTENCE_TRANSFORMERS_AVAILABLE = True
+except ImportError:
+    SENTENCE_TRANSFORMERS_AVAILABLE = False
 
 from core.data_processing.chunking_engine import ChunkingEngine
 from core.engine.unified_knowledge_graph import UnifiedKnowledgeGraph
@@ -25,7 +33,7 @@ logger = logging.getLogger(__name__)
 
 class IngestionStrategy(Protocol):
     @abstractmethod
-    def ingest(self, data_source: Any, metadata: Dict[str, Any]) -> Dict[str, Any]:
+    async def ingest(self, data_source: Any, metadata: Dict[str, Any]) -> Dict[str, Any]:
         """Ingest data and return a status report."""
         pass
 
@@ -37,18 +45,18 @@ class MemoryIngestionStrategy:
     def __init__(self, ukg: UnifiedKnowledgeGraph):
         self.ukg = ukg
 
-    def ingest(self, data_source: Any, metadata: Dict[str, Any]) -> Dict[str, Any]:
+    async def ingest(self, data_source: Any, metadata: Dict[str, Any]) -> Dict[str, Any]:
         """
         Expects data_source to be a dict or list of dicts compatible with UKG.
         """
         count = 0
         if isinstance(data_source, list):
             # Assume list of company dicts for now
-            self.ukg.ingest_financial_data(data_source)
+            await asyncio.to_thread(self.ukg.ingest_financial_data, data_source)
             count = len(data_source)
         elif isinstance(data_source, dict):
             # Assume single entity or graph update
-            self.ukg.ingest_financial_data([data_source])
+            await asyncio.to_thread(self.ukg.ingest_financial_data, [data_source])
             count = 1
 
         return {"status": "success", "mode": "memory", "items_ingested": count}
@@ -62,8 +70,14 @@ class PersistentIngestionStrategy:
         self.storage_path = storage_path
         self.chunker = ChunkingEngine(strategy=chunking_strategy)
         os.makedirs(storage_path, exist_ok=True)
+        self.model = None
+        if chunking_strategy == "semantic" and SENTENCE_TRANSFORMERS_AVAILABLE:
+            try:
+                self.model = SentenceTransformer('all-MiniLM-L6-v2')
+            except Exception as e:
+                logger.error(f"Failed to initialize sentence_transformers in PersistentIngestionStrategy: {e}")
 
-    def ingest(self, data_source: Any, metadata: Dict[str, Any]) -> Dict[str, Any]:
+    async def ingest(self, data_source: Any, metadata: Dict[str, Any]) -> Dict[str, Any]:
         """
         Expects data_source to be a raw text string or file path.
         """
@@ -73,8 +87,8 @@ class PersistentIngestionStrategy:
         # 1. Load Data
         if isinstance(data_source, str) and os.path.exists(data_source):
             try:
-                with open(data_source, 'r', encoding='utf-8') as f:
-                    text_content = f.read()
+                async with aiofiles.open(data_source, 'r', encoding='utf-8') as f:
+                    text_content = await f.read()
                 metadata["source_path"] = data_source
                 source_id = os.path.basename(data_source)
             except Exception as e:
@@ -88,15 +102,20 @@ class PersistentIngestionStrategy:
         chunks = self.chunker.chunk(text_content, metadata)
 
         # 3. Embed & Store (Mock Vector Store)
-        # In a real system, we would generate embeddings here.
-        # For now, we save chunks to JSONL.
         output_file = os.path.join(self.storage_path, f"{source_id}.jsonl")
 
-        with open(output_file, 'w', encoding='utf-8') as f:
+        async with aiofiles.open(output_file, 'w', encoding='utf-8') as f:
             for chunk in chunks:
-                # Simulate embedding ID
                 chunk["vector_id"] = str(uuid.uuid4())
-                f.write(json.dumps(chunk) + "\n")
+                if self.model and "text" in chunk:
+                    try:
+                        # Ensure we do non-blocking inference for embeddings
+                        embedding = await asyncio.to_thread(self.model.encode, chunk["text"])
+                        chunk["embedding"] = embedding.tolist()
+                    except Exception as e:
+                        logger.error(f"Failed to encode chunk embedding: {e}")
+
+                await f.write(json.dumps(chunk) + "\n")
 
         return {
             "status": "success",
@@ -117,7 +136,7 @@ class IngestionEngine:
         self.memory_strategy = MemoryIngestionStrategy(self.ukg)
         self.persistent_strategy = PersistentIngestionStrategy(storage_path)
 
-    def ingest(self, data: Any, metadata: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    async def ingest(self, data: Any, metadata: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         """
         Main entry point.
         """
@@ -144,4 +163,4 @@ class IngestionEngine:
                 strategy = self.memory_strategy
 
         logger.info(f"Ingesting data using {strategy.__class__.__name__}...")
-        return strategy.ingest(data, metadata)
+        return await strategy.ingest(data, metadata)

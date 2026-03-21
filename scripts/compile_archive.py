@@ -6,7 +6,7 @@ from datetime import datetime
 # Define directories
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 NEWSLETTER_DIR = os.path.join(BASE_DIR, 'core', 'libraries_and_archives', 'restored_newsletters')
-OUTPUT_FILE = os.path.join(BASE_DIR, 'showcase', 'data', 'market_mayhem_archive.json')
+OUTPUT_FILE = os.path.join(BASE_DIR, 'data', 'market_mayhem_archive.json')
 
 def extract_date_from_filename(filename):
     """Attempt to extract a date from a filename like newsletter_market_mayhem_apr_04_2025.html"""

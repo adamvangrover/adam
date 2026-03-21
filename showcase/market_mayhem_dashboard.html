@@ -9,7 +9,6 @@
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="js/market_mayhem_data_static.js"></script>
     
     <style>
         :root {
@@ -890,28 +889,12 @@
         async function initDashboard() {
             try {
                 // Fetch Simulation Data (Updated to local ./data path for better portability)
-                let data;
-                try {
-                    const response = await fetch('./data/market_mayhem_data.json');
-                    data = await response.json();
-                } catch (e) {
-                    console.warn("Could not fetch local market_mayhem_data.json, using fallback.");
-                    data = window.MARKET_MAYHEM_DATA_FALLBACK || {
-                        synthesis: {status: "FALLBACK", narrative: "Static data fallback active.", early_warning_indicators: []},
-                        portfolio: [],
-                        outlook: {labels: [], historical_spx: [], base_cone: [], bull_cone: [], bear_cone: []}
-                    };
-                }
+                const response = await fetch('./data/market_mayhem_data.json');
+                const data = await response.json();
                 
                 // Fetch Archive Data
-                let archiveData;
-                try {
-                    const archiveResponse = await fetch('./data/market_mayhem_archive.json');
-                    archiveData = await archiveResponse.json();
-                } catch (e) {
-                    console.warn("Could not fetch local market_mayhem_archive.json, using fallback.");
-                    archiveData = window.MARKET_MAYHEM_ARCHIVE_FALLBACK || [];
-                }
+                const archiveResponse = await fetch('./data/market_mayhem_archive.json');
+                const archiveData = await archiveResponse.json();
 
                 renderSynthesis(data.synthesis, data.indicators || data.synthesis.early_warning_indicators);
                 renderPortfolio(data.portfolio);

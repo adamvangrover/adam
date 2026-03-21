@@ -49,7 +49,6 @@ class WACCInputs(BaseModel):
 
 class DCFInputs(WACCInputs):
     growth_rates: List[float] = Field(..., description="List of EBITDA growth rates for the projection period")
-    terminal_growth_rate: Optional[float] = Field(default=None, description="Optional override for terminal growth rate")
 
 class DCFOutput(BaseModel):
     enterprise_value: float
@@ -101,7 +100,7 @@ def calculate_dcf(inputs: DCFInputs) -> DCFOutput:
         equity_percent=inputs.equity_percent
     )
 
-    df_proj, ev, wacc = engine.run_dcf(inputs.growth_rates, terminal_growth_rate=inputs.terminal_growth_rate)
+    df_proj, ev, wacc = engine.run_dcf(inputs.growth_rates)
 
     # Convert DataFrame to list of dicts for JSON serialization
     projections = df_proj.to_dict(orient='records')

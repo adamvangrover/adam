@@ -8,11 +8,11 @@ import os
 import yaml
 import json
 import threading
-import asyncio
 import uuid
+import asyncio
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 from contextvars import ContextVar
 
 # Centralized Context for Trace IDs
@@ -179,28 +179,25 @@ class SwarmLogger:
         except Exception as e:
             logging.error(f"Failed to write swarm telemetry event: {e}")
 
+    async def async_log_event(self, event_type: str, agent_id: str, details: dict[str, Any]) -> None:
+        """Non-blocking helper to log structured events via asyncio.to_thread."""
+        await asyncio.to_thread(self.log_event, event_type, agent_id, details)
+
     def log_thought(self, agent_id: str, thought: str) -> None:
         """Helper to log internal agent reasoning (THOUGHT_TRACE)."""
         self.log_event("THOUGHT_TRACE", agent_id, {"content": thought})
+
+    async def async_log_thought(self, agent_id: str, thought: str) -> None:
+        """Non-blocking helper to log internal agent reasoning via asyncio.to_thread."""
+        await asyncio.to_thread(self.log_thought, agent_id, thought)
 
     def log_tool(self, agent_id: str, tool_name: str, params: dict[str, Any]) -> None:
         """Helper to log tool execution (TOOL_EXECUTION)."""
         self.log_event("TOOL_EXECUTION", agent_id, {"tool": tool_name, "parameters": params})
 
-    # --- Async Logging Methods ---
-
-    async def async_log_event(self, event_type: str, agent_id: str, details: dict[str, Any]) -> None:
-        """Async version of log_event to prevent blocking the event loop."""
-        await asyncio.to_thread(self.log_event, event_type, agent_id, details)
-
-    async def async_log_thought(self, agent_id: str, thought: str) -> None:
-        """Async helper to log internal agent reasoning (THOUGHT_TRACE)."""
-        await self.async_log_event("THOUGHT_TRACE", agent_id, {"content": thought})
-
     async def async_log_tool(self, agent_id: str, tool_name: str, params: dict[str, Any]) -> None:
-        """Async helper to log tool execution (TOOL_EXECUTION)."""
-        await self.async_log_event("TOOL_EXECUTION", agent_id, {"tool": tool_name, "parameters": params})
-
+        """Non-blocking helper to log tool execution via asyncio.to_thread."""
+        await asyncio.to_thread(self.log_tool, agent_id, tool_name, params)
 
 class NarrativeLogger:
     """
@@ -226,14 +223,21 @@ class NarrativeLogger:
             "5_Metadata": metadata or {}
         }
         self.logger.info(f"NARRATIVE:\n{json.dumps(story, indent=2)}")
-
 # --- From logger.py ---
 def setup_logger(name: str, level=None) -> 'logging.Logger':
+    import logging
     if level is None:
         level = logging.INFO
     return get_logger(name) # Reusing get_logger from logging_utils
 
 # --- From system_logger.py ---
+import json
+import logging
+import os
+from datetime import datetime
+from typing import Any, Dict, List, Optional
+from pathlib import Path
+
 class SystemLogger:
     """
     A unified logging system for the Adam platform to capture critical state changes,
@@ -280,6 +284,7 @@ class SystemLogger:
         except Exception as e:
             self.logger.error(f"Failed to read system log: {e}")
         return events
+
 
     def consolidate_logs(self) -> None:
         events = self._read_events()
@@ -339,10 +344,10 @@ def create_timestamped_system_file(input_data: Dict[str, Any], output_filename: 
         print(f"System state snapshot saved to {filename}")
     except Exception as e:
         print(f"Failed to save system state snapshot: {e}")
-
 # --- From microscopic_telemetry.py ---
 import time
 import psutil
+import uuid
 
 class MicroscopicTelemetry:
     """

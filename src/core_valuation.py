@@ -33,7 +33,7 @@ class ValuationEngine:
         wacc = (self.we * ke) + (self.wd * self.kd * (1 - self.t))
         return wacc
 
-    def run_dcf(self, growth_rates: List[float], terminal_growth_rate: float = None) -> Tuple[pd.DataFrame, float, float]:
+    def run_dcf(self, growth_rates: List[float]) -> Tuple[pd.DataFrame, float, float]:
         """
         Generates Free Cash Flow (FCF) projections and calculates Enterprise Value.
 
@@ -51,7 +51,7 @@ class ValuationEngine:
             raise ValueError(f"Expected exactly {years} growth rates, got {len(growth_rates)}.")
 
         wacc = self.calculate_wacc()
-        g = float(terminal_growth_rate if terminal_growth_rate is not None else DEFAULT_ASSUMPTIONS['terminal_growth_rate'])
+        g = float(DEFAULT_ASSUMPTIONS['terminal_growth_rate'])
 
         if wacc <= g:
             raise ValueError(f"WACC ({wacc:.4f}) must be greater than terminal growth rate ({g:.4f}) to calculate terminal value.")

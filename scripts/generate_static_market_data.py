@@ -16,9 +16,7 @@ def main():
     files_to_load = {
         "MARKET_MAYHEM_DATA": os.path.join(base_dir, "market_mayhem_index.json"),
         "STRATEGIC_COMMAND_DATA": os.path.join(base_dir, "strategic_command.json"),
-        "SP500_MARKET_DATA": os.path.join(base_dir, "sp500_market_data.json"),
-        "MARKET_MAYHEM_DATA_FALLBACK": os.path.join(base_dir, "market_mayhem_data.json"),
-        "MARKET_MAYHEM_ARCHIVE_FALLBACK": os.path.join(base_dir, "market_mayhem_archive.json")
+        "SP500_MARKET_DATA": os.path.join(base_dir, "sp500_market_data.json")
     }
 
     js_content = "// AUTO-GENERATED FILE. DO NOT EDIT.\n// Fallback static data for serverless environments.\n\n"

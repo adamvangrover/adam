@@ -373,7 +373,8 @@ class UniversalIngestor:
 
         if "reports" in str(filepath):
             artifact_type = ArtifactType.REPORT
-            title = data.get("title", data.get("company_name", title))
+            if isinstance(data, dict):
+                title = data.get("title", data.get("company_name", title))
         elif "prompt" in str(filepath):
             artifact_type = ArtifactType.PROMPT
 
@@ -521,7 +522,8 @@ class UniversalIngestor:
 
         if "reports" in str(filepath):
             artifact_type = ArtifactType.REPORT
-            title = data.get("title", data.get("company_name", title))
+            if isinstance(data, dict):
+                title = data.get("title", data.get("company_name", title))
         elif "prompt" in str(filepath):
             artifact_type = ArtifactType.PROMPT
 

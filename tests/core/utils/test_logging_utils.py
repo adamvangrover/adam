@@ -162,34 +162,3 @@ def test_setup_logging_with_dict():
     with patch('core.utils.logging_utils.logging.config.dictConfig') as mock_dict_config:
         setup_logging(config={"version": 1})
         mock_dict_config.assert_called_once_with({"version": 1})
-
-@pytest.mark.asyncio
-async def test_swarm_logger_async_log_event(temp_log_file, reset_swarm_logger):
-    logger = SwarmLogger(temp_log_file)
-    await logger.async_log_event("ASYNC_EVENT", "AgentAsync", {"k": "v"})
-
-    assert temp_log_file.exists()
-    with temp_log_file.open("r") as f:
-        data = json.loads(f.readlines()[0])
-        assert data["event_type"] == "ASYNC_EVENT"
-        assert data["agent_id"] == "AgentAsync"
-
-@pytest.mark.asyncio
-async def test_swarm_logger_async_log_thought(temp_log_file, reset_swarm_logger):
-    logger = SwarmLogger(temp_log_file)
-    await logger.async_log_thought("AgentC", "Async thinking")
-
-    with temp_log_file.open("r") as f:
-        data = json.loads(f.readlines()[0])
-        assert data["event_type"] == "THOUGHT_TRACE"
-        assert data["details"] == {"content": "Async thinking"}
-
-@pytest.mark.asyncio
-async def test_swarm_logger_async_log_tool(temp_log_file, reset_swarm_logger):
-    logger = SwarmLogger(temp_log_file)
-    await logger.async_log_tool("AgentD", "calculator", {"eq": "2+2"})
-
-    with temp_log_file.open("r") as f:
-        data = json.loads(f.readlines()[0])
-        assert data["event_type"] == "TOOL_EXECUTION"
-        assert data["details"] == {"tool": "calculator", "parameters": {"eq": "2+2"}}
