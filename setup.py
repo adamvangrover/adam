@@ -59,7 +59,9 @@ if not install_requires:
         "pydantic>=2.0.0",
         "requests>=2.31.0",
         "fastapi>=0.100.0",
-        "uvicorn>=0.23.0"
+        "uvicorn>=0.23.0",
+        "aiofiles>=23.0.0",
+        "sentence-transformers>=2.2.0"
     ]
 
 setup(

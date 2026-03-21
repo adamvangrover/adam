@@ -30,11 +30,19 @@ class ReflectorAgent(AgentBase):
             config = {"name": "ReflectorAgent"}
         super().__init__(config, kernel=kernel)
 
-    async def execute(self, input_data: AgentInput) -> AgentOutput:
+    async def execute(self, input_data: Union[AgentInput, Dict[str, Any]]) -> Union[AgentOutput, Dict[str, Any]]:
         """
         Analyzes the provided content (reasoning trace, report, etc.) and provides a critique.
         """
-        content_to_analyze = input_data.query
+        # Handle both legacy dict payloads and new Pydantic AgentInput
+        if isinstance(input_data, dict):
+            content_to_analyze = input_data.get("query", input_data.get("payload", ""))
+            context = input_data.get("context", {})
+            return_dict = True
+        else:
+            content_to_analyze = input_data.query
+            context = input_data.context if hasattr(input_data, 'context') else {}
+            return_dict = False
 
         logger.info("ReflectorAgent: Analyzing content for self-correction...")
 
@@ -51,16 +59,21 @@ class ReflectorAgent(AgentBase):
                 else:
                     result = reflector_app.invoke(initial_state, config=config)
 
+                out_metadata = {
+                    "original_content_snippet": content_to_analyze[:100] + "...",
+                    "critique_notes": result.get("critique_notes", []),
+                    "quality_score": result.get("score", 0.0) * 10,
+                    "verification_status": "PASS" if result.get("is_valid") else "NEEDS_REVISION"
+                }
+
+                if return_dict:
+                    return out_metadata
+
                 return AgentOutput(
                     answer=result.get("refined_content", "No refinement needed."),
                     sources=["ReflectorGraph"],
                     confidence=result.get("score", 0.0),
-                    metadata={
-                        "original_content_snippet": content_to_analyze[:100] + "...",
-                        "critique_notes": result.get("critique_notes", []),
-                        "quality_score": result.get("score", 0.0) * 10,
-                        "verification_status": "PASS" if result.get("is_valid") else "NEEDS_REVISION"
-                    }
+                    metadata=out_metadata
                 )
             except Exception as e:
                 logging.error(f"ReflectorGraph execution failed: {e}. Falling back to heuristics.")
@@ -84,14 +97,19 @@ class ReflectorAgent(AgentBase):
             critique.append("No explicit sources cited. Risk of hallucination.")
             score -= 1.5
 
+        out_metadata = {
+            "original_content_snippet": content_to_analyze[:100] + "...",
+            "critique_notes": critique,
+            "quality_score": score,
+            "verification_status": "PASS" if score > 7.0 else "NEEDS_REVISION"
+        }
+
+        if return_dict:
+            return out_metadata
+
         return AgentOutput(
             answer="Critique complete.",
             sources=["StaticHeuristics"],
             confidence=score / 10.0,
-            metadata={
-                "original_content_snippet": content_to_analyze[:100] + "...",
-                "critique_notes": critique,
-                "quality_score": score,
-                "verification_status": "PASS" if score > 7.0 else "NEEDS_REVISION"
-            }
+            metadata=out_metadata
         )
