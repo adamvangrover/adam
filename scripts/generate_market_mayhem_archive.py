@@ -580,7 +580,7 @@ def parse_html_file(filepath):
 
         filename = os.path.basename(filepath)
 
-        if filename in ["index.html", "market_mayhem_archive.html", "market_mayhem_archive_v24.html", "daily_briefings_library.html",
+        if filename in ["index.html", "market_mayhem_archive.html", "daily_briefings_library.html",
                         "market_pulse_library.html", "house_view_library.html", "portfolio_dashboard.html",
                         "data.html", "reports.html", "agents.html", "chat.html", "market_mayhem_rebuild.html", "market_mayhem_conviction.html",
                         "live_market_pulse.html", "macro_glitch_monitor.html", "financial_twin.html", "war_room.html",
@@ -846,9 +846,9 @@ def generate_archive():
 
         # Entity HTML
         entity_html = ""
-        for t in item['entities']['tickers']: entity_html += f'<a href="market_mayhem_archive_v24.html?search={t}" class="tag ticker" style="text-decoration:none;">${t}</a>'
-        for s in item['entities']['sovereigns']: entity_html += f'<a href="market_mayhem_archive_v24.html?search={s}" class="tag" style="text-decoration:none;">{s}</a>'
-        for k in item['entities'].get('keywords', []): entity_html += f'<a href="market_mayhem_archive_v24.html?search={k}" class="tag" style="text-decoration:none; border-color:#666;">{k}</a>'
+        for t in item['entities']['tickers']: entity_html += f'<a href="market_mayhem_archive.html?search={t}" class="tag ticker" style="text-decoration:none;">${t}</a>'
+        for s in item['entities']['sovereigns']: entity_html += f'<a href="market_mayhem_archive.html?search={s}" class="tag" style="text-decoration:none;">{s}</a>'
+        for k in item['entities'].get('keywords', []): entity_html += f'<a href="market_mayhem_archive.html?search={k}" class="tag" style="text-decoration:none; border-color:#666;">{k}</a>'
 
         if not entity_html:
             entity_html = f'<span class="tag" style="border-color:#444;">{item["type"]}</span>'
