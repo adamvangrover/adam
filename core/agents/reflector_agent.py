@@ -50,7 +50,7 @@ class ReflectorAgent(AgentBase):
         if GRAPH_AVAILABLE and reflector_app:
             logging.info("ReflectorAgent: Delegating to v23 ReflectorGraph.")
 
-            initial_state = init_reflector_state(content_to_analyze, context)
+            initial_state = init_reflector_state(content_to_analyze, input_data.context)
             config = {"configurable": {"thread_id": "1"}}
 
             try:
