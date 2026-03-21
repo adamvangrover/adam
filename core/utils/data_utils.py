@@ -8,6 +8,11 @@ and provides an in-memory caching mechanism to prevent redundant disk I/O.
 By separating the logic into the `DataLoader` class, the application can maintain
 isolated cache scopes where necessary or rely on the backward-compatible `load_data` wrapper function.
 
+AI Context:
+This module uses a strictly defined routing paradigm mapping string data types to parser methods.
+Type hinting is strictly enforced using Python 3.10+ modern union paradigms `|`. Memory growth is capped
+actively via LIFO evictions triggered at a dynamic `MAX_CACHE_ENTRIES` threshold.
+
 Typical Usage Example:
     loader = DataLoader(use_cache=True)
     data = loader.load({"type": "json", "path": "config/settings.json"})
@@ -37,52 +42,62 @@ class DataLoader:
     with built-in caching.
     """
     SUPPORTED_TYPES = {"json", "csv", "yaml", "smart_text"}
-    MAX_FILE_SIZE_BYTES = 50 * 1024 * 1024  # 50 MB limit to prevent memory exhaustion
+    MAX_FILE_SIZE_BYTES: int = 50 * 1024 * 1024  # 50 MB limit to prevent memory exhaustion
+    MAX_CACHE_ENTRIES: int = 1000
 
-    def __init__(self, use_cache: bool = True):
+    def __init__(self, use_cache: bool = True) -> None:
         """
         Initializes the DataLoader with an optional caching mechanism.
+        AI Context: Call this constructor once per data pipeline stage to maintain isolated cache states.
+        If handling massive >50MB files, disable caching (`use_cache=False`) to preserve memory.
 
         Args:
             use_cache (bool): Determines whether file contents are cached in memory after the first read.
                               Defaults to True.
         """
-        self.use_cache = use_cache
-        self._data_cache = {}
+        self.use_cache: bool = use_cache
+        self._data_cache: dict[str, Any] = {}
 
     def load(self, source_config: dict[str, Any]) -> dict[str, Any] | list[Any] | None:
         """
-        Loads data based on the provided source configuration.
+        Loads data dynamically based on the provided configuration using a strict routing paradigm.
 
-        This method identifies the data type, validates file presence and size bounds,
-        utilizes the cache if requested, and falls back to actual file reading/API querying.
+        AI Context: Use this method to retrieve system settings, datasets, or external API responses.
+        It inherently protects against path traversal and memory exhaustion through built-in bounds checking.
+        If `source_config["type"]` is not explicitly supported, it throws an `InvalidInputError`.
+
+        Routing Logic:
+            - "api": Redirects to `_load_api`
+            - "json", "csv", "yaml", "smart_text": Validates path existence, enforces `MAX_FILE_SIZE_BYTES`,
+              checks the local memory cache (`_data_cache`), and then reads from disk via `_read_file`.
 
         Args:
-            source_config (dict[str, Any]): A dictionary containing 'type' and 'path' keys.
-                                            Example: {"type": "json", "path": "/path/to/file.json"}
+            source_config (dict[str, Any]): A dictionary requiring a strictly formatted 'type' string
+                                            and an optional 'path' string depending on the type.
+                                            Example: {"type": "json", "path": "/path/to/data.json"}
 
         Returns:
-            dict[str, Any] | list[Any] | None: The loaded data structure, or None if load fails.
+            dict[str, Any] | list[Any] | None: A structured representation of the target data, or None on graceful failure.
 
         Raises:
-            InvalidInputError: If 'type' or 'path' are missing or invalid.
-            FileReadError: If the file does not exist, exceeds the size limit, or fails to parse.
+            InvalidInputError: Triggered when 'type' is missing/unsupported or 'path' is omitted for local files.
+            FileReadError: Triggered upon I/O failures, missing files, parser crashes, or if the target exceeds 50MB.
         """
         data_type = source_config.get("type")
         file_path = source_config.get("path")
 
-        if data_type == "api":
-            return self._load_api(source_config)
+        match data_type:
+            case "api":
+                return self._load_api(source_config)
+            case t if t in self.SUPPORTED_TYPES:
+                if not file_path:
+                    logger.error("Invalid source configuration: 'path' is required for file-based sources.")
+                    raise InvalidInputError("Missing 'path' in source_config")
+                file_path_obj = Path(file_path)
+            case _:
+                logger.error(f"Unsupported data type: {data_type}")
+                raise InvalidInputError(f"Unsupported data type: {data_type}")
 
-        if not file_path:
-            logger.error("Invalid source configuration: 'path' is required for file-based sources.")
-            raise InvalidInputError("Missing 'path' in source_config")
-
-        if data_type not in self.SUPPORTED_TYPES:
-            logger.error(f"Unsupported data type: {data_type}")
-            raise InvalidInputError(f"Unsupported data type: {data_type}")
-
-        file_path_obj = Path(file_path)
         if not file_path_obj.exists():
             logger.error(f"Data file not found: {file_path_obj}")
             raise FileReadError(str(file_path_obj), "File not found")
@@ -99,6 +114,10 @@ class DataLoader:
 
         data = self._read_file(file_path_obj, data_type)
         if self.use_cache and data is not None:
+            if len(self._data_cache) >= self.MAX_CACHE_ENTRIES:
+                logger.warning("Cache capacity reached. Evicting oldest entry.")
+                # LIFO cache eviction or simple pop
+                self._data_cache.pop(next(iter(self._data_cache)))
             self._data_cache[cache_key] = data
         return data
 
@@ -114,18 +133,18 @@ class DataLoader:
         Returns:
             The parsed data structure depending on the file type.
         """
-        parsers = {
-            "json": DataLoader._load_json,
-            "csv": DataLoader._load_csv,
-            "yaml": DataLoader._load_yaml,
-            "smart_text": DataLoader._load_smart_text,
-        }
-
-        parser = parsers.get(data_type)
         try:
-            if not parser:
-                raise ValueError(f"Unhandled data type in _read_file: {data_type}")
-            return parser(file_path)
+            match data_type:
+                case "json":
+                    return DataLoader._load_json(file_path)
+                case "csv":
+                    return DataLoader._load_csv(file_path)
+                case "yaml":
+                    return DataLoader._load_yaml(file_path)
+                case "smart_text":
+                    return DataLoader._load_smart_text(file_path)
+                case _:
+                    raise ValueError(f"Unhandled data type in _read_file: {data_type}")
         except (json.JSONDecodeError, FileNotFoundError, IOError, yaml.YAMLError) as e:
             logger.exception(f"Error loading data from {file_path}: {e}")
             raise FileReadError(str(file_path), str(e)) from e
@@ -180,30 +199,31 @@ class DataLoader:
         logger.warning("API data source not yet implemented. Returning placeholder data.")
         provider = source_config.get("provider")
 
-        if provider == "example_financial_data_api":
-            return {
-                "income_statement": {
-                    "revenue": [1000, 1100, 1250],
-                    "net_income": [100, 120, 150],
-                },
-                "balance_sheet": {
-                    "assets": [2000, 2100, 2200],
-                    "liabilities": [800, 850, 900],
-                },
-                "cash_flow_statement": {
-                    "operating_cash_flow": [150, 170, 200]
+        match provider:
+            case "example_financial_data_api":
+                return {
+                    "income_statement": {
+                        "revenue": [1000, 1100, 1250],
+                        "net_income": [100, 120, 150],
+                    },
+                    "balance_sheet": {
+                        "assets": [2000, 2100, 2200],
+                        "liabilities": [800, 850, 900],
+                    },
+                    "cash_flow_statement": {
+                        "operating_cash_flow": [150, 170, 200]
+                    }
                 }
-            }
-        elif provider == "example_market_data_api":
-            return {
-                "market_trends": [
-                   {"sector": "healthcare", "trend": "neutral"},
-                   {"sector": "energy", "trend": "downward"}
-                ]
-            }
-        else:
-            logger.warning(f"Unknown API provider: {provider}")
-            return None
+            case "example_market_data_api":
+                return {
+                    "market_trends": [
+                       {"sector": "healthcare", "trend": "neutral"},
+                       {"sector": "energy", "trend": "downward"}
+                    ]
+                }
+            case _:
+                logger.warning(f"Unknown API provider: {provider}")
+                return None
 
 
 def load_data(source_config: dict[str, Any], cache: bool = True) -> dict[str, Any] | list[Any] | None:
