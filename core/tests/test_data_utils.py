@@ -1,13 +1,12 @@
-import json
 import csv
-import yaml
-from pathlib import Path
-from unittest.mock import patch, mock_open
+import json
 
 import pytest
+import yaml
 
-from core.utils.data_utils import DataLoader, load_data
 from core.system.error_handler import FileReadError, InvalidInputError
+from core.utils.data_utils import DataLoader, load_data
+
 
 @pytest.fixture
 def temp_json_file(tmp_path):
@@ -95,6 +94,12 @@ def test_load_unsupported_type(temp_json_file):
     with pytest.raises(InvalidInputError, match="Unsupported data type: xml"):
         loader.load({"type": "xml", "path": str(temp_json_file)})
 
+def test_unsupported_type_match_routing():
+    """Verify that match-case strictly enforces supported types before checking path."""
+    loader = DataLoader()
+    with pytest.raises(InvalidInputError, match="Unsupported data type: unsupported"):
+        loader.load({"type": "unsupported", "path": "doesnt_matter.json"})
+
 def test_load_file_not_found(tmp_path):
     loader = DataLoader()
     file_path = tmp_path / "nonexistent.json"
@@ -122,6 +127,35 @@ def test_caching_behavior(temp_json_file):
 
     result2 = loader.load({"type": "json", "path": str(temp_json_file)})
     assert result2 == {"key": "value"}
+
+def test_cache_eviction_limit(tmp_path):
+    loader = DataLoader(use_cache=True)
+    loader.MAX_CACHE_ENTRIES = 2
+
+    file1 = tmp_path / "data1.json"
+    file2 = tmp_path / "data2.json"
+    file3 = tmp_path / "data3.json"
+
+    with open(file1, "w") as f:
+        json.dump({"id": 1}, f)
+    with open(file2, "w") as f:
+        json.dump({"id": 2}, f)
+    with open(file3, "w") as f:
+        json.dump({"id": 3}, f)
+
+    loader.load({"type": "json", "path": str(file1)})
+    loader.load({"type": "json", "path": str(file2)})
+
+    assert len(loader._data_cache) == 2
+    assert str(file1) in loader._data_cache
+
+    # Load 3rd file, triggering eviction
+    loader.load({"type": "json", "path": str(file3)})
+
+    assert len(loader._data_cache) == 2
+    # File 1 should have been evicted due to LIFO / pop(next(iter))
+    assert str(file1) not in loader._data_cache
+    assert str(file3) in loader._data_cache
 
 def test_caching_disabled(temp_json_file):
     loader = DataLoader(use_cache=False)
