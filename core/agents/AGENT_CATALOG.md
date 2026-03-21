@@ -1011,3 +1011,18 @@ This document provides a comprehensive catalog of all the agents in the ADAM sys
 *   **Compute and Resource Requirements:** Medium (Database I/O, LLM context).
 *   **Dependencies:** None.
 *   **Developer Notes:** Critical for maintaining persona and context over long time horizons.
+
+---
+
+## `omega_meta_orchestrator`
+
+*   **File:** `core/agents/meta_agents/omega_meta_orchestrator.py`
+*   **Description:** The root metacognitive System 2 DAG router via Pydantic for ADAM v26.1. It acts as the core orchestrator, dynamically routing user requests to either the Fast Swarm Path (System 1) or the Slow Graph Reasoning Path (System 2) based on query complexity.
+*   **Configuration:** `config/agents.yaml`
+*   **Architecture and Base Agent:** Inherits from `core.agents.templates.omega_agent.OmegaAgent` or similar core templates, utilizing strictly validated Pydantic models for inputs and outputs.
+*   **Agent Forge and Lifecycle:** Runs continuously or invoked on-demand to handle top-level user interactions and cognitive routing.
+*   **Model Context Protocol (MCP):** Operates primarily with strict JSON Pydantic structures.
+*   **Tools and Hooks:** Connects with `PheromoneDB` (System 1 cache) and LangGraph engines (System 2).
+*   **Compute and Resource Requirements:** Variable, primarily lightweight routing with heavy downstream LLM usage depending on the selected path.
+*   **Dependencies:** `pydantic`, `logging`, LangGraph, `PheromoneDB`.
+*   **Developer Notes:** As the central hub of v26.1 architecture, all modifications to core system routing should pass through or interface directly with Omega.
