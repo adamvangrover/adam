@@ -31,11 +31,12 @@ def test_chunking_engine_recursive():
     # Check simple overlap logic
     assert len(chunks[0]['text']) <= 50
 
-def test_ingestion_memory_strategy(setup_teardown):
+@pytest.mark.asyncio
+async def test_ingestion_memory_strategy(setup_teardown):
     engine = IngestionEngine(mode="memory")
     data = [{"symbol": "TEST", "sector": "Tech", "description": "Test Corp"}]
 
-    result = engine.ingest(data)
+    result = await engine.ingest(data)
 
     assert result["status"] == "success"
     assert result["mode"] == "memory"
@@ -43,7 +44,8 @@ def test_ingestion_memory_strategy(setup_teardown):
 
     # Verify it hit the UKG (Singleton might be tricky in tests, but we trust the return for now)
 
-def test_ingestion_persistent_strategy(setup_teardown):
+@pytest.mark.asyncio
+async def test_ingestion_persistent_strategy(setup_teardown):
     engine = IngestionEngine(mode="persistent", storage_path=TEST_DATA_DIR)
 
     # Create dummy large file
@@ -51,7 +53,7 @@ def test_ingestion_persistent_strategy(setup_teardown):
     with open(file_path, "w") as f:
         f.write("A" * 5000) # 5KB
 
-    result = engine.ingest(file_path)
+    result = await engine.ingest(file_path)
 
     assert result["status"] == "success"
     assert result["mode"] == "persistent"
@@ -68,15 +70,16 @@ def test_ingestion_persistent_strategy(setup_teardown):
         first_chunk = json.loads(lines[0])
         assert "vector_id" in first_chunk
 
-def test_ingestion_auto_strategy(setup_teardown):
+@pytest.mark.asyncio
+async def test_ingestion_auto_strategy(setup_teardown):
     engine = IngestionEngine(mode="auto", storage_path=TEST_DATA_DIR)
 
     # 1. Structured Data -> Memory
     data_struct = [{"symbol": "AUTO", "sector": "Auto"}]
-    res_mem = engine.ingest(data_struct)
+    res_mem = await engine.ingest(data_struct)
     assert res_mem["mode"] == "memory"
 
     # 2. Large Text -> Persistent
     large_text = "B" * 15000
-    res_persist = engine.ingest(large_text)
+    res_persist = await engine.ingest(large_text)
     assert res_persist["mode"] == "persistent"
