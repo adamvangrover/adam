@@ -1,13 +1,16 @@
 import ast
+import asyncio
 import json
 import re
 import uuid
-import asyncio
-import aiofiles
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
 from typing import Any
+
+import aiofiles
+
+from core.data_processing.chunking_engine import ChunkingEngine
 
 # --- EMBEDDED SCRUBBER (Merged for stability) ---
 
@@ -227,6 +230,7 @@ class UniversalIngestor:
 
     def __init__(self):
         self.artifacts: list[GoldStandardArtifact] = []
+        self.chunking_engine = ChunkingEngine(strategy="semantic")
 
     def scan_directory(self, root_path: str, recursive: bool = True):
         """
@@ -415,24 +419,15 @@ class UniversalIngestor:
 
         lines = text.split('\n')
         title = filepath.name
-        chunks = []
-        current_chunk = []
 
-        # Innovative Markdown Chunking (Semantic Simulation)
         for line in lines:
             if line.strip().startswith('# '):
                 title = line.strip().replace('# ', '')
+                break
 
-            # Start a new chunk at any header level
-            if line.strip().startswith('#'):
-                if current_chunk:
-                    chunks.append("\n".join(current_chunk))
-                current_chunk = [line]
-            else:
-                current_chunk.append(line)
-
-        if current_chunk:
-            chunks.append("\n".join(current_chunk))
+        # Semantic Chunking via ChunkingEngine
+        chunk_dicts = self.chunking_engine.chunk(text)
+        chunks = [c["text"] for c in chunk_dicts if "text" in c]
 
         artifact_type = ArtifactType.CODE_DOC
         if "prompt" in str(filepath):
@@ -442,7 +437,7 @@ class UniversalIngestor:
 
         metadata = GoldStandardScrubber.extract_metadata(text, artifact_type.value)
 
-        # Innovator Payload: Simulated Vector Database / RAG embedding prep
+        # Vector Database / RAG embedding prep
         metadata["semantic_chunks"] = len(chunks)
         metadata["chunk_preview"] = chunks[0][:100] + "..." if chunks else ""
 
@@ -459,11 +454,17 @@ class UniversalIngestor:
         with filepath.open('r', encoding='utf-8', errors='ignore') as f:
             text = GoldStandardScrubber.clean_text(f.read())
 
+        # Semantic Chunking via ChunkingEngine
+        chunk_dicts = self.chunking_engine.chunk(text)
+        chunks = [c["text"] for c in chunk_dicts if "text" in c]
+
         metadata = GoldStandardScrubber.extract_metadata(text, ArtifactType.UNKNOWN.value)
+        metadata["semantic_chunks"] = len(chunks)
+        metadata["chunk_preview"] = chunks[0][:100] + "..." if chunks else ""
 
         artifact = GoldStandardArtifact(
             source_path=str(filepath),
-            content=text,
+            content={"full_text": text, "chunks": chunks},
             artifact_type=ArtifactType.UNKNOWN,
             title=filepath.name,
             metadata=metadata
@@ -564,24 +565,15 @@ class UniversalIngestor:
 
         lines = text.split('\n')
         title = filepath.name
-        chunks = []
-        current_chunk = []
 
-        # Innovative Markdown Chunking (Semantic Simulation)
         for line in lines:
             if line.strip().startswith('# '):
                 title = line.strip().replace('# ', '')
+                break
 
-            # Start a new chunk at any header level
-            if line.strip().startswith('#'):
-                if current_chunk:
-                    chunks.append("\n".join(current_chunk))
-                current_chunk = [line]
-            else:
-                current_chunk.append(line)
-
-        if current_chunk:
-            chunks.append("\n".join(current_chunk))
+        # Semantic Chunking via ChunkingEngine
+        chunk_dicts = self.chunking_engine.chunk(text)
+        chunks = [c["text"] for c in chunk_dicts if "text" in c]
 
         artifact_type = ArtifactType.CODE_DOC
         if "prompt" in str(filepath):
@@ -591,7 +583,7 @@ class UniversalIngestor:
 
         metadata = GoldStandardScrubber.extract_metadata(text, artifact_type.value)
 
-        # Innovator Payload: Simulated Vector Database / RAG embedding prep
+        # Vector Database / RAG embedding prep
         metadata["semantic_chunks"] = len(chunks)
         metadata["chunk_preview"] = chunks[0][:100] + "..." if chunks else ""
 
@@ -609,11 +601,17 @@ class UniversalIngestor:
             raw_text = await f.read()
             text = GoldStandardScrubber.clean_text(raw_text)
 
+        # Semantic Chunking via ChunkingEngine
+        chunk_dicts = self.chunking_engine.chunk(text)
+        chunks = [c["text"] for c in chunk_dicts if "text" in c]
+
         metadata = GoldStandardScrubber.extract_metadata(text, ArtifactType.UNKNOWN.value)
+        metadata["semantic_chunks"] = len(chunks)
+        metadata["chunk_preview"] = chunks[0][:100] + "..." if chunks else ""
 
         artifact = GoldStandardArtifact(
             source_path=str(filepath),
-            content=text,
+            content={"full_text": text, "chunks": chunks},
             artifact_type=ArtifactType.UNKNOWN,
             title=filepath.name,
             metadata=metadata
