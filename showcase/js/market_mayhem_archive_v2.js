@@ -52,20 +52,31 @@ class MarketMayhemController {
 
     async loadData() {
         try {
-            const [strategic, market, archive] = await Promise.all([
-                fetch('data/strategic_command.json').then(r => r.json()).catch(() => null),
-                fetch('data/sp500_market_data.json').then(r => r.json()).catch(() => null),
-                fetch('data/market_mayhem_index.json').then(r => r.json()).catch(() => null)
-            ]);
+            // Only attempt fetch if not explicitly running a file:// scheme which blocks CORS
+            const isLocalFile = window.location.protocol === 'file:';
+            let strategic = null, market = null, archive = null;
+
+            if (!isLocalFile) {
+                [strategic, market, archive] = await Promise.all([
+                    fetch('data/strategic_command.json').then(r => r.ok ? r.json() : null).catch(() => null),
+                    fetch('data/sp500_market_data.json').then(r => r.ok ? r.json() : null).catch(() => null),
+                    fetch('data/market_mayhem_index.json').then(r => r.ok ? r.json() : null).catch(() => null)
+                ]);
+            }
 
             this.data.strategic = strategic || window.STRATEGIC_COMMAND_DATA || null;
-            this.data.market = market || window.SP500_MARKET_DATA || [];
-            this.data.archive = archive || window.MARKET_MAYHEM_DATA || [];
+            this.data.market = (market && market.length > 0) ? market : (window.SP500_MARKET_DATA || []);
+            this.data.archive = (archive && archive.length > 0) ? archive : (window.MARKET_MAYHEM_DATA || []);
+
+            // Fallback for missing archive data mapping
+            if (!this.data.archive || this.data.archive.length === 0) {
+                 this.data.archive = window.MARKET_MAYHEM_ARCHIVE_FALLBACK || window.MARKET_MAYHEM_DATA_FALLBACK || [];
+            }
         } catch (e) {
             console.warn("[MarketMayhem] Fetch failed, using static fallback data.", e);
             this.data.strategic = window.STRATEGIC_COMMAND_DATA || null;
             this.data.market = window.SP500_MARKET_DATA || [];
-            this.data.archive = window.MARKET_MAYHEM_DATA || [];
+            this.data.archive = window.MARKET_MAYHEM_DATA || window.MARKET_MAYHEM_ARCHIVE_FALLBACK || window.MARKET_MAYHEM_DATA_FALLBACK || [];
         }
     }
 
@@ -198,6 +209,7 @@ class MarketMayhemController {
         const impliedTarget = Math.round(currentSPX * (1 + avgUpside));
 
         // Mock Macro Data
+        const btcLevel = 105420;
         const treasury10y = 4.12;
         const bslIndex = 98.45;
         const bslSpread = "+350 bps";
@@ -215,6 +227,10 @@ class MarketMayhemController {
             <div class="metric-row">
                 <span class="metric-label">Implied S&P Target</span>
                 <span class="metric-val" style="color: #d946ef;">${impliedTarget}</span>
+            </div>
+            <div class="metric-row">
+                <span class="metric-label">BTC Level</span>
+                <span class="metric-val" style="color: #f59e0b;">${btcLevel.toLocaleString()}</span>
             </div>
             <div class="metric-row">
                 <span class="metric-label">10Y Treasury</span>
