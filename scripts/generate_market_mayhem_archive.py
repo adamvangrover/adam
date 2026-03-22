@@ -1288,6 +1288,11 @@ def generate_archive():
                 <div style="text-align:center; color:#666;">Loading Strategic Command...</div>
             </div>
 
+            <!-- Outlook -->
+            <div id="outlookPanel" class="sidebar-panel">
+                <!-- Injected via JS -->
+            </div>
+
             <!-- Top Conviction -->
             <div id="convictionPanel" class="sidebar-panel">
                 <!-- Injected via JS -->
