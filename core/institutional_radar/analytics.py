@@ -139,7 +139,10 @@ class InstitutionalRadarAnalytics:
         prev_df = self.get_quarterly_holdings(prev_year, prev_q)
 
         # Create set of (fund, cusip) for previous quarter
-        prev_holdings = set(zip(prev_df['fund_name'], prev_df['cusip']))
+        if prev_df.empty:
+            prev_holdings = set()
+        else:
+            prev_holdings = set(zip(prev_df['fund_name'], prev_df['cusip']))
 
         # ⚡ Bolt: Vectorized filtering using a multi-index is ~100x faster than .iterrows() loop
         mask = ~curr_df.set_index(['fund_name', 'cusip']).index.isin(prev_holdings)
