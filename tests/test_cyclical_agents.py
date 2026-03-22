@@ -5,7 +5,7 @@ from unittest.mock import Mock, patch, call
 
 from core.agents.cyclical_reasoning_agent import CyclicalReasoningAgent
 from core.agents.reflector_agent import ReflectorAgent
-from core.agents.agent_base import AgentInput
+from core.schemas.agent_schema import AgentInput
 
 
 class TestCyclicalAgents(unittest.TestCase):
