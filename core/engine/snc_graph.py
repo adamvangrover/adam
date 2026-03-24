@@ -180,7 +180,7 @@ async def regulatory_review_node(state: SNCAnalysisState) -> Dict[str, Any]:
 
     return {
         "regulatory_rating": result.overall_borrower_rating,
-        "regulatory_rationale": result.rationale,
+        "rationale": result.rationale,
         "regulator_watch_points": watch_points,
         "human_readable_status": "Completed regulatory compliance check."
     }
@@ -193,10 +193,10 @@ async def committee_debate_node(state: SNCAnalysisState) -> Dict[str, Any]:
     """
     print("--- Committee: Orchestrating Debate & Consensus ---")
     reg_rating = state["regulatory_rating"]
-    reg_rat = state["regulatory_rationale"]
+    reg_rat = state.get("rationale", "")
 
-    strat_rating = state["analyst_rating"]
-    strat_rat = state["analyst_rationale"]
+    strat_rating = state.get("analyst_rating", "Unknown")
+    strat_rat = state.get("analyst_rationale", "")
     strat_confidence = 0.85  # Assume high confidence from deep fundamental review
 
     result = consensus_engine.calculate_consensus(
@@ -259,6 +259,7 @@ async def report_generation_node(state: SNCAnalysisState) -> Dict[str, Any]:
 """
     return {
         "final_report": report,
+        "iteration_count": state.get("iteration_count", 0) + 1,
         "human_readable_status": "Final report generated."
     }
 

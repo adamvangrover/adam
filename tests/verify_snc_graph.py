@@ -5,7 +5,10 @@ from core.engine.states import init_snc_state
 import json
 
 
-def test_snc_graph():
+import pytest
+
+@pytest.mark.asyncio
+async def test_snc_graph():
     print("Running SNC Graph Verification...")
 
     # 1. Define Input Data
@@ -28,7 +31,7 @@ def test_snc_graph():
 
     # 3. Run Graph
     # langgraph invocation
-    final_state = snc_graph_app.invoke(initial_state, config={"configurable": {"thread_id": "verify_1"}})
+    final_state = await snc_graph_app.ainvoke(initial_state, config={"configurable": {"thread_id": "verify_1"}})
 
     print(f"Final Rating: {final_state['regulatory_rating']}")
     print(f"Iterations: {final_state['iteration_count']}")
@@ -42,4 +45,5 @@ def test_snc_graph():
 
 
 if __name__ == "__main__":
-    test_snc_graph()
+    import asyncio
+    asyncio.run(test_snc_graph())

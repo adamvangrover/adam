@@ -122,6 +122,8 @@ class SNCAnalysisState(TypedDict, total=False):
     structure_analysis: Optional[str]  # Analysis of the syndicate structure
     regulatory_rating: Optional[str]  # Pass, SM, SS, D, L
     rationale: Optional[str]
+    analyst_rating: Optional[str]
+    analyst_rationale: Optional[str]
     critique_notes: List[str]
     iteration_count: int
 
