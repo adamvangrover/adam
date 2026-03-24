@@ -5,7 +5,7 @@ import argparse
 import hashlib
 from typing import List, Dict, Callable, Optional
 from datetime import datetime
-from concurrent.futures import ProcessPoolExecutor, as_completed
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 # Import common utilities
 from core.data_processing.utils import (
@@ -107,7 +107,7 @@ class UniversalIngestor:
 
         logger.info(f"Found {len(all_files)} files. Starting parallel ingestion...")
 
-        with ProcessPoolExecutor(max_workers=max_workers) as executor:
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
             # map returns results in order, as_completed returns as they finish
             future_to_file = {executor.submit(self._process_single_file, fp): fp for fp in all_files}
 
