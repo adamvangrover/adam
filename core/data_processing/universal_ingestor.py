@@ -512,8 +512,8 @@ class UniversalIngestor:
         async with aiofiles.open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
             try:
                 content = await f.read()
-                clean_content = await asyncio.to_thread(GoldStandardScrubber.clean_text, content)
-                data = await asyncio.to_thread(json.loads, clean_content)
+                clean_content = GoldStandardScrubber.clean_text(content)
+                data = json.loads(clean_content)
             except json.JSONDecodeError:
                 return  # Skip invalid JSON
 
@@ -526,7 +526,7 @@ class UniversalIngestor:
         elif "prompt" in str(filepath):
             artifact_type = ArtifactType.PROMPT
 
-        metadata = await asyncio.to_thread(GoldStandardScrubber.extract_metadata, data, artifact_type.value)
+        metadata = GoldStandardScrubber.extract_metadata(data, artifact_type.value)
         if "original_keys" not in metadata:
             metadata["original_keys"] = list(data.keys()) if isinstance(data, dict) else []
 
@@ -544,7 +544,7 @@ class UniversalIngestor:
         async with aiofiles.open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
             async for line in f:
                 try:
-                    content.append(await asyncio.to_thread(json.loads, line))
+                    content.append(json.loads(line))
                 except Exception:
                     continue
 
@@ -561,7 +561,7 @@ class UniversalIngestor:
     async def _process_markdown_async(self, filepath: Path):
         async with aiofiles.open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
             raw_text = await f.read()
-            text = await asyncio.to_thread(GoldStandardScrubber.clean_text, raw_text)
+            text = GoldStandardScrubber.clean_text(raw_text)
 
         lines = text.split('\n')
         title = filepath.name
@@ -572,7 +572,7 @@ class UniversalIngestor:
                 break
 
         # Semantic Chunking via ChunkingEngine
-        chunk_dicts = await asyncio.to_thread(self.chunking_engine.chunk, text)
+        chunk_dicts = self.chunking_engine.chunk(text)
         chunks = [c["text"] for c in chunk_dicts if "text" in c]
 
         artifact_type = ArtifactType.CODE_DOC
@@ -581,7 +581,7 @@ class UniversalIngestor:
         elif "newsletter" in str(filepath) or "Fortress" in str(filepath):
             artifact_type = ArtifactType.NEWSLETTER
 
-        metadata = await asyncio.to_thread(GoldStandardScrubber.extract_metadata, text, artifact_type.value)
+        metadata = GoldStandardScrubber.extract_metadata(text, artifact_type.value)
 
         # Vector Database / RAG embedding prep
         metadata["semantic_chunks"] = len(chunks)
@@ -599,13 +599,13 @@ class UniversalIngestor:
     async def _process_text_async(self, filepath: Path):
         async with aiofiles.open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
             raw_text = await f.read()
-            text = await asyncio.to_thread(GoldStandardScrubber.clean_text, raw_text)
+            text = GoldStandardScrubber.clean_text(raw_text)
 
         # Semantic Chunking via ChunkingEngine
-        chunk_dicts = await asyncio.to_thread(self.chunking_engine.chunk, text)
+        chunk_dicts = self.chunking_engine.chunk(text)
         chunks = [c["text"] for c in chunk_dicts if "text" in c]
 
-        metadata = await asyncio.to_thread(GoldStandardScrubber.extract_metadata, text, ArtifactType.UNKNOWN.value)
+        metadata = GoldStandardScrubber.extract_metadata(text, ArtifactType.UNKNOWN.value)
         metadata["semantic_chunks"] = len(chunks)
         metadata["chunk_preview"] = chunks[0][:100] + "..." if chunks else ""
 
@@ -623,29 +623,25 @@ class UniversalIngestor:
             async with aiofiles.open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
                 source = await f.read()
 
-            def parse_python_ast(src):
-                tree = ast.parse(src)
-                docstring = ast.get_docstring(tree)
+            tree = ast.parse(source)
+            docstring = ast.get_docstring(tree)
 
-                classes = [node.name for node in ast.walk(tree) if isinstance(node, ast.ClassDef)]
-                functions = [node.name for node in ast.walk(tree) if isinstance(node, ast.FunctionDef)]
+            classes = [node.name for node in ast.walk(tree) if isinstance(node, ast.ClassDef)]
+            functions = [node.name for node in ast.walk(tree) if isinstance(node, ast.FunctionDef)]
 
-                content = f"Module: {filepath.name}\n"
-                if docstring:
-                    content += f"Docstring: {docstring}\n"
-                if classes:
-                    content += f"Classes: {', '.join(classes)}\n"
-                if functions:
-                    content += f"Functions: {', '.join(functions)}\n"
+            content = f"Module: {filepath.name}\n"
+            if docstring:
+                content += f"Docstring: {docstring}\n"
+            if classes:
+                content += f"Classes: {', '.join(classes)}\n"
+            if functions:
+                content += f"Functions: {', '.join(functions)}\n"
 
-                metadata = {
-                    "classes": classes,
-                    "functions": functions,
-                    "has_docstring": bool(docstring)
-                }
-                return content, metadata
-
-            content, metadata = await asyncio.to_thread(parse_python_ast, source)
+            metadata = {
+                "classes": classes,
+                "functions": functions,
+                "has_docstring": bool(docstring)
+            }
 
             artifact = GoldStandardArtifact(
                 source_path=str(filepath),

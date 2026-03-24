@@ -44,7 +44,6 @@ def test_ingestor_scan_directory(temp_workspace):
     assert ArtifactType.UNKNOWN.value in types
 
 def test_markdown_chunking(temp_workspace):
-    pytest.importorskip("sentence_transformers")
     ingestor = UniversalIngestor()
     ingestor.process_file(str(temp_workspace / "prompt.md"))
 
