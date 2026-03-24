@@ -1,11 +1,11 @@
 import logging
-import asyncio
-from typing import Dict, Any, List, Optional
+from typing import Any, Dict, List
+
 from core.agents.agent_base import AgentBase
-from core.schemas.v23_5_schema import SNCRatingModel, PrimaryFacilityAssessment
-from core.system.aof_guardrail import AgenticOversightFramework
-from core.engine.risk_consensus_engine import RiskConsensusEngine
 from core.agents.specialized.regulatory_snc_agent import RegulatorySNCAgent
+from core.engine.risk_consensus_engine import RiskConsensusEngine
+from core.schemas.v23_5_schema import PrimaryFacilityAssessment, SNCRatingModel
+from core.system.aof_guardrail import AgenticOversightFramework
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -47,41 +47,59 @@ class StrategicSNCAgent(AgentBase):
         reg_rationale = reg_result.rationale
 
         # 2. Generate Strategic View (The Gas)
-        # Internal Logic (DSCR/LTV - 2025 Model)
+        # Internal Logic (DSCR/LTV/Liquidity - 2026 Model)
         ebitda = float(financials.get('ebitda', 0.0))
         total_debt = float(financials.get('total_debt', 0.0))
         interest_expense = float(financials.get('interest_expense', 1.0))
-        if interest_expense <= 0: interest_expense = 1.0
+        if interest_expense <= 0:
+            interest_expense = 1.0
 
         capex = float(financials.get('capex', 0.0))
         principal = float(financials.get('principal_payment', 0.0))
+        cash = float(financials.get('cash', 0.0))
+        working_capital = float(financials.get('working_capital', 0.0))
 
         numerator = ebitda - capex
         denominator = interest_expense + principal
         dscr = numerator / denominator if denominator > 0 else (numerator / interest_expense if interest_expense > 0 else 0.0)
         ltv = total_debt / enterprise_value if enterprise_value > 0 else 99.0
-        collateral_quality = "Medium"
 
-        if dscr >= 1.2 and ltv <= 0.8:
+        # Advanced Collateral and Liquidity scoring
+        liquidity_ratio = (cash + working_capital) / total_debt if total_debt > 0 else 1.0
+        collateral_quality = "Strong" if ltv <= 0.5 else ("Medium" if ltv <= 0.85 else "Weak")
+
+        if dscr >= 1.5 and ltv <= 0.6:
             new_rating = "Pass"
             new_score = 0.95
-            strat_rationale = f"Strong repayment capacity (DSCR {dscr:.2f}x) supports Pass rating despite leverage."
-        elif dscr < 0.8 and collateral_quality == 'Low':
-            new_rating = "Doubtful"
-            new_score = 0.99
-            strat_rationale = "Cash flow insufficient to service debt."
-        elif dscr < 1.0 or ltv > 0.9:
+            strat_rationale = f"Robust repayment capacity (DSCR {dscr:.2f}x) and Strong Liquidity."
+        elif dscr >= 1.15 and ltv <= 0.8:
+            new_rating = "Pass"
+            new_score = 0.85
+            strat_rationale = f"Adequate coverage (DSCR {dscr:.2f}x), LTV in acceptable range."
+        elif dscr >= 1.0 and ltv <= 0.85 and liquidity_ratio > 0.2:
+            new_rating = "Special Mention"
+            new_score = 0.80
+            strat_rationale = f"Coverage tight (DSCR {dscr:.2f}x) but supported by adequate liquidity buffer."
+        elif dscr < 1.0 and liquidity_ratio > 0.5:
+            new_rating = "Special Mention"
+            new_score = 0.75
+            strat_rationale = f"Operating shortfall (DSCR {dscr:.2f}x), but high liquidity mitigates immediate risk."
+        elif (dscr < 1.0 and ltv > 0.9) or (dscr < 0.8 and collateral_quality == 'Weak'):
             new_rating = "Substandard"
             new_score = 0.90
-            strat_rationale = "Repayment relies on collateral liquidation."
-        elif dscr < 1.2 or ltv > 0.8:
-            new_rating = "Special Mention"
-            new_score = 0.85
-            strat_rationale = "Tight coverage requires monitoring."
+            strat_rationale = f"Cash flow insufficient (DSCR {dscr:.2f}x) and weak collateral. High risk."
+        elif dscr < 0.5 and ltv > 1.2:
+            new_rating = "Doubtful"
+            new_score = 0.95
+            strat_rationale = "Severe distress. Deleveraging or restructuring imminent."
+        elif dscr < 0.1 and ltv > 1.5:
+            new_rating = "Loss"
+            new_score = 0.99
+            strat_rationale = "Insolvent. Asset value fully impaired."
         else:
             new_rating = "Special Mention"
             new_score = 0.70
-            strat_rationale = "Metrics borderline."
+            strat_rationale = "Metrics borderline, requiring active oversight."
 
         # 3. Consensus & Dialogue
         consensus_result = self.consensus_engine.calculate_consensus(
@@ -97,11 +115,15 @@ class StrategicSNCAgent(AgentBase):
 
         # 4. Facility Assessment (Shared Logic)
         sorted_cap_structure = sorted(capital_structure, key=lambda x: x.get('priority', 99))
-        primary_facility = sorted_cap_structure[0] if sorted_cap_structure else {'name': 'General Facility', 'amount': total_debt}
+        primary_facility = sorted_cap_structure[0] if sorted_cap_structure else {
+            'name': 'General Facility', 'amount': total_debt
+        }
 
         collateral_bucket = "Weak"
-        if ltv < 0.6: collateral_bucket = "Strong"
-        elif ltv < 0.9: collateral_bucket = "Adequate"
+        if ltv < 0.6:
+            collateral_bucket = "Strong"
+        elif ltv < 0.9:
+            collateral_bucket = "Adequate"
 
         # 5. Construct Result with Dialogue
         result = SNCRatingModel(
