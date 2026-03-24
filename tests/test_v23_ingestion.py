@@ -81,6 +81,7 @@ class TestV23Ingestion(unittest.TestCase):
         # Create a parquet file
         file_path = Path(self.temp_dir) / "test.parquet"
         df = pd.DataFrame({'col1': [1, 2], 'col2': [3, 4]})
+        df.index = [pd.Timestamp('2023-01-01'), pd.Timestamp('2023-01-02')]
         df.to_parquet(file_path)
 
         # Run Ingestor
