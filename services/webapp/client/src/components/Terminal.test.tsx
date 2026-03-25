@@ -29,6 +29,7 @@ test('renders terminal with accessible input and output', () => {
   expect(log).toBeInTheDocument();
   expect(log).toHaveAttribute('aria-live', 'polite');
   expect(log).toHaveAttribute('aria-label', 'Terminal Output');
+  expect(log).toHaveAttribute('tabindex', '0');
 });
 
 test('handles command history navigation', () => {
