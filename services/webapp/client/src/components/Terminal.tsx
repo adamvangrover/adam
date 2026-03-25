@@ -160,7 +160,8 @@ const Terminal: React.FC = () => {
       }}></div>
 
       <div
-        style={{ flexGrow: 1, overflowY: 'auto', marginBottom: '10px', position: 'relative', zIndex: 1 }}
+        className="flex-grow overflow-y-auto mb-2.5 relative z-10 focus:outline-none focus:ring-1 focus:ring-[var(--primary-color)]"
+        tabIndex={0}
         role="log"
         aria-live="polite"
         aria-label="Terminal Output"
