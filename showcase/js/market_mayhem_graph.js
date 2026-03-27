@@ -108,12 +108,33 @@ class DataManager {
             const response = await fetch('data/sp500_market_data.json');
             const rawData = await response.json();
 
+            // Find max history length to align all entities to "Today"
+            let maxHistory = 0;
+            rawData.forEach(item => {
+                if (item.price_history && item.price_history.length > maxHistory) {
+                    maxHistory = item.price_history.length;
+                }
+            });
+
             // Process Entities
             State.data = rawData.map((item, index) => {
-                const history = item.price_history;
+                let history = item.price_history || [];
+                // Left-pad shorter histories with their initial price so they align on the right
+                if (history.length > 0 && history.length < maxHistory) {
+                    const padCount = maxHistory - history.length;
+                    const padArray = Array(padCount).fill(history[0]);
+                    history = padArray.concat(history);
+                } else if (history.length === 0) {
+                    history = Array(maxHistory).fill(10); // Fallback if missing
+                }
+
                 // Generate Projections
                 const mc = MonteCarloEngine.run(history, item.outlook, item.risk_score, true);
                 const mcUnbiased = MonteCarloEngine.run(history, item.outlook, item.risk_score, false); // For comparison if needed
+
+                // Guard normFactor against divide by zero or missing
+                const startPrice = history[0] || 10;
+                const normFactor = startPrice > 0 ? (10 / startPrice) : 1;
 
                 return {
                     id: index,
@@ -128,17 +149,15 @@ class DataManager {
                     credit: item.credit,
                     // Normalize positions for 3D space
                     // X: Time (handled by loop), Y: Price (Normalized), Z: Risk/Conviction
-                    normFactor: 10 / history[0], // Scale initial price to ~10
+                    normFactor: normFactor, // Scale initial price to ~10
                     zPos: (item.risk_score - 50) / 2 // Risk maps to Z depth
                 };
             });
 
             // Set Global Time Params
-            if (State.data.length > 0) {
-                State.historyLength = State.data[0].history.length;
-                State.totalSteps = State.historyLength + CONFIG.futureSteps;
-                State.currentStep = State.historyLength - 1; // Start at "Today"
-            }
+            State.historyLength = maxHistory;
+            State.totalSteps = State.historyLength + CONFIG.futureSteps;
+            State.currentStep = State.historyLength - 1; // Start at "Today"
 
             console.log(`Loaded ${State.data.length} entities. History: ${State.historyLength}, Future: ${CONFIG.futureSteps}`);
             return true;
@@ -183,9 +202,13 @@ function getVector(entity, step, target) {
     if (step < State.historyLength) {
         // Historical
         const idx = Math.floor(step);
-        const nextIdx = Math.min(idx + 1, State.historyLength - 1);
+        const safeIdx = Math.max(0, Math.min(idx, entity.history.length - 1));
+        const safeNextIdx = Math.max(0, Math.min(idx + 1, entity.history.length - 1));
         const alpha = step - idx;
-        price = THREE.MathUtils.lerp(entity.history[idx], entity.history[nextIdx], alpha);
+
+        const p1 = entity.history[safeIdx] || 10;
+        const p2 = entity.history[safeNextIdx] || 10;
+        price = THREE.MathUtils.lerp(p1, p2, alpha);
     } else {
         // Projected (Use Mean Path)
         const idx = Math.floor(step - State.historyLength);
@@ -193,15 +216,19 @@ function getVector(entity, step, target) {
         const alpha = step - Math.floor(step);
 
         // Safety check for array bounds
-        const p1 = entity.mc.meanPath[Math.min(idx, entity.mc.meanPath.length-1)];
-        const p2 = entity.mc.meanPath[Math.min(nextIdx, entity.mc.meanPath.length-1)];
+        const safeIdx = Math.max(0, Math.min(idx, entity.mc.meanPath.length-1));
+        const safeNextIdx = Math.max(0, Math.min(nextIdx, entity.mc.meanPath.length-1));
+
+        const p1 = entity.mc.meanPath[safeIdx] || 10;
+        const p2 = entity.mc.meanPath[safeNextIdx] || 10;
 
         price = THREE.MathUtils.lerp(p1, p2, alpha);
     }
 
     // Y Axis: Price Normalized (centered around 0 visually?)
-    // Let's just map Price * normFactor
-    const y = (price * entity.normFactor) - 10; // Shift down
+    // Let's just map Price * normFactor, guard against NaN just in case
+    const safePrice = isNaN(price) ? 10 : price;
+    const y = (safePrice * entity.normFactor) - 10; // Shift down
 
     // Z Axis: Risk
     const z = entity.zPos;
@@ -360,7 +387,8 @@ function createVisuals() {
                 // Calculate position relative to start
                 const stepAbs = (State.historyLength - 1) + t;
                 const x = ((stepAbs / State.totalSteps) * 100) - 50;
-                const y = (path[t] * norm) - 10;
+                const safePathVal = isNaN(path[t]) ? (points[points.length - 1].y + 10) / norm : path[t];
+                const y = ((safePathVal || 0) * norm) - 10;
                 points.push(new THREE.Vector3(x, y, z));
             }
             const geo = new THREE.BufferGeometry().setFromPoints(points);
@@ -378,7 +406,8 @@ function createVisuals() {
         for(let t=1; t<entity.mc.meanPath.length; t++){
              const stepAbs = (State.historyLength - 1) + t;
              const x = ((stepAbs / State.totalSteps) * 100) - 50;
-             const y = (entity.mc.meanPath[t] * norm) - 10;
+             const safeMeanPathVal = isNaN(entity.mc.meanPath[t]) ? (meanPoints[meanPoints.length - 1].y + 10) / norm : entity.mc.meanPath[t];
+             const y = ((safeMeanPathVal || 0) * norm) - 10;
              meanPoints.push(new THREE.Vector3(x, y, z));
         }
         const meanGeo = new THREE.BufferGeometry().setFromPoints(meanPoints);
@@ -392,8 +421,17 @@ function createVisuals() {
         coneGroup.add(meanLine);
 
         // --- Confidence Tube ---
+        // Verify meanPoints has no NaNs
+        const validMeanPoints = meanPoints.filter(p => !isNaN(p.x) && !isNaN(p.y) && !isNaN(p.z));
+        if (validMeanPoints.length < 2) {
+            validMeanPoints.push(new THREE.Vector3(startVec.x + 0.1, startVec.y, startVec.z));
+            if (validMeanPoints.length < 2) {
+                validMeanPoints.push(new THREE.Vector3(0, 0, 0), new THREE.Vector3(1, 0, 0));
+            }
+        }
+
         // Create a tube around the mean path to show variance
-        const tubePath = new THREE.CatmullRomCurve3(meanPoints);
+        const tubePath = new THREE.CatmullRomCurve3(validMeanPoints);
         // Radius scales with time (t) to show increasing uncertainty
         const tubeGeo = new THREE.TubeGeometry(tubePath, 30, 0.1, 8, false);
         // Custom radius requires modifying geometry or using shader, here we use simple transparent mesh
