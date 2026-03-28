@@ -1,0 +1,24 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "MarketMayhemLedger",
+  "type": "object",
+  "properties": {
+    "report_date": { "type": "string", "format": "date" },
+    "data_points": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "variable_node": { "type": "string" },
+          "market_level_value": { "type": "string" },
+          "primary_model_target": {
+            "type": "string",
+            "enum": ["PD", "LGD", "DCF", "EV"]
+          },
+          "context_provenance": { "type": "string" }
+        },
+        "required": ["variable_node", "market_level_value", "primary_model_target"]
+      }
+    }
+  }
+}
