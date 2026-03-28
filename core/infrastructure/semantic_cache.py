@@ -3,6 +3,7 @@ import json
 import os
 import time
 from typing import Dict, Any, Optional
+from collections import OrderedDict
 
 class SemanticCache:
     """
@@ -10,8 +11,10 @@ class SemanticCache:
     Caches outputs based on inputs + logic version + underlying data hash.
     """
 
-    def __init__(self, cache_dir: str = "core/libraries_and_archives/cache"):
+    def __init__(self, cache_dir: str = "core/libraries_and_archives/cache", memory_capacity: int = 1000):
         self.cache_dir = cache_dir
+        self.memory_capacity = memory_capacity
+        self._memory_cache = OrderedDict()
         os.makedirs(self.cache_dir, exist_ok=True)
 
     def _generate_key(self, prompt: str, context_hash: str, model_id: str) -> str:
@@ -22,6 +25,17 @@ class SemanticCache:
     def get(self, prompt: str, context_hash: str, model_id: str) -> Optional[Dict[str, Any]]:
         """Retrieves a cached response if it exists and is valid."""
         key = self._generate_key(prompt, context_hash, model_id)
+
+        # 1. Check in-memory LRU cache
+        if key in self._memory_cache:
+            entry = self._memory_cache[key]
+            if time.time() - entry['timestamp'] > 86400:
+                self._memory_cache.pop(key, None)
+                return None
+            self._memory_cache.move_to_end(key)
+            return entry['output']
+
+        # 2. Fallback to disk cache
         path = os.path.join(self.cache_dir, f"{key}.json")
 
         if os.path.exists(path):
@@ -32,6 +46,11 @@ class SemanticCache:
                 # Check expiry (optional, e.g. 24h)
                 if time.time() - entry['timestamp'] > 86400:
                     return None
+
+                # Update memory cache
+                self._memory_cache[key] = entry
+                if len(self._memory_cache) > self.memory_capacity:
+                    self._memory_cache.popitem(last=False)
 
                 return entry['output']
             except Exception:
@@ -52,6 +71,13 @@ class SemanticCache:
             "output": output,
             "metadata": metadata or {}
         }
+
+        # Update memory cache
+        if key in self._memory_cache:
+            self._memory_cache.move_to_end(key)
+        self._memory_cache[key] = entry
+        if len(self._memory_cache) > self.memory_capacity:
+            self._memory_cache.popitem(last=False)
 
         with open(path, 'w') as f:
             json.dump(entry, f, indent=2)
