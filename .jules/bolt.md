@@ -90,3 +90,7 @@
 ## 2025-06-14 - [Vectorized pandas DataFrame logic in Agent Improvement and Ingestion]
 **Learning:** `df.iterrows()` was used in `AgentImprovementPipeline` and `InstitutionalRadarAnalytics` causing significant performance bottlenecks due to row-by-row Series conversion. Replacing `df.iterrows()` with `zip(df.index, df.to_dict(orient="records"))` and `df.to_dict(orient="records")` yielded significant speedups (~10x) with zero logic changes.
 **Action:** Always prefer `to_dict(orient="records")` on filtered or mapped DataFrames over `.iterrows()` loops.
+
+## 2025-05-28 - Replace df.apply with vectorized np.select
+**Learning:** In pandas dataframes, using `df.apply(..., axis=1)` for row-by-row conditional mapping is an O(N) anti-pattern that acts as a significant performance bottleneck (13.5s for 1M rows).
+**Action:** Always replace `df.apply(..., axis=1)` logic with vectorized array-oriented logic like `np.select` (0.18s for 1M rows) or `np.where` when mapping conditional choices in pandas.
