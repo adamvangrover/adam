@@ -1,8 +1,9 @@
-import streamlit as st
-import os
-import time
 import asyncio
+import os
 import sys
+import time
+
+import streamlit as st
 
 # Ensure the root directory is in the python path to load core modules correctly
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
@@ -49,7 +50,7 @@ if HAS_META_ORCHESTRATOR and "orchestrator" not in st.session_state:
 if HAS_PLANNER and "planner" not in st.session_state:
     try:
         st.session_state.planner = NeuroSymbolicPlanner()
-    except Exception as e:
+    except Exception:
         HAS_PLANNER = False
 
 # ==========================================
@@ -78,12 +79,9 @@ def authenticate():
             submitted = st.form_submit_button("Login")
             
             if submitted:
-                # Mock validation 
-                if username == "admin" and password == "admin": 
-                    st.session_state.authenticated = True
-                    st.session_state.username = username
-                    st.rerun()
-                elif os.environ.get("ADMIN_PASSWORD") and password == os.environ.get("ADMIN_PASSWORD"):
+                # Validation
+                admin_password = os.environ.get("ADMIN_PASSWORD")
+                if admin_password and password == admin_password:
                     st.session_state.authenticated = True
                     st.session_state.username = username
                     st.rerun()
@@ -354,7 +352,7 @@ def main():
     if not authenticate():
         return
 
-    st.sidebar.title(f"ADAM Portal UI")
+    st.sidebar.title("ADAM Portal UI")
     st.sidebar.markdown(f"User: `{st.session_state.username}`")
     st.sidebar.divider()
     

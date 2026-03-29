@@ -174,3 +174,8 @@
 **Vulnerability:** Code injection vulnerability caused by using `eval()` to execute rules defined as strings in `condition_code`. Even with restricted `__builtins__`, using `eval` on dynamic execution rules opens paths to arbitrary code execution if rule strings can be controlled or tampered with.
 **Learning:** `eval({"__builtins__": None})` is not sufficiently sandboxed against determined injection or object traversal if input is untrusted. Hard-coded rules that execute as text strings are inherently fragile.
 **Prevention:** Rather than using `eval`, utilize the `ast` module (`ast.parse()`) and walk the AST directly for a whitelist of explicitly permitted operations (e.g., specific mathematical comparators, simple constants, and specific attribute resolutions) via an implementation like `_safe_eval_condition`.
+
+## 2024-05-23 - Hardcoded Admin Credentials in Streamlit Portal
+**Vulnerability:** The Streamlit portal (`streamlit_portal.py`) contained a hardcoded fallback `if username == "admin" and password == "admin":` for authentication, allowing any user to bypass the environment variable-based security.
+**Learning:** Leaving mock or hardcoded credentials in production-ready files (even UI portals) completely undermines application security.
+**Prevention:** Never hardcode credentials. Always rely on environment variables or secure secret management systems for authentication logic.
