@@ -1,5 +1,14 @@
 # Changelog
 
+## [2026-mar-29] - Protocol ARCHITECT_INFINITE Expansion
+
+### Jules' Log
+> "I noticed we lack a unified understanding of off-exchange (dark pool) trading volumes, which often masks true institutional sentiment. I built `DarkPoolAgent` to bridge this gap, integrating real-time dark pool volume anomaly detection directly into the agent network to uncover hidden accumulation or distribution."
+
+### Added
+- Created `core/agents/specialized/dark_pool_agent.py`
+- Created `tests/test_dark_pool_agent.py`
+
 ## [2026-mar-10] - Protocol ARCHITECT_INFINITE Expansion
 
 ### Jules' Log
