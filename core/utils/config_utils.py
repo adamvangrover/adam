@@ -1,11 +1,14 @@
 # core/utils/config_utils.py
 
-import yaml
-import os
+import copy
+import functools
 import logging
+import os
 import re
 from pathlib import Path
 from typing import Any
+
+import yaml
 
 # Configure logging (consider moving to a central location)
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -39,15 +42,11 @@ def _substitute_env_vars(content: str) -> str:
 
     return ENV_VAR_PATTERN.sub(replace, content)
 
-def load_config(file_path: str | Path) -> dict[str, Any] | None:
+@functools.lru_cache(maxsize=128)
+def _load_config_cached(file_path: str | Path) -> dict[str, Any] | None:
     """
-    Loads a YAML configuration file with environment variable substitution.
-
-    Args:
-        file_path (str | Path): The path to the YAML configuration file.
-
-    Returns:
-        dict[str, Any] | None: The configuration as a dictionary, or None if an error occurred.
+    Internal cached loader for YAML configuration files.
+    Memoized with lru_cache to eliminate redundant disk I/O and parsing.
     """
     path = Path(file_path)
 
@@ -76,6 +75,21 @@ def load_config(file_path: str | Path) -> dict[str, Any] | None:
     except Exception as e:
         logging.exception(f"Error loading config from {path}: {e}")
         return None
+
+def load_config(file_path: str | Path) -> dict[str, Any] | None:
+    """
+    Loads a YAML configuration file with environment variable substitution.
+    ⚡ Bolt: Calls a memoized internal loader and deepcopies the result
+    to prevent cross-component mutability pollution.
+
+    Args:
+        file_path (str | Path): The path to the YAML configuration file.
+
+    Returns:
+        dict[str, Any] | None: The configuration as a dictionary, or None if an error occurred.
+    """
+    config = _load_config_cached(file_path)
+    return copy.deepcopy(config) if config is not None else None
 
 def deep_update(d: dict[str, Any], u: dict[str, Any]) -> dict[str, Any]:
     """

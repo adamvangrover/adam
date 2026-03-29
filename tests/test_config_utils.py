@@ -1,19 +1,28 @@
 # tests/test_config_utils.py
 
-import os
-import yaml
 import logging
-from pathlib import Path
+import os
 from unittest.mock import patch
+
 import pytest
+import yaml
 
 from core.utils.config_utils import (
-    load_config,
-    load_app_config,
-    deep_update,
+    _load_config_cached,
     _substitute_env_vars,
-    save_config
+    deep_update,
+    load_app_config,
+    load_config,
+    save_config,
 )
+
+
+@pytest.fixture(autouse=True)
+def clear_config_cache():
+    """Clear the lru_cache on _load_config_cached before and after each test."""
+    _load_config_cached.cache_clear()
+    yield
+    _load_config_cached.cache_clear()
 
 @pytest.fixture
 def temp_yaml_file(tmp_path):
@@ -112,7 +121,10 @@ def test_load_app_config_basic_merge(mock_load_config):
 def test_load_app_config_agent_override(mock_load_config):
     def side_effect_loader(filepath):
         if 'config/settings.yaml' == str(filepath):
-            return {'settings_specific': 'value', 'agents': {'agent1': {'param_a': 'original_value', 'param_c': 'settings_only'}}}
+            return {
+                'settings_specific': 'value',
+                'agents': {'agent1': {'param_a': 'original_value', 'param_c': 'settings_only'}}
+            }
         elif 'config/agents.yaml' == str(filepath):
             return {'agents': {'agent1': {'param_a': 'overridden_value', 'param_b': 'agents_only'}}}
         return {}
