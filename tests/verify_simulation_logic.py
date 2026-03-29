@@ -10,7 +10,7 @@ import json
 # Add root to path
 sys.path.append(os.getcwd())
 
-from core.v23_graph_engine.simulation_engine import CrisisSimulationEngine
+from core.engine.simulation_engine import CrisisSimulationEngine
 from core.system.provenance_logger import ProvenanceLogger
 
 def test_simulation_workflow():
@@ -66,7 +66,7 @@ def test_simulation_workflow():
         if entry['activity_type'] == "simulation":
             found_sim_log = True
             print(f"    Found Log: {entry['record_id']} @ {entry['timestamp']}")
-            print(f"    Log content sample: {str(entry['outcome'])[:100]}...")
+            print(f"    Log content sample: {str(entry)[:100]}...")
             break
 
     if found_sim_log:
