@@ -17,11 +17,19 @@ except ImportError:
     np = None
 from typing import Literal, Dict, Any, List, Optional
 from core.engine.states import RiskAssessmentState, ResearchArtifact
-from core.utils.logging_utils import get_logger
+import logging
+def get_logger(name): return logging.getLogger(name)
 
 logger = get_logger(__name__)
 
-from core.utils.graph_utils import StateGraph, END, START, MemorySaver, HAS_LANGGRAPH
+try:
+    from langgraph.graph import StateGraph, END, START
+    from langgraph.checkpoint.memory import MemorySaver
+    HAS_LANGGRAPH = True
+except ImportError:
+    HAS_LANGGRAPH = False
+    StateGraph = END = START = MemorySaver = None
+# StateGraph, END, START, MemorySaver, HAS_LANGGRAPH
 
 # v23.5 Integration: APEX Generative Risk Engine
 try:

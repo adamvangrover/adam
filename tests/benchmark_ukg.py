@@ -6,7 +6,7 @@ import networkx as nx
 # Add repo root to path
 sys.path.append(os.getcwd())
 
-from core.v23_graph_engine.unified_knowledge_graph import UnifiedKnowledgeGraph
+from core.engine.unified_knowledge_graph import UnifiedKnowledgeGraph
 
 def benchmark():
     ukg = UnifiedKnowledgeGraph()

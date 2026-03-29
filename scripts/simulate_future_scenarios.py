@@ -7,7 +7,7 @@ from datetime import datetime
 # Add repo root to path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from core.v23_graph_engine.simulation_engine import CrisisSimulationEngine
+from core.engine.simulation_engine import CrisisSimulationEngine
 from core.engine.unified_knowledge_graph import UnifiedKnowledgeGraph
 
 logging.basicConfig(level=logging.INFO)
