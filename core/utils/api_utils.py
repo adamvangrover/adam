@@ -13,18 +13,21 @@ Typical Usage Example:
     validate_api_request(request_data={"id": 123}, required_parameters=["id"])
 
 Dependencies:
-    - Built-ins: typing, logging
+    - Built-ins: asyncio, json, logging, typing
 """
 
-import logging
-from typing import Dict, Any, List, Optional
+import asyncio
 import json
+import logging
+from typing import Any
 
 logger = logging.getLogger(__name__)
+
 
 class MaliciousPayloadError(ValueError):
     """Raised when an API payload is suspected of malicious intent by the AI inspector."""
     pass
+
 
 class APIValidator:
     """
@@ -32,20 +35,21 @@ class APIValidator:
     """
 
     @staticmethod
-    def validate(request_data: Dict[str, Any], required_parameters: List[str]) -> bool:
+    def validate(request_data: dict[str, Any], required_parameters: list[str]) -> bool:
         """
         Validates API request data against a list of required parameters.
         Raises ValueError if a required parameter is missing to maintain legacy compatibility.
 
         Args:
-            request_data (Dict[str, Any]): The API request payload to validate.
-            required_parameters (List[str]): A list of string keys that must be present in request_data.
+            request_data (dict[str, Any]): The API request payload to validate.
+            required_parameters (list[str]): A list of string keys that must be present in request_data.
 
         Returns:
             bool: True if validation succeeds.
 
         Raises:
             ValueError: If a required parameter is missing.
+            TypeError: If request_data is not a dictionary.
         """
         if not isinstance(request_data, dict):
             raise TypeError(f"Expected request_data to be a dict, got {type(request_data).__name__}")
@@ -66,29 +70,34 @@ class APIValidator:
         return True
 
     @staticmethod
-    async def inspect_payload_intent(request_data: Dict[str, Any]) -> Dict[str, Any]:
+    async def inspect_payload_intent(request_data: dict[str, Any]) -> dict[str, Any]:
         """
         AI Feature: Analyzes an API payload using a mock LLM zero-shot classifier
         to detect potential injection attacks, prompt leaking, or malicious intent.
 
         In production, this would route to a local safety model or fast LLM endpoint.
+        Uses `asyncio.to_thread` for JSON serialization to avoid blocking the event loop on massive payloads.
 
         Args:
-            request_data (Dict[str, Any]): The incoming API payload to analyze.
+            request_data (dict[str, Any]): The incoming API payload to analyze.
 
         Returns:
-            Dict[str, Any]: Analysis results containing a safety score and flags.
+            dict[str, Any]: Analysis results containing a safety score and flags.
 
         Raises:
             MaliciousPayloadError: If the payload is determined to be highly dangerous.
         """
         logger.info("Initiating AI smart payload inspection...")
 
-        # Serialize payload to analyze its string representation
-        try:
-            payload_str = json.dumps(request_data).lower()
-        except TypeError:
-            payload_str = str(request_data).lower()
+        def _serialize_payload(data: dict[str, Any]) -> str:
+            """Helper to serialize payload off the main thread."""
+            try:
+                return json.dumps(data).lower()
+            except TypeError:
+                return str(data).lower()
+
+        # Optimize: offload CPU-heavy JSON serialization to a background thread
+        payload_str = await asyncio.to_thread(_serialize_payload, request_data)
 
         # Mock LLM Safety Heuristics
         suspicious_patterns = [
@@ -102,13 +111,10 @@ class APIValidator:
             "eval("
         ]
 
-        flags = []
-        for pattern in suspicious_patterns:
-            if pattern in payload_str:
-                flags.append(f"Detected suspicious pattern related to: {pattern}")
+        flags = [f"Detected suspicious pattern related to: {pattern}" for pattern in suspicious_patterns if pattern in payload_str]
 
-        safety_score = 1.0 - (len(flags) * 0.25)
-        safety_score = max(0.0, safety_score)
+        # Safety calculation
+        safety_score = max(0.0, 1.0 - (len(flags) * 0.25))
 
         result = {
             "is_safe": safety_score > 0.5,
@@ -123,13 +129,14 @@ class APIValidator:
 
         return result
 
-def validate_api_request(request_data: Dict[str, Any], required_parameters: List[str]) -> bool:
+
+def validate_api_request(request_data: dict[str, Any], required_parameters: list[str]) -> bool:
     """
     Legacy wrapper for API validation.
 
     Args:
-        request_data (Dict[str, Any]): The API request payload to validate.
-        required_parameters (List[str]): A list of string keys that must be present.
+        request_data (dict[str, Any]): The API request payload to validate.
+        required_parameters (list[str]): A list of string keys that must be present.
 
     Returns:
         bool: True if validation succeeds.
