@@ -1,5 +1,5 @@
 import pytest
-from core.utils.api_utils import APIValidator, validate_api_request, MaliciousPayloadError
+from core.utils.api_utils import APIValidator, validate_api_request, MaliciousPayloadError, PayloadSizeError
 import json
 
 def test_validate_api_request_success():
@@ -49,3 +49,12 @@ async def test_inspect_payload_intent_mildly_suspicious():
     assert result["recommendation"] == "allow"
     assert len(result["flags"]) == 1
     assert "system prompt" in result["flags"][0]
+
+@pytest.mark.asyncio
+async def test_inspect_payload_intent_size_limit():
+    # Construct a payload that exceeds the MAX_PAYLOAD_LENGTH limit
+    massive_string = "a" * (APIValidator.MAX_PAYLOAD_LENGTH + 1)
+    request_data = {"prompt": massive_string}
+
+    with pytest.raises(PayloadSizeError, match="Payload exceeds maximum safe structural entropy limit"):
+        await APIValidator.inspect_payload_intent(request_data)

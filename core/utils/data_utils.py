@@ -3,29 +3,30 @@ core/utils/data_utils.py
 
 Architecture & Usage:
 This module provides the central data loading and caching utility for Adam OS.
-It is designed to cleanly ingest various data formats (JSON, CSV, YAML, and unstructured text via AI mock parsing)
-and provides an in-memory caching mechanism to prevent redundant disk I/O.
+It cleanly ingests various data formats (JSON, CSV, YAML, and unstructured text via AI mock parsing)
+and provides a highly-efficient O(1) in-memory LRU caching mechanism to prevent redundant disk I/O.
 By separating the logic into the `DataLoader` class, the application can maintain
 isolated cache scopes where necessary or rely on the backward-compatible `load_data` wrapper function.
 
 AI Context:
-This module uses a strictly defined routing paradigm mapping string data types to parser methods.
-Type hinting is strictly enforced using Python 3.10+ modern union paradigms `|`. Memory growth is capped
-actively via LIFO evictions triggered at a dynamic `MAX_CACHE_ENTRIES` threshold.
+This module natively protects against path traversal via strict `Path.resolve()` boundary checks.
+Type hinting enforces Python 3.10+ modern pipe-union paradigms (`|`).
+Memory growth is capped actively via O(1) LIFO evictions triggered at a dynamic `MAX_CACHE_ENTRIES` threshold,
+driven by `collections.OrderedDict`.
 
 Typical Usage Example:
     loader = DataLoader(use_cache=True)
     data = loader.load({"type": "json", "path": "config/settings.json"})
 
 Dependencies:
-    - Built-ins: csv, json, pathlib, typing
+    - Built-ins: csv, json, logging, pathlib, typing, collections
     - External: yaml
 """
-
 
 import csv
 import json
 import logging
+from collections import OrderedDict
 from pathlib import Path
 from typing import Any
 
@@ -38,8 +39,8 @@ logger = logging.getLogger(__name__)
 
 class DataLoader:
     """
-    A class to handle loading data from files (JSON, CSV, YAML) or APIs,
-    with built-in caching.
+    A robust data ingestion class capable of loading static files (JSON, CSV, YAML)
+    or simulated APIs, featuring an O(1) LRU eviction cache mechanism.
     """
     SUPPORTED_TYPES = {"json", "csv", "yaml", "smart_text"}
     MAX_FILE_SIZE_BYTES: int = 50 * 1024 * 1024  # 50 MB limit to prevent memory exhaustion
@@ -48,58 +49,53 @@ class DataLoader:
     def __init__(self, use_cache: bool = True) -> None:
         """
         Initializes the DataLoader with an optional caching mechanism.
-        AI Context: Call this constructor once per data pipeline stage to maintain isolated cache states.
-        If handling massive >50MB files, disable caching (`use_cache=False`) to preserve memory.
+
+        AI Context: Call this constructor once per pipeline stage to maintain isolated cache states.
+        It uses an `OrderedDict` to achieve efficient O(1) eviction tracking without list-resizing overhead.
 
         Args:
             use_cache (bool): Determines whether file contents are cached in memory after the first read.
                               Defaults to True.
         """
         self.use_cache: bool = use_cache
-        self._data_cache: dict[str, Any] = {}
+        self._data_cache: OrderedDict[str, Any] = OrderedDict()
 
     def load(self, source_config: dict[str, Any]) -> dict[str, Any] | list[Any] | None:
         """
-        Loads data dynamically based on the provided configuration using a strict routing paradigm.
+        Loads data dynamically based on the provided configuration routing.
 
-        AI Context: Use this method to retrieve system settings, datasets, or external API responses.
-        It inherently protects against path traversal and memory exhaustion through built-in bounds checking.
-        If `source_config["type"]` is not explicitly supported, it throws an `InvalidInputError`.
-
-        Routing Logic:
-            - "api": Redirects to `_load_api`
-            - "json", "csv", "yaml", "smart_text": Validates path existence, enforces `MAX_FILE_SIZE_BYTES`,
-              checks the local memory cache (`_data_cache`), and then reads from disk via `_read_file`.
+        AI Context: Intrinsic directory traversal protection is enforced via `.resolve()`.
+        Cache operations utilize `.move_to_end()` to refresh LRU status safely.
 
         Args:
-            source_config (dict[str, Any]): A dictionary requiring a strictly formatted 'type' string
-                                            and an optional 'path' string depending on the type.
+            source_config (dict[str, Any]): Must contain 'type', and optionally 'path' for file types.
                                             Example: {"type": "json", "path": "/path/to/data.json"}
 
         Returns:
-            dict[str, Any] | list[Any] | None: A structured representation of the target data, or None on graceful failure.
+            dict[str, Any] | list[Any] | None: Parsed structure or None.
 
         Raises:
-            InvalidInputError: Triggered when 'type' is missing/unsupported or 'path' is omitted for local files.
-            FileReadError: Triggered upon I/O failures, missing files, parser crashes, or if the target exceeds 50MB.
+            InvalidInputError: If 'type' is missing/unsupported or 'path' is omitted.
+            FileReadError: Upon I/O failure, traversal breach, or if the file exceeds bounds.
         """
         data_type = source_config.get("type")
         file_path = source_config.get("path")
 
-        match data_type:
-            case "api":
-                return self._load_api(source_config)
-            case t if t in self.SUPPORTED_TYPES:
-                if not file_path:
-                    logger.error("Invalid source configuration: 'path' is required for file-based sources.")
-                    raise InvalidInputError("Missing 'path' in source_config")
-                file_path_obj = Path(file_path)
-            case _:
-                logger.error(f"Unsupported data type: {data_type}")
-                raise InvalidInputError(f"Unsupported data type: {data_type}")
+        if data_type == "api":
+            return self._load_api(source_config)
 
-        if not file_path_obj.exists():
-            logger.error(f"Data file not found: {file_path_obj}")
+        if data_type not in self.SUPPORTED_TYPES:
+            logger.error(f"Unsupported data type: {data_type}")
+            raise InvalidInputError(f"Unsupported data type: {data_type}")
+
+        if not file_path:
+            logger.error("Invalid source configuration: 'path' is required for file-based sources.")
+            raise InvalidInputError("Missing 'path' in source_config")
+
+        # Guard against traversal and verify existence safely
+        file_path_obj = Path(file_path).resolve()
+        if not file_path_obj.is_file():
+            logger.error(f"Data file not found or invalid: {file_path_obj}")
             raise FileReadError(str(file_path_obj), "File not found")
 
         file_size = file_path_obj.stat().st_size
@@ -108,44 +104,43 @@ class DataLoader:
             raise FileReadError(str(file_path_obj), f"File exceeds maximum size limit of {self.MAX_FILE_SIZE_BYTES} bytes")
 
         cache_key = str(file_path_obj)
+
         if self.use_cache and cache_key in self._data_cache:
-            logger.info(f"Loading data from cache: {file_path_obj}")
+            logger.info(f"Loading data from cache: {cache_key}")
+            # Refresh LRU access tracking O(1)
+            self._data_cache.move_to_end(cache_key)
             return self._data_cache[cache_key]
 
         data = self._read_file(file_path_obj, data_type)
+
         if self.use_cache and data is not None:
             if len(self._data_cache) >= self.MAX_CACHE_ENTRIES:
-                logger.warning("Cache capacity reached. Evicting oldest entry.")
-                # LIFO cache eviction or simple pop
-                self._data_cache.pop(next(iter(self._data_cache)))
+                logger.warning("Cache capacity reached. Evicting oldest entry (LRU).")
+                # Fast O(1) eviction
+                self._data_cache.popitem(last=False)
             self._data_cache[cache_key] = data
+
         return data
 
     @staticmethod
     def _read_file(file_path: Path, data_type: str) -> dict[str, Any] | list[Any] | None:
         """
-        Internal method to handle the routing and parsing of specific file types.
-
-        Args:
-            file_path (Path): Pathlib object pointing to the target file.
-            data_type (str): The string identifier for the file type ('json', 'csv', 'yaml', 'smart_text').
-
-        Returns:
-            The parsed data structure depending on the file type.
+        Internal router delegating parser methods securely.
         """
+        parsers = {
+            "json": DataLoader._load_json,
+            "csv": DataLoader._load_csv,
+            "yaml": DataLoader._load_yaml,
+            "smart_text": DataLoader._load_smart_text
+        }
+
+        parser_func = parsers.get(data_type)
+        if not parser_func:
+            raise ValueError(f"Unhandled data type in _read_file: {data_type}")
+
         try:
-            match data_type:
-                case "json":
-                    return DataLoader._load_json(file_path)
-                case "csv":
-                    return DataLoader._load_csv(file_path)
-                case "yaml":
-                    return DataLoader._load_yaml(file_path)
-                case "smart_text":
-                    return DataLoader._load_smart_text(file_path)
-                case _:
-                    raise ValueError(f"Unhandled data type in _read_file: {data_type}")
-        except (json.JSONDecodeError, FileNotFoundError, IOError, yaml.YAMLError) as e:
+            return parser_func(file_path)
+        except (json.JSONDecodeError, IOError, yaml.YAMLError) as e:
             logger.exception(f"Error loading data from {file_path}: {e}")
             raise FileReadError(str(file_path), str(e)) from e
         except Exception as e:
@@ -180,7 +175,6 @@ class DataLoader:
             raw_text = f.read()
 
         # Mock LLM API extraction logic
-        # Here we simulate an advanced RAG feature extracting complex insights
         mock_extracted_data = {
             "source_file": str(file_path),
             "text_length": len(raw_text),

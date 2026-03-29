@@ -1,14 +1,15 @@
 # core/utils/config_utils.py
 
-import yaml
 import os
-import logging
 import re
+import yaml
+import logging
+from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
-# Configure logging (consider moving to a central location)
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+# Configure logger
+logger = logging.getLogger(__name__)
 
 # 🛡️ Sentinel: Regex for finding environment variables in the format ${VAR} or ${VAR:default}
 ENV_VAR_PATTERN = re.compile(r'\$\{(\w+)(?::([^}]+))?\}')
@@ -25,8 +26,7 @@ def _substitute_env_vars(content: str) -> str:
         str: The content with environment variables substituted.
     """
     def replace(match: re.Match) -> str:
-        var_name = match.group(1)
-        default_val = match.group(2)
+        var_name, default_val = match.group(1), match.group(2)
         val = os.environ.get(var_name)
 
         if val is not None:
@@ -34,7 +34,7 @@ def _substitute_env_vars(content: str) -> str:
         if default_val is not None:
             return default_val
 
-        logging.warning(f"Environment variable '{var_name}' not set and no default provided. Replacing with empty string.")
+        logger.warning(f"Environment variable '{var_name}' not set and no default provided. Replacing with empty string.")
         return ""
 
     return ENV_VAR_PATTERN.sub(replace, content)
@@ -43,43 +43,52 @@ def load_config(file_path: str | Path) -> dict[str, Any] | None:
     """
     Loads a YAML configuration file with environment variable substitution.
 
+    AI Context:
+        Purpose: Parses a YAML file, substituting ${VAR} style env vars before parsing.
+        Inputs: `file_path` (str or Path) pointing to the YAML file.
+        Outputs: Returns a `dict` on success, or `None` on failure. Empty YAML returns `{}`.
+
     Args:
         file_path (str | Path): The path to the YAML configuration file.
 
     Returns:
         dict[str, Any] | None: The configuration as a dictionary, or None if an error occurred.
     """
-    path = Path(file_path)
+    path = Path(file_path).resolve()
 
-    if not path.exists():
-        logging.error(f"Config file not found: {path}")
+    if not path.is_file():
+        logger.error(f"Config file not found: {path}")
         return None
 
     try:
         content = path.read_text(encoding='utf-8')
-
-        # 🛡️ Sentinel: Substitute environment variables before parsing
         content = _substitute_env_vars(content)
 
         config = yaml.safe_load(content)
-        if config is None:  # Handle empty YAML files
-            logging.warning(f"Configuration file is empty: {path}")
+
+        if config is None:
+            logger.warning(f"Configuration file is empty: {path}")
             return {}
         if not isinstance(config, dict):
-            logging.warning(f"Configuration file {path} did not parse as a dictionary. Returning empty dict.")
+            logger.warning(f"Configuration file {path} did not parse as a dictionary. Returning empty dict.")
             return {}
 
         return config
     except yaml.YAMLError as e:
-        logging.error(f"Error parsing YAML in {path}: {e}")
+        logger.error(f"Error parsing YAML in {path}: {e}")
         return None
     except Exception as e:
-        logging.exception(f"Error loading config from {path}: {e}")
+        logger.exception(f"Error loading config from {path}: {e}")
         return None
 
 def deep_update(d: dict[str, Any], u: dict[str, Any]) -> dict[str, Any]:
     """
     Recursively updates a dictionary. Fixes type errors when overriding scalar with dict.
+
+    AI Context:
+        Purpose: Merges two dictionaries recursively. The target dict `d` is updated with values from `u`.
+        Inputs: `d` (base dict), `u` (update dict).
+        Outputs: Returns the mutated dictionary `d`.
 
     Args:
         d (dict[str, Any]): The dictionary to update.
@@ -90,14 +99,15 @@ def deep_update(d: dict[str, Any], u: dict[str, Any]) -> dict[str, Any]:
     """
     for k, v in u.items():
         if isinstance(v, dict):
-            existing = d.get(k, {})
+            existing = d.get(k)
             if not isinstance(existing, dict):
-                existing = {}
-            d[k] = deep_update(existing, v)
+                d[k] = {}
+            deep_update(d[k], v)
         else:
             d[k] = v
     return d
 
+@lru_cache(maxsize=1)
 def load_app_config() -> dict[str, Any]:
     """
     Loads and merges configurations from a predefined list of YAML files.
@@ -105,7 +115,11 @@ def load_app_config() -> dict[str, Any]:
     Robustness Update:
     - Handles missing files gracefully (logs warning but continues).
     - Merges dictionaries deeply to prevent overwriting nested configurations.
-    - Returns empty dict if no configs loaded instead of crashing.
+    - Uses `@lru_cache` to drastically optimize performance by caching the combined dict.
+
+    AI Context:
+        Purpose: Aggregates configuration from all base YAML files into a single master dictionary.
+        Outputs: Combined `dict`. Returns empty `{}` if none loaded. Cache can be cleared via `clear_config_cache()`.
 
     Returns:
         dict[str, Any]: A dictionary containing the combined configuration.
@@ -129,40 +143,40 @@ def load_app_config() -> dict[str, Any]:
         "config/report_layout.yaml",
     ]
 
-    # Ensure agents.yaml is loaded after settings.yaml
     try:
-        settings_index = config_files_base.index("config/settings.yaml")
+        settings_idx = config_files_base.index("config/settings.yaml")
         config_files_ordered = (
-            config_files_base[:settings_index + 1] +
+            config_files_base[:settings_idx + 1] +
             ["config/agents.yaml"] +
-            config_files_base[settings_index + 1:]
+            config_files_base[settings_idx + 1:]
         )
     except ValueError:
-        logging.warning("config/settings.yaml not found in base config list, appending config/agents.yaml at the end.")
+        logger.warning("config/settings.yaml not found in base config list, appending config/agents.yaml at the end.")
         config_files_ordered = config_files_base + ["config/agents.yaml"]
 
     combined_config: dict[str, Any] = {}
     files_loaded = 0
 
     for file_path in config_files_ordered:
-        loaded_content = load_config(file_path)
-        if loaded_content is not None:
-            if isinstance(loaded_content, dict):
-                combined_config = deep_update(combined_config, loaded_content)
+        loaded = load_config(file_path)
+        if loaded is not None:
+            if isinstance(loaded, dict):
+                deep_update(combined_config, loaded)
                 files_loaded += 1
             else:
-                logging.warning(f"Configuration file {file_path} content is not a dictionary. Skipping.")
+                logger.warning(f"Configuration file {file_path} content is not a dictionary. Skipping.")
         else:
-            logging.warning(f"Configuration file {file_path} could not be loaded. Skipping.")
+            logger.warning(f"Configuration file {file_path} could not be loaded. Skipping.")
 
     if files_loaded == 0:
-        logging.warning("No configuration files were successfully loaded. Application may not function correctly.")
+        logger.warning("No configuration files were successfully loaded. Application may not function correctly.")
 
     return combined_config
 
+@lru_cache(maxsize=1)
 def load_error_codes() -> dict[str, Any]:
     """
-    Loads error codes from the errors.yaml configuration file.
+    Loads error codes from the errors.yaml configuration file. Uses caching for performance.
 
     Returns:
         dict[str, Any]: A dictionary containing error codes and messages.
@@ -170,8 +184,16 @@ def load_error_codes() -> dict[str, Any]:
     error_config = load_config('config/errors.yaml')
     if error_config and isinstance(error_config, dict) and 'errors' in error_config:
         return error_config['errors']
-    logging.warning("Could not load error codes from config/errors.yaml.")
+    logger.warning("Could not load error codes from config/errors.yaml.")
     return {}
+
+def clear_config_cache() -> None:
+    """
+    Clears the cached configurations for `load_app_config` and `load_error_codes`.
+    Useful during testing or dynamic reconfiguration.
+    """
+    load_app_config.cache_clear()
+    load_error_codes.cache_clear()
 
 def save_config(config: dict[str, Any], file_path: str | Path) -> bool:
     """
@@ -184,13 +206,12 @@ def save_config(config: dict[str, Any], file_path: str | Path) -> bool:
     Returns:
         bool: True if successful, False otherwise.
     """
-    path = Path(file_path)
+    path = Path(file_path).resolve()
     try:
-        # Ensure parent directory exists
         path.parent.mkdir(parents=True, exist_ok=True)
         with path.open('w', encoding='utf-8') as f:
-            yaml.dump(config, f, default_flow_style=False)
+            yaml.safe_dump(config, f, default_flow_style=False)
         return True
     except Exception as e:
-        logging.error(f"Error saving config to {path}: {e}")
+        logger.error(f"Error saving config to {path}: {e}")
         return False

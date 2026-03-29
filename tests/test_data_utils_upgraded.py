@@ -3,6 +3,7 @@ import json
 import csv
 import yaml
 from pathlib import Path
+from collections import OrderedDict
 from core.utils.data_utils import DataLoader, load_data
 from core.system.error_handler import FileReadError, InvalidInputError
 
@@ -64,6 +65,45 @@ def test_caching(temp_files):
     data2 = loader.load({"type": "json", "path": temp_files["json"]})
     assert data1 == data2
     assert data2 == {"key": "value"}
+
+def test_lru_cache_eviction(tmp_path, monkeypatch):
+    """
+    Tests the new O(1) LRU caching behavior using OrderedDict.
+    Verifies that the oldest item is evicted and that recently
+    accessed items are bumped to the end of the eviction queue.
+    """
+    monkeypatch.setattr(DataLoader, "MAX_CACHE_ENTRIES", 3)
+    loader = DataLoader(use_cache=True)
+
+    # Create 4 dummy json files
+    files = []
+    for i in range(4):
+        p = tmp_path / f"test_{i}.json"
+        p.write_text(f'{{"id": {i}}}')
+        files.append(str(p))
+
+    # Load first 3
+    loader.load({"type": "json", "path": files[0]})
+    loader.load({"type": "json", "path": files[1]})
+    loader.load({"type": "json", "path": files[2]})
+
+    # Cache should be exactly 3 items long
+    assert len(loader._data_cache) == 3
+
+    # Re-access the oldest item (files[0]), making it the NEWEST accessed
+    loader.load({"type": "json", "path": files[0]})
+
+    # Load the 4th item, which should evict the OLDEST (which is now files[1], because files[0] was bumped)
+    loader.load({"type": "json", "path": files[3]})
+
+    # Verify files[1] was evicted and the cache size remains 3
+    assert len(loader._data_cache) == 3
+    resolved_files = [str(Path(f).resolve()) for f in files]
+
+    assert resolved_files[1] not in loader._data_cache
+    assert resolved_files[0] in loader._data_cache
+    assert resolved_files[2] in loader._data_cache
+    assert resolved_files[3] in loader._data_cache
 
 def test_invalid_input(temp_files):
     loader = DataLoader(use_cache=False)
