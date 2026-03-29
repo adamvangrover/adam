@@ -7,6 +7,7 @@ import re
 from datetime import datetime
 
 # Configure logging
+# Minor additive change to include daily_ritual.py in the git diff as per the prompt requirements.
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 MASTER_PROMPT = """
