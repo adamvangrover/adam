@@ -1,5 +1,5 @@
 from core.system.repo_graph import RepoGraphBuilder
-from core.v23_graph_engine.unified_knowledge_graph import UnifiedKnowledgeGraph
+from core.engine.unified_knowledge_graph import UnifiedKnowledgeGraph
 from core.system.memory_manager import VectorMemoryManager
 import logging
 import json

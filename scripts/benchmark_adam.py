@@ -23,7 +23,7 @@ from pathlib import Path
 # Add repo root to path
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
-from core.v23_graph_engine.unified_knowledge_graph import UnifiedKnowledgeGraph
+from core.engine.unified_knowledge_graph import UnifiedKnowledgeGraph
 from core.llm.engines.dummy_llm_engine import DummyLLMEngine
 from core.utils.logging_utils import SwarmLogger
 

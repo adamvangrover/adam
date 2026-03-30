@@ -1,4 +1,4 @@
-from core.v23_graph_engine.unified_knowledge_graph import UnifiedKnowledgeGraph
+from core.engine.unified_knowledge_graph import UnifiedKnowledgeGraph
 import sys
 import os
 
@@ -49,7 +49,7 @@ def test_odyssey_graph_integration():
     print(f"Total Nodes: {ukg.graph.number_of_nodes()}")
 
     nodes = list(ukg.graph.nodes(data=True))
-    node_types = [d['type'] for n, d in nodes]
+    node_types = [d.get('type') for n, d in nodes if d.get('type')]
 
     print(f"Node Types found: {set(node_types)}")
 
@@ -63,7 +63,7 @@ def test_odyssey_graph_integration():
     print(f"Total Edges: {ukg.graph.number_of_edges()}")
 
     # Verify Financial Data
-    report_node = [n for n, d in nodes if d['type'] == 'FinancialReport'][0]
+    report_node = [n for n, d in nodes if d.get('type') == 'FinancialReport'][0]
     report_data = ukg.graph.nodes[report_node]
     print(f"Report Data: {report_data}")
 

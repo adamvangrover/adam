@@ -72,7 +72,7 @@ async def async_main():
         # Initialize Meta Orchestrator (v23 Brain)
         # If --legacy is passed, we might modify behavior, but for now we pass it via context or config
         if args.legacy:
-            logger.info("LEGACY MODE: Enabled. Routing priority will favor v23_graph_engine components.")
+            logger.info("LEGACY MODE: Enabled. Routing priority will favor engine components.")
 
         meta_orchestrator = MetaOrchestrator(legacy_orchestrator=legacy_orchestrator)
 
