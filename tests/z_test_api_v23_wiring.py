@@ -16,7 +16,7 @@ class TestAdaptiveAPIReal(unittest.TestCase):
             'services.webapp.api',
             'core.system.agent_orchestrator',
             'core.agents.query_understanding_agent',
-            'core.v23_graph_engine.meta_orchestrator',
+            'core.engine.meta_orchestrator',
             'flask_jwt_extended'
         ]
         for module in list(sys.modules.keys()):

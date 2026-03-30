@@ -3,7 +3,7 @@ import json
 import logging
 import os
 from core.agents.agent_base import AgentBase
-from core.v23_graph_engine.unified_knowledge_graph import UnifiedKnowledgeGraph
+from core.engine.unified_knowledge_graph import UnifiedKnowledgeGraph
 
 logger = logging.getLogger(__name__)
 

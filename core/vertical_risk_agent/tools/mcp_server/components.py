@@ -22,7 +22,7 @@ COMPONENTS = {
     "planner": "core.agents.developer_swarm.planner_agent",
 
     # Core Engines
-    "seal_loop": "core.v23_graph_engine.autonomous_self_improvement",
+    "seal_loop": "core.engine.autonomous_self_improvement",
     "meta_orchestrator": "core.engine.meta_orchestrator",
 
     # Risk Engines

@@ -3,7 +3,7 @@ import asyncio
 from typing import Dict, Any, Optional, List
 # Import mocks first to patch environment if needed
 import core.intelligence.nssf.mocks
-from core.v23_graph_engine.neuro_symbolic_planner import NeuroSymbolicPlanner
+from core.engine.neuro_symbolic_planner import NeuroSymbolicPlanner
 try:
     from core.v24_architecture.brain.rag_planner import RAGPlanner
     V24_AVAILABLE = True

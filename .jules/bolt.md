@@ -90,3 +90,11 @@
 ## 2025-06-14 - [Vectorized pandas DataFrame logic in Agent Improvement and Ingestion]
 **Learning:** `df.iterrows()` was used in `AgentImprovementPipeline` and `InstitutionalRadarAnalytics` causing significant performance bottlenecks due to row-by-row Series conversion. Replacing `df.iterrows()` with `zip(df.index, df.to_dict(orient="records"))` and `df.to_dict(orient="records")` yielded significant speedups (~10x) with zero logic changes.
 **Action:** Always prefer `to_dict(orient="records")` on filtered or mapped DataFrames over `.iterrows()` loops.
+
+## 2025-10-24 - File-based SemanticCache is a major bottleneck
+**Learning:** The previous `SemanticCache` implementation sequentially accessed the disk (`os.path.exists`, `open()`, `json.load()`, etc) for every identical read operation, which drastically slowed down processes hitting identical/semantic context heavily (like generative risk analysis loops caching state logic or repeated sub-agent queries to identical parameters). The I/O blocking caused by file-based lookup scales poorly with the number of prompt queries.
+**Action:** When working with systems involving frequent, identical LLM/Semantic calls or similar caching constraints, layer an in-memory `OrderedDict` LRU cache on top of the durable disk-cache. A tiny in-memory limit (e.g. 1000 items) is sufficient to skip thousands of redundant disk accesses for hot items while preserving long-term persistence to disk.
+
+## 2026-11-20 - [Cache Config File Loadings]
+**Learning:** During multi-agent instantiation or repeated system cycles, utilities like `load_config()` parse the same YAML files from disk numerous times, resulting in thousands of redundant I/O operations and blocking parses.
+**Action:** When optimizing standard configuration parsing, repetitive property loading, and avoiding redundant disk I/O operations, natively utilize the `@functools.lru_cache` decorator. However, remember to explicitly call `function.cache_clear()` in unit test `setUp`/`tearDown` hooks (or autouse fixtures) to prevent cross-test state pollution.
