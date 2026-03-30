@@ -1,6 +1,7 @@
 import logging
+
 import numpy as np
-from typing import Dict, List, Tuple
+
 try:
     from sklearn.feature_extraction.text import TfidfVectorizer
     from sklearn.metrics.pairwise import cosine_similarity
@@ -61,7 +62,11 @@ class SemanticRouter:
             "run parallel scan",
             "hive mind analysis",
             "dispatch swarm scouts",
-            "concurrent market scan"
+            "concurrent market scan",
+            "simulate market reaction",
+            "massive parallelized intuition",
+            "digital sandbox",
+            "MiroFish simulation"
         ],
         "CRISIS": [
             "simulate a market crash",

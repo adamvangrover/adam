@@ -1,5 +1,16 @@
 # Changelog
 
+## [2026-03-XX] - MiroFish Swarm Integration
+### Jules' Log
+> "I added `MiroFishSwarmEngine` and `personas.py` into `core/engine/swarm/` to fulfill the Architectural Blueprint regarding massive parallelized System 3 compute. The integration was conducted as strictly additive (Protocol ARCHITECT_INFINITE). Instead of replacing the legacy `HiveMind`, the system seamlessly diverts complex requests (e.g., 'simulate market reaction') through the `SemanticRouter` directly to the MiroFish simulation. The `MiroFishSwarmEngine` includes robust Wind-Up (instantiating heterogeneous Retail, Institutional, and Regulatory personas) and dynamic Wind-Down (halting on early consensus) to optimize token efficiency. A failure triggers Graceful Degradation back to the classical, linear `CrisisSimulationEngine`."
+
+### Added
+- Created `core/engine/swarm/mirofish_engine.py` (Massive Parallelized Swarm Logic)
+- Created `core/engine/swarm/personas.py` (Retail, Institutional, Regulatory Agents)
+- Created `tests/core/engine/swarm/test_mirofish_engine.py` (Self-contained Testing)
+- Updated `core/engine/states.py` with `SwarmSimulationState`
+- Updated `core/engine/meta_orchestrator.py` routing logic.
+
 ## [2026-mar-29] - Protocol ARCHITECT_INFINITE Expansion
 
 ### Jules' Log

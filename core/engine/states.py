@@ -1,6 +1,6 @@
-from typing import TypedDict, List, Optional, Annotated, Dict, Any, Literal
 import operator
 from datetime import datetime
+from typing import Annotated, Any, Dict, List, Literal, Optional, TypedDict
 
 
 # NOTE: TypedDicts use total=False to allow for partial updates during graph execution (fixing strictness issues).
@@ -695,6 +695,38 @@ class DoubleCrisisState(TypedDict, total=False):
     score: Dict[str, float]
 
 
+class SwarmSimulationState(TypedDict, total=False):
+    """
+    State for the Massive Parallelized Swarm (MiroFish Integration).
+
+    Attributes:
+        simulation_id (str): Unique identifier for the simulation run.
+        seed_parameters (Dict[str, Any]): Initial environmental factors.
+        active_agents (int): Number of active simulated personas.
+        sentiment_evolution (List[float]): Tracking sentiment across cycles.
+        emergent_narratives (List[str]): Extracted narratives from the swarm.
+        final_report (Optional[str]): Consolidated output from the reporting agent.
+        critique_notes (List[str]): Neuro-Symbolic Risk Officer evaluation.
+        needs_recalibration (bool): If the critic rejects the simulation output.
+        iteration_count (int): Number of critique/refine loops.
+        human_readable_status (str): Status message for UI.
+    """
+    simulation_id: str
+    seed_parameters: Dict[str, Any]
+    active_agents: int
+    sentiment_evolution: List[float]
+    emergent_narratives: List[str]
+
+    # Reporting and Validation
+    final_report: Optional[str]
+    critique_notes: List[str]
+    needs_recalibration: bool
+    iteration_count: int
+
+    # Explainability
+    human_readable_status: str
+
+
 def init_double_crisis_state() -> DoubleCrisisState:
     """Initializes the Double Crisis Simulation State."""
     return {
@@ -710,4 +742,20 @@ def init_double_crisis_state() -> DoubleCrisisState:
         "history": ["Simulation Initialized."],
         "game_over": False,
         "score": {}
+    }
+
+
+def init_swarm_simulation_state(sim_id: str, seed_params: Dict[str, Any], agent_count: int) -> SwarmSimulationState:
+    """Initializes the Swarm Simulation State."""
+    return {
+        "simulation_id": sim_id,
+        "seed_parameters": seed_params,
+        "active_agents": agent_count,
+        "sentiment_evolution": [],
+        "emergent_narratives": [],
+        "final_report": None,
+        "critique_notes": [],
+        "needs_recalibration": False,
+        "iteration_count": 0,
+        "human_readable_status": f"Initializing Swarm Environment with {agent_count} agents..."
     }
