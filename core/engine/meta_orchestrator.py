@@ -14,58 +14,65 @@ Architectural Evolution:
 6. Swarm Intelligence: Parallelized Hive Mind processing.
 """
 
-import logging
 import asyncio
+import logging
 import re
 import uuid
-import json
-from typing import Dict, Any, Optional, Callable, Awaitable
+from typing import Any, Awaitable, Callable, Dict, Optional
 
-# --- Core Imports ---
-from core.schemas.hnasp import HNASPState, Meta as HNASPMeta, PersonaState, LogicLayer
-from core.engine.neuro_symbolic_planner import NeuroSymbolicPlanner
-from core.engine.states import (
-    init_risk_state, init_esg_state, init_compliance_state, 
-    init_crisis_state, init_omniscient_state, init_surveillance_state,
-    init_reflector_state
-)
-
-# --- Graph Applications ---
-from core.engine.red_team_graph import red_team_app
-from core.engine.esg_graph import esg_graph_app
-from core.engine.regulatory_compliance_graph import compliance_graph_app
-from core.engine.crisis_simulation_graph import crisis_simulation_app
-from core.engine.deep_dive_graph import deep_dive_app
-from core.engine.surveillance_graph import surveillance_graph_app
-from core.engine.reflector_graph import reflector_app
-
-# --- Orchestration & Tools ---
-from core.system.agent_orchestrator import AgentOrchestrator
-from core.mcp.registry import MCPRegistry
-from core.llm_plugin import LLMPlugin
-from core.engine.autonomous_self_improvement import CodeAlchemist
-from core.engine.swarm.hive_mind import HiveMind
-from core.engine.semantic_router import SemanticRouter
-from core.utils.logging_utils import SwarmLogger
-from core.utils.repo_context import RepoContextManager
-from core.utils.proof_of_thought import ProofOfThoughtLogger
+from core.agents.fundamental_analyst_agent import FundamentalAnalystAgent
+from core.agents.specialized.credit_snc import SNCRatingAgent
 
 # --- v23.5 Deep Dive Agents (Legacy Support & Fallback) ---
 from core.agents.specialized.management_assessment_agent import ManagementAssessmentAgent
-from core.agents.fundamental_analyst_agent import FundamentalAnalystAgent
-from core.agents.specialized.peer_comparison_agent import PeerComparisonAgent
-from core.agents.specialized.credit_snc import SNCRatingAgent 
-from core.agents.specialized.financial_covenant_agent import CovenantAnalystAgent 
 from core.agents.specialized.monte_carlo_risk_agent import MonteCarloRiskAgent
-from core.agents.specialized.quantum_scenario_agent import QuantumScenarioAgent
+from core.agents.specialized.peer_comparison_agent import PeerComparisonAgent
 from core.agents.specialized.portfolio_manager_agent import PortfolioManagerAgent
+from core.agents.specialized.quantum_scenario_agent import QuantumScenarioAgent
+from core.engine.autonomous_self_improvement import CodeAlchemist
+from core.engine.crisis_simulation_graph import crisis_simulation_app
+from core.engine.deep_dive_graph import deep_dive_app
+from core.engine.esg_graph import esg_graph_app
+from core.engine.neuro_symbolic_planner import NeuroSymbolicPlanner
 
+# --- Graph Applications ---
+from core.engine.red_team_graph import red_team_app
+from core.engine.reflector_graph import reflector_app
+from core.engine.regulatory_compliance_graph import compliance_graph_app
+from core.engine.semantic_router import SemanticRouter
+from core.engine.states import (
+    init_compliance_state,
+    init_crisis_state,
+    init_esg_state,
+    init_omniscient_state,
+    init_reflector_state,
+    init_surveillance_state,
+)
+from core.engine.surveillance_graph import surveillance_graph_app
+from core.engine.swarm.hive_mind import HiveMind
+from core.engine.swarm.mirofish_engine import MiroFishSwarmEngine
+from core.llm_plugin import LLMPlugin
+from core.mcp.registry import MCPRegistry
+
+# --- Core Imports ---
 # --- Schemas ---
 from core.schemas.v23_5_schema import (
-    V26KnowledgeGraph, Meta, Nodes, HyperDimensionalKnowledgeGraph,
-    EquityAnalysis, Fundamentals, ValuationEngine, DCFModel, PriceTargets, 
-    CreditAnalysis, CovenantRiskAnalysis
+    CreditAnalysis,
+    DCFModel,
+    EquityAnalysis,
+    Fundamentals,
+    HyperDimensionalKnowledgeGraph,
+    Meta,
+    Nodes,
+    V26KnowledgeGraph,
+    ValuationEngine,
 )
+
+# --- Orchestration & Tools ---
+from core.system.agent_orchestrator import AgentOrchestrator
+from core.utils.logging_utils import SwarmLogger
+from core.utils.proof_of_thought import ProofOfThoughtLogger
+from core.utils.repo_context import RepoContextManager
 
 logger = logging.getLogger(__name__)
 
@@ -84,6 +91,7 @@ class MetaOrchestrator:
         self.planner = NeuroSymbolicPlanner()
         self.code_alchemist = CodeAlchemist()
         self.hive_mind = HiveMind(worker_count=5)
+        self.mirofish_engine = MiroFishSwarmEngine(agent_count=50) # Added MiroFish Swarm
         self.semantic_router = SemanticRouter()
         
         # 2. Tooling & Context
@@ -345,7 +353,7 @@ class MetaOrchestrator:
                 tools=tools,
                 thinking_level="high"
             )
-            logger.info(f"Gemini Native Execution Complete.")
+            logger.info("Gemini Native Execution Complete.")
             return result_obj.model_dump(by_alias=True)
 
         except Exception as e:
@@ -447,19 +455,43 @@ class MetaOrchestrator:
     # --- Specialized Flows ---
 
     async def _run_swarm_flow(self, query: str, context: Optional[Dict] = None):
-        logger.info("Engaging Swarm Intelligence (Hive Mind)...")
-        if not self.hive_mind.workers:
-            await self.hive_mind.initialize()
+        """
+        Engages the massive parallelized Swarm Intelligence (MiroFish Integration).
+        Replaces simple HiveMind task dispersion with a full cyclical reasoning workflow.
+        """
+        logger.info("Engaging Massive Parallelized Swarm Intelligence (MiroFish)...")
         
         target = query.replace("swarm", "").strip()
-        await self.hive_mind.disperse_task("ANALYST", {"target": target})
-        results = await self.hive_mind.gather_results(timeout=5.0)
-        
-        return {
-            "status": "Swarm Execution Complete",
-            "worker_count": self.hive_mind.worker_count,
-            "results": results
-        }
+
+        try:
+            # Phase 1: Environment Init (GraphRAG Extraction)
+            await self.mirofish_engine.initialize_environment(
+                seed_parameters={"target": target, "sentiment": "Bearish", "context": context}
+            )
+
+            # Phase 2: Agent Decoupling via Event Bus with dynamic wind-down
+            # Allows the simulation to halt early if consensus is reached, saving tokens.
+            simulation_data = await self.mirofish_engine.run_simulation_cycles(cycles=5)
+
+            # Phase 3: Reporting Agent Tool Calling
+            final_synthesis = await self.mirofish_engine.synthesize_report()
+
+            # Phase 4: Embedded Neuro-Symbolic Validation
+            # The Risk Officer (Planner/Reflector) critiques the emergent finding
+            validation = await self._reflect_on_result(final_synthesis, f"Validate swarm output for: {target}")
+
+            return {
+                "status": "MiroFish Swarm Execution Complete",
+                "active_personas": self.mirofish_engine.agent_count,
+                "emergent_dynamics": final_synthesis,
+                "raw_simulation_log": simulation_data,
+                "neuro_symbolic_signoff": validation.get("meta_reflection", {}).get("score", 10) >= 8
+            }
+
+        except Exception as e:
+            logger.error(f"MiroFish Swarm Failed: {e}. Gracefully falling back to Classical Crisis Engine.", exc_info=True)
+            # Graceful Degradation: Fallback to the purely deterministic, linear CrisisSimulationEngine
+            return await self._run_crisis_flow(query, context)
 
     async def _run_code_gen_flow(self, query: str, context: Optional[Dict] = None):
         logger.info("Engaging Code Alchemist...")
