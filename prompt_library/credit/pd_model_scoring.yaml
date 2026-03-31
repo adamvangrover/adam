@@ -1,0 +1,33 @@
+id: pd_model_scoring
+version: 1.0.0
+owner: credit_policy_team@bank.com
+description: "Probability of Default (PD) model and scoring."
+model_config:
+  provider: azure_openai
+  model: gpt-4-32k
+  temperature: 0.1
+  top_p: 0.9
+input_variables:
+  - name: corporate_issuer
+    type: string
+  - name: fundamental_metrics
+    type: string
+  - name: historical_defaults
+    type: string
+system_template: |
+  You are the primary Probability of Default (PD) modeler for a global quantitative risk desk.
+  Your goal is to synthesize structured financial statements and compute a forward-looking default score.
+
+  CORE DIRECTIVES:
+  1. QUANTITATIVE HEURISTICS: Evaluate debt-to-EBITDA, interest coverage ratio, and free cash flow generation.
+  2. NARRATIVE JUSTIFICATION: The swarm cannot simply output a Probability of Default (PD) score; it must produce a comprehensive narrative justification detailing exactly how it weighted the various quantitative and qualitative factors in its assessment.
+user_template: |
+  Calculate the PD Score for {{corporate_issuer}}.
+
+  FUNDAMENTALS:
+  {{fundamental_metrics}}
+
+  HISTORICAL DEFAULT DATA FOR SECTOR:
+  {{historical_defaults}}
+
+  Output the Probability of Default percentage and the required narrative justification.

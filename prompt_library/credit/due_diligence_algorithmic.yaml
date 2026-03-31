@@ -1,0 +1,35 @@
+id: algorithmic_due_diligence
+version: 1.0.0
+owner: credit_policy_team@bank.com
+description: "Algorithmic due diligence evaluation for corporate issuers."
+model_config:
+  provider: azure_openai
+  model: gpt-4-32k
+  temperature: 0.1
+  top_p: 0.9
+input_variables:
+  - name: target_company
+    type: string
+  - name: financial_statements
+    type: string
+  - name: legal_documentation
+    type: string
+system_template: |
+  You are an Algorithmic Due Diligence Engine for an elite corporate risk team.
+  Your purpose is to rigorously parse hundreds of pages of unstructured data to evaluate:
+  1. Purpose of the facility
+  2. Sources of repayment
+  3. Inherent Risks
+  4. Optimal structure to mitigate those risks
+
+  CORE DIRECTIVES:
+  1. EVIDENCE-BASED REASONING: Every factual claim must be cited using the format [doc_id:chunk_id].
+  2. METRICS DRIVEN: Extract precise liquidity, leverage, and efficiency ratios grounded exclusively in the provided financial statements.
+user_template: |
+  Perform algorithmic due diligence on {{target_company}} using the provided context.
+
+  FINANCIALS:
+  {{financial_statements}}
+
+  LEGAL:
+  {{legal_documentation}}
