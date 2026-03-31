@@ -1,5 +1,13 @@
 # Changelog
 
+## [2026-04-XX] - MiroFish Dynamic Agent Loading
+### Jules' Log
+> "I added dynamic agent loading logic to `MiroFishSwarmEngine` inside `core/engine/swarm/mirofish_engine.py` using `AgentPersonaAdapter` to allow all specialized agents from `core/agents/` to be spun up as part of the MiroFish engine as needed."
+
+### Added
+- Created `AgentPersonaAdapter` in `mirofish_engine.py` to wrap standard agents.
+- Added `_load_dynamic_agents` to dynamically load `AgentBase` subclasses and incorporate them into the swarm matrix.
+
 ## [2026-03-XX] - MiroFish Swarm Integration
 ### Jules' Log
 > "I added `MiroFishSwarmEngine` and `personas.py` into `core/engine/swarm/` to fulfill the Architectural Blueprint regarding massive parallelized System 3 compute. The integration was conducted as strictly additive (Protocol ARCHITECT_INFINITE). Instead of replacing the legacy `HiveMind`, the system seamlessly diverts complex requests (e.g., 'simulate market reaction') through the `SemanticRouter` directly to the MiroFish simulation. The `MiroFishSwarmEngine` includes robust Wind-Up (instantiating heterogeneous Retail, Institutional, and Regulatory personas) and dynamic Wind-Down (halting on early consensus) to optimize token efficiency. A failure triggers Graceful Degradation back to the classical, linear `CrisisSimulationEngine`."
