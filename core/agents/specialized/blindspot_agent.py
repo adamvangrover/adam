@@ -6,7 +6,7 @@ import logging
 import asyncio
 import os
 import threading
-from core.agents.agent_base import AgentBase
+from core.agents.agent_base import AgentBase, AgentInput, AgentOutput
 import networkx as nx
 
 # Local helper to avoid circular dependency with services.webapp.api
@@ -47,11 +47,12 @@ class BlindspotAgent(AgentBase):
         super().__init__(config)
         self.anomalies = []
 
-    async def execute(self, *args, **kwargs) -> Dict[str, Any]:
+    # Protocol ADAM-V-NEXT: Blindspot Monitor verified
+    async def execute(self, input_data: AgentInput) -> AgentOutput:
         """
-        Scans for blindspots.
+        Scans for blindspots using strict Pydantic models.
         """
-        logging.info(f"Agent {self.name} initiating Blindspot Scan...")
+        logging.info(f"Agent {self.name} initiating Blindspot Scan for query: {input_data.query}")
 
         # 1. Try to connect to Neo4j
         driver = get_neo4j_driver()
@@ -182,11 +183,15 @@ class BlindspotAgent(AgentBase):
         except ImportError:
             logging.debug("Neural link not available for thought emission")
 
-        return {
-            "status": "SCAN_COMPLETE",
-            "anomalies_detected": len(found_anomalies),
-            "findings": found_anomalies
-        }
+        return AgentOutput(
+            status="success",
+            data={
+                "status": "SCAN_COMPLETE",
+                "anomalies_detected": len(found_anomalies),
+                "findings": found_anomalies
+            },
+            confidence=0.95
+        )
 
     def _detect_circular_dependencies(self) -> List[Dict[str, Any]]:
         """

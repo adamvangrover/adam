@@ -14,6 +14,7 @@ import {
 const Sidebar: React.FC = () => {
   const navItems = [
     { path: '/', label: 'MISSION CONTROL', icon: LayoutDashboard },
+    { path: '/synthesizer', label: 'SYNTHESIZER', icon: BrainCircuit },
     { path: '/terminal', label: 'UFOs TERMINAL', icon: Terminal },
     { path: '/market-data', label: 'MARKET DATA', icon: BarChart2 },
     { path: '/agents', label: 'AGENT REGISTRY', icon: Users },

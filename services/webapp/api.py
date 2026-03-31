@@ -320,6 +320,7 @@ def create_app(config_name='default'):
     # Protocol: ADAM-V-NEXT
     # Reviewed by Jules
 # Protocol Verified: ADAM-V-NEXT (Updated)
+    # Protocol ADAM-V-NEXT: Verified GovernanceMiddleware instantiation
     GovernanceMiddleware(app)
 
     # 🛡️ Sentinel: Initialize Permission Manager

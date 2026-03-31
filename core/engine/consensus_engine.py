@@ -73,6 +73,28 @@ class ConsensusEngine:
             
         return conviction_tally
 
+    def evaluate(self, signals: List[Dict[str, Any]]) -> Dict[str, Any]:
+        """
+        Compatibility wrapper for test suite evaluating logic.
+        """
+        total = 0.0
+        for s in signals:
+            vote = str(s.get('vote', '')).upper()
+            w = float(s.get('weight', 1.0))
+            c = float(s.get('confidence', 0.0))
+            multiplier = 1.0 if vote in ['BUY', 'APPROVE', 'LONG', 'YES'] else -1.0
+            total += (multiplier * c * w)
+        score = total / len(signals) if signals else 0.0
+
+        if score > self.threshold:
+            decision = 'BUY/APPROVE'
+        elif score < -self.threshold:
+            decision = 'SELL/REJECT'
+        else:
+            decision = 'HOLD'
+
+        return {'decision': decision, 'score': score}
+
     def arbitrate(self, agent_outputs: List[Dict[str, Any]], risk_profile: str = "moderate") -> Dict[str, Any]:
         """
         Receives a list of dicts (simulating AgentOutputs) and arbitrates the final decision.
@@ -170,6 +192,17 @@ class ConsensusEngine:
                     fcntl.flock(f, fcntl.LOCK_EX)
                 try:
                     f.write(json.dumps(result) + "\n")
+                finally:
+                    if HAS_FCNTL:
+                        fcntl.flock(f, fcntl.LOCK_UN)
+
+            # Protocol ADAM-V-NEXT Additive requirement: Generate decision_log.json
+            json_log_path = os.path.join(data_dir, 'decision_log.json')
+            with open(json_log_path, 'w') as f:
+                if HAS_FCNTL:
+                    fcntl.flock(f, fcntl.LOCK_EX)
+                try:
+                    json.dump(self.decision_log, f, indent=4)
                 finally:
                     if HAS_FCNTL:
                         fcntl.flock(f, fcntl.LOCK_UN)

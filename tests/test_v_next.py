@@ -47,7 +47,7 @@ class TestVNext(unittest.TestCase):
         # 0.9 + 0.8 = 1.7 / 2 = 0.85
         result = engine.evaluate(signals)
         self.assertEqual(result['decision'], 'BUY/APPROVE')
-        self.assertEqual(result['score'], 0.85)
+        self.assertAlmostEqual(result['score'], 0.85, places=5)
 
 if __name__ == '__main__':
     unittest.main()
