@@ -13,6 +13,8 @@ import SimulationTools from './pages/SimulationTools';
 import Terminal from './components/Terminal';
 import AgentRegistry from './pages/AgentRegistry';
 import Reports from './pages/Reports';
+import Synthesizer from './pages/Synthesizer';
+import AgentIntercom from './components/AgentIntercom';
 
 // New Pages (Phase 3 & 4) - Mocking them for now until Phase 3/4 execution
 const KnowledgeGraph = () => <div className="p-10 text-cyber-cyan font-mono">KNOWLEDGE GRAPH :: CONNECTING TO NEO4J...</div>;
@@ -25,6 +27,7 @@ const App: React.FC = () => {
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<Dashboard />} />
+          <Route path="synthesizer" element={<Synthesizer />} />
           <Route path="terminal" element={<Terminal />} />
           <Route path="market-data" element={<MarketData />} />
           <Route path="agents" element={<AgentRegistry />} />
@@ -44,6 +47,7 @@ const App: React.FC = () => {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
       </Routes>
+      <AgentIntercom />
     </Router>
   );
 };

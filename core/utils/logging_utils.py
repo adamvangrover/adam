@@ -215,6 +215,7 @@ class NarrativeLogger:
         """
         Log a complete, structured narrative execution arc.
         """
+        # Protocol ADAM-V-NEXT: Narrative Logging Verified
         story = {
             "chapter": "Execution Arc",
             "timestamp": datetime.now(timezone.utc).isoformat(),
