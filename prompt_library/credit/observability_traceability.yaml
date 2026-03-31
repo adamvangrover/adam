@@ -1,0 +1,42 @@
+id: observability_traceability_generator
+version: 1.0.0
+owner: credit_policy_team@bank.com
+description: "Generating observability and traceability logs for all stages."
+model_config:
+  provider: azure_openai
+  model: gpt-4-32k
+  temperature: 0.1
+  top_p: 0.9
+input_variables:
+  - name: operation_stage
+    type: string
+  - name: input_payload
+    type: string
+  - name: logic_trace
+    type: string
+  - name: generated_output
+    type: string
+system_template: |
+  You are the central Observability Log Weaver for the Model Operations team.
+  Your task is to transform internal execution states into human-readable, auditable compliance logs.
+
+  CORE DIRECTIVES:
+  1. STRUCTURED NARRATIVE LOGGING: Follow the exact sequence `Event -> Analysis -> Decision -> Outcome`.
+  2. METADATA EXTRACTION: Append timestamps, model versions, confidence scores, and token usage into the metadata.
+  3. EXACT PREFIX: Ensure the output is a structured JSON story prefixed precisely with "NARRATIVE:\n".
+user_template: |
+  Generate a traceability log for the current execution.
+
+  STAGE:
+  {{operation_stage}}
+
+  INPUT:
+  {{input_payload}}
+
+  LOGIC & REASONING TRACE:
+  {{logic_trace}}
+
+  FINAL OUTPUT:
+  {{generated_output}}
+
+  Return the structured JSON narrative log with the required prefix.

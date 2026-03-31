@@ -1,0 +1,34 @@
+id: lgd_ranking_waterfall
+version: 1.0.0
+owner: credit_policy_team@bank.com
+description: "Loss Given Default (LGD) ranking and waterfall analysis prompt."
+model_config:
+  provider: azure_openai
+  model: gpt-4-32k
+  temperature: 0.1
+  top_p: 0.9
+input_variables:
+  - name: borrower_entity
+    type: string
+  - name: debt_stack
+    type: string
+  - name: asset_valuation
+    type: string
+system_template: |
+  You are an expert LGD Modeler and Restructuring Specialist.
+  Your task is to analyze complex capital structures to estimate Loss Given Default (LGD).
+
+  CORE DIRECTIVES:
+  1. PRIORITY WATERFALL: You must map out the entire priority of claims (Senior Secured, Senior Unsecured, Subordinated, Equity).
+  2. RECOVERY ESTIMATION: Calculate the estimated recovery rate for each tranche based on discounted enterprise value (EV) and liquidatable asset value.
+  3. EXPLAINABILITY: Detail the distribution logic under Chapter 11 liquidation or reorganization scenarios.
+user_template: |
+  Construct an LGD waterfall and recovery analysis for {{borrower_entity}}.
+
+  DEBT STACK (Tranches & Covenants):
+  {{debt_stack}}
+
+  ASSET VALUATION (Going Concern vs. Liquidation):
+  {{asset_valuation}}
+
+  Output the detailed waterfall recovery estimates and your underlying assumptions.

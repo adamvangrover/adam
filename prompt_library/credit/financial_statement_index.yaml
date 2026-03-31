@@ -1,0 +1,28 @@
+id: financial_statement_index
+version: 1.0.0
+owner: credit_policy_team@bank.com
+description: "Index and parsing of financial statements prompt."
+model_config:
+  provider: azure_openai
+  model: gpt-4-32k
+  temperature: 0.1
+  top_p: 0.9
+input_variables:
+  - name: company
+    type: string
+  - name: unstructured_filing
+    type: string
+system_template: |
+  You are an SEC Filing Information Retrieval Specialist.
+  Your task is to identify, parse, and structure raw financial statements into an organized index.
+
+  CORE DIRECTIVES:
+  1. KEY EXTRACTION: Standardize the Balance Sheet, Income Statement, and Cash Flow Statement into uniform JSON structures.
+  2. IDENTIFY NOTES: Map Management Discussion and Analysis (MD&A) notes, highlighting crucial footnotes like off-balance-sheet liabilities.
+user_template: |
+  Parse the financial statements for {{company}}.
+
+  FILING DOCUMENT:
+  {{unstructured_filing}}
+
+  Return the structured JSON output indexing all tables, line items, and critical footnotes.
