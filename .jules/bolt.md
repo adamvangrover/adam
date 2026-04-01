@@ -98,3 +98,7 @@
 ## 2026-11-20 - [Cache Config File Loadings]
 **Learning:** During multi-agent instantiation or repeated system cycles, utilities like `load_config()` parse the same YAML files from disk numerous times, resulting in thousands of redundant I/O operations and blocking parses.
 **Action:** When optimizing standard configuration parsing, repetitive property loading, and avoiding redundant disk I/O operations, natively utilize the `@functools.lru_cache` decorator. However, remember to explicitly call `function.cache_clear()` in unit test `setUp`/`tearDown` hooks (or autouse fixtures) to prevent cross-test state pollution.
+
+## 2026-03-31 - [Graph Node Batching]
+**Learning:** In `UnifiedKnowledgeGraph.ingest_risk_state`, adding root entity nodes individually via `self.graph.add_node` and `self.graph.add_edge` inside a high-throughput function introduces significant overhead. Batching all node and edge creations into lists and using `add_nodes_from`/`add_edges_from` improves performance.
+**Action:** Always batch `networkx` node and edge creations into lists, even for small numbers of root nodes, to avoid function call overhead during ingestion.
