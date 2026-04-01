@@ -54,24 +54,82 @@ TEMPLATE_HEADER = """<!DOCTYPE html>
         }
         .cyber-btn:hover { border-color: var(--primary-color); color: var(--primary-color); }
 
-        /* Grid */
+        /* Layout */
+        .app-container {
+            display: flex;
+            height: calc(100vh - 60px);
+            overflow: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background: rgba(0,0,0,0.5);
+            border-right: 1px solid var(--panel-border);
+            overflow-y: auto;
+            padding: 20px 0;
+            flex-shrink: 0;
+        }
+
+        .sidebar-item {
+            display: block;
+            padding: 8px 20px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+            border-left: 2px solid transparent;
+        }
+        .sidebar-item:hover {
+            color: var(--primary-color);
+            background: rgba(0, 243, 255, 0.05);
+            border-left-color: var(--primary-color);
+        }
+
+        /* Grid Content */
+        .main-content {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
         .grid-container {
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; padding: 40px;
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;
         }
 
         .dir-card {
             background: rgba(255, 255, 255, 0.03); border: 1px solid var(--panel-border);
-            border-radius: 4px; padding: 20px; transition: all 0.2s;
+            border-radius: 4px; padding: 0; transition: all 0.2s;
         }
         .dir-card:hover { border-color: var(--primary-color); background: rgba(255, 255, 255, 0.05); }
 
         .dir-title {
             font-family: 'JetBrains Mono', monospace; color: var(--accent-color);
-            border-bottom: 1px solid #333; padding-bottom: 10px; margin-bottom: 15px; font-size: 0.9rem;
-            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid transparent; padding: 15px 20px; font-size: 0.9rem;
+            display: flex; justify-content: space-between; align-items: flex-start;
+            cursor: pointer; margin: 0; outline: none; list-style: none;
+            word-break: break-word;
         }
 
-        .file-list { list-style: none; padding: 0; margin: 0; }
+        .dir-title > span:first-child {
+            flex-grow: 1;
+            margin-right: 10px;
+        }
+
+        .dir-title > span:last-child {
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .dir-title::-webkit-details-marker {
+            display: none;
+        }
+
+        details[open] .dir-title {
+            border-bottom: 1px solid #333;
+        }
+
+        .file-list { list-style: none; padding: 15px 20px; margin: 0; }
         .file-item { margin-bottom: 8px; font-size: 0.85rem; display: flex; align-items: center; }
         .file-item a { color: var(--text-muted); text-decoration: none; transition: color 0.2s; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .file-item a:hover { color: var(--primary-color); }
@@ -105,14 +163,23 @@ TEMPLATE_HEADER = """<!DOCTYPE html>
         </nav>
     </header>
 
-    <div class="search-bar">
-        <input type="text" id="search-input" placeholder="Search system artifacts (e.g., 'report', 'dashboard', 'agent')..." onkeyup="filterFiles()">
-    </div>
+    <div class="app-container">
+        <div class="sidebar" id="sidebar">
+            <div style="padding: 0 20px 10px 20px; font-size: 0.7rem; color: #666; font-family: 'JetBrains Mono'; border-bottom: 1px solid #333; margin-bottom: 10px;">QUICK JUMP</div>
+            <!-- Sidebar injected here -->
+        </div>
 
-    <div class="grid-container" id="grid">
+        <div class="main-content">
+            <div class="search-bar" style="background: transparent; border: none; padding: 0 0 20px 0;">
+                <input type="text" id="search-input" placeholder="Search system artifacts (e.g., 'report', 'dashboard', 'agent')..." onkeyup="filterFiles()">
+            </div>
+
+            <div class="grid-container" id="grid">
 """
 
 TEMPLATE_FOOTER = """
+            </div>
+        </div>
     </div>
 
     <footer style="border-top: 1px solid var(--panel-border); padding: 40px; text-align: center; color: var(--text-muted); font-size: 0.8rem;">
@@ -195,9 +262,17 @@ def generate_index():
     sorted_dirs = sorted(file_map.keys())
 
     # Generate HTML content
-    html_content = TEMPLATE_HEADER
+
+    # First build the sidebar
+    sidebar_html = ""
+    for directory in sorted_dirs:
+        dir_id = f"dir-{directory.replace('/', '-').replace(' ', '-')}"
+        sidebar_html += f'<a href="#{dir_id}" class="sidebar-item">{directory}</a>\n'
+
+    html_content = TEMPLATE_HEADER.replace("<!-- Sidebar injected here -->", sidebar_html)
 
     for directory in sorted_dirs:
+        dir_id = f"dir-{directory.replace('/', '-').replace(' ', '-')}"
         files = sorted(file_map[directory], key=lambda x: x['name'])
 
         # Icon logic
@@ -208,11 +283,11 @@ def generate_index():
         if "test" in directory: dir_icon = "🧪"
 
         html_content += f"""
-        <div class="dir-card">
-            <div class="dir-title">
+        <details class="dir-card" id="{dir_id}">
+            <summary class="dir-title">
                 <span>{dir_icon} {directory}</span>
                 <span style="font-size:0.7rem; opacity:0.5;">{len(files)} files</span>
-            </div>
+            </summary>
             <ul class="file-list">
         """
 
@@ -231,7 +306,7 @@ def generate_index():
 
         html_content += """
             </ul>
-        </div>
+        </details>
         """
 
     html_content += TEMPLATE_FOOTER
