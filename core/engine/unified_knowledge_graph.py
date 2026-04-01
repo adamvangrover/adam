@@ -17,12 +17,13 @@ Key Components:
   FIBO and PROV-O simultaneously, creating a fully verifiable reasoning chain.
 """
 
-import networkx as nx
-import logging
 import json
+import logging
 import os
 import threading
-from typing import List, Dict, Any, Optional
+from typing import Any, Dict, List, Optional
+
+import networkx as nx
 
 # Bolt Optimization: Import GraphCache for thread-safe singleton
 from core.engine.graph_cache import GraphCache
@@ -335,14 +336,20 @@ class UnifiedKnowledgeGraph:
             logger.warning("No ticker found in risk state. Skipping.")
             return
 
+        # Bolt Optimization: Batch node/edge creation for O(1) graph update overhead
+        nodes_to_add = []
+        edges_to_add = []
+
         # 1. Legal Entity
         entity_id = f"LegalEntity::{ticker}"
-        self.graph.add_node(
+        nodes_to_add.append((
             entity_id,
-            type="LegalEntity",
-            ticker=ticker,
-            label=ticker  # For display
-        )
+            {
+                "type": "LegalEntity",
+                "ticker": ticker,
+                "label": ticker  # For display
+            }
+        ))
 
         # 2. Financial Report (Snapshot)
         bs = risk_state.get("balance_sheet")
@@ -358,15 +365,17 @@ class UnifiedKnowledgeGraph:
             debt = bs.get("total_debt")
             leverage = (debt / ebitda) if (debt is not None and ebitda is not None and ebitda != 0) else None
 
-            self.graph.add_node(
+            nodes_to_add.append((
                 report_id,
-                type="FinancialReport",
-                fiscal_year=fy,
-                total_debt=debt,
-                ebitda=ebitda,
-                leverage_ratio=leverage
-            )
-            self.graph.add_edge(entity_id, report_id, relation="REPORTED")
+                {
+                    "type": "FinancialReport",
+                    "fiscal_year": fy,
+                    "total_debt": debt,
+                    "ebitda": ebitda,
+                    "leverage_ratio": leverage
+                }
+            ))
+            edges_to_add.append((entity_id, report_id, {"relation": "REPORTED"}))
 
         # 3. Covenants
         covenants = risk_state.get("covenants", [])
@@ -375,39 +384,38 @@ class UnifiedKnowledgeGraph:
         if covenants:
             facility_id = f"CreditFacility::{ticker}::General"
             if not self.graph.has_node(facility_id):
-                self.graph.add_node(facility_id, type="CreditFacility", name="General Facility")
-                self.graph.add_edge(entity_id, facility_id, relation="BORROWS")
-
-            # Bolt Optimization: Batch node/edge creation for O(1) graph update overhead
-            covenant_nodes = []
-            covenant_edges = []
+                nodes_to_add.append((facility_id, {"type": "CreditFacility", "name": "General Facility"}))
+                edges_to_add.append((entity_id, facility_id, {"relation": "BORROWS"}))
 
             for cov in covenants:
                 cov_name = cov.get("name", "Unknown Covenant")
                 cov_id = f"Covenant::{ticker}::{cov_name}"
 
-                covenant_nodes.append((cov_id, {
+                nodes_to_add.append((cov_id, {
                     "type": "Covenant",
                     "name": cov_name,
                     "threshold": cov.get("threshold"),
                     "operator": cov.get("operator")
                 }))
-                covenant_edges.append((facility_id, cov_id, {"relation": "GOVERNED_BY"}))
-
-            self.graph.add_nodes_from(covenant_nodes)
-            self.graph.add_edges_from(covenant_edges)
+                edges_to_add.append((facility_id, cov_id, {"relation": "GOVERNED_BY"}))
 
         # 4. Risk Model Output
         if risk_state.get("draft_memo"):
             memo = risk_state["draft_memo"]
             model_id = f"RiskModel::{ticker}::{self.graph.number_of_nodes()}"  # Unique ID
-            self.graph.add_node(
+            nodes_to_add.append((
                 model_id,
-                type="RiskModel",
-                recommendation=memo.get("recommendation"),
-                confidence=memo.get("confidence_score")
-            )
-            self.graph.add_edge(entity_id, model_id, relation="HAS_RISK_MODEL")
+                {
+                    "type": "RiskModel",
+                    "recommendation": memo.get("recommendation"),
+                    "confidence": memo.get("confidence_score")
+                }
+            ))
+            edges_to_add.append((entity_id, model_id, {"relation": "HAS_RISK_MODEL"}))
+
+        # Add everything to the graph in one go
+        self.graph.add_nodes_from(nodes_to_add)
+        self.graph.add_edges_from(edges_to_add)
 
         logger.info(f"Ingested Risk State for {ticker}. Graph nodes: {self.graph.number_of_nodes()}")
 
