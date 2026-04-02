@@ -11,6 +11,23 @@ logger = logging.getLogger(__name__)
 P = ParamSpec("P")
 R = TypeVar("R")
 
+
+def _calculate_jitter(attempt: int, backoff_in_seconds: float, max_backoff: float) -> float:
+    """
+    Calculates the sleep time with exponential backoff and full jitter.
+
+    Args:
+        attempt (int): The current retry attempt (0-indexed).
+        backoff_in_seconds (float): The base backoff time in seconds.
+        max_backoff (float): The maximum allowed backoff time in seconds.
+
+    Returns:
+        float: The randomized sleep time.
+    """
+    temp = min(max_backoff, backoff_in_seconds * (2 ** attempt))
+    return random.uniform(0, temp)
+
+
 def retry_with_backoff(
     retries: int = 3,
     backoff_in_seconds: float = 1.0,
@@ -24,11 +41,15 @@ def retry_with_backoff(
     exponential backoff with full jitter to avoid thundering herd problems, and
     allows specifying a maximum backoff limit and specific exceptions to catch.
 
+    Architecture & Usage:
+        Use this decorator to wrap network calls, database queries, or flaky API endpoints.
+        It enforces deterministic resilience with randomized delays.
+
     Args:
-        retries: Maximum number of retry attempts before raising the exception.
-        backoff_in_seconds: Base backoff time in seconds.
-        max_backoff: Maximum backoff time in seconds to prevent unbounded sleeps.
-        exceptions: Tuple of exceptions that should trigger a retry.
+        retries (int): Maximum number of retry attempts before raising the exception.
+        backoff_in_seconds (float): Base backoff time in seconds.
+        max_backoff (float): Maximum backoff time in seconds to prevent unbounded sleeps.
+        exceptions (tuple[type[Exception], ...]): Tuple of exceptions that should trigger a retry.
 
     Returns:
         The decorated function.
@@ -46,12 +67,9 @@ def retry_with_backoff(
                             logger.error(
                                 f"Async function {func.__name__} failed after {retries} retries: {e}"
                             )
-                            raise
+                            raise e from None
 
-                        # Exponential backoff with full jitter
-                        temp = min(max_backoff, backoff_in_seconds * (2 ** attempt))
-                        sleep_time = random.uniform(0, temp)
-
+                        sleep_time = _calculate_jitter(attempt, backoff_in_seconds, max_backoff)
                         logger.warning(
                             f"Async function {func.__name__} failed: {e}. "
                             f"Retrying in {sleep_time:.2f}s... (Attempt {attempt + 1}/{retries})"
@@ -72,12 +90,9 @@ def retry_with_backoff(
                             logger.error(
                                 f"Function {func.__name__} failed after {retries} retries: {e}"
                             )
-                            raise
+                            raise e from None
 
-                        # Exponential backoff with full jitter
-                        temp = min(max_backoff, backoff_in_seconds * (2 ** attempt))
-                        sleep_time = random.uniform(0, temp)
-
+                        sleep_time = _calculate_jitter(attempt, backoff_in_seconds, max_backoff)
                         logger.warning(
                             f"Function {func.__name__} failed: {e}. "
                             f"Retrying in {sleep_time:.2f}s... (Attempt {attempt + 1}/{retries})"
