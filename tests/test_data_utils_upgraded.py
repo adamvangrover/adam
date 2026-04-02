@@ -1,8 +1,10 @@
+import asyncio
 import pytest
 import json
 import csv
 import yaml
 from pathlib import Path
+from unittest.mock import patch
 from core.utils.data_utils import DataLoader, load_data
 from core.system.error_handler import FileReadError, InvalidInputError
 
@@ -47,11 +49,28 @@ def test_load_yaml(temp_files):
     data = loader.load({"type": "yaml", "path": temp_files["yaml"]})
     assert data == {"key": "value"}
 
-def test_load_smart_text(temp_files):
+@patch("core.llm_plugin.LLMPlugin.generate_text")
+def test_load_smart_text_success(mock_generate_text, temp_files):
+    # Mock successful LLM response containing JSON
+    mock_generate_text.return_value = '```json\n{"extracted_entities": ["AI", "Parsing"], "summary": "Real summary"}\n```'
     loader = DataLoader(use_cache=False)
     data = loader.load({"type": "smart_text", "path": temp_files["smart_text"]})
     assert "source_file" in data
+    assert data["summary"] == "Real summary"
+    assert "AI" in data["extracted_entities"]
+    assert data["text_length"] == 23
+
+@patch("core.llm_plugin.LLMPlugin.generate_text")
+def test_load_smart_text_fallback(mock_generate_text, temp_files):
+    # Mock LLM failing with exception
+    mock_generate_text.side_effect = Exception("API timeout")
+    loader = DataLoader(use_cache=False)
+    data = loader.load({"type": "smart_text", "path": temp_files["smart_text"]})
+
+    # Assert fallback to mock behavior
+    assert "source_file" in data
     assert "summary" in data
+    assert data["summary"] == "This is a mock AI-generated summary of the unstructured text."
     assert data["text_length"] == 23
 
 def test_caching(temp_files):
@@ -86,3 +105,48 @@ def test_file_size_limit(temp_files, monkeypatch):
 def test_load_data_wrapper(temp_files):
     data = load_data({"type": "json", "path": temp_files["json"]}, cache=False)
     assert data == {"key": "value"}
+
+@pytest.mark.asyncio
+async def test_async_load(temp_files):
+    loader = DataLoader(use_cache=True)
+    data = await loader.async_load({"type": "json", "path": temp_files["json"]})
+    assert data == {"key": "value"}
+    # Verify caching in async mode
+    assert loader._data_cache[temp_files["json"]] == {"key": "value"}
+
+@patch("core.utils.data_utils.load_config")
+def test_api_whitelisting_valid(mock_load_config):
+    mock_load_config.return_value = {
+        "data_sources": {
+            "whitelisted_api_feeds": ["example_market_data_api"]
+        }
+    }
+    loader = DataLoader(use_cache=True)
+    data = loader.load({"type": "api", "provider": "example_market_data_api"})
+    assert "market_trends" in data
+    # Verify API result was cached
+    assert "api:example_market_data_api" in loader._data_cache
+
+    # Second call should fetch from cache, load_config should not be called again
+    loader.load({"type": "api", "provider": "example_market_data_api"})
+    mock_load_config.assert_called_once()
+
+
+@patch("core.utils.data_utils.load_config")
+def test_api_whitelisting_invalid(mock_load_config):
+    mock_load_config.return_value = {
+        "data_sources": {
+            "whitelisted_api_feeds": ["some_other_api"]
+        }
+    }
+    loader = DataLoader()
+    with pytest.raises(InvalidInputError, match="is not whitelisted"):
+        loader.load({"type": "api", "provider": "example_market_data_api"})
+
+
+@patch("core.utils.data_utils.load_config")
+def test_api_whitelisting_missing_config(mock_load_config):
+    mock_load_config.return_value = None
+    loader = DataLoader()
+    with pytest.raises(InvalidInputError, match="Configuration missing"):
+        loader.load({"type": "api", "provider": "example_market_data_api"})

@@ -23,6 +23,7 @@ Dependencies:
 """
 
 
+import asyncio
 import csv
 import json
 import logging
@@ -32,6 +33,7 @@ from typing import Any
 import yaml
 
 from core.system.error_handler import FileReadError, InvalidInputError
+from core.utils.config_utils import load_config
 
 logger = logging.getLogger(__name__)
 
@@ -40,6 +42,12 @@ class DataLoader:
     """
     A class to handle loading data from files (JSON, CSV, YAML) or APIs,
     with built-in caching.
+
+    Architecture & Usage:
+    This class is the central data ingestion engine. It validates paths, parses
+    data deterministically, and maintains an internal LRU-like cache.
+    Use `load` for synchronous pipelines and `async_load` for high-throughput
+    asynchronous ingestion where `json.loads` might block the event loop.
     """
     SUPPORTED_TYPES = {"json", "csv", "yaml", "smart_text"}
     MAX_FILE_SIZE_BYTES: int = 50 * 1024 * 1024  # 50 MB limit to prevent memory exhaustion
@@ -57,6 +65,67 @@ class DataLoader:
         """
         self.use_cache: bool = use_cache
         self._data_cache: dict[str, Any] = {}
+
+    def _update_cache(self, cache_key: str, data: Any) -> None:
+        """
+        Safely updates the internal cache, enforcing capacity constraints via LIFO eviction.
+        """
+        if len(self._data_cache) >= self.MAX_CACHE_ENTRIES:
+            logger.warning("Cache capacity reached. Evicting oldest entry.")
+            self._data_cache.pop(next(iter(self._data_cache)))
+        self._data_cache[cache_key] = data
+
+    async def async_load(self, source_config: dict[str, Any]) -> dict[str, Any] | list[Any] | None:
+        """
+        Asynchronously loads data dynamically based on the provided configuration.
+        Offloads synchronous CPU-bound parsing (like JSON) to a thread pool to avoid blocking the event loop.
+
+        Args:
+            source_config (dict[str, Any]): Configuration specifying 'type' and 'path'.
+
+        Returns:
+            dict[str, Any] | list[Any] | None: The loaded data.
+
+        Raises:
+            InvalidInputError: Triggered on unknown type/path.
+            FileReadError: Triggered on I/O failures.
+        """
+        data_type = source_config.get("type")
+        file_path = source_config.get("path")
+
+        # Cache key determination
+        cache_key = f"api:{source_config.get('provider')}" if data_type == "api" else str(file_path) if file_path else ""
+
+        if self.use_cache and cache_key in self._data_cache:
+            logger.info(f"Loading data from cache: {cache_key}")
+            return self._data_cache[cache_key]
+
+        match data_type:
+            case "api":
+                data = await asyncio.to_thread(self._load_api, source_config)
+            case t if t in self.SUPPORTED_TYPES:
+                if not file_path:
+                    logger.error("Invalid source configuration: 'path' is required for file-based sources.")
+                    raise InvalidInputError("Missing 'path' in source_config")
+                file_path_obj = Path(file_path)
+
+                if not file_path_obj.exists():
+                    logger.error(f"Data file not found: {file_path_obj}")
+                    raise FileReadError(str(file_path_obj), "File not found")
+
+                file_size = file_path_obj.stat().st_size
+                if file_size > self.MAX_FILE_SIZE_BYTES:
+                    logger.error(f"File {file_path_obj} exceeds maximum allowed size ({self.MAX_FILE_SIZE_BYTES} bytes)")
+                    raise FileReadError(str(file_path_obj), f"File exceeds maximum size limit of {self.MAX_FILE_SIZE_BYTES} bytes")
+
+                data = await asyncio.to_thread(self._read_file, file_path_obj, data_type)
+            case _:
+                logger.error(f"Unsupported data type: {data_type}")
+                raise InvalidInputError(f"Unsupported data type: {data_type}")
+
+        if self.use_cache and data is not None:
+            self._update_cache(cache_key, data)
+        return data
 
     def load(self, source_config: dict[str, Any]) -> dict[str, Any] | list[Any] | None:
         """
@@ -86,39 +155,38 @@ class DataLoader:
         data_type = source_config.get("type")
         file_path = source_config.get("path")
 
+        # Cache key determination
+        cache_key = f"api:{source_config.get('provider')}" if data_type == "api" else str(file_path) if file_path else ""
+
+        if self.use_cache and cache_key in self._data_cache:
+            logger.info(f"Loading data from cache: {cache_key}")
+            return self._data_cache[cache_key]
+
         match data_type:
             case "api":
-                return self._load_api(source_config)
+                data = self._load_api(source_config)
             case t if t in self.SUPPORTED_TYPES:
                 if not file_path:
                     logger.error("Invalid source configuration: 'path' is required for file-based sources.")
                     raise InvalidInputError("Missing 'path' in source_config")
                 file_path_obj = Path(file_path)
+
+                if not file_path_obj.exists():
+                    logger.error(f"Data file not found: {file_path_obj}")
+                    raise FileReadError(str(file_path_obj), "File not found")
+
+                file_size = file_path_obj.stat().st_size
+                if file_size > self.MAX_FILE_SIZE_BYTES:
+                    logger.error(f"File {file_path_obj} exceeds maximum allowed size ({self.MAX_FILE_SIZE_BYTES} bytes)")
+                    raise FileReadError(str(file_path_obj), f"File exceeds maximum size limit of {self.MAX_FILE_SIZE_BYTES} bytes")
+
+                data = self._read_file(file_path_obj, data_type)
             case _:
                 logger.error(f"Unsupported data type: {data_type}")
                 raise InvalidInputError(f"Unsupported data type: {data_type}")
 
-        if not file_path_obj.exists():
-            logger.error(f"Data file not found: {file_path_obj}")
-            raise FileReadError(str(file_path_obj), "File not found")
-
-        file_size = file_path_obj.stat().st_size
-        if file_size > self.MAX_FILE_SIZE_BYTES:
-            logger.error(f"File {file_path_obj} exceeds maximum allowed size ({self.MAX_FILE_SIZE_BYTES} bytes)")
-            raise FileReadError(str(file_path_obj), f"File exceeds maximum size limit of {self.MAX_FILE_SIZE_BYTES} bytes")
-
-        cache_key = str(file_path_obj)
-        if self.use_cache and cache_key in self._data_cache:
-            logger.info(f"Loading data from cache: {file_path_obj}")
-            return self._data_cache[cache_key]
-
-        data = self._read_file(file_path_obj, data_type)
         if self.use_cache and data is not None:
-            if len(self._data_cache) >= self.MAX_CACHE_ENTRIES:
-                logger.warning("Cache capacity reached. Evicting oldest entry.")
-                # LIFO cache eviction or simple pop
-                self._data_cache.pop(next(iter(self._data_cache)))
-            self._data_cache[cache_key] = data
+            self._update_cache(cache_key, data)
         return data
 
     @staticmethod
@@ -171,16 +239,14 @@ class DataLoader:
     @staticmethod
     def _load_smart_text(file_path: Path) -> dict[str, Any]:
         """
-        AI Feature: Parses unstructured text into a structured JSON representation
-        using a mock LLM extraction pipeline. In production, this would call
-        an actual LLM API or local model to extract named entities and relationships.
+        AI Feature: Parses unstructured text into a structured JSON representation.
+        Upgraded to use LLMPlugin for real extraction, with a graceful fallback to a deterministic response.
         """
+        import re
         logger.info(f"Initiating AI smart parsing for unstructured text: {file_path}")
         with file_path.open('r', encoding="utf-8") as f:
             raw_text = f.read()
 
-        # Mock LLM API extraction logic
-        # Here we simulate an advanced RAG feature extracting complex insights
         mock_extracted_data = {
             "source_file": str(file_path),
             "text_length": len(raw_text),
@@ -192,12 +258,60 @@ class DataLoader:
                 "keywords": ["finance", "revenue", "growth"]
             }
         }
-        return mock_extracted_data
+
+        try:
+            from core.llm_plugin import LLMPlugin
+            llm = LLMPlugin(use_cache=False)
+            prompt = (
+                f"Extract entities and summarize the following text:\n\n{raw_text}\n\n"
+                "Respond ONLY with a valid JSON dictionary matching this structure:\n"
+                "{\"extracted_entities\": [\"entity1\", \"entity2\"], \"summary\": \"your summary here\"}"
+            )
+            response = llm.generate_text(prompt)
+
+            # Use non-greedy regex with DOTALL to extract JSON block safely
+            match = re.search(r'\{.*?\}', response, re.DOTALL)
+            if match:
+                extracted_json = json.loads(match.group(0))
+                # Merge the core file info with the LLM extracted data
+                result = {
+                    "source_file": str(file_path),
+                    "text_length": len(raw_text),
+                    "extracted_entities": extracted_json.get("extracted_entities", []),
+                    "summary": extracted_json.get("summary", ""),
+                    "rag_context": mock_extracted_data["rag_context"] # Keep default stub for rag
+                }
+                return result
+            else:
+                logger.warning(f"LLM smart parse failed to return JSON string. Falling back.")
+                return mock_extracted_data
+
+        except Exception as e:
+            logger.warning(f"Real LLM smart parsing failed ({e}). Gracefully degrading to mock fallback data.")
+            return mock_extracted_data
 
     def _load_api(self, source_config: dict[str, Any]) -> dict[str, Any] | None:
-        """Provides placeholder data for API calls."""
+        """
+        Provides placeholder data for API calls. Enforces API whitelisting security.
+        Reads config/data_sources.yaml once per session to check if the requested API provider is allowed.
+        """
         logger.warning("API data source not yet implemented. Returning placeholder data.")
         provider = source_config.get("provider")
+
+        if not provider:
+            raise InvalidInputError("API provider not specified in configuration.")
+
+        # Cache the whitelist in the class to prevent repetitive disk I/O on API fetches
+        if not hasattr(self, '_whitelisted_apis'):
+            config = load_config("config/data_sources.yaml")
+            if config and "data_sources" in config:
+                self._whitelisted_apis = config["data_sources"].get("whitelisted_api_feeds", [])
+            else:
+                logger.error("Could not load data_sources.yaml for API whitelisting check.")
+                raise InvalidInputError("Configuration missing.")
+
+        if provider not in self._whitelisted_apis:
+            raise InvalidInputError(f"API provider '{provider}' is not whitelisted.")
 
         match provider:
             case "example_financial_data_api":
