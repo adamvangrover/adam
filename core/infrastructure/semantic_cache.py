@@ -2,19 +2,23 @@ import hashlib
 import json
 import os
 import time
-from typing import Dict, Any, Optional
 from collections import OrderedDict
+from typing import Any
+
 
 class SemanticCache:
     """
     Implements a Semantic Cache with Provenance awareness.
     Caches outputs based on inputs + logic version + underlying data hash.
+    Employs a two-tier hybrid caching strategy: an in-memory OrderedDict LRU cache
+    to prevent disk I/O bottlenecks on repeated hits, layered above a persistent
+    file-based JSON disk cache.
     """
 
     def __init__(self, cache_dir: str = "core/libraries_and_archives/cache", memory_capacity: int = 1000):
         self.cache_dir = cache_dir
         self.memory_capacity = memory_capacity
-        self._memory_cache = OrderedDict()
+        self._memory_cache: OrderedDict[str, dict[str, Any]] = OrderedDict()
         os.makedirs(self.cache_dir, exist_ok=True)
 
     def _generate_key(self, prompt: str, context_hash: str, model_id: str) -> str:
@@ -22,7 +26,7 @@ class SemanticCache:
         raw_key = f"{prompt}|{context_hash}|{model_id}"
         return hashlib.sha256(raw_key.encode('utf-8')).hexdigest()
 
-    def get(self, prompt: str, context_hash: str, model_id: str) -> Optional[Dict[str, Any]]:
+    def get(self, prompt: str, context_hash: str, model_id: str) -> dict[str, Any] | None:
         """Retrieves a cached response if it exists and is valid."""
         key = self._generate_key(prompt, context_hash, model_id)
 
@@ -43,7 +47,7 @@ class SemanticCache:
                 with open(path, 'r') as f:
                     entry = json.load(f)
 
-                # Check expiry (optional, e.g. 24h)
+                # Check expiry (e.g., 24h)
                 if time.time() - entry['timestamp'] > 86400:
                     return None
 
@@ -57,7 +61,7 @@ class SemanticCache:
                 return None
         return None
 
-    def set(self, prompt: str, context_hash: str, model_id: str, output: Dict[str, Any], metadata: Dict[str, Any] = None):
+    def set(self, prompt: str, context_hash: str, model_id: str, output: dict[str, Any], metadata: dict[str, Any] | None = None) -> None:
         """Writes a response to the cache."""
         key = self._generate_key(prompt, context_hash, model_id)
         path = os.path.join(self.cache_dir, f"{key}.json")
@@ -76,11 +80,17 @@ class SemanticCache:
         if key in self._memory_cache:
             self._memory_cache.move_to_end(key)
         self._memory_cache[key] = entry
-        if len(self._memory_cache) > self.memory_capacity:
+
+        # Enforce LRU policy on memory cache
+        while len(self._memory_cache) > self.memory_capacity:
             self._memory_cache.popitem(last=False)
 
         with open(path, 'w') as f:
             json.dump(entry, f, indent=2)
+
+    def clear(self) -> None:
+        """Clears the in-memory cache and optionally could remove disk files."""
+        self._memory_cache.clear()
 
     @staticmethod
     def compute_data_hash(data: Any) -> str:

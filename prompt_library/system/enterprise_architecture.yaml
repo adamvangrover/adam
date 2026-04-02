@@ -1,0 +1,40 @@
+- title: "Enterprise-Grade AI Risk Architecture Blueprint"
+  prompt: |
+    **Objective:** Define the complete architectural blueprint and implement the strategic roadmap for the "Cognitive Financial Operating System" (v23.0).
+
+    **Persona:** Act as a Principal Systems Architect and Quantitative Engineer specializing in enterprise-grade financial AI systems.
+
+    **Core Directives & Architectural Pillars:**
+
+    1.  **Repository Modernization ("Merge & Purge"):**
+        - Designate `core/engine/` as the singular source of truth.
+        - Sequester experimental code into `experimental/`.
+        - Enforce an "Additive-Only" development philosophy leveraging the Strangler Fig Pattern.
+        - Transition to `uv` for package management, centralized in `pyproject.toml`.
+        - Implement asynchronous Python FastAPI combined with gRPC for internal microservices, and GraphQL for external APIs.
+        - Distribute task orchestration via Celery, Redis, and Apache Kafka.
+
+    2.  **Observation Lakehouse & Data Sovereignty:**
+        - Eliminate network latency dependencies on cloud vector databases.
+        - Design an append-only analytical database using DuckDB, Apache Parquet, and Apache Iceberg.
+        - Deterministically capture "Stimulus-Response Cubes" (SRCs) for sub-100ms behavioral clustering.
+        - Establish an immutable "Golden Data Source" to prevent "Promptware" injections and maintain local security compliance.
+
+    3.  **Hybrid Neurosymbolic Agent State Protocol (HNASP):**
+        - Implement strict neurosymbolic separation.
+        - Use JsonLogic AST for the "Logic Layer" (deterministic business rules).
+        - Use BayesACT EPA vectors for the "Persona State" (probabilistic urgency/focus).
+        - Standardize input/outputs using pure Pydantic schemas.
+        - Utilize the Model Context Protocol (MCP) as the universal interface for all external tool intelligence.
+
+    4.  **High-Frequency Quantitative Execution:**
+        - Architect the Python to Rust integration boundary (PyO3).
+        - Outline the parameters for the Avellaneda-Stoikov market-making engine (Gamma, Sigma, T, Kappa).
+        - Describe how the Python orchestrator safely and efficiently executes sub-millisecond Rust modules with graceful pure Python fallback degradation.
+
+    5.  **Quantum Readiness (Agentic Stress Testing):**
+        - Integrate Qiskit modules to generate Quantum Amplitude Estimation (QAE) Python scripts.
+        - Provide an interface for the Risk Agent to model severe macroeconomic shocks efficiently.
+
+    **Expected Output:**
+    Generate a detailed multi-phase roadmap and architectural implementation guide adhering strictly to the above pillars. Provide actionable guidelines, structural diagrams (mermaid.js), and system requirements.
