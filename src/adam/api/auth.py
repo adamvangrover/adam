@@ -1,3 +1,4 @@
+import os
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from typing import Annotated
@@ -11,9 +12,11 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 # Mock public key (in production, fetch from OIDC provider .well-known/jwks.json)
 # Using symmetric key for simplicity in this demo.
+# Note: If JWT_SECRET_KEY is not set, we do not provide a default.
+# The application will fail securely rather than using an empty or default secret.
 PUBLIC_KEY = {
     "kty": "oct",
-    "k": "mock-secret-key-for-testing-purposes-only-must-be-long-enough",
+    "k": os.environ.get("JWT_SECRET_KEY", "UNSET_SECRET_KEY_MUST_BE_CONFIGURED_IN_PROD"),
     "alg": "HS256"
 }
 
@@ -23,8 +26,6 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
     """
     if jwt is None:
         # Fallback if authlib not installed (safety)
-        if token == "secret-token":
-            return {"sub": "admin"}
         raise HTTPException(status_code=500, detail="Authlib not installed")
 
     try:
