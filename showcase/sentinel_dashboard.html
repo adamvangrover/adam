@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Governance Harness - Sentinel Dashboard</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        cyber: {
+                            dark: '#0a0a0f',
+                            panel: '#151520',
+                            border: '#2a2a40',
+                            accent: '#00f3ff',
+                            warning: '#ffb000',
+                            danger: '#ff3366',
+                            success: '#00ff66'
+                        }
+                    },
+                    fontFamily: {
+                        mono: ['"JetBrains Mono"', 'monospace'],
+                        sans: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- React & ReactDOM -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- React Flow (for Regulatory DAG) -->
+    <script src="https://unpkg.com/reactflow@11.10.1/dist/umd/index.js"></script>
+    <link href="https://unpkg.com/reactflow@11.10.1/dist/style.css" rel="stylesheet" />
+
+    <style>
+        body {
+            background-color: #0a0a0f;
+            color: #e0e0e0;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        .scanline {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,243,255,0.05) 50%, rgba(0,243,255,0));
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 50;
+        }
+
+        .panel {
+            background: rgba(21, 21, 32, 0.8);
+            border: 1px solid #2a2a40;
+            border-radius: 4px;
+            backdrop-filter: blur(10px);
+        }
+
+        .glass-btn {
+            background: rgba(0, 243, 255, 0.1);
+            border: 1px solid #00f3ff;
+            color: #00f3ff;
+            transition: all 0.2s;
+        }
+
+        .glass-btn:hover {
+            background: rgba(0, 243, 255, 0.2);
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
+        }
+
+        .glass-btn-danger {
+            background: rgba(255, 51, 102, 0.1);
+            border: 1px solid #ff3366;
+            color: #ff3366;
+            transition: all 0.2s;
+        }
+
+        .glass-btn-danger:hover {
+            background: rgba(255, 51, 102, 0.2);
+            box-shadow: 0 0 10px rgba(255, 51, 102, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="scanline"></div>
+    <div id="root"></div>
+
+    <!-- Application Logic -->
+    <script type="text/babel" src="js/sentinel.js"></script>
+</body>
+</html>
