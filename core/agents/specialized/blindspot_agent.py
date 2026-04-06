@@ -184,11 +184,14 @@ class BlindspotAgent(AgentBase):
             logging.debug("Neural link not available for thought emission")
 
         return AgentOutput(
-            status="success",
-            data={
-                "status": "SCAN_COMPLETE",
-                "anomalies_detected": len(found_anomalies),
-                "findings": found_anomalies
+            answer="Blindspot scan completed successfully.",
+            metadata={
+                "status": "success",
+                "data": {
+                    "status": "SCAN_COMPLETE",
+                    "anomalies_detected": len(found_anomalies),
+                    "findings": found_anomalies
+                }
             },
             confidence=0.95
         )
