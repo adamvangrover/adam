@@ -56,7 +56,7 @@ class GitRepoSubAgent(AgentBase):
             if os.path.exists(repo_path):
                 return {"status": "already exists", "path": repo_path}
 
-            subprocess.run(["git", "clone", repo_url, repo_path], check=True)
+            subprocess.run(["git", "clone", "--", repo_url, repo_path], check=True)
             return {"status": "cloned", "path": repo_path}
         except subprocess.CalledProcessError as e:
             return {"error": str(e)}
