@@ -6,6 +6,9 @@ from core.agents.specialized.blindspot_agent import BlindspotAgent
 # Setup basic logging to see output
 logging.basicConfig(level=logging.INFO)
 
+import pytest
+
+@pytest.mark.asyncio
 async def test_consensus_engine():
     print("\n--- Testing Consensus Engine ---")
     engine = ConsensusEngine(threshold=0.5)
@@ -36,16 +39,19 @@ async def test_consensus_engine():
     print("Buy Result:", result_buy)
     assert result_buy['decision'] == 'BUY/APPROVE'
 
+@pytest.mark.asyncio
 async def test_blindspot_agent():
     print("\n--- Testing Blindspot Agent ---")
     config = {"agent_id": "BlindspotScanner_01"}
     agent = BlindspotAgent(config)
 
+    from core.agents.agent_base import AgentInput
     # This should hit the fallback logic since we don't have a real Neo4j connection active in this script context usually
-    result = await agent.execute()
+    input_data = AgentInput(query="test_query")
+    result = await agent.execute(input_data)
     print("Agent Result:", result)
 
-    assert result['status'] == 'SCAN_COMPLETE'
+    assert result.metadata['status'] == 'SCAN_COMPLETE'
     # We expect at least one anomaly from our mocked "Sentiment Divergence" logic
     # if the seed data has Energy as -0.2 sentiment but we force a check,
     # strictly speaking the mock logic depends on the specific seed data.
