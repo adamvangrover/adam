@@ -53,25 +53,38 @@ class OdysseyKnowledgeGraph(UnifiedKnowledgeGraph):
         if not node_id:
             raise ValueError("Entity missing @id")
 
-        self.graph.add_node(
+        # Bolt Optimization: Batch node/edge creation for O(1) graph update overhead
+        nodes_to_add = []
+        edges_to_add = []
+
+        nodes_to_add.append((
             node_id,
-            type=entity_data.get("@type"),
-            legal_name=entity_data.get("legalName"),
-            data=entity_data
-        )
+            {
+                "type": entity_data.get("@type"),
+                "legal_name": entity_data.get("legalName"),
+                "data": entity_data
+            }
+        ))
 
         if "hasCreditFacility" in entity_data:
             for facility in entity_data["hasCreditFacility"]:
                 fac_id = facility.get("@id")
                 if fac_id:
-                    self.graph.add_node(
+                    nodes_to_add.append((
                         fac_id,
-                        type="CreditFacility",
-                        facility_type=facility.get("facilityType"),
-                        has_jcrew_blocker=facility.get("hasJCrewBlocker", False),
-                        interest_coverage_ratio=facility.get("interestCoverageRatio")
-                    )
-                    self.graph.add_edge(node_id, fac_id, relation="BORROWS")
+                        {
+                            "type": "CreditFacility",
+                            "facility_type": facility.get("facilityType"),
+                            "has_jcrew_blocker": facility.get("hasJCrewBlocker", False),
+                            "interest_coverage_ratio": facility.get("interestCoverageRatio")
+                        }
+                    ))
+                    edges_to_add.append((node_id, fac_id, {"relation": "BORROWS"}))
+
+        if nodes_to_add:
+            self.graph.add_nodes_from(nodes_to_add)
+        if edges_to_add:
+            self.graph.add_edges_from(edges_to_add)
 
     def detect_fractured_ouroboros(self, limit: int = 100) -> List[List[str]]:
         """

@@ -1236,6 +1236,9 @@ def create_app(config_name='default'):
         """
         Celery task to run a simulation.
         """
+        if not re.match(r'^[a-zA-Z0-9_]+$', simulation_name) or simulation_name not in _get_allowed_simulations():
+            return {'status': 'failure', 'message': f'Simulation {simulation_name} not allowed.'}
+
         import importlib
         try:
             module = importlib.import_module(f"core.simulations.{simulation_name}")
