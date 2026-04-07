@@ -58,6 +58,7 @@ class TestCodeAlchemist(unittest.IsolatedAsyncioTestCase):
     async def test_validate_code_semantics(self, MockLLMPlugin):
         # Setup mock to return semantic analysis JSON
         mock_llm_instance = MockLLMPlugin.return_value
+        mock_llm_instance.generate_text = AsyncMock(return_value='{"semantic_errors": null}')
         mock_llm_instance.get_completion = AsyncMock(return_value='{"semantic_errors": null}')
 
         agent = CodeAlchemist(self.config)
@@ -94,6 +95,7 @@ class TestCodeAlchemist(unittest.IsolatedAsyncioTestCase):
         # Setup mock for optimization
         mock_llm_instance = MockLLMPlugin.return_value
         # Mock responses
+        mock_llm_instance.generate_text = AsyncMock(return_value='```python\ndef optimized(): pass\n```')
         mock_llm_instance.get_completion = AsyncMock(return_value='```python\ndef optimized(): pass\n```')
 
         agent = CodeAlchemist(self.config)
