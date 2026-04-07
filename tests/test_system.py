@@ -77,9 +77,9 @@ class TestAgentOrchestrator(unittest.TestCase):
         }
 
         mock_sentiment_agent = AsyncMock()
-        mock_sentiment_agent.execute.return_value = "positive"
+        mock_sentiment_agent.execute = AsyncMock(return_value="positive")
         mock_macro_agent = AsyncMock()
-        mock_macro_agent.execute.return_value = {'GDP_growth': 2.5, 'inflation': 2.0}
+        mock_macro_agent.execute = AsyncMock(return_value={'GDP_growth': 2.5, 'inflation': 2.0})
 
         self.orchestrator.agents = {
             "MarketSentimentAgent": mock_sentiment_agent,
@@ -98,9 +98,9 @@ class TestAgentOrchestrator(unittest.TestCase):
         mock_tech = AsyncMock()
         mock_risk = AsyncMock()
 
-        mock_fund.execute.return_value = {'some_data': 'some_value'}
-        mock_tech.execute.return_value = {'other_data': 'other_value'}
-        mock_risk.execute.return_value = {'risk_score': 0.5}
+        mock_fund.execute = AsyncMock(return_value={'some_data': 'some_value'})
+        mock_tech.execute = AsyncMock(return_value={'other_data': 'other_value'})
+        mock_risk.execute = AsyncMock(return_value={'risk_score': 0.5})
 
         self.orchestrator.agents = {
             "FundamentalAnalystAgent": mock_fund,

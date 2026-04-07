@@ -184,13 +184,13 @@ class BlindspotAgent(AgentBase):
             logging.debug("Neural link not available for thought emission")
 
         return AgentOutput(
-            status="success",
-            data={
+            answer=f"Scan complete. {len(found_anomalies)} anomalies detected.",
+            confidence=0.95,
+            metadata={
                 "status": "SCAN_COMPLETE",
                 "anomalies_detected": len(found_anomalies),
                 "findings": found_anomalies
-            },
-            confidence=0.95
+            }
         )
 
     def _detect_circular_dependencies(self) -> List[Dict[str, Any]]:

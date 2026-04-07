@@ -116,7 +116,9 @@ class ApprovalTool:
 
     def __init__(self, secret_key: str = None):
         self._sessions: Dict[str, ApprovalSession] = {}
-        self.secret_key = secret_key or os.environ.get('GOVERNANCE_OVERRIDE_SECRET', 'dev-secret-do-not-use-in-prod')
+        self.secret_key = secret_key or os.environ.get('GOVERNANCE_OVERRIDE_SECRET')
+        if not self.secret_key:
+            raise ValueError("GOVERNANCE_OVERRIDE_SECRET environment variable is not set")
 
     def request_approval(self, action: str, impact: str, conviction: float, ttl: int = 300,
                          policy_override: Optional[QuorumPolicy] = None) -> str:

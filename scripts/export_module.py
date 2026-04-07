@@ -35,6 +35,12 @@ COMMON_ASSETS = [
 
 # Module Definitions
 MODULES = {
+    "sentinel": {
+        "entry": "sentinel_dashboard.html",
+        "includes": [
+            "js/sentinel.js"
+        ]
+    },
     "market_mayhem": {
         "entry": "market_mayhem_archive.html",
         "includes": [

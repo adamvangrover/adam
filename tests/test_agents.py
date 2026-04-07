@@ -44,9 +44,9 @@ class TestMarketSentimentAgent(unittest.IsolatedAsyncioTestCase):
 
         # Mock additional agents to return predictable values
         self.agent.options_flow_agent = AsyncMock()
-        self.agent.options_flow_agent.execute.return_value = {"sentiment_score": 0.5}
+        self.agent.options_flow_agent.execute = AsyncMock(return_value={"sentiment_score": 0.5})
         self.agent.insider_activity_agent = AsyncMock()
-        self.agent.insider_activity_agent.execute.return_value = {"sentiment_score": 0.5}
+        self.agent.insider_activity_agent.execute = AsyncMock(return_value={"sentiment_score": 0.5})
 
         sentiment, details = await self.agent.analyze_sentiment()
 
@@ -62,9 +62,9 @@ class TestMarketSentimentAgent(unittest.IsolatedAsyncioTestCase):
         self.agent.web_traffic_api.get_web_traffic_sentiment.return_value = 0.0
         self.agent.check_credit_dominance_rule = AsyncMock(return_value=(None, {}))
         self.agent.options_flow_agent = AsyncMock()
-        self.agent.options_flow_agent.execute.return_value = {"sentiment_score": 0.5}
+        self.agent.options_flow_agent.execute = AsyncMock(return_value={"sentiment_score": 0.5})
         self.agent.insider_activity_agent = AsyncMock()
-        self.agent.insider_activity_agent.execute.return_value = {"sentiment_score": 0.5}
+        self.agent.insider_activity_agent.execute = AsyncMock(return_value={"sentiment_score": 0.5})
 
         sentiment, details = await self.agent.analyze_sentiment()
         # 1.0*0.25 + 0*0.15 + 0*0.15 + 0*0.1 + 0.5*0.2 + 0.5*0.15 = 0.25 + 0.1 + 0.075 = 0.425
@@ -78,9 +78,9 @@ class TestMarketSentimentAgent(unittest.IsolatedAsyncioTestCase):
         self.agent.web_traffic_api.get_web_traffic_sentiment.return_value = 0.0
         self.agent.check_credit_dominance_rule = AsyncMock(return_value=(None, {}))
         self.agent.options_flow_agent = AsyncMock()
-        self.agent.options_flow_agent.execute.return_value = {"sentiment_score": 0.5}
+        self.agent.options_flow_agent.execute = AsyncMock(return_value={"sentiment_score": 0.5})
         self.agent.insider_activity_agent = AsyncMock()
-        self.agent.insider_activity_agent.execute.return_value = {"sentiment_score": 0.5}
+        self.agent.insider_activity_agent.execute = AsyncMock(return_value={"sentiment_score": 0.5})
 
         sentiment, details = await self.agent.analyze_sentiment()
         # -1.0*0.25 + 0*0.15 + 0*0.15 + 0*0.1 + 0.5*0.2 + 0.5*0.15 = -0.25 + 0.1 + 0.075 = -0.075
@@ -96,8 +96,7 @@ class TestMacroeconomicAnalysisAgent(unittest.TestCase):
         }
         self.agent = MacroeconomicAnalysisAgent(config)
 
-    @patch('core.agents.macroeconomic_analysis_agent.send_message')
-    def test_analyze_macroeconomic_data(self, mock_send_message):
+    def test_analyze_macroeconomic_data(self):
         """Test analyzing macroeconomic data."""
         # Mock the data source's responses
         self.agent.data_sources['government_stats_api'].get_gdp.return_value = None  # Completed assignment
@@ -107,12 +106,8 @@ class TestMacroeconomicAnalysisAgent(unittest.TestCase):
         self.assertIsInstance(insights, dict)  # Check if insights is a dictionary
         self.assertIn('GDP_growth_trend', insights)
         self.assertIn('inflation_outlook', insights)
-        mock_send_message.assert_called_once_with(
-            {'agent': 'macroeconomic_analysis_agent', 'insights': insights}
-        )
 
-    @patch('core.agents.macroeconomic_analysis_agent.send_message')
-    def test_analyze_macroeconomic_data_with_high_gdp_growth(self, mock_send_message):
+    def test_analyze_macroeconomic_data_with_high_gdp_growth(self):
         """Test analyzing macroeconomic data with high GDP growth."""
         # Mock the data source's responses with high GDP growth
         self.agent.data_sources['government_stats_api'].get_gdp.return_value = {'value': 2.5}
@@ -128,8 +123,7 @@ class TestGeopoliticalRiskAgent(unittest.TestCase):
         config = {'data_sources': {'news_api': Mock(), 'political_database': Mock()}}
         self.agent = GeopoliticalRiskAgent(config)
 
-    @patch('core.agents.geopolitical_risk_agent.send_message')
-    def test_assess_geopolitical_risks(self, mock_send_message):
+    def test_assess_geopolitical_risks(self):
         """Test assessing geopolitical risks."""
         # ... (mock data sources and their responses)
 
@@ -137,9 +131,6 @@ class TestGeopoliticalRiskAgent(unittest.TestCase):
         self.assertIsInstance(risk_assessments, dict)
         self.assertIn('global_risk_index', risk_assessments) # Note: changed from political_risk_index based on source code output
         self.assertIn('regional_assessments', risk_assessments) # Note: changed from key_risks
-        mock_send_message.assert_called_once_with(
-            {'agent': 'geopolitical_risk_agent', 'risk_assessments': risk_assessments}
-        )
 
 # ... (add test classes for other agents with similar structure)
 

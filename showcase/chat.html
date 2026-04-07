@@ -161,7 +161,10 @@
                 // PATH A: Check for specific "Demo" triggers first (Fast track)
                 // This allows you to show off specific scenarios instantly.
                 const lowerText = text.toLowerCase();
-                if (lowerText.includes('apple') || lowerText.includes('risk') || lowerText.includes('sim')) {
+                const demoKeywords = ['apple', 'aapl', 'risk', 'sim', 'inflation', 'cpi', 'energy', 'oil', 'brent', 'vix', 'volatility', 'credit', 'bsl', 'yield', 'crypto', 'bitcoin', 'btc', 'nvidia', 'ai', 'compute'];
+                const hasDemoKeyword = demoKeywords.some(kw => lowerText.includes(kw));
+
+                if (hasDemoKeyword) {
                     // Simulate a network delay for realism
                     await new Promise(r => setTimeout(r, 1200));
                     displayHtml = generateDemoResponse(lowerText);
@@ -188,7 +191,7 @@
                 // PATH D: Default fallback if nothing else works
                 else {
                     await new Promise(r => setTimeout(r, 1000));
-                    displayHtml = "System operational. However, I am not connected to the DataManager. \n\nTry asking about **Apple** or running a **Risk Simulation** to see my demo capabilities.";
+                    displayHtml = "System operational. However, I am not connected to the DataManager. \n\nTry asking about **Apple**, **inflation**, **energy**, **vix**, **credit**, **crypto**, **nvidia** or running a **Risk Simulation** to see my demo capabilities.";
                 }
 
                 // 3. Remove Loader and Show Response
@@ -209,7 +212,25 @@
             if (query.includes('risk') || query.includes('sim')) {
                 return "Initiating **Crisis Simulation Protocol**...\n\nScenario: *Global Interest Rate Shock (+50bps)*\n\nRunning 10,000 paths...\n\n**Result:**\n- Portfolio VaR (99%): -4.2%\n- Expected Drawdown: -12.5%\n- Most impacted sector: Real Estate (REITs)\n\nGraph updated.";
             }
-            return "Analysis complete.";
+            if (query.includes('inflation') || query.includes('cpi')) {
+                return "## Inflation & CPI Outlook\n\n**Stance:** HAWKISH\n\nThe Federal Reserve remains in a restrictive stance, with the effective federal funds rate maintained at 5.25%–5.50%. Despite cooling headline CPI, the 'stickiness' of super-core inflation prevents any immediate pivot. Forward guidance remains data-dependent, yet the 'Dot Plot' suggests a delayed easing cycle, now pushed to Q4 2026. This environment forces a rigorous reassessment of debt service coverage ratios (DSCR) across the mid-market landscape.";
+            }
+            if (query.includes('energy') || query.includes('oil') || query.includes('brent')) {
+                return "## Energy Shock Scenario\n\n**Alert:** COMMODITY SUPER-CYCLE\n\nA sustained energy shock pushes Brent to $110/bbl, triggering a surprise 25bps 'inflation-slayer' Fed hike.\n\n- **Credit Risk:** Rapid deterioration in B-rated credits; interest coverage ratios (ICR) fall below 1.2x for 30% of the BSL universe.\n- **Market Risk:** A violent sell-off in long-duration assets; the 10Y yield spikes toward 5.25%, causing a double-digit drawdown in fixed-income portfolios.\n- **Liquidity Risk:** Bid-ask spreads in the secondary loan market widen by 200bps as dealers pull back, stranding 'zombie' firms unable to refinance.";
+            }
+            if (query.includes('vix') || query.includes('volatility')) {
+                return "## Volatility Daemon\n\n**VIX Status:** ELEVATED (26.14)\n\nThe 'Fear Gauge' has breached the 25-point firewall. This is no longer a localized glitch; volatility is now the atmospheric baseline. The decoupling from liquidity is no longer transient; it's structural.";
+            }
+            if (query.includes('credit') || query.includes('bsl') || query.includes('yield')) {
+                return "## BSL Market Update & The Repricing Mirage\n\nThe Broadly Syndicated Loan (BSL) market has witnessed a 40% YoY increase in issuance, largely driven by 'amend-and-extend' activity. While the 'Repricing Mirage' suggests health, the underlying reality is a transfer of value from lenders to borrowers.\n\n- **Spread Tightening:** BSL spreads have compressed to L+325, significantly tighter than Private Credit counterparts (L+450–500).\n- **Late-Cycle Echoes:** Current behavior mirrors the 2007 and 2019 pre-crisis windows, where covenant-lite structures reached 90% of total volume, eroding recovery prospects (LGD).\n- **Private Credit vs. BSL:** We are seeing a 'cannibalization' effect where BSL is reclaiming market share from Private Credit as issuers hunt for the lowest cost of capital, despite the increased market risk.";
+            }
+            if (query.includes('crypto') || query.includes('bitcoin') || query.includes('btc')) {
+                return "## Bitcoin (BTC) Overview\n\n**Price:** $66,012 | -1.33%\n\nA low-res retreat. BTC is flickering below the $67k handle, acting once again like a high-beta software derivative rather than a 'Digital Gold' safe-haven. The ultimate 'off-chain' firewall, surging as the legacy fiat kernel shows signs of thermal throttling.";
+            }
+            if (query.includes('nvidia') || query.includes('ai') || query.includes('compute')) {
+                return "## Nvidia & AI Infrastructure\n\n**Trend:** RACK-LEVEL AUDITS\n\nThe Commerce Department now requires real-time telemetry from H200 clusters in 'neutral' zones; Nvidia is shifting its business model from selling chips to managing audited compute environments. Additionally, OpenAI's $150B Nuclear Pivot confirms they are seeking direct ownership of modular nuclear reactors (SMRs), signaling that the next phase of LLM scaling is an energy play, not a code play.";
+            }
+            return "Analysis complete. I am currently running in an offline demonstration mode. I am programmed to respond to specific queries like 'apple', 'risk', 'inflation', 'energy', 'vix', 'credit', 'crypto', and 'nvidia'.";
         }
 
         // --- HELPER: Format Backend JSON (from File 1) ---

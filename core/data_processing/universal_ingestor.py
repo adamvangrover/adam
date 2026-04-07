@@ -512,8 +512,12 @@ class UniversalIngestor:
         async with aiofiles.open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
             try:
                 content = await f.read()
-                clean_content = GoldStandardScrubber.clean_text(content)
-                data = json.loads(clean_content)
+
+                def parse_json(raw_content):
+                    clean = GoldStandardScrubber.clean_text(raw_content)
+                    return json.loads(clean)
+
+                data = await asyncio.to_thread(parse_json, content)
             except json.JSONDecodeError:
                 return  # Skip invalid JSON
 
@@ -540,13 +544,19 @@ class UniversalIngestor:
         self.artifacts.append(artifact)
 
     async def _process_jsonl_async(self, filepath: Path):
-        content = []
         async with aiofiles.open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
-            async for line in f:
+            lines = await f.readlines()
+
+        def parse_jsonl(raw_lines):
+            result = []
+            for line in raw_lines:
                 try:
-                    content.append(json.loads(line))
+                    result.append(json.loads(line))
                 except Exception:
                     continue
+            return result
+
+        content = await asyncio.to_thread(parse_jsonl, lines)
 
         title = filepath.name
         artifact = GoldStandardArtifact(
@@ -561,19 +571,25 @@ class UniversalIngestor:
     async def _process_markdown_async(self, filepath: Path):
         async with aiofiles.open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
             raw_text = await f.read()
-            text = GoldStandardScrubber.clean_text(raw_text)
 
-        lines = text.split('\n')
-        title = filepath.name
+        def process_md(raw):
+            text = GoldStandardScrubber.clean_text(raw)
 
-        for line in lines:
-            if line.strip().startswith('# '):
-                title = line.strip().replace('# ', '')
-                break
+            lines = text.split('\n')
+            title = filepath.name
 
-        # Semantic Chunking via ChunkingEngine
-        chunk_dicts = self.chunking_engine.chunk(text)
-        chunks = [c["text"] for c in chunk_dicts if "text" in c]
+            for line in lines:
+                if line.strip().startswith('# '):
+                    title = line.strip().replace('# ', '')
+                    break
+
+            # Semantic Chunking via ChunkingEngine
+            chunk_dicts = self.chunking_engine.chunk(text)
+            chunks = [c["text"] for c in chunk_dicts if "text" in c]
+
+            return text, title, chunks
+
+        text, title, chunks = await asyncio.to_thread(process_md, raw_text)
 
         artifact_type = ArtifactType.CODE_DOC
         if "prompt" in str(filepath):
@@ -599,11 +615,17 @@ class UniversalIngestor:
     async def _process_text_async(self, filepath: Path):
         async with aiofiles.open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
             raw_text = await f.read()
-            text = GoldStandardScrubber.clean_text(raw_text)
 
-        # Semantic Chunking via ChunkingEngine
-        chunk_dicts = self.chunking_engine.chunk(text)
-        chunks = [c["text"] for c in chunk_dicts if "text" in c]
+        def process_text(raw):
+            text = GoldStandardScrubber.clean_text(raw)
+
+            # Semantic Chunking via ChunkingEngine
+            chunk_dicts = self.chunking_engine.chunk(text)
+            chunks = [c["text"] for c in chunk_dicts if "text" in c]
+
+            return text, chunks
+
+        text, chunks = await asyncio.to_thread(process_text, raw_text)
 
         metadata = GoldStandardScrubber.extract_metadata(text, ArtifactType.UNKNOWN.value)
         metadata["semantic_chunks"] = len(chunks)
@@ -623,25 +645,30 @@ class UniversalIngestor:
             async with aiofiles.open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
                 source = await f.read()
 
-            tree = ast.parse(source)
-            docstring = ast.get_docstring(tree)
+            def process_python(src, fname):
+                tree = ast.parse(src)
+                docstring = ast.get_docstring(tree)
 
-            classes = [node.name for node in ast.walk(tree) if isinstance(node, ast.ClassDef)]
-            functions = [node.name for node in ast.walk(tree) if isinstance(node, ast.FunctionDef)]
+                classes = [node.name for node in ast.walk(tree) if isinstance(node, ast.ClassDef)]
+                functions = [node.name for node in ast.walk(tree) if isinstance(node, ast.FunctionDef)]
 
-            content = f"Module: {filepath.name}\n"
-            if docstring:
-                content += f"Docstring: {docstring}\n"
-            if classes:
-                content += f"Classes: {', '.join(classes)}\n"
-            if functions:
-                content += f"Functions: {', '.join(functions)}\n"
+                content = f"Module: {fname}\n"
+                if docstring:
+                    content += f"Docstring: {docstring}\n"
+                if classes:
+                    content += f"Classes: {', '.join(classes)}\n"
+                if functions:
+                    content += f"Functions: {', '.join(functions)}\n"
 
-            metadata = {
-                "classes": classes,
-                "functions": functions,
-                "has_docstring": bool(docstring)
-            }
+                metadata = {
+                    "classes": classes,
+                    "functions": functions,
+                    "has_docstring": bool(docstring)
+                }
+
+                return content, metadata
+
+            content, metadata = await asyncio.to_thread(process_python, source, filepath.name)
 
             artifact = GoldStandardArtifact(
                 source_path=str(filepath),

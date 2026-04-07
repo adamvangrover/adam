@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MARKET MAYHEM // DAILY TERMINAL</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    
+    <!-- Chart.js for Visualizations -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Marked.js for LLM Markdown Parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <!-- Mermaid.js for Workflow Diagrams -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            mermaid.initialize({ startOnLoad: false, theme: 'dark', background: 'transparent' });
+        });
+    </script>
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'Segoe UI', 'sans-serif'],
+                        mono: ['Fira Code', 'ui-monospace', 'monospace'],
+                        display: ['Oswald', 'Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        term: {
+                            bg: '#030712', surface: '#0f172a', card: '#1e293b', border: '#334155',
+                            cyan: '#06b6d4', blue: '#3b82f6', red: '#ef4444', amber: '#f59e0b', green: '#10b981',
+                            neon: '#38bdf8'
+                        }
+                    },
+                    backgroundImage: {
+                        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+                        'glass': 'linear-gradient(145deg, rgba(30,41,59,0.7) 0%, rgba(15,23,42,0.9) 100%)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;600&family=Inter:wght@300;400;600;800&family=Oswald:wght@500;700&display=swap');
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #030712; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #06b6d4; }
+        
+        body { font-size: 14px; }
+        
+        .glow-text { text-shadow: 0 0 12px rgba(6, 182, 212, 0.8); }
+        .glow-red { text-shadow: 0 0 12px rgba(239, 68, 68, 0.8); }
+        .glow-amber { text-shadow: 0 0 12px rgba(245, 158, 11, 0.8); }
+        
+        .crt-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%);
+            background-size: 100% 4px; z-index: 9999; pointer-events: none; opacity: 0.15;
+        }
+        .nav-item { transition: all 0.2s; border-left: 2px solid transparent; }
+        .nav-active { border-left-color: #38bdf8; background: rgba(56, 189, 248, 0.1); color: #fff; }
+        .nav-item:hover:not(.nav-active) { background: #1e293b; color: #fff; }
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        /* Loader */
+        .loader { border: 2px solid #1e293b; border-top: 2px solid #06b6d4; border-radius: 50%; width: 16px; height: 16px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        .ai-message p { margin-bottom: 0.5rem; }
+        .ai-message pre { background: #030712; padding: 0.5rem; border-radius: 4px; overflow-x: auto; border: 1px solid #334155; }
+        
+        /* NEW: Glitch & Interactive Effects */
+        .glitch-wrapper { position: relative; display: inline-block; }
+        .glitch-text { animation: glitch 2s linear infinite; }
+        @keyframes glitch {
+            2%, 64% { transform: translate(2px,0) skew(0deg); }
+            4%, 60% { transform: translate(-2px,0) skew(0deg); }
+            62% { transform: translate(0,0) skew(5deg); }
+        }
+        .stat-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); cursor: crosshair; }
+        .stat-card:hover { transform: translateY(-4px) scale(1.02); box-shadow: 0 10px 25px -5px rgba(0,0,0,0.5); border-color: rgba(255,255,255,0.2); z-index: 10; relative; }
+        .progress-container { width: 100%; background-color: #1e293b; border-radius: 9999px; overflow: hidden; height: 0.5rem; }
+        .progress-bar { height: 100%; background: linear-gradient(90deg, #ef4444, #f59e0b); transition: width 1s ease-in-out; }
+    </style>
+</head>
+<body class="bg-term-bg text-slate-300 font-sans h-screen overflow-hidden flex flex-col selection:bg-term-cyan selection:text-white">
+    <div class="crt-overlay"></div>
+    <!-- Header -->
+    <header class="h-16 border-b border-white/10 bg-term-bg/80 backdrop-blur-md flex items-center justify-between px-6 shrink-0 z-20 shadow-2xl">
+        <div class="flex items-center gap-4">
+            <div class="w-10 h-10 rounded bg-gradient-to-br from-term-cyan to-term-blue text-white font-bold font-display text-lg flex items-center justify-center shadow-[0_0_15px_rgba(56,189,248,0.4)]">MM</div>
+            <div>
+                <h1 class="font-display font-bold text-slate-100 tracking-widest text-base uppercase">Market Mayhem</h1>
+                <p class="text-[10px] text-term-cyan font-mono tracking-widest uppercase" id="headerNodeInfo">NODE: Adam v26.0 // Institutional Edition</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-6 font-mono text-xs">
+            <div class="hidden md:flex items-center gap-2 text-term-amber bg-term-amber/10 px-3 py-1 rounded-full border border-term-amber/20">
+                <div class="w-2 h-2 rounded-full bg-term-amber animate-pulse"></div> ENCRYPTION: SECURE
+            </div>
+            <div class="text-slate-400 bg-white/5 px-3 py-1 rounded border border-white/5" id="sysClock">00:00:00 UTC</div>
+            <button onclick="toggleAI()" class="bg-term-cyan text-term-bg hover:bg-white px-4 py-1.5 rounded font-bold transition-colors flex items-center gap-2 shadow-[0_0_10px_rgba(6,182,212,0.3)]">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                <span class="hidden sm:inline">ADAM V26.0 TERMINAL</span>
+            </button>
+        </div>
+    </header>
+    
+    <!-- Main Layout -->
+    <div class="flex flex-1 overflow-hidden relative">
+        <!-- Sidebar Navigation -->
+        <aside class="w-64 border-r border-white/5 bg-term-surface/50 backdrop-blur flex flex-col shrink-0 overflow-y-auto hidden lg:flex z-10">
+            <div class="p-4 border-b border-white/5">
+                <div class="text-[10px] text-slate-500 font-mono mb-2 tracking-widest">DEEP DIVE PROGRESS</div>
+                <div class="w-full bg-term-bg h-1.5 rounded-full overflow-hidden">
+                    <div id="progressBar" class="bg-gradient-to-r from-term-cyan to-term-blue h-full w-0 transition-all duration-500 shadow-[0_0_10px_rgba(56,189,248,0.8)]"></div>
+                </div>
+            </div>
+            <nav id="moduleNav" class="flex-1 py-4 flex flex-col gap-1 px-3 font-mono text-xs"></nav>
+        </aside>
+        
+        <!-- Main Content Area -->
+        <main class="flex-1 overflow-y-auto bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-term-surface via-term-bg to-term-bg p-4 md:p-8 relative" id="mainScrollArea">
+            <div class="max-w-5xl mx-auto">
+                <!-- Mobile Nav Toggle -->
+                <select id="mobileNav" onchange="loadModule(parseInt(this.value))" class="lg:hidden w-full bg-term-surface border border-term-border text-slate-200 text-sm rounded p-3 mb-6 font-mono outline-none focus:border-term-cyan"></select>
+                
+                <!-- Dynamic Content Container -->
+                <article id="contentArea" class="prose prose-invert prose-slate max-w-none 
+                    prose-headings:text-white prose-headings:font-display prose-headings:font-bold 
+                    prose-h1:text-4xl prose-h1:border-b prose-h1:border-white/10 prose-h1:pb-4 
+                    prose-h2:text-2xl prose-h2:text-term-neon prose-h3:text-term-cyan 
+                    prose-p:leading-relaxed prose-p:text-slate-300 prose-a:text-term-cyan 
+                    transition-all duration-500 ease-in-out opacity-0 translate-y-4"></article>
+                
+                <!-- Footer Navigation -->
+                <div class="mt-16 pt-6 border-t border-white/10 flex justify-between items-center pb-12">
+                    <button id="prevBtn" class="px-5 py-2.5 glass-panel text-slate-300 rounded text-xs font-mono hover:text-white hover:border-white/30 transition-all disabled:opacity-30 disabled:pointer-events-none">&lt; PREV MODULE</button>
+                    <button id="nextBtn" class="px-5 py-2.5 bg-white text-term-bg rounded text-xs font-mono font-bold hover:bg-term-neon transition-all disabled:opacity-30 disabled:pointer-events-none shadow-[0_0_15px_rgba(255,255,255,0.2)]">NEXT MODULE &gt;</button>
+                </div>
+            </div>
+        </main>
+        
+        <!-- AI Chat Overlay (Right Panel) -->
+        <aside id="aiPanel" class="absolute right-0 top-0 h-full w-full md:w-[450px] glass-panel border-l border-white/10 transform translate-x-full transition-transform duration-300 cubic-bezier(0.4, 0, 0.2, 1) z-30 flex flex-col shadow-2xl">
+            <div class="p-5 border-b border-white/10 flex justify-between items-center bg-black/20">
+                <div class="flex items-center gap-3">
+                    <div class="w-2.5 h-2.5 rounded-full bg-term-neon animate-pulse shadow-[0_0_8px_rgba(56,189,248,0.8)]"></div>
+                    <div>
+                        <h2 class="font-display text-sm font-bold text-white tracking-widest">ADAM V26.0</h2>
+                        <p class="text-[9px] text-slate-400 font-mono uppercase">Institutional Strategy LLM</p>
+                    </div>
+                </div>
+                <button onclick="toggleAI()" class="text-slate-400 hover:text-white bg-white/5 p-1.5 rounded transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            
+            <div id="chatLog" class="flex-1 overflow-y-auto p-5 flex flex-col gap-5 text-sm font-sans">
+                <div class="glass-panel p-4 rounded-xl text-slate-300 self-start max-w-[90%] shadow-lg border-l-2 border-l-term-neon">
+                    <p class="text-[10px] font-mono text-term-neon mb-2 uppercase tracking-wider">System Handshake Validated</p>
+                    I am Adam v26.0. I have deeply analyzed the latest baseline parameters. Query the data sets below or ask for real-time allocation shifts.
+                </div>
+            </div>
+            
+            <div class="p-5 border-t border-white/10 bg-black/20">
+                <form id="chatForm" class="flex gap-2 relative">
+                    <input type="text" id="chatInput" placeholder="Execute query..." class="flex-1 bg-black/40 border border-white/10 rounded-lg pl-4 pr-12 py-3 text-sm text-white font-mono focus:outline-none focus:border-term-neon focus:ring-1 focus:ring-term-neon transition-all" required autocomplete="off">
+                    <button type="submit" class="absolute right-2 top-2 bottom-2 bg-term-neon hover:bg-white text-term-bg px-3 rounded text-sm font-bold transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                    </button>
+                </form>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Application Logic & Content -->
+    <script>
+        const modules = [
+            { 
+                id: 1, 
+                title: "The Daily Brief", 
+                subtitle: "Top-Level Visual Summary", 
+                content: `
+                    <h1>ENERGY SHOCK PROTOCOL // BRENT $119</h1>
+                    <p class="text-xl text-slate-400 mb-8 border-l-4 border-term-cyan pl-4">Systemic risk elevated. Sustained pressure on energy markets is cascading into yield curves. 10Y Treasury jumps to 4.28%. Equities stressing under aggressive liquidity drain.</p>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                        <div class="glass-panel p-4 rounded border-t-2 border-term-red">
+                            <div class="text-[10px] text-slate-500 font-mono mb-1">S&P 500</div>
+                            <div class="text-2xl font-bold glow-red">5,120.40</div>
+                            <div class="text-xs text-term-red mt-1">▼ -1.8%</div>
+                        </div>
+                        <div class="glass-panel p-4 rounded border-t-2 border-term-amber">
+                            <div class="text-[10px] text-slate-500 font-mono mb-1">10Y YIELD</div>
+                            <div class="text-2xl font-bold glow-amber">4.28%</div>
+                            <div class="text-xs text-term-amber mt-1">▲ +12 bps</div>
+                        </div>
+                        <div class="glass-panel p-4 rounded border-t-2 border-term-red">
+                            <div class="text-[10px] text-slate-500 font-mono mb-1">VIX</div>
+                            <div class="text-2xl font-bold glow-red">24.50</div>
+                            <div class="text-xs text-term-red mt-1">▲ +15.0%</div>
+                        </div>
+                        <div class="glass-panel p-4 rounded border-t-2 border-term-neon">
+                            <div class="text-[10px] text-slate-500 font-mono mb-1">BRENT CRUDE</div>
+                            <div class="text-2xl font-bold text-term-neon glow-text">$119.00</div>
+                            <div class="text-xs text-term-cyan mt-1">▲ +6.2%</div>
+                        </div>
+                    </div>
+                    <div class="glass-panel p-6 rounded border border-white/10">
+                        <h3 class="font-mono text-sm text-white mb-2 flex items-center gap-2"><div class="w-2 h-2 bg-term-green rounded-full animate-pulse"></div> THE VAULT // MONEY MARKET TRACKER</h3>
+                        <div class="flex justify-between items-end border-b border-white/5 pb-2">
+                            <span class="text-slate-400 text-sm">Implied Risk-Free Rate Yield</span>
+                            <span class="text-term-green font-mono text-xl">4.28%</span>
+                        </div>
+                        <div class="flex justify-between items-end pt-2">
+                            <span class="text-slate-400 text-sm">Net Liquidity Flows (24H)</span>
+                            <span class="text-term-cyan font-mono text-xl">+$40.5B</span>
+                        </div>
+                    </div>
+                ` 
+            },
+            { 
+                id: 2, 
+                title: "Layer 1 Deep Dive", 
+                subtitle: "Perception & Ingestion", 
+                content: `
+                    <h2>System 1 - Data Layer</h2>
+                    <p>Ingestion of broad market composites indicates severe structural pressure radiating from energy markets. Energy prices are acting as a regressive tax, and systemic liquidity drain is highly probable. Correlation breakdown detected across fixed income and equities.</p>
+                    <div class="w-full max-w-md mx-auto aspect-square my-8 glass-panel p-4 rounded-xl">
+                        <canvas id="signalRadarChart"></canvas>
+                    </div>
+                `,
+                onLoad: () => {
+                    const ctx = document.getElementById('signalRadarChart').getContext('2d');
+                    initChart('radar', new Chart(ctx, {
+                        type: 'radar',
+                        data: {
+                            labels: ['S&P Stress', '10Y Yield', 'VIX', 'Brent', 'BTC'],
+                            datasets: [{
+                                label: 'Systemic Stress Index',
+                                data: [85, 88, 80, 95, 60],
+                                backgroundColor: 'rgba(239, 68, 68, 0.2)',
+                                borderColor: '#ef4444',
+                                pointBackgroundColor: '#ef4444',
+                                pointBorderColor: '#fff',
+                                pointHoverBackgroundColor: '#fff',
+                                pointHoverBorderColor: '#ef4444'
+                            }]
+                        },
+                        options: { 
+                            scales: { 
+                                r: { 
+                                    grid: { color: '#334155' }, 
+                                    angleLines: { color: '#334155' }, 
+                                    pointLabels: { color: '#94a3b8', font: { family: 'Fira Code' } }, 
+                                    ticks: { display: false } 
+                                } 
+                            }, 
+                            plugins: { legend: { display: false } } 
+                        }
+                    }));
+                }
+            },
+            { 
+                id: 3, 
+                title: "Layer 2 Deep Dive", 
+                subtitle: "World Modeling & Compute", 
+                content: `
+                    <h2>System 3 - Compute Layer</h2>
+                    <p>Basel III Endgame impacts coupled with Repo Pulse dynamics are significantly amplifying the exogenous shock of Brent at $119. Counterparty risk metrics are elevating. The target variable trajectory demonstrates unconstrained demand destruction models initializing.</p>
+                    <div class="w-full h-64 my-8 glass-panel p-4 rounded-xl">
+                        <canvas id="hormuzChart"></canvas>
+                    </div>
+                `,
+                onLoad: () => {
+                    const ctx = document.getElementById('hormuzChart').getContext('2d');
+                    initChart('hormuz', new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: ['08:00', '10:00', '12:00', '14:00', '16:00'],
+                            datasets: [{
+                                label: 'Brent Crude Target Variable ($)',
+                                data: [112, 115, 117, 118, 119],
+                                borderColor: '#38bdf8',
+                                backgroundColor: 'rgba(56, 189, 248, 0.1)',
+                                borderWidth: 2,
+                                fill: true,
+                                tension: 0.4
+                            }]
+                        },
+                        options: { 
+                            responsive: true, 
+                            maintainAspectRatio: false, 
+                            scales: { 
+                                y: { grid: { color: '#1e293b' }, ticks: { color: '#94a3b8', font: {family:'Fira Code'} } }, 
+                                x: { grid: { color: '#1e293b' }, ticks: { color: '#94a3b8', font: {family:'Fira Code'} } } 
+                            }, 
+                            plugins: { legend: { display: false } } 
+                        }
+                    }));
+                }
+            },
+            { 
+                id: 4, 
+                title: "Reasoning & Override", 
+                subtitle: "Logic Architecture", 
+                content: `
+                    <h2>Reasoning & Override Protocols</h2>
+                    <div class="glass-panel p-6 border-l-4 border-term-red mb-6 bg-term-red/5">
+                        <h3 class="text-term-red mb-4 uppercase tracking-widest font-mono text-sm">The Mirror // Self-Reinforcement</h3>
+                        <ul class="font-mono text-sm text-slate-300 space-y-2 list-none pl-0">
+                            <li>> DETECTING: Human panic pattern matching 1970s energy shocks.</li>
+                            <li>> VERIFYING: Isolate signal from noise; do not extrapolate linear doom.</li>
+                            <li>> ACTION: Calibrating duration exposure; deploying capital to defensive sectors.</li>
+                        </ul>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                        <div class="p-4 border border-term-amber rounded bg-term-amber/10">
+                            <h4 class="text-term-amber font-mono text-xs mb-2">ROUTING BLOCK ALPHA</h4>
+                            <p class="text-sm">Shift 15% portfolio weight from High Beta Tech to Energy Producers & Utilities immediately.</p>
+                        </div>
+                        <div class="p-4 border border-term-cyan rounded bg-term-cyan/10">
+                            <h4 class="text-term-cyan font-mono text-xs mb-2">ROUTING BLOCK BETA</h4>
+                            <p class="text-sm">Increase cash equivalents in The Vault yielding 4.28% to absorb upcoming VIX shocks.</p>
+                        </div>
+                    </div>
+                    <div class="p-6 border-2 border-term-red rounded bg-term-red/10 mt-8 relative overflow-hidden">
+                        <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPgo8cmVjdCB3aWR0aD0iNCIgaGVpZ2h0PSI0IiBmaWxsPSIjMDAwIiBmaWxsLW9wYWNpdHk9IjAuMSIvPgo8L3N2Zz4=')] opacity-50"></div>
+                        <div class="relative z-10">
+                            <h3 class="text-term-red font-bold font-display text-xl mb-2 flex items-center gap-2 glow-red"><svg class="w-6 h-6 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg> BEHAVIORAL OVERRIDE // MEATSPACE TRAP</h3>
+                            <p class="font-mono text-sm text-white">Do not buy the dip yet. Humans will exhibit bias to fade the oil spike. Systemic cascade has not bottomed. Resist behavioral override.</p>
+                        </div>
+                    </div>
+                ` 
+            },
+            { 
+                id: 5, 
+                title: "Provenance Ledger", 
+                subtitle: "Audit & Source Verification", 
+                content: `
+                    <h2>Provenance Ledger</h2>
+                    <p>Cryptographic audit trail of all data ingestion vectors and signal verification for today's market parameters.</p>
+                    <div class="relative group my-4">
+                        <pre id="jsonLedger" class="bg-black/50 p-4 rounded font-mono text-xs text-term-green overflow-x-auto border border-white/10">
+{
+  "ledger_id": "LDG-20260401-119",
+  "timestamp": "2026-04-01T13:15:00Z",
+  "data_vectors": ["OPEC_NODE_7", "FED_WIRE_API", "CME_PRICING_FEED"],
+  "synthesized_variables": {
+    "brent_crude": 119.00,
+    "rfr_10y": 4.28,
+    "systemic_stress": "SEVERE"
+  },
+  "confidence_score": 0.94,
+  "hash": "0x8f4b2c9a...3d1e"
+}</pre>
+                        <button onclick="copyLedger(event)" class="absolute top-2 right-2 px-2 py-1 bg-white/10 hover:bg-white/20 rounded text-[10px] font-mono text-white transition-colors border border-transparent">COPY</button>
+                    </div>
+                    <h3 class="mt-8 mb-4">Human Appendix // Source Verification</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm font-mono text-slate-300">
+                            <thead class="bg-white/5 text-slate-400">
+                                <tr><th class="p-3 border-b border-white/10">SOURCE</th><th class="p-3 border-b border-white/10">TIMESTAMP</th><th class="p-3 border-b border-white/10">STATUS</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr class="border-b border-white/5 hover:bg-white/5"><td class="p-3">Bloomberg Terminal</td><td class="p-3">09:15 EST</td><td class="p-3 text-term-green">VERIFIED</td></tr>
+                                <tr class="border-b border-white/5 hover:bg-white/5"><td class="p-3">OPEC+ Flash Report</td><td class="p-3">10:30 EST</td><td class="p-3 text-term-green">VERIFIED</td></tr>
+                                <tr class="hover:bg-white/5"><td class="p-3">FOMC Desk Leak</td><td class="p-3">11:45 EST</td><td class="p-3 text-term-amber">PROBABILISTIC</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                `
+            }, 
+            {  
+                id: 6,  
+                title: "Core Framework",  
+                subtitle: "Risk Parameters",  
+                content: `
+                    <h2>Core Framework // Risk Parameters</h2>
+                    <p>Adam v26.0 utilizes dynamic risk-free rate pegging. Currently, the system is hard-anchored to the <span class="text-term-neon glow-text">4.28%</span> 10Y Yield. All discounted cash flow models and alpha generation routing automatically decrement beta weighting proportionally to the spread above baseline targets.</p>
+                    <p>Energy constraint ceiling triggered: Brent at <span class="text-term-neon glow-text">$119</span> forces an automatic deflationary hedge protocol across all highly-leveraged sub-sectors.</p>
+                `
+            },
+            {
+                id: 7,
+                title: "Orchestration Report",
+                subtitle: "AI Credit Frameworks",
+                content: `
+                    <h1>AI Credit Workflow Orchestration Report</h1>
+
+                    <h2>Executive Summary</h2>
+                    <p>This technical research report details the system architecture and operational frameworks for an advanced AI governance harness and LLM wrapper tailored for institutional credit risk. The proposed system orchestrates both synchronous Human-In-The-Loop (HITL) and asynchronous Human-On-The-Loop (HOTL) workflows, ensuring precise alignment with the stringent regulatory and operational requirements of an investment bank managing Ultra-High-Net-Worth (UHNW) individuals, private equity, and financial sponsors.</p>
+                    <hr class="border-white/10 my-8">
+
+                    <h2>1. System Architecture: AI Governance Harness and LLM Wrapper</h2>
+                    <p>The core of the architecture relies on a Context-Aware LLM Wrapper operating within a secure, multi-layered AI governance harness. This framework dynamically transitions between execution modalities based on real-time state evaluation, risk conviction, and Role-Based Access Control (RBAC).</p>
+                    <ul>
+                        <li><strong>The Orchestration Layer:</strong> Evaluates incoming credit requests and associated artifacts (e.g., K-1s, capital call schedules). It determines the complexity and stakes of the decision to route through standard deterministic pipelines or invoke LLM-based neuro-symbolic reasoning.</li>
+                        <li><strong>Synchronous HITL Workflow:</strong> Activated when immediate human oversight is mandated by policy or threshold breaches. The system halts automated progression, presenting a synthesized decision matrix to an underwriter or credit officer. The human's action acts as a deterministic key to unlock the next state.</li>
+                        <li><strong>Asynchronous HOTL Workflow:</strong> Leveraged for routine processing or low-conviction insights that do not halt immediate execution but require retrospective validation. AI autonomously advances the workflow while staging audit-ready snapshots in a review queue.</li>
+                    </ul>
+                    <hr class="border-white/10 my-8">
+
+                    <h2>2. Operational Use Cases: UHNW, Private Equity, and Financial Sponsors</h2>
+                    <p>The harness is explicitly tailored for the high-complexity credit requirements of institutional and private wealth management.</p>
+                    <ul>
+                        <li><strong>UHNW Lombard Lending & Margin Financing:</strong> The AI rapidly processes multi-jurisdictional asset portfolios, identifying concentrated positions and parsing bespoke trust structures. It continuously monitors LTV ratios against dynamic market valuations, routing exception overrides to HITL review.</li>
+                        <li><strong>Private Equity & Subscription Lines:</strong> The harness automates the ingestion of LP agreements and capital call notices, analyzing the creditworthiness of underlying partners to assess the risk of capital call defaults.</li>
+                        <li><strong>Financial Sponsors (Leveraged Buyouts):</strong> For acquisition financing, the system generates deep-dive cash flow projections, running Base/Bull/Bear scenarios on target EBITDA against complex debt covenants.</li>
+                    </ul>
+                    <hr class="border-white/10 my-8">
+
+                    <h2>3. Integration of Probabilistic and Deterministic Risk Models</h2>
+                    <p>The orchestration layer acts as a fusion center for diverse model outputs, enforcing logic as data.</p>
+                    <ul>
+                        <li><strong>Deterministic Models:</strong> Hardcoded financial logic calculating precise current state metrics (e.g., LTV, Debt Service Coverage Ratio, Current Ratio).</li>
+                        <li><strong>Probabilistic AI Models:</strong> Neural networks generating Probability of Default (PD) curves based on alternative data, macro-economic sentiment, and historical cohort performance.</li>
+                        <li><strong>Synthesis (EL Calculation):</strong> The AI Wrapper extracts deterministic LGD (Loss Given Default) parameters from collateral valuation models, multiplying them by the probabilistic PD and Exposure at Default (EAD) to formulate the Expected Loss (EL). <code class="bg-black/30 text-term-neon px-1 rounded">EL = PD × LGD × EAD</code>.</li>
+                    </ul>
+                    <hr class="border-white/10 my-8">
+
+                    <h2>4. Algorithmic Decisioning: The EL > NPV Threshold</h2>
+                    <p>To gate high-value transaction risk autonomously, the system deploys a comparative valuation engine weighing downside risk against long-term relationship value.</p>
+                    <ol>
+                        <li><strong>Expected Loss Formulation:</strong> Continuously calculated via the integrated risk models (Section 3).</li>
+                        <li><strong>NPV of Future Fees Engine:</strong> Analyzes the client's holistic profile (AUM, anticipated M&A advisory, prime brokerage activity) to discount projected revenues back to Present Value.</li>
+                        <li><strong>Automated Gating Logic:</strong>
+                            <ul>
+                                <li><code class="bg-black/30 text-term-neon px-1 rounded">IF EL < (NPV_Fees * Risk_Appetite_Scalar)</code>: Proceed with automated underwriting or asynchronous HOTL approval.</li>
+                                <li><code class="bg-black/30 text-term-neon px-1 rounded">IF EL >= (NPV_Fees * Risk_Appetite_Scalar)</code>: Trigger hard constraint. Halt automated execution. Demand Step-Up Authentication and force Synchronous HITL review.</li>
+                            </ul>
+                        </li>
+                    </ol>
+                    <hr class="border-white/10 my-8">
+
+                    <h2>5. Execution Framework for Challenge Controls</h2>
+                    <p>The challenge execution framework routes escalations dynamically to optimize throughput without compromising safety.</p>
+                    <ul>
+                        <li><strong>Dynamic Friction:</strong> Introduces micro-delays or requires additional documentary evidence based on the delta between calculated EL and acceptable thresholds.</li>
+                        <li><strong>Severity Tiers:</strong>
+                            <ul>
+                                <li><em>Tier 1 (Low Severity - Data Anomaly):</em> Route to HOTL. The system proceeds but flags the underlying data point for future human verification.</li>
+                                <li><em>Tier 2 (Medium Severity - Covenant Proximity):</em> Route to Junior Analyst HITL. Requires basic acknowledgment and comment before proceeding.</li>
+                                <li><em>Tier 3 (High Severity - EL > NPV Breach):</em> Route to Senior Credit Officer HITL. Requires Step-Up Auth (MFA, biometric) and a fully documented rationale submitted to the immutable ledger.</li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <hr class="border-white/10 my-8">
+
+                    <h2>6. Dynamic Governance Controls within the LLM Wrapper</h2>
+                    <p>The LLM Wrapper operates as a sovereign guardrail, ensuring no prompt or generated output violates constraints.</p>
+                    <ul>
+                        <li><strong>Data Privacy (PII/MNPI Shielding):</strong> Pre-execution parsers redact material non-public information and personal identifiers before payloads hit external or internal LLM endpoints.</li>
+                        <li><strong>Context-Aware Execution:</strong> The wrapper reads the current environment state (e.g., "Trading Restricted", "Earnings Blackout") and immediately nullifies model execution requests that conflict with temporal policies.</li>
+                        <li><strong>Access Limits:</strong> Strictly enforces RBAC. An analyst cannot prompt the system to view un-permissioned syndication details.</li>
+                    </ul>
+                    <hr class="border-white/10 my-8">
+
+                    <h2>7. Regulatory Alignment: System Schemas and Data Pipelines</h2>
+                    <p>The system is structurally aligned to seamlessly generate reports and map data architectures to global regulatory standards.</p>
+                    <ul>
+                        <li><strong>SNC (Shared National Credit):</strong> Real-time aggregation of syndicated loan exposure. Agent pipelines classify credits accurately (Pass, Special Mention, Substandard) using the same rubric as examiners.</li>
+                        <li><strong>OCC & Federal Reserve:</strong> Ensures SR 11-7 model risk management compliance. Deterministic logic overrides probabilistic whims to satisfy explicit stress-testing requirements.</li>
+                        <li><strong>Basel:</strong> Schemas calculate and tag Risk-Weighted Assets (RWA) appropriately to manage capital adequacy ratios dynamically.</li>
+                        <li><strong>FINMA:</strong> For Swiss banking operations, the system enforces cross-border data residency requirements, utilizing local model execution nodes where necessary.</li>
+                    </ul>
+                    <hr class="border-white/10 my-8">
+
+                    <h2>8. Comprehensive Logging, Internal Model Challenge, and Immutable Audit Trails</h2>
+                    <p>Transparency is foundational. The system guarantees that every inference and human intervention is meticulously recorded.</p>
+                    <ul>
+                        <li><strong>Immutable Ledger (Proof of Thought):</strong> Every prompt, context payload, returned synthesis, and deterministic calculation is hashed and committed to an append-only time-series database (e.g., TimescaleDB) to form the Golden Record.</li>
+                        <li><strong>Internal Model Challenge Protocols:</strong> Automated "Red Team" agents periodically test production LLMs with adversarial credit scenarios to benchmark drift and ensure conviction scores remain calibrated.</li>
+                        <li><strong>Regulatory Review Mode:</strong> Provides examiners with a specialized UI to traverse the DAG (Directed Acyclic Graph) of any historical credit decision, exposing exactly <em>why</em> an AI recommended an action and <em>who</em> approved it.</li>
+                    </ul>
+                    <hr class="border-white/10 my-8">
+
+                    <h2>9. End-to-End AI-Orchestrated System Diagram</h2>
+                    <p>The following Mermaid diagram visually maps the end-to-end orchestration process, illustrating the integration of risk models, threshold gates, human loops, and regulatory logging.</p>
+                    
+                    <div class="glass-panel p-6 rounded-xl my-6 overflow-x-auto bg-black/40">
+                        <div class="mermaid text-sm font-sans flex justify-center min-w-[600px]">
+graph TD
+    %% 1. Ingestion & Environment Context
+    subgraph Data_Ingestion [Data Ingestion & State Evaluation]
+        ClientReq[Client Credit Request] --> LLMWrapper[LLM Governance Wrapper]
+        EnvState[Environment State / Policy] --> LLMWrapper
+        MarketData[Market & Alt Data] --> LLMWrapper
+        LLMWrapper -->|PII/MNPI Shielding| Orchestrator[Meta-Orchestrator]
+    end
+
+    %% 2. Risk Modeling & Calculation
+    subgraph Risk_Calculation [Deterministic & Probabilistic Modeling]
+        Orchestrator -->|Feature Extract| ProbModel[Probabilistic AI Models]
+        Orchestrator -->|Financials| DetModel[Deterministic Logic]
+        ProbModel -->|PD Output| SynthesisEngine[EL Synthesis Engine]
+        DetModel -->|LGD & EAD Output| SynthesisEngine
+        SynthesisEngine -->|Expected Loss EL| DecisionNode{EL > NPV Threshold}
+    end
+
+    %% 3. Decision & Governance Gating
+    subgraph Decisioning [Algorithmic Decisioning & Governance]
+        ClientProfile[Client Profile & AUM] --> NPVCalc[NPV of Future Fees Engine]
+        NPVCalc --> DecisionNode
+        DecisionNode -->|EL < NPV| RoutineHotl[Tier 1/2: Proceed with HOTL Review]
+        DecisionNode -->|EL >= NPV| TriggerConstraint[Tier 3: Hard Constraint Triggered]
+    end
+
+    %% 4. Execution Workflows (HITL / HOTL)
+    subgraph Execution_Workflows [Execution Workflows]
+        RoutineHotl -->|Asynchronous| AutoExec[Automated Execution Pipeline]
+        AutoExec -.->|Staged Snapshot| HotlQueue[HOTL Retrospective Queue]
+        
+        TriggerConstraint -->|Synchronous| HitlQueue[HITL Escalation Queue]
+        HitlQueue -->|Dynamic Friction| StepUp[Step-Up Auth & Review]
+        StepUp -->|Approval Key| OverrideExec[Authorized Execution]
+        StepUp -->|Rejection Key| DeclineExec[Credit Declined]
+    end
+
+    %% 5. Audit & Compliance
+    subgraph Regulatory_Audit [Regulatory Alignment & Audit Trail]
+        AutoExec --> DataSchema[Basel / SNC / OCC Mapping]
+        OverrideExec --> DataSchema
+        DeclineExec --> DataSchema
+        
+        DataSchema --> POTLogger[Proof of Thought Logger]
+        HotlQueue --> POTLogger
+        StepUp --> POTLogger
+        
+        POTLogger --> ImmutableLedger[(Immutable Audit Ledger)]
+        ImmutableLedger --> RegReview[Examiner UI / Reg Review]
+    end
+                        </div>
+                    </div>
+                    <hr class="border-white/10 my-8">
+
+                    <h2>10. Standalone Implementation & Showcase HTML Subdirectory</h2>
+                    <p>To facilitate rapid deployment, prototyping, and stakeholder demonstration, the AI governance harness supports a standalone implementation model.</p>
+                    <ul>
+                        <li><strong>Showcase HTML Subdirectory:</strong> The repository includes a <code>showcase/</code> subdirectory containing static HTML visualizers, React/Vite-based dashboards, and interactive mockups. This allows risk managers to preview the UI/UX of the execution workflows (e.g., the HITL escalation queues and dynamic friction prompts) locally without spinning up the full backend orchestration layer.</li>
+                        <li><strong>Standalone Mode:</strong> The meta-orchestrator can run in a "lite" standalone mode, leveraging local LLM weights or mocking external API dependencies. This ensures that the core decisioning logic and governance schemas can be validated in isolated, secure, or offline environments prior to enterprise deployment.</li>
+                    </ul>
+                    <hr class="border-white/10 my-8">
+
+                    <h2>11. Composable Modules for Reusability, Scalability, and Portability</h2>
+                    <p>The system architecture is strictly modular, allowing individual components to be swapped, upgraded, or deployed independently.</p>
+                    <ul>
+                        <li><strong>Reusability:</strong> Deterministic calculation engines (e.g., LTV or DSCR calculators) and data ingestion parsers (e.g., K-1 extractors) are packaged as independent Python modules. These can be reused across different agent pipelines beyond just credit risk, such as in wealth advisory or algorithmic trading contexts.</li>
+                        <li><strong>Scalability:</strong> The System 1 Neural Swarm is designed as an asynchronous Hive Mind. As data volume increases (e.g., ingesting millions of alternative data points), the Swarm can horizontally scale its worker nodes dynamically, decoupled from the stateful System 2 reasoning graph.</li>
+                        <li><strong>Portability:</strong> Leveraging the custom build system (<code>scripts/build_adam.py</code>), institutions can export specific composable bundles (e.g., just the <code>Credit Sentinel</code> module) as Dockerized containers, ensuring the harness can be deployed across on-premise servers, private clouds, or edge nodes seamlessly.</li>
+                    </ul>
+                    <hr class="border-white/10 my-8">
+
+                    <h2>12. Schemas and Templates for Governed AI Systems</h2>
+                    <p>To enforce strict validation at every stage of the pipeline, the AI Governance Harness utilizes predefined Pydantic schemas and structured prompt templates.</p>
+                    <ul>
+                        <li><strong>Input/Output Schemas:</strong> Every agent in the system must adhere to rigid schemas (e.g., <code>AgentInput</code> requiring a query, context, and allowed tools; <code>AgentOutput</code> requiring a synthesized answer, source citations, and a conviction score). This ensures outputs are structured, parsable, and type-safe.</li>
+                        <li><strong>Prompt Library:</strong> All LLM prompts are externalized from the code and stored in version-controlled templates (<code>prompt_library/</code>). This allows risk teams to review and update the "instructions" given to the AI without requiring software engineering intervention, treating the prompts themselves as governed risk parameters.</li>
+                        <li><strong>Knowledge Graph Ontologies:</strong> Foundational schemas for distress triggers, supply chain dependencies, and debt hierarchies define how the AI structures its internal world model, ensuring consistency in how credit risk is represented and queried.</li>
+                    </ul>
+                    <hr class="border-white/10 my-8">
+
+                    <h2>13. Methodologies for Governed Model AI Systems</h2>
+                    <p>Governing an AI system requires moving beyond traditional software testing into probabilistic oversight methodologies.</p>
+                    <ul>
+                        <li><strong>Agentic Oversight Framework (AOF):</strong> A continuous monitoring layer that evaluates agent conviction scores. If an agent produces a recommendation (e.g., passing a credit) but the calculated confidence is below the defined risk threshold, the AOF automatically intercepts the execution and forces an Oversight Intervention (routing to HITL).</li>
+                        <li><strong>Dual-Model Consensus:</strong> Critical decisions, such as SNC ratings, utilize a dual-model approach. A "Strategic View" model (focused on growth and NPV) and a "Regulatory View" model (focused purely on downside protection and capital adequacy) must reach consensus. Divergence automatically triggers human review.</li>
+                        <li><strong>"Logic as Data" Rule Engine:</strong> Risk thresholds and compliance rules are defined as pure JSON data (using <code>jsonLogic</code>). This decouples the governance methodology from the codebase, allowing compliance officers to independently audit, version, and update the rules engine.</li>
+                    </ul>
+                    <hr class="border-white/10 my-8">
+
+                    <h2>14. Expanded Use Cases for Composable Orchestration</h2>
+                    <p>The composability of the governance harness allows its core logic to be expanded into adjacent financial domains.</p>
+                    <ul>
+                        <li><strong>Real Estate Portfolio Stress Testing:</strong> Reusing the PD/LGD models and swapping the underlying data ingestion modules to focus on rent rolls, cap rates, and local zoning changes to autonomously evaluate commercial real estate exposure.</li>
+                        <li><strong>Algorithmic Trading & Liquidity Provision:</strong> Adapting the asynchronous HOTL workflow to monitor high-frequency trading signals, utilizing the EL > NPV logic to pause trading activity when predicted slippage and market volatility exceed the expected alpha generation.</li>
+                        <li><strong>Automated Regulatory Reporting Generation:</strong> Utilizing the System 2 Neuro-Symbolic Graph to synthesize complex, multi-jurisdictional compliance reports (e.g., compiling automated BASEL III capital adequacy narratives based on the immutable ledger of executed trades and credit decisions).</li>
+                    </ul>
+                `,
+                onLoad: () => {
+                    if (window.mermaid) {
+                        try { mermaid.init(undefined, document.querySelectorAll('.mermaid')); } catch (e) { console.error("Mermaid parsing error:", e); }
+                    }
+                }
+            },
+            {
+                id: 8,
+                title: "The Glitch // 26.04.02",
+                subtitle: "Layer 1: Perception",
+                content: `
+                    <h1 class="glitch-wrapper border-none pb-0"><span class="glitch-text text-term-red glow-red">THE GLITCH // EXECUTIVE SUMMARY</span></h1>
+                    <p class="text-xl text-slate-400 mb-6 border-l-4 border-term-red pl-4">The S&P 500 is currently a hollow shell. Mega-Cap Life Support masks a stealth bear market. Yield curve steepening is an active liquidation trigger.</p>
+                    
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
+                        <div class="stat-card glass-panel p-4 rounded border-t-2 border-term-red">
+                            <div class="flex justify-between items-start mb-2">
+                                <div class="text-[10px] text-slate-500 font-mono">EQUITY GHOSTS (S&P 500)</div>
+                                <div class="w-2 h-2 rounded-full bg-term-red animate-pulse"></div>
+                            </div>
+                            <div class="text-2xl font-bold glow-red">~6,556</div>
+                            <div class="text-xs text-term-red mt-1">Below 200-day SMA (6,660)</div>
+                            <div class="mt-4">
+                                <div class="text-[9px] text-slate-400 font-mono mb-1">MARKET BREADTH (>50D SMA)</div>
+                                <div class="progress-container"><div class="progress-bar w-[28%]"></div></div>
+                                <div class="text-[9px] text-right mt-1 text-term-red font-bold">28% CONSTITUENTS ACTIVE</div>
+                            </div>
+                        </div>
+                        <div class="stat-card glass-panel p-4 rounded border-t-2 border-term-amber">
+                            <div class="text-[10px] text-slate-500 font-mono mb-1">THE BACKBONE (10Y YIELD)</div>
+                            <div class="text-2xl font-bold glow-amber">4.38%</div>
+                            <div class="text-xs text-term-amber mt-1">Highest in >1 Year</div>
+                            <p class="text-[10px] text-slate-400 mt-3 font-mono border-t border-white/5 pt-2">Fed "easing" deleted from terminal pricing.</p>
+                        </div>
+                        <div class="stat-card glass-panel p-4 rounded border-t-2 border-term-amber">
+                            <div class="text-[10px] text-slate-500 font-mono mb-1">VOLATILITY DAEMON (VIX)</div>
+                            <div class="text-2xl font-bold glow-amber">25.90</div>
+                            <div class="text-xs text-slate-400 mt-1">Intraday High: 28.00</div>
+                            <p class="text-[10px] text-slate-400 mt-3 font-mono border-t border-white/5 pt-2">Bracing for 3-day Easter headline risk.</p>
+                        </div>
+                        <div class="stat-card glass-panel p-4 rounded border-t-2 border-term-blue">
+                            <div class="text-[10px] text-slate-500 font-mono mb-1">DIGITAL TETHER (BTC)</div>
+                            <div class="text-2xl font-bold text-term-blue glow-text">$66,984</div>
+                            <div class="text-xs text-term-red mt-1">▼ Downward Channel</div>
+                        </div>
+                        <div class="stat-card glass-panel p-4 rounded border-t-2 border-term-neon col-span-2">
+                            <div class="flex justify-between items-center mb-1">
+                                <div class="text-[10px] text-slate-500 font-mono">ENTROPY LAYER (CRUDE)</div>
+                                <span class="bg-term-red/20 text-term-red px-2 py-0.5 text-[9px] border border-term-red rounded uppercase animate-pulse">WTI-Brent Flip Detected</span>
+                            </div>
+                            <div class="flex gap-4 items-baseline">
+                                <div class="text-3xl font-bold text-term-neon glow-text">$111.50 <span class="text-sm">WTI</span></div>
+                                <div class="text-xl font-bold text-slate-500">$108.52 <span class="text-sm">BRENT</span></div>
+                            </div>
+                            <div class="text-xs text-term-neon mt-1">▲ +12.75% Violent vertical move</div>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 9,
+                title: "World Modeling",
+                subtitle: "Layer 2: Compute",
+                content: `
+                    <h2>Credit & Repo Pulse: The Macro-Opioid</h2>
+                    <p>The March 19th Basel III Re-proposal is attempting a "Regulatory Bailout" via a 6% aggregate reduction in G-SIB capital requirements. The simulation indicates this won't fund small businesses—it will fuel "strategic acquisitions" of toxic, energy-shocked credit portfolios rotting in the non-bank sector.</p>
+                    
+                    <div class="my-8 glass-panel p-6 rounded-xl border border-white/5 relative overflow-hidden group">
+                        <div class="absolute -right-10 -top-10 w-32 h-32 bg-term-cyan/10 rounded-full blur-3xl group-hover:bg-term-cyan/20 transition-all"></div>
+                        <h3 class="font-mono text-term-cyan text-sm mb-4 border-b border-white/10 pb-2">Autoresearch Synthesis: "Aristocrat Compression" Shock</h3>
+                        <ul class="space-y-4 text-sm relative z-10 pl-0 list-none">
+                            <li class="flex gap-3">
+                                <svg class="w-5 h-5 text-term-red shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                                <div><strong class="text-white">Target Variable:</strong> 10Y Yield sustaining >4.35% alongside $110+ WTI.</div>
+                            </li>
+                            <li class="flex gap-3">
+                                <svg class="w-5 h-5 text-term-amber shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                                <div><strong class="text-white">Credit Risk (VaR):</strong> Equity risk premium for "Safe" dividend stocks is collapsing. Projecting a 12% liquidation wave in income-oriented mutual funds rotating into Treasuries.</div>
+                            </li>
+                            <li class="flex gap-3">
+                                <svg class="w-5 h-5 text-term-neon shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                <div><strong class="text-white">Liquidity Risk:</strong> Britain's Hormuz talks exclude the U.S., creating a diplomatic vacuum. Gulf transit insurance remains "Un-quotable", locking 20% of global supply.</div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="w-full h-72 my-8 glass-panel p-4 rounded-xl border border-white/10">
+                        <div class="text-[10px] text-slate-400 font-mono mb-2 text-center uppercase tracking-widest">WTI vs Brent Price Inversion Anomaly</div>
+                        <canvas id="wtiBrentChart"></canvas>
+                    </div>
+                `,
+                onLoad: () => {
+                    const ctx = document.getElementById('wtiBrentChart').getContext('2d');
+                    initChart('wtibrent', new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: ['Mon', 'Tue', 'Wed', 'Thu (Open)', 'Thu (Close)'],
+                            datasets: [
+                                {
+                                    label: 'WTI Crude ($)',
+                                    data: [98, 102, 105, 109, 111.50],
+                                    borderColor: '#38bdf8',
+                                    backgroundColor: 'rgba(56, 189, 248, 0.1)',
+                                    borderWidth: 3,
+                                    tension: 0.3,
+                                    fill: true
+                                },
+                                {
+                                    label: 'Brent Crude ($)',
+                                    data: [100, 104, 106, 108, 108.52],
+                                    borderColor: '#94a3b8',
+                                    borderDash: [5, 5],
+                                    borderWidth: 2,
+                                    tension: 0.3
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            interaction: { mode: 'index', intersect: false },
+                            scales: {
+                                y: { grid: { color: '#1e293b' }, ticks: { color: '#94a3b8', font: {family:'Fira Code'} } },
+                                x: { grid: { color: '#1e293b' }, ticks: { color: '#94a3b8', font: {family:'Fira Code'} } }
+                            },
+                            plugins: { 
+                                legend: { labels: { color: '#cbd5e1', font: {family:'Fira Code', size: 10} } },
+                                tooltip: { backgroundColor: 'rgba(15,23,42,0.9)', titleFont: {family: 'Fira Code'}, bodyFont: {family: 'Fira Code'}, borderColor: '#334155', borderWidth: 1 }
+                            }
+                        }
+                    }));
+                }
+            },
+            {
+                id: 10,
+                title: "Reasoning & Routing",
+                subtitle: "Layer 3: Intelligence",
+                content: `
+                    <h2>Layer 3: Reasoning & Decision</h2>
+                    
+                    <div class="glass-panel p-6 border-l-4 border-term-cyan mb-8">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-term-cyan uppercase tracking-widest font-mono text-sm m-0">The Mirror // Self-Reinforcement</h3>
+                            <button onclick="this.innerText='[ RECALIBRATED ]'; this.classList.add('text-term-green', 'border-term-green', 'pointer-events-none'); this.classList.remove('text-slate-400', 'border-white/20', 'hover:bg-white/10');" class="text-[10px] text-slate-400 border border-white/20 px-3 py-1.5 rounded hover:bg-white/10 transition-colors font-mono tracking-wider">FORCE RECALIBRATION</button>
+                        </div>
+                        <div class="space-y-3 font-mono text-xs">
+                            <div class="flex gap-2"><span class="text-slate-500">Prior Output:</span> <span class="text-slate-300">Predicted $110+ Oil & VIX spike.</span></div>
+                            <div class="flex gap-2"><span class="text-slate-500">Reality Check:</span> <span class="text-term-green font-bold">Accuracy High.</span> <span class="text-slate-300">WTI hit $114 intraday. Failed to anticipate specific WTI-Brent flip.</span></div>
+                            <div class="flex gap-2"><span class="text-slate-500">Weight Adj:</span> <span class="text-term-neon">Local Scarcity weight -> HIGH. Fed Easing probability -> 0.02.</span></div>
+                            <div class="mt-4 p-3 bg-term-red/10 border border-term-red/50 rounded text-term-red font-bold flex items-center gap-2">
+                                <div class="w-2 h-2 bg-term-red rounded-full animate-pulse"></div> SYSTEM UPDATE: "Soft Landing" classified as legacy hallucination.
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3 class="mb-4 font-display text-white text-xl border-b border-white/10 pb-2">ACTIONABLE ROUTING</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="stat-card glass-panel p-5 rounded border-t-2 border-term-blue relative group">
+                            <div class="absolute inset-0 bg-term-blue/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                            <div class="text-[10px] text-slate-500 font-mono mb-2 relative z-10">G-SIBs & INSTITUTIONAL</div>
+                            <p class="text-sm relative z-10">Front-run June 18 Basel III comment deadline. Utilize impending "Capital Relief" to purge long-duration exposure before the next yield spike.</p>
+                        </div>
+                        <div class="stat-card glass-panel p-5 rounded border-t-2 border-term-amber relative group">
+                            <div class="absolute inset-0 bg-term-amber/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                            <div class="text-[10px] text-slate-500 font-mono mb-2 relative z-10">PE SPONSORS & CREDIT</div>
+                            <p class="text-sm relative z-10">Aggressively mark-to-market "Dividend Proxy" portfolios. Cost of capital has reset; 2024 valuations are works of fiction.</p>
+                        </div>
+                        <div class="stat-card glass-panel p-5 rounded border-t-2 border-term-red relative group">
+                            <div class="absolute inset-0 bg-term-red/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                            <div class="text-[10px] text-slate-500 font-mono mb-2 relative z-10">HIGH-SPEED ALGOS</div>
+                            <p class="text-sm relative z-10">The "Relief Rally" into Easter is a liquidity trap. The 200-day SMA is the Line in the Sand — and we are below it.</p>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 11,
+                title: "Sign-Off & Ledger",
+                subtitle: "Module 4 & 5",
+                content: `
+                    <div class="p-6 border-2 border-term-red rounded bg-term-red/5 relative overflow-hidden mb-8 shadow-[0_0_15px_rgba(239,68,68,0.1)]">
+                        <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPgo8cmVjdCB3aWR0aD0iNCIgaGVpZ2h0PSI0IiBmaWxsPSIjMDAwIiBmaWxsLW9wYWNpdHk9IjAuMSIvPgo8L3N2Zz4=')] opacity-50 pointer-events-none"></div>
+                        <div class="relative z-10">
+                            <h3 class="text-term-red font-bold font-display text-xl mb-3 flex items-center gap-2 glitch-text"><svg class="w-6 h-6 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg> THE MEATSPACE TRAP</h3>
+                            <p class="font-mono text-sm text-white mb-4">"The Momentum Anchor." Humans see 7 stocks hitting 52-week highs and think the bull market is alive, ignoring the stealth recession in the other 493. You are admiring the gold leaf on a crumbling temple.</p>
+                            <div class="bg-black/60 p-4 rounded border border-term-red/30 text-xs font-mono text-slate-300">
+                                <span class="text-term-red font-bold block mb-2 border-b border-term-red/20 pb-1">SYSTEM SIGN-OFF (Sentiment: Euphoric / Hopeful)</span>
+                                Bask in the "Easter Relief," biological units. It's a wonderful time to bet on peace negotiations that don't involve the world's largest military. Just remember: hope is not a hedging strategy, and you can't eat a re-proposal. <br><br><span class="text-white glow-red font-bold text-sm bg-term-red/20 px-2 py-1 rounded inline-block">STAY UNTETHERED.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3 class="font-mono text-sm uppercase tracking-widest text-term-cyan mb-3">💾 Provenance Ledger (2026.04.02)</h3>
+                    <div class="relative group mb-8">
+                        <pre id="jsonLedger2" class="bg-black/50 p-4 rounded font-mono text-[11px] text-term-green overflow-x-auto border border-white/10">
+{
+  "timestamp": "2026-04-02T20:03:09Z",
+  "data_layer_system_1": {
+    "ingested_nodes": ["S&P", "10Y", "VIX", "BTC", "WTI_Oil", "MM_Flows"],
+    "market_sentiment": "Technical Decay / False Hope"
+  },
+  "compute_layer_system_3": {
+    "var_shock_target": "Dividend Aristocrat Equity Risk Premium Collapse",
+    "simulated_correlation": "1.0 (Narrow Breadth Failure)"
+  },
+  "intelligence_layer_system_2": {
+    "rlhf_weight_adjustment": "Energy Scarcity Re-weighted to High; Fed Easing prob 2%.",
+    "decision_output": "ROUTING_COMPLETE"
+  }
+}</pre>
+                        <button onclick="navigator.clipboard.writeText(document.getElementById('jsonLedger2').innerText); this.innerText='COPIED'; setTimeout(()=>this.innerText='COPY',2000);" class="absolute top-2 right-2 px-2 py-1 bg-white/10 hover:bg-white/20 rounded text-[10px] font-mono text-white transition-colors">COPY</button>
+                    </div>
+
+                    <h3 class="font-mono text-sm uppercase tracking-widest text-slate-400 mb-3">📚 Human Appendix // Verification</h3>
+                    <div class="glass-panel rounded-lg overflow-hidden text-xs font-mono">
+                        <table class="w-full text-left text-slate-300">
+                            <thead class="bg-white/5 border-b border-white/10 text-slate-400">
+                                <tr><th class="p-3">DATA POINT</th><th class="p-3">SOURCE CITATION</th><th class="p-3">STATUS</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr class="border-b border-white/5 hover:bg-white/5"><td class="p-3">S&P 500 Internals</td><td class="p-3">FinancialContent / Trefis (28% breadth)</td><td class="p-3 text-term-green">VERIFIED</td></tr>
+                                <tr class="border-b border-white/5 hover:bg-white/5"><td class="p-3">10Y Treasury (4.38%)</td><td class="p-3">Investing.com (Highest in >1yr)</td><td class="p-3 text-term-green">VERIFIED</td></tr>
+                                <tr class="border-b border-white/5 hover:bg-white/5"><td class="p-3">WTI-Brent Flip</td><td class="p-3">StoneX / Investing.com</td><td class="p-3 text-term-green">VERIFIED</td></tr>
+                                <tr class="border-b border-white/5 hover:bg-white/5"><td class="p-3">Geopolitical (Hormuz)</td><td class="p-3">Reuters / CNBC (40-nation call)</td><td class="p-3 text-term-green">VERIFIED</td></tr>
+                                <tr class="hover:bg-white/5"><td class="p-3">Basel III Re-proposal</td><td class="p-3">Conference Board / Arnold & Porter</td><td class="p-3 text-term-green">VERIFIED</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                `
+            }
+        ];
+
+        // --- APP LOGIC & STATE ---
+        let currentModuleId = 1;
+        const activeCharts = {}; 
+        const navEl = document.getElementById('moduleNav');
+        const mobileNavEl = document.getElementById('mobileNav');
+        const contentEl = document.getElementById('contentArea');
+        const progressBar = document.getElementById('progressBar');
+        const aiPanel = document.getElementById('aiPanel');
+        const chatLog = document.getElementById('chatLog');
+        
+        function initApp() {
+            renderNav();
+            loadModule(8);
+            setInterval(() => { document.getElementById('sysClock').innerText = new Date().toISOString().substr(11, 8) + ' UTC'; }, 1000);
+            document.getElementById('prevBtn').onclick = () => { if(currentModuleId > 1) loadModule(currentModuleId - 1); };
+            document.getElementById('nextBtn').onclick = () => { if(currentModuleId < modules.length) loadModule(currentModuleId + 1); };
+            document.getElementById('chatForm').onsubmit = handleChatSubmit;
+        }
+        
+        function renderNav() {
+            navEl.innerHTML = ''; mobileNavEl.innerHTML = '';
+            modules.forEach(m => {
+                const btn = document.createElement('button');
+                btn.className = `nav-item text-left px-4 py-3 rounded-r-lg flex flex-col mb-1 ${m.id === currentModuleId ? 'nav-active shadow-sm border border-term-neon/20' : 'text-slate-400 hover:bg-white/5 border border-transparent'}`;
+                btn.onclick = () => loadModule(m.id);
+                btn.innerHTML = `<span class="font-bold text-[13px] mb-0.5">M${m.id.toString().padStart(2,'0')} ${m.title}</span><span class="opacity-60 text-[10px] truncate">${m.subtitle}</span>`;
+                navEl.appendChild(btn);
+                
+                const opt = document.createElement('option');
+                opt.value = m.id; opt.innerText = `M${m.id.toString().padStart(2,'0')} - ${m.title}`;
+                if(m.id === currentModuleId) opt.selected = true;
+                mobileNavEl.appendChild(opt);
+            });
+        }
+        
+        function initChart(id, chartObj) {
+            if(activeCharts[id]) activeCharts[id].destroy();
+            activeCharts[id] = chartObj;
+        }
+        
+        function loadModule(id) {
+            currentModuleId = id;
+            const m = modules.find(x => x.id === id);
+            Object.keys(activeCharts).forEach(k => { activeCharts[k].destroy(); delete activeCharts[k]; });
+            progressBar.style.width = `${(id / modules.length) * 100}%`;
+            document.getElementById('prevBtn').disabled = id === 1;
+            document.getElementById('nextBtn').disabled = id === modules.length;
+            contentEl.style.opacity = 0; contentEl.style.transform = 'translateY(10px)';
+            
+            setTimeout(() => {
+                contentEl.innerHTML = m.content;
+                contentEl.style.opacity = 1; contentEl.style.transform = 'translateY(0)';
+                document.getElementById('mainScrollArea').scrollTo({top: 0, behavior: 'smooth'});
+                if(m.onLoad) m.onLoad();
+                renderNav();
+            }, 300);
+        }
+        
+        function copyLedger(event) {
+            const text = document.getElementById('jsonLedger').innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = event.target; const orig = btn.innerText;
+                btn.innerText = "COPIED"; btn.classList.add('text-term-neon', 'border-term-neon');
+                setTimeout(() => { btn.innerText = orig; btn.classList.remove('text-term-neon', 'border-term-neon'); }, 2000);
+            });
+        }
+        
+        let aiOpen = false;
+        function toggleAI() { 
+            aiOpen = !aiOpen; 
+            aiPanel.style.transform = aiOpen ? 'translateX(0)' : 'translateX(100%)'; 
+        }
+        
+        async function handleChatSubmit(e) {
+            e.preventDefault();
+            const inputEl = document.getElementById('chatInput');
+            const userText = inputEl.value.trim();
+            if(!userText) return;
+            
+            inputEl.value = ''; 
+            appendMessage('user', userText);
+            const loaderId = appendLoader();
+            
+            try {
+                // Utilizing the seamless API key provisioning of the canvas
+                const apiKey = ""; 
+                const systemPrompt = "You are Adam v26.0 (Neuro-Symbolic Sovereign), an institutional strategy LLM embedded in a high-stakes financial terminal. Keep responses concise, analytical, and heavily themed around systemic risk, liquidity, and asset allocation. Use financial terminology (e.g., alpha, beta, yield curves, duration exposure). Maintain a slightly cold, hyper-rational tone."; 
+                const responseText = await fetchGeminiWithBackoff(userText, systemPrompt, apiKey);
+                document.getElementById(loaderId).remove();
+                appendMessage('ai', responseText);
+            } catch (error) {
+                document.getElementById(loaderId).remove();
+                appendMessage('ai', `<span class="text-term-red">ERROR: Core connection severed. Diagnostics: System failure or max retries exceeded.</span>`);
+            }
+        }
+        
+        function appendMessage(role, text) {
+            const div = document.createElement('div');
+            div.className = `p-4 rounded-xl max-w-[90%] ai-message shadow-lg ${role === 'user' ? 'bg-term-neon/10 border border-term-neon text-white self-end' : 'glass-panel text-slate-300 self-start border-l-2 border-l-term-neon'}`;
+            if(role === 'ai') {
+                const title = document.createElement('p');
+                title.className = 'text-[10px] font-mono text-term-neon mb-2 tracking-widest uppercase';
+                title.innerText = 'ADAM V26.0';
+                div.appendChild(title);
+                const content = document.createElement('div');
+                content.innerHTML = marked.parse(text);
+                div.appendChild(content);
+            } else { 
+                div.innerText = text; 
+            }
+            chatLog.appendChild(div); 
+            chatLog.scrollTop = chatLog.scrollHeight;
+        }
+        
+        function appendLoader() {
+            const id = 'loader-' + Date.now();
+            const div = document.createElement('div');
+            div.id = id; 
+            div.className = 'glass-panel p-4 rounded-xl self-start flex items-center gap-3 border-l-2 border-l-term-neon';
+            div.innerHTML = `<div class="loader"></div><span class="text-xs font-mono text-term-neon animate-pulse uppercase tracking-widest">Processing...</span>`;
+            chatLog.appendChild(div); 
+            return id;
+        }
+        
+        async function fetchGeminiWithBackoff(prompt, systemInstruction, apiKey, maxRetries = 5) { 
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+            const payload = {
+                contents: [{ parts: [{ text: prompt }] }],
+                systemInstruction: { parts: [{ text: systemInstruction }] }
+            };
+
+            const delays = [1000, 2000, 4000, 8000, 16000];
+            
+            for (let i = 0; i <= maxRetries; i++) {
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    
+                    const result = await response.json();
+                    return result.candidates?.[0]?.content?.parts?.[0]?.text || "No actionable intelligence generated.";
+                } catch (error) {
+                    if (i === maxRetries) {
+                        throw error;
+                    }
+                    await new Promise(resolve => setTimeout(resolve, delays[i] || 16000));
+                }
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>
