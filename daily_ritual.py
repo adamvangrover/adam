@@ -270,7 +270,8 @@ def _simulate_llm_response() -> str:
 import time
 from typing import Dict, Any
 from pydantic import BaseModel
-from core.agents.agent_base import AgentBase, AgentInput, AgentOutput
+from core.schemas.agent_schema import AgentInput, AgentOutput
+from core.agents.agent_base import AgentBase
 
 class HealthMetrics(BaseModel):
     agent_id: str
@@ -303,7 +304,7 @@ class SystemHealthAgent(AgentBase):
 **3. FILE: tests/test_system_health_agent.py**
 ```python
 import pytest
-from core.agents.agent_base import AgentInput
+from core.schemas.agent_schema import AgentInput
 from core.agents.system_health_agent import SystemHealthAgent
 
 @pytest.mark.asyncio
@@ -325,7 +326,8 @@ async def test_ping():
 from typing import Any, Dict, List, Optional
 import logging
 import re
-from core.agents.agent_base import AgentBase, AgentInput, AgentOutput
+from core.schemas.agent_schema import AgentInput, AgentOutput
+from core.agents.agent_base import AgentBase
 from core.agents.system_health_agent import SystemHealthAgent
 
 logger = logging.getLogger(__name__)
