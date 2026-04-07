@@ -54,7 +54,10 @@ MODULES = {
             "*_Market_Mayhem.html",
             "market_mayhem_archive_v*.html",
             "market_mayhem_rebuild.html",
-            "market_mayhem_conviction.html"
+            "market_mayhem_conviction.html",
+            "market_mayhem_overview.html",
+            "market_predictions.html",
+            "top_ten_convictions.html"
         ]
     },
     "system_brain": {
