@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Sentinel // Mega-Cap Risk Assessment</title>
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        term: { bg: '#030712', surface: '#0f172a', card: '#1e293b', border: '#334155', cyan: '#06b6d4', blue: '#3b82f6', red: '#ef4444', amber: '#f59e0b', green: '#10b981', neon: '#38bdf8' }
+                    },
+                    fontFamily: { sans: ['Inter', 'sans-serif'], mono: ['Fira Code', 'monospace'] }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #030712; color: #cbd5e1; }
+        .glass-panel { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .glow-red { box-shadow: 0 0 15px rgba(239, 68, 68, 0.3); border-color: rgba(239, 68, 68, 0.6); }
+        .glow-green { box-shadow: 0 0 15px rgba(16, 185, 129, 0.3); border-color: rgba(16, 185, 129, 0.6); }
+        .glow-amber { box-shadow: 0 0 15px rgba(245, 158, 11, 0.3); border-color: rgba(245, 158, 11, 0.6); }
+    </style>
+</head>
+<body class="font-sans antialiased min-h-screen">
+    <!-- Header -->
+    <header class="h-16 border-b border-white/10 bg-term-bg/80 backdrop-blur-md flex items-center px-6 sticky top-0 z-50">
+        <div class="flex items-center gap-4 w-full justify-between max-w-6xl mx-auto">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded bg-term-neon/20 border border-term-neon flex items-center justify-center text-term-neon font-mono font-bold text-xs">PS</div>
+                <div>
+                    <h1 class="text-sm font-bold tracking-widest text-white uppercase">Project Sentinel</h1>
+                    <p class="text-[10px] text-slate-500 font-mono uppercase tracking-widest">Mega-Cap Pro Forma Assessments</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-4 text-xs font-mono">
+                <span class="text-slate-400 border border-white/10 px-2 py-1 rounded">Brent: $119.50</span>
+                <span class="text-slate-400 border border-white/10 px-2 py-1 rounded">VIX: 25.75</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto p-6 md:p-12 space-y-12">
+        <!-- Overview Section -->
+        <section class="glass-panel p-8 rounded-2xl border-l-4 border-l-term-neon">
+            <h2 class="text-2xl font-bold text-white mb-4">Autonomous Approval vs. Human Oversight</h2>
+            <div class="prose prose-invert max-w-none text-slate-300">
+                <p>
+                    Under the current market regime (Energy Shock Protocol, Brent > $119, 10Y Yield > 4.4%), Project Sentinel enforces strict <strong>Logic as Data</strong> gates. The <code>RiskSynthesisEngine</code> dynamically calculates an Expected Loss (EL) limit based on the client's NPV Fees multiplied by a risk scalar (&sigma; = 0.15).
+                </p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6 not-prose">
+                    <div class="bg-term-bg border border-term-green/30 p-5 rounded-xl border-t-2 border-t-term-green">
+                        <h3 class="text-term-green font-bold mb-2">Automated Pass-Through</h3>
+                        <p class="text-xs text-slate-400 font-mono leading-relaxed">
+                            <strong>Criteria:</strong> EL < Gate AND Conviction > 0.90<br><br>
+                            Reserved for pristine balance sheets with fortress liquidity. Mega-cap tech and defense primes typically qualify. No human intervention required.
+                        </p>
+                    </div>
+                    <div class="bg-term-bg border border-term-amber/30 p-5 rounded-xl border-t-2 border-t-term-amber">
+                        <h3 class="text-term-amber font-bold mb-2">HOTL Review (Retrospective)</h3>
+                        <p class="text-xs text-slate-400 font-mono leading-relaxed">
+                            <strong>Criteria:</strong> EL < Gate AND Conviction <= 0.90<br><br>
+                            Systemic uncertainty (e.g., complex supply chains) lowers the LLM's conviction. Trades execute but are queued for Human-On-The-Loop validation within 24 hours.
+                        </p>
+                    </div>
+                    <div class="bg-term-bg border border-term-red/30 p-5 rounded-xl border-t-2 border-t-term-red">
+                        <h3 class="text-term-red font-bold mb-2">HITL Tier 3 (Hard Constraint)</h3>
+                        <p class="text-xs text-slate-400 font-mono leading-relaxed">
+                            <strong>Criteria:</strong> EL >= Gate OR Policy Breach<br><br>
+                            High-leverage LBOs, offshore entities, and severe covenant breaches trigger immediate lock. Requires MFA step-up and explicit underwriter rationale.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pro Forma Assessments -->
+        <h2 class="text-3xl font-display font-bold text-white border-b border-white/10 pb-4">Pro Forma Risk Assessments</h2>
+
+        <!-- Tier 1: Mega Caps (Automated) -->
+        <section class="space-y-6">
+            <h3 class="text-xl font-bold text-term-green flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                Tier 1: Mega-Cap Tech & Defense (Automated Pass-Through)
+            </h3>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- AAPL -->
+                <div class="glass-panel p-6 rounded-2xl relative overflow-hidden glow-green">
+                    <div class="absolute top-0 right-0 p-4 opacity-20 text-4xl font-black">AAPL</div>
+                    <h4 class="text-white font-bold text-lg mb-1">Apple Inc. (Senior Unsecured)</h4>
+                    <p class="text-xs font-mono text-slate-400 mb-6">Facility: $5B Revolving Credit | Jurisdiction: USA</p>
+
+                    <div class="grid grid-cols-2 gap-4 mb-6">
+                        <div class="bg-black/30 p-3 rounded border border-white/5">
+                            <span class="block text-[10px] text-slate-500 font-mono">Expected Loss (EL)</span>
+                            <span class="text-white font-mono text-lg">$3.50M</span>
+                            <span class="block text-[9px] text-slate-500 mt-1">PD: 0.20% | LGD: 35%</span>
+                        </div>
+                        <div class="bg-black/30 p-3 rounded border border-white/5">
+                            <span class="block text-[10px] text-slate-500 font-mono">Dynamic Gate Limit</span>
+                            <span class="text-slate-300 font-mono text-lg">$11.25M</span>
+                            <span class="block text-[9px] text-slate-500 mt-1">NPV: $75M | &sigma;: 0.15</span>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between border-t border-white/10 pt-4">
+                        <div>
+                            <span class="block text-[10px] text-slate-500 font-mono mb-1">AI Conviction Score</span>
+                            <div class="flex items-center gap-2"><div class="w-16 h-1.5 bg-term-green rounded-full"></div> <span class="text-term-green font-mono text-sm font-bold">0.99</span></div>
+                        </div>
+                        <div class="bg-term-green/20 text-term-green border border-term-green/50 px-3 py-1 rounded text-xs font-bold tracking-widest">AUTO-APPROVED</div>
+                    </div>
+                </div>
+
+                <!-- MSFT -->
+                <div class="glass-panel p-6 rounded-2xl relative overflow-hidden glow-green">
+                    <div class="absolute top-0 right-0 p-4 opacity-20 text-4xl font-black">MSFT</div>
+                    <h4 class="text-white font-bold text-lg mb-1">Microsoft Corp. (Bridge Facility)</h4>
+                    <p class="text-xs font-mono text-slate-400 mb-6">Facility: $2B Term Loan | Jurisdiction: USA</p>
+
+                    <div class="grid grid-cols-2 gap-4 mb-6">
+                        <div class="bg-black/30 p-3 rounded border border-white/5">
+                            <span class="block text-[10px] text-slate-500 font-mono">Expected Loss (EL)</span>
+                            <span class="text-white font-mono text-lg">$1.50M</span>
+                            <span class="block text-[9px] text-slate-500 mt-1">PD: 0.15% | LGD: 50%</span>
+                        </div>
+                        <div class="bg-black/30 p-3 rounded border border-white/5">
+                            <span class="block text-[10px] text-slate-500 font-mono">Dynamic Gate Limit</span>
+                            <span class="text-slate-300 font-mono text-lg">$6.00M</span>
+                            <span class="block text-[9px] text-slate-500 mt-1">NPV: $40M | &sigma;: 0.15</span>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between border-t border-white/10 pt-4">
+                        <div>
+                            <span class="block text-[10px] text-slate-500 font-mono mb-1">AI Conviction Score</span>
+                            <div class="flex items-center gap-2"><div class="w-16 h-1.5 bg-term-green rounded-full"></div> <span class="text-term-green font-mono text-sm font-bold">0.97</span></div>
+                        </div>
+                        <div class="bg-term-green/20 text-term-green border border-term-green/50 px-3 py-1 rounded text-xs font-bold tracking-widest">AUTO-APPROVED</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tier 2: HOTL Review -->
+        <section class="space-y-6">
+            <h3 class="text-xl font-bold text-term-amber flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                Tier 2: Complex Industrials (HOTL Retrospective)
+            </h3>
+            <p class="text-sm text-slate-400 max-w-3xl">Entities with high energy dependency (Brent $119 exposure) or opaque supply chains. The Expected Loss remains under the limit, but the LLM degrades its conviction score due to macro volatility, forcing a human retrospective review.</p>
+
+            <div class="glass-panel p-6 rounded-2xl relative overflow-hidden glow-amber border-l-4 border-l-term-amber">
+                <div class="flex flex-col md:flex-row gap-6">
+                    <div class="flex-1">
+                        <h4 class="text-white font-bold text-lg mb-1">Global Logistics Partners (Secured)</h4>
+                        <p class="text-xs font-mono text-slate-400 mb-6">Facility: $800M Fleet Financing | Jurisdiction: USA / EU</p>
+
+                        <div class="bg-term-amber/10 border border-term-amber/30 p-4 rounded-lg mb-4 text-sm text-slate-300">
+                            <strong>AI Rationale:</strong> "Borrower maintains adequate ICR (2.8x), keeping PD low. However, extreme crude volatility introduces fuel-hedging margin risk over the 24-month horizon. Downgrading conviction score."
+                        </div>
+                    </div>
+
+                    <div class="w-full md:w-72 space-y-4">
+                        <div class="bg-black/30 p-3 rounded border border-white/5 flex justify-between items-center">
+                            <div>
+                                <span class="block text-[10px] text-slate-500 font-mono">Expected Loss</span>
+                                <span class="text-white font-mono text-sm">$3.84M</span>
+                            </div>
+                            <div class="text-right">
+                                <span class="block text-[10px] text-slate-500 font-mono">Gate Limit</span>
+                                <span class="text-slate-300 font-mono text-sm">$4.50M</span>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-between items-center bg-black/30 p-3 rounded border border-white/5">
+                            <span class="text-[10px] text-slate-500 font-mono">Conviction:</span>
+                            <span class="text-term-amber font-mono text-sm font-bold">0.82 <span class="text-[10px] font-normal text-slate-500">(< 0.90)</span></span>
+                        </div>
+
+                        <div class="w-full text-center bg-term-amber/20 text-term-amber border border-term-amber/50 px-3 py-2 rounded text-xs font-bold tracking-widest">
+                            QUEUED FOR HOTL
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tier 3: HITL Escalation -->
+        <section class="space-y-6">
+            <h3 class="text-xl font-bold text-term-red flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                Tier 3: High-Risk Sponsors & Policy Breaches (HITL Hard Gate)
+            </h3>
+            <p class="text-sm text-slate-400 max-w-3xl">These facilities violate strict governance logic. Either the Expected Loss structurally exceeds the portfolio profitability gate, or the entity violates hardcoded Redlines (e.g., restricted jurisdictions). These trigger the Friction Modal requiring step-up authentication.</p>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Healthcare LBO (EL Breach) -->
+                <div class="glass-panel p-6 rounded-2xl relative overflow-hidden glow-red">
+                    <div class="absolute top-0 right-0 px-4 py-2 bg-term-red text-white text-xs font-bold tracking-widest">EL > GATE LIMIT</div>
+                    <h4 class="text-white font-bold text-lg mt-4 mb-1">Apex Healthcare Group (LBO)</h4>
+                    <p class="text-xs font-mono text-slate-400 mb-6">Sponsor: PE Fund Alpha | Facility: $450M Mezzanine</p>
+
+                    <div class="grid grid-cols-2 gap-4 mb-6">
+                        <div class="bg-term-red/10 p-3 rounded border border-term-red/30">
+                            <span class="block text-[10px] text-term-red font-mono">Expected Loss (EL)</span>
+                            <span class="text-term-red font-mono text-lg font-bold">$12.15M</span>
+                            <span class="block text-[9px] text-slate-400 mt-1">PD: 4.5% | LGD: 60%</span>
+                        </div>
+                        <div class="bg-black/30 p-3 rounded border border-white/5">
+                            <span class="block text-[10px] text-slate-500 font-mono">Dynamic Gate Limit</span>
+                            <span class="text-slate-300 font-mono text-lg">$3.75M</span>
+                            <span class="block text-[9px] text-slate-500 mt-1">NPV: $25M | &sigma;: 0.15</span>
+                        </div>
+                    </div>
+
+                    <p class="text-xs text-slate-300 mb-4 bg-black/40 p-3 rounded border border-white/5">
+                        <strong class="text-term-red block mb-1">Risk Synthesis:</strong> "Single-B borrower facing severe margin compression from wage inflation. At current high-yield spreads, probability of default exceeds acceptable thresholds for the mezzanine tranche."
+                    </p>
+
+                    <div class="w-full text-center bg-term-red text-white px-3 py-2 rounded text-xs font-bold tracking-widest cursor-pointer shadow-[0_0_15px_rgba(239,68,68,0.5)]">
+                        MFA STEP-UP REQUIRED
+                    </div>
+                </div>
+
+                <!-- Offshore Entity (Redline Breach) -->
+                <div class="glass-panel p-6 rounded-2xl relative overflow-hidden glow-red border-dashed border-term-red/50">
+                    <div class="absolute top-0 right-0 px-4 py-2 bg-term-red text-white text-xs font-bold tracking-widest">POLICY REDLINE</div>
+                    <h4 class="text-white font-bold text-lg mt-4 mb-1">Triton Energy Offshore</h4>
+                    <p class="text-xs font-mono text-slate-400 mb-6">Facility: $150M RCF | Jurisdiction: <span class="text-term-red font-bold underline">Cayman Islands</span></p>
+
+                    <div class="grid grid-cols-2 gap-4 mb-6">
+                        <div class="bg-black/30 p-3 rounded border border-white/5">
+                            <span class="block text-[10px] text-slate-500 font-mono">Expected Loss (EL)</span>
+                            <span class="text-white font-mono text-lg">$0.45M</span>
+                            <span class="block text-[9px] text-slate-500 mt-1">PD: 1.0% | LGD: 30%</span>
+                        </div>
+                        <div class="bg-black/30 p-3 rounded border border-white/5">
+                            <span class="block text-[10px] text-slate-500 font-mono">Dynamic Gate Limit</span>
+                            <span class="text-slate-300 font-mono text-lg">$1.50M</span>
+                            <span class="block text-[9px] text-slate-500 mt-1">NPV: $10M | &sigma;: 0.15</span>
+                        </div>
+                    </div>
+
+                    <p class="text-xs text-slate-300 mb-4 bg-black/40 p-3 rounded border border-white/5">
+                        <strong class="text-term-red block mb-1">Guardrail Output:</strong> "[REDLINE BREACH: HIGH RISK JURISDICTION]. Despite EL remaining below the mathematical gate limit, the entity's domicile violates the core constitution's No-Go parameter. Halting execution."
+                    </p>
+
+                    <div class="w-full text-center bg-term-red text-white px-3 py-2 rounded text-xs font-bold tracking-widest cursor-pointer shadow-[0_0_15px_rgba(239,68,68,0.5)]">
+                        MANUAL OVERRIDE REQUIRED
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+</body>
+</html>
