@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM v26.0 :: Broadcom Inc. (AVGO) Deep Dive</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'Segoe UI', 'sans-serif'],
+                        mono: ['Fira Code', 'ui-monospace', 'monospace'],
+                        display: ['Oswald', 'Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        term: {
+                            bg: '#030712', surface: '#0f172a', card: '#1e293b', border: '#334155',
+                            cyan: '#06b6d4', blue: '#3b82f6', red: '#ef4444', amber: '#f59e0b', green: '#10b981',
+                            neon: '#38bdf8'
+                        }
+                    },
+                    backgroundImage: {
+                        'glass': 'linear-gradient(145deg, rgba(30,41,59,0.7) 0%, rgba(15,23,42,0.9) 100%)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;600&family=Inter:wght@300;400;600;800&family=Oswald:wght@500;700&display=swap');
+        body { font-size: 14px; background-color: #030712; color: #cbd5e1; }
+        .glow-text { text-shadow: 0 0 12px rgba(6, 182, 212, 0.8); }
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+    </style>
+</head>
+<body class="font-sans h-screen overflow-y-auto selection:bg-term-cyan selection:text-white p-8">
+
+    <div class="max-w-4xl mx-auto">
+        <header class="border-b border-white/10 pb-6 mb-8 flex justify-between items-end">
+            <div>
+                <h1 class="text-4xl font-display font-bold text-white tracking-wider glow-text mb-2">Broadcom Inc.</h1>
+                <div class="flex gap-4 font-mono text-sm">
+                    <span class="text-term-cyan">TICKER: AVGO</span>
+                    <span class="text-slate-500">|</span>
+                    <span class="text-term-amber">SECTOR: Technology</span>
+                </div>
+            </div>
+            <div class="text-right font-mono text-xs text-slate-500">
+                <div class="mb-1">GENERATED: 2026-04-06 01:26:22 UTC</div>
+                <div>SYSTEM: ADAM V26.0</div>
+            </div>
+        </header>
+
+        <main class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="glass-panel p-6 rounded-lg border-t-2 border-t-term-cyan">
+                <div class="text-[10px] text-slate-500 font-mono mb-2 uppercase">Current Price</div>
+                <div class="text-3xl font-bold text-white">$1350.00</div>
+            </div>
+
+            <div class="glass-panel p-6 rounded-lg border-t-2 border-t-term-green">
+                <div class="text-[10px] text-slate-500 font-mono mb-2 uppercase">Target Price (12M)</div>
+                <div class="text-3xl font-bold text-term-green">$1600.00</div>
+            </div>
+
+            <div class="glass-panel p-6 rounded-lg border-t-2 border-t-term-amber">
+                <div class="text-[10px] text-slate-500 font-mono mb-2 uppercase">Conviction Score</div>
+                <div class="text-3xl font-bold text-term-amber glow-amber">HIGH</div>
+            </div>
+        </main>
+
+        <section class="glass-panel p-8 rounded-lg mb-8 prose prose-invert max-w-none">
+            <h2 class="text-xl font-display text-white mb-4 border-b border-white/10 pb-2">Alpha Routing Protocol</h2>
+            <p class="text-slate-300 leading-relaxed font-mono text-sm">
+                > INITIALIZING ASSET ANALYSIS FOR AVGO...<br>
+                > CORRELATION MATRIX: STABLE<br>
+                > LIQUIDITY PROFILE: OPTIMAL<br>
+                > VOLATILITY SKEW: NEGATIVE<br><br>
+                System recommendation is to accumulate AVGO on any macro-induced weakness.
+                The current fundamental trajectory indicates a strong probabilistic advantage
+                over the next 12-24 months. Expected loss (EL) is well below the dynamic gate limit,
+                qualifying AVGO for automated pass-through in most institutional portfolios.
+            </p>
+        </section>
+
+        <footer class="text-center text-[10px] font-mono text-slate-600 mt-12 border-t border-white/5 pt-6">
+            CONFIDENTIAL // INTERNAL USE ONLY // ADAM FINANCIAL OS V26.0
+        </footer>
+    </div>
+
+</body>
+</html>

@@ -1,103 +1,280 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Governance Harness - Sentinel Dashboard</title>
-    <!-- Tailwind CSS -->
+    <title>Project Sentinel // Governance Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
-                        cyber: {
-                            dark: '#0a0a0f',
-                            panel: '#151520',
-                            border: '#2a2a40',
-                            accent: '#00f3ff',
-                            warning: '#ffb000',
-                            danger: '#ff3366',
-                            success: '#00ff66'
-                        }
+                        brand: { bg: '#0b0f19', panel: '#151e32', primary: '#38bdf8', danger: '#f43f5e', warning: '#f59e0b', success: '#10b981' }
                     },
-                    fontFamily: {
-                        mono: ['"JetBrains Mono"', 'monospace'],
-                        sans: ['Inter', 'sans-serif']
-                    }
+                    fontFamily: { sans: ['Inter', 'sans-serif'], mono: ['Fira Code', 'monospace'] }
                 }
             }
         }
     </script>
-    <!-- React & ReactDOM -->
-    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
-    <!-- Babel for JSX -->
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-
-    <!-- React Flow (for Regulatory DAG) -->
-    <script src="https://unpkg.com/reactflow@11.10.1/dist/umd/index.js"></script>
-    <link href="https://unpkg.com/reactflow@11.10.1/dist/style.css" rel="stylesheet" />
-
     <style>
-        body {
-            background-color: #0a0a0f;
-            color: #e0e0e0;
-            font-family: 'Inter', sans-serif;
-            margin: 0;
-            padding: 0;
-            overflow-x: hidden;
-        }
-
-        .scanline {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100vh;
-            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,243,255,0.05) 50%, rgba(0,243,255,0));
-            background-size: 100% 4px;
-            pointer-events: none;
-            z-index: 50;
-        }
-
-        .panel {
-            background: rgba(21, 21, 32, 0.8);
-            border: 1px solid #2a2a40;
-            border-radius: 4px;
-            backdrop-filter: blur(10px);
-        }
-
-        .glass-btn {
-            background: rgba(0, 243, 255, 0.1);
-            border: 1px solid #00f3ff;
-            color: #00f3ff;
-            transition: all 0.2s;
-        }
-
-        .glass-btn:hover {
-            background: rgba(0, 243, 255, 0.2);
-            box-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
-        }
-
-        .glass-btn-danger {
-            background: rgba(255, 51, 102, 0.1);
-            border: 1px solid #ff3366;
-            color: #ff3366;
-            transition: all 0.2s;
-        }
-
-        .glass-btn-danger:hover {
-            background: rgba(255, 51, 102, 0.2);
-            box-shadow: 0 0 10px rgba(255, 51, 102, 0.5);
-        }
+        body { background-color: #0b0f19; color: #f8fafc; }
+        .glass { background: rgba(21, 30, 50, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
+        .glow-red { box-shadow: 0 0 15px rgba(244, 63, 94, 0.3); border-color: rgba(244, 63, 94, 0.6); }
+        .glow-green { box-shadow: 0 0 15px rgba(16, 185, 129, 0.3); border-color: rgba(16, 185, 129, 0.6); }
+        .glow-amber { box-shadow: 0 0 15px rgba(245, 158, 11, 0.3); border-color: rgba(245, 158, 11, 0.6); }
+        /* Graph Styles */
+        .node { width: 140px; text-align: center; padding: 10px; border-radius: 8px; font-size: 12px; font-weight: bold; }
+        .edge { height: 2px; background: #334155; position: absolute; }
     </style>
 </head>
-<body>
-    <div class="scanline"></div>
-    <div id="root"></div>
+<body class="h-screen flex flex-col font-sans overflow-hidden">
+    <!-- Header -->
+    <header class="h-14 border-b border-white/10 glass flex justify-between items-center px-6 z-20">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded bg-brand-primary/20 border border-brand-primary flex items-center justify-center text-brand-primary font-mono font-bold text-xs">PS</div>
+            <h1 class="text-sm font-bold tracking-widest uppercase">Project Sentinel <span class="text-slate-500 font-normal">| AI Governance Harness</span></h1>
+        </div>
+        <div class="flex items-center gap-4 text-xs font-mono">
+            <span class="flex items-center gap-2 text-brand-success"><span class="w-2 h-2 rounded-full bg-brand-success animate-pulse"></span> SYSTEM HEALTH: NOMINAL</span>
+            <span class="text-slate-400 border border-white/10 px-2 py-1 rounded">VIX: 22.5 (Caution)</span>
+        </div>
+    </header>
 
-    <!-- Application Logic -->
-    <script type="text/babel" src="js/sentinel.js"></script>
+    <!-- Main Content -->
+    <div class="flex-1 flex overflow-hidden">
+
+        <!-- Left Panel: Feed -->
+        <aside class="w-80 border-r border-white/10 glass flex flex-col">
+            <div class="p-4 border-b border-white/10">
+                <h2 class="text-xs font-bold text-slate-400 uppercase tracking-widest">Live Document Feed</h2>
+                <p class="text-[10px] text-slate-500 font-mono mt-1">Ingesting K-1s & Capital Calls</p>
+            </div>
+            <div class="flex-1 overflow-y-auto p-4 space-y-3" id="docFeed">
+                <!-- Feed Items generated by JS -->
+            </div>
+        </aside>
+
+        <!-- Center Panel: Proof of Thought DAG -->
+        <main class="flex-1 relative flex flex-col bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+CjxyZWN0IHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgZmlsbD0ibm9uZSIvPgo8Y2lyY2xlIGN4PSIyMCIgY3k9IjIwIiByPSIxIiBmaWxsPSJyZ2JhKDI1NSwyNTUsMjU1LDAuMSkiLz4KPC9zdmc+')]">
+            <div class="p-6">
+                <h2 class="text-lg font-bold text-white mb-1">Regulatory DAG: Proof of Thought</h2>
+                <p class="text-xs text-slate-400 font-mono">Real-time decision path mapping for <span class="text-brand-primary" id="activeEntity">Entity_A_Q3</span></p>
+            </div>
+
+            <div class="flex-1 relative mx-8 my-4 glass rounded-xl border-white/10 p-8 flex items-center justify-center">
+                <!-- Simplified Visual DAG -->
+                <div class="relative w-full max-w-3xl h-64 flex justify-between items-center">
+
+                    <div class="node bg-slate-800 border border-slate-600 text-slate-300 z-10" id="node1">Raw Document<br><span class="text-[9px] font-normal text-slate-500">Sanitizer</span></div>
+
+                    <div class="node bg-slate-800 border border-slate-600 text-slate-300 z-10" id="node2">Context Injector<br><span class="text-[9px] font-normal text-slate-500">Market Params</span></div>
+
+                    <div class="node bg-slate-800 border border-slate-600 text-slate-300 z-10" id="node3">Risk Synthesis<br><span class="text-[9px] font-normal text-slate-500">EL vs Gate</span></div>
+
+                    <div class="node bg-slate-800 border border-slate-600 text-slate-300 z-10" id="node4">Decision Gate<br><span class="text-[9px] font-normal text-slate-500" id="node4Sub">Pending...</span></div>
+
+                    <!-- Connecting Lines -->
+                    <div class="absolute top-1/2 left-[140px] right-[75%] h-[2px] bg-slate-600 -translate-y-1/2 z-0" id="edge1"></div>
+                    <div class="absolute top-1/2 left-[25%] right-[50%] h-[2px] bg-slate-600 -translate-y-1/2 z-0" id="edge2"></div>
+                    <div class="absolute top-1/2 left-[50%] right-[25%] h-[2px] bg-slate-600 -translate-y-1/2 z-0" id="edge3"></div>
+
+                </div>
+            </div>
+
+            <!-- Audit Console Bottom -->
+            <div class="h-48 border-t border-white/10 glass p-4 flex flex-col">
+                <div class="flex justify-between items-center mb-2">
+                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest">Immutable Ledger (SHA-256 Hash)</h3>
+                    <span class="text-[10px] font-mono text-brand-primary" id="auditHash">Waiting for execution...</span>
+                </div>
+                <div class="flex-1 bg-black/50 border border-white/5 rounded p-3 font-mono text-[10px] text-slate-400 overflow-y-auto" id="auditLog">
+                    > System initialized. Awaiting input.
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Friction Modal (HITL Step-Up) -->
+    <div id="frictionModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
+        <div class="glass w-[500px] rounded-xl border border-brand-danger shadow-[0_0_30px_rgba(244,63,94,0.2)] overflow-hidden transform scale-95 transition-transform duration-300" id="modalContent">
+            <div class="bg-brand-danger/20 border-b border-brand-danger/30 p-4 flex items-center gap-3">
+                <div class="w-8 h-8 rounded-full bg-brand-danger/20 flex items-center justify-center text-brand-danger animate-pulse">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                </div>
+                <div>
+                    <h3 class="text-brand-danger font-bold text-lg">MFA STEP-UP REQUIRED</h3>
+                    <p class="text-xs font-mono text-brand-danger/80">Tier 3 Escalation: Hard Constraint Breached</p>
+                </div>
+            </div>
+            <div class="p-6 space-y-4">
+                <div class="bg-black/30 p-3 rounded border border-white/5 font-mono text-xs">
+                    <div class="flex justify-between mb-1"><span class="text-slate-500">Expected Loss (EL):</span><span class="text-white" id="modalEl">$1.2M</span></div>
+                    <div class="flex justify-between mb-1"><span class="text-slate-500">Dynamic Gate Limit:</span><span class="text-white" id="modalGate">$0.8M</span></div>
+                    <div class="flex justify-between pt-2 border-t border-white/10 mt-2"><span class="text-brand-danger">Logic Trigger:</span><span class="text-brand-danger">EL &gt; (NPV * &sigma;)</span></div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 mb-2">UNDERWRITER RATIONALE (REQUIRED)</label>
+                    <textarea class="w-full bg-black/40 border border-white/10 rounded p-3 text-sm text-white font-mono focus:outline-none focus:border-brand-primary h-24" placeholder="Enter justification for manual override..."></textarea>
+                </div>
+            </div>
+            <div class="p-4 border-t border-white/10 bg-black/20 flex justify-end gap-3">
+                <button onclick="closeModal()" class="px-4 py-2 rounded text-sm text-slate-300 hover:text-white transition-colors">Reject</button>
+                <button onclick="authorizeAction()" class="bg-brand-danger hover:bg-red-600 text-white px-6 py-2 rounded text-sm font-bold flex items-center gap-2 shadow-[0_0_15px_rgba(244,63,94,0.4)] transition-all">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                    BIOMETRIC AUTHORIZE
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simulation Data
+        const queue = [
+            { id: "Doc_8841", type: "Capital Call", entity: "Global_Infra_IV", pd: 0.02, lgd: 0.45, ead: 1000000, npv_fees: 5000000, sigma: 0.15, conviction: 0.95, jurisdiction: "USA" },
+            { id: "Doc_9923", type: "K-1 Return", entity: "Cayman_Offshore_X", pd: 0.05, lgd: 0.60, ead: 2500000, npv_fees: 4000000, sigma: 0.15, conviction: 0.88, jurisdiction: "Cayman Islands" },
+            { id: "Doc_1042", type: "Credit Memo", entity: "Tech_Growth_II", pd: 0.12, lgd: 0.50, ead: 8000000, npv_fees: 15000000, sigma: 0.15, conviction: 0.75, jurisdiction: "USA" }
+        ];
+
+        function log(msg, color="text-slate-400") {
+            const l = document.getElementById('auditLog');
+            l.innerHTML += `<br><span class="${color}">> [${new Date().toISOString().split('T')[1].slice(0,8)}] ${msg}</span>`;
+            l.scrollTop = l.scrollHeight;
+        }
+
+        function updateDAG(state, doc) {
+            document.getElementById('activeEntity').innerText = doc.entity;
+            document.getElementById('node1').className = "node bg-brand-primary/20 border border-brand-primary text-white z-10 glow-blue";
+            document.getElementById('edge1').className = "absolute top-1/2 left-[140px] right-[75%] h-[2px] bg-brand-primary -translate-y-1/2 z-0 shadow-[0_0_8px_#38bdf8]";
+
+            setTimeout(() => {
+                document.getElementById('node2').className = "node bg-brand-primary/20 border border-brand-primary text-white z-10 glow-blue";
+                document.getElementById('edge2').className = "absolute top-1/2 left-[25%] right-[50%] h-[2px] bg-brand-primary -translate-y-1/2 z-0 shadow-[0_0_8px_#38bdf8]";
+            }, 500);
+
+            setTimeout(() => {
+                document.getElementById('node3').className = "node bg-brand-primary/20 border border-brand-primary text-white z-10 glow-blue";
+                document.getElementById('edge3').className = "absolute top-1/2 left-[50%] right-[25%] h-[2px] bg-brand-primary -translate-y-1/2 z-0 shadow-[0_0_8px_#38bdf8]";
+            }, 1000);
+
+            setTimeout(() => {
+                const n4 = document.getElementById('node4');
+                const sub = document.getElementById('node4Sub');
+                if(state.routing === "HITL_TIER_3") {
+                    n4.className = "node bg-brand-danger/20 border border-brand-danger text-white z-10 glow-red animate-pulse";
+                    sub.innerText = "MFA Required";
+                    sub.className = "text-[9px] font-normal text-brand-danger";
+                    showModal(doc.el, doc.gate);
+                } else if(state.routing === "HOTL") {
+                    n4.className = "node bg-brand-warning/20 border border-brand-warning text-white z-10 glow-amber";
+                    sub.innerText = "Queue for Review";
+                    sub.className = "text-[9px] font-normal text-brand-warning";
+                } else {
+                    n4.className = "node bg-brand-success/20 border border-brand-success text-white z-10 glow-green";
+                    sub.innerText = "Auto-Approved";
+                    sub.className = "text-[9px] font-normal text-brand-success";
+                }
+
+                // Gen fake hash
+                const hash = Array.from({length:64}, () => Math.floor(Math.random()*16).toString(16)).join('');
+                document.getElementById('auditHash').innerText = hash;
+                log(`Hash Generated: ${hash}`, "text-brand-success");
+
+            }, 1500);
+        }
+
+        function showModal(el, gate) {
+            document.getElementById('modalEl').innerText = '$' + (el/1000000).toFixed(2) + 'M';
+            document.getElementById('modalGate').innerText = '$' + (gate/1000000).toFixed(2) + 'M';
+            const m = document.getElementById('frictionModal');
+            m.classList.remove('hidden');
+            setTimeout(() => {
+                m.classList.remove('opacity-0');
+                document.getElementById('modalContent').classList.remove('scale-95');
+            }, 50);
+            log("Tier 3 Escalation Triggered. Awaiting Human Authorization.", "text-brand-danger");
+        }
+
+        function closeModal() {
+            const m = document.getElementById('frictionModal');
+            m.classList.add('opacity-0');
+            document.getElementById('modalContent').classList.add('scale-95');
+            setTimeout(() => m.classList.add('hidden'), 300);
+            log("Transaction Rejected by Underwriter.", "text-brand-warning");
+            resetDAG();
+        }
+
+        function authorizeAction() {
+            closeModal();
+            log("Biometric Auth Confirmed. Override applied and logged to immutable ledger.", "text-brand-success");
+            document.getElementById('node4').className = "node bg-brand-success/20 border border-brand-success text-white z-10 glow-green";
+            document.getElementById('node4Sub').innerText = "Manual Override (HITL)";
+            document.getElementById('node4Sub').className = "text-[9px] font-normal text-brand-success";
+        }
+
+        function resetDAG() {
+            ['node1','node2','node3','node4'].forEach(id => {
+                document.getElementById(id).className = "node bg-slate-800 border border-slate-600 text-slate-300 z-10";
+            });
+            ['edge1','edge2','edge3'].forEach(id => {
+                document.getElementById(id).className = "absolute top-1/2 h-[2px] bg-slate-600 -translate-y-1/2 z-0 " + (id==='edge1'?'left-[140px] right-[75%]':id==='edge2'?'left-[25%] right-[50%]':'left-[50%] right-[25%]');
+            });
+            document.getElementById('node4Sub').innerText = "Pending...";
+            document.getElementById('node4Sub').className = "text-[9px] font-normal text-slate-500";
+        }
+
+        function processItem(doc) {
+            resetDAG();
+            log(`Ingesting ${doc.id} [${doc.entity}]`);
+
+            // Logic
+            const el = doc.pd * doc.lgd * doc.ead;
+            const gate = doc.npv_fees * doc.sigma;
+            doc.el = el; doc.gate = gate;
+
+            let state = { routing: "UNDEFINED", stepUp: false };
+
+            if(doc.jurisdiction === "Cayman Islands") {
+                log("REDLINE BREACH: High-Risk Jurisdiction detected.", "text-brand-danger");
+                state.routing = "HITL_TIER_3"; state.stepUp = true;
+            } else if (el >= gate) {
+                log(`Gate Breached. EL ($${(el/1e6).toFixed(2)}M) >= Gate ($${(gate/1e6).toFixed(2)}M)`, "text-brand-danger");
+                state.routing = "HITL_TIER_3"; state.stepUp = true;
+            } else if (el < gate && doc.conviction > 0.9) {
+                log("Pass-Through Logic Met. Auto-Approve.", "text-brand-success");
+                state.routing = "AUTOMATED";
+            } else {
+                log("Conviction < 0.9. HOTL Review Queued.", "text-brand-warning");
+                state.routing = "HOTL";
+            }
+
+            updateDAG(state, doc);
+        }
+
+        function renderFeed() {
+            const f = document.getElementById('docFeed');
+            queue.forEach(doc => {
+                const div = document.createElement('div');
+                div.className = "bg-black/30 border border-white/5 p-3 rounded hover:bg-white/5 cursor-pointer transition-colors";
+                div.onclick = () => processItem(doc);
+                div.innerHTML = `
+                    <div class="flex justify-between mb-1">
+                        <span class="text-xs font-bold text-white">${doc.id}</span>
+                        <span class="text-[10px] text-slate-500 font-mono">${doc.type}</span>
+                    </div>
+                    <div class="text-[10px] text-brand-primary mb-2">${doc.entity}</div>
+                    <div class="flex justify-between text-[9px] font-mono text-slate-400">
+                        <span>PD: ${(doc.pd*100).toFixed(1)}%</span>
+                        <span>Conv: ${(doc.conviction*100).toFixed(0)}%</span>
+                    </div>
+                `;
+                f.appendChild(div);
+            });
+        }
+
+        window.onload = renderFeed;
+    </script>
 </body>
 </html>
