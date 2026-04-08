@@ -269,14 +269,18 @@ def _simulate_llm_response() -> str:
 ```python
 import time
 from typing import Dict, Any
+
 from pydantic import BaseModel
+
 from core.schemas.agent_schema import AgentInput, AgentOutput
 from core.agents.agent_base import AgentBase
+
 
 class HealthMetrics(BaseModel):
     agent_id: str
     uptime_seconds: float
     error_count: int
+
 
 class SystemHealthAgent(AgentBase):
     def __init__(self, config: Dict[str, Any], **kwargs):
@@ -304,8 +308,10 @@ class SystemHealthAgent(AgentBase):
 **3. FILE: tests/test_system_health_agent.py**
 ```python
 import pytest
+
 from core.schemas.agent_schema import AgentInput
 from core.agents.system_health_agent import SystemHealthAgent
+
 
 @pytest.mark.asyncio
 async def test_health_metrics():
@@ -315,6 +321,7 @@ async def test_health_metrics():
     assert result.metadata["status"] == "healthy"
     assert "metrics" in result.metadata
 
+
 @pytest.mark.asyncio
 async def test_ping():
     agent = SystemHealthAgent({"agent_id": "test_agent"})
@@ -323,14 +330,16 @@ async def test_ping():
 
 **4. FILE: core/agents/meta_cognitive_agent.py**
 ```python
-from typing import Any, Dict, List, Optional
 import logging
 import re
+from typing import Any, Dict, List, Optional
+
 from core.schemas.agent_schema import AgentInput, AgentOutput
 from core.agents.agent_base import AgentBase
 from core.agents.system_health_agent import SystemHealthAgent
 
 logger = logging.getLogger(__name__)
+
 
 class MetaCognitiveAgent(AgentBase):
     \"\"\"
@@ -345,7 +354,8 @@ class MetaCognitiveAgent(AgentBase):
 
         super().__init__(config, kernel=kernel)
         self.agent_performance = {}
-        self.system_health_agent = SystemHealthAgent(config={"agent_id": "meta_cognitive_health_monitor"}, kernel=kernel)
+        health_config = {"agent_id": "meta_cognitive_health_monitor"}
+        self.system_health_agent = SystemHealthAgent(config=health_config, kernel=kernel)
 
         # Load specific configurations for fallacy detection
         self.logical_fallacies = self.config.get("logical_fallacies", {
@@ -376,12 +386,12 @@ class MetaCognitiveAgent(AgentBase):
         logger.info(f"MetaCognitiveAgent analyzing output from {agent_name}...")
 
         if not content_to_analyze:
-             return AgentOutput(
-                 answer="No content provided for analysis.",
-                 sources=[],
-                 confidence=0.0,
-                 metadata={"status": "error"}
-             )
+            return AgentOutput(
+                answer="No content provided for analysis.",
+                sources=[],
+                confidence=0.0,
+                metadata={"status": "error"}
+            )
 
         # 1. Detect Logical Fallacies
         detected_fallacies = self._detect_logical_fallacies(content_to_analyze)
@@ -419,12 +429,11 @@ class MetaCognitiveAgent(AgentBase):
             logger.warning(f"Failed to execute system_health_agent: {e}")
             health_metrics = {"status": "unknown", "error": str(e)}
 
-
         final_answer = f"Coherence Score: {coherence_score}/10. Status: {verification_status}."
         if detected_fallacies:
             final_answer += f" {len(detected_fallacies)} Fallacies Detected."
         if contradictions:
-            final_answer += f" Contradictions Present."
+            final_answer += " Contradictions Present."
 
         return AgentOutput(
             answer=final_answer,
@@ -498,7 +507,7 @@ class MetaCognitiveAgent(AgentBase):
         try:
             return self.system_health_agent.ping()
         except AttributeError:
-             return "PONG: SystemHealthAgent lacks ping method."
+            return "PONG: SystemHealthAgent lacks ping method."
 ```
 
 **5. GIT COMMIT MESSAGE:**

@@ -1,6 +1,8 @@
 import pytest
+
 from core.schemas.agent_schema import AgentInput
 from core.agents.system_health_agent import SystemHealthAgent
+
 
 @pytest.mark.asyncio
 async def test_health_metrics():
@@ -9,6 +11,7 @@ async def test_health_metrics():
     result = await agent.execute(input_data)
     assert result.metadata["status"] == "healthy"
     assert "metrics" in result.metadata
+
 
 @pytest.mark.asyncio
 async def test_ping():

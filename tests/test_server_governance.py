@@ -2,7 +2,7 @@ import sys
 import os
 import unittest
 import json
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, AsyncMock
 
 # Define exception classes for mocking
 class GovernanceError(Exception): pass
