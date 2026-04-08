@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field, model_validator
-from typing import List, Optional, Union
+from typing import List, Optional, Union, Literal
 
 class CreditMetrics(BaseModel):
     pd: float = Field(..., description="Probabilistic Probability of Default")
@@ -115,3 +115,63 @@ class CapitalStructureRecovery(BaseModel):
     total_distributable_value: Optional[float] = None
     debt_tranches: Optional[List[DebtTranche]] = None
     equity_residual_value: Optional[float] = None
+
+
+class TransactionMetadata(BaseModel):
+    transaction_id: str
+    inference_timestamp: str
+    execution_modality: Literal["AUTOMATED", "HOTL", "HITL_TIER_3"]
+
+
+class AuditMetadata(BaseModel):
+    model_registry_id: str
+    model_version_hash: str = Field(..., pattern=r"^[a-f0-9]{64}$")
+    data_snapshot_uri: str
+    pipeline_execution_id: Optional[str] = None
+
+
+class PredictionMetrics(BaseModel):
+    probability_of_default: float = Field(..., ge=0, le=1)
+    decision_threshold: float
+    algorithmic_decision: Literal["APPROVE", "DENY", "ESCALATE"]
+    confidence_interval: Optional[List[float]] = Field(None, min_length=2, max_length=2)
+
+
+class FeatureAttribution(BaseModel):
+    feature_name: str
+    raw_feature_value: float
+    shap_marginal_contribution: float
+
+
+class ExplainabilityPayload(BaseModel):
+    xai_methodology: Literal["SHAP", "LIME"]
+    base_value: float
+    feature_attributions: List[FeatureAttribution]
+
+
+class CreditDecision_XAIPayload(BaseModel):
+    transaction_metadata: TransactionMetadata
+    audit_metadata: AuditMetadata = Field(..., alias="_audit_metadata")
+    prediction_metrics: PredictionMetrics
+    explainability_payload: ExplainabilityPayload
+
+
+class PrincipalDenialReason(BaseModel):
+    reason_rank: int = Field(..., ge=1, le=4)
+    form_c1_code: Literal["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20"]
+    consumer_facing_narrative: str
+    aggregated_shap_weight: float
+    constituent_features: Optional[List[str]] = None
+
+
+class AuditValidation(BaseModel):
+    xai_fidelity_score: Optional[float] = Field(None, ge=0, le=1)
+    requires_human_review: Optional[bool] = None
+    mapping_algorithm_version: Optional[str] = None
+
+
+class AdverseAction_RegB_Translation(BaseModel):
+    transaction_id: str
+    regulatory_framework: Literal["ECOA_Regulation_B"] = "ECOA_Regulation_B"
+    principal_denial_reasons: List[PrincipalDenialReason] = Field(..., max_length=4)
+    audit_validation: Optional[AuditValidation] = None
