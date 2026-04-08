@@ -1,0 +1,225 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$defs": {
+    "BalanceSheet": {
+      "properties": {
+        "cash_and_equivalents": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Cash And Equivalents"
+        },
+        "total_senior_debt": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Total Senior Debt"
+        },
+        "total_subordinated_debt": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Total Subordinated Debt"
+        }
+      },
+      "title": "BalanceSheet",
+      "type": "object"
+    },
+    "CashFlow": {
+      "properties": {
+        "operating_cash_flow": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Operating Cash Flow"
+        },
+        "capex_maintenance": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Capex Maintenance"
+        },
+        "free_cash_flow": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Free Cash Flow"
+        }
+      },
+      "title": "CashFlow",
+      "type": "object"
+    },
+    "IncomeStatement": {
+      "properties": {
+        "revenue": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Revenue"
+        },
+        "cogs": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Cogs"
+        },
+        "ebitda_adjusted": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Ebitda Adjusted"
+        }
+      },
+      "title": "IncomeStatement",
+      "type": "object"
+    },
+    "ReportingPeriod": {
+      "properties": {
+        "period_end_date": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Period End Date"
+        },
+        "period_type": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Period Type"
+        },
+        "income_statement": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/IncomeStatement"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "balance_sheet": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BalanceSheet"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "cash_flow": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CashFlow"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "title": "ReportingPeriod",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "entity_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Entity Id"
+    },
+    "reporting_periods": {
+      "anyOf": [
+        {
+          "items": {
+            "$ref": "#/$defs/ReportingPeriod"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Reporting Periods"
+    }
+  },
+  "title": "FinancialSpreadTemplate",
+  "type": "object"
+}

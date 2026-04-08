@@ -1,0 +1,110 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$defs": {
+    "RegulatoryNarrative": {
+      "properties": {
+        "primary_repayment_source_analysis": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Primary Repayment Source Analysis"
+        },
+        "secondary_repayment_source_analysis": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Secondary Repayment Source Analysis"
+        },
+        "mitigating_factors": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Mitigating Factors"
+        },
+        "examiner_conclusion": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Examiner Conclusion"
+        }
+      },
+      "title": "RegulatoryNarrative",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "borrower_name": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Borrower Name"
+    },
+    "snc_rating": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Snc Rating"
+    },
+    "regulatory_narrative": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/RegulatoryNarrative"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "date_of_exam": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Date Of Exam"
+    }
+  },
+  "title": "RegulatoryClassificationReport",
+  "type": "object"
+}
