@@ -3,17 +3,18 @@ import re
 import hashlib
 import os
 from typing import Dict, Any, Optional, Tuple
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 class CreditMetrics(BaseModel):
     pd: float = Field(..., description="Probabilistic Probability of Default")
     lgd: float = Field(..., description="Deterministic Loss Given Default")
     ead: float = Field(..., description="Exposure at Default")
+    expected_loss: float = Field(0.0, description="Calculated Expected Loss")
 
-    @property
-    def expected_loss(self) -> float:
-        """Calculated: pd * lgd * ead"""
-        return self.pd * self.lgd * self.ead
+    @model_validator(mode='after')
+    def calculate_expected_loss(self):
+        self.expected_loss = self.pd * self.lgd * self.ead
+        return self
 
 class DecisionState(BaseModel):
     conviction_score: float = Field(ge=0, le=1)
