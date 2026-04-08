@@ -6,8 +6,14 @@ import AgentRunner from '../AgentRunner'; // Assuming AgentRunner is still JS, a
 
 const Dashboard: React.FC = () => {
   return (
-    <div>
-      <h2 className="text-2xl font-bold mb-4">Dashboard</h2>
+    <div className="animate-fade-in">
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h2 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500 tracking-tight">Dashboard</h2>
+          <p className="text-slate-400 mt-1 text-sm">Monitor and control your AI agents</p>
+        </div>
+      </div>
+
       <div className="Dashboard">
         <div className="Card">
           {/* @ts-ignore - AgentRunner is JS and types are inferred strictly */}

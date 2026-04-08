@@ -29,13 +29,13 @@ const Sidebar: React.FC = () => {
                   group relative outline-none
                   focus-visible:ring-2 focus-visible:ring-[var(--primary-color)] focus-visible:ring-inset
                   ${isActive
-                    ? 'bg-[var(--primary-color)] text-[var(--bg-color)] border-l-4 border-[var(--accent-color)]'
-                    : 'text-[#aaa] border-l-4 border-transparent hover:bg-[rgba(0,243,255,0.1)] hover:text-[var(--primary-color)] hover:border-[var(--primary-color)]/50'
+                    ? 'bg-gradient-to-r from-[var(--primary-color)] to-[var(--primary-color)]/80 text-[#0f172a] shadow-md shadow-cyan-900/20 border-l-4 border-[var(--accent-color)] font-bold'
+                    : 'text-slate-400 border-l-4 border-transparent hover:bg-slate-800/50 hover:text-cyan-400 hover:border-cyan-500/50'
                   }
                 `}
               >
-                <span className="mr-2.5 w-5 text-center">{item.icon}</span>
-                <span className="font-semibold text-sm font-mono">{item.label}</span>
+                <span className="mr-3 w-5 text-center text-lg">{item.icon}</span>
+                <span className="font-medium text-sm tracking-wide">{item.label}</span>
               </NavLink>
             </li>
           ))}
