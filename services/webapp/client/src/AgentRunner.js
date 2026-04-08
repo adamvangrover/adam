@@ -179,17 +179,17 @@ function AgentRunner({ singleAgent }) {
         </div>
       )}
 
-      <div className="bg-slate-900/50 p-4 rounded-lg border border-slate-800">
+      <div className="bg-[#0f172a] p-5 rounded-xl border border-slate-700/50 shadow-inner">
         {renderForm()}
       </div>
 
       <button
         onClick={handleRunAgent}
         disabled={loading || !selectedAgent}
-        className={`flex items-center justify-center gap-2 px-4 py-2 rounded font-medium transition-all w-full
+        className={`flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all w-full tracking-wide uppercase text-sm
           ${loading || !selectedAgent
             ? 'bg-slate-800 text-slate-500 cursor-not-allowed border border-slate-700'
-            : 'bg-cyan-600 hover:bg-cyan-500 text-white shadow-lg shadow-cyan-900/20 hover:shadow-cyan-900/40'
+            : 'bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white shadow-lg shadow-cyan-900/30 hover:shadow-cyan-500/25 border border-cyan-500/30 transform hover:-translate-y-0.5'
           }`}
         aria-busy={loading}
       >

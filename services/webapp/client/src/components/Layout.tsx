@@ -10,7 +10,7 @@ const Layout: React.FC = () => {
       <GlobalNav />
       <div style={{ display: 'flex', flexGrow: 1, overflow: 'hidden' }}>
         <Sidebar />
-        <main style={{ flexGrow: 1, padding: '20px', overflowY: 'auto', backgroundColor: 'var(--bg-color)' }}>
+        <main style={{ flexGrow: 1, padding: '30px 40px', overflowY: 'auto', backgroundColor: 'var(--bg-color)' }} className="scrollbar-hide">
           <Outlet />
         </main>
         <AgentIntercom />
