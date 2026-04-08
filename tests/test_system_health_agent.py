@@ -1,5 +1,5 @@
 import pytest
-from core.agents.agent_base import AgentInput
+from core.schemas.agent_schema import AgentInput
 from core.agents.system_health_agent import SystemHealthAgent
 
 @pytest.mark.asyncio
