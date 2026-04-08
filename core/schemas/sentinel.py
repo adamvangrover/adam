@@ -44,6 +44,24 @@ class FinancialSpreadTemplate(BaseModel):
     entity_id: Optional[str] = None
     reporting_periods: Optional[List[ReportingPeriod]] = None
 
+class CapitalAccountAnalysis(BaseModel):
+    beginning_capital_account: Optional[float] = None
+    capital_contributed: Optional[float] = None
+    current_year_net_income: Optional[float] = None
+    withdrawals_distributions: Optional[float] = None
+    ending_capital_account: float
+
+class PartnerShareOfLiabilities(BaseModel):
+    nonrecourse: Optional[float] = None
+    qualified_nonrecourse_financing: Optional[float] = None
+    recourse: Optional[float] = None
+
+class ScheduleK1Extraction(BaseModel):
+    partner_identifying_number: Optional[str] = Field(None, pattern=r"^[0-9]{9}$")
+    partnership_name: Optional[str] = None
+    capital_account_analysis: Optional[CapitalAccountAnalysis] = None
+    partner_share_of_liabilities: Optional[PartnerShareOfLiabilities] = None
+
 class Covenant(BaseModel):
     covenant_type: Optional[str] = None # ["Maintenance", "Incurrence"]
     metric_name: Optional[str] = None # ["Total Leverage Ratio", "Fixed Charge Coverage Ratio", "Minimum Liquidity"]
