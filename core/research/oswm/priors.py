@@ -3,7 +3,9 @@ import torch.nn as nn
 import numpy as np
 
 class Prior:
-    """Base class for synthetic priors."""
+    """
+    Base class for synthetic priors.
+    """
     def sample_batch(self, batch_size, seq_len, device='cpu'):
         raise NotImplementedError
 
@@ -13,6 +15,11 @@ class NeuralNetworkPrior(Prior):
         self.input_dim = input_dim
         self.output_dim = output_dim
         self.hidden_dim = hidden_dim
+
+    def generate_trajectory(self, steps, start_val=0.0):
+        # Fallback for old tests
+        res = self.sample_batch(1, steps)
+        return res[:, 0, 0].tolist()
 
     def sample_batch(self, batch_size, seq_len, device='cpu'):
         current_state = torch.randn(batch_size, 1, self.input_dim, device=device)
@@ -35,9 +42,20 @@ class NeuralNetworkPrior(Prior):
         return data
 
 class MomentumPrior(Prior):
-    """Generates data based on simple physical laws (Harmonic Oscillator)."""
+    """
+    Generates data based on simple physical laws (Harmonic Oscillator). 
+
+[Image of harmonic oscillator physics model]
+
+    P(t+1) = P(t) + V(t)*dt
+    V(t+1) = V(t) - (k*P(t) + c*V(t))*dt
+    """
     def __init__(self, dim=1):
         self.dim = dim
+
+    def sample_batch(self, batch_size, seq_len, device='cpu'):
+        pos = torch.randn(batch_size, 1, self.dim, device=device)
+        vel = torch.randn(batch_size, 1, self.dim, device=device)
 
     def sample_batch(self, batch_size, seq_len, device='cpu'):
         pos = torch.randn(batch_size, 1, self.dim, device=device)
@@ -95,6 +113,11 @@ class OrnsteinUhlenbeckPrior(Prior):
         self.dim = dim
         self.dt = dt
 
+    def generate_trajectory(self, steps, start_val=0.0):
+        # Fallback for old tests
+        res = self.sample_batch(1, steps)
+        return res[:, 0, 0].tolist()
+
     def sample_batch(self, batch_size, seq_len, device='cpu'):
         theta = torch.rand(batch_size, 1, 1, device=device) * 0.55 + 0.1
         mu = torch.randn(batch_size, 1, self.dim, device=device)
@@ -111,6 +134,41 @@ class OrnsteinUhlenbeckPrior(Prior):
             dW = torch.randn(batch_size, 1, self.dim, device=device)
             dx = theta * (mu - x) * self.dt + sigma * dW * sqrt_dt
             x = torch.clamp(x + dx, -1e6, 1e6)
+
+        return data
+
+class NoisyWavePrior(Prior):
+    """
+    Replaces the pseudoscientific 'WavelengthSpeedOfLightPrior'.
+    Generates a realistic, frequency-modulated sine wave with dynamic noise,
+    clamped between 0 and 1.
+    """
+    def __init__(self, dim=1):
+        self.dim = dim
+
+    def generate_trajectory(self, steps, start_val=0.0):
+        # Fallback for old tests
+        res = self.sample_batch(1, steps)
+        return res[:, 0, 0].tolist()
+
+    def sample_batch(self, batch_size, seq_len, device='cpu'):
+        # Random base frequencies and phase shifts
+        frequency = torch.rand(batch_size, 1, self.dim, device=device) * 5.0 + 1.0
+        phase = torch.rand(batch_size, 1, self.dim, device=device) * 2 * np.pi
+
+        data = torch.empty((seq_len, batch_size, self.dim), device=device)
+
+        for t in range(seq_len):
+            time_t = t * 0.1
+
+            # Base wave dynamics
+            base_val = 0.5 * (torch.sin(frequency * time_t + phase) + 1.0)
+
+            # Add stochastic measurement noise
+            noise = torch.randn_like(base_val) * 0.05
+            val = torch.clamp(base_val + noise, 0.0, 1.0)
+
+            data[t] = val.squeeze(1)
 
         return data
 
@@ -131,10 +189,11 @@ class PriorSampler:
         Samples a truly mixed batch of trajectories.
         Distribution: 30% NN, 30% Momentum, 30% OU, 10% Wave.
         """
-        probabilities = [0.3, 0.3, 0.3, 0.1]
+        probabilities = torch.tensor([0.3, 0.3, 0.3, 0.1], device=device)
 
         # Determine exact number of samples for each prior in this batch
-        counts = np.random.multinomial(batch_size, probabilities)
+        multinomial = torch.distributions.Multinomial(total_count=batch_size, probs=probabilities)
+        counts = multinomial.sample().int().tolist()
 
         batches = []
         if counts[0] > 0:
