@@ -102,3 +102,7 @@
 ## 2026-03-31 - [Graph Node Batching]
 **Learning:** In `UnifiedKnowledgeGraph.ingest_risk_state`, adding root entity nodes individually via `self.graph.add_node` and `self.graph.add_edge` inside a high-throughput function introduces significant overhead. Batching all node and edge creations into lists and using `add_nodes_from`/`add_edges_from` improves performance.
 **Action:** Always batch `networkx` node and edge creations into lists, even for small numbers of root nodes, to avoid function call overhead during ingestion.
+
+## 2026-11-21 - [Event Loop Blocking in High-Throughput Async Ingestion]
+**Learning:** During high-throughput asynchronous file ingestion (e.g., `UniversalIngestor.scan_directory_async`), utilizing `aiofiles` for I/O is not sufficient. CPU-intensive synchronous operations like `json.loads`, string cleaning, semantic chunking (`sentence_transformers`), and `ast.parse` will still block the main event loop, causing silent performance bottlenecks and negating the benefits of concurrency.
+**Action:** Always wrap heavy synchronous data processing and parsing steps inside `await asyncio.to_thread(func, args)` within async pipelines to properly offload CPU-bound work and maintain event loop responsiveness.

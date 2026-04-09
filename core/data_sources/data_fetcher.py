@@ -10,8 +10,9 @@ try:
 except ImportError:
     pd = None
 
+import concurrent.futures
 import time
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Union
 
 from core.utils.logging_utils import get_logger
 from core.utils.retry_utils import retry_with_backoff
@@ -355,6 +356,51 @@ class DataFetcher:
             logger.error(f"Error fetching calendar: {e}")
             return {}
 
+    def _fetch_single_metric(self, symbol: str, name: str = None) -> tuple[str, Dict[str, Any]]:
+        """Helper to fetch a single metric with fallback, returning a tuple of (symbol, data)"""
+        data = self.fetch_realtime_snapshot(symbol)
+        if data and data.get("last_price"):
+            if name:
+                data['name'] = name
+            return symbol, data
+
+        # Try to fetch standard market data if snapshot fails
+        data = self.fetch_market_data(symbol)
+        if data:
+            result = {
+                "symbol": symbol,
+                "last_price": data.get("current_price"),
+                "previous_close": data.get("previous_close")
+            }
+            if name:
+                result['name'] = name
+            return symbol, result
+
+        return symbol, {}
+
+    def _bulk_fetch_metrics(self, tickers: Union[Dict[str, str], List[str]]) -> Dict[str, Any]:
+        """
+        ⚡ BOLT OPTIMIZATION: Fetches metrics concurrently for multiple tickers.
+        Replaces sequential network calls with a ThreadPoolExecutor.
+        """
+        metrics = {}
+
+        # Normalize input to list of tuples (symbol, name_or_none)
+        if isinstance(tickers, dict):
+            items = list(tickers.items())
+        else:
+            items = [(symbol, None) for symbol in tickers]
+
+        with concurrent.futures.ThreadPoolExecutor(max_workers=max(1, min(len(items), 10))) as executor:
+            futures = [executor.submit(self._fetch_single_metric, sym, name) for sym, name in items]
+            for future in concurrent.futures.as_completed(futures):
+                # Do not catch exceptions here so the caller's @retry_with_backoff can be triggered
+                symbol, data = future.result()
+                if data:
+                    metrics[symbol] = data
+
+        return metrics
+
     @retry_with_backoff(retries=2, backoff_in_seconds=1)
     def fetch_credit_metrics(self) -> Dict[str, Any]:
         """
@@ -362,75 +408,28 @@ class DataFetcher:
         Specifically targeting High Yield (HYG) and Investment Grade (LQD) ETFs as proxies for CDX,
         and 10Y Treasury Yield (^TNX) to estimate spreads.
         """
-        metrics = {}
         tickers = {
             "HYG": "High Yield Corp Bond ETF",
             "LQD": "Inv Grade Corp Bond ETF",
             "^TNX": "10-Year Treasury Yield"
         }
-
-        for symbol, name in tickers.items():
-            data = self.fetch_realtime_snapshot(symbol)
-            if data and data.get("last_price"):
-                metrics[symbol] = data
-                metrics[symbol]['name'] = name
-            else:
-                 # Try to fetch standard market data if snapshot fails
-                data = self.fetch_market_data(symbol)
-                if data:
-                     # Adapt to snapshot format lightly
-                     metrics[symbol] = {
-                         "symbol": symbol,
-                         "last_price": data.get("current_price"),
-                         "previous_close": data.get("previous_close"),
-                         "name": name
-                     }
-        return metrics
+        return self._bulk_fetch_metrics(tickers)
 
     @retry_with_backoff(retries=2, backoff_in_seconds=1)
     def fetch_volatility_metrics(self) -> Dict[str, Any]:
         """
         Fetches volatility metrics: VIX, VIX3M, MOVE Index.
         """
-        metrics = {}
         tickers = ["^VIX", "^VIX3M", "^MOVE"]
-
-        for symbol in tickers:
-            data = self.fetch_realtime_snapshot(symbol)
-            if data and data.get("last_price"):
-                 metrics[symbol] = data
-            else:
-                 # Fallback
-                 data = self.fetch_market_data(symbol)
-                 if data:
-                     metrics[symbol] = {
-                         "symbol": symbol,
-                         "last_price": data.get("current_price"),
-                         "previous_close": data.get("previous_close")
-                     }
-        return metrics
+        return self._bulk_fetch_metrics(tickers)
 
     @retry_with_backoff(retries=2, backoff_in_seconds=1)
     def fetch_crypto_metrics(self) -> Dict[str, Any]:
         """
         Fetches major crypto metrics: BTC-USD, ETH-USD.
         """
-        metrics = {}
         tickers = ["BTC-USD", "ETH-USD"]
-
-        for symbol in tickers:
-            data = self.fetch_realtime_snapshot(symbol)
-            if data and data.get("last_price"):
-                 metrics[symbol] = data
-            else:
-                 data = self.fetch_market_data(symbol)
-                 if data:
-                     metrics[symbol] = {
-                         "symbol": symbol,
-                         "last_price": data.get("current_price"),
-                         "previous_close": data.get("previous_close")
-                     }
-        return metrics
+        return self._bulk_fetch_metrics(tickers)
 
     @retry_with_backoff(retries=2, backoff_in_seconds=1)
     def fetch_treasury_metrics(self) -> Dict[str, Any]:
@@ -439,29 +438,13 @@ class DataFetcher:
         Uses ^TNX (10Y Yield), ^IRX (13W Yield), ^FVX (5Y Yield).
         Also fetches IEF (7-10 Year Treasury Bond ETF) for price action comparison.
         """
-        metrics = {}
         tickers = {
             "^TNX": "10-Year Treasury Yield",
             "^IRX": "13-Week Treasury Bill",
             "^FVX": "5-Year Treasury Yield",
             "IEF": "iShares 7-10 Year Treasury Bond ETF"
         }
-
-        for symbol, name in tickers.items():
-            data = self.fetch_realtime_snapshot(symbol)
-            if data and data.get("last_price"):
-                 metrics[symbol] = data
-                 metrics[symbol]['name'] = name
-            else:
-                 data = self.fetch_market_data(symbol)
-                 if data:
-                     metrics[symbol] = {
-                         "symbol": symbol,
-                         "last_price": data.get("current_price"),
-                         "previous_close": data.get("previous_close"),
-                         "name": name
-                     }
-        return metrics
+        return self._bulk_fetch_metrics(tickers)
 
     def fetch_macro_liquidity(self) -> Dict[str, Any]:
         """

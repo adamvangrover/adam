@@ -1,0 +1,143 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$defs": {
+    "QualitativeFactors": {
+      "properties": {
+        "management_experience_score": {
+          "anyOf": [
+            {
+              "maximum": 5,
+              "minimum": 1,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Management Experience Score"
+        },
+        "industry_headwinds_indicator": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Industry Headwinds Indicator"
+        },
+        "sponsor_support_strength": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Sponsor Support Strength"
+        }
+      },
+      "title": "QualitativeFactors",
+      "type": "object"
+    },
+    "QuantitativeFactors": {
+      "properties": {
+        "merton_distance_to_default": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Merton Distance To Default"
+        },
+        "altman_z_score": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Altman Z Score"
+        },
+        "debt_service_coverage_ratio_ttm": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Debt Service Coverage Ratio Ttm"
+        }
+      },
+      "title": "QuantitativeFactors",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "composite_pd_percentage": {
+      "anyOf": [
+        {
+          "maximum": 100,
+          "minimum": 0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Composite Pd Percentage"
+    },
+    "implied_sp_rating": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Implied Sp Rating"
+    },
+    "quantitative_factors": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/QuantitativeFactors"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "qualitative_factors": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/QualitativeFactors"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    }
+  },
+  "title": "ProbabilityOfDefaultModel",
+  "type": "object"
+}

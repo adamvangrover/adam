@@ -10,10 +10,7 @@ class Prior:
         raise NotImplementedError
 
 class NeuralNetworkPrior(Prior):
-    """
-    Generates data from random neural networks (Random MLPs). 
-    Simulates complex, non-linear, but structured dynamics.
-    """
+    """Generates data from random neural networks (Random MLPs)."""
     def __init__(self, input_dim=1, output_dim=1, hidden_dim=32):
         self.input_dim = input_dim
         self.output_dim = output_dim
@@ -56,10 +53,9 @@ class MomentumPrior(Prior):
     def __init__(self, dim=1):
         self.dim = dim
 
-    def generate_trajectory(self, steps, start_pos=0.0):
-        # Fallback for old tests
-        res = self.sample_batch(1, steps)
-        return res[:, 0, 0].tolist()
+    def sample_batch(self, batch_size, seq_len, device='cpu'):
+        pos = torch.randn(batch_size, 1, self.dim, device=device)
+        vel = torch.randn(batch_size, 1, self.dim, device=device)
 
     def sample_batch(self, batch_size, seq_len, device='cpu'):
         pos = torch.randn(batch_size, 1, self.dim, device=device)
@@ -81,12 +77,38 @@ class MomentumPrior(Prior):
 
         return data
 
+class NoisyWavePrior(Prior):
+    """
+    Replaces the pseudoscientific 'WavelengthSpeedOfLightPrior'.
+    Generates a realistic, frequency-modulated sine wave with dynamic noise,
+    clamped between 0 and 1.
+    """
+    def __init__(self, dim=1):
+        self.dim = dim
+
+    def sample_batch(self, batch_size, seq_len, device='cpu'):
+        # Random base frequencies and phase shifts
+        frequency = torch.rand(batch_size, 1, self.dim, device=device) * 5.0 + 1.0
+        phase = torch.rand(batch_size, 1, self.dim, device=device) * 2 * np.pi
+
+        data = torch.empty((seq_len, batch_size, self.dim), device=device)
+
+        for t in range(seq_len):
+            time_t = t * 0.1
+
+            # Base wave dynamics
+            base_val = 0.5 * (torch.sin(frequency * time_t + phase) + 1.0)
+
+            # Add stochastic measurement noise
+            noise = torch.randn_like(base_val) * 0.05
+            val = torch.clamp(base_val + noise, 0.0, 1.0)
+
+            data[t] = val.squeeze(1)
+
+        return data
+
 class OrnsteinUhlenbeckPrior(Prior):
-    """
-    Generates synthetic data using an Ornstein-Uhlenbeck process. 
-    Simulates mean-reverting financial time series (e.g., volatility, interest rates).
-    Equation: dx = theta * (mu - x) * dt + sigma * dW
-    """
+    """Simulates mean-reverting financial time series (e.g., volatility)."""
     def __init__(self, dim=1, dt=0.01):
         self.dim = dim
         self.dt = dt

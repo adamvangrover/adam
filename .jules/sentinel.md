@@ -179,3 +179,8 @@
 **Vulnerability:** The Streamlit portal (`streamlit_portal.py`) contained a hardcoded fallback `if username == "admin" and password == "admin":` for authentication, allowing any user to bypass the environment variable-based security.
 **Learning:** Leaving mock or hardcoded credentials in production-ready files (even UI portals) completely undermines application security.
 **Prevention:** Never hardcode credentials. Always rely on environment variables or secure secret management systems for authentication logic.
+
+## 2026-03-24 - [Critical] Command Option Injection in GitRepoSubAgent
+**Vulnerability:** `GitRepoSubAgent` executed `subprocess.run(["git", "clone", repo_url, repo_path])`. If an attacker supplies a URL starting with `-` (like `--upload-pack=...`), `git` interprets it as an option instead of a URL, leading to arbitrary code execution (Command Option Injection).
+**Learning:** External commands that accept positional arguments (like `git`, `tar`, `curl`) can be tricked into interpreting those arguments as flags if they start with a hyphen. Validating URL scheme is good but sometimes bypasses exist or are added later.
+**Prevention:** Always use the end-of-options separator `--` before untrusted arguments in `subprocess` calls (e.g., `["git", "clone", "--", repo_url, repo_path]`) to force the command to treat them as positional arguments.

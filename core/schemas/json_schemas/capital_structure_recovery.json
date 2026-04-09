@@ -1,0 +1,128 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$defs": {
+    "DebtTranche": {
+      "properties": {
+        "tranche_name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Tranche Name"
+        },
+        "seniority_rank": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Seniority Rank"
+        },
+        "outstanding_principal": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Outstanding Principal"
+        },
+        "allocated_recovery_value": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Allocated Recovery Value"
+        },
+        "recovery_percentage": {
+          "anyOf": [
+            {
+              "maximum": 100,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Recovery Percentage"
+        }
+      },
+      "title": "DebtTranche",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "enterprise_valuation_scenario": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Enterprise Valuation Scenario"
+    },
+    "total_distributable_value": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Total Distributable Value"
+    },
+    "debt_tranches": {
+      "anyOf": [
+        {
+          "items": {
+            "$ref": "#/$defs/DebtTranche"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Debt Tranches"
+    },
+    "equity_residual_value": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Equity Residual Value"
+    }
+  },
+  "title": "CapitalStructureRecovery",
+  "type": "object"
+}

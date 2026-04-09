@@ -11,6 +11,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 try:
     from core.engine.consensus_engine import ConsensusEngine
     from core.agents.specialized.blindspot_agent import BlindspotAgent
+    from core.agents.agent_base import AgentInput
     from services.webapp.governance import GovernanceMiddleware
     from core.utils.logging_utils import NarrativeLogger
 except ImportError as e:
@@ -51,13 +52,15 @@ class TestAdamVNext(unittest.TestCase):
                  with patch('core.engine.live_mock_engine.live_engine', mock_live):
                     loop = asyncio.new_event_loop()
                     asyncio.set_event_loop(loop)
-                    result = loop.run_until_complete(agent.execute())
+                    result = loop.run_until_complete(agent.execute(AgentInput(query="test_query")))
 
-                    self.assertIn("status", result)
-                    self.assertEqual(result["status"], "SCAN_COMPLETE")
+                    result_dict = result.model_dump()
+                    self.assertIn("metadata", result_dict)
+                    self.assertIn("status", result_dict["metadata"])
+                    self.assertEqual(result_dict["metadata"]["data"]["status"], "SCAN_COMPLETE")
                     # Should find simulated anomalies if Neo4j is None (NetworkX fallback)
-                    self.assertTrue(len(result['findings']) > 0)
-                    print(f"Blindspot Agent found {len(result['findings'])} anomalies (Simulated).")
+                    self.assertTrue(len(result_dict["metadata"]["data"]['findings']) > 0)
+                    print(f"Blindspot Agent found {len(result_dict['metadata']['data']['findings'])} anomalies (Simulated).")
 
     def test_governance_middleware(self):
         """Task 4.1: Governance Middleware"""

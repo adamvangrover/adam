@@ -1,10 +1,13 @@
-from typing import Any, Dict, List, Optional
 import logging
 import re
-from core.agents.agent_base import AgentBase, AgentInput, AgentOutput
+from typing import Any, Dict, List, Optional
+
+from core.schemas.agent_schema import AgentInput, AgentOutput
+from core.agents.agent_base import AgentBase
 from core.agents.system_health_agent import SystemHealthAgent
 
 logger = logging.getLogger(__name__)
+
 
 class MetaCognitiveAgent(AgentBase):
     """
@@ -16,10 +19,11 @@ class MetaCognitiveAgent(AgentBase):
     def __init__(self, config: Dict[str, Any] = None, kernel: Optional[Any] = None):
         if config is None:
             config = {"name": "MetaCognitiveAgent"}
-            
+
         super().__init__(config, kernel=kernel)
         self.agent_performance = {}
-        self.system_health_agent = SystemHealthAgent(agent_name="meta_cognitive_health_monitor")
+        health_config = {"agent_id": "meta_cognitive_health_monitor"}
+        self.system_health_agent = SystemHealthAgent(config=health_config, kernel=kernel)
 
         # Load specific configurations for fallacy detection
         self.logical_fallacies = self.config.get("logical_fallacies", {
@@ -50,12 +54,12 @@ class MetaCognitiveAgent(AgentBase):
         logger.info(f"MetaCognitiveAgent analyzing output from {agent_name}...")
 
         if not content_to_analyze:
-             return AgentOutput(
-                 answer="No content provided for analysis.",
-                 sources=[],
-                 confidence=0.0,
-                 metadata={"status": "error"}
-             )
+            return AgentOutput(
+                answer="No content provided for analysis.",
+                sources=[],
+                confidence=0.0,
+                metadata={"status": "error"}
+            )
 
         # 1. Detect Logical Fallacies
         detected_fallacies = self._detect_logical_fallacies(content_to_analyze)
@@ -93,12 +97,11 @@ class MetaCognitiveAgent(AgentBase):
             logger.warning(f"Failed to execute system_health_agent: {e}")
             health_metrics = {"status": "unknown", "error": str(e)}
 
-        
         final_answer = f"Coherence Score: {coherence_score}/10. Status: {verification_status}."
         if detected_fallacies:
             final_answer += f" {len(detected_fallacies)} Fallacies Detected."
         if contradictions:
-            final_answer += f" Contradictions Present."
+            final_answer += " Contradictions Present."
 
         return AgentOutput(
             answer=final_answer,
@@ -172,4 +175,4 @@ class MetaCognitiveAgent(AgentBase):
         try:
             return self.system_health_agent.ping()
         except AttributeError:
-             return "PONG: SystemHealthAgent lacks ping method."
+            return "PONG: SystemHealthAgent lacks ping method."

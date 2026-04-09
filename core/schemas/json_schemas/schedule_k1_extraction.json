@@ -1,0 +1,159 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$defs": {
+    "CapitalAccountAnalysis": {
+      "properties": {
+        "beginning_capital_account": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Beginning Capital Account"
+        },
+        "capital_contributed": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Capital Contributed"
+        },
+        "current_year_net_income": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Current Year Net Income"
+        },
+        "withdrawals_distributions": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Withdrawals Distributions"
+        },
+        "ending_capital_account": {
+          "title": "Ending Capital Account",
+          "type": "number"
+        }
+      },
+      "required": [
+        "ending_capital_account"
+      ],
+      "title": "CapitalAccountAnalysis",
+      "type": "object"
+    },
+    "PartnerShareOfLiabilities": {
+      "properties": {
+        "nonrecourse": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Nonrecourse"
+        },
+        "qualified_nonrecourse_financing": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Qualified Nonrecourse Financing"
+        },
+        "recourse": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Recourse"
+        }
+      },
+      "title": "PartnerShareOfLiabilities",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "partner_identifying_number": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9]{9}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Partner Identifying Number"
+    },
+    "partnership_name": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Partnership Name"
+    },
+    "capital_account_analysis": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/CapitalAccountAnalysis"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "partner_share_of_liabilities": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/PartnerShareOfLiabilities"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    }
+  },
+  "title": "ScheduleK1Extraction",
+  "type": "object"
+}

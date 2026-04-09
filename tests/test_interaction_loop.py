@@ -48,9 +48,9 @@ class TestInteractionLoop(unittest.TestCase):
 
         loop = InteractionLoop(config=self.mock_config, knowledge_base = self.mock_kb) #Pass Knowledge Base
 
-        self.mock_query_agent.execute.return_value = ["DataRetrievalAgent"]
-        self.mock_data_agent.execute.return_value = "low"
-        self.mock_result_agent.execute.return_value = "The risk rating is low."
+        self.mock_query_agent.execute = AsyncMock(return_value=["DataRetrievalAgent"])
+        self.mock_data_agent.execute = AsyncMock(return_value="low")
+        self.mock_result_agent.execute = AsyncMock(return_value="The risk rating is low.")
 
         # Note: execute_agent is not used by InteractionLoop anymore, it calls agent.execute() directly
 
@@ -73,9 +73,9 @@ class TestInteractionLoop(unittest.TestCase):
 
         loop = InteractionLoop(config=self.mock_config, knowledge_base=self.mock_kb)
 
-        self.mock_query_agent.execute.return_value = ["DataRetrievalAgent"]
-        self.mock_data_agent.execute.return_value = "Positive"
-        self.mock_result_agent.execute.return_value = "The market sentiment is Positive."
+        self.mock_query_agent.execute = AsyncMock(return_value=["DataRetrievalAgent"])
+        self.mock_data_agent.execute = AsyncMock(return_value="Positive")
+        self.mock_result_agent.execute = AsyncMock(return_value="The market sentiment is Positive.")
 
         result = loop.process_input("kb:market_sentiment")
         self.assertEqual(result, "The market sentiment is Positive.")
@@ -92,7 +92,7 @@ class TestInteractionLoop(unittest.TestCase):
         }.get(x)
 
         loop = InteractionLoop(config=self.mock_config, knowledge_base=self.mock_kb)
-        self.mock_query_agent.execute.return_value = []  # No agents needed
+        self.mock_query_agent.execute = AsyncMock(return_value=[])  # No agents needed
 
         # updatekb command logic is probably handled inside agents now or specific command processor?
         # Looking at original test, it expected "Knowledge base updated."
@@ -139,7 +139,7 @@ class TestInteractionLoop(unittest.TestCase):
         }.get(x)  # Returns None for NonexistentAgent
 
         loop = InteractionLoop(config=self.mock_config, knowledge_base=self.mock_kb)
-        self.mock_query_agent.execute.return_value = ["NonexistentAgent"]
+        self.mock_query_agent.execute = AsyncMock(return_value=["NonexistentAgent"])
 
         with self.assertRaises(AgentNotFoundError) as context:
             loop.process_input("some query")
@@ -153,7 +153,7 @@ class TestInteractionLoop(unittest.TestCase):
         mock_orchestrator_instance.get_agent.return_value = self.mock_query_agent
 
         loop = InteractionLoop(config=self.mock_config, knowledge_base=self.mock_kb)
-        self.mock_query_agent.execute.return_value = ["DataRetrievalAgent"]
+        self.mock_query_agent.execute = AsyncMock(return_value=["DataRetrievalAgent"])
 
         # Need to ensure get_agent returns mock_data_agent when asked
         mock_orchestrator_instance.get_agent.side_effect = lambda x: {
@@ -186,8 +186,8 @@ class TestInteractionLoop(unittest.TestCase):
         }.get(x)
 
         loop = InteractionLoop(config=self.mock_config, knowledge_base=self.mock_kb)
-        self.mock_query_agent.execute.return_value = ["Agent1", "Agent2"]
-        self.mock_result_agent.execute.return_value = "Combined Result"
+        self.mock_query_agent.execute = AsyncMock(return_value=["Agent1", "Agent2"])
+        self.mock_result_agent.execute = AsyncMock(return_value="Combined Result")
 
         result = loop.process_input("some query")
         self.assertEqual(result, "Combined Result")

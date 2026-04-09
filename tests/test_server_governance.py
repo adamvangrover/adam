@@ -67,7 +67,7 @@ class TestServerGovernance(unittest.TestCase):
         """Test that execute_python_sandbox calls GovernanceEnforcer.validate"""
 
         # Setup
-        self.mock_sandbox.execute.return_value = {"status": "success", "output": "test"}
+        self.mock_sandbox.execute = AsyncMock(return_value={"status": "success", "output": "test"})
         code = "print('test')"
 
         # Execute

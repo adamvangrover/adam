@@ -76,6 +76,7 @@
 </head>
 <body class="bg-term-bg text-slate-300 font-sans h-screen overflow-hidden flex flex-col selection:bg-term-cyan selection:text-white">
     <div class="crt-overlay"></div>
+    
     <!-- Header -->
     <header class="h-16 border-b border-white/10 bg-term-bg/80 backdrop-blur-md flex items-center justify-between px-6 shrink-0 z-20 shadow-2xl">
         <div class="flex items-center gap-4">
@@ -96,9 +97,9 @@
             </button>
         </div>
     </header>
+
     <!-- Main Layout -->
     <div class="flex flex-1 overflow-hidden relative">
-        
         <!-- Sidebar Navigation -->
         <aside class="w-64 border-r border-white/5 bg-term-surface/50 backdrop-blur flex flex-col shrink-0 overflow-y-auto hidden lg:flex z-10">
             <div class="p-4 border-b border-white/5">
@@ -109,12 +110,13 @@
             </div>
             <nav id="moduleNav" class="flex-1 py-4 flex flex-col gap-1 px-3 font-mono text-xs"></nav>
         </aside>
+
         <!-- Main Content Area -->
         <main class="flex-1 overflow-y-auto bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-term-surface via-term-bg to-term-bg p-4 md:p-8 relative" id="mainScrollArea">
             <div class="max-w-5xl mx-auto">
-                
                 <!-- Mobile Nav Toggle -->
                 <select id="mobileNav" onchange="loadModule(parseInt(this.value))" class="lg:hidden w-full bg-term-surface border border-term-border text-slate-200 text-sm rounded p-3 mb-6 font-mono outline-none focus:border-term-cyan"></select>
+                
                 <!-- Dynamic Content Container -->
                 <article id="contentArea" class="prose prose-invert prose-slate max-w-none 
                     prose-headings:text-white prose-headings:font-display prose-headings:font-bold 
@@ -122,6 +124,7 @@
                     prose-h2:text-2xl prose-h2:text-term-neon prose-h3:text-term-cyan 
                     prose-p:leading-relaxed prose-p:text-slate-300 prose-a:text-term-cyan 
                     transition-all duration-500 ease-in-out opacity-0 translate-y-4"></article>
+                
                 <!-- Footer Navigation -->
                 <div class="mt-16 pt-6 border-t border-white/10 flex justify-between items-center pb-12">
                     <button id="prevBtn" class="px-5 py-2.5 glass-panel text-slate-300 rounded text-xs font-mono hover:text-white hover:border-white/30 transition-all disabled:opacity-30 disabled:pointer-events-none">&lt; PREV MODULE</button>
@@ -129,6 +132,7 @@
                 </div>
             </div>
         </main>
+
         <!-- AI Chat Overlay (Right Panel) -->
         <aside id="aiPanel" class="absolute right-0 top-0 h-full w-full md:w-[450px] glass-panel border-l border-white/10 transform translate-x-full transition-transform duration-300 cubic-bezier(0.4, 0, 0.2, 1) z-30 flex flex-col shadow-2xl">
             <div class="p-5 border-b border-white/10 flex justify-between items-center bg-black/20">
@@ -158,6 +162,7 @@
             </div>
         </aside>
     </div>
+
     <!-- Application Logic & Content -->
     <script>
         // --- CORE DATA & CONTENT MODULES ---
@@ -415,6 +420,7 @@
                 `
             }
         ];
+
         // --- APP LOGIC & STATE ---
         let currentModuleId = 1;
         const activeCharts = {}; 
@@ -446,6 +452,7 @@
                 btn.onclick = () => loadModule(m.id);
                 btn.innerHTML = `<span class="font-bold text-[13px] mb-0.5">M${m.id.toString().padStart(2,'0')} ${m.title}</span><span class="opacity-60 text-[10px] truncate">${m.subtitle}</span>`;
                 navEl.appendChild(btn);
+                
                 // Mobile
                 const opt = document.createElement('option');
                 opt.value = m.id; opt.innerText = `M${m.id.toString().padStart(2,'0')} - ${m.title}`;
@@ -465,6 +472,7 @@
             
             // Clean up old charts
             Object.keys(activeCharts).forEach(k => { activeCharts[k].destroy(); delete activeCharts[k]; });
+            
             // UI Updates
             progressBar.style.width = `${(id / modules.length) * 100}%`;
             document.getElementById('prevBtn').disabled = id === 1;
@@ -472,6 +480,7 @@
             
             contentEl.style.opacity = 0;
             contentEl.style.transform = 'translateY(10px)';
+            
             setTimeout(() => {
                 contentEl.innerHTML = m.content;
                 contentEl.style.opacity = 1;
@@ -570,12 +579,13 @@
         }
         
         async function fetchGeminiWithBackoff(prompt, systemInstruction, apiKey, maxRetries = 5) {
-            // Using the correct preview model for text generation in this environment
             const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
             const payload = {
                 contents: [{ parts: [{ text: prompt }] }],
                 systemInstruction: { parts: [{ text: systemInstruction }] }
             };
+            const delays = [1000, 2000, 4000, 8000, 16000];
+
             for (let i = 0; i <= maxRetries; i++) {
                 try {
                     const response = await fetch(url, {
@@ -589,7 +599,7 @@
                     return data.candidates?.[0]?.content?.parts?.[0]?.text || "No actionable data returned.";
                 } catch (err) {
                     if (i === maxRetries) throw err;
-                    await new Promise(r => setTimeout(r, Math.pow(2, i) * 1000));
+                    await new Promise(resolve => setTimeout(resolve, delays[i] || 16000));
                 }
             }
         }
@@ -600,12 +610,16 @@
             const origText = btn.innerHTML;
             btn.innerHTML = `<div class="w-4 h-4 rounded-full border-2 border-term-bg border-t-white animate-spin"></div> GENERATING...`;
             btn.disabled = true;
+            
             const container = document.getElementById('aiBriefContainer');
             const content = document.getElementById('aiBriefContent');
+            
             container.classList.remove('hidden');
             content.innerHTML = '<span class="animate-pulse text-slate-500">Synthesizing macro parameters...</span>';
+            
             const prompt = "Summarize: Brent Crude at $119.50, S&P 500 up +0.5% on fake peace relief, Basel III easing offers $250B capital reprieve. Output HTML <ul> with 3 punchy, technical bullets.";
             const systemInstruction = "You are Adam v26.0. Output ONLY raw HTML list. No markdown blocks.";
+            
             try {
                 const apiKey = ""; 
                 let response = await fetchGeminiWithBackoff(prompt, systemInstruction, apiKey);

@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adam Nexus OS - System Command</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-color: #090b10;
+            --panel-bg: rgba(16, 20, 28, 0.7);
+            --border-color: rgba(64, 169, 255, 0.15);
+            --primary-blue: #40a9ff;
+            --accent-cyan: #00e5ff;
+            --danger-red: #ff4d4f;
+            --success-green: #00ffaa;
+            --text-main: #e2e8f0;
+            --text-muted: #94a3b8;
+            --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --glass-blur: blur(16px);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: var(--font-family);
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(64, 169, 255, 0.08), transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(0, 229, 255, 0.05), transparent 25%);
+            color: var(--text-main);
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Top Navigation Bar */
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background: rgba(9, 11, 16, 0.8);
+            backdrop-filter: var(--glass-blur);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .brand-logo {
+            font-size: 1.5rem;
+            color: var(--accent-cyan);
+            text-shadow: 0 0 10px rgba(0, 229, 255, 0.4);
+        }
+
+        .brand-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            background: linear-gradient(90deg, #fff, var(--primary-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-controls {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .role-selector {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            outline: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .role-selector:hover {
+            border-color: var(--primary-blue);
+        }
+
+        .system-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            color: var(--success-green);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--success-green);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--success-green);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        /* Main Layout */
+        .main-layout {
+            display: grid;
+            grid-template-columns: 300px 1fr 350px;
+            gap: 1.5rem;
+            padding: 1.5rem;
+            flex-grow: 1;
+            height: calc(100vh - 70px);
+        }
+
+        .glass-panel {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            backdrop-filter: var(--glass-blur);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            overflow-y: auto;
+        }
+
+        .panel-header {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--primary-blue);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 1px solid rgba(64, 169, 255, 0.2);
+            padding-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Sidebar - Daily Brief */
+        .brief-item {
+            background: rgba(255, 255, 255, 0.03);
+            border-left: 3px solid var(--primary-blue);
+            padding: 1rem;
+            border-radius: 0 4px 4px 0;
+            transition: transform 0.2s, background 0.2s;
+            cursor: pointer;
+        }
+
+        .brief-item:hover {
+            background: rgba(64, 169, 255, 0.1);
+            transform: translateX(4px);
+        }
+
+        .brief-item.urgent { border-left-color: var(--danger-red); }
+        .brief-item.insight { border-left-color: var(--accent-cyan); }
+
+        .brief-meta {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 0.25rem;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .brief-title {
+            font-size: 0.9rem;
+            font-weight: 500;
+            line-height: 1.4;
+        }
+
+        /* Center - App Grid / Workspace */
+        .workspace {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .hero-banner {
+            background: linear-gradient(135deg, rgba(64, 169, 255, 0.15), rgba(0, 229, 255, 0.05));
+            border: 1px solid var(--primary-blue);
+            border-radius: 12px;
+            padding: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .hero-text h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .hero-text p {
+            color: var(--text-muted);
+        }
+
+        .app-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .app-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .app-card:hover {
+            background: rgba(64, 169, 255, 0.08);
+            border-color: var(--primary-blue);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .app-icon {
+            font-size: 2.5rem;
+            color: var(--primary-blue);
+            transition: color 0.3s;
+        }
+
+        .app-card:hover .app-icon {
+            color: var(--accent-cyan);
+            text-shadow: 0 0 15px rgba(0, 229, 255, 0.5);
+        }
+
+        .app-title {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .app-desc {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        /* Right Sidebar - Telemetry */
+        .telemetry-log {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.8rem;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 1rem;
+            border-radius: 6px;
+            flex-grow: 1;
+            overflow-y: auto;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .log-entry { margin-bottom: 0.5rem; border-bottom: 1px dashed rgba(255,255,255,0.05); padding-bottom: 4px;}
+        .log-time { color: var(--text-muted); margin-right: 0.5rem; }
+        .log-agent { color: var(--primary-blue); }
+        .log-msg { color: var(--text-main); }
+        .log-warn { color: #faad14; }
+        .log-error { color: var(--danger-red); }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(64, 169, 255, 0.3); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(64, 169, 255, 0.6); }
+
+        /* Iframe overlay (Hidden by default) */
+        .iframe-overlay {
+            position: fixed;
+            top: 70px;
+            left: 0;
+            width: 100vw;
+            height: calc(100vh - 70px);
+            background: var(--bg-color);
+            z-index: 50;
+            display: none;
+            flex-direction: column;
+            animation: slideUp 0.4s ease forwards;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .iframe-overlay.active {
+            display: flex;
+        }
+
+        .iframe-header {
+            padding: 0.5rem 2rem;
+            background: var(--panel-bg);
+            border-bottom: 1px solid var(--primary-blue);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .close-btn {
+            background: transparent;
+            border: 1px solid var(--danger-red);
+            color: var(--danger-red);
+            padding: 0.4rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .close-btn:hover {
+            background: var(--danger-red);
+            color: white;
+        }
+
+        iframe {
+            width: 100%;
+            flex-grow: 1;
+            border: none;
+            background: #fff; /* For legacy showcases that expect white bg */
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="top-nav">
+        <div class="brand">
+            <i class="fa-solid fa-network-wired brand-logo"></i>
+            <span class="brand-title">ADAM NEXUS OS</span>
+        </div>
+        <div class="nav-controls">
+            <div class="system-status">
+                <div class="status-dot"></div>
+                NEURAL MESH ONLINE
+            </div>
+            <select class="role-selector" id="roleSelect" onchange="updateRoleView()">
+                <option value="executive">Executive View</option>
+                <option value="analyst">Quantitative Analyst</option>
+                <option value="risk">Chief Risk Officer</option>
+                <option value="system">System Administrator</option>
+            </select>
+        </div>
+    </nav>
+
+    <main class="main-layout">
+        <!-- Left Panel: Daily Briefing -->
+        <aside class="glass-panel">
+            <div class="panel-header">
+                <i class="fa-solid fa-bolt"></i> Daily Protocol Brief
+            </div>
+            <div id="briefContainer" class="workspace" style="gap: 0.75rem;">
+                <!-- Populated via JS -->
+            </div>
+        </aside>
+
+        <!-- Center Panel: Workspace / Apps -->
+        <section class="workspace">
+            <div class="hero-banner">
+                <div class="hero-text">
+                    <h1 id="greetingMsg">Welcome to Nexus</h1>
+                    <p id="roleDesc">Aggregating global financial intelligence across all nodes.</p>
+                </div>
+                <div class="hero-stats" style="text-align: right;">
+                    <div style="font-size: 2rem; color: var(--accent-cyan); font-weight: bold;">v26.5</div>
+                    <div style="color: var(--text-muted); font-size: 0.8rem;">Architecture Build</div>
+                </div>
+            </div>
+
+            <div class="glass-panel" style="flex-grow: 1; overflow: visible;">
+                <div class="panel-header">
+                    <i class="fa-solid fa-layer-group"></i> Active Modules
+                </div>
+                <div class="app-grid" id="appGrid">
+                    <!-- Populated via JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Right Panel: Telemetry -->
+        <aside class="glass-panel">
+            <div class="panel-header">
+                <i class="fa-solid fa-terminal"></i> Live Telemetry
+            </div>
+            <div class="telemetry-log" id="telemetryLog">
+                <div class="log-entry">
+                    <span class="log-time">[00:00:00]</span>
+                    <span class="log-agent">[SystemOrchestrator]</span>
+                    <span class="log-msg">Initializing Swarm Matrices...</span>
+                </div>
+            </div>
+        </aside>
+    </main>
+
+    <!-- Fullscreen Iframe Overlay for launching showcases -->
+    <div class="iframe-overlay" id="appOverlay">
+        <div class="iframe-header">
+            <div style="font-weight: 600; color: var(--primary-blue);" id="appOverlayTitle">Module View</div>
+            <button class="close-btn" onclick="closeApp()">
+                <i class="fa-solid fa-xmark"></i> Terminate Link
+            </button>
+        </div>
+        <iframe id="appFrame" src=""></iframe>
+    </div>
+
+    <script>
+        // --- Data Definitions ---
+
+        const briefs = [
+            { type: 'urgent', time: '10 mins ago', title: 'Systemic Tremor detected in Crypto Arbitrage spreads. MarketSentimentAgent overriding standard flow.' },
+            { type: 'insight', time: '1 hr ago', title: 'MarketRegimeAgent classified current state as HIGH_VOLATILITY_CRASH_RISK.' },
+            { type: 'normal', time: '3 hrs ago', title: 'FundamentalAnalyst completed 10-K ingestion for 500 equities.' },
+            { type: 'normal', time: '4 hrs ago', title: 'Daily Market Mayhem synthesis compiled and archived.' },
+            { type: 'insight', time: '5 hrs ago', title: 'RiskGuardian reports portfolio VaR within acceptable bounds.' }
+        ];
+
+        const apps = [
+            { id: 'market_mayhem', title: 'Market Mayhem', icon: 'fa-newspaper', desc: 'Daily synthesized market newsletter', url: 'newsletter_market_mayhem.html', roles: ['executive', 'analyst', 'risk'] },
+            { id: 'sentinel', title: 'Project Sentinel', icon: 'fa-shield-halved', desc: 'AI Governance & Compliance Audit', url: 'sentinel_dashboard.html', roles: ['risk', 'system', 'executive'] },
+            { id: 'unified_dash', title: 'Unified Dashboard', icon: 'fa-chart-pie', desc: 'Holistic system oversight', url: 'unified_dashboard.html', roles: ['executive', 'system'] },
+            { id: 'war_room', title: 'War Room V2', icon: 'fa-chess-board', desc: 'Kinetic & geopolitical conflict tracking', url: 'war_room_v2.html', roles: ['executive', 'risk'] },
+            { id: 'quantum', title: 'Quantum Infra', icon: 'fa-atom', desc: 'QMC & advanced compute tracking', url: 'quantum_infrastructure.html', roles: ['system', 'analyst'] },
+            { id: 'oswm', title: 'OSWM Monitor', icon: 'fa-brain', desc: 'One-Shot World Model synthetic data', url: 'oswm_dashboard.html', roles: ['system', 'analyst'] },
+            { id: 'unified_bank', title: 'Unified Banking', icon: 'fa-building-columns', desc: 'Banking sector stress dashboard', url: 'unified_banking_dashboard.html', roles: ['analyst', 'risk'] },
+            { id: 'snc_heatmap', title: 'SNC Heatmap', icon: 'fa-fire', desc: 'Shared National Credit Risk Visualization', url: 'snc_credit_heatmap.html', roles: ['risk', 'analyst'] },
+            { id: 'workflows', title: 'Workflow Visualizer', icon: 'fa-project-diagram', desc: 'Agent execution graph', url: 'workflows.html', roles: ['system', 'analyst'] },
+            { id: 'scenario_lab', title: 'Scenario Lab', icon: 'fa-flask', desc: 'Stress testing & simulations', url: 'scenario_lab.html', roles: ['risk', 'executive'] },
+            { id: 'terminal', title: 'System Terminal', icon: 'fa-terminal', desc: 'Direct CLI access', url: 'terminal.html', roles: ['system'] },
+            { id: 'research', title: 'Research Hub', icon: 'fa-book-open', desc: 'Quantitative research documents', url: 'research.html', roles: ['analyst', 'executive'] },
+            { id: 'knowledge_graph', title: 'Knowledge Graph', icon: 'fa-network-wired', desc: 'Entity relationship visualizer', url: 'system_knowledge_graph.html', roles: ['analyst', 'system'] },
+            { id: 'risk_topography', title: 'Risk Topography', icon: 'fa-mountain', desc: '3D Volatility Surface Map', url: 'risk_topography.html', roles: ['risk', 'executive', 'analyst'] },
+            { id: 'sector_swarm', title: 'Sector Swarm', icon: 'fa-braille', desc: 'Sector rotation & momentum tracking', url: 'sector_swarm.html', roles: ['analyst', 'executive'] },
+            { id: 'terminal_profile', title: 'Agent Profile', icon: 'fa-user-astronaut', desc: 'Personalized agent settings & context', url: 'terminal_profile.html', roles: ['system', 'executive', 'analyst', 'risk'] }
+        ];
+
+        const telemetryMessages = [
+            { agent: 'QuantitativeAnalyst', msg: 'Calculated RSI for SPY: 42.1 (Neutral)' },
+            { agent: 'NewsBot', msg: 'Ingested 1,204 news artifacts. Sentiment: Bearish.' },
+            { agent: 'RiskGuardian', msg: 'Updating CVaR matrix across Tech sector.' },
+            { agent: 'SystemHealthAgent', msg: 'Ping response latency: 12ms. Token usage nominal.', type: 'success' },
+            { agent: 'MarketScanner-V2', msg: 'Polling yfinance ticker batch [AAPL, MSFT, NVDA]...', type: 'warn' },
+            { agent: 'MetaCognitiveAgent', msg: 'Analyzed output. Coherence: 9.8. Status: PASS.' },
+            { agent: 'PortfolioManager', msg: 'Rebalancing Tech weighting...', type: 'normal' },
+            { agent: 'ComplianceBot', msg: 'Trade 4892 blocked: Volcker Rule violation.', type: 'error' },
+            { agent: 'MacroRegime', msg: 'Yield curve inversion detected.', type: 'warn' }
+        ];
+
+        // --- DOM Elements ---
+        const briefContainer = document.getElementById('briefContainer');
+        const appGrid = document.getElementById('appGrid');
+        const telemetryLog = document.getElementById('telemetryLog');
+        const roleSelect = document.getElementById('roleSelect');
+        const greetingMsg = document.getElementById('greetingMsg');
+        const roleDesc = document.getElementById('roleDesc');
+        const appOverlay = document.getElementById('appOverlay');
+        const appFrame = document.getElementById('appFrame');
+        const appOverlayTitle = document.getElementById('appOverlayTitle');
+
+        // --- Initialization ---
+        function init() {
+            renderBriefs();
+            updateRoleView();
+            startTelemetrySimulation();
+        }
+
+        function renderBriefs() {
+            briefs.forEach(b => {
+                const el = document.createElement('div');
+                el.className = `brief-item ${b.type}`;
+                el.innerHTML = `
+                    <div class="brief-meta">
+                        <span>${b.type === 'urgent' ? '<i class="fa-solid fa-triangle-exclamation"></i> PRIORITY' : 'UPDATE'}</span>
+                        <span>${b.time}</span>
+                    </div>
+                    <div class="brief-title">${b.title}</div>
+                `;
+                briefContainer.appendChild(el);
+            });
+        }
+
+        function updateRoleView() {
+            const role = roleSelect.value;
+            
+            // Update Headers
+            const roleTitles = {
+                'executive': ['Executive Command', 'Holistic overview of system intelligence.'],
+                'analyst': ['Quant Analyst Terminal', 'Deep-dive modeling and data ingestion pipelines.'],
+                'risk': ['CRO Overwatch', 'Systemic vulnerability and portfolio stress monitoring.'],
+                'system': ['Neural Mesh Admin', 'Infrastructure, compute, and model weights management.']
+            };
+            greetingMsg.innerText = roleTitles[role][0];
+            roleDesc.innerText = roleTitles[role][1];
+
+            // Filter Apps
+            appGrid.innerHTML = '';
+            const allowedApps = apps.filter(a => a.roles.includes(role));
+            allowedApps.forEach(app => {
+                const a = document.createElement('a');
+                a.href = "#";
+                a.className = 'app-card';
+                a.onclick = (e) => { e.preventDefault(); launchApp(app); };
+                a.innerHTML = `
+                    <i class="fa-solid ${app.icon} app-icon"></i>
+                    <div style="text-align:center;">
+                        <div class="app-title">${app.title}</div>
+                        <div class="app-desc">${app.desc}</div>
+                    </div>
+                `;
+                appGrid.appendChild(a);
+            });
+        }
+
+        function launchApp(app) {
+            appOverlayTitle.innerText = `MODULE: ${app.title.toUpperCase()}`;
+            appFrame.src = app.url;
+            appOverlay.classList.add('active');
+            addLog('SystemOrchestrator', `Launched module: ${app.id}`);
+        }
+
+        function closeApp() {
+            appOverlay.classList.remove('active');
+            setTimeout(() => { appFrame.src = ""; }, 400); // Clear after animation
+            addLog('SystemOrchestrator', `Terminated module link.`);
+        }
+
+        // --- Telemetry Simulation ---
+        function startTelemetrySimulation() {
+            setInterval(() => {
+                const log = telemetryMessages[Math.floor(Math.random() * telemetryMessages.length)];
+                addLog(log.agent, log.msg, log.type);
+            }, 3500);
+        }
+
+        function addLog(agent, msg, type = 'normal') {
+            const now = new Date();
+            const timeStr = `[${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}:${now.getSeconds().toString().padStart(2,'0')}]`;
+            
+            let colorClass = 'log-msg';
+            if(type === 'warn') colorClass = 'log-warn';
+            if(type === 'error') colorClass = 'log-error';
+
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.innerHTML = `
+                <span class="log-time">${timeStr}</span>
+                <span class="log-agent">[${agent}]</span>
+                <span class="${colorClass}">${msg}</span>
+            `;
+            
+            telemetryLog.appendChild(entry);
+            telemetryLog.scrollTop = telemetryLog.scrollHeight;
+
+            // Keep log from growing infinitely in DOM
+            if(telemetryLog.childElementCount > 50) {
+                telemetryLog.removeChild(telemetryLog.firstElementChild);
+            }
+        }
+
+        // Run
+        init();
+    </script>
+</body>
+</html>
