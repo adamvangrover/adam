@@ -4,8 +4,10 @@ from typing import Dict, Any
 
 from core.security.red_team.quantum_scanner import QuantumScanner
 from core.security.red_team.response_engine import RealTimeResponseEngine
+from core.security.red_team.sandbox_env import SandboxEnvironment
 from core.agents.red_team_agent import RedTeamAgent
 from core.agents.agent_base import AgentInput
+from core.system.red_teaming_framework import RedTeamingFramework
 
 # --- Tests for QuantumScanner ---
 
@@ -52,6 +54,48 @@ def test_response_engine_mitigation():
     assert mitigation["status"] == "SUCCESS"
     assert mitigation["action_executed"] == "BLOCK_IP_AND_ALERT"
 
+def test_zero_day_mitigation():
+    engine = RealTimeResponseEngine()
+    threat = {"type": "ZERO_DAY", "severity_score": 5.0}
+    analysis = engine.analyze_threat(threat)
+    assert analysis["urgency"] == "IMMEDIATE"
+    assert analysis["recommended_action"] == "ISOLATE_ZERO_DAY_MICRO_SEGMENTATION"
+    assert analysis["calculated_severity"] == 10.0
+
+def test_quantum_attack_mitigation():
+    engine = RealTimeResponseEngine()
+    threat = {"type": "QUANTUM_DECRYPTION_ATTACK", "severity_score": 2.0}
+    analysis = engine.analyze_threat(threat)
+    assert analysis["urgency"] == "IMMEDIATE"
+    assert analysis["recommended_action"] == "CYCLE_TO_LATTICE_BASED_ENCRYPTION"
+    assert analysis["calculated_severity"] == 10.0
+
+def test_adversarial_ai_mitigations():
+    engine = RealTimeResponseEngine()
+    threat = {"type": "ADVERSARIAL_AI_MARKET_STRUCTURE", "severity_score": 3.0}
+    analysis = engine.analyze_threat(threat)
+    assert analysis["urgency"] == "IMMEDIATE"
+    assert analysis["recommended_action"] == "ENGAGE_AI_COUNTERMEASURES_FOR_ADVERSARIAL_AI_MARKET_STRUCTURE"
+    assert analysis["calculated_severity"] == 10.0
+
+# --- Tests for SandboxEnvironment ---
+
+def test_sandbox_detonation():
+    sandbox = SandboxEnvironment()
+    threat_1 = {"type": "SQL_INJECTION", "severity_score": 5.0}
+    threat_2 = {"type": "ZERO_DAY", "severity_score": 9.5}
+
+    sandbox.detonate(threat_1)
+    sandbox.detonate(threat_2)
+
+    blast_radius = sandbox.analyze_impact()
+    assert blast_radius == 12  # 5.0 -> +2, 9.5 -> +10
+
+    containment = sandbox.contain()
+    assert containment["status"] == "SUCCESS"
+    assert sandbox.blast_radius == 0
+    assert len(sandbox.active_threats) == 0
+
 # --- Tests for RedTeamAgent Integration ---
 
 @pytest.mark.asyncio
@@ -81,3 +125,27 @@ async def test_red_team_agent_cybersecurity_integration():
     # Check impact score was boosted
     impact_score = metadata["critique"]["impact_score"]
     assert impact_score > 0.0 # Should be boosted by at least 3 + 2
+
+# --- Tests for RedTeamingFramework ---
+
+@pytest.mark.asyncio
+async def test_framework_run():
+    agent = RedTeamAgent(config={"name": "FrameworkTestAgent"})
+    framework = RedTeamingFramework(red_team_agent=agent, system="Test Production Environment")
+
+    input_data = AgentInput(
+        query="Test Cybersecurity Target",
+        context={
+            "encryption_algorithms": ["RSA-1024", "AES-256"],
+            "cyber_threats": [
+                {"type": "ZERO_DAY", "severity_score": 9.5}
+            ]
+        }
+    )
+
+    report = await framework.run(input_data)
+
+    assert "=== Red Team Exercise Report ===" in report
+    assert "Target System: Test Production Environment" in report
+    assert len(framework.logs) == 1
+    assert framework.logs[0]["input"] == input_data

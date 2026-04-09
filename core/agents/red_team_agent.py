@@ -10,6 +10,7 @@ from core.engine.states import RedTeamState, GraphState
 from core.agents.skills.counterfactual_reasoning_skill import CounterfactualReasoningSkill
 from core.security.red_team.quantum_scanner import QuantumScanner
 from core.security.red_team.response_engine import RealTimeResponseEngine
+from core.security.red_team.sandbox_env import SandboxEnvironment
 
 logger = logging.getLogger(__name__)
 
@@ -170,12 +171,25 @@ class RedTeamAgent(AgentBase):
         cyber_threats = data_context.get("cyber_threats", [])
         if cyber_threats:
             response_engine = RealTimeResponseEngine()
+            sandbox = SandboxEnvironment()
+
             for threat in cyber_threats:
+                # Detonate threat in sandbox to analyze impact
+                sandbox.detonate(threat)
                 analysis = response_engine.analyze_threat(threat)
                 if analysis["calculated_severity"] > 7.0:
                     total_impact = min(10.0, total_impact + 2.0)
                 mitigation = response_engine.execute_mitigation(analysis)
                 human_status_additions.append(f"Mitigated {threat.get('type')}: {mitigation['action_executed']}")
+
+            # Incorporate sandbox blast radius into total impact
+            blast_radius = sandbox.analyze_impact()
+            if blast_radius > 0:
+                total_impact = min(10.0, total_impact + (blast_radius / 10.0))
+                human_status_additions.append(f"Sandbox Blast Radius: {blast_radius}")
+
+            # Contain sandbox
+            sandbox.contain()
 
         logger.info(f"[{self.name}] Simulated Impact: {total_impact:.2f}")
 
