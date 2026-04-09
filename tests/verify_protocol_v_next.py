@@ -57,10 +57,10 @@ class TestAdamVNext(unittest.TestCase):
                     result_dict = result.model_dump()
                     self.assertIn("metadata", result_dict)
                     self.assertIn("status", result_dict["metadata"])
-                    self.assertEqual(result_dict["metadata"]["data"]["status"], "SCAN_COMPLETE")
+                    self.assertEqual(result_dict["metadata"]["status"], "SCAN_COMPLETE")
                     # Should find simulated anomalies if Neo4j is None (NetworkX fallback)
-                    self.assertTrue(len(result_dict["metadata"]["data"]['findings']) > 0)
-                    print(f"Blindspot Agent found {len(result_dict['metadata']['data']['findings'])} anomalies (Simulated).")
+                    self.assertTrue(len(result_dict["metadata"]['findings']) > 0)
+                    print(f"Blindspot Agent found {len(result_dict['metadata']['findings'])} anomalies (Simulated).")
 
     def test_governance_middleware(self):
         """Task 4.1: Governance Middleware"""

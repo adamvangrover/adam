@@ -167,7 +167,7 @@ class BlindspotAgent(AgentBase):
         # Emit thought for the Agent Intercom
         try:
             from core.v30_architecture.python_intelligence.bridge.neural_link import emit_thought, Thought
-            from datetime import datetime
+            from datetime import datetime, timezone
 
             if len(found_anomalies) > 0:
                 highest_severity = "CRITICAL" if any(a['severity'] == "CRITICAL" for a in found_anomalies) else "HIGH"
@@ -175,7 +175,7 @@ class BlindspotAgent(AgentBase):
 
                 asyncio.create_task(emit_thought(Thought(
                     id=f"bs_{int(datetime.now().timestamp())}",
-                    timestamp=datetime.utcnow().isoformat(),
+                    timestamp=datetime.now(timezone.utc).isoformat(),
                     agent_name="BlindspotMonitor",
                     content=content,
                     conviction_score=0.95
