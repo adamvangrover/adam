@@ -50,6 +50,23 @@ class RealTimeResponseEngine:
             urgency = "IMMEDIATE"
             recommended_action = "REVOKE_ALL_CREDENTIALS"
             severity_score = max(severity_score, 9.0)
+        elif threat_type == "ZERO_DAY":
+            urgency = "IMMEDIATE"
+            recommended_action = "ISOLATE_ZERO_DAY_MICRO_SEGMENTATION"
+            severity_score = 10.0
+        elif threat_type == "QUANTUM_DECRYPTION_ATTACK":
+            urgency = "IMMEDIATE"
+            recommended_action = "CYCLE_TO_LATTICE_BASED_ENCRYPTION"
+            severity_score = 10.0
+        elif threat_type in [
+            "ADVERSARIAL_AI_SYSTEM", "ADVERSARIAL_AI_LOGIC", "ADVERSARIAL_AI_PRICING",
+            "ADVERSARIAL_AI_MARKET_STRUCTURE", "ADVERSARIAL_AI_REAL_TIME_ANALYTICS",
+            "ADVERSARIAL_AI_PERIMETER_MONITORING", "ADVERSARIAL_AI_IDENTITY_ACCESS_MANAGEMENT",
+            "ADVERSARIAL_AI_PROFILING", "ADVERSARIAL_AI_LEARNING"
+        ]:
+            urgency = "IMMEDIATE"
+            recommended_action = f"ENGAGE_AI_COUNTERMEASURES_FOR_{threat_type}"
+            severity_score = 10.0
 
         analysis_result = {
             "threat_id": f"TR_{int(time.time())}",
