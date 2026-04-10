@@ -3,111 +3,125 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The War Room - ADAM-V-NEXT</title>
+    <title>The War Room - ADAM V-NEXT</title>
     <style>
         :root {
-            --primary-color: #0ff;
-            --secondary-color: #f0f;
             --bg-color: #050a0f;
-            --panel-bg: rgba(10, 20, 30, 0.85);
-            --text-color: #e0e0e0;
-            --border-color: #333;
-            --alert-color: #f00;
-            --success-color: #0f0;
-            --font-family: 'JetBrains Mono', monospace;
+            --panel-bg: rgba(10, 15, 25, 0.85);
+            --border-color: #00f3ff;
+            --text-main: #e0e0e0;
+            --text-muted: #888;
+            --accent-green: #0f0;
+            --accent-red: #f00;
+            --accent-yellow: #ff0;
+            --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+            --font-sans: 'Inter', sans-serif;
         }
 
         body {
             margin: 0;
             padding: 20px;
             background-color: var(--bg-color);
-            color: var(--text-color);
-            font-family: var(--font-family);
-            background-image:
-                linear-gradient(rgba(0, 255, 255, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 255, 255, 0.03) 1px, transparent 1px);
-            background-size: 40px 40px;
+            color: var(--text-main);
+            font-family: var(--font-mono);
             height: 100vh;
             box-sizing: border-box;
-            overflow: hidden;
+            background-image:
+                radial-gradient(circle at 50% 50%, rgba(0, 243, 255, 0.05) 0%, transparent 50%),
+                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 100% 100%, 20px 20px, 20px 20px;
         }
 
-        h1 {
-            margin-top: 0;
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 20px;
-            color: var(--primary-color);
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+            font-family: var(--font-sans);
+        }
+
+        .header h1 {
+            margin: 0;
+            color: var(--border-color);
             text-transform: uppercase;
-            letter-spacing: 4px;
-            font-size: 2rem;
-            text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
+            font-size: 1.5rem;
+        }
+
+        .header .status {
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            gap: 10px;
+            font-size: 0.9rem;
+            color: var(--accent-green);
         }
 
-        .status-badge {
-            font-size: 1rem;
-            background: rgba(0, 255, 0, 0.1);
-            color: var(--success-color);
-            padding: 5px 15px;
-            border: 1px solid var(--success-color);
-            border-radius: 4px;
+        .header .status .indicator {
+            width: 10px;
+            height: 10px;
+            background-color: var(--accent-green);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--accent-green);
             animation: pulse 2s infinite;
         }
 
         @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(0, 255, 0, 0.4); }
-            70% { box-shadow: 0 0 0 10px rgba(0, 255, 0, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(0, 255, 0, 0); }
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+            100% { opacity: 1; transform: scale(1); }
         }
 
+        /* 4-Quadrant Grid for 4k resolution */
         .grid-container {
             display: grid;
             grid-template-columns: 1fr 1fr;
             grid-template-rows: 1fr 1fr;
             gap: 20px;
-            height: calc(100vh - 80px); /* Adjust based on header */
+            height: calc(100vh - 100px); /* Fill remaining height */
         }
 
-        .panel {
+        .quadrant {
             background: var(--panel-bg);
-            border: 1px solid var(--primary-color);
+            border: 1px solid rgba(0, 243, 255, 0.3);
             border-radius: 8px;
             padding: 20px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(0, 255, 255, 0.05);
             display: flex;
             flex-direction: column;
-            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
             position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
         }
 
-        .panel::before {
+        .quadrant::before {
             content: '';
             position: absolute;
-            top: 0; left: 0; right: 0;
+            top: 0;
+            left: 0;
+            right: 0;
             height: 2px;
-            background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
+            background: linear-gradient(90deg, transparent, var(--border-color), transparent);
+            opacity: 0.5;
         }
 
-        .panel-header {
+        .quadrant-title {
             font-size: 1.2rem;
-            font-weight: bold;
-            color: var(--secondary-color);
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 10px;
+            color: #fff;
+            margin-top: 0;
             margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 1px dashed rgba(255,255,255,0.2);
             text-transform: uppercase;
-            letter-spacing: 2px;
             display: flex;
+            justify-content: space-between;
             align-items: center;
         }
 
-        .panel-header span {
-            margin-right: 10px;
-            font-size: 1.5rem;
-        }
-
-        /* 1. Live Ticker Styles */
+        /* Quadrant 1: Live Ticker */
         .ticker-list {
             list-style: none;
             padding: 0;
@@ -124,56 +138,70 @@
             font-size: 1.1rem;
         }
 
-        .ticker-up { color: var(--success-color); }
-        .ticker-down { color: var(--alert-color); }
+        .ticker-symbol { color: #fff; font-weight: bold; }
+        .ticker-price { font-family: var(--font-mono); }
+        .ticker-change.up { color: var(--accent-green); }
+        .ticker-change.down { color: var(--accent-red); }
 
-        /* 2. News Feed Styles */
+        /* Quadrant 2: News Feed */
         .news-feed {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
             overflow-y: auto;
             flex-grow: 1;
-            padding-right: 10px;
         }
 
         .news-item {
-            margin-bottom: 15px;
-            padding: 10px;
-            background: rgba(255,255,255,0.02);
-            border-left: 3px solid var(--primary-color);
+            background: rgba(0,0,0,0.4);
+            padding: 12px;
+            border-left: 3px solid var(--border-color);
+            border-radius: 0 4px 4px 0;
+            transition: background 0.2s;
+        }
+
+        .news-item:hover {
+            background: rgba(0, 243, 255, 0.1);
         }
 
         .news-time {
             font-size: 0.8rem;
-            color: #888;
+            color: var(--border-color);
             margin-bottom: 5px;
         }
 
-        .news-title {
+        .news-headline {
             font-size: 1rem;
-            line-height: 1.4;
+            color: #fff;
+            margin: 0 0 5px 0;
         }
 
-        .news-critical {
-            border-left-color: var(--alert-color);
+        .news-impact {
+            font-size: 0.75rem;
+            text-transform: uppercase;
         }
+        .impact-high { color: var(--accent-red); }
+        .impact-medium { color: var(--accent-yellow); }
+        .impact-low { color: var(--accent-green); }
 
-        /* 3. Risk Radar Styles */
+        /* Quadrant 3: Risk Radar */
         .radar-container {
+            flex-grow: 1;
             display: flex;
             justify-content: center;
             align-items: center;
-            flex-grow: 1;
             position: relative;
         }
 
         .radar-svg {
-            width: 100%;
-            height: 100%;
-            max-width: 300px;
-            max-height: 300px;
-            filter: drop-shadow(0 0 10px rgba(0, 255, 255, 0.3));
+            width: 80%;
+            height: 80%;
+            max-width: 400px;
+            max-height: 400px;
+            filter: drop-shadow(0 0 10px rgba(0, 243, 255, 0.3));
         }
 
-        /* 4. System Health Styles */
+        /* Quadrant 4: System Health */
         .health-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -182,123 +210,126 @@
             align-content: start;
         }
 
-        .health-node {
+        .health-card {
             background: rgba(0,0,0,0.5);
-            border: 1px solid #444;
+            border: 1px solid #333;
             padding: 15px;
-            border-radius: 4px;
+            border-radius: 6px;
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 10px;
         }
 
-        .node-name {
-            font-weight: bold;
-            color: #aaa;
+        .health-name {
             font-size: 0.9rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
         }
 
-        .node-bar-container {
-            height: 6px;
+        .health-value {
+            font-size: 1.5rem;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .health-bar-container {
+            height: 4px;
             background: #222;
-            border-radius: 3px;
+            width: 100%;
+            border-radius: 2px;
             overflow: hidden;
         }
 
-        .node-bar {
+        .health-bar {
             height: 100%;
-            background: var(--primary-color);
             transition: width 0.5s ease;
-        }
-
-        .node-status {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.8rem;
         }
 
         /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
-        ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--primary-color); }
+        ::-webkit-scrollbar-thumb { background: rgba(0, 243, 255, 0.3); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(0, 243, 255, 0.6); }
 
-        /* Responsive adjustments for extremely large/small screens */
-        @media (max-width: 1200px) {
-            .grid-container {
-                grid-template-columns: 1fr;
-                grid-template-rows: auto auto auto auto;
-                height: auto;
-                overflow-y: auto;
-            }
-            body { overflow-y: auto; height: auto; }
-            .panel { min-height: 350px; }
-        }
     </style>
 </head>
 <body>
 
-    <!-- Protocol ADAM-V-NEXT: The War Room Verified -->
-    <h1>
-        <span>The War Room <span style={{color: '#888', fontSize: '1rem'}}>// SYNTHESIZER V2</span></span>
-        <div class="status-badge">SYSTEM OPTIMAL</div>
-    </h1>
+    <div class="header">
+        <h1>ADAM-V-NEXT // The War Room</h1>
+        <div class="status">
+            <div class="indicator"></div>
+            SYSTEM ONLINE // ALL AGENTS NOMINAL
+        </div>
+    </div>
 
     <div class="grid-container">
 
         <!-- Quadrant 1: Live Ticker -->
-        <div class="panel">
-            <div class="panel-header"><span>⚡</span> Live Market Pulse</div>
+        <div class="quadrant">
+            <h2 class="quadrant-title">
+                Live Price Stream
+                <span style="font-size: 0.7rem; color: var(--accent-green);">LIVE ⚡</span>
+            </h2>
             <ul class="ticker-list" id="tickerList">
                 <!-- Populated by JS -->
             </ul>
         </div>
 
         <!-- Quadrant 2: News Feed -->
-        <div class="panel">
-            <div class="panel-header"><span>📰</span> Global Intelligence Feed</div>
+        <div class="quadrant">
+            <h2 class="quadrant-title">
+                Global Intelligence Feed
+                <span style="font-size: 0.7rem; color: var(--border-color);">FILTER: ALL</span>
+            </h2>
             <div class="news-feed" id="newsFeed">
                 <!-- Populated by JS -->
             </div>
         </div>
 
         <!-- Quadrant 3: Risk Radar -->
-        <div class="panel">
-            <div class="panel-header"><span>🎯</span> Multidimensional Risk Radar</div>
+        <div class="quadrant">
+            <h2 class="quadrant-title">
+                Systemic Risk Radar
+                <span style="font-size: 0.7rem; color: var(--accent-yellow);">UPDATING</span>
+            </h2>
             <div class="radar-container">
-                <svg viewBox="-120 -120 240 240" class="radar-svg">
-                    <!-- Concentric circles -->
-                    <circle cx="0" cy="0" r="100" fill="none" stroke="#333" stroke-width="1" />
-                    <circle cx="0" cy="0" r="75" fill="none" stroke="#333" stroke-width="1" />
-                    <circle cx="0" cy="0" r="50" fill="none" stroke="#333" stroke-width="1" />
-                    <circle cx="0" cy="0" r="25" fill="none" stroke="#333" stroke-width="1" />
+                <svg class="radar-svg" viewBox="0 0 100 100">
+                    <!-- Background Webs -->
+                    <polygon points="50,5 95,27.5 95,72.5 50,95 5,72.5 5,27.5" fill="rgba(0, 243, 255, 0.05)" stroke="rgba(0, 243, 255, 0.2)" stroke-width="0.5"/>
+                    <polygon points="50,20 80,35 80,65 50,80 20,65 20,35" fill="rgba(0, 243, 255, 0.05)" stroke="rgba(0, 243, 255, 0.2)" stroke-width="0.5"/>
+                    <polygon points="50,35 65,42.5 65,57.5 50,65 35,57.5 35,42.5" fill="rgba(0, 243, 255, 0.05)" stroke="rgba(0, 243, 255, 0.2)" stroke-width="0.5"/>
 
                     <!-- Axes -->
-                    <line x1="0" y1="-100" x2="0" y2="100" stroke="#444" stroke-width="1" />
-                    <line x1="-100" y1="0" x2="100" y2="0" stroke="#444" stroke-width="1" />
-                    <line x1="-70.7" y1="-70.7" x2="70.7" y2="70.7" stroke="#444" stroke-width="1" />
-                    <line x1="-70.7" y1="70.7" x2="70.7" y2="-70.7" stroke="#444" stroke-width="1" />
+                    <line x1="50" y1="50" x2="50" y2="5" stroke="rgba(0, 243, 255, 0.2)" stroke-width="0.5"/>
+                    <line x1="50" y1="50" x2="95" y2="27.5" stroke="rgba(0, 243, 255, 0.2)" stroke-width="0.5"/>
+                    <line x1="50" y1="50" x2="95" y2="72.5" stroke="rgba(0, 243, 255, 0.2)" stroke-width="0.5"/>
+                    <line x1="50" y1="50" x2="50" y2="95" stroke="rgba(0, 243, 255, 0.2)" stroke-width="0.5"/>
+                    <line x1="50" y1="50" x2="5" y2="72.5" stroke="rgba(0, 243, 255, 0.2)" stroke-width="0.5"/>
+                    <line x1="50" y1="50" x2="5" y2="27.5" stroke="rgba(0, 243, 255, 0.2)" stroke-width="0.5"/>
+
+                    <!-- Data Polygon (Dynamic) -->
+                    <polygon id="radarData" points="50,25 70,40 60,60 50,70 30,55 40,30" fill="rgba(255, 0, 0, 0.3)" stroke="rgba(255, 0, 0, 0.8)" stroke-width="1.5" style="transition: all 0.5s ease;"/>
 
                     <!-- Labels -->
-                    <text x="0" y="-110" fill="#888" font-size="8" text-anchor="middle">Volatility</text>
-                    <text x="110" y="0" fill="#888" font-size="8" text-anchor="start" alignment-baseline="middle">Credit</text>
-                    <text x="0" y="115" fill="#888" font-size="8" text-anchor="middle">Liquidity</text>
-                    <text x="-110" y="0" fill="#888" font-size="8" text-anchor="end" alignment-baseline="middle">Macro</text>
-
-                    <text x="80" y="-80" fill="#888" font-size="8" text-anchor="middle">Geopolitics</text>
-                    <text x="80" y="80" fill="#888" font-size="8" text-anchor="middle">Regulatory</text>
-                    <text x="-80" y="80" fill="#888" font-size="8" text-anchor="middle">Contagion</text>
-                    <text x="-80" y="-80" fill="#888" font-size="8" text-anchor="middle">Sentiment</text>
-
-                    <!-- Radar Polygon -->
-                    <polygon id="radarPolygon" points="" fill="rgba(0, 255, 255, 0.2)" stroke="var(--primary-color)" stroke-width="2" />
+                    <text x="50" y="3" fill="#888" font-size="3" text-anchor="middle">Geopolitics</text>
+                    <text x="96" y="27.5" fill="#888" font-size="3" text-anchor="start">Liquidity</text>
+                    <text x="96" y="72.5" fill="#888" font-size="3" text-anchor="start">Credit</text>
+                    <text x="50" y="98" fill="#888" font-size="3" text-anchor="middle">Contagion</text>
+                    <text x="4" y="72.5" fill="#888" font-size="3" text-anchor="end">Volatility</text>
+                    <text x="4" y="27.5" fill="#888" font-size="3" text-anchor="end">Macro</text>
                 </svg>
             </div>
         </div>
 
         <!-- Quadrant 4: System Health -->
-        <div class="panel">
-            <div class="panel-header"><span>🧠</span> Neural Swarm Telemetry</div>
+        <div class="quadrant">
+            <h2 class="quadrant-title">
+                Core Subsystems
+                <span style="font-size: 0.7rem; color: var(--text-muted);">MONITORING</span>
+            </h2>
             <div class="health-grid" id="healthGrid">
                 <!-- Populated by JS -->
             </div>
@@ -309,190 +340,168 @@
     <script>
         // --- 1. Live Ticker Logic ---
         const tickers = [
-            { symbol: 'SPX', price: 5120.50, change: 0.00, vol: 2.5 },
-            { symbol: 'NDX', price: 18050.25, change: 0.00, vol: 5.0 },
-            { symbol: 'VIX', price: 14.20, change: 0.00, vol: 1.2 },
-            { symbol: 'US10Y', price: 4.25, change: 0.00, vol: 0.05 },
-            { symbol: 'BTC', price: 65000, change: 0.00, vol: 150 },
-            { symbol: 'OIL', price: 82.50, change: 0.00, vol: 0.8 },
-            { symbol: 'GLD', price: 2150.80, change: 0.00, vol: 1.5 }
+            { symbol: 'SPY', price: 512.45, baseVol: 0.5 },
+            { symbol: 'QQQ', price: 445.12, baseVol: 0.8 },
+            { symbol: 'IWM', price: 205.30, baseVol: 0.6 },
+            { symbol: 'BTC', price: 68420.00, baseVol: 50.0 },
+            { symbol: 'ETH', price: 3840.50, baseVol: 15.0 },
+            { symbol: 'US10Y', price: 4.25, baseVol: 0.01 },
+            { symbol: 'VIX', price: 14.20, baseVol: 0.3 }
         ];
 
-        function updateTickers() {
-            const list = document.getElementById('tickerList');
-            list.innerHTML = '';
+        const tickerList = document.getElementById('tickerList');
 
+        function initTickers() {
+            tickerList.innerHTML = '';
             tickers.forEach(t => {
-                // Simulate price movement
-                const move = (Math.random() - 0.5) * t.vol;
-                t.price += move;
-                t.change = move;
-                const pctChange = (t.change / t.price) * 100;
-
-                const item = document.createElement('li');
-                item.className = 'ticker-item';
-
-                const colorClass = t.change >= 0 ? 'ticker-up' : 'ticker-down';
-                const sign = t.change >= 0 ? '+' : '';
-
-                item.innerHTML = `
-                    <span style="font-weight: bold; width: 60px; display: inline-block;">${t.symbol}</span>
-                    <span style="font-family: monospace;">${t.price.toFixed(2)}</span>
-                    <span class="${colorClass}" style="width: 80px; text-align: right;">${sign}${pctChange.toFixed(2)}%</span>
+                const li = document.createElement('li');
+                li.className = 'ticker-item';
+                li.innerHTML = `
+                    <span class="ticker-symbol">${t.symbol}</span>
+                    <div>
+                        <span class="ticker-price" id="price-${t.symbol}">$${t.price.toFixed(2)}</span>
+                        <span class="ticker-change up" id="change-${t.symbol}">+0.00%</span>
+                    </div>
                 `;
-                list.appendChild(item);
+                tickerList.appendChild(li);
+            });
+        }
+
+        function updateTickers() {
+            tickers.forEach(t => {
+                // Random walk
+                const change = (Math.random() - 0.5) * t.baseVol;
+                t.price += change;
+                const pctChange = (change / t.price) * 100;
+
+                const priceEl = document.getElementById(`price-${t.symbol}`);
+                const changeEl = document.getElementById(`change-${t.symbol}`);
+
+                if(priceEl && changeEl) {
+                    priceEl.textContent = t.symbol.includes('10Y') ? `${t.price.toFixed(3)}%` : `$${t.price.toFixed(2)}`;
+                    changeEl.textContent = `${pctChange > 0 ? '+' : ''}${pctChange.toFixed(2)}%`;
+                    changeEl.className = `ticker-change ${pctChange > 0 ? 'up' : 'down'}`;
+
+                    // Flash effect
+                    priceEl.style.color = pctChange > 0 ? 'var(--accent-green)' : 'var(--accent-red)';
+                    setTimeout(() => priceEl.style.color = '', 300);
+                }
             });
         }
 
         // --- 2. News Feed Logic ---
         const newsItems = [
-            { title: "Central Bank signals potential rate cut in Q3.", crit: false },
-            { title: "Tech sector rally continues amidst AI chip shortage.", crit: false },
-            { title: "Geopolitical tensions escalate in key transit corridor.", crit: true },
-            { title: "Major sovereign debt downgrade rocks European markets.", crit: true },
-            { title: "Retail sales data beats expectations.", crit: false },
-            { title: "New regulatory framework proposed for digital assets.", crit: false }
+            { headline: "Fed signals potential rate cut in Q3", impact: "high", color: "var(--accent-green)" },
+            { headline: "Tech sector earnings beat expectations", impact: "medium", color: "var(--accent-yellow)" },
+            { headline: "Geopolitical tensions rise in Eastern Europe", impact: "high", color: "var(--accent-red)" },
+            { headline: "Oil prices surge on supply concerns", impact: "medium", color: "var(--accent-red)" },
+            { headline: "New AI regulations proposed by EU", impact: "low", color: "var(--border-color)" }
         ];
 
-        function addNews() {
-            const feed = document.getElementById('newsFeed');
+        const newsFeed = document.getElementById('newsFeed');
+
+        function addNewsItem() {
             const item = newsItems[Math.floor(Math.random() * newsItems.length)];
-            const time = new Date().toLocaleTimeString();
+            const time = new Date().toLocaleTimeString('en-US', { hour12: false });
 
             const div = document.createElement('div');
-            div.className = `news-item ${item.crit ? 'news-critical' : ''}`;
+            div.className = 'news-item';
             div.innerHTML = `
-                <div class="news-time">${time} ${item.crit ? '<span style="color:#f00; font-weight:bold;">[CRITICAL]</span>' : ''}</div>
-                <div class="news-title">${item.title}</div>
+                <div class="news-time">[${time}] SYSTEM MSG</div>
+                <h3 class="news-headline">${item.headline}</h3>
+                <div class="news-impact impact-${item.impact}" style="color: ${item.color}">Impact: ${item.impact.toUpperCase()}</div>
             `;
 
-            feed.insertBefore(div, feed.firstChild);
-
-            // Keep only latest 10
-            if(feed.children.length > 10) {
-                feed.removeChild(feed.lastChild);
+            newsFeed.prepend(div);
+            if (newsFeed.children.length > 10) {
+                newsFeed.removeChild(newsFeed.lastChild);
             }
         }
 
         // --- 3. Risk Radar Logic ---
-        // 8 axes corresponding to the labels above
-        let radarValues = [50, 40, 60, 30, 70, 45, 20, 55]; // 0-100 scale
+        const radarPolygon = document.getElementById('radarData');
 
         function updateRadar() {
-            // Jitter values
-            radarValues = radarValues.map(v => {
-                let nv = v + (Math.random() - 0.5) * 10;
-                return Math.max(10, Math.min(100, nv));
+            // Generate 6 random points radiating from center (50,50)
+            const angles = [0, 60, 120, 180, 240, 300]; // in degrees
+            // Top (0), TopRight(60), BotRight(120), Bot(180), BotLeft(240), TopLeft(300)
+
+            let pointsStr = "";
+            angles.forEach(angle => {
+                // Random distance from center (10 to 45)
+                const r = 10 + Math.random() * 35;
+                const rad = (angle - 90) * Math.PI / 180; // -90 so 0 is top
+                const x = 50 + r * Math.cos(rad);
+                const y = 50 + r * Math.sin(rad);
+                pointsStr += `${x},${y} `;
             });
 
-            const angles = [
-                -Math.PI/2,        // Top
-                -Math.PI/4,        // Top Right
-                0,                 // Right
-                Math.PI/4,         // Bottom Right
-                Math.PI/2,         // Bottom
-                3*Math.PI/4,       // Bottom Left
-                Math.PI,           // Left
-                -3*Math.PI/4       // Top Left
-            ];
-
-            let points = "";
-            for(let i=0; i<8; i++) {
-                const r = radarValues[i];
-                const x = r * Math.cos(angles[i]);
-                const y = r * Math.sin(angles[i]);
-                points += `${x},${y} `;
-            }
-
-            const poly = document.getElementById('radarPolygon');
-            poly.setAttribute('points', points.trim());
-
-            // Change color based on overall risk (avg area approx)
-            const avg = radarValues.reduce((a,b)=>a+b, 0) / 8;
-            if(avg > 70) {
-                poly.setAttribute('stroke', '#f00');
-                poly.setAttribute('fill', 'rgba(255, 0, 0, 0.2)');
-            } else if (avg > 50) {
-                poly.setAttribute('stroke', '#ffa500');
-                poly.setAttribute('fill', 'rgba(255, 165, 0, 0.2)');
-            } else {
-                poly.setAttribute('stroke', '#0ff');
-                poly.setAttribute('fill', 'rgba(0, 255, 255, 0.2)');
-            }
+            radarPolygon.setAttribute('points', pointsStr.trim());
         }
 
         // --- 4. System Health Logic ---
-        const nodes = [
-            { id: 'n1', name: 'MetaOrchestrator', load: 45 },
-            { id: 'n2', name: 'RiskEngine_v2', load: 80 },
-            { id: 'n3', name: 'ConsensusEngine', load: 30 },
-            { id: 'n4', name: 'BlindspotMonitor', load: 15 },
-            { id: 'n5', name: 'MarketDataFeeds', load: 60 },
-            { id: 'n6', name: 'GraphMemoryDB', load: 90 }
+        const subsystems = [
+            { name: "Risk Officer", load: 45, color: "var(--accent-green)" },
+            { name: "Blindspot Scanner", load: 88, color: "var(--accent-yellow)" },
+            { name: "Consensus Engine", load: 30, color: "var(--border-color)" },
+            { name: "Network DB", load: 95, color: "var(--accent-red)" },
+            { name: "Live Mock Engine", load: 60, color: "var(--accent-green)" },
+            { name: "Meta-Orchestrator", load: 25, color: "var(--border-color)" }
         ];
 
+        const healthGrid = document.getElementById('healthGrid');
+
         function initHealth() {
-            const grid = document.getElementById('healthGrid');
-            grid.innerHTML = '';
-            nodes.forEach(n => {
+            healthGrid.innerHTML = '';
+            subsystems.forEach((sub, i) => {
                 const div = document.createElement('div');
-                div.className = 'health-node';
+                div.className = 'health-card';
                 div.innerHTML = `
-                    <div class="node-name">${n.name}</div>
-                    <div class="node-bar-container">
-                        <div class="node-bar" id="bar-${n.id}" style="width: ${n.load}%"></div>
+                    <div class="health-name">${sub.name}</div>
+                    <div class="health-value">
+                        <span id="health-val-${i}">${sub.load}%</span>
+                        <span style="font-size: 0.8rem; color: ${sub.color}">ONLINE</span>
                     </div>
-                    <div class="node-status">
-                        <span>CPU / MEM</span>
-                        <span id="val-${n.id}">${n.load}%</span>
+                    <div class="health-bar-container">
+                        <div class="health-bar" id="health-bar-${i}" style="width: ${sub.load}%; background-color: ${sub.color}"></div>
                     </div>
                 `;
-                grid.appendChild(div);
+                healthGrid.appendChild(div);
             });
         }
 
         function updateHealth() {
-            nodes.forEach(n => {
-                n.load += (Math.random() - 0.5) * 15;
-                n.load = Math.max(5, Math.min(98, n.load));
+            subsystems.forEach((sub, i) => {
+                // Jitter load
+                sub.load = Math.max(5, Math.min(100, sub.load + (Math.random() - 0.5) * 10));
 
-                const bar = document.getElementById(`bar-${n.id}`);
-                const val = document.getElementById(`val-${n.id}`);
+                // Determine color based on load
+                if (sub.load > 90) sub.color = 'var(--accent-red)';
+                else if (sub.load > 70) sub.color = 'var(--accent-yellow)';
+                else sub.color = 'var(--accent-green)';
 
-                if(bar && val) {
-                    bar.style.width = `${n.load}%`;
-                    val.innerText = `${n.load.toFixed(0)}%`;
+                const valEl = document.getElementById(`health-val-${i}`);
+                const barEl = document.getElementById(`health-bar-${i}`);
 
-                    if(n.load > 85) {
-                        bar.style.background = 'var(--alert-color)';
-                        val.style.color = 'var(--alert-color)';
-                    } else if (n.load > 60) {
-                        bar.style.background = '#ffa500';
-                        val.style.color = '#ffa500';
-                    } else {
-                        bar.style.background = 'var(--primary-color)';
-                        val.style.color = 'var(--text-color)';
-                    }
+                if(valEl && barEl) {
+                    valEl.textContent = `${Math.round(sub.load)}%`;
+                    barEl.style.width = `${sub.load}%`;
+                    barEl.style.backgroundColor = sub.color;
                 }
             });
         }
 
         // --- Initialization and Loops ---
-        window.onload = () => {
-            initHealth();
-            updateTickers();
-            updateRadar();
+        initTickers();
+        initHealth();
+        addNewsItem();
+        updateRadar();
 
-            // Initial news
-            for(let i=0; i<3; i++) addNews();
+        setInterval(updateTickers, 1500);
+        setInterval(addNewsItem, 5000);
+        setInterval(updateRadar, 3000);
+        setInterval(updateHealth, 2000);
 
-            // Set intervals
-            setInterval(updateTickers, 1000);
-            setInterval(updateRadar, 2000);
-            setInterval(updateHealth, 3000);
-            setInterval(addNews, 8000);
-        };
     </script>
 </body>
 </html>
-<!-- Protocol Verified: ADAM-V-NEXT -->
