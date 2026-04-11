@@ -106,3 +106,7 @@
 ## 2026-11-21 - [Event Loop Blocking in High-Throughput Async Ingestion]
 **Learning:** During high-throughput asynchronous file ingestion (e.g., `UniversalIngestor.scan_directory_async`), utilizing `aiofiles` for I/O is not sufficient. CPU-intensive synchronous operations like `json.loads`, string cleaning, semantic chunking (`sentence_transformers`), and `ast.parse` will still block the main event loop, causing silent performance bottlenecks and negating the benefits of concurrency.
 **Action:** Always wrap heavy synchronous data processing and parsing steps inside `await asyncio.to_thread(func, args)` within async pipelines to properly offload CPU-bound work and maintain event loop responsiveness.
+
+## 2026-11-23 - [Class-Level Configuration Caching]
+**Learning:** In `DataLoader._load_api`, caching the `data_sources.yaml` whitelist on the `self` instance (`self._whitelisted_apis`) meant that every instantiation of `DataLoader` was triggering `load_config` (and deepcopy) and storing its own copy of the config. For heavily used utilities, caching static config at the class level (`DataLoader._CLASS_WHITELISTED_APIS`) prevents redundant parsing and copying.
+**Action:** Always prefer caching static whitelists or configuration objects at the class level instead of the instance level to reduce disk I/O and object creation overhead, but remember to reset it in tests with `autouse` fixtures.
