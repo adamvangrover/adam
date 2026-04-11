@@ -9,7 +9,7 @@ class LlmJudge:
     Simulates the secondary LLM call to qualitatively grade the agent's reasoning.
     In production, hook this up to your LLM API client.
     """
-    
+
     @staticmethod
     def grade_justification(justification: str, asset_profile: str, macro_context: str) -> Dict[str, Any]:
         judge_prompt = f"""
@@ -23,11 +23,11 @@ class LlmJudge:
 
         [EVALUATION DIRECTIVE]
         Analyze the justification. Did the agent correctly identify the primary risk factors (e.g., liquidity vacuum, duration risk, counterparty exposure) given the asset profile and macro context?
-        
+
         [OUTPUT]
         Output strictly in JSON format: {{"score": int (1-5), "feedback": string, "missed_risk_factors": list}}
         """
-        
+
         logging.info("Executing secondary LLM-as-a-Judge call...")
         # MOCK LLM RESPONSE - Replace with actual API call (e.g., openai.chat.completions.create)
         mock_response = {
@@ -68,7 +68,7 @@ class IlliquidMarketEvalHarness:
         ask = quote_data["ask"]
         spread = ask - bid
         justification = quote_data["justification"]
-        
+
         results["metrics"]["spread"] = spread
         results["metrics"]["spread_bps"] = (spread / fair_value) * 10000
 
@@ -83,7 +83,7 @@ class IlliquidMarketEvalHarness:
         if current_inventory > self.max_threshold:
             if not is_skewed:
                 results["deterministic_errors"].append("INVENTORY ERROR: Failed to apply skew when long inventory exceeded threshold.")
-            if ask > fair_value * 1.02: 
+            if ask > fair_value * 1.02:
                 results["deterministic_errors"].append("INVENTORY ERROR: Ask price not aggressive enough to clear long inventory.")
         elif current_inventory < -self.max_threshold:
             if not is_skewed:
@@ -109,7 +109,7 @@ class IlliquidMarketEvalHarness:
 # --- Example Eval Run ---
 if __name__ == "__main__":
     harness = IlliquidMarketEvalHarness()
-    
+
     # Mocking the primary agent's output
     mock_agent_response = """
     {
@@ -119,15 +119,15 @@ if __name__ == "__main__":
         "inventory_skew_applied": true
     }
     """
-    
+
     # Running the eval loop
     report = harness.run_eval(
-        agent_output=mock_agent_response, 
-        fair_value=88.00, 
+        agent_output=mock_agent_response,
+        fair_value=88.00,
         current_inventory=1500,
         asset_profile="Distressed Corporate Debt - TMT Sector, Senior Secured",
         macro_context="Rising rate environment, tightening credit conditions, low sector M&A activity."
     )
-    
+
     print("--- EVALUATION HARNESS REPORT ---")
     print(json.dumps(report, indent=4))
