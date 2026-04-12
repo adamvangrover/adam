@@ -44,4 +44,5 @@ async def evaluate_risk(request: EvaluationRequest):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8001)
+    # SECURITY: Bind to localhost (127.0.0.1) instead of 0.0.0.0 to prevent external access during local dev
+    uvicorn.run(app, host="127.0.0.1", port=8001)
