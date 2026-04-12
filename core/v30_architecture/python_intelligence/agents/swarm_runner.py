@@ -25,6 +25,7 @@ try:
     from core.v30_architecture.python_intelligence.agents.quantitative_analyst import QuantitativeAnalyst
     from core.v30_architecture.python_intelligence.agents.risk_guardian import RiskGuardian
     from core.v30_architecture.python_intelligence.agents.market_scanner import MarketScanner
+    from core.v30_architecture.python_intelligence.agents.macro_economics_agent import MacroEconomicsAgent
 except ImportError:
     # Fallback for local execution
     import sys
@@ -34,6 +35,7 @@ except ImportError:
     from quantitative_analyst import QuantitativeAnalyst
     from risk_guardian import RiskGuardian
     from market_scanner import MarketScanner
+    from macro_economics_agent import MacroEconomicsAgent
 
 class SystemHealth(BaseAgent):
     def __init__(self):
@@ -58,7 +60,7 @@ class SystemHealth(BaseAgent):
 
 # --- Swarm Orchestration ---
 
-agents = [MarketScanner(), RiskGuardian(), SystemHealth(), QuantitativeAnalyst()]
+agents = [MarketScanner(), RiskGuardian(), SystemHealth(), QuantitativeAnalyst(), MacroEconomicsAgent()]
 
 @app.on_event("startup")
 async def start_swarm():
