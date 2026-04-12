@@ -184,3 +184,7 @@
 **Vulnerability:** `GitRepoSubAgent` executed `subprocess.run(["git", "clone", repo_url, repo_path])`. If an attacker supplies a URL starting with `-` (like `--upload-pack=...`), `git` interprets it as an option instead of a URL, leading to arbitrary code execution (Command Option Injection).
 **Learning:** External commands that accept positional arguments (like `git`, `tar`, `curl`) can be tricked into interpreting those arguments as flags if they start with a hyphen. Validating URL scheme is good but sometimes bypasses exist or are added later.
 **Prevention:** Always use the end-of-options separator `--` before untrusted arguments in `subprocess` calls (e.g., `["git", "clone", "--", repo_url, repo_path]`) to force the command to treat them as positional arguments.
+## 2026-04-12 - Prevent binding to all interfaces (0.0.0.0)
+**Vulnerability:** Fast API application was binding to all interfaces (0.0.0.0), exposing it to external networks unnecessarily.
+**Learning:** Found in `services/sentinel_api.py`. Uvicorn bound to 0.0.0.0 by default. It must be explicitly bound to 127.0.0.1 for local deployments.
+**Prevention:** Configure local APIs to bind to localhost (127.0.0.1) explicitly unless external access is required. Use bandit `uv run bandit` to scan for these risks.
