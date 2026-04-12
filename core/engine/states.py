@@ -201,6 +201,8 @@ class RedTeamState(TypedDict, total=False):
     critique_notes: List[str]
     iteration_count: int
     is_sufficiently_severe: bool
+    data_context: Dict[str, Any]
+    skill_output: Dict[str, Any]
 
     # Explainability
     human_readable_status: str

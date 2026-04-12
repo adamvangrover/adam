@@ -8,6 +8,12 @@ from core.system.error_handler import FileReadError, InvalidInputError
 from core.utils.data_utils import DataLoader, load_data
 
 
+@pytest.fixture(autouse=True)
+def reset_whitelisted_apis():
+    DataLoader._CLASS_WHITELISTED_APIS = None
+    yield
+    DataLoader._CLASS_WHITELISTED_APIS = None
+
 @pytest.fixture
 def temp_json_file(tmp_path):
     file_path = tmp_path / "test.json"
@@ -99,8 +105,8 @@ def test_load_api_market():
 
 def test_load_api_unknown():
     loader = DataLoader()
-    data = loader.load({"type": "api", "provider": "unknown_provider"})
-    assert data is None
+    with pytest.raises(InvalidInputError, match="is not whitelisted"):
+        loader.load({"type": "api", "provider": "unknown_provider"})
 
 def test_missing_path():
     loader = DataLoader()

@@ -8,6 +8,9 @@ from core.agents.agent_base import AgentBase, AgentInput, AgentOutput
 from langgraph.graph import StateGraph, END
 from core.engine.states import RedTeamState, GraphState
 from core.agents.skills.counterfactual_reasoning_skill import CounterfactualReasoningSkill
+from core.security.red_team.quantum_scanner import QuantumScanner
+from core.security.red_team.response_engine import RealTimeResponseEngine
+from core.security.red_team.sandbox_env import SandboxEnvironment
 
 logger = logging.getLogger(__name__)
 
@@ -63,6 +66,8 @@ class RedTeamAgent(AgentBase):
         # Handle AgentInput
         target_entity = input_data.query if input_data.query else "General Portfolio"
         credit_memo = input_data.context.get("credit_memo", {"assumptions": {"revenue_growth": 0.05, "interest_rate": 0.04}})
+        encryption_algorithms = input_data.context.get("encryption_algorithms", [])
+        cyber_threats = input_data.context.get("cyber_threats", [])
 
         # Initialize RedTeamState
         initial_state: RedTeamState = {
@@ -76,7 +81,11 @@ class RedTeamAgent(AgentBase):
             "is_sufficiently_severe": False,
             "human_readable_status": "Initiating Red Team Loop...",
             # Inject data for skill use
-            "data_context": {"credit_memo": credit_memo}
+            "data_context": {
+                "credit_memo": credit_memo,
+                "encryption_algorithms": encryption_algorithms,
+                "cyber_threats": cyber_threats
+            }
         }
 
         # Invoke the internal graph (Adversarial Self-Correction)
@@ -139,6 +148,7 @@ class RedTeamAgent(AgentBase):
         """
         desc = state["current_scenario_description"]
         skill_output = state.get("skill_output", {})
+        data_context = state.get("data_context", {})
 
         # Use skill output if available, else fallback
         total_impact = skill_output.get("simulated_impact_score", 0.0) / 10.0 # Scale to 0-10
@@ -147,11 +157,49 @@ class RedTeamAgent(AgentBase):
         if "ESCALATED" in desc:
             total_impact = min(10.0, total_impact * 1.5)
 
+        # --- Cybersecurity & Quantum Readiness Assessment ---
+        human_status_additions = []
+
+        encryption_algorithms = data_context.get("encryption_algorithms", [])
+        if encryption_algorithms:
+            scanner = QuantumScanner()
+            scan_results = scanner.scan_system(encryption_algorithms)
+            if scan_results["system_vulnerable"]:
+                total_impact = min(10.0, total_impact + 3.0) # Severe impact boost for quantum vulnerability
+                human_status_additions.append(f"Quantum Vulnerability: {scan_results['overall_severity']}")
+
+        cyber_threats = data_context.get("cyber_threats", [])
+        if cyber_threats:
+            response_engine = RealTimeResponseEngine()
+            sandbox = SandboxEnvironment()
+
+            for threat in cyber_threats:
+                # Detonate threat in sandbox to analyze impact
+                sandbox.detonate(threat)
+                analysis = response_engine.analyze_threat(threat)
+                if analysis["calculated_severity"] > 7.0:
+                    total_impact = min(10.0, total_impact + 2.0)
+                mitigation = response_engine.execute_mitigation(analysis)
+                human_status_additions.append(f"Mitigated {threat.get('type')}: {mitigation['action_executed']}")
+
+            # Incorporate sandbox blast radius into total impact
+            blast_radius = sandbox.analyze_impact()
+            if blast_radius > 0:
+                total_impact = min(10.0, total_impact + (blast_radius / 10.0))
+                human_status_additions.append(f"Sandbox Blast Radius: {blast_radius}")
+
+            # Contain sandbox
+            sandbox.contain()
+
         logger.info(f"[{self.name}] Simulated Impact: {total_impact:.2f}")
+
+        status_msg = f"Simulated Impact: {total_impact:.1f}"
+        if human_status_additions:
+            status_msg += " | " + " | ".join(human_status_additions)
 
         return {
             "simulated_impact_score": total_impact,
-            "human_readable_status": f"Simulated Impact: {total_impact:.1f}"
+            "human_readable_status": status_msg
         }
 
     async def _critique_node(self, state: RedTeamState) -> Dict[str, Any]:

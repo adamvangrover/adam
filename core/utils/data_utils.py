@@ -52,6 +52,7 @@ class DataLoader:
     SUPPORTED_TYPES = {"json", "csv", "yaml", "smart_text"}
     MAX_FILE_SIZE_BYTES: int = 50 * 1024 * 1024  # 50 MB limit to prevent memory exhaustion
     MAX_CACHE_ENTRIES: int = 1000
+    _CLASS_WHITELISTED_APIS = None
 
     def __init__(self, use_cache: bool = True) -> None:
         """
@@ -302,15 +303,15 @@ class DataLoader:
             raise InvalidInputError("API provider not specified in configuration.")
 
         # Cache the whitelist in the class to prevent repetitive disk I/O on API fetches
-        if not hasattr(self, '_whitelisted_apis'):
+        if DataLoader._CLASS_WHITELISTED_APIS is None:
             config = load_config("config/data_sources.yaml")
             if config and "data_sources" in config:
-                self._whitelisted_apis = config["data_sources"].get("whitelisted_api_feeds", [])
+                DataLoader._CLASS_WHITELISTED_APIS = config["data_sources"].get("whitelisted_api_feeds", [])
             else:
                 logger.error("Could not load data_sources.yaml for API whitelisting check.")
                 raise InvalidInputError("Configuration missing.")
 
-        if provider not in self._whitelisted_apis:
+        if provider not in DataLoader._CLASS_WHITELISTED_APIS:
             raise InvalidInputError(f"API provider '{provider}' is not whitelisted.")
 
         match provider:

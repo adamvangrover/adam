@@ -8,7 +8,7 @@ import sys
 # Add repo root to path
 sys.path.append(os.getcwd())
 
-from core.research.oswm.priors import NeuralNetworkPrior as NNPrior, MomentumPrior, PriorSampler
+from core.research.oswm.priors import NeuralNetworkPrior as NNPrior, MomentumPrior, PriorSampler, NoisyWavePrior
 from core.research.oswm.model import WorldModelTransformer
 from core.research.oswm.inference import OSWMInference
 from core.research.federated_learning.fl_coordinator import FederatedCoordinator
@@ -28,10 +28,22 @@ class TestOSWM(unittest.TestCase):
         self.assertEqual(len(traj), 10)
         self.assertTrue(all(isinstance(x, float) for x in traj))
 
+    def test_noisy_wave_prior_generation(self):
+        prior = NoisyWavePrior()
+        traj = prior.generate_trajectory(steps=10, start_val=0.0)
+        self.assertEqual(len(traj), 10)
+        self.assertTrue(all(isinstance(x, float) for x in traj))
+
     def test_prior_sampler_shape(self):
         # Sample: (Steps, Batch, Feat)
         sample = PriorSampler.sample(batch_size=2, steps=10)
         self.assertEqual(sample.shape, (10, 2, 1))
+
+    def test_prior_sampler_device(self):
+        # Check that we can pass device correctly
+        sample = PriorSampler.sample(batch_size=2, steps=10, device='cpu')
+        self.assertEqual(sample.shape, (10, 2, 1))
+        self.assertEqual(sample.device.type, 'cpu')
 
     def test_model_architecture(self):
         model = WorldModelTransformer(input_dim=1, d_model=32, nhead=2, num_layers=2)
