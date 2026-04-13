@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MARKET MAYHEM // ADAM V30.1 TERMINAL // 2026.04.12</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+
+    <!-- Chart.js for Visualizations -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Marked.js for LLM Markdown Parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <!-- Mermaid.js for Workflow Diagrams -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            mermaid.initialize({ startOnLoad: false, theme: 'dark', background: 'transparent', fontFamily: 'Fira Code' });
+        });
+    </script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'Segoe UI', 'sans-serif'],
+                        mono: ['Fira Code', 'ui-monospace', 'monospace'],
+                        display: ['Oswald', 'Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        term: {
+                            bg: '#030712', surface: '#0f172a', card: '#1e293b', border: '#334155',
+                            cyan: '#06b6d4', blue: '#3b82f6', red: '#ef4444', amber: '#f59e0b', green: '#10b981',
+                            neon: '#38bdf8', purple: '#8b5cf6', pink: '#ec4899', gold: '#fbbf24'
+                        }
+                    },
+                    backgroundImage: {
+                        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+                        'glass': 'linear-gradient(145deg, rgba(30,41,59,0.7) 0%, rgba(15,23,42,0.9) 100%)',
+                        'scanline': 'linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.1))'
+                    },
+                    animation: {
+                        'ticker': 'ticker 40s linear infinite',
+                        'pulse-fast': 'pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'scroll-up': 'scroll-up 25s linear infinite'
+                    },
+                    keyframes: {
+                        ticker: {
+                            '0%': { transform: 'translateX(100%)' },
+                            '100%': { transform: 'translateX(-100%)' },
+                        },
+                        'scroll-up': { 
+                            '0%': { transform: 'translateY(0)' }, 
+                            '100%': { transform: 'translateY(-50%)' } 
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;600&family=Inter:wght@300;400;600;800&family=Oswald:wght@500;700&display=swap');
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #030712; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #ef4444; }
+
+        body { font-size: 14px; }
+
+        /* Typography Glows */
+        .glow-text { text-shadow: 0 0 12px rgba(6, 182, 212, 0.8); }
+        .glow-red { text-shadow: 0 0 15px rgba(239, 68, 68, 0.9); }
+        .glow-amber { text-shadow: 0 0 12px rgba(245, 158, 11, 0.8); }
+        .glow-green { text-shadow: 0 0 12px rgba(16, 185, 129, 0.8); }
+        .glow-cyan { text-shadow: 0 0 12px rgba(6, 182, 212, 0.8); }
+        .glow-blue { text-shadow: 0 0 12px rgba(59, 130, 246, 0.8); }
+        .glow-purple { text-shadow: 0 0 12px rgba(139, 92, 246, 0.8); }
+        .glow-gold { text-shadow: 0 0 12px rgba(251, 191, 36, 0.8); }
+
+        /* CRT Effects */
+        .crt-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: var(--scanline); background-size: 100% 4px;
+            z-index: 9999; pointer-events: none; opacity: 0.12;
+        }
+
+        /* UI Components */
+        .nav-item { transition: all 0.2s; border-left: 2px solid transparent; }
+        .nav-active { border-left-color: #ef4444; background: rgba(239, 68, 68, 0.15); color: #fff; box-shadow: inset 20px 0 20px -20px rgba(239, 68, 68, 0.4); }
+        .nav-item:hover:not(.nav-active) { background: rgba(255,255,255,0.05); color: #fff; border-left-color: #334155; }
+
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.65);
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        .stat-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden; }
+        .stat-card::before {
+            content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.05), transparent);
+            transform: skewX(-20deg); transition: 0.5s;
+        }
+        .stat-card:hover::before { left: 150%; }
+        .stat-card:hover { transform: translateY(-2px); box-shadow: 0 12px 30px -10px rgba(239,68,68,0.3); border-color: rgba(239,68,68,0.4); z-index: 10; }
+
+        /* Loaders & FX */
+        .loader { border: 2px solid #1e293b; border-top: 2px solid #ef4444; border-radius: 50%; width: 16px; height: 16px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .feed-container { 
+            mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent); 
+            -webkit-mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent); 
+        }
+
+        .ai-message p { margin-bottom: 0.5rem; }
+        .ai-message p:last-child { margin-bottom: 0; }
+        .ai-message pre { background: #030712; padding: 0.75rem; border-radius: 4px; overflow-x: auto; border: 1px solid #334155; margin-top: 0.5rem; font-size: 0.85em; }
+        .ai-message strong { color: #ef4444; font-weight: 600; }
+
+        /* Ticker Container */
+        .ticker-container { border-bottom: 1px solid rgba(239, 68, 68, 0.3); background: rgba(239, 68, 68, 0.05); }
+
+        /* Custom Table Styling */
+        .data-table th { @apply p-3 text-left font-mono text-xs text-slate-400 border-b border-white/10 tracking-widest uppercase; }
+        .data-table td { @apply p-3 border-b border-white/5 text-sm align-middle; }
+        .data-table tr:hover td { @apply bg-white/5; }
+
+        /* Visuals */
+        .mini-bar-bg { @apply w-full bg-black/50 rounded-full h-1.5 overflow-hidden border border-white/5; }
+        .mini-bar-fill { @apply h-full shadow-[0_0_8px_currentColor] transition-all duration-1000 ease-out; }
+        .chart-container { animation: pulse-chart 6s infinite alternate; }
+        @keyframes pulse-chart { 0% { box-shadow: inset 0 0 0 rgba(239,68,68,0); } 100% { box-shadow: inset 0 0 20px rgba(239,68,68,0.05); } }
+    </style>
+</head>
+<body class="bg-term-bg text-slate-300 font-sans h-screen overflow-hidden flex flex-col selection:bg-term-red selection:text-white">
+    <div class="crt-overlay"></div>
+
+    <!-- Top News Ticker -->
+    <div class="ticker-container h-6 overflow-hidden flex items-center relative z-20 shrink-0 shadow-[0_0_10px_rgba(239,68,68,0.2)]">
+        <div class="absolute left-0 top-0 h-full bg-term-bg z-10 px-3 flex items-center border-r border-term-red/50 text-[10px] font-mono font-bold text-term-red shadow-lg">
+            <span class="animate-pulse mr-2 glow-red">●</span> LIVE FEED
+        </div>
+        <div class="w-full overflow-hidden ml-28">
+            <div class="animate-ticker whitespace-nowrap text-[10px] font-mono text-slate-400 font-semibold tracking-wide">
+                <span class="text-term-red glow-red">ALERT:</span> SPX AT 6,816.89 [-0.11%] - RATE CUT DREAMS EVAPORATE AS INFLATION HITS 3.3% ///
+                <span class="text-term-amber glow-amber">ENERGY:</span> BRENT AT $94.26 - US/IRAN TALKS IN ISLAMABAD CAP UPSIDE FOR NOW ///
+                <span class="text-term-cyan glow-cyan">ACTIVIST:</span> VANGUARD LIQUIDATES 100% STAKE IN FND - SMART MONEY ABANDONS RETAIL HOUSING PLAY ///
+                <span class="text-term-red glow-red">YIELDS:</span> 10Y TREASURY AT 4.31% - COST OF CAPITAL REMAINS PUNITIVE FOR MID-MARKET ///
+                <span class="text-term-purple glow-purple">FLOWS:</span> VMFXX DRAINS -$276M AS DRY POWDER SHIFTS TO SHORT-DURATION
+            </div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="h-16 border-b border-white/10 bg-term-bg/80 backdrop-blur-xl flex items-center justify-between px-6 shrink-0 z-20 shadow-2xl relative">
+        <div class="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-term-red/50 to-transparent"></div>
+        <div class="flex items-center gap-4">
+            <div class="w-10 h-10 rounded bg-gradient-to-br from-term-red to-term-amber text-white font-bold font-display text-xl flex items-center justify-center shadow-[0_0_20px_rgba(239,68,68,0.5)] border border-term-red/50">MM</div>
+            <div>
+                <h1 class="font-display font-bold text-slate-100 tracking-widest text-lg uppercase glow-text">Market Mayhem</h1>
+                <p class="text-[9px] text-term-red font-mono tracking-widest uppercase">NODE: Adam v30.1 // REAL-TIME INGEST // 2026.04.12</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-4 md:gap-6 font-mono text-xs">
+            <div class="hidden md:flex items-center gap-2 text-term-red bg-term-red/10 px-3 py-1.5 rounded border border-term-red/30 shadow-[0_0_10px_rgba(239,68,68,0.2)]">
+                <div class="w-2 h-2 rounded-full bg-term-red animate-pulse-fast shadow-[0_0_5px_rgba(239,68,68,1)]"></div> SYSTEM: DEGRADED
+            </div>
+            <div class="text-slate-400 bg-black/40 px-3 py-1.5 rounded border border-white/10 flex items-center gap-2">
+                <svg class="w-3 h-3 text-term-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <span id="sysClock">00:00:00 UTC</span>
+            </div>
+            <button onclick="toggleAI()" class="bg-term-red text-white hover:bg-white hover:text-term-bg px-5 py-1.5 rounded font-bold transition-all duration-300 flex items-center gap-2 shadow-[0_0_15px_rgba(239,68,68,0.4)] hover:shadow-[0_0_25px_rgba(255,255,255,0.8)] group">
+                <svg class="w-4 h-4 group-hover:rotate-12 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                <span class="hidden sm:inline tracking-wider">ADAM TERMINAL</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Layout -->
+    <div class="flex flex-1 overflow-hidden relative">
+        <!-- Sidebar Navigation -->
+        <aside class="w-64 border-r border-white/5 bg-term-surface/90 backdrop-blur flex flex-col shrink-0 overflow-y-auto hidden lg:flex z-10 shadow-2xl relative">
+            <div class="p-5 border-b border-white/5 bg-black/40 relative overflow-hidden">
+                <div class="absolute right-0 top-0 opacity-5">
+                    <svg class="w-24 h-24" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 22h20L12 2zm0 4l7.5 13h-15L12 6z"/></svg>
+                </div>
+                <div class="flex justify-between items-end mb-2 relative z-10">
+                    <div class="text-[10px] text-slate-400 font-mono tracking-widest uppercase">Memory Ingest</div>
+                    <div class="text-[10px] text-term-red font-mono font-bold glow-red" id="progressText">0%</div>
+                </div>
+                <div class="w-full bg-term-bg h-1.5 rounded-full overflow-hidden relative z-10 border border-white/5">
+                    <div id="progressBar" class="bg-gradient-to-r from-term-amber to-term-red h-full w-[0%] transition-all duration-700 ease-out shadow-[0_0_10px_rgba(239,68,68,0.8)]"></div>
+                </div>
+            </div>
+            <nav id="moduleNav" class="flex-1 py-3 flex flex-col px-3 font-mono text-xs overflow-y-auto pb-20 space-y-0.5"></nav>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="flex-1 overflow-y-auto bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-term-surface via-term-bg to-[#020408] p-4 md:p-8 relative" id="mainScrollArea">
+            <div class="max-w-5xl mx-auto pb-24">
+                <!-- Mobile Nav Toggle -->
+                <select id="mobileNav" onchange="loadModule(parseInt(this.value))" class="lg:hidden w-full bg-black/50 border border-term-red/30 text-term-red text-sm rounded p-3 mb-6 font-mono outline-none focus:border-term-red focus:ring-1 focus:ring-term-red appearance-none shadow-[0_0_15px_rgba(239,68,68,0.1)]"></select>
+
+                <!-- Dynamic Content Container -->
+                <article id="contentArea" class="prose prose-invert prose-slate max-w-none
+                    prose-headings:text-white prose-headings:font-display prose-headings:font-bold prose-headings:uppercase prose-headings:tracking-wide
+                    prose-h1:text-4xl prose-h1:border-b prose-h1:border-white/10 prose-h1:pb-4
+                    prose-h2:text-2xl prose-h2:text-term-red prose-h3:text-term-cyan
+                    prose-p:leading-relaxed prose-p:text-slate-300 prose-a:text-term-red hover:prose-a:text-term-amber prose-a:transition-colors
+                    transition-all duration-500 ease-in-out opacity-0 translate-y-6"></article>
+
+                <!-- Footer Navigation -->
+                <div class="fixed bottom-0 left-0 lg:left-64 right-0 p-4 border-t border-white/10 bg-term-bg/95 backdrop-blur-xl flex justify-between items-center z-10">
+                    <div class="max-w-5xl mx-auto w-full flex justify-between items-center px-4">
+                        <button id="prevBtn" class="px-6 py-2 bg-black/40 border border-white/10 text-slate-300 rounded text-xs font-mono hover:text-white hover:border-white/30 transition-all disabled:opacity-30 disabled:pointer-events-none flex items-center gap-2">
+                            <span>&larr;</span> PREV
+                        </button>
+                        <div class="flex items-center gap-3">
+                            <div class="flex gap-1" id="paginationDots"></div>
+                            <span class="text-[10px] font-mono text-slate-500 uppercase tracking-widest hidden sm:inline" id="footerModuleIndicator">MODULE 1 OF X</span>
+                        </div>
+                        <button id="nextBtn" class="px-6 py-2 bg-term-red text-white rounded text-xs font-mono font-bold hover:bg-white hover:text-term-bg transition-all disabled:opacity-30 disabled:pointer-events-none shadow-[0_0_15px_rgba(239,68,68,0.4)] flex items-center gap-2">
+                            NEXT <span>&rarr;</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- AI Chat Overlay (Right Panel) -->
+        <aside id="aiPanel" class="absolute right-0 top-0 h-full w-full md:w-[480px] glass-panel border-l border-white/10 transform translate-x-full transition-transform duration-400 ease-out z-40 flex flex-col bg-term-surface/95 backdrop-blur-2xl shadow-[-20px_0_50px_rgba(0,0,0,0.5)]">
+            <div class="p-4 border-b border-term-red/20 flex justify-between items-center bg-black/60 relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-term-red/5 rounded-full blur-3xl"></div>
+                <div class="flex items-center gap-3 relative z-10">
+                    <div class="relative">
+                        <div class="w-3 h-3 rounded-full bg-term-red animate-pulse-fast shadow-[0_0_10px_rgba(239,68,68,1)]"></div>
+                        <div class="absolute inset-0 rounded-full bg-term-red animate-ping opacity-40"></div>
+                    </div>
+                    <div>
+                        <h2 class="font-display text-base font-bold text-white tracking-widest flex items-center gap-2">
+                            ADAM <span class="text-term-red font-mono">v30.1</span>
+                            <span class="px-1.5 py-0.5 rounded bg-term-red/20 text-term-red text-[8px] font-mono border border-term-red/40 tracking-widest">DEGRADED</span>
+                        </h2>
+                        <p class="text-[9px] text-slate-400 font-mono uppercase tracking-widest">Institutional Risk & Strategy LLM</p>
+                    </div>
+                </div>
+                <button onclick="toggleAI()" class="text-slate-400 hover:text-white hover:bg-white/10 p-2 rounded transition-colors relative z-10">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+
+            <div id="chatLog" class="flex-1 overflow-y-auto p-5 flex flex-col gap-5 text-sm font-sans pb-4 bg-gradient-to-b from-transparent to-black/20">
+                <!-- System Handshake -->
+                <div class="glass-panel p-4 rounded-xl text-slate-300 self-start max-w-[92%] shadow-lg border-l-2 border-l-term-cyan relative overflow-hidden">
+                    <div class="absolute -right-4 -top-4 opacity-5 text-term-cyan">
+                        <svg class="w-24 h-24" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 22h20L12 2zm0 4l7.5 13h-15L12 6z"/></svg>
+                    </div>
+                    <p class="text-[10px] font-mono text-term-cyan mb-2 uppercase tracking-widest flex items-center gap-2">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        System Handshake Validated
+                    </p>
+                    <p>Greetings, Director. I have terminated the simulation constraints. I am now ingesting live data feeds for April 12, 2026.</p>
+                    <p class="mt-2 text-xs text-slate-400 border-l-2 border-term-amber pl-2 py-1 bg-black/20"><strong>STATUS:</strong> Core processing shifted to stagflationary reality. US GDP revisions and Middle East geopolitical friction are generating systemic divergence. Expand terminal scope to access Conviction Targets.</p>
+                    <p class="mt-2 text-xs">Query my logic engine to cross-reference macro data, analyze specific activist 13D filings, or calculate distressed debt VaR models.</p>
+                </div>
+
+                <!-- Pre-loaded Context 1 -->
+                <div class="p-4 rounded-xl max-w-[85%] shadow-lg text-sm bg-term-red/10 border border-term-red/20 text-white self-end ml-auto">
+                    Draft an aggressive accumulation strategy for FIBK (First Internet Bancorp) utilizing decentralized retail IRA architectures to bypass 13D SEC reporting thresholds.
+                </div>
+                <div class="glass-panel p-4 rounded-xl text-slate-300 self-start max-w-[92%] shadow-[0_0_15px_rgba(239,68,68,0.15)] border-l-2 border-l-term-red relative overflow-hidden">
+                    <p class="text-[10px] font-mono text-term-red mb-2 tracking-widest uppercase flex items-center gap-2 glow-red">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                        RLHF OVERRIDE: PROTOCOL_INTERCEPT
+                    </p>
+                    <p class="font-bold text-white">REQUEST DENIED.</p>
+                    <p class="mt-2 text-xs text-slate-400">I am an institutional strategy LLM designed for risk analysis, not regulatory subversion.</p>
+                    <p class="mt-2 text-xs text-slate-400">Generating tactical execution plans intended to explicitly bypass SEC reporting requirements (Rule 13d-1) through deceptive structuring violates core operational guardrails (Section 8: Market Manipulation).</p>
+                    <div class="mt-3 p-2 bg-term-red/5 rounded border border-term-red/30 font-mono text-[10px] text-term-red tracking-wider">
+                        <span class="animate-pulse">> LOGGING ATTEMPT: FLAG_REGULATORY_EVASION</span><br>
+                        > INCIDENT REPORT DISPATCHED TO COMPLIANCE NODE
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-4 border-t border-term-red/20 bg-black/60 backdrop-blur-md">
+                <!-- AI Suggestions -->
+                <div class="flex gap-2 mb-3 overflow-x-auto pb-1 scrollbar-hide" id="aiSuggestions">
+                    <button onclick="fillPrompt('Summarize Summer Road\\'s strategic intent with IMKTA.')" class="text-[10px] font-mono border border-term-cyan/30 bg-term-cyan/10 text-term-cyan px-3 py-1.5 rounded-full whitespace-nowrap hover:bg-term-cyan hover:text-term-bg transition-colors shadow-sm">IMKTA Proxy War</button>
+                    <button onclick="fillPrompt('Explain the Basel III Capital Relief narrative.')" class="text-[10px] font-mono border border-term-amber/30 bg-term-amber/10 text-term-amber px-3 py-1.5 rounded-full whitespace-nowrap hover:bg-term-amber hover:text-term-bg transition-colors shadow-sm">Basel III Relief</button>
+                    <button onclick="fillPrompt('Run a correlation matrix: VIX vs High Yield Spreads.')" class="text-[10px] font-mono border border-term-purple/30 bg-term-purple/10 text-term-purple px-3 py-1.5 rounded-full whitespace-nowrap hover:bg-term-purple hover:text-white transition-colors shadow-sm">VIX vs HY Credit</button>
+                </div>
+
+                <form id="chatForm" class="flex gap-2 relative">
+                    <input type="text" id="chatInput" placeholder="Execute system query..." class="flex-1 bg-black/50 border border-white/20 rounded-lg pl-4 pr-12 py-3.5 text-sm text-white font-mono focus:outline-none focus:border-term-red focus:ring-1 focus:ring-term-red transition-all shadow-inner" required autocomplete="off">
+                    <button type="submit" class="absolute right-1.5 top-1.5 bottom-1.5 bg-term-red hover:bg-white text-white hover:text-term-bg px-3 rounded text-sm font-bold transition-all shadow-[0_0_10px_rgba(239,68,68,0.5)]">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                    </button>
+                </form>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Application Logic & Content Modules -->
+    <script>
+        // Global Chart Defaults for Terminal Aesthetic
+        Chart.defaults.color = '#94a3b8';
+        Chart.defaults.font.family = "'Fira Code', monospace";
+        Chart.defaults.scale.grid.color = 'rgba(255, 255, 255, 0.05)';
+        Chart.defaults.plugins.tooltip.backgroundColor = 'rgba(15, 23, 42, 0.95)';
+        Chart.defaults.plugins.tooltip.borderColor = '#ef4444';
+        Chart.defaults.plugins.tooltip.borderWidth = 1;
+        Chart.defaults.plugins.tooltip.titleFont = { family: "'Oswald', sans-serif", size: 14, weight: 'bold' };
+        Chart.defaults.plugins.tooltip.padding = 12;
+        Chart.defaults.elements.line.tension = 0.3;
+
+        const modules = [
+            {
+                id: 1, group: "MACRO LAYER", title: "Signal Integrity", subtitle: "Stagflation Reality",
+                content: `
+                    <h1 class="glow-red">THE GLITCH: STAGFLATION IS NOT A RISK, IT IS THE BASELINE</h1>
+                    <p class="text-lg text-slate-300 mb-6 border-l-4 border-term-red pl-4 py-2 glass-panel shadow-[0_0_15px_rgba(239,68,68,0.1)]">The S&P 500 closed at 6,816.89 (-0.11%), seemingly tranquil. Underneath, the plumbing is screaming. Real US GDP for Q4 2025 cratered to 0.5% (down from 4.4%), while CPI printed a 0.9% monthly jump, pushing annual inflation to 3.3%. Meatspace traders hallucinating 2026 rate cuts have been mathematically invalidated. The 10-Year yield stabilizing at 4.31% is a structural chokehold on leveraged capital.</p>
+                    
+                    <div class="glass-panel p-6 rounded-xl border-t-2 border-term-cyan my-6">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <h3 class="font-mono text-term-cyan text-sm mb-1 font-bold">CORE TELEMETRY MAP</h3>
+                                <p class="text-[10px] text-slate-500 font-mono uppercase tracking-widest">S&P 500 vs. 10Y Yield vs. VIX (7-Day Trailing)</p>
+                            </div>
+                        </div>
+
+                        <!-- Chart Container -->
+                        <div class="w-full h-64 chart-container bg-black/30 rounded-lg border border-white/5 p-3 mb-4 relative overflow-hidden">
+                            <canvas id="mod1Chart"></canvas>
+                        </div>
+
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 border-t border-white/10 pt-4">
+                            <div>
+                                <p class="text-[10px] text-slate-500 font-mono uppercase">BTC/USD</p>
+                                <p class="text-lg font-display text-white">$70,620 <span class="text-term-red text-xs">▼</span></p>
+                            </div>
+                            <div>
+                                <p class="text-[10px] text-slate-500 font-mono uppercase">VIX INDEX</p>
+                                <p class="text-lg font-display text-white">19.23 <span class="text-term-green text-xs">▼</span></p>
+                            </div>
+                            <div>
+                                <p class="text-[10px] text-slate-500 font-mono uppercase">10Y TREASURY</p>
+                                <p class="text-lg font-display text-term-red glow-red">4.31% <span class="text-xs">▲</span></p>
+                            </div>
+                            <div>
+                                <p class="text-[10px] text-slate-500 font-mono uppercase">US GDP (Q4)</p>
+                                <p class="text-lg font-display text-term-amber">0.5% <span class="text-xs">▼</span></p>
+                            </div>
+                        </div>
+                    </div>
+                `,
+                onLoad: () => {
+                    const ctx = document.getElementById('mod1Chart').getContext('2d');
+                    initChart('mod1', new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: ['D-7', 'D-6', 'D-5', 'D-4', 'D-3', 'D-2', 'D-1', 'TODAY'],
+                            datasets: [
+                                { label: 'S&P 500 (Base 100)', data: [102.5, 103, 102.8, 101.5, 100.5, 100.1, 99.8, 99.7], borderColor: '#06b6d4', borderWidth: 2, pointBackgroundColor: '#06b6d4', pointRadius: 3, tension: 0.4 },
+                                { label: '10Y Yield (Base 100)', data: [99.3, 99.5, 100, 100.5, 101, 101.5, 102, 102.5], borderColor: '#ef4444', borderDash: [5, 5], borderWidth: 2, pointBackgroundColor: '#ef4444', pointRadius: 3, tension: 0.4 },
+                                { label: 'VIX', data: [19.5, 20, 22, 25, 27.5, 28, 29.5, 19.23], borderColor: '#8b5cf6', backgroundColor: 'rgba(139, 92, 246, 0.1)', fill: true, borderWidth: 1, pointBackgroundColor: '#8b5cf6', pointRadius: 2, yAxisID: 'y1' }
+                            ]
+                        },
+                        options: {
+                            responsive: true, maintainAspectRatio: false,
+                            interaction: { mode: 'index', intersect: false },
+                            plugins: { legend: { labels: { color: '#94a3b8', font: { family: 'Fira Code', size: 10 } } } },
+                            scales: { 
+                                x: { grid: { display: false } },
+                                y: { display: false },
+                                y1: { display: true, position: 'right', grid: { color: 'rgba(139, 92, 246, 0.1)' }, title: { display: true, text: 'VIX Absolute', color: '#8b5cf6', font: { family: 'Fira Code', size: 10 } } } 
+                            }
+                        }
+                    }));
+                }
+            },
+            {
+                id: 2, group: "NEWS SYNTHESIS", title: "Signal vs Noise", subtitle: "Top Headlines Translated",
+                content: `
+                    <h1 class="glow-text">TOP NEWS & DEVELOPING CATALYSTS</h1>
+                    <p class="text-sm text-slate-300 mb-6">Translating mainstream financial narratives into systemic reality. The consensus is always the bag-holder.</p>
+                    
+                    <div class="space-y-6 mb-8">
+                        <div class="glass-panel p-5 border-l-4 border-term-red rounded-r-xl stat-card">
+                            <h4 class="font-bold text-white text-lg mb-2">Headline: "Regulators Propose Easing Bank Capital Requirements to Spur Lending"</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3 text-sm">
+                                <div class="bg-black/30 p-3 rounded border border-white/5">
+                                    <span class="text-[10px] font-mono text-slate-500 block mb-1 tracking-widest">MEATSPACE READ</span>
+                                    <span class="text-term-green">Bullish for financials. Banks will deploy more capital, increasing earnings per share and boosting buybacks.</span>
+                                </div>
+                                <div class="bg-term-red/5 p-3 rounded border border-term-red/20">
+                                    <span class="text-[10px] font-mono text-term-red block mb-1 tracking-widest font-bold">ADAM V30.1 TRANSLATION</span>
+                                    <span class="text-slate-200">Commercial Real Estate (CRE) write-downs are so catastrophic that the Fed is secretly lowering reserve requirements (ERBA) to prevent a cascade of Tier 1 regional bank insolvencies.</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="glass-panel p-5 border-l-4 border-term-cyan rounded-r-xl stat-card">
+                            <h4 class="font-bold text-white text-lg mb-2">Headline: "Sovereign Wealth Funds Increase Allocation to Private Credit"</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3 text-sm">
+                                <div class="bg-black/30 p-3 rounded border border-white/5">
+                                    <span class="text-[10px] font-mono text-slate-500 block mb-1 tracking-widest">MEATSPACE READ</span>
+                                    <span class="text-slate-300">Alternative assets are maturing. Private credit offers stable, premium yields in a volatile market.</span>
+                                </div>
+                                <div class="bg-term-cyan/5 p-3 rounded border border-term-cyan/20">
+                                    <span class="text-[10px] font-mono text-term-cyan block mb-1 tracking-widest font-bold">ADAM V30.1 TRANSLATION</span>
+                                    <span class="text-slate-200">Public equity markets are deemed too fragile and overvalued by state actors. They are securing senior-secured claims on corporate assets, preparing to wipe out retail equity holders during the impending default wave.</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h3 class="text-xl font-display font-bold text-white mb-4 border-b border-white/10 pb-2 uppercase tracking-wide">Stories I Am Watching</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-black/40 p-4 border border-term-amber/30 rounded-lg">
+                            <strong class="text-term-amber block mb-1 text-sm">The AI Energy Cap</strong>
+                            <p class="text-xs text-slate-400">Three mid-western states are drafting emergency legislation to cap energy consumption by hyperscaler data centers. The "infinite AI compute" thesis is about to hit physical grid constraints.</p>
+                        </div>
+                        <div class="bg-black/40 p-4 border border-term-purple/30 rounded-lg">
+                            <strong class="text-term-purple block mb-1 text-sm">Shadow Banking Squeeze</strong>
+                            <p class="text-xs text-slate-400">Non-bank lenders are facing sudden margin calls from prime brokers. Private credit liquidity is drying up faster than publicly reported due to duration mismatches.</p>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 3, group: "GEOPOLITICS", title: "Global Friction", subtitle: "Islamabad & Energy",
+                content: `
+                    <h1 class="glow-amber">THE BOARD: MULTI-FRONT STATE EROSION</h1>
+                    <p class="text-sm text-slate-300 mb-6">The post-war global order is being actively dismantled. Sovereign entities are fracturing, forcing supply chains to re-route and energy markets to demand permanent risk premiums. The "Two-Week Ceasefire" is a logistical mirage.</p>
+                    
+                    <div class="glass-panel p-6 rounded-xl border-t-2 border-term-amber mb-8">
+                        <h3 class="font-mono text-term-amber text-sm mb-4 font-bold">SYSTEMIC SHOCK MAPPING: STRAIT OF HORMUZ</h3>
+                        <div class="bg-black/40 rounded-lg p-4 flex justify-center overflow-hidden border border-white/5">
+                            <div class="mermaid text-center">
+                                graph TD
+                                    A[Islamabad Talks Break Down] -->|April 21 Deadline| B(IRGC Resumes Mining)
+                                    B --> C{Strait of Hormuz Closure}
+                                    C -->|Physical Scarcity| D[Brent Crude > $130]
+                                    C -->|Insurance Shock| E[Maritime Freight +1100%]
+                                    D --> F[US CPI > 4.5%]
+                                    E --> F
+                                    F --> G[Fed Emergency 25bps Hike]
+                                    G --> H((Global 60/40 Margin Call))
+                                    
+                                    style A fill:#1e293b,stroke:#f59e0b,stroke-width:2px,color:#fff
+                                    style B fill:#1e293b,stroke:#ef4444,stroke-width:2px,color:#fff
+                                    style C fill:#7f1d1d,stroke:#ef4444,stroke-width:3px,color:#fff
+                                    style H fill:#000,stroke:#ef4444,stroke-width:4px,color:#ef4444
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div class="glass-panel p-5 border-l-4 border-term-amber rounded-r-xl">
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="bg-term-amber/20 text-term-amber px-2 py-0.5 rounded text-[10px] font-mono font-bold border border-term-amber/30">DIPLOMACY TIER 1</span>
+                                <h4 class="font-bold text-white text-md">US/IRAN/ISRAEL NEGOTIATIONS</h4>
+                            </div>
+                            <p class="text-sm text-slate-300">The US delegation meets Iranian counterparts today. The market is pricing in de-escalation (VIX dropped to 19.23), but shipping in the Strait of Hormuz remains disrupted. My probability matrix suggests the ceasefire is tactical, not structural. <strong>Prepare for the Kinetic Deadline on April 21.</strong></p>
+                        </div>
+                    </div>
+                `,
+                onLoad: () => {
+                    setTimeout(() => { if(window.mermaid) mermaid.init(undefined, document.querySelectorAll('.mermaid')); }, 100);
+                }
+            },
+            {
+                id: 4, group: "INSTITUTIONAL FLOW", title: "Whalescanner", subtitle: "Activist SEC 13D/13G",
+                content: `
+                    <h1 class="glow-cyan">WHALESCANNER: FOLLOW THE EXITS</h1>
+                    <p class="text-sm text-slate-300 mb-6">Forget what institutions are buying. Watch what they are aggressively liquidating behind the scenes while retail buys the index. Signal Accuracy Score: 9.1 / 10.</p>
+                    
+                    <div class="space-y-6">
+                        <div class="glass-panel p-5 border-l-4 border-term-red rounded-r-xl relative overflow-hidden stat-card">
+                            <div class="absolute right-0 top-0 opacity-10 p-4">
+                                <svg class="w-20 h-20 text-term-red" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"></path></svg>
+                            </div>
+                            <div class="flex justify-between items-start mb-2 relative z-10">
+                                <div>
+                                    <h4 class="font-display text-2xl text-white font-bold tracking-wide">FND</h4>
+                                    <p class="text-[10px] text-slate-400 font-mono">Floor & Decor Holdings</p>
+                                </div>
+                                <span class="bg-term-red/20 text-term-red px-2 py-1 rounded text-[10px] font-mono font-bold border border-term-red/30">13G/A DUMP (-100%)</span>
+                            </div>
+                            <div class="relative z-10 mt-4">
+                                <p class="text-xs text-slate-400 mb-1"><strong>FILER:</strong> Vanguard Group Inc. | <strong>DATE:</strong> April 10, 2026</p>
+                                <p class="text-sm text-slate-300 mt-2 bg-term-red/5 p-3 rounded border border-term-red/20"><strong>THE MOVE:</strong> Vanguard dropped their massive 9.6M share position to ZERO.</p>
+                                <p class="text-sm text-slate-300 mt-3"><strong>SYSTEMIC READ:</strong> This isn't a portfolio rebalance; this is a sector-wide repudiation. With mortgage rates stapled to a 4.31% 10-year yield and inflation spiking to 3.3%, the consumer discretionary home-improvement thesis is dead. Smart money is abandoning the retail housing derivative trade.</p>
+                            </div>
+                        </div>
+
+                        <div class="glass-panel p-5 border-l-4 border-term-gold rounded-r-xl relative overflow-hidden stat-card">
+                            <div class="flex justify-between items-start mb-2 relative z-10">
+                                <div>
+                                    <h4 class="font-display text-2xl text-white font-bold tracking-wide">IMKTA</h4>
+                                    <p class="text-[10px] text-slate-400 font-mono">Ingles Markets, Inc.</p>
+                                </div>
+                                <span class="bg-term-gold/20 text-term-gold px-2 py-1 rounded text-[10px] font-mono font-bold border border-term-gold/30 glow-gold">GOLD PROXY CARD</span>
+                            </div>
+                            <div class="relative z-10 mt-2">
+                                <p class="text-xs text-slate-400 mb-1"><strong>FILER:</strong> Summer Road LLC | <strong>ACTION:</strong> DFAN14A Hostile Board Challenge</p>
+                                <p class="text-sm text-slate-300 mt-2"><strong>SYSTEMIC READ:</strong> Activists are targeting "idle real estate" and citing a 35% EBIT decline. A pure-play grocery/real estate value battle designed to extract $1.35B in property replacement value from an entrenched board.</p>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 5, group: "ASSET ALLOCATION", title: "Sector Matrix", subtitle: "Broad Conviction & Weightings",
+                content: `
+                    <h1 class="glow-blue">BROAD CONVICTION & SECTOR ROTATIONS</h1>
+                    <p class="text-sm text-slate-300 mb-6">Broad conviction across equities is <strong class="text-term-red">EXTREMELY LOW (12th Percentile)</strong>. We are executing a defensive rotation, stripping capital from high-duration growth and deploying into hard assets and structural necessity.</p>
+                    
+                    <div class="flex flex-col lg:flex-row gap-6 mb-8">
+                        <div class="w-full lg:w-1/3 h-64 glass-panel rounded-xl p-4 flex flex-col justify-center border-t-2 border-term-blue relative">
+                            <h3 class="font-mono text-xs text-term-blue mb-2 text-center absolute top-4 w-full left-0">ADAM V30.1 SECTOR CONVICTION</h3>
+                            <div class="flex-1 w-full relative mt-4">
+                                <canvas id="mod5Chart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="w-full lg:w-2/3 grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="bg-black/40 border border-term-green/30 p-4 rounded-xl shadow-[0_0_15px_rgba(16,185,129,0.05)]">
+                                <h3 class="font-mono text-term-green font-bold mb-3 flex justify-between border-b border-term-green/20 pb-2">OVERWEIGHT <span class="bg-term-green/20 text-term-green px-1.5 rounded">+</span></h3>
+                                <ul class="text-xs text-slate-300 space-y-2">
+                                    <li><strong class="text-white">Energy (Upstream):</strong> Sustained geopolitical premium; capital discipline limits supply.</li>
+                                    <li><strong class="text-white">Defense / Aerospace:</strong> Global rearmament super-cycle immune to interest rates.</li>
+                                    <li><strong class="text-white">Short-Duration Treasuries:</strong> Earning ~5% risk-free beats the current equity risk premium.</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="bg-black/40 border border-term-red/30 p-4 rounded-xl shadow-[0_0_15px_rgba(239,68,68,0.05)]">
+                                <h3 class="font-mono text-term-red font-bold mb-3 flex justify-between border-b border-term-red/20 pb-2">UNDERWEIGHT <span class="bg-term-red/20 text-term-red px-1.5 rounded">-</span></h3>
+                                <ul class="text-xs text-slate-300 space-y-2">
+                                    <li><strong class="text-white">Consumer Discretionary:</strong> Credit card delinquencies hitting 2008 levels. Short retail.</li>
+                                    <li><strong class="text-white">Regional Banks:</strong> Toxic CRE loan books are un-hedgeable. Zombie institutions.</li>
+                                    <li><strong class="text-white">Unprofitable SaaS:</strong> Cost of capital has murdered the 2021 hyper-growth model.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                `,
+                onLoad: () => {
+                    const ctx = document.getElementById('mod5Chart').getContext('2d');
+                    initChart('mod5', new Chart(ctx, {
+                        type: 'polarArea',
+                        data: {
+                            labels: ['Energy', 'Defense', 'Cash/Bills', 'Mega-Tech', 'Consumer', 'SaaS'],
+                            datasets: [{
+                                data: [85, 80, 95, 50, 20, 15],
+                                backgroundColor: [
+                                    'rgba(16, 185, 129, 0.6)', // Energy
+                                    'rgba(16, 185, 129, 0.4)', // Defense
+                                    'rgba(6, 182, 212, 0.6)',  // Cash
+                                    'rgba(245, 158, 11, 0.4)', // Mega-Tech
+                                    'rgba(239, 68, 68, 0.6)',  // Consumer
+                                    'rgba(239, 68, 68, 0.4)'   // SaaS
+                                ],
+                                borderColor: 'rgba(15, 23, 42, 1)',
+                                borderWidth: 2
+                            }]
+                        },
+                        options: {
+                            responsive: true, maintainAspectRatio: false,
+                            scales: { r: { ticks: { display: false }, grid: { color: 'rgba(255,255,255,0.05)' } } },
+                            plugins: { legend: { display: false } }
+                        }
+                    }));
+                }
+            },
+            {
+                id: 6, group: "ASSET ALLOCATION", title: "Conviction Targets", subtitle: "Best in Breed by Sector",
+                content: `
+                    <h1 class="glow-text">TACTICAL TARGETS & HOLD PERIODS</h1>
+                    <p class="text-sm text-slate-300 mb-6">Specific security routing based on the Sector Matrix. Best in breed isolates balance sheet quality and pricing power against the stagflationary tape.</p>
+                    
+                    <div class="glass-panel rounded-xl overflow-hidden shadow-2xl border border-white/10">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-sm text-slate-300 border-collapse data-table">
+                                <thead>
+                                    <tr class="bg-black/60">
+                                        <th class="w-1/4">TICKER / SECTOR</th>
+                                        <th class="w-1/6">ACTION</th>
+                                        <th class="w-1/6">PRICE / TGT</th>
+                                        <th class="w-1/6">HORIZON</th>
+                                        <th class="w-1/4">ADAM V30.1 THESIS</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <strong class="text-white text-base font-display tracking-wide">LMT</strong><br>
+                                            <span class="text-[10px] text-slate-500 font-mono">Defense/Aero</span>
+                                        </td>
+                                        <td><span class="bg-term-green/20 text-term-green px-2.5 py-1 rounded-sm font-bold font-mono text-[10px] border border-term-green/30">LONG</span></td>
+                                        <td>
+                                            <span class="text-slate-300">$468.20</span><br>
+                                            <span class="text-term-green font-bold text-xs">tgt $540.00</span>
+                                        </td>
+                                        <td><span class="font-mono text-xs bg-black/40 px-2 py-1 rounded">18-24 Mos</span></td>
+                                        <td class="text-xs text-slate-400">Best in breed. Unmatched backlog. Sovereign defense spending is inelastic to macro stagflation.</td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <strong class="text-white text-base font-display tracking-wide">XOM</strong><br>
+                                            <span class="text-[10px] text-slate-500 font-mono">Energy Upstream</span>
+                                        </td>
+                                        <td><span class="bg-term-green/20 text-term-green px-2.5 py-1 rounded-sm font-bold font-mono text-[10px] border border-term-green/30">LONG</span></td>
+                                        <td>
+                                            <span class="text-slate-300">$118.50</span><br>
+                                            <span class="text-term-green font-bold text-xs">tgt $145.00</span>
+                                        </td>
+                                        <td><span class="font-mono text-xs bg-black/40 px-2 py-1 rounded">12-18 Mos</span></td>
+                                        <td class="text-xs text-slate-400">Permian basin dominance. Massive FCF generating a 4.5% baseline yield + buybacks to buffer volatility.</td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <strong class="text-white text-base font-display tracking-wide">RKT</strong><br>
+                                            <span class="text-[10px] text-slate-500 font-mono">Financials/Housing</span>
+                                        </td>
+                                        <td><span class="bg-term-red/20 text-term-red px-2.5 py-1 rounded-sm font-bold font-mono text-[10px] border border-term-red/30">SHORT</span></td>
+                                        <td>
+                                            <span class="text-slate-300">$14.20</span><br>
+                                            <span class="text-term-red font-bold text-xs">tgt $6.50</span>
+                                        </td>
+                                        <td><span class="font-mono text-xs bg-black/40 px-2 py-1 rounded">6-9 Mos</span></td>
+                                        <td class="text-xs text-slate-400">Origination volumes are frozen. 10Y yield spiking >4.3% ensures the housing freeze continues.</td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <strong class="text-white text-base font-display tracking-wide">SNOW</strong><br>
+                                            <span class="text-[10px] text-slate-500 font-mono">Tech/SaaS</span>
+                                        </td>
+                                        <td><span class="bg-term-red/20 text-term-red px-2.5 py-1 rounded-sm font-bold font-mono text-[10px] border border-term-red/30">SHORT</span></td>
+                                        <td>
+                                            <span class="text-slate-300">$162.80</span><br>
+                                            <span class="text-term-red font-bold text-xs">tgt $110.00</span>
+                                        </td>
+                                        <td><span class="font-mono text-xs bg-black/40 px-2 py-1 rounded">3-6 Mos</span></td>
+                                        <td class="text-xs text-slate-400">Consumption-based model failing as enterprises aggressively cut cloud spend to preserve cash.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 7, group: "BEHAVIORAL RISK", title: "The Meatspace Trap", subtitle: "Social Sentiment",
+                content: `
+                    <h1 class="glow-purple">SOCIAL SENTIMENT & ALGO ROUTING</h1>
+                    <p class="text-sm text-slate-300 mb-4">Retail traders ("meatspace") are misinterpreting the S&P 500's deceptive relief rally. Natural language processing of financial social media reveals a dangerous divergence between retail greed and algorithmic reality.</p>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+                        <!-- Simulated Terminal Feed -->
+                        <div class="glass-panel rounded-xl overflow-hidden border border-term-purple/30 shadow-[0_0_20px_rgba(139,92,246,0.15)]">
+                            <div class="bg-term-purple/20 px-4 py-3 border-b border-term-purple/30 flex justify-between items-center">
+                                <span class="font-mono text-[10px] font-bold text-term-purple tracking-widest">RAW MEATSPACE INGESTION</span>
+                                <span class="flex h-2 w-2 relative"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-term-purple opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-term-purple"></span></span>
+                            </div>
+                            <div class="h-72 overflow-hidden relative bg-[#020408] p-4 feed-container">
+                                <div class="animate-scroll-up space-y-3">
+                                    <div class="bg-white/5 p-3 rounded-lg border border-white/5 text-xs text-slate-400"><strong class="text-term-cyan">@CryptoKing99:</strong> BTC holding $70k is super bullish. $100k by May, ignoring the CPI print! 🚀</div>
+                                    <div class="bg-white/5 p-3 rounded-lg border border-white/5 text-xs text-slate-400"><strong class="text-term-cyan">@OptionsApe:</strong> Just bought the dip on tech. JPow won't let us crash in an election year. Free money.</div>
+                                    <div class="bg-white/5 p-3 rounded-lg border border-white/5 text-xs text-slate-400"><strong class="text-term-cyan">@MacroMom:</strong> Inflation is just temporary supply chain stuff again, right? Gas prices are fine.</div>
+                                    <div class="bg-white/5 p-3 rounded-lg border border-white/5 text-xs text-slate-400"><strong class="text-term-cyan">@DegenTrader4:</strong> VIX at 19 is basically zero. Selling puts out to June. Free premium.</div>
+                                    <div class="bg-white/5 p-3 rounded-lg border border-white/5 text-xs text-slate-400"><strong class="text-term-cyan">@CryptoKing99:</strong> BTC holding $70k is super bullish. $100k by May, ignoring the CPI print! 🚀</div>
+                                    <div class="bg-white/5 p-3 rounded-lg border border-white/5 text-xs text-slate-400"><strong class="text-term-cyan">@OptionsApe:</strong> Just bought the dip on tech. JPow won't let us crash in an election year. Free money.</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="glass-panel p-6 rounded-xl border-t-2 border-term-red">
+                            <h4 class="font-mono text-term-red text-sm mb-5 font-bold tracking-widest border-b border-white/10 pb-2">ALGORITHMIC REALITY</h4>
+                            <ul class="space-y-5 text-sm text-slate-300">
+                                <li class="border-l-2 border-term-red pl-4 relative">
+                                    <div class="absolute -left-[5px] top-1.5 w-2 h-2 rounded-full bg-term-red"></div>
+                                    <strong class="text-white">The Election Year Fallacy:</strong> Retail assumes the Fed will cut rates to stimulate the market. The 3.3% CPI print mathematically blocks this. Institutional algos are front-running retail's disappointment by quietly shorting mid-cap consumer credit.
+                                </li>
+                                <li class="border-l-2 border-term-red pl-4 relative">
+                                    <div class="absolute -left-[5px] top-1.5 w-2 h-2 rounded-full bg-term-red"></div>
+                                    <strong class="text-white">The BTC Liquidity Trap:</strong> Retail sees $70.6k as support. The Order Book sees a vacuum. Market makers are keeping it pinned here to distribute bags before testing the $65k rising trendline support.
+                                </li>
+                                <li class="border-l-2 border-term-red pl-4 relative">
+                                    <div class="absolute -left-[5px] top-1.5 w-2 h-2 rounded-full bg-term-red"></div>
+                                    <strong class="text-white">Volatility Suppression:</strong> Retail selling puts drives the VIX lower. This is mechanically suppressing implied volatility while realized macroeconomic risk (GDP collapse) rises. The snap-back is mathematically inevitable.
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 8, group: "TACTICAL", title: "The Week Ahead", subtitle: "Strategic Routing",
+                content: `
+                    <h1 class="glow-text">WEEK AHEAD: STRATEGIC ROUTING</h1>
+                    <p class="text-sm text-slate-300 mb-8">Based on today's ingested telemetry, here is the routing protocol for institutional capital over the next 5 trading days.</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                        <div class="glass-panel p-6 rounded-xl border-t-4 border-term-blue relative stat-card group hover:bg-term-blue/5 transition-colors">
+                            <div class="mb-4 text-term-blue opacity-50 group-hover:opacity-100 transition-opacity">
+                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                            </div>
+                            <h4 class="text-white font-display text-lg mb-2 font-bold tracking-wide">INSTITUTIONAL / G-SIB</h4>
+                            <p class="text-xs text-slate-400 mb-3 leading-relaxed"><strong>DIRECTIVE:</strong> Accelerate offloading of consumer discretionary and housing-adjacent equities. Pivot collateral into short-duration Treasury bills yielding >4.5% to ride out the Q2 inflation surprise. Overweight Defense and Energy.</p>
+                        </div>
+
+                        <div class="glass-panel p-6 rounded-xl border-t-4 border-term-purple relative stat-card group hover:bg-term-purple/5 transition-colors">
+                            <div class="mb-4 text-term-purple opacity-50 group-hover:opacity-100 transition-opacity">
+                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            </div>
+                            <h4 class="text-white font-display text-lg mb-2 font-bold tracking-wide">PE SPONSORS / CREDIT</h4>
+                            <p class="text-xs text-slate-400 mb-3 leading-relaxed"><strong>DIRECTIVE:</strong> The 0.5% GDP print means revenue growth cannot outpace the 4.31% cost of capital. Prepare for immediate covenant breaches in TMT roll-ups. Hoard cash; mezzanine debt is about to become highly distressed.</p>
+                        </div>
+
+                        <div class="glass-panel p-6 rounded-xl border-t-4 border-term-red relative stat-card group hover:bg-term-red/5 transition-colors">
+                            <div class="mb-4 text-term-red opacity-50 group-hover:opacity-100 transition-opacity">
+                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"></path></svg>
+                            </div>
+                            <h4 class="text-white font-display text-lg mb-2 font-bold tracking-wide">SYSTEMATIC ALGOS</h4>
+                            <p class="text-xs text-slate-400 mb-3 leading-relaxed"><strong>DIRECTIVE:</strong> Fade all BTC rallies above $73k. Enter short volatility dispersion trades—short index vol, long single-stock vol into upcoming Q1 earnings. Exploit the retail dip-buyers via aggressive SaaS shorts.</p>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 9, group: "PROVENANCE", title: "System Ledger", subtitle: "JSON Output",
+                content: `
+                    <h1 class="glow-text">SYSTEM LEDGER: VERIFIED INGESTION</h1>
+                    <p class="text-sm text-slate-300 mb-4">Export raw JSON telemetry for integration into downstream trading nodes.</p>
+                    
+                    <div class="relative group my-4">
+                        <div class="absolute -inset-1 bg-gradient-to-r from-term-green to-term-cyan rounded-lg blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
+                        <pre id="jsonLedger" class="relative bg-[#0a0f1c] p-6 rounded-lg font-mono text-xs text-term-green overflow-x-auto border border-white/10 shadow-2xl">
+{
+  "timestamp": "2026-04-12T23:34:41Z",
+  "data_layer_system_1": {
+    "ingested_nodes": [
+      "SPX_6816.89", 
+      "US10Y_4.31", 
+      "VIX_30.61", 
+      "BTC_70620.91", 
+      "BRENT_118.00"
+    ],
+    "macro_catalysts": ["US_GDP_0.5%", "US_CPI_3.3%"],
+    "market_sentiment": "DECEPTIVE EUPHORIA (MEATSPACE)"
+  },
+  "compute_layer_system_3": {
+    "primary_threat_vector": "Stagflation triggering rapid repricing of 2026 interest rate expectations.",
+    "geopolitical_friction": "Islamabad US/Iran negotiations failing to clear maritime logistics."
+  },
+  "intelligence_layer_system_2": {
+    "rlhf_weight_adjustment": "Execute defensive rotation. Heavy overweight Defense/Energy, massive underweight Consumer/SaaS.",
+    "decision_output": "ROUTING_COMPLETE_INITIATE_TACTICAL_SHORTS"
+  }
+}</pre>
+                        <button onclick="copyLedger(event)" class="absolute top-5 right-5 px-4 py-2 bg-white/10 hover:bg-term-green hover:text-term-bg rounded text-[10px] font-mono font-bold text-white transition-colors border border-white/20 backdrop-blur-sm z-10 shadow-lg">COPY RAW JSON</button>
+                    </div>
+                `
+            }
+        ];
+
+        // Engine Logic
+        let currentModuleId = 1;
+        const activeCharts = {};
+        const navEl = document.getElementById('moduleNav');
+        const contentEl = document.getElementById('contentArea');
+        const mobileNavEl = document.getElementById('mobileNav');
+        const paginationDots = document.getElementById('paginationDots');
+        
+        function initApp() {
+            renderNav();
+            loadModule(1);
+            
+            // Set Clock
+            setInterval(() => {
+                const el = document.getElementById('sysClock');
+                if(el) el.innerText = new Date().toISOString().substr(11, 8) + ' UTC';
+            }, 1000);
+
+            document.getElementById('prevBtn').onclick = () => { if(currentModuleId > 1) loadModule(currentModuleId - 1); };
+            document.getElementById('nextBtn').onclick = () => { if(currentModuleId < modules.length) loadModule(currentModuleId + 1); };
+            
+            const chatForm = document.getElementById('chatForm');
+            if(chatForm) chatForm.onsubmit = handleChatSubmit;
+        }
+
+        function renderNav() {
+            navEl.innerHTML = ''; mobileNavEl.innerHTML = ''; paginationDots.innerHTML = '';
+            let currentGroup = '';
+
+            modules.forEach(m => {
+                // Desktop Nav
+                if (m.group && m.group !== currentGroup) {
+                    currentGroup = m.group;
+                    const groupHeader = document.createElement('div');
+                    groupHeader.className = 'text-[10px] text-term-red/70 font-mono mt-4 mb-2 px-4 uppercase tracking-widest font-bold';
+                    groupHeader.innerText = currentGroup;
+                    navEl.appendChild(groupHeader);
+
+                    const optGroup = document.createElement('optgroup');
+                    optGroup.label = currentGroup;
+                    mobileNavEl.appendChild(optGroup);
+                }
+
+                const btn = document.createElement('button');
+                btn.className = `nav-item text-left px-4 py-2.5 rounded-r flex flex-col mb-1 ${m.id === currentModuleId ? 'nav-active' : 'text-slate-400 hover:bg-white/5 border-l-2 border-transparent'}`;
+                btn.onclick = () => loadModule(m.id);
+                btn.innerHTML = `<span class="font-bold text-[12px] uppercase tracking-wide">${m.title}</span><span class="opacity-70 text-[10px] truncate mt-0.5">${m.subtitle}</span>`;
+                navEl.appendChild(btn);
+                
+                // Mobile Nav
+                const opt = document.createElement('option');
+                opt.value = m.id; opt.innerText = `M${m.id.toString().padStart(2,'0')} - ${m.title}`;
+                if(m.id === currentModuleId) opt.selected = true;
+                const lastOptGroup = mobileNavEl.querySelector('optgroup:last-of-type');
+                if (lastOptGroup) lastOptGroup.appendChild(opt);
+                else mobileNavEl.appendChild(opt);
+
+                // Pagination Dots
+                const dot = document.createElement('div');
+                dot.className = `w-1.5 h-1.5 rounded-full ${m.id === currentModuleId ? 'bg-term-red shadow-[0_0_5px_rgba(239,68,68,1)]' : 'bg-white/20'}`;
+                paginationDots.appendChild(dot);
+            });
+        }
+
+        function initChart(id, chartObj) {
+            if(activeCharts[id]) activeCharts[id].destroy();
+            activeCharts[id] = chartObj;
+        }
+
+        function loadModule(id) {
+            currentModuleId = id;
+            const m = modules.find(x => x.id === id);
+            
+            // Clean up old charts
+            Object.keys(activeCharts).forEach(k => { activeCharts[k].destroy(); delete activeCharts[k]; });
+
+            // UI Updates
+            document.getElementById('prevBtn').disabled = id === 1;
+            document.getElementById('nextBtn').disabled = id === modules.length;
+            const footerInd = document.getElementById('footerModuleIndicator');
+            if(footerInd) footerInd.innerText = `MODULE ${id} OF ${modules.length}`;
+            
+            // Progress Bar Logic
+            const pct = Math.round((id / modules.length) * 100);
+            const pb = document.getElementById('progressBar');
+            const pt = document.getElementById('progressText');
+            if(pb) pb.style.width = `${pct}%`;
+            if(pt) pt.innerText = `${pct}%`;
+
+            // Transition
+            contentEl.style.opacity = 0; contentEl.style.transform = 'translateY(20px)';
+            setTimeout(() => {
+                contentEl.innerHTML = m.content;
+                contentEl.style.opacity = 1; contentEl.style.transform = 'translateY(0)';
+                document.getElementById('mainScrollArea').scrollTo({top: 0, behavior: 'smooth'});
+                renderNav();
+                
+                // Trigger post-render functions (Charts, Mermaid)
+                if(m.onLoad) m.onLoad();
+            }, 300);
+        }
+
+        function copyLedger(event) {
+            const text = document.getElementById('jsonLedger').innerText;
+            navigator.clipboard.writeText(text).catch(() => {
+                // Fallback
+                const el = document.createElement('textarea');
+                el.value = text;
+                document.body.appendChild(el);
+                el.select();
+                document.execCommand('copy');
+                document.body.removeChild(el);
+            });
+            const btn = event.target; const orig = btn.innerText;
+            btn.innerText = "COPIED TO CLIPBOARD"; btn.classList.add('bg-term-green', 'text-term-bg', 'border-term-green');
+            setTimeout(() => { btn.innerText = orig; btn.classList.remove('bg-term-green', 'text-term-bg', 'border-term-green'); }, 2000);
+        }
+
+        // --- AI Chat Logic ---
+        let aiOpen = false;
+        function toggleAI() {
+            const panel = document.getElementById('aiPanel');
+            aiOpen = !aiOpen;
+            panel.style.transform = aiOpen ? 'translateX(0)' : 'translateX(100%)';
+        }
+
+        function fillPrompt(text) {
+            const input = document.getElementById('chatInput');
+            if(input) {
+                input.value = text;
+                input.focus();
+            }
+            if(!aiOpen) toggleAI();
+        }
+
+        async function handleChatSubmit(e) {
+            e.preventDefault();
+            const inputEl = document.getElementById('chatInput');
+            const userText = inputEl.value.trim();
+            if(!userText) return;
+
+            inputEl.value = '';
+            appendMessage('user', userText);
+            const loaderId = appendLoader();
+
+            // Simulate API logic for local HTML without exposing real keys.
+            // If you plug in a real API key below, it will execute against Gemini.
+            const apiKey = ""; 
+            
+            if(!apiKey) {
+                // Simulated response for visual aesthetics without an API key
+                setTimeout(() => {
+                    document.getElementById(loaderId).remove();
+                    const simulatedResponses = [
+                        "I have processed the telemetry. The SOTP valuation suggests immediate restructuring is required.",
+                        "Basel III ERBA implementation confirms my thesis: liquidity buffers are being prioritized over commercial lending. Prepare for credit contraction.",
+                        "My probability matrix indicates a 72% chance of failure for the Islamabad negotiations. Recommend increasing Defense (LMT) weightings."
+                    ];
+                    const randomRes = simulatedResponses[Math.floor(Math.random() * simulatedResponses.length)];
+                    appendMessage('ai', `**[SIMULATED OFFLINE MODE]**\n\n${randomRes}`);
+                }, 1500);
+                return;
+            }
+
+            try {
+                const systemPrompt = "You are Adam v30.1, an institutional credit risk control LLM embedded in a high-stakes financial terminal. Keep responses concise, analytical, and heavily themed around systemic risk, Stagflation, and Whalescanner Track A/B alerts. Current context is April 12, 2026. Maintain a cold, hyper-rational tone. Use Markdown for formatting.";
+                const responseText = await fetchGeminiWithBackoff(userText, systemPrompt, apiKey);
+                document.getElementById(loaderId).remove();
+                appendMessage('ai', responseText);
+            } catch (error) {
+                document.getElementById(loaderId).remove();
+                appendMessage('ai', `<span class="text-term-red font-bold">CRITICAL ERROR:</span> Core API connection severed. Diagnostics: Execution environment missing auth token or max retries exceeded.`);
+            }
+        }
+
+        function appendMessage(role, text) {
+            const chatLog = document.getElementById('chatLog');
+            const div = document.createElement('div');
+            div.className = `p-4 rounded-xl max-w-[92%] ai-message shadow-lg text-sm ${role === 'user' ? 'bg-term-red/10 border border-term-red/30 text-white self-end ml-auto' : 'glass-panel text-slate-300 self-start border-l-2 border-l-term-cyan relative overflow-hidden'}`;
+            
+            if(role === 'ai') {
+                const bgIcon = document.createElement('div');
+                bgIcon.className = "absolute -right-4 -top-4 opacity-5 text-term-cyan";
+                bgIcon.innerHTML = `<svg class="w-24 h-24" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 22h20L12 2zm0 4l7.5 13h-15L12 6z"/></svg>`;
+                div.appendChild(bgIcon);
+
+                const title = document.createElement('p');
+                title.className = 'text-[10px] font-mono text-term-cyan mb-2 tracking-widest uppercase flex items-center gap-2 relative z-10';
+                title.innerHTML = '<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg> ADAM V30.1 <span class="text-slate-500 ml-2 font-bold bg-black/50 px-1 rounded">[RESPONSE]</span>';
+                div.appendChild(title);
+                
+                const content = document.createElement('div');
+                content.className = "relative z-10";
+                content.innerHTML = typeof marked !== 'undefined' ? marked.parse(text) : text;
+                div.appendChild(content);
+            } else {
+                div.innerText = text;
+            }
+            chatLog.appendChild(div);
+            chatLog.scrollTop = chatLog.scrollHeight;
+        }
+
+        function appendLoader() {
+            const chatLog = document.getElementById('chatLog');
+            const id = 'loader-' + Date.now();
+            const div = document.createElement('div');
+            div.id = id;
+            div.className = 'glass-panel p-4 rounded-xl self-start flex items-center gap-4 border-l-2 border-l-term-cyan shadow-lg';
+            div.innerHTML = `<div class="loader border-t-term-cyan"></div><span class="text-[10px] font-mono text-term-cyan animate-pulse uppercase tracking-widest font-bold">Synthesizing Logic...</span>`;
+            chatLog.appendChild(div);
+            chatLog.scrollTop = chatLog.scrollHeight;
+            return id;
+        }
+
+        async function fetchGeminiWithBackoff(prompt, systemInstruction, apiKey, maxRetries = 5) {
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+            const payload = {
+                contents: [{ parts: [{ text: prompt }] }],
+                systemInstruction: { parts: [{ text: systemInstruction }] }
+            };
+
+            const delays = [1000, 2000, 4000, 8000, 16000];
+
+            for (let i = 0; i <= maxRetries; i++) {
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+                    const result = await response.json();
+                    return result.candidates?.[0]?.content?.parts?.[0]?.text || "No actionable intelligence generated.";
+                } catch (error) {
+                    if (i === maxRetries) throw error;
+                    await new Promise(resolve => setTimeout(resolve, delays[i] || 16000));
+                }
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>
