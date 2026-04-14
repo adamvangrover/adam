@@ -65,19 +65,27 @@ const PromptAlpha: React.FC = () => {
   // 6. Advanced Filter & Sort Logic
   const processedPrompts = useMemo(() => {
     // A. Filter View
-    let data = prompts
-      .filter(p => viewMode === 'VAULT' ? p.isFavorite : true)
-      .filter(p =>
-        p.title.toLowerCase().includes(filter.toLowerCase()) ||
-        p.content.toLowerCase().includes(filter.toLowerCase()) ||
-        p.tags.some(t => t.toLowerCase().includes(filter.toLowerCase()))
+    let data = prompts;
+
+    if (viewMode === 'VAULT') {
+      data = data.filter(p => p.isFavorite);
+    }
+
+    if (filter.trim() !== '') {
+      const lowerFilter = filter.toLowerCase();
+      data = data.filter(p =>
+        p.title.toLowerCase().includes(lowerFilter) ||
+        p.content.toLowerCase().includes(lowerFilter) ||
+        p.tags.some(t => t.toLowerCase().includes(lowerFilter))
       );
+    }
 
     // B. Sort
-    return data.sort((a, b) => {
+    const sortedData = [...data];
+    return sortedData.sort((a, b) => {
       let res = 0;
       if (sortBy === 'ALPHA') res = a.alphaScore - b.alphaScore;
-      else if (sortBy === 'TIME') res = new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime();
+      else if (sortBy === 'TIME') res = a.timestamp - b.timestamp;
       else if (sortBy === 'SOURCE') res = a.source.localeCompare(b.source);
       return sortDir === 'ASC' ? res : -res;
     });

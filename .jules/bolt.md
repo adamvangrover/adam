@@ -110,3 +110,7 @@
 ## 2026-11-23 - [Class-Level Configuration Caching]
 **Learning:** In `DataLoader._load_api`, caching the `data_sources.yaml` whitelist on the `self` instance (`self._whitelisted_apis`) meant that every instantiation of `DataLoader` was triggering `load_config` (and deepcopy) and storing its own copy of the config. For heavily used utilities, caching static config at the class level (`DataLoader._CLASS_WHITELISTED_APIS`) prevents redundant parsing and copying.
 **Action:** Always prefer caching static whitelists or configuration objects at the class level instead of the instance level to reduce disk I/O and object creation overhead, but remember to reset it in tests with `autouse` fixtures.
+
+## 2026-04-13 - [Sorting Timestamp Performance]
+**Learning:** Found that the React frontend in `services/webapp/client/src/pages/PromptAlpha.tsx` was doing unnecessary `new Date().getTime()` instantiations during sorting. The timestamp fields on the `PromptObject` are already numbers (`export interface PromptObject { ... timestamp: number; ... }`). Doing `new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()` in a `sort` block processes O(N log N) `Date` constructions and function calls pointlessly for thousands of elements.
+**Action:** Subtracted the integer timestamps directly (`a.timestamp - b.timestamp`) in sorting comparators and optimized array string allocations by hoisting lowercasing out of inner loops to improve performance when re-rendering heavily streaming large lists.
