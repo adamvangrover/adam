@@ -2,6 +2,7 @@ import unittest
 import sys
 import os
 import shutil
+import json
 
 # Add root to sys.path
 sys.path.append(os.getcwd())
@@ -55,8 +56,8 @@ class TestAdamPhaseTwo(unittest.TestCase):
             lines = f.readlines()
             self.assertEqual(len(lines), 2)
 
-            entry1 = eval(lines[0].replace('true', 'True').replace('false', 'False')) # json.loads safer but eval ok for quick test
-            entry2 = eval(lines[1].replace('true', 'True').replace('false', 'False'))
+            entry1 = json.loads(lines[0])
+            entry2 = json.loads(lines[1])
 
             # Check Genesis Hash
             self.assertEqual(entry1['previous_hash'], "0"*64)
