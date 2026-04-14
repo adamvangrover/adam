@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unified Evaluation Dashboard</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; background: #0b0f19; color: #fff; margin: 0; padding: 20px; }
+        .dashboard-container { max-width: 1200px; margin: 0 auto; }
+        .header { border-bottom: 1px solid var(--primary-color); padding-bottom: 10px; margin-bottom: 20px; }
+        .eval-card { background: rgba(255, 255, 255, 0.05); padding: 20px; margin-bottom: 20px; border-radius: 8px; border: 1px solid var(--panel-border); }
+        .status-success { color: #10b981; font-weight: bold; }
+        .status-failed { color: #ef4444; font-weight: bold; }
+        pre { background: #000; padding: 15px; border-radius: 4px; overflow-x: auto; color: #a1a1aa; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="header">
+            <h1 style="color: var(--primary-color);">Unified Evaluation Dashboard</h1>
+            <p>Interactive view of the latest eval harness runs.</p>
+            <button onclick="loadReport()" style="padding: 10px 15px; background: var(--primary-color); color: #000; border: none; cursor: pointer; border-radius: 4px; font-weight: bold;">Refresh Data</button>
+        </div>
+        <div id="dashboard-content">
+            <p>Loading evaluation report...</p>
+        </div>
+    </div>
+
+    <script>
+        async function loadReport() {
+            try {
+                // In a real scenario, this would fetch from a live endpoint or served static file
+                // For this interactive HTML, we'll try to fetch the generated JSON report
+                const response = await fetch('../evals/data/unified_eval_report.json');
+                const data = await response.json();
+
+                if (!data.evaluations) {
+                    document.getElementById('dashboard-content').innerHTML = '<p>No evaluation data found.</p>';
+                    return;
+                }
+
+                let html = `<h3>Report Timestamp: ${data.timestamp}</h3>`;
+
+                for (const [evalName, evalData] of Object.entries(data.evaluations)) {
+                    const statusClass = evalData.status === 'success' ? 'status-success' : 'status-failed';
+                    html += `
+                        <div class="eval-card">
+                            <h2>${evalName.replace('_', ' ').toUpperCase()}</h2>
+                            <p>Status: <span class="${statusClass}">${evalData.status.toUpperCase()}</span></p>
+                            <p>Duration: ${evalData.duration_seconds}s</p>
+                            <h4>Logs:</h4>
+                            <pre>${evalData.logs || 'No logs available.'}</pre>
+                        </div>
+                    `;
+                }
+
+                document.getElementById('dashboard-content').innerHTML = html;
+            } catch (error) {
+                console.error('Error loading report:', error);
+                document.getElementById('dashboard-content').innerHTML = `
+                    <div class="eval-card">
+                        <p class="status-failed">Failed to load unified_eval_report.json.</p>
+                        <p>Ensure the unified eval harness has been run: <code>python evals/unified_eval.py</code></p>
+                        <p>Error details: ${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Initial load
+        loadReport();
+    </script>
+</body>
+</html>
