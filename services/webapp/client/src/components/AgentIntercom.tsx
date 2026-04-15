@@ -22,10 +22,14 @@ const AgentIntercom: React.FC = () => {
   const [filterText, setFilterText] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const filteredThoughts = thoughts.filter((t) =>
-      t.agent_name.toLowerCase().includes(filterText.toLowerCase()) ||
-      t.content.toLowerCase().includes(filterText.toLowerCase())
-  );
+  const filteredThoughts = React.useMemo(() => {
+    if (!filterText.trim()) return thoughts;
+    const lowerFilter = filterText.toLowerCase();
+    return thoughts.filter((t) =>
+      t.agent_name.toLowerCase().includes(lowerFilter) ||
+      t.content.toLowerCase().includes(lowerFilter)
+    );
+  }, [thoughts, filterText]);
 
   useEffect(() => {
     // Bolt Optimization: Use recursive setTimeout instead of setInterval to prevent

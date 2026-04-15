@@ -11,10 +11,14 @@ const AgentStatus: React.FC = () => {
     dataManager.getManifest().then(data => setAgents(data.agents));
   }, []);
 
-  const filteredAgents = agents.filter(a =>
-      a.name.toLowerCase().includes(filter.toLowerCase()) ||
-      a.specialization.toLowerCase().includes(filter.toLowerCase())
-  );
+  const filteredAgents = React.useMemo(() => {
+    if (!filter.trim()) return agents;
+    const lowerFilter = filter.toLowerCase();
+    return agents.filter(a =>
+        a.name.toLowerCase().includes(lowerFilter) ||
+        a.specialization.toLowerCase().includes(lowerFilter)
+    );
+  }, [agents, filter]);
 
   return (
     <div style={{ padding: '20px' }}>
