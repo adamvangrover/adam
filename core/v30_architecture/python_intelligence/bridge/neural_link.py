@@ -1,5 +1,7 @@
 import asyncio
 import json
+import uuid
+from pydantic import Field
 import logging
 import uvicorn
 import os
@@ -14,6 +16,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class Thought(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     timestamp: str
     agent_name: str
     content: str

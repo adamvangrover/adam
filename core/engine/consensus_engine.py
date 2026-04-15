@@ -93,7 +93,11 @@ class ConsensusEngine:
         else:
             decision = 'HOLD'
 
-        return {'decision': decision, 'score': score}
+        rationale = " | ".join(
+            [f"{s.get('agent', 'Unknown')} voted {s.get('vote', '')}: {s.get('reason', '')}" for s in signals]
+        )
+
+        return {'decision': decision, 'score': score, 'rationale': rationale}
 
     def arbitrate(self, agent_outputs: List[Dict[str, Any]], risk_profile: str = "moderate") -> Dict[str, Any]:
         """

@@ -26,6 +26,7 @@ try:
     from core.v30_architecture.python_intelligence.agents.risk_guardian import RiskGuardian
     from core.v30_architecture.python_intelligence.agents.market_scanner import MarketScanner
     from core.v30_architecture.python_intelligence.agents.dynamic_search_agent import DynamicSearchAgent
+    from core.agents.specialized.blindspot_agent import BlindspotAgent
 except ImportError:
     # Fallback for local execution
     import sys
@@ -36,6 +37,7 @@ except ImportError:
     from risk_guardian import RiskGuardian
     from market_scanner import MarketScanner
     from dynamic_search_agent import DynamicSearchAgent
+    from core.agents.specialized.blindspot_agent import BlindspotAgent
 
 class SystemHealth(BaseAgent):
     def __init__(self):
@@ -60,7 +62,7 @@ class SystemHealth(BaseAgent):
 
 # --- Swarm Orchestration ---
 
-agents = [MarketScanner(), RiskGuardian(), SystemHealth(), QuantitativeAnalyst(), DynamicSearchAgent()]
+agents = [MarketScanner(), RiskGuardian(), SystemHealth(), QuantitativeAnalyst(), DynamicSearchAgent(), BlindspotAgent({})]
 
 @app.on_event("startup")
 async def start_swarm():

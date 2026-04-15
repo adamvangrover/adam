@@ -41,6 +41,7 @@ const AgentRegistry = () => {
     }, [agents, sortConfig]);
 
     const filteredAgents = React.useMemo(() => {
+        if (!filter.trim()) return sortedAgents;
         const lowerFilter = filter.toLowerCase();
         return sortedAgents.filter(agent =>
             agent.name.toLowerCase().includes(lowerFilter) ||
