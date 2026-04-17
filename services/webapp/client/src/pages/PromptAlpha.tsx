@@ -22,6 +22,83 @@ import {
   ArrowUp, ArrowDown, Grid, List, Play, Eye
 } from 'lucide-react';
 
+
+// Bolt ⚡: Memoize PromptListRow to prevent O(N) re-renders when global state or unrelated filter inputs change.
+const PromptListRow = React.memo(({ prompt, selectPrompt }: { prompt: any, selectPrompt: (id: string) => void }) => {
+    return (
+        <tr
+            onClick={() => selectPrompt(prompt.id)}
+            className="border-b border-slate-900/50 hover:bg-cyan-900/5 cursor-pointer transition-colors group relative"
+        >
+            <td className="p-3">
+                <div className="flex items-center gap-2">
+                    <div className={`w-1 h-8 rounded-sm ${prompt.alphaScore >= 80 ? 'bg-green-500' : prompt.alphaScore >= 50 ? 'bg-yellow-500' : 'bg-slate-700'}`} />
+                    <span className={`font-mono font-bold text-lg ${prompt.alphaScore >= 80 ? 'text-green-400' : prompt.alphaScore >= 50 ? 'text-yellow-500' : 'text-slate-500'}`}>
+                        {prompt.alphaScore}
+                    </span>
+                </div>
+            </td>
+            <td className="p-3 overflow-hidden">
+                <div className="text-gray-200 font-medium group-hover:text-cyan-300 transition-colors truncate">
+                    {prompt.title}
+                </div>
+                <div className="text-[11px] text-slate-500 mt-1 line-clamp-1 font-mono opacity-80">
+                    {prompt.content}
+                </div>
+            </td>
+            <td className="p-3 hidden md:table-cell">
+                <div className="flex gap-1 flex-wrap">
+                    {prompt.tags.slice(0, 3).map((tag: string) => (
+                        <span key={tag} className="text-[9px] text-slate-400 bg-slate-900 px-1.5 py-0.5 rounded border border-slate-800 whitespace-nowrap">
+                            {tag}
+                        </span>
+                    ))}
+                </div>
+            </td>
+            <td className="p-3 hidden lg:table-cell">
+                <div className="flex items-center gap-2">
+                    <Activity size={10} className="text-slate-600" />
+                    <span className="text-xs text-slate-400 font-mono uppercase">{prompt.source}</span>
+                </div>
+            </td>
+            <td className="p-3 text-xs text-slate-600 font-mono text-right">
+                {new Date(prompt.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'})}
+            </td>
+            <td className="p-3 text-right">
+                {/* Hover Actions */}
+                <div className="hidden group-hover:flex items-center justify-end gap-2">
+                    <button className="p-1 hover:bg-cyan-500/20 rounded text-cyan-400" title="Simulate"><Play size={12} /></button>
+                    <button className="p-1 hover:bg-cyan-500/20 rounded text-cyan-400" title="Inspect"><Eye size={12} /></button>
+                </div>
+            </td>
+        </tr>
+    );
+});
+PromptListRow.displayName = 'PromptListRow';
+
+// Bolt ⚡: Memoize PromptGridCard for the grid layout
+const PromptGridCard = React.memo(({ prompt, selectPrompt }: { prompt: any, selectPrompt: (id: string) => void }) => {
+    return (
+        <div onClick={() => selectPrompt(prompt.id)} className="bg-slate-900/40 border border-slate-800 hover:border-cyan-500/50 p-4 rounded flex flex-col gap-3 cursor-pointer group hover:bg-slate-900/80 transition-all">
+            <div className="flex justify-between items-start">
+                <span className={`text-xl font-bold font-mono ${prompt.alphaScore >= 80 ? 'text-green-400' : 'text-slate-500'}`}>{prompt.alphaScore}</span>
+                <span className="text-[10px] text-slate-600 border border-slate-800 px-1 rounded">{prompt.source}</span>
+            </div>
+            <div className="flex-1">
+                <h3 className="text-sm font-bold text-gray-200 group-hover:text-cyan-400 line-clamp-2">{prompt.title}</h3>
+                <p className="text-[10px] text-slate-500 mt-2 line-clamp-3 font-mono">{prompt.content}</p>
+            </div>
+            <div className="flex justify-between items-end border-t border-slate-800/50 pt-2">
+                <div className="flex gap-1">
+                {prompt.tags.slice(0, 2).map((t: string) => <div key={t} className="w-1.5 h-1.5 rounded-full bg-slate-700" title={t} />)}
+                </div>
+                <span className="text-[10px] text-slate-600">{new Date(prompt.timestamp).toLocaleTimeString()}</span>
+            </div>
+        </div>
+    );
+});
+PromptGridCard.displayName = 'PromptGridCard';
+
 const PromptAlpha: React.FC = () => {
   // 1. Initialize Simulation Engines
   usePromptFeed();
@@ -257,53 +334,7 @@ const PromptAlpha: React.FC = () => {
                               </thead>
                               <tbody>
                                   {processedPrompts.map(prompt => (
-                                      <tr 
-                                          key={prompt.id} 
-                                          onClick={() => selectPrompt(prompt.id)}
-                                          className="border-b border-slate-900/50 hover:bg-cyan-900/5 cursor-pointer transition-colors group relative"
-                                      >
-                                          <td className="p-3">
-                                              <div className="flex items-center gap-2">
-                                                <div className={`w-1 h-8 rounded-sm ${prompt.alphaScore >= 80 ? 'bg-green-500' : prompt.alphaScore >= 50 ? 'bg-yellow-500' : 'bg-slate-700'}`} />
-                                                <span className={`font-mono font-bold text-lg ${prompt.alphaScore >= 80 ? 'text-green-400' : prompt.alphaScore >= 50 ? 'text-yellow-500' : 'text-slate-500'}`}>
-                                                    {prompt.alphaScore}
-                                                </span>
-                                              </div>
-                                          </td>
-                                          <td className="p-3 overflow-hidden">
-                                              <div className="text-gray-200 font-medium group-hover:text-cyan-300 transition-colors truncate">
-                                                  {prompt.title}
-                                              </div>
-                                              <div className="text-[11px] text-slate-500 mt-1 line-clamp-1 font-mono opacity-80">
-                                                  {prompt.content}
-                                              </div>
-                                          </td>
-                                          <td className="p-3 hidden md:table-cell">
-                                              <div className="flex gap-1 flex-wrap">
-                                                  {prompt.tags.slice(0, 3).map(tag => (
-                                                      <span key={tag} className="text-[9px] text-slate-400 bg-slate-900 px-1.5 py-0.5 rounded border border-slate-800 whitespace-nowrap">
-                                                          {tag}
-                                                      </span>
-                                                  ))}
-                                              </div>
-                                          </td>
-                                          <td className="p-3 hidden lg:table-cell">
-                                            <div className="flex items-center gap-2">
-                                              <Activity size={10} className="text-slate-600" />
-                                              <span className="text-xs text-slate-400 font-mono uppercase">{prompt.source}</span>
-                                            </div>
-                                          </td>
-                                          <td className="p-3 text-xs text-slate-600 font-mono text-right">
-                                              {new Date(prompt.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'})}
-                                          </td>
-                                          <td className="p-3 text-right">
-                                            {/* Hover Actions */}
-                                            <div className="hidden group-hover:flex items-center justify-end gap-2">
-                                              <button className="p-1 hover:bg-cyan-500/20 rounded text-cyan-400" title="Simulate"><Play size={12} /></button>
-                                              <button className="p-1 hover:bg-cyan-500/20 rounded text-cyan-400" title="Inspect"><Eye size={12} /></button>
-                                            </div>
-                                          </td>
-                                      </tr>
+                                      <PromptListRow key={prompt.id} prompt={prompt} selectPrompt={selectPrompt} />
                                   ))}
                               </tbody>
                           </table>
@@ -313,22 +344,7 @@ const PromptAlpha: React.FC = () => {
                         {layoutMode === 'GRID' && (
                            <div className="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                               {processedPrompts.map(prompt => (
-                                <div key={prompt.id} onClick={() => selectPrompt(prompt.id)} className="bg-slate-900/40 border border-slate-800 hover:border-cyan-500/50 p-4 rounded flex flex-col gap-3 cursor-pointer group hover:bg-slate-900/80 transition-all">
-                                   <div className="flex justify-between items-start">
-                                      <span className={`text-xl font-bold font-mono ${prompt.alphaScore >= 80 ? 'text-green-400' : 'text-slate-500'}`}>{prompt.alphaScore}</span>
-                                      <span className="text-[10px] text-slate-600 border border-slate-800 px-1 rounded">{prompt.source}</span>
-                                   </div>
-                                   <div className="flex-1">
-                                      <h3 className="text-sm font-bold text-gray-200 group-hover:text-cyan-400 line-clamp-2">{prompt.title}</h3>
-                                      <p className="text-[10px] text-slate-500 mt-2 line-clamp-3 font-mono">{prompt.content}</p>
-                                   </div>
-                                   <div className="flex justify-between items-end border-t border-slate-800/50 pt-2">
-                                      <div className="flex gap-1">
-                                        {prompt.tags.slice(0, 2).map(t => <div key={t} className="w-1.5 h-1.5 rounded-full bg-slate-700" title={t} />)}
-                                      </div>
-                                      <span className="text-[10px] text-slate-600">{new Date(prompt.timestamp).toLocaleTimeString()}</span>
-                                   </div>
-                                </div>
+                                  <PromptGridCard key={prompt.id} prompt={prompt} selectPrompt={selectPrompt} />
                               ))}
                            </div>
                         )}
