@@ -52,29 +52,38 @@ class LakehouseConnector(BaseTool):
             return json.dumps({"error": f"Fallback failed: {e}"})
 
     def _query_local_lake(self, query: str) -> str:
-        # Very simple SQL-like parsing for fallback
-
-        # Try loading local data
-        df = None
+        # Use DuckDB for real SQL execution over local files
         try:
-            if os.path.exists(os.path.join(self.local_lake_path, "financials.parquet")):
-                df = pd.read_parquet(os.path.join(self.local_lake_path, "financials.parquet"))
-            elif os.path.exists(os.path.join(self.local_lake_path, "financials.json")):
-                df = pd.read_json(os.path.join(self.local_lake_path, "financials.json"))
-        except:
-            pass
+            import duckdb
 
-        if df is not None:
-            # Filter logic (Mock)
-            if "AAPL" in query:
-                df = df[df['ticker'] == 'AAPL']
-            elif "TSLA" in query:
-                df = df[df['ticker'] == 'TSLA']
+            # Setup duckdb connection
+            con = duckdb.connect(database=':memory:')
 
-            # Format as JSONL
-            return "\n".join([json.dumps(record) for record in df.to_dict(orient="records")])
+            # Register local files as tables if they exist
+            parquet_path = os.path.join(self.local_lake_path, "financials.parquet")
+            json_path = os.path.join(self.local_lake_path, "financials.json")
 
-        # Fallback to hardcoded mock if no files
+            table_created = False
+            if os.path.exists(parquet_path):
+                con.execute(f"CREATE VIEW financials AS SELECT * FROM read_parquet('{parquet_path}')")
+                table_created = True
+            elif os.path.exists(json_path):
+                con.execute(f"CREATE VIEW financials AS SELECT * FROM read_json_auto('{json_path}')")
+                table_created = True
+
+            if table_created:
+                # Execute the provided query
+                # Note: We assume the query references the 'financials' table
+                # A more robust system would map query tables to local files dynamically
+                result_df = con.execute(query).df()
+                return "\n".join([json.dumps(record) for record in result_df.to_dict(orient="records")])
+
+        except ImportError:
+            logger.warning("duckdb not installed, falling back to basic mock logic.")
+        except Exception as e:
+            logger.error(f"DuckDB query failed: {e}")
+
+        # Fallback to hardcoded mock if no files or duckdb fails
         mock_data = [
             {"metric": "EBITDA", "year": 2023, "value": 1500000000, "currency": "USD", "source": "HardcodedFallback"},
             {"metric": "TotalDebt", "year": 2023, "value": 4000000000, "currency": "USD", "source": "HardcodedFallback"}

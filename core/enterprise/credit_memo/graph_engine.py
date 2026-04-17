@@ -4,12 +4,28 @@ from typing import List, Dict, Any
 
 class GraphEngine:
     """
-    Simulates Neo4j GraphRAG with NetworkX fallback.
+    Connects to Neo4j GraphRAG with NetworkX fallback.
     Protocol: Enterprise Knowledge Graph
     """
     def __init__(self):
-        self.graph = nx.Graph()
-        self._build_mock_graph()
+        self.use_neo4j = False
+        try:
+            from neo4j import GraphDatabase
+            import os
+            uri = os.environ.get("NEO4J_URI", "bolt://localhost:7687")
+            user = os.environ.get("NEO4J_USER", "neo4j")
+            password = os.environ.get("NEO4J_PASSWORD", "password")
+            # Only connect if we aren't in a pure mock environment
+            if not (os.environ.get("MOCK_MODE", "false").lower() == "true"):
+                self.driver = GraphDatabase.driver(uri, auth=(user, password))
+                self.use_neo4j = True
+                logging.info("Connected to Neo4j successfully.")
+            else:
+                raise Exception("MOCK_MODE is enabled")
+        except Exception as e:
+            logging.info(f"Neo4j connection failed or bypassed: {e}. Falling back to NetworkX.")
+            self.graph = nx.Graph()
+            self._build_mock_graph()
 
     def _build_mock_graph(self):
         """
@@ -64,11 +80,34 @@ class GraphEngine:
         self.graph.add_node("Visa Inc.", type="Partner", risk="Low")
         self.graph.add_edge("JPMorgan Chase", "Visa Inc.", relationship="CO_BRAND_CARD_AGREEMENT")
 
-
     def query_relationships(self, entity_name: str, depth: int = 2) -> List[Dict[str, Any]]:
         """
         Finds connected entities up to `depth`.
         """
+        if self.use_neo4j:
+            try:
+                query = """
+                MATCH (start {name: $entity_name})-[r*1..""" + str(depth) + """]-(connected)
+                RETURN connected, [rel in r | type(rel)] as path_types
+                """
+                results = []
+                with self.driver.session() as session:
+                    records = session.run(query, entity_name=entity_name)
+                    for record in records:
+                        node = record["connected"]
+                        path = " -> ".join(record["path_types"])
+                        results.append({
+                            "entity": node.get("name", "Unknown"),
+                            "type": node.get("type", "Unknown"),
+                            "risk_level": node.get("risk", "Unknown"),
+                            "path": path
+                        })
+                if results:
+                    return results
+            except Exception as e:
+                logging.error(f"Neo4j query failed: {e}. Falling back to NetworkX.")
+
+        # Fallback to NetworkX
         # Fuzzy match for demo if exact name not found
         target = entity_name
         if target not in self.graph:

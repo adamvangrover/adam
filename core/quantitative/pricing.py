@@ -1,6 +1,7 @@
 import math
 import logging
 from typing import Tuple
+import asyncio
 
 logger = logging.getLogger(__name__)
 
@@ -90,6 +91,15 @@ class AvellanedaStoikovModel:
         ask = r + (delta / 2.0)
 
         return (bid, ask)
+
+    async def get_quotes_async(self, mid_price: float, inventory_q: float, time_remaining: float) -> Tuple[float, float]:
+        """
+        Asynchronous wrapper for get_quotes to ensure non-blocking execution in async swarms.
+        Offloads the potentially synchronous execution to a background thread.
+        """
+        return await asyncio.to_thread(
+            self.get_quotes, mid_price, inventory_q, time_remaining
+        )
 
     def update_parameters(self, volatility: float = None, risk_aversion: float = None):
         """
