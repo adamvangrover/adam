@@ -1,6 +1,14 @@
 import React, { useState } from 'react';
 import './MarketMayhem.css';
 
+/**
+ * MarketMayhem Component
+ *
+ * Implements a 3-stage interactive workflow:
+ * 1. Directory: High-level overview of stressed/divergent market conditions.
+ * 2. Tearsheet: Key metrics for a selected market asset.
+ * 3. Drill-Down: Deep quantitative data.
+ */
 const MarketMayhem: React.FC = () => {
     const [viewMode, setViewMode] = useState<'euphoria' | 'credit'>('euphoria');
 
