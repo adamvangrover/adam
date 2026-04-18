@@ -1,35 +1,13 @@
-# Adam Script Registry
+# Generation Script Registry
 
-This directory contains the operational tools for running, testing, and maintaining the Adam system.
+The `scripts/` directory contains numerous standalone python scripts responsible for executing distinct workflows or generating static assets/dashboards.
 
-## 🏃 Execution
+## Core Dashboards
+- **`generate_daily_index.py`**: Parses daily brief HTML files to extract metadata and outputs the interactive `showcase/adam_daily_hub.html`. This dashboard includes a masonry card grid and a 'gated insider access' UI mechanism with an authentication modal (`#authModal`).
+- **`generate_comprehensive_index.py`**: Consolidates various data streams into a master index at `showcase/comprehensive_index.html`.
+- **`generate_predictive_reports.py`**: Generates the 'Predictive Deep Dives' Cyberpunk/Bloomberg-styled HTML dashboard located at `showcase/predictive_deep_dives.html`, displaying distress reports, actionable ideas, and ML JSON blobs.
 
-*   **`run_adam.py`**: **The Main Entry Point.** Runs the CLI or launches the core engine.
-    ```bash
-    python scripts/run_adam.py --query "Analyze AAPL"
-    ```
-*   **`swarm_showcase.py`**: Runs a visual demo of the Swarm agents in action (console animation).
+## System Maintenance
+- **`daily_ritual.py`**: The automated recursive execution wrapper for Protocol ARCHITECT_INFINITE.
 
-## 🧪 Simulation & Testing
-
-*   **`run_simple_simulation.py`**: A lightweight test of the simulation engine.
-*   **`run_llm_driven_simulation.py`**: Launches a complex, multi-agent scenario driven by LLMs.
-*   **`benchmark_adam.py`**: Measures throughput and latency of the Knowledge Graph.
-
-## 🛠️ Data Generation
-
-*   **`generate_ui_data.py`**: Creates mock JSON data for the frontend dashboard (useful for offline dev).
-*   **`generate_market_mayhem_archive.py`**: Generates historical scenarios for the "Market Mayhem" game.
-*   **`fetch_market_data.py`**: Connects to external APIs (FMP, Yahoo) to populate the local DB.
-
-## 🧹 Maintenance
-
-*   **`initialize_comprehensive_memory.py`**: Resets and seeds the vector database.
-*   **`archive_ui_artifacts.py`**: Backs up generated reports to the `archive/` folder.
-
-## ⚠️ Important Note
-Always run scripts from the **repository root** to ensure imports work correctly:
-```bash
-export PYTHONPATH=.
-python scripts/script_name.py
-```
+*(Note: Always execute scripts from the repository root via `PYTHONPATH=. uv run python scripts/script_name.py`)*
