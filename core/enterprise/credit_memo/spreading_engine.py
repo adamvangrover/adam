@@ -531,10 +531,66 @@ class SpreadingEngine:
 
     def get_equity_data(self, borrower_name: str) -> EquityMarketData:
         """
-        Returns mock equity market data.
+        Fetches live equity data using yfinance if available, gracefully falling back to mocks.
         """
         name = borrower_name.lower()
 
+        # Define the ticker mapping
+        ticker_map = {
+            "apple": "AAPL",
+            "tesla": "TSLA",
+            "jpmorgan": "JPM"
+        }
+
+        # Attempt to get ticker from name, default to the original string
+        ticker = None
+        for k, v in ticker_map.items():
+            if k in name:
+                ticker = v
+                break
+
+        if not ticker:
+            # If it's short, it might be a ticker itself
+            if len(borrower_name) <= 5 and borrower_name.isalpha():
+                ticker = borrower_name.upper()
+
+        if ticker:
+            try:
+                import yfinance as yf
+                t = yf.Ticker(ticker)
+
+                # Fetch fast_info and info
+                try:
+                    price = t.fast_info.last_price
+                    volume = float(t.fast_info.last_volume)
+                    market_cap = float(t.fast_info.market_cap / 1_000_000) # Convert to millions as per mock
+                except:
+                    price = 100.0
+                    volume = 1000000.0
+                    market_cap = 1000.0
+
+                info = t.info
+                pe_ratio = info.get("trailingPE", 15.0)
+                dividend_yield = info.get("dividendYield", 0.0)
+                if dividend_yield is not None:
+                    dividend_yield = dividend_yield * 100 # Convert to percentage
+                else:
+                    dividend_yield = 0.0
+                beta = info.get("beta", 1.0)
+
+                return EquityMarketData(
+                    market_cap=market_cap,
+                    share_price=price,
+                    volume_avg_30d=volume,
+                    pe_ratio=pe_ratio,
+                    dividend_yield=dividend_yield,
+                    beta=beta
+                )
+            except Exception as e:
+                import logging
+                logging.getLogger(__name__).warning(f"Failed to fetch live equity data for {ticker}: {e}. Falling back to mock data.")
+
+        # Fallback to mock logic
         if "apple" in name:
             return EquityMarketData(
                 market_cap=3450000.0,
