@@ -1,3 +1,8 @@
+"""
+Automated recursive execution wrapper for Protocol ARCHITECT_INFINITE.
+This script manages the daily system expansion logic, featuring regex-based output parsing
+and a resilient fallback using a functional MOCK_PAYLOAD if the LLM environment is unavailable.
+"""
 import os
 import re
 import datetime
