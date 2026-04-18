@@ -4,6 +4,9 @@ mod pricing;
 use pricing::{MarketParams, calculate_quotes};
 
 #[pyfunction]
+/// Calculates market quotes based on provided market parameters and liquidity mechanics.
+/// Exposes functionality to the Python layer via PyO3.
+#[pyfunction]
 fn get_quotes(mid_price: f64, volatility: f64, inventory: f64, risk_aversion: f64, time_horizon: f64, liquidity_param: f64) -> PyResult<(f64, f64)> {
     let params = MarketParams {
         mid_price,

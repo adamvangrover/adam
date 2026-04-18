@@ -3,11 +3,13 @@ import './MarketMayhem.css';
 
 /**
  * MarketMayhem Component
+ * @component
  *
+ * Description:
  * Implements a 3-stage interactive workflow:
- * 1. Directory: High-level overview of stressed/divergent market conditions.
- * 2. Tearsheet: Key metrics for a selected market asset.
- * 3. Drill-Down: Deep quantitative data.
+ * 1. Directory: High-level scanning of stressed/divergent market conditions.
+ * 2. Tearsheet: Summarized intermediate view (Key metrics for a selected asset).
+ * 3. Drill-Down: Granular data transparency (Deep quantitative data).
  */
 const MarketMayhem: React.FC = () => {
     const [viewMode, setViewMode] = useState<'euphoria' | 'credit'>('euphoria');

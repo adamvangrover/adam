@@ -200,6 +200,8 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 """
 
 def extract_modules():
+    # Dashboard Schemas: The extracted JavaScript array structures (const modules = [...])
+    # are required to correctly render masonry card grids and gated content modals in the UI.
     all_modules = []
 
     # Regex to find the const modules = [...] array

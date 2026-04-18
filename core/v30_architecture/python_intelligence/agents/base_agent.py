@@ -23,6 +23,14 @@ class BaseAgent:
     The foundational agent class for the v30 architecture.
     All modular agents in the Python Intelligence swarm must inherit from this class.
     It provides standard telemetry and communication channels via the NeuralMesh.
+
+    Usage Example:
+        class ConcreteAgent(BaseAgent):
+            def __init__(self):
+                super().__init__(name="Agent-X", role="Analyzer")
+
+            async def run(self):
+                await self.emit("THOUGHT", {"msg": "analyzing"})
     """
     def __init__(self, name: str, role: str):
         """
@@ -42,7 +50,10 @@ class BaseAgent:
         Args:
             packet_type (str): The classification of the emitted data (e.g., "THOUGHT", "ACTION").
             payload (dict): The structured data payload to transmit.
-        """
+
+        Usage Example:
+            await self.emit(packet_type="THOUGHT", payload={"status": "processing"})
+
         packet = NeuralPacket(
             source_agent=self.name,
             packet_type=packet_type,

@@ -7,6 +7,14 @@ class EngineFactory:
     """
     Factory pattern for runtime environment rotation.
     Allows seamless switching between Simulation (System 3) and Live (System 1/2) engines.
+
+    Graceful Fallback Mechanism:
+    Defaults to LiveMockEngine if REAL engines fail or are not selected,
+    guaranteeing system continuity.
+
+    PyO3 Bindings & Data Handoffs:
+    Real engines may interface with the `core/rust_pricing` layer to compute
+    advanced metrics via PyO3, abstracting the complex Rust structures behind standard Python interfaces.
     """
 
     @staticmethod

@@ -19,6 +19,9 @@ class NeuralPacket(BaseModel):
     """
     Standardized data packet for the V30 Neural Mesh.
     Wraps all inter-agent communication and frontend updates.
+
+    Usage Example:
+        packet = NeuralPacket(source_agent="MyAgent", packet_type="alert", payload={"k": "v"})
     """
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     timestamp: str = Field(default_factory=lambda: datetime.utcnow().isoformat())
@@ -122,6 +125,15 @@ async def websocket_mesh(websocket: WebSocket):
 
 # Helper for agents to emit into the mesh
 async def emit_packet(packet: NeuralPacket):
+    """
+    Helper for agents to emit a NeuralPacket into the mesh.
+
+    Args:
+        packet (NeuralPacket): The packet to broadcast.
+
+    Usage Example:
+        await emit_packet(NeuralPacket(source_agent="x", packet_type="info", payload={}))
+    """
     await mesh.broadcast(packet)
 
 if __name__ == "__main__":
