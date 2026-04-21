@@ -65,10 +65,12 @@ class LakehouseConnector(BaseTool):
 
             table_created = False
             if os.path.exists(parquet_path):
-                con.execute(f"CREATE VIEW financials AS SELECT * FROM read_parquet('{parquet_path}')")
+                escaped_path = parquet_path.replace("'", "''")
+                con.execute(f"CREATE VIEW financials AS SELECT * FROM read_parquet('{escaped_path}')")  # nosec B608
                 table_created = True
             elif os.path.exists(json_path):
-                con.execute(f"CREATE VIEW financials AS SELECT * FROM read_json_auto('{json_path}')")
+                escaped_path = json_path.replace("'", "''")
+                con.execute(f"CREATE VIEW financials AS SELECT * FROM read_json_auto('{escaped_path}')")  # nosec B608
                 table_created = True
 
             if table_created:

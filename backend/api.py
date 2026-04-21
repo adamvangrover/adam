@@ -5,6 +5,9 @@ import datetime
 import json
 import asyncio
 
+background_tasks = set()
+
+
 app = FastAPI(title="Adam v30 Telemetry API")
 
 # Mock database for historical evaluation logs
@@ -37,7 +40,9 @@ class ConnectionManager:
         for connection in self.active_connections:
             if connection != sender:
                 try:
-                    await connection.send_text(message)
+                    task = asyncio.create_task(connection.send_text(message))
+                    background_tasks.add(task)
+                    task.add_done_callback(background_tasks.discard)
                 except Exception as e:
                     print(f"Error sending message: {e}")
 
@@ -78,6 +83,86 @@ async def websocket_endpoint(websocket: WebSocket):
     except Exception as e:
         print(f"WebSocket error: {e}")
         manager.disconnect(websocket)
+
+
+
+
+class ClearanceRequest(BaseModel):
+    module_id: str
+    key: str
+
+@app.post("/api/v1/secure-payload")
+async def get_secure_payload(req: ClearanceRequest):
+    """
+    Mock endpoint for securely fetching gated content.
+    Requires a valid clearance key to return the decrypted payload.
+    """
+    VALID_KEYS = ["admin", "adam", "genesis"]
+
+    if req.key.lower().strip() not in VALID_KEYS:
+        return {"status": "error", "message": "ACCESS DENIED. INVALID KEY."}
+
+    # In a real system, we'd fetch the module content from the DB using module_id.
+    # For now, we return a mock success payload.
+    return {
+        "status": "success",
+        "payload": f"SECURE PAYLOAD FOR MODULE {req.module_id}\nDecryption successful."
+    }
+
+
+from pydantic import BaseModel
+from typing import List, Optional
+import os
+
+class MemoryInput(BaseModel):
+    content: str
+    category: str
+    tags: Optional[List[str]] = None
+
+@app.post("/api/v1/memory")
+async def add_memory(req: MemoryInput):
+    """
+    Stores memory logs from the UI or models.
+    """
+    try:
+        from core.memory.engine import MemoryEngine
+        engine = MemoryEngine()
+        engine.store_memory(content=req.content, category=req.category, tags=req.tags)
+        return {"status": "success", "message": "Memory stored."}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
+@app.get("/api/v1/memory")
+async def get_memories(query: str = "", limit: int = 10):
+    """
+    Fetches memories based on query.
+    """
+    try:
+        from core.memory.engine import MemoryEngine
+        engine = MemoryEngine()
+
+        if query:
+            results = engine.query_memory(query, limit)
+        else:
+            conn = engine._get_conn()
+            cursor = conn.cursor()
+            cursor.execute("SELECT content, category, tags, timestamp FROM memories ORDER BY timestamp DESC LIMIT ?", (limit,))
+            rows = cursor.fetchall()
+            engine._close_conn(conn)
+            import json
+            results = [
+                {
+                    "content": r[0],
+                    "category": r[1],
+                    "tags": json.loads(r[2]),
+                    "timestamp": r[3]
+                }
+                for r in rows
+            ]
+
+        return {"status": "success", "data": results}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
 
 if __name__ == "__main__":
     import uvicorn
