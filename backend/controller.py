@@ -114,6 +114,10 @@ class AdamCLIController:
 
                     await self.push_telemetry_event("RETRY_TRIGGERED", attempt, metrics, "FAIL", reason)
 
+                    # Exponential backoff before retry
+                    if attempt < self.max_retries:
+                        await asyncio.sleep(2 ** attempt)
+
                     # Construct modifier for next prompt
                     current_modifiers += f"\n[PREVIOUS FAILURE]: {reason}. Adjust accordingly."
 

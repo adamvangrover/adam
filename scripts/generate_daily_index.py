@@ -1,3 +1,4 @@
+import concurrent.futures
 import os
 import re
 import json
@@ -199,67 +200,63 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 </html>
 """
 
+def process_file(file_path):
+    module_regex = re.compile(r"const modules = \[\s*(.*?)\s*\];\n", re.DOTALL)
+    date_match = re.search(r'(\d{4}-\d{2}-\d{2})', file_path)
+    date_str = date_match.group(1) if date_match else "Unknown Date"
+    modules = []
+
+    try:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            file_content = f.read()
+
+            match = module_regex.search(file_content)
+            if match:
+                module_text = match.group(1)
+                blocks = re.split(r'\},\s*\{', module_text)
+
+                for block in blocks:
+                    block = block.strip().lstrip('{').rstrip('}')
+
+                    group_match = re.search(r'group:\s*["\'](.*?)["\']', block)
+                    title_match = re.search(r'title:\s*["\'](.*?)["\']', block)
+                    sub_match = re.search(r'subtitle:\s*["\'](.*?)["\']', block)
+                    content_match = re.search(r'content:\s*`(.*?)`', block, re.DOTALL)
+
+                    if group_match and title_match:
+                        raw_content = content_match.group(1) if content_match else ""
+                        clean_content = re.sub(r'<canvas.*?</canvas>', '[Interactive Canvas Removed]', raw_content, flags=re.DOTALL)
+                        clean_content = re.sub(r'<div class="w-full h-48 chart-container.*?</div>', '[Chart Removed]', clean_content, flags=re.DOTALL)
+
+                        modules.append({
+                            'date': date_str,
+                            'source_file': os.path.relpath(file_path, 'showcase/'),
+                            'group': group_match.group(1),
+                            'title': title_match.group(1),
+                            'subtitle': sub_match.group(1) if sub_match else "",
+                            'html': clean_content
+                        })
+    except Exception as e:
+        print(f"Error reading {file_path}: {e}")
+    return modules
+
 def extract_modules():
     all_modules = []
-
-    # Regex to find the const modules = [...] array
-    module_regex = re.compile(r"const modules = \[\s*(.*?)\s*\];\n", re.DOTALL)
-
     print("Parsing daily files...")
+    html_files = []
     for root, dirs, files in os.walk(ROOT_DIR):
         for file in files:
             if file.endswith(".html"):
-                file_path = os.path.join(root, file)
+                html_files.append(os.path.join(root, file))
 
-                date_match = re.search(r'(\d{4}-\d{2}-\d{2})', file_path)
-                date_str = date_match.group(1) if date_match else "Unknown Date"
+    with concurrent.futures.ProcessPoolExecutor() as executor:
+        results = executor.map(process_file, html_files)
+        for res_modules in results:
+            all_modules.extend(res_modules)
 
-                try:
-                    with open(file_path, 'r', encoding='utf-8') as f:
-                        content = f.read()
-
-                        # Find the module array text
-                        match = module_regex.search(content)
-                        if match:
-                            module_text = match.group(1)
-
-                            # Extremely hacky parsing of JS object literals to extract fields
-                            # A real JS parser would be better, but regex works for this specific templated format
-
-                            # Split by '}, {' to get rough module blocks
-                            blocks = re.split(r'\},\s*\{', module_text)
-
-                            for block in blocks:
-                                # Clean up edges
-                                block = block.strip().lstrip('{').rstrip('}')
-
-                                # Extract fields
-                                group_match = re.search(r'group:\s*["\'](.*?)["\']', block)
-                                title_match = re.search(r'title:\s*["\'](.*?)["\']', block)
-                                sub_match = re.search(r'subtitle:\s*["\'](.*?)["\']', block)
-
-                                # Extract content (between backticks)
-                                content_match = re.search(r'content:\s*`(.*?)`', block, re.DOTALL)
-
-                                if group_match and title_match and content_match:
-                                    # Strip script tags/canvas from content to make it displayable in masonry
-                                    raw_html = content_match.group(1)
-                                    clean_html = re.sub(r'<div class="w-full h-48 chart-container.*?</div>', '', raw_html, flags=re.DOTALL)
-                                    clean_html = re.sub(r'<canvas.*?</canvas>', '', clean_html, flags=re.DOTALL)
-
-                                    all_modules.append({
-                                        'date': date_str,
-                                        'source_file': os.path.relpath(file_path, 'showcase/'),
-                                        'group': group_match.group(1),
-                                        'title': title_match.group(1),
-                                        'subtitle': sub_match.group(1) if sub_match else "",
-                                        'html': clean_html
-                                    })
-                except Exception as e:
-                    print(f"Error parsing {file_path}: {e}")
-
-    # Sort by date descending
+    # Sort modules by date, descending
     all_modules.sort(key=lambda x: x['date'], reverse=True)
+
     return all_modules
 
 def generate_cards_html(modules):

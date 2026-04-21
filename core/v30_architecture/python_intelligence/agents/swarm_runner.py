@@ -71,4 +71,4 @@ async def start_swarm():
 
 if __name__ == "__main__":
     logger.info("Starting Swarm Runner & Neural Mesh v2...")
-    uvicorn.run(app, host="0.0.0.0", port=8001)  # nosec B104
+    uvicorn.run(app, host="127.0.0.1", port=8001)
