@@ -188,3 +188,10 @@
 **Vulnerability:** Fast API application was binding to all interfaces (0.0.0.0), exposing it to external networks unnecessarily.
 **Learning:** Found in `services/sentinel_api.py`. Uvicorn bound to 0.0.0.0 by default. It must be explicitly bound to 127.0.0.1 for local deployments.
 **Prevention:** Configure local APIs to bind to localhost (127.0.0.1) explicitly unless external access is required. Use bandit `uv run bandit` to scan for these risks.
+## 2026-04-17 - [The Documenter Executed]
+**Action:** Executed a comprehensive documentation sprint covering the v30 architecture, Engine factory, Daily Ritual scripts, React UI schemas, AOPL prompts, and Mock ecosystem.
+**Learning:** Systematic documentation mapping accelerates future context ingestion and solidifies architectural boundaries.
+
+## 2026-10-24 - [The Documenter Executed - Global Knowledge Base Update]
+**Action:** Applied "The Documenter" protocol across all major repository domains. Documented core architecture (`v30_architecture`, `EngineFactory`), operations scripts (`daily_ritual.py`, generation scripts), React Component Library (`MarketMayhem.tsx`), Dashboard Schemas, AOPL Structure, and the Static Mock Mode fallback.
+**Learning:** Comprehensive, inline documentation with concrete usage examples drastically improves the maintainability of complex, multi-agent systems and ensures graceful fallbacks (like Mock Mode) are properly utilized by future developers.

@@ -1,3 +1,14 @@
+"""
+generate_daily_index.py
+
+This script parses daily HTML transmission files located in the `ROOT_DIR` to extract
+metadata and JavaScript array structures (`const modules = [...]`). It then generates
+the interactive Adam Daily Hub dashboard (`showcase/adam_daily_hub.html`). The resulting
+dashboard includes a masonry grid layout and an 'insider access' authentication modal.
+
+Requirements:
+    - The source HTML files must contain the `const modules = [...]` structure.
+"""
 import concurrent.futures
 import os
 import re
@@ -104,7 +115,6 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         </div>
     </header>
 
-    <!-- Authentication Modal -->
     <div id="authModal" class="fixed inset-0 z-40 bg-term-bg/80 backdrop-blur-sm flex items-center justify-center">
         <div class="glass-card p-8 w-full max-w-md border-term-cyan/30 shadow-[0_0_30px_rgba(6,182,212,0.15)] relative overflow-hidden">
             <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-term-cyan to-transparent"></div>
@@ -135,7 +145,6 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         </div>
 
         <div class="masonry-grid" id="moduleGrid">
-            <!-- CARDS INJECTED HERE -->
             {CARDS_HTML}
         </div>
     </main>
@@ -201,6 +210,21 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 """
 
 def process_file(file_path):
+    # Dashboard Schemas:
+    # The generated daily HTML pages (like predictive_deep_dives.html) contain an embedded
+    # JavaScript array structure defined as 'const modules = [...]'.
+    # This structure must contain a dictionary with the following schema:
+    # {
+    #   'group': str,       // The categorization tag (e.g., 'SYSTEM STATUS', 'MARKET MAYHEM')
+    #   'title': str,       // The main title of the module card
+    #   'subtitle': str,    // The secondary subtitle/date
+    #   'content': str      // The raw HTML content (often containing raw data or charts) enclosed in backticks
+    # }
+    # This function parses these HTML files using regex to extract these
+    # elements, reformats them, and uses them to correctly render the dynamic masonry card grids
+    # and gated content modals in the interactive Adam Daily Hub UI.
+
+    # Regex to find the const modules = [...] array
     module_regex = re.compile(r"const modules = \[\s*(.*?)\s*\];\n", re.DOTALL)
     date_match = re.search(r'(\d{4}-\d{2}-\d{2})', file_path)
     date_str = date_match.group(1) if date_match else "Unknown Date"
@@ -240,6 +264,7 @@ def process_file(file_path):
         print(f"Error reading {file_path}: {e}")
     return modules
 
+
 def extract_modules():
     all_modules = []
     print("Parsing daily files...")
@@ -258,6 +283,7 @@ def extract_modules():
     all_modules.sort(key=lambda x: x['date'], reverse=True)
 
     return all_modules
+
 
 def generate_cards_html(modules):
     cards_html = ""

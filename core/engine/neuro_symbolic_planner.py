@@ -393,10 +393,15 @@ class NeuroSymbolicPlanner:
                         context={"user_intent": description}
                     )
                 else:
-                    # Sync fallback
-                    agent_result = self.default_agent.execute(
-                        target_data=target_data,
-                        context={"user_intent": description}
+                    # Async wrapper for sync fallback
+                    import asyncio
+                    import functools
+                    agent_result = await asyncio.to_thread(
+                        functools.partial(
+                            self.default_agent.execute,
+                            target_data=target_data,
+                            context={"user_intent": description}
+                        )
                     )
 
                 score = agent_result.get("overall_risk_score", "N/A")

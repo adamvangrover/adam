@@ -1,6 +1,24 @@
 import React, { useState } from 'react';
 import './MarketMayhem.css';
 
+/**
+ * MarketMayhem Component
+ * @component
+ *
+ * Description:
+ * Implements a 3-stage interactive workflow (Directory, Tearsheet, Drill-Down)
+ * to provide progressively granular market intelligence insights.
+ *
+ * @remarks
+ * **3-Stage Interactive Workflow:**
+ * 1. **Directory:** The high-level scanning view. Allows the user to toggle between macro themes
+ *    (e.g., 'Equity Landscape' vs 'Physical Truth') and observe broad market stresses or divergences.
+ * 2. **Tearsheet:** An intermediate, summarized view. Displays key metrics, trends, and top-level
+ *    narratives for specific assets or sectors selected from the Directory.
+ * 3. **Drill-Down:** Granular data transparency. Provides deep quantitative data, historical
+ *    comparisons, and raw technical indicators (e.g., RSI, MACD, Bollinger Bands) to support
+ *    the Tearsheet narrative.
+ */
 const MarketMayhem: React.FC = () => {
     const [viewMode, setViewMode] = useState<'euphoria' | 'credit'>('euphoria');
 

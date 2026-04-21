@@ -12,6 +12,27 @@ interface MarketPulse {
     timestamp: number;
 }
 
+// Bolt ⚡: Memoize SectorSentimentCell to prevent O(N) re-renders during frequent pulse updates
+const SectorSentimentCell = React.memo(({ k, v }: { k: string, v: any }) => (
+    <div style={{ marginBottom: '15px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px', fontSize: '0.9rem' }}>
+            <span>{k}</span>
+            <span style={{ color: v.sentiment > 0 ? '#0f0' : '#f00' }}>{v.trend.toUpperCase()}</span>
+        </div>
+        {/* Bar Chart */}
+        <div style={{ height: '6px', background: '#333', width: '100%', position: 'relative' }}>
+            <div style={{
+                position: 'absolute', top: 0, bottom: 0,
+                left: '50%',
+                width: `${Math.abs(v.sentiment * 50)}%`,
+                background: v.sentiment > 0 ? '#0f0' : '#f00',
+                transform: v.sentiment < 0 ? 'translateX(-100%)' : 'none'
+            }}></div>
+        </div>
+    </div>
+));
+SectorSentimentCell.displayName = 'SectorSentimentCell';
+
 // Protocol: ADAM-V-NEXT
 // Verified by Jules
 const Synthesizer: React.FC = () => {
@@ -245,22 +266,7 @@ const Synthesizer: React.FC = () => {
                     </h3>
                     <div style={{ marginTop: '20px' }}>
                         {pulse?.sectors && Object.entries(pulse.sectors).map(([k, v]: [string, any]) => (
-                            <div key={k} style={{ marginBottom: '15px' }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px', fontSize: '0.9rem' }}>
-                                    <span>{k}</span>
-                                    <span style={{ color: v.sentiment > 0 ? '#0f0' : '#f00' }}>{v.trend.toUpperCase()}</span>
-                                </div>
-                                {/* Bar Chart */}
-                                <div style={{ height: '6px', background: '#333', width: '100%', position: 'relative' }}>
-                                    <div style={{
-                                        position: 'absolute', top: 0, bottom: 0,
-                                        left: '50%',
-                                        width: `${Math.abs(v.sentiment * 50)}%`,
-                                        background: v.sentiment > 0 ? '#0f0' : '#f00',
-                                        transform: v.sentiment < 0 ? 'translateX(-100%)' : 'none'
-                                    }}></div>
-                                </div>
-                            </div>
+                            <SectorSentimentCell key={k} k={k} v={v} />
                         ))}
                     </div>
                 </div>
