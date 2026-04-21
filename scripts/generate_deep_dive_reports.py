@@ -1,3 +1,11 @@
+"""
+generate_deep_dive_reports.py
+
+This script generates quantitative deep dive reports for a predefined list of tickers
+by fetching historical market data via `yfinance` and calculating technical indicators.
+It outputs the synthesized reports as a JSON object assigned to `window.DEEP_DIVE_DATA`
+in `showcase/js/deep_dive_data.js`, which is subsequently loaded by frontend dashboards.
+"""
 import json
 import random
 import datetime

@@ -1,3 +1,14 @@
+"""
+generate_daily_index.py
+
+This script parses daily HTML transmission files located in the `ROOT_DIR` to extract
+metadata and JavaScript array structures (`const modules = [...]`). It then generates
+the interactive Adam Daily Hub dashboard (`showcase/adam_daily_hub.html`). The resulting
+dashboard includes a masonry grid layout and an 'insider access' authentication modal.
+
+Requirements:
+    - The source HTML files must contain the `const modules = [...]` structure.
+"""
 import os
 import re
 import json
@@ -200,8 +211,19 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 """
 
 def extract_modules():
-    # Dashboard Schemas: The extracted JavaScript array structures (const modules = [...])
-    # are required to correctly render masonry card grids and gated content modals in the UI.
+    # Dashboard Schemas:
+    # The generated daily HTML pages (like predictive_deep_dives.html) contain an embedded
+    # JavaScript array structure defined as 'const modules = [...]'.
+    # This structure must contain a dictionary with the following schema:
+    # {
+    #   'group': str,       // The categorization tag (e.g., 'SYSTEM STATUS', 'MARKET MAYHEM')
+    #   'title': str,       // The main title of the module card
+    #   'subtitle': str,    // The secondary subtitle/date
+    #   'content': str      // The raw HTML content (often containing raw data or charts) enclosed in backticks
+    # }
+    # This `extract_modules` function parses these HTML files using regex to extract these
+    # elements, reformats them, and uses them to correctly render the dynamic masonry card grids
+    # and gated content modals in the interactive Adam Daily Hub UI.
     all_modules = []
 
     # Regex to find the const modules = [...] array
