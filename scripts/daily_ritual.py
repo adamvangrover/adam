@@ -1,21 +1,3 @@
-"""
-Automated recursive execution wrapper for Protocol ARCHITECT_INFINITE.
-This script manages the daily system expansion logic, featuring regex-based output parsing
-and a resilient fallback using a functional MOCK_PAYLOAD if the LLM environment is unavailable.
-
-Protocol ARCHITECT_INFINITE:
-A purely additive biological growth protocol divided into four phases:
-1. Audit (Internal Scan) - Identifies weak links and missing agents.
-2. Harvest (External Research) - Researches new patterns and libraries.
-3. Build (Additive Manufacturing) - Generates a New Organ (feature), Neural Pathway (integration), or Cortex Expansion (test/doc).
-4. Memory (Documentation) - Logs rationale and updates dependencies.
-
-Regex-Based Parsing Logic:
-The `parse_and_apply` function uses strict regex patterns (e.g., `\\*\\*\\d+\\.\\s*FILE:\\s*([^*]+)\\*\\*\\s*\\`\\`\\`[a-zA-Z]*\\n(.*?)\\`\\`\\``) to reliably extract file paths and code blocks from the LLM's unstructured text output, converting them into actual files on the filesystem.
-
-MOCK_PAYLOAD Fallback Mechanism:
-If the `litellm` library is missing or all API calls fail, the `call_llm` function gracefully falls back to `MOCK_PAYLOAD`. This string contains a hardcoded, fully functional Crypto Arbitrage Agent and its test suite, ensuring the script always produces a valid, executable output for downstream CI/CD pipelines to consume even when offline.
-"""
 import os
 import re
 import datetime

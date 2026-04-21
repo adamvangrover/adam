@@ -57,7 +57,7 @@ class BaseAgent:
 
         Usage Example:
             await self.emit(packet_type="THOUGHT", payload={"status": "processing"})
-
+        """
         packet = NeuralPacket(
             source_agent=self.name,
             packet_type=packet_type,
