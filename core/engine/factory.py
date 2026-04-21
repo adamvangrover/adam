@@ -10,11 +10,13 @@ class EngineFactory:
 
     Graceful Fallback Mechanism:
     Defaults to LiveMockEngine if REAL engines fail or are not selected,
-    guaranteeing system continuity.
+    guaranteeing system continuity. This ensures that even if the primary Rust layer
+    fails to load, the system degrades gracefully without catastrophic failure.
 
     PyO3 Bindings & Data Handoffs:
     Real engines may interface with the `core/rust_pricing` layer to compute
     advanced metrics via PyO3, abstracting the complex Rust structures behind standard Python interfaces.
+    Data handoffs typically utilize standard primitive types to minimize serialization overhead between Python and Rust.
     """
 
     @staticmethod

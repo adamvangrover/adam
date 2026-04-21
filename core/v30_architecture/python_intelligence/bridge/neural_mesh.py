@@ -19,6 +19,7 @@ class NeuralPacket(BaseModel):
     """
     Standardized data packet for the V30 Neural Mesh.
     Wraps all inter-agent communication and frontend updates.
+    The NeuralMesh acts as an ephemeral cortex, routing these packets between agents and the UI.
 
     Usage Example:
         packet = NeuralPacket(source_agent="MyAgent", packet_type="alert", payload={"k": "v"})

@@ -3,7 +3,7 @@
 This document formalizes the aesthetic guidelines for the Adam frontend, embodying a "Bloomberg Terminal meets Cyberpunk" style.
 
 ## Core Aesthetic
-The overarching visual language balances institutional density (data-heavy, precise, utility-first) with cyberpunk accents (neon highlights, stark contrast, terminal-like interactivity).
+The overarching visual language balances institutional density (data-heavy, precise, utility-first) with cyberpunk accents (neon highlights, stark contrast, terminal-like interactivity). This aesthetic must be strictly adhered to when building new UI components to ensure visual consistency across the application.
 
 ## Color Palette
 *   **Backgrounds**: True black (`#000000`) and deep slate (`#0F172A`).

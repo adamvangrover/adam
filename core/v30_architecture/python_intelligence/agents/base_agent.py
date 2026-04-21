@@ -29,8 +29,12 @@ class BaseAgent:
             def __init__(self):
                 super().__init__(name="Agent-X", role="Analyzer")
 
-            async def run(self):
-                await self.emit("THOUGHT", {"msg": "analyzing"})
+            async def run(self, input_data: dict):
+                # Agents perform their specific operational logic
+                result = self._process_data(input_data)
+
+                # Agents broadcast their state/results to the mesh using emit()
+                await self.emit("THOUGHT", {"msg": "analyzing", "output": result})
     """
     def __init__(self, name: str, role: str):
         """

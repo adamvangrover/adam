@@ -8,7 +8,7 @@ The `v30` architecture focuses on distributed, asynchronous intelligence. Agents
 
 ### BaseAgent Implementations
 
-All operational agents inherit from `BaseAgent` (`core/v30_architecture/python_intelligence/agents/base_agent.py`), which provides standardized telemetry and NeuralMesh integration.
+All operational agents inherit from `BaseAgent` (`core/v30_architecture/python_intelligence/agents/base_agent.py`), which provides standardized telemetry and NeuralMesh integration. This standardized base class ensures that all agents, regardless of their specific domain (e.g., risk analysis, market scanning), can uniformly broadcast their state and findings.
 
 **Usage Example:**
 ```python
@@ -19,8 +19,11 @@ class MyCustomAgent(BaseAgent):
         super().__init__(name="CustomAgent01", role="Specialized Analyzer")
 
     async def execute_task(self, data):
-        # ... logic ...
-        await self.emit(packet_type="THOUGHT", payload={"status": "processing"})
+        # Implement agent-specific logic here
+        processed_data = data * 2
+
+        # Asynchronously emit telemetry to the NeuralMesh
+        await self.emit(packet_type="THOUGHT", payload={"status": "processing", "result": processed_data})
 ```
 
 ### NeuralMesh Interactions
