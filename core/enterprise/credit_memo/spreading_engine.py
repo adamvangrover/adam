@@ -1,4 +1,9 @@
 from typing import Dict, List, Any
+import logging
+try:
+    import yfinance as yf
+except ImportError:
+    yf = None
 from .model import FinancialSpread, DCFAnalysis, CreditRating, DebtFacility, EquityMarketData, PDModel, LGDAnalysis, Scenario, ScenarioAnalysis, SystemTwoCritique, CreditMemo, RepaymentScheduleItem, PeerComp, AuditLogEntry
 import random
 import uuid
@@ -531,8 +536,31 @@ class SpreadingEngine:
 
     def get_equity_data(self, borrower_name: str) -> EquityMarketData:
         """
-        Returns mock equity market data.
+        Returns equity market data. Uses yfinance if available, otherwise mocks.
         """
+        if yf is not None:
+            try:
+                ticker_str = borrower_name.split()[0]
+                if "apple" in borrower_name.lower(): ticker_str = "AAPL"
+                elif "tesla" in borrower_name.lower(): ticker_str = "TSLA"
+                elif "jpmorgan" in borrower_name.lower(): ticker_str = "JPM"
+
+                ticker = yf.Ticker(ticker_str)
+                info = ticker.info
+                if "currentPrice" in info:
+                    return EquityMarketData(
+                        market_cap=info.get("marketCap", 0.0) / 1000000,
+                        share_price=info.get("currentPrice", 0.0),
+                        volume_avg_30d=info.get("averageVolume", 0.0),
+                        pe_ratio=info.get("trailingPE", 0.0),
+                        dividend_yield=info.get("dividendYield", 0.0),
+                        beta=info.get("beta", 1.0)
+                    )
+            except Exception as e:
+                import logging
+                logging.getLogger(__name__).warning(f"yfinance failed for {borrower_name}: {e}. Falling back to mock data.")
+
+        # Mock logic
         name = borrower_name.lower()
 
         if "apple" in name:

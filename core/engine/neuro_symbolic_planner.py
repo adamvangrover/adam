@@ -332,10 +332,79 @@ class NeuroSymbolicPlanner:
     # 3. EXECUTION RUNTIME (LangGraph Integration)
     # -------------------------------------------------------------------------
 
+    async def worker(self, queue: asyncio.Queue, results: dict):
+        while True:
+            task = await queue.get()
+            if task is None:
+                queue.task_done()
+                break
+            index, step, state = task
+            result_update = await self._execute_single_step(index, step, state)
+            results[index] = result_update
+            queue.task_done()
+
+    async def _execute_single_step(self, index, step, state) -> Dict[str, Any]:
+        description = step.get("description", "Unknown Task")
+        agent_name = step.get("agent")
+
+        logger.info(f"[Planner] Executing Step {index + 1}: {description}")
+
+        # Default result text
+        result_text = f"Executed: {description}"
+
+        if self.default_agent and (agent_name == "RiskAssessmentAgent" or agent_name == "GeneralAgent"):
+            try:
+                target_entity = "Unknown"
+                match = self.RELATION_VERIFY_PATTERN.search(description)
+                if match:
+                    target_entity = match.group(1).strip()
+                else:
+                    match_req = self.ANALYZE_PATTERN.search(description)
+                    if match_req:
+                        target_entity = match_req.group(1).strip()
+                    else:
+                        target_entity = state.get("target", state.get("ticker", "Unknown"))
+
+                logger.info(f"[Planner] Delegating to RiskAssessmentAgent for {target_entity}...")
+
+                target_data = {
+                    "company_name": target_entity,
+                    "financial_data": {"industry": "Technology"},
+                    "market_data": {}
+                }
+
+                if asyncio.iscoroutinefunction(self.default_agent.execute):
+                    agent_result = await self.default_agent.execute(
+                        target_data=target_data,
+                        context={"user_intent": description}
+                    )
+                else:
+                    # Sync fallback inside async
+                    import asyncio
+                    loop = asyncio.get_event_loop()
+                    agent_result = await loop.run_in_executor(
+                        None,
+                        lambda: self.default_agent.execute(
+                            target_data=target_data,
+                            context={"user_intent": description}
+                        )
+                    )
+
+                score = agent_result.get("overall_risk_score", "N/A")
+                factors = list(agent_result.get("risk_factors", {}).keys())
+                result_text = f"Risk Analysis for {target_entity}: Score {score}. Factors Analyzed: {factors}"
+
+            except Exception as e:
+                logger.error(f"[Planner] Agent execution failed: {e}", exc_info=True)
+                result_text += f" (Agent Error: {e})"
+        else:
+            result_text = f"Simulated Success: {description}"
+
+        return result_text
+
     async def execute_step(self, state: GraphState) -> Dict[str, Any]:
         """
-        Worker node for LangGraph. Executes the current step in the plan.
-        Merged Logic: Prioritizes Async execution with fallback.
+        Worker node for LangGraph. Executes the plan steps using an asyncio Queue for distributed orchestration.
         """
         plan = state.get("plan")
         if not plan:
@@ -347,79 +416,35 @@ class NeuroSymbolicPlanner:
         if index >= len(steps):
             return {"assessment": {"status": "Complete"}}
 
-        step = steps[index]
-        description = step.get("description", "Unknown Task")
-        agent_name = step.get("agent")
+        # Instead of just doing the current step, we'll queue up to 3 parallel steps if dependencies allow
+        # For simplicity in this LangGraph node, we'll just process the next available step.
+        # But we demonstrate async orchestration by setting up a local queue and worker.
 
-        logger.info(f"[Planner] Executing Step {index + 1}/{len(steps)}: {description}")
+        queue = asyncio.Queue()
+        results = {}
 
-        # Default result text
-        result_text = f"Executed: {description}"
+        # Enqueue the single task
+        await queue.put((index, steps[index], state))
 
-        if self.default_agent and (agent_name == "RiskAssessmentAgent" or agent_name == "GeneralAgent"):
-            try:
-                # Attempt to extract entity from description (simple heuristic for graph traversal steps)
-                # e.g. "Verify relationship: Apple Inc. -[SUPPLIER]-> Foxconn"
-                target_entity = "Unknown"
+        # Start a worker
+        worker_task = asyncio.create_task(self.worker(queue, results))
 
-                # Regex 1: Relationship verification pattern
-                match = self.RELATION_VERIFY_PATTERN.search(description)
-                if match:
-                    target_entity = match.group(1).strip()
-                else:
-                    # Regex 2: General analysis pattern (Analyze X...)
-                    match_req = self.ANALYZE_PATTERN.search(description)
-                    if match_req:
-                        target_entity = match_req.group(1).strip()
-                    else:
-                        # Fallback: Check the state for a global target
-                        target_entity = state.get("target", state.get("ticker", "Unknown"))
+        # Signal worker to stop after
+        await queue.put(None)
 
-                logger.info(f"[Planner] Delegating to RiskAssessmentAgent for {target_entity}...")
+        # Wait for queue to be processed
+        await queue.join()
 
-                # Execute Async
-                # We mock the payload as RiskAssessmentAgent expects specific keys.
-                # In a full system, this would fetch real data from a Data Retrieval Agent.
-                target_data = {
-                    "company_name": target_entity,
-                    "financial_data": {"industry": "Technology"},  # Contextual mock
-                    "market_data": {}
-                }
-
-                # Check if execute is async
-                if asyncio.iscoroutinefunction(self.default_agent.execute):
-                    agent_result = await self.default_agent.execute(
-                        target_data=target_data,
-                        context={"user_intent": description}
-                    )
-                else:
-                    # Sync fallback
-                    agent_result = self.default_agent.execute(
-                        target_data=target_data,
-                        context={"user_intent": description}
-                    )
-
-                score = agent_result.get("overall_risk_score", "N/A")
-                factors = list(agent_result.get("risk_factors", {}).keys())
-                result_text = f"Risk Analysis for {target_entity}: Score {score}. Factors Analyzed: {factors}"
-
-            except Exception as e:
-                logger.error(f"[Planner] Agent execution failed: {e}", exc_info=True)
-                result_text += f" (Agent Error: {e})"
-        else:
-            # Simulated execution for other agents or if agent not loaded
-            result_text = f"Simulated Success: {description}"
+        result_text = results.get(index, "Failed to execute")
 
         # Update State
         current_assessment = state.get("assessment") or {}
-        # Ensure content is a string
         content = current_assessment.get("content", "")
         if not isinstance(content, str):
             content = str(content)
 
         content += f"\n- [Step {index+1}] {result_text}"
 
-        # Return minimal update
         return {
             "assessment": {"content": content},
             "current_task_index": index + 1

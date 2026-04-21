@@ -1,4 +1,9 @@
 import networkx as nx
+import os
+try:
+    from neo4j import GraphDatabase
+except ImportError:
+    GraphDatabase = None
 import logging
 from typing import List, Dict, Any
 
@@ -9,7 +14,24 @@ class GraphEngine:
     """
     def __init__(self):
         self.graph = nx.Graph()
-        self._build_mock_graph()
+        self.neo4j_driver = None
+
+        uri = os.environ.get("NEO4J_URI")
+        user = os.environ.get("NEO4J_USER")
+        password = os.environ.get("NEO4J_PASSWORD")
+
+        if GraphDatabase and uri and user and password:
+            try:
+                self.neo4j_driver = GraphDatabase.driver(uri, auth=(user, password))
+                # Verify connectivity
+                self.neo4j_driver.verify_connectivity()
+                logging.getLogger(__name__).info("Successfully connected to Neo4j database. Using real graph engine.")
+            except Exception as e:
+                logging.getLogger(__name__).warning(f"Failed to connect to Neo4j ({e}). Falling back to mock graph.")
+                self.neo4j_driver = None
+                self._build_mock_graph()
+        else:
+            self._build_mock_graph()
 
     def _build_mock_graph(self):
         """
@@ -69,6 +91,31 @@ class GraphEngine:
         """
         Finds connected entities up to `depth`.
         """
+        if self.neo4j_driver:
+            try:
+                query = (
+                    "MATCH path = (n {name: $entity_name})-[*1..$depth]-(m) "
+                    "RETURN [node in nodes(path) | node.name] AS path, "
+                    "labels(m)[0] AS type, m.risk AS risk_level"
+                )
+                with self.neo4j_driver.session() as session:
+                    result = session.run(query, entity_name=entity_name, depth=depth)
+                    results = []
+                    for record in result:
+                        path = " -> ".join(record["path"])
+                        results.append({
+                            "entity": record["path"][-1],
+                            "type": record["type"],
+                            "risk_level": record["risk_level"],
+                            "path": path
+                        })
+                return results
+            except Exception as e:
+                logging.getLogger(__name__).warning(f"Neo4j query failed ({e}). Falling back to mock graph.")
+                # We do not switch to mock mid-query unless we build it first.
+                if len(self.graph.nodes) == 0:
+                    self._build_mock_graph()
+
         # Fuzzy match for demo if exact name not found
         target = entity_name
         if target not in self.graph:

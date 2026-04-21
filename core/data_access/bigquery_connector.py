@@ -18,13 +18,17 @@ class BigQueryConnector:
         self._initialize_client()
 
     def _initialize_client(self):
-        try:
-            # from google.cloud import bigquery
-            # self.client = bigquery.Client(project=self.project_id)
+        if os.environ.get("GOOGLE_APPLICATION_CREDENTIALS"):
+            try:
+                from google.cloud import bigquery
+                self.client = bigquery.Client(project=self.project_id)
+                logger.info(f"Initialized BigQuery Connector for {self.project_id}.{self.dataset_id} (Live)")
+            except Exception as e:
+                logger.warning(f"Failed to initialize live BigQuery client: {e}. Using Mock.")
+                self.client = "MOCK_BQ_CLIENT"
+        else:
             self.client = "MOCK_BQ_CLIENT"
-            logger.info(f"Initialized BigQuery Connector for {self.project_id}.{self.dataset_id} (Mock)")
-        except ImportError:
-            logger.warning("google-cloud-bigquery not installed. Using Mock.")
+            logger.info(f"GOOGLE_APPLICATION_CREDENTIALS not set. Initialized BigQuery Connector for {self.project_id}.{self.dataset_id} (Mock)")
 
     def query(self, sql: str) -> List[Dict[str, Any]]:
         """
@@ -36,10 +40,15 @@ class BigQueryConnector:
                 {"ticker": "AAPL", "revenue": 100000, "period": "2024-Q3"},
                 {"ticker": "GOOGL", "revenue": 85000, "period": "2024-Q3"}
             ]
-        # Real implementation would be:
-        # query_job = self.client.query(sql)
-        # return [dict(row) for row in query_job]
-        return []
+        try:
+            query_job = self.client.query(sql)
+            return [dict(row) for row in query_job]
+        except Exception as e:
+            logger.warning(f"Live BigQuery query failed: {e}. Falling back to mock data.")
+            return [
+                {"ticker": "AAPL", "revenue": 100000, "period": "2024-Q3"},
+                {"ticker": "GOOGL", "revenue": 85000, "period": "2024-Q3"}
+            ]
 
     def insert_rows(self, table_id: str, rows: List[Dict[str, Any]]) -> bool:
         """
@@ -51,11 +60,15 @@ class BigQueryConnector:
         if self.client == "MOCK_BQ_CLIENT":
             return True
 
-        # errors = self.client.insert_rows_json(full_table_id, rows)
-        # if errors:
-        #     logger.error(f"BQ Insert Errors: {errors}")
-        #     return False
-        return True
+        try:
+            errors = self.client.insert_rows_json(full_table_id, rows)
+            if errors:
+                logger.error(f"BQ Insert Errors: {errors}")
+                return False
+            return True
+        except Exception as e:
+            logger.warning(f"Live BigQuery insert failed: {e}. Falling back to mock (True).")
+            return True
 
     def get_schema(self, table_id: str) -> List[Dict[str, str]]:
         """

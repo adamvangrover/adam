@@ -4,6 +4,11 @@ from typing import Any
 import json
 import os
 import pandas as pd
+try:
+    from sqlalchemy import create_engine
+    from sqlalchemy.exc import SQLAlchemyError
+except ImportError:
+    create_engine = None
 import logging
 
 # Configure logger
@@ -44,7 +49,18 @@ class LakehouseConnector(BaseTool):
              logger.warning(f"SecurityViolation: Blocked unsafe SQL query: {sql_query}")
              return json.dumps({"error": "SecurityViolation: Only strict read-only SELECT statements are allowed."})
 
-        # SIMULATE CONNECTION FAILURE -> FALLBACK
+        # Try Real DB Connection
+        db_url = os.environ.get("DATABASE_URL")
+        if db_url and create_engine:
+            try:
+                engine = create_engine(db_url)
+                with engine.connect() as conn:
+                    df = pd.read_sql(sql_query, conn)
+                return "\n".join([json.dumps(record) for record in df.to_dict(orient="records")])
+            except Exception as e:
+                logger.warning(f"Real DB connection failed, falling back to mock: {e}")
+
+        # FALLBACK
         try:
             return self._query_local_lake(sql_query)
         except Exception as e:

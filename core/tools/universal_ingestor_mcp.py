@@ -3,6 +3,14 @@ from core.data_processing.universal_ingestor import UniversalIngestor, ArtifactT
 from typing import Any, Dict
 import json
 import os
+import logging
+
+logger = logging.getLogger(__name__)
+
+try:
+    from duckduckgo_search import DDGS
+except ImportError:
+    DDGS = None
 
 
 class UniversalIngestorMCP(BaseTool):
@@ -28,10 +36,24 @@ class UniversalIngestorMCP(BaseTool):
                 self.ingestor.process_file(query)
                 return json.dumps({"status": "Ingested", "path": query, "conviction": "High"})
 
-        # 2. Search Mode (Mock)
-        # In a real system, this would query Azure AI Search.
-        # Here, we return a mock JSONL string.
+        # 2. Search Mode
+        # Attempt real web search using DuckDuckGo
+        if DDGS is not None:
+            try:
+                with DDGS() as ddgs:
+                    results = list(ddgs.text(query, max_results=3))
+                if results:
+                    return json.dumps({
+                        "title": f"Web Search Results for {query}",
+                        "content": "\n".join([f"{r.get('title')}: {r.get('body')}" for r in results]),
+                        "source": "DuckDuckGo Web Search",
+                        "metadata": {"filter_used": filter, "raw_results": results},
+                        "conviction_score": 0.85
+                    })
+            except Exception as e:
+                logger.warning(f"Real web search failed for query '{query}': {e}. Falling back to mock search.")
 
+        # Graceful Fallback to Mock
         mock_result = {
             "title": f"Search Results for {query}",
             "content": "This is a verified source extracted via Universal Ingestor.",
