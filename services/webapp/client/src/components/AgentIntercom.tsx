@@ -13,6 +13,25 @@ interface Thought {
   conviction_score: number;
 }
 
+// Bolt ⚡: Memoize ThoughtRow to prevent O(N) re-renders
+const ThoughtRow = React.memo(({ t }: { t: Thought }) => (
+    <div style={{ marginBottom: '12px', borderLeft: `2px solid ${t.conviction_score > 0.8 ? '#0f0' : t.conviction_score > 0.5 ? '#ff0' : '#f00'}`, paddingLeft: '8px', opacity: 0.9, background: 'rgba(255,255,255,0.02)', borderRadius: '0 4px 4px 0', padding: '5px 8px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', color: '#888', marginBottom: '2px' }}>
+            <span style={{ color: '#0ff', fontWeight: 'bold' }}>[{t.agent_name}]</span>
+            <span>{new Date(t.timestamp).toLocaleTimeString()}</span>
+        </div>
+        <div style={{ color: '#e0e0e0' }}>
+            <span style={{ color: '#00f3ff', marginRight: '5px' }}>&gt;</span>{t.content}
+        </div>
+        {t.conviction_score !== undefined && (
+            <div style={{ fontSize: '0.65rem', color: t.conviction_score > 0.8 ? '#0f0' : '#aaa', marginTop: '4px', textAlign: 'right' }}>
+                Conviction: {(t.conviction_score * 100).toFixed(0)}%
+            </div>
+        )}
+    </div>
+));
+ThoughtRow.displayName = 'ThoughtRow';
+
 // Protocol: ADAM-V-NEXT
 // Verified by Jules
 const AgentIntercom: React.FC = () => {
@@ -185,20 +204,7 @@ const AgentIntercom: React.FC = () => {
               </div>
           ) : (
               filteredThoughts.map((t) => (
-                  <div key={t.id} style={{ marginBottom: '12px', borderLeft: `2px solid ${t.conviction_score > 0.8 ? '#0f0' : t.conviction_score > 0.5 ? '#ff0' : '#f00'}`, paddingLeft: '8px', opacity: 0.9, background: 'rgba(255,255,255,0.02)', borderRadius: '0 4px 4px 0', padding: '5px 8px' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', color: '#888', marginBottom: '2px' }}>
-                          <span style={{ color: '#0ff', fontWeight: 'bold' }}>[{t.agent_name}]</span>
-                          <span>{new Date(t.timestamp).toLocaleTimeString()}</span>
-                      </div>
-                      <div style={{ color: '#e0e0e0' }}>
-                          <span style={{ color: '#00f3ff', marginRight: '5px' }}>&gt;</span>{t.content}
-                      </div>
-                      {t.conviction_score !== undefined && (
-                          <div style={{ fontSize: '0.65rem', color: t.conviction_score > 0.8 ? '#0f0' : '#aaa', marginTop: '4px', textAlign: 'right' }}>
-                              Conviction: {(t.conviction_score * 100).toFixed(0)}%
-                          </div>
-                      )}
-                  </div>
+                  <ThoughtRow key={t.id} t={t} />
               ))
           )}
       </div>

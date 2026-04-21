@@ -1,0 +1,9 @@
+1. **Identify bottleneck**: The `AgentStatus.tsx` component iterates through `filteredAgents` array to render table rows inside a `<tbody/>`. Each row is a `<tr>` containing inline code that relies directly on `agent`. If `AgentStatus` re-renders (which could be triggered by updates to `AuditLogViewer` below it or other global state changes), all `<tr>` elements and their children will be re-rendered unnecessarily even if the `agent` data remains unchanged.
+2. **Apply optimization**: Refactor the inline `<tr>` rendering into a separate `React.memo` component, like `AgentRow`.
+3. **Identify bottleneck 2**: The `Synthesizer.tsx` component iterates through `Object.entries(conviction)` to render heatmap cells. Each cell is a `<div>` with `Object.entries(conviction).map(([agent, val]) => ( ... ))`. If `Synthesizer.tsx` re-renders frequently (which it might due to `useSwarmSimulation` or `usePromptFeed` polling, or just general React state updates), all heatmap cells and their inner animated elements will re-render unnecessarily if their individual `val` hasn't changed.
+4. **Apply optimization 2**: Refactor the inline heatmap cell rendering into a separate `React.memo` component, like `ConvictionCell`.
+5. **Identify bottleneck 3**: The `AgentIntercom.tsx` component iterates through `filteredThoughts` to render thoughts. Each thought is a `<div>`. If `AgentIntercom.tsx` re-renders (e.g. from the stream polling, user typing in filter), all thought elements will re-render even if they didn't change.
+6. **Apply optimization 3**: Refactor the inline thought element into a separate `React.memo` component, like `ThoughtRow`.
+7. **Verify impact**: Ensure the components still render correctly. I will run linting and tests to ensure correctness.
+8. **Pre-commit**: Run pre-commit instructions.
+9. **Submit**: Create PR.
