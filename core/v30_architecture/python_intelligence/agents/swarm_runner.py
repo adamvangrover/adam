@@ -26,6 +26,10 @@ try:
     from core.v30_architecture.python_intelligence.agents.risk_guardian import RiskGuardian
     from core.v30_architecture.python_intelligence.agents.market_scanner import MarketScanner
     from core.agents.specialized.blindspot_agent import BlindspotAgent
+    # Sovereign Swarm Integration
+    from core.v30_architecture.python_intelligence.agents.sovereign_orchestrator import SovereignOrchestrator
+    from core.v30_architecture.python_intelligence.agents.adversarial_red_team import AdversarialRedTeamAgent
+    from core.v30_architecture.python_intelligence.agents.hardened_shield import HardenedShieldAgent
 except ImportError:
     # Fallback for local execution
     import sys
@@ -36,6 +40,11 @@ except ImportError:
     from risk_guardian import RiskGuardian
     from market_scanner import MarketScanner
     from core.agents.specialized.blindspot_agent import BlindspotAgent
+    # Sovereign Swarm Integration Fallback
+    from sovereign_orchestrator import SovereignOrchestrator
+    from adversarial_red_team import AdversarialRedTeamAgent
+    from hardened_shield import HardenedShieldAgent
+
 
 class SystemHealth(BaseAgent):
     def __init__(self):
@@ -47,7 +56,7 @@ class SystemHealth(BaseAgent):
                 payload = {
                     "cpu_usage": round(random.uniform(20, 80), 1),
                     "memory_usage": round(random.uniform(30, 60), 1),
-                    "active_agents": 4,
+                    "active_agents": 7, # Updated count
                     "mesh_latency_ms": int(random.uniform(5, 50))
                 }
 
@@ -60,13 +69,26 @@ class SystemHealth(BaseAgent):
 
 # --- Swarm Orchestration ---
 
-agents = [MarketScanner(), RiskGuardian(), SystemHealth(), QuantitativeAnalyst(), BlindspotAgent({})]
+agents = [
+    MarketScanner(),
+    RiskGuardian(),
+    SystemHealth(),
+    QuantitativeAnalyst(),
+    BlindspotAgent({}),
+    SovereignOrchestrator(),
+    AdversarialRedTeamAgent(),
+    HardenedShieldAgent()
+]
+
+# Ensure we maintain strong references to tasks
+_active_tasks = []
 
 @app.on_event("startup")
 async def start_swarm():
     logger.info("Initializing V30 Swarm Agents...")
     for agent in agents:
-        asyncio.create_task(agent.run())
+        task = asyncio.create_task(agent.run())
+        _active_tasks.append(task)
         logger.info(f"Launched {agent.name}")
 
 if __name__ == "__main__":
