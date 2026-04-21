@@ -3,25 +3,6 @@ import { dataManager, DataManifest } from '../utils/DataManager';
 import { Search } from 'lucide-react';
 import AuditLogViewer from '../components/AuditLogViewer';
 
-// Bolt ⚡: Memoize AgentRow to prevent O(N) re-renders when global state or unrelated filter inputs change.
-const AgentRow = React.memo(({ agent }: { agent: DataManifest['agents'][0] }) => (
-  <tr style={{ borderBottom: '1px solid #333', background: 'rgba(0,0,0,0.1)' }}>
-    <td style={{ padding: '10px', fontFamily: 'monospace', color: '#888' }}>{agent.id}</td>
-    <td style={{ padding: '10px', fontWeight: 'bold' }}>{agent.name}</td>
-    <td style={{ padding: '10px' }}>
-        <span style={{
-            color: agent.status === 'Active' ? '#0f0' : (agent.status === 'Processing' ? '#0ff' : '#888'),
-            border: `1px solid ${agent.status === 'Active' ? '#0f0' : (agent.status === 'Processing' ? '#0ff' : '#888')}`,
-            padding: '2px 6px', fontSize: '0.7rem', borderRadius: '2px'
-        }}>
-            {agent.status.toUpperCase()}
-        </span>
-    </td>
-    <td style={{ padding: '10px', color: '#aaa' }}>{agent.specialization}</td>
-  </tr>
-));
-AgentRow.displayName = 'AgentRow';
-
 const AgentStatus: React.FC = () => {
   const [agents, setAgents] = useState<DataManifest['agents']>([]);
   const [filter, setFilter] = useState('');
@@ -81,7 +62,20 @@ const AgentStatus: React.FC = () => {
           </thead>
           <tbody>
             {filteredAgents.map(agent => (
-              <AgentRow key={agent.id} agent={agent} />
+              <tr key={agent.id} style={{ borderBottom: '1px solid #333', background: 'rgba(0,0,0,0.1)' }}>
+                <td style={{ padding: '10px', fontFamily: 'monospace', color: '#888' }}>{agent.id}</td>
+                <td style={{ padding: '10px', fontWeight: 'bold' }}>{agent.name}</td>
+                <td style={{ padding: '10px' }}>
+                    <span style={{
+                        color: agent.status === 'Active' ? '#0f0' : (agent.status === 'Processing' ? '#0ff' : '#888'),
+                        border: `1px solid ${agent.status === 'Active' ? '#0f0' : (agent.status === 'Processing' ? '#0ff' : '#888')}`,
+                        padding: '2px 6px', fontSize: '0.7rem', borderRadius: '2px'
+                    }}>
+                        {agent.status.toUpperCase()}
+                    </span>
+                </td>
+                <td style={{ padding: '10px', color: '#aaa' }}>{agent.specialization}</td>
+              </tr>
             ))}
           </tbody>
         </table>
