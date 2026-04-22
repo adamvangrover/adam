@@ -18,6 +18,7 @@ except ImportError:
         sys.path.insert(0, repo_root)
     from core.v30_architecture.python_intelligence.bridge.neural_mesh import NeuralPacket, emit_packet
 
+
 class BaseAgent:
     """
     The foundational agent class for the v30 architecture.
@@ -47,7 +48,7 @@ class BaseAgent:
         self.name = name
         self.role = role
 
-    async def emit(self, packet_type: str, payload: dict):
+    async def emit(self, packet_type: str, payload: dict, **kwargs):
         """
         Asynchronously emit a telemetry packet to the NeuralMesh.
 
