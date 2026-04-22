@@ -5,7 +5,7 @@ import os
 import hashlib
 import time
 import urllib.request
-import xml.etree.ElementTree as ET
+import defusedxml.ElementTree as ET
 import threading
 from typing import List, Dict, Any, Tuple, Optional
 from pydantic import BaseModel
@@ -402,9 +402,13 @@ class NewsBotAgent(BaseAgent):
     def _fetch_rss_feeds(self) -> List[Dict[str, str]]:
         data = []
         rss_url = "https://feeds.finance.yahoo.com/rss/2.0/headline?s=AAPL,TSLA,MSFT&region=US&lang=en-US"
+        if not rss_url.startswith("https://"):
+            logger.error(f"Insecure URL scheme rejected: {rss_url}")
+            return data
+
         try:
             req = urllib.request.Request(rss_url, headers={'User-Agent': 'Mozilla/5.0'})
-            with urllib.request.urlopen(req, timeout=5) as response:
+            with urllib.request.urlopen(req, timeout=5) as response:  # nosec B310
                 xml_content = response.read()
                 root = ET.fromstring(xml_content)
                 for item in root.findall('./channel/item')[:5]:
