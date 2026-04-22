@@ -10,6 +10,13 @@ from core.unified_ledger.schema import ChildOrder, OrderSide, OrderType, Executi
 
 logger = logging.getLogger(__name__)
 
+try:
+    import rust_pricing
+    RUST_AVAILABLE = True
+except ImportError:
+    RUST_AVAILABLE = False
+    logger.warning("rust_pricing module not found. Falling back to pure Python implementation for MatchingEngine.")
+
 class OrderBook:
     def __init__(self, symbol: str):
         self.symbol = symbol
@@ -199,50 +206,90 @@ class OrderBook:
 class MatchingEngine:
     """
     Manages order books for multiple symbols.
+    Utilizes Rust bindings for deterministic, sub-millisecond execution if available.
     """
     def __init__(self):
-        self.books: Dict[str, OrderBook] = {}
+        if RUST_AVAILABLE:
+            try:
+                self.rust_engine = rust_pricing.RustMatchingEngine()
+                self.use_rust = True
+                logger.info("Successfully initialized RustMatchingEngine.")
+            except Exception as e:
+                logger.error(f"Failed to initialize RustMatchingEngine: {e}. Falling back to Python.")
+                self.use_rust = False
+                self.books: Dict[str, OrderBook] = {}
+        else:
+            self.use_rust = False
+            self.books: Dict[str, OrderBook] = {}
 
     def cancel_order(self, symbol: str, order_id: UUID) -> bool:
-        if symbol in self.books:
-            return self.books[symbol].cancel_order(order_id)
-        return False
+        if self.use_rust:
+            return self.rust_engine.cancel_order(symbol, str(order_id))
+        else:
+            if symbol in self.books:
+                return self.books[symbol].cancel_order(order_id)
+            return False
 
     def process_order(self, order: ChildOrder) -> Dict:
-        if order.symbol not in self.books:
-            self.books[order.symbol] = OrderBook(order.symbol)
+        if self.use_rust:
+            order_dict = {
+                "order_id": str(order.order_id),
+                "symbol": order.symbol,
+                "side": order.side.value,
+                "quantity": order.quantity,
+                "price": order.price,
+                "order_type": order.order_type.value,
+                "status": order.status,
+                "filled_quantity": order.filled_quantity,
+            }
+            try:
+                result = self.rust_engine.process_order(order_dict)
 
-        book = self.books[order.symbol]
-        fills = book.add_order(order)
+                # Update the original order object based on the result
+                order.status = result.get("status", order.status)
+                order.filled_quantity = result.get("filled_quantity", order.filled_quantity)
+                if "average_fill_price" in result:
+                    order.average_fill_price = result["average_fill_price"]
 
-        # Calculate average fill price
-        total_fill_cost = 0.0
-        total_fill_qty = 0.0
+                return result
+            except Exception as e:
+                logger.error(f"Rust process_order failed: {e}. Order not processed properly.")
+                raise e
+        else:
+            if order.symbol not in self.books:
+                self.books[order.symbol] = OrderBook(order.symbol)
 
-        processed_fills = []
+            book = self.books[order.symbol]
+            fills = book.add_order(order)
 
-        for matched_order, qty in fills:
-            price = matched_order.price # Limit price of maker
-            cost = price * qty
-            total_fill_cost += cost
-            total_fill_qty += qty
-            processed_fills.append({
-                "maker_order_id": str(matched_order.order_id),
-                "taker_order_id": str(order.order_id),
-                "price": price,
-                "quantity": qty,
-                "timestamp": datetime.utcnow().isoformat()
-            })
+            # Calculate average fill price
+            total_fill_cost = 0.0
+            total_fill_qty = 0.0
 
-        if total_fill_qty > 0:
-            avg_price = total_fill_cost / total_fill_qty
-            order.average_fill_price = avg_price
-            order.status = "FILLED" if order.filled_quantity >= order.quantity else "PARTIALLY_FILLED"
+            processed_fills = []
 
-        return {
-            "order_id": str(order.order_id),
-            "symbol": order.symbol,
-            "status": order.status,
-            "filled_quantity": order.filled_quantity,
-            "fills": processed_fills
-        }
+            for matched_order, qty in fills:
+                price = matched_order.price # Limit price of maker
+                cost = price * qty
+                total_fill_cost += cost
+                total_fill_qty += qty
+                processed_fills.append({
+                    "maker_order_id": str(matched_order.order_id),
+                    "taker_order_id": str(order.order_id),
+                    "price": price,
+                    "quantity": qty,
+                    "timestamp": datetime.utcnow().isoformat()
+                })
+
+            if total_fill_qty > 0:
+                avg_price = total_fill_cost / total_fill_qty
+                order.average_fill_price = avg_price
+                order.status = "FILLED" if order.filled_quantity >= order.quantity else "PARTIALLY_FILLED"
+
+            return {
+                "order_id": str(order.order_id),
+                "symbol": order.symbol,
+                "status": order.status,
+                "filled_quantity": order.filled_quantity,
+                "fills": processed_fills
+            }
