@@ -1,9 +1,11 @@
 use pyo3::prelude::*;
 
 mod pricing;
-use pricing::{MarketParams, calculate_quotes};
+mod matching;
 
-#[pyfunction]
+use pricing::{MarketParams, calculate_quotes};
+use matching::RustMatchingEngine;
+
 /// Calculates market quotes based on provided market parameters and liquidity mechanics.
 /// Exposes functionality to the Python layer via PyO3.
 #[pyfunction]
@@ -22,5 +24,6 @@ fn get_quotes(mid_price: f64, volatility: f64, inventory: f64, risk_aversion: f6
 #[pymodule]
 fn rust_pricing(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(get_quotes, m)?)?;
+    m.add_class::<RustMatchingEngine>()?;
     Ok(())
 }
