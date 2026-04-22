@@ -30,6 +30,7 @@ try:
     from core.v30_architecture.python_intelligence.agents.sovereign_orchestrator import SovereignOrchestrator
     from core.v30_architecture.python_intelligence.agents.adversarial_red_team import AdversarialRedTeamAgent
     from core.v30_architecture.python_intelligence.agents.hardened_shield import HardenedShieldAgent
+    from core.v30_architecture.python_intelligence.agents.market_sentiment_agent import MarketSentimentAgent
 except ImportError:
     # Fallback for local execution
     import sys
@@ -44,6 +45,7 @@ except ImportError:
     from sovereign_orchestrator import SovereignOrchestrator
     from adversarial_red_team import AdversarialRedTeamAgent
     from hardened_shield import HardenedShieldAgent
+    from market_sentiment_agent import MarketSentimentAgent
 
 
 class SystemHealth(BaseAgent):
@@ -77,7 +79,8 @@ agents = [
     BlindspotAgent({}),
     SovereignOrchestrator(),
     AdversarialRedTeamAgent(),
-    HardenedShieldAgent()
+    HardenedShieldAgent(),
+    MarketSentimentAgent()
 ]
 
 # Ensure we maintain strong references to tasks
