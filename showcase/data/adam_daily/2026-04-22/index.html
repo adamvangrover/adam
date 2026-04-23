@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Predictive Deep Dives | Adam v30 Terminal</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
+
+        :root {
+            --bg-dark: #050505;
+            --bg-panel: #0a0a0a;
+            --bg-card: #111111;
+            --neon-green: #00ff41;
+            --neon-blue: #00f3ff;
+            --neon-red: #ff003c;
+            --warning-orange: #ffaa00;
+            --text-main: #e0e0e0;
+            --text-muted: #666;
+            --border-color: #222;
+        }
+        
+        body {
+            font-family: 'JetBrains Mono', 'Courier New', Courier, monospace;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.5;
+            overflow-x: hidden;
+        }
+
+        /* CRT Scanline Overlay */
+        body::after {
+            content: " ";
+            display: block;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.15) 50%);
+            background-size: 100% 4px;
+            z-index: 999;
+            pointer-events: none;
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        h1.main-title {
+            color: var(--neon-blue);
+            text-transform: uppercase;
+            text-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
+            margin: 0;
+            font-size: 1.8em;
+            letter-spacing: 1px;
+        }
+        
+        .sys-clock {
+            color: var(--neon-green);
+            font-size: 0.9em;
+            background: rgba(0, 255, 65, 0.1);
+            padding: 5px 10px;
+            border: 1px solid var(--neon-green);
+        }
+
+        /* Scenario Controls */
+        .scenario-bar {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .scenario-btn {
+            background: transparent;
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            padding: 8px 16px;
+            font-family: inherit;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+        }
+
+        .scenario-btn:hover {
+            background: rgba(255,255,255,0.05);
+        }
+
+        .scenario-btn.active.base { border-color: var(--neon-green); color: var(--neon-green); box-shadow: 0 0 12px rgba(0,255,65,0.2); background: rgba(0,255,65,0.05); }
+        .scenario-btn.active.stress { border-color: var(--warning-orange); color: var(--warning-orange); box-shadow: 0 0 12px rgba(255,170,0,0.2); background: rgba(255,170,0,0.05); }
+        .scenario-btn.active.severe { border-color: var(--neon-red); color: var(--neon-red); box-shadow: 0 0 12px rgba(255,0,60,0.2); background: rgba(255,0,60,0.05); }
+        
+        .container {
+            display: flex;
+            flex-direction: row;
+            gap: 20px;
+        }
+        
+        .main-col {
+            flex: 2;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            min-width: 0; 
+        }
+        
+        .side-col {
+            flex: 1;
+            background-color: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            padding: 15px;
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        /* Sensitivity Matrix */
+        .matrix-panel {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            padding: 20px;
+        }
+
+        table.sensitivity-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.9em;
+        }
+
+        table.sensitivity-table th {
+            color: var(--neon-blue);
+            border-bottom: 1px solid var(--border-color);
+            padding: 10px 8px;
+            vertical-align: bottom;
+        }
+
+        table.sensitivity-table td {
+            padding: 10px 8px;
+            border-bottom: 1px dashed #222;
+        }
+
+        table.sensitivity-table tr:hover td {
+            background: rgba(255,255,255,0.03);
+        }
+
+        /* Cards Grid */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+            gap: 20px;
+        }
+
+        .report-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-left-width: 4px;
+            border-left-style: solid;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.3s ease;
+            position: relative;
+        }
+
+        .report-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.5);
+            z-index: 10;
+        }
+        
+        .report-card h2 { margin-top: 0; margin-bottom: 5px; font-size: 1.4em; }
+        .report-card h3 { font-size: 1em; border-bottom: 1px solid var(--border-color); padding-bottom: 5px; margin-top: 15px; margin-bottom: 10px; }
+        
+        /* Pricing Block */
+        .pricing-block {
+            background: rgba(0,0,0,0.6);
+            border: 1px dashed var(--border-color);
+            border-radius: 4px;
+            padding: 12px;
+            margin: 15px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .price-col {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .price-label { font-size: 0.7em; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px;}
+        .price-val { font-size: 1.2em; font-weight: bold; }
+        
+        .dislocation-badge {
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-size: 0.9em;
+            font-weight: bold;
+            background: rgba(255,0,60,0.1);
+            border: 1px solid var(--neon-red);
+            color: var(--neon-red);
+        }
+
+        .dislocation-badge.positive {
+            background: rgba(0,255,65,0.1);
+            border-color: var(--neon-green);
+            color: var(--neon-green);
+        }
+
+        /* Capital Stack Table */
+        .cap-stack-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            margin-bottom: 15px;
+            font-size: 0.8em;
+            background: rgba(0,0,0,0.5);
+        }
+
+        .cap-stack-table th {
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border-color);
+            padding: 6px;
+            text-align: left;
+            font-weight: normal;
+        }
+
+        .cap-stack-table td {
+            padding: 6px;
+            border-bottom: 1px dashed #222;
+            color: var(--text-main);
+        }
+
+        ul { padding-left: 20px; margin-bottom: 0; }
+        li { margin-bottom: 8px; line-height: 1.4; font-size: 0.85em; color: var(--text-main); }
+        
+        .text-muted { color: var(--text-muted); font-size: 0.9em; }
+
+        /* ML Data Block */
+        .ml-data-block { margin-bottom: 25px; position: relative; }
+        .ml-data-block-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+        .ml-data-block strong { color: var(--neon-blue); font-size: 0.9em; }
+
+        .copy-btn {
+            background: transparent;
+            border: 1px solid var(--neon-blue);
+            color: var(--neon-blue);
+            font-family: inherit;
+            font-size: 0.75em;
+            padding: 3px 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .copy-btn:hover {
+            background: var(--neon-blue);
+            color: var(--bg-dark);
+        }
+        
+        pre {
+            background-color: #000;
+            color: var(--neon-blue);
+            padding: 10px;
+            overflow-x: auto;
+            border: 1px solid #222;
+            font-size: 0.75em;
+            margin-top: 5px;
+        }
+
+        /* Animations */
+        @keyframes blink {
+            0%, 100% { opacity: 1; text-shadow: 0 0 10px var(--neon-red); }
+            50% { opacity: 0.5; text-shadow: none; }
+        }
+
+        /* Responsive */
+        @media (max-width: 1000px) {
+            .container { flex-direction: column; }
+            .side-col { position: static; max-height: none; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1 class="main-title">v30 Terminal: Predictive Deep Dives</h1>
+        <div class="sys-clock" id="clock">Loading Time...</div>
+    </header>
+
+    <div class="scenario-bar">
+        <strong style="color: var(--neon-blue); font-size: 1.1em; letter-spacing: 1px;">MACRO SCENARIO:</strong>
+        <button class="scenario-btn active base" id="btn-base" onclick="setScenario('base')">[ BASE ] HY Spread: 284 bps</button>
+        <button class="scenario-btn stress" id="btn-stress" onclick="setScenario('stress')">[ STRESS ] HY Spread: 584 bps</button>
+        <button class="scenario-btn severe" id="btn-severe" onclick="setScenario('severe')">[ SEVERE ] HY Spread: 884+ bps</button>
+    </div>
+
+    <div class="container">
+        <!-- Main Left Column -->
+        <div class="main-col">
+            <!-- Matrix Panel -->
+            <div class="matrix-panel" id="matrix-container">
+                <!-- Injected via JS -->
+            </div>
+
+            <!-- Cards Grid -->
+            <div class="cards-grid" id="cards-container">
+                <!-- Injected via JS -->
+            </div>
+        </div>
+
+        <!-- ML Side Column -->
+        <div class="side-col" id="ml-container">
+            <!-- Injected via JS -->
+        </div>
+    </div>
+
+    <script>
+        // Ultimate Merged Data Structure: Equity pricing + Capital Stack tranches
+        const data = [
+            {
+                ticker: "QRTEA",
+                name: "QVC Group",
+                filing: "Chapter 11 (Apr 16, 2026)",
+                catalyst: "RSA Executed, $3B+ Debt",
+                cash: "DIP Financing",
+                currentPrice: 0.45,
+                fairValue: { base: 0.15, stress: 0.05, severe: 0.00 },
+                baseScore: 99,
+                capitalStack: [
+                    { tranche: "DIP Facility", price: "99.0c", val: "100.0c" },
+                    { tranche: "1L Secured Term", price: "64.5c", val: "70.0c" },
+                    { tranche: "Unsecured Notes '27", price: "4.2c", val: "2.0c" }
+                ],
+                scenarios: {
+                    base: ["Operating under Chapter 11 with Restructuring Support Agreement.", "Focus on inventory liquidation and vendor term negotiations."],
+                    stress: ["Risk of DIP financing covenant breaches as retail environment weakens.", "Store closures accelerate; severe headcount reductions."],
+                    severe: ["Total failure of restructuring plan.", "Immediate conversion to Chapter 7 liquidation."]
+                }
+            },
+            {
+                ticker: "FLYE",
+                name: "Fly-E Group",
+                filing: "10-Q (Going Concern)",
+                catalyst: "Forbearance Expiration",
+                cash: "$295K vs $5.5M Debt",
+                currentPrice: 0.18,
+                fairValue: { base: 0.05, stress: 0.00, severe: 0.00 },
+                baseScore: 88,
+                capitalStack: [
+                    { tranche: "Peapack Bank Loan", price: "N/A", val: "65.0c" },
+                    { tranche: "Trade Payables", price: "Illiquid", val: "20.0c" }
+                ],
+                scenarios: {
+                    base: ["Imminent Chapter 11 risk due to expired March forbearance.", "Extreme equity dilution via reverse splits."],
+                    stress: ["Asset foreclosure initiated by Peapack-Gladstone Bank.", "Section 363 asset sale forced at distressed valuation."],
+                    severe: ["Immediate asset seizure by secured creditors.", "Operations halted completely."]
+                }
+            },
+            {
+                ticker: "REBN",
+                name: "Reborn Coffee",
+                filing: "8-K (Apr 21, 2026)",
+                catalyst: "Amended Forbearance",
+                cash: "Critical (0.08 Ratio)",
+                currentPrice: 1.12,
+                fairValue: { base: 0.45, stress: 0.15, severe: 0.00 },
+                baseScore: 82,
+                capitalStack: [
+                    { tranche: "Arena Sr. Secured", price: "Distressed", val: "85.0c" },
+                    { tranche: "Convertible Debt", price: "12.0c", val: "5.0c" }
+                ],
+                scenarios: {
+                    base: ["Must meet $400k/mo payments to Arena Investors starting May.", "Heavy dilution expected via warrant issuance."],
+                    stress: ["Missed May payment triggers immediate default.", "Creditor seizes intellectual property and roasting assets."],
+                    severe: ["Total equity wipeout.", "Forced liquidation of all retail locations."]
+                }
+            },
+            {
+                ticker: "SAVE",
+                name: "Spirit Airlines",
+                filing: "Market Rumors / Refinance",
+                catalyst: "Crushing Debt Maturities",
+                cash: "Deteriorating",
+                currentPrice: 2.85,
+                fairValue: { base: 1.20, stress: 0.35, severe: 0.00 },
+                baseScore: 78,
+                capitalStack: [
+                    { tranche: "Loyalty 8% '25", price: "92.0c", val: "95.0c" },
+                    { tranche: "Conv 1% '26", price: "24.5c", val: "18.0c" },
+                    { tranche: "Unsecured '25", price: "32.0c", val: "20.0c" }
+                ],
+                scenarios: {
+                    base: ["High probability of out-of-court restructuring or LME.", "Capacity shrinking rapidly to conserve cash."],
+                    stress: ["Pre-packaged Chapter 11 filing before year-end.", "Massive fleet sell-off required to satisfy creditors."],
+                    severe: ["Uncontrollable free-fall bankruptcy.", "Complete loss of equity value; route network liquidated."]
+                }
+            },
+            {
+                ticker: "MNTS",
+                name: "Momentus Inc.",
+                filing: "Form S-3 (Apr 21, 2026)",
+                catalyst: "Going Concern Warning",
+                cash: "Burn Heavy",
+                currentPrice: 0.65,
+                fairValue: { base: 0.20, stress: 0.05, severe: 0.00 },
+                baseScore: 72,
+                capitalStack: [
+                    { tranche: "Senior Secured", price: "Unquoted", val: "50.0c" },
+                    { tranche: "Convertible Notes", price: "12.0c", val: "5.0c" }
+                ],
+                scenarios: {
+                    base: ["Survival dependent entirely on continuous equity raises.", "Significant dilution expected for current shareholders."],
+                    stress: ["Capital markets freeze halts S-3 issuance capabilities.", "Inability to fund aerospace operations beyond Q3 2026."],
+                    severe: ["Immediate operational shutdown.", "Fire sale of proprietary space technology assets."]
+                }
+            },
+            {
+                ticker: "SOAR",
+                name: "Volato Group",
+                filing: "8-K (Apr 22, 2026)",
+                catalyst: "Auditor Dismissed",
+                cash: "Constrained",
+                currentPrice: 0.44,
+                fairValue: { base: 0.25, stress: 0.10, severe: 0.00 },
+                baseScore: 65,
+                capitalStack: [
+                    { tranche: "Convertible Facility", price: "Suspended", val: "TBD" },
+                    { tranche: "Equipment Leases", price: "Performing", val: "Par" }
+                ],
+                scenarios: {
+                    base: ["High volatility leading up to May 7 M2i Global merger vote.", "Risk of delayed reporting and SEC scrutiny over controls."],
+                    stress: ["Merger fails; convertible note facility completely suspended.", "Immediate distressed restructuring required."],
+                    severe: ["Chapter 11 filing.", "Fleet repossession by secured lenders."]
+                }
+            },
+            {
+                ticker: "PSPX",
+                name: "Pacific Sports Exch.",
+                filing: "10-Q (Going Concern)",
+                catalyst: "Zero Cash Balance",
+                cash: "$0.00",
+                currentPrice: 0.08,
+                fairValue: { base: 0.00, stress: 0.00, severe: 0.00 },
+                baseScore: 94,
+                capitalStack: [
+                    { tranche: "Related Party Adv.", price: "Illiquid", val: "0.0c" },
+                    { tranche: "Op. Liabilities", price: "Default", val: "5.0c" }
+                ],
+                scenarios: {
+                    base: ["Operations propped up solely by related-party advances.", "High immediate delisting risk."],
+                    stress: ["Silent wind-down and asset abandonment.", "Becomes a shell-company reverse merger target."],
+                    severe: ["SEC intervention due to material control failures.", "Total administrative collapse."]
+                }
+            },
+            {
+                ticker: "MTEX",
+                name: "Mannatech Inc.",
+                filing: "Form 12b-25 (Apr 2026)",
+                catalyst: "Late 10-K, Auditor Flag",
+                cash: "Declining",
+                currentPrice: 8.40,
+                fairValue: { base: 5.50, stress: 2.10, severe: 0.50 },
+                baseScore: 60,
+                capitalStack: [
+                    { tranche: "Term Loan", price: "Unquoted", val: "80.0c" },
+                    { tranche: "Vendor Debt", price: "Stressed", val: "60.0c" }
+                ],
+                scenarios: {
+                    base: ["Implementing aggressive cost-reduction plan to preserve cash.", "Risk of technical default on existing credit facilities."],
+                    stress: ["Auditor formally resigns over financial viability.", "Forced to execute distressed liability management exercise."],
+                    severe: ["Supply chain partners halt shipments due to credit risk.", "Chapter 11 filing required to restructure vendor debt."]
+                }
+            }
+        ];
+
+        let currentScenario = 'base';
+
+        // Helper to format currency
+        const formatMoney = (val) => `$${val.toFixed(2)}`;
+
+        // Helper to determine color based on distress score
+        function getColor(score) {
+            if(score >= 90) return 'var(--neon-red)';
+            if(score >= 75) return 'var(--warning-orange)';
+            return 'var(--neon-green)';
+        }
+
+        function initMatrix() {
+            const container = document.getElementById('matrix-container');
+            let html = `
+                <div style="display:flex; justify-content:space-between; align-items:flex-end;">
+                    <h2 style="color: var(--neon-blue); margin-top:0; font-size:1.2em; text-transform: uppercase;">Fair Value & PD Matrix</h2>
+                    <span style="font-size:0.8em; color:var(--text-muted);">(PD = Prob. of Default)</span>
+                </div>
+                <table class="sensitivity-table">
+                    <tr>
+                        <th>Asset <br><span class="text-muted" style="font-size:0.8em; font-weight:normal;">Trading Level</span></th>
+                        <th>Base Case<br><span class="text-muted" style="font-size:0.8em; font-weight:normal;">284 bps</span></th>
+                        <th>Stress Test<br><span class="text-muted" style="font-size:0.8em; font-weight:normal;">584 bps</span></th>
+                        <th>Severe Shock<br><span class="text-muted" style="font-size:0.8em; font-weight:normal;">884+ bps</span></th>
+                    </tr>
+            `;
+            
+            data.forEach(d => {
+                let base = d.baseScore;
+                let stress = Math.min(99, base + 12);
+                let severe = Math.min(99, base + 22);
+                
+                html += `
+                    <tr>
+                        <td style="font-weight:bold; color: var(--text-main);">${d.ticker} <br><span style="color:var(--neon-blue); font-size:0.85em; font-weight:normal;">${formatMoney(d.currentPrice)}</span></td>
+                        <td>${formatMoney(d.fairValue.base)} <br><span style="color:${getColor(base)}; font-size:0.8em;">${base}% PD</span></td>
+                        <td>${formatMoney(d.fairValue.stress)} <br><span style="color:${getColor(stress)}; font-size:0.8em;">${stress}% PD</span></td>
+                        <td>${formatMoney(d.fairValue.severe)} <br><span style="color:${getColor(severe)}; font-size:0.8em;">${severe}% PD</span></td>
+                    </tr>
+                `;
+            });
+            html += `</table>`;
+            container.innerHTML = html;
+        }
+
+        function renderCards() {
+            const container = document.getElementById('cards-container');
+            container.innerHTML = '';
+            
+            data.forEach(d => {
+                // Determine scores
+                let score = d.baseScore;
+                if(currentScenario === 'stress') score = Math.min(99, score + 12);
+                if(currentScenario === 'severe') score = Math.min(99, score + 22);
+                
+                // Pricing calculations
+                let fv = d.fairValue[currentScenario];
+                let cp = d.currentPrice;
+                let dislocation = ((fv - cp) / cp) * 100;
+                let disFormatted = dislocation > 0 ? `+${dislocation.toFixed(1)}%` : `${dislocation.toFixed(1)}%`;
+                let disClass = dislocation > 0 ? 'dislocation-badge positive' : 'dislocation-badge';
+
+                let colorVar = getColor(score);
+                let blinkCss = score >= 90 ? 'animation: blink 1s infinite;' : '';
+                
+                // Generate inner HTML fragments
+                let predictionsHtml = d.scenarios[currentScenario].map(p => `<li>${p}</li>`).join('');
+                let capStackHtml = d.capitalStack.map(tr => `
+                    <tr>
+                        <td>${tr.tranche}</td>
+                        <td>${tr.price}</td>
+                        <td style="color: var(--neon-blue);">${tr.val}</td>
+                    </tr>
+                `).join('');
+                
+                // Construct Card
+                let card = document.createElement('div');
+                card.className = 'report-card';
+                card.style.borderColor = 'var(--border-color)';
+                card.style.borderLeftColor = colorVar;
+                
+                card.onmouseenter = () => card.style.boxShadow = `0 8px 16px rgba(0,0,0,0.5), 0 0 15px ${colorVar}40`;
+                card.onmouseleave = () => card.style.boxShadow = `0 4px 6px rgba(0,0,0,0.3)`;
+
+                card.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <div>
+                            <h2 style="color: ${colorVar};">${d.ticker}</h2>
+                            <div style="color: var(--neon-blue); font-size: 0.9em; margin-bottom: 5px;">${d.name}</div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-size: 0.7em; color: var(--text-muted); text-transform: uppercase;">Distress Score</div>
+                            <div style="color: ${colorVar}; font-size: 1.8em; font-weight: bold; ${blinkCss}">${score}%</div>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; margin-bottom: 10px; font-size: 0.85em; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 4px;">
+                        <div><strong>Status:</strong><br><span style="color:var(--text-muted)">${d.filing}</span></div>
+                        <div><strong>Cash:</strong><br><span style="color:var(--text-muted)">${d.cash}</span></div>
+                        <div style="grid-column: span 2;"><strong>Catalyst:</strong><br><span style="color:var(--warning-orange)">${d.catalyst}</span></div>
+                    </div>
+                    
+                    <div class="pricing-block">
+                        <div class="price-col">
+                            <span class="price-label">Equity Lvl</span>
+                            <span class="price-val" style="color: var(--text-main);">${formatMoney(cp)}</span>
+                        </div>
+                        <div class="price-col" style="border-left: 1px solid var(--border-color); border-right: 1px solid var(--border-color); padding: 0 15px;">
+                            <span class="price-label">Expected FV</span>
+                            <span class="price-val" style="color: ${colorVar};">${formatMoney(fv)}</span>
+                        </div>
+                        <div class="price-col">
+                            <span class="price-label">Dislocation</span>
+                            <span class="${disClass}">${disFormatted}</span>
+                        </div>
+                    </div>
+
+                    <h3 style="color: ${colorVar};">Capital Stack Depth</h3>
+                    <table class="cap-stack-table">
+                        <tr>
+                            <th>Tranche</th>
+                            <th>Quoted Px</th>
+                            <th>Exp. Val</th>
+                        </tr>
+                        ${capStackHtml}
+                    </table>
+                    
+                    <h3 style="color: ${colorVar};">Actionable Scenario Insights</h3>
+                    <ul>
+                        ${predictionsHtml}
+                    </ul>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function renderML() {
+            const container = document.getElementById('ml-container');
+            container.innerHTML = `
+                <h2 style="color: var(--neon-blue); margin-top: 0; font-size: 1.2em; text-transform: uppercase;">ML Data Pipeline</h2>
+                <p class="text-muted" style="margin-bottom: 20px; font-size: 0.8em;">Live unified JSON output matched to pricing targets & cap stack.</p>
+            `;
+            
+            data.forEach(d => {
+                let score = d.baseScore;
+                if(currentScenario === 'stress') score = Math.min(99, score + 12);
+                if(currentScenario === 'severe') score = Math.min(99, score + 22);
+
+                let fv = d.fairValue[currentScenario];
+                let cp = d.currentPrice;
+                let dislocation = ((fv - cp) / cp); // Decimal form for ML payload
+
+                let mlObj = {
+                    asset_id: d.ticker,
+                    scenario_model: currentScenario.toUpperCase(),
+                    pd_score: score,
+                    primary_catalyst: d.catalyst,
+                    pricing_engine: {
+                        current_equity_level: cp,
+                        expected_fair_value: fv,
+                        implied_dislocation_pct: parseFloat((dislocation * 100).toFixed(2))
+                    },
+                    capital_stack: d.capitalStack,
+                    predicted_outcomes: d.scenarios[currentScenario]
+                };
+                
+                let block = document.createElement('div');
+                block.className = 'ml-data-block';
+                block.innerHTML = `
+                    <div class="ml-data-block-header">
+                        <strong>${d.ticker}_DATA</strong>
+                        <button class="copy-btn" onclick="copyText(this)">COPY</button>
+                    </div>
+                    <pre>${JSON.stringify(mlObj, null, 2)}</pre>
+                `;
+                container.appendChild(block);
+            });
+        }
+
+        // Handle Scenario Selection
+        window.setScenario = function(scen) {
+            currentScenario = scen;
+            
+            // Update buttons
+            document.querySelectorAll('.scenario-btn').forEach(btn => {
+                btn.classList.remove('active');
+                btn.style.backgroundColor = 'transparent';
+                btn.style.boxShadow = 'none';
+                btn.style.color = 'var(--text-main)';
+                btn.style.borderColor = 'var(--border-color)';
+            });
+            
+            let activeBtn = document.getElementById('btn-' + scen);
+            activeBtn.classList.add('active');
+            
+            // Reapply specific active styles dynamically
+            if(scen === 'base') { activeBtn.style.borderColor = 'var(--neon-green)'; activeBtn.style.color = 'var(--neon-green)'; activeBtn.style.boxShadow = '0 0 12px rgba(0,255,65,0.2)'; activeBtn.style.backgroundColor = 'rgba(0,255,65,0.05)';}
+            if(scen === 'stress') { activeBtn.style.borderColor = 'var(--warning-orange)'; activeBtn.style.color = 'var(--warning-orange)'; activeBtn.style.boxShadow = '0 0 12px rgba(255,170,0,0.2)'; activeBtn.style.backgroundColor = 'rgba(255,170,0,0.05)';}
+            if(scen === 'severe') { activeBtn.style.borderColor = 'var(--neon-red)'; activeBtn.style.color = 'var(--neon-red)'; activeBtn.style.boxShadow = '0 0 12px rgba(255,0,60,0.2)'; activeBtn.style.backgroundColor = 'rgba(255,0,60,0.05)';}
+            
+            // Rerender UI components
+            renderCards();
+            renderML();
+        };
+
+        // Copy to clipboard utility
+        window.copyText = function(btn) {
+            const pre = btn.parentElement.nextElementSibling;
+            const text = pre.innerText;
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                const orig = btn.innerText;
+                btn.innerText = 'COPIED!';
+                btn.style.backgroundColor = 'var(--neon-blue)';
+                btn.style.color = 'var(--bg-dark)';
+                setTimeout(() => {
+                    btn.innerText = orig;
+                    btn.style.backgroundColor = 'transparent';
+                    btn.style.color = 'var(--neon-blue)';
+                }, 2000);
+            } catch(e) {}
+            document.body.removeChild(textArea);
+        };
+
+        // System Clock
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('clock').innerText = now.toISOString().replace('T', ' ').substring(0, 19) + ' SYS_TIME';
+        }
+
+        // Initialization
+        setInterval(updateClock, 1000);
+        updateClock();
+        initMatrix();
+        setScenario('base'); // Initial render
+    </script>
+</body>
+</html>
