@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PREDICTIVE DEEP DIVES // ADAM V34.0 TERMINAL // 2026.04.22</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'Fira Code', 'monospace'],
+                        display: ['Oswald', 'sans-serif'],
+                    },
+                    colors: {
+                        term: {
+                            bg: '#030508', surface: '#0a0f16', card: '#111822', border: '#1f2d3d',
+                            cyan: '#00f3ff', blue: '#3b82f6', red: '#ff003c', amber: '#ffaa00', green: '#00ff41',
+                            muted: '#64748b'
+                        }
+                    },
+                    animation: {
+                        'ticker': 'ticker 40s linear infinite',
+                        'pulse-fast': 'pulse 1.2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'glitch': 'glitch 0.3s linear infinite',
+                        'scan': 'scan 8s linear infinite',
+                    },
+                    keyframes: {
+                        ticker: { '0%': { transform: 'translateX(100%)' }, '100%': { transform: 'translateX(-100%)' } },
+                        glitch: {
+                            '0%, 100%': { transform: 'translate(0)' },
+                            '20%': { transform: 'translate(-2px, 1px)' },
+                            '40%': { transform: 'translate(2px, -1px)' },
+                            '60%': { transform: 'translate(-1px, 2px)' },
+                            '80%': { transform: 'translate(1px, -2px)' },
+                        },
+                        scan: {
+                            '0%': { transform: 'translateY(-100%)' },
+                            '100%': { transform: 'translateY(1000%)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;600&family=Inter:wght@300;400;600;800&family=Oswald:wght@500;700&family=JetBrains+Mono:wght@400;700&display=swap');
+        
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #030508; }
+        ::-webkit-scrollbar-thumb { background: #1f2d3d; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #ffaa00; }
+        
+        body { background-color: #030508; color: #e2e8f0; overflow-x: hidden; }
+
+        /* CRT Overlay & Scanline */
+        .crt-overlay {
+            position: fixed; inset: 0; pointer-events: none; z-index: 9999;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.15) 50%);
+            background-size: 100% 4px; mix-blend-mode: overlay; opacity: 0.4;
+        }
+
+        .glass-panel {
+            background: rgba(10, 15, 22, 0.85); backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05); box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.3s ease;
+        }
+
+        .glass-panel:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.7);
+        }
+
+        .glow-cyan { text-shadow: 0 0 10px rgba(0, 243, 255, 0.6); }
+        .glow-red { text-shadow: 0 0 10px rgba(255, 0, 60, 0.6); }
+        .glow-amber { text-shadow: 0 0 10px rgba(255, 170, 0, 0.6); }
+
+        /* Scenario Buttons */
+        .scenario-btn { position: relative; overflow: hidden; transition: all 0.3s ease; }
+        .scenario-btn::before {
+            content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transition: all 0.5s ease;
+        }
+        .scenario-btn:hover::before { left: 100%; }
+        
+        .active-base { border-color: #00ff41 !important; color: #00ff41 !important; box-shadow: 0 0 15px rgba(0,255,65,0.2); background: rgba(0,255,65,0.1); }
+        .active-stress { border-color: #ffaa00 !important; color: #ffaa00 !important; box-shadow: 0 0 15px rgba(255,170,0,0.2); background: rgba(255,170,0,0.1); }
+        .active-severe { border-color: #ff003c !important; color: #ff003c !important; box-shadow: 0 0 15px rgba(255,0,60,0.2); background: rgba(255,0,60,0.1); }
+
+        .matrix-row:hover td { background-color: rgba(255,255,255,0.03); }
+
+        /* Nav Highlight */
+        .nav-item.active { border-left-color: #00f3ff; background: linear-gradient(90deg, rgba(0, 243, 255, 0.1) 0%, transparent 100%); color: #fff; }
+    </style>
+</head>
+<body class="font-sans flex flex-col h-screen selection:bg-term-amber selection:text-black">
+    <div class="crt-overlay"></div>
+
+    <!-- Ticker -->
+    <div class="border-b border-term-red/30 bg-term-red/5 h-7 overflow-hidden flex items-center relative z-20 shrink-0">
+        <div class="absolute left-0 top-0 h-full bg-term-bg z-10 px-3 flex items-center border-r border-term-red/30 text-[10px] font-mono font-bold text-term-red shadow-[5px_0_15px_#000]">
+            <span class="animate-pulse mr-2">●</span> SIGNAL FEED
+        </div>
+        <div class="w-full overflow-hidden ml-28">
+            <div class="animate-ticker whitespace-nowrap text-[11px] font-mono text-slate-400 tracking-widest">
+                <span class="text-term-amber font-bold">MACRO:</span> S&P 500 AT 7,120 (-0.59%) ///
+                <span class="text-term-red font-bold">ENERGY:</span> BRENT AT $96.88 (PHYSICAL $119) ///
+                <span class="text-term-cyan font-bold">FED:</span> WARSH NOMINATION SHAKES DOT PLOT ///
+                <span class="text-term-amber font-bold">WHALESCANNER:</span> MSTR 13D ACCUMULATION DETECTED ///
+                <span class="text-term-red font-bold">GEOPOLITICS:</span> TRUMP EXTENDS CEASEFIRE, BUT NAVY BLOCKADE REMAINS ACTIVE
+            </div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="h-16 border-b border-term-border bg-term-surface/90 backdrop-blur-md flex items-center justify-between px-6 shrink-0 z-30 relative shadow-xl">
+        <div class="flex items-center gap-4">
+            <div class="w-10 h-10 rounded border border-term-cyan/50 bg-term-cyan/10 text-term-cyan font-bold font-display text-xl flex items-center justify-center glow-cyan relative overflow-hidden group cursor-pointer">
+                <div class="absolute inset-0 bg-term-cyan/20 translate-y-full group-hover:translate-y-0 transition-transform"></div>
+                <span class="relative z-10">V34</span>
+            </div>
+            <div>
+                <h1 class="font-display font-bold text-white tracking-widest text-lg uppercase leading-tight">Predictive Deep Dives</h1>
+                <p class="text-[10px] text-term-cyan font-mono tracking-widest uppercase">NODE: Adam // Credit & Activist Intel</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-6 font-mono text-xs">
+            <div class="hidden md:flex items-center gap-2 text-term-amber bg-term-amber/10 border border-term-amber/30 px-3 py-1 rounded">
+                <div class="w-2 h-2 rounded-full bg-term-amber animate-pulse-fast"></div> SYSTEM: DEGRADED (MANDATE CONFLICT)
+            </div>
+            <div class="text-slate-300 bg-black px-3 py-1 rounded border border-white/10 shadow-inner">
+                <span id="sysClock">00:00:00 UTC</span>
+            </div>
+            <button onclick="toggleAI()" class="bg-term-cyan/10 border border-term-cyan/50 text-term-cyan hover:bg-term-cyan hover:text-black px-4 py-1.5 rounded font-bold transition-all shadow-[0_0_10px_rgba(0,243,255,0.2)] tracking-wider text-[10px]">
+                CONSOLE
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Layout -->
+    <div class="flex flex-1 overflow-hidden relative z-10">
+        
+        <!-- Left Navigation Array -->
+        <aside class="w-64 border-r border-term-border bg-term-card/80 backdrop-blur-md flex-col shrink-0 hidden lg:flex z-20">
+            <div class="p-4 border-b border-term-border text-[10px] font-mono text-term-muted tracking-widest uppercase">
+                Routing Matrix
+            </div>
+            <nav class="flex-1 overflow-y-auto py-2" id="left-nav">
+                <a href="#artifacts-section" class="nav-item block px-6 py-3 text-slate-400 hover:text-white font-mono text-[11px] uppercase tracking-wider border-l-2 border-transparent transition-colors">1. System Artifacts</a>
+                <a href="#predictive-section" class="nav-item active block px-6 py-3 text-slate-400 hover:text-white font-mono text-[11px] uppercase tracking-wider border-l-2 border-transparent transition-colors">2. Credit & Eq Deep Dives</a>
+                <a href="#threat-section" class="nav-item block px-6 py-3 text-slate-400 hover:text-white font-mono text-[11px] uppercase tracking-wider border-l-2 border-transparent transition-colors">3. Threat Matrix</a>
+                <a href="#intel-section" class="nav-item block px-6 py-3 text-slate-400 hover:text-white font-mono text-[11px] uppercase tracking-wider border-l-2 border-transparent transition-colors">4. Global Intel Feed</a>
+            </nav>
+            <div class="p-4 border-t border-term-border bg-black/50">
+                <div class="text-[10px] text-term-cyan font-mono uppercase tracking-widest mb-2 flex justify-between">
+                    <span>Engine Sync</span> <span>99%</span>
+                </div>
+                <div class="w-full h-1 bg-term-surface rounded overflow-hidden">
+                    <div class="h-full w-[99%] bg-term-cyan shadow-[0_0_8px_#00f3ff]"></div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Center Column (Main Scroll Area) -->
+        <main class="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 relative z-0 scroll-smooth" id="main-scroll">
+            
+            <!-- MODULE 1: System Artifacts -->
+            <section id="artifacts-section" class="mb-12 pt-4">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-2 h-2 bg-term-cyan rounded-full animate-pulse"></div>
+                    <h2 class="font-display text-2xl text-white tracking-widest uppercase m-0">System Artifacts</h2>
+                </div>
+                
+                <div class="glass-panel p-5 rounded border-t-2 border-term-cyan mb-6 relative">
+                    <div class="absolute top-5 left-6 z-10 font-mono text-[10px] text-slate-300 uppercase tracking-widest bg-black/60 px-2 py-1 rounded border border-white/10">The Liquidity Mirage: SPX vs. HY Spread (OAS)</div>
+                    <div class="w-full h-[280px]">
+                        <canvas id="artifactChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- MODULE 2: Predictive Deep Dives -->
+            <section id="predictive-section" class="mb-12 pt-4">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-2 h-2 bg-term-amber rounded-full animate-pulse"></div>
+                    <h2 class="font-display text-2xl text-white tracking-widest uppercase m-0">Predictive Deep Dives</h2>
+                </div>
+
+                <!-- Control Bar -->
+                <div class="bg-term-card border border-term-border p-4 rounded mb-6 flex flex-col xl:flex-row gap-4 items-center justify-between shadow-lg">
+                    <div class="font-mono text-sm tracking-widest font-bold text-slate-300">
+                        MACRO SCENARIO ROUTING:
+                    </div>
+                    <div class="flex gap-3 w-full xl:w-auto">
+                        <button class="scenario-btn flex-1 xl:flex-none border border-term-border text-slate-400 px-4 py-2 font-mono text-[10px] sm:text-xs font-bold rounded uppercase active-base" id="btn-base" onclick="setScenario('base')">
+                            [ BASE ] Ceasefire Holds
+                        </button>
+                        <button class="scenario-btn flex-1 xl:flex-none border border-term-border text-slate-400 px-4 py-2 font-mono text-[10px] sm:text-xs font-bold rounded uppercase" id="btn-stress" onclick="setScenario('stress')">
+                            [ STRESS ] Warsh Shock
+                        </button>
+                        <button class="scenario-btn flex-1 xl:flex-none border border-term-border text-slate-400 px-4 py-2 font-mono text-[10px] sm:text-xs font-bold rounded uppercase" id="btn-severe" onclick="setScenario('severe')">
+                            [ SEVERE ] Blockade Active
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Sensitivity Matrix -->
+                <div class="glass-panel p-5 rounded border-t-2 border-term-cyan mb-8">
+                    <div class="flex justify-between items-end mb-4 border-b border-term-border pb-2">
+                        <h3 class="font-display text-lg text-slate-200 tracking-wide uppercase">Fair Value & Default Matrix</h3>
+                        <span class="font-mono text-[9px] text-term-muted border border-white/5 bg-black/40 px-2 py-0.5 rounded">PD = Prob. of Default</span>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left font-mono text-xs whitespace-nowrap">
+                            <thead>
+                                <tr class="text-term-muted border-b border-term-border">
+                                    <th class="pb-3 font-normal">ASSET <br><span class="text-[9px]">TICKER</span></th>
+                                    <th class="pb-3 font-normal">CURRENT <br><span class="text-[9px]">TRADING LEVEL</span></th>
+                                    <th class="pb-3 font-normal text-term-green">BASE CASE <br><span class="text-[9px]">OAS: 284 bps</span></th>
+                                    <th class="pb-3 font-normal text-term-amber">STRESS TEST <br><span class="text-[9px]">OAS: 584 bps</span></th>
+                                    <th class="pb-3 font-normal text-term-red">SEVERE SHOCK <br><span class="text-[9px]">OAS: 884+ bps</span></th>
+                                </tr>
+                            </thead>
+                            <tbody id="matrix-tbody">
+                                <!-- Injected via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Cards Grid -->
+                <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 pb-6" id="cards-container">
+                    <!-- Injected via JS -->
+                </div>
+            </section>
+
+            <!-- MODULE 3: Threat Matrix & Intel -->
+            <div class="grid grid-cols-1 xl:grid-cols-2 gap-8 mb-16 pt-4" id="threat-section">
+                <!-- Threat Scatter -->
+                <div>
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="w-2 h-2 bg-term-red rounded-full animate-pulse glow-red"></div>
+                        <h2 class="font-display text-2xl text-white tracking-widest uppercase m-0">Threat Matrix</h2>
+                    </div>
+                    <div class="glass-panel p-5 rounded border-t-2 border-term-red h-[380px] relative">
+                        <div class="absolute top-5 left-6 z-10 font-mono text-[10px] text-slate-300 uppercase tracking-widest bg-black/60 px-2 py-1 rounded border border-white/10">Probability vs. Systemic Impact</div>
+                        <canvas id="threatChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Intel Feed -->
+                <div id="intel-section">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="w-2 h-2 bg-term-blue rounded-full animate-pulse glow-cyan"></div>
+                        <h2 class="font-display text-2xl text-white tracking-widest uppercase m-0">Global Intel Feed</h2>
+                    </div>
+                    <div class="glass-panel p-0 rounded border-t-2 border-term-blue h-[380px] flex flex-col overflow-hidden">
+                        <div class="p-3 border-b border-white/5 bg-black/40 text-[10px] font-mono text-term-cyan uppercase tracking-widest flex justify-between">
+                            <span>Live Intercepts</span> <span>2026.04.22</span>
+                        </div>
+                        <div class="flex-1 overflow-y-auto p-4 space-y-4">
+                            <div class="border-l-2 border-term-red pl-3 relative group">
+                                <span class="text-[9px] font-mono text-term-muted absolute -top-1 right-0">14:02 EST</span>
+                                <h4 class="text-white font-bold text-sm mb-1 group-hover:text-term-red transition-colors">Warsh Narrows Fed Mandate</h4>
+                                <p class="text-xs text-slate-400 leading-relaxed">Senate hearing reveals nominee's intent to overhaul inflation framework. Equities rally on "AI-productivity" optimism while credit markets price in "Mandate Uncertainty."</p>
+                            </div>
+                            <div class="border-l-2 border-term-amber pl-3 relative group">
+                                <span class="text-[9px] font-mono text-term-muted absolute -top-1 right-0">12:45 EST</span>
+                                <h4 class="text-white font-bold text-sm mb-1 group-hover:text-term-amber transition-colors">The Pakistan Swerve</h4>
+                                <p class="text-xs text-slate-400 leading-relaxed">Trump extends ceasefire via Truth Social due to Islamabad talks. However, physical naval blockade of the Strait remains at full force. Brent physical execution hits $119.</p>
+                            </div>
+                            <div class="border-l-2 border-term-cyan pl-3 relative group">
+                                <span class="text-[9px] font-mono text-term-muted absolute -top-1 right-0">10:15 EST</span>
+                                <h4 class="text-white font-bold text-sm mb-1 group-hover:text-term-cyan transition-colors">SEER Proxy Imminent</h4>
+                                <p class="text-xs text-slate-400 leading-relaxed">Radoff-JEC $2.25 bid expires at 17:00. Board hiring of Perella Weinberg implies rejection. Expect immediate transition to hostile proxy solicitation.</p>
+                            </div>
+                            <div class="border-l-2 border-term-green pl-3 relative group">
+                                <span class="text-[9px] font-mono text-term-muted absolute -top-1 right-0">09:30 EST</span>
+                                <h4 class="text-white font-bold text-sm mb-1 group-hover:text-term-green transition-colors">MSTR "Hard-Code" Accumulation</h4>
+                                <p class="text-xs text-slate-400 leading-relaxed">Whalescanner detects aggressive accumulation of MSTR. Thesis: Acting as an equity-sink and hard-asset hedge against the potential loss of Federal Reserve independence.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+
+        <!-- Right Column (ML Pipeline) -->
+        <aside class="w-full md:w-80 lg:w-[350px] xl:w-[400px] border-l border-term-border bg-term-card/50 flex flex-col shrink-0 hidden md:flex z-10 shadow-[-10px_0_20px_rgba(0,0,0,0.5)]">
+            <div class="p-4 border-b border-term-border bg-term-surface sticky top-0 z-20">
+                <h2 class="font-display text-lg text-term-cyan tracking-widest uppercase mb-1 flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M4 17h16a2 2 0 002-2V5a2 2 0 00-2-2H4a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                    ML Payload Pipeline
+                </h2>
+                <p class="text-[10px] font-mono text-term-muted">Live JSON output bound to matrix.</p>
+            </div>
+            <div class="p-4 flex flex-col gap-4 overflow-y-auto flex-1" id="ml-container">
+                <!-- Injected via JS -->
+            </div>
+        </aside>
+
+        <!-- AI Chat Slide-out Panel -->
+        <aside id="aiPanel" class="absolute right-0 top-0 h-full w-full md:w-[480px] glass-panel border-l border-white/10 transform translate-x-full transition-transform duration-500 ease-[cubic-bezier(0.19,1,0.22,1)] z-50 flex flex-col bg-term-bg/98 backdrop-blur-3xl shadow-[-20px_0_50px_rgba(0,0,0,0.9)]">
+            <div class="p-4 border-b border-term-cyan/20 flex justify-between items-center bg-[#050505] shrink-0">
+                <div class="flex items-center gap-3">
+                    <div class="relative">
+                        <div class="w-3 h-3 rounded-full bg-term-cyan animate-pulse-fast glow-cyan"></div>
+                        <div class="absolute inset-0 bg-term-cyan rounded-full animate-ping opacity-50"></div>
+                    </div>
+                    <div>
+                        <h2 class="font-display text-sm md:text-base font-bold text-white tracking-widest m-0">ADAM V34.0 CORE</h2>
+                        <p class="text-[9px] text-term-cyan font-mono uppercase tracking-wider m-0">Neuro-Symbolic Sovereign LLM</p>
+                    </div>
+                </div>
+                <button onclick="toggleAI()" class="text-slate-500 hover:text-white p-2 transition-colors">✕</button>
+            </div>
+            
+            <div id="chatLog" class="flex-1 overflow-y-auto p-4 md:p-6 flex flex-col gap-5 text-sm font-sans pb-4 scroll-smooth">
+                <div class="flex gap-3">
+                    <div class="w-6 h-6 rounded bg-term-surface border border-term-cyan/50 flex items-center justify-center shrink-0 mt-1 shadow-[0_0_10px_rgba(0,243,255,0.2)] text-black bg-term-cyan">
+                        <span class="text-[10px] font-mono font-bold">A</span>
+                    </div>
+                    <div class="bg-term-surface p-3.5 rounded-lg rounded-tl-none border border-term-cyan/20 text-slate-300 max-w-[90%] shadow-lg relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-term-cyan to-transparent"></div>
+                        <p class="text-[10px] font-mono text-term-cyan mb-2 uppercase tracking-widest">Connection Established</p>
+                        <p class="mb-2">I am Adam v34.0. Payload <span class="text-white font-mono">2026.04.22</span> ingested. The simulation is straining under a Political-Monetary conflict.</p>
+                        <p class="text-xs text-slate-400 mt-2 bg-black/50 p-2 rounded border border-white/5 border-l-term-red">Awaiting queries on the "Independence Trap", SEER Binary Deadline, or the MSTR accumulation node.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="px-5 py-3 border-t border-white/5 bg-black/80 shrink-0">
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="triggerPreset('Explain the Independence Trap')" class="px-3 py-1.5 bg-term-surface border border-term-cyan/30 hover:bg-term-cyan/10 hover:border-term-cyan text-[10px] font-mono rounded-full text-slate-300 transition-all">Independence Trap</button>
+                    <button onclick="triggerPreset('Status of SEER Bid')" class="px-3 py-1.5 bg-term-surface border border-term-amber/30 hover:bg-term-amber/10 hover:border-term-amber text-[10px] font-mono rounded-full text-slate-300 transition-all">SEER Bid</button>
+                    <button onclick="triggerPreset('Analyze MSTR Accumulation')" class="px-3 py-1.5 bg-term-surface border border-term-green/30 hover:bg-term-green/10 hover:border-term-green text-[10px] font-mono rounded-full text-slate-300 transition-all">MSTR Alpha</button>
+                </div>
+            </div>
+
+            <div class="p-4 border-t border-term-cyan/20 bg-[#050505] relative shrink-0">
+                <form id="chatForm" class="flex gap-2" onsubmit="handleAIQuery(event)">
+                    <input type="text" id="aiInput" placeholder="Query the matrix..." class="flex-1 bg-term-surface border border-white/10 rounded-sm px-4 py-2.5 text-sm text-white font-mono focus:outline-none focus:border-term-cyan focus:ring-1 focus:ring-term-cyan transition-all placeholder:text-slate-600 shadow-inner" autocomplete="off">
+                    <button type="submit" class="bg-term-cyan text-black hover:bg-white px-5 py-2.5 rounded-sm font-mono text-xs font-bold transition-all shadow-[0_0_15px_rgba(0,243,255,0.3)]">SEND</button>
+                </form>
+            </div>
+        </aside>
+
+    </div>
+
+    <script>
+        // Chart.js Global Settings
+        Chart.defaults.color = '#64748b';
+        Chart.defaults.font.family = "'JetBrains Mono', 'Fira Code', monospace";
+        Chart.defaults.scale.grid.color = 'rgba(255, 255, 255, 0.05)';
+        Chart.defaults.plugins.tooltip.backgroundColor = 'rgba(10, 15, 22, 0.95)';
+        Chart.defaults.plugins.tooltip.titleFont = { family: "'Oswald', sans-serif", size: 14 };
+
+        // Core Data Structure
+        const data = [
+            {
+                ticker: "SEER", name: "Seer, Inc.", filing: "Binary Proxy Deadline", catalyst: "Radoff-JEC $2.25 Bid Expiring", cash: "$215M (Cash Rich)", currentPrice: 1.88,
+                fairValue: { base: 2.25, stress: 1.50, severe: 1.00 }, baseScore: 40, inverseRisk: false,
+                capitalStack: [ { tranche: "Common Equity", price: "$1.88", val: "$2.25 (Bid)" }, { tranche: "Net Cash/Share", price: "N/A", val: "~$1.70" } ],
+                scenarios: {
+                    base: ["Board accepts $2.25 bid or negotiates slight bump.", "Arbitrage spread closes cleanly."],
+                    stress: ["Board rejects bid; proxy fight initiated.", "Market discounts cash pile due to cash-burn fears."],
+                    severe: ["Capital markets freeze halts all M&A.", "Activists walk away; stock re-rates to pure fundamental value ($1.00)."]
+                }
+            },
+            {
+                ticker: "UCB", name: "United Community Banks", filing: "8-K (Merger Agreement)", catalyst: "Acquiring Peach State", cash: "Adequate (Regional)", currentPrice: 28.50,
+                fairValue: { base: 31.75, stress: 24.00, severe: 18.00 }, baseScore: 15, inverseRisk: false,
+                capitalStack: [ { tranche: "Senior Unsecured", price: "98.5c", val: "Par" }, { tranche: "Common Equity", price: "$28.50", val: "$31.75" } ],
+                scenarios: {
+                    base: ["Merger completes smoothly; $0.12 accretive to EPS by 2027.", "Regional bank consolidation thesis validated."],
+                    stress: ["Higher-for-longer rates (Warsh effect) pressure NIM.", "Merger integration delayed by regulatory scrutiny."],
+                    severe: ["Systemic regional bank run.", "Merger collapses due to material adverse change (MAC) clause."]
+                }
+            },
+            {
+                ticker: "SLB", name: "Schlumberger", filing: "13F/13G Sweeps", catalyst: "Entropy Tech Accumulation", cash: "Massive Free Cash Flow", currentPrice: 51.20,
+                fairValue: { base: 58.00, stress: 65.00, severe: 80.00 }, baseScore: 5, inverseRisk: true,
+                capitalStack: [ { tranche: "Corp Bonds '29", price: "102.0c", val: "105.0c" }, { tranche: "Common Equity", price: "$51.20", val: "$58.00" } ],
+                scenarios: {
+                    base: ["Steady energy transition capex.", "Standard physical market supply/demand."],
+                    stress: ["Brent spikes on geopolitical risk.", "Increased demand for offshore/international drilling services."],
+                    severe: ["Kinetic blockade closes Hormuz completely.", "Unprecedented premium on non-Middle East physical infrastructure and tech."]
+                }
+            },
+            {
+                ticker: "MSTR", name: "MicroStrategy Inc.", filing: "13D Accumulation", catalyst: "Whalescanner BTC Proxy", cash: "Leveraged for BTC", currentPrice: 1450.00,
+                fairValue: { base: 1600.00, stress: 1200.00, severe: 800.00 }, baseScore: 50, inverseRisk: false,
+                capitalStack: [ { tranche: "Convertible Notes", price: "Volatile", val: "Premium" }, { tranche: "Common Equity", price: "$1450", val: "NAV + Premium" } ],
+                scenarios: {
+                    base: ["BTC stabilizes around $74k-$78k.", "Institutional accumulation continues to treat MSTR as equity-sink."],
+                    stress: ["Warsh hawkishness drives USD up, pressing BTC down.", "Leverage begins to work against NAV premium."],
+                    severe: ["Global margin call across all risk assets.", "Forced deleveraging of convertible stack."]
+                }
+            },
+            {
+                ticker: "SAVE", name: "Spirit Airlines", filing: "LME / Restructuring", catalyst: "Crushing Debt + Oil Spike", cash: "Deteriorating Rapidly", currentPrice: 2.15,
+                fairValue: { base: 1.20, stress: 0.35, severe: 0.00 }, baseScore: 82, inverseRisk: false,
+                capitalStack: [ { tranche: "Loyalty 8% '25", price: "92.0c", val: "95.0c" }, { tranche: "Unsecured '25", price: "32.0c", val: "20.0c" } ],
+                scenarios: {
+                    base: ["Out-of-court restructuring required.", "Capacity shrinking to conserve cash amid $88 Brent."],
+                    stress: ["Brent breaks $95; jet fuel costs destroy margins completely.", "Pre-packaged Chapter 11 filing expedited."],
+                    severe: ["Uncontrollable free-fall bankruptcy due to fuel shock.", "Total equity wipeout."]
+                }
+            },
+            {
+                ticker: "QRTEA", name: "QVC Group", filing: "Chapter 11 Prep", catalyst: "Stagflation Retail Crush", cash: "DIP Financing Talks", currentPrice: 0.45,
+                fairValue: { base: 0.15, stress: 0.05, severe: 0.00 }, baseScore: 92, inverseRisk: false,
+                capitalStack: [ { tranche: "1L Secured Term", price: "64.5c", val: "70.0c" }, { tranche: "Unsecured Notes", price: "4.2c", val: "2.0c" } ],
+                scenarios: {
+                    base: ["Operating under Chapter 11 with Restructuring Support Agreement.", "Vendor term renegotiations."],
+                    stress: ["Consumer spending drops sharply on inflation fears.", "DIP financing covenant breaches likely."],
+                    severe: ["Total failure of restructuring plan.", "Immediate conversion to Chapter 7 liquidation."]
+                }
+            }
+        ];
+
+        let currentScenario = 'base';
+        const activeCharts = {};
+
+        // Utility Functions
+        const formatMoney = (val) => `$${val.toFixed(2)}`;
+        
+        function getColor(score, isInverse = false) {
+            if (isInverse) {
+                if(score >= 70) return '#00ff41';
+                if(score >= 40) return '#00f3ff';
+                return '#ffaa00';
+            }
+            if(score >= 85) return '#ff003c';
+            if(score >= 60) return '#ffaa00';
+            return '#00ff41';
+        }
+
+        function calculateScore(baseScore, scenario, isInverse) {
+            let score = baseScore;
+            if(scenario === 'stress') score = isInverse ? Math.max(1, score - 15) : Math.min(99, score + 18);
+            if(scenario === 'severe') score = isInverse ? Math.max(1, score - 30) : Math.min(99, score + 35);
+            return score;
+        }
+
+        // Init Components
+        function initMatrix() {
+            const tbody = document.getElementById('matrix-tbody');
+            tbody.innerHTML = data.map(d => {
+                let sBase = calculateScore(d.baseScore, 'base', d.inverseRisk);
+                let sStress = calculateScore(d.baseScore, 'stress', d.inverseRisk);
+                let sSevere = calculateScore(d.baseScore, 'severe', d.inverseRisk);
+                
+                return `
+                    <tr class="matrix-row border-b border-white/5 transition-colors">
+                        <td class="py-3"><strong class="text-white text-sm">${d.ticker}</strong><br><span class="text-[10px] text-term-muted">${d.name}</span></td>
+                        <td class="py-3"><span class="text-term-cyan font-bold">${formatMoney(d.currentPrice)}</span></td>
+                        <td class="py-3">${formatMoney(d.fairValue.base)} <br><span style="color:${getColor(sBase, d.inverseRisk)}; font-size:10px;">${sBase}% PD</span></td>
+                        <td class="py-3">${formatMoney(d.fairValue.stress)} <br><span style="color:${getColor(sStress, d.inverseRisk)}; font-size:10px;">${sStress}% PD</span></td>
+                        <td class="py-3">${formatMoney(d.fairValue.severe)} <br><span style="color:${getColor(sSevere, d.inverseRisk)}; font-size:10px;">${sSevere}% PD</span></td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function renderCards() {
+            const container = document.getElementById('cards-container');
+            container.innerHTML = data.map(d => {
+                let score = calculateScore(d.baseScore, currentScenario, d.inverseRisk);
+                let fv = d.fairValue[currentScenario];
+                let dislocation = ((fv - d.currentPrice) / d.currentPrice) * 100;
+                let disClass = dislocation > 0 ? 'text-term-green bg-term-green/10 border-term-green/30' : 'text-term-red bg-term-red/10 border-term-red/30';
+                if (d.inverseRisk && currentScenario !== 'base') disClass = 'text-term-green bg-term-green/10 border-term-green/30 glow-cyan';
+                let colorVar = getColor(score, d.inverseRisk);
+                let blinkCss = (score >= 90 && !d.inverseRisk) ? 'animate-pulse glow-red' : '';
+                
+                let predictionsHtml = d.scenarios[currentScenario].map(p => `<li class="mb-1.5 flex gap-2"><span class="text-term-muted mt-0.5">›</span> <span>${p}</span></li>`).join('');
+                let capStackHtml = d.capitalStack.map(tr => `
+                    <div class="flex justify-between items-center py-1.5 border-b border-dashed border-white/10 text-xs">
+                        <span class="text-slate-300">${tr.tranche}</span>
+                        <div class="text-right"><span class="text-term-muted mr-3">${tr.price}</span><span class="text-term-cyan font-bold">${tr.val}</span></div>
+                    </div>
+                `).join('');
+
+                return `
+                    <div class="glass-panel rounded-lg p-5 relative overflow-hidden group border-l-4" style="border-left-color: ${colorVar}">
+                        <div class="absolute -right-16 -top-16 w-32 h-32 rounded-full blur-3xl opacity-20 transition-all group-hover:opacity-40" style="background-color: ${colorVar}"></div>
+                        <div class="flex justify-between items-start mb-4 relative z-10">
+                            <div>
+                                <h2 class="font-display text-2xl font-bold text-white tracking-wide flex items-center gap-2 m-0">${d.ticker} ${d.inverseRisk ? '<span class="text-[9px] bg-term-cyan/20 text-term-cyan px-1.5 py-0.5 rounded font-mono border border-term-cyan/30">HEDGE</span>' : ''}</h2>
+                                <div class="text-term-muted font-mono text-xs mt-1">${d.name}</div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-[9px] font-mono text-term-muted uppercase tracking-widest mb-1">PD Score</div>
+                                <div class="text-3xl font-display font-bold ${blinkCss}" style="color: ${colorVar};">${score}%</div>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3 mb-5 font-mono text-[10px] bg-black/40 p-3 rounded border border-white/5 relative z-10">
+                            <div><span class="text-term-muted block mb-0.5">STATUS</span><span class="text-slate-200">${d.filing}</span></div>
+                            <div><span class="text-term-muted block mb-0.5">LIQUIDITY</span><span class="text-slate-200">${d.cash}</span></div>
+                            <div class="col-span-2 mt-1 border-t border-white/5 pt-2"><span class="text-term-muted block mb-0.5">PRIMARY CATALYST</span><span class="text-term-amber font-bold">${d.catalyst}</span></div>
+                        </div>
+                        <div class="flex justify-between items-center bg-black/60 border border-white/10 rounded p-3 mb-5 relative z-10">
+                            <div class="flex flex-col items-start"><span class="text-[9px] font-mono text-term-muted uppercase mb-1">Trading Lvl</span><span class="text-lg font-bold text-white">${formatMoney(d.currentPrice)}</span></div>
+                            <div class="flex flex-col items-center border-x border-white/10 px-4"><span class="text-[9px] font-mono text-term-muted uppercase mb-1">Exp. Value</span><span class="text-lg font-bold" style="color: ${colorVar};">${formatMoney(fv)}</span></div>
+                            <div class="flex flex-col items-end"><span class="text-[9px] font-mono text-term-muted uppercase mb-1">Dislocation</span><span class="text-xs font-mono font-bold px-2 py-1 rounded border ${disClass}">${dislocation > 0 ? '+' : ''}${dislocation.toFixed(1)}%</span></div>
+                        </div>
+                        <div class="relative z-10">
+                            <h3 class="font-mono text-[11px] font-bold text-term-muted uppercase tracking-widest mb-2 border-b border-white/10 pb-1 mt-0">Capital Stack Resolution</h3>
+                            <div class="mb-5 font-mono">${capStackHtml}</div>
+                            <h3 class="font-mono text-[11px] font-bold text-term-muted uppercase tracking-widest mb-2 border-b border-white/10 pb-1 mt-0">Scenario Intelligence</h3>
+                            <ul class="text-xs text-slate-300 p-0 list-none">${predictionsHtml}</ul>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderML() {
+            const container = document.getElementById('ml-container');
+            container.innerHTML = data.map(d => {
+                let score = calculateScore(d.baseScore, currentScenario, d.inverseRisk);
+                let fv = d.fairValue[currentScenario];
+                let mlObj = {
+                    node_id: `ADAM_V34_${d.ticker}`, scenario: currentScenario.toUpperCase(), pd_score: score, catalyst: d.catalyst,
+                    pricing: { eq_lvl: d.currentPrice, model_fv: fv, disloc_pct: parseFloat((((fv - d.currentPrice) / d.currentPrice) * 100).toFixed(2)) }
+                };
+                return `
+                    <div class="bg-[#05080c] border border-term-border rounded overflow-hidden group shadow-lg">
+                        <div class="flex justify-between items-center bg-black/50 px-3 py-2 border-b border-term-border">
+                            <span class="font-mono text-[10px] font-bold text-term-cyan">${d.ticker}_JSON</span>
+                            <button class="text-[9px] font-mono border border-term-cyan/30 text-term-cyan px-2 py-0.5 rounded hover:bg-term-cyan hover:text-black transition-colors" onclick="copyText(this)">COPY</button>
+                        </div>
+                        <pre class="p-3 text-[10px] font-mono text-term-amber overflow-x-auto m-0 leading-relaxed">${JSON.stringify(mlObj, null, 2)}</pre>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Initialize Charts
+        function initCharts() {
+            // Artifacts Line Chart (SPX vs HY OAS)
+            const ctxLine = document.getElementById('artifactChart').getContext('2d');
+            activeCharts['line'] = new Chart(ctxLine, {
+                type: 'line',
+                data: {
+                    labels: ['04.15', '04.16', '04.17', '04.20', '04.21', 'TODAY'],
+                    datasets: [
+                        { label: 'SPX (Index)', data: [7020, 7050, 7080, 7110, 7064, 7137.90], borderColor: '#00f3ff', borderWidth: 2, pointRadius: 4, tension: 0.3, yAxisID: 'y' },
+                        { label: 'HY Spread (bps)', data: [290, 288, 286, 285, 285, 284], borderColor: '#ff003c', borderWidth: 2, pointRadius: 4, tension: 0.3, yAxisID: 'y1', borderDash: [5, 5] }
+                    ]
+                },
+                options: { 
+                    responsive: true, maintainAspectRatio: false, 
+                    scales: { 
+                        y: { position: 'left', grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#00f3ff', font: {family: "'Fira Code', monospace", size: 10} } },
+                        y1: { position: 'right', reverse: true, grid: { display: false }, ticks: { color: '#ff003c', font: {family: "'Fira Code', monospace", size: 10} } },
+                        x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { font: {family: "'Fira Code', monospace", size: 10} } }
+                    },
+                    plugins: { legend: { labels: { color: '#e2e8f0', font: {family: "'Fira Code', monospace", size: 11}, usePointStyle: true } } }
+                }
+            });
+
+            // Threat Matrix Scatter Chart
+            const ctxScatter = document.getElementById('threatChart').getContext('2d');
+            activeCharts['scatter'] = new Chart(ctxScatter, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: 'Threat Nodes',
+                        data: [
+                            {x: 95, y: 90, label: 'Kinetic Blockade (Active)'},
+                            {x: 85, y: 80, label: 'Warsh Fed Pivot'},
+                            {x: 90, y: 35, label: 'SEER Proxy Fight'},
+                            {x: 15, y: 20, label: 'Ceasefire Peace Dividend'}
+                        ],
+                        backgroundColor: (ctx) => {
+                            const v = ctx.raw;
+                            if (!v) return '#fff';
+                            if (v.x > 50 && v.y > 50) return '#ff003c'; // High/High
+                            if (v.x <= 50 && v.y > 50) return '#ffaa00'; // Low/High
+                            return '#00f3ff';
+                        },
+                        pointRadius: (ctx) => (ctx.raw && ctx.raw.x > 80 && ctx.raw.y > 80) ? 12 : 8,
+                        pointHoverRadius: 14,
+                        borderColor: 'rgba(255,255,255,0.2)',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    scales: {
+                        x: { title: { display: true, text: 'Probability (%)', color: '#64748b' }, min: 0, max: 100, grid: { color: 'rgba(255,255,255,0.05)' } },
+                        y: { title: { display: true, text: 'Systemic Impact (1-100)', color: '#64748b' }, min: 0, max: 100, grid: { color: 'rgba(255,255,255,0.05)' } }
+                    },
+                    plugins: { 
+                        legend: { display: false },
+                        tooltip: { callbacks: { label: (ctx) => `${ctx.raw.label}: Prob ${ctx.raw.x}%, Impact ${ctx.raw.y}` } }
+                    }
+                }
+            });
+        }
+
+        // UI Interactions
+        window.setScenario = function(scen) {
+            currentScenario = scen;
+            document.querySelectorAll('.scenario-btn').forEach(btn => {
+                btn.className = 'scenario-btn flex-1 xl:flex-none border border-term-border text-slate-400 px-4 py-2 font-mono text-[10px] sm:text-xs font-bold rounded uppercase';
+            });
+            document.getElementById('btn-' + scen).classList.add(`active-${scen}`);
+            renderCards();
+            renderML();
+        };
+
+        window.copyText = function(btn) {
+            const text = btn.parentElement.nextElementSibling.innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                const orig = btn.innerText; btn.innerText = 'COPIED'; btn.classList.add('bg-term-cyan', 'text-black');
+                setTimeout(() => { btn.innerText = orig; btn.classList.remove('bg-term-cyan', 'text-black'); }, 2000);
+            }).catch(e => {
+                const ta = document.createElement("textarea"); ta.value = text; document.body.appendChild(ta);
+                ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+                btn.innerText = 'COPIED'; setTimeout(() => btn.innerText = 'COPY', 2000);
+            });
+        };
+
+        // Scroll Spy for Nav
+        const sections = document.querySelectorAll('section, #threat-section');
+        const navItems = document.querySelectorAll('#left-nav .nav-item');
+        const mainScroll = document.getElementById('main-scroll');
+        
+        mainScroll.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (mainScroll.scrollTop >= sectionTop - 60) current = section.getAttribute('id');
+            });
+            navItems.forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('href').substring(1) === current || (current==='threat-section' && item.getAttribute('href').includes('intel'))) {
+                    item.classList.add('active');
+                }
+            });
+        });
+
+        // AI Logic
+        let aiOpen = false;
+        const aiBrain = {
+            "independence trap": "The market is pricing in rate cuts based on AI productivity (driving SPX to 7,137), but Kevin Warsh's Senate testimony implies a narrowing of the Fed's mandate and an overhaul of the inflation framework. It's a trap: equity highs built on a policy foundation that is about to be physically uninstalled.",
+            "seer bid": "The $2.25/share cash bid from Radoff-JEC expires today at 5:00 PM ET. The board hired Perella Weinberg for defense, implying an imminent rejection. Expect a proxy war for the three board seats immediately.",
+            "mstr": "MicroStrategy is decoupling from standard BTC dynamics. Whales are accumulating it (+11.8% delta) as a 'Hard-Code' equity hedge against the potential loss of Federal Reserve independence under the new Warsh mandate.",
+            "default": "Query recognized. Cross-referencing 2026.04.22 macro nodes... Divergence detected. Please specify if investigating Policy Vectors (Warsh), Kinetic Vectors (Blockade), or Micro/Credit (SEER/HY Spreads)."
+        };
+
+        window.toggleAI = function() {
+            aiOpen = !aiOpen;
+            document.getElementById('aiPanel').style.transform = aiOpen ? 'translateX(0)' : 'translateX(100%)';
+            if(aiOpen) document.getElementById('aiInput').focus();
+        }
+
+        window.triggerPreset = function(text) {
+            document.getElementById('aiInput').value = text;
+            handleAIQuery(new Event('submit'));
+        }
+
+        window.handleAIQuery = function(e) {
+            e.preventDefault();
+            const input = document.getElementById('aiInput');
+            const chatLog = document.getElementById('chatLog');
+            const query = input.value.trim();
+            if(!query) return;
+
+            chatLog.insertAdjacentHTML('beforeend', `<div class="flex gap-3 justify-end mt-4"><div class="bg-term-card p-3 rounded-lg rounded-tr-none border border-white/5 text-slate-300 max-w-[85%] shadow-md"><p class="font-mono text-sm m-0">${query}</p></div></div>`);
+            input.value = '';
+            chatLog.scrollTop = chatLog.scrollHeight;
+
+            let responseText = aiBrain["default"];
+            const lowerQuery = query.toLowerCase();
+            for (const key in aiBrain) { if (lowerQuery.includes(key)) { responseText = aiBrain[key]; break; } }
+
+            setTimeout(() => {
+                chatLog.insertAdjacentHTML('beforeend', `<div class="flex gap-3 mt-2"><div class="w-6 h-6 rounded bg-term-surface border border-term-cyan/50 flex items-center justify-center shrink-0 mt-1 text-black bg-term-cyan shadow-[0_0_8px_rgba(0,243,255,0.3)]"><span class="text-[10px] font-mono font-bold">A</span></div><div class="bg-term-surface p-4 rounded-lg rounded-tl-none border-l-2 border-term-cyan text-slate-300 max-w-[90%] shadow-lg"><p class="mb-0 leading-relaxed">${responseText}</p></div></div>`);
+                chatLog.scrollTop = chatLog.scrollHeight;
+            }, 800);
+        }
+
+        // Run Init
+        setInterval(() => {
+            const d = new Date();
+            document.getElementById('sysClock').innerText = d.getUTCHours().toString().padStart(2, '0') + ':' + d.getUTCMinutes().toString().padStart(2, '0') + ':' + d.getUTCSeconds().toString().padStart(2, '0') + ' UTC';
+        }, 1000);
+        
+        initMatrix();
+        setScenario('base');
+        initCharts();
+    </script>
+</body>
+</html>
