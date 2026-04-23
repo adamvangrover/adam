@@ -4862,7 +4862,7 @@ window.FILESYSTEM_MANIFEST = [
           {
             "name": "mock_llm_generator.py",
             "type": "file",
-            "path": "./core/engine/mock_llm_generator.py",
+            "path": "./config/mocks/mock_llm_generator.py",
             "size": 3674,
             "modified": "2026-02-22T23:55:18.552501"
           },
@@ -9043,7 +9043,7 @@ window.FILESYSTEM_MANIFEST = [
           {
             "name": "mock_edgar.py",
             "type": "file",
-            "path": "./core/pipelines/mock_edgar.py",
+            "path": "./config/mocks/mock_edgar.py",
             "size": 24128,
             "modified": "2026-02-22T23:55:18.660501"
           },
@@ -11118,38 +11118,38 @@ window.FILESYSTEM_MANIFEST = [
           {
             "name": "mock_llm_service",
             "type": "directory",
-            "path": "./core/tools/mock_llm_service",
+            "path": "./config/mocks/mock_llm_service",
             "children": [
               {
                 "name": "README.md",
                 "type": "file",
-                "path": "./core/tools/mock_llm_service/README.md",
+                "path": "./config/mocks/mock_llm_service/README.md",
                 "size": 1410,
                 "modified": "2026-02-22T23:55:18.700501"
               },
               {
                 "name": "app.py",
                 "type": "file",
-                "path": "./core/tools/mock_llm_service/app.py",
+                "path": "./config/mocks/mock_llm_service/app.py",
                 "size": 33521,
                 "modified": "2026-02-22T23:55:18.700501"
               },
               {
                 "name": "data",
                 "type": "directory",
-                "path": "./core/tools/mock_llm_service/data",
+                "path": "./config/mocks/mock_llm_service/data",
                 "children": [
                   {
                     "name": "PROBABILITY_MAP_CORE.json",
                     "type": "file",
-                    "path": "./core/tools/mock_llm_service/data/PROBABILITY_MAP_CORE.json",
+                    "path": "./config/mocks/mock_llm_service/data/PROBABILITY_MAP_CORE.json",
                     "size": 1907,
                     "modified": "2026-02-22T23:55:18.700501"
                   },
                   {
                     "name": "index.html",
                     "type": "file",
-                    "path": "./core/tools/mock_llm_service/data/index.html",
+                    "path": "./config/mocks/mock_llm_service/data/index.html",
                     "size": 4173,
                     "modified": "2026-02-22T23:55:18.700501"
                   }
@@ -11159,14 +11159,14 @@ window.FILESYSTEM_MANIFEST = [
               {
                 "name": "index.html",
                 "type": "file",
-                "path": "./core/tools/mock_llm_service/index.html",
+                "path": "./config/mocks/mock_llm_service/index.html",
                 "size": 7066,
                 "modified": "2026-02-22T23:55:18.700501"
               },
               {
                 "name": "requirements.txt",
                 "type": "file",
-                "path": "./core/tools/mock_llm_service/requirements.txt",
+                "path": "./config/mocks/mock_llm_service/requirements.txt",
                 "size": 6,
                 "modified": "2026-02-22T23:55:18.704501"
               }

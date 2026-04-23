@@ -14,7 +14,7 @@ from core.enterprise.credit_memo.orchestrator import CreditMemoOrchestrator
 from core.enterprise.credit_memo.audit_logger import audit_logger
 
 # Import MockEdgar for fallback/setup if needed by the orchestrator (Optional, keeping context)
-from core.pipelines.mock_edgar import MockEdgar
+from config.mocks.mock_edgar import MockEdgar
 
 # Rich Portfolio Data (From Left Side - Better Dataset)
 PORTFOLIO = [

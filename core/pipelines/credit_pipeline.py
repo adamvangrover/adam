@@ -1,6 +1,6 @@
 from typing import Dict, Any
 import logging
-from core.pipelines.mock_edgar import MockEdgar
+from config.mocks.mock_edgar import MockEdgar
 from core.agents.credit.orchestrator import CreditOrchestrator
 
 class CreditPipeline:

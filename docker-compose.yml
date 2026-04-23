@@ -106,3 +106,39 @@ services:
     image: qdrant/qdrant
     ports:
       - "6333:6333"
+
+  core-engine-legacy:
+    build:
+      context: .
+      dockerfile: Dockerfile.core
+    environment:
+      - ENV=demo
+    ports:
+      - "5002:5001"
+    depends_on:
+      - db
+      - redis
+
+  swarm-engine:
+    build:
+      context: .
+      dockerfile: Dockerfile.swarm
+    environment:
+      - ENV=demo
+    ports:
+      - "5003:5001"
+    depends_on:
+      - db
+      - redis
+
+  modern-engine:
+    build:
+      context: .
+      dockerfile: Dockerfile.modern
+    environment:
+      - ENV=demo
+    ports:
+      - "5004:5001"
+    depends_on:
+      - db
+      - redis

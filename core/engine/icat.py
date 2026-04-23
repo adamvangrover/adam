@@ -101,13 +101,18 @@ class ICATEngine:
         elif source == "edgar":
             if not self.edgar_available:
                 logger.warning("Edgartools not available. Returning mock SEC structure.")
-                return self._mock_edgar_fetch(ticker)
+                if os.getenv("ENV") == "demo":
+                    return self._mock_edgar_fetch_icat(ticker)
+                else:
+                    # In production, route to the rust engine or live fetch
+                    pass  # Placeholder for actual Rust execution layer call
+                return self._mock_edgar_fetch_icat(ticker) # Fallback to mock for now
             return self._fetch_from_edgar(ticker)
 
         else:
             raise ValueError(f"Unknown source: {source}")
 
-    def _mock_edgar_fetch(self, ticker: str) -> Dict[str, Any]:
+    def _mock_edgar_fetch_icat(self, ticker: str) -> Dict[str, Any]:
         """Mock response simulating an SEC fetch for demonstration."""
         return {
             "ticker": ticker,

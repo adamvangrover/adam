@@ -16,7 +16,7 @@ import logging
 from datetime import datetime
 from typing import Dict, Any, List
 
-from core.pipelines.mock_edgar import EdgarSource
+from config.mocks.mock_edgar import EdgarSource
 
 # Configure Logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
