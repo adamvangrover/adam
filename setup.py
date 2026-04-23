@@ -61,7 +61,8 @@ if not install_requires:
         "fastapi>=0.100.0",
         "uvicorn>=0.23.0",
         "aiofiles>=23.0.0",
-        "sentence-transformers>=2.2.0"
+        "sentence-transformers>=2.2.0",
+        "defusedxml>=0.7.1"
     ]
 
 setup(
