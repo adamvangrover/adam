@@ -1,0 +1,75 @@
+{
+  "spec_version": "1.4.0-otel",
+  "timestamp": "2026-04-24T00:13:03.355457Z",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "severity_text": "WARN",
+  "severity_number": 13,
+  "event_name": "swarm.agent.lifecycle.deprecated",
+  "resource": {
+    "service.name": "swarm-orchestrator",
+    "service.version": "4.2.0",
+    "deployment.environment": "production",
+    "node.id": "worker-node-aws-us-east-1a-04"
+  },
+  "attributes": {
+    "agent.id": "RegulatoryComplianceAgent",
+    "agent.previous_version": "v29.x",
+    "agent.target_version": "v30",
+    "deprecation.reason": "Transitioning to v30 architecture.",
+    "deprecation.action_required": true
+  },
+  "metrics": {
+    "agent.core_logic.function_count": 10,
+    "agent.capabilities.count": 7
+  },
+  "artifacts": {
+    "provenance": {
+      "repository": "git+ssh://repo/agents/regulatory.py",
+      "commit_sha": "a1b2c3d4e5f6g7h8i9j0",
+      "docstring_hash": "sha256:d8c4b12389a..."
+    },
+    "extracted_capabilities": [
+      "Monitors regulatory changes and trends across relevant jurisdictions.",
+      "Analyzes financial transactions and activities for compliance.",
+      "Identifies potential regulatory risks and provides mitigation strategies.",
+      "Generates compliance reports and audit trails.",
+      "Collaborates with other agents to incorporate compliance considerations.",
+      "Provides guidance on interacting with regulatory bodies.",
+      "Adapts to changing political landscapes and regulatory priorities."
+    ],
+    "core_logic_signatures": [
+      {
+        "name": "__init__",
+        "ast_hash": "sha256:8f4343466481234a",
+        "loc": 14,
+        "source": "def __init__(self, config: Dict[str, Any], **kwargs):\n        \"\"\"\n        Initializes the RegulatoryComplianceAgent with configuration parameters.\n\n        Args:\n            config: A dictionary containing configuration parameters.\n        \"\"\"\n        super().__init__(config, **kwargs)\n        self.regulatory_knowledge = self._load_regulatory_knowledge()\n        self.nlp_toolkit = self._initialize_nlp_toolkit()\n        self.political_landscape = self._load_political_landscape()\n        # Initialize LLM with config from agent config\n        self.llm = LLMPlugin(config=self.config.get(\"llm_config\"))\n\n        # Load learned parameters for continuous learning\n        self.learned_params = self._load_learned_profile()"
+      },
+      {
+        "name": "_load_learned_profile",
+        "ast_hash": "sha256:1a2b3c4d5e6f7g8h",
+        "loc": 22,
+        "source": "def _load_learned_profile(self) -> Dict:\n        \"\"\"\n        Loads the learned compliance profile (weights, risk modifiers) from disk.\n        \"\"\"\n        profile_path = \"data/compliance_learned_profile.json\"\n        default_profile = {\n            \"rule_weights\": {\n                \"threshold_violation\": 0.5,\n                \"geopolitical_risk\": 0.3\n            },\n            \"entity_risk_modifiers\": {},\n            \"learning_rate\": 0.05\n        }\n        if os.path.exists(profile_path):\n            try:\n                with open(profile_path, 'r') as f:\n                    return json.load(f)\n            except Exception as e:\n                logger.error(f\"Failed to load learned profile: {e}\")\n        return default_profile"
+      },
+      {
+        "name": "_save_learned_profile",
+        "ast_hash": "sha256:9h8g7f6e5d4c3b2a",
+        "loc": 11,
+        "source": "def _save_learned_profile(self):\n        \"\"\"\n        Saves the learned compliance profile to disk.\n        \"\"\"\n        profile_path = \"data/compliance_learned_profile.json\"\n        try:\n            os.makedirs(os.path.dirname(profile_path), exist_ok=True)\n            with open(profile_path, 'w') as f:\n                json.dump(self.learned_params, f, indent=2)\n        except Exception as e:\n            logger.error(f\"Failed to save learned profile: {e}\")"
+      },
+      {
+        "name": "_load_regulatory_knowledge",
+        "ast_hash": "sha256:5q6w7e8r9t0y1u2i",
+        "loc": 33,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "execute",
+        "ast_hash": "sha256:z1x2c3v4b5n6m7l8",
+        "loc": 47,
+        "source_omitted_for_brevity": true
+      }
+    ]
+  }
+}
