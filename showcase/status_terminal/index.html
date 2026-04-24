@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sovereign Status Terminal</title>
+    <style>
+        :root {
+            --bg-base: #0f0f13;
+            --bg-panel: #1a1a24;
+            --text-main: #e2e8f0;
+            --text-muted: #94a3b8;
+            --neon-blue: #0ea5e9;
+            --neon-green: #10b981;
+            --neon-red: #ef4444;
+            --border-color: #334155;
+        }
+
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-main);
+            font-family: 'Fira Code', 'JetBrains Mono', monospace;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1, h2, h3 {
+            color: var(--neon-blue);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 0;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 20px;
+            margin-bottom: 20px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+        }
+
+        input[type="text"] {
+            background-color: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 8px 12px;
+            font-family: inherit;
+            outline: none;
+            width: 250px;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--neon-blue);
+        }
+
+        .container {
+            display: flex;
+            gap: 20px;
+            height: calc(100vh - 120px);
+        }
+
+        .table-container {
+            flex: 1;
+            background-color: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            overflow-y: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+        }
+
+        th {
+            background-color: #000;
+            color: var(--neon-blue);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        tr:hover {
+            background-color: rgba(14, 165, 233, 0.1);
+        }
+
+        .selected-row {
+            background-color: rgba(14, 165, 233, 0.2);
+            border-left: 4px solid var(--neon-blue);
+        }
+
+        .details-panel {
+            flex: 1;
+            background-color: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .details-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        .export-btn {
+            background-color: transparent;
+            border: 1px solid var(--neon-green);
+            color: var(--neon-green);
+            padding: 8px 16px;
+            cursor: pointer;
+            font-family: inherit;
+            text-transform: uppercase;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+
+        .export-btn:hover {
+            background-color: var(--neon-green);
+            color: #000;
+        }
+
+        pre {
+            background-color: #000;
+            padding: 15px;
+            border: 1px solid var(--border-color);
+            color: var(--neon-green);
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+
+        .risk-high { color: var(--neon-red); }
+        .risk-med { color: #f59e0b; }
+        .risk-low { color: var(--neon-green); }
+
+        .instructions {
+            background-color: var(--bg-panel);
+            padding: 15px;
+            border-left: 4px solid var(--neon-blue);
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>SOVEREIGN // STATUS TERMINAL</h1>
+        <div class="controls">
+            <input type="text" id="searchInput" placeholder="SEARCH ENTITY OR SECTOR..." onkeyup="filterTable()">
+        </div>
+    </header>
+
+    <div id="instructionsPanel" class="instructions" style="display: none;">
+        <strong>[SYSTEM ALERT]</strong> CORS policy prevented loading the local JSONL file.
+        <br><br>
+        To run this dashboard properly, start a local server from the root of this project:
+        <br><code>python -m http.server 8000</code>
+        <br>Then navigate to <code>http://localhost:8000/showcase/status_terminal/index.html</code>
+    </div>
+
+    <div class="container">
+        <div class="table-container">
+            <table id="dataTable">
+                <thead>
+                    <tr>
+                        <th onclick="sortTable(0)">ENTITY &#x21D5;</th>
+                        <th onclick="sortTable(1)">DATE &#x21D5;</th>
+                        <th onclick="sortTable(2)">RISK SCORE &#x21D5;</th>
+                        <th onclick="sortTable(3)">SYSTEM STATUS &#x21D5;</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <!-- Rows injected by JS -->
+                </tbody>
+            </table>
+        </div>
+
+        <div class="details-panel" id="detailsPanel">
+            <div class="details-header">
+                <h2 id="detailTitle">SYSTEM STATUS</h2>
+                <button class="export-btn" onclick="exportProfile()" id="exportBtn" style="display:none;">EXPORT .JSON</button>
+            </div>
+            <pre id="detailContent">// SELECT AN ENTITY TO VIEW COMPREHENSIVE STATUS...</pre>
+        </div>
+    </div>
+
+    <script>
+        let allRecords = [];
+        let currentSelectedRecord = null;
+
+        async function loadData() {
+            try {
+                const response = await fetch('valuation_history.jsonl');
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+                const text = await response.text();
+                const lines = text.split('\n');
+
+                lines.forEach(line => {
+                    if (line.trim()) {
+                        try {
+                            allRecords.push(JSON.parse(line));
+                        } catch (e) {
+                            console.error("Error parsing JSON line:", e);
+                        }
+                    }
+                });
+
+                renderTable(allRecords);
+            } catch (error) {
+                console.error("Failed to load data:", error);
+                if (window.location.protocol === 'file:') {
+                    document.getElementById('instructionsPanel').style.display = 'block';
+                }
+            }
+        }
+
+        function renderTable(records) {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+
+            records.forEach((record, index) => {
+                const tr = document.createElement('tr');
+
+                const name = record.borrower_name || record.ticker || "UNKNOWN";
+                const dateRaw = record.system_timestamp || record.report_date || "N/A";
+                const date = dateRaw !== "N/A" ? new Date(dateRaw).toISOString().split('T')[0] : "N/A";
+                const risk = record.risk_score !== undefined ? record.risk_score : "N/A";
+
+                let riskClass = "";
+                if (typeof risk === 'number') {
+                    if (risk > 75) riskClass = "risk-high";
+                    else if (risk > 40) riskClass = "risk-med";
+                    else riskClass = "risk-low";
+                }
+
+                tr.innerHTML = `
+                    <td><strong>${name}</strong></td>
+                    <td>${date}</td>
+                    <td class="${riskClass}">${risk}</td>
+                    <td><span class="status-badge" style="border: 1px solid var(--neon-blue); color: var(--neon-blue);">ONLINE</span></td>
+                `;
+
+                tr.onclick = () => {
+                    document.querySelectorAll('tr').forEach(r => r.classList.remove('selected-row'));
+                    tr.classList.add('selected-row');
+                    showDetails(record);
+                };
+
+                tbody.appendChild(tr);
+            });
+        }
+
+        function showDetails(record) {
+            currentSelectedRecord = record;
+            const name = record.borrower_name || record.ticker || "UNKNOWN ENTITY";
+            document.getElementById('detailTitle').innerText = name + " // STATUS";
+            document.getElementById('exportBtn').style.display = 'block';
+
+            // Pretty print the JSON payload
+            document.getElementById('detailContent').innerText = JSON.stringify(record, null, 2);
+        }
+
+        function filterTable() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = allRecords.filter(r => {
+                const name = (r.borrower_name || r.ticker || "").toLowerCase();
+                const sector = (r.sector || (r.borrower_details && r.borrower_details.sector) || "").toLowerCase();
+                return name.includes(query) || sector.includes(query);
+            });
+            renderTable(filtered);
+        }
+
+        let sortDirections = [true, true, true, true]; // true = asc
+        function sortTable(colIndex) {
+            const direction = sortDirections[colIndex] ? 1 : -1;
+            sortDirections[colIndex] = !sortDirections[colIndex];
+
+            const sorted = [...allRecords].sort((a, b) => {
+                let valA, valB;
+
+                if (colIndex === 0) {
+                    valA = a.borrower_name || a.ticker || "";
+                    valB = b.borrower_name || b.ticker || "";
+                } else if (colIndex === 1) {
+                    valA = a.system_timestamp || a.report_date || "";
+                    valB = b.system_timestamp || b.report_date || "";
+                } else if (colIndex === 2) {
+                    valA = typeof a.risk_score === 'number' ? a.risk_score : 0;
+                    valB = typeof b.risk_score === 'number' ? b.risk_score : 0;
+                }
+
+                if (valA < valB) return -1 * direction;
+                if (valA > valB) return 1 * direction;
+                return 0;
+            });
+
+            renderTable(sorted);
+        }
+
+        function exportProfile() {
+            if (!currentSelectedRecord) return;
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(currentSelectedRecord, null, 2));
+            const downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            const name = currentSelectedRecord.borrower_name || currentSelectedRecord.ticker || "entity";
+            const safeName = name.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+            downloadAnchorNode.setAttribute("download", `status_profile_${safeName}.json`);
+            document.body.appendChild(downloadAnchorNode);
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+        }
+
+        // Initialize
+        loadData();
+    </script>
+</body>
+</html>
