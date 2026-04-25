@@ -25,6 +25,22 @@ const HEADLINES = [
   "SoftBank pours $50B into AI hardware manufacturing"
 ];
 
+const NewsRow = React.memo(({ item, isNewest }: { item: NewsItem, isNewest: boolean }) => (
+    <div className={`p-3 border-b border-cyan-900/20 hover:bg-cyan-900/20 transition-colors cursor-pointer ${isNewest ? 'animate-flash' : ''}`}>
+        <div className="flex justify-between items-start mb-1">
+            <span className="text-[10px] text-cyan-600 font-bold">{new Date(item.timestamp).toLocaleTimeString()}</span>
+            <span className={`text-[9px] px-1 rounded ${item.priority === 'HIGH' ? 'bg-red-900 text-red-200' : 'bg-cyan-900/50 text-cyan-400'}`}>
+                {item.source}
+            </span>
+        </div>
+        <h4 className={`text-xs font-mono leading-tight ${item.priority === 'HIGH' ? 'text-white font-bold' : 'text-cyan-200'}`}>
+            {item.priority === 'HIGH' && <span className="text-red-500 mr-1">FLASH:</span>}
+            {item.headline}
+        </h4>
+    </div>
+));
+NewsRow.displayName = 'NewsRow';
+
 export const NewsWire: React.FC = () => {
   const [news, setNews] = useState<NewsItem[]>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -62,18 +78,7 @@ export const NewsWire: React.FC = () => {
 
         <div className="flex-1 overflow-y-auto p-0 scrollbar-hide" ref={scrollRef}>
             {news.map((item, i) => (
-                <div key={item.id} className={`p-3 border-b border-cyan-900/20 hover:bg-cyan-900/20 transition-colors cursor-pointer ${i===0 ? 'animate-flash' : ''}`}>
-                    <div className="flex justify-between items-start mb-1">
-                        <span className="text-[10px] text-cyan-600 font-bold">{new Date(item.timestamp).toLocaleTimeString()}</span>
-                        <span className={`text-[9px] px-1 rounded ${item.priority === 'HIGH' ? 'bg-red-900 text-red-200' : 'bg-cyan-900/50 text-cyan-400'}`}>
-                            {item.source}
-                        </span>
-                    </div>
-                    <h4 className={`text-xs font-mono leading-tight ${item.priority === 'HIGH' ? 'text-white font-bold' : 'text-cyan-200'}`}>
-                        {item.priority === 'HIGH' && <span className="text-red-500 mr-1">FLASH:</span>}
-                        {item.headline}
-                    </h4>
-                </div>
+                <NewsRow key={item.id} item={item} isNewest={i === 0} />
             ))}
         </div>
 
