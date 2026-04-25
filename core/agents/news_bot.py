@@ -120,8 +120,8 @@ class NewsBot(AgentBase):
         # Sentiment Model (FinBERT)
         try:
             name = "ProsusAI/finbert"
-            self.finbert_tokenizer = AutoTokenizer.from_pretrained(name)  # nosec B615
-            self.finbert_model = AutoModelForSequenceClassification.from_pretrained(name)  # nosec B615
+            self.finbert_tokenizer = AutoTokenizer.from_pretrained(name, revision="main")
+            self.finbert_model = AutoModelForSequenceClassification.from_pretrained(name, revision="main")
             print(f"✔ Sentiment Model ({name}) loaded.")
         except Exception as e:
             print(f"✘ Failed to load FinBERT: {e}")
@@ -130,8 +130,8 @@ class NewsBot(AgentBase):
         try:
             # Using distilbart-cnn-12-6 for speed/memory efficiency
             name = "sshleifer/distilbart-cnn-12-6" 
-            self.summarizer_tokenizer = AutoTokenizer.from_pretrained(name)  # nosec B615
-            self.summarizer_model = AutoModelForSeq2SeqLM.from_pretrained(name)  # nosec B615
+            self.summarizer_tokenizer = AutoTokenizer.from_pretrained(name, revision="main")
+            self.summarizer_model = AutoModelForSeq2SeqLM.from_pretrained(name, revision="main")
             print(f"✔ Summarization Model ({name}) loaded.")
         except Exception as e:
             print(f"✘ Failed to load Summarizer: {e}")

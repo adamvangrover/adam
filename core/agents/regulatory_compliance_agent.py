@@ -1,6 +1,7 @@
 # core/agents/regulatory_compliance_agent.py
 
 from __future__ import annotations
+from typing_extensions import deprecated
 import re
 import logging
 import json
@@ -23,6 +24,7 @@ from core.agents.agent_base import AgentBase
 logger = logging.getLogger(__name__)
 
 
+@deprecated('Transitioning to v30 architecture')
 class RegulatoryComplianceAgent(AgentBase):
     """
     Ensures adherence to all applicable financial regulations and compliance standards.
