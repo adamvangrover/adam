@@ -1,0 +1,80 @@
+{
+  "spec_version": "1.4.0-otel",
+  "timestamp": "2026-04-24T00:13:03.355457Z",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "severity_text": "WARN",
+  "severity_number": 13,
+  "event_name": "swarm.agent.lifecycle.deprecated",
+  "resource": {
+    "service.name": "swarm-orchestrator",
+    "service.version": "4.2.0",
+    "deployment.environment": "production",
+    "node.id": "worker-node-aws-us-east-1a-04"
+  },
+  "attributes": {
+    "agent.id": "LiquidityRiskAgent",
+    "agent.previous_version": "v29.x",
+    "agent.target_version": "v30",
+    "deprecation.reason": "Transitioning to v30 architecture.",
+    "deprecation.action_required": true
+  },
+  "metrics": {
+    "agent.core_logic.function_count": 7,
+    "agent.capabilities.count": 0
+  },
+  "artifacts": {
+    "provenance": {
+      "repository": "git+ssh://repo/core/agents/liquidity_risk_agent.py",
+      "commit_sha": "a1b2c3d4e5f6g7h8i9j0",
+      "docstring_hash": "sha256:d8c4b12389a..."
+    },
+    "extracted_capabilities": [],
+    "core_logic_signatures": [
+      {
+        "name": "__init__",
+        "ast_hash": "sha256:7bf97a7dad0a32ab",
+        "loc": 2,
+        "source": "def __init__(self, config: Dict[str, Any], **kwargs):\n        super().__init__(config, **kwargs)"
+      },
+      {
+        "name": "execute",
+        "ast_hash": "sha256:01bfbe62b85487fb",
+        "loc": 88,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "_calculate_lcr",
+        "ast_hash": "sha256:b225e58cc304fc65",
+        "loc": 25,
+        "source": "def _calculate_lcr(self, financial_data: Dict[str, Any]) -> float:\n        \"\"\"Calculates Liquidity Coverage Ratio (LCR) approximation.\"\"\"\n        # LCR = HQLA / Total Net Cash Outflows over 30 days\n\n        cash = financial_data.get(\"cash_and_equivalents\", 0)\n        govt_bonds = financial_data.get(\"government_bonds\", 0)\n        corp_bonds = financial_data.get(\"corporate_bonds_high_grade\", 0)\n\n        # HQLA proxy: Cash + 100% Govt + 85% Corp\n        hqla = cash + (govt_bonds * 1.0) + (corp_bonds * 0.85)\n\n        cl = financial_data.get(\"current_liabilities\", 0)\n        net_outflows = financial_data.get(\"net_cash_outflows_30d\")\n\n        if net_outflows is None or net_outflows == 0:\n            # Proxy: 20% of Current Liabilities assume due in 30 days\n            if cl > 0:\n                net_outflows = cl * 0.20\n            else:\n                net_outflows = 1.0 # Avoid div by zero\n\n        if net_outflows <= 0:\n            return 10.0 # High liquidity implied if no outflows\n\n        return hqla / net_outflows"
+      },
+      {
+        "name": "_calculate_impact_cost",
+        "ast_hash": "sha256:c291f9ed48d75243",
+        "loc": 22,
+        "source": "def _calculate_impact_cost(self, market_data: Dict[str, Any], trade_size: float) -> float:\n        \"\"\"Calculates estimated market impact cost (percentage) for a given trade size.\"\"\"\n        spread = market_data.get(\"bid_ask_spread\", 0)\n        price = market_data.get(\"price\", 100)\n        avg_vol = market_data.get(\"avg_daily_volume\", 1000000)\n        volatility = market_data.get(\"volatility\", 0.02) # Daily vol\n\n        if avg_vol <= 0: return 1.0 # 100% impact (illiquid)\n        if price <= 0: return 0.0\n\n        # Impact Model: Half-Spread + Temporary Impact (Square Root Law)\n        # Cost = (Spread/2) + c * sigma * sqrt(Size / Volume)\n        # Assuming c approx 0.5 to 1.0. Let's use 1.0 conservative.\n\n        half_spread_pct = (spread / 2) / price\n\n        # Market Impact (Price Move)\n        # If trade size > avg_vol, impact is massive.\n        ratio = trade_size / avg_vol\n        market_impact_pct = volatility * np.sqrt(ratio)\n\n        return float(half_spread_pct + market_impact_pct)"
+      },
+      {
+        "name": "_calculate_ccc",
+        "ast_hash": "sha256:270a6d22ac81850d",
+        "loc": 21,
+        "source": "def _calculate_ccc(self, financial_data: Dict[str, Any]) -> Optional[float]:\n        \"\"\"Calculates Cash Conversion Cycle (CCC) = DSO + DIO - DPO.\"\"\"\n        sales = financial_data.get(\"sales\", 0)\n        cogs = financial_data.get(\"cogs\", 0)\n        receivables = financial_data.get(\"receivables\", 0)\n        inventory = financial_data.get(\"inventory\", 0)\n        payables = financial_data.get(\"payables\", 0)\n\n        if sales == 0 or cogs == 0:\n            return None\n\n        # Days Sales Outstanding (DSO)\n        dso = (receivables / sales) * 365\n\n        # Days Inventory Outstanding (DIO)\n        dio = (inventory / cogs) * 365\n\n        # Days Payable Outstanding (DPO)\n        dpo = (payables / cogs) * 365 # Often uses COGS or Purch (approx COGS)\n\n        return float(dso + dio - dpo)"
+      },
+      {
+        "name": "_calculate_nsfr",
+        "ast_hash": "sha256:2eb160de0b4e04e8",
+        "loc": 34,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "_calculate_spread_volatility",
+        "ast_hash": "sha256:a39ddc968cc37b5b",
+        "loc": 7,
+        "source": "def _calculate_spread_volatility(self, market_data: Dict[str, Any]) -> float:\n        \"\"\"Calculates volatility of the bid-ask spread if history is provided.\"\"\"\n        spread_history = market_data.get(\"spread_history\", [])\n        if not spread_history or len(spread_history) < 2:\n            return 0.0\n\n        return float(np.std(spread_history))"
+      }
+    ]
+  }
+}

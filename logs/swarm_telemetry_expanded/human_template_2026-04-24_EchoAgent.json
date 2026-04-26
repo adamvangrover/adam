@@ -1,0 +1,90 @@
+{
+  "spec_version": "1.4.0-otel",
+  "timestamp": "2026-04-24T00:13:03.355457Z",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "severity_text": "WARN",
+  "severity_number": 13,
+  "event_name": "swarm.agent.lifecycle.deprecated",
+  "resource": {
+    "service.name": "swarm-orchestrator",
+    "service.version": "4.2.0",
+    "deployment.environment": "production",
+    "node.id": "worker-node-aws-us-east-1a-04"
+  },
+  "attributes": {
+    "agent.id": "EchoAgent",
+    "agent.previous_version": "v29.x",
+    "agent.target_version": "v30",
+    "deprecation.reason": "Transitioning to v30 architecture.",
+    "deprecation.action_required": true
+  },
+  "metrics": {
+    "agent.core_logic.function_count": 9,
+    "agent.capabilities.count": 0
+  },
+  "artifacts": {
+    "provenance": {
+      "repository": "git+ssh://repo/core/agents/echo_agent.py",
+      "commit_sha": "a1b2c3d4e5f6g7h8i9j0",
+      "docstring_hash": "sha256:d8c4b12389a..."
+    },
+    "extracted_capabilities": [],
+    "core_logic_signatures": [
+      {
+        "name": "__init__",
+        "ast_hash": "sha256:594ca3258e68647a",
+        "loc": 6,
+        "source": "def __init__(self, config):\n        self.config = config\n        self.environment = self.detect_environment()\n        self.ui_enabled = config.get('ui_enabled', False)\n        self.logger = logging.getLogger(__name__)\n        logging.basicConfig(level=logging.INFO)"
+      },
+      {
+        "name": "detect_environment",
+        "ast_hash": "sha256:052aef49653ff912",
+        "loc": 29,
+        "source": "def detect_environment(self):\n        \"\"\"\n        Detects the environment settings including LLM engine, API type, and system resources.\n        \"\"\"\n        try:\n            # 1. LLM Engine Identification\n            llm_engine = os.environ.get('LLM_ENGINE', 'unknown')  # Example: 'openai', 'google'\n\n            # 2. API Type Determination\n            api_type = 'simulated' if 'simulated' in self.config.get('data_sources', {}) else 'actual'\n\n            # 3. Resource Availability Assessment (Example: CPU and memory check)\n            resources = {\n                'cpu': os.cpu_count(),\n                'memory': os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_PHYS_PAGES') / (1024. ** 3)  # in GB\n            }\n\n            environment = {\n                'llm_engine': llm_engine,\n                'api_type': api_type,\n                'resources': resources,\n            }\n\n            self.logger.info(\"Environment detected: %s\", environment)\n            return environment\n\n        except Exception as e:\n            self.logger.error(\"Error detecting environment: %s\", e)\n            return {}"
+      },
+      {
+        "name": "optimize_prompt",
+        "ast_hash": "sha256:bfd6eb11b065f827",
+        "loc": 16,
+        "source": "def optimize_prompt(self, prompt, **kwargs):\n        \"\"\"\n        Optimizes the prompt based on the current environment and task context.\n        \"\"\"\n        try:\n            optimized_prompt = prompt  # Placeholder for optimization logic\n            if self.environment.get('llm_engine') == 'openai':\n                # Example optimization: Customize prompt for OpenAI engine\n                optimized_prompt = f\"Optimized for OpenAI: {prompt}\"\n\n            self.logger.info(\"Prompt optimized: %s\", optimized_prompt)\n            return optimized_prompt\n\n        except Exception as e:\n            self.logger.error(\"Error optimizing prompt: %s\", e)\n            return prompt"
+      },
+      {
+        "name": "run_ui",
+        "ast_hash": "sha256:b577cccbe3317515",
+        "loc": 14,
+        "source": "def run_ui(self):\n        \"\"\"\n        Starts the chatbot UI if enabled.\n        \"\"\"\n        try:\n            if self.ui_enabled:\n                # Placeholder for actual UI implementation\n                self.logger.info(\"Starting chatbot UI...\")\n                pass  # Start UI code here\n            else:\n                self.logger.info(\"UI not enabled.\")\n\n        except Exception as e:\n            self.logger.error(\"Error starting UI: %s\", e)"
+      },
+      {
+        "name": "run_expert_network",
+        "ast_hash": "sha256:1367172afdc4901e",
+        "loc": 11,
+        "source": "def run_expert_network(self, task, **kwargs):\n        \"\"\"\n        Run a network of expert models to process the task.\n        \"\"\"\n        try:\n            # Placeholder for expert network logic\n            self.logger.info(\"Running expert network for task: %s\", task)\n            pass  # Implement expert network logic here\n\n        except Exception as e:\n            self.logger.error(\"Error running expert network: %s\", e)"
+      },
+      {
+        "name": "enhance_output",
+        "ast_hash": "sha256:a55b72b9ebd521d1",
+        "loc": 12,
+        "source": "def enhance_output(self, output, **kwargs):\n        \"\"\"\n        Enhance the output using additional knowledge or insights.\n        \"\"\"\n        try:\n            enhanced_output = output  # Placeholder for enhancing logic\n            self.logger.info(\"Output enhanced: %s\", enhanced_output)\n            return enhanced_output\n\n        except Exception as e:\n            self.logger.error(\"Error enhancing output: %s\", e)\n            return output"
+      },
+      {
+        "name": "get_knowledge_graph_context",
+        "ast_hash": "sha256:9cfbe8cffad1544c",
+        "loc": 14,
+        "source": "def get_knowledge_graph_context(self, query):\n        \"\"\"\n        Retrieves relevant context from the knowledge graph based on the query.\n        \"\"\"\n        try:\n            from core.engine.unified_knowledge_graph import UnifiedKnowledgeGraph\n            kg = UnifiedKnowledgeGraph()\n            context = {\"status\": \"retrieved\", \"query\": query, \"metadata\": \"Mock response from UKG in EchoAgent.\"}\n            self.logger.info(\"Knowledge graph context retrieved for query '%s': %s\", query, context)\n            return context\n\n        except Exception as e:\n            self.logger.error(\"Error fetching knowledge graph context: %s\", e)\n            return {}"
+      },
+      {
+        "name": "process_task",
+        "ast_hash": "sha256:06587b14418540d7",
+        "loc": 26,
+        "source": "def process_task(self, ch, method, properties, body):\n        \"\"\"\n        Processes the received task from the message queue.\n        \"\"\"\n        try:\n            task = json.loads(body)\n            task_type = task.get('type')\n            self.logger.info(\"Processing task of type: %s\", task_type)\n\n            if task_type == 'optimize_prompt':\n                optimized_prompt = self.optimize_prompt(task['prompt'], **task.get('kwargs', {}))\n\n            elif task_type == 'run_expert_network':\n                self.run_expert_network(task['task'], **task.get('kwargs', {}))\n\n            elif task_type == 'enhance_output':\n                enhanced_output = self.enhance_output(task['output'], **task.get('kwargs', {}))\n\n            elif task_type == 'get_knowledge_graph_context':\n                context = self.get_knowledge_graph_context(task['query'])\n\n            else:\n                self.logger.warning(\"Unknown task type: %s\", task_type)\n\n        except Exception as e:\n            self.logger.error(\"Error processing task: %s\", e)"
+      },
+      {
+        "name": "run",
+        "ast_hash": "sha256:bf812064a9bd676d",
+        "loc": 11,
+        "source": "async def run(self, **kwargs):\n        \"\"\"\n        Main entry point for running the agent using a modern async loop.\n        \"\"\"\n        try:\n            self.logger.info(\"EchoAgent async loop started.\")\n            # Simulate a non-blocking wait for tasks\n            await asyncio.sleep(0.1)\n\n        except Exception as e:\n            self.logger.error(\"Error running EchoAgent: %s\", e)"
+      }
+    ]
+  }
+}

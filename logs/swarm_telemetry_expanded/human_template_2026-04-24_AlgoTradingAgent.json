@@ -1,0 +1,99 @@
+{
+  "spec_version": "1.4.0-otel",
+  "timestamp": "2026-04-24T00:13:03.355457Z",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "severity_text": "WARN",
+  "severity_number": 13,
+  "event_name": "swarm.agent.lifecycle.deprecated",
+  "resource": {
+    "service.name": "swarm-orchestrator",
+    "service.version": "4.2.0",
+    "deployment.environment": "production",
+    "node.id": "worker-node-aws-us-east-1a-04"
+  },
+  "attributes": {
+    "agent.id": "AlgoTradingAgent",
+    "agent.previous_version": "v29.x",
+    "agent.target_version": "v30",
+    "deprecation.reason": "Transitioning to v30 architecture.",
+    "deprecation.action_required": true
+  },
+  "metrics": {
+    "agent.core_logic.function_count": 10,
+    "agent.capabilities.count": 0
+  },
+  "artifacts": {
+    "provenance": {
+      "repository": "git+ssh://repo/core/agents/algo_trading_agent.py",
+      "commit_sha": "a1b2c3d4e5f6g7h8i9j0",
+      "docstring_hash": "sha256:d8c4b12389a..."
+    },
+    "extracted_capabilities": [],
+    "core_logic_signatures": [
+      {
+        "name": "__init__",
+        "ast_hash": "sha256:a64d00f80eb28cf0",
+        "loc": 19,
+        "source": "def __init__(self, config: Dict[str, Any] = None, data=None, strategies=None, initial_balance=10000, **kwargs):\n        \"\"\"\n        Initializes the trading agent.\n\n        Args:\n            config (Dict[str, Any]): Configuration dictionary for AgentBase compatibility.\n            data (pd.DataFrame): Historical market data (e.g., price history).\n            strategies (list, optional): List of strategies to be simulated. Defaults to None.\n            initial_balance (float, optional): The starting balance for the simulation. Defaults to 10000.\n        \"\"\"\n        if config is None:\n            config = {}\n        super().__init__(config, **kwargs)\n        \n        # Support both legacy init params and config-based init\n        self.data = data if data is not None else config.get('data', pd.DataFrame())\n        self.strategies = strategies or config.get('strategies', ['momentum', 'mean_reversion', 'arbitrage'])\n        self.initial_balance = initial_balance if initial_balance != 10000 else config.get('initial_balance', 10000)\n        self.results = {}"
+      },
+      {
+        "name": "execute",
+        "ast_hash": "sha256:ca8f34b4e72b364f",
+        "loc": 36,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "run_simulation",
+        "ast_hash": "sha256:04cc7df9212a2e8b",
+        "loc": 19,
+        "source": "def run_simulation(self, strategy):\n        \"\"\"\n        Runs the simulation for a given strategy.\n\n        Args:\n            strategy (str): The name of the strategy to simulate.\n\n        Returns:\n            dict: The performance metrics for the strategy.\n        \"\"\"\n        if strategy == 'momentum':\n            return self.momentum_trading()\n        elif strategy == 'mean_reversion':\n            return self.mean_reversion_trading()\n        elif strategy == 'arbitrage':\n            return self.arbitrage_trading()\n        else:\n            logging.warning(f\"Unknown strategy: {strategy}\")\n            return {}"
+      },
+      {
+        "name": "momentum_trading",
+        "ast_hash": "sha256:613970cd86b6dff8",
+        "loc": 32,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "mean_reversion_trading",
+        "ast_hash": "sha256:923430a3e48feb26",
+        "loc": 30,
+        "source": "def mean_reversion_trading(self):\n        \"\"\"\n        Simulates mean reversion trading strategy.\n\n        Buy when the price is below the mean (moving average), sell when above.\n\n        Returns:\n            dict: Performance metrics for mean reversion strategy.\n        \"\"\"\n        balance = self.initial_balance\n        position = 0\n        trade_log = []\n\n        window_size = 20  # Lookback period for moving average\n        for i in range(window_size, len(self.data)):\n            mean = self.data['Close'][i - window_size:i].mean()\n            price = self.data['Close'][i]\n\n            if price < mean and position == 0:  # Buy signal\n                position = balance / price\n                balance = 0\n\n            elif price > mean and position > 0:  # Sell signal\n                balance = position * price\n                position = 0\n\n            trade_log.append({'Balance': balance, 'Position': position})\n\n        final_balance = balance if position == 0 else position * self.data['Close'].iloc[-1]\n        return self.calculate_performance_metrics(trade_log, final_balance)"
+      },
+      {
+        "name": "arbitrage_trading",
+        "ast_hash": "sha256:97fc9eb12ebccebd",
+        "loc": 31,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "calculate_performance_metrics",
+        "ast_hash": "sha256:85bc14a46b4224da",
+        "loc": 29,
+        "source": "def calculate_performance_metrics(self, trade_log, final_balance):\n        \"\"\"\n        Calculates performance metrics such as cumulative returns and drawdown.\n\n        Args:\n            trade_log (list): List of trade actions.\n            final_balance (float): The final balance after the simulation.\n\n        Returns:\n            dict: The performance metrics.\n        \"\"\"\n        trade_df = pd.DataFrame(trade_log)\n        trade_df['Cumulative Balance'] = trade_df['Balance'].cumsum() + trade_df['Position'] * self.data['Close']\n\n        total_return = (trade_df['Cumulative Balance'].iloc[-1] - self.initial_balance) / self.initial_balance\n        win_rate = np.mean(trade_df['Cumulative Balance'] > 0) * 100\n        max_drawdown = self.calculate_max_drawdown(trade_df['Cumulative Balance'])\n\n        # Sharpe Ratio\n        daily_returns = trade_df['Cumulative Balance'].pct_change().dropna()\n        sharpe_ratio = daily_returns.mean() / daily_returns.std() if daily_returns.std() != 0 else 0\n\n        return {\n            'Final Balance': final_balance,\n            'Total Return': total_return,\n            'Win Rate': win_rate,\n            'Max Drawdown': max_drawdown,\n            'Sharpe Ratio': sharpe_ratio\n        }"
+      },
+      {
+        "name": "calculate_max_drawdown",
+        "ast_hash": "sha256:cb068d9e3f983750",
+        "loc": 13,
+        "source": "def calculate_max_drawdown(self, cumulative_balance):\n        \"\"\"\n        Calculates the maximum drawdown of the portfolio.\n\n        Args:\n            cumulative_balance (pd.Series): Series of cumulative balance values.\n\n        Returns:\n            float: The maximum drawdown percentage.\n        \"\"\"\n        rolling_max = cumulative_balance.cummax()\n        drawdown = (cumulative_balance - rolling_max) / rolling_max\n        return drawdown.min()"
+      },
+      {
+        "name": "evaluate_strategies",
+        "ast_hash": "sha256:501b47af549f95ef",
+        "loc": 11,
+        "source": "def evaluate_strategies(self):\n        \"\"\"\n        Evaluates all strategies by running simulations and comparing their performance.\n\n        Returns:\n            dict: A dictionary of performance metrics for each strategy.\n        \"\"\"\n        for strategy in self.strategies:\n            self.results[strategy] = self.run_simulation(strategy)\n\n        return self.results"
+      },
+      {
+        "name": "plot_performance",
+        "ast_hash": "sha256:4414d9e7b466a93d",
+        "loc": 14,
+        "source": "def plot_performance(self):\n        \"\"\"\n        Plots the performance of all strategies.\n        \"\"\"\n        plt.figure(figsize=(10, 6))\n\n        for strategy, result in self.results.items():\n            plt.plot(result['Final Balance'], label=f'{strategy} (Total Return: {result[\"Total Return\"]*100:.2f}%)')\n\n        plt.title('Strategy Performance Comparison')\n        plt.xlabel('Time')\n        plt.ylabel('Portfolio Value')\n        plt.legend(loc='upper left')\n        plt.show()"
+      }
+    ]
+  }
+}

@@ -1,0 +1,81 @@
+{
+  "spec_version": "1.4.0-otel",
+  "timestamp": "2026-04-24T00:13:03.355457Z",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "severity_text": "WARN",
+  "severity_number": 13,
+  "event_name": "swarm.agent.lifecycle.deprecated",
+  "resource": {
+    "service.name": "swarm-orchestrator",
+    "service.version": "4.2.0",
+    "deployment.environment": "production",
+    "node.id": "worker-node-aws-us-east-1a-04"
+  },
+  "attributes": {
+    "agent.id": "MarketRegimeAgent",
+    "agent.previous_version": "v29.x",
+    "agent.target_version": "v30",
+    "deprecation.reason": "Transitioning to v30 architecture.",
+    "deprecation.action_required": true
+  },
+  "metrics": {
+    "agent.core_logic.function_count": 7,
+    "agent.capabilities.count": 0
+  },
+  "artifacts": {
+    "provenance": {
+      "repository": "git+ssh://repo/core/agents/specialized/market_regime_agent.py",
+      "commit_sha": "a1b2c3d4e5f6g7h8i9j0",
+      "docstring_hash": "sha256:d8c4b12389a..."
+    },
+    "extracted_capabilities": [],
+    "core_logic_signatures": [
+      {
+        "name": "__init__",
+        "ast_hash": "sha256:0b5b3d4a76180a47",
+        "loc": 10,
+        "source": "def __init__(self, config: Dict[str, Any], **kwargs):\n        super().__init__(config, **kwargs)\n        self.symbol = config.get(\"symbol\", \"SPY\")\n        self.lookback_period = config.get(\"lookback_period\", 100)\n        self.adx_period = config.get(\"adx_period\", 14)\n\n        # Thresholds\n        self.hurst_threshold = config.get(\"hurst_threshold\", 0.5) # > 0.5 Trending, < 0.5 Mean Reverting\n        self.adx_threshold = config.get(\"adx_threshold\", 25) # > 25 Strong Trend\n        self.volatility_percentile = config.get(\"volatility_percentile\", 0.8)"
+      },
+      {
+        "name": "execute",
+        "ast_hash": "sha256:366a1a7943f2c63f",
+        "loc": 41,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "_fetch_data",
+        "ast_hash": "sha256:1ca700c2a4b3f1e3",
+        "loc": 14,
+        "source": "def _fetch_data(self, symbol: str) -> Optional[pd.DataFrame]:\n        \"\"\"Fetches historical data using yfinance.\"\"\"\n        try:\n            # We need enough data for Hurst (requires reasonable sample size, e.g. 100+)\n            # and ADX (requires lookback + smoothing)\n            period = \"1y\"\n            ticker = yf.Ticker(symbol)\n            df = ticker.history(period=period)\n            if df.empty:\n                return None\n            return df\n        except Exception as e:\n            logger.error(f\"Error fetching data for {symbol}: {e}\")\n            return None"
+      },
+      {
+        "name": "_calculate_hurst",
+        "ast_hash": "sha256:0b67b7f223400ea3",
+        "loc": 37,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "_calculate_adx",
+        "ast_hash": "sha256:11248ed7cfbb3552",
+        "loc": 36,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "_calculate_volatility_regime",
+        "ast_hash": "sha256:e041e2268dab50d8",
+        "loc": 19,
+        "source": "def _calculate_volatility_regime(self, series: pd.Series) -> str:\n        \"\"\"\n        Determines if volatility is 'LOW', 'NORMAL', or 'HIGH' based on history.\n        \"\"\"\n        try:\n            returns = series.pct_change().dropna()\n            current_vol = returns.tail(20).std() # Short term\n            hist_vol = returns.std() # Long term\n\n            ratio = current_vol / hist_vol if hist_vol > 0 else 1.0\n\n            if ratio > 1.5:\n                return \"HIGH\"\n            elif ratio < 0.5:\n                return \"LOW\"\n            else:\n                return \"NORMAL\"\n        except Exception:\n            return \"NORMAL\""
+      },
+      {
+        "name": "_classify_regime",
+        "ast_hash": "sha256:0c3e0ee8d995f270",
+        "loc": 22,
+        "source": "def _classify_regime(self, hurst: float, adx: float, vol: str) -> str:\n        \"\"\"Logic gate for Regime Classification.\"\"\"\n\n        # 1. Volatility Override\n        if vol == \"HIGH\":\n            return \"HIGH_VOLATILITY_CRASH_RISK\"\n\n        # 2. Trend Strength (ADX)\n        if adx > self.adx_threshold:\n            # Strong Trend. Check Hurst to confirm persistence or mean reversion within trend?\n            # Usually ADX > 25 implies Trend.\n            # Use Hurst to confirm 'Clean' trend vs 'Noisy' trend?\n            return \"STRONG_TREND\"\n\n        # 3. Hurst Differentiation (for low ADX)\n        if hurst < 0.4:\n            return \"MEAN_REVERSION\" # Choppy, range-bound\n        elif hurst > 0.6:\n            # Trending but ADX is low? Could be nascent trend.\n            return \"NASCENT_TREND\"\n\n        return \"UNDEFINED_NOISE\""
+      }
+    ]
+  }
+}

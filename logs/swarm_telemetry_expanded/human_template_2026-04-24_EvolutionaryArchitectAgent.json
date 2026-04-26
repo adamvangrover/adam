@@ -1,0 +1,74 @@
+{
+  "spec_version": "1.4.0-otel",
+  "timestamp": "2026-04-24T00:13:03.355457Z",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "severity_text": "WARN",
+  "severity_number": 13,
+  "event_name": "swarm.agent.lifecycle.deprecated",
+  "resource": {
+    "service.name": "swarm-orchestrator",
+    "service.version": "4.2.0",
+    "deployment.environment": "production",
+    "node.id": "worker-node-aws-us-east-1a-04"
+  },
+  "attributes": {
+    "agent.id": "EvolutionaryArchitectAgent",
+    "agent.previous_version": "v29.x",
+    "agent.target_version": "v30",
+    "deprecation.reason": "Transitioning to v30 architecture.",
+    "deprecation.action_required": true
+  },
+  "metrics": {
+    "agent.core_logic.function_count": 6,
+    "agent.capabilities.count": 0
+  },
+  "artifacts": {
+    "provenance": {
+      "repository": "git+ssh://repo/core/agents/meta_agents/evolutionary_architect_agent.py",
+      "commit_sha": "a1b2c3d4e5f6g7h8i9j0",
+      "docstring_hash": "sha256:d8c4b12389a..."
+    },
+    "extracted_capabilities": [],
+    "core_logic_signatures": [
+      {
+        "name": "__init__",
+        "ast_hash": "sha256:e2780bb045c92f8e",
+        "loc": 4,
+        "source": "def __init__(self, config: Dict[str, Any], **kwargs):\n        super().__init__(config, **kwargs)\n        AuditMixin.__init__(self)\n        self.max_iterations = config.get(\"max_iterations\", 5)"
+      },
+      {
+        "name": "execute",
+        "ast_hash": "sha256:3be5a5ead670564c",
+        "loc": 42,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "optimize_config_genetic",
+        "ast_hash": "sha256:66d2cf653db15012",
+        "loc": 50,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "_generate_changes_real",
+        "ast_hash": "sha256:bcaf87e39acf43e0",
+        "loc": 25,
+        "source": "async def _generate_changes_real(self, input_data: EvolutionaryArchitectInput) -> List[ProposedChange]:\n        \"\"\"\n        Attempts to generate code changes using the Semantic Kernel.\n        \"\"\"\n        # Construct a prompt for the kernel\n        # This is a simplified \"Prompt-as-Code\" construction within the agent\n        prompt = f\"\"\"\n        You are an Evolutionary Architect. Your goal is: {input_data.goal_type.value}.\n        Description: {input_data.description}\n        Constraints: {', '.join(input_data.constraints)}\n\n        Generate a diff or new code block for the requested feature.\n        \"\"\"\n\n        # In a real scenario, we would retrieve specific skills from the kernel\n        # For now, we assume a generic 'generate_code' function exists or we invoke the LLM directly\n\n        # Simulate an async call that might fail if no LLM is configured\n        # result = await self.kernel.invoke(prompt)\n        # For this specific \"Mock-to-Real\" bridge, we will return the mock structure\n        # but wrapped in this method to show intent of where the API call goes.\n\n        # raising NotImplementedError to trigger fallback in the try/except block above\n        # until a real LLM endpoint is confirmed.\n        raise NotImplementedError(\"LLM Kernel not fully configured for code generation.\")"
+      },
+      {
+        "name": "_generate_changes_mock",
+        "ast_hash": "sha256:10e2d48501e01468",
+        "loc": 28,
+        "source": "def _generate_changes_mock(self, input_data: EvolutionaryArchitectInput) -> List[ProposedChange]:\n        \"\"\"\n        Simulates the generation of code changes based on the goal.\n        \"\"\"\n        changes = []\n\n        if input_data.goal_type == EvolutionGoal.FEATURE_ADDITION:\n            # Create a mock new file proposal\n            changes.append(ProposedChange(\n                file_path=\"core/new_feature.py\",\n                diff=\"<<<<<<< SEARCH\\n=======\\n# New Feature Implementation\\ndef new_feature():\\n    pass\\n>>>>>>> REPLACE\",\n                rationale=\"Adding new feature scaffold as requested.\"\n            ))\n        elif input_data.target_files:\n            for file in input_data.target_files:\n                changes.append(ProposedChange(\n                    file_path=file,\n                    diff=f\"<<<<<<< SEARCH\\n# Old Code\\n=======\\n# Optimized Code by EvolutionaryAgent\\n>>>>>>> REPLACE\",\n                    rationale=f\"Refactoring {file} for performance.\"\n                ))\n        else:\n             changes.append(ProposedChange(\n                file_path=\"README.md\",\n                diff=\"<<<<<<< SEARCH\\n# Project\\n=======\\n# Project (Enhanced)\\n>>>>>>> REPLACE\",\n                rationale=\"General enhancement to documentation.\"\n            ))\n\n        return changes"
+      },
+      {
+        "name": "_evaluate_safety",
+        "ast_hash": "sha256:956c78cbd6c961fe",
+        "loc": 30,
+        "source": "def _evaluate_safety(self, changes: List[ProposedChange], constraints: List[str]) -> float:\n        \"\"\"\n        Evaluates the safety of the proposed changes using AST parsing.\n        \"\"\"\n        score = 1.0\n\n        for change in changes:\n            # We can't parse a Diff directly, but we can parse the 'REPLACE' block if we extract it\n            # Simple heuristic extraction\n            if \">>>>>>> REPLACE\" in change.diff:\n                try:\n                    # Extract content between ======= and >>>>>>> REPLACE\n                    content = change.diff.split(\"=======\")[1].split(\">>>>>>> REPLACE\")[0]\n                    # Attempt to parse\n                    ast.parse(content)\n                except SyntaxError:\n                    logging.warning(f\"Syntax Error detected in proposal for {change.file_path}\")\n                    score -= 0.5\n                except Exception:\n                    # If extraction fails or other error\n                    score -= 0.1\n\n            # Constraint Checking (Simple keyword search)\n            for constraint in constraints:\n                if \"no external deps\" in constraint.lower():\n                    if \"import\" in change.diff and \"core\" not in change.diff: # Very naive check\n                         logging.warning(\"Potential external dependency violation.\")\n                         score -= 0.2\n\n        return max(0.0, score)"
+      }
+    ]
+  }
+}

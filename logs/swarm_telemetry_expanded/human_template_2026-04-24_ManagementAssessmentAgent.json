@@ -1,0 +1,48 @@
+{
+  "spec_version": "1.4.0-otel",
+  "timestamp": "2026-04-24T00:13:03.355457Z",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "severity_text": "WARN",
+  "severity_number": 13,
+  "event_name": "swarm.agent.lifecycle.deprecated",
+  "resource": {
+    "service.name": "swarm-orchestrator",
+    "service.version": "4.2.0",
+    "deployment.environment": "production",
+    "node.id": "worker-node-aws-us-east-1a-04"
+  },
+  "attributes": {
+    "agent.id": "ManagementAssessmentAgent",
+    "agent.previous_version": "v29.x",
+    "agent.target_version": "v30",
+    "deprecation.reason": "Transitioning to v30 architecture.",
+    "deprecation.action_required": true
+  },
+  "metrics": {
+    "agent.core_logic.function_count": 2,
+    "agent.capabilities.count": 0
+  },
+  "artifacts": {
+    "provenance": {
+      "repository": "git+ssh://repo/core/agents/specialized/management_assessment_agent.py",
+      "commit_sha": "a1b2c3d4e5f6g7h8i9j0",
+      "docstring_hash": "sha256:d8c4b12389a..."
+    },
+    "extracted_capabilities": [],
+    "core_logic_signatures": [
+      {
+        "name": "__init__",
+        "ast_hash": "sha256:11bc0dcb95256e55",
+        "loc": 3,
+        "source": "def __init__(self, config: Dict[str, Any]):\n        super().__init__(config)\n        self.persona = \"Management Consultant\""
+      },
+      {
+        "name": "execute",
+        "ast_hash": "sha256:a0ff034eb7f95ee2",
+        "loc": 30,
+        "source": "async def execute(self, params: Dict[str, Any]) -> EntityEcosystem:\n        logger.info(\"Executing Management Assessment...\")\n        company_name = params.get(\"company_name\", \"Unknown Entity\")\n\n        # Mock Logic for Deep Dive\n        # In production, this would use NLP on earnings transcripts and SEC Form 4 parsing.\n\n        assessment = ManagementAssessment(\n            capital_allocation_score=8.5,\n            alignment_analysis=\"Insiders hold >5% of float; Recent open market purchases.\",\n            key_person_risk=\"Low\",\n            ceo_tone_score=0.75  # Positive sentiment\n        )\n\n        ecosystem = EntityEcosystem(\n            legal_entity=LegalEntity(\n                name=company_name,\n                lei=\"5493006MNBPLZN2B8S08\",  # Mock LEI\n                jurisdiction=\"Delaware, USA\",\n                sector=\"Technology\",\n                industry=\"Consumer Electronics\"\n            ),\n            management_assessment=assessment,\n            competitive_positioning=CompetitivePositioning(\n                moat_status=\"Wide\",\n                technology_risk_vector=\"Moderate Disruption Risk\",\n                market_share_trend=\"Stable\"\n            )\n        )\n        return ecosystem"
+      }
+    ]
+  }
+}

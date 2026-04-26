@@ -1,0 +1,85 @@
+{
+  "spec_version": "1.4.0-otel",
+  "timestamp": "2026-04-24T00:13:03.355457Z",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "severity_text": "WARN",
+  "severity_number": 13,
+  "event_name": "swarm.agent.lifecycle.deprecated",
+  "resource": {
+    "service.name": "swarm-orchestrator",
+    "service.version": "4.2.0",
+    "deployment.environment": "production",
+    "node.id": "worker-node-aws-us-east-1a-04"
+  },
+  "attributes": {
+    "agent.id": "AlternativeDataAgent",
+    "agent.previous_version": "v29.x",
+    "agent.target_version": "v30",
+    "deprecation.reason": "Transitioning to v30 architecture.",
+    "deprecation.action_required": true
+  },
+  "metrics": {
+    "agent.core_logic.function_count": 8,
+    "agent.capabilities.count": 0
+  },
+  "artifacts": {
+    "provenance": {
+      "repository": "git+ssh://repo/core/agents/alternative_data_agent.py",
+      "commit_sha": "a1b2c3d4e5f6g7h8i9j0",
+      "docstring_hash": "sha256:d8c4b12389a..."
+    },
+    "extracted_capabilities": [],
+    "core_logic_signatures": [
+      {
+        "name": "__init__",
+        "ast_hash": "sha256:aea8cb10e3c4e6e1",
+        "loc": 23,
+        "source": "def __init__(self, knowledge_base_path=\"knowledge_base/Knowledge_Graph.json\", google_maps_api_key=None):\n        \"\"\"\n        Initializes the Alternative Data Agent with access to various\n        alternative data sources and analytical tools.\n\n        Args:\n            knowledge_base_path (str): Path to the knowledge base file.\n            google_maps_api_key (str, optional): API key for Google Maps.\n        \"\"\"\n        self.knowledge_base_path = knowledge_base_path\n        self.knowledge_base = self._load_knowledge_base()\n\n        # Initialize sentiment analyzers\n        self.nltk_sentiment_analyzer = SentimentIntensityAnalyzer()\n        self.textblob_sentiment_analyzer = TextBlob\n        self.vader_sentiment_analyzer = VaderSentiment()\n\n        # Initialize connections to external APIs\n        self.google_maps_api_key = google_maps_api_key\n        if google_maps_api_key:\n            self.google_maps_client = googlemaps.Client(key=google_maps_api_key)\n        else:\n            self.google_maps_client = None"
+      },
+      {
+        "name": "_load_knowledge_base",
+        "ast_hash": "sha256:b14ef62bf29bfd2a",
+        "loc": 16,
+        "source": "def _load_knowledge_base(self):\n        \"\"\"\n        Loads the knowledge base from the JSON file.\n\n        Returns:\n            dict: The knowledge base data.\n        \"\"\"\n        try:\n            with open(self.knowledge_base_path, 'r') as file:\n                return json.load(file)\n        except FileNotFoundError:\n            print(f\"Knowledge base file not found: {self.knowledge_base_path}\")\n            return {}\n        except json.JSONDecodeError:\n            print(f\"Error decoding knowledge base JSON: {self.knowledge_base_path}\")\n            return {}"
+      },
+      {
+        "name": "gather_alternative_data",
+        "ast_hash": "sha256:5618ac1736d3ab1b",
+        "loc": 57,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "analyze_social_media_sentiment",
+        "ast_hash": "sha256:01ebe8c5753769e2",
+        "loc": 29,
+        "source": "def analyze_social_media_sentiment(self, company_name):\n        \"\"\"\n        Analyzes social media sentiment for a given company.\n\n        Args:\n            company_name (str): The name of the company.\n\n        Returns:\n            dict: Social media sentiment analysis results, including\n                  overall sentiment score and sentiment breakdown\n                  (positive, negative, neutral).\n        \"\"\"\n        # --- Developer Notes ---\n        # - Gather social media data using the SocialMediaAPI (placeholder)\n        # - Perform sentiment analysis using different libraries (NLTK, TextBlob, VADER)\n        # - Combine or compare sentiment scores from different libraries\n        # - Calculate overall sentiment score and sentiment breakdown\n\n        # Placeholder for social media sentiment analysis logic\n        # ...\n\n        return {\n            \"overall_sentiment\": 0.75,  # Example overall sentiment score\n            \"sentiment_breakdown\": {\n                \"positive\": 0.8,\n                \"negative\": 0.1,\n                \"neutral\": 0.1\n            }\n        }"
+      },
+      {
+        "name": "analyze_web_traffic",
+        "ast_hash": "sha256:fe50c107088a0877",
+        "loc": 25,
+        "source": "def analyze_web_traffic(self, company_name):\n        \"\"\"\n        Analyzes web traffic data for a given company.\n\n        Args:\n            company_name (str): The name of the company.\n\n        Returns:\n            dict: Web traffic analysis results, including website visits,\n                  page views, and other relevant metrics.\n        \"\"\"\n        # --- Developer Notes ---\n        # - Gather web traffic data using the WebTrafficAPI (placeholder)\n        # - Analyze website traffic trends and patterns\n        # - Identify key metrics (e.g., unique visitors, page views, bounce rate)\n        # - Correlate web traffic data with other data sources (e.g., social media sentiment)\n\n        # Placeholder for web traffic analysis logic\n        # ...\n\n        return {\n            \"website_visits\": 1000000,  # Example website visits\n            \"page_views\": 5000000,  # Example page views\n            # ... other metrics\n        }"
+      },
+      {
+        "name": "analyze_satellite_imagery",
+        "ast_hash": "sha256:63abe9c0a55b53f8",
+        "loc": 25,
+        "source": "def analyze_satellite_imagery(self, company_name):\n        \"\"\"\n        Analyzes satellite imagery data for a given company.\n\n        Args:\n            company_name (str): The name of the company.\n\n        Returns:\n            dict: Satellite imagery analysis results, including insights\n                  on manufacturing activity, retail store traffic, etc.\n        \"\"\"\n        # --- Developer Notes ---\n        # - Gather satellite imagery data using the SatelliteImageryAPI (placeholder)\n        # - Analyze images of manufacturing plants to estimate production levels\n        # - Analyze images of retail store parking lots to estimate customer traffic\n        # - Identify changes in infrastructure or land use\n\n        # Placeholder for satellite imagery analysis logic\n        # ...\n\n        return {\n            \"manufacturing_activity\": \"Increasing\",  # Example analysis result\n            \"retail_store_traffic\": \"Decreasing\",  # Example analysis result\n            # ... other insights\n        }"
+      },
+      {
+        "name": "analyze_foot_traffic",
+        "ast_hash": "sha256:610fba1efb1d8cb3",
+        "loc": 25,
+        "source": "def analyze_foot_traffic(self, company_name):\n        \"\"\"\n        Analyzes foot traffic data for a given company.\n\n        Args:\n            company_name (str): The name of the company.\n\n        Returns:\n            dict: Foot traffic analysis results, including customer\n                  traffic patterns and trends for retail stores.\n        \"\"\"\n        # --- Developer Notes ---\n        # - Gather foot traffic data using the FootTrafficAPI (placeholder)\n        # - Analyze foot traffic patterns in retail stores\n        # - Identify peak hours and days\n        # - Correlate foot traffic with sales data\n\n        # Placeholder for foot traffic analysis logic\n        # ...\n\n        return {\n            \"peak_hours\": \"12pm-2pm\",  # Example analysis result\n            \"peak_days\": [\"Saturday\", \"Sunday\"],  # Example analysis result\n            # ... other insights\n        }"
+      },
+      {
+        "name": "analyze_shipping_data",
+        "ast_hash": "sha256:8968e435335a5f08",
+        "loc": 25,
+        "source": "def analyze_shipping_data(self, company_name):\n        \"\"\"\n        Analyzes shipping data for a given company.\n\n        Args:\n            company_name (str): The name of the company.\n\n        Returns:\n            dict: Shipping data analysis results, including insights\n                  on supply chain efficiency, shipping volume, etc.\n        \"\"\"\n        # --- Developer Notes ---\n        # - Gather shipping data using the ShippingDataAPI (placeholder)\n        # - Analyze shipping volume and trends\n        # - Identify potential bottlenecks or delays in the supply chain\n        # - Estimate delivery times and shipping costs\n\n        # Placeholder for shipping data analysis logic\n        # ...\n\n        return {\n            \"shipping_volume\": \"Increasing\",  # Example analysis result\n            \"supply_chain_efficiency\": \"Stable\",  # Example analysis result\n            # ... other insights\n        }"
+      }
+    ]
+  }
+}

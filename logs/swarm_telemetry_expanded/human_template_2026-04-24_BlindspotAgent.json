@@ -1,0 +1,55 @@
+{
+  "spec_version": "1.4.0-otel",
+  "timestamp": "2026-04-24T00:13:03.355457Z",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "severity_text": "WARN",
+  "severity_number": 13,
+  "event_name": "swarm.agent.lifecycle.deprecated",
+  "resource": {
+    "service.name": "swarm-orchestrator",
+    "service.version": "4.2.0",
+    "deployment.environment": "production",
+    "node.id": "worker-node-aws-us-east-1a-04"
+  },
+  "attributes": {
+    "agent.id": "BlindspotAgent",
+    "agent.previous_version": "v29.x",
+    "agent.target_version": "v30",
+    "deprecation.reason": "Transitioning to v30 architecture.",
+    "deprecation.action_required": true
+  },
+  "metrics": {
+    "agent.core_logic.function_count": 3,
+    "agent.capabilities.count": 0
+  },
+  "artifacts": {
+    "provenance": {
+      "repository": "git+ssh://repo/core/agents/specialized/blindspot_agent.py",
+      "commit_sha": "a1b2c3d4e5f6g7h8i9j0",
+      "docstring_hash": "sha256:d8c4b12389a..."
+    },
+    "extracted_capabilities": [],
+    "core_logic_signatures": [
+      {
+        "name": "__init__",
+        "ast_hash": "sha256:b3995d56553886eb",
+        "loc": 3,
+        "source": "def __init__(self, config: Dict[str, Any]):\n        super().__init__(config)\n        self.anomalies = []"
+      },
+      {
+        "name": "execute",
+        "ast_hash": "sha256:6507c45dffdae86f",
+        "loc": 144,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "_detect_circular_dependencies",
+        "ast_hash": "sha256:7b860baa98a6704d",
+        "loc": 11,
+        "source": "def _detect_circular_dependencies(self) -> List[Dict[str, Any]]:\n        \"\"\"\n        Detect circular dependencies in the knowledge graph (simulated).\n        \"\"\"\n        # In a real scenario, we would run a cycle detection algo on Neo4j\n        # Simulating a common financial risk cycle\n        return [{\n            \"type\": \"CIRCULAR_DEPENDENCY\",\n            \"severity\": \"MEDIUM\",\n            \"description\": \"Risk Loop Detected: Sovereign Debt Yields -> Currency Devaluation -> Import Inflation -> Central Bank Rate Hike -> Sovereign Debt Yields.\"\n        }]"
+      }
+    ]
+  }
+}

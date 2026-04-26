@@ -1,0 +1,68 @@
+{
+  "spec_version": "1.4.0-otel",
+  "timestamp": "2026-04-24T00:13:03.355457Z",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "severity_text": "WARN",
+  "severity_number": 13,
+  "event_name": "swarm.agent.lifecycle.deprecated",
+  "resource": {
+    "service.name": "swarm-orchestrator",
+    "service.version": "4.2.0",
+    "deployment.environment": "production",
+    "node.id": "worker-node-aws-us-east-1a-04"
+  },
+  "attributes": {
+    "agent.id": "PeerSetAgent",
+    "agent.previous_version": "v29.x",
+    "agent.target_version": "v30",
+    "deprecation.reason": "Transitioning to v30 architecture.",
+    "deprecation.action_required": true
+  },
+  "metrics": {
+    "agent.core_logic.function_count": 5,
+    "agent.capabilities.count": 0
+  },
+  "artifacts": {
+    "provenance": {
+      "repository": "git+ssh://repo/core/agents/peer_set_agent.py",
+      "commit_sha": "a1b2c3d4e5f6g7h8i9j0",
+      "docstring_hash": "sha256:d8c4b12389a..."
+    },
+    "extracted_capabilities": [],
+    "core_logic_signatures": [
+      {
+        "name": "__init__",
+        "ast_hash": "sha256:7bf97a7dad0a32ab",
+        "loc": 2,
+        "source": "def __init__(self, config: Dict[str, Any], **kwargs):\n        super().__init__(config, **kwargs)"
+      },
+      {
+        "name": "execute",
+        "ast_hash": "sha256:56fec36f54079ed4",
+        "loc": 99,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "find_peers",
+        "ast_hash": "sha256:4f6f862a4fe68dcf",
+        "loc": 98,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "find_peers_mock",
+        "ast_hash": "sha256:dd60b557125a9561",
+        "loc": 28,
+        "source": "def find_peers_mock(self, ticker: str, method: str) -> List[Dict[str, Any]]:\n        \"\"\"\n        Original logic using only Mock DB.\n        \"\"\"\n        target = next((c for c in self.COMPANY_DB if c['ticker'] == ticker), None)\n        if not target:\n            return []\n\n        peers = []\n        if method == 'products' or method == 'semantic':\n            target_products = set(target.get('products', []))\n            for company in self.COMPANY_DB:\n                if company['ticker'] == ticker: continue\n                company_products = set(company.get('products', []))\n                if not target_products.isdisjoint(company_products):\n                    peers.append(company)\n        else:\n            target_code = target.get(method)\n            if not target_code:\n                if method in ['gics', 'naics', 'nace']:\n                    target_code = target.get('industry')\n                    method = 'industry'\n\n            for company in self.COMPANY_DB:\n                if company['ticker'] == ticker: continue\n                if company.get(method) == target_code:\n                    peers.append(company)\n        return peers"
+      },
+      {
+        "name": "fetch_real_data",
+        "ast_hash": "sha256:00f00f18da7f847f",
+        "loc": 22,
+        "source": "def fetch_real_data(self, ticker: str) -> Optional[Dict[str, Any]]:\n        \"\"\"\n        Fetches data from yfinance if available.\n        \"\"\"\n        if not yf:\n            return None\n        try:\n            t = yf.Ticker(ticker)\n            info = t.info\n            # Map yfinance info to our schema\n            return {\n                \"ticker\": ticker,\n                \"name\": info.get(\"longName\"),\n                \"sector\": info.get(\"sector\"),\n                \"industry\": info.get(\"industry\"),\n                \"summary\": info.get(\"longBusinessSummary\"),\n                \"products\": [], # yfinance doesn't give products list\n                \"markets\": []\n            }\n        except Exception as e:\n            logger.warning(f\"yfinance fetch failed for {ticker}: {e}\")\n            return None"
+      }
+    ]
+  }
+}

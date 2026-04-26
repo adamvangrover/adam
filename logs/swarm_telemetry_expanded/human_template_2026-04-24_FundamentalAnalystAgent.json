@@ -1,0 +1,157 @@
+{
+  "spec_version": "1.4.0-otel",
+  "timestamp": "2026-04-24T00:13:03.355457Z",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "severity_text": "WARN",
+  "severity_number": 13,
+  "event_name": "swarm.agent.lifecycle.deprecated",
+  "resource": {
+    "service.name": "swarm-orchestrator",
+    "service.version": "4.2.0",
+    "deployment.environment": "production",
+    "node.id": "worker-node-aws-us-east-1a-04"
+  },
+  "attributes": {
+    "agent.id": "FundamentalAnalystAgent",
+    "agent.previous_version": "v29.x",
+    "agent.target_version": "v30",
+    "deprecation.reason": "Transitioning to v30 architecture.",
+    "deprecation.action_required": true
+  },
+  "metrics": {
+    "agent.core_logic.function_count": 19,
+    "agent.capabilities.count": 0
+  },
+  "artifacts": {
+    "provenance": {
+      "repository": "git+ssh://repo/core/agents/fundamental_analyst_agent.py",
+      "commit_sha": "a1b2c3d4e5f6g7h8i9j0",
+      "docstring_hash": "sha256:d8c4b12389a..."
+    },
+    "extracted_capabilities": [],
+    "core_logic_signatures": [
+      {
+        "name": "__init__",
+        "ast_hash": "sha256:f9cdb4134f1c585d",
+        "loc": 13,
+        "source": "def __init__(self, config: Dict[str, Any], kernel: Optional[Kernel] = None):\n        super().__init__(config, kernel=kernel)\n        self.persona = self.config.get('persona', \"Financial Analyst\")\n        self.description = self.config.get('description', \"Performs fundamental company analysis.\")\n        self.memory_manager = VectorMemoryManager()\n\n        # Initialize Gemini Analyzer\n        # We try to use it if available, gracefully fallback if not configured\n        try:\n            self.gemini_analyzer = GeminiFinancialReportAnalyzer()\n        except Exception as e:\n            logging.warning(f\"Could not initialize GeminiFinancialReportAnalyzer: {e}\")\n            self.gemini_analyzer = None"
+      },
+      {
+        "name": "execute_pydantic",
+        "ast_hash": "sha256:adaa719aef090297",
+        "loc": 150,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "_format_output",
+        "ast_hash": "sha256:528b337f6cecab97",
+        "loc": 20,
+        "source": "def _format_output(self, result: Dict[str, Any], is_standard_mode: bool, company_id: str) -> Union[Dict[str, Any], AgentOutput]:  # noqa: E501\n        \"\"\"Helper to format output based on input mode.\"\"\"\n        if not is_standard_mode:\n            return result\n\n        # Standard Mode: Wrap in AgentOutput\n        error = result.get(\"error\")\n        if error:\n             return AgentOutput(\n                answer=f\"Analysis failed: {error}\",\n                confidence=0.0,\n                metadata={\"error\": error, \"raw_result\": result}\n            )\n\n        return AgentOutput(\n            answer=result.get(\"analysis_summary\", \"No summary generated.\"),\n            sources=[f\"Company Data for {company_id}\"], # Placeholder for actual source tracking\n            confidence=0.9 if result.get(\"financial_ratios\") else 0.5,\n            metadata=result\n        )"
+      },
+      {
+        "name": "retrieve_company_data",
+        "ast_hash": "sha256:5ecbc6c626464d55",
+        "loc": 21,
+        "source": "async def retrieve_company_data(self, company_id: str) -> Optional[Dict[str, Any]]:\n        \"\"\"\n        Retrieves company data by sending a message to the DataRetrievalAgent.\n        \"\"\"\n        if 'DataRetrievalAgent' in self.peer_agents:\n            logging.info(f\"Requesting company financials for {company_id} from DataRetrievalAgent.\")\n            request_data = {'data_type': 'get_company_financials', 'company_id': company_id}\n            try:\n                response = await self.send_message('DataRetrievalAgent', request_data)\n                logging.debug(f\"Data received from DataRetrievalAgent for {company_id}: {response is not None}\")\n                if response:\n                    return response\n                else:\n                    logging.warning(f\"DataRetrievalAgent returned no data for {company_id}.\")\n                    return None\n            except Exception as e:\n                logging.exception(f\"Error sending message to DataRetrievalAgent for {company_id}: {e}\")\n                return None\n        else:\n            logging.error(\"DataRetrievalAgent not found in peer agents. Cannot retrieve company data.\")\n            return None"
+      },
+      {
+        "name": "extract_raw_metrics",
+        "ast_hash": "sha256:93a1c1564b58afa2",
+        "loc": 33,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "calculate_financial_ratios",
+        "ast_hash": "sha256:8a0b61583427d840",
+        "loc": 57,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "calculate_comps_valuation",
+        "ast_hash": "sha256:a24a7588244e9f0b",
+        "loc": 3,
+        "source": "def calculate_comps_valuation(self, company_data: Dict[str, Any]) -> Optional[float]:\n        logging.warning(\"Comps valuation not yet implemented.\")\n        return None"
+      },
+      {
+        "name": "assess_financial_health",
+        "ast_hash": "sha256:c6a1a6cd4c764929",
+        "loc": 28,
+        "source": "def assess_financial_health(self, financial_ratios: Dict[str, float]) -> str:\n        logging.debug(f\"FAA_XAI:ASSESS_HEALTH_INPUT: financial_ratios={financial_ratios}\")\n        if not financial_ratios:\n            logging.debug(\"FAA_XAI:ASSESS_HEALTH_RESULT: Ratios empty, returning Unknown.\")\n            return \"Unknown\"\n\n        score = 0\n        if financial_ratios.get(\"return_on_equity\", 0) > 0.15:\n            score += 2\n        if financial_ratios.get(\"debt_to_equity\", 1) < 1:\n            score += 1\n        if financial_ratios.get(\"current_ratio\", 0) > 1.5:\n            score += 1\n        if financial_ratios.get(\"net_profit_margin\", 0) > .1:\n            score += 1\n        if financial_ratios.get(\"revenue_growth\") is not None and financial_ratios.get(\"revenue_growth\", 0) > 0.05:\n            score += 1  # Added check for > 0.05\n\n        logging.debug(f\"FAA_XAI:ASSESS_HEALTH_SCORE: Score={score}\")\n\n        health_assessment = \"Weak\"\n        if score >= 4:\n            health_assessment = \"Strong\"\n        elif score >= 2:\n            health_assessment = \"Moderate\"\n\n        logging.debug(f\"FAA_XAI:ASSESS_HEALTH_OUTPUT: Health='{health_assessment}'\")\n        return health_assessment"
+      },
+      {
+        "name": "generate_analysis_summary",
+        "ast_hash": "sha256:94fe2f1ffe0fb645",
+        "loc": 133,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "export_to_csv",
+        "ast_hash": "sha256:fc497f2c2aa805e1",
+        "loc": 3,
+        "source": "def export_to_csv(self, data: Dict[str, List[Union[str, float]]], filename: str):\n        # ... (existing code) ...\n        pass"
+      },
+      {
+        "name": "calculate_growth_rate",
+        "ast_hash": "sha256:a8d4a9b54826547e",
+        "loc": 3,
+        "source": "def calculate_growth_rate(self, financial_statements: Dict[str, Any], metric: str) -> Optional[float]:\n        # ... (existing code) ...\n        pass"
+      },
+      {
+        "name": "calculate_ebitda_margin",
+        "ast_hash": "sha256:4ba999d7a6b361f3",
+        "loc": 3,
+        "source": "def calculate_ebitda_margin(self, financial_statements: Dict[str, Any]) -> Optional[float]:\n        # ... (existing code) ...\n        pass"
+      },
+      {
+        "name": "calculate_dcf_scenarios",
+        "ast_hash": "sha256:e8491689745432b2",
+        "loc": 52,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "calculate_dcf_valuation",
+        "ast_hash": "sha256:69a4ff834e31f12a",
+        "loc": 128,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "calculate_enterprise_value",
+        "ast_hash": "sha256:3bae9156cbb3520d",
+        "loc": 48,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "estimate_default_likelihood",
+        "ast_hash": "sha256:04e5271bcf142465",
+        "loc": 3,
+        "source": "def estimate_default_likelihood(self, financial_ratios: Dict[str, float]) -> Optional[float]:\n        # ... (existing code) ...\n        pass"
+      },
+      {
+        "name": "calculate_distressed_metrics",
+        "ast_hash": "sha256:bc42bfbc87b00efb",
+        "loc": 3,
+        "source": "def calculate_distressed_metrics(self, financial_statements: Dict[str, Any]) -> Dict[str, float]:\n        # ... (existing code, note the type hint vs usage in generate_analysis_summary) ...\n        pass"
+      },
+      {
+        "name": "estimate_recovery_rate",
+        "ast_hash": "sha256:c41aa0e75ce2602e",
+        "loc": 3,
+        "source": "def estimate_recovery_rate(self, financial_statements, default_likelihood):  # Should be financial_ratios\n        # ... (existing code, note the type hint vs usage in generate_analysis_summary) ...\n        pass"
+      },
+      {
+        "name": "send_message",
+        "ast_hash": "sha256:739a74e1ed7d5ab9",
+        "loc": 3,
+        "source": "def send_message(self, message: Dict[str, Any]):\n        # ... (existing code) ...\n        pass"
+      }
+    ]
+  }
+}

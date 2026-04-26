@@ -1,0 +1,68 @@
+{
+  "spec_version": "1.4.0-otel",
+  "timestamp": "2026-04-24T00:13:03.355457Z",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "severity_text": "WARN",
+  "severity_number": 13,
+  "event_name": "swarm.agent.lifecycle.deprecated",
+  "resource": {
+    "service.name": "swarm-orchestrator",
+    "service.version": "4.2.0",
+    "deployment.environment": "production",
+    "node.id": "worker-node-aws-us-east-1a-04"
+  },
+  "attributes": {
+    "agent.id": "OperationalRiskAgent",
+    "agent.previous_version": "v29.x",
+    "agent.target_version": "v30",
+    "deprecation.reason": "Transitioning to v30 architecture.",
+    "deprecation.action_required": true
+  },
+  "metrics": {
+    "agent.core_logic.function_count": 5,
+    "agent.capabilities.count": 0
+  },
+  "artifacts": {
+    "provenance": {
+      "repository": "git+ssh://repo/core/agents/operational_risk_agent.py",
+      "commit_sha": "a1b2c3d4e5f6g7h8i9j0",
+      "docstring_hash": "sha256:d8c4b12389a..."
+    },
+    "extracted_capabilities": [],
+    "core_logic_signatures": [
+      {
+        "name": "__init__",
+        "ast_hash": "sha256:7bf97a7dad0a32ab",
+        "loc": 2,
+        "source": "def __init__(self, config: Dict[str, Any], **kwargs):\n        super().__init__(config, **kwargs)"
+      },
+      {
+        "name": "execute",
+        "ast_hash": "sha256:74f70d8f6b56c16d",
+        "loc": 91,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "_run_lda_simulation",
+        "ast_hash": "sha256:2c795fd4312cb3d2",
+        "loc": 37,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "_evaluate_kris",
+        "ast_hash": "sha256:2340b07a14c89e4b",
+        "loc": 25,
+        "source": "def _evaluate_kris(self, profile: Dict[str, Any]) -> tuple[float, Dict[str, Any]]:\n        \"\"\"Evaluates Key Risk Indicators (KRIs).\"\"\"\n        score = 0.0\n        kris = {}\n\n        # Cyber Incidents\n        cyber = profile.get(\"kri_cyber_incidents\", 0)\n        if cyber > 0:\n            score += 10 + (cyber * 5)\n            kris[\"cyber_security\"] = f\"Warning: {cyber} incidents detected\"\n        else:\n            kris[\"cyber_security\"] = \"Stable\"\n\n        # System Uptime (IT Risk)\n        uptime = profile.get(\"kri_system_uptime\", 100.0)\n        if uptime < 99.0:\n            score += 10\n            kris[\"it_systems\"] = f\"Critical: Low Uptime ({uptime}%)\"\n        elif uptime < 99.9:\n            score += 5\n            kris[\"it_systems\"] = f\"Concern: Moderate Uptime ({uptime}%)\"\n        else:\n            kris[\"it_systems\"] = \"Stable\"\n\n        return score, kris"
+      },
+      {
+        "name": "_evaluate_scenarios",
+        "ast_hash": "sha256:ab95ea3b09710fa9",
+        "loc": 20,
+        "source": "def _evaluate_scenarios(self, profile: Dict[str, Any], revenue: float) -> tuple[float, Dict[str, Any]]:\n        \"\"\"Evaluates specific stress scenarios.\"\"\"\n        impact = 0.0\n        scenarios = {}\n\n        # Cyber Attack Scenario\n        if profile.get(\"scenario_cyber_attack\", False):\n            # Assume 2% revenue loss + reputation damage\n            loss = revenue * 0.02\n            impact += loss\n            scenarios[\"cyber_attack_sim\"] = {\"estimated_loss\": loss, \"impact\": \"High\"}\n\n        # Regulatory Fine Scenario\n        if profile.get(\"scenario_regulatory_fine\", False):\n            # Assume 1% revenue fine\n            loss = revenue * 0.01\n            impact += loss\n            scenarios[\"regulatory_fine_sim\"] = {\"estimated_loss\": loss, \"impact\": \"Medium\"}\n\n        return impact, scenarios"
+      }
+    ]
+  }
+}

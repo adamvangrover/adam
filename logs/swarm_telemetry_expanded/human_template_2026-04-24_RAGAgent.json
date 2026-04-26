@@ -1,0 +1,92 @@
+{
+  "spec_version": "1.4.0-otel",
+  "timestamp": "2026-04-24T00:13:03.355457Z",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "severity_text": "WARN",
+  "severity_number": 13,
+  "event_name": "swarm.agent.lifecycle.deprecated",
+  "resource": {
+    "service.name": "swarm-orchestrator",
+    "service.version": "4.2.0",
+    "deployment.environment": "production",
+    "node.id": "worker-node-aws-us-east-1a-04"
+  },
+  "attributes": {
+    "agent.id": "RAGAgent",
+    "agent.previous_version": "v29.x",
+    "agent.target_version": "v30",
+    "deprecation.reason": "Transitioning to v30 architecture.",
+    "deprecation.action_required": true
+  },
+  "metrics": {
+    "agent.core_logic.function_count": 9,
+    "agent.capabilities.count": 0
+  },
+  "artifacts": {
+    "provenance": {
+      "repository": "git+ssh://repo/core/agents/rag_agent.py",
+      "commit_sha": "a1b2c3d4e5f6g7h8i9j0",
+      "docstring_hash": "sha256:d8c4b12389a..."
+    },
+    "extracted_capabilities": [],
+    "core_logic_signatures": [
+      {
+        "name": "__init__",
+        "ast_hash": "sha256:cd8ca2787b78cc42",
+        "loc": 28,
+        "source": "def __init__(\n        self,\n        config: Dict[str, Any],\n        constitution: Optional[Dict[str, Any]] = None,\n        kernel: Optional[Kernel] = None,\n        llm_engine: Optional[BaseLLMEngine] = None,\n        embedding_model: Optional[BaseEmbeddingModel] = None,\n        vector_store: Optional[BaseVectorStore] = None,\n        **kwargs\n    ):\n        \"\"\"\n        Initializes the RAGAgent.\n        \"\"\"\n        super().__init__(config, constitution, kernel)\n\n        self.llm_engine = llm_engine\n        self.embedding_model = embedding_model\n        self.vector_store = vector_store\n        self.tools = {}\n        self.state = \"idle\"\n\n        # Log initialization details\n        log_message = f\"RAG Agent {type(self).__name__} initialized\"\n        if self.kernel:\n            log_message += \" with Semantic Kernel instance.\"\n        else:\n            log_message += \".\"\n        logging.info(log_message)"
+      },
+      {
+        "name": "execute",
+        "ast_hash": "sha256:01ed1af58d83a2d3",
+        "loc": 20,
+        "source": "async def execute(self, skill_name: str, **kwargs) -> Optional[Any]:\n        \"\"\"\n        Executes a RAG skill based on the skill_name.\n        \"\"\"\n        if skill_name == 'process_rag_query':\n            query = kwargs.get('query')\n            if not query:\n                return {\"error\": \"Query not provided for process_rag_query skill.\"}\n            return await self.process_query(query)\n\n        elif skill_name == 'ingest_document':\n            doc_input = kwargs.get('document')\n            if not doc_input:\n                return {\"error\": \"Document not provided for ingest_document skill.\"}\n            await self.ingest_document(doc_input)\n            return {\"status\": \"ingestion_complete\"}\n\n        else:\n            logging.warning(f\"Unknown skill '{skill_name}' requested from RAGAgent.\")\n            return None"
+      },
+      {
+        "name": "process_query",
+        "ast_hash": "sha256:0cfc9389e07ef894",
+        "loc": 33,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "ingest_document",
+        "ast_hash": "sha256:060dae0873772d80",
+        "loc": 60,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "enhance_query_with_sk",
+        "ast_hash": "sha256:fe91ea7527fa76aa",
+        "loc": 27,
+        "source": "async def enhance_query_with_sk(self, query: str) -> str:\n        \"\"\"\n        Enhances a query using a Semantic Kernel skill.\n        \"\"\"\n        if not self.kernel:\n            logging.warning(f\"RAG Agent: Semantic Kernel not available. Returning original query.\")\n            return query\n\n        skill_name = \"QueryEnhancerSkill\"\n        function_name = \"enhance\"\n\n        try:\n            # Check if plugin exists, if not try to load (mock path logic preserved from original)\n            if hasattr(self.kernel, 'plugins') and skill_name not in self.kernel.plugins:\n                # Logic to load would go here, omitting specific path assumptions for now\n                pass\n\n            if hasattr(self.kernel, 'plugins') and skill_name in self.kernel.plugins:\n                enhancer_function = self.kernel.plugins[skill_name][function_name]\n                # Assuming invoke takes arguments\n                result = await self.kernel.invoke(enhancer_function, query=query)\n                return str(result)\n\n            return query\n        except Exception as e:\n            logging.error(f\"RAG Agent: Error running QueryEnhancerSkill: {e}\")\n            return query"
+      },
+      {
+        "name": "register_tool",
+        "ast_hash": "sha256:ea3c1b0820bf857f",
+        "loc": 22,
+        "source": "def register_tool(self, tool_instance: Any, plugin_name: Optional[str] = None):\n        \"\"\"\n        Registers a tool with the agent's Semantic Kernel instance.\n        \"\"\"\n        if not self.kernel:\n            logging.warning(f\"RAG Agent: Cannot register tool, Semantic Kernel not available.\")\n            return\n\n        if not hasattr(tool_instance, \"name\"):\n            logging.error(f\"RAG Agent: Tool instance does not have a 'name' attribute.\")\n            return\n\n        tool_name = plugin_name or tool_instance.name\n\n        try:\n            # SK v1.x\n            if hasattr(self.kernel, 'add_plugin'):\n                self.kernel.add_plugin(plugin_instance=tool_instance, plugin_name=tool_name)\n            self.tools[tool_name] = tool_instance\n            logging.info(f\"RAG Agent: Registered tool '{tool_name}' with Semantic Kernel.\")\n        except Exception as e:\n            logging.error(f\"RAG Agent: Failed to register tool '{tool_name}': {e}\")"
+      },
+      {
+        "name": "invoke_tool",
+        "ast_hash": "sha256:25cffbc983a78701",
+        "loc": 16,
+        "source": "async def invoke_tool(self, plugin_name: str, function_name: str, **kwargs) -> Optional[str]:\n        \"\"\"\n        Invokes a registered tool's function via Semantic Kernel.\n        \"\"\"\n        if not self.kernel:\n            logging.warning(f\"RAG Agent: Cannot invoke tool, Semantic Kernel not available.\")\n            return None\n\n        try:\n            if hasattr(self.kernel, 'plugins') and plugin_name in self.kernel.plugins:\n                target_function = self.kernel.plugins[plugin_name][function_name]\n                result = await self.kernel.invoke(target_function, **kwargs)\n                return str(result)\n        except Exception as e:\n            logging.error(f\"RAG Agent: Error invoking tool '{plugin_name}.{function_name}': {e}\")\n            return None"
+      },
+      {
+        "name": "search_web_if_needed",
+        "ast_hash": "sha256:4f1ee6b321bcd626",
+        "loc": 16,
+        "source": "async def search_web_if_needed(self, query: str, direct_url: Optional[str] = None) -> Optional[str]:\n        \"\"\"\n        Example of how an agent might decide to use the web search tool.\n        \"\"\"\n        if \"search for\" in query.lower() or \"find on the web\" in query.lower() or direct_url:\n            logging.info(f\"RAG Agent: Web search triggered for query: '{query}'\")\n            plugin_name = \"web_search\"\n            function_name = \"fetch_web_content\"\n            tool_args = {}\n            if direct_url:\n                tool_args[\"url\"] = direct_url\n            if query and not direct_url:\n                tool_args[\"query\"] = query\n\n            return await self.invoke_tool(plugin_name, function_name, **tool_args)\n        return None"
+      },
+      {
+        "name": "get_skill_schema",
+        "ast_hash": "sha256:02b07d2006b3a083",
+        "loc": 24,
+        "source": "def get_skill_schema(self) -> Dict[str, Any]:\n        \"\"\"\n        Defines the agent's skills (MCP).\n        \"\"\"\n        return {\n            \"name\": \"RAGAgent\",\n            \"description\": \"Handles document ingestion and retrieval-augmented generation queries.\",\n            \"skills\": [\n                {\n                    \"name\": \"process_rag_query\",\n                    \"description\": \"Answers a query based on documents in the vector store.\",\n                    \"parameters\": [\n                        {\"name\": \"query\", \"type\": \"string\", \"description\": \"The user's query.\"}\n                    ]\n                },\n                {\n                    \"name\": \"ingest_document\",\n                    \"description\": \"Ingests a document into the RAG system's vector store.\",\n                    \"parameters\": [\n                        {\"name\": \"document\", \"type\": \"any\", \"description\": \"The document content or object to ingest.\"}\n                    ]\n                }\n            ]\n        }"
+      }
+    ]
+  }
+}

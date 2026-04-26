@@ -1,0 +1,62 @@
+{
+  "spec_version": "1.4.0-otel",
+  "timestamp": "2026-04-24T00:13:03.355457Z",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "severity_text": "WARN",
+  "severity_number": 13,
+  "event_name": "swarm.agent.lifecycle.deprecated",
+  "resource": {
+    "service.name": "swarm-orchestrator",
+    "service.version": "4.2.0",
+    "deployment.environment": "production",
+    "node.id": "worker-node-aws-us-east-1a-04"
+  },
+  "attributes": {
+    "agent.id": "IndustryRiskAgent",
+    "agent.previous_version": "v29.x",
+    "agent.target_version": "v30",
+    "deprecation.reason": "Transitioning to v30 architecture.",
+    "deprecation.action_required": true
+  },
+  "metrics": {
+    "agent.core_logic.function_count": 4,
+    "agent.capabilities.count": 0
+  },
+  "artifacts": {
+    "provenance": {
+      "repository": "git+ssh://repo/core/agents/industry_risk_agent.py",
+      "commit_sha": "a1b2c3d4e5f6g7h8i9j0",
+      "docstring_hash": "sha256:d8c4b12389a..."
+    },
+    "extracted_capabilities": [],
+    "core_logic_signatures": [
+      {
+        "name": "__init__",
+        "ast_hash": "sha256:cc2b07ff009155fb",
+        "loc": 31,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "execute",
+        "ast_hash": "sha256:596b825f50bc1cac",
+        "loc": 112,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "_calculate_hhi",
+        "ast_hash": "sha256:bde949df643be2fb",
+        "loc": 16,
+        "source": "def _calculate_hhi(self, market_shares: list[float]) -> Optional[float]:\n        \"\"\"Calculates Herfindahl-Hirschman Index (HHI). Sum of squared market shares * 10000.\"\"\"\n        if not market_shares:\n            return None\n\n        # Ensure shares are decimals summing to roughly 1.0 (or just sum of squares if percentages)\n        # We assume input is like [0.30, 0.20] for 30%, 20%\n\n        total = sum(market_shares)\n        if total > 10: # Likely passed as whole numbers 30, 20\n            shares = [s/100.0 for s in market_shares]\n        else:\n            shares = market_shares\n\n        hhi = sum([s**2 for s in shares]) * 10000\n        return float(hhi)"
+      },
+      {
+        "name": "_assess_lifecycle_stage",
+        "ast_hash": "sha256:0405065ae318795b",
+        "loc": 10,
+        "source": "def _assess_lifecycle_stage(self, growth_rate: float) -> str:\n        \"\"\"Determines industry lifecycle stage based on 3-year CAGR.\"\"\"\n        if growth_rate > 0.15:\n            return \"Growth\"\n        elif growth_rate > 0.02:\n            return \"Mature\"\n        elif growth_rate > -0.05:\n            return \"Stagnant\"\n        else:\n            return \"Decline\""
+      }
+    ]
+  }
+}

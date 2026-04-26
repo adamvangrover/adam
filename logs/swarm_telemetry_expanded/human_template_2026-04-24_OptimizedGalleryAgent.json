@@ -1,0 +1,54 @@
+{
+  "spec_version": "1.4.0-otel",
+  "timestamp": "2026-04-24T00:13:03.355457Z",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "severity_text": "WARN",
+  "severity_number": 13,
+  "event_name": "swarm.agent.lifecycle.deprecated",
+  "resource": {
+    "service.name": "swarm-orchestrator",
+    "service.version": "4.2.0",
+    "deployment.environment": "production",
+    "node.id": "worker-node-aws-us-east-1a-04"
+  },
+  "attributes": {
+    "agent.id": "OptimizedGalleryAgent",
+    "agent.previous_version": "v29.x",
+    "agent.target_version": "v30",
+    "deprecation.reason": "Transitioning to v30 architecture.",
+    "deprecation.action_required": true
+  },
+  "metrics": {
+    "agent.core_logic.function_count": 3,
+    "agent.capabilities.count": 0
+  },
+  "artifacts": {
+    "provenance": {
+      "repository": "git+ssh://repo/core/agents/specialized/optimized_gallery_agent.py",
+      "commit_sha": "a1b2c3d4e5f6g7h8i9j0",
+      "docstring_hash": "sha256:d8c4b12389a..."
+    },
+    "extracted_capabilities": [],
+    "core_logic_signatures": [
+      {
+        "name": "execute",
+        "ast_hash": "sha256:fadffa729ef915a1",
+        "loc": 13,
+        "source": "async def execute(self, task: str = \"fetch_data\", *args, **kwargs) -> Any:\n        \"\"\"\n        Main execution entry point.\n        \"\"\"\n        if task == \"fetch_data\":\n            # Wrap the heavy operation with the redundancy checker\n            return await self.execute_redundant_task(\n                task_name=\"gallery_data_fetch\",\n                task_func=self._simulate_heavy_fetch,\n                ttl=10, # Short TTL for demo\n                use_stale_on_error=True\n            )\n        return {\"error\": \"Unknown task\"}"
+      },
+      {
+        "name": "_simulate_heavy_fetch",
+        "ast_hash": "sha256:d1458c1de4c8e3ef",
+        "loc": 19,
+        "source": "async def _simulate_heavy_fetch(self) -> Dict[str, Any]:\n        \"\"\"\n        Simulates a network call that might fail or take time.\n        \"\"\"\n        # Simulate latency\n        await asyncio.sleep(0.5)\n\n        # Simulate random failure (30% chance)\n        if random.random() < 0.3:\n            raise ConnectionError(\"Simulated Network Failure in Gallery Backend\")\n\n        return {\n            \"status\": \"fresh\",\n            \"data\": [\n                {\"id\": 1, \"name\": \"Optimized_Agent_1\"},\n                {\"id\": 2, \"name\": \"Optimized_Agent_2\"}\n            ],\n            \"timestamp\": asyncio.get_event_loop().time()\n        }"
+      },
+      {
+        "name": "get_skill_schema",
+        "ast_hash": "sha256:caba6e7e8918cbf7",
+        "loc": 6,
+        "source": "def get_skill_schema(self) -> Dict[str, Any]:\n        return {\n            \"name\": \"OptimizedGalleryAgent\",\n            \"description\": \"Demonstrates graceful degradation and caching.\",\n            \"skills\": [\"fetch_data\"]\n        }"
+      }
+    ]
+  }
+}

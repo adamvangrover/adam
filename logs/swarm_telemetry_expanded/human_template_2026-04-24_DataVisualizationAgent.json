@@ -1,0 +1,67 @@
+{
+  "spec_version": "1.4.0-otel",
+  "timestamp": "2026-04-24T00:13:03.355457Z",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "severity_text": "WARN",
+  "severity_number": 13,
+  "event_name": "swarm.agent.lifecycle.deprecated",
+  "resource": {
+    "service.name": "swarm-orchestrator",
+    "service.version": "4.2.0",
+    "deployment.environment": "production",
+    "node.id": "worker-node-aws-us-east-1a-04"
+  },
+  "attributes": {
+    "agent.id": "DataVisualizationAgent",
+    "agent.previous_version": "v29.x",
+    "agent.target_version": "v30",
+    "deprecation.reason": "Transitioning to v30 architecture.",
+    "deprecation.action_required": true
+  },
+  "metrics": {
+    "agent.core_logic.function_count": 5,
+    "agent.capabilities.count": 0
+  },
+  "artifacts": {
+    "provenance": {
+      "repository": "git+ssh://repo/core/agents/data_visualization_agent.py",
+      "commit_sha": "a1b2c3d4e5f6g7h8i9j0",
+      "docstring_hash": "sha256:d8c4b12389a..."
+    },
+    "extracted_capabilities": [],
+    "core_logic_signatures": [
+      {
+        "name": "__init__",
+        "ast_hash": "sha256:2e23521fe5f7cd5d",
+        "loc": 11,
+        "source": "def __init__(self, config: Dict[str, Any], kernel: Optional[Any] = None):\n        \"\"\"\n        Initializes the Data Visualization Agent.\n\n        Args:\n            config (dict): Configuration dictionary.\n            kernel (Optional[Any]): Semantic Kernel instance.\n        \"\"\"\n        super().__init__(config, kernel=kernel)\n        # Initialize visualization libraries and settings if needed\n        sns.set_theme()"
+      },
+      {
+        "name": "execute",
+        "ast_hash": "sha256:e992ee90d0485101",
+        "loc": 33,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "create_chart",
+        "ast_hash": "sha256:a5373a0d5a75d300",
+        "loc": 18,
+        "source": "def create_chart(self, data, chart_type, kwargs):\n        \"\"\"\n        Creates a chart of the specified type using the given data.\n        \"\"\"\n        try:\n            if chart_type == \"line\":\n                # Placeholder: In a real app, this would save to a file or return bytes\n                # plt.plot(data['x'], data['y'])\n                # plt.savefig('chart.png')\n                return {\"status\": \"Line chart created\", \"path\": \"chart.png\"}\n            elif chart_type == \"bar\":\n                # plt.bar(data['x'], data['y'])\n                return {\"status\": \"Bar chart created\"}\n            # ... (Add other chart types)\n            return {\"status\": \"Chart created (mock)\"}\n        except Exception as e:\n            logger.error(f\"Error creating chart: {e}\")\n            return {\"error\": str(e)}"
+      },
+      {
+        "name": "create_graph",
+        "ast_hash": "sha256:a26615958832d1a6",
+        "loc": 13,
+        "source": "def create_graph(self, data, graph_type, kwargs):\n        \"\"\"\n        Creates a graph of the specified type using the given data.\n        \"\"\"\n        if graph_type == \"network\":\n            # Create a network graph\n            # ...\n            pass\n        elif graph_type == \"treemap\":\n            # Create a treemap\n            # ...\n            pass\n        return {\"status\": \"Graph created (mock)\"}"
+      },
+      {
+        "name": "create_map",
+        "ast_hash": "sha256:29ceeeb0de6c7b3c",
+        "loc": 13,
+        "source": "def create_map(self, data, map_type, kwargs):\n        \"\"\"\n        Creates a map of the specified type using the given data.\n        \"\"\"\n        if map_type == \"choropleth\":\n            # Create a choropleth map\n            # ...\n            pass\n        elif map_type == \"heatmap\":\n            # Create a heatmap\n            # ...\n            pass\n        return {\"status\": \"Map created (mock)\"}"
+      }
+    ]
+  }
+}

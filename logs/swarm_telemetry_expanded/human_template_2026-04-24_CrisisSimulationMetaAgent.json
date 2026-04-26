@@ -1,0 +1,56 @@
+{
+  "spec_version": "1.4.0-otel",
+  "timestamp": "2026-04-24T00:13:03.355457Z",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "severity_text": "WARN",
+  "severity_number": 13,
+  "event_name": "swarm.agent.lifecycle.deprecated",
+  "resource": {
+    "service.name": "swarm-orchestrator",
+    "service.version": "4.2.0",
+    "deployment.environment": "production",
+    "node.id": "worker-node-aws-us-east-1a-04"
+  },
+  "attributes": {
+    "agent.id": "CrisisSimulationMetaAgent",
+    "agent.previous_version": "v29.x",
+    "agent.target_version": "v30",
+    "deprecation.reason": "Transitioning to v30 architecture.",
+    "deprecation.action_required": true
+  },
+  "metrics": {
+    "agent.core_logic.function_count": 3,
+    "agent.capabilities.count": 0
+  },
+  "artifacts": {
+    "provenance": {
+      "repository": "git+ssh://repo/core/agents/meta_agents/crisis_simulation_agent.py",
+      "commit_sha": "a1b2c3d4e5f6g7h8i9j0",
+      "docstring_hash": "sha256:d8c4b12389a..."
+    },
+    "extracted_capabilities": [],
+    "core_logic_signatures": [
+      {
+        "name": "__init__",
+        "ast_hash": "sha256:f1023a1069ce4d70",
+        "loc": 24,
+        "source": "def __init__(self, config: Dict[str, Any], **kwargs):\n        super().__init__(config, **kwargs)\n        try:\n            with open(\"prompt_library/AOPL-v1.0/simulation/crisis_simulation.md\", \"r\") as f:\n                prompt_template = f.read()\n\n            from core.prompting.base_prompt_plugin import PromptMetadata\n\n            metadata = PromptMetadata(\n                prompt_id=\"crisis_simulation_v1\",\n                author=\"ADAM Project\",\n                model_config={\"temperature\": 0.0, \"max_tokens\": 4096}\n            )\n\n            self.simulation_plugin = CrisisSimulationPlugin(\n                metadata=metadata,\n                user_template=prompt_template\n            )\n        except FileNotFoundError:\n            logging.error(\"Crisis simulation prompt template not found.\")\n            self.simulation_plugin = None\n        except Exception as e:\n            logging.error(f\"Error initializing CrisisSimulationPlugin: {e}\")\n            self.simulation_plugin = None"
+      },
+      {
+        "name": "execute",
+        "ast_hash": "sha256:92f99ca26bf7d9d5",
+        "loc": 111,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "_mock_llm_call",
+        "ast_hash": "sha256:0caa623a9cf66087",
+        "loc": 36,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      }
+    ]
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "spec_version": "1.4.0-otel",
+  "timestamp": "2026-04-24T00:13:03.355457Z",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "severity_text": "WARN",
+  "severity_number": 13,
+  "event_name": "swarm.agent.lifecycle.deprecated",
+  "resource": {
+    "service.name": "swarm-orchestrator",
+    "service.version": "4.2.0",
+    "deployment.environment": "production",
+    "node.id": "worker-node-aws-us-east-1a-04"
+  },
+  "attributes": {
+    "agent.id": "AdaptiveRPCAgent",
+    "agent.previous_version": "v29.x",
+    "agent.target_version": "v30",
+    "deprecation.reason": "Transitioning to v30 architecture.",
+    "deprecation.action_required": true
+  },
+  "metrics": {
+    "agent.core_logic.function_count": 5,
+    "agent.capabilities.count": 0
+  },
+  "artifacts": {
+    "provenance": {
+      "repository": "git+ssh://repo/core/agents/templates/v23_adaptive_rpc_agent.py",
+      "commit_sha": "a1b2c3d4e5f6g7h8i9j0",
+      "docstring_hash": "sha256:d8c4b12389a..."
+    },
+    "extracted_capabilities": [],
+    "core_logic_signatures": [
+      {
+        "name": "__init__",
+        "ast_hash": "sha256:b6634ebaf8e6e74b",
+        "loc": 5,
+        "source": "def __init__(self, agent_id: str, config: Dict[str, Any], system_context: Any):\n        super().__init__(agent_id, config, system_context)\n        self.tools = config.get(\"tools\", [])\n        self.conviction_threshold = config.get(\"conviction_threshold\", 0.85)\n        self.max_tool_context_tokens = 2000"
+      },
+      {
+        "name": "execute_task",
+        "ast_hash": "sha256:dcf94ae3cb554863",
+        "loc": 38,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "_filter_tools_by_budget",
+        "ast_hash": "sha256:64f92fde7cd086e3",
+        "loc": 19,
+        "source": "def _filter_tools_by_budget(self, query: str) -> List[Dict]:\n        \"\"\"\n        Implementation of Heuristic 2: Entropy Check.\n        Prevents 'Context Saturation' by loading only high-relevance schemas.\n        \"\"\"\n        # (Placeholder logic: In a real system, use embeddings to select top-k tools)\n        # If the prompt mentions \"risk\", load risk tools. If \"sql\", load SQL tools.\n        relevant_tools = []\n        current_tokens = 0\n\n        for tool in self.tools:\n            # Estimate token cost of schema\n            cost = len(json.dumps(tool)) / 4\n            if current_tokens + cost > self.max_tool_context_tokens:\n                break\n            relevant_tools.append(tool)\n            current_tokens += cost\n\n        return relevant_tools"
+      },
+      {
+        "name": "_construct_protocol_prompt",
+        "ast_hash": "sha256:3335cc362317799b",
+        "loc": 23,
+        "source": "def _construct_protocol_prompt(self, task: str, schemas: List[Dict]) -> str:\n        return f\"\"\"\n        SYSTEM: You are an autonomous agent utilizing the Model Context Protocol (MCP).\n\n        PROTOCOL: JSON-RPC 2.0\n\n        AVAILABLE TOOLS:\n        {json.dumps(schemas, indent=2)}\n\n        CRITICAL INSTRUCTION - AMBIGUITY GUARDRAIL:\n        1. Assess your CONVICTION. Do you have all necessary parameters to call a tool?\n        2. If YES (Conviction > 85%): Output a valid JSON-RPC Request.\n        3. If NO (Conviction < 85%): Output a JSON containing a \"clarification_request\".\n\n        FORMAT:\n        {{\n          \"thought_trace\": \"Reasoning about parameter certainty...\",\n          \"conviction_score\": 0.0-1.0,\n          \"action\": {{ ... JSON-RPC or Clarification ... }}\n        }}\n\n        TASK: {task}\n        \"\"\""
+      },
+      {
+        "name": "_metacognitive_gate",
+        "ast_hash": "sha256:728f2798ceeb9eb5",
+        "loc": 45,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      }
+    ]
+  }
+}

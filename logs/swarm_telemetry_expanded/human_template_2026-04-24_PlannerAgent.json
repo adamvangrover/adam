@@ -1,0 +1,54 @@
+{
+  "spec_version": "1.4.0-otel",
+  "timestamp": "2026-04-24T00:13:03.355457Z",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "severity_text": "WARN",
+  "severity_number": 13,
+  "event_name": "swarm.agent.lifecycle.deprecated",
+  "resource": {
+    "service.name": "swarm-orchestrator",
+    "service.version": "4.2.0",
+    "deployment.environment": "production",
+    "node.id": "worker-node-aws-us-east-1a-04"
+  },
+  "attributes": {
+    "agent.id": "PlannerAgent",
+    "agent.previous_version": "v29.x",
+    "agent.target_version": "v30",
+    "deprecation.reason": "Transitioning to v30 architecture.",
+    "deprecation.action_required": true
+  },
+  "metrics": {
+    "agent.core_logic.function_count": 3,
+    "agent.capabilities.count": 0
+  },
+  "artifacts": {
+    "provenance": {
+      "repository": "git+ssh://repo/core/agents/developer_swarm/planner_agent.py",
+      "commit_sha": "a1b2c3d4e5f6g7h8i9j0",
+      "docstring_hash": "sha256:d8c4b12389a..."
+    },
+    "extracted_capabilities": [],
+    "core_logic_signatures": [
+      {
+        "name": "__init__",
+        "ast_hash": "sha256:94d527ba4d9d398b",
+        "loc": 3,
+        "source": "def __init__(self, config: Dict[str, Any], **kwargs):\n        super().__init__(config, **kwargs)\n        self.name = \"PlannerAgent\""
+      },
+      {
+        "name": "execute",
+        "ast_hash": "sha256:e0a79ec482290d5e",
+        "loc": 17,
+        "source": "async def execute(self, task_description: str) -> List[Dict[str, Any]]:\n        \"\"\"\n        Takes a task description and returns a structured plan.\n\n        :param task_description: A string describing the high-level task.\n        :return: A list of dictionaries, where each dictionary represents a\n                 step in the plan.\n        \"\"\"\n        # In a real implementation, this would involve a sophisticated call\n        # to an LLM with a carefully crafted prompt to break down the task.\n        # For now, this is a placeholder implementation.\n        self.context[\"plan\"] = [\n            {\"step\": 1, \"task\": \"Understand the request\", \"status\": \"pending\"},\n            {\"step\": 2, \"task\": \"Create a plan\", \"status\": \"pending\"},\n            {\"step\": 3, \"task\": \"Execute the plan\", \"status\": \"pending\"},\n        ]\n        return self.context[\"plan\"]"
+      },
+      {
+        "name": "get_skill_schema",
+        "ast_hash": "sha256:b690811f04d3da61",
+        "loc": 15,
+        "source": "def get_skill_schema(self) -> Dict[str, Any]:\n        \"\"\"\n        Defines the skills of the PlannerAgent.\n        \"\"\"\n        schema = super().get_skill_schema()\n        schema[\"skills\"].append(\n            {\n                \"name\": \"create_plan\",\n                \"description\": \"Creates a detailed plan from a high-level task description.\",\n                \"parameters\": [\n                    {\"name\": \"task_description\", \"type\": \"string\", \"description\": \"The high-level task description.\"}\n                ]\n            }\n        )\n        return schema"
+      }
+    ]
+  }
+}

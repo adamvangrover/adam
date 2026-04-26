@@ -1,0 +1,67 @@
+{
+  "spec_version": "1.4.0-otel",
+  "timestamp": "2026-04-24T00:13:03.355457Z",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "severity_text": "WARN",
+  "severity_number": 13,
+  "event_name": "swarm.agent.lifecycle.deprecated",
+  "resource": {
+    "service.name": "swarm-orchestrator",
+    "service.version": "4.2.0",
+    "deployment.environment": "production",
+    "node.id": "worker-node-aws-us-east-1a-04"
+  },
+  "attributes": {
+    "agent.id": "BehavioralEconomicsAgent",
+    "agent.previous_version": "v29.x",
+    "agent.target_version": "v30",
+    "deprecation.reason": "Transitioning to v30 architecture.",
+    "deprecation.action_required": true
+  },
+  "metrics": {
+    "agent.core_logic.function_count": 5,
+    "agent.capabilities.count": 0
+  },
+  "artifacts": {
+    "provenance": {
+      "repository": "git+ssh://repo/core/agents/behavioral_economics_agent.py",
+      "commit_sha": "a1b2c3d4e5f6g7h8i9j0",
+      "docstring_hash": "sha256:d8c4b12389a..."
+    },
+    "extracted_capabilities": [],
+    "core_logic_signatures": [
+      {
+        "name": "__init__",
+        "ast_hash": "sha256:3780ef8f6486f1a4",
+        "loc": 8,
+        "source": "def __init__(self, config: Dict[str, Any], **kwargs):\n        super().__init__(config, **kwargs)\n        # Initialization specific to this agent, e.g., loading bias models or patterns\n        self.bias_patterns = self.config.get(\"bias_patterns\", {})\n        logging.info(f\"BehavioralEconomicsAgent initialized with {len(self.bias_patterns)} bias patterns.\")\n        # Load a pre-trained sentiment analysis model\n        self.sentiment_analyzer = pipeline(\n            \"sentiment-analysis\", model=\"distilbert-base-uncased-finetuned-sst-2-english\")"
+      },
+      {
+        "name": "execute",
+        "ast_hash": "sha256:bee44d4219a41008",
+        "loc": 34,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "_identify_market_biases",
+        "ast_hash": "sha256:2470fe54e1be1075",
+        "loc": 30,
+        "source": "def _identify_market_biases(self, content: str) -> List[Dict[str, str]]:\n        \"\"\"\n        Identifies common market biases in a given text using sentiment analysis.\n        \"\"\"\n        identified_biases = []\n        # Use the sentiment analyzer to get the sentiment of the text\n        sentiment_result = self.sentiment_analyzer(content)\n        sentiment_label = sentiment_result[0]['label']\n        sentiment_score = sentiment_result[0]['score']\n\n        if sentiment_label == 'NEGATIVE' and sentiment_score > 0.8:\n            identified_biases.append({\n                \"bias\": \"Fear/Panic\",\n                \"evidence\": f\"High negative sentiment (score: {sentiment_score:.2f})\"\n            })\n        elif sentiment_label == 'POSITIVE' and sentiment_score > 0.8:\n            identified_biases.append({\n                \"bias\": \"Greed/Irrational Exuberance\",\n                \"evidence\": f\"High positive sentiment (score: {sentiment_score:.2f})\"\n            })\n\n        # Also run the simple pattern matching for other biases\n        for bias, patterns in self.bias_patterns.get(\"market\", {}).items():\n            for pattern in patterns:\n                if pattern.lower() in content.lower():\n                    identified_biases.append({\n                        \"bias\": bias,\n                        \"evidence\": f\"Found pattern '{pattern}'\"\n                    })\n        return identified_biases"
+      },
+      {
+        "name": "_identify_user_biases",
+        "ast_hash": "sha256:e5552d21384f45c8",
+        "loc": 15,
+        "source": "def _identify_user_biases(self, queries: List[str]) -> List[Dict[str, str]]:\n        \"\"\"\n        Identifies cognitive biases in user query patterns.\n        Placeholder implementation.\n        \"\"\"\n        identified_biases = []\n        full_query_text = \" \".join(queries).lower()\n        for bias, patterns in self.bias_patterns.get(\"user\", {}).items():\n            for pattern in patterns:\n                if pattern.lower() in full_query_text:\n                    identified_biases.append({\n                        \"bias\": bias,\n                        \"evidence\": f\"Found pattern '{pattern}' in query history.\"\n                    })\n        return identified_biases"
+      },
+      {
+        "name": "_generate_insights",
+        "ast_hash": "sha256:2c472079923312b3",
+        "loc": 17,
+        "source": "def _generate_insights(self, analysis_results: Dict[str, Any]) -> str:\n        \"\"\"\n        Generates a summary of insights based on the identified biases.\n        Placeholder implementation.\n        \"\"\"\n        if not analysis_results[\"market_biases\"] and not analysis_results[\"user_biases\"]:\n            return \"No significant cognitive biases detected.\"\n\n        insight_text = \"Behavioral Analysis Insights:\\n\"\n        if analysis_results[\"market_biases\"]:\n            insight_text += \"- Market sentiment may be influenced by: \"\n            insight_text += \", \".join(list(set([b[\"bias\"] for b in analysis_results[\"market_biases\"]]))) + \".\\n\"\n        if analysis_results[\"user_biases\"]:\n            insight_text += \"- User interaction patterns suggest potential for: \"\n            insight_text += \", \".join(list(set([b[\"bias\"] for b in analysis_results[\"user_biases\"]]))) + \".\\n\"\n\n        return insight_text"
+      }
+    ]
+  }
+}

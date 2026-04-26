@@ -1,0 +1,144 @@
+{
+  "spec_version": "1.4.0-otel",
+  "timestamp": "2026-04-24T00:13:03.355457Z",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "severity_text": "WARN",
+  "severity_number": 13,
+  "event_name": "swarm.agent.lifecycle.deprecated",
+  "resource": {
+    "service.name": "swarm-orchestrator",
+    "service.version": "4.2.0",
+    "deployment.environment": "production",
+    "node.id": "worker-node-aws-us-east-1a-04"
+  },
+  "attributes": {
+    "agent.id": "CatalystAgent",
+    "agent.previous_version": "v29.x",
+    "agent.target_version": "v30",
+    "deprecation.reason": "Transitioning to v30 architecture.",
+    "deprecation.action_required": true
+  },
+  "metrics": {
+    "agent.core_logic.function_count": 18,
+    "agent.capabilities.count": 0
+  },
+  "artifacts": {
+    "provenance": {
+      "repository": "git+ssh://repo/core/agents/catalyst_agent.py",
+      "commit_sha": "a1b2c3d4e5f6g7h8i9j0",
+      "docstring_hash": "sha256:d8c4b12389a..."
+    },
+    "extracted_capabilities": [],
+    "core_logic_signatures": [
+      {
+        "name": "__init__",
+        "ast_hash": "sha256:ceb70b1ac6b2f847",
+        "loc": 17,
+        "source": "def __init__(self, config_path=\"catalyst_config.json\"):\n        self.config = self.load_config(config_path)\n        self.client_data_url = self.config[\"client_data_url\"]\n        self.market_data_url = self.config[\"market_data_url\"]\n        self.company_financials_url = self.config[\"company_financials_url\"]\n        self.industry_reports_url = self.config[\"industry_reports_url\"]\n        self.bank_product_data_url = self.config[\"bank_product_data_url\"]\n        self.knowledge_graph_url = self.config[\"knowledge_graph_url\"]\n        self.financial_modeling_url = self.config[\"financial_modeling_url\"]\n        self.reporting_url = self.config[\"reporting_url\"]\n        self.nlp_url = self.config[\"nlp_url\"]\n        self.client_data = {}\n        self.market_data = {}\n        self.company_financials = {}\n        self.industry_reports = {}\n        self.bank_product_data = {}\n        self.logger = self.setup_logger()"
+      },
+      {
+        "name": "setup_logger",
+        "ast_hash": "sha256:d9fac48b14d9a2be",
+        "loc": 8,
+        "source": "def setup_logger(self):\n        logger = logging.getLogger(__name__)\n        logger.setLevel(logging.INFO)\n        formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')\n        ch = logging.StreamHandler()\n        ch.setFormatter(formatter)\n        logger.addHandler(ch)\n        return logger"
+      },
+      {
+        "name": "load_config",
+        "ast_hash": "sha256:cb0cd910c6a2167d",
+        "loc": 10,
+        "source": "def load_config(self, config_path):\n        try:\n            with open(config_path, \"r\") as f:\n                return json.load(f)\n        except FileNotFoundError:\n            self.logger.error(f\"Config file not found: {config_path}\")\n            return {}\n        except json.JSONDecodeError:\n            self.logger.error(f\"Invalid JSON format in config file: {config_path}\")\n            return {}"
+      },
+      {
+        "name": "fetch_data",
+        "ast_hash": "sha256:e16e6d870f3a73da",
+        "loc": 8,
+        "source": "def fetch_data(self, url, params=None):\n        try:\n            response = requests.get(url, params=params, timeout=10)\n            response.raise_for_status()\n            return response.json()\n        except requests.exceptions.RequestException as e:\n            self.logger.error(f\"Error fetching data from {url}: {e}\")\n            return None"
+      },
+      {
+        "name": "load_client_data",
+        "ast_hash": "sha256:e43bd8c3e4b44bf8",
+        "loc": 8,
+        "source": "def load_client_data(self, client_id):\n        client_data = self.fetch_data(f\"{self.client_data_url}/{client_id}\")\n        if client_data:\n            self.client_data = client_data\n            self.logger.info(f\"Loaded client data for {client_id}\")\n        else:\n            self.logger.warning(f\"Failed to load client data for {client_id}\")\n        return self.client_data"
+      },
+      {
+        "name": "load_market_data",
+        "ast_hash": "sha256:106ad0c92f6e60a6",
+        "loc": 8,
+        "source": "def load_market_data(self, date=None):\n        market_data = self.fetch_data(self.market_data_url, params={\"date\": date})\n        if market_data:\n            self.market_data = market_data\n            self.logger.info(\"Loaded market data\")\n        else:\n            self.logger.warning(\"Failed to load market data\")\n        return self.market_data"
+      },
+      {
+        "name": "load_company_financials",
+        "ast_hash": "sha256:0587d4cdac3be4a2",
+        "loc": 8,
+        "source": "def load_company_financials(self, company_id):\n        company_financials = self.fetch_data(f\"{self.company_financials_url}/{company_id}\")\n        if company_financials:\n            self.company_financials = company_financials\n            self.logger.info(f\"Loaded company financials for {company_id}\")\n        else:\n            self.logger.warning(f\"Failed to load company financials for {company_id}\")\n        return self.company_financials"
+      },
+      {
+        "name": "load_industry_reports",
+        "ast_hash": "sha256:be377bbaf1c135b7",
+        "loc": 8,
+        "source": "def load_industry_reports(self, industry):\n        industry_reports = self.fetch_data(self.industry_reports_url, params={\"industry\": industry})\n        if industry_reports:\n            self.industry_reports = industry_reports\n            self.logger.info(f\"Loaded industry reports for {industry}\")\n        else:\n            self.logger.warning(f\"Failed to load industry reports for {industry}\")\n        return self.industry_reports"
+      },
+      {
+        "name": "load_bank_product_data",
+        "ast_hash": "sha256:ebcc1e8eacddea92",
+        "loc": 8,
+        "source": "def load_bank_product_data(self):\n        bank_product_data = self.fetch_data(self.bank_product_data_url)\n        if bank_product_data:\n            self.bank_product_data = bank_product_data\n            self.logger.info(\"Loaded bank product data\")\n        else:\n            self.logger.warning(\"Failed to load bank product data\")\n        return self.bank_product_data"
+      },
+      {
+        "name": "analyze_news_sentiment",
+        "ast_hash": "sha256:76aa7b7dcb708b84",
+        "loc": 8,
+        "source": "def analyze_news_sentiment(self):\n        # Placeholder: Call NLP service to analyze news sentiment\n        sentiment_data = self.fetch_data(self.nlp_url + \"/sentiment\", params={\"text\": \"news\"})\n        if sentiment_data and \"sentiment\" in sentiment_data:\n            return sentiment_data[\"sentiment\"]\n        else:\n            self.logger.warning(\"Failed to analyze news sentiment\")\n            return 0.5"
+      },
+      {
+        "name": "get_client_connections",
+        "ast_hash": "sha256:575fa9bd9e3f83c2",
+        "loc": 9,
+        "source": "def get_client_connections(self):\n        # Placeholder: Call Knowledge Graph to get client connections\n        connections = self.fetch_data(self.knowledge_graph_url + \"/connections\",\n                                      params={\"client_id\": self.client_data.get(\"client_id\")})\n        if connections:\n            return connections\n        else:\n            self.logger.warning(\"Failed to get client connections\")\n            return []"
+      },
+      {
+        "name": "get_client_needs",
+        "ast_hash": "sha256:d692768dc2a10b8b",
+        "loc": 3,
+        "source": "def get_client_needs(self):\n        # Placeholder: Extract client needs from client data\n        return {\"needs\": self.client_data.get(\"investment_goals\")}"
+      },
+      {
+        "name": "recommend_products",
+        "ast_hash": "sha256:7b5e7953ddb5c0cf",
+        "loc": 6,
+        "source": "def recommend_products(self, client_needs):\n        # Placeholder: Recommend products based on client needs\n        if client_needs.get(\"needs\") == \"growth\":\n            return [{\"product\": \"leveraged loan\", \"rationale\": \"Growth financing\"}]\n        else:\n            return []"
+      },
+      {
+        "name": "generate_report_summary",
+        "ast_hash": "sha256:fb1e5fa76be9497a",
+        "loc": 13,
+        "source": "def generate_report_summary(self, opportunities, client_data, deal_structure, recommended_products):\n        # Placeholder: Call NLP service to generate report summary\n        summary_data = self.fetch_data(self.nlp_url + \"/summary\", params={\"data\": json.dumps({\n            \"opportunities\": opportunities,\n            \"client_data\": client_data,\n            \"deal_structure\": deal_structure,\n            \"recommended_products\": recommended_products\n        })})\n        if summary_data and \"summary\" in summary_data:\n            return summary_data[\"summary\"]\n        else:\n            self.logger.warning(\"Failed to generate report summary\")\n            return \"Report Summary Unavailable.\""
+      },
+      {
+        "name": "identify_opportunities",
+        "ast_hash": "sha256:229ae9806f62f440",
+        "loc": 6,
+        "source": "def identify_opportunities(self):\n        news_sentiment = self.analyze_news_sentiment()\n        client_connections = self.get_client_connections()\n        if news_sentiment > 0.7 and client_connections:\n            return [{\"opportunity_type\": \"strategic_alliance\", \"rationale\": \"Positive market sentiment and strong client connections\"}]\n        return []"
+      },
+      {
+        "name": "structure_deal",
+        "ast_hash": "sha256:64c262e5a8f2ba12",
+        "loc": 4,
+        "source": "def structure_deal(self, opportunity):\n        client_needs = self.get_client_needs()\n        product_recommendation = self.recommend_products(client_needs)\n        return {\"opportunity\": opportunity, \"solution\": product_recommendation, \"negotiation_strategy\": \"relationship-focused\"}"
+      },
+      {
+        "name": "generate_report",
+        "ast_hash": "sha256:3c664a883dc054a8",
+        "loc": 8,
+        "source": "def generate_report(self, opportunities, client_data, deal_structure, recommended_products):\n        report_summary = self.generate_report_summary(opportunities, client_data, deal_structure, recommended_products)\n        return {\"summary\": report_summary, \"details\": {\n            \"opportunities\": opportunities,\n            \"client_data\": client_data,\n            \"deal_structure\": deal_structure,\n            \"recommended_products\": recommended_products\n        }}"
+      },
+      {
+        "name": "run",
+        "ast_hash": "sha256:c83cd746b8659540",
+        "loc": 15,
+        "source": "def run(self, client_id, company_id, industry):\n        self.load_client_data(client_id)\n        self.load_market_data()\n        self.load_company_financials(company_id)\n        self.load_industry_reports(industry)\n        self.load_bank_product_data()\n\n        opportunities = self.identify_opportunities()\n        if opportunities:\n            deal_structure = self.structure_deal(opportunities[0])\n            recommended_products = deal_structure.get(\"solution\", [])\n            report = self.generate_report(opportunities, self.client_data, deal_structure, recommended_products)\n            return report\n        else:\n            return {\"message\": \"No opportunities identified.\"}"
+      }
+    ]
+  }
+}

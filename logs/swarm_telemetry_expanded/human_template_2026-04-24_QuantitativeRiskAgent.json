@@ -1,0 +1,61 @@
+{
+  "spec_version": "1.4.0-otel",
+  "timestamp": "2026-04-24T00:13:03.355457Z",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "severity_text": "WARN",
+  "severity_number": 13,
+  "event_name": "swarm.agent.lifecycle.deprecated",
+  "resource": {
+    "service.name": "swarm-orchestrator",
+    "service.version": "4.2.0",
+    "deployment.environment": "production",
+    "node.id": "worker-node-aws-us-east-1a-04"
+  },
+  "attributes": {
+    "agent.id": "QuantitativeRiskAgent",
+    "agent.previous_version": "v29.x",
+    "agent.target_version": "v30",
+    "deprecation.reason": "Transitioning to v30 architecture.",
+    "deprecation.action_required": true
+  },
+  "metrics": {
+    "agent.core_logic.function_count": 4,
+    "agent.capabilities.count": 0
+  },
+  "artifacts": {
+    "provenance": {
+      "repository": "git+ssh://repo/core/agents/quantitative_risk_agent.py",
+      "commit_sha": "a1b2c3d4e5f6g7h8i9j0",
+      "docstring_hash": "sha256:d8c4b12389a..."
+    },
+    "extracted_capabilities": [],
+    "core_logic_signatures": [
+      {
+        "name": "__init__",
+        "ast_hash": "sha256:49c99ef662bbff98",
+        "loc": 3,
+        "source": "def __init__(self, config: Dict[str, Any] = None, constitution: Dict[str, Any] = None, kernel: Any = None):\n        super().__init__(config, constitution, kernel)\n        self.confidence_level = self.config.get('confidence_level', 0.95)"
+      },
+      {
+        "name": "execute",
+        "ast_hash": "sha256:90b35fc8c534f9e4",
+        "loc": 39,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "calculate_var",
+        "ast_hash": "sha256:9947f2733b4d6db3",
+        "loc": 9,
+        "source": "def calculate_var(self, returns: np.ndarray) -> float:\n        \"\"\"Calculates Value at Risk (VaR)\"\"\"\n        if not HAS_SCIPY:\n            # Historical simulation fallback\n            return float(np.percentile(returns, (1 - self.confidence_level) * 100))\n\n        mu = np.mean(returns)\n        sigma = np.std(returns)\n        return float(norm.ppf(1 - self.confidence_level, mu, sigma))"
+      },
+      {
+        "name": "calculate_cvar",
+        "ast_hash": "sha256:4614ab9dcff0fb8b",
+        "loc": 4,
+        "source": "def calculate_cvar(self, returns: np.ndarray) -> float:\n        \"\"\"Calculates Conditional Value at Risk (CVaR)\"\"\"\n        var = self.calculate_var(returns)\n        return float(returns[returns <= var].mean())"
+      }
+    ]
+  }
+}

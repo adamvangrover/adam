@@ -1,0 +1,85 @@
+{
+  "spec_version": "1.4.0-otel",
+  "timestamp": "2026-04-24T00:13:03.355457Z",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "severity_text": "WARN",
+  "severity_number": 13,
+  "event_name": "swarm.agent.lifecycle.deprecated",
+  "resource": {
+    "service.name": "swarm-orchestrator",
+    "service.version": "4.2.0",
+    "deployment.environment": "production",
+    "node.id": "worker-node-aws-us-east-1a-04"
+  },
+  "attributes": {
+    "agent.id": "EventDrivenRiskAgent",
+    "agent.previous_version": "v29.x",
+    "agent.target_version": "v30",
+    "deprecation.reason": "Transitioning to v30 architecture.",
+    "deprecation.action_required": true
+  },
+  "metrics": {
+    "agent.core_logic.function_count": 8,
+    "agent.capabilities.count": 0
+  },
+  "artifacts": {
+    "provenance": {
+      "repository": "git+ssh://repo/core/agents/event_driven_risk_agent.py",
+      "commit_sha": "a1b2c3d4e5f6g7h8i9j0",
+      "docstring_hash": "sha256:d8c4b12389a..."
+    },
+    "extracted_capabilities": [],
+    "core_logic_signatures": [
+      {
+        "name": "__init__",
+        "ast_hash": "sha256:f88edd9aafc68a4f",
+        "loc": 8,
+        "source": "def __init__(self, name: str = \"EventDrivenRiskAgent\", config: Dict = None):\n        if config is None:\n            config = {}\n        config[\"agent_id\"] = name\n        super().__init__(config)\n        self.event_data = {}  # Store event data\n        self.api_key = os.getenv(\"NEWS_API_KEY\")  # Get from env\n        self.news_api_url = \"https://newsapi.org/v2/everything\""
+      },
+      {
+        "name": "fetch_events",
+        "ast_hash": "sha256:0bab0ca9d2021510",
+        "loc": 46,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "analyze_event_impact",
+        "ast_hash": "sha256:aab9c785bd18d49b",
+        "loc": 22,
+        "source": "def analyze_event_impact(self, events: List[Dict]) -> Dict:\n        \"\"\"\n        Analyzes the impact of events on financial markets.\n\n        Args:\n            events: List of event dictionaries.\n\n        Returns:\n            Dictionary of event impact assessments.\n        \"\"\"\n        impacts = {}\n        for event in events:\n            # Placeholder for impact analysis logic (e.g., sentiment analysis, historical correlation)\n            # This is where more sophistacted analysis will be placed.\n            impact_score = self.simulate_impact_analysis(event)  # replace with actual analysis\n            impacts[event[\"title\"]] = {\n                \"impact_score\": impact_score,\n                \"publishedAt\": event[\"publishedAt\"],\n                \"keyword\": event[\"keyword\"]\n            }\n\n        return impacts"
+      },
+      {
+        "name": "generate_risk_alerts",
+        "ast_hash": "sha256:b5b0833c711e7337",
+        "loc": 22,
+        "source": "def generate_risk_alerts(self, event_impacts: Dict) -> List[Dict]:\n        \"\"\"\n        Generates risk alerts based on event impact assessments.\n\n        Args:\n            event_impacts: Dictionary of event impact assessments.\n\n        Returns:\n            List of risk alert dictionaries.\n        \"\"\"\n        alerts = []\n        for event_title, impact_data in event_impacts.items():\n            if impact_data[\"impact_score\"] > 0.7:  # Threshold for high impact\n                alert = {\n                    \"event\": event_title,\n                    \"impact_score\": impact_data[\"impact_score\"],\n                    \"publishedAt\": impact_data[\"publishedAt\"],\n                    \"keyword\": impact_data[\"keyword\"],\n                    \"message\": f\"High impact event detected: {event_title} (Impact Score: {impact_data['impact_score']})\"\n                }\n                alerts.append(alert)\n        return alerts"
+      },
+      {
+        "name": "simulate_impact_analysis",
+        "ast_hash": "sha256:bd20236fb20b95a1",
+        "loc": 7,
+        "source": "def simulate_impact_analysis(self, event: Dict) -> float:\n        \"\"\"\n        Simulates impact analysis for testing purposes.\n        Will be replaced with actual analysis.\n        \"\"\"\n        # Placeholder for more sophisticated logic\n        return hash(event[\"title\"]) % 100 / 100.0"
+      },
+      {
+        "name": "generate_event_visualization",
+        "ast_hash": "sha256:09c686c5010e8f3c",
+        "loc": 3,
+        "source": "def generate_event_visualization(self, event_impacts: Dict):\n        \"\"\"Generates a visualization of event impacts\"\"\"\n        generate_event_impact_chart(event_impacts)"
+      },
+      {
+        "name": "execute",
+        "ast_hash": "sha256:c3029c3eb1450e34",
+        "loc": 13,
+        "source": "async def execute(self, *args, **kwargs):\n        \"\"\"\n        Executes the agent's logic. Wraps run() for AgentBase compatibility.\n        \"\"\"\n        keywords = kwargs.get(\"keywords\", [])\n        from_date = kwargs.get(\"from_date\", datetime.date.today())\n        to_date = kwargs.get(\"to_date\", datetime.date.today())\n\n        # If args are provided, try to map them\n        if args and isinstance(args[0], list):\n            keywords = args[0]\n\n        return self.run(keywords, from_date, to_date)"
+      },
+      {
+        "name": "run",
+        "ast_hash": "sha256:ce31c68e700cbff5",
+        "loc": 17,
+        "source": "def run(self, keywords: List[str], from_date: datetime.date, to_date: datetime.date):\n        \"\"\"\n        Runs the event-driven risk analysis.\n\n        Args:\n            keywords: List of keywords to search for.\n            from_date: Start date for event search.\n            to_date: End date for event search.\n        \"\"\"\n\n        events = self.fetch_events(keywords, from_date, to_date)\n        if not events:  # handle error from fetch_events\n            return {}\n        impacts = self.analyze_event_impact(events)\n        alerts = self.generate_risk_alerts(impacts)\n        self.generate_event_visualization(impacts)\n        return {\"impacts\": impacts, \"alerts\": alerts}"
+      }
+    ]
+  }
+}

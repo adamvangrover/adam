@@ -1,0 +1,133 @@
+{
+  "spec_version": "1.4.0-otel",
+  "timestamp": "2026-04-24T00:13:03.355457Z",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "severity_text": "WARN",
+  "severity_number": 13,
+  "event_name": "swarm.agent.lifecycle.deprecated",
+  "resource": {
+    "service.name": "swarm-orchestrator",
+    "service.version": "4.2.0",
+    "deployment.environment": "production",
+    "node.id": "worker-node-aws-us-east-1a-04"
+  },
+  "attributes": {
+    "agent.id": "CryptoAgent",
+    "agent.previous_version": "v29.x",
+    "agent.target_version": "v30",
+    "deprecation.reason": "Transitioning to v30 architecture.",
+    "deprecation.action_required": true
+  },
+  "metrics": {
+    "agent.core_logic.function_count": 16,
+    "agent.capabilities.count": 0
+  },
+  "artifacts": {
+    "provenance": {
+      "repository": "git+ssh://repo/core/agents/crypto_agent.py",
+      "commit_sha": "a1b2c3d4e5f6g7h8i9j0",
+      "docstring_hash": "sha256:d8c4b12389a..."
+    },
+    "extracted_capabilities": [],
+    "core_logic_signatures": [
+      {
+        "name": "__init__",
+        "ast_hash": "sha256:312c5eeb00e32a2a",
+        "loc": 46,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "_load_knowledge_base",
+        "ast_hash": "sha256:b14ef62bf29bfd2a",
+        "loc": 16,
+        "source": "def _load_knowledge_base(self):\n        \"\"\"\n        Loads the knowledge base from the JSON file.\n\n        Returns:\n            dict: The knowledge base data.\n        \"\"\"\n        try:\n            with open(self.knowledge_base_path, 'r') as file:\n                return json.load(file)\n        except FileNotFoundError:\n            print(f\"Knowledge base file not found: {self.knowledge_base_path}\")\n            return {}\n        except json.JSONDecodeError:\n            print(f\"Error decoding knowledge base JSON: {self.knowledge_base_path}\")\n            return {}"
+      },
+      {
+        "name": "get_uniswap_v3_router_abi",
+        "ast_hash": "sha256:c306fc43f4f72647",
+        "loc": 5,
+        "source": "def get_uniswap_v3_router_abi(self):\n        \"\"\"\n        Fetches the ABI for the Uniswap V3 router. Replace with actual ABI.\n        \"\"\"\n        return json.loads('[...]')"
+      },
+      {
+        "name": "analyze_crypto_market",
+        "ast_hash": "sha256:4d8569e0ca084939",
+        "loc": 24,
+        "source": "def analyze_crypto_market(self, symbol):\n        \"\"\"\n        Analyzes a specific cryptocurrency.\n\n        Args:\n            symbol (str): The symbol of the cryptocurrency.\n\n        Returns:\n            dict: Analysis results, including price prediction, risk assessment,\n                  on-chain analysis, and sentiment analysis.\n        \"\"\"\n        price_prediction = self.predict_price(symbol)\n        risk_assessment = self.assess_risk(symbol)\n        on_chain_analysis = self.analyze_on_chain_metrics(symbol)\n        sentiment_analysis = self.get_social_media_sentiment(symbol)\n\n        analysis_results = {\n            \"price_prediction\": price_prediction,\n            \"risk_assessment\": risk_assessment,\n            \"on_chain_analysis\": on_chain_analysis,\n            \"sentiment_analysis\": sentiment_analysis\n        }\n\n        return analysis_results"
+      },
+      {
+        "name": "predict_price",
+        "ast_hash": "sha256:f6a0e981e38ef3a4",
+        "loc": 29,
+        "source": "def predict_price(self, symbol):\n        \"\"\"\n        Predicts the future price of a cryptocurrency using linear regression.\n\n        Args:\n            symbol (str): The symbol of the cryptocurrency.\n\n        Returns:\n            float: The predicted price.\n        \"\"\"\n        historical_data = self.get_historical_data(symbol)\n        if not historical_data:\n            return None\n\n        # Append the latest price to the deque\n        for data in historical_data:\n            self.price_history.append(data[\"price_close\"])\n\n        X = [[datetime.datetime.strptime(d[\"date\"], \"%Y-%m-%d\").timestamp()] for d in historical_data]\n        y = [d[\"price_close\"] for d in historical_data]\n\n        model = LinearRegression()\n        model.fit(X, y)\n\n        # Predict the price for 7 days from now\n        future_date = (datetime.datetime.now() + datetime.timedelta(days=7)).timestamp()\n        predicted_price = model.predict([[future_date]])\n\n        return predicted_price[0]"
+      },
+      {
+        "name": "assess_risk",
+        "ast_hash": "sha256:a04901381f5a90b3",
+        "loc": 27,
+        "source": "def assess_risk(self, symbol):\n        \"\"\"\n        Assesses the risk associated with a cryptocurrency.\n\n        Args:\n            symbol (str): The symbol of the cryptocurrency.\n\n        Returns:\n            str: The risk assessment (e.g., \"High Risk\", \"Medium Risk\", \"Low Risk\").\n        \"\"\"\n        historical_data = self.get_historical_data(symbol)\n        if not historical_data:\n            return \"Unknown Risk\"\n\n        # Update the deque with latest data\n        prices = [d[\"price_close\"] for d in historical_data]\n        for price in prices:\n            self.price_history.append(price)\n\n        volatility = self.calculate_volatility(list(self.price_history))\n\n        if volatility > 0.2:\n            return \"High Risk\"\n        elif volatility > 0.1:\n            return \"Medium Risk\"\n        else:\n            return \"Low Risk\""
+      },
+      {
+        "name": "calculate_volatility",
+        "ast_hash": "sha256:9c5e27d0c4375c1a",
+        "loc": 11,
+        "source": "def calculate_volatility(self, prices):\n        \"\"\"\n        Calculates the volatility of a price series.\n\n        Args:\n            prices (list): A list of prices.\n\n        Returns:\n            float: The volatility.\n        \"\"\"\n        return np.std(prices) / np.mean(prices)"
+      },
+      {
+        "name": "get_historical_data",
+        "ast_hash": "sha256:c9e56f2c5d35e9f5",
+        "loc": 11,
+        "source": "def get_historical_data(self, symbol):\n        \"\"\"\n        Retrieves historical data for a cryptocurrency from the knowledge base.\n\n        Args:\n            symbol (str): The symbol of the cryptocurrency.\n\n        Returns:\n            list: Historical data for the cryptocurrency.\n        \"\"\"\n        return self.knowledge_base.get(\"cryptocurrencies\", {}).get(symbol, {}).get(\"historical_data\", [])"
+      },
+      {
+        "name": "analyze_on_chain_metrics",
+        "ast_hash": "sha256:da421102eb97649b",
+        "loc": 20,
+        "source": "def analyze_on_chain_metrics(self, symbol):\n        \"\"\"\n        Analyzes on-chain metrics for a cryptocurrency.\n\n        Args:\n            symbol (str): The symbol of the cryptocurrency.\n\n        Returns:\n            dict: On-chain analysis results.\n        \"\"\"\n        on_chain_data = self.get_on_chain_data(symbol)\n        if not on_chain_data:\n            return {}\n\n        analysis_results = {\n            \"transaction_volume\": on_chain_data.get(\"transaction_volume\", None),\n            \"active_addresses\": on_chain_data.get(\"active_addresses\", None),\n        }\n\n        return analysis_results"
+      },
+      {
+        "name": "get_on_chain_data",
+        "ast_hash": "sha256:f11177d2bb650199",
+        "loc": 11,
+        "source": "def get_on_chain_data(self, symbol):\n        \"\"\"\n        Retrieves on-chain data for a cryptocurrency.\n\n        Args:\n            symbol (str): The symbol of the cryptocurrency.\n\n        Returns:\n            dict: On-chain data for the cryptocurrency.\n        \"\"\"\n        return self.knowledge_base.get(\"cryptocurrencies\", {}).get(symbol, {}).get(\"on_chain_data\", {})"
+      },
+      {
+        "name": "get_social_media_sentiment",
+        "ast_hash": "sha256:9de100100881823b",
+        "loc": 28,
+        "source": "def get_social_media_sentiment(self, symbol):\n        \"\"\"\n        Analyzes social media sentiment for a cryptocurrency.\n\n        Args:\n            symbol (str): The symbol of the cryptocurrency.\n\n        Returns:\n            dict: Sentiment analysis results, including overall sentiment\n                  score and sentiment breakdown (positive, negative, neutral).\n        \"\"\"\n        news_data = self.cg.get_coin_news(id=symbol)\n        sentiment_score = 0\n        for article in news_data:\n            text = article['title'] + \" \" + article['description']\n            sentiment = self.sentiment_analyzer.polarity_scores(text)\n            sentiment_score += sentiment['compound']\n\n        sentiment_results = {\n            \"overall_sentiment\": sentiment_score / len(news_data) if news_data else 0,\n            \"sentiment_breakdown\": {\n                \"positive\": sentiment_score / len(news_data) if sentiment_score > 0 else 0,\n                \"negative\": sentiment_score / len(news_data) if sentiment_score < 0 else 0,\n                \"neutral\": 1 - (sentiment_score / len(news_data)) if not sentiment_score else 0,\n            }\n        }\n\n        return sentiment_results"
+      },
+      {
+        "name": "trade_decision",
+        "ast_hash": "sha256:b0fdaa7ca83bb0bb",
+        "loc": 27,
+        "source": "def trade_decision(self, symbol, strategy='macd'):\n        \"\"\"\n        Makes a trading decision based on chosen strategy.\n\n        Args:\n            symbol (str): The symbol of the cryptocurrency.\n            strategy (str): Trading strategy to use ('macd', 'sentiment', etc.).\n\n        Returns:\n            str: The decision to 'buy', 'sell', or 'hold'.\n        \"\"\"\n        if strategy == 'macd':\n            return self.moving_average_crossover(symbol)\n        elif strategy == 'sentiment':\n            sentiment = self.get_social_media_sentiment(symbol)\n            if sentiment[\"overall_sentiment\"] > 0:\n                return 'buy'\n            else:\n                return 'sell'\n        elif strategy == 'volatility':\n            risk = self.assess_risk(symbol)\n            if risk == 'Low Risk':\n                return 'buy'\n            else:\n                return 'sell'\n        else:\n            return 'hold'"
+      },
+      {
+        "name": "moving_average_crossover",
+        "ast_hash": "sha256:987343f27da45a59",
+        "loc": 28,
+        "source": "def moving_average_crossover(self, symbol, short_period=12, long_period=26):\n        \"\"\"\n        Implement the MACD and Moving Average Crossover strategy.\n\n        Args:\n            symbol (str): The symbol of the cryptocurrency.\n            short_period (int): The short period for the moving average.\n            long_period (int): The long period for the moving average.\n\n        Returns:\n            str: 'buy', 'sell', or 'hold' based on the MACD strategy.\n        \"\"\"\n        historical_prices = self.get_historical_data(symbol)\n        if not TALIB_AVAILABLE:\n            logging.warning(\"TA-Lib is not installed. Skipping MACD strategy.\")\n            return 'hold'\n        if not historical_prices:\n            return 'hold'\n\n        prices = [d[\"price_close\"] for d in historical_prices]\n        short_term_ma = talib.SMA(np.array(prices), timeperiod=short_period)\n        long_term_ma = talib.SMA(np.array(prices), timeperiod=long_period)\n\n        if short_term_ma[-1] > long_term_ma[-1]:\n            return 'buy'\n        elif short_term_ma[-1] < long_term_ma[-1]:\n            return 'sell'\n        return 'hold'"
+      },
+      {
+        "name": "execute_trade",
+        "ast_hash": "sha256:93133a9328668071",
+        "loc": 20,
+        "source": "def execute_trade(self, symbol, action, amount):\n        \"\"\"\n        Executes the trade on the connected exchange.\n\n        Args:\n            symbol (str): The symbol of the cryptocurrency (e.g., 'BTC/USDT').\n            action (str): 'buy' or 'sell'.\n            amount (float): Amount to trade.\n\n        Returns:\n            dict: The result of the trade execution.\n        \"\"\"\n        if action == 'buy':\n            order = self.exchange_client.create_market_buy_order(symbol, amount)\n        elif action == 'sell':\n            order = self.exchange_client.create_market_sell_order(symbol, amount)\n        else:\n            return {'error': 'Invalid action'}\n\n        return order"
+      },
+      {
+        "name": "create_smart_contract",
+        "ast_hash": "sha256:77eeae8d587bf9d0",
+        "loc": 12,
+        "source": "def create_smart_contract(self, contract_code, **kwargs):\n        \"\"\"\n        Generates a smart contract based on a provided template and kwargs.\n\n        Args:\n            contract_code (str): Smart contract template code (Solidity, Vyper, etc.).\n            **kwargs: Parameters to insert into the template.\n\n        Returns:\n            str: The finalized contract code.\n        \"\"\"\n        return contract_code.format(**kwargs)"
+      },
+      {
+        "name": "deploy_smart_contract",
+        "ast_hash": "sha256:3ef20596f971f7d5",
+        "loc": 28,
+        "source": "def deploy_smart_contract(self, contract_code, gas_price=20000000000, gas_limit=5000000):\n        \"\"\"\n        Deploys a smart contract to the blockchain using the connected Web3 instance.\n\n        Args:\n            contract_code (str): The smart contract's compiled bytecode.\n            gas_price (int): Gas price for the deployment.\n            gas_limit (int): Gas limit for the deployment.\n\n        Returns:\n            str: Transaction hash of the deployment.\n        \"\"\"\n        if not self.wallet_address or not self.wallet_private_key:\n            raise ValueError(\"Wallet address or private key not provided.\")\n\n        compiled_contract = self.web3.eth.contract(abi=contract_code['abi'], bytecode=contract_code['bytecode'])\n\n        transaction = {\n            'from': self.wallet_address,\n            'gas': gas_limit,\n            'gasPrice': gas_price,\n            'data': compiled_contract.bytecode,\n        }\n\n        signed_txn = self.web3.eth.account.sign_transaction(transaction, self.wallet_private_key)\n        tx_hash = self.web3.eth.sendRawTransaction(signed_txn.rawTransaction)\n\n        return f\"Transaction Hash: {tx_hash.hex()}\""
+      }
+    ]
+  }
+}

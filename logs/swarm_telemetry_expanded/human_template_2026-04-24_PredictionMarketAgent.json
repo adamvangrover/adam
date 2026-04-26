@@ -1,0 +1,91 @@
+{
+  "spec_version": "1.4.0-otel",
+  "timestamp": "2026-04-24T00:13:03.355457Z",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "severity_text": "WARN",
+  "severity_number": 13,
+  "event_name": "swarm.agent.lifecycle.deprecated",
+  "resource": {
+    "service.name": "swarm-orchestrator",
+    "service.version": "4.2.0",
+    "deployment.environment": "production",
+    "node.id": "worker-node-aws-us-east-1a-04"
+  },
+  "attributes": {
+    "agent.id": "PredictionMarketAgent",
+    "agent.previous_version": "v29.x",
+    "agent.target_version": "v30",
+    "deprecation.reason": "Transitioning to v30 architecture.",
+    "deprecation.action_required": true
+  },
+  "metrics": {
+    "agent.core_logic.function_count": 9,
+    "agent.capabilities.count": 0
+  },
+  "artifacts": {
+    "provenance": {
+      "repository": "git+ssh://repo/core/agents/prediction_market_agent.py",
+      "commit_sha": "a1b2c3d4e5f6g7h8i9j0",
+      "docstring_hash": "sha256:d8c4b12389a..."
+    },
+    "extracted_capabilities": [],
+    "core_logic_signatures": [
+      {
+        "name": "__init__",
+        "ast_hash": "sha256:80a61391dec85713",
+        "loc": 19,
+        "source": "def __init__(self, config: Dict[str, Any], kernel: Optional[Any] = None):\n        \"\"\"\n        Initializes the Prediction Market Agent.\n\n        Args:\n            config (dict): Configuration dictionary.\n            kernel (Optional[Any]): Semantic Kernel instance.\n        \"\"\"\n        super().__init__(config, kernel=kernel)\n        self.knowledge_base_path = self.config.get(\"knowledge_base_path\", \"knowledge_base/Knowledge_Graph.json\")\n        self.web3_provider_uri = self.config.get(\"web3_provider_uri\")\n        self.knowledge_base = self._load_knowledge_base()\n\n        # Initialize connections to data sources\n        if self.web3_provider_uri:\n            self.web3 = Web3(Web3.HTTPProvider(self.web3_provider_uri))\n        else:\n            self.web3 = None\n            logger.info(\"Web3 provider URI not set. Blockchain features disabled.\")"
+      },
+      {
+        "name": "_load_knowledge_base",
+        "ast_hash": "sha256:f24d50944fd16458",
+        "loc": 13,
+        "source": "def _load_knowledge_base(self):\n        \"\"\"\n        Loads the knowledge base from the JSON file.\n        \"\"\"\n        try:\n            with open(self.knowledge_base_path, 'r') as file:\n                return json.load(file)\n        except FileNotFoundError:\n            logger.warning(f\"Knowledge base file not found: {self.knowledge_base_path}\")\n            return {}\n        except json.JSONDecodeError:\n            logger.error(f\"Error decoding knowledge base JSON: {self.knowledge_base_path}\")\n            return {}"
+      },
+      {
+        "name": "execute",
+        "ast_hash": "sha256:376899b1dfcd76d9",
+        "loc": 46,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "analyze_near_term_targets",
+        "ast_hash": "sha256:d6d4fa7fb51e9836",
+        "loc": 8,
+        "source": "def analyze_near_term_targets(self, event):\n        \"\"\"\n        Analyzes prediction market data to estimate near-term price targets.\n        \"\"\"\n        return {\n            \"1-week\": {\"target\": 150, \"probability\": 0.6},\n            \"1-month\": {\"target\": 160, \"probability\": 0.4}\n        }"
+      },
+      {
+        "name": "analyze_conviction_levels",
+        "ast_hash": "sha256:39d911e5e0ebfd40",
+        "loc": 5,
+        "source": "def analyze_conviction_levels(self, event):\n        \"\"\"\n        Analyzes prediction market data to assess conviction levels.\n        \"\"\"\n        return 0.8"
+      },
+      {
+        "name": "analyze_long_term_trend",
+        "ast_hash": "sha256:68afc90ac6c442a3",
+        "loc": 5,
+        "source": "def analyze_long_term_trend(self, event):\n        \"\"\"\n        Analyzes historical data and long-term forecasts.\n        \"\"\"\n        return \"bullish\""
+      },
+      {
+        "name": "analyze_momentum",
+        "ast_hash": "sha256:fea444d7bbe8cc95",
+        "loc": 5,
+        "source": "def analyze_momentum(self, event):\n        \"\"\"\n        Analyzes price and volume data to assess momentum.\n        \"\"\"\n        return 0.7"
+      },
+      {
+        "name": "perform_technical_analysis",
+        "ast_hash": "sha256:a7fa2f7093a86f88",
+        "loc": 10,
+        "source": "def perform_technical_analysis(self, event):\n        \"\"\"\n        Performs technical analysis on the event.\n        \"\"\"\n        return {\n            \"support_level\": 140,\n            \"resistance_level\": 170,\n            \"trend\": \"upward\",\n            \"pattern\": \"bullish flag\"\n        }"
+      },
+      {
+        "name": "perform_fundamental_valuation",
+        "ast_hash": "sha256:650afbea07872713",
+        "loc": 11,
+        "source": "def perform_fundamental_valuation(self, event):\n        \"\"\"\n        Performs fundamental valuation analysis on the event.\n        \"\"\"\n        return {\n            \"intrinsic_value\": 160,\n            \"valuation_metrics\": {\n                \"P/E_ratio\": 20,\n                \"P/B_ratio\": 3\n            }\n        }"
+      }
+    ]
+  }
+}

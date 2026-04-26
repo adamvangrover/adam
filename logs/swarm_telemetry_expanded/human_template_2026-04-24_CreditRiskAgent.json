@@ -1,0 +1,85 @@
+{
+  "spec_version": "1.4.0-otel",
+  "timestamp": "2026-04-24T00:13:03.355457Z",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "severity_text": "WARN",
+  "severity_number": 13,
+  "event_name": "swarm.agent.lifecycle.deprecated",
+  "resource": {
+    "service.name": "swarm-orchestrator",
+    "service.version": "4.2.0",
+    "deployment.environment": "production",
+    "node.id": "worker-node-aws-us-east-1a-04"
+  },
+  "attributes": {
+    "agent.id": "CreditRiskAgent",
+    "agent.previous_version": "v29.x",
+    "agent.target_version": "v30",
+    "deprecation.reason": "Transitioning to v30 architecture.",
+    "deprecation.action_required": true
+  },
+  "metrics": {
+    "agent.core_logic.function_count": 8,
+    "agent.capabilities.count": 0
+  },
+  "artifacts": {
+    "provenance": {
+      "repository": "git+ssh://repo/core/agents/credit_risk_agent.py",
+      "commit_sha": "a1b2c3d4e5f6g7h8i9j0",
+      "docstring_hash": "sha256:d8c4b12389a..."
+    },
+    "extracted_capabilities": [],
+    "core_logic_signatures": [
+      {
+        "name": "__init__",
+        "ast_hash": "sha256:7bf97a7dad0a32ab",
+        "loc": 2,
+        "source": "def __init__(self, config: Dict[str, Any], **kwargs):\n        super().__init__(config, **kwargs)"
+      },
+      {
+        "name": "execute",
+        "ast_hash": "sha256:197c140be428c281",
+        "loc": 99,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "_calculate_z_score",
+        "ast_hash": "sha256:2c07afeb26fe7c75",
+        "loc": 11,
+        "source": "def _calculate_z_score(self, A, B, C, D, E, industry_type):\n        \"\"\"Calculates Altman Z-Score based on industry type.\"\"\"\n        if industry_type == \"Manufacturing\":\n            # Original Z-Score\n            return 1.2 * A + 1.4 * B + 3.3 * C + 0.6 * D + 1.0 * E\n        else:\n            # Altman Z''-Score (Emerging Markets / Non-Manufacturing)\n            # Coefficients: 6.56, 3.26, 6.72, 1.05\n            # Note: The coefficients are significantly higher because the cutoffs are different.\n            # Sales/Assets (E) is omitted.\n            return 6.56 * A + 3.26 * B + 6.72 * C + 1.05 * D"
+      },
+      {
+        "name": "_interpret_z_score",
+        "ast_hash": "sha256:b52e3a365f72602a",
+        "loc": 20,
+        "source": "def _interpret_z_score(self, z_score, industry_type):\n        \"\"\"Interprets the Z-Score based on the model used.\"\"\"\n        if industry_type == \"Manufacturing\":\n            if z_score > 2.99:\n                return {\"zone\": \"Safe\", \"message\": \"Low Default Probability\"}\n            elif z_score > 1.81:\n                return {\"zone\": \"Grey\", \"message\": \"Moderate Default Probability\"}\n            else:\n                return {\"zone\": \"Distress\", \"message\": \"High Default Probability\"}\n        else:\n            # Z'' Score thresholds are different\n            # Safe > 2.60\n            # Grey 1.10 - 2.60\n            # Distress < 1.10\n            if z_score > 2.60:\n                return {\"zone\": \"Safe\", \"message\": \"Low Default Probability\"}\n            elif z_score > 1.10:\n                return {\"zone\": \"Grey\", \"message\": \"Moderate Default Probability\"}\n            else:\n                return {\"zone\": \"Distress\", \"message\": \"High Default Probability\"}"
+      },
+      {
+        "name": "_calculate_merton_dd",
+        "ast_hash": "sha256:02a0201b14dd8add",
+        "loc": 26,
+        "source": "def _calculate_merton_dd(self, equity: float, debt: float, vol: float, r: float, T: float = 1.0) -> float:\n        \"\"\"\n        Calculates Distance to Default (DD) using a simplified Merton Model.\n        Assuming 'vol' is Equity Volatility.\n        \"\"\"\n        # Estimate Asset Value (V) roughly as Equity + Debt\n        # Ideally, we solve for V and Asset Volatility iteratively.\n        # Approximation:\n        V = equity + debt\n\n        # Unlevering volatility: sigma_A approx sigma_E * (E/V)\n        sigma_A = vol * (equity / V)\n\n        # Avoid division by zero\n        if sigma_A == 0: sigma_A = 0.01\n\n        # Distance to Default (d2 in Black-Scholes context relative to debt face value)\n        # Using the standard KMV-like definition:\n        # DD = (Asset Value - Default Point) / (Asset Value * Asset Volatility)\n        # Default Point is often Short Term Debt + 0.5 * Long Term Debt. Here we just use 'debt'.\n\n        numerator = np.log(V / debt) + (r - 0.5 * sigma_A**2) * T\n        denominator = sigma_A * np.sqrt(T)\n\n        dd = numerator / denominator\n        return float(dd)"
+      },
+      {
+        "name": "_pd_from_dd",
+        "ast_hash": "sha256:79fe5ffb997f4b25",
+        "loc": 4,
+        "source": "def _pd_from_dd(self, dd: float) -> float:\n        \"\"\"Probability of Default from Distance to Default.\"\"\"\n        # PD = N(-DD)\n        return float(norm.cdf(-dd))"
+      },
+      {
+        "name": "_map_pd_to_rating",
+        "ast_hash": "sha256:83725d8326e18801",
+        "loc": 22,
+        "source": "def _map_pd_to_rating(self, pd: float) -> str:\n        \"\"\"Maps Probability of Default to approximate Credit Rating (S&P scale).\"\"\"\n        if pd <= 0.0005: return \"AAA\"    # <= 0.05%\n        if pd <= 0.0010: return \"AA+\"\n        if pd <= 0.0020: return \"AA\"\n        if pd <= 0.0030: return \"AA-\"\n        if pd <= 0.0050: return \"A+\"\n        if pd <= 0.0070: return \"A\"\n        if pd <= 0.0100: return \"A-\"\n        if pd <= 0.0150: return \"BBB+\"\n        if pd <= 0.0250: return \"BBB\"\n        if pd <= 0.0500: return \"BBB-\"   # Investment Grade Cutoff (~5%)\n        if pd <= 0.0750: return \"BB+\"\n        if pd <= 0.1000: return \"BB\"\n        if pd <= 0.1500: return \"BB-\"\n        if pd <= 0.2000: return \"B+\"\n        if pd <= 0.2500: return \"B\"\n        if pd <= 0.3000: return \"B-\"\n        if pd <= 0.4000: return \"CCC+\"\n        if pd <= 0.5000: return \"CCC\"\n        if pd <= 0.6000: return \"CCC-\"\n        return \"D\""
+      },
+      {
+        "name": "_calculate_fundamental_ratios",
+        "ast_hash": "sha256:a89864060990a7ed",
+        "loc": 29,
+        "source": "def _calculate_fundamental_ratios(self, ebitda, ebit, interest_expense, debt_service, total_debt):\n        \"\"\"Calculates key credit ratios.\"\"\"\n        ratios = {}\n\n        # Interest Coverage Ratio = EBIT / Interest Expense\n        if interest_expense > 0:\n            icr = ebit / interest_expense\n            ratios[\"interest_coverage_ratio\"] = float(icr)\n            ratios[\"icr_assessment\"] = \"Healthy\" if icr > 3.0 else \"Weak\" if icr < 1.5 else \"Adequate\"\n        else:\n            ratios[\"interest_coverage_ratio\"] = None\n\n        # DSCR = EBITDA / Debt Service\n        if debt_service > 0:\n            dscr = ebitda / debt_service\n            ratios[\"dscr\"] = float(dscr)\n            ratios[\"dscr_assessment\"] = \"Strong\" if dscr > 1.25 else \"Breakeven\" if dscr >= 1.0 else \"Deficit\"\n        else:\n            ratios[\"dscr\"] = None\n\n        # Leverage Ratio = Total Debt / EBITDA\n        if ebitda > 0:\n            lev = total_debt / ebitda\n            ratios[\"debt_to_ebitda\"] = float(lev)\n            ratios[\"leverage_assessment\"] = \"Low\" if lev < 2.0 else \"High\" if lev > 4.0 else \"Moderate\"\n        else:\n             ratios[\"debt_to_ebitda\"] = None\n\n        return ratios"
+      }
+    ]
+  }
+}

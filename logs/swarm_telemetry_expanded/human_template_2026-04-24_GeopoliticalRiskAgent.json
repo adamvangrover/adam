@@ -1,0 +1,81 @@
+{
+  "spec_version": "1.4.0-otel",
+  "timestamp": "2026-04-24T00:13:03.355457Z",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "severity_text": "WARN",
+  "severity_number": 13,
+  "event_name": "swarm.agent.lifecycle.deprecated",
+  "resource": {
+    "service.name": "swarm-orchestrator",
+    "service.version": "4.2.0",
+    "deployment.environment": "production",
+    "node.id": "worker-node-aws-us-east-1a-04"
+  },
+  "attributes": {
+    "agent.id": "GeopoliticalRiskAgent",
+    "agent.previous_version": "v29.x",
+    "agent.target_version": "v30",
+    "deprecation.reason": "Transitioning to v30 architecture.",
+    "deprecation.action_required": true
+  },
+  "metrics": {
+    "agent.core_logic.function_count": 7,
+    "agent.capabilities.count": 0
+  },
+  "artifacts": {
+    "provenance": {
+      "repository": "git+ssh://repo/core/agents/geopolitical_risk_agent.py",
+      "commit_sha": "a1b2c3d4e5f6g7h8i9j0",
+      "docstring_hash": "sha256:d8c4b12389a..."
+    },
+    "extracted_capabilities": [],
+    "core_logic_signatures": [
+      {
+        "name": "__init__",
+        "ast_hash": "sha256:6c79f9fe2ac6229b",
+        "loc": 27,
+        "source": "def __init__(self, config: Dict[str, Any], **kwargs):\n        super().__init__(config, **kwargs)\n        self.data_sources = config.get('data_sources', {})\n\n        # Base connectivity for contagion (Region -> [Connected Regions])\n        self.connectivity_map = {\n            \"US\": [\"EU\", \"CN\", \"Global\"],\n            \"CN\": [\"US\", \"EM\", \"Global\"],\n            \"EU\": [\"US\", \"RU\", \"Middle East\", \"Global\"],\n            \"RU\": [\"EU\", \"Middle East\"],\n            \"Middle East\": [\"EU\", \"US\", \"RU\"],\n            \"EM\": [\"CN\", \"US\"]\n        }\n\n        # Enhanced Supply Chain Dependency Map (Region -> Dependency Weight)\n        self.supply_chain_dependency = {\n            \"US\": {\"CN\": 0.4, \"EU\": 0.3},\n            \"EU\": {\"CN\": 0.3, \"RU\": 0.4}, # Energy dependency on RU\n            \"CN\": {\"US\": 0.3, \"EM\": 0.4},\n            \"EM\": {\"CN\": 0.5, \"US\": 0.3}\n        }\n\n        # Economic weight for global impact\n        self.global_weights = {\n            \"US\": 0.25, \"CN\": 0.18, \"EU\": 0.17,\n            \"RU\": 0.03, \"Middle East\": 0.05, \"EM\": 0.32\n        }"
+      },
+      {
+        "name": "execute",
+        "ast_hash": "sha256:ef297ebfa3c0130a",
+        "loc": 82,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "calculate_risk_score",
+        "ast_hash": "sha256:f60eb303060a6328",
+        "loc": 35,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "identify_key_risks",
+        "ast_hash": "sha256:7f533471e11aa533",
+        "loc": 20,
+        "source": "def identify_key_risks(self, region: str, score: float, factors: Optional[Dict[str, float]]) -> List[str]:\n        \"\"\"Identifies key drivers of risk.\"\"\"\n        risks = []\n\n        if factors:\n            if factors.get(\"political_stability\", 100) < 40: risks.append(\"Political Instability\")\n            if factors.get(\"trade_conflict\", 0) > 60: risks.append(\"Trade War Risk\")\n            if factors.get(\"social_unrest\", 0) > 60: risks.append(\"Social Unrest\")\n            if factors.get(\"institutional_strength\", 100) < 40: risks.append(\"Weak Institutions\")\n        else:\n            # Legacy heuristics\n            if region in [\"US\", \"CN\"]: risks.append(\"Trade Tensions\")\n            if region in [\"RU\", \"Middle East\"]: risks.append(\"Armed Conflict\")\n            if region == \"EU\": risks.append(\"Regulatory Fragmentation\")\n            if region == \"EM\": risks.append(\"Currency Volatility\")\n\n        if score > 70 and not risks:\n            risks.append(\"General Elevated Risk\")\n\n        return risks"
+      },
+      {
+        "name": "calculate_contagion",
+        "ast_hash": "sha256:bb846fe5e587f19c",
+        "loc": 35,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "_apply_event_impacts",
+        "ast_hash": "sha256:3aefb99d450df332",
+        "loc": 13,
+        "source": "def _apply_event_impacts(self, factors: Optional[Dict[str, Any]]) -> float:\n        \"\"\"Applies score adjustments based on boolean flags or keywords.\"\"\"\n        if not factors: return 0.0\n\n        impact = 0.0\n\n        # Check for specific flags\n        if factors.get(\"active_conflict\", False): impact += 25\n        if factors.get(\"sanctions_imposed\", False): impact += 15\n        if factors.get(\"upcoming_election_uncertainty\", False): impact += 10\n        if factors.get(\"supply_chain_disruption\", False): impact += 10\n\n        return impact"
+      },
+      {
+        "name": "assess_geopolitical_risks",
+        "ast_hash": "sha256:29401dbfe63a806b",
+        "loc": 3,
+        "source": "def assess_geopolitical_risks(self) -> Dict[str, Any]:\n        \"\"\"Legacy wrapper.\"\"\"\n        return asyncio.run(self.execute([\"Global\"]))"
+      }
+    ]
+  }
+}

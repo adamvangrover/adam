@@ -1,0 +1,54 @@
+{
+  "spec_version": "1.4.0-otel",
+  "timestamp": "2026-04-24T00:13:03.355457Z",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "severity_text": "WARN",
+  "severity_number": 13,
+  "event_name": "swarm.agent.lifecycle.deprecated",
+  "resource": {
+    "service.name": "swarm-orchestrator",
+    "service.version": "4.2.0",
+    "deployment.environment": "production",
+    "node.id": "worker-node-aws-us-east-1a-04"
+  },
+  "attributes": {
+    "agent.id": "QuantumMonteCarloAgent",
+    "agent.previous_version": "v29.x",
+    "agent.target_version": "v30",
+    "deprecation.reason": "Transitioning to v30 architecture.",
+    "deprecation.action_required": true
+  },
+  "metrics": {
+    "agent.core_logic.function_count": 3,
+    "agent.capabilities.count": 0
+  },
+  "artifacts": {
+    "provenance": {
+      "repository": "git+ssh://repo/core/agents/quantum_monte_carlo_agent.py",
+      "commit_sha": "a1b2c3d4e5f6g7h8i9j0",
+      "docstring_hash": "sha256:d8c4b12389a..."
+    },
+    "extracted_capabilities": [],
+    "core_logic_signatures": [
+      {
+        "name": "__init__",
+        "ast_hash": "sha256:07408487b08e5b0c",
+        "loc": 3,
+        "source": "def __init__(self, config=None, **kwargs):\n        super().__init__(config, **kwargs)\n        self.bridge = QuantumMonteCarloBridge()"
+      },
+      {
+        "name": "execute",
+        "ast_hash": "sha256:3724387680baf2ec",
+        "loc": 21,
+        "source": "async def execute(self, **kwargs) -> Dict[str, Any]:\n        \"\"\"\n        Sets up and runs a simulation based on financial data.\n        \"\"\"\n        logging.info(\"QuantumMonteCarloAgent: Initializing Simulation\")\n\n        financial_data = kwargs.get('financial_data', {})\n        simulation_params = {\n            \"assets\": financial_data.get('total_assets', 1000),\n            \"volatility\": kwargs.get('volatility', 0.20),\n            \"correlation_matrix\": \"identity\" # Simplified\n        }\n\n        job_id = self.bridge.setup_simulation(simulation_params)\n        results = self.bridge.run_simulation(job_id)\n\n        return {\n            \"agent\": \"QuantumMonteCarloAgent\",\n            \"simulation_results\": results,\n            \"interpretation\": f\"Quantum simulation indicates a 99% VaR of {results['results']['var_99']:.2f}.\"\n        }"
+      },
+      {
+        "name": "get_skill_schema",
+        "ast_hash": "sha256:fc30cf000add22fe",
+        "loc": 17,
+        "source": "def get_skill_schema(self) -> Dict[str, Any]:\n        return {\n            \"name\": \"QuantumMonteCarloAgent\",\n            \"description\": \"Runs quantum-accelerated risk simulations.\",\n            \"skills\": [\n                {\n                    \"name\": \"run_quantum_simulation\",\n                    \"description\": \"Runs a Monte Carlo simulation on a quantum backend.\",\n                    \"parameters\": {\n                         \"type\": \"object\",\n                         \"properties\": {\n                             \"financial_data\": {\"type\": \"object\"}\n                         }\n                    }\n                }\n            ]\n        }"
+      }
+    ]
+  }
+}

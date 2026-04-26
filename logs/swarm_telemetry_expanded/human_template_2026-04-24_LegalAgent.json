@@ -1,0 +1,117 @@
+{
+  "spec_version": "1.4.0-otel",
+  "timestamp": "2026-04-24T00:13:03.355457Z",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "severity_text": "WARN",
+  "severity_number": 13,
+  "event_name": "swarm.agent.lifecycle.deprecated",
+  "resource": {
+    "service.name": "swarm-orchestrator",
+    "service.version": "4.2.0",
+    "deployment.environment": "production",
+    "node.id": "worker-node-aws-us-east-1a-04"
+  },
+  "attributes": {
+    "agent.id": "LegalAgent",
+    "agent.previous_version": "v29.x",
+    "agent.target_version": "v30",
+    "deprecation.reason": "Transitioning to v30 architecture.",
+    "deprecation.action_required": true
+  },
+  "metrics": {
+    "agent.core_logic.function_count": 13,
+    "agent.capabilities.count": 0
+  },
+  "artifacts": {
+    "provenance": {
+      "repository": "git+ssh://repo/core/agents/legal_agent.py",
+      "commit_sha": "a1b2c3d4e5f6g7h8i9j0",
+      "docstring_hash": "sha256:d8c4b12389a..."
+    },
+    "extracted_capabilities": [],
+    "core_logic_signatures": [
+      {
+        "name": "__init__",
+        "ast_hash": "sha256:ec4bf1f4b0470b8f",
+        "loc": 11,
+        "source": "def __init__(self, config: Dict[str, Any], kernel: Optional[Any] = None):\n        \"\"\"\n        Initializes the Legal Agent.\n\n        Args:\n            config (dict): Configuration dictionary.\n            kernel (Optional[Any]): Semantic Kernel instance.\n        \"\"\"\n        super().__init__(config, kernel=kernel)\n        self.knowledge_base_path = self.config.get(\"knowledge_base_path\", \"knowledge_base/Knowledge_Graph.json\")\n        self.knowledge_base = self._load_knowledge_base()"
+      },
+      {
+        "name": "_load_knowledge_base",
+        "ast_hash": "sha256:f24d50944fd16458",
+        "loc": 13,
+        "source": "def _load_knowledge_base(self):\n        \"\"\"\n        Loads the knowledge base from the JSON file.\n        \"\"\"\n        try:\n            with open(self.knowledge_base_path, 'r') as file:\n                return json.load(file)\n        except FileNotFoundError:\n            logger.warning(f\"Knowledge base file not found: {self.knowledge_base_path}\")\n            return {}\n        except json.JSONDecodeError:\n            logger.error(f\"Error decoding knowledge base JSON: {self.knowledge_base_path}\")\n            return {}"
+      },
+      {
+        "name": "execute",
+        "ast_hash": "sha256:d850abb9895d39b8",
+        "loc": 33,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "review_credit_agreement",
+        "ast_hash": "sha256:f16b16c65b77eda0",
+        "loc": 45,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "check_covenants",
+        "ast_hash": "sha256:9890823851b22855",
+        "loc": 31,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "detect_fraud_signals",
+        "ast_hash": "sha256:f9b5190390a4ec7a",
+        "loc": 26,
+        "source": "def detect_fraud_signals(self, doc_text: str, financials: Dict[str, Any]) -> Dict[str, Any]:\n        \"\"\"\n        Scans for red flags indicating potential fraud or misrepresentation.\n        \"\"\"\n        logger.info(\"Scanning for fraud signals...\")\n        signals = []\n        risk_level = \"Low\"\n\n        # Textual Signals\n        red_flag_keywords = [\"material weakness\", \"restatement\", \"investigation\", \"accounting irregularities\"]\n        for kw in red_flag_keywords:\n            if kw in doc_text.lower():\n                signals.append(f\"Keyword alert: '{kw}' found in documentation.\")\n                risk_level = \"High\"\n\n        # Financial Signals (Benford's Law is too complex for this, simple heuristic)\n        # Check for perfect integers where unlikely\n        rev = financials.get(\"revenue\", 0)\n        if rev > 1000 and rev % 100 == 0:\n             signals.append(\"Revenue figure is suspiciously round.\")\n             if risk_level == \"Low\": risk_level = \"Medium\"\n\n        return {\n            \"fraud_risk_level\": risk_level,\n            \"signals_detected\": signals\n        }"
+      },
+      {
+        "name": "suggest_restructuring_strategy",
+        "ast_hash": "sha256:023c51d58ed3d79e",
+        "loc": 10,
+        "source": "def suggest_restructuring_strategy(self, distress_level: str) -> str:\n        \"\"\"\n        Suggests a strategy based on distress level.\n        \"\"\"\n        if distress_level == \"High\":\n            return \"Immediate forbearance agreement recommended. Engage restructuring counsel. Prepare for Chapter 11 filing or distressed exchange.\"\n        elif distress_level == \"Medium\":\n            return \"Negotiate covenant waiver or amendment. Consider asset sales to deleverage. Review cash sweep provisions.\"\n        else:\n            return \"Monitor compliance. No immediate restructuring action required.\""
+      },
+      {
+        "name": "analyze_legal_aspects",
+        "ast_hash": "sha256:f036bde7edb558f5",
+        "loc": 2,
+        "source": "def analyze_legal_aspects(self, acquirer_name, target_name):\n        return {\"status\": \"Not implemented\"}"
+      },
+      {
+        "name": "analyze_legal_standing",
+        "ast_hash": "sha256:1c998e8dce24bcf1",
+        "loc": 2,
+        "source": "def analyze_legal_standing(self, company_name, company_data):\n        return {\"status\": \"Not implemented\"}"
+      },
+      {
+        "name": "analyze_legal_document",
+        "ast_hash": "sha256:54b849afeab3c020",
+        "loc": 3,
+        "source": "def analyze_legal_document(self, document_text):\n        # Forward to new method\n        return self.review_credit_agreement(document_text)"
+      },
+      {
+        "name": "assess_geopolitical_legal_impact",
+        "ast_hash": "sha256:2db7c2f662b97b60",
+        "loc": 2,
+        "source": "def assess_geopolitical_legal_impact(self, geopolitical_event):\n        return {}"
+      },
+      {
+        "name": "assess_regulatory_legal_impact",
+        "ast_hash": "sha256:de368d771ba9646a",
+        "loc": 2,
+        "source": "def assess_regulatory_legal_impact(self, regulation_change):\n        return {}"
+      },
+      {
+        "name": "provide_legal_advice",
+        "ast_hash": "sha256:8d096ffa7a8ab811",
+        "loc": 2,
+        "source": "def provide_legal_advice(self, query):\n        return \"Consult outside counsel.\""
+      }
+    ]
+  }
+}

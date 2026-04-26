@@ -1,0 +1,85 @@
+{
+  "spec_version": "1.4.0-otel",
+  "timestamp": "2026-04-24T00:13:03.355457Z",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "severity_text": "WARN",
+  "severity_number": 13,
+  "event_name": "swarm.agent.lifecycle.deprecated",
+  "resource": {
+    "service.name": "swarm-orchestrator",
+    "service.version": "4.2.0",
+    "deployment.environment": "production",
+    "node.id": "worker-node-aws-us-east-1a-04"
+  },
+  "attributes": {
+    "agent.id": "MachineLearningModelTrainingAgent",
+    "agent.previous_version": "v29.x",
+    "agent.target_version": "v30",
+    "deprecation.reason": "Transitioning to v30 architecture.",
+    "deprecation.action_required": true
+  },
+  "metrics": {
+    "agent.core_logic.function_count": 8,
+    "agent.capabilities.count": 0
+  },
+  "artifacts": {
+    "provenance": {
+      "repository": "git+ssh://repo/core/agents/machine_learning_model_training_agent.py",
+      "commit_sha": "a1b2c3d4e5f6g7h8i9j0",
+      "docstring_hash": "sha256:d8c4b12389a..."
+    },
+    "extracted_capabilities": [],
+    "core_logic_signatures": [
+      {
+        "name": "__init__",
+        "ast_hash": "sha256:375da5718b264e0e",
+        "loc": 9,
+        "source": "def __init__(self, config: Dict[str, Any], kernel: Optional[Any] = None):\n        \"\"\"\n        Initializes the ML Training Agent.\n\n        Args:\n            config (dict): Configuration dictionary.\n            kernel (Optional[Any]): Semantic Kernel instance.\n        \"\"\"\n        super().__init__(config, kernel=kernel)"
+      },
+      {
+        "name": "execute",
+        "ast_hash": "sha256:e8aaf8b9447bc88d",
+        "loc": 31,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "_run_pipeline",
+        "ast_hash": "sha256:8bbd4b0d2587ac80",
+        "loc": 18,
+        "source": "def _run_pipeline(self, data_sources, model_type, model_name):\n        # Load and preprocess the data\n        data = self.load_data(data_sources)\n        if data is None or data.empty:\n             raise ValueError(\"Data loading failed or empty data.\")\n\n        preprocessed_data = self.preprocess_data(data)\n\n        # Train the model\n        model = self.train_model(preprocessed_data, model_type)\n\n        # Evaluate the model\n        metrics = self.evaluate_model(model, preprocessed_data)\n\n        # Save the model\n        self.save_model(model, model_name)\n\n        return {\"status\": \"success\", \"model_name\": model_name, \"metrics\": metrics}"
+      },
+      {
+        "name": "load_data",
+        "ast_hash": "sha256:ae7530aecc78f4b7",
+        "loc": 20,
+        "source": "def load_data(self, data_sources):\n        \"\"\"\n        Loads data from the specified sources.\n        \"\"\"\n        # Placeholder: Assume first source is a csv path or DataFrame\n        source = data_sources[0]\n        if isinstance(source, str) and source.endswith('.csv'):\n            if os.path.exists(source):\n                return pd.read_csv(source)\n            else:\n                logger.warning(f\"File not found: {source}\")\n                return None\n        elif isinstance(source, pd.DataFrame):\n            return source\n\n        # Mock data for testing if no file\n        return pd.DataFrame({\n            'feature1': [1, 2, 3, 4, 5],\n            'target': [2, 4, 6, 8, 10]\n        })"
+      },
+      {
+        "name": "preprocess_data",
+        "ast_hash": "sha256:d9eaa440e2a34f83",
+        "loc": 6,
+        "source": "def preprocess_data(self, data):\n        \"\"\"\n        Preprocesses the data for model training.\n        \"\"\"\n        # Minimal preprocessing\n        return data.dropna()"
+      },
+      {
+        "name": "train_model",
+        "ast_hash": "sha256:544e85c910f671e6",
+        "loc": 25,
+        "source": "def train_model(self, data, model_type):\n        \"\"\"\n        Trains a machine learning model of the specified type.\n        \"\"\"\n        X = data.drop('target', axis=1, errors='ignore')\n        # If no target column, assume last column is target for simplicity\n        if 'target' not in data.columns:\n             X = data.iloc[:, :-1]\n             y = data.iloc[:, -1]\n        else:\n             y = data['target']\n\n        if model_type == \"linear_regression\":\n            model = LinearRegression()\n            model.fit(X, y)\n            return model\n        elif model_type == \"decision_tree\":\n            model = DecisionTreeRegressor()\n            model.fit(X, y)\n            return model\n\n        logger.warning(f\"Unknown model type {model_type}, defaulting to LinearRegression\")\n        model = LinearRegression()\n        model.fit(X, y)\n        return model"
+      },
+      {
+        "name": "evaluate_model",
+        "ast_hash": "sha256:e738cd72e9632240",
+        "loc": 14,
+        "source": "def evaluate_model(self, model, data):\n        \"\"\"\n        Evaluates the performance of the trained model.\n        \"\"\"\n        X = data.drop('target', axis=1, errors='ignore')\n        if 'target' not in data.columns:\n             X = data.iloc[:, :-1]\n             y = data.iloc[:, -1]\n        else:\n             y = data['target']\n\n        score = model.score(X, y)\n        logger.info(f\"Model Score (R^2): {score}\")\n        return {\"r2_score\": score}"
+      },
+      {
+        "name": "save_model",
+        "ast_hash": "sha256:05167af8d74e0499",
+        "loc": 9,
+        "source": "def save_model(self, model, model_name):\n        \"\"\"\n        Saves the trained model to a file.\n        \"\"\"\n        os.makedirs(\"models\", exist_ok=True)\n        path = f\"models/{model_name}.pkl\"\n        with open(path, 'wb') as f:\n            pickle.dump(model, f)\n        logger.info(f\"Model saved to {path}\")"
+      }
+    ]
+  }
+}

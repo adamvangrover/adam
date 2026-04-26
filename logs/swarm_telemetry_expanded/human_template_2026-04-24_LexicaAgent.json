@@ -1,0 +1,67 @@
+{
+  "spec_version": "1.4.0-otel",
+  "timestamp": "2026-04-24T00:13:03.355457Z",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "severity_text": "WARN",
+  "severity_number": 13,
+  "event_name": "swarm.agent.lifecycle.deprecated",
+  "resource": {
+    "service.name": "swarm-orchestrator",
+    "service.version": "4.2.0",
+    "deployment.environment": "production",
+    "node.id": "worker-node-aws-us-east-1a-04"
+  },
+  "attributes": {
+    "agent.id": "LexicaAgent",
+    "agent.previous_version": "v29.x",
+    "agent.target_version": "v30",
+    "deprecation.reason": "Transitioning to v30 architecture.",
+    "deprecation.action_required": true
+  },
+  "metrics": {
+    "agent.core_logic.function_count": 5,
+    "agent.capabilities.count": 0
+  },
+  "artifacts": {
+    "provenance": {
+      "repository": "git+ssh://repo/core/agents/lexica_agent.py",
+      "commit_sha": "a1b2c3d4e5f6g7h8i9j0",
+      "docstring_hash": "sha256:d8c4b12389a..."
+    },
+    "extracted_capabilities": [],
+    "core_logic_signatures": [
+      {
+        "name": "__init__",
+        "ast_hash": "sha256:938e19edf266de11",
+        "loc": 11,
+        "source": "def __init__(self, config: Dict[str, Any], kernel: Optional[Any] = None):\n        \"\"\"\n        Initializes the Lexica Agent.\n\n        Args:\n            config (dict): Configuration dictionary.\n            kernel (Optional[Any]): Semantic Kernel instance.\n        \"\"\"\n        super().__init__(config, kernel=kernel)\n        self.data_sources = self.config.get('data_sources', {})\n        self.api_keys = self.config.get('api_keys', {})"
+      },
+      {
+        "name": "execute",
+        "ast_hash": "sha256:055c7db07fad3236",
+        "loc": 37,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "search_web",
+        "ast_hash": "sha256:f0aa1e6c2831d669",
+        "loc": 27,
+        "source": "def search_web(self, query):\n        \"\"\"\n        Searches the web using a search engine API.\n        \"\"\"\n        results = []\n        api_key = self.api_keys.get('google_search_api_key')\n        engine_id = self.api_keys.get('google_search_engine_id')\n\n        if not api_key or not engine_id:\n            logger.warning(\"Google Search API keys missing. Skipping web search.\")\n            return results\n\n        url = f\"https://www.googleapis.com/customsearch/v1?key={api_key}&cx={engine_id}&q={query}\"\n        try:\n            response = requests.get(url, timeout=10)\n            if response.status_code == 200:\n                data = response.json()\n                results = [\n                    {\"title\": item.get('title'), \"link\": item.get('link'), \"snippet\": item.get('snippet')}\n                    for item in data.get('items', [])\n                ]\n            else:\n                logger.error(f\"Error searching the web: {response.status_code} - {response.text}\")\n        except Exception as e:\n            logger.error(f\"Web search exception: {e}\")\n\n        return results"
+      },
+      {
+        "name": "get_news_articles",
+        "ast_hash": "sha256:40a7c1bf57b0c21c",
+        "loc": 26,
+        "source": "def get_news_articles(self, query):\n        \"\"\"\n        Fetches news articles using a news aggregator API.\n        \"\"\"\n        articles = []\n        api_key = self.api_keys.get('news_api_key')\n\n        if not api_key:\n            logger.warning(\"NewsAPI key missing. Skipping news fetch.\")\n            return articles\n\n        url = f\"https://newsapi.org/v2/everything?q={query}&apiKey={api_key}\"\n        try:\n            response = requests.get(url, timeout=10)\n            if response.status_code == 200:\n                data = response.json()\n                articles = [\n                    {\"title\": item.get('title'), \"link\": item.get('url'), \"source\": item.get('source', {}).get('name')}\n                    for item in data.get('articles', [])\n                ]\n            else:\n                logger.error(f\"Error fetching news articles: {response.status_code} - {response.text}\")\n        except Exception as e:\n            logger.error(f\"News fetch exception: {e}\")\n\n        return articles"
+      },
+      {
+        "name": "get_financial_data",
+        "ast_hash": "sha256:df9314fc1d10d052",
+        "loc": 22,
+        "source": "def get_financial_data(self, query):\n        \"\"\"\n        Retrieves financial data from a database or API.\n        \"\"\"\n        data = {}\n        api_key = self.api_keys.get('iex_api_key')\n\n        if not api_key:\n            logger.warning(\"IEX Cloud API key missing. Skipping financial data fetch.\")\n            return data\n\n        url = f\"https://cloud.iexapis.com/stable/stock/{query}/quote?token={api_key}\"\n        try:\n            response = requests.get(url, timeout=10)\n            if response.status_code == 200:\n                data = response.json()\n            else:\n                logger.error(f\"Error fetching financial data: {response.status_code} - {response.text}\")\n        except Exception as e:\n            logger.error(f\"Financial data fetch exception: {e}\")\n\n        return data"
+      }
+    ]
+  }
+}

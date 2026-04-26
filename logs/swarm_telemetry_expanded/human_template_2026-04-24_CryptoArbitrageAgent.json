@@ -1,0 +1,73 @@
+{
+  "spec_version": "1.4.0-otel",
+  "timestamp": "2026-04-24T00:13:03.355457Z",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "severity_text": "WARN",
+  "severity_number": 13,
+  "event_name": "swarm.agent.lifecycle.deprecated",
+  "resource": {
+    "service.name": "swarm-orchestrator",
+    "service.version": "4.2.0",
+    "deployment.environment": "production",
+    "node.id": "worker-node-aws-us-east-1a-04"
+  },
+  "attributes": {
+    "agent.id": "CryptoArbitrageAgent",
+    "agent.previous_version": "v29.x",
+    "agent.target_version": "v30",
+    "deprecation.reason": "Transitioning to v30 architecture.",
+    "deprecation.action_required": true
+  },
+  "metrics": {
+    "agent.core_logic.function_count": 6,
+    "agent.capabilities.count": 0
+  },
+  "artifacts": {
+    "provenance": {
+      "repository": "git+ssh://repo/core/agents/specialized/crypto_arbitrage_agent.py",
+      "commit_sha": "a1b2c3d4e5f6g7h8i9j0",
+      "docstring_hash": "sha256:d8c4b12389a..."
+    },
+    "extracted_capabilities": [],
+    "core_logic_signatures": [
+      {
+        "name": "__init__",
+        "ast_hash": "sha256:799b0e011b86c606",
+        "loc": 4,
+        "source": "def __init__(self, config: Dict[str, Any], **kwargs):\n        super().__init__(config, **kwargs)\n        self.exchanges: Dict[str, Any] = {}\n        self.initialized_exchanges = False"
+      },
+      {
+        "name": "_init_exchanges",
+        "ast_hash": "sha256:bd880409e3bccaed",
+        "loc": 15,
+        "source": "async def _init_exchanges(self, exchange_ids: List[str]):\n        \"\"\"Initializes CCXT exchange instances.\"\"\"\n        if not CCXT_AVAILABLE:\n            return\n\n        for ex_id in exchange_ids:\n            if ex_id not in self.exchanges:\n                try:\n                    exchange_class = getattr(ccxt, ex_id)\n                    self.exchanges[ex_id] = exchange_class()\n                    # await self.exchanges[ex_id].load_markets() # Optional: load markets\n                except Exception as e:\n                    logging.error(f\"Failed to initialize exchange {ex_id}: {e}\")\n\n        self.initialized_exchanges = True"
+      },
+      {
+        "name": "_close_exchanges",
+        "ast_hash": "sha256:aeb6863071a52df5",
+        "loc": 7,
+        "source": "async def _close_exchanges(self):\n        \"\"\"Closes exchange connections.\"\"\"\n        if not CCXT_AVAILABLE:\n            return\n        for exchange in self.exchanges.values():\n            await exchange.close()\n        self.exchanges.clear()"
+      },
+      {
+        "name": "_fetch_price",
+        "ast_hash": "sha256:1d09a53834fbe521",
+        "loc": 19,
+        "source": "async def _fetch_price(self, exchange_id: str, symbol: str) -> Optional[float]:\n        \"\"\"Fetches the latest ticker price for a symbol on an exchange.\"\"\"\n        if not CCXT_AVAILABLE:\n            # Mock data for testing/fallback\n            import random\n            base_price = 50000 if \"BTC\" in symbol else 3000\n            variance = random.uniform(-0.01, 0.01)\n            return base_price * (1 + variance)\n\n        if exchange_id not in self.exchanges:\n            return None\n\n        try:\n            exchange = self.exchanges[exchange_id]\n            ticker = await exchange.fetch_ticker(symbol)\n            return ticker.get('last')\n        except Exception as e:\n            logging.warning(f\"Error fetching {symbol} from {exchange_id}: {e}\")\n            return None"
+      },
+      {
+        "name": "execute",
+        "ast_hash": "sha256:7a324e10cbbaadaf",
+        "loc": 74,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "_fetch_price_wrapper",
+        "ast_hash": "sha256:fdcd1deef051e153",
+        "loc": 4,
+        "source": "async def _fetch_price_wrapper(self, exchange_id: str, symbol: str):\n        \"\"\"Helper to unpack results for gather.\"\"\"\n        price = await self._fetch_price(exchange_id, symbol)\n        return (exchange_id, symbol, price)"
+      }
+    ]
+  }
+}

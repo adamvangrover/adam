@@ -1,0 +1,84 @@
+{
+  "spec_version": "1.4.0-otel",
+  "timestamp": "2026-04-24T00:13:03.355457Z",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "severity_text": "WARN",
+  "severity_number": 13,
+  "event_name": "swarm.agent.lifecycle.deprecated",
+  "resource": {
+    "service.name": "swarm-orchestrator",
+    "service.version": "4.2.0",
+    "deployment.environment": "production",
+    "node.id": "worker-node-aws-us-east-1a-04"
+  },
+  "attributes": {
+    "agent.id": "RootNodeAgent",
+    "agent.previous_version": "v29.x",
+    "agent.target_version": "v30",
+    "deprecation.reason": "Transitioning to v30 architecture.",
+    "deprecation.action_required": true
+  },
+  "metrics": {
+    "agent.core_logic.function_count": 8,
+    "agent.capabilities.count": 0
+  },
+  "artifacts": {
+    "provenance": {
+      "repository": "git+ssh://repo/core/agents/specialized/root_node_agent.py",
+      "commit_sha": "a1b2c3d4e5f6g7h8i9j0",
+      "docstring_hash": "sha256:d8c4b12389a..."
+    },
+    "extracted_capabilities": [],
+    "core_logic_signatures": [
+      {
+        "name": "__init__",
+        "ast_hash": "sha256:9cb36634fd66d088",
+        "loc": 5,
+        "source": "def __init__(self, config: Dict[str, Any] = None):\n        super().__init__(config=config or {})\n        self.max_depth = 5\n        self.simulation_count = 10 # Number of MCTS rollouts\n        self.exploration_weight = 1.41"
+      },
+      {
+        "name": "execute",
+        "ast_hash": "sha256:5892703f01316ed9",
+        "loc": 10,
+        "source": "async def execute(self, **kwargs) -> str:\n        \"\"\"\n        Executes the agent's main logic.\n        Expects 'problem_statement' in kwargs.\n        \"\"\"\n        problem = kwargs.get(\"problem_statement\")\n        if not problem:\n            return \"No problem statement provided.\"\n\n        return self.solve(problem)"
+      },
+      {
+        "name": "solve",
+        "ast_hash": "sha256:7df9acb05536c9d4",
+        "loc": 30,
+        "source": "def solve(self, problem_statement: str) -> str:\n        \"\"\"\n        Main entry point to solve a problem using MCTS.\n        \"\"\"\n        logger.info(f\"RootNodeAgent solving: {problem_statement}\")\n\n        # 1. Initialize Root Node\n        root = SearchNode(id=\"root\", content=problem_statement, depth=0)\n        tree = {\"root\": root}\n\n        for i in range(self.simulation_count):\n            # MCTS Phase 1: Selection\n            selected_node_id = self._select(tree, \"root\")\n\n            # MCTS Phase 2: Expansion\n            if not tree[selected_node_id].is_terminal:\n                new_child_id = self._expand(tree, selected_node_id)\n                leaf_node_id = new_child_id\n            else:\n                leaf_node_id = selected_node_id\n\n            # MCTS Phase 3: Simulation (Rollout)\n            reward = self._simulate(tree[leaf_node_id])\n\n            # MCTS Phase 4: Backpropagation\n            self._backpropagate(tree, leaf_node_id, reward)\n\n        # Select best child of root\n        best_path = self._get_best_reasoning_path(tree)\n        return best_path"
+      },
+      {
+        "name": "_select",
+        "ast_hash": "sha256:a1515ef5243369c0",
+        "loc": 27,
+        "source": "def _select(self, tree: Dict[str, SearchNode], node_id: str) -> str:\n        \"\"\"\n        Traverse the tree using UCT (Upper Confidence Bound for Trees).\n        \"\"\"\n        node = tree[node_id]\n        if not node.children_ids:\n            return node_id\n\n        # UCT Selection\n        best_score = -float('inf')\n        best_child = None\n\n        for child_id in node.children_ids:\n            child = tree[child_id]\n            if child.visits == 0:\n                return child_id # Prioritize unvisited\n\n            exploitation = child.value / child.visits\n            exploration = self.exploration_weight * np.sqrt(np.log(node.visits) / child.visits)\n            uct_score = exploitation + exploration\n\n            if uct_score > best_score:\n                best_score = uct_score\n                best_child = child_id\n\n        # Recursively select\n        return self._select(tree, best_child)"
+      },
+      {
+        "name": "_expand",
+        "ast_hash": "sha256:18cffdc1f0192e88",
+        "loc": 22,
+        "source": "def _expand(self, tree: Dict[str, SearchNode], parent_id: str) -> str:\n        \"\"\"\n        Generate a new reasoning step (child node).\n        In a real implementation, this calls the LLM. Here we mock it or use simple logic.\n        \"\"\"\n        parent = tree[parent_id]\n        child_id = f\"node_{len(tree)}\"\n\n        # Mock generation of reasoning step\n        step_content = f\"Reasoning Step {parent.depth + 1}.{len(parent.children_ids) + 1} derived from '{parent.content[:20]}...'\"\n\n        new_node = SearchNode(\n            id=child_id,\n            content=step_content,\n            parent_id=parent_id,\n            depth=parent.depth + 1,\n            is_terminal=(parent.depth + 1 >= self.max_depth)\n        )\n\n        tree[child_id] = new_node\n        parent.children_ids.append(child_id)\n        return child_id"
+      },
+      {
+        "name": "_simulate",
+        "ast_hash": "sha256:a347b0a7fed2e6ba",
+        "loc": 12,
+        "source": "def _simulate(self, node: SearchNode) -> float:\n        \"\"\"\n        Estimate the value of a state.\n        Implements GRPO-like relative scoring: Generate K completions and score relative to mean.\n        \"\"\"\n        # Mock GRPO: Random score, but we pretend we generated a 'group' and normalized.\n        # In real code: group_scores = [evaluate(gen) for gen in generated_group]\n        # reward = (score - mean(group_scores)) / std(group_scores)\n\n        # Here we just return a heuristic validity score\n        base_score = random.random()\n        return base_score"
+      },
+      {
+        "name": "_backpropagate",
+        "ast_hash": "sha256:ab142d997b28d68c",
+        "loc": 10,
+        "source": "def _backpropagate(self, tree: Dict[str, SearchNode], node_id: str, reward: float):\n        \"\"\"\n        Propagate reward up the tree.\n        \"\"\"\n        current_id = node_id\n        while current_id is not None:\n            node = tree[current_id]\n            node.visits += 1\n            node.value += reward\n            current_id = node.parent_id"
+      },
+      {
+        "name": "_get_best_reasoning_path",
+        "ast_hash": "sha256:1e73dc00b735b252",
+        "loc": 19,
+        "source": "def _get_best_reasoning_path(self, tree: Dict[str, SearchNode]) -> str:\n        \"\"\"\n        Construct the final answer from the most visited path.\n        \"\"\"\n        current_id = \"root\"\n        path = []\n\n        while True:\n            node = tree[current_id]\n            path.append(node.content)\n\n            if not node.children_ids:\n                break\n\n            # Select child with most visits (Robust Child)\n            best_child = max(node.children_ids, key=lambda x: tree[x].visits)\n            current_id = best_child\n\n        return \"\\n -> \".join(path)"
+      }
+    ]
+  }
+}
