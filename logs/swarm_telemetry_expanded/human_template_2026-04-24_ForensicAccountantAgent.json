@@ -1,0 +1,68 @@
+{
+  "spec_version": "1.4.0-otel",
+  "timestamp": "2026-04-24T00:13:03.355457Z",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "severity_text": "WARN",
+  "severity_number": 13,
+  "event_name": "swarm.agent.lifecycle.deprecated",
+  "resource": {
+    "service.name": "swarm-orchestrator",
+    "service.version": "4.2.0",
+    "deployment.environment": "production",
+    "node.id": "worker-node-aws-us-east-1a-04"
+  },
+  "attributes": {
+    "agent.id": "ForensicAccountantAgent",
+    "agent.previous_version": "v29.x",
+    "agent.target_version": "v30",
+    "deprecation.reason": "Transitioning to v30 architecture.",
+    "deprecation.action_required": true
+  },
+  "metrics": {
+    "agent.core_logic.function_count": 5,
+    "agent.capabilities.count": 0
+  },
+  "artifacts": {
+    "provenance": {
+      "repository": "git+ssh://repo/core/agents/specialized/forensic_accountant_agent.py",
+      "commit_sha": "a1b2c3d4e5f6g7h8i9j0",
+      "docstring_hash": "sha256:d8c4b12389a..."
+    },
+    "extracted_capabilities": [],
+    "core_logic_signatures": [
+      {
+        "name": "__init__",
+        "ast_hash": "sha256:9f80e0db89f8b019",
+        "loc": 3,
+        "source": "def __init__(self, config=None, **kwargs):\n        super().__init__(config, **kwargs)\n        AuditMixin.__init__(self)"
+      },
+      {
+        "name": "execute",
+        "ast_hash": "sha256:94067f943271ff6b",
+        "loc": 47,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "_check_benford",
+        "ast_hash": "sha256:b3a84c846cf0c7d5",
+        "loc": 33,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "_check_round_numbers",
+        "ast_hash": "sha256:f9fa81451addae12",
+        "loc": 15,
+        "source": "def _check_round_numbers(self, transactions: List[Dict]) -> float:\n        \"\"\"\n        Checks the percentage of transactions that are 'round' numbers (multiple of 100).\n        \"\"\"\n        round_count = 0\n        total = 0\n\n        for t in transactions:\n            amount = t.get('amount', 0)\n            if amount > 0:\n                total += 1\n                if amount % 100 == 0:\n                    round_count += 1\n\n        return round_count / total if total > 0 else 0.0"
+      },
+      {
+        "name": "get_skill_schema",
+        "ast_hash": "sha256:b846b6fbd7380520",
+        "loc": 18,
+        "source": "def get_skill_schema(self) -> Dict[str, Any]:\n        return {\n            \"name\": \"ForensicAccountantAgent\",\n            \"description\": \"Detects financial anomalies using statistical analysis.\",\n            \"skills\": [\n                {\n                    \"name\": \"audit_ledger\",\n                    \"description\": \"Scans transactions for fraud patterns.\",\n                    \"parameters\": {\n                        \"type\": \"object\",\n                        \"properties\": {\n                            \"transactions\": {\"type\": \"array\", \"items\": {\"type\": \"object\"}}\n                        },\n                        \"required\": [\"transactions\"]\n                    }\n                }\n            ]\n        }"
+      }
+    ]
+  }
+}

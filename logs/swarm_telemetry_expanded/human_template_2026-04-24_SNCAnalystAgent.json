@@ -1,0 +1,118 @@
+{
+  "spec_version": "1.4.0-otel",
+  "timestamp": "2026-04-24T00:13:03.355457Z",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "severity_text": "WARN",
+  "severity_number": 13,
+  "event_name": "swarm.agent.lifecycle.deprecated",
+  "resource": {
+    "service.name": "swarm-orchestrator",
+    "service.version": "4.2.0",
+    "deployment.environment": "production",
+    "node.id": "worker-node-aws-us-east-1a-04"
+  },
+  "attributes": {
+    "agent.id": "SNCAnalystAgent",
+    "agent.previous_version": "v29.x",
+    "agent.target_version": "v30",
+    "deprecation.reason": "Transitioning to v30 architecture.",
+    "deprecation.action_required": true
+  },
+  "metrics": {
+    "agent.core_logic.function_count": 13,
+    "agent.capabilities.count": 0
+  },
+  "artifacts": {
+    "provenance": {
+      "repository": "git+ssh://repo/core/agents/snc_analyst_agent.py",
+      "commit_sha": "a1b2c3d4e5f6g7h8i9j0",
+      "docstring_hash": "sha256:d8c4b12389a..."
+    },
+    "extracted_capabilities": [],
+    "core_logic_signatures": [
+      {
+        "name": "__init__",
+        "ast_hash": "sha256:60c9f2cd0cabc3c4",
+        "loc": 17,
+        "source": "def __init__(self, config: Dict[str, Any], kernel: Optional[Kernel] = None):\n        super().__init__(config, kernel)\n        self.persona = self.config.get('persona', \"SNC Analyst Examiner\")\n        self.description = self.config.get(\n            'description', \"Analyzes Shared National Credits based on regulatory guidelines by retrieving data via A2A and using Semantic Kernel skills.\")\n        self.expertise = self.config.get(\n            'expertise', [\"SNC analysis\", \"regulatory compliance\", \"credit risk assessment\"])\n\n        self.comptrollers_handbook_snc = self.config.get('comptrollers_handbook_SNC', {})\n        if not self.comptrollers_handbook_snc:\n            logging.warning(\"Comptroller's Handbook SNC guidelines not found in agent configuration.\")\n\n        self.occ_guidelines_snc = self.config.get('occ_guidelines_SNC', {})\n        if not self.occ_guidelines_snc:\n            logging.warning(\"OCC Guidelines SNC not found in agent configuration.\")\n\n        self.audit_log = []"
+      },
+      {
+        "name": "_log_audit_event",
+        "ast_hash": "sha256:3de2471a3305dc9d",
+        "loc": 7,
+        "source": "def _log_audit_event(self, event_type: str, details: Dict[str, Any]):\n        \"\"\"Logs an event to the internal audit trail.\"\"\"\n        self.audit_log.append({\n            \"timestamp\": datetime.now(timezone.utc).isoformat(),\n            \"event_type\": event_type,\n            \"details\": details\n        })"
+      },
+      {
+        "name": "generate_defense_file",
+        "ast_hash": "sha256:c72421ebb04cafca",
+        "loc": 8,
+        "source": "def generate_defense_file(self, filepath: str):\n        \"\"\"Generates a JSON audit trail file.\"\"\"\n        try:\n            with open(filepath, 'w') as f:\n                json.dump(self.audit_log, f, indent=2)\n            logging.info(f\"Defense file generated at {filepath}\")\n        except Exception as e:\n            logging.error(f\"Failed to generate defense file: {e}\")"
+      },
+      {
+        "name": "execute",
+        "ast_hash": "sha256:de88383d40fd1e78",
+        "loc": 114,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "_prepare_financial_inputs_for_sk",
+        "ast_hash": "sha256:b5ad750142e675fc",
+        "loc": 16,
+        "source": "def _prepare_financial_inputs_for_sk(self, financial_data_detailed: Dict[str, Any]) -> Dict[str, str]:\n        \"\"\"Prepares stringified financial inputs required by SK skills.\"\"\"\n        cash_flow_statement = financial_data_detailed.get(\"cash_flow_statement\", {})\n        key_ratios = financial_data_detailed.get(\"key_ratios\", {})\n        market_data = financial_data_detailed.get(\"market_data\", {})\n        dcf_assumptions = financial_data_detailed.get(\"dcf_assumptions\", {})\n\n        return {\n            \"historical_fcf_str\": str(cash_flow_statement.get('free_cash_flow', [\"N/A\"])),\n            \"historical_cfo_str\": str(cash_flow_statement.get('cash_flow_from_operations', [\"N/A\"])),\n            \"annual_debt_service_str\": str(market_data.get(\"annual_debt_service_placeholder\", \"Not Available\")),\n            \"ratios_summary_str\": json.dumps(key_ratios) if key_ratios else \"Not available\",\n            \"projected_fcf_str\": str(dcf_assumptions.get(\"projected_fcf_placeholder\", \"Not Available\")),\n            \"payment_history_status_str\": str(market_data.get(\"payment_history_placeholder\", \"Current\")),\n            \"interest_capitalization_status_str\": str(market_data.get(\"interest_capitalization_placeholder\", \"No\"))\n        }"
+      },
+      {
+        "name": "_prepare_qualitative_inputs_for_sk",
+        "ast_hash": "sha256:09fcde24b0883a7a",
+        "loc": 6,
+        "source": "def _prepare_qualitative_inputs_for_sk(self, qualitative_company_info: Dict[str, Any]) -> Dict[str, str]:\n        \"\"\"Prepares stringified qualitative inputs required by SK skills.\"\"\"\n        return {\n            \"qualitative_notes_stability_str\": qualitative_company_info.get(\"revenue_cashflow_stability_notes_placeholder\", \"Management reports stable customer contracts.\"),\n            \"notes_financial_deterioration_str\": qualitative_company_info.get(\"financial_deterioration_notes_placeholder\", \"No significant deterioration noted recently.\")\n        }"
+      },
+      {
+        "name": "_perform_financial_analysis",
+        "ast_hash": "sha256:6e6ff3cc250f551b",
+        "loc": 15,
+        "source": "def _perform_financial_analysis(self, financial_data_detailed: Dict[str, Any], sk_financial_inputs: Dict[str, str]) -> Dict[str, Any]:\n        logging.debug(\n            f\"SNC_FIN_ANALYSIS_INPUT: financial_data_detailed keys: {list(financial_data_detailed.keys())}, sk_inputs keys: {list(sk_financial_inputs.keys())}\")\n        key_ratios = financial_data_detailed.get(\"key_ratios\", {})\n\n        analysis_result = {\n            \"debt_to_equity\": key_ratios.get(\"debt_to_equity_ratio\"),\n            \"profitability\": key_ratios.get(\"net_profit_margin\"),\n            \"liquidity_ratio\": key_ratios.get(\"current_ratio\"),\n            \"interest_coverage\": key_ratios.get(\"interest_coverage_ratio\"),\n            \"tier_1_capital_ratio\": key_ratios.get(\"tier_1_capital_ratio\"),\n            **sk_financial_inputs\n        }\n        logging.debug(f\"SNC_FIN_ANALYSIS_OUTPUT: {analysis_result}\")\n        return analysis_result"
+      },
+      {
+        "name": "_perform_qualitative_analysis",
+        "ast_hash": "sha256:8cb8f08577444b83",
+        "loc": 18,
+        "source": "def _perform_qualitative_analysis(self,\n                                      company_name: str,\n                                      qualitative_company_info: Dict[str, Any],\n                                      industry_data_context: Dict[str, Any],\n                                      economic_data_context: Dict[str, Any],\n                                      sk_qualitative_inputs: Dict[str, str]) -> Dict[str, Any]:\n        logging.debug(\n            f\"SNC_QUAL_ANALYSIS_INPUT: company_name='{company_name}', qualitative_info_keys={list(qualitative_company_info.keys())}, industry_keys={list(industry_data_context.keys())}, economic_keys={list(economic_data_context.keys())}, sk_qual_inputs keys: {list(sk_qualitative_inputs.keys())}\")\n        qualitative_result = {\n            \"management_quality\": qualitative_company_info.get(\"management_assessment\", \"Not Assessed\"),\n            \"industry_outlook\": industry_data_context.get(\"outlook\", \"Neutral\"),\n            \"economic_conditions\": economic_data_context.get(\"overall_outlook\", \"Stable\"),\n            \"business_model_strength\": qualitative_company_info.get(\"business_model_strength\", \"N/A\"),\n            \"competitive_advantages\": qualitative_company_info.get(\"competitive_advantages\", \"N/A\"),\n            **sk_qualitative_inputs\n        }\n        logging.debug(f\"SNC_QUAL_ANALYSIS_OUTPUT: {qualitative_result}\")\n        return qualitative_result"
+      },
+      {
+        "name": "_evaluate_credit_risk_mitigation",
+        "ast_hash": "sha256:a21e15dfb0461c4a",
+        "loc": 25,
+        "source": "def _evaluate_credit_risk_mitigation(self, collateral_and_debt_details: Dict[str, Any]) -> Dict[str, Any]:\n        logging.debug(\n            f\"SNC_CREDIT_MITIGATION_INPUT: collateral_and_debt_details_keys={list(collateral_and_debt_details.keys())}\")\n        ltv = collateral_and_debt_details.get(\"loan_to_value_ratio\")\n        collateral_quality_assessment = \"Low\"\n        if ltv is not None:\n            try:\n                ltv_float = float(ltv)\n                if ltv_float < 0.5:\n                    collateral_quality_assessment = \"High\"\n                elif ltv_float < 0.75:\n                    collateral_quality_assessment = \"Medium\"\n            except ValueError:\n                logging.warning(f\"Could not parse LTV ratio '{ltv}' as float.\")\n\n        mitigation_result = {\n            \"collateral_quality_fallback\": collateral_quality_assessment,\n            \"collateral_summary_for_sk\": collateral_and_debt_details.get(\"collateral_type\", \"Not specified.\"),\n            \"loan_to_value_ratio\": str(ltv) if ltv is not None else \"Not specified.\",\n            \"collateral_notes_for_sk\": collateral_and_debt_details.get(\"other_credit_enhancements\", \"None.\"),\n            \"collateral_valuation\": collateral_and_debt_details.get(\"collateral_valuation\"),\n            \"guarantees_present\": collateral_and_debt_details.get(\"guarantees_exist\", False)\n        }\n        logging.debug(f\"SNC_CREDIT_MITIGATION_OUTPUT: {mitigation_result}\")\n        return mitigation_result"
+      },
+      {
+        "name": "_rate_from_sk_assessments",
+        "ast_hash": "sha256:9a8cbf593e56c217",
+        "loc": 26,
+        "source": "def _rate_from_sk_assessments(self, repayment_assessment: Optional[str], collateral_assessment: Optional[str], nonaccrual_assessment: Optional[str]) -> Tuple[Optional[SNCRating], str]:\n        \"\"\"Determines a rating based purely on the string outputs from SK skills.\"\"\"\n        if repayment_assessment == \"Unsustainable\":\n            return SNCRating.LOSS, \"Repayment capacity is assessed as unsustainable.\"\n        if nonaccrual_assessment == \"Non-Accrual Warranted\" and repayment_assessment == \"Weak\":\n            return SNCRating.LOSS, \"Non-accrual status is warranted alongside weak repayment capacity.\"\n\n        if repayment_assessment == \"Weak\":\n            return SNCRating.DOUBTFUL, \"Repayment capacity is weak, casting doubt on the ability to service debt.\"\n        if collateral_assessment == \"Substandard\" and repayment_assessment == \"Adequate\":\n            return SNCRating.DOUBTFUL, \"Collateral is substandard, and repayment capacity is only adequate, not strong.\"\n\n        if nonaccrual_assessment == \"Non-Accrual Warranted\":\n            return SNCRating.SUBSTANDARD, \"Non-accrual status is warranted, indicating significant financial distress.\"\n        if collateral_assessment == \"Substandard\":\n            return SNCRating.SUBSTANDARD, \"Collateral is substandard, providing inadequate support for the credit.\"\n        if repayment_assessment == \"Adequate\" and collateral_assessment == \"Special Mention\":\n            return SNCRating.SUBSTANDARD, \"Repayment capacity is merely adequate and not supported by Pass-rated collateral.\"\n\n        if collateral_assessment == \"Special Mention\" or repayment_assessment == \"Adequate\":\n            return SNCRating.SPECIAL_MENTION, \"Weaknesses are noted in collateral or repayment that require monitoring.\"\n\n        if repayment_assessment == \"Strong\" and collateral_assessment == \"Pass\" and nonaccrual_assessment == \"Accrual Appropriate\":\n            return SNCRating.PASS, \"Strong repayment, Pass-rated collateral, and appropriate accrual status indicate a Pass rating.\"\n\n        return None, \"SK assessments did not map to a definitive rating.\""
+      },
+      {
+        "name": "_rate_from_fallback_logic",
+        "ast_hash": "sha256:f41128cb9199dd95",
+        "loc": 42,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "_synthesize_rationale",
+        "ast_hash": "sha256:968861138e46df27",
+        "loc": 43,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "_determine_rating",
+        "ast_hash": "sha256:fda7a0428ce9ca3c",
+        "loc": 162,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      }
+    ]
+  }
+}

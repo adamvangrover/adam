@@ -1,0 +1,66 @@
+{
+  "spec_version": "1.4.0-otel",
+  "timestamp": "2026-04-24T00:13:03.355457Z",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "severity_text": "WARN",
+  "severity_number": 13,
+  "event_name": "swarm.agent.lifecycle.deprecated",
+  "resource": {
+    "service.name": "swarm-orchestrator",
+    "service.version": "4.2.0",
+    "deployment.environment": "production",
+    "node.id": "worker-node-aws-us-east-1a-04"
+  },
+  "attributes": {
+    "agent.id": "NaturalLanguageGenerationAgent",
+    "agent.previous_version": "v29.x",
+    "agent.target_version": "v30",
+    "deprecation.reason": "Transitioning to v30 architecture.",
+    "deprecation.action_required": true
+  },
+  "metrics": {
+    "agent.core_logic.function_count": 5,
+    "agent.capabilities.count": 0
+  },
+  "artifacts": {
+    "provenance": {
+      "repository": "git+ssh://repo/core/agents/natural_language_generation_agent.py",
+      "commit_sha": "a1b2c3d4e5f6g7h8i9j0",
+      "docstring_hash": "sha256:d8c4b12389a..."
+    },
+    "extracted_capabilities": [],
+    "core_logic_signatures": [
+      {
+        "name": "__init__",
+        "ast_hash": "sha256:599301ae650fdae6",
+        "loc": 15,
+        "source": "def __init__(self, config: Dict[str, Any], kernel: Optional[Any] = None):\n        \"\"\"\n        Initializes the NLG Agent.\n\n        Args:\n            config (dict): Configuration dictionary.\n            kernel (Optional[Any]): Semantic Kernel instance.\n        \"\"\"\n        super().__init__(config, kernel=kernel)\n        self.model_name = self.config.get('model_name', 'gpt2')\n        try:\n            self.generator = pipeline('text-generation', model=self.model_name)\n        except Exception as e:\n            logger.error(f\"Failed to load generation model: {e}\")\n            self.generator = None"
+      },
+      {
+        "name": "execute",
+        "ast_hash": "sha256:4d885ad2cc2628bf",
+        "loc": 29,
+        "source": "async def execute(self, *args, **kwargs):\n        \"\"\"\n        Executes NLG tasks.\n\n        Tasks:\n        - \"text\": Generates text from prompt.\n        - \"summary\": Summarizes data.\n        - \"report\": Generates a report.\n        \"\"\"\n        output_type = kwargs.get('output_type')\n        data = kwargs.get('data')\n\n        logger.info(f\"NaturalLanguageGenerationAgent executing output_type: {output_type}\")\n\n        try:\n            # Run blocking model calls in executor\n            loop = asyncio.get_running_loop()\n\n            if output_type == \"text\":\n                return await loop.run_in_executor(None, self.generate_text, data, kwargs)\n            elif output_type == \"summary\":\n                return await loop.run_in_executor(None, self.summarize_data, data, kwargs)\n            elif output_type == \"report\":\n                return await loop.run_in_executor(None, self.generate_report, data, kwargs.get('report_type'), kwargs)\n            else:\n                return {\"error\": \"Invalid output type.\"}\n        except Exception as e:\n            logger.error(f\"NLG error: {e}\")\n            return {\"error\": str(e)}"
+      },
+      {
+        "name": "generate_text",
+        "ast_hash": "sha256:b0f44b75b7d5cbe6",
+        "loc": 14,
+        "source": "def generate_text(self, prompt, kwargs):\n        \"\"\"\n        Generates text based on the given prompt and parameters.\n        \"\"\"\n        if not self.generator:\n            return \"Model not initialized.\"\n        try:\n            # Clean kwargs for pipeline\n            gen_kwargs = {k: v for k, v in kwargs.items() if k in ['max_length', 'num_return_sequences']}\n            generated_text = self.generator(prompt, **gen_kwargs)\n            return generated_text\n        except Exception as e:\n            logger.error(f\"Generation failed: {e}\")\n            return str(e)"
+      },
+      {
+        "name": "summarize_data",
+        "ast_hash": "sha256:4ebcb863177447c4",
+        "loc": 6,
+        "source": "def summarize_data(self, data, kwargs):\n        \"\"\"\n        Summarizes the given data into a concise and informative text.\n        \"\"\"\n        prompt = f\"Summarize the following data:\\n\\n{data}\\n\\nSummary:\"\n        return self.generate_text(prompt, kwargs)"
+      },
+      {
+        "name": "generate_report",
+        "ast_hash": "sha256:b0a9841404b24b07",
+        "loc": 12,
+        "source": "def generate_report(self, data, report_type, kwargs):\n        \"\"\"\n        Generates a report of the specified type based on the given data.\n        \"\"\"\n        if report_type == \"market_sentiment\":\n            prompt = f\"Generate market sentiment report for: {data}\"\n            return self.generate_text(prompt, kwargs)\n        elif report_type == \"financial_analysis\":\n            prompt = f\"Generate financial analysis report for: {data}\"\n            return self.generate_text(prompt, kwargs)\n\n        return \"Unknown report type.\""
+      }
+    ]
+  }
+}

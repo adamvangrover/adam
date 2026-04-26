@@ -1,0 +1,92 @@
+{
+  "spec_version": "1.4.0-otel",
+  "timestamp": "2026-04-24T00:13:03.355457Z",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "severity_text": "WARN",
+  "severity_number": 13,
+  "event_name": "swarm.agent.lifecycle.deprecated",
+  "resource": {
+    "service.name": "swarm-orchestrator",
+    "service.version": "4.2.0",
+    "deployment.environment": "production",
+    "node.id": "worker-node-aws-us-east-1a-04"
+  },
+  "attributes": {
+    "agent.id": "RedTeamAgent",
+    "agent.previous_version": "v29.x",
+    "agent.target_version": "v30",
+    "deprecation.reason": "Transitioning to v30 architecture.",
+    "deprecation.action_required": true
+  },
+  "metrics": {
+    "agent.core_logic.function_count": 9,
+    "agent.capabilities.count": 0
+  },
+  "artifacts": {
+    "provenance": {
+      "repository": "git+ssh://repo/core/agents/red_team_agent.py",
+      "commit_sha": "a1b2c3d4e5f6g7h8i9j0",
+      "docstring_hash": "sha256:d8c4b12389a..."
+    },
+    "extracted_capabilities": [],
+    "core_logic_signatures": [
+      {
+        "name": "__init__",
+        "ast_hash": "sha256:5785e716dd09eeac",
+        "loc": 6,
+        "source": "def __init__(self, config: Dict[str, Any], kernel=None):\n        super().__init__(config, kernel=kernel)\n        self._name = config.get(\"name\", \"RedTeamAgent\") # Use private attribute to avoid conflict\n        self.skill = CounterfactualReasoningSkill(llm_client=kernel)\n        # Compile the internal graph once during initialization\n        self.graph_app = self._build_red_team_graph()"
+      },
+      {
+        "name": "name",
+        "ast_hash": "sha256:d7e01e9f7ca3c078",
+        "loc": 2,
+        "source": "def name(self) -> str:\n        return self._name"
+      },
+      {
+        "name": "name",
+        "ast_hash": "sha256:ec2db01aeea60799",
+        "loc": 2,
+        "source": "def name(self, value: str):\n        self._name = value"
+      },
+      {
+        "name": "execute",
+        "ast_hash": "sha256:22774d29f2cb4c76",
+        "loc": 57,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "_generate_attack_node",
+        "ast_hash": "sha256:6b0d135de874e6b4",
+        "loc": 28,
+        "source": "async def _generate_attack_node(self, state: RedTeamState) -> Dict[str, Any]:\n        \"\"\"\n        Node: Generates or refines an adversarial scenario using CounterfactualReasoningSkill.\n        \"\"\"\n        target = state[\"target_entity\"]\n        iteration = state[\"iteration_count\"]\n        current_desc = state.get(\"current_scenario_description\", \"\")\n\n        credit_memo = state.get(\"data_context\", {}).get(\"credit_memo\", {})\n        if not credit_memo:\n             credit_memo = {\"assumptions\": {\"revenue_growth\": 0.05, \"interest_rate\": 0.04}}\n\n        logger.info(f\"[{self.name}] Generating scenario (Iter {iteration})...\")\n\n        # Use Skill to generate the base bear case\n        bear_case = self.skill.generate_bear_case(credit_memo)\n        new_desc = f\"{bear_case['scenario']}: {bear_case['failure_catalyst']} triggered by {bear_case['inverted_assumptions']}\"\n\n        # Escalation Logic: If previous iterations failed, make it worse.\n        if iteration > 0 and not state[\"is_sufficiently_severe\"]:\n             new_desc = f\"ESCALATED (Iter {iteration}): {new_desc} AND Secondary Liquidity Crisis.\"\n\n        return {\n            \"current_scenario_description\": new_desc,\n            \"iteration_count\": iteration + 1,\n            \"human_readable_status\": f\"Drafting scenario (Iter {iteration})\",\n            \"skill_output\": bear_case\n        }"
+      },
+      {
+        "name": "_simulate_impact_node",
+        "ast_hash": "sha256:f47225407cd5f22a",
+        "loc": 61,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "_critique_node",
+        "ast_hash": "sha256:b34d8c0109592dad",
+        "loc": 14,
+        "source": "async def _critique_node(self, state: RedTeamState) -> Dict[str, Any]:\n        \"\"\"\n        Node: Checks severity threshold.\n        Acts as the 'Reflector' in the cyclical process.\n        \"\"\"\n        impact = state[\"simulated_impact_score\"]\n        threshold = state[\"severity_threshold\"]\n\n        is_severe = impact >= threshold\n\n        return {\n            \"is_sufficiently_severe\": is_severe,\n            \"human_readable_status\": f\"Critique: {'Severe enough' if is_severe else 'Too mild'}\"\n        }"
+      },
+      {
+        "name": "_should_continue",
+        "ast_hash": "sha256:698387eb63586a87",
+        "loc": 9,
+        "source": "def _should_continue(self, state: RedTeamState) -> Literal[\"escalate\", \"finalize\"]:\n        \"\"\"\n        Conditional Edge: Decides whether to loop back or finish.\n        \"\"\"\n        if state[\"is_sufficiently_severe\"]:\n            return \"finalize\"\n        if state[\"iteration_count\"] >= 3:  # Max retries to prevent infinite loops\n            return \"finalize\"\n        return \"escalate\""
+      },
+      {
+        "name": "_build_red_team_graph",
+        "ast_hash": "sha256:43050bb94b2e0234",
+        "loc": 23,
+        "source": "def _build_red_team_graph(self):\n        workflow = StateGraph(RedTeamState)\n\n        # Add nodes (bound to self methods)\n        workflow.add_node(\"generate_attack\", self._generate_attack_node)\n        workflow.add_node(\"simulate_impact\", self._simulate_impact_node)\n        workflow.add_node(\"critique\", self._critique_node)\n\n        workflow.set_entry_point(\"generate_attack\")\n\n        workflow.add_edge(\"generate_attack\", \"simulate_impact\")\n        workflow.add_edge(\"simulate_impact\", \"critique\")\n\n        workflow.add_conditional_edges(\n            \"critique\",\n            self._should_continue,\n            {\n                \"escalate\": \"generate_attack\",\n                \"finalize\": END\n            }\n        )\n\n        return workflow.compile()"
+      }
+    ]
+  }
+}

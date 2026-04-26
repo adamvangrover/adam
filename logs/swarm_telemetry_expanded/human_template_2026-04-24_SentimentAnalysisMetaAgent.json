@@ -1,0 +1,66 @@
+{
+  "spec_version": "1.4.0-otel",
+  "timestamp": "2026-04-24T00:13:03.355457Z",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "severity_text": "WARN",
+  "severity_number": 13,
+  "event_name": "swarm.agent.lifecycle.deprecated",
+  "resource": {
+    "service.name": "swarm-orchestrator",
+    "service.version": "4.2.0",
+    "deployment.environment": "production",
+    "node.id": "worker-node-aws-us-east-1a-04"
+  },
+  "attributes": {
+    "agent.id": "SentimentAnalysisMetaAgent",
+    "agent.previous_version": "v29.x",
+    "agent.target_version": "v30",
+    "deprecation.reason": "Transitioning to v30 architecture.",
+    "deprecation.action_required": true
+  },
+  "metrics": {
+    "agent.core_logic.function_count": 5,
+    "agent.capabilities.count": 0
+  },
+  "artifacts": {
+    "provenance": {
+      "repository": "git+ssh://repo/core/agents/meta_agents/sentiment_analysis_meta_agent.py",
+      "commit_sha": "a1b2c3d4e5f6g7h8i9j0",
+      "docstring_hash": "sha256:d8c4b12389a..."
+    },
+    "extracted_capabilities": [],
+    "core_logic_signatures": [
+      {
+        "name": "__init__",
+        "ast_hash": "sha256:b374f475fa724eb0",
+        "loc": 2,
+        "source": "def __init__(self, config):\n        super().__init__(config)"
+      },
+      {
+        "name": "execute",
+        "ast_hash": "sha256:7a026c925b7bbfea",
+        "loc": 16,
+        "source": "def execute(self, sub_agent_output):\n        if sub_agent_output.get(\"error\"):\n            return self._to_error_output(sub_agent_output.get(\"error\"))\n\n        articles = sub_agent_output.get(\"data\", [])\n        if not articles:\n            return self._to_error_output(\"No articles found\")\n\n        sentiments = []\n        for article in articles:\n            sentiment = self._analyze_sentiment(article.get(\"title\"))\n            sentiments.append({\n                \"title\": article.get(\"title\"),\n                \"sentiment\": sentiment,\n            })\n        return self._to_structured_output(sentiments)"
+      },
+      {
+        "name": "_analyze_sentiment",
+        "ast_hash": "sha256:f9a3cb2565a33180",
+        "loc": 3,
+        "source": "def _analyze_sentiment(self, text):\n        blob = TextBlob(text)\n        return blob.sentiment.polarity"
+      },
+      {
+        "name": "_to_structured_output",
+        "ast_hash": "sha256:52b231b9a20f2bda",
+        "loc": 6,
+        "source": "def _to_structured_output(self, sentiments):\n        return {\n            \"source_agent\": self.__class__.__name__,\n            \"confidence_score\": 0.8,\n            \"data\": sentiments,\n        }"
+      },
+      {
+        "name": "_to_error_output",
+        "ast_hash": "sha256:6e34b7c471b15c9e",
+        "loc": 6,
+        "source": "def _to_error_output(self, error):\n        return {\n            \"source_agent\": self.__class__.__name__,\n            \"confidence_score\": 0.0,\n            \"error\": str(error),\n        }"
+      }
+    ]
+  }
+}

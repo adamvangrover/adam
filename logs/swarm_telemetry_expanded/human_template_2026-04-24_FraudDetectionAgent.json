@@ -1,0 +1,61 @@
+{
+  "spec_version": "1.4.0-otel",
+  "timestamp": "2026-04-24T00:13:03.355457Z",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "severity_text": "WARN",
+  "severity_number": 13,
+  "event_name": "swarm.agent.lifecycle.deprecated",
+  "resource": {
+    "service.name": "swarm-orchestrator",
+    "service.version": "4.2.0",
+    "deployment.environment": "production",
+    "node.id": "worker-node-aws-us-east-1a-04"
+  },
+  "attributes": {
+    "agent.id": "FraudDetectionAgent",
+    "agent.previous_version": "v29.x",
+    "agent.target_version": "v30",
+    "deprecation.reason": "Transitioning to v30 architecture.",
+    "deprecation.action_required": true
+  },
+  "metrics": {
+    "agent.core_logic.function_count": 4,
+    "agent.capabilities.count": 0
+  },
+  "artifacts": {
+    "provenance": {
+      "repository": "git+ssh://repo/core/agents/fraud_detection_agent.py",
+      "commit_sha": "a1b2c3d4e5f6g7h8i9j0",
+      "docstring_hash": "sha256:d8c4b12389a..."
+    },
+    "extracted_capabilities": [],
+    "core_logic_signatures": [
+      {
+        "name": "__init__",
+        "ast_hash": "sha256:a4aa9e4c95d8ce2c",
+        "loc": 3,
+        "source": "def __init__(self, config: Dict[str, Any], constitution: Optional[Dict[str, Any]] = None, kernel: Any = None):\n        super().__init__(config, constitution, kernel)\n        self.anomalies_detected = []"
+      },
+      {
+        "name": "execute",
+        "ast_hash": "sha256:0ffe8e36f12d58e1",
+        "loc": 32,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "detect_anomalies",
+        "ast_hash": "sha256:4b3da6a5b1445956",
+        "loc": 22,
+        "source": "def detect_anomalies(self, data: Dict[str, Any]) -> List[str]:\n        \"\"\"\n        Analyzes financial data for inconsistencies.\n        \"\"\"\n        anomalies = []\n\n        # Mock Logic for Detection\n        revenue = float(data.get(\"revenue\", 0))\n        cash_flow = float(data.get(\"cash_flow\", 0))\n        expenses = float(data.get(\"expenses\", 0))\n\n        if revenue > 0 and cash_flow < (revenue * 0.1):\n            anomalies.append(\"Revenue high but operating cash flow dangerously low (<10%).\")\n\n        if expenses == 0 and revenue > 0:\n            anomalies.append(\"Zero expenses reported with positive revenue (Highly Suspicious).\")\n\n        if data.get(\"growth_rate\", 0) > 0.50:\n            anomalies.append(\"Unusual growth rate (>50%) flagged for review.\")\n\n        self.anomalies_detected = anomalies\n        return anomalies"
+      },
+      {
+        "name": "restate_financials",
+        "ast_hash": "sha256:133f3772dbfe34ec",
+        "loc": 21,
+        "source": "def restate_financials(self, data: Dict[str, Any]) -> Dict[str, Any]:\n        \"\"\"\n        Simulates a financial restatement by adjusting metrics downwards.\n        \"\"\"\n        restated = data.copy()\n\n        # Simulate 'cooking the books' correction\n        if \"revenue\" in restated:\n            restated[\"revenue\"] = float(restated[\"revenue\"]) * 0.85  # 15% reduction\n\n        if \"expenses\" in restated:\n            restated[\"expenses\"] = float(restated[\"expenses\"]) * 1.20 # 20% increase (underreported costs)\n\n        if \"net_income\" in restated:\n            # Re-calculate net income if possible, or just slash it\n            restated[\"net_income\"] = float(restated.get(\"revenue\", 0)) - float(restated.get(\"expenses\", 0))\n\n        restated[\"restatement_date\"] = \"2026-04-01\"\n        restated[\"notes\"] = \"Restated due to accounting irregularities discovered by FraudDetectionAgent.\"\n\n        return restated"
+      }
+    ]
+  }
+}

@@ -1,0 +1,74 @@
+{
+  "spec_version": "1.4.0-otel",
+  "timestamp": "2026-04-24T00:13:03.355457Z",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "severity_text": "WARN",
+  "severity_number": 13,
+  "event_name": "swarm.agent.lifecycle.deprecated",
+  "resource": {
+    "service.name": "swarm-orchestrator",
+    "service.version": "4.2.0",
+    "deployment.environment": "production",
+    "node.id": "worker-node-aws-us-east-1a-04"
+  },
+  "attributes": {
+    "agent.id": "MacroeconomicAnalysisAgent",
+    "agent.previous_version": "v29.x",
+    "agent.target_version": "v30",
+    "deprecation.reason": "Transitioning to v30 architecture.",
+    "deprecation.action_required": true
+  },
+  "metrics": {
+    "agent.core_logic.function_count": 6,
+    "agent.capabilities.count": 0
+  },
+  "artifacts": {
+    "provenance": {
+      "repository": "git+ssh://repo/core/agents/macroeconomic_analysis_agent.py",
+      "commit_sha": "a1b2c3d4e5f6g7h8i9j0",
+      "docstring_hash": "sha256:d8c4b12389a..."
+    },
+    "extracted_capabilities": [],
+    "core_logic_signatures": [
+      {
+        "name": "__init__",
+        "ast_hash": "sha256:d5162890919d1bd0",
+        "loc": 12,
+        "source": "def __init__(self, config: Dict[str, Any], **kwargs):\n        \"\"\"\n        Initializes the MacroeconomicAnalysisAgent.\n\n        Args:\n            config: Configuration dictionary containing data sources and indicators.\n            **kwargs: Additional arguments for AgentBase (e.g., kernel).\n        \"\"\"\n        super().__init__(config, **kwargs)\n        # Defensive access to config\n        self.data_sources = config.get('data_sources', {})\n        self.indicators = config.get('indicators', ['GDP', 'inflation'])"
+      },
+      {
+        "name": "execute",
+        "ast_hash": "sha256:9ae89890ea5359f0",
+        "loc": 18,
+        "source": "async def execute(self, **kwargs) -> Dict[str, Any]:\n        \"\"\"\n        Executes the macroeconomic analysis workflow.\n\n        Args:\n            **kwargs: Context arguments (e.g. specific country or period).\n\n        Returns:\n            Dict[str, Any]: A dictionary containing insights and trend analysis.\n        \"\"\"\n        logging.info(f\"MacroeconomicAnalysisAgent executing with context: {kwargs.keys()}\")\n\n        # Delegate to the core analysis logic\n        # In a real async world, data fetching should be awaited.\n        # For now, we wrap the synchronous method.\n        insights = self.analyze_macroeconomic_data()\n\n        return insights"
+      },
+      {
+        "name": "analyze_macroeconomic_data",
+        "ast_hash": "sha256:1f25594d0c917705",
+        "loc": 48,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "analyze_gdp_trend",
+        "ast_hash": "sha256:11b542ceb7cc2235",
+        "loc": 15,
+        "source": "def analyze_gdp_trend(self, gdp_growth: Any) -> str:\n        \"\"\"\n        Analyzes the trend of GDP growth.\n        \"\"\"\n        # Placeholder logic\n        if not gdp_growth:\n            return \"neutral\"\n        # If gdp_growth is a dict with 'value' (as in test mocks)\n        if isinstance(gdp_growth, dict) and 'value' in gdp_growth:\n            val = gdp_growth['value']\n            if val > 2.0:\n                return \"positive\"\n            if val < 0.0:\n                return \"negative\"\n        return \"stable\""
+      },
+      {
+        "name": "analyze_inflation_outlook",
+        "ast_hash": "sha256:b49f6c72747a98ba",
+        "loc": 6,
+        "source": "def analyze_inflation_outlook(self, inflation_rate: Any) -> str:\n        \"\"\"\n        Analyzes the inflation outlook.\n        \"\"\"\n        # Placeholder logic\n        return \"stable\""
+      },
+      {
+        "name": "generate_reflation_report",
+        "ast_hash": "sha256:df640e8dd3c905ff",
+        "loc": 31,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      }
+    ]
+  }
+}

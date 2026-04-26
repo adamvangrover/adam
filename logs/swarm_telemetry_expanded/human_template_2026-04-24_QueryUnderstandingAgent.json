@@ -1,0 +1,68 @@
+{
+  "spec_version": "1.4.0-otel",
+  "timestamp": "2026-04-24T00:13:03.355457Z",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "severity_text": "WARN",
+  "severity_number": 13,
+  "event_name": "swarm.agent.lifecycle.deprecated",
+  "resource": {
+    "service.name": "swarm-orchestrator",
+    "service.version": "4.2.0",
+    "deployment.environment": "production",
+    "node.id": "worker-node-aws-us-east-1a-04"
+  },
+  "attributes": {
+    "agent.id": "QueryUnderstandingAgent",
+    "agent.previous_version": "v29.x",
+    "agent.target_version": "v30",
+    "deprecation.reason": "Transitioning to v30 architecture.",
+    "deprecation.action_required": true
+  },
+  "metrics": {
+    "agent.core_logic.function_count": 5,
+    "agent.capabilities.count": 0
+  },
+  "artifacts": {
+    "provenance": {
+      "repository": "git+ssh://repo/core/agents/query_understanding_agent.py",
+      "commit_sha": "a1b2c3d4e5f6g7h8i9j0",
+      "docstring_hash": "sha256:d8c4b12389a..."
+    },
+    "extracted_capabilities": [],
+    "core_logic_signatures": [
+      {
+        "name": "__init__",
+        "ast_hash": "sha256:dd76444349ec0e3a",
+        "loc": 32,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "get_available_agent_skills",
+        "ast_hash": "sha256:5216bb4515e9084b",
+        "loc": 20,
+        "source": "def get_available_agent_skills(self) -> str:\n        \"\"\"\n        Gets a formatted string of available agent skills from the orchestrator's\n        MCP service registry.\n        \"\"\"\n\n        # Assuming the orchestrator is accessible via self.orchestrator\n        # This might need to be adjusted based on how agents access the orchestrator\n        if not hasattr(self, \"orchestrator\") or not self.orchestrator:\n            # In V23 architecture, orchestration logic handles routing.\n            # This method acts as a helper for self-reflection if orchestrator is injected.\n            return \"N/A - Orchestrator Link Inactive\"\n\n        available_skills = []\n        for agent_name, skill_schema in self.orchestrator.mcp_service_registry.items():\n            for skill in skill_schema[\"skills\"]:\n                available_skills.append(\n                    f\"- Agent: {agent_name}, Skill: {skill['name']}, Description: {skill['description']}\"\n                )\n        return \"\\n\".join(available_skills)"
+      },
+      {
+        "name": "execute",
+        "ast_hash": "sha256:0bffe7ba90bf3d08",
+        "loc": 44,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "run_semantic_kernel_skill",
+        "ast_hash": "sha256:fbd56dfe1f8c9f22",
+        "loc": 28,
+        "source": "async def run_semantic_kernel_skill(self, skill_name: str, input_vars: Dict[str, str]) -> str:\n        \"\"\"\n        Executes a Semantic Kernel skill. This assumes the agent has access to\n        a Semantic Kernel instance (self.kernel).\n        \"\"\"\n        if not hasattr(self, 'kernel') or not self.kernel:\n            raise AttributeError(\"Agent does not have access to a Semantic Kernel instance (self.kernel)\")\n\n        # Get the Semantic Kernel function for the given skill name.\n        # This assumes skills are organized in a way that the skill name is also the function name.\n        # You might need to adjust this based on how your skills are registered.\n        sk_function = self.kernel.functions.get_function(skill_name)\n\n        if not sk_function:\n            raise ValueError(f\"Semantic Kernel skill '{skill_name}' not found.\")\n\n        # Create the Semantic Kernel context.\n        sk_context = self.kernel.create_new_context()\n\n        # Set input variables for the Semantic Kernel function.\n        for var_name, var_value in input_vars.items():\n            sk_context[var_name] = var_value\n\n        # Execute the Semantic Kernel function.\n        result = await self.kernel.run(sk_function, input_vars=input_vars)\n\n        # Return the result as a string.\n        return str(result)"
+      },
+      {
+        "name": "get_skill_schema",
+        "ast_hash": "sha256:f3c11289402b4328",
+        "loc": 20,
+        "source": "def get_skill_schema(self) -> Dict[str, Any]:\n        \"\"\"\n        Defines the agent's skills (MCP).\n        \"\"\"\n        return {\n            \"name\": type(self).__name__,\n            \"description\": self.config.get(\"description\", \"Understands user queries and routes them to appropriate agents.\"),\n            \"skills\": [\n                {\n                    \"name\": \"understand_query\",\n                    \"description\": \"Analyzes the user query and determines the relevant agents.\",\n                    \"inputs\": [\n                        {\"name\": \"user_query\", \"type\": \"string\", \"description\": \"The user's input query.\"}\n                    ],\n                    \"outputs\": [\n                        {\"name\": \"relevant_agents\", \"type\": \"list[string]\", \"description\": \"A list of agent names.\"}\n                    ]\n                }\n            ]\n        }"
+      }
+    ]
+  }
+}

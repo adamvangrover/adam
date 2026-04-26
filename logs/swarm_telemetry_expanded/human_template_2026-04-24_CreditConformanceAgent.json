@@ -1,0 +1,61 @@
+{
+  "spec_version": "1.4.0-otel",
+  "timestamp": "2026-04-24T00:13:03.355457Z",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "severity_text": "WARN",
+  "severity_number": 13,
+  "event_name": "swarm.agent.lifecycle.deprecated",
+  "resource": {
+    "service.name": "swarm-orchestrator",
+    "service.version": "4.2.0",
+    "deployment.environment": "production",
+    "node.id": "worker-node-aws-us-east-1a-04"
+  },
+  "attributes": {
+    "agent.id": "CreditConformanceAgent",
+    "agent.previous_version": "v29.x",
+    "agent.target_version": "v30",
+    "deprecation.reason": "Transitioning to v30 architecture.",
+    "deprecation.action_required": true
+  },
+  "metrics": {
+    "agent.core_logic.function_count": 4,
+    "agent.capabilities.count": 0
+  },
+  "artifacts": {
+    "provenance": {
+      "repository": "git+ssh://repo/core/agents/specialized/credit_conformance_agent.py",
+      "commit_sha": "a1b2c3d4e5f6g7h8i9j0",
+      "docstring_hash": "sha256:d8c4b12389a..."
+    },
+    "extracted_capabilities": [],
+    "core_logic_signatures": [
+      {
+        "name": "__init__",
+        "ast_hash": "sha256:50f3e5e28a70a745",
+        "loc": 5,
+        "source": "def __init__(self, config: Dict[str, Any], constitution: Optional[Dict[str, Any]] = None, kernel: Optional[Kernel] = None):\n        super().__init__(config, constitution, kernel)\n        self.llm_plugin = LLMPlugin(config=config.get(\"model_config\", {}))\n        self.prompt_path = \"prompt_library/AOPL-v1.0/professional_outcomes/LIB-PRO-008_credit_conformance_tier2.md\"\n        self.max_retries = 3"
+      },
+      {
+        "name": "_load_prompt",
+        "ast_hash": "sha256:cdf2b6f0ecc195e0",
+        "loc": 6,
+        "source": "def _load_prompt(self) -> str:\n        \"\"\"Loads the master prompt from file.\"\"\"\n        if not os.path.exists(self.prompt_path):\n            raise FileNotFoundError(f\"Prompt file not found at {self.prompt_path}\")\n        with open(self.prompt_path, \"r\") as f:\n            return f.read()"
+      },
+      {
+        "name": "execute",
+        "ast_hash": "sha256:1b75490856b7f02c",
+        "loc": 48,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "_extract_json",
+        "ast_hash": "sha256:82368b5b6ea2e659",
+        "loc": 14,
+        "source": "def _extract_json(self, text: str) -> str:\n        \"\"\"Extracts JSON substring from the text, handling markdown code blocks.\"\"\"\n        # Check for markdown code blocks\n        match = re.search(r\"```json\\s*(.*?)\\s*```\", text, re.DOTALL)\n        if match:\n            return match.group(1)\n\n        # Fallback: find first { and last }\n        start = text.find(\"{\")\n        end = text.rfind(\"}\")\n        if start != -1 and end != -1:\n            return text[start:end+1]\n\n        return text"
+      }
+    ]
+  }
+}

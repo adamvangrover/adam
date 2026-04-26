@@ -1,0 +1,54 @@
+{
+  "spec_version": "1.4.0-otel",
+  "timestamp": "2026-04-24T00:13:03.355457Z",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "severity_text": "WARN",
+  "severity_number": 13,
+  "event_name": "swarm.agent.lifecycle.deprecated",
+  "resource": {
+    "service.name": "swarm-orchestrator",
+    "service.version": "4.2.0",
+    "deployment.environment": "production",
+    "node.id": "worker-node-aws-us-east-1a-04"
+  },
+  "attributes": {
+    "agent.id": "HNASPAgent",
+    "agent.previous_version": "v29.x",
+    "agent.target_version": "v30",
+    "deprecation.reason": "Transitioning to v30 architecture.",
+    "deprecation.action_required": true
+  },
+  "metrics": {
+    "agent.core_logic.function_count": 3,
+    "agent.capabilities.count": 0
+  },
+  "artifacts": {
+    "provenance": {
+      "repository": "git+ssh://repo/core/agents/hnasp_agent.py",
+      "commit_sha": "a1b2c3d4e5f6g7h8i9j0",
+      "docstring_hash": "sha256:d8c4b12389a..."
+    },
+    "extracted_capabilities": [],
+    "core_logic_signatures": [
+      {
+        "name": "__init__",
+        "ast_hash": "sha256:5c24ed302dfc263a",
+        "loc": 19,
+        "source": "def __init__(self, config: Dict[str, Any], constitution: Optional[Dict[str, Any]] = None, kernel: Optional[Any] = None):\n        super().__init__(config, constitution, kernel)\n\n        # Initialize HNASP Components\n        self.lakehouse = ObservationLakehouse()  # Default path\n        self.logic_engine = LogicEngine()\n        self.personality_engine = BayesACTEngine()\n        self.llm_client = MockLLMClient()  # In real system, this would be an OpenAI client wrapper\n\n        self.state_manager = HNASPStateManager(\n            lakehouse=self.lakehouse,\n            logic_engine=self.logic_engine,\n            personality_engine=self.personality_engine,\n            llm_client=self.llm_client\n        )\n\n        self.agent_id = config.get(\"agent_id\", \"hnasp_default\")\n        self.identity_label = config.get(\"identity_label\", \"assistant\")\n        self.active_rules = config.get(\"active_rules\", {})"
+      },
+      {
+        "name": "execute",
+        "ast_hash": "sha256:513249ce391a6ee9",
+        "loc": 27,
+        "source": "async def execute(self, *args: Any, **kwargs: Any) -> Any:\n        \"\"\"\n        Executes the HNASP cycle.\n        Expected kwargs:\n            user_input: str\n            state_variables: Dict[str, Any] (optional)\n        \"\"\"\n        user_input = kwargs.get(\"user_input\", \"\")\n        state_variables = kwargs.get(\"state_variables\", {})\n\n        if not user_input:\n            logger.warning(\"HNASPAgent received empty user_input.\")\n            return \"Please provide input.\"\n\n        try:\n            # Run blocking I/O (file access) in a separate thread\n            response = await asyncio.to_thread(\n                self.state_manager.run_cycle,\n                agent_id=self.agent_id,\n                user_input=user_input,\n                state_variables=state_variables,\n                initial_rules=self.active_rules\n            )\n            return response\n        except Exception as e:\n            logger.error(f\"HNASP Execution failed: {e}\")\n            raise"
+      },
+      {
+        "name": "get_skill_schema",
+        "ast_hash": "sha256:7414a5e78d1f68cb",
+        "loc": 15,
+        "source": "def get_skill_schema(self) -> Dict[str, Any]:\n        return {\n            \"name\": \"HNASPAgent\",\n            \"description\": \"A neurosymbolic agent with deterministic logic and probabilistic personality.\",\n            \"skills\": [\n                {\n                    \"name\": \"execute\",\n                    \"description\": \"Process user input statefully via HNASP.\",\n                    \"parameters\": {\n                        \"user_input\": \"The text input from the user.\",\n                        \"state_variables\": \"Optional dictionary of logic variables (e.g. transaction_amount).\"\n                    }\n                }\n            ]\n        }"
+      }
+    ]
+  }
+}

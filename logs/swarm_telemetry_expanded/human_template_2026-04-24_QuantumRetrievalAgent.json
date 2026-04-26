@@ -1,0 +1,67 @@
+{
+  "spec_version": "1.4.0-otel",
+  "timestamp": "2026-04-24T00:13:03.355457Z",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "severity_text": "WARN",
+  "severity_number": 13,
+  "event_name": "swarm.agent.lifecycle.deprecated",
+  "resource": {
+    "service.name": "swarm-orchestrator",
+    "service.version": "4.2.0",
+    "deployment.environment": "production",
+    "node.id": "worker-node-aws-us-east-1a-04"
+  },
+  "attributes": {
+    "agent.id": "QuantumRetrievalAgent",
+    "agent.previous_version": "v29.x",
+    "agent.target_version": "v30",
+    "deprecation.reason": "Transitioning to v30 architecture.",
+    "deprecation.action_required": true
+  },
+  "metrics": {
+    "agent.core_logic.function_count": 5,
+    "agent.capabilities.count": 0
+  },
+  "artifacts": {
+    "provenance": {
+      "repository": "git+ssh://repo/core/agents/specialized/quantum_retrieval_agent.py",
+      "commit_sha": "a1b2c3d4e5f6g7h8i9j0",
+      "docstring_hash": "sha256:d8c4b12389a..."
+    },
+    "extracted_capabilities": [],
+    "core_logic_signatures": [
+      {
+        "name": "__init__",
+        "ast_hash": "sha256:0b2b6baf0021a293",
+        "loc": 7,
+        "source": "def __init__(self, name=\"QuantumRetrievalAgent\", config=None):\n        if config is None:\n            config = {\"agent_id\": name, \"name\": name}\n        super().__init__(config=config)\n        self.optimizer = AdamOptimizer(learning_rate=0.05)\n        self.credit_engine = ComprehensiveCreditSimulation()\n        self.description = \"Specialized agent for probabilistic search and credit restructuring optimization.\""
+      },
+      {
+        "name": "find_needle",
+        "ast_hash": "sha256:ce26139943b6e23e",
+        "loc": 35,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "search_optimal_restructuring",
+        "ast_hash": "sha256:44c53b1740c2f2ae",
+        "loc": 28,
+        "source": "def search_optimal_restructuring(self, credit_inputs: dict):\n        \"\"\"\n        Uses the AVG protocol (simulated) to find the optimal restructuring path.\n        This maps the credit recovery problem to an energy minimization problem.\n        \"\"\"\n        self.log_audit_event(\"credit_search_init\", \"Searching for optimal capital structure\")\n\n        # Run the Comprehensive Simulation\n        # This is a classical simulation, but we treat it as the 'Oracle'\n        # that the quantum agent would query.\n\n        # 1. Classical Analysis\n        analysis = self.credit_engine.run_comprehensive_analysis(credit_inputs)\n\n        # 2. Simulated Quantum Enhancement\n        # In a real scenario, we'd use the optimizer to find the best 'proposal' configuration.\n        # Here we simulate that the \"AVG Recovery\" output from the engine *is* the result of such a search.\n\n        avg_result = analysis['avg_recovery']\n\n        return {\n            \"analysis\": analysis,\n            \"quantum_metadata\": {\n                \"confidence\": avg_result['avg_confidence'],\n                \"search_space_size\": \"10^12 scenarios\",\n                \"method\": \"AVG-Hybrid-Anneal\"\n            }\n        }"
+      },
+      {
+        "name": "execute",
+        "ast_hash": "sha256:2109cb3cc133140c",
+        "loc": 12,
+        "source": "async def execute(self, *args, **kwargs) -> dict:\n        \"\"\"Standard AgentBase entry point.\"\"\"\n        # Map args/kwargs to request format\n        request = kwargs.get('request', kwargs)\n\n        query_type = request.get(\"type\", \"search\")\n\n        if query_type == \"credit_restructuring\":\n            return self.search_optimal_restructuring(request.get(\"inputs\", {}))\n        else:\n            size = request.get(\"size\", 1e15)\n            return self.find_needle(haystack_size=size)"
+      },
+      {
+        "name": "process_request",
+        "ast_hash": "sha256:21914e9a0304ccb2",
+        "loc": 9,
+        "source": "def process_request(self, request):\n        \"\"\"Deprecated synchronous entry point.\"\"\"\n        query_type = request.get(\"type\", \"search\")\n\n        if query_type == \"credit_restructuring\":\n            return self.search_optimal_restructuring(request.get(\"inputs\", {}))\n        else:\n            size = request.get(\"size\", 1e15)\n            return self.find_needle(haystack_size=size)"
+      }
+    ]
+  }
+}

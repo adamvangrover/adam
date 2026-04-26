@@ -1,0 +1,55 @@
+{
+  "spec_version": "1.4.0-otel",
+  "timestamp": "2026-04-24T00:13:03.355457Z",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "severity_text": "WARN",
+  "severity_number": 13,
+  "event_name": "swarm.agent.lifecycle.deprecated",
+  "resource": {
+    "service.name": "swarm-orchestrator",
+    "service.version": "4.2.0",
+    "deployment.environment": "production",
+    "node.id": "worker-node-aws-us-east-1a-04"
+  },
+  "attributes": {
+    "agent.id": "MarketMakingAgent",
+    "agent.previous_version": "v29.x",
+    "agent.target_version": "v30",
+    "deprecation.reason": "Transitioning to v30 architecture.",
+    "deprecation.action_required": true
+  },
+  "metrics": {
+    "agent.core_logic.function_count": 3,
+    "agent.capabilities.count": 0
+  },
+  "artifacts": {
+    "provenance": {
+      "repository": "git+ssh://repo/core/agents/market_making_agent.py",
+      "commit_sha": "a1b2c3d4e5f6g7h8i9j0",
+      "docstring_hash": "sha256:d8c4b12389a..."
+    },
+    "extracted_capabilities": [],
+    "core_logic_signatures": [
+      {
+        "name": "__init__",
+        "ast_hash": "sha256:0517e8e10e45a218",
+        "loc": 8,
+        "source": "def __init__(self, initial_gamma: float = 0.5, initial_sigma: float = 0.2, dt: float = 1/252):\n        self.model = AvellanedaStoikovModel(gamma=initial_gamma, sigma=initial_sigma, T=dt, k=1.5)\n        self.logger = logging.getLogger(__name__)\n        self.current_gamma = initial_gamma\n\n        # RL-like Policy Parameters\n        self.inventory_risk_threshold = 2000 # Units\n        self.volatility_threshold = 30.0"
+      },
+      {
+        "name": "adapt_strategy",
+        "ast_hash": "sha256:db6f7a2743bf1235",
+        "loc": 41,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "get_quotes",
+        "ast_hash": "sha256:91558a2af640fdac",
+        "loc": 5,
+        "source": "def get_quotes(self, mid_price: float, inventory: float, time_remaining: float) -> Tuple[float, float]:\n        \"\"\"\n        Delegates to the underlying quantitative model.\n        \"\"\"\n        return self.model.get_quotes(mid_price, inventory, time_remaining)"
+      }
+    ]
+  }
+}

@@ -1,0 +1,62 @@
+{
+  "spec_version": "1.4.0-otel",
+  "timestamp": "2026-04-24T00:13:03.355457Z",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "severity_text": "WARN",
+  "severity_number": 13,
+  "event_name": "swarm.agent.lifecycle.deprecated",
+  "resource": {
+    "service.name": "swarm-orchestrator",
+    "service.version": "4.2.0",
+    "deployment.environment": "production",
+    "node.id": "worker-node-aws-us-east-1a-04"
+  },
+  "attributes": {
+    "agent.id": "PortfolioOptimizationAgent",
+    "agent.previous_version": "v29.x",
+    "agent.target_version": "v30",
+    "deprecation.reason": "Transitioning to v30 architecture.",
+    "deprecation.action_required": true
+  },
+  "metrics": {
+    "agent.core_logic.function_count": 4,
+    "agent.capabilities.count": 0
+  },
+  "artifacts": {
+    "provenance": {
+      "repository": "git+ssh://repo/core/agents/portfolio_optimization_agent.py",
+      "commit_sha": "a1b2c3d4e5f6g7h8i9j0",
+      "docstring_hash": "sha256:d8c4b12389a..."
+    },
+    "extracted_capabilities": [],
+    "core_logic_signatures": [
+      {
+        "name": "__init__",
+        "ast_hash": "sha256:2f08b4ef0556189a",
+        "loc": 10,
+        "source": "def __init__(self, config: Dict[str, Any] = None, constitution: Dict[str, Any] = None, kernel: Any = None):\n        super().__init__(config, constitution, kernel)\n        self.risk_free_rate = self.config.get('risk_free_rate', 0.02)\n\n        if HAS_TORCH:\n            self.model = LSTMModel()\n            self.criterion = nn.MSELoss()\n            self.optimizer = optim.Adam(self.model.parameters(), lr=0.01)\n        else:\n            logging.warning(\"PyTorch not found. AI optimization disabled.\")"
+      },
+      {
+        "name": "execute",
+        "ast_hash": "sha256:d55c912a943e4ff0",
+        "loc": 26,
+        "source": "async def execute(self, *args, **kwargs):\n        \"\"\"\n        Main execution entry point.\n        Expected kwargs:\n            - historical_prices: pd.DataFrame or dict (assets as columns, date index)\n            - method: 'mean_variance' (default) or 'ai_forecast'\n        \"\"\"\n        data = kwargs.get('historical_prices')\n        method = kwargs.get('method', 'mean_variance')\n\n        if data is None:\n            return {\"status\": \"error\", \"message\": \"No historical_prices provided\"}\n\n        # Convert to DataFrame if dict\n        if isinstance(data, dict):\n            try:\n                data = pd.DataFrame(data)\n            except Exception as e:\n                return {\"status\": \"error\", \"message\": f\"Failed to convert data to DataFrame: {e}\"}\n\n        if method == 'mean_variance':\n            return self.optimize_mean_variance(data)\n        elif method == 'ai_forecast':\n            return self.optimize_ai(data)\n        else:\n            return {\"status\": \"error\", \"message\": f\"Unknown method: {method}\"}"
+      },
+      {
+        "name": "optimize_mean_variance",
+        "ast_hash": "sha256:b9a41b75af537d37",
+        "loc": 53,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "optimize_ai",
+        "ast_hash": "sha256:057b34dfc0b6ac7a",
+        "loc": 76,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      }
+    ]
+  }
+}

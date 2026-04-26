@@ -1,0 +1,48 @@
+{
+  "spec_version": "1.4.0-otel",
+  "timestamp": "2026-04-24T00:13:03.355457Z",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "severity_text": "WARN",
+  "severity_number": 13,
+  "event_name": "swarm.agent.lifecycle.deprecated",
+  "resource": {
+    "service.name": "swarm-orchestrator",
+    "service.version": "4.2.0",
+    "deployment.environment": "production",
+    "node.id": "worker-node-aws-us-east-1a-04"
+  },
+  "attributes": {
+    "agent.id": "ComplianceKYCAgent",
+    "agent.previous_version": "v29.x",
+    "agent.target_version": "v30",
+    "deprecation.reason": "Transitioning to v30 architecture.",
+    "deprecation.action_required": true
+  },
+  "metrics": {
+    "agent.core_logic.function_count": 2,
+    "agent.capabilities.count": 0
+  },
+  "artifacts": {
+    "provenance": {
+      "repository": "git+ssh://repo/core/agents/sub_agents/compliance_kyc_agent.py",
+      "commit_sha": "a1b2c3d4e5f6g7h8i9j0",
+      "docstring_hash": "sha256:d8c4b12389a..."
+    },
+    "extracted_capabilities": [],
+    "core_logic_signatures": [
+      {
+        "name": "__init__",
+        "ast_hash": "sha256:7bf97a7dad0a32ab",
+        "loc": 2,
+        "source": "def __init__(self, config: Dict[str, Any], **kwargs):\n        super().__init__(config, **kwargs)"
+      },
+      {
+        "name": "execute",
+        "ast_hash": "sha256:1eb87af3b24263a7",
+        "loc": 12,
+        "source": "async def execute(self, *args: Any, **kwargs: Any) -> Any:\n        \"\"\"\n        Main execution method for the ComplianceKYCAgent.\n        This agent will perform KYC/AML checks.\n        \"\"\"\n        # Placeholder implementation\n        print(\"Executing ComplianceKYCAgent\")\n        # In a real implementation, this would involve:\n        # 1. Receiving customer information.\n        # 2. Calling external APIs for KYC/AML checks.\n        # 3. Returning the results of the checks.\n        return {\"status\": \"success\", \"data\": \"KYC/AML checks passed\"}"
+      }
+    ]
+  }
+}

@@ -1,0 +1,72 @@
+{
+  "spec_version": "1.4.0-otel",
+  "timestamp": "2026-04-24T00:13:03.355457Z",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "severity_text": "WARN",
+  "severity_number": 13,
+  "event_name": "swarm.agent.lifecycle.deprecated",
+  "resource": {
+    "service.name": "swarm-orchestrator",
+    "service.version": "4.2.0",
+    "deployment.environment": "production",
+    "node.id": "worker-node-aws-us-east-1a-04"
+  },
+  "attributes": {
+    "agent.id": "OdysseyHubAgent",
+    "agent.previous_version": "v29.x",
+    "agent.target_version": "v30",
+    "deprecation.reason": "Transitioning to v30 architecture.",
+    "deprecation.action_required": true
+  },
+  "metrics": {
+    "agent.core_logic.function_count": 6,
+    "agent.capabilities.count": 0
+  },
+  "artifacts": {
+    "provenance": {
+      "repository": "git+ssh://repo/core/agents/orchestrators/odyssey_hub_agent.py",
+      "commit_sha": "a1b2c3d4e5f6g7h8i9j0",
+      "docstring_hash": "sha256:d8c4b12389a..."
+    },
+    "extracted_capabilities": [],
+    "core_logic_signatures": [
+      {
+        "name": "__init__",
+        "ast_hash": "sha256:24c894192e679228",
+        "loc": 11,
+        "source": "def __init__(self, config: Dict[str, Any], constitution: Optional[Dict[str, Any]] = None, kernel: Any = None):\n        super().__init__(config, constitution, kernel)\n\n        # Initialize the Knowledge Graph (The Hub's Brain)\n        self.ukg = UnifiedKnowledgeGraph()\n\n        # Load specific Odyssey configuration if not already present\n        if \"execution_protocol\" not in self.config:\n            self._load_odyssey_config()\n\n        logger.info(\"OdysseyHubAgent (Adam v25.5) initialized.\")"
+      },
+      {
+        "name": "_load_odyssey_config",
+        "ast_hash": "sha256:c7abfbe9f723dc6b",
+        "loc": 15,
+        "source": "def _load_odyssey_config(self):\n        \"\"\"Loads the v25.5 portable config to get the execution protocol.\"\"\"\n        config_path = \"config/Adam_v25.5_Portable_Config.json\"\n        if os.path.exists(config_path):\n            try:\n                with open(config_path, \"r\") as f:\n                    odyssey_config = json.load(f)\n                    # Merge specific content into self.config\n                    if \"system_prompt_content\" in odyssey_config:\n                        self.config.update(odyssey_config[\"system_prompt_content\"])\n                logger.info(f\"Loaded configuration from {config_path}\")\n            except Exception as e:\n                logger.error(f\"Failed to load Odyssey config: {e}\")\n        else:\n            logger.warning(f\"Odyssey config not found at {config_path}\")"
+      },
+      {
+        "name": "execute",
+        "ast_hash": "sha256:85c92030f31acecd",
+        "loc": 23,
+        "source": "async def execute(self, *args, **kwargs) -> Dict[str, Any]:\n        \"\"\"\n        Orchestrates the Odyssey workflow.\n        1. Ingests context into UKG.\n        2. Delegates to Spoke Agents (Mocked for now or via MetaOrchestrator).\n        3. Synthesizes results.\n        \"\"\"\n        request = kwargs.get(\"request\") or (args[0] if args else \"\")\n        ticker = kwargs.get(\"ticker\")\n\n        logger.info(f\"OdysseyHubAgent received request: {request} for ticker: {ticker}\")\n\n        # Phase 1: Semantic Grounding\n        self._semantic_grounding(ticker)\n\n        # Phase 2: Spoke Delegation (Placeholder for actual Agent calls)\n        # In a real system, this would use self.send_message() to sub-agents\n        spoke_results = await self._delegate_to_spokes(ticker)\n\n        # Phase 3: Synthesis\n        result = self._synthesize_verdict(ticker, spoke_results)\n\n        return result"
+      },
+      {
+        "name": "_semantic_grounding",
+        "ast_hash": "sha256:1ed70ebdecefba5f",
+        "loc": 8,
+        "source": "def _semantic_grounding(self, ticker: str):\n        \"\"\"Ensures the entity exists in the graph.\"\"\"\n        if not ticker:\n            return\n\n        # Check if node exists (Conceptually)\n        # In reality, we might ingest initial data here\n        logger.info(f\"Phase 1: Semantic Grounding for {ticker}\")"
+      },
+      {
+        "name": "_delegate_to_spokes",
+        "ast_hash": "sha256:7275c987879074c5",
+        "loc": 24,
+        "source": "async def _delegate_to_spokes(self, ticker: str) -> Dict[str, Any]:\n        \"\"\"Delegates analysis to CreditSentry, Market Mayhem, and Fundamental Analyst.\"\"\"\n        logger.info(\"Phase 2: Spoke Delegation\")\n\n        # Mock responses for the spokes\n        # In production, these would be: await self.send_message(\"CreditSentry\", ...)\n        results = {\n            \"CreditSentry\": {\n                \"status\": \"Success\",\n                \"covenants\": [\"Max Leverage < 4.0x\"],\n                \"leverage_check\": \"PASS\"\n            },\n            \"MarketMayhem\": {\n                \"status\": \"Success\",\n                \"contagion_risk\": \"Low\",\n                \"scenario\": \"Fractured Ouroboros - Mild\"\n            },\n            \"FundamentalAnalyst\": {\n                \"status\": \"Success\",\n                \"true_ebitda\": 15000000,\n                \"add_backs_flagged\": [\"Synergies\"]\n            }\n        }\n        return results"
+      },
+      {
+        "name": "_synthesize_verdict",
+        "ast_hash": "sha256:923d991c31b30278",
+        "loc": 25,
+        "source": "def _synthesize_verdict(self, ticker: str, spoke_results: Dict[str, Any]) -> Dict[str, Any]:\n        \"\"\"Synthesizes the final CRO report.\"\"\"\n        logger.info(\"Phase 3: Synthesis & Conviction\")\n\n        # Ingest results into UKG\n        risk_state = {\n            \"ticker\": ticker,\n            \"draft_memo\": {\n                \"recommendation\": \"BUY\" if spoke_results[\"CreditSentry\"][\"leverage_check\"] == \"PASS\" else \"HOLD\",\n                \"confidence_score\": 0.85\n            }\n            # Add other fields as per UnifiedKnowledgeGraph.ingest_risk_state expectance\n        }\n        # Safely ingest mock data\n        # self.ukg.ingest_risk_state(risk_state)\n\n        return {\n            \"agent\": \"Adam v25.5\",\n            \"role\": \"Odyssey CRO\",\n            \"ticker\": ticker,\n            \"verdict\": risk_state[\"draft_memo\"][\"recommendation\"],\n            \"rationale\": \"SNC Ratings clear. Market contagion risk low. EBITDA quality acceptable.\",\n            \"spoke_data\": spoke_results,\n            \"graph_status\": \"FIBO Verified\"\n        }"
+      }
+    ]
+  }
+}

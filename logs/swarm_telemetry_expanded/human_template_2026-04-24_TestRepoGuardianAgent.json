@@ -1,0 +1,67 @@
+{
+  "spec_version": "1.4.0-otel",
+  "timestamp": "2026-04-24T00:13:03.355457Z",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "severity_text": "WARN",
+  "severity_number": 13,
+  "event_name": "swarm.agent.lifecycle.deprecated",
+  "resource": {
+    "service.name": "swarm-orchestrator",
+    "service.version": "4.2.0",
+    "deployment.environment": "production",
+    "node.id": "worker-node-aws-us-east-1a-04"
+  },
+  "attributes": {
+    "agent.id": "TestRepoGuardianAgent",
+    "agent.previous_version": "v29.x",
+    "agent.target_version": "v30",
+    "deprecation.reason": "Transitioning to v30 architecture.",
+    "deprecation.action_required": true
+  },
+  "metrics": {
+    "agent.core_logic.function_count": 5,
+    "agent.capabilities.count": 0
+  },
+  "artifacts": {
+    "provenance": {
+      "repository": "git+ssh://repo/core/agents/governance/repo_guardian/tests/test_agent.py",
+      "commit_sha": "a1b2c3d4e5f6g7h8i9j0",
+      "docstring_hash": "sha256:d8c4b12389a..."
+    },
+    "extracted_capabilities": [],
+    "core_logic_signatures": [
+      {
+        "name": "setUp",
+        "ast_hash": "sha256:276a5c93624c2c14",
+        "loc": 3,
+        "source": "def setUp(self):\n        self.config = {\"some\": \"config\"}\n        self.agent = RepoGuardianAgent(config=self.config)"
+      },
+      {
+        "name": "test_initialization",
+        "ast_hash": "sha256:4ad10dd24b1dd09a",
+        "loc": 4,
+        "source": "def test_initialization(self):\n        self.assertIsNotNone(self.agent.tools)\n        self.assertIsNotNone(self.agent.analyzer)\n        self.assertIsNotNone(self.agent.scanner)"
+      },
+      {
+        "name": "test_run_heuristics_security",
+        "ast_hash": "sha256:d9df9283e68e3091",
+        "loc": 17,
+        "source": "def test_run_heuristics_security(self):\n        pr = PullRequest(\n            pr_id=\"PR-1\",\n            author=\"test_user\",\n            title=\"Bad PR\",\n            description=\"Adds a secret\",\n            files=[\n                FileDiff(\n                    filepath=\"config.py\",\n                    change_type=\"add\",\n                    diff_content=\"api_key = 'AKIA1234567890123456'\"\n                )\n            ]\n        )\n        comments, results = self.agent._run_heuristics(pr)\n        self.assertTrue(any(c.severity == \"critical\" and \"SECURITY\" in c.message for c in comments))\n        self.assertTrue(len(results[\"config.py\"].security_findings) > 0)"
+      },
+      {
+        "name": "test_run_heuristics_python_ast",
+        "ast_hash": "sha256:ef19fcb25ceef011",
+        "loc": 19,
+        "source": "def test_run_heuristics_python_ast(self):\n        pr = PullRequest(\n            pr_id=\"PR-2\",\n            author=\"test_user\",\n            title=\"Code PR\",\n            description=\"Adds a function\",\n            files=[\n                FileDiff(\n                    filepath=\"main.py\",\n                    change_type=\"add\",\n                    diff_content=\"def new_func(): pass\", # Not used for AST if new_content exists, but used for fallback\n                    new_content=\"def new_func():\\n    pass\"\n                )\n            ]\n        )\n        comments, results = self.agent._run_heuristics(pr)\n        # Should have missing docstring and type hints in results\n        self.assertTrue(len(results[\"main.py\"].missing_docstrings) > 0)\n        self.assertTrue(len(results[\"main.py\"].missing_type_hints) > 0)"
+      },
+      {
+        "name": "test_execute_critical_security_failure",
+        "ast_hash": "sha256:2a58533bfa9c0e54",
+        "loc": 36,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      }
+    ]
+  }
+}

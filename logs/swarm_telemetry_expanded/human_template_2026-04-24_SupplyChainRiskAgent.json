@@ -1,0 +1,99 @@
+{
+  "spec_version": "1.4.0-otel",
+  "timestamp": "2026-04-24T00:13:03.355457Z",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "severity_text": "WARN",
+  "severity_number": 13,
+  "event_name": "swarm.agent.lifecycle.deprecated",
+  "resource": {
+    "service.name": "swarm-orchestrator",
+    "service.version": "4.2.0",
+    "deployment.environment": "production",
+    "node.id": "worker-node-aws-us-east-1a-04"
+  },
+  "attributes": {
+    "agent.id": "SupplyChainRiskAgent",
+    "agent.previous_version": "v29.x",
+    "agent.target_version": "v30",
+    "deprecation.reason": "Transitioning to v30 architecture.",
+    "deprecation.action_required": true
+  },
+  "metrics": {
+    "agent.core_logic.function_count": 10,
+    "agent.capabilities.count": 0
+  },
+  "artifacts": {
+    "provenance": {
+      "repository": "git+ssh://repo/core/agents/supply_chain_risk_agent.py",
+      "commit_sha": "a1b2c3d4e5f6g7h8i9j0",
+      "docstring_hash": "sha256:d8c4b12389a..."
+    },
+    "extracted_capabilities": [],
+    "core_logic_signatures": [
+      {
+        "name": "__init__",
+        "ast_hash": "sha256:66e898ac00163722",
+        "loc": 19,
+        "source": "def __init__(self, config: Dict[str, Any], kernel: Optional[Any] = None):\n        \"\"\"\n        Initializes the SupplyChainRiskAgent.\n\n        Args:\n            config (dict): Configuration dictionary.\n            kernel (Optional[Any]): Semantic Kernel instance.\n        \"\"\"\n        super().__init__(config, kernel=kernel)\n        self.news_api_key = self.config.get('news_api_key') or os.environ.get('NEWS_API_KEY')\n        self.supplier_data = self.config.get('supplier_data', [])\n        self.transportation_routes = self.config.get('transportation_routes', [])\n        self.geopolitical_data = self.config.get('geopolitical_data', [])\n        self.web_scraping_urls = self.config.get('web_scraping_urls', [])\n        self.base_url = \"https://newsapi.org/v2/everything\"\n        self.logger = logging.getLogger(__name__)\n\n        if not self.news_api_key:\n            self.logger.warning(\"NEWS_API_KEY is not set. News fetching will fail.\")"
+      },
+      {
+        "name": "execute",
+        "ast_hash": "sha256:ae306f739eac3d79",
+        "loc": 31,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "fetch_news",
+        "ast_hash": "sha256:296cc171b0a70060",
+        "loc": 25,
+        "source": "def fetch_news(self, query, language='en', page_size=5):\n        \"\"\"\n        Fetches news articles related to the query (supply chain, geopolitical risks, etc.).\n        \"\"\"\n        if not self.news_api_key:\n            return []\n\n        params = {\n            'q': query,\n            'language': language,\n            'pageSize': page_size,\n            'apiKey': self.news_api_key\n        }\n\n        # \ud83d\udee1\ufe0f Sentinel: Added timeout to prevent DoS via slow connections\n        try:\n            response = requests.get(self.base_url, params=params, timeout=10)\n            if response.status_code == 200:\n                return response.json().get('articles', [])\n            else:\n                self.logger.error(f\"Failed to fetch news. Status code: {response.status_code}\")\n                return []\n        except requests.RequestException as e:\n            self.logger.error(f\"Request failed: {e}\")\n            return []"
+      },
+      {
+        "name": "_is_safe_url",
+        "ast_hash": "sha256:e135abf5a2aa743e",
+        "loc": 31,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "fetch_web_scraped_data",
+        "ast_hash": "sha256:1d1c573fb37fe7bf",
+        "loc": 26,
+        "source": "def fetch_web_scraped_data(self):\n        \"\"\"\n        Fetches additional data through web scraping from the provided URLs.\n        \"\"\"\n        scraped_data = []\n        for url in self.web_scraping_urls:\n            # \ud83d\udee1\ufe0f Sentinel: SSRF Protection\n            if not self._is_safe_url(url):\n                self.logger.warning(f\"Skipping unsafe URL: {url}\")\n                continue\n\n            try:\n                # Add timeout to prevent DoS via slow connections\n                response = requests.get(url, timeout=10)\n                if response.status_code == 200:\n                    soup = BeautifulSoup(response.content, 'html.parser')\n                    paragraphs = soup.find_all('p')\n                    for p in paragraphs:\n                        if p.text:\n                            scraped_data.append(p.text.strip())\n                else:\n                    self.logger.error(f\"Failed to scrape {url}. Status code: {response.status_code}\")\n            except requests.RequestException as e:\n                self.logger.error(f\"Request failed for {url}: {e}\")\n\n        return scraped_data"
+      },
+      {
+        "name": "analyze_impact",
+        "ast_hash": "sha256:104d880fa9463f6c",
+        "loc": 21,
+        "source": "def analyze_impact(self, articles):\n        \"\"\"\n        Analyze the fetched articles for keywords and return a summary of the supply chain risks.\n        \"\"\"\n        risk_summary = {'disruptions': [], 'geopolitical_risks': [], 'transportation_risks': []}\n\n        for article in articles:\n            title = article.get('title', '').lower()\n            description = article.get('description', '').lower()\n            content = article.get('content', '').lower()\n\n            for keyword in ['supply chain disruption', 'natural disaster', 'geopolitical risk', 'trade policy']:\n                if keyword in title or keyword in description or keyword in content:\n                    if 'disruption' in title or 'disruption' in description:\n                        risk_summary['disruptions'].append(article['title'])\n                    elif 'geopolitical' in title or 'trade policy' in description:\n                        risk_summary['geopolitical_risks'].append(article['title'])\n                    elif 'transportation' in title or 'transport' in description:\n                        risk_summary['transportation_risks'].append(article['title'])\n\n        return risk_summary"
+      },
+      {
+        "name": "generate_risk_map",
+        "ast_hash": "sha256:dd1c03b19deec3c1",
+        "loc": 47,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "send_alert",
+        "ast_hash": "sha256:4163dbb368b39cc9",
+        "loc": 15,
+        "source": "def send_alert(self, risks):\n        \"\"\"\n        Send alerts based on detected risks.\n        \"\"\"\n        alert_level = 0\n        for risk_type, articles in risks.items():\n            if articles:\n                alert_level += 1\n\n        if alert_level >= 3:\n            self.logger.warning(\"High supply chain risk detected! Immediate attention needed!\")\n        elif alert_level >= 1:\n            self.logger.info(\"Moderate supply chain risk detected. Monitor closely.\")\n        else:\n            self.logger.info(\"Supply chain risks are at a normal level.\")"
+      },
+      {
+        "name": "report_risks",
+        "ast_hash": "sha256:4810dd990f4e1d84",
+        "loc": 24,
+        "source": "def report_risks(self):\n        \"\"\"\n        Fetches news articles and analyzes the risks, generating a report.\n        \"\"\"\n        all_risks = {'disruptions': [], 'geopolitical_risks': [], 'transportation_risks': []}\n\n        # Fetch and analyze news articles\n        for keyword in ['supply chain disruption', 'geopolitical risk', 'transportation issues']:\n            self.logger.info(f\"Fetching news for keyword: {keyword}\")\n            articles = self.fetch_news(query=keyword)\n\n            if articles:\n                risk_analysis = self.analyze_impact(articles)\n                for risk_type in risk_analysis:\n                    all_risks[risk_type].extend(risk_analysis[risk_type])\n\n        # Fetch additional data via web scraping\n        scraped_data = self.fetch_web_scraped_data()\n        if scraped_data:\n            self.logger.info(\"Web scraping provided additional information (summary):\")\n            self.logger.info(f\"Scraped {len(scraped_data)} items.\")\n            # Optionally analyze scraped data here\n\n        return all_risks"
+      },
+      {
+        "name": "display_risk_report",
+        "ast_hash": "sha256:d0d1169c9a304f0a",
+        "loc": 12,
+        "source": "def display_risk_report(self, risks):\n        \"\"\"\n        Displays a summarized risk report.\n        \"\"\"\n        self.logger.info(\"\\nSupply Chain Risk Report:\")\n        for risk_type, articles in risks.items():\n            if articles:\n                self.logger.info(f\"\\n{risk_type.replace('_', ' ').title()}:\")\n                for article in articles:\n                    self.logger.info(f\"- {article}\")\n            else:\n                self.logger.info(f\"\\nNo {risk_type.replace('_', ' ')} detected.\")"
+      }
+    ]
+  }
+}

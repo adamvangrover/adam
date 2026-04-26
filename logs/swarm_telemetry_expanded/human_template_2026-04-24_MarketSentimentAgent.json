@@ -1,0 +1,76 @@
+{
+  "spec_version": "1.4.0-otel",
+  "timestamp": "2026-04-24T00:13:03.355457Z",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "severity_text": "WARN",
+  "severity_number": 13,
+  "event_name": "swarm.agent.lifecycle.deprecated",
+  "resource": {
+    "service.name": "swarm-orchestrator",
+    "service.version": "4.2.0",
+    "deployment.environment": "production",
+    "node.id": "worker-node-aws-us-east-1a-04"
+  },
+  "attributes": {
+    "agent.id": "MarketSentimentAgent",
+    "agent.previous_version": "v29.x",
+    "agent.target_version": "v30",
+    "deprecation.reason": "Transitioning to v30 architecture.",
+    "deprecation.action_required": true
+  },
+  "metrics": {
+    "agent.core_logic.function_count": 6,
+    "agent.capabilities.count": 0
+  },
+  "artifacts": {
+    "provenance": {
+      "repository": "git+ssh://repo/core/agents/market_sentiment_agent.py",
+      "commit_sha": "a1b2c3d4e5f6g7h8i9j0",
+      "docstring_hash": "sha256:d8c4b12389a..."
+    },
+    "extracted_capabilities": [],
+    "core_logic_signatures": [
+      {
+        "name": "__init__",
+        "ast_hash": "sha256:ae8a7fd911933492",
+        "loc": 18,
+        "source": "def __init__(self, config: Dict[str, Any], **kwargs):\n        \"\"\"\n        Initializes the MarketSentimentAgent.\n        \"\"\"\n        super().__init__(config, **kwargs)\n        self.data_sources = config.get('data_sources', [])\n        self.sentiment_threshold = config.get('sentiment_threshold', 0.5)\n\n        # Initialize sources\n        # In a real system, these might be injected or configured\n        self.news_api = SimulatedFinancialNewsAPI(self.config)\n        self.prediction_market_api = SimulatedPredictionMarketAPI()\n        self.social_media_api = SimulatedSocialMediaAPI(self.config)\n        self.web_traffic_api = SimulatedWebTrafficAPI()\n        self.data_fetcher = DataFetcher()\n        self.crypto_arbitrage_agent = CryptoArbitrageAgent(config)\n        self.options_flow_agent = OptionsFlowAgent(config)\n        self.insider_activity_agent = InsiderActivityAgent(config)"
+      },
+      {
+        "name": "execute",
+        "ast_hash": "sha256:4e08542b20682dd0",
+        "loc": 50,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "_format_output",
+        "ast_hash": "sha256:ced12be79f27826f",
+        "loc": 27,
+        "source": "def _format_output(self, result: Dict[str, Any], query: str) -> AgentOutput:\n        \"\"\"Helper to format output to AgentOutput.\"\"\"\n        sentiment_score = result.get(\"sentiment_score\", 0.0)\n        details = result.get(\"details\", {})\n\n        # Construct a textual answer\n        answer = f\"Market Sentiment Analysis for '{query}':\\n\"\n        answer += f\"Overall Sentiment Score: {sentiment_score:.2f} (0.0 Bearish - 1.0 Bullish)\\n\\n\"\n\n        if \"credit_override\" in details:\n            answer += f\"WARNING: Credit Dominance Rule Triggered: {details['credit_override']}\\n\"\n            answer += \"Sentiment has been overridden to reflect systemic risk.\\n\\n\"\n\n        answer += \"Breakdown:\\n\"\n        answer += f\"- News: {details.get('news_sentiment', 'N/A')}\\n\"\n        answer += f\"- Prediction Markets: {details.get('prediction_market_sentiment', 'N/A')}\\n\"\n        answer += f\"- Social Media: {details.get('social_media_sentiment', 'N/A')}\\n\"\n        answer += f\"- Web Traffic: {details.get('web_traffic_sentiment', 'N/A')}\\n\"\n        answer += f\"- Options Flow: {details.get('options_flow_sentiment', 'N/A')}\\n\"\n        answer += f\"- Insider Activity: {details.get('insider_activity_sentiment', 'N/A')}\\n\"\n\n        return AgentOutput(\n            answer=answer,\n            sources=[\"SimulatedFinancialNewsAPI\", \"SimulatedPredictionMarketAPI\", \"SimulatedSocialMediaAPI\", \"OptionsFlowAgent\", \"InsiderActivityAgent\"],\n            confidence=0.8, # Placeholder confidence\n            metadata=result\n        )"
+      },
+      {
+        "name": "analyze_sentiment",
+        "ast_hash": "sha256:9b9466b35080b1e7",
+        "loc": 89,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "check_credit_dominance_rule",
+        "ast_hash": "sha256:00fb3777f64cf66d",
+        "loc": 125,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "combine_sentiment",
+        "ast_hash": "sha256:1c58554424eceb13",
+        "loc": 31,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      }
+    ]
+  }
+}

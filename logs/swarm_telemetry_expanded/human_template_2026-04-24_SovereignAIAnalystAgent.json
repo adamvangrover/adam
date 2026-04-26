@@ -1,0 +1,54 @@
+{
+  "spec_version": "1.4.0-otel",
+  "timestamp": "2026-04-24T00:13:03.355457Z",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "severity_text": "WARN",
+  "severity_number": 13,
+  "event_name": "swarm.agent.lifecycle.deprecated",
+  "resource": {
+    "service.name": "swarm-orchestrator",
+    "service.version": "4.2.0",
+    "deployment.environment": "production",
+    "node.id": "worker-node-aws-us-east-1a-04"
+  },
+  "attributes": {
+    "agent.id": "SovereignAIAnalystAgent",
+    "agent.previous_version": "v29.x",
+    "agent.target_version": "v30",
+    "deprecation.reason": "Transitioning to v30 architecture.",
+    "deprecation.action_required": true
+  },
+  "metrics": {
+    "agent.core_logic.function_count": 3,
+    "agent.capabilities.count": 0
+  },
+  "artifacts": {
+    "provenance": {
+      "repository": "git+ssh://repo/core/agents/specialized/sovereign_ai_analyst_agent.py",
+      "commit_sha": "a1b2c3d4e5f6g7h8i9j0",
+      "docstring_hash": "sha256:d8c4b12389a..."
+    },
+    "extracted_capabilities": [],
+    "core_logic_signatures": [
+      {
+        "name": "__init__",
+        "ast_hash": "sha256:03c44c42bbc9a1ff",
+        "loc": 7,
+        "source": "def __init__(self, config: Dict[str, Any], kernel: Optional[Kernel] = None):\n        super().__init__(config, kernel)\n        self.persona = self.config.get('persona', \"Sovereign AI Strategy Analyst\")\n        self.description = self.config.get(\n            'description', \"Analyzes Sovereign AI adoption, AI Factories, and the Geopolitical Risk Index.\")\n        self.expertise = self.config.get(\n            'expertise', [\"Sovereign AI\", \"Geopolitics\", \"Chip Demand\", \"Energy Security\"])"
+      },
+      {
+        "name": "execute",
+        "ast_hash": "sha256:57db94ee81066a2e",
+        "loc": 25,
+        "source": "async def execute(self, **kwargs) -> Dict[str, Any]:\n        \"\"\"\n        Executes the Sovereign AI analysis.\n        \"\"\"\n        logging.info(\"Executing Sovereign AI Analysis...\")\n\n        # 1. Gather Context (Simulated or from Peer Agents)\n        # In a real scenario, this would call 'DataRetrievalAgent' for GPR index, NVDA capex, etc.\n        # Here we use the knowledge from the 2026 Outlook report.\n\n        context = {\n            \"gpr_index\": 138.5,\n            \"theme\": \"Reflationary Agentic Boom\",\n            \"key_players\": [\"US\", \"China\", \"Saudi Arabia\", \"France\", \"Japan\"],\n            \"key_companies\": [\"NVDA\", \"PLTR\", \"TSLA\"]\n        }\n\n        # 2. Reasoning (using the Persona)\n        analysis = await self._analyze_sovereign_ai_landscape(context)\n\n        return {\n            \"agent\": self.persona,\n            \"analysis\": analysis,\n            \"data_context\": context\n        }"
+      },
+      {
+        "name": "_analyze_sovereign_ai_landscape",
+        "ast_hash": "sha256:4134c597c03da6b1",
+        "loc": 17,
+        "source": "async def _analyze_sovereign_ai_landscape(self, context: Dict[str, Any]) -> str:\n        \"\"\"\n        Generates a strategic assessment of the Sovereign AI landscape.\n        \"\"\"\n        # This would typically use the LLM/Semantic Kernel.\n        # Hardcoding the logic trace for the v26.0 baseline update.\n\n        gpr = context.get('gpr_index')\n\n        narrative = (\n            f\"The Sovereign AI paradigm has shifted the demand curve for compute from cyclical to inelastic. \"\n            f\"With the GPR Index at {gpr}, nations view AI infrastructure as a defense necessity. \"\n            f\"We are witnessing the rise of 'AI Factories' in the Global South and Europe. \"\n            f\"Recommendation: Overweight hardware providers (NVDA) and sovereign OS providers (PLTR).\"\n        )\n\n        return narrative"
+      }
+    ]
+  }
+}

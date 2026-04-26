@@ -1,0 +1,48 @@
+{
+  "spec_version": "1.4.0-otel",
+  "timestamp": "2026-04-24T00:13:03.355457Z",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "severity_text": "WARN",
+  "severity_number": 13,
+  "event_name": "swarm.agent.lifecycle.deprecated",
+  "resource": {
+    "service.name": "swarm-orchestrator",
+    "service.version": "4.2.0",
+    "deployment.environment": "production",
+    "node.id": "worker-node-aws-us-east-1a-04"
+  },
+  "attributes": {
+    "agent.id": "DistressedSurveillanceAgent",
+    "agent.previous_version": "v29.x",
+    "agent.target_version": "v30",
+    "deprecation.reason": "Transitioning to v30 architecture.",
+    "deprecation.action_required": true
+  },
+  "metrics": {
+    "agent.core_logic.function_count": 2,
+    "agent.capabilities.count": 0
+  },
+  "artifacts": {
+    "provenance": {
+      "repository": "git+ssh://repo/core/agents/specialized/distressed_surveillance_agent.py",
+      "commit_sha": "a1b2c3d4e5f6g7h8i9j0",
+      "docstring_hash": "sha256:d8c4b12389a..."
+    },
+    "extracted_capabilities": [],
+    "core_logic_signatures": [
+      {
+        "name": "__init__",
+        "ast_hash": "sha256:f917d05efa6797d2",
+        "loc": 3,
+        "source": "def __init__(self, config: Dict[str, Any], kernel: Optional[Any] = None):\n        super().__init__(config, kernel=kernel)\n        self.graph = surveillance_graph_app"
+      },
+      {
+        "name": "execute",
+        "ast_hash": "sha256:bd1219912e40cae6",
+        "loc": 25,
+        "source": "async def execute(self, **kwargs) -> Dict[str, Any]:\n        \"\"\"\n        Executes the surveillance workflow.\n        Expected kwargs: sector (str)\n        \"\"\"\n        sector = kwargs.get(\"sector\", \"General\")\n        logger.info(f\"DistressedSurveillanceAgent executing for sector: {sector}\")\n\n        initial_state = init_surveillance_state(sector=sector)\n        config = {\"configurable\": {\"thread_id\": \"surveillance_1\"}}\n\n        try:\n            if hasattr(self.graph, 'ainvoke'):\n                result = await self.graph.ainvoke(initial_state, config=config)\n            else:\n                result = self.graph.invoke(initial_state, config=config)\n\n            return {\n                \"status\": \"success\",\n                \"watchlist\": result.get(\"watchlist\", []),\n                \"report\": result.get(\"final_report\", \"\")\n            }\n        except Exception as e:\n            logger.error(f\"Surveillance execution failed: {e}\")\n            return {\"status\": \"error\", \"error\": str(e)}"
+      }
+    ]
+  }
+}
