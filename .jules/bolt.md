@@ -128,3 +128,7 @@
 ## 2026-11-26 - [React.memo for Component with CSS Animations]
 **Learning:** In a streaming list (like `NewsWire.tsx`) where the first element receives a flash animation, if the rendering logic is inline, the addition of a new element forces a full re-render of all previously existing elements.
 **Action:** Extract the list item into a `React.memo` component and explicitly pass an `isNewest` prop rather than tracking the list index internally, ensuring that only the new first element and the *previous* first element re-render while the rest of the list correctly skips rendering.
+
+## 2026-04-26 - React List Optimization
+**Learning:** Extracting inner mapped elements into separate functional components wrapped in `React.memo` (like `ThoughtRow`) is highly effective at preventing O(N) re-renders during frequent interval pulses in React UI components.
+**Action:** When auditing frontend performance, specifically look for inline `.map()` functions rendering complex JSX in frequently updating components, and extract/memoize them.
