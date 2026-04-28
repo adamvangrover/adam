@@ -5,6 +5,9 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Activity, Radio, ShieldAlert, Cpu, TrendingUp, Users, Loader2 } from 'lucide-react';
 import AgentIntercom from '../components/AgentIntercom';
 import NarrativeDashboard from '../components/NarrativeDashboard';
+import MarketSentiment from '../MarketSentiment';
+import RiskAssessment from '../RiskAssessment';
+import FundamentalAnalysis from '../FundamentalAnalysis';
 
 interface MarketPulse {
     indices: Record<string, any>;
@@ -256,6 +259,25 @@ const Synthesizer: React.FC = () => {
                                 </div>
                             </div>
                         ))}
+                    </div>
+                </div>
+
+
+                {/* Embedded Signals */}
+                <div className="glass-panel" style={{ padding: '20px', gridColumn: 'span 2' }}>
+                    <h3 style={{ borderBottom: '1px solid #444', paddingBottom: '10px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <Activity size={20} color="#f0f" /> Real-time Signals Aggregation
+                    </h3>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '20px', marginTop: '20px' }}>
+                        <div style={{ background: 'rgba(0,0,0,0.4)', padding: '10px', borderRadius: '8px', border: '1px solid #333' }}>
+                            <MarketSentiment />
+                        </div>
+                        <div style={{ background: 'rgba(0,0,0,0.4)', padding: '10px', borderRadius: '8px', border: '1px solid #333' }}>
+                            <RiskAssessment data={{ risk_score: 45, breakdown: { market_risk: 'Medium', credit_risk: 'Low', liquidity_risk: 'Medium' }, summary: 'Moderate risk environment. Hold steady.' }} />
+                        </div>
+                        <div style={{ background: 'rgba(0,0,0,0.4)', padding: '10px', borderRadius: '8px', border: '1px solid #333' }}>
+                            <FundamentalAnalysis data={{ dcf_valuation: { estimated_value: 145.2, narrative_summary: 'Slightly undervalued based on projected cash flows.' }, financial_ratios: { pe_ratio: 15.4, debt_to_equity: 0.8 } }} />
+                        </div>
                     </div>
                 </div>
 
