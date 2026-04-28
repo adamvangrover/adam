@@ -5,125 +5,431 @@
 ---
 
 ## Part 1: The Developer's Bible (AGENTS.md)
-<!-- INCLUDE AGENTS.md CONTENT HERE -->
-# AGENTS.md: The Developer's Bible
+# The Adam Agent Developer's Bible
 
-> **"If it isn't in AGENTS.md, it doesn't exist."**
+> **"Code defines the body; Prompts define the mind."**
 
-## 1. Prime Directive: Bifurcation
-The codebase is strictly divided into two paths. DO NOT CROSS THE STREAMS.
+This document is the absolute source of truth for creating, modifying, and debugging agents within the Adam v26.0 ecosystem. Deviating from these standards will result in PR rejection.
 
-*   **Path A: The Product (Reliability)**
-    *   **Scope:** `core/`, `services/webapp/`, `scripts/`
-    *   **Philosophy:** "Measure twice, cut once." High test coverage, strict typing, zero hallucinations.
-    *   **Key Agents:** `FundamentalAnalyst`, `RiskManager`, `Governance`.
+---
 
-*   **Path B: The Lab (Velocity)**
-    *   **Scope:** `experimental/`, `tinker_lab/`, `prototype/`
-    *   **Philosophy:** "Move fast and break things." rapid iteration, experimental prompts, mock data allowed.
-    *   **Key Agents:** `IdeaGenerator`, `ChaosMonkey`.
+## 🧭 Navigation
 
-## 2. The Pheromone Protocol (Memory)
-Agents MUST leave pheromone trails (logs/artifacts) for others to follow.
-*   **Structured Logs:** All agents must log to `logs/swarm_telemetry.jsonl`.
-*   **Knowledge Base:** Before starting a task, read `docs/AGENTS_KNOWLEDGE_BASE.md`.
-*   **Post-Task:** Update the Knowledge Base with new findings.
+*   [The Prime Directive: Bifurcation](#the-prime-directive-bifurcation)
+*   [Pheromones & Memory Hooks](#pheromones--memory-hooks-mandatory)
+*   [Architecture: System 1 vs. System 2](#architecture-system-1-vs-system-2)
+*   [Communication Protocols](#communication-protocols)
+*   [Debugging & Tracing](#debugging--tracing)
+*   [Best Practices](#best-practices)
+*   [Swarm Protocols](#swarm-protocols--inter-agent-communication)
 
-## 3. Neuro-Symbolic Architecture
-Adam is NOT a chatbot. He is a **Neuro-Symbolic Sovereign**.
-*   **System 1 (Swarm):** Fast, async, intuitive. (e.g., News scanning, sentiment analysis).
-*   **System 2 (Graph):** Slow, deliberate, logical. (e.g., DCF Valuation, Legal Review).
-*   **The Bridge:** The `MetaOrchestrator` routes between System 1 and System 2.
+---
 
-## 4. Security & Governance
-*   **Safe Deserialization:** NEVER use `pickle.load`. Use `core.security.safe_unpickler.safe_load`.
-*   **Governance Middleware:** All high-risk actions (Trade Execution, Config Change) must pass through `services/webapp/governance.py`.
-*   **Override Protocol:** Emergency overrides require a signed HMAC token.
+## The Prime Directive: Bifurcation
+
+This repository supports two conflicting goals: **Reliability** and **Velocity**. To manage this, we strictly bifurcate the codebase.
+
+### Path A: The Product (Reliability)
+*   **Locations:** `core/agents/`, `core/credit_sentinel/`
+*   **Philosophy:** "Slow is Smooth, Smooth is Fast."
+*   **Specialized Mandates:**
+    *   **Fundamental Agent:** Forward-looking cash flow modeling, Enterprise Value (EV), and Base/Bull/Bear scenarios.
+    *   **Risk Agent:** Probability of Default, Liquidity Runway (Months), and Recovery Rate (% of Assets).
+    *   **Credit Sentinel:** Continuous monitoring via System 1 Swarm for covenant breaches and distress signals.
+*   **Requirements:**
+    *   **Strict Typing:** Pydantic models for ALL inputs/outputs.
+    *   **Defensive Coding:** `try/except` blocks around every external call.
+    *   **Auditability:** Every decision must be logged with a reasoning trace.
+    *   **No Magic Numbers:** All constants must be in a config file.
+
+### Path B: The Lab (Velocity)
+*   **Locations:** `experimental/`, `research/`, `tinker_lab/`
+*   **Philosophy:** "Move Fast and Break Things."
+*   **Requirements:**
+    *   **Minimal Overhead:** Raw dictionaries are fine.
+    *   **Optimization:** Focus on VRAM usage and token throughput.
+    *   **Experimentation:** Feel free to monkey-patch or use bleeding-edge libraries.
+
+**CRITICAL RULE:** Do not import "Lab" code into "Product" modules. The Product must be stable.
+
+---
+
+## Pheromones & Memory Hooks (MANDATORY)
+
+**"Those who cannot remember the past are condemned to repeat it."**
+
+Before writing a single line of code, you **MUST** consult the **[Agent Knowledge Base](docs/AGENTS_KNOWLEDGE_BASE.md)**.
+
+This document aggregates critical lessons from Sentinel (Security), Bolt (Architecture), Palette (UX), and the Swarm (Async).
+
+### The Pre-Flight Checklist
+1.  **Security Check:** Are you handling user input? (Check `docs/AGENTS_KNOWLEDGE_BASE.md#security`)
+2.  **Graph Check:** Are you modifying the Knowledge Graph? (Check `docs/AGENTS_KNOWLEDGE_BASE.md#architecture`)
+3.  **Frontend Check:** Are you touching the UI? (Check `docs/AGENTS_KNOWLEDGE_BASE.md#ux`)
+4.  **Logging:** If you discover a new "trap", log it in `docs/AGENTS_KNOWLEDGE_BASE.md` immediately.
+
+---
+
+## Architecture: System 1 vs. System 2
+
+Understanding where your agent fits is crucial. Adam v26.0 employs a "Hybrid Cognitive Engine" inspired by Daniel Kahneman's *Thinking, Fast and Slow*.
+
+### ⚡ System 1: The Neural Swarm (Fast & Intuitive)
+*   **Role:** The Autonomic Nervous System. Handles perception, reflexes, and continuous monitoring.
+*   **Architecture:** Event-Driven, Asynchronous Pub/Sub (Event Loop).
+*   **Base Class:** `AsyncAgentBase`
+*   **Key Characteristics:**
+    *   **Low Latency:** Reacts in milliseconds.
+    *   **High Concurrency:** Thousands of agents running in parallel.
+    *   **No Global State:** Agents act on local information (Pheromones).
+*   **Use Cases:**
+    *   Ingesting live market data via WebSocket.
+    *   Sentiment analysis of breaking news.
+    *   Anomaly detection (e.g., "Volume spike detected").
+*   **Example:** `SentinelWorker` observes a data stream and deposits a `RISK_ALERT` token if a threshold is breached.
+
+### 🧠 System 2: The Neuro-Symbolic Graph (Slow & Deliberate)
+*   **Role:** The Prefrontal Cortex. Handles reasoning, planning, complex analysis, and synthesis.
+*   **Architecture:** Directed Acyclic Graph (DAG) or Cyclic State Machine (LangGraph).
+*   **Base Class:** `TemplateAgentV26` (inherits from `OmegaAgent`)
+*   **Key Characteristics:**
+    *   **Stateful:** Maintains context across multiple steps (Memory).
+    *   **Reflective:** Can critique its own outputs and loop back to correct errors.
+    *   **Tool-Augmented:** Uses MCP tools for deterministic calculations.
+*   **Use Cases:**
+    *   Generating a 30-page "Deep Dive" credit memo.
+    *   Conducting a DCF valuation with sensitivity analysis.
+    *   Reconciling conflicting data from multiple sources.
+*   **Example:** `FundamentalAnalyst` receives a ticker, drafts a research plan, executes multiple searches, compiles financial ratios, and writes a structured report.
+
+---
+
+## Communication Protocols
+
+All "System 2" agents must adhere to the **Standard Interface**.
+
+### 1. Input Schema (`AgentInput`)
+
+```python
+from pydantic import BaseModel, Field
+from typing import Dict, Any
+
+class AgentInput(BaseModel):
+    query: str = Field(..., description="The specific question or objective.")
+    context: Dict[str, Any] = Field(default_factory=dict, description="Shared graph state (RAG data, previous results).")
+    tools: List[str] = Field(default_factory=list, description="List of allowed tool names.")
+```
+
+### 2. Output Schema (`AgentOutput`)
+
+```python
+class AgentOutput(BaseModel):
+    answer: str = Field(..., description="The final synthesized answer.")
+    sources: List[str] = Field(default_factory=list, description="List of citations (filenames, URLs).")
+    confidence: float = Field(..., ge=0.0, le=1.0, description="Conviction score (0.0 to 1.0).")
+    metadata: Dict[str, Any] = Field(default_factory=dict, description="Debug info, token usage, etc.")
+```
+
+**Constraint:** If `confidence` < 0.85, the Consensus Engine will flag the result for human review.
+
+---
+
+## Debugging & Tracing
+
+Agents are complex. Use these tools to diagnose issues.
+
+### 1. The `--debug` Flag
+Running the main script with `--debug` enables verbose logging for the Planner and Agents.
+
+```bash
+python scripts/run_adam.py --mode deep_dive --ticker AAPL --debug
+```
+
+### 2. Trace Analysis
+Look for the standard log prefixes:
+*   `[Planner]`: High-level goal decomposition.
+*   `[Orchestrator]`: Routing decisions.
+*   `[Agent:Risk]`: Specific agent logs.
+
+### 3. Common Errors
+*   **"Hallucinated Tool":** The agent tried to call a tool that isn't in `mcp.json`.
+    *   *Fix:* Check the system prompt tool definitions.
+*   **"Low Conviction":** The agent returned a generic answer because it couldn't find data.
+    *   *Fix:* Check the `context` passed to the agent. Was the RAG retrieval successful?
+
+---
+
+## Best Practices
+
+1.  **Grounding:** Every claim needs a source. If you calculate a ratio, cite the line item in the 10-K.
+2.  **Tool Use:** Agents should prefer using Tools (Python functions) over doing math in their head.
+    *   *Bad:* LLM tries to calculate `EBITDA / Interest`.
+    *   *Good:* LLM calls `calculate_ratio(ebitda, interest)`.
+3.  **Prompt Versioning:** Do not hardcode prompts. Load them from `prompt_library/AOPL-v2.0/`.
+4.  **Testing:** Write a unit test for every new agent using `pytest`. Mock the LLM response to test logic flow.
+
+---
+
+## Tool Usage (MCP)
+
+We use the **Model Context Protocol (MCP)**.
+To add a tool:
+1.  Define the function in `server/server.py`.
+2.  Register it in `mcp.json`.
+3.  Restart the server.
+
+Refer to `docs/architecture.md` for more details.
+
+---
+
+## Swarm Protocols & Inter-Agent Communication
+
+To prevent "Graph Spaghetti" and circular dependencies, follow these rules:
+
+1.  **No Direct Calls**:
+    *   Do NOT instantiate `AgentB` inside `AgentA`.
+    *   *Bad:* `result = RiskAgent().execute(...)` inside `LegalAgent`.
+    *   *Good:* Return a request to the `MetaOrchestrator` to run `RiskAgent` next.
+
+2.  **Use the Orchestrator**:
+    *   If an agent needs info from another domain, it should signal this in its output `metadata`.
+    *   Example: `metadata={"next_step": "consult_legal", "query": "Check covenants"}`.
+
+3.  **Conflict Resolution**:
+    *   If two agents (e.g., Risk and Growth) provide conflicting advice, the `ConsensusEngine` will arbitrate based on their `confidence` scores and the user's risk profile.
+
 
 ---
 
 ## Part 2: System Architecture (docs/architecture.md)
-<!-- INCLUDE docs/architecture.md CONTENT HERE -->
-# Adam v26.0 Architecture: The Neuro-Symbolic Graph
+# Adam v26.0 Architecture: The Neuro-Symbolic Sovereign
 
-## Overview
-Adam represents a paradigm shift from "Chat with PDF" to "Autonomous Financial Analysis."
-The system is built on a **Hub-and-Spoke** topology, centered around the `MetaOrchestrator`.
+## 1. Executive Summary
+Adam v26.0 represents a paradigm shift from **Generative AI** to **Agentic AI**. It is designed not just to chat, but to *execute* complex financial workflows with fiduciary-grade reliability.
 
-## Core Components
+The core architectural innovation is the **Hybrid Cognitive Engine**:
+*   **System 1 (The Swarm):** Fast, asynchronous, massively parallel. Handles news ingestion, sentiment scoring, and data fetching.
+*   **System 2 (The Graph):** Slow, synchronous, stateful. Handles deep reasoning, multi-step planning, and risk adjudication.
 
-### 1. The Brain: MetaOrchestrator (`core/engine/meta_orchestrator.py`)
-*   **Function:** Intent classification and dynamic routing.
-*   **Logic:**
-    *   If `query` contains "deep dive" -> Route to `DeepDiveGraph`.
-    *   If `query` contains "news" or "scan" -> Route to `HiveMind` (Swarm).
-    *   If `query` is generic -> Route to `SemanticRouter`.
+## 2. High-Level Diagram
 
-### 2. System 1: The Hive Mind (`core/engine/swarm/`)
-*   **Type:** Asynchronous Event Loop (Python `asyncio`).
-*   **Workers:** 5-20 lightweight agents.
-*   **Role:** High-throughput data ingestion, pattern recognition, and noise filtering.
+```mermaid
+graph TD
+    User[User / API] --> Meta[Meta Orchestrator]
 
-### 3. System 2: The Planner (`core/engine/neuro_symbolic_planner.py`)
-*   **Type:** Directed Acyclic Graph (DAG) via `LangGraph`.
-*   **Role:** Multi-step reasoning, self-correction, and report generation.
-*   **Phases:**
-    1.  **Plan:** Deconstruct the query into steps.
-    2.  **Execute:** Dispatch agents for each step.
-    3.  **Reflect:** Critique the output.
-    4.  **Refine:** Loop back if quality is low.
+    subgraph "System 1: The Swarm (Async)"
+        Meta -.->|Fast Query| Swarm[Swarm Manager]
+        Swarm --> Worker1[News Bot]
+        Swarm --> Worker2[Data Fetcher]
+        Swarm --> Worker3[Sentiment Scorer]
+        Worker1 & Worker2 & Worker3 --> MessageBus[Redis / Memory]
+    end
 
-### 4. The Body: MCP Server (`server/`)
-*   **Protocol:** Model Context Protocol (MCP).
-*   **Role:** Standardized interface for external tools (Search, Database, Terminal).
+    subgraph "System 2: The Graph (Reasoning)"
+        Meta ==>|Deep Dive| Planner[Neuro-Symbolic Planner]
+        Planner --> Graph[Execution Graph (DAG)]
 
-## Data Flow
-1.  **User Query** -> `MetaOrchestrator`
-2.  `MetaOrchestrator` -> **Context Enrichment** (RAG)
-3.  `MetaOrchestrator` -> **Route Selection** (Fast vs. Slow)
-4.  **Execution Engine** (Swarm or Graph) performs work.
-5.  **Synthesizer** aggregates results into `HyperDimensionalKnowledgeGraph`.
-6.  **Response** sent to User.
+        Graph --> NodeA[Fundamental Analysis]
+        Graph --> NodeB[Risk Modeling]
+        Graph --> NodeC[Legal Review]
+
+        NodeA & NodeB & NodeC --> Consensus[Consensus Engine]
+        Consensus -->|Low Conviction| Planner
+        Consensus -->|High Conviction| FinalOutput
+    end
+
+    MessageBus -.-> Graph
+```
+
+## 3. Core Subsystems
+
+### 3.1 The Neuro-Symbolic Planner (`core/engine`)
+Unlike standard "Auto-GPT" loops which can get stuck, Adam uses a **Planner-Executor-Critic** pattern.
+1.  **Plan:** The user's goal is broken into a fixed DAG (Directed Acyclic Graph).
+2.  **Execute:** Agents run the nodes.
+3.  **Critique:** A separate LLM call validates the output against the plan.
+
+### 3.2 The Credit Sentinel (`core/credit_sentinel`)
+This is the "Distressed Debt" specialist module.
+*   **Input:** 10-K/10-Q filings, Earnings Call Transcripts.
+*   **Process:**
+    *   **Ratio Calculator:** Deterministic Python functions (System 2) calculate EBITDA, Leverage, etc.
+    *   **Trend Watcher:** Pandas-based time-series analysis.
+    *   **Risk Analyst:** LLM-based qualitative assessment of Management Discussion & Analysis (MD&A).
+*   **Output:** A regulatory-grade Investment Memo.
+
+### 3.3 The Universal Ingestor (`core/data_processing`)
+Data integrity is paramount.
+*   **Pipeline:** Raw File -> Text Extraction (Docling) -> PII Redaction -> Chunking -> Vectorization.
+*   **Semantic Conviction:** Every chunk is scored for reliability.
+
+### 3.4 The Neural Dashboard (`webapp/`)
+A decoupled frontend that provides visibility into the "Black Box".
+*   **Visualizing Thought:** The dashboard subscribes to the `AgentIntercom` channel to show real-time reasoning steps.
+
+## 4. Tooling & Model Context Protocol (MCP)
+
+Adam v26.0 adopts the **Model Context Protocol (MCP)** to standardize how agents interact with the outside world.
+
+*   **Registry:** Tools are defined in `mcp.json`.
+*   **Execution:** The `server/` acts as the MCP host.
+*   **Workflow:**
+    1.  Agent decides to use a tool (e.g., `fetch_stock_price`).
+    2.  Agent emits a specific "Tool Call" token.
+    3.  Orchestrator intercepts the token, calls the Python function in `server/`, and returns the result to the Agent's context window.
+
+## 5. Technology Stack
+
+*   **Language:** Python 3.10+ (Core), TypeScript (Frontend).
+*   **Orchestration:** LangGraph (System 2), AsyncIO (System 1).
+*   **Database:** Neo4j (Knowledge Graph), PostgreSQL (Transactional).
+*   **LLM Interface:** LiteLLM (Abstraction layer for OpenAI, Anthropic, Local Models).
+*   **Dependency Management:** `uv` (Rust-based pip alternative).
+
+## 6. Security & Governance
+
+*   **AOF (Agentic Oversight Framework):** A set of "Guardrails" that prevent agents from taking unauthorized actions (e.g., executing trades > $1M without human approval).
+*   **Audit Trail:** Every thought and action is logged to `logfire` / Telemetry.
+
 
 ---
 
 ## Part 3: Setup & Deployment (docs/setup_guide.md)
-<!-- INCLUDE docs/setup_guide.md CONTENT HERE -->
 # Adam v26.0 Setup Guide
 
 This document provides definitive instructions for setting up the Adam environment. We strictly support **`uv`** for dependency management.
 
-## Prerequisites
-*   **OS:** Linux (Ubuntu 22.04), macOS (Ventura+), or WSL2.
-*   **Python:** 3.10+
-*   **Manager:** `uv` (from Astral).
+---
 
-## Installation
+## 📋 Table of Contents
+*   [Prerequisites](#prerequisites)
+*   [Environment Variables](#environment-variables)
+*   [Installation (Local)](#installation-local)
+*   [Docker Deployment](#docker-deployment)
+*   [Troubleshooting](#troubleshooting)
+
+---
+
+## Prerequisites
+
+*   **Operating System:**
+    *   **Linux:** Ubuntu 22.04 LTS (Recommended)
+    *   **macOS:** Ventura or newer (Apple Silicon supported)
+    *   **Windows:** WSL2 (Ubuntu 22.04) ONLY. Native Windows is not actively supported.
+*   **Python:** 3.10+
+*   **Tools:** `uv`, `git`, `curl`, `make` (optional)
+
+---
+
+## Environment Variables
+
+Adam requires a `.env` file in the project root to store secrets.
+
+1.  **Copy the Template:**
+    ```bash
+    cp .env.example .env
+    ```
+
+2.  **Configure Keys:**
+    Open `.env` and set the following:
+
+    ```ini
+    # --- LLM Providers ---
+    OPENAI_API_KEY=sk-...         # Required for Planner/Reasoning
+    ANTHROPIC_API_KEY=sk-ant...   # Optional (Recommended for Coding)
+
+    # --- Financial Data ---
+    FMP_API_KEY=...               # Financial Modeling Prep (Market Data)
+    SEC_API_KEY=...               # Optional (for 10-K fetching)
+
+    # --- Infrastructure ---
+    POSTGRES_URI=postgresql://user:pass@localhost:5432/adam
+    REDIS_URL=redis://localhost:6379/0
+    ```
+
+---
+
+## Installation (Local)
 
 ### 1. Install `uv`
+If you haven't already:
 ```bash
 curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
+*Restart your shell after installation.*
 
-### 2. Clone & Sync
+### 2. Clone the Repository
 ```bash
 git clone https://github.com/adamvangrover/adam.git
 cd adam
+```
+
+### 3. Sync Dependencies
+This command creates the virtual environment (`.venv`) and installs all locked dependencies.
+```bash
+# This will install dependencies from pyproject.toml/requirements.txt
 uv sync
+```
+
+### 4. Activate Environment
+```bash
 source .venv/bin/activate
 ```
 
-### 3. Environment Variables
-Copy `.env.example` to `.env` and configure:
-*   `OPENAI_API_KEY`: Required for Planner.
-*   `FMP_API_KEY`: Required for Market Data.
-*   `GOVERNANCE_OVERRIDE_SECRET`: Optional (for security overrides).
+### 5. Verify Installation
+Run the help command to ensure the CLI is working.
+```bash
+uv run python scripts/run_adam.py --help
+```
+
+---
 
 ## Docker Deployment
+
+For production or isolated testing, use Docker Compose.
+
 ```bash
+# 1. Build and Start
 docker-compose up --build -d
+
+# 2. View Logs
+docker-compose logs -f app
+
+# 3. Stop
+docker-compose down
 ```
-Access the dashboard at `http://localhost:80`.
+
+The Web Interface will be available at `http://localhost:80` (or `http://localhost:3000` depending on configuration).
+
+---
+
+## Troubleshooting
+
+### 1. `uv: command not found`
+*   **Cause:** The installer didn't update your PATH.
+*   **Fix:** Add `export PATH="$HOME/.cargo/bin:$PATH"` to your `~/.bashrc` or `~/.zshrc`.
+
+### 2. `libmagic` Error (ImportError: failed to find libmagic)
+*   **Cause:** The `python-magic` library requires a system-level dependency for file type detection.
+*   **Fix:**
+    *   **Ubuntu:** `sudo apt-get install libmagic1`
+    *   **macOS:** `brew install libmagic`
+
+### 3. Docker "Port Already in Use"
+*   **Cause:** Another service is running on port 5000 or 5432.
+*   **Fix:**
+    1.  Find the process: `sudo lsof -i :5000`
+    2.  Kill it: `kill -9 <PID>`
+    3.  Or, change the port mapping in `docker-compose.yml`.
+
+### 4. LLM "Rate Limit Exceeded"
+*   **Cause:** You ran out of OpenAI credits.
+*   **Fix:** Check your billing status or switch to a local model in `config/models.yaml`.
+
+### 5. Missing Modules (e.g., `yaml`, `pydantic_settings`)
+*   **Cause:** The virtual environment is not activated or dependencies are out of sync.
+*   **Fix:** Ensure you ran `uv sync` and `source .venv/bin/activate`.
+
 
 ---
 
