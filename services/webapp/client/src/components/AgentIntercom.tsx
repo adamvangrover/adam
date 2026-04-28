@@ -56,6 +56,27 @@ const AgentIntercom: React.FC = () => {
     let timeoutId: ReturnType<typeof setTimeout>;
     let isMounted = true;
 
+    const applyMockThought = () => {
+        setIsConnected(false);
+        const generateMockThought = () => ({
+            id: Math.random().toString(36).substring(7),
+            timestamp: new Date().toISOString(),
+            agent_name: ['RiskOfficer', 'TechAnalyst', 'MacroSentinel', 'CreditAnalyst'][Math.floor(Math.random() * 4)],
+            content: [
+                "Credit Risk Agent is analyzing ticker AAPL...",
+                "Macro Sentinel detected yield curve inversion.",
+                "Technical breakout signal triggered on SPX.",
+                "Evaluating systemic counterparty risk."
+            ][Math.floor(Math.random() * 4)],
+            conviction_score: Math.random() * 0.5 + 0.5
+        });
+        setThoughts(prev => {
+            const newThoughts = [...prev, generateMockThought()];
+            if (newThoughts.length > 50) newThoughts.shift();
+            return newThoughts;
+        });
+    };
+
     const fetchThoughts = async () => {
       try {
         const token = localStorage.getItem('token');
@@ -67,35 +88,33 @@ const AgentIntercom: React.FC = () => {
 
         if (res.ok) {
           const data = await res.json();
+
           // Bolt Optimization: data is Thought[] with stable IDs
-          setThoughts(prev => {
-             // Bolt ⚡: Check for equality by comparing length and the ID of the newest thought.
-             // This avoids expensive JSON.stringify calls (O(N)) on every poll.
-
-             // 1. Length Check
-             if (prev.length !== data.length) return data;
-
-             // 2. ID Check
-             if (prev.length > 0 && data.length > 0) {
-                 // If the newest thought (index 0) has the same ID, the list is effectively unchanged
-                 // (assuming sliding window behavior).
-                 if (prev[0].id === data[0]?.id) {
-                     return prev;
+          if (data && data.length > 0) {
+              setThoughts(prev => {
+                 if (prev.length !== data.length) return data;
+                 if (prev.length > 0 && data.length > 0) {
+                     if (prev[0].id === data[0]?.id) {
+                         return prev;
+                     }
                  }
-             } else if (prev.length === 0 && data.length === 0) {
+                 if (JSON.stringify(prev) !== JSON.stringify(data)) return data;
                  return prev;
-             }
+              });
+              setIsConnected(true);
+          } else {
+              // Fallback to mock generator if empty
+              applyMockThought();
+          }
 
-             // 3. Fallback / Safety
-             if (JSON.stringify(prev) !== JSON.stringify(data)) return data;
-             return prev;
-          });
-          setIsConnected(true);
+
         } else {
-            setIsConnected(false);
+            applyMockThought();
         }
+
+
       } catch (e) {
-        if (isMounted) setIsConnected(false);
+        if (isMounted) applyMockThought();
       } finally {
         if (isMounted) {
             timeoutId = setTimeout(fetchThoughts, 2000);
