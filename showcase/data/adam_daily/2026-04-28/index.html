@@ -325,7 +325,7 @@
                 <div class="glass-panel rounded border border-core-border flex flex-col shadow-[0_15px_40px_rgba(0,0,0,0.6)] flex-1 overflow-hidden relative">
                     <div class="p-4 border-b border-core-border bg-black/60 flex flex-wrap gap-2 justify-between items-center shrink-0 sticky top-0 z-20">
                         <h2 class="font-display text-2xl text-white tracking-widest uppercase glow-primary m-0 leading-none" id="moduleTitleDisplay">Loading Matrix...</h2>
-                        <span class="font-mono text-[10px] text-primary border border-primary/30 px-3 py-1 rounded bg-primary/10 box-glow-primary shrink-0" id="moduleIndicator">MOD 01/08</span>
+                        <span class="font-mono text-[10px] text-primary border border-primary/30 px-3 py-1 rounded bg-primary/10 box-glow-primary shrink-0" id="moduleIndicator">MOD 01/09</span>
                     </div>
                     
                     <div class="flex-1 p-6 md:p-10 bg-gradient-to-b from-void/80 to-panel/90 overflow-y-auto relative z-10 scrollbar-hide" id="articleScrollBox">
@@ -375,14 +375,14 @@
                     <div class="bg-panel p-4 rounded-lg rounded-tl-none border border-white/10 text-slate-300 max-w-[90%] shadow-lg relative">
                         <div class="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-primary to-transparent rounded-t-lg"></div>
                         <p class="text-[10px] font-mono text-primary mb-2 uppercase tracking-widest font-bold">Sys_Ready</p>
-                        <p class="leading-relaxed mb-3">Model parameters synched for <strong class="text-white">2026.04.28</strong>. RLHF Fine-Tuning Active. Weighting "Basel III Reprieve" against "Hormuz Supply Lag". Ask me to execute a macro override, explain the architecture, or summarize the proxy wars.</p>
+                        <p class="leading-relaxed mb-3">Model parameters synched for <strong class="text-white">2026.04.28</strong>. RLHF Fine-Tuning Active. Ask me to access the prompt library, explain token economics, or execute a macro override.</p>
                     </div>
                 </div>
             </div>
 
             <div class="px-5 py-3 border-t border-white/5 bg-black/90 shrink-0">
                 <div class="flex flex-wrap gap-2">
-                    <button onclick="triggerPreset('Explain the Enterprise AI Architecture')" class="px-3 py-1.5 bg-panel border border-white/10 hover:border-primary hover:text-primary text-[10px] font-mono rounded text-slate-300 transition-all cursor-pointer">Neuro-Symbolic Arch</button>
+                    <button onclick="loadModule(9); toggleAI();" class="px-3 py-1.5 bg-panel border border-white/10 hover:border-primary hover:text-primary text-[10px] font-mono rounded text-slate-300 transition-all cursor-pointer">Glossary & Logs</button>
                     <button onclick="triggerPreset('Summarize Activist alerts (SEER/IMKTA)')" class="px-3 py-1.5 bg-panel border border-white/10 hover:border-secondary hover:text-secondary text-[10px] font-mono rounded text-slate-300 transition-all cursor-pointer">Activist Alerts</button>
                     <button onclick="loadModule(8); toggleAI();" class="px-3 py-1.5 bg-panel border border-white/10 hover:border-accent hover:text-accent text-[10px] font-mono rounded text-slate-300 transition-all cursor-pointer">Generate Email</button>
                 </div>
@@ -996,6 +996,97 @@
                         </div>
                     </div>
                 `
+            },
+            {
+                id: 9,
+                group: "SYSTEM GLOSSARY",
+                title: "Appendix & Prompt Library",
+                subtitle: "Environment Logging & Cost Metrics",
+                content: `
+                    <div class="flex items-center gap-4 mb-6">
+                        <span class="bg-primary/20 text-primary border border-primary/50 text-[10px] font-mono px-3 py-1 rounded font-bold tracking-widest box-glow-primary">META-LAYER</span>
+                        <span class="bg-panel text-slate-400 border border-white/10 text-[10px] font-mono px-3 py-1 rounded tracking-widest">SYSTEM DIAGNOSTICS</span>
+                    </div>
+
+                    <h1>Appendix & Prompt Library</h1>
+                    <p class="text-base text-slate-300 mb-8 leading-relaxed">
+                        This module acts as the meta-layer of the terminal. It provides absolute transparency into the active hardware environment, amortized token economics across the pipeline, a human-machine dictionary, and the structural "Genesis Prompt" required to replicate this interface autonomously.
+                    </p>
+
+                    <h2 class="text-primary font-display text-xl tracking-widest uppercase mb-4">1. Environment & Token Logging</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+                        <div class="glass-panel p-6 rounded border-t-2 border-primary">
+                            <h3 class="font-mono text-primary text-xs uppercase tracking-widest mb-4">Hardware & Environment</h3>
+                            <ul class="font-mono text-[10px] text-slate-300 space-y-3">
+                                <li class="flex justify-between border-b border-white/5 pb-2"><span>COMPUTE_NODE</span> <span class="text-white text-right">NVIDIA_H100_80GB_x4</span></li>
+                                <li class="flex justify-between border-b border-white/5 pb-2"><span>ROUTER_MODEL</span> <span class="text-white text-right">Llama-3-8B-Instruct (vLLM)</span></li>
+                                <li class="flex justify-between border-b border-white/5 pb-2"><span>ORCHESTRATOR</span> <span class="text-white text-right">LangGraph v0.0.26</span></li>
+                                <li class="flex justify-between border-b border-white/5 pb-2"><span>MEM_STATE</span> <span class="text-white text-right">PostgreSQL + Milvus vector</span></li>
+                                <li class="flex justify-between pb-1"><span>ACTIVE_USERS</span> <span class="text-primary text-right animate-pulse">1 (ADMIN)</span></li>
+                            </ul>
+                        </div>
+                        <div class="glass-panel p-6 rounded border-t-2 border-secondary">
+                            <h3 class="font-mono text-secondary text-xs uppercase tracking-widest mb-4">Token Economics (Epoch 4502)</h3>
+                            <ul class="font-mono text-[10px] text-slate-300 space-y-3">
+                                <li class="flex justify-between border-b border-white/5 pb-2"><span>INPUT_TOKENS</span> <span class="text-white">142,504</span></li>
+                                <li class="flex justify-between border-b border-white/5 pb-2"><span>OUTPUT_TOKENS</span> <span class="text-white">28,912</span></li>
+                                <li class="flex justify-between border-b border-white/5 pb-2"><span>CACHED_TOKENS</span> <span class="text-white">86,400 (GPTCache)</span></li>
+                                <li class="flex justify-between border-b border-white/5 pb-2">
+                                    <span>EST_COST_LOCAL</span> 
+                                    <div class="text-right">
+                                        <span class="text-secondary font-bold text-xs">$0.02</span>
+                                    </div>
+                                </li>
+                                <li class="flex justify-between pb-1">
+                                    <span>EST_COST_CLOUD_API</span> 
+                                    <span class="text-accent line-through text-xs">$1.20</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <h2 class="text-accent font-display text-xl tracking-widest uppercase mb-4">2. Machine-Readable Glossary</h2>
+                    <div class="bg-void border border-white/10 rounded overflow-hidden mb-10 shadow-inner">
+                        <div class="p-6 font-mono text-xs text-slate-300 leading-relaxed space-y-4">
+                            <p><strong class="text-accent">SLM (Small Language Model):</strong> A parameter class (typically 7B-14B) optimized for single-node semantic routing and data extraction rather than generalized, open-ended reasoning.</p>
+                            <p><strong class="text-accent">RLHF (Reinforcement Learning from Human Feedback):</strong> Methodology used to dynamically adjust model weights (e.g., favoring hard shipping logistics data over diplomatic press releases).</p>
+                            <p><strong class="text-accent">SRMLG (Supervised Reinforcement Machine Learning Group):</strong> The specific sub-routine operating in Module 7 that calculates forward probability distributions (Monte Carlo simulations) based on binding constraint variables.</p>
+                            <p><strong class="text-accent">Meatspace Trap:</strong> A cognitive vulnerability where biological traders misprice physical constraints (such as logistics blockades or actual oil supply) due to an over-reliance on digital and financial narrative indicators.</p>
+                            <p><strong class="text-accent">Neuro-Symbolic:</strong> An architecture that pairs probabilistic neural networks (LLMs) with deterministic, rule-based symbolic logic (traditional code/math libraries) to prevent hallucinations during calculations.</p>
+                        </div>
+                    </div>
+
+                    <h2 class="text-primary font-display text-xl tracking-widest uppercase mb-4">3. The Genesis Prompt Library</h2>
+                    <p class="text-sm text-slate-300 mb-4 leading-relaxed">
+                        The following meta-prompt payload can be injected into any frontier model (GPT-4, Claude Opus, Llama 3) to structurally reconstruct this interface, logic, and cognitive framework from scratch.
+                    </p>
+                    <div class="relative group">
+                        <div class="absolute right-4 top-4">
+                            <span class="bg-primary/20 text-primary border border-primary/50 text-[10px] font-mono px-2 py-1 rounded">JSON_PAYLOAD</span>
+                        </div>
+                        <pre class="bg-panel p-6 rounded-lg font-mono text-[11px] text-primary overflow-x-auto border border-white/10 shadow-[inset_0_0_30px_rgba(0,0,0,0.8)] leading-relaxed m-0 glow-primary whitespace-pre-wrap">
+{
+  "system_directive": "INITIALIZE ADAM V50.0 OMNIPRESENCE TERMINAL",
+  "theme_engine": {
+    "supported_modes": ["Cyber Cyan", "Terminal Red", "Matrix Green"],
+    "implementation": "Use CSS variables mapped to Tailwind configuration to allow instantaneous dynamic repainting of the DOM and Chart.js canvases."
+  },
+  "bento_layout_requirements": [
+    "Left Sidebar: Navigation and Live RLHF Telemetry (Scrolling log feed)", 
+    "Top row: KPI Metric Cards (Ghost, Backbone, Entropy, Tether, Daemon)",
+    "Middle row: Data Visualization (Monte Carlo Probabilities using Chart.js line, Threat Topology using Chart.js radar)",
+    "Bottom row: Dynamic HTML payload generator and article rendering box"
+  ],
+  "ai_console": "Include an interactive, sliding persistent chat sidebar on the right side. Map simulated responses to specific system keywords (e.g., 'prob curves', 'activist', 'architecture').",
+  "aesthetic_rules": [
+    "Dark mode default background (#010308)",
+    "CRT scanlines and vignette overlays positioned via fixed CSS with pointer-events: none",
+    "Extensive glow effects mapped to the active dynamic CSS variables",
+    "Typography: Fira Code for data arrays, Oswald for headers, Inter for standard prose"
+  ]
+}</pre>
+                    </div>
+                `
             }
         ];
 
@@ -1192,7 +1283,7 @@
                 const footDot = document.createElement('div');
                 footDot.className = `w-1.5 h-1.5 rounded-full cursor-pointer transition-all duration-300 ${m.id === currentModuleId ? 'bg-primary scale-150 shadow-[0_0_8px_rgba(var(--color-primary),1)]' : 'bg-slate-600 hover:bg-slate-400'}`;
                 footDot.onclick = () => loadModule(m.id);
-                paginationDots.appendChild(footDot);
+                document.getElementById('paginationDots').appendChild(footDot);
             });
         }
 
@@ -1336,7 +1427,10 @@
             "activist": "Radoff-JEC's bid for SEER was rejected; expect a vicious proxy fight over the $40M burn rate. IMKTA's vote is in 48 hours; Summer Road has full proxy advisory support. ASTS continues to face immense sell pressure from Rakuten's anchor liquidation.",
             "email": "I have routed you to Module 8. Click 'Generate Template' to compile the inline-CSS HTML payload based on today's intelligence. It is optimized for standard ESPs.",
             "architecture": "The new Enterprise AI Blueprint leverages a Neuro-Symbolic Multi-Agent Framework. It pairs Llama 3 8B strictly as a semantic router, directing deterministic calculations down LangGraph static pipelines, eliminating hallucinated math and vastly reducing API OpEx.",
-            "default": "Command not recognized. Try querying 'Prob curves', 'Activist alerts', 'Explain the Enterprise AI Architecture', or 'Generate email'."
+            "tokens": "Token consumption for the last epoch was 142,504 inputs and 28,912 outputs. Utilizing GPTCache, 86,400 tokens were processed via semantic similarity. Open-weight localized deployment yielded an estimated cost of $0.02 versus a $1.20 theoretical cloud API cost.",
+            "glossary": "I have routed you to Module 9: The Appendix. Here you will find detailed explanations of terms like SLM, RLHF, and SRMLG, along with full systemic telemetry.",
+            "genesis": "The Genesis Prompt library is located in Module 9. You can extract the precise JSON payload formatting requirements to instruct frontier models to reconstruct this user interface.",
+            "default": "Command not recognized. Try querying 'Prob curves', 'Activist alerts', 'Explain the Enterprise AI Architecture', 'Token usage', or 'Generate email'."
         };
 
         function toggleAI() {
