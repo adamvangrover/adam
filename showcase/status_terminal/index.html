@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOVEREIGN // STATUS TERMINAL</title>
+    <style>
+        :root {
+            --bg-base: #0a0a0c;
+            --bg-panel: #111116;
+            --bg-panel-hover: #1a1a24;
+            --text-main: #d1d5db;
+            --text-muted: #6b7280;
+            --neon-blue: #0ea5e9;
+            --neon-green: #10b981;
+            --neon-red: #ef4444;
+            --neon-amber: #f59e0b;
+            --border-color: #27272a;
+            --border-highlight: #3f3f46;
+        }
+
+        * {
+            box-sizing: border-box;
+            scrollbar-width: thin;
+            scrollbar-color: var(--border-color) var(--bg-base);
+        }
+
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-main);
+            font-family: 'Fira Code', 'JetBrains Mono', 'Courier New', monospace;
+            margin: 0;
+            padding: 16px;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background-image:
+                linear-gradient(rgba(14, 165, 233, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(14, 165, 233, 0.03) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        h1, h2, h3, h4 {
+            color: var(--neon-blue);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-top: 0;
+            font-weight: 600;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-highlight);
+            padding-bottom: 16px;
+            margin-bottom: 16px;
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-title h1 {
+            margin: 0;
+            font-size: 1.5rem;
+            text-shadow: 0 0 10px rgba(14, 165, 233, 0.3);
+        }
+
+        .blink {
+            animation: blinker 1s linear infinite;
+            color: var(--neon-green);
+        }
+
+        @keyframes blinker {
+            50% { opacity: 0; }
+        }
+
+        input[type="text"], input[type="number"] {
+            background-color: var(--bg-base);
+            border: 1px solid var(--border-highlight);
+            color: var(--neon-blue);
+            padding: 8px 12px;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        input[type="text"]:focus, input[type="number"]:focus {
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 8px rgba(14, 165, 233, 0.2);
+        }
+
+        .container {
+            display: flex;
+            gap: 16px;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .panel {
+            background-color: rgba(17, 17, 22, 0.85);
+            border: 1px solid var(--border-highlight);
+            backdrop-filter: blur(4px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* LEFT PANEL: Directory */
+        .directory-panel {
+            flex: 0 0 350px;
+            overflow: hidden;
+        }
+
+        .search-bar {
+            padding: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .search-bar input {
+            width: 100%;
+        }
+
+        .table-container {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        th {
+            background-color: var(--bg-base);
+            color: var(--text-muted);
+            padding: 10px;
+            text-align: left;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            border-bottom: 1px solid var(--border-highlight);
+            cursor: pointer;
+            user-select: none;
+        }
+
+        th:hover {
+            color: var(--neon-blue);
+        }
+
+        td {
+            padding: 10px;
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+        }
+
+        tr:hover td {
+            background-color: var(--bg-panel-hover);
+        }
+
+        .selected-row td {
+            background-color: rgba(14, 165, 233, 0.1);
+            border-left: 3px solid var(--neon-blue);
+        }
+
+        /* RIGHT PANEL: Details & Models */
+        .details-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .details-header {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-highlight);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .details-header h2 {
+            margin: 0;
+            font-size: 1.25rem;
+        }
+
+        .action-btns {
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            background-color: transparent;
+            border: 1px solid var(--border-highlight);
+            color: var(--text-main);
+            padding: 6px 12px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            transition: all 0.2s;
+        }
+
+        button:hover {
+            border-color: var(--neon-blue);
+            color: var(--neon-blue);
+        }
+
+        .btn-export:hover {
+            border-color: var(--neon-green);
+            color: var(--neon-green);
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+            background-color: var(--bg-base);
+        }
+
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .tab:hover {
+            color: var(--text-main);
+            background-color: var(--bg-panel);
+        }
+
+        .tab.active {
+            color: var(--neon-blue);
+            border-bottom-color: var(--neon-blue);
+            background-color: rgba(14, 165, 233, 0.05);
+        }
+
+        .tab-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Interactive Models Layout */
+        .model-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        .model-section {
+            border: 1px solid var(--border-color);
+            padding: 16px;
+            background-color: var(--bg-base);
+        }
+
+        .model-section h3 {
+            font-size: 1rem;
+            margin-bottom: 16px;
+            border-bottom: 1px dashed var(--border-highlight);
+            padding-bottom: 8px;
+        }
+
+        .input-group {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            font-size: 0.9rem;
+        }
+
+        .input-group label {
+            color: var(--text-muted);
+        }
+
+        .input-group input {
+            width: 120px;
+            text-align: right;
+        }
+
+        .output-group {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border-highlight);
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .output-val {
+            color: var(--neon-green);
+            text-shadow: 0 0 5px rgba(16, 185, 129, 0.4);
+        }
+
+        .output-val.negative {
+            color: var(--neon-red);
+            text-shadow: 0 0 5px rgba(239, 68, 68, 0.4);
+        }
+
+        /* Raw JSON view */
+        pre {
+            margin: 0;
+            color: var(--neon-green);
+            font-size: 0.85rem;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        /* Utilities */
+        .risk-high { color: var(--neon-red); }
+        .risk-med { color: var(--neon-amber); }
+        .risk-low { color: var(--neon-green); }
+
+        .instructions {
+            background-color: rgba(239, 68, 68, 0.1);
+            border: 1px solid var(--neon-red);
+            padding: 16px;
+            margin-bottom: 16px;
+            color: var(--text-main);
+        }
+
+        /* Summary Cards */
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .card {
+            background-color: var(--bg-base);
+            border: 1px solid var(--border-highlight);
+            padding: 16px;
+            border-left: 3px solid var(--neon-blue);
+        }
+
+        .card-title {
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .card-val {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-title">
+            <span class="blink">●</span>
+            <h1>SOVEREIGN // OMNI-TERMINAL</h1>
+        </div>
+        <div>
+            <span style="color: var(--text-muted); font-size: 0.8rem;">PROTOCOL: ARCHITECT_INFINITE | ENV: PROD</span>
+        </div>
+    </header>
+
+    <div id="instructionsPanel" class="instructions" style="display: none;">
+        <strong>[ERR_CORS_POLICY_VIOLATION]</strong> Cannot load local JSONL file via file:// protocol.
+        <br><br>
+        Execute the following from the project root to initialize the data relay:<br>
+        <code style="color: var(--neon-green);">> python -m http.server 8000</code><br>
+        <code style="color: var(--neon-green);">> open http://localhost:8000/showcase/status_terminal/index.html</code>
+    </div>
+
+    <div class="container">
+        <!-- LEFT PANEL -->
+        <div class="panel directory-panel">
+            <div class="search-bar">
+                <input type="text" id="searchInput" placeholder="> FILTER ENTITIES..." onkeyup="filterTable()">
+            </div>
+            <div class="table-container">
+                <table id="dataTable">
+                    <thead>
+                        <tr>
+                            <th onclick="sortTable(0)">ENTITY</th>
+                            <th onclick="sortTable(1)">RISK</th>
+                            <th onclick="sortTable(2)">DATE</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <!-- Rows injected by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- RIGHT PANEL -->
+        <div class="panel details-panel" id="detailsWrapper" style="opacity: 0.3; pointer-events: none;">
+            <div class="details-header">
+                <h2 id="detailTitle">AWAITING SELECTION...</h2>
+                <div class="action-btns">
+                    <button class="btn-export" onclick="exportProfile()">EXPORT .JSON</button>
+                </div>
+            </div>
+
+            <div class="tabs">
+                <div class="tab active" onclick="switchTab('overview')">OVERVIEW</div>
+                <div class="tab" onclick="switchTab('dcf')">DCF / EV MODEL</div>
+                <div class="tab" onclick="switchTab('risk')">CREDIT RISK (PD/LGD)</div>
+                <div class="tab" onclick="switchTab('raw')">RAW PAYLOAD</div>
+            </div>
+
+            <!-- OVERVIEW TAB -->
+            <div class="tab-content active" id="tab-overview">
+                <div class="summary-cards">
+                    <div class="card">
+                        <div class="card-title">IMPLIED EV</div>
+                        <div class="card-val" id="ov-ev">--</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">CREDIT RATING / PD</div>
+                        <div class="card-val" id="ov-rating">--</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">SYSTEM SCORE</div>
+                        <div class="card-val" id="ov-score">--</div>
+                    </div>
+                </div>
+                <h3 style="border-bottom: 1px solid var(--border-highlight); padding-bottom: 8px;">EXECUTIVE SUMMARY</h3>
+                <div id="ov-summary" style="line-height: 1.6; color: var(--text-main); font-size: 0.95rem;">
+                    --
+                </div>
+            </div>
+
+            <!-- DCF MODEL TAB -->
+            <div class="tab-content" id="tab-dcf">
+                <div class="model-grid">
+                    <div class="model-section">
+                        <h3>INPUT PARAMETERS</h3>
+                        <div class="input-group">
+                            <label>Base FCF ($M)</label>
+                            <input type="number" id="inp-fcf" step="0.1" oninput="calcDCF()">
+                        </div>
+                        <div class="input-group">
+                            <label>WACC (%)</label>
+                            <input type="number" id="inp-wacc" step="0.001" oninput="calcDCF()">
+                        </div>
+                        <div class="input-group">
+                            <label>Terminal Growth (%)</label>
+                            <input type="number" id="inp-growth" step="0.001" oninput="calcDCF()">
+                        </div>
+                        <div class="input-group">
+                            <label>Total Debt ($M)</label>
+                            <input type="number" id="inp-debt" step="0.1" oninput="calcDCF()">
+                        </div>
+                        <div class="input-group">
+                            <label>Cash ($M)</label>
+                            <input type="number" id="inp-cash" step="0.1" oninput="calcDCF()">
+                        </div>
+                        <div class="input-group">
+                            <label>Shares Out. (M)</label>
+                            <input type="number" id="inp-shares" step="0.1" oninput="calcDCF()">
+                        </div>
+                    </div>
+                    <div class="model-section">
+                        <h3>IMPLIED OUTPUTS</h3>
+                        <div class="output-group" style="margin-top: 0; padding-top: 0; border: none;">
+                            <label>Terminal Value</label>
+                            <span class="output-val" id="out-tv">--</span>
+                        </div>
+                        <div class="output-group">
+                            <label>Enterprise Value (EV)</label>
+                            <span class="output-val" id="out-ev">--</span>
+                        </div>
+                        <div class="output-group">
+                            <label>Equity Value</label>
+                            <span class="output-val" id="out-equity">--</span>
+                        </div>
+                        <div class="output-group">
+                            <label>IMPLIED SHARE PRICE</label>
+                            <span class="output-val" id="out-price" style="font-size: 1.5rem;">--</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RISK MODEL TAB -->
+            <div class="tab-content" id="tab-risk">
+                <div class="model-grid">
+                    <div class="model-section">
+                        <h3>INPUT PARAMETERS</h3>
+                        <div class="input-group">
+                            <label>1-Yr PD (%)</label>
+                            <input type="number" id="inp-pd" step="0.0001" oninput="calcRisk()">
+                        </div>
+                        <div class="input-group">
+                            <label>LGD (%)</label>
+                            <input type="number" id="inp-lgd" step="0.01" oninput="calcRisk()">
+                        </div>
+                        <div class="input-group">
+                            <label>Exposure At Default ($M)</label>
+                            <input type="number" id="inp-ead" step="0.1" oninput="calcRisk()">
+                        </div>
+                    </div>
+                    <div class="model-section">
+                        <h3>RISK METRICS</h3>
+                        <div class="output-group" style="margin-top: 0; padding-top: 0; border: none;">
+                            <label>Expected Loss (EL)</label>
+                            <span class="output-val negative" id="out-el">--</span>
+                        </div>
+                        <div class="output-group">
+                            <label>Implied Credit Rating</label>
+                            <span class="output-val" id="out-risk-rating" style="color: var(--neon-blue);">--</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RAW TAB -->
+            <div class="tab-content" id="tab-raw">
+                <pre id="detailContent">--</pre>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPT TEMPLATE CONTINUES... -->
+    <script>
+        let allRecords = [];
+        let currentSelectedRecord = null;
+
+        async function loadData() {
+            try {
+                const response = await fetch('valuation_history.jsonl');
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+                const text = await response.text();
+                const lines = text.split('\n');
+
+                lines.forEach(line => {
+                    if (line.trim()) {
+                        try {
+                            allRecords.push(JSON.parse(line));
+                        } catch (e) {
+                            console.error("Error parsing JSON line:", e);
+                        }
+                    }
+                });
+
+                renderTable(allRecords);
+            } catch (error) {
+                console.error("Failed to load data:", error);
+                if (window.location.protocol === 'file:') {
+                    document.getElementById('instructionsPanel').style.display = 'block';
+                }
+            }
+        }
+
+        function renderTable(records) {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+
+            records.forEach((record, index) => {
+                const tr = document.createElement('tr');
+
+                const name = record.borrower_name || record.ticker || "UNKNOWN";
+                const dateRaw = record.system_timestamp || record.report_date || "N/A";
+                const date = dateRaw !== "N/A" ? new Date(dateRaw).toISOString().split('T')[0] : "N/A";
+                const risk = record.risk_score !== undefined ? record.risk_score : (record.pd_score || "N/A");
+
+                let riskClass = "risk-low";
+                let displayRisk = risk;
+                if (typeof risk === 'number') {
+                    displayRisk = risk.toFixed(1);
+                    if (risk > 75) riskClass = "risk-high";
+                    else if (risk > 40) riskClass = "risk-med";
+                }
+
+                tr.innerHTML = `
+                    <td><strong>${name}</strong></td>
+                    <td class="${riskClass}">${displayRisk}</td>
+                    <td style="color: var(--text-muted);">${date}</td>
+                `;
+
+                tr.onclick = () => {
+                    document.querySelectorAll('tr').forEach(r => r.classList.remove('selected-row'));
+                    tr.classList.add('selected-row');
+                    showDetails(record);
+                };
+
+                tbody.appendChild(tr);
+            });
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+            event.currentTarget.classList.add('active');
+            document.getElementById(`tab-${tabId}`).classList.add('active');
+        }
+
+        function showDetails(record) {
+            currentSelectedRecord = record;
+            document.getElementById('detailsWrapper').style.opacity = '1';
+            document.getElementById('detailsWrapper').style.pointerEvents = 'auto';
+
+            const name = record.borrower_name || record.ticker || "UNKNOWN ENTITY";
+            document.getElementById('detailTitle').innerText = name + " // SYSTEM STATE";
+
+            // Raw
+            document.getElementById('detailContent').innerText = JSON.stringify(record, null, 2);
+
+            // Overview
+            document.getElementById('ov-score').innerText = record.risk_score ? record.risk_score.toFixed(1) : "N/A";
+            document.getElementById('ov-summary').innerText = record.executive_summary || "No summary available.";
+
+            let impliedRating = "NR";
+            if (record.pd_model && record.pd_model.credit_rating) {
+                impliedRating = record.pd_model.credit_rating;
+            } else if (record.pd_model && record.pd_model.implied_rating) {
+                impliedRating = record.pd_model.implied_rating;
+            }
+            let pdDisp = record.pd_model && record.pd_model.pd_1yr ? (record.pd_model.pd_1yr * 100).toFixed(2) + "%" : "--";
+            document.getElementById('ov-rating').innerText = `${impliedRating} (${pdDisp})`;
+
+            let evDisp = "--";
+            if (record.dcf_analysis && record.dcf_analysis.enterprise_value) {
+                evDisp = "$" + formatNumber(record.dcf_analysis.enterprise_value) + "M";
+            }
+            document.getElementById('ov-ev').innerText = evDisp;
+
+            // Seed DCF Form
+            if (record.dcf_analysis) {
+                document.getElementById('inp-fcf').value = record.dcf_analysis.base_fcf || 1000;
+                document.getElementById('inp-wacc').value = record.dcf_analysis.wacc || 0.10;
+                document.getElementById('inp-growth').value = record.dcf_analysis.growth_rate || 0.02;
+                document.getElementById('inp-debt').value = record.dcf_analysis.total_debt || 500;
+                document.getElementById('inp-cash').value = record.dcf_analysis.cash || 100;
+                document.getElementById('inp-shares').value = record.dcf_analysis.mock_shares || 100;
+                calcDCF();
+            }
+
+            // Seed Risk Form
+            if (record.pd_model) {
+                document.getElementById('inp-pd').value = record.pd_model.pd_1yr || 0.02;
+                document.getElementById('inp-lgd').value = record.pd_model.lgd || 0.45;
+                document.getElementById('inp-ead').value = record.pd_model.exposure_at_default || 500;
+                calcRisk();
+            }
+        }
+
+        function formatNumber(num) {
+            return parseFloat(num).toLocaleString('en-US', {maximumFractionDigits: 2});
+        }
+
+        function calcDCF() {
+            const fcf = parseFloat(document.getElementById('inp-fcf').value) || 0;
+            const wacc = parseFloat(document.getElementById('inp-wacc').value) || 0.10;
+            const g = parseFloat(document.getElementById('inp-growth').value) || 0;
+            const debt = parseFloat(document.getElementById('inp-debt').value) || 0;
+            const cash = parseFloat(document.getElementById('inp-cash').value) || 0;
+            const shares = parseFloat(document.getElementById('inp-shares').value) || 1;
+
+            if (wacc <= g) {
+                document.getElementById('out-tv').innerText = "ERR";
+                return;
+            }
+
+            const tv = (fcf * (1 + g)) / (wacc - g);
+            // PV of TV approx for mock (assuming yr 5)
+            const pv_tv = tv / Math.pow(1 + wacc, 5);
+            // Simplistic EV = PV(FCF) + PV(TV). MOCK: FCF * 4 approx + PV_TV
+            const ev = (fcf * 3.8) + pv_tv;
+            const equity = ev - debt + cash;
+            const price = equity / shares;
+
+            document.getElementById('out-tv').innerText = "$" + formatNumber(tv);
+            document.getElementById('out-ev').innerText = "$" + formatNumber(ev);
+            document.getElementById('out-equity').innerText = "$" + formatNumber(equity);
+            document.getElementById('out-price').innerText = "$" + formatNumber(price);
+            document.getElementById('ov-ev').innerText = "$" + formatNumber(ev) + "M";
+        }
+
+        function calcRisk() {
+            const pd = parseFloat(document.getElementById('inp-pd').value) || 0;
+            const lgd = parseFloat(document.getElementById('inp-lgd').value) || 0;
+            const ead = parseFloat(document.getElementById('inp-ead').value) || 0;
+
+            const el = pd * lgd * ead;
+
+            let rating = "AAA";
+            if (pd > 0.2) rating = "CCC";
+            else if (pd > 0.05) rating = "B";
+            else if (pd > 0.02) rating = "BB";
+            else if (pd > 0.005) rating = "BBB";
+            else if (pd > 0.001) rating = "AA";
+
+            document.getElementById('out-el').innerText = "$" + formatNumber(el) + "M";
+            document.getElementById('out-risk-rating').innerText = rating;
+        }
+
+        function filterTable() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = allRecords.filter(r => {
+                const name = (r.borrower_name || r.ticker || "").toLowerCase();
+                return name.includes(query);
+            });
+            renderTable(filtered);
+        }
+
+        let sortDirections = [true, true, true]; // true = asc
+        function sortTable(colIndex) {
+            const direction = sortDirections[colIndex] ? 1 : -1;
+            sortDirections[colIndex] = !sortDirections[colIndex];
+
+            const sorted = [...allRecords].sort((a, b) => {
+                let valA, valB;
+
+                if (colIndex === 0) {
+                    valA = a.borrower_name || a.ticker || "";
+                    valB = b.borrower_name || b.ticker || "";
+                } else if (colIndex === 1) {
+                    valA = typeof a.risk_score === 'number' ? a.risk_score : 0;
+                    valB = typeof b.risk_score === 'number' ? b.risk_score : 0;
+                } else if (colIndex === 2) {
+                    valA = a.system_timestamp || a.report_date || "";
+                    valB = b.system_timestamp || b.report_date || "";
+                }
+
+                if (valA < valB) return -1 * direction;
+                if (valA > valB) return 1 * direction;
+                return 0;
+            });
+
+            renderTable(sorted);
+        }
+
+        function exportProfile() {
+            if (!currentSelectedRecord) return;
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(currentSelectedRecord, null, 2));
+            const downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            const name = currentSelectedRecord.borrower_name || currentSelectedRecord.ticker || "entity";
+            const safeName = name.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+            downloadAnchorNode.setAttribute("download", `sovereign_status_${safeName}.json`);
+            document.body.appendChild(downloadAnchorNode);
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+        }
+
+        // Initialize
+        loadData();
+    </script>
+</body>
+</html>
