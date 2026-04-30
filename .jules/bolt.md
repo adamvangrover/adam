@@ -132,3 +132,7 @@
 ## 2026-04-26 - React List Optimization
 **Learning:** Extracting inner mapped elements into separate functional components wrapped in `React.memo` (like `ThoughtRow`) is highly effective at preventing O(N) re-renders during frequent interval pulses in React UI components.
 **Action:** When auditing frontend performance, specifically look for inline `.map()` functions rendering complex JSX in frequently updating components, and extract/memoize them.
+
+## 2026-11-27 - [Separating Search Index Instantiation from Search Execution]
+**Learning:** In React components like `GlobalNav.tsx`, instantiating a search index (e.g., `new Fuse(...)`) within the same `useMemo` block or render path as the search execution causes a severe performance bottleneck. When the search index relies on static or slowly changing data (like a manifest) but is coupled with a rapidly changing dependency (like the `searchTerm` from every keystroke), the expensive O(N) index reconstruction happens on every key press, leading to noticeable input lag.
+**Action:** Always separate the search index instantiation and the search execution into two distinct `useMemo` hooks. The first hook should build the index and depend only on the data source, while the second hook should perform the search and depend on both the index and the search query. This ensures the index is built once when the data changes, and only the fast search operation runs on every keystroke.
