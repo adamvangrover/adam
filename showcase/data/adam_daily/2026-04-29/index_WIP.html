@@ -42,19 +42,25 @@
                         }
                     },
                     backgroundImage: {
-                        'hex-pattern': 'url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAAXNSR0IArs4c6QAAACVJREFUKFNjZCASMDKgAhgZGBgY0OUYkRTY2P5TgMvQUoYpQQAA3QIDz6D/4wAAAABJRU5ErkJggg==")',
+                        'hex-pattern': 'linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px)',
                         'scanline': 'linear-gradient(to bottom, transparent 50%, rgba(0, 0, 0, 0.3) 51%)'
+                    },
+                    backgroundSize: {
+                        'hex-pattern': '20px 20px'
                     },
                     animation: {
                         'ticker': 'ticker 40s linear infinite',
                         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'scroll-up': 'scrollUp 35s linear infinite',
                         'flash-red': 'flashRed 2s infinite',
                         'glitch': 'glitch 2s linear infinite',
                         'pulse-fast': 'pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'spin-slow': 'spin 12s linear infinite',
                         'ping-slow': 'ping 3s cubic-bezier(0, 0, 0.2, 1) infinite',
                     },
                     keyframes: {
                         ticker: { '0%': { transform: 'translateX(100vw)' }, '100%': { transform: 'translateX(-100%)' } },
+                        scrollUp: { '0%': { transform: 'translateY(0)' }, '100%': { transform: 'translateY(-50%)' } },
                         flashRed: { '0%, 100%': { opacity: 1 }, '50%': { opacity: 0.1 } },
                         glitch: {
                             '2%, 64%': { transform: 'translate(2px,0) skew(0deg)' },
@@ -81,10 +87,12 @@
         body.theme-gold { --color-primary: 251 191 36; --color-secondary: 245 158 11; --color-accent: 239 68 68; }
         body.theme-cobalt { --color-primary: 59 130 246; --color-secondary: 148 163 184; --color-accent: 225 29 72; }
 
+        /* Global DEFCON 1 Override */
         body.defcon-active { --color-primary: 255 30 56; --color-secondary: 255 170 0; --color-accent: 255 30 56; }
         body.defcon-active .vignette { box-shadow: inset 0 0 200px rgba(255, 30, 56, 0.4); animation: flashRed 2s infinite; }
         body.defcon-active .glass-panel { border-color: rgba(255, 30, 56, 0.3); }
 
+        /* Scrollbars */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #010308; }
         ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 3px; }
@@ -92,6 +100,7 @@
 
         body { background-color: #010308; color: #cbd5e1; overflow: hidden; }
 
+        /* Overlays */
         .crt-overlay {
             position: fixed; inset: 0; pointer-events: none; z-index: 9999;
             background-image: var(--scanline); background-size: 100% 4px;
@@ -103,6 +112,7 @@
             transition: box-shadow 0.5s ease;
         }
 
+        /* Glass & Glow */
         .glass-panel {
             background: rgba(9, 15, 26, 0.7);
             backdrop-filter: blur(16px);
@@ -123,15 +133,18 @@
         .box-glow-secondary { box-shadow: 0 0 15px rgba(var(--color-secondary), 0.2); }
         .box-glow-accent { box-shadow: 0 0 15px rgba(var(--color-accent), 0.2); }
 
+        /* Utilities */
         .data-row { transition: all 0.2s ease; cursor: default; }
         .data-row:hover { background-color: rgba(var(--color-primary), 0.05); transform: translateX(4px); border-left: 2px solid rgb(var(--color-primary)); }
         .clip-path-angled { clip-path: polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%); }
+        .clip-path-toast { clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px); }
         
         .glitch-text { display: inline-block; position: relative; }
         .glitch-text::before, .glitch-text::after { content: attr(data-text); position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0.8; pointer-events: none;}
         .glitch-text::before { left: 2px; text-shadow: -2px 0 rgba(var(--color-accent), 1); clip: rect(24px, 550px, 90px, 0); animation: glitch 3s infinite linear alternate-reverse; }
         .glitch-text::after { left: -2px; text-shadow: -2px 0 rgba(var(--color-secondary), 1); clip: rect(85px, 550px, 140px, 0); animation: glitch 2s infinite linear alternate-reverse; }
 
+        /* Custom Prose Tweaks */
         .prose h1, .prose h2, .prose h3, .prose h4 { font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 1px; color: #fff; margin-bottom: 1rem; }
         .prose h1 { border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.5rem; margin-bottom: 1.5rem; font-size: 2rem; }
         .prose h2 { color: rgb(var(--color-primary)); margin-top: 2.5rem; font-size: 1.5rem; }
@@ -148,44 +161,84 @@
         .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
         @keyframes typing { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
 
+        /* Probability Bars & Interactive Grids */
         .prob-bar-container { width: 100%; background-color: rgba(255,255,255,0.05); border-radius: 4px; overflow: hidden; height: 1.5rem; display: flex; position: relative; }
         .prob-bar-fill { height: 100%; display: flex; align-items: center; padding-left: 0.5rem; font-size: 0.65rem; font-family: 'Fira Code', monospace; color: #000; font-weight: bold; transition: width 0.8s cubic-bezier(0.19, 1, 0.22, 1); width: 0%; white-space: nowrap; overflow: hidden;}
         
         .copy-btn-overlay { position: absolute; right: 10px; top: 10px; opacity: 0; transition: opacity 0.2s; }
         .group:hover .copy-btn-overlay { opacity: 1; }
 
+        /* Custom Range Slider */
         input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
         input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 16px; width: 8px; border-radius: 2px; background: rgb(var(--color-primary)); cursor: pointer; margin-top: -6px; box-shadow: 0 0 10px rgba(var(--color-primary), 0.8); }
         input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; cursor: pointer; background: rgba(255,255,255,0.1); border-radius: 2px; }
         input[type=range]:focus { outline: none; }
 
+        /* Grids */
         .heat-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 2px; width: 100%; }
         .heat-cell { aspect-ratio: 1; border-radius: 2px; transition: transform 0.2s; cursor: crosshair; }
         .heat-cell:hover { transform: scale(1.3); z-index: 10; border: 1px solid #fff; box-shadow: 0 0 10px rgba(var(--color-primary), 0.5);}
         
+        .weight-grid { display: grid; grid-template-columns: repeat(16, 1fr); gap: 1px; width: 100%; }
+        .weight-cell { aspect-ratio: 1; transition: background-color 0.5s ease; opacity: 0.8; }
+        .weight-cell:hover { opacity: 1; }
+        
+        /* Depletion Bars */
         .depletion-bg { width: 100%; background-color: rgba(255,255,255,0.05); height: 8px; border-radius: 4px; overflow: hidden; position: relative;}
         .depletion-fill { height: 100%; background-color: rgb(var(--color-primary)); transition: width 1.5s cubic-bezier(0.19, 1, 0.22, 1); }
         .depletion-critical { background-color: rgb(var(--color-accent)); animation: flashRed 1s infinite; box-shadow: 0 0 10px rgba(var(--color-accent), 0.8);}
 
+        /* Metric Flash Animation */
+        @keyframes metricFlashPos { 0% { color: rgb(var(--color-primary)); text-shadow: 0 0 15px rgb(var(--color-primary)); } 100% { color: white; text-shadow: none; } }
+        @keyframes metricFlashNeg { 0% { color: rgb(var(--color-accent)); text-shadow: 0 0 15px rgb(var(--color-accent)); } 100% { color: white; text-shadow: none; } }
+        .flash-pos { animation: metricFlashPos 1s ease-out; }
+        .flash-neg { animation: metricFlashNeg 1s ease-out; }
+
+        .node-pulse { animation: ping-slow 3s cubic-bezier(0, 0, 0.2, 1) infinite; }
+        
+        /* Boot Screen */
         #bootScreen { transition: opacity 0.8s ease-in-out; }
         .boot-text-line { overflow: hidden; white-space: nowrap; border-right: 2px solid rgb(var(--color-primary)); animation: typingBoot 0.5s steps(40, end), blink-caret .75s step-end infinite; width: 0; display: inline-block; }
         @keyframes typingBoot { from { width: 0 } to { width: 100% } }
         @keyframes blink-caret { from, to { border-color: transparent } 50% { border-color: rgb(var(--color-primary)); } }
 
+        /* Layout & Widget Controls */
         .bento-widget { resize: both; overflow: auto; min-width: 150px; min-height: 80px; }
         .bento-widget::-webkit-scrollbar { display: none; }
         .bento-draggable { cursor: grab; transition: transform 0.2s ease, box-shadow 0.2s ease; }
         .bento-draggable:active { cursor: grabbing; transform: scale(0.98); z-index: 50; }
+        .bento-placeholder { border: 2px dashed rgb(var(--color-primary)); background: rgba(var(--color-primary), 0.1); border-radius: 0.5rem; }
 
         .chart-container { position: relative; width: 100%; max-width: 100%; height: 300px; max-height: 400px; margin: 0 auto; }
         @media (min-width: 768px) { .chart-container { height: 350px; } }
         
+        /* DCF Waterfall Styles */
         .dcf-bar-container { display: flex; align-items: flex-end; justify-content: center; height: 250px; padding-bottom: 20px; gap: 8px; border-bottom: 1px solid rgba(255,255,255,0.1); }
         .dcf-col { display: flex; flex-direction: column; justify-content: flex-end; align-items: center; width: 40px; position: relative; }
         .dcf-bar-pos { background-color: rgb(var(--color-primary)); width: 100%; border-radius: 4px 4px 0 0; transition: height 1s ease-out; }
         .dcf-bar-neg { background-color: rgb(var(--color-accent)); width: 100%; border-radius: 0 0 4px 4px; transition: height 1s ease-out; position: absolute; top: 100%; }
         .dcf-label { position: absolute; bottom: -25px; font-size: 10px; font-family: monospace; color: #94a3b8; }
         .dcf-val { position: absolute; top: -20px; font-size: 10px; font-family: monospace; color: #fff; white-space: nowrap; }
+
+        /* Traceability Tooltip */
+        .trace-tooltip {
+            position: absolute;
+            background: rgba(0,0,0,0.95);
+            border: 1px solid rgb(var(--color-primary));
+            padding: 12px;
+            border-radius: 4px;
+            font-family: 'Fira Code', monospace;
+            font-size: 10px;
+            z-index: 99999;
+            pointer-events: none;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            opacity: 0;
+            transform: translateY(10px);
+            box-shadow: 0 5px 25px rgba(var(--color-primary), 0.3);
+            min-width: 220px;
+        }
+        .traceable { cursor: help; border-bottom: 1px dotted rgba(255,255,255,0.4); transition: color 0.2s; }
+        .traceable:hover { color: rgb(var(--color-primary)) !important; }
     </style>
 </head>
 <body class="h-screen w-screen flex flex-col selection:bg-primary selection:text-black relative theme-cyan text-sm" id="appBody">
@@ -220,8 +273,7 @@
             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <svg class="h-4 w-4 text-primary/70 group-focus-within:text-primary transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
             </div>
-            <!-- Interactive Search / Command Bar -->
-            <input type="text" id="commandInput" class="block w-full pl-10 pr-3 py-1.5 border border-core-border rounded bg-void/50 text-white font-mono text-xs placeholder-slate-500 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all shadow-inner" placeholder="Search modules or execute AI override (e.g., /route PLTR, /matrix)...">
+            <input type="text" id="commandInput" class="block w-full pl-10 pr-3 py-1.5 border border-core-border rounded bg-void/50 text-white font-mono text-xs placeholder-slate-500 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all shadow-inner" placeholder="Search modules or execute AI override (e.g., /route PLTR)...">
             <div class="absolute inset-y-0 right-0 pr-2 flex items-center gap-2">
                 <span class="text-[9px] font-mono text-primary/80 uppercase px-1.5 border border-primary/30 rounded bg-primary/10">Search / AI</span>
             </div>
@@ -284,7 +336,7 @@
             <!-- Live Telemetry Feed -->
             <div class="glass-panel rounded h-[35%] min-h-[200px] border-t-2 border-t-secondary flex flex-col overflow-hidden relative shrink-0 shadow-lg bento-widget">
                 <div class="absolute top-0 right-0 w-24 h-24 bg-secondary/10 blur-2xl rounded-full pointer-events-none"></div>
-                <div class="p-3 border-b border-core-border bg-black/40 flex justify-between items-center z-10">
+                <div class="p-3 border-b border-core-border bg-black/40 flex justify-between items-center z-10 cursor-move" title="Drag to resize vertically">
                     <h2 class="font-mono text-[10px] text-secondary tracking-widest uppercase flex items-center gap-2 m-0">
                         <span class="w-1.5 h-1.5 bg-secondary rounded-full animate-pulse"></span> Terminal Telemetry
                     </h2>
@@ -304,32 +356,32 @@
             <div class="flex flex-wrap gap-3 shrink-0" id="kpiGrid">
                 <div class="glass-panel interactive-panel p-4 rounded border-b-2 border-b-accent flex flex-col justify-between bento-widget bento-draggable flex-1 min-w-[150px]" onclick="loadModule(1)">
                     <span class="font-mono text-[10px] text-slate-400 uppercase tracking-widest mb-1 flex justify-between pointer-events-none">SPX 500 <span class="text-accent">▼</span></span>
-                    <div class="font-display text-2xl xl:text-3xl font-bold text-white tracking-tight pointer-events-none" id="kpiSpx">7,138.80</div>
+                    <div class="font-display text-2xl xl:text-3xl font-bold text-white tracking-tight pointer-events-auto traceable" data-trace-type="NYSE_SIP" id="kpiSpx">7,138.80</div>
                     <div class="font-mono text-[10px] text-accent mt-1 pointer-events-none">-0.49%</div>
                 </div>
                 <div class="glass-panel interactive-panel p-4 rounded border-b-2 border-b-accent flex flex-col justify-between box-glow-accent bento-widget bento-draggable flex-1 min-w-[150px]" onclick="loadModule(2)">
                     <span class="font-mono text-[10px] text-slate-400 uppercase tracking-widest mb-1 flex justify-between pointer-events-none">10Y Backbone <span class="text-accent">▲</span></span>
-                    <div class="font-display text-2xl xl:text-3xl font-bold text-accent glow-accent tracking-tight pointer-events-none" id="kpiYield">4.415%</div>
+                    <div class="font-display text-2xl xl:text-3xl font-bold text-accent glow-accent tracking-tight pointer-events-auto traceable" data-trace-type="FRED_API" id="kpiYield">4.415%</div>
                     <div class="font-mono text-[10px] text-accent mt-1 pointer-events-none">+6.3 bps (SURGE)</div>
                 </div>
-                <div class="glass-panel interactive-panel p-4 rounded border-b-2 border-b-secondary flex flex-col justify-between box-glow-secondary bento-widget bento-draggable flex-1 min-w-[150px]" onclick="loadModule(1)">
+                <div class="glass-panel interactive-panel p-4 rounded border-b-2 border-b-secondary flex flex-col justify-between box-glow-secondary bento-widget bento-draggable flex-1 min-w-[150px]" onclick="loadModule(13)">
                     <span class="font-mono text-[10px] text-slate-400 uppercase tracking-widest mb-1 flex justify-between pointer-events-none">Brent Entropy <span class="text-secondary">▲</span></span>
-                    <div class="font-display text-2xl xl:text-3xl font-bold text-secondary tracking-tight glow-secondary glitch-text pointer-events-none" id="kpiBrent" data-text="$111.78">$111.78</div>
+                    <div class="font-display text-2xl xl:text-3xl font-bold text-secondary tracking-tight glow-secondary glitch-text pointer-events-auto traceable" data-trace-type="ICE_FUTURES" id="kpiBrent" data-text="$111.78">$111.78</div>
                     <div class="font-mono text-[10px] text-secondary mt-1 pointer-events-none">+0.47% (8th DAY)</div>
                 </div>
                 <div class="glass-panel interactive-panel p-4 rounded border-b-2 border-b-primary flex flex-col justify-between bento-widget bento-draggable flex-1 min-w-[150px]" onclick="loadModule(2)">
                     <span class="font-mono text-[10px] text-slate-400 uppercase tracking-widest mb-1 flex justify-between pointer-events-none">BTC Tether <span class="text-primary">▲</span></span>
-                    <div class="font-display text-2xl xl:text-3xl font-bold text-white tracking-tight pointer-events-none" id="kpiBtc">75,935</div>
+                    <div class="font-display text-2xl xl:text-3xl font-bold text-white tracking-tight pointer-events-auto traceable" data-trace-type="BINANCE_WSS" id="kpiBtc">75,935</div>
                     <div class="font-mono text-[10px] text-primary mt-1 pointer-events-none">-0.50% (LIQ DRAIN)</div>
                 </div>
                 <div class="glass-panel interactive-panel p-4 rounded border-b-2 border-b-primary flex flex-col justify-between bento-widget bento-draggable flex-1 min-w-[150px]" onclick="loadModule(2)">
                     <span class="font-mono text-[10px] text-slate-400 uppercase tracking-widest mb-1 flex justify-between pointer-events-none">VIX Daemon <span class="text-white">▲</span></span>
-                    <div class="font-display text-2xl xl:text-3xl font-bold text-white tracking-tight pointer-events-none" id="kpiVix">18.60</div>
+                    <div class="font-display text-2xl xl:text-3xl font-bold text-white tracking-tight pointer-events-auto traceable" data-trace-type="CBOE_SIP" id="kpiVix">18.60</div>
                     <div class="font-mono text-[10px] text-primary mt-1 pointer-events-none">+4.0% (WAKING)</div>
                 </div>
                 <div class="glass-panel interactive-panel p-4 rounded border-b-2 border-b-accent flex flex-col justify-between box-glow-accent bento-widget bento-draggable flex-1 min-w-[150px]" onclick="loadModule(8)">
                     <span class="font-mono text-[10px] text-slate-400 uppercase tracking-widest mb-1 flex justify-between pointer-events-none">HY OAS Spread <span class="text-accent">▲</span></span>
-                    <div class="font-display text-2xl xl:text-3xl font-bold text-white tracking-tight pointer-events-none" id="kpiOas">3.05%</div>
+                    <div class="font-display text-2xl xl:text-3xl font-bold text-white tracking-tight pointer-events-auto traceable" data-trace-type="ICE_BofA_IDX" id="kpiOas">3.05%</div>
                     <div class="font-mono text-[10px] text-accent mt-1 pointer-events-none">+9 bps (LEAKING)</div>
                 </div>
             </div>
@@ -381,11 +433,11 @@
 
                     <!-- Footer Pagination -->
                     <div class="p-4 border-t border-core-border bg-black/90 flex justify-between items-center shrink-0 z-20 relative">
-                        <button id="prevBtn" class="group px-4 py-2 bg-void border border-core-border text-slate-300 rounded text-xs font-mono font-bold hover:text-white hover:border-primary/50 transition-all disabled:opacity-20 disabled:cursor-not-allowed flex items-center gap-2 cursor-pointer">
+                        <button id="prevBtn" onclick="navigateModule(-1)" class="group px-4 py-2 bg-void border border-core-border text-slate-300 rounded text-xs font-mono font-bold hover:text-white hover:border-primary/50 transition-all disabled:opacity-20 disabled:cursor-not-allowed flex items-center gap-2 cursor-pointer">
                             <span class="group-hover:-translate-x-1 transition-transform">←</span> PREV
                         </button>
                         <div class="flex gap-1.5 flex-wrap justify-center max-w-[50%]" id="paginationDots"></div>
-                        <button id="nextBtn" class="group px-6 py-2 bg-primary text-black rounded text-xs font-mono font-bold hover:bg-white hover:shadow-[0_0_15px_rgba(var(--color-primary),0.8)] transition-all disabled:opacity-20 disabled:cursor-not-allowed flex items-center gap-2 clip-path-angled cursor-pointer">
+                        <button id="nextBtn" onclick="navigateModule(1)" class="group px-6 py-2 bg-primary text-black rounded text-xs font-mono font-bold hover:bg-white hover:shadow-[0_0_15px_rgba(var(--color-primary),0.8)] transition-all disabled:opacity-20 disabled:cursor-not-allowed flex items-center gap-2 clip-path-angled cursor-pointer">
                             NEXT <span class="group-hover:translate-x-1 transition-transform">→</span>
                         </button>
                     </div>
@@ -428,7 +480,7 @@
             <div class="px-5 py-3 border-t border-white/5 bg-black/90 shrink-0">
                 <div class="flex flex-wrap gap-2">
                     <button onclick="triggerPreset('Pull Big Tech DCF Valuations')" class="px-2 py-1.5 bg-panel border border-white/10 hover:border-primary hover:text-primary text-[9px] font-mono rounded text-slate-300 transition-all cursor-pointer">Big Tech DCF</button>
-                    <button onclick="triggerPreset('Explain the Stagflationary Trap & Yield Surge')" class="px-2 py-1.5 bg-panel border border-white/10 hover:border-secondary hover:text-secondary text-[9px] font-mono rounded text-slate-300 transition-all cursor-pointer">Stagflation Trap</button>
+                    <button onclick="triggerPreset('Explain the Stagflationary Trap')" class="px-2 py-1.5 bg-panel border border-white/10 hover:border-secondary hover:text-secondary text-[9px] font-mono rounded text-slate-300 transition-all cursor-pointer">Stagflation Trap</button>
                     <button onclick="triggerPreset('Summarize Musk v Altman Trial')" class="px-2 py-1.5 bg-panel border border-white/10 hover:border-accent hover:text-accent text-[9px] font-mono rounded text-slate-300 transition-all cursor-pointer">Musk Trial</button>
                     <button onclick="triggerPreset('Analyze GPU Compute Topology')" class="px-2 py-1.5 bg-panel border border-white/10 hover:border-core-green hover:text-core-green text-[9px] font-mono rounded text-slate-300 transition-all cursor-pointer">GPU Topology</button>
                 </div>
@@ -483,6 +535,9 @@
         let gammaChartInstance = null;
         let liquidityChartInstance = null;
         let baseRadarData = [99, 88, 95, 95, 80];
+        let currentModuleId = 1;
+        let isDefconActive = false;
+        let isAIPanelOpen = false;
 
         // Helper for Chart colors
         window.getRGBA = function(varName, alpha=1) {
@@ -506,12 +561,12 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 <div class="bg-panel p-4 rounded border-t-2 border-primary text-center">
                     <p class="text-[10px] font-mono text-slate-400 uppercase tracking-widest mb-1">Implied Share Price</p>
-                    <p class="text-3xl font-bold text-white mt-1">${config.price}</p>
+                    <p class="text-3xl font-bold text-white mt-1 traceable" data-trace-type="DCF_CALC">${config.price}</p>
                     <p class="text-xs ${config.priceDeltaClass || 'text-core-green'} font-mono mt-2">${config.priceDelta}</p>
                 </div>
                 <div class="bg-panel p-4 rounded border-t-2 border-primary text-center">
                     <p class="text-[10px] font-mono text-slate-400 uppercase tracking-widest mb-1">Implied Enterprise Value</p>
-                    <p class="text-3xl font-bold text-primary mt-1">${config.ev}</p>
+                    <p class="text-3xl font-bold text-primary mt-1 traceable" data-trace-type="EV_MODEL">${config.ev}</p>
                 </div>
                 <div class="bg-panel p-4 rounded border-t-2 ${config.yieldBoxClass || 'border-primary'} text-center ${config.yieldBoxGlow || ''}">
                     <p class="text-[10px] font-mono text-slate-400 uppercase tracking-widest mb-1">FY26 FCF Yield</p>
@@ -554,7 +609,7 @@
             </div>`;
 
         // ---------------------------------------------------------
-        // 33 MODULES 
+        // CLEAN, DEDUPLICATED DATA MODULES (30 Modules Total)
         // ---------------------------------------------------------
         const modules = [
             {
@@ -667,21 +722,23 @@
                     <h2 class="mb-6 text-white border-none mt-6 font-display text-2xl tracking-widest uppercase">Track A: Immediate Catalyst Alerts</h2>
                     <p class="text-sm text-slate-400 mb-6 font-mono">Schedule 13D and Form 4 Code P (> $250k or >10% shift) strict filtering applied.</p>
                     <div class="space-y-6 mb-12">
+                        <!-- SEER Alert -->
                         <div class="bg-void p-6 border-l-4 border-secondary rounded-r relative overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.5)] border-y border-r border-white/5 hover:border-secondary/50 transition-colors cursor-crosshair">
                             <div class="flex justify-between items-start mb-4 relative z-10 flex-wrap gap-2">
                                 <div>
                                     <h4 class="font-display font-bold text-white text-2xl tracking-widest flex items-center gap-3 m-0">
                                         SEER <span class="text-sm font-sans text-slate-500 font-normal tracking-normal">(Seer, Inc.)</span>
                                     </h4>
-                                    <p class="text-xs text-slate-400 font-mono mt-1 mb-0"><span class="text-secondary">FILER:</span> Radoff-JEC Group / Seer Board | FORM: DFAN14A</p>
+                                    <p class="text-xs text-slate-400 font-mono mt-1 mb-0"><span class="text-secondary">FILER:</span> Seer Board / Radoff-JEC Group</p>
                                 </div>
                                 <span class="bg-secondary/10 text-secondary px-3 py-1 rounded text-[10px] font-mono border border-secondary/30 font-bold shrink-0 box-glow-secondary">HOSTILE COUNTER-STRIKE</span>
                             </div>
                             <div class="bg-panel/50 p-4 rounded text-sm text-slate-300 relative z-10 leading-relaxed m-0 border border-white/5">
                                 <strong class="text-secondary font-mono text-xs block mb-2 uppercase">System Implications: The Narrative War</strong> 
-                                Following the Board's unanimous rejection on April 27, Radoff-JEC launched a public counter-offensive yesterday. Radoff’s latest filing explicitly highlights Seer’s $40M+ annual cash burn against the Board's claim of "intrinsic value." The improved $2.35 bid expires in 3 days (May 2).
+                                Following the Board's unanimous rejection on April 27, Radoff-JEC launched a public counter-offensive yesterday. Radoff’s latest filing explicitly highlights Seer’s $40M+ annual cash burn against the Board's claim of "intrinsic value." The improved $2.35 bid expires in 3 days (May 2). Expect a final "Item 4" update tomorrow morning.
                             </div>
                         </div>
+                        <!-- IMKTA Alert -->
                         <div class="bg-void p-6 border-l-4 border-accent rounded-r relative overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.5)] border-y border-r border-white/5 hover:border-accent/50 transition-colors cursor-crosshair">
                             <div class="flex justify-between items-start mb-4 relative z-10 flex-wrap gap-2">
                                 <div>
@@ -694,10 +751,35 @@
                             </div>
                             <div class="bg-panel/50 p-4 rounded text-sm text-slate-300 relative z-10 leading-relaxed m-0 border border-white/5">
                                 <strong class="text-accent font-mono text-xs block mb-2 uppercase">System Implications: Binary Governance Event</strong> 
-                                We are at the terminal point of the proxy battle. With ISS, Glass Lewis, and Egan-Jones all recommending the activist nominee (Rory Held), the burden of proof has shifted entirely to management. Tomorrow's virtual meeting results will be a watershed moment for family-controlled TMT/Retailers.
+                                We are at the terminal point of the proxy battle. With ISS, Glass Lewis, and Egan-Jones all recommending the activist nominee (Rory Held), the burden of proof has shifted entirely to management. Tomorrow's virtual meeting results will be a watershed moment for family-controlled TMT/Retailers. Expect massive volume and potential "post-vote" volatility.
                             </div>
                         </div>
-                    </div>`
+                        <!-- FIBK Alert -->
+                        <div class="bg-void p-6 border-l-4 border-core-green rounded-r relative overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.5)] border-y border-r border-white/5 hover:border-core-green/50 transition-colors cursor-crosshair">
+                            <div class="flex justify-between items-start mb-4 relative z-10 flex-wrap gap-2">
+                                <div>
+                                    <h4 class="font-display font-bold text-white text-2xl tracking-widest flex items-center gap-3 m-0">
+                                        INBK <span class="text-sm font-sans text-slate-500 font-normal tracking-normal">(First Internet Bancorp)</span>
+                                    </h4>
+                                    <p class="text-xs text-slate-400 font-mono mt-1 mb-0"><span class="text-core-green">FILER:</span> John C. Lame | April 30 Earnings Call</p>
+                                </div>
+                                <span class="bg-core-green/10 text-core-green px-3 py-1 rounded text-[10px] font-mono border border-core-green/30 font-bold shrink-0 box-glow-green">STRIKE WINDOW ACTIVE</span>
+                            </div>
+                            <div class="bg-panel/50 p-4 rounded text-sm text-slate-300 relative z-10 leading-relaxed m-0 border border-white/5">
+                                <strong class="text-core-green font-mono text-xs block mb-2 uppercase">System Note: Noise Reduction Applied</strong>
+                                *Not to be confused with First Interstate (FIBK).* As predicted by our "Strike Setup" logic, activist John Lame has maintained total silence leading into tomorrow's April 30 earnings call. We anticipate a public disclosure targeting digital asset risk and "Excess Tier-1" capital returns.
+                            </div>
+                        </div>
+                    </div>
+                    <h2 class="mb-6 text-white border-none mt-6 font-display text-2xl tracking-widest uppercase">Track B: Routine Accumulation / Structural Monitor</h2>
+                    <ul class="space-y-4 font-mono text-xs text-slate-300">
+                        <li class="glass-panel p-4 rounded border-l-2 border-primary">
+                            <strong class="text-white text-sm">ASTS (AST SpaceMobile):</strong> Rakuten Mobile continues its systematic liquidation. Shares dropped ~5.9% yesterday to $72.65. Structural Note: The anchor exit is now the primary price driver, overriding all operational milestones.
+                        </li>
+                        <li class="glass-panel p-4 rounded border-l-2 border-secondary">
+                            <strong class="text-white text-sm">LW (Lamb Weston):</strong> Jana Partners' $6.3M purchase floor ($42.48) remains the sector's highest-conviction defense level.
+                        </li>
+                    </ul>`
             },
             {
                 id: 5, group: "MARKET MECHANICS", title: "Options Flow & Gamma", subtitle: "0DTE Traps & Dealer Positioning",
@@ -722,12 +804,12 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                         <div class="bg-panel p-6 rounded border-l-4 border-accent">
                             <h4 class="font-mono text-accent text-xs mb-2 font-bold uppercase tracking-widest m-0">Zero-Gamma Level (Flip Line)</h4>
-                            <div class="font-display text-3xl text-white my-2">7,105</div>
+                            <div class="font-display text-3xl text-white my-2 traceable" data-trace-type="CBOE_SIP">7,105</div>
                             <p class="text-xs text-slate-400 m-0 leading-relaxed">If spot falls below this level, dealer hedging accelerates downside velocity. Current spot: 7,138.80.</p>
                         </div>
                         <div class="bg-panel p-6 rounded border-l-4 border-secondary">
                             <h4 class="font-mono text-secondary text-xs mb-2 font-bold uppercase tracking-widest m-0">0DTE Volume</h4>
-                            <div class="font-display text-3xl text-white my-2">55%</div>
+                            <div class="font-display text-3xl text-white my-2 traceable" data-trace-type="OCC_API">55%</div>
                             <p class="text-xs text-slate-400 m-0 leading-relaxed">Zero-days to expiration account for over half of all SPX options volume today, creating a massive intraday tail-risk.</p>
                         </div>
                     </div>`,
@@ -773,7 +855,7 @@
                         </div>
                         <div class="text-right mt-4 sm:mt-0">
                             <span class="text-primary font-mono text-xs block mb-1">DATA LAG: 15 MIN</span>
-                            <span class="bg-accent/20 text-accent px-2 py-1 rounded text-[10px] font-mono border border-accent/50 animate-pulse">TOXICITY: ELEVATED</span>
+                            <span class="bg-accent/20 text-accent px-2 py-1 rounded text-[10px] font-mono border border-accent/50">TOXICITY: ELEVATED</span>
                         </div>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
@@ -781,11 +863,10 @@
                             <h3 class="font-display text-white text-lg m-0 mb-2 uppercase">Order Flow Toxicity</h3>
                             <p class="text-sm text-slate-400 leading-relaxed m-0">Institutions are actively front-running the retail "Soft Landing" narrative. Analysis of FINRA TRF data shows that 58% of all SPY volume executed off-exchange today was sold at the bid. <strong class="text-accent group-hover:text-white transition-colors">Smart money is distributing into strength.</strong></p>
                         </div>
-                        
                         <div class="bg-panel p-6 rounded border border-white/5 shadow-lg">
                             <h3 class="font-mono text-primary text-xs uppercase tracking-widest mb-4 flex justify-between items-center">
                                 Volume Heatmap (SPY / QQQ)
-                                <button onclick="triggerPreset('Analyze Dark Pool Liquidity')" class="bg-primary/10 text-primary border border-primary/30 px-2 py-1 rounded text-[9px] hover:bg-primary hover:text-black transition-all cursor-pointer">ANALYZE</button>
+                                <button onclick="triggerPreset('Analyze Dark Pool Liquidity')" class="bg-primary/10 text-primary border border-primary/30 px-2 py-1 rounded text-[9px] hover:bg-primary hover:text-black transition-all">ANALYZE</button>
                             </h3>
                             <div class="heat-grid" id="heatmapGrid"></div>
                             <p class="text-[9px] font-mono text-slate-500 text-right mt-2 uppercase">Each block = 100,000 shares. Click cells for detail.</p>
@@ -815,11 +896,21 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr class="data-row border-b border-core-border/50"><td class="py-4 px-4 font-bold text-white">NVDA</td><td class="py-4 px-4 text-accent">ASK (DIST)</td><td class="py-4 px-4">420,000</td><td class="py-4 px-4">$36.5M</td><td class="py-4 px-4 text-accent">INST. LIQUIDATION</td></tr>
-                                <tr class="data-row border-b border-core-border/50"><td class="py-4 px-4 font-bold text-white">XOM</td><td class="py-4 px-4 text-primary">BID (ACCUM)</td><td class="py-4 px-4">1,250,000</td><td class="py-4 px-4">$150.2M</td><td class="py-4 px-4 text-primary">ENERGY ROTATION</td></tr>
-                                <tr class="data-row border-b border-core-border/50"><td class="py-4 px-4 font-bold text-white">PLTR</td><td class="py-4 px-4 text-primary">BID (ACCUM)</td><td class="py-4 px-4">880,000</td><td class="py-4 px-4">$21.1M</td><td class="py-4 px-4 text-primary">DEFENSE CAPEX</td></tr>
-                                <tr class="data-row border-b border-core-border/50"><td class="py-4 px-4 font-bold text-white">AAPL</td><td class="py-4 px-4 text-primary">BID (ACCUM)</td><td class="py-4 px-4">1,100,000</td><td class="py-4 px-4">$195.8M</td><td class="py-4 px-4 text-primary">PRE-EARNINGS DEFENSE</td></tr>
-                                <tr class="data-row"><td class="py-4 px-4 font-bold text-white">SPY</td><td class="py-4 px-4 text-accent">ASK (DIST)</td><td class="py-4 px-4">2,500,000</td><td class="py-4 px-4">$1.3B</td><td class="py-4 px-4 text-accent font-bold animate-pulse">INDEX SHORT</td></tr>
+                                <tr class="data-row border-b border-core-border/50">
+                                    <td class="py-4 px-4 font-bold text-white">NVDA</td><td class="py-4 px-4 text-accent">ASK (DIST)</td><td class="py-4 px-4 traceable">420,000</td><td class="py-4 px-4">$36.5M</td><td class="py-4 px-4 text-accent">INST. LIQUIDATION</td>
+                                </tr>
+                                <tr class="data-row border-b border-core-border/50">
+                                    <td class="py-4 px-4 font-bold text-white">XOM</td><td class="py-4 px-4 text-primary">BID (ACCUM)</td><td class="py-4 px-4 traceable">1,250,000</td><td class="py-4 px-4">$150.2M</td><td class="py-4 px-4 text-primary">ENERGY ROTATION</td>
+                                </tr>
+                                <tr class="data-row border-b border-core-border/50">
+                                    <td class="py-4 px-4 font-bold text-white">PLTR</td><td class="py-4 px-4 text-primary">BID (ACCUM)</td><td class="py-4 px-4 traceable">880,000</td><td class="py-4 px-4">$21.1M</td><td class="py-4 px-4 text-primary">DEFENSE CAPEX</td>
+                                </tr>
+                                <tr class="data-row border-b border-core-border/50">
+                                    <td class="py-4 px-4 font-bold text-white">AAPL</td><td class="py-4 px-4 text-primary">BID (ACCUM)</td><td class="py-4 px-4 traceable">1,100,000</td><td class="py-4 px-4">$195.8M</td><td class="py-4 px-4 text-primary">PRE-EARNINGS DEFENSE</td>
+                                </tr>
+                                <tr class="data-row">
+                                    <td class="py-4 px-4 font-bold text-white">SPY</td><td class="py-4 px-4 text-accent">ASK (DIST)</td><td class="py-4 px-4 traceable">2,500,000</td><td class="py-4 px-4">$1.3B</td><td class="py-4 px-4 text-accent font-bold animate-pulse">INDEX SHORT</td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>`,
@@ -863,6 +954,7 @@
                         Equity markets hallucinate; credit markets do the math. This module visualizes the cost to insure against sovereign default. A widening spread indicates a repricing of "Risk-Free" assumptions due to geopolitical stress and fiscal dominance.
                     </p>
                     <div class="space-y-6 mb-10 p-6 glass-panel rounded border border-white/5">
+                        <!-- Country 1 -->
                         <div class="relative">
                             <div class="flex justify-between items-end mb-2">
                                 <span class="font-display font-bold text-white tracking-widest text-lg">UNITED STATES</span>
@@ -872,15 +964,17 @@
                                 <div class="bg-primary h-full transition-all duration-1000 shadow-[0_0_10px_rgba(var(--color-primary),0.5)]" style="width: 15%" id="cds1"></div>
                             </div>
                         </div>
+                        <!-- Country 2 -->
                         <div class="relative">
                             <div class="flex justify-between items-end mb-2">
                                 <span class="font-display font-bold text-white tracking-widest text-lg">JAPAN</span>
-                                <span class="font-mono text-secondary font-bold text-lg">82 bps <span class="text-xs font-normal text-secondary ml-2">+14 bps</span></span>
+                                <span class="font-mono text-secondary font-bold text-lg traceable" data-trace-type="BOJ_API">82 bps</span> <span class="text-xs font-normal text-secondary ml-2">+14 bps</span>
                             </div>
                             <div class="w-full bg-void h-3 rounded overflow-hidden flex border border-white/5">
                                 <div class="bg-secondary h-full transition-all duration-1000 shadow-[0_0_10px_rgba(var(--color-secondary),0.5)]" style="width: 0%" id="cds2" data-target="28%"></div>
                             </div>
                         </div>
+                        <!-- Country 3 -->
                         <div class="relative">
                             <div class="flex justify-between items-end mb-2">
                                 <span class="font-display font-bold text-white tracking-widest text-lg">GERMANY</span>
@@ -890,6 +984,7 @@
                                 <div class="bg-slate-400 h-full transition-all duration-1000" style="width: 0%" id="cds3" data-target="5%"></div>
                             </div>
                         </div>
+                        <!-- Country 4 -->
                         <div class="relative">
                             <div class="flex justify-between items-end mb-2">
                                 <span class="font-display font-bold text-white tracking-widest text-lg">FRANCE</span>
@@ -899,10 +994,11 @@
                                 <div class="bg-slate-400 h-full transition-all duration-1000" style="width: 0%" id="cds4" data-target="8%"></div>
                             </div>
                         </div>
+                        <!-- Country 5 (Distressed) -->
                         <div class="relative">
                             <div class="flex justify-between items-end mb-2">
                                 <span class="font-display font-bold text-white tracking-widest text-lg">EMERGING MARKETS (CDX IG)</span>
-                                <span class="font-mono text-accent font-bold text-lg">210 bps <span class="text-xs font-normal text-accent ml-2">+25 bps</span></span>
+                                <span class="font-mono text-accent font-bold text-lg traceable" data-trace-type="ICE_CDX">210 bps</span> <span class="text-xs font-normal text-accent ml-2">+25 bps</span>
                             </div>
                             <div class="w-full bg-void h-3 rounded overflow-hidden flex border border-accent/20">
                                 <div class="bg-accent h-full transition-all duration-1000 shadow-[0_0_15px_rgba(var(--color-accent),0.8)]" style="width: 0%" id="cds5" data-target="65%"></div>
@@ -1031,7 +1127,7 @@
                     </div>
                     <h1>Strait of Hormuz Logistics Monitor</h1>
                     <p class="text-base text-slate-300 mb-8 leading-relaxed">
-                        This module analyzes raw SAR satellite imagery to count physical shipping containers and tanker drafts, bypassing delayed or manipulated diplomatic reports. The "Zero-Transit" reality is confirmed.
+                        This module analyzes raw SAR satellite imagery to count physical shipping containers and tanker drafts, bypassing delayed or manipulated diplomatic reports. 
                     </p>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
                         <div class="relative rounded-lg overflow-hidden border-2 border-core-border aspect-video bg-[#0a1128] flex items-center justify-center shadow-lg group cursor-crosshair" id="sarContainer">
@@ -1045,8 +1141,10 @@
                             
                             <!-- Tracking Reticle -->
                             <div id="sarReticle" class="absolute w-24 h-24 border border-primary/80 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none transform -translate-x-1/2 -translate-y-1/2 z-20 flex items-center justify-center">
-                                <div class="w-1 h-2 absolute top-0 bg-primary"></div><div class="w-1 h-2 absolute bottom-0 bg-primary"></div>
-                                <div class="w-2 h-1 absolute left-0 bg-primary"></div><div class="w-2 h-1 absolute right-0 bg-primary"></div>
+                                <div class="w-1 h-2 absolute top-0 bg-primary"></div>
+                                <div class="w-1 h-2 absolute bottom-0 bg-primary"></div>
+                                <div class="w-2 h-1 absolute left-0 bg-primary"></div>
+                                <div class="w-2 h-1 absolute right-0 bg-primary"></div>
                                 <div class="w-1 h-1 bg-primary rounded-full"></div>
                                 <div class="absolute -bottom-6 text-[8px] font-mono text-primary whitespace-nowrap bg-black/80 px-1 rounded" id="sarCoords">TRK: ...</div>
                             </div>
@@ -1056,13 +1154,13 @@
                         <div class="flex flex-col justify-center gap-6">
                             <div class="glass-panel p-6 rounded border-l-4 border-accent shadow-lg hover:border-l-primary transition-colors cursor-crosshair">
                                 <h3 class="font-mono text-accent text-xs mb-2 font-bold uppercase tracking-widest m-0">Vessel Count (24HR)</h3>
-                                <div class="font-display text-4xl text-white my-2 glitch-text" data-text="0 Transits">0 Transits</div>
+                                <div class="font-display text-4xl text-white my-2 glitch-text traceable" data-trace-type="ESA_SAR_API" data-text="0 Transits">0 Transits</div>
                                 <p class="text-xs text-slate-400 m-0">-100% against 90-day moving average. Total cessation.</p>
                             </div>
                             
                             <div class="glass-panel p-6 rounded border-l-4 border-secondary shadow-lg hover:border-l-primary transition-colors cursor-crosshair">
                                 <h3 class="font-mono text-secondary text-xs mb-2 font-bold uppercase tracking-widest m-0">Draft Analysis</h3>
-                                <div class="font-display text-4xl text-white my-2">12.4m Avg</div>
+                                <div class="font-display text-4xl text-white my-2 traceable" data-trace-type="ESA_SAR_API">12.4m Avg</div>
                                 <p class="text-xs text-slate-400 m-0">Tankers riding high in the water indicate empty holds and zero loading at terminal ports.</p>
                             </div>
                         </div>
@@ -1104,7 +1202,7 @@
                                     <span class="text-white font-display text-lg tracking-wider block">TSMC Wafer Intermediates (Taiwan)</span>
                                     <span class="text-[10px] font-mono text-slate-500 uppercase">Impact: NVDA, AMD, AAPL</span>
                                 </div>
-                                <span class="font-mono text-primary font-bold" id="deplete1">42%</span>
+                                <span class="font-mono text-primary font-bold traceable" data-trace-type="LOGISTICS_API" id="deplete1">42%</span>
                             </div>
                             <div class="depletion-bg"><div class="depletion-fill" id="bar1" style="width: 0%"></div></div>
                         </div>
@@ -1114,7 +1212,7 @@
                                     <span class="text-white font-display text-lg tracking-wider block">Neon Gas Synthesis (Ukraine/China)</span>
                                     <span class="text-[10px] font-mono text-slate-500 uppercase">Impact: Global Lithography</span>
                                 </div>
-                                <span class="font-mono text-accent font-bold animate-pulse" id="deplete2">14% (CRITICAL)</span>
+                                <span class="font-mono text-accent font-bold animate-pulse traceable" data-trace-type="LOGISTICS_API" id="deplete2">14% (CRITICAL)</span>
                             </div>
                             <div class="depletion-bg"><div class="depletion-fill depletion-critical" id="bar2" style="width: 0%"></div></div>
                         </div>
@@ -1124,7 +1222,7 @@
                                     <span class="text-white font-display text-lg tracking-wider block">Refined Copper (South America)</span>
                                     <span class="text-[10px] font-mono text-slate-500 uppercase">Impact: Grid Expansion, Datacenters</span>
                                 </div>
-                                <span class="font-mono text-secondary font-bold" id="deplete3">68%</span>
+                                <span class="font-mono text-secondary font-bold traceable" data-trace-type="COMEX_DATA" id="deplete3">68%</span>
                             </div>
                             <div class="depletion-bg"><div class="depletion-fill bg-secondary" id="bar3" style="width: 0%"></div></div>
                         </div>
@@ -1134,7 +1232,7 @@
                                     <span class="text-white font-display text-lg tracking-wider block">Logistics Freighters (Hormuz/Suez)</span>
                                     <span class="text-[10px] font-mono text-slate-500 uppercase">Impact: Inflation Baseline</span>
                                 </div>
-                                <span class="font-mono text-accent font-bold animate-pulse" id="deplete4">8% (BLOCKADE)</span>
+                                <span class="font-mono text-accent font-bold animate-pulse traceable" data-trace-type="MARITIME_AIS" id="deplete4">8% (BLOCKADE)</span>
                             </div>
                             <div class="depletion-bg"><div class="depletion-fill depletion-critical" id="bar4" style="width: 0%"></div></div>
                         </div>
@@ -1170,19 +1268,19 @@
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
                         <div class="glass-panel p-6 rounded border-t-2 border-primary shadow-lg cursor-crosshair hover:bg-void transition-colors">
                             <h3 class="font-mono text-primary text-xs uppercase tracking-widest mb-2">US Hypercluster</h3>
-                            <div class="font-display text-3xl text-white my-2">1.4 GW</div>
+                            <div class="font-display text-3xl text-white my-2 traceable" data-trace-type="POWER_GRID">1.4 GW</div>
                             <div class="w-full bg-void h-1.5 rounded mt-4 mb-2"><div class="bg-primary h-full rounded" style="width: 82%"></div></div>
                             <p class="text-[10px] font-mono text-slate-400 m-0 flex justify-between"><span>UTILIZATION</span><span>82%</span></p>
                         </div>
                         <div class="glass-panel p-6 rounded border-t-2 border-secondary shadow-lg cursor-crosshair hover:bg-void transition-colors">
                             <h3 class="font-mono text-secondary text-xs uppercase tracking-widest mb-2">EU Sovereign Core</h3>
-                            <div class="font-display text-3xl text-white my-2">450 MW</div>
+                            <div class="font-display text-3xl text-white my-2 traceable" data-trace-type="POWER_GRID">450 MW</div>
                             <div class="w-full bg-void h-1.5 rounded mt-4 mb-2"><div class="bg-secondary h-full rounded" style="width: 45%"></div></div>
                             <p class="text-[10px] font-mono text-slate-400 m-0 flex justify-between"><span>UTILIZATION</span><span>45%</span></p>
                         </div>
                         <div class="glass-panel p-6 rounded border-t-2 border-accent shadow-lg cursor-crosshair hover:bg-void transition-colors">
                             <h3 class="font-mono text-accent text-xs uppercase tracking-widest mb-2">ME_NEXUS (Offline)</h3>
-                            <div class="font-display text-3xl text-accent my-2 animate-pulse">0 MW</div>
+                            <div class="font-display text-3xl text-accent my-2 animate-pulse traceable" data-trace-type="POWER_GRID">0 MW</div>
                             <div class="w-full bg-void h-1.5 rounded mt-4 mb-2"><div class="bg-accent h-full rounded" style="width: 0%"></div></div>
                             <p class="text-[10px] font-mono text-accent m-0 flex justify-between"><span>COOLING_FAIL</span><span>0%</span></p>
                         </div>
@@ -1228,7 +1326,7 @@
                         <div class="absolute inset-0 z-10 pointer-events-none" style="background: radial-gradient(circle at center, transparent 0%, #010308 100%);"></div>
                         <canvas id="networkCanvas" class="w-full h-full block absolute top-0 left-0"></canvas>
                         <div class="absolute bottom-4 left-4 z-20 font-mono text-[10px] text-primary/80 uppercase bg-black/80 px-2 py-1 border border-white/10 rounded">
-                            Rendering 80 Nodes // Spring Physics Active
+                            Rendering 80 Nodes // Spring Physics Active // Interactive Mouse
                         </div>
                     </div>`,
                 onLoad: () => {
@@ -1251,9 +1349,29 @@
                     const cPrimaryDim = getRGBA('--color-primary', 0.15);
                     const cAccent = getRGBA('--color-accent');
 
+                    let mouseX = -1000; let mouseY = -1000;
+                    canvas.addEventListener('mousemove', (e) => {
+                        const rect = canvas.getBoundingClientRect();
+                        mouseX = e.clientX - rect.left;
+                        mouseY = e.clientY - rect.top;
+                    });
+                    canvas.addEventListener('mouseleave', () => { mouseX = -1000; mouseY = -1000; });
+
                     function draw() {
                         ctx.clearRect(0, 0, canvas.width, canvas.height);
                         particles.forEach(p => {
+                            // Interactive repel
+                            const dxM = p.x - mouseX; const dyM = p.y - mouseY;
+                            const distM = Math.sqrt(dxM*dxM + dyM*dyM);
+                            if(distM < 100) {
+                                p.vx += dxM * 0.002;
+                                p.vy += dyM * 0.002;
+                            }
+                            
+                            // Speed limits
+                            p.vx = Math.max(-3, Math.min(3, p.vx));
+                            p.vy = Math.max(-3, Math.min(3, p.vy));
+
                             p.x += p.vx; p.y += p.vy;
                             if(p.x < 0 || p.x > canvas.width) p.vx *= -1;
                             if(p.y < 0 || p.y > canvas.height) p.vy *= -1;
@@ -1279,6 +1397,7 @@
                         }
                         if(window.activeAnimFrame) window.activeAnimFrame = requestAnimationFrame(draw);
                     }
+                    if(window.activeAnimFrame) cancelAnimationFrame(window.activeAnimFrame);
                     window.activeAnimFrame = requestAnimationFrame(draw);
                 }
             },
@@ -1303,7 +1422,7 @@
                         <div class="bg-panel p-6 rounded border border-white/5 shadow-lg hover:border-white/10 transition-colors">
                             <h3 class="font-mono text-white text-sm uppercase tracking-widest mb-6 flex justify-between">
                                 <span>S&P 500 Target Zone</span>
-                                <span class="text-primary">Spot: 7,138.80</span>
+                                <span class="text-primary traceable" data-trace-type="NYSE_SIP">Spot: 7,138.80</span>
                             </h3>
                             <div class="space-y-5">
                                 <div>
@@ -1325,7 +1444,7 @@
                         <div class="bg-panel p-6 rounded border border-white/5 shadow-lg hover:border-white/10 transition-colors">
                             <h3 class="font-mono text-white text-sm uppercase tracking-widest mb-6 flex justify-between">
                                 <span>10-Year Treasury Yield</span>
-                                <span class="text-secondary">Spot: 4.415%</span>
+                                <span class="text-secondary traceable" data-trace-type="FRED_API">Spot: 4.415%</span>
                             </h3>
                             <div class="space-y-5">
                                 <div>
@@ -1685,15 +1804,15 @@
                         <ul class="space-y-6 m-0 p-0 list-none text-sm text-slate-300 font-mono">
                             <li class="flex flex-col gap-2 border-b border-white/5 pb-6">
                                 <strong class="text-white font-sans text-lg">System Clock / Timestamp</strong>
-                                <span class="text-primary text-base">Wednesday, April 29, 2026 at 6:12 AM EDT</span>
+                                <span class="text-primary text-base">Wednesday, April 29, 2026 at 10:15 PM EDT</span>
                             </li>
                             <li class="flex flex-col gap-4 pt-2">
                                 <strong class="text-white font-sans text-lg mb-2">Sources, Citations & Hash Verification</strong>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
                                     <div class="bg-void p-4 rounded border border-white/5 hover:border-primary/50 transition-colors cursor-crosshair"><span class="text-primary font-bold block text-xs uppercase mb-2">S&P 500</span>Tool Ingestion (Verified at 7,138.80; -0.49% change).</div>
                                     <div class="bg-void p-4 rounded border border-white/5 hover:border-primary/50 transition-colors cursor-crosshair"><span class="text-primary font-bold block text-xs uppercase mb-2">10-Year Treasury</span>Trading Economics (Verified at 4.415%; 1-month high).</div>
-                                    <div class="bg-void p-4 rounded border border-white/5 hover:border-primary/50 transition-colors cursor-crosshair"><span class="text-primary font-bold block text-xs uppercase mb-2">VIX Index</span>Tool Ingestion (Verified at 18.02; intraday high 19.43).</div>
-                                    <div class="bg-void p-4 rounded border border-white/5 hover:border-primary/50 transition-colors cursor-crosshair"><span class="text-primary font-bold block text-xs uppercase mb-2">Bitcoin</span>Tool Ingestion (Verified at $77,032; Snapshot 08:05 UTC).</div>
+                                    <div class="bg-void p-4 rounded border border-white/5 hover:border-primary/50 transition-colors cursor-crosshair"><span class="text-primary font-bold block text-xs uppercase mb-2">VIX Index</span>Tool Ingestion (Verified at 18.60; intraday high 19.43).</div>
+                                    <div class="bg-void p-4 rounded border border-white/5 hover:border-primary/50 transition-colors cursor-crosshair"><span class="text-primary font-bold block text-xs uppercase mb-2">Bitcoin</span>Tool Ingestion (Verified at $75,935; Snapshot 08:05 UTC).</div>
                                     <div class="bg-void p-4 rounded border border-white/5 hover:border-primary/50 transition-colors cursor-crosshair"><span class="text-primary font-bold block text-xs uppercase mb-2">Brent Crude</span>ShipFinder / Forbes (Verified at $111.78; 8th straight session).</div>
                                     <div class="bg-void p-4 rounded border border-white/5 hover:border-primary/50 transition-colors cursor-crosshair"><span class="text-primary font-bold block text-xs uppercase mb-2">Hormuz Traffic</span>ShipFinder AIS Logs (Verified Zero Recorded Transits on Apr 26).</div>
                                 </div>
@@ -1744,12 +1863,12 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr class="border-b border-white/5"><td class="py-3 px-4 text-white">S&P 500 Index</td><td class="py-3 px-4 text-accent">7,138.80 (-0.49%)</td><td class="py-3 px-4 text-slate-400">Broad risk-off sentiment ahead of megacap prints</td></tr>
-                                <tr class="border-b border-white/5"><td class="py-3 px-4 text-white">Nasdaq 100 Index</td><td class="py-3 px-4 text-accent">27,029.01 (-1.01%)</td><td class="py-3 px-4 text-slate-400">Tech-heavy concentration risk taking profits</td></tr>
-                                <tr class="border-b border-white/5"><td class="py-3 px-4 text-white">WTI Crude Oil</td><td class="py-3 px-4 text-secondary">$111.78</td><td class="py-3 px-4 text-slate-400">Elevated margin pressure on transport/data centers</td></tr>
-                                <tr class="border-b border-white/5"><td class="py-3 px-4 text-white">10-Year Treasury Yield</td><td class="py-3 px-4 text-secondary">4.37% - 4.41%</td><td class="py-3 px-4 text-slate-400">Higher discount rates pressuring tech valuations</td></tr>
-                                <tr class="border-b border-white/5"><td class="py-3 px-4 text-white">VIX Index</td><td class="py-3 px-4 text-primary">18.02 - 18.08</td><td class="py-3 px-4 text-slate-400">Volatility sellers absorbing premium ahead of event</td></tr>
-                                <tr><td class="py-3 px-4 text-white">MSFT Implied Move</td><td class="py-3 px-4 text-secondary">~6.0% - 7.0%</td><td class="py-3 px-4 text-slate-400">High confidence in massive post-earnings repricing</td></tr>
+                                <tr class="border-b border-white/5"><td class="py-3 px-4 text-white">S&P 500 Index</td><td class="py-3 px-4 text-accent traceable" data-trace-type="NYSE_SIP">7,138.80 (-0.49%)</td><td class="py-3 px-4 text-slate-400">Broad risk-off sentiment ahead of megacap prints</td></tr>
+                                <tr class="border-b border-white/5"><td class="py-3 px-4 text-white">Nasdaq 100 Index</td><td class="py-3 px-4 text-accent traceable" data-trace-type="NASDAQ_SIP">27,029.01 (-1.01%)</td><td class="py-3 px-4 text-slate-400">Tech-heavy concentration risk taking profits</td></tr>
+                                <tr class="border-b border-white/5"><td class="py-3 px-4 text-white">WTI Crude Oil</td><td class="py-3 px-4 text-secondary traceable" data-trace-type="NYMEX_FUTURES">$103.89 - $105.25</td><td class="py-3 px-4 text-slate-400">Elevated margin pressure on transport/data centers</td></tr>
+                                <tr class="border-b border-white/5"><td class="py-3 px-4 text-white">10-Year Treasury Yield</td><td class="py-3 px-4 text-secondary traceable" data-trace-type="FRED_API">4.35% - 4.37%</td><td class="py-3 px-4 text-slate-400">Higher discount rates pressuring tech valuations</td></tr>
+                                <tr class="border-b border-white/5"><td class="py-3 px-4 text-white">VIX Index</td><td class="py-3 px-4 text-primary traceable" data-trace-type="CBOE_SIP">17.83 - 18.08</td><td class="py-3 px-4 text-slate-400">Volatility sellers absorbing premium ahead of event</td></tr>
+                                <tr><td class="py-3 px-4 text-white">MSFT Implied Move</td><td class="py-3 px-4 text-secondary">~6.0% - 6.4%</td><td class="py-3 px-4 text-slate-400">High confidence in massive post-earnings repricing</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -1759,9 +1878,9 @@
                         Alphabet dismantled the bearish thesis that GenAI would rapidly cannibalize search. Google Cloud delivered breathtaking growth, validating the TPU v8 and Gemini enterprise integrations. However, the $5.11 EPS was heavily subsidized by a $36.9B unrealized gain on strategic investments (Anthropic).
                     </p>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
-                        <div class="bg-panel p-4 rounded border-t-2 border-primary"><span class="block text-[10px] text-slate-500 mb-1">Total Revenue</span><span class="text-white text-xl font-bold">$109.90B</span> <span class="text-core-green text-xs">+22.0%</span></div>
-                        <div class="bg-panel p-4 rounded border-t-2 border-primary"><span class="block text-[10px] text-slate-500 mb-1">Google Cloud Rev</span><span class="text-white text-xl font-bold">$20.03B</span> <span class="text-core-green text-xs">+63.4%</span></div>
-                        <div class="bg-panel p-4 rounded border-t-2 border-primary"><span class="block text-[10px] text-slate-500 mb-1">Cloud Op Income</span><span class="text-white text-xl font-bold">$6.60B</span> <span class="text-core-green text-xs">+203%</span></div>
+                        <div class="bg-panel p-4 rounded border-t-2 border-primary"><span class="block text-[10px] text-slate-500 mb-1">Total Revenue</span><span class="text-white text-xl font-bold traceable" data-trace-type="EDGAR_8K">$109.90B</span> <span class="text-core-green text-xs">+22.0%</span></div>
+                        <div class="bg-panel p-4 rounded border-t-2 border-primary"><span class="block text-[10px] text-slate-500 mb-1">Google Cloud Rev</span><span class="text-white text-xl font-bold traceable" data-trace-type="EDGAR_8K">$20.03B</span> <span class="text-core-green text-xs">+63.4%</span></div>
+                        <div class="bg-panel p-4 rounded border-t-2 border-primary"><span class="block text-[10px] text-slate-500 mb-1">Cloud Op Income</span><span class="text-white text-xl font-bold traceable" data-trace-type="EDGAR_8K">$6.60B</span> <span class="text-core-green text-xs">+203%</span></div>
                     </div>
 
                     <h2 class="text-white border-none font-display text-2xl tracking-widest uppercase mb-4">Microsoft (MSFT): Azure & The Network Effects of Intelligence</h2>
@@ -1769,9 +1888,9 @@
                         Microsoft established a commanding narrative of durable commercial demand. Total Cloud revenue hit $54.5 billion, and the dedicated AI business surpassed a $37 billion run rate (+123% YoY). Notably, Microsoft delivered a Capex undershoot ($31.9B vs $35.29B est), signaling massive infrastructure efficiency and a highly favorable restructuring of its OpenAI partnership.
                     </p>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
-                        <div class="bg-panel p-4 rounded border-t-2 border-white"><span class="block text-[10px] text-slate-500 mb-1">Azure Growth (CC)</span><span class="text-white text-xl font-bold">+39.0%</span> <span class="text-core-green text-xs">Beat</span></div>
-                        <div class="bg-panel p-4 rounded border-t-2 border-white"><span class="block text-[10px] text-slate-500 mb-1">Commercial RPO</span><span class="text-white text-xl font-bold">$627.0B</span> <span class="text-core-green text-xs">+99.0%</span></div>
-                        <div class="bg-panel p-4 rounded border-t-2 border-white"><span class="block text-[10px] text-slate-500 mb-1">Q3 Capex</span><span class="text-white text-xl font-bold">$31.90B</span> <span class="text-primary text-xs">Undershoot</span></div>
+                        <div class="bg-panel p-4 rounded border-t-2 border-white"><span class="block text-[10px] text-slate-500 mb-1">Azure Growth (CC)</span><span class="text-white text-xl font-bold traceable" data-trace-type="EDGAR_8K">+39.0%</span> <span class="text-core-green text-xs">Beat</span></div>
+                        <div class="bg-panel p-4 rounded border-t-2 border-white"><span class="block text-[10px] text-slate-500 mb-1">Commercial RPO</span><span class="text-white text-xl font-bold traceable" data-trace-type="EDGAR_8K">$627.0B</span> <span class="text-core-green text-xs">+99.0%</span></div>
+                        <div class="bg-panel p-4 rounded border-t-2 border-white"><span class="block text-[10px] text-slate-500 mb-1">Q3 Capex</span><span class="text-white text-xl font-bold traceable" data-trace-type="EDGAR_8K">$31.90B</span> <span class="text-primary text-xs">Undershoot</span></div>
                     </div>
 
                     <h2 class="text-secondary border-none font-display text-2xl tracking-widest uppercase mb-4">Amazon (AMZN): AWS Surge vs. Free Cash Flow Collapse</h2>
@@ -1779,9 +1898,9 @@
                         AWS accelerated to 28% growth, reaching $37.6B, driven by its proprietary custom silicon stack (Trainium/Graviton/Nitro) surpassing a $20B run rate. However, the stock dropped nearly 3% after-hours due to a catastrophic collapse in Free Cash Flow as Andy Jassy committed to a staggering $200 Billion capex plan for 2026.
                     </p>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
-                        <div class="bg-panel p-4 rounded border-t-2 border-secondary"><span class="block text-[10px] text-slate-500 mb-1">AWS Revenue</span><span class="text-white text-xl font-bold">$37.60B</span> <span class="text-core-green text-xs">+28.0%</span></div>
-                        <div class="bg-panel p-4 rounded border-t-2 border-secondary"><span class="block text-[10px] text-slate-500 mb-1">Operating Income</span><span class="text-white text-xl font-bold">$23.90B</span> <span class="text-core-green text-xs">Beat</span></div>
-                        <div class="bg-panel p-4 rounded border-t-2 border-accent box-glow-accent"><span class="block text-[10px] text-slate-500 mb-1">TTM Free Cash Flow</span><span class="text-accent text-xl font-bold glitch-text" data-text="$1.20B">$1.20B</span> <span class="text-accent text-xs">Collapse</span></div>
+                        <div class="bg-panel p-4 rounded border-t-2 border-secondary"><span class="block text-[10px] text-slate-500 mb-1">AWS Revenue</span><span class="text-white text-xl font-bold traceable" data-trace-type="EDGAR_8K">$37.60B</span> <span class="text-core-green text-xs">+28.0%</span></div>
+                        <div class="bg-panel p-4 rounded border-t-2 border-secondary"><span class="block text-[10px] text-slate-500 mb-1">Operating Income</span><span class="text-white text-xl font-bold traceable" data-trace-type="EDGAR_8K">$23.90B</span> <span class="text-core-green text-xs">Beat</span></div>
+                        <div class="bg-panel p-4 rounded border-t-2 border-accent box-glow-accent"><span class="block text-[10px] text-slate-500 mb-1">TTM Free Cash Flow</span><span class="text-accent text-xl font-bold glitch-text traceable" data-trace-type="EDGAR_8K" data-text="$1.20B">$1.20B</span> <span class="text-accent text-xs">Collapse</span></div>
                     </div>
 
                     <h2 class="text-core-purple border-none font-display text-2xl tracking-widest uppercase mb-4" style="color: #b53cff;">Meta Platforms (META): The Pivot to Closed-Weights (Muse Spark)</h2>
@@ -1789,9 +1908,9 @@
                         Meta delivered exceptional core advertising performance (Revenue +33% to $56.31B), though EPS was inflated by an $8.03B U.S. Treasury tax benefit. The historic catalyst was the debut of <strong class="text-white">Muse Spark</strong>. Meta is officially abandoning its open-source ethos in favor of a proprietary, multimodal ecosystem, enforcing "thought compression" to halve inference token costs vs. GPT-5.
                     </p>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
-                        <div class="bg-panel p-4 rounded border-t-2 border-core-purple"><span class="block text-[10px] text-slate-500 mb-1">Total Revenue</span><span class="text-white text-xl font-bold">$56.31B</span> <span class="text-core-green text-xs">+33.0%</span></div>
-                        <div class="bg-panel p-4 rounded border-t-2 border-core-purple"><span class="block text-[10px] text-slate-500 mb-1">Ad Impressions / Price</span><span class="text-white text-xl font-bold">+19% / +12%</span></div>
-                        <div class="bg-panel p-4 rounded border-t-2 border-accent"><span class="block text-[10px] text-slate-500 mb-1">Reality Labs Loss</span><span class="text-accent text-xl font-bold">($4.03B)</span> <span class="text-slate-400 text-xs">Burn</span></div>
+                        <div class="bg-panel p-4 rounded border-t-2 border-core-purple"><span class="block text-[10px] text-slate-500 mb-1">Total Revenue</span><span class="text-white text-xl font-bold traceable" data-trace-type="EDGAR_8K">$56.31B</span> <span class="text-core-green text-xs">+33.0%</span></div>
+                        <div class="bg-panel p-4 rounded border-t-2 border-core-purple"><span class="block text-[10px] text-slate-500 mb-1">Ad Impressions / Price</span><span class="text-white text-xl font-bold traceable" data-trace-type="EDGAR_8K">+19% / +12%</span></div>
+                        <div class="bg-panel p-4 rounded border-t-2 border-accent"><span class="block text-[10px] text-slate-500 mb-1">Reality Labs Loss</span><span class="text-accent text-xl font-bold traceable" data-trace-type="EDGAR_8K">($4.03B)</span> <span class="text-slate-400 text-xs">Burn</span></div>
                     </div>
 
                     <h2 class="text-slate-300 border-none font-display text-2xl tracking-widest uppercase mb-4">Apple (AAPL): Hardware Resurgence & CEO Transition</h2>
@@ -1874,7 +1993,7 @@
                     taxData: ['(22.8)', '(26.3)', '(29.7)', '(33.1)', '(36.5)'], nopatData: ['104.0', '119.8', '135.7', '150.9', '166.3'], daData: ['22.0', '25.0', '28.0', '31.0', '34.0'],
                     capexData: ['(125.0)', '(130.0)', '(135.0)', '(140.0)', '(145.0)'], fcfData: ['8.0', '19.8', '33.7', '46.9', '60.3']
                 }),
-                onLoad: () => renderWaterfall('msftWaterfall', [8.0, 19.8, 33.7, 46.9, 60.3, 75.2, 92.1], 150)
+                onLoad: () => window.renderWaterfall('msftWaterfall', [8.0, 19.8, 33.7, 46.9, 60.3, 75.2, 92.1], 150)
             },
             {
                 id: 22, group: "FINANCIAL MODELING", title: "GOOGL Valuation", subtitle: "DCF & Enterprise Value (7-Year)",
@@ -1886,7 +2005,7 @@
                     taxData: ['(20.2)', '(23.2)', '(26.3)', '(29.4)', '(32.6)'], nopatData: ['106.1', '121.8', '138.5', '154.7', '171.2'], daData: ['24.0', '28.0', '32.0', '35.0', '38.0'],
                     capexData: ['(180.0)', '(140.0)', '(130.0)', '(120.0)', '(115.0)'], fcfData: ['-49.8', '9.8', '40.5', '69.7', '94.2']
                 }),
-                onLoad: () => renderWaterfall('googlWaterfall', [-49.8, 9.8, 40.5, 69.7, 94.2, 115.5, 130.2], 180)
+                onLoad: () => window.renderWaterfall('googlWaterfall', [-49.8, 9.8, 40.5, 69.7, 94.2, 115.5, 130.2], 180)
             },
             {
                 id: 23, group: "FINANCIAL MODELING", title: "AMZN Valuation", subtitle: "DCF & Enterprise Value (7-Year)",
@@ -1900,7 +2019,7 @@
                     taxData: ['(18.4)', '(23.3)', '(28.7)', '(34.5)', '(40.6)'], nopatData: ['69.3', '87.7', '108.1', '130.0', '152.5'], daData: ['85.0', '100.0', '110.0', '115.0', '120.0'],
                     capexData: ['(200.0)', '(180.0)', '(150.0)', '(140.0)', '(135.0)'], fcfData: ['-50.7', '2.7', '63.1', '100.0', '132.5']
                 }),
-                onLoad: () => renderWaterfall('amznWaterfall', [-50.7, 2.7, 63.1, 100.0, 132.5, 154.1, 173.7], 200)
+                onLoad: () => window.renderWaterfall('amznWaterfall', [-50.7, 2.7, 63.1, 100.0, 132.5, 154.1, 173.7], 200)
             },
             {
                 id: 24, group: "FINANCIAL MODELING", title: "META Valuation", subtitle: "DCF & Enterprise Value (7-Year)",
@@ -1912,7 +2031,7 @@
                     taxData: ['(12.3)', '(13.8)', '(15.8)', '(17.8)', '(19.7)'], nopatData: ['56.1', '63.1', '72.2', '81.2', '89.7'], daData: ['15.0', '18.0', '22.0', '25.0', '28.0'],
                     capexData: ['(145.0)', '(110.0)', '(90.0)', '(85.0)', '(80.0)'], fcfData: ['-73.9', '-28.9', '4.2', '21.2', '37.7']
                 }),
-                onLoad: () => renderWaterfall('metaWaterfall', [-73.9, -28.9, 4.2, 21.2, 37.7, 50.1, 65.4], 150)
+                onLoad: () => window.renderWaterfall('metaWaterfall', [-73.9, -28.9, 4.2, 21.2, 37.7, 50.1, 65.4], 150)
             },
             {
                 id: 25, group: "FINANCIAL MODELING", title: "AAPL Valuation", subtitle: "DCF & Enterprise Value (7-Year)",
@@ -1924,7 +2043,7 @@
                     taxData: ['(21.5)', '(23.0)', '(24.6)', '(26.1)', '(27.5)'], nopatData: ['113.3', '120.8', '129.3', '137.0', '144.8'], daData: ['12.0', '13.0', '14.0', '15.0', '16.0'],
                     capexData: ['(15.0)', '(16.0)', '(17.0)', '(18.0)', '(19.0)'], fcfData: ['110.3', '117.8', '126.3', '134.0', '141.8']
                 }),
-                onLoad: () => renderWaterfall('aaplWaterfall', [110.3, 117.8, 126.3, 134.0, 141.8, 150.1, 158.5], 200)
+                onLoad: () => window.renderWaterfall('aaplWaterfall', [110.3, 117.8, 126.3, 134.0, 141.8, 150.1, 158.5], 200)
             },
             {
                 id: 26, group: "DISTRIBUTION", title: "Email Dispatcher", subtitle: "Generate Copy-Ready Newsletter",
@@ -1961,9 +2080,11 @@
                             <p class="text-sm text-slate-400 mt-2 m-0">STATIC DATA INJECTION // SYSTEM DIRECTORY // WIDGET SIZING</p>
                         </div>
                     </div>
+
                     <p class="text-base text-slate-300 mb-8 leading-relaxed border-l-4 border-primary pl-6 py-3 glass-panel">
                         This module provides administrative control over the real-time simulation. The form below maps directly to the global <code class="bg-black/50 px-1 rounded text-primary">window.systemTelemetry</code> object, injecting static data across the top KPI widget layer. The Dashboard Widget layout relies on the <code class="bg-black/50 px-1 rounded text-primary">.bento-widget</code> class (CSS <code class="bg-black/50 px-1 rounded text-primary">resize: both</code>), and you can drag elements to swap their positions.
                     </p>
+
                     <div class="grid grid-cols-1 xl:grid-cols-2 gap-8 mb-12">
                         <!-- Telemetry Edit -->
                         <div class="glass-panel p-6 rounded border-t-2 border-primary shadow-lg">
@@ -1979,6 +2100,7 @@
                             <button onclick="pushTelemetryData()" class="mt-6 w-full px-4 py-2.5 bg-primary text-black rounded font-mono font-bold hover:bg-white hover:shadow-[0_0_15px_rgba(var(--color-primary),0.8)] transition-all uppercase clip-path-angled cursor-pointer">Update Core Telemetry</button>
                             <button onclick="exportTelemetry()" class="mt-4 w-full px-4 py-2.5 bg-void border border-primary text-primary rounded font-mono font-bold hover:bg-primary hover:text-black transition-all uppercase clip-path-angled cursor-pointer">Export Ledger to JSON</button>
                         </div>
+
                         <!-- Grid Sizing Guide -->
                         <div class="glass-panel p-6 rounded border-t-2 border-secondary shadow-lg">
                             <h2 class="text-white font-display text-xl tracking-widest uppercase mb-6 border-b border-white/10 pb-2">2. Dashboard Layout Guide</h2>
@@ -1992,6 +2114,7 @@
                             </div>
                         </div>
                     </div>
+
                     <h2 class="text-white font-display text-xl tracking-widest uppercase mb-6">3. System Module Directory</h2>
                     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" id="inventoryGrid"></div>
                 `,
@@ -2132,572 +2255,541 @@
                         });
                     }
                 }
-            },
-            {
-                id: 31, group: "SECURITY VECTORS", title: "Q-Day Threat Horizon", subtitle: "Quantum Decryption Timelines",
-                content: `
-                    <div class="flex items-center justify-between mb-8 border-b border-white/10 pb-4 flex-wrap gap-4">
-                        <div>
-                            <h1 class="m-0 border-none pb-0 text-3xl">QUANTUM CRYPTOGRAPHY RISK</h1>
-                            <p class="text-sm text-slate-400 mt-2 m-0">SNDL (STORE NOW, DECRYPT LATER) TELEMETRY</p>
-                        </div>
-                        <div class="text-right">
-                            <span class="bg-accent/20 text-accent px-2 py-1 rounded text-[10px] font-mono border border-accent/50 animate-pulse">THREAT HORIZON: NARROWING</span>
-                        </div>
-                    </div>
-                    <p class="text-base text-slate-300 mb-8 leading-relaxed border-l-4 border-accent pl-6 py-3 glass-panel">
-                        Adversarial nation-states are executing massive "Store Now, Decrypt Later" (SNDL) data-harvesting operations. As quantum coherence scales, the timeline to breaking RSA-2048 (Q-Day) is collapsing faster than institutional migration to post-quantum cryptography (PQC) standards.
-                    </p>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
-                        <div class="glass-panel p-6 rounded border-t-2 border-primary shadow-lg cursor-crosshair">
-                            <h3 class="font-mono text-primary text-xs uppercase tracking-widest mb-4">Q-Day Probability Curve</h3>
-                            <div class="space-y-4">
-                                <div>
-                                    <div class="flex justify-between text-xs font-mono mb-1 text-slate-400"><span>By 2028</span><span class="text-accent">15%</span></div>
-                                    <div class="w-full bg-void h-2 rounded"><div class="bg-accent h-full rounded" style="width: 15%"></div></div>
-                                </div>
-                                <div>
-                                    <div class="flex justify-between text-xs font-mono mb-1 text-slate-400"><span>By 2030</span><span class="text-secondary">48%</span></div>
-                                    <div class="w-full bg-void h-2 rounded"><div class="bg-secondary h-full rounded" style="width: 48%"></div></div>
-                                </div>
-                                <div>
-                                    <div class="flex justify-between text-xs font-mono mb-1 text-slate-400"><span>By 2032</span><span class="text-primary">82%</span></div>
-                                    <div class="w-full bg-void h-2 rounded"><div class="bg-primary h-full rounded" style="width: 82%"></div></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="glass-panel p-6 rounded border-t-2 border-accent shadow-lg cursor-crosshair relative overflow-hidden">
-                            <div class="absolute inset-0 bg-[linear-gradient(rgba(255,30,56,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,30,56,0.05)_1px,transparent_1px)] bg-[size:10px_10px] pointer-events-none"></div>
-                            <h3 class="font-mono text-accent text-xs uppercase tracking-widest mb-4 relative z-10">Vulnerable Protocols</h3>
-                            <ul class="text-sm font-mono text-slate-300 space-y-3 m-0 relative z-10">
-                                <li class="flex justify-between"><span class="text-white">RSA-2048</span><span class="text-accent bg-accent/20 px-2 py-0.5 rounded">CRITICAL</span></li>
-                                <li class="flex justify-between"><span class="text-white">ECC (Curve25519)</span><span class="text-accent bg-accent/20 px-2 py-0.5 rounded">CRITICAL</span></li>
-                                <li class="flex justify-between"><span class="text-white">AES-256</span><span class="text-core-green bg-core-green/20 px-2 py-0.5 rounded text-core-green">QUANTUM RESISTANT</span></li>
-                            </ul>
-                        </div>
-                    </div>
-                `
-            },
-            {
-                id: 32, group: "MARKET MECHANICS", title: "Order Book Imbalance", subtitle: "Level 3 Data Reconstruction",
-                content: `
-                    <div class="flex items-center justify-between mb-8 border-b border-white/10 pb-4">
-                        <div>
-                            <h1 class="m-0 border-none pb-0 text-3xl">ORDER BOOK IMBALANCE (VWAP)</h1>
-                            <p class="text-sm text-slate-400 mt-2 m-0">LEVEL 3 ALGORITHMIC EXECUTION TRACKING</p>
-                        </div>
-                    </div>
-                    <p class="text-base text-slate-300 mb-8 leading-relaxed">
-                        Reconstructing fragmented liquidity pools to visualize true algorithmic execution paths. The disparity between cumulative bid size and cumulative ask size dictates short-term high-frequency execution vectors.
-                    </p>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
-                        <div class="glass-panel p-6 rounded shadow-lg flex flex-col items-center justify-center relative overflow-hidden">
-                            <h3 class="font-mono text-white text-xs uppercase tracking-widest mb-6 border-b border-white/10 pb-2 w-full text-center">SPY (S&P 500 ETF)</h3>
-                            <div class="flex w-full items-end justify-center gap-2 h-40">
-                                <div class="w-16 bg-primary rounded-t shadow-[0_0_15px_rgba(var(--color-primary),0.5)] transition-all duration-500" style="height: 35%"></div>
-                                <div class="w-16 bg-accent rounded-t shadow-[0_0_15px_rgba(var(--color-accent),0.5)] transition-all duration-500" style="height: 85%"></div>
-                            </div>
-                            <div class="flex w-full justify-center gap-2 mt-4 text-xs font-mono">
-                                <div class="w-16 text-center text-primary">BID (35%)</div>
-                                <div class="w-16 text-center text-accent">ASK (85%)</div>
-                            </div>
-                            <p class="text-[10px] text-accent font-mono mt-4 text-center border border-accent/30 bg-accent/10 px-2 py-1 rounded w-full">STATUS: AGGRESSIVE DISTRIBUTION</p>
-                        </div>
-                        <div class="glass-panel p-6 rounded shadow-lg flex flex-col items-center justify-center relative overflow-hidden">
-                            <h3 class="font-mono text-white text-xs uppercase tracking-widest mb-6 border-b border-white/10 pb-2 w-full text-center">TLT (20+ Yr Treasury)</h3>
-                            <div class="flex w-full items-end justify-center gap-2 h-40">
-                                <div class="w-16 bg-primary rounded-t shadow-[0_0_15px_rgba(var(--color-primary),0.5)] transition-all duration-500" style="height: 92%"></div>
-                                <div class="w-16 bg-accent rounded-t shadow-[0_0_15px_rgba(var(--color-accent),0.5)] transition-all duration-500" style="height: 20%"></div>
-                            </div>
-                            <div class="flex w-full justify-center gap-2 mt-4 text-xs font-mono">
-                                <div class="w-16 text-center text-primary">BID (92%)</div>
-                                <div class="w-16 text-center text-accent">ASK (20%)</div>
-                            </div>
-                            <p class="text-[10px] text-primary font-mono mt-4 text-center border border-primary/30 bg-primary/10 px-2 py-1 rounded w-full">STATUS: FLIGHT TO SAFETY BID</p>
-                        </div>
-                    </div>
-                `
-            },
-            {
-                id: 33, group: "LABOR MARKET", title: "Demographic Arbitrage", subtitle: "Labor Force Participation & Wage Inflation",
-                content: `
-                    <div class="flex items-center justify-between mb-8 border-b border-white/10 pb-4 flex-wrap">
-                        <div>
-                            <h1 class="m-0 border-none pb-0 text-3xl">LABOR FORCE DEMOGRAPHICS</h1>
-                            <p class="text-sm text-slate-400 mt-2 m-0">STRUCTURAL SHIFTS & PARTICIPATION RATES BY RACE</p>
-                        </div>
-                        <div class="text-right mt-4 sm:mt-0">
-                            <span class="text-primary font-mono text-xs block mb-1">DATA: APRIL 2026 BLS SURVEY</span>
-                            <span class="bg-secondary/20 text-secondary px-2 py-1 rounded text-[10px] font-mono border border-secondary/50 animate-pulse">WAGE INFLATION RISK: ELEVATED</span>
-                        </div>
-                    </div>
-                    <p class="text-base text-slate-300 mb-8 leading-relaxed">
-                        The structural tight labor market driving persistent wage inflation is increasingly dependent on minority participation growth to offset the accelerated retirement cycle of the aging white demographic. This "demographic arbitrage" is a critical input for understanding service-sector wage floors.
-                    </p>
-                    
-                    <h2 class="text-white border-none mt-6 font-display text-2xl tracking-widest uppercase mb-4">Labor Force Participation Rates (LFPR)</h2>
-                    <div class="overflow-x-auto glass-panel rounded border border-white/5 shadow-lg mb-10">
-                        <table class="w-full text-left font-mono text-xs whitespace-nowrap m-0">
-                            <thead class="bg-black/60 border-b border-core-border">
-                                <tr>
-                                    <th class="py-4 px-4 text-core-muted font-normal">Demographic Group</th>
-                                    <th class="py-4 px-4 text-core-muted font-normal">Current LFPR (Apr 2026)</th>
-                                    <th class="py-4 px-4 text-core-muted font-normal">YoY Change</th>
-                                    <th class="py-4 px-4 text-core-muted font-normal">Structural Implication</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr class="data-row border-b border-core-border/50">
-                                    <td class="py-4 px-4 font-bold text-white">White</td>
-                                    <td class="py-4 px-4 text-white">62.1%</td>
-                                    <td class="py-4 px-4 text-accent">-0.4%</td>
-                                    <td class="py-4 px-4 text-slate-400">Aging cohort; accelerated boomer retirement phase.</td>
-                                </tr>
-                                <tr class="data-row border-b border-core-border/50">
-                                    <td class="py-4 px-4 font-bold text-white">Black or African American</td>
-                                    <td class="py-4 px-4 text-white">63.7%</td>
-                                    <td class="py-4 px-4 text-primary">+0.3%</td>
-                                    <td class="py-4 px-4 text-slate-400">Prime-age participation absorbing service sector gaps.</td>
-                                </tr>
-                                <tr class="data-row border-b border-core-border/50">
-                                    <td class="py-4 px-4 font-bold text-white">Hispanic or Latino</td>
-                                    <td class="py-4 px-4 text-secondary font-bold">66.9%</td>
-                                    <td class="py-4 px-4 text-slate-400">Flat</td>
-                                    <td class="py-4 px-4 text-slate-400">Highest overall participation; driven by Gen-Z entry.</td>
-                                </tr>
-                                <tr class="data-row border-b border-core-border/50">
-                                    <td class="py-4 px-4 font-bold text-white">Asian</td>
-                                    <td class="py-4 px-4 text-white">64.6%</td>
-                                    <td class="py-4 px-4 text-primary">+0.5%</td>
-                                    <td class="py-4 px-4 text-slate-400">Surge in tech/STEM re-entry post-2024 layoffs.</td>
-                                </tr>
-                                <tr class="bg-primary/5">
-                                    <td class="py-4 px-4 font-bold text-primary">Aggregate Total</td>
-                                    <td class="py-4 px-4 text-primary font-bold">62.5%</td>
-                                    <td class="py-4 px-4 text-accent">-0.1%</td>
-                                    <td class="py-4 px-4 text-primary">Overall supply constrained; wages must rise to attract marginal workers.</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                        <div class="bg-panel p-6 rounded border-l-4 border-secondary">
-                            <h3 class="font-display text-white text-lg m-0 mb-2 uppercase">The Missing Millions</h3>
-                            <p class="text-sm text-slate-400 leading-relaxed m-0">The 0.4% drop in white participation removes approximately 650,000 workers from the supply pool. Because this group holds disproportionate wealth (via housing and equities), their exit relies on accumulated capital rather than labor income, creating an unbridgeable supply deficit.</p>
-                        </div>
-                        <div class="bg-panel p-6 rounded border-l-4 border-primary">
-                            <h3 class="font-display text-white text-lg m-0 mb-2 uppercase">Macro Routing Implication</h3>
-                            <p class="text-sm text-slate-400 leading-relaxed m-0">The Fed cannot print labor. Powell's 'Hawkish Hold' is justified because unit labor costs will not fall while demographic math is inverted. Corporate margins in labor-intensive sectors (Hospitality, Logistics) will face severe structural compression.</p>
-                        </div>
-                    </div>
-                `
             }
         ];
 
-        // --- CORE ENGINE ---
-
-        function initApp() {
-            renderBootLogs();
-            setTimeout(() => {
-                document.getElementById('bootScreen').style.opacity = '0';
-                setTimeout(() => document.getElementById('bootScreen').remove(), 1000);
-            }, 3500);
-
-            initCharts();
-            populateNav();
-            loadModule(1);
-            startTicker();
-            updateClock();
-            setInterval(updateClock, 1000);
-            startTelemetry();
-            initDragAndDrop();
-        }
-
-        function renderBootLogs() {
-            const lines = ["INITIALIZING NEURAL LINK...", "SYNCING AIS_HORMUZ_STREAM...", "LOADING MACRO_WEIGHTS...", "RLHF ENGINE: OPTIMIZING...", "DECRYPTING PROVENANCE...", "ADAM V50.0 ONLINE."];
-            const container = document.getElementById('bootLogs');
-            lines.forEach((l, i) => {
-                setTimeout(() => {
-                    const el = document.createElement('div');
-                    el.innerText = `> ${l}`;
-                    container.appendChild(el);
-                }, i * 400);
-            });
-        }
-
-        function updateClock() {
-            document.getElementById('sysClock').innerText = new Date().toLocaleTimeString() + ' UTC';
-        }
-
-        function initCharts() {
-            const cPrimary = getComputedStyle(document.documentElement).getPropertyValue('--color-primary').trim() || '0 229 255';
-            const ctx1 = document.getElementById('probabilityChart').getContext('2d');
-            probChartInstance = new Chart(ctx1, {
-                type: 'line',
-                data: {
-                    labels: ['T-6', 'T-5', 'T-4', 'T-3', 'T-2', 'T-1', 'NOW'],
-                    datasets: [{
-                        label: 'Macro Probability',
-                        data: [7400, 7350, 7200, 7250, 7180, 7150, 7138],
-                        borderColor: `rgb(${cPrimary})`,
-                        backgroundColor: `rgba(${cPrimary.split(' ').join(',')}, 0.1)`,
-                        fill: true, tension: 0.4
-                    }]
-                },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false } }, y: { grid: { color: 'rgba(255,255,255,0.05)' } } } }
-            });
-
-            const ctx2 = document.getElementById('radarChart').getContext('2d');
-            radarChartInstance = new Chart(ctx2, {
-                type: 'radar',
-                data: {
-                    labels: ['Geopolitics', 'Credit', 'Liquidity', 'Energy', 'Compute'],
-                    datasets: [{
-                        data: baseRadarData,
-                        borderColor: '#ff1e38',
-                        backgroundColor: 'rgba(255, 30, 56, 0.2)'
-                    }]
-                },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { r: { grid: { color: 'rgba(255,255,255,0.1)' }, pointLabels: { color: 'rgba(255,255,255,0.6)' }, ticks: { display: false } } } }
-            });
-        }
-
-        function populateNav() {
+        // ---------------------------------------------------------
+        // UI FILTERING / NAVIGATION SEARCH & MATRIX PROTOCOL
+        // ---------------------------------------------------------
+        
+        function initNavigation() {
             const nav = document.getElementById('moduleNav');
-            const dots = document.getElementById('paginationDots');
-            const mobile = document.getElementById('mobileNav');
-            
+            const mobileNav = document.getElementById('mobileNav');
+            nav.innerHTML = '';
+            mobileNav.innerHTML = '';
+
+            let currentGroup = '';
             modules.forEach(m => {
-                // Sidebar
-                const btn = document.createElement('div');
-                btn.className = "nav-item p-2 rounded text-[10px] font-mono cursor-pointer hover:bg-primary/10 hover:text-primary transition-all flex justify-between";
-                btn.innerHTML = `<span>MOD ${m.id.toString().padStart(2,'0')}</span><span class="opacity-40 truncate ml-2 max-w-[150px] text-right">${m.title}</span>`;
-                btn.onclick = () => loadModule(m.id);
-                nav.appendChild(btn);
+                if (m.group !== currentGroup) {
+                    currentGroup = m.group;
+                    const groupLabel = document.createElement('div');
+                    groupLabel.className = 'text-[9px] font-mono text-slate-500 uppercase tracking-widest mt-4 mb-1 px-3';
+                    groupLabel.innerText = currentGroup;
+                    nav.appendChild(groupLabel);
+                }
 
-                // Mobile
-                const opt = document.createElement('option');
-                opt.value = m.id;
-                opt.innerText = `MOD ${m.id.toString().padStart(2,'0')} - ${m.title}`;
-                mobile.appendChild(opt);
+                // Desktop Nav Item
+                const navItem = document.createElement('div');
+                navItem.className = 'nav-item p-2 rounded hover:bg-white/5 cursor-pointer text-xs font-sans text-slate-300 transition-colors border-l-2 border-transparent hover:border-primary flex flex-col gap-1';
+                navItem.innerHTML = `<span class="font-bold text-white">${m.title}</span><span class="text-[10px] text-slate-500 font-mono">${m.subtitle}</span>`;
+                navItem.onclick = () => loadModule(m.id);
+                nav.appendChild(navItem);
 
-                // Dots
-                const dot = document.createElement('div');
-                dot.className = `w-1.5 h-1.5 rounded-full bg-white/10 cursor-pointer hover:bg-primary transition-all dot-${m.id}`;
-                dot.onclick = () => loadModule(m.id);
-                dots.appendChild(dot);
+                // Mobile Nav Item
+                const option = document.createElement('option');
+                option.value = m.id;
+                option.innerText = `${m.group}: ${m.title}`;
+                mobileNav.appendChild(option);
             });
-            
-            document.getElementById('prevBtn').onclick = () => loadModule(currentModuleId > 1 ? currentModuleId - 1 : modules.length);
-            document.getElementById('nextBtn').onclick = () => loadModule(currentModuleId < modules.length ? currentModuleId + 1 : 1);
         }
 
         function loadModule(id) {
-            const m = modules.find(x => x.id === id);
-            if(!m) return;
             currentModuleId = id;
+            const mod = modules.find(m => m.id === id);
+            if (!mod) return;
+            
             document.getElementById('mobileNav').value = id;
+            document.getElementById('moduleTitleDisplay').innerText = mod.title;
+            document.getElementById('moduleIndicator').innerText = `MOD ${String(id).padStart(2, '0')} // ${mod.group}`;
             
-            const content = document.getElementById('contentArea');
-            content.classList.remove('opacity-100', 'translate-y-0');
-            content.classList.add('opacity-0', 'translate-y-4');
+            const contentArea = document.getElementById('contentArea');
+            contentArea.style.opacity = 0;
+            contentArea.style.transform = 'translateY(10px)';
             
-            setTimeout(() => {
-                document.getElementById('moduleTitleDisplay').innerText = m.title;
-                document.getElementById('moduleIndicator').innerText = `MOD ${m.id.toString().padStart(2,'0')} // ${m.group}`;
-                content.innerHTML = m.content;
-                content.classList.remove('opacity-0', 'translate-y-4');
-                content.classList.add('opacity-100', 'translate-y-0');
-                
-                if (m.onLoad) m.onLoad();
+            // Build Pagination Dots
+            const dotsContainer = document.getElementById('paginationDots');
+            dotsContainer.innerHTML = '';
+            modules.forEach(m => {
+                const dot = document.createElement('button');
+                dot.className = `w-2 h-2 rounded-full transition-all cursor-pointer ${m.id === id ? 'bg-primary shadow-[0_0_8px_rgba(var(--color-primary),1)] scale-125' : 'bg-slate-700 hover:bg-slate-500'}`;
+                dot.onclick = () => loadModule(m.id);
+                dotsContainer.appendChild(dot);
+            });
 
-                // Update dots
-                document.querySelectorAll('#paginationDots div').forEach(d => d.classList.replace('bg-primary', 'bg-white/10'));
-                document.querySelector(`.dot-${id}`).classList.replace('bg-white/10', 'bg-primary');
-                
-                // Update Nav Highlights
-                document.querySelectorAll('#moduleNav .nav-item').forEach((n, idx) => {
-                    if(idx + 1 === id) n.classList.add('bg-primary/20', 'text-primary');
-                    else n.classList.remove('bg-primary/20', 'text-primary');
-                });
+            document.getElementById('prevBtn').disabled = id === 1;
+            document.getElementById('nextBtn').disabled = id === modules.length;
+
+            setTimeout(() => {
+                contentArea.innerHTML = mod.content;
+                contentArea.style.opacity = 1;
+                contentArea.style.transform = 'translateY(0)';
+                if (mod.onLoad) setTimeout(mod.onLoad, 100);
             }, 300);
         }
 
-        function renderWaterfall(containerId, data, startY=0) {
-            const container = document.getElementById(containerId);
-            if(!container) return;
-            container.innerHTML = data.map((val, i) => {
-                const height = Math.abs(val) + 20;
-                const isPos = val >= 0;
-                return `
-                    <div class="dcf-col">
-                        <div class="${isPos ? 'dcf-bar-pos' : 'dcf-bar-neg'}" style="height: ${height}%;"></div>
-                        <span class="dcf-val">${val}</span>
-                        <span class="dcf-label">${2026 + i}</span>
-                    </div>
-                `;
-            }).join('');
+        function navigateModule(direction) {
+            const newId = currentModuleId + direction;
+            if (newId >= 1 && newId <= modules.length) {
+                loadModule(newId);
+                document.getElementById('mainScrollArea').scrollTo({top: 0, behavior: 'smooth'});
+            }
+        }
+
+        document.getElementById('commandInput').addEventListener('keyup', function(e) {
+            if (e.key === 'Enter') {
+                const q = this.value;
+                if(q.trim() === '/matrix' || q.trim() === '/ghost') {
+                    triggerMatrixMode();
+                    this.value = '';
+                    return;
+                }
+                if(q.startsWith('/')) {
+                    triggerPreset(q);
+                    this.value = '';
+                }
+                return;
+            }
+            
+            const term = this.value.toLowerCase();
+            if (term.startsWith('/')) return;
+            
+            const items = document.querySelectorAll('#moduleNav .nav-item');
+            items.forEach(item => {
+                const text = item.innerText.toLowerCase();
+                if(text.includes(term)) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+
+        // ---------------------------------------------------------
+        // UI TOGGLES AND ACTIONS
+        // ---------------------------------------------------------
+        function toggleDefcon() {
+            isDefconActive = !isDefconActive;
+            const btn = document.getElementById('defconBtn');
+            if(isDefconActive) {
+                document.body.classList.add('defcon-active');
+                btn.classList.add('bg-accent', 'text-black');
+                btn.classList.remove('text-accent', 'bg-void');
+            } else {
+                document.body.classList.remove('defcon-active');
+                btn.classList.remove('bg-accent', 'text-black');
+                btn.classList.add('text-accent', 'bg-void');
+            }
+            if(probabilityChartInstance) probabilityChartInstance.update();
+            if(radarChartInstance) radarChartInstance.update();
+        }
+
+        function changeTheme(theme) {
+            document.body.className = `h-screen w-screen flex flex-col selection:bg-primary selection:text-black relative text-sm ${theme} ${isDefconActive ? 'defcon-active' : ''}`;
+            if(probChartInstance) { probChartInstance.destroy(); initCharts(); }
+            if(radarChartInstance) { radarChartInstance.destroy(); initCharts(); }
         }
 
         function toggleAI() {
-            isAIOpen = !isAIOpen;
-            document.getElementById('aiPanel').style.transform = isAIOpen ? 'translateX(0)' : 'translateX(100%)';
-        }
-
-        async function handleAIQuery(e) {
-            e.preventDefault();
-            const input = document.getElementById('aiInput');
-            const q = input.value.trim();
-            if(!q) return;
-
-            addChatMessage('user', q);
-            input.value = '';
-            const loadingId = addTypingIndicator();
-
-            try {
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{ parts: [{ text: q }] }],
-                        systemInstruction: { parts: [{ text: "You are Adam, a cynical, data-driven macro-analysis AI agent in 2026. Focus on the Hormuz Blockade, high 10Y yields, and the Mag 7 DCFs. Be direct." }] }
-                    })
-                });
-                const data = await response.json();
-                const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "Link Error.";
-                removeTypingIndicator(loadingId);
-                addChatMessage('adam', text);
-            } catch {
-                removeTypingIndicator(loadingId);
-                addChatMessage('adam', "Network failure. Connectivity in Hormuz corridor degraded. API Key not provided.");
+            const panel = document.getElementById('aiPanel');
+            isAIPanelOpen = !isAIPanelOpen;
+            if(isAIPanelOpen) {
+                panel.classList.remove('translate-x-full');
+                setTimeout(() => document.getElementById('aiInput').focus(), 500);
+            } else {
+                panel.classList.add('translate-x-full');
             }
         }
 
         function triggerPreset(text) {
-            if(!isAIOpen) toggleAI();
+            if(!isAIPanelOpen) toggleAI();
+            const input = document.getElementById('aiInput');
+            input.value = text;
             setTimeout(() => {
-                const input = document.getElementById('aiInput');
-                input.value = text;
                 document.getElementById('chatForm').dispatchEvent(new Event('submit'));
             }, 300);
         }
 
-        function addChatMessage(role, text) {
-            const log = document.getElementById('chatLog');
-            const div = document.createElement('div');
-            const isAdam = role === 'adam';
-            div.className = "flex gap-3";
-            div.innerHTML = `
-                <div class="w-7 h-7 rounded border ${isAdam ? 'border-primary/50 bg-primary/10' : 'border-white/10 bg-void'} flex items-center justify-center shrink-0">
-                    <span class="text-[10px] font-bold ${isAdam ? 'text-primary' : 'text-slate-500'}">${isAdam ? 'A' : 'U'}</span>
-                </div>
-                <div class="bg-panel p-3 rounded border border-white/5 text-slate-300 max-w-[85%] relative shadow-lg">
-                    ${isAdam ? '<div class="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-primary to-transparent rounded-t-lg"></div>' : ''}
-                    <p class="leading-relaxed m-0 text-xs">${text}</p>
+        function handleAIQuery(e) {
+            e.preventDefault();
+            const input = document.getElementById('aiInput');
+            const val = input.value.trim();
+            if(!val) return;
+
+            const chatLog = document.getElementById('chatLog');
+            
+            // Add user message
+            const userHtml = `
+                <div class="flex gap-3 justify-end">
+                    <div class="bg-primary/20 p-4 rounded-lg rounded-tr-none border border-primary/30 text-white max-w-[90%] shadow-lg">
+                        <p class="m-0">${val}</p>
+                    </div>
+                    <div class="w-7 h-7 rounded bg-slate-800 flex items-center justify-center shrink-0 border border-slate-600">
+                        <span class="text-[10px] font-display font-bold text-slate-400">U</span>
+                    </div>
                 </div>
             `;
-            log.appendChild(div);
-            log.scrollTop = log.scrollHeight;
+            chatLog.insertAdjacentHTML('beforeend', userHtml);
+            input.value = '';
+            
+            // Scroll to bottom
+            chatLog.scrollTo({top: chatLog.scrollHeight, behavior: 'smooth'});
+
+            // Simulate typing
+            const typingId = 'typing-' + Date.now();
+            const typingHtml = `
+                <div class="flex gap-3" id="${typingId}">
+                    <div class="w-7 h-7 rounded border border-primary/50 bg-primary/10 flex items-center justify-center shrink-0 shadow-[0_0_10px_rgba(var(--color-primary),0.2)]">
+                        <span class="text-[10px] font-display font-bold text-primary">A</span>
+                    </div>
+                    <div class="bg-panel p-4 rounded-lg rounded-tl-none border border-white/10 text-slate-300 flex items-center">
+                        <div class="typing-indicator"><span></span><span></span><span></span></div>
+                    </div>
+                </div>
+            `;
+            chatLog.insertAdjacentHTML('beforeend', typingHtml);
+            chatLog.scrollTo({top: chatLog.scrollHeight, behavior: 'smooth'});
+
+            // Simulate response
+            setTimeout(() => {
+                document.getElementById(typingId).remove();
+                
+                let responseText = "Understood. The telemetry has been logged and the neural weights are adapting to the new input vector.";
+                if(val.toLowerCase().includes('dcf') || val.toLowerCase().includes('tech')) {
+                    responseText = "Generating Discounted Cash Flow models for the Magnificent Seven. Note that Amazon's FCF collapse creates a severe divergence from Microsoft's structural moat. Check modules 21 through 25 for details.";
+                } else if(val.toLowerCase().includes('stagflation')) {
+                    responseText = "The Stagflationary Trap occurs when supply-side chokepoints (e.g., Hormuz blockade driving Brent Crude >$111) force central banks to maintain restrictive yields (10Y > 4.4%) even as economic growth stalls. This creates a lethal environment for highly leveraged assets.";
+                } else if(val.toLowerCase().includes('musk')) {
+                    responseText = "Loading legal overhang analysis for Musk v. Altman. The trial in Oakland federal court presents a non-zero probability of structural unwinding for OpenAI's for-profit arm. This introduces severe tail-risk for Microsoft's Azure AI revenue projections.";
+                    setTimeout(()=> loadModule(20), 1000);
+                }
+
+                const responseHtml = `
+                    <div class="flex gap-3">
+                        <div class="w-7 h-7 rounded border border-primary/50 bg-primary/10 flex items-center justify-center shrink-0 shadow-[0_0_10px_rgba(var(--color-primary),0.2)]">
+                            <span class="text-[10px] font-display font-bold text-primary">A</span>
+                        </div>
+                        <div class="bg-panel p-4 rounded-lg rounded-tl-none border border-white/10 text-slate-300 max-w-[90%] shadow-lg relative">
+                            <div class="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-primary to-transparent rounded-t-lg"></div>
+                            <p class="text-[10px] font-mono text-primary mb-2 uppercase tracking-widest font-bold">Sys_Resp</p>
+                            <p class="leading-relaxed m-0">${responseText}</p>
+                        </div>
+                    </div>
+                `;
+                chatLog.insertAdjacentHTML('beforeend', responseHtml);
+                chatLog.scrollTo({top: chatLog.scrollHeight, behavior: 'smooth'});
+            }, 1500 + Math.random() * 1000);
         }
 
-        function addTypingIndicator() {
-            const id = 'typing-' + Date.now();
-            const log = document.getElementById('chatLog');
-            const div = document.createElement('div');
-            div.id = id;
-            div.className = "flex gap-3 animate-pulse";
-            div.innerHTML = `<div class="w-7 h-7 rounded border border-primary/50 bg-primary/10 flex items-center justify-center shrink-0"><span class="text-[10px] font-bold text-primary">A</span></div><div class="typing-indicator p-3"><span></span><span></span><span></span></div>`;
-            log.appendChild(div);
-            log.scrollTop = log.scrollHeight;
-            return id;
+        // ---------------------------------------------------------
+        // TELEMETRY UPDATES
+        // ---------------------------------------------------------
+        function pushTelemetryData() {
+            window.systemTelemetry.spx = parseFloat(document.getElementById('input_spx').value) || window.systemTelemetry.spx;
+            window.systemTelemetry.yield = parseFloat(document.getElementById('input_yield').value) || window.systemTelemetry.yield;
+            window.systemTelemetry.brent = parseFloat(document.getElementById('input_brent').value) || window.systemTelemetry.brent;
+            window.systemTelemetry.btc = parseFloat(document.getElementById('input_btc').value) || window.systemTelemetry.btc;
+            window.systemTelemetry.vix = parseFloat(document.getElementById('input_vix').value) || window.systemTelemetry.vix;
+            window.systemTelemetry.oas = parseFloat(document.getElementById('input_oas').value) || window.systemTelemetry.oas;
+
+            // Update UI Elements with flash
+            const updateAndFlash = (id, val, prefix='', suffix='', decimals=2) => {
+                const el = document.getElementById(id);
+                if(el) {
+                    const oldVal = parseFloat(el.innerText.replace(/[^0-9.-]+/g,""));
+                    const newVal = parseFloat(val);
+                    el.innerText = prefix + (isNaN(newVal) ? val : newVal.toLocaleString('en-US', {minimumFractionDigits: decimals, maximumFractionDigits: decimals})) + suffix;
+                    
+                    el.classList.remove('flash-pos', 'flash-neg');
+                    void el.offsetWidth; // trigger reflow
+                    if(newVal > oldVal) el.classList.add('flash-pos');
+                    else el.classList.add('flash-neg');
+                }
+            };
+
+            updateAndFlash('kpiSpx', window.systemTelemetry.spx, '', '', 2);
+            updateAndFlash('kpiYield', window.systemTelemetry.yield, '', '%', 3);
+            updateAndFlash('kpiBrent', window.systemTelemetry.brent, '$', '', 2);
+            updateAndFlash('kpiBtc', window.systemTelemetry.btc, '', '', 0);
+            updateAndFlash('kpiVix', window.systemTelemetry.vix, '', '', 2);
+            updateAndFlash('kpiOas', window.systemTelemetry.oas, '', '%', 2);
+            
+            showToast("Telemetry Overridden & Broadcasted globally.");
+            scrambleChart();
         }
 
-        function removeTypingIndicator(id) { document.getElementById(id)?.remove(); }
+        function showToast(message) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'bg-primary text-black font-mono text-xs px-4 py-3 shadow-[0_0_20px_rgba(var(--color-primary),0.5)] clip-path-toast transition-all duration-500 opacity-0 translate-y-4';
+            toast.innerHTML = `<span class="font-bold mr-2">SYS_MSG:</span> ${message}`;
+            container.appendChild(toast);
+            
+            requestAnimationFrame(() => {
+                toast.classList.remove('opacity-0', 'translate-y-4');
+            });
 
-        function startTicker() {
-            const news = [
-                "*** HORMUZ TRANSITS REMAIN AT ZERO // WTI CRUDE BREAKS $111 ***",
-                "*** MSFT CLOUD BACKLOG HITS $627B ON AI ENTERPRISE ADOPTION ***",
-                "*** 10Y YIELD BREAKS 4.415% // HIGHEST SINCE Q4 2023 ***",
-                "*** MUSK TRIAL: EVIDENCE OF OPENAI FOR-PROFIT MISCONDUCT LEAKED ***"
-            ];
-            document.getElementById('tickerText').innerText = news.join(' | ');
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-4');
+                setTimeout(() => toast.remove(), 500);
+            }, 4000);
         }
 
-        function startTelemetry() {
-            const box = document.getElementById('liveTelemetryBox');
-            setInterval(() => {
-                const logs = [`[PKT] Ingesting Signal 26°N 56°E...`, `[SYS] RLHF delta check: -0.0031`, `[VOL] Gamma squeeze risk strike 7,100`, `[CRED] OAS Spread widening +4bps`, `[LBR] Demographic LFPR tracking variance: +0.2%` ];
-                const l = document.createElement('div');
-                l.className = "text-primary/70 animate-pulse";
-                l.innerText = logs[Math.floor(Math.random()*logs.length)];
-                box.appendChild(l);
-                if(box.children.length > 10) box.removeChild(box.firstChild);
-            }, 3000);
-        }
+        // ---------------------------------------------------------
+        // CHARTS & GRAPHS LOGIC
+        // ---------------------------------------------------------
+        function initCharts() {
+            applyChartDefaults();
+            const cPrimary = getRGBA('--color-primary');
+            const cSecondary = getRGBA('--color-secondary');
+            const cAccent = getRGBA('--color-accent');
 
-        function toggleDefcon() {
-            isDefcon = !isDefcon;
-            document.body.classList.toggle('defcon-active', isDefcon);
-            document.getElementById('defconBtn').innerText = isDefcon ? "DEFCON 1 ACTIVE" : "DEFCON OVERRIDE";
-        }
-
-        function changeTheme(t) {
-            document.body.className = `h-screen w-screen flex flex-col relative ${t} text-sm selection:bg-primary selection:text-black`;
-        }
-
-        function initDragAndDrop() {
-            const draggables = document.querySelectorAll('.bento-draggable');
-            draggables.forEach(d => {
-                d.addEventListener('dragstart', (e) => {
-                    window.dragTarget = d;
-                    d.style.opacity = '0.5';
-                });
-                d.addEventListener('dragend', () => { d.style.opacity = '1'; });
-                d.addEventListener('dragover', (e) => e.preventDefault());
-                d.addEventListener('drop', (e) => {
-                    if(window.dragTarget !== d) {
-                        const tmp = d.innerHTML;
-                        d.innerHTML = window.dragTarget.innerHTML;
-                        window.dragTarget.innerHTML = tmp;
+            // Probability Chart
+            const ctxProb = document.getElementById('probabilityChart');
+            if (ctxProb) {
+                if(probChartInstance) probChartInstance.destroy();
+                probChartInstance = new Chart(ctxProb.getContext('2d'), {
+                    type: 'line',
+                    data: {
+                        labels: ['T-0', 'T+1', 'T+2', 'T+3', 'T+4', 'T+5', 'T+6', 'T+7'],
+                        datasets: [
+                            { label: 'Hyper-Inflation Tail Risk', data: [15, 18, 22, 28, 35, 42, 55, 68], borderColor: cAccent, backgroundColor: getRGBA('--color-accent', 0.1), tension: 0.4, fill: true, borderWidth: 2 },
+                            { label: 'Soft Landing Illusion', data: [80, 75, 65, 50, 35, 20, 15, 10], borderColor: cPrimary, backgroundColor: getRGBA('--color-primary', 0.05), tension: 0.4, fill: true, borderWidth: 2 },
+                            { label: 'Systemic Credit Event', data: [5, 5, 8, 15, 25, 30, 45, 60], borderColor: cSecondary, tension: 0.4, borderDash: [5, 5], borderWidth: 2 }
+                        ]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        interaction: { mode: 'index', intersect: false },
+                        plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8', font: {family: "'Fira Code', monospace", size: 10} } } },
+                        scales: { x: { grid: { color: 'rgba(255,255,255,0.05)' } }, y: { grid: { color: 'rgba(255,255,255,0.05)' }, min: 0, max: 100 } }
                     }
                 });
-            });
-        }
+            }
 
-        // Action Functions
-        function scrambleChart() {
-            if(!probChartInstance) return;
-            const newData = Array.from({length: 7}, () => Math.floor(Math.random() * (7500 - 6800) + 6800));
-            probChartInstance.data.datasets[0].data = newData;
-            probChartInstance.update();
-            
-            if(radarChartInstance) {
-                radarChartInstance.data.datasets[0].data = baseRadarData.map(v => v + (Math.random() * 20 - 10));
-                radarChartInstance.update();
+            // Radar Chart
+            const ctxRadar = document.getElementById('radarChart');
+            if(ctxRadar) {
+                if(radarChartInstance) radarChartInstance.destroy();
+                radarChartInstance = new Chart(ctxRadar.getContext('2d'), {
+                    type: 'radar',
+                    data: {
+                        labels: ['Geopolitics', 'Credit Risk', 'Energy Friction', 'Liquidity Drain', 'Fed Policy Error'],
+                        datasets: [{
+                            label: 'Real-Time Threat Vector',
+                            data: baseRadarData,
+                            backgroundColor: getRGBA('--color-accent', 0.2),
+                            borderColor: cAccent,
+                            pointBackgroundColor: cAccent,
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: { r: { angleLines: { color: 'rgba(255,255,255,0.1)' }, grid: { color: 'rgba(255,255,255,0.1)' }, pointLabels: { color: '#cbd5e1', font: {family: "'Fira Code', monospace", size: 9} }, ticks: { display: false, min: 0, max: 100 } } }
+                    }
+                });
             }
         }
 
-        function updateRadarChart(index, val) {
-            if(!radarChartInstance) return;
-            baseRadarData[index] = val * 100;
-            radarChartInstance.data.datasets[0].data = [...baseRadarData];
-            radarChartInstance.update();
+        function scrambleChart() {
+            if(probChartInstance) {
+                probChartInstance.data.datasets.forEach(ds => {
+                    ds.data = ds.data.map(v => Math.max(0, Math.min(100, v + (Math.random() * 20 - 10))));
+                });
+                probChartInstance.update();
+            }
         }
 
-        function pushTelemetryData() {
-            const spx = document.getElementById('input_spx').value;
-            const yld = document.getElementById('input_yield').value;
-            const brent = document.getElementById('input_brent').value;
-            const btc = document.getElementById('input_btc').value;
-            
-            if(spx) { window.systemTelemetry.spx = parseFloat(spx); document.getElementById('kpiSpx').innerText = parseFloat(spx).toLocaleString(); }
-            if(yld) { window.systemTelemetry.yield = parseFloat(yld); document.getElementById('kpiYield').innerText = parseFloat(yld).toFixed(3) + '%'; }
-            if(brent) { window.systemTelemetry.brent = parseFloat(brent); document.getElementById('kpiBrent').innerText = '$' + parseFloat(brent).toFixed(2); document.getElementById('kpiBrent').setAttribute('data-text', '$'+parseFloat(brent).toFixed(2)); }
-            if(btc) { window.systemTelemetry.btc = parseFloat(btc); document.getElementById('kpiBtc').innerText = parseFloat(btc).toLocaleString(); }
-            
-            const btn = document.querySelector('button[onclick="pushTelemetryData()"]');
-            btn.innerText = "UPDATED!";
-            setTimeout(() => btn.innerText = "Update Core Telemetry", 2000);
-            scrambleChart();
+        function updateRadarChart(index, multiplier) {
+            if(radarChartInstance) {
+                const newData = [...baseRadarData];
+                newData[index] = Math.min(100, newData[index] * (parseFloat(multiplier) + 0.5));
+                radarChartInstance.data.datasets[0].data = newData;
+                radarChartInstance.update();
+            }
         }
 
         function recalibrateModel() {
             document.getElementById('lossIndicator').innerText = "Loss: " + (Math.random() * 0.005).toFixed(4);
             const bars = document.querySelectorAll('.prob-bar-fill');
-            bars.forEach(b => {
-                b.style.width = '0%';
-                setTimeout(() => b.style.width = (Math.random() * 80 + 10) + '%', 300);
+            bars.forEach(bar => {
+                bar.style.width = '0%';
+                setTimeout(() => {
+                    const newTarget = (parseFloat(bar.getAttribute('data-target')) + (Math.random() * 10 - 5)).toFixed(1) + '%';
+                    bar.setAttribute('data-target', newTarget);
+                    bar.innerText = newTarget;
+                    bar.style.width = newTarget;
+                }, 500);
             });
+            showToast("SRMLG Model weights forcibly recalibrated.");
         }
 
-        function generateEmail() {
-            const html = `<html><body style="font-family: Arial, sans-serif; background: #010308; color: #fff; padding: 20px;">
-                <h1 style="color: #00e5ff;">ADAM V50.0 // BRIEFING</h1>
-                <p>SPX: ${window.systemTelemetry.spx} | 10Y: ${window.systemTelemetry.yield}%</p>
-                <hr style="border-color: #333;" />
-                <div style="background: #090f1a; padding: 20px; border-left: 4px solid #ff1e38; margin-top: 20px;">
-                    <h2 style="color: #ff1e38;">Hormuz Blockade Active</h2>
-                    <p>Total cessation of VLCC movement confirmed via SAR data.</p>
-                </div>
-            </body></html>`;
+        // Traceability Tooltip Logic
+        const traceTooltip = document.createElement('div');
+        traceTooltip.className = 'trace-tooltip text-primary';
+        document.body.appendChild(traceTooltip);
+
+        document.addEventListener('mouseover', (e) => {
+            const traceEl = e.target.closest('.traceable');
+            if(traceEl) {
+                const type = traceEl.getAttribute('data-trace-type') || 'FINANCIAL_API';
+                const hash = Array.from({length: 16}, () => Math.floor(Math.random()*16).toString(16)).join('');
+                traceTooltip.innerHTML = `
+                    <div class="text-white mb-2 font-bold" style="font-size: 11px;">DATA PROVENANCE VERIFIED</div>
+                    <div class="text-slate-400 mb-1">SOURCE: <span class="text-primary">${type}</span></div>
+                    <div class="text-slate-400 mb-1">HASH: <span class="text-secondary">0x${hash}</span></div>
+                    <div class="text-slate-400">SYNC: <span class="text-core-green">T-0.0${Math.floor(Math.random()*99)}s</span></div>
+                `;
+                const rect = traceEl.getBoundingClientRect();
+                traceTooltip.style.left = rect.left + 'px';
+                traceTooltip.style.top = (rect.top - 80) + 'px';
+                traceTooltip.style.opacity = '1';
+                traceTooltip.style.transform = 'translateY(0)';
+            } else {
+                traceTooltip.style.opacity = '0';
+                traceTooltip.style.transform = 'translateY(10px)';
+            }
+        });
+
+        // Telemetry Feed Generation
+        function generateTelemetry() {
+            const container = document.getElementById('liveTelemetryBox');
+            if(!container) return;
+            const messages = [
+                "<span class='text-primary'>[NET]</span> BGP Route 104.16.0.0/12 optimized.",
+                "<span class='text-accent'>[SEC]</span> Anomaly detected in Hormuz shipping lanes. Retrying...",
+                "<span class='text-secondary'>[SYS]</span> Llama-3-8B weights updated. Loss: 0.0034.",
+                "<span class='text-white'>[TRD]</span> SPX 0DTE flow heavily put-skewed.",
+                "<span class='text-core-green'>[PWR]</span> US Hypercluster running at 82% capacity.",
+                "<span class='text-slate-400'>[LOG]</span> Syncing with ICE BofA High Yield Index."
+            ];
             
-            document.getElementById('emailCodeOutput').value = html;
+            const msg = document.createElement('p');
+            msg.innerHTML = messages[Math.floor(Math.random() * messages.length)];
+            msg.className = "m-0 opacity-0 transform translate-y-2 transition-all duration-300";
+            container.appendChild(msg);
+            
+            requestAnimationFrame(() => {
+                msg.classList.remove('opacity-0', 'translate-y-2');
+            });
+            
+            if(container.children.length > 8) {
+                container.removeChild(container.firstChild);
+            }
+            
+            setTimeout(generateTelemetry, Math.random() * 2000 + 500);
+        }
+
+        // Generate Email Code
+        function generateEmail() {
+            const textarea = document.getElementById('emailCodeOutput');
             const iframe = document.getElementById('emailPreviewFrame');
-            iframe.contentWindow.document.open();
-            iframe.contentWindow.document.write(html);
-            iframe.contentWindow.document.close();
+            if(!textarea || !iframe) return;
+
+            const htmlContent = `
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: 'Arial', sans-serif; background-color: #010308; color: #cbd5e1; margin: 0; padding: 20px; }
+        .container { max-width: 600px; margin: 0 auto; background: #090f1a; border: 1px solid #1e293b; padding: 20px; border-radius: 8px; }
+        h1 { color: #00e5ff; font-family: 'Arial Black', sans-serif; text-transform: uppercase; border-bottom: 1px solid #1e293b; padding-bottom: 10px; }
+        h2 { color: #ffaa00; font-size: 16px; margin-top: 20px; }
+        .metric-box { background: #010308; border-left: 4px solid #ff1e38; padding: 15px; margin-bottom: 20px; }
+        .metric-val { font-size: 24px; font-weight: bold; color: #fff; }
+        p { line-height: 1.6; font-size: 14px; }
+        .footer { margin-top: 30px; font-size: 10px; color: #475569; text-align: center; font-family: monospace; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Adam Core Intelligence // Daily Brief</h1>
+        <p>Model parameters synched for <strong>2026.04.29</strong>. RLHF Fine-Tuning Active.</p>
+        
+        <h2>Macro Topography</h2>
+        <div class="metric-box">
+            <div>SPX 500 Status</div>
+            <div class="metric-val">${window.systemTelemetry.spx}</div>
+            <div style="color: #ff1e38; font-size: 12px; margin-top: 5px;">Negative Gamma Regime Active</div>
+        </div>
+        
+        <h2>Threat Topology</h2>
+        <p>The Strait of Hormuz has officially entered a state of near-total operational cessation. Brent Crude extends its upward march, currently trading at <strong>$${window.systemTelemetry.brent}</strong>.</p>
+        
+        <div class="footer">GENERATED BY ADAM NEURO-SYMBOLIC ROUTER V50.0</div>
+    </div>
+</body>
+</html>`;
+            textarea.value = htmlContent;
+            const doc = iframe.contentWindow.document;
+            doc.open();
+            doc.write(htmlContent);
+            doc.close();
+            
             document.getElementById('copyEmailBtn').disabled = false;
         }
 
         function copyEmailHTML() {
-            const txt = document.getElementById('emailCodeOutput').value;
-            navigator.clipboard.writeText(txt);
+            const textarea = document.getElementById('emailCodeOutput');
+            navigator.clipboard.writeText(textarea.value);
             const btn = document.getElementById('copyEmailBtn');
-            btn.innerText = "COPIED!";
-            setTimeout(() => btn.innerText = "2. Copy Raw HTML", 2000);
+            btn.innerText = 'COPIED!';
+            setTimeout(() => btn.innerText = '2. Copy Raw HTML', 2000);
+            showToast("HTML copied to clipboard.");
         }
 
-        window.exportTelemetry = function() {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(window.systemTelemetry, null, 2));
-            const anchor = document.createElement('a');
-            anchor.setAttribute("href", dataStr);
-            anchor.setAttribute("download", "adam_telemetry_export.json");
-            document.body.appendChild(anchor);
-            anchor.click();
-            anchor.remove();
-        };
-
-        window.triggerMatrixMode = function() {
-            let c = document.getElementById('matrixCanvas');
-            if(!c) {
-                c = document.createElement('canvas');
-                c.id = 'matrixCanvas';
-                c.style.position = 'fixed';
-                c.style.top = '0';
-                c.style.left = '0';
-                c.style.width = '100vw';
-                c.style.height = '100vh';
-                c.style.zIndex = '9999';
-                c.style.pointerEvents = 'none';
-                c.style.opacity = '0.7';
-                document.body.appendChild(c);
-                
-                const ctx = c.getContext('2d');
-                c.width = window.innerWidth;
-                c.height = window.innerHeight;
-                
-                const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()".split("");
-                const fontSize = 14;
-                const columns = c.width / fontSize;
-                const drops = [];
-                for(let x = 0; x < columns; x++) drops[x] = 1;
-                
-                function draw() {
-                    ctx.fillStyle = "rgba(1, 3, 8, 0.05)";
-                    ctx.fillRect(0, 0, c.width, c.height);
-                    ctx.fillStyle = "#00e5ff"; 
-                    ctx.font = fontSize + "px monospace";
-                    for(let i = 0; i < drops.length; i++) {
-                        const text = chars[Math.floor(Math.random() * chars.length)];
-                        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-                        if(drops[i] * fontSize > c.height && Math.random() > 0.975) drops[i] = 0;
-                        drops[i]++;
-                    }
-                    window.matrixAnim = requestAnimationFrame(draw);
-                }
-                draw();
-                
+        // ---------------------------------------------------------
+        // INITIALIZATION LOGIC
+        // ---------------------------------------------------------
+        window.onload = function() {
+            // Boot sequence
+            const bootLogs = document.getElementById('bootLogs');
+            const messages = [
+                "INITIALIZING KERNEL...",
+                "MOUNTING NEURO-SYMBOLIC ROUTER...",
+                "CONNECTING TO GLOBAL TELEMETRY...",
+                "BYPASSING SECURITY PROTOCOLS...",
+                "SYSTEM READY."
+            ];
+            
+            let delay = 0;
+            messages.forEach((msg, idx) => {
                 setTimeout(() => {
-                    cancelAnimationFrame(window.matrixAnim);
-                    c.style.transition = 'opacity 2s';
-                    c.style.opacity = '0';
-                    setTimeout(() => c.remove(), 2000);
-                }, 10000);
-            }
-        };
+                    const el = document.createElement('div');
+                    el.className = 'boot-text-line';
+                    el.innerText = msg;
+                    bootLogs.appendChild(el);
+                }, delay);
+                delay += 400;
+            });
 
+            setTimeout(() => {
+                const bootScreen = document.getElementById('bootScreen');
+                if (bootScreen) {
+                    bootScreen.style.opacity = '0';
+                    setTimeout(() => bootScreen.style.display = 'none', 800);
+                }
+                
+                // Initialize core components
+                initNavigation();
+                initCharts();
+                generateTelemetry();
+                loadModule(1); // Load default module
+
+                // Clock loop
+                setInterval(() => {
+                    const now = new Date();
+                    document.getElementById('sysClock').innerText = now.toISOString().substring(11,19) + ' UTC';
+                }, 1000);
+
+                // Ticker loop
+                const ticker = document.getElementById('tickerText');
+                if(ticker) {
+                    ticker.innerHTML = '<span class="text-white">MSFT</span> $458.20 <span class="text-core-green">▲</span> &nbsp;&nbsp;&nbsp; <span class="text-white">GOOGL</span> $185.40 <span class="text-core-green">▲</span> &nbsp;&nbsp;&nbsp; <span class="text-white">AMZN</span> $150.66 <span class="text-accent">▼</span> &nbsp;&nbsp;&nbsp; <span class="text-white">META</span> $518.30 <span class="text-accent">▼</span> &nbsp;&nbsp;&nbsp; <span class="text-white">AAPL</span> $210.45 <span class="text-core-green">▲</span> &nbsp;&nbsp;&nbsp; <span class="text-white">NVDA</span> $880.12 <span class="text-accent">▼</span> &nbsp;&nbsp;&nbsp; <span class="text-secondary">BRENT</span> $111.78 <span class="text-secondary">▲</span> &nbsp;&nbsp;&nbsp; <span class="text-primary">VIX</span> 18.60 <span class="text-primary">▲</span> &nbsp;&nbsp;&nbsp; <span class="text-white">10Y YIELD</span> 4.415% <span class="text-secondary">▲</span>';
+                }
+            }, delay + 600);
+        };
     </script>
 </body>
 </html>
