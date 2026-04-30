@@ -36,21 +36,25 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ isOffline }) => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  const searchResults = useMemo(() => {
-    if (!searchTerm || !manifest) return [];
+  const fuseInstance = useMemo(() => {
+    if (!manifest) return null;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const agents = (manifest.agents || []).map((a: any) => ({ ...a, type: 'agent' }));
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const reports = (manifest.reports || []).map((r: any) => ({ ...r, type: 'report' }));
 
-    const fuse = new Fuse([...agents, ...reports], {
+    return new Fuse([...agents, ...reports], {
       keys: ['name', 'title', 'docstring', 'content'],
       threshold: 0.3
     });
+  }, [manifest]);
 
-    return fuse.search(searchTerm).slice(0, 5).map(r => r.item);
-  }, [searchTerm, manifest]);
+  const searchResults = useMemo(() => {
+    if (!searchTerm || !fuseInstance) return [];
+
+    return fuseInstance.search(searchTerm).slice(0, 5).map(r => r.item);
+  }, [searchTerm, fuseInstance]);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleSelection = (item: any) => {
