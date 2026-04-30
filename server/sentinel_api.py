@@ -39,4 +39,5 @@ def evaluate_credit(request: CreditRequest):
         raise HTTPException(status_code=400, detail=str(e))
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    # SECURITY: Bind to localhost (127.0.0.1) instead of 0.0.0.0 to prevent external access during local dev
+    uvicorn.run(app, host="127.0.0.1", port=8000)
