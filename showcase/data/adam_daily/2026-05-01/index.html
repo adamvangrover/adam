@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM OMNIPRESENCE // V50.0</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;700&family=Inter:wght@300;400;600;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    
+    <!-- Scripts -->
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['Fira Code', 'monospace'],
+                        display: ['Share Tech Mono', 'monospace'],
+                    },
+                    colors: {
+                        void: '#03050a',
+                        panel: '#0a101d',
+                        cyan: '#00e5ff',
+                        amber: '#ffaa00',
+                        red: '#ff1e38',
+                        green: '#00fa9a',
+                        border: '#1e293b'
+                    },
+                    backgroundImage: {
+                        'hex': 'linear-gradient(rgba(0, 229, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 229, 255, 0.03) 1px, transparent 1px)'
+                    },
+                    animation: {
+                        'pulse-fast': 'pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'glitch': 'glitch 2s linear infinite',
+                        'ticker': 'ticker 30s linear infinite',
+                    },
+                    keyframes: {
+                        ticker: { '0%': { transform: 'translateX(100%)' }, '100%': { transform: 'translateX(-100%)' } },
+                        glitch: {
+                            '2%, 64%': { transform: 'translate(2px,0) skew(0deg)' },
+                            '4%, 60%': { transform: 'translate(-2px,0) skew(0deg)' },
+                            '62%': { transform: 'translate(0,0) skew(5deg)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        :root {
+            --scanline: linear-gradient(to bottom, transparent 50%, rgba(0, 0, 0, 0.4) 51%);
+        }
+        body { background-color: #03050a; color: #cbd5e1; overflow: hidden; margin: 0; }
+        
+        /* Terminal Effects */
+        .crt-overlay {
+            position: fixed; inset: 0; pointer-events: none; z-index: 9999;
+            background-image: var(--scanline); background-size: 100% 4px;
+            opacity: 0.15; mix-blend-mode: overlay;
+        }
+        .vignette {
+            position: fixed; inset: 0; pointer-events: none; z-index: 9998;
+            box-shadow: inset 0 0 150px rgba(0,0,0,0.9);
+        }
+
+        /* Glass Panels */
+        .glass {
+            background: rgba(10, 16, 29, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        }
+        .glass-hover:hover { border-color: rgba(0, 229, 255, 0.4); box-shadow: 0 0 15px rgba(0, 229, 255, 0.1); transform: translateY(-1px); transition: all 0.2s; }
+
+        /* Scrollbars */
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 2px; }
+        ::-webkit-scrollbar-thumb:hover { background: #00e5ff; }
+
+        /* Glow Utilities */
+        .glow-cyan { text-shadow: 0 0 10px rgba(0, 229, 255, 0.8); }
+        .glow-red { text-shadow: 0 0 10px rgba(255, 30, 56, 0.8); }
+        .glow-amber { text-shadow: 0 0 10px rgba(255, 170, 0, 0.8); }
+        .glow-green { text-shadow: 0 0 10px rgba(0, 250, 154, 0.8); }
+
+        /* Custom Range Slider for DCF */
+        input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 16px; width: 8px; border-radius: 2px; background: #00e5ff; cursor: pointer; margin-top: -6px; box-shadow: 0 0 10px rgba(0,229,255,0.8); }
+        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; cursor: pointer; background: rgba(255,255,255,0.1); border-radius: 2px; }
+        
+        /* Typing Indicator */
+        .typing span { display: inline-block; width: 4px; height: 4px; background-color: #00e5ff; border-radius: 50%; animation: typing 1.4s infinite ease-in-out both; margin: 0 2px; }
+        .typing span:nth-child(1) { animation-delay: -0.32s; }
+        .typing span:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes typing { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
+
+        /* DCF Chart Canvas sizing */
+        .chart-container { position: relative; height: 250px; width: 100%; }
+        
+        .nav-item.active { border-left-color: #00e5ff; background: rgba(0, 229, 255, 0.05); }
+
+        /* Prose Overrides for Markdown */
+        .prose-custom p { margin-top: 0.5em; margin-bottom: 0.5em; }
+        .prose-custom ul { margin-top: 0.25em; margin-bottom: 0.25em; }
+        .prose-custom li { margin-top: 0; margin-bottom: 0; }
+    </style>
+</head>
+<body class="h-screen w-screen flex flex-col font-sans">
+    <div class="crt-overlay"></div>
+    <div class="vignette"></div>
+    <div class="absolute inset-0 bg-hex opacity-20 pointer-events-none z-0 bg-[size:24px_24px]"></div>
+
+    <!-- GLOBAL HEADER -->
+    <header class="h-14 border-b border-border bg-panel/90 backdrop-blur flex items-center justify-between px-4 z-30 shrink-0">
+        <div class="flex items-center gap-4">
+            <div class="w-8 h-8 rounded border border-cyan/50 bg-cyan/10 flex items-center justify-center shadow-[0_0_10px_rgba(0,229,255,0.3)]">
+                <span class="font-display font-bold text-cyan text-lg leading-none">A</span>
+            </div>
+            <div>
+                <h1 class="font-display font-bold text-white text-base uppercase leading-none tracking-widest m-0 glow-cyan">Adam Omnipresence</h1>
+                <div class="font-mono text-[9px] text-cyan uppercase tracking-widest mt-0.5">V50.0 // Institutional Router</div>
+            </div>
+        </div>
+        
+        <div class="hidden md:flex items-center gap-6">
+            <div class="flex flex-col text-right font-mono text-[10px]">
+                <span class="text-slate-500">SYS_CLOCK</span>
+                <span class="text-white font-bold tracking-wider" id="sysClock">00:00:00 EDT</span>
+            </div>
+            <div class="h-6 w-px bg-border"></div>
+            <div class="flex flex-col text-right font-mono text-[10px]">
+                <span class="text-slate-500">MARKET STATUS</span>
+                <span class="text-amber font-bold tracking-wider animate-pulse-fast">ELEVATED VOLATILITY</span>
+            </div>
+            <button onclick="toggleAI()" class="bg-cyan/10 border border-cyan text-cyan hover:bg-cyan hover:text-black px-4 py-1.5 font-display text-xs font-bold transition-all uppercase tracking-widest cursor-pointer rounded">
+                Engage Co-Pilot
+            </button>
+        </div>
+        
+        <!-- Mobile AI Toggle -->
+        <button onclick="toggleAI()" class="md:hidden text-cyan border border-cyan/50 bg-cyan/10 p-2 rounded">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.25-5v1.5a.25.25 0 0 1-.5 0V11h-1a.5.5 0 0 1-.5-.5v-2a.5.5 0 0 1 .5-.5h.5V6.5a.5.5 0 0 1 1 0V8h.5a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.5.5h-1z"/></svg>
+        </button>
+    </header>
+
+    <!-- MAIN BENTO GRID -->
+    <main class="flex-1 flex overflow-hidden relative z-10 p-3 gap-3">
+        
+        <!-- LEFT SIDEBAR: Navigation -->
+        <aside class="w-64 flex flex-col gap-3 shrink-0 hidden lg:flex">
+            <div class="glass rounded-lg border-t-2 border-t-cyan flex flex-col h-full overflow-hidden">
+                <div class="p-3 border-b border-border bg-black/40">
+                    <h2 class="font-mono text-[10px] text-slate-400 tracking-widest uppercase m-0">Terminal Directory</h2>
+                </div>
+                <nav id="moduleNav" class="flex-1 p-2 space-y-1 overflow-y-auto">
+                    <!-- Populated by JS -->
+                </nav>
+            </div>
+        </aside>
+
+        <!-- CENTER: KPI Row + Main Content -->
+        <section class="flex-1 flex flex-col gap-3 min-w-0">
+            <!-- TOP KPI ROW -->
+            <div class="flex gap-3 shrink-0 overflow-x-auto scrollbar-hide pb-1">
+                <div class="glass flex-1 min-w-[140px] p-3 rounded-lg border-b-2 border-b-red cursor-pointer glass-hover">
+                    <div class="font-mono text-[9px] text-slate-400 uppercase tracking-widest mb-1 flex justify-between">SPX 500 <span class="text-red">▼</span></div>
+                    <div class="font-display text-xl font-bold text-white tracking-tight">7,184.20</div>
+                    <div class="font-mono text-[9px] text-red mt-1">-0.84%</div>
+                </div>
+                <div class="glass flex-1 min-w-[140px] p-3 rounded-lg border-b-2 border-b-amber cursor-pointer glass-hover">
+                    <div class="font-mono text-[9px] text-slate-400 uppercase tracking-widest mb-1 flex justify-between">10Y YIELD <span class="text-amber">▲</span></div>
+                    <div class="font-display text-xl font-bold text-amber glow-amber tracking-tight">4.485%</div>
+                    <div class="font-mono text-[9px] text-amber mt-1">+4.2 bps</div>
+                </div>
+                <div class="glass flex-1 min-w-[140px] p-3 rounded-lg border-b-2 border-b-cyan cursor-pointer glass-hover">
+                    <div class="font-mono text-[9px] text-slate-400 uppercase tracking-widest mb-1 flex justify-between">BRENT CRUDE <span class="text-cyan">▲</span></div>
+                    <div class="font-display text-xl font-bold text-cyan glow-cyan tracking-tight">$114.50</div>
+                    <div class="font-mono text-[9px] text-cyan mt-1">+1.20%</div>
+                </div>
+                <div class="glass flex-1 min-w-[140px] p-3 rounded-lg border-b-2 border-b-red cursor-pointer glass-hover">
+                    <div class="font-mono text-[9px] text-slate-400 uppercase tracking-widest mb-1 flex justify-between">VIX INDEX <span class="text-red">▲</span></div>
+                    <div class="font-display text-xl font-bold text-white tracking-tight">22.40</div>
+                    <div class="font-mono text-[9px] text-red mt-1">+12.5%</div>
+                </div>
+            </div>
+
+            <!-- DYNAMIC MODULE INJECTION POINT -->
+            <div class="glass rounded-lg border-t border-white/5 flex-1 flex flex-col overflow-hidden relative" id="mainDisplay">
+                <div class="p-4 border-b border-border bg-black/50 flex justify-between items-center shrink-0">
+                    <h2 class="font-display text-2xl text-white tracking-widest uppercase m-0" id="moduleTitle">Loading...</h2>
+                    <span class="font-mono text-[10px] text-cyan border border-cyan/30 px-2 py-1 rounded bg-cyan/10" id="moduleIndicator">MOD 00</span>
+                </div>
+                <div class="flex-1 overflow-y-auto p-4 md:p-6" id="moduleContent">
+                    <!-- HTML Injected Here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- RIGHT SIDEBAR: AI Chat Panel -->
+        <aside id="aiPanel" class="w-[350px] lg:w-[400px] glass rounded-lg border-t-2 border-t-cyan flex flex-col shrink-0 absolute right-3 top-16 bottom-3 lg:top-3 transform translate-x-[120%] lg:translate-x-0 transition-transform duration-300 z-40">
+            <div class="p-3 border-b border-border bg-black/40 flex justify-between items-center shrink-0">
+                <div class="flex items-center gap-2">
+                    <div class="w-2 h-2 rounded-full bg-cyan animate-pulse"></div>
+                    <h2 class="font-display text-sm font-bold text-white tracking-widest uppercase m-0">Adam Co-Pilot</h2>
+                </div>
+                <button onclick="toggleAI()" class="lg:hidden text-slate-400 hover:text-white">✕</button>
+            </div>
+            
+            <div id="chatLog" class="flex-1 overflow-y-auto p-4 flex flex-col gap-4 text-sm font-sans scroll-smooth pb-4">
+                <!-- System Intro -->
+                <div class="flex gap-3">
+                    <div class="w-6 h-6 rounded border border-cyan/50 bg-cyan/10 flex items-center justify-center shrink-0 mt-1">
+                        <span class="text-[9px] font-display font-bold text-cyan">A</span>
+                    </div>
+                    <div class="bg-panel/80 p-3 rounded-lg rounded-tl-none border border-white/10 text-slate-300">
+                        <p class="text-[9px] font-mono text-cyan mb-1 uppercase font-bold">Sys_Ready // Gemini 2.5 Flash</p>
+                        <p class="m-0 text-xs leading-relaxed">Neural weights synchronized for present day. I have full context of the terminal's DCF models, macro data, and geopolitical feeds.<br><br>Warning: API Key is required for live reasoning. How shall we route capital today?</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-3 border-t border-border bg-black/60 shrink-0">
+                <div class="flex gap-2 mb-2 overflow-x-auto scrollbar-hide pb-1">
+                    <button onclick="presetAI('Summarize the Mag 7 DCF models.')" class="whitespace-nowrap px-2 py-1 bg-void border border-white/10 hover:border-cyan text-[9px] font-mono rounded text-slate-400 transition-colors">Summarize DCFs</button>
+                    <button onclick="presetAI('Explain the Hormuz Chokepoint impact.')" class="whitespace-nowrap px-2 py-1 bg-void border border-white/10 hover:border-red text-[9px] font-mono rounded text-slate-400 transition-colors">Hormuz Impact</button>
+                </div>
+                <form id="chatForm" class="flex gap-2" onsubmit="handleAI(event)">
+                    <input type="text" id="aiInput" placeholder="Command Adam..." class="flex-1 bg-void border border-white/10 rounded px-3 py-2 text-xs text-white font-mono focus:outline-none focus:border-cyan transition-colors" autocomplete="off">
+                    <button type="submit" class="bg-cyan text-black hover:bg-white px-3 py-2 rounded font-display text-xs font-bold transition-all uppercase cursor-pointer">Run</button>
+                </form>
+            </div>
+        </aside>
+
+    </main>
+
+    <!-- BOTTOM TICKER -->
+    <footer class="h-8 border-t border-border bg-panel flex items-center shrink-0 z-30 relative overflow-hidden">
+        <div class="absolute left-0 top-0 h-full bg-cyan text-black z-10 px-3 flex items-center font-mono text-[10px] font-bold tracking-widest shadow-[5px_0_15px_#03050a]">
+            LIVE FEED
+        </div>
+        <div class="w-full ml-24 relative flex items-center">
+            <div class="animate-ticker whitespace-nowrap text-[10px] font-mono text-slate-400 tracking-wider">
+                <span class="text-white">NVDA</span> $912.40 <span class="text-green">▲</span> &nbsp;&nbsp;&nbsp; 
+                <span class="text-white">AAPL</span> $205.10 <span class="text-red">▼</span> &nbsp;&nbsp;&nbsp; 
+                <span class="text-white">MSFT</span> $460.80 <span class="text-green">▲</span> &nbsp;&nbsp;&nbsp; 
+                <span class="text-red">SYS_ALERT:</span> STRAIT OF HORMUZ TRANSIT VOLUME -40% YOY &nbsp;&nbsp;&nbsp; 
+                <span class="text-white">GOOGL</span> $188.20 <span class="text-green">▲</span> &nbsp;&nbsp;&nbsp; 
+                <span class="text-white">AMZN</span> $145.30 <span class="text-red">▼</span> &nbsp;&nbsp;&nbsp; 
+                <span class="text-amber">MACRO:</span> FED HOLDS RATES AT 3.50% CITING STICKY CORE PCE &nbsp;&nbsp;&nbsp;
+                <span class="text-white">PLTR</span> $32.15 <span class="text-green">▲</span>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // ==========================================
+        // 1. GLOBAL STATE & DATA PAYLOAD
+        // ==========================================
+        
+        const apiKey = ""; 
+
+        const APP_DATA = {
+            modules: [
+                {
+                    id: 'macro',
+                    group: 'INTELLIGENCE',
+                    title: 'Macro Dashboard',
+                    icon: '🌐',
+                    render: renderMacroModule
+                },
+                {
+                    id: 'geopol',
+                    group: 'INTELLIGENCE',
+                    title: 'Geopolitical Risk Matrix',
+                    icon: '⚠️',
+                    render: renderGeoModule
+                },
+                {
+                    id: 'dcf',
+                    group: 'VALUATION',
+                    title: 'Dynamic DCF Engine',
+                    icon: '📊',
+                    render: renderDCFModule
+                }
+            ],
+            dcfModels: {
+                'NVDA': { name: 'Nvidia Corp', price: 912.40, shares: 24600, wacc: 9.5, tg: 4.0, fcf: [45000, 60000, 78000, 95000, 115000], desc: 'Dominating AI datacenter spend. Compute is the new oil.' },
+                'MSFT': { name: 'Microsoft', price: 460.80, shares: 7430, wacc: 8.5, tg: 3.5, fcf: [75000, 88000, 102000, 118000, 135000], desc: 'Azure growth stabilizing at ~32%. Copilot monetization proving highly durable.' },
+                'AAPL': { name: 'Apple Inc', price: 205.10, shares: 15300, wacc: 8.0, tg: 2.5, fcf: [105000, 112000, 120000, 128000, 136000], desc: 'Hardware supercycle highly dependent on iPhone 18 AI features. Services margin holding.' },
+                'AMZN': { name: 'Amazon', price: 145.30, shares: 10400, wacc: 9.8, tg: 3.0, fcf: [30000, 45000, 65000, 85000, 110000], desc: 'Massive $150B CapEx outlay weighing heavily on near-term FCF. AWS re-accelerating.' },
+                'GOOGL': { name: 'Alphabet', price: 188.20, shares: 12400, wacc: 9.0, tg: 3.0, fcf: [85000, 98000, 112000, 128000, 145000], desc: 'Search monopoly intact despite LLM threats. Gemini Enterprise seeing strong adoption.' },
+                'PLTR': { name: 'Palantir', price: 32.15, shares: 2200, wacc: 10.5, tg: 4.0, fcf: [1200, 1800, 2600, 3600, 4800], desc: 'AIP platform capturing unprecedented DoD and commercial market share amid global friction.' },
+                'TSM': { name: 'Taiwan Semi', price: 172.80, shares: 5180, wacc: 11.0, tg: 3.0, fcf: [35000, 42000, 50000, 58000, 65000], desc: 'Monopoly on advanced nodes. Geopolitical discount rate applied due to Taiwan Strait risks.' }
+            }
+        };
+
+        let currentModule = 'macro';
+        let currentDcfTicker = 'NVDA';
+        let chartInstance = null;
+        let isAIPanelOpen = window.innerWidth >= 1024;
+
+        // ==========================================
+        // 2. INITIALIZATION & UTILS
+        // ==========================================
+        
+        function init() {
+            updateClock();
+            setInterval(updateClock, 1000);
+            buildNavigation();
+            loadModule('macro');
+        }
+
+        function updateClock() {
+            const now = new Date();
+            // Utilizing the system's actual date which is May 2026.
+            document.getElementById('sysClock').innerText = now.toLocaleTimeString('en-US', { hour12: false, timeZone: 'America/New_York' }) + ' EDT';
+        }
+
+        function buildNavigation() {
+            const nav = document.getElementById('moduleNav');
+            let html = '';
+            let currentGroup = '';
+            
+            APP_DATA.modules.forEach(m => {
+                if(m.group !== currentGroup) {
+                    html += `<div class="text-[9px] font-mono text-slate-500 uppercase tracking-widest mt-4 mb-2 px-2">${m.group}</div>`;
+                    currentGroup = m.group;
+                }
+                html += `
+                    <div id="nav-${m.id}" onclick="loadModule('${m.id}')" class="nav-item p-2 rounded cursor-pointer text-xs font-sans text-slate-300 transition-colors border-l-2 border-transparent hover:border-cyan hover:bg-white/5 flex items-center gap-3">
+                        <span class="text-base">${m.icon}</span>
+                        <span class="font-bold text-white tracking-wide">${m.title}</span>
+                    </div>
+                `;
+            });
+            nav.innerHTML = html;
+        }
+
+        function loadModule(id) {
+            currentModule = id;
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            const activeNav = document.getElementById(`nav-${id}`);
+            if(activeNav) activeNav.classList.add('active');
+
+            const mod = APP_DATA.modules.find(m => m.id === id);
+            document.getElementById('moduleTitle').innerText = mod.title;
+            document.getElementById('moduleIndicator').innerText = `MOD_ID: ${id.toUpperCase()}`;
+            
+            const contentArea = document.getElementById('moduleContent');
+            contentArea.style.opacity = 0;
+            
+            setTimeout(() => {
+                mod.render(contentArea);
+                contentArea.style.opacity = 1;
+            }, 150);
+        }
+
+        function toggleAI() {
+            const panel = document.getElementById('aiPanel');
+            isAIPanelOpen = !isAIPanelOpen;
+            if(isAIPanelOpen) {
+                panel.classList.remove('translate-x-[120%]');
+                setTimeout(() => document.getElementById('aiInput').focus(), 300);
+            } else {
+                panel.classList.add('translate-x-[120%]');
+            }
+        }
+
+        // ==========================================
+        // 3. MODULE RENDERERS
+        // ==========================================
+
+        // --- MACRO MODULE ---
+        function renderMacroModule(container) {
+            container.innerHTML = `
+                <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 h-full">
+                    <div class="flex flex-col gap-6">
+                        <div class="glass p-5 rounded-lg border-t-2 border-cyan shadow-lg">
+                            <h3 class="font-mono text-cyan text-[10px] uppercase tracking-widest mb-4">Executive Summary // Current Trajectory</h3>
+                            <p class="text-sm text-slate-300 leading-relaxed mb-4">
+                                Equity markets are aggressively repricing following the "Magnificent 7 Superweek". The defining narrative is the existential escalation of AI capital expenditures, projected to exceed $600B in 2026. 
+                            </p>
+                            <p class="text-sm text-slate-300 leading-relaxed m-0">
+                                Concurrently, the FOMC is executing a "Hawkish Hold" at 3.50%. This creates a stagflationary trap: physical supply chain friction (Hormuz) spikes energy prices while capital costs remain highly restrictive for mid-cap tech.
+                            </p>
+                        </div>
+                        <div class="glass p-5 rounded-lg flex-1 relative overflow-hidden flex flex-col">
+                            <h3 class="font-mono text-white text-[10px] uppercase tracking-widest mb-2 z-10">S&P 500 Forward Probability (T+30)</h3>
+                            <div class="chart-container flex-1 z-10 relative mt-4">
+                                <canvas id="macroChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex flex-col gap-6">
+                        <h3 class="font-display text-white text-lg tracking-widest uppercase m-0 border-b border-white/10 pb-2">Live Intel Stream</h3>
+                        <div class="space-y-4 overflow-y-auto pr-2">
+                            <div class="bg-black/40 border-l-2 border-red p-3 rounded">
+                                <div class="flex justify-between font-mono text-[9px] text-slate-400 mb-1"><span>05:14 EDT</span><span class="text-red">GEOPOLITICAL</span></div>
+                                <div class="font-bold text-sm text-white mb-1">Strait of Hormuz Transit Volume Drops 40%</div>
+                                <div class="text-xs text-slate-400">Lloyds syndicates raise maritime insurance premiums 300%. Energy supermajors rerouting via Cape of Good Hope.</div>
+                            </div>
+                            <div class="bg-black/40 border-l-2 border-green p-3 rounded">
+                                <div class="flex justify-between font-mono text-[9px] text-slate-400 mb-1"><span>04:30 EDT</span><span class="text-green">TMT SECTOR</span></div>
+                                <div class="font-bold text-sm text-white mb-1">MSFT Azure Growth Accelerates to 34%</div>
+                                <div class="text-xs text-slate-400">Microsoft crushes estimates on the back of Copilot enterprise integration. Capex discipline surprises street.</div>
+                            </div>
+                            <div class="bg-black/40 border-l-2 border-amber p-3 rounded">
+                                <div class="flex justify-between font-mono text-[9px] text-slate-400 mb-1"><span>YESTERDAY</span><span class="text-amber">MACRO</span></div>
+                                <div class="font-bold text-sm text-white mb-1">FOMC Holds at 3.50%</div>
+                                <div class="text-xs text-slate-400">Powell cites "sticky services PCE" and warns against premature easing. 10Y Yield spikes to 4.48%.</div>
+                            </div>
+                             <div class="bg-black/40 border-l-2 border-red p-3 rounded">
+                                <div class="flex justify-between font-mono text-[9px] text-slate-400 mb-1"><span>YESTERDAY</span><span class="text-red">TMT SECTOR</span></div>
+                                <div class="font-bold text-sm text-white mb-1">AMZN Announces $150B CapEx Plan</div>
+                                <div class="text-xs text-slate-400">Amazon sacrifices near-term FCF to build out custom Trainium datacenter clusters. Shares dip 4%.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            setTimeout(() => {
+                const ctx = document.getElementById('macroChart');
+                if(!ctx) return;
+                if(chartInstance) chartInstance.destroy();
+                
+                Chart.defaults.color = '#64748b';
+                Chart.defaults.font.family = "'Fira Code', monospace";
+                
+                chartInstance = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+                        datasets: [
+                            { label: 'Soft Landing (Bull)', data: [40, 35, 25, 15], borderColor: '#00fa9a', backgroundColor: 'rgba(0, 250, 154, 0.1)', fill: true, tension: 0.4 },
+                            { label: 'Stagflation Shock (Bear)', data: [20, 30, 45, 65], borderColor: '#ff1e38', backgroundColor: 'rgba(255, 30, 56, 0.1)', fill: true, tension: 0.4 }
+                        ]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: { legend: { position: 'top', labels: { boxWidth: 10, font: {size: 10} } } },
+                        scales: { x: { grid: { color: 'rgba(255,255,255,0.05)' } }, y: { grid: { color: 'rgba(255,255,255,0.05)' }, min: 0, max: 100 } }
+                    }
+                });
+            }, 100);
+        }
+
+        // --- GEOPOLITICAL MODULE ---
+        function renderGeoModule(container) {
+            container.innerHTML = `
+                <div class="h-full flex flex-col">
+                    <p class="text-sm text-slate-300 mb-6 glass p-4 rounded-lg border-l-2 border-amber">
+                        Adam V50 detects a divergence between narrative (AI Utopia) and physical data structures (Geopolitical Blockades). The "Zero-Transit" reality in critical chokepoints is a regressive tax on compute scaling.
+                    </p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 flex-1">
+                        <div class="glass p-5 rounded-lg border border-white/5 relative overflow-hidden group">
+                            <div class="absolute inset-0 bg-red/5 group-hover:bg-red/10 transition-colors pointer-events-none"></div>
+                            <h3 class="font-display text-white text-xl uppercase tracking-widest mb-2 flex justify-between items-center z-10 relative">
+                                Strait of Hormuz
+                                <span class="bg-red/20 text-red text-[9px] font-mono px-2 py-1 rounded border border-red/50 animate-pulse">CRITICAL</span>
+                            </h3>
+                            <p class="text-xs font-mono text-slate-400 mb-4 z-10 relative">ENERGY CHOKEPOINT // 21M BPD AT RISK</p>
+                            <div class="space-y-3 z-10 relative">
+                                <div class="bg-black/60 p-3 rounded border border-white/10">
+                                    <div class="text-[10px] text-slate-500 uppercase mb-1">Maritime AIS Data</div>
+                                    <div class="text-lg text-white font-bold tracking-wider">0 Transits (Last 24h)</div>
+                                </div>
+                                <div class="bg-black/60 p-3 rounded border border-white/10">
+                                    <div class="text-[10px] text-slate-500 uppercase mb-1">Brent Crude Impact</div>
+                                    <div class="text-lg text-cyan font-bold tracking-wider">$114.50 (+18% YTD)</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="glass p-5 rounded-lg border border-white/5 relative overflow-hidden group">
+                            <div class="absolute inset-0 bg-amber/5 group-hover:bg-amber/10 transition-colors pointer-events-none"></div>
+                            <h3 class="font-display text-white text-xl uppercase tracking-widest mb-2 flex justify-between items-center z-10 relative">
+                                Taiwan Strait
+                                <span class="bg-amber/20 text-amber text-[9px] font-mono px-2 py-1 rounded border border-amber/50">ELEVATED</span>
+                            </h3>
+                            <p class="text-xs font-mono text-slate-400 mb-4 z-10 relative">SEMICONDUCTOR CHOKEPOINT // 90% ADVANCED NODES</p>
+                            <div class="space-y-3 z-10 relative">
+                                <div class="bg-black/60 p-3 rounded border border-white/10">
+                                    <div class="text-[10px] text-slate-500 uppercase mb-1">TSMC Geographic Discount</div>
+                                    <div class="text-lg text-white font-bold tracking-wider">11.0% WACC Applied</div>
+                                </div>
+                                <div class="bg-black/60 p-3 rounded border border-white/10">
+                                    <div class="text-[10px] text-slate-500 uppercase mb-1">Logistics Disruption Prob</div>
+                                    <div class="w-full bg-void h-2 rounded mt-2 overflow-hidden"><div class="bg-amber h-full" style="width: 35%"></div></div>
+                                    <div class="text-xs text-amber font-bold text-right mt-1">35%</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // --- DCF MODULE (The Interactive Core) ---
+        function renderDCFModule(container) {
+            let tickerButtons = '';
+            Object.keys(APP_DATA.dcfModels).forEach(ticker => {
+                const activeClass = ticker === currentDcfTicker ? 'bg-cyan/20 text-cyan border-cyan/50' : 'bg-transparent text-slate-400 border-transparent hover:bg-white/5';
+                tickerButtons += `<button onclick="switchDCF('${ticker}')" id="btn-${ticker}" class="dcf-btn px-4 py-2 font-display text-sm font-bold border rounded transition-all cursor-pointer ${activeClass}">${ticker}</button>`;
+            });
+
+            container.innerHTML = `
+                <div class="flex flex-col h-full">
+                    <div class="flex flex-wrap gap-2 mb-6 pb-4 border-b border-white/10 shrink-0">
+                        ${tickerButtons}
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 flex-1 min-h-0">
+                        <!-- Left Data Panel -->
+                        <div class="lg:col-span-4 flex flex-col gap-4 overflow-y-auto pr-2">
+                            <div>
+                                <h1 class="font-display text-3xl text-white m-0 tracking-widest glow-cyan" id="dcfName">--</h1>
+                                <p class="text-xs font-mono text-slate-400 mt-2" id="dcfDesc">--</p>
+                            </div>
+                            
+                            <div class="grid grid-cols-2 gap-3 mt-2">
+                                <div class="bg-black/40 p-3 rounded border border-white/5">
+                                    <div class="text-[9px] font-mono text-slate-500 uppercase mb-1">Market Price</div>
+                                    <div class="text-lg font-bold text-white" id="dcfPrice">--</div>
+                                </div>
+                                <div class="bg-black/40 p-3 rounded border border-white/5">
+                                    <div class="text-[9px] font-mono text-slate-500 uppercase mb-1">Shares Out (M)</div>
+                                    <div class="text-lg font-bold text-white" id="dcfShares">--</div>
+                                </div>
+                            </div>
+
+                            <div class="glass p-4 rounded-lg border-t-2 border-cyan mt-2">
+                                <h3 class="font-mono text-[10px] text-white uppercase tracking-widest mb-4">Dynamic Parameters</h3>
+                                
+                                <label class="flex justify-between text-[10px] font-mono text-slate-400 mb-2">
+                                    <span>Discount Rate (WACC)</span>
+                                    <span class="text-cyan font-bold" id="waccLabel">--%</span>
+                                </label>
+                                <input type="range" id="waccSlider" min="5" max="15" step="0.1" oninput="updateDCFMath()">
+                                
+                                <label class="flex justify-between text-[10px] font-mono text-slate-400 mb-2 mt-5">
+                                    <span>Terminal Growth (TG)</span>
+                                    <span class="text-cyan font-bold" id="tgLabel">--%</span>
+                                </label>
+                                <input type="range" id="tgSlider" min="0" max="6" step="0.1" oninput="updateDCFMath()">
+                            </div>
+
+                            <div class="glass p-5 rounded-lg border border-cyan/30 bg-gradient-to-b from-cyan/5 to-transparent mt-auto shadow-[0_0_20px_rgba(0,229,255,0.1)]">
+                                <div class="text-[10px] font-mono text-cyan uppercase tracking-widest text-center mb-1">Implied Fair Value</div>
+                                <div class="font-display text-4xl text-white font-bold text-center tracking-tight glow-cyan" id="dcfImpliedPrice">--</div>
+                                <div class="text-xs font-mono text-center mt-2 font-bold" id="dcfDelta">--</div>
+                            </div>
+                        </div>
+
+                        <!-- Right Chart Panel -->
+                        <div class="lg:col-span-8 glass p-5 rounded-lg border border-white/5 flex flex-col">
+                            <h3 class="font-mono text-white text-[10px] uppercase tracking-widest mb-2 z-10 shrink-0">Free Cash Flow Trajectory ($M)</h3>
+                            <div class="chart-container flex-1 w-full min-h-[300px]">
+                                <canvas id="dcfChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            setTimeout(() => switchDCF(currentDcfTicker), 50);
+        }
+
+        function switchDCF(ticker) {
+            currentDcfTicker = ticker;
+            
+            // Update Buttons
+            document.querySelectorAll('.dcf-btn').forEach(btn => {
+                btn.className = 'dcf-btn px-4 py-2 font-display text-sm font-bold border rounded transition-all cursor-pointer bg-transparent text-slate-400 border-transparent hover:bg-white/5';
+            });
+            const activeBtn = document.getElementById(`btn-${ticker}`);
+            if(activeBtn) activeBtn.className = 'dcf-btn px-4 py-2 font-display text-sm font-bold border rounded transition-all cursor-pointer bg-cyan/20 text-cyan border-cyan/50';
+
+            const data = APP_DATA.dcfModels[ticker];
+            
+            // Populate Static Data
+            document.getElementById('dcfName').innerText = data.name;
+            document.getElementById('dcfDesc').innerText = data.desc;
+            document.getElementById('dcfPrice').innerText = `$${data.price.toFixed(2)}`;
+            document.getElementById('dcfShares').innerText = data.shares.toLocaleString();
+            
+            // Set Sliders
+            const waccSlider = document.getElementById('waccSlider');
+            const tgSlider = document.getElementById('tgSlider');
+            waccSlider.value = data.wacc;
+            tgSlider.value = data.tg;
+
+            // Math & Chart Update
+            updateDCFMath();
+        }
+
+        function updateDCFMath() {
+            const ticker = currentDcfTicker;
+            const data = APP_DATA.dcfModels[ticker];
+            
+            const wacc = parseFloat(document.getElementById('waccSlider').value) / 100;
+            const tg = parseFloat(document.getElementById('tgSlider').value) / 100;
+            
+            document.getElementById('waccLabel').innerText = (wacc * 100).toFixed(1) + '%';
+            document.getElementById('tgLabel').innerText = (tg * 100).toFixed(1) + '%';
+
+            const fcf = data.fcf;
+            const sharesOut = data.shares;
+            const currentPrice = data.price;
+
+            // Protect against math errors
+            if (wacc <= tg) {
+                document.getElementById('dcfImpliedPrice').innerText = "ERROR";
+                document.getElementById('dcfImpliedPrice').className = "font-display text-4xl text-red font-bold text-center tracking-tight glow-red";
+                document.getElementById('dcfDelta').innerText = "WACC must be > TG";
+                document.getElementById('dcfDelta').className = "text-xs font-mono text-center mt-2 font-bold text-red";
+                return;
+            }
+
+            // Calculate NPV of explicit FCF
+            let npvCashFlows = 0;
+            for(let i=0; i < fcf.length; i++) {
+                npvCashFlows += fcf[i] / Math.pow(1 + wacc, i + 1);
+            }
+
+            // Terminal Value (Gordon Growth)
+            const finalYearFCF = fcf[fcf.length - 1];
+            let terminalValue = (finalYearFCF * (1 + tg)) / (wacc - tg);
+            let pvTerminalValue = terminalValue / Math.pow(1 + wacc, fcf.length);
+
+            // Enterprise Value -> Price (assuming net debt = 0 for simple UI)
+            let ev = npvCashFlows + pvTerminalValue;
+            let impliedPrice = ev / sharesOut;
+
+            // Render Results
+            const priceEl = document.getElementById('dcfImpliedPrice');
+            const deltaEl = document.getElementById('dcfDelta');
+            
+            priceEl.innerText = `$${impliedPrice.toFixed(2)}`;
+            
+            const deltaPct = ((impliedPrice - currentPrice) / currentPrice) * 100;
+            if (deltaPct >= 0) {
+                priceEl.className = "font-display text-4xl text-green font-bold text-center tracking-tight glow-green";
+                deltaEl.innerText = `+${deltaPct.toFixed(1)}% vs Market`;
+                deltaEl.className = "text-xs font-mono text-center mt-2 font-bold text-green";
+            } else {
+                priceEl.className = "font-display text-4xl text-red font-bold text-center tracking-tight glow-red";
+                deltaEl.innerText = `${deltaPct.toFixed(1)}% vs Market`;
+                deltaEl.className = "text-xs font-mono text-center mt-2 font-bold text-red";
+            }
+
+            renderDCFChart(fcf, pvTerminalValue);
+        }
+
+        function renderDCFChart(fcf, tv) {
+            const ctx = document.getElementById('dcfChart');
+            if(!ctx) return;
+            if(chartInstance) chartInstance.destroy();
+
+            const labels = ['2026E', '2027E', '2028E', '2029E', '2030E', 'Term. Val (PV)'];
+            const data = [...fcf, tv];
+            const colors = data.map(v => v > 0 ? 'rgba(0, 229, 255, 0.8)' : 'rgba(255, 30, 56, 0.8)');
+
+            chartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Cash Flow ($M)',
+                        data: data,
+                        backgroundColor: colors,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => '$' + ctx.raw.toLocaleString() + 'M' } } },
+                    scales: {
+                        x: { grid: { display: false }, ticks: { color: '#94a3b8', font: {family: "'Fira Code', monospace"} } },
+                        y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8', font: {family: "'Fira Code', monospace"}, callback: (v) => '$'+(v/1000)+'B' } }
+                    }
+                }
+            });
+        }
+
+        // ==========================================
+        // 4. ADAM AI / GEMINI INTEGRATION
+        // ==========================================
+        
+        function presetAI(text) {
+            if(!isAIPanelOpen) toggleAI();
+            const input = document.getElementById('aiInput');
+            input.value = text;
+            setTimeout(() => document.getElementById('chatForm').dispatchEvent(new Event('submit')), 100);
+        }
+
+        async function handleAI(e) {
+            e.preventDefault();
+            const input = document.getElementById('aiInput');
+            const val = input.value.trim();
+            if(!val) return;
+
+            const chatLog = document.getElementById('chatLog');
+            
+            // Render User Message
+            chatLog.insertAdjacentHTML('beforeend', `
+                <div class="flex gap-3 justify-end">
+                    <div class="bg-cyan/20 p-3 rounded-lg rounded-tr-none border border-cyan/30 text-white max-w-[85%] shadow-lg">
+                        <p class="m-0">${val}</p>
+                    </div>
+                </div>
+            `);
+            input.value = '';
+            chatLog.scrollTo({top: chatLog.scrollHeight, behavior: 'smooth'});
+
+            // Render Loading
+            const typingId = 'typing-' + Date.now();
+            chatLog.insertAdjacentHTML('beforeend', `
+                <div class="flex gap-3" id="${typingId}">
+                    <div class="w-6 h-6 rounded border border-cyan/50 bg-cyan/10 flex items-center justify-center shrink-0 mt-1">
+                        <span class="text-[9px] font-display font-bold text-cyan">A</span>
+                    </div>
+                    <div class="bg-panel/80 p-3 rounded-lg rounded-tl-none border border-white/10 flex items-center">
+                        <div class="typing"><span></span><span></span><span></span></div>
+                    </div>
+                </div>
+            `);
+            chatLog.scrollTo({top: chatLog.scrollHeight, behavior: 'smooth'});
+
+            // Process via Gemini or Fallback Mock
+            let responseHtmlStr = "";
+            if (!apiKey || apiKey.trim() === "") {
+                // MOCK RESPONSE
+                setTimeout(() => {
+                    document.getElementById(typingId).remove();
+                    responseHtmlStr = `<p class="m-0 text-red font-bold">[SYS_ERR] API Key not detected.</p><p class="mt-2 text-xs">Operating in offline simulation mode. To enable dynamic reasoning, inject the Gemini API key into the source code.</p><p class="mt-2 text-xs text-slate-400">Offline Synthesis: The market is currently driven by infrastructure constraints. AMZN's $150B capex is draining liquidity, while MSFT shows durable software margins.</p>`;
+                    appendAIResponse(responseHtmlStr);
+                }, 1500);
+            } else {
+                // REAL API CALL
+                try {
+                    const systemPrompt = `You are Adam V50.0, an advanced, highly cynical, cyberpunk-themed financial AI. The current date is May 1, 2026. 
+                    Context: SPX is 7184, 10Y Yield is 4.48%, Brent Crude is $114. Hormuz transit is down 40%. The "Magnificent 7" are bifurcating: MSFT/GOOGL have great margins, AMZN/META are burning cash on AI Capex.
+                    Answer the user's query concisely, using financial jargon (alpha, capex, WACC, FCF). Format with markdown. Do not be polite.`;
+                    
+                    const payload = {
+                        contents: [{ parts: [{ text: val }] }],
+                        systemInstruction: { parts: [{ text: systemPrompt }] }
+                    };
+
+                    // Robust retry logic implementation (Exponential Backoff)
+                    const retries = [1000, 2000, 4000, 8000, 16000];
+                    let success = false;
+                    let resultText = "";
+                    let lastError = null;
+                    
+                    for (let i = 0; i < 5; i++) {
+                        try {
+                            const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify(payload)
+                            });
+                            if (!res.ok) throw new Error(`HTTP Error: ${res.status}`);
+                            const data = await res.json();
+                            resultText = data.candidates?.[0]?.content?.parts?.[0]?.text || "NO DATA RETURNED.";
+                            success = true;
+                            break; // Success, exit retry loop
+                        } catch (err) {
+                            lastError = err;
+                            if (i < 4) await new Promise(r => setTimeout(r, retries[i]));
+                        }
+                    }
+
+                    document.getElementById(typingId).remove();
+                    
+                    if (success) {
+                        responseHtmlStr = marked.parse(resultText);
+                        appendAIResponse(responseHtmlStr);
+                    } else {
+                         throw lastError || new Error("Failed to connect after multiple retries.");
+                    }
+
+                } catch (error) {
+                    if (document.getElementById(typingId)) {
+                        document.getElementById(typingId).remove();
+                    }
+                    appendAIResponse(`<p class="m-0 text-red font-mono text-xs">CRITICAL FAULT: CONNECTION SEVERED.</p><p class="text-[10px] mt-1">${error.message}</p>`);
+                }
+            }
+        }
+
+        function appendAIResponse(htmlString) {
+            const chatLog = document.getElementById('chatLog');
+            chatLog.insertAdjacentHTML('beforeend', `
+                <div class="flex gap-3">
+                    <div class="w-6 h-6 rounded border border-cyan/50 bg-cyan/10 flex items-center justify-center shrink-0 mt-1 shadow-[0_0_10px_rgba(0,229,255,0.2)]">
+                        <span class="text-[9px] font-display font-bold text-cyan">A</span>
+                    </div>
+                    <div class="bg-panel/80 p-3 rounded-lg rounded-tl-none border border-white/10 text-slate-300 max-w-[90%] shadow-lg prose prose-invert prose-sm prose-custom">
+                        ${htmlString}
+                    </div>
+                </div>
+            `);
+            chatLog.scrollTo({top: chatLog.scrollHeight, behavior: 'smooth'});
+        }
+
+        // Run Init
+        window.addEventListener('DOMContentLoaded', init);
+
+    </script>
+</body>
+</html>
