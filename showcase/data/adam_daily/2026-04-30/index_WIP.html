@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adam OmniOS // Market Mayhem Edition</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Merriweather:wght@300;400;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                        serif: ['Merriweather', 'serif'],
+                    },
+                    colors: {
+                        os: {
+                            desktop: '#0f111a',
+                            panel: '#1e212b',
+                            window: '#181a20',
+                            border: '#2a2d3d',
+                            accent: '#3b82f6',
+                            text: '#e2e8f0',
+                            muted: '#94a3b8',
+                            danger: '#ef4444',
+                            warning: '#f59e0b',
+                            success: '#10b981'
+                        }
+                    },
+                    boxShadow: {
+                        'window': '0 25px 50px -12px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(255,255,255,0.05)',
+                        'dock': '0 -10px 40px rgba(0,0,0,0.5)',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body { margin: 0; overflow: hidden; background-color: #0f111a; color: #e2e8f0; user-select: none; }
+        
+        /* Desktop Background */
+        .desktop-bg {
+            position: absolute; inset: 0; z-index: 0;
+            background: radial-gradient(circle at 50% 0%, #1e253c 0%, #0f111a 70%);
+        }
+
+        /* Window System */
+        .os-window {
+            position: absolute;
+            background: rgba(24, 26, 32, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.05);
+            transition: transform 0.1s, opacity 0.1s;
+        }
+        .os-window.active { display: flex; animation: windowPop 0.2s cubic-bezier(0.19, 1, 0.22, 1) forwards; }
+        .window-header {
+            height: 38px; background: rgba(0,0,0,0.4); border-bottom: 1px solid rgba(255,255,255,0.05);
+            display: flex; justify-content: space-between; align-items: center; padding: 0 12px; cursor: default;
+        }
+        .window-content { flex: 1; overflow-y: auto; overflow-x: hidden; position: relative; user-select: text; }
+        
+        /* Scrollbars */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+        /* Window Controls */
+        .win-btn { width: 12px; height: 12px; border-radius: 50%; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s; }
+        .win-close { background: #ff5f56; } .win-close:hover { background: #ff3b30; }
+        .win-min { background: #ffbd2e; } .win-min:hover { background: #e5a510; }
+        .win-max { background: #27c93f; } .win-max:hover { background: #1aab29; }
+        
+        /* Dock */
+        .dock {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 9999;
+            background: rgba(15, 17, 26, 0.6); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 24px; padding: 8px 12px; display: flex; gap: 12px; box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
+        .dock-item {
+            width: 48px; height: 48px; border-radius: 12px; background: rgba(255,255,255,0.05);
+            display: flex; align-items: center; justify-content: center; cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.19, 1, 0.22, 1); border: 1px solid rgba(255,255,255,0.05);
+            position: relative;
+        }
+        .dock-item:hover { transform: translateY(-8px) scale(1.1); background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); }
+        .dock-item.open::after { content: ''; position: absolute; bottom: -4px; width: 4px; height: 4px; border-radius: 50%; background: #e2e8f0; }
+        .dock-tooltip {
+            position: absolute; top: -35px; background: rgba(0,0,0,0.8); color: white; padding: 4px 10px;
+            border-radius: 6px; font-size: 11px; opacity: 0; pointer-events: none; transition: opacity 0.2s; white-space: nowrap; font-family: 'Inter', sans-serif;
+        }
+        .dock-item:hover .dock-tooltip { opacity: 1; }
+
+        /* Typography for Notepad */
+        .notepad-content { background: #fafafa; color: #111827; min-height: 100%; padding: 40px 60px; font-family: 'Merriweather', serif; }
+        .notepad-content a { color: #2563eb; text-decoration: none; border-bottom: 1px solid transparent; transition: border-color 0.2s; cursor: pointer; }
+        .notepad-content a:hover { border-bottom-color: #2563eb; }
+        .notepad-content h1 { font-family: 'Inter', sans-serif; font-weight: 700; font-size: 2.2rem; letter-spacing: -0.02em; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px; margin-bottom: 20px;}
+        .notepad-content h2 { font-family: 'Inter', sans-serif; font-weight: 600; font-size: 1.4rem; color: #1f2937; margin-top: 30px; }
+        .notepad-content p { line-height: 1.8; font-size: 14px; color: #374151; }
+        .notepad-content blockquote { border-left: 4px solid #3b82f6; padding-left: 1rem; color: #4b5563; font-style: italic; background: #f3f4f6; padding: 10px 15px; border-radius: 0 4px 4px 0;}
+
+        /* Utilities */
+        @keyframes windowPop { 0% { opacity: 0; transform: scale(0.97) translateY(10px); } 100% { opacity: 1; transform: scale(1) translateY(0); } }
+        .chart-wrap { position: relative; width: 100%; height: 100%; min-height: 220px; }
+        
+        /* Interactive Elements */
+        input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 14px; width: 14px; border-radius: 50%; background: #3b82f6; cursor: pointer; margin-top: -5px; }
+        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; cursor: pointer; background: #334155; border-radius: 2px; }
+        
+        /* DCF Waterfall Custom */
+        .dcf-bar-container { display: flex; align-items: flex-end; justify-content: space-around; height: 220px; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-top: 20px;}
+        .dcf-col { display: flex; flex-direction: column; justify-content: flex-end; align-items: center; width: 10%; position: relative; }
+        .dcf-bar-pos { background-color: #3b82f6; width: 100%; border-radius: 4px 4px 0 0; transition: height 0.5s ease-out; }
+        .dcf-bar-neg { background-color: #ef4444; width: 100%; border-radius: 0 0 4px 4px; transition: height 0.5s ease-out; position: absolute; top: 100%; }
+        .dcf-label { position: absolute; bottom: -22px; font-size: 10px; font-family: 'JetBrains Mono'; color: #94a3b8; }
+        .dcf-val { position: absolute; top: -20px; font-size: 10px; font-family: 'JetBrains Mono'; color: #fff; white-space: nowrap;}
+        
+        /* Data Tables */
+        .data-table { width: 100%; text-align: left; font-family: 'JetBrains Mono', monospace; font-size: 11px; white-space: nowrap; border-collapse: collapse; }
+        .data-table th { padding: 10px 12px; font-weight: 500; color: #94a3b8; border-bottom: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.4); }
+        .data-table td { padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,0.05); color: #e2e8f0; }
+        .data-table tr:hover td { background: rgba(255,255,255,0.02); }
+    </style>
+</head>
+<body>
+
+    <div class="desktop-bg"></div>
+
+    <div class="absolute top-0 left-0 right-0 h-7 bg-black/40 backdrop-blur-md border-b border-white/5 flex justify-between items-center px-4 z-50 text-[11px] font-sans text-os-text">
+        <div class="flex items-center gap-4">
+            <span class="font-bold text-white tracking-widest cursor-default">ADAM OMNIOS</span>
+            <span class="text-os-muted hover:text-white cursor-pointer transition-colors" onclick="openApp('app-notepad')">Briefing</span>
+            <span class="text-os-muted hover:text-white cursor-pointer transition-colors" onclick="openApp('app-market')">Markets</span>
+            <span class="text-os-muted hover:text-white cursor-pointer transition-colors" onclick="openApp('app-dcf')">Appraisals</span>
+            <span class="text-os-muted hover:text-white cursor-pointer transition-colors" onclick="openApp('app-radar')">Intel Radar</span>
+        </div>
+        <div class="flex items-center gap-4 text-os-muted font-mono">
+            <span class="flex items-center gap-1.5"><div class="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse"></div> RLHF_SYNC</span>
+            <span id="osClock">Thu Apr 30 08:32 AM</span>
+        </div>
+    </div>
+
+    <div id="app-notepad" class="os-window" style="width: 850px; height: 85vh; top: 50px; left: 50px; z-index: 100;">
+        <div class="window-header" id="app-notepad-header">
+            <div class="flex items-center gap-2">
+                <button class="win-btn win-close" onclick="closeApp('app-notepad')"></button>
+                <button class="win-btn win-min"></button>
+                <button class="win-btn win-max" onclick="maximizeApp('app-notepad')"></button>
+            </div>
+            <div class="text-[12px] font-medium text-os-muted flex-1 text-center pointer-events-none">Market_Mayhem_Daily_Briefing.md</div>
+            <div class="w-14"></div>
+        </div>
+        <div class="window-content bg-[#fafafa]">
+            <div class="notepad-content prose prose-slate max-w-none">
+                <h1>Market Mayhem: The $18.6 Trillion Crucible</h1>
+                <p style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #6b7280; border-bottom: 1px solid #e5e7eb; padding-bottom: 20px;">DATE: April 30, 2026 | CLASSIFICATION: CONFIDENTIAL | AUTHOR: ADAM</p>
+                
+                <h2>1. The Glitch: Limbo Regime & The Stagflationary Trap</h2>
+                <p>We built a digital cathedral of central banking and expected 'Forward Guidance' to be our holy scripture, only to find the high priests are speaking in different tongues. The glitch is the 'Dissensus Paradox': the market is celebrating a 'Hold' at 3.50% while the Fed's internal logic is tearing itself apart. Trust the yields; the S&P 7,100 floor is a beautiful, speculative hallucination.</p>
+                <blockquote>The Strait of Hormuz has officially entered a state of near-total operational cessation. After a weekend that saw zero recorded transits, WTI crude has breached $105. This energy shock acts as a highly regressive tax on consumer discretionary income and places a massive structural premium on the electricity-intensive operations of AI data centers.</blockquote>
+
+                <h2>2. Mag 7 Superweek: The Margin Expanders vs. Capital Burners</h2>
+                <p>The defining narrative of Q1 2026 is the relentless, existential escalation of AI capital expenditures—projected to exceed $600B across hyperscalers. The market is aggressively bifurcating the cohort based on Return on Invested Capital (ROIC):</p>
+                <ul>
+                    <li><strong>The Margin Expanders (MSFT & GOOGL):</strong> Alphabet dismantled search-cannibalization fears with Cloud growth accelerating to 63.4%. Microsoft's Azure hit +39% (CC), reversing deceleration, with an incredible Capex undershoot signaling supreme capital discipline.</li>
+                    <li><strong>The Capital Burners (AMZN & META):</strong> Amazon's AWS accelerated, but TTM Free Cash Flow collapsed to $1.2B under the weight of a monumental $200B forward capex commitment. Meta's pivot to the closed-weights "Muse Spark" model signals the end of the open-source era, demanding near-term monetization to justify its $4B Reality Labs burn.</li>
+                </ul>
+                <p><strong>Actionable Intelligence:</strong> <a onclick="openApp('app-dcf')">Open Appraisals (DCF)</a> to view the 7-year enterprise valuations reflecting these CapEx structures.</p>
+
+                <h2>3. Legal Overhang: Musk v. Altman Trial</h2>
+                <p>The highly anticipated federal trial kicked off in Oakland. Elon Musk took the stand, bluntly testifying that "it's not okay to steal a charity." The litigation seeks up to $150 billion in disgorgement and the explicit ouster of Sam Altman. The structural threat to closed-weight, profit-driven AI architectures is actively pricing into downstream software multiples, particularly introducing tail-risk to Microsoft's Azure revenue projections.</p>
+
+                <h2>4. Behavioral Finance Corner: Anchoring Bias</h2>
+                <p>Risk managers are currently "anchored" to the zero-interest-rate environment (ZIRP) of the last decade. This creates a psychological floor where 4.5% rates feel "abnormal," leading to an expectation that they must revert soon. Assess credit viability assuming the current SOFR environment is the <strong>"new neutral."</strong> The market is pricing a return to 2019; physics (Hormuz, Energy, Onshoring) is dictating a return to 1979.</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="app-market" class="os-window" style="width: 950px; height: 680px; top: 80px; left: 150px; z-index: 90;">
+        <div class="window-header" id="app-market-header">
+            <div class="flex items-center gap-2">
+                <button class="win-btn win-close" onclick="closeApp('app-market')"></button>
+                <button class="win-btn win-min"></button>
+                <button class="win-btn win-max" onclick="maximizeApp('app-market')"></button>
+            </div>
+            <div class="text-[12px] font-medium text-os-muted flex-1 text-center pointer-events-none">Market Terminal & Shadow Liquidity</div>
+            <div class="w-14"></div>
+        </div>
+        <div class="window-content bg-os-desktop p-5 flex flex-col gap-5">
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-3 shrink-0">
+                <div class="bg-os-panel border border-os-border p-3 rounded-lg"><div class="text-[10px] text-os-muted mb-1 font-mono">S&P 500</div><div class="text-lg font-bold text-white">7,138.80</div><div class="text-[10px] text-os-danger mt-1">-0.49%</div></div>
+                <div class="bg-os-panel border border-os-border p-3 rounded-lg"><div class="text-[10px] text-os-muted mb-1 font-mono">10Y TREASURY</div><div class="text-lg font-bold text-os-accent">4.415%</div><div class="text-[10px] text-os-accent mt-1">+6.3 bps</div></div>
+                <div class="bg-os-panel border border-os-border p-3 rounded-lg"><div class="text-[10px] text-os-muted mb-1 font-mono">BRENT CRUDE</div><div class="text-lg font-bold text-os-warning">$111.78</div><div class="text-[10px] text-os-warning mt-1">+0.47% (8th Day)</div></div>
+                <div class="bg-os-panel border border-os-border p-3 rounded-lg"><div class="text-[10px] text-os-muted mb-1 font-mono">BTC TETHER</div><div class="text-lg font-bold text-white">75,935</div><div class="text-[10px] text-os-danger mt-1">-0.50%</div></div>
+                <div class="bg-os-panel border border-os-border p-3 rounded-lg"><div class="text-[10px] text-os-muted mb-1 font-mono">VIX DAEMON</div><div class="text-lg font-bold text-white">18.60</div><div class="text-[10px] text-os-success mt-1">+4.0%</div></div>
+            </div>
+            
+            <div class="flex gap-5 flex-1 min-h-[250px]">
+                <div class="bg-os-panel border border-os-border p-4 rounded-lg flex-[2] flex flex-col">
+                    <h3 class="text-xs font-semibold text-white mb-4 uppercase tracking-wider">Macro Convergence Matrix (T+7)</h3>
+                    <div class="chart-wrap"><canvas id="marketChart"></canvas></div>
+                </div>
+                <div class="bg-os-panel border border-os-border p-4 rounded-lg flex-1 flex flex-col">
+                    <h3 class="text-xs font-semibold text-white mb-4 uppercase tracking-wider">SPX Gamma Profile</h3>
+                    <div class="chart-wrap mb-4" style="min-height: 120px;"><canvas id="gammaChart"></canvas></div>
+                    <div class="flex-1 flex flex-col justify-center gap-3">
+                        <div class="bg-black/30 p-3 rounded border border-white/5">
+                            <div class="text-[10px] text-os-muted font-mono mb-1">Zero-Gamma Level (Flip Line)</div>
+                            <div class="text-xl text-white font-mono">7,105</div>
+                        </div>
+                        <div class="bg-black/30 p-3 rounded border border-white/5">
+                            <div class="text-[10px] text-os-muted font-mono mb-1">0DTE Option Volume</div>
+                            <div class="text-xl text-white font-mono">55.2%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-os-panel border border-os-border rounded-lg overflow-hidden flex flex-col shrink-0">
+                <div class="p-3 border-b border-white/5 bg-black/20 text-xs font-bold text-white uppercase tracking-widest flex justify-between items-center">
+                    <span>Shadow Liquidity // Dark Pool Block Trades (> $5M)</span>
+                    <span class="text-[10px] text-os-danger font-mono bg-os-danger/10 px-2 py-0.5 rounded border border-os-danger/30">TOXICITY: ELEVATED</span>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr><th>TICKER</th><th>SIDE</th><th>VOLUME</th><th>NOTIONAL</th><th>SIGNAL</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td class="font-bold text-white">NVDA</td><td class="text-os-danger">ASK (DIST)</td><td>420,000</td><td>$36.5M</td><td class="text-os-danger">INST. LIQUIDATION</td></tr>
+                        <tr><td class="font-bold text-white">XOM</td><td class="text-os-accent">BID (ACCUM)</td><td>1,250,000</td><td>$150.2M</td><td class="text-os-accent">ENERGY ROTATION</td></tr>
+                        <tr><td class="font-bold text-white">PLTR</td><td class="text-os-accent">BID (ACCUM)</td><td>880,000</td><td>$21.1M</td><td class="text-os-accent">DEFENSE CAPEX</td></tr>
+                        <tr><td class="font-bold text-white">AAPL</td><td class="text-os-accent">BID (ACCUM)</td><td>1,100,000</td><td>$195.8M</td><td class="text-os-accent">PRE-EARNINGS DEFENSE</td></tr>
+                        <tr><td class="font-bold text-white">SPY</td><td class="text-os-danger">ASK (DIST)</td><td>2,500,000</td><td>$1.3B</td><td class="text-os-danger font-bold">INDEX SHORT</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="app-dcf" class="os-window" style="width: 1050px; height: 700px; top: 100px; left: 200px; z-index: 80;">
+        <div class="window-header" id="app-dcf-header">
+            <div class="flex items-center gap-2">
+                <button class="win-btn win-close" onclick="closeApp('app-dcf')"></button>
+                <button class="win-btn win-min"></button>
+                <button class="win-btn win-max" onclick="maximizeApp('app-dcf')"></button>
+            </div>
+            <div class="text-[12px] font-medium text-os-muted flex-1 text-center pointer-events-none">Enterprise Appraisals // 7-Year DCF Valuations</div>
+            <div class="w-14"></div>
+        </div>
+        <div class="window-content bg-os-desktop flex h-full">
+            <div class="w-48 bg-os-panel border-r border-os-border p-3 flex flex-col gap-1 overflow-y-auto">
+                <div class="text-[10px] font-bold text-os-muted uppercase tracking-widest px-2 mb-2 mt-2">Coverage Universe</div>
+                <button class="text-left px-3 py-2 rounded-md text-sm font-medium transition-colors bg-blue-500/20 text-blue-400 border border-blue-500/30 dcf-tab" onclick="switchDCF('MSFT', this)">MSFT</button>
+                <button class="text-left px-3 py-2 rounded-md text-sm font-medium transition-colors hover:bg-white/5 text-os-text border border-transparent dcf-tab" onclick="switchDCF('GOOGL', this)">GOOGL</button>
+                <button class="text-left px-3 py-2 rounded-md text-sm font-medium transition-colors hover:bg-white/5 text-os-text border border-transparent dcf-tab" onclick="switchDCF('AMZN', this)">AMZN</button>
+                <button class="text-left px-3 py-2 rounded-md text-sm font-medium transition-colors hover:bg-white/5 text-os-text border border-transparent dcf-tab" onclick="switchDCF('META', this)">META</button>
+                <button class="text-left px-3 py-2 rounded-md text-sm font-medium transition-colors hover:bg-white/5 text-os-text border border-transparent dcf-tab" onclick="switchDCF('AAPL', this)">AAPL</button>
+                
+                <div class="mt-auto p-4 bg-black/30 rounded border border-white/5">
+                    <div class="text-[10px] text-os-muted font-mono mb-3">DYNAMIC ASSUMPTIONS</div>
+                    <label class="block text-[10px] text-os-text mb-1 flex justify-between"><span>WACC (%)</span><span id="wacc-label">8.5</span></label>
+                    <input type="range" id="wacc-slider" min="6" max="15" step="0.1" value="8.5" oninput="updateLiveDCF()">
+                    
+                    <label class="block text-[10px] text-os-text mb-1 mt-4 flex justify-between"><span>Term. Growth (%)</span><span id="tg-label">3.0</span></label>
+                    <input type="range" id="tg-slider" min="1" max="5" step="0.1" value="3.0" oninput="updateLiveDCF()">
+                </div>
+            </div>
+            <div class="flex-1 p-6 overflow-y-auto flex flex-col">
+                <div class="flex justify-between items-start mb-6">
+                    <div>
+                        <h2 class="text-2xl font-bold text-white m-0 tracking-tight" id="dcf-title">Microsoft Corp (MSFT)</h2>
+                        <p class="text-sm text-os-muted mt-1" id="dcf-subtitle">Q3 FY2026 Base Case // Azure +39% Growth</p>
+                    </div>
+                    <div class="flex gap-4">
+                        <div class="text-right bg-os-panel border border-os-border px-4 py-2 rounded-lg">
+                            <div class="text-[10px] text-os-muted font-mono uppercase mb-1">Implied Share Price</div>
+                            <div class="text-xl font-bold text-white" id="dcf-price">$458.20</div>
+                        </div>
+                        <div class="text-right bg-blue-500/10 border border-blue-500/30 px-4 py-2 rounded-lg">
+                            <div class="text-[10px] text-blue-400 font-mono uppercase mb-1">Enterprise Value</div>
+                            <div class="text-xl font-bold text-white" id="dcf-ev">$3.35T</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-os-panel border border-os-border p-5 rounded-lg mb-6 shadow-inner">
+                    <h3 class="text-xs font-semibold text-white uppercase tracking-wider mb-2 border-b border-white/5 pb-2">Free Cash Flow Waterfall (7-Year Horizon, $B)</h3>
+                    <div class="dcf-bar-container" id="dcf-waterfall">
+                        </div>
+                </div>
+
+                <div class="bg-os-panel border border-os-border rounded-lg overflow-hidden">
+                    <table class="data-table">
+                        <thead>
+                            <tr><th>Metric ($B)</th><th class="text-right">2026E</th><th class="text-right">2027E</th><th class="text-right">2028E</th><th class="text-right">2029E</th><th class="text-right">2030E</th></tr>
+                        </thead>
+                        <tbody id="dcf-table">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="app-credit" class="os-window" style="width: 850px; height: 550px; top: 120px; left: 100px; z-index: 70;">
+        <div class="window-header" id="app-credit-header">
+            <div class="flex items-center gap-2">
+                <button class="win-btn win-close" onclick="closeApp('app-credit')"></button>
+                <button class="win-btn win-min"></button>
+                <button class="win-btn win-max" onclick="maximizeApp('app-credit')"></button>
+            </div>
+            <div class="text-[12px] font-medium text-os-muted flex-1 text-center pointer-events-none">Credit Desk & Fixed Income</div>
+            <div class="w-14"></div>
+        </div>
+        <div class="window-content bg-os-desktop p-5 flex gap-5">
+            <div class="flex-1 flex flex-col gap-5">
+                <div class="bg-os-panel border border-os-border p-5 rounded-lg shadow-lg">
+                    <h3 class="text-xs font-semibold text-white uppercase tracking-wider mb-1">Sovereign CDS Spreads (5Y)</h3>
+                    <p class="text-[10px] font-mono text-os-muted mb-4 border-b border-white/5 pb-2">Credit Default Swaps & Macro Contagion</p>
+                    <div class="space-y-4">
+                        <div>
+                            <div class="flex justify-between text-xs font-mono mb-1"><span class="text-white">United States</span><span class="text-os-muted">48 bps</span></div>
+                            <div class="w-full bg-black/50 h-2 rounded overflow-hidden"><div class="bg-blue-500 h-full" style="width: 20%"></div></div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-xs font-mono mb-1"><span class="text-white">Japan (BOJ Watch)</span><span class="text-os-warning">82 bps</span></div>
+                            <div class="w-full bg-black/50 h-2 rounded overflow-hidden"><div class="bg-os-warning h-full" style="width: 40%"></div></div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-xs font-mono mb-1"><span class="text-white">Germany</span><span class="text-os-muted">14 bps</span></div>
+                            <div class="w-full bg-black/50 h-2 rounded overflow-hidden"><div class="bg-slate-500 h-full" style="width: 5%"></div></div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-xs font-mono mb-1"><span class="text-white">Emerging Mkts (CDX IG)</span><span class="text-os-danger font-bold">210 bps</span></div>
+                            <div class="w-full bg-black/50 h-2 rounded overflow-hidden"><div class="bg-os-danger h-full" style="width: 75%"></div></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-os-panel border border-os-border p-5 rounded-lg shadow-lg flex-1">
+                    <h3 class="text-xs font-semibold text-white uppercase tracking-wider mb-2 text-os-warning">Broadly Syndicated Loans (BSL)</h3>
+                    <p class="text-[13px] text-os-muted leading-relaxed mb-3">The BSL market is experiencing a significant "Repricing Mirage." Institutional demand for floating-rate paper has compressed spreads to levels not seen since early 2022. Issuance volume is dominated by refinancing and repricing activities rather than M&A-driven new money. <strong class="text-white">Covenant-lite issuance stands at 88%.</strong></p>
+                    <div class="bg-black/30 border border-white/5 p-3 rounded font-mono text-[11px] text-slate-300">
+                        > TACTICAL OUTLOOK: Energy shocks combined with sustained high interest rates push lower-middle market firms toward a "Cash-Flow Cliff," spiking Default Rates (PD). Limit exposure to cyclical BSL tranches.
+                    </div>
+                </div>
+            </div>
+            
+            <div class="w-64 bg-os-panel border border-os-border rounded-lg p-4 shadow-lg flex flex-col">
+                <h3 class="text-xs font-semibold text-white uppercase tracking-wider mb-4 border-b border-white/5 pb-2">Global Liquidity Map</h3>
+                <div class="flex-1 chart-wrap min-h-[200px]"><canvas id="creditChart"></canvas></div>
+                <div class="mt-4 pt-4 border-t border-white/5 space-y-3">
+                    <div>
+                        <div class="text-[10px] text-os-muted font-mono uppercase">Fed Balance Sheet</div>
+                        <div class="text-lg font-bold text-white">$7.2T</div>
+                    </div>
+                    <div>
+                        <div class="text-[10px] text-os-muted font-mono uppercase">ECB Balance Sheet</div>
+                        <div class="text-lg font-bold text-white">€6.5T</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="app-radar" class="os-window" style="width: 900px; height: 600px; top: 150px; left: 250px; z-index: 60;">
+        <div class="window-header" id="app-radar-header">
+            <div class="flex items-center gap-2">
+                <button class="win-btn win-close" onclick="closeApp('app-radar')"></button>
+                <button class="win-btn win-min"></button>
+                <button class="win-btn win-max" onclick="maximizeApp('app-radar')"></button>
+            </div>
+            <div class="text-[12px] font-medium text-os-muted flex-1 text-center pointer-events-none">Intel Radar // Whalescanner & Cyber-Kinetic</div>
+            <div class="w-14"></div>
+        </div>
+        <div class="window-content bg-os-desktop p-5 flex flex-col gap-4">
+            
+            <div class="flex gap-4 flex-1">
+                <div class="flex-1 bg-os-panel border border-os-border rounded-lg overflow-hidden flex flex-col">
+                    <div class="p-3 border-b border-white/5 bg-black/20 text-xs font-bold text-white uppercase tracking-widest flex justify-between">
+                        <span>13D / Proxy Alerts</span>
+                        <span class="text-[10px] text-blue-400 font-mono bg-blue-500/10 px-2 py-0.5 rounded">LIVE</span>
+                    </div>
+                    <div class="overflow-y-auto p-2 flex flex-col gap-2">
+                        <div class="p-3 bg-black/30 border border-white/5 rounded hover:border-blue-500/50 transition-colors">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="font-bold text-white text-sm">SEER <span class="text-os-muted font-normal text-xs">(Seer, Inc.)</span></span>
+                                <span class="text-[10px] font-mono text-os-danger border border-os-danger/30 px-1 rounded">HOSTILE</span>
+                            </div>
+                            <p class="text-[11px] text-os-muted m-0">Radoff-JEC Group launched counter-offensive. $2.35 bid expires in 3 days. Board rejected claims of cash burn.</p>
+                        </div>
+                        <div class="p-3 bg-black/30 border border-white/5 rounded hover:border-blue-500/50 transition-colors">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="font-bold text-white text-sm">IMKTA <span class="text-os-muted font-normal text-xs">(Ingles Mkts)</span></span>
+                                <span class="text-[10px] font-mono text-os-warning border border-os-warning/30 px-1 rounded">PROXY VOTE</span>
+                            </div>
+                            <p class="text-[11px] text-os-muted m-0">Terminal point. ISS & Glass Lewis backing activist. Virtual meeting results imminent today.</p>
+                        </div>
+                        <div class="p-3 bg-black/30 border border-white/5 rounded hover:border-blue-500/50 transition-colors">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="font-bold text-white text-sm">INBK <span class="text-os-muted font-normal text-xs">(First Internet)</span></span>
+                                <span class="text-[10px] font-mono text-os-success border border-os-success/30 px-1 rounded">EARNINGS</span>
+                            </div>
+                            <p class="text-[11px] text-os-muted m-0">Activist John C. Lame maintained silence. Anticipating disclosure targeting digital asset risk today.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="w-80 bg-os-panel border border-os-border rounded-lg p-4 flex flex-col shadow-lg">
+                    <h3 class="text-xs font-semibold text-white uppercase tracking-wider mb-2 text-center">Threat Topology</h3>
+                    <div class="flex-1 chart-wrap"><canvas id="radarChart"></canvas></div>
+                </div>
+            </div>
+
+            <div class="flex gap-4 h-32">
+                <div class="flex-1 bg-os-panel border border-os-border p-4 rounded-lg flex items-center justify-between shadow-lg">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 bg-black rounded-full border border-white/10 flex items-center justify-center relative overflow-hidden shrink-0">
+                            <div class="absolute w-full h-[1px] bg-blue-500/50 animate-[scrollUp_2s_linear_infinite]"></div>
+                            <span class="text-lg">🛰️</span>
+                        </div>
+                        <div>
+                            <h4 class="text-sm font-bold text-white m-0">ESA Sentinel-1 SAR</h4>
+                            <p class="text-[10px] font-mono text-os-muted m-0">Hormuz Vessel Count (24HR)</p>
+                            <p class="text-sm text-white m-0 mt-1"><strong class="text-os-danger font-mono">0 Transits</strong> <span class="text-xs text-os-muted">(-100% vs 90d avg)</span></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex-1 bg-os-panel border border-os-border p-4 rounded-lg flex flex-col justify-center shadow-lg">
+                    <div class="flex justify-between items-start mb-2">
+                        <h4 class="text-sm font-bold text-white m-0">Cyber-Kinetic Threat Intel</h4>
+                        <span class="bg-os-danger/20 text-os-danger px-2 py-0.5 rounded text-[10px] font-mono border border-os-danger/50 animate-pulse">BGP ROUTE DROPS</span>
+                    </div>
+                    <p class="text-[11px] text-os-muted m-0">Massive BGP route drops across the Red Sea corridor. Advanced Persistent Threats (APTs) targeting physical logic controllers (PLCs).</p>
+                    <div class="mt-2 text-[10px] font-mono text-white flex justify-between">
+                        <span>Volt Typhoon <span class="text-os-warning">PORT_OF_LA_PROBE</span></span>
+                        <span>Sandworm <span class="text-os-accent">GRID_RECON</span></span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div id="app-compute" class="os-window" style="width: 800px; height: 500px; top: 180px; left: 300px; z-index: 50;">
+        <div class="window-header" id="app-compute-header">
+            <div class="flex items-center gap-2">
+                <button class="win-btn win-close" onclick="closeApp('app-compute')"></button>
+                <button class="win-btn win-min"></button>
+                <button class="win-btn win-max" onclick="maximizeApp('app-compute')"></button>
+            </div>
+            <div class="text-[12px] font-medium text-os-muted flex-1 text-center pointer-events-none">Sovereign Compute Allocation</div>
+            <div class="w-14"></div>
+        </div>
+        <div class="window-content bg-os-desktop p-5 flex flex-col gap-5">
+            <p class="text-sm text-slate-300 leading-relaxed m-0">The bottleneck for the AI Supercycle is no longer silicon; it is gigawatts. This matrix tracks real-time GPU cluster utilization across Tier 1 sovereign and private datacenters, mapping power draw against theoretical FLOP limits.</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-os-panel p-5 rounded-lg border-t-2 border-blue-500 shadow-lg">
+                    <h3 class="font-mono text-blue-400 text-xs uppercase tracking-widest mb-2">US Hypercluster</h3>
+                    <div class="font-bold text-3xl text-white my-2">1.4 GW</div>
+                    <div class="w-full bg-black h-1.5 rounded mt-4 mb-2"><div class="bg-blue-500 h-full rounded" style="width: 82%"></div></div>
+                    <p class="text-[10px] font-mono text-slate-400 m-0 flex justify-between"><span>UTILIZATION</span><span>82%</span></p>
+                </div>
+                <div class="bg-os-panel p-5 rounded-lg border-t-2 border-purple-500 shadow-lg">
+                    <h3 class="font-mono text-purple-400 text-xs uppercase tracking-widest mb-2">EU Sovereign Core</h3>
+                    <div class="font-bold text-3xl text-white my-2">450 MW</div>
+                    <div class="w-full bg-black h-1.5 rounded mt-4 mb-2"><div class="bg-purple-500 h-full rounded" style="width: 45%"></div></div>
+                    <p class="text-[10px] font-mono text-slate-400 m-0 flex justify-between"><span>UTILIZATION</span><span>45%</span></p>
+                </div>
+                <div class="bg-os-panel p-5 rounded-lg border-t-2 border-os-danger shadow-lg">
+                    <h3 class="font-mono text-os-danger text-xs uppercase tracking-widest mb-2">ME_NEXUS</h3>
+                    <div class="font-bold text-3xl text-os-danger my-2 animate-pulse">0 MW</div>
+                    <div class="w-full bg-black h-1.5 rounded mt-4 mb-2"><div class="bg-os-danger h-full rounded" style="width: 0%"></div></div>
+                    <p class="text-[10px] font-mono text-os-danger m-0 flex justify-between"><span>COOLING_FAIL</span><span>0%</span></p>
+                </div>
+            </div>
+
+            <div class="bg-os-panel p-5 rounded-lg border border-white/5 shadow-lg flex-1 flex flex-col">
+                <h3 class="text-xs font-semibold text-white uppercase tracking-wider mb-4 border-b border-white/5 pb-2">Node Architecture (H100/B200) Topology</h3>
+                <div class="flex-1 grid grid-cols-16 gap-1" id="gpuGrid" style="grid-template-columns: repeat(32, minmax(0, 1fr));"></div>
+                <div class="mt-4 flex gap-4 text-[10px] font-mono text-slate-400">
+                    <div class="flex items-center gap-2"><span class="w-2 h-2 bg-os-success"></span> ACTIVE (TRAIN)</div>
+                    <div class="flex items-center gap-2"><span class="w-2 h-2 bg-blue-500"></span> ACTIVE (INFER)</div>
+                    <div class="flex items-center gap-2"><span class="w-2 h-2 bg-os-danger"></span> THERMAL LIMIT</div>
+                    <div class="flex items-center gap-2"><span class="w-2 h-2 bg-slate-800"></span> IDLE</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dock">
+        <div class="dock-item open" onclick="openApp('app-notepad')" data-app="app-notepad">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#e2e8f0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+            <span class="dock-tooltip">Briefing (Notepad)</span>
+        </div>
+        <div class="dock-item" onclick="openApp('app-market')" data-app="app-market">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+            <span class="dock-tooltip">Market Terminal</span>
+        </div>
+        <div class="dock-item" onclick="openApp('app-credit')" data-app="app-credit">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#facc15" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+            <span class="dock-tooltip">Credit Desk</span>
+        </div>
+        <div class="dock-item" onclick="openApp('app-dcf')" data-app="app-dcf">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+            <span class="dock-tooltip">Appraisals (DCF)</span>
+        </div>
+        <div class="dock-item" onclick="openApp('app-radar')" data-app="app-radar">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><circle cx="12" cy="11" r="3"></circle></svg>
+            <span class="dock-tooltip">Intel Radar</span>
+        </div>
+        <div class="dock-item" onclick="openApp('app-compute')" data-app="app-compute">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#c084fc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect><rect x="9" y="9" width="6" height="6"></rect><line x1="9" y1="1" x2="9" y2="4"></line><line x1="15" y1="1" x2="15" y2="4"></line><line x1="9" y1="20" x2="9" y2="23"></line><line x1="15" y1="20" x2="15" y2="23"></line><line x1="20" y1="9" x2="23" y2="9"></line><line x1="20" y1="14" x2="23" y2="14"></line><line x1="1" y1="9" x2="4" y2="9"></line><line x1="1" y1="14" x2="4" y2="14"></line></svg>
+            <span class="dock-tooltip">Compute Matrix</span>
+        </div>
+    </div>
+
+    <script>
+        // Set defaults for ChartJS
+        Chart.defaults.color = '#94a3b8';
+        Chart.defaults.font.family = "'JetBrains Mono', monospace";
+        Chart.defaults.plugins.tooltip.backgroundColor = 'rgba(15, 17, 26, 0.9)';
+
+        let zIndexCounter = 100;
+        let chartsInitialized = false;
+
+        // Window Management
+        function makeDraggable(elmnt) {
+            let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+            const header = document.getElementById(elmnt.id + "-header");
+            if (header) {
+                header.onmousedown = dragMouseDown;
+            }
+
+            elmnt.onmousedown = function() { bringToFront(elmnt.id); };
+
+            function dragMouseDown(e) {
+                e.preventDefault();
+                pos3 = e.clientX; pos4 = e.clientY;
+                document.onmouseup = closeDragElement;
+                document.onmousemove = elementDrag;
+                bringToFront(elmnt.id);
+            }
+            function elementDrag(e) {
+                e.preventDefault();
+                pos1 = pos3 - e.clientX; pos2 = pos4 - e.clientY;
+                pos3 = e.clientX; pos4 = e.clientY;
+                elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+                elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+            }
+            function closeDragElement() {
+                document.onmouseup = null;
+                document.onmousemove = null;
+            }
+        }
+
+        function bringToFront(id) {
+            zIndexCounter++;
+            document.getElementById(id).style.zIndex = zIndexCounter;
+        }
+
+        function openApp(id) {
+            const win = document.getElementById(id);
+            win.classList.add('active');
+            bringToFront(id);
+            
+            // Update dock dot
+            document.querySelector(`.dock-item[data-app="${id}"]`).classList.add('open');
+
+            if (!chartsInitialized && (id === 'app-market' || id === 'app-radar' || id === 'app-credit')) {
+                initCharts();
+                chartsInitialized = true;
+            }
+            
+            if (id === 'app-compute') {
+                initComputeGrid();
+            }
+        }
+
+        function closeApp(id) {
+            document.getElementById(id).classList.remove('active');
+            document.querySelector(`.dock-item[data-app="${id}"]`).classList.remove('open');
+        }
+
+        function maximizeApp(id) {
+            const win = document.getElementById(id);
+            if (win.dataset.maximized === "true") {
+                win.style.width = win.dataset.origW;
+                win.style.height = win.dataset.origH;
+                win.style.top = win.dataset.origT;
+                win.style.left = win.dataset.origL;
+                win.dataset.maximized = "false";
+            } else {
+                win.dataset.origW = win.style.width;
+                win.dataset.origH = win.style.height;
+                win.dataset.origT = win.style.top;
+                win.dataset.origL = win.style.left;
+                
+                win.style.width = "100%";
+                win.style.height = "calc(100vh - 28px)";
+                win.style.top = "28px";
+                win.style.left = "0";
+                win.dataset.maximized = "true";
+            }
+            bringToFront(id);
+        }
+
+        // Initialize Draggable Windows
+        document.querySelectorAll('.os-window').forEach(win => {
+            makeDraggable(win);
+        });
+
+        openApp('app-notepad');
+
+
+        // DCF Data Config (Comprehensive V50 Data)
+        const dcfData = {
+            'MSFT': { 
+                title: 'Microsoft Corp (MSFT)', sub: 'Q3 FY2026 Base // Azure +39%', ev: 3350, price: '$458.20',
+                baseFcf: [8.0, 19.8, 33.7, 46.9, 60.3, 75.2, 92.1], 
+                data: [ 
+                    ['Revenue', '285.0', '324.9', '363.8', '400.2', '436.2'], 
+                    ['EBIT Margin', '44.5%', '45.0%', '45.5%', '46.0%', '46.5%'], 
+                    ['EBIT', '126.8', '146.2', '165.5', '184.0', '202.8'],
+                    ['Taxes', '(22.8)', '(26.3)', '(29.7)', '(33.1)', '(36.5)'],
+                    ['NOPAT', '104.0', '119.8', '135.7', '150.9', '166.3'],
+                    ['D&A', '22.0', '25.0', '28.0', '31.0', '34.0'],
+                    ['CapEx', '(125.0)', '(130.0)', '(135.0)', '(140.0)', '(145.0)'],
+                    ['Unlevered FCF', '8.0', '19.8', '33.7', '46.9', '60.3']
+                ] 
+            },
+            'GOOGL': { 
+                title: 'Alphabet Inc (GOOGL)', sub: 'Q1 2026 Base // Cloud +63%', ev: 2200, price: '$185.40',
+                baseFcf: [-49.8, 9.8, 40.5, 69.7, 94.2, 115.5, 130.2], 
+                data: [ 
+                    ['Revenue', '395.0', '446.3', '499.9', '549.9', '599.4'], 
+                    ['EBIT Margin', '32.0%', '32.5%', '33.0%', '33.5%', '34.0%'], 
+                    ['EBIT', '126.4', '145.0', '164.9', '184.2', '203.8'],
+                    ['Taxes', '(20.2)', '(23.2)', '(26.3)', '(29.4)', '(32.6)'],
+                    ['NOPAT', '106.1', '121.8', '138.5', '154.7', '171.2'],
+                    ['D&A', '24.0', '28.0', '32.0', '35.0', '38.0'],
+                    ['CapEx', '(180.0)', '(140.0)', '(130.0)', '(120.0)', '(115.0)'],
+                    ['Unlevered FCF', '-49.8', '9.8', '40.5', '69.7', '94.2']
+                ] 
+            },
+            'AMZN': { 
+                title: 'Amazon.com Inc (AMZN)', sub: 'Q1 2026 Base // AWS +28% // $200B CapEx Guide', ev: 1700, price: '$150.66',
+                baseFcf: [-50.7, 2.7, 63.1, 100.0, 132.5, 154.1, 173.7], 
+                data: [ 
+                    ['Revenue', '877.5', '1009.1', '1140.3', '1265.7', '1379.6'], 
+                    ['EBIT Margin', '10.0%', '11.0%', '12.0%', '13.0%', '14.0%'], 
+                    ['EBIT', '87.8', '111.0', '136.8', '164.5', '193.1'],
+                    ['Taxes', '(18.4)', '(23.3)', '(28.7)', '(34.5)', '(40.6)'],
+                    ['NOPAT', '69.3', '87.7', '108.1', '130.0', '152.5'],
+                    ['D&A', '85.0', '100.0', '110.0', '115.0', '120.0'],
+                    ['CapEx', '(200.0)', '(180.0)', '(150.0)', '(140.0)', '(135.0)'],
+                    ['Unlevered FCF', '-50.7', '2.7', '63.1', '100.0', '132.5']
+                ] 
+            },
+            'META': { 
+                title: 'Meta Platforms (META)', sub: 'Q1 2026 Base // R.Labs Burn $4B', ev: 1320, price: '$518.30',
+                baseFcf: [-73.9, -28.9, 4.2, 21.2, 37.7, 50.1, 65.4], 
+                data: [ 
+                    ['Revenue', '180.0', '205.2', '231.8', '257.3', '280.5'], 
+                    ['EBIT Margin', '38.0%', '37.5%', '38.0%', '38.5%', '39.0%'], 
+                    ['EBIT', '68.4', '76.9', '88.1', '99.1', '109.4'],
+                    ['Taxes', '(12.3)', '(13.8)', '(15.8)', '(17.8)', '(19.7)'],
+                    ['NOPAT', '56.1', '63.1', '72.2', '81.2', '89.7'],
+                    ['D&A', '15.0', '18.0', '22.0', '25.0', '28.0'],
+                    ['CapEx', '(145.0)', '(110.0)', '(90.0)', '(85.0)', '(80.0)'],
+                    ['Unlevered FCF', '-73.9', '-28.9', '4.2', '21.2', '37.7']
+                ] 
+            },
+            'AAPL': { 
+                title: 'Apple Inc (AAPL)', sub: 'Q2 2026 Consensus // Svc Margin >70%', ev: 3150, price: '$210.45',
+                baseFcf: [110.3, 117.8, 126.3, 134.0, 141.8, 150.1, 158.5], 
+                data: [ 
+                    ['Revenue', '435.0', '461.1', '488.7', '513.2', '538.8'], 
+                    ['EBIT Margin', '31.0%', '31.2%', '31.5%', '31.8%', '32.0%'], 
+                    ['EBIT', '134.8', '143.8', '153.9', '163.1', '172.4'],
+                    ['Taxes', '(21.5)', '(23.0)', '(24.6)', '(26.1)', '(27.5)'],
+                    ['NOPAT', '113.3', '120.8', '129.3', '137.0', '144.8'],
+                    ['D&A', '12.0', '13.0', '14.0', '15.0', '16.0'],
+                    ['CapEx', '(15.0)', '(16.0)', '(17.0)', '(18.0)', '(19.0)'],
+                    ['Unlevered FCF', '110.3', '117.8', '126.3', '134.0', '141.8']
+                ] 
+            }
+        };
+
+        let currentTicker = 'MSFT';
+
+        function switchDCF(ticker, btnElement) {
+            currentTicker = ticker;
+            document.querySelectorAll('.dcf-tab').forEach(b => {
+                b.className = "text-left px-3 py-2 rounded-md text-sm font-medium transition-colors hover:bg-white/5 text-os-text border border-transparent dcf-tab";
+            });
+            btnElement.className = "text-left px-3 py-2 rounded-md text-sm font-medium transition-colors bg-blue-500/20 text-blue-400 border border-blue-500/30 dcf-tab";
+            
+            const conf = dcfData[ticker];
+            document.getElementById('dcf-title').innerText = conf.title;
+            document.getElementById('dcf-subtitle').innerText = conf.sub;
+            document.getElementById('dcf-price').innerText = conf.price;
+            
+            // Build Table
+            let tbody = '';
+            conf.data.forEach((row, idx) => {
+                let rClass = '';
+                if(row[0] === 'CapEx') rClass = 'text-os-danger';
+                if(row[0] === 'Taxes' || row[0] === 'D&A') rClass = 'text-os-muted';
+                if(row[0] === 'Unlevered FCF') rClass = 'font-bold text-blue-400 bg-blue-500/10';
+                
+                tbody += `<tr><td class="${rClass}">${row[0]}</td><td class="text-right ${rClass}">${row[1]}</td><td class="text-right ${rClass}">${row[2]}</td><td class="text-right ${rClass}">${row[3]}</td><td class="text-right ${rClass}">${row[4]}</td><td class="text-right ${rClass}">${row[5]}</td></tr>`;
+            });
+            document.getElementById('dcf-table').innerHTML = tbody;
+
+            updateLiveDCF();
+        }
+
+        function updateLiveDCF() {
+            const wacc = parseFloat(document.getElementById('wacc-slider').value);
+            const tg = parseFloat(document.getElementById('tg-slider').value);
+            document.getElementById('wacc-label').innerText = wacc.toFixed(1);
+            document.getElementById('tg-label').innerText = tg.toFixed(1);
+
+            const conf = dcfData[currentTicker];
+            const waccDelta = (8.5 - wacc) * 100;
+            const tgDelta = (tg - 3.0) * 150;
+            const newEv = Math.max(100, conf.ev + waccDelta + tgDelta);
+            document.getElementById('dcf-ev').innerText = '$' + (newEv/1000).toFixed(2) + 'T';
+
+            // Draw Waterfall
+            const maxVal = Math.max(...conf.baseFcf.map(Math.abs));
+            let wfHtml = '';
+            conf.baseFcf.forEach((val, i) => {
+                const height = (Math.abs(val) / maxVal) * 100;
+                const isNeg = val < 0;
+                wfHtml += `
+                    <div class="dcf-col">
+                        <div class="dcf-val" style="top: ${isNeg ? 'auto' : `-${height+20}px`}; bottom: ${isNeg ? `-${height+25}px` : 'auto'}; color: ${isNeg ? '#ef4444':'#fff'}">${val.toFixed(1)}</div>
+                        <div class="${isNeg ? 'dcf-bar-neg' : 'dcf-bar-pos'}" style="height: ${height}%"></div>
+                        <div class="dcf-label" style="bottom: ${isNeg ? `-${height+40}px` : '-22px'}">Y${i+1}</div>
+                    </div>
+                `;
+            });
+            document.getElementById('dcf-waterfall').innerHTML = wfHtml;
+        }
+        
+        switchDCF('MSFT', document.querySelector('.dcf-tab'));
+
+        function initComputeGrid() {
+            const grid = document.getElementById('gpuGrid');
+            if (!grid || grid.innerHTML !== '') return;
+            for (let i = 0; i < 256; i++) {
+                const cell = document.createElement('div');
+                const rand = Math.random();
+                let bgClass = 'bg-slate-800';
+                if (rand > 0.95) bgClass = 'bg-os-danger shadow-[0_0_5px_#ef4444]';
+                else if (rand > 0.6) bgClass = 'bg-os-success';
+                else if (rand > 0.2) bgClass = 'bg-blue-500';
+                cell.className = `aspect-square ${bgClass} rounded-sm opacity-80 hover:opacity-100 hover:scale-125 transition-all`;
+                grid.appendChild(cell);
+            }
+        }
+
+        // Initialize Charts.js
+        function initCharts() {
+            // Market Probability Chart
+            const ctxProb = document.getElementById('marketChart');
+            if (ctxProb) {
+                new Chart(ctxProb.getContext('2d'), {
+                    type: 'line',
+                    data: {
+                        labels: ['T-0', 'T+1', 'T+2', 'T+3', 'T+4', 'T+5', 'T+6', 'T+7'],
+                        datasets: [
+                            { label: 'Systemic Breakdown (< 7,050)', data: [15, 18, 22, 28, 45, 70.5, 78, 85], borderColor: '#ef4444', backgroundColor: 'rgba(239, 68, 68, 0.1)', fill: true, tension: 0.4 },
+                            { label: 'Soft Landing Illusion', data: [80, 75, 65, 50, 35, 21.1, 15, 10], borderColor: '#38bdf8', backgroundColor: 'rgba(56, 189, 248, 0.05)', fill: true, tension: 0.4 },
+                            { label: 'Mean Reversion (> 7,250)', data: [5, 7, 13, 22, 20, 8.4, 7, 5], borderColor: '#10b981', borderDash: [5, 5], tension: 0.4 }
+                        ]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8', font: {size: 10} } } },
+                        scales: { x: { grid: { color: 'rgba(255,255,255,0.05)' } }, y: { grid: { color: 'rgba(255,255,255,0.05)' }, min: 0, max: 100 } }
+                    }
+                });
+            }
+
+            // Gamma Bar Chart
+            const ctxGamma = document.getElementById('gammaChart');
+            if (ctxGamma) {
+                new Chart(ctxGamma.getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: ['6900','6950','7000','7050','7100','7150','7200','7250'],
+                        datasets: [{
+                            data: [-800, -1200, -2500, -3100, -400, 1500, 2200, 1800],
+                            backgroundColor: (ctx) => ctx.raw > 0 ? '#38bdf8' : '#ef4444',
+                            borderRadius: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: { x: { grid: { display: false }, ticks: {color: '#94a3b8', font: {size: 9}} }, y: { display: false } }
+                    }
+                });
+            }
+
+            // Radar Chart
+            const ctxRadar = document.getElementById('radarChart');
+            if(ctxRadar) {
+                new Chart(ctxRadar.getContext('2d'), {
+                    type: 'radar',
+                    data: {
+                        labels: ['Geopolitics', 'Credit Risk', 'Energy Friction', 'Liquidity Drain', 'Fed Policy'],
+                        datasets: [{
+                            data: [99, 88, 95, 95, 80],
+                            backgroundColor: 'rgba(239, 68, 68, 0.2)',
+                            borderColor: '#ef4444',
+                            pointBackgroundColor: '#ef4444',
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: { r: { angleLines: { color: 'rgba(255,255,255,0.1)' }, grid: { color: 'rgba(255,255,255,0.1)' }, pointLabels: { color: '#cbd5e1', font: {size: 10} }, ticks: { display: false, min: 0, max: 100 } } }
+                    }
+                });
+            }
+
+            // Credit Liquidity Chart
+            const ctxLiq = document.getElementById('creditChart');
+            if (ctxLiq) {
+                new Chart(ctxLiq.getContext('2d'), {
+                    type: 'line',
+                    data: {
+                        labels: ['2023', '2024', '2025', '2026'],
+                        datasets: [
+                            { label: 'Fed', data: [8.3, 7.8, 7.4, 7.2], borderColor: '#38bdf8', tension: 0.4 },
+                            { label: 'ECB', data: [7.8, 7.2, 6.8, 6.5], borderColor: '#c084fc', tension: 0.4 },
+                            { label: 'BOJ', data: [5.2, 5.0, 5.1, 5.4], borderColor: '#facc15', tension: 0.4 }
+                        ]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: { x: { display: false }, y: { grid: { color: 'rgba(255,255,255,0.05)' } } }
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+</html>
