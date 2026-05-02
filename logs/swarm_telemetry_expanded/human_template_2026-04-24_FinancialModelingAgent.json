@@ -1,0 +1,133 @@
+{
+  "spec_version": "1.4.0-otel",
+  "timestamp": "2026-04-24T00:13:03.355457Z",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "severity_text": "WARN",
+  "severity_number": 13,
+  "event_name": "swarm.agent.lifecycle.deprecated",
+  "resource": {
+    "service.name": "swarm-orchestrator",
+    "service.version": "4.2.0",
+    "deployment.environment": "production",
+    "node.id": "worker-node-aws-us-east-1a-04"
+  },
+  "attributes": {
+    "agent.id": "FinancialModelingAgent",
+    "agent.previous_version": "v29.x",
+    "agent.target_version": "v30",
+    "deprecation.reason": "Transitioning to v30 architecture.",
+    "deprecation.action_required": true
+  },
+  "metrics": {
+    "agent.core_logic.function_count": 15,
+    "agent.capabilities.count": 0
+  },
+  "artifacts": {
+    "provenance": {
+      "repository": "git+ssh://repo/core/agents/financial_modeling_agent.py",
+      "commit_sha": "a1b2c3d4e5f6g7h8i9j0",
+      "docstring_hash": "sha256:d8c4b12389a..."
+    },
+    "extracted_capabilities": [],
+    "core_logic_signatures": [
+      {
+        "name": "__init__",
+        "ast_hash": "sha256:cb02ee580798bdfa",
+        "loc": 41,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "execute",
+        "ast_hash": "sha256:01185ee8654b4f1b",
+        "loc": 99,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "apply_sentiment_adjustment",
+        "ast_hash": "sha256:de4856638427587c",
+        "loc": 22,
+        "source": "def apply_sentiment_adjustment(self, sentiment_score: float):\n        \"\"\"\n        Adjusts financial assumptions based on a sentiment score.\n        Score range: -1.0 (Very Bearish) to 1.0 (Very Bullish)\n        \"\"\"\n        # Logic:\n        # Bullish (>0): Increases growth rate slightly, might lower discount rate (lower risk premium).\n        # Bearish (<0): Decreases growth rate, increases discount rate.\n\n        # Adjustment Factors\n        growth_impact = 0.02 * sentiment_score # +/- 2%\n        discount_impact = -0.01 * sentiment_score # Inverse: High sentiment -> Lower risk premium\n\n        self.assumptions.growth_rate += growth_impact\n        self.assumptions.discount_rate += discount_impact\n        self.assumptions.sentiment_adjustment_factor = 1.0 + (0.1 * sentiment_score)\n\n        # Sync back to instance vars\n        self.growth_rate = self.assumptions.growth_rate\n        self.discount_rate = self.assumptions.discount_rate\n\n        logging.info(f\"Applied sentiment adjustment (score: {sentiment_score}). New Growth: {self.growth_rate:.4f}, New Discount: {self.discount_rate:.4f}\")"
+      },
+      {
+        "name": "generate_cash_flows",
+        "ast_hash": "sha256:2e9c868baafbd4a8",
+        "loc": 15,
+        "source": "def generate_cash_flows(self, years=None, cash_flow_input=None):\n        \"\"\"\n        Generates a forecast of cash flows over a number of years.\n        \"\"\"\n        years = years or self.forecast_years\n        if cash_flow_input is not None:\n            if not isinstance(cash_flow_input, (list, np.ndarray)):\n                raise ValueError(\"cash_flow_input must be a list or numpy array.\")\n            self.cash_flows = np.array(cash_flow_input)\n        else:\n            cash_flows = []\n            for year in range(1, years + 1):\n                cash_flows.append(self.initial_cash_flow * (1 + self.growth_rate) ** year)\n            self.cash_flows = np.array(cash_flows)\n        return self.cash_flows"
+      },
+      {
+        "name": "calculate_discounted_cash_flows",
+        "ast_hash": "sha256:22a58727b51f86f0",
+        "loc": 10,
+        "source": "def calculate_discounted_cash_flows(self):\n        \"\"\"\n        Calculates the discounted cash flows (DCF) using the provided discount rate.\n        \"\"\"\n        if self.cash_flows is None:\n            raise ValueError(\"Cash flows have not been generated.\")\n\n        discounted_cash_flows = self.cash_flows / (1 + self.discount_rate) ** np.arange(1, len(self.cash_flows) + 1)\n        self.discounted_cash_flows = discounted_cash_flows\n        return self.discounted_cash_flows"
+      },
+      {
+        "name": "calculate_terminal_value",
+        "ast_hash": "sha256:33d59bccc1fa04bd",
+        "loc": 16,
+        "source": "def calculate_terminal_value(self):\n        \"\"\"\n        Calculates the terminal value based on the final year's cash flow and the terminal growth rate.\n        \"\"\"\n        if self.cash_flows is None:\n            raise ValueError(\"Cash flows have not been generated.\")\n\n        if self.terminal_valuation_method == 'Gordon Growth':\n            terminal_cash_flow = self.cash_flows[-1] * (1 + self.terminal_growth_rate)\n            terminal_value = terminal_cash_flow / (self.discount_rate - self.terminal_growth_rate)\n        elif self.terminal_valuation_method == 'Exit Multiple':\n            terminal_value = self.cash_flows[-1] * self.industry_multiples.get(\"EBITDA\", 10)\n        else:\n            raise ValueError(\"Invalid terminal valuation method.\")\n        self.terminal_value = terminal_value\n        return self.terminal_value"
+      },
+      {
+        "name": "calculate_npv",
+        "ast_hash": "sha256:df49110de6e9a85c",
+        "loc": 14,
+        "source": "def calculate_npv(self):\n        \"\"\"\n        Calculates the net present value (NPV) of the investment based on discounted cash flows and terminal value.\n        \"\"\"\n        if self.discounted_cash_flows is None:\n            self.calculate_discounted_cash_flows()\n\n        if self.terminal_value is None:\n            self.calculate_terminal_value()\n\n        npv = np.sum(self.discounted_cash_flows) + self.terminal_value / \\\n            (1 + self.discount_rate) ** len(self.discounted_cash_flows)\n        self.npv = npv\n        return self.npv"
+      },
+      {
+        "name": "perform_sensitivity_analysis",
+        "ast_hash": "sha256:d42ede5acd1dfa30",
+        "loc": 24,
+        "source": "def perform_sensitivity_analysis(self, sensitivity_range, variable='growth_rate'):\n        \"\"\"\n        Performs sensitivity analysis on a given variable (e.g., growth rate, discount rate).\n        \"\"\"\n        results = {}\n        original_variable = getattr(self, variable)\n        for value in sensitivity_range:\n            setattr(self, variable, value)\n            # Re-generate cash flows if growth rate changes\n            if variable == 'growth_rate':\n                self.generate_cash_flows()\n            self.calculate_discounted_cash_flows()\n            self.calculate_terminal_value()\n            npv = self.calculate_npv()\n            results[value] = npv\n\n        # Reset to original state\n        setattr(self, variable, original_variable)\n        if variable == 'growth_rate':\n            self.generate_cash_flows()\n        self.calculate_discounted_cash_flows()\n        self.calculate_terminal_value()\n\n        return results"
+      },
+      {
+        "name": "fetch_and_calculate_dcf",
+        "ast_hash": "sha256:1d2f07b73f91d5e2",
+        "loc": 19,
+        "source": "def fetch_and_calculate_dcf(self, company_identifier: str, company_name: str = \"Unknown Company\") -> Tuple[float, Dict[str, Any], Dict[str, pd.DataFrame]]:\n        \"\"\"\n        Fetches financial data, calculates DCF, and generates a comprehensive report.\n        \"\"\"\n        self.company_name = company_name\n\n        financial_data = self._fetch_financial_data(company_identifier)\n        # Calculate Free Cash Flow for forecast\n        fcf_forecast = self._calculate_fcf_forecast(financial_data)\n\n        # Calculate DCF\n        intrinsic_value, dcf_details = self.calculate_dcf_from_projections(fcf_forecast)\n\n        report_data = {\n            'historical': pd.DataFrame(financial_data['historical']),\n            'forecast': pd.DataFrame(financial_data['forecast']),\n            'dcf_details': dcf_details\n        }\n        return intrinsic_value, dcf_details, report_data"
+      },
+      {
+        "name": "_fetch_financial_data",
+        "ast_hash": "sha256:5ef85cd2a51d60bf",
+        "loc": 25,
+        "source": "def _fetch_financial_data(self, company_identifier: str) -> Dict[str, Any]:\n        \"\"\"\n        Placeholder method to fetch financial data from data sources.\n        \"\"\"\n        # Mock data\n        historical_data = {\n            'revenue': [100, 110, 120, 130, 140],\n            'ebitda': [20, 22, 25, 28, 30],\n            'ebit': [15, 17, 20, 23, 25],\n            'interest_expense': [2, 2, 2, 2, 2],\n            'total_debt': [50, 48, 46, 44, 42],\n            'cash_and_equivalents': [10, 12, 15, 18, 20],\n            'total_assets': [200, 210, 220, 230, 240],\n            'current_assets': [50, 55, 60, 65, 70],\n            'current_liabilities': [30, 32, 34, 36, 38],\n            'ebitda_margin': [0.20, 0.21, 0.22, 0.23, 0.24],\n            'capex': [10, 11, 12, 13, 14],\n        }\n        forecast_data = {\n            'revenue_growth': [0.10] * 7,\n            'ebitda_margin': [0.25] * 7,\n            'capex_percent_revenue': [0.10] * 7,\n            'working_capital_percent_revenue': [0.05] * 7,\n        }\n        return {'historical': historical_data, 'forecast': forecast_data}"
+      },
+      {
+        "name": "_calculate_fcf_forecast",
+        "ast_hash": "sha256:7f1d219cadbd0711",
+        "loc": 38,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "calculate_dcf_from_projections",
+        "ast_hash": "sha256:d4ebd71c09a1aa19",
+        "loc": 37,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "run_monte_carlo_simulation",
+        "ast_hash": "sha256:e5613ea328be5316",
+        "loc": 48,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "calculate_financial_ratios",
+        "ast_hash": "sha256:3613d1daf3832ad5",
+        "loc": 49,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "calculate_lbo",
+        "ast_hash": "sha256:e2b7f70a66d8cb91",
+        "loc": 81,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      }
+    ]
+  }
+}

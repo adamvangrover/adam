@@ -1,0 +1,72 @@
+{
+  "spec_version": "1.4.0-otel",
+  "timestamp": "2026-04-24T00:13:03.355457Z",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "severity_text": "WARN",
+  "severity_number": 13,
+  "event_name": "swarm.agent.lifecycle.deprecated",
+  "resource": {
+    "service.name": "swarm-orchestrator",
+    "service.version": "4.2.0",
+    "deployment.environment": "production",
+    "node.id": "worker-node-aws-us-east-1a-04"
+  },
+  "attributes": {
+    "agent.id": "GitRepoSubAgent",
+    "agent.previous_version": "v29.x",
+    "agent.target_version": "v30",
+    "deprecation.reason": "Transitioning to v30 architecture.",
+    "deprecation.action_required": true
+  },
+  "metrics": {
+    "agent.core_logic.function_count": 6,
+    "agent.capabilities.count": 0
+  },
+  "artifacts": {
+    "provenance": {
+      "repository": "git+ssh://repo/core/agents/sub_agents/git_repo_sub_agent.py",
+      "commit_sha": "a1b2c3d4e5f6g7h8i9j0",
+      "docstring_hash": "sha256:d8c4b12389a..."
+    },
+    "extracted_capabilities": [],
+    "core_logic_signatures": [
+      {
+        "name": "__init__",
+        "ast_hash": "sha256:a32fde7bab70556a",
+        "loc": 4,
+        "source": "def __init__(self, config):\n        super().__init__(config)\n        self.clone_dir = self.config.get(\"clone_dir\", \"downloads/repos\")\n        os.makedirs(self.clone_dir, exist_ok=True)"
+      },
+      {
+        "name": "execute",
+        "ast_hash": "sha256:2b5afb6c8dab407a",
+        "loc": 15,
+        "source": "async def execute(self, repo_url: str, operation: str = \"clone\"):\n        try:\n            self._validate_url(repo_url)\n            repo_path = self._get_safe_repo_path(repo_url)\n        except ValueError as e:\n            return {\"error\": str(e)}\n\n        if operation == \"clone\":\n            return self._clone_repo(repo_url, repo_path)\n        elif operation == \"list_files\":\n            if not os.path.exists(repo_path):\n                return {\"error\": \"Repository not found. Please clone it first.\"}\n            return self._list_files(repo_path)\n        else:\n            return {\"error\": f\"Unsupported operation: {operation}\"}"
+      },
+      {
+        "name": "_validate_url",
+        "ast_hash": "sha256:02cb49f02ad82de2",
+        "loc": 5,
+        "source": "def _validate_url(self, repo_url: str):\n        if not repo_url.startswith((\"http://\", \"https://\")):\n            raise ValueError(\"Invalid URL scheme. Only http/https are allowed.\")\n        if repo_url.startswith(\"-\"):\n            raise ValueError(\"Invalid URL: cannot start with '-'\")"
+      },
+      {
+        "name": "_get_safe_repo_path",
+        "ast_hash": "sha256:c65ab5e0a0d843c6",
+        "loc": 19,
+        "source": "def _get_safe_repo_path(self, repo_url: str):\n        # Extract name and prevent simple traversal characters in the name itself\n        repo_name = repo_url.rstrip('/').split(\"/\")[-1].replace(\".git\", \"\")\n\n        if not repo_name:\n             raise ValueError(\"Could not determine repository name from URL.\")\n\n        if \"..\" in repo_name or \"/\" in repo_name or \"\\\\\" in repo_name:\n             raise ValueError(\"Invalid repository name extracted from URL.\")\n\n        repo_path = os.path.join(self.clone_dir, repo_name)\n        abs_repo_path = os.path.abspath(repo_path)\n        abs_clone_dir = os.path.abspath(self.clone_dir)\n\n        # Ensure the resolved path is strictly inside the clone directory\n        if not abs_repo_path.startswith(abs_clone_dir) or abs_repo_path == abs_clone_dir:\n             raise ValueError(\"Security Violation: Path traversal detected.\")\n\n        return abs_repo_path"
+      },
+      {
+        "name": "_clone_repo",
+        "ast_hash": "sha256:99d2275a730ab3cb",
+        "loc": 11,
+        "source": "def _clone_repo(self, repo_url: str, repo_path: str):\n        try:\n            if os.path.exists(repo_path):\n                return {\"status\": \"already exists\", \"path\": repo_path}\n\n            subprocess.run([\"git\", \"clone\", \"--\", repo_url, repo_path], check=True)\n            return {\"status\": \"cloned\", \"path\": repo_path}\n        except subprocess.CalledProcessError as e:\n            return {\"error\": str(e)}\n        except Exception as e:\n            return {\"error\": str(e)}"
+      },
+      {
+        "name": "_list_files",
+        "ast_hash": "sha256:48dce443430395ac",
+        "loc": 6,
+        "source": "def _list_files(self, repo_path: str):\n        files = []\n        for root, _, filenames in os.walk(repo_path):\n            for filename in filenames:\n                files.append(os.path.join(root, filename).replace(repo_path, \"\", 1))\n        return {\"files\": files}"
+      }
+    ]
+  }
+}

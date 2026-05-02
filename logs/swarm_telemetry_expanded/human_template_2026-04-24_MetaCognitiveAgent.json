@@ -1,0 +1,73 @@
+{
+  "spec_version": "1.4.0-otel",
+  "timestamp": "2026-04-24T00:13:03.355457Z",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "severity_text": "WARN",
+  "severity_number": 13,
+  "event_name": "swarm.agent.lifecycle.deprecated",
+  "resource": {
+    "service.name": "swarm-orchestrator",
+    "service.version": "4.2.0",
+    "deployment.environment": "production",
+    "node.id": "worker-node-aws-us-east-1a-04"
+  },
+  "attributes": {
+    "agent.id": "MetaCognitiveAgent",
+    "agent.previous_version": "v29.x",
+    "agent.target_version": "v30",
+    "deprecation.reason": "Transitioning to v30 architecture.",
+    "deprecation.action_required": true
+  },
+  "metrics": {
+    "agent.core_logic.function_count": 6,
+    "agent.capabilities.count": 0
+  },
+  "artifacts": {
+    "provenance": {
+      "repository": "git+ssh://repo/core/agents/meta_cognitive_agent.py",
+      "commit_sha": "a1b2c3d4e5f6g7h8i9j0",
+      "docstring_hash": "sha256:d8c4b12389a..."
+    },
+    "extracted_capabilities": [],
+    "core_logic_signatures": [
+      {
+        "name": "__init__",
+        "ast_hash": "sha256:0ad185d4ba6f8163",
+        "loc": 21,
+        "source": "def __init__(self, config: Dict[str, Any] = None, kernel: Optional[Any] = None):\n        if config is None:\n            config = {\"name\": \"MetaCognitiveAgent\"}\n\n        super().__init__(config, kernel=kernel)\n        self.agent_performance = {}\n        health_config = {\"agent_id\": \"meta_cognitive_health_monitor\"}\n        self.system_health_agent = SystemHealthAgent(config=health_config, kernel=kernel)\n\n        # Load specific configurations for fallacy detection\n        self.logical_fallacies = self.config.get(\"logical_fallacies\", {\n            \"appeal_to_authority\": [r\"\\b(expert|authority|source) says\\b\", r\"\\b(studies|research) shows?\\b\"],\n            \"hasty_generalization\": [r\"\\b(always|never|everyone|no one) (is|are|does|do)\\b\"],\n            \"false_cause\": [r\"\\b(happened after|coincidence|caused by)\\b\"]\n        })\n        self.positive_keywords = self.config.get(\"positive_keywords\", [\n            r\"\\b(strong buy|outperform|bullish|upward trend|high confidence|positive outlook)\\b\"\n        ])\n        self.negative_keywords = self.config.get(\"negative_keywords\", [\n            r\"\\b(high risk|underperform|bearish|downward trend|low confidence|negative outlook|risky)\\b\"\n        ])"
+      },
+      {
+        "name": "execute",
+        "ast_hash": "sha256:2f197d89cc5d437c",
+        "loc": 79,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "_detect_logical_fallacies",
+        "ast_hash": "sha256:10266275bddea987",
+        "loc": 16,
+        "source": "def _detect_logical_fallacies(self, text: str) -> List[Dict[str, str]]:\n        \"\"\"\n        Scans text for configured logical fallacies using regex.\n        \"\"\"\n        found = []\n        text_lower = text.lower()\n\n        for fallacy_name, patterns in self.logical_fallacies.items():\n            for pattern in patterns:\n                matches = re.finditer(pattern, text_lower)\n                for match in matches:\n                    found.append({\n                        \"fallacy\": fallacy_name,\n                        \"evidence\": match.group(0)\n                    })\n        return found"
+      },
+      {
+        "name": "_detect_contradictions",
+        "ast_hash": "sha256:695dd848ed15efbe",
+        "loc": 24,
+        "source": "def _detect_contradictions(self, text: str) -> List[str]:\n        \"\"\"\n        Checks if the text contains both highly positive and highly negative assertions\n        in close proximity without obvious nuance (e.g., \"However\", \"Although\").\n        \"\"\"\n        contradictions = []\n        text_lower = text.lower()\n\n        has_pos = any(re.search(pat, text_lower) for pat in self.positive_keywords)\n        has_neg = any(re.search(pat, text_lower) for pat in self.negative_keywords)\n\n        # If both extreme positive and extreme negative exist\n        if has_pos and has_neg:\n            # Check for nuance words\n            nuance_words = [\"however\", \"although\", \"despite\", \"but\", \"while\", \"on the other hand\"]\n            has_nuance = any(word in text_lower for word in nuance_words)\n\n            if not has_nuance:\n                contradictions.append(\n                    \"Detected conflicting extreme assertions (e.g., 'strong buy' and 'high risk') \"\n                    \"without clear contextual nuance.\"\n                )\n\n        return contradictions"
+      },
+      {
+        "name": "record_performance",
+        "ast_hash": "sha256:747145f6953125fd",
+        "loc": 10,
+        "source": "def record_performance(self, agent_name: str, metric: str, value: float):\n        \"\"\"\n        Records a performance metric for an agent.\n        \"\"\"\n        if agent_name not in self.agent_performance:\n            self.agent_performance[agent_name] = {}\n        self.agent_performance[agent_name][metric] = value\n\n        # Optional: Log trend if accumulating history\n        logger.debug(f\"Recorded {metric}={value} for {agent_name}\")"
+      },
+      {
+        "name": "ping_health",
+        "ast_hash": "sha256:4c1c2a881d3c4ab3",
+        "loc": 5,
+        "source": "def ping_health(self) -> str:\n        try:\n            return self.system_health_agent.ping()\n        except AttributeError:\n            return \"PONG: SystemHealthAgent lacks ping method.\""
+      }
+    ]
+  }
+}

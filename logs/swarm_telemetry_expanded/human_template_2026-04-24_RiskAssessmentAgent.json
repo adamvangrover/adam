@@ -1,0 +1,246 @@
+{
+  "spec_version": "1.4.0-otel",
+  "timestamp": "2026-04-24T00:13:03.355457Z",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "severity_text": "WARN",
+  "severity_number": 13,
+  "event_name": "swarm.agent.lifecycle.deprecated",
+  "resource": {
+    "service.name": "swarm-orchestrator",
+    "service.version": "4.2.0",
+    "deployment.environment": "production",
+    "node.id": "worker-node-aws-us-east-1a-04"
+  },
+  "attributes": {
+    "agent.id": "RiskAssessmentAgent",
+    "agent.previous_version": "v29.x",
+    "agent.target_version": "v30",
+    "deprecation.reason": "Transitioning to v30 architecture.",
+    "deprecation.action_required": true
+  },
+  "metrics": {
+    "agent.core_logic.function_count": 34,
+    "agent.capabilities.count": 0
+  },
+  "artifacts": {
+    "provenance": {
+      "repository": "git+ssh://repo/core/agents/risk_assessment_agent.py",
+      "commit_sha": "a1b2c3d4e5f6g7h8i9j0",
+      "docstring_hash": "sha256:d8c4b12389a..."
+    },
+    "extracted_capabilities": [],
+    "core_logic_signatures": [
+      {
+        "name": "__init__",
+        "ast_hash": "sha256:40075bb1b57f40f8",
+        "loc": 16,
+        "source": "def __init__(self, config: Dict[str, Any], **kwargs):\n        \"\"\"\n        Initializes the Risk Assessment Agent.\n\n        Args:\n            config: A dictionary containing configuration parameters.\n                    Expected keys: 'knowledge_base_path' (optional)\n        \"\"\"\n        super().__init__(config, **kwargs)\n        self.knowledge_base_path = self.config.get(\"knowledge_base_path\", \"data/risk_rating_mapping.json\")\n        self.knowledge_base = self._load_knowledge_base()\n        self.debug_mode = self.knowledge_base.get(\"metadata\", {}).get(\"debug_mode\", False)\n\n        # Robustness: In-memory cache for risk assessments (simple LRU-like via limit)\n        self._risk_cache = {}\n        self._cache_size_limit = 100"
+      },
+      {
+        "name": "_load_knowledge_base",
+        "ast_hash": "sha256:f62c59005819a818",
+        "loc": 16,
+        "source": "def _load_knowledge_base(self) -> Dict[str, Any]:\n        \"\"\"\n        Loads the knowledge base from the JSON file.\n\n        Returns:\n            dict: The knowledge base data.\n        \"\"\"\n        try:\n            with open(self.knowledge_base_path, 'r') as file:\n                return json.load(file)\n        except FileNotFoundError:\n            logger.error(f\"Knowledge base file not found: {self.knowledge_base_path}\")\n            return {}\n        except json.JSONDecodeError:\n            logger.error(f\"Error decoding knowledge base JSON: {self.knowledge_base_path}\")\n            return {}"
+      },
+      {
+        "name": "execute",
+        "ast_hash": "sha256:35813904c1896b9a",
+        "loc": 131,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "_update_cache",
+        "ast_hash": "sha256:19f6df82a762e625",
+        "loc": 10,
+        "source": "def _update_cache(self, key: str, value: Any) -> None:\n        \"\"\"Updates the cache, managing size limits.\"\"\"\n        if len(self._risk_cache) >= self._cache_size_limit:\n            # Remove oldest (first inserted in Python 3.7+ dict)\n            iterator = iter(self._risk_cache)\n            try:\n                del self._risk_cache[next(iterator)]\n            except StopIteration:\n                pass\n        self._risk_cache[key] = (value, datetime.datetime.now())"
+      },
+      {
+        "name": "assess_investment_risk",
+        "ast_hash": "sha256:dc42e273c1c4d0a1",
+        "loc": 44,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "_assess_liquidity_runway",
+        "ast_hash": "sha256:3005112f004ecf5d",
+        "loc": 19,
+        "source": "def _assess_liquidity_runway(self, financial_data: Dict) -> float:\n        \"\"\"\n        Estimates liquidity runway in months.\n        \"\"\"\n        cash = financial_data.get(\"cash\", 0)\n        burn_rate = financial_data.get(\"monthly_burn_rate\", 0)\n\n        # Fallback if burn rate not available: use liquidity ratio\n        if burn_rate == 0:\n            l_ratio = financial_data.get(\"liquidity_ratio\", 0)\n            if l_ratio > 1.5: return 24.0\n            if l_ratio > 1.0: return 12.0\n            return 6.0\n\n        if burn_rate < 0:\n             # Net positive cash flow\n             return 999.0\n\n        return cash / burn_rate"
+      },
+      {
+        "name": "_estimate_recovery_rate",
+        "ast_hash": "sha256:452ad7421b33f690",
+        "loc": 15,
+        "source": "def _estimate_recovery_rate(self, financial_data: Dict) -> float:\n        \"\"\"\n        Estimates recovery rate based on Asset Coverage.\n        Recovery = Total Assets / Total Debt (Capped at 1.0)\n        \"\"\"\n        assets = financial_data.get(\"total_assets\", 0)\n        debt = financial_data.get(\"total_debt\", 1) # Avoid div/0\n\n        if debt == 0:\n            return 1.0\n\n        coverage = assets / debt\n        # Simple heuristic: Senior secured often gets 70-100% if coverage > 1.\n        # Unsecured gets less. We'll use a conservative estimate (80% of coverage).\n        return min(1.0, coverage * 0.8)"
+      },
+      {
+        "name": "assess_loan_risk",
+        "ast_hash": "sha256:10c62e284e07880b",
+        "loc": 51,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "assess_leveraged_finance_risk",
+        "ast_hash": "sha256:1a08fc8f0abc6a03",
+        "loc": 56,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "assess_distressed_debt_risk",
+        "ast_hash": "sha256:50003dc0b349d2a6",
+        "loc": 58,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "calculate_lgd",
+        "ast_hash": "sha256:403c9b2765eeec21",
+        "loc": 17,
+        "source": "def calculate_lgd(self, seniority: str, collateral_coverage: float) -> float:\n        \"\"\"\n        Estimates Loss Given Default (LGD).\n        \"\"\"\n        # Base LGD by seniority\n        base_lgd = {\n            \"Senior Secured\": 0.35,\n            \"Senior Unsecured\": 0.50,\n            \"Subordinated\": 0.75,\n            \"Equity\": 1.00\n        }.get(seniority, 0.50)\n\n        # Adjust for collateral\n        # LGD = Base * (1 - min(1, collateral_coverage))\n        # We'll assume a minimum floor of 5% even with full collateral\n        adjusted_lgd = base_lgd * (1 - min(1.0, collateral_coverage))\n        return max(0.05, adjusted_lgd)"
+      },
+      {
+        "name": "calculate_rwa",
+        "ast_hash": "sha256:0b95d7d819481279",
+        "loc": 11,
+        "source": "def calculate_rwa(self, pd: float, lgd: float, ead: float) -> float:\n        \"\"\"\n        Estimates Risk-Weighted Assets (RWA) using a simplified heuristic.\n        \"\"\"\n        # Heuristic: RW = 20% + (PD * 20) + (LGD * 1.5)\n        # This is a mock function for demonstration purposes\n        rw_percentage = 0.20 + (pd * 20) + (lgd * 1.5)\n        rw_percentage = min(15.0, max(0.0, rw_percentage)) # Cap at 1500%\n\n        rwa = ead * rw_percentage\n        return rwa"
+      },
+      {
+        "name": "calculate_expected_return",
+        "ast_hash": "sha256:bd3ce1cfb9fcfe98",
+        "loc": 14,
+        "source": "def calculate_expected_return(self, interest_rate: float, pd: float, lgd: float, capital_cost: float, rwa_ratio: float = 1.0) -> float:\n        \"\"\"\n        Calculates Risk-Adjusted Return on Capital (RAROC).\n        \"\"\"\n        expected_loss = pd * lgd\n        risk_adjusted_income = interest_rate - expected_loss\n\n        economic_capital = rwa_ratio * 0.08 # Assumes Basel standard 8% capital\n\n        if economic_capital <= 0:\n            return 0.0\n\n        raroc = (risk_adjusted_income - (economic_capital * capital_cost)) / economic_capital\n        return raroc"
+      },
+      {
+        "name": "assess_project_risk",
+        "ast_hash": "sha256:95c3ccb9b45cdef3",
+        "loc": 19,
+        "source": "def assess_project_risk(self, project_details: Dict, context: Dict) -> Dict:\n        \"\"\"\n        Assesses the risk associated with a project.\n        \"\"\"\n        logger.info(f\"Assessing project risk...\")\n        risk_factors = {}\n\n        risk_factors[\"project_management_risk\"] = self._assess_project_management_risk(project_details)\n        risk_factors[\"technical_risk\"] = self._assess_technical_risk(project_details)\n        risk_factors[\"market_risk\"] = self._assess_project_market_risk(project_details, context)\n        risk_factors[\"financial_risk\"] = self._assess_project_financial_risk(project_details)\n        risk_factors[\"regulatory_risk\"] = self._assess_regulatory_risk(project_details)\n\n        overall_risk_score = self._calculate_overall_risk_score(risk_factors)\n\n        return {\n            \"overall_risk_score\": overall_risk_score,\n            \"risk_factors\": risk_factors\n        }"
+      },
+      {
+        "name": "_calculate_market_risk",
+        "ast_hash": "sha256:ed8c7cbf0a271c55",
+        "loc": 23,
+        "source": "def _calculate_market_risk(self, market_data: Dict) -> float:\n        \"\"\"\n        Calculates market risk using Volatility or Parametric VaR (Value at Risk).\n        \"\"\"\n        if \"price_data\" in market_data:\n            prices = np.array(market_data[\"price_data\"])  # Ensure numpy array\n            if len(prices) > 1:\n                returns = np.log(prices[1:] / prices[:-1])\n                std_dev = np.std(returns)\n                volatility = std_dev * np.sqrt(252)\n\n                # Quantitative Rigor: Parametric VaR (95%)\n                if SCIPY_AVAILABLE:\n                    # VaR = z_score * std_dev * sqrt(T)\n                    # We assume 1 day horizon for this metric\n                    z_score = norm.ppf(0.95)\n                    var_95 = z_score * std_dev\n                    logger.debug(f\"Volatility: {volatility:.2f}, 1-Day VaR(95%): {var_95:.4f}\")\n                    # Normalize VaR to 0-1 scale for risk scoring (assuming > 5% daily drop is catastrophic)\n                    return min(1.0, var_95 * 20)\n\n                return min(1.0, float(volatility))\n        return 0.2"
+      },
+      {
+        "name": "_calculate_credit_risk",
+        "ast_hash": "sha256:671dcb3bccf607b8",
+        "loc": 18,
+        "source": "def _calculate_credit_risk(self, financial_data: Dict) -> float:\n        credit_rating = financial_data.get(\"credit_rating\")\n        if credit_rating:\n            return self._estimate_default_probability(credit_rating)\n\n        # Use Altman Z-Score if available\n        z_score = financial_data.get(\"z_score\")\n        if z_score is not None:\n            # Map Z-Score to PD\n            # > 3.0 Safe (<0.1%)\n            # 1.8 - 3.0 Grey (1-5%)\n            # < 1.8 Distress (>10%)\n            if z_score > 3.0: return 0.001\n            if z_score > 2.5: return 0.01\n            if z_score > 1.8: return 0.05\n            return 0.15\n\n        return 0.1"
+      },
+      {
+        "name": "_calculate_liquidity_risk",
+        "ast_hash": "sha256:118e133941ba39b5",
+        "loc": 3,
+        "source": "def _calculate_liquidity_risk(self, market_data: Dict) -> float:\n        trading_volume = market_data.get(\"trading_volume\", 0)\n        return self._assess_liquidity(trading_volume)"
+      },
+      {
+        "name": "_estimate_default_probability",
+        "ast_hash": "sha256:5992373e1c626e09",
+        "loc": 6,
+        "source": "def _estimate_default_probability(self, credit_rating: str) -> float:\n        credit_ratings = self.knowledge_base.get(\"credit_ratings\", {})\n        for rating_system in credit_ratings.values():\n            if credit_rating in rating_system:\n                return rating_system[credit_rating].get(\"default_probability\", 0.3)\n        return 0.3"
+      },
+      {
+        "name": "_assess_liquidity",
+        "ast_hash": "sha256:9b3cdd68b7c05b5b",
+        "loc": 18,
+        "source": "def _assess_liquidity(self, trading_volume: int) -> float:\n        # Logarithmic scaling for better differentiation at low volumes\n        if trading_volume <= 0:\n            return 1.0\n\n        # Assume 1M is \"High Liquidity\" (Risk = 0.1)\n        # Assume 10k is \"Low Liquidity\" (Risk = 0.9)\n        # Risk = 1 / log10(volume) roughly\n\n        log_vol = np.log10(trading_volume)\n        if log_vol >= 6:  # 1M\n            return 0.1\n        elif log_vol >= 5:  # 100k\n            return 0.2\n        elif log_vol >= 4:  # 10k\n            return 0.5\n        else:\n            return 0.8"
+      },
+      {
+        "name": "_assess_operational_risk",
+        "ast_hash": "sha256:d64c917ade6d8721",
+        "loc": 3,
+        "source": "def _assess_operational_risk(self, company_name: str) -> str:\n        company_size = self.knowledge_base.get(\"companies\", {}).get(company_name, {}).get(\"size\", \"Medium\")\n        return \"Medium\" if company_size == \"Large\" else \"Low\""
+      },
+      {
+        "name": "_assess_geopolitical_risks",
+        "ast_hash": "sha256:c288b6d42e14a7a7",
+        "loc": 6,
+        "source": "def _assess_geopolitical_risks(self, company_name: str) -> List[str]:\n        company_location = self.knowledge_base.get(\"companies\", {}).get(company_name, {}).get(\"location\", \"US\")\n        if company_location == \"US\":\n            return [\"Trade tensions with China\"]\n        else:\n            return [\"Political instability in emerging markets\"]"
+      },
+      {
+        "name": "_assess_industry_risk",
+        "ast_hash": "sha256:c16a39bbd10d2a95",
+        "loc": 7,
+        "source": "def _assess_industry_risk(self, industry: str) -> str:\n        if industry == \"Technology\":\n            return \"Medium\"\n        elif industry == \"Financials\":\n            return \"High\"\n        else:\n            return \"Low\""
+      },
+      {
+        "name": "_calculate_overall_risk_score",
+        "ast_hash": "sha256:2208d3f45117320d",
+        "loc": 31,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "_assess_economic_risk",
+        "ast_hash": "sha256:682bb53d9bd72752",
+        "loc": 13,
+        "source": "def _assess_economic_risk(self) -> float:\n        economic_data = self.knowledge_base.get(\"economic_data\", {})\n        if not economic_data:\n            return 0.5\n        usa_data = economic_data.get(\"USA\", {})\n        gdp_growth = usa_data.get(\"GDP_growth\", 0)\n        inflation = usa_data.get(\"inflation\", 0)\n        unemployment = usa_data.get(\"unemployment\", 0)\n\n        # Stagflation Index\n        risk = (1 - gdp_growth) + inflation + unemployment\n        # Clip to 0-1\n        return max(0.0, min(1.0, risk / 3))"
+      },
+      {
+        "name": "_assess_volatility_risk",
+        "ast_hash": "sha256:a6197983d1eeb1b0",
+        "loc": 7,
+        "source": "def _assess_volatility_risk(self) -> float:\n        volatility_indices = self.knowledge_base.get(\"volatility_indices\", {})\n        if not volatility_indices:\n            return 0.5\n        vix = volatility_indices.get(\"VIX\", {}).get(\"value\", 20) / 40\n        vxn = volatility_indices.get(\"VXN\", {}).get(\"value\", 25) / 40\n        return min(1.0, (vix + vxn) / 2)"
+      },
+      {
+        "name": "_assess_currency_risk",
+        "ast_hash": "sha256:8acd99f365361f41",
+        "loc": 7,
+        "source": "def _assess_currency_risk(self) -> float:\n        currency_par_values = self.knowledge_base.get(\"currency_par_values\", {})\n        if not currency_par_values:\n            return 0.5\n        usd_eur = abs(1 - currency_par_values.get(\"USD/EUR\", 0.85))\n        usd_jpy = abs(1 - currency_par_values.get(\"USD/JPY\", 145) / 145)\n        return min(1.0, (usd_eur + usd_jpy) / 2)"
+      },
+      {
+        "name": "_assess_borrower_liquidity",
+        "ast_hash": "sha256:b114cface0453bec",
+        "loc": 3,
+        "source": "def _assess_borrower_liquidity(self, borrower_data: Dict) -> float:\n        liquidity_ratio = borrower_data.get(\"liquidity_ratio\", 1)\n        return 1 / liquidity_ratio if liquidity_ratio > 0 else 1.0"
+      },
+      {
+        "name": "_assess_collateral_risk",
+        "ast_hash": "sha256:68649ffe5de0cd4f",
+        "loc": 4,
+        "source": "def _assess_collateral_risk(self, loan_details: Dict) -> float:\n        collateral_value = loan_details.get(\"collateral_value\", 0)\n        loan_amount = loan_details.get(\"loan_amount\", 1)\n        return max(0.0, 1 - (collateral_value / loan_amount)) if loan_amount > 0 else 1.0"
+      },
+      {
+        "name": "_assess_interest_rate_risk",
+        "ast_hash": "sha256:284cbef96826bf64",
+        "loc": 3,
+        "source": "def _assess_interest_rate_risk(self, loan_details: Dict) -> float:\n        interest_rate_type = loan_details.get(\"interest_rate_type\", \"fixed\")\n        return 0.6 if interest_rate_type == \"variable\" else 0.2"
+      },
+      {
+        "name": "_assess_project_management_risk",
+        "ast_hash": "sha256:78074663d7334b53",
+        "loc": 8,
+        "source": "def _assess_project_management_risk(self, project_details: Dict) -> float:\n        project_manager_experience = project_details.get(\"project_manager_experience\", \"Medium\")\n        if project_manager_experience == \"High\":\n            return 0.2\n        elif project_manager_experience == \"Medium\":\n            return 0.5\n        else:\n            return 0.8"
+      },
+      {
+        "name": "_assess_technical_risk",
+        "ast_hash": "sha256:11a00c0795efa999",
+        "loc": 8,
+        "source": "def _assess_technical_risk(self, project_details: Dict) -> float:\n        technology_maturity = project_details.get(\"technology_maturity\", \"Medium\")\n        if technology_maturity == \"Mature\":\n            return 0.2\n        elif technology_maturity == \"Established\":\n            return 0.5\n        else:\n            return 0.8"
+      },
+      {
+        "name": "_assess_project_market_risk",
+        "ast_hash": "sha256:7247d677700eb5a0",
+        "loc": 8,
+        "source": "def _assess_project_market_risk(self, project_details: Dict, context: Dict) -> float:\n        market_demand = context.get(\"market_demand\", \"Medium\")\n        if market_demand == \"High\":\n            return 0.2\n        elif market_demand == \"Medium\":\n            return 0.5\n        else:\n            return 0.8"
+      },
+      {
+        "name": "_assess_project_financial_risk",
+        "ast_hash": "sha256:b9a4b7960ef64521",
+        "loc": 4,
+        "source": "def _assess_project_financial_risk(self, project_details: Dict) -> float:\n        project_budget = project_details.get(\"project_budget\", 1000000)\n        funding_secured = project_details.get(\"funding_secured\", 500000)\n        return max(0.0, 1 - (funding_secured / project_budget)) if project_budget > 0 else 1.0"
+      },
+      {
+        "name": "_assess_regulatory_risk",
+        "ast_hash": "sha256:f88d64ad81e24bf1",
+        "loc": 8,
+        "source": "def _assess_regulatory_risk(self, project_details: Dict) -> float:\n        regulatory_environment = project_details.get(\"regulatory_environment\", \"Medium\")\n        if regulatory_environment == \"Favorable\":\n            return 0.2\n        elif regulatory_environment == \"Neutral\":\n            return 0.5\n        else:\n            return 0.8"
+      }
+    ]
+  }
+}

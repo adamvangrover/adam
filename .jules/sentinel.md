@@ -195,3 +195,24 @@
 ## 2026-10-24 - [The Documenter Executed - Global Knowledge Base Update]
 **Action:** Applied "The Documenter" protocol across all major repository domains. Documented core architecture (`v30_architecture`, `EngineFactory`), operations scripts (`daily_ritual.py`, generation scripts), React Component Library (`MarketMayhem.tsx`), Dashboard Schemas, AOPL Structure, and the Static Mock Mode fallback.
 **Learning:** Comprehensive, inline documentation with concrete usage examples drastically improves the maintainability of complex, multi-agent systems and ensures graceful fallbacks (like Mock Mode) are properly utilized by future developers.
+
+## 2026-04-23 - [Critical] XML External Entity (XXE) Vulnerability & Unsafe URL Parsing
+**Vulnerability:** The `news_bot.py` agent parsed untrusted RSS feed data using `xml.etree.ElementTree`, which is susceptible to XXE attacks. Additionally, it used `urllib.request.urlopen` which could theoretically be tricked into opening local files or unsupported schemes.
+**Learning:** Python's standard `xml.etree` is unsafe for untrusted XML. Standard library HTTP clients (`urllib`) require strict URL scheme validation, while modern clients (`requests`) are safer by default and provide easier API constraints. Furthermore, when adding security fixes that introduce third-party libraries (`defusedxml`), the dependency must be correctly added to the project's dependency manifest (`setup.py`) to prevent breaking the application, regardless of whether it's temporarily available in the environment via `requirements.txt`.
+**Prevention:** 1) Always use `defusedxml` when parsing any XML data not strictly controlled by the application. 2) Prefer the `requests` library for external HTTP calls over raw `urllib`. 3) Always update dependency lists (`setup.py` / `pyproject.toml`) when relying on a new third-party library to ensure the build remains resilient.
+## 2026-04-30 - Prevent binding to all interfaces (0.0.0.0)
+**Vulnerability:** Fast API application was binding to all interfaces (0.0.0.0), exposing it to external networks unnecessarily.
+**Learning:** Found in . Uvicorn bound to 0.0.0.0 by default. It must be explicitly bound to 127.0.0.1 for local deployments.
+**Prevention:** Configure local APIs to bind to localhost (127.0.0.1) explicitly unless external access is required. Use bandit usage: bandit [-h] [-r] [-a {file,vuln}] [-n CONTEXT_LINES] [-c CONFIG_FILE]
+              [-p PROFILE] [-t TESTS] [-s SKIPS]
+              [-l | --severity-level {all,low,medium,high}]
+              [-i | --confidence-level {all,low,medium,high}]
+              [-f {csv,custom,html,json,screen,txt,xml,yaml}]
+              [--msg-template MSG_TEMPLATE] [-o [OUTPUT_FILE]] [-v] [-d] [-q]
+              [--ignore-nosec] [-x EXCLUDED_PATHS] [-b BASELINE]
+              [--ini INI_PATH] [--exit-zero] [--version]
+              [targets ...] to scan for these risks.
+## 2026-04-30 - Prevent binding to all interfaces (0.0.0.0) in server
+**Vulnerability:** Fast API application was binding to all interfaces (0.0.0.0), exposing it to external networks unnecessarily.
+**Learning:** Found in server/sentinel_api.py. Uvicorn bound to 0.0.0.0 by default. It must be explicitly bound to 127.0.0.1 for local deployments.
+**Prevention:** Configure local APIs to bind to localhost (127.0.0.1) explicitly unless external access is required. Use bandit 'uv run bandit' to scan for these risks.

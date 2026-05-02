@@ -1,0 +1,66 @@
+{
+  "spec_version": "1.4.0-otel",
+  "timestamp": "2026-04-24T00:13:03.355457Z",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "severity_text": "WARN",
+  "severity_number": 13,
+  "event_name": "swarm.agent.lifecycle.deprecated",
+  "resource": {
+    "service.name": "swarm-orchestrator",
+    "service.version": "4.2.0",
+    "deployment.environment": "production",
+    "node.id": "worker-node-aws-us-east-1a-04"
+  },
+  "attributes": {
+    "agent.id": "SentinelAgent",
+    "agent.previous_version": "v29.x",
+    "agent.target_version": "v30",
+    "deprecation.reason": "Transitioning to v30 architecture.",
+    "deprecation.action_required": true
+  },
+  "metrics": {
+    "agent.core_logic.function_count": 5,
+    "agent.capabilities.count": 0
+  },
+  "artifacts": {
+    "provenance": {
+      "repository": "git+ssh://repo/core/agents/specialized/sentinel_agent.py",
+      "commit_sha": "a1b2c3d4e5f6g7h8i9j0",
+      "docstring_hash": "sha256:d8c4b12389a..."
+    },
+    "extracted_capabilities": [],
+    "core_logic_signatures": [
+      {
+        "name": "__init__",
+        "ast_hash": "sha256:7a2f1e7fa3ca9461",
+        "loc": 3,
+        "source": "def __init__(self, config: Dict[str, Any], kernel: Optional[Any] = None, graph: Optional[OdysseyKnowledgeGraph] = None):\n        super().__init__(config, kernel=kernel)\n        self.graph = graph or OdysseyKnowledgeGraph()"
+      },
+      {
+        "name": "execute",
+        "ast_hash": "sha256:d86bb6e3410a4535",
+        "loc": 14,
+        "source": "async def execute(self, **kwargs) -> Dict[str, Any]:\n        \"\"\"\n        Executes the Sentinel workflow.\n        Expected kwargs: document_path (str) or entity_data (dict)\n        \"\"\"\n        doc_path = kwargs.get(\"document_path\")\n        entity_data = kwargs.get(\"entity_data\")\n\n        if entity_data:\n            return self.process_entity(entity_data)\n        elif doc_path:\n            return self.process_document(doc_path)\n        else:\n            return {\"error\": \"No input provided (document_path or entity_data)\"}"
+      },
+      {
+        "name": "process_document",
+        "ast_hash": "sha256:201e49f76e19d8bb",
+        "loc": 11,
+        "source": "def process_document(self, document_path: str) -> Dict[str, Any]:\n        \"\"\"\n        Ingests a document, extracts data, validates, and loads into graph.\n        \"\"\"\n        logger.info(f\"Sentinel processing {document_path}\")\n\n        # 1. Extraction (Mocked for now)\n        extracted_data = self._mock_extract(document_path)\n\n        # 2. Validation & Ingestion\n        return self.process_entity(extracted_data)"
+      },
+      {
+        "name": "process_entity",
+        "ast_hash": "sha256:c06588e846e65ad4",
+        "loc": 11,
+        "source": "def process_entity(self, entity_data: Dict[str, Any]) -> Dict[str, Any]:\n        try:\n            # Check for critical data failure (e.g., missing revenue if it was a mandatory field)\n            # Schema validation handles checking required fields defined in schema.\n\n            self.graph.ingest_odyssey_entity(entity_data)\n            logger.info(\"Entity successfully validated and ingested.\")\n            return {\"status\": \"success\", \"entity_id\": entity_data.get(\"@id\"), \"data\": entity_data}\n        except ValueError as e:\n            logger.error(f\"CRITICAL DATA FAILURE: {e}\")\n            return {\"status\": \"error\", \"error\": str(e), \"flag\": \"FLAG_DATA_MISSING\"}"
+      },
+      {
+        "name": "_mock_extract",
+        "ast_hash": "sha256:df2e22bfe807787b",
+        "loc": 15,
+        "source": "def _mock_extract(self, doc_path: str) -> dict:\n        # Mock extraction logic\n        return {\n            \"@id\": f\"urn:fibo:be-le-cb:Corporation:US-Mock-{doc_path}\",\n            \"@type\": \"fibo-be-le-cb:Corporation\",\n            \"legalName\": \"Mock Corp Inc.\",\n            \"hasCreditFacility\": [\n                {\n                    \"@id\": \"urn:fibo:loan:TermLoanB-001\",\n                    \"facilityType\": \"Term Loan B\",\n                    \"hasJCrewBlocker\": True,\n                    \"interestCoverageRatio\": 2.5\n                }\n            ]\n        }"
+      }
+    ]
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "spec_version": "1.4.0-otel",
+  "timestamp": "2026-04-24T00:13:03.355457Z",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "severity_text": "WARN",
+  "severity_number": 13,
+  "event_name": "swarm.agent.lifecycle.deprecated",
+  "resource": {
+    "service.name": "swarm-orchestrator",
+    "service.version": "4.2.0",
+    "deployment.environment": "production",
+    "node.id": "worker-node-aws-us-east-1a-04"
+  },
+  "attributes": {
+    "agent.id": "Meta19Agent",
+    "agent.previous_version": "v29.x",
+    "agent.target_version": "v30",
+    "deprecation.reason": "Transitioning to v30 architecture.",
+    "deprecation.action_required": true
+  },
+  "metrics": {
+    "agent.core_logic.function_count": 5,
+    "agent.capabilities.count": 0
+  },
+  "artifacts": {
+    "provenance": {
+      "repository": "git+ssh://repo/core/agents/meta_19_agent.py",
+      "commit_sha": "a1b2c3d4e5f6g7h8i9j0",
+      "docstring_hash": "sha256:d8c4b12389a..."
+    },
+    "extracted_capabilities": [],
+    "core_logic_signatures": [
+      {
+        "name": "__init__",
+        "ast_hash": "sha256:fdd12d3f2bab720e",
+        "loc": 32,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "execute",
+        "ast_hash": "sha256:9e64e9555706cbc6",
+        "loc": 44,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "_detect_logical_fallacies",
+        "ast_hash": "sha256:b9a980edf6007f46",
+        "loc": 18,
+        "source": "def _detect_logical_fallacies(self, text: str) -> List[Dict[str, str]]:\n        \"\"\"\n        Detects logical fallacies in a given text using regex patterns.\n        \"\"\"\n        detected_fallacies = []\n        for fallacy, patterns in self.compiled_fallacies.items():\n            # Check pre-filter first to avoid iterating through all patterns if none match\n            prefilter = self.fallacy_prefilters.get(fallacy)\n            if prefilter and not prefilter.search(text):\n                continue\n\n            for pattern in patterns:\n                if pattern.search(text):\n                    detected_fallacies.append({\n                        \"fallacy\": fallacy,\n                        \"evidence\": f\"Detected pattern '{pattern.pattern}'\"\n                    })\n        return detected_fallacies"
+      },
+      {
+        "name": "_cross_validate_outputs",
+        "ast_hash": "sha256:97ed80c310665055",
+        "loc": 15,
+        "source": "def _cross_validate_outputs(self, analysis_chain: List[Dict[str, Any]]) -> List[str]:\n        \"\"\"\n        Cross-validates outputs from different agents to find inconsistencies.\n        \"\"\"\n        inconsistencies = []\n        outputs_text = \" \".join([str(step.get(\"output\", \"\")) for step in analysis_chain]).lower()\n\n        has_positive = bool(self.positive_pattern.search(outputs_text)) if self.positive_pattern else False\n        has_negative = bool(self.negative_pattern.search(outputs_text)) if self.negative_pattern else False\n\n        if has_positive and has_negative:\n            inconsistencies.append(\n                \"Inconsistency detected: The analysis contains conflicting positive and negative statements.\")\n\n        return inconsistencies"
+      },
+      {
+        "name": "_generate_summary",
+        "ast_hash": "sha256:9c6766523bffe5d3",
+        "loc": 15,
+        "source": "def _generate_summary(self, analysis_results: Dict[str, Any]) -> str:\n        \"\"\"\n        Generates a summary of the meta-cognitive findings.\n        \"\"\"\n        if analysis_results[\"confidence_score\"] > 0.9:\n            return \"The analysis appears logically consistent and coherent.\"\n\n        summary_text = f\"Meta-cognitive review raised some concerns (Confidence: {analysis_results['confidence_score']:.2f}):\\n\"\n        if analysis_results[\"inconsistencies\"]:\n            summary_text += \"- Inconsistencies: \" + \" \".join(analysis_results[\"inconsistencies\"]) + \"\\n\"\n        if analysis_results[\"logical_fallacies\"]:\n            summary_text += \"- Potential logical fallacies detected: \"\n            summary_text += \", \".join(list(set([f[\"fallacy\"] for f in analysis_results[\"logical_fallacies\"]]))) + \".\\n\"\n\n        return summary_text"
+      }
+    ]
+  }
+}

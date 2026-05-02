@@ -1,0 +1,54 @@
+{
+  "spec_version": "1.4.0-otel",
+  "timestamp": "2026-04-24T00:13:03.355457Z",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "severity_text": "WARN",
+  "severity_number": 13,
+  "event_name": "swarm.agent.lifecycle.deprecated",
+  "resource": {
+    "service.name": "swarm-orchestrator",
+    "service.version": "4.2.0",
+    "deployment.environment": "production",
+    "node.id": "worker-node-aws-us-east-1a-04"
+  },
+  "attributes": {
+    "agent.id": "CreditSentryAgent",
+    "agent.previous_version": "v29.x",
+    "agent.target_version": "v30",
+    "deprecation.reason": "Transitioning to v30 architecture.",
+    "deprecation.action_required": true
+  },
+  "metrics": {
+    "agent.core_logic.function_count": 3,
+    "agent.capabilities.count": 0
+  },
+  "artifacts": {
+    "provenance": {
+      "repository": "git+ssh://repo/core/agents/specialized/credit_sentry_agent.py",
+      "commit_sha": "a1b2c3d4e5f6g7h8i9j0",
+      "docstring_hash": "sha256:d8c4b12389a..."
+    },
+    "extracted_capabilities": [],
+    "core_logic_signatures": [
+      {
+        "name": "__init__",
+        "ast_hash": "sha256:7a2f1e7fa3ca9461",
+        "loc": 3,
+        "source": "def __init__(self, config: Dict[str, Any], kernel: Optional[Any] = None, graph: Optional[OdysseyKnowledgeGraph] = None):\n        super().__init__(config, kernel=kernel)\n        self.graph = graph or OdysseyKnowledgeGraph()"
+      },
+      {
+        "name": "execute",
+        "ast_hash": "sha256:fbcf284e61f9878a",
+        "loc": 27,
+        "source": "async def execute(self, **kwargs) -> Dict[str, Any]:\n        entity_id = kwargs.get(\"entity_id\")\n        stress_scenario = kwargs.get(\"stress_scenario\", {})  # e.g. {\"sofr_hike_bps\": 500}\n\n        if not entity_id:\n            return {\"error\": \"Missing entity_id\"}\n\n        logger.info(f\"CreditSentry analyzing {entity_id} under scenario {stress_scenario}\")\n\n        # 1. Structural Risk Analysis\n        j_crew_risk = self.graph.detect_j_crew_maneuver(entity_id)\n        ouroboros_cycles = self.graph.detect_fractured_ouroboros()  # This is global, but relevant\n\n        # 2. Solvency Analysis (Mocked calculation)\n        fccr = self._calculate_stress_fccr(entity_id, stress_scenario)\n\n        status = \"Pass\"\n        if fccr < 1.0:\n            status = \"Zombie\"\n\n        return {\n            \"entity_id\": entity_id,\n            \"fccr_stress\": fccr,\n            \"status\": status,\n            \"j_crew_risk\": j_crew_risk,\n            \"circular_dependencies_detected\": len(ouroboros_cycles) > 0\n        }"
+      },
+      {
+        "name": "_calculate_stress_fccr",
+        "ast_hash": "sha256:be0f1ac8843fc9ea",
+        "loc": 10,
+        "source": "def _calculate_stress_fccr(self, entity_id: str, scenario: Dict[str, Any]) -> float:\n        # Fetch financials from graph (mocked access)\n        # In reality: self.graph.nodes[entity_id]['data']['financials']...\n        # Assume base FCCR is 1.2\n        base_fccr = 1.2\n        hike = scenario.get(\"sofr_hike_bps\", 0)\n\n        # Simple impact model: 100bps hike -> -0.1 FCCR\n        impact = (hike / 100.0) * 0.1\n        return base_fccr - impact"
+      }
+    ]
+  }
+}

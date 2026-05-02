@@ -125,3 +125,14 @@
 ## 2026-11-25 - [React.memo on Mapped Lists Connected to Global State]
 **Learning:** In dashboards like `PromptAlpha.tsx` subscribing to a global Zustand store (`usePromptStore`), mapping over large dynamic arrays (e.g., thousands of `PromptObject` items) without `React.memo` causes a severe O(N) re-render bottleneck when the parent component re-renders due to unrelated state changes or new items streaming in. Extracting the inline JSX mapped elements (like `<tr>` and grid `<div>` items) into separate `React.memo()` components allows React to accurately skip rendering for items that have not changed by reference.
 **Action:** Always verify if a parent component maps over items and subscribes to highly dynamic global state streams. Use `React.memo` on the list items to avoid massive O(N) re-renders during high-throughput state updates.
+## 2026-11-26 - [React.memo for Component with CSS Animations]
+**Learning:** In a streaming list (like `NewsWire.tsx`) where the first element receives a flash animation, if the rendering logic is inline, the addition of a new element forces a full re-render of all previously existing elements.
+**Action:** Extract the list item into a `React.memo` component and explicitly pass an `isNewest` prop rather than tracking the list index internally, ensuring that only the new first element and the *previous* first element re-render while the rest of the list correctly skips rendering.
+
+## 2026-04-26 - React List Optimization
+**Learning:** Extracting inner mapped elements into separate functional components wrapped in `React.memo` (like `ThoughtRow`) is highly effective at preventing O(N) re-renders during frequent interval pulses in React UI components.
+**Action:** When auditing frontend performance, specifically look for inline `.map()` functions rendering complex JSX in frequently updating components, and extract/memoize them.
+
+## 2026-11-27 - [Separating Search Index Instantiation from Search Execution]
+**Learning:** In React components like `GlobalNav.tsx`, instantiating a search index (e.g., `new Fuse(...)`) within the same `useMemo` block or render path as the search execution causes a severe performance bottleneck. When the search index relies on static or slowly changing data (like a manifest) but is coupled with a rapidly changing dependency (like the `searchTerm` from every keystroke), the expensive O(N) index reconstruction happens on every key press, leading to noticeable input lag.
+**Action:** Always separate the search index instantiation and the search execution into two distinct `useMemo` hooks. The first hook should build the index and depend only on the data source, while the second hook should perform the search and depend on both the index and the search query. This ensures the index is built once when the data changes, and only the fast search operation runs on every keystroke.

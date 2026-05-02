@@ -1,0 +1,60 @@
+{
+  "spec_version": "1.4.0-otel",
+  "timestamp": "2026-04-24T00:13:03.355457Z",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "severity_text": "WARN",
+  "severity_number": 13,
+  "event_name": "swarm.agent.lifecycle.deprecated",
+  "resource": {
+    "service.name": "swarm-orchestrator",
+    "service.version": "4.2.0",
+    "deployment.environment": "production",
+    "node.id": "worker-node-aws-us-east-1a-04"
+  },
+  "attributes": {
+    "agent.id": "AdaptiveAgent",
+    "agent.previous_version": "v29.x",
+    "agent.target_version": "v30",
+    "deprecation.reason": "Transitioning to v30 architecture.",
+    "deprecation.action_required": true
+  },
+  "metrics": {
+    "agent.core_logic.function_count": 4,
+    "agent.capabilities.count": 0
+  },
+  "artifacts": {
+    "provenance": {
+      "repository": "git+ssh://repo/core/agents/adaptive_agent.py",
+      "commit_sha": "a1b2c3d4e5f6g7h8i9j0",
+      "docstring_hash": "sha256:d8c4b12389a..."
+    },
+    "extracted_capabilities": [],
+    "core_logic_signatures": [
+      {
+        "name": "__init__",
+        "ast_hash": "sha256:609881654029570b",
+        "loc": 8,
+        "source": "def __init__(self, config: Dict[str, Any], constitution: Optional[Dict[str, Any]] = None, kernel: Any = None):\n        # Initialize Base\n        super().__init__(config, constitution, kernel)\n\n        # Initialize Mixins\n        AdaptiveConvictionMixin.__init__(self)\n        StateAnchorMixin.__init__(self)\n        ToolRAGMixin.__init__(self)"
+      },
+      {
+        "name": "execute",
+        "ast_hash": "sha256:ad4032ff8009a6de",
+        "loc": 20,
+        "source": "async def execute(self, *args: Any, **kwargs: Any) -> Any:\n        \"\"\"\n        Overridden execute method that applies the Adaptive Logic.\n        \"\"\"\n        # 1. Extract Task Description\n        task_description = kwargs.get(\"input_text\") or (args[0] if args else \"\")\n        if not task_description:\n            return {\"error\": \"No input provided\"}\n\n        # 2. Tool RAG: Load relevant tools only\n        self.load_tools_jit(str(task_description))\n\n        # 3. Conviction Check & Mode Switching\n        mode, meta = self.get_interaction_strategy(str(task_description))\n        logging.info(f\"AdaptiveAgent Strategy: {mode} (Conviction: {meta['conviction']:.2f}, Complexity: {meta['complexity']:.2f})\")\n\n        if mode == \"DIRECT\":\n            return self._execute_direct_prompt(task_description)\n        else:\n            return await self._execute_mcp_workflow(task_description)"
+      },
+      {
+        "name": "_execute_direct_prompt",
+        "ast_hash": "sha256:3fd83880f344e1cd",
+        "loc": 9,
+        "source": "def _execute_direct_prompt(self, task: str) -> Dict[str, Any]:\n        \"\"\"\n        Simulated 'System 1' Fast execution path.\n        \"\"\"\n        # In a real system, this would just call the LLM with a simple prompt\n        return self.generate_metacognitive_response(\n            content=f\"[Direct Prompt Result] Processed '{task}' via natural language path.\",\n            conviction=1.0 # Direct path assumes high confidence in simplicity\n        )"
+      },
+      {
+        "name": "_execute_mcp_workflow",
+        "ast_hash": "sha256:cd76a9c6510bca90",
+        "loc": 22,
+        "source": "async def _execute_mcp_workflow(self, task: str) -> Dict[str, Any]:\n        \"\"\"\n        Simulated 'System 2' Structured execution path.\n        \"\"\"\n        # 1. Create State Anchor before async/complex work\n        anchor_id = self.create_anchor(label=f\"pre_task_{task[:10]}\")\n\n        # 2. Simulate Async Work (e.g., calling tools)\n        # In reality: await self.call_mcp_tool(...)\n        import asyncio\n        await asyncio.sleep(0.1)\n\n        # 3. Verify Drift\n        if not self.verify_anchor(anchor_id):\n            logging.warning(\"State Drift detected during MCP workflow! Re-evaluating...\")\n            # Self-correction logic would go here\n            pass\n\n        return self.generate_metacognitive_response(\n            content=f\"[MCP Result] Processed '{task}' via structured schema path.\",\n            conviction=self._conviction_history[-1] if self._conviction_history else 0.9\n        )"
+      }
+    ]
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "spec_version": "1.4.0-otel",
+  "timestamp": "2026-04-24T00:13:03.355457Z",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "severity_text": "WARN",
+  "severity_number": 13,
+  "event_name": "swarm.agent.lifecycle.deprecated",
+  "resource": {
+    "service.name": "swarm-orchestrator",
+    "service.version": "4.2.0",
+    "deployment.environment": "production",
+    "node.id": "worker-node-aws-us-east-1a-04"
+  },
+  "attributes": {
+    "agent.id": "PeerComparisonAgent",
+    "agent.previous_version": "v29.x",
+    "agent.target_version": "v30",
+    "deprecation.reason": "Transitioning to v30 architecture.",
+    "deprecation.action_required": true
+  },
+  "metrics": {
+    "agent.core_logic.function_count": 2,
+    "agent.capabilities.count": 0
+  },
+  "artifacts": {
+    "provenance": {
+      "repository": "git+ssh://repo/core/agents/specialized/peer_comparison_agent.py",
+      "commit_sha": "a1b2c3d4e5f6g7h8i9j0",
+      "docstring_hash": "sha256:d8c4b12389a..."
+    },
+    "extracted_capabilities": [],
+    "core_logic_signatures": [
+      {
+        "name": "__init__",
+        "ast_hash": "sha256:795321e9ad8af0f7",
+        "loc": 3,
+        "source": "def __init__(self, config: Dict[str, Any]):\n        super().__init__(config)\n        self.persona = \"Equity Strategist\""
+      },
+      {
+        "name": "execute",
+        "ast_hash": "sha256:e3263416e4951b5b",
+        "loc": 16,
+        "source": "async def execute(self, **kwargs) -> MultiplesAnalysis:\n        logger.info(\"Executing Peer Comparison...\")\n\n        # Support both nested 'params' key and flat kwargs\n        params = kwargs.get('params', kwargs)\n\n        company_id = params.get(\"company_id\", \"Unknown\")\n\n        # Mock Data\n        # In production, this fetches live peer data from Bloomberg/FactSet/API.\n\n        return MultiplesAnalysis(\n            current_ev_ebitda=14.5,\n            peer_median_ev_ebitda=12.0,\n            premium_discount=\"20% Premium\"\n        )"
+      }
+    ]
+  }
+}

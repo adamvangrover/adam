@@ -16,6 +16,14 @@ const mockThoughts = [
   { agent: "Risk Officer", message: "Holding position: Portfolio volatility exceeding thresholds." }
 ];
 
+const ThoughtRow = React.memo(({ t }: { t: AgentThought }) => (
+  <div className="text-xs leading-relaxed opacity-0 animate-fade-in" style={{ animation: 'fadeIn 0.5s ease-out forwards' }}>
+    <div className="text-cyber-text/40 mb-1">[{t.time}] <span className="text-cyber-cyan">{t.agent}</span>:</div>
+    <div className="text-cyber-text/90 pl-2 border-l border-cyber-cyan/20">{t.message}</div>
+  </div>
+));
+ThoughtRow.displayName = 'ThoughtRow';
+
 const AgentIntercom: React.FC = () => {
   const [thoughts, setThoughts] = useState<AgentThought[]>([]);
   const [isMinimized, setIsMinimized] = useState(false);
@@ -64,10 +72,7 @@ const AgentIntercom: React.FC = () => {
       {!isMinimized && (
         <div className="p-3 overflow-y-auto flex-grow flex flex-col-reverse gap-2 scrollbar-thin scrollbar-thumb-cyber-cyan/30 scrollbar-track-transparent">
           {thoughts.map((t) => (
-            <div key={t.id} className="text-xs leading-relaxed opacity-0 animate-fade-in" style={{ animation: 'fadeIn 0.5s ease-out forwards' }}>
-              <div className="text-cyber-text/40 mb-1">[{t.time}] <span className="text-cyber-cyan">{t.agent}</span>:</div>
-              <div className="text-cyber-text/90 pl-2 border-l border-cyber-cyan/20">{t.message}</div>
-            </div>
+            <ThoughtRow key={t.id} t={t} />
           ))}
           {thoughts.length === 0 && (
             <div className="text-xs text-cyber-text/50 text-center mt-8 animate-pulse">

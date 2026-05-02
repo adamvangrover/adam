@@ -1,0 +1,75 @@
+{
+  "spec_version": "1.4.0-otel",
+  "timestamp": "2026-04-24T00:13:03.355457Z",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "severity_text": "WARN",
+  "severity_number": 13,
+  "event_name": "swarm.agent.lifecycle.deprecated",
+  "resource": {
+    "service.name": "swarm-orchestrator",
+    "service.version": "4.2.0",
+    "deployment.environment": "production",
+    "node.id": "worker-node-aws-us-east-1a-04"
+  },
+  "attributes": {
+    "agent.id": "EconomicRiskAgent",
+    "agent.previous_version": "v29.x",
+    "agent.target_version": "v30",
+    "deprecation.reason": "Transitioning to v30 architecture.",
+    "deprecation.action_required": true
+  },
+  "metrics": {
+    "agent.core_logic.function_count": 6,
+    "agent.capabilities.count": 0
+  },
+  "artifacts": {
+    "provenance": {
+      "repository": "git+ssh://repo/core/agents/economic_risk_agent.py",
+      "commit_sha": "a1b2c3d4e5f6g7h8i9j0",
+      "docstring_hash": "sha256:d8c4b12389a..."
+    },
+    "extracted_capabilities": [],
+    "core_logic_signatures": [
+      {
+        "name": "__init__",
+        "ast_hash": "sha256:7bf97a7dad0a32ab",
+        "loc": 2,
+        "source": "def __init__(self, config: Dict[str, Any], **kwargs):\n        super().__init__(config, **kwargs)"
+      },
+      {
+        "name": "execute",
+        "ast_hash": "sha256:f46ae10806174ff4",
+        "loc": 73,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "_analyze_macro_scenario",
+        "ast_hash": "sha256:fbf9ddce15e5510d",
+        "loc": 50,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "_classify_misery",
+        "ast_hash": "sha256:8eb9be3335530e43",
+        "loc": 5,
+        "source": "def _classify_misery(self, misery_index):\n        if misery_index < 0.06: return \"Low\"\n        if misery_index < 0.10: return \"Moderate\"\n        if misery_index < 0.15: return \"High\"\n        return \"Severe\""
+      },
+      {
+        "name": "_apply_sahm_rule",
+        "ast_hash": "sha256:d4674490ebfc008c",
+        "loc": 37,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "_calculate_taylor_rule",
+        "ast_hash": "sha256:4e82a9cbacb4cf95",
+        "loc": 15,
+        "source": "def _calculate_taylor_rule(self, inflation: float, gdp_growth: float, target_inflation: float = 0.02, r_star: float = 0.005) -> float:\n        \"\"\"\n        Standard Taylor Rule: i = r* + pi + 0.5(pi - pi*) + 0.5(y - y*)\n        Here we use GDP growth deviation from trend (approx 2%) as output gap proxy.\n        \"\"\"\n        # Assumptions\n        trend_growth = 0.02\n        output_gap = gdp_growth - trend_growth # Rough proxy\n\n        # Taylor Rule Formula\n        # i = r_star + inflation + 0.5 * (inflation - target_inflation) + 0.5 * output_gap\n\n        i_taylor = r_star + inflation + 0.5 * (inflation - target_inflation) + 0.5 * output_gap\n\n        return float(i_taylor)"
+      }
+    ]
+  }
+}

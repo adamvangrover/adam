@@ -1,0 +1,130 @@
+{
+  "spec_version": "1.4.0-otel",
+  "timestamp": "2026-04-24T00:13:03.355457Z",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "severity_text": "WARN",
+  "severity_number": 13,
+  "event_name": "swarm.agent.lifecycle.deprecated",
+  "resource": {
+    "service.name": "swarm-orchestrator",
+    "service.version": "4.2.0",
+    "deployment.environment": "production",
+    "node.id": "worker-node-aws-us-east-1a-04"
+  },
+  "attributes": {
+    "agent.id": "AnomalyDetectionAgent",
+    "agent.previous_version": "v29.x",
+    "agent.target_version": "v30",
+    "deprecation.reason": "Transitioning to v30 architecture.",
+    "deprecation.action_required": true
+  },
+  "metrics": {
+    "agent.core_logic.function_count": 14,
+    "agent.capabilities.count": 4
+  },
+  "artifacts": {
+    "provenance": {
+      "repository": "git+ssh://repo/core/agents/anomaly_detection_agent.py",
+      "commit_sha": "a1b2c3d4e5f6g7h8i9j0",
+      "docstring_hash": "sha256:d8c4b12389a..."
+    },
+    "extracted_capabilities": [
+      "Leverages various statistical methods and machine learning algorithms for comprehensive anomaly detection.",
+      "Integrates with Adam's knowledge base for context-aware analysis.",
+      "Employs XAI techniques to provide explanations for detected anomalies.",
+      "Collaborates with other agents for in-depth investigation and reporting."
+    ],
+    "core_logic_signatures": [
+      {
+        "name": "__init__",
+        "ast_hash": "sha256:f5b7059e1f56e441",
+        "loc": 11,
+        "source": "def __init__(self, config: Dict):\n        \"\"\"\n        Initializes the AnomalyDetectionAgent with configuration parameters.\n\n        Args:\n            config: A dictionary containing configuration parameters.\n        \"\"\"\n        self.config = config\n        self.market_data = self._load_market_data()\n        self.company_data = self._load_company_data()\n        self.scaler = StandardScaler()"
+      },
+      {
+        "name": "_load_market_data",
+        "ast_hash": "sha256:9e745cb26aca21cc",
+        "loc": 15,
+        "source": "def _load_market_data(self) -> pd.DataFrame:\n        \"\"\"\n        Loads market data from Adam's knowledge graph.\n\n        Returns:\n            A pandas DataFrame containing market data.\n        \"\"\"\n        # TODO: Implement data retrieval from knowledge graph using API calls\n        # Placeholder market data (replace with actual data)\n        data = {\n            'stock_price': [100, 102, 105, 108, 110, 112, 115, 118, 120, 122, 125, 128, 130, 132, 135, 138, 140, 142, 145, 148, 150, 152, 155, 158, 160, 162, 165, 168, 170, 172, 175, 178, 180, 182, 185, 188, 190, 192, 195, 198, 200, 202, 205, 208, 210, 212, 215, 218, 220, 222, 225, 228, 230, 232, 235, 238, 240, 242, 245, 248, 250],\n            'trading_volume': [1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1900, 2000, 2100, 2200, 2300, 2400, 2500, 2600, 2700, 2800, 2900, 3000, 3100, 3200, 3300, 3400, 3500, 3600, 3700, 3800, 3900, 4000, 4100, 4200, 4300, 4400, 4500, 4600, 4700, 4800, 4900, 5000, 5100, 5200, 5300, 5400, 5500, 5600, 5700, 5800, 5900, 6000, 6100, 6200, 6300, 6400, 6500, 6600, 6700, 6800, 6900, 7000]\n        }\n        df = pd.DataFrame(data)\n        return df"
+      },
+      {
+        "name": "_load_company_data",
+        "ast_hash": "sha256:abd3ef501da39c4c",
+        "loc": 83,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "_detect_outliers_zscore",
+        "ast_hash": "sha256:951d44fd4a8dbc58",
+        "loc": 14,
+        "source": "def _detect_outliers_zscore(self, data: pd.Series, threshold: float = 3) -> List[int]:\n        \"\"\"\n        Detects outliers using the z-score method.\n\n        Args:\n            data: A pandas Series containing the data.\n            threshold: The z-score threshold for outlier detection.\n\n        Returns:\n            A list of indices of the outliers.\n        \"\"\"\n        z_scores = np.abs(stats.zscore(data))\n        outliers = np.where(z_scores > threshold)[0]\n        return outliers.tolist()"
+      },
+      {
+        "name": "_detect_outliers_isolation_forest",
+        "ast_hash": "sha256:c59e041320f1f3c1",
+        "loc": 16,
+        "source": "def _detect_outliers_isolation_forest(self, data: pd.DataFrame, contamination: float = 0.1) -> List[int]:\n        \"\"\"\n        Detects outliers using Isolation Forest.\n\n        Args:\n            data: A pandas DataFrame containing the data.\n            contamination: The proportion of outliers in the data set.\n\n        Returns:\n            A list of indices of the outliers.\n        \"\"\"\n        model = IsolationForest(contamination=contamination)\n        model.fit(data)\n        predictions = model.predict(data)\n        outliers = np.where(predictions == -1)[0]\n        return outliers.tolist()"
+      },
+      {
+        "name": "_detect_outliers_lof",
+        "ast_hash": "sha256:cc414e9a9b4c3c23",
+        "loc": 15,
+        "source": "def _detect_outliers_lof(self, data: pd.DataFrame, n_neighbors: int = 20) -> List[int]:\n        \"\"\"\n        Detects outliers using Local Outlier Factor (LOF).\n\n        Args:\n            data: A pandas DataFrame containing the data.\n            n_neighbors: Number of neighbors to use by default for kneighbors queries.\n\n        Returns:\n            A list of indices of the outliers.\n        \"\"\"\n        model = LocalOutlierFactor(n_neighbors=n_neighbors)\n        predictions = model.fit_predict(data)\n        outliers = np.where(predictions == -1)[0]\n        return outliers.tolist()"
+      },
+      {
+        "name": "_detect_outliers_one_class_svm",
+        "ast_hash": "sha256:5ae704b51959bc7f",
+        "loc": 16,
+        "source": "def _detect_outliers_one_class_svm(self, data: pd.DataFrame, nu: float = 0.1) -> List[int]:\n        \"\"\"\n        Detects outliers using One-Class SVM.\n\n        Args:\n            data: A pandas DataFrame containing the data.\n            nu: An upper bound on the fraction of training errors and a lower bound of the fraction of support vectors.\n\n        Returns:\n            A list of indices of the outliers.\n        \"\"\"\n        model = OneClassSVM(nu=nu)\n        model.fit(data)\n        predictions = model.predict(data)\n        outliers = np.where(predictions == -1)[0]\n        return outliers.tolist()"
+      },
+      {
+        "name": "_detect_anomalies_clustering",
+        "ast_hash": "sha256:8abe5fcde3b3bdba",
+        "loc": 18,
+        "source": "def _detect_anomalies_clustering(self, data: pd.DataFrame, n_clusters: int = 5) -> List[int]:\n        \"\"\"\n        Detects anomalies using KMeans clustering.\n\n        Args:\n            data: A pandas DataFrame containing the data.\n            n_clusters: The number of clusters to form as well as the number of centroids to generate.\n\n        Returns:\n            A list of indices of the outliers.\n        \"\"\"\n        model = KMeans(n_clusters=n_clusters, n_init=10)\n        model.fit(data)\n        distances = model.transform(data)\n        min_distances = np.min(distances, axis=1)\n        threshold = np.percentile(min_distances, 95)\n        outliers = np.where(min_distances > threshold)[0]\n        return outliers.tolist()"
+      },
+      {
+        "name": "_detect_anomalies_time_series",
+        "ast_hash": "sha256:6ed22cb417888b5f",
+        "loc": 47,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "_get_financial_ratios",
+        "ast_hash": "sha256:e5093737c9129598",
+        "loc": 43,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "_explain_anomaly",
+        "ast_hash": "sha256:a0b65a95547e1669",
+        "loc": 15,
+        "source": "def _explain_anomaly(self, anomaly: Dict, data: pd.DataFrame) -> str:\n        \"\"\"\n        Provides an explanation for a detected anomaly using XAI techniques.\n\n        Args:\n            anomaly: A dictionary representing the detected anomaly.\n            data: A pandas DataFrame containing the relevant data.\n\n        Returns:\n            A string explaining the anomaly.\n        \"\"\"\n        # TODO: Implement XAI explanations using LIME, SHAP, or other techniques\n        # explanation = ...\n        # return explanation\n        pass"
+      },
+      {
+        "name": "detect_market_anomalies",
+        "ast_hash": "sha256:b6d09ffdddad3bc1",
+        "loc": 82,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "detect_company_anomalies",
+        "ast_hash": "sha256:707d49ef15abf420",
+        "loc": 44,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "run",
+        "ast_hash": "sha256:c326ca63aa07a173",
+        "loc": 6,
+        "source": "async def run(self):\n        \"\"\"\n        Runs the AnomalyDetectionAgent to detect anomalies in market and company data.\n        \"\"\"\n        market_anomalies = self.detect_market_anomalies()\n        company_anomalies = self.detect_company_anomalies()"
+      }
+    ]
+  }
+}

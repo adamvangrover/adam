@@ -32,6 +32,7 @@ try:
     from core.v30_architecture.python_intelligence.agents.hardened_shield import HardenedShieldAgent
     from core.v30_architecture.python_intelligence.agents.market_sentiment_agent import MarketSentimentAgent
     from core.v30_architecture.python_intelligence.agents.macro_economic_agent import MacroEconomicAgent
+    from core.v30_architecture.python_intelligence.agents.regulatory_compliance_agent import RegulatoryComplianceAgent
 except ImportError:
     # Fallback for local execution
     import sys
@@ -48,6 +49,7 @@ except ImportError:
     from hardened_shield import HardenedShieldAgent
     from market_sentiment_agent import MarketSentimentAgent
     from macro_economic_agent import MacroEconomicAgent
+    from regulatory_compliance_agent import RegulatoryComplianceAgent
 
 
 class SystemHealth(BaseAgent):
@@ -84,6 +86,7 @@ agents = [
     HardenedShieldAgent(),
     MarketSentimentAgent(),
     MacroEconomicAgent()
+    RegulatoryComplianceAgent()
 ]
 
 # Ensure we maintain strong references to tasks

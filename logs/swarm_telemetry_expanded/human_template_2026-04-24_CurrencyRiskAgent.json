@@ -1,0 +1,61 @@
+{
+  "spec_version": "1.4.0-otel",
+  "timestamp": "2026-04-24T00:13:03.355457Z",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "severity_text": "WARN",
+  "severity_number": 13,
+  "event_name": "swarm.agent.lifecycle.deprecated",
+  "resource": {
+    "service.name": "swarm-orchestrator",
+    "service.version": "4.2.0",
+    "deployment.environment": "production",
+    "node.id": "worker-node-aws-us-east-1a-04"
+  },
+  "attributes": {
+    "agent.id": "CurrencyRiskAgent",
+    "agent.previous_version": "v29.x",
+    "agent.target_version": "v30",
+    "deprecation.reason": "Transitioning to v30 architecture.",
+    "deprecation.action_required": true
+  },
+  "metrics": {
+    "agent.core_logic.function_count": 4,
+    "agent.capabilities.count": 0
+  },
+  "artifacts": {
+    "provenance": {
+      "repository": "git+ssh://repo/core/agents/currency_risk_agent.py",
+      "commit_sha": "a1b2c3d4e5f6g7h8i9j0",
+      "docstring_hash": "sha256:d8c4b12389a..."
+    },
+    "extracted_capabilities": [],
+    "core_logic_signatures": [
+      {
+        "name": "__init__",
+        "ast_hash": "sha256:7bf97a7dad0a32ab",
+        "loc": 2,
+        "source": "def __init__(self, config: Dict[str, Any], **kwargs):\n        super().__init__(config, **kwargs)"
+      },
+      {
+        "name": "execute",
+        "ast_hash": "sha256:b3cccfb81aeff870",
+        "loc": 128,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "_check_ppp",
+        "ast_hash": "sha256:49f100691aed4095",
+        "loc": 23,
+        "source": "def _check_ppp(self, cpi_domestic: float, cpi_foreign: float, spot: float) -> tuple[str, str]:\n        \"\"\"\n        Simplified PPP check.\n        If Inflation Domestic > Inflation Foreign, Domestic Currency should depreciate (Spot rate go up if defined as Dom/For?).\n        Wait, standard quote is usually Base/Quote or Quote/Base.\n        Assuming Spot is Domestic per Foreign Unit (e.g. 150 JPY/USD, if we report in JPY).\n\n        If CPI_Dom (105) > CPI_For (102), then Domestic purchasing power eroded faster.\n        Domestic currency should weaken -> Spot (Dom/For) should rise.\n        \"\"\"\n        # We assume indices started at 100 same time.\n        # Theoretical Spot = Spot_0 * (CPI_Dom / CPI_For)\n        # We don't have Spot_0.\n\n        # We just return the inflation differential signal.\n        inflation_diff = (cpi_domestic - cpi_foreign)\n\n        if inflation_diff > 5:\n            return \"High Inflation Differential\", \"Domestic Currency Overvalued (Pressure to Depreciate)\"\n        elif inflation_diff < -5:\n             return \"Low Inflation Differential\", \"Domestic Currency Undervalued (Pressure to Appreciate)\"\n        else:\n             return \"Stable\", \"Neutral\""
+      },
+      {
+        "name": "_calculate_carry_score",
+        "ast_hash": "sha256:022d7043aacef863",
+        "loc": 10,
+        "source": "def _calculate_carry_score(self, r_dom: float, r_for: float, vol: float) -> float:\n        \"\"\"\n        Carry Score = (r_foreign - r_domestic) / Volatility\n        Assumes we are Long Foreign, Short Domestic.\n        If we hold foreign currency, we earn r_for, pay r_dom.\n        \"\"\"\n        carry = r_for - r_dom\n        if vol == 0: return 0.0\n\n        return float(carry / vol)"
+      }
+    ]
+  }
+}

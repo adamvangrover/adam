@@ -1,0 +1,66 @@
+{
+  "spec_version": "1.4.0-otel",
+  "timestamp": "2026-04-24T00:13:03.355457Z",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "severity_text": "WARN",
+  "severity_number": 13,
+  "event_name": "swarm.agent.lifecycle.deprecated",
+  "resource": {
+    "service.name": "swarm-orchestrator",
+    "service.version": "4.2.0",
+    "deployment.environment": "production",
+    "node.id": "worker-node-aws-us-east-1a-04"
+  },
+  "attributes": {
+    "agent.id": "IndustrySpecialistAgent",
+    "agent.previous_version": "v29.x",
+    "agent.target_version": "v30",
+    "deprecation.reason": "Transitioning to v30 architecture.",
+    "deprecation.action_required": true
+  },
+  "metrics": {
+    "agent.core_logic.function_count": 5,
+    "agent.capabilities.count": 0
+  },
+  "artifacts": {
+    "provenance": {
+      "repository": "git+ssh://repo/core/agents/industry_specialist_agent.py",
+      "commit_sha": "a1b2c3d4e5f6g7h8i9j0",
+      "docstring_hash": "sha256:d8c4b12389a..."
+    },
+    "extracted_capabilities": [],
+    "core_logic_signatures": [
+      {
+        "name": "__init__",
+        "ast_hash": "sha256:73fd0d59c4b6033f",
+        "loc": 11,
+        "source": "def __init__(self, config: Dict[str, Any], kernel: Optional[Any] = None):\n        \"\"\"\n        Initializes the Industry Specialist Agent.\n\n        Args:\n            config (dict): Configuration dictionary.\n            kernel (Optional[Any]): Semantic Kernel instance.\n        \"\"\"\n        super().__init__(config, kernel=kernel)\n        self.sector = self.config.get('sector', 'technology')  # Default to technology sector\n        self.specialist = self.load_specialist(self.sector)"
+      },
+      {
+        "name": "load_specialist",
+        "ast_hash": "sha256:8f0181ef0d97f513",
+        "loc": 21,
+        "source": "def load_specialist(self, sector):\n        \"\"\"\n        Dynamically loads the industry specialist module for the given sector.\n\n        Args:\n            sector (str): The name of the sector.\n\n        Returns:\n            object: An instance of the industry specialist class.\n        \"\"\"\n        try:\n            module = importlib.import_module(f\"core.agents.industry_specialists.{sector}\")\n            class_name = sector.capitalize() + \"Specialist\"  # Example: TechnologySpecialist\n            specialist_class = getattr(module, class_name)\n            return specialist_class(self.config)  # Instantiate the specialist class\n        except ImportError:\n            logger.warning(f\"No specialist found for sector: {sector}. Using generic fallback.\")\n            return None\n        except Exception as e:\n            logger.error(f\"Error loading specialist for {sector}: {e}\")\n            return None"
+      },
+      {
+        "name": "execute",
+        "ast_hash": "sha256:a00b2376c28a051f",
+        "loc": 21,
+        "source": "async def execute(self, *args, **kwargs):\n        \"\"\"\n        Executes industry analysis tasks.\n\n        Tasks:\n        - \"analyze_industry\": Analyzes overall industry trends.\n        - \"analyze_company\": Analyzes a specific company in the sector.\n        \"\"\"\n        task = kwargs.get('task')\n        logger.info(f\"IndustrySpecialistAgent ({self.sector}) executing task: {task}\")\n\n        if task == \"analyze_industry\":\n            return self.analyze_industry()\n\n        elif task == \"analyze_company\":\n            company_data = kwargs.get(\"company_data\", {})\n            return self.analyze_company(company_data)\n\n        else:\n            logger.warning(f\"Unknown task: {task}\")\n            return {\"error\": f\"Unknown task: {task}\"}"
+      },
+      {
+        "name": "analyze_industry",
+        "ast_hash": "sha256:d2549e2b5001bf80",
+        "loc": 18,
+        "source": "def analyze_industry(self):\n        \"\"\"\n        Analyzes the industry trends for the specified sector.\n\n        Returns:\n            dict: A dictionary containing industry trends and insights.\n        \"\"\"\n        if self.specialist:\n            trends = self.specialist.analyze_industry_trends()\n            # Send trends to message queue (Legacy support)\n            try:\n                message = {'agent': 'industry_specialist_agent', 'sector': self.sector, 'trends': trends}\n            except Exception as e:\n                logger.warning(f\"Failed to send legacy message: {e}\")\n            return trends\n        else:\n            logger.warning(f\"No specialist loaded for sector: {self.sector}\")\n            return {\"status\": \"No specialist loaded\", \"sector\": self.sector}"
+      },
+      {
+        "name": "analyze_company",
+        "ast_hash": "sha256:484bb841d87eeba1",
+        "loc": 25,
+        "source": "def analyze_company(self, company_data):\n        \"\"\"\n        Analyzes a company within the specified sector.\n\n        Args:\n            company_data (dict): Data about the company.\n\n        Returns:\n            dict: A dictionary containing company analysis results.\n        \"\"\"\n        if self.specialist:\n            analysis_results = self.specialist.analyze_company(company_data)\n            # Send analysis results to message queue (Legacy support)\n            try:\n                message = {\n                    'agent': 'industry_specialist_agent',\n                    'sector': self.sector,\n                    'company_analysis': analysis_results\n                }\n            except Exception as e:\n                logger.warning(f\"Failed to send legacy message: {e}\")\n            return analysis_results\n        else:\n            logger.warning(f\"No specialist loaded for sector: {self.sector}\")\n            return {\"status\": \"No specialist loaded\", \"sector\": self.sector}"
+      }
+    ]
+  }
+}

@@ -1,0 +1,74 @@
+{
+  "spec_version": "1.4.0-otel",
+  "timestamp": "2026-04-24T00:13:03.355457Z",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "severity_text": "WARN",
+  "severity_number": 13,
+  "event_name": "swarm.agent.lifecycle.deprecated",
+  "resource": {
+    "service.name": "swarm-orchestrator",
+    "service.version": "4.2.0",
+    "deployment.environment": "production",
+    "node.id": "worker-node-aws-us-east-1a-04"
+  },
+  "attributes": {
+    "agent.id": "InstitutionalTrendAgent",
+    "agent.previous_version": "v29.x",
+    "agent.target_version": "v30",
+    "deprecation.reason": "Transitioning to v30 architecture.",
+    "deprecation.action_required": true
+  },
+  "metrics": {
+    "agent.core_logic.function_count": 6,
+    "agent.capabilities.count": 0
+  },
+  "artifacts": {
+    "provenance": {
+      "repository": "git+ssh://repo/core/agents/specialized/institutional_trend_agent.py",
+      "commit_sha": "a1b2c3d4e5f6g7h8i9j0",
+      "docstring_hash": "sha256:d8c4b12389a..."
+    },
+    "extracted_capabilities": [],
+    "core_logic_signatures": [
+      {
+        "name": "__init__",
+        "ast_hash": "sha256:aaddb182a846d126",
+        "loc": 22,
+        "source": "def __init__(self, config: Dict[str, Any] = None, **kwargs):\n        if config is None:\n            config = {}\n        super().__init__(config, **kwargs)\n\n        # --- HARD SKILL COMPONENTS (Data Fetching) ---\n        self.handler = Sec13FHandler()\n        # Default watchlist \"The Old Guard & The Quants\"\n        self.watchlist = config.get(\"watchlist\", {\n            \"Berkshire Hathaway\": \"0001067983\",\n            \"Renaissance Technologies\": \"0001037389\",\n            \"Bridgewater Associates\": \"0001350694\",\n            \"Citadel Advisors\": \"0001423053\"\n        })\n\n        # --- SOFT SKILL COMPONENTS (Cognition) ---\n        self.persona = \"Chief Investment Strategist\"\n        # Prompt-as-Code file path\n        self.prompt_path = config.get(\n            \"prompt_path\",\n            \"prompt_library/AOPL-v1.0/professional_outcomes/LIB-PRO-010_quarterly_trend_monitor.md\"\n        )"
+      },
+      {
+        "name": "execute",
+        "ast_hash": "sha256:8ed9d96a286d628a",
+        "loc": 30,
+        "source": "async def execute(self, *args, **kwargs) -> Dict[str, Any]:\n        \"\"\"\n        Orchestrates the pipeline: Fetch -> Calculate Delta -> Synthesize.\n        \"\"\"\n        logger.info(\"Executing Institutional Trend Analysis...\")\n\n        # 1. Context Extraction\n        task = kwargs.get(\"task\", \"analyze\")\n        period = kwargs.get(\"period\", \"2025-Q3\")\n\n        # 2. Hard Logic Execution (The Quant Layer)\n        if task in [\"analyze\", \"synthesis\"]:\n            try:\n                quantitative_data = self._run_quantitative_analysis(period)\n            except Exception as e:\n                logger.error(f\"Failed to run quantitative analysis: {e}\")\n                return {\"error\": str(e)}\n        else:\n            return {\"error\": f\"Unknown task: {task}\"}\n\n        # 3. Cognitive Execution (The LLM Layer)\n        # We convert the structured quantitative data into a context string for the LLM\n        report_content = await self._synthesize_intelligence(quantitative_data, period)\n\n        return {\n            \"report_type\": \"Quarterly Trend Monitor\",\n            \"period\": period,\n            \"quantitative_metrics\": quantitative_data,  # Return raw data for UI/Charts\n            \"synthesis\": report_content  # Return LLM narrative\n        }"
+      },
+      {
+        "name": "_run_quantitative_analysis",
+        "ast_hash": "sha256:5e6c2491ae3e26d9",
+        "loc": 43,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "_synthesize_intelligence",
+        "ast_hash": "sha256:784528b9217b9f5d",
+        "loc": 37,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "_get_previous_period",
+        "ast_hash": "sha256:3d0e019d04d1a435",
+        "loc": 14,
+        "source": "def _get_previous_period(self, period: str) -> str:\n        \"\"\"\n        Utility to calculate previous quarter.\n        \"\"\"\n        if \"Q3\" in period:\n            return period.replace(\"Q3\", \"Q2\")\n        elif \"Q2\" in period:\n            return period.replace(\"Q2\", \"Q1\")\n        elif \"Q1\" in period:\n            year = int(period.split('-')[0]) - 1\n            return f\"{year}-Q4\"\n        elif \"Q4\" in period:\n            return period.replace(\"Q4\", \"Q3\")\n        return period"
+      },
+      {
+        "name": "_mock_generation",
+        "ast_hash": "sha256:bb2d5ee0705a8898",
+        "loc": 13,
+        "source": "def _mock_generation(self, raw_data: str) -> str:\n        \"\"\"\n        Fallback generator if LLM is offline.\n        \"\"\"\n        return f\"\"\"\n        ## Offline Analysis Mode\n        System could not connect to Cognitive Kernel. \n        \n        Data processed successfully:\n        {raw_data[:500]}...\n        \n        (Please check LLM configuration)\n        \"\"\""
+      }
+    ]
+  }
+}

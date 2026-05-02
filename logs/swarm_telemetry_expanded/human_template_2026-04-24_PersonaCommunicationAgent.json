@@ -1,0 +1,48 @@
+{
+  "spec_version": "1.4.0-otel",
+  "timestamp": "2026-04-24T00:13:03.355457Z",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "severity_text": "WARN",
+  "severity_number": 13,
+  "event_name": "swarm.agent.lifecycle.deprecated",
+  "resource": {
+    "service.name": "swarm-orchestrator",
+    "service.version": "4.2.0",
+    "deployment.environment": "production",
+    "node.id": "worker-node-aws-us-east-1a-04"
+  },
+  "attributes": {
+    "agent.id": "PersonaCommunicationAgent",
+    "agent.previous_version": "v29.x",
+    "agent.target_version": "v30",
+    "deprecation.reason": "Transitioning to v30 architecture.",
+    "deprecation.action_required": true
+  },
+  "metrics": {
+    "agent.core_logic.function_count": 2,
+    "agent.capabilities.count": 0
+  },
+  "artifacts": {
+    "provenance": {
+      "repository": "git+ssh://repo/core/agents/meta_agents/persona_communication_agent.py",
+      "commit_sha": "a1b2c3d4e5f6g7h8i9j0",
+      "docstring_hash": "sha256:d8c4b12389a..."
+    },
+    "extracted_capabilities": [],
+    "core_logic_signatures": [
+      {
+        "name": "__init__",
+        "ast_hash": "sha256:7bf97a7dad0a32ab",
+        "loc": 2,
+        "source": "def __init__(self, config: Dict[str, Any], **kwargs):\n        super().__init__(config, **kwargs)"
+      },
+      {
+        "name": "execute",
+        "ast_hash": "sha256:7f6c6ab4c37ba464",
+        "loc": 12,
+        "source": "async def execute(self, *args: Any, **kwargs: Any) -> Any:\n        \"\"\"\n        Main execution method for the PersonaCommunicationAgent.\n        This agent will tailor output for different user personas.\n        \"\"\"\n        # Placeholder implementation\n        print(\"Executing PersonaCommunicationAgent\")\n        # In a real implementation, this would involve:\n        # 1. Receiving content and a target persona.\n        # 2. Reformatting the content for the persona (e.g., analyst, manager).\n        # 3. Returning the tailored content.\n        return {\"status\": \"success\", \"data\": \"persona-specific communication\"}"
+      }
+    ]
+  }
+}

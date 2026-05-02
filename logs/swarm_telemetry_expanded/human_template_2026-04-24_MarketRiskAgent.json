@@ -1,0 +1,91 @@
+{
+  "spec_version": "1.4.0-otel",
+  "timestamp": "2026-04-24T00:13:03.355457Z",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "severity_text": "WARN",
+  "severity_number": 13,
+  "event_name": "swarm.agent.lifecycle.deprecated",
+  "resource": {
+    "service.name": "swarm-orchestrator",
+    "service.version": "4.2.0",
+    "deployment.environment": "production",
+    "node.id": "worker-node-aws-us-east-1a-04"
+  },
+  "attributes": {
+    "agent.id": "MarketRiskAgent",
+    "agent.previous_version": "v29.x",
+    "agent.target_version": "v30",
+    "deprecation.reason": "Transitioning to v30 architecture.",
+    "deprecation.action_required": true
+  },
+  "metrics": {
+    "agent.core_logic.function_count": 9,
+    "agent.capabilities.count": 0
+  },
+  "artifacts": {
+    "provenance": {
+      "repository": "git+ssh://repo/core/agents/market_risk_agent.py",
+      "commit_sha": "a1b2c3d4e5f6g7h8i9j0",
+      "docstring_hash": "sha256:d8c4b12389a..."
+    },
+    "extracted_capabilities": [],
+    "core_logic_signatures": [
+      {
+        "name": "__init__",
+        "ast_hash": "sha256:409006174caabbb7",
+        "loc": 4,
+        "source": "def __init__(self, config: Dict[str, Any], **kwargs):\n        super().__init__(config, **kwargs)\n        self.confidence_level = self.config.get(\"confidence_level\", 0.95)\n        self.decay_factor = self.config.get(\"ewma_decay\", 0.94)"
+      },
+      {
+        "name": "execute",
+        "ast_hash": "sha256:64dd7a47879ae3e5",
+        "loc": 82,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "_calculate_ewma_volatility",
+        "ast_hash": "sha256:ba61e7636490ff8e",
+        "loc": 22,
+        "source": "def _calculate_ewma_volatility(self, returns: np.ndarray) -> float:\n        \"\"\"Calculates Exponentially Weighted Moving Average (EWMA) Volatility.\"\"\"\n        if len(returns) == 0:\n            return 0.0\n\n        # We can implement a simple recursive calculation or a weighted sum.\n        # For efficiency on short arrays, weighted sum is fine.\n        # Weights: (1-lambda) * lambda^i for i=0 to T-1 (where i=0 is most recent)\n\n        T = len(returns)\n        # Reverse returns so index 0 is most recent\n        r_reversed = returns[::-1]\n\n        weights = np.array([(1 - self.decay_factor) * (self.decay_factor ** i) for i in range(T)])\n\n        # Normalize weights to sum to 1 (handling finite window truncation)\n        weights = weights / weights.sum()\n\n        weighted_sq_returns = np.sum(weights * (r_reversed ** 2))\n        daily_ewma = np.sqrt(weighted_sq_returns)\n\n        return float(daily_ewma * np.sqrt(252))"
+      },
+      {
+        "name": "_calculate_var",
+        "ast_hash": "sha256:0aebc3e345d34dc6",
+        "loc": 12,
+        "source": "def _calculate_var(self, returns: np.ndarray) -> float:\n        \"\"\"Calculates Value at Risk at the configured confidence level (returns positive loss %).\"\"\"\n        if SCIPY_AVAILABLE:\n            mean = np.mean(returns)\n            std = np.std(returns)\n            quantile = 1.0 - self.confidence_level\n            cutoff = norm.ppf(quantile, mean, std)\n            return float(-cutoff)\n        else:\n             # Historical simulation\n             quantile = 1.0 - self.confidence_level\n             return float(-np.percentile(returns, quantile * 100))"
+      },
+      {
+        "name": "_calculate_cvar",
+        "ast_hash": "sha256:bab4ae07086f81fb",
+        "loc": 25,
+        "source": "def _calculate_cvar(self, returns: np.ndarray) -> float:\n        \"\"\"Calculates Conditional Value at Risk (Expected Shortfall).\"\"\"\n        quantile = 1.0 - self.confidence_level\n        if SCIPY_AVAILABLE:\n             # Parametric CVaR under Normal assumption\n             mean = np.mean(returns)\n             std = np.std(returns)\n             # ES = - (mu - sigma * (pdf(norm.ppf(alpha)) / alpha))\n             # where alpha is the significance level (e.g., 0.05)\n\n             z_score = norm.ppf(quantile)\n             pdf_val = norm.pdf(z_score)\n\n             # Formula for Expected Shortfall for normal distribution:\n             # ES = -mean + sigma * pdf(z) / alpha\n             es = -mean + std * (pdf_val / quantile)\n             return float(es)\n        else:\n             # Historical CVaR\n             cutoff = np.percentile(returns, quantile * 100)\n             # Filter returns worse than cutoff\n             tail_losses = returns[returns <= cutoff]\n             if len(tail_losses) == 0:\n                 return float(-cutoff)\n             return float(-np.mean(tail_losses))"
+      },
+      {
+        "name": "_calculate_beta",
+        "ast_hash": "sha256:ad32db7207459b97",
+        "loc": 12,
+        "source": "def _calculate_beta(self, asset_returns: np.ndarray, benchmark_returns: np.ndarray) -> float:\n        \"\"\"Calculates Beta relative to a benchmark.\"\"\"\n        if len(asset_returns) != len(benchmark_returns):\n            return 0.0\n\n        cov_matrix = np.cov(asset_returns, benchmark_returns)\n        covariance = cov_matrix[0][1]\n        variance = cov_matrix[1][1]\n\n        if variance == 0:\n            return 0.0\n        return covariance / variance"
+      },
+      {
+        "name": "_run_stress_test",
+        "ast_hash": "sha256:8bc85a27da9008d1",
+        "loc": 18,
+        "source": "def _run_stress_test(self, returns: np.ndarray) -> Dict[str, float]:\n        \"\"\"Simulates various stress scenarios based on historical or hypothetical shocks.\"\"\"\n        current_vol = np.std(returns)\n\n        # 3-Sigma Event\n        sigma_3_shock = float(np.mean(returns) - 3 * current_vol)\n\n        # 6-Sigma Event (Black Swan)\n        sigma_6_shock = float(np.mean(returns) - 6 * current_vol)\n\n        return {\n            \"historical_2008_crash\": 0.40, # 40% loss\n            \"historical_covid_crash\": 0.30, # 30% loss\n            \"hypothetical_mild_recession\": 0.15,\n            \"statistical_3_sigma_shock\": abs(sigma_3_shock),\n            \"statistical_6_sigma_shock\": abs(sigma_6_shock),\n            \"correlation_breakdown_shock\": 0.25 # Assumption: diversification fails\n        }"
+      },
+      {
+        "name": "_calculate_sortino_ratio",
+        "ast_hash": "sha256:cbe94ee68926d1df",
+        "loc": 18,
+        "source": "def _calculate_sortino_ratio(self, returns: np.ndarray, target_return: float = 0.0) -> float:\n        \"\"\"Calculates Sortino Ratio (Return / Downside Deviation).\"\"\"\n        mean_return = np.mean(returns)\n\n        # Downside deviation: only consider returns below target\n        downside_returns = returns[returns < target_return]\n\n        if len(downside_returns) == 0:\n            return 0.0 # No downside risk?\n\n        downside_deviation = np.std(downside_returns)\n\n        if downside_deviation == 0:\n            return 0.0\n\n        # Annualized Sortino (assuming daily returns)\n        sortino = (mean_return - target_return) / downside_deviation\n        return float(sortino * np.sqrt(252))"
+      },
+      {
+        "name": "_calculate_max_drawdown",
+        "ast_hash": "sha256:9b1c755d90bb7963",
+        "loc": 15,
+        "source": "def _calculate_max_drawdown(self, prices: np.ndarray) -> float:\n        \"\"\"Calculates Maximum Drawdown from peak.\"\"\"\n        if len(prices) < 2:\n            return 0.0\n\n        # Calculate running maximum\n        running_max = np.maximum.accumulate(prices)\n\n        # Calculate drawdown for each point\n        drawdowns = (prices - running_max) / running_max\n\n        # Max drawdown is the minimum (most negative) value\n        max_dd = np.min(drawdowns)\n\n        return float(abs(max_dd))"
+      }
+    ]
+  }
+}

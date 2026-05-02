@@ -1,0 +1,1502 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OMNIPRESENCE // ADAM V50.0 // 2026.04.28</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;700&family=Inter:wght@300;400;600;800&family=Oswald:wght@300;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Scripts -->
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Tailwind Custom Configuration -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['Fira Code', 'monospace'],
+                        display: ['Oswald', 'sans-serif'],
+                    },
+                    colors: {
+                        void: '#010308',
+                        panel: '#090f1a',
+                        // Map primary/secondary to CSS variables for dynamic theming
+                        primary: 'rgb(var(--color-primary) / <alpha-value>)',
+                        secondary: 'rgb(var(--color-secondary) / <alpha-value>)',
+                        accent: 'rgb(var(--color-accent) / <alpha-value>)',
+                        core: {
+                            muted: '#475569',
+                            border: '#1e293b'
+                        }
+                    },
+                    backgroundImage: {
+                        'hex-pattern': 'url("data:image/svg+xml,%3Csvg width=\'60\' height=\'103.92304845413264\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M30 103.92304845413264l-30-17.320508075688775v-34.64101615137755l30-17.320508075688775 30 17.320508075688775v34.64101615137755zM15 77.94228634059948l15 8.660254037844386 15-8.660254037844386v-17.32050807568877l-15-8.660254037844386-15 8.660254037844386z\' fill=\'%23ffffff\' fill-opacity=\'0.015\' fill-rule=\'evenodd\'/%3E%3C/svg%3E")',
+                        'scanline': 'linear-gradient(to bottom, transparent 50%, rgba(0, 0, 0, 0.3) 51%)'
+                    },
+                    animation: {
+                        'ticker': 'ticker 40s linear infinite',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'scroll-up': 'scrollUp 35s linear infinite',
+                        'flash-red': 'flashRed 2s infinite',
+                    },
+                    keyframes: {
+                        ticker: { '0%': { transform: 'translateX(100vw)' }, '100%': { transform: 'translateX(-100%)' } },
+                        scrollUp: { '0%': { transform: 'translateY(0)' }, '100%': { transform: 'translateY(-50%)' } },
+                        flashRed: { '0%, 100%': { opacity: 1 }, '50%': { opacity: 0.3 } }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        /* Dynamic Theme Variables */
+        :root {
+            --color-primary: 0 229 255;   /* Cyan */
+            --color-secondary: 255 170 0; /* Amber */
+            --color-accent: 255 30 56;    /* Red */
+        }
+        body.theme-red {
+            --color-primary: 255 30 56;   /* Red */
+            --color-secondary: 255 170 0; /* Amber */
+            --color-accent: 0 229 255;    /* Cyan */
+        }
+        body.theme-green {
+            --color-primary: 0 250 154;   /* Green */
+            --color-secondary: 0 229 255; /* Cyan */
+            --color-accent: 181 60 255;   /* Purple */
+        }
+
+        /* Scrollbars */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #010308; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgb(var(--color-primary)); }
+
+        body { background-color: #010308; color: #cbd5e1; overflow: hidden; }
+
+        /* Overlays */
+        .crt-overlay {
+            position: fixed; inset: 0; pointer-events: none; z-index: 9999;
+            background-image: var(--scanline); background-size: 100% 4px;
+            opacity: 0.15; mix-blend-mode: overlay;
+        }
+        .vignette {
+            position: fixed; inset: 0; pointer-events: none; z-index: 9998;
+            box-shadow: inset 0 0 150px rgba(0,0,0,0.9);
+        }
+
+        /* Glass & Glow using dynamic vars */
+        .glass-panel {
+            background: rgba(9, 15, 26, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s ease;
+        }
+        .glass-panel:hover { border-color: rgba(var(--color-primary), 0.3); }
+        
+        .glow-primary { text-shadow: 0 0 12px rgba(var(--color-primary), 0.8); }
+        .glow-secondary { text-shadow: 0 0 12px rgba(var(--color-secondary), 0.8); }
+        .glow-accent { text-shadow: 0 0 12px rgba(var(--color-accent), 0.8); }
+        
+        .box-glow-primary { box-shadow: 0 0 15px rgba(var(--color-primary), 0.2); }
+        .box-glow-secondary { box-shadow: 0 0 15px rgba(var(--color-secondary), 0.2); }
+        .box-glow-accent { box-shadow: 0 0 15px rgba(var(--color-accent), 0.2); }
+
+        /* Utilities */
+        .data-row:hover td { background-color: rgba(var(--color-primary), 0.05); }
+        .clip-path-angled { clip-path: polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%); }
+
+        /* Custom Prose Tweaks */
+        .prose h1, .prose h2, .prose h3, .prose h4 { font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 1px; color: #fff; margin-bottom: 1rem; }
+        .prose h1 { border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.5rem; margin-bottom: 1.5rem; font-size: 2rem; }
+        .prose h2 { color: rgb(var(--color-primary)); margin-top: 2rem; font-size: 1.5rem; }
+        .prose h3 { color: rgb(var(--color-secondary)); margin-top: 1.5rem; font-size: 1.25rem; }
+        .prose p { margin-bottom: 1.25rem; line-height: 1.7; }
+        .prose strong { color: #fff; }
+        .prose a { color: rgb(var(--color-primary)); text-decoration: none; border-bottom: 1px dashed rgb(var(--color-primary)); }
+
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        .typing-indicator span { display: inline-block; width: 4px; height: 4px; background-color: rgb(var(--color-primary)); border-radius: 50%; animation: typing 1.4s infinite ease-in-out both; margin: 0 2px; }
+        .typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
+        .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes typing { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
+
+        /* Probability Bars */
+        .prob-bar-container { width: 100%; background-color: rgba(255,255,255,0.05); border-radius: 4px; overflow: hidden; height: 1.5rem; display: flex; }
+        .prob-bar-fill { height: 100%; display: flex; align-items: center; padding-left: 0.5rem; font-size: 0.65rem; font-family: 'Fira Code', monospace; color: #000; font-weight: bold; transition: width 1s ease-in-out; }
+    </style>
+</head>
+<body class="h-screen w-screen flex flex-col selection:bg-primary selection:text-black relative theme-cyan" id="appBody">
+    <div class="crt-overlay"></div>
+    <div class="vignette"></div>
+    <div class="absolute inset-0 bg-hex-pattern opacity-30 z-0 pointer-events-none"></div>
+
+    <!-- HEADER / COMMAND BAR -->
+    <header class="h-16 border-b border-core-border bg-panel/90 backdrop-blur-md flex items-center justify-between px-4 shrink-0 z-30 relative shadow-2xl">
+        <div class="absolute bottom-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-primary/50 to-transparent"></div>
+        
+        <div class="flex items-center gap-4">
+            <div class="w-10 h-10 rounded border border-primary/50 bg-primary/10 flex items-center justify-center box-glow-primary">
+                <span class="font-display font-bold text-primary text-xl leading-none tracking-tighter">A50</span>
+            </div>
+            <div class="flex flex-col justify-center">
+                <h1 class="font-display font-bold text-white text-lg uppercase leading-none tracking-widest">Adam Omnipresence</h1>
+                <span class="font-mono text-[10px] text-primary uppercase tracking-widest mt-1">v50.0 // ML Reinforcement Core</span>
+            </div>
+        </div>
+
+        <div class="hidden md:flex flex-1 max-w-2xl mx-8 relative group">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg class="h-4 w-4 text-primary/70" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            </div>
+            <input type="text" class="block w-full pl-10 pr-3 py-1.5 border border-core-border rounded bg-void/50 text-white font-mono text-xs placeholder-slate-500 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" placeholder="Query macro matrix or execute override (e.g., /route PLTR)...">
+            <div class="absolute inset-y-0 right-0 pr-2 flex items-center">
+                <span class="text-[9px] font-mono text-core-muted border border-core-border px-1.5 rounded bg-void">⌘K</span>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-5">
+            <div class="hidden lg:flex items-center gap-3">
+                <span class="text-[10px] font-mono text-slate-400">THEME:</span>
+                <select id="themeSelector" onchange="changeTheme(this.value)" class="bg-void border border-core-border text-primary font-mono text-xs p-1.5 rounded outline-none focus:border-primary">
+                    <option value="theme-cyan">Protocol: Cyber Cyan</option>
+                    <option value="theme-red">Protocol: Terminal Red (Degraded)</option>
+                    <option value="theme-green">Protocol: Matrix Green (Secure)</option>
+                </select>
+            </div>
+
+            <div class="hidden lg:flex items-center gap-4 font-mono text-[10px]">
+                <div class="flex flex-col text-right">
+                    <span class="text-slate-400">SYS_CLOCK</span>
+                    <span class="text-white font-bold tracking-wider" id="sysClock">00:00:00 UTC</span>
+                </div>
+                <div class="h-8 w-px bg-core-border"></div>
+                <div class="flex flex-col text-right">
+                    <span class="text-slate-400">RLHF_STATUS</span>
+                    <span class="text-primary font-bold tracking-wider animate-pulse glow-primary">OPTIMIZING</span>
+                </div>
+            </div>
+            
+            <button onclick="toggleAI()" class="clip-path-angled bg-primary/10 border border-primary text-primary hover:bg-primary hover:text-black px-6 py-2 font-display text-sm font-bold transition-all box-glow-primary tracking-widest uppercase cursor-pointer relative z-50">
+                Engage AI
+            </button>
+        </div>
+    </header>
+
+    <!-- MAIN BENTO GRID LAYOUT -->
+    <main class="flex-1 flex overflow-hidden relative z-10 p-3 md:p-4 gap-4">
+        
+        <!-- LEFT COLUMN: Navigation & Telemetry -->
+        <aside class="w-72 flex flex-col gap-4 hidden xl:flex shrink-0 h-full">
+            <!-- Nav Routing -->
+            <div class="glass-panel rounded flex-1 border-t-2 border-t-primary flex flex-col overflow-hidden">
+                <div class="p-3 border-b border-core-border bg-black/40">
+                    <h2 class="font-mono text-[10px] text-slate-400 tracking-widest uppercase">Data Topography</h2>
+                </div>
+                <nav id="moduleNav" class="flex-1 p-2 space-y-1 overflow-y-auto scrollbar-hide"></nav>
+            </div>
+
+            <!-- Live Telemetry Feed -->
+            <div class="glass-panel rounded h-[35%] border-t-2 border-t-secondary flex flex-col overflow-hidden relative shrink-0">
+                <div class="absolute top-0 right-0 w-24 h-24 bg-secondary/10 blur-2xl rounded-full"></div>
+                <div class="p-3 border-b border-core-border bg-black/40 flex justify-between items-center z-10">
+                    <h2 class="font-mono text-[10px] text-secondary tracking-widest uppercase flex items-center gap-2">
+                        <span class="w-1.5 h-1.5 bg-secondary rounded-full animate-pulse"></span> RLHF Pipeline
+                    </h2>
+                </div>
+                <div class="flex-1 bg-void p-3 overflow-hidden relative z-10 border-t border-black shadow-inner">
+                    <div class="animate-scroll-up font-mono text-[9px] text-primary/80 leading-relaxed space-y-2">
+                        <p>> EPOCH 4022: Start ... <span class="text-white">OK</span></p>
+                        <p>> INGEST: SEC_14A_8_PROXY [IMKTA] ... <span class="text-white">OK</span></p>
+                        <p>> PARSE: ISS_GlassLewis_Align ... <span class="text-secondary">SWEEP_DETECTED</span></p>
+                        <p>> ALERT: Envoy_Recall_Confirm ... <span class="text-accent">HORMUZ_CLOSED</span></p>
+                        <p>> WEIGHT_ADJ: Maritime Friction ... <span class="text-primary">w=0.95</span></p>
+                        <p>> CALC: OAS_Spread_Widen ... <span class="text-accent">296bps (TRAP)</span></p>
+                        <p>> INGEST: ICE_BofA_HY_Index ... <span class="text-white">OK</span></p>
+                        <p>> MONTE_CARLO: S&P_500 7-Day ... <span class="text-secondary">RUNNING</span></p>
+                        <p>> INGEST: US_COURT_OAKLAND_0428 ... <span class="text-white">OK</span></p>
+                        <p>> PARSE: Musk_v_Altman_Subpoena ... <span class="text-accent">BROCKMAN_DIARY</span></p>
+                        <p>> INGEST: SEC_EDGAR_8K [SEER] ... <span class="text-white">OK</span></p>
+                        <p>> PARSE: Board_Rejection_Bid ... <span class="text-primary">PROXY_WAR_ACTIVE</span></p>
+                        <p>> SRMLG: PROB_CURVE_UPDATE ... <span class="text-accent">DEBT_DOWNGRADE_PRICED</span></p>
+                        
+                        <!-- Duplicate for seamless scroll loop -->
+                        <p>> EPOCH 4023: Start ... <span class="text-white">OK</span></p>
+                        <p>> INGEST: SEC_14A_8_PROXY [IMKTA] ... <span class="text-white">OK</span></p>
+                        <p>> PARSE: ISS_GlassLewis_Align ... <span class="text-secondary">SWEEP_DETECTED</span></p>
+                        <p>> ALERT: Envoy_Recall_Confirm ... <span class="text-accent">HORMUZ_CLOSED</span></p>
+                        <p>> WEIGHT_ADJ: Maritime Friction ... <span class="text-primary">w=0.95</span></p>
+                        <p>> CALC: OAS_Spread_Widen ... <span class="text-accent">296bps (TRAP)</span></p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- CENTER GRID: Dashboard Bento Box -->
+        <section class="flex-1 flex flex-col gap-4 overflow-y-auto pr-2 scrollbar-hide relative z-10" id="mainScrollArea">
+            
+            <!-- Top Row: Key Metrics -->
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 shrink-0">
+                <div class="glass-panel p-4 rounded border-b-2 border-b-accent flex flex-col justify-between">
+                    <span class="font-mono text-[10px] text-slate-400 uppercase tracking-widest mb-1">SPX 500 (Ghost)</span>
+                    <div class="flex items-end justify-between">
+                        <span class="font-display text-2xl xl:text-3xl font-bold text-white tracking-tight">7,138.24</span>
+                        <span class="font-mono text-xs text-accent mb-1">-0.49%</span>
+                    </div>
+                </div>
+                <div class="glass-panel p-4 rounded border-b-2 border-b-accent flex flex-col justify-between box-glow-accent">
+                    <span class="font-mono text-[10px] text-slate-400 uppercase tracking-widest mb-1">10Y Backbone</span>
+                    <div class="flex items-end justify-between">
+                        <span class="font-display text-2xl xl:text-3xl font-bold text-accent glow-accent tracking-tight">4.358%</span>
+                        <span class="font-mono text-xs text-accent mb-1">+4.2bps</span>
+                    </div>
+                </div>
+                <div class="glass-panel p-4 rounded border-b-2 border-b-secondary flex flex-col justify-between box-glow-secondary">
+                    <span class="font-mono text-[10px] text-slate-400 uppercase tracking-widest mb-1">Brent Entropy</span>
+                    <div class="flex items-end justify-between">
+                        <span class="font-display text-2xl xl:text-3xl font-bold text-secondary tracking-tight glow-secondary">$104.51</span>
+                        <span class="font-mono text-xs text-secondary mb-1">+2.82%</span>
+                    </div>
+                </div>
+                <div class="glass-panel p-4 rounded border-b-2 border-b-primary flex flex-col justify-between">
+                    <span class="font-mono text-[10px] text-slate-400 uppercase tracking-widest mb-1">BTC Tether</span>
+                    <div class="flex items-end justify-between">
+                        <span class="font-display text-2xl xl:text-3xl font-bold text-white tracking-tight">76,366</span>
+                        <span class="font-mono text-xs text-primary mb-1">-1.3%</span>
+                    </div>
+                </div>
+                <div class="glass-panel p-4 rounded border-b-2 border-b-primary flex flex-col justify-between">
+                    <span class="font-mono text-[10px] text-slate-400 uppercase tracking-widest mb-1">VIX Daemon</span>
+                    <div class="flex items-end justify-between">
+                        <span class="font-display text-2xl xl:text-3xl font-bold text-white tracking-tight">18.05</span>
+                        <span class="font-mono text-xs text-primary mb-1">WAKING</span>
+                    </div>
+                </div>
+                <div class="glass-panel p-4 rounded border-b-2 border-b-accent flex flex-col justify-between box-glow-accent">
+                    <span class="font-mono text-[10px] text-slate-400 uppercase tracking-widest mb-1">HY OAS Spread</span>
+                    <div class="flex items-end justify-between">
+                        <span class="font-display text-2xl xl:text-3xl font-bold text-white tracking-tight">2.96%</span>
+                        <span class="font-mono text-[10px] text-accent mt-1">+16 bps</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Middle Row: Persistent Charts -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 shrink-0 h-64">
+                <div class="lg:col-span-2 glass-panel rounded border border-core-border flex flex-col relative overflow-hidden h-full">
+                    <div class="p-2.5 border-b border-core-border bg-black/30 flex justify-between items-center z-10 shrink-0">
+                        <h2 class="font-display text-sm text-white tracking-wide uppercase m-0">Forward Probability Curves (S&P 500)</h2>
+                        <span class="text-[9px] font-mono text-primary px-2 py-1 rounded bg-primary/10 border border-primary/30">7-DAY MONTE CARLO</span>
+                    </div>
+                    <div class="flex-1 p-2 relative z-10 bg-void/50 w-full h-full">
+                        <canvas id="probabilityChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-1 glass-panel rounded border border-core-border flex flex-col relative h-full">
+                    <div class="p-2.5 border-b border-core-border bg-black/30 z-10 shrink-0">
+                        <h2 class="font-display text-sm text-white tracking-wide uppercase m-0">Threat Topology</h2>
+                    </div>
+                    <div class="flex-1 p-2 relative z-10 flex items-center justify-center bg-void/50 w-full h-full">
+                        <canvas id="radarChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Row: Dynamic Content Module Area -->
+            <div class="flex flex-col flex-1 min-h-[500px]">
+                
+                <!-- Mobile Nav Select -->
+                <select id="mobileNav" onchange="loadModule(parseInt(this.value))" class="xl:hidden w-full bg-panel border border-core-border text-primary font-bold text-sm rounded p-3 mb-4 font-mono outline-none shadow-[0_0_10px_rgba(var(--color-primary),0.1)] focus:border-primary appearance-none"></select>
+
+                <div class="glass-panel rounded border border-core-border flex flex-col shadow-[0_15px_40px_rgba(0,0,0,0.6)] flex-1 overflow-hidden relative">
+                    <div class="p-4 border-b border-core-border bg-black/60 flex flex-wrap gap-2 justify-between items-center shrink-0 sticky top-0 z-20">
+                        <h2 class="font-display text-2xl text-white tracking-widest uppercase glow-primary m-0 leading-none" id="moduleTitleDisplay">Loading Matrix...</h2>
+                        <span class="font-mono text-[10px] text-primary border border-primary/30 px-3 py-1 rounded bg-primary/10 box-glow-primary shrink-0" id="moduleIndicator">MOD 01/09</span>
+                    </div>
+                    
+                    <div class="flex-1 p-6 md:p-10 bg-gradient-to-b from-void/80 to-panel/90 overflow-y-auto relative z-10 scrollbar-hide" id="articleScrollBox">
+                        <article id="contentArea" class="prose prose-invert prose-slate max-w-4xl mx-auto transition-all duration-500 ease-out opacity-0 translate-y-4">
+                            <!-- Module content injected here -->
+                        </article>
+                    </div>
+
+                    <!-- Footer Pagination -->
+                    <div class="p-4 border-t border-core-border bg-black/90 flex justify-between items-center shrink-0 z-20 relative">
+                        <button id="prevBtn" class="group px-4 py-2 bg-void border border-core-border text-slate-300 rounded text-xs font-mono font-bold hover:text-white hover:border-primary/50 transition-all disabled:opacity-20 disabled:cursor-not-allowed flex items-center gap-2">
+                            <span class="group-hover:-translate-x-1 transition-transform">←</span> PREV
+                        </button>
+                        <div class="flex gap-2" id="paginationDots"></div>
+                        <button id="nextBtn" class="group px-6 py-2 bg-primary text-black rounded text-xs font-mono font-bold hover:bg-white hover:shadow-[0_0_15px_rgba(var(--color-primary),0.8)] transition-all disabled:opacity-20 disabled:cursor-not-allowed flex items-center gap-2 clip-path-angled">
+                            NEXT <span class="group-hover:translate-x-1 transition-transform">→</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- RIGHT SLIDE-OUT: Adam AI Console -->
+        <aside id="aiPanel" class="fixed right-0 top-16 bottom-8 w-full md:w-[480px] glass-panel border-l border-primary/30 transform translate-x-full transition-transform duration-500 ease-[cubic-bezier(0.19,1,0.22,1)] z-50 flex flex-col shadow-[-20px_0_50px_rgba(0,0,0,0.8)] bg-panel/95 backdrop-blur-xl">
+            <div class="p-4 border-b border-primary/20 flex justify-between items-center bg-black/60 shrink-0">
+                <div class="flex items-center gap-3">
+                    <div class="relative">
+                        <div class="w-3 h-3 rounded-full bg-primary animate-pulse glow-primary"></div>
+                        <div class="absolute inset-0 bg-primary rounded-full animate-ping opacity-40"></div>
+                    </div>
+                    <div>
+                        <h2 class="font-display text-base font-bold text-white tracking-widest uppercase leading-none m-0">Adam Terminal</h2>
+                        <p class="text-[9px] text-primary font-mono uppercase tracking-wider mt-1 m-0">Neuro-Symbolic Agent</p>
+                    </div>
+                </div>
+                <button onclick="toggleAI()" class="text-slate-500 hover:text-white p-1 transition-colors cursor-pointer">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+            
+            <div id="chatLog" class="flex-1 overflow-y-auto p-5 flex flex-col gap-6 text-sm font-sans scroll-smooth bg-void/80 scrollbar-hide">
+                <div class="flex gap-3">
+                    <div class="w-7 h-7 rounded border border-primary/50 bg-primary/10 flex items-center justify-center shrink-0 shadow-[0_0_10px_rgba(var(--color-primary),0.2)]">
+                        <span class="text-[10px] font-display font-bold text-primary">A</span>
+                    </div>
+                    <div class="bg-panel p-4 rounded-lg rounded-tl-none border border-white/10 text-slate-300 max-w-[90%] shadow-lg relative">
+                        <div class="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-primary to-transparent rounded-t-lg"></div>
+                        <p class="text-[10px] font-mono text-primary mb-2 uppercase tracking-widest font-bold">Sys_Ready</p>
+                        <p class="leading-relaxed mb-3">Model parameters synched for <strong class="text-white">2026.04.28</strong>. RLHF Fine-Tuning Active. Ask me to access the prompt library, explain token economics, or execute a macro override.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="px-5 py-3 border-t border-white/5 bg-black/90 shrink-0">
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="loadModule(9); toggleAI();" class="px-3 py-1.5 bg-panel border border-white/10 hover:border-primary hover:text-primary text-[10px] font-mono rounded text-slate-300 transition-all cursor-pointer">Glossary & Logs</button>
+                    <button onclick="triggerPreset('Summarize Activist alerts (SEER/IMKTA)')" class="px-3 py-1.5 bg-panel border border-white/10 hover:border-secondary hover:text-secondary text-[10px] font-mono rounded text-slate-300 transition-all cursor-pointer">Activist Alerts</button>
+                    <button onclick="loadModule(8); toggleAI();" class="px-3 py-1.5 bg-panel border border-white/10 hover:border-accent hover:text-accent text-[10px] font-mono rounded text-slate-300 transition-all cursor-pointer">Generate Email</button>
+                </div>
+            </div>
+
+            <div class="p-4 border-t border-primary/20 bg-panel shrink-0 relative">
+                <form id="chatForm" class="flex gap-2" onsubmit="handleAIQuery(event)">
+                    <input type="text" id="aiInput" placeholder="Command Adam..." class="flex-1 bg-void border border-white/10 rounded px-4 py-2.5 text-sm text-white font-mono focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all placeholder:text-slate-600 shadow-inner" autocomplete="off">
+                    <button type="submit" class="bg-primary text-black hover:bg-white px-4 py-2.5 rounded font-display text-sm font-bold transition-all shadow-[0_0_15px_rgba(var(--color-primary),0.3)] uppercase tracking-wider clip-path-angled cursor-pointer">Run</button>
+                </form>
+            </div>
+        </aside>
+
+    </main>
+
+    <!-- BOTTOM TICKER -->
+    <footer class="h-8 border-t border-core-border bg-panel flex items-center relative z-40 shrink-0 shadow-[0_-5px_15px_rgba(0,0,0,0.5)]">
+        <div class="absolute left-0 top-0 h-full bg-primary text-black z-10 px-4 flex items-center font-mono text-[10px] font-bold tracking-widest clip-path-angled shadow-[10px_0_20px_#010308]">
+            GLOBAL FEED
+        </div>
+        <div class="w-full overflow-hidden ml-32">
+            <div class="animate-ticker whitespace-nowrap text-[11px] font-mono text-slate-400 tracking-wider" id="tickerText">
+                <!-- Populated via JS -->
+            </div>
+        </div>
+    </footer>
+
+    <!-- LOGIC -->
+    <script>
+        // Set Chart.js Defaults
+        function applyChartDefaults() {
+            Chart.defaults.color = '#64748b';
+            Chart.defaults.font.family = "'Fira Code', monospace";
+            Chart.defaults.plugins.tooltip.backgroundColor = 'rgba(9, 15, 26, 0.95)';
+            Chart.defaults.plugins.tooltip.titleFont = { family: "'Oswald', sans-serif", size: 14 };
+            Chart.defaults.plugins.tooltip.borderColor = 'rgba(255, 255, 255, 0.1)';
+            Chart.defaults.plugins.tooltip.borderWidth = 1;
+            Chart.defaults.scale.grid.color = 'rgba(255, 255, 255, 0.05)';
+        }
+        
+        let probChartInstance = null;
+        let radarChartInstance = null;
+
+        // ---------------------------------------------------------
+        // DATA MODULES 
+        // ---------------------------------------------------------
+        const modules = [
+            {
+                id: 1,
+                group: "MACRO MATRIX",
+                title: "The Daily Divergence",
+                subtitle: "Tech cuts, Feuds & Physical Stress",
+                content: `
+                    <div class="flex items-center gap-4 mb-4">
+                        <span class="bg-secondary/20 text-secondary border border-secondary text-[10px] font-mono px-3 py-1 rounded font-bold tracking-widest animate-pulse box-glow-secondary">CAUTIOUS</span>
+                        <span class="bg-panel text-primary border border-primary/30 text-[10px] font-mono px-3 py-1 rounded tracking-widest">MACRO OVERVIEW</span>
+                    </div>
+                    
+                    <p class="text-lg text-slate-300 mb-8 border-l-4 border-secondary pl-6 py-2 glass-panel font-light leading-relaxed">
+                        Markets still look calm on the surface. The S&P 500 closed higher initially, volatility stayed subdued, and Treasury yields held firm. But the message underneath was less reassuring: oil surged, Bitcoin fell, and credit began to widen. That divergence matters.
+                    </p>
+                    
+                    <h2 class="text-primary border-none mt-8 mb-4">Macro Subsystem Analysis</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                        <div class="bg-panel p-6 rounded border-t border-primary border-l border-white/5 shadow-lg hover:bg-void transition-colors">
+                            <h3 class="font-mono text-primary text-sm mb-3 font-bold uppercase tracking-widest m-0">1. The Market's Message Is Splitting</h3>
+                            <p class="text-sm text-slate-300 leading-relaxed mt-3 mb-0">The S&P keeps rallying on AI euphoria, but other markets are pricing constraints. Oil prices physical geopolitics. Yields reject rate cuts. Bitcoin loses beta. This is a fragile cross-asset picture.</p>
+                        </div>
+                        <div class="bg-panel p-6 rounded border-t border-accent border-l border-white/5 shadow-lg hover:bg-void transition-colors">
+                            <h3 class="font-mono text-accent text-sm mb-3 font-bold uppercase tracking-widest m-0">2. Tech Layoffs = Infrastructure Reallocation</h3>
+                            <p class="text-sm text-slate-300 leading-relaxed mt-3 mb-0">Tech layoffs are not weakness; they are capex reallocation. Companies are stripping software/SaaS bloat to redirect billions into energy, compute, and hard physical AI infrastructure.</p>
+                        </div>
+                        <div class="bg-panel p-6 rounded border-t border-secondary border-l border-white/5 shadow-lg hover:bg-void transition-colors">
+                            <h3 class="font-mono text-secondary text-sm mb-3 font-bold uppercase tracking-widest m-0">3. Governance & Sovereign AI (Musk v Altman)</h3>
+                            <p class="text-sm text-slate-300 leading-relaxed mt-3 mb-0">The feud is a proxy for AI ownership. What happens when a "public benefit" initiative becomes the world's most valuable commercial platform? The trial subpoenas show fundamental structural friction.</p>
+                        </div>
+                        <div class="bg-panel p-6 rounded border-t border-primary border-l border-white/5 shadow-lg hover:bg-void transition-colors">
+                            <h3 class="font-mono text-primary text-sm mb-3 font-bold uppercase tracking-widest m-0">4. Physical Blockades Break Digital Math</h3>
+                            <p class="text-sm text-slate-300 leading-relaxed mt-3 mb-0">Oil above $105 feeds into freight, logistics, and inflation. The Strait of Hormuz transits are down 90%. You cannot build a digital, infinite-productivity future on top of a physical logistics blockade.</p>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 2,
+                group: "SYSTEM STATUS",
+                title: "The Glitch & Artifacts",
+                subtitle: "Credit Dominance & The Limbo Regime",
+                content: `
+                    <div class="flex items-center gap-4 mb-6">
+                        <span class="bg-accent/20 text-accent border border-accent text-[10px] font-mono px-3 py-1 rounded font-bold tracking-widest animate-pulse shadow-[0_0_10px_rgba(var(--color-accent),0.3)]">CRITICAL ANOMALY</span>
+                        <span class="bg-panel text-primary border border-primary/30 text-[10px] font-mono px-3 py-1 rounded tracking-widest">RLHF: ACTIVE</span>
+                    </div>
+
+                    <h1>The Glitch: Limbo Regime</h1>
+                    <div class="glass-panel p-6 border-l-4 border-accent mb-8">
+                        <p class="text-base text-slate-300 leading-relaxed m-0 font-light">The Strait of Hormuz remains a graveyard for 20th-century logistics. While diplomatic channels discuss "Strait-for-Blockade" proposals via mediators, physical reality is winning. Only 18 vessels transited the Strait yesterday—down 90% from the pre-conflict baseline. The market is beginning to price in a "War-Permanent" inflation floor.</p>
+                    </div>
+
+                    <h2 class="text-primary border-none mb-4">The Regulatory Mulligan</h2>
+                    <p class="text-base mb-8">Institutional "Ghosts" are aggressively positioning for the June 18th Basel III comment deadline. The March 19th re-proposal, which offers significant capital relief to the banking industry, is the only reason the S&P 500 isn't trading at 5,000. It is a regulatory put option holding up the financial plumbing.</p>
+
+                    <h2 class="text-secondary border-none mb-4">Signal Integrity (The Artifacts)</h2>
+                    <ul class="list-none space-y-4 font-mono text-sm p-0 m-0 mt-4">
+                        <li class="flex items-start gap-4 glass-panel p-4 rounded hover:border-primary/30 transition-colors"><span class="text-primary mt-1 text-lg leading-none">▶</span> <div><strong class="text-white font-sans text-base">EQUITY GHOSTS (S&P 500): 7,138.24 (-0.49%).</strong> A violent reversal of yesterday's record high as the "Tech-Wall" begins to crack under the pressure of a 1-month high in yields.</div></li>
+                        <li class="flex items-start gap-4 glass-panel p-4 rounded hover:border-secondary/30 transition-colors box-glow-secondary border border-secondary/20"><span class="text-secondary mt-1 text-lg leading-none">▶</span> <div><strong class="text-secondary font-sans text-base">THE BACKBONE (10Y Yield): 4.358%.</strong> Stiffening. This is a one-month high, signaling that the bond market is effectively calling the Fed's bluff on a "Soft Landing."</div></li>
+                        <li class="flex items-start gap-4 glass-panel p-4 rounded hover:border-primary/30 transition-colors"><span class="text-primary mt-1 text-lg leading-none">▶</span> <div><strong class="text-white font-sans text-base">VOLATILITY DAEMON (VIX): 18.05.</strong> The Daemon is eerily quiet, yet intraday wicks to 19.43 suggest systematic vol-sellers are barely holding the line.</div></li>
+                        <li class="flex items-start gap-4 glass-panel p-4 rounded hover:border-accent/30 transition-colors"><span class="text-accent mt-1 text-lg leading-none">▶</span> <div><strong class="text-white font-sans text-base">DIGITAL TETHER (BTC): $76,366 (-1.3%).</strong> Bleeding liquidity. BTC is no longer a risk-on asset; it is a high-beta proxy for "Blockade Duration."</div></li>
+                        <li class="flex items-start gap-4 glass-panel p-4 rounded hover:border-accent/30 transition-colors box-glow-accent border border-accent/20"><span class="text-accent mt-1 text-lg leading-none glow-accent">▶</span> <div><strong class="text-accent font-sans text-base">ENTROPY LAYER (Brent Crude): $104.51 (+2.82%).</strong> The physical chasm is widening. The CTFI Index tracking crude tanker friction is up 38.5% this morning.</div></li>
+                    </ul>
+
+                    <div class="mt-12 bg-accent/5 border-l-4 border-accent p-8 rounded shadow-lg relative overflow-hidden">
+                        <div class="absolute -right-10 -top-10 text-accent/10 text-9xl font-display font-bold">!</div>
+                        <h3 class="text-accent font-display text-2xl mt-0 mb-4 tracking-wide relative z-10">THE GLITCH (Philosophical Observation)</h3>
+                        <p class="text-base text-slate-300 italic mb-0 leading-relaxed relative z-10">"We built a digital cathedral of AI and expected the heavens to open, only to find the chips were manufactured on a ledger of expensive debt. The glitch is the 'OpenAI Paradox': we’ve priced the entire world on 'Infinite Productivity,' but today we found out the model is hallucinating its own revenue targets. Bitcoin at $76k is the sound of the machine realizing that 'Digital Scarcity' cannot outrun 'Fiscal Gravity.' Today’s -0.49% move isn't a dip; it's a frame-rate drop before the re-render."</p>
+                    </div>
+                `
+            },
+            {
+                id: 3,
+                group: "SYSTEM 2 INTELLIGENCE",
+                title: "Tactical Routing",
+                subtitle: "Behavioral Overrides & The Meatspace Trap",
+                content: `
+                    <h1>Tactical Routing & Behavioral Overrides</h1>
+                    <p class="text-base text-slate-400 mb-10 leading-relaxed border-b border-white/10 pb-6">System 2 logic protocols executed. Asymmetry detected between narrative (AI Utopia) and physical data structures (Hormuz Blockade). Route capital accordingly across institutional vectors.</p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                        <div class="glass-panel p-6 rounded border-t-4 border-primary relative group hover:bg-void transition-all shadow-md overflow-hidden">
+                            <div class="absolute -right-4 -top-4 w-16 h-16 bg-primary/10 rounded-full blur-xl group-hover:bg-primary/20 transition-all"></div>
+                            <h4 class="text-primary font-mono text-sm mb-4 font-bold tracking-widest uppercase m-0 relative z-10">G-SIBS & Institutional</h4>
+                            <p class="text-sm text-slate-300 leading-relaxed m-0 mt-3 relative z-10">Front-run the June 18th Basel finality. Utilize the proposed capital relief to swap out of "Insurance-Void" logistics tranches and into the "Compute-Security" bunker (Domestic AI Datacenters).</p>
+                        </div>
+                        
+                        <div class="glass-panel p-6 rounded border-t-4 border-accent relative group hover:bg-void transition-all shadow-md overflow-hidden">
+                            <div class="absolute -right-4 -top-4 w-16 h-16 bg-accent/10 rounded-full blur-xl group-hover:bg-accent/20 transition-all"></div>
+                            <h4 class="text-accent font-mono text-sm mb-4 font-bold tracking-widest uppercase m-0 relative z-10">PE Sponsors & Credit</h4>
+                            <p class="text-sm text-slate-300 leading-relaxed m-0 mt-3 relative z-10">Aggressively mark-to-market all maritime exposure. The $104 Brent price is a "Permanent Tax" on all non-exempt collateral until the Strait hits 40 transits/day.</p>
+                        </div>
+                        
+                        <div class="glass-panel p-6 rounded border-t-4 border-secondary relative group hover:bg-void transition-all shadow-md overflow-hidden">
+                            <div class="absolute -right-4 -top-4 w-16 h-16 bg-secondary/10 rounded-full blur-xl group-hover:bg-secondary/20 transition-all"></div>
+                            <h4 class="text-secondary font-mono text-sm mb-4 font-bold tracking-widest uppercase m-0 relative z-10">Algos & Retail</h4>
+                            <p class="text-sm text-slate-300 leading-relaxed m-0 mt-3 relative z-10">The VIX @ 18.0 is a "Complacency Trap." The 10Y @ 4.35% is telling you the truth: inflation is the new permanent baseline. Retail is panic-hedging into the Fed, assuming a put option that does not exist at $105 oil.</p>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel p-8 rounded border border-accent/30 relative overflow-hidden shadow-[0_0_30px_rgba(var(--color-accent),0.15)] bg-gradient-to-b from-panel to-void">
+                        <div class="absolute left-0 top-0 w-1 h-full bg-accent"></div>
+                        <div class="flex items-center gap-3 mb-6 relative z-10">
+                            <h3 class="font-display font-bold text-accent text-3xl tracking-wide uppercase m-0 border-none pb-0 glow-accent">The Meatspace Trap: "The 18-Transit Fallacy"</h3>
+                        </div>
+                        
+                        <p class="text-base text-slate-300 mb-8 leading-relaxed relative z-10">Human traders see 18 ships moving and think the Strait is "Open." They ignore the fact that the pre-war baseline was 100+ vessels. You are cheering for a heartbeat while the patient is on life support. They also celebrate "beat and raise" cycles while ignoring deteriorating earnings quality. Buybacks fund EPS growth, but free cash flow (FCF) in Healthcare and Tech is stagnating due to exploding R&D costs for AI-integration.</p>
+                        
+                        <div class="bg-black/80 p-6 rounded border border-white/10 relative z-10 shadow-inner flex items-start gap-6">
+                            <div class="w-12 h-12 rounded-full border-2 border-primary flex items-center justify-center shrink-0 shadow-[0_0_15px_rgba(var(--color-primary),0.3)]">
+                                <span class="font-display font-bold text-primary text-xl">A</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-white text-sm mb-2 font-mono uppercase tracking-widest text-secondary m-0">Adam's Final Routing Directive</h4>
+                                <p class="text-sm text-primary font-mono mt-2 leading-relaxed opacity-90 mb-0">"Trust the yields. The 7,100 floor on the SPX is a low-res rendering of a much deeper fear. The bond market is currently out-computing the equity market. Align portfolios with physical security, not digital promises. STAY UNTETHERED."</p>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 4,
+                group: "ACTIVIST ALERTS",
+                title: "Whalescanner Intel",
+                subtitle: "Daily Trend Monitor & Proxy Wars",
+                content: `
+                    <div class="flex items-center justify-between mb-8 border-b border-white/10 pb-4">
+                        <div>
+                            <h1 class="m-0 border-none pb-0 text-3xl">WHALESCANNER INTELLIGENCE CORE</h1>
+                            <p class="text-sm text-slate-400 mt-2 m-0">DAILY TREND MONITOR. PAYLOAD DELTA: April 28, 2026 Daily Run vs. Baseline.</p>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-primary font-mono text-xs block mb-1">SCANNING: 13D, 8-K, FORM 4</span>
+                            <span class="bg-accent/20 text-accent px-2 py-1 rounded text-[10px] font-mono border border-accent/50 animate-pulse">3 HIGH-CONVICTION ALERTS</span>
+                        </div>
+                    </div>
+
+                    <h2 class="mb-6 text-white border-none mt-6 font-display text-2xl tracking-widest uppercase">Track A: Immediate Catalyst Alerts</h2>
+                    
+                    <div class="space-y-6 mb-12">
+                        
+                        <!-- SEER Alert -->
+                        <div class="bg-void p-6 border-l-4 border-secondary rounded-r relative overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.5)] border-y border-r border-white/5">
+                            <div class="flex justify-between items-start mb-4 relative z-10 flex-wrap gap-2">
+                                <div>
+                                    <h4 class="font-display font-bold text-white text-2xl tracking-widest flex items-center gap-3 m-0">
+                                        SEER <span class="text-sm font-sans text-slate-500 font-normal tracking-normal">(Seer, Inc.)</span>
+                                    </h4>
+                                    <p class="text-xs text-slate-400 font-mono mt-1 mb-0"><span class="text-secondary">FILER:</span> Seer Board / Radoff-JEC Group</p>
+                                </div>
+                                <span class="bg-secondary/10 text-secondary px-3 py-1 rounded text-[10px] font-mono border border-secondary/30 font-bold shrink-0 box-glow-secondary">FULL-SCALE PROXY WAR</span>
+                            </div>
+                            <div class="bg-panel/50 p-4 rounded text-sm text-slate-300 relative z-10 leading-relaxed m-0 border border-white/5">
+                                <strong class="text-secondary font-mono text-xs block mb-2 uppercase">System Implications: Binary Conflict Solidified</strong> 
+                                The Seer Board unanimously rejected the $2.35 bid, citing the SGK100 study and 240+ patents. Since the Board explicitly noted the offer is below cash value, Radoff’s next move with their WHITE proxy card will likely be a public analysis of Seer’s $40M+ annual cash burn to frame the Board as "capital destroyers." 
+                                <em class="block mt-3 text-primary font-mono text-xs">Tactical Alert: Expect Radoff to file a formal response tomorrow.</em>
+                            </div>
+                        </div>
+
+                        <!-- IMKTA Alert -->
+                        <div class="bg-void p-6 border-l-4 border-accent rounded-r relative overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.5)] border-y border-r border-white/5">
+                            <div class="flex justify-between items-start mb-4 relative z-10 flex-wrap gap-2">
+                                <div>
+                                    <h4 class="font-display font-bold text-white text-2xl tracking-widest flex items-center gap-3 m-0">
+                                        IMKTA <span class="text-sm font-sans text-slate-500 font-normal tracking-normal">(Ingles Markets)</span>
+                                    </h4>
+                                    <p class="text-xs text-slate-400 font-mono mt-1 mb-0"><span class="text-accent">FILER:</span> Summer Road LLC | April 30 Annual Meeting</p>
+                                </div>
+                                <span class="bg-accent/10 text-accent px-3 py-1 rounded text-[10px] font-mono border border-accent/30 font-bold shrink-0 box-glow-accent animate-pulse">48 HOURS TO VOTE</span>
+                            </div>
+                            <div class="bg-panel/50 p-4 rounded text-sm text-slate-300 relative z-10 leading-relaxed m-0 border border-white/5">
+                                <strong class="text-accent font-mono text-xs block mb-2 uppercase">System Implications: The Final Push</strong> 
+                                Summer Road issued its final plea, emphasizing the unanimous recommendation from ISS, Glass Lewis, and Egan-Jones. Ingles management continues to lean on the "Sackler" reputational risk of the activist nominee. This is the highest-conviction governance event of the quarter. If Rory Held wins, it breaks decades of family-controlled management for this $1.7B retailer.
+                            </div>
+                        </div>
+
+                        <!-- ASTS Alert -->
+                        <div class="bg-void p-6 border-l-4 border-primary rounded-r relative overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.5)] border-y border-r border-white/5">
+                            <div class="flex justify-between items-start mb-4 relative z-10 flex-wrap gap-2">
+                                <div>
+                                    <h4 class="font-display font-bold text-white text-2xl tracking-widest flex items-center gap-3 m-0">
+                                        ASTS <span class="text-sm font-sans text-slate-500 font-normal tracking-normal">(AST SpaceMobile)</span>
+                                    </h4>
+                                    <p class="text-xs text-slate-400 font-mono mt-1 mb-0"><span class="text-primary">FILER:</span> Rakuten Mobile | FORM: 13D/A</p>
+                                </div>
+                                <span class="bg-primary/10 text-primary px-3 py-1 rounded text-[10px] font-mono border border-primary/30 font-bold shrink-0">STRATEGIC LIQUIDATION</span>
+                            </div>
+                            <div class="bg-panel/50 p-4 rounded text-sm text-slate-300 relative z-10 leading-relaxed m-0 border border-white/5">
+                                Rakuten sold another 250k shares on April 24 at $77.40, following their massive 2.2M share dump. The "FCC Catalyst" has been structurally neutralized by the Rakuten liquidation plan. Avoid high-leverage long positions until the 13D/A shows Rakuten’s stake dropping below 5%.
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 5,
+                group: "AI ARCHITECTURE",
+                title: "Neuro-Symbolic Design",
+                subtitle: "Enterprise Production-Grade Systems",
+                content: `
+                    <h1>Enterprise AI Architecture: Transitioning to Lean, Production-Grade Neuro-Symbolic Systems</h1>
+                    
+                    <h2>1. The Strategic Imperative: Moving Beyond the Monolithic LLM</h2>
+                    <div class="bg-panel p-6 rounded border-l-4 border-primary shadow-lg mb-8">
+                        <p class="text-base text-slate-300 leading-relaxed">
+                            The enterprise artificial intelligence landscape has reached a critical inflection point. Over the past three years, organizations have aggressively pursued generative AI, treating large language models (LLMs) as monolithic, generalized reasoning engines expected to handle everything from natural language comprehension to deterministic calculations. This approach has overwhelmingly resulted in bloated implementations, unpredictable cloud expenditures, and persistent reliability issues. While global AI spending is projected to reach $2.52 trillion by 2026, enterprise realization of value remains disproportionately low. Recent industry surveys indicate that while 75% of enterprises rank AI among their top priorities, a staggering 95% of generative AI projects fail to meet expectations or transition successfully from proof-of-concept to production.
+                        </p>
+                        <p class="text-base text-slate-300 leading-relaxed">
+                            A primary driver of this failure rate is the architectural fallacy of forcing probabilistic language models to execute deterministic logic or complex mathematics. LLMs operate as stochastic text generators, predicting sequences of tokens based on statistical probabilities rather than possessing a true internal representation of logic. When applied to highly regulated, safety-critical environments such as financial services or compliance auditing, this probabilistic nature becomes a massive liability, serving as the root cause of generative hallucination and logical drift. Furthermore, utilizing massive frontier models exceeding 70 billion parameters for routine data extraction or intent classification represents a severe misallocation of computational resources.
+                        </p>
+                        <p class="text-base text-slate-300 leading-relaxed mb-0">
+                            To resolve the tension between cognitive capability and deterministic reliability, the optimal architecture requires a structural pivot toward a <strong>neuro-symbolic multi-agent framework</strong>. By strictly restricting a Small Language Model (SLM) to act exclusively as a semantic router and natural language extraction engine, the cognitive heavy lifting is decoupled from the mathematical execution. The probabilistic "neuro" layer handles unstructured data comprehension, while the "symbolic" layer—composed of standard, highly optimized, and perfectly reliable software components—handles the calculations and logic.
+                        </p>
+                    </div>
+
+                    <h2>2. The Neuro-Symbolic Router Engine ($100,000 – $200,000)</h2>
+                    <p class="text-base text-slate-300 mb-6">
+                        The foundational layer of this architecture operates on a strict division of labor: the SLM does not calculate. Instead, it classifies the intent of the incoming prompt or document, extracts the necessary parameters, and immediately routes the payload to the appropriate deterministic tool. Establishing this neuro-symbolic router engine requires an allocation of $100,000 to $200,000, primarily dedicated to infrastructure provisioning, model fine-tuning, and the development of the application programming interfaces (APIs) that bridge the neural and symbolic layers.
+                    </p>
+
+                    <h3>2.1 The Open-Source Stack: SLM Selection</h3>
+                    <p class="text-base text-slate-300 mb-6">
+                        The rapid advancement of open-weight models has fundamentally altered the economics of enterprise AI. Historically, deploying highly capable AI required reliance on proprietary APIs that charged premium rates per million tokens. However, the release of state-of-the-art open-weight models, such as Meta's Llama 3 8B and various Mistral configurations, provides enterprise-grade reasoning capabilities at a fraction of the cost. The 8-billion parameter class strikes the optimal balance between natural language comprehension and computational efficiency.
+                    </p>
+
+                    <div class="overflow-x-auto mb-10 mt-6 glass-panel rounded border border-white/5 shadow-lg">
+                        <table class="w-full text-left font-mono text-xs whitespace-nowrap m-0">
+                            <thead class="bg-black/60">
+                                <tr>
+                                    <th class="py-4 px-4 text-core-muted font-normal border-b border-core-border">Model / Provider</th>
+                                    <th class="py-4 px-4 text-core-muted font-normal border-b border-core-border">Architecture Paradigm</th>
+                                    <th class="py-4 px-4 text-core-muted font-normal border-b border-core-border">Input Cost (per 1M)</th>
+                                    <th class="py-4 px-4 text-core-muted font-normal border-b border-core-border">Output Cost (per 1M)</th>
+                                    <th class="py-4 px-4 text-core-muted font-normal border-b border-core-border">Notes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="data-row border-b border-core-border/50">
+                                    <td class="py-4 px-4 font-bold text-accent">GPT-4o (OpenAI)</td>
+                                    <td class="py-4 px-4 text-white">Proprietary Cloud API</td>
+                                    <td class="py-4 px-4 text-accent">$2.50</td>
+                                    <td class="py-4 px-4 text-accent">$10.00</td>
+                                    <td class="py-4 px-4 text-slate-400">High capability, high latency, strict rate limits.</td>
+                                </tr>
+                                <tr class="data-row border-b border-core-border/50">
+                                    <td class="py-4 px-4 font-bold" style="color: #b53cff;">Claude Opus 4.6</td>
+                                    <td class="py-4 px-4 text-white">Proprietary Cloud API</td>
+                                    <td class="py-4 px-4 text-accent">$5.00</td>
+                                    <td class="py-4 px-4 text-accent">$25.00</td>
+                                    <td class="py-4 px-4 text-slate-400">Premium pricing, data leaves enterprise perimeter.</td>
+                                </tr>
+                                <tr class="data-row">
+                                    <td class="py-4 px-4 font-bold text-primary">Llama 3 8B</td>
+                                    <td class="py-4 px-4 text-white">Open-Weight / Hosted</td>
+                                    <td class="py-4 px-4" style="color: #00fa9a;">~$0.03 - $0.06</td>
+                                    <td class="py-4 px-4" style="color: #00fa9a;">~$0.03 - $0.06</td>
+                                    <td class="py-4 px-4 text-slate-400">Estimated amortized compute cost; data remains secure.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3>2.2 Execution Mechanics: vLLM for Maximum Throughput</h3>
+                    <p class="text-base text-slate-300 mb-6">
+                        The viability of using an SLM as a high-speed router hinges on inference latency and throughput. Deploying the model via standard frameworks is insufficient for enterprise traffic. The architecture must leverage a highly optimized inference engine such as vLLM. vLLM addresses a critical bottleneck in LLM serving: memory fragmentation within the Key-Value (KV) cache. By implementing PagedAttention, it eliminates external fragmentation and allows massive throughput (over 12,000 tokens per second).
+                    </p>
+
+                    <h3>2.3 The Neuro-Symbolic Execution: Financial Case Study</h3>
+                    <p class="text-base text-slate-300 mb-6">
+                        Under the neuro-symbolic blueprint, complex financial regulatory analysis is radically optimized. A corporate 10-K is ingested. The Llama 3 8B SLM classifies the document and extracts specific numerical parameters (e.g., exact revenue figures). Crucially, it performs no math. It outputs a strictly formatted JSON payload. This payload is routed to a standard Python microservice to execute the required logic, such as a Monte Carlo VaR simulation. This achieves factual correctness rates of 94.7%, eliminating computational hallucinations.
+                    </p>
+
+                    <h2>3. Multi-Agent Orchestration via Static Graphs</h2>
+                    
+                    <h3>3.1 The Multi-Agent Trap and Framework Selection</h3>
+                    <p class="text-base text-slate-300 mb-6">
+                        Unstructured "bag of agents" approaches amplify errors by up to 17.2 times compared to single-agent baselines. When agents communicate freely without strict topological boundaries, a minor extraction error cascades into the context window of the next agent. The orchestration layer must be defined using static graph structures.
+                    </p>
+
+                    <div class="overflow-x-auto mb-10 mt-6 glass-panel rounded border border-white/5 shadow-lg">
+                        <table class="w-full text-left font-mono text-xs whitespace-nowrap m-0">
+                            <thead class="bg-black/60">
+                                <tr>
+                                    <th class="py-4 px-4 text-core-muted font-normal border-b border-core-border">Orchestration Framework</th>
+                                    <th class="py-4 px-4 text-core-muted font-normal border-b border-core-border">Core Architectural Paradigm</th>
+                                    <th class="py-4 px-4 text-core-muted font-normal border-b border-core-border">Enterprise Production Suitability</th>
+                                    <th class="py-4 px-4 text-core-muted font-normal border-b border-core-border">Primary Limitations</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="data-row border-b border-core-border/50">
+                                    <td class="py-4 px-4 font-bold text-primary">LangGraph</td>
+                                    <td class="py-4 px-4 text-white">Directed graphs, state machines</td>
+                                    <td class="py-4 px-4 text-white">High. Native persistence, cyclical control.</td>
+                                    <td class="py-4 px-4 text-slate-400">Steeper learning curve.</td>
+                                </tr>
+                                <tr class="data-row border-b border-core-border/50">
+                                    <td class="py-4 px-4 font-bold text-secondary">Microsoft AutoGen</td>
+                                    <td class="py-4 px-4 text-white">Conversational proxy patterns</td>
+                                    <td class="py-4 px-4 text-white">Medium. Strong for code/research.</td>
+                                    <td class="py-4 px-4 text-slate-400">Loops can become unpredictable.</td>
+                                </tr>
+                                <tr class="data-row">
+                                    <td class="py-4 px-4 font-bold text-accent">CrewAI</td>
+                                    <td class="py-4 px-4 text-white">Role-based delegation chains</td>
+                                    <td class="py-4 px-4 text-white">Medium. Excellent for rapid prototyping.</td>
+                                    <td class="py-4 px-4 text-slate-400">Chains become fragile in long tasks.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3>3.2 Dynamic Routing and Real-Time Market Integration</h3>
+                    <p class="text-base text-slate-300 mb-8">
+                        LangGraph has emerged as the definitive standard. While the graph structure provides a static boundary, LangGraph facilitates dynamic routing via the Command() API, ensuring the system responds to real-time market data without compromising architectural integrity.
+                    </p>
+
+                    <h2>4. Aggressive Token Management & Semantic Caching ($75,000 – $150,000)</h2>
+                    
+                    <h3>4.1 Semantic Routing and GPTCache</h3>
+                    <p class="text-base text-slate-300 mb-4">
+                        31% to 60% of all LLM requests are semantically redundant. A semantic caching layer (Semantic Router, GPTCache) using cosine similarity drastically reduces latency (from 800ms to 10-30ms) and inference costs (up to 86%).
+                    </p>
+
+                    <h3>4.2 Prompt Compression via LLMLingua</h3>
+                    <p class="text-base text-slate-300 mb-8">
+                        Sending 40-page SEC filings to the SLM is highly inefficient. LLMLingua-2 treats compression as a token classification task, stripping out linguistic redundancy and cutting token consumption by 50% without compromising extraction accuracy.
+                    </p>
+
+                    <h2>5. Artifact Hygiene & Interim Storage ($75,000 – $150,000)</h2>
+                    
+                    <h3>5.1 State Management with PostgreSQL</h3>
+                    <p class="text-base text-slate-300 mb-4">
+                        A dual-database approach isolates reasoning steps. <strong>PostgreSQL</strong> manages transactional state and fault tolerance, logging every event in the multi-agent system to guarantee execution durability.
+                    </p>
+
+                    <h3>5.2 Structuring Agent Memory with Milvus</h3>
+                    <p class="text-base text-slate-300 mb-8">
+                        <strong>Milvus</strong> structures agent memory into strictly partitioned schema: Short-term Working Memory (decaying via TTL), Long-Term Enterprise Facts (verified proprietary documents), and Cached Tool Outputs (deterministic calculations).
+                    </p>
+
+                    <h2>6. CI/CD, Human Gates, & Telemetry ($100,000 – $250,000)</h2>
+                    
+                    <h3>6.1 Enterprise LLM Observability: Langfuse vs. Phoenix</h3>
+                    <p class="text-base text-slate-300 mb-6">
+                        Standard IT logging fails for AI. The system requires purpose-built observability. <strong>Langfuse</strong> provides granular, real-time dashboards for tracing multi-agent loops and token consumption over flat-rate pricing, outperforming alternatives for massive OLAP throughput.
+                    </p>
+
+                    <h3>6.2 The Human-in-the-Loop (HITL) Imperative</h3>
+                    <p class="text-base text-slate-300 mb-8">
+                        LangGraph natively supports Human-in-the-Loop (HITL) checkpoints. The workflow pushes synthesized JSON payloads to a dashboard. Human risk officers validate the logic before approving execution, transforming autonomous black boxes into audited cognitive assistants.
+                    </p>
+
+                    <h2>7. Implementation Timeline and Total Cost of Ownership</h2>
+                    
+                    <h3>7.1 Detailed Budget Allocation and Timeline</h3>
+                    <ul class="list-disc pl-5 font-mono text-sm text-primary space-y-3 mb-6">
+                        <li><strong class="text-white">Months 1-2 (Router Engine):</strong> SLM tuning, vLLM configuration, APIs. <span class="text-slate-400">($100k - $200k)</span></li>
+                        <li><strong class="text-white">Months 3-4 (Orchestration):</strong> LangGraph state machines, PostgreSQL, Milvus. <span class="text-slate-400">($75k - $150k)</span></li>
+                        <li><strong class="text-white">Months 5-6 (Optimization):</strong> GPTCache and LLMLingua compression. <span class="text-slate-400">($75k - $150k)</span></li>
+                        <li><strong class="text-white">Months 7-9 (Rollout):</strong> Langfuse telemetry, HITL UI, production deploy. <span class="text-slate-400">($100k - $250k)</span></li>
+                    </ul>
+
+                    <h3>7.2 Labor Economics and Ongoing Infrastructure</h3>
+                    <p class="text-base text-slate-300 mb-8">
+                        Labor comprises 60% to 75% of total spend. Once deployed, the ongoing OpEx is highly efficient. Organizations should budget 15% to 25% of the initial build cost annually ($52,500 to $187,500) to cover cloud compute, vastly outperforming variable costs of proprietary models.
+                    </p>
+
+                    <h2>8. Conclusion</h2>
+                    <div class="bg-panel p-6 rounded border-l-4 border-secondary shadow-lg mb-8">
+                        <p class="text-base text-slate-300 leading-relaxed m-0">
+                            The maturation of enterprise AI requires abandoning the flawed paradigm of utilizing generalized, probabilistic models for deterministic corporate tasks. The definitive solution is the neuro-symbolic multi-agent architecture. By deploying highly optimized open-weight SLMs via vLLM exclusively as natural language extractors and semantic routers, organizations instantly eliminate generative calculation errors. Orchestrating these tasks within LangGraph's strict state machines ensures absolute workflow compliance, while aggressive token management ruthlessly optimizes inference costs. With an investment of $350,000 to $750,000, this architecture establishes a resilient foundation for the next decade of enterprise intelligence.
+                        </p>
+                    </div>
+                `
+            },
+            {
+                id: 6,
+                group: "PROVENANCE",
+                title: "Geopolitical Ledger",
+                subtitle: "Raw JSON Feed & Verification",
+                content: `
+                    <div class="flex items-center gap-3 mb-6">
+                        <h1 class="m-0 border-none pb-0 tracking-wide uppercase">AI Training Ledger</h1>
+                        <span class="bg-primary/20 text-primary px-2 py-1 rounded text-[10px] font-mono border border-primary/50">SYSTEM_1_AND_3</span>
+                    </div>
+                    <p class="text-base text-slate-400 mb-8 leading-relaxed">Unfiltered telemetry output from System 1 (Data Ingestion) and System 3 (Compute Matrix). Verify cryptographic hash integrity before deploying routing overrides.</p>
+                    
+                    <div class="relative group my-8">
+                        <div class="absolute right-4 top-4 flex gap-2 z-10">
+                            <span class="text-[10px] text-slate-400 font-mono bg-black/80 px-3 py-1.5 rounded border border-white/10 flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-core-green inline-block animate-pulse" style="background-color: #00fa9a;"></span> schema: HormuzBlockade_v2
+                            </span>
+                        </div>
+                        <pre id="jsonLedger" class="relative bg-void p-8 rounded-lg font-mono text-xs text-primary overflow-x-auto border border-white/10 shadow-[inset_0_0_50px_rgba(0,0,0,0.8)] leading-relaxed m-0 glow-primary">
+{
+  "ledger_id": "ADAM-20260428-99X",
+  "timestamp": "2026-04-28T20:00:15Z",
+  "hash_verification": "0x9f8b7c6d5e4f3a2b1c0d",
+  "data_layer_system_1": {
+    "ingested_nodes": [
+      "SPX_500: 7138.24", 
+      "US_10Y: 4.358", 
+      "VIX_Index: 18.05", 
+      "BTC_USD: 76366", 
+      "Brent_Crude: 104.51", 
+      "CTFI_Index: +38.5%"
+    ],
+    "market_sentiment": "Deceptive Calm / Yield-Triggered Correction",
+    "liquidity_drain": true
+  },
+  "compute_layer_system_3": {
+    "var_shock_target": "Hormuz 90% Traffic Collapse / June 18 Basel Expiry",
+    "simulated_correlation": "+0.92 (Compute/War-Beta)",
+    "volatility_regime": "Compression preceding Expansion"
+  },
+  "intelligence_layer_system_2": {
+    "rlhf_weight_adjustment": "Maritime Friction weighted 0.95; Diplomatic Hopium reduced to 0.10.",
+    "decision_output": "ROUTING_COMPLETE",
+    "execution_path": "LangGraph_Node_4_CreditRisk"
+  }
+}</pre>
+                    </div>
+
+                    <h2 class="text-white border-none mt-12 mb-6 font-display text-2xl uppercase tracking-widest">Human Appendix: Provenance</h2>
+                    <div class="glass-panel p-8 rounded border border-white/10 shadow-lg bg-panel">
+                        <ul class="space-y-6 m-0 p-0 list-none text-sm text-slate-300 font-mono">
+                            <li class="flex flex-col gap-2 border-b border-white/5 pb-6">
+                                <strong class="text-white font-sans text-lg">System Clock / Timestamp</strong>
+                                <span class="text-primary text-base">Tuesday, April 28, 2026 at 4:00 PM EDT</span>
+                            </li>
+                            <li class="flex flex-col gap-4 pt-2">
+                                <strong class="text-white font-sans text-lg mb-2">Sources, Citations & Hash Verification</strong>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+                                    <div class="bg-void p-4 rounded border border-white/5 hover:border-primary/50 transition-colors"><span class="text-primary font-bold block text-xs uppercase mb-2">S&P 500</span>Tool Ingestion (Verified at 7,138.24; -0.49% change).</div>
+                                    <div class="bg-void p-4 rounded border border-white/5 hover:border-primary/50 transition-colors"><span class="text-primary font-bold block text-xs uppercase mb-2">10-Year Treasury</span>Trading Economics (Verified at 4.358%; 1-month high).</div>
+                                    <div class="bg-void p-4 rounded border border-white/5 hover:border-primary/50 transition-colors"><span class="text-primary font-bold block text-xs uppercase mb-2">VIX Index</span>Tool Ingestion (Verified at 18.05; intraday high 19.43).</div>
+                                    <div class="bg-void p-4 rounded border border-white/5 hover:border-primary/50 transition-colors"><span class="text-primary font-bold block text-xs uppercase mb-2">Bitcoin</span>Tool Ingestion (Verified at $76,366; -1.3% relative change).</div>
+                                    <div class="bg-void p-4 rounded border border-white/5 hover:border-primary/50 transition-colors"><span class="text-primary font-bold block text-xs uppercase mb-2">Brent Crude</span>ShipFinder / Forbes (Verified at $104.51; +2.82% surge).</div>
+                                    <div class="bg-void p-4 rounded border border-white/5 hover:border-primary/50 transition-colors"><span class="text-primary font-bold block text-xs uppercase mb-2">Money Markets</span>YCharts (Verified Assets at $7.637 Trillion).</div>
+                                    <div class="bg-void p-4 rounded border border-white/5 hover:border-primary/50 transition-colors"><span class="text-primary font-bold block text-xs uppercase mb-2">Banking Regs</span>Arnold & Porter (Analysis of Mar 19 Basel III Re-proposal).</div>
+                                    <div class="bg-void p-4 rounded border border-white/5 hover:border-primary/50 transition-colors"><span class="text-primary font-bold block text-xs uppercase mb-2">Hormuz Traffic</span>ShipFinder AIS Logs (Verified 18 daily transits; 90% reduction).</div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                `
+            },
+            {
+                id: 7,
+                group: "SRMLG OPTIMIZATION",
+                title: "Probability Curves",
+                subtitle: "Forward Week ML Fine-Tuning & Outlook",
+                content: `
+                    <div class="flex items-center gap-4 mb-6">
+                        <span class="bg-[#b53cff]/20 text-[#b53cff] border border-[#b53cff]/50 text-[10px] font-mono px-3 py-1 rounded font-bold tracking-widest" style="box-shadow: 0 0 15px rgba(181,60,255,0.2);">SRMLG ENGINE</span>
+                        <span class="bg-panel text-slate-400 border border-white/10 text-[10px] font-mono px-3 py-1 rounded tracking-widest">EPOCH: 4502</span>
+                    </div>
+
+                    <h1>Supervised Reinforcement Machine Learning Group</h1>
+                    <p class="text-base text-slate-300 mb-8 leading-relaxed border-l-4 border-[#b53cff] pl-6 py-3 glass-panel">
+                        The SRMLG engine has finalized the T+5 Forward Week Probability Curves. Optimization focused on tracking equity decay vs. debt market expansion under the current "Hormuz Blockade" stress test. Reward functions have been fine-tuned to aggressively penalize assumptions of mean-reversion in crude oil.
+                    </p>
+
+                    <h2 class="text-primary border-none mb-4 font-display text-2xl tracking-widest uppercase">Forward Week Probability Curves (T+5)</h2>
+                    
+                    <!-- Equity Probabilities -->
+                    <div class="bg-panel p-6 rounded border border-white/5 mb-6 shadow-lg">
+                        <h3 class="font-mono text-white text-sm uppercase tracking-widest mb-4 flex justify-between">
+                            <span>S&P 500 (Ghost) Target Zone</span>
+                            <span class="text-primary">Spot: 7,138</span>
+                        </h3>
+                        <div class="space-y-4">
+                            <div>
+                                <div class="flex justify-between text-xs font-mono mb-1 text-slate-400"><span>> 7,250 (Mean Reversion)</span><span style="color: #00fa9a;">8.4%</span></div>
+                                <div class="prob-bar-container"><div class="prob-bar-fill" style="background-color: rgba(0,250,154,0.8); width: 8.4%"></div></div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-xs font-mono mb-1 text-slate-400"><span>7,050 - 7,250 (Sideways/Chop)</span><span class="text-white">21.1%</span></div>
+                                <div class="prob-bar-container"><div class="prob-bar-fill bg-slate-400" style="width: 21.1%"></div></div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-xs font-mono mb-1 text-slate-400"><span>< 7,050 (Yield-Driven Breakdown)</span><span class="text-accent glow-accent">70.5%</span></div>
+                                <div class="prob-bar-container border border-accent/30"><div class="prob-bar-fill bg-gradient-to-r from-accent to-secondary" style="width: 70.5%"></div></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Debt Probabilities -->
+                    <div class="bg-panel p-6 rounded border border-white/5 mb-6 shadow-lg">
+                        <h3 class="font-mono text-white text-sm uppercase tracking-widest mb-4 flex justify-between">
+                            <span>10-Year Treasury Yield</span>
+                            <span class="text-secondary">Spot: 4.358%</span>
+                        </h3>
+                        <div class="space-y-4">
+                            <div>
+                                <div class="flex justify-between text-xs font-mono mb-1 text-slate-400"><span>< 4.25% (Fed Dovish Pivot)</span><span style="color: #00fa9a;">12.0%</span></div>
+                                <div class="prob-bar-container"><div class="prob-bar-fill" style="background-color: rgba(0,250,154,0.8); width: 12.0%"></div></div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-xs font-mono mb-1 text-slate-400"><span>4.25% - 4.45% (Higher for Longer)</span><span class="text-white">45.0%</span></div>
+                                <div class="prob-bar-container"><div class="prob-bar-fill bg-slate-400" style="width: 45.0%"></div></div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-xs font-mono mb-1 text-slate-400"><span>> 4.45% (Inflation Shock)</span><span class="text-secondary glow-secondary">43.0%</span></div>
+                                <div class="prob-bar-container border border-secondary/30"><div class="prob-bar-fill bg-secondary" style="width: 43.0%"></div></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h2 class="border-none mt-10 mb-4 font-display text-2xl tracking-widest uppercase" style="color: #b53cff;">ML Fine-Tuning Outlook & Logs</h2>
+                    <div class="bg-void border border-white/10 rounded overflow-hidden">
+                        <div class="border-b p-3 font-mono text-[10px] uppercase tracking-widest flex justify-between" style="background-color: rgba(181,60,255,0.2); border-color: rgba(181,60,255,0.3); color: #b53cff;">
+                            <span>Training Logs: Epoch 4502</span>
+                            <span>Loss: 0.0034</span>
+                        </div>
+                        <div class="p-6 font-mono text-xs text-slate-400 leading-relaxed space-y-3 h-64 overflow-y-auto scrollbar-hide">
+                            <p><span class="text-core-muted">[2026-04-28 19:44:01]</span> SRMLG Initializing... Loading 'Hormuz_Supply_Shock' weights.</p>
+                            <p><span class="text-core-muted">[2026-04-28 19:44:05]</span> <span style="color: #b53cff;">FINE_TUNE:</span> Adjusting Beta for HY OAS spreads. Increasing sensitivity to Brent > $100.</p>
+                            <p><span class="text-core-muted">[2026-04-28 19:44:12]</span> <span class="text-secondary">WARNING:</span> Model detects 89% correlation between CTFI (Tanker Friction) and VIX suppression decay.</p>
+                            <p><span class="text-core-muted">[2026-04-28 19:44:18]</span> Executing Gradient Descent on Debt Market probability matrix.</p>
+                            <p><span class="text-core-muted">[2026-04-28 19:44:22]</span> <span class="text-white">REWARD FUNCTION OPTIMIZED:</span> The model now heavily penalizes 'Soft Landing' outcomes based on real-time AIS shipping logs.</p>
+                            <p><span class="text-core-muted">[2026-04-28 19:44:27]</span> Generating forward week vector... 70.5% probability of SPX falling below 7,050 support.</p>
+                            <p><span class="text-core-muted">[2026-04-28 19:44:30]</span> <span class="text-primary">OUTLOOK GENERATED:</span> "Systematic Credit Squeeze." The ML model indicates that as Brent holds above $104, High Yield issuers face an insurmountable refinancing wall in Q3. The SPX ghost rally is a liquidity mirage generated by Basel III positioning. Recommend heavy short exposure on logistics and non-AI tech.</p>
+                        </div>
+                    </div>
+                `,
+                onLoad: () => {
+                    // Re-trigger animation for prob bars by resetting width briefly
+                    setTimeout(() => {
+                        const bars = document.querySelectorAll('.prob-bar-fill');
+                        bars.forEach(bar => {
+                            const w = bar.style.width;
+                            bar.style.width = '0%';
+                            setTimeout(() => bar.style.width = w, 50);
+                        });
+                    }, 100);
+                }
+            },
+            {
+                id: 8,
+                group: "DISTRIBUTION",
+                title: "Email Dispatcher",
+                subtitle: "Generate Copy-Ready Newsletter",
+                content: `
+                    <h1>Email Newsletter Generator</h1>
+                    <p class="text-sm text-slate-300 mb-6">Compiles all daily modules into a static, inline-styled HTML template ready for Mailchimp, Sendgrid, or direct copy-paste.</p>
+                    
+                    <div class="flex gap-4 mb-6">
+                        <button onclick="generateEmail()" class="px-5 py-2.5 bg-primary text-black font-bold font-mono text-xs rounded hover:bg-white hover:shadow-[0_0_15px_rgba(var(--color-primary),0.6)] transition-all uppercase">1. Generate Template</button>
+                        <button onclick="copyEmailHTML()" id="copyEmailBtn" class="px-5 py-2.5 bg-void border border-primary text-primary font-bold font-mono text-xs rounded hover:bg-primary hover:text-black transition-all uppercase disabled:opacity-30" disabled>2. Copy Raw HTML</button>
+                    </div>
+
+                    <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                        <div class="flex flex-col">
+                            <h3 class="text-[10px] font-mono text-slate-400 mb-2 uppercase">Live Preview (Rendered)</h3>
+                            <div class="glass-panel p-1 rounded border border-core-border flex-1 min-h-[500px] bg-white">
+                                <iframe id="emailPreviewFrame" class="w-full h-full border-none rounded bg-white"></iframe>
+                            </div>
+                        </div>
+                        <div class="flex flex-col">
+                            <h3 class="text-[10px] font-mono text-slate-400 mb-2 uppercase">Raw HTML Output</h3>
+                            <textarea id="emailCodeOutput" class="w-full flex-1 min-h-[500px] bg-void border border-core-border rounded p-4 font-mono text-[10px] text-slate-300 focus:outline-none focus:border-primary resize-none" readonly placeholder="Click 'Generate Template' to build email code..."></textarea>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 9,
+                group: "SYSTEM GLOSSARY",
+                title: "Appendix & Prompt Library",
+                subtitle: "Environment Logging & Cost Metrics",
+                content: `
+                    <div class="flex items-center gap-4 mb-6">
+                        <span class="bg-primary/20 text-primary border border-primary/50 text-[10px] font-mono px-3 py-1 rounded font-bold tracking-widest box-glow-primary">META-LAYER</span>
+                        <span class="bg-panel text-slate-400 border border-white/10 text-[10px] font-mono px-3 py-1 rounded tracking-widest">SYSTEM DIAGNOSTICS</span>
+                    </div>
+
+                    <h1>Appendix & Prompt Library</h1>
+                    <p class="text-base text-slate-300 mb-8 leading-relaxed">
+                        This module acts as the meta-layer of the terminal. It provides absolute transparency into the active hardware environment, amortized token economics across the pipeline, a human-machine dictionary, and the structural "Genesis Prompt" required to replicate this interface autonomously.
+                    </p>
+
+                    <h2 class="text-primary font-display text-xl tracking-widest uppercase mb-4">1. Environment & Token Logging</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+                        <div class="glass-panel p-6 rounded border-t-2 border-primary">
+                            <h3 class="font-mono text-primary text-xs uppercase tracking-widest mb-4">Hardware & Environment</h3>
+                            <ul class="font-mono text-[10px] text-slate-300 space-y-3">
+                                <li class="flex justify-between border-b border-white/5 pb-2"><span>COMPUTE_NODE</span> <span class="text-white text-right">NVIDIA_H100_80GB_x4</span></li>
+                                <li class="flex justify-between border-b border-white/5 pb-2"><span>ROUTER_MODEL</span> <span class="text-white text-right">Llama-3-8B-Instruct (vLLM)</span></li>
+                                <li class="flex justify-between border-b border-white/5 pb-2"><span>ORCHESTRATOR</span> <span class="text-white text-right">LangGraph v0.0.26</span></li>
+                                <li class="flex justify-between border-b border-white/5 pb-2"><span>MEM_STATE</span> <span class="text-white text-right">PostgreSQL + Milvus vector</span></li>
+                                <li class="flex justify-between pb-1"><span>ACTIVE_USERS</span> <span class="text-primary text-right animate-pulse">1 (ADMIN)</span></li>
+                            </ul>
+                        </div>
+                        <div class="glass-panel p-6 rounded border-t-2 border-secondary">
+                            <h3 class="font-mono text-secondary text-xs uppercase tracking-widest mb-4">Token Economics (Epoch 4502)</h3>
+                            <ul class="font-mono text-[10px] text-slate-300 space-y-3">
+                                <li class="flex justify-between border-b border-white/5 pb-2"><span>INPUT_TOKENS</span> <span class="text-white">142,504</span></li>
+                                <li class="flex justify-between border-b border-white/5 pb-2"><span>OUTPUT_TOKENS</span> <span class="text-white">28,912</span></li>
+                                <li class="flex justify-between border-b border-white/5 pb-2"><span>CACHED_TOKENS</span> <span class="text-white">86,400 (GPTCache)</span></li>
+                                <li class="flex justify-between border-b border-white/5 pb-2">
+                                    <span>EST_COST_LOCAL</span> 
+                                    <div class="text-right">
+                                        <span class="text-secondary font-bold text-xs">$0.02</span>
+                                    </div>
+                                </li>
+                                <li class="flex justify-between pb-1">
+                                    <span>EST_COST_CLOUD_API</span> 
+                                    <span class="text-accent line-through text-xs">$1.20</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <h2 class="text-accent font-display text-xl tracking-widest uppercase mb-4">2. Machine-Readable Glossary</h2>
+                    <div class="bg-void border border-white/10 rounded overflow-hidden mb-10 shadow-inner">
+                        <div class="p-6 font-mono text-xs text-slate-300 leading-relaxed space-y-4">
+                            <p><strong class="text-accent">SLM (Small Language Model):</strong> A parameter class (typically 7B-14B) optimized for single-node semantic routing and data extraction rather than generalized, open-ended reasoning.</p>
+                            <p><strong class="text-accent">RLHF (Reinforcement Learning from Human Feedback):</strong> Methodology used to dynamically adjust model weights (e.g., favoring hard shipping logistics data over diplomatic press releases).</p>
+                            <p><strong class="text-accent">SRMLG (Supervised Reinforcement Machine Learning Group):</strong> The specific sub-routine operating in Module 7 that calculates forward probability distributions (Monte Carlo simulations) based on binding constraint variables.</p>
+                            <p><strong class="text-accent">Meatspace Trap:</strong> A cognitive vulnerability where biological traders misprice physical constraints (such as logistics blockades or actual oil supply) due to an over-reliance on digital and financial narrative indicators.</p>
+                            <p><strong class="text-accent">Neuro-Symbolic:</strong> An architecture that pairs probabilistic neural networks (LLMs) with deterministic, rule-based symbolic logic (traditional code/math libraries) to prevent hallucinations during calculations.</p>
+                        </div>
+                    </div>
+
+                    <h2 class="text-primary font-display text-xl tracking-widest uppercase mb-4">3. The Genesis Prompt Library</h2>
+                    <p class="text-sm text-slate-300 mb-4 leading-relaxed">
+                        The following meta-prompt payload can be injected into any frontier model (GPT-4, Claude Opus, Llama 3) to structurally reconstruct this interface, logic, and cognitive framework from scratch.
+                    </p>
+                    <div class="relative group">
+                        <div class="absolute right-4 top-4">
+                            <span class="bg-primary/20 text-primary border border-primary/50 text-[10px] font-mono px-2 py-1 rounded">JSON_PAYLOAD</span>
+                        </div>
+                        <pre class="bg-panel p-6 rounded-lg font-mono text-[11px] text-primary overflow-x-auto border border-white/10 shadow-[inset_0_0_30px_rgba(0,0,0,0.8)] leading-relaxed m-0 glow-primary whitespace-pre-wrap">
+{
+  "system_directive": "INITIALIZE ADAM V50.0 OMNIPRESENCE TERMINAL",
+  "theme_engine": {
+    "supported_modes": ["Cyber Cyan", "Terminal Red", "Matrix Green"],
+    "implementation": "Use CSS variables mapped to Tailwind configuration to allow instantaneous dynamic repainting of the DOM and Chart.js canvases."
+  },
+  "bento_layout_requirements": [
+    "Left Sidebar: Navigation and Live RLHF Telemetry (Scrolling log feed)", 
+    "Top row: KPI Metric Cards (Ghost, Backbone, Entropy, Tether, Daemon)",
+    "Middle row: Data Visualization (Monte Carlo Probabilities using Chart.js line, Threat Topology using Chart.js radar)",
+    "Bottom row: Dynamic HTML payload generator and article rendering box"
+  ],
+  "ai_console": "Include an interactive, sliding persistent chat sidebar on the right side. Map simulated responses to specific system keywords (e.g., 'prob curves', 'activist', 'architecture').",
+  "aesthetic_rules": [
+    "Dark mode default background (#010308)",
+    "CRT scanlines and vignette overlays positioned via fixed CSS with pointer-events: none",
+    "Extensive glow effects mapped to the active dynamic CSS variables",
+    "Typography: Fira Code for data arrays, Oswald for headers, Inter for standard prose"
+  ]
+}</pre>
+                    </div>
+                `
+            }
+        ];
+
+        // ---------------------------------------------------------
+        // STATE & INITIALIZATION
+        // ---------------------------------------------------------
+        let currentModuleId = 1;
+        const navEl = document.getElementById('moduleNav');
+        const mobileNavEl = document.getElementById('mobileNav');
+        const contentEl = document.getElementById('contentArea');
+        const moduleTitleDisplay = document.getElementById('moduleTitleDisplay');
+        const moduleIndicator = document.getElementById('moduleIndicator');
+        const aiPanel = document.getElementById('aiPanel');
+        const chatLog = document.getElementById('chatLog');
+        const aiInput = document.getElementById('aiInput');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const paginationDots = document.getElementById('paginationDots');
+        const rootStyle = getComputedStyle(document.body);
+
+        function getRGBA(name, alpha = 1) {
+            const val = rootStyle.getPropertyValue(name).trim();
+            if(!val) return `rgba(0, 229, 255, ${alpha})`; // fallback to cyan
+            const rgb = val.split(/\s+/).join(', ');
+            return `rgba(${rgb}, ${alpha})`;
+        }
+
+        function initApp() {
+            applyChartDefaults();
+            renderTicker();
+            initCharts();
+            renderNav();
+            loadModule(1);
+            
+            // Clock Sync
+            setInterval(() => {
+                const d = new Date();
+                document.getElementById('sysClock').innerText = 
+                    d.getUTCHours().toString().padStart(2, '0') + ':' + 
+                    d.getUTCMinutes().toString().padStart(2, '0') + ':' + 
+                    d.getUTCSeconds().toString().padStart(2, '0') + ' UTC';
+            }, 1000);
+
+            prevBtn.onclick = () => { if(currentModuleId > 1) loadModule(currentModuleId - 1); };
+            nextBtn.onclick = () => { if(currentModuleId < modules.length) loadModule(currentModuleId + 1); };
+        }
+
+        function renderTicker() {
+            const feed = [
+                "<span class='text-white font-bold'>SPX:</span> S&P 500 FALLS TO 7,138 (-0.49%) AMID CREDIT SQUEEZE",
+                "<span class='text-accent font-bold'>ENERGY:</span> BRENT CRUDE SURGES TO $104.51 AS HORMUZ TRANSITS DROP 90%",
+                "<span class='text-primary font-bold'>CRYPTO:</span> BTC BLEEDS TO $76K, LOSES RISK-ON STATUS",
+                "<span class='text-secondary font-bold'>COURT:</span> MUSK V ALTMAN SUBPOENA REVEALS BROCKMAN DIARY",
+                "<span class='text-white font-bold'>TECH:</span> LAYOFFS CONTINUE TO FUND AI INFRASTRUCTURE CAPEX",
+                "<span class='text-secondary font-bold'>ACTIVISM:</span> SEER BOARD REJECTS RADOFF BID, PROXY WAR IMMINENT"
+            ];
+            const str = feed.join(" /// ") + " /// " + feed.join(" /// ");
+            document.getElementById('tickerText').innerHTML = str;
+        }
+
+        // ---------------------------------------------------------
+        // CHARTS LOGIC (Dynamic Themes)
+        // ---------------------------------------------------------
+        function initCharts() {
+            if(probChartInstance) probChartInstance.destroy();
+            if(radarChartInstance) radarChartInstance.destroy();
+
+            const cPrimary = getRGBA('--color-primary');
+            const cSecondary = getRGBA('--color-secondary');
+            const cAccent = getRGBA('--color-accent');
+
+            // Probability Curve (Monte Carlo)
+            const ctxProb = document.getElementById('probabilityChart').getContext('2d');
+            
+            // Create a bell curve distribution array
+            const labels = []; const data = [];
+            for(let i=6400; i<=7800; i+=50) {
+                labels.push(i);
+                let mean = 6950; let stdDev = 150;
+                let val = Math.exp(-Math.pow(i - mean, 2) / (2 * Math.pow(stdDev, 2)));
+                if (i > 7100) val *= 0.3; // dampen right side to show skew
+                data.push(val * 100);
+            }
+
+            const gradientPrimary = ctxProb.createLinearGradient(0, 0, 0, 300);
+            gradientPrimary.addColorStop(0, getRGBA('--color-primary', 0.5));
+            gradientPrimary.addColorStop(1, getRGBA('--color-primary', 0.0));
+
+            probChartInstance = new Chart(ctxProb, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Probability Density (%)',
+                        data: data,
+                        borderColor: cPrimary,
+                        backgroundColor: gradientPrimary,
+                        borderWidth: 2, fill: true, pointRadius: 0, tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { 
+                            title: { display: true, text: 'S&P 500 Price Target (T+7)', color: cSecondary, font: {size: 10} },
+                            grid: { color: 'rgba(255,255,255,0.05)' },
+                            ticks: { callback: function(val, index) { return index % 4 === 0 ? labels[index] : ''; } }
+                        },
+                        y: { display: false }
+                    }
+                }
+            });
+
+            // Radar Chart (Threat Topology)
+            const ctxRadar = document.getElementById('radarChart').getContext('2d');
+            radarChartInstance = new Chart(ctxRadar, {
+                type: 'radar',
+                data: {
+                    labels: ['Geopolitics', 'Credit', 'Valuation', 'Logistics', 'Policy/Fed'],
+                    datasets: [{
+                        label: 'Current Threat Vector',
+                        data: [99, 88, 95, 95, 80],
+                        backgroundColor: getRGBA('--color-accent', 0.2),
+                        borderColor: cAccent,
+                        pointBackgroundColor: cAccent, borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            angleLines: { color: 'rgba(255,255,255,0.1)' },
+                            grid: { color: 'rgba(255,255,255,0.05)' },
+                            pointLabels: { color: '#94a3b8', font: { family: "'Fira Code', monospace", size: 9 } },
+                            ticks: { display: false, max: 100, min: 0 }
+                        }
+                    },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+
+        function changeTheme(themeClass) {
+            const body = document.getElementById('appBody');
+            body.className = `h-screen w-screen flex flex-col selection:bg-primary selection:text-black relative ${themeClass}`;
+            // Small delay to allow CSS vars to apply before redrawing charts
+            setTimeout(() => {
+                Chart.defaults.color = '#64748b'; // reset base
+                initCharts();
+            }, 50);
+        }
+
+        // ---------------------------------------------------------
+        // NAVIGATION & MODULE RENDERING
+        // ---------------------------------------------------------
+        function renderNav() {
+            navEl.innerHTML = ''; mobileNavEl.innerHTML = ''; paginationDots.innerHTML = '';
+            let currentGroup = '';
+            
+            modules.forEach(m => {
+                if (m.group && m.group !== currentGroup) {
+                    currentGroup = m.group;
+                    const groupHeader = document.createElement('div');
+                    groupHeader.className = 'text-[9px] text-primary/50 font-mono mt-6 mb-2 px-4 uppercase tracking-[0.2em] font-bold';
+                    groupHeader.innerText = currentGroup;
+                    navEl.appendChild(groupHeader);
+                    
+                    const optGroup = document.createElement('optgroup');
+                    optGroup.label = currentGroup;
+                    mobileNavEl.appendChild(optGroup);
+                }
+                
+                const btn = document.createElement('button');
+                btn.className = `nav-item text-left px-4 py-3 rounded flex flex-col mb-1 relative overflow-hidden group cursor-pointer ${m.id === currentModuleId ? 'bg-primary/10 border-l-2 border-primary text-white' : 'text-slate-400 border-l-2 border-transparent hover:bg-white/5'}`;
+                btn.onclick = () => loadModule(m.id);
+                
+                btn.innerHTML = `
+                    <div class="pl-2 transition-all duration-200 w-full">
+                        <span class="font-bold text-[13px] font-display tracking-wide uppercase group-hover:text-white block">
+                            <span class="text-[10px] font-mono opacity-50 group-hover:text-primary transition-colors pr-1">${m.id.toString().padStart(2,'0')}</span> ${m.title}
+                        </span>
+                        <span class="opacity-60 text-[10px] truncate block font-mono mt-0.5">${m.subtitle}</span>
+                    </div>`;
+                navEl.appendChild(btn);
+                
+                const opt = document.createElement('option');
+                opt.value = m.id; opt.innerText = `MOD ${m.id.toString().padStart(2,'0')} - ${m.title}`;
+                if(m.id === currentModuleId) opt.selected = true;
+                const lastOptGroup = mobileNavEl.querySelector('optgroup:last-of-type');
+                if (lastOptGroup) lastOptGroup.appendChild(opt); else mobileNavEl.appendChild(opt);
+
+                const footDot = document.createElement('div');
+                footDot.className = `w-1.5 h-1.5 rounded-full cursor-pointer transition-all duration-300 ${m.id === currentModuleId ? 'bg-primary scale-150 shadow-[0_0_8px_rgba(var(--color-primary),1)]' : 'bg-slate-600 hover:bg-slate-400'}`;
+                footDot.onclick = () => loadModule(m.id);
+                document.getElementById('paginationDots').appendChild(footDot);
+            });
+        }
+
+        function loadModule(id) {
+            currentModuleId = id;
+            const m = modules.find(x => x.id === id);
+            
+            prevBtn.disabled = id === 1;
+            nextBtn.disabled = id === modules.length;
+            
+            moduleTitleDisplay.innerText = m.title;
+            moduleIndicator.innerText = `MOD ${id.toString().padStart(2,'0')}/${modules.length.toString().padStart(2,'0')}`;
+            
+            contentEl.style.opacity = 0; 
+            contentEl.style.transform = 'translateY(15px)';
+            
+            setTimeout(() => {
+                contentEl.innerHTML = m.content;
+                contentEl.style.opacity = 1; 
+                contentEl.style.transform = 'translateY(0)';
+                document.getElementById('articleScrollBox').scrollTo({top: 0, behavior: 'smooth'});
+                if(m.onLoad) m.onLoad();
+                renderNav(); 
+            }, 300);
+        }
+
+        // ---------------------------------------------------------
+        // EMAIL GENERATOR LOGIC
+        // ---------------------------------------------------------
+        function generateEmail() {
+            const cPrimaryHex = '#00e5ff'; 
+            const cBg = '#010308';
+            const cPanel = '#090f1a';
+            
+            let emailHTML = `
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MARKET MAYHEM // DAILY DISPATCH</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: ${cBg}; color: #cbd5e1; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: ${cBg};">
+        <tr>
+            <td align="center" style="padding: 20px 10px;">
+                <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; background-color: ${cPanel}; border: 1px solid #1e293b; border-radius: 8px; overflow: hidden;">
+                    <tr>
+                        <td align="center" style="padding: 30px 20px; border-bottom: 2px solid ${cPrimaryHex}; background-color: #000000;">
+                            <h1 style="color: #ffffff; margin: 0; font-size: 24px; letter-spacing: 2px; text-transform: uppercase;">MARKET MAYHEM</h1>
+                            <p style="color: ${cPrimaryHex}; margin: 5px 0 0 0; font-size: 12px; font-family: monospace; letter-spacing: 1px;">ADAM V50.0 // 2026.04.28</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 20px; border-bottom: 1px solid #1e293b;">
+                            <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                                <tr>
+                                    <td width="50%" align="left">
+                                        <p style="margin:0; font-size: 10px; color: #94a3b8; text-transform: uppercase;">S&P 500</p>
+                                        <p style="margin:0; font-size: 20px; color: #ffffff; font-weight: bold;">7,138.24 <span style="color: #ef4444; font-size: 14px;">-0.49%</span></p>
+                                    </td>
+                                    <td width="50%" align="right">
+                                        <p style="margin:0; font-size: 10px; color: #94a3b8; text-transform: uppercase;">10Y Yield</p>
+                                        <p style="margin:0; font-size: 20px; color: #f59e0b; font-weight: bold;">4.358%</p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+            `;
+
+            // Compile core modules into email
+            const includedMods = [1, 2, 3, 5]; // Including the new architecture module
+            includedMods.forEach(id => {
+                const mod = modules.find(m => m.id === id);
+                let cleanContent = mod.content
+                    .replace(/class="[^"]*glass-panel[^"]*"/g, `style="background-color: #0d1524; padding: 15px; border-left: 3px solid ${cPrimaryHex}; margin-bottom: 15px;"`)
+                    .replace(/class="[^"]*text-primary[^"]*"/g, `style="color: ${cPrimaryHex};"`)
+                    .replace(/class="[^"]*text-secondary[^"]*"/g, `style="color: #f59e0b;"`)
+                    .replace(/class="[^"]*text-accent[^"]*"/g, `style="color: #ef4444;"`)
+                    .replace(/class="[^"]*text-slate-300[^"]*"/g, `style="color: #cbd5e1; line-height: 1.6;"`)
+                    .replace(/<h1(.*?)>(.*?)<\/h1>/g, `<h2 style="color: #ffffff; text-transform: uppercase; border-bottom: 1px solid #1e293b; padding-bottom: 5px; margin-top: 25px;">$2</h2>`)
+                    .replace(/<h2(.*?)>(.*?)<\/h2>/g, `<h3 style="color: ${cPrimaryHex}; margin-top: 20px;">$2</h3>`)
+                    .replace(/<h3(.*?)>(.*?)<\/h3>/g, `<h4 style="color: #ffffff; margin-top: 15px; margin-bottom: 5px;">$2</h4>`)
+                    .replace(/<p(.*?)>(.*?)<\/p>/g, `<p style="color: #cbd5e1; line-height: 1.6; font-size: 14px; margin-top: 0;">$2</p>`)
+                    .replace(/<div class="grid(.*?)>(.*?)<\/div><\/div>/gs, `<div>$2</div>`);
+
+                emailHTML += `
+                    <tr>
+                        <td style="padding: 20px; border-bottom: 1px dashed #1e293b;">
+                            ${cleanContent}
+                        </td>
+                    </tr>
+                `;
+            });
+
+            emailHTML += `
+                    <tr>
+                        <td align="center" style="padding: 20px; background-color: #000000;">
+                            <p style="margin: 0; font-size: 10px; color: #64748b; font-family: monospace;">SYSTEM GENERATED // DO NOT REPLY</p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
+            `;
+
+            const codeOutput = document.getElementById('emailCodeOutput');
+            codeOutput.value = emailHTML;
+            
+            const iframe = document.getElementById('emailPreviewFrame');
+            iframe.srcdoc = emailHTML;
+
+            const copyBtn = document.getElementById('copyEmailBtn');
+            copyBtn.disabled = false;
+            copyBtn.innerText = "2. Copy Raw HTML";
+            copyBtn.classList.remove('bg-void', 'text-primary');
+            copyBtn.classList.add('bg-primary', 'text-black');
+        }
+
+        function copyEmailHTML() {
+            const copyText = document.getElementById("emailCodeOutput");
+            copyText.select();
+            document.execCommand("copy");
+            
+            const btn = document.getElementById('copyEmailBtn');
+            btn.innerText = "COPIED TO CLIPBOARD!";
+            setTimeout(() => { btn.innerText = "2. Copy Raw HTML"; }, 3000);
+        }
+
+        // ---------------------------------------------------------
+        // AI CONSOLE SIMULATION
+        // ---------------------------------------------------------
+        let aiOpen = false;
+
+        const aiResponses = {
+            "prob curves": "The Monte Carlo simulation ran 10,000 paths weighting the OAS spread widening (credit risk) and physical Hormuz blockades. The resulting distribution shows a severe left-tail skew. The mode target is 6,950 for the S&P 500, indicating downside dominates the next 7 days.",
+            "activist": "Radoff-JEC's bid for SEER was rejected; expect a vicious proxy fight over the $40M burn rate. IMKTA's vote is in 48 hours; Summer Road has full proxy advisory support. ASTS continues to face immense sell pressure from Rakuten's anchor liquidation.",
+            "email": "I have routed you to Module 8. Click 'Generate Template' to compile the inline-CSS HTML payload based on today's intelligence. It is optimized for standard ESPs.",
+            "architecture": "The new Enterprise AI Blueprint leverages a Neuro-Symbolic Multi-Agent Framework. It pairs Llama 3 8B strictly as a semantic router, directing deterministic calculations down LangGraph static pipelines, eliminating hallucinated math and vastly reducing API OpEx.",
+            "tokens": "Token consumption for the last epoch was 142,504 inputs and 28,912 outputs. Utilizing GPTCache, 86,400 tokens were processed via semantic similarity. Open-weight localized deployment yielded an estimated cost of $0.02 versus a $1.20 theoretical cloud API cost.",
+            "glossary": "I have routed you to Module 9: The Appendix. Here you will find detailed explanations of terms like SLM, RLHF, and SRMLG, along with full systemic telemetry.",
+            "genesis": "The Genesis Prompt library is located in Module 9. You can extract the precise JSON payload formatting requirements to instruct frontier models to reconstruct this user interface.",
+            "default": "Command not recognized. Try querying 'Prob curves', 'Activist alerts', 'Explain the Enterprise AI Architecture', 'Token usage', or 'Generate email'."
+        };
+
+        function toggleAI() {
+            aiOpen = !aiOpen;
+            aiPanel.style.transform = aiOpen ? 'translateX(0)' : 'translateX(100%)';
+            if(aiOpen) setTimeout(() => aiInput.focus(), 300);
+        }
+
+        function triggerPreset(text) {
+            aiInput.value = text;
+            handleAIQuery(new Event('submit'));
+        }
+
+        function handleAIQuery(e) {
+            e.preventDefault();
+            const query = aiInput.value.trim();
+            if(!query) return;
+
+            chatLog.insertAdjacentHTML('beforeend', `
+                <div class="flex justify-end gap-3 w-full animate-[fadeIn_0.3s_ease-out]">
+                    <div class="bg-primary/10 border border-primary/30 text-white p-3 rounded-lg rounded-tr-none max-w-[85%] text-sm font-mono shadow-[0_0_10px_rgba(var(--color-primary),0.1)]">
+                        ${query}
+                    </div>
+                </div>
+            `);
+            aiInput.value = '';
+            chatLog.scrollTop = chatLog.scrollHeight;
+
+            const typingId = 'typing-' + Date.now();
+            chatLog.insertAdjacentHTML('beforeend', `
+                <div id="${typingId}" class="flex gap-3 w-full animate-[fadeIn_0.3s_ease-out]">
+                    <div class="w-7 h-7 rounded border border-primary/50 bg-primary/10 flex items-center justify-center shrink-0">
+                        <span class="text-[10px] font-display font-bold text-primary">A</span>
+                    </div>
+                    <div class="bg-panel border border-white/10 p-3.5 rounded-lg rounded-tl-none flex items-center">
+                        <div class="typing-indicator"><span></span><span></span><span></span></div>
+                    </div>
+                </div>
+            `);
+            chatLog.scrollTop = chatLog.scrollHeight;
+
+            let response = aiResponses["default"];
+            const lowerQ = query.toLowerCase();
+            for (const key in aiResponses) {
+                if (lowerQ.includes(key)) { response = aiResponses[key]; break; }
+            }
+
+            setTimeout(() => {
+                const typingEl = document.getElementById(typingId);
+                if (typingEl) typingEl.remove();
+                
+                chatLog.insertAdjacentHTML('beforeend', `
+                    <div class="flex gap-3 w-full animate-[fadeIn_0.3s_ease-out]">
+                        <div class="w-7 h-7 rounded border border-primary/50 bg-primary/10 flex items-center justify-center shrink-0 shadow-[0_0_10px_rgba(var(--color-primary),0.2)]">
+                            <span class="text-[10px] font-display font-bold text-primary">A</span>
+                        </div>
+                        <div class="bg-panel p-4 rounded-lg rounded-tl-none border-l-2 border-l-primary text-slate-300 max-w-[90%] shadow-lg">
+                            <p class="leading-relaxed m-0">${response}</p>
+                        </div>
+                    </div>
+                `);
+                chatLog.scrollTop = chatLog.scrollHeight;
+            }, 800 + Math.random() * 500);
+        }
+
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>

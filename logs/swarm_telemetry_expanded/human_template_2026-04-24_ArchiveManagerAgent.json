@@ -1,0 +1,78 @@
+{
+  "spec_version": "1.4.0-otel",
+  "timestamp": "2026-04-24T00:13:03.355457Z",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "severity_text": "WARN",
+  "severity_number": 13,
+  "event_name": "swarm.agent.lifecycle.deprecated",
+  "resource": {
+    "service.name": "swarm-orchestrator",
+    "service.version": "4.2.0",
+    "deployment.environment": "production",
+    "node.id": "worker-node-aws-us-east-1a-04"
+  },
+  "attributes": {
+    "agent.id": "ArchiveManagerAgent",
+    "agent.previous_version": "v29.x",
+    "agent.target_version": "v30",
+    "deprecation.reason": "Transitioning to v30 architecture.",
+    "deprecation.action_required": true
+  },
+  "metrics": {
+    "agent.core_logic.function_count": 7,
+    "agent.capabilities.count": 0
+  },
+  "artifacts": {
+    "provenance": {
+      "repository": "git+ssh://repo/core/agents/archive_manager_agent.py",
+      "commit_sha": "a1b2c3d4e5f6g7h8i9j0",
+      "docstring_hash": "sha256:d8c4b12389a..."
+    },
+    "extracted_capabilities": [],
+    "core_logic_signatures": [
+      {
+        "name": "__init__",
+        "ast_hash": "sha256:b2f81d42b65e7732",
+        "loc": 5,
+        "source": "def __init__(self, config):\n        self.config = config\n        self.data_dir = config.get('data_dir', 'core/libraries_and_archives')\n        self.backup_dir = config.get('backup_dir', 'backups')\n        self.access_control = config.get('access_control', {})"
+      },
+      {
+        "name": "store_data",
+        "ast_hash": "sha256:bb0c6d99be99e1e1",
+        "loc": 21,
+        "source": "def store_data(self, data, data_type, filename):\n        \"\"\"\n        Stores data in the appropriate directory based on data type and filename.\n\n        Args:\n            data (dict or list): The data to be stored.\n            data_type (str): The type of data (e.g., \"market_overview\", \"company_report\").\n            filename (str): The name of the file to store the data in.\n        \"\"\"\n\n        # Append date to filename if not already present\n        if not filename.endswith(\".json\"):\n            filename += \"_\" + datetime.datetime.now().strftime(\"%Y%m%d\") + \".json\"\n\n        filepath = os.path.join(self.data_dir, data_type, filename)\n        os.makedirs(os.path.dirname(filepath), exist_ok=True)  # Create directories if they don't exist\n\n        with open(filepath, 'w') as f:\n            json.dump(data, f, indent=4)\n\n        print(f\"Stored data in {filepath}\")"
+      },
+      {
+        "name": "retrieve_data",
+        "ast_hash": "sha256:5b582746430fa56d",
+        "loc": 25,
+        "source": "def retrieve_data(self, data_type, filename):\n        \"\"\"\n        Retrieves data from the specified file.\n\n        Args:\n            data_type (str): The type of data.\n            filename (str): The name of the file.\n\n        Returns:\n            dict or list: The retrieved data.\n        \"\"\"\n\n        # Check if filename contains date, otherwise append current date\n        if not filename.endswith(\".json\"):\n            filename += \"_\" + datetime.datetime.now().strftime(\"%Y%m%d\") + \".json\"\n\n        filepath = os.path.join(self.data_dir, data_type, filename)\n        try:\n            with open(filepath, 'r') as f:\n                data = json.load(f)\n            print(f\"Retrieved data from {filepath}\")\n            return data\n        except FileNotFoundError:\n            print(f\"File not found: {filepath}\")\n            return None"
+      },
+      {
+        "name": "create_backup",
+        "ast_hash": "sha256:413b89165dc2e710",
+        "loc": 7,
+        "source": "def create_backup(self):\n        \"\"\"\n        Creates a backup of the data directory.\n        \"\"\"\n\n        # ... (implementation for data backup, e.g., using shutil.copytree)\n        pass"
+      },
+      {
+        "name": "restore_backup",
+        "ast_hash": "sha256:400740e8620a937b",
+        "loc": 7,
+        "source": "def restore_backup(self):\n        \"\"\"\n        Restores data from a backup.\n        \"\"\"\n\n        # ... (implementation for data restoration, e.g., using shutil.copytree)\n        pass"
+      },
+      {
+        "name": "check_access",
+        "ast_hash": "sha256:7fa7c15d4e811f36",
+        "loc": 14,
+        "source": "def check_access(self, user, data_type):\n        \"\"\"\n        Checks if a user has access to the specified data type.\n\n        Args:\n            user (str): The user ID or name.\n            data_type (str): The type of data.\n\n        Returns:\n            bool: True if the user has access, False otherwise.\n        \"\"\"\n\n        # ... (implementation for access control, e.g., using a dictionary of user permissions)\n        pass"
+      },
+      {
+        "name": "run",
+        "ast_hash": "sha256:6cb54c0eaf746d7f",
+        "loc": 5,
+        "source": "def run(self):\n        # ... (fetch data storage or retrieval requests)\n        # ... (store or retrieve data as requested)\n        # ... (perform periodic backups and access control checks)\n        pass"
+      }
+    ]
+  }
+}

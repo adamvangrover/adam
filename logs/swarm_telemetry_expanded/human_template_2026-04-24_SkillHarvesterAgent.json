@@ -1,0 +1,60 @@
+{
+  "spec_version": "1.4.0-otel",
+  "timestamp": "2026-04-24T00:13:03.355457Z",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "severity_text": "WARN",
+  "severity_number": 13,
+  "event_name": "swarm.agent.lifecycle.deprecated",
+  "resource": {
+    "service.name": "swarm-orchestrator",
+    "service.version": "4.2.0",
+    "deployment.environment": "production",
+    "node.id": "worker-node-aws-us-east-1a-04"
+  },
+  "attributes": {
+    "agent.id": "SkillHarvesterAgent",
+    "agent.previous_version": "v29.x",
+    "agent.target_version": "v30",
+    "deprecation.reason": "Transitioning to v30 architecture.",
+    "deprecation.action_required": true
+  },
+  "metrics": {
+    "agent.core_logic.function_count": 4,
+    "agent.capabilities.count": 0
+  },
+  "artifacts": {
+    "provenance": {
+      "repository": "git+ssh://repo/core/agents/meta_agents/skill_harvester_agent.py",
+      "commit_sha": "a1b2c3d4e5f6g7h8i9j0",
+      "docstring_hash": "sha256:d8c4b12389a..."
+    },
+    "extracted_capabilities": [],
+    "core_logic_signatures": [
+      {
+        "name": "__init__",
+        "ast_hash": "sha256:2d1f042a01ca8e0f",
+        "loc": 4,
+        "source": "def __init__(self, config=None, **kwargs):\n        super().__init__(config, **kwargs)\n        AuditMixin.__init__(self)\n        self.registry_path = \"docs/agent_skills_registry.json\""
+      },
+      {
+        "name": "execute",
+        "ast_hash": "sha256:d7bc00bfe46dac52",
+        "loc": 29,
+        "source": "async def execute(self, **kwargs) -> Dict[str, Any]:\n        logging.info(\"SkillHarvesterAgent starting harvest...\")\n\n        agents = self._find_agent_classes()\n        registry = []\n\n        for agent_cls in agents:\n            try:\n                # Instantiate lightly to get schema\n                # We assume a default config is enough\n                agent = agent_cls(config={\"name\": \"harvester_temp\"})\n                schema = agent.get_skill_schema()\n                if schema:\n                    registry.append(schema)\n            except Exception as e:\n                logging.warning(f\"Could not harvest skills from {agent_cls.__name__}: {e}\")\n\n        # Save Registry\n        os.makedirs(os.path.dirname(self.registry_path), exist_ok=True)\n        with open(self.registry_path, 'w') as f:\n            json.dump(registry, f, indent=2)\n\n        self.log_decision(\n            activity_type=\"SkillHarvest\",\n            details={\"agents_scanned\": len(agents)},\n            outcome={\"registry_size\": len(registry)}\n        )\n\n        return {\"status\": \"SUCCESS\", \"registry_path\": self.registry_path}"
+      },
+      {
+        "name": "_find_agent_classes",
+        "ast_hash": "sha256:f8ba4ddcb6df1370",
+        "loc": 20,
+        "source": "def _find_agent_classes(self) -> List[type]:\n        \"\"\"\n        Dynamically finds all AgentBase subclasses in core/agents.\n        \"\"\"\n        found_agents = []\n        root_dir = \"core/agents\"\n\n        for root, dirs, files in os.walk(root_dir):\n            for file in files:\n                if file.endswith(\"_agent.py\"):\n                    module_path = os.path.join(root, file).replace(\"/\", \".\").replace(\".py\", \"\")\n                    try:\n                        module = importlib.import_module(module_path)\n                        for name, obj in inspect.getmembers(module):\n                            if inspect.isclass(obj) and issubclass(obj, AgentBase) and obj is not AgentBase:\n                                found_agents.append(obj)\n                    except Exception as e:\n                        pass\n\n        return list(set(found_agents))"
+      },
+      {
+        "name": "get_skill_schema",
+        "ast_hash": "sha256:ec26bdae825ff6d8",
+        "loc": 12,
+        "source": "def get_skill_schema(self) -> Dict[str, Any]:\n        return {\n            \"name\": \"SkillHarvesterAgent\",\n            \"description\": \"Compiles the central skill registry.\",\n            \"skills\": [\n                {\n                    \"name\": \"harvest_skills\",\n                    \"description\": \"Updates agent_skills_registry.json\",\n                    \"parameters\": {}\n                }\n            ]\n        }"
+      }
+    ]
+  }
+}

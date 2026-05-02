@@ -1,0 +1,76 @@
+{
+  "spec_version": "1.4.0-otel",
+  "timestamp": "2026-04-24T00:13:03.355457Z",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "severity_text": "WARN",
+  "severity_number": 13,
+  "event_name": "swarm.agent.lifecycle.deprecated",
+  "resource": {
+    "service.name": "swarm-orchestrator",
+    "service.version": "4.2.0",
+    "deployment.environment": "production",
+    "node.id": "worker-node-aws-us-east-1a-04"
+  },
+  "attributes": {
+    "agent.id": "MacroLiquidityAgent",
+    "agent.previous_version": "v29.x",
+    "agent.target_version": "v30",
+    "deprecation.reason": "Transitioning to v30 architecture.",
+    "deprecation.action_required": true
+  },
+  "metrics": {
+    "agent.core_logic.function_count": 6,
+    "agent.capabilities.count": 0
+  },
+  "artifacts": {
+    "provenance": {
+      "repository": "git+ssh://repo/core/agents/specialized/macro_liquidity_agent.py",
+      "commit_sha": "a1b2c3d4e5f6g7h8i9j0",
+      "docstring_hash": "sha256:d8c4b12389a..."
+    },
+    "extracted_capabilities": [],
+    "core_logic_signatures": [
+      {
+        "name": "__init__",
+        "ast_hash": "sha256:8b41a5197d9c0d6c",
+        "loc": 14,
+        "source": "def __init__(self, config: Dict[str, Any], **kwargs):\n        super().__init__(config, **kwargs)\n        self.data_fetcher = DataFetcher()\n        self.tickers = {\n            \"TNX\": \"^TNX\",      # 10Y Treasury Yield\n            \"IRX\": \"^IRX\",      # 13W Treasury Bill\n            \"HYG\": \"HYG\",       # High Yield Bond ETF\n            \"LQD\": \"LQD\",       # Investment Grade Bond ETF\n            \"DXY\": \"DX-Y.NYB\",  # US Dollar Index (Yahoo ticker)\n            \"GOLD\": \"GC=F\"      # Gold Futures\n        }\n        # Allow config to override tickers\n        if config.get(\"tickers\"):\n            self.tickers.update(config[\"tickers\"])"
+      },
+      {
+        "name": "execute",
+        "ast_hash": "sha256:6ee4081e611e4f70",
+        "loc": 45,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "_fetch_macro_data",
+        "ast_hash": "sha256:d7be6d1ff8bc2ce4",
+        "loc": 49,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "_calculate_indicators",
+        "ast_hash": "sha256:01d4fdf054c107bb",
+        "loc": 40,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "_compute_stress_index",
+        "ast_hash": "sha256:4a9ce10897d80083",
+        "loc": 72,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "_detect_anomalies",
+        "ast_hash": "sha256:c457c7f8c8768171",
+        "loc": 20,
+        "source": "def _detect_anomalies(self, indicators: Dict[str, Any]) -> List[str]:\n        \"\"\"\n        Detects specific contradictions (e.g., Gold Up + Dollar Up).\n        \"\"\"\n        anomalies = []\n\n        dxy = indicators.get(\"dxy_level\")\n        gold = indicators.get(\"gold_price\")\n        tnx = indicators.get(\"tnx_yield\")\n\n        # Anomaly 1: Gold & Dollar Rising Together (Fear Bid)\n        # We need change data for this, but using levels for heuristic check\n        # Ideally this would look at daily % change.\n        # For this version, we'll skip change-based anomalies without history.\n\n        # Anomaly 2: Yields Up, Gold Up (Inflation expectations unanchoring?)\n        if tnx and gold and tnx > 4.5 and gold > 2100:\n             anomalies.append(\"High Yields + High Gold: Inflation Fear?\")\n\n        return anomalies"
+      }
+    ]
+  }
+}

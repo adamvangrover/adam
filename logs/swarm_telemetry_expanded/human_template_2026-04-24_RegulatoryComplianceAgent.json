@@ -1,0 +1,144 @@
+{
+  "spec_version": "1.4.0-otel",
+  "timestamp": "2026-04-24T00:13:03.355457Z",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "severity_text": "WARN",
+  "severity_number": 13,
+  "event_name": "swarm.agent.lifecycle.deprecated",
+  "resource": {
+    "service.name": "swarm-orchestrator",
+    "service.version": "4.2.0",
+    "deployment.environment": "production",
+    "node.id": "worker-node-aws-us-east-1a-04"
+  },
+  "attributes": {
+    "agent.id": "RegulatoryComplianceAgent",
+    "agent.previous_version": "v29.x",
+    "agent.target_version": "v30",
+    "deprecation.reason": "Transitioning to v30 architecture.",
+    "deprecation.action_required": true
+  },
+  "metrics": {
+    "agent.core_logic.function_count": 16,
+    "agent.capabilities.count": 7
+  },
+  "artifacts": {
+    "provenance": {
+      "repository": "git+ssh://repo/core/agents/regulatory_compliance_agent.py",
+      "commit_sha": "a1b2c3d4e5f6g7h8i9j0",
+      "docstring_hash": "sha256:d8c4b12389a..."
+    },
+    "extracted_capabilities": [
+      "Monitors regulatory changes and trends across relevant jurisdictions.",
+      "Analyzes financial transactions and activities for compliance.",
+      "Identifies potential regulatory risks and provides mitigation strategies.",
+      "Generates compliance reports and audit trails.",
+      "Collaborates with other agents to incorporate compliance considerations.",
+      "Provides guidance on interacting with regulatory bodies.",
+      "Adapts to changing political landscapes and regulatory priorities."
+    ],
+    "core_logic_signatures": [
+      {
+        "name": "__init__",
+        "ast_hash": "sha256:8be20b4f0113d0fd",
+        "loc": 16,
+        "source": "def __init__(self, config: Dict[str, Any], **kwargs):\n        \"\"\"\n        Initializes the RegulatoryComplianceAgent with configuration parameters.\n\n        Args:\n            config: A dictionary containing configuration parameters.\n        \"\"\"\n        super().__init__(config, **kwargs)\n        self.regulatory_knowledge = self._load_regulatory_knowledge()\n        self.nlp_toolkit = self._initialize_nlp_toolkit()\n        self.political_landscape = self._load_political_landscape()\n        # Initialize LLM with config from agent config\n        self.llm = LLMPlugin(config=self.config.get(\"llm_config\"))\n\n        # Load learned parameters for continuous learning\n        self.learned_params = self._load_learned_profile()"
+      },
+      {
+        "name": "_load_learned_profile",
+        "ast_hash": "sha256:c30797667c7a657d",
+        "loc": 20,
+        "source": "def _load_learned_profile(self) -> Dict:\n        \"\"\"\n        Loads the learned compliance profile (weights, risk modifiers) from disk.\n        \"\"\"\n        profile_path = \"data/compliance_learned_profile.json\"\n        default_profile = {\n            \"rule_weights\": {\n                \"threshold_violation\": 0.5,\n                \"geopolitical_risk\": 0.3\n            },\n            \"entity_risk_modifiers\": {},\n            \"learning_rate\": 0.05\n        }\n        if os.path.exists(profile_path):\n            try:\n                with open(profile_path, 'r') as f:\n                    return json.load(f)\n            except Exception as e:\n                logger.error(f\"Failed to load learned profile: {e}\")\n        return default_profile"
+      },
+      {
+        "name": "_save_learned_profile",
+        "ast_hash": "sha256:a5a683ac1835eb56",
+        "loc": 11,
+        "source": "def _save_learned_profile(self):\n        \"\"\"\n        Saves the learned compliance profile to disk.\n        \"\"\"\n        profile_path = \"data/compliance_learned_profile.json\"\n        try:\n            os.makedirs(os.path.dirname(profile_path), exist_ok=True)\n            with open(profile_path, 'w') as f:\n                json.dump(self.learned_params, f, indent=2)\n        except Exception as e:\n            logger.error(f\"Failed to save learned profile: {e}\")"
+      },
+      {
+        "name": "_load_regulatory_knowledge",
+        "ast_hash": "sha256:a7cd2684c76260bd",
+        "loc": 40,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "_initialize_nlp_toolkit",
+        "ast_hash": "sha256:7cb510ded559e505",
+        "loc": 17,
+        "source": "def _initialize_nlp_toolkit(self) -> nltk.stem.WordNetLemmatizer:\n        \"\"\"\n        Initializes the NLP toolkit with necessary resources.\n\n        Returns:\n            An instance of the NLP toolkit.\n        \"\"\"\n        try:\n            # Download required NLTK resources\n            # Note: In production, these should be pre-downloaded\n            nltk.download('punkt', quiet=True)\n            nltk.download('wordnet', quiet=True)\n            nltk.download('vader_lexicon', quiet=True)  # For sentiment analysis\n        except Exception as e:\n            logger.warning(f\"NLTK download failed: {e}\")\n\n        return nltk.stem.WordNetLemmatizer()"
+      },
+      {
+        "name": "_get_aml_updates",
+        "ast_hash": "sha256:d9a22c18787b7d47",
+        "loc": 23,
+        "source": "def _get_aml_updates(self, api_key: str) -> List[str]:\n        \"\"\"\n        Retrieves AML updates from a regulatory API.\n\n        Args:\n            api_key: The API key for authentication.\n\n        Returns:\n            A list of AML updates.\n        \"\"\"\n        # Example API call (replace with actual API endpoint and parameters)\n        url = f\"https://regulatory-api.com/aml/updates?api_key={api_key}\"\n        try:\n            response = requests.get(url, timeout=10)\n            if response.status_code == 200:\n                updates = response.json().get(\"updates\", [])\n                return updates\n            else:\n                logger.warning(f\"Error retrieving AML updates: {response.status_code}\")\n                return []\n        except Exception as e:\n            logger.error(f\"Exception retrieving AML updates: {e}\")\n            return []"
+      },
+      {
+        "name": "_load_political_landscape",
+        "ast_hash": "sha256:9beab018f1f5991b",
+        "loc": 21,
+        "source": "def _load_political_landscape(self) -> Dict:\n        \"\"\"\n        Loads data on the current political landscape.\n\n        Returns:\n            A dictionary containing information on political leaders,\n            party affiliations, key policies, and recent developments.\n        \"\"\"\n        try:\n            loader = PoliticalLandscapeLoader()\n            landscape = loader.load_landscape()\n            return landscape\n        except Exception as e:\n            logger.error(f\"Error loading political landscape: {e}\")\n            # Return a minimal valid structure to prevent crashes\n            return {\n                \"US\": {\n                    \"president\": \"Unknown\",\n                    \"recent_developments\": [\"Data unavailable\"]\n                }\n            }"
+      },
+      {
+        "name": "_analyze_transaction",
+        "ast_hash": "sha256:ca8a7ddbcacc2d91",
+        "loc": 74,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "_generate_compliance_report",
+        "ast_hash": "sha256:e43665d06c07bd2a",
+        "loc": 20,
+        "source": "def _generate_compliance_report(self, transactions: List[Dict]) -> Tuple[str, List[Dict]]:\n        \"\"\"\n        Generates a compliance report for a list of transactions.\n\n        Args:\n            transactions: A list of dictionaries representing financial transactions.\n\n        Returns:\n            A tuple containing the compliance report string and the structured results list.\n        \"\"\"\n        report = \"Compliance Report:\\n\"\n        results = []\n        for transaction in transactions:\n            analysis = self._analyze_transaction(transaction)\n            results.append(analysis)\n            report += f\"  - Transaction {analysis['transaction_id']}: {analysis['compliance_status']}\\n\"\n            if analysis['violated_rules']:\n                report += f\"    Violated Rules: {', '.join(analysis['violated_rules'])}\\n\"\n            report += f\"    Risk Score: {analysis['risk_score']}\\n\"\n        return report, results"
+      },
+      {
+        "name": "_get_regulatory_updates",
+        "ast_hash": "sha256:774325de0180a362",
+        "loc": 30,
+        "source": "def _get_regulatory_updates(self) -> List[Tuple[str, str, str]]:\n        \"\"\"\n        Retrieves the latest regulatory updates from relevant sources.\n\n        Returns:\n            A list of tuples, where each tuple contains the source,\n            title, and summary of a regulatory update.\n        \"\"\"\n        updates = []\n\n        # 1. Scrape regulatory websites\n        # Example: Scraping FINRA website for KYC updates\n        finra_url = \"https://www.finra.org/rules-guidance/key-topics/know-your-customer\"\n        try:\n            response = requests.get(finra_url, timeout=10)\n            if response.status_code == 200:\n                finra_html = response.text\n                soup = BeautifulSoup(finra_html, 'html.parser')\n                # ... (Extract relevant updates from the parsed HTML)\n                # Example:\n                updates.append(\n                    (\"FINRA\", \"New KYC Rule\", \"Enhanced due diligence for high-risk customers.\")\n                )\n        except Exception as e:\n            logger.error(f\"Failed to scrape FINRA: {e}\")\n\n        # 2. Access regulatory RSS feeds\n        # ... (Implementation for accessing RSS feeds)\n\n        return updates"
+      },
+      {
+        "name": "provide_guidance",
+        "ast_hash": "sha256:e8993765b3505ae8",
+        "loc": 27,
+        "source": "def provide_guidance(self, user_question: str) -> str:\n        \"\"\"\n        Provides guidance on regulatory compliance matters using LLM.\n\n        Args:\n            user_question: The user's question regarding compliance.\n\n        Returns:\n            A string containing the guidance.\n        \"\"\"\n        prompt = (\n            \"You are a Regulatory Compliance Expert. Provide guidance on the following compliance matter.\\n\\n\"\n            f\"User Question: {user_question}\\n\\n\"\n            \"Context (Regulatory Knowledge):\\n\"\n            f\"{self.regulatory_knowledge}\\n\\n\"\n            \"Context (Political Landscape):\\n\"\n            f\"{self.political_landscape}\\n\\n\"\n            \"Guidance:\"\n        )\n\n        try:\n            guidance = self.llm.generate_text(prompt, task=\"regulatory_guidance\")\n            return guidance\n        except Exception as e:\n            # Fallback if LLM fails\n            logger.error(f\"LLM generation failed: {e}\")\n            return \"Please consult with a compliance expert for further assistance.\""
+      },
+      {
+        "name": "_integrate_knowledge",
+        "ast_hash": "sha256:ae61cc5a79a734d1",
+        "loc": 23,
+        "source": "def _integrate_knowledge(self, updates: List[Tuple[str, str, str]], knowledge_graph: Any = None):\n        \"\"\"\n        Integrates new regulatory updates into the knowledge base (Local + Graph).\n        \"\"\"\n        if not updates:\n            return\n\n        logger.info(f\"Integrating {len(updates)} regulatory updates into Knowledge Base.\")\n\n        # 1. Update local cache\n        for source, title, summary in updates:\n            if source not in self.regulatory_knowledge:\n                self.regulatory_knowledge[source] = {\"updates\": []}\n            self.regulatory_knowledge[source][\"updates\"].append({\"title\": title, \"summary\": summary})\n\n        # 2. Update UnifiedKnowledgeGraph if available\n        if knowledge_graph and hasattr(knowledge_graph, 'ingest_regulatory_data'):\n            formatted_updates = [{\"source\": s, \"title\": t, \"summary\": sum} for s, t, sum in updates]\n            try:\n                knowledge_graph.ingest_regulatory_data(formatted_updates)\n                logger.info(\"Updates ingested into UnifiedKnowledgeGraph.\")\n            except Exception as e:\n                logger.error(f\"Failed to ingest regulatory data into Graph: {e}\")"
+      },
+      {
+        "name": "_continuous_learning",
+        "ast_hash": "sha256:08180fd04d50cd11",
+        "loc": 35,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "process_feedback",
+        "ast_hash": "sha256:ced5273f0c7cbe2d",
+        "loc": 28,
+        "source": "def process_feedback(self, feedback_data: Dict[str, Any]):\n        \"\"\"\n        Processes feedback from audits or human reviewers to adjust learned parameters.\n\n        Args:\n            feedback_data: Dict containing 'transaction_id', 'correct_assessment' (bool),\n                           'rule_id' (optional), 'comment'.\n        \"\"\"\n        # This allows adjusting rule weights\n        if \"rule_id\" in feedback_data:\n            rule = feedback_data[\"rule_id\"]\n            correct = feedback_data.get(\"correct_assessment\", True)\n\n            weights = self.learned_params.setdefault(\"rule_weights\", {})\n            current_weight = weights.get(rule, 0.5)\n\n            learning_rate = self.learned_params.get(\"learning_rate\", 0.05)\n\n            if not correct:\n                # We were wrong (False Positive), decrease weight\n                weights[rule] = max(0.1, current_weight - learning_rate)\n                logger.info(f\"Feedback: Decreasing weight for rule {rule} to {weights[rule]}\")\n            else:\n                # We were right (True Positive), potentially increase (reinforcement)\n                weights[rule] = min(1.0, current_weight + (learning_rate * 0.1))\n                logger.info(f\"Feedback: Increasing weight for rule {rule} to {weights[rule]}\")\n\n        self._save_learned_profile()"
+      },
+      {
+        "name": "_save_audit_trail",
+        "ast_hash": "sha256:f21c15cdc4700185",
+        "loc": 18,
+        "source": "def _save_audit_trail(self, results: List[Dict]):\n        \"\"\"\n        Saves analysis results to a secure audit log file (JSONL).\n        \"\"\"\n        audit_file = \"logs/compliance_audit.jsonl\"\n        try:\n            os.makedirs(os.path.dirname(audit_file), exist_ok=True)\n            with open(audit_file, \"a\") as f:\n                for res in results:\n                    entry = {\n                        \"timestamp\": datetime.utcnow().isoformat(),\n                        \"agent_id\": self.config.get(\"agent_id\", \"unknown\"),\n                        **res\n                    }\n                    f.write(json.dumps(entry) + \"\\n\")\n            logger.info(f\"Audit trail saved to {audit_file}\")\n        except Exception as e:\n            logger.error(f\"Failed to save audit trail: {e}\")"
+      },
+      {
+        "name": "execute",
+        "ast_hash": "sha256:694ec988823b1a46",
+        "loc": 65,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      }
+    ]
+  }
+}

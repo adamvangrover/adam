@@ -1,0 +1,55 @@
+{
+  "spec_version": "1.4.0-otel",
+  "timestamp": "2026-04-24T00:13:03.355457Z",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "severity_text": "WARN",
+  "severity_number": 13,
+  "event_name": "swarm.agent.lifecycle.deprecated",
+  "resource": {
+    "service.name": "swarm-orchestrator",
+    "service.version": "4.2.0",
+    "deployment.environment": "production",
+    "node.id": "worker-node-aws-us-east-1a-04"
+  },
+  "attributes": {
+    "agent.id": "ReviewerAgent",
+    "agent.previous_version": "v29.x",
+    "agent.target_version": "v30",
+    "deprecation.reason": "Transitioning to v30 architecture.",
+    "deprecation.action_required": true
+  },
+  "metrics": {
+    "agent.core_logic.function_count": 3,
+    "agent.capabilities.count": 0
+  },
+  "artifacts": {
+    "provenance": {
+      "repository": "git+ssh://repo/core/agents/developer_swarm/reviewer_agent.py",
+      "commit_sha": "a1b2c3d4e5f6g7h8i9j0",
+      "docstring_hash": "sha256:d8c4b12389a..."
+    },
+    "extracted_capabilities": [],
+    "core_logic_signatures": [
+      {
+        "name": "__init__",
+        "ast_hash": "sha256:15ea54037d1b27e5",
+        "loc": 3,
+        "source": "def __init__(self, config: Dict[str, Any], **kwargs):\n        super().__init__(config, **kwargs)\n        self.name = \"ReviewerAgent\""
+      },
+      {
+        "name": "execute",
+        "ast_hash": "sha256:08ff3f7ba99723d3",
+        "loc": 44,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "get_skill_schema",
+        "ast_hash": "sha256:9a5bc43ee3de5f3c",
+        "loc": 15,
+        "source": "def get_skill_schema(self) -> Dict[str, Any]:\n        \"\"\"\n        Defines the skills of the ReviewerAgent.\n        \"\"\"\n        schema = super().get_skill_schema()\n        schema[\"skills\"].append(\n            {\n                \"name\": \"review_code\",\n                \"description\": \"Reviews a code artifact for quality and style.\",\n                \"parameters\": [\n                    {\"name\": \"code_artifact\", \"type\": \"dict\", \"description\": \"A dictionary containing the code to review.\"}\n                ]\n            }\n        )\n        return schema"
+      }
+    ]
+  }
+}

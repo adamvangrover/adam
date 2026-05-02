@@ -1,0 +1,61 @@
+{
+  "spec_version": "1.4.0-otel",
+  "timestamp": "2026-04-24T00:13:03.355457Z",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "severity_text": "WARN",
+  "severity_number": 13,
+  "event_name": "swarm.agent.lifecycle.deprecated",
+  "resource": {
+    "service.name": "swarm-orchestrator",
+    "service.version": "4.2.0",
+    "deployment.environment": "production",
+    "node.id": "worker-node-aws-us-east-1a-04"
+  },
+  "attributes": {
+    "agent.id": "InsiderActivityAgent",
+    "agent.previous_version": "v29.x",
+    "agent.target_version": "v30",
+    "deprecation.reason": "Transitioning to v30 architecture.",
+    "deprecation.action_required": true
+  },
+  "metrics": {
+    "agent.core_logic.function_count": 4,
+    "agent.capabilities.count": 0
+  },
+  "artifacts": {
+    "provenance": {
+      "repository": "git+ssh://repo/core/agents/insider_activity_agent.py",
+      "commit_sha": "a1b2c3d4e5f6g7h8i9j0",
+      "docstring_hash": "sha256:d8c4b12389a..."
+    },
+    "extracted_capabilities": [],
+    "core_logic_signatures": [
+      {
+        "name": "__init__",
+        "ast_hash": "sha256:5e6fef3c85a6c7f3",
+        "loc": 6,
+        "source": "def __init__(self, config: Dict[str, Any], **kwargs):\n        \"\"\"\n        Initializes the InsiderActivityAgent.\n        \"\"\"\n        super().__init__(config, **kwargs)\n        self.mock_mode = config.get('mock_mode', False)"
+      },
+      {
+        "name": "execute",
+        "ast_hash": "sha256:761c30e07dbb888b",
+        "loc": 64,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "_fetch_insider_data",
+        "ast_hash": "sha256:835b3ff50a791f5c",
+        "loc": 16,
+        "source": "def _fetch_insider_data(self, query: str) -> InsiderActivityData:\n        \"\"\"Simulates fetching SEC Form 4 insider data.\"\"\"\n        if self.mock_mode:\n             return InsiderActivityData(\n                 buy_volume=1500000.0,\n                 sell_volume=500000.0,\n                 cluster_buys=True,\n                 officer_buys=2\n             )\n        # Add some randomness for non-mock but simulated execution\n        return InsiderActivityData(\n             buy_volume=random.uniform(0, 5000000),\n             sell_volume=random.uniform(100000, 10000000),\n             cluster_buys=random.choice([True, False]),\n             officer_buys=random.randint(0, 3)\n        )"
+      },
+      {
+        "name": "_format_output",
+        "ast_hash": "sha256:1c044226c26c1a12",
+        "loc": 17,
+        "source": "def _format_output(self, result: Dict[str, Any], query: str) -> AgentOutput:\n        \"\"\"Helper to format output to AgentOutput.\"\"\"\n        sentiment_score = result.get(\"sentiment_score\", 0.0)\n        details = result.get(\"details\", {})\n\n        answer = f\"Insider Activity Analysis for '{query}':\\n\"\n        answer += f\"Sentiment Score: {sentiment_score:.2f} (0.0 Bearish - 1.0 Bullish)\\n\"\n        answer += f\"Buy Volume: ${details.get('buy_volume'):,.2f}\\n\"\n        answer += f\"Sell Volume: ${details.get('sell_volume'):,.2f}\\n\"\n        answer += f\"Cluster Buys Detected: {details.get('cluster_buys')}\\n\"\n\n        return AgentOutput(\n            answer=answer,\n            sources=[\"SimulatedSECForm4API\"],\n            confidence=0.85,\n            metadata=result\n        )"
+      }
+    ]
+  }
+}

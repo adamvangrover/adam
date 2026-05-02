@@ -1,0 +1,88 @@
+{
+  "spec_version": "1.4.0-otel",
+  "timestamp": "2026-04-24T00:13:03.355457Z",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "severity_text": "WARN",
+  "severity_number": 13,
+  "event_name": "swarm.agent.lifecycle.deprecated",
+  "resource": {
+    "service.name": "swarm-orchestrator",
+    "service.version": "4.2.0",
+    "deployment.environment": "production",
+    "node.id": "worker-node-aws-us-east-1a-04"
+  },
+  "attributes": {
+    "agent.id": "CreditRiskControllerAgent",
+    "agent.previous_version": "v29.x",
+    "agent.target_version": "v30",
+    "deprecation.reason": "Transitioning to v30 architecture.",
+    "deprecation.action_required": true
+  },
+  "metrics": {
+    "agent.core_logic.function_count": 8,
+    "agent.capabilities.count": 0
+  },
+  "artifacts": {
+    "provenance": {
+      "repository": "git+ssh://repo/core/agents/specialized/credit_risk_controller_agent.py",
+      "commit_sha": "a1b2c3d4e5f6g7h8i9j0",
+      "docstring_hash": "sha256:d8c4b12389a..."
+    },
+    "extracted_capabilities": [],
+    "core_logic_signatures": [
+      {
+        "name": "__init__",
+        "ast_hash": "sha256:cc5281f08be0522f",
+        "loc": 138,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "execute",
+        "ast_hash": "sha256:7f9b9e5a17b94db8",
+        "loc": 14,
+        "source": "async def execute(self, *args: Any, **kwargs: Any) -> Any:\n        \"\"\"\n        Implementation of the abstract execute method.\n        Bridges the gap between AsyncAgentBase's dict-based calls and the agent's task-based logic.\n        \"\"\"\n        if args and isinstance(args[0], AsyncTask):\n            task_obj = args[0]\n        else:\n            # Construct AsyncTask from kwargs\n            input_data = kwargs # Use all kwargs as input data\n            task_name = kwargs.get(\"task\", \"CreditRiskAudit\")\n            task_obj = AsyncTask(name=task_name, dependencies=[], execute_func=None, input_data=input_data)\n        \n        return await self.execute_task(task_obj)"
+      },
+      {
+        "name": "execute_task",
+        "ast_hash": "sha256:984969f3a5595ceb",
+        "loc": 75,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "_calculate_sp_frp",
+        "ast_hash": "sha256:bf201107457ca42d",
+        "loc": 17,
+        "source": "def _calculate_sp_frp(self, leverage: float, coverage: float) -> Tuple[str, str]:\n        \"\"\"\n        Emulates S&P Corporate Methodology (2024) Matrix.\n        Returns (FRP Description, Anchor Rating).\n        \"\"\"\n        if leverage < 1.5 and coverage > 15.0:\n            return \"Minimal\", \"AA\"\n        elif leverage < 2.0:\n            return \"Modest\", \"BBB\"\n        elif leverage < 3.0:\n            return \"Intermediate\", \"BBB-\"\n        elif leverage < 4.0:\n            return \"Significant\", \"BB\"\n        elif leverage < 5.0:\n            return \"Aggressive\", \"B+\"\n        else:\n            return \"Highly Leveraged\", \"B\""
+      },
+      {
+        "name": "_simulate_regulatory_response",
+        "ast_hash": "sha256:35660815760efdfc",
+        "loc": 24,
+        "source": "def _simulate_regulatory_response(self, leverage: float, repayment_capacity: float, tdr_flag: bool) -> Tuple[str, List[str]]:\n        \"\"\"\n        Simulates the SNC Examiner's logic gates.\n        \"\"\"\n        risk = \"Low\"\n        drivers = []\n\n        if tdr_flag:\n            return \"Critical\", [\"TDR Flag Present - Automatic Substandard/Doubtful\"]\n\n        if leverage > 7.0:\n            risk = \"High\"\n            drivers.append(\"Leverage > 7.0x (SNC Non-Pass threshold)\")\n        elif leverage > 6.0:\n            if repayment_capacity < 50.0:\n                risk = \"High\"\n                drivers.append(\"Leverage > 6.0x AND Repayment Capacity < 50% (No De-leveraging path)\")\n            else:\n                risk = \"Medium\"\n                drivers.append(\"Leverage > 6.0x but Repayment Capacity Adequate\")\n        elif leverage < 4.0:\n            risk = \"Low\"\n        \n        return risk, drivers"
+      },
+      {
+        "name": "_calculate_conviction_score",
+        "ast_hash": "sha256:7117c3edbd24c99e",
+        "loc": 77,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "_construct_prompt",
+        "ast_hash": "sha256:d0694bb5600af8f8",
+        "loc": 33,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "_parse_output",
+        "ast_hash": "sha256:1a05a4d86ff4c4e1",
+        "loc": 16,
+        "source": "def _parse_output(self, llm_content: str, heuristic_context: Dict) -> Dict:\n        \"\"\"\n        Wraps the Markdown content in the strict JSON schema required by the 'Apex' system.\n        \"\"\"\n        return {\n            \"v23_knowledge_graph\": {\n                \"credit_analysis\": {\n                    \"snc_rating_model\": {\n                        \"overall_borrower_rating\": \"Derived from LLM content\",\n                        \"regulatory_disagreement_risk\": heuristic_context['disagreement_risk'],\n                        \"conviction_score\": heuristic_context['conviction_score']\n                    },\n                    \"generated_report\": llm_content\n                }\n            }\n        }"
+      }
+    ]
+  }
+}

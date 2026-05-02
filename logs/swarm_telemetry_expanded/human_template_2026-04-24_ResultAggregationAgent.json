@@ -1,0 +1,54 @@
+{
+  "spec_version": "1.4.0-otel",
+  "timestamp": "2026-04-24T00:13:03.355457Z",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "severity_text": "WARN",
+  "severity_number": 13,
+  "event_name": "swarm.agent.lifecycle.deprecated",
+  "resource": {
+    "service.name": "swarm-orchestrator",
+    "service.version": "4.2.0",
+    "deployment.environment": "production",
+    "node.id": "worker-node-aws-us-east-1a-04"
+  },
+  "attributes": {
+    "agent.id": "ResultAggregationAgent",
+    "agent.previous_version": "v29.x",
+    "agent.target_version": "v30",
+    "deprecation.reason": "Transitioning to v30 architecture.",
+    "deprecation.action_required": true
+  },
+  "metrics": {
+    "agent.core_logic.function_count": 3,
+    "agent.capabilities.count": 0
+  },
+  "artifacts": {
+    "provenance": {
+      "repository": "git+ssh://repo/core/agents/result_aggregation_agent.py",
+      "commit_sha": "a1b2c3d4e5f6g7h8i9j0",
+      "docstring_hash": "sha256:d8c4b12389a..."
+    },
+    "extracted_capabilities": [],
+    "core_logic_signatures": [
+      {
+        "name": "__init__",
+        "ast_hash": "sha256:528ba30338b58fbf",
+        "loc": 10,
+        "source": "def __init__(self, config: Dict[str, Any], **kwargs):\n        \"\"\"\n        Initializes the ResultAggregationAgent.\n        \"\"\"\n        super().__init__(config, **kwargs)\n\n        # Access config directly, assuming it's already loaded by Orchestrator\n        self.persona = self.config.get('persona', \"Result Aggregation Agent\")\n        self.description = self.config.get('description', \"Combines results from multiple agents.\")\n        self.expertise = self.config.get('expertise', [\"data aggregation\", \"result summarization\"])"
+      },
+      {
+        "name": "execute",
+        "ast_hash": "sha256:8d219810130ecb23",
+        "loc": 21,
+        "source": "async def execute(self, results: list) -> str:\n        \"\"\"\n        Combines results from multiple agents.\n\n        Args:\n            results: A list of results (strings, for now) from other agents.\n\n        Returns:\n            A single string representing the aggregated results.\n        \"\"\"\n        try:\n            if not results:\n                return \"No results to aggregate.\"\n\n            aggregated_result = self._concatenate_results(results)\n            logging.info(f\"Results aggregated: {aggregated_result}\")\n            return aggregated_result\n\n        except Exception as e:\n            logging.error(f\"Error in ResultAggregationAgent: {e}\")\n            return \"An error occurred during result aggregation.\""
+      },
+      {
+        "name": "_concatenate_results",
+        "ast_hash": "sha256:bebea66b8679581d",
+        "loc": 5,
+        "source": "def _concatenate_results(self, results: list) -> str:\n        \"\"\"\n        Concatenates results with separators (basic implementation).\n        \"\"\"\n        return \"\\n\\n\".join([str(r) for r in results])"
+      }
+    ]
+  }
+}

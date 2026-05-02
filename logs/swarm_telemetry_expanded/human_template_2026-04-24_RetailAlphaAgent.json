@@ -1,0 +1,85 @@
+{
+  "spec_version": "1.4.0-otel",
+  "timestamp": "2026-04-24T00:13:03.355457Z",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "severity_text": "WARN",
+  "severity_number": 13,
+  "event_name": "swarm.agent.lifecycle.deprecated",
+  "resource": {
+    "service.name": "swarm-orchestrator",
+    "service.version": "4.2.0",
+    "deployment.environment": "production",
+    "node.id": "worker-node-aws-us-east-1a-04"
+  },
+  "attributes": {
+    "agent.id": "RetailAlphaAgent",
+    "agent.previous_version": "v29.x",
+    "agent.target_version": "v30",
+    "deprecation.reason": "Transitioning to v30 architecture.",
+    "deprecation.action_required": true
+  },
+  "metrics": {
+    "agent.core_logic.function_count": 8,
+    "agent.capabilities.count": 0
+  },
+  "artifacts": {
+    "provenance": {
+      "repository": "git+ssh://repo/core/agents/specialized/retail_alpha_agent.py",
+      "commit_sha": "a1b2c3d4e5f6g7h8i9j0",
+      "docstring_hash": "sha256:d8c4b12389a..."
+    },
+    "extracted_capabilities": [],
+    "core_logic_signatures": [
+      {
+        "name": "__init__",
+        "ast_hash": "sha256:9c03c196324b7880",
+        "loc": 8,
+        "source": "def __init__(self, config: Dict[str, Any], constitution: Dict[str, Any] = None, kernel=None):\n        super().__init__(config, constitution=constitution, kernel=kernel)\n        self.mock_mode = config.get(\"mock_mode\", True) # Default to mock for instant utility\n\n        # Initialize sub-agents if available and not in mock mode\n        self.radar_agent = InstitutionalRadarAgent(config) if RADAR_AVAILABLE and not self.mock_mode else None\n        # Risk agent might need specific init, keeping it simple for now\n        self.risk_agent = None"
+      },
+      {
+        "name": "execute",
+        "ast_hash": "sha256:e16b9e5753fdea01",
+        "loc": 20,
+        "source": "async def execute(self, tickers: List[str] = None, **kwargs) -> Dict[str, Any]:\n        if not tickers:\n            tickers = [\"AAPL\", \"NVDA\", \"TSLA\", \"GME\", \"AMC\", \"PLTR\", \"AMD\", \"MSFT\"]\n\n        logger.info(f\"Generating Retail Alpha Signals for: {tickers}\")\n\n        results = []\n\n        for ticker in tickers:\n            signal = await self._analyze_ticker(ticker)\n            results.append(signal)\n\n        # Sort by conviction\n        results.sort(key=lambda x: x['conviction'], reverse=True)\n\n        return {\n            \"signals\": results,\n            \"market_status\": self._get_market_status(),\n            \"timestamp\": \"2025-10-24T14:30:00Z\" # In a real app, use datetime.utcnow()\n        }"
+      },
+      {
+        "name": "_analyze_ticker",
+        "ast_hash": "sha256:ebf4392c5e485ce4",
+        "loc": 57,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "_get_institutional_score",
+        "ast_hash": "sha256:1c91b213d29f16fe",
+        "loc": 10,
+        "source": "def _get_institutional_score(self, ticker: str) -> int:\n        \"\"\"Mock logic for demo - replace with InstitutionalRadarAgent\"\"\"\n        # randomized but consistent for demo\n        seed = sum(ord(c) for c in ticker)\n        random.seed(seed)\n        base = random.randint(20, 90)\n        # Bias some popular ones for the narrative\n        if ticker in [\"NVDA\", \"MSFT\"]: return 85 # Whales love these\n        if ticker in [\"GME\", \"AMC\"]: return 25   # Whales hate these\n        return base"
+      },
+      {
+        "name": "_get_retail_sentiment",
+        "ast_hash": "sha256:0c3eaf7a2a45ad36",
+        "loc": 5,
+        "source": "def _get_retail_sentiment(self, ticker: str) -> int:\n        \"\"\"Mock logic for demo - replace with MarketSentimentGraph\"\"\"\n        if ticker in [\"GME\", \"AMC\", \"TSLA\"]: return 95 # Retail loves these\n        if ticker in [\"NVDA\"]: return 80\n        return 50"
+      },
+      {
+        "name": "_get_risk_profile",
+        "ast_hash": "sha256:c69993609067ef94",
+        "loc": 5,
+        "source": "def _get_risk_profile(self, ticker: str) -> int:\n        \"\"\"Mock logic\"\"\"\n        if ticker in [\"GME\", \"AMC\"]: return 90\n        if ticker in [\"MSFT\", \"AAPL\"]: return 30\n        return 60"
+      },
+      {
+        "name": "_get_catalyst",
+        "ast_hash": "sha256:3447bf86dd48484c",
+        "loc": 11,
+        "source": "def _get_catalyst(self, ticker: str) -> str:\n        catalysts = [\n            \"Earnings Beat Expectation\",\n            \"New Product Launch\",\n            \"CEO Insider Buying\",\n            \"Sector Rotation\",\n            \"Short Squeeze Potential\",\n            \"Analyst Upgrade Cycle\",\n            \"Macro Headwinds\"\n        ]\n        return random.choice(catalysts)"
+      },
+      {
+        "name": "_get_market_status",
+        "ast_hash": "sha256:5fe6a5acea5c420b",
+        "loc": 6,
+        "source": "def _get_market_status(self):\n        return {\n            \"regime\": \"High Volatility / Distribution\",\n            \"vix\": 24.5,\n            \"sector_rotation\": \"Tech -> Energy\"\n        }"
+      }
+    ]
+  }
+}

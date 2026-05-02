@@ -18,6 +18,29 @@ interface LogEntry {
   message: string;
 }
 
+
+const getLogLevelColor = (level: string) => {
+  switch (level) {
+    case 'INFO': return 'text-blue-400';
+    case 'WARN': return 'text-yellow-400';
+    case 'ERROR': return 'text-red-400';
+    default: return 'text-gray-300';
+  }
+};
+
+// ⚡ Bolt: Wrapped list item in React.memo to prevent O(N) re-renders
+// Since SystemHealthMonitor updates state every 3s via setInterval,
+// extracting this prevents re-rendering all existing 50 logs.
+const LogEntryRow = React.memo(({ log }: { log: LogEntry }) => (
+  <div className="mb-1 border-b border-gray-800 pb-1 last:border-0">
+    <span className="text-gray-500 mr-3">[{log.timestamp}]</span>
+    <span className={`font-bold mr-3 ${getLogLevelColor(log.level)}`}>{log.level}</span>
+    <span className="text-indigo-300 mr-3">[{log.source}]</span>
+    <span className="text-gray-300">{log.message}</span>
+  </div>
+));
+LogEntryRow.displayName = 'LogEntryRow';
+
 const SystemHealthMonitor: React.FC = () => {
   const [systemStatus, setSystemStatus] = useState<SystemStatus>({
     cpuUsage: 0,
@@ -65,14 +88,6 @@ const SystemHealthMonitor: React.FC = () => {
     }
   };
 
-  const getLogLevelColor = (level: string) => {
-    switch (level) {
-      case 'INFO': return 'text-blue-400';
-      case 'WARN': return 'text-yellow-400';
-      case 'ERROR': return 'text-red-400';
-      default: return 'text-gray-300';
-    }
-  };
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
@@ -138,12 +153,7 @@ const SystemHealthMonitor: React.FC = () => {
         
         <div className="flex-1 overflow-y-auto bg-gray-900 rounded p-4 font-mono text-sm custom-scrollbar">
           {logs.map((log) => (
-            <div key={log.id} className="mb-1 border-b border-gray-800 pb-1 last:border-0">
-              <span className="text-gray-500 mr-3">[{log.timestamp}]</span>
-              <span className={`font-bold mr-3 ${getLogLevelColor(log.level)}`}>{log.level}</span>
-              <span className="text-indigo-300 mr-3">[{log.source}]</span>
-              <span className="text-gray-300">{log.message}</span>
-            </div>
+            <LogEntryRow key={log.id} log={log} />
           ))}
           {logs.length === 0 && (
             <div className="text-gray-500 text-center mt-10">Waiting for system events...</div>

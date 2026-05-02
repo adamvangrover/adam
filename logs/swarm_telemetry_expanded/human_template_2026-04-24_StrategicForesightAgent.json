@@ -1,0 +1,154 @@
+{
+  "spec_version": "1.4.0-otel",
+  "timestamp": "2026-04-24T00:13:03.355457Z",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "severity_text": "WARN",
+  "severity_number": 13,
+  "event_name": "swarm.agent.lifecycle.deprecated",
+  "resource": {
+    "service.name": "swarm-orchestrator",
+    "service.version": "4.2.0",
+    "deployment.environment": "production",
+    "node.id": "worker-node-aws-us-east-1a-04"
+  },
+  "attributes": {
+    "agent.id": "StrategicForesightAgent",
+    "agent.previous_version": "v29.x",
+    "agent.target_version": "v30",
+    "deprecation.reason": "Transitioning to v30 architecture.",
+    "deprecation.action_required": true
+  },
+  "metrics": {
+    "agent.core_logic.function_count": 19,
+    "agent.capabilities.count": 0
+  },
+  "artifacts": {
+    "provenance": {
+      "repository": "git+ssh://repo/core/agents/strategic_foresight_agent.py",
+      "commit_sha": "a1b2c3d4e5f6g7h8i9j0",
+      "docstring_hash": "sha256:d8c4b12389a..."
+    },
+    "extracted_capabilities": [],
+    "core_logic_signatures": [
+      {
+        "name": "__init__",
+        "ast_hash": "sha256:dd223ce229866276",
+        "loc": 37,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "execute",
+        "ast_hash": "sha256:e3209f4ad9f6d34f",
+        "loc": 25,
+        "source": "async def execute(self, **kwargs) -> Dict[str, Any]:\n        \"\"\"\n        Executes the foresight analysis. Dispatches logic based on input type.\n        \"\"\"\n        logger.info(\"StrategicForesightAgent executing...\")\n\n        # Dispatch 1: Specific Financial Market Analysis (Main Branch Logic)\n        if \"ticker\" in kwargs:\n            ticker = kwargs.get(\"ticker\")\n            horizon = kwargs.get(\"horizon\", 10)\n            return self._generate_market_briefing(ticker, horizon)\n\n        # Dispatch 2: Geopolitical Simulation (Main Branch Logic)\n        elif \"simulation_data\" in kwargs:\n            simulation_data = kwargs.get('simulation_data')\n            briefing = self._generate_nsc_briefing(simulation_data)\n            \n            # Add Swarm Critique\n            critiques = self.critique_swarm.critique(briefing, simulation_data)\n            briefing[\"independent_critiques\"] = critiques\n            return briefing\n\n        # Dispatch 3: Default Comprehensive Strategic Foresight (Feature Branch Logic)\n        else:\n            return await self._generate_comprehensive_foresight()"
+      },
+      {
+        "name": "_generate_comprehensive_foresight",
+        "ast_hash": "sha256:02ef9e57824c527d",
+        "loc": 72,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "_generate_market_briefing",
+        "ast_hash": "sha256:4a80d0649c4c52cc",
+        "loc": 63,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "_construct_market_narrative",
+        "ast_hash": "sha256:642d9ff979d33daa",
+        "loc": 8,
+        "source": "def _construct_market_narrative(self, ticker, status, drift):\n        if status == \"REGIME_SHIFT_IMMINENT\":\n            direction = \"CRASH\" if drift < 0 else \"melt-up\"\n            return f\"CRITICAL ALERT: OSWM detects a {abs(drift*100):.1f}% {direction} trajectory for {ticker}. Hedging recommended.\"\n        elif status == \"HIGH_UNCERTAINTY\":\n            return f\"WARNING: Market physics are breaking down for {ticker}. Predictive confidence is low.\"\n        else:\n            return f\"Conditions for {ticker} appear nominal. Standard risk parameters apply.\""
+      },
+      {
+        "name": "_generate_nsc_briefing",
+        "ast_hash": "sha256:c1d8852380d3b3ea",
+        "loc": 51,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "_get_affected_sector",
+        "ast_hash": "sha256:0e492b754b3d3319",
+        "loc": 5,
+        "source": "def _get_affected_sector(self, scenario):\n        if \"Semiconductor\" in scenario: return \"Advanced Technology & Defense\"\n        elif \"Energy\" in scenario: return \"Critical Energy & Logistics\"\n        elif \"Cyber\" in scenario or \"Quantum\" in scenario: return \"Financial & Information Systems\"\n        return \"National Economic\""
+      },
+      {
+        "name": "_analyze_economic_fallout",
+        "ast_hash": "sha256:55d91b6d1bb1488f",
+        "loc": 11,
+        "source": "def _analyze_economic_fallout(self, sector_impact: Dict[str, int]) -> str:\n        if not sector_impact: return \"Insufficient data to project economic fallout.\"\n        sorted_sectors = sorted(sector_impact.items(), key=lambda item: item[1], reverse=True)\n        top_3 = sorted_sectors[:3]\n        analysis = \"Contagion Risk Analysis: \"\n        for sector, val in top_3:\n             if val > 50: analysis += f\"{sector} ({val}/100) severe risk. \"\n             elif val > 20: analysis += f\"{sector} ({val}/100) moderate strain. \"\n        if sector_impact.get(\"Finance\", 0) > 70 or sector_impact.get(\"Shadow Banking\", 0) > 70:\n            analysis += \"Capital flight and liquidity crunch imminent.\"\n        return analysis"
+      },
+      {
+        "name": "_get_recommendations",
+        "ast_hash": "sha256:cb83906c2d151371",
+        "loc": 14,
+        "source": "def _get_recommendations(self, scenario, threat_level):\n        recs = []\n        if scenario == \"Semiconductor Blockade\":\n            recs = [\"Invoke Defense Production Act for domestic fabs.\", \"Initiate 'Silicon Shield' diplomatic protocols.\", \"Authorize strategic reserve release of rare earths.\"]\n        elif scenario == \"Energy Shock\":\n            recs = [\"Deploy naval assets to transit straits.\", \"Activate SPR drawdown.\", \"Implement emergency industrial rationing.\"]\n        elif scenario == \"Cyber Infrastructure Attack\":\n            recs = [\"Sever links to critical banking nodes.\", \"Activate NCMF counter-strike.\", \"Mandate paper-trail backups.\"]\n        elif scenario == \"Quantum Decryption Event\":\n            recs = [\"Initiate PQC transition immediately.\", \"Isolate sovereign ledger nodes.\", \"Freeze blockchain assets.\"]\n        \n        if threat_level == \"CRITICAL\":\n            recs.append(\"Raise DEFCON level. Mobilize cyber-command response.\")\n        return recs"
+      },
+      {
+        "name": "_fetch_live_market_data",
+        "ast_hash": "sha256:8c6040649ca2582c",
+        "loc": 30,
+        "source": "async def _fetch_live_market_data(self) -> Dict[str, Any]:\n        \"\"\"Fetches live snapshots and computes system credit rating.\"\"\"\n        loop = asyncio.get_running_loop()\n        def get_snap(t):\n            try: return self.data_fetcher.fetch_realtime_snapshot(t)\n            except: return {}\n\n        tickers = [\"SPY\", \"QQQ\", \"HYG\", \"LQD\", \"^TNX\", \"^VIX\", \"BTC-USD\", \"ETH-USD\"]\n        tasks = [loop.run_in_executor(None, get_snap, t) for t in tickers]\n        results = await asyncio.gather(*tasks)\n\n        data_map = {t: r for t, r in zip(tickers, results)}\n        vix = data_map.get(\"^VIX\", {}).get(\"last_price\", 20.0)\n        hyg = data_map.get(\"HYG\", {}).get(\"last_price\", 75.0)\n\n        credit_score = 100 - (vix * 1.5) + (hyg / 2.0)\n        rating = \"BBB\"\n        if credit_score > 90: rating = \"AAA\"\n        elif credit_score > 80: rating = \"AA\"\n        elif credit_score > 70: rating = \"A\"\n        elif credit_score > 60: rating = \"BBB\"\n        elif credit_score > 50: rating = \"BB\"\n        elif credit_score > 40: rating = \"B\"\n        else: rating = \"CCC\"\n\n        return {\n            \"tickers\": data_map,\n            \"systemic_credit_rating\": rating,\n            \"credit_score_raw\": credit_score\n        }"
+      },
+      {
+        "name": "_run_gnn",
+        "ast_hash": "sha256:889b01da43967742",
+        "loc": 9,
+        "source": "def _run_gnn(self):\n        if not self.gnn_engine: return {}\n        try:\n            risk_map = self.gnn_engine.predict_risk()\n            sorted_nodes = sorted(risk_map.items(), key=lambda item: item[1], reverse=True)\n            return {\"top_risks\": sorted_nodes[:3], \"average_system_risk\": float(np.mean(list(risk_map.values())))}\n        except Exception as e:\n            logger.error(f\"GNN Engine failed: {e}\")\n            return {}"
+      },
+      {
+        "name": "_run_fl",
+        "ast_hash": "sha256:fdf6b963898a0deb",
+        "loc": 8,
+        "source": "def _run_fl(self):\n        if not self.fl_coordinator: return {}\n        try:\n            loss, acc = self.fl_coordinator.run_round(1)\n            return {\"round\": 1, \"avg_loss\": float(loss), \"consensus_accuracy\": float(acc)}\n        except Exception as e:\n            logger.error(f\"FL Coordinator failed: {e}\")\n            return {}"
+      },
+      {
+        "name": "_audit_world_model",
+        "ast_hash": "sha256:b5ff4a892f70c3c9",
+        "loc": 15,
+        "source": "def _audit_world_model(self) -> Dict[str, Any]:\n        \"\"\"Audits the Unified Knowledge Graph schema.\"\"\"\n        graph = self.ukg.graph\n        node_types = {}\n        for n, attrs in graph.nodes(data=True):\n            nt = attrs.get('type', 'Unknown')\n            node_types[nt] = node_types.get(nt, 0) + 1\n        sorted_types = sorted(node_types.items(), key=lambda x: x[1], reverse=True)[:5]\n        return {\n            \"total_nodes\": graph.number_of_nodes(),\n            \"total_edges\": graph.number_of_edges(),\n            \"node_types\": sorted_types,\n            \"density\": nx.density(graph),\n            \"status\": \"Audited & Provenance Verified\"\n        }"
+      },
+      {
+        "name": "_load_future_scenarios",
+        "ast_hash": "sha256:618f2c61268a6b13",
+        "loc": 8,
+        "source": "def _load_future_scenarios(self) -> List[Dict[str, Any]]:\n        path = \"showcase/data/future_scenarios.json\"\n        if os.path.exists(path):\n            try:\n                with open(path, 'r') as f: return json.load(f)\n            except Exception as e:\n                logging.error(f\"Failed to load future scenarios: {e}\")\n        return []"
+      },
+      {
+        "name": "_load_log_data",
+        "ast_hash": "sha256:c62689ce372d8202",
+        "loc": 11,
+        "source": "def _load_log_data(self) -> List[Dict[str, Any]]:\n        if os.path.exists(self.log_path):\n            try:\n                with open(self.log_path, 'r') as f:\n                    data = json.load(f)\n                    if isinstance(data, list): return data\n                    if isinstance(data, dict) and \"log\" in data: return data[\"log\"]\n            except Exception as e:\n                logging.error(f\"Failed to load log: {e}\")\n        logging.warning(\"Using synthetic data for Strategic Foresight.\")\n        return self._generate_synthetic_data()"
+      },
+      {
+        "name": "_generate_synthetic_data",
+        "ast_hash": "sha256:9cad325221a32d93",
+        "loc": 11,
+        "source": "def _generate_synthetic_data(self) -> List[Dict[str, Any]]:\n        data = []\n        price = 100.0\n        for i in range(200):\n            price += np.random.normal(0, 1)\n            data.append({\n                \"state\": {\"price\": price, \"vix\": 15 + np.random.normal(0, 2), \"liquidity\": 1000},\n                \"action\": {\"buy_sell_imbalance\": np.random.normal(0, 0.5)},\n                \"reward\": 0.0\n            })\n        return data"
+      },
+      {
+        "name": "_opine_macro",
+        "ast_hash": "sha256:461fd84144fcc82d",
+        "loc": 6,
+        "source": "def _opine_macro(self, oswm_result, sentiment_details) -> str:\n        score = oswm_result[\"conviction_score\"]\n        vix = sentiment_details.get(\"vix\", 20.0)\n        if score < 0.4 or vix > 30:\n            return \"Extreme Caution. Sovereign risk premiums are detaching from fundamentals. Recommended defensive posturing.\"\n        return \"Stable. Sovereign credit spreads within nominal variance, but monitoring fiscal issuance closely.\""
+      },
+      {
+        "name": "_generate_dynamic_views",
+        "ast_hash": "sha256:db11637d2cc2ba5c",
+        "loc": 8,
+        "source": "def _generate_dynamic_views(self, oswm, sentiment, black_swan) -> Dict[str, str]:\n        views = self.HOUSE_VIEWS_TEMPLATE.copy()\n        base_pd = black_swan.get(\"base_pd\", 0.01)\n        if base_pd > 0.05:\n             views[\"Tail Risk\"] = \"Elevated. Systemic PD > 5%. Hedging mandatory.\"\n        if sentiment.get(\"liquidity_mirage\"):\n            views[\"Liquidity\"] = \"Mirage. Equity rally unsupported by credit flows. Expect reversal.\"\n        return views"
+      },
+      {
+        "name": "_extract_alpha",
+        "ast_hash": "sha256:174f52e7bba8544c",
+        "loc": 16,
+        "source": "def _extract_alpha(self, oswm_result, sentiment, gnn_metrics) -> List[str]:\n        score = oswm_result[\"conviction_score\"]\n        signals = []\n        if score > 0.7: signals.append(\"OSWM High Conviction: Mean Reversion Trade.\")\n        \n        eth_btc = sentiment.get(\"eth_btc_ratio\")\n        if eth_btc is not None and eth_btc < 0.05:\n             signals.append(\"Crypto: ETH/BTC Rotation Imminent (Oversold).\")\n        \n        vix = sentiment.get(\"vix\")\n        if vix is not None and vix > 30 and score > 0.5:\n             signals.append(\"Vol: Short VIX (Premium Harvesting).\")\n        \n        if gnn_metrics and gnn_metrics.get(\"average_system_risk\", 0) > 0.7:\n            signals.append(\"GNN Alert: Systemic Contagion Risk High. Short Financials.\")\n        return signals"
+      }
+    ]
+  }
+}

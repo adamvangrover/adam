@@ -1,0 +1,68 @@
+{
+  "spec_version": "1.4.0-otel",
+  "timestamp": "2026-04-24T00:13:03.355457Z",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "severity_text": "WARN",
+  "severity_number": 13,
+  "event_name": "swarm.agent.lifecycle.deprecated",
+  "resource": {
+    "service.name": "swarm-orchestrator",
+    "service.version": "4.2.0",
+    "deployment.environment": "production",
+    "node.id": "worker-node-aws-us-east-1a-04"
+  },
+  "attributes": {
+    "agent.id": "MonteCarloRiskAgent",
+    "agent.previous_version": "v29.x",
+    "agent.target_version": "v30",
+    "deprecation.reason": "Transitioning to v30 architecture.",
+    "deprecation.action_required": true
+  },
+  "metrics": {
+    "agent.core_logic.function_count": 5,
+    "agent.capabilities.count": 0
+  },
+  "artifacts": {
+    "provenance": {
+      "repository": "git+ssh://repo/core/agents/specialized/monte_carlo_risk_agent.py",
+      "commit_sha": "a1b2c3d4e5f6g7h8i9j0",
+      "docstring_hash": "sha256:d8c4b12389a..."
+    },
+    "extracted_capabilities": [],
+    "core_logic_signatures": [
+      {
+        "name": "__init__",
+        "ast_hash": "sha256:1eb8389759cea8c2",
+        "loc": 5,
+        "source": "def __init__(self, config: Dict[str, Any]):\n        super().__init__(config)\n        self.persona = \"Quantitative Risk Modeler\"\n        # Defaults are now handled in Pydantic, but we can store global overrides here if needed\n        self.iterations = 10000"
+      },
+      {
+        "name": "execute",
+        "ast_hash": "sha256:c7ce05e2d6fdef60",
+        "loc": 171,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "_run_gbm_simulation",
+        "ast_hash": "sha256:bd2ac45bab9b4a36",
+        "loc": 21,
+        "source": "def _run_gbm_simulation(self, request: MonteCarloRequest, dt: float) -> np.ndarray:\n        \"\"\"\n        Geometric Brownian Motion.\n        S_{t+1} = S_t * exp((mu - 0.5*sigma^2)dt + sigma * sqrt(dt) * Z)\n        \"\"\"\n        N = request.iterations\n        M = request.dt_steps\n        S0 = request.current_ebitda\n        mu = request.drift\n        sigma = request.volatility\n\n        # Paths matrix: (Iterations, Steps + 1)\n        paths = np.zeros((N, M + 1))\n        paths[:, 0] = S0\n\n        for t in range(1, M + 1):\n            Z = np.random.standard_normal(N)\n            # Vectorized update\n            paths[:, t] = paths[:, t-1] * np.exp((mu - 0.5 * sigma**2) * dt + sigma * np.sqrt(dt) * Z)\n\n        return paths"
+      },
+      {
+        "name": "_run_heston_simulation",
+        "ast_hash": "sha256:0d23a16e9b2527d6",
+        "loc": 50,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "_run_ou_simulation",
+        "ast_hash": "sha256:3362373674d48c9c",
+        "loc": 29,
+        "source": "def _run_ou_simulation(self, request: MonteCarloRequest, dt: float) -> np.ndarray:\n        \"\"\"\n        Ornstein-Uhlenbeck Process (Mean Reversion).\n        dX_t = theta * (mu - X_t) * dt + sigma * dW_t\n        \"\"\"\n        N = request.iterations\n        M = request.dt_steps\n        X0 = request.current_ebitda\n\n        # Note: In OU, 'mu' is the long-run mean level, 'theta' is speed.\n        # We mapped these in Pydantic schema: ou_mu -> Long Run Mean, ou_theta -> Speed\n        long_run_mean = request.ou_mu\n        theta = request.ou_theta\n        sigma = request.volatility\n\n        X = np.zeros((N, M + 1))\n        X[:, 0] = X0\n\n        for t in range(1, M + 1):\n            Z = np.random.standard_normal(N)\n\n            X_prev = X[:, t-1]\n\n            # Update: X_{t+1} = X_t + theta * (mu - X_t) * dt + sigma * sqrt(dt) * Z\n            dX = theta * (long_run_mean - X_prev) * dt + sigma * np.sqrt(dt) * Z\n\n            X[:, t] = X_prev + dX\n\n        return X"
+      }
+    ]
+  }
+}

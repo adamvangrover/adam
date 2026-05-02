@@ -1,0 +1,80 @@
+{
+  "spec_version": "1.4.0-otel",
+  "timestamp": "2026-04-24T00:13:03.355457Z",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "severity_text": "WARN",
+  "severity_number": 13,
+  "event_name": "swarm.agent.lifecycle.deprecated",
+  "resource": {
+    "service.name": "swarm-orchestrator",
+    "service.version": "4.2.0",
+    "deployment.environment": "production",
+    "node.id": "worker-node-aws-us-east-1a-04"
+  },
+  "attributes": {
+    "agent.id": "ChronosAgent",
+    "agent.previous_version": "v29.x",
+    "agent.target_version": "v30",
+    "deprecation.reason": "Transitioning to v30 architecture.",
+    "deprecation.action_required": true
+  },
+  "metrics": {
+    "agent.core_logic.function_count": 7,
+    "agent.capabilities.count": 0
+  },
+  "artifacts": {
+    "provenance": {
+      "repository": "git+ssh://repo/core/agents/meta_agents/chronos_agent.py",
+      "commit_sha": "a1b2c3d4e5f6g7h8i9j0",
+      "docstring_hash": "sha256:d8c4b12389a..."
+    },
+    "extracted_capabilities": [],
+    "core_logic_signatures": [
+      {
+        "name": "__init__",
+        "ast_hash": "sha256:339278037eadaf0f",
+        "loc": 11,
+        "source": "def __init__(self, \n                 llm_engine: BaseLLMEngine,\n                 config: Dict[str, Any], \n                 tools: List[BaseTool] = [],\n                 **kwargs):\n        super().__init__(config=config, **kwargs)\n        self.llm_engine = llm_engine\n        self.tools = tools\n        self.archive_path = config.get(\"archive_path\", \"core/libraries_and_archives/reports/\")\n        self.role = \"Temporal State & Historic Context Manager\"\n        self.goal = \"To optimize working memory usage and provide deep historical context for current events.\""
+      },
+      {
+        "name": "execute",
+        "ast_hash": "sha256:dcb86479c427436a",
+        "loc": 30,
+        "source": "async def execute(self, input_data: ChronosInput) -> ChronosOutput:\n        \"\"\"\n        Executes the temporal analysis.\n        Combines structured file scanning (main) with LLM-driven inference (v24).\n        \"\"\"\n        logger.info(f\"ChronosAgent analyzing temporal context for query: {input_data.query}\")\n\n        reference_date = input_data.reference_date or datetime.utcnow()\n\n        # 1. Determine Strategy (Optional enhancement from v24 logic)\n        strategy = await self._determine_memory_strategy(input_data.query)\n        logger.debug(f\"Chronos determined memory strategy: {strategy}\")\n\n        # 2. Retrieve Memories (Using main branch's robust file scanning)\n        memories = self._retrieve_memories(input_data.query, input_data.horizons, reference_date)\n\n        # 3. Find Historical Analogs (Using v24's LLM logic, mapped to main's Schema)\n        analogs = await self._find_historical_analogs(input_data.query, input_data.market_context)\n\n        # 4. Synthesize Narrative\n        synthesis = await self._synthesize_temporal_context(memories, analogs, strategy)\n\n        output = ChronosOutput(\n            query_context=input_data.query,\n            memories=memories,\n            historical_analogs=analogs,\n            temporal_synthesis=synthesis\n        )\n\n        return output"
+      },
+      {
+        "name": "_determine_memory_strategy",
+        "ast_hash": "sha256:e65084903fe61d5e",
+        "loc": 18,
+        "source": "async def _determine_memory_strategy(self, query: str) -> str:\n        \"\"\"\n        Uses LLM to classify the query's temporal need.\n        \"\"\"\n        prompt = f\"\"\"\n        Analyze the following query and determine the best memory retrieval strategy:\n        Query: \"{query}\"\n\n        Options:\n        - \"immediate\": Requires only the last few messages.\n        - \"project\": Requires context from current active files/session.\n        - \"archival\": Requires deep search into long-term vector storage/files.\n        - \"comprehensive\": Requires all layers.\n\n        Return only the option name.\n        \"\"\"\n        response = await self.llm_engine.generate_response(f\"{self.SYSTEM_PROMPT}\\n\\n{prompt}\")\n        return response.strip().lower()"
+      },
+      {
+        "name": "_retrieve_memories",
+        "ast_hash": "sha256:96c6996b682c30bc",
+        "loc": 29,
+        "source": "def _retrieve_memories(self, query: str, horizons: List[TimeHorizon], ref_date: datetime) -> Dict[TimeHorizon, List[MemoryFragment]]:\n        \"\"\"\n        Retrieves memories for the requested horizons, scanning real files for Long Term.\n        \"\"\"\n        results = {}\n\n        for horizon in horizons:\n            fragments = []\n            if horizon == TimeHorizon.SHORT_TERM:\n                fragments.append(MemoryFragment(\n                    source=\"Active Context\",\n                    content=f\"Recent user interaction regarding '{query}'\",\n                    timestamp=ref_date - timedelta(minutes=5),\n                    relevance_score=0.95\n                ))\n            elif horizon == TimeHorizon.MEDIUM_TERM:\n                fragments.append(MemoryFragment(\n                    source=\"Project History\",\n                    content=\"Active session data scanned.\",\n                    timestamp=ref_date - timedelta(days=2),\n                    relevance_score=0.75\n                ))\n            elif horizon == TimeHorizon.LONG_TERM:\n                # Real Scan of Archives (from main branch logic)\n                fragments.extend(self._scan_archives_for_memory(query, ref_date))\n\n            results[horizon] = fragments\n\n        return results"
+      },
+      {
+        "name": "_scan_archives_for_memory",
+        "ast_hash": "sha256:ae47a157957bf474",
+        "loc": 40,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "_find_historical_analogs",
+        "ast_hash": "sha256:e270c34c5999416a",
+        "loc": 36,
+        "source_omitted_for_brevity": true,
+        "note": "In a real telemetry pipeline, large functions can be truncated or omitted entirely in favor of the 'ast_hash' to save network bandwidth and storage costs."
+      },
+      {
+        "name": "_synthesize_temporal_context",
+        "ast_hash": "sha256:d752452733a99b40",
+        "loc": 20,
+        "source": "async def _synthesize_temporal_context(self, \n                                           memories: Dict[TimeHorizon, List[MemoryFragment]], \n                                           analogs: List[HistoricalComparison],\n                                           strategy: str) -> str:\n        \"\"\"\n        Synthesizes findings into a cohesive narrative using the LLM for better flow.\n        \"\"\"\n        # Convert objects to string summaries for the prompt\n        memory_summary = {k.value: len(v) for k, v in memories.items()}\n        analog_summary = [a.period_name for a in analogs]\n\n        prompt = f\"\"\"\n        Synthesize the temporal state based on the following:\n        Strategy Selected: {strategy}\n        Memories Retrieved: {json.dumps(memory_summary)}\n        Historical Analogs Identified: {json.dumps(analog_summary)}\n\n        Provide a concise 2-sentence summary of the temporal context.\n        \"\"\"\n        return await self.llm_engine.generate_response(f\"{self.SYSTEM_PROMPT}\\n\\n{prompt}\")"
+      }
+    ]
+  }
+}
