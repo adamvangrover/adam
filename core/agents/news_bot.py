@@ -5,6 +5,7 @@ import time
 import random
 import asyncio
 import argparse
+import logging
 from typing import Dict, Any, Optional, List, Union, Set
 from collections import defaultdict
 from datetime import datetime, timezone
@@ -58,6 +59,9 @@ except ImportError:
     Kernel = Any
 
 
+from typing_extensions import deprecated
+
+@deprecated("Legacy agent, use v30 architecture version instead")
 class NewsBot(AgentBase):
     """
     An advanced News Aggregation Agent that fetches data from APIs, RSS, and Crypto sources,
@@ -435,6 +439,7 @@ class NewsBot(AgentBase):
 
     async def execute(self, *args, **kwargs) -> Dict[str, Any]:
         """Run a full cycle: Fetch -> Analyze -> Alert -> Report."""
+        logging.warning("This legacy agent is deprecated.")
         print(f"\n--- Cycle Start: {datetime.now().strftime('%H:%M:%S')} ---")
         
         news = await self.aggregate_news()

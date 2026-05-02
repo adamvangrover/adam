@@ -4,8 +4,8 @@ import asyncio
 import os
 import hashlib
 import time
-import urllib.request
-import xml.etree.ElementTree as ET
+import requests
+import defusedxml.ElementTree as ET
 import threading
 from typing import List, Dict, Any, Tuple, Optional
 from pydantic import BaseModel
@@ -403,19 +403,19 @@ class NewsBotAgent(BaseAgent):
         data = []
         rss_url = "https://feeds.finance.yahoo.com/rss/2.0/headline?s=AAPL,TSLA,MSFT&region=US&lang=en-US"
         try:
-            req = urllib.request.Request(rss_url, headers={'User-Agent': 'Mozilla/5.0'})
-            with urllib.request.urlopen(req, timeout=5) as response:
-                xml_content = response.read()
-                root = ET.fromstring(xml_content)
-                for item in root.findall('./channel/item')[:5]:
-                    title = item.find('title')
-                    desc = item.find('description')
-                    data.append({
-                        "title": title.text if title is not None else "No Title",
-                        "content": desc.text if desc is not None else "",
-                        "source": "YahooFinanceRSS",
-                        "doc_type": "rss_feed"
-                    })
+            response = requests.get(rss_url, headers={'User-Agent': 'Mozilla/5.0'}, timeout=5)
+            response.raise_for_status()
+            xml_content = response.content
+            root = ET.fromstring(xml_content)
+            for item in root.findall('./channel/item')[:5]:
+                title = item.find('title')
+                desc = item.find('description')
+                data.append({
+                    "title": title.text if title is not None else "No Title",
+                    "content": desc.text if desc is not None else "",
+                    "source": "YahooFinanceRSS",
+                    "doc_type": "rss_feed"
+                })
         except Exception as e:
             logger.warning(f"Failed to fetch RSS feeds: {e}")
             raise e

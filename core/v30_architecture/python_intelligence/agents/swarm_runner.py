@@ -31,6 +31,7 @@ try:
     from core.v30_architecture.python_intelligence.agents.adversarial_red_team import AdversarialRedTeamAgent
     from core.v30_architecture.python_intelligence.agents.hardened_shield import HardenedShieldAgent
     from core.v30_architecture.python_intelligence.agents.market_sentiment_agent import MarketSentimentAgent
+    from core.v30_architecture.python_intelligence.agents.macro_economic_agent import MacroEconomicAgent
 except ImportError:
     # Fallback for local execution
     import sys
@@ -46,6 +47,7 @@ except ImportError:
     from adversarial_red_team import AdversarialRedTeamAgent
     from hardened_shield import HardenedShieldAgent
     from market_sentiment_agent import MarketSentimentAgent
+    from macro_economic_agent import MacroEconomicAgent
 
 
 class SystemHealth(BaseAgent):
@@ -80,7 +82,8 @@ agents = [
     SovereignOrchestrator(),
     AdversarialRedTeamAgent(),
     HardenedShieldAgent(),
-    MarketSentimentAgent()
+    MarketSentimentAgent(),
+    MacroEconomicAgent()
 ]
 
 # Ensure we maintain strong references to tasks

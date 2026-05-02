@@ -4,10 +4,14 @@ This module defines the ReviewerAgent, a specialized agent responsible for
 performing static analysis on code to ensure quality and consistency.
 """
 
+import logging
 from typing import Any, Dict
 from core.agents.agent_base import AgentBase
 
 
+from typing_extensions import deprecated
+
+@deprecated("Legacy agent, use v30 architecture version instead")
 class ReviewerAgent(AgentBase):
     """
     The ReviewerAgent checks code for style guide violations (PEP 8),
@@ -25,6 +29,7 @@ class ReviewerAgent(AgentBase):
         :param code_artifact: A dictionary containing the 'file_path' and 'code'.
         :return: A dictionary containing the review results.
         """
+        logging.warning("This legacy agent is deprecated.")
         source_code = code_artifact.get("code")
 
         # 1. Simulate running a linter (e.g., ruff)
