@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Market Mayhem | Interactive Terminal</title>
+    <style>
+        :root {
+            --bg-base: #050505;
+            --panel-bg: #111111;
+            --text-main: #e0e0e0;
+            --neon-green: #00ff41;
+            --neon-red: #ff003c;
+            --neon-cyan: #00f0ff;
+            --font-mono: 'Courier New', Courier, monospace;
+        }
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-main);
+            font-family: var(--font-mono);
+            margin: 0;
+            padding: 10px;
+            display: grid;
+            grid-template-columns: 1fr 2fr 1fr;
+            gap: 15px;
+            height: 95vh;
+        }
+        .panel {
+            background: var(--panel-bg);
+            border: 1px solid #333;
+            padding: 15px;
+            border-top: 3px solid var(--neon-cyan);
+            overflow-y: auto;
+        }
+        h2 {
+            color: var(--neon-cyan);
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            border-bottom: 1px solid #333;
+            padding-bottom: 5px;
+        }
+        .feed-item {
+            border-left: 2px solid var(--neon-green);
+            padding-left: 10px;
+            margin-bottom: 15px;
+        }
+        .feed-item.bearish { border-color: var(--neon-red); }
+        .metric-row { display: flex; justify-content: space-between; margin: 10px 0; }
+        input[type=range] { width: 100%; cursor: pointer; }
+        .target-price { font-size: 2.5rem; color: var(--neon-green); font-weight: bold; text-align: center; margin-top: 20px;}
+        /* Add more custom CSS here to refine the Cyberpunk aesthetic */
+    </style>
+</head>
+<body>
+
+    <div class="panel" id="intel-stream">
+        <h2>EDGAR & Intel Stream</h2>
+        <div id="feed-container"></div>
+    </div>
+
+    <div class="panel" id="core-matrix">
+        <h2 id="target-ticker">TICKER | Dynamic DCF Engine</h2>
+        <div class="controls">
+            <div class="metric-row">
+                <label>WACC (%) <span id="wacc-val">9.0</span></label>
+                <input type="range" id="wacc-slider" min="5" max="15" step="0.1" value="9.0">
+            </div>
+            <div class="metric-row">
+                <label>Terminal Growth (%) <span id="tg-val">2.5</span></label>
+                <input type="range" id="tg-slider" min="0" max="5" step="0.1" value="2.5">
+            </div>
+        </div>
+        <div class="target-price" id="implied-price">$0.00</div>
+
+        <h2 style="margin-top: 40px;">Credit-Equity Convergence</h2>
+        <div id="chart-container" style="height: 200px; border: 1px dashed #444; text-align:center; line-height:200px;">[D3.js / Chart.js Canvas]</div>
+    </div>
+
+    <div class="panel" id="risk-log">
+        <h2>Neuro-Symbolic Glitch Log</h2>
+        <div id="glitch-container" style="color: var(--neon-red); font-size: 0.9rem;"></div>
+
+        <h2 style="margin-top: 20px;">Tail-Risk (QAE Approximation)</h2>
+        <div id="tail-risk-data"></div>
+    </div>
+
+    <script>
+        // ==========================================
+        // DATA PAYLOAD INJECTION POINT
+        // The DAG Python script will replace the empty object below
+        // with the compiled JSON output before emailing.
+        // ==========================================
+        const ADAM_PAYLOAD = {};
+
+        // ==========================================
+        // UI RENDER LOGIC
+        // ==========================================
+        function renderDashboard() {
+            if (Object.keys(ADAM_PAYLOAD).length === 0) {
+                document.getElementById('feed-container').innerHTML = "<p>Awaiting data payload...</p>";
+                return;
+            }
+
+            // 1. Render Intel Stream
+            const feedDiv = document.getElementById('feed-container');
+            ADAM_PAYLOAD.newsFeed.forEach(item => {
+                feedDiv.innerHTML += `
+                    <div class="feed-item ${item.sentiment}">
+                        <small style="color:#888;">${item.timestamp} | ${item.ticker}</small>
+                        <div>${item.headline}</div>
+                        <small>Materiality Score: ${item.materiality}/100</small>
+                    </div>
+                `;
+            });
+
+            // 2. Hydrate DCF baseline values
+            document.getElementById('target-ticker').innerText = `${ADAM_PAYLOAD.dcf.ticker} | Dynamic DCF Engine`;
+
+            // 3. Render Glitches
+            document.getElementById('glitch-container').innerHTML = ADAM_PAYLOAD.glitches.map(g => `<p>> SYSTEM WARNING: ${g}</p>`).join('');
+
+            // Render Tail Risk
+            if(ADAM_PAYLOAD.tailRisk) {
+                document.getElementById('tail-risk-data').innerHTML = `
+                    <p><strong>VaR (95%):</strong> ${ADAM_PAYLOAD.tailRisk.var95}</p>
+                    <p><strong>Expected Shortfall:</strong> ${ADAM_PAYLOAD.tailRisk.expectedShortfall}</p>
+                    <p style="color:var(--neon-cyan)"><em>${ADAM_PAYLOAD.tailRisk.shockNarrative}</em></p>
+                `;
+            }
+        }
+
+        // --- DYNAMIC DCF CALCULATOR ENGINE ---
+        function calculateImpliedPrice() {
+            if (!ADAM_PAYLOAD.dcf) return;
+
+            // Grab current slider values
+            const wacc = parseFloat(document.getElementById('wacc-slider').value) / 100;
+            const tg = parseFloat(document.getElementById('tg-slider').value) / 100;
+
+            // Update UI labels
+            document.getElementById('wacc-val').innerText = (wacc * 100).toFixed(1);
+            document.getElementById('tg-val').innerText = (tg * 100).toFixed(1);
+
+            const baseCashFlows = ADAM_PAYLOAD.dcf.baseCashFlows; // e.g., [100, 115, 130, 150, 175]
+            const sharesOut = ADAM_PAYLOAD.dcf.sharesOut;
+            const netDebt = ADAM_PAYLOAD.dcf.netDebt; // Total Debt - Cash
+
+            let presentValueOfFCF = 0;
+            let finalYearFCF = baseCashFlows[baseCashFlows.length - 1];
+
+            // 1. Discount explicit forecast period
+            for (let i = 0; i < baseCashFlows.length; i++) {
+                presentValueOfFCF += baseCashFlows[i] / Math.pow((1 + wacc), i + 1);
+            }
+
+            // 2. Calculate Terminal Value (Gordon Growth) and discount to present
+            let terminalValue = (finalYearFCF * (1 + tg)) / (wacc - tg);
+            let presentValueOfTV = terminalValue / Math.pow((1 + wacc), baseCashFlows.length);
+
+            // 3. Implied Enterprise Value & Equity Value
+            let impliedEV = presentValueOfFCF + presentValueOfTV;
+            let impliedEquityValue = impliedEV - netDebt;
+
+            // 4. Per Share Price
+            let impliedPrice = impliedEquityValue / sharesOut;
+
+            // Render result with neon glitch effect if it drastically deviates from current market price
+            const priceDisplay = document.getElementById('implied-price');
+            priceDisplay.innerText = "$" + impliedPrice.toFixed(2);
+
+            const marketPrice = ADAM_PAYLOAD.dcf.currentPrice;
+            if (impliedPrice > marketPrice * 1.3 || impliedPrice < marketPrice * 0.7) {
+                priceDisplay.style.textShadow = "0 0 10px var(--neon-red)"; // Highlight massive divergence
+            } else {
+                priceDisplay.style.textShadow = "0 0 10px var(--neon-green)";
+            }
+        }
+
+        // Add Event Listeners to Sliders
+        document.getElementById('wacc-slider').addEventListener('input', calculateImpliedPrice);
+        document.getElementById('tg-slider').addEventListener('input', calculateImpliedPrice);
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            renderDashboard();
+            calculateImpliedPrice();
+        });
+    </script>
+</body>
+</html>
