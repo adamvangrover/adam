@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM OMNIOS // V60.0 TERMINAL</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;600;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    
+    <!-- Libraries -->
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                        display: ['Share Tech Mono', 'monospace'],
+                    },
+                    colors: {
+                        os: { base: '#020408', panel: '#0a0d14', window: '#0f131c', border: '#1e2532' }
+                    },
+                    animation: {
+                        'flicker': 'flicker 0.15s infinite',
+                        'marquee': 'marquee 30s linear infinite',
+                    },
+                    keyframes: {
+                        windowPop: {
+                            '0%': { opacity: 0, transform: 'scale(0.97) translateY(10px)' },
+                            '100%': { opacity: 1, transform: 'scale(1) translateY(0)' }
+                        },
+                        marquee: {
+                            '0%': { transform: 'translateX(100vw)' },
+                            '100%': { transform: 'translateX(-100%)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        :root {
+            --theme-accent: #00e5ff;
+            --theme-glow: rgba(0, 229, 255, 0.4);
+            --theme-bg-tint: rgba(0, 229, 255, 0.05);
+            --color-red: #ff1e38;
+            --color-green: #00fa9a;
+            --color-amber: #ffaa00;
+            --color-purple: #b53cff;
+        }
+        
+        body.theme-matrix { --theme-accent: #00fa9a; --theme-glow: rgba(0, 250, 154, 0.4); --theme-bg-tint: rgba(0, 250, 154, 0.05); }
+        body.theme-critical { --theme-accent: #ff1e38; --theme-glow: rgba(255, 30, 56, 0.6); --theme-bg-tint: rgba(255, 30, 56, 0.1); }
+
+        body { margin: 0; overflow: hidden; background-color: #020408; color: #cbd5e1; user-select: none; transition: background-color 0.5s; }
+        
+        /* Background & CRT */
+        #world-canvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+        .crt-overlay {
+            position: fixed; inset: 0; pointer-events: none; z-index: 9999;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.04), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.04));
+            background-size: 100% 4px, 6px 100%; opacity: 0.35; mix-blend-mode: overlay;
+        }
+        .vignette { position: fixed; inset: 0; pointer-events: none; z-index: 9998; box-shadow: inset 0 0 150px rgba(0,0,0,0.95); }
+
+        /* Scrollbars */
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #1e2532; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--theme-accent); }
+
+        /* Typography & Utilities */
+        .glow-accent { text-shadow: 0 0 10px var(--theme-glow), 0 0 20px var(--theme-glow); color: var(--theme-accent); }
+        .glass-panel { background: rgba(10, 13, 20, 0.7); backdrop-filter: blur(10px); border: 1px solid #1e2532; border-radius: 8px; }
+        .text-accent { color: var(--theme-accent); transition: color 0.3s; }
+        .border-accent { border-color: var(--theme-accent); transition: border-color 0.3s; }
+        .bg-accent { background-color: var(--theme-accent); transition: background-color 0.3s; color: #000; }
+        .bg-accent-tint { background-color: var(--theme-bg-tint); transition: background-color 0.3s; }
+
+        /* OS Windows */
+        .os-window {
+            position: absolute; background: rgba(13, 17, 26, 0.85); backdrop-filter: blur(30px);
+            border: 1px solid #1e2532; border-radius: 10px; display: none; flex-direction: column; overflow: hidden;
+            box-shadow: 0 30px 60px -12px rgba(0,0,0,0.9), inset 0 1px 0 rgba(255,255,255,0.05);
+            transition: border-color 0.3s, opacity 0.2s;
+        }
+        .os-window.active { display: flex; animation: windowPop 0.2s ease-out forwards; border-color: var(--theme-glow); box-shadow: 0 40px 80px -15px rgba(0,0,0,1), 0 0 20px var(--theme-bg-tint); }
+        .window-header { height: 36px; background: rgba(5, 7, 10, 0.9); border-bottom: 1px solid #1e2532; display: flex; justify-content: space-between; align-items: center; padding: 0 14px; cursor: grab; }
+        .window-header:active { cursor: grabbing; }
+        .window-content { flex: 1; overflow-y: auto; overflow-x: hidden; position: relative; user-select: text; }
+        .win-btn { width: 12px; height: 12px; border-radius: 50%; border: none; cursor: pointer; transition: transform 0.2s; display: inline-block; margin-right: 6px;}
+        .win-btn:hover { transform: scale(1.2); }
+
+        /* Dock */
+        .dock {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 9997;
+            background: rgba(5, 7, 10, 0.8); backdrop-filter: blur(20px); border: 1px solid #1e2532;
+            border-radius: 20px; padding: 8px 12px; display: flex; gap: 12px; box-shadow: 0 20px 40px rgba(0,0,0,0.9);
+            transition: border-color 0.3s;
+        }
+        .dock-item {
+            width: 44px; height: 44px; border-radius: 12px; background: rgba(255,255,255,0.03);
+            display: flex; align-items: center; justify-content: center; cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); border: 1px solid transparent; font-size: 18px; color: #fff; position: relative;
+        }
+        .dock-item:hover { transform: translateY(-10px) scale(1.1); background: var(--theme-bg-tint); border-color: var(--theme-accent); box-shadow: 0 10px 20px var(--theme-bg-tint); z-index: 10;}
+        .dock-item.open::after { content: ''; position: absolute; bottom: -5px; width: 4px; height: 4px; border-radius: 50%; background: var(--theme-accent); box-shadow: 0 0 8px var(--theme-accent); }
+        .dock-tooltip {
+            position: absolute; top: -35px; background: #e2e8f0; color: #020408; padding: 4px 10px; border-radius: 6px; font-size: 10px; opacity: 0; pointer-events: none; transition: opacity 0.2s, transform 0.2s; white-space: nowrap; font-family: 'JetBrains Mono', monospace; font-weight: bold; transform: translateY(5px);
+        }
+        .dock-item:hover .dock-tooltip { opacity: 1; transform: translateY(0); }
+
+        /* Data Tables */
+        .data-table { width: 100%; text-align: left; font-family: 'JetBrains Mono', monospace; font-size: 11px; border-collapse: collapse; }
+        .data-table th { padding: 10px 12px; font-weight: 600; color: #64748b; border-bottom: 1px solid #1e2532; background: rgba(0,0,0,0.4); position: sticky; top: 0; z-index: 10; text-transform: uppercase;}
+        .data-table td { padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,0.03); color: #cbd5e1; }
+        .data-table tr:hover td { background: var(--theme-bg-tint); }
+
+        /* DCF Waterfall */
+        .dcf-bar-container { display: flex; align-items: flex-end; justify-content: space-around; height: 160px; padding-bottom: 25px; border-bottom: 1px solid #1e2532; margin-top: 15px;}
+        .dcf-col { display: flex; flex-direction: column; justify-content: flex-end; align-items: center; width: 10%; position: relative; }
+        .dcf-bar-pos { background: linear-gradient(180deg, var(--theme-accent) 0%, transparent 100%); width: 100%; border-radius: 2px 2px 0 0; transition: height 0.6s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 -5px 15px var(--theme-bg-tint); border-top: 1px solid var(--theme-accent);}
+        .dcf-bar-neg { background: linear-gradient(0deg, var(--color-red) 0%, transparent 100%); width: 100%; border-radius: 0 0 2px 2px; transition: height 0.6s cubic-bezier(0.16, 1, 0.3, 1); position: absolute; top: 100%; border-bottom: 1px solid var(--color-red);}
+        .dcf-label { position: absolute; bottom: -22px; font-size: 9px; font-family: 'JetBrains Mono'; color: #64748b; }
+        .dcf-val { position: absolute; top: -20px; font-size: 10px; font-family: 'JetBrains Mono'; color: #fff; font-weight: bold;}
+
+        /* Sliders */
+        input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 14px; width: 14px; border-radius: 50%; background: var(--theme-accent); cursor: pointer; margin-top: -5px; box-shadow: 0 0 10px var(--theme-accent); border: 2px solid #020408; transition: background 0.3s, box-shadow 0.3s;}
+        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; cursor: pointer; background: #1e2532; border-radius: 2px; }
+        input[type=range]:focus { outline: none; }
+    </style>
+</head>
+<body>
+
+    <!-- SYSTEM PAYLOAD / DATALAKE -->
+    <script type="application/json" id="adam-datalake">
+    {
+        "meta": { "version": "v60.0", "timestamp": "2026-05-02T10:20:00Z", "regime": "Stagflation / Capital Intensive AI" },
+        "kpis": {
+            "spx": { "val": 7184.20, "chg": -12.4, "trend": "down", "unit": "" },
+            "ndx": { "val": 24102.11, "chg": 45.2, "trend": "up", "unit": "" },
+            "yield_10y": { "val": 4.55, "chg": 0.04, "trend": "up", "unit": "%" },
+            "brent": { "val": 84.15, "chg": 2.20, "trend": "up", "unit": "$" },
+            "vix": { "val": 18.20, "chg": 1.5, "trend": "up", "unit": "" },
+            "btc": { "val": 92450, "chg": -1200, "trend": "down", "unit": "$" }
+        },
+        "forecasts": {
+            "near_term_0_7": {
+                "spx": [7184, 7150, 7120, 7080, 7000, 6950, 6900],
+                "yield": [4.55, 4.56, 4.58, 4.60, 4.62, 4.65, 4.68],
+                "confidence": "82%",
+                "narrative": "Immediate liquidity drain. Dark pools show aggressive distribution."
+            },
+            "near_term_0_30": {
+                "spx": [7184, 7000, 6800, 6950, 7100, 7250, 7150],
+                "yield": [4.55, 4.65, 4.70, 4.60, 4.50, 4.40, 4.35],
+                "confidence": "65%",
+                "narrative": "Mean reversion post FOMC shock. Volatility crush allows mechanical bidding."
+            },
+            "quarterly": {
+                "spx": [7184, 6500, 7400, 7600],
+                "yield": [4.55, 4.80, 4.10, 3.80],
+                "confidence": "55%",
+                "narrative": "Earnings reality check. Capital intensive AI burn hits AMZN/META, rotating funds to MSFT/NVDA."
+            },
+            "annual_5_7y": {
+                "spx": [7184, 8200, 9500, 11000, 13500, 15000, 18000],
+                "yield": [4.55, 4.00, 3.50, 3.00, 2.80, 2.50, 2.50],
+                "confidence": "40%",
+                "narrative": "AI productivity supercycle actualizes. AGI structural deflation offsets geopolitical friction."
+            }
+        },
+        "geopolitics": [
+            { "region": "Hormuz", "event": "Zero-Transit Blockade", "impact": "Severe", "asset_target": "Brent Crude" },
+            { "region": "Taiwan", "event": "Foundry Export Quotas", "impact": "High", "asset_target": "Semiconductors" },
+            { "region": "EU", "event": "Sovereign Debt Fragmentation", "impact": "Moderate", "asset_target": "EUR/USD" },
+            { "region": "US", "event": "FOMC Dissensus Paradox", "impact": "Severe", "asset_target": "10Y Yield" }
+        ],
+        "universe": [
+            {
+                "ticker": "MSFT", "name": "Microsoft Corp", "sector": "Software / AI", "price": 458.20, "shares_out": 7430,
+                "scenarios": {
+                    "base": {
+                        "wacc": 8.5, "tg": 3.0,
+                        "projections": [
+                            {"year": 2026, "rev": 285.0, "rev_g": 18.2, "ebit_m": 44.5, "tax": 18.0, "capex": 55.0, "da": 22.0, "nwc": -2.0},
+                            {"year": 2027, "rev": 332.0, "rev_g": 16.5, "ebit_m": 45.0, "tax": 18.0, "capex": 60.0, "da": 25.0, "nwc": -2.5},
+                            {"year": 2028, "rev": 381.8, "rev_g": 15.0, "ebit_m": 45.5, "tax": 18.0, "capex": 65.0, "da": 28.0, "nwc": -3.0},
+                            {"year": 2029, "rev": 435.2, "rev_g": 14.0, "ebit_m": 46.0, "tax": 18.0, "capex": 68.0, "da": 31.0, "nwc": -3.5},
+                            {"year": 2030, "rev": 491.8, "rev_g": 13.0, "ebit_m": 46.5, "tax": 18.0, "capex": 70.0, "da": 34.0, "nwc": -4.0},
+                            {"year": 2031, "rev": 550.8, "rev_g": 12.0, "ebit_m": 47.0, "tax": 18.0, "capex": 72.0, "da": 37.0, "nwc": -4.5},
+                            {"year": 2032, "rev": 611.4, "rev_g": 11.0, "ebit_m": 47.5, "tax": 18.0, "capex": 75.0, "da": 40.0, "nwc": -5.0}
+                        ]
+                    }
+                }
+            },
+            {
+                "ticker": "NVDA", "name": "NVIDIA Corporation", "sector": "Semiconductors", "price": 890.50, "shares_out": 2480,
+                "scenarios": {
+                    "base": {
+                        "wacc": 10.0, "tg": 4.5,
+                        "projections": [
+                            {"year": 2026, "rev": 155.0, "rev_g": 45.0, "ebit_m": 62.0, "tax": 14.0, "capex": 8.5, "da": 3.0, "nwc": -5.0},
+                            {"year": 2027, "rev": 195.0, "rev_g": 25.8, "ebit_m": 61.0, "tax": 14.0, "capex": 10.0, "da": 4.5, "nwc": -6.0},
+                            {"year": 2028, "rev": 230.0, "rev_g": 17.9, "ebit_m": 60.5, "tax": 14.0, "capex": 12.0, "da": 6.0, "nwc": -7.0},
+                            {"year": 2029, "rev": 265.0, "rev_g": 15.2, "ebit_m": 59.0, "tax": 14.0, "capex": 14.0, "da": 7.5, "nwc": -8.0},
+                            {"year": 2030, "rev": 300.0, "rev_g": 13.2, "ebit_m": 58.0, "tax": 14.0, "capex": 15.0, "da": 9.0, "nwc": -9.0},
+                            {"year": 2031, "rev": 335.0, "rev_g": 11.6, "ebit_m": 57.0, "tax": 14.0, "capex": 16.0, "da": 10.5, "nwc": -10.0},
+                            {"year": 2032, "rev": 370.0, "rev_g": 10.4, "ebit_m": 56.0, "tax": 14.0, "capex": 17.0, "da": 12.0, "nwc": -11.0}
+                        ]
+                    }
+                }
+            },
+            {
+                "ticker": "AMZN", "name": "Amazon.com Inc", "sector": "E-Commerce / Cloud", "price": 145.30, "shares_out": 10400,
+                "scenarios": {
+                    "base": {
+                        "wacc": 9.2, "tg": 3.0,
+                        "projections": [
+                            {"year": 2026, "rev": 877.5, "rev_g": 12.0, "ebit_m": 10.5, "tax": 21.0, "capex": 200.0, "da": 85.0, "nwc": 5.0},
+                            {"year": 2027, "rev": 974.0, "rev_g": 11.0, "ebit_m": 11.2, "tax": 21.0, "capex": 180.0, "da": 100.0, "nwc": 5.5},
+                            {"year": 2028, "rev": 1071.4, "rev_g": 10.0, "ebit_m": 11.8, "tax": 21.0, "capex": 150.0, "da": 110.0, "nwc": 6.0},
+                            {"year": 2029, "rev": 1167.8, "rev_g": 9.0, "ebit_m": 12.5, "tax": 21.0, "capex": 140.0, "da": 115.0, "nwc": 6.5},
+                            {"year": 2030, "rev": 1261.2, "rev_g": 8.0, "ebit_m": 13.2, "tax": 21.0, "capex": 135.0, "da": 120.0, "nwc": 7.0},
+                            {"year": 2031, "rev": 1349.4, "rev_g": 7.0, "ebit_m": 14.0, "tax": 21.0, "capex": 130.0, "da": 125.0, "nwc": 7.5},
+                            {"year": 2032, "rev": 1430.4, "rev_g": 6.0, "ebit_m": 14.5, "tax": 21.0, "capex": 125.0, "da": 130.0, "nwc": 8.0}
+                        ]
+                    }
+                }
+            }
+        ],
+        "darkpool": [
+            { "time": "09:42", "ticker": "NVDA", "type": "CALL SWEEP", "size": "$14.2M", "sentiment": "bullish" },
+            { "time": "10:15", "ticker": "SPY", "type": "PUT BLOCK", "size": "$28.5M", "sentiment": "bearish" },
+            { "time": "11:03", "ticker": "AMZN", "type": "PUT SWEEP", "size": "$5.1M", "sentiment": "bearish" },
+            { "time": "13:22", "ticker": "TSLA", "type": "CALL BLOCK", "size": "$8.4M", "sentiment": "bullish" }
+        ]
+    }
+    </script>
+
+    <!-- 3D BACKGROUND -->
+    <canvas id="world-canvas"></canvas>
+    <div class="crt-overlay"></div>
+    <div class="vignette"></div>
+
+    <!-- TOP BAR -->
+    <header class="absolute top-0 left-0 w-full h-10 bg-[#020408]/90 backdrop-blur border-b border-[#1e2532] flex justify-between items-center px-4 z-[9999] text-[11px] font-sans">
+        <div class="flex items-center gap-6">
+            <div class="font-bold text-white tracking-widest flex items-center gap-2 cursor-default">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-accent"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+                <span class="text-accent glow-accent">ADAM OMNIOS V60</span>
+            </div>
+            <div class="hidden md:flex gap-4 border-l border-[#1e2532] pl-6">
+                <span class="text-[#64748b] hover:text-white cursor-pointer transition-colors" onclick="openApp('app-macro')">Macro Forecasts</span>
+                <span class="text-[#64748b] hover:text-white cursor-pointer transition-colors" onclick="openApp('app-dcf')">DCF Engine</span>
+                <span class="text-[#64748b] hover:text-white cursor-pointer transition-colors" onclick="openApp('app-geo')">Geopolitics</span>
+                <span class="text-[#64748b] hover:text-white cursor-pointer transition-colors" onclick="openApp('app-report')">Newsletter Gen</span>
+            </div>
+        </div>
+        
+        <div class="flex-1 overflow-hidden mx-6 relative hidden lg:block h-full border-x border-[#1e2532]">
+            <div class="absolute inset-y-0 left-0 w-12 bg-gradient-to-r from-[#020408] to-transparent z-10"></div>
+            <div class="absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-[#020408] to-transparent z-10"></div>
+            <div class="whitespace-nowrap animate-marquee font-mono text-[10px] flex gap-8 items-center h-full text-[#8b949e]" id="top-ticker"></div>
+        </div>
+
+        <div class="flex items-center gap-4 font-mono shrink-0">
+            <select id="theme-selector" class="bg-[#0a0d14] border border-[#1e2532] text-xs text-[#cbd5e1] rounded px-2 py-1 outline-none focus:border-accent" onchange="changeTheme(this.value)">
+                <option value="cyan">UI: Cyber Cyan</option>
+                <option value="matrix">UI: Matrix Green</option>
+                <option value="critical">UI: Crimson Alert</option>
+            </select>
+            <div class="flex items-center gap-2 bg-accent-tint border border-accent/30 px-2 py-1 rounded text-accent transition-colors">
+                <div class="w-1.5 h-1.5 bg-accent rounded-full animate-flicker shadow-[0_0_5px_var(--theme-accent)]"></div> SYNC OK
+            </div>
+            <span id="osClock" class="text-white">--:--:--</span>
+        </div>
+    </header>
+
+    <!-- APP 1: MACRO & FORECASTS -->
+    <div id="app-macro" class="os-window" style="width: 900px; height: 620px; top: 60px; left: 50px; z-index: 100;">
+        <div class="window-header" id="app-macro-header">
+            <div class="flex items-center gap-2">
+                <button class="win-btn win-close" onclick="closeApp('app-macro')"></button>
+                <button class="win-btn win-min"></button>
+                <button class="win-btn win-max" onclick="maximizeApp('app-macro')"></button>
+            </div>
+            <div class="text-[11px] font-bold text-[#64748b] uppercase tracking-widest pointer-events-none font-mono">/telemetry/forecasts</div>
+            <div class="w-12"></div>
+        </div>
+        <div class="window-content bg-[#0a0d14] p-5 flex flex-col gap-5">
+            <!-- KPIs -->
+            <div class="grid grid-cols-3 lg:grid-cols-6 gap-3 shrink-0" id="kpi-container"></div>
+            
+            <div class="flex flex-col lg:flex-row gap-5 flex-1 mt-1">
+                <!-- Forecast Chart -->
+                <div class="glass-panel p-4 flex-[2] flex flex-col relative overflow-hidden">
+                    <div class="flex justify-between items-center mb-4 z-10">
+                        <h3 class="text-[10px] text-white uppercase tracking-widest font-mono flex items-center gap-2">
+                            <span class="w-2 h-2 bg-accent rounded-full animate-pulse shadow-[0_0_8px_var(--theme-accent)]"></span> Forward Probability Matrix (SPX)
+                        </h3>
+                        <select id="forecast-horizon" class="bg-[#020408] border border-[#1e2532] text-[9px] text-[#64748b] rounded px-2 py-1 outline-none font-mono" onchange="renderForecastChart()">
+                            <option value="near_term_0_7">T+7 Days (Near Term)</option>
+                            <option value="near_term_0_30">T+30 Days (Monthly)</option>
+                            <option value="quarterly">Quarterly Outlook</option>
+                            <option value="annual_5_7y">5-7 Year Structural</option>
+                        </select>
+                    </div>
+                    <div class="flex-1 relative w-full min-h-[250px] z-10">
+                        <canvas id="forecastChart"></canvas>
+                    </div>
+                    <div class="mt-4 p-3 bg-[#020408] border border-[#1e2532] rounded text-[10px] font-mono text-[#cbd5e1] leading-relaxed" id="forecast-narrative"></div>
+                </div>
+                
+                <!-- Dark Pool -->
+                <div class="glass-panel flex-1 flex flex-col overflow-hidden">
+                    <div class="p-3 border-b border-[#1e2532] bg-[#020408] flex justify-between items-center shrink-0">
+                        <h3 class="text-[10px] text-white uppercase tracking-widest font-mono">Dark Pool Flow</h3>
+                    </div>
+                    <div class="flex-1 overflow-auto p-3">
+                        <table class="w-full text-left font-mono text-[9px] border-collapse" id="darkpool-table"></table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- APP 2: 7-YEAR DCF ENGINE -->
+    <div id="app-dcf" class="os-window" style="width: 1150px; height: 750px; top: 90px; left: 120px; z-index: 110;">
+        <div class="window-header" id="app-dcf-header">
+            <div class="flex items-center gap-2">
+                <button class="win-btn win-close" onclick="closeApp('app-dcf')"></button>
+                <button class="win-btn win-min"></button>
+                <button class="win-btn win-max" onclick="maximizeApp('app-dcf')"></button>
+            </div>
+            <div class="text-[11px] font-bold text-[#64748b] uppercase tracking-widest pointer-events-none font-mono">/bin/dcf_v60_7yr.sh</div>
+            <div class="w-12"></div>
+        </div>
+        <div class="window-content bg-[#020408] flex">
+            <!-- Sidebar -->
+            <div class="w-60 bg-[#0a0d14] border-r border-[#1e2532] flex flex-col shrink-0">
+                <div class="p-3 border-b border-[#1e2532]"><h3 class="text-[10px] font-mono text-[#64748b] uppercase tracking-widest">Coverage Universe</h3></div>
+                <div class="flex-1 overflow-y-auto p-2 flex flex-col gap-1" id="dcf-ticker-list"></div>
+                <div class="p-4 border-t border-[#1e2532]">
+                    <h3 class="text-[10px] font-mono text-white uppercase tracking-widest mb-3">Model Parameters</h3>
+                    <label class="flex justify-between text-[9px] font-mono text-[#64748b] mb-1"><span>WACC (%)</span><span class="text-accent font-bold" id="lbl-wacc">--</span></label>
+                    <input type="range" id="slider-wacc" min="5" max="15" step="0.1" oninput="executeDCF()">
+                    <label class="flex justify-between text-[9px] font-mono text-[#64748b] mb-1 mt-4"><span>Term Growth (%)</span><span class="text-accent font-bold" id="lbl-tg">--</span></label>
+                    <input type="range" id="slider-tg" min="0" max="6" step="0.1" oninput="executeDCF()">
+                </div>
+            </div>
+            
+            <!-- Main Content -->
+            <div class="flex-1 flex flex-col overflow-y-auto relative">
+                <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,var(--theme-bg-tint)_0%,transparent_100%)] pointer-events-none"></div>
+
+                <!-- Top Stats -->
+                <div class="p-6 border-b border-[#1e2532] flex justify-between items-start shrink-0 z-10">
+                    <div>
+                        <h2 class="text-3xl font-display font-bold text-white tracking-widest m-0" id="dcf-name">--</h2>
+                        <div class="flex gap-4 mt-3 font-mono text-[10px]">
+                            <span class="bg-[#1e2532] px-2 py-1 rounded">TICKER: <span class="text-accent font-bold" id="dcf-ticker">--</span></span>
+                            <span class="bg-[#1e2532] px-2 py-1 rounded">SECTOR: <span class="text-white" id="dcf-sector">--</span></span>
+                            <span class="bg-[#1e2532] px-2 py-1 rounded">SHARES: <span class="text-white" id="dcf-shares">--</span>M</span>
+                        </div>
+                    </div>
+                    <div class="flex gap-3">
+                        <div class="bg-[#0a0d14] border border-[#1e2532] rounded-lg p-3 text-right min-w-[110px]">
+                            <div class="text-[9px] font-mono text-[#64748b] uppercase mb-1">Mkt Price</div>
+                            <div class="text-lg font-bold text-white font-mono" id="dcf-mkt-price">--</div>
+                        </div>
+                        <div class="bg-accent-tint border border-accent rounded-lg p-3 text-right min-w-[140px] shadow-[inset_0_0_20px_var(--theme-bg-tint)] transition-all" id="implied-box">
+                            <div class="text-[9px] font-mono text-accent uppercase mb-1" id="implied-label">7Y Target Price</div>
+                            <div class="text-2xl font-bold text-white font-mono glow-accent transition-all" id="dcf-target-price">--</div>
+                            <div class="text-[10px] font-mono font-bold mt-1" id="dcf-upside">--</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex flex-col p-6 gap-6 z-10 flex-1">
+                    <!-- Waterfall -->
+                    <div class="glass-panel p-4 pb-0 flex flex-col rounded-xl">
+                        <h3 class="text-[10px] font-mono text-white uppercase tracking-widest mb-2 border-b border-[#1e2532] pb-2">Unlevered FCF Projections ($B) - 7 Year Horizon</h3>
+                        <div class="dcf-bar-container" id="dcf-waterfall"></div>
+                    </div>
+                    
+                    <!-- 7-Year Table -->
+                    <div class="glass-panel overflow-x-auto rounded-xl">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Metrics ($B)</th>
+                                    <th class="text-right">2026E</th><th class="text-right">2027E</th><th class="text-right">2028E</th><th class="text-right">2029E</th><th class="text-right">2030E</th><th class="text-right">2031E</th><th class="text-right">2032E</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dcf-table-body"></tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Summary EV Math -->
+                    <div class="flex justify-between items-center bg-[#0a0d14] p-4 border border-[#1e2532] rounded-xl font-mono text-xs text-white">
+                        <div class="flex gap-8">
+                            <div><span class="text-[#64748b] block mb-1">PV of Cash Flows</span><span id="dcf-pv-cf" class="font-bold">--</span></div>
+                            <div><span class="text-[#64748b] block mb-1">Terminal Value (PV)</span><span id="dcf-pv-tv" class="font-bold">--</span></div>
+                            <div><span class="text-[#64748b] block mb-1">Enterprise Value</span><span id="dcf-ev" class="font-bold text-accent">--</span></div>
+                        </div>
+                        <div class="text-right text-[10px] text-[#64748b] max-w-xs">
+                            Terminal Value calculated using Perpetuity Growth Method. Forward Target implies theoretical EV divided by Shares Outstanding.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- APP 3: GEOPOLITICS & NEWS -->
+    <div id="app-geo" class="os-window" style="width: 600px; height: 400px; top: 150px; left: 600px; z-index: 95;">
+        <div class="window-header" id="app-geo-header">
+            <div class="flex items-center gap-2">
+                <button class="win-btn win-close" onclick="closeApp('app-geo')"></button>
+                <button class="win-btn win-min"></button>
+                <button class="win-btn win-max" onclick="maximizeApp('app-geo')"></button>
+            </div>
+            <div class="text-[11px] font-bold text-[#64748b] uppercase tracking-widest font-mono">/intel/geopolitics</div>
+            <div class="w-12"></div>
+        </div>
+        <div class="window-content bg-[#0a0d14] p-5 flex flex-col gap-4">
+            <h3 class="text-[10px] font-mono text-white uppercase tracking-widest border-b border-[#1e2532] pb-2">Macro State Ledger</h3>
+            <div class="overflow-y-auto flex-1">
+                <table class="w-full text-left font-mono text-[10px] border-collapse" id="geo-table">
+                    <thead>
+                        <tr><th class="pb-2 text-[#64748b] border-b border-[#1e2532]">Region</th><th class="pb-2 text-[#64748b] border-b border-[#1e2532]">Event / Vector</th><th class="pb-2 text-[#64748b] border-b border-[#1e2532]">Asset Impact</th></tr>
+                    </thead>
+                    <tbody id="geo-body"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- APP 4: NEWSLETTER / REPORT GENERATOR -->
+    <div id="app-report" class="os-window" style="width: 1000px; height: 700px; top: 40px; right: 50px; z-index: 90;">
+        <div class="window-header" id="app-report-header">
+            <div class="flex items-center gap-2">
+                <button class="win-btn win-close" onclick="closeApp('app-report')"></button>
+                <button class="win-btn win-min"></button>
+                <button class="win-btn win-max" onclick="maximizeApp('app-report')"></button>
+            </div>
+            <div class="text-[11px] font-bold text-[#64748b] uppercase tracking-widest font-mono">/export/newsletter_gen</div>
+            <div class="w-12"></div>
+        </div>
+        <div class="window-content bg-[#020408] flex flex-col md:flex-row h-full">
+            <div class="w-full md:w-1/3 bg-[#0a0d14] border-r border-[#1e2532] p-5 flex flex-col gap-4 shrink-0">
+                <h3 class="text-[10px] font-mono text-white uppercase tracking-widest border-b border-[#1e2532] pb-2">Compilation Settings</h3>
+                <p class="text-[10px] text-[#64748b] font-mono">Select dynamic modules to inject into the daily briefing HTML.</p>
+                
+                <label class="flex items-center gap-2 text-[11px] font-mono text-[#cbd5e1]"><input type="checkbox" id="chk-kpis" checked class="accent-accent"> Include Live KPIs</label>
+                <label class="flex items-center gap-2 text-[11px] font-mono text-[#cbd5e1]"><input type="checkbox" id="chk-forecast" checked class="accent-accent"> Include Forecast Matrix</label>
+                <label class="flex items-center gap-2 text-[11px] font-mono text-[#cbd5e1]"><input type="checkbox" id="chk-dcf" checked class="accent-accent"> Include Top DCF Pick</label>
+                <label class="flex items-center gap-2 text-[11px] font-mono text-[#cbd5e1]"><input type="checkbox" id="chk-geo" checked class="accent-accent"> Include Geo Ledger</label>
+
+                <div class="mt-auto flex flex-col gap-3">
+                    <button onclick="generateReport()" class="w-full py-3 bg-accent text-black font-bold font-mono text-[10px] rounded hover:bg-white transition-all uppercase cursor-pointer">1. Compile Report</button>
+                    <button onclick="copyReportHtml()" id="btn-copy-report" class="w-full py-3 bg-[#1e2532] text-white font-bold font-mono text-[10px] rounded hover:border-accent border border-transparent transition-all uppercase cursor-pointer" disabled>2. Copy Raw HTML</button>
+                </div>
+            </div>
+            <div class="flex-1 flex flex-col p-5 bg-[#020408]">
+                <h3 class="text-[10px] font-mono text-white uppercase tracking-widest border-b border-[#1e2532] pb-2 mb-4">Preview</h3>
+                <div class="glass-panel flex-1 bg-white rounded overflow-hidden p-1 relative">
+                    <iframe id="report-preview" class="w-full h-full border-none bg-white rounded"></iframe>
+                </div>
+                <textarea id="report-code" class="hidden"></textarea> <!-- Hidden storage for code -->
+            </div>
+        </div>
+    </div>
+
+    <!-- APP 5: AI CO-PILOT -->
+    <div id="app-ai" class="os-window" style="width: 400px; height: 500px; bottom: 80px; right: 50px; top: auto; left: auto; z-index: 120;">
+        <div class="window-header" id="app-ai-header">
+            <div class="flex items-center gap-2">
+                <button class="win-btn win-close" onclick="closeApp('app-ai')"></button>
+                <button class="win-btn win-min"></button>
+                <button class="win-btn win-max" onclick="maximizeApp('app-ai')"></button>
+            </div>
+            <div class="text-[11px] font-bold text-[#64748b] uppercase tracking-widest flex items-center gap-2 font-mono">
+                <span class="w-1.5 h-1.5 bg-accent rounded-full animate-pulse"></span> Adam Co-Pilot
+            </div>
+            <div class="w-12"></div>
+        </div>
+        <div class="window-content bg-[#0a0d14] flex flex-col relative">
+            <div id="chatLog" class="flex-1 overflow-y-auto p-4 flex flex-col gap-4 text-sm font-sans z-10 scroll-smooth pb-4">
+                <div class="flex gap-3">
+                    <div class="w-7 h-7 rounded border border-accent bg-accent-tint flex items-center justify-center shrink-0 shadow-[0_0_8px_var(--theme-glow)]">
+                        <span class="text-[10px] font-display font-bold text-accent">A</span>
+                    </div>
+                    <div class="glass-panel p-3 text-[#cbd5e1] max-w-[85%] border-t-2 border-t-accent">
+                        <p class="text-[9px] font-mono text-accent mb-1 uppercase tracking-widest font-bold">Sys_Ready // V60</p>
+                        <p class="m-0 text-xs leading-relaxed">Telemetry online. Forecasting module, DCF 7-year engine, and geopolitical arrays synced. How can I assist with your macro routing today?</p>
+                    </div>
+                </div>
+            </div>
+            <div class="p-3 border-t border-[#1e2532] bg-[#020408] z-10 shrink-0">
+                <form id="chatForm" class="flex gap-2">
+                    <input type="text" id="aiInput" placeholder="Command..." class="flex-1 bg-[#0a0d14] border border-[#1e2532] rounded px-3 py-2 text-xs text-white font-mono focus:outline-none focus:border-accent transition-colors" autocomplete="off">
+                    <button type="submit" id="aiRunBtn" class="bg-accent-tint text-accent border border-accent hover:bg-accent hover:text-black px-4 py-2 rounded font-mono text-xs font-bold transition-all cursor-pointer">EXEC</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- DOCK -->
+    <div class="dock">
+        <div class="dock-item" onclick="openApp('app-macro')" data-app="app-macro">🌐<span class="dock-tooltip">Macro Forecasts</span></div>
+        <div class="dock-item" onclick="openApp('app-dcf')" data-app="app-dcf">📊<span class="dock-tooltip">7-Year DCF Engine</span></div>
+        <div class="dock-item" onclick="openApp('app-geo')" data-app="app-geo">⚠️<span class="dock-tooltip">Geopolitical Ledger</span></div>
+        <div class="dock-item" onclick="openApp('app-report')" data-app="app-report">📝<span class="dock-tooltip">Newsletter Generator</span></div>
+        <div class="w-px h-6 bg-white/10 self-center mx-1"></div>
+        <div class="dock-item" onclick="openApp('app-ai')" data-app="app-ai">✨<span class="dock-tooltip">Adam AI</span></div>
+    </div>
+
+    <!-- LOGIC -->
+    <script>
+        // --- GLOBAL STATE ---
+        let ADAM_DATA = {};
+        let currentTicker = 'MSFT';
+        let forecastChartInst = null;
+        let zIndexCounter = 100;
+
+        // --- INIT ---
+        window.addEventListener('DOMContentLoaded', () => {
+            // Load Context
+            ADAM_DATA = JSON.parse(document.getElementById('adam-datalake').textContent);
+
+            // Clock & Top Ticker
+            setInterval(() => {
+                document.getElementById('osClock').innerText = new Date().toLocaleString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: 'America/New_York' }) + ' EDT';
+            }, 1000);
+            buildTopTicker();
+
+            // Draggables
+            document.querySelectorAll('.os-window').forEach(win => makeDraggable(win));
+
+            // Init Background
+            initThreeJS();
+
+            // Init Apps
+            initMacroApp();
+            initDCFApp();
+            initGeoApp();
+            initAI();
+
+            // Default Open
+            openApp('app-report');
+            setTimeout(() => openApp('app-dcf'), 100);
+            setTimeout(() => openApp('app-macro'), 200);
+        });
+
+        // --- WINDOW MANAGER ---
+        function makeDraggable(elmnt) {
+            let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+            const header = document.getElementById(elmnt.id + "-header");
+            if (header) header.onmousedown = dragMouseDown;
+            elmnt.onmousedown = function() { bringToFront(elmnt.id); };
+
+            function dragMouseDown(e) {
+                if(e.target.classList.contains('win-btn') || e.target.tagName==='SELECT') return;
+                e.preventDefault();
+                pos3 = e.clientX; pos4 = e.clientY;
+                document.onmouseup = closeDragElement;
+                document.onmousemove = elementDrag;
+                bringToFront(elmnt.id);
+            }
+            function elementDrag(e) {
+                e.preventDefault();
+                pos1 = pos3 - e.clientX; pos2 = pos4 - e.clientY;
+                pos3 = e.clientX; pos4 = e.clientY;
+                elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+                elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+            }
+            function closeDragElement() { document.onmouseup = null; document.onmousemove = null; }
+        }
+
+        function bringToFront(id) {
+            zIndexCounter++;
+            document.getElementById(id).style.zIndex = zIndexCounter;
+        }
+
+        function openApp(id) {
+            const win = document.getElementById(id);
+            if(!win.classList.contains('active')) win.classList.add('active');
+            bringToFront(id);
+            document.querySelector(`.dock-item[data-app="${id}"]`)?.classList.add('open');
+            if(id === 'app-macro' && forecastChartInst) setTimeout(() => forecastChartInst.resize(), 300);
+        }
+
+        function closeApp(id) {
+            document.getElementById(id).classList.remove('active');
+            document.querySelector(`.dock-item[data-app="${id}"]`)?.classList.remove('open');
+        }
+
+        function maximizeApp(id) {
+            const win = document.getElementById(id);
+            if (win.dataset.maximized === "true") {
+                win.style.width = win.dataset.origW; win.style.height = win.dataset.origH;
+                win.style.top = win.dataset.origT; win.style.left = win.dataset.origL;
+                win.style.borderRadius = "10px";
+                win.dataset.maximized = "false";
+            } else {
+                win.dataset.origW = win.style.width || getComputedStyle(win).width; 
+                win.dataset.origH = win.style.height || getComputedStyle(win).height;
+                win.dataset.origT = win.style.top || getComputedStyle(win).top; 
+                win.dataset.origL = win.style.left || getComputedStyle(win).left;
+                win.style.width = "100%"; win.style.height = "calc(100vh - 40px)";
+                win.style.top = "40px"; win.style.left = "0";
+                win.style.borderRadius = "0";
+                win.dataset.maximized = "true";
+            }
+            bringToFront(id);
+            if(id === 'app-macro' && forecastChartInst) setTimeout(() => forecastChartInst.resize(), 300);
+        }
+
+        // --- THEME ---
+        function changeTheme(themeName) {
+            document.body.className = `dark theme-${themeName}`;
+            if(forecastChartInst) {
+                const color = themeName === 'matrix' ? '#00fa9a' : (themeName === 'critical' ? '#ff1e38' : '#00e5ff');
+                forecastChartInst.data.datasets[0].borderColor = color;
+                forecastChartInst.data.datasets[0].backgroundColor = color + '20';
+                forecastChartInst.update();
+            }
+            if(currentTicker) executeDCF(); // Redraw UI
+        }
+
+        function buildTopTicker() {
+            const tk = document.getElementById('top-ticker');
+            let html = '';
+            for(let i=0; i<4; i++) {
+                Object.entries(ADAM_DATA.kpis).forEach(([key, data]) => {
+                    const color = data.trend === 'up' ? 'text-[var(--color-green)]' : 'text-[var(--color-red)]';
+                    const icon = data.trend === 'up' ? '▲' : '▼';
+                    html += `<span><span class="text-white">${key.toUpperCase()}</span> ${data.val} <span class="${color}">${icon} ${data.chg}${data.unit}</span></span>`;
+                });
+            }
+            tk.innerHTML = html;
+        }
+
+        // --- APP: MACRO & FORECASTING ---
+        function initMacroApp() {
+            // KPIs
+            let kpiHtml = '';
+            for (const [key, data] of Object.entries(ADAM_DATA.kpis)) {
+                const isBadUp = key==='vix' || key==='yield_10y' || key==='brent';
+                const color = data.trend === 'up' ? (isBadUp ? 'text-[var(--color-red)]' : 'text-[var(--color-green)]') : (isBadUp ? 'text-[var(--color-green)]' : 'text-[var(--color-red)]');
+                const sign = data.trend === 'up' ? '+' : '';
+                kpiHtml += `
+                    <div class="glass-panel p-3 border-b-2 border-[#1e2532]">
+                        <div class="text-[9px] text-[#64748b] mb-1 font-mono uppercase truncate">${key.replace('_', ' ')}</div>
+                        <div class="text-lg font-bold text-white font-display">${data.val}${data.unit||''}</div>
+                        <div class="text-[9px] ${color} mt-1 font-mono">${sign}${data.chg}${data.unit||''}</div>
+                    </div>`;
+            }
+            document.getElementById('kpi-container').innerHTML = kpiHtml;
+
+            // Darkpool Table
+            let dpHtml = '';
+            ADAM_DATA.darkpool.forEach(w => {
+                const color = w.sentiment === 'bullish' ? 'text-[var(--color-green)]' : 'text-[var(--color-red)]';
+                dpHtml += `<tr class="border-b border-[#1e2532]">
+                    <td class="py-2 text-[#64748b]">${w.time}</td><td class="py-2 font-bold text-white">${w.ticker}</td>
+                    <td class="py-2"><span class="bg-[#1e2532] rounded px-1.5 py-0.5 text-[8px] text-[#cbd5e1]">${w.type}</span></td>
+                    <td class="py-2 text-right font-bold ${color}">${w.size}</td></tr>`;
+            });
+            document.getElementById('darkpool-table').innerHTML = dpHtml;
+
+            // Initialize Chart
+            Chart.defaults.color = '#64748b';
+            Chart.defaults.font.family = "'JetBrains Mono', monospace";
+            const ctx = document.getElementById('forecastChart').getContext('2d');
+            forecastChartInst = new Chart(ctx, {
+                type: 'line',
+                data: { labels: [], datasets: [] },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { grid: { color: 'rgba(255,255,255,0.05)' } },
+                        y: { grid: { color: 'rgba(255,255,255,0.05)' } }
+                    }
+                }
+            });
+            renderForecastChart();
+        }
+
+        function renderForecastChart() {
+            const horizon = document.getElementById('forecast-horizon').value;
+            const data = ADAM_DATA.forecasts[horizon];
+            
+            let labels = [];
+            if(horizon === 'near_term_0_7') labels = ['T-0','T+1','T+2','T+3','T+4','T+5','T+6','T+7'];
+            else if(horizon === 'near_term_0_30') labels = ['Week 0','Week 1','Week 2','Week 3','Week 4'];
+            else if(horizon === 'quarterly') labels = ['Q1','Q2','Q3','Q4'];
+            else if(horizon === 'annual_5_7y') labels = ['2026','2027','2028','2029','2030','2031','2032'];
+
+            const themeColor = document.body.classList.contains('theme-matrix') ? '#00fa9a' : (document.body.classList.contains('theme-critical') ? '#ff1e38' : '#00e5ff');
+
+            forecastChartInst.data.labels = labels;
+            forecastChartInst.data.datasets = [{
+                label: 'SPX Forecast Trajectory',
+                data: data.spx,
+                borderColor: themeColor,
+                backgroundColor: themeColor + '20',
+                fill: true, tension: 0.4, borderWidth: 2
+            }];
+            forecastChartInst.update();
+
+            document.getElementById('forecast-narrative').innerHTML = `
+                <span class="text-accent font-bold">CONFIDENCE: ${data.confidence}</span><br>
+                ${data.narrative}
+            `;
+        }
+
+        // --- APP: DCF ENGINE (7-YEAR) ---
+        function initDCFApp() {
+            const list = document.getElementById('dcf-ticker-list');
+            let html = '';
+            ADAM_DATA.universe.forEach(co => {
+                html += `<button id="tick-btn-${co.ticker}" class="text-left px-3 py-2 rounded text-xs font-mono transition-colors text-[#cbd5e1] hover:bg-[#1e2532] border border-transparent" onclick="loadDCF('${co.ticker}')">${co.ticker} - ${co.name}</button>`;
+            });
+            list.innerHTML = html;
+            loadDCF(ADAM_DATA.universe[0].ticker);
+        }
+
+        function loadDCF(ticker) {
+            currentTicker = ticker;
+            document.querySelectorAll('#dcf-ticker-list button').forEach(btn => btn.className = "text-left px-3 py-2 rounded text-xs font-mono transition-colors text-[#cbd5e1] hover:bg-[#1e2532] border border-transparent");
+            document.getElementById(`tick-btn-${ticker}`).className = "text-left px-3 py-2 rounded text-xs font-mono transition-colors bg-accent-tint text-accent border border-accent/30";
+
+            const co = ADAM_DATA.universe.find(c => c.ticker === ticker);
+            document.getElementById('dcf-name').innerText = co.name;
+            document.getElementById('dcf-ticker').innerText = co.ticker;
+            document.getElementById('dcf-sector').innerText = co.sector;
+            document.getElementById('dcf-shares').innerText = co.shares_out.toLocaleString();
+            document.getElementById('dcf-mkt-price').innerText = `$${co.price.toFixed(2)}`;
+
+            const scen = co.scenarios.base;
+            document.getElementById('slider-wacc').value = scen.wacc;
+            document.getElementById('slider-tg').value = scen.tg;
+
+            executeDCF();
+        }
+
+        function executeDCF() {
+            const co = ADAM_DATA.universe.find(c => c.ticker === currentTicker);
+            const wacc = parseFloat(document.getElementById('slider-wacc').value) / 100;
+            const tg = parseFloat(document.getElementById('slider-tg').value) / 100;
+            
+            document.getElementById('lbl-wacc').innerText = (wacc*100).toFixed(1) + '%';
+            document.getElementById('lbl-tg').innerText = (tg*100).toFixed(1) + '%';
+
+            let npvCashFlows = 0;
+            let fcfArray = [];
+
+            co.scenarios.base.projections.forEach((p, idx) => {
+                const ebit = p.rev * (p.ebit_m / 100);
+                const nopat = ebit * (1 - (p.tax / 100));
+                const fcf = nopat + p.da - p.capex - p.nwc;
+                fcfArray.push(fcf);
+                npvCashFlows += fcf / Math.pow(1 + wacc, idx + 1);
+            });
+
+            const finalFcf = fcfArray[fcfArray.length - 1];
+            let tv = 0, pvTv = 0;
+            if (wacc > tg) {
+                tv = (finalFcf * (1 + tg)) / (wacc - tg);
+                pvTv = tv / Math.pow(1 + wacc, fcfArray.length);
+            }
+
+            const ev = npvCashFlows + pvTv;
+            const impliedPrice = ev / (co.shares_out / 1000);
+
+            document.getElementById('dcf-pv-cf').innerText = `$${npvCashFlows.toFixed(1)}B`;
+            document.getElementById('dcf-pv-tv').innerText = `$${pvTv.toFixed(1)}B`;
+            document.getElementById('dcf-ev').innerText = `$${ev.toFixed(1)}B`;
+
+            const priceEl = document.getElementById('dcf-target-price');
+            const upsideEl = document.getElementById('dcf-upside');
+            const boxEl = document.getElementById('implied-box');
+            
+            if (wacc <= tg) {
+                priceEl.innerText = "ERR";
+                priceEl.className = "text-2xl font-bold font-mono text-[var(--color-red)]";
+                upsideEl.innerText = "Math Paradox"; upsideEl.className = "text-[10px] font-mono font-bold mt-1 text-[var(--color-red)]";
+                boxEl.className = "bg-[rgba(255,30,56,0.05)] border border-[var(--color-red)] rounded-lg p-3 text-right min-w-[140px]";
+            } else {
+                priceEl.innerText = `$${impliedPrice.toFixed(2)}`;
+                const upsidePct = ((impliedPrice - co.price) / co.price) * 100;
+                if (upsidePct >= 0) {
+                    priceEl.className = "text-2xl font-bold font-mono text-accent glow-accent";
+                    upsideEl.className = "text-[10px] font-mono font-bold mt-1 text-[var(--color-green)]";
+                    upsideEl.innerText = `+${upsidePct.toFixed(1)}% Upside`;
+                    boxEl.className = "bg-accent-tint border border-accent rounded-lg p-3 text-right min-w-[140px] shadow-[inset_0_0_20px_var(--theme-bg-tint)]";
+                } else {
+                    priceEl.className = "text-2xl font-bold font-mono text-white";
+                    upsideEl.className = "text-[10px] font-mono font-bold mt-1 text-[var(--color-red)]";
+                    upsideEl.innerText = `${upsidePct.toFixed(1)}% Downside`;
+                    boxEl.className = "bg-[#0a0d14] border border-[#1e2532] rounded-lg p-3 text-right min-w-[140px]";
+                }
+            }
+
+            // Table
+            const metrics = [
+                {name: 'Revenue', key: 'rev', format: ''},
+                {name: 'EBIT Margin', key: 'ebit_m', format: '%'},
+                {name: 'CapEx', key: 'capex', format: '', color: 'text-[var(--color-red)]'},
+                {name: 'Unlevered FCF', isFcf: true, format: '', color: 'text-accent font-bold bg-accent-tint'}
+            ];
+            
+            let tableHtml = '';
+            metrics.forEach(m => {
+                tableHtml += `<tr class="${m.isFcf ? 'bg-accent-tint' : ''}">`;
+                tableHtml += `<td class="font-bold ${m.color || 'text-white'}">${m.name}</td>`;
+                co.scenarios.base.projections.forEach((p, idx) => {
+                    let val = p[m.key];
+                    if (m.isFcf) val = fcfArray[idx];
+                    if (m.name === 'CapEx') val = -val;
+                    tableHtml += `<td class="text-right ${m.color || 'text-[#cbd5e1]'}">${val.toFixed(1)}${m.format}</td>`;
+                });
+                tableHtml += `</tr>`;
+            });
+            document.getElementById('dcf-table-body').innerHTML = tableHtml;
+
+            // Waterfall
+            const maxVal = Math.max(...fcfArray.map(Math.abs));
+            let wfHtml = '';
+            fcfArray.forEach((val, i) => {
+                const height = Math.max(5, (Math.abs(val) / maxVal) * 100);
+                const isNeg = val < 0;
+                wfHtml += `
+                    <div class="dcf-col">
+                        <div class="dcf-val" style="top: ${isNeg ? 'auto' : `-${height+20}px`}; bottom: ${isNeg ? `-${height+25}px` : 'auto'}; color: ${isNeg ? 'var(--color-red)':'#fff'}">${val.toFixed(1)}</div>
+                        <div class="${isNeg ? 'dcf-bar-neg' : 'dcf-bar-pos'}" style="height: ${height}%"></div>
+                        <div class="dcf-label" style="bottom: ${isNeg ? `-${height+40}px` : '-22px'}">FY${26+i}</div>
+                    </div>
+                `;
+            });
+            document.getElementById('dcf-waterfall').innerHTML = wfHtml;
+        }
+
+        // --- APP: GEOPOLITICS ---
+        function initGeoApp() {
+            let html = '';
+            ADAM_DATA.geopolitics.forEach(g => {
+                const color = g.impact === 'Severe' ? 'text-[var(--color-red)]' : (g.impact === 'High' ? 'text-[var(--color-amber)]' : 'text-accent');
+                html += `<tr class="border-b border-[#1e2532] hover:bg-white/5">
+                    <td class="py-3 font-bold text-white">${g.region}</td>
+                    <td class="py-3 text-[#cbd5e1]">${g.event} <span class="bg-[#1e2532] px-2 py-0.5 rounded text-[8px] ml-2 ${color}">${g.impact}</span></td>
+                    <td class="py-3 font-mono text-accent">${g.asset_target}</td>
+                </tr>`;
+            });
+            document.getElementById('geo-body').innerHTML = html;
+        }
+
+        // --- APP: NEWSLETTER GENERATOR ---
+        function generateReport() {
+            const incKPI = document.getElementById('chk-kpis').checked;
+            const incFor = document.getElementById('chk-forecast').checked;
+            const incDCF = document.getElementById('chk-dcf').checked;
+            const incGeo = document.getElementById('chk-geo').checked;
+
+            const co = ADAM_DATA.universe.find(c => c.ticker === currentTicker);
+            const forecast = ADAM_DATA.forecasts['near_term_0_30'];
+
+            let html = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <style>
+                    body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #020408; color: #cbd5e1; margin: 0; padding: 20px; line-height: 1.6; }
+                    .container { max-width: 650px; margin: 0 auto; background: #0a0d14; border: 1px solid #1e2532; border-radius: 8px; overflow: hidden; }
+                    .header { background: #00e5ff; color: #000; padding: 20px; text-align: center; font-weight: bold; text-transform: uppercase; font-size: 20px; letter-spacing: 2px;}
+                    .content { padding: 30px; }
+                    h2 { color: #00e5ff; font-size: 16px; border-bottom: 1px solid #1e2532; padding-bottom: 8px; margin-top: 30px; text-transform: uppercase; }
+                    .kpi-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+                    .kpi-box { background: #11151e; padding: 15px; border-radius: 4px; text-align: center; }
+                    .kpi-val { font-size: 22px; font-weight: bold; color: #fff; margin: 5px 0; }
+                    .kpi-lbl { font-size: 10px; color: #64748b; text-transform: uppercase; }
+                    .dcf-box { background: rgba(0, 229, 255, 0.05); border-left: 4px solid #00e5ff; padding: 15px; margin-bottom: 20px; }
+                    .footer { background: #020408; padding: 20px; text-align: center; font-size: 10px; color: #64748b; }
+                    table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 12px; }
+                    th, td { padding: 10px; border-bottom: 1px solid #1e2532; text-align: left; }
+                    th { color: #64748b; }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <div class="header">Adam Omnios V60 Briefing</div>
+                    <div class="content">
+                        <p style="color: #fff; font-size: 14px;">System synchronization complete. Below is the automated macro and structural intelligence routing for ${new Date().toLocaleDateString()}.</p>
+            `;
+
+            if (incKPI) {
+                html += `<h2>Global Telemetry</h2><div class="kpi-grid">`;
+                ['spx', 'yield_10y', 'brent'].forEach(k => {
+                    html += `<div class="kpi-box"><div class="kpi-lbl">${k}</div><div class="kpi-val">${ADAM_DATA.kpis[k].val}</div></div>`;
+                });
+                html += `</div>`;
+            }
+
+            if (incFor) {
+                html += `
+                    <h2>T+30 Forward Outlook (SPX)</h2>
+                    <p style="background: #11151e; padding: 15px; border-radius: 4px;"><strong>Confidence: ${forecast.confidence}</strong><br/>${forecast.narrative}</p>
+                `;
+            }
+
+            if (incDCF) {
+                const target = document.getElementById('dcf-target-price').innerText;
+                const upside = document.getElementById('dcf-upside').innerText;
+                html += `
+                    <h2>Structural Valuation: ${co.ticker}</h2>
+                    <div class="dcf-box">
+                        <div style="font-size: 12px; color: #64748b;">7-YEAR IMPLIED TARGET</div>
+                        <div style="font-size: 28px; color: #00e5ff; font-weight: bold;">${target}</div>
+                        <div style="font-size: 12px; color: #00fa9a; margin-top: 5px;">${upside}</div>
+                        <p style="font-size: 12px; margin-top: 15px;">Based on internal DCF engine running WACC at ${document.getElementById('slider-wacc').value}% and Terminal Growth at ${document.getElementById('slider-tg').value}%.</p>
+                    </div>
+                `;
+            }
+
+            if (incGeo) {
+                html += `<h2>Geopolitical Ledger</h2><table><tr><th>Region</th><th>Vector</th><th>Target</th></tr>`;
+                ADAM_DATA.geopolitics.forEach(g => {
+                    html += `<tr><td style="color:#fff;">${g.region}</td><td>${g.event}</td><td style="color:#00e5ff;">${g.asset_target}</td></tr>`;
+                });
+                html += `</table>`;
+            }
+
+            html += `
+                    </div>
+                    <div class="footer">GENERATED BY ADAM OMNIOS V60. DO NOT DISTRIBUTE.</div>
+                </div>
+            </body>
+            </html>`;
+
+            document.getElementById('report-code').value = html;
+            const iframe = document.getElementById('report-preview');
+            iframe.contentWindow.document.open();
+            iframe.contentWindow.document.write(html);
+            iframe.contentWindow.document.close();
+            
+            document.getElementById('btn-copy-report').disabled = false;
+        }
+
+        function copyReportHtml() {
+            const code = document.getElementById('report-code').value;
+            navigator.clipboard.writeText(code);
+            const btn = document.getElementById('btn-copy-report');
+            btn.innerText = "COPIED!";
+            setTimeout(() => btn.innerText = "2. Copy Raw HTML", 2000);
+        }
+
+        // --- APP: AI CO-PILOT ---
+        function initAI() {
+            document.getElementById('chatForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const input = document.getElementById('aiInput');
+                const val = input.value.trim();
+                if(!val) return;
+
+                const chatLog = document.getElementById('chatLog');
+                input.value = '';
+
+                // User Msg
+                chatLog.insertAdjacentHTML('beforeend', `
+                    <div class="flex gap-3 justify-end">
+                        <div class="bg-accent-tint p-3 rounded-lg rounded-tr-none border border-accent/30 text-white max-w-[85%] text-xs shadow-lg">
+                            ${val}
+                        </div>
+                    </div>
+                `);
+                chatLog.scrollTo({top: chatLog.scrollHeight, behavior: 'smooth'});
+
+                // Typing
+                const typingId = 'typing-' + Date.now();
+                chatLog.insertAdjacentHTML('beforeend', `
+                    <div class="flex gap-3" id="${typingId}">
+                        <div class="w-7 h-7 rounded border border-accent bg-accent-tint flex items-center justify-center shrink-0">
+                            <span class="text-[10px] font-display font-bold text-accent">A</span>
+                        </div>
+                        <div class="glass-panel p-3 text-[#cbd5e1] rounded-tl-none">
+                            <span class="animate-pulse text-[10px] uppercase tracking-widest font-mono text-accent">Synthesizing telemetry...</span>
+                        </div>
+                    </div>
+                `);
+                chatLog.scrollTo({top: chatLog.scrollHeight, behavior: 'smooth'});
+
+                // Response
+                setTimeout(() => {
+                    document.getElementById(typingId).remove();
+                    let response = "I am operating in strict heuristic mode without external API bridging. Based on current V60 internal parameters, recommend overweighting high FCF converters and monitoring the T+30 probability matrix closely.";
+                    
+                    if(val.toLowerCase().includes("report") || val.toLowerCase().includes("newsletter")) {
+                        response = "I have updated the Newsletter Generation module. You can now compile the 7-Year DCF metrics directly into copy-ready HTML for distribution.";
+                    } else if(val.toLowerCase().includes("dcf")) {
+                        response = "The DCF engine now projects 7 years out to capture the end-stage realization of the AI Capital Supercycle. WACC and TG sensitivities are strictly tied to the 10Y Yield drift.";
+                    }
+
+                    chatLog.insertAdjacentHTML('beforeend', `
+                        <div class="flex gap-3">
+                            <div class="w-7 h-7 rounded border border-accent bg-accent-tint flex items-center justify-center shrink-0 shadow-[0_0_8px_var(--theme-glow)]">
+                                <span class="text-[10px] font-display font-bold text-accent">A</span>
+                            </div>
+                            <div class="glass-panel p-4 border-accent/30 text-[#cbd5e1] max-w-[85%] text-xs prose prose-invert rounded-tl-none">
+                                ${marked.parse(response)}
+                            </div>
+                        </div>
+                    `);
+                    chatLog.scrollTo({top: chatLog.scrollHeight, behavior: 'smooth'});
+                }, 1000);
+            });
+        }
+
+        // --- THREE.JS BACKGROUND ---
+        function initThreeJS() {
+            const canvas = document.getElementById('world-canvas');
+            const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+
+            const scene = new THREE.Scene();
+            scene.fog = new THREE.FogExp2(0x020408, 0.002);
+
+            const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.set(0, 10, 50);
+
+            // Matrix/Nodes
+            const particleCount = 1000;
+            const geometry = new THREE.BufferGeometry();
+            const positions = new Float32Array(particleCount * 3);
+            for(let i=0; i<particleCount*3; i++) {
+                positions[i] = (Math.random() - 0.5) * 200;
+            }
+            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            
+            const material = new THREE.PointsMaterial({ color: 0x00e5ff, size: 1.0, transparent: true, opacity: 0.6, blending: THREE.AdditiveBlending });
+            const particles = new THREE.Points(geometry, material);
+            scene.add(particles);
+
+            // Grid
+            const gridHelper = new THREE.GridHelper(300, 60, 0x00e5ff, 0x1e2532);
+            gridHelper.position.y = -15;
+            gridHelper.material.transparent = true;
+            gridHelper.material.opacity = 0.15;
+            scene.add(gridHelper);
+
+            // Theme Sync
+            const observer = new MutationObserver(() => {
+                const color = document.body.classList.contains('theme-matrix') ? 0x00fa9a : (document.body.classList.contains('theme-critical') ? 0xff1e38 : 0x00e5ff);
+                material.color.setHex(color);
+                gridHelper.material.color.setHex(color);
+            });
+            observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+
+            let targetX = 0, targetY = 0;
+            document.addEventListener('mousemove', (e) => {
+                targetX = (e.clientX / window.innerWidth) * 2 - 1;
+                targetY = -(e.clientY / window.innerHeight) * 2 + 1;
+            });
+
+            let time = 0;
+            function animate() {
+                requestAnimationFrame(animate);
+                time += 0.002;
+                
+                const posArray = geometry.attributes.position.array;
+                for(let i=0; i<particleCount; i++) {
+                    posArray[i*3+1] -= 0.2;
+                    if(posArray[i*3+1] < -50) posArray[i*3+1] = 50;
+                }
+                geometry.attributes.position.needsUpdate = true;
+
+                gridHelper.position.z = (time * 50) % 5;
+                
+                camera.position.x += (targetX * 5 - camera.position.x) * 0.05;
+                camera.position.y += ((targetY * 2 + 10) - camera.position.y) * 0.05;
+                camera.lookAt(0, 0, 0);
+
+                renderer.render(scene, camera);
+            }
+            animate();
+
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+        }
+    </script>
+</body>
+</html>
