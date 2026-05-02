@@ -23,6 +23,9 @@ class GraphEngine:
             else:
                 raise Exception("MOCK_MODE is enabled")
         except Exception as e:
+            if not (os.environ.get("MOCK_MODE", "false").lower() == "true"):
+                logging.error(f"Neo4j connection failed in production: {e}")
+                raise RuntimeError(f"Neo4j connection failed: {e}")
             logging.info(f"Neo4j connection failed or bypassed: {e}. Falling back to NetworkX.")
             self.graph = nx.Graph()
             self._build_mock_graph()

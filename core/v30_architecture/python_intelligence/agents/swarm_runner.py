@@ -31,6 +31,7 @@ try:
     from core.v30_architecture.python_intelligence.agents.adversarial_red_team import AdversarialRedTeamAgent
     from core.v30_architecture.python_intelligence.agents.hardened_shield import HardenedShieldAgent
     from core.v30_architecture.python_intelligence.agents.market_sentiment_agent import MarketSentimentAgent
+    from core.v30_architecture.python_intelligence.agents.macro_economic_agent import MacroEconomicAgent
     from core.v30_architecture.python_intelligence.agents.regulatory_compliance_agent import RegulatoryComplianceAgent
 except ImportError:
     # Fallback for local execution
@@ -47,6 +48,7 @@ except ImportError:
     from adversarial_red_team import AdversarialRedTeamAgent
     from hardened_shield import HardenedShieldAgent
     from market_sentiment_agent import MarketSentimentAgent
+    from macro_economic_agent import MacroEconomicAgent
     from regulatory_compliance_agent import RegulatoryComplianceAgent
 
 
@@ -83,6 +85,7 @@ agents = [
     AdversarialRedTeamAgent(),
     HardenedShieldAgent(),
     MarketSentimentAgent(),
+    MacroEconomicAgent()
     RegulatoryComplianceAgent()
 ]
 
