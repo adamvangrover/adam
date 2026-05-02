@@ -14,6 +14,9 @@ from core.agents.options_flow_agent import OptionsFlowAgent
 from core.agents.insider_activity_agent import InsiderActivityAgent
 
 
+from typing_extensions import deprecated
+
+@deprecated("Legacy agent, use v30 architecture version instead")
 class MarketSentimentAgent(AgentBase):
     """
     Agent responsible for gauging market sentiment from a variety of sources,
@@ -47,6 +50,7 @@ class MarketSentimentAgent(AgentBase):
         Returns:
             Dict containing the sentiment score and analysis details, or AgentOutput.
         """
+        logging.warning("This legacy agent is deprecated.")
         # 1. Input Normalization
         query = ""
         is_standard_mode = False

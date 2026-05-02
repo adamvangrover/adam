@@ -5,6 +5,7 @@ import time
 import random
 import asyncio
 import argparse
+import logging
 from typing import Dict, Any, Optional, List, Union, Set
 from collections import defaultdict
 from datetime import datetime, timezone
@@ -58,6 +59,9 @@ except ImportError:
     Kernel = Any
 
 
+from typing_extensions import deprecated
+
+@deprecated("Legacy agent, use v30 architecture version instead")
 class NewsBot(AgentBase):
     """
     An advanced News Aggregation Agent that fetches data from APIs, RSS, and Crypto sources,
@@ -120,8 +124,8 @@ class NewsBot(AgentBase):
         # Sentiment Model (FinBERT)
         try:
             name = "ProsusAI/finbert"
-            self.finbert_tokenizer = AutoTokenizer.from_pretrained(name)  # nosec B615
-            self.finbert_model = AutoModelForSequenceClassification.from_pretrained(name)  # nosec B615
+            self.finbert_tokenizer = AutoTokenizer.from_pretrained(name, revision="main")  # nosec B615
+            self.finbert_model = AutoModelForSequenceClassification.from_pretrained(name, revision="main")  # nosec B615
             print(f"✔ Sentiment Model ({name}) loaded.")
         except Exception as e:
             print(f"✘ Failed to load FinBERT: {e}")
@@ -130,8 +134,8 @@ class NewsBot(AgentBase):
         try:
             # Using distilbart-cnn-12-6 for speed/memory efficiency
             name = "sshleifer/distilbart-cnn-12-6" 
-            self.summarizer_tokenizer = AutoTokenizer.from_pretrained(name)  # nosec B615
-            self.summarizer_model = AutoModelForSeq2SeqLM.from_pretrained(name)  # nosec B615
+            self.summarizer_tokenizer = AutoTokenizer.from_pretrained(name, revision="main")  # nosec B615
+            self.summarizer_model = AutoModelForSeq2SeqLM.from_pretrained(name, revision="main")  # nosec B615
             print(f"✔ Summarization Model ({name}) loaded.")
         except Exception as e:
             print(f"✘ Failed to load Summarizer: {e}")
@@ -435,6 +439,7 @@ class NewsBot(AgentBase):
 
     async def execute(self, *args, **kwargs) -> Dict[str, Any]:
         """Run a full cycle: Fetch -> Analyze -> Alert -> Report."""
+        logging.warning("This legacy agent is deprecated.")
         print(f"\n--- Cycle Start: {datetime.now().strftime('%H:%M:%S')} ---")
         
         news = await self.aggregate_news()
