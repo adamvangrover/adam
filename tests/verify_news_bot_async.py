@@ -38,12 +38,14 @@ class TestNewsBotAsync(unittest.IsolatedAsyncioTestCase):
                 bot.cg = MagicMock()
                 bot.cg.get_trending_searches = MagicMock(return_value={"coins": []})
 
-                results = await bot.execute()
+                with patch.object(bot, 'summarize_articles', new_callable=AsyncMock) as mock_summarize:
+                    mock_summarize.return_value = "Mock summary"
+                    results = await bot.execute()
 
-                self.assertIn("personalized_feed", results)
+                self.assertIn("feed", results)
                 # We expect at least one article from finance mock
-                self.assertTrue(len(results["personalized_feed"]) > 0, "Personalized feed is empty")
-                self.assertEqual(results["personalized_feed"][0]["title"], "Test News")
+                self.assertTrue(len(results["feed"]) > 0, "Personalized feed is empty")
+                self.assertEqual(results["feed"][0]["title"], "Test News")
 
 if __name__ == "__main__":
     unittest.main()

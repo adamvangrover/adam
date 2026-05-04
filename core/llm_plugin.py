@@ -537,12 +537,20 @@ class HuggingFaceLLM(BaseLLM):
         if self.api_key:
             os.environ["HF_API_TOKEN"] = self.api_key
 
+    def _get_model_revision(self) -> str:
+        # Pinned revisions for common models to prevent supply chain attacks
+        revisions = {
+            "google/flan-t5-base": "7bcac572ce56db69c1ea7c8af255c5d7c9672fc2",
+            "microsoft/phi-2": "810d367871c1d460086d9f82db8696f2e0a0fcd0"
+        }
+        return revisions.get(self.model_name, "main")
+
     @property
     def tokenizer(self):
         if self._tokenizer is None:
             try:
                 from transformers import AutoTokenizer
-                self._tokenizer = AutoTokenizer.from_pretrained(self.model_name, revision="main")
+                self._tokenizer = AutoTokenizer.from_pretrained(self.model_name, revision=self._get_model_revision())
             except ImportError:
                 raise LLMConfigurationError("Transformers library not installed.")
             except Exception as e:
@@ -555,9 +563,9 @@ class HuggingFaceLLM(BaseLLM):
             try:
                 from transformers import AutoModelForSeq2SeqLM, AutoModelForCausalLM
                 try:
-                    self._model = AutoModelForSeq2SeqLM.from_pretrained(self.model_name, revision="main")
+                    self._model = AutoModelForSeq2SeqLM.from_pretrained(self.model_name, revision=self._get_model_revision())
                 except:
-                    self._model = AutoModelForCausalLM.from_pretrained(self.model_name, revision="main")
+                    self._model = AutoModelForCausalLM.from_pretrained(self.model_name, revision=self._get_model_revision())
             except ImportError:
                 raise LLMConfigurationError("Transformers library not installed.")
             except Exception as e:
