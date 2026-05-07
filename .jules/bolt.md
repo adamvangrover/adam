@@ -140,3 +140,7 @@
 ## 2026-11-28 - [React Polling Optimization]
 **Learning:** In periodic network polls (like in `NarrativeDashboard`), using `setInterval` can cause request pile-ups during slow API responses, and blindly calling `setState(data)` causes React to re-render the whole component list even if the data is identical. `React.memo` alone won't prevent list re-renders when data references change (e.g., from `res.json()`).
 **Action:** Replace `setInterval` with a recursive `setTimeout`, check for `isMounted`, and use deep equality checks (e.g., `JSON.stringify(prev) !== JSON.stringify(data)`) inside the state setter to skip setting state and avoid unnecessary full re-renders when data is unchanged.
+
+## 2024-05-07 - [React.memo and sliding window lists]
+**Learning:** `React.memo` components initialized with mapped lists utilizing array index (`key={i}`) as keys will defeat memoization entirely if the list behaves as a sliding window (e.g. `prev.slice(-50)` when a new item is added). This is because the new item pushes everything else's index down by one, causing React to erroneously re-render all existing components because they have "new" prop identities.
+**Action:** Always assign a unique ID (e.g., UUID or `Math.random().toString(36)`) when generating items for a sliding window or dynamic list, and map that unique ID as the React `key` instead of relying on index, in order for `React.memo` to effectively bypass re-rendering.
