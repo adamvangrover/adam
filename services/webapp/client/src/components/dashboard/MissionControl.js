@@ -26,6 +26,26 @@ ChartJS.register(
   Filler
 );
 
+// Bolt ⚡ Optimization: Use React.memo for list items that update frequently
+// This prevents O(N) full re-renders of the terminal log list when a single new log is added.
+const TerminalLogRow = React.memo(({ log }) => (
+    <div className="mb-1">
+        <span className="text-slate-500">[{log.timestamp}]</span> <span className={log.type === 'error' ? 'text-rose-500' : 'text-emerald-400'}>{log.message}</span>
+    </div>
+));
+TerminalLogRow.displayName = 'TerminalLogRow';
+
+const AgentStatusRow = React.memo(({ agent }) => (
+    <div className="flex justify-between items-center p-2 rounded bg-slate-800/50 border border-slate-700/50">
+        <div className="flex flex-col">
+            <span className="text-sm font-medium text-slate-200">{agent.name}</span>
+            <span className="text-xs text-slate-500">{agent.task}</span>
+        </div>
+        <div className={`w-2 h-2 rounded-full ${agent.status === 'active' ? 'bg-emerald-500 shadow-lg shadow-emerald-500/50' : 'bg-amber-500'}`}></div>
+    </div>
+));
+AgentStatusRow.displayName = 'AgentStatusRow';
+
 const TerminalLog = ({ logs }) => {
     const bottomRef = useRef(null);
 
@@ -35,10 +55,8 @@ const TerminalLog = ({ logs }) => {
 
     return (
         <div className="font-mono text-xs bg-slate-950 p-4 rounded-lg border border-slate-800 h-48 overflow-y-auto text-emerald-500/80 shadow-inner">
-            {logs.map((log, i) => (
-                <div key={i} className="mb-1">
-                    <span className="text-slate-500">[{log.timestamp}]</span> <span className={log.type === 'error' ? 'text-rose-500' : 'text-emerald-400'}>{log.message}</span>
-                </div>
+            {logs.map((log) => (
+                <TerminalLogRow key={log.id} log={log} />
             ))}
             <div ref={bottomRef} />
         </div>
@@ -53,7 +71,8 @@ const MissionControl = () => {
 
     const addLog = (message, type = 'info') => {
         const timestamp = new Date().toLocaleTimeString();
-        setLogs(prev => [...prev.slice(-50), { timestamp, message, type }]);
+        const id = Math.random().toString(36).substr(2, 9); // Bolt ⚡ Optimization: Unique ID to prevent React.memo key index bugs in sliding window
+        setLogs(prev => [...prev.slice(-50), { id, timestamp, message, type }]);
     };
 
     useEffect(() => {
@@ -83,8 +102,14 @@ const MissionControl = () => {
 
         fetchData();
 
-        // Polling simulation
-        const interval = setInterval(() => {
+        // Bolt ⚡ Optimization: Recursive setTimeout prevents request pile-up and UI lag
+        // associated with setInterval during slow operations or react re-renders.
+        let timeoutId;
+        let isMounted = true;
+
+        const pollSimulation = () => {
+             if (!isMounted) return;
+
              // Randomly generate logs to simulate activity
              const actions = ["Scanning news feeds...", "Re-calibrating risk models...", "Optimizing knowledge graph...", "Fetching SEC filings..."];
              const randomAction = actions[Math.floor(Math.random() * actions.length)];
@@ -99,11 +124,20 @@ const MissionControl = () => {
                  if (newLoad > 95) newLoad = 95;
 
                  // Keep history length fixed to 7 points to match the labels
-                 return [...prev.slice(1), Math.round(newLoad)];
+                 const newHistory = [...prev.slice(1), Math.round(newLoad)];
+                 return newHistory;
              });
-        }, 3000);
 
-        return () => clearInterval(interval);
+             timeoutId = setTimeout(pollSimulation, 3000);
+        };
+
+        // Start recursive polling
+        timeoutId = setTimeout(pollSimulation, 3000);
+
+        return () => {
+            isMounted = false;
+            clearTimeout(timeoutId);
+        };
     }, []);
 
     // Bolt Optimization ⚡: Wrapped chartData and chartOptions in useMemo.
@@ -205,13 +239,7 @@ const MissionControl = () => {
                         <h2 className="text-lg font-semibold text-white mb-4">Agent Status</h2>
                         <div className="space-y-3">
                             {agents.map((agent) => (
-                                <div key={agent.id} className="flex justify-between items-center p-2 rounded bg-slate-800/50 border border-slate-700/50">
-                                    <div className="flex flex-col">
-                                        <span className="text-sm font-medium text-slate-200">{agent.name}</span>
-                                        <span className="text-xs text-slate-500">{agent.task}</span>
-                                    </div>
-                                    <div className={`w-2 h-2 rounded-full ${agent.status === 'active' ? 'bg-emerald-500 shadow-lg shadow-emerald-500/50' : 'bg-amber-500'}`}></div>
-                                </div>
+                                <AgentStatusRow key={agent.id} agent={agent} />
                             ))}
                             {agents.length === 0 && <div className="text-slate-500 text-sm">Loading agent registry...</div>}
                         </div>
