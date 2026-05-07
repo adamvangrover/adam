@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM | Intelligence Archive</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/portal.css">
+
+    <style>
+        .report-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+
+        .report-card {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .report-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: var(--portal-text-muted);
+            margin-bottom: 10px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .report-type {
+            padding: 2px 8px;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.1);
+        }
+
+        .type-mayhem { background: rgba(239, 68, 68, 0.2); color: #fca5a5; }
+        .type-briefing { background: rgba(16, 185, 129, 0.2); color: #6ee7b7; }
+        .type-conviction { background: rgba(168, 85, 247, 0.2); color: #d8b4fe; }
+    </style>
+</head>
+<body>
+
+    <aside class="portal-sidebar" id="portal-sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">ADAM <span style="color: #fff; font-size: 0.5em; vertical-align: super;">v26</span></div>
+            <button class="toggle-btn" id="sidebar-toggle"><i class="fas fa-bars"></i></button>
+        </div>
+        <div class="sidebar-nav" id="sidebar-nav"></div>
+    </aside>
+
+    <main class="portal-main">
+        <header class="portal-header">
+             <div style="display: flex; align-items: center;">
+                <button class="mobile-toggle" id="mobile-toggle"><i class="fas fa-bars"></i></button>
+                <div class="header-search">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" class="search-input" placeholder="Search reports...">
+                </div>
+            </div>
+        </header>
+
+        <div class="portal-content">
+            <div class="animate-fade-in" style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 30px;">
+                <div>
+                    <h1 class="page-title">Intelligence Archive</h1>
+                    <p class="page-subtitle" style="margin-bottom: 0;">Access historical reports, briefings, and Market Mayhem scenarios.</p>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button class="action-btn" style="border: 1px solid var(--portal-border); padding: 5px 15px; border-radius: 4px; font-size: 0.8rem; color: #fff;">
+                        <i class="fas fa-filter"></i> Filter
+                    </button>
+                </div>
+            </div>
+
+            <div class="report-grid animate-fade-in delay-1" id="report-container">
+                <!-- Mock Data populated via JS below -->
+            </div>
+        </div>
+    </main>
+
+    <script src="js/portal_nav.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const reports = [
+                {
+                    title: "The Great Bifurcation: Software vs Hardware",
+                    date: "2026-02-15",
+                    type: "CONVICTION",
+                    desc: "An in-depth analysis of the widening valuation gap between software and hardware sectors in the post-AI boom era.",
+                    link: "../market_mayhem_conviction.html",
+                    class: "type-conviction"
+                },
+                {
+                    title: "Market Mayhem: The 2026 Sovereign Debt Crisis Simulation",
+                    date: "2026-01-10",
+                    type: "MAYHEM",
+                    desc: "Simulation results analyzing a hypothetical rapid unwinding of Japanese sovereign debt and its global contagion effects.",
+                    link: "../market_mayhem_dashboard.html",
+                    class: "type-mayhem"
+                },
+                {
+                    title: "Daily Briefing: Credit Markets Stabilize",
+                    date: "2026-02-18",
+                    type: "BRIEFING",
+                    desc: "Morning synthesis of overnight trading activity across G7 credit markets.",
+                    link: "../daily_briefing.html",
+                    class: "type-briefing"
+                },
+                {
+                    title: "Market Mayhem: Flash Crash of 2010 Re-Evaluated",
+                    date: "2025-11-05",
+                    type: "MAYHEM",
+                    desc: "Applying modern neural net analysis to the 2010 Flash Crash data to predict future micro-structure vulnerabilities.",
+                    link: "../market_mayhem_dashboard.html",
+                    class: "type-mayhem"
+                },
+                 {
+                    title: "House View: Q1 2026 Reflationary Boom",
+                    date: "2026-01-05",
+                    type: "CONVICTION",
+                    desc: "Macro strategy framework for positioning portfolios during the expected Q1 reflationary environment.",
+                    link: "../macro_strategy.html",
+                    class: "type-conviction"
+                }
+            ];
+
+            const container = document.getElementById('report-container');
+
+            reports.forEach(report => {
+                const card = document.createElement('a');
+                card.href = report.link;
+                card.className = 'glass-card report-card';
+                card.style.textDecoration = 'none';
+                card.style.color = 'inherit';
+
+                card.innerHTML = `
+                    <div class="report-meta">
+                        <span><i class="far fa-calendar-alt"></i> ${report.date}</span>
+                        <span class="report-type ${report.class}">${report.type}</span>
+                    </div>
+                    <h3 style="color: #fff; margin-bottom: 10px; font-size: 1.1rem;">${report.title}</h3>
+                    <p style="color: var(--portal-text-muted); font-size: 0.85rem; line-height: 1.5; flex-grow: 1;">${report.desc}</p>
+                    <div style="margin-top: 15px; font-family: 'JetBrains Mono'; font-size: 0.75rem; color: var(--portal-accent); text-align: right;">
+                        READ REPORT &rarr;
+                    </div>
+                `;
+
+                container.appendChild(card);
+            });
+        });
+    </script>
+</body>
+</html>

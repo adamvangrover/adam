@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM | Next-Gen Portal</title>
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/portal.css">
+</head>
+<body>
+
+    <!-- Sidebar Navigation -->
+    <aside class="portal-sidebar" id="portal-sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">ADAM <span style="color: #fff; font-size: 0.5em; vertical-align: super;">v26</span></div>
+            <button class="toggle-btn" id="sidebar-toggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+
+        <div class="sidebar-nav" id="sidebar-nav">
+            <!-- Dynamically populated by portal_nav.js -->
+            <div style="padding: 20px; color: var(--portal-text-muted); font-size: 0.8rem; text-align: center;">
+                Loading Navigation...
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="portal-main">
+
+        <!-- Header -->
+        <header class="portal-header">
+            <div style="display: flex; align-items: center;">
+                <button class="mobile-toggle" id="mobile-toggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="header-search">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" class="search-input" placeholder="Search knowledge graph, agents, or files (Ctrl+K)...">
+                </div>
+            </div>
+
+            <div class="header-actions">
+                <button class="action-btn">
+                    <i class="fas fa-bell"></i>
+                    <span class="badge">3</span>
+                </button>
+                <button class="action-btn">
+                    <i class="fas fa-terminal"></i>
+                </button>
+                <button class="action-btn">
+                    <i class="fas fa-cog"></i>
+                </button>
+                <div style="width: 35px; height: 35px; border-radius: 50%; background: var(--portal-border); display: flex; align-items: center; justify-content: center; margin-left: 10px; border: 1px solid var(--portal-accent);">
+                    <i class="fas fa-user-astronaut text-accent"></i>
+                </div>
+            </div>
+        </header>
+
+        <!-- Dashboard Content -->
+        <div class="portal-content">
+
+            <div class="animate-fade-in">
+                <h1 class="page-title">Global Command Center</h1>
+                <p class="page-subtitle">Real-time systemic oversight and unified agentic control.</p>
+            </div>
+
+            <!-- Stats Row -->
+            <div class="dashboard-grid animate-fade-in delay-1">
+
+                <div class="glass-card">
+                    <div class="card-header">
+                        <h3 class="card-title">System Health</h3>
+                        <i class="fas fa-heartbeat card-icon"></i>
+                    </div>
+                    <div class="stat-value">OPTIMAL</div>
+                    <div class="stat-trend trend-up">
+                        <i class="fas fa-arrow-up"></i>
+                        <span>Latency 42ms (USE-1)</span>
+                    </div>
+                </div>
+
+                <div class="glass-card">
+                    <div class="card-header">
+                        <h3 class="card-title">Active Swarm</h3>
+                        <i class="fas fa-network-wired card-icon"></i>
+                    </div>
+                    <div class="stat-value">14 <span style="font-size: 1rem; color: var(--portal-text-muted);">Nodes</span></div>
+                    <div class="stat-trend trend-up">
+                        <i class="fas fa-circle" style="font-size: 0.5rem;"></i>
+                        <span>All sub-systems responsive</span>
+                    </div>
+                </div>
+
+                <div class="glass-card" style="border-color: rgba(245, 158, 11, 0.3);">
+                    <div class="card-header">
+                        <h3 class="card-title" style="color: #f59e0b;">Market Volatility (VIX)</h3>
+                        <i class="fas fa-chart-line card-icon" style="color: #f59e0b;"></i>
+                    </div>
+                    <div class="stat-value" id="mock-vix" style="color: #f59e0b;">21.40</div>
+                    <div class="stat-trend trend-down">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span>Elevated. Monitoring divergence.</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="animate-fade-in delay-2" style="margin-bottom: 20px;">
+                <h3 class="mono text-accent">QUICK ACCESS DECK</h3>
+            </div>
+
+            <!-- Action Grid -->
+            <div class="actions-grid animate-fade-in delay-2">
+
+                <a href="../credit_valuation_architect.html" class="action-card">
+                    <i class="fas fa-file-invoice-dollar"></i>
+                    <span class="mono" style="font-size: 0.8rem; font-weight: bold;">CREDIT ARCHITECT</span>
+                    <span style="font-size: 0.7rem; color: var(--portal-text-muted); margin-top: 5px;">Valuation Models</span>
+                </a>
+
+                <a href="../comprehensive_credit_dashboard.html" class="action-card">
+                    <i class="fas fa-columns"></i>
+                    <span class="mono" style="font-size: 0.8rem; font-weight: bold;">UNIFIED DASHBOARD</span>
+                    <span style="font-size: 0.7rem; color: var(--portal-text-muted); margin-top: 5px;">Enterprise View</span>
+                </a>
+
+                <a href="../market_mayhem_dashboard.html" class="action-card">
+                    <i class="fas fa-radiation" style="color: #ef4444;"></i>
+                    <span class="mono" style="font-size: 0.8rem; font-weight: bold;">MARKET MAYHEM</span>
+                    <span style="font-size: 0.7rem; color: var(--portal-text-muted); margin-top: 5px;">Crisis Sim</span>
+                </a>
+
+                <a href="../system_brain.html" class="action-card">
+                    <i class="fas fa-brain" style="color: #a855f7;"></i>
+                    <span class="mono" style="font-size: 0.8rem; font-weight: bold;">SYSTEM BRAIN</span>
+                    <span style="font-size: 0.7rem; color: var(--portal-text-muted); margin-top: 5px;">Knowledge Graph</span>
+                </a>
+
+                 <a href="../nexus.html" class="action-card">
+                    <i class="fas fa-globe" style="color: #3b82f6;"></i>
+                    <span class="mono" style="font-size: 0.8rem; font-weight: bold;">NEXUS SIMULATION</span>
+                    <span style="font-size: 0.7rem; color: var(--portal-text-muted); margin-top: 5px;">Geopolitical Engine</span>
+                </a>
+
+                 <a href="../war_room.html" class="action-card">
+                    <i class="fas fa-shield-alt" style="color: #f97316;"></i>
+                    <span class="mono" style="font-size: 0.8rem; font-weight: bold;">WAR ROOM</span>
+                    <span style="font-size: 0.7rem; color: var(--portal-text-muted); margin-top: 5px;">Defcon Command</span>
+                </a>
+
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="js/portal_nav.js"></script>
+</body>
+</html>
