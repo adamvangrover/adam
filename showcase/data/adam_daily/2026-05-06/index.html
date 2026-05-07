@@ -29,7 +29,14 @@
                         serif: ['Merriweather', 'serif'],
                     },
                     colors: {
-                        os: { desktop: '#010204', panel: '#0a0d14', window: '#11151e', border: '#1e2532' },
+                        os: { 
+                            bg: 'var(--os-bg)', 
+                            panel: 'var(--os-panel)', 
+                            window: 'var(--os-window)', 
+                            border: 'var(--os-border)',
+                            text: 'var(--os-text)',
+                            muted: 'var(--os-muted)'
+                        },
                         cyber: { cyan: '#00e5ff', red: '#ff1e38', amber: '#ffaa00', green: '#00fa9a', purple: '#b53cff' }
                     },
                     animation: {
@@ -54,19 +61,52 @@
     </script>
     
     <style>
-        /* Dynamic Theme System */
+        /* Dynamic Theme System (Dark Mode Default) */
         :root {
+            --os-bg: #010204;
+            --os-panel: #0a0d14;
+            --os-window: #11151e;
+            --os-border: #1e2532;
+            --os-text: #ffffff;
+            --os-muted: #64748b;
+            --os-invert: 0; /* For images/icons */
+            
             --theme-primary: #00e5ff;
             --theme-glow: rgba(0, 229, 255, 0.6);
             --theme-bg-glow: rgba(0, 229, 255, 0.1);
             --theme-border: rgba(0, 229, 255, 0.25);
         }
-        body.theme-matrix { --theme-primary: #00fa9a; --theme-glow: rgba(0, 250, 154, 0.6); --theme-bg-glow: rgba(0, 250, 154, 0.1); --theme-border: rgba(0, 250, 154, 0.25); }
-        body.theme-crimson { --theme-primary: #ff1e38; --theme-glow: rgba(255, 30, 56, 0.6); --theme-bg-glow: rgba(255, 30, 56, 0.1); --theme-border: rgba(255, 30, 56, 0.25); }
-        body.theme-purple { --theme-primary: #b53cff; --theme-glow: rgba(181, 60, 255, 0.6); --theme-bg-glow: rgba(181, 60, 255, 0.1); --theme-border: rgba(181, 60, 255, 0.25); }
-        body.theme-gold { --theme-primary: #ffaa00; --theme-glow: rgba(255, 170, 0, 0.6); --theme-bg-glow: rgba(255, 170, 0, 0.1); --theme-border: rgba(255, 170, 0, 0.25); }
 
-        body { margin: 0; overflow: hidden; background-color: var(--os-desktop); color: #cbd5e1; user-select: none; }
+        /* Light Mode Definitions */
+        body.light-mode {
+            --os-bg: #f8fafc;
+            --os-panel: #ffffff;
+            --os-window: #f1f5f9;
+            --os-border: #cbd5e1;
+            --os-text: #0f172a;
+            --os-muted: #64748b;
+            --os-invert: 1;
+        }
+
+        /* Primary Colors - Adjusting slightly in light mode for contrast */
+        body.theme-cyan { --theme-primary: #00e5ff; }
+        body.theme-matrix { --theme-primary: #00fa9a; }
+        body.theme-crimson { --theme-primary: #ff1e38; }
+        body.theme-purple { --theme-primary: #b53cff; }
+        body.theme-gold { --theme-primary: #ffaa00; }
+
+        body.light-mode.theme-cyan { --theme-primary: #008b99; --theme-bg-glow: rgba(0, 139, 153, 0.1); --theme-glow: rgba(0, 139, 153, 0.4); }
+        body.light-mode.theme-matrix { --theme-primary: #00a86b; --theme-bg-glow: rgba(0, 168, 107, 0.1); --theme-glow: rgba(0, 168, 107, 0.4); }
+        body.light-mode.theme-purple { --theme-primary: #8e24aa; --theme-bg-glow: rgba(142, 36, 170, 0.1); --theme-glow: rgba(142, 36, 170, 0.4); }
+        body.light-mode.theme-gold { --theme-primary: #d97706; --theme-bg-glow: rgba(217, 119, 6, 0.1); --theme-glow: rgba(217, 119, 6, 0.4); }
+        body.light-mode.theme-crimson { --theme-primary: #e11d48; --theme-bg-glow: rgba(225, 29, 72, 0.1); --theme-glow: rgba(225, 29, 72, 0.4); }
+
+        body:not(.light-mode).theme-matrix { --theme-glow: rgba(0, 250, 154, 0.6); --theme-bg-glow: rgba(0, 250, 154, 0.1); --theme-border: rgba(0, 250, 154, 0.25); }
+        body:not(.light-mode).theme-crimson { --theme-glow: rgba(255, 30, 56, 0.6); --theme-bg-glow: rgba(255, 30, 56, 0.1); --theme-border: rgba(255, 30, 56, 0.25); }
+        body:not(.light-mode).theme-purple { --theme-glow: rgba(181, 60, 255, 0.6); --theme-bg-glow: rgba(181, 60, 255, 0.1); --theme-border: rgba(181, 60, 255, 0.25); }
+        body:not(.light-mode).theme-gold { --theme-glow: rgba(255, 170, 0, 0.6); --theme-bg-glow: rgba(255, 170, 0, 0.1); --theme-border: rgba(255, 170, 0, 0.25); }
+
+        body { margin: 0; overflow: hidden; background-color: var(--os-bg); color: var(--os-text); user-select: none; transition: background-color 0.5s ease, color 0.5s ease; }
         
         .text-theme { color: var(--theme-primary) !important; }
         .bg-theme { background-color: var(--theme-primary) !important; }
@@ -76,33 +116,37 @@
         .glow-text { text-shadow: 0 0 10px var(--theme-glow), 0 0 20px var(--theme-glow); }
         
         /* 3D Background & Overlays */
-        #world-canvas { position: fixed; inset: 0; z-index: 1; pointer-events: auto; cursor: crosshair; }
+        #world-canvas { position: fixed; inset: 0; z-index: 1; pointer-events: auto; cursor: crosshair; transition: filter 0.5s ease; }
         .crt-overlay {
             position: fixed; inset: 0; pointer-events: none; z-index: 9999;
             background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.2) 50%), 
                         linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
-            background-size: 100% 4px, 6px 100%; opacity: 0.35; mix-blend-mode: overlay;
+            background-size: 100% 4px, 6px 100%; opacity: 0.25; mix-blend-mode: overlay;
         }
-        .vignette { position: fixed; inset: 0; pointer-events: none; z-index: 9998; box-shadow: inset 0 0 150px rgba(0,0,0,0.9); }
+        body.light-mode .crt-overlay { opacity: 0.1; }
+        .vignette { position: fixed; inset: 0; pointer-events: none; z-index: 9998; box-shadow: inset 0 0 150px rgba(0,0,0,0.9); transition: box-shadow 0.5s; }
+        body.light-mode .vignette { box-shadow: inset 0 0 150px rgba(0,0,0,0.1); }
 
         /* OS Windows */
         .os-window {
             position: absolute;
-            background: rgba(10, 13, 20, 0.88);
+            background: var(--os-panel);
             backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            border: 1px solid #1e2532; border-radius: 10px;
+            border: 1px solid var(--os-border); border-radius: 10px;
             display: none; flex-direction: column; overflow: hidden;
-            box-shadow: 0 30px 60px -12px rgba(0,0,0,0.9), inset 0 1px 0 rgba(255,255,255,0.05);
-            transition: border-color 0.4s ease, transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 30px 60px -12px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.05);
+            transition: border-color 0.4s ease, transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.4s ease;
         }
+        body.light-mode .os-window { box-shadow: 0 20px 50px -12px rgba(0,0,0,0.2); }
         .os-window.active { 
             display: flex; animation: windowPop 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; 
             border-color: var(--theme-border);
         }
         
         .window-header {
-            height: 38px; background: rgba(5, 7, 10, 0.9); border-bottom: 1px solid #1e2532;
+            height: 38px; background: var(--os-bg); border-bottom: 1px solid var(--os-border);
             display: flex; justify-content: space-between; align-items: center; padding: 0 14px; cursor: grab; user-select: none;
+            transition: background-color 0.4s ease;
         }
         .window-header:active { cursor: grabbing; }
         .window-content { flex: 1; overflow-y: auto; overflow-x: hidden; position: relative; user-select: text; }
@@ -116,90 +160,83 @@
         /* Dock */
         .dock {
             position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 9997;
-            background: rgba(5, 7, 10, 0.8); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 20px; padding: 8px 12px; display: flex; gap: 6px; box-shadow: 0 20px 40px rgba(0,0,0,0.9);
-            flex-wrap: wrap; justify-content: center; max-width: 95vw;
+            background: var(--os-panel); backdrop-filter: blur(20px); border: 1px solid var(--os-border);
+            border-radius: 20px; padding: 8px 12px; display: flex; gap: 6px; box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            flex-wrap: wrap; justify-content: center; max-width: 95vw; transition: background-color 0.4s ease;
         }
         .dock-item {
-            width: 40px; height: 40px; border-radius: 10px; background: rgba(255,255,255,0.03);
+            width: 40px; height: 40px; border-radius: 10px; background: var(--os-window);
             display: flex; align-items: center; justify-content: center; cursor: pointer;
-            transition: all 0.2s; font-size: 18px; position: relative; border: 1px solid transparent; color: white;
+            transition: all 0.2s; font-size: 18px; position: relative; border: 1px solid transparent; color: var(--os-text);
         }
         .dock-item:hover { transform: translateY(-8px) scale(1.1); background: var(--theme-bg-glow); border-color: var(--theme-primary); z-index: 10;}
         .dock-item.open::after { content: ''; position: absolute; bottom: -4px; width: 4px; height: 4px; border-radius: 50%; background: var(--theme-primary); box-shadow: 0 0 8px var(--theme-primary); }
 
-        .dock-tooltip {
-            position: absolute; top: -38px; background: #e2e8f0; color: #030509; padding: 4px 10px;
-            border-radius: 6px; font-size: 10px; opacity: 0; pointer-events: none; transition: opacity 0.2s, transform 0.2s;
-            white-space: nowrap; font-family: 'JetBrains Mono', monospace; font-weight: bold; transform: translateY(5px);
-        }
-        .dock-item:hover .dock-tooltip { opacity: 1; transform: translateY(0); }
-
         /* Context Menu */
         #context-menu {
-            position: fixed; background: rgba(10, 13, 20, 0.95); backdrop-filter: blur(15px); border: 1px solid #1e2532; border-radius: 8px; padding: 6px; min-width: 200px; z-index: 100000; display: none; box-shadow: 0 15px 35px rgba(0,0,0,0.8); font-family: 'JetBrains Mono', monospace; font-size: 11px;
+            position: fixed; background: var(--os-panel); backdrop-filter: blur(15px); border: 1px solid var(--os-border); border-radius: 8px; padding: 6px; min-width: 200px; z-index: 100000; display: none; box-shadow: 0 15px 35px rgba(0,0,0,0.5); font-family: 'JetBrains Mono', monospace; font-size: 11px;
         }
-        .context-item { padding: 8px 12px; color: #cbd5e1; cursor: pointer; border-radius: 4px; transition: background 0.1s; display: flex; justify-content: space-between; align-items: center; }
+        .context-item { padding: 8px 12px; color: var(--os-text); cursor: pointer; border-radius: 4px; transition: background 0.1s; display: flex; justify-content: space-between; align-items: center; }
         .context-item:hover { background: var(--theme-bg-glow); color: var(--theme-primary); font-weight: bold; }
-        .context-separator { height: 1px; background: #1e2532; margin: 4px 0; }
+        .context-separator { height: 1px; background: var(--os-border); margin: 4px 0; }
 
         /* Typography & Utilities */
-        .glass-panel { background: rgba(0, 0, 0, 0.4); border: 1px solid #1e2532; border-radius: 8px; }
+        .glass-panel { background: var(--os-window); border: 1px solid var(--os-border); border-radius: 8px; transition: background-color 0.4s, border-color 0.4s; }
         .chart-wrap { position: relative; width: 100%; height: 100%; min-height: 220px; }
         
         /* Data Tables */
         .data-table { width: 100%; text-align: left; font-family: 'JetBrains Mono', monospace; font-size: 11px; border-collapse: collapse; }
-        .data-table th { padding: 10px 12px; font-weight: 600; color: #64748b; border-bottom: 1px solid #1e2532; background: rgba(0,0,0,0.4); position: sticky; top: 0; z-index: 10; text-transform: uppercase;}
-        .data-table td { padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,0.03); color: #cbd5e1; }
+        .data-table th { padding: 10px 12px; font-weight: 600; color: var(--os-muted); border-bottom: 1px solid var(--os-border); background: var(--os-window); position: sticky; top: 0; z-index: 10; text-transform: uppercase;}
+        .data-table td { padding: 10px 12px; border-bottom: 1px solid var(--os-border); color: var(--os-text); }
         .data-table tr:hover td { background: var(--theme-bg-glow); }
-        .row-expanded { background-color: rgba(30, 41, 59, 0.5); } 
+        .row-expanded { background-color: var(--theme-bg-glow); } 
 
         /* DCF Waterfall Custom */
-        .dcf-bar-container { display: flex; align-items: flex-end; justify-content: space-around; height: 160px; padding-bottom: 25px; border-bottom: 1px solid #1e2532; margin-top: 15px;}
+        .dcf-bar-container { display: flex; align-items: flex-end; justify-content: space-around; height: 160px; padding-bottom: 25px; border-bottom: 1px solid var(--os-border); margin-top: 15px;}
         .dcf-col { display: flex; flex-direction: column; justify-content: flex-end; align-items: center; width: 10%; position: relative; }
         .dcf-bar-pos { background: linear-gradient(180deg, var(--theme-primary) 0%, transparent 100%); width: 100%; border-radius: 2px 2px 0 0; transition: height 0.6s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 -5px 15px var(--theme-bg-glow); border-top: 1px solid var(--theme-primary);}
         .dcf-bar-neg { background: linear-gradient(0deg, #ff1e38 0%, transparent 100%); width: 100%; border-radius: 0 0 2px 2px; transition: height 0.6s cubic-bezier(0.16, 1, 0.3, 1); position: absolute; top: 100%; border-bottom: 1px solid #ff1e38;}
-        .dcf-label { position: absolute; bottom: -22px; font-size: 9px; font-family: 'JetBrains Mono'; color: #64748b; }
-        .dcf-val { position: absolute; font-size: 10px; font-family: 'JetBrains Mono'; color: #fff; font-weight: bold;}
+        .dcf-label { position: absolute; bottom: -22px; font-size: 9px; font-family: 'JetBrains Mono'; color: var(--os-muted); }
+        .dcf-val { position: absolute; font-size: 10px; font-family: 'JetBrains Mono'; color: var(--os-text); font-weight: bold;}
 
         /* Sliders */
         input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
-        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 14px; width: 14px; border-radius: 50%; background: var(--theme-primary); cursor: pointer; margin-top: -5px; box-shadow: 0 0 10px var(--theme-glow); border: 2px solid #030509;}
-        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; cursor: pointer; background: #1e2532; border-radius: 2px; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 14px; width: 14px; border-radius: 50%; background: var(--theme-primary); cursor: pointer; margin-top: -5px; box-shadow: 0 0 10px var(--theme-glow); border: 2px solid var(--os-panel);}
+        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; cursor: pointer; background: var(--os-border); border-radius: 2px; }
         input[type=range]:focus { outline: none; }
         
         /* Sensitivity Matrix */
         .sens-grid { display: grid; grid-template-columns: 45px repeat(3, 1fr); grid-template-rows: 20px repeat(3, 1fr); gap: 2px; text-align: center; font-family: 'JetBrains Mono'; font-size: 10px; }
-        .sens-cell { display: flex; align-items: center; justify-content: center; padding: 6px; border-radius: 2px; transition: all 0.2s; font-weight: bold; }
-        .sens-cell:hover { transform: scale(1.1); z-index: 10; box-shadow: 0 0 15px rgba(0,0,0,0.8); border: 1px solid white;}
-        .sens-header { background: rgba(0,0,0,0.4); color: #64748b; font-size: 9px; display: flex; align-items: center; justify-content: center; border-radius: 2px; }
+        .sens-cell { display: flex; align-items: center; justify-content: center; padding: 6px; border-radius: 2px; transition: all 0.2s; font-weight: bold; background-color: var(--os-window); }
+        .sens-cell:hover { transform: scale(1.1); z-index: 10; box-shadow: 0 0 15px rgba(0,0,0,0.2); border: 1px solid var(--os-text);}
+        .sens-header { background: var(--os-window); color: var(--os-muted); font-size: 9px; display: flex; align-items: center; justify-content: center; border-radius: 2px; }
 
         /* Correlation Heatmap */
         .corr-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 2px; }
         .corr-cell { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; border-radius: 2px; position: relative; cursor: help; transition: transform 0.2s; }
-        .corr-cell:hover { transform: scale(1.1); z-index: 20; border: 1px solid #fff; box-shadow: 0 0 10px rgba(0,0,0,0.8); }
-        .corr-cell:hover::after { content: attr(data-val); position: absolute; top: -20px; background: #fff; color: #000; padding: 2px 4px; border-radius: 2px; font-size: 8px; z-index: 20; }
+        .corr-cell:hover { transform: scale(1.1); z-index: 20; border: 1px solid var(--os-text); box-shadow: 0 0 10px rgba(0,0,0,0.5); }
+        .corr-cell:hover::after { content: attr(data-val); position: absolute; top: -20px; background: var(--os-text); color: var(--os-bg); padding: 2px 4px; border-radius: 2px; font-size: 8px; z-index: 20; }
 
         /* Terminal Style */
-        #terminal-output { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #00fa9a; line-height: 1.4; white-space: pre-wrap; height: 100%; overflow-y: auto; scrollbar-width: none; }
+        #terminal-output { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--theme-primary); line-height: 1.4; white-space: pre-wrap; height: 100%; overflow-y: auto; scrollbar-width: none; }
         #terminal-output::-webkit-scrollbar { display: none; }
-        .terminal-prompt { color: #00e5ff; }
-        .terminal-input { background: transparent; border: none; color: #fff; outline: none; width: 100%; font-family: inherit; }
+        .terminal-prompt { color: var(--theme-primary); }
+        .terminal-input { background: transparent; border: none; color: var(--os-text); outline: none; width: 100%; font-family: inherit; }
 
         /* Markdown Overrides */
-        .prose { max-width: 100% !important; }
-        .prose h1, .prose h2, .prose h3 { color: #fff; font-family: 'Inter', sans-serif; letter-spacing: -0.02em; }
-        .prose h1 { font-size: 2.2rem; border-bottom: 2px solid #1e2532; padding-bottom: 0.75rem; margin-bottom: 1.5rem; font-weight: 800;}
-        .prose h2 { font-size: 1.5rem; color: var(--theme-primary); margin-top: 2rem; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 0.5rem;}
-        .prose strong { color: #fff; font-weight: 600;}
-        .prose code { background: #000; padding: 0.2rem 0.4rem; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 0.85em; color: var(--theme-primary); border: 1px solid #1e2532;}
-        .prose blockquote { border-left: 3px solid var(--theme-primary); background: var(--theme-bg-glow); padding: 0.75rem 1rem; margin: 1.5rem 0; font-style: italic; color: #cbd5e1; border-radius: 0 4px 4px 0;}
+        .prose { max-width: 100% !important; color: var(--os-text); }
+        .prose h1, .prose h2, .prose h3 { color: var(--os-text); font-family: 'Inter', sans-serif; letter-spacing: -0.02em; }
+        .prose h1 { font-size: 2.2rem; border-bottom: 2px solid var(--os-border); padding-bottom: 0.75rem; margin-bottom: 1.5rem; font-weight: 800;}
+        .prose h2 { font-size: 1.5rem; color: var(--theme-primary); margin-top: 2rem; border-bottom: 1px solid var(--os-border); padding-bottom: 0.5rem;}
+        .prose strong { color: var(--os-text); font-weight: 600;}
+        .prose code { background: var(--os-bg); padding: 0.2rem 0.4rem; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 0.85em; color: var(--theme-primary); border: 1px solid var(--os-border);}
+        .prose blockquote { border-left: 3px solid var(--theme-primary); background: var(--os-window); padding: 0.75rem 1rem; margin: 1.5rem 0; font-style: italic; color: var(--os-muted); border-radius: 0 4px 4px 0;}
         .prose table { width: 100%; text-align: left; font-family: 'JetBrains Mono', monospace; font-size: 12px; margin: 1.5rem 0; border-collapse: collapse; }
-        .prose th { border-bottom: 2px solid #1e2532; padding: 10px; color: #64748b; background: rgba(0,0,0,0.3);}
-        .prose td { border-bottom: 1px solid #1e2532; padding: 10px; color: #cbd5e1; }
-        .prose li { color: #cbd5e1; }
+        .prose th { border-bottom: 2px solid var(--os-border); padding: 10px; color: var(--os-muted); background: var(--os-window);}
+        .prose td { border-bottom: 1px solid var(--os-border); padding: 10px; color: var(--os-text); }
+        .prose li { color: var(--os-text); }
 
-        /* Reader Theme (Newsletter) */
+        /* Reader Theme (Newsletter specific overrides for printing) */
         .reader-theme { background: #fdfdfd; color: #111; }
         .reader-theme h1, .reader-theme h2, .reader-theme h3 { font-family: 'Inter', sans-serif; letter-spacing: -0.02em; color: #111; border-color: #ddd;}
         .reader-theme h1 { font-weight: 800; font-size: 2.2rem; border-bottom: 3px solid #111; padding-bottom: 0.5rem;}
@@ -213,9 +250,9 @@
         .reader-theme code { background: #f1f5f9; color: #e11d48; border-color: #e2e8f0; border-width: 1px;}
         
         /* Topology Nodes */
-        .node-agent { position: absolute; width: 36px; height: 36px; border-radius: 50%; background: var(--theme-bg-glow); border: 2px solid var(--theme-primary); display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: bold; font-family: 'Share Tech Mono'; cursor: pointer; box-shadow: 0 0 15px var(--theme-bg-glow); transition: transform 0.2s; z-index: 10; }
+        .node-agent { position: absolute; width: 36px; height: 36px; border-radius: 50%; background: var(--theme-bg-glow); border: 2px solid var(--theme-primary); display: flex; align-items: center; justify-content: center; color: var(--os-text); font-size: 12px; font-weight: bold; font-family: 'Share Tech Mono'; cursor: pointer; box-shadow: 0 0 15px var(--theme-bg-glow); transition: transform 0.2s; z-index: 10; }
         .node-agent:hover { transform: scale(1.2); }
-        .node-agent.critical { border-color: #ff1e38; background: rgba(255, 30, 56, 0.2); box-shadow: 0 0 20px rgba(255,30,56,0.6); animation: pulse-critical 2s infinite; }
+        .node-agent.critical { border-color: #ff1e38; background: rgba(255, 30, 56, 0.2); box-shadow: 0 0 20px rgba(255,30,56,0.6); animation: pulse-critical 2s infinite; color: #ff1e38; }
         @keyframes pulse-critical { 0% { box-shadow: 0 0 0 0 rgba(255,30,56,0.7); } 70% { box-shadow: 0 0 0 15px rgba(255,30,56,0); } 100% { box-shadow: 0 0 0 0 rgba(255,30,56,0); } }
 
         /* Boot Screen */
@@ -237,6 +274,14 @@
 
         /* Toast Notifications */
         .toast-enter { animation: windowPop 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        
+        /* Utility classes overrides */
+        .bg-os-bg { background-color: var(--os-bg); }
+        .bg-os-panel { background-color: var(--os-panel); }
+        .bg-os-window { background-color: var(--os-window); }
+        .border-os-border { border-color: var(--os-border); }
+        .text-os-text { color: var(--os-text); }
+        .text-os-muted { color: var(--os-muted); }
     </style>
 </head>
 <body class="theme-cyan">
@@ -424,40 +469,6 @@ Architecting this system necessitates moving away from generalized LLMs toward h
                 }
             },
             {
-                "ticker": "META", "name": "Meta Platforms", "sector": "Interactive Media", "price": 420.50, "shares_out": 2540,
-                "scenarios": {
-                    "base": {
-                        "wacc": 10.0, "tg": 2.5,
-                        "projections": [
-                            {"year": 2026, "rev": 180.0, "rev_g": 15.0, "ebit_m": 38.0, "tax": 18.0, "capex": 145.0, "da": 15.0, "nwc": -0.5},
-                            {"year": 2027, "rev": 205.2, "rev_g": 14.0, "ebit_m": 37.5, "tax": 18.0, "capex": 110.0, "da": 18.0, "nwc": -0.8},
-                            {"year": 2028, "rev": 231.8, "rev_g": 13.0, "ebit_m": 38.0, "tax": 18.0, "capex": 90.0, "da": 22.0, "nwc": -1.0},
-                            {"year": 2029, "rev": 257.3, "rev_g": 11.0, "ebit_m": 38.5, "tax": 18.0, "capex": 85.0, "da": 25.0, "nwc": -1.2},
-                            {"year": 2030, "rev": 280.5, "rev_g": 9.0, "ebit_m": 39.0, "tax": 18.0, "capex": 80.0, "da": 28.0, "nwc": -1.5}
-                        ]
-                    },
-                    "bull": { "wacc": 9.0, "tg": 3.0, "projections": [{"year": 2026, "rev": 190.0, "rev_g": 18.0, "ebit_m": 40.0, "tax": 18.0, "capex": 130.0, "da": 15.0, "nwc": -0.5}, {"year": 2027, "rev": 224.2, "rev_g": 18.0, "ebit_m": 41.0, "tax": 18.0, "capex": 100.0, "da": 18.0, "nwc": -0.8}, {"year": 2028, "rev": 260.1, "rev_g": 16.0, "ebit_m": 42.0, "tax": 18.0, "capex": 85.0, "da": 22.0, "nwc": -1.0}, {"year": 2029, "rev": 296.5, "rev_g": 14.0, "ebit_m": 42.5, "tax": 18.0, "capex": 80.0, "da": 25.0, "nwc": -1.2}, {"year": 2030, "rev": 332.1, "rev_g": 12.0, "ebit_m": 43.0, "tax": 18.0, "capex": 75.0, "da": 28.0, "nwc": -1.5}] },
-                    "bear": { "wacc": 11.0, "tg": 2.0, "projections": [{"year": 2026, "rev": 170.0, "rev_g": 10.0, "ebit_m": 35.0, "tax": 18.0, "capex": 160.0, "da": 15.0, "nwc": -0.5}, {"year": 2027, "rev": 183.6, "rev_g": 8.0, "ebit_m": 34.0, "tax": 18.0, "capex": 130.0, "da": 18.0, "nwc": -0.8}, {"year": 2028, "rev": 196.5, "rev_g": 7.0, "ebit_m": 33.0, "tax": 18.0, "capex": 110.0, "da": 22.0, "nwc": -1.0}, {"year": 2029, "rev": 208.2, "rev_g": 6.0, "ebit_m": 32.0, "tax": 18.0, "capex": 95.0, "da": 25.0, "nwc": -1.2}, {"year": 2030, "rev": 218.7, "rev_g": 5.0, "ebit_m": 31.0, "tax": 18.0, "capex": 85.0, "da": 28.0, "nwc": -1.5}] }
-                }
-            },
-            {
-                "ticker": "AAPL", "name": "Apple Inc", "sector": "Consumer Electronics", "price": 178.90, "shares_out": 15300,
-                "scenarios": {
-                    "base": {
-                        "wacc": 8.0, "tg": 2.0,
-                        "projections": [
-                            {"year": 2026, "rev": 435.0, "rev_g": 4.5, "ebit_m": 31.0, "tax": 16.0, "capex": 15.0, "da": 12.0, "nwc": -4.0},
-                            {"year": 2027, "rev": 461.1, "rev_g": 6.0, "ebit_m": 31.2, "tax": 16.0, "capex": 16.0, "da": 13.0, "nwc": -4.5},
-                            {"year": 2028, "rev": 488.7, "rev_g": 6.0, "ebit_m": 31.5, "tax": 16.0, "capex": 17.0, "da": 14.0, "nwc": -5.0},
-                            {"year": 2029, "rev": 513.2, "rev_g": 5.0, "ebit_m": 31.8, "tax": 16.0, "capex": 18.0, "da": 15.0, "nwc": -5.5},
-                            {"year": 2030, "rev": 538.8, "rev_g": 5.0, "ebit_m": 32.0, "tax": 16.0, "capex": 19.0, "da": 16.0, "nwc": -6.0}
-                        ]
-                    },
-                    "bull": { "wacc": 7.0, "tg": 2.5, "projections": [{"year": 2026, "rev": 450.0, "rev_g": 8.0, "ebit_m": 32.0, "tax": 16.0, "capex": 15.0, "da": 12.0, "nwc": -4.0}, {"year": 2027, "rev": 486.0, "rev_g": 8.0, "ebit_m": 32.5, "tax": 16.0, "capex": 16.0, "da": 13.0, "nwc": -4.5}, {"year": 2028, "rev": 524.9, "rev_g": 8.0, "ebit_m": 33.0, "tax": 16.0, "capex": 17.0, "da": 14.0, "nwc": -5.0}, {"year": 2029, "rev": 561.6, "rev_g": 7.0, "ebit_m": 33.5, "tax": 16.0, "capex": 18.0, "da": 15.0, "nwc": -5.5}, {"year": 2030, "rev": 595.3, "rev_g": 6.0, "ebit_m": 34.0, "tax": 16.0, "capex": 19.0, "da": 16.0, "nwc": -6.0}] },
-                    "bear": { "wacc": 9.0, "tg": 1.5, "projections": [{"year": 2026, "rev": 415.0, "rev_g": 0.0, "ebit_m": 29.0, "tax": 16.0, "capex": 15.0, "da": 12.0, "nwc": -4.0}, {"year": 2027, "rev": 419.2, "rev_g": 1.0, "ebit_m": 28.5, "tax": 16.0, "capex": 16.0, "da": 13.0, "nwc": -4.5}, {"year": 2028, "rev": 423.3, "rev_g": 1.0, "ebit_m": 28.0, "tax": 16.0, "capex": 17.0, "da": 14.0, "nwc": -5.0}, {"year": 2029, "rev": 427.6, "rev_g": 1.0, "ebit_m": 28.0, "tax": 16.0, "capex": 18.0, "da": 15.0, "nwc": -5.5}, {"year": 2030, "rev": 431.9, "rev_g": 1.0, "ebit_m": 28.0, "tax": 16.0, "capex": 19.0, "da": 16.0, "nwc": -6.0}] }
-                }
-            },
-            {
                 "ticker": "NVDA", "name": "NVIDIA Corporation", "sector": "Semiconductors / AI", "price": 890.50, "shares_out": 2480,
                 "scenarios": {
                     "base": {
@@ -473,23 +484,6 @@ Architecting this system necessitates moving away from generalized LLMs toward h
                     "bull": { "wacc": 9.0, "tg": 5.0, "projections": [{"year": 2026, "rev": 165.0, "rev_g": 55.0, "ebit_m": 64.0, "tax": 14.0, "capex": 9.0, "da": 3.0, "nwc": -5.0}, {"year": 2027, "rev": 220.0, "rev_g": 33.3, "ebit_m": 64.0, "tax": 14.0, "capex": 11.0, "da": 4.5, "nwc": -6.0}, {"year": 2028, "rev": 280.0, "rev_g": 27.2, "ebit_m": 63.5, "tax": 14.0, "capex": 13.0, "da": 6.0, "nwc": -7.0}, {"year": 2029, "rev": 340.0, "rev_g": 21.4, "ebit_m": 63.0, "tax": 14.0, "capex": 15.0, "da": 7.5, "nwc": -8.0}, {"year": 2030, "rev": 400.0, "rev_g": 17.6, "ebit_m": 62.0, "tax": 14.0, "capex": 16.0, "da": 9.0, "nwc": -9.0}] },
                     "bear": { "wacc": 11.0, "tg": 3.0, "projections": [{"year": 2026, "rev": 130.0, "rev_g": 25.0, "ebit_m": 55.0, "tax": 14.0, "capex": 8.0, "da": 3.0, "nwc": -3.0}, {"year": 2027, "rev": 145.0, "rev_g": 11.5, "ebit_m": 52.0, "tax": 14.0, "capex": 9.0, "da": 4.5, "nwc": -3.0}, {"year": 2028, "rev": 155.0, "rev_g": 6.9, "ebit_m": 48.0, "tax": 14.0, "capex": 10.0, "da": 6.0, "nwc": -3.0}, {"year": 2029, "rev": 165.0, "rev_g": 6.4, "ebit_m": 45.0, "tax": 14.0, "capex": 11.0, "da": 7.5, "nwc": -3.0}, {"year": 2030, "rev": 175.0, "rev_g": 6.0, "ebit_m": 43.0, "tax": 14.0, "capex": 11.0, "da": 9.0, "nwc": -3.0}] }
                 }
-            },
-            {
-                "ticker": "XOM", "name": "Exxon Mobil", "sector": "Energy", "price": 120.04, "shares_out": 4040,
-                "scenarios": {
-                    "base": {
-                        "wacc": 9.5, "tg": 1.5,
-                        "projections": [
-                            {"year": 2026, "rev": 350.0, "rev_g": 5.0, "ebit_m": 15.0, "tax": 25.0, "capex": 24.0, "da": 20.0, "nwc": -1.5},
-                            {"year": 2027, "rev": 360.5, "rev_g": 3.0, "ebit_m": 15.5, "tax": 25.0, "capex": 25.0, "da": 21.0, "nwc": -1.0},
-                            {"year": 2028, "rev": 371.3, "rev_g": 3.0, "ebit_m": 15.5, "tax": 25.0, "capex": 25.5, "da": 22.0, "nwc": -1.0},
-                            {"year": 2029, "rev": 382.5, "rev_g": 3.0, "ebit_m": 16.0, "tax": 25.0, "capex": 26.0, "da": 23.0, "nwc": -1.0},
-                            {"year": 2030, "rev": 393.9, "rev_g": 3.0, "ebit_m": 16.0, "tax": 25.0, "capex": 26.0, "da": 24.0, "nwc": -1.0}
-                        ]
-                    },
-                    "bull": { "wacc": 8.5, "tg": 2.5, "projections": [{"year": 2026, "rev": 380.0, "rev_g": 10.0, "ebit_m": 18.0, "tax": 25.0, "capex": 24.0, "da": 20.0, "nwc": -1.5}, {"year": 2027, "rev": 402.8, "rev_g": 6.0, "ebit_m": 18.5, "tax": 25.0, "capex": 25.0, "da": 21.0, "nwc": -1.0}, {"year": 2028, "rev": 427.0, "rev_g": 6.0, "ebit_m": 19.0, "tax": 25.0, "capex": 25.5, "da": 22.0, "nwc": -1.0}, {"year": 2029, "rev": 452.6, "rev_g": 6.0, "ebit_m": 19.0, "tax": 25.0, "capex": 26.0, "da": 23.0, "nwc": -1.0}, {"year": 2030, "rev": 479.7, "rev_g": 6.0, "ebit_m": 19.5, "tax": 25.0, "capex": 26.0, "da": 24.0, "nwc": -1.0}] },
-                    "bear": { "wacc": 10.5, "tg": 0.5, "projections": [{"year": 2026, "rev": 310.0, "rev_g": -5.0, "ebit_m": 10.0, "tax": 25.0, "capex": 24.0, "da": 20.0, "nwc": -1.5}, {"year": 2027, "rev": 310.0, "rev_g": 0.0, "ebit_m": 10.0, "tax": 25.0, "capex": 25.0, "da": 21.0, "nwc": -1.0}, {"year": 2028, "rev": 313.1, "rev_g": 1.0, "ebit_m": 10.5, "tax": 25.0, "capex": 25.5, "da": 22.0, "nwc": -1.0}, {"year": 2029, "rev": 316.2, "rev_g": 1.0, "ebit_m": 10.5, "tax": 25.0, "capex": 26.0, "da": 23.0, "nwc": -1.0}, {"year": 2030, "rev": 319.4, "rev_g": 1.0, "ebit_m": 11.0, "tax": 25.0, "capex": 26.0, "da": 24.0, "nwc": -1.0}] }
-                }
             }
         ],
         "portfolio": [
@@ -504,6 +498,11 @@ Architecting this system necessitates moving away from generalized LLMs toward h
             { "ticker": "RBLX", "risk": 85, "reward": 30, "allocation": 2 },
             { "ticker": "PLTR", "risk": 75, "reward": 85, "allocation": 4 }
         ],
+        "liquidity": {
+            "dates": ["Q1", "Q2", "Q3", "Q4", "Q1 '25", "Q2 '25", "Q3 '25", "Q4 '25", "Q1 '26", "Q2 '26"],
+            "reserves": [3.1, 3.2, 3.15, 3.3, 3.4, 3.35, 3.5, 3.6, 3.7, 3.8],
+            "spx": [4100, 4200, 4350, 4500, 4800, 5100, 5500, 6000, 6800, 7369]
+        },
         "syslog": [
             {"trace_id": "trace-sys-001", "event_id": "evt-100", "timestamp": "2026-05-06T19:00:00", "event_type": "SYSTEM_BOOT", "agent_id": "Flywheel_Orchestrator", "details": {"version": "v55.0-Omega"}},
             {"trace_id": "trace-data-001", "event_id": "evt-101", "timestamp": "2026-05-06T19:00:05", "event_type": "KNOWLEDGE_GRAPH_UPDATE", "agent_id": "Redis_VSS_Node", "details": {"action": "UPSERT", "node": "Macro_Telemetry", "edges_added": 450}},
@@ -526,48 +525,51 @@ Architecting this system necessitates moving away from generalized LLMs toward h
     <div class="crt-overlay"></div>
     <div class="vignette"></div>
 
-    <!-- CONTEXT MENU (THEMES) -->
+    <!-- CONTEXT MENU -->
     <div id="context-menu">
-        <div class="context-item text-[#64748b] font-bold pb-2 border-b border-[#1e2532] mb-1 cursor-default pointer-events-none">VISUAL ENVIRONMENT</div>
+        <div class="context-item text-os-muted font-bold pb-2 border-b border-os-border mb-1 cursor-default pointer-events-none">VISUAL ENVIRONMENT</div>
         <div class="context-item" onclick="setTheme('cyan')"><span class="w-2 h-2 rounded-full bg-[#00e5ff] mr-2 shadow-[0_0_5px_#00e5ff]"></span> Protocol Cyan (Neural)</div>
         <div class="context-item" onclick="setTheme('matrix')"><span class="w-2 h-2 rounded-full bg-[#00fa9a] mr-2 shadow-[0_0_5px_#00fa9a]"></span> Quant Green (Terminal)</div>
         <div class="context-item" onclick="setTheme('purple')"><span class="w-2 h-2 rounded-full bg-[#b53cff] mr-2 shadow-[0_0_5px_#b53cff]"></span> Synth Purple (Galaxy)</div>
         <div class="context-item" onclick="setTheme('gold')"><span class="w-2 h-2 rounded-full bg-[#ffaa00] mr-2 shadow-[0_0_5px_#ffaa00]"></span> Inst. Gold (Probabilistic)</div>
         <div class="context-item" onclick="setTheme('crimson')"><span class="w-2 h-2 rounded-full bg-[#ff1e38] mr-2 shadow-[0_0_5px_#ff1e38]"></span> DEFCON Red (Chaos)</div>
         <div class="context-separator"></div>
+        <div class="context-item text-os-muted font-bold pb-2 border-b border-os-border mb-1 mt-2 cursor-default pointer-events-none">VIEW MODE</div>
+        <div class="context-item font-bold" onclick="toggleLightMode()">🌗 Toggle Light/Dark Mode</div>
+        <div class="context-separator"></div>
         <div class="context-item text-[#ff1e38] hover:bg-[#ff1e38]/10" onclick="closeAllApps()">✕ Terminate All Tasks</div>
     </div>
 
     <!-- TOP MENU BAR -->
-    <header class="absolute top-0 left-0 w-full h-8 bg-black/60 backdrop-blur-md border-b border-[#1e2532] flex justify-between items-center px-4 z-[9999] text-[11px] font-sans transition-colors duration-500">
+    <header class="absolute top-0 left-0 w-full h-8 bg-os-panel/80 backdrop-blur-md border-b border-os-border flex justify-between items-center px-4 z-[9999] text-[11px] font-sans transition-colors duration-500">
         <div class="flex items-center gap-6">
-            <div class="font-bold text-white tracking-widest flex items-center gap-2 cursor-default">
+            <div class="font-bold text-os-text tracking-widest flex items-center gap-2 cursor-default">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" class="stroke-current text-theme" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
                 ADAM OMNIOS
             </div>
             <div class="flex gap-4">
-                <span class="text-[#64748b] hover:text-white cursor-pointer transition-colors" onclick="openApp('app-notepad')">Library</span>
-                <span class="text-[#64748b] hover:text-white cursor-pointer transition-colors" onclick="openApp('app-macro')">Macro</span>
-                <span class="text-[#64748b] hover:text-white cursor-pointer transition-colors" onclick="openApp('app-corr')">Correlations</span>
-                <span class="text-[#64748b] hover:text-white cursor-pointer transition-colors" onclick="openApp('app-dcf')">Valuation</span>
-                <span class="text-[#64748b] hover:text-white cursor-pointer transition-colors" onclick="openApp('app-portfolio')">Quantum</span>
-                <span class="text-[#64748b] hover:text-white cursor-pointer transition-colors" onclick="openApp('app-geo')">Geo-Tac</span>
-                <span class="text-[#64748b] hover:text-white cursor-pointer transition-colors" onclick="openApp('app-syslog')">Traces</span>
-                <span class="text-[#64748b] hover:text-white cursor-pointer transition-colors" onclick="openApp('app-term')">Terminal</span>
+                <span class="text-os-muted hover:text-os-text cursor-pointer transition-colors font-semibold" onclick="openApp('app-notepad')">Library</span>
+                <span class="text-os-muted hover:text-os-text cursor-pointer transition-colors font-semibold" onclick="openApp('app-macro')">Macro</span>
+                <span class="text-os-muted hover:text-os-text cursor-pointer transition-colors font-semibold" onclick="openApp('app-dcf')">Valuation</span>
+                <span class="text-os-muted hover:text-os-text cursor-pointer transition-colors font-semibold" onclick="openApp('app-portfolio')">Quantum</span>
+                <span class="text-os-muted hover:text-os-text cursor-pointer transition-colors font-semibold" onclick="openApp('app-geo')">Geo-Tac</span>
+                <span class="text-os-muted hover:text-os-text cursor-pointer transition-colors font-semibold" onclick="openApp('app-liquidity')">Liquidity</span>
+                <span class="text-os-muted hover:text-os-text cursor-pointer transition-colors font-semibold" onclick="openApp('app-supply')">Supply Chain</span>
+                <span class="text-os-muted hover:text-os-text cursor-pointer transition-colors font-semibold" onclick="openApp('app-syslog')">Traces</span>
             </div>
         </div>
         
-        <div class="flex-1 overflow-hidden mx-6 relative hidden lg:block h-full border-x border-[#1e2532]">
-            <div class="absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-black to-transparent z-10"></div>
-            <div class="absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-black to-transparent z-10"></div>
-            <div class="whitespace-nowrap animate-marquee font-mono text-[10px] flex gap-8 items-center h-full text-[#8b949e]" id="top-ticker"></div>
+        <div class="flex-1 overflow-hidden mx-6 relative hidden lg:block h-full border-x border-os-border">
+            <div class="absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-os-panel to-transparent z-10 transition-colors duration-500"></div>
+            <div class="absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-os-panel to-transparent z-10 transition-colors duration-500"></div>
+            <div class="whitespace-nowrap animate-marquee font-mono text-[10px] flex gap-8 items-center h-full text-os-muted font-bold" id="top-ticker"></div>
         </div>
 
         <div class="flex items-center gap-4 font-mono shrink-0">
             <div class="flex items-center gap-2 bg-theme-glow border border-theme px-2 py-0.5 rounded text-theme font-bold transition-colors">
                 <div class="w-1.5 h-1.5 bg-theme rounded-full animate-flicker shadow-theme"></div> DB_SYNC_V55
             </div>
-            <span id="osClock" class="text-white">--:--:--</span>
+            <span id="osClock" class="text-os-text font-bold">--:--:--</span>
         </div>
     </header>
 
@@ -581,15 +583,15 @@ Architecting this system necessitates moving away from generalized LLMs toward h
                 <button class="win-btn win-min"></button>
                 <button class="win-btn win-max" onclick="maximizeApp('app-notepad')"></button>
             </div>
-            <div class="text-[11px] font-bold text-[#64748b] uppercase tracking-widest pointer-events-none font-mono">/docs/Library_Viewer.exe</div>
-            <div class="w-12 text-right"><span class="text-[9px] font-mono border border-[#1e2532] px-1 rounded text-[#64748b]">READ</span></div>
+            <div class="text-[11px] font-bold text-os-muted uppercase tracking-widest pointer-events-none font-mono">/docs/Library_Viewer.exe</div>
+            <div class="w-12 text-right"><span class="text-[9px] font-mono border border-os-border px-1 rounded text-os-muted">READ</span></div>
         </div>
-        <div class="window-content bg-[#0a0d14]/95 flex font-sans text-[#cbd5e1]">
-            <div class="w-64 border-r border-[#1e2532] bg-[#010204]/80 flex flex-col shrink-0">
-                <div class="p-3 text-[10px] font-mono text-[#64748b] uppercase tracking-widest border-b border-[#1e2532]">Document Directory</div>
+        <div class="window-content bg-os-panel flex font-sans text-os-text">
+            <div class="w-64 border-r border-os-border bg-os-bg flex flex-col shrink-0">
+                <div class="p-3 text-[10px] font-mono text-os-muted uppercase tracking-widest border-b border-os-border">Document Directory</div>
                 <div class="flex-1 overflow-y-auto p-2 flex flex-col gap-1">
                     <button class="text-left px-3 py-2 rounded text-xs font-mono transition-colors bg-theme-glow border border-theme text-theme" onclick="loadDoc('market-mayhem-md', this)">Market Mayhem Brief</button>
-                    <button class="text-left px-3 py-2 rounded text-xs font-mono transition-colors hover:bg-white/5 border border-transparent text-[#cbd5e1]" onclick="loadDoc('architecture-md', this)">SLM Architecture</button>
+                    <button class="text-left px-3 py-2 rounded text-xs font-mono transition-colors hover:bg-os-window border border-transparent text-os-text" onclick="loadDoc('architecture-md', this)">SLM Architecture</button>
                 </div>
             </div>
             <div class="flex-1 overflow-y-auto p-8 lg:p-12 font-serif prose prose-invert prose-sm" id="briefing-content">
@@ -608,58 +610,58 @@ Architecting this system necessitates moving away from generalized LLMs toward h
                 <button class="win-btn win-min"></button>
                 <button class="win-btn win-max" onclick="maximizeApp('app-macro')"></button>
             </div>
-            <div class="text-[11px] font-bold text-[#64748b] uppercase tracking-widest pointer-events-none font-mono">/sys/bin/macro_matrix.exe</div>
+            <div class="text-[11px] font-bold text-os-muted uppercase tracking-widest pointer-events-none font-mono">/sys/bin/macro_matrix.exe</div>
             <div class="w-12"></div>
         </div>
-        <div class="window-content bg-[#010204] p-5 flex flex-col gap-4">
+        <div class="window-content bg-os-bg p-5 flex flex-col gap-4">
             <div class="grid grid-cols-3 md:grid-cols-6 gap-3 shrink-0" id="kpi-grid"></div>
             
             <div class="flex flex-col lg:flex-row gap-4 flex-1 mt-1">
-                <div class="glass-panel p-4 flex-[2] flex flex-col relative overflow-hidden">
-                    <h3 class="text-[10px] text-white mb-4 uppercase tracking-widest font-mono flex justify-between z-10">
+                <div class="glass-panel p-4 flex-[2] flex flex-col relative overflow-hidden bg-os-panel">
+                    <h3 class="text-[10px] text-os-text mb-4 uppercase tracking-widest font-mono flex justify-between z-10 font-bold">
                         <span class="flex items-center gap-2 text-theme transition-colors"><span class="w-2 h-2 bg-theme rounded-full animate-pulse shadow-theme transition-colors"></span> SPX Forward Probability Matrix</span>
-                        <span class="text-[#64748b]">T+30 Days</span>
+                        <span class="text-os-muted">T+30 Days</span>
                     </h3>
                     <div class="flex-1 relative w-full h-[45%] min-h-[150px] z-10">
                         <canvas id="macroChart"></canvas>
                     </div>
                     
-                    <h3 class="text-[10px] text-white mt-5 mb-2 uppercase tracking-widest font-mono z-10">
-                        <span class="text-[#64748b]">Gamma Exposure (GEX) by Strike</span>
+                    <h3 class="text-[10px] text-os-text mt-5 mb-2 uppercase tracking-widest font-mono z-10 font-bold">
+                        <span class="text-os-muted">Gamma Exposure (GEX) by Strike</span>
                     </h3>
-                    <div class="flex-1 relative w-full h-[35%] min-h-[120px] z-10 border-t border-white/5 pt-3">
+                    <div class="flex-1 relative w-full h-[35%] min-h-[120px] z-10 border-t border-os-border pt-3">
                         <canvas id="gexChart"></canvas>
                     </div>
                 </div>
                 
                 <div class="flex-1 flex flex-col gap-4">
-                    <div class="glass-panel flex-1 flex flex-col overflow-hidden">
-                        <div class="p-3 border-b border-[#1e2532] bg-[#010204] flex justify-between items-center shrink-0">
-                            <h3 class="text-[10px] text-white uppercase tracking-widest font-mono flex items-center gap-2">
+                    <div class="glass-panel flex-1 flex flex-col overflow-hidden bg-os-panel">
+                        <div class="p-3 border-b border-os-border bg-os-bg flex justify-between items-center shrink-0">
+                            <h3 class="text-[10px] text-os-text uppercase tracking-widest font-mono flex items-center gap-2 font-bold">
                                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="text-theme transition-colors" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>
                                 Dark Pool Flow
                             </h3>
                         </div>
-                        <div class="flex-1 overflow-auto p-3 bg-[#0a0d14]">
+                        <div class="flex-1 overflow-auto p-3 bg-os-window">
                             <table class="w-full text-left font-mono text-[9px] border-collapse">
                                 <thead>
                                     <tr>
-                                        <th class="pb-2 text-[#64748b] font-normal border-b border-[#1e2532] bg-transparent">Time</th>
-                                        <th class="pb-2 text-[#64748b] font-normal border-b border-[#1e2532] bg-transparent">Ticker</th>
-                                        <th class="pb-2 text-[#64748b] font-normal border-b border-[#1e2532] bg-transparent">Type</th>
-                                        <th class="pb-2 text-[#64748b] font-normal border-b border-[#1e2532] text-right bg-transparent">Prem</th>
+                                        <th class="pb-2 text-os-muted font-normal border-b border-os-border bg-transparent">Time</th>
+                                        <th class="pb-2 text-os-muted font-normal border-b border-os-border bg-transparent">Ticker</th>
+                                        <th class="pb-2 text-os-muted font-normal border-b border-os-border bg-transparent">Type</th>
+                                        <th class="pb-2 text-os-muted font-normal border-b border-os-border text-right bg-transparent">Prem</th>
                                     </tr>
                                 </thead>
                                 <tbody id="whale-table"></tbody>
                             </table>
                         </div>
                     </div>
-                    <div class="p-4 border border-[#ff1e38] bg-gradient-to-b from-[rgba(255,30,56,0.1)] to-transparent rounded-lg shrink-0">
+                    <div class="p-4 border border-[#ff1e38] bg-[#ff1e38]/10 rounded-lg shrink-0">
                         <h4 class="text-[10px] text-[#ff1e38] font-bold mb-2 uppercase tracking-widest font-mono flex items-center gap-2">
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
                             System Anomaly
                         </h4>
-                        <p class="text-[11px] text-[#cbd5e1] leading-relaxed font-serif italic m-0">"Correlation variance anomaly detected: +0.95 with Diplomatic Hopium. SPX trading purely on resolution-beta."</p>
+                        <p class="text-[11px] text-os-text leading-relaxed font-serif italic m-0 opacity-90">"Correlation variance anomaly detected: +0.95 with Diplomatic Hopium. SPX trading purely on resolution-beta."</p>
                     </div>
                 </div>
             </div>
@@ -676,19 +678,19 @@ Architecting this system necessitates moving away from generalized LLMs toward h
                 <div class="win-btn win-min"></div>
                 <div class="win-btn win-max" onclick="maximizeApp('app-corr')"></div>
             </div>
-            <div class="text-[10px] font-bold text-[#64748b] uppercase font-mono">asset_correlations.bin</div>
+            <div class="text-[10px] font-bold text-os-muted uppercase font-mono">asset_correlations.bin</div>
             <div class="w-8"></div>
         </div>
-        <div class="window-content bg-[#010204] p-6 flex flex-col">
-            <div class="flex justify-between items-center mb-6 border-b border-[#1e2532] pb-4">
-                <h3 class="text-xs font-bold text-white uppercase tracking-widest font-mono">Cross-Asset Heatmap</h3>
+        <div class="window-content bg-os-bg p-6 flex flex-col">
+            <div class="flex justify-between items-center mb-6 border-b border-os-border pb-4">
+                <h3 class="text-xs font-bold text-os-text uppercase tracking-widest font-mono">Cross-Asset Heatmap</h3>
                 <span class="text-[9px] text-theme font-mono border border-theme/30 px-2 py-1 rounded bg-theme-glow">MODE: PEARSON_SIM</span>
             </div>
             <div id="corr-container" class="flex flex-col gap-1 w-full max-w-sm mx-auto">
                 <!-- Labels + Matrix built by JS -->
             </div>
             <div class="mt-auto pt-6">
-                <div class="p-3 bg-white/5 border border-white/10 rounded text-[10px] font-serif italic text-[#cbd5e1]">
+                <div class="p-3 bg-os-window border border-os-border rounded text-[10px] font-serif italic text-os-text opacity-90">
                     Note: AI Infrastructure and Diplomatic Hopium correlation hitting record +0.95. Fundamental earnings have been temporarily decoupled.
                 </div>
             </div>
@@ -705,32 +707,32 @@ Architecting this system necessitates moving away from generalized LLMs toward h
                 <button class="win-btn win-min"></button>
                 <button class="win-btn win-max" onclick="maximizeApp('app-dcf')"></button>
             </div>
-            <div class="text-[11px] font-bold text-[#64748b] uppercase tracking-widest pointer-events-none font-mono">/sys/intel/dcf_engine.sh</div>
+            <div class="text-[11px] font-bold text-os-muted uppercase tracking-widest pointer-events-none font-mono">/sys/intel/dcf_engine.sh</div>
             <div class="w-12"></div>
         </div>
-        <div class="window-content bg-[#010204] flex">
+        <div class="window-content bg-os-bg flex">
             <!-- Sidebar -->
-            <div class="w-56 bg-[#0a0d14] border-r border-[#1e2532] flex flex-col shrink-0 z-20">
-                <div class="p-3 border-b border-[#1e2532]">
-                    <h3 class="text-[10px] font-mono text-[#64748b] uppercase tracking-widest">Coverage Universe</h3>
+            <div class="w-56 bg-os-panel border-r border-os-border flex flex-col shrink-0 z-20">
+                <div class="p-3 border-b border-os-border">
+                    <h3 class="text-[10px] font-mono font-bold text-os-muted uppercase tracking-widest">Coverage Universe</h3>
                 </div>
                 <div class="flex-1 overflow-y-auto p-2 flex flex-col gap-1" id="dcf-ticker-list"></div>
                 
-                <div class="p-4 border-t border-[#1e2532] bg-black/40">
-                    <h3 class="text-[10px] font-mono text-white uppercase tracking-widest mb-3">Scenario Toggle</h3>
-                    <div class="flex bg-[#1e2532] rounded p-1 gap-1 mb-4">
-                        <button class="flex-1 py-1.5 text-[9px] font-bold rounded bg-[#010204] text-white shadow-sm transition-all" id="btn-scen-base" onclick="setScenario('base')">BASE</button>
-                        <button class="flex-1 py-1.5 text-[9px] font-bold rounded text-[#8b949e] hover:text-white transition-all" id="btn-scen-bull" onclick="setScenario('bull')">BULL</button>
-                        <button class="flex-1 py-1.5 text-[9px] font-bold rounded text-[#8b949e] hover:text-white transition-all" id="btn-scen-bear" onclick="setScenario('bear')">BEAR</button>
+                <div class="p-4 border-t border-os-border bg-os-window">
+                    <h3 class="text-[10px] font-mono font-bold text-os-text uppercase tracking-widest mb-3">Scenario Toggle</h3>
+                    <div class="flex bg-os-bg border border-os-border rounded p-1 gap-1 mb-4">
+                        <button class="flex-1 py-1.5 text-[9px] font-bold rounded bg-os-panel text-os-text shadow-sm transition-all" id="btn-scen-base" onclick="setScenario('base')">BASE</button>
+                        <button class="flex-1 py-1.5 text-[9px] font-bold rounded text-os-muted hover:text-os-text transition-all" id="btn-scen-bull" onclick="setScenario('bull')">BULL</button>
+                        <button class="flex-1 py-1.5 text-[9px] font-bold rounded text-os-muted hover:text-os-text transition-all" id="btn-scen-bear" onclick="setScenario('bear')">BEAR</button>
                     </div>
 
-                    <h3 class="text-[10px] font-mono text-white uppercase tracking-widest mb-3">Valuation Parameters</h3>
-                    <label class="flex justify-between text-[10px] font-mono text-[#64748b] mb-2">
+                    <h3 class="text-[10px] font-mono font-bold text-os-text uppercase tracking-widest mb-3">Valuation Parameters</h3>
+                    <label class="flex justify-between text-[10px] font-mono text-os-muted mb-2">
                         <span>Discount Rate (WACC)</span><span class="text-theme font-bold transition-colors" id="lbl-wacc">--%</span>
                     </label>
                     <input type="range" id="slider-wacc" min="6" max="15" step="0.1" oninput="liveUpdateDCF()">
                     
-                    <label class="flex justify-between text-[10px] font-mono text-[#64748b] mb-2 mt-5">
+                    <label class="flex justify-between text-[10px] font-mono text-os-muted mb-2 mt-5">
                         <span>Term. Growth Rate</span><span class="text-theme font-bold transition-colors" id="lbl-tg">--%</span>
                     </label>
                     <input type="range" id="slider-tg" min="0.5" max="6" step="0.1" oninput="liveUpdateDCF()">
@@ -739,25 +741,25 @@ Architecting this system necessitates moving away from generalized LLMs toward h
             
             <!-- Main Content -->
             <div class="flex-1 flex flex-col overflow-y-auto relative z-10">
-                <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,var(--theme-bg-glow)_0%,transparent_100%)] pointer-events-none transition-colors duration-500"></div>
+                <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,var(--theme-bg-glow)_0%,transparent_100%)] pointer-events-none transition-colors duration-500 opacity-50"></div>
 
-                <div class="p-6 border-b border-[#1e2532] flex justify-between items-start shrink-0 z-10 bg-[#0a0d14]/50 backdrop-blur">
+                <div class="p-6 border-b border-os-border flex justify-between items-start shrink-0 z-10 bg-os-panel/50 backdrop-blur">
                     <div>
-                        <h2 class="text-3xl font-display font-bold text-white tracking-widest m-0" id="dcf-company-name">--</h2>
+                        <h2 class="text-3xl font-display font-bold text-os-text tracking-widest m-0" id="dcf-company-name">--</h2>
                         <div class="flex gap-4 mt-3">
-                            <div class="font-mono text-[11px]"><span class="text-[#64748b]">Ticker:</span> <span class="text-theme font-bold transition-colors" id="dcf-ticker-display">--</span></div>
-                            <div class="font-mono text-[11px]"><span class="text-[#64748b]">Sector:</span> <span class="text-white" id="dcf-sector">--</span></div>
-                            <div class="font-mono text-[11px]"><span class="text-[#64748b]">Shares (M):</span> <span class="text-white" id="dcf-shares">--</span></div>
+                            <div class="font-mono text-[11px]"><span class="text-os-muted">Ticker:</span> <span class="text-theme font-bold transition-colors" id="dcf-ticker-display">--</span></div>
+                            <div class="font-mono text-[11px]"><span class="text-os-muted">Sector:</span> <span class="text-os-text font-bold" id="dcf-sector">--</span></div>
+                            <div class="font-mono text-[11px]"><span class="text-os-muted">Shares (M):</span> <span class="text-os-text font-bold" id="dcf-shares">--</span></div>
                         </div>
                     </div>
                     <div class="flex gap-3">
-                        <div class="bg-[#0a0d14] border border-[#1e2532] rounded-lg p-3 text-right min-w-[110px]">
-                            <div class="text-[9px] font-mono text-[#64748b] uppercase mb-1">Mkt Price</div>
-                            <div class="text-lg font-bold text-white font-mono" id="dcf-mkt-price">--</div>
+                        <div class="bg-os-window border border-os-border rounded-lg p-3 text-right min-w-[110px]">
+                            <div class="text-[9px] font-mono text-os-muted font-bold uppercase mb-1">Mkt Price</div>
+                            <div class="text-lg font-bold text-os-text font-mono" id="dcf-mkt-price">--</div>
                         </div>
                         <div class="bg-theme-glow border border-theme rounded-lg p-3 text-right min-w-[140px] shadow-theme transition-all duration-300" id="implied-box">
-                            <div class="text-[9px] font-mono text-theme uppercase mb-1 transition-colors" id="implied-label">Implied Value</div>
-                            <div class="text-2xl font-bold text-white font-mono glow-text transition-all" id="dcf-implied-price">--</div>
+                            <div class="text-[9px] font-mono text-theme font-bold uppercase mb-1 transition-colors" id="implied-label">Implied Value</div>
+                            <div class="text-2xl font-bold text-os-text font-mono glow-text transition-all" id="dcf-implied-price">--</div>
                             <div class="text-[10px] font-mono font-bold mt-1 transition-all" id="dcf-upside">--</div>
                         </div>
                     </div>
@@ -765,21 +767,21 @@ Architecting this system necessitates moving away from generalized LLMs toward h
 
                 <div class="flex flex-col xl:flex-row flex-1 p-6 gap-6 min-h-[400px] z-10">
                     <div class="flex-[3] flex flex-col gap-6">
-                        <div class="glass-panel p-4 pb-0 flex flex-col rounded-xl">
-                            <h3 class="text-[10px] font-mono text-white uppercase tracking-widest mb-2 border-b border-[#1e2532] pb-2">Unlevered Free Cash Flow Projections ($B)</h3>
+                        <div class="glass-panel bg-os-panel p-4 pb-0 flex flex-col rounded-xl border-os-border">
+                            <h3 class="text-[10px] font-mono font-bold text-os-text uppercase tracking-widest mb-2 border-b border-os-border pb-2">Unlevered Free Cash Flow Projections ($B)</h3>
                             <div class="dcf-bar-container" id="dcf-waterfall"></div>
                         </div>
                         
-                        <div class="glass-panel overflow-x-auto flex-1 rounded-xl bg-[#0a0d14]">
+                        <div class="glass-panel overflow-x-auto flex-1 rounded-xl bg-os-panel border-os-border">
                             <table class="data-table">
                                 <thead>
                                     <tr>
-                                        <th class="bg-transparent border-[#1e2532]">Metrics ($B)</th>
-                                        <th class="text-right bg-transparent border-[#1e2532]">FY26E</th>
-                                        <th class="text-right bg-transparent border-[#1e2532]">FY27E</th>
-                                        <th class="text-right bg-transparent border-[#1e2532]">FY28E</th>
-                                        <th class="text-right bg-transparent border-[#1e2532]">FY29E</th>
-                                        <th class="text-right bg-transparent border-[#1e2532]">FY30E</th>
+                                        <th class="bg-transparent border-os-border">Metrics ($B)</th>
+                                        <th class="text-right bg-transparent border-os-border">FY26E</th>
+                                        <th class="text-right bg-transparent border-os-border">FY27E</th>
+                                        <th class="text-right bg-transparent border-os-border">FY28E</th>
+                                        <th class="text-right bg-transparent border-os-border">FY29E</th>
+                                        <th class="text-right bg-transparent border-os-border">FY30E</th>
                                     </tr>
                                 </thead>
                                 <tbody id="dcf-table-body"></tbody>
@@ -788,20 +790,20 @@ Architecting this system necessitates moving away from generalized LLMs toward h
                     </div>
                     
                     <div class="flex-[2] flex flex-col gap-6">
-                        <div class="glass-panel p-5 rounded-xl flex-1 flex flex-col">
-                            <h3 class="text-[10px] font-mono text-white uppercase tracking-widest mb-4 border-b border-[#1e2532] pb-2">Sensitivity Matrix</h3>
+                        <div class="glass-panel bg-os-panel p-5 rounded-xl flex-1 flex flex-col border-os-border">
+                            <h3 class="text-[10px] font-mono font-bold text-os-text uppercase tracking-widest mb-4 border-b border-os-border pb-2">Sensitivity Matrix</h3>
                             <div class="flex-1 flex items-center justify-center relative mt-2">
-                                <div class="absolute -left-3 top-1/2 -translate-y-1/2 -rotate-90 text-[8px] font-mono text-[#64748b] tracking-widest">WACC</div>
-                                <div class="absolute -top-3 left-1/2 -translate-x-1/2 text-[8px] font-mono text-[#64748b] tracking-widest">TERM G.</div>
+                                <div class="absolute -left-3 top-1/2 -translate-y-1/2 -rotate-90 text-[8px] font-mono text-os-muted font-bold tracking-widest">WACC</div>
+                                <div class="absolute -top-3 left-1/2 -translate-x-1/2 text-[8px] font-mono text-os-muted font-bold tracking-widest">TERM G.</div>
                                 <div class="sens-grid w-full h-full" id="sens-matrix"></div>
                             </div>
                         </div>
                         
-                        <div class="glass-panel p-5 rounded-xl bg-[#010204]">
+                        <div class="glass-panel bg-os-window p-5 rounded-xl border-os-border">
                             <div class="space-y-3">
-                                <div class="flex justify-between text-[10px] font-mono"><span class="text-[#64748b]">Enterprise Value</span><span class="text-white font-bold" id="val-ev">--</span></div>
-                                <div class="flex justify-between text-[10px] font-mono"><span class="text-[#64748b]">Terminal Value (PV)</span><span class="text-white font-bold" id="val-tv">--</span></div>
-                                <div class="flex justify-between text-[10px] font-mono"><span class="text-[#64748b]">TV % of Total EV</span><span class="text-theme font-bold transition-colors" id="val-tv-pct">--</span></div>
+                                <div class="flex justify-between text-[10px] font-mono"><span class="text-os-muted font-bold">Enterprise Value</span><span class="text-os-text font-bold" id="val-ev">--</span></div>
+                                <div class="flex justify-between text-[10px] font-mono"><span class="text-os-muted font-bold">Terminal Value (PV)</span><span class="text-os-text font-bold" id="val-tv">--</span></div>
+                                <div class="flex justify-between text-[10px] font-mono"><span class="text-os-muted font-bold">TV % of Total EV</span><span class="text-theme font-bold transition-colors" id="val-tv-pct">--</span></div>
                             </div>
                         </div>
                     </div>
@@ -820,23 +822,23 @@ Architecting this system necessitates moving away from generalized LLMs toward h
                 <button class="win-btn win-min"></button>
                 <button class="win-btn win-max" onclick="maximizeApp('app-portfolio')"></button>
             </div>
-            <div class="text-[11px] font-bold text-[#64748b] uppercase tracking-widest pointer-events-none font-mono">/sys/intel/quantum_ledger.exe</div>
+            <div class="text-[11px] font-bold text-os-muted uppercase tracking-widest pointer-events-none font-mono">/sys/intel/quantum_ledger.exe</div>
             <div class="w-12"></div>
         </div>
-        <div class="window-content bg-[#010204] p-5 flex flex-col">
-            <div class="flex justify-between items-center mb-6 border-b border-[#1e2532] pb-4">
+        <div class="window-content bg-os-bg p-5 flex flex-col">
+            <div class="flex justify-between items-center mb-6 border-b border-os-border pb-4">
                 <div>
-                    <h2 class="text-[13px] font-bold text-white uppercase tracking-widest font-mono m-0 flex items-center gap-2">
+                    <h2 class="text-[13px] font-bold text-os-text uppercase tracking-widest font-mono m-0 flex items-center gap-2">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-theme transition-colors"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
                         Portfolio Risk Topography
                     </h2>
-                    <p class="text-[9px] text-[#64748b] font-mono mt-1">X: Volatility Risk, Y: Upside Potential, Size: Capital Allocation</p>
+                    <p class="text-[9px] text-os-muted font-bold font-mono mt-1">X: Volatility Risk, Y: Upside Potential, Size: Capital Allocation</p>
                 </div>
                 <div class="bg-theme-glow border border-theme px-3 py-1.5 rounded font-mono text-[10px] text-theme font-bold shadow-theme transition-colors">
                     AUM: $1.42B
                 </div>
             </div>
-            <div class="flex-1 relative glass-panel p-2">
+            <div class="flex-1 relative glass-panel bg-os-panel p-2">
                 <canvas id="portfolioChart"></canvas>
             </div>
         </div>
@@ -852,11 +854,12 @@ Architecting this system necessitates moving away from generalized LLMs toward h
                 <button class="win-btn win-min"></button>
                 <button class="win-btn win-max" onclick="maximizeApp('app-geo')"></button>
             </div>
-            <div class="text-[11px] font-bold text-[#64748b] uppercase tracking-widest pointer-events-none font-mono">/bin/geo_tactical_map.sh</div>
+            <div class="text-[11px] font-bold text-os-muted uppercase tracking-widest pointer-events-none font-mono">/bin/geo_tactical_map.sh</div>
             <div class="w-12"></div>
         </div>
-        <div class="window-content bg-[#010204] flex flex-col relative overflow-hidden">
-            <div class="absolute top-4 left-4 z-20 bg-[#0a0d14]/80 p-4 border border-[#1e2532] rounded backdrop-blur-md shadow-[0_0_20px_rgba(0,0,0,0.8)]">
+        <div class="window-content bg-[#010204] flex flex-col relative overflow-hidden" id="geo-map-container">
+            <!-- Force dark background always for the map so the radar sweep pops -->
+            <div class="absolute top-4 left-4 z-20 bg-black/80 p-4 border border-[#1e2532] rounded backdrop-blur-md shadow-[0_0_20px_rgba(0,0,0,0.8)]">
                 <h3 class="font-mono text-[10px] text-[#ff1e38] font-bold tracking-widest uppercase mb-3 flex items-center gap-2">
                     <span class="w-2 h-2 bg-[#ff1e38] rounded-full animate-ping-fast"></span> Active Friction Nodes
                 </h3>
@@ -868,7 +871,71 @@ Architecting this system necessitates moving away from generalized LLMs toward h
             </div>
             <!-- Canvas Map -->
             <canvas id="geoMapCanvas" class="absolute inset-0 w-full h-full z-10"></canvas>
-            <div class="absolute inset-0 opacity-20 pointer-events-none z-0" style="background-image: radial-gradient(var(--theme-border) 1px, transparent 1px); background-size: 20px 20px;"></div>
+            <div class="absolute inset-0 opacity-20 pointer-events-none z-0" style="background-image: radial-gradient(var(--theme-primary) 1px, transparent 1px); background-size: 30px 30px;"></div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- APP 16: GLOBAL LIQUIDITY MONITOR (NEW)     -->
+    <!-- ========================================== -->
+    <div id="app-liquidity" class="os-window" style="width: 850px; height: 500px; top: 190px; left: 140px; z-index: 65;">
+        <div class="window-header" id="app-liquidity-header">
+            <div class="flex items-center gap-2">
+                <button class="win-btn win-close" onclick="closeApp('app-liquidity')"></button>
+                <button class="win-btn win-min"></button>
+                <button class="win-btn win-max" onclick="maximizeApp('app-liquidity')"></button>
+            </div>
+            <div class="text-[11px] font-bold text-os-muted uppercase tracking-widest pointer-events-none font-mono">/sys/intel/global_liquidity.sh</div>
+            <div class="w-12 text-right"><span class="text-[9px] font-mono border border-os-border px-1 rounded text-os-muted">FED_API</span></div>
+        </div>
+        <div class="window-content bg-os-bg p-5 flex flex-col gap-4">
+            <div class="flex justify-between items-end border-b border-os-border pb-4 shrink-0">
+                <div>
+                    <h2 class="text-sm font-bold text-os-text uppercase tracking-widest font-mono m-0 flex items-center gap-2">
+                        Systemic Liquidity vs. SPX Valuation
+                    </h2>
+                    <p class="text-[10px] text-os-muted font-bold font-mono mt-1">Correlation tracking of Central Bank Reserves to Equity Multiples</p>
+                </div>
+                <div class="flex gap-4 text-right">
+                    <div>
+                        <div class="text-[9px] font-mono text-os-muted font-bold uppercase mb-1">Global Reserves</div>
+                        <div class="text-lg font-bold text-os-text font-mono">$3.8T <span class="text-[#00fa9a] text-[10px] ml-1">↑ +2.7%</span></div>
+                    </div>
+                    <div>
+                        <div class="text-[9px] font-mono text-os-muted font-bold uppercase mb-1">SPX Fair Value</div>
+                        <div class="text-lg font-bold text-theme font-mono transition-colors">6800.00 <span class="text-[#ff1e38] text-[10px] ml-1">↓ Delta</span></div>
+                    </div>
+                </div>
+            </div>
+            <div class="flex-1 relative glass-panel bg-os-panel p-4">
+                <canvas id="liquidityChartCanvas"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- APP 17: SUPPLY CHAIN TOPOLOGY (NEW)        -->
+    <!-- ========================================== -->
+    <div id="app-supply" class="os-window" style="width: 700px; height: 500px; top: 160px; right: 200px; left: auto; z-index: 68;">
+        <div class="window-header" id="app-supply-header">
+            <div class="flex items-center gap-2">
+                <button class="win-btn win-close" onclick="closeApp('app-supply')"></button>
+                <button class="win-btn win-min"></button>
+                <button class="win-btn win-max" onclick="maximizeApp('app-supply')"></button>
+            </div>
+            <div class="text-[11px] font-bold text-os-muted uppercase tracking-widest pointer-events-none font-mono">/sys/logistics/choke_points</div>
+            <div class="w-12 text-right">
+                <span class="w-2 h-2 rounded-full bg-[#ff1e38] inline-block animate-pulse"></span>
+            </div>
+        </div>
+        <div class="window-content bg-[#0a0d14] relative overflow-hidden" id="supply-container">
+            <!-- Strict dark mode for visualization -->
+            <div class="absolute top-4 right-4 z-20 text-right">
+                <h3 class="font-mono text-[10px] text-theme font-bold tracking-widest uppercase mb-1">Logistics Flow Map</h3>
+                <p class="text-[9px] text-[#64748b] font-mono">Real-time commodity transit (BBL/d)</p>
+            </div>
+            <canvas id="supplyCanvas" class="absolute inset-0 w-full h-full z-10"></canvas>
+            <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(0,229,255,0.05)_0%,rgba(0,0,0,0.8)_100%)] pointer-events-none z-0"></div>
         </div>
     </div>
 
@@ -882,56 +949,56 @@ Architecting this system necessitates moving away from generalized LLMs toward h
                 <button class="win-btn win-min"></button>
                 <button class="win-btn win-max" onclick="maximizeApp('app-syslog')"></button>
             </div>
-            <div class="text-[11px] font-bold text-[#64748b] uppercase tracking-widest pointer-events-none font-mono">/var/log/sys_trace_monitor</div>
+            <div class="text-[11px] font-bold text-os-muted uppercase tracking-widest pointer-events-none font-mono">/var/log/sys_trace_monitor</div>
             <div class="w-12 flex justify-end items-center gap-2">
                 <span class="w-2 h-2 rounded-full bg-[#00fa9a] animate-pulse"></span>
-                <span class="text-[9px] font-mono text-[#00fa9a]">LIVE</span>
+                <span class="text-[9px] font-mono text-[#00fa9a] font-bold">LIVE</span>
             </div>
         </div>
-        <div class="window-content bg-[#010204] flex flex-col">
+        <div class="window-content bg-os-bg flex flex-col">
             <!-- Controls -->
-            <div class="bg-[#0a0d14] border-b border-[#1e2532] p-4 flex flex-col sm:flex-row gap-4 items-center justify-between shrink-0">
+            <div class="bg-os-panel border-b border-os-border p-4 flex flex-col sm:flex-row gap-4 items-center justify-between shrink-0">
                 <div class="w-full sm:w-1/3 relative">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <svg class="h-4 w-4 text-[#64748b]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                        <svg class="h-4 w-4 text-os-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                     </div>
-                    <input type="text" id="searchInput" placeholder="Query traces, agents..." class="bg-[#11151e] border border-[#1e2532] text-xs font-mono rounded focus:border-theme block w-full pl-9 p-2 text-white placeholder-[#64748b] transition-colors outline-none">
+                    <input type="text" id="searchInput" placeholder="Query traces, agents..." class="bg-os-window border border-os-border text-xs font-mono rounded focus:border-theme block w-full pl-9 p-2 text-os-text placeholder:text-os-muted transition-colors outline-none">
                 </div>
                 <div class="flex flex-wrap gap-3 w-full sm:w-auto font-mono">
-                    <select id="agentFilter" class="bg-[#11151e] border border-[#1e2532] text-[#cbd5e1] text-[10px] rounded focus:border-theme block p-2 outline-none uppercase transition-colors">
+                    <select id="agentFilter" class="bg-os-window border border-os-border text-os-text font-bold text-[10px] rounded focus:border-theme block p-2 outline-none uppercase transition-colors">
                         <option value="ALL">All Agents</option>
                     </select>
-                    <select id="typeFilter" class="bg-[#11151e] border border-[#1e2532] text-[#cbd5e1] text-[10px] rounded focus:border-theme block p-2 outline-none uppercase transition-colors">
+                    <select id="typeFilter" class="bg-os-window border border-os-border text-os-text font-bold text-[10px] rounded focus:border-theme block p-2 outline-none uppercase transition-colors">
                         <option value="ALL">All Events</option>
                     </select>
                 </div>
             </div>
 
             <!-- Stats -->
-            <div class="flex bg-[#0a0d14] border-b border-[#1e2532] px-4 py-2 shrink-0 font-mono gap-6 text-[10px]">
-                <div><span class="text-[#64748b]">TOTAL:</span> <span id="stat-total" class="font-bold text-white">0</span></div>
-                <div><span class="text-[#64748b]">CRITICAL:</span> <span id="stat-critical" class="font-bold text-[#ff1e38]">0</span></div>
-                <div><span class="text-[#64748b]">COMPLETED:</span> <span id="stat-completed" class="font-bold text-[#00fa9a]">0</span></div>
+            <div class="flex bg-os-panel border-b border-os-border px-4 py-2 shrink-0 font-mono gap-6 text-[10px]">
+                <div><span class="text-os-muted font-bold">TOTAL:</span> <span id="stat-total" class="font-bold text-os-text">0</span></div>
+                <div><span class="text-os-muted font-bold">CRITICAL:</span> <span id="stat-critical" class="font-bold text-[#ff1e38]">0</span></div>
+                <div><span class="text-os-muted font-bold">COMPLETED:</span> <span id="stat-completed" class="font-bold text-[#00fa9a]">0</span></div>
             </div>
 
             <!-- Table -->
-            <div class="flex-1 overflow-auto relative p-2 bg-[#010204]">
+            <div class="flex-1 overflow-auto relative p-2 bg-os-bg">
                 <table class="data-table w-full relative">
-                    <thead class="bg-[#0a0d14]">
+                    <thead class="bg-os-window border-os-border">
                         <tr>
-                            <th scope="col" class="w-24 bg-transparent border-[#1e2532]">Timestamp</th>
-                            <th scope="col" class="w-40 bg-transparent border-[#1e2532]">Agent Identity</th>
-                            <th scope="col" class="w-32 bg-transparent border-[#1e2532]">Event Type</th>
-                            <th scope="col" class="bg-transparent border-[#1e2532]">Execution Summary</th>
+                            <th scope="col" class="w-24 bg-transparent border-os-border">Timestamp</th>
+                            <th scope="col" class="w-40 bg-transparent border-os-border">Agent Identity</th>
+                            <th scope="col" class="w-32 bg-transparent border-os-border">Event Type</th>
+                            <th scope="col" class="bg-transparent border-os-border">Execution Summary</th>
                         </tr>
                     </thead>
-                    <tbody id="syslog-table-body" class="divide-y divide-[#1e2532] text-[10px] font-mono">
+                    <tbody id="syslog-table-body" class="divide-y divide-os-border text-[10px] font-mono">
                         <!-- Populated by JS -->
                     </tbody>
                 </table>
-                <div id="syslogEmptyState" class="hidden absolute inset-0 flex-col items-center justify-center text-[#64748b] bg-[#010204]">
+                <div id="syslogEmptyState" class="hidden absolute inset-0 flex-col items-center justify-center text-os-muted bg-os-bg">
                     <svg class="w-10 h-10 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m5.231 13.481L15 17.25m-4.5-15H5.625c-.621 0-1.125.504-1.125 1.125v16.5c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9zm3.75 11.625a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"></path></svg>
-                    <p class="font-mono text-xs">NO TRACES MATCH QUERY PARAMETERS.</p>
+                    <p class="font-mono text-xs font-bold">NO TRACES MATCH QUERY PARAMETERS.</p>
                 </div>
             </div>
         </div>
@@ -940,32 +1007,37 @@ Architecting this system necessitates moving away from generalized LLMs toward h
     <!-- ========================================== -->
     <!-- APP 8: L2 ORDER BOOK STREAM                -->
     <!-- ========================================== -->
-    <div id="app-orderbook" class="os-window" style="width: 320px; height: 500px; top: 150px; right: 80px; left: auto; z-index: 98;">
+    <div id="app-orderbook" class="os-window" style="width: 320px; height: 580px; top: 150px; right: 80px; left: auto; z-index: 98;">
         <div class="window-header" id="app-orderbook-header">
             <div class="flex items-center gap-2">
                 <button class="win-btn win-close" onclick="closeApp('app-orderbook')"></button>
                 <button class="win-btn win-min"></button>
                 <button class="win-btn win-max" onclick="maximizeApp('app-orderbook')"></button>
             </div>
-            <div class="text-[11px] font-bold text-[#64748b] uppercase tracking-widest pointer-events-none font-mono">/stream/l2_book</div>
+            <div class="text-[11px] font-bold text-os-muted uppercase tracking-widest pointer-events-none font-mono">/stream/l2_book</div>
             <div class="w-12"></div>
         </div>
-        <div class="window-content bg-[#0a0d14] flex flex-col font-mono text-[10px]">
-            <div class="flex justify-between border-b border-[#1e2532] p-2 bg-[#010204]">
-                <div class="text-[#cbd5e1] font-bold">BTC/USDT <span class="text-[#64748b]">PERP</span></div>
-                <div class="text-theme font-bold transition-colors" id="ob-price">81,462.00</div>
+        <div class="window-content bg-os-panel flex flex-col font-mono text-[10px]">
+            <div class="flex justify-between border-b border-os-border p-2 bg-os-bg">
+                <div class="text-os-text font-bold">BTC/USDT <span class="text-os-muted">PERP</span></div>
+                <div class="text-theme font-bold transition-colors text-[11px]" id="ob-price">81,462.00</div>
             </div>
-            <div class="flex px-2 py-1 border-b border-[#1e2532] text-[#64748b] bg-[#11151e]">
+            <div class="flex px-2 py-1 border-b border-os-border text-os-muted font-bold bg-os-window">
                 <div class="flex-1">PRICE</div>
                 <div class="flex-1 text-right">SIZE</div>
                 <div class="flex-1 text-right">TOTAL</div>
             </div>
             <!-- Asks (Red) -->
-            <div id="ob-asks" class="flex flex-col-reverse flex-1 overflow-hidden bg-[#010204]"></div>
+            <div id="ob-asks" class="flex flex-col-reverse flex-1 overflow-hidden bg-os-bg"></div>
             <!-- Spread -->
-            <div class="py-2 px-2 text-center font-bold text-lg text-theme border-y border-[#1e2532] bg-[#11151e] shadow-theme glow-text transition-colors" id="ob-spread">81,462.00</div>
+            <div class="py-2 px-2 text-center font-bold text-lg text-theme border-y border-os-border bg-os-window shadow-theme glow-text transition-colors" id="ob-spread">81,462.00</div>
             <!-- Bids (Green) -->
-            <div id="ob-bids" class="flex flex-col flex-1 overflow-hidden bg-[#010204]"></div>
+            <div id="ob-bids" class="flex flex-col flex-1 overflow-hidden bg-os-bg"></div>
+            <!-- Depth Chart -->
+            <div class="h-[100px] border-t border-os-border bg-os-panel relative mt-auto shrink-0 p-1">
+                <div class="absolute top-1 left-2 text-[8px] text-os-muted font-bold tracking-widest">MARKET DEPTH</div>
+                <canvas id="obDepthCanvas" class="w-full h-full"></canvas>
+            </div>
         </div>
     </div>
 
@@ -979,11 +1051,11 @@ Architecting this system necessitates moving away from generalized LLMs toward h
                 <button class="win-btn win-min"></button>
                 <button class="win-btn win-max" onclick="maximizeApp('app-network')"></button>
             </div>
-            <div class="text-[11px] font-bold text-[#64748b] uppercase tracking-widest pointer-events-none font-mono">/sys/agent_topology</div>
+            <div class="text-[11px] font-bold text-os-muted uppercase tracking-widest pointer-events-none font-mono">/sys/agent_topology</div>
             <div class="w-12"></div>
         </div>
-        <div class="window-content bg-[#010204] relative overflow-hidden" id="topology-container">
-            <div class="absolute inset-0 opacity-20 pointer-events-none" style="background-image: radial-gradient(var(--theme-border) 1px, transparent 1px); background-size: 20px 20px;"></div>
+        <div class="window-content bg-os-bg relative overflow-hidden" id="topology-container">
+            <div class="absolute inset-0 opacity-20 pointer-events-none" style="background-image: radial-gradient(var(--os-border) 1px, transparent 1px); background-size: 20px 20px;"></div>
             <!-- SVG for drawing lines -->
             <svg id="topo-edges" class="absolute inset-0 w-full h-full pointer-events-none z-[5]"></svg>
             <!-- Nodes added via JS -->
@@ -1000,19 +1072,19 @@ Architecting this system necessitates moving away from generalized LLMs toward h
                 <button class="win-btn win-min"></button>
                 <button class="win-btn win-max" onclick="maximizeApp('app-ledger')"></button>
             </div>
-            <div class="text-[11px] font-bold text-[#64748b] uppercase tracking-widest pointer-events-none font-mono">/data/MarketMayhemLedger.json</div>
-            <div class="w-12 text-right"><span class="text-[9px] font-mono border border-theme px-1 rounded text-theme bg-theme-glow transition-colors">SYNC</span></div>
+            <div class="text-[11px] font-bold text-os-muted uppercase tracking-widest pointer-events-none font-mono">/data/MarketMayhemLedger.json</div>
+            <div class="w-12 text-right"><span class="text-[9px] font-mono border border-theme px-1 rounded text-theme bg-theme-glow transition-colors font-bold">SYNC</span></div>
         </div>
-        <div class="window-content bg-[#010204] p-5">
-            <h3 class="text-xs font-mono text-white mb-4 uppercase tracking-widest border-b border-[#1e2532] pb-2">Institutional AI Training Ledger</h3>
-            <div class="glass-panel overflow-hidden bg-[#0a0d14]">
+        <div class="window-content bg-os-bg p-5">
+            <h3 class="text-xs font-mono font-bold text-os-text mb-4 uppercase tracking-widest border-b border-os-border pb-2">Institutional AI Training Ledger</h3>
+            <div class="glass-panel overflow-hidden bg-os-panel">
                 <table class="data-table w-full">
                     <thead>
                         <tr>
-                            <th class="bg-transparent border-[#1e2532]">Data Variable / Node</th>
-                            <th class="bg-transparent border-[#1e2532]">Market Level / Value</th>
-                            <th class="bg-transparent border-[#1e2532]">Primary Model Target</th>
-                            <th class="bg-transparent border-[#1e2532]">Unstructured Context / Provenance</th>
+                            <th class="bg-transparent border-os-border">Data Variable / Node</th>
+                            <th class="bg-transparent border-os-border">Market Level / Value</th>
+                            <th class="bg-transparent border-os-border">Primary Model Target</th>
+                            <th class="bg-transparent border-os-border">Unstructured Context / Provenance</th>
                         </tr>
                     </thead>
                     <tbody id="ledger-table-body">
@@ -1020,9 +1092,9 @@ Architecting this system necessitates moving away from generalized LLMs toward h
                     </tbody>
                 </table>
             </div>
-            <div class="mt-4 p-4 glass-panel rounded-lg">
-                <h3 class="text-[10px] font-bold text-white uppercase tracking-widest font-mono mb-2">RAW JSON</h3>
-                <pre id="jsonLedgerOut" class="font-mono text-[9px] text-[#cbd5e1] overflow-auto max-h-32 m-0 bg-[#010204] p-2 border border-[#1e2532] rounded"></pre>
+            <div class="mt-4 p-4 glass-panel rounded-lg bg-os-window">
+                <h3 class="text-[10px] font-bold text-os-text uppercase tracking-widest font-mono mb-2">RAW JSON</h3>
+                <pre id="jsonLedgerOut" class="font-mono text-[9px] text-os-muted overflow-auto max-h-32 m-0 bg-os-bg p-2 border border-os-border rounded"></pre>
             </div>
         </div>
     </div>
@@ -1037,17 +1109,27 @@ Architecting this system necessitates moving away from generalized LLMs toward h
                 <button class="win-btn win-min"></button>
                 <button class="win-btn win-max" onclick="maximizeApp('app-terminal')"></button>
             </div>
-            <div class="text-[11px] font-bold text-[#64748b] uppercase tracking-widest pointer-events-none font-mono">/bin/bash - adam_terminal</div>
+            <div class="text-[11px] font-bold text-os-muted uppercase tracking-widest pointer-events-none font-mono">/bin/bash - adam_terminal</div>
             <div class="w-12"></div>
         </div>
-        <div class="window-content bg-[#010204] p-4 flex flex-col" onclick="document.getElementById('term-in').focus()">
+        <div class="window-content bg-os-bg p-4 flex flex-col" onclick="document.getElementById('term-in').focus()">
             <div id="terminal-output" class="font-mono text-[11px] text-theme transition-colors leading-relaxed whitespace-pre-wrap overflow-y-auto flex-1 pb-2">Adam OS Kernel [Version 55.0.231]
 (c) 2026 Sovereign Systems. All rights reserved.
+
+<pre style="font-size: 8px; line-height: 1;">
+  ___      _                ___  ___ 
+ / _ \    | |               |  \/  |
+/ /_\ \ __| | __ _ _ __ ___ | .  . |
+|  _  |/ _` |/ _` | '_ ` _ \| |\/| |
+| | | | (_| | (_| | | | | | | |  | |
+\_| |_/\__,_|\__,_|_| |_| |_\_|  |_/ 
+</pre>
+Type 'help' to see available modules and commands.
 
 root@adam-node:~# _</div>
             <div class="flex gap-2 font-mono text-[11px] mt-2 shrink-0">
                 <span class="text-theme transition-colors">root@adam-node:~#</span>
-                <input type="text" id="term-in" class="bg-transparent border-none text-white outline-none flex-1 font-mono" autocomplete="off" spellcheck="false" onkeydown="handleTerminal(event)">
+                <input type="text" id="term-in" class="bg-transparent border-none text-os-text outline-none flex-1 font-mono font-bold" autocomplete="off" spellcheck="false" onkeydown="handleTerminal(event)">
             </div>
         </div>
     </div>
@@ -1062,29 +1144,29 @@ root@adam-node:~# _</div>
                 <button class="win-btn win-min"></button>
                 <button class="win-btn win-max" onclick="maximizeApp('app-config')"></button>
             </div>
-            <div class="text-[11px] font-bold text-[#64748b] uppercase tracking-widest pointer-events-none font-mono">/sys/config.exe</div>
+            <div class="text-[11px] font-bold text-os-muted uppercase tracking-widest pointer-events-none font-mono">/sys/config.exe</div>
             <div class="w-12"></div>
         </div>
-        <div class="window-content bg-[#010204] p-6">
-            <h3 class="text-xs font-mono text-white mb-4 uppercase tracking-widest border-b border-[#1e2532] pb-2">Telemetry Override</h3>
+        <div class="window-content bg-os-bg p-6">
+            <h3 class="text-xs font-mono font-bold text-os-text mb-4 uppercase tracking-widest border-b border-os-border pb-2">Telemetry Override</h3>
             <div class="grid grid-cols-2 gap-4 mb-6">
-                <div><label class="block text-[9px] font-mono text-[#64748b] mb-1">SPX 500</label><input type="number" step="0.01" id="cfg-spx" class="w-full bg-[#11151e] border border-[#1e2532] rounded p-2 text-white font-mono text-xs focus:border-theme outline-none transition-colors"></div>
-                <div><label class="block text-[9px] font-mono text-[#64748b] mb-1">10Y YIELD (%)</label><input type="number" step="0.001" id="cfg-yield" class="w-full bg-[#11151e] border border-[#1e2532] rounded p-2 text-white font-mono text-xs focus:border-theme outline-none transition-colors"></div>
-                <div><label class="block text-[9px] font-mono text-[#64748b] mb-1">BRENT CRUDE ($)</label><input type="number" step="0.01" id="cfg-brent" class="w-full bg-[#11151e] border border-[#1e2532] rounded p-2 text-white font-mono text-xs focus:border-theme outline-none transition-colors"></div>
-                <div><label class="block text-[9px] font-mono text-[#64748b] mb-1">BITCOIN ($)</label><input type="number" id="cfg-btc" class="w-full bg-[#11151e] border border-[#1e2532] rounded p-2 text-white font-mono text-xs focus:border-theme outline-none transition-colors"></div>
-                <div><label class="block text-[9px] font-mono text-[#64748b] mb-1">VIX INDEX</label><input type="number" step="0.01" id="cfg-vix" class="w-full bg-[#11151e] border border-[#1e2532] rounded p-2 text-white font-mono text-xs focus:border-theme outline-none transition-colors"></div>
-                <div><label class="block text-[9px] font-mono text-[#64748b] mb-1">OAS SPREAD (%)</label><input type="number" step="0.01" id="cfg-oas" class="w-full bg-[#11151e] border border-[#1e2532] rounded p-2 text-white font-mono text-xs focus:border-theme outline-none transition-colors"></div>
+                <div><label class="block text-[9px] font-mono text-os-muted font-bold mb-1">SPX 500</label><input type="number" step="0.01" id="cfg-spx" class="w-full bg-os-window border border-os-border rounded p-2 text-os-text font-bold font-mono text-xs focus:border-theme outline-none transition-colors"></div>
+                <div><label class="block text-[9px] font-mono text-os-muted font-bold mb-1">10Y YIELD (%)</label><input type="number" step="0.001" id="cfg-yield" class="w-full bg-os-window border border-os-border rounded p-2 text-os-text font-bold font-mono text-xs focus:border-theme outline-none transition-colors"></div>
+                <div><label class="block text-[9px] font-mono text-os-muted font-bold mb-1">BRENT CRUDE ($)</label><input type="number" step="0.01" id="cfg-brent" class="w-full bg-os-window border border-os-border rounded p-2 text-os-text font-bold font-mono text-xs focus:border-theme outline-none transition-colors"></div>
+                <div><label class="block text-[9px] font-mono text-os-muted font-bold mb-1">BITCOIN ($)</label><input type="number" id="cfg-btc" class="w-full bg-os-window border border-os-border rounded p-2 text-os-text font-bold font-mono text-xs focus:border-theme outline-none transition-colors"></div>
+                <div><label class="block text-[9px] font-mono text-os-muted font-bold mb-1">VIX INDEX</label><input type="number" step="0.01" id="cfg-vix" class="w-full bg-os-window border border-os-border rounded p-2 text-os-text font-bold font-mono text-xs focus:border-theme outline-none transition-colors"></div>
+                <div><label class="block text-[9px] font-mono text-os-muted font-bold mb-1">OAS SPREAD (%)</label><input type="number" step="0.01" id="cfg-oas" class="w-full bg-os-window border border-os-border rounded p-2 text-os-text font-bold font-mono text-xs focus:border-theme outline-none transition-colors"></div>
             </div>
-            <button onclick="applyConfig()" class="w-full bg-theme text-black font-bold font-mono text-xs py-2 rounded hover:bg-white transition-colors shadow-theme mb-6 cursor-pointer">BROADCAST TELEMETRY</button>
+            <button onclick="applyConfig()" class="w-full bg-theme text-white mix-blend-difference font-bold font-mono text-xs py-2 rounded hover:opacity-80 transition-opacity shadow-theme mb-6 cursor-pointer border border-transparent">BROADCAST TELEMETRY</button>
 
-            <h3 class="text-xs font-mono text-white mb-4 uppercase tracking-widest border-b border-[#1e2532] pb-2">Neural Parameters</h3>
+            <h3 class="text-xs font-mono font-bold text-os-text mb-4 uppercase tracking-widest border-b border-os-border pb-2">Neural Parameters</h3>
             <div class="space-y-4">
                 <div>
-                    <div class="flex justify-between text-[9px] font-mono text-[#64748b] mb-1"><span>Geopolitics / Friction</span><span id="cfg-val-geo" class="text-[#ff1e38] font-bold">0.99</span></div>
+                    <div class="flex justify-between text-[9px] font-mono text-os-muted font-bold mb-1"><span>Geopolitics / Friction</span><span id="cfg-val-geo" class="text-[#ff1e38] font-bold">0.99</span></div>
                     <input type="range" min="0" max="1" step="0.01" value="0.99" oninput="document.getElementById('cfg-val-geo').innerText=this.value;">
                 </div>
                 <div>
-                    <div class="flex justify-between text-[9px] font-mono text-[#64748b] mb-1"><span>Credit Spread Beta</span><span id="cfg-val-cred" class="text-[#ffaa00] font-bold">0.88</span></div>
+                    <div class="flex justify-between text-[9px] font-mono text-os-muted font-bold mb-1"><span>Credit Spread Beta</span><span id="cfg-val-cred" class="text-[#ffaa00] font-bold">0.88</span></div>
                     <input type="range" min="0" max="1" step="0.01" value="0.88" oninput="document.getElementById('cfg-val-cred').innerText=this.value;">
                 </div>
             </div>
@@ -1101,30 +1183,30 @@ root@adam-node:~# _</div>
                 <button class="win-btn win-min"></button>
                 <button class="win-btn win-max" onclick="maximizeApp('app-artifact')"></button>
             </div>
-            <div class="text-[11px] font-bold text-[#64748b] uppercase tracking-widest pointer-events-none font-mono">/data/node_explorer.exe</div>
+            <div class="text-[11px] font-bold text-os-muted uppercase tracking-widest pointer-events-none font-mono">/data/node_explorer.exe</div>
             <div class="w-12 text-right">
-                <span class="text-[9px] font-mono border border-theme/50 text-theme bg-theme-glow px-1 rounded transition-colors">DECRYPTED</span>
+                <span class="text-[9px] font-mono font-bold border border-theme/50 text-theme bg-theme-glow px-1 rounded transition-colors">DECRYPTED</span>
             </div>
         </div>
-        <div class="window-content bg-[#0a0d14] flex flex-col p-6 relative">
+        <div class="window-content bg-os-panel flex flex-col p-6 relative">
             <div class="absolute inset-0 opacity-5 pointer-events-none" style="background-image: linear-gradient(0deg, transparent 24%, var(--theme-primary) 25%, var(--theme-primary) 26%, transparent 27%, transparent 74%, var(--theme-primary) 75%, var(--theme-primary) 76%, transparent 77%, transparent), linear-gradient(90deg, transparent 24%, var(--theme-primary) 25%, var(--theme-primary) 26%, transparent 27%, transparent 74%, var(--theme-primary) 75%, var(--theme-primary) 76%, transparent 77%, transparent); background-size: 30px 30px;"></div>
             
-            <div class="flex justify-between items-start mb-4 border-b border-[#1e2532] pb-4 relative z-10">
+            <div class="flex justify-between items-start mb-4 border-b border-os-border pb-4 relative z-10">
                 <div>
-                    <h2 id="artifact-title" class="text-xl font-bold text-white font-sans tracking-tight mb-2">Select a Node</h2>
+                    <h2 id="artifact-title" class="text-xl font-bold text-os-text font-sans tracking-tight mb-2">Select a Node</h2>
                     <div class="flex gap-2">
-                        <span id="artifact-type" class="text-[9px] font-mono px-2 py-0.5 rounded border border-theme text-theme bg-theme-glow transition-colors">--</span>
-                        <span id="artifact-sector" class="text-[9px] font-mono px-2 py-0.5 rounded border border-[#64748b] text-[#cbd5e1] bg-[#1e2532]">--</span>
+                        <span id="artifact-type" class="text-[9px] font-mono px-2 py-0.5 rounded border border-theme font-bold text-theme bg-theme-glow transition-colors">--</span>
+                        <span id="artifact-sector" class="text-[9px] font-mono px-2 py-0.5 rounded border border-os-border font-bold text-os-muted bg-os-window">--</span>
                     </div>
                 </div>
                 <div class="flex flex-col gap-2 text-right">
-                    <button id="artifact-add-btn" class="bg-white text-black font-bold font-mono text-[9px] px-3 py-1.5 rounded hover:bg-gray-200 transition-colors cursor-pointer hidden shadow-theme">ADD TO NEWSLETTER</button>
-                    <span id="artifact-id" class="text-[10px] font-mono text-[#64748b]">ID: --</span>
+                    <button id="artifact-add-btn" class="bg-os-text text-os-bg font-bold font-mono text-[9px] px-3 py-1.5 rounded hover:opacity-80 transition-opacity cursor-pointer hidden shadow-theme">ADD TO NEWSLETTER</button>
+                    <span id="artifact-id" class="text-[10px] font-mono font-bold text-os-muted">ID: --</span>
                 </div>
             </div>
             
-            <div id="artifact-content" class="flex-1 overflow-y-auto font-serif text-[#cbd5e1] text-sm leading-relaxed prose prose-invert prose-sm relative z-10">
-                <div class="flex h-full items-center justify-center text-[#64748b] italic">
+            <div id="artifact-content" class="flex-1 overflow-y-auto font-serif text-os-text text-sm leading-relaxed prose prose-invert prose-sm relative z-10">
+                <div class="flex h-full items-center justify-center text-os-muted italic font-bold">
                     Click any floating particle in the 3D space to decrypt and explore data nodes.
                 </div>
             </div>
@@ -1141,27 +1223,27 @@ root@adam-node:~# _</div>
                 <button class="win-btn win-min"></button>
                 <button class="win-btn win-max" onclick="maximizeApp('app-newsletter')"></button>
             </div>
-            <div class="text-[11px] font-bold text-[#64748b] uppercase tracking-widest pointer-events-none font-mono">/dist/newsletter_compiler</div>
+            <div class="text-[11px] font-bold text-os-muted uppercase tracking-widest pointer-events-none font-mono">/dist/newsletter_compiler</div>
             <div class="w-12"></div>
         </div>
-        <div class="window-content bg-[#010204] flex flex-col md:flex-row h-full">
-            <div class="w-full md:w-64 bg-[#0a0d14] border-r border-[#1e2532] flex flex-col shrink-0">
-                <div class="p-4 border-b border-[#1e2532] bg-[#11151e]">
-                    <h3 class="text-xs font-bold text-white uppercase tracking-widest font-mono">Staged Items</h3>
-                    <p class="text-[10px] text-[#64748b] mt-1">Artifacts queued for export.</p>
+        <div class="window-content bg-os-bg flex flex-col md:flex-row h-full">
+            <div class="w-full md:w-64 bg-os-panel border-r border-os-border flex flex-col shrink-0">
+                <div class="p-4 border-b border-os-border bg-os-window">
+                    <h3 class="text-xs font-bold text-os-text uppercase tracking-widest font-mono">Staged Items</h3>
+                    <p class="text-[10px] text-os-muted font-bold mt-1">Artifacts queued for export.</p>
                 </div>
                 <div id="newsletter-queue" class="flex-1 overflow-y-auto p-3 flex flex-col gap-2">
-                    <div class="text-[10px] text-center text-[#64748b] italic mt-4" id="newsletter-empty">Queue is empty.</div>
+                    <div class="text-[10px] text-center text-os-muted font-bold italic mt-4" id="newsletter-empty">Queue is empty.</div>
                 </div>
-                <div class="p-4 border-t border-[#1e2532] flex flex-col gap-2 bg-[#0a0d14]">
-                    <button onclick="clearNewsletter()" class="w-full border border-[#ff1e38]/50 text-[#ff1e38] hover:bg-[#ff1e38]/10 py-1.5 rounded font-mono text-[10px] transition-colors cursor-pointer">Clear Queue</button>
-                    <button onclick="printNewsletter()" class="w-full bg-theme text-black font-bold py-2 rounded font-mono text-xs hover:bg-white transition-colors glow-theme cursor-pointer shadow-theme">EXPORT TO PDF</button>
+                <div class="p-4 border-t border-os-border flex flex-col gap-2 bg-os-panel">
+                    <button onclick="clearNewsletter()" class="w-full border border-[#ff1e38]/50 text-[#ff1e38] hover:bg-[#ff1e38]/10 py-1.5 rounded font-mono text-[10px] font-bold transition-colors cursor-pointer">Clear Queue</button>
+                    <button onclick="printNewsletter()" class="w-full bg-theme text-white mix-blend-difference font-bold py-2 rounded font-mono text-xs hover:opacity-80 transition-opacity glow-theme cursor-pointer shadow-theme">EXPORT TO PDF</button>
                 </div>
             </div>
             <div class="flex-1 p-6 overflow-y-auto bg-white text-black reader-theme" id="newsletter-preview">
                 <!-- Preview content -->
                 <div class="max-w-2xl mx-auto">
-                    <h1 class="text-3xl font-bold font-sans border-b-2 border-black pb-2 mb-6 uppercase tracking-tight">Executive Intelligence Report</h1>
+                    <h1 class="text-3xl font-bold font-sans border-b-2 border-black pb-2 mb-6 uppercase tracking-tight text-black">Executive Intelligence Report</h1>
                     <p class="text-xs font-mono text-gray-500 mb-8 pb-4 border-b border-gray-200" id="newsletter-date"></p>
                     <div id="newsletter-document-body" class="flex flex-col gap-8">
                         <p class="text-sm italic text-gray-500 text-center">Add artifacts from the 3D Node Explorer to build your report.</p>
@@ -1181,42 +1263,42 @@ root@adam-node:~# _</div>
                 <button class="win-btn win-min"></button>
                 <button class="win-btn win-max" onclick="maximizeApp('app-ai')"></button>
             </div>
-            <div class="text-[11px] font-bold text-[#64748b] uppercase tracking-widest flex items-center gap-2 pointer-events-none font-mono">
+            <div class="text-[11px] font-bold text-os-muted uppercase tracking-widest flex items-center gap-2 pointer-events-none font-mono">
                 <span class="w-1.5 h-1.5 bg-theme rounded-full animate-pulse shadow-theme transition-colors"></span> Adam Co-Pilot
             </div>
             <div class="w-12 text-right pr-2">
-                <span class="text-[9px] font-mono text-theme border border-theme/30 px-1 rounded bg-theme-glow glow-text transition-colors">v55.0</span>
+                <span class="text-[9px] font-mono font-bold text-theme border border-theme/30 px-1 rounded bg-theme-glow glow-text transition-colors">v55.0</span>
             </div>
         </div>
-        <div class="window-content bg-[#0a0d14] flex flex-col relative">
+        <div class="window-content bg-os-panel flex flex-col relative">
             <div id="chatLog" class="flex-1 overflow-y-auto p-4 flex flex-col gap-4 text-sm font-sans z-10 scroll-smooth pb-6">
                 <div class="flex gap-3">
                     <div class="w-7 h-7 rounded border border-theme bg-theme-glow flex items-center justify-center shrink-0 shadow-theme transition-colors">
-                        <span class="text-[10px] font-display font-bold text-theme transition-colors">A</span>
+                        <span class="text-[10px] font-display font-bold text-theme transition-colors" style="filter: invert(var(--os-invert))">A</span>
                     </div>
-                    <div class="glass-panel p-3 border-theme/30 text-[#cbd5e1] max-w-[85%]">
+                    <div class="glass-panel p-3 border-theme/30 text-os-text max-w-[85%] bg-os-window border border-os-border">
                         <p class="text-[9px] font-mono text-theme mb-1 uppercase tracking-widest font-bold transition-colors">Sys_Ready</p>
-                        <p class="m-0 text-xs leading-relaxed">Model parameters synched for <strong>2026.05.06</strong>. VeNRA Strict RLHF Mode Active.<br><br>Loaded Context:<br>- Project Freedom Pause / Islamabad Blink<br>- S&P Record Melt-up (7369+)<br>- Small Language Model Architecture<br><br>Command prompt ready.</p>
+                        <p class="m-0 text-xs leading-relaxed opacity-90">Model parameters synched for <strong>2026.05.06</strong>. VeNRA Strict RLHF Mode Active.<br><br>Loaded Context:<br>- Project Freedom Pause / Islamabad Blink<br>- S&P Record Melt-up (7369+)<br>- Small Language Model Architecture<br><br>Command prompt ready.</p>
                     </div>
                 </div>
             </div>
-            <div class="p-3 border-t border-[#1e2532] bg-[#010204] z-10 shrink-0">
+            <div class="p-3 border-t border-os-border bg-os-bg z-10 shrink-0">
                 <div class="flex gap-2 mb-2 overflow-x-auto scrollbar-hide pb-1">
-                    <button onclick="aiPreset('Analyze Project Freedom Pause')" class="whitespace-nowrap px-2 py-1 bg-[#11151e] border border-[#1e2532] hover:border-theme text-[9px] font-mono rounded text-[#cbd5e1] hover:text-white transition-colors cursor-pointer">Project Freedom</button>
-                    <button onclick="aiPreset('Explain RAG vector database options.')" class="whitespace-nowrap px-2 py-1 bg-[#11151e] border border-[#1e2532] hover:border-[#ffaa00] text-[9px] font-mono rounded text-[#cbd5e1] hover:text-white transition-colors cursor-pointer">RAG Vector DBs</button>
-                    <button onclick="aiPreset('What is the Data Flywheel?')" class="whitespace-nowrap px-2 py-1 bg-[#11151e] border border-[#1e2532] hover:border-[#00fa9a] text-[9px] font-mono rounded text-[#cbd5e1] hover:text-white transition-colors cursor-pointer">Data Flywheel</button>
-                    <button onclick="aiPreset('How is the S&P hitting 7369?')" class="whitespace-nowrap px-2 py-1 bg-[#11151e] border border-[#1e2532] hover:border-[#ff1e38] text-[9px] font-mono rounded text-[#cbd5e1] hover:text-white transition-colors cursor-pointer">SPX Melt-up</button>
+                    <button onclick="aiPreset('Analyze Project Freedom Pause')" class="whitespace-nowrap px-2 py-1 bg-os-window border border-os-border hover:border-theme text-[9px] font-mono font-bold rounded text-os-muted hover:text-os-text transition-colors cursor-pointer">Project Freedom</button>
+                    <button onclick="aiPreset('Explain RAG vector database options.')" class="whitespace-nowrap px-2 py-1 bg-os-window border border-os-border hover:border-[#ffaa00] text-[9px] font-mono font-bold rounded text-os-muted hover:text-os-text transition-colors cursor-pointer">RAG Vector DBs</button>
+                    <button onclick="aiPreset('What is the Data Flywheel?')" class="whitespace-nowrap px-2 py-1 bg-os-window border border-os-border hover:border-[#00fa9a] text-[9px] font-mono font-bold rounded text-os-muted hover:text-os-text transition-colors cursor-pointer">Data Flywheel</button>
+                    <button onclick="aiPreset('How is the S&P hitting 7369?')" class="whitespace-nowrap px-2 py-1 bg-os-window border border-os-border hover:border-[#ff1e38] text-[9px] font-mono font-bold rounded text-os-muted hover:text-os-text transition-colors cursor-pointer">SPX Melt-up</button>
                 </div>
                 <form id="chatForm" class="flex gap-2 relative">
-                    <input type="text" id="aiInput" placeholder="Query models..." class="flex-1 bg-[#0a0d14] border border-[#1e2532] rounded px-3 py-2 text-xs text-white font-mono focus:outline-none focus:border-theme transition-colors shadow-inner" autocomplete="off">
-                    <button type="submit" id="aiRunBtn" class="bg-theme text-black border border-theme hover:bg-white px-4 py-2 rounded font-mono text-xs font-bold transition-all cursor-pointer shadow-theme">EXEC</button>
+                    <input type="text" id="aiInput" placeholder="Query models..." class="flex-1 bg-os-panel border border-os-border rounded px-3 py-2 text-xs text-os-text font-bold font-mono focus:outline-none focus:border-theme transition-colors shadow-inner" autocomplete="off">
+                    <button type="submit" id="aiRunBtn" class="bg-theme text-white mix-blend-difference border border-theme hover:opacity-80 px-4 py-2 rounded font-mono text-xs font-bold transition-all cursor-pointer shadow-theme">EXEC</button>
                 </form>
             </div>
         </div>
     </div>
 
     <!-- Toast Notification Container -->
-    <div id="toastContainer" class="fixed top-10 right-4 z-[10000] flex flex-col gap-2"></div>
+    <div id="toastContainer" class="fixed top-10 right-4 z-[10000] flex flex-col gap-2 pointer-events-none"></div>
 
     <!-- ========================================== -->
     <!-- DOCK                                       -->
@@ -1227,14 +1309,16 @@ root@adam-node:~# _</div>
         <div class="dock-item" onclick="openApp('app-dcf')" data-app="app-dcf" title="DCF Appraisals">📊</div>
         <div class="dock-item" onclick="openApp('app-portfolio')" data-app="app-portfolio" title="Quantum Ledger">⬡</div>
         <div class="dock-item" onclick="openApp('app-geo')" data-app="app-geo" title="Geo-Tac Map">🗺️</div>
-        <div class="w-px h-6 bg-white/10 self-center mx-1"></div>
+        <div class="dock-item" onclick="openApp('app-liquidity')" data-app="app-liquidity" title="Liquidity Monitor">🌊</div>
+        <div class="dock-item" onclick="openApp('app-supply')" data-app="app-supply" title="Supply Chain Map">🚢</div>
+        <div class="w-px h-6 bg-os-text opacity-10 self-center mx-1"></div>
         <div class="dock-item" onclick="openApp('app-network')" data-app="app-network" title="Agent Topology">🕸️</div>
         <div class="dock-item" onclick="openApp('app-syslog')" data-app="app-syslog" title="Trace Monitor">🖥️</div>
         <div class="dock-item" onclick="openApp('app-orderbook')" data-app="app-orderbook" title="L2 Order Book">📉</div>
         <div class="dock-item" onclick="openApp('app-ledger')" data-app="app-ledger" title="System Ledger">💾</div>
         <div class="dock-item" onclick="openApp('app-terminal')" data-app="app-terminal" title="System Terminal">💻</div>
         <div class="dock-item" onclick="openApp('app-config')" data-app="app-config" title="System Config">⚙️</div>
-        <div class="w-px h-6 bg-white/10 self-center mx-1"></div>
+        <div class="w-px h-6 bg-os-text opacity-10 self-center mx-1"></div>
         <div class="dock-item" onclick="openApp('app-newsletter')" data-app="app-newsletter" title="Newsletter Export">📰</div>
         <div class="dock-item" onclick="openApp('app-ai')" data-app="app-ai" title="Adam Co-Pilot">✨</div>
     </div>
@@ -1292,7 +1376,7 @@ root@adam-node:~# _</div>
             let delay = 0;
             messages.forEach((line, i) => {
                 setTimeout(() => {
-                    bootLogs.innerHTML += `<div class="mb-1">> ${line}</div>`;
+                    bootLogs.innerHTML += `<div class="mb-1 font-bold">> ${line}</div>`;
                 }, delay);
                 delay += 150 + Math.random() * 200;
             });
@@ -1308,11 +1392,7 @@ root@adam-node:~# _</div>
         }
 
         function initApps() {
-            Chart.defaults.color = '#64748b';
-            Chart.defaults.font.family = "'JetBrains Mono', monospace";
-            Chart.defaults.plugins.tooltip.backgroundColor = 'rgba(10, 13, 20, 0.95)';
-            Chart.defaults.plugins.tooltip.borderColor = 'rgba(255,255,255,0.1)';
-            Chart.defaults.plugins.tooltip.borderWidth = 1;
+            updateChartColors(); // Sets up initial chart.js defaults based on theme
 
             initBriefingApp();
             initMacroApp();
@@ -1320,6 +1400,8 @@ root@adam-node:~# _</div>
             initDCFApp();
             initPortfolioChart();
             initGeoMap();
+            initLiquidityApp(); // NEW
+            initSupplyApp();    // NEW
             initNetworkApp();
             initSyslogApp();
             initOrderBookApp();
@@ -1332,6 +1414,32 @@ root@adam-node:~# _</div>
                 openApp('app-notepad');
                 setTimeout(() => openApp('app-macro'), 150);
             }, 500); 
+        }
+
+        // Update Chart JS globals based on light/dark mode
+        function updateChartColors() {
+            const isLight = document.body.classList.contains('light-mode');
+            const gridColor = isLight ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.05)';
+            const textColor = isLight ? '#475569' : '#64748b'; // text-os-muted mapping
+            
+            Chart.defaults.color = textColor;
+            Chart.defaults.font.family = "'JetBrains Mono', monospace";
+            Chart.defaults.plugins.tooltip.backgroundColor = isLight ? 'rgba(255, 255, 255, 0.95)' : 'rgba(10, 13, 20, 0.95)';
+            Chart.defaults.plugins.tooltip.titleColor = isLight ? '#0f172a' : '#ffffff';
+            Chart.defaults.plugins.tooltip.bodyColor = isLight ? '#0f172a' : '#ffffff';
+            Chart.defaults.plugins.tooltip.borderColor = gridColor;
+            Chart.defaults.plugins.tooltip.borderWidth = 1;
+
+            for(let key in charts) {
+                if(charts[key]) {
+                    if(charts[key].options.scales) {
+                        if(charts[key].options.scales.x) charts[key].options.scales.x.grid.color = gridColor;
+                        if(charts[key].options.scales.y) charts[key].options.scales.y.grid.color = gridColor;
+                        if(charts[key].options.scales.y1) charts[key].options.scales.y1.grid.color = gridColor;
+                    }
+                    charts[key].update();
+                }
+            }
         }
 
         // --- Window Management ---
@@ -1367,7 +1475,7 @@ root@adam-node:~# _</div>
             document.getElementById(id).style.zIndex = zIndexCounter;
         }
         
-        function openApp(id) {
+        window.openApp = function(id) {
             const win = document.getElementById(id);
             if(!win.classList.contains('active')) {
                 win.classList.add('active');
@@ -1388,18 +1496,18 @@ root@adam-node:~# _</div>
             }
         }
         
-        function closeApp(id) {
+        window.closeApp = function(id) {
             document.getElementById(id).classList.remove('active');
             const dockItem = document.querySelector(`.dock-item[data-app="${id}"]`);
             if(dockItem) dockItem.classList.remove('open');
         }
         
-        function closeAllApps() {
+        window.closeAllApps = function() {
             document.querySelectorAll('.os-window').forEach(w => w.classList.remove('active'));
             document.querySelectorAll('.dock-item').forEach(d => d.classList.remove('open'));
         }
         
-        function maximizeApp(id) {
+        window.maximizeApp = function(id) {
             const win = document.getElementById(id);
             if (win.dataset.maximized === "true") {
                 win.style.width = win.dataset.origW; win.style.height = win.dataset.origH;
@@ -1424,6 +1532,7 @@ root@adam-node:~# _</div>
             if(charts.macro) { charts.macro.resize(); }
             if(charts.gex) { charts.gex.resize(); }
             if(charts.portfolio) { charts.portfolio.resize(); }
+            if(charts.liquidity) { charts.liquidity.resize(); }
         }
 
         // --- Terminal ---
@@ -1436,16 +1545,19 @@ root@adam-node:~# _</div>
                 if(cmd === '') return;
 
                 const themeColor = getComputedStyle(document.body).getPropertyValue('--theme-primary').trim() || '#00e5ff';
-                output.innerHTML += `\n<span style="color:${themeColor}">root@adam-node:~#</span> <span class="text-white">${cmd}</span>\n`;
+                output.innerHTML += `\n<span style="color:${themeColor}">root@adam-node:~#</span> <span class="text-os-text font-bold">${cmd}</span>\n`;
                 
                 if(cmd === 'help') {
-                    output.innerHTML += "AVAILABLE MODULES:\n- status: Get system metrics\n- clear: Purge buffer\n- reboot: Full kernel restart\n- open [app_id]: Launch GUI module (macro, dcf, ai, portfolio, geo, syslog, corr, ledger, config)\n- theme [color]: Update UI (cyan, matrix, crimson, purple, gold)";
+                    output.innerHTML += "AVAILABLE MODULES:\n- status: Get system metrics\n- clear: Purge buffer\n- reboot: Full kernel restart\n- open [app_id]: Launch GUI module (macro, dcf, ai, portfolio, geo, syslog, corr, ledger, config, liquidity, supply)\n- theme [color]: Update UI (cyan, matrix, crimson, purple, gold)\n- toggle_mode: Switch Light/Dark visual mode";
                 } else if(cmd === 'status') {
                     output.innerHTML += "SYSTEM: NOMINAL\nNODES: 1,200 ACTIVE IN 3D SPACE\nUPTIME: 335 DAYS\nOFAC_TUNNEL: ENCRYPTED";
                 } else if(cmd === 'clear') {
                     output.innerHTML = "Adam OS Kernel [Version 55.0.231]\n(c) 2026 Sovereign Systems. All rights reserved.\n";
                 } else if(cmd === 'reboot') {
                     location.reload();
+                } else if(cmd === 'toggle_mode') {
+                    toggleLightMode();
+                    output.innerHTML += "[OK] System Visual Mode Inverted.";
                 } else if(cmd.startsWith('theme ')) {
                     const themeArg = cmd.split(' ')[1];
                     const validThemes = ['cyan', 'matrix', 'crimson', 'purple', 'gold'];
@@ -1460,7 +1572,8 @@ root@adam-node:~# _</div>
                     const map = { 
                         'macro': 'app-macro', 'term': 'app-terminal', 'corr': 'app-corr', 'ai': 'app-ai', 
                         'dcf': 'app-dcf', 'notepad': 'app-notepad', 'briefing': 'app-notepad', 'portfolio': 'app-portfolio',
-                        'geo': 'app-geo', 'syslog': 'app-syslog', 'ledger': 'app-ledger', 'config': 'app-config'
+                        'geo': 'app-geo', 'syslog': 'app-syslog', 'ledger': 'app-ledger', 'config': 'app-config',
+                        'liquidity': 'app-liquidity', 'supply': 'app-supply'
                     };
                     if (map[appName]) {
                         openApp(map[appName]);
@@ -1477,7 +1590,7 @@ root@adam-node:~# _</div>
             }
         };
 
-        // --- Themes ---
+        // --- Themes & Light Mode ---
         function setupContextMenu() {
             const menu = document.getElementById('context-menu');
             document.addEventListener('contextmenu', (e) => {
@@ -1492,11 +1605,23 @@ root@adam-node:~# _</div>
             });
         }
 
-        window.setTheme = function(theme) {
-            document.body.className = `dark theme-${theme}`;
+        window.toggleLightMode = function() {
+            document.body.classList.toggle('light-mode');
+            const isLight = document.body.classList.contains('light-mode');
             
-            const colorMap = { 'cyan': '#00e5ff', 'matrix': '#00fa9a', 'crimson': '#ff1e38', 'purple': '#b53cff', 'gold': '#ffaa00' };
-            const hex = colorMap[theme] || '#00e5ff';
+            // Update charts
+            updateChartColors();
+
+            // Rerender correlation matrix for color overrides
+            initCorrApp();
+            
+            showToast(`Visual Mode: ${isLight ? 'INSTITUTIONAL LIGHT' : 'NEURAL DARK'}`);
+        }
+
+        window.setTheme = function(theme) {
+            document.body.className = document.body.className.replace(/theme-\w+/, `theme-${theme}`);
+            
+            const hex = getHexColor();
             
             if(charts.macro) {
                 charts.macro.data.datasets[1].borderColor = hex;
@@ -1508,25 +1633,27 @@ root@adam-node:~# _</div>
                 charts.portfolio.data.datasets[0].backgroundColor = hex + '60';
                 charts.portfolio.update();
             }
+            if(charts.liquidity) {
+                charts.liquidity.data.datasets[0].borderColor = hex;
+                charts.liquidity.data.datasets[0].backgroundColor = hex + '80';
+                charts.liquidity.update();
+            }
             if(currentTicker) liveUpdateDCF(); 
             
             drawTopologyLines();
             initCorrApp(); // Redraw correlations matrix to update hover UI CSS overrides
-            
-            // Trigger 3D Background Update (Handled implicitly by MutationObserver below, but nice to be explicit)
         }
 
         function getHexColor() {
-            const theme = document.body.className.match(/theme-(\w+)/)?.[1] || 'cyan';
-            const map = { 'cyan': '#00e5ff', 'matrix': '#00fa9a', 'crimson': '#ff1e38', 'purple': '#b53cff', 'gold': '#ffaa00' };
-            return map[theme];
+            // Read from computed style to catch light-mode overrides
+            return getComputedStyle(document.body).getPropertyValue('--theme-primary').trim() || '#00e5ff';
         }
 
         // --- UI Utilities ---
         function showToast(msg) {
             const container = document.getElementById('toastContainer');
             const t = document.createElement('div');
-            t.className = 'bg-theme text-black font-bold font-mono text-[10px] px-4 py-2 shadow-[0_0_15px_var(--theme-glow)] border border-white rounded toast-enter transition-colors';
+            t.className = 'bg-theme text-white mix-blend-difference font-bold font-mono text-[10px] px-4 py-2 shadow-theme border border-transparent rounded toast-enter transition-colors';
             t.innerText = msg;
             container.appendChild(t);
             setTimeout(() => { t.style.opacity = 0; t.style.transition = 'opacity 0.3s'; setTimeout(()=>t.remove(), 300); }, 3000);
@@ -1540,7 +1667,7 @@ root@adam-node:~# _</div>
                     const isBadUp = key==='vix' || key==='brent';
                     const colorClass = data.trend === 'up' ? (isBadUp ? 'text-[#ff1e38]' : 'text-[#00fa9a]') : (isBadUp ? 'text-[#00fa9a]' : 'text-[#ff1e38]');
                     const icon = data.trend === 'up' ? '▲' : '▼';
-                    html += `<span><span class="text-white">${key.toUpperCase()}</span> ${data.value} <span class="${colorClass}">${icon} ${data.change}${data.unit||''}</span></span>`;
+                    html += `<span class="mr-6"><span class="text-os-text">${key.toUpperCase()}</span> ${data.value} <span class="${colorClass}">${icon} ${data.change}${data.unit||''}</span></span>`;
                 });
             }
             tk.innerHTML = html;
@@ -1550,12 +1677,12 @@ root@adam-node:~# _</div>
             if (typeof json != 'string') json = JSON.stringify(json, undefined, 2);
             json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
             return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
-                let cls = 'json-number';
+                let cls = 'text-[#ffaa00] font-bold'; // number
                 if (/^"/.test(match)) {
-                    if (/:$/.test(match)) cls = 'json-key';
-                    else cls = 'json-string';
-                } else if (/true|false/.test(match)) cls = 'json-boolean';
-                else if (/null/.test(match)) cls = 'json-boolean text-[#64748b]';
+                    if (/:$/.test(match)) cls = 'text-theme font-bold'; // key
+                    else cls = 'text-[#00fa9a]'; // string
+                } else if (/true|false/.test(match)) cls = 'text-[#b53cff] font-bold'; // boolean
+                else if (/null/.test(match)) cls = 'text-os-muted';
                 return '<span class="' + cls + '">' + match + '</span>';
             });
         }
@@ -1563,10 +1690,10 @@ root@adam-node:~# _</div>
         // --- App: Document Library / Briefing ---
         window.loadDoc = function(templateId, btn) {
             document.querySelectorAll('#app-notepad .w-64 button').forEach(b => {
-                b.className = "text-left px-3 py-2 rounded text-xs font-mono transition-colors hover:bg-white/5 border border-transparent text-[#cbd5e1]";
+                b.className = "text-left px-3 py-2 rounded text-xs font-mono transition-colors hover:bg-os-window border border-transparent text-os-text font-bold";
             });
             if(btn) {
-                btn.className = "text-left px-3 py-2 rounded text-xs font-mono transition-colors bg-theme-glow border border-theme text-theme";
+                btn.className = "text-left px-3 py-2 rounded text-xs font-mono font-bold transition-colors bg-theme-glow border border-theme text-theme shadow-sm";
             }
             const mdContent = document.getElementById(templateId).innerHTML;
             document.getElementById('briefing-content').innerHTML = marked.parse(mdContent);
@@ -1582,11 +1709,11 @@ root@adam-node:~# _</div>
             let html = '';
             payload.ledger.forEach(row => {
                 html += `
-                    <tr class="hover:bg-white/5 transition-colors">
-                        <td class="font-bold text-white">${row.variable}</td>
-                        <td class="text-theme font-mono transition-colors">${row.value}</td>
-                        <td class="text-[#cbd5e1]"><span class="bg-[#1e2532] px-2 py-0.5 rounded text-[9px]">${row.target}</span></td>
-                        <td class="text-[#64748b] italic">${row.context}</td>
+                    <tr class="hover:bg-os-window transition-colors">
+                        <td class="font-bold text-os-text">${row.variable}</td>
+                        <td class="text-theme font-mono font-bold transition-colors">${row.value}</td>
+                        <td class="text-os-text"><span class="bg-os-bg border border-os-border px-2 py-0.5 rounded text-[9px] font-bold">${row.target}</span></td>
+                        <td class="text-os-muted italic">${row.context}</td>
                     </tr>
                 `;
             });
@@ -1628,10 +1755,10 @@ root@adam-node:~# _</div>
                 const colorClass = data.trend === 'up' ? (isBadUp ? 'text-[#ff1e38]' : 'text-[#00fa9a]') : (isBadUp ? 'text-[#00fa9a]' : 'text-[#ff1e38]');
                 const sign = data.trend === 'up' ? '+' : '';
                 kpiHtml += `
-                    <div class="glass-panel p-3 border-b-2 border-white/10">
-                        <div class="text-[9px] text-[#64748b] mb-1 font-mono uppercase truncate">${key.replace('_', ' ')}</div>
-                        <div class="text-lg font-bold text-white font-display">${data.value}${data.unit||''}</div>
-                        <div class="text-[9px] ${colorClass} mt-1 font-mono">${sign}${data.change}${data.unit||''}</div>
+                    <div class="glass-panel bg-os-window p-3 border-b-4 border-theme/20 shadow-sm">
+                        <div class="text-[9px] text-os-muted mb-1 font-mono font-bold uppercase truncate">${key.replace('_', ' ')}</div>
+                        <div class="text-lg font-bold text-os-text font-display">${data.value}${data.unit||''}</div>
+                        <div class="text-[9px] ${colorClass} font-bold mt-1 font-mono">${sign}${data.change}${data.unit||''}</div>
                     </div>`;
             }
             kpiGrid.innerHTML = kpiHtml;
@@ -1652,8 +1779,8 @@ root@adam-node:~# _</div>
                     responsive: true, maintainAspectRatio: false, 
                     plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: {size: 10} } } }, 
                     scales: { 
-                        x: { grid: { color: 'rgba(255,255,255,0.05)' } }, 
-                        y: { grid: { color: 'rgba(255,255,255,0.05)' }, min: 0, max: 100 }
+                        x: { grid: { color: Chart.defaults.borderColor } }, 
+                        y: { grid: { color: Chart.defaults.borderColor }, min: 0, max: 100 }
                     } 
                 }
             });
@@ -1669,7 +1796,7 @@ root@adam-node:~# _</div>
                     labels: strikes,
                     datasets: [{ data: gex, backgroundColor: gex.map(v => v>0?getHexColor():'#ff1e38'), borderRadius: 2 }]
                 },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false } }, y: { grid: { color: 'rgba(255,255,255,0.05)' } } } }
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false } }, y: { grid: { color: Chart.defaults.borderColor } } } }
             });
 
             // Whalescanner
@@ -1678,11 +1805,11 @@ root@adam-node:~# _</div>
             payload.whalescanner.forEach(w => {
                 const color = w.sentiment === 'bullish' ? 'text-[#00fa9a]' : 'text-[#ff1e38]';
                 wHtml += `
-                    <tr class="border-b border-[#1e2532] hover:bg-white/5 transition-colors">
-                        <td class="py-1 text-[#64748b]">${w.time}</td>
-                        <td class="py-1 font-bold text-white">${w.ticker}</td>
-                        <td class="py-1"><span class="text-[#cbd5e1] bg-[#1e2532] rounded px-1.5 py-0.5 text-[8px]">${w.type}</span></td>
-                        <td class="py-1 text-right font-bold ${color}">${w.prem}</td>
+                    <tr class="border-b border-os-border hover:bg-os-bg transition-colors">
+                        <td class="py-1.5 text-os-muted font-bold">${w.time}</td>
+                        <td class="py-1.5 font-bold text-os-text">${w.ticker}</td>
+                        <td class="py-1.5"><span class="text-os-text bg-os-bg border border-os-border rounded px-1.5 py-0.5 text-[8px] font-bold">${w.type}</span></td>
+                        <td class="py-1.5 text-right font-bold ${color}">${w.prem}</td>
                     </tr>
                 `;
             });
@@ -1698,25 +1825,21 @@ root@adam-node:~# _</div>
             
             function hexToRgb(hex) {
                 var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-                return result ? {
-                    r: parseInt(result[1], 16),
-                    g: parseInt(result[2], 16),
-                    b: parseInt(result[3], 16)
-                } : {r: 0, g:229, b:255};
+                return result ? { r: parseInt(result[1], 16), g: parseInt(result[2], 16), b: parseInt(result[3], 16) } : {r: 0, g:229, b:255};
             }
             const themeRgb = hexToRgb(themeColorHex);
 
             let head = `<div class="flex"><div class="w-12 h-6"></div>`;
-            assets.forEach(a => head += `<div class="flex-1 text-center text-[8px] font-mono text-[#64748b]">${a}</div>`);
+            assets.forEach(a => head += `<div class="flex-1 text-center text-[8px] font-mono font-bold text-os-muted">${a}</div>`);
             head += `</div>`;
             container.innerHTML = head;
 
             matrix.forEach((row, i) => {
-                let rowHtml = `<div class="flex items-center"><div class="w-12 text-[8px] font-mono text-[#64748b]">${assets[i]}</div>`;
+                let rowHtml = `<div class="flex items-center"><div class="w-12 text-[8px] font-bold font-mono text-os-muted">${assets[i]}</div>`;
                 row.forEach(val => {
                     const alpha = Math.abs(val).toFixed(2);
                     const color = val > 0 ? `rgba(${themeRgb.r}, ${themeRgb.g}, ${themeRgb.b}, ${alpha})` : `rgba(255, 30, 56, ${alpha})`;
-                    rowHtml += `<div class="corr-cell flex-1 border border-[#1e2532]" style="background:${color}" data-val="${val}"></div>`;
+                    rowHtml += `<div class="corr-cell flex-1 border border-os-border" style="background:${color}" data-val="${val}"></div>`;
                 });
                 rowHtml += `</div>`;
                 container.innerHTML += rowHtml;
@@ -1728,7 +1851,7 @@ root@adam-node:~# _</div>
             const list = document.getElementById('dcf-ticker-list');
             let html = '';
             payload.universe.forEach((co, idx) => {
-                html += `<button id="tick-btn-${co.ticker}" class="text-left px-3 py-2 rounded-md text-xs font-mono transition-colors text-[#cbd5e1] hover:bg-white/5 border border-transparent dcf-tab" onclick="loadDCFData('${co.ticker}')">${co.ticker} - ${co.name}</button>`;
+                html += `<button id="tick-btn-${co.ticker}" class="text-left px-3 py-2 rounded-md text-xs font-mono font-bold transition-colors text-os-text hover:bg-os-bg border border-transparent dcf-tab" onclick="loadDCFData('${co.ticker}')">${co.ticker} - ${co.name}</button>`;
             });
             list.innerHTML = html;
             if(payload.universe.length > 0) loadDCFData(payload.universe[0].ticker);
@@ -1737,11 +1860,11 @@ root@adam-node:~# _</div>
         window.loadDCFData = function(ticker) {
             currentTicker = ticker;
             document.querySelectorAll('.dcf-tab').forEach(btn => {
-                btn.className = "text-left px-3 py-2 rounded-md text-xs font-mono transition-colors text-[#cbd5e1] hover:bg-white/5 border border-transparent dcf-tab";
+                btn.className = "text-left px-3 py-2 rounded-md text-xs font-mono font-bold transition-colors text-os-text hover:bg-os-bg border border-transparent dcf-tab";
             });
             const activeBtn = document.getElementById(`tick-btn-${ticker}`);
             if(activeBtn) {
-                activeBtn.className = "text-left px-3 py-2 rounded-md text-xs font-mono transition-colors bg-theme-glow text-theme border border-theme dcf-tab";
+                activeBtn.className = "text-left px-3 py-2 rounded-md text-xs font-mono font-bold transition-colors bg-theme-glow text-theme border border-theme dcf-tab shadow-sm";
             }
 
             const co = payload.universe.find(c => c.ticker === ticker);
@@ -1762,7 +1885,7 @@ root@adam-node:~# _</div>
             currentScenario = scen;
             ['base', 'bull', 'bear'].forEach(s => {
                 const btn = document.getElementById(`btn-scen-${s}`);
-                if(btn) btn.className = `flex-1 py-1.5 text-[9px] font-bold rounded transition-all ${s===scen ? 'bg-[#010204] text-white shadow-sm' : 'text-[#64748b] hover:text-white'}`;
+                if(btn) btn.className = `flex-1 py-1.5 text-[9px] font-bold rounded transition-all ${s===scen ? 'bg-os-panel text-os-text shadow-sm' : 'text-os-muted hover:text-os-text'}`;
             });
             const co = payload.universe.find(c => c.ticker === currentTicker);
             document.getElementById('slider-wacc').value = co.scenarios[scen].wacc;
@@ -1818,42 +1941,42 @@ root@adam-node:~# _</div>
                 upsideEl.innerText = "Math Paradox";
                 upsideEl.className = "text-[10px] font-mono font-bold mt-1 text-[#ff1e38]";
                 boxEl.className = "bg-[rgba(255,30,56,0.05)] border border-[#ff1e38] rounded-lg p-3 text-right min-w-[140px] shadow-[inset_0_0_20px_rgba(255,30,56,0.1)] transition-all duration-300";
-                labelEl.className = "text-[9px] font-mono text-[#ff1e38] uppercase mb-1";
+                labelEl.className = "text-[9px] font-mono text-[#ff1e38] font-bold uppercase mb-1";
             } else {
                 priceEl.innerText = `$${impliedPrice.toFixed(2)}`;
                 const upsidePct = ((impliedPrice - co.price) / co.price) * 100;
                 if (upsidePct >= 0) {
-                    priceEl.className = "text-2xl font-bold font-mono text-white glow-text";
+                    priceEl.className = "text-2xl font-bold font-mono text-os-text glow-text";
                     upsideEl.className = "text-[10px] font-mono font-bold mt-1 text-[#00fa9a]";
                     upsideEl.innerText = `+${upsidePct.toFixed(1)}% vs Mkt`;
                     boxEl.className = "bg-theme-glow border border-theme rounded-lg p-3 text-right min-w-[140px] shadow-theme transition-all duration-300";
-                    labelEl.className = "text-[9px] font-mono text-theme uppercase mb-1 transition-colors";
+                    labelEl.className = "text-[9px] font-mono text-theme font-bold uppercase mb-1 transition-colors";
                 } else {
-                    priceEl.className = "text-2xl font-bold font-mono text-white";
+                    priceEl.className = "text-2xl font-bold font-mono text-os-text";
                     upsideEl.className = "text-[10px] font-mono font-bold mt-1 text-[#ff1e38]";
                     upsideEl.innerText = `${upsidePct.toFixed(1)}% vs Mkt`;
-                    boxEl.className = "bg-[#0a0d14] border border-[#1e2532] rounded-lg p-3 text-right min-w-[140px] transition-all duration-300";
-                    labelEl.className = "text-[9px] font-mono text-[#64748b] uppercase mb-1 transition-colors";
+                    boxEl.className = "bg-os-window border border-os-border rounded-lg p-3 text-right min-w-[140px] transition-all duration-300";
+                    labelEl.className = "text-[9px] font-mono text-os-muted font-bold uppercase mb-1 transition-colors";
                 }
             }
 
             const metrics = [
                 {name: 'Revenue', key: 'rev', format: ''},
-                {name: 'YoY Growth', key: 'rev_g', format: '%', color: 'text-[#64748b]'},
+                {name: 'YoY Growth', key: 'rev_g', format: '%', color: 'text-os-muted'},
                 {name: 'EBIT Margin', key: 'ebit_m', format: '%'},
-                {name: 'CapEx', key: 'capex', format: '', color: 'text-[#ff1e38]'},
+                {name: 'CapEx', key: 'capex', format: '', color: 'text-[#ff1e38] font-bold'},
                 {name: 'Unlevered FCF', isFcf: true, format: '', color: 'text-theme font-bold bg-theme-glow'}
             ];
             
             let tableHtml = '';
             metrics.forEach(m => {
-                tableHtml += `<tr class="${m.isFcf ? 'bg-theme-glow' : ''} transition-colors">`;
-                tableHtml += `<td class="font-bold ${m.color || 'text-white'} transition-colors">${m.name}</td>`;
+                tableHtml += `<tr class="${m.isFcf ? 'bg-theme-glow' : ''} transition-colors hover:bg-os-window">`;
+                tableHtml += `<td class="font-bold ${m.color || 'text-os-text'} transition-colors">${m.name}</td>`;
                 scenData.projections.forEach((p, idx) => {
                     let val = p[m.key];
                     if (m.isFcf) val = fcfArray[idx];
                     if (m.name === 'CapEx') val = -val;
-                    tableHtml += `<td class="text-right ${m.color || 'text-[#cbd5e1]'}">${val.toFixed(1)}${m.format}</td>`;
+                    tableHtml += `<td class="text-right ${m.color || 'text-os-text'} font-bold">${val.toFixed(1)}${m.format}</td>`;
                 });
                 tableHtml += `</tr>`;
             });
@@ -1866,7 +1989,7 @@ root@adam-node:~# _</div>
                 const isNeg = val < 0;
                 wfHtml += `
                     <div class="dcf-col">
-                        <div class="dcf-val" style="top: ${isNeg ? 'auto' : `-${height+20}px`}; bottom: ${isNeg ? `-${height+25}px` : 'auto'}; color: ${isNeg ? '#ff1e38':'#fff'}">${val.toFixed(1)}</div>
+                        <div class="dcf-val" style="top: ${isNeg ? 'auto' : `-${height+20}px`}; bottom: ${isNeg ? `-${height+25}px` : 'auto'}; color: ${isNeg ? '#ff1e38':'var(--os-text)'}">${val.toFixed(1)}</div>
                         <div class="${isNeg ? 'dcf-bar-neg' : 'dcf-bar-pos'}" style="height: ${height}%"></div>
                         <div class="dcf-label" style="bottom: ${isNeg ? `-${height+40}px` : '-22px'}">FY${26+i}</div>
                     </div>
@@ -1882,16 +2005,16 @@ root@adam-node:~# _</div>
             const tgSteps = [0.005, 0, -0.005]; 
             
             let html = `<div class="sens-header"></div>`;
-            waccSteps.forEach(w => { html += `<div class="sens-header">${((baseWacc+w)*100).toFixed(1)}%</div>`; });
+            waccSteps.forEach(w => { html += `<div class="sens-header font-bold">${((baseWacc+w)*100).toFixed(1)}%</div>`; });
             
             tgSteps.forEach(t => {
-                html += `<div class="sens-header">${((baseTg+t)*100).toFixed(1)}%</div>`;
+                html += `<div class="sens-header font-bold">${((baseTg+t)*100).toFixed(1)}%</div>`;
                 waccSteps.forEach(w => {
                     const testWacc = baseWacc + w;
                     const testTg = baseTg + t;
                     let priceStr = "ERR";
-                    let bgColor = "bg-[#1e2532]";
-                    let txtColor = "text-[#cbd5e1]";
+                    let bgColor = "bg-os-window";
+                    let txtColor = "text-os-text";
 
                     if (testWacc > testTg) {
                         let npv = 0;
@@ -1906,7 +2029,7 @@ root@adam-node:~# _</div>
                         
                         if (w===0 && t===0) { bgColor = "bg-theme-glow"; txtColor = "text-theme"; priceStr = "[" + priceStr + "]"; }
                     }
-                    html += `<div class="sens-cell ${bgColor} ${txtColor} transition-colors">${priceStr}</div>`;
+                    html += `<div class="sens-cell border border-transparent hover:border-os-text ${bgColor} ${txtColor} transition-colors">${priceStr}</div>`;
                 });
             });
             document.getElementById('sens-matrix').innerHTML = html;
@@ -1948,12 +2071,201 @@ root@adam-node:~# _</div>
                         }
                     },
                     scales: {
-                        x: { title: { display: true, text: 'Volatility Risk', color: '#64748b' }, grid: { color: 'rgba(255,255,255,0.05)' }, min: 0, max: 100 },
-                        y: { title: { display: true, text: 'Upside Reward', color: '#64748b' }, grid: { color: 'rgba(255,255,255,0.05)' }, min: 0, max: 100 }
+                        x: { title: { display: true, text: 'Volatility Risk' }, min: 0, max: 100 },
+                        y: { title: { display: true, text: 'Upside Reward' }, min: 0, max: 100 }
                     }
                 }
             });
         }
+
+        // --- NEW APP: Liquidity Monitor ---
+        function initLiquidityApp() {
+            const ctx = document.getElementById('liquidityChartCanvas');
+            if(!ctx) return;
+            
+            if(charts.liquidity) charts.liquidity.destroy();
+            charts.liquidity = new Chart(ctx.getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: payload.liquidity.dates,
+                    datasets: [
+                        {
+                            type: 'bar',
+                            label: 'Central Bank Reserves ($T)',
+                            data: payload.liquidity.reserves,
+                            backgroundColor: getHexColor() + '80',
+                            borderColor: getHexColor(),
+                            borderWidth: 1,
+                            yAxisID: 'y'
+                        },
+                        {
+                            type: 'line',
+                            label: 'S&P 500 Index',
+                            data: payload.liquidity.spx,
+                            borderColor: '#ffaa00',
+                            backgroundColor: '#ffaa00',
+                            borderWidth: 2,
+                            pointRadius: 4,
+                            yAxisID: 'y1',
+                            tension: 0.3
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    scales: {
+                        x: { grid: { display: false } },
+                        y: { 
+                            type: 'linear', display: true, position: 'left',
+                            title: { display: true, text: 'Reserves ($T)' },
+                            min: 2.8, max: 4.0
+                        },
+                        y1: {
+                            type: 'linear', display: true, position: 'right',
+                            title: { display: true, text: 'SPX Level' },
+                            grid: { drawOnChartArea: false } // only want grid lines for one axis
+                        }
+                    }
+                }
+            });
+        }
+
+        // --- NEW APP: Supply Chain Map (Canvas Flow) ---
+        function initSupplyApp() {
+            const canvas = document.getElementById('supplyCanvas');
+            if(!canvas) return;
+            const ctx = canvas.getContext('2d');
+            
+            function resize() {
+                canvas.width = canvas.parentElement.clientWidth;
+                canvas.height = canvas.parentElement.clientHeight;
+            }
+            window.addEventListener('resize', resize); resize();
+
+            // Setup Nodes (Logistics Hubs)
+            const hubs = [
+                { id: 'US', x: 0.15, y: 0.4, label: 'US GULF', cap: 100, flow: 100, color: '#00e5ff' },
+                { id: 'EU', x: 0.45, y: 0.3, label: 'ROTTERDAM', cap: 100, flow: 85, color: '#00e5ff' },
+                { id: 'SUEZ', x: 0.55, y: 0.45, label: 'SUEZ CANAL', cap: 100, flow: 60, color: '#ffaa00' },
+                { id: 'RED_SEA', x: 0.58, y: 0.55, label: 'RED SEA', cap: 100, flow: 60, color: '#ffaa00' },
+                { id: 'HORMUZ', x: 0.65, y: 0.48, label: 'HORMUZ', cap: 100, flow: 5, color: '#ff1e38' }, // Blockade point
+                { id: 'GULF', x: 0.7, y: 0.42, label: 'PERSIAN GULF', cap: 100, flow: 100, color: '#00e5ff' },
+                { id: 'ASIA', x: 0.85, y: 0.5, label: 'APAC HUB', cap: 100, flow: 40, color: '#00e5ff' }
+            ];
+
+            // Routes
+            const routes = [
+                { from: 'GULF', to: 'HORMUZ' },
+                { from: 'HORMUZ', to: 'ASIA' },
+                { from: 'HORMUZ', to: 'RED_SEA' },
+                { from: 'RED_SEA', to: 'SUEZ' },
+                { from: 'SUEZ', to: 'EU' },
+                { from: 'US', to: 'EU' }
+            ];
+
+            let flowOffset = 0;
+
+            function draw() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                flowOffset -= 0.5; // Flow animation speed
+
+                // Draw Connections
+                routes.forEach(r => {
+                    const n1 = hubs.find(h => h.id === r.from);
+                    const n2 = hubs.find(h => h.id === r.to);
+                    
+                    const x1 = n1.x * canvas.width;
+                    const y1 = n1.y * canvas.height;
+                    const x2 = n2.x * canvas.width;
+                    const y2 = n2.y * canvas.height;
+
+                    // Determine flow state based on the bottleneck (Hormuz)
+                    let isActive = true;
+                    if(r.from === 'HORMUZ' || r.to === 'HORMUZ') isActive = false;
+
+                    // Base line
+                    ctx.beginPath();
+                    ctx.moveTo(x1, y1);
+                    // Add slight curve
+                    ctx.quadraticCurveTo(x1, y2, x2, y2);
+                    ctx.strokeStyle = '#1e2532';
+                    ctx.lineWidth = 4;
+                    ctx.stroke();
+
+                    // Flowing dashed line
+                    ctx.beginPath();
+                    ctx.moveTo(x1, y1);
+                    ctx.quadraticCurveTo(x1, y2, x2, y2);
+                    
+                    if(isActive) {
+                        ctx.strokeStyle = '#00fa9a'; // Green flowing
+                        ctx.lineWidth = 2;
+                        ctx.setLineDash([10, 10]);
+                        ctx.lineDashOffset = flowOffset;
+                        ctx.stroke();
+                    } else {
+                        ctx.strokeStyle = '#ff1e38'; // Red jammed
+                        ctx.lineWidth = 2;
+                        ctx.setLineDash([2, 5]);
+                        ctx.lineDashOffset = 0; // static
+                        ctx.stroke();
+                    }
+                    ctx.setLineDash([]); // Reset
+                });
+
+                // Draw Nodes
+                hubs.forEach(h => {
+                    const cx = h.x * canvas.width;
+                    const cy = h.y * canvas.height;
+
+                    // Draw capacity circle background
+                    ctx.beginPath();
+                    ctx.arc(cx, cy, 18, 0, Math.PI * 2);
+                    ctx.fillStyle = '#0a0d14';
+                    ctx.fill();
+                    ctx.lineWidth = 1;
+                    ctx.strokeStyle = '#1e2532';
+                    ctx.stroke();
+
+                    // Draw actual flow
+                    const pct = h.flow / h.cap;
+                    ctx.beginPath();
+                    ctx.arc(cx, cy, 14, 0, Math.PI * 2 * pct);
+                    ctx.lineTo(cx, cy);
+                    ctx.fillStyle = h.color;
+                    ctx.fill();
+
+                    // Node Label
+                    ctx.fillStyle = '#fff';
+                    ctx.font = 'bold 9px "JetBrains Mono"';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(h.label, cx, cy - 25);
+                    
+                    // Metrics box
+                    ctx.fillStyle = '#11151e';
+                    ctx.fillRect(cx - 20, cy + 22, 40, 14);
+                    ctx.strokeStyle = h.color;
+                    ctx.strokeRect(cx - 20, cy + 22, 40, 14);
+                    ctx.fillStyle = h.color;
+                    ctx.fillText(`${h.flow}%`, cx, cy + 32);
+
+                    // Pulse effect for critical nodes
+                    if(h.id === 'HORMUZ') {
+                        ctx.beginPath();
+                        ctx.arc(cx, cy, 18 + Math.abs(Math.sin(flowOffset/10))*10, 0, Math.PI * 2);
+                        ctx.strokeStyle = `rgba(255, 30, 56, ${Math.abs(Math.cos(flowOffset/10))})`;
+                        ctx.stroke();
+                    }
+                });
+
+                if(window.activeAnimSupply) requestAnimationFrame(draw);
+            }
+
+            if(window.activeAnimSupply) cancelAnimationFrame(window.activeAnimSupply);
+            window.activeAnimSupply = requestAnimationFrame(draw);
+        }
+
 
         // --- App: Geo-Tactical Map ---
         function initGeoMap() {
@@ -1967,6 +2279,23 @@ root@adam-node:~# _</div>
             }
             window.addEventListener('resize', resize); resize();
 
+            // Procedural stylized world map points (very rough approx for a terminal look)
+            const mapDots = [];
+            for(let x=0; x<1; x+=0.02) {
+                for(let y=0; y<1; y+=0.03) {
+                    // North America rough
+                    if(x>0.1 && x<0.35 && y>0.1 && y<0.4) { if(Math.random()>0.3) mapDots.push({x,y}); }
+                    // South America
+                    if(x>0.2 && x<0.35 && y>0.4 && y<0.8) { if(Math.random()>0.4) mapDots.push({x,y}); }
+                    // Europe / Africa
+                    if(x>0.45 && x<0.65 && y>0.15 && y<0.75) { if(Math.random()>0.3) mapDots.push({x,y}); }
+                    // Asia
+                    if(x>0.65 && x<0.95 && y>0.1 && y<0.5) { if(Math.random()>0.3) mapDots.push({x,y}); }
+                    // Australia
+                    if(x>0.8 && x<0.95 && y>0.6 && y<0.8) { if(Math.random()>0.5) mapDots.push({x,y}); }
+                }
+            }
+
             const nodes = [
                 {x: 0.65, y: 0.45, type: 'critical', pulse: 0}, // Middle East
                 {x: 0.50, y: 0.35, type: 'elevated', pulse: 0}, // EU/Red Sea
@@ -1975,13 +2304,51 @@ root@adam-node:~# _</div>
                 {x: 0.15, y: 0.40, type: 'normal', pulse: 0}    // US West
             ];
 
+            let sweepAngle = 0;
+
             function draw() {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 
+                // Draw dotted map background
+                ctx.fillStyle = 'rgba(100, 116, 139, 0.2)'; // Muted gray for map
+                mapDots.forEach(d => {
+                    ctx.fillRect(d.x * canvas.width, d.y * canvas.height, 2, 2);
+                });
+
+                // Radar Sweep
+                sweepAngle += 0.02;
+                const cx = canvas.width/2;
+                const cy = canvas.height/2;
+                const r = Math.max(cx, cy) * 1.5;
+                
+                ctx.save();
+                ctx.translate(cx, cy);
+                ctx.rotate(sweepAngle);
+                
+                const grad = ctx.createLinearGradient(0,0, r,0);
+                grad.addColorStop(0, 'rgba(0,229,255,0.0)');
+                grad.addColorStop(0.9, 'rgba(0,229,255,0.1)');
+                grad.addColorStop(1, 'rgba(0,229,255,0.4)');
+                
+                ctx.beginPath();
+                ctx.moveTo(0,0);
+                ctx.arc(0,0, r, 0, 0.2);
+                ctx.lineTo(0,0);
+                ctx.fillStyle = grad;
+                ctx.fill();
+                
+                ctx.beginPath();
+                ctx.moveTo(0,0);
+                ctx.lineTo(r * Math.cos(0.2), r * Math.sin(0.2));
+                ctx.strokeStyle = 'rgba(0,229,255,0.8)';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+                ctx.restore();
+
+
                 // Draw Connections
                 const themeColor = getHexColor() || '#00e5ff';
-                
-                ctx.strokeStyle = themeColor + '20';
+                ctx.strokeStyle = themeColor + '30'; // Increased visibility
                 ctx.lineWidth = 1;
                 ctx.beginPath();
                 nodes.forEach((n1, i) => {
@@ -2000,8 +2367,8 @@ root@adam-node:~# _</div>
 
                 // Draw Nodes
                 nodes.forEach(n => {
-                    const cx = n.x * canvas.width;
-                    const cy = n.y * canvas.height;
+                    const nx = n.x * canvas.width;
+                    const ny = n.y * canvas.height;
                     
                     n.pulse += 0.05;
                     const pR = 4 + Math.sin(n.pulse) * 3;
@@ -2012,15 +2379,15 @@ root@adam-node:~# _</div>
                     else if(n.type === 'elevated') { color = '#ffaa00'; shadow = 10; }
 
                     ctx.beginPath();
-                    ctx.arc(cx, cy, pR, 0, Math.PI*2);
+                    ctx.arc(nx, ny, pR, 0, Math.PI*2);
                     ctx.fillStyle = color;
                     ctx.shadowColor = color;
                     ctx.shadowBlur = shadow;
                     ctx.fill();
                     
                     ctx.beginPath();
-                    ctx.arc(cx, cy, pR + 5, 0, Math.PI*2);
-                    ctx.strokeStyle = color + '40';
+                    ctx.arc(nx, ny, pR + 5, 0, Math.PI*2);
+                    ctx.strokeStyle = color + '80'; // brighter rings
                     ctx.lineWidth = 1;
                     ctx.stroke();
                 });
@@ -2034,12 +2401,12 @@ root@adam-node:~# _</div>
         // --- App: Syslog Trace Monitor ---
         function getEventStyles(type) {
             switch(type) {
-                case 'ANOMALY_DETECTED': return 'bg-[#ff1e38]/10 text-[#ff1e38] border-[#ff1e38]/20';
-                case 'TASK_COMPLETE': return 'bg-[#00fa9a]/10 text-[#00fa9a] border-[#00fa9a]/20';
-                case 'TASK_START': return 'bg-[#00e5ff]/10 text-[#00e5ff] border-[#00e5ff]/20';
-                case 'INTER_AGENT_COMM': return 'bg-[#b53cff]/10 text-[#b53cff] border-[#b53cff]/20';
-                case 'KNOWLEDGE_GRAPH_UPDATE': return 'bg-[#ffaa00]/10 text-[#ffaa00] border-[#ffaa00]/20';
-                case 'THOUGHT_TRACE': return 'bg-[#64748b]/10 text-[#64748b] border-[#64748b]/20';
+                case 'ANOMALY_DETECTED': return 'bg-[#ff1e38]/10 text-[#ff1e38] border-[#ff1e38]/30';
+                case 'TASK_COMPLETE': return 'bg-[#00fa9a]/10 text-[#00fa9a] border-[#00fa9a]/30';
+                case 'TASK_START': return 'bg-[#00e5ff]/10 text-[#00e5ff] border-[#00e5ff]/30';
+                case 'INTER_AGENT_COMM': return 'bg-[#b53cff]/10 text-[#b53cff] border-[#b53cff]/30';
+                case 'KNOWLEDGE_GRAPH_UPDATE': return 'bg-[#ffaa00]/10 text-[#ffaa00] border-[#ffaa00]/30';
+                case 'THOUGHT_TRACE': return 'bg-os-window text-os-text border-os-border';
                 case 'SYSTEM_BOOT': return 'bg-theme-glow text-theme border-theme border-opacity-30';
                 default: return 'bg-theme-glow text-theme border-theme border-opacity-20';
             }
@@ -2049,18 +2416,18 @@ root@adam-node:~# _</div>
             if (item.event_type === 'ANOMALY_DETECTED') {
                 return `<span class="text-[#ff1e38] font-bold">[${item.details.severity}]</span> ${item.details.description}`;
             } else if (item.event_type === 'TASK_COMPLETE') {
-                const recClass = item.details.output?.recommendation === 'BUY' ? 'text-[#00fa9a]' : (item.details.output?.recommendation === 'SELL' ? 'text-[#ff1e38]' : (item.details.output?.recommendation ? 'text-theme' : 'text-[#cbd5e1]'));
+                const recClass = item.details.output?.recommendation === 'BUY' ? 'text-[#00fa9a]' : (item.details.output?.recommendation === 'SELL' ? 'text-[#ff1e38]' : (item.details.output?.recommendation ? 'text-theme' : 'text-os-text'));
                 return `Action: <span class="font-bold ${recClass}">${item.details.output?.recommendation || 'COMPLETED'}</span>`;
             } else if (item.event_type === 'KNOWLEDGE_GRAPH_UPDATE') {
-                return `<span class="text-[#cbd5e1]">${item.details.action}</span> node: <span class="text-white">${item.details.node}</span>`;
+                return `<span class="text-os-muted">${item.details.action}</span> node: <span class="text-os-text font-bold">${item.details.node}</span>`;
             } else if (item.event_type === 'INTER_AGENT_COMM') {
                 return `To <span class="text-theme font-bold">${item.details.receiver_id}</span>: ${item.details.payload_summary}`;
             } else if (item.event_type === 'THOUGHT_TRACE') {
-                return `Conf ${(item.details.confidence*100).toFixed(0) || '--'}%: <span class="text-[#cbd5e1]">${item.details.content}</span>`;
+                return `Conf ${(item.details.confidence*100).toFixed(0) || '--'}%: <span class="text-os-muted">${item.details.content}</span>`;
             } else if (item.event_type === 'SYSTEM_BOOT') {
-                return `Core protocol active. Ver: ${item.details.version}`;
+                return `Core protocol active. Ver: <span class="font-bold">${item.details.version}</span>`;
             }
-            return '<span class="text-[#64748b]">System Event</span>';
+            return '<span class="text-os-muted">System Event</span>';
         }
 
         let syslogData = [];
@@ -2131,24 +2498,24 @@ root@adam-node:~# _</div>
                     const timeStr = item.timestamp.split('T')[1].substring(0,8);
                     const tr = document.createElement('tr');
                     tr.id = `trace-${item.event_id}`;
-                    tr.className = "cursor-pointer hover:bg-[#11151e] transition-colors border-b border-[#1e2532] text-[10px] font-mono";
+                    tr.className = "cursor-pointer hover:bg-os-window transition-colors border-b border-os-border text-[10px] font-mono";
                     tr.onclick = () => toggleSyslogRow(item.event_id);
                     
                     tr.innerHTML = `
-                        <td class="text-[#64748b] py-3 px-2">${timeStr}</td>
-                        <td class="text-[#cbd5e1] font-bold py-3 px-2">${item.agent_id}</td>
+                        <td class="text-os-muted font-bold py-3 px-2">${timeStr}</td>
+                        <td class="text-os-text font-bold py-3 px-2">${item.agent_id}</td>
                         <td class="py-3 px-2"><span class="px-2 py-0.5 rounded border ${getEventStyles(item.event_type)} text-[8px] font-bold">${item.event_type}</span></td>
-                        <td class="truncate max-w-md py-3 px-2 text-white">${getEventSummary(item)}</td>
+                        <td class="truncate max-w-md py-3 px-2 text-os-text">${getEventSummary(item)}</td>
                     `;
                     tbody.appendChild(tr);
 
                     const expandTr = document.createElement('tr');
                     expandTr.id = `exp-trace-${item.event_id}`;
-                    expandTr.className = "hidden bg-[#030509]";
+                    expandTr.className = "hidden bg-os-panel";
                     const payloadStr = JSON.stringify(item, null, 2);
                     expandTr.innerHTML = `
-                        <td colspan="4" class="p-4 border-b border-[#1e2532]">
-                            <div class="bg-[#0a0d14] rounded p-4 border border-[#1e2532] overflow-x-auto text-[9px] font-mono shadow-inner">
+                        <td colspan="4" class="p-4 border-b border-os-border">
+                            <div class="bg-os-bg rounded p-4 border border-os-border overflow-x-auto text-[9px] font-mono shadow-inner">
                                 <pre><code>${syntaxHighlight(payloadStr)}</code></pre>
                             </div>
                         </td>
@@ -2164,28 +2531,43 @@ root@adam-node:~# _</div>
             const bidsContainer = document.getElementById('ob-bids');
             let basePrice = payload.kpis.btc.value;
             
-            function generateRow(type, i) {
+            // For depth chart
+            let asksDepth = [];
+            let bidsDepth = [];
+
+            function generateRow(type, i, updateDepth = true) {
                 const diff = (Math.random() * 5 + i * 2).toFixed(2);
                 const price = type === 'ask' ? (basePrice + parseFloat(diff)).toFixed(2) : (basePrice - parseFloat(diff)).toFixed(2);
                 const size = (Math.random() * 2 + 0.05).toFixed(4);
                 const total = (parseFloat(size) * 1.5 + i * 0.5).toFixed(4);
                 const color = type === 'ask' ? 'text-[#ff1e38]' : 'text-[#00fa9a]';
                 
+                if (updateDepth) {
+                    if (type === 'ask') asksDepth.push({ price: parseFloat(price), size: parseFloat(total) });
+                    if (type === 'bid') bidsDepth.push({ price: parseFloat(price), size: parseFloat(total) });
+                }
+
                 return `
                     <div class="flex px-2 py-1 cursor-pointer transition-colors duration-200">
                         <div class="flex-1 font-bold ${color}">${price}</div>
-                        <div class="flex-1 text-right text-white">${size}</div>
-                        <div class="flex-1 text-right text-[#64748b]">${total}</div>
+                        <div class="flex-1 text-right text-os-text font-bold">${size}</div>
+                        <div class="flex-1 text-right text-os-muted">${total}</div>
                     </div>
                 `;
             }
 
             function populateBook() {
                 let asksHtml = '', bidsHtml = '';
+                asksDepth = []; bidsDepth = [];
                 for(let i=10; i>0; i--) asksHtml += generateRow('ask', i);
                 for(let i=1; i<=10; i++) bidsHtml += generateRow('bid', i);
                 asksContainer.innerHTML = asksHtml;
                 bidsContainer.innerHTML = bidsHtml;
+                
+                // Sort depth for charting
+                asksDepth.sort((a,b)=>a.price - b.price);
+                bidsDepth.sort((a,b)=>b.price - a.price); // Descending bids
+                drawDepthChart();
             }
             populateBook();
 
@@ -2199,7 +2581,7 @@ root@adam-node:~# _</div>
                     
                     basePrice = payload.kpis.btc.value; // Sync to global config changes
                     
-                    row.outerHTML = generateRow(isAsk ? 'ask' : 'bid', idx + 1);
+                    row.outerHTML = generateRow(isAsk ? 'ask' : 'bid', idx + 1, false);
                     const newRow = container.children[idx];
                     newRow.classList.add(isAsk ? 'flash-red' : 'flash-green');
                     setTimeout(() => { newRow.classList.remove('flash-red', 'flash-green'); }, 500);
@@ -2208,8 +2590,65 @@ root@adam-node:~# _</div>
                     const newBase = (basePrice + parseFloat(wobble)).toLocaleString('en-US', {minimumFractionDigits: 2});
                     document.getElementById('ob-spread').innerText = newBase;
                     document.getElementById('ob-price').innerText = newBase;
+
+                    // occasionally update depth chart to look alive
+                    if(Math.random() > 0.8) {
+                        if(isAsk && asksDepth[idx]) asksDepth[idx].size += (Math.random()-0.5);
+                        if(!isAsk && bidsDepth[idx]) bidsDepth[idx].size += (Math.random()-0.5);
+                        drawDepthChart();
+                    }
                 }
             }, 300);
+
+            // Depth Chart functionality
+            function drawDepthChart() {
+                const canvas = document.getElementById('obDepthCanvas');
+                if(!canvas) return;
+                const ctx = canvas.getContext('2d');
+                canvas.width = canvas.parentElement.clientWidth - 10;
+                canvas.height = canvas.parentElement.clientHeight - 20;
+                
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                const maxVol = Math.max(...asksDepth.map(d=>d.size), ...bidsDepth.map(d=>d.size)) * 1.2;
+                if(maxVol === 0) return;
+
+                const midX = canvas.width / 2;
+
+                // Draw Bids (Green)
+                ctx.beginPath();
+                ctx.moveTo(midX, canvas.height);
+                let acc = 0;
+                bidsDepth.forEach((b, i) => {
+                    acc += b.size; // Cumulative
+                    const x = midX - ((i / bidsDepth.length) * midX);
+                    const y = canvas.height - (acc / (maxVol * bidsDepth.length)) * canvas.height;
+                    ctx.lineTo(x, y);
+                });
+                ctx.lineTo(0, canvas.height);
+                ctx.fillStyle = 'rgba(0, 250, 154, 0.2)';
+                ctx.fill();
+                ctx.strokeStyle = 'rgba(0, 250, 154, 0.8)';
+                ctx.lineWidth = 1.5;
+                ctx.stroke();
+
+                // Draw Asks (Red)
+                ctx.beginPath();
+                ctx.moveTo(midX, canvas.height);
+                acc = 0;
+                asksDepth.forEach((a, i) => {
+                    acc += a.size; // Cumulative
+                    const x = midX + ((i / asksDepth.length) * midX);
+                    const y = canvas.height - (acc / (maxVol * asksDepth.length)) * canvas.height;
+                    ctx.lineTo(x, y);
+                });
+                ctx.lineTo(canvas.width, canvas.height);
+                ctx.fillStyle = 'rgba(255, 30, 56, 0.2)';
+                ctx.fill();
+                ctx.strokeStyle = 'rgba(255, 30, 56, 0.8)';
+                ctx.lineWidth = 1.5;
+                ctx.stroke();
+            }
         }
 
         // --- App: Agent Topology Network ---
@@ -2291,7 +2730,7 @@ root@adam-node:~# _</div>
                     if (i < j) {
                         const dist = Math.sqrt(Math.pow(n1.x - n2.x, 2) + Math.pow(n1.y - n2.y, 2));
                         if(dist < 150) {
-                            html += `<line x1="${n1.x}" y1="${n1.y}" x2="${n2.x}" y2="${n2.y}" stroke="${lineColor}" stroke-width="1" stroke-opacity="0.15" />`;
+                            html += `<line x1="${n1.x}" y1="${n1.y}" x2="${n2.x}" y2="${n2.y}" stroke="${lineColor}" stroke-width="1" stroke-opacity="0.25" />`;
                         }
                     }
                 });
@@ -2322,11 +2761,11 @@ root@adam-node:~# _</div>
                 // User msg
                 chatLog.insertAdjacentHTML('beforeend', `
                     <div class="flex gap-3 justify-end">
-                        <div class="bg-theme-glow p-3 rounded-lg rounded-tr-none border border-theme text-white max-w-[85%] text-xs shadow-theme transition-colors">
+                        <div class="bg-theme-glow p-3 rounded-lg rounded-tr-none border border-theme text-os-text font-bold max-w-[85%] text-xs shadow-theme transition-colors">
                             ${val}
                         </div>
                         <div class="w-7 h-7 rounded bg-os-window flex items-center justify-center shrink-0 border border-os-border">
-                            <span class="text-xs font-display font-bold text-[#64748b]">U</span>
+                            <span class="text-xs font-display font-bold text-os-muted">U</span>
                         </div>
                     </div>
                 `);
@@ -2336,9 +2775,9 @@ root@adam-node:~# _</div>
                 chatLog.insertAdjacentHTML('beforeend', `
                     <div class="flex gap-3" id="${typingId}">
                         <div class="w-7 h-7 rounded border border-theme bg-theme-glow flex items-center justify-center shrink-0 shadow-theme transition-colors">
-                            <span class="text-[10px] font-display font-bold text-theme transition-colors">A</span>
+                            <span class="text-[10px] font-display font-bold text-theme transition-colors" style="filter: invert(var(--os-invert))">A</span>
                         </div>
-                        <div class="glass-panel p-3 text-[#cbd5e1] border border-white/5 flex items-center">
+                        <div class="glass-panel p-3 text-os-muted border border-os-border flex items-center bg-os-window">
                             <div class="typing-indicator"><span></span><span></span><span></span></div>
                         </div>
                     </div>
@@ -2369,9 +2808,9 @@ root@adam-node:~# _</div>
                     chatLog.insertAdjacentHTML('beforeend', `
                         <div class="flex gap-3">
                             <div class="w-7 h-7 rounded border border-theme bg-theme-glow flex items-center justify-center shrink-0 shadow-theme transition-colors">
-                                <span class="text-[10px] font-display font-bold text-theme transition-colors">A</span>
+                                <span class="text-[10px] font-display font-bold text-theme transition-colors" style="filter: invert(var(--os-invert))">A</span>
                             </div>
-                            <div class="glass-panel p-4 border-theme/20 text-[#cbd5e1] max-w-[85%] text-xs prose prose-invert rounded-lg rounded-tl-none shadow-lg transition-colors">
+                            <div class="glass-panel bg-os-panel p-4 border border-theme text-os-text max-w-[85%] text-xs prose prose-invert rounded-lg rounded-tl-none shadow-lg transition-colors">
                                 ${marked.parse(responseHtml)}
                             </div>
                         </div>
@@ -2479,10 +2918,10 @@ root@adam-node:~# _</div>
             newsletterItems.forEach((item, i) => {
                 // Add to sidebar
                 const el = document.createElement('div');
-                el.className = 'bg-[#11151e] p-2 rounded border border-[#1e2532] text-xs font-mono flex justify-between items-center';
+                el.className = 'bg-os-bg p-2 rounded border border-os-border text-xs font-mono flex justify-between items-center';
                 el.innerHTML = `
-                    <div class="truncate flex-1 pr-2"><span class="text-theme font-bold transition-colors">${i+1}.</span> <span class="text-white">${item.title}</span></div>
-                    <button onclick="removeNewsletterItem(${i})" class="text-[#ff1e38] hover:text-white px-1 cursor-pointer">✕</button>
+                    <div class="truncate flex-1 pr-2"><span class="text-theme font-bold transition-colors">${i+1}.</span> <span class="text-os-text font-bold">${item.title}</span></div>
+                    <button onclick="removeNewsletterItem(${i})" class="text-[#ff1e38] hover:opacity-70 px-1 cursor-pointer font-bold">✕</button>
                 `;
                 queueEl.appendChild(el);
                 
@@ -2491,8 +2930,8 @@ root@adam-node:~# _</div>
                     <div class="mb-8">
                         <h2 class="text-xl font-bold font-sans text-gray-900 border-b border-gray-200 pb-1 mb-3">${i+1}. ${item.title}</h2>
                         <div class="flex gap-3 mb-4">
-                            <span class="text-[10px] font-mono px-2 py-0.5 bg-gray-100 text-gray-700 border border-gray-300 rounded">${item.type}</span>
-                            <span class="text-[10px] font-mono px-2 py-0.5 bg-gray-100 text-gray-700 border border-gray-300 rounded">${item.sector}</span>
+                            <span class="text-[10px] font-mono font-bold px-2 py-0.5 bg-gray-100 text-gray-700 border border-gray-300 rounded">${item.type}</span>
+                            <span class="text-[10px] font-mono font-bold px-2 py-0.5 bg-gray-100 text-gray-700 border border-gray-300 rounded">${item.sector}</span>
                         </div>
                         <div class="prose prose-sm max-w-none text-gray-800 ai-markdown">
                             ${marked.parse(item.content)}
@@ -2532,20 +2971,24 @@ root@adam-node:~# _</div>
             }, 500);
         };
 
-        // --- Three.js Background Engine (Interactive Data Themes) ---
+        // --- Three.js Background Engine (Interactive Data Themes & Light Mode) ---
         function initThreeJS() {
             const canvas = document.getElementById('world-canvas');
             const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.setPixelRatio(window.devicePixelRatio);
 
+            const isLightInit = document.body.classList.contains('light-mode');
+            const baseBgColor = isLightInit ? 0xf8fafc : 0x010204;
+
             const scene = new THREE.Scene();
-            scene.fog = new THREE.FogExp2(0x010204, 0.002);
+            scene.fog = new THREE.FogExp2(baseBgColor, 0.002);
+            renderer.setClearColor(baseBgColor);
 
             const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
             camera.position.set(0, 15, 60);
 
-            let particles, gridHelper;
+            let particles, gridHelper, scannerPlane;
             const particleCount = 1200;
             const geometry = new THREE.BufferGeometry();
             const positions = new Float32Array(particleCount * 3);
@@ -2568,13 +3011,9 @@ root@adam-node:~# _</div>
                 targetPositions[i*3+2] = positions[i*3+2];
                 
                 if (i % 10 === 0) {
-                    colors[i*3] = dataColor.r;
-                    colors[i*3+1] = dataColor.g;
-                    colors[i*3+2] = dataColor.b;
+                    colors[i*3] = dataColor.r; colors[i*3+1] = dataColor.g; colors[i*3+2] = dataColor.b;
                 } else {
-                    colors[i*3] = baseColor.r;
-                    colors[i*3+1] = baseColor.g;
-                    colors[i*3+2] = baseColor.b;
+                    colors[i*3] = baseColor.r; colors[i*3+1] = baseColor.g; colors[i*3+2] = baseColor.b;
                 }
             }
             geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
@@ -2585,16 +3024,24 @@ root@adam-node:~# _</div>
                 vertexColors: true, 
                 transparent: true, 
                 opacity: 0.8, 
-                blending: THREE.AdditiveBlending 
+                blending: isLightInit ? THREE.NormalBlending : THREE.AdditiveBlending 
             });
             particles = new THREE.Points(geometry, material);
             scene.add(particles);
 
+            // Floor Grid
             gridHelper = new THREE.GridHelper(300, 60, baseColor, baseColor);
-            gridHelper.material.opacity = 0.08;
+            gridHelper.material.opacity = isLightInit ? 0.2 : 0.08;
             gridHelper.material.transparent = true;
             gridHelper.position.y = -15;
             scene.add(gridHelper);
+
+            // Scanner Plane Enhancement
+            const planeGeo = new THREE.PlaneGeometry(300, 300);
+            const planeMat = new THREE.MeshBasicMaterial({ color: baseColor, transparent: true, opacity: 0.05, side: THREE.DoubleSide, blending: THREE.AdditiveBlending });
+            scannerPlane = new THREE.Mesh(planeGeo, planeMat);
+            scannerPlane.rotation.x = Math.PI / 2;
+            scene.add(scannerPlane);
 
             // Raycaster for clicking particles
             const raycaster = new THREE.Raycaster();
@@ -2615,7 +3062,10 @@ root@adam-node:~# _</div>
                     const oldG = colorAttr.getY(index);
                     const oldB = colorAttr.getZ(index);
                     
-                    colorAttr.setXYZ(index, 1, 1, 1); // White flash
+                    const isLight = document.body.classList.contains('light-mode');
+                    if (isLight) { colorAttr.setXYZ(index, 0, 0, 0); } // Black flash in light mode
+                    else { colorAttr.setXYZ(index, 1, 1, 1); } // White flash in dark mode
+                    
                     colorAttr.needsUpdate = true;
                     
                     setTimeout(() => {
@@ -2629,11 +3079,11 @@ root@adam-node:~# _</div>
 
             // Theme Mapping Logic (Mathematical Shapes)
             const themes = {
-                'theme-cyan': { color: 0x00e5ff, shape: 'network' },
-                'theme-matrix': { color: 0x00fa9a, shape: 'matrix' },
-                'theme-crimson': { color: 0xff1e38, shape: 'chaos' },
-                'theme-purple': { color: 0xb53cff, shape: 'galaxy' },
-                'theme-gold': { color: 0xffaa00, shape: 'math' }
+                'theme-cyan': { color: 0x00e5ff, lightColor: 0x008b99, shape: 'network' },
+                'theme-matrix': { color: 0x00fa9a, lightColor: 0x00a86b, shape: 'matrix' },
+                'theme-crimson': { color: 0xff1e38, lightColor: 0xe11d48, shape: 'chaos' },
+                'theme-purple': { color: 0xb53cff, lightColor: 0x8e24aa, shape: 'galaxy' },
+                'theme-gold': { color: 0xffaa00, lightColor: 0xd97706, shape: 'math' }
             };
 
             let currentShape = 'network';
@@ -2641,7 +3091,6 @@ root@adam-node:~# _</div>
             function updateShapeTargets(shapeType) {
                 for(let i=0; i<particleCount; i++) {
                     if(shapeType === 'galaxy') {
-                        // Swirling galaxy spiral
                         let r = Math.random() * 80;
                         let theta = Math.random() * Math.PI * 2;
                         let spiral = theta + r * 0.15;
@@ -2649,7 +3098,6 @@ root@adam-node:~# _</div>
                         targetPositions[i*3+1] = (Math.random()-0.5) * 8;
                         targetPositions[i*3+2] = r * Math.sin(spiral);
                     } else if(shapeType === 'math') {
-                        // Geometric 3D Sine Wave Lattice
                         let side = Math.ceil(Math.sqrt(particleCount));
                         let ix = i % side;
                         let iz = Math.floor(i / side);
@@ -2660,12 +3108,10 @@ root@adam-node:~# _</div>
                         targetPositions[i*3+1] = y;
                         targetPositions[i*3+2] = z;
                     } else if(shapeType === 'matrix') {
-                        // Falling Data Terminal
                         targetPositions[i*3] = (Math.random() - 0.5) * 150;
-                        targetPositions[i*3+1] = (Math.random() - 0.5) * 150; // Random Y, animated downwards later
+                        targetPositions[i*3+1] = (Math.random() - 0.5) * 150; 
                         targetPositions[i*3+2] = (Math.random() - 0.5) * 150;
                     } else if(shapeType === 'network') {
-                        // Artificial Brain / Neural Topology
                         let u = Math.random();
                         let v = Math.random();
                         let theta = u * 2.0 * Math.PI;
@@ -2675,7 +3121,6 @@ root@adam-node:~# _</div>
                         targetPositions[i*3+1] = r * Math.sin(phi) * Math.sin(theta);
                         targetPositions[i*3+2] = r * Math.cos(phi);
                     } else {
-                        // Chaos / Scattered
                         targetPositions[i*3] = (Math.random() - 0.5) * 200;
                         targetPositions[i*3+1] = (Math.random() - 0.5) * 100;
                         targetPositions[i*3+2] = (Math.random() - 0.5) * 200;
@@ -2683,14 +3128,22 @@ root@adam-node:~# _</div>
                 }
             }
             
-            // Initialize Default Shape
             updateShapeTargets('network');
 
             const observer = new MutationObserver(() => {
+                const isLight = document.body.classList.contains('light-mode');
+                const newBgColor = isLight ? 0xf8fafc : 0x010204;
+                renderer.setClearColor(newBgColor);
+                scene.fog.color.setHex(newBgColor);
+                material.blending = isLight ? THREE.NormalBlending : THREE.AdditiveBlending;
+                material.opacity = isLight ? 0.9 : 0.8;
+                scannerPlane.material.opacity = isLight ? 0.08 : 0.05;
+                gridHelper.material.opacity = isLight ? 0.2 : 0.08;
+
                 for (const [cls, config] of Object.entries(themes)) {
                     if (document.body.classList.contains(cls)) {
-                        // Update base colors but keep data nodes amber
-                        const newBase = new THREE.Color(config.color);
+                        const targetColorHex = isLight ? config.lightColor : config.color;
+                        const newBase = new THREE.Color(targetColorHex);
                         const cAttr = geometry.attributes.color;
                         for(let i=0; i<particleCount; i++) {
                             if (i % 10 !== 0) {
@@ -2699,9 +3152,13 @@ root@adam-node:~# _</div>
                         }
                         cAttr.needsUpdate = true;
                         
-                        gridHelper.material.color.setHex(config.color);
-                        currentShape = config.shape;
-                        updateShapeTargets(currentShape);
+                        gridHelper.material.color.setHex(targetColorHex);
+                        scannerPlane.material.color.setHex(targetColorHex);
+
+                        if(currentShape !== config.shape) {
+                            currentShape = config.shape;
+                            updateShapeTargets(currentShape);
+                        }
                         break;
                     }
                 }
