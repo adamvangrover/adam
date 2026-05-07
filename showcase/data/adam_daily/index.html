@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en" class="dark theme-cyan">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM DAILY // NEXUS HUB</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    
+    <!-- Libraries -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                        display: ['Share Tech Mono', 'monospace'],
+                    },
+                    colors: {
+                        os: { 
+                            bg: '#050505', 
+                            panel: '#0a0a0a', 
+                            window: '#111111', 
+                            border: '#333333',
+                            text: '#e0e0e0',
+                            muted: '#888888'
+                        },
+                        cyber: { 
+                            cyan: '#00e5ff', 
+                            red: '#ff1e38', 
+                            amber: '#ffaa00', 
+                            green: '#00fa9a', 
+                            purple: '#b53cff' 
+                        }
+                    },
+                    animation: {
+                        'flicker': 'flicker 0.15s infinite',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: theme('colors.os.bg');
+            color: theme('colors.os.text');
+            margin: 0;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .glass-panel {
+            background: rgba(10, 10, 10, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid theme('colors.os.border');
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .cyber-border {
+            border: 1px solid theme('colors.cyber.cyan');
+            box-shadow: 0 0 10px rgba(0, 229, 255, 0.2);
+        }
+        
+        .cyber-border-red {
+            border: 1px solid theme('colors.cyber.red');
+            box-shadow: 0 0 10px rgba(255, 30, 56, 0.2);
+        }
+
+        .neon-text-cyan {
+            text-shadow: 0 0 5px theme('colors.cyber.cyan'), 0 0 10px theme('colors.cyber.cyan');
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: theme('colors.os.bg');
+        }
+        ::-webkit-scrollbar-thumb {
+            background: theme('colors.os.border');
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: theme('colors.cyber.cyan');
+        }
+
+        .nav-item {
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .nav-item:hover {
+            background: rgba(0, 229, 255, 0.1);
+            border-left: 2px solid theme('colors.cyber.cyan');
+            color: theme('colors.cyber.cyan');
+        }
+        .nav-item.active {
+            background: rgba(0, 229, 255, 0.15);
+            border-left: 2px solid theme('colors.cyber.cyan');
+            color: theme('colors.cyber.cyan');
+            font-weight: bold;
+            box-shadow: inset 0 0 10px rgba(0, 229, 255, 0.1);
+        }
+        
+        .crt-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%);
+            background-size: 100% 4px;
+            z-index: 9999;
+            pointer-events: none;
+            opacity: 0.15;
+        }
+
+        .log-line { border-left: 2px solid theme('colors.cyber.cyan'); margin-bottom: 4px; padding-left: 8px; font-size: 0.75rem; }
+        .log-error { border-left-color: theme('colors.cyber.red'); color: theme('colors.cyber.red'); }
+        .log-warn { border-left-color: theme('colors.cyber.amber'); color: theme('colors.cyber.amber'); }
+    </style>
+</head>
+<body class="font-sans antialiased text-sm">
+    <div class="crt-overlay"></div>
+
+    <!-- HEADER -->
+    <header class="glass-panel h-14 flex items-center justify-between px-4 shrink-0 z-10 border-b border-os-border">
+        <div class="flex items-center space-x-4">
+            <i data-lucide="cpu" class="w-6 h-6 text-cyber-cyan animate-pulse-slow"></i>
+            <div>
+                <h1 class="font-display text-lg font-bold tracking-widest text-cyber-cyan neon-text-cyan">ADAM_DAILY // NEXUS_HUB</h1>
+                <div class="text-[10px] font-mono text-os-muted uppercase tracking-wider">v55.0 Institutional Master Terminal</div>
+            </div>
+        </div>
+        
+        <div class="flex space-x-6">
+            <div class="flex flex-col items-end">
+                <span class="text-[10px] font-mono text-os-muted">SYSTEM STATUS</span>
+                <span class="text-xs font-mono text-cyber-green font-bold"><span class="inline-block w-2 h-2 bg-cyber-green rounded-full mr-1 animate-pulse"></span>ONLINE / ACTIVE</span>
+            </div>
+            <div class="flex flex-col items-end">
+                <span class="text-[10px] font-mono text-os-muted">GLOBAL COMPUTE</span>
+                <span class="text-xs font-mono text-cyber-cyan font-bold" id="header-compute">84.2%</span>
+            </div>
+            <div class="flex flex-col items-end">
+                <span class="text-[10px] font-mono text-os-muted">DATA SYNC</span>
+                <span class="text-xs font-mono text-cyber-purple font-bold">REALTIME</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN LAYOUT -->
+    <div class="flex flex-1 overflow-hidden">
+        
+        <!-- LEFT SIDEBAR: NAVIGATION -->
+        <aside class="w-64 glass-panel border-r border-os-border flex flex-col shrink-0">
+            <div class="p-3 border-b border-os-border flex items-center space-x-2 bg-os-window">
+                <i data-lucide="folder-tree" class="w-4 h-4 text-cyber-cyan"></i>
+                <span class="font-mono text-xs font-bold text-os-text">INDEX</span>
+            </div>
+            <div class="flex-1 overflow-y-auto p-2" id="nav-container">
+                <!-- Historic Crises -->
+                <div class="text-[10px] font-mono text-cyber-amber uppercase tracking-widest mb-2 mt-2 px-2">Historical Crises</div>
+                <div class="nav-item p-2 text-xs font-mono rounded" onclick="loadDate('1987-10-23', this)">1987-10-23 <span class="text-[10px] text-os-muted ml-1">Black Monday</span></div>
+                <div class="nav-item p-2 text-xs font-mono rounded" onclick="loadDate('2000-03-10', this)">2000-03-10 <span class="text-[10px] text-os-muted ml-1">Dot Com Peak</span></div>
+                <div class="nav-item p-2 text-xs font-mono rounded" onclick="loadDate('2008-09-15', this)">2008-09-15 <span class="text-[10px] text-os-muted ml-1">Lehman Bros</span></div>
+                <div class="nav-item p-2 text-xs font-mono rounded" onclick="loadDate('2020-03-16', this)">2020-03-16 <span class="text-[10px] text-os-muted ml-1">COVID Crash</span></div>
+                
+                <div class="text-[10px] font-mono text-cyber-cyan uppercase tracking-widest mb-2 mt-4 px-2">2026 Simulation Nexus</div>
+                <!-- 2026 Dates injected by JS -->
+                <div id="nexus-dates"></div>
+            </div>
+        </aside>
+
+        <!-- CENTER PANEL: IFRAME VIEW -->
+        <main class="flex-1 flex flex-col bg-os-bg relative min-w-0">
+            <div class="h-8 glass-panel border-b border-os-border flex items-center px-4 justify-between text-xs font-mono shrink-0">
+                <div class="flex items-center space-x-2 text-cyber-cyan">
+                    <i data-lucide="terminal" class="w-4 h-4"></i>
+                    <span id="current-path">/showcase/data/adam_daily/</span>
+                </div>
+                <div class="flex items-center space-x-3 text-os-muted">
+                    <button class="hover:text-cyber-cyan transition-colors" onclick="reloadIframe()" title="Reload Frame">
+                        <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+                    </button>
+                    <button class="hover:text-cyber-cyan transition-colors" onclick="openNewTab()" title="Open in New Tab">
+                        <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="flex-1 relative">
+                <div id="iframe-loader" class="absolute inset-0 flex items-center justify-center bg-os-bg z-10">
+                    <div class="flex flex-col items-center">
+                        <i data-lucide="loader" class="w-8 h-8 text-cyber-cyan animate-spin mb-4"></i>
+                        <span class="font-mono text-xs text-cyber-cyan">ESTABLISHING UPLINK...</span>
+                    </div>
+                </div>
+                <iframe id="main-frame" class="w-full h-full border-0" sandbox="allow-scripts allow-same-origin allow-forms allow-popups" onload="document.getElementById('iframe-loader').style.display='none'"></iframe>
+            </div>
+        </main>
+
+        <!-- RIGHT SIDEBAR: TELEMETRY & SYSTEM OUTPUT -->
+        <aside class="w-80 glass-panel border-l border-os-border flex flex-col shrink-0 bg-os-panel">
+            
+            <!-- Compute Monitoring -->
+            <div class="h-64 border-b border-os-border flex flex-col">
+                <div class="p-2 border-b border-os-border flex items-center space-x-2 bg-os-window">
+                    <i data-lucide="activity" class="w-4 h-4 text-cyber-cyan"></i>
+                    <span class="font-mono text-xs font-bold text-os-text">COMPUTE TELEMETRY</span>
+                </div>
+                <div class="flex-1 p-2 relative">
+                    <canvas id="computeChart"></canvas>
+                </div>
+                <div class="flex px-4 py-2 text-[10px] font-mono justify-between bg-os-window border-t border-os-border">
+                    <div>CPU: <span class="text-cyber-cyan" id="stat-cpu">42%</span></div>
+                    <div>MEM: <span class="text-cyber-purple" id="stat-mem">16GB</span></div>
+                    <div>GPU: <span class="text-cyber-green" id="stat-gpu">88%</span></div>
+                </div>
+            </div>
+
+            <!-- Prompts & LLM Output -->
+            <div class="flex-1 flex flex-col min-h-0 border-b border-os-border">
+                <div class="p-2 border-b border-os-border flex items-center space-x-2 bg-os-window">
+                    <i data-lucide="message-square" class="w-4 h-4 text-cyber-purple"></i>
+                    <span class="font-mono text-xs font-bold text-os-text">SWARM TELEMETRY & PROMPTS</span>
+                </div>
+                <div class="flex-1 p-2 overflow-y-auto font-mono text-[10px]" id="system-logs">
+                    <!-- Logs injected via JS -->
+                </div>
+            </div>
+
+            <!-- API / Sandbox Context Hookup -->
+            <div class="h-48 flex flex-col shrink-0">
+                <div class="p-2 border-b border-os-border flex items-center space-x-2 bg-os-window">
+                    <i data-lucide="plug" class="w-4 h-4 text-cyber-amber"></i>
+                    <span class="font-mono text-xs font-bold text-os-text">SANDBOX QUICKSTART</span>
+                </div>
+                <div class="flex-1 p-3 flex flex-col space-y-2 bg-os-bg overflow-y-auto">
+                    <div class="text-[10px] text-os-muted mb-1 font-mono">Agentic Microservice Context Generator</div>
+                    
+                    <div class="flex space-x-2">
+                        <select class="bg-os-window border border-os-border text-os-text text-[10px] font-mono p-1 flex-1 rounded outline-none focus:border-cyber-cyan">
+                            <option>LLM: GPT-4o-Mini (Mock)</option>
+                            <option>LLM: Claude-3.5-Sonnet (Mock)</option>
+                            <option>LLM: Local Llama3 (Mock)</option>
+                        </select>
+                        <button class="bg-os-window hover:bg-cyber-cyan hover:text-os-bg border border-cyber-cyan text-cyber-cyan text-[10px] font-mono px-2 py-1 rounded transition-colors" onclick="triggerMockAPI()">
+                            CONNECT
+                        </button>
+                    </div>
+
+                    <textarea id="prompt-input" class="w-full h-16 bg-os-window border border-os-border text-os-text text-[10px] font-mono p-2 rounded outline-none focus:border-cyber-cyan resize-none" placeholder="Enter scenario parameters to inject into date payload..."></textarea>
+                    
+                    <button class="w-full bg-cyber-purple/20 hover:bg-cyber-purple/40 border border-cyber-purple text-cyber-purple text-[10px] font-mono py-1.5 rounded transition-colors uppercase font-bold" onclick="simulateInjection()">
+                        Inject Context Payload
+                    </button>
+                </div>
+            </div>
+            
+        </aside>
+
+    </div>
+
+    <script>
+        // Initialize Icons
+        lucide.createIcons();
+
+        const dates2026 = [
+            '2026-03-24', '2026-03-27', '2026-03-29', '2026-04-01', '2026-04-02', '2026-04-05', '2026-04-06', '2026-04-08', '2026-04-09', '2026-04-12', '2026-04-16', '2026-04-21', '2026-04-22', '2026-04-27', '2026-04-28', '2026-04-29', '2026-04-30', '2026-05-01', '2026-05-02', '2026-05-03', '2026-05-04', '2026-05-06'
+        ];
+
+        // Populate 2026 dates
+        const nexusDatesContainer = document.getElementById('nexus-dates');
+        dates2026.forEach(date => {
+            const el = document.createElement('div');
+            el.className = 'nav-item p-2 text-xs font-mono rounded';
+            el.innerHTML = `${date}`;
+            el.onclick = () => loadDate(date, el);
+            nexusDatesContainer.appendChild(el);
+        });
+
+        let currentDate = '';
+
+        function getFilenameForDate(date) {
+            // Mapping specific dates to their actual HTML files because not all of them have index.html
+            const mapping = {
+                '1987-10-23': 'market_mayhem_1987-10-23.md',
+                '2000-03-10': 'market_mayhem_2000-03-10.md',
+                '2008-09-15': 'market_mayhem_2008-09-15.md',
+                '2020-03-16': 'market_mayhem_2020-03-16.md',
+                '2026-03-24': 'market_mayhem_2026-03-24.html',
+                '2026-05-01': 'index_v50.html',
+            };
+            return mapping[date] || 'index.html';
+        }
+
+        function loadDate(date, element) {
+            currentDate = date;
+            
+            // Update active state
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            if(element) element.classList.add('active');
+
+            const filename = getFilenameForDate(date);
+
+            // Update UI
+            document.getElementById('current-path').textContent = `/showcase/data/adam_daily/${date}/${filename}`;
+            document.getElementById('iframe-loader').style.display = 'flex';
+            
+            // Set Iframe src
+            const iframe = document.getElementById('main-frame');
+            iframe.src = `data/adam_daily/${date}/${filename}`;
+
+            addLog(`UPLINK ESTABLISHED to Nexus Node: ${date} (${filename})`, 'info');
+        }
+
+        function reloadIframe() {
+            const iframe = document.getElementById('main-frame');
+            if(currentDate) {
+                document.getElementById('iframe-loader').style.display = 'flex';
+                iframe.src = iframe.src;
+                addLog(`Reloaded Nexus Node: ${currentDate}`, 'info');
+            }
+        }
+
+        function openNewTab() {
+            if(currentDate) {
+                const filename = getFilenameForDate(currentDate);
+                window.open(`data/adam_daily/${currentDate}/${filename}`, '_blank');
+            }
+        }
+
+        // Initialize first date
+        setTimeout(() => {
+            const first2026 = document.querySelector('#nexus-dates .nav-item');
+            if(first2026) loadDate('2026-03-24', first2026);
+        }, 100);
+
+
+        // --- TELEMETRY CHART (Chart.js) ---
+        const ctx = document.getElementById('computeChart').getContext('2d');
+        const computeData = {
+            labels: Array(20).fill(''),
+            datasets: [
+                {
+                    label: 'CPU Load',
+                    data: Array(20).fill(40).map(() => 30 + Math.random() * 40),
+                    borderColor: '#00e5ff',
+                    backgroundColor: 'rgba(0, 229, 255, 0.1)',
+                    borderWidth: 1.5,
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 0
+                },
+                {
+                    label: 'Mem Alloc',
+                    data: Array(20).fill(60).map(() => 50 + Math.random() * 20),
+                    borderColor: '#b53cff',
+                    backgroundColor: 'transparent',
+                    borderWidth: 1,
+                    fill: false,
+                    tension: 0.4,
+                    pointRadius: 0
+                }
+            ]
+        };
+
+        const computeChart = new Chart(ctx, {
+            type: 'line',
+            data: computeData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: false,
+                interaction: { intersect: false, mode: 'index' },
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { display: false },
+                    y: { 
+                        display: true, 
+                        min: 0, max: 100, 
+                        grid: { color: 'rgba(51, 51, 51, 0.5)', drawBorder: false },
+                        ticks: { color: '#888', font: { family: 'JetBrains Mono', size: 9 }, stepSize: 25 }
+                    }
+                }
+            }
+        });
+
+        // Sim loop
+        setInterval(() => {
+            // Update chart
+            computeData.datasets[0].data.shift();
+            computeData.datasets[0].data.push(40 + Math.random() * 50);
+            
+            computeData.datasets[1].data.shift();
+            computeData.datasets[1].data.push(60 + Math.random() * 15);
+            
+            computeChart.update();
+
+            // Update stats
+            const cpu = computeData.datasets[0].data[19].toFixed(1);
+            document.getElementById('stat-cpu').textContent = `${cpu}%`;
+            document.getElementById('header-compute').textContent = `${cpu}%`;
+            document.getElementById('stat-gpu').textContent = `${(70 + Math.random()*25).toFixed(1)}%`;
+            
+            // Random log occasionally
+            if(Math.random() > 0.8) {
+                const msgs = [
+                    "Optimizer Agent: Adjusting DCF weights...",
+                    "Swarm Telemetry: UHD packet received from Model DB.",
+                    "Governance: Validating 'High Risk' execution parameter.",
+                    "API: Fetching cross-asset volatility surface...",
+                    "LLM Pipeline: Generating synthetic SEC filing snippet."
+                ];
+                addLog(msgs[Math.floor(Math.random() * msgs.length)], 'info');
+            }
+
+        }, 1000);
+
+
+        // --- LOGGING SYSTEM ---
+        const logsContainer = document.getElementById('system-logs');
+        function addLog(msg, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `log-line ${type === 'error' ? 'log-error' : type === 'warn' ? 'log-warn' : 'text-os-text'}`;
+            const time = new Date().toISOString().substring(11, 23);
+            div.innerHTML = `<span class="text-os-muted">[${time}]</span> ${msg}`;
+            logsContainer.appendChild(div);
+            
+            if (logsContainer.children.length > 100) {
+                logsContainer.removeChild(logsContainer.firstChild);
+            }
+            logsContainer.scrollTop = logsContainer.scrollHeight;
+        }
+
+        // Init logs
+        addLog("ADAM OMNIOS Boot Sequence Initiated...");
+        addLog("Loading Network Mesh...", "info");
+        addLog("Connecting to Neo4j Knowledge Graph...", "info");
+        addLog("WARNING: LLM fallbacks enabled for external models.", "warn");
+        addLog("System Ready.", "info");
+
+        // --- MOCK API / SANDBOX ---
+        function triggerMockAPI() {
+            addLog("Initiating connection to requested LLM sandbox...", "info");
+            setTimeout(() => {
+                addLog("Connection Established. Ready for payload injection.", "info");
+            }, 800);
+        }
+
+        function simulateInjection() {
+            const input = document.getElementById('prompt-input').value;
+            if(!input) {
+                addLog("Cannot inject empty context payload.", "warn");
+                return;
+            }
+            if(!currentDate) {
+                addLog("No Nexus Node selected.", "error");
+                return;
+            }
+            
+            addLog(`Injecting context to ${currentDate} instance: "${input.substring(0, 30)}..."`, "info");
+            document.getElementById('prompt-input').value = "";
+            
+            setTimeout(() => {
+                addLog(`Agentic swarm processing contextual parameters...`, "info");
+            }, 500);
+            
+            setTimeout(() => {
+                addLog(`Payload merged into ADAM_PAYLOAD. Re-rendering dashboard.`, "info");
+                reloadIframe();
+            }, 2000);
+        }
+
+    </script>
+</body>
+</html>
