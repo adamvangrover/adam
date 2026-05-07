@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM | Analytics Hub</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/portal.css">
+
+    <!-- Chart.js for demo purposes -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <aside class="portal-sidebar" id="portal-sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">ADAM <span style="color: #fff; font-size: 0.5em; vertical-align: super;">v26</span></div>
+            <button class="toggle-btn" id="sidebar-toggle"><i class="fas fa-bars"></i></button>
+        </div>
+        <div class="sidebar-nav" id="sidebar-nav"></div>
+    </aside>
+
+    <main class="portal-main">
+        <header class="portal-header">
+             <div style="display: flex; align-items: center;">
+                <button class="mobile-toggle" id="mobile-toggle"><i class="fas fa-bars"></i></button>
+                <div class="header-search">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" class="search-input" placeholder="Search analytics...">
+                </div>
+            </div>
+        </header>
+
+        <div class="portal-content">
+            <div class="animate-fade-in">
+                <h1 class="page-title">Analytics Hub</h1>
+                <p class="page-subtitle">Deep systemic data analysis and visual telemetry.</p>
+            </div>
+
+            <div class="dashboard-grid animate-fade-in delay-1" style="grid-template-columns: 2fr 1fr;">
+
+                <div class="glass-card">
+                    <div class="card-header">
+                        <h3 class="card-title">Systemic Risk Convergence</h3>
+                    </div>
+                    <div style="height: 300px; width: 100%;">
+                        <canvas id="mainChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="glass-card">
+                    <div class="card-header">
+                        <h3 class="card-title">Compute Allocation</h3>
+                    </div>
+                    <div style="height: 200px; width: 100%; display: flex; justify-content: center; align-items: center;">
+                        <canvas id="doughnutChart"></canvas>
+                    </div>
+                    <div style="margin-top: 20px;">
+                        <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 5px;">
+                            <span>Neural Mesh</span> <span class="mono text-accent">65%</span>
+                        </div>
+                        <div style="width: 100%; background: rgba(255,255,255,0.1); height: 4px; border-radius: 2px;">
+                            <div style="width: 65%; background: var(--portal-accent); height: 100%; border-radius: 2px;"></div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="glass-card animate-fade-in delay-2">
+                 <div class="card-header">
+                        <h3 class="card-title">Recent Telemetry Signals</h3>
+                 </div>
+                 <div style="overflow-x: auto;">
+                     <table style="width: 100%; text-align: left; border-collapse: collapse;">
+                         <thead>
+                             <tr style="border-bottom: 1px solid var(--portal-border); color: var(--portal-text-muted); font-size: 0.8rem; text-transform: uppercase;">
+                                 <th style="padding: 10px;">Timestamp</th>
+                                 <th style="padding: 10px;">Node</th>
+                                 <th style="padding: 10px;">Event</th>
+                                 <th style="padding: 10px;">Severity</th>
+                             </tr>
+                         </thead>
+                         <tbody class="mono" style="font-size: 0.85rem;">
+                             <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                 <td style="padding: 10px; color: var(--portal-text-muted);">2026-02-18 14:32:01</td>
+                                 <td style="padding: 10px;">Risk_Engine_Alpha</td>
+                                 <td style="padding: 10px;">Spike in HY spreads detected</td>
+                                 <td style="padding: 10px; color: #f59e0b;">WARN</td>
+                             </tr>
+                             <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                 <td style="padding: 10px; color: var(--portal-text-muted);">2026-02-18 14:28:44</td>
+                                 <td style="padding: 10px;">Credit_Analyst_Core</td>
+                                 <td style="padding: 10px;">NVDA Valuation Model updated</td>
+                                 <td style="padding: 10px; color: #10b981;">INFO</td>
+                             </tr>
+                             <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                 <td style="padding: 10px; color: var(--portal-text-muted);">2026-02-18 14:15:22</td>
+                                 <td style="padding: 10px;">Market_Maker_01</td>
+                                 <td style="padding: 10px;">Arbitrage loop executed ($2.4k)</td>
+                                 <td style="padding: 10px; color: #10b981;">INFO</td>
+                             </tr>
+                         </tbody>
+                     </table>
+                 </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script src="js/portal_nav.js"></script>
+    <script>
+        // Init Demo Charts
+        document.addEventListener('DOMContentLoaded', () => {
+            // Setup Chart.js defaults for dark theme
+            Chart.defaults.color = '#94a3b8';
+            Chart.defaults.font.family = "'JetBrains Mono', monospace";
+
+            const ctxLine = document.getElementById('mainChart').getContext('2d');
+            new Chart(ctxLine, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+                    datasets: [
+                        {
+                            label: 'Credit Stress',
+                            data: [12, 19, 15, 25, 22, 30, 28],
+                            borderColor: '#00f3ff',
+                            backgroundColor: 'rgba(0, 243, 255, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.4,
+                            fill: true
+                        },
+                        {
+                            label: 'Equity Volatility',
+                            data: [5, 10, 8, 15, 12, 20, 18],
+                            borderColor: '#a855f7',
+                            borderWidth: 2,
+                            tension: 0.4,
+                            borderDash: [5, 5]
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'top' }
+                    },
+                    scales: {
+                        y: { grid: { color: 'rgba(255, 255, 255, 0.05)' } },
+                        x: { grid: { color: 'rgba(255, 255, 255, 0.05)' } }
+                    }
+                }
+            });
+
+            const ctxDoughnut = document.getElementById('doughnutChart').getContext('2d');
+            new Chart(ctxDoughnut, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Neural Mesh', 'Risk Engine', 'I/O', 'Idle'],
+                    datasets: [{
+                        data: [65, 20, 10, 5],
+                        backgroundColor: [
+                            '#00f3ff',
+                            '#f59e0b',
+                            '#a855f7',
+                            'rgba(255,255,255,0.1)'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '75%',
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
