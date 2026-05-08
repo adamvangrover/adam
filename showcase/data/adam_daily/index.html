@@ -339,9 +339,9 @@
             document.getElementById('current-path').textContent = `/showcase/data/adam_daily/${date}/${filename}`;
             document.getElementById('iframe-loader').style.display = 'flex';
             
-            // Set Iframe src
+            // Set Iframe src (Relative path from current directory)
             const iframe = document.getElementById('main-frame');
-            iframe.src = `data/adam_daily/${date}/${filename}`;
+            iframe.src = `${date}/${filename}`;
 
             addLog(`UPLINK ESTABLISHED to Nexus Node: ${date} (${filename})`, 'info');
         }
@@ -358,7 +358,7 @@
         function openNewTab() {
             if(currentDate) {
                 const filename = getFilenameForDate(currentDate);
-                window.open(`data/adam_daily/${currentDate}/${filename}`, '_blank');
+                window.open(`${currentDate}/${filename}`, '_blank');
             }
         }
 
