@@ -3,15 +3,32 @@ import { useSwarmStore, Agent } from '../stores/swarmStore';
 import { generateAgentTask } from '../utils/simulationEngine';
 
 export function useSwarmSimulation() {
-  const { initializeSwarm, updateAgent, updateMetrics, agents } = useSwarmStore();
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  // Bolt Optimization ⚡: Extract only initializeSwarm using a selector to prevent
+  // subscribing the parent component (PromptAlpha) to ALL store changes in the simulation loop.
+  const initializeSwarm = useSwarmStore((state) => state.initializeSwarm);
+
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    if (agents.length === 0) {
+    if (useSwarmStore.getState().agents.length === 0) {
       initializeSwarm(24); // 24 active agents
     }
 
-    intervalRef.current = setInterval(() => {
+    let isMounted = true;
+
+    // Bolt Optimization ⚡: Replace setInterval with recursive setTimeout to prevent
+    // request pile-ups, and use `getState()` to access current store state without re-rendering.
+    const runSimulationStep = () => {
+      if (!isMounted) return;
+
+      const state = useSwarmStore.getState();
+      const agents = state.agents;
+
+      if (agents.length === 0) {
+        timeoutRef.current = setTimeout(runSimulationStep, 200);
+        return;
+      }
+
       // 1. Update random agent
       const randomAgentIndex = Math.floor(Math.random() * agents.length);
       const agent = agents[randomAgentIndex];
@@ -44,19 +61,23 @@ export function useSwarmSimulation() {
          }
       }
 
-      updateAgent(agent.id, updates);
+      state.updateAgent(agent.id, updates);
 
       // 2. Update System Metrics (Brownian motion)
-      updateMetrics({
+      state.updateMetrics({
         networkLoad: Math.min(100, Math.max(0, 45 + (Math.random() * 20 - 10))),
         consensusRate: Math.min(100, Math.max(90, 98 + (Math.random() * 2 - 1))),
         activeNodes: agents.filter(a => a.status !== 'IDLE').length
       });
 
-    }, 200); // 5 updates per second for "Live" feel
+      timeoutRef.current = setTimeout(runSimulationStep, 200); // 5 updates per second for "Live" feel
+    };
+
+    runSimulationStep();
 
     return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
+      isMounted = false;
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
     };
-  }, [agents.length, initializeSwarm, updateAgent, updateMetrics, agents]);
+  }, [initializeSwarm]);
 }
