@@ -216,3 +216,7 @@
 **Vulnerability:** Fast API application was binding to all interfaces (0.0.0.0), exposing it to external networks unnecessarily.
 **Learning:** Found in server/sentinel_api.py. Uvicorn bound to 0.0.0.0 by default. It must be explicitly bound to 127.0.0.1 for local deployments.
 **Prevention:** Configure local APIs to bind to localhost (127.0.0.1) explicitly unless external access is required. Use bandit 'uv run bandit' to scan for these risks.
+## 2026-05-08 - Added timeout to requests.get in downloads/download_agents.py
+**Vulnerability:** A missing timeout in `requests.get` could lead to an infinite hang and a potential Denial of Service (CWE-400) if the remote server is unresponsive.
+**Learning:** Always specify a timeout for external network requests, even for simple download scripts, to ensure the application fails gracefully rather than hanging indefinitely.
+**Prevention:** Include a `timeout` parameter (e.g., `timeout=10`) in all `requests` calls to establish a maximum wait time.
