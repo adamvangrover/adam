@@ -7,7 +7,8 @@ def download_agents():
     Downloads pre-configured agents from a remote repository.
     """
     agents_url = "https://raw.githubusercontent.com/adam-agi/adam/main/config/agents.yaml"
-    response = requests.get(agents_url)
+    # Added timeout to prevent potential denial of service if the server hangs
+    response = requests.get(agents_url, timeout=10)
     agents_config = response.text
 
     with open("config/downloaded_agents.yaml", "w") as f:
