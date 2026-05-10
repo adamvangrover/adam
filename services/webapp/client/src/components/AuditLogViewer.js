@@ -147,24 +147,35 @@ const AuditLogViewer = () => {
     const [traces, setTraces] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    const fetchTraces = async () => {
-        try {
-            const response = await fetch('/api/traces');
-            if (response.ok) {
-                const data = await response.json();
-                setTraces(data.traces || []);
-            }
-        } catch (error) {
-            console.error("Failed to fetch traces:", error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
     useEffect(() => {
+        let timeoutId;
+        let isMounted = true;
+
+        const fetchTraces = async () => {
+            if (!isMounted) return;
+            try {
+                const response = await fetch('/api/traces');
+                if (response.ok) {
+                    const data = await response.json();
+                    const newTraces = data.traces || [];
+                    // Bolt ⚡ Optimization: Prevent unnecessary list re-renders by skipping state updates if data hasn't changed.
+                    setTraces(prev => JSON.stringify(prev) !== JSON.stringify(newTraces) ? newTraces : prev);
+                }
+            } catch (error) {
+                console.error("Failed to fetch traces:", error);
+            } finally {
+                if (isMounted) setLoading(false);
+                // Bolt ⚡ Optimization: Recursive setTimeout prevents request pile-up during slow network calls.
+                if (isMounted) timeoutId = setTimeout(fetchTraces, 5000);
+            }
+        };
+
         fetchTraces();
-        const interval = setInterval(fetchTraces, 5000);
-        return () => clearInterval(interval);
+
+        return () => {
+            isMounted = false;
+            if (timeoutId) clearTimeout(timeoutId);
+        };
     }, []);
 
     if (loading && traces.length === 0) return <div style={{padding: '20px', color: '#0f0'}}>Loading Neural Audit Logs...</div>;
