@@ -1,10 +1,15 @@
 # core/utils/agent_utils.py
 
 import json
+import logging
+from typing import Any, Dict, List
 
-_MOCK_MESSAGE_BUS = []
+logger = logging.getLogger(__name__)
 
-def communicate_between_agents(sender_agent, receiver_agent, message):
+_MOCK_MESSAGE_BUS: List[Dict[str, Any]] = []
+
+
+def communicate_between_agents(sender_agent: str, receiver_agent: str, message: Any) -> None:
     """
     Facilitates communication between agents using the message queue.
 
@@ -22,11 +27,14 @@ def communicate_between_agents(sender_agent, receiver_agent, message):
         }
         # Store in global bus for backward compatibility tests
         _MOCK_MESSAGE_BUS.append(message_with_routing)
+        logger.debug(f"Message stored in mock bus from {sender_agent} to {receiver_agent}")
     except Exception as e:
-        print(f"Error in agent communication: {e}")
+        logger.error(f"Error in agent communication: {e}", exc_info=True)
 
 
-def share_knowledge_between_agents(sender_agent, receiver_agent, knowledge_type, knowledge_data):
+def share_knowledge_between_agents(
+    sender_agent: str, receiver_agent: str, knowledge_type: str, knowledge_data: Any
+) -> None:
     """
     Enables knowledge sharing between agents.
 
@@ -46,11 +54,12 @@ def share_knowledge_between_agents(sender_agent, receiver_agent, knowledge_type,
         }
         # Store in global bus for backward compatibility tests
         _MOCK_MESSAGE_BUS.append(knowledge_message)
+        logger.debug(f"Knowledge shared in mock bus from {sender_agent} to {receiver_agent} (type: {knowledge_type})")
     except Exception as e:
-        print(f"Error in knowledge sharing between agents: {e}")
+        logger.error(f"Error in knowledge sharing between agents: {e}", exc_info=True)
 
 
-def monitor_agent_performance(agent_name, metric, value):
+def monitor_agent_performance(agent_name: str, metric: str, value: Any) -> None:
     """
     Monitors agent performance metrics.
 
@@ -62,10 +71,11 @@ def monitor_agent_performance(agent_name, metric, value):
     # Store the performance metrics (e.g., in a database or log file)
     # Analyze the metrics to identify trends or potential issues
     # ... (Implementation for monitoring agent performance)
+    logger.debug(f"Monitored performance for {agent_name}: {metric} = {value}")
     pass  # Placeholder for actual implementation
 
 
-def validate_agent_inputs(agent_name, inputs, required_parameters):
+def validate_agent_inputs(agent_name: str, inputs: Dict[str, Any], required_parameters: List[str]) -> None:
     """
     Validates agent inputs against a list of required parameters.
 
@@ -79,10 +89,12 @@ def validate_agent_inputs(agent_name, inputs, required_parameters):
     """
     for param in required_parameters:
         if param not in inputs:
-            raise ValueError(f"Agent {agent_name} missing required parameter: {param}")
+            error_msg = f"Agent {agent_name} missing required parameter: {param}"
+            logger.error(error_msg)
+            raise ValueError(error_msg)
 
 
-def format_agent_output(agent_name, output_data, format="json"):
+def format_agent_output(agent_name: str, output_data: Any, format: str = "json") -> Any:
     """
     Formats agent output data into the specified format (default: JSON).
 
@@ -98,15 +110,19 @@ def format_agent_output(agent_name, output_data, format="json"):
         return json.dumps(output_data, indent=4)
     elif format == "csv":
         # Convert output_data to CSV format
+        logger.warning(f"CSV formatting not implemented for agent {agent_name}")
         pass  # Placeholder for CSV conversion logic
     elif format == "text":
         # Convert output_data to plain text format
+        logger.warning(f"Text formatting not implemented for agent {agent_name}")
         pass  # Placeholder for text conversion logic
     else:
-        raise ValueError(f"Invalid output format for agent {agent_name}: {format}")
+        error_msg = f"Invalid output format for agent {agent_name}: {format}"
+        logger.error(error_msg)
+        raise ValueError(error_msg)
 
 
-def log_agent_action(agent_name, action, details):
+def log_agent_action(agent_name: str, action: str, details: Any) -> None:
     """
     Logs agent actions and events.
 
@@ -118,85 +134,5 @@ def log_agent_action(agent_name, action, details):
     # Record the log entry (e.g., in a log file or database)
     # Include timestamp, agent name, action, and details
     # ... (Implementation for logging agent actions)
+    logger.info(f"Agent {agent_name} performed {action}: {details}")
     pass  # Placeholder for actual implementation
-
-# Add more agent utility functions as needed
-
-"""
-Graph Utilities for Adam v23.5
-
-This module provides a unified interface for LangGraph components,
-handling fallback logic for environments where langgraph is not installed.
-"""
-
-import logging
-
-logger = logging.getLogger(__name__)
-
-try:
-    from langgraph.graph import StateGraph, END, START
-    from langgraph.checkpoint.memory import MemorySaver
-    HAS_LANGGRAPH = True
-except ImportError:
-    HAS_LANGGRAPH = False
-    logger.warning("LangGraph not installed. Graph features will be disabled or mocked.")
-
-    class StateGraph:
-        """Mock StateGraph for environments without langgraph."""
-        def __init__(self, state_schema, *args, **kwargs):
-            self.state_schema = state_schema
-
-        def add_node(self, node_name, action):
-            pass
-
-        def add_edge(self, start_node, end_node):
-            pass
-
-        def set_entry_point(self, node_name):
-            pass
-
-        def add_conditional_edges(self, source, path, path_map=None):
-            pass
-
-        def compile(self, checkpointer=None):
-            return CompiledGraphMock()
-
-    class CompiledGraphMock:
-        """Mock for a compiled graph."""
-        def invoke(self, inputs, config=None):
-            logger.info(f"Mock graph invoked with inputs: {inputs}")
-            return inputs
-
-    class MemorySaver:
-        """Mock MemorySaver."""
-        pass
-
-    END = "END"
-    START = "START"
-import time
-import logging
-from functools import wraps
-import random
-
-logger = logging.getLogger(__name__)
-
-
-def retry_with_backoff(retries=3, backoff_in_seconds=1):
-    def decorator(func):
-        @wraps(func)
-        def wrapper(*args, **kwargs):
-            x = 0
-            while True:
-                try:
-                    return func(*args, **kwargs)
-                except Exception as e:
-                    if x == retries:
-                        logger.error(f"Function {func.__name__} failed after {retries} retries: {e}")
-                        raise
-                    else:
-                        sleep = (backoff_in_seconds * 2 ** x) + random.uniform(0, 1)
-                        logger.warning(f"Function {func.__name__} failed: {e}. Retrying in {sleep:.2f}s...")
-                        time.sleep(sleep)
-                        x += 1
-        return wrapper
-    return decorator
