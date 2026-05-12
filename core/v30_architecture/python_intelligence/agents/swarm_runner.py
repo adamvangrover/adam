@@ -85,7 +85,7 @@ agents = [
     AdversarialRedTeamAgent(),
     HardenedShieldAgent(),
     MarketSentimentAgent(),
-    MacroEconomicAgent()
+    MacroEconomicAgent(),
     RegulatoryComplianceAgent()
 ]
 
