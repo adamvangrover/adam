@@ -77,13 +77,33 @@ function Simulations() {
 
     // Polling for status updates
     useEffect(() => {
-        const interval = setInterval(() => {
+        let timeoutId;
+        let isMounted = true;
+
+        const pollHistory = async () => {
+            if (!isMounted) return;
             const running = history.some(run => run.status === 'PENDING' || run.status === 'STARTED');
             if (running) {
-                fetchHistory();
+                try {
+                    await fetchHistory();
+                } catch (e) {
+                    console.error("Failed to fetch simulation history:", e);
+                }
             }
-        }, 5000);
-        return () => clearInterval(interval);
+            // Bolt Optimization ⚡: Replace setInterval with recursive setTimeout to prevent
+            // request pile-ups during slow API responses
+            if (isMounted) {
+                timeoutId = setTimeout(pollHistory, 5000);
+            }
+        };
+
+        // Delay the first execution by 5000ms just like the original setInterval
+        timeoutId = setTimeout(pollHistory, 5000);
+
+        return () => {
+            isMounted = false;
+            if (timeoutId) clearTimeout(timeoutId);
+        };
     }, [history, fetchHistory]);
 
 

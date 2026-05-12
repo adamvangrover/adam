@@ -152,3 +152,6 @@
 ## 2026-11-28 - [React Polling Optimization]
 **Learning:** In periodic network polls (like in `AuditLogViewer`), using `setInterval` can cause request pile-ups during slow API responses, and blindly calling `setState(data)` causes React to re-render the whole component list even if the data is identical. `React.memo` alone won't prevent list re-renders when data references change (e.g., from `res.json()`).
 **Action:** Replace `setInterval` with a recursive `setTimeout`, check for `isMounted`, and use deep equality checks (e.g., `JSON.stringify(prev) !== JSON.stringify(data)`) inside the state setter to skip setting state and avoid unnecessary full re-renders when data is unchanged.
+## 2026-05-11 - [Polling Loop Robustness]
+**Learning:** When replacing `setInterval` with recursive `setTimeout` to prevent request pile-ups during network polls, using `await` inside the polling function without a `try/catch` block creates a fatal fragility. If the awaited fetch throws an error (e.g., network failure), the error will bubble up, permanently halt the function's execution, and prevent the next `setTimeout` from ever scheduling, thus killing the polling loop entirely.
+**Action:** Always wrap `await` API calls inside recursive polling functions with a `try/catch` block to ensure the timeout correctly schedules the next poll regardless of temporary failures.
