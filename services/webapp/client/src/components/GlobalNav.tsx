@@ -11,15 +11,32 @@ const GlobalNav: React.FC = () => {
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
+    let isMounted = true;
+    let timeoutId: ReturnType<typeof setTimeout>;
+
     const checkStatus = async () => {
-      const s = await dataManager.checkConnection();
-      setStatus(s.status);
-      setMode(s.status === 'ONLINE' ? 'LIVE' : 'ARCHIVE');
+      if (!isMounted) return;
+      try {
+        const s = await dataManager.checkConnection();
+        if (isMounted) {
+          setStatus(s.status);
+          setMode(s.status === 'ONLINE' ? 'LIVE' : 'ARCHIVE');
+        }
+      } catch (error) {
+        console.error("Error checking connection:", error);
+      } finally {
+        if (isMounted) {
+          // Bolt ⚡: Recursive setTimeout to prevent request pileups
+          timeoutId = setTimeout(checkStatus, 10000);
+        }
+      }
     };
 
     checkStatus();
-    const interval = setInterval(checkStatus, 10000); // Check every 10s
-    return () => clearInterval(interval);
+    return () => {
+      isMounted = false;
+      clearTimeout(timeoutId);
+    };
   }, []);
 
   // Palette: Keyboard shortcut for Global Search
