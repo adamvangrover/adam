@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en" class="dark theme-cyan">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RATES & PRICES OUTLOOK</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'], display: ['Share Tech Mono', 'monospace'] },
+                    colors: { os: { bg: '#050505', panel: '#0a0a0a', window: '#111111', border: '#333333', text: '#e0e0e0', muted: '#888888' }, cyber: { cyan: '#00e5ff', red: '#ff1e38', amber: '#ffaa00', green: '#00fa9a', purple: '#b53cff' } }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: theme('colors.os.bg'); color: theme('colors.os.text'); margin: 0; padding: 20px; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: theme('colors.os.bg'); }
+        ::-webkit-scrollbar-thumb { background: theme('colors.os.border'); border-radius: 3px; }
+        .glass-panel { background: rgba(10, 10, 10, 0.7); backdrop-filter: blur(10px); border: 1px solid theme('colors.os.border'); border-radius: 8px; }
+        .header-glow { text-shadow: 0 0 10px theme('colors.cyber.cyan'); }
+        .data-table { width: 100%; border-collapse: collapse; font-family: 'JetBrains Mono', monospace; font-size: 11px; }
+        .data-table th { text-align: left; padding: 10px; border-bottom: 1px solid theme('colors.os.border'); color: theme('colors.os.muted'); font-weight: normal; }
+        .data-table td { padding: 10px; border-bottom: 1px solid theme('colors.os.border'); }
+        .data-table tr:hover { background: rgba(255,255,255,0.02); }
+    </style>
+</head>
+<body class="font-sans antialiased flex flex-col h-full">
+    <header class="glass-panel p-4 flex justify-between items-center shrink-0 mb-4">
+        <div>
+            <h1 class="font-display text-2xl font-bold tracking-widest text-cyber-cyan header-glow uppercase">Forward Synthesis // Rates & Prices Outlook</h1>
+            <p class="text-xs font-mono text-os-muted mt-1">MULTI-HORIZON PROJECTIONS • COST OF CAPITAL • COMMODITY CURVES</p>
+        </div>
+        <div class="text-right">
+            <div class="text-[10px] font-mono text-os-muted uppercase">Terminal Rate Cons.</div>
+            <div class="text-2xl font-mono text-os-text font-bold">4.25%</div>
+        </div>
+    </header>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 flex-1 min-h-0">
+        <!-- Projections Table -->
+        <div class="glass-panel p-4 flex flex-col overflow-hidden">
+            <h2 class="text-xs font-mono font-bold text-cyber-purple uppercase mb-4 border-b border-os-border pb-2 shrink-0">Global Asset Target Projections</h2>
+            <div class="flex-1 overflow-auto pr-2">
+                <table class="data-table w-full">
+                    <thead class="sticky top-0 bg-os-panel shadow-sm">
+                        <tr>
+                            <th>Asset Class</th>
+                            <th>Spot (May 9)</th>
+                            <th>T+7 Days</th>
+                            <th>Next Quarter</th>
+                            <th>EOY 2026</th>
+                            <th>5Y Terminal</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-os-border/50">
+                        <tr class="hover:bg-os-window cursor-crosshair transition-colors">
+                            <td class="font-bold text-cyber-cyan">S&P 500</td>
+                            <td class="text-os-text font-bold">7,398</td>
+                            <td>7,450</td>
+                            <td>7,200 <span class="text-cyber-amber text-[9px] block">Vol Shock</span></td>
+                            <td>7,600</td>
+                            <td>9,500 <span class="text-cyber-green text-[9px] block">AI Prod.</span></td>
+                        </tr>
+                        <tr class="hover:bg-os-window cursor-crosshair transition-colors">
+                            <td class="font-bold text-cyber-cyan">Bitcoin (BTC)</td>
+                            <td class="text-os-text font-bold">$80,346</td>
+                            <td>$82,000</td>
+                            <td>$95,000</td>
+                            <td>$110,000</td>
+                            <td>$250,000 <span class="text-cyber-green text-[9px] block">Sov. Adop.</span></td>
+                        </tr>
+                        <tr class="hover:bg-os-window cursor-crosshair transition-colors">
+                            <td class="font-bold text-cyber-amber">10Y US Treasury</td>
+                            <td class="text-os-text font-bold">4.364%</td>
+                            <td>4.35%</td>
+                            <td>4.20%</td>
+                            <td>4.15%</td>
+                            <td>4.50% <span class="text-cyber-red text-[9px] block">Fiscal Deficit</span></td>
+                        </tr>
+                        <tr class="hover:bg-os-window cursor-crosshair transition-colors">
+                            <td class="font-bold text-cyber-amber">US HY OAS</td>
+                            <td class="text-os-text font-bold">2.79%</td>
+                            <td>2.85%</td>
+                            <td>3.50%</td>
+                            <td>4.00% <span class="text-cyber-red text-[9px] block">Def. Cycle</span></td>
+                            <td>3.20%</td>
+                        </tr>
+                        <tr class="hover:bg-os-window cursor-crosshair transition-colors">
+                            <td class="font-bold text-cyber-purple">Brent Crude Oil</td>
+                            <td class="text-os-text font-bold">$84.50</td>
+                            <td>$86.00</td>
+                            <td>$95.00 <span class="text-cyber-red text-[9px] block">Geo-Risk</span></td>
+                            <td>$80.00</td>
+                            <td>$110.00 <span class="text-cyber-red text-[9px] block">Struct. Deficit</span></td>
+                        </tr>
+                        <tr class="hover:bg-os-window cursor-crosshair transition-colors">
+                            <td class="font-bold text-cyber-purple">Gold (XAU)</td>
+                            <td class="text-os-text font-bold">$2,350</td>
+                            <td>$2,360</td>
+                            <td>$2,450</td>
+                            <td>$2,600</td>
+                            <td>$3,500 <span class="text-cyber-green text-[9px] block">De-dollarization</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="mt-4 p-3 border border-os-border bg-os-window rounded font-mono text-[9px] text-os-muted italic shrink-0">
+                *Projections derived from Adam v26.0 Neuro-Symbolic Ensembles blending historical volatility, deep learning trend forecasting, and live fundamental constraints.
+            </div>
+        </div>
+
+        <!-- Yield Curve & Sensitivity -->
+        <div class="flex flex-col gap-4 min-h-0">
+            <div class="glass-panel p-4 flex flex-col flex-1 min-h-[250px]">
+                <h2 class="text-xs font-mono font-bold text-cyber-amber uppercase mb-4 border-b border-os-border pb-2 shrink-0">Yield Curve Dynamics (US Treasury)</h2>
+                <div class="flex-1 relative w-full h-full">
+                    <canvas id="yieldCurveChart"></canvas>
+                </div>
+            </div>
+
+            <div class="glass-panel p-4 shrink-0">
+                <h2 class="text-xs font-mono font-bold text-os-text uppercase mb-3 border-b border-os-border pb-2">Rate Sensitivity Matrix (SPX Multiple)</h2>
+                <div class="grid grid-cols-4 gap-1 font-mono text-center text-[10px]">
+                    <div class="bg-os-bg p-2 text-os-muted font-bold rounded-tl">10Y Yield</div>
+                    <div class="bg-os-bg p-2 text-os-muted font-bold">3.50%</div>
+                    <div class="bg-os-bg p-2 text-cyber-amber font-bold border border-cyber-amber/50">4.36% (Spot)</div>
+                    <div class="bg-os-bg p-2 text-os-muted font-bold rounded-tr">5.00%</div>
+
+                    <div class="bg-os-bg p-2 text-os-muted font-bold text-left pl-3 rounded-bl">Implied Fwd P/E</div>
+                    <div class="bg-[rgba(0,250,154,0.1)] p-2 text-cyber-green font-bold">22.5x</div>
+                    <div class="bg-[rgba(255,170,0,0.1)] p-2 text-cyber-amber font-bold border border-cyber-amber/50">20.8x</div>
+                    <div class="bg-[rgba(255,30,56,0.1)] p-2 text-cyber-red font-bold rounded-br">18.2x</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const ctxYield = document.getElementById('yieldCurveChart').getContext('2d');
+        Chart.defaults.color = '#888888';
+        Chart.defaults.font.family = "'JetBrains Mono', monospace";
+
+        new Chart(ctxYield, {
+            type: 'line',
+            data: {
+                labels: ['1M', '3M', '6M', '1Y', '2Y', '5Y', '10Y', '20Y', '30Y'],
+                datasets: [
+                    {
+                        label: 'Current (May 2026)',
+                        data: [5.35, 5.38, 5.36, 5.10, 4.80, 4.45, 4.36, 4.58, 4.52],
+                        borderColor: '#ffaa00',
+                        backgroundColor: '#ffaa00',
+                        borderWidth: 2,
+                        pointBackgroundColor: '#ffaa00',
+                        pointRadius: 4,
+                        tension: 0.3
+                    },
+                    {
+                        label: 'T-1 Year (May 2025)',
+                        data: [5.05, 5.25, 5.15, 4.70, 4.05, 3.50, 3.45, 3.80, 3.65],
+                        borderColor: '#333333',
+                        borderWidth: 2,
+                        borderDash: [5, 5],
+                        pointRadius: 0,
+                        tension: 0.3
+                    },
+                    {
+                        label: 'Adam Forward Projection (EOY 2026)',
+                        data: [4.75, 4.60, 4.50, 4.40, 4.25, 4.10, 4.15, 4.40, 4.35],
+                        borderColor: '#00e5ff',
+                        backgroundColor: 'rgba(0, 229, 255, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        pointRadius: 0,
+                        tension: 0.3
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
+                plugins: {
+                    legend: { position: 'top', labels: { boxWidth: 12, font: {size: 10} } }
+                },
+                scales: {
+                    x: { grid: { color: 'rgba(255,255,255,0.05)' } },
+                    y: {
+                        grid: { color: 'rgba(255,255,255,0.05)' },
+                        title: { display: true, text: 'Yield (%)', color: '#888', font: {size: 10} },
+                        min: 3.0, max: 6.0
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
