@@ -215,7 +215,7 @@
                             </thead>
                             <tbody>
                                 {debts.map((d, i) => (
-                                    <tr key={i} className="group hover:bg-white/5 transition-colors">
+                                    <tr key={`fy-${i}`} className="group hover:bg-white/5 transition-colors">
                                         <td className="py-1">
                                             <input type="text" value={d.name} onChange={(e) => onUpdate(i, 'name', e.target.value)} className="bg-transparent focus:text-accent w-full outline-none text-slate-300" />
                                         </td>
@@ -731,22 +731,22 @@
                                                     <th className="p-3">FY-3</th>
                                                     <th className="p-3">FY-2</th>
                                                     <th className="p-3 border-r border-accent/20 bg-accent/5 text-white">LTM</th>
-                                                    {Array.from({length:7}).map((_, i) => <th key={i} className="p-3 text-accent">FY+{i+1}</th>)}
+                                                    {Array.from({length:7}).map((_, i) => <th key={`fy-${i}`} className="p-3 text-accent">FY+{i+1}</th>)}
                                                 </tr>
                                             </thead>
                                             <tbody className="divide-y divide-border/30">
                                                 {/* Revenue Row */}
                                                 <tr className="hover:bg-white/5">
                                                     <td className="text-left p-2 pl-4 sticky left-0 bg-[#0f172a] z-10 border-r border-border font-medium">Revenue</td>
-                                                    {historical.revenue.map((v, i) => <td key={i} className="p-2 text-muted">{fmt.cleanNum(v)}</td>)}
-                                                    {projections.rev.map((v, i) => <td key={i} className="p-2 font-bold text-white">{fmt.cleanNum(v)}</td>)}
+                                                    {historical.revenue.map((v, i) => <td key={`fy-${i}`} className="p-2 text-muted">{fmt.cleanNum(v)}</td>)}
+                                                    {projections.rev.map((v, i) => <td key={`fy-${i}`} className="p-2 font-bold text-white">{fmt.cleanNum(v)}</td>)}
                                                 </tr>
                                                 {/* Growth Input Row */}
                                                 <tr className="bg-bg/30">
                                                     <td className="text-left p-1 pl-6 sticky left-0 bg-[#0f172a] z-10 border-r border-border text-[10px] text-muted uppercase">Growth %</td>
                                                     <td className="p-1" colSpan="3"></td>
                                                     {currentScenario.growth.map((v, i) => (
-                                                        <td key={i} className="p-1">
+                                                        <td key={`fy-${i}`} className="p-1">
                                                             <input
                                                                 type="number"
                                                                 value={(v*100).toFixed(1)}
@@ -759,15 +759,15 @@
                                                 {/* EBITDA Row */}
                                                 <tr className="hover:bg-white/5">
                                                     <td className="text-left p-2 pl-4 sticky left-0 bg-[#0f172a] z-10 border-r border-border font-medium">EBITDA</td>
-                                                    {historical.revenue.map((r, i) => <td key={i} className="p-2 text-muted">{fmt.cleanNum(r * historical.margin[i])}</td>)}
-                                                    {projections.ebitda.map((v, i) => <td key={i} className="p-2">{fmt.cleanNum(v)}</td>)}
+                                                    {historical.revenue.map((r, i) => <td key={`fy-${i}`} className="p-2 text-muted">{fmt.cleanNum(r * historical.margin[i])}</td>)}
+                                                    {projections.ebitda.map((v, i) => <td key={`fy-${i}`} className="p-2">{fmt.cleanNum(v)}</td>)}
                                                 </tr>
                                                 {/* Margin Input Row */}
                                                 <tr className="bg-bg/30">
                                                     <td className="text-left p-1 pl-6 sticky left-0 bg-[#0f172a] z-10 border-r border-border text-[10px] text-muted uppercase">Margin %</td>
-                                                    {historical.margin.map((v, i) => <td key={i} className="p-1 text-[10px] text-muted text-center">{(v*100).toFixed(1)}%</td>)}
+                                                    {historical.margin.map((v, i) => <td key={`fy-${i}`} className="p-1 text-[10px] text-muted text-center">{(v*100).toFixed(1)}%</td>)}
                                                     {currentScenario.margin.map((v, i) => (
-                                                        <td key={i} className="p-1">
+                                                        <td key={`fy-${i}`} className="p-1">
                                                             <input
                                                                 type="number"
                                                                 value={(v*100).toFixed(1)}
@@ -783,12 +783,12 @@
                                                 <tr className="hover:bg-white/5">
                                                     <td className="text-left p-2 pl-4 sticky left-0 bg-[#0f172a] z-10 border-r border-border">(-) Est. Taxes</td>
                                                     <td colSpan="3" className="text-center text-muted">-</td>
-                                                    {projections.ebitda.map((v, i) => <td key={i} className="p-2 text-danger/80">({fmt.cleanNum((v - v*0.15)* (inputs.tax/100))})</td>)}
+                                                    {projections.ebitda.map((v, i) => <td key={`fy-${i}`} className="p-2 text-danger/80">({fmt.cleanNum((v - v*0.15)* (inputs.tax/100))})</td>)}
                                                 </tr>
                                                 <tr className="hover:bg-white/5">
                                                     <td className="text-left p-2 pl-4 sticky left-0 bg-[#0f172a] z-10 border-r border-border font-bold text-accent">Unlevered FCF</td>
                                                     <td colSpan="3" className="text-center text-muted">-</td>
-                                                    {projections.fcf.map((v, i) => <td key={i} className="p-2 font-bold text-accent">{fmt.cleanNum(v)}</td>)}
+                                                    {projections.fcf.map((v, i) => <td key={`fy-${i}`} className="p-2 font-bold text-accent">{fmt.cleanNum(v)}</td>)}
                                                 </tr>
                                             </tbody>
                                         </table>

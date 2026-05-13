@@ -46,15 +46,27 @@ export const NewsWire: React.FC = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    let isMounted = true;
+    let timeoutId: NodeJS.Timeout;
+
     // Initial Population
     const initialNews = Array.from({ length: 15 }, () => generateNews());
     setNews(initialNews);
 
-    const interval = setInterval(() => {
-        setNews(prev => [generateNews(), ...prev].slice(0, 50));
-    }, 3000);
+    const scheduleNext = () => {
+        timeoutId = setTimeout(() => {
+            if (!isMounted) return;
+            setNews(prev => [generateNews(), ...prev].slice(0, 50));
+            scheduleNext();
+        }, 3000);
+    };
 
-    return () => clearInterval(interval);
+    scheduleNext();
+
+    return () => {
+        isMounted = false;
+        clearTimeout(timeoutId);
+    };
   }, []);
 
   const generateNews = (): NewsItem => {

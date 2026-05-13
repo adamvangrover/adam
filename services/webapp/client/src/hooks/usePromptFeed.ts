@@ -72,6 +72,8 @@ export function usePromptFeed() {
       }
     };
 
+    let isMounted = true;
+
     // Start feeds
     feeds.forEach(feed => {
       if (!feed.isActive) return;
@@ -80,16 +82,23 @@ export function usePromptFeed() {
       fetchFeed(feed.id, feed.url);
 
       // Interval fetch
-      if (intervalsRef.current[feed.id]) clearInterval(intervalsRef.current[feed.id]);
+      if (intervalsRef.current[feed.id]) clearTimeout(intervalsRef.current[feed.id]);
 
-      intervalsRef.current[feed.id] = setInterval(() => {
-        fetchFeed(feed.id, feed.url);
-      }, preferences.refreshInterval);
+      const scheduleFetch = () => {
+        intervalsRef.current[feed.id] = setTimeout(() => {
+            if (!isMounted) return;
+            fetchFeed(feed.id, feed.url);
+            scheduleFetch();
+        }, preferences.refreshInterval);
+      };
+
+      scheduleFetch();
     });
 
     return () => {
+      isMounted = false;
       // Cleanup
-      Object.values(intervalsRef.current).forEach(clearInterval);
+      Object.values(intervalsRef.current).forEach(clearTimeout);
       intervalsRef.current = {};
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -98,8 +107,10 @@ export function usePromptFeed() {
 
   // Separate Effect for Simulation
   useEffect(() => {
+    let isMounted = true;
+
     if (simIntervalRef.current) {
-        clearInterval(simIntervalRef.current);
+        clearTimeout(simIntervalRef.current);
         simIntervalRef.current = null;
     }
 
@@ -109,16 +120,23 @@ export function usePromptFeed() {
         addPrompts(initialBatch);
 
         // Ongoing drip
-        simIntervalRef.current = setInterval(() => {
-            if (Math.random() > 0.3) { // 70% chance to generate per tick
-                addPrompts([generateSyntheticPrompt()]);
-            }
-        }, 5000); // Check every 5s
+        const scheduleSimulation = () => {
+            simIntervalRef.current = setTimeout(() => {
+                if (!isMounted) return;
+                if (Math.random() > 0.3) { // 70% chance to generate per tick
+                    addPrompts([generateSyntheticPrompt()]);
+                }
+                scheduleSimulation();
+            }, 5000); // Check every 5s
+        };
+
+        scheduleSimulation();
     }
 
     return () => {
+        isMounted = false;
         if (simIntervalRef.current) {
-            clearInterval(simIntervalRef.current);
+            clearTimeout(simIntervalRef.current);
         }
     };
   }, [preferences.useSimulation, addPrompts]);
