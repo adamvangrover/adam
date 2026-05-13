@@ -115,3 +115,8 @@ def test_parse_json_garbage_failure():
     text = "There is no JSON here."
     with pytest.raises(ValueError, match="Failed to extract valid JSON from the provided text."):
         parse_json_garbage(text)
+
+def test_parse_json_garbage_ast_fallback():
+    # Python dictionary with single quotes, invalid in strict JSON
+    text = "Here is a python dict: {'key': 'value', 'valid': True, 'null': None}"
+    assert parse_json_garbage(text) == {'key': 'value', 'valid': True, 'null': None}

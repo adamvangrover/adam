@@ -13,13 +13,21 @@ import json
 import logging
 import random
 import re
+import ast
 import time
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional, TypedDict
 
 logger = logging.getLogger(__name__)
 
 # Global bus for backward compatibility testing
-_MOCK_MESSAGE_BUS: List[Dict[str, Any]] = []
+class AgentMessage(TypedDict, total=False):
+    sender: str
+    receiver: str
+    message: Any
+    knowledge_type: str
+    knowledge_data: Any
+
+_MOCK_MESSAGE_BUS: list[AgentMessage] = []
 
 
 def communicate_between_agents(
@@ -87,7 +95,7 @@ def monitor_agent_performance(agent_name: str, metric: str, value: Any) -> None:
 
 
 def validate_agent_inputs(
-    agent_name: str, inputs: Dict[str, Any], required_parameters: List[str]
+    agent_name: str, inputs: dict[str, Any], required_parameters: list[str]
 ) -> None:
     """Validates agent inputs against a list of required parameters.
 
@@ -168,7 +176,7 @@ def log_agent_action(agent_name: str, action: str, details: Any) -> None:
     )
 
 
-def parse_json_garbage(text: str) -> Dict[str, Any]:
+def parse_json_garbage(text: str) -> dict[str, Any]:
     """Safely extracts and parses JSON from a string that might contain markdown
     or conversational garbage.
 
@@ -198,10 +206,17 @@ def parse_json_garbage(text: str) -> Dict[str, Any]:
     # 3. Fallback to greedy curly brace extraction
     braces_match = re.search(r"(\{.*\})", text, re.DOTALL)
     if braces_match:
+        extracted = braces_match.group(1)
         try:
-            return json.loads(braces_match.group(1))
+            return json.loads(extracted)
         except json.JSONDecodeError:
-            pass
+            # 4. Final fallback: try to parse as a Python dictionary literal
+            try:
+                parsed_ast = ast.literal_eval(extracted)
+                if isinstance(parsed_ast, dict):
+                    return parsed_ast
+            except (SyntaxError, ValueError):
+                pass
 
     raise ValueError("Failed to extract valid JSON from the provided text.")
 
