@@ -34,37 +34,51 @@ const NeuralDashboard = () => {
     const [query, setQuery] = useState("Analyze Apple Inc. credit risk");
     const [status, setStatus] = useState("Idle");
 
+    const timeoutRef = useRef(null);
+    const isMounted = useRef(true);
+
     useEffect(() => {
         setGraphData(initialGraph);
+        return () => {
+            isMounted.current = false;
+            if (timeoutRef.current) clearTimeout(timeoutRef.current);
+        };
     }, []);
 
     const runSimulation = () => {
+        if (timeoutRef.current) clearTimeout(timeoutRef.current);
         setStatus("Running...");
         let step = 0;
         const sequence = ["MetaOrchestrator", "Planner", "GraphEngine", "Draft", "KnowledgeBase", "Draft", "Critique", "Refine", "Draft", "Critique", "MetaOrchestrator"];
 
-        const interval = setInterval(() => {
-            if (step >= sequence.length) {
-                clearInterval(interval);
-                setStatus("Complete");
-                setActiveNode(null);
-                return;
-            }
+        const scheduleNext = () => {
+            timeoutRef.current = setTimeout(() => {
+                if (!isMounted.current) return;
 
-            const nodeId = sequence[step];
-            setActiveNode(nodeId);
-
-            // Focus on the active node
-            if (fgRef.current) {
-                // Find node object
-                const node = graphData.nodes.find(n => n.id === nodeId);
-                if (node) {
-                     // fgRef.current.centerAt(node.x, node.y, 1000);
+                if (step >= sequence.length) {
+                    setStatus("Complete");
+                    setActiveNode(null);
+                    return;
                 }
-            }
 
-            step++;
-        }, 1000);
+                const nodeId = sequence[step];
+                setActiveNode(nodeId);
+
+                // Focus on the active node
+                if (fgRef.current) {
+                    // Find node object
+                    const node = graphData.nodes.find(n => n.id === nodeId);
+                    if (node) {
+                         // fgRef.current.centerAt(node.x, node.y, 1000);
+                    }
+                }
+
+                step++;
+                scheduleNext();
+            }, 1000);
+        };
+
+        scheduleNext();
     };
 
     const handleNodePaint = (node, ctx, globalScale) => {

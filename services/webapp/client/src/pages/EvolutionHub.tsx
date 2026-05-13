@@ -193,7 +193,7 @@ const ArchitectureViz = ({ type }: { type: string }) => {
         <svg viewBox="0 0 200 120" className="w-full h-48 opacity-80 hover:opacity-100 transition-opacity">
             {[...Array(8)].map((_, i) => (
                 <circle 
-                    key={i}
+                    key={`circle-${i}`}
                     cx={100 + 40 * Math.cos(i * Math.PI / 4)} 
                     cy={60 + 30 * Math.sin(i * Math.PI / 4)} 
                     r="6" 
@@ -351,7 +351,7 @@ const EvolutionHub = () => {
                         </h3>
                         <div className="space-y-2">
                             {selectedVersion.constraints.map((c, i) => (
-                                <div key={i} className="flex items-center gap-2 text-xs text-slate-300 bg-slate-900/50 p-2 rounded border border-slate-800/50">
+                                <div key={`constraint-${i}`} className="flex items-center gap-2 text-xs text-slate-300 bg-slate-900/50 p-2 rounded border border-slate-800/50">
                                     <div className="w-1.5 h-1.5 rounded-full bg-red-500"></div>
                                     {c}
                                 </div>
@@ -389,7 +389,7 @@ const EvolutionHub = () => {
                         {/* Highlights Grid */}
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
                             {selectedVersion.highlights.map((h, i) => (
-                                <div key={i} className="bg-slate-900/40 p-3 rounded-lg border border-slate-800 flex items-center gap-3">
+                                <div key={`highlight-${i}`} className="bg-slate-900/40 p-3 rounded-lg border border-slate-800 flex items-center gap-3">
                                     <CheckCircle className="w-4 h-4 text-emerald-500/80" />
                                     <span className="text-sm text-slate-200">{h}</span>
                                 </div>
@@ -414,7 +414,7 @@ const EvolutionHub = () => {
                             </h3>
                             <div className="space-y-5">
                                 {selectedVersion.metrics.map((m, i) => (
-                                    <div key={i} className="group">
+                                    <div key={`metric-${i}`} className="group">
                                         <div className="flex justify-between items-end mb-1">
                                             <span className="text-sm text-slate-400 group-hover:text-slate-200 transition-colors">{m.label}</span>
                                             <div className="text-right">
@@ -446,7 +446,7 @@ const EvolutionHub = () => {
                             </h3>
                             <div className="grid grid-cols-1 gap-3">
                                 {selectedVersion.agents.map((agent, i) => (
-                                    <div key={i} className="flex items-center justify-between p-3 rounded-lg bg-slate-800/30 border border-slate-700/50 hover:bg-slate-800/50 hover:border-purple-500/30 transition-all">
+                                    <div key={`agent-${agent.id || i}`} className="flex items-center justify-between p-3 rounded-lg bg-slate-800/30 border border-slate-700/50 hover:bg-slate-800/50 hover:border-purple-500/30 transition-all">
                                         <div className="flex items-center gap-3">
                                             <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
                                                 agent.type === 'fiduciary' ? 'bg-red-500/20 text-red-400' :

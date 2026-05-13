@@ -686,23 +686,23 @@
                                             <tr className="bg-slate-900/50 text-slate-400">
                                                 <th className="p-2 text-left sticky left-0 bg-slate-900 border-r border-slate-800 min-w-[140px] z-10">Fiscal Year ($M)</th>
                                                 {['FY-2', 'FY-1', 'LTM'].map(y => <th key={y} className="p-2 border-b border-slate-800 text-slate-500">{y}</th>)}
-                                                {Array.from({length:7}).map((_,i) => <th key={i} className="p-2 text-cyan-400 border-b border-slate-800">FY+{i+1}</th>)}
+                                                {Array.from({length:7}).map((_,i) => <th key={`fy-${i}`} className="p-2 text-cyan-400 border-b border-slate-800">FY+{i+1}</th>)}
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-slate-800/50">
                                             {/* Revenue */}
                                             <tr className="bg-slate-900/30">
                                                 <td className="p-2 text-left sticky left-0 bg-slate-900 border-r border-slate-800 font-bold text-slate-300">Revenue</td>
-                                                {history.revenue.map((v,i) => <td key={i} className="p-2 text-slate-400">
+                                                {history.revenue.map((v,i) => <td key={`fy-${i}`} className="p-2 text-slate-400">
                                                     <input className="w-full bg-transparent text-right focus:outline-none focus:text-cyan-400 border-b border-slate-800 focus:border-cyan-500" value={v} onChange={e => updateHistory('revenue', i, parseFloat(e.target.value))} />
                                                 </td>)}
-                                                {model.proj_rev.map((v,i) => <td key={i} className="p-2 text-slate-200 font-bold">{v.toFixed(0)}</td>)}
+                                                {model.proj_rev.map((v,i) => <td key={`fy-${i}`} className="p-2 text-slate-200 font-bold">{v.toFixed(0)}</td>)}
                                             </tr>
                                             <tr>
                                                 <td className="p-2 text-left sticky left-0 bg-slate-900 border-r border-slate-800 text-cyan-500/70 italic text-[10px]">Growth % (Driver)</td>
                                                 <td colSpan="3" className="p-2 text-center text-slate-600 text-[10px]">-</td>
                                                 {drivers.growth.map((v,i) => (
-                                                    <td key={i} className="p-1">
+                                                    <td key={`fy-${i}`} className="p-1">
                                                         <input type="number" step="0.1" value={v} onChange={(e) => updateDriver('growth', i, parseFloat(e.target.value))}
                                                             className="w-full driver-input p-1 focus:outline-none" />
                                                     </td>
@@ -712,16 +712,16 @@
                                             {/* COGS & Gross Profit */}
                                             <tr>
                                                 <td className="p-2 text-left sticky left-0 bg-slate-900 border-r border-slate-800 text-slate-400">(-) COGS</td>
-                                                {history.cogs.map((v,i) => <td key={i} className="p-2 text-slate-500">
+                                                {history.cogs.map((v,i) => <td key={`fy-${i}`} className="p-2 text-slate-500">
                                                     <input className="w-full bg-transparent text-right focus:outline-none focus:text-cyan-400 border-b border-slate-800 focus:border-cyan-500" value={v} onChange={e => updateHistory('cogs', i, parseFloat(e.target.value))} />
                                                 </td>)}
-                                                {model.proj_cogs.map((v,i) => <td key={i} className="p-2 text-slate-500">({v.toFixed(0)})</td>)}
+                                                {model.proj_cogs.map((v,i) => <td key={`fy-${i}`} className="p-2 text-slate-500">({v.toFixed(0)})</td>)}
                                             </tr>
                                             <tr>
                                                 <td className="p-2 text-left sticky left-0 bg-slate-900 border-r border-slate-800 text-cyan-500/70 italic text-[10px]">COGS % of Rev (Driver)</td>
                                                 <td colSpan="3" className="p-2 text-center text-slate-600 text-[10px]">-</td>
                                                 {drivers.cogs_pct.map((v,i) => (
-                                                    <td key={i} className="p-1">
+                                                    <td key={`fy-${i}`} className="p-1">
                                                         <input type="number" step="0.1" value={v} onChange={(e) => updateDriver('cogs_pct', i, parseFloat(e.target.value))}
                                                             className="w-full driver-input p-1 focus:outline-none" />
                                                     </td>
@@ -729,23 +729,23 @@
                                             </tr>
                                             <tr>
                                                 <td className="p-2 text-left sticky left-0 bg-slate-900 border-r border-slate-800 text-slate-400 font-bold">Gross Profit</td>
-                                                {history.revenue.map((r,i) => <td key={i} className="p-2 text-slate-300 font-bold">{(r - history.cogs[i]).toFixed(0)}</td>)}
-                                                {model.proj_gross_profit.map((v,i) => <td key={i} className="p-2 text-slate-300 font-bold">{v.toFixed(0)}</td>)}
+                                                {history.revenue.map((r,i) => <td key={`fy-${i}`} className="p-2 text-slate-300 font-bold">{(r - history.cogs[i]).toFixed(0)}</td>)}
+                                                {model.proj_gross_profit.map((v,i) => <td key={`fy-${i}`} className="p-2 text-slate-300 font-bold">{v.toFixed(0)}</td>)}
                                             </tr>
 
                                             {/* SG&A */}
                                             <tr>
                                                 <td className="p-2 text-left sticky left-0 bg-slate-900 border-r border-slate-800 text-slate-400">(-) SG&A</td>
-                                                {history.sga.map((v,i) => <td key={i} className="p-2 text-slate-500">
+                                                {history.sga.map((v,i) => <td key={`fy-${i}`} className="p-2 text-slate-500">
                                                     <input className="w-full bg-transparent text-right focus:outline-none focus:text-cyan-400 border-b border-slate-800 focus:border-cyan-500" value={v} onChange={e => updateHistory('sga', i, parseFloat(e.target.value))} />
                                                 </td>)}
-                                                {model.proj_sga.map((v,i) => <td key={i} className="p-2 text-slate-500">({v.toFixed(0)})</td>)}
+                                                {model.proj_sga.map((v,i) => <td key={`fy-${i}`} className="p-2 text-slate-500">({v.toFixed(0)})</td>)}
                                             </tr>
                                             <tr>
                                                 <td className="p-2 text-left sticky left-0 bg-slate-900 border-r border-slate-800 text-cyan-500/70 italic text-[10px]">SG&A % of Rev (Driver)</td>
                                                 <td colSpan="3" className="p-2 text-center text-slate-600 text-[10px]">-</td>
                                                 {drivers.sga_pct.map((v,i) => (
-                                                    <td key={i} className="p-1">
+                                                    <td key={`fy-${i}`} className="p-1">
                                                         <input type="number" step="0.1" value={v} onChange={(e) => updateDriver('sga_pct', i, parseFloat(e.target.value))}
                                                             className="w-full driver-input p-1 focus:outline-none" />
                                                     </td>
@@ -755,28 +755,28 @@
                                             {/* EBITDA */}
                                             <tr className="bg-slate-900/30">
                                                 <td className="p-2 text-left sticky left-0 bg-slate-900 border-r border-slate-800 font-bold text-emerald-400">EBITDA</td>
-                                                {model.hist_ebitda.map((v,i) => <td key={i} className="p-2 text-slate-400 font-bold">{v.toFixed(0)}</td>)}
-                                                {model.proj_ebitda.map((v,i) => <td key={i} className="p-2 text-slate-200 font-bold">{v.toFixed(0)}</td>)}
+                                                {model.hist_ebitda.map((v,i) => <td key={`fy-${i}`} className="p-2 text-slate-400 font-bold">{v.toFixed(0)}</td>)}
+                                                {model.proj_ebitda.map((v,i) => <td key={`fy-${i}`} className="p-2 text-slate-200 font-bold">{v.toFixed(0)}</td>)}
                                             </tr>
                                             <tr>
                                                 <td className="p-2 text-left sticky left-0 bg-slate-900 border-r border-slate-800 text-cyan-500/70 italic text-[10px]">Margin %</td>
-                                                {model.hist_ebitda.map((v,i) => <td key={i} className="p-2 text-slate-600 text-[10px]">{(v/history.revenue[i]*100).toFixed(1)}%</td>)}
-                                                {model.proj_ebitda.map((v,i) => <td key={i} className="p-2 text-cyan-700 text-[10px]">{(v/model.proj_rev[i]*100).toFixed(1)}%</td>)}
+                                                {model.hist_ebitda.map((v,i) => <td key={`fy-${i}`} className="p-2 text-slate-600 text-[10px]">{(v/history.revenue[i]*100).toFixed(1)}%</td>)}
+                                                {model.proj_ebitda.map((v,i) => <td key={`fy-${i}`} className="p-2 text-cyan-700 text-[10px]">{(v/model.proj_rev[i]*100).toFixed(1)}%</td>)}
                                             </tr>
 
                                             {/* D&A */}
                                             <tr>
                                                 <td className="p-2 text-left sticky left-0 bg-slate-900 border-r border-slate-800 text-slate-400">(-) D&A</td>
-                                                {history.da.map((v,i) => <td key={i} className="p-2 text-slate-500">
+                                                {history.da.map((v,i) => <td key={`fy-${i}`} className="p-2 text-slate-500">
                                                     <input className="w-full bg-transparent text-right focus:outline-none focus:text-cyan-400 border-b border-slate-800 focus:border-cyan-500" value={v} onChange={e => updateHistory('da', i, parseFloat(e.target.value))} />
                                                 </td>)}
-                                                {model.proj_da.map((v,i) => <td key={i} className="p-2 text-slate-500">({v.toFixed(0)})</td>)}
+                                                {model.proj_da.map((v,i) => <td key={`fy-${i}`} className="p-2 text-slate-500">({v.toFixed(0)})</td>)}
                                             </tr>
                                             <tr>
                                                 <td className="p-2 text-left sticky left-0 bg-slate-900 border-r border-slate-800 text-cyan-500/70 italic text-[10px]">D&A % of Rev (Driver)</td>
                                                 <td colSpan="3" className="p-2 text-center text-slate-600 text-[10px]">-</td>
                                                 {drivers.da_pct.map((v,i) => (
-                                                    <td key={i} className="p-1">
+                                                    <td key={`fy-${i}`} className="p-1">
                                                         <input type="number" step="0.1" value={v} onChange={(e) => updateDriver('da_pct', i, parseFloat(e.target.value))}
                                                             className="w-full driver-input p-1 focus:outline-none" />
                                                     </td>
@@ -786,28 +786,28 @@
                                             {/* EBIT & Tax */}
                                             <tr className="bg-slate-900/30">
                                                 <td className="p-2 text-left sticky left-0 bg-slate-900 border-r border-slate-800 font-bold text-slate-300">EBIT</td>
-                                                {history.revenue.map((r,i) => <td key={i} className="p-2 text-slate-400">{(model.hist_ebitda[i] - history.da[i]).toFixed(0)}</td>)}
-                                                {model.proj_ebit.map((v,i) => <td key={i} className="p-2 text-slate-200">{v.toFixed(0)}</td>)}
+                                                {history.revenue.map((r,i) => <td key={`fy-${i}`} className="p-2 text-slate-400">{(model.hist_ebitda[i] - history.da[i]).toFixed(0)}</td>)}
+                                                {model.proj_ebit.map((v,i) => <td key={`fy-${i}`} className="p-2 text-slate-200">{v.toFixed(0)}</td>)}
                                             </tr>
                                             <tr>
                                                 <td className="p-2 text-left sticky left-0 bg-slate-900 border-r border-slate-800 text-slate-400">(-) Tax</td>
                                                 <td colSpan="3" className="p-2 text-center text-slate-600">-</td>
-                                                {model.proj_tax.map((v,i) => <td key={i} className="p-2 text-slate-500">({v.toFixed(0)})</td>)}
+                                                {model.proj_tax.map((v,i) => <td key={`fy-${i}`} className="p-2 text-slate-500">({v.toFixed(0)})</td>)}
                                             </tr>
 
                                             {/* FCF Items */}
                                             <tr>
                                                 <td className="p-2 text-left sticky left-0 bg-slate-900 border-r border-slate-800 text-slate-400">(-) Capex</td>
-                                                {history.capex.map((v,i) => <td key={i} className="p-2 text-slate-500">
+                                                {history.capex.map((v,i) => <td key={`fy-${i}`} className="p-2 text-slate-500">
                                                     <input className="w-full bg-transparent text-right focus:outline-none focus:text-cyan-400 border-b border-slate-800 focus:border-cyan-500" value={v} onChange={e => updateHistory('capex', i, parseFloat(e.target.value))} />
                                                 </td>)}
-                                                {model.proj_capex.map((v,i) => <td key={i} className="p-2 text-slate-500">({v.toFixed(0)})</td>)}
+                                                {model.proj_capex.map((v,i) => <td key={`fy-${i}`} className="p-2 text-slate-500">({v.toFixed(0)})</td>)}
                                             </tr>
                                             <tr>
                                                 <td className="p-2 text-left sticky left-0 bg-slate-900 border-r border-slate-800 text-cyan-500/70 italic text-[10px]">Capex % of Rev (Driver)</td>
                                                 <td colSpan="3" className="p-2 text-center text-slate-600 text-[10px]">-</td>
                                                 {drivers.capex_pct.map((v,i) => (
-                                                    <td key={i} className="p-1">
+                                                    <td key={`fy-${i}`} className="p-1">
                                                         <input type="number" step="0.1" value={v} onChange={(e) => updateDriver('capex_pct', i, parseFloat(e.target.value))}
                                                             className="w-full driver-input p-1 focus:outline-none" />
                                                     </td>
@@ -817,13 +817,13 @@
                                             <tr>
                                                 <td className="p-2 text-left sticky left-0 bg-slate-900 border-r border-slate-800 text-slate-400">(-) NWC Change</td>
                                                 <td colSpan="3" className="p-2 text-center text-slate-600">-</td>
-                                                {model.proj_nwc_chg.map((v,i) => <td key={i} className="p-2 text-slate-500">({v.toFixed(0)})</td>)}
+                                                {model.proj_nwc_chg.map((v,i) => <td key={`fy-${i}`} className="p-2 text-slate-500">({v.toFixed(0)})</td>)}
                                             </tr>
                                             <tr>
                                                 <td className="p-2 text-left sticky left-0 bg-slate-900 border-r border-slate-800 text-cyan-500/70 italic text-[10px]">NWC % of Rev (Driver)</td>
                                                 <td colSpan="3" className="p-2 text-center text-slate-600 text-[10px]">-</td>
                                                 {drivers.nwc_pct.map((v,i) => (
-                                                    <td key={i} className="p-1">
+                                                    <td key={`fy-${i}`} className="p-1">
                                                         <input type="number" step="0.1" value={v} onChange={(e) => updateDriver('nwc_pct', i, parseFloat(e.target.value))}
                                                             className="w-full driver-input p-1 focus:outline-none" />
                                                     </td>
@@ -833,7 +833,7 @@
                                             <tr className="border-t-2 border-slate-700 bg-emerald-900/10">
                                                 <td className="p-2 text-left sticky left-0 bg-slate-900 border-r border-slate-800 font-bold text-emerald-400">Unlevered FCF</td>
                                                 <td colSpan="3" className="p-2 text-center text-slate-600">-</td>
-                                                {model.proj_fcf.map((v,i) => <td key={i} className="p-2 font-bold text-emerald-400">{v.toFixed(0)}</td>)}
+                                                {model.proj_fcf.map((v,i) => <td key={`fy-${i}`} className="p-2 font-bold text-emerald-400">{v.toFixed(0)}</td>)}
                                             </tr>
                                         </tbody>
                                     </table>
@@ -879,7 +879,7 @@
                                                     {name: '2nd Lien', debt: inputs.debt_2l, rec: model.waterfall.rec_2l},
                                                     {name: 'Unsecured', debt: inputs.debt_unsec, rec: model.waterfall.rec_unsec}
                                                 ].map((tranche, i) => (
-                                                    <div key={i} className="flex items-center gap-2">
+                                                    <div key={`fy-${i}`} className="flex items-center gap-2">
                                                         <div className="w-16 text-[10px] text-slate-400">{tranche.name}</div>
                                                         <div className="flex-1 h-3 bg-slate-800 rounded-sm overflow-hidden relative">
                                                             {tranche.debt > 0 && (

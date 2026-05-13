@@ -13,6 +13,13 @@ const AGENTS = [
 ];
 
 export const SystemMonitor: React.FC = () => {
+  const memoBlocks = React.useMemo(() => {
+    return Array.from({length: 50}).map((_, i) => ({
+      id: `mem-block-${i}`,
+      colorClass: Math.random() > 0.7 ? 'bg-cyan-700/50' : Math.random() > 0.9 ? 'bg-amber-600/50' : 'bg-transparent'
+    }));
+  }, []);
+
   return (
     <div className="h-full flex flex-col gap-4 p-4 overflow-y-auto">
       <h2 className="text-xl font-bold text-cyan-400 font-mono border-b border-cyan-900 pb-2 mb-2 flex items-center gap-2">
@@ -54,10 +61,10 @@ export const SystemMonitor: React.FC = () => {
       <div className="mt-8">
         <h3 className="text-sm font-bold text-cyan-500 font-mono mb-4 uppercase tracking-widest border-b border-cyan-900/30 pb-1 w-max">Memory Allocation</h3>
         <div className="flex gap-1 h-8 w-full bg-cyan-950/30 rounded overflow-hidden">
-            {Array.from({length: 50}).map((_, i) => (
+            {memoBlocks.map((block) => (
                 <div
-                    key={i}
-                    className={`flex-1 ${Math.random() > 0.7 ? 'bg-cyan-700/50' : Math.random() > 0.9 ? 'bg-amber-600/50' : 'bg-transparent'} border-r border-black/20`}
+                    key={block.id}
+                    className={`flex-1 ${block.colorClass} border-r border-black/20`}
                 />
             ))}
         </div>
