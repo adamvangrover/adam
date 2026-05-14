@@ -1,10 +1,15 @@
 import React, { useState, useEffect, useRef, memo } from 'react';
 import { dataManager } from '../utils/DataManager';
 
+interface HistoryLine {
+    id: string;
+    text: string;
+}
+
 // Bolt: Memoized component for history rendering.
 // This prevents the entire history list (potentially hundreds of DOM nodes)
 // from re-rendering on every keystroke in the input field.
-const TerminalHistory = memo(({ history }: { history: string[] }) => {
+const TerminalHistory = memo(({ history }: { history: HistoryLine[] }) => {
     const endRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -13,12 +18,12 @@ const TerminalHistory = memo(({ history }: { history: string[] }) => {
 
     return (
         <>
-            {history.map((line, i) => (
-                <div key={i} style={{
+            {history.map((line) => (
+                <div key={line.id} style={{
                     marginBottom: '4px',
-                    color: line.startsWith('ERROR') ? '#f00' : (line.includes('[INFO]') ? '#0ff' : '#0f0')
+                    color: line.text.startsWith('ERROR') ? '#f00' : (line.text.includes('[INFO]') ? '#0ff' : '#0f0')
                 }}>
-                    {line}
+                    {line.text}
                 </div>
             ))}
             <div ref={endRef} />
@@ -27,19 +32,24 @@ const TerminalHistory = memo(({ history }: { history: string[] }) => {
 });
 
 const Terminal: React.FC = () => {
-  const [history, setHistory] = useState<string[]>([
-      '> ADAM v23.5 KERNEL INITIALIZED',
-      '> CONNECTED TO NEURO-SYMBOLIC CORE...',
-      '> TYPE "help" FOR COMMANDS'
+  const [history, setHistory] = useState<HistoryLine[]>([
+      { id: 'init-1', text: '> ADAM v23.5 KERNEL INITIALIZED' },
+      { id: 'init-2', text: '> CONNECTED TO NEURO-SYMBOLIC CORE...' },
+      { id: 'init-3', text: '> TYPE "help" FOR COMMANDS' }
   ]);
   const [input, setInput] = useState('');
   const [commandHistory, setCommandHistory] = useState<string[]>([]);
   const [historyPointer, setHistoryPointer] = useState<number>(-1);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  const createLine = (text: string): HistoryLine => ({
+      id: Math.random().toString(36).substr(2, 9),
+      text
+  });
+
   const handleCommand = async (cmd: string) => {
     const timestamp = new Date().toISOString().split('T')[1].slice(0,8);
-    const newHistory = [...history, `[${timestamp}] $ ${cmd}`];
+    const newHistory = [...history, createLine(`[${timestamp}] $ ${cmd}`)];
 
     const cleanCmd = cmd.trim().toLowerCase();
 
@@ -52,32 +62,32 @@ const Terminal: React.FC = () => {
     switch (cleanCmd) {
       case 'help':
         newHistory.push(
-            'AVAILABLE COMMANDS:',
-            '  status       - Check system connectivity and health',
-            '  scan agents  - List all active agents and their tasks',
-            '  query [sym]  - Initiate Deep Dive analysis for a ticker',
-            '  mode [type]  - Switch mode (live/archive)',
-            '  clear        - Clear terminal screen'
+            createLine('AVAILABLE COMMANDS:'),
+            createLine('  status       - Check system connectivity and health'),
+            createLine('  scan agents  - List all active agents and their tasks'),
+            createLine('  query [sym]  - Initiate Deep Dive analysis for a ticker'),
+            createLine('  mode [type]  - Switch mode (live/archive)'),
+            createLine('  clear        - Clear terminal screen')
         );
         break;
       case 'status':
         const status = await dataManager.checkConnection();
         newHistory.push(
-            `SYSTEM STATUS: ${status.status}`,
-            `LATENCY: ${status.latency}ms`,
-            `VERSION: ${status.version}`,
-            `MODE: ${dataManager.isOfflineMode() ? 'OFFLINE / SIMULATED' : 'ONLINE / CONNECTED'}`
+            createLine(`SYSTEM STATUS: ${status.status}`),
+            createLine(`LATENCY: ${status.latency}ms`),
+            createLine(`VERSION: ${status.version}`),
+            createLine(`MODE: ${dataManager.isOfflineMode() ? 'OFFLINE / SIMULATED' : 'ONLINE / CONNECTED'}`)
         );
         break;
       case 'scan agents':
-        newHistory.push('SCANNING AGENT NETWORK...');
+        newHistory.push(createLine('SCANNING AGENT NETWORK...'));
         const manifest = await dataManager.getManifest();
         if (manifest.agents) {
             manifest.agents.forEach(a => {
-                newHistory.push(`[${a.status.toUpperCase()}] ${a.name.padEnd(20)} :: ${a.specialization}`);
+                newHistory.push(createLine(`[${a.status.toUpperCase()}] ${a.name.padEnd(20)} :: ${a.specialization}`));
             });
         } else {
-            newHistory.push('NO AGENTS DETECTED.');
+            newHistory.push(createLine('NO AGENTS DETECTED.'));
         }
         break;
       case 'clear':
@@ -88,27 +98,27 @@ const Terminal: React.FC = () => {
         if (cleanCmd.startsWith('query ')) {
             const ticker = cleanCmd.split(' ')[1]?.toUpperCase();
             if (ticker) {
-                newHistory.push(`INITIATING DEEP DIVE SIMULATION FOR: ${ticker}...`);
-                setTimeout(() => setHistory(h => [...h, `[INFO] Fetching 10-K for ${ticker}... DONE`]), 500);
-                setTimeout(() => setHistory(h => [...h, `[INFO] Running Sentiment Analysis (BERT)... DONE`]), 1200);
-                setTimeout(() => setHistory(h => [...h, `[INFO] Calculating Monte Carlo Risk... DONE`]), 2000);
-                setTimeout(() => setHistory(h => [...h, `[RESULT] Analysis Complete. Report generated in Vault.`]), 2500);
+                newHistory.push(createLine(`INITIATING DEEP DIVE SIMULATION FOR: ${ticker}...`));
+                setTimeout(() => setHistory(h => [...h, createLine(`[INFO] Fetching 10-K for ${ticker}... DONE`)]), 500);
+                setTimeout(() => setHistory(h => [...h, createLine(`[INFO] Running Sentiment Analysis (BERT)... DONE`)]), 1200);
+                setTimeout(() => setHistory(h => [...h, createLine(`[INFO] Calculating Monte Carlo Risk... DONE`)]), 2000);
+                setTimeout(() => setHistory(h => [...h, createLine(`[RESULT] Analysis Complete. Report generated in Vault.`)]), 2500);
             } else {
-                newHistory.push('ERROR: Ticker required. Usage: query [ticker]');
+                newHistory.push(createLine('ERROR: Ticker required. Usage: query [ticker]'));
             }
         } else if (cleanCmd.startsWith('mode ')) {
              const m = cleanCmd.split(' ')[1];
              if (m === 'live') {
                  dataManager.toggleSimulationMode(false);
-                 newHistory.push('SWITCHING TO LIVE MODE...');
+                 newHistory.push(createLine('SWITCHING TO LIVE MODE...'));
              } else if (m === 'archive') {
                  dataManager.toggleSimulationMode(true);
-                 newHistory.push('SWITCHING TO ARCHIVE MODE...');
+                 newHistory.push(createLine('SWITCHING TO ARCHIVE MODE...'));
              } else {
-                 newHistory.push('ERROR: Unknown mode. Use "live" or "archive".');
+                 newHistory.push(createLine('ERROR: Unknown mode. Use "live" or "archive".'));
              }
         } else {
-            newHistory.push(`ERROR: UNKNOWN COMMAND "${cmd}"`);
+            newHistory.push(createLine(`ERROR: UNKNOWN COMMAND "${cmd}"`));
         }
     }
     setHistory(newHistory);

@@ -33,16 +33,23 @@ class DataManager {
 
   private startSimulationEngine() {
     if (this.simulationInterval) return;
-    this.simulationInterval = setInterval(() => {
-      // Update market data slightly
-      this.marketDataCache.SPY += (Math.random() * 0.5 - 0.25);
-      this.marketDataCache.BTC += (Math.random() * 50 - 25);
-      this.marketDataCache.ETH += (Math.random() * 10 - 5);
-      this.marketDataCache.VIX += (Math.random() * 0.2 - 0.1);
 
-      // Keep VIX positive
-      if (this.marketDataCache.VIX < 10) this.marketDataCache.VIX = 10;
-    }, 2000);
+    const scheduleNext = () => {
+        this.simulationInterval = setTimeout(() => {
+          // Update market data slightly
+          this.marketDataCache.SPY += (Math.random() * 0.5 - 0.25);
+          this.marketDataCache.BTC += (Math.random() * 50 - 25);
+          this.marketDataCache.ETH += (Math.random() * 10 - 5);
+          this.marketDataCache.VIX += (Math.random() * 0.2 - 0.1);
+
+          // Keep VIX positive
+          if (this.marketDataCache.VIX < 10) this.marketDataCache.VIX = 10;
+
+          scheduleNext();
+        }, 2000);
+    };
+
+    scheduleNext();
   }
 
   async checkConnection(): Promise<SystemStatus> {

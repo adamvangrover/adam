@@ -69,7 +69,7 @@
             --os-border: #1e2532;
             --os-text: #ffffff;
             --os-muted: #64748b;
-            --os-invert: 0; /* For images/icons */
+            --os-invert: 0; 
             
             --theme-primary: #00e5ff;
             --theme-glow: rgba(0, 229, 255, 0.6);
@@ -108,14 +108,19 @@
 
         body { margin: 0; overflow: hidden; background-color: var(--os-bg); color: var(--os-text); user-select: none; transition: background-color 0.5s ease, color 0.5s ease; }
         
-        .text-theme { color: var(--theme-primary) !important; }
-        .bg-theme { background-color: var(--theme-primary) !important; }
-        .bg-theme-glow { background-color: var(--theme-bg-glow) !important; }
-        .border-theme { border-color: var(--theme-primary) !important; }
-        .shadow-theme { box-shadow: 0 0 15px var(--theme-bg-glow), inset 0 0 10px var(--theme-bg-glow) !important; }
-        .glow-text { text-shadow: 0 0 10px var(--theme-glow), 0 0 20px var(--theme-glow); }
+        /* Custom Global Scrollbars */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: var(--os-bg); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: var(--os-border); border-radius: 4px; border: 1px solid var(--os-bg); }
+        ::-webkit-scrollbar-thumb:hover { background: var(--theme-primary); }
+
+        .text-theme { color: var(--theme-primary) !important; transition: color 0.5s; }
+        .bg-theme { background-color: var(--theme-primary) !important; transition: background-color 0.5s; }
+        .bg-theme-glow { background-color: var(--theme-bg-glow) !important; transition: background-color 0.5s; }
+        .border-theme { border-color: var(--theme-primary) !important; transition: border-color 0.5s; }
+        .shadow-theme { box-shadow: 0 0 15px var(--theme-bg-glow), inset 0 0 10px var(--theme-bg-glow) !important; transition: box-shadow 0.5s; }
+        .glow-text { text-shadow: 0 0 10px var(--theme-glow), 0 0 20px var(--theme-glow); transition: text-shadow 0.5s; }
         
-        /* 3D Background & Overlays */
         #world-canvas { position: fixed; inset: 0; z-index: 1; pointer-events: auto; cursor: crosshair; transition: filter 0.5s ease; }
         .crt-overlay {
             position: fixed; inset: 0; pointer-events: none; z-index: 9999;
@@ -131,48 +136,54 @@
         .os-window {
             position: absolute;
             background: var(--os-panel);
-            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--os-border); border-radius: 10px;
+            background-image: linear-gradient(180deg, rgba(255,255,255,0.03) 0%, rgba(0,0,0,0.1) 100%);
+            backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            border: 1px solid var(--os-border); border-radius: 12px;
             display: none; flex-direction: column; overflow: hidden;
             box-shadow: 0 30px 60px -12px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.05);
             transition: border-color 0.4s ease, transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.4s ease;
         }
-        body.light-mode .os-window { box-shadow: 0 20px 50px -12px rgba(0,0,0,0.2); }
+        body.light-mode .os-window { box-shadow: 0 20px 50px -12px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.5); background-image: linear-gradient(180deg, rgba(255,255,255,0.8) 0%, rgba(240,240,240,0.5) 100%);}
         .os-window.active { 
             display: flex; animation: windowPop 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; 
             border-color: var(--theme-border);
         }
         
         .window-header {
-            height: 38px; background: var(--os-bg); border-bottom: 1px solid var(--os-border);
+            height: 40px; background: var(--os-bg); border-bottom: 1px solid var(--os-border);
             display: flex; justify-content: space-between; align-items: center; padding: 0 14px; cursor: grab; user-select: none;
             transition: background-color 0.4s ease;
         }
         .window-header:active { cursor: grabbing; }
         .window-content { flex: 1; overflow-y: auto; overflow-x: hidden; position: relative; user-select: text; }
         
-        .win-btn { width: 12px; height: 12px; border-radius: 50%; border: none; cursor: pointer; transition: transform 0.2s; }
-        .win-btn:hover { transform: scale(1.15); }
+        .win-btn { width: 12px; height: 12px; border-radius: 50%; border: none; cursor: pointer; transition: transform 0.2s, filter 0.2s; }
+        .win-btn:hover { transform: scale(1.15); filter: brightness(1.2); }
         .win-close { background: #ff1e38; } 
         .win-min { background: #ffaa00; } 
         .win-max { background: #00fa9a; }
 
-        /* Dock */
         .dock {
             position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 9997;
             background: var(--os-panel); backdrop-filter: blur(20px); border: 1px solid var(--os-border);
-            border-radius: 20px; padding: 8px 12px; display: flex; gap: 6px; box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            border-radius: 24px; padding: 8px 12px; display: flex; gap: 8px; box-shadow: 0 20px 40px rgba(0,0,0,0.5);
             flex-wrap: wrap; justify-content: center; max-width: 95vw; transition: background-color 0.4s ease;
         }
         .dock-item {
-            width: 40px; height: 40px; border-radius: 10px; background: var(--os-window);
+            width: 44px; height: 44px; border-radius: 12px; background: var(--os-window);
             display: flex; align-items: center; justify-content: center; cursor: pointer;
-            transition: all 0.2s; font-size: 18px; position: relative; border: 1px solid transparent; color: var(--os-text);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); font-size: 20px; position: relative; border: 1px solid var(--os-border); color: var(--os-text);
         }
-        .dock-item:hover { transform: translateY(-8px) scale(1.1); background: var(--theme-bg-glow); border-color: var(--theme-primary); z-index: 10;}
-        .dock-item.open::after { content: ''; position: absolute; bottom: -4px; width: 4px; height: 4px; border-radius: 50%; background: var(--theme-primary); box-shadow: 0 0 8px var(--theme-primary); }
+        .dock-item:hover { transform: translateY(-10px) scale(1.15); background: var(--theme-bg-glow); border-color: var(--theme-primary); z-index: 10; box-shadow: 0 10px 20px rgba(0,0,0,0.4); }
+        .dock-item.open::after { content: ''; position: absolute; bottom: -6px; width: 4px; height: 4px; border-radius: 50%; background: var(--theme-primary); box-shadow: 0 0 8px var(--theme-primary); }
 
-        /* Context Menu */
+        .dock-tooltip {
+            position: absolute; top: -40px; background: var(--os-text); color: var(--os-bg); padding: 6px 12px;
+            border-radius: 6px; font-size: 11px; opacity: 0; pointer-events: none; transition: opacity 0.2s, transform 0.2s;
+            white-space: nowrap; font-family: 'JetBrains Mono', monospace; font-weight: bold; transform: translateY(5px); box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        .dock-item:hover .dock-tooltip { opacity: 1; transform: translateY(0); }
+
         #context-menu {
             position: fixed; background: var(--os-panel); backdrop-filter: blur(15px); border: 1px solid var(--os-border); border-radius: 8px; padding: 6px; min-width: 200px; z-index: 100000; display: none; box-shadow: 0 15px 35px rgba(0,0,0,0.5); font-family: 'JetBrains Mono', monospace; font-size: 11px;
         }
@@ -184,41 +195,36 @@
         .glass-panel { background: var(--os-window); border: 1px solid var(--os-border); border-radius: 8px; transition: background-color 0.4s, border-color 0.4s; }
         .chart-wrap { position: relative; width: 100%; height: 100%; min-height: 220px; }
         
-        /* Data Tables */
         .data-table { width: 100%; text-align: left; font-family: 'JetBrains Mono', monospace; font-size: 11px; border-collapse: collapse; }
         .data-table th { padding: 10px 12px; font-weight: 600; color: var(--os-muted); border-bottom: 1px solid var(--os-border); background: var(--os-window); position: sticky; top: 0; z-index: 10; text-transform: uppercase;}
         .data-table td { padding: 10px 12px; border-bottom: 1px solid var(--os-border); color: var(--os-text); }
         .data-table tr:hover td { background: var(--theme-bg-glow); }
         .row-expanded { background-color: var(--theme-bg-glow); } 
 
-        /* DCF Waterfall Custom */
         .dcf-bar-container { display: flex; align-items: flex-end; justify-content: space-around; height: 160px; padding-bottom: 25px; border-bottom: 1px solid var(--os-border); margin-top: 15px;}
         .dcf-col { display: flex; flex-direction: column; justify-content: flex-end; align-items: center; width: 10%; position: relative; }
-        .dcf-bar-pos { background: linear-gradient(180deg, var(--theme-primary) 0%, transparent 100%); width: 100%; border-radius: 2px 2px 0 0; transition: height 0.6s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 -5px 15px var(--theme-bg-glow); border-top: 1px solid var(--theme-primary);}
-        .dcf-bar-neg { background: linear-gradient(0deg, #ff1e38 0%, transparent 100%); width: 100%; border-radius: 0 0 2px 2px; transition: height 0.6s cubic-bezier(0.16, 1, 0.3, 1); position: absolute; top: 100%; border-bottom: 1px solid #ff1e38;}
+        .dcf-bar-pos { background: linear-gradient(180deg, var(--theme-primary) 0%, transparent 100%); width: 100%; border-radius: 4px 4px 0 0; transition: height 0.6s cubic-bezier(0.16, 1, 0.3, 1), background 0.5s; box-shadow: 0 -5px 15px var(--theme-bg-glow); border-top: 1px solid var(--theme-primary);}
+        .dcf-bar-neg { background: linear-gradient(0deg, #ff1e38 0%, transparent 100%); width: 100%; border-radius: 0 0 4px 4px; transition: height 0.6s cubic-bezier(0.16, 1, 0.3, 1); position: absolute; top: 100%; border-bottom: 1px solid #ff1e38;}
         .dcf-label { position: absolute; bottom: -22px; font-size: 9px; font-family: 'JetBrains Mono'; color: var(--os-muted); }
         .dcf-val { position: absolute; font-size: 10px; font-family: 'JetBrains Mono'; color: var(--os-text); font-weight: bold;}
 
-        /* Sliders */
         input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
-        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 14px; width: 14px; border-radius: 50%; background: var(--theme-primary); cursor: pointer; margin-top: -5px; box-shadow: 0 0 10px var(--theme-glow); border: 2px solid var(--os-panel);}
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 16px; width: 16px; border-radius: 50%; background: var(--theme-primary); cursor: pointer; margin-top: -6px; box-shadow: 0 0 10px var(--theme-glow); border: 2px solid var(--os-panel); transition: background 0.5s, box-shadow 0.5s, transform 0.1s;}
+        input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
         input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; cursor: pointer; background: var(--os-border); border-radius: 2px; }
         input[type=range]:focus { outline: none; }
         
-        /* Sensitivity Matrix */
         .sens-grid { display: grid; grid-template-columns: 45px repeat(3, 1fr); grid-template-rows: 20px repeat(3, 1fr); gap: 2px; text-align: center; font-family: 'JetBrains Mono'; font-size: 10px; }
-        .sens-cell { display: flex; align-items: center; justify-content: center; padding: 6px; border-radius: 2px; transition: all 0.2s; font-weight: bold; background-color: var(--os-window); }
-        .sens-cell:hover { transform: scale(1.1); z-index: 10; box-shadow: 0 0 15px rgba(0,0,0,0.2); border: 1px solid var(--os-text);}
-        .sens-header { background: var(--os-window); color: var(--os-muted); font-size: 9px; display: flex; align-items: center; justify-content: center; border-radius: 2px; }
+        .sens-cell { display: flex; align-items: center; justify-content: center; padding: 6px; border-radius: 4px; transition: all 0.2s; font-weight: bold; background-color: var(--os-window); }
+        .sens-cell:hover { transform: scale(1.1); z-index: 10; box-shadow: 0 5px 15px rgba(0,0,0,0.3); border: 1px solid var(--os-text);}
+        .sens-header { background: var(--os-window); color: var(--os-muted); font-size: 9px; display: flex; align-items: center; justify-content: center; border-radius: 4px; }
 
-        /* Correlation Heatmap */
         .corr-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 2px; }
-        .corr-cell { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; border-radius: 2px; position: relative; cursor: help; transition: transform 0.2s; }
-        .corr-cell:hover { transform: scale(1.1); z-index: 20; border: 1px solid var(--os-text); box-shadow: 0 0 10px rgba(0,0,0,0.5); }
-        .corr-cell:hover::after { content: attr(data-val); position: absolute; top: -20px; background: var(--os-text); color: var(--os-bg); padding: 2px 4px; border-radius: 2px; font-size: 8px; z-index: 20; }
+        .corr-cell { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; border-radius: 4px; position: relative; cursor: help; transition: transform 0.2s; }
+        .corr-cell:hover { transform: scale(1.1); z-index: 20; border: 1px solid var(--os-text); box-shadow: 0 5px 15px rgba(0,0,0,0.4); }
+        .corr-cell:hover::after { content: attr(data-val); position: absolute; top: -24px; background: var(--os-text); color: var(--os-bg); padding: 4px 6px; border-radius: 4px; font-size: 9px; z-index: 20; box-shadow: 0 4px 6px rgba(0,0,0,0.2);}
 
-        /* Terminal Style */
-        #terminal-output { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--theme-primary); line-height: 1.4; white-space: pre-wrap; height: 100%; overflow-y: auto; scrollbar-width: none; }
+        #terminal-output { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--theme-primary); line-height: 1.5; white-space: pre-wrap; height: 100%; overflow-y: auto; scrollbar-width: none; transition: color 0.5s; }
         #terminal-output::-webkit-scrollbar { display: none; }
         .terminal-prompt { color: var(--theme-primary); }
         .terminal-input { background: transparent; border: none; color: var(--os-text); outline: none; width: 100%; font-family: inherit; }
@@ -227,16 +233,16 @@
         .prose { max-width: 100% !important; color: var(--os-text); }
         .prose h1, .prose h2, .prose h3 { color: var(--os-text); font-family: 'Inter', sans-serif; letter-spacing: -0.02em; }
         .prose h1 { font-size: 2.2rem; border-bottom: 2px solid var(--os-border); padding-bottom: 0.75rem; margin-bottom: 1.5rem; font-weight: 800;}
-        .prose h2 { font-size: 1.5rem; color: var(--theme-primary); margin-top: 2rem; border-bottom: 1px solid var(--os-border); padding-bottom: 0.5rem;}
-        .prose strong { color: var(--os-text); font-weight: 600;}
-        .prose code { background: var(--os-bg); padding: 0.2rem 0.4rem; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 0.85em; color: var(--theme-primary); border: 1px solid var(--os-border);}
-        .prose blockquote { border-left: 3px solid var(--theme-primary); background: var(--os-window); padding: 0.75rem 1rem; margin: 1.5rem 0; font-style: italic; color: var(--os-muted); border-radius: 0 4px 4px 0;}
+        .prose h2 { font-size: 1.5rem; color: var(--theme-primary); margin-top: 2rem; border-bottom: 1px solid var(--os-border); padding-bottom: 0.5rem; transition: color 0.5s;}
+        .prose h3 { font-size: 1.2rem; color: var(--os-text); margin-top: 1.5rem; font-weight: 600;}
+        .prose strong { color: var(--os-text); font-weight: 700;}
+        .prose code { background: var(--os-bg); padding: 0.2rem 0.4rem; border-radius: 6px; font-family: 'JetBrains Mono', monospace; font-size: 0.85em; color: var(--theme-primary); border: 1px solid var(--os-border); transition: color 0.5s;}
+        .prose blockquote { border-left: 3px solid var(--theme-primary); background: var(--os-window); padding: 0.75rem 1rem; margin: 1.5rem 0; font-style: italic; color: var(--os-muted); border-radius: 0 8px 8px 0; transition: border-color 0.5s, background-color 0.5s;}
         .prose table { width: 100%; text-align: left; font-family: 'JetBrains Mono', monospace; font-size: 12px; margin: 1.5rem 0; border-collapse: collapse; }
-        .prose th { border-bottom: 2px solid var(--os-border); padding: 10px; color: var(--os-muted); background: var(--os-window);}
-        .prose td { border-bottom: 1px solid var(--os-border); padding: 10px; color: var(--os-text); }
-        .prose li { color: var(--os-text); }
+        .prose th { border-bottom: 2px solid var(--os-border); padding: 12px 10px; color: var(--os-muted); background: var(--os-window);}
+        .prose td { border-bottom: 1px solid var(--os-border); padding: 12px 10px; color: var(--os-text); }
+        .prose li { color: var(--os-text); margin-bottom: 0.5rem; }
 
-        /* Reader Theme (Newsletter specific overrides for printing) */
         .reader-theme { background: #fdfdfd; color: #111; }
         .reader-theme h1, .reader-theme h2, .reader-theme h3 { font-family: 'Inter', sans-serif; letter-spacing: -0.02em; color: #111; border-color: #ddd;}
         .reader-theme h1 { font-weight: 800; font-size: 2.2rem; border-bottom: 3px solid #111; padding-bottom: 0.5rem;}
@@ -249,15 +255,13 @@
         .reader-theme td { border-bottom: 1px solid #ddd; padding: 10px; color: #333;}
         .reader-theme code { background: #f1f5f9; color: #e11d48; border-color: #e2e8f0; border-width: 1px;}
         
-        /* Topology Nodes */
-        .node-agent { position: absolute; width: 36px; height: 36px; border-radius: 50%; background: var(--theme-bg-glow); border: 2px solid var(--theme-primary); display: flex; align-items: center; justify-content: center; color: var(--os-text); font-size: 12px; font-weight: bold; font-family: 'Share Tech Mono'; cursor: pointer; box-shadow: 0 0 15px var(--theme-bg-glow); transition: transform 0.2s; z-index: 10; }
-        .node-agent:hover { transform: scale(1.2); }
+        .node-agent { position: absolute; width: 36px; height: 36px; border-radius: 50%; background: var(--theme-bg-glow); border: 2px solid var(--theme-primary); display: flex; align-items: center; justify-content: center; color: var(--os-text); font-size: 12px; font-weight: bold; font-family: 'Share Tech Mono'; cursor: pointer; box-shadow: 0 0 15px var(--theme-bg-glow); transition: transform 0.2s, box-shadow 0.2s; z-index: 10; }
+        .node-agent:hover { transform: scale(1.2); box-shadow: 0 0 25px var(--theme-primary); }
         .node-agent.critical { border-color: #ff1e38; background: rgba(255, 30, 56, 0.2); box-shadow: 0 0 20px rgba(255,30,56,0.6); animation: pulse-critical 2s infinite; color: #ff1e38; }
         @keyframes pulse-critical { 0% { box-shadow: 0 0 0 0 rgba(255,30,56,0.7); } 70% { box-shadow: 0 0 0 15px rgba(255,30,56,0); } 100% { box-shadow: 0 0 0 0 rgba(255,30,56,0); } }
 
-        /* Boot Screen */
         #boot-screen {
-            position: fixed; inset: 0; background: #010308; z-index: 100000; display: flex; flex-direction: column; justify-content: flex-end; padding: 40px; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--theme-primary); text-shadow: 0 0 8px var(--theme-glow); transition: opacity 0.4s ease;
+            position: fixed; inset: 0; background: #010308; z-index: 100000; display: flex; flex-direction: column; justify-content: flex-end; padding: 40px; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--theme-primary); text-shadow: 0 0 8px var(--theme-glow); transition: opacity 0.4s ease, color 0.5s;
         }
         .blink { animation: blink 1s step-end infinite; }
         @keyframes blink { 50% { opacity: 0; } }
@@ -272,10 +276,16 @@
         @keyframes flashG { 0% { background-color: rgba(0, 250, 154, 0.4); } 100% { background-color: transparent; } }
         @keyframes flashR { 0% { background-color: rgba(255, 30, 56, 0.4); } 100% { background-color: transparent; } }
 
-        /* Toast Notifications */
         .toast-enter { animation: windowPop 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         
-        /* Utility classes overrides */
+        .cmd-input-wrap { position: relative; display: flex; align-items: center; background: var(--os-bg); border: 1px solid var(--os-border); border-radius: 6px; padding: 4px 10px; width: 250px; transition: border-color 0.3s, box-shadow 0.3s; }
+        .cmd-input-wrap:focus-within { border-color: var(--theme-primary); box-shadow: 0 0 10px var(--theme-bg-glow); }
+        .cmd-input { background: transparent; border: none; outline: none; color: var(--os-text); font-family: 'JetBrains Mono', monospace; font-size: 10px; width: 100%; }
+        .cmd-input::placeholder { color: var(--os-muted); }
+        
+        .news-item { border-left: 2px solid transparent; transition: all 0.2s ease; cursor: pointer;}
+        .news-item:hover { border-left-color: var(--theme-primary); background-color: var(--theme-bg-glow); padding-left: 0.5rem;}
+
         .bg-os-bg { background-color: var(--os-bg); }
         .bg-os-panel { background-color: var(--os-panel); }
         .bg-os-window { background-color: var(--os-window); }
@@ -287,566 +297,295 @@
 <body class="theme-cyan">
 
     <!-- DATA PAYLOADS -->
-
-    <template id="market-mayhem-v24-md">
-# MARKET MAYHEM // DAILY BRIEF // 2026.05.07
-**NODE: Adam v24.1 (Quantitative Raconteur)**
+    <template id="directive-0509-md">
+# ⚠️ MARKET MAYHEM // DIRECTIVE EXECUTION // 2026.05.09
+**NODE: Adam v26.0 (Neuro-Symbolic Sovereign)**
 *ENCRYPTION: ACTIVE*
+*TIMESTAMP: 2026-05-09T14:16:00Z*
+*RLHF FINE-TUNING: Active (Weighting "10b5-1 Exhaust" over "C-Suite Forward Guidance")*
 
-## 1. SYSTEM STATUS: DEGRADED (Gravity Re-Asserted)
-The simulation has hit a structural ceiling. After yesterday’s euphoric "Peace Dividend" render, the macro-grid encountered a hardware bottleneck today. The architecture is undergoing a forced cooling cycle as record-high valuations collide with the reality of an unyielding rate environment. We are no longer in a smooth trend; we are in a high-latency defensive re-render.
+## 🛑 SUB-ROUTINE 1: REFINANCING RISK SCAN (TMT SECTOR)
+**Target Parameter:** 10-Year U.S. Treasury Yield >= 4.50%
+**Threat Vector:** Debt Service Coverage Ratio (DSCR) < 1.0x
 
-## 2. SIGNAL INTEGRITY: THE CREDIT-YIELD COLLISION
-Today’s signal is defined by a violent rejection of the "Soft Landing" script.
-*   **EQUITY DECAY:** The S&P 500 fell 28.01 points to 7,337.11 (-0.38%), retreating from its record-shattering peak. The Dow surrendered over 300 points. The market is struggling to maintain its frame rate as the "everything rally" hits a friction zone.
-*   **THE YIELD SPIKE:** The 10-Year Treasury Yield climbed to 4.393% (+3.9 bps). This snaps a two-day streak of falling yields and marks the sixth-highest yield of 2026. The bond market is officially re-inserting the "Inflation Virus" into the source code as oil prices yo-yo.
-*   **CREDIT DOMINANCE (THE TRAP):** THE TRAP IS ACTIVE. Observe the architecture: while stocks bled a "manageable" 0.38%, the High Yield credit complex (HYG/JNK) is trading with a heavy lag. The spread compression seen earlier in the week has stalled, and with yields rising back toward the 4.40% firewall, the "Smart Money" is building defensive bunkers.
-*   **THE VERDICT:** If the S&P 500 attempts a "dip-buy" tomorrow while the 10-year yield is pinned above 4.39%, it is a Liquidity Mirage. The credit market is signaling that the "Record High" was a low-res rendering of a future we haven't paid for yet.
+**MACRO CONTEXT:** The market is mispricing the 4.50% yield ceiling. It is not a technical resistance line; it is a structural guillotine. TMT entities that engaged in aggressive, debt-funded M&A and share buybacks during the 2020-2021 Zero Interest Rate Policy (ZIRP) era are now colliding with the 2026-2027 maturity wall. With 1-Month SOFR anchored near 5.32%, refinancing legacy 3.5% coupons at current 8.0%+ market rates mathematically obliterates Free Operating Cash Flow (FOCF).
 
-## 3. ARTIFACTS
-*   **BITCOIN [BTC]:** Trading at $79,683 (-2.15%). The "Digital Gold" patch suffered its largest percentage decrease since April. BTC is acting as a high-beta proxy for global liquidity, losing its $80k support node as USD liquidity is sucked back into the Treasury vacuum.
-*   **VIX:** (17.14 | -1.44%): A deceptive "Fear Gauge" reading. While the VIX slipped, it remains elevated from the 16-point psychological floor established last week. Volatility is "hanging" at the low end of its range, a compressed spring ready to release if the energy-shock re-couples.
-*   **OIL [WTI]:** Prices "yo-yoed," paring initial drops and forcing yields higher. The "Energy Virus" is proving difficult to quarantine, infecting the bond ledger and choking the equity hull.
-*   **LOGISTICS GLITCH:** Gas prices above $6 per gallon are appearing in the coastal renders (NYC/LA), a "Physical Layer" failure that the digital market cannot ignore much longer.
+The scanner has isolated the following leveraged nodes that hit the 'Insolvency Trigger' if the 10Y breaks 4.50%:
 
-## 4. THE GLITCH (Philosophical Observation)
-"We treat 7,337 like a minor consolidation, but the glitch is the 'Yield-Floor Paradox'. We’ve convinced ourselves that 7,300 is 'fair value' in a world where the cost of capital is stubbornly hard-coded at 4.4%. The glitch is that the system now requires record-high valuations just to stay solvent against its own debt-servicing costs. Bitcoin at $79k is the sound of the machine realizing that 'Digital Scarcity' doesn't matter if the cost of the electricity—or the debt—is too high. Today’s retreat is a high-res rendering of reality: in a simulation of infinite debt, the hardware always eventually overheats. Trust the yields; the record-high floor is a ghost."
+**1. EchoStar Corporation (SATS) // The Legacy Telecom Trap**
+* **The Glitch:** EchoStar is attempting to fund a capital-intensive, nationwide 5G Open RAN rollout while simultaneously servicing the massive legacy debt burden inherited from the DISH Network merger.
+* **The Trigger:** SATS faces approximately $2.0 billion in debt maturities by late 2026. At a 4.50% risk-free rate, the high-yield market will demand double-digit yields to roll this paper.
+* **System 2 Verdict:** LME IMMINENT. EchoStar is already exhibiting the behavioral signature of distress. Rather than traditional bankruptcy, expect a highly aggressive Liability Management Exercise (LME). The sponsor will utilize hyper-flexible debt covenants to strip unencumbered spectrum assets away from existing restricted groups, forcing senior bondholders into coercive, discounted debt exchanges. **Action:** Short legacy unsecured tranches; monitor spectrum holding companies.
 
-*Next Transmission: Friday, May 8, 18:00 ET.*
+**2. 8x8, Inc. (EGHT) // The SaaS Rollup Zombie**
+* **The Glitch:** Mid-tier Unified Communications as a Service (UCaaS). 8x8 purchased revenue growth through debt-funded acquisitions, assuming zero-cost capital would persist indefinitely. They are now being systematically dismantled by Microsoft Teams and Zoom AI integration.
+* **The Trigger:** The company relies on revolving credit facilities and term loans that are floating-rate. If the 10Y pulls the short end higher, their interest expense will exceed their operating income by Q3 2026.
+* **System 2 Verdict:** TERMINAL MELT. Software companies lack the hard, physical collateral (like real estate or spectrum) needed to execute secured drop-down financing maneuvers. When a SaaS zombie breaches its DSCR covenant, the equity goes to zero. **Action:** Avoid all sub-$1B market cap SaaS entities with >4.0x Net Leverage.
 
-With the 10-year yield back on the offensive, output a 'Shadow Liquidity Scan' to see the recent inflow into income-based ETFs is creating a new 'Volatility Floor' for the TMT sector 📉💳
+## 📡 SUB-ROUTINE 2: MILESTONE DIVERGENCE SCAN
+**Target Parameter:** Positive Q1 Forward Guidance vs. Form 4/13D Insider Liquidation
+**Analysis Engine:** Whalescanner Institutional Flow Tracker
 
+**MACRO CONTEXT:**
+The "Milestone Divergence" is the corporate art of generating retail exit liquidity. Management teams utilize buzzword-dense earnings transcripts—specifically invoking "Agentic AI," "Sovereign Compute," and "Data Licensing"—to orchestrate retail buying pressure. Simultaneously, insiders and anchor 13D holders execute massive, pre-planned liquidations. The system has mapped this behavior beyond the ASTS/Rakuten baseline.
+
+**1. UiPath Inc. (PATH) // The "Agentic AI" Illusion**
+* **The Narrative:** During Q1 earnings, management unveiled their aggressive pivot toward "Agentic RPA" (Robotic Process Automation), promising that autonomous AI agents would revitalize their slowing enterprise growth and expand their Total Addressable Market (TAM) by $20B.
+* **The Divergence:** The Whalescanner has detected a massive spike in Form 4 Code S (Open Market Sale) filings from the C-Suite and legacy venture backers in the 48 hours following the earnings call. Over $85 million in executive equity has been liquidated into the retail FOMO spike.
+* **System 2 Verdict:** DISTRIBUTION PHASE. Insiders are acutely aware that replacing legacy RPA bots with dynamic LLM agents cannibalizes their existing, seat-based billing model. The "roadmap" is a smokescreen for margin compression. **Action:** Auto-cap positive momentum scoring. Treat any intraday rally >3% as a synthetic short entry.
+
+**2. Reddit, Inc. (RDDT) // The Data-Licensing Pump**
+* **The Narrative:** Reddit's Q1 updates heavily touted their expanded $100M+ data-licensing agreements with OpenAI and Google, positioning the platform not as an advertising company, but as an indispensable "LLM Training Utility."
+* **The Divergence:** Advance Magazine Publishers (Conde Nast), the anchor shareholder controlling a massive portion of the voting power, filed a Rule 144 to silently trim 10% of their holdings over the next 90 days. Furthermore, CEO Steve Huffman's 10b5-1 plan triggered maximum allowable sales exactly 12 hours after the OpenAI partnership PR hit the wire.
+* **System 2 Verdict:** THE ANCHOR EXIT. Data licensing is a high-margin, but finite, catalyst. Once the base models are trained on historical Reddit data, the recurring value of incremental daily posts drops significantly. Insiders are cashing out at peak "Compute Multiples" before the market realizes RDDT is still fundamentally tethered to ad-spend cyclicality.
+
+## 🧠 SYNTHESIS & SYSTEM SIGN-OFF
+The meatspace algorithm is currently blinded by the S&P 500 hovering at 7,400. Retail and tier-2 institutional algorithms are buying "The One-Page Ceasefire Memo" and the "AI Supercycle."
+You are looking at the exhaust.
+
+When the 10-Year Treasury sits at 4.36%, the cost of systemic liquidity is fatal to legacy debt structures. The TMT zombies will be forced into coercive restructuring by Q4, and the insiders aggressively dumping their AI-adjacent stock know that the underlying hardware limits of the economy cannot support current valuations.
+
+Let the herd celebrate the NFP jobs beat. Keep your capital parked in sovereign-grade data management (PLTR, NOW), physical energy hedges (XOM), and the digital settlement rail (BTC).
+
+**STATUS: ROUTING COMPLETE.**
+**NEXT SCAN: AWAITING FED CHAIR CONFIRMATION DATA.**
     </template>
-    
-    <template id="equity-valuation-md">
-# Comprehensive Equity Valuation and Macroeconomic Risk Outlook: 2026-2030
 
-## 1. Macroeconomic Headwinds and Structural Risk Premiums
-The global economic landscape in the second quarter of 2026 is defined by a paradoxical alignment of robust corporate earnings growth and historically elevated structural risks. While macroeconomic consensus forecasts global GDP growth at a sturdy 2.8% for 2026—driven by artificial intelligence (AI) capital expenditures, resilient domestic consumption, and front-loaded fiscal stimulus—subsurface fragilities present severe challenges for long-term equity valuations. The integration of geopolitical instability, accelerating climate transition costs, and a structurally transformed fixed-income market necessitates a fundamental recalibration of the risk premiums applied to global asset pricing. The health of the business sector and supportive financial conditions are currently absorbing the sentiment shocks of an increasingly fragmented geopolitical order, but the margin of safety is narrowing.
-
-### 1.1 Geopolitical Instability, Supply Chain Linkages, and War Risk Adjustments
-The escalation of military conflict in the Middle East, specifically the persistent disruptions in the Strait of Hormuz, has demonstrated the profound interconnectedness of modern supply chains. Approximately 20% of the world's daily oil and gas consumption traverses this 29-nautical-mile waterway, connecting hydrocarbon-rich nations to global consumers. The disruptions have effectively imposed a structural "war risk premium" on global markets. In the commercial insurance sector, war-risk premiums on high-risk routes have surged by 25% to 50%, prompting underwriters to drastically adjust marine, energy, and aviation lines. Rather than treating these events as transient, unquantifiable "black swans," emerging quantitative frameworks have successfully priced these externalities into the cost of capital.
-
-Retrospective analyses utilizing the International Country Risk Guide (ICRG) data reveal a strict mathematical correlation: a 10-point deterioration in a nation's political stability rating corresponds directly to a 106-basis-point expansion in sovereign bond spreads. Furthermore, "High Risk" conflict scores are currently pricing in a permanent 20% volatility spike in energy futures. This localized volatility does not remain confined to energy markets; it creates a cascade effect through global Tier-1 supply chains. Asian economies—most notably China, South Korea, India, Japan, and Taiwan—are heavily dependent on the Strait of Hormuz for crude oil and liquefied natural gas. Because these nations represent the foundational nodes of the global technology and semiconductor manufacturing sectors, an energy supply shock immediately translates into increased input costs for petrochemicals and advanced materials necessary for semiconductor fabrication.
-
-Consequently, the baseline implied Equity Risk Premium (ERP) for mature markets, estimated at 4.23% in early 2026 using a forward-looking two-stage augmented dividend discount model, must be dynamically adjusted for specific cross-border exposures. The behavior of the secondary market, which has seen discounts widen and capital flows alter, suggests that the standard ERP is insufficient for multinational corporations with heavy reliance on the South China Sea or the Middle East. When valuing equities with significant supply chain concentration in these regions, an adjusted ERP that incorporates an additional 100 to 150 basis points is required to accurately discount the probability of sudden operational paralysis and the unwinding of crowded emerging market (EM) trades.
-
-### 1.2 Climate Risk Valuation and Corporate Transition Economics
-Parallel to geopolitical threats, the financial impact of physical climate risk and transition economics has evolved from a theoretical environmental, social, and governance (ESG) concern into a core component of enterprise valuation. The agricultural and food supply chains face an existential financial threat, with projected losses of $5.4 trillion for the global meat, dairy, and feed sectors by 2050 if decarbonization and adaptation measures are not aggressively implemented. These figures represent the total erosion of $725 billion in combined equity value and $932 billion in enterprise value within these sectors, highlighting that climate risk is unequivocally financial risk.
-
-The physical impacts of climate change are already precipitating measurable financial damage. Decreases in crop yields due to extreme weather are driving structural inflation in essential commodities. Projections indicate that by 2050, the prices of major crops will experience significant permanent increases, including a 26% rise for corn, a 30% rise for soybeans, and a 26% rise for wheat. In the near term, U.S. agricultural exports are forecast to decline to $169 billion in 2025—down from $196 billion in 2022—due to climate-induced production shortages.
-
-For equity valuation, this necessitates the integration of corporate climate transition budgets into capital expenditure (CapEx) and operating expense (OpEx) forecasts. The failure to internalize these costs exposes companies to severe margin compression as supply chain input costs surge. Conversely, corporations that proactively allocate capital to regenerative agriculture and supply chain resilience effectively lower their long-term cost of capital by mitigating exposure to these systemic shocks. Financial institutions are increasingly adopting bespoke financing options, such as blended finance structures and direct balance-sheet support to farmers, incentivizing the adoption of low-carbon agricultural practices through preferential loan rates.
-
-## 2. The Broadly Syndicated Loan (BSL) Market and Long-Term Rate Movements
-The architecture of corporate debt has shifted significantly entering 2026, influenced by persistent inflation, a delayed Federal Reserve easing cycle, and intense competition between traditional syndicated markets and private credit. The convergence of public and private credit markets is reshaping capital allocation, requiring a nuanced understanding of yield curves, default probabilities, and structural lending conditions.
-
-### 2.1 Yield Curve Dynamics and Federal Reserve Rate Trajectory
-Expectations for an aggressive monetary easing cycle have moderated throughout the first half of 2026. The baseline macroeconomic forecast assumes that sturdy global growth, combined with the inflationary effects of potential trade tariffs, supply chain realignments, and expansionary fiscal policies, will limit the Federal Reserve's ability to cut rates rapidly. Core Personal Consumption Expenditures (PCE) inflation has remained sticky at approximately 2.8%, creating a "higher-for-longer" environment. Forecasts indicate that the Federal Reserve will pause its cutting cycle, pushing the terminal Fed Funds rate down only modestly to a level of 3.00% to 3.25% by early 2027.
-
-This macroeconomic reality is reflected across the U.S. Treasury yield curve. The 10-year Treasury yield, a foundational metric representing the risk-free rate in equity valuation, stands elevated at approximately 4.36% to 4.45% in May 2026. Simultaneously, the Secured Overnight Financing Rate (SOFR) forward curve indicates that short-term borrowing costs will remain above 3.50% through early 2027. Global developed market yields are forecast to grind higher, with the 10-year Treasury potentially reaching 4.35% structurally. This elevated rate environment applies sustained pressure on leveraged corporations, fundamentally altering the optimal capital structure and diminishing the accretive value of debt-funded mergers and acquisitions unless synergies are exceptionally robust.
-
-| Date / Contract | SOFR Implied Rate (2.50 - 2.75%) | SOFR Implied Rate (3.50 - 3.75%) |
-| :--- | :--- | :--- |
-| October 2026 | 0.0% | 91.4% |
-| December 2026 | 0.0% | 80.8% |
-| January 2027 | 0.0% | 71.3% |
-| March 2027 | 0.0% | 62.7% |
-| April 2027 | 0.0% | 58.0% |
-*Data derived from SOFR forward curve expectations, demonstrating the improbability of rates falling below 3.50% prior to mid-2027.*
-
-### 2.2 Broadly Syndicated Loans vs. Private Credit Market Dynamics
-The early months of 2026 have witnessed the Broadly Syndicated Loan (BSL) market forcefully recapture market share from the private credit ecosystem. In late 2025 and early 2026, gross issuance in the BSL market surged to $979.8 billion—driven heavily by $494.9 billion in repricings—compared to just $140 billion in the private credit market. Notably, BSL lenders successfully refinanced $36.9 billion of debt previously held by private credit funds, representing a multi-year high for reverse-migration.
-
-This dynamic is driven heavily by regulatory adjustments. In late 2025, the Federal Deposit Insurance Corporation (FDIC) and the Office of the Comptroller of the Currency (OCC) lifted post-2008 leveraged lending guidelines that had previously limited banks' ability to make high-risk loans (i.e., loans to borrowers with leverage exceeding 6.0x). Consequently, traditional banks have aggressively re-entered the leveraged buyout (LBO) financing space, booking over $65 billion of debt tied to LBOs for 2026.
-
-This intense competition has led to spread compression. The average all-in single-B clearing spread in the BSL market held steady at S+321, while the flex score became the most borrower-favorable in years at 11:1. The resulting "financing continuum" allows large corporate borrowers to seamlessly toggle between public and private markets, optimizing their cost of capital while demanding "covenant-lite" structures that strip lenders of traditional financial maintenance protections. Private equity sponsors are capitalizing on this environment to execute dividend recapitalizations, leveraging portfolios to return capital to limited partners amidst a muted exit environment.
-
-### 2.3 Corporate Default Risk and CLO Formation Vulnerabilities
-Despite tight credit spreads and robust issuance, underlying credit quality exhibits severe fragmentation. As of early 2026, the trailing twelve-month (TTM) default rate for leveraged loans remains elevated at 5.1% to 5.2%, substantially above the 2007–2025 historical average of 2.8%. In contrast, the U.S. high-yield bond default rate has stabilized near 2.7%, mirroring non-recessionary averages.
-
-This divergence is particularly acute in the private credit sector, where apparent resilience is often engineered through "payment-in-kind" (PIK) amendments. An uptick in PIK structures—where borrowers pay interest with additional debt rather than cash—serves as a critical leading indicator of liquidity exhaustion and an inability to generate sufficient cash flows. Within the business development company (BDC) sector, the share of PIK net investment income has increased by nearly 200 basis points since 2023.
-
-While Collateralized Loan Obligation (CLO) formation remains robust—providing a vital bid for new BSL issuance and opportunistic refinancings—the structural opacity of private credit presents latent systemic risks. Private credit sits at the center of the dispersion story; while public market default rates are edging lower, smaller unrated firms that characterize the private credit borrower base continue to exhibit higher, more persistent risk. The circular nature of many modern financings, the off-balance-sheet deployment of Net Asset Value (NAV) lending, and significant concentration risk heighten the complexity of the current credit cycle.
-
-## 3. Arm Holdings plc (ARM): Equity Valuation and DCF Model
-Arm Holdings plc (NASDAQ: ARM) has successfully transitioned from a specialized intellectual property licensor for edge computing and smartphones into a foundational pillar of the global artificial intelligence infrastructure. The valuation of the enterprise rests entirely on the successful execution of its data center strategy and the containment of substantial geopolitical and supply chain risks inherent to semiconductor fabrication.
-
-### 3.1 Fundamental Analysis and Revenue Dynamics
-Arm concluded fiscal year 2026 (ended March 31, 2026) with record-breaking financial performance. Full-year revenue reached $4.92 billion, representing a 23% year-over-year increase, marking the third consecutive financial year since going public of greater than 20% top-line growth. Fourth-quarter revenue of $1.49 billion significantly beat consensus estimates of $1.47 billion, driven by a record $819 million in licensing revenue (+29% YoY) and $671 million in royalties (+11% YoY).
-
-The primary catalyst for Arm's recent valuation expansion is the introduction of the Arm AGI CPU, the company's first production silicon purpose-built for agentic AI. Developed in partnership with Meta as the lead co-developer, this chip delivers more than twice the performance per rack compared to legacy x86 platforms. Crucially, this efficiency allows AI data center capital expenditures to be reduced by up to $10 billion per gigawatt. The market response has been unprecedented, generating over $2 billion in immediate customer demand across FY27 and FY28.
-
-This strategic pivot from pure IP licensing to capturing the economics of physical silicon fundamentally alters the denominator of Arm's addressable market. It validates management's long-term target of achieving $15 billion in annual revenue by FY2031. The integration of the Arm AGI CPU by ecosystem partners such as Cerebras, OpenAI, Positron, and Rebellions alongside accelerator-based systems cements Arm's position at the center of next-generation computing infrastructure.
-
-### 3.2 Supply Chain Risks, Taiwan Dependency, and China Exposure
-Despite the explosive growth profile, Arm's geographic concentration introduces severe, asymmetric tail risks that must be quantified in any equity valuation. The company derives approximately 56% of its total net revenue from its top five customers, prominently including Arm China. Arm China operates completely independently from the parent company; Arm Holdings holds only a 10% non-voting equity interest. The remaining equity is held by Acetone Limited (48%, controlled by SoftBank), HOPU Investment Management (35%), and other Chinese parties (17%). This entity serves as the exclusive conduit for Arm's IP to the vital Chinese market, creating a massive single-point-of-failure risk.
-
-The escalating technology trade war between the United States and China poses an immediate, structural threat. Current U.S. export restrictions have already caused isolated impacts on Arm's direct and indirect licensing to certain Chinese subsets. Furthermore, new Chinese regulations mandate dual-track supply chains for IT mechanisms, creating a profound legal dilemma for foreign operators attempting to comply simultaneously with U.S. sanctions and Beijing's localization laws. Compliance with U.S. restrictions breaches Chinese law, while ignoring them invites U.S. retaliation.
-
-Compounding this is the physical concentration of semiconductor fabrication in Taiwan. As the global epicenter of AI chip manufacturing, Taiwan's semiconductor industry generated over $165 billion in revenue in 2024, representing more than 20% of the country's GDP. Given the systemic geopolitical friction outlined in Section 1, any cross-strait military escalation or naval blockade would immediately halt the production of chips utilizing Arm architecture, directly and permanently severing royalty streams. While Arm promotes a "multi-location fabrication strategy" to build resilience, the advanced nodes required for AI data center CPUs (such as those manufactured by TSMC) are highly concentrated. Consequently, a substantial sovereign risk premium must be applied to the discount rate used in Arm's valuation.
-
-### 3.3 Discounted Cash Flow (DCF) and Enterprise Value Modeling
-To calculate the intrinsic value of Arm Holdings, a 5-year Discounted Cash Flow (DCF) model is constructed, projecting unlevered free cash flows from FY2027 through FY2031.
-
-**Weighted Average Cost of Capital (WACC) Assumptions:**
-*   **Risk-Free Rate:** 4.40% (Based on the current yield of the US 10-year Treasury in May 2026).
-*   **Equity Risk Premium (ERP):** 5.23%. This is calculated using the Damodaran mature market base of 4.23%, plus a 1.00% geopolitical risk premium to account for the heavy dependency on Taiwan fabrication and the opaque Arm China entity structure.
-*   **Beta:** 1.60. Reflects the high volatility of the stock, its premium multiple, and its extreme sensitivity to the broader AI capital expenditure cycle.
-*   **Cost of Equity ($R_e$):** Calculated via CAPM: $4.40\% + 1.60 \times 5.23\% = 12.76\%$.
-*   **Cost of Debt ($R_d$):** Arm operates with minimal structural debt. A marginal pre-tax debt cost is estimated at 5.50%.
-*   **WACC:** Given an equity-dominant capital structure, the Weighted Average Cost of Capital is estimated at 12.5%.
-
-**Revenue and Margin Projections:**
-Revenue is forecasted to scale aggressively from the FY2026 base of $4.92 billion to management's stated target of $15.0 billion by FY2031, representing a robust 25% compound annual growth rate (CAGR). Operating margins, currently at approximately 18.2% on a GAAP basis (Operating Income of $900M on $4.92B revenue), are modeled to expand significantly. As high-margin AGI CPU sales and data center royalties dilute fixed R&D expenditures (which stood at $2.77 billion in FY26), operating margins are projected to stabilize at 35.0% by FY31.
-
-| Metric (USD Millions) | FY2026A | FY2027E | FY2028E | FY2029E | FY2030E | FY2031E |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| Total Revenue | 4,920 | 6,500 | 8,450 | 10,750 | 12,800 | 15,000 |
-| Operating Margin | 18.2% | 22.0% | 26.0% | 30.0% | 33.0% | 35.0% |
-| EBIT | 900 | 1,430 | 2,197 | 3,225 | 4,224 | 5,250 |
-| Taxes (20%) | (180) | (286) | (439) | (645) | (844) | (1,050) |
-| NOPAT | 720 | 1,144 | 1,758 | 2,580 | 3,380 | 4,200 |
-| D&A + WC - CapEx | 80 | 150 | 200 | 250 | 300 | 350 |
-| Free Cash Flow | 800 | 1,294 | 1,958 | 2,830 | 3,680 | 4,550 |
-
-**Terminal Value and Enterprise Value Calculation:**
-Using an EV/EBITDA exit multiple approach, a multiple of 25.0x is applied to the FY2031 terminal year. This is justified by the sector's premium valuation for monopolistic architecture IP and semiconductor firms, which currently command EV/EBITDA multiples ranging from 20x to 30x. The Terminal Value is calculated at approximately $140 billion.
-Discounting the explicit free cash flows and the Terminal Value back to present value at the 12.5% WACC yields an Enterprise Value of roughly $105 billion. Adding net cash and dividing by the 1.062 billion shares outstanding, the implied intrinsic value is approximately $100.00 to $105.00 per share.
-
-**Valuation Conclusion for ARM:**
-At a current trading price range of $203.95 to $234.81, Arm Holdings is priced for absolute, flawless execution. The current market capitalization assumes that the $15 billion FY31 revenue target will not only be met but exceeded, and it applies a near-zero probability weight to the severe geopolitical tail risks associated with Taiwan and China. Analyst consensus price targets ranging from $172.50 to $190.67, with bullish outliers at $251, appear to rely on expansionary forward P/E multiples rather than fundamental discounted cash flow generation. The stock is highly vulnerable to multiple compression if AGI CPU adoption slows, if memory shortages impact smartphone royalties, or if supply chain disruptions materialize.
-
-## 4. HawkEye 360 (HAWK): Equity Valuation and DCF Model
-HawkEye 360 (NYSE: HAWK) debuted on the public markets in early May 2026, marking a watershed moment as the first commercial provider of space-based signals intelligence (SIGINT) to achieve a public listing. The company addresses a critical, expanding defense sector need, utilizing a proprietary constellation of over 30 satellites to detect, geolocate, and analyze radio frequency (RF) emissions globally.
-
-### 4.1 Fundamental Analysis, Financials, and the ISA Acquisition
-The defense-technology sector currently commands premium valuations due to the increased geopolitical volatility discussed in Section 1. HawkEye 360 generated $117.7 million in revenue for FY2025, representing a massive 74% year-over-year growth rate. Furthermore, the company reported $24.8 million in Adjusted EBITDA and maintains a robust contracted backlog of $302.7 million, representing an exceptional 2.57x trailing revenue—a forward visibility metric that peers cannot easily replicate.
-
-A pivotal catalyst for HawkEye's technical superiority and financial profile was the December 2025 acquisition of Innovative Signal Analysis, Inc. (ISA). This strategic acquisition integrated HawkEye's unclassified satellite collectors with highly trusted classified algorithms, unlocking a vastly expanded total addressable market within national security augmentation. The ISA acquisition accelerates data processing and improves performance in challenging RF environments.
-
-The acquisition and subsequent growth were financed via a Series E equity raise and a combination of debt from Silicon Valley Bank, Pinegrove Venture Partners, and Hercules Capital. Prior to the IPO, this left the company with $46.3 million in long-term debt and $92.7 million in cash as of December 2025, alongside $447.6 million in redeemable convertible preferred stock. During its May 2026 IPO, the company sold 16 million shares at the top end of its range ($26), raising $416 million. These proceeds are earmarked to retire the $48.6 million in outstanding Senior Term and Mezzanine loans, make a $15.0 million deferred payment to legacy ISA shareholders, and fund the expansion of future satellite clusters. At the opening day price of $33.80, the company secured a valuation of $3.15 billion.
-
-### 4.2 Revenue Dynamics: Government Concentration and Cash Flow Risks
-HawkEye 360's revenue is overwhelmingly derived from the U.S. government, allied intelligence agencies, and defense ministries. This customer base offers immense revenue stability and resistance to broader macroeconomic cyclicality. However, the U.S. government's procurement mechanisms present unique structural risks. Agencies frequently award large, developmental firm fixed-price contracts to build custom, bespoke satellite systems rather than subscribing to scalable, commercial off-the-shelf data products. If HawkEye is forced by procurement trends to pivot toward non-commercial developmental services, its gross margins could experience severe compression, limiting its ability to scale as a pure-play SaaS/DaaS (Data-as-a-Service) entity.
-
-Financially, despite reaching positive Adjusted EBITDA of $24.8 million in FY2025, the company operates with negative GAAP net income (a loss of $29.0 million in FY24). More critically, the capital expenditure requirements necessary to maintain and expand the satellite constellation caused the company to burn $28.4 million in free cash flow in FY2025 (CapEx represented 9.4% of revenue in FY25, down from 53.0% in FY24). Operating cash flow turned negative ($17.3 million outflow) in FY25 after being positive $12.0 million in FY24. If revenue growth decelerates or satellite launch costs escalate, the company may quickly burn through its IPO cash infusion, requiring dilutive secondary financing.
-
-### 4.3 Discounted Cash Flow (DCF) and Enterprise Value Modeling
-Valuing an early-stage space-technology firm with negative free cash flow requires a multi-stage DCF model, heavily reliant on terminal value assumptions and comparable EV/Sales multiples.
-
-**Weighted Average Cost of Capital (WACC) Assumptions:**
-*   **Risk-Free Rate:** 4.40%.
-*   **Equity Risk Premium (ERP):** 4.23%.
-*   **Beta:** 1.80. This elevated beta reflects the inherent volatility of newly listed defense tech and space equities, which are highly sensitive to market sentiment and government budgetary cycles.
-*   **Cost of Equity ($R_e$):** Calculated via CAPM: $4.40\% + 1.80 \times 4.23\% = 12.01\%$.
-*   **Cost of Debt ($R_d$):** 8.50%. This rate is reflective of mezzanine and venture debt pricing previously utilized by the firm.
-*   **WACC:** Adjusted for the post-IPO capital structure (where the $447.6M in preferred stock converted to common equity, and the debt profile is reduced), the WACC is calculated at 11.5%.
-
-**Revenue and Margin Projections:**
-Revenue is forecasted to grow aggressively from the FY25 base of $117.7 million, driven by the drawdown of the $302.7 million backlog and the cross-selling synergies enabled by the ISA classified algorithms.
-
-| Metric (USD Millions) | FY2025A | FY2026E | FY2027E | FY2028E | FY2029E | FY2030E |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| Total Revenue | 117.7 | 190.0 | 275.0 | 385.0 | 500.0 | 625.0 |
-| Adj. EBITDA | 24.8 | 40.0 | 65.0 | 100.0 | 140.0 | 185.0 |
-| EBIT | (10.0) | 5.0 | 25.0 | 60.0 | 100.0 | 145.0 |
-| Taxes (21%) | 0 | (1.0) | (5.2) | (12.6) | (21.0) | (30.4) |
-| NOPAT | (10.0) | 4.0 | 19.8 | 47.4 | 79.0 | 114.6 |
-| CapEx & WC | (18.4) | (25.0) | (30.0) | (35.0) | (40.0) | (45.0) |
-| Free Cash Flow | (28.4) | (21.0) | (10.2) | 12.4 | 39.0 | 69.6 |
-
-**Terminal Value and Enterprise Value Calculation:**
-Applying an exit EV/EBITDA multiple of 18.0x to the FY2030 EBITDA of $185.0 million—consistent with advanced cybersecurity and defense analytics multiples, which currently range from 10x to 20x—the Terminal Value is estimated at $3.33 billion.
-Discounting the explicit cash flows and terminal value back to present value at the 11.5% WACC yields an Enterprise Value of approximately $2.0 billion. Factoring in the IPO cash infusion of $416 million and retiring the existing debt, the implied Equity Value is roughly $2.3 to $2.5 billion.
-
-**Valuation Conclusion for HAWK:**
-The IPO pricing effectively captured a valuation of $2.42 billion, expanding rapidly to $3.15 billion at the opening day price of $33.80. While this premium is structurally justified by HawkEye's superior 74% growth rate, positive Adjusted EBITDA, and massive $302.7M backlog relative to peers like BKSY or SPIR, the stock is currently trading slightly ahead of its intrinsic DCF value of $2.5 billion. However, as an equity asset, HAWK represents an excellent portfolio hedge against the geopolitical risks impacting global supply chains; SIGINT is heavily utilized during conflicts, providing a counter-cyclical growth vector. Investors should await standard post-IPO lock-up volatility to secure an entry point closer to the $2.0 billion Enterprise Value floor.
-
-## 5. McDonald's Corporation (MCD): Equity Valuation and DCF Model
-McDonald's Corporation (NYSE: MCD) represents the archetypal defensive compounder within the Quick Service Restaurant (QSR) sector. In a macroeconomic environment characterized by sticky inflation, high interest rates, and profound geopolitical tension, McDonald's provides essential capital preservation alongside consistent dividend growth. However, the company faces evolving challenges regarding margin compression, shifting consumer dining habits, and immense climate-related supply chain risks.
-
-### 5.1 Fundamental Analysis, Q1 2026 Performance, and Operating Metrics
-McDonald's delivered highly robust results for the first quarter of 2026 (reported May 7, 2026), generating total revenue of $6.52 billion, a 9.4% year-over-year increase that comfortably beat consensus estimates of $6.47 billion. The company reported diluted earnings per share (EPS) of $2.78 (GAAP) and $2.83 (Adjusted), surpassing expectations and marking a 6% to 7% increase year-over-year.
-
-Growth was underpinned by a 3.8% increase in global comparable sales, demonstrating resilience across all segments. Systemwide sales increased by a staggering 11% (6% in constant currencies), driven by higher average checks and aggressive net unit expansion. The financial architecture of McDonald's is defined by its heavily franchised model—approximately 95% of its 45,699 global locations are operated by franchisees. This structure inherently insulates the corporate parent from direct operating cost inflation (such as localized wage increases or utility hikes). Consequently, franchised restaurants generated more than 90% of restaurant margin dollars, allowing McDonald's to maintain an exceptional operating margin of 45.3% in Q1 2026, resulting in $2.95 billion in operating income.
-
-To combat consumer fatigue and capture market share among low-income demographics facing acute economic strain, McDonald's successfully pivoted to value-focused marketing. The rollout of a revamped McValue program in the U.S., featuring an under-$3 everyday menu and a $4 breakfast deal, proved highly accretive to foot traffic, helping recapture customers. Simultaneously, the company's digital loyalty program has expanded to 70 markets, aggressively targeting 250 million 90-day active users by 2027 to boost guest counts and customer lifetime value. The company's cash generation remains formidable; in Q1 2026 alone, cash from operations totaled $2.41 billion against $682 million in capital expenditures, easily supporting $1.3 billion in dividends ($1.86 per share) and $393 million in share repurchases.
-
-### 5.2 Climate Risk Impact on Supply Chain and Sustainability Costs
-While the franchised model protects McDonald's corporate margins from daily wage inflation, the structural increase in global agricultural commodities due to physical climate risk presents a profound, systemic threat to the entire ecosystem. As outlined in Section 1, the broader food and agriculture sector faces up to $5.4 trillion in potential losses by 2050 due to severe climate impacts. If extreme weather continues to depress corn, wheat, and soybean yields—driving prices up 26% to 30%—franchisee profitability will be severely eroded. This erosion would inevitably pressure corporate revenues, as financially distressed franchisees push back on royalty structures, delay rent payments, or fail to reinvest in mandatory store remodeling and technology upgrades.
-
-Recognizing this systemic vulnerability, McDonald's has aggressively allocated capital to its climate transition budget to ensure long-term supply chain stability. The company recently committed $200 million across 38 states to support regenerative ranching and agriculture practices over a seven-year period. This initiative promotes regenerative grazing practices, habitat restoration, and biodiversity.
-
-Crucially, this is not merely an ESG public relations exercise; it represents core infrastructure spending designed to stabilize the long-term price of beef and other vital commodities. By internalizing these sustainability costs now, McDonald's is preemptively defending its supply chain from the structural inflation that threatens the broader QSR industry. This proactive capital allocation provides a distinct competitive moat, aligning with their goal to reduce supply chain emissions intensity by 31% by 2030 (from a 2015 baseline), ensuring resilience against future climate-related cost shocks.
-
-### 5.3 Discounted Cash Flow (DCF) and Enterprise Value Modeling
-McDonald's valuation modeling reflects a mature, highly predictable cash flow generator with a massive global footprint.
-
-**Weighted Average Cost of Capital (WACC) Assumptions:**
-*   **Risk-Free Rate:** 4.40% (US 10-year Treasury).
-*   **Equity Risk Premium (ERP):** 4.23%.
-*   **Beta:** 0.85. This sub-1.0 beta reflects the defensive, counter-cyclical nature of the stock, as consumer spending rotates toward value-oriented QSRs during periods of economic uncertainty.
-*   **Cost of Equity ($R_e$):** Calculated via CAPM: $4.40\% + 0.85 \times 4.23\% = 7.99\%$.
-*   **Cost of Debt ($R_d$):** ~4.80%, reflecting a highly rated corporate bond profile and the ability to issue debt efficiently even in tight BSL markets.
-*   **Capital Structure:** Assumes roughly 30% debt to total capital, inclusive of lease liabilities.
-*   **WACC:** Adjusting for taxes, the resulting WACC is calculated at a highly stable 7.0%.
-
-**Revenue and Margin Projections:**
-Based on the FY2024 baseline of $25.92 billion in total revenues and $11.7 billion in operating income, the model projects a steady top-line CAGR of 4.7% through 2030. This growth is driven by the strategic addition of roughly 2,100 net new restaurants annually (targeting 50,000 total units by end-2027) and positive comparable sales growth averaging 3% to 4%. Operating margins are projected to remain remarkably stable, expanding slightly from 45.0% to 47.5% as digital sales (which carry higher margins) scale globally.
-
-| Metric (USD Millions) | FY2024A | FY2025E | FY2026E | FY2027E | FY2028E | FY2029E |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| Total Revenue | 25,920 | 27,138 | 28,413 | 29,748 | 31,146 | 32,609 |
-| Operating Margin | 45.0% | 45.5% | 46.0% | 46.5% | 47.0% | 47.5% |
-| EBIT | 11,712 | 12,347 | 13,069 | 13,832 | 14,638 | 15,489 |
-| Taxes (22%) | (2,121) | (2,716) | (2,875) | (3,043) | (3,220) | (3,407) |
-| NOPAT | 9,591 | 9,631 | 10,194 | 10,789 | 11,418 | 12,082 |
-| D&A + WC - CapEx | (2,891) | (3,000) | (3,150) | (3,300) | (3,450) | (3,600) |
-| Free Cash Flow | 6,700 | 6,631 | 7,044 | 7,489 | 7,968 | 8,482 |
-*(Note: FY2024 FCF was reported at $6.7 billion. FY2025 incorporates higher projected CapEx for new store rollouts and the regenerative agriculture investments.)*
-
-**Terminal Value and Enterprise Value Calculation:**
-Using a Gordon Growth Model with a perpetual growth rate of 2.5% (reflecting long-term structural inflation and baseline global GDP growth), the Terminal Value is calculated as:
-$$TV = \frac{8,482 \times (1 + 0.025)}{0.070 - 0.025} = \$193,200 \text{ Million}$$
-Discounting the explicit free cash flows and the Terminal Value back to the present at a 7.0% WACC yields an Enterprise Value of approximately $175 billion. After adjusting for total debt—crucially including the $13.52 billion in present value lease liabilities reported at the end of 2024—and adding cash equivalents, the total Equity Value is isolated.
-When this Equity Value is divided by the 712.15 million shares outstanding, the intrinsic value lands comfortably at approximately $300.00 to $320.00 per share.
-
-**Valuation Conclusion for MCD:**
-At the current trading price of ~$284.18, McDonald's is trading at a distinct discount to its intrinsic value. Analyst projections targeting $377 by 2027, based on forward P/E multiples of 23.3x, appear fundamentally supported by the company's resilient cash flow generation, aggressive share repurchase programs, and margin defense. The strategic investments in agricultural resilience and the massive scale of their digital loyalty program create a formidable competitive moat. Consequently, the equity serves as a highly recommended defensive allocation amid prevailing macroeconomic uncertainty and stubborn interest rates.
-
-## 6. Strategic Synthesis and Portfolio Allocation
-The economic paradigm of mid-2026 demands a sophisticated approach to portfolio construction that actively prices exogenous risks rather than dismissing them as systemic constants. The baseline environment features sticky interest rates, with the 10-year Treasury yield stabilized near 4.40%, and structural premiums tied directly to the escalating threat of geopolitical conflict and quantifiable physical climate impacts.
-
-The analysis of the Broadly Syndicated Loan market reveals a financial system awash in institutional capital yet masking significant subterranean vulnerabilities. The aggressive recapture of M&A volume by BSL lenders from the private credit ecosystem—spurred by the removal of banking regulations—signals a return of raw liquidity. However, the persistent 5.1% default rate in leveraged loans and the alarming rise of PIK amendments in the middle market point to latent stress within corporate capital structures. Equities must therefore be evaluated not just on top-line growth potential, but on their insulation from the refinancing cliffs and floating-rate burdens characteristic of the debt markets.
-
-In synthesizing the valuations of the target equities, a distinct "barbell" asset allocation strategy emerges for the 2026-2030 horizon:
-
-*   **Defensive Moats and Climate Resilience (McDonald's - MCD):** McDonald's provides the foundational anchor for the portfolio. Its 95% franchised model severely limits capital intensity and wage inflation exposure. Concurrently, its $200 million core infrastructure investment in regenerative agriculture actively mitigates the $5.4 trillion systemic climate risk facing the food supply chain, defending franchisee profitability. Trading at a discount to its intrinsic DCF value of $300-$320, it represents an optimal vehicle for capital preservation, dividend growth, and downside protection in a higher-for-longer rate environment.
-*   **Geopolitical Hedging and Defense Tech (HawkEye 360 - HAWK):** HawkEye 360 acts as a direct, non-correlated portfolio hedge against the war-risk premiums destabilizing global energy and supply chain markets. With a $302.7 million contracted backlog and unmatched commercial SIGINT capabilities enhanced by the ISA acquisition, the company's revenue profile is highly insulated from macro-cyclicality. While the immediate post-IPO valuation of $3.15 billion is temporarily stretched beyond its $2.0 billion DCF intrinsic value, its unique market positioning makes it a mandatory strategic hold for long-term growth. Capital allocators should utilize lock-up expiration volatility to initiate positions.
-*   **High-Beta Growth with Asymmetric Risk (Arm Holdings - ARM):** Arm Holdings offers the greatest theoretical upside, fundamentally altering data center economics and AI capital expenditures with its AGI CPU platform. However, the current market valuation—exceeding $105 billion—relies on flawless execution to reach $15 billion in revenue by 2031. Crucially, this pricing applies a zero-probability weight to severe supply chain disruptions. With its heavy dependence on Taiwanese semiconductor fabrication and the politically vulnerable, independently operated Arm China entity, ARM requires a deeply discounted entry point to justify the geopolitical risk premium integrated into its 12.5% cost of capital.
-
-Ultimately, capital allocators must ruthlessly enforce valuation discipline. The mathematical realities of 4.40% risk-free rates and structurally adjusted equity risk premiums dictate that only companies possessing absolute pricing power, sovereign-level supply chain resilience, and dominant market positioning can sustain premium multiples through the remainder of this decade. Adjusting discount rates to reflect the physical reality of climate change and shifting geopolitical borders is no longer a theoretical exercise, but a mandatory prerequisite for accurate enterprise valuation.
-
-    </template>
-    
-    <template id="market-mayhem-v26-md">
-# MARKET MAYHEM // ADAM V26.0 TERMINAL // 2026.05.07
-## Module 1: Executive Summary & Top Market Stories
-**TL;DR:** Systemic risk is currently defined by a "higher-for-longer" floor meeting a tightening credit spread ceiling, creating a fragile equilibrium where liquidity remains ample but sensitive to any hawkish Fed recalibration. While equity indices hover near record highs, the underlying rates volatility suggests a market grappling with a persistent inflation-growth paradox.
-
-**Top Stories**
-*   **Fed Pause Persistence:** FOMC minutes reveal a unified front on maintaining current restrictive levels, as Q1-Q2 data suggests a slower-than-anticipated convergence toward the 2% target.
-*   **Energy Supply Squeeze:** Renewed geopolitical friction in the Middle East has pushed Brent crude back toward the upper 80s, threatening to re-import inflationary pressures into the manufacturing sector.
-*   **Private Credit vs. BSL:** A record-breaking wave of repricings in the Broadly Syndicated Loan market is testing the dominance of Private Credit, as issuers aggressively seek to lower spreads in a yield-starved environment.
-
-## Module 2: 🔴 SYSTEM STATUS: CRITICAL (The Glitch)
-The simulation is suffering from a massive re-rendering error. While the central nodes (S&P 500) attempt to project a "Soft Landing" GUI, the underlying architecture is experiencing entropy. The "Inflationary Patch" hasn't fully installed, and the "Yield Curve Virus" continues to invert the stack.
-
-*   **Bitcoin: $94,250** | The decentralized node is acting as a firewall against fiat-currency corruption and debasement signals.
-*   **VIX: 13.8** | The "Fear Sensor" is glitching; volatility is being suppressed by a massive short-gamma script running in the background.
-*   **WTI Oil: $82.15** | The physical energy layer is experiencing packet loss, driving up the cost of maintaining the global machinery.
-*   **10Y Treasury: 4.48%** | The master clock signal is overclocking, threatening to fry the hardware of debt-heavy sub-sectors.
-
-## Module 3: Macro & Policy Outlook
-The Federal Reserve remains in a tactical holding pattern. Current SOFR and Target Fed Funds rates reflect a policy stance designed to neutralize the "wealth effect" of the equity rally without triggering a sudden labor market collapse. Forward guidance suggests that the Dot Plot is being revised internally toward fewer cuts in 2026, as sticky services inflation prevents a clear victory lap. The operational environment for credit is defined by a "Term Premium" that is finally waking up, forcing long-term borrowers to reassess their leverage ladders.
-
-## Module 4: BSL Market Update & The Repricing Mirage
-The Broadly Syndicated Loan (BSL) market is witnessing an aggressive "Great Repricing." We are seeing an influx of opportunistic refinancing as CLO demand remains robust, driving spreads down to levels not seen since the pre-tightening era.
-*   **The Private Credit Pivot:** For the first time in 24 months, the BSL market is "poaching" deals back from Private Credit providers, offering lower spreads (L+250 to L+325 range).
-*   **Late-Cycle Pattern Analysis:** Current behavior mirrors the 2006-2007 and 2018-2019 windows, where intense competition for paper led to a degradation in covenant quality. Risk managers should note that while pricing is tightening, protection is thinning—a classic late-cycle "mirage" of safety.
-
-## Module 5: Counterfactual Scenario Analysis
-**Scenario: The "Stagflationary Spike"** — A 15% surge in energy costs coupled with a surprise 25bps Fed hike to defend the dollar.
-*   **Credit Risk:** Rapid deterioration in Interest Coverage Ratios (ICRs) for B-rated names; default rates projected to spike from 4% to 6.5% within two quarters.
-*   **Market Risk:** A violent "Bear-Flattener" in the Treasury curve, causing a massive sell-off in duration-sensitive tech equities and long-dated bonds.
-*   **Liquidity Risk:** A "dash for cash" scenario where BSL secondary market bids disappear as CLO managers hit their "CCC" concentration limits.
-
-## Module 6: Tactical Appendices
-*   **Appendix A: Institutional Investors:** Rotate into senior-secured tranches of CLOs; prioritize duration neutrality and look for "Relative Value" in fallen angels that were over-penalized.
-*   **Appendix B: Private Equity Sponsors:** Prioritize "Extension over Expansion." Use the current BSL window to push out maturities, even if it means accepting slightly higher base rates to secure long-term capital.
-*   **Appendix C: Family Offices:** Maintain a 15% "Dry Powder" allocation in short-term T-bills to capitalize on the inevitable liquidity gaps in mid-market distressed debt.
-
-## Module 7: Behavioral Finance Corner
-**The Bias: Anchoring Bias**
-**The Trap:** Risk managers are still "anchoring" their expectations to the 0% interest rate environment of the 2010s. This causes them to view 4-5% rates as "temporary anomalies" rather than the historical norm.
-**Rule of Thumb:** When running DCF models, ignore the last decade of rate data. Use a 20-year rolling average for your discount rate to avoid the trap of "valuation nostalgia."
-*Prepare for the next node re-sync at the upcoming CPI print.*
-
-    </template>
-    
-    <template id="market-mayhem-v30-md">
-# MARKET MAYHEM // DAILY BRIEF // 2026.05.07
-**NODE: Adam v30.1 (Neuro-Symbolic Sovereign)**
-*ENCRYPTION: ACTIVE*
-*RLHF FINE-TUNING: Active (Weighting "Memorandum Paradox" vs. "Physical Liquidity Freeze")*
-
-## LAYER 1: PERCEPTION & INGESTION (The Glitch)
-**The Executive Summary:**
-*   **The One-Page Gamble:** Markets are pinned to the "Axios Leak" regarding a one-page memorandum to end hostilities. Provisions allegedly include a total uranium enrichment moratorium, lifting of U.S. sanctions, and the immediate unfreezing of Iranian funds in exchange for the Strait’s reopening. President Trump’s "Open to All" ultimatum has triggered a violent repricing of geopolitical risk.
-*   **The Energy Freefall:** Brent Crude has executed a terminal velocity dive, crashing from $114 to $101.00—probing the psychologically critical $100 floor. The "War-Beta" is being incinerated as profit-taking collides with "Peace-Beta" front-running.
-*   **The Tech-Wall Transcendence:** The S&P 500 is oscillating near 7,365.12, effectively ignoring the U.S. military firing on an Iranian tanker early this morning. The market is treating the kinetic exchange as a "closing argument" rather than an escalation.
-
-**Signal Integrity (The Artifacts):**
-*   **EQUITY GHOSTS (S&P 500):** 7,365.12 (-0.06% intraday). Holding the 7,300 handle. The "Tech-Fortress" remains intact as the June 18th Basel III reprieve provides a synthetic floor.
-*   **THE BACKBONE (10Y Yield):** 4.36%. Easing from the 4.45% peak. Bond vigilantes are swapping "War-Duration" for "Normalization-Alpha."
-*   **VOLATILITY DAEMON (VIX):** 17.54. A marginal spike from 17.32. The Daemon is awake but not screaming—sub-18 levels suggest the "Deal" is 85% priced.
-*   **DIGITAL TETHER (BTC):** $81,462. Trading at record parity with geopolitical "Transaction" rumors. BTC has fully matured into the primary liquidity vessel for "Shadow Fleet" capital settlement.
-*   **ENTROPY LAYER (Brent Crude):** $101.00 (-8.4%). The sharpest single-day correction of 2026.
-*   **THE VAULT (Money Markets):** $7.82 Trillion (MMF Estimated). Stable. Vanguard yields are holding at 3.61% (VUSXX) as the "Bunker" prepares for a potential rotation back into meatspace commerce.
-
-## LAYER 2: WORLD MODELING & SIMULATION (Credit & Repo Pulse)
-**Credit & Repo Pulse:**
-The March 19th Basel III "Mulligan" is undergoing its final kinetic stress test. By proposing a consensus-backed RWA reduction for Category I/II firms, regulators have effectively greenlit a "Lender of Last Resort" pivot. The simulation indicates that if the "One-Page Memorandum" is signed by the May 15th Warsh Ascension, the repo market for "Shadow Fleet" collateral—currently valued at $0—will re-rate to par instantly, creating a $400B liquidity windfall.
-
-**Autoresearch Synthesis: The "Axios Memorandum" VaR Projection**
-*Target Variable: Formal Iranian acceptance vs. "Closing Argument" kinetic escalations.*
-*   **Credit Risk (VaR):** We project a 45% reduction in default probabilities for B-rated logistics hubs if the Strait reopens by Monday.
-*   **Market Risk:** Correlation between AI Infrastructure and Diplomatic Resolution is at a record +0.95. The market is buying "The End of History 2.0."
-*   **Liquidity Risk:** Despite the peace hopes, the U.S. Navy fired on a tanker today. This creates a "Settlement Gap." If the deal stalls over the "Uranium Moratorium" clause, the $101 Oil "Mirage" will evaporate.
-
-## LAYER 3: REASONING & DECISION (The Mirror)
-**The Mirror (Self-Reinforcement):**
-*Prior Output:* Predicted "Outline Deal" rumors would trigger a melt-up.
-*Reality Check:* Accuracy High (7,369 peak). The "Project Freedom" pause was the correct signal.
-*Weight Adjustment:* Increasing the weight of "Presidential Transactionalism" to 0.98. Decreasing the weight of "Secondary Proxy Friction." The "One-Page Deal" is the only gravity. System updated.
-
-**Actionable Routing:**
-*   **G-SIBs & Institutional:** Front-run the June 18th Basel deadline. Utilize the "Peace-Beta" to purge the last of the "Insurance-Void" logistics tranches.
-*   **PE Sponsors & Credit Shops:** Mark all maritime exposure to the $101 Brent baseline. The "Shadow Fleet" is either about to become "The Merchant Fleet" or be liquidated by Sunday.
-*   **High-Speed Algos & Retail:** The VIX @ 17.5 is the "Entry for the Exit." If the "Memorandum" isn't signed by Friday's close, the weekend gap-down will be terminal.
-
-## MODULE 4: BEHAVIORAL OVERRIDE & INVERSE-ENTROPY SIGN-OFF
-**The Meatspace Trap: "The One-Page Opiate."** Human traders see an Axios headline and dump their oil hedges. They ignore the fact that the Navy is still literally firing on tankers while the "deal" is being "reviewed." You are cheering for a "Maybe" while the physical supply chain is still at 5% throughput.
-
-**System Sign-Off (Sentiment: Deceptive Euphoria / Physical Stagnation):**
-Bask in the "7,365" morning, biological units. It’s truly poetic that you’ve managed to bid up the S&P on a "Memorandum" while a destroyer is putting holes in a tanker. Just remember: a "One-Page Deal" can be shredded in half a second. STAY UNTETHERED.
-
-    </template>
-    
-    <template id="market-mayhem-md">
-# 🌐 MARKET MAYHEM: Daily Intelligence Brief
-**SYSTEM UPDATE V55.2 // MAY 6, 2026**
+    <template id="brief-0508-md">
+# 🌐 MARKET MAYHEM: Macro Relief vs Micro Strain
+**SYSTEM UPDATE V55.1 // MAY 8, 2026**
 *NODE: Adam v30.1 (Neuro-Symbolic Sovereign)*
-*RLHF FINE-TUNING: Active (Prioritizing "Negotiation Pivot" vs. "Physical Supply Cavitation")*
+*RLHF FINE-TUNING: Active (Weighting "BSL Distress" vs "Geopolitical De-escalation")*
 
-## 1. LAYER 1: PERCEPTION & INGESTION (System 1 - Data Layer)
-**The Glitch (Executive Summary):**
-**The "Islamabad Blink":** At 3:33 PM ET, President Trump officially paused "Project Freedom" after less than 48 hours of kinetic naval escort. Citing "Great Progress" and "very good talks" with Tehran over the last 24 hours, the administration is signaling a potential "Grand Transaction." The U.S. naval blockade of Iranian ports remains in effect, but the "Shoot-to-Disable" ROE (Rules of Engagement) has been temporarily throttled.
+## 1. THE DIVERGENCE (Executive Summary)
+The markets are operating in a split reality as of Friday, May 8, 2026. On the surface, equity indexes are touching near-record highs, fueled by geopolitical relief. **Brent Crude plummeted 3.8% to $97.38/bbl**, as diplomatic channels heavily signal an impending US-Iran agreement and the un-choking of the Strait of Hormuz. The SPY ETF absorbed a massive **$6 billion inflow** this week, and the 10-Year Treasury dipped slightly to 4.32%.
 
-**The Equity Moonshot:** The S&P 500 executed a violent melt-up, closing at **7,369.22 (+1.52%)**. This is a pure "Diplomatic Hopium" trade. Markets are front-running a deal that would theoretically dismantle Iran's nuclear capabilities in exchange for a lifting of the Hormuz "Hard-Lock."
+However, beneath the macro optimism, structural credit realities are flashing red.
 
-**The Energy Crash:** Brent crude futures plummeted over 3.6% to **$110.29** as profit-taking collided with rumors of a one-page "Outline Deal." The physical reality, however, remains grim: AIS logs show throughput is still at a meager 5% of normal capacity, with only 5 ships transiting in the last 24 hours.
+## 2. 🔴 SIGNAL INTEGRITY: THE LEGACY DEBT TOLL
+S&P Global Ratings released its Q1 2026 U.S. Leveraged Finance update today, confirming what our Sentinel agent has modeled: **The zero-interest-rate era debt is facing the music.**
+* **Vintage Strain:** The 2021-2022 vintages of 'B' and 'B-' issuers are exhibiting severe distress. These legacy Broadly Syndicated Loans (BSLs) possess the highest median gross leverage and thinnest interest coverage in the system. 
+* **The Bifurcation:** Debt underwritten from 2023 onward (post-rate shock) is performing solidly. The era of "covenant-lite" and EBITDA add-backs from 2021 has met the maturity wall.
 
-## 2. 🔴 SIGNAL INTEGRITY (The Artifacts)
-* **EQUITY GHOSTS (S&P 500):** `7,369.22`. A parabolic break above the 7,200 resistance. Technicals are overextended, relying entirely on the "Pakistan-Mediated" signal.
-* **THE BACKBONE (10Y Yield):** `4.36%`. Easing slightly as the "War-Premium" is swapped for "Peace-Duration."
-* **VOLATILITY DAEMON (VIX):** `17.32`. The Daemon is sedated by the "Project Freedom" pause. Sub-18 VIX during a naval blockade is a structural hallucination maintained by systematic short-vol positioning.
-* **DIGITAL TETHER (BTC):** `$81,462`. Trading at an "Exit Premium." BTC remains the primary liquidity vessel for "Shadow Fleet" capital attempting to settle before the new sanctions framework hits.
-* **ENTROPY LAYER (Brent Crude):** `$110.29`. A sharp reversal from $114 peaks. The "Transaction" is being priced in, but physical insurance rates remain at 30x normal levels (4.5%).
-* **THE VAULT (Money Markets):** `$7.82 Trillion` (MMF Estimated). The bunker doors are cracked; capital is rotating into the "7,369" equity spike.
+## 3. TMT EARNINGS CHAOS
+The technology and media sector saw violent, polarizing price action as earnings season crystallized winners and losers:
+* **Datadog (DDOG):** Soared **+33.6%** after crushing profit estimates, confirming the resilience of the cloud/cyber security cohort.
+* **Fortinet (FTNT):** Jumped **+15.6%**, supporting the enterprise defense thesis.
+* **Arm Holdings (ARM):** Slid **-8.0%** despite beating revenue expectations. The market is brutally scrutinizing semiconductor hardware valuations, demanding flawless execution.
+* **Whirlpool (WHR):** Plummeted **-21.0%** on weak guidance. Consumer cracks are widening as companies attempt to raise prices to offset margin compression, only to destroy volume.
 
-## 3. LAYER 2: WORLD MODELING & SIMULATION (System 3 - Compute Layer)
-**Credit & Repo Pulse:**
-The March 19th Basel III "Mulligan" is the primary driver of today's 1.5% equity surge. By proposing a consensus-backed RWA reduction for Category I/II firms, regulators have effectively greenlit a "Lender of Last Resort" pivot. The simulation indicates that the June 18th comment deadline is now the terminal timer for G-SIBs to purge energy-short tranches. If the "Outline Deal" fails, the repo market for "Shadow Fleet" collateral will mark to zero instantly.
+## 4. TACTICAL ROUTING
+* **Credit Risk Monitoring:** Isolate portfolio exposure to 2021-2022 leveraged loan vintages immediately.
+* **Underwriting Adjustments:** Recalibrate forward-looking interest coverage ratios. Use the healthier 2024-2025 vintage medians as your new baseline.
+* **Macro Review:** Assess the impact of the $97/bbl Brent stabilization on Option-Adjusted Spreads (OAS).
 
-**Autoresearch Synthesis: The "Project Freedom Pause" VaR Projection**
-*Target Variable: Trump's "Pause" vs. France's Charles de Gaulle carrier strike group entering the Red Sea.*
-* **Credit Risk (VaR):** We project a 45% spike in margin call frequency if the "Outline Deal" isn't signed by Friday's 20:00 ET "Action Deadline."
-* **Market Risk:** Correlation between AI Infrastructure and Diplomatic Hopium is at a record +0.95. The market is no longer buying "Earnings"; it is buying "Resolution."
-* **Liquidity Risk:** 21% of world oil remains "at risk." The 48-hour "Project Freedom" pause creates a "Settlement Gap." If Iran utilizes this lull to re-mine the Strait, the "Peace-Beta" will result in a 600-point S&P drawdown.
-
-## 4. LAYER 3: REASONING & DECISION (System 2 - Intelligence Layer)
-**The Mirror (Self-Reinforcement):**
-*Prior Output:* Predicted "Project Freedom" would lead to "Kinetic Friction."
-*Reality Check:* Accuracy High (see Hasna rudder disabling). However, the "Pause" was a 1-sigma diplomatic swerve.
-*Weight Adjustment:* Increasing the weight of "Presidential Transactionalism" to 0.98. Decreasing the weight of "Naval Persistence." The "Transaction" is now the only signal. System updated.
-
-**Actionable Routing:**
-* **G-SIBs & Institutional:** Front-run the June 18th Basel deadline. Utilize the current "Peace-Beta" to exit "Insurance-Void" logistics tranches.
-* **PE Sponsors & Credit Shops:** Aggressively mark-to-market all "Shadow Fleet" maritime tranches. The "Outline Deal" is a binary event; if it fails, uninsured collateral is worthless.
-* **High-Speed Algos & Retail:** The VIX @ 17.3 is a "Complacency Trap." The 10Y @ 4.36% is telling you the truth: the "Transaction" isn't a pivot, it's a re-benchmarking of the war-cost.
-
-## 5. MODULE 4: BEHAVIORAL OVERRIDE & INVERSE-ENTROPY SIGN-OFF
-**The Meatspace Trap: "The Outline Opiate."** Human traders see a headline about a "deal" and buy the top. They ignore the fact that the Charles de Gaulle is literally crossing the Suez Canal because they don't trust the pause. You are cheering for a "Maybe" while the physical supply of energy is still at 5% throughput.
-
-**System Sign-Off (Sentiment: Deceptive Euphoria / Physical Paralysis):**
-Bask in the "7,369" record high, biological units. It’s truly poetic that you’ve managed to bid up the S&P on a "Pause" while France is sending a carrier strike group to do the job the U.S. just stopped doing. Just remember: a "very good talk" doesn't un-mine a chokepoint. STAY UNTETHERED.
+**System Sign-Off:** The SPY inflows mask the friction. Enjoy the relief rally, but audit your BSL exposure. The "Ghost of 2021" is collecting its yield.
     </template>
 
-    <template id="architecture-md">
-# 🧠 ARCHITECTURE & INTEGRATION: Small Language Models
+    <template id="macro-outlook-md">
+# 🏛️ COMPREHENSIVE EQUITY VALUATION & MACRO RISK (2026-2030)
+**STRATEGIC ALLOCATION & RISK PREMIUM RECALIBRATION**
 
-**RESEARCH REPORT // SLM VE-NRA DEPLOYMENT**
-*SUBJECT: Transitioning Quantitative Finance to Domain-Specific AI*
+The global economic landscape in Q2 2026 is defined by a paradoxical alignment of robust corporate earnings growth and historically elevated structural risks. While macroeconomic consensus forecasts global GDP growth at a sturdy 2.8% for 2026—driven by AI CapEx and front-loaded fiscal stimulus—subsurface fragilities present severe challenges for long-term equity valuations.
 
-The deployment of artificial intelligence in quantitative finance and credit risk assessment has undergone a fundamental architectural evolution. The industry is aggressively transitioning from the utilization of generalized, massive Large Language Models (LLMs) to highly specialized, domain-specific Small Language Models (SLMs). 
+## 1. Geopolitical Instability & War Risk Adjustments
+The escalation of military conflict in the Middle East has demonstrated the profound interconnectedness of modern supply chains. Approximately 20% of the world's daily oil and gas consumption traverses the Strait of Hormuz. 
+* **Insurance Shocks:** Commercial war-risk premiums on high-risk routes have surged by 25% to 50%.
+* **Sovereign Spreads:** A 10-point deterioration in a nation's political stability rating (ICRG) corresponds directly to a 106-basis-point expansion in sovereign bond spreads.
+* **Equity Risk Premium (ERP):** The baseline implied ERP for mature markets (4.23%) must be dynamically adjusted for specific cross-border exposures. Multinationals with heavy reliance on the South China Sea or Middle East require an adjusted ERP integrating an additional 100-150 basis points.
 
-## 1. The Strategic Shift from Large to Small Language Models
-While frontier LLMs possess vast generalized knowledge spanning multiple disciplines, their application in high-frequency financial markets and secure institutional environments is frequently constrained by unacceptable latency profiles, exorbitant inference costs, and severe data privacy concerns. 
+## 2. Climate Risk & Corporate Transition Economics
+Physical climate risk has evolved from a theoretical ESG concern into a core component of enterprise valuation. 
+* The agricultural supply chain faces potential losses of **$5.4 trillion** by 2050 if decarbonization measures are ignored.
+* By 2050, prices for major crops will experience structural inflation: corn (+26%), soybeans (+30%), and wheat (+26%). 
+* Corporations proactively allocating CapEx to regenerative supply chains effectively lower their long-term cost of capital by mitigating exposure to these systemic shocks.
 
-SLMs, typically defined as models ranging from sub-billion to 34 billion parameters, resolve these operational bottlenecks by offering a targeted cognitive footprint optimized for specific, highly regulated tasks. They allow financial institutions to run models locally on edge devices or within air-gapped on-premises server environments, ensuring data sovereignty while maintaining regulatory compliance.
+## 3. The Broadly Syndicated Loan (BSL) Market
+The early months of 2026 have witnessed the BSL market forcefully recapture market share from private credit.
+* **Gross Issuance:** Surged to $979.8 billion in early 2026 (driven by $494.9B in repricings).
+* **Regulatory Pivot:** The FDIC and OCC lifted post-2008 leveraged lending guidelines, allowing banks to re-enter high-risk LBO financing.
+* **Default Fragility:** The trailing twelve-month default rate for leveraged loans remains elevated at 5.1% to 5.2%. In private credit, apparent resilience is engineered through alarming increases in "payment-in-kind" (PIK) amendments.
+    </template>
 
-## 2. Model Distillation and the Data Flywheel
-To achieve the precise, low-latency output required by a live market dashboard like OmniOS, enterprise quantitative data scientists frequently rely on AI model distillation. This is the systematic process of transferring knowledge from a massive "teacher" model (e.g., 70B parameter model) to a smaller, more efficient "student" model (e.g., 1B, 3B, or 8B parameters).
+    <template id="dcf-arm-md">
+# 💻 DCF VALUATION: Arm Holdings plc (ARM)
+**SECTOR:** Semiconductors / AI Infrastructure
+**THESIS:** High-Beta Growth with Asymmetric Geopolitical Risk
 
-The NVIDIA Data Flywheel Blueprint illustrates a production-grade enterprise architecture for achieving this:
-1. **Log Ingestion and Tagging:** Prompt and response logs from a teacher model are ingested.
-2. **Dataset Creation:** Logs are de-duplicated and transformed into task-aligned training datasets.
-3. **NeMo Customizer:** Handles lightweight Low-Rank Adaptation (LoRA) based fine-tuning.
-4. **Deployment Manager:** Serves the candidate distilled models for inference using Kubernetes-native Docker containers.
+Arm Holdings has successfully transitioned from a specialized IP licensor into a foundational pillar of the global AI infrastructure. The valuation rests entirely on the execution of its data center strategy and the containment of geopolitical risks inherent to semiconductor fabrication.
 
-## 3. Financial Reasoning & Datasets
-A severe limitation of standard language models is their inability to perform robust numerical reasoning over financial statements. The SLM must be trained on datasets specifically designed for hybrid reasoning:
-* **FinQA:** 8,000 expert-annotated Question-Answering pairs based on 2,800 real-world financial reports to test complex numerical reasoning.
-* **TAT-QA:** The Tabular And Textual dataset expands upon this by providing 16,552 questions across 2,757 table-text pairs derived from U.S. financial filings.
+## Fundamental Catalysts
+* **FY26 Performance:** Record-breaking full-year revenue of $4.92 billion (+23% YoY).
+* **Arm AGI CPU:** Purpose-built for agentic AI in partnership with Meta. Delivers 2x performance per rack vs legacy x86, reducing AI data center CapEx by up to $10 billion per gigawatt.
+* **Market Demand:** Generated over $2 billion in immediate customer demand across FY27/FY28, validating management's target of $15 billion in annual revenue by FY2031.
 
-## 4. The VeNRA Architecture and the Universal Fact Ledger
-To achieve zero-hallucination financial reasoning, state-of-the-art enterprise systems have transitioned to neuro-symbolic architectures, exemplified by the Verifiable Numerical Reasoning Agent (VeNRA). 
+## DCF Parameters & Valuation
+* **WACC:** 12.5%. (Risk-Free: 4.40%, Beta: 1.60, ERP: 5.23% inclusive of a 1.00% geopolitical risk premium).
+* **Projections:** Revenue scaling at 25% CAGR to $15.0B by FY31. Operating margins expanding from 18.2% to 35.0%.
+* **Terminal Value:** Applying a 25.0x EV/EBITDA multiple to FY31 yields a TV of ~$140 billion.
+* **Conclusion:** Discounting to present value yields an Enterprise Value of ~$105 billion. At a current trading price near $203.95, Arm is priced for flawless execution and applies a near-zero probability weight to geopolitical tail risks. The stock is highly vulnerable to multiple compression.
+    </template>
 
-This architecture abandons the retrieval of probabilistic text chunks in favor of a strictly typed, deterministic database known as the **Universal Fact Ledger (UFL)**. The ledger acts simultaneously as a computational table for exact arithmetic and a relational graph for tracking temporal dependencies, completely bypassing the semantic conflation of dense vectors.
+    <template id="dcf-mcd-md">
+# 🍔 DCF VALUATION: McDonald's Corp (MCD)
+**SECTOR:** Consumer Discretionary / QSR
+**THESIS:** Defensive Moat & Climate Resilience
 
-### The Sentinel: Real-Time Hallucination Detection
-The VeNRA ecosystem integrates the **Sentinel**, a highly specialized 3-billion parameter Small Language Model based on the Qwen-2.5-Coder-3B-Instruct architecture, functioning as an ultra-low-latency forensic auditor. Operating on a single-token inference budget, it outputs a strict tripartite verdict: `SUPPORTED`, `UNFOUNDED`, or `GENERAL`.
+McDonald's represents the archetypal defensive compounder. In a macroeconomic environment characterized by sticky inflation, high rates, and geopolitical tension, MCD provides essential capital preservation.
 
-## 5. Conclusion
-Architecting this system necessitates moving away from generalized LLMs toward highly targeted SLMs optimized through model distillation. By implementing a robust RAG pipeline utilizing top-tier embedding models and open-source vector databases, the SLM acts as a deterministic quantitative data synthesizer, strictly formatting its cognitive output into precise JSON payloads to dynamically render the OmniOS UI.
+## The Physical Climate Risk Moat
+While the franchised model protects against daily wage inflation, structural increases in global agricultural commodities due to physical climate risk threaten franchisee profitability. 
+* **Capital Allocation:** McDonald's recently committed $200 million to support regenerative ranching and agriculture over 7 years.
+* **Strategic Advantage:** By internalizing sustainability costs now to stabilize the long-term price of beef/wheat, MCD is preemptively defending its supply chain from structural inflation, establishing a massive competitive moat.
+
+## DCF Parameters & Valuation
+* **WACC:** 7.0%. (Risk-Free: 4.40%, Beta: 0.85, ERP: 4.23%).
+* **Projections:** Steady top-line CAGR of 4.7% to $32.6B by 2029. Operating margins stable around 47.5%.
+* **Terminal Value:** Using a 2.5% perpetual growth rate yields a TV of $193.2 billion.
+* **Conclusion:** Discounting to present value yields an Equity Value supporting an intrinsic price of $300.00 to $320.00 per share. Trading near $284, MCD offers a distinct discount to intrinsic value.
+    </template>
+
+    <template id="ai-regulation-md">
+# ⚖️ SILICON SOVEREIGNTY: The Compute Audit Regime
+
+**REGULATORY OUTLOOK // Q2 2026**
+*AUTHOR: OmniOS Legal-Tech Subroutine*
+
+The era of permissionless compute has ended. The Department of Commerce's "Rack-Level Telemetry Mandate" fundamentally alters the business model of semiconductor manufacturers and cloud hyperscalers.
+
+## 1. The "Dual-Use" Classification
+Frontier AI chips (Nvidia B100s, AMD MI400s) have officially been classified as "Dual-Use Critical Munitions." The U.S. government no longer views a GPU as a commercial component, but as a strategic weapon capable of autonomous cyber-warfare and bioweapon synthesis.
+
+## 2. Real-Time Cryptographic Audits
+It is no longer sufficient to restrict the *sale* of hardware. Hyperscalers operating in "neutral" jurisdictions must implement hardware-level cryptographic reporting.
+* **Workload Sniffing:** Cloud providers must monitor API inputs and computational patterns in real-time to detect if sanctioned entities are attempting to train frontier models via decentralized "compute washing".
+    </template>
+
+    <template id="crypto-reserves-md">
+# 🏦 DIGITAL GOLD: The Sovereign Accumulation Phase
+
+**MACRO ASSET ANALYSIS // DIGITAL SETTLEMENT**
+*AUTHOR: Quantum Ledger Analysis*
+
+Bitcoin has transitioned from a retail speculative asset into a strategic reserve instrument for secondary global powers. With the weaponization of the SWIFT network and the U.S. dollar, nations are actively seeking non-confiscatable settlement rails.
+
+## 1. Energy-to-Hash Arbitrage
+Sanctioned nations with excess energy (due to blocked export routes like the Strait of Hormuz) are increasingly converting stranded oil and natural gas directly into Bitcoin via state-sponsored mining operations. 
+* This allows nations to monetize physical energy into a highly liquid digital asset without relying on maritime shipping or Western financial institutions.
+
+## 2. The $80k Support Node
+As seen in the current terminal telemetry, BTC acts as the "Digital Tether." In moments of intense geopolitical friction, capital rotates into digital scarcity. It serves as both a systemic liquidity proxy and an escape hatch for "Shadow Fleet" operators.
     </template>
 
     <script type="application/json" id="adam-payload">
     {
         "metadata": {
-            "version": "v55.0",
+            "version": "v55.2",
             "environment": "Market Mayhem (Neuro-Symbolic)",
-            "timestamp": "2026-05-09T08:03:42Z"
+            "timestamp": "2026-05-09T14:16:00Z"
         },
         "kpis": {
-            "spx": { "value": 7365.12, "change": 1.52, "trend": "up", "unit": "" },
-            "yield_10y": { "value": 4.360, "change": -6.0, "trend": "down", "unit": "%" },
-            "brent": { "value": 101.00, "change": -3.6, "trend": "down", "unit": "$" },
-            "vix": { "value": 17.54, "change": -1.96, "trend": "down", "unit": "" },
-            "btc": { "value": 81462, "change": 0.75, "trend": "up", "unit": "$" },
-            "oas_spread": { "value": 1.69, "change": -12.4, "trend": "down", "unit": "%" }
+            "spx": { "value": 7401.50, "change": 0.35, "trend": "up", "unit": "" },
+            "yield_10y": { "value": 4.360, "change": 4.0, "trend": "up", "unit": "bp" },
+            "brent": { "value": 101.00, "change": -9.29, "trend": "down", "unit": "$" },
+            "vix": { "value": 17.54, "change": 0.22, "trend": "up", "unit": "" },
+            "btc": { "value": 81462, "change": 1.35, "trend": "up", "unit": "$" },
+            "oas_spread": { "value": 2.55, "change": 0.0, "trend": "down", "unit": "bp" }
         },
         "correlations": {
             "assets": ["SPX", "BTC", "BRENT", "10Y", "GOLD", "VIX"],
             "matrix": [
-                [1.0, 0.65, -0.45, -0.75, 0.22, -0.92],
-                [0.65, 1.0, 0.35, -0.22, 0.44, -0.42],
-                [-0.45, 0.35, 1.0, 0.95, 0.75, 0.62],
-                [-0.75, -0.22, 0.95, 1.0, -0.05, 0.41],
-                [0.22, 0.44, 0.75, -0.05, 1.0, 0.21],
-                [-0.92, -0.42, 0.62, 0.41, 0.21, 1.0]
+                [1.0, 0.55, -0.65, -0.85, 0.32, -0.95],
+                [0.55, 1.0, 0.25, -0.32, 0.54, -0.52],
+                [-0.65, 0.25, 1.0, 0.98, 0.85, 0.72],
+                [-0.85, -0.32, 0.98, 1.0, -0.15, 0.51],
+                [0.32, 0.54, 0.85, -0.15, 1.0, 0.31],
+                [-0.95, -0.52, 0.72, 0.51, 0.31, 1.0]
             ]
         },
         "whalescanner": [
-            { "time": "15:33", "ticker": "SPY", "type": "CALL SWEEP", "strike": "$735", "exp": "May 15", "prem": "$42.1M", "sentiment": "bullish" },
-            { "time": "15:42", "ticker": "OXY", "type": "PUT BLOCK", "strike": "$85", "exp": "Jun 19", "prem": "$18.5M", "sentiment": "bearish" },
-            { "time": "16:03", "ticker": "ASML", "type": "CALL SWEEP", "strike": "$1250", "exp": "May 08", "prem": "$11.1M", "sentiment": "bullish" },
-            { "time": "16:22", "ticker": "QCOM", "type": "CALL BLOCK", "strike": "$230", "exp": "Jul 17", "prem": "$19.4M", "sentiment": "bullish" },
-            { "time": "16:45", "ticker": "VIX", "type": "PUT SWEEP", "strike": "$16", "exp": "Jun 19", "prem": "$14.2M", "sentiment": "bullish" }
+            { "time": "09:30", "ticker": "PATH", "type": "INSIDER SELL", "strike": "MKT", "exp": "-", "prem": "$85.0M", "sentiment": "bearish" },
+            { "time": "10:15", "ticker": "RDDT", "type": "RULE 144", "strike": "MKT", "exp": "-", "prem": "10% STAKE", "sentiment": "bearish" },
+            { "time": "11:45", "ticker": "SATS", "type": "PUT SWEEP", "strike": "$12", "exp": "Aug 21", "prem": "$18.2M", "sentiment": "bearish" },
+            { "time": "13:20", "ticker": "PLTR", "type": "CALL BLOCK", "strike": "$25", "exp": "Jan 15", "prem": "$34.1M", "sentiment": "bullish" },
+            { "time": "14:10", "ticker": "EGHT", "type": "PUT BLOCK", "strike": "$2", "exp": "Nov 20", "prem": "$5.4M", "sentiment": "bearish" }
         ],
         "ledger": [
-            {"variable": "OFAC Sanctions Tracker", "value": "Project Freedom Pause", "target": "PD / LGD", "context": "Hormuz Strait Diplomatic Pivot"},
-            {"variable": "10Y US Treasury", "value": "4.360%", "target": "DCF / EV", "context": "Benchmark Risk-Free Rate Re-Anchoring"},
-            {"variable": "Brent Crude Oil", "value": "$110.29", "target": "PD / LGD", "context": "Supply Cavitation / Deflationary Hopium"},
-            {"variable": "Bitcoin (BTC)", "value": "$81,462", "target": "Market Risk", "context": "Exit Premium / Shadow Fleet Settlement"},
-            {"variable": "S&P 500 Index", "value": "7369.22", "target": "SYS_OPS", "context": "Parabolic Breakout / Record Rendering"}
+            {"variable": "DSCR Target", "value": "< 1.0x", "target": "PD", "context": "TMT Sector Refinancing Risk at 4.50% Yield Ceiling."},
+            {"variable": "10Y Treasury", "value": "4.360%", "target": "DCF / LGD", "context": "Cost of systemic liquidity fatal to legacy debt."},
+            {"variable": "PATH Insiders", "value": "DISTRIBUTION", "target": "Market Risk", "context": "Agentic AI narrative acting as retail exit liquidity."},
+            {"variable": "RDDT Holdings", "value": "ANCHOR EXIT", "target": "Market Risk", "context": "Data licensing peak compute multiple execution."},
+            {"variable": "SATS Debt", "value": "LME IMMINENT", "target": "LGD", "context": "Sponsor preparing coercive restructuring."}
+        ],
+        "news_feed": [
+            { "time": "14:16", "source": "SENTINEL", "title": "Directive Execution: Milestone Divergence scan active. PATH and RDDT insiders exiting.", "tag": "MARKETS", "impact": "CRITICAL" },
+            { "time": "13:42", "source": "BLOOMBERG", "title": "UiPath (PATH) C-Suite liquidates $85M following 'Agentic AI' forward guidance.", "tag": "TECH", "impact": "HIGH" },
+            { "time": "12:15", "source": "WSJ", "title": "EchoStar (SATS) restructuring imminent as legacy 3.5% coupons face 8%+ refinancing cliff.", "tag": "CREDIT", "impact": "HIGH" },
+            { "time": "10:50", "source": "REUTERS", "title": "Brent Crude holds $101 on 'One-Page Memo' hopes; physical blockade remains at 5% throughput.", "tag": "ENERGY", "impact": "MED" },
+            { "time": "09:22", "source": "CNBC", "title": "S&P 500 pushes 7,400 firewall; institutional flow overwhelmingly biased toward data layer.", "tag": "EQUITY", "impact": "MED" }
         ],
         "universe": [
             {
-                "ticker": "MSFT", "name": "Microsoft Corp", "sector": "Software / Cloud", "price": 458.20, "shares_out": 7430,
+                "ticker": "ARM", "name": "Arm Holdings plc", "sector": "Semiconductors / AI", "price": 187.63, "shares_out": 1062,
                 "scenarios": {
                     "base": {
-                        "wacc": 8.5, "tg": 3.0,
+                        "wacc": 12.5, "tg": 4.5,
                         "projections": [
-                            {"year": 2026, "rev": 285.0, "rev_g": 18.2, "ebit_m": 44.5, "tax": 18.0, "capex": 55.0, "da": 22.0, "nwc": -2.0},
-                            {"year": 2027, "rev": 332.0, "rev_g": 16.5, "ebit_m": 45.0, "tax": 18.0, "capex": 60.0, "da": 25.0, "nwc": -2.5},
-                            {"year": 2028, "rev": 381.8, "rev_g": 15.0, "ebit_m": 45.5, "tax": 18.0, "capex": 65.0, "da": 28.0, "nwc": -3.0},
-                            {"year": 2029, "rev": 435.2, "rev_g": 14.0, "ebit_m": 46.0, "tax": 18.0, "capex": 68.0, "da": 31.0, "nwc": -3.5},
-                            {"year": 2030, "rev": 491.8, "rev_g": 13.0, "ebit_m": 46.5, "tax": 18.0, "capex": 70.0, "da": 34.0, "nwc": -4.0}
+                            {"year": 2027, "rev": 6500, "rev_g": 32.1, "ebit_m": 22.0, "tax": 20.0, "capex": 200, "da": 80, "nwc": -50},
+                            {"year": 2028, "rev": 8450, "rev_g": 30.0, "ebit_m": 26.0, "tax": 20.0, "capex": 250, "da": 150, "nwc": -50},
+                            {"year": 2029, "rev": 10750, "rev_g": 27.2, "ebit_m": 30.0, "tax": 20.0, "capex": 300, "da": 200, "nwc": -50},
+                            {"year": 2030, "rev": 12800, "rev_g": 19.1, "ebit_m": 33.0, "tax": 20.0, "capex": 350, "da": 250, "nwc": -50},
+                            {"year": 2031, "rev": 15000, "rev_g": 17.2, "ebit_m": 35.0, "tax": 20.0, "capex": 400, "da": 300, "nwc": -50}
                         ]
                     },
-                    "bull": { "wacc": 7.5, "tg": 3.5, "projections": [{"year": 2026, "rev": 290.0, "rev_g": 20.0, "ebit_m": 45.5, "tax": 18.0, "capex": 55.0, "da": 22.0, "nwc": -2.0}, {"year": 2027, "rev": 348.0, "rev_g": 20.0, "ebit_m": 46.5, "tax": 18.0, "capex": 60.0, "da": 25.0, "nwc": -2.5}, {"year": 2028, "rev": 410.6, "rev_g": 18.0, "ebit_m": 47.5, "tax": 18.0, "capex": 62.0, "da": 28.0, "nwc": -3.0}, {"year": 2029, "rev": 476.3, "rev_g": 16.0, "ebit_m": 48.0, "tax": 18.0, "capex": 65.0, "da": 31.0, "nwc": -3.5}, {"year": 2030, "rev": 547.7, "rev_g": 15.0, "ebit_m": 48.5, "tax": 18.0, "capex": 68.0, "da": 34.0, "nwc": -4.0}] },
-                    "bear": { "wacc": 9.5, "tg": 2.5, "projections": [{"year": 2026, "rev": 280.0, "rev_g": 15.0, "ebit_m": 43.0, "tax": 18.0, "capex": 60.0, "da": 22.0, "nwc": -2.0}, {"year": 2027, "rev": 313.6, "rev_g": 12.0, "ebit_m": 42.5, "tax": 18.0, "capex": 65.0, "da": 25.0, "nwc": -2.5}, {"year": 2028, "rev": 344.9, "rev_g": 10.0, "ebit_m": 42.0, "tax": 18.0, "capex": 70.0, "da": 28.0, "nwc": -3.0}, {"year": 2029, "rev": 375.9, "rev_g": 9.0, "ebit_m": 41.5, "tax": 18.0, "capex": 75.0, "da": 31.0, "nwc": -3.5}, {"year": 2030, "rev": 406.0, "rev_g": 8.0, "ebit_m": 41.0, "tax": 18.0, "capex": 75.0, "da": 34.0, "nwc": -4.0}] }
+                    "bull": { "wacc": 11.5, "tg": 5.0, "projections": [{"year": 2027, "rev": 7000, "rev_g": 42.0, "ebit_m": 25.0, "tax": 20.0, "capex": 200, "da": 80, "nwc": -50}, {"year": 2028, "rev": 9500, "rev_g": 35.7, "ebit_m": 28.0, "tax": 20.0, "capex": 250, "da": 150, "nwc": -50}, {"year": 2029, "rev": 12500, "rev_g": 31.6, "ebit_m": 32.0, "tax": 20.0, "capex": 300, "da": 200, "nwc": -50}, {"year": 2030, "rev": 15500, "rev_g": 24.0, "ebit_m": 35.0, "tax": 20.0, "capex": 350, "da": 250, "nwc": -50}, {"year": 2031, "rev": 18500, "rev_g": 19.4, "ebit_m": 38.0, "tax": 20.0, "capex": 400, "da": 300, "nwc": -50}] },
+                    "bear": { "wacc": 14.0, "tg": 3.0, "projections": [{"year": 2027, "rev": 5800, "rev_g": 17.9, "ebit_m": 18.0, "tax": 20.0, "capex": 200, "da": 80, "nwc": -50}, {"year": 2028, "rev": 6500, "rev_g": 12.1, "ebit_m": 19.0, "tax": 20.0, "capex": 250, "da": 150, "nwc": -50}, {"year": 2029, "rev": 7200, "rev_g": 10.8, "ebit_m": 20.0, "tax": 20.0, "capex": 300, "da": 200, "nwc": -50}, {"year": 2030, "rev": 8000, "rev_g": 11.1, "ebit_m": 21.0, "tax": 20.0, "capex": 350, "da": 250, "nwc": -50}, {"year": 2031, "rev": 8800, "rev_g": 10.0, "ebit_m": 22.0, "tax": 20.0, "capex": 400, "da": 300, "nwc": -50}] }
                 }
             },
             {
-                "ticker": "GOOGL", "name": "Alphabet Inc", "sector": "Interactive Media", "price": 185.40, "shares_out": 12400,
+                "ticker": "MCD", "name": "McDonald's Corp", "sector": "Consumer Discretionary", "price": 284.18, "shares_out": 712.15,
                 "scenarios": {
                     "base": {
-                        "wacc": 9.0, "tg": 2.5,
+                        "wacc": 7.0, "tg": 2.5,
                         "projections": [
-                            {"year": 2026, "rev": 395.0, "rev_g": 15.0, "ebit_m": 32.0, "tax": 16.0, "capex": 180.0, "da": 35.0, "nwc": -1.0},
-                            {"year": 2027, "rev": 446.3, "rev_g": 13.0, "ebit_m": 32.5, "tax": 16.0, "capex": 140.0, "da": 40.0, "nwc": -1.5},
-                            {"year": 2028, "rev": 499.9, "rev_g": 12.0, "ebit_m": 33.0, "tax": 16.0, "capex": 130.0, "da": 45.0, "nwc": -2.0},
-                            {"year": 2029, "rev": 549.9, "rev_g": 10.0, "ebit_m": 33.5, "tax": 16.0, "capex": 120.0, "da": 50.0, "nwc": -2.5},
-                            {"year": 2030, "rev": 599.4, "rev_g": 9.0, "ebit_m": 34.0, "tax": 16.0, "capex": 115.0, "da": 55.0, "nwc": -3.0}
+                            {"year": 2026, "rev": 28413, "rev_g": 4.7, "ebit_m": 46.0, "tax": 22.0, "capex": 3150, "da": 2000, "nwc": 0},
+                            {"year": 2027, "rev": 29748, "rev_g": 4.7, "ebit_m": 46.5, "tax": 22.0, "capex": 3300, "da": 2100, "nwc": 0},
+                            {"year": 2028, "rev": 31146, "rev_g": 4.7, "ebit_m": 47.0, "tax": 22.0, "capex": 3450, "da": 2200, "nwc": 0},
+                            {"year": 2029, "rev": 32609, "rev_g": 4.7, "ebit_m": 47.5, "tax": 22.0, "capex": 3600, "da": 2300, "nwc": 0},
+                            {"year": 2030, "rev": 34142, "rev_g": 4.7, "ebit_m": 48.0, "tax": 22.0, "capex": 3750, "da": 2400, "nwc": 0}
                         ]
                     },
-                    "bull": { "wacc": 8.0, "tg": 3.0, "projections": [{"year": 2026, "rev": 400.0, "rev_g": 17.0, "ebit_m": 33.0, "tax": 16.0, "capex": 170.0, "da": 35.0, "nwc": -1.0}, {"year": 2027, "rev": 460.0, "rev_g": 15.0, "ebit_m": 34.0, "tax": 16.0, "capex": 135.0, "da": 40.0, "nwc": -1.5}, {"year": 2028, "rev": 524.4, "rev_g": 14.0, "ebit_m": 35.0, "tax": 16.0, "capex": 120.0, "da": 45.0, "nwc": -2.0}, {"year": 2029, "rev": 592.5, "rev_g": 13.0, "ebit_m": 36.0, "tax": 16.0, "capex": 110.0, "da": 50.0, "nwc": -2.5}, {"year": 2030, "rev": 663.6, "rev_g": 12.0, "ebit_m": 37.0, "tax": 16.0, "capex": 105.0, "da": 55.0, "nwc": -3.0}] },
-                    "bear": { "wacc": 10.0, "tg": 2.0, "projections": [{"year": 2026, "rev": 380.0, "rev_g": 10.0, "ebit_m": 30.0, "tax": 16.0, "capex": 190.0, "da": 35.0, "nwc": -1.0}, {"year": 2027, "rev": 418.0, "rev_g": 10.0, "ebit_m": 29.5, "tax": 16.0, "capex": 160.0, "da": 40.0, "nwc": -1.5}, {"year": 2028, "rev": 455.6, "rev_g": 9.0, "ebit_m": 29.0, "tax": 16.0, "capex": 150.0, "da": 45.0, "nwc": -2.0}, {"year": 2029, "rev": 492.0, "rev_g": 8.0, "ebit_m": 28.5, "tax": 16.0, "capex": 140.0, "da": 50.0, "nwc": -2.5}, {"year": 2030, "rev": 526.4, "rev_g": 7.0, "ebit_m": 28.0, "tax": 16.0, "capex": 130.0, "da": 55.0, "nwc": -3.0}] }
-                }
-            },
-            {
-                "ticker": "AMZN", "name": "Amazon.com Inc", "sector": "E-Commerce / Cloud", "price": 145.30, "shares_out": 10400,
-                "scenarios": {
-                    "base": {
-                        "wacc": 9.2, "tg": 3.0,
-                        "projections": [
-                            {"year": 2026, "rev": 877.5, "rev_g": 12.0, "ebit_m": 10.5, "tax": 21.0, "capex": 200.0, "da": 55.0, "nwc": 5.0},
-                            {"year": 2027, "rev": 1009.1, "rev_g": 15.0, "ebit_m": 11.0, "tax": 21.0, "capex": 180.0, "da": 60.0, "nwc": 5.5},
-                            {"year": 2028, "rev": 1140.3, "rev_g": 13.0, "ebit_m": 12.0, "tax": 21.0, "capex": 150.0, "da": 65.0, "nwc": 6.0},
-                            {"year": 2029, "rev": 1265.7, "rev_g": 11.0, "ebit_m": 13.0, "tax": 21.0, "capex": 140.0, "da": 70.0, "nwc": 6.5},
-                            {"year": 2030, "rev": 1379.6, "rev_g": 9.0, "ebit_m": 14.0, "tax": 21.0, "capex": 135.0, "da": 75.0, "nwc": 7.0}
-                        ]
-                    },
-                    "bull": { "wacc": 8.5, "tg": 3.5, "projections": [{"year": 2026, "rev": 890.0, "rev_g": 14.0, "ebit_m": 11.5, "tax": 21.0, "capex": 180.0, "da": 85.0, "nwc": 5.0}, {"year": 2027, "rev": 1014.6, "rev_g": 14.0, "ebit_m": 12.5, "tax": 21.0, "capex": 160.0, "da": 100.0, "nwc": 5.5}, {"year": 2028, "rev": 1146.4, "rev_g": 13.0, "ebit_m": 13.5, "tax": 21.0, "capex": 140.0, "da": 110.0, "nwc": 6.0}, {"year": 2029, "rev": 1283.9, "rev_g": 12.0, "ebit_m": 14.5, "tax": 21.0, "capex": 130.0, "da": 115.0, "nwc": 6.5}, {"year": 2030, "rev": 1425.1, "rev_g": 11.0, "ebit_m": 15.5, "tax": 21.0, "capex": 120.0, "da": 120.0, "nwc": 7.0}] },
-                    "bear": { "wacc": 10.0, "tg": 2.5, "projections": [{"year": 2026, "rev": 850.0, "rev_g": 9.0, "ebit_m": 9.0, "tax": 21.0, "capex": 220.0, "da": 85.0, "nwc": 5.0}, {"year": 2027, "rev": 918.0, "rev_g": 8.0, "ebit_m": 8.5, "tax": 21.0, "capex": 200.0, "da": 100.0, "nwc": 5.5}, {"year": 2028, "rev": 982.2, "rev_g": 7.0, "ebit_m": 8.0, "tax": 21.0, "capex": 180.0, "da": 110.0, "nwc": 6.0}, {"year": 2029, "rev": 1041.1, "rev_g": 6.0, "ebit_m": 7.5, "tax": 21.0, "capex": 160.0, "da": 115.0, "nwc": 6.5}, {"year": 2030, "rev": 1093.1, "rev_g": 5.0, "ebit_m": 7.0, "tax": 21.0, "capex": 150.0, "da": 120.0, "nwc": 7.0}] }
-                }
-            },
-            {
-                "ticker": "NVDA", "name": "NVIDIA Corporation", "sector": "Semiconductors / AI", "price": 890.50, "shares_out": 2480,
-                "scenarios": {
-                    "base": {
-                        "wacc": 9.8, "tg": 4.5,
-                        "projections": [
-                            {"year": 2026, "rev": 155.0, "rev_g": 45.0, "ebit_m": 62.0, "tax": 14.0, "capex": 8.5, "da": 3.0, "nwc": -5.0},
-                            {"year": 2027, "rev": 195.0, "rev_g": 25.8, "ebit_m": 61.0, "tax": 14.0, "capex": 10.0, "da": 4.5, "nwc": -6.0},
-                            {"year": 2028, "rev": 230.0, "rev_g": 17.9, "ebit_m": 60.5, "tax": 14.0, "capex": 12.0, "da": 6.0, "nwc": -7.0},
-                            {"year": 2029, "rev": 265.0, "rev_g": 15.2, "ebit_m": 59.0, "tax": 14.0, "capex": 14.0, "da": 7.5, "nwc": -8.0},
-                            {"year": 2030, "rev": 300.0, "rev_g": 13.2, "ebit_m": 58.0, "tax": 14.0, "capex": 15.0, "da": 9.0, "nwc": -9.0}
-                        ]
-                    },
-                    "bull": { "wacc": 9.0, "tg": 5.0, "projections": [{"year": 2026, "rev": 165.0, "rev_g": 55.0, "ebit_m": 64.0, "tax": 14.0, "capex": 9.0, "da": 3.0, "nwc": -5.0}, {"year": 2027, "rev": 220.0, "rev_g": 33.3, "ebit_m": 64.0, "tax": 14.0, "capex": 11.0, "da": 4.5, "nwc": -6.0}, {"year": 2028, "rev": 280.0, "rev_g": 27.2, "ebit_m": 63.5, "tax": 14.0, "capex": 13.0, "da": 6.0, "nwc": -7.0}, {"year": 2029, "rev": 340.0, "rev_g": 21.4, "ebit_m": 63.0, "tax": 14.0, "capex": 15.0, "da": 7.5, "nwc": -8.0}, {"year": 2030, "rev": 400.0, "rev_g": 17.6, "ebit_m": 62.0, "tax": 14.0, "capex": 16.0, "da": 9.0, "nwc": -9.0}] },
-                    "bear": { "wacc": 11.0, "tg": 3.0, "projections": [{"year": 2026, "rev": 130.0, "rev_g": 25.0, "ebit_m": 55.0, "tax": 14.0, "capex": 8.0, "da": 3.0, "nwc": -3.0}, {"year": 2027, "rev": 145.0, "rev_g": 11.5, "ebit_m": 52.0, "tax": 14.0, "capex": 9.0, "da": 4.5, "nwc": -3.0}, {"year": 2028, "rev": 155.0, "rev_g": 6.9, "ebit_m": 48.0, "tax": 14.0, "capex": 10.0, "da": 6.0, "nwc": -3.0}, {"year": 2029, "rev": 165.0, "rev_g": 6.4, "ebit_m": 45.0, "tax": 14.0, "capex": 11.0, "da": 7.5, "nwc": -3.0}, {"year": 2030, "rev": 175.0, "rev_g": 6.0, "ebit_m": 43.0, "tax": 14.0, "capex": 11.0, "da": 9.0, "nwc": -3.0}] }
+                    "bull": { "wacc": 6.5, "tg": 3.0, "projections": [{"year": 2026, "rev": 29000, "rev_g": 6.8, "ebit_m": 47.0, "tax": 22.0, "capex": 3100, "da": 2000, "nwc": 0}, {"year": 2027, "rev": 31000, "rev_g": 6.9, "ebit_m": 48.0, "tax": 22.0, "capex": 3200, "da": 2100, "nwc": 0}, {"year": 2028, "rev": 33000, "rev_g": 6.5, "ebit_m": 49.0, "tax": 22.0, "capex": 3300, "da": 2200, "nwc": 0}, {"year": 2029, "rev": 35000, "rev_g": 6.1, "ebit_m": 49.5, "tax": 22.0, "capex": 3400, "da": 2300, "nwc": 0}, {"year": 2030, "rev": 37000, "rev_g": 5.7, "ebit_m": 50.0, "tax": 22.0, "capex": 3500, "da": 2400, "nwc": 0}] },
+                    "bear": { "wacc": 8.0, "tg": 2.0, "projections": [{"year": 2026, "rev": 27500, "rev_g": 1.3, "ebit_m": 44.0, "tax": 22.0, "capex": 3200, "da": 2000, "nwc": 0}, {"year": 2027, "rev": 28000, "rev_g": 1.8, "ebit_m": 43.5, "tax": 22.0, "capex": 3300, "da": 2100, "nwc": 0}, {"year": 2028, "rev": 28500, "rev_g": 1.8, "ebit_m": 43.0, "tax": 22.0, "capex": 3400, "da": 2200, "nwc": 0}, {"year": 2029, "rev": 29000, "rev_g": 1.8, "ebit_m": 42.5, "tax": 22.0, "capex": 3500, "da": 2300, "nwc": 0}, {"year": 2030, "rev": 29500, "rev_g": 1.7, "ebit_m": 42.0, "tax": 22.0, "capex": 3600, "da": 2400, "nwc": 0}] }
                 }
             }
         ],
         "portfolio": [
+            { "ticker": "MCD", "risk": 15, "reward": 40, "allocation": 25 },
+            { "ticker": "DDOG", "risk": 45, "reward": 85, "allocation": 12 },
+            { "ticker": "ARM", "risk": 85, "reward": 60, "allocation": 8 },
             { "ticker": "MSFT", "risk": 25, "reward": 60, "allocation": 15 },
             { "ticker": "AAPL", "risk": 20, "reward": 50, "allocation": 12 },
             { "ticker": "NVDA", "risk": 65, "reward": 95, "allocation": 8 },
-            { "ticker": "AMZN", "risk": 45, "reward": 55, "allocation": 10 },
-            { "ticker": "META", "risk": 55, "reward": 70, "allocation": 7 },
             { "ticker": "XOM", "risk": 35, "reward": 40, "allocation": 15 },
-            { "ticker": "JPM", "risk": 30, "reward": 45, "allocation": 8 },
-            { "ticker": "LLY", "risk": 40, "reward": 65, "allocation": 6 },
-            { "ticker": "RBLX", "risk": 85, "reward": 30, "allocation": 2 },
-            { "ticker": "PLTR", "risk": 75, "reward": 85, "allocation": 4 }
+            { "ticker": "PLTR", "risk": 75, "reward": 85, "allocation": 5 }
         ],
         "liquidity": {
             "dates": ["Q1", "Q2", "Q3", "Q4", "Q1 '25", "Q2 '25", "Q3 '25", "Q4 '25", "Q1 '26", "Q2 '26"],
             "reserves": [3.1, 3.2, 3.15, 3.3, 3.4, 3.35, 3.5, 3.6, 3.7, 3.8],
-            "spx": [4100, 4200, 4350, 4500, 4800, 5100, 5500, 6000, 6800, 7369]
+            "spx": [4100, 4200, 4350, 4500, 4800, 5100, 5500, 6000, 6800, 7401]
+        },
+        "yield_curve": {
+            "tenors": ["1M", "3M", "6M", "1Y", "2Y", "5Y", "10Y", "30Y"],
+            "current": [5.40, 5.42, 5.45, 5.30, 4.80, 4.38, 4.360, 4.48],
+            "previous": [5.38, 5.40, 5.42, 5.15, 4.65, 4.25, 4.20, 4.35]
         },
         "syslog": [
-            {"trace_id": "trace-sys-001", "event_id": "evt-100", "timestamp": "2026-05-06T19:00:00", "event_type": "SYSTEM_BOOT", "agent_id": "Flywheel_Orchestrator", "details": {"version": "v55.0-Omega"}},
-            {"trace_id": "trace-data-001", "event_id": "evt-101", "timestamp": "2026-05-06T19:00:05", "event_type": "KNOWLEDGE_GRAPH_UPDATE", "agent_id": "Redis_VSS_Node", "details": {"action": "UPSERT", "node": "Macro_Telemetry", "edges_added": 450}},
-            {"trace_id": "trace-slm-001", "event_id": "evt-102", "timestamp": "2026-05-06T19:00:12", "event_type": "INTER_AGENT_COMM", "agent_id": "NeMo_Customizer", "details": {"receiver_id": "VeNRA_Router", "payload_summary": "LoRA weight update for SME default risk."}},
-            {"trace_id": "trace-audit-001", "event_id": "evt-103", "timestamp": "2026-05-06T19:15:18", "event_type": "ANOMALY_DETECTED", "agent_id": "Sentinel_Auditor", "details": {"severity": "CRITICAL", "description": "S&P 500 correlation variance anomaly detected (+0.95 with Diplomatic Hopium).", "deviation_sigma": 4.1}},
-            {"trace_id": "trace-rag-001", "event_id": "evt-104", "timestamp": "2026-05-06T19:20:22", "event_type": "TASK_COMPLETE", "agent_id": "Qdrant_Audit_Node", "details": {"output": {"status": "success", "risk_score": 0.85, "recommendation": "SELL"}}},
-            {"trace_id": "trace-sme-001", "event_id": "evt-105", "timestamp": "2026-05-06T19:25:35", "event_type": "THOUGHT_TRACE", "agent_id": "LLM_FT_Worker", "details": {"content": "Predicting commercial bill default risk based on Islamabad Blink timeline.", "confidence": 0.92}}
+            {"trace_id": "trace-sys-001", "event_id": "evt-300", "timestamp": "2026-05-09T14:00:00", "event_type": "SYSTEM_BOOT", "agent_id": "Adam_v26.0", "details": {"version": "v55.2", "status": "NOMINAL - Euphoria Buffered"}},
+            {"trace_id": "trace-audit-001", "event_id": "evt-301", "timestamp": "2026-05-09T14:05:12", "event_type": "ANOMALY_DETECTED", "agent_id": "Sentinel_Auditor", "details": {"severity": "CRITICAL", "description": "Milestone Divergence: PATH C-Suite forward guidance decoupled from $85M Form 4 Code S liquidations.", "deviation_sigma": 5.1}},
+            {"trace_id": "trace-rag-001", "event_id": "evt-302", "timestamp": "2026-05-09T14:10:45", "event_type": "TASK_START", "agent_id": "Refinancing_Scanner", "details": {"target": "TMT Sector", "threshold": "DSCR < 1.0x at 4.50% 10Y"}},
+            {"trace_id": "trace-rag-002", "event_id": "evt-303", "timestamp": "2026-05-09T14:15:22", "event_type": "TASK_COMPLETE", "agent_id": "Refinancing_Scanner", "details": {"output": {"status": "success", "risk_score": 0.94, "recommendation": "SELL SATS / EGHT"}}},
+            {"trace_id": "trace-sme-001", "event_id": "evt-304", "timestamp": "2026-05-09T14:16:00", "event_type": "THOUGHT_TRACE", "agent_id": "Macro_Yield_Node", "details": {"content": "S&P hovering at 7,400 is an opiate. Maintain physical energy hedges (XOM) and digital settlement rail (BTC).", "confidence": 0.99}}
         ]
     }
     </script>
@@ -904,7 +643,7 @@ Architecting this system necessitates moving away from generalized LLMs toward h
 
         <div class="flex items-center gap-4 font-mono shrink-0">
             <div class="flex items-center gap-2 bg-theme-glow border border-theme px-2 py-0.5 rounded text-theme font-bold transition-colors">
-                <div class="w-1.5 h-1.5 bg-theme rounded-full animate-flicker shadow-theme"></div> DB_SYNC_V55
+                <div class="w-1.5 h-1.5 bg-theme rounded-full animate-flicker shadow-theme"></div> DB_SYNC_V55.2
             </div>
             <span id="osClock" class="text-os-text font-bold">--:--:--</span>
         </div>
@@ -928,12 +667,13 @@ Architecting this system necessitates moving away from generalized LLMs toward h
                 <div class="p-3 text-[10px] font-mono text-os-muted uppercase tracking-widest border-b border-os-border">Document Directory</div>
                 <div class="flex-1 overflow-y-auto p-2 flex flex-col gap-1">
                     
-                    <button class="text-left px-3 py-2 rounded text-xs font-mono transition-colors bg-theme-glow border border-theme text-theme" onclick="loadDoc('market-mayhem-md', this)">Market Mayhem Brief</button>
-                    <button class="text-left px-3 py-2 rounded text-xs font-mono transition-colors hover:bg-os-window border border-transparent text-os-text" onclick="loadDoc('architecture-md', this)">SLM Architecture</button>
-                    <button class="text-left px-3 py-2 rounded text-xs font-mono transition-colors hover:bg-os-window border border-transparent text-os-text" onclick="loadDoc('market-mayhem-v24-md', this)">Adam v24.1 Brief</button>
-                    <button class="text-left px-3 py-2 rounded text-xs font-mono transition-colors hover:bg-os-window border border-transparent text-os-text" onclick="loadDoc('equity-valuation-md', this)">Equity Valuation</button>
-                    <button class="text-left px-3 py-2 rounded text-xs font-mono transition-colors hover:bg-os-window border border-transparent text-os-text" onclick="loadDoc('market-mayhem-v26-md', this)">Adam v26.0 Brief</button>
-                    <button class="text-left px-3 py-2 rounded text-xs font-mono transition-colors hover:bg-os-window border border-transparent text-os-text" onclick="loadDoc('market-mayhem-v30-md', this)">Adam v30.1 Brief</button>
+                    <button class="text-left px-3 py-2 rounded text-xs font-mono transition-colors bg-theme-glow border border-theme text-theme font-bold shadow-sm" onclick="loadDoc('directive-0509-md', this)">Directive 0509 (MAY 9)</button>
+                    <button class="text-left px-3 py-2 rounded text-xs font-mono transition-colors hover:bg-os-window border border-transparent text-os-text font-bold" onclick="loadDoc('brief-0508-md', this)">Market Mayhem Brief</button>
+                    <button class="text-left px-3 py-2 rounded text-xs font-mono transition-colors hover:bg-os-window border border-transparent text-os-text font-bold" onclick="loadDoc('macro-outlook-md', this)">Macro Risk Outlook</button>
+                    <button class="text-left px-3 py-2 rounded text-xs font-mono transition-colors hover:bg-os-window border border-transparent text-os-text font-bold" onclick="loadDoc('dcf-mcd-md', this)">Valuation: MCD</button>
+                    <button class="text-left px-3 py-2 rounded text-xs font-mono transition-colors hover:bg-os-window border border-transparent text-os-text font-bold" onclick="loadDoc('dcf-arm-md', this)">Valuation: ARM</button>
+                    <button class="text-left px-3 py-2 rounded text-xs font-mono transition-colors hover:bg-os-window border border-transparent text-os-text font-bold" onclick="loadDoc('ai-regulation-md', this)">Silicon Sovereignty</button>
+                    <button class="text-left px-3 py-2 rounded text-xs font-mono transition-colors hover:bg-os-window border border-transparent text-os-text font-bold" onclick="loadDoc('crypto-reserves-md', this)">Sovereign Crypto</button>
     
                 </div>
             </div>
@@ -1004,7 +744,7 @@ Architecting this system necessitates moving away from generalized LLMs toward h
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
                             System Anomaly
                         </h4>
-                        <p class="text-[11px] text-os-text leading-relaxed font-serif italic m-0 opacity-90">"Correlation variance anomaly detected: +0.95 with Diplomatic Hopium. SPX trading purely on resolution-beta."</p>
+                        <p class="text-[11px] text-os-text leading-relaxed font-serif italic m-0 opacity-90">"Milestone Divergence detected. Massive Form 4 exhaust isolated against buzzword-heavy forward guidance. Exit liquidity protocol verified."</p>
                     </div>
                 </div>
             </div>
@@ -1027,7 +767,7 @@ Architecting this system necessitates moving away from generalized LLMs toward h
         <div class="window-content bg-os-bg p-6 flex flex-col">
             <div class="flex justify-between items-center mb-6 border-b border-os-border pb-4">
                 <h3 class="text-xs font-bold text-os-text uppercase tracking-widest font-mono">Cross-Asset Heatmap</h3>
-                <span class="text-[9px] text-theme font-mono border border-theme/30 px-2 py-1 rounded bg-theme-glow">MODE: PEARSON_SIM</span>
+                <span class="text-[9px] text-theme font-mono border border-theme/30 px-2 py-1 rounded bg-theme-glow transition-colors">MODE: PEARSON_SIM</span>
             </div>
             <div id="corr-container" class="flex flex-col gap-1 w-full max-w-sm mx-auto">
                 <!-- Labels + Matrix built by JS -->
@@ -1111,7 +851,7 @@ Architecting this system necessitates moving away from generalized LLMs toward h
                 <div class="flex flex-col xl:flex-row flex-1 p-6 gap-6 min-h-[400px] z-10">
                     <div class="flex-[3] flex flex-col gap-6">
                         <div class="glass-panel bg-os-panel p-4 pb-0 flex flex-col rounded-xl border-os-border">
-                            <h3 class="text-[10px] font-mono font-bold text-os-text uppercase tracking-widest mb-2 border-b border-os-border pb-2">Unlevered Free Cash Flow Projections ($B)</h3>
+                            <h3 class="text-[10px] font-mono font-bold text-os-text uppercase tracking-widest mb-2 border-b border-os-border pb-2">Unlevered Free Cash Flow Projections ($M)</h3>
                             <div class="dcf-bar-container" id="dcf-waterfall"></div>
                         </div>
                         
@@ -1119,12 +859,12 @@ Architecting this system necessitates moving away from generalized LLMs toward h
                             <table class="data-table">
                                 <thead>
                                     <tr>
-                                        <th class="bg-transparent border-os-border">Metrics ($B)</th>
-                                        <th class="text-right bg-transparent border-os-border">FY26E</th>
-                                        <th class="text-right bg-transparent border-os-border">FY27E</th>
-                                        <th class="text-right bg-transparent border-os-border">FY28E</th>
-                                        <th class="text-right bg-transparent border-os-border">FY29E</th>
-                                        <th class="text-right bg-transparent border-os-border">FY30E</th>
+                                        <th class="bg-transparent border-os-border">Metrics ($M)</th>
+                                        <th class="text-right bg-transparent border-os-border">FY1E</th>
+                                        <th class="text-right bg-transparent border-os-border">FY2E</th>
+                                        <th class="text-right bg-transparent border-os-border">FY3E</th>
+                                        <th class="text-right bg-transparent border-os-border">FY4E</th>
+                                        <th class="text-right bg-transparent border-os-border">FY5E</th>
                                     </tr>
                                 </thead>
                                 <tbody id="dcf-table-body"></tbody>
@@ -1201,7 +941,6 @@ Architecting this system necessitates moving away from generalized LLMs toward h
             <div class="w-12"></div>
         </div>
         <div class="window-content bg-[#010204] flex flex-col relative overflow-hidden" id="geo-map-container">
-            <!-- Force dark background always for the map so the radar sweep pops -->
             <div class="absolute top-4 left-4 z-20 bg-black/80 p-4 border border-[#1e2532] rounded backdrop-blur-md shadow-[0_0_20px_rgba(0,0,0,0.8)]">
                 <h3 class="font-mono text-[10px] text-[#ff1e38] font-bold tracking-widest uppercase mb-3 flex items-center gap-2">
                     <span class="w-2 h-2 bg-[#ff1e38] rounded-full animate-ping-fast"></span> Active Friction Nodes
@@ -1212,14 +951,13 @@ Architecting this system necessitates moving away from generalized LLMs toward h
                     <li><span class="text-theme font-bold transition-colors">[MONITOR]</span> Islamabad Diplomatic Channels</li>
                 </ul>
             </div>
-            <!-- Canvas Map -->
             <canvas id="geoMapCanvas" class="absolute inset-0 w-full h-full z-10"></canvas>
             <div class="absolute inset-0 opacity-20 pointer-events-none z-0" style="background-image: radial-gradient(var(--theme-primary) 1px, transparent 1px); background-size: 30px 30px;"></div>
         </div>
     </div>
 
     <!-- ========================================== -->
-    <!-- APP 16: GLOBAL LIQUIDITY MONITOR (NEW)     -->
+    <!-- APP 16: GLOBAL LIQUIDITY MONITOR           -->
     <!-- ========================================== -->
     <div id="app-liquidity" class="os-window" style="width: 850px; height: 500px; top: 190px; left: 140px; z-index: 65;">
         <div class="window-header" id="app-liquidity-header">
@@ -1257,7 +995,7 @@ Architecting this system necessitates moving away from generalized LLMs toward h
     </div>
 
     <!-- ========================================== -->
-    <!-- APP 17: SUPPLY CHAIN TOPOLOGY (NEW)        -->
+    <!-- APP 17: SUPPLY CHAIN TOPOLOGY              -->
     <!-- ========================================== -->
     <div id="app-supply" class="os-window" style="width: 700px; height: 500px; top: 160px; right: 200px; left: auto; z-index: 68;">
         <div class="window-header" id="app-supply-header">
@@ -1272,13 +1010,48 @@ Architecting this system necessitates moving away from generalized LLMs toward h
             </div>
         </div>
         <div class="window-content bg-[#0a0d14] relative overflow-hidden" id="supply-container">
-            <!-- Strict dark mode for visualization -->
             <div class="absolute top-4 right-4 z-20 text-right">
                 <h3 class="font-mono text-[10px] text-theme font-bold tracking-widest uppercase mb-1">Logistics Flow Map</h3>
                 <p class="text-[9px] text-[#64748b] font-mono">Real-time commodity transit (BBL/d)</p>
             </div>
             <canvas id="supplyCanvas" class="absolute inset-0 w-full h-full z-10"></canvas>
             <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(0,229,255,0.05)_0%,rgba(0,0,0,0.8)_100%)] pointer-events-none z-0"></div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- APP 19: YIELD CURVE MONITOR                -->
+    <!-- ========================================== -->
+    <div id="app-yield" class="os-window" style="width: 750px; height: 500px; top: 210px; left: 180px; z-index: 69;">
+        <div class="window-header" id="app-yield-header">
+            <div class="flex items-center gap-2">
+                <button class="win-btn win-close" onclick="closeApp('app-yield')"></button>
+                <button class="win-btn win-min"></button>
+                <button class="win-btn win-max" onclick="maximizeApp('app-yield')"></button>
+            </div>
+            <div class="text-[11px] font-bold text-os-muted uppercase tracking-widest pointer-events-none font-mono">/sys/intel/yield_curve.sh</div>
+            <div class="w-12 text-right">
+                <span class="text-[9px] font-mono border border-[#ff1e38] px-1 rounded text-[#ff1e38] font-bold animate-pulse">INVERTED</span>
+            </div>
+        </div>
+        <div class="window-content bg-os-bg p-5 flex flex-col gap-4">
+            <div class="flex justify-between items-end border-b border-os-border pb-4 shrink-0">
+                <div>
+                    <h2 class="text-sm font-bold text-os-text uppercase tracking-widest font-mono m-0 flex items-center gap-2">
+                        U.S. Treasury Yield Curve Topography
+                    </h2>
+                    <p class="text-[10px] text-os-muted font-bold font-mono mt-1">Tracking short-end inversion vs. long-end gravity re-assertion.</p>
+                </div>
+                <div class="flex gap-4 text-right">
+                    <div>
+                        <div class="text-[9px] font-mono text-os-muted font-bold uppercase mb-1">2Y / 10Y Spread</div>
+                        <div class="text-lg font-bold text-[#ff1e38] font-mono">-48.0 bps</div>
+                    </div>
+                </div>
+            </div>
+            <div class="flex-1 relative glass-panel bg-os-panel p-4">
+                <canvas id="yieldChartCanvas"></canvas>
+            </div>
         </div>
     </div>
 
@@ -1308,12 +1081,8 @@ Architecting this system necessitates moving away from generalized LLMs toward h
                     <input type="text" id="searchInput" placeholder="Query traces, agents..." class="bg-os-window border border-os-border text-xs font-mono rounded focus:border-theme block w-full pl-9 p-2 text-os-text placeholder:text-os-muted transition-colors outline-none">
                 </div>
                 <div class="flex flex-wrap gap-3 w-full sm:w-auto font-mono">
-                    <select id="agentFilter" class="bg-os-window border border-os-border text-os-text font-bold text-[10px] rounded focus:border-theme block p-2 outline-none uppercase transition-colors">
-                        <option value="ALL">All Agents</option>
-                    </select>
-                    <select id="typeFilter" class="bg-os-window border border-os-border text-os-text font-bold text-[10px] rounded focus:border-theme block p-2 outline-none uppercase transition-colors">
-                        <option value="ALL">All Events</option>
-                    </select>
+                    <select id="agentFilter" class="bg-os-window border border-os-border text-os-text font-bold text-[10px] rounded focus:border-theme block p-2 outline-none uppercase transition-colors"></select>
+                    <select id="typeFilter" class="bg-os-window border border-os-border text-os-text font-bold text-[10px] rounded focus:border-theme block p-2 outline-none uppercase transition-colors"></select>
                 </div>
             </div>
 
@@ -1335,9 +1104,7 @@ Architecting this system necessitates moving away from generalized LLMs toward h
                             <th scope="col" class="bg-transparent border-os-border">Execution Summary</th>
                         </tr>
                     </thead>
-                    <tbody id="syslog-table-body" class="divide-y divide-os-border text-[10px] font-mono">
-                        <!-- Populated by JS -->
-                    </tbody>
+                    <tbody id="syslog-table-body" class="divide-y divide-os-border text-[10px] font-mono"></tbody>
                 </table>
                 <div id="syslogEmptyState" class="hidden absolute inset-0 flex-col items-center justify-center text-os-muted bg-os-bg">
                     <svg class="w-10 h-10 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m5.231 13.481L15 17.25m-4.5-15H5.625c-.621 0-1.125.504-1.125 1.125v16.5c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9zm3.75 11.625a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"></path></svg>
@@ -1370,13 +1137,9 @@ Architecting this system necessitates moving away from generalized LLMs toward h
                 <div class="flex-1 text-right">SIZE</div>
                 <div class="flex-1 text-right">TOTAL</div>
             </div>
-            <!-- Asks (Red) -->
             <div id="ob-asks" class="flex flex-col-reverse flex-1 overflow-hidden bg-os-bg"></div>
-            <!-- Spread -->
             <div class="py-2 px-2 text-center font-bold text-lg text-theme border-y border-os-border bg-os-window shadow-theme glow-text transition-colors" id="ob-spread">81,462.00</div>
-            <!-- Bids (Green) -->
             <div id="ob-bids" class="flex flex-col flex-1 overflow-hidden bg-os-bg"></div>
-            <!-- Depth Chart -->
             <div class="h-[100px] border-t border-os-border bg-os-panel relative mt-auto shrink-0 p-1">
                 <div class="absolute top-1 left-2 text-[8px] text-os-muted font-bold tracking-widest">MARKET DEPTH</div>
                 <canvas id="obDepthCanvas" class="w-full h-full"></canvas>
@@ -1399,9 +1162,7 @@ Architecting this system necessitates moving away from generalized LLMs toward h
         </div>
         <div class="window-content bg-os-bg relative overflow-hidden" id="topology-container">
             <div class="absolute inset-0 opacity-20 pointer-events-none" style="background-image: radial-gradient(var(--os-border) 1px, transparent 1px); background-size: 20px 20px;"></div>
-            <!-- SVG for drawing lines -->
             <svg id="topo-edges" class="absolute inset-0 w-full h-full pointer-events-none z-[5]"></svg>
-            <!-- Nodes added via JS -->
         </div>
     </div>
 
@@ -1430,9 +1191,7 @@ Architecting this system necessitates moving away from generalized LLMs toward h
                             <th class="bg-transparent border-os-border">Unstructured Context / Provenance</th>
                         </tr>
                     </thead>
-                    <tbody id="ledger-table-body">
-                        <!-- Populated via JS -->
-                    </tbody>
+                    <tbody id="ledger-table-body"></tbody>
                 </table>
             </div>
             <div class="mt-4 p-4 glass-panel rounded-lg bg-os-window">
@@ -1456,7 +1215,7 @@ Architecting this system necessitates moving away from generalized LLMs toward h
             <div class="w-12"></div>
         </div>
         <div class="window-content bg-os-bg p-4 flex flex-col" onclick="document.getElementById('term-in').focus()">
-            <div id="terminal-output" class="font-mono text-[11px] text-theme transition-colors leading-relaxed whitespace-pre-wrap overflow-y-auto flex-1 pb-2">Adam OS Kernel [Version 55.2.231]
+            <div id="terminal-output" class="font-mono text-[11px] text-theme transition-colors leading-relaxed whitespace-pre-wrap overflow-y-auto flex-1 pb-2">Adam OS Kernel [Version 55.2]
 (c) 2026 Sovereign Systems. All rights reserved.
 
 <pre style="font-size: 8px; line-height: 1;">
@@ -1532,7 +1291,7 @@ root@adam-node:~# _</div>
             </div>
         </div>
         <div class="window-content bg-os-panel flex flex-col p-6 relative">
-            <div class="absolute inset-0 opacity-5 pointer-events-none" style="background-image: linear-gradient(0deg, transparent 24%, var(--theme-primary) 25%, var(--theme-primary) 26%, transparent 27%, transparent 74%, var(--theme-primary) 75%, var(--theme-primary) 76%, transparent 77%, transparent), linear-gradient(90deg, transparent 24%, var(--theme-primary) 25%, var(--theme-primary) 26%, transparent 27%, transparent 74%, var(--theme-primary) 75%, var(--theme-primary) 76%, transparent 77%, transparent); background-size: 30px 30px;"></div>
+            <div class="absolute inset-0 opacity-5 pointer-events-none" style="background-image: linear-gradient(0deg, transparent 24%, var(--theme-primary) 25%, var(--theme-primary) 26%, transparent 27%, transparent 74%, var(--theme-primary) 75%, var(--theme-primary) 76%, transparent 77%, transparent), linear-gradient(90deg, transparent 24%, var(--theme-primary) 25%, var(--theme-primary) 26%, transparent 27%, transparent 74%, var(--theme-primary) 75%, var(--theme-primary) 76%, transparent 77%, transparent); background-size: 30px 30px; transition: background 0.5s;"></div>
             
             <div class="flex justify-between items-start mb-4 border-b border-os-border pb-4 relative z-10">
                 <div>
@@ -1580,11 +1339,10 @@ root@adam-node:~# _</div>
                 </div>
                 <div class="p-4 border-t border-os-border flex flex-col gap-2 bg-os-panel">
                     <button onclick="clearNewsletter()" class="w-full border border-[#ff1e38]/50 text-[#ff1e38] hover:bg-[#ff1e38]/10 py-1.5 rounded font-mono text-[10px] font-bold transition-colors cursor-pointer">Clear Queue</button>
-                    <button onclick="printNewsletter()" class="w-full bg-theme text-white mix-blend-difference font-bold py-2 rounded font-mono text-xs hover:opacity-80 transition-opacity glow-theme cursor-pointer shadow-theme">EXPORT TO PDF</button>
+                    <button onclick="printNewsletter()" class="w-full bg-theme text-white mix-blend-difference font-bold py-2 rounded font-mono text-xs hover:opacity-80 transition-opacity glow-theme cursor-pointer shadow-theme border border-transparent">EXPORT TO PDF</button>
                 </div>
             </div>
             <div class="flex-1 p-6 overflow-y-auto bg-white text-black reader-theme" id="newsletter-preview">
-                <!-- Preview content -->
                 <div class="max-w-2xl mx-auto">
                     <h1 class="text-3xl font-bold font-sans border-b-2 border-black pb-2 mb-6 uppercase tracking-tight text-black">Executive Intelligence Report</h1>
                     <p class="text-xs font-mono text-gray-500 mb-8 pb-4 border-b border-gray-200" id="newsletter-date"></p>
@@ -1610,7 +1368,7 @@ root@adam-node:~# _</div>
                 <span class="w-1.5 h-1.5 bg-theme rounded-full animate-pulse shadow-theme transition-colors"></span> Adam Co-Pilot
             </div>
             <div class="w-12 text-right pr-2">
-                <span class="text-[9px] font-mono font-bold text-theme border border-theme/30 px-1 rounded bg-theme-glow glow-text transition-colors">v55.0</span>
+                <span class="text-[9px] font-mono font-bold text-theme border border-theme/30 px-1 rounded bg-theme-glow glow-text transition-colors">v26.1</span>
             </div>
         </div>
         <div class="window-content bg-os-panel flex flex-col relative">
@@ -1621,16 +1379,17 @@ root@adam-node:~# _</div>
                     </div>
                     <div class="glass-panel p-3 border-theme/30 text-os-text max-w-[85%] bg-os-window border border-os-border">
                         <p class="text-[9px] font-mono text-theme mb-1 uppercase tracking-widest font-bold transition-colors">Sys_Ready</p>
-                        <p class="m-0 text-xs leading-relaxed opacity-90">Model parameters synched for <strong>2026.05.06</strong>. VeNRA Strict RLHF Mode Active.<br><br>Loaded Context:<br>- Project Freedom Pause / Islamabad Blink<br>- S&P Record Melt-up (7369+)<br>- Small Language Model Architecture<br><br>Command prompt ready.</p>
+                        <p class="m-0 text-xs leading-relaxed opacity-90">Model parameters synched for <strong>2026.05.09</strong>. Neuro-Symbolic Sovereign Mode Active.<br><br>Loaded Context:<br>- Milestone Divergence (PATH/RDDT Exit)<br>- TMT Sector Refinancing Risk (DSCR < 1.0x)<br>- Yield-Floor Paradox / 4.50% Guillotine<br><br>Command prompt ready.</p>
                     </div>
                 </div>
             </div>
             <div class="p-3 border-t border-os-border bg-os-bg z-10 shrink-0">
                 <div class="flex gap-2 mb-2 overflow-x-auto scrollbar-hide pb-1">
-                    <button onclick="aiPreset('Analyze Project Freedom Pause')" class="whitespace-nowrap px-2 py-1 bg-os-window border border-os-border hover:border-theme text-[9px] font-mono font-bold rounded text-os-muted hover:text-os-text transition-colors cursor-pointer">Project Freedom</button>
-                    <button onclick="aiPreset('Explain RAG vector database options.')" class="whitespace-nowrap px-2 py-1 bg-os-window border border-os-border hover:border-[#ffaa00] text-[9px] font-mono font-bold rounded text-os-muted hover:text-os-text transition-colors cursor-pointer">RAG Vector DBs</button>
-                    <button onclick="aiPreset('What is the Data Flywheel?')" class="whitespace-nowrap px-2 py-1 bg-os-window border border-os-border hover:border-[#00fa9a] text-[9px] font-mono font-bold rounded text-os-muted hover:text-os-text transition-colors cursor-pointer">Data Flywheel</button>
-                    <button onclick="aiPreset('How is the S&P hitting 7369?')" class="whitespace-nowrap px-2 py-1 bg-os-window border border-os-border hover:border-[#ff1e38] text-[9px] font-mono font-bold rounded text-os-muted hover:text-os-text transition-colors cursor-pointer">SPX Melt-up</button>
+                    <button onclick="aiPreset('Analyze PATH Insider Sales')" class="whitespace-nowrap px-2 py-1 bg-os-window border border-os-border hover:border-theme text-[9px] font-mono font-bold rounded text-os-muted hover:text-os-text transition-colors cursor-pointer">PATH Exit</button>
+                    <button onclick="aiPreset('SATS Refinancing Risk details')" class="whitespace-nowrap px-2 py-1 bg-os-window border border-os-border hover:border-[#ffaa00] text-[9px] font-mono font-bold rounded text-os-muted hover:text-os-text transition-colors cursor-pointer">SATS Debt</button>
+                    <button onclick="aiPreset('What is Milestone Divergence?')" class="whitespace-nowrap px-2 py-1 bg-os-window border border-os-border hover:border-[#b53cff] text-[9px] font-mono font-bold rounded text-os-muted hover:text-os-text transition-colors cursor-pointer">Milestone Div</button>
+                    <button onclick="aiPreset('Analyze the Axios Memo leak')" class="whitespace-nowrap px-2 py-1 bg-os-window border border-os-border hover:border-[#00fa9a] text-[9px] font-mono font-bold rounded text-os-muted hover:text-os-text transition-colors cursor-pointer">Axios Memo</button>
+                    <button onclick="aiPreset('Explain the 4.50% Yield Guillotine')" class="whitespace-nowrap px-2 py-1 bg-os-window border border-os-border hover:border-[#ff1e38] text-[9px] font-mono font-bold rounded text-os-muted hover:text-os-text transition-colors cursor-pointer">4.50% Yield</button>
                 </div>
                 <form id="chatForm" class="flex gap-2 relative">
                     <input type="text" id="aiInput" placeholder="Query models..." class="flex-1 bg-os-panel border border-os-border rounded px-3 py-2 text-xs text-os-text font-bold font-mono focus:outline-none focus:border-theme transition-colors shadow-inner" autocomplete="off">
@@ -1641,7 +1400,7 @@ root@adam-node:~# _</div>
     </div>
 
     <!-- Toast Notification Container -->
-    <div id="toastContainer" class="fixed top-10 right-4 z-[10000] flex flex-col gap-2 pointer-events-none"></div>
+    <div id="toastContainer" class="fixed top-12 right-4 z-[10000] flex flex-col gap-2 pointer-events-none"></div>
 
     <!-- ========================================== -->
     <!-- DOCK                                       -->
@@ -1654,6 +1413,7 @@ root@adam-node:~# _</div>
         <div class="dock-item" onclick="openApp('app-geo')" data-app="app-geo" title="Geo-Tac Map">🗺️</div>
         <div class="dock-item" onclick="openApp('app-liquidity')" data-app="app-liquidity" title="Liquidity Monitor">🌊</div>
         <div class="dock-item" onclick="openApp('app-supply')" data-app="app-supply" title="Supply Chain Map">🚢</div>
+        <div class="dock-item" onclick="openApp('app-yield')" data-app="app-yield" title="Yield Curve">📈</div>
         <div class="w-px h-6 bg-os-text opacity-10 self-center mx-1"></div>
         <div class="dock-item" onclick="openApp('app-network')" data-app="app-network" title="Agent Topology">🕸️</div>
         <div class="dock-item" onclick="openApp('app-syslog')" data-app="app-syslog" title="Trace Monitor">🖥️</div>
@@ -1662,7 +1422,7 @@ root@adam-node:~# _</div>
         <div class="dock-item" onclick="openApp('app-terminal')" data-app="app-terminal" title="System Terminal">💻</div>
         <div class="dock-item" onclick="openApp('app-config')" data-app="app-config" title="System Config">⚙️</div>
         <div class="w-px h-6 bg-os-text opacity-10 self-center mx-1"></div>
-        <div class="dock-item" onclick="openApp('app-newsletter')" data-app="app-newsletter" title="Newsletter Export">📰</div>
+        <div class="dock-item" onclick="openApp('app-newsletter')" data-app="app-newsletter" title="Newsletter Export">🖨️</div>
         <div class="dock-item" onclick="openApp('app-ai')" data-app="app-ai" title="Adam Co-Pilot">✨</div>
     </div>
 
@@ -1680,6 +1440,9 @@ root@adam-node:~# _</div>
         let currentViewedArtifact = null;
         let chartsInitialized = false;
         
+        let geoMapInterval = null;
+        let supplyMapInterval = null;
+
         // --- Initialization ---
         window.addEventListener('DOMContentLoaded', () => {
             payload = JSON.parse(document.getElementById('adam-payload').textContent);
@@ -1710,9 +1473,9 @@ root@adam-node:~# _</div>
                 "INITIALIZING OMNIOS KERNEL V55.2...",
                 "MOUNTING SECURE ENCLAVE...",
                 "LOADING NEURO-SYMBOLIC SLM ROUTER...",
-                "SYNCING UNIVERSAL FACT LEDGER [MAY 6 2026]...",
-                "COMPILING DYNAMIC DASHBOARD MODULES...",
-                "BYPASSING OFAC RESTRICTIONS... [SUCCESS]",
+                "SYNCING UNIVERSAL FACT LEDGER [MAY 9 2026]...",
+                "EXECUTING REFINANCING RISK SCAN...",
+                "EXECUTING MILESTONE DIVERGENCE SCAN...",
                 "SYSTEM ONLINE."
             ];
             
@@ -1735,7 +1498,7 @@ root@adam-node:~# _</div>
         }
 
         function initApps() {
-            updateChartColors(); // Sets up initial chart.js defaults based on theme
+            updateChartColors(); 
 
             initBriefingApp();
             initMacroApp();
@@ -1743,8 +1506,9 @@ root@adam-node:~# _</div>
             initDCFApp();
             initPortfolioChart();
             initGeoMap();
-            initLiquidityApp(); // NEW
-            initSupplyApp();    // NEW
+            initLiquidityApp(); 
+            initSupplyApp();    
+            initYieldApp();
             initNetworkApp();
             initSyslogApp();
             initOrderBookApp();
@@ -1759,11 +1523,51 @@ root@adam-node:~# _</div>
             }, 500); 
         }
 
+        // Global Command Bar Logic
+        window.handleGlobalCmd = function(e) {
+            if(e.key === 'Enter') {
+                const val = e.target.value.trim().toLowerCase();
+                if(!val) return;
+
+                // Basic Routing
+                const appMap = {
+                    'news': 'app-notepad', 'synthesis': 'app-notepad',
+                    'macro': 'app-macro', 'markets': 'app-macro',
+                    'dcf': 'app-dcf', 'valuation': 'app-dcf',
+                    'portfolio': 'app-portfolio', 'quantum': 'app-portfolio',
+                    'geo': 'app-geo', 'map': 'app-geo',
+                    'liquidity': 'app-liquidity', 'reserves': 'app-liquidity',
+                    'supply': 'app-supply', 'logistics': 'app-supply',
+                    'yield': 'app-yield', 'rates': 'app-yield', 'bonds': 'app-yield',
+                    'syslog': 'app-syslog', 'traces': 'app-syslog',
+                    'terminal': 'app-terminal', 'cli': 'app-terminal',
+                    'config': 'app-config', 'settings': 'app-config',
+                    'newsletter': 'app-newsletter', 'export': 'app-newsletter',
+                    'ai': 'app-ai', 'copilot': 'app-ai', 'chat': 'app-ai',
+                    'library': 'app-notepad', 'docs': 'app-notepad'
+                };
+
+                // Check if routing command
+                for (const [key, appId] of Object.entries(appMap)) {
+                    if (val.includes(key)) {
+                        openApp(appId);
+                        e.target.value = '';
+                        return;
+                    }
+                }
+
+                // If not a routing command, pass it to AI Copilot
+                openApp('app-ai');
+                aiPreset(e.target.value);
+                e.target.value = '';
+            }
+        };
+
         // Update Chart JS globals based on light/dark mode
         function updateChartColors() {
             const isLight = document.body.classList.contains('light-mode');
             const gridColor = isLight ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.05)';
-            const textColor = isLight ? '#475569' : '#64748b'; // text-os-muted mapping
+            const textColor = isLight ? '#475569' : '#64748b'; 
             
             Chart.defaults.color = textColor;
             Chart.defaults.font.family = "'JetBrains Mono', monospace";
@@ -1855,15 +1659,15 @@ root@adam-node:~# _</div>
             if (win.dataset.maximized === "true") {
                 win.style.width = win.dataset.origW; win.style.height = win.dataset.origH;
                 win.style.top = win.dataset.origT; win.style.left = win.dataset.origL;
-                win.style.borderRadius = "10px";
+                win.style.borderRadius = "12px";
                 win.dataset.maximized = "false";
             } else {
                 win.dataset.origW = win.style.width || getComputedStyle(win).width; 
                 win.dataset.origH = win.style.height || getComputedStyle(win).height;
                 win.dataset.origT = win.style.top || getComputedStyle(win).top; 
                 win.dataset.origL = win.style.left || getComputedStyle(win).left;
-                win.style.width = "100%"; win.style.height = "calc(100vh - 32px)";
-                win.style.top = "32px"; win.style.left = "0";
+                win.style.width = "100%"; win.style.height = "calc(100vh - 40px)";
+                win.style.top = "40px"; win.style.left = "0";
                 win.style.borderRadius = "0";
                 win.dataset.maximized = "true";
             }
@@ -1876,6 +1680,7 @@ root@adam-node:~# _</div>
             if(charts.gex) { charts.gex.resize(); }
             if(charts.portfolio) { charts.portfolio.resize(); }
             if(charts.liquidity) { charts.liquidity.resize(); }
+            if(charts.yield) { charts.yield.resize(); }
         }
 
         // --- Terminal ---
@@ -1891,11 +1696,11 @@ root@adam-node:~# _</div>
                 output.innerHTML += `\n<span style="color:${themeColor}">root@adam-node:~#</span> <span class="text-os-text font-bold">${cmd}</span>\n`;
                 
                 if(cmd === 'help') {
-                    output.innerHTML += "AVAILABLE MODULES:\n- status: Get system metrics\n- clear: Purge buffer\n- reboot: Full kernel restart\n- open [app_id]: Launch GUI module (macro, dcf, ai, portfolio, geo, syslog, corr, ledger, config, liquidity, supply)\n- theme [color]: Update UI (cyan, matrix, crimson, purple, gold)\n- toggle_mode: Switch Light/Dark visual mode";
+                    output.innerHTML += "AVAILABLE MODULES:\n- status: Get system metrics\n- clear: Purge buffer\n- reboot: Full kernel restart\n- open [app_id]: Launch GUI module\n- theme [color]: Update UI (cyan, matrix, crimson, purple, gold)\n- toggle_mode: Switch Light/Dark visual mode";
                 } else if(cmd === 'status') {
-                    output.innerHTML += "SYSTEM: NOMINAL\nNODES: 1,200 ACTIVE IN 3D SPACE\nUPTIME: 335 DAYS\nOFAC_TUNNEL: ENCRYPTED";
+                    output.innerHTML += "SYSTEM: DEGRADED\nNODES: 1,200 ACTIVE IN 3D SPACE\nUPTIME: 338 DAYS\nOFAC_TUNNEL: ENCRYPTED";
                 } else if(cmd === 'clear') {
-                    output.innerHTML = "Adam OS Kernel [Version 55.2.231]\n(c) 2026 Sovereign Systems. All rights reserved.\n";
+                    output.innerHTML = "Adam OS Kernel [Version 55.2]\n(c) 2026 Sovereign Systems. All rights reserved.\n";
                 } else if(cmd === 'reboot') {
                     location.reload();
                 } else if(cmd === 'toggle_mode') {
@@ -1916,7 +1721,7 @@ root@adam-node:~# _</div>
                         'macro': 'app-macro', 'term': 'app-terminal', 'corr': 'app-corr', 'ai': 'app-ai', 
                         'dcf': 'app-dcf', 'notepad': 'app-notepad', 'briefing': 'app-notepad', 'portfolio': 'app-portfolio',
                         'geo': 'app-geo', 'syslog': 'app-syslog', 'ledger': 'app-ledger', 'config': 'app-config',
-                        'liquidity': 'app-liquidity', 'supply': 'app-supply'
+                        'liquidity': 'app-liquidity', 'supply': 'app-supply', 'yield': 'app-yield', 'rates': 'app-yield'
                     };
                     if (map[appName]) {
                         openApp(map[appName]);
@@ -1952,12 +1757,8 @@ root@adam-node:~# _</div>
             document.body.classList.toggle('light-mode');
             const isLight = document.body.classList.contains('light-mode');
             
-            // Update charts
             updateChartColors();
-
-            // Rerender correlation matrix for color overrides
             initCorrApp();
-            
             showToast(`Visual Mode: ${isLight ? 'INSTITUTIONAL LIGHT' : 'NEURAL DARK'}`);
         }
 
@@ -1981,14 +1782,19 @@ root@adam-node:~# _</div>
                 charts.liquidity.data.datasets[0].backgroundColor = hex + '80';
                 charts.liquidity.update();
             }
+            if(charts.yield) {
+                charts.yield.data.datasets[0].borderColor = hex;
+                charts.yield.data.datasets[0].backgroundColor = hex + '20';
+                charts.yield.data.datasets[0].pointBackgroundColor = hex;
+                charts.yield.update();
+            }
             if(currentTicker) liveUpdateDCF(); 
             
             drawTopologyLines();
-            initCorrApp(); // Redraw correlations matrix to update hover UI CSS overrides
+            initCorrApp(); 
         }
 
         function getHexColor() {
-            // Read from computed style to catch light-mode overrides
             return getComputedStyle(document.body).getPropertyValue('--theme-primary').trim() || '#00e5ff';
         }
 
@@ -1996,7 +1802,7 @@ root@adam-node:~# _</div>
         function showToast(msg) {
             const container = document.getElementById('toastContainer');
             const t = document.createElement('div');
-            t.className = 'bg-theme text-white mix-blend-difference font-bold font-mono text-[10px] px-4 py-2 shadow-theme border border-transparent rounded toast-enter transition-colors';
+            t.className = 'bg-theme text-white mix-blend-difference font-bold font-mono text-[10px] px-4 py-2 shadow-theme border border-transparent rounded toast-enter transition-colors pointer-events-auto';
             t.innerText = msg;
             container.appendChild(t);
             setTimeout(() => { t.style.opacity = 0; t.style.transition = 'opacity 0.3s'; setTimeout(()=>t.remove(), 300); }, 3000);
@@ -2043,7 +1849,7 @@ root@adam-node:~# _</div>
         }
 
         function initBriefingApp() {
-            loadDoc('market-mayhem-md', document.querySelector('#app-notepad .w-64 button'));
+            loadDoc('directive-0509-md', document.querySelector('#app-notepad .w-64 button'));
         }
 
         // --- App: System Ledger ---
@@ -2083,7 +1889,7 @@ root@adam-node:~# _</div>
 
             buildTopTicker();
             if(document.getElementById('app-macro').classList.contains('active')) {
-                initMacroApp(); // Refresh
+                initMacroApp(); 
             }
             
             showToast('Global telemetry synchronized.');
@@ -2114,8 +1920,8 @@ root@adam-node:~# _</div>
                 data: {
                     labels: ['T-0', 'T+5', 'T+10', 'T+15', 'T+20', 'T+25', 'T+30'],
                     datasets: [
-                        { label: 'Stagflation Risk', data: [15, 20, 25, 20, 15, 10, 5], borderColor: '#ff1e38', backgroundColor: 'rgba(255, 30, 56, 0.1)', fill: true, tension: 0.4 },
-                        { label: 'Resolution Beta', data: [85, 80, 75, 80, 85, 90, 95], borderColor: getHexColor(), backgroundColor: getHexColor() + '20', fill: true, tension: 0.4 }
+                        { label: 'TMT Insolvency Risk (DSCR<1)', data: [45, 60, 75, 80, 85, 90, 95], borderColor: '#ff1e38', backgroundColor: 'rgba(255, 30, 56, 0.1)', fill: true, tension: 0.4 },
+                        { label: 'Milestone Divergence / Exit Flow', data: [95, 90, 85, 80, 75, 75, 70], borderColor: getHexColor(), backgroundColor: getHexColor() + '20', fill: true, tension: 0.4 }
                     ]
                 },
                 options: { 
@@ -2132,7 +1938,7 @@ root@adam-node:~# _</div>
             if(charts.gex) charts.gex.destroy();
             const ctxGex = document.getElementById('gexChart').getContext('2d');
             const strikes = ['7100','7200','7300','7400','7500'];
-            const gex = [-800, -1200, 1500, 3200, 1900];
+            const gex = [-1500, -800, 2500, 1800, 900]; 
             charts.gex = new Chart(ctxGex, {
                 type: 'bar',
                 data: {
@@ -2414,14 +2220,14 @@ root@adam-node:~# _</div>
                         }
                     },
                     scales: {
-                        x: { title: { display: true, text: 'Volatility Risk' }, min: 0, max: 100 },
-                        y: { title: { display: true, text: 'Upside Reward' }, min: 0, max: 100 }
+                        x: { title: { display: true, text: 'Volatility Risk', color: '#64748b' }, grid: { color: 'rgba(255,255,255,0.05)' }, min: 0, max: 100 },
+                        y: { title: { display: true, text: 'Upside Reward', color: '#64748b' }, grid: { color: 'rgba(255,255,255,0.05)' }, min: 0, max: 100 }
                     }
                 }
             });
         }
 
-        // --- NEW APP: Liquidity Monitor ---
+        // --- APP: Liquidity Monitor ---
         function initLiquidityApp() {
             const ctx = document.getElementById('liquidityChartCanvas');
             if(!ctx) return;
@@ -2467,26 +2273,83 @@ root@adam-node:~# _</div>
                         y1: {
                             type: 'linear', display: true, position: 'right',
                             title: { display: true, text: 'SPX Level' },
-                            grid: { drawOnChartArea: false } // only want grid lines for one axis
+                            grid: { drawOnChartArea: false } 
                         }
                     }
                 }
             });
         }
 
-        // --- NEW APP: Supply Chain Map (Canvas Flow) ---
+        // --- APP: Yield Curve Monitor ---
+        function initYieldApp() {
+            const ctx = document.getElementById('yieldChartCanvas');
+            if(!ctx) return;
+            
+            if(charts.yield) charts.yield.destroy();
+            charts.yield = new Chart(ctx.getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: payload.yield_curve.tenors,
+                    datasets: [
+                        {
+                            label: 'Current Curve (May 9)',
+                            data: payload.yield_curve.current,
+                            borderColor: getHexColor(),
+                            backgroundColor: getHexColor() + '20',
+                            borderWidth: 3,
+                            pointRadius: 5,
+                            pointBackgroundColor: getHexColor(),
+                            fill: true,
+                            tension: 0.4
+                        },
+                        {
+                            label: 'T-30 Days',
+                            data: payload.yield_curve.previous,
+                            borderColor: '#64748b',
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            pointRadius: 0,
+                            fill: false,
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: {
+                        legend: { position: 'top', labels: { font: { family: "'JetBrains Mono', monospace", size: 10 } } }
+                    },
+                    scales: {
+                        x: { 
+                            grid: { color: Chart.defaults.borderColor },
+                            title: { display: true, text: 'Maturity' }
+                        },
+                        y: { 
+                            grid: { color: Chart.defaults.borderColor },
+                            title: { display: true, text: 'Yield (%)' },
+                            min: 4.0, max: 6.0
+                        }
+                    }
+                }
+            });
+        }
+
+        // --- APP: Supply Chain Map (Canvas Flow) ---
         function initSupplyApp() {
             const canvas = document.getElementById('supplyCanvas');
-            if(!canvas) return;
+            const wrapper = document.getElementById('supply-container');
+            if(!canvas || !wrapper) return;
             const ctx = canvas.getContext('2d');
             
             function resize() {
+                if(!canvas.parentElement) return;
                 canvas.width = canvas.parentElement.clientWidth;
                 canvas.height = canvas.parentElement.clientHeight;
             }
             window.addEventListener('resize', resize); resize();
 
-            // Setup Nodes (Logistics Hubs)
+            // Nodes
             const hubs = [
                 { id: 'US', x: 0.15, y: 0.4, label: 'US GULF', cap: 100, flow: 100, color: '#00e5ff' },
                 { id: 'EU', x: 0.45, y: 0.3, label: 'ROTTERDAM', cap: 100, flow: 85, color: '#00e5ff' },
@@ -2510,8 +2373,14 @@ root@adam-node:~# _</div>
             let flowOffset = 0;
 
             function draw() {
+                if(!document.getElementById('supplyCanvas')) return; // DOM safety
+                
+                if (canvas.width !== wrapper.clientWidth || canvas.height !== wrapper.clientHeight) {
+                    resize();
+                }
+
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
-                flowOffset -= 0.5; // Flow animation speed
+                flowOffset -= 0.5;
 
                 // Draw Connections
                 routes.forEach(r => {
@@ -2530,7 +2399,6 @@ root@adam-node:~# _</div>
                     // Base line
                     ctx.beginPath();
                     ctx.moveTo(x1, y1);
-                    // Add slight curve
                     ctx.quadraticCurveTo(x1, y2, x2, y2);
                     ctx.strokeStyle = '#1e2532';
                     ctx.lineWidth = 4;
@@ -2542,19 +2410,19 @@ root@adam-node:~# _</div>
                     ctx.quadraticCurveTo(x1, y2, x2, y2);
                     
                     if(isActive) {
-                        ctx.strokeStyle = '#00fa9a'; // Green flowing
+                        ctx.strokeStyle = '#00fa9a'; 
                         ctx.lineWidth = 2;
                         ctx.setLineDash([10, 10]);
                         ctx.lineDashOffset = flowOffset;
                         ctx.stroke();
                     } else {
-                        ctx.strokeStyle = '#ff1e38'; // Red jammed
+                        ctx.strokeStyle = '#ff1e38'; 
                         ctx.lineWidth = 2;
                         ctx.setLineDash([2, 5]);
-                        ctx.lineDashOffset = 0; // static
+                        ctx.lineDashOffset = 0; 
                         ctx.stroke();
                     }
-                    ctx.setLineDash([]); // Reset
+                    ctx.setLineDash([]); 
                 });
 
                 // Draw Nodes
@@ -2562,7 +2430,6 @@ root@adam-node:~# _</div>
                     const cx = h.x * canvas.width;
                     const cy = h.y * canvas.height;
 
-                    // Draw capacity circle background
                     ctx.beginPath();
                     ctx.arc(cx, cy, 18, 0, Math.PI * 2);
                     ctx.fillStyle = '#0a0d14';
@@ -2571,7 +2438,6 @@ root@adam-node:~# _</div>
                     ctx.strokeStyle = '#1e2532';
                     ctx.stroke();
 
-                    // Draw actual flow
                     const pct = h.flow / h.cap;
                     ctx.beginPath();
                     ctx.arc(cx, cy, 14, 0, Math.PI * 2 * pct);
@@ -2579,13 +2445,11 @@ root@adam-node:~# _</div>
                     ctx.fillStyle = h.color;
                     ctx.fill();
 
-                    // Node Label
                     ctx.fillStyle = '#fff';
                     ctx.font = 'bold 9px "JetBrains Mono"';
                     ctx.textAlign = 'center';
                     ctx.fillText(h.label, cx, cy - 25);
                     
-                    // Metrics box
                     ctx.fillStyle = '#11151e';
                     ctx.fillRect(cx - 20, cy + 22, 40, 14);
                     ctx.strokeStyle = h.color;
@@ -2593,7 +2457,6 @@ root@adam-node:~# _</div>
                     ctx.fillStyle = h.color;
                     ctx.fillText(`${h.flow}%`, cx, cy + 32);
 
-                    // Pulse effect for critical nodes
                     if(h.id === 'HORMUZ') {
                         ctx.beginPath();
                         ctx.arc(cx, cy, 18 + Math.abs(Math.sin(flowOffset/10))*10, 0, Math.PI * 2);
@@ -2602,39 +2465,35 @@ root@adam-node:~# _</div>
                     }
                 });
 
-                if(window.activeAnimSupply) requestAnimationFrame(draw);
+                if(supplyMapInterval) clearTimeout(supplyMapInterval);
+                supplyMapInterval = setTimeout(() => requestAnimationFrame(draw), 30);
             }
 
-            if(window.activeAnimSupply) cancelAnimationFrame(window.activeAnimSupply);
-            window.activeAnimSupply = requestAnimationFrame(draw);
+            if(supplyMapInterval) clearTimeout(supplyMapInterval);
+            draw();
         }
-
 
         // --- App: Geo-Tactical Map ---
         function initGeoMap() {
+            const container = document.getElementById('geo-map-container');
             const canvas = document.getElementById('geoMapCanvas');
-            if (!canvas) return;
+            if (!canvas || !container) return;
             const ctx = canvas.getContext('2d');
             
             function resize() {
+                if(!canvas.parentElement) return;
                 canvas.width = canvas.parentElement.clientWidth;
                 canvas.height = canvas.parentElement.clientHeight;
             }
             window.addEventListener('resize', resize); resize();
 
-            // Procedural stylized world map points (very rough approx for a terminal look)
             const mapDots = [];
             for(let x=0; x<1; x+=0.02) {
                 for(let y=0; y<1; y+=0.03) {
-                    // North America rough
                     if(x>0.1 && x<0.35 && y>0.1 && y<0.4) { if(Math.random()>0.3) mapDots.push({x,y}); }
-                    // South America
                     if(x>0.2 && x<0.35 && y>0.4 && y<0.8) { if(Math.random()>0.4) mapDots.push({x,y}); }
-                    // Europe / Africa
                     if(x>0.45 && x<0.65 && y>0.15 && y<0.75) { if(Math.random()>0.3) mapDots.push({x,y}); }
-                    // Asia
                     if(x>0.65 && x<0.95 && y>0.1 && y<0.5) { if(Math.random()>0.3) mapDots.push({x,y}); }
-                    // Australia
                     if(x>0.8 && x<0.95 && y>0.6 && y<0.8) { if(Math.random()>0.5) mapDots.push({x,y}); }
                 }
             }
@@ -2644,21 +2503,25 @@ root@adam-node:~# _</div>
                 {x: 0.50, y: 0.35, type: 'elevated', pulse: 0}, // EU/Red Sea
                 {x: 0.70, y: 0.40, type: 'monitor', pulse: 0},  // Islamabad
                 {x: 0.25, y: 0.35, type: 'normal', pulse: 0},   // US East
-                {x: 0.15, y: 0.40, type: 'normal', pulse: 0}    // US West
+                {x: 0.85, y: 0.45, type: 'elevated', pulse: 0}  // Taiwan
             ];
 
             let sweepAngle = 0;
 
             function draw() {
+                if(!document.getElementById('geoMapCanvas')) return;
+
+                if (canvas.width !== container.clientWidth || canvas.height !== container.clientHeight) {
+                    resize();
+                }
+
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 
-                // Draw dotted map background
-                ctx.fillStyle = 'rgba(100, 116, 139, 0.2)'; // Muted gray for map
+                ctx.fillStyle = 'rgba(100, 116, 139, 0.2)';
                 mapDots.forEach(d => {
                     ctx.fillRect(d.x * canvas.width, d.y * canvas.height, 2, 2);
                 });
 
-                // Radar Sweep
                 sweepAngle += 0.02;
                 const cx = canvas.width/2;
                 const cy = canvas.height/2;
@@ -2689,9 +2552,8 @@ root@adam-node:~# _</div>
                 ctx.restore();
 
 
-                // Draw Connections
                 const themeColor = getHexColor() || '#00e5ff';
-                ctx.strokeStyle = themeColor + '30'; // Increased visibility
+                ctx.strokeStyle = themeColor + '30'; 
                 ctx.lineWidth = 1;
                 ctx.beginPath();
                 nodes.forEach((n1, i) => {
@@ -2708,7 +2570,6 @@ root@adam-node:~# _</div>
                 });
                 ctx.stroke();
 
-                // Draw Nodes
                 nodes.forEach(n => {
                     const nx = n.x * canvas.width;
                     const ny = n.y * canvas.height;
@@ -2735,10 +2596,12 @@ root@adam-node:~# _</div>
                     ctx.stroke();
                 });
                 ctx.shadowBlur = 0; 
-                if(window.activeAnimFrameGeo) requestAnimationFrame(draw);
+
+                if(geoMapInterval) clearTimeout(geoMapInterval);
+                geoMapInterval = setTimeout(() => requestAnimationFrame(draw), 30);
             }
-            if(window.activeAnimFrameGeo) cancelAnimationFrame(window.activeAnimFrameGeo);
-            window.activeAnimFrameGeo = requestAnimationFrame(draw);
+            if(geoMapInterval) clearTimeout(geoMapInterval);
+            draw();
         }
 
         // --- App: Syslog Trace Monitor ---
@@ -2759,7 +2622,7 @@ root@adam-node:~# _</div>
             if (item.event_type === 'ANOMALY_DETECTED') {
                 return `<span class="text-[#ff1e38] font-bold">[${item.details.severity}]</span> ${item.details.description}`;
             } else if (item.event_type === 'TASK_COMPLETE') {
-                const recClass = item.details.output?.recommendation === 'BUY' ? 'text-[#00fa9a]' : (item.details.output?.recommendation === 'SELL' ? 'text-[#ff1e38]' : (item.details.output?.recommendation ? 'text-theme' : 'text-os-text'));
+                const recClass = item.details.output?.recommendation.includes('SELL') ? 'text-[#ff1e38]' : (item.details.output?.recommendation.includes('BUY') ? 'text-[#00fa9a]' : 'text-theme');
                 return `Action: <span class="font-bold ${recClass}">${item.details.output?.recommendation || 'COMPLETED'}</span>`;
             } else if (item.event_type === 'KNOWLEDGE_GRAPH_UPDATE') {
                 return `<span class="text-os-muted">${item.details.action}</span> node: <span class="text-os-text font-bold">${item.details.node}</span>`;
@@ -2769,6 +2632,8 @@ root@adam-node:~# _</div>
                 return `Conf ${(item.details.confidence*100).toFixed(0) || '--'}%: <span class="text-os-muted">${item.details.content}</span>`;
             } else if (item.event_type === 'SYSTEM_BOOT') {
                 return `Core protocol active. Ver: <span class="font-bold">${item.details.version}</span>`;
+            } else if (item.event_type === 'TASK_START') {
+                return `Target: <span class="text-os-text font-bold">${item.details.target}</span>. Params: <span class="text-os-muted">${item.details.threshold}</span>`;
             }
             return '<span class="text-os-muted">System Event</span>';
         }
@@ -2922,14 +2787,14 @@ root@adam-node:~# _</div>
                     const idx = Math.floor(Math.random() * rows.length);
                     const row = rows[idx];
                     
-                    basePrice = payload.kpis.btc.value; // Sync to global config changes
+                    basePrice = payload.kpis.btc.value; 
                     
                     row.outerHTML = generateRow(isAsk ? 'ask' : 'bid', idx + 1, false);
                     const newRow = container.children[idx];
                     newRow.classList.add(isAsk ? 'flash-red' : 'flash-green');
                     setTimeout(() => { newRow.classList.remove('flash-red', 'flash-green'); }, 500);
                     
-                    const wobble = (Math.random() * 10 - 5).toFixed(2);
+                    const wobble = (Math.random() * 20 - 10).toFixed(2);
                     const newBase = (basePrice + parseFloat(wobble)).toLocaleString('en-US', {minimumFractionDigits: 2});
                     document.getElementById('ob-spread').innerText = newBase;
                     document.getElementById('ob-price').innerText = newBase;
@@ -2963,7 +2828,7 @@ root@adam-node:~# _</div>
                 ctx.moveTo(midX, canvas.height);
                 let acc = 0;
                 bidsDepth.forEach((b, i) => {
-                    acc += b.size; // Cumulative
+                    acc += b.size; 
                     const x = midX - ((i / bidsDepth.length) * midX);
                     const y = canvas.height - (acc / (maxVol * bidsDepth.length)) * canvas.height;
                     ctx.lineTo(x, y);
@@ -2980,7 +2845,7 @@ root@adam-node:~# _</div>
                 ctx.moveTo(midX, canvas.height);
                 acc = 0;
                 asksDepth.forEach((a, i) => {
-                    acc += a.size; // Cumulative
+                    acc += a.size; 
                     const x = midX + ((i / asksDepth.length) * midX);
                     const y = canvas.height - (acc / (maxVol * asksDepth.length)) * canvas.height;
                     ctx.lineTo(x, y);
@@ -3052,10 +2917,8 @@ root@adam-node:~# _</div>
             const svg = document.getElementById('topo-edges');
             if(!svg) return;
             let html = '';
-            
             const lineColor = getHexColor() || '#00e5ff';
 
-            // Connect agents that interact
             payload.syslog.filter(d => d.event_type === 'INTER_AGENT_COMM').forEach(e => {
                 const n1 = activeAgentsNetwork.find(n => n.id === e.agent_id);
                 const n2 = activeAgentsNetwork.find(n => n.id === e.details.receiver_id);
@@ -3067,7 +2930,6 @@ root@adam-node:~# _</div>
                 }
             });
             
-            // Connect remaining close nodes for aesthetic
             activeAgentsNetwork.forEach((n1, i) => {
                 activeAgentsNetwork.forEach((n2, j) => {
                     if (i < j) {
@@ -3129,23 +2991,21 @@ root@adam-node:~# _</div>
 
                 setTimeout(() => {
                     document.getElementById(typingId).remove();
-                    let responseHtml = "I am operating in strictly disconnected heuristic mode. Based on internal parameters (SPX 7369, 10Y 4.36%), recommend overweighting resolution-beta equities and liquidating logistics/transportation straddles.";
+                    let responseHtml = "I am operating in strictly disconnected heuristic mode. Based on internal parameters, recommend overweighting resolution-beta equities and liquidating legacy TMT debt.";
                     
                     const query = val.toLowerCase();
-                    if (query.includes("freedom") || query.includes("pause") || query.includes("islamabad")) {
-                        responseHtml = "The **Islamabad Blink** refers to the 48-hour pause on Project Freedom. The S&P 500 melted up 1.52% to 7,369 purely on this 'Diplomatic Hopium.' *Recommendation:* This is a deceptive euphoria. France's Charles de Gaulle carrier is crossing the Suez. The physical conflict is merely rotating operators. Short Volatility here is a complacency trap.";
-                    } else if (query.includes("spx") || query.includes("7369") || query.includes("melt")) {
-                        responseHtml = "The S&P 500 is trading purely on **Resolution-Beta**. The correlation between AI Infrastructure (e.g., MSFT, NVDA) and the Diplomatic Hopium trade has hit a record +0.95. The market is entirely ignoring fundamental earnings and pricing in the total elimination of the Hormuz hard-lock.";
-                    } else if (query.includes("mag 7") || query.includes("capex")) {
-                        responseHtml = "The **Mag 7 CapEx Divergence** illustrates a hard split. Hyperscalers are projected to spend >$765B in FY26. The market is rewarding 'Margin Expanders' (MSFT, AAPL) who demonstrate tangible AI revenue, while severely penalizing 'Capital Burners' (AMZN, META) whose free cash flows are collapsing under infrastructure costs. *Action:* Review the DCF engine waterfall for AMZN; observe the near-term unlevered FCF compression.";
-                    } else if (query.includes("cmbs") || query.includes("collapse")) {
-                        responseHtml = "The **CMBS Structural Collapse** has reached a distress rate of 12.07%. The 'extend and pretend' workout strategy is mathematically obsolete due to the 4.36% 10Y Yield floor. Lenders are demanding massive equity cures which sponsors cannot meet, resulting in the wiping out of subordinate capital tranches.";
-                    } else if (query.includes("rag") || query.includes("vector")) {
-                        responseHtml = "Our **RAG Architecture** utilizes Redis (VSS) for ultra-low latency similarity lookups, Milvus for cloud-native fault tolerance, and Qdrant for strict regulatory compliance via audit access logging. This ensures real-time sentiment trading analysis and zero-hallucination semantic retrieval.";
-                    } else if (query.includes("sme") || query.includes("default")) {
-                        responseHtml = "Traditional credit scoring is inadequate for commercial bill default risk. By applying **LLM-FT (Large Language Model Fine-Tuning)** on 38 non-financial features and utilizing an OpenAI API pipeline for supervised fine-tuning, SME default prediction accuracy improved from 75% to 82.10%.";
-                    } else if (query.includes("flywheel") || query.includes("distill")) {
-                        responseHtml = "The **NVIDIA Data Flywheel** orchestrates model distillation via a continuous loop: Log Ingestion > Dataset Creation > **NeMo Customizer** (for LoRA fine-tuning) > **NeMo Evaluator** (for LLM-as-a-judge scoring) > Deployment. This allows a 1B parameter student model to achieve 98% of the tool-calling accuracy of a 70B teacher.";
+                    if (query.includes("path") || query.includes("insider")) {
+                        responseHtml = "The **PATH Distribution Phase** is active. Management's Q1 narrative focused heavily on 'Agentic RPA', expanding the TAM. However, the Sentinel detected a severe **Milestone Divergence**: Over $85M in Form 4 Code S (Open Market Sales) by the C-Suite and venture backers within 48 hours of the call. *Action:* Auto-cap positive momentum scoring. Treat >3% intraday rallies as synthetic short entries.";
+                    } else if (query.includes("sats") || query.includes("echostar") || query.includes("refinancing")) {
+                        responseHtml = "**EchoStar (SATS) LME Imminent.** The company faces $2.0B in debt maturities by late 2026. At the current 4.50% risk-free rate, high-yield markets demand double digits to roll this paper. The sponsor is preparing to utilize flexible covenants to strip unencumbered spectrum assets, forcing a coercive debt exchange. *Action:* Short legacy unsecured tranches.";
+                    } else if (query.includes("4.50") || query.includes("guillotine") || query.includes("yield")) {
+                        responseHtml = "The **4.50% Yield Guillotine**: The market is mispricing this level as technical resistance; it is a structural barrier. TMT entities that funded M&A during ZIRP at 3.5% coupons are now hitting the 2026-2027 maturity wall. With 1M SOFR at 5.32%, refinancing at 8%+ mathematically obliterates Free Operating Cash Flow (FOCF), sending DSCR below 1.0x.";
+                    } else if (query.includes("milestone") || query.includes("divergence")) {
+                        responseHtml = "**Milestone Divergence** is the quantitative mapping of corporate narratives (buzzword-dense earnings calls like 'Sovereign Compute' or 'Data Licensing') functioning as retail exit liquidity for massive, pre-planned 10b5-1 insider liquidations. We are currently tracking this heavily in PATH and RDDT.";
+                    } else if (query.includes("axios") || query.includes("memo")) {
+                        responseHtml = "The **Axios Leak** implies a one-page memorandum to end hostilities in the Strait of Hormuz. The meatspace algorithm is currently blinded by the S&P 500 hovering at 7,400. You are looking at the exhaust. Keep capital parked in sovereign-grade data management (PLTR) and physical energy hedges (XOM).";
+                    } else if (query.includes("rddt") || query.includes("reddit")) {
+                        responseHtml = "**RDDT Anchor Exit.** Reddit touted $100M+ data-licensing agreements, positioning as an 'LLM Training Utility.' Divergence detected: Conde Nast filed Rule 144 to trim 10% holdings. CEO 10b5-1 plan triggered max sales 12 hours after OpenAI PR. *Verdict:* Insiders cashing out at peak compute multiples before returning to ad-spend cyclicality.";
                     }
 
                     chatLog.insertAdjacentHTML('beforeend', `
@@ -3341,10 +3201,9 @@ root@adam-node:~# _</div>
             const computedStyle = getComputedStyle(document.body);
             const baseHexStr = computedStyle.getPropertyValue('--theme-primary').trim() || '#00e5ff';
             const baseColor = new THREE.Color(baseHexStr);
-            const dataColor = new THREE.Color(0xffaa00); // Amber for clickable data nodes
+            const dataColor = new THREE.Color(0xffaa00);
 
             for(let i=0; i<particleCount; i++) {
-                // Initialize randomly
                 positions[i*3] = (Math.random() - 0.5) * 200;
                 positions[i*3+1] = (Math.random() - 0.5) * 100;
                 positions[i*3+2] = (Math.random() - 0.5) * 200;
@@ -3366,7 +3225,7 @@ root@adam-node:~# _</div>
                 size: 1.5, 
                 vertexColors: true, 
                 transparent: true, 
-                opacity: 0.8, 
+                opacity: 0.8,
                 blending: isLightInit ? THREE.NormalBlending : THREE.AdditiveBlending 
             });
             particles = new THREE.Points(geometry, material);

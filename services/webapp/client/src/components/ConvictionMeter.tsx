@@ -44,7 +44,7 @@ export const ConvictionMeter: React.FC<ConvictionMeterProps> = ({ score, reasoni
                 <h4 className="font-semibold text-sm text-gray-700 mb-2">Reasoning Trace:</h4>
                 <ul className="list-disc pl-5 text-sm text-gray-600 space-y-1">
                     {reasoning && reasoning.map((r, i) => (
-                        <li key={i}>{r}</li>
+                        <li key={`${r}-${i}`}>{r}</li>
                     ))}
                 </ul>
             </div>

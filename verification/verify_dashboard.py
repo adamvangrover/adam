@@ -1,22 +1,26 @@
 from playwright.sync_api import sync_playwright
-import os
+import time
 
-def test_dashboard():
+def verify_dashboard():
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
         page = browser.new_page()
+        try:
+            print("Navigating to HTML Showcases...")
+            page.goto("file:///app/showcase/credit_valuation_architect.html")
+            time.sleep(2)
+            page.screenshot(path="/app/verification/cva.png", full_page=True)
+            print("Screenshot saved to /app/verification/cva.png")
 
-        # Load the local HTML file
-        file_path = os.path.abspath("showcase/unified_banking_dashboard.html")
-        page.goto(f"file://{file_path}")
+            page.goto("file:///app/showcase/credit_architect.html")
+            time.sleep(2)
+            page.screenshot(path="/app/verification/ca.png", full_page=True)
+            print("Screenshot saved to /app/verification/ca.png")
 
-        # Wait for data to load (Chart.js canvas should render)
-        page.wait_for_selector("#priceChart")
-        page.wait_for_selector("#orderLog div") # Wait for at least one log entry
-
-        # Take screenshot
-        page.screenshot(path="verification/dashboard_screenshot.png", full_page=True)
-        browser.close()
+        except Exception as e:
+            print(f"Error: {e}")
+        finally:
+            browser.close()
 
 if __name__ == "__main__":
-    test_dashboard()
+    verify_dashboard()
