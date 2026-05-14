@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en" class="dark theme-cyan">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PORTFOLIO ANALYSIS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'], display: ['Share Tech Mono', 'monospace'] },
+                    colors: { os: { bg: '#010204', panel: '#0a0d14', window: '#11151e', border: '#1e2532', text: '#ffffff', muted: '#64748b' }, cyber: { cyan: '#00e5ff', red: '#ff1e38', amber: '#ffaa00', green: '#00fa9a', purple: '#b53cff' } }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: theme('colors.os.bg'); color: theme('colors.os.text'); margin: 0; padding: 20px; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: theme('colors.os.bg'); }
+        ::-webkit-scrollbar-thumb { background: theme('colors.os.border'); border-radius: 3px; }
+        .glass-panel { background: rgba(10, 13, 20, 0.8); backdrop-filter: blur(12px); border: 1px solid theme('colors.os.border'); border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        .header-glow { text-shadow: 0 0 10px theme('colors.cyber.cyan'); }
+        .data-table th { text-align: left; padding: 8px 12px; border-bottom: 1px solid theme('colors.os.border'); color: theme('colors.os.muted'); font-weight: normal; }
+        .data-table td { padding: 8px 12px; border-bottom: 1px solid theme('colors.os.border'); }
+        .data-table tr:hover { background: rgba(0, 229, 255, 0.05); }
+    </style>
+</head>
+<body class="font-sans antialiased flex flex-col h-full gap-4">
+    <header class="glass-panel p-4 flex justify-between items-center shrink-0">
+        <div>
+            <h1 class="font-display text-2xl font-bold tracking-widest text-cyber-cyan header-glow uppercase">Forward Synthesis // Portfolio Quantum Analysis</h1>
+            <p class="text-xs font-mono text-os-muted mt-1">ALLOCATION MATRIX • VAR • STRATEGIC BARBELL • ASSET TOPOGRAPHY</p>
+        </div>
+        <div class="flex gap-6 text-right">
+            <div>
+                <div class="text-[10px] font-mono text-os-muted uppercase">Gross Exposure</div>
+                <div class="text-xl font-mono text-os-text font-bold">142.5%</div>
+            </div>
+            <div>
+                <div class="text-[10px] font-mono text-os-muted uppercase">1-Day VaR (99%)</div>
+                <div class="text-xl font-mono text-cyber-red font-bold animate-pulse">$4.2M</div>
+            </div>
+        </div>
+    </header>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 flex-1 min-h-0">
+        <!-- Target Allocation Doughnut -->
+        <div class="glass-panel p-4 flex flex-col h-full">
+            <h2 class="text-xs font-mono font-bold text-cyber-cyan uppercase mb-4 border-b border-os-border pb-2 shrink-0">Target Asset Allocation</h2>
+            <div class="flex-1 relative min-h-[200px]">
+                <canvas id="allocChart"></canvas>
+            </div>
+            <div class="text-[10px] font-mono text-os-muted mt-4 bg-os-window p-3 border border-os-border rounded shrink-0">
+                <span class="text-cyber-cyan font-bold">Strategy Barbell:</span> Bimodal distribution. Pairing deep value defensive moats (MCD) against hyper-growth AI infrastructure (PLTR, ARM).
+            </div>
+        </div>
+
+        <!-- Risk Topography Bubble Chart -->
+        <div class="glass-panel p-4 flex flex-col h-full">
+            <h2 class="text-xs font-mono font-bold text-cyber-purple uppercase mb-4 border-b border-os-border pb-2 shrink-0">Risk / Reward Topography</h2>
+            <div class="flex-1 relative min-h-[200px]">
+                <canvas id="bubbleChart"></canvas>
+            </div>
+            <div class="text-[9px] font-mono text-os-muted mt-2 text-center shrink-0">X: Volatility Risk | Y: Upside Potential | Size: Allocation</div>
+        </div>
+
+        <!-- Live Positions Matrix -->
+        <div class="glass-panel p-4 flex flex-col h-full overflow-hidden">
+            <h2 class="text-xs font-mono font-bold text-os-text uppercase mb-4 border-b border-os-border pb-2 shrink-0">Active Holdings Matrix</h2>
+            <div class="flex-1 overflow-auto">
+                <table class="data-table w-full text-[10px] font-mono">
+                    <thead class="sticky top-0 bg-os-panel">
+                        <tr>
+                            <th>Ticker</th>
+                            <th>Weight</th>
+                            <th>Entry</th>
+                            <th>Spot</th>
+                            <th class="text-right">PnL</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="cursor-crosshair transition-colors">
+                            <td class="font-bold text-cyber-cyan">PLTR</td>
+                            <td>12.5%</td>
+                            <td>$21.40</td>
+                            <td>$26.15</td>
+                            <td class="text-right text-cyber-green font-bold">+22.1%</td>
+                        </tr>
+                        <tr class="cursor-crosshair transition-colors">
+                            <td class="font-bold text-cyber-cyan">ARM</td>
+                            <td>10.0%</td>
+                            <td>$110.50</td>
+                            <td>$135.20</td>
+                            <td class="text-right text-cyber-green font-bold">+22.3%</td>
+                        </tr>
+                        <tr class="cursor-crosshair transition-colors">
+                            <td class="font-bold text-cyber-amber">MCD</td>
+                            <td>15.0%</td>
+                            <td>$280.10</td>
+                            <td>$275.40</td>
+                            <td class="text-right text-cyber-red font-bold">-1.6%</td>
+                        </tr>
+                        <tr class="cursor-crosshair transition-colors">
+                            <td class="font-bold text-cyber-purple">BTC</td>
+                            <td>10.0%</td>
+                            <td>$68,500</td>
+                            <td>$80,346</td>
+                            <td class="text-right text-cyber-green font-bold">+17.2%</td>
+                        </tr>
+                        <tr class="cursor-crosshair transition-colors">
+                            <td class="font-bold text-cyber-amber">XOM</td>
+                            <td>8.5%</td>
+                            <td>$115.00</td>
+                            <td>$118.50</td>
+                            <td class="text-right text-cyber-green font-bold">+3.0%</td>
+                        </tr>
+                        <tr class="cursor-crosshair transition-colors bg-cyber-red/5">
+                            <td class="font-bold text-cyber-red">SATS (Short)</td>
+                            <td>-5.0%</td>
+                            <td>$14.20</td>
+                            <td>$11.10</td>
+                            <td class="text-right text-cyber-green font-bold">+21.8%</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Risk Factors Row -->
+    <div class="glass-panel p-4 shrink-0 flex flex-col md:flex-row gap-6 items-center">
+        <div class="flex-1 w-full">
+            <h2 class="text-xs font-mono font-bold text-os-text uppercase mb-4 border-b border-os-border pb-2">Macro Factor Exposures (Beta)</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 font-mono text-xs">
+
+                <div class="flex flex-col gap-1">
+                    <div class="flex justify-between text-[10px]"><span class="text-os-muted font-bold">Equity (SPY)</span><span class="text-cyber-green font-bold">0.85</span></div>
+                    <div class="w-full bg-os-bg h-1.5 rounded"><div class="bg-cyber-green h-1.5 rounded" style="width: 85%"></div></div>
+                </div>
+
+                <div class="flex flex-col gap-1">
+                    <div class="flex justify-between text-[10px]"><span class="text-os-muted font-bold">Rate Duration</span><span class="text-cyber-amber font-bold">0.40</span></div>
+                    <div class="w-full bg-os-bg h-1.5 rounded"><div class="bg-cyber-amber h-1.5 rounded" style="width: 40%"></div></div>
+                </div>
+
+                <div class="flex flex-col gap-1">
+                    <div class="flex justify-between text-[10px]"><span class="text-os-muted font-bold">Geopolitical Shock</span><span class="text-cyber-purple font-bold">0.95</span></div>
+                    <div class="w-full bg-os-bg h-1.5 rounded shadow-[0_0_8px_rgba(181,60,255,0.6)]"><div class="bg-cyber-purple h-1.5 rounded" style="width: 95%"></div></div>
+                </div>
+
+                <div class="flex flex-col gap-1">
+                    <div class="flex justify-between text-[10px]"><span class="text-os-muted font-bold">Credit Spread Blowout</span><span class="text-cyber-red font-bold">-0.30</span></div>
+                    <div class="w-full bg-os-bg h-1.5 rounded relative"><div class="bg-cyber-red h-1.5 rounded absolute right-1/2" style="width: 30%"></div></div>
+                </div>
+
+            </div>
+        </div>
+        <div class="shrink-0 p-3 border border-cyber-red bg-cyber-red/10 rounded font-mono text-[10px] text-cyber-red font-bold max-w-xs leading-relaxed animate-pulse">
+            <span class="text-os-text">SYSTEM ALERT:</span> Structural overexposure to data-center capacity constraints and Taiwan geopolitics. Hedge active via XOM & Short Legacy BSL.
+        </div>
+    </div>
+
+    <script>
+        Chart.defaults.color = '#64748b';
+        Chart.defaults.font.family = "'JetBrains Mono', monospace";
+        Chart.defaults.plugins.tooltip.backgroundColor = 'rgba(10, 13, 20, 0.95)';
+        Chart.defaults.plugins.tooltip.titleColor = '#ffffff';
+        Chart.defaults.plugins.tooltip.borderColor = 'rgba(0, 229, 255, 0.25)';
+        Chart.defaults.plugins.tooltip.borderWidth = 1;
+
+        // Doughnut Chart
+        const ctxAlloc = document.getElementById('allocChart').getContext('2d');
+        new Chart(ctxAlloc, {
+            type: 'doughnut',
+            data: {
+                labels: ['AI / Data Infra', 'Defensive Moats', 'Crypto (BTC)', 'Short Legacy Credit', 'Cash / Treasuries'],
+                datasets: [{
+                    data: [35, 25, 10, 15, 15],
+                    backgroundColor: ['#00e5ff', '#ffaa00', '#b53cff', '#ff1e38', '#00fa9a'],
+                    borderWidth: 2,
+                    borderColor: '#0a0d14',
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '75%',
+                plugins: {
+                    legend: { position: 'bottom', labels: { boxWidth: 10, font: {size: 9}, color: '#64748b' } }
+                }
+            }
+        });
+
+        // Bubble Chart
+        const ctxBubble = document.getElementById('bubbleChart').getContext('2d');
+        new Chart(ctxBubble, {
+            type: 'bubble',
+            data: {
+                datasets: [{
+                    label: 'Portfolio Holdings',
+                    data: [
+                        {x: 85, y: 90, r: 12.5, ticker: 'PLTR'},
+                        {x: 95, y: 85, r: 10.0, ticker: 'ARM'},
+                        {x: 20, y: 15, r: 15.0, ticker: 'MCD'},
+                        {x: 35, y: 40, r: 8.5, ticker: 'XOM'},
+                        {x: 100, y: 100, r: 10.0, ticker: 'BTC'},
+                        {x: 75, y: 80, r: 5.0, ticker: 'SATS (Short)'}
+                    ],
+                    backgroundColor: 'rgba(0, 229, 255, 0.4)',
+                    borderColor: '#00e5ff',
+                    borderWidth: 1,
+                    hoverBackgroundColor: '#00e5ff',
+                    hoverRadius: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: (ctx) => `${ctx.raw.ticker}: Risk ${ctx.raw.x}, Reward ${ctx.raw.y}, Alloc ${ctx.raw.r}%`
+                        }
+                    }
+                },
+                scales: {
+                    x: { grid: { color: 'rgba(255,255,255,0.05)' }, title: { display: true, text: 'Volatility Risk', font:{size: 9} }, min: 0, max: 110 },
+                    y: { grid: { color: 'rgba(255,255,255,0.05)' }, title: { display: true, text: 'Upside Reward', font:{size: 9} }, min: 0, max: 110 }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

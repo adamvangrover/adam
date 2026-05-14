@@ -170,8 +170,15 @@
                 <span class="font-mono text-xs font-bold text-os-text">INDEX</span>
             </div>
             <div class="flex-1 overflow-y-auto p-2" id="nav-container">
+                <!-- Forward Synthesis & Outlook -->
+                <div class="text-[10px] font-mono text-cyber-purple uppercase tracking-widest mb-2 mt-2 px-2">Forward Synthesis</div>
+                <div class="nav-item p-2 text-xs font-mono rounded flex items-center gap-2" onclick="loadDate('macro_tail_risks', this)"><i data-lucide="globe" class="w-3.5 h-3.5 text-cyber-purple"></i>Macro & Tail Risks</div>
+                <div class="nav-item p-2 text-xs font-mono rounded flex items-center gap-2" onclick="loadDate('industry_watchlists', this)"><i data-lucide="eye" class="w-3.5 h-3.5 text-cyber-purple"></i>Industry Watchlists</div>
+                <div class="nav-item p-2 text-xs font-mono rounded flex items-center gap-2" onclick="loadDate('rates_outlook', this)"><i data-lucide="trending-up" class="w-3.5 h-3.5 text-cyber-purple"></i>Rates & Prices Outlook</div>
+                <div class="nav-item p-2 text-xs font-mono rounded flex items-center gap-2" onclick="loadDate('portfolio_analysis', this)"><i data-lucide="pie-chart" class="w-3.5 h-3.5 text-cyber-purple"></i>Portfolio Analysis</div>
+
                 <!-- Historic Crises -->
-                <div class="text-[10px] font-mono text-cyber-amber uppercase tracking-widest mb-2 mt-2 px-2">Historical Crises</div>
+                <div class="text-[10px] font-mono text-cyber-amber uppercase tracking-widest mb-2 mt-4 px-2">Historical Crises</div>
                 <div class="nav-item p-2 text-xs font-mono rounded" onclick="loadDate('1987-10-23', this)">1987-10-23 <span class="text-[10px] text-os-muted ml-1">Black Monday</span></div>
                 <div class="nav-item p-2 text-xs font-mono rounded" onclick="loadDate('2000-03-10', this)">2000-03-10 <span class="text-[10px] text-os-muted ml-1">Dot Com Peak</span></div>
                 <div class="nav-item p-2 text-xs font-mono rounded" onclick="loadDate('2008-09-15', this)">2008-09-15 <span class="text-[10px] text-os-muted ml-1">Lehman Bros</span></div>
@@ -296,6 +303,10 @@
         function getFilenameForDate(date) {
             // Mapping specific dates to their actual HTML files because not all of them have index.html
             const mapping = {
+                'macro_tail_risks': 'macro_tail_risks.html',
+                'industry_watchlists': 'industry_watchlists.html',
+                'rates_outlook': 'rates_outlook.html',
+                'portfolio_analysis': 'portfolio_analysis.html',
                 '1987-10-23': 'market_mayhem_1987-10-23.md',
                 '2000-03-10': 'market_mayhem_2000-03-10.md',
                 '2008-09-15': 'market_mayhem_2008-09-15.md',
@@ -324,7 +335,6 @@
                 '2026-05-06': 'index.html',
                 '2026-05-07': 'index.html',
                 '2026-05-09': 'index.html',
-
             };
             return mapping[date] || 'index.html';
         }
@@ -339,12 +349,20 @@
             const filename = getFilenameForDate(date);
 
             // Update UI
-            document.getElementById('current-path').textContent = `/showcase/data/adam_daily/${date}/${filename}`;
+            if (date === 'macro_tail_risks' || date === 'industry_watchlists' || date === 'rates_outlook' || date === 'portfolio_analysis') {
+                document.getElementById('current-path').textContent = `/showcase/data/adam_daily/${filename}`;
+            } else {
+                document.getElementById('current-path').textContent = `/showcase/data/adam_daily/${date}/${filename}`;
+            }
             document.getElementById('iframe-loader').style.display = 'flex';
             
             // Set Iframe src (Relative path from current directory)
             const iframe = document.getElementById('main-frame');
-            iframe.src = `${date}/${filename}`;
+            if (date === 'macro_tail_risks' || date === 'industry_watchlists' || date === 'rates_outlook' || date === 'portfolio_analysis') {
+                iframe.src = `${filename}`;
+            } else {
+                iframe.src = `${date}/${filename}`;
+            }
 
             addLog(`UPLINK ESTABLISHED to Nexus Node: ${date} (${filename})`, 'info');
         }
@@ -361,14 +379,18 @@
         function openNewTab() {
             if(currentDate) {
                 const filename = getFilenameForDate(currentDate);
-                window.open(`${currentDate}/${filename}`, '_blank');
+                if (currentDate === 'macro_tail_risks' || currentDate === 'industry_watchlists' || currentDate === 'rates_outlook' || currentDate === 'portfolio_analysis') {
+                    window.open(`${filename}`, '_blank');
+                } else {
+                    window.open(`${currentDate}/${filename}`, '_blank');
+                }
             }
         }
 
         // Initialize first date
         setTimeout(() => {
-            const first2026 = document.querySelector('#nexus-dates .nav-item');
-            if(first2026) loadDate('2026-03-24', first2026);
+            const firstSynthesis = document.querySelector('#nav-container .nav-item');
+            if(firstSynthesis) loadDate('macro_tail_risks', firstSynthesis);
         }, 100);
 
 
