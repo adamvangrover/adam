@@ -58,6 +58,13 @@
         /* Terminal Cursor */
         @keyframes blink { 50% { opacity: 0; } }
         .cursor-blink { animation: blink 1s step-start infinite; }
+        
+        .tab-btn { transition: all 0.2s ease; }
+        .tab-btn.active { border-bottom: 2px solid #3b82f6; color: #fff; background: rgba(59, 130, 246, 0.1); }
+        .chat-container { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .chat-container.closed { transform: translateY(calc(100% - 3rem)); }
+        .pitch-dot { transition: all 0.3s ease; }
+        .pitch-dot.hidden-pitch { opacity: 0; transform: scale(0); pointer-events: none; }
     </style>
 </head>
 <body class="min-h-screen p-4 md:p-6 lg:p-8">
@@ -106,11 +113,17 @@
                 <h2 class="text-xl font-bold text-white"><i class="fas fa-stadium text-blue-400 mr-2"></i>Game Recap: Citi Field</h2>
                 <div class="flex gap-2">
                     <span class="bg-slate-800 text-xs px-3 py-1 rounded-full text-slate-300 mono border border-slate-700"><i class="fas fa-calendar-day mr-1"></i>May 14, 2026</span>
-                    <span class="bg-blue-900/30 text-blue-400 text-xs px-3 py-1 rounded-full mono border border-blue-800/50"><i class="fas fa-cloud-sun mr-1"></i>68°F | Wind 8mph CF</span>
+                    <span class="bg-blue-900/30 text-blue-400 text-xs px-3 py-1 rounded-full mono border border-blue-800/50"><i class="fas fa-cloud-sun mr-1"></i>68°F | Wind 12mph CF</span>
                 </div>
             </div>
+
+            <div class="flex gap-1 mb-4 border-b border-slate-800 pb-px">
+                <button onclick="switchTab('recap', 'summary')" id="tab-summary" class="tab-btn active px-4 py-2 text-xs font-bold text-slate-400 uppercase tracking-wider rounded-t-lg">Summary</button>
+                <button onclick="switchTab('recap', 'pbp')" id="tab-pbp" class="tab-btn px-4 py-2 text-xs font-bold text-slate-400 uppercase tracking-wider rounded-t-lg">Play-by-Play</button>
+                <button onclick="switchTab('recap', 'advanced')" id="tab-advanced" class="tab-btn px-4 py-2 text-xs font-bold text-slate-400 uppercase tracking-wider rounded-t-lg">Advanced Metrics</button>
+            </div>
             
-            <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+            <div id="content-summary" class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
                 <!-- Scoreboard -->
                 <div class="md:col-span-5 bg-slate-900/50 p-5 rounded-xl border border-slate-800 relative overflow-hidden">
                     <div class="absolute inset-0 bg-[url('https://placehold.co/400x200/0f172a/1e293b?text=Citi+Field+Night')] opacity-20 bg-cover bg-center mix-blend-overlay"></div>
@@ -119,6 +132,7 @@
                             <span class="text-3xl font-black text-white">NYM</span>
                             <span class="text-5xl text-orange-500 font-black drop-shadow-[0_0_10px_rgba(249,115,22,0.5)]">9</span>
                             <span class="text-xs text-slate-400 mt-1 font-mono">11 Hits, 0 Err</span>
+                            <span class="text-[10px] text-slate-500 mt-1">WP: Senga (4-1)</span>
                         </div>
                         <div class="flex flex-col items-center px-4">
                             <span class="text-slate-500 text-xs font-semibold uppercase tracking-widest mb-1">Final</span>
@@ -128,8 +142,17 @@
                             <span class="text-3xl font-black text-slate-300">DET</span>
                             <span class="text-5xl text-slate-400 font-black">4</span>
                             <span class="text-xs text-slate-400 mt-1 font-mono">6 Hits, 1 Err</span>
+                            <span class="text-[10px] text-slate-500 mt-1">LP: Skubal (5-2)</span>
                         </div>
                     </div>
+                    <!-- Innings Line -->
+                    <table class="w-full mt-4 text-[10px] text-center text-slate-400 mono border-t border-slate-800 pt-2">
+                        <thead><tr><th></th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>9</th><th>R</th><th>H</th><th>E</th></tr></thead>
+                        <tbody>
+                            <tr><td class="text-left font-sans font-bold">DET</td><td>0</td><td>1</td><td>0</td><td>2</td><td>0</td><td>1</td><td>0</td><td>0</td><td>0</td><td class="text-white font-bold">4</td><td>6</td><td>1</td></tr>
+                            <tr><td class="text-left font-sans font-bold text-orange-400">NYM</td><td>2</td><td>0</td><td>4</td><td>1</td><td>0</td><td>2</td><td>0</td><td>0</td><td>X</td><td class="text-orange-400 font-bold">9</td><td>11</td><td>0</td></tr>
+                        </tbody>
+                    </table>
                 </div>
 
                 <!-- Highlights Timeline -->
@@ -144,7 +167,12 @@
                         <div class="relative">
                             <div class="absolute -left-[21px] top-1 w-2.5 h-2.5 bg-orange-500 rounded-full border border-slate-900 shadow-[0_0_8px_rgba(249,115,22,0.8)]"></div>
                             <strong class="text-white">Bot 3rd: Alonso's Moonshot</strong>
-                            <p class="text-slate-400 text-xs mt-0.5">Pete Alonso crushes a 3-run HR to center field, traveling <span class="text-orange-300 font-mono">421 ft</span>. Completely breaks the game open.</p>
+                            <p class="text-slate-400 text-xs mt-0.5">Pete Alonso crushes a 3-run HR to center field, traveling <span class="text-orange-300 font-mono">421 ft</span>. Completely breaks the game open. (xBA .980)</p>
+                        </div>
+                        <div class="relative">
+                            <div class="absolute -left-[21px] top-1 w-2.5 h-2.5 bg-emerald-500 rounded-full border border-slate-900 shadow-[0_0_8px_rgba(16,185,129,0.8)]"></div>
+                            <strong class="text-white">Top 5th: Nimmo's Diving Catch</strong>
+                            <p class="text-slate-400 text-xs mt-0.5">Brandon Nimmo saves 2 runs with a 4-star catch in left-center. Catch Probability: <span class="text-emerald-300 font-mono">22%</span>.</p>
                         </div>
                         <div class="relative">
                             <div class="absolute -left-[21px] top-1 w-2.5 h-2.5 bg-slate-400 rounded-full border border-slate-900 shadow-[0_0_8px_rgba(148,163,184,0.8)]"></div>
@@ -152,6 +180,34 @@
                             <p class="text-slate-400 text-xs mt-0.5">Nolan McLean enters in relief, striking out the side with fastballs topping at <span class="text-white font-mono">101.4 mph</span>.</p>
                         </div>
                     </div>
+                </div>
+            </div>
+
+            <div id="content-pbp" class="hidden space-y-4">
+                <div class="bg-slate-900/50 p-4 rounded-xl border border-slate-800 max-h-64 overflow-y-auto">
+                    <ul class="space-y-3 text-xs text-slate-300">
+                        <li class="border-b border-slate-800 pb-2"><span class="text-orange-400 font-bold mr-2">Bot 6th</span> Nimmo walks. Lindor strikes out swinging. Alonso doubles to right (RBI). Nimmo scores.</li>
+                        <li class="border-b border-slate-800 pb-2"><span class="text-orange-400 font-bold mr-2">Bot 6th</span> Martinez singles up the middle (RBI). Alonso scores.</li>
+                        <li class="border-b border-slate-800 pb-2"><span class="text-slate-500 font-bold mr-2">Top 6th</span> Greene homers to right center (402 ft).</li>
+                        <li class="border-b border-slate-800 pb-2"><span class="text-slate-500 font-bold mr-2">Top 5th</span> Baez grounds into double play. Pitch Challenge: Overturned to ball (Hawk-Eye).</li>
+                        <li><span class="text-slate-500 italic">Load more plays...</span></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div id="content-advanced" class="hidden grid grid-cols-2 gap-4">
+                <div class="bg-slate-900/50 p-4 rounded-xl border border-slate-800">
+                    <h4 class="text-xs uppercase text-slate-500 mb-2 font-bold">Weather Impact API</h4>
+                    <p class="text-xs text-slate-300 mb-2">Wind gusts at 12mph blowing out to CF increased HR probability index by +14%.</p>
+                    <div class="flex items-center gap-2"><i class="fas fa-wind text-blue-400"></i><div class="h-1.5 w-full bg-slate-800 rounded-full"><div class="h-full bg-blue-500 w-[65%] rounded-full"></div></div></div>
+                </div>
+                <div class="bg-slate-900/50 p-4 rounded-xl border border-slate-800">
+                    <h4 class="text-xs uppercase text-slate-500 mb-2 font-bold">Pitcher Stuff+</h4>
+                    <ul class="text-xs text-slate-300 space-y-1 font-mono">
+                        <li>Senga Forkball: <span class="text-emerald-400">128</span> (Elite)</li>
+                        <li>Skubal Changeup: <span class="text-orange-400">92</span> (Below Avg)</li>
+                        <li>McLean Fastball: <span class="text-emerald-400">145</span> (Max)</li>
+                    </ul>
                 </div>
             </div>
         </section>
@@ -171,8 +227,11 @@
                     <div class="w-12 h-12 shrink-0 rounded-full bg-black flex items-center justify-center border-2 border-red-500 shadow-[0_0_15px_rgba(239,68,68,0.6)]">
                         <i class="fas fa-jedi text-white text-lg"></i>
                     </div>
-                    <div>
-                        <div class="text-white font-bold text-sm flex items-center gap-2">Pete Alonso <span class="bg-red-500/20 text-red-400 text-[9px] px-1.5 py-0.5 rounded border border-red-500/30 tracking-wider">SITH LORD</span></div>
+                    <div class="flex-1">
+                        <div class="text-white font-bold text-sm flex items-center justify-between">
+                            <span class="flex items-center gap-2">Pete Alonso <span class="bg-red-500/20 text-red-400 text-[9px] px-1.5 py-0.5 rounded border border-red-500/30 tracking-wider">SITH LORD</span></span>
+                            <span class="text-[10px] mono text-red-400">FORCE: 112 MPH</span>
+                        </div>
                         <div class="text-[11px] text-slate-400 mt-0.5">Red saber AR overlay on HR trot.</div>
                     </div>
                 </div>
@@ -181,9 +240,25 @@
                     <div class="w-12 h-12 shrink-0 rounded-full bg-slate-800 flex items-center justify-center border-2 border-slate-300 shadow-[0_0_15px_rgba(148,163,184,0.6)]">
                         <i class="fas fa-mask text-slate-300 text-lg"></i>
                     </div>
-                    <div>
-                        <div class="text-white font-bold text-sm flex items-center gap-2">Nolan McLean <span class="bg-slate-500/20 text-slate-300 text-[9px] px-1.5 py-0.5 rounded border border-slate-500/30 tracking-wider">MANDO</span></div>
+                    <div class="flex-1">
+                        <div class="text-white font-bold text-sm flex items-center justify-between">
+                            <span class="flex items-center gap-2">Nolan McLean <span class="bg-slate-500/20 text-slate-300 text-[9px] px-1.5 py-0.5 rounded border border-slate-500/30 tracking-wider">MANDO</span></span>
+                            <span class="text-[10px] mono text-slate-300">BESKAR VELO: 101 MPH</span>
+                        </div>
                         <div class="text-[11px] text-slate-400 mt-0.5">Exclusive stadium Bobblehead drop.</div>
+                    </div>
+                </div>
+                
+                <div class="flex items-center gap-4 bg-gradient-to-r from-green-900/30 to-slate-900/80 p-3 rounded-xl border border-green-800/50 relative group">
+                    <div class="w-12 h-12 shrink-0 rounded-full bg-slate-900 flex items-center justify-center border-2 border-green-500 shadow-[0_0_15px_rgba(34,197,94,0.4)]">
+                        <i class="fas fa-robot text-green-400 text-lg"></i>
+                    </div>
+                    <div class="flex-1">
+                        <div class="text-white font-bold text-sm flex items-center justify-between">
+                            <span class="flex items-center gap-2">Kodai Senga <span class="bg-green-500/20 text-green-400 text-[9px] px-1.5 py-0.5 rounded border border-green-500/30 tracking-wider">JEDI MASTER</span></span>
+                            <span class="text-[10px] mono text-green-400">MIND TRICK: 8 K's</span>
+                        </div>
+                        <div class="text-[11px] text-slate-400 mt-0.5">Ghost-fork rendered as Force illusion on Jumbotron.</div>
                     </div>
                 </div>
             </div>
@@ -271,6 +346,23 @@
                     <p class="text-[10px] text-slate-500 mt-6 text-center">
                         <i class="fas fa-info-circle mr-1"></i>MGM and DraftKings filings indicate automated risk models shifted the run-line heavily prior to first pitch due to weather API integrations confirming wind blowing out.
                     </p>
+
+                    <div class="mt-4 pt-4 border-t border-slate-700/50">
+                        <h4 class="text-xs uppercase tracking-widest text-slate-400 font-bold mb-2">Algorithmic Line Movement</h4>
+                        <div class="flex items-end h-16 gap-1 bg-slate-950 p-2 rounded border border-slate-800">
+                            <!-- Simulated bar chart for line movement -->
+                            <div class="w-1/6 bg-slate-700 h-[30%] rounded-t group relative"><div class="absolute -top-6 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 text-[9px] bg-black px-1 rounded transition-opacity">8AM</div></div>
+                            <div class="w-1/6 bg-slate-600 h-[40%] rounded-t group relative"><div class="absolute -top-6 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 text-[9px] bg-black px-1 rounded transition-opacity">10AM</div></div>
+                            <div class="w-1/6 bg-blue-900 h-[60%] rounded-t group relative"><div class="absolute -top-6 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 text-[9px] bg-black px-1 border border-blue-500 text-blue-300 rounded transition-opacity w-max z-10">Weather API Hit</div></div>
+                            <div class="w-1/6 bg-orange-600 h-[85%] rounded-t group relative"><div class="absolute -top-6 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 text-[9px] bg-black px-1 rounded transition-opacity">2PM</div></div>
+                            <div class="w-1/6 bg-orange-500 h-[95%] rounded-t group relative"><div class="absolute -top-6 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 text-[9px] bg-black px-1 rounded transition-opacity">4PM</div></div>
+                            <div class="w-1/6 bg-orange-400 h-[100%] rounded-t group relative"><div class="absolute -top-6 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 text-[9px] bg-black px-1 border border-orange-500 text-orange-300 rounded transition-opacity w-max z-10">First Pitch</div></div>
+                        </div>
+                        <div class="flex justify-between text-[9px] text-slate-500 mt-1 uppercase">
+                            <span>Open (8.0)</span>
+                            <span>Line Moved to 9.0</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -283,6 +375,12 @@
             </div>
             
             <div class="flex flex-col items-center justify-center">
+
+                <div class="w-full flex justify-center gap-2 mb-4">
+                    <button onclick="togglePitches('strike')" class="text-[10px] px-2 py-1 rounded bg-emerald-900/30 text-emerald-400 border border-emerald-800/50 hover:bg-emerald-800/50 transition-colors">Toggle Strikes</button>
+                    <button onclick="togglePitches('ball')" class="text-[10px] px-2 py-1 rounded bg-red-900/30 text-red-400 border border-red-800/50 hover:bg-red-800/50 transition-colors">Toggle Balls</button>
+                </div>
+
                 <!-- Interactive SVG Pitch Zone -->
                 <div class="relative w-48 h-56 bg-slate-900/50 rounded-lg border border-slate-700/50 flex items-center justify-center overflow-hidden group">
                     <svg viewBox="0 0 100 120" class="w-full h-full drop-shadow-xl z-10">
@@ -297,20 +395,29 @@
                         <line x1="30" y1="60" x2="70" y2="60" stroke="#cbd5e1" stroke-width="0.5" opacity="0.5"/>
                         
                         <!-- Pitches (Data plotted) -->
-                        <circle cx="34" cy="74" r="3.5" fill="#22c55e" class="shadow-glow-green cursor-pointer hover:r-5 transition-all">
+                        <circle cx="34" cy="74" r="3.5" fill="#22c55e" class="pitch-dot strike shadow-glow-green cursor-pointer hover:r-5 transition-all">
                             <title>Strike 3 (Called) - 101mph</title>
                         </circle>
-                        <circle cx="66" cy="24" r="3.5" fill="#22c55e" class="shadow-glow-green cursor-pointer hover:r-5 transition-all">
+                        <circle cx="66" cy="24" r="3.5" fill="#22c55e" class="pitch-dot strike shadow-glow-green cursor-pointer hover:r-5 transition-all">
                             <title>Strike 1 (Swinging) - 88mph</title>
                         </circle>
-                        <circle cx="26" cy="45" r="3.5" fill="#ef4444" class="shadow-glow-red cursor-pointer hover:r-5 transition-all">
+                        <circle cx="32" cy="22" r="3.5" fill="#22c55e" class="pitch-dot strike shadow-glow-green cursor-pointer hover:r-5 transition-all">
+                            <title>Strike 2 (Foul) - 94mph</title>
+                        </circle>
+
+                        <circle cx="26" cy="45" r="3.5" fill="#ef4444" class="pitch-dot ball shadow-glow-red cursor-pointer hover:r-5 transition-all">
                             <title>Ball 1 - Challenge Overturned</title>
                         </circle>
-                        <circle cx="26" cy="45" r="5" fill="none" stroke="#ef4444" stroke-width="1" class="animate-ping" opacity="0.7"/> <!-- Overturn highlight -->
-                        <circle cx="75" cy="85" r="3.5" fill="#ef4444" class="shadow-glow-red cursor-pointer hover:r-5 transition-all">
+                        <circle cx="26" cy="45" r="5" fill="none" stroke="#ef4444" stroke-width="1" class="animate-ping ball" opacity="0.7"/> <!-- Overturn highlight -->
+                        
+                        <circle cx="75" cy="85" r="3.5" fill="#ef4444" class="pitch-dot ball shadow-glow-red cursor-pointer hover:r-5 transition-all">
                             <title>Ball 2 - 84mph Slider</title>
                         </circle>
-                        <circle cx="50" cy="50" r="3.5" fill="#f97316" class="shadow-glow-orange cursor-pointer hover:r-5 transition-all">
+                        <circle cx="48" cy="95" r="3.5" fill="#ef4444" class="pitch-dot ball shadow-glow-red cursor-pointer hover:r-5 transition-all">
+                            <title>Ball 3 - 88mph Splitter in dirt</title>
+                        </circle>
+
+                        <circle cx="50" cy="50" r="3.5" fill="#f97316" class="pitch-dot in-play shadow-glow-orange cursor-pointer hover:r-5 transition-all">
                             <title>Alonso HR - 84mph Slider (Middle/Middle)</title>
                         </circle>
                     </svg>
@@ -325,8 +432,13 @@
                         <span class="text-slate-400"><i class="fas fa-circle text-red-500 text-[10px] mr-1"></i>Balls</span>
                         <span class="text-slate-400"><i class="fas fa-circle text-orange-500 text-[10px] mr-1"></i>In-Play</span>
                     </div>
-                    <div class="bg-blue-900/20 border border-blue-800/40 p-2 rounded text-[10px] text-blue-300 text-center">
-                        <strong>AI Overturn Event:</strong> Top 5th inning, 0.18 inches off plate. Margin confirmed by AI tracking.
+                    <div class="bg-blue-900/20 border border-blue-800/40 p-3 rounded text-[10px] text-blue-300 relative overflow-hidden">
+                        <div class="absolute right-0 top-0 h-full w-1/3 bg-gradient-to-l from-blue-500/20 to-transparent"></div>
+                        <strong class="text-blue-400 block mb-1 font-mono uppercase border-b border-blue-800/50 pb-1">AI Challenge Log: Top 5th</strong>
+                        Batter: Riley Greene (3-2 count).<br>
+                        Umpire: Called Strike 3.<br>
+                        Hawk-Eye Margin: <span class="text-white font-bold bg-blue-900 px-1 rounded">0.12 inches</span> off plate.<br>
+                        Result: <span class="text-red-400 font-bold">OVERTURNED TO BALL 4</span>.
                     </div>
                 </div>
             </div>
@@ -342,7 +454,10 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <!-- MSG -->
                 <div class="space-y-3">
-                    <h3 class="text-red-400 font-bold border-l-2 border-red-500 pl-3 uppercase tracking-wide text-sm">MSG "Threat Management" Policy</h3>
+                    <h3 class="text-red-400 font-bold border-l-2 border-red-500 pl-3 uppercase tracking-wide text-sm flex justify-between items-center">
+                        MSG "Threat Management" Policy
+                        <i class="fas fa-expand cursor-pointer text-slate-500 hover:text-white transition-colors" title="Expand Details"></i>
+                    </h3>
                     <p class="text-sm text-slate-300 leading-relaxed">
                         Madison Square Garden implements controversial facial recognition software to enforce an "Enemy Ban" against adverse attorneys and legal critics. 
                     </p>
@@ -350,17 +465,28 @@
                         <li><strong class="text-slate-200">Mechanism:</strong> High-definition biometrics scan faces at ticket turnstiles, matching them against legal databases.</li>
                         <li><strong class="text-slate-200">Legal Friction:</strong> This data weaponization draws scrutiny from the NY AG, questioning the line between public safety and corporate vindictiveness.</li>
                     </ul>
+                    
+                    <div class="mt-4 h-12 w-full bg-slate-900 border border-slate-700 rounded relative overflow-hidden flex items-center px-4">
+                        <div class="absolute left-0 top-0 h-full w-1 bg-red-500 shadow-[0_0_15px_rgba(239,68,68,1)]" style="animation: scan 2s linear infinite alternate;"></div>
+                        <style>@keyframes scan { from { left: 0; } to { left: 100%; } }</style>
+                        <i class="fas fa-users text-slate-600 mr-4 text-xl"></i>
+                        <div class="font-mono text-[9px] text-red-400">BIOMETRIC_SCAN_ACTIVE<br><span class="text-slate-500 animate-pulse">Processing ID matrix...</span></div>
+                    </div>
                 </div>
 
                 <!-- DraftKings/MGM -->
                 <div class="space-y-3">
-                    <h3 class="text-emerald-400 font-bold border-l-2 border-emerald-500 pl-3 uppercase tracking-wide text-sm">Sportsbook Machine Learning (10-K)</h3>
+                    <h3 class="text-emerald-400 font-bold border-l-2 border-emerald-500 pl-3 uppercase tracking-wide text-sm flex justify-between items-center">
+                        Sportsbook Machine Learning (10-K)
+                        <i class="fas fa-expand cursor-pointer text-slate-500 hover:text-white transition-colors" title="Expand Details"></i>
+                    </h3>
                     <p class="text-sm text-slate-300 leading-relaxed">
                         Conversely, DraftKings and MGM utilize massive behavioral telemetry (app usage, wager timing, location) to achieve market efficiency and mitigate liability.
                     </p>
                     <ul class="text-xs space-y-2 text-slate-400 list-disc pl-5 mt-2">
                         <li><strong class="text-slate-200">Mechanism:</strong> Algorithmic profiling identifies "sharp" betting syndicates without requiring physical biometrics.</li>
                         <li><strong class="text-slate-200">Vulnerability:</strong> 2026 SEC Filings cite evolving privacy laws (like those targeting MSG) as major threats to their analytics pipelines.</li>
+                        <li><strong class="text-slate-200">Execution:</strong> "Sharp" models flag accounts placing maximum limit bets precisely when weather APIs trigger game model updates.</li>
                     </ul>
                 </div>
             </div>
@@ -450,6 +576,32 @@
         </section>
 
     </main>
+
+    <div id="rag-chat" class="chat-container closed fixed bottom-0 right-4 md:right-8 w-80 bg-slate-900 border border-slate-700 rounded-t-xl shadow-2xl z-50 flex flex-col h-96">
+        <!-- Chat Header -->
+        <div onclick="toggleChat()" class="bg-blue-600 hover:bg-blue-500 cursor-pointer text-white p-3 rounded-t-xl flex justify-between items-center transition-colors">
+            <div class="flex items-center gap-2">
+                <i class="fas fa-robot"></i>
+                <span class="font-bold text-sm">Dashboard Assistant</span>
+            </div>
+            <i id="chat-icon" class="fas fa-chevron-up text-xs"></i>
+        </div>
+        
+        <!-- Chat Body -->
+        <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-900/90 text-sm">
+            <div class="bg-slate-800 text-slate-200 p-3 rounded-lg rounded-tl-none border border-slate-700 w-[85%] shadow-md">
+                Hello! I have full context on the May 14, 2026 Mets game, DraftKings algorithms, and MSG surveillance policies. Ask me anything about the dashboard data.
+            </div>
+        </div>
+        
+        <!-- Chat Input -->
+        <div class="p-3 border-t border-slate-800 bg-slate-950">
+            <form id="chat-form" onsubmit="handleChatSubmit(event)" class="flex gap-2">
+                <input type="text" id="chat-input" placeholder="Ask about odds, MSG, or the game..." class="flex-1 bg-slate-800 border border-slate-700 text-white text-xs rounded px-3 py-2 focus:outline-none focus:border-blue-500" autocomplete="off">
+                <button type="submit" class="bg-blue-600 text-white px-3 py-2 rounded text-xs hover:bg-blue-500 transition-colors"><i class="fas fa-paper-plane"></i></button>
+            </form>
+        </div>
+    </div>
 
     <script>
         // --- Data Structure for RAG Provenance ---
@@ -642,21 +794,27 @@
                 terminal.innerHTML += `<div class="text-slate-500 pl-4">> Requesting: <span class="text-slate-400">${item.verifyEndpoint}</span></div>`;
                 terminal.scrollTop = terminal.scrollHeight;
                 
-                await sleep(800); // Simulate network latency
+                await sleep(600); 
 
-                // Step 2: Response & Match
-                terminal.innerHTML += `<div class="text-slate-500 pl-4">> Response 200 OK. Parsing semantic JSON...</div>`;
+                // Step 2: Reasoning & NLP Extraction
+                terminal.innerHTML += `<div class="text-purple-400 pl-4">> LLM Reasoning: Analyzing payload semantics for factual grounding...</div>`;
+                terminal.scrollTop = terminal.scrollHeight;
+                await sleep(400);
+
+                // Step 3: Response & Match
+                terminal.innerHTML += `<div class="text-slate-500 pl-4">> Semantic match threshold > 0.98. Source integrity verified.</div>`;
                 terminal.scrollTop = terminal.scrollHeight;
                 
-                await sleep(600);
+                await sleep(500);
 
-                // Step 3: Upgrade Data
-                terminal.innerHTML += `<div class="text-emerald-400 pl-4">> 100% Fact Match Confirmed. Adjusting weights.</div>`;
+                // Step 4: Upgrade Data
+                terminal.innerHTML += `<div class="text-emerald-400 pl-4">> <i class="fas fa-check"></i> Fact Confirmed. Adjusting Conviction to 'High', Weight to 1.0.</div>`;
                 terminal.scrollTop = terminal.scrollHeight;
 
                 // Update Data Object
                 item.confidence = 100.0;
                 item.weight = 1.00;
+                item.conviction = "High";
                 
                 // Visually flash the table row
                 renderProvenanceTable(); 
@@ -702,6 +860,88 @@
             setTimeout(() => animateCounter('comp-tokens', 0, 1420, 1500), 400);
             setTimeout(() => animateCounter('total-tokens', 0, 3265, 1800), 600);
         };
+
+        function switchTab(group, tabId) {
+            if(group === 'recap') {
+                document.getElementById('tab-summary').classList.remove('active');
+                document.getElementById('tab-pbp').classList.remove('active');
+                document.getElementById('tab-advanced').classList.remove('active');
+                
+                document.getElementById('content-summary').classList.add('hidden');
+                document.getElementById('content-pbp').classList.add('hidden');
+                document.getElementById('content-advanced').classList.add('hidden');
+                
+                document.getElementById(`tab-${tabId}`).classList.add('active');
+                document.getElementById(`content-${tabId}`).classList.remove('hidden');
+            }
+        }
+
+        function togglePitches(type) {
+            const elements = document.querySelectorAll(`.pitch-dot.${type}`);
+            elements.forEach(el => {
+                el.classList.toggle('hidden-pitch');
+            });
+        }
+
+        function toggleChat() {
+            const chat = document.getElementById('rag-chat');
+            const icon = document.getElementById('chat-icon');
+            if (chat.classList.contains('closed')) {
+                chat.classList.remove('closed');
+                icon.classList.replace('fa-chevron-up', 'fa-chevron-down');
+                document.getElementById('chat-input').focus();
+            } else {
+                chat.classList.add('closed');
+                icon.classList.replace('fa-chevron-down', 'fa-chevron-up');
+            }
+        }
+
+        const kb = [
+            { keywords: ['odds', 'shift', 'line', 'move', 'sharp', 'over', 'weather'], response: "The DraftKings line moved heavily towards the Over 8.5 because weather APIs detected 12mph winds blowing out to Center Field, increasing the HR probability index by 14%. Algorithmic syndicates (Sharps) immediately hammered the Over." },
+            { keywords: ['msg', 'madison', 'square', 'garden', 'facial', 'enemy', 'ban'], response: "MSG uses advanced facial recognition biometrics at their gates to identify and eject adverse attorneys involved in litigation against the company. This 'Enemy Ban' is facing massive scrutiny from the NY Attorney General." },
+            { keywords: ['mets', 'score', 'who won', 'skubal', 'senga'], response: "The Mets defeated the Tigers 9-4. Senga got the win (4-1) with 8 strikeouts, while Skubal took the loss giving up an early Lindor double and an Alonso HR." },
+            { keywords: ['star wars', 'bobblehead', 'mclean', 'mando', 'grogu'], response: "May 14th was Star Wars 'Mandalorian and Grogu' day at Citi Field. Nolan McLean had an exclusive 'Mando' bobblehead drop, and players featured AR jumbotron overlays (like Pete Alonso's Sith Lord graphic)." },
+            { keywords: ['hawk', 'eye', 'abs', 'umpire', 'overturn', 'pitch'], response: "In the top of the 5th, a called strike 3 to Riley Greene was challenged. The Hawk-Eye ABS system proved the ball was 0.12 inches off the plate, overturning the call to Ball 4." }
+        ];
+
+        function handleChatSubmit(e) {
+            e.preventDefault();
+            const inputEl = document.getElementById('chat-input');
+            const text = inputEl.value.trim().toLowerCase();
+            if(!text) return;
+            
+            appendMessage('user', inputEl.value);
+            inputEl.value = '';
+            
+            // Simulate AI thinking delay
+            setTimeout(() => {
+                let foundResponse = "I'm sorry, my context window is limited to the May 14th dashboard telemetry. Try asking about the DraftKings odds shift, MSG's facial recognition, or the Hawk-Eye overturn.";
+                
+                for(let item of kb) {
+                    if(item.keywords.some(kw => text.includes(kw))) {
+                        foundResponse = item.response;
+                        break;
+                    }
+                }
+                
+                appendMessage('bot', foundResponse);
+            }, 600);
+        }
+
+        function appendMessage(sender, text) {
+            const container = document.getElementById('chat-messages');
+            const msgDiv = document.createElement('div');
+            
+            if (sender === 'user') {
+                msgDiv.className = 'bg-slate-700 text-white p-3 rounded-lg rounded-tr-none border border-slate-600 w-[85%] ml-auto';
+            } else {
+                msgDiv.className = 'bg-slate-800 text-slate-200 p-3 rounded-lg rounded-tl-none border border-blue-900/50 w-[85%] border-l-2 border-l-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.1)]';
+            }
+            
+            msgDiv.innerText = text;
+            container.appendChild(msgDiv);
+            container.scrollTop = container.scrollHeight;
+        }
     </script>
 </body>
 </html>
