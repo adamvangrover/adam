@@ -1,259 +1,306 @@
-import React, { useState, useMemo } from 'react';
-import { Activity, TrendingUp, AlertTriangle, Info } from 'lucide-react';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Global Macro & Energy Simulation</title>
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- React & ReactDOM via CDN -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <!-- Babel for in-browser JSX compilation -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+  <div id="root"></div>
 
-// Math helpers for Monte Carlo Simulation
-const randn_bm = () => {
-  let u = 0, v = 0;
-  while(u === 0) u = Math.random(); // Converting [0,1) to (0,1)
-  while(v === 0) v = Math.random();
-  return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
-};
+  <script type="text/babel">
+    const { useState, useMemo } = React;
 
-const getPercentile = (sortedArray, p) => {
-  const index = (sortedArray.length - 1) * p;
-  const lower = Math.floor(index);
-  const upper = lower + 1;
-  const weight = index % 1;
-  if (upper >= sortedArray.length) return sortedArray[lower];
-  return sortedArray[lower] * (1 - weight) + sortedArray[upper] * weight;
-};
+    // --- SVG Icon Components (Replacing lucide-react) ---
+    const Activity = ({ className }) => (
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+      </svg>
+    );
 
-export default function App() {
-  // State variables for sidebar inputs
-  const [probClosure, setProbClosure] = useState(0.40);
-  const [probScarring, setProbScarring] = useState(0.25);
-  const [baseOilPrice, setBaseOilPrice] = useState(90);
-  const [aiCapexOffset, setAiCapexOffset] = useState(0.3);
+    const TrendingUp = ({ className }) => (
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+        <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+        <polyline points="17 6 23 6 23 12"></polyline>
+      </svg>
+    );
 
-  // Run Monte Carlo simulation whenever inputs change
-  const simulationData = useMemo(() => {
-    const iterations = 10000;
-    
-    // Using typed arrays for huge performance boost and default numeric sorting
-    const simOilPrice = new Float32Array(iterations);
-    const simGdp = new Float32Array(iterations);
-    const simCpi = new Float32Array(iterations);
+    const AlertTriangle = ({ className }) => (
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+        <line x1="12" y1="9" x2="12" y2="13"></line>
+        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+      </svg>
+    );
 
-    for (let i = 0; i < iterations; i++) {
-      // Stochastic events
-      const closureEvent = Math.random() < probClosure ? 1 : 0;
-      const scarringEvent = Math.random() < probScarring ? 1 : 0;
-      
-      const oilVolatility = randn_bm() * 0.14;
-      const gdpShock = randn_bm() * 0.5;
-      const cpiShock = randn_bm() * 0.3;
+    const Info = ({ className }) => (
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="16" x2="12" y2="12"></line>
+        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+      </svg>
+    );
 
-      // Base market calculations
-      const currentOilPrice = baseOilPrice + (closureEvent * 20) + (scarringEvent * 30) + (baseOilPrice * oilVolatility);
-      simOilPrice[i] = currentOilPrice;
-      
-      // Macro calculations based on user's formulas
-      simGdp[i] = 2.5 - ((currentOilPrice - 80) * 0.03) + gdpShock + aiCapexOffset;
-      simCpi[i] = 3.0 + ((currentOilPrice - 80) * 0.02) + cpiShock;
-    }
-
-    // Sort for percentile calculation
-    simOilPrice.sort();
-    simGdp.sort();
-    simCpi.sort();
-
-    // Generate Histogram Bins (50 bins)
-    const minOil = simOilPrice[0];
-    const maxOil = simOilPrice[iterations - 1];
-    const binCount = 50;
-    const binWidth = (maxOil - minOil) / binCount;
-    const bins = new Array(binCount).fill(0);
-
-    for (let i = 0; i < iterations; i++) {
-      let binIndex = Math.floor((simOilPrice[i] - minOil) / binWidth);
-      if (binIndex === binCount) binIndex--; 
-      bins[binIndex]++;
-    }
-
-    const maxBinCount = Math.max(...bins);
-    const histogram = bins.map((count, i) => ({
-      count,
-      percent: maxBinCount === 0 ? 0 : (count / maxBinCount) * 100,
-      label: (minOil + (i + 0.5) * binWidth).toFixed(0)
-    }));
-
-    return {
-      oil: { median: getPercentile(simOilPrice, 0.5), tail: getPercentile(simOilPrice, 0.95) },
-      gdp: { median: getPercentile(simGdp, 0.5), tail: getPercentile(simGdp, 0.05) }, // 5th percentile
-      cpi: { median: getPercentile(simCpi, 0.5), tail: getPercentile(simCpi, 0.95) },
-      histogram
+    // --- Math helpers for Monte Carlo Simulation ---
+    const randn_bm = () => {
+      let u = 0, v = 0;
+      while(u === 0) u = Math.random(); 
+      while(v === 0) v = Math.random();
+      return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
     };
-  }, [probClosure, probScarring, baseOilPrice, aiCapexOffset]);
 
-  return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans p-4 md:p-8">
-      <div className="max-w-7xl mx-auto space-y-6">
+    const getPercentile = (sortedArray, p) => {
+      const index = (sortedArray.length - 1) * p;
+      const lower = Math.floor(index);
+      const upper = lower + 1;
+      const weight = index % 1;
+      if (upper >= sortedArray.length) return sortedArray[lower];
+      return sortedArray[lower] * (1 - weight) + sortedArray[upper] * weight;
+    };
+
+    // --- Main App Component ---
+    function App() {
+      // State variables for sidebar inputs
+      const [probClosure, setProbClosure] = useState(0.40);
+      const [probScarring, setProbScarring] = useState(0.25);
+      const [baseOilPrice, setBaseOilPrice] = useState(90);
+      const [aiCapexOffset, setAiCapexOffset] = useState(0.3);
+
+      // Run Monte Carlo simulation whenever inputs change
+      const simulationData = useMemo(() => {
+        const iterations = 10000;
         
-        {/* Header */}
-        <header className="mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-slate-900 mb-2">
-            2026 Global Macro & Energy Simulation
-          </h1>
-          <p className="text-lg text-slate-600">
-            Macroeconomic Monte Carlo Simulator: Middle East Conflict
-          </p>
-        </header>
+        const simOilPrice = new Float32Array(iterations);
+        const simGdp = new Float32Array(iterations);
+        const simCpi = new Float32Array(iterations);
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        for (let i = 0; i < iterations; i++) {
+          const closureEvent = Math.random() < probClosure ? 1 : 0;
+          const scarringEvent = Math.random() < probScarring ? 1 : 0;
           
-          {/* Sidebar Controls */}
-          <div className="lg:col-span-1 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-            <h2 className="text-xl font-semibold mb-6 flex items-center">
-              <Activity className="w-5 h-5 mr-2 text-indigo-600" />
-              Parameters
-            </h2>
+          const oilVolatility = randn_bm() * 0.14;
+          const gdpShock = randn_bm() * 0.5;
+          const cpiShock = randn_bm() * 0.3;
 
-            <div className="space-y-6">
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1 flex justify-between">
-                  <span>Prob. Hormuz Closure:</span>
-                  <span className="text-indigo-600 font-semibold">{(probClosure * 100).toFixed(0)}%</span>
-                </label>
-                <input 
-                  type="range" min="0" max="1" step="0.05" 
-                  value={probClosure} 
-                  onChange={(e) => setProbClosure(parseFloat(e.target.value))}
-                  className="w-full accent-indigo-600 h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer"
-                />
-              </div>
+          const currentOilPrice = baseOilPrice + (closureEvent * 20) + (scarringEvent * 30) + (baseOilPrice * oilVolatility);
+          simOilPrice[i] = currentOilPrice;
+          
+          simGdp[i] = 2.5 - ((currentOilPrice - 80) * 0.03) + gdpShock + aiCapexOffset;
+          simCpi[i] = 3.0 + ((currentOilPrice - 80) * 0.02) + cpiShock;
+        }
 
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1 flex justify-between">
-                  <span>Prob. Infra Scarring:</span>
-                  <span className="text-indigo-600 font-semibold">{(probScarring * 100).toFixed(0)}%</span>
-                </label>
-                <input 
-                  type="range" min="0" max="1" step="0.05" 
-                  value={probScarring} 
-                  onChange={(e) => setProbScarring(parseFloat(e.target.value))}
-                  className="w-full accent-indigo-600 h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer"
-                />
-              </div>
+        simOilPrice.sort();
+        simGdp.sort();
+        simCpi.sort();
 
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
-                  Base Brent Price ($/bbl)
-                </label>
-                <input 
-                  type="number" 
-                  value={baseOilPrice} 
-                  onChange={(e) => setBaseOilPrice(parseFloat(e.target.value) || 0)}
-                  className="w-full px-4 py-2 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-600 outline-none transition-shadow"
-                />
-              </div>
+        const minOil = simOilPrice[0];
+        const maxOil = simOilPrice[iterations - 1];
+        const binCount = 50;
+        const binWidth = (maxOil - minOil) / binCount;
+        const bins = new Array(binCount).fill(0);
 
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1 flex justify-between">
-                  <span>AI Capex GDP Offset:</span>
-                  <span className="text-indigo-600 font-semibold">{aiCapexOffset.toFixed(2)}%</span>
-                </label>
-                <input 
-                  type="range" min="0" max="1" step="0.1" 
-                  value={aiCapexOffset} 
-                  onChange={(e) => setAiCapexOffset(parseFloat(e.target.value))}
-                  className="w-full accent-indigo-600 h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer"
-                />
-              </div>
-            </div>
-          </div>
+        for (let i = 0; i < iterations; i++) {
+          let binIndex = Math.floor((simOilPrice[i] - minOil) / binWidth);
+          if (binIndex === binCount) binIndex--; 
+          bins[binIndex]++;
+        }
 
-          {/* Main Content Area */}
-          <div className="lg:col-span-3 space-y-8">
+        const maxBinCount = Math.max(...bins);
+        const histogram = bins.map((count, i) => ({
+          count,
+          percent: maxBinCount === 0 ? 0 : (count / maxBinCount) * 100,
+          label: (minOil + (i + 0.5) * binWidth).toFixed(0)
+        }));
+
+        return {
+          oil: { median: getPercentile(simOilPrice, 0.5), tail: getPercentile(simOilPrice, 0.95) },
+          gdp: { median: getPercentile(simGdp, 0.5), tail: getPercentile(simGdp, 0.05) },
+          cpi: { median: getPercentile(simCpi, 0.5), tail: getPercentile(simCpi, 0.95) },
+          histogram
+        };
+      }, [probClosure, probScarring, baseOilPrice, aiCapexOffset]);
+
+      return (
+        <div className="min-h-screen bg-slate-50 text-slate-900 font-sans p-4 md:p-8">
+          <div className="max-w-7xl mx-auto space-y-6">
             
-            {/* Results Table */}
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-              <h2 className="text-xl font-semibold mb-6 flex items-center">
-                <TrendingUp className="w-5 h-5 mr-2 text-indigo-600" />
-                Forward 6-Month Macroeconomic Output
-              </h2>
+            {/* Header */}
+            <header className="mb-8">
+              <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-slate-900 mb-2">
+                2026 Global Macro & Energy Simulation
+              </h1>
+              <p className="text-lg text-slate-600">
+                Macroeconomic Monte Carlo Simulator: Middle East Conflict
+              </p>
+            </header>
+
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
               
-              <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse">
-                  <thead>
-                    <tr className="border-b-2 border-slate-200 text-slate-600 text-sm">
-                      <th className="pb-3 font-semibold">Metric</th>
-                      <th className="pb-3 font-semibold">Median (Base Case)</th>
-                      <th className="pb-3 font-semibold text-rose-600 flex items-center">
-                        <AlertTriangle className="w-4 h-4 mr-1" />
-                        Tail Risk (Adverse)
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="text-slate-800">
-                    <tr className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
-                      <td className="py-4 font-medium">Brent Crude ($/bbl)</td>
-                      <td className="py-4 text-lg">${simulationData.oil.median.toFixed(2)}</td>
-                      <td className="py-4 text-rose-600 font-semibold text-lg">
-                        ${simulationData.oil.tail.toFixed(2)} <span className="text-xs text-slate-400 font-normal ml-1">(95th Pctl)</span>
-                      </td>
-                    </tr>
-                    <tr className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
-                      <td className="py-4 font-medium">U.S. GDP Growth (%)</td>
-                      <td className="py-4 text-lg">{simulationData.gdp.median.toFixed(2)}%</td>
-                      <td className="py-4 text-rose-600 font-semibold text-lg">
-                        {simulationData.gdp.tail.toFixed(2)}% <span className="text-xs text-slate-400 font-normal ml-1">(5th Pctl)</span>
-                      </td>
-                    </tr>
-                    <tr className="hover:bg-slate-50 transition-colors">
-                      <td className="py-4 font-medium">U.S. Core CPI (%)</td>
-                      <td className="py-4 text-lg">{simulationData.cpi.median.toFixed(2)}%</td>
-                      <td className="py-4 text-rose-600 font-semibold text-lg">
-                        {simulationData.cpi.tail.toFixed(2)}% <span className="text-xs text-slate-400 font-normal ml-1">(95th Pctl)</span>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
+              {/* Sidebar Controls */}
+              <div className="lg:col-span-1 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                <h2 className="text-xl font-semibold mb-6 flex items-center">
+                  <Activity className="w-5 h-5 mr-2 text-indigo-600" />
+                  Parameters
+                </h2>
 
-            {/* Histogram Chart */}
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-              <h2 className="text-xl font-semibold mb-6">Simulated Distribution: Brent Crude Prices</h2>
-              <div className="h-64 w-full flex items-end space-x-[2px] mt-4">
-                {simulationData.histogram.map((bin, i) => (
-                  <div key={i} className="flex-1 flex flex-col items-center group relative h-full justify-end">
-                    {/* Tooltip on hover */}
-                    <div className="opacity-0 group-hover:opacity-100 absolute bottom-full mb-2 bg-slate-800 text-white text-xs py-1.5 px-3 rounded pointer-events-none transition-opacity z-10 whitespace-nowrap shadow-lg">
-                      <div className="font-semibold">${bin.label}</div>
-                      <div className="text-slate-300">{bin.count.toLocaleString()} iterations</div>
-                      <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-800"></div>
-                    </div>
-                    {/* Bar */}
-                    <div 
-                      className="w-full bg-indigo-500/90 hover:bg-indigo-400 transition-colors rounded-t-sm"
-                      style={{ height: `${Math.max(1, bin.percent)}%` }}
-                    ></div>
+                <div className="space-y-6">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1 flex justify-between">
+                      <span>Prob. Hormuz Closure:</span>
+                      <span className="text-indigo-600 font-semibold">{(probClosure * 100).toFixed(0)}%</span>
+                    </label>
+                    <input 
+                      type="range" min="0" max="1" step="0.05" 
+                      value={probClosure} 
+                      onChange={(e) => setProbClosure(parseFloat(e.target.value))}
+                      className="w-full accent-indigo-600 h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer"
+                    />
                   </div>
-                ))}
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1 flex justify-between">
+                      <span>Prob. Infra Scarring:</span>
+                      <span className="text-indigo-600 font-semibold">{(probScarring * 100).toFixed(0)}%</span>
+                    </label>
+                    <input 
+                      type="range" min="0" max="1" step="0.05" 
+                      value={probScarring} 
+                      onChange={(e) => setProbScarring(parseFloat(e.target.value))}
+                      className="w-full accent-indigo-600 h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">
+                      Base Brent Price ($/bbl)
+                    </label>
+                    <input 
+                      type="number" 
+                      value={baseOilPrice} 
+                      onChange={(e) => setBaseOilPrice(parseFloat(e.target.value) || 0)}
+                      className="w-full px-4 py-2 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-600 outline-none transition-shadow"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1 flex justify-between">
+                      <span>AI Capex GDP Offset:</span>
+                      <span className="text-indigo-600 font-semibold">{aiCapexOffset.toFixed(2)}%</span>
+                    </label>
+                    <input 
+                      type="range" min="0" max="1" step="0.1" 
+                      value={aiCapexOffset} 
+                      onChange={(e) => setAiCapexOffset(parseFloat(e.target.value))}
+                      className="w-full accent-indigo-600 h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer"
+                    />
+                  </div>
+                </div>
               </div>
-              <div className="flex justify-between mt-4 text-sm text-slate-500 font-medium">
-                <span>${simulationData.histogram[0].label}</span>
-                <span>${simulationData.histogram[Math.floor(simulationData.histogram.length / 2)].label}</span>
-                <span>${simulationData.histogram[simulationData.histogram.length - 1].label}</span>
+
+              {/* Main Content Area */}
+              <div className="lg:col-span-3 space-y-8">
+                
+                {/* Results Table */}
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                  <h2 className="text-xl font-semibold mb-6 flex items-center">
+                    <TrendingUp className="w-5 h-5 mr-2 text-indigo-600" />
+                    Forward 6-Month Macroeconomic Output
+                  </h2>
+                  
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse">
+                      <thead>
+                        <tr className="border-b-2 border-slate-200 text-slate-600 text-sm">
+                          <th className="pb-3 font-semibold">Metric</th>
+                          <th className="pb-3 font-semibold">Median (Base Case)</th>
+                          <th className="pb-3 font-semibold text-rose-600 flex items-center">
+                            <AlertTriangle className="w-4 h-4 mr-1" />
+                            Tail Risk (Adverse)
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="text-slate-800">
+                        <tr className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
+                          <td className="py-4 font-medium">Brent Crude ($/bbl)</td>
+                          <td className="py-4 text-lg">${simulationData.oil.median.toFixed(2)}</td>
+                          <td className="py-4 text-rose-600 font-semibold text-lg">
+                            ${simulationData.oil.tail.toFixed(2)} <span className="text-xs text-slate-400 font-normal ml-1">(95th Pctl)</span>
+                          </td>
+                        </tr>
+                        <tr className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
+                          <td className="py-4 font-medium">U.S. GDP Growth (%)</td>
+                          <td className="py-4 text-lg">{simulationData.gdp.median.toFixed(2)}%</td>
+                          <td className="py-4 text-rose-600 font-semibold text-lg">
+                            {simulationData.gdp.tail.toFixed(2)}% <span className="text-xs text-slate-400 font-normal ml-1">(5th Pctl)</span>
+                          </td>
+                        </tr>
+                        <tr className="hover:bg-slate-50 transition-colors">
+                          <td className="py-4 font-medium">U.S. Core CPI (%)</td>
+                          <td className="py-4 text-lg">{simulationData.cpi.median.toFixed(2)}%</td>
+                          <td className="py-4 text-rose-600 font-semibold text-lg">
+                            {simulationData.cpi.tail.toFixed(2)}% <span className="text-xs text-slate-400 font-normal ml-1">(95th Pctl)</span>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                {/* Histogram Chart */}
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                  <h2 className="text-xl font-semibold mb-6">Simulated Distribution: Brent Crude Prices</h2>
+                  <div className="h-64 w-full flex items-end space-x-[2px] mt-4">
+                    {simulationData.histogram.map((bin, i) => (
+                      <div key={i} className="flex-1 flex flex-col items-center group relative h-full justify-end">
+                        <div className="opacity-0 group-hover:opacity-100 absolute bottom-full mb-2 bg-slate-800 text-white text-xs py-1.5 px-3 rounded pointer-events-none transition-opacity z-10 whitespace-nowrap shadow-lg">
+                          <div className="font-semibold">${bin.label}</div>
+                          <div className="text-slate-300">{bin.count.toLocaleString()} iterations</div>
+                          <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-800"></div>
+                        </div>
+                        <div 
+                          className="w-full bg-indigo-500/90 hover:bg-indigo-400 transition-colors rounded-t-sm"
+                          style={{ height: `${Math.max(1, bin.percent)}%` }}
+                        ></div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="flex justify-between mt-4 text-sm text-slate-500 font-medium">
+                    <span>${simulationData.histogram[0].label}</span>
+                    <span>${simulationData.histogram[Math.floor(simulationData.histogram.length / 2)].label}</span>
+                    <span>${simulationData.histogram[simulationData.histogram.length - 1].label}</span>
+                  </div>
+                </div>
+
+                {/* Notes Section */}
+                <div className="bg-blue-50/50 p-6 rounded-2xl border border-blue-100 text-sm text-slate-700 space-y-3">
+                  <h3 className="font-semibold text-blue-900 flex items-center mb-4 text-base">
+                    <Info className="w-5 h-5 mr-2 text-blue-600" />
+                    Notes on the Model
+                  </h3>
+                  <ul className="list-disc pl-5 space-y-2 text-blue-800/80">
+                    <li><strong>Adverse Scenario:</strong> Assumes Persian Gulf exports only normalize by late July.</li>
+                    <li><strong>Severely Adverse (Scarring):</strong> Models a persistent 2.5 mb/d reduction to capacity.</li>
+                    <li><strong>Transmission:</strong> Incorporates historical elasticities for consumer sentiment destruction and structural inflation pass-through, offsetting some economic drag with corporate AI infrastructure investments.</li>
+                  </ul>
+                </div>
+
               </div>
             </div>
-
-            {/* Notes Section */}
-            <div className="bg-blue-50/50 p-6 rounded-2xl border border-blue-100 text-sm text-slate-700 space-y-3">
-              <h3 className="font-semibold text-blue-900 flex items-center mb-4 text-base">
-                <Info className="w-5 h-5 mr-2 text-blue-600" />
-                Notes on the Model
-              </h3>
-              <ul className="list-disc pl-5 space-y-2 text-blue-800/80">
-                <li><strong>Adverse Scenario:</strong> Assumes Persian Gulf exports only normalize by late July.</li>
-                <li><strong>Severely Adverse (Scarring):</strong> Models a persistent 2.5 mb/d reduction to capacity.</li>
-                <li><strong>Transmission:</strong> Incorporates historical elasticities for consumer sentiment destruction and structural inflation pass-through, offsetting some economic drag with corporate AI infrastructure investments.</li>
-              </ul>
-            </div>
-
           </div>
         </div>
-      </div>
-    </div>
-  );
-}
+      );
+    }
+
+    // --- Mount the App ---
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>
