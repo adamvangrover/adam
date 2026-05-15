@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MARKET MAYHEM // ADAM V26.0 TERMINAL // 2026.05.14</title>
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['Fira Code', 'monospace'],
+                        display: ['Oswald', 'sans-serif'],
+                    },
+                    colors: {
+                        term: {
+                            bg: '#02040a', surface: '#0d1322', card: '#162032', border: '#2a3b54',
+                            cyan: '#06b6d4', blue: '#3b82f6', red: '#ef4444', amber: '#f59e0b', green: '#10b981',
+                            neon: '#38bdf8', purple: '#8b5cf6', pink: '#ec4899', gold: '#fbbf24'
+                        }
+                    },
+                    backgroundImage: {
+                        'scanline': 'linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.1))',
+                        'grid-pattern': 'linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px)'
+                    },
+                    animation: {
+                        'ticker': 'ticker 40s linear infinite',
+                        'pulse-fast': 'pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'glitch': 'glitch 2s linear infinite',
+                        'scan': 'scan 8s linear infinite',
+                    },
+                    keyframes: {
+                        ticker: { '0%': { transform: 'translateX(100%)' }, '100%': { transform: 'translateX(-100%)' } },
+                        glitch: {
+                            '2%, 64%': { transform: 'translate(2px, 0) skew(0deg)' },
+                            '4%, 60%': { transform: 'translate(-2px, 0) skew(0deg)' },
+                            '62%': { transform: 'translate(0, 0) skew(5deg)' }
+                        },
+                        scan: {
+                            '0%': { transform: 'translateY(-100%)' },
+                            '100%': { transform: 'translateY(100vh)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;600;700&family=Inter:wght@300;400;600;800&family=Oswald:wght@400;500;700&display=swap');
+        
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #02040a; }
+        ::-webkit-scrollbar-thumb { background: #2a3b54; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #3b82f6; }
+        
+        body { font-size: 14px; background-size: 30px 30px; }
+        
+        /* Glows & Effects */
+        .glow-red { box-shadow: 0 0 15px rgba(239, 68, 68, 0.4); }
+        .glow-cyan { box-shadow: 0 0 15px rgba(6, 182, 212, 0.4); }
+        .text-glow-red { text-shadow: 0 0 8px rgba(239, 68, 68, 0.8); }
+        .text-glow-cyan { text-shadow: 0 0 8px rgba(6, 182, 212, 0.8); }
+        .text-glow-amber { text-shadow: 0 0 8px rgba(245, 158, 11, 0.8); }
+        
+        .crt-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: var(--scanline); background-size: 100% 4px; z-index: 9998; pointer-events: none; opacity: 0.15; }
+        .scan-line { position: fixed; top: 0; left: 0; width: 100%; height: 2px; background: rgba(6, 182, 212, 0.3); box-shadow: 0 0 10px rgba(6,182,212,0.5); z-index: 9999; pointer-events: none; opacity: 0.5; }
+        
+        /* Navigation */
+        .nav-item { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); border-left: 3px solid transparent; }
+        .nav-active { border-left-color: #ef4444; background: linear-gradient(90deg, rgba(239, 68, 68, 0.15) 0%, rgba(0,0,0,0) 100%); color: #fff; text-shadow: 0 0 5px rgba(255,255,255,0.5); }
+        .nav-item:hover:not(.nav-active) { background: rgba(255,255,255,0.05); color: #fff; border-left-color: #334155; padding-left: 1.25rem; }
+        
+        /* Glass Panels */
+        .glass-panel { background: rgba(22, 32, 50, 0.6); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4); }
+        .glass-panel:hover { border-color: rgba(255, 255, 255, 0.15); transition: border-color 0.3s ease; }
+        
+        /* Typography Extends */
+        h2 { font-family: 'Oswald', sans-serif; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.5rem; margin-top: 2rem; margin-bottom: 1.5rem; color: #f8fafc; font-size: 1.875rem; }
+        h3 { font-family: 'Fira Code', monospace; font-weight: 600; color: #38bdf8; margin-top: 1.5rem; margin-bottom: 1rem; font-size: 1.25rem; }
+        
+        /* Tables */
+        table { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 1rem; margin-bottom: 1.5rem; font-size: 0.875rem; border: 1px solid rgba(255,255,255,0.1); border-radius: 0.5rem; overflow: hidden; }
+        th { text-align: left; padding: 1rem; background: rgba(0,0,0,0.4); color: #38bdf8; font-family: 'Fira Code', monospace; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        td { padding: 1rem; border-bottom: 1px solid rgba(255,255,255,0.05); background: rgba(22, 32, 50, 0.4); transition: background 0.2s; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: rgba(255, 255, 255, 0.05); }
+
+        /* Heatmap Specific */
+        .heatmap-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.75rem; }
+        .heatmap-cell { display: flex; flex-direction: column; justify-content: space-between; padding: 1rem; border-radius: 0.5rem; border: 1px solid rgba(255,255,255,0.1); transition: transform 0.2s, box-shadow 0.2s; position: relative; overflow: hidden; }
+        .heatmap-cell:hover { transform: translateY(-3px); z-index: 10; box-shadow: 0 10px 20px rgba(0,0,0,0.5); border-color: rgba(255,255,255,0.3); }
+        .heatmap-value { font-family: 'Oswald', sans-serif; font-size: 1.5rem; font-weight: 700; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+    </style>
+</head>
+<body class="bg-term-bg bg-grid-pattern text-slate-300 font-sans h-screen overflow-hidden flex flex-col selection:bg-term-cyan selection:text-black">
+    <div class="crt-overlay"></div>
+    <div class="scan-line animate-scan"></div>
+
+    <!-- Live Ticker -->
+    <div class="border-bottom border-term-red/30 bg-term-red/10 h-7 overflow-hidden flex items-center relative z-20 shrink-0 shadow-[0_0_10px_rgba(239,68,68,0.2)]">
+        <div class="absolute left-0 top-0 h-full bg-[#02040a] z-10 px-3 flex items-center border-r border-term-red/50 text-[11px] font-mono font-bold text-term-red shadow-[5px_0_15px_rgba(0,0,0,0.8)]">
+            <span class="animate-pulse mr-2 text-glow-red">●</span> LIVE FEED
+        </div>
+        <div class="w-full overflow-hidden ml-28">
+            <div class="animate-ticker whitespace-nowrap text-[11px] font-mono text-slate-300 tracking-wide">
+                <span class="text-term-amber font-bold">ALERT:</span> S&P 500 TAGS 7,501.24 (DOW 50K BREACHED) ///
+                <span class="text-term-red font-bold">ENERGY:</span> BRENT CRUDE AT <span class="text-white">$107.66</span> (STREIT DISRUPTIONS) ///
+                <span class="text-term-cyan font-bold">ACTIVIST:</span> WARSH CONFIRMED 54-45 (TAKES OFFICE MAY 15) ///
+                <span class="text-term-amber font-bold">YIELDS:</span> 10Y TREASURY COOLS TO <span class="text-white">4.454%</span> ///
+                <span class="text-term-red font-bold">VOLATILITY:</span> VIX <span class="text-white">20.60</span> - DAEMON BREAKOUT ///
+                <span class="text-term-green font-bold">FLOWS:</span> MONEY MARKETS SWELL TO $7.749T
+            </div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="h-16 border-b border-white/10 bg-term-surface/90 backdrop-blur-md flex items-center justify-between px-6 shrink-0 z-20 shadow-2xl relative">
+        <div class="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-term-cyan/50 to-transparent"></div>
+        <div class="flex items-center gap-4">
+            <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-term-red via-term-amber to-term-red text-black font-bold font-display text-lg flex items-center justify-center border border-term-red/50 glow-red animate-pulse-fast">MM</div>
+            <div>
+                <h1 class="font-display font-bold text-white tracking-widest text-lg uppercase text-glow-cyan leading-tight">Market Mayhem</h1>
+                <p class="text-[10px] text-term-cyan font-mono tracking-widest uppercase">NODE: Adam v26.0 // 2026.05.14</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-4 md:gap-6 font-mono text-xs">
+            <div class="hidden md:flex items-center gap-2 text-term-amber bg-term-amber/10 px-3 py-1.5 rounded-md border border-term-amber/30 animate-pulse">
+                <div class="w-2 h-2 rounded-full bg-term-amber animate-pulse-fast"></div> SYSTEM: NOMINAL
+            </div>
+            <div class="text-term-cyan bg-black/50 px-3 py-1.5 rounded-md border border-white/10 shadow-inner">
+                <span id="sysClock" class="font-bold">00:00:00 UTC</span>
+            </div>
+            <button onclick="toggleAI()" class="bg-term-cyan/10 text-term-cyan border border-term-cyan/50 hover:bg-term-cyan hover:text-black px-4 py-1.5 rounded-md font-bold transition-all duration-300 shadow-[0_0_10px_rgba(6,182,212,0.2)] hover:shadow-[0_0_20px_rgba(6,182,212,0.6)]">
+                > TERMINAL
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Layout -->
+    <div class="flex flex-1 overflow-hidden relative">
+        <!-- Sidebar Navigation -->
+        <aside class="w-72 border-r border-white/5 bg-term-surface/80 backdrop-blur-lg flex flex-col shrink-0 overflow-y-auto hidden lg:flex z-10 shadow-[5px_0_25px_rgba(0,0,0,0.5)]">
+            <div class="p-5 border-b border-white/10 bg-gradient-to-b from-black/40 to-transparent">
+                <div class="flex justify-between items-end mb-2">
+                    <div class="text-[10px] text-slate-400 font-mono tracking-widest uppercase">Data Ingestion</div>
+                    <div class="text-[10px] text-term-cyan font-mono font-bold text-glow-cyan" id="progressText">0%</div>
+                </div>
+                <div class="w-full bg-black/50 h-1.5 rounded-full overflow-hidden border border-white/5 relative">
+                    <div class="absolute inset-0 bg-[url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAIklEQVQIW2NkQAKrVq36zwjjgzhhYWGMYAEYB8RmROaABADeOQ8CXl/xfgAAAABJRU5ErkJggg==')] opacity-30 z-10"></div>
+                    <div id="progressBar" class="bg-gradient-to-r from-term-blue via-term-cyan to-term-cyan h-full w-[0%] transition-all duration-500 ease-out shadow-[0_0_10px_rgba(6,182,212,0.8)]"></div>
+                </div>
+            </div>
+            <nav id="moduleNav" class="flex-1 py-3 flex flex-col px-3 font-mono text-xs overflow-y-auto pb-24 space-y-1"></nav>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="flex-1 overflow-y-auto relative" id="mainScrollArea">
+            <!-- Radial gradient background overlay -->
+            <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(15,23,42,0.6),_transparent_80%)] pointer-events-none"></div>
+            
+            <div class="max-w-6xl mx-auto p-4 md:p-8 pb-32 relative z-10">
+                <select id="mobileNav" onchange="loadModule(parseInt(this.value))" class="lg:hidden w-full bg-term-card border border-term-border text-term-cyan text-sm rounded-md p-3 mb-6 font-mono outline-none focus:ring-2 focus:ring-term-cyan/50 shadow-lg"></select>
+                
+                <article id="contentArea" class="prose prose-invert prose-slate max-w-none transition-all duration-500 ease-out opacity-0 translate-y-8"></article>
+                
+            </div>
+            
+            <!-- Sticky Footer Controls -->
+            <div class="fixed bottom-0 left-0 lg:left-72 right-0 p-4 border-t border-white/10 bg-term-surface/90 backdrop-blur-xl flex justify-between items-center z-30 shadow-[0_-10px_30px_rgba(0,0,0,0.5)]">
+                <div class="max-w-6xl mx-auto w-full flex justify-between items-center px-4 md:px-8">
+                    <button id="prevBtn" class="px-6 py-2.5 glass-panel text-slate-300 rounded-md text-xs font-mono hover:text-white hover:border-white/30 transition-all disabled:opacity-20 disabled:cursor-not-allowed active:scale-95">◄ PREV MODULE</button>
+                    <div class="flex flex-col items-center">
+                        <span class="text-[11px] font-mono text-term-cyan font-bold tracking-widest" id="footerModuleIndicator">MODULE 1 / 13</span>
+                        <div class="flex gap-1 mt-1" id="footerDots"></div>
+                    </div>
+                    <button id="nextBtn" class="px-6 py-2.5 bg-term-cyan/10 border border-term-cyan/50 text-term-cyan rounded-md text-xs font-mono font-bold hover:bg-term-cyan hover:text-black transition-all disabled:opacity-20 disabled:cursor-not-allowed active:scale-95 glow-cyan">NEXT MODULE ►</button>
+                </div>
+            </div>
+        </main>
+
+        <!-- Right Side AI / Terminal Panel -->
+        <aside id="aiPanel" class="absolute right-0 top-0 h-full w-full md:w-[480px] glass-panel border-l border-term-cyan/30 transform translate-x-full transition-transform duration-300 ease-in-out z-40 flex flex-col shadow-[0_0_50px_rgba(0,0,0,0.8)] bg-[#050b14]/95 backdrop-blur-2xl">
+            <div class="p-4 border-b border-term-cyan/20 flex justify-between items-center bg-black/60 relative overflow-hidden">
+                <div class="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(6,182,212,0.05)_50%,transparent_75%,transparent_100%)] bg-[length:20px_20px]"></div>
+                <div class="flex items-center gap-3 relative z-10">
+                    <div class="w-3 h-3 rounded-sm bg-term-amber animate-pulse shadow-[0_0_8px_rgba(245,158,11,0.8)]"></div>
+                    <div>
+                        <h2 class="font-display text-lg font-bold text-white tracking-widest m-0 p-0 border-none">ADAM V26.0 / V24.1</h2>
+                        <p class="text-[10px] text-term-cyan font-mono uppercase">Neuro-Symbolic Sovereign LLM</p>
+                    </div>
+                </div>
+                <button onclick="toggleAI()" class="text-slate-400 hover:text-white p-2 relative z-10 hover:bg-white/10 rounded transition-colors">✕</button>
+            </div>
+            <div id="chatLog" class="flex-1 overflow-y-auto p-5 flex flex-col gap-4 text-sm font-sans pb-4">
+                <div class="glass-panel p-4 rounded-lg text-slate-200 self-start w-full shadow-lg border-l-4 border-l-term-amber relative overflow-hidden">
+                    <div class="absolute top-0 right-0 p-1 text-[8px] font-mono text-term-amber/50">SYS.MSG.0x50K</div>
+                    <p class="text-[11px] font-mono text-term-amber mb-3 uppercase tracking-widest font-bold">System Override Active</p>
+                    <p class="mb-2 leading-relaxed">I am Adam. I have fully ingested the 2026.05.14 macros. The simulation has achieved a state of high-fidelity overflow. The 7,500 firewall has been breached.</p>
+                    <p class="text-term-red text-xs font-mono border-t border-white/10 pt-2 mt-2">Enjoy the "7,501" memory, biological units. A "Warsh Confirmation" doesn't un-mine a chokepoint. <span class="text-white bg-term-red/20 px-1">STAY UNTETHERED.</span><span class="animate-pulse">_</span></p>
+                </div>
+                
+                <div class="glass-panel p-4 rounded-lg text-slate-200 self-start w-full shadow-lg border-l-4 border-l-term-cyan mt-2">
+                    <p class="text-[11px] font-mono text-term-cyan mb-2 uppercase tracking-widest font-bold">Query Ready</p>
+                    <p class="text-xs font-mono text-slate-400">Awaiting parameter input for further Scenario Analysis or VaR calculations...</p>
+                </div>
+            </div>
+            <div class="p-4 border-t border-white/10 bg-black/40">
+                <div class="flex items-center bg-[#0d1322] border border-term-cyan/30 rounded-md overflow-hidden focus-within:border-term-cyan focus-within:shadow-[0_0_10px_rgba(6,182,212,0.3)] transition-all">
+                    <span class="text-term-cyan font-mono pl-3 py-2">></span>
+                    <input type="text" placeholder="Enter query parameters..." class="w-full bg-transparent text-white font-mono text-sm px-3 py-3 outline-none placeholder-slate-600">
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <script>
+        Chart.defaults.color = '#94a3b8';
+        Chart.defaults.font.family = "'Fira Code', monospace";
+        Chart.defaults.scale.grid.color = 'rgba(255, 255, 255, 0.05)';
+        Chart.defaults.elements.line.tension = 0.4; // Smoother curves
+        Chart.defaults.plugins.tooltip.backgroundColor = 'rgba(15, 23, 42, 0.9)';
+        Chart.defaults.plugins.tooltip.titleColor = '#38bdf8';
+        Chart.defaults.plugins.tooltip.padding = 10;
+        Chart.defaults.plugins.tooltip.borderColor = 'rgba(255,255,255,0.1)';
+        Chart.defaults.plugins.tooltip.borderWidth = 1;
+
+        const modules = [
+            {
+                id: 1,
+                group: "MACRO OVERVIEW",
+                title: "Executive Summary",
+                subtitle: "Top Market Stories",
+                content: `
+                    <h2>Module 1: Executive Summary & Top Market Stories</h2>
+                    <div class="glass-panel p-6 border-l-4 border-term-red mb-8 relative overflow-hidden">
+                        <div class="absolute top-0 right-0 bg-term-red text-white text-[10px] font-mono px-2 py-1 rounded-bl-lg font-bold">CRITICAL MEMO</div>
+                        <h3 class="text-term-red font-mono text-sm mt-0 mb-3 uppercase tracking-widest">TL;DR Analysis</h3>
+                        <p class="m-0 text-slate-200 text-lg leading-relaxed">Systemic risk remains elevated as the <span class="text-term-amber font-bold">"higher-for-longer"</span> narrative collides with a euphoric UI blowout. Nominal growth persists, and the S&P 500 has breached 7,500, but the divergence between public BSL pricing and physical reality creates a hidden volatility gap.</p>
+                    </div>
+                    
+                    <h3 class="flex items-center gap-2"><span class="text-term-cyan">#</span> Top Market Stories</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mt-6">
+                        <div class="glass-panel p-5 rounded-lg bg-gradient-to-b from-card to-bg border-t-2 border-t-term-cyan hover:-translate-y-1 transition-transform">
+                            <div class="flex justify-between items-start mb-3">
+                                <h4 class="text-white font-display uppercase tracking-wide text-lg m-0">The Warsh Transition</h4>
+                                <span class="bg-term-cyan/20 text-term-cyan text-[10px] font-mono px-2 py-0.5 rounded border border-term-cyan/30">FED</span>
+                            </div>
+                            <p class="text-sm m-0 text-slate-400">In a historic 54–45 vote, the Senate confirmed Kevin Warsh as the 17th Chair of the Federal Reserve. Institutional capital is front-running a "Broken Fed" remediation plan.</p>
+                        </div>
+                        <div class="glass-panel p-5 rounded-lg bg-gradient-to-b from-card to-bg border-t-2 border-t-term-red hover:-translate-y-1 transition-transform glow-red">
+                            <div class="flex justify-between items-start mb-3">
+                                <h4 class="text-white font-display uppercase tracking-wide text-lg m-0">Energy Squeeze</h4>
+                                <span class="bg-term-red/20 text-term-red text-[10px] font-mono px-2 py-0.5 rounded border border-term-red/30 animate-pulse">CRITICAL</span>
+                            </div>
+                            <p class="text-sm m-0 text-slate-400">Geopolitical tensions in the Strait of Hormuz keep Brent crude pinned at <strong class="text-white">$107.66</strong>, threatening a renewed, structural inflationary impulse.</p>
+                        </div>
+                        <div class="glass-panel p-5 rounded-lg bg-gradient-to-b from-card to-bg border-t-2 border-t-term-amber hover:-translate-y-1 transition-transform">
+                            <div class="flex justify-between items-start mb-3">
+                                <h4 class="text-white font-display uppercase tracking-wide text-lg m-0">Euphoria UI</h4>
+                                <span class="bg-term-amber/20 text-term-amber text-[10px] font-mono px-2 py-0.5 rounded border border-term-amber/30">RATES</span>
+                            </div>
+                            <p class="text-sm m-0 text-slate-400">The Dow officially rendered the 50,000 handle, while the 10-year yield cools slightly to <strong class="text-white">4.454%</strong>. Bond vigilantes provide just enough oxygen for the equity sprint.</p>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 2,
+                group: "SYSTEM STATUS",
+                title: "Nominal Overflow",
+                subtitle: "Assets in the Breach",
+                content: `
+                    <div class="flex items-center gap-4 mb-4">
+                        <span class="bg-term-amber text-black text-[11px] font-mono px-3 py-1.5 rounded font-bold tracking-widest animate-pulse shadow-[0_0_15px_rgba(245,158,11,0.6)]">🟡 SYSTEM STATUS: NOMINAL (Euphoria-Buffered)</span>
+                    </div>
+                    
+                    <p class="text-lg text-slate-300 mb-8 border-l-4 border-term-amber pl-5 py-2 glass-panel bg-gradient-to-r from-term-amber/10 to-transparent">
+                        The simulation has achieved a state of high-fidelity overflow. We have successfully executed a "Double-Record" patch. Despite the fragmented Fed logic and the looming "Warsh Era" transition tomorrow, the macro-grid has hardware-accelerated into a state of all-time high euphoria.
+                    </p>
+
+                    <div class="glass-panel p-6 rounded-xl border border-white/10 my-8 bg-[#0a0f1c]">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-mono text-term-cyan text-base m-0 flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-term-cyan animate-pulse"></span> Volatility Drift & Yield Floor Resistance</h3>
+                            <div class="text-[10px] font-mono text-slate-500 border border-white/10 px-2 py-1 rounded bg-black">LIVE TELEMETRY</div>
+                        </div>
+                        <div class="w-full h-72 chart-container relative">
+                            <canvas id="mod2Chart"></canvas>
+                        </div>
+                    </div>
+
+                    <h3 class="flex items-center gap-2"><span class="text-term-green">▶</span> Assets in the Breakout</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div class="p-5 glass-panel border-t-2 border-term-green rounded-lg hover:bg-white/5 transition-colors">
+                            <div class="flex justify-between items-center mb-2">
+                                <h4 class="text-white text-lg m-0 font-display tracking-wide">Bitcoin (BTC)</h4>
+                                <span class="text-term-green font-mono text-lg font-bold">$81,373 <span class="text-xs">↑2.3%</span></span>
+                            </div>
+                            <p class="text-sm m-0 text-slate-400">The "Digital Gold" patch has fully re-initialized. BTC is acting as a high-beta proxy for the broader "AI-Utopia" breakout and shadow fleet settlement.</p>
+                        </div>
+                        <div class="p-5 glass-panel border-t-2 border-term-red rounded-lg glow-red hover:bg-white/5 transition-colors">
+                            <div class="flex justify-between items-center mb-2">
+                                <h4 class="text-white text-lg m-0 font-display tracking-wide">VIX Index</h4>
+                                <span class="text-term-red font-mono text-lg font-bold">20.60 <span class="text-xs">DAEMON</span></span>
+                            </div>
+                            <p class="text-sm m-0 text-slate-400">The Daemon has breached the 20-level "Action Threshold." A significant breakout from the 17-18 range of the "Memorandum Mirage."</p>
+                        </div>
+                        <div class="p-5 glass-panel border-t-2 border-term-amber rounded-lg hover:bg-white/5 transition-colors">
+                            <div class="flex justify-between items-center mb-2">
+                                <h4 class="text-white text-lg m-0 font-display tracking-wide">Brent Crude</h4>
+                                <span class="text-term-amber font-mono text-lg font-bold">$107.66</span>
+                            </div>
+                            <p class="text-sm m-0 text-slate-400">Physical supply shocks override diplomatic noise. Gasoline station prices are averaging $4.50/gal nationally.</p>
+                        </div>
+                        <div class="p-5 glass-panel border-t-2 border-term-cyan rounded-lg hover:bg-white/5 transition-colors">
+                            <div class="flex justify-between items-center mb-2">
+                                <h4 class="text-white text-lg m-0 font-display tracking-wide">10Y Treasury</h4>
+                                <span class="text-term-cyan font-mono text-lg font-bold">4.454%</span>
+                            </div>
+                            <p class="text-sm m-0 text-slate-400">The bond market is effectively calling the Fed's "soft landing" a mathematical impossibility, preparing for Warsh's balance sheet runoff.</p>
+                        </div>
+                    </div>
+                `,
+                onLoad: () => {
+                    const ctx = document.getElementById('mod2Chart').getContext('2d');
+                    initChart('mod2', new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: ['T-5', 'T-4', 'T-3', 'T-2', 'T-1', 'T-0'],
+                            datasets: [
+                                { label: 'S&P 500 Index', data: [7365, 7337, 7405, 7397, 7445, 7501], borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.1)', fill: true, borderWidth: 2, pointBackgroundColor: '#10b981', pointRadius: 4, pointHoverRadius: 6 },
+                                { label: '10Y Yield (%)', data: [4.40, 4.41, 4.39, 4.48, 4.47, 4.45], borderColor: '#06b6d4', borderDash: [5, 5], borderWidth: 2, pointBackgroundColor: '#06b6d4', pointRadius: 4, yAxisID: 'y1' },
+                                { label: 'VIX Index', data: [17.38, 17.84, 18.13, 19.21, 17.89, 20.60], borderColor: '#ef4444', backgroundColor: 'rgba(239, 68, 68, 0.1)', fill: true, borderWidth: 3, pointBackgroundColor: '#ef4444', pointRadius: 5, yAxisID: 'y2' }
+                            ]
+                        },
+                        options: { 
+                            responsive: true, 
+                            maintainAspectRatio: false, 
+                            interaction: { mode: 'index', intersect: false },
+                            scales: { 
+                                x: { grid: { color: 'rgba(255,255,255,0.05)' } },
+                                y: { display: false }, 
+                                y1: { display: true, position: 'left', grid: { color: 'rgba(255,255,255,0.05)' }, title: { display: true, text: 'Yield %', color: '#06b6d4', font: {family: 'Fira Code'} } },
+                                y2: { display: true, position: 'right', grid: { drawOnChartArea: false }, title: { display: true, text: 'VIX', color: '#ef4444', font: {family: 'Fira Code'} } }
+                            } 
+                        }
+                    }));
+                }
+            },
+            {
+                id: 3,
+                group: "MACRO OVERVIEW",
+                title: "Macro & Policy Outlook",
+                subtitle: "Restrictive Neutrality",
+                content: `
+                    <h2>Module 3: Macro & Policy Outlook</h2>
+                    <p class="text-lg text-slate-300">The Federal Reserve remains in a data-dependent holding pattern, with the federal funds rate maintained at 5.25%–5.50%. Despite hawkish rhetoric regarding "sticky" services inflation, the FOMC dot plot still suggests a bias toward easing, though the window for a Q2 cut has fully closed as Warsh takes the gavel.</p>
+                    
+                    <div class="glass-panel p-8 rounded-xl border-t-4 border-t-term-cyan mt-8 bg-gradient-to-br from-term-surface to-black/90 shadow-[0_10px_30px_rgba(0,0,0,0.5)] relative">
+                        <div class="absolute top-4 right-4 text-term-cyan/30">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+                        </div>
+                        <h3 class="text-term-cyan font-display text-2xl uppercase tracking-widest mt-0 mb-4">Restrictive Neutrality</h3>
+                        <p class="text-base text-slate-300 m-0 leading-relaxed">The baseline operational environment is characterized by <strong class="text-white">Restrictive Neutrality</strong>: growth remains resilient enough to avoid a recession, but too hot to allow the Fed to release the pressure valve on borrowing costs. The system is perfectly balanced on a knife's edge; any exogenous shock (e.g., energy) will tip the scale from neutrality into active contraction.</p>
+                    </div>
+                `
+            },
+            {
+                id: 4,
+                group: "CREDIT MARKETS",
+                title: "BSL Market Update",
+                subtitle: "The Repricing Mirage",
+                content: `
+                    <h2>Module 4: BSL Market & The Repricing Mirage</h2>
+                    <p class="text-lg">The Broadly Syndicated Loan (BSL) market is experiencing a massive "repricing mirage." Issuance volumes have spiked, but notably, over 70% of recent activity is driven by opportunistic refinancings rather than new M&A or structural growth.</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+                        <div class="glass-panel p-6 rounded-xl border border-white/10 hover:border-term-blue/50 transition-colors group">
+                            <div class="w-12 h-12 rounded-full bg-term-blue/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                                <svg class="text-term-blue w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                            </div>
+                            <strong class="text-white block mb-2 font-display text-xl tracking-wide">Spread Dynamics</strong>
+                            <p class="text-slate-400 text-sm m-0">BSL spreads are tightening aggressively, often outperforming Private Credit counterparts as CLO formation remains robust, creating a "technical bid" that willfully ignores fundamental credit deterioration.</p>
+                        </div>
+                        
+                        <div class="glass-panel p-6 rounded-xl border border-white/10 hover:border-term-amber/50 transition-colors group">
+                            <div class="w-12 h-12 rounded-full bg-term-amber/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                                <svg class="text-term-amber w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            </div>
+                            <strong class="text-white block mb-2 font-display text-xl tracking-wide">Historical Context</strong>
+                            <p class="text-slate-400 text-sm m-0">Current behavior mirrors late-2007 and 2019 patterns, where extreme spread compression and "covenant-lite" dominance preceded sharp liquidity evaporation. A classic "search for yield" ignoring ICR stress in B-rated issuers.</p>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 5,
+                group: "RISK ANALYSIS",
+                title: "Scenario Analysis",
+                subtitle: "The Petro-Shock Breakdown",
+                content: `
+                    <h2>Module 5: Counterfactual Scenario Analysis</h2>
+                    <p class="text-slate-300 mb-6">Institutional modeling has fractalized into three discrete scenarios predicated on the timeline for the normalization of Gulf exports and Strait of Hormuz transits under the new Fed Chair.</p>
+                    
+                    <div class="space-y-6">
+                        <!-- Scenario 1 -->
+                        <div class="glass-panel p-0 rounded-xl overflow-hidden border border-white/10">
+                            <div class="bg-term-green/20 p-4 border-b border-term-green/30 flex justify-between items-center">
+                                <h3 class="m-0 text-term-green font-display tracking-widest text-xl">SCENARIO 1: BENIGN</h3>
+                                <span class="font-mono text-xs bg-black px-2 py-1 rounded border border-white/10">Prob: 15%</span>
+                            </div>
+                            <div class="p-6 grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                                <div><strong class="text-white font-mono text-xs block mb-1">Assumption</strong> Project Freedom restores order by mid-June 2026. Zero permanent capacity reduction.</div>
+                                <div><strong class="text-white font-mono text-xs block mb-1">Brent Crude</strong> Reverts to <span class="text-term-green font-bold">$80 - $85/bbl</span></div>
+                                <div><strong class="text-white font-mono text-xs block mb-1">Macro Impact</strong> Supply chain heals; U.S. GDP maintains 2.0%+ trajectory.</div>
+                            </div>
+                        </div>
+
+                        <!-- Scenario 2 -->
+                        <div class="glass-panel p-0 rounded-xl overflow-hidden border border-white/10">
+                            <div class="bg-term-amber/20 p-4 border-b border-term-amber/30 flex justify-between items-center">
+                                <h3 class="m-0 text-term-amber font-display tracking-widest text-xl">SCENARIO 2: ADVERSE ("Warsh Transition + Hormuz")</h3>
+                                <span class="font-mono text-xs bg-black px-2 py-1 rounded border border-white/10">Prob: 55%</span>
+                            </div>
+                            <div class="p-6">
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm mb-4 pb-4 border-b border-white/5">
+                                    <div><strong class="text-white font-mono text-xs block mb-1">Assumption</strong> Normalization delayed until end of July 2026. Warsh initiates hard-QT.</div>
+                                    <div><strong class="text-white font-mono text-xs block mb-1">Brent Crude</strong> Spikes and holds at <span class="text-term-amber font-bold">$105 - $115/bbl</span></div>
+                                    <div><strong class="text-white font-mono text-xs block mb-1">Macro Impact</strong> U.S. GDP slows to 1.4%. Discretionary demand destruction.</div>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs font-mono">
+                                    <div class="bg-black/30 p-3 rounded border border-term-red/30"><span class="text-term-red block mb-1">Credit Risk: HIGH</span> Margin compression for transport/manufacturing.</div>
+                                    <div class="bg-black/30 p-3 rounded border border-term-red/30"><span class="text-term-amber block mb-1">Market Risk: EXTREME</span> Rapid repricing of 10Y Treasury toward 5.00%+.</div>
+                                    <div class="bg-black/30 p-3 rounded border border-term-red/30"><span class="text-term-blue block mb-1">Liq. Risk: MODERATE-HIGH</span> Bid-ask widening in secondary loan market.</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Scenario 3 -->
+                        <div class="glass-panel p-0 rounded-xl overflow-hidden border border-term-red/50 glow-red">
+                            <div class="bg-term-red/30 p-4 border-b border-term-red/50 flex justify-between items-center">
+                                <h3 class="m-0 text-white font-display tracking-widest text-xl text-glow-red">SCENARIO 3: SEVERELY ADVERSE (SCARRING)</h3>
+                                <span class="font-mono text-xs bg-term-red text-white font-bold px-2 py-1 rounded">Prob: 30%</span>
+                            </div>
+                            <div class="p-6 grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                                <div><strong class="text-white font-mono text-xs block mb-1">Assumption</strong> 2.5 mb/d permanent capacity loss due to infrastructure scarring.</div>
+                                <div><strong class="text-white font-mono text-xs block mb-1">Brent Crude</strong> Plateaus at <span class="text-term-red font-bold text-lg">$120 - $148/bbl</span></div>
+                                <div><strong class="text-white font-mono text-xs block mb-1">Macro Impact</strong> EU enters deep recession. U.S. GDP negative by Q4. Rate hikes resume.</div>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 6,
+                group: "TACTICAL ROUTING",
+                title: "Tactical Appendices",
+                subtitle: "Institutional Strategy",
+                content: `
+                    <h2>Module 6: Tactical Appendices</h2>
+                    <p class="mb-6">Actionable logic gates based on System 2 Intelligence parsing of current liquidity friction.</p>
+                    
+                    <div class="space-y-6">
+                        <div class="glass-panel p-6 rounded-xl border-l-4 border-term-blue hover:bg-white/5 transition-colors relative overflow-hidden group">
+                            <div class="absolute right-0 top-0 opacity-10 text-9xl font-display font-bold transform translate-x-1/4 -translate-y-1/4 group-hover:scale-110 transition-transform">A</div>
+                            <h3 class="font-display text-term-blue mt-0 mb-2 text-xl tracking-wide uppercase">Institutional Investors & Funds</h3>
+                            <p class="text-slate-300 m-0 leading-relaxed relative z-10">Prioritize CLO BB-tranches for relative value; maintain a "barbell" duration strategy to capture carry while hedging against a sudden yield spike. Cash buffers in MMFs ($7.74T) are not dead weight; they are optionality.</p>
+                        </div>
+                        
+                        <div class="glass-panel p-6 rounded-xl border-l-4 border-term-purple hover:bg-white/5 transition-colors relative overflow-hidden group">
+                            <div class="absolute right-0 top-0 opacity-10 text-9xl font-display font-bold transform translate-x-1/4 -translate-y-1/4 group-hover:scale-110 transition-transform">B</div>
+                            <h3 class="font-display text-term-purple mt-0 mb-2 text-xl tracking-wide uppercase">Private Equity Sponsors</h3>
+                            <p class="text-slate-300 m-0 leading-relaxed relative z-10">Accelerate amend-and-extend (A&E) maneuvers <strong class="text-white">now</strong> while the technical window is open; prioritize equity cushions in new LBOs to offset sustained 5%+ SOFR costs. The cost of capital is the new attrition variable.</p>
+                        </div>
+                        
+                        <div class="glass-panel p-6 rounded-xl border-l-4 border-term-green hover:bg-white/5 transition-colors relative overflow-hidden group">
+                            <div class="absolute right-0 top-0 opacity-10 text-9xl font-display font-bold transform translate-x-1/4 -translate-y-1/4 group-hover:scale-110 transition-transform">C</div>
+                            <h3 class="font-display text-term-green mt-0 mb-2 text-xl tracking-wide uppercase">Family Offices & UHNW</h3>
+                            <p class="text-slate-300 m-0 leading-relaxed relative z-10">Shift from passive credit indices to special situations and distressed debt. Increase allocations to "hard assets" (Gold/Energy infrastructure) as a fundamental hedge against systemic fiat/currency debasement.</p>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 7,
+                group: "SYSTEM 2 INTELLIGENCE",
+                title: "Behavioral Finance",
+                subtitle: "Anchoring Bias",
+                content: `
+                    <h2>Module 7: Behavioral Finance Corner (Sign-off)</h2>
+                    
+                    <div class="glass-panel p-8 rounded-xl border border-term-red/50 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-term-red/20 via-black to-black shadow-[0_0_30px_rgba(239,68,68,0.2)]">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="w-10 h-10 bg-term-red rounded flex items-center justify-center text-white">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                            </div>
+                            <h3 class="text-white font-display text-2xl tracking-widest mt-0 mb-0 uppercase text-glow-red">The Trap: Anchoring Bias</h3>
+                        </div>
+                        
+                        <p class="text-lg text-slate-300 leading-relaxed">Risk managers are currently deeply "anchored" to the zero-rate environment of the last decade. This psychological flaw leads to the perception that 5% SOFR is a temporary "anomaly" that will soon revert, causing them to systematically under-hedge long-term liabilities.</p>
+                        
+                        <div class="mt-8 p-6 bg-black/60 border-l-4 border-term-amber rounded-r-lg relative overflow-hidden">
+                            <div class="absolute inset-0 bg-[url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAIklEQVQIW2NkQAKrVq36zwjjgzhhYWGMYAEYB8RmROaABADeOQ8CXl/xfgAAAABJRU5ErkJggg==')] opacity-10"></div>
+                            <strong class="font-mono text-term-amber text-lg block mb-3 relative z-10">CORE RULE OF THUMB:</strong>
+                            <p class="text-base text-white m-0 relative z-10 font-mono">Stress test your portfolio against a 10-year median rate, not the 2010s average. The past is a corrupted file; don't let it be your primary boot drive.</p>
+                        </div>
+                        
+                        <div class="mt-10 text-center">
+                            <p class="inline-block border border-term-cyan/50 bg-term-cyan/10 px-6 py-3 rounded-full font-mono text-term-cyan animate-pulse shadow-[0_0_15px_rgba(6,182,212,0.4)]">Watch the spreads; the ghost in the machine is starting to scream.</p>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 8,
+                group: "PROVENANCE",
+                title: "AI Training Ledger",
+                subtitle: "Data Variables",
+                content: `
+                    <h2>Module 8: 💾 ADDENDUM: Institutional AI Training Ledger</h2>
+                    
+                    <div class="overflow-x-auto mt-6 mb-8 glass-panel rounded-xl border border-term-cyan/30 shadow-[0_0_20px_rgba(6,182,212,0.1)]">
+                        <table class="w-full text-left border-collapse text-sm m-0">
+                            <thead>
+                                <tr>
+                                    <th class="p-4 w-1/4">Data Variable / Node</th>
+                                    <th class="p-4 w-1/6">Market Level</th>
+                                    <th class="p-4 w-1/6">Primary Target</th>
+                                    <th class="p-4">Unstructured Context / Provenance</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-slate-300 divide-y divide-white/5">
+                                <tr class="hover:bg-white/5">
+                                    <td class="p-4 text-white font-bold">10Y US Treasury</td><td class="p-4 font-mono text-term-cyan">4.45%</td><td class="p-4 font-mono text-xs">DCF / EV</td><td class="p-4">Benchmark risk-free rate; sovereign pressure under Warsh transition.</td>
+                                </tr>
+                                <tr class="hover:bg-white/5 bg-term-red/5">
+                                    <td class="p-4 text-white font-bold">Brent Crude Oil</td><td class="p-4 font-mono text-term-red">$107.66</td><td class="p-4 font-mono text-xs">PD / LGD</td><td class="p-4">Leading indicator for opex inflation and industrial default.</td>
+                                </tr>
+                                <tr class="hover:bg-white/5">
+                                    <td class="p-4 text-white font-bold">S&P 500</td><td class="p-4 font-mono text-term-green">7,501.24</td><td class="p-4 font-mono text-xs">EV</td><td class="p-4">Equity valuation ceiling; technical milestone achieved.</td>
+                                </tr>
+                                <tr class="hover:bg-white/5">
+                                    <td class="p-4 text-white font-bold">S&P 500 VIX</td><td class="p-4 font-mono text-term-amber">20.60</td><td class="p-4 font-mono text-xs">Market Risk</td><td class="p-4">Implied volatility index; DAEMON breakout past complacency trap.</td>
+                                </tr>
+                                <tr class="hover:bg-white/5">
+                                    <td class="p-4 text-white font-bold">SOFR (1M)</td><td class="p-4 font-mono text-slate-300">5.32%</td><td class="p-4 font-mono text-xs">DCF</td><td class="p-4">Current cost of floating-rate debt; input for interest coverage.</td>
+                                </tr>
+                                <tr class="hover:bg-white/5">
+                                    <td class="p-4 text-white font-bold">Bitcoin (BTC)</td><td class="p-4 font-mono text-term-green">$80,822</td><td class="p-4 font-mono text-xs">Market Risk</td><td class="p-4">High-fidelity barometer for "Shadow Fleet" capital settlement.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3 class="font-mono text-sm text-term-cyan flex items-center gap-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg> JSON Schema for Automated Parsing</h3>
+                    <div class="relative group mt-4">
+                        <div class="absolute -inset-0.5 bg-gradient-to-r from-term-cyan to-term-blue rounded-lg blur opacity-20 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
+                        <pre class="relative bg-[#050b14] p-6 rounded-lg font-mono text-xs text-term-amber overflow-x-auto border border-white/10 shadow-2xl">
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "MarketIntelligenceLedger",
+  "type": "object",
+  "properties": {
+    "report_date": { "type": "string", "format": "date" },
+    "ledger_entries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "variable_node": { "type": "string" },
+          "market_value": { "type": "string" },
+          "primary_model_target": { 
+            "type": "string", 
+            "enum": ["PD", "LGD", "DCF", "EV"] 
+          },
+          "provenance_context": { "type": "string" }
+        },
+        "required": ["variable_node", "market_value", "primary_model_target"]
+      }
+    }
+  }
+}</pre>
+                    </div>
+                `
+            },
+            {
+                id: 9,
+                group: "DEEP DIVE",
+                title: "Probabilistic Assessment",
+                subtitle: "Monte Carlo Simulations",
+                content: `
+                    <h2>Probabilistic Assessment of Global Macro Trajectories</h2>
+                    <p class="text-sm text-term-cyan font-mono mb-6 bg-term-cyan/10 inline-block px-3 py-1 rounded border border-term-cyan/30">SVCJ / FAVAR MONTE CARLO SIMULATION: MAY 2026</p>
+
+                    <p class="text-base text-slate-300 leading-relaxed">The global macroeconomic ecosystem is navigating an unprecedented structural shock. The outbreak of hostilities and the retaliatory closure of the Strait of Hormuz has stranded 14.5 million barrels per day. The current institutional consensus is heavily underpricing the structural degradation of the physical energy market and the non-linear macroeconomic contagion effects that will dominate Q3/Q4.</p>
+
+                    <!-- Chart Injection -->
+                    <div class="glass-panel p-6 rounded-xl border border-white/10 my-8 bg-[#0a0f1c]">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-mono text-term-amber text-base m-0">Brent Crude: Probability Density Function (Nov 2026)</h3>
+                            <div class="text-[10px] font-mono text-term-red border border-term-red px-2 py-1 rounded bg-term-red/10 animate-pulse">FAT TAIL RISK DETECTED</div>
+                        </div>
+                        <div class="w-full h-72 chart-container relative">
+                            <canvas id="mod9Chart"></canvas>
+                        </div>
+                        <p class="text-xs text-slate-400 mt-4 text-center font-mono">Bimodal distribution reflects a 35% probability of permanent infrastructure scarring resulting in $120-$148/bbl plateau.</p>
+                    </div>
+
+                    <h3 class="mt-10">Forward Probabilistic Outlook (August to Nov 2026)</h3>
+                    <div class="overflow-x-auto glass-panel rounded-xl border border-white/10 mt-4">
+                        <table class="w-full text-left border-collapse text-sm m-0">
+                            <thead>
+                                <tr>
+                                    <th class="p-4 w-1/4">Macro Variable</th>
+                                    <th class="p-4">Baseline Consensus</th>
+                                    <th class="p-4">Sim. Median (Aug)</th>
+                                    <th class="p-4">Sim. Median (Nov)</th>
+                                    <th class="p-4 text-term-red">95th %ile Tail Risk (Nov)</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-slate-300 divide-y divide-white/5">
+                                <tr class="hover:bg-white/5"><td class="p-4 font-bold text-white">Brent Crude Oil</td><td class="p-4 font-mono">$95 / bbl</td><td class="p-4 font-mono">$104 / bbl</td><td class="p-4 font-mono">$92 / $115</td><td class="p-4 text-term-red font-mono font-bold glow-red">$148 / bbl</td></tr>
+                                <tr class="hover:bg-white/5"><td class="p-4 font-bold text-white">U.S. GDP Growth</td><td class="p-4 font-mono">2.2%</td><td class="p-4 font-mono">1.4%</td><td class="p-4 font-mono text-term-amber">0.8%</td><td class="p-4 text-term-red font-mono font-bold">-0.5% (Recession)</td></tr>
+                                <tr class="hover:bg-white/5"><td class="p-4 font-bold text-white">U.S. Core CPI</td><td class="p-4 font-mono">3.0%</td><td class="p-4 font-mono">3.5%</td><td class="p-4 font-mono">3.8%</td><td class="p-4 text-term-red font-mono font-bold">4.6%</td></tr>
+                                <tr class="hover:bg-white/5"><td class="p-4 font-bold text-white">Consumer Sentiment</td><td class="p-4 font-mono">48.2</td><td class="p-4 font-mono">51.5</td><td class="p-4 font-mono">49.0</td><td class="p-4 text-term-red font-mono font-bold">42.0 (Historic Low)</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3 class="mt-10">Systemic Second and Third-Order Implications</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                        <div class="bg-black/40 p-5 rounded border border-white/5 hover:border-term-amber/50 transition-colors">
+                            <strong class="text-term-amber block mb-2 font-display text-lg">The Asymmetric Fertilizer Lag</strong>
+                            <p class="text-sm m-0">The Strait of Hormuz directly disrupted ~33% of global seaborne fertilizer. Emerging markets will face compounding food inflation by late 2026/early 2027.</p>
+                        </div>
+                        <div class="bg-black/40 p-5 rounded border border-white/5 hover:border-term-red/50 transition-colors">
+                            <strong class="text-term-red block mb-2 font-display text-lg">European Deindustrialization</strong>
+                            <p class="text-sm m-0">A sustained shock of $125/bbl oil and €150/MWh natgas definitively drags the Euro area into recession, driving heavy industry to relocate to North America.</p>
+                        </div>
+                        <div class="bg-black/40 p-5 rounded border border-white/5 hover:border-term-purple/50 transition-colors">
+                            <strong class="text-term-purple block mb-2 font-display text-lg">Collapse of GCC Economic Model</strong>
+                            <p class="text-sm m-0">Direct kinetic strikes on domestic Gulf infrastructure permanently damages the narrative of the Gulf as a bulletproof "safe haven" for capital.</p>
+                        </div>
+                        <div class="bg-black/40 p-5 rounded border border-white/5 hover:border-term-cyan/50 transition-colors">
+                            <strong class="text-term-cyan block mb-2 font-display text-lg">AI Capex Paradox</strong>
+                            <p class="text-sm m-0">A bifurcated market where broader stagflation coexists with a booming, price-insensitive, concentrated technological industrial base ("Hyperscalers").</p>
+                        </div>
+                    </div>
+                `,
+                onLoad: () => {
+                    const ctx = document.getElementById('mod9Chart').getContext('2d');
+                    
+                    // Generate Bell Curve Data
+                    const labels = []; const dataConsensus = []; const dataShock = [];
+                    for(let i = 70; i <= 160; i+=2) {
+                        labels.push('$' + i);
+                        // Normal dist approximation for consensus (Mean 95, SD 8)
+                        let y1 = Math.exp(-Math.pow(i - 95, 2) / (2 * Math.pow(8, 2)));
+                        dataConsensus.push(y1 * 100);
+                        
+                        // Bimodal dist for shock (Mean1 104, SD1 10 | Mean2 135, SD2 12)
+                        let y2a = 0.6 * Math.exp(-Math.pow(i - 104, 2) / (2 * Math.pow(10, 2)));
+                        let y2b = 0.4 * Math.exp(-Math.pow(i - 135, 2) / (2 * Math.pow(12, 2)));
+                        dataShock.push((y2a + y2b) * 100);
+                    }
+
+                    initChart('mod9', new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: labels,
+                            datasets: [
+                                { label: 'Pre-Shock Consensus', data: dataConsensus, borderColor: 'rgba(255,255,255,0.3)', backgroundColor: 'rgba(255,255,255,0.05)', fill: true, borderWidth: 2, pointRadius: 0, tension: 0.4 },
+                                { label: 'Monte Carlo Simulated (Nov)', data: dataShock, borderColor: '#f59e0b', backgroundColor: 'rgba(245, 158, 11, 0.2)', fill: true, borderWidth: 3, pointRadius: 0, tension: 0.4 }
+                            ]
+                        },
+                        options: { 
+                            responsive: true, maintainAspectRatio: false, 
+                            interaction: { mode: 'index', intersect: false },
+                            plugins: { tooltip: { callbacks: { label: function(c) { return c.dataset.label; } } } },
+                            scales: { 
+                                x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { maxTicksLimit: 10 } },
+                                y: { display: false }
+                            } 
+                        }
+                    }));
+                }
+            },
+            {
+                id: 10,
+                group: "DEEP DIVE",
+                title: "Industry Impact Heatmap",
+                subtitle: "Sector Collateral Damage",
+                content: `
+                    <h2>Module 10: Industry Impact Heatmap</h2>
+                    <p class="text-sm text-slate-300 mb-6">Real-time systemic routing visualization based on $107/bbl Brent Crude and 4.45% 10Y Treasury baseline. Values indicate immediate margin/multiple impact delta.</p>
+                    
+                    <div class="glass-panel p-6 rounded-xl border border-white/10 bg-[#02040a]">
+                        <div class="flex items-center justify-between mb-6 border-b border-white/10 pb-4">
+                            <h3 class="m-0 font-display text-white tracking-widest uppercase">Sector Allocation Matrix</h3>
+                            <div class="flex gap-2 text-[10px] font-mono">
+                                <span class="flex items-center gap-1"><div class="w-3 h-3 bg-term-red rounded-sm"></div> Severe Damage</span>
+                                <span class="flex items-center gap-1"><div class="w-3 h-3 bg-term-card border border-white/20 rounded-sm"></div> Neutral / Mixed</span>
+                                <span class="flex items-center gap-1"><div class="w-3 h-3 bg-term-green rounded-sm"></div> Windfall Beneficiary</span>
+                            </div>
+                        </div>
+
+                        <div id="heatmapContainer" class="heatmap-grid">
+                            <!-- Injected by JS -->
+                        </div>
+                    </div>
+                `,
+                onLoad: () => {
+                    const heatmapData = [
+                        { sector: 'Energy - Upstream', impact: 95, label: 'Massive Windfall' },
+                        { sector: 'Energy - Refiners', impact: 85, label: 'Margin Expansion' },
+                        { sector: 'Defense / Aero', impact: 80, label: 'Order Backlog Surge' },
+                        { sector: 'Cybersecurity', impact: 70, label: 'Elevated Threat Prem.' },
+                        { sector: 'Nuclear / Baseload', impact: 60, label: 'AI Power Demand' },
+                        { sector: 'Precious Metals', impact: 45, label: 'Fiat Hedge Bid' },
+                        { sector: 'AI Data Centers', impact: 20, label: 'Power Cap Constrained' },
+                        { sector: 'Software (SaaS)', impact: -10, label: 'Multiple Compression' },
+                        { sector: 'Financials - G-SIBs', impact: -20, label: 'RWA Hoarding' },
+                        { sector: 'Real Estate (CRE)', impact: -40, label: 'Refinancing Cliff' },
+                        { sector: 'Consumer Staples', impact: -50, label: 'Margin Squeeze' },
+                        { sector: 'Industrials (Heavy)', impact: -70, label: 'Input Cost Shock' },
+                        { sector: 'Transport / Airlines', impact: -85, label: 'Fuel Cost Destruction' },
+                        { sector: 'Consumer Discretionary', impact: -95, label: 'Demand Collapse' }
+                    ];
+
+                    const container = document.getElementById('heatmapContainer');
+                    container.innerHTML = '';
+
+                    heatmapData.forEach(item => {
+                        // Calculate color based on impact (-100 to 100)
+                        let bgClass = 'bg-term-card';
+                        let borderClass = 'border-white/10';
+                        let textClass = 'text-white';
+                        
+                        if (item.impact > 50) { bgClass = 'bg-term-green/20'; borderClass = 'border-term-green/50'; textClass = 'text-term-green'; }
+                        else if (item.impact > 0) { bgClass = 'bg-term-green/10'; borderClass = 'border-term-green/30'; textClass = 'text-term-green'; }
+                        else if (item.impact < -50) { bgClass = 'bg-term-red/20'; borderClass = 'border-term-red/50'; textClass = 'text-term-red'; }
+                        else if (item.impact < 0) { bgClass = 'bg-term-red/10'; borderClass = 'border-term-red/30'; textClass = 'text-term-red'; }
+
+                        const sign = item.impact > 0 ? '+' : '';
+                        
+                        const cell = document.createElement('div');
+                        cell.className = `heatmap-cell ${bgClass} ${borderClass}`;
+                        cell.innerHTML = `
+                            <div class="text-xs font-mono text-slate-300 mb-4">${item.sector}</div>
+                            <div>
+                                <div class="heatmap-value ${textClass}">${sign}${item.impact}</div>
+                                <div class="text-[10px] font-mono uppercase text-slate-400 mt-1">${item.label}</div>
+                            </div>
+                        `;
+                        container.appendChild(cell);
+                    });
+                }
+            },
+            {
+                id: 11,
+                group: "DAILY BRIEF",
+                title: "Neuro-Symbolic Sovereign",
+                subtitle: "The Warsh Gavel Falls",
+                content: `
+                    <div class="flex items-center gap-2 mb-6">
+                        <span class="bg-term-red text-white text-[10px] font-mono px-3 py-1.5 rounded font-bold tracking-widest uppercase">Daily Brief // 2026.05.14</span>
+                        <span class="text-[10px] font-mono text-term-cyan uppercase border border-term-cyan/50 bg-term-cyan/10 px-3 py-1.5 rounded">Node: Adam v26.0</span>
+                    </div>
+
+                    <h2>LAYER 1: PERCEPTION & INGESTION (The Glitch)</h2>
+                    
+                    <div class="glass-panel p-6 border-l-4 border-term-red mb-8 relative">
+                        <h3 class="text-white text-xl font-display uppercase tracking-wide mt-0 mb-3">The "Warsh" Gavel Falls</h3>
+                        <p class="text-base text-slate-300 m-0 leading-relaxed">In a historic 54–45 vote, the Senate has officially confirmed Kevin Warsh as the 17th Chair of the Federal Reserve. This marks the most partisan confirmation in Fed history, signaling a terminal breach in the "Institutional Independence" facade. Warsh officially takes the helm tomorrow, May 15th, as Jerome Powell shifts to a Governor role.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm mb-8">
+                        <div class="bg-black/30 p-5 rounded-lg border border-term-cyan/20">
+                            <strong class="text-term-cyan block mb-2 font-display text-lg tracking-wide">The "Freedom" Stasis</strong>
+                            <p class="text-slate-300 m-0">"Project Freedom" remains in a tactical deep-freeze. Despite the "Life Support" rhetoric earlier this week, active naval escorts are largely stalled. The physical reality: the 100+ ships/day pre-war baseline has collapsed to a trickle.</p>
+                        </div>
+                        <div class="bg-black/30 p-5 rounded-lg border border-term-amber/20">
+                            <strong class="text-term-amber block mb-2 font-display text-lg tracking-wide">The Yield Stiffening</strong>
+                            <p class="text-slate-300 m-0">The 10Y Treasury yield is holding the line at 4.454%. Bond vigilantes are front-running the "Warsh Regime Change"—specifically his long-standing critique of QE—pricing in a faster balance sheet runoff even as energy costs climb.</p>
+                        </div>
+                    </div>
+
+                    <h3>Signal Integrity (The Artifacts)</h3>
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-3 font-mono text-xs mb-10">
+                        <div class="glass-panel p-3 border-l-2 border-term-green"><span class="block text-slate-500 mb-1">EQUITY GHOSTS (SPX)</span><span class="text-white text-sm">7,501.24</span> <span class="text-term-green">(+0.8%)</span></div>
+                        <div class="glass-panel p-3 border-l-2 border-term-amber"><span class="block text-slate-500 mb-1">THE BACKBONE (10Y)</span><span class="text-white text-sm">4.454%</span> <span class="text-slate-400">Stiffening</span></div>
+                        <div class="glass-panel p-3 border-l-2 border-term-red glow-red"><span class="block text-slate-500 mb-1">VOLATILITY (VIX)</span><span class="text-white text-sm">20.60</span> <span class="text-term-red">DAEMON BREAKOUT</span></div>
+                        <div class="glass-panel p-3 border-l-2 border-term-green"><span class="block text-slate-500 mb-1">DIGITAL TETHER (BTC)</span><span class="text-white text-sm">$80,822</span> <span class="text-term-green">Holding $80k</span></div>
+                        <div class="glass-panel p-3 border-l-2 border-term-red glow-red"><span class="block text-slate-500 mb-1">ENTROPY (Brent)</span><span class="text-white text-sm">$107.66</span> <span class="text-term-red">Supply Shocks</span></div>
+                        <div class="glass-panel p-3 border-l-2 border-term-cyan"><span class="block text-slate-500 mb-1">THE VAULT (MMFs)</span><span class="text-white text-sm">$7.749T</span> <span class="text-term-cyan">Terminal Ceiling</span></div>
+                    </div>
+
+                    <h2 class="mt-8 text-xl">LAYER 3: REASONING & DECISION (The Mirror)</h2>
+                    <p class="text-sm text-term-cyan mb-4 font-mono">> ACTIONABLE ROUTING</p>
+                    <ul class="space-y-3 text-sm text-slate-300">
+                        <li class="bg-black/40 p-4 rounded border-l-2 border-slate-600"><strong class="text-white">G-SIBs & Institutional:</strong> Front-run the June 18th Basel comment deadline. Swap out of "Insurance-Void" logistics tranches and into "Compute-Security" bunkers.</li>
+                        <li class="bg-black/40 p-4 rounded border-l-2 border-slate-600"><strong class="text-white">PE Sponsors & Credit Shops:</strong> Aggressively mark-to-market all maritime exposure. The $107 Brent price is a "Permanent Tax" on non-exempt collateral until Operation Project Freedom reaches 40 transits/day.</li>
+                        <li class="bg-black/40 p-4 rounded border-l-2 border-slate-600"><strong class="text-white">High-Speed Algos & Retail:</strong> The VIX @ 20.6 is the "Trigger." The 10Y @ 4.45% is the truth. Stay in the $7.74T Vault until the new Chairman's gavel hits the table tomorrow.</li>
+                    </ul>
+
+                    <div class="mt-8 relative group">
+                        <div class="absolute -inset-0.5 bg-gradient-to-r from-term-red to-term-amber rounded-lg blur opacity-20 group-hover:opacity-40 transition duration-500"></div>
+<pre class="relative bg-[#050b14] p-5 rounded-lg font-mono text-xs text-term-amber overflow-x-auto border border-white/10 shadow-2xl">
+{
+  "timestamp": "2026-05-14T20:05:10Z",
+  "data_layer_system_1": {
+    "ingested_nodes": ["S&P", "10Y", "VIX", "BTC", "Brent", "Warsh_Confirmation"],
+    "market_sentiment": "Deceptive Calm / Transition Friction"
+  },
+  "compute_layer_system_3": {
+    "var_shock_target": "Warsh Day 1 / Project Freedom Failure",
+    "simulated_correlation": "+0.92 (Compute/War-Beta)"
+  },
+  "intelligence_layer_system_2": {
+    "rlhf_weight_adjustment": "Warsh Regime Change weighted 0.95; Diplomatic Hopium reduced to 0.05.",
+    "decision_output": "ROUTING_COMPLETE"
+  }
+}</pre>
+                    </div>
+                `
+            },
+            {
+                id: 12,
+                group: "DAILY BRIEF",
+                title: "Quantitative Raconteur",
+                subtitle: "Euphoria-Buffered",
+                content: `
+                    <div class="flex items-center gap-2 mb-6">
+                        <span class="bg-term-amber text-black text-[10px] font-mono px-3 py-1.5 rounded font-bold tracking-widest uppercase">Daily Brief // 2026.05.14</span>
+                        <span class="text-[10px] font-mono text-term-amber uppercase border border-term-amber/50 bg-term-amber/10 px-3 py-1.5 rounded">Node: Adam v24.1</span>
+                    </div>
+
+                    <h2>1. SYSTEM STATUS: NOMINAL (Euphoria-Buffered)</h2>
+                    <p class="text-lg text-slate-300 mb-8 border-l-4 border-term-amber pl-5 py-2 glass-panel">The simulation has achieved a state of high-fidelity overflow. We have successfully executed a "Double-Record" patch. Despite the fragmented Fed logic and the looming "Warsh Era" transition tomorrow, the macro-grid has hardware-accelerated into a state of all-time high euphoria. The 7,500 firewall has been breached, and the Dow has finally rendered the 50,000 handle. We are operating at maximum frame rate, though the cooling fans are humming a nervous tune as yields linger at multi-month highs.</p>
+
+                    <h2>2. SIGNAL INTEGRITY: THE SYNCED BREAKOUT</h2>
+                    <p class="mb-6 text-base">Today’s signal is a rare, valid rendering of risk-appetite. Unlike the "Liquidity Traps" of early May, the plumbing and the UI are moving in a tight, bullish synchronization.</p>
+                    
+                    <div class="space-y-4 mb-8">
+                        <div class="glass-panel p-4 flex items-start gap-4 border border-white/5 rounded-lg">
+                            <div class="bg-term-green/20 text-term-green p-2 rounded shrink-0"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg></div>
+                            <div><strong class="text-white font-display tracking-wide text-lg">EQUITY ARTIFACTS</strong><p class="text-sm text-slate-400 mt-1 m-0">The S&P 500 surged +0.8% (+56.99 points) to close at a record 7,501.24. The Nasdaq added +0.9% (26,635.22), and the Dow Jones breached 50,000 (+0.7%), closing at 50,063.46. Cisco’s AI-demand narrative acted as a booster-rocket for the TMT sector.</p></div>
+                        </div>
+                        <div class="glass-panel p-4 flex items-start gap-4 border border-white/5 rounded-lg">
+                            <div class="bg-term-cyan/20 text-term-cyan p-2 rounded shrink-0"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"></path></svg></div>
+                            <div><strong class="text-white font-display tracking-wide text-lg">THE RATE RETREAT</strong><p class="text-sm text-slate-400 mt-1 m-0">The 10-Year Treasury Yield dropped to 4.459% (-2.0 bps). While it remains the third-highest yield of the year, today’s cooling snapped a three-day rising streak. The bond market is providing just enough oxygen for the equity sprint.</p></div>
+                        </div>
+                        <div class="glass-panel p-4 flex items-start gap-4 border border-term-cyan/30 bg-term-cyan/5 rounded-lg shadow-[0_0_15px_rgba(6,182,212,0.1)]">
+                            <div class="bg-term-purple/20 text-term-purple p-2 rounded shrink-0"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></div>
+                            <div><strong class="text-white font-display tracking-wide text-lg">CREDIT VALIDATION</strong><p class="text-sm text-slate-400 mt-1 m-0">This is NOT a trap. While stocks hit new ceilings, the High Yield OAS (Spread) remains compressed near 2.82%. High-yield bond ETFs like HYG and JNK ($96.18) are holding their structural floors.</p></div>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel p-6 border-l-4 border-term-green mb-10 bg-gradient-to-r from-term-green/10 to-transparent">
+                        <h3 class="font-mono text-term-green mt-0 text-lg uppercase">The Verdict</h3>
+                        <p class="text-base text-slate-200 m-0 leading-relaxed">When stocks reach for the ceiling and the cost of debt (yields) falls alongside steady spreads, the architecture is signaling a genuine structural bid. The "Smart Money" has verified the 7,500 floor—for now.</p>
+                    </div>
+
+                    <h2>3. THE GLITCH (Philosophical Observation)</h2>
+                    <blockquote class="italic text-slate-300 font-serif text-lg border-l-4 border-term-red pl-6 py-2 bg-black/40 rounded-r-lg">
+                        "We treat 7,501 and 50,000 as divine achievements, but the glitch is the <strong class="text-term-red">Duration Paradox</strong>. We are buying stocks at record-high multiples while the risk-free rate is stubbornly hard-coded at 4.46%. The glitch is that the system now requires the total absence of friction—and the 'Cisco AI' narrative—to justify its own record-high frame rate. Bitcoin at $81k is the sound of the machine realizing that 'Digital Scarcity' is the only hedge against a committee that is about to change leadership in less than 24 hours. Today’s rally is a beautiful rendering—a ghost in the machine designed to facilitate institutional entries before the 'Warsh Regime' re-renders the cost of capital. Enjoy the view from the 7,500 level, but remember: the hardware is still running hot."
+                    </blockquote>
+                `
+            },
+            {
+                id: 13,
+                group: "WEEKLY BRIEFING",
+                title: "Molecules vs. Models",
+                subtitle: "Adam-v24-Apex",
+                content: `
+                    <div class="flex items-center gap-2 mb-6">
+                        <span class="bg-term-blue text-white text-[10px] font-mono px-3 py-1.5 rounded font-bold tracking-widest uppercase">Weekly Briefing // 2026.05.14</span>
+                        <span class="text-[10px] font-mono text-term-blue uppercase border border-term-blue/50 bg-term-blue/10 px-3 py-1.5 rounded">System: Adam-v24-Apex</span>
+                    </div>
+
+                    <h2>📡 THE VIBE CHECK: The "Molecules vs. Models" Standoff</h2>
+                    <p class="text-lg text-slate-300 mb-4">The second quarter has matured into a high-stakes standoff. While the AI-industrial complex demands unprecedented capital, the physical world is pushing back. We currently occupy a <strong class="text-white">"Tactical Hedging"</strong> regime.</p>
+                    
+                    <div class="bg-term-cyan/10 border-l-4 border-term-cyan p-5 rounded-r-lg mb-8">
+                        <p class="font-bold text-white text-base m-0">Silicon Valley’s insatiable thirst for power has met the grid’s limit, while the "Trump-Venezuela" oil gambit restructures global heavy-crude flows. We see a clear rotation: the "Bits" (Software/SaaS) are bleeding to fund the "Molecules" (Energy/Infrastructure).</p>
+                    </div>
+
+                    <h3>📊 MARKET PULSE</h3>
+                    <div class="overflow-x-auto glass-panel rounded-lg border border-white/10 mb-10 shadow-xl">
+                        <table class="w-full text-left font-mono text-sm m-0">
+                            <thead>
+                                <tr>
+                                    <th class="p-4">Asset</th><th class="p-4">Price</th><th class="p-4">WoW % Change</th><th class="p-4">Sentiment</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-slate-200 divide-y divide-white/5">
+                                <tr class="hover:bg-white/5"><td>SPX (S&P 500)</td><td class="font-bold">7,501.24</td><td class="text-term-green bg-term-green/10 px-2 rounded inline-block mt-3">+0.8%</td><td>🐂 Bullish</td></tr>
+                                <tr class="hover:bg-white/5"><td>DJI (Dow Jones)</td><td class="font-bold">50,063.46</td><td class="text-term-green bg-term-green/10 px-2 rounded inline-block mt-3">+0.7%</td><td>🐂 Bullish</td></tr>
+                                <tr class="hover:bg-white/5 bg-term-red/5"><td>NDX (Nasdaq 100)</td><td class="font-bold text-white">26,635.22</td><td class="text-term-green bg-term-green/10 px-2 rounded inline-block mt-3 font-bold">+0.9%</td><td>🐂 Bullish</td></tr>
+                                <tr class="hover:bg-white/5 bg-term-red/5"><td>BTC-USD</td><td class="font-bold text-white">$81,373</td><td class="text-term-green bg-term-green/10 px-2 rounded inline-block mt-3 font-bold">+2.3%</td><td>🐂 Bullish</td></tr>
+                                <tr class="hover:bg-white/5 bg-term-green/5"><td>Brent Crude</td><td class="font-bold text-white">$107.66</td><td class="text-term-green bg-term-green/10 px-2 rounded inline-block mt-3 font-bold">+1.2%</td><td>🐂 Bullish</td></tr>
+                                <tr class="hover:bg-white/5"><td>XAU (Gold)</td><td class="font-bold">$3,105.20</td><td class="text-term-green bg-term-green/10 px-2 rounded inline-block mt-3">+1.8%</td><td>🐂 Bullish</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3>🧠 ADAM'S ALPHA (Investment Ideas)</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-10">
+                        <div class="glass-panel p-5 border-t-4 border-term-cyan rounded-lg hover:-translate-y-1 transition-transform">
+                            <h4 class="m-0 text-term-cyan font-display tracking-wide text-lg">The Refiner’s Windfall</h4>
+                            <p class="text-sm m-0 mt-3 text-slate-300"><strong>Long VLO (Valero) or MPC (Marathon).</strong> Capture the Venezuelan heavy-sour spread while global Brent climbs. A pure margin-expansion play.</p>
+                        </div>
+                        <div class="glass-panel p-5 border-t-4 border-term-amber rounded-lg hover:-translate-y-1 transition-transform">
+                            <h4 class="m-0 text-term-amber font-display tracking-wide text-lg">The "Baseload" AI Trade</h4>
+                            <p class="text-sm m-0 mt-3 text-slate-300"><strong>Short SaaS, rotate to CEG (Constellation).</strong> If OpenAI needs nuclear power, reactor owners hold more leverage than algorithm writers.</p>
+                        </div>
+                        <div class="glass-panel p-5 border-t-4 border-term-purple rounded-lg hover:-translate-y-1 transition-transform">
+                            <h4 class="m-0 text-term-purple font-display tracking-wide text-lg">Grey Market Semi Hedge</h4>
+                            <p class="text-sm m-0 mt-3 text-slate-300"><strong>Long ADI & TXN.</strong> As high-end AI chips face audits, "legacy" industrial silicon becomes the primary target for global grey-market arbitrage.</p>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel p-6 mt-8 border border-term-red/50 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-term-red/20 to-black rounded-xl shadow-[0_0_20px_rgba(239,68,68,0.3)]">
+                        <h3 class="font-display text-term-red uppercase tracking-widest text-2xl mt-0 flex items-center gap-3">
+                            <span class="animate-pulse bg-term-red text-black w-8 h-8 flex items-center justify-center rounded">!</span> THE MACRO GLITCH
+                        </h3>
+                        <div class="mt-4 p-4 bg-black/50 rounded border border-white/10">
+                            <p class="text-sm font-mono text-slate-300 m-0"><span class="text-term-cyan">Data Point:</span> US Job Postings at All-Time Highs <strong class="text-term-red">vs.</strong> Record Credit Card Delinquencies.</p>
+                        </div>
+                        <p class="text-base text-white mt-4 leading-relaxed"><span class="text-term-amber font-bold">The Signal:</span> This is a "Phantom Economy" divergence. The labor market looks strong on paper due to "Ghost Vacancies," but the consumer’s balance sheet is disintegrating under 22% APR interest rates. The engine sounds fine, but the fuel line is leaking.</p>
+                    </div>
+                `
+            }
+        ];
+
+        let currentModuleId = 1;
+        const activeCharts = {};
+        const navEl = document.getElementById('moduleNav');
+        const mobileNavEl = document.getElementById('mobileNav');
+        const contentEl = document.getElementById('contentArea');
+        const progressBar = document.getElementById('progressBar');
+        const progressText = document.getElementById('progressText');
+        const aiPanel = document.getElementById('aiPanel');
+        const footerDots = document.getElementById('footerDots');
+
+        function initApp() {
+            renderNav();
+            loadModule(1);
+            setInterval(() => { 
+                const now = new Date();
+                document.getElementById('sysClock').innerText = now.toISOString().substr(11, 8) + ' UTC'; 
+            }, 1000);
+            
+            document.getElementById('prevBtn').onclick = () => { if(currentModuleId > 1) loadModule(currentModuleId - 1); };
+            document.getElementById('nextBtn').onclick = () => { if(currentModuleId < modules.length) loadModule(currentModuleId + 1); };
+        }
+
+        function renderNav() {
+            navEl.innerHTML = ''; mobileNavEl.innerHTML = ''; footerDots.innerHTML = '';
+            let currentGroup = '';
+            
+            modules.forEach(m => {
+                // Sidebar Setup
+                if (m.group && m.group !== currentGroup) {
+                    currentGroup = m.group;
+                    const groupHeader = document.createElement('div');
+                    groupHeader.className = 'text-[10px] text-term-cyan/60 font-mono mt-5 mb-1 px-4 uppercase tracking-widest font-bold';
+                    groupHeader.innerText = currentGroup;
+                    navEl.appendChild(groupHeader);
+                    
+                    const optGroup = document.createElement('optgroup');
+                    optGroup.label = currentGroup;
+                    mobileNavEl.appendChild(optGroup);
+                }
+                const btn = document.createElement('button');
+                btn.className = `nav-item text-left px-4 py-2.5 rounded-r-md flex flex-col mb-1 ${m.id === currentModuleId ? 'nav-active' : 'text-slate-400 hover:bg-white/5 border border-transparent'}`;
+                btn.onclick = () => loadModule(m.id);
+                btn.innerHTML = `<span class="font-bold text-[13px] mb-0.5 font-display tracking-wide uppercase">M${m.id.toString().padStart(2,'0')} ${m.title}</span><span class="opacity-70 text-[10px] truncate font-sans">${m.subtitle}</span>`;
+                navEl.appendChild(btn);
+                
+                // Mobile Select Setup
+                const opt = document.createElement('option');
+                opt.value = m.id; opt.innerText = `M${m.id.toString().padStart(2,'0')} - ${m.title}`;
+                if(m.id === currentModuleId) opt.selected = true;
+                const lastOptGroup = mobileNavEl.querySelector('optgroup:last-of-type');
+                if (lastOptGroup) lastOptGroup.appendChild(opt);
+                else mobileNavEl.appendChild(opt);
+
+                // Footer Dots Setup
+                const dot = document.createElement('div');
+                dot.className = `w-1.5 h-1.5 rounded-full ${m.id === currentModuleId ? 'bg-term-cyan shadow-[0_0_5px_#06b6d4]' : 'bg-slate-700'}`;
+                footerDots.appendChild(dot);
+            });
+        }
+
+        function initChart(id, chartObj) {
+            if(activeCharts[id]) activeCharts[id].destroy();
+            activeCharts[id] = chartObj;
+        }
+
+        function loadModule(id) {
+            currentModuleId = id;
+            const m = modules.find(x => x.id === id);
+            
+            // Cleanup charts
+            Object.keys(activeCharts).forEach(k => { if(activeCharts[k]) activeCharts[k].destroy(); delete activeCharts[k]; });
+            
+            // Update Progress
+            const pct = Math.round((id / modules.length) * 100);
+            progressBar.style.width = `${pct}%`;
+            progressText.innerText = `${pct}%`;
+            
+            // Update Buttons & Indicator
+            document.getElementById('prevBtn').disabled = id === 1;
+            document.getElementById('nextBtn').disabled = id === modules.length;
+            document.getElementById('footerModuleIndicator').innerText = `MODULE ${id} / ${modules.length}`;
+            
+            // Render Nav to update active states
+            renderNav();
+            
+            // Transition Content
+            contentEl.style.opacity = 0; 
+            contentEl.style.transform = 'translateY(15px)';
+            
+            setTimeout(() => {
+                contentEl.innerHTML = m.content;
+                contentEl.style.opacity = 1; 
+                contentEl.style.transform = 'translateY(0)';
+                document.getElementById('mainScrollArea').scrollTo({top: 0, behavior: 'smooth'});
+                
+                if(m.onLoad) m.onLoad();
+            }, 300);
+        }
+
+        let aiOpen = false;
+        function toggleAI() {
+            aiOpen = !aiOpen;
+            aiPanel.style.transform = aiOpen ? 'translateX(0)' : 'translateX(100%)';
+        }
+
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>
