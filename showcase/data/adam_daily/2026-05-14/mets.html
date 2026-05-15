@@ -11,7 +11,9 @@
     <!-- FontAwesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     
-    <!-- Custom Styles & Fonts -->
+    <!-- Three.js for AR Bobblehead -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Space+Mono&display=swap');
         
@@ -19,6 +21,7 @@
             font-family: 'Inter', sans-serif; 
             background-color: #020617; /* Slate 950 */
             color: #cbd5e1; /* Slate 300 */
+            overflow-x: hidden;
         }
         
         .mono { 
@@ -26,10 +29,10 @@
         }
         
         .glass-panel {
-            background: rgba(30, 41, 59, 0.6); /* Slate 800 with opacity */
+            background: rgba(30, 41, 59, 0.6);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(71, 85, 105, 0.4); /* Slate 600 */
+            border: 1px solid rgba(71, 85, 105, 0.4);
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
         }
 
@@ -65,6 +68,9 @@
         .chat-container.closed { transform: translateY(calc(100% - 3rem)); }
         .pitch-dot { transition: all 0.3s ease; }
         .pitch-dot.hidden-pitch { opacity: 0; transform: scale(0); pointer-events: none; }
+        
+        /* 3D Canvas focus ring removal */
+        canvas { outline: none; }
     </style>
 </head>
 <body class="min-h-screen p-4 md:p-6 lg:p-8">
@@ -79,7 +85,6 @@
             </p>
         </div>
         
-        <!-- Token Usage Widget -->
         <div class="glass-panel p-4 rounded-xl flex flex-wrap gap-4 items-center text-xs mono text-slate-300 border-l-4 border-l-blue-500">
             <div>
                 <span class="block text-slate-500 uppercase text-[10px] tracking-wider mb-1">Prompt Tokens</span>
@@ -105,7 +110,6 @@
 
     <main class="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-8xl mx-auto pb-12">
         
-        <!-- Full Game Recap & Conditions -->
         <section class="glass-panel rounded-2xl p-6 lg:p-8 lg:col-span-2 relative overflow-hidden animate-fade-in delay-100">
             <div class="absolute -top-20 -left-20 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
             
@@ -212,7 +216,6 @@
             </div>
         </section>
 
-        <!-- Star Wars Player Thematics -->
         <section class="glass-panel rounded-2xl p-6 relative overflow-hidden animate-fade-in delay-[150ms]">
             <div class="absolute -bottom-10 -right-10 w-40 h-40 bg-yellow-500/10 rounded-full blur-2xl pointer-events-none"></div>
             
@@ -222,7 +225,7 @@
             
             <p class="text-xs text-slate-400 mb-4">Citi Field's "Mandalorian and Grogu" promotion featured exclusive walk-up VFX, AR overlays, and a digital Grogu foul-ball tracker.</p>
 
-            <div class="flex flex-col gap-3 h-[280px] overflow-y-auto pr-2">
+            <div class="flex flex-col gap-3 h-[280px] overflow-y-auto pr-2 custom-scrollbar">
                 <!-- Alonso -->
                 <div class="flex items-center gap-4 bg-gradient-to-r from-red-900/40 to-slate-900/80 p-3 rounded-xl border border-red-900/50 relative group">
                     <div class="w-10 h-10 shrink-0 rounded-full bg-black flex items-center justify-center border-2 border-red-500 shadow-[0_0_15px_rgba(239,68,68,0.6)]">
@@ -294,20 +297,20 @@
                 </div>
             </div>
 
-            <!-- Virtual Download Widget -->
-            <div class="mt-5 bg-slate-900/90 border border-slate-700 p-3 rounded-xl flex items-center justify-between shadow-inner">
+            <!-- Virtual Download Widget -> Now triggers 3D AR Viewer -->
+            <div class="mt-5 bg-slate-900/90 border border-slate-700 p-3 rounded-xl flex items-center justify-between shadow-inner relative z-10">
                  <div class="flex items-center gap-3">
                      <div class="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center shadow-[0_0_10px_rgba(99,102,241,0.5)] animate-pulse">
                          <i class="fas fa-vr-cardboard text-xl text-white"></i>
                      </div>
                      <div>
                          <h4 class="text-white font-bold text-xs">Digital AR Collectible</h4>
-                         <p class="text-[10px] text-slate-400">Mando & Grogu Virtual Bobblehead</p>
+                         <p class="text-[10px] text-slate-400">Mando & Grogu Bobblehead</p>
                          <p class="text-[9px] text-purple-400 mt-0.5 font-mono"><i class="fab fa-ethereum mr-1"></i>Web3 Verified • Free Mint</p>
                      </div>
                  </div>
                  <button onclick="downloadBobblehead()" id="download-btn" class="bg-purple-600 hover:bg-purple-500 text-white text-[10px] px-3 py-2 rounded font-bold transition-all shadow-[0_0_10px_rgba(147,51,234,0.4)] uppercase tracking-wider">
-                     <i class="fas fa-download mr-1"></i> Mint
+                     <i class="fas fa-hammer mr-1"></i> Mint
                  </button>
             </div>
         </section>
@@ -398,7 +401,6 @@
                     <div class="mt-4 pt-4 border-t border-slate-700/50">
                         <h4 class="text-xs uppercase tracking-widest text-slate-400 font-bold mb-2">Algorithmic Line Movement</h4>
                         <div class="flex items-end h-16 gap-1 bg-slate-950 p-2 rounded border border-slate-800">
-                            <!-- Simulated bar chart for line movement -->
                             <div class="w-1/6 bg-slate-700 h-[30%] rounded-t group relative"><div class="absolute -top-6 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 text-[9px] bg-black px-1 rounded transition-opacity">8AM</div></div>
                             <div class="w-1/6 bg-slate-600 h-[40%] rounded-t group relative"><div class="absolute -top-6 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 text-[9px] bg-black px-1 rounded transition-opacity">10AM</div></div>
                             <div class="w-1/6 bg-blue-900 h-[60%] rounded-t group relative"><div class="absolute -top-6 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 text-[9px] bg-black px-1 border border-blue-500 text-blue-300 rounded transition-opacity w-max z-10">Weather API Hit</div></div>
@@ -429,48 +431,42 @@
                     <button onclick="togglePitches('ball')" class="text-[10px] px-2 py-1 rounded bg-red-900/30 text-red-400 border border-red-800/50 hover:bg-red-800/50 transition-colors">Toggle Balls</button>
                 </div>
 
-                <!-- Interactive SVG Pitch Zone -->
                 <div class="relative w-48 h-56 bg-slate-900/50 rounded-lg border border-slate-700/50 flex items-center justify-center overflow-hidden group">
                     <svg viewBox="0 0 100 120" class="w-full h-full drop-shadow-xl z-10">
-                        <!-- Home Plate -->
                         <path d="M 25 110 L 50 120 L 75 110 L 75 100 L 25 100 Z" fill="#334155" opacity="0.6"/>
-                        <!-- Strike Zone Box -->
                         <rect x="30" y="20" width="40" height="60" fill="rgba(59, 130, 246, 0.1)" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="3"/>
-                        <!-- Inner Grid -->
                         <line x1="43.3" y1="20" x2="43.3" y2="80" stroke="#cbd5e1" stroke-width="0.5" opacity="0.5"/>
                         <line x1="56.6" y1="20" x2="56.6" y2="80" stroke="#cbd5e1" stroke-width="0.5" opacity="0.5"/>
                         <line x1="30" y1="40" x2="70" y2="40" stroke="#cbd5e1" stroke-width="0.5" opacity="0.5"/>
                         <line x1="30" y1="60" x2="70" y2="60" stroke="#cbd5e1" stroke-width="0.5" opacity="0.5"/>
                         
-                        <!-- Pitches (Data plotted) -->
-                        <circle cx="34" cy="74" r="3.5" fill="#22c55e" class="pitch-dot strike shadow-glow-green cursor-pointer hover:r-5 transition-all">
+                        <circle cx="34" cy="74" r="3.5" fill="#22c55e" class="pitch-dot strike shadow-[0_0_5px_#22c55e] cursor-pointer hover:r-5 transition-all">
                             <title>Strike 3 (Called) - 101mph</title>
                         </circle>
-                        <circle cx="66" cy="24" r="3.5" fill="#22c55e" class="pitch-dot strike shadow-glow-green cursor-pointer hover:r-5 transition-all">
+                        <circle cx="66" cy="24" r="3.5" fill="#22c55e" class="pitch-dot strike shadow-[0_0_5px_#22c55e] cursor-pointer hover:r-5 transition-all">
                             <title>Strike 1 (Swinging) - 88mph</title>
                         </circle>
-                        <circle cx="32" cy="22" r="3.5" fill="#22c55e" class="pitch-dot strike shadow-glow-green cursor-pointer hover:r-5 transition-all">
+                        <circle cx="32" cy="22" r="3.5" fill="#22c55e" class="pitch-dot strike shadow-[0_0_5px_#22c55e] cursor-pointer hover:r-5 transition-all">
                             <title>Strike 2 (Foul) - 94mph</title>
                         </circle>
 
-                        <circle cx="26" cy="45" r="3.5" fill="#ef4444" class="pitch-dot ball shadow-glow-red cursor-pointer hover:r-5 transition-all">
+                        <circle cx="26" cy="45" r="3.5" fill="#ef4444" class="pitch-dot ball shadow-[0_0_5px_#ef4444] cursor-pointer hover:r-5 transition-all">
                             <title>Ball 1 - Challenge Overturned</title>
                         </circle>
-                        <circle cx="26" cy="45" r="5" fill="none" stroke="#ef4444" stroke-width="1" class="animate-ping ball" opacity="0.7"/> <!-- Overturn highlight -->
+                        <circle cx="26" cy="45" r="5" fill="none" stroke="#ef4444" stroke-width="1" class="animate-ping ball" opacity="0.7"/>
                         
-                        <circle cx="75" cy="85" r="3.5" fill="#ef4444" class="pitch-dot ball shadow-glow-red cursor-pointer hover:r-5 transition-all">
+                        <circle cx="75" cy="85" r="3.5" fill="#ef4444" class="pitch-dot ball shadow-[0_0_5px_#ef4444] cursor-pointer hover:r-5 transition-all">
                             <title>Ball 2 - 84mph Slider</title>
                         </circle>
-                        <circle cx="48" cy="95" r="3.5" fill="#ef4444" class="pitch-dot ball shadow-glow-red cursor-pointer hover:r-5 transition-all">
+                        <circle cx="48" cy="95" r="3.5" fill="#ef4444" class="pitch-dot ball shadow-[0_0_5px_#ef4444] cursor-pointer hover:r-5 transition-all">
                             <title>Ball 3 - 88mph Splitter in dirt</title>
                         </circle>
 
-                        <circle cx="50" cy="50" r="3.5" fill="#f97316" class="pitch-dot in-play shadow-glow-orange cursor-pointer hover:r-5 transition-all">
+                        <circle cx="50" cy="50" r="3.5" fill="#f97316" class="pitch-dot in-play shadow-[0_0_5px_#f97316] cursor-pointer hover:r-5 transition-all">
                             <title>Alonso HR - 84mph Slider (Middle/Middle)</title>
                         </circle>
                     </svg>
 
-                    <!-- Overlay text -->
                     <div class="absolute bottom-2 left-2 text-[9px] text-slate-500 font-mono">Catcher View</div>
                 </div>
 
@@ -626,7 +622,6 @@
     </main>
 
     <div id="rag-chat" class="chat-container closed fixed bottom-0 right-4 md:right-8 w-80 bg-slate-900 border border-slate-700 rounded-t-xl shadow-2xl z-50 flex flex-col h-96">
-        <!-- Chat Header -->
         <div onclick="toggleChat()" class="bg-blue-600 hover:bg-blue-500 cursor-pointer text-white p-3 rounded-t-xl flex justify-between items-center transition-colors">
             <div class="flex items-center gap-2">
                 <i class="fas fa-robot"></i>
@@ -635,14 +630,12 @@
             <i id="chat-icon" class="fas fa-chevron-up text-xs"></i>
         </div>
         
-        <!-- Chat Body -->
         <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-900/90 text-sm">
             <div class="bg-slate-800 text-slate-200 p-3 rounded-lg rounded-tl-none border border-slate-700 w-[85%] shadow-md">
                 Hello! I have full context on the May 14, 2026 Mets game, DraftKings algorithms, and MSG surveillance policies. Ask me anything about the dashboard data.
             </div>
         </div>
         
-        <!-- Chat Input -->
         <div class="p-3 border-t border-slate-800 bg-slate-950">
             <form id="chat-form" onsubmit="handleChatSubmit(event)" class="flex gap-2">
                 <input type="text" id="chat-input" placeholder="Ask about odds, MSG, or the game..." class="flex-1 bg-slate-800 border border-slate-700 text-white text-xs rounded px-3 py-2 focus:outline-none focus:border-blue-500" autocomplete="off">
@@ -651,9 +644,45 @@
         </div>
     </div>
 
+    <!-- AR 3D Viewer Modal -->
+    <div id="ar-modal" class="fixed inset-0 z-[100] hidden bg-slate-950/90 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="relative w-full max-w-4xl h-[80vh] bg-slate-900 border border-slate-700 rounded-2xl overflow-hidden shadow-[0_0_50px_rgba(147,51,234,0.3)] flex flex-col animate-fade-in">
+            <!-- Modal Header -->
+            <div class="flex justify-between items-center p-4 border-b border-slate-800 bg-slate-950 z-20">
+                <h3 class="text-white font-bold"><i class="fas fa-vr-cardboard text-purple-400 mr-2"></i>AR Asset Viewer: Mando & Grogu Bobblehead</h3>
+                <button onclick="closeARModal()" class="text-slate-400 hover:text-white transition-colors"><i class="fas fa-times text-xl"></i></button>
+            </div>
+            
+            <!-- Three.js Canvas Container -->
+            <div id="ar-container" class="flex-1 relative w-full h-full bg-[#020617] cursor-move">
+                
+                <!-- Schema details overlay -->
+                <div class="absolute top-4 left-4 bg-slate-900/70 backdrop-blur p-4 rounded-xl border border-slate-700 pointer-events-none text-sm z-10 w-64 shadow-lg hidden md:block">
+                    <p><span class="text-slate-400 uppercase text-[10px] tracking-wider">Asset:</span><br><span class="font-bold text-white">Mando_Grogu_Bobblehead_AR</span></p>
+                    <div class="mt-3 pt-3 border-t border-slate-700">
+                        <p class="text-slate-400 uppercase text-[10px] tracking-wider mb-1">Attributes</p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="bg-blue-900/50 border border-blue-700 text-blue-300 text-[10px] px-2 py-1 rounded">Velo: 101mph</span>
+                            <span class="bg-slate-700 border border-slate-600 text-slate-300 text-[10px] px-2 py-1 rounded">Mat: Beskar</span>
+                            <span class="bg-green-900/50 border border-green-700 text-green-300 text-[10px] px-2 py-1 rounded">Comp: Grogu</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Controls hint -->
+                <div class="absolute bottom-6 left-1/2 -translate-x-1/2 bg-slate-800/80 backdrop-blur border border-slate-700 p-3 rounded-xl text-center z-10 shadow-lg">
+                    <p class="text-xs text-slate-300 mb-2"><i class="fas fa-mouse text-slate-400 mr-2"></i>Click & Drag to Rotate | Scroll to Zoom</p>
+                    <button id="bobble-trigger" class="bg-purple-600 hover:bg-purple-500 text-white text-xs px-4 py-2 rounded shadow-[0_0_10px_rgba(147,51,234,0.3)] transition-colors">
+                        Trigger Spring Physics
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
     <script>
         // --- Data Structure for RAG Provenance ---
-        // We set initial confidence slightly lower so the AI loop can "correct" them to 100%.
         let provenanceData = [
             {
                 id: "F-001",
@@ -717,7 +746,6 @@
             }
         ];
 
-        // --- Helper to format the Confidence Bar ---
         function getConfidenceBar(score, color) {
             const is100 = score >= 100;
             const barColor = is100 ? 'emerald' : color;
@@ -732,10 +760,8 @@
             `;
         }
 
-        // --- Helper to format Conviction Badge ---
         function getConvictionBadge(level, isMax = false) {
             if (isMax) return `<span class="px-2 py-1 text-[10px] uppercase tracking-wider rounded border bg-emerald-500/20 text-emerald-300 border-emerald-400/50 shadow-[0_0_8px_rgba(52,211,153,0.3)]">ABSOLUTE</span>`;
-            
             const colors = {
                 'High': 'bg-blue-500/10 text-blue-400 border-blue-500/20',
                 'Medium': 'bg-amber-500/10 text-amber-400 border-amber-500/20',
@@ -745,16 +771,13 @@
             return `<span class="px-2 py-1 text-[10px] uppercase tracking-wider rounded border ${classes}">${level}</span>`;
         }
 
-        // --- Render Table ---
         function renderProvenanceTable() {
             const tbody = document.getElementById('provenance-body');
             tbody.innerHTML = ''; 
-            
             provenanceData.forEach((item, index) => {
                 const tr = document.createElement('tr');
                 tr.id = `row-${item.id}`;
                 tr.className = `hover:bg-slate-800/30 transition-colors`;
-                
                 const isVerified = item.confidence >= 100;
                 const weightClass = isVerified ? 'bg-emerald-900/40 text-emerald-300 border-emerald-700/50 shadow-[0_0_8px_rgba(52,211,153,0.2)]' : 'bg-slate-800 text-white border-transparent';
                 
@@ -783,7 +806,6 @@
             });
         }
 
-        // --- Token Counter Animation ---
         function animateCounter(id, start, end, duration) {
             let obj = document.getElementById(id);
             if(!obj) return;
@@ -800,12 +822,9 @@
             window.requestAnimationFrame(step);
         }
 
-        // --- Iterative RLHF & AI Validation Loop ---
+        // --- Iterative RL Validation Logic ---
         let isTraining = false;
-
-        async function sleep(ms) {
-            return new Promise(resolve => setTimeout(resolve, ms));
-        }
+        async function sleep(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
 
         async function startRLLoop() {
             if(isTraining) return;
@@ -820,7 +839,6 @@
             const claimsText = document.getElementById('claims-verified');
             const progressBar = document.getElementById('progress-bar');
             
-            // UI State Change
             btn.innerHTML = '<i class="fas fa-circle-notch fa-spin mr-2"></i> Validating...';
             btn.classList.replace('bg-purple-600', 'bg-slate-700');
             btn.classList.remove('hover:bg-purple-500');
@@ -836,35 +854,26 @@
 
             for (let i = 0; i < provenanceData.length; i++) {
                 const item = provenanceData[i];
-                
-                // Step 1: Querying
                 terminal.innerHTML += `<div class="mt-2 text-slate-300">> <span class="text-yellow-400">STEP ${i+1}:</span> Verifying Claim [${item.id}]</div>`;
                 terminal.innerHTML += `<div class="text-slate-500 pl-4">> Requesting: <span class="text-slate-400">${item.verifyEndpoint}</span></div>`;
                 terminal.scrollTop = terminal.scrollHeight;
-                
                 await sleep(600); 
 
-                // Step 2: Reasoning & NLP Extraction
                 terminal.innerHTML += `<div class="text-purple-400 pl-4">> LLM Reasoning: Analyzing payload semantics for factual grounding...</div>`;
                 terminal.scrollTop = terminal.scrollHeight;
                 await sleep(400);
 
-                // Step 3: Response & Match
                 terminal.innerHTML += `<div class="text-slate-500 pl-4">> Semantic match threshold > 0.98. Source integrity verified.</div>`;
                 terminal.scrollTop = terminal.scrollHeight;
-                
                 await sleep(500);
 
-                // Step 4: Upgrade Data
                 terminal.innerHTML += `<div class="text-emerald-400 pl-4">> <i class="fas fa-check"></i> Fact Confirmed. Adjusting Conviction to 'High', Weight to 1.0.</div>`;
                 terminal.scrollTop = terminal.scrollHeight;
 
-                // Update Data Object
                 item.confidence = 100.0;
                 item.weight = 1.00;
                 item.conviction = "High";
                 
-                // Visually flash the table row
                 renderProvenanceTable(); 
                 const row = document.getElementById(`row-${item.id}`);
                 if(row) {
@@ -872,9 +881,8 @@
                     setTimeout(() => row.classList.remove('bg-emerald-900/20'), 800);
                 }
 
-                // Update Metrics
                 currentGlobalAcc += (11.6 / provenanceData.length);
-                if (i === provenanceData.length - 1) currentGlobalAcc = 100.0; // Force exact 100 at end
+                if (i === provenanceData.length - 1) currentGlobalAcc = 100.0;
                 
                 globalAcc.innerText = currentGlobalAcc.toFixed(1) + '%';
                 accBar.style.width = currentGlobalAcc.toFixed(1) + '%';
@@ -886,7 +894,6 @@
                 await sleep(600);
             }
 
-            // Finish
             terminal.innerHTML += `<div class="mt-4 text-emerald-400 font-bold">> VALIDATION COMPLETE. All parameters achieved 100% ground truth.</div>`;
             terminal.scrollTop = terminal.scrollHeight;
 
@@ -899,11 +906,285 @@
             arrow.classList.remove('animate-pulse');
         }
 
-        // --- Initialization ---
+        // --- STREAMING_CHUNK:Implementing Three.js AR Viewer logic ---
+        
+        let arScene, arCamera, arRenderer;
+        let headMesh, bodyGroup;
+        let isBobbling = false;
+        let bobbleVelocity = 0;
+        let bobbleAngle = 0;
+        const targetAngle = 0;
+        const stiffness = 150 * 0.001; 
+        const damping = 0.8 * 0.95;
+
+        let isDragging = false;
+        let previousMousePosition = { x: 0, y: 0 };
+        let targetRotation = { x: 0, y: 0 };
+        let arInitialized = false;
+
+        function initARScene() {
+            if(arInitialized) return;
+            const container = document.getElementById('ar-container');
+            const width = container.clientWidth || 800;
+            const height = container.clientHeight || 600;
+
+            arScene = new THREE.Scene();
+            arScene.fog = new THREE.FogExp2(0x020617, 0.05);
+
+            arCamera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+            arCamera.position.set(0, 1.5, 5);
+
+            arRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            arRenderer.setSize(width, height);
+            arRenderer.setPixelRatio(window.devicePixelRatio);
+            arRenderer.shadowMap.enabled = true;
+            arRenderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            arRenderer.outputEncoding = THREE.sRGBEncoding;
+            arRenderer.toneMapping = THREE.ACESFilmicToneMapping;
+            arRenderer.toneMappingExposure = 1.2; 
+            container.appendChild(arRenderer.domElement);
+
+            const ambient = new THREE.AmbientLight(0xffffff, 0.5);
+            arScene.add(ambient);
+
+            const dirLight = new THREE.DirectionalLight(0xffffff, 1.2);
+            dirLight.position.set(5, 10, 5);
+            dirLight.castShadow = true;
+            dirLight.shadow.mapSize.width = 2048;
+            dirLight.shadow.mapSize.height = 2048;
+            arScene.add(dirLight);
+            
+            const rimLight = new THREE.SpotLight(0x8b5cf6, 3);
+            rimLight.position.set(-5, 5, -5);
+            rimLight.lookAt(0,0,0);
+            arScene.add(rimLight);
+
+            buildARObjects();
+
+            // Interactions scoping to the container
+            container.addEventListener('mousedown', onMouseDownAR);
+            container.addEventListener('mousemove', onMouseMoveAR);
+            window.addEventListener('mouseup', onMouseUpAR);
+            container.addEventListener('wheel', onMouseWheelAR);
+            
+            container.addEventListener('touchstart', onTouchStartAR, {passive: false});
+            container.addEventListener('touchmove', onTouchMoveAR, {passive: false});
+            window.addEventListener('touchend', onMouseUpAR);
+
+            document.getElementById('bobble-trigger').addEventListener('click', () => {
+                bobbleVelocity = 0.5; 
+                isBobbling = true;
+            });
+
+            window.addEventListener('resize', onWindowResizeAR);
+            
+            arInitialized = true;
+            animateAR();
+        }
+
+        function buildARObjects() {
+            bodyGroup = new THREE.Group();
+            arScene.add(bodyGroup);
+
+            // Mound
+            const moundGeo = new THREE.CylinderGeometry(1.5, 1.6, 0.2, 64);
+            const moundMat = new THREE.MeshStandardMaterial({ color: 0x3d2b1f, roughness: 1.0, metalness: 0.0 });
+            const mound = new THREE.Mesh(moundGeo, moundMat);
+            mound.position.y = -0.1;
+            mound.receiveShadow = true;
+            bodyGroup.add(mound);
+            
+            // Logo
+            const logoOuterGeo = new THREE.CylinderGeometry(0.6, 0.6, 0.01, 32);
+            const logoOuterMat = new THREE.MeshBasicMaterial({ color: 0xff5910 });
+            const logoOuter = new THREE.Mesh(logoOuterGeo, logoOuterMat);
+            logoOuter.position.set(0, 0.105, 0.5);
+            mound.add(logoOuter);
+
+            const logoGeo = new THREE.CylinderGeometry(0.5, 0.5, 0.015, 32);
+            const logoMat = new THREE.MeshBasicMaterial({ color: 0x002d72 });
+            const logo = new THREE.Mesh(logoGeo, logoMat);
+            logo.position.set(0, 0.11, 0.5);
+            mound.add(logo);
+
+            // Body
+            const bodyGeo = new THREE.CylinderGeometry(0.25, 0.35, 0.6, 32);
+            const bodyMat = new THREE.MeshStandardMaterial({ color: 0x555555, roughness: 0.8, metalness: 0.2 });
+            const body = new THREE.Mesh(bodyGeo, bodyMat);
+            body.position.y = 0.3;
+            body.castShadow = true;
+            bodyGroup.add(body);
+
+            // Beskar Chest
+            const chestPlateGeo = new THREE.BoxGeometry(0.4, 0.4, 0.1);
+            const beskarMat = new THREE.MeshStandardMaterial({ color: 0xc0c0c0, metalness: 0.9, roughness: 0.3 });
+            const chestPlate = new THREE.Mesh(chestPlateGeo, beskarMat);
+            chestPlate.position.set(0, 0.4, 0.2);
+            chestPlate.rotation.x = -0.1;
+            chestPlate.castShadow = true;
+            bodyGroup.add(chestPlate);
+
+            // Arms
+            const armGeo = new THREE.CylinderGeometry(0.08, 0.08, 0.5, 16);
+            const leftArm = new THREE.Mesh(armGeo, bodyMat);
+            leftArm.position.set(-0.35, 0.4, 0);
+            leftArm.rotation.z = Math.PI / 4;
+            bodyGroup.add(leftArm);
+            const rightArm = new THREE.Mesh(armGeo, bodyMat);
+            rightArm.position.set(0.35, 0.4, 0);
+            rightArm.rotation.z = -Math.PI / 4;
+            bodyGroup.add(rightArm);
+            
+            // Grogu
+            const groguGroup = new THREE.Group();
+            groguGroup.position.set(0.4, 0.5, 0.3);
+            
+            const groguBody = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.15, 0.2, 16), new THREE.MeshStandardMaterial({ color: 0x8b7355, roughness: 0.9 }));
+            groguGroup.add(groguBody);
+            const groguMat = new THREE.MeshStandardMaterial({ color: 0x7cb342, roughness: 0.5 });
+            const groguHead = new THREE.Mesh(new THREE.SphereGeometry(0.1, 16, 16), groguMat);
+            groguHead.position.y = 0.15;
+            groguGroup.add(groguHead);
+            const leftEar = new THREE.Mesh(new THREE.ConeGeometry(0.05, 0.15, 16), groguMat);
+            leftEar.position.set(-0.1, 0.15, 0); leftEar.rotation.z = Math.PI / 2;
+            groguGroup.add(leftEar);
+            const rightEar = new THREE.Mesh(new THREE.ConeGeometry(0.05, 0.15, 16), groguMat);
+            rightEar.position.set(0.1, 0.15, 0); rightEar.rotation.z = -Math.PI / 2;
+            groguGroup.add(rightEar);
+            bodyGroup.add(groguGroup);
+            
+            // Baseball
+            const ball = new THREE.Mesh(new THREE.SphereGeometry(0.06, 32, 32), new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.8 }));
+            ball.position.set(-0.4, 0.5, 0.2);
+            bodyGroup.add(ball);
+
+            // Head
+            headMesh = new THREE.Group(); 
+            headMesh.position.y = 0.8 + 0.4;
+            const helmetBase = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.4, 0.6, 32), beskarMat);
+            helmetBase.position.y = -0.1;
+            headMesh.add(helmetBase);
+            const helmetTop = new THREE.Mesh(new THREE.SphereGeometry(0.4, 32, 16, 0, Math.PI * 2, 0, Math.PI / 2), beskarMat);
+            helmetTop.position.y = 0.2;
+            headMesh.add(helmetTop);
+            
+            const visorMat = new THREE.MeshStandardMaterial({ color: 0x0a0a0a, roughness: 0.1, metalness: 0.9 });
+            const visorH = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.1, 0.1), visorMat);
+            visorH.position.set(0, 0, 0.4);
+            headMesh.add(visorH);
+            const visorV = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.4, 0.1), visorMat);
+            visorV.position.set(0, -0.15, 0.4);
+            headMesh.add(visorV);
+
+            bodyGroup.add(headMesh);
+        }
+
+        function onWindowResizeAR() {
+            const container = document.getElementById('ar-container');
+            if(!container || !arCamera || !arRenderer) return;
+            const width = container.clientWidth;
+            const height = container.clientHeight;
+            if(width === 0 || height === 0) return; 
+            arCamera.aspect = width / height;
+            arCamera.updateProjectionMatrix();
+            arRenderer.setSize(width, height);
+        }
+
+        function onMouseDownAR(e) { isDragging = true; previousMousePosition = { x: e.offsetX, y: e.offsetY }; }
+        function onTouchStartAR(e) { if(e.touches.length > 0) { isDragging = true; previousMousePosition = { x: e.touches[0].clientX, y: e.touches[0].clientY }; } }
+        
+        function onMouseMoveAR(e) {
+            if (!isDragging) return;
+            targetRotation.y += (e.offsetX - previousMousePosition.x) * 0.01;
+            targetRotation.x += (e.offsetY - previousMousePosition.y) * 0.01;
+            targetRotation.x = Math.max(-Math.PI/4, Math.min(Math.PI/4, targetRotation.x));
+            previousMousePosition = { x: e.offsetX, y: e.offsetY };
+        }
+        
+        function onTouchMoveAR(e) {
+            if (!isDragging || e.touches.length === 0) return;
+            e.preventDefault(); 
+            targetRotation.y += (e.touches[0].clientX - previousMousePosition.x) * 0.01;
+            targetRotation.x += (e.touches[0].clientY - previousMousePosition.y) * 0.01;
+            targetRotation.x = Math.max(-Math.PI/4, Math.min(Math.PI/4, targetRotation.x));
+            previousMousePosition = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+        }
+        function onMouseUpAR() { isDragging = false; }
+        
+        function onMouseWheelAR(e) {
+            if(!arCamera) return;
+            e.preventDefault();
+            arCamera.position.z += e.deltaY * 0.01;
+            arCamera.position.z = Math.max(2, Math.min(10, arCamera.position.z));
+        }
+
+        function animateAR() {
+            requestAnimationFrame(animateAR);
+            const modal = document.getElementById('ar-modal');
+            if (modal.classList.contains('hidden')) return; // skip rendering if closed
+
+            if (bodyGroup) {
+                bodyGroup.rotation.y += (targetRotation.y - bodyGroup.rotation.y) * 0.1;
+                bodyGroup.rotation.x += (targetRotation.x - bodyGroup.rotation.x) * 0.1;
+            }
+
+            if (headMesh && isBobbling) {
+                const force = -stiffness * (bobbleAngle - targetAngle);
+                bobbleVelocity += force;
+                bobbleVelocity *= damping;
+                bobbleAngle += bobbleVelocity;
+                
+                headMesh.rotation.x = bobbleAngle;
+                headMesh.rotation.z = bobbleAngle * 0.5;
+
+                if (Math.abs(bobbleVelocity) < 0.0001 && Math.abs(bobbleAngle) < 0.0001) {
+                    isBobbling = false;
+                    headMesh.rotation.set(0,0,0);
+                }
+            } else if (headMesh && !isBobbling) {
+                 headMesh.position.y = (1.2) + Math.sin(Date.now() * 0.001) * 0.01;
+            }
+            arRenderer.render(arScene, arCamera);
+        }
+
+        function openARModal() {
+            document.getElementById('ar-modal').classList.remove('hidden');
+            setTimeout(() => onWindowResizeAR(), 50); // Ensure size calc happens after display block
+        }
+        function closeARModal() { document.getElementById('ar-modal').classList.add('hidden'); }
+
+        // --- STREAMING_CHUNK:Interactive Chatbot and global init ---
+
+        function downloadBobblehead() {
+            const btn = document.getElementById('download-btn');
+            if(btn.innerText.includes('View AR')) {
+                openARModal();
+                return;
+            }
+            
+            btn.innerHTML = '<i class="fas fa-circle-notch fa-spin mr-1"></i> Minting...';
+            btn.classList.add('pointer-events-none', 'opacity-80');
+            
+            setTimeout(() => {
+                btn.innerHTML = '<i class="fas fa-vr-cardboard mr-1"></i> View AR Asset';
+                btn.classList.remove('pointer-events-none', 'opacity-80');
+                btn.classList.replace('bg-purple-600', 'bg-emerald-600');
+                btn.classList.replace('hover:bg-purple-500', 'hover:bg-emerald-500');
+                btn.classList.replace('shadow-[0_0_10px_rgba(147,51,234,0.4)]', 'shadow-[0_0_10px_rgba(16,185,129,0.4)]');
+                
+                // Initialize the 3D scene if not done already
+                if(!arInitialized) initARScene();
+                openARModal();
+
+                setTimeout(() => {
+                    if(document.getElementById('rag-chat').classList.contains('closed')) toggleChat();
+                    appendMessage('bot', "Success! Your digital AR Bobblehead has been minted. You can now interact with the high-fidelity 3D object directly inside the dashboard overlay.");
+                }, 800);
+            }, 1800);
+        }
+
         window.onload = () => {
             renderProvenanceTable();
-            
-            // Simulate Token calculation stream
             setTimeout(() => animateCounter('prompt-tokens', 0, 1845, 1200), 200);
             setTimeout(() => animateCounter('comp-tokens', 0, 1420, 1500), 400);
             setTimeout(() => animateCounter('total-tokens', 0, 3265, 1800), 600);
@@ -926,9 +1207,7 @@
 
         function togglePitches(type) {
             const elements = document.querySelectorAll(`.pitch-dot.${type}`);
-            elements.forEach(el => {
-                el.classList.toggle('hidden-pitch');
-            });
+            elements.forEach(el => { el.classList.toggle('hidden-pitch'); });
         }
 
         function toggleChat() {
@@ -948,49 +1227,12 @@
             { keywords: ['odds', 'shift', 'line', 'move', 'sharp', 'over', 'weather'], response: "The DraftKings line moved heavily towards the Over 8.5 because weather APIs detected 12mph winds blowing out to Center Field, increasing the HR probability index by 14%. Algorithmic syndicates (Sharps) immediately hammered the Over." },
             { keywords: ['msg', 'madison', 'square', 'garden', 'facial', 'enemy', 'ban'], response: "MSG uses advanced facial recognition biometrics at their gates to identify and eject adverse attorneys involved in litigation against the company. This 'Enemy Ban' is facing massive scrutiny from the NY Attorney General." },
             { keywords: ['mets', 'score', 'who won', 'skubal', 'senga'], response: "The Mets defeated the Tigers 9-4. Senga got the win (4-1) with 8 strikeouts, while Skubal took the loss giving up an early Lindor double and an Alonso HR." },
-            { keywords: ['star wars', 'mclean', 'mando'], response: "May 14th was Star Wars 'Mandalorian and Grogu' day at Citi Field. Nolan McLean had an exclusive 'Mando' physical bobblehead drop, but you can also mint a digital AR version right here on the dashboard!" },
+            { keywords: ['star wars', 'mclean', 'mando'], response: "May 14th was Star Wars 'Mandalorian and Grogu' day at Citi Field. Nolan McLean had an exclusive 'Mando' physical bobblehead drop, but you can also mint the 3D digital AR version right here on the dashboard!" },
             { keywords: ['hawk', 'eye', 'abs', 'umpire', 'overturn', 'pitch'], response: "In the top of the 5th, a called strike 3 to Riley Greene was challenged. The Hawk-Eye ABS system proved the ball was 0.12 inches off the plate, overturning the call to Ball 4." },
             { keywords: ['soto', 'han solo', 'falcon', 'juan'], response: "Juan Soto was themed as Han Solo for the game! Every time he got a hit, a Millennium Falcon hyperspace trail AR overlay followed the ball into the outfield." },
             { keywords: ['vader', 'darth', 'empire', 'sith', 'tigers'], response: "The visiting Detroit Tigers were portrayed as the Empire, with Darth Vader's Imperial March playing during pitching changes. Pete Alonso, however, embraced the dark side as a Sith Lord for his home runs." },
-            { keywords: ['boba', 'fett', 'bounty'], response: "Tarik Skubal took on the role of Boba Fett. His pitches featured an AR targeting UI resembling the Slave I ship's HUD." },
-            { keywords: ['bobblehead', 'download', 'virtual', 'nft', 'mint', 'grogu'], response: "You can download the exclusive virtual AR Bobblehead of Nolan McLean (Mando) and Grogu directly from the Star Wars Day Roster panel on the dashboard. It will mint a local JSON metadata file!" }
+            { keywords: ['boba', 'fett', 'bounty'], response: "Tarik Skubal took on the role of Boba Fett. His pitches featured an AR targeting UI resembling the Slave I ship's HUD." }
         ];
-
-        function downloadBobblehead() {
-            const btn = document.getElementById('download-btn');
-            if(btn.innerText.includes('Saved')) return;
-            
-            btn.innerHTML = '<i class="fas fa-circle-notch fa-spin mr-1"></i> Minting...';
-            btn.classList.add('pointer-events-none', 'opacity-80');
-            
-            setTimeout(() => {
-                btn.innerHTML = '<i class="fas fa-check mr-1"></i> Saved to Wallet';
-                btn.classList.replace('bg-purple-600', 'bg-emerald-600');
-                btn.classList.replace('shadow-[0_0_10px_rgba(147,51,234,0.4)]', 'shadow-[0_0_10px_rgba(16,185,129,0.4)]');
-                
-                // Generate Virtual JSON Download
-                const metadata = {
-                    "asset": "Mando_Grogu_Bobblehead_AR",
-                    "owner": "Dashboard_User",
-                    "mint_date": new Date().toISOString(),
-                    "franchise": "New York Mets x Star Wars",
-                    "traits": {"Velo": "101mph", "Material": "Beskar", "Companion": "Grogu"}
-                };
-                const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(metadata, null, 2));
-                const downloadAnchorNode = document.createElement('a');
-                downloadAnchorNode.setAttribute("href", dataStr);
-                downloadAnchorNode.setAttribute("download", "mando_grogu_ar_bobblehead.json");
-                document.body.appendChild(downloadAnchorNode);
-                downloadAnchorNode.click();
-                downloadAnchorNode.remove();
-
-                // Trigger Chat notification
-                setTimeout(() => {
-                    if(document.getElementById('rag-chat').classList.contains('closed')) toggleChat();
-                    appendMessage('bot', "Success! Your AR Bobblehead metadata has been minted and downloaded. You can import this JSON into any compatible Web3/AR viewer.");
-                }, 800);
-            }, 1800);
-        }
 
         function handleChatSubmit(e) {
             e.preventDefault();
@@ -1001,17 +1243,14 @@
             appendMessage('user', inputEl.value);
             inputEl.value = '';
             
-            // Simulate AI thinking delay
             setTimeout(() => {
                 let foundResponse = "I'm sorry, my context window is limited to the May 14th dashboard telemetry. Try asking about the DraftKings odds shift, MSG's facial recognition, or the Hawk-Eye overturn.";
-                
                 for(let item of kb) {
                     if(item.keywords.some(kw => text.includes(kw))) {
                         foundResponse = item.response;
                         break;
                     }
                 }
-                
                 appendMessage('bot', foundResponse);
             }, 600);
         }
@@ -1019,13 +1258,11 @@
         function appendMessage(sender, text) {
             const container = document.getElementById('chat-messages');
             const msgDiv = document.createElement('div');
-            
             if (sender === 'user') {
                 msgDiv.className = 'bg-slate-700 text-white p-3 rounded-lg rounded-tr-none border border-slate-600 w-[85%] ml-auto';
             } else {
                 msgDiv.className = 'bg-slate-800 text-slate-200 p-3 rounded-lg rounded-tl-none border border-blue-900/50 w-[85%] border-l-2 border-l-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.1)]';
             }
-            
             msgDiv.innerText = text;
             container.appendChild(msgDiv);
             container.scrollTop = container.scrollHeight;
