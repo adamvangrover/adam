@@ -1,8 +1,20 @@
 import React, { useEffect, useRef } from 'react';
 
-interface TerminalDisplayProps {
-  lines: string[];
+export interface TerminalLineItem {
+  id: string;
+  text: string;
 }
+
+interface TerminalDisplayProps {
+  lines: TerminalLineItem[];
+}
+
+// ⚡ Bolt: Extract and memoize terminal line to prevent O(N) re-renders
+// when new items are appended to the sliding window list.
+const TerminalLine = React.memo(({ line }: { line: string }) => (
+  <div className="break-all">{line}</div>
+));
+TerminalLine.displayName = 'TerminalLine';
 
 const TerminalDisplay: React.FC<TerminalDisplayProps> = ({ lines }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -23,8 +35,10 @@ const TerminalDisplay: React.FC<TerminalDisplayProps> = ({ lines }) => {
         aria-label="Terminal Output"
         tabIndex={0}
     >
-        {lines.map((line, i) => (
-            <div key={i} className="break-all">{line}</div>
+        {lines.map((line) => (
+            // ⚡ Bolt: Assign a stable ID key instead of index to prevent O(N) unmounts/remounts
+            // when the list behaves as a sliding window.
+            <TerminalLine key={line.id} line={line.text} />
         ))}
     </div>
   );

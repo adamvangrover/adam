@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import TerminalDisplay from './TerminalDisplay';
 
 const Terminal: React.FC = () => {
-  const [output, setOutput] = useState<string[]>([]);
+  const [output, setOutput] = useState<{id: string, text: string}[]>([]);
   const [input, setInput] = useState('');
   const [isLive] = useState(false);
   const [history, setHistory] = useState<string[]>([]);
@@ -17,7 +17,7 @@ const Terminal: React.FC = () => {
       "SYSTEM READY."
     ];
     for (const line of bootSequence) {
-        setOutput(prev => [...prev, `> ${line}`]);
+        setOutput(prev => [...prev, { id: Math.random().toString(36).substr(2, 9), text: `> ${line}` }]);
         await new Promise(r => setTimeout(r, 600));
     }
   };
@@ -27,28 +27,33 @@ const Terminal: React.FC = () => {
     setTimeout(() => simulateBoot(), 0);
   }, []);
 
+  const appendLines = (lines: string[]) => {
+    const newItems = lines.map(text => ({ id: Math.random().toString(36).substr(2, 9), text }));
+    setOutput(prev => [...prev, ...newItems]);
+  };
+
   const handleCommand = (cmd: string) => {
     if (!cmd.trim()) return;
 
     const timestamp = new Date().toISOString().split('T')[1].split('.')[0];
-    setOutput(prev => [...prev, `[${timestamp}] $ ${cmd}`]);
+    appendLines([`[${timestamp}] $ ${cmd}`]);
     setHistory(prev => [...prev, cmd]);
     setHistoryIndex(-1);
 
     if (cmd === 'help') {
-        setOutput(prev => [...prev, "AVAILABLE COMMANDS:", "  help - Show this menu", "  status - System Health", "  query [ticker] - Deep Dive", "  clear - Clear Screen"]);
+        appendLines(["AVAILABLE COMMANDS:", "  help - Show this menu", "  status - System Health", "  query [ticker] - Deep Dive", "  clear - Clear Screen"]);
     } else if (cmd === 'status') {
-        setOutput(prev => [...prev, "SYSTEM STATUS: ONLINE (SIMULATION MODE)", "CPU: 65%", "MEMORY: 12GB/32GB", "AGENTS: 97 ACTIVE"]);
+        appendLines(["SYSTEM STATUS: ONLINE (SIMULATION MODE)", "CPU: 65%", "MEMORY: 12GB/32GB", "AGENTS: 97 ACTIVE"]);
     } else if (cmd.startsWith('query')) {
         const ticker = cmd.split(' ')[1] || 'UNKNOWN';
-        setOutput(prev => [...prev, `INITIATING DEEP DIVE FOR ${ticker.toUpperCase()}...`, "FETCHING SEC FILINGS... DONE", "RUNNING SENTIMENT ANALYSIS... DONE", "CALCULATING INTRINSIC VALUE..."]);
+        appendLines([`INITIATING DEEP DIVE FOR ${ticker.toUpperCase()}...`, "FETCHING SEC FILINGS... DONE", "RUNNING SENTIMENT ANALYSIS... DONE", "CALCULATING INTRINSIC VALUE..."]);
         setTimeout(() => {
-            setOutput(prev => [...prev, `REPORT GENERATED FOR ${ticker.toUpperCase()}. SEE 'REPORTS' MODULE.`]);
+            appendLines([`REPORT GENERATED FOR ${ticker.toUpperCase()}. SEE 'REPORTS' MODULE.`]);
         }, 2000);
     } else if (cmd === 'clear') {
         setOutput([]);
     } else {
-        setOutput(prev => [...prev, `Unknown command: ${cmd}`]);
+        appendLines([`Unknown command: ${cmd}`]);
     }
   };
 
