@@ -1,10 +1,11 @@
-from typing import Dict, Any, List, Optional
-import os
-import subprocess
-import shutil
-import tempfile
 import logging
+import os
+import shutil
+import subprocess
+import tempfile
 from datetime import datetime, timedelta
+from typing import Any, Dict, List
+
 from pydantic import BaseModel, Field
 
 from core.agents.agent_base import AgentBase
@@ -32,6 +33,10 @@ class GitHubAlphaAgent(AgentBase):
         super().__init__(config or {})
         self.temp_dir = tempfile.gettempdir()
 
+    def _validate_url(self, repo_url: str):
+        if not repo_url.startswith(("http://", "https://")):
+            raise ValueError("Invalid URL scheme. Only http/https are allowed.")
+
     async def execute(self, query: str, context: Dict[str, Any] = None) -> Dict[str, Any]:
         """
         Analyzes a GitHub repository for activity metrics.
@@ -46,15 +51,44 @@ class GitHubAlphaAgent(AgentBase):
         context = context or {}
         repo_url = query.strip()
         days = context.get("days", 30)
-        branch = context.get("branch", None) # Let git decide default if None
+        branch = context.get("branch", None)  # Let git decide default if None
+
+        try:
+            self._validate_url(repo_url)
+        except ValueError as e:
+            return AgentOutput(
+                answer=f"Failed to analyze repository: {str(e)}",
+                sources=[repo_url],
+                confidence=0.0,
+                metadata={"error": str(e)}
+            ).model_dump()
 
         logger.info(f"GitHubAlphaAgent analyzing: {repo_url} for past {days} days.")
 
         # Create a unique temp directory for this clone
-        repo_name = repo_url.split("/")[-1].replace(".git", "")
+        repo_name = repo_url.rstrip('/').split("/")[-1].replace(".git", "")
+
+        if not repo_name or ".." in repo_name or "/" in repo_name or "\\" in repo_name:
+            return AgentOutput(
+                answer="Failed to analyze repository: Invalid repository name extracted from URL.",
+                sources=[repo_url],
+                confidence=0.0,
+                metadata={"error": "Invalid repository name extracted from URL."}
+            ).model_dump()
+
         # Use a safe timestamp
         ts = datetime.now().strftime('%Y%m%d%H%M%S')
         clone_path = os.path.join(self.temp_dir, f"alpha_agent_{repo_name}_{ts}")
+
+        abs_clone_path = os.path.abspath(clone_path)
+        abs_temp_dir = os.path.abspath(self.temp_dir)
+        if os.path.commonpath([abs_temp_dir, abs_clone_path]) != abs_temp_dir or abs_clone_path == abs_temp_dir:
+            return AgentOutput(
+                answer="Failed to analyze repository: Path traversal detected.",
+                sources=[repo_url],
+                confidence=0.0,
+                metadata={"error": "Security Violation: Path traversal detected."}
+            ).model_dump()
 
         try:
             # 1. Clone the repo
