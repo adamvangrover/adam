@@ -220,3 +220,8 @@
 **Vulnerability:** A missing timeout in `requests.get` could lead to an infinite hang and a potential Denial of Service (CWE-400) if the remote server is unresponsive.
 **Learning:** Always specify a timeout for external network requests, even for simple download scripts, to ensure the application fails gracefully rather than hanging indefinitely.
 **Prevention:** Include a `timeout` parameter (e.g., `timeout=10`) in all `requests` calls to establish a maximum wait time.
+
+## 2026-05-18 - Missing Scheme Validation in GitHubAlphaAgent
+**Vulnerability:** The `GitHubAlphaAgent` executed `subprocess.run(["git", "clone", ...])` with untrusted URLs without validating the scheme, allowing potential RCE via Git's `ext::` protocol or local file disclosure via the `file://` protocol.
+**Learning:** `git clone` natively supports dangerous protocols like `ext::` which allows command execution. Merely preventing options injection with `--` is not enough to secure Git commands against untrusted inputs.
+**Prevention:** Always validate URL schemes (e.g., restricting to `http://` and `https://`) before passing them to external command line utilities like `git` or `curl`.
