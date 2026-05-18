@@ -16,8 +16,11 @@ const mockThoughts = [
   { agent: "Risk Officer", message: "Holding position: Portfolio volatility exceeding thresholds." }
 ];
 
+// ⚡ Bolt: Removed inline style animation and `<style>` injection.
+// Using global CSS classes prevents unnecessary style recalculations and layout thrashing
+// on every 4s state update, improving rendering performance for the sliding window list.
 const ThoughtRow = React.memo(({ t }: { t: AgentThought }) => (
-  <div className="text-xs leading-relaxed opacity-0 animate-fade-in" style={{ animation: 'fadeIn 0.5s ease-out forwards' }}>
+  <div className="text-xs leading-relaxed opacity-0 animate-fade-in">
     <div className="text-cyber-text/40 mb-1">[{t.time}] <span className="text-cyber-cyan">{t.agent}</span>:</div>
     <div className="text-cyber-text/90 pl-2 border-l border-cyber-cyan/20">{t.message}</div>
   </div>
@@ -81,13 +84,6 @@ const AgentIntercom: React.FC = () => {
           )}
         </div>
       )}
-
-      <style>{`
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(5px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-      `}</style>
     </div>
   );
 };
