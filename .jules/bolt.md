@@ -164,3 +164,7 @@
 ## 2026-05-16 - [React List Key Collision in Sliding Windows]
 **Learning:** When rendering append-only lists of primitives (e.g., terminal lines in React), extracting the mapped item into its own `React.memo` component is insufficient if you use the array index as the `key`. Furthermore, using content hashes or substrings fails due to key collisions when duplicate lines exist.
 **Action:** You must assign a stable, uniquely generated identifier to each item at the time of its creation/insertion into the state to ensure existing elements effectively skip the re-rendering and diffing process.
+
+## 2026-11-29 - [Optimized Loading Component Style Injection]
+**Learning:** React components that inject `<style>` tags on every render cause unnecessary style recalculations and layout thrashing, especially inside components with frequent state updates (like `AgentIntercom` which updates every 4s).
+**Action:** Always extract `@keyframes` and static CSS classes to global CSS files (e.g., `index.css`) rather than using inline `<style>` injections within heavily re-rendered functional components.
