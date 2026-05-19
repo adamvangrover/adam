@@ -36,7 +36,7 @@ class WorkspaceManager:
         try:
             # We use bash -lc to evaluate the script.
             subprocess.run(
-                ['bash', '-lc', script],
+                ['bash', '-lc', '--', script],
                 cwd=cwd,
                 timeout=timeout_sec,
                 check=True,
