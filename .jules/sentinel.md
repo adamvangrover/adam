@@ -225,3 +225,8 @@
 **Vulnerability:** The `GitHubAlphaAgent` executed `subprocess.run(["git", "clone", ...])` with untrusted URLs without validating the scheme, allowing potential RCE via Git's `ext::` protocol or local file disclosure via the `file://` protocol.
 **Learning:** `git clone` natively supports dangerous protocols like `ext::` which allows command execution. Merely preventing options injection with `--` is not enough to secure Git commands against untrusted inputs.
 **Prevention:** Always validate URL schemes (e.g., restricting to `http://` and `https://`) before passing them to external command line utilities like `git` or `curl`.
+
+## 2026-05-18 - [Critical] Command Option Injection in WorkspaceManager
+**Vulnerability:** `WorkspaceManager._run_hook` executed `subprocess.run(['bash', '-lc', script])`. If an attacker supplies a script string starting with `-` (like `-i`), `bash` interprets it as an option instead of a script payload, leading to an unexpected execution behavior or potential bypasses.
+**Learning:** Even when passing a script directly to an interpreter like `bash -c`, untrusted scripts that start with a hyphen can cause argument injection.
+**Prevention:** Always use the end-of-options separator `--` before the untrusted payload when evaluating it via interpreters like bash (e.g., `['bash', '-lc', '--', script]`).
