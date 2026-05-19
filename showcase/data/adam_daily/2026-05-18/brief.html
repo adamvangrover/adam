@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Market Mayhem: The Infrastructure Awakening</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        term: {
+                            bg: '#0a0a0c',
+                            panel: '#151518',
+                            border: '#2a2a30',
+                            text: '#a0a0ab',
+                            highlight: '#ffffff',
+                            green: '#00ff66',
+                            red: '#ff3366',
+                            blue: '#3399ff',
+                            amber: '#ffb000'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #0a0a0c;
+            color: #a0a0ab;
+            font-family: 'Inter', sans-serif;
+        }
+        .glass-panel {
+            background: rgba(21, 21, 24, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid #2a2a30;
+        }
+        .gradient-text {
+            background: linear-gradient(to right, #ffffff, #888893);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .blinking-cursor::after {
+            content: '█';
+            animation: blink 1s step-end infinite;
+            color: #00ff66;
+            margin-left: 4px;
+        }
+        @keyframes blink { 50% { opacity: 0; } }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #0a0a0c; }
+        ::-webkit-scrollbar-thumb { background: #2a2a30; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #3a3a40; }
+    </style>
+</head>
+<body class="antialiased min-h-screen p-4 md:p-8 flex flex-col items-center">
+
+    <div class="w-full max-w-6xl space-y-6">
+        
+        <!-- Header -->
+        <header class="glass-panel p-6 rounded-xl flex flex-col md:flex-row justify-between items-start md:items-center border-b-4 border-b-term-red">
+            <div>
+                <div class="flex items-center gap-3 mb-2">
+                    <span class="px-2 py-1 bg-term-red/20 text-term-red text-xs font-mono font-bold rounded">RESTRICTED</span>
+                    <span class="text-xs font-mono text-term-text tracking-widest uppercase">Global Macro Surveillance</span>
+                </div>
+                <h1 class="text-3xl md:text-4xl font-bold text-white tracking-tight">MARKET MAYHEM</h1>
+                <p class="text-lg text-term-text mt-1">The Infrastructure Awakening</p>
+            </div>
+            <div class="mt-4 md:mt-0 text-left md:text-right font-mono text-sm">
+                <p class="text-term-highlight">MAY 18, 2026</p>
+                <p class="text-term-blue blinking-cursor">SYS_STATUS: NOMINAL</p>
+            </div>
+        </header>
+
+        <!-- Executive Summary -->
+        <section class="glass-panel p-6 md:p-8 rounded-xl border-l-4 border-l-term-blue">
+            <h2 class="text-xs font-mono text-term-blue tracking-widest uppercase mb-4">Executive Summary</h2>
+            <p class="text-lg text-term-highlight leading-relaxed font-medium">
+                The market caught a localized contagion today, selling off on the delayed realization that China’s <span class="text-term-red">DeepSeek V4</span> might actually commoditize the AI infrastructure layer faster than U.S. titans can monetize it.
+            </p>
+            <p class="text-base mt-4 leading-relaxed">
+                Naturally, the sell-side echo chamber is already out in force insisting the mega-cap moat is bulletproof. Down in the physical world, real assets are fracturing: Comex Gold and Silver settled lower, while Arabica coffee hit a record high—because nothing screams "late-cycle geopolitical friction" quite like a U.S.-Colombia tariff dispute pricing out your morning espresso. The "Higher-for-Longer" regime isn't just a threat; it’s the new baseline.
+            </p>
+        </section>
+
+        <!-- Market Levels Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <!-- S&P 500 -->
+            <div class="glass-panel p-5 rounded-xl">
+                <div class="text-xs font-mono text-term-text mb-1 uppercase">S&P 500</div>
+                <div class="text-2xl font-mono text-term-highlight font-bold">7403.05</div>
+                <div class="text-xs text-term-red mt-2 flex items-center gap-1">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"></path></svg>
+                    Broad AI Rout / Contagion
+                </div>
+            </div>
+            <!-- 10Y Yield -->
+            <div class="glass-panel p-5 rounded-xl border-t-2 border-t-term-amber">
+                <div class="text-xs font-mono text-term-text mb-1 uppercase">US 10-Yr Yield</div>
+                <div class="text-2xl font-mono text-term-highlight font-bold">4.623%</div>
+                <div class="text-xs text-term-amber mt-2 flex items-center gap-1">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                    Restrictive / Anchored
+                </div>
+            </div>
+            <!-- WTI Crude -->
+            <div class="glass-panel p-5 rounded-xl border-t-2 border-t-term-red">
+                <div class="text-xs font-mono text-term-text mb-1 uppercase">WTI Crude</div>
+                <div class="text-2xl font-mono text-term-highlight font-bold">$103.14</div>
+                <div class="text-xs text-term-red mt-2 flex items-center gap-1">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                    Inflation Switch: ON
+                </div>
+            </div>
+            <!-- Bitcoin -->
+            <div class="glass-panel p-5 rounded-xl border-t-2 border-t-term-green">
+                <div class="text-xs font-mono text-term-text mb-1 uppercase">Bitcoin</div>
+                <div class="text-2xl font-mono text-term-highlight font-bold">$77,326.44</div>
+                <div class="text-xs text-term-green mt-2 flex items-center gap-1">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>
+                    High-Beta Resilience
+                </div>
+            </div>
+        </div>
+
+        <!-- Deep Dives Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            
+            <!-- Credit & Macro -->
+            <div class="glass-panel p-6 rounded-xl flex flex-col gap-4">
+                <h2 class="text-sm font-mono text-white tracking-widest uppercase border-b border-term-border pb-2">Credit Risk & Macro Surveillance</h2>
+                
+                <div>
+                    <h3 class="text-term-highlight font-semibold mb-1">The Liquidity Mirage</h3>
+                    <p class="text-sm">With the 10-Year stubbornly anchored at 4.623%, duration risk on over-leveraged tech balance sheets is quietly amplifying. While broadly syndicated loans (BSL) sit at <span class="text-term-blue font-mono">S+350</span>, private credit is demanding <span class="text-term-amber font-mono">S+575</span>. This 225bps gap is the "honesty premium." Tight index spreads denote technical CLO bids, not fundamentals.</p>
+                </div>
+                
+                <div>
+                    <h3 class="text-term-highlight font-semibold mb-1">Energy: The Inflation Anchor</h3>
+                    <p class="text-sm">With WTI breaching $100, the Fed’s flexibility has evaporated. This is a tax on margins and a floor under Treasury yields. If a capital structure only works under a "quick-cut" scenario, it no longer works.</p>
+                </div>
+            </div>
+
+            <!-- AI Infrastructure -->
+            <div class="glass-panel p-6 rounded-xl flex flex-col gap-4">
+                <h2 class="text-sm font-mono text-white tracking-widest uppercase border-b border-term-border pb-2">AI Phase 2: The Capex Crunch</h2>
+                
+                <div>
+                    <h3 class="text-term-highlight font-semibold mb-1">The Power Constraint</h3>
+                    <p class="text-sm">The narrative shifted from "How big is the opportunity?" to "What is the ROIC on this power bill?" The AI trade is transitioning from software multiples to physical infrastructure. Compute demand is now an energy and power-grid problem.</p>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4 mt-2">
+                    <div class="bg-term-bg p-3 rounded border border-term-green/30">
+                        <span class="block text-xs font-mono text-term-green mb-1">FAVOR (The Plumbing)</span>
+                        <ul class="text-xs space-y-1 list-disc pl-4 text-white">
+                            <li>Chips / GPUs</li>
+                            <li>Data centers</li>
+                            <li>Power/grid capacity</li>
+                        </ul>
+                    </div>
+                    <div class="bg-term-bg p-3 rounded border border-term-red/30">
+                        <span class="block text-xs font-mono text-term-red mb-1">AVOID (The Squeeze)</span>
+                        <ul class="text-xs space-y-1 list-disc pl-4 text-white">
+                            <li>SaaS "Wrappers"</li>
+                            <li>Agent-based layers</li>
+                            <li>Unclear monetization</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Adam OS Agents -->
+        <h2 class="text-xs font-mono text-term-text tracking-widest uppercase text-center mt-8 mb-4">Adam OS: Multi-Agent Intelligence Network</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <!-- Agent 1 -->
+            <div class="glass-panel p-5 rounded-xl border border-term-border hover:border-term-blue transition-colors">
+                <div class="flex items-center gap-2 mb-3">
+                    <div class="w-2 h-2 rounded-full bg-term-blue animate-pulse"></div>
+                    <span class="font-mono text-sm text-term-highlight">Risk Officer</span>
+                </div>
+                <p class="text-xs italic leading-relaxed text-term-text">"The survivability filter is our primary lens. Focus on senior secured structures. Avoid 2020–2021 vintage LBOs reliant on aggressive add-backs. We are prioritizing liquidity runways through the 2027 maturity wall."</p>
+            </div>
+            <!-- Agent 2 -->
+            <div class="glass-panel p-5 rounded-xl border border-term-border hover:border-term-amber transition-colors">
+                <div class="flex items-center gap-2 mb-3">
+                    <div class="w-2 h-2 rounded-full bg-term-amber animate-pulse"></div>
+                    <span class="font-mono text-sm text-term-highlight">Macro Sentinel</span>
+                </div>
+                <p class="text-xs italic leading-relaxed text-term-text">"Yields are stubbornly anchored. The Trump–Xi summit is merely a fragile trade truce; structural red lines on semiconductors remain. The inflation risk from $103 Oil is the primary tail risk for Q2."</p>
+            </div>
+            <!-- Agent 3 -->
+            <div class="glass-panel p-5 rounded-xl border border-term-border hover:border-term-green transition-colors">
+                <div class="flex items-center gap-2 mb-3">
+                    <div class="w-2 h-2 rounded-full bg-term-green animate-pulse"></div>
+                    <span class="font-mono text-sm text-term-highlight">Crypto Oracle</span>
+                </div>
+                <p class="text-xs italic leading-relaxed text-term-text">"Bitcoin holds above $77K, decoupling from the pure 'tech proxy' trade and acting as a hedge against fiat debasement. Watch institutional outflows via Rust execution layers if BSL spreads gap out."</p>
+            </div>
+        </div>
+
+        <!-- LLM CONTEXT / SYSTEM PROMPT INJECTION -->
+        <div class="mt-12 mb-8">
+            <div class="bg-[#050505] border border-term-border rounded-xl overflow-hidden shadow-2xl">
+                <!-- Mac-like terminal header -->
+                <div class="bg-[#1a1a1f] px-4 py-2 flex items-center justify-between border-b border-term-border">
+                    <div class="flex gap-2">
+                        <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                        <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                        <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                    </div>
+                    <div class="text-xs font-mono text-term-text">LLM_INITIALIZATION_PROTOCOL.json</div>
+                    <div>
+                        <button onclick="copyPrompt()" class="text-xs font-mono text-term-blue hover:text-white transition-colors flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                            COPY PROMPT
+                        </button>
+                    </div>
+                </div>
+                <!-- Payload -->
+                <div class="p-6 overflow-x-auto">
+<pre id="llm-prompt" class="text-xs font-mono text-green-400 whitespace-pre-wrap leading-relaxed">
+{
+  "system_directive": "You are a quantitative frontend engineering LLM. Your task is to generate a single-file interactive React/D3 or HTML/JS Heatmap Dashboard for the S&P 500 based strictly on the Market Mayhem macro environment specified below.",
+  "context_date": "May 18, 2026",
+  "macro_environment": {
+    "sp500_level": 7403.05,
+    "us_10yr_yield": "4.623%",
+    "wti_crude": "$103.14",
+    "theme_1": "DeepSeek V4 (China) contagion is commoditizing the AI infrastructure layer, causing a brutal rotation out of US software/SaaS and into hard infrastructure/power.",
+    "theme_2": "Higher-for-Longer rates are crushing floating-rate borrowers. Refinancing maturity walls (2027) are critical.",
+    "theme_3": "Oil > $100 is acting as an inflation anchor, pressuring transport/consumer margins."
+  },
+  "required_dashboard_features": [
+    "1. Treemap/Heatmap visual aggregating S&P 500 by Sector, Industry, and Ticker.",
+    "2. Box sizes determined by Market Cap; Colors determined by 1-Day Performance.",
+    "3. Drill-down functionality to view company-level Consensus Forecasts.",
+    "4. A 'Risk Rating' score (1-10) for every company based on their 'Refinancing Wall' and 'Energy Exposure'.",
+    "5. Early Warning Indicator UI flags (e.g., ⚠️ High Duration, 🛢️ Energy Squeeze, 🔌 AI Power Constraint)."
+  ],
+  "data_generation_rules": "Simulate a JSON dataset for the top 50 S&P500 companies that accurately reflects the macro environment (e.g., Energy/Power/Compute Hardware should be green/outperforming; Over-leveraged CRE, SaaS wrappers, and duration-heavy tech should be deep red/underperforming).",
+  "output_format": "Provide a complete, runnable HTML file containing the CSS, JS, and mock data needed to render this analytical dashboard."
+}
+</pre>
+                </div>
+            </div>
+            <p class="text-center text-xs font-mono text-term-text mt-4">Provide the JSON payload above as the system prompt to your chosen LLM (e.g., Gemini 1.5 Pro) to generate the subsequent S&P 500 Dashboard artifact.</p>
+        </div>
+
+    </div>
+
+    <script>
+        function copyPrompt() {
+            const promptText = document.getElementById('llm-prompt').innerText;
+            const btn = event.currentTarget;
+            
+            // Fallback for iframe/canvas environments
+            const textArea = document.createElement("textarea");
+            textArea.value = promptText;
+            document.body.appendChild(textArea);
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                const originalText = btn.innerHTML;
+                btn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> COPIED!`;
+                btn.classList.add('text-term-green');
+                btn.classList.remove('text-term-blue');
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.classList.remove('text-term-green');
+                    btn.classList.add('text-term-blue');
+                }, 2000);
+            } catch (err) {
+                console.error('Failed to copy', err);
+            }
+            document.body.removeChild(textArea);
+        }
+    </script>
+</body>
+</html>
