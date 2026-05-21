@@ -469,7 +469,22 @@ The core artifact produced by Adam's System 2 analysis.
               "type": "object",
               "properties": {
                 "snc_rating_model": { "overall_borrower_rating": "string" },
-                "covenant_risk_analysis": { "headroom_assessment": "string" }
+                "covenant_risk_analysis": {
+                  "type": "object",
+                  "properties": {
+                    "fccr_assessment": {
+                      "type": "object",
+                      "properties": {
+                        "current_ratio": { "type": "number" },
+                        "minimum_required": { "type": "number" },
+                        "headroom_bps": { "type": "integer" },
+                        "status": { "enum": ["Compliant", "Warning Zone", "Breached"] },
+                        "prov_o_lineage_hash": { "type": "string", "description": "Rust execution ledger hash" }
+                      },
+                      "required": ["current_ratio", "status", "prov_o_lineage_hash"]
+                    }
+                  }
+                }
               }
             },
             "simulation_engine": { "type": "object", "description": "Monte Carlo & Quantum Scenarios" },

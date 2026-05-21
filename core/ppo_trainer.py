@@ -1,4 +1,5 @@
 import json
+import re
 
 import torch
 from peft import LoraConfig
@@ -36,6 +37,16 @@ def get_rewards(queries, responses):
                         "primary_model_target",
                     ]
                 ):
+                    is_valid = False
+                    break
+
+                # Check regex pattern for string fields
+                pattern = r"^[a-zA-Z0-9\s\-\.\,\%\$\(\)\/\+:\_\&]+$"
+                if not isinstance(point["variable_node"], str) or not re.match(pattern, point["variable_node"]):
+                    is_valid = False
+                    break
+
+                if not isinstance(point["market_level_value"], str) or not re.match(pattern, point["market_level_value"]):
                     is_valid = False
                     break
 
