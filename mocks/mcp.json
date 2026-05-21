@@ -4,7 +4,9 @@
     "server": {
       "type": "stdio",
       "command": "python",
-      "args": ["server/server.py"]
+      "args": [
+        "server/server.py"
+      ]
     },
     "registry": {
       "tools": [
@@ -19,7 +21,9 @@
                 "description": "The target entity and analysis context (e.g., 'Analyze Apple Inc. for credit risk')."
               }
             },
-            "required": ["query"]
+            "required": [
+              "query"
+            ]
           }
         },
         {
@@ -28,10 +32,17 @@
           "input_schema": {
             "type": "object",
             "properties": {
-              "entity_id": { "type": "string" },
-              "amount": { "type": "number" }
+              "entity_id": {
+                "type": "string"
+              },
+              "amount": {
+                "type": "number"
+              }
             },
-            "required": ["entity_id", "amount"]
+            "required": [
+              "entity_id",
+              "amount"
+            ]
           }
         },
         {
@@ -40,9 +51,13 @@
           "input_schema": {
             "type": "object",
             "properties": {
-              "ticker": { "type": "string" }
+              "ticker": {
+                "type": "string"
+              }
             },
-            "required": ["ticker"]
+            "required": [
+              "ticker"
+            ]
           }
         },
         {
@@ -56,7 +71,9 @@
                 "description": "The attack vector (e.g., 'Liquidity Crunch', 'Correlation Breakdown')."
               }
             },
-            "required": ["scenario"]
+            "required": [
+              "scenario"
+            ]
           }
         },
         {
@@ -70,7 +87,9 @@
                 "description": "The macro event (e.g., 'Global Recession', 'Interest Rate Spike')."
               }
             },
-            "required": ["macro_shock"]
+            "required": [
+              "macro_shock"
+            ]
           }
         },
         {
@@ -79,9 +98,13 @@
           "input_schema": {
             "type": "object",
             "properties": {
-              "borrower_id": { "type": "string" }
+              "borrower_id": {
+                "type": "string"
+              }
             },
-            "required": ["borrower_id"]
+            "required": [
+              "borrower_id"
+            ]
           }
         },
         {
@@ -92,10 +115,17 @@
             "properties": {
               "regime": {
                 "type": "string",
-                "enum": ["stress", "normal", "bubble"],
+                "enum": [
+                  "stress",
+                  "normal",
+                  "bubble"
+                ],
                 "default": "stress"
               },
-              "n_samples": { "type": "integer", "default": 5 }
+              "n_samples": {
+                "type": "integer",
+                "default": 5
+              }
             }
           }
         },
@@ -105,12 +135,25 @@
           "input_schema": {
             "type": "object",
             "properties": {
-              "asset_value": { "type": "number" },
-              "debt": { "type": "number" },
-              "volatility": { "type": "number" },
-              "horizon": { "type": "number", "default": 1.0 }
+              "asset_value": {
+                "type": "number"
+              },
+              "debt": {
+                "type": "number"
+              },
+              "volatility": {
+                "type": "number"
+              },
+              "horizon": {
+                "type": "number",
+                "default": 1.0
+              }
             },
-            "required": ["asset_value", "debt", "volatility"]
+            "required": [
+              "asset_value",
+              "debt",
+              "volatility"
+            ]
           }
         },
         {
@@ -119,9 +162,39 @@
           "input_schema": {
             "type": "object",
             "properties": {
-              "code": { "type": "string" }
+              "code": {
+                "type": "string"
+              }
             },
-            "required": ["code"]
+            "required": [
+              "code"
+            ]
+          }
+        },
+        {
+          "name": "calculate_fccr_headroom",
+          "description": "Deterministically calculates the Fixed Charge Coverage Ratio and headroom against a minimum covenant threshold.",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "ebitda": {
+                "type": "number",
+                "description": "Adjusted EBITDA"
+              },
+              "interest_expense": {
+                "type": "number",
+                "description": "Total interest expense"
+              },
+              "covenant_minimum": {
+                "type": "number",
+                "description": "The minimum FCCR required by the credit agreement"
+              }
+            },
+            "required": [
+              "ebitda",
+              "interest_expense",
+              "covenant_minimum"
+            ]
           }
         }
       ],
@@ -174,11 +247,11 @@
           "name": "crisis-simulation",
           "description": "Simulate a macroeconomic shock event.",
           "arguments": [
-             {
-               "name": "event",
-               "description": "The crisis event to simulate.",
-               "required": true
-             }
+            {
+              "name": "event",
+              "description": "The crisis event to simulate.",
+              "required": true
+            }
           ]
         }
       ]
