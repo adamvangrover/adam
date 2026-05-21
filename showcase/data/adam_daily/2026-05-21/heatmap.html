@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Axis Divergence Heatmap | Market Mayhem</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        term: {
+                            bg: '#0a0a0c',
+                            panel: '#151518',
+                            border: '#2a2a30',
+                            text: '#a0a0ab',
+                            highlight: '#ffffff',
+                            green: '#30cc5a',
+                            red: '#f63538',
+                            blue: '#3399ff',
+                            amber: '#ffb000'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #0a0a0c;
+            color: #a0a0ab;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+        .glass-panel {
+            background: rgba(21, 21, 24, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid #2a2a30;
+        }
+        .treemap-node {
+            transition: filter 0.2s ease, z-index 0s;
+        }
+        .treemap-node:hover {
+            filter: brightness(1.3);
+            z-index: 10;
+            box-shadow: 0 0 15px rgba(0,0,0,0.8);
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #0a0a0c; }
+        ::-webkit-scrollbar-thumb { background: #2a2a30; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #3a3a40; }
+
+        .heat-cell-text {
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+        }
+    </style>
+</head>
+<body class="antialiased min-h-screen flex flex-col items-center">
+
+    <div id="root" class="w-full h-screen flex flex-col"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef, useMemo } = React;
+
+        // Theme 1: AI Commoditization -> SaaS/Software Red, Infrastructure/Compute Green
+        // Theme 2: Refinancing Wall -> CRE/Highly levered Red
+        // Theme 3: Oil > $100 -> Energy Green, Transport/Consumer Red
+        const mockData = [
+            // TECHNOLOGY - QUANTUM & INFRASTRUCTURE (Multi-Axis Winners)
+            { ticker: "NVDA", name: "NVIDIA Corp", sector: "Technology", industry: "Semiconductors", marketCap: 2800, perf1d: 3.5, forecast: "EPS $28.40 | Rev $130B", riskRating: 4, flags: ["⚡ Qiskit Integration"] },
+            { ticker: "AMD", name: "Advanced Micro Devices", sector: "Technology", industry: "Semiconductors", marketCap: 280, perf1d: 2.1, forecast: "EPS $4.50 | Rev $26B", riskRating: 5, flags: ["⚡ Compute Demand"] },
+            { ticker: "IBM", name: "IBM Corp", sector: "Technology", industry: "IT Services", marketCap: 180, perf1d: 5.2, forecast: "EPS $10.20 | Rev $62B", riskRating: 3, flags: ["🧠 Quantum Supremacy"] },
+
+            // TECHNOLOGY - SOFTWARE (Losers from Commotization)
+            { ticker: "CRM", name: "Salesforce Inc", sector: "Technology", industry: "Software", marketCap: 250, perf1d: -4.2, forecast: "EPS $8.10 | Rev $35B", riskRating: 8, flags: ["⚠️ Moat Commoditization"] },
+            { ticker: "ADBE", name: "Adobe Inc", sector: "Technology", industry: "Software", marketCap: 210, perf1d: -3.5, forecast: "EPS $16.00 | Rev $20B", riskRating: 7, flags: ["⚠️ Moat Commoditization"] },
+
+            // ENERGY & COMMODITIES (Friction Costs)
+            { ticker: "XOM", name: "Exxon Mobil", sector: "Energy", industry: "Oil & Gas", marketCap: 480, perf1d: 2.5, forecast: "EPS $10.20 | Rev $360B", riskRating: 2, flags: ["🛢️ $105 WTI Margin"] },
+            { ticker: "CVX", name: "Chevron Corp", sector: "Energy", industry: "Oil & Gas", marketCap: 300, perf1d: 2.1, forecast: "EPS $14.50 | Rev $210B", riskRating: 2, flags: ["🛢️ Inflation Anchor"] },
+            { ticker: "SBUX", name: "Starbucks", sector: "Cons Discretionary", industry: "Restaurants", marketCap: 100, perf1d: -3.8, forecast: "EPS $3.50 | Rev $36B", riskRating: 6, flags: ["☕ Arabica Friction Cost"] },
+
+            // FINANCIALS & REAL ESTATE (Liquidity Deficit / Duration Risk)
+            { ticker: "SPG", name: "Simon Property", sector: "Real Estate", industry: "Retail REITs", marketCap: 45, perf1d: -6.5, forecast: "FFO $11.50 | Rev $5.2B", riskRating: 9, flags: ["💀 4.75% Duration Risk"] },
+            { ticker: "PLD", name: "Prologis", sector: "Real Estate", industry: "Industrial REITs", marketCap: 100, perf1d: -5.1, forecast: "FFO $5.40 | Rev $8.5B", riskRating: 8, flags: ["💀 4.75% Duration Risk"] },
+            { ticker: "BX", name: "Blackstone", sector: "Financials", industry: "Capital Markets", marketCap: 145, perf1d: -4.5, forecast: "EPS $4.80 | Rev $12B", riskRating: 7, flags: ["💀 Private Credit Default"] },
+            { ticker: "JPM", name: "JPMorgan Chase", sector: "Financials", industry: "Banks", marketCap: 550, perf1d: -1.5, forecast: "EPS $16.50 | Rev $165B", riskRating: 4, flags: ["🏦 Liquidity Vacuum"] },
+
+            // CRYPTO PROXY (Parallel Hedge)
+            { ticker: "MSTR", name: "MicroStrategy", sector: "Technology", industry: "Software", marketCap: 35, perf1d: 6.8, forecast: "EPS $1.20 | Rev $0.5B", riskRating: 8, flags: ["₿ Parallel Hedge"] },
+            { ticker: "COIN", name: "Coinbase", sector: "Financials", industry: "Capital Markets", marketCap: 60, perf1d: 5.5, forecast: "EPS $4.50 | Rev $4B", riskRating: 7, flags: ["₿ Digital Scarcity"] }
+        ];
+
+        const buildHierarchy = (data) => {
+            const root = { name: "S&P 500", children: [] };
+            const sectors = {};
+            data.forEach(d => {
+                if (!sectors[d.sector]) {
+                    sectors[d.sector] = { name: d.sector, children: [], type: 'sector' };
+                    root.children.push(sectors[d.sector]);
+                }
+                const sector = sectors[d.sector];
+                let industry = sector.children.find(c => c.name === d.industry);
+                if (!industry) {
+                    industry = { name: d.industry, children: [], type: 'industry', sectorName: d.sector };
+                    sector.children.push(industry);
+                }
+                industry.children.push({ ...d, value: d.marketCap, type: 'ticker' });
+            });
+            return root;
+        };
+
+        const getColor = (perf) => {
+            if (perf <= -6) return '#8b0000'; // Deep Dark Red
+            if (perf <= -4) return '#c41c1c'; // Dark Red
+            if (perf <= -2) return '#e04444'; // Red
+            if (perf <= -0.5) return '#a35050'; // Dull Red
+            if (perf < 0.5) return '#414554'; // Neutral Dark Grey
+            if (perf < 2) return '#488f5d'; // Dull Green
+            if (perf < 4) return '#2eab55'; // Green
+            if (perf < 6) return '#17d14f'; // Bright Green
+            return '#00ff40'; // Neon Green
+        };
+
+        const DetailPanel = ({ selected }) => {
+            if (!selected || selected.type !== 'ticker') {
+                return (
+                    <div className="glass-panel h-full flex flex-col items-center justify-center p-6 text-center border-l-4 border-l-term-border">
+                        <svg className="w-12 h-12 text-term-border mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <p className="text-term-text font-mono text-sm uppercase tracking-widest">Select a ticker on the heatmap to view target analysis.</p>
+                    </div>
+                );
+            }
+
+            const data = selected.data;
+            const isPos = data.perf1d >= 0;
+
+            return (
+                <div className="glass-panel h-full flex flex-col border-t-4 md:border-t-0 md:border-l-4 border-term-border p-6 overflow-y-auto">
+                    <div className="flex justify-between items-start mb-6">
+                        <div>
+                            <h2 className="text-3xl font-bold text-white mb-1 tracking-tight">{data.ticker}</h2>
+                            <p className="text-sm text-term-text">{data.name}</p>
+                        </div>
+                        <div className={`px-3 py-1 rounded text-lg font-mono font-bold ${isPos ? 'bg-term-green/20 text-term-green' : 'bg-term-red/20 text-term-red'}`}>
+                            {isPos ? '+' : ''}{data.perf1d}%
+                        </div>
+                    </div>
+
+                    <div className="space-y-6">
+                        {/* Meta Data */}
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="bg-term-bg p-3 rounded border border-term-border">
+                                <p className="text-xs font-mono text-term-text uppercase mb-1">Sector</p>
+                                <p className="text-sm text-white font-medium">{data.sector}</p>
+                            </div>
+                            <div className="bg-term-bg p-3 rounded border border-term-border">
+                                <p className="text-xs font-mono text-term-text uppercase mb-1">Industry</p>
+                                <p className="text-sm text-white font-medium">{data.industry}</p>
+                            </div>
+                            <div className="bg-term-bg p-3 rounded border border-term-border col-span-2">
+                                <p className="text-xs font-mono text-term-text uppercase mb-1">Market Cap</p>
+                                <p className="text-lg text-white font-mono">${data.marketCap} Billion</p>
+                            </div>
+                        </div>
+
+                        {/* Forecasts */}
+                        <div className="bg-term-bg p-4 rounded border border-term-blue/30">
+                            <h3 className="text-xs font-mono text-term-blue uppercase mb-2 flex items-center gap-2">
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                                Consensus Forecast
+                            </h3>
+                            <p className="text-sm text-white font-mono">{data.forecast}</p>
+                        </div>
+
+                        {/* Risk Rating */}
+                        <div>
+                            <div className="flex justify-between items-end mb-2">
+                                <h3 className="text-xs font-mono text-term-text uppercase">Systemic Risk Rating</h3>
+                                <span className={`text-xl font-bold font-mono ${data.riskRating >= 8 ? 'text-term-red' : data.riskRating >= 5 ? 'text-term-amber' : 'text-term-green'}`}>
+                                    {data.riskRating}/10
+                                </span>
+                            </div>
+                            <div className="h-2 w-full bg-term-bg rounded-full overflow-hidden">
+                                <div
+                                    className={`h-full ${data.riskRating >= 8 ? 'bg-term-red' : data.riskRating >= 5 ? 'bg-term-amber' : 'bg-term-green'}`}
+                                    style={{ width: `${(data.riskRating / 10) * 100}%` }}
+                                ></div>
+                            </div>
+                            <p className="text-xs text-term-text mt-2 italic">Scored based on 2027 Refinancing Wall exposure & Input Cost (Energy) reliance.</p>
+                        </div>
+
+                        {/* Flags */}
+                        {data.flags && data.flags.length > 0 && (
+                            <div>
+                                <h3 className="text-xs font-mono text-term-text uppercase mb-3">Early Warning Indicators</h3>
+                                <div className="flex flex-wrap gap-2">
+                                    {data.flags.map((flag, idx) => {
+                                        const isNegative = flag.includes('⚠️') || flag.includes('💀') || flag.includes('📉');
+                                        return (
+                                            <span key={idx} className={`text-xs px-2 py-1 rounded border ${isNegative ? 'bg-term-red/10 border-term-red/30 text-term-red' : 'bg-term-green/10 border-term-green/30 text-term-green'}`}>
+                                                {flag}
+                                            </span>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+
+        const Treemap = ({ data, onSelect }) => {
+            const containerRef = useRef(null);
+            const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+
+            useEffect(() => {
+                const observeTarget = containerRef.current;
+                const resizeObserver = new ResizeObserver(entries => {
+                    if (entries[0]) {
+                        setDimensions({
+                            width: entries[0].contentRect.width,
+                            height: entries[0].contentRect.height
+                        });
+                    }
+                });
+                if (observeTarget) resizeObserver.observe(observeTarget);
+                return () => { if (observeTarget) resizeObserver.unobserve(observeTarget); };
+            }, []);
+
+            const nodes = useMemo(() => {
+                if (dimensions.width === 0 || dimensions.height === 0) return [];
+
+                const rootNode = d3.hierarchy(buildHierarchy(data))
+                    .sum(d => d.value)
+                    .sort((a, b) => b.value - a.value);
+
+                const treemapLayout = d3.treemap()
+                    .size([dimensions.width, dimensions.height])
+                    .paddingTop(24)
+                    .paddingRight(2)
+                    .paddingInner(2)
+                    .paddingOuter(2);
+
+                treemapLayout(rootNode);
+                return rootNode.descendants();
+            }, [data, dimensions]);
+
+            return (
+                <div ref={containerRef} className="w-full h-full relative overflow-hidden bg-term-bg rounded border border-term-border">
+                    {nodes.map((node, i) => {
+                        const isLeaf = !node.children;
+                        const isSector = node.depth === 1;
+                        const width = node.x1 - node.x0;
+                        const height = node.y1 - node.y0;
+
+                        if (width <= 0 || height <= 0) return null;
+
+                        if (isSector) {
+                            return (
+                                <div key={`sector-${i}`} style={{
+                                    position: 'absolute',
+                                    left: node.x0, top: node.y0,
+                                    width: width, height: height,
+                                    pointerEvents: 'none',
+                                    border: '2px solid rgba(255,255,255,0.1)'
+                                }}>
+                                    <div className="text-[10px] font-mono text-term-text/70 uppercase pl-1 pt-1 font-bold tracking-widest truncate bg-[#0a0a0c]/80 inline-block px-2">
+                                        {node.data.name}
+                                    </div>
+                                </div>
+                            );
+                        }
+
+                        if (isLeaf) {
+                            const showText = width > 40 && height > 30;
+                            const showPerf = width > 50 && height > 45;
+                            const bgColor = getColor(node.data.perf1d);
+
+                            return (
+                                <div
+                                    key={`leaf-${i}`}
+                                    className="treemap-node cursor-pointer flex flex-col items-center justify-center absolute overflow-hidden rounded-sm"
+                                    style={{
+                                        left: node.x0, top: node.y0,
+                                        width: width, height: height,
+                                        backgroundColor: bgColor,
+                                        border: '1px solid rgba(0,0,0,0.5)'
+                                    }}
+                                    onClick={() => onSelect(node)}
+                                >
+                                    {showText && (
+                                        <span className="font-bold text-white text-sm md:text-base heat-cell-text truncate px-1">
+                                            {node.data.ticker}
+                                        </span>
+                                    )}
+                                    {showPerf && (
+                                        <span className="font-mono text-white/90 text-[10px] heat-cell-text mt-0.5">
+                                            {node.data.perf1d > 0 ? '+' : ''}{node.data.perf1d}%
+                                        </span>
+                                    )}
+                                </div>
+                            );
+                        }
+                        return null;
+                    })}
+                </div>
+            );
+        };
+
+        const App = () => {
+            const [selectedNode, setSelectedNode] = useState(null);
+
+            return (
+                <div className="w-full h-full flex flex-col p-2 md:p-4 gap-4 max-w-[1600px] mx-auto">
+
+                    {/* Header Panel */}
+                    <header className="glass-panel flex-shrink-0 p-4 rounded-xl flex flex-col md:flex-row justify-between items-center border-b-4 border-b-term-red shadow-lg z-10">
+                        <div className="flex flex-col items-center md:items-start mb-4 md:mb-0">
+                            <div className="flex items-center gap-3 mb-1">
+                                <span className="px-2 py-0.5 bg-term-red/20 text-term-red text-[10px] font-mono font-bold rounded">RESTRICTED</span>
+                                <span className="text-xs font-mono text-term-text tracking-widest uppercase">Global Macro Surveillance</span>
+                            </div>
+                            <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight">MARKET MAYHEM</h1>
+                            <p className="text-sm text-term-text mt-0.5">The Infrastructure Awakening (Context Date: May 18, 2026)</p>
+                        </div>
+
+                        <div className="flex gap-4 md:gap-8 bg-term-bg/50 p-3 rounded-lg border border-term-border">
+                            <div className="text-center md:text-left">
+                                <p className="text-[10px] font-mono text-term-text uppercase">S&P 500</p>
+                                <p className="text-lg font-mono font-bold text-white">7403.05</p>
+                                <p className="text-[10px] text-term-red">-1.8%</p>
+                            </div>
+                            <div className="w-px bg-term-border"></div>
+                            <div className="text-center md:text-left">
+                                <p className="text-[10px] font-mono text-term-text uppercase">10Y Yield</p>
+                                <p className="text-lg font-mono font-bold text-term-amber">4.623%</p>
+                                <p className="text-[10px] text-term-amber uppercase">Anchored</p>
+                            </div>
+                            <div className="w-px bg-term-border"></div>
+                            <div className="text-center md:text-left">
+                                <p className="text-[10px] font-mono text-term-text uppercase">WTI Crude</p>
+                                <p className="text-lg font-mono font-bold text-term-green">$103.14</p>
+                                <p className="text-[10px] text-term-green">+2.4%</p>
+                            </div>
+                        </div>
+                    </header>
+
+                    {/* Main Content Area */}
+                    <main className="flex-1 min-h-0 flex flex-col md:flex-row gap-4">
+                        {/* Heatmap Area */}
+                        <div className="flex-1 glass-panel rounded-xl flex flex-col p-4 shadow-lg">
+                            <div className="flex justify-between items-end mb-3">
+                                <div>
+                                    <h2 className="text-sm font-mono text-white tracking-widest uppercase">Intraday Sector Allocation Matrix</h2>
+                                    <p className="text-xs text-term-text">Size: Market Cap | Color: 1D Performance</p>
+                                </div>
+                                <div className="hidden lg:flex items-center gap-1 text-[10px] font-mono border border-term-border p-1 rounded">
+                                    <div className="w-3 h-3 bg-[#8b0000]"></div><span className="text-term-text mr-2">-6%</span>
+                                    <div className="w-3 h-3 bg-[#414554]"></div><span className="text-term-text mr-2">0%</span>
+                                    <div className="w-3 h-3 bg-[#00ff40]"></div><span className="text-term-text">+6%</span>
+                                </div>
+                            </div>
+                            <div className="flex-1 w-full min-h-[400px]">
+                                <Treemap data={mockData} onSelect={setSelectedNode} />
+                            </div>
+                        </div>
+
+                        {/* Side Panel Area */}
+                        <div className="w-full md:w-[350px] lg:w-[400px] flex-shrink-0 flex flex-col shadow-lg rounded-xl overflow-hidden">
+                            <DetailPanel selected={selectedNode} />
+                        </div>
+                    </main>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
