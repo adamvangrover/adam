@@ -29,15 +29,6 @@ export const TickerTape: React.FC = () => {
         ))}
         {/* Duplicate for seamless loop if needed, simplified here */}
       </div>
-      <style>{`
-        @keyframes marquee {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-100%); }
-        }
-        .animate-marquee {
-          animation: marquee 30s linear infinite;
-        }
-      `}</style>
     </div>
   );
 };

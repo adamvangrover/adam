@@ -234,42 +234,6 @@ const EvolutionHub = () => {
 
     return (
         <div className="min-h-screen bg-[#050b14] text-slate-200 font-mono relative overflow-hidden flex flex-col">
-            {/* Custom CSS */}
-            <style>{`
-                @keyframes scan {
-                    0% { top: 0%; }
-                    100% { top: 100%; }
-                }
-                .scan-line {
-                    width: 100%;
-                    height: 2px;
-                    background: rgba(168, 85, 247, 0.3);
-                    opacity: 0.5;
-                    animation: scan 4s linear infinite;
-                    position: fixed;
-                    top: 0;
-                    pointer-events: none;
-                    z-index: 50;
-                }
-                .glass-panel {
-                    background: rgba(13, 20, 31, 0.7);
-                    backdrop-filter: blur(12px);
-                    border: 1px solid rgba(59, 130, 246, 0.15);
-                    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-                }
-                .glass-panel-active {
-                    border: 1px solid rgba(168, 85, 247, 0.4);
-                    box-shadow: 0 0 20px rgba(168, 85, 247, 0.15);
-                }
-                .text-glow {
-                    text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
-                }
-                /* Scrollbar */
-                ::-webkit-scrollbar { width: 8px; }
-                ::-webkit-scrollbar-track { background: #0f172a; }
-                ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
-                ::-webkit-scrollbar-thumb:hover { background: #475569; }
-            `}</style>
 
             <div className="scan-line"></div>
 
