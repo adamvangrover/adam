@@ -327,7 +327,7 @@ const Synthesizer: React.FC = () => {
                         {Object.entries(conviction).map(([agent, val]) => (
                             <div key={agent} style={{ textAlign: 'center', padding: '10px', background: `rgba(0, 255, 0, ${val * 0.3})`, border: `1px solid rgba(0,255,0,${val})`, borderRadius: '4px', position: 'relative', overflow: 'hidden' }}>
                                 {/* Animated scanning bar */}
-                                <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '2px', background: 'rgba(255,255,255,0.5)', animation: 'scan 3s linear infinite' }}></div>
+                                <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '2px', background: 'rgba(255,255,255,0.5)', animation: 'scan-synthesizer 3s linear infinite' }}></div>
                                 <div style={{ fontSize: '0.7rem', fontWeight: 'bold' }}>{agent}</div>
                                 <div style={{ fontSize: '1.2rem', color: '#fff' }}>{(val * 100).toFixed(0)}%</div>
                                 {val > 0.8 && <div style={{ fontSize: '0.55rem', color: '#000', background: '#0f0', padding: '2px', marginTop: '5px', borderRadius: '2px' }}>HIGH CONVICTION</div>}
@@ -335,14 +335,6 @@ const Synthesizer: React.FC = () => {
                             </div>
                         ))}
                     </div>
-                    {/* Add keyframes globally for scanning bar */}
-                    <style>{`
-                        @keyframes scan {
-                            0% { transform: translateY(-100%); opacity: 0; }
-                            50% { opacity: 1; }
-                            100% { transform: translateY(1000%); opacity: 0; }
-                        }
-                    `}</style>
                 </div>
 
                 {/* 7. Forecast Chart (SVG) */}

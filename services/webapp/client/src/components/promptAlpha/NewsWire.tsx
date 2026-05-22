@@ -94,15 +94,6 @@ export const NewsWire: React.FC = () => {
             ))}
         </div>
 
-        <style>{`
-            .animate-spin-slow { animation: spin 4s linear infinite; }
-            @keyframes spin { 100% { transform: rotate(360deg); } }
-            @keyframes flash {
-                0% { background-color: rgba(34, 211, 238, 0.2); }
-                100% { background-color: transparent; }
-            }
-            .animate-flash { animation: flash 1s ease-out; }
-        `}</style>
     </div>
   );
 };
