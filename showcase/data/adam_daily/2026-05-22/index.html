@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MARKET MAYHEM: MULTI-AXIS DIVERGENCE</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        terminal: {
+                            bg: '#0a0f18',
+                            card: '#111827',
+                            border: '#1f2937',
+                            cyan: '#06b6d4',
+                            amber: '#f59e0b',
+                            red: '#ef4444',
+                            green: '#10b981'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #0a0f18;
+            color: #e5e7eb;
+            overflow-x: hidden;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0a0f18;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1f2937;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #374151;
+        }
+
+        /* Ticker Animation */
+        .ticker-wrap {
+            width: 100%;
+            overflow: hidden;
+            background-color: #000;
+            border-bottom: 1px solid #1f2937;
+            white-space: nowrap;
+            box-sizing: border-box;
+        }
+        .ticker {
+            display: inline-block;
+            white-space: nowrap;
+            padding-right: 100%;
+            box-sizing: content-box;
+            animation: ticker 30s linear infinite;
+        }
+        .ticker:hover {
+            animation-play-state: paused;
+        }
+        @keyframes ticker {
+            0% { transform: translate3d(0, 0, 0); }
+            100% { transform: translate3d(-100%, 0, 0); }
+        }
+
+        /* Glitch & Pulse Effects */
+        .pulse-red {
+            animation: pulse-red 2s infinite;
+        }
+        @keyframes pulse-red {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+
+        .typing-cursor::after {
+            content: '█';
+            animation: blink 1s step-start infinite;
+            color: #06b6d4;
+            margin-left: 4px;
+        }
+        @keyframes blink {
+            50% { opacity: 0; }
+        }
+
+        .glass-panel {
+            background: rgba(17, 24, 39, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(31, 41, 55, 0.8);
+        }
+
+        .nav-button.active {
+            border-bottom: 2px solid #06b6d4;
+            color: #06b6d4;
+            background: rgba(6, 182, 212, 0.1);
+        }
+    </style>
+</head>
+<body class="antialiased min-h-screen flex flex-col">
+
+    <!-- Live Ticker -->
+    <div class="ticker-wrap h-10 flex items-center font-mono text-sm">
+        <div class="ticker" id="ticker-content">
+            <!-- Populated by JS -->
+        </div>
+    </div>
+
+    <!-- Main Header -->
+    <header class="border-b border-terminal-border bg-terminal-bg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <div>
+                <div class="flex items-center gap-3">
+                    <div class="w-3 h-3 rounded-full bg-red-500 pulse-red"></div>
+                    <h1 class="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
+                        <i data-lucide="activity" class="text-terminal-cyan h-6 w-6"></i>
+                        MARKET MAYHEM <span class="text-terminal-border mx-2">|</span> <span class="font-light text-gray-400">MULTI-AXIS DIVERGENCE</span>
+                    </h1>
+                </div>
+                <p class="text-sm font-mono text-gray-500 mt-1">MAY 22, 2026 // MACRO SURVEILLANCE & CREDIT INTELLIGENCE</p>
+            </div>
+                        <div class="hidden md:flex items-center gap-4 font-mono text-xs text-gray-400">
+                <a href="heatmap.html" target="_blank" class="flex items-center gap-2 px-3 py-1 bg-terminal-cyan/10 text-terminal-cyan rounded hover:bg-terminal-cyan/20 border border-terminal-cyan/30 transition-colors">
+                    <i data-lucide="grid" class="w-4 h-4"></i> VIEW HEATMAP
+                </a>
+                <div class="bg-terminal-card px-3 py-1 rounded border border-terminal-border">
+                    STATUS: <span class="text-terminal-red">ELEVATED VOLATILITY</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Grid -->
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <!-- Left Column: Narratives & Risks -->
+        <div class="lg:col-span-7 space-y-6">
+
+            <!-- Executive Summary -->
+            <section class="glass-panel rounded-xl p-6 relative overflow-hidden group hover:border-terminal-cyan/50 transition-colors duration-300">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-terminal-cyan/5 rounded-full blur-3xl -mr-10 -mt-10"></div>
+                <h2 class="text-xl font-semibold mb-4 flex items-center gap-2 border-b border-terminal-border pb-3">
+                    <i data-lucide="file-text" class="text-terminal-cyan h-5 w-5"></i>
+                    EXECUTIVE SUMMARY: THE TWO-SPEED TRAP
+                </h2>
+                <div class="space-y-4 text-gray-300 leading-relaxed">
+                    <p>
+                        The market caught a localized contagion today, selling off on the delayed realization that China’s <span class=\"text-white font-mono bg-terminal-card px-1 py-0.5 rounded border border-terminal-border\">DeepSeek V4</span> might actually commoditize the AI infrastructure layer faster than U.S. titans can monetize it. Naturally, the sell-side echo chamber is already out in force insisting the mega-cap moat is bulletproof. <br><br>This is a multi-axis divergence—a market suddenly terrified of open-weight models out of China, yet desperate to believe U.S. mega-cap tech valuations remain fundamentally untouchable. Down in the physical world, real assets are fracturing. Comex Gold and Silver settled lower, while Arabica coffee hit a record high.</span>
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Credit Risk & Macro Surveillance -->
+            <section class="glass-panel rounded-xl p-6">
+                <h2 class="text-xl font-semibold mb-4 flex items-center gap-2 border-b border-terminal-border pb-3">
+                    <i data-lucide="shield-alert" class="text-terminal-red h-5 w-5"></i>
+                    CREDIT RISK & MACRO SURVEILLANCE
+                </h2>
+
+                <div class="space-y-4">
+                    <!-- Accordion Item 1 -->
+                    <div class="border border-terminal-border rounded-lg bg-terminal-bg overflow-hidden cursor-pointer group" onclick="toggleAccordion('risk1')">
+                        <div class="p-4 flex justify-between items-center bg-terminal-card group-hover:bg-gray-800 transition-colors">
+                            <h3 class="font-semibold font-mono text-terminal-cyan flex items-center gap-2">
+                                <span class="bg-terminal-bg border border-terminal-border px-2 py-0.5 text-xs rounded">01</span> The Liquidity Mirage
+                            </h3>
+                            <i data-lucide="chevron-down" class="h-4 w-4 text-gray-400 transition-transform duration-200" id="icon-risk1"></i>
+                        </div>
+                        <div id="risk1" class="hidden p-4 text-sm text-gray-300 border-t border-terminal-border">
+                            With the 10-Year stubbornly anchored at <span class="text-white font-mono">4.623%</span>, the duration risk on over-leveraged tech balance sheets is quietly amplifying. The market is confidently pricing in a soft landing while ignoring the structural gravity of sustained capital costs. The 225bps gap between broadly syndicated loans and private credit is the "honesty premium"—tight index spreads in liquid markets do not mean fundamentals are improving; they mean the technical bid is masking a deteriorating credit transmission.
+                        </div>
+                    </div>
+
+                    <!-- Accordion Item 2 -->
+                    <div class="border border-terminal-border rounded-lg bg-terminal-bg overflow-hidden cursor-pointer group" onclick="toggleAccordion('risk2')">
+                        <div class="p-4 flex justify-between items-center bg-terminal-card group-hover:bg-gray-800 transition-colors">
+                            <h3 class="font-semibold font-mono text-terminal-amber flex items-center gap-2">
+                                <span class="bg-terminal-bg border border-terminal-border px-2 py-0.5 text-xs rounded">02</span> The Energy-Inflation Transmission
+                            </h3>
+                            <i data-lucide="chevron-down" class="h-4 w-4 text-gray-400 transition-transform duration-200" id="icon-risk2"></i>
+                        </div>
+                        <div id="risk2" class="hidden p-4 text-sm text-gray-300 border-t border-terminal-border">
+                            With WTI breaching <span class="text-white font-mono">$103</span>, the Fed’s flexibility has evaporated. This isn't just a commodity spike; it’s a tax on margins and a floor under Treasury yields. If the capital structure only works under a "quick-cut" scenario, it no longer works.
+                        </div>
+                    </div>
+
+                    <!-- Accordion Item 3 -->
+                    <div class="border border-terminal-border rounded-lg bg-terminal-bg overflow-hidden cursor-pointer group" onclick="toggleAccordion('risk3')">
+                        <div class="p-4 flex justify-between items-center bg-terminal-card group-hover:bg-gray-800 transition-colors">
+                            <h3 class="font-semibold font-mono text-terminal-green flex items-center gap-2">
+                                <span class="bg-terminal-bg border border-terminal-border px-2 py-0.5 text-xs rounded">03</span> AI Phase 2: Physicality & Power
+                            </h3>
+                            <i data-lucide="chevron-down" class="h-4 w-4 text-gray-400 transition-transform duration-200" id="icon-risk3"></i>
+                        </div>
+                        <div id="risk3" class="hidden p-4 text-sm text-gray-300 border-t border-terminal-border">
+                            <p class="mb-3">The narrative has shifted from "How big is the opportunity?" to "What is the ROIC on this power bill?"</p>
+                            <ul class="space-y-2 ml-4 list-disc marker:text-terminal-cyan">
+                                <li><strong>The Winners:</strong> Chips, power grid capacity, and data center real estate. These are the physical assets with near-term visibility and pricing power.</li>
+                                <li><strong class="text-terminal-red">The Losers:</strong> SaaS "wrappers" and agent-based software layers facing extreme scrutiny and budget crowd-out.</li>
+                                <li><strong class="text-terminal-amber">The Constraint:</strong> The AI trade is increasingly a Power Trade. Compute demand is now an energy problem.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Right Column: Data & Metrics -->
+        <div class="lg:col-span-5 space-y-6 flex flex-col">
+
+            <!-- Visual Chart -->
+            <section class="glass-panel rounded-xl p-4 flex-shrink-0">
+                <div class="flex justify-between items-center mb-2">
+                    <h3 class="text-sm font-mono text-gray-400">S&P 500 INTRADAY SIMULATION</h3>
+                    <span class="text-xs font-mono text-terminal-red bg-terminal-red/10 px-2 py-1 rounded">ROUT ACTIVE</span>
+                </div>
+                <div class="h-48 w-full relative">
+                    <canvas id="spxChart"></canvas>
+                </div>
+            </section>
+
+            <!-- Deterministic Market Levels Table -->
+            <section class="glass-panel rounded-xl p-0 flex-grow overflow-hidden flex flex-col">
+                <div class="p-4 border-b border-terminal-border bg-terminal-card flex items-center gap-2">
+                    <i data-lucide="bar-chart-2" class="text-terminal-cyan h-5 w-5"></i>
+                    <h2 class="text-lg font-semibold">DETERMINISTIC MARKET LEVELS</h2>
+                </div>
+                <div class="overflow-x-auto flex-grow">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-terminal-bg font-mono text-xs text-gray-400 border-b border-terminal-border">
+                                <th class="p-3 font-medium">ASSET / INDICATOR</th>
+                                <th class="p-3 font-medium text-right">LEVEL</th>
+                                <th class="p-3 font-medium hidden sm:table-cell">MACRO NARRATIVE</th>
+                            </tr>
+                        </thead>
+                        <tbody id="market-table-body" class="text-sm divide-y divide-terminal-border">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+        </div>
+
+        <!-- Bottom Span: ADAM OS -->
+        <div class="lg:col-span-12">
+            <section class="glass-panel rounded-xl border border-terminal-cyan/30 overflow-hidden flex flex-col md:flex-row shadow-[0_0_15px_rgba(6,182,212,0.1)]">
+
+                <!-- Sidebar / Agent Selector -->
+                <div class="w-full md:w-64 bg-terminal-card border-b md:border-b-0 md:border-r border-terminal-border flex flex-row md:flex-col p-4 md:p-0 overflow-x-auto">
+                    <div class="hidden md:flex p-4 border-b border-terminal-border items-center gap-2">
+                        <i data-lucide="cpu" class="text-terminal-cyan h-5 w-5"></i>
+                        <h2 class="font-bold tracking-widest text-sm">ADAM OS<span class="text-terminal-cyan text-xs ml-1 block opacity-70">MULTI-AGENT INSIGHTS</span></h2>
+                    </div>
+
+                    <div class="flex flex-row md:flex-col w-full gap-2 md:gap-0">
+                        <button onclick="activateAgent('risk')" id="btn-risk" class="nav-button flex-1 md:flex-none text-left px-4 py-3 text-sm font-mono hover:bg-gray-800 transition-colors flex items-center gap-3 border-l-2 border-transparent">
+                            <i data-lucide="shield" class="h-4 w-4"></i> Risk Officer
+                        </button>
+                        <button onclick="activateAgent('macro')" id="btn-macro" class="nav-button flex-1 md:flex-none text-left px-4 py-3 text-sm font-mono hover:bg-gray-800 transition-colors flex items-center gap-3 border-l-2 border-transparent">
+                            <i data-lucide="globe" class="h-4 w-4"></i> Macro Sentinel
+                        </button>
+                        <button onclick="activateAgent('crypto')" id="btn-crypto" class="nav-button flex-1 md:flex-none text-left px-4 py-3 text-sm font-mono hover:bg-gray-800 transition-colors flex items-center gap-3 border-l-2 border-transparent">
+                            <i data-lucide="bitcoin" class="h-4 w-4"></i> Crypto Oracle
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Terminal Output Area -->
+                <div class="flex-grow p-6 bg-[#050914] relative min-h-[200px] flex flex-col justify-center">
+                    <div class="absolute top-4 right-4 text-xs font-mono text-gray-600 flex items-center gap-2">
+                        SYSTEM TERMINAL <div class="w-2 h-2 bg-terminal-cyan rounded-full animate-pulse"></div>
+                    </div>
+
+                    <div class="font-mono text-sm leading-relaxed text-terminal-cyan/90 max-w-4xl" id="terminal-output">
+                        Select an agent module to initialize insight retrieval sequence...
+                    </div>
+                </div>
+
+            </section>
+        </div>
+
+    </main>
+
+    <script>
+        // Data Definitions
+        const marketData = [
+            { asset: 'S&P 500', level: '7445.72', trend: 'down', narrative: 'DeepSeek contagion / AI infrastructure commoditization' },
+            { asset: 'US 10-Yr Yield', level: '4.586%', trend: 'down', narrative: 'Liquidity mirage / duration amplifying' },
+            { asset: 'WTI Crude', level: '$97.73', trend: 'down', narrative: 'Energy-inflation transmission' },
+            { asset: 'Bitcoin', level: '$77,416.15', trend: 'down', narrative: 'Flight from fiat duration / parallel hedge' },
+            { asset: 'Gold', level: '$4533.10', trend: 'down', narrative: 'Tactical settling amid broader asset fracturing' },
+            { asset: 'Private Credit', level: 'S+575', trend: 'up', narrative: 'Rising default premiums on floating rates' },
+        ];
+
+        const agents = {
+            risk: "The market caught a localized contagion today, selling off on the delayed realization that China’s DeepSeek V4 might actually commoditize the AI infrastructure layer faster than U.S. titans can monetize it.",
+            macro: "Down in the physical world, real assets are fracturing. Comex Gold and Silver settled lower, while Arabica coffee hit a record high—because nothing screams 'late-cycle geopolitical friction' quite like a U.S.-Colombia tariff dispute.",
+            crypto: "Bitcoin’s drop to $77,416 indicates tactical settling as capital flees fiat duration risk while participating in the computational sovereignty supercycle amid market mayhem."
+        };
+
+        // Render Ticker
+        const tickerContainer = document.getElementById('ticker-content');
+        let tickerHTML = '';
+        // Duplicate for continuous scroll
+        for(let i=0; i<4; i++){
+            marketData.forEach(item => {
+                let colorClass = item.trend === 'down' ? 'text-terminal-red' : (item.trend === 'up' ? 'text-terminal-amber' : 'text-terminal-cyan');
+                let arrow = item.trend === 'down' ? '▼' : (item.trend === 'up' ? '▲' : '■');
+                tickerHTML += `<span class="mx-6 text-gray-400">${item.asset}: <span class="${colorClass}">${item.level} ${arrow}</span></span>`;
+            });
+        }
+        tickerContainer.innerHTML = tickerHTML;
+
+        // Render Table
+        const tableBody = document.getElementById('market-table-body');
+        marketData.forEach(item => {
+            let colorClass = item.trend === 'down' ? 'text-terminal-red' : (item.trend === 'up' ? 'text-terminal-amber' : 'text-gray-200');
+            let isAlert = item.level === 'REC HIGH' ? 'animate-pulse text-terminal-amber font-bold' : '';
+
+            const tr = document.createElement('tr');
+            tr.className = 'hover:bg-terminal-card/80 transition-colors group cursor-default';
+            tr.innerHTML = `
+                <td class="p-3 font-semibold text-white group-hover:text-terminal-cyan transition-colors">${item.asset}</td>
+                <td class="p-3 font-mono text-right ${colorClass} ${isAlert}">${item.level}</td>
+                <td class="p-3 text-gray-400 hidden sm:table-cell group-hover:text-gray-200 transition-colors">${item.narrative}</td>
+            `;
+            tableBody.appendChild(tr);
+        });
+
+        // Accordion Logic
+        function toggleAccordion(id) {
+            const el = document.getElementById(id);
+            const icon = document.getElementById('icon-' + id);
+            if (el.classList.contains('hidden')) {
+                el.classList.remove('hidden');
+                icon.style.transform = 'rotate(180deg)';
+            } else {
+                el.classList.add('hidden');
+                icon.style.transform = 'rotate(0deg)';
+            }
+        }
+
+        // Terminal Typewriter Effect Logic
+        let typeInterval;
+        function activateAgent(agentId) {
+            // Update Active Buttons
+            document.querySelectorAll('.nav-button').forEach(btn => {
+                btn.classList.remove('active', 'border-terminal-cyan');
+                btn.classList.add('border-transparent');
+            });
+            const activeBtn = document.getElementById(`btn-${agentId}`);
+            activeBtn.classList.add('active');
+
+            if(window.innerWidth >= 768) {
+                activeBtn.classList.remove('border-transparent');
+                activeBtn.classList.add('border-terminal-cyan');
+            }
+
+            // Typewriter effect
+            const output = document.getElementById('terminal-output');
+            const text = agents[agentId];
+            output.innerHTML = '';
+            output.classList.add('typing-cursor');
+
+            clearInterval(typeInterval);
+
+            let i = 0;
+            const prefixes = {
+                risk: "> [SYS.RISK] Analyzing credit structures...\n> ",
+                macro: "> [SYS.MACRO] Querying global liquidity nodes...\n> ",
+                crypto: "> [SYS.CRYPTO] Parsing on-chain flows...\n> "
+            };
+
+            let fullText = prefixes[agentId] + text;
+
+            typeInterval = setInterval(() => {
+                if (i < fullText.length) {
+                    // Handle line breaks for the prefix
+                    if (fullText.charAt(i) === '\n') {
+                        output.innerHTML += '<br>';
+                    } else {
+                        output.innerHTML += fullText.charAt(i);
+                    }
+                    i++;
+                } else {
+                    clearInterval(typeInterval);
+                    // Remove cursor after a delay
+                    setTimeout(() => output.classList.remove('typing-cursor'), 2000);
+                }
+            }, 20); // Typing speed
+        }
+
+        // Initialize Chart.js
+        window.onload = function() {
+            // Initialize Icons safely
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+
+            const ctx = document.getElementById('spxChart').getContext('2d');
+
+            // Generate synthetic intraday data dropping sharply at the end
+            const dataPoints = [];
+            let currentPrice = 7400;
+            for(let i=0; i<40; i++) {
+                currentPrice += (Math.random() - 0.4) * 15; // Drift
+                dataPoints.push(currentPrice);
+            }
+            // The Drop (DeepSeek Contagion)
+            for(let i=0; i<10; i++) {
+                currentPrice -= (Math.random() * 20 + 5);
+                dataPoints.push(currentPrice);
+            }
+            // Final Level
+            dataPoints.push(7485.20);
+
+            const labels = Array.from({length: dataPoints.length}, (_, i) => `${9 + Math.floor(i/6)}:${(i%6)*10} AM`);
+            labels[labels.length-1] = "NOW";
+
+            // Gradient for line
+            const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+            gradient.addColorStop(0, 'rgba(239, 68, 68, 0.5)'); // Red
+            gradient.addColorStop(1, 'rgba(239, 68, 68, 0.0)');
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'S&P 500 Intraday',
+                        data: dataPoints,
+                        borderColor: '#ef4444',
+                        backgroundColor: gradient,
+                        borderWidth: 2,
+                        pointRadius: 0,
+                        pointHitRadius: 10,
+                        fill: true,
+                        tension: 0.3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                            backgroundColor: 'rgba(17, 24, 39, 0.9)',
+                            titleColor: '#9ca3af',
+                            bodyColor: '#ef4444',
+                            borderColor: '#374151',
+                            borderWidth: 1,
+                            callbacks: {
+                                label: function(context) {
+                                    return context.parsed.y.toFixed(2);
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            display: false, // hide x axis to look more like a sparkline
+                        },
+                        y: {
+                            display: true,
+                            position: 'right',
+                            grid: {
+                                color: '#1f2937',
+                                drawBorder: false,
+                            },
+                            ticks: {
+                                color: '#6b7280',
+                                font: { family: "'JetBrains Mono', monospace", size: 10 }
+                            }
+                        }
+                    },
+                    interaction: {
+                        mode: 'nearest',
+                        axis: 'x',
+                        intersect: false
+                    }
+                }
+            });
+
+            // Auto-trigger first agent after slight delay to draw attention
+            setTimeout(() => {
+                activateAgent('risk');
+            }, 800);
+
+            // Open first accordion by default
+            toggleAccordion('risk1');
+        };
+    </script>
+</body>
+</html>
