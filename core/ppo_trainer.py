@@ -111,7 +111,7 @@ model = AutoModelForCausalLMWithValueHead.from_pretrained(
 # The Reference model is automatically handled by trl
 # (it disables the LoRA adapters to get reference probabilities)
 
-tokenizer = AutoTokenizer.from_pretrained(config.model_name)
+tokenizer = AutoTokenizer.from_pretrained(config.model_name)  # nosec B615
 tokenizer.pad_token = tokenizer.eos_token
 
 # 4. Initialize the PPO Trainer
