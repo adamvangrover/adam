@@ -1,27 +1,16 @@
-name: Adam CI / frontend-test
-
-on:
-  push:
-    branches: [ main, master ]
-  pull_request:
-    branches: [ main, master ]
-
-jobs:
-  frontend-test:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
-    - name: Set up Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '18'
-        cache: 'npm'
-        cache-dependency-path: services/webapp/client/package-lock.json
-    - name: Install Frontend Dependencies
-      run: |
-        cd services/webapp/client
-        npm install --legacy-peer-deps
-    - name: Test Frontend
-      run: |
-        cd services/webapp/client
-        npm test -- --watchAll=false --passWithNoTests
+name: Adam CI / frontend-teston:push:branches: [ main, master ]pull_request:branches: [ main, master ]jobs:frontend-test:runs-on: ubuntu-lateststeps:- name: Checkout codeuses: actions/checkout@v4- name: Set up Node.js
+  uses: actions/setup-node@v4
+  with:
+    node-version: '20'
+    cache: 'npm'
+    cache-dependency-path: services/webapp/client/package-lock.json
+    
+- name: Install Frontend Dependencies
+  run: |
+    cd services/webapp/client
+    npm install --legacy-peer-deps
+    
+- name: Test Frontend
+  run: |
+    cd services/webapp/client
+    npm test -- --watchAll=false --passWithNoTests
