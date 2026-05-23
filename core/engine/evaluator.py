@@ -1,5 +1,9 @@
 # core/engine/evaluator.py
 
+from typing import Dict
+from core.evaluation.llm_judge import ConvictionScorer
+from evals.graders.llm_judge import grade_answer
+
 class EvaluatorKernel:
     def __init__(self, golden_dataset: Dict):
         self.scorer = ConvictionScorer()

@@ -103,6 +103,7 @@ lora_config = LoraConfig(
 # 3. Load the Actor and Critic (Value Head) together
 model = AutoModelForCausalLMWithValueHead.from_pretrained(
     config.model_name,
+    revision="27d67f1b5f57dc0953326b2601d68371d40ea8da",
     peft_config=lora_config,
     device_map="auto",
     load_in_8bit=True,  # Requires bitsandbytes
@@ -111,7 +112,10 @@ model = AutoModelForCausalLMWithValueHead.from_pretrained(
 # The Reference model is automatically handled by trl
 # (it disables the LoRA adapters to get reference probabilities)
 
-tokenizer = AutoTokenizer.from_pretrained(config.model_name)
+tokenizer = AutoTokenizer.from_pretrained(
+    config.model_name,
+    revision="27d67f1b5f57dc0953326b2601d68371d40ea8da"
+)
 tokenizer.pad_token = tokenizer.eos_token
 
 # 4. Initialize the PPO Trainer
