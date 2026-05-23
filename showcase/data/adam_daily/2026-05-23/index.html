@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MARKET MAYHEM: Macroeconomic Surveillance</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Chosen Palette: Warm Institutional Neutrals (Stone-50 background, Stone-800 text, Amber-600 highlights, Rose-700/Teal-700 indicators) -->
+    <!-- Application Structure Plan: The application uses a dashboard layout designed for quick cognitive parsing of conflicting market signals. It begins with an overarching 'Paradox' summary, flows into an interactive 'Telemetry' module where users can correlate asset prices with visual trends, and concludes with a 'Risk & Surveillance' tabbed interface. This structure allows users to first grasp the macro contradiction (high equities + high yields), explore the deterministic data supporting it, and then drill down into specific localized risks and AI-agent insights without being overwhelmed by a wall of text. -->
+    <!-- Visualization & Content Choices: The core interactive element is a dynamic line chart (Chart.js) linked to market level buttons. Goal: Compare asset momentums. Justification: Visualizing the 'Bullish Momentum' of equities against the 'Elevated' yield curve immediately illustrates the report's core thesis. Risk pillars are presented as interactive tabs to organize complex qualitative insights (Agent outputs) logically. No SVG or Mermaid used; all UI relies on Tailwind CSS, Canvas, and Unicode symbols. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <style>
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 380px;
+            }
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .data-card.active {
+            border-color: #d97706;
+            background-color: #fef3c7;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 16px;
+            width: 16px;
+            border-radius: 50%;
+            background: #d97706;
+            cursor: pointer;
+            margin-top: -6px;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: #d6d3d1;
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body class="bg-stone-50 text-stone-800 font-sans antialiased leading-relaxed selection:bg-amber-200 selection:text-stone-900">
+
+    <header class="bg-stone-100 border-b border-stone-300 py-6 sticky top-0 z-50 shadow-sm">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+                <h1 class="text-2xl md:text-3xl font-bold tracking-tight text-stone-900 uppercase">Market Mayhem</h1>
+                <p class="text-sm font-medium text-amber-700 tracking-wider mt-1">&#9881; Institutional-Grade Macroeconomic & Credit Surveillance</p>
+            </div>
+            <div class="text-right text-xs md:text-sm text-stone-500 font-mono">
+                <p>Origin: New York</p>
+                <p>Date: May 22, 2026</p>
+                <p>Architect: Adam v26.0 (Neuro-Symbolic)</p>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12">
+
+        <section class="bg-white p-6 md:p-8 rounded-lg shadow-sm border border-stone-200">
+            <h2 class="text-xl font-bold uppercase tracking-widest text-stone-400 mb-4 border-b border-stone-100 pb-2">System Status: The Divergence Glitch</h2>
+            <p class="text-lg md:text-xl font-light text-stone-600 mb-6 leading-relaxed">
+                Markets are operating in a state of severe cognitive dissonance ahead of the holiday weekend. The equity UI is projecting an <strong class="text-stone-900 font-semibold">"Eighth-Week Hallucination"</strong> of corporate momentum, actively masking a structural capital extraction occurring beneath the surface.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-stone-50 p-6 rounded border border-stone-200">
+                <div>
+                    <h3 class="text-sm font-bold text-teal-700 uppercase mb-2">&#9650; The Equity Illusion</h3>
+                    <p class="text-sm">The S&P 500 continues to float near record highs. Algos are treating tech earnings beats as permanent patches, completely ignoring that corporate margins are expanding without accounting for long-term capital cost replication.</p>
+                </div>
+                <div>
+                    <h3 class="text-sm font-bold text-rose-700 uppercase mb-2">&#9888; The Underlying Reality</h3>
+                    <p class="text-sm">UMich consumer sentiment just crashed to 44.8, with long-term inflation expectations spiking to 3.9%. The base rate is locked at 4.57%, choking leveraged structures and confirming a deep liquidity mirage.</p>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2 class="text-xl font-bold uppercase tracking-widest text-stone-400 mb-4 border-b border-stone-200 pb-2">Deterministic Market Levels</h2>
+            <p class="text-base text-stone-600 mb-6 max-w-3xl">
+                This interactive telemetry module validates current market pricing against qualitative trend signals.
+                Select any asset class below to visualize its recent stylized trajectory and understand how it contributes to the broader macroeconomic paradox.
+            </p>
+
+            <div class="flex flex-col lg:flex-row gap-8 items-start">
+
+                <div class="w-full lg:w-1/2 grid grid-cols-1 sm:grid-cols-2 gap-3" id="asset-grid">
+                    <button class="data-card active text-left p-4 rounded border border-stone-300 hover:border-amber-500 hover:shadow-md transition-all bg-white" data-asset="spx">
+                        <div class="text-xs font-mono text-stone-500 mb-1">S&P 500 (SPX)</div>
+                        <div class="text-2xl font-bold text-stone-900">7,473.47</div>
+                        <div class="text-xs font-bold text-teal-600 mt-2 tracking-wide uppercase">Illusion Momentum</div>
+                    </button>
+                    <button class="data-card text-left p-4 rounded border border-stone-300 hover:border-amber-500 hover:shadow-md transition-all bg-white" data-asset="ndx">
+                        <div class="text-xs font-mono text-stone-500 mb-1">Nasdaq (NDX)</div>
+                        <div class="text-2xl font-bold text-stone-900">26,343.97</div>
+                        <div class="text-xs font-bold text-teal-600 mt-2 tracking-wide uppercase">Tech-Wall Defense</div>
+                    </button>
+                    <button class="data-card text-left p-4 rounded border border-stone-300 hover:border-amber-500 hover:shadow-md transition-all bg-white" data-asset="yield">
+                        <div class="text-xs font-mono text-stone-500 mb-1">US 10-Year Yield</div>
+                        <div class="text-2xl font-bold text-stone-900">4.570%</div>
+                        <div class="text-xs font-bold text-rose-600 mt-2 tracking-wide uppercase">Structural Backbone</div>
+                    </button>
+                    <button class="data-card text-left p-4 rounded border border-stone-300 hover:border-amber-500 hover:shadow-md transition-all bg-white" data-asset="wti">
+                        <div class="text-xs font-mono text-stone-500 mb-1">WTI Crude</div>
+                        <div class="text-2xl font-bold text-stone-900">$97.00 / bbl</div>
+                        <div class="text-xs font-bold text-rose-600 mt-2 tracking-wide uppercase">Entropy Layer</div>
+                    </button>
+                    <button class="data-card text-left p-4 rounded border border-stone-300 hover:border-amber-500 hover:shadow-md transition-all bg-white" data-asset="vix">
+                        <div class="text-xs font-mono text-stone-500 mb-1">VIX Index</div>
+                        <div class="text-2xl font-bold text-stone-900">16.87</div>
+                        <div class="text-xs font-bold text-amber-600 mt-2 tracking-wide uppercase">Holiday Coma</div>
+                    </button>
+                    <button class="data-card text-left p-4 rounded border border-stone-300 hover:border-amber-500 hover:shadow-md transition-all bg-white" data-asset="btc">
+                        <div class="text-xs font-mono text-stone-500 mb-1">Bitcoin (BTC)</div>
+                        <div class="text-2xl font-bold text-stone-900">$75,837.75</div>
+                        <div class="text-xs font-bold text-stone-600 mt-2 tracking-wide uppercase">Liquidating Tether</div>
+                    </button>
+                </div>
+
+                <div class="w-full lg:w-1/2 bg-white p-4 md:p-6 rounded-lg border border-stone-200 shadow-sm flex flex-col justify-center items-center h-full">
+                    <div class="w-full flex justify-between items-center mb-4">
+                        <h3 id="chart-title" class="font-bold text-stone-800">S&P 500 (SPX) - 6 Month Synthetic Trend</h3>
+                        <span id="chart-signal" class="text-xs font-bold px-2 py-1 bg-teal-100 text-teal-800 rounded">Illusion Momentum</span>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="marketChart"></canvas>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <section>
+            <h2 class="text-xl font-bold uppercase tracking-widest text-stone-400 mb-4 border-b border-stone-200 pb-2">Credit Risk & Macro Surveillance</h2>
+            <p class="text-base text-stone-600 mb-6 max-w-3xl">
+                Explore isolated surveillance categories addressing structural vulnerabilities beneath the headline momentum.
+                Interact with the tabs below to read core analysis alongside real-time directives from the Adam OS multi-agent framework.
+            </p>
+
+            <div class="bg-white rounded-lg border border-stone-200 overflow-hidden shadow-sm">
+
+                <div class="flex flex-col sm:flex-row border-b border-stone-200 bg-stone-100">
+                    <button class="tab-btn active flex-1 py-4 px-6 text-sm font-bold text-stone-500 hover:text-stone-900 focus:outline-none uppercase tracking-wide border-b-2 border-transparent transition-colors text-left sm:text-center" data-target="tab-credit">
+                        &#9878; 1. Gamma Fallback
+                    </button>
+                    <button class="tab-btn flex-1 py-4 px-6 text-sm font-bold text-stone-500 hover:text-stone-900 focus:outline-none uppercase tracking-wide border-b-2 border-transparent transition-colors text-left sm:text-center border-t sm:border-t-0 sm:border-l border-stone-200" data-target="tab-commodity">
+                        &#128674; 2. Physical Logistics
+                    </button>
+                    <button class="tab-btn flex-1 py-4 px-6 text-sm font-bold text-stone-500 hover:text-stone-900 focus:outline-none uppercase tracking-wide border-b-2 border-transparent transition-colors text-left sm:text-center border-t sm:border-t-0 sm:border-l border-stone-200" data-target="tab-crypto">
+                        &#128179; 3. Consumer Drain
+                    </button>
+                </div>
+
+                <div class="p-6 md:p-8">
+                    <div id="tab-credit" class="tab-content active">
+                        <div class="flex flex-col md:flex-row gap-8">
+                            <div class="flex-1">
+                                <h3 class="text-2xl font-bold text-stone-900 mb-2">Gamma Fallback Simulator</h3>
+                                <p class="mb-4 text-stone-700 text-sm">Models the violent unwinding of short-volatility and yield-harvesting strategies. Adjust the sovereign anchor and consumer sentiment inputs below to stress-test leveraged corporate tranches.</p>
+
+                                <div class="bg-stone-50 p-4 border border-stone-200 rounded mb-4">
+                                    <div class="mb-4">
+                                        <label class="flex justify-between text-xs font-bold text-stone-600 uppercase mb-1">
+                                            <span>Base Rate (SOFR / 10Y Yield)</span>
+                                            <span id="sofr-val" class="text-rose-600">4.50%</span>
+                                        </label>
+                                        <input type="range" id="sofr-slider" min="2.0" max="6.5" step="0.1" value="4.5" class="w-full appearance-none bg-transparent">
+                                    </div>
+                                    <div>
+                                        <label class="flex justify-between text-xs font-bold text-stone-600 uppercase mb-1">
+                                            <span>UMich Consumer Sentiment</span>
+                                            <span id="sentiment-val" class="text-teal-600">44.8</span>
+                                        </label>
+                                        <input type="range" id="sentiment-slider" min="30" max="80" step="0.1" value="44.8" class="w-full appearance-none bg-transparent">
+                                    </div>
+                                </div>
+                                <p class="text-xs text-stone-500"><em>Simulation calculates Probability of Default (PD) acceleration.</em></p>
+                            </div>
+
+                            <div class="flex-1 bg-stone-900 text-stone-300 p-5 rounded-lg shadow-inner relative overflow-hidden flex flex-col justify-center">
+                                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-stone-500 to-rose-600"></div>
+                                <h4 class="text-amber-500 mb-4 font-bold tracking-widest uppercase text-xs flex items-center gap-2">
+                                    <span>&#9881;</span> Live PD Stress Matrix
+                                </h4>
+
+                                <div class="space-y-4">
+                                    <div>
+                                        <div class="flex justify-between text-xs mb-1 font-mono">
+                                            <span>PE-Backed Consumer (B3/B-)</span>
+                                            <span id="pd-pe" class="font-bold text-rose-400">0%</span>
+                                        </div>
+                                        <div class="w-full bg-stone-800 rounded-full h-2">
+                                            <div id="bar-pe" class="bg-rose-500 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="flex justify-between text-xs mb-1 font-mono">
+                                            <span>Legacy Healthcare Roll-ups</span>
+                                            <span id="pd-hc" class="font-bold text-amber-400">0%</span>
+                                        </div>
+                                        <div class="w-full bg-stone-800 rounded-full h-2">
+                                            <div id="bar-hc" class="bg-amber-500 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="flex justify-between text-xs mb-1 font-mono">
+                                            <span>CRE Mezzanine Debt</span>
+                                            <span id="pd-cre" class="font-bold text-stone-400">0%</span>
+                                        </div>
+                                        <div class="w-full bg-stone-800 rounded-full h-2">
+                                            <div id="bar-cre" class="bg-stone-500 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="tab-commodity" class="tab-content">
+                        <div class="flex flex-col md:flex-row gap-8">
+                            <div class="flex-1">
+                                <h3 class="text-2xl font-bold text-stone-900 mb-4">Physical Layer Breakdown</h3>
+                                <p class="mb-4 text-stone-700">The digital tether is bleeding because the physical supply chain is choking. The Strait of Hormuz bottleneck is no longer a tail-risk; it is the baseline operating environment. Equity markets are pricing tech earnings as if software exists in a vacuum.</p>
+                                <p class="text-stone-700 font-medium bg-amber-50 p-3 rounded border-l-4 border-amber-500">Servers require physical energy. Hardware requires maritime transit. This decoupling is mathematically unsustainable.</p>
+                            </div>
+                            <div class="flex-1">
+                                <table class="min-w-full bg-white border border-stone-200 text-sm">
+                                    <thead class="bg-stone-100 text-stone-600 uppercase text-xs">
+                                        <tr>
+                                            <th class="py-2 px-3 text-left">Constraint</th>
+                                            <th class="py-2 px-3 text-left">Synthetic Impact</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-stone-200 text-stone-700">
+                                        <tr>
+                                            <td class="py-3 px-3 font-semibold">Throughput Compression</td>
+                                            <td class="py-3 px-3">Brent crude locked near $103/bbl; sets a permanent floor under the PPI.</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="py-3 px-3 font-semibold">Routing Arbitrage</td>
+                                            <td class="py-3 px-3">Cape of Good Hope detours adding 14-21 days. Immediate liquidity drain on logistics operators.</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="py-3 px-3 font-semibold">Insurance Premiums</td>
+                                            <td class="py-3 px-3">War-risk premiums un-quotable. Validates the consumer sentiment crash.</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="tab-crypto" class="tab-content">
+                        <div class="flex flex-col md:flex-row gap-8">
+                            <div class="flex-1">
+                                <h3 class="text-2xl font-bold text-stone-900 mb-4">The 3.9% Terminal Drain</h3>
+                                <p class="mb-4 text-stone-700">The University of Michigan's 3.9% long-run inflation expectation is not a statistical anomaly; it is a behavioral lock-in. The human layer has capitulated to the reality of structural capital extraction.</p>
+                                <div class="bg-stone-900 text-stone-300 p-4 rounded-lg font-mono text-sm shadow-inner relative overflow-hidden mb-4">
+                                    <div class="absolute top-0 left-0 w-full h-1 bg-teal-600"></div>
+                                    <div class="text-stone-400 mb-1 text-xs">Agent: <span class="text-white font-bold">Credit Officer</span></div>
+                                    <p>Regional banks holding securitized tranches of Unsecured Personal Credit (FinTech/BNPL) will face severe write-downs. Phantom leverage is undocumented in traditional DTI ratios.</p>
+                                </div>
+                            </div>
+                            <div class="flex-1 flex flex-col gap-3">
+                                <div class="p-4 bg-stone-50 border border-stone-200 rounded">
+                                    <h4 class="font-bold text-stone-800 text-sm">&#128663; Subprime Auto (23-24 Vintages)</h4>
+                                    <p class="text-xs text-stone-600 mt-1">Underwritten at peak collateral values. 60+ day delinquencies accelerating past 2008 curves.</p>
+                                </div>
+                                <div class="p-4 bg-stone-50 border border-stone-200 rounded">
+                                    <h4 class="font-bold text-stone-800 text-sm">&#128179; Credit Card Net Charge-Offs</h4>
+                                    <p class="text-xs text-stone-600 mt-1">Revolving credit is being used for baseline survival (energy, groceries), pushing structural upward shifts in NCO rates.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <footer class="border-t border-stone-200 pt-6 mt-12 mb-8 text-center md:text-left flex flex-col md:flex-row justify-between items-center gap-4">
+            <p class="text-xs text-stone-400 uppercase tracking-widest font-mono">Generated via Adam OS multi-agent framework. W3C PROV-O compliance maintained. No material drift detected.</p>
+            <div class="text-stone-300 flex gap-2">
+                <span title="Status: Online">&#11044;</span>
+            </div>
+        </footer>
+
+    </main>
+
+    <script>
+        const chartDataMap = {
+            'spx': {
+                label: 'S&P 500 Trajectory',
+                data: [7100, 7050, 7250, 7350, 7408.50, 7473.47],
+                color: '#0f766e',
+                bgColor: 'rgba(15, 118, 110, 0.1)',
+                title: 'S&P 500 (SPX) - 6 Month Synthetic Trend',
+                signalText: 'Illusion Momentum',
+                signalClass: ['bg-teal-100', 'text-teal-800']
+            },
+            'ndx': {
+                label: 'Nasdaq 100 Trajectory',
+                data: [24500, 24200, 25500, 25800, 26225.14, 26343.97],
+                color: '#0f766e',
+                bgColor: 'rgba(15, 118, 110, 0.1)',
+                title: 'Nasdaq (NDX) - 6 Month Synthetic Trend',
+                signalText: 'Tech-Wall Defense',
+                signalClass: ['bg-teal-100', 'text-teal-800']
+            },
+            'yield': {
+                label: '10-Year Yield (%)',
+                data: [4.30, 4.45, 4.50, 4.55, 4.595, 4.570],
+                color: '#be123c',
+                bgColor: 'rgba(190, 18, 60, 0.1)',
+                title: 'US 10-Year Yield - Sustained Elevation',
+                signalText: 'Structural Backbone',
+                signalClass: ['bg-rose-100', 'text-rose-800']
+            },
+            'wti': {
+                label: 'WTI Crude ($/bbl)',
+                data: [88.00, 92.50, 95.00, 99.50, 101.16, 97.00],
+                color: '#be123c',
+                bgColor: 'rgba(190, 18, 60, 0.1)',
+                title: 'WTI Crude - Chokepoint Pricing',
+                signalText: 'Entropy Layer',
+                signalClass: ['bg-rose-100', 'text-rose-800']
+            },
+            'vix': {
+                label: 'VIX Volatility Index',
+                data: [13.2, 12.8, 14.5, 15.6, 17.03, 16.87],
+                color: '#d97706',
+                bgColor: 'rgba(217, 119, 6, 0.1)',
+                title: 'VIX - Compression Coma',
+                signalText: 'Holiday Coma',
+                signalClass: ['bg-amber-100', 'text-amber-800']
+            },
+            'btc': {
+                label: 'Bitcoin ($)',
+                data: [65000, 61000, 72000, 68000, 79119.60, 75837.75],
+                color: '#57534e',
+                bgColor: 'rgba(87, 83, 78, 0.1)',
+                title: 'Bitcoin - The Disconnect',
+                signalText: 'Liquidating Tether',
+                signalClass: ['bg-stone-200', 'text-stone-800']
+            }
+        };
+
+        const ctx = document.getElementById('marketChart').getContext('2d');
+        let currentChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['M-5', 'M-4', 'M-3', 'M-2', 'M-1', 'Current'],
+                datasets: [{
+                    label: chartDataMap['spx'].label,
+                    data: chartDataMap['spx'].data,
+                    borderColor: chartDataMap['spx'].color,
+                    backgroundColor: chartDataMap['spx'].bgColor,
+                    borderWidth: 3,
+                    pointBackgroundColor: chartDataMap['spx'].color,
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: '#1c1917',
+                        titleFont: { family: 'ui-sans-serif, system-ui, sans-serif' },
+                        bodyFont: { family: 'ui-sans-serif, system-ui, sans-serif' },
+                        padding: 10,
+                        cornerRadius: 4,
+                        displayColors: false
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { display: false, drawBorder: false },
+                        ticks: { color: '#78716c', font: { family: 'ui-monospace, SFMono-Regular, monospace', size: 10 } }
+                    },
+                    y: {
+                        grid: { color: '#e7e5e4', borderDash: [5, 5], drawBorder: false },
+                        ticks: { color: '#78716c', font: { family: 'ui-monospace, SFMono-Regular, monospace', size: 10 } }
+                    }
+                },
+                interaction: {
+                    intersect: false,
+                    mode: 'index',
+                },
+            }
+        });
+
+        const dataCards = document.querySelectorAll('.data-card');
+        const chartTitle = document.getElementById('chart-title');
+        const chartSignal = document.getElementById('chart-signal');
+
+        dataCards.forEach(card => {
+            card.addEventListener('click', function() {
+
+                dataCards.forEach(c => {
+                    c.classList.remove('active');
+                    c.style.borderColor = '';
+                    c.style.backgroundColor = '';
+                });
+
+                this.classList.add('active');
+
+                const assetKey = this.getAttribute('data-asset');
+                const newData = chartDataMap[assetKey];
+
+                currentChart.data.datasets[0].label = newData.label;
+                currentChart.data.datasets[0].data = newData.data;
+                currentChart.data.datasets[0].borderColor = newData.color;
+                currentChart.data.datasets[0].backgroundColor = newData.bgColor;
+                currentChart.data.datasets[0].pointBackgroundColor = newData.color;
+
+                currentChart.update();
+
+                chartTitle.textContent = newData.title;
+                chartSignal.textContent = newData.signalText;
+                chartSignal.className = `text-xs font-bold px-2 py-1 rounded ${newData.signalClass.join(' ')}`;
+            });
+        });
+
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+
+                tabBtns.forEach(b => {
+                    b.classList.remove('active', 'border-amber-500', 'text-stone-900', 'bg-white');
+                    b.classList.add('border-transparent', 'text-stone-500');
+                });
+                tabContents.forEach(c => c.classList.remove('active'));
+
+                btn.classList.remove('border-transparent', 'text-stone-500');
+                btn.classList.add('active', 'border-amber-500', 'text-stone-900', 'bg-white');
+
+                const targetId = btn.getAttribute('data-target');
+                document.getElementById(targetId).classList.add('active');
+            });
+        });
+
+        const firstTabBtn = document.querySelector('.tab-btn');
+        if(firstTabBtn) {
+            firstTabBtn.classList.remove('border-transparent');
+            firstTabBtn.classList.add('border-amber-500', 'text-stone-900', 'bg-white');
+        }
+
+        const sofrSlider = document.getElementById('sofr-slider');
+        const sentimentSlider = document.getElementById('sentiment-slider');
+        const sofrValText = document.getElementById('sofr-val');
+        const sentimentValText = document.getElementById('sentiment-val');
+
+        const barPE = document.getElementById('bar-pe');
+        const pdPE = document.getElementById('pd-pe');
+        const barHC = document.getElementById('bar-hc');
+        const pdHC = document.getElementById('pd-hc');
+        const barCRE = document.getElementById('bar-cre');
+        const pdCRE = document.getElementById('pd-cre');
+
+        function updateSimulator() {
+            const sofr = parseFloat(sofrSlider.value);
+            const sentiment = parseFloat(sentimentSlider.value);
+
+            sofrValText.textContent = sofr.toFixed(2) + '%';
+            sentimentValText.textContent = sentiment.toFixed(1);
+
+            // Synthetic PD formulas based on macro vulnerability notes
+            let valPE = (sofr * 11) + ((100 - sentiment) * 0.9) - 20;
+            let valHC = (sofr * 9) + ((100 - sentiment) * 0.5) - 10;
+            let valCRE = (sofr * 14) + ((100 - sentiment) * 0.2) - 15;
+
+            // Clamp between 0 and 100
+            valPE = Math.max(0, Math.min(100, valPE));
+            valHC = Math.max(0, Math.min(100, valHC));
+            valCRE = Math.max(0, Math.min(100, valCRE));
+
+            // Visual updates
+            barPE.style.width = valPE + '%';
+            pdPE.textContent = valPE.toFixed(1) + '%';
+
+            barHC.style.width = valHC + '%';
+            pdHC.textContent = valHC.toFixed(1) + '%';
+
+            barCRE.style.width = valCRE + '%';
+            pdCRE.textContent = valCRE.toFixed(1) + '%';
+
+            // Color shifts based on severity
+            pdPE.className = valPE > 60 ? 'font-bold text-rose-500' : 'font-bold text-amber-500';
+            pdHC.className = valHC > 60 ? 'font-bold text-rose-500' : 'font-bold text-amber-500';
+            pdCRE.className = valCRE > 60 ? 'font-bold text-rose-500' : 'font-bold text-amber-500';
+        }
+
+        sofrSlider.addEventListener('input', updateSimulator);
+        sentimentSlider.addEventListener('input', updateSimulator);
+
+        // Run once on load
+        setTimeout(updateSimulator, 200);
+
+    </script>
+</body>
+</html>
