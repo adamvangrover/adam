@@ -1,22 +1,8 @@
-name: CI / Rust
+name: CI / Ruston:push:paths:- 'core/experimental/adamos_kernel/'
+pull_request:
+paths:
+- 'core/experimental/adamos_kernel/'jobs:test-rust:runs-on: ubuntu-lateststeps:- name: Checkout codeuses: actions/checkout@v4  - name: Install Rust
+    uses: dtolnay/rust-toolchain@stable
 
-on:
-  push:
-    paths:
-      - 'core/experimental/adamos_kernel/**'
-  pull_request:
-    paths:
-      - 'core/experimental/adamos_kernel/**'
-
-jobs:
-  test-rust:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Install Rust
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          override: true
-      - name: Run Tests
-        run: cargo test --manifest-path core/experimental/adamos_kernel/Cargo.toml
+  - name: Run Tests
+    run: cargo test --manifest-path core/experimental/adamos_kernel/Cargo.toml
