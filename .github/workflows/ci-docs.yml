@@ -14,14 +14,18 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.10"
+          # Using a single version as this is a quick build step
+          python-version: "3.12"
           cache: 'pip'
-      - name: Install MkDocs
+
+      - name: Install MkDocs and dependencies
         run: |
           python -m pip install --upgrade pip
           pip install mkdocs-material mkdocs mkdocstrings mkdocstrings-python
+
       - name: Build Docs
         run: mkdocs build
