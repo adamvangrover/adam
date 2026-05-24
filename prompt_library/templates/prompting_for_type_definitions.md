@@ -1,0 +1,1 @@
+I am starting a new feature in <TypeScript/Python>. Before I write the logic, generate comprehensive, strictly-typed Interfaces/Types/Pydantic Models for a <describe the domain, e.g., E-commerce Checkout System>. Include descriptive JSDoc/docstrings on every property. I will use these definitions to ground GitHub Copilot's context.

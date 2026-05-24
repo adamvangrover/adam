@@ -1,0 +1,1 @@
+I am starting a new <type of project, e.g., Node.js/Express API, React web app, Python data science project>. Suggest a clean, scalable, and conventional directory structure. Provide the structure as an ASCII tree and briefly explain the purpose of each top-level directory.

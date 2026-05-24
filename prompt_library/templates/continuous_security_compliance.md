@@ -1,0 +1,1 @@
+Enhance my existing CI pipeline by integrating continuous security checks. Add dedicated jobs to run dependency vulnerability scans (e.g., npm audit, pip-audit, cargo audit) and SAST tools (e.g., Bandit, CodeQL). Ensure the build fails if high-severity vulnerabilities are found. Provide the updated YAML.
