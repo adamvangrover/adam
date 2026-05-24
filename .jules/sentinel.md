@@ -230,3 +230,8 @@
 **Vulnerability:** `WorkspaceManager._run_hook` executed `subprocess.run(['bash', '-lc', script])`. If an attacker supplies a script string starting with `-` (like `-i`), `bash` interprets it as an option instead of a script payload, leading to an unexpected execution behavior or potential bypasses.
 **Learning:** Even when passing a script directly to an interpreter like `bash -c`, untrusted scripts that start with a hyphen can cause argument injection.
 **Prevention:** Always use the end-of-options separator `--` before the untrusted payload when evaluating it via interpreters like bash (e.g., `['bash', '-lc', '--', script]`).
+
+## 2026-05-24 - Unsafe Hugging Face Hub download without revision pinning
+**Vulnerability:** Hugging Face model downloads via `from_pretrained()` without a `revision` parameter are vulnerable to supply chain attacks, as the default branch can be updated with malicious weights.
+**Learning:** Bandit rule B615 explicitly requires pinning the `revision` parameter to a specific cryptographic commit hash (not a branch tag like "main") for secure model fetching.
+**Prevention:** Always pin Hugging Face dependencies to a verifiable commit hash (e.g., `revision="27d67f1b5f57dc0953326b2601d68371d40ea8da"`) when calling `from_pretrained()`.
