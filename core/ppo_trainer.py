@@ -82,8 +82,10 @@ def your_data_collator(data):
 
 
 # 1. Configuration for the Harness
+MODEL_NAME = "mistralai/Mistral-7B-v0.1"
+MODEL_REVISION = "27d67f1b5f57dc0953326b2601d68371d40ea8da"
 config = PPOConfig(
-    model_name="mistralai/Mistral-7B-v0.1",
+    model_name=MODEL_NAME,
     learning_rate=1.41e-5,
     batch_size=16,
     mini_batch_size=4,
@@ -103,6 +105,7 @@ lora_config = LoraConfig(
 # 3. Load the Actor and Critic (Value Head) together
 model = AutoModelForCausalLMWithValueHead.from_pretrained(
     config.model_name,
+    revision=MODEL_REVISION,
     peft_config=lora_config,
     device_map="auto",
     load_in_8bit=True,  # Requires bitsandbytes
@@ -111,7 +114,7 @@ model = AutoModelForCausalLMWithValueHead.from_pretrained(
 # The Reference model is automatically handled by trl
 # (it disables the LoRA adapters to get reference probabilities)
 
-tokenizer = AutoTokenizer.from_pretrained(config.model_name)
+tokenizer = AutoTokenizer.from_pretrained(config.model_name, revision=MODEL_REVISION)
 tokenizer.pad_token = tokenizer.eos_token
 
 # 4. Initialize the PPO Trainer
