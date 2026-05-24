@@ -1,8 +1,8 @@
-Here is the fully formatted and integrated guide, now including the advanced **"God-Mode" / Jules** prompt. I have maintained the strict **Persona-Task-Context-Format** architecture throughout to ensure the new massive, holistic prompt remains deterministic and actionable for advanced AI agents.
+Here is the fully formatted and integrated guide, now including the advanced **"Ecosystem-Upgrade-Mode" / Jules** prompt. I have maintained the strict **Persona-Task-Context-Format** architecture throughout to ensure the new massive, holistic prompt remains deterministic and actionable for advanced AI agents.
 
 ---
 
-# 🚀 ADAM & Jules Prompt Engineering Guide: Complete Edition
+# 🚀 ADAM & Swarm Prompt Engineering Guide: Complete Edition
 
 To get the absolute best results from an AI assistant like ADAM (or an autonomous agent like Jules) for your repository, success comes down to providing clear, specific, and context-rich prompts. The secret to minimizing hallucinations and maximizing output quality is treating the AI as a specialized agent.
 
