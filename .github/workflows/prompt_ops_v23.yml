@@ -8,8 +8,24 @@ on:
 jobs:
   evaluate_agent:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
       - name: Run FinanceBench Evaluation
         run: |
           # Placeholder for evaluation script
@@ -17,4 +33,4 @@ jobs:
           #   --agent "CreditArchitect" \
           #   --dataset "data/golden/finance_bench_v1.jsonl" \
           #   --threshold 0.95
-          echo "Running FinanceBench Evaluation..."
+          echo "Running FinanceBench Evaluation on Python ${{ matrix.python-version }}..."
