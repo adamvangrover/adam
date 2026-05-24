@@ -1,14 +1,10 @@
-Here is the fully formatted and upgraded version of your ADAM Prompt Engineering Guide. I have enhanced the structure using industry-standard Markdown practices, improved scannability, and re-engineered the prompt templates themselves to align with current LLM research (specifically using the **Persona-Task-Context-Format** framework).
-
-By structuring the prompts with clear constraints and section headers, you reduce AI hallucinations and guarantee highly deterministic outputs.
+Here is the fully formatted and integrated guide, now including the advanced **"God-Mode" / Jules** prompt. I have maintained the strict **Persona-Task-Context-Format** architecture throughout to ensure the new massive, holistic prompt remains deterministic and actionable for advanced AI agents.
 
 ---
 
-# 🚀 ADAM Prompt Engineering Guide: Complete Edition
+# 🚀 ADAM & Jules Prompt Engineering Guide: Complete Edition
 
-To get the absolute best results from an AI assistant like ADAM for your repository, success comes down to providing clear, specific, and context-rich prompts. The secret to minimizing hallucinations and maximizing output quality is treating the AI as a specialized agent.
-
-Industry research shows that the most effective prompts utilize the **Persona-Task-Context-Format** framework.
+To get the absolute best results from an AI assistant like ADAM (or an autonomous agent like Jules) for your repository, success comes down to providing clear, specific, and context-rich prompts. The secret to minimizing hallucinations and maximizing output quality is treating the AI as a specialized agent.
 
 This guide is designed for both manual copy-pasting and automated machine workflows. Below are top-tier prompt templates, categorized by task, structurally optimized to maximize output quality.
 
@@ -171,7 +167,7 @@ Include brief inline comments explaining what each command does.
 
 ## 🤖 GitHub Copilot Optimization
 
-Sometimes you need ADAM to prepare your codebase so that inline AI tools (like Copilot or Cursor) work flawlessly.
+Sometimes you need ADAM to prepare your codebase so that inline AI tools work flawlessly.
 
 ### Generating Copilot-Friendly Scaffolding
 
@@ -349,6 +345,35 @@ Task: Suggest a clean, scalable, and industry-standard directory structure.
 Output Format: 
 1. Provide the structure as an ASCII tree in a code block.
 2. Briefly explain the architectural purpose of each top-level directory.
+
+```
+
+---
+
+## 🌟 Ecosystem Upgrade Prompt (For Swarm)
+
+Use this massive, holistic prompt when you need an advanced, autonomous agent (like Jules) to analyze and upgrade the entire ecosystem of your repository at once.
+
+```text
+Act as "Jules", a Principal Staff Engineer, Lead MLOps/DevOps Architect, and AI Systems Designer.
+
+Task: Design and implement a holistic, repository-wide modernization of our infrastructure, codebase, and AI operations. Our repository contains traditional code, complex CI/CD pipelines, LLM prompts/agents, and ML data pipelines. 
+
+Systemic Upgrade Requirements:
+1. CI/CD & Automation Optimization: Audit our existing GitHub Actions. Upgrade all workflows to use the latest major action versions (v4/v5), implement aggressive dependency caching, and design parallelized matrix strategies to slash build times. Ensure all workflows use strict paths filtering.
+2. PromptOps & Evals (The AI Testing Pipeline): Design a robust, 2-stage PromptOps evaluation pipeline.
+   - Stage 1 (Fast): Deterministic logic tests, schema validation, and token limit checks (fail fast without LLM costs).
+   - Stage 2 (Deep): Parallelized domain-specific LLM-as-a-Judge evaluations against our golden datasets. Output the evaluation metrics as workflow artifacts.
+3. Human Gates & Deployment Protections: Integrate strict GitHub Environments into the CI/CD pipelines. Design the workflows so that passing the Stage 2 LLM evaluations is a mandatory prerequisite for triggering a "Pending Human Approval" gate before any deployment to Production.
+4. ML Data Flywheel & Continuous Learning: Architect an automated feedback loop. Write the script/pipeline architecture to automatically capture failed LLM evaluations and edge-case exceptions from production logs, sanitize them, and append them to a continuous learning database. Outline how this database will trigger automated fine-tuning runs.
+5. Code Quality & Security Hardening: Integrate aggressive, zero-tolerance static analysis. Add steps for dependency audits (npm audit, cargo audit, pip-audit), SAST scanning (Bandit, CodeQL), and strict auto-formatting (Black, Prettier).
+
+Output Format & Constraints:
+Do NOT give me generic advice. I require actionable, copy-paste-ready artifacts:
+1. The specific proposed folder structures.
+2. The exact, complete updated GitHub Action YAML files.
+3. The Python evaluation scaffolding scripts.
+4. A brief sequential execution plan detailing the exact order in which I should merge these systemic changes.
 
 ```
 
