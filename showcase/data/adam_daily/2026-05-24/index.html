@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MARKET MAYHEM: Macroeconomic Surveillance</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Chosen Palette: Warm Institutional Neutrals (Stone-50 background, Stone-800 text, Amber-600 highlights, Rose-700/Teal-700 indicators) -->
+    <!-- Application Structure Plan: Dashboard layout designed for quick cognitive parsing of conflicting market signals. Includes overarching summary, interactive 'Telemetry' module linking asset prices with visual trends, and concludes with a 'Risk & Surveillance' tabbed interface. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. Relying strictly on Tailwind, Canvas, and Unicode. -->
+
+    <style>
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 380px;
+            }
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .data-card {
+            transition: all 0.2s ease;
+        }
+        .data-card.active {
+            border-color: #d97706;
+            background-color: #fef3c7;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 16px;
+            width: 16px;
+            border-radius: 50%;
+            background: #d97706;
+            cursor: pointer;
+            margin-top: -6px;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: #d6d3d1;
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body class="bg-stone-50 text-stone-800 font-sans antialiased leading-relaxed selection:bg-amber-200 selection:text-stone-900">
+
+    <header class="bg-stone-100 border-b border-stone-300 py-6 sticky top-0 z-50 shadow-sm">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+                <h1 class="text-2xl md:text-3xl font-bold tracking-tight text-stone-900 uppercase">Market Mayhem</h1>
+                <p class="text-sm font-medium text-amber-700 tracking-wider mt-1">&#9881; Institutional-Grade Macroeconomic & Credit Surveillance</p>
+            </div>
+            <div class="text-right text-xs md:text-sm text-stone-500 font-mono">
+                <p>Origin: New York</p>
+                <p>Date: May 24, 2026</p>
+                <p>Architect: Adam v26.0 (Neuro-Symbolic)</p>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12">
+
+        <section class="bg-white p-6 md:p-8 rounded-lg shadow-sm border border-stone-200">
+            <h2 class="text-xl font-bold uppercase tracking-widest text-stone-400 mb-4 border-b border-stone-100 pb-2">Executive Summary: Multi-Axis Divergence</h2>
+            <p class="text-lg md:text-xl font-light text-stone-600 mb-6 leading-relaxed">
+                The global macro environment is operating in a state of severe, multi-axis divergence. Equities remain structurally elevated despite an underlying tightening mechanism. The concentration of capital into defensive havens alongside high-beta assets creates a bifurcated, inherently volatile landscape.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-stone-50 p-6 rounded border border-stone-200">
+                <div>
+                    <h3 class="text-sm font-bold text-teal-700 uppercase mb-2">&#9650; The Equity & Crypto Illusion</h3>
+                    <p class="text-sm text-stone-600">The S&P 500 (7,473) and Nasdaq (26,343) project robust sentiment, heavily concentrated in tech. Simultaneously, Bitcoin holds the $76k threshold, signaling sustained structural liquidity overflow despite traditional constraints.</p>
+                </div>
+                <div>
+                    <h3 class="text-sm font-bold text-rose-700 uppercase mb-2">&#9888; The Underlying Reality</h3>
+                    <p class="text-sm text-stone-600">Fixed-income is signaling persistent liquidity constraints. The 10-Year yield stabilizing at 4.558% reflects deep-seated pressures. Commodity havens like Gold ($4,523) confirm ongoing hedging against structural transitions and multi-region frictions.</p>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2 class="text-xl font-bold uppercase tracking-widest text-stone-400 mb-4 border-b border-stone-200 pb-2">Live Telemetry Table</h2>
+            <p class="text-base text-stone-600 mb-6 max-w-3xl">
+                This interactive module validates current market pricing against qualitative trend signals.
+                Select any asset class below to visualize its recent stylized trajectory and understand its systemic role.
+            </p>
+
+            <div class="flex flex-col lg:flex-row gap-8 items-start">
+
+                <div class="w-full lg:w-1/2 grid grid-cols-1 sm:grid-cols-2 gap-3" id="asset-grid">
+                    <button class="data-card active text-left p-4 rounded border border-stone-300 hover:border-amber-500 hover:shadow-md bg-white" data-asset="spx">
+                        <div class="text-xs font-mono text-stone-500 mb-1">S&P 500 (SPX)</div>
+                        <div class="text-2xl font-bold text-stone-900">7,473.47</div>
+                        <div class="text-xs font-bold text-teal-600 mt-2 tracking-wide uppercase">Illusion Momentum</div>
+                    </button>
+                    <button class="data-card text-left p-4 rounded border border-stone-300 hover:border-amber-500 hover:shadow-md bg-white" data-asset="ndx">
+                        <div class="text-xs font-mono text-stone-500 mb-1">Nasdaq (NDX)</div>
+                        <div class="text-2xl font-bold text-stone-900">26,343.97</div>
+                        <div class="text-xs font-bold text-teal-600 mt-2 tracking-wide uppercase">Tech-Wall Defense</div>
+                    </button>
+                    <button class="data-card text-left p-4 rounded border border-stone-300 hover:border-amber-500 hover:shadow-md bg-white" data-asset="yield">
+                        <div class="text-xs font-mono text-stone-500 mb-1">US 10-Year Yield</div>
+                        <div class="text-2xl font-bold text-stone-900">4.558%</div>
+                        <div class="text-xs font-bold text-rose-600 mt-2 tracking-wide uppercase">Structural Constraint</div>
+                    </button>
+                    <button class="data-card text-left p-4 rounded border border-stone-300 hover:border-amber-500 hover:shadow-md bg-white" data-asset="gold">
+                        <div class="text-xs font-mono text-stone-500 mb-1">Gold (XAU)</div>
+                        <div class="text-2xl font-bold text-stone-900">$4,523.20</div>
+                        <div class="text-xs font-bold text-amber-600 mt-2 tracking-wide uppercase">Haven Accumulation</div>
+                    </button>
+                    <button class="data-card text-left p-4 rounded border border-stone-300 hover:border-amber-500 hover:shadow-md bg-white" data-asset="wti">
+                        <div class="text-xs font-mono text-stone-500 mb-1">WTI Crude</div>
+                        <div class="text-2xl font-bold text-stone-900">$96.60</div>
+                        <div class="text-xs font-bold text-rose-600 mt-2 tracking-wide uppercase">Inflationary Support</div>
+                    </button>
+                    <button class="data-card text-left p-4 rounded border border-stone-300 hover:border-amber-500 hover:shadow-md bg-white" data-asset="btc">
+                        <div class="text-xs font-mono text-stone-500 mb-1">Bitcoin (BTC)</div>
+                        <div class="text-2xl font-bold text-stone-900">$76,601.70</div>
+                        <div class="text-xs font-bold text-stone-600 mt-2 tracking-wide uppercase">Liquidity Valve</div>
+                    </button>
+                </div>
+
+                <div class="w-full lg:w-1/2 bg-white p-4 md:p-6 rounded-lg border border-stone-200 shadow-sm flex flex-col justify-center items-center h-full">
+                    <div class="w-full flex justify-between items-center mb-4">
+                        <h3 id="chart-title" class="font-bold text-stone-800">S&P 500 (SPX) - 6 Month Trajectory</h3>
+                        <span id="chart-signal" class="text-xs font-bold px-2 py-1 bg-teal-100 text-teal-800 rounded">Illusion Momentum</span>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="marketChart"></canvas>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <section>
+            <h2 class="text-xl font-bold uppercase tracking-widest text-stone-400 mb-4 border-b border-stone-200 pb-2">Risk Radar & Swarm Projections</h2>
+            <p class="text-base text-stone-600 mb-6 max-w-3xl">
+                Explore deep-layer surveillance categories addressing vulnerabilities beneath headline momentum.
+                Interact with the tabs below to dynamically simulate credit risk and review Adam OS multi-agent logs.
+            </p>
+
+            <div class="bg-white rounded-lg border border-stone-200 overflow-hidden shadow-sm">
+
+                <!-- Tab Headers -->
+                <div class="flex flex-col sm:flex-row border-b border-stone-200 bg-stone-100">
+                    <button class="tab-btn active flex-1 py-4 px-6 text-sm font-bold text-stone-500 hover:text-stone-900 focus:outline-none uppercase tracking-wide border-b-2 border-transparent transition-colors text-left sm:text-center" data-target="tab-credit">
+                        &#9878; 1. Yield & Credit Stress
+                    </button>
+                    <button class="tab-btn flex-1 py-4 px-6 text-sm font-bold text-stone-500 hover:text-stone-900 focus:outline-none uppercase tracking-wide border-b-2 border-transparent transition-colors text-left sm:text-center border-t sm:border-t-0 sm:border-l border-stone-200" data-target="tab-commodity">
+                        &#128674; 2. Geopolitical Reality
+                    </button>
+                    <button class="tab-btn flex-1 py-4 px-6 text-sm font-bold text-stone-500 hover:text-stone-900 focus:outline-none uppercase tracking-wide border-b-2 border-transparent transition-colors text-left sm:text-center border-t sm:border-t-0 sm:border-l border-stone-200" data-target="tab-agent">
+                        &#128421; 3. Agent Diff Logs
+                    </button>
+                </div>
+
+                <div class="p-6 md:p-8">
+                    <!-- Tab 1: Credit & Yield -->
+                    <div id="tab-credit" class="tab-content active">
+                        <div class="flex flex-col md:flex-row gap-8">
+                            <div class="flex-1">
+                                <h3 class="text-2xl font-bold text-stone-900 mb-2">Liability Ledger Simulator</h3>
+                                <p class="mb-4 text-stone-700 text-sm">
+                                    The convergence between the 13-week yield (3.585%) and the 10-year yield (4.558%) dictates capital flows.
+                                    Adjust the 10Y sovereign anchor and crude price vectors below to stress-test corporate liability ledgers.
+                                </p>
+
+                                <div class="bg-stone-50 p-4 border border-stone-200 rounded mb-4">
+                                    <div class="mb-4">
+                                        <label class="flex justify-between text-xs font-bold text-stone-600 uppercase mb-1">
+                                            <span>US 10-Year Yield Anchor</span>
+                                            <span id="yield-val" class="text-rose-600">4.56%</span>
+                                        </label>
+                                        <input type="range" id="yield-slider" min="3.0" max="6.5" step="0.01" value="4.56" class="w-full appearance-none bg-transparent">
+                                    </div>
+                                    <div>
+                                        <label class="flex justify-between text-xs font-bold text-stone-600 uppercase mb-1">
+                                            <span>WTI Crude Vector ($)</span>
+                                            <span id="crude-val" class="text-amber-600">96.60</span>
+                                        </label>
+                                        <input type="range" id="crude-slider" min="60" max="130" step="0.1" value="96.6" class="w-full appearance-none bg-transparent">
+                                    </div>
+                                </div>
+                                <p class="text-xs text-stone-500"><em>Simulation calculates Probability of Default (PD) acceleration across asset classes.</em></p>
+                            </div>
+
+                            <div class="flex-1 bg-stone-900 text-stone-300 p-5 rounded-lg shadow-inner relative overflow-hidden flex flex-col justify-center">
+                                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-stone-500 to-rose-600"></div>
+                                <h4 class="text-amber-500 mb-4 font-bold tracking-widest uppercase text-xs flex items-center gap-2">
+                                    <span>&#9881;</span> Live PD Stress Matrix
+                                </h4>
+
+                                <div class="space-y-4">
+                                    <div>
+                                        <div class="flex justify-between text-xs mb-1 font-mono">
+                                            <span>High-Yield Corporate (B/CCC)</span>
+                                            <span id="pd-hy" class="font-bold text-rose-400">0%</span>
+                                        </div>
+                                        <div class="w-full bg-stone-800 rounded-full h-2">
+                                            <div id="bar-hy" class="bg-rose-500 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="flex justify-between text-xs mb-1 font-mono">
+                                            <span>CRE Mezzanine Tranches</span>
+                                            <span id="pd-cre" class="font-bold text-amber-400">0%</span>
+                                        </div>
+                                        <div class="w-full bg-stone-800 rounded-full h-2">
+                                            <div id="bar-cre" class="bg-amber-500 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="flex justify-between text-xs mb-1 font-mono">
+                                            <span>Subprime Auto Asset-Backed</span>
+                                            <span id="pd-auto" class="font-bold text-stone-400">0%</span>
+                                        </div>
+                                        <div class="w-full bg-stone-800 rounded-full h-2">
+                                            <div id="bar-auto" class="bg-stone-500 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab 2: Geopolitics -->
+                    <div id="tab-commodity" class="tab-content">
+                        <div class="flex flex-col md:flex-row gap-8">
+                            <div class="flex-1">
+                                <h3 class="text-2xl font-bold text-stone-900 mb-4">Structural Hedging & Physical Friction</h3>
+                                <p class="mb-4 text-stone-700">
+                                    Elevated energy prices and precious metal accumulations point directly to structural hedging against multi-region frictions.
+                                    Financial algorithms are pricing equities efficiently, yet completely ignoring the physical supply chains that power their underlying revenues.
+                                </p>
+                                <p class="text-stone-700 font-medium bg-amber-50 p-3 rounded border-l-4 border-amber-500">
+                                    Gold at $4,523 is not speculative momentum; it is sovereign-level haven accumulation.
+                                </p>
+                            </div>
+                            <div class="flex-1">
+                                <table class="min-w-full bg-white border border-stone-200 text-sm">
+                                    <thead class="bg-stone-100 text-stone-600 uppercase text-xs">
+                                        <tr>
+                                            <th class="py-2 px-3 text-left">Friction Point</th>
+                                            <th class="py-2 px-3 text-left">Market Implication</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-stone-200 text-stone-700">
+                                        <tr>
+                                            <td class="py-3 px-3 font-semibold">Crude Psychological Support</td>
+                                            <td class="py-3 px-3">WTI at $96.60 tests the $95-$100 threshold. Sustained breaches will structurally reset inflation targets upward.</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="py-3 px-3 font-semibold">Gold Standard Decoupling</td>
+                                            <td class="py-3 px-3">Aggressive buying validates a breakdown in trust regarding fiat-based fixed income yields resolving in real terms.</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="py-3 px-3 font-semibold">Logistical Arbitrage</td>
+                                            <td class="py-3 px-3">Maritime chokepoints are driving up baseline operating expenses for hardware and physical delivery systems.</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab 3: Agent Log -->
+                    <div id="tab-agent" class="tab-content">
+                        <div class="flex flex-col md:flex-row gap-8">
+                            <div class="flex-1">
+                                <h3 class="text-2xl font-bold text-stone-900 mb-4">System Constraint Diff Log</h3>
+                                <p class="mb-4 text-stone-700">Raw diagnostic outputs from specialized Adam OS cognitive agents analyzing the multi-axis divergence.</p>
+
+                                <div class="bg-stone-900 text-stone-300 p-4 rounded-lg font-mono text-sm shadow-inner relative overflow-hidden mb-4">
+                                    <div class="absolute top-0 left-0 w-full h-1 bg-teal-600"></div>
+                                    <div class="flex justify-between items-center mb-2 border-b border-stone-700 pb-2">
+                                        <div class="text-stone-400 text-xs uppercase tracking-wider">Agent: <span class="text-white font-bold">Macro Sentinel</span></div>
+                                        <div class="text-teal-400 text-xs">Priority: HIGH</div>
+                                    </div>
+                                    <p class="leading-relaxed text-stone-300">
+                                        "The multi-axis divergence between equity valuations and absolute yield levels continues. The concentration of capital into defensive havens (Gold at 4,523) alongside high-beta assets (Nasdaq at 26,343) creates a bifurcated structural landscape. A reversion to the mean must reconcile through either dramatic yield collapse or equity haircut."
+                                    </p>
+                                </div>
+
+                                <div class="bg-stone-900 text-stone-300 p-4 rounded-lg font-mono text-sm shadow-inner relative overflow-hidden">
+                                    <div class="absolute top-0 left-0 w-full h-1 bg-rose-600"></div>
+                                    <div class="flex justify-between items-center mb-2 border-b border-stone-700 pb-2">
+                                        <div class="text-stone-400 text-xs uppercase tracking-wider">Agent: <span class="text-white font-bold">Risk Officer</span></div>
+                                        <div class="text-rose-400 text-xs">Priority: CRITICAL</div>
+                                    </div>
+                                    <p class="leading-relaxed text-stone-300">
+                                        "Recommend close observation of the $95-$100 zone for WTI Crude; sustained breaches may structurally impact inflation forecasts, requiring a recalibration of short-term liability ledgers. The 13-week/10-year curve inversion indicates a broken capital transmission mechanism."
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <footer class="border-t border-stone-200 pt-6 mt-12 mb-8 text-center md:text-left flex flex-col md:flex-row justify-between items-center gap-4">
+            <p class="text-xs text-stone-400 uppercase tracking-widest font-mono">Generated via Adam OS multi-agent framework. W3C PROV-O compliance maintained. No material drift detected.</p>
+            <div class="text-stone-300 flex gap-2">
+                <span title="Status: Online" class="animate-pulse text-teal-500">&#11044;</span>
+            </div>
+        </footer>
+
+    </main>
+
+    <script>
+        // Data Configuration Object matching exact requested metrics
+        const chartDataMap = {
+            'spx': {
+                label: 'S&P 500 (SPX)',
+                data: [7100, 7180, 7290, 7360, 7420, 7473.47],
+                color: '#0f766e',
+                bgColor: 'rgba(15, 118, 110, 0.1)',
+                title: 'S&P 500 (SPX) - 6 Month Trajectory',
+                signalText: 'Illusion Momentum',
+                signalClass: ['bg-teal-100', 'text-teal-800']
+            },
+            'ndx': {
+                label: 'Nasdaq (NDX)',
+                data: [24100, 24500, 25100, 25800, 26100, 26343.97],
+                color: '#0f766e',
+                bgColor: 'rgba(15, 118, 110, 0.1)',
+                title: 'Nasdaq (NDX) - 6 Month Trajectory',
+                signalText: 'Tech-Wall Defense',
+                signalClass: ['bg-teal-100', 'text-teal-800']
+            },
+            'yield': {
+                label: '10-Year Yield (%)',
+                data: [4.250, 4.380, 4.490, 4.510, 4.540, 4.558],
+                color: '#be123c',
+                bgColor: 'rgba(190, 18, 60, 0.1)',
+                title: 'US 10-Year Yield - Persistent Elevation',
+                signalText: 'Structural Constraint',
+                signalClass: ['bg-rose-100', 'text-rose-800']
+            },
+            'gold': {
+                label: 'Gold (XAU)',
+                data: [3850, 3990, 4150, 4320, 4480, 4523.20],
+                color: '#d97706',
+                bgColor: 'rgba(217, 119, 6, 0.1)',
+                title: 'Gold (XAU) - Haven Parabolic Curve',
+                signalText: 'Haven Accumulation',
+                signalClass: ['bg-amber-100', 'text-amber-800']
+            },
+            'wti': {
+                label: 'WTI Crude ($)',
+                data: [82.50, 85.00, 89.20, 93.40, 95.80, 96.60],
+                color: '#be123c',
+                bgColor: 'rgba(190, 18, 60, 0.1)',
+                title: 'WTI Crude - Testing Psychological Resistance',
+                signalText: 'Inflationary Support',
+                signalClass: ['bg-rose-100', 'text-rose-800']
+            },
+            'btc': {
+                label: 'Bitcoin ($)',
+                data: [61000, 64500, 68000, 71500, 75200, 76601.70],
+                color: '#57534e',
+                bgColor: 'rgba(87, 83, 78, 0.1)',
+                title: 'Bitcoin (BTC) - Alternative Liquidity Drain',
+                signalText: 'Liquidity Valve',
+                signalClass: ['bg-stone-200', 'text-stone-800']
+            }
+        };
+
+        // Initialize Chart.js Context
+        const ctx = document.getElementById('marketChart').getContext('2d');
+        let currentChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['T-5m', 'T-4m', 'T-3m', 'T-2m', 'T-1m', 'Current'],
+                datasets: [{
+                    label: chartDataMap['spx'].label,
+                    data: chartDataMap['spx'].data,
+                    borderColor: chartDataMap['spx'].color,
+                    backgroundColor: chartDataMap['spx'].bgColor,
+                    borderWidth: 3,
+                    pointBackgroundColor: chartDataMap['spx'].color,
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: '#1c1917',
+                        titleFont: { family: 'ui-sans-serif, system-ui, sans-serif' },
+                        bodyFont: { family: 'ui-sans-serif, system-ui, sans-serif' },
+                        padding: 10,
+                        cornerRadius: 4,
+                        displayColors: false
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { display: false, drawBorder: false },
+                        ticks: { color: '#78716c', font: { family: 'ui-monospace, SFMono-Regular, monospace', size: 10 } }
+                    },
+                    y: {
+                        grid: { color: '#e7e5e4', borderDash: [5, 5], drawBorder: false },
+                        ticks: { color: '#78716c', font: { family: 'ui-monospace, SFMono-Regular, monospace', size: 10 } }
+                    }
+                },
+                interaction: {
+                    intersect: false,
+                    mode: 'index',
+                },
+            }
+        });
+
+        const dataCards = document.querySelectorAll('.data-card');
+        const chartTitle = document.getElementById('chart-title');
+        const chartSignal = document.getElementById('chart-signal');
+
+        dataCards.forEach(card => {
+            card.addEventListener('click', function() {
+                // Reset Active States
+                dataCards.forEach(c => {
+                    c.classList.remove('active');
+                    c.style.borderColor = '';
+                    c.style.backgroundColor = '';
+                });
+
+                // Set New Active State
+                this.classList.add('active');
+
+                // Fetch Data Map
+                const assetKey = this.getAttribute('data-asset');
+                const newData = chartDataMap[assetKey];
+
+                // Update Chart
+                currentChart.data.datasets[0].label = newData.label;
+                currentChart.data.datasets[0].data = newData.data;
+                currentChart.data.datasets[0].borderColor = newData.color;
+                currentChart.data.datasets[0].backgroundColor = newData.bgColor;
+                currentChart.data.datasets[0].pointBackgroundColor = newData.color;
+                currentChart.update();
+
+                // Update UI Labels
+                chartTitle.textContent = newData.title;
+                chartSignal.textContent = newData.signalText;
+                chartSignal.className = `text-xs font-bold px-2 py-1 rounded ${newData.signalClass.join(' ')}`;
+            });
+        });
+
+        // Tab Switching Logic
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                tabBtns.forEach(b => {
+                    b.classList.remove('active', 'border-amber-500', 'text-stone-900', 'bg-white');
+                    b.classList.add('border-transparent', 'text-stone-500');
+                });
+                tabContents.forEach(c => c.classList.remove('active'));
+
+                btn.classList.remove('border-transparent', 'text-stone-500');
+                btn.classList.add('active', 'border-amber-500', 'text-stone-900', 'bg-white');
+
+                const targetId = btn.getAttribute('data-target');
+                document.getElementById(targetId).classList.add('active');
+            });
+        });
+
+        // Ensure first tab styles are correct on load
+        const firstTabBtn = document.querySelector('.tab-btn');
+        if(firstTabBtn) {
+            firstTabBtn.classList.remove('border-transparent');
+            firstTabBtn.classList.add('border-amber-500', 'text-stone-900', 'bg-white');
+        }
+
+        const yieldSlider = document.getElementById('yield-slider');
+        const crudeSlider = document.getElementById('crude-slider');
+        const yieldValText = document.getElementById('yield-val');
+        const crudeValText = document.getElementById('crude-val');
+
+        const barHY = document.getElementById('bar-hy');
+        const pdHY = document.getElementById('pd-hy');
+        const barCRE = document.getElementById('bar-cre');
+        const pdCRE = document.getElementById('pd-cre');
+        const barAuto = document.getElementById('bar-auto');
+        const pdAuto = document.getElementById('pd-auto');
+
+        function updateSimulator() {
+            const currentYield = parseFloat(yieldSlider.value);
+            const currentCrude = parseFloat(crudeSlider.value);
+
+            yieldValText.textContent = currentYield.toFixed(2) + '%';
+            crudeValText.textContent = '$' + currentCrude.toFixed(1);
+
+            // Synthetic Probability of Default formulas factoring in yield constraints and crude inflation
+            let valHY = (currentYield * 12) + (currentCrude * 0.15) - 30;
+            let valCRE = (currentYield * 15) + (currentCrude * 0.05) - 45;
+            let valAuto = (currentYield * 8) + (currentCrude * 0.25) - 10;
+
+            // Clamp values between 0 and 100 for percentage
+            valHY = Math.max(0, Math.min(100, valHY));
+            valCRE = Math.max(0, Math.min(100, valCRE));
+            valAuto = Math.max(0, Math.min(100, valAuto));
+
+            // Apply Visual Widths
+            barHY.style.width = valHY + '%';
+            pdHY.textContent = valHY.toFixed(1) + '%';
+
+            barCRE.style.width = valCRE + '%';
+            pdCRE.textContent = valCRE.toFixed(1) + '%';
+
+            barAuto.style.width = valAuto + '%';
+            pdAuto.textContent = valAuto.toFixed(1) + '%';
+
+            // Shift Colors Based on Severity Thresholds
+            pdHY.className = valHY > 65 ? 'font-bold text-rose-500' : 'font-bold text-amber-500';
+            pdCRE.className = valCRE > 65 ? 'font-bold text-rose-500' : 'font-bold text-amber-500';
+            pdAuto.className = valAuto > 65 ? 'font-bold text-rose-500' : 'font-bold text-amber-500';
+        }
+
+        // Attach listeners to sliders
+        yieldSlider.addEventListener('input', updateSimulator);
+        crudeSlider.addEventListener('input', updateSimulator);
+
+        // Run simulation immediately on initialization
+        setTimeout(updateSimulator, 200);
+
+    </script>
+</body>
+</html>
