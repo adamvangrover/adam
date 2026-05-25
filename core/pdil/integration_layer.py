@@ -10,6 +10,7 @@ class ProvenanceHeader(BaseModel):
     jsonLogic_version: str = Field(..., description="Version of the jsonLogic schema used")
     confidence_score: float = Field(..., description="Agent conviction score (0.0 to 1.0)")
     derivation_path: str = Field(..., description="Path indicating how the conclusion was reached")
+    source_data_object: str = Field(..., description="Reference to the source data object, satisfying W3C PROV-O requirements")
 
 class GovernanceError(Exception):
     """Raised when an inference fails governance validation (e.g. invalid schema, missing provenance, poisoned data)."""
@@ -25,7 +26,8 @@ class GovernanceGatekeeper:
     def validate_inference(self, inference_output: Dict[str, Any]) -> Dict[str, Any]:
         """
         Validates LLM probabilistic inferences natively using jsonschema.
-        Ensures the presence of a valid ProvenanceHeader.
+        Ensures the presence of a valid ProvenanceHeader and satisfies W3C PROV-O compliance
+        by verifying context-first grounding and data source origin.
         Raises GovernanceError if validation fails or data is poisoned.
         """
 
