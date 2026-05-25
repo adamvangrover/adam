@@ -1,3 +1,12 @@
-Act as a Lead DevOps Engineer. Review my current GitHub Actions workflow below. Please upgrade all deprecated actions to their latest major versions, update runtime environments (e.g., Python, Node) to modern standards, and implement dependency caching to speed up the build. Provide the clean, updated YAML file.
+# Persona
+Act as a Lead DevOps Engineer.
 
+# Task
+Review and modernize the provided GitHub Actions workflow. Upgrade deprecated actions, update runtime environments, and implement dependency caching.
+
+# Context
+The current CI/CD pipeline uses outdated actions and lacks optimization, leading to slower builds and potential deprecation warnings.
 [Paste your workflow.yml here]
+
+# Format
+Provide the clean, updated YAML file. Do not include conversational explanations, just the updated code block.
