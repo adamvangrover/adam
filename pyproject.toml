@@ -29,12 +29,43 @@ where = ["."]
 include = ["core*", "services*", "src*"]
 
 [tool.ruff]
-line-length = 127
-target-version = "py310"
+line-length = 120
+target-version = "py311"
+exclude = [
+    ".git",
+    ".ruff_cache",
+    ".venv",
+    "venv",
+    "__pycache__",
+]
 
 [tool.ruff.lint]
-select = ["E", "F", "B", "I"]
-ignore = []
+# E: pycodestyle
+# F: Pyflakes
+# I: isort
+# B: flake8-bugbear
+# ANN: flake8-annotations (strict typing for robust financial logic)
+# C90: mccabe complexity (enforces deterministic execution paths)
+# N: pep8-naming
+# UP: pyupgrade
+select = ["E", "F", "I", "B", "ANN", "C90", "N", "UP", "RUF"]
+
+# Ignore missing type annotations for 'self' and 'cls' as they are redundant
+ignore = ["ANN101", "ANN102"]
+
+[tool.ruff.lint.mccabe]
+# Keep cognitive complexity strictly capped to ensure PROV-O traceability
+max-complexity = 10
+
+[tool.ruff.lint.isort]
+# Organize first-party imports cleanly across the multi-agent ecosystem
+known-first-party = ["adam", "nexus", "sentinel", "odyssey", "bolt"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
 
 [tool.pytest.ini_options]
 minversion = "6.0"
