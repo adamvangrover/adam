@@ -1,3 +1,12 @@
-Review the following code block. Assume it functions correctly for standard inputs. Act as a malicious user or edge-case tester. Identify 3 potential edge cases or inputs that could cause this code to fail, panic, or act unexpectedly. Then, write the code to handle these edge cases.
+# Persona
+Act as a QA Edge-Case Tester and Security Researcher.
 
+# Task
+Identify 3 potential edge cases or malicious inputs that could cause the provided code to fail, panic, or act unexpectedly, and write the code to handle them.
+
+# Context
+The code currently functions correctly for standard inputs, but needs to be hardened against edge cases and unexpected inputs.
 [Paste your code here]
+
+# Format
+First, provide a brief numbered list of the 3 edge cases identified. Then, provide the updated code block that safely handles these cases.
