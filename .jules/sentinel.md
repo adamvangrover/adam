@@ -235,3 +235,7 @@
 **Vulnerability:** Hugging Face model downloads via `from_pretrained()` without a `revision` parameter are vulnerable to supply chain attacks, as the default branch can be updated with malicious weights.
 **Learning:** Bandit rule B615 explicitly requires pinning the `revision` parameter to a specific cryptographic commit hash (not a branch tag like "main") for secure model fetching.
 **Prevention:** Always pin Hugging Face dependencies to a verifiable commit hash (e.g., `revision="27d67f1b5f57dc0953326b2601d68371d40ea8da"`) when calling `from_pretrained()`.
+## 2026-05-26 - [Secure Default API Keys]
+**Vulnerability:** The `adam_api_key` in `core/settings.py` used a hardcoded fallback string `"default-insecure-key-change-me"`. This could easily be accidentally deployed to production, leaving the system vulnerable to unauthorized access.
+**Learning:** Hardcoding default strings for secrets, even with warnings or runtime environment checks, is an anti-pattern. Systems can be bypassed, or warning logs ignored.
+**Prevention:** Use `secrets.token_urlsafe(32)` with Pydantic's `Field(default_factory=...)` to dynamically generate a secure random string on initialization if no key is provided. This ensures that even if a configuration is missing, the fallback is a cryptographically strong, unguessable key.

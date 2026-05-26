@@ -33,7 +33,8 @@ class TestCoreApiSecurity(unittest.TestCase):
                 "action": "run_analysis",
                 "parameters": {"query": "test"}
             }
-            headers = {"X-API-Key": "default-insecure-key-change-me"}
+            from core.settings import settings
+            headers = {"X-API-Key": settings.adam_api_key}
 
             # Act
             response = self.app.post('/', json=payload, headers=headers)

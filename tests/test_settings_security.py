@@ -4,26 +4,19 @@ from core.settings import Settings
 import os
 
 class TestSettingsSecurity(unittest.TestCase):
-    def test_development_mode_allows_default_key(self):
-        """Test that development mode allows the default insecure key (with warning)."""
+    def test_default_key_is_secure(self):
+        """Test that by default, a secure random key is generated."""
         # Ensure environment is clean
         if "ADAM_API_KEY" in os.environ:
             del os.environ["ADAM_API_KEY"]
 
-        settings = Settings(environment="development")
-        self.assertEqual(settings.adam_api_key, "default-insecure-key-change-me")
-        self.assertEqual(settings.environment, "development")
+        settings_1 = Settings(environment="development")
+        settings_2 = Settings(environment="development")
 
-    def test_production_mode_blocks_default_key(self):
-        """Test that production mode raises ValueError if default key is used."""
-        # Ensure environment is clean
-        if "ADAM_API_KEY" in os.environ:
-            del os.environ["ADAM_API_KEY"]
-
-        with self.assertRaises(ValueError) as cm:
-            Settings(environment="production")
-
-        self.assertIn("CRITICAL SECURITY ERROR", str(cm.exception))
+        self.assertNotEqual(settings_1.adam_api_key, "default-insecure-key-change-me")
+        self.assertTrue(len(settings_1.adam_api_key) > 32)
+        # Should generate a new key each time if not provided
+        self.assertNotEqual(settings_1.adam_api_key, settings_2.adam_api_key)
 
     def test_production_mode_allows_secure_key(self):
         """Test that production mode allows a custom secure key."""

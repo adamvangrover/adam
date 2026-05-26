@@ -1,8 +1,9 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from typing import Optional, List
 import os
-from pydantic import model_validator
+from pydantic import model_validator, Field
 import logging
+import secrets
 
 
 class Settings(BaseSettings):
@@ -24,7 +25,7 @@ class Settings(BaseSettings):
     google_api_key: Optional[str] = None  # Added for Gemini support
 
     # Internal Security
-    adam_api_key: str = "default-insecure-key-change-me"
+    adam_api_key: str = Field(default_factory=lambda: secrets.token_urlsafe(32))
 
     # Database / Infrastructure
     postgres_user: Optional[str] = None
@@ -46,21 +47,6 @@ class Settings(BaseSettings):
         extra="ignore",
         case_sensitive=False
     )
-
-    @model_validator(mode='after')
-    def check_security(self):
-        if self.adam_api_key == "default-insecure-key-change-me":
-            if self.environment.lower() == "production":
-                raise ValueError(
-                    "CRITICAL SECURITY ERROR: You are running in PRODUCTION mode with the default insecure API key. "
-                    "Please set ADAM_API_KEY environment variable to a secure value."
-                )
-            else:
-                logging.warning(
-                    "SECURITY WARNING: You are using the default insecure API key. "
-                    "This is acceptable for development, but MUST be changed in production."
-                )
-        return self
 
 
 # Global settings instance
