@@ -1,6 +1,6 @@
 from typing import Any, Dict
 from pydantic import BaseModel, Field
-from core.pdil.integration_layer import ProvenanceHeader
+from src.governance.gatekeeper import ProvenanceHeader
 
 class AgentInput(BaseModel):
     data: Dict[str, Any] = Field(..., description="Deterministic input data")
