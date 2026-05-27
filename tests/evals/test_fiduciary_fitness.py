@@ -1,6 +1,6 @@
 import pytest
 from hypothesis import given, settings, HealthCheck, strategies as st
-from core.pdil.integration_layer import GovernanceGatekeeper, GovernanceError
+from src.governance.gatekeeper import GovernanceGatekeeper, GovernanceError
 
 VALID_SCHEMA = {
     "type": "object",

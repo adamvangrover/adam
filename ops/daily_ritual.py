@@ -50,7 +50,7 @@ Based on Phase 1 & 2, generate **ONE** of the following strictly additive artifa
 
 ### EXECUTION PHASE 4: THE MEMORY (Documentation)
 * Update `CHANGELOG.md` with a "Jules' Log" entry explaining *why* this addition matters.
-* If a new library was used, append it to `requirements.txt`.
+* If a new library was used, append it to `requirements/base.txt`.
 
 ---
 
