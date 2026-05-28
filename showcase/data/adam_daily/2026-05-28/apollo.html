@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apollo's Shift to Daily Pricing in Private Credit</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Custom Tailwind Config & CSS -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'brand-bg': '#f5f4f0', // Warm neutral background
+                        'brand-card': '#ffffff',
+                        'brand-primary': '#1e3a8a', // Deep trustworthy blue
+                        'brand-secondary': '#64748b', // Slate gray
+                        'brand-accent': '#ea580c', // Subtle orange accent for alerts/changes
+                        'brand-text': '#1e293b', // Dark slate for text
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #f5f4f0;
+            color: #1e293b;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Required Chart Container Styling */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 1000px; /* Constrain max width for readability */
+            margin-left: auto;
+            margin-right: auto;
+            height: 45vh; /* Responsive height */
+            max-height: 500px;
+            min-height: 300px;
+        }
+
+        /* Timeline specific styles */
+        .timeline-node {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .timeline-node.active {
+            background-color: #1e3a8a;
+            color: white;
+            border-color: #1e3a8a;
+            transform: scale(1.05);
+        }
+        
+        /* Interactive Cards */
+        .interactive-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .interactive-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Custom Scrollbar for inner content if needed */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+    </style>
+</head>
+<body class="bg-brand-bg text-brand-text">
+
+    <!-- Chosen Palette: Warm Neutrals & Institutional Slate/Blue -->
+    <!-- Application Structure Plan: 
+         1. Executive Summary (Hero): High-impact metrics ($830B) to establish scale.
+         2. The Core Shift (Visualization): A Chart.js visualization contrasting traditional quarterly pricing with the new daily pricing to instantly communicate the "black box" vs "transparency" concept.
+         3. Implementation Timeline (Interactive): A horizontal interactive timeline allowing users to click and explore the rollout phases.
+         4. Methodology & Drivers (Interactive Grid): A categorized dashboard grid letting users toggle between 'How they are doing it' and 'Why they are doing it', keeping the UI clean while offering deep dives.
+         Rationale: This structure moves from the 'What' (scale and concept) to the 'When' (timeline) and finally the 'How/Why' (methodology/drivers), providing a logical, user-driven exploration path rather than a static wall of text.
+    -->
+    <!-- Visualization & Content Choices:
+         - Goal: Inform Scale -> Viz: Dynamic JS counter ($830B) -> Interaction: Auto-animate on load -> Justification: Grabs attention immediately.
+         - Goal: Compare Pricing Models -> Viz: Chart.js Line Chart -> Interaction: Hover tooltips showing the lag of quarterly vs daily -> Justification: Best way to visualize the "lagging" nature of quarterly valuations mentioned in the text.
+         - Goal: Organize Timeline -> Viz: Interactive HTML/CSS horizontal timeline -> Interaction: Click dates to update text pane -> Justification: Consolidates dates into a spatial format, better than bullet points. (NO SVG used, pure HTML/CSS nodes).
+         - Goal: Explain Methodology/Drivers -> Viz: Interactive Tabbed Cards -> Interaction: Click tabs to swap content -> Justification: Groups related textual insights without overwhelming the user.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <!-- Navigation / Header -->
+    <nav class="bg-brand-primary text-white sticky top-0 z-50 shadow-md">
+        <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="font-bold text-xl tracking-tight">Apollo Pricing Intelligence</div>
+            <div class="text-sm opacity-80">Interactive Briefing</div>
+        </div>
+    </nav>
+
+    <main class="max-w-6xl mx-auto px-4 py-8 space-y-16">
+
+        <!-- SECTION 1: Hero & Executive Summary -->
+        <section class="text-center space-y-6 py-8">
+            <p class="text-brand-secondary font-semibold uppercase tracking-wider text-sm">Strategic Initiative Brief</p>
+            <h1 class="text-4xl md:text-5xl font-extrabold text-brand-text leading-tight max-w-4xl mx-auto">
+                Dismantling the "Black Box" of Private Credit
+            </h1>
+            <p class="text-lg md:text-xl text-brand-secondary max-w-3xl mx-auto leading-relaxed">
+                Apollo Global Management is pushing for unprecedented transparency in private markets, transitioning its massive credit platform from traditional, lagging quarterly valuations to 100% daily pricing by late 2026.
+            </p>
+            
+            <div class="flex flex-wrap justify-center gap-6 pt-6">
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 min-w-[250px]">
+                    <div class="text-sm text-brand-secondary mb-1">Impacted Platform Size</div>
+                    <div class="text-4xl font-bold text-brand-primary flex justify-center items-center">
+                        $<span id="aum-counter">0</span>B
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 min-w-[250px]">
+                    <div class="text-sm text-brand-secondary mb-1">Target Completion</div>
+                    <div class="text-3xl font-bold text-brand-text mt-1">Q3 2026</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: The Core Shift (Visualization) -->
+        <section class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 md:p-10">
+            <div class="max-w-3xl mb-8">
+                <h2 class="text-2xl font-bold text-brand-primary mb-3">The Valuation Paradigm Shift</h2>
+                <p class="text-brand-secondary leading-relaxed">
+                    This section illustrates the core problem Apollo is solving. Historically, private credit relied on lagging, stepped quarterly valuations—the "black box." Apollo's new methodology uses actual trades and macro trends to emulate public markets, resulting in a responsive, daily valuation curve. 
+                </p>
+            </div>
+            
+            <div class="chart-container bg-gray-50 rounded-xl p-4 border border-gray-100">
+                <canvas id="pricingComparisonChart"></canvas>
+            </div>
+            <div class="flex justify-center gap-6 mt-4 text-sm text-brand-secondary">
+                <div class="flex items-center gap-2">
+                    <div class="w-4 h-4 bg-gray-300 rounded-sm"></div>
+                    <span>Traditional Quarterly Pricing (Lagging, Flat)</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <div class="w-4 h-1 bg-brand-primary"></div>
+                    <span>Apollo Daily Pricing (Responsive, Market-aligned)</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: Rollout Timeline -->
+        <section>
+            <h2 class="text-2xl font-bold text-brand-primary mb-3">Rollout Timeline</h2>
+            <p class="text-brand-secondary mb-8 max-w-2xl">
+                Explore the phased approach Apollo is taking to implement this massive infrastructure shift. Click on the milestones below to see which asset classes are affected.
+            </p>
+
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 md:p-10">
+                <div class="flex flex-col md:flex-row gap-8 items-start">
+                    
+                    <!-- Interactive Timeline UI -->
+                    <div class="w-full md:w-1/2 flex flex-col space-y-6 relative">
+                        <!-- Connecting Line -->
+                        <div class="absolute left-6 top-6 bottom-6 w-0.5 bg-gray-200 z-0 hidden md:block"></div>
+                        
+                        <!-- Node 1 -->
+                        <div class="timeline-node active relative z-10 flex items-center gap-4 p-4 rounded-xl border-2 border-brand-primary bg-brand-primary text-white" onclick="updateTimeline(0, this)">
+                            <div class="w-4 h-4 rounded-full bg-white shadow-sm shrink-0"></div>
+                            <div>
+                                <div class="font-bold text-lg">June 30, 2026</div>
+                                <div class="text-sm opacity-90">Phase 1 Launch</div>
+                            </div>
+                        </div>
+
+                        <!-- Node 2 -->
+                        <div class="timeline-node relative z-10 flex items-center gap-4 p-4 rounded-xl border-2 border-gray-300 bg-white text-brand-text hover:border-brand-primary" onclick="updateTimeline(1, this)">
+                            <div class="w-4 h-4 rounded-full bg-gray-300 shadow-sm shrink-0"></div>
+                            <div>
+                                <div class="font-bold text-lg">September 30, 2026</div>
+                                <div class="text-sm text-brand-secondary node-desc">Phase 2 Launch</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Timeline Content Display -->
+                    <div class="w-full md:w-1/2 bg-brand-bg rounded-xl p-6 md:p-8 min-h-[200px] flex flex-col justify-center border border-gray-200" id="timeline-content-box">
+                        <h3 class="text-xl font-bold text-brand-primary mb-2" id="tl-title">Phase 1: Corporate Investment-Grade</h3>
+                        <div class="text-sm text-brand-secondary font-mono mb-4 border-b border-gray-300 pb-2 inline-block" id="tl-date">June 30, 2026</div>
+                        <p class="text-brand-text leading-relaxed" id="tl-desc">
+                            Daily pricing officially goes live for all corporate investment-grade fixed-income assets. This marks the first major step in bringing public-market transparency to the private credit platform.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 4: Methodology & Market Drivers (Interactive Dashboard) -->
+        <section>
+            <h2 class="text-2xl font-bold text-brand-primary mb-3">Strategic Execution & Industry Impact</h2>
+            <p class="text-brand-secondary mb-8 max-w-2xl">
+                Understanding <em>how</em> Apollo is achieving this and <em>why</em> they are doing it now is critical. Toggle between Methodology (the mechanics) and Drivers (the market forces).
+            </p>
+
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+                
+                <!-- Tab Controls -->
+                <div class="flex border-b border-gray-200 bg-gray-50">
+                    <button class="flex-1 py-4 px-6 text-center font-bold text-brand-primary border-b-2 border-brand-primary bg-white focus:outline-none transition-colors" id="tab-btn-methodology" onclick="switchTab('methodology')">
+                        Methodology (How)
+                    </button>
+                    <button class="flex-1 py-4 px-6 text-center font-bold text-brand-secondary border-b-2 border-transparent hover:bg-gray-100 hover:text-brand-text focus:outline-none transition-colors" id="tab-btn-drivers" onclick="switchTab('drivers')">
+                        Market Drivers & Implications (Why)
+                    </button>
+                </div>
+
+                <!-- Tab Content: Methodology -->
+                <div id="tab-content-methodology" class="p-6 md:p-10 grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="interactive-card bg-brand-bg p-6 rounded-xl border border-gray-200">
+                        <div class="text-2xl mb-4">📊</div>
+                        <h3 class="font-bold text-lg mb-2">Data Synthesis</h3>
+                        <p class="text-sm text-brand-secondary leading-relaxed">
+                            Instead of static prices, marks shift daily based on changing interest rates, credit spreads, and actual market trends. Apollo observes live trades and baselines against comparable public valuations.
+                        </p>
+                    </div>
+                    <div class="interactive-card bg-brand-bg p-6 rounded-xl border border-gray-200">
+                        <div class="text-2xl mb-4">🤝</div>
+                        <h3 class="font-bold text-lg mb-2">Strategic Partnerships</h3>
+                        <p class="text-sm text-brand-secondary leading-relaxed">
+                            Apollo is collaborating closely with Intercontinental Exchange Inc. (ICE) via ICE Private Credit Intelligence. This partnership provides the external data infrastructure needed to optimize data tracking.
+                        </p>
+                    </div>
+                    <div class="interactive-card bg-brand-bg p-6 rounded-xl border border-gray-200">
+                        <div class="text-2xl mb-4">🛡️</div>
+                        <h3 class="font-bold text-lg mb-2">Conservative Alignment</h3>
+                        <p class="text-sm text-brand-secondary leading-relaxed">
+                            To ensure trust and mitigate risk, for positions shared with third parties, Apollo plans a conservative approach: aligning its marks to the lowest observable valuation available.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Tab Content: Drivers -->
+                <div id="tab-content-drivers" class="p-6 md:p-10 grid grid-cols-1 md:grid-cols-3 gap-6 hidden">
+                    <div class="interactive-card bg-blue-50 p-6 rounded-xl border border-blue-100">
+                        <div class="text-2xl mb-4">👥</div>
+                        <h3 class="font-bold text-lg text-brand-primary mb-2">Retail Demand</h3>
+                        <p class="text-sm text-brand-secondary leading-relaxed">
+                            Individual and wealth-channel investors are increasingly moving into private assets. Unlike institutional capital, these cohorts require liquidity-like visibility and daily confidence in their holdings.
+                        </p>
+                    </div>
+                    <div class="interactive-card bg-blue-50 p-6 rounded-xl border border-blue-100">
+                        <div class="text-2xl mb-4">📉</div>
+                        <h3 class="font-bold text-lg text-brand-primary mb-2">Redemption Jitters</h3>
+                        <p class="text-sm text-brand-secondary leading-relaxed">
+                            The industry is facing pressure from record retail redemption requests. Increased portfolio transparency is a direct mechanism to calm these jitters and build investor confidence.
+                        </p>
+                    </div>
+                    <div class="interactive-card bg-blue-50 p-6 rounded-xl border border-blue-100">
+                        <div class="text-2xl mb-4">⚔️</div>
+                        <h3 class="font-bold text-lg text-brand-primary mb-2">Competitive Disruption</h3>
+                        <p class="text-sm text-brand-secondary leading-relaxed">
+                            This move is highly disruptive. While competitors resist, experts argue Apollo's scale ($830B) will inevitably pressure peers to justify their ongoing quarterly opacity.
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Footer / CTA -->
+        <section class="mt-12 bg-brand-primary text-white rounded-2xl p-8 md:p-12 text-center shadow-lg">
+            <h2 class="text-2xl md:text-3xl font-bold mb-4">Evaluating Private Asset Options?</h2>
+            <p class="text-blue-100 max-w-2xl mx-auto mb-8 leading-relaxed">
+                As the industry shifts toward transparency, understanding liquidity profiles and underlying asset performance is more critical than ever. 
+            </p>
+            <div class="flex flex-col sm:flex-row justify-center gap-4">
+                <button onclick="alert('Module: Redemption Liquidity Analysis Simulation triggered.')" class="bg-white text-brand-primary font-bold py-3 px-6 rounded-lg hover:bg-gray-100 transition shadow-sm">
+                    Analyze Redemption Liquidity
+                </button>
+                <button onclick="alert('Module: Peer Performance Comparison Simulation triggered.')" class="bg-transparent border border-white text-white font-bold py-3 px-6 rounded-lg hover:bg-white hover:text-brand-primary transition shadow-sm">
+                    Compare Peer Performance
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-white border-t border-gray-200 py-8 mt-12 text-center text-sm text-brand-secondary">
+        <p>Source Data: Apollo Global Management Announcements (May 2026 Context)</p>
+        <p class="mt-2 text-xs opacity-70">Generated for analytical exploration.</p>
+    </footer>
+
+    <!-- Interactive Logic -->
+    <script>
+        // 1. AUM Counter Animation
+        const animateCounter = (id, target, duration) => {
+            const obj = document.getElementById(id);
+            let start = 0;
+            const end = target;
+            const stepTime = Math.abs(Math.floor(duration / end));
+            
+            const timer = setInterval(() => {
+                start += 11; // Increment step
+                if(start >= end) {
+                    obj.innerHTML = end;
+                    clearInterval(timer);
+                } else {
+                    obj.innerHTML = start;
+                }
+            }, stepTime);
+        };
+
+        // Initialize counter on load
+        window.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                animateCounter('aum-counter', 830, 2000);
+            }, 300);
+            initChart();
+        });
+
+        // 2. Timeline Interaction Logic
+        const timelineData = [
+            {
+                date: "June 30, 2026",
+                title: "Phase 1: Corporate Investment-Grade",
+                desc: "Daily pricing officially goes live for all corporate investment-grade fixed-income assets. This marks the first major step in bringing public-market transparency to the private credit platform."
+            },
+            {
+                date: "September 30, 2026",
+                title: "Phase 2: Direct Lending & Asset-Backed",
+                desc: "Daily pricing expands comprehensively to include direct lending and asset-backed finance assets, completing the transition for the $830 billion credit platform."
+            }
+        ];
+
+        function updateTimeline(index, element) {
+            // Update UI styling for nodes
+            const nodes = document.querySelectorAll('.timeline-node');
+            nodes.forEach(node => {
+                node.classList.remove('active', 'bg-brand-primary', 'text-white', 'border-brand-primary');
+                node.classList.add('bg-white', 'text-brand-text', 'border-gray-300');
+                node.querySelector('div.w-4').classList.remove('bg-white');
+                node.querySelector('div.w-4').classList.add('bg-gray-300');
+                node.querySelector('.node-desc')?.classList.add('text-brand-secondary');
+            });
+
+            // Set active styles
+            element.classList.add('active', 'bg-brand-primary', 'text-white', 'border-brand-primary');
+            element.classList.remove('bg-white', 'text-brand-text', 'border-gray-300');
+            element.querySelector('div.w-4').classList.add('bg-white');
+            element.querySelector('div.w-4').classList.remove('bg-gray-300');
+            element.querySelector('.node-desc')?.classList.remove('text-brand-secondary');
+
+            // Update Content Box
+            const data = timelineData[index];
+            const box = document.getElementById('timeline-content-box');
+            
+            // Simple fade effect
+            box.style.opacity = 0;
+            setTimeout(() => {
+                document.getElementById('tl-title').innerText = data.title;
+                document.getElementById('tl-date').innerText = data.date;
+                document.getElementById('tl-desc').innerText = data.desc;
+                box.style.opacity = 1;
+                box.style.transition = "opacity 0.3s ease";
+            }, 150);
+        }
+
+        // 3. Tab Interaction Logic
+        function switchTab(tabName) {
+            const btnMethod = document.getElementById('tab-btn-methodology');
+            const btnDrivers = document.getElementById('tab-btn-drivers');
+            const contentMethod = document.getElementById('tab-content-methodology');
+            const contentDrivers = document.getElementById('tab-content-drivers');
+
+            if (tabName === 'methodology') {
+                // Style buttons
+                btnMethod.className = "flex-1 py-4 px-6 text-center font-bold text-brand-primary border-b-2 border-brand-primary bg-white focus:outline-none transition-colors";
+                btnDrivers.className = "flex-1 py-4 px-6 text-center font-bold text-brand-secondary border-b-2 border-transparent hover:bg-gray-100 hover:text-brand-text focus:outline-none transition-colors";
+                // Show/Hide content
+                contentMethod.classList.remove('hidden');
+                contentDrivers.classList.add('hidden');
+            } else {
+                // Style buttons
+                btnDrivers.className = "flex-1 py-4 px-6 text-center font-bold text-brand-primary border-b-2 border-brand-primary bg-white focus:outline-none transition-colors";
+                btnMethod.className = "flex-1 py-4 px-6 text-center font-bold text-brand-secondary border-b-2 border-transparent hover:bg-gray-100 hover:text-brand-text focus:outline-none transition-colors";
+                // Show/Hide content
+                contentDrivers.classList.remove('hidden');
+                contentMethod.classList.add('hidden');
+            }
+        }
+
+        // 4. Chart.js Visualization Logic
+        function initChart() {
+            const ctx = document.getElementById('pricingComparisonChart').getContext('2d');
+            
+            // Synthetic data to illustrate the concept of quarterly lag vs daily response
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            
+            // Quarterly Step Function (Lagging)
+            const quarterlyData = [100, 100, 100, 102, 102, 102, 98, 98, 98, 105, 105, 105];
+            
+            // Daily/Responsive Function (Emulating market fluctuations leading to the quarterly mark)
+            const dailyData = [100, 99.5, 101, 102, 103, 101.5, 98, 97, 99, 105, 106, 104.5];
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: months,
+                    datasets: [
+                        {
+                            label: 'Traditional Quarterly (The "Black Box")',
+                            data: quarterlyData,
+                            borderColor: '#cbd5e1', // Light gray
+                            backgroundColor: 'transparent',
+                            borderWidth: 3,
+                            stepped: true, // Crucial for showing the flat quarterly nature
+                            pointRadius: 0,
+                            pointHoverRadius: 6
+                        },
+                        {
+                            label: 'Apollo Daily Pricing (Transparent)',
+                            data: dailyData,
+                            borderColor: '#1e3a8a', // Brand Primary
+                            backgroundColor: 'rgba(30, 58, 138, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.4, // Smooth curve to represent daily fluctuations
+                            pointBackgroundColor: '#ea580c',
+                            pointBorderColor: '#fff',
+                            pointRadius: 3,
+                            pointHoverRadius: 6,
+                            fill: true
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false, // Required for chart container styling
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    plugins: {
+                        legend: {
+                            display: false // Using custom HTML legend below the chart
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(30, 41, 59, 0.9)',
+                            titleFont: { family: 'Inter', size: 13 },
+                            bodyFont: { family: 'Inter', size: 13 },
+                            padding: 12,
+                            cornerRadius: 8,
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        label += context.parsed.y.toFixed(1) + ' Index';
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            min: 95,
+                            max: 110,
+                            grid: {
+                                color: '#f1f5f9',
+                                drawBorder: false,
+                            },
+                            ticks: {
+                                font: { family: 'Inter', size: 11 },
+                                color: '#94a3b8'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false,
+                                drawBorder: false,
+                            },
+                            ticks: {
+                                font: { family: 'Inter', size: 11 },
+                                color: '#94a3b8'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
