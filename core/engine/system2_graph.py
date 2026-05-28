@@ -1,4 +1,9 @@
+"""
+Observed Drift: Added strict type hints and hoisted imports to align with high-assurance engineering standards.
+"""
 from langgraph.graph import StateGraph, END
+from langgraph.graph.state import CompiledStateGraph
+import logging
 from typing import Literal
 
 from core.engine.system2_state import System2State
@@ -20,14 +25,13 @@ def route_validation_feedback(state: System2State) -> Literal["regenerate", "fin
     
     if iteration_count >= max_iterations:
         # We hit the max loops. Force exit to prevent infinite hallucination loops.
-        import logging
         logging.error(f"[{state.get('company_ticker')}] Max Iterations ({max_iterations}) reached. Model still invalid. Forcing finalize.")
         return "finalize"
         
     # The model was invalid but we still have iterations left. Loop back.
     return "regenerate"
 
-def build_system2_graph():
+def build_system2_graph() -> CompiledStateGraph:
     """
     Constructs the cyclic "Neuro-Symbolic Graph" for financial modeling.
     Returns the compiled LangGraph application.
