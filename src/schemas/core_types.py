@@ -3,10 +3,15 @@ from pydantic import BaseModel, Field
 from src.governance.gatekeeper import ProvenanceHeader
 
 class AgentInput(BaseModel):
+    """Deterministic input data and context for agent execution."""
     data: Dict[str, Any] = Field(..., description="Deterministic input data")
     context: str = Field("", description="Additional context for the agent")
 
 class AgentOutput(BaseModel):
+    """
+    Deterministic output payload and provenance trace for agent execution.
+    Provides strict type checking across all agents (Nexus/Sentinel) for horizontal scaling.
+    """
     provenance_trace: ProvenanceHeader = Field(..., description="W3C PROV-O compliant provenance trace")
     data: Dict[str, Any] = Field(..., description="Deterministic output payload")
-    observed_drift: bool = Field(False, description="Flag indicating if logic shifted from existing implementation")
+    observed_drift: bool = Field(False, description="Flag indicating if logic shifted from existing implementation, triggers self-healing")
