@@ -24415,23 +24415,23 @@ window.FILESYSTEM_MANIFEST = [
         "modified": "2026-02-22T23:55:19.788501"
       },
       {
-        "name": "2022 Year in Review: Navigating a Turbulent Market.html",
+        "name": "2022 Year in Review - Navigating a Turbulent Market.html",
         "type": "file",
-        "path": "./showcase/2022 Year in Review: Navigating a Turbulent Market.html",
+        "path": "./showcase/2022 Year in Review - Navigating a Turbulent Market.html",
         "size": 35581,
         "modified": "2026-02-22T23:55:19.788501"
       },
       {
-        "name": "2023 Year in Review: A Year of Recovery and Resilience.html",
+        "name": "2023 Year in Review - A Year of Recovery and Resilience.html",
         "type": "file",
-        "path": "./showcase/2023 Year in Review: A Year of Recovery and Resilience.html",
+        "path": "./showcase/2023 Year in Review - A Year of Recovery and Resilience.html",
         "size": 35434,
         "modified": "2026-02-22T23:55:19.792501"
       },
       {
-        "name": "2024 Year in Review: Navigating Uncertainty and Transition.html",
+        "name": "2024 Year in Review - Navigating Uncertainty and Transition.html",
         "type": "file",
-        "path": "./showcase/2024 Year in Review: Navigating Uncertainty and Transition.html",
+        "path": "./showcase/2024 Year in Review - Navigating Uncertainty and Transition.html",
         "size": 35868,
         "modified": "2026-02-22T23:55:19.792501"
       },
@@ -25815,9 +25815,9 @@ window.FILESYSTEM_MANIFEST = [
         "modified": "2026-02-22T23:55:19.856501"
       },
       {
-        "name": "Q1 2025 and Full Year Outlook: Navigating a Bifurcated Market.html",
+        "name": "Q1 2025 and Full Year Outlook - Navigating a Bifurcated Market.html",
         "type": "file",
-        "path": "./showcase/Q1 2025 and Full Year Outlook: Navigating a Bifurcated Market.html",
+        "path": "./showcase/Q1 2025 and Full Year Outlook - Navigating a Bifurcated Market.html",
         "size": 36342,
         "modified": "2026-02-22T23:55:19.856501"
       },
