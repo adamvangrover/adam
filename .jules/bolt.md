@@ -168,3 +168,7 @@
 ## 2026-11-29 - [Optimized Loading Component Style Injection]
 **Learning:** React components that inject `<style>` tags on every render cause unnecessary style recalculations and layout thrashing, especially inside components with frequent state updates (like `AgentIntercom` which updates every 4s).
 **Action:** Always extract `@keyframes` and static CSS classes to global CSS files (e.g., `index.css`) rather than using inline `<style>` injections within heavily re-rendered functional components.
+
+## 2023-10-25 - [Optimize JSON Schema Validation]
+**Learning:** `jsonschema.validate()` implicitly evaluates the validity of the schema and re-compiles the validator upon every single function call. This creates significant overhead when doing frequent validations against a static schema (like inside the GovernanceGatekeeper processing loops).
+**Action:** Always extract the validation to an explicitly instantiated validator class (e.g., using `jsonschema.validators.validator_for(schema)` and pre-compiling it via `ValidatorClass(schema)`) to reuse it across multiple validations for a dramatic speedup (often 50-100x).
