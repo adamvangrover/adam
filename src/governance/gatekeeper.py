@@ -29,6 +29,11 @@ class GovernanceGatekeeper:
         """
         self.schema = schema
 
+        # Pre-compile the JSON schema validator for performance
+        ValidatorClass = jsonschema.validators.validator_for(schema)
+        ValidatorClass.check_schema(schema)
+        self.validator = ValidatorClass(schema)
+
     def validate_inference(self, inference_output: Dict[str, Any]) -> Dict[str, Any]:
         """
         Validates LLM probabilistic inferences natively using jsonschema.
@@ -55,7 +60,7 @@ class GovernanceGatekeeper:
             raise GovernanceError("Missing 'data' payload in inference output.")
 
         try:
-            jsonschema.validate(instance=payload, schema=self.schema)
+            self.validator.validate(instance=payload)
         except jsonschema.exceptions.ValidationError as e:
             raise GovernanceError(f"Schema validation failed: {e.message}")
 
