@@ -2,8 +2,22 @@ name: CI / Security
 on:
   push:
     branches: [ main, master ]
+    paths:
+      - '**/*.py'
+      - '**/*.rs'
+      - '**/*.js'
+      - '**/*.ts'
+      - 'package.json'
+      - 'Cargo.toml'
   pull_request:
     branches: [ main, master ]
+    paths:
+      - '**/*.py'
+      - '**/*.rs'
+      - '**/*.js'
+      - '**/*.ts'
+      - 'package.json'
+      - 'Cargo.toml'
   schedule:
     - cron: '0 0 * * 0'
 jobs:
@@ -24,8 +38,11 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install bandit
+          pip install pip-audit
       - name: Run Bandit (Python Security)
         run: bandit -r core services scripts -ll -x tests
+      - name: Run pip-audit
+        run: pip-audit -r requirements/base.txt
   rust-security:
     runs-on: ubuntu-latest
     steps:
@@ -51,3 +68,16 @@ jobs:
       - name: Run NPM Audit
         working-directory: services/webapp/client
         run: npm audit --audit-level=high || echo "NPM audit found issues"
+  codeql-analysis:
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: python, javascript
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
