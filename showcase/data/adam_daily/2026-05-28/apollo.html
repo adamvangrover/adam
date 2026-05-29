@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Apollo's Shift to Daily Pricing in Private Credit</title>
+    <title>Apollo Pricing Shift Dashboard</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -22,6 +22,7 @@
                         'brand-primary': '#1e3a8a', // Deep trustworthy blue
                         'brand-secondary': '#64748b', // Slate gray
                         'brand-accent': '#ea580c', // Subtle orange accent for alerts/changes
+                        'brand-alert': '#b91c1c', // Deep red for risk/impact
                         'brand-text': '#1e293b', // Dark slate for text
                     },
                     fontFamily: {
@@ -46,12 +47,18 @@
         .chart-container {
             position: relative;
             width: 100%;
-            max-width: 1000px; /* Constrain max width for readability */
+            max-width: 1000px;
             margin-left: auto;
             margin-right: auto;
-            height: 45vh; /* Responsive height */
+            height: 45vh;
             max-height: 500px;
             min-height: 300px;
+        }
+        
+        .bar-chart-container {
+             position: relative;
+             width: 100%;
+             height: 300px;
         }
 
         /* Timeline specific styles */
@@ -63,7 +70,7 @@
             background-color: #1e3a8a;
             color: white;
             border-color: #1e3a8a;
-            transform: scale(1.05);
+            transform: scale(1.02);
         }
         
         /* Interactive Cards */
@@ -78,6 +85,7 @@
         /* Custom Scrollbar for inner content if needed */
         ::-webkit-scrollbar {
             width: 8px;
+            height: 8px;
         }
         ::-webkit-scrollbar-track {
             background: #f1f1f1; 
@@ -93,27 +101,13 @@
 </head>
 <body class="bg-brand-bg text-brand-text">
 
-    <!-- Chosen Palette: Warm Neutrals & Institutional Slate/Blue -->
-    <!-- Application Structure Plan: 
-         1. Executive Summary (Hero): High-impact metrics ($830B) to establish scale.
-         2. The Core Shift (Visualization): A Chart.js visualization contrasting traditional quarterly pricing with the new daily pricing to instantly communicate the "black box" vs "transparency" concept.
-         3. Implementation Timeline (Interactive): A horizontal interactive timeline allowing users to click and explore the rollout phases.
-         4. Methodology & Drivers (Interactive Grid): A categorized dashboard grid letting users toggle between 'How they are doing it' and 'Why they are doing it', keeping the UI clean while offering deep dives.
-         Rationale: This structure moves from the 'What' (scale and concept) to the 'When' (timeline) and finally the 'How/Why' (methodology/drivers), providing a logical, user-driven exploration path rather than a static wall of text.
-    -->
-    <!-- Visualization & Content Choices:
-         - Goal: Inform Scale -> Viz: Dynamic JS counter ($830B) -> Interaction: Auto-animate on load -> Justification: Grabs attention immediately.
-         - Goal: Compare Pricing Models -> Viz: Chart.js Line Chart -> Interaction: Hover tooltips showing the lag of quarterly vs daily -> Justification: Best way to visualize the "lagging" nature of quarterly valuations mentioned in the text.
-         - Goal: Organize Timeline -> Viz: Interactive HTML/CSS horizontal timeline -> Interaction: Click dates to update text pane -> Justification: Consolidates dates into a spatial format, better than bullet points. (NO SVG used, pure HTML/CSS nodes).
-         - Goal: Explain Methodology/Drivers -> Viz: Interactive Tabbed Cards -> Interaction: Click tabs to swap content -> Justification: Groups related textual insights without overwhelming the user.
-    -->
-    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
-
     <!-- Navigation / Header -->
     <nav class="bg-brand-primary text-white sticky top-0 z-50 shadow-md">
-        <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
+        <div class="max-w-6xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center gap-2">
             <div class="font-bold text-xl tracking-tight">Apollo Pricing Intelligence</div>
-            <div class="text-sm opacity-80">Interactive Briefing</div>
+            <div class="flex items-center gap-3">
+                <div class="text-sm opacity-80 border border-blue-400 px-3 py-1 rounded">RESTRICTED: INTERNAL</div>
+            </div>
         </div>
     </nav>
 
@@ -148,14 +142,14 @@
             <div class="max-w-3xl mb-8">
                 <h2 class="text-2xl font-bold text-brand-primary mb-3">The Valuation Paradigm Shift</h2>
                 <p class="text-brand-secondary leading-relaxed">
-                    This section illustrates the core problem Apollo is solving. Historically, private credit relied on lagging, stepped quarterly valuations—the "black box." Apollo's new methodology uses actual trades and macro trends to emulate public markets, resulting in a responsive, daily valuation curve. 
+                    This section illustrates the core problem Apollo is solving. Historically, private credit relied on lagging, stepped quarterly valuations. Apollo's new methodology uses actual trades and macro trends to emulate public markets, resulting in a responsive, daily valuation curve. 
                 </p>
             </div>
             
             <div class="chart-container bg-gray-50 rounded-xl p-4 border border-gray-100">
                 <canvas id="pricingComparisonChart"></canvas>
             </div>
-            <div class="flex justify-center gap-6 mt-4 text-sm text-brand-secondary">
+            <div class="flex flex-wrap justify-center gap-6 mt-4 text-sm text-brand-secondary">
                 <div class="flex items-center gap-2">
                     <div class="w-4 h-4 bg-gray-300 rounded-sm"></div>
                     <span>Traditional Quarterly Pricing (Lagging, Flat)</span>
@@ -169,9 +163,9 @@
 
         <!-- SECTION 3: Rollout Timeline -->
         <section>
-            <h2 class="text-2xl font-bold text-brand-primary mb-3">Rollout Timeline</h2>
+            <h2 class="text-2xl font-bold text-brand-primary mb-3">Implementation Timeline</h2>
             <p class="text-brand-secondary mb-8 max-w-2xl">
-                Explore the phased approach Apollo is taking to implement this massive infrastructure shift. Click on the milestones below to see which asset classes are affected.
+                Explore the phased approach Apollo is taking to implement this massive infrastructure shift.
             </p>
 
             <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 md:p-10">
@@ -213,44 +207,199 @@
             </div>
         </section>
 
-        <!-- SECTION 4: Methodology & Market Drivers (Interactive Dashboard) -->
+        <!-- SECTION 4: Broadly Syndicated Loan (BSL) Pricing -->
         <section>
-            <h2 class="text-2xl font-bold text-brand-primary mb-3">Strategic Execution & Industry Impact</h2>
+            <h2 class="text-2xl font-bold text-brand-primary mb-3">Broadly Syndicated Loan (BSL) Market Exposure</h2>
+            <p class="text-brand-secondary mb-8 max-w-3xl">
+                The daily pricing model immediately uncovers collateral quality drift in the $1.4 Trillion BSL market, specifically exposing vulnerabilities in CLO structures and loans facing duration mismatch or lagging marks.
+            </p>
+
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden mb-8">
+                <div class="p-6 border-b border-gray-200 bg-gray-50 flex justify-between items-center flex-wrap gap-4">
+                    <h3 class="font-bold text-lg text-brand-text">Targeted BSL Security Pricing (Most Likely Impacted)</h3>
+                    <div class="text-sm font-mono text-brand-secondary bg-white px-3 py-1 rounded border border-gray-200">Simulated Daily Marks</div>
+                </div>
+                
+                <!-- Targeted BSL Security Pricing Table -->
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-gray-100 text-brand-secondary text-xs uppercase tracking-wider">
+                                <th class="p-4 font-semibold">Security Name</th>
+                                <th class="p-4 font-semibold">CUSIP/ID</th>
+                                <th class="p-4 font-semibold">Historical Mark</th>
+                                <th class="p-4 font-semibold">Target Daily Price</th>
+                                <th class="p-4 font-semibold">Spread Impact</th>
+                                <th class="p-4 font-semibold">Vulnerability Driver</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-brand-text text-sm divide-y divide-gray-100">
+                            <tr class="hover:bg-blue-50 transition">
+                                <td class="p-4 font-medium text-brand-primary">Cloudflare Inc. Term Loan B</td>
+                                <td class="p-4 font-mono text-xs text-gray-500">18915M AA8</td>
+                                <td class="p-4">99.75</td>
+                                <td class="p-4 text-brand-alert font-bold">98.10</td>
+                                <td class="p-4 text-brand-alert">+45 bps</td>
+                                <td class="p-4 text-xs text-brand-secondary">High valuation tech sensitivity to daily rate shifts</td>
+                            </tr>
+                            <tr class="hover:bg-blue-50 transition">
+                                <td class="p-4 font-medium text-brand-primary">Ultimate Software Group TLB</td>
+                                <td class="p-4 font-mono text-xs text-gray-500">90385U AQ3</td>
+                                <td class="p-4">98.50</td>
+                                <td class="p-4 text-brand-alert font-bold">96.85</td>
+                                <td class="p-4 text-brand-alert">+60 bps</td>
+                                <td class="p-4 text-xs text-brand-secondary">Leveraged SaaS cash flow duration mismatch</td>
+                            </tr>
+                            <tr class="hover:bg-blue-50 transition">
+                                <td class="p-4 font-medium text-brand-primary">PetVet Care Centers TLB</td>
+                                <td class="p-4 font-mono text-xs text-gray-500">716760 AC5</td>
+                                <td class="p-4">97.00</td>
+                                <td class="p-4 text-brand-alert font-bold">94.20</td>
+                                <td class="p-4 text-brand-alert">+85 bps</td>
+                                <td class="p-4 text-xs text-brand-secondary">Rollup structure heavily reliant on lagging marks</td>
+                            </tr>
+                            <tr class="hover:bg-blue-50 transition">
+                                <td class="p-4 font-medium text-brand-primary">Envision Healthcare TL</td>
+                                <td class="p-4 font-mono text-xs text-gray-500">29364G AK2</td>
+                                <td class="p-4">82.15</td>
+                                <td class="p-4 text-brand-alert font-bold">75.50</td>
+                                <td class="p-4 text-brand-alert">+120 bps</td>
+                                <td class="p-4 text-xs text-brand-secondary">Distressed healthcare structurally exposed</td>
+                            </tr>
+                            <tr class="hover:bg-blue-50 transition">
+                                <td class="p-4 font-medium text-brand-primary">Asurion LLC Term Loan B-9</td>
+                                <td class="p-4 font-mono text-xs text-gray-500">04646X AY7</td>
+                                <td class="p-4">98.25</td>
+                                <td class="p-4 text-brand-alert font-bold">97.10</td>
+                                <td class="p-4 text-brand-alert">+35 bps</td>
+                                <td class="p-4 text-xs text-brand-secondary">Large cap borrower, but subject to broad index liquidity drain</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- BSL Analysis Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-brand-bg p-6 rounded-xl border border-gray-200">
+                    <h3 class="font-bold text-lg mb-2 text-brand-primary">CLO Issuance & Quality Drift</h3>
+                    <p class="text-sm text-brand-secondary leading-relaxed mb-4">
+                        Daily pricing reveals a growing concern in CLO collateral pools. Recent tranches show CCC-rated buckets nearing their 7.5% caps. By marking these loans daily instead of waiting for quarterly downgrades, managers can preemptively optimize portfolio composition before trigger events occur.
+                    </p>
+                    <div class="h-3 w-full bg-gray-200 rounded-full overflow-hidden flex">
+                        <div class="h-full bg-brand-primary w-[65%]" title="B- or higher (65%)"></div>
+                        <div class="h-full bg-yellow-400 w-[28%]" title="CCC+ (28%)"></div>
+                        <div class="h-full bg-brand-alert w-[7%]" title="CCC/CCC- (7% - Nearing Cap)"></div>
+                    </div>
+                    <div class="flex justify-between text-xs mt-2 text-gray-500 font-semibold">
+                        <span>High Quality Pool</span>
+                        <span class="text-brand-alert">Approaching Limit (7.5%)</span>
+                    </div>
+                </div>
+
+                <div class="bg-brand-bg p-6 rounded-xl border border-gray-200">
+                    <h3 class="font-bold text-lg mb-2 text-brand-primary">The "Higher for Longer" Impact</h3>
+                    <p class="text-sm text-brand-secondary leading-relaxed">
+                        With SOFR rates remaining elevated, interest coverage ratios (ICRs) across the BSL market are deteriorating rapidly. Traditional quarterly models mask this cash-flow bleed. Daily valuations incorporate live SOFR curves, immediately pricing the increased default probability into the loan's current mark, providing true algorithmic transparency.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 5 & 6: Premium Compression & Pricing Ranges -->
+        <section class="space-y-6 bg-white p-8 rounded-2xl shadow-sm border border-gray-200">
+            <div class="mb-8 border-b border-gray-100 pb-8">
+                <h2 class="text-3xl font-extrabold text-brand-primary mb-4">The Illiquidity Premium Compression Event</h2>
+                <p class="text-lg text-brand-secondary leading-relaxed mb-6">
+                    By introducing continuous price discovery to traditionally opaque Level 3 assets, the artificial dampening of volatility—historically used to smooth returns—will evaporate. The traditional "illiquidity premium" is currently mispriced because it relies on stale marks.
+                </p>
+                <div class="flex flex-wrap gap-4">
+                    <span class="bg-blue-50 text-brand-primary font-semibold px-4 py-2 rounded-lg border border-blue-100">Projected Secondary Volume Spike: +150%</span>
+                    <span class="bg-red-50 text-brand-alert font-semibold px-4 py-2 rounded-lg border border-red-100">Est. Average Mark-Down (Level 3): 3.5% - 8.0%</span>
+                </div>
+            </div>
+
+            <h3 class="text-2xl font-bold text-brand-text mb-3">Projected Pricing Ranges: The Efficiency Squeeze</h3>
+            <p class="text-brand-secondary mb-8">
+                As algorithmic scrutiny is applied, the gap between "bid-ask" and "fair value" will violently narrow.
+            </p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                <div class="bg-gray-50 p-6 rounded-xl border border-gray-200">
+                    <h4 class="font-bold text-md mb-4 text-center text-brand-text">Pre-Pivot vs. Post-Pivot Valuation Ranges</h4>
+                    <div class="bar-chart-container">
+                        <canvas id="valuationRangeChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="flex flex-col justify-center space-y-4">
+                    <div class="bg-brand-bg p-5 rounded-lg border border-gray-200 shadow-sm flex items-start">
+                        <span class="text-2xl mr-4">🏢</span>
+                        <div>
+                            <span class="font-bold text-brand-text block">Middle-Market CRE Debt</span>
+                            <span class="text-sm text-brand-secondary">Historical: 98-100 &rarr; <span class="font-bold text-brand-alert">Projected: 82-88</span></span>
+                            <p class="text-xs text-gray-500 mt-1">Driving factor: Realized vacancy rates finally pricing into the debt.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-brand-bg p-5 rounded-lg border border-gray-200 shadow-sm flex items-start">
+                        <span class="text-2xl mr-4">💻</span>
+                        <div>
+                            <span class="font-bold text-brand-text block">Venture Debt (Growth Tech)</span>
+                            <span class="text-sm text-brand-secondary">Historical: 95-100 &rarr; <span class="font-bold text-brand-alert">Projected: 75-85</span></span>
+                            <p class="text-xs text-gray-500 mt-1">Driving factor: Unprofitable tech duration mismatch priced daily against the Nasdaq volatility.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-brand-bg p-5 rounded-lg border border-gray-200 shadow-sm flex items-start">
+                        <span class="text-2xl mr-4">🚢</span>
+                        <div>
+                            <span class="font-bold text-brand-text block">Aircraft & Shipping Leasing</span>
+                            <span class="text-sm text-brand-secondary">Historical: 92-96 &rarr; <span class="font-bold text-brand-alert">Projected: 85-90</span></span>
+                            <p class="text-xs text-gray-500 mt-1">Driving factor: Highly vulnerable to daily geopolitical supply chain pricing sensitivity.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 7: Strategic Execution & Industry Impact (Interactive Dashboard) -->
+        <section>
+            <h2 class="text-2xl font-bold text-brand-primary mb-3">Strategic Execution Mechanics</h2>
             <p class="text-brand-secondary mb-8 max-w-2xl">
                 Understanding <em>how</em> Apollo is achieving this and <em>why</em> they are doing it now is critical. Toggle between Methodology (the mechanics) and Drivers (the market forces).
             </p>
 
             <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-                
                 <!-- Tab Controls -->
-                <div class="flex border-b border-gray-200 bg-gray-50">
+                <div class="flex flex-col sm:flex-row border-b border-gray-200 bg-gray-50">
                     <button class="flex-1 py-4 px-6 text-center font-bold text-brand-primary border-b-2 border-brand-primary bg-white focus:outline-none transition-colors" id="tab-btn-methodology" onclick="switchTab('methodology')">
                         Methodology (How)
                     </button>
                     <button class="flex-1 py-4 px-6 text-center font-bold text-brand-secondary border-b-2 border-transparent hover:bg-gray-100 hover:text-brand-text focus:outline-none transition-colors" id="tab-btn-drivers" onclick="switchTab('drivers')">
-                        Market Drivers & Implications (Why)
+                        Market Drivers (Why)
                     </button>
                 </div>
 
                 <!-- Tab Content: Methodology -->
                 <div id="tab-content-methodology" class="p-6 md:p-10 grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div class="interactive-card bg-brand-bg p-6 rounded-xl border border-gray-200">
-                        <div class="text-2xl mb-4">📊</div>
-                        <h3 class="font-bold text-lg mb-2">Data Synthesis</h3>
+                        <div class="text-3xl mb-4">📊</div>
+                        <h3 class="font-bold text-lg mb-2 text-brand-text">Data Synthesis</h3>
                         <p class="text-sm text-brand-secondary leading-relaxed">
                             Instead of static prices, marks shift daily based on changing interest rates, credit spreads, and actual market trends. Apollo observes live trades and baselines against comparable public valuations.
                         </p>
                     </div>
                     <div class="interactive-card bg-brand-bg p-6 rounded-xl border border-gray-200">
-                        <div class="text-2xl mb-4">🤝</div>
-                        <h3 class="font-bold text-lg mb-2">Strategic Partnerships</h3>
+                        <div class="text-3xl mb-4">🤝</div>
+                        <h3 class="font-bold text-lg mb-2 text-brand-text">Strategic Partnerships</h3>
                         <p class="text-sm text-brand-secondary leading-relaxed">
-                            Apollo is collaborating closely with Intercontinental Exchange Inc. (ICE) via ICE Private Credit Intelligence. This partnership provides the external data infrastructure needed to optimize data tracking.
+                            Apollo is collaborating closely with external data providers like Intercontinental Exchange Inc. (ICE) via ICE Private Credit Intelligence to build the required pricing infrastructure.
                         </p>
                     </div>
                     <div class="interactive-card bg-brand-bg p-6 rounded-xl border border-gray-200">
-                        <div class="text-2xl mb-4">🛡️</div>
-                        <h3 class="font-bold text-lg mb-2">Conservative Alignment</h3>
+                        <div class="text-3xl mb-4">🛡️</div>
+                        <h3 class="font-bold text-lg mb-2 text-brand-text">Conservative Alignment</h3>
                         <p class="text-sm text-brand-secondary leading-relaxed">
                             To ensure trust and mitigate risk, for positions shared with third parties, Apollo plans a conservative approach: aligning its marks to the lowest observable valuation available.
                         </p>
@@ -260,43 +409,82 @@
                 <!-- Tab Content: Drivers -->
                 <div id="tab-content-drivers" class="p-6 md:p-10 grid grid-cols-1 md:grid-cols-3 gap-6 hidden">
                     <div class="interactive-card bg-blue-50 p-6 rounded-xl border border-blue-100">
-                        <div class="text-2xl mb-4">👥</div>
+                        <div class="text-3xl mb-4">👥</div>
                         <h3 class="font-bold text-lg text-brand-primary mb-2">Retail Demand</h3>
                         <p class="text-sm text-brand-secondary leading-relaxed">
                             Individual and wealth-channel investors are increasingly moving into private assets. Unlike institutional capital, these cohorts require liquidity-like visibility and daily confidence in their holdings.
                         </p>
                     </div>
                     <div class="interactive-card bg-blue-50 p-6 rounded-xl border border-blue-100">
-                        <div class="text-2xl mb-4">📉</div>
+                        <div class="text-3xl mb-4">📉</div>
                         <h3 class="font-bold text-lg text-brand-primary mb-2">Redemption Jitters</h3>
                         <p class="text-sm text-brand-secondary leading-relaxed">
-                            The industry is facing pressure from record retail redemption requests. Increased portfolio transparency is a direct mechanism to calm these jitters and build investor confidence.
+                            The industry is facing pressure from retail redemption requests. Increased portfolio transparency is a direct mechanism to calm these jitters and force a trusted baseline.
                         </p>
                     </div>
                     <div class="interactive-card bg-blue-50 p-6 rounded-xl border border-blue-100">
-                        <div class="text-2xl mb-4">⚔️</div>
+                        <div class="text-3xl mb-4">⚔️</div>
                         <h3 class="font-bold text-lg text-brand-primary mb-2">Competitive Disruption</h3>
                         <p class="text-sm text-brand-secondary leading-relaxed">
-                            This move is highly disruptive. While competitors resist, experts argue Apollo's scale ($830B) will inevitably pressure peers to justify their ongoing quarterly opacity.
+                            This move is highly disruptive. While competitors resist, experts argue Apollo's massive scale will inevitably pressure peers to justify their ongoing quarterly opacity or lose allocation.
                         </p>
                     </div>
                 </div>
-
             </div>
         </section>
 
-        <!-- Footer / CTA -->
-        <section class="mt-12 bg-brand-primary text-white rounded-2xl p-8 md:p-12 text-center shadow-lg">
-            <h2 class="text-2xl md:text-3xl font-bold mb-4">Evaluating Private Asset Options?</h2>
-            <p class="text-blue-100 max-w-2xl mx-auto mb-8 leading-relaxed">
-                As the industry shifts toward transparency, understanding liquidity profiles and underlying asset performance is more critical than ever. 
-            </p>
+        <!-- SECTION 8: Knock-On Effects -->
+        <section class="bg-brand-primary text-white rounded-2xl p-8 md:p-10 shadow-lg">
+            <h2 class="text-2xl font-bold mb-8 text-center md:text-left">Knock-On Effects: Ecosystem Re-Wiring</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                <div class="bg-white/10 p-6 rounded-xl border border-white/20">
+                    <h3 class="font-bold text-xl mb-4 text-blue-200 border-b border-blue-400/30 pb-2">Primary Issuance Market</h3>
+                    <ul class="list-none space-y-4 text-blue-50">
+                        <li class="flex items-start">
+                            <span class="mr-3 text-brand-accent font-bold">→</span>
+                            <span><strong>Pricing Discipline:</strong> Sponsors (PE firms) can no longer issue debt with aggressive EBITDA add-backs without facing immediate secondary market punishment. Primary yields will widen.</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="mr-3 text-brand-accent font-bold">→</span>
+                            <span><strong>Shorter Duration:</strong> To minimize daily volatility exposure, issuers will pivot to shorter-dated paper (3-4 years) rather than the standard 7-year structures.</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="mr-3 text-brand-accent font-bold">→</span>
+                            <span><strong>Covenant Re-Tightening:</strong> Cov-lite issuance is projected to drop significantly as data providers demand structural protections for par valuations.</span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="bg-white/10 p-6 rounded-xl border border-white/20">
+                    <h3 class="font-bold text-xl mb-4 text-blue-200 border-b border-blue-400/30 pb-2">Secondaries Market Transformation</h3>
+                    <ul class="list-none space-y-4 text-blue-50">
+                        <li class="flex items-start">
+                            <span class="mr-3 text-brand-accent font-bold">→</span>
+                            <span><strong>LP Liquidity Explosion:</strong> With daily marks providing a trusted baseline, the bid-ask spread for LP stakes will collapse, driving secondary volumes up (+150% projected).</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="mr-3 text-brand-accent font-bold">→</span>
+                            <span><strong>Algorithmic Arbitrage:</strong> Quant funds will enter the space, executing statistical arbitrage between public proxies (e.g., HY ETFs) and newly available daily private credit marks.</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="mr-3 text-brand-accent font-bold">→</span>
+                            <span><strong>The "Zombie Fund" Purge:</strong> Managers hiding underperforming assets behind appraisal lags will face forced liquidations and industry consolidation.</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Action / CTA -->
+        <section class="mt-8 text-center py-8">
+            <h2 class="text-xl md:text-2xl font-bold mb-6 text-brand-text">Simulate Impact on Your Portfolio</h2>
             <div class="flex flex-col sm:flex-row justify-center gap-4">
-                <button onclick="alert('Module: Redemption Liquidity Analysis Simulation triggered.')" class="bg-white text-brand-primary font-bold py-3 px-6 rounded-lg hover:bg-gray-100 transition shadow-sm">
-                    Analyze Redemption Liquidity
+                <button onclick="alert('System Alert: Initiating Stress Test. Loading Level 3 Asset Overlays...')" class="bg-brand-primary text-white font-bold py-3 px-8 rounded-lg hover:bg-blue-800 transition shadow-md">
+                    Run NAV Stress Test
                 </button>
-                <button onclick="alert('Module: Peer Performance Comparison Simulation triggered.')" class="bg-transparent border border-white text-white font-bold py-3 px-6 rounded-lg hover:bg-white hover:text-brand-primary transition shadow-sm">
-                    Compare Peer Performance
+                <button onclick="alert('System Alert: Liquidity model processing. Compressing Illiquidity Premium factors...')" class="bg-white border-2 border-brand-primary text-brand-primary font-bold py-3 px-8 rounded-lg hover:bg-gray-50 transition shadow-sm">
+                    Analyze Redemption Liquidity
                 </button>
             </div>
         </section>
@@ -304,8 +492,8 @@
     </main>
 
     <footer class="bg-white border-t border-gray-200 py-8 mt-12 text-center text-sm text-brand-secondary">
-        <p>Source Data: Apollo Global Management Announcements (May 2026 Context)</p>
-        <p class="mt-2 text-xs opacity-70">Generated for analytical exploration.</p>
+        <p class="font-semibold">Neural System Analysis Engine | Module: Apollo Pricing Impact Dynamics</p>
+        <p class="mt-2 text-xs opacity-70">Source Data: Apollo Global Management Market Activity (Forward Looking Projection 2026)</p>
     </footer>
 
     <!-- Interactive Logic -->
@@ -328,14 +516,6 @@
             }, stepTime);
         };
 
-        // Initialize counter on load
-        window.addEventListener('DOMContentLoaded', () => {
-            setTimeout(() => {
-                animateCounter('aum-counter', 830, 2000);
-            }, 300);
-            initChart();
-        });
-
         // 2. Timeline Interaction Logic
         const timelineData = [
             {
@@ -346,7 +526,7 @@
             {
                 date: "September 30, 2026",
                 title: "Phase 2: Direct Lending & Asset-Backed",
-                desc: "Daily pricing expands comprehensively to include direct lending and asset-backed finance assets, completing the transition for the $830 billion credit platform."
+                desc: "Daily pricing expands comprehensively to include direct lending and asset-backed finance assets, completing the transition for the $830 billion credit platform. The Illiquidity Premium compression begins."
             }
         ];
 
@@ -391,57 +571,48 @@
             const contentDrivers = document.getElementById('tab-content-drivers');
 
             if (tabName === 'methodology') {
-                // Style buttons
                 btnMethod.className = "flex-1 py-4 px-6 text-center font-bold text-brand-primary border-b-2 border-brand-primary bg-white focus:outline-none transition-colors";
                 btnDrivers.className = "flex-1 py-4 px-6 text-center font-bold text-brand-secondary border-b-2 border-transparent hover:bg-gray-100 hover:text-brand-text focus:outline-none transition-colors";
-                // Show/Hide content
                 contentMethod.classList.remove('hidden');
                 contentDrivers.classList.add('hidden');
             } else {
-                // Style buttons
                 btnDrivers.className = "flex-1 py-4 px-6 text-center font-bold text-brand-primary border-b-2 border-brand-primary bg-white focus:outline-none transition-colors";
                 btnMethod.className = "flex-1 py-4 px-6 text-center font-bold text-brand-secondary border-b-2 border-transparent hover:bg-gray-100 hover:text-brand-text focus:outline-none transition-colors";
-                // Show/Hide content
                 contentDrivers.classList.remove('hidden');
                 contentMethod.classList.add('hidden');
             }
         }
 
-        // 4. Chart.js Visualization Logic
-        function initChart() {
-            const ctx = document.getElementById('pricingComparisonChart').getContext('2d');
-            
-            // Synthetic data to illustrate the concept of quarterly lag vs daily response
+        // 4. Chart.js Initialization
+        function initCharts() {
+            // Chart 1: Line Chart (Paradigm Shift)
+            const ctx1 = document.getElementById('pricingComparisonChart').getContext('2d');
             const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-            
-            // Quarterly Step Function (Lagging)
             const quarterlyData = [100, 100, 100, 102, 102, 102, 98, 98, 98, 105, 105, 105];
-            
-            // Daily/Responsive Function (Emulating market fluctuations leading to the quarterly mark)
             const dailyData = [100, 99.5, 101, 102, 103, 101.5, 98, 97, 99, 105, 106, 104.5];
 
-            new Chart(ctx, {
+            new Chart(ctx1, {
                 type: 'line',
                 data: {
                     labels: months,
                     datasets: [
                         {
-                            label: 'Traditional Quarterly (The "Black Box")',
+                            label: 'Traditional Quarterly',
                             data: quarterlyData,
-                            borderColor: '#cbd5e1', // Light gray
+                            borderColor: '#cbd5e1', 
                             backgroundColor: 'transparent',
                             borderWidth: 3,
-                            stepped: true, // Crucial for showing the flat quarterly nature
+                            stepped: true, 
                             pointRadius: 0,
                             pointHoverRadius: 6
                         },
                         {
-                            label: 'Apollo Daily Pricing (Transparent)',
+                            label: 'Apollo Daily Pricing',
                             data: dailyData,
-                            borderColor: '#1e3a8a', // Brand Primary
+                            borderColor: '#1e3a8a', 
                             backgroundColor: 'rgba(30, 58, 138, 0.1)',
                             borderWidth: 2,
-                            tension: 0.4, // Smooth curve to represent daily fluctuations
+                            tension: 0.4, 
                             pointBackgroundColor: '#ea580c',
                             pointBorderColor: '#fff',
                             pointRadius: 3,
@@ -452,15 +623,10 @@
                 },
                 options: {
                     responsive: true,
-                    maintainAspectRatio: false, // Required for chart container styling
-                    interaction: {
-                        mode: 'index',
-                        intersect: false,
-                    },
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
                     plugins: {
-                        legend: {
-                            display: false // Using custom HTML legend below the chart
-                        },
+                        legend: { display: false },
                         tooltip: {
                             backgroundColor: 'rgba(30, 41, 59, 0.9)',
                             titleFont: { family: 'Inter', size: 13 },
@@ -470,12 +636,8 @@
                             callbacks: {
                                 label: function(context) {
                                     let label = context.dataset.label || '';
-                                    if (label) {
-                                        label += ': ';
-                                    }
-                                    if (context.parsed.y !== null) {
-                                        label += context.parsed.y.toFixed(1) + ' Index';
-                                    }
+                                    if (label) label += ': ';
+                                    if (context.parsed.y !== null) label += context.parsed.y.toFixed(1) + ' Mark';
                                     return label;
                                 }
                             }
@@ -483,32 +645,79 @@
                     },
                     scales: {
                         y: {
-                            beginAtZero: false,
-                            min: 95,
-                            max: 110,
-                            grid: {
-                                color: '#f1f5f9',
-                                drawBorder: false,
-                            },
-                            ticks: {
-                                font: { family: 'Inter', size: 11 },
-                                color: '#94a3b8'
-                            }
+                            min: 95, max: 110,
+                            grid: { color: '#f1f5f9', drawBorder: false },
+                            ticks: { font: { family: 'Inter', size: 11 }, color: '#94a3b8' }
                         },
                         x: {
-                            grid: {
-                                display: false,
-                                drawBorder: false,
-                            },
-                            ticks: {
-                                font: { family: 'Inter', size: 11 },
-                                color: '#94a3b8'
-                            }
+                            grid: { display: false, drawBorder: false },
+                            ticks: { font: { family: 'Inter', size: 11 }, color: '#94a3b8' }
+                        }
+                    }
+                }
+            });
+
+            // Chart 2: Bar Chart (Valuation Range Compression)
+            const ctx2 = document.getElementById('valuationRangeChart').getContext('2d');
+            new Chart(ctx2, {
+                type: 'bar',
+                data: {
+                    labels: ['CRE Debt', 'Venture Tech', 'Leasing'],
+                    datasets: [
+                        {
+                            label: 'Historical Quarterly Mark',
+                            data: [99, 97, 94],
+                            backgroundColor: '#cbd5e1',
+                            borderColor: '#94a3b8',
+                            borderWidth: 1,
+                            barPercentage: 0.7,
+                            categoryPercentage: 0.8
+                        },
+                        {
+                            label: 'Projected Daily Efficient Price',
+                            data: [85, 80, 87],
+                            backgroundColor: '#1e3a8a',
+                            borderColor: '#1e3a8a',
+                            borderWidth: 1,
+                            barPercentage: 0.7,
+                            categoryPercentage: 0.8
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            min: 60, max: 105,
+                            title: { display: true, text: 'Price (Par = 100)', color: '#64748b', font: { family: 'Inter' } },
+                            grid: { color: '#f1f5f9' },
+                            ticks: { font: { family: 'Inter' }, color: '#64748b'}
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { font: { family: 'Inter', weight: 'bold' }, color: '#1e293b' }
+                        }
+                    },
+                    plugins: {
+                        legend: { position: 'bottom', labels: { font: { family: 'Inter' }, color: '#1e293b' } },
+                        tooltip: {
+                            backgroundColor: 'rgba(30, 41, 59, 0.9)',
+                            padding: 10,
+                            cornerRadius: 6,
+                            titleFont: { family: 'Inter' },
+                            bodyFont: { family: 'Inter' }
                         }
                     }
                 }
             });
         }
+
+        // Initialize all functions on load
+        window.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => { animateCounter('aum-counter', 830, 2000); }, 300);
+            initCharts();
+        });
     </script>
 </body>
 </html>
