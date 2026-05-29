@@ -476,16 +476,52 @@
             </div>
         </section>
 
-        <!-- Action / CTA -->
-        <section class="mt-8 text-center py-8">
-            <h2 class="text-xl md:text-2xl font-bold mb-6 text-brand-text">Simulate Impact on Your Portfolio</h2>
-            <div class="flex flex-col sm:flex-row justify-center gap-4">
-                <button onclick="alert('System Alert: Initiating Stress Test. Loading Level 3 Asset Overlays...')" class="bg-brand-primary text-white font-bold py-3 px-8 rounded-lg hover:bg-blue-800 transition shadow-md">
-                    Run NAV Stress Test
-                </button>
-                <button onclick="alert('System Alert: Liquidity model processing. Compressing Illiquidity Premium factors...')" class="bg-white border-2 border-brand-primary text-brand-primary font-bold py-3 px-8 rounded-lg hover:bg-gray-50 transition shadow-sm">
-                    Analyze Redemption Liquidity
-                </button>
+        <!-- SECTION 9: AI Market Shock Simulator -->
+        <section id="ai-simulator" class="mt-8 bg-gray-900 text-white rounded-2xl p-8 md:p-10 shadow-lg border border-gray-700 relative overflow-hidden">
+            <!-- Decorative background element -->
+            <div class="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 rounded-full bg-brand-primary opacity-20 blur-3xl pointer-events-none"></div>
+
+            <div class="relative z-10">
+                <h2 class="text-2xl md:text-3xl font-bold mb-4 flex items-center gap-3">
+                    <span class="text-brand-accent">✨</span> AI Market Shock Simulator
+                </h2>
+                <p class="text-gray-300 mb-6 max-w-3xl">
+                    Test how the private credit market and specific BSL assets would react to macroeconomic shocks under Apollo's daily pricing model. Input your own scenario or run a pre-configured stress test.
+                </p>
+
+                <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-inner">
+                    <div id="ai-error-msg" class="hidden mb-4 p-3 bg-red-900/50 border border-red-500 text-red-200 rounded text-sm"></div>
+                    
+                    <textarea id="scenario-input" class="w-full bg-gray-900 border border-gray-600 rounded-lg p-4 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-accent focus:border-transparent mb-4 transition-all" rows="3" placeholder="E.g., 'Core CPI prints at 5.5%, forcing the Fed to unexpectedly hike rates by 50bps while tech sector earnings miss projections...'"></textarea>
+                    
+                    <div class="flex flex-col sm:flex-row flex-wrap gap-4 items-center justify-between">
+                        <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+                            <button id="run-sim-btn" onclick="runAiSimulation()" class="bg-brand-accent text-white font-bold py-3 px-6 rounded-lg hover:bg-orange-600 transition shadow-md whitespace-nowrap flex items-center justify-center gap-2">
+                                ✨ Run Custom Simulation
+                            </button>
+                        </div>
+                        
+                        <div class="flex flex-wrap gap-2 w-full sm:w-auto">
+                            <button onclick="runPresetSimulation('A sudden 150bps widening in high-yield spreads accompanied by a wave of retail redemption requests across major private credit vehicles.')" class="bg-gray-700 text-gray-200 text-sm py-2 px-4 rounded hover:bg-gray-600 transition border border-gray-600">
+                                ✨ Run NAV Stress Test
+                            </button>
+                            <button onclick="runPresetSimulation('Retail investors request $10B in redemptions while BSL market liquidity dries up entirely, specifically hitting the SaaS and CRE sectors.')" class="bg-gray-700 text-gray-200 text-sm py-2 px-4 rounded hover:bg-gray-600 transition border border-gray-600">
+                                ✨ Analyze Redemption Liquidity
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Loading State -->
+                    <div id="sim-loading" class="hidden mt-8 flex flex-col items-center justify-center py-8">
+                        <div class="w-10 h-10 border-4 border-gray-600 border-t-brand-accent rounded-full animate-spin mb-4"></div>
+                        <p class="text-brand-accent font-mono text-sm animate-pulse">Synthesizing systemic risk models...</p>
+                    </div>
+
+                    <!-- Results Output -->
+                    <div id="sim-results" class="hidden mt-8 bg-gray-50 text-brand-text p-6 md:p-8 rounded-lg text-sm leading-relaxed border border-gray-200 shadow-inner overflow-hidden">
+                        <!-- AI content injected here -->
+                    </div>
+                </div>
             </div>
         </section>
 
@@ -718,6 +754,102 @@
             setTimeout(() => { animateCounter('aum-counter', 830, 2000); }, 300);
             initCharts();
         });
+
+        // 5. Gemini AI Integration
+        const apiKey = ""; // Exec environment provides this
+
+        async function fetchWithRetry(url, options, maxRetries = 5) {
+            const delays = [1000, 2000, 4000, 8000, 16000];
+            for (let i = 0; i < maxRetries; i++) {
+                try {
+                    const response = await fetch(url, options);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return await response.json();
+                } catch (error) {
+                    if (i === maxRetries - 1) throw error;
+                    await new Promise(resolve => setTimeout(resolve, delays[i]));
+                }
+            }
+        }
+
+        function runPresetSimulation(promptText) {
+            const inputField = document.getElementById('scenario-input');
+            inputField.value = promptText;
+            
+            // Scroll to the simulator section
+            document.getElementById('ai-simulator').scrollIntoView({ behavior: 'smooth' });
+            
+            // Short delay to let scrolling finish before running
+            setTimeout(() => {
+                runAiSimulation();
+            }, 500);
+        }
+
+        async function runAiSimulation() {
+            const input = document.getElementById('scenario-input').value;
+            const errorMsg = document.getElementById('ai-error-msg');
+            
+            if (!input.trim()) {
+                errorMsg.innerText = "Please enter a macroeconomic scenario to simulate.";
+                errorMsg.classList.remove('hidden');
+                return;
+            }
+            errorMsg.classList.add('hidden');
+
+            const btn = document.getElementById('run-sim-btn');
+            const loading = document.getElementById('sim-loading');
+            const resultsDiv = document.getElementById('sim-results');
+
+            btn.disabled = true;
+            btn.classList.add('opacity-50', 'cursor-not-allowed');
+            loading.classList.remove('hidden');
+            loading.classList.add('flex');
+            resultsDiv.classList.add('hidden');
+
+            const systemPrompt = `You are a Senior Risk Analyst evaluating a Private Credit portfolio. Apollo Global Management has just transitioned its $830B credit platform to 100% daily pricing, destroying the traditional "illiquidity premium" and exposing actual market volatility. 
+            
+            The user will provide a macroeconomic shock scenario. Your job is to predict the immediate fallout on the Broadly Syndicated Loan (BSL) market and Private Credit NAVs under this new transparent DAILY pricing model.
+            
+            Specifically highlight:
+            1. The estimated mark-to-market NAV impact (provide realistic percentage drops).
+            2. The impact on BSL collateral quality (specifically mentioning CLO structures if relevant).
+            3. Which specific sectors (e.g., Tech, CRE, Healthcare) face the most severe repricing based on the user's shock.
+            
+            Format the response in clean, raw HTML (use <h3>, <ul>, <li>, <p>, <strong>, and Tailwind utility classes for styling if desired, like <h3 class="text-xl font-bold text-brand-primary mb-3">). Do NOT wrap your response in markdown code blocks (\`\`\`html) - return ONLY the raw HTML string.`;
+
+            const payload = {
+                contents: [{ parts: [{ text: `Simulate this scenario: ${input}` }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] }
+            };
+
+            try {
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+                const result = await fetchWithRetry(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                let text = result.candidates?.[0]?.content?.parts?.[0]?.text || "<p>Simulation failed to generate a response.</p>";
+                
+                // Clean up any markdown artifacts in case the model ignores the formatting instruction
+                text = text.replace(/```html/gi, '').replace(/```/g, '');
+                
+                resultsDiv.innerHTML = text;
+                resultsDiv.classList.remove('hidden');
+            } catch (error) {
+                console.error("Simulation Error:", error);
+                errorMsg.innerHTML = "Error connecting to the AI Simulation Engine. Please try again later.";
+                errorMsg.classList.remove('hidden');
+            } finally {
+                btn.disabled = false;
+                btn.classList.remove('opacity-50', 'cursor-not-allowed');
+                loading.classList.add('hidden');
+                loading.classList.remove('flex');
+            }
+        }
     </script>
 </body>
 </html>
