@@ -8726,7 +8726,7 @@ window.MOCK_DATA = {
       "last_modified": 1768266822.940379
     },
     {
-      "path": "data/CACM:SaaS_DefaultRisk_v1.jsonld",
+      "path": "data/CACM-SaaS_DefaultRisk_v1.jsonld",
       "type": "file",
       "size": 2649,
       "last_modified": 1768266822.9363563
@@ -11144,7 +11144,7 @@ window.MOCK_DATA = {
       "last_modified": 1768266823.338364
     },
     {
-      "path": "docs/notebooks/CACM-ADK MVP: Interactive Notebook with UI.ipynb",
+      "path": "docs/notebooks/CACM-ADK-MVP-Interactive-Notebook-with-UI.ipynb",
       "type": "file",
       "size": 36687,
       "last_modified": 1768266823.326305

@@ -25,7 +25,7 @@ graph TD
 
     subgraph Ontologies
         E[context_definition.jsonld]
-        F[CACM:SaaS_DefaultRisk_v1.jsonld]
+        F[CACM-SaaS_DefaultRisk_v1.jsonld]
     end
 
     subgraph Core Data

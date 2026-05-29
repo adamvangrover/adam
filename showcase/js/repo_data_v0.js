@@ -10020,9 +10020,9 @@ window.REPO_DATA = {
     },
     {
       "id": 827,
-      "label": "CACM:SaaS_DefaultRisk_v1.jsonld",
+      "label": "CACM-SaaS_DefaultRisk_v1.jsonld",
       "group": "jsonld",
-      "path": "data/CACM:SaaS_DefaultRisk_v1.jsonld",
+      "path": "data/CACM-SaaS_DefaultRisk_v1.jsonld",
       "size": 2649,
       "lines": 0,
       "imports": [],
@@ -12742,9 +12742,9 @@ window.REPO_DATA = {
     },
     {
       "id": 1090,
-      "label": "CACM-ADK MVP: Interactive Notebook with UI.ipynb",
+      "label": "CACM-ADK-MVP-Interactive-Notebook-with-UI.ipynb",
       "group": "ipynb",
-      "path": "docs/notebooks/CACM-ADK MVP: Interactive Notebook with UI.ipynb",
+      "path": "docs/notebooks/CACM-ADK-MVP-Interactive-Notebook-with-UI.ipynb",
       "size": 36687,
       "lines": 0,
       "imports": [],
@@ -28824,7 +28824,7 @@ window.REPO_DATA = {
       }
     },
     "data": {
-      "CACM:SaaS_DefaultRisk_v1.jsonld": {
+      "CACM-SaaS_DefaultRisk_v1.jsonld": {
         "__file__": true,
         "type": "file",
         "size": 2649,
@@ -30285,7 +30285,7 @@ window.REPO_DATA = {
           "size": 51932,
           "lines": 0
         },
-        "CACM-ADK MVP: Interactive Notebook with UI.ipynb": {
+        "CACM-ADK-MVP-Interactive-Notebook-with-UI.ipynb": {
           "__file__": true,
           "type": "file",
           "size": 36687,

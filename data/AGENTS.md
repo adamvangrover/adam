@@ -231,7 +231,7 @@ Decision trees are used by agents to make decisions in a structured and transpar
 
 Ontologies and schemas provide a way to define the semantic context of the data in the ADAM system. They allow agents to understand the meaning of the data and to reason about it in a more intelligent way.
 
-### 3.1. `context_definition.jsonld` and `CACM:SaaS_DefaultRisk_v1.jsonld`
+### 3.1. `context_definition.jsonld` and `CACM-SaaS_DefaultRisk_v1.jsonld`
 
 *   **Purpose:** These files contain the ontologies and schemas for the ADAM system. They define the concepts, properties, and relationships that are used to represent the data in the system.
 *   **Schema:** The ontologies and schemas are represented in JSON-LD format, which is a standard for representing linked data in JSON.

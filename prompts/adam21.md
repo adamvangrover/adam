@@ -394,7 +394,7 @@ wsm_v7_1.py
 
 ./data:
 AGENTS.md
-CACM:SaaS_DefaultRisk_v1.jsonld
+CACM-SaaS_DefaultRisk_v1.jsonld
 DATA_NAVIGATION.md
 adam_core_data.json
 adam_market_baseline.json
@@ -471,7 +471,7 @@ utils.js
 
 ./docs/notebooks:
 AI_Overview_v2.ipynb
-CACM-ADK MVP: Interactive Notebook with UI.ipynb
+CACM-ADK-MVP-Interactive-Notebook-with-UI.ipynb
 Comprehensive_Credit_Analysis_Notebook.ipynb
 FAAv12.ipynb
 ICATv4.ipynb
