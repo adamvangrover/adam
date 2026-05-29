@@ -108,6 +108,7 @@
                 <span class="text-term-green">AI CAPEX:</span> MAG-7 HARDWARE SPEND EXCEEDS GDP OF FINLAND ///
                 <span class="text-term-gold">METALS:</span> PBOC CONTINUES GOLD ACCUMULATION PROGRAM ///
                 <span class="text-term-purple">DERIVATIVES:</span> 0DTE CALL GAMMA PEAKING AT 7550 STRIKE ///
+                <span class="text-term-red">LIQUIDITY:</span> G5 CENTRAL BANK BALANCE SHEETS CONTRACTION ACCELERATES ///
             </div>
         </div>
     </div>
@@ -138,6 +139,14 @@
     <div class="flex flex-1 overflow-hidden relative">
         <!-- Sidebar Nav -->
         <aside class="w-64 border-r border-white/5 bg-term-surface/80 backdrop-blur flex flex-col shrink-0 overflow-y-auto hidden lg:flex z-10">
+            <!-- Node Telemetry -->
+            <div class="p-4 border-b border-white/5 bg-black/40 text-[9px] font-mono text-slate-400 space-y-1.5">
+                <div class="text-term-cyan font-bold tracking-widest mb-2">NODE TELEMETRY</div>
+                <div class="flex justify-between"><span>CORE_TEMP:</span> <span class="text-term-amber">84°C</span></div>
+                <div class="flex justify-between"><span>MEM_UTIL:</span> <span class="text-term-cyan">98.2%</span></div>
+                <div class="flex justify-between"><span>NET_LATENCY:</span> <span class="text-term-green">0.2ms</span></div>
+                <div class="flex justify-between"><span>API_LINK:</span> <span class="text-term-red animate-pulse">FALLBACK_MODE</span></div>
+            </div>
             <div class="p-4 border-b border-white/5 bg-black/20">
                 <div class="flex justify-between items-end mb-2">
                     <div class="text-[10px] text-slate-500 font-mono tracking-widest">INGESTION PROGRESS</div>
@@ -186,7 +195,7 @@
             </div>
             
             <div class="p-3 border-t border-white/10 bg-black/60 shrink-0">
-                <!-- Quick Query Chips -->
+                <!-- Quick Query Chips (Expanded) -->
                 <div class="flex gap-2 overflow-x-auto no-scrollbar pb-3 mb-1">
                     <button onclick="submitAdamQuery('Explain the CCC Refinancing Wall')" class="shrink-0 bg-term-red/10 border border-term-red/30 hover:bg-term-red/30 text-term-red px-3 py-1 rounded-full text-[10px] font-mono transition-colors whitespace-nowrap">CCC Refinancing</button>
                     <button onclick="submitAdamQuery('Analyze Regional Bank HTM Exposure')" class="shrink-0 bg-term-cyan/10 border border-term-cyan/30 hover:bg-term-cyan/30 text-term-cyan px-3 py-1 rounded-full text-[10px] font-mono transition-colors whitespace-nowrap">Bank HTM Exposure</button>
@@ -194,8 +203,11 @@
                     <button onclick="submitAdamQuery('Impact of $97 Brent on Fed Policy')" class="shrink-0 bg-term-amber/10 border border-term-amber/30 hover:bg-term-amber/30 text-term-amber px-3 py-1 rounded-full text-[10px] font-mono transition-colors whitespace-nowrap">$97 Brent Impact</button>
                     <button onclick="submitAdamQuery('Why is VIX so low at 16.29?')" class="shrink-0 bg-term-purple/10 border border-term-purple/30 hover:bg-term-purple/30 text-term-purple px-3 py-1 rounded-full text-[10px] font-mono transition-colors whitespace-nowrap">VIX Suppression</button>
                     <button onclick="submitAdamQuery('Gold & Central Bank Buying')" class="shrink-0 bg-term-gold/10 border border-term-gold/30 hover:bg-term-gold/30 text-term-gold px-3 py-1 rounded-full text-[10px] font-mono transition-colors whitespace-nowrap">Sovereign Gold</button>
+                    <button onclick="submitAdamQuery('Uranium & Nuclear Supercycle')" class="shrink-0 bg-term-amber/10 border border-term-amber/30 hover:bg-term-amber/30 text-term-amber px-3 py-1 rounded-full text-[10px] font-mono transition-colors whitespace-nowrap">Uranium Supercycle</button>
+                    <button onclick="submitAdamQuery('Analyze Emerging Market Debt Contagion')" class="shrink-0 bg-term-red/10 border border-term-red/30 hover:bg-term-red/30 text-term-red px-3 py-1 rounded-full text-[10px] font-mono transition-colors whitespace-nowrap">EM Debt Contagion</button>
                     <button onclick="submitAdamQuery('Explain Private Credit NAV Loans')" class="shrink-0 bg-term-blue/10 border border-term-blue/30 hover:bg-term-blue/30 text-term-blue px-3 py-1 rounded-full text-[10px] font-mono transition-colors whitespace-nowrap">NAV Loans</button>
                     <button onclick="submitAdamQuery('AI CapEx Sustainability bubble')" class="shrink-0 bg-term-green/10 border border-term-green/30 hover:bg-term-green/30 text-term-green px-3 py-1 rounded-full text-[10px] font-mono transition-colors whitespace-nowrap">AI CapEx Bubble</button>
+                    <button onclick="submitAdamQuery('Explain Central Bank Liquidity Divergence (M2)')" class="shrink-0 bg-term-cyan/10 border border-term-cyan/30 hover:bg-term-cyan/30 text-term-cyan px-3 py-1 rounded-full text-[10px] font-mono transition-colors whitespace-nowrap">M2 Liquidity Drain</button>
                     <button onclick="submitAdamQuery('What is the IBIT ETF Outflow signaling?')" class="shrink-0 bg-term-cyan/10 border border-term-cyan/30 hover:bg-term-cyan/30 text-term-cyan px-3 py-1 rounded-full text-[10px] font-mono transition-colors whitespace-nowrap">IBIT Outflow</button>
                 </div>
 
@@ -215,7 +227,7 @@
         // --- API & INTELLIGENT FALLBACK LOGIC ---
         const apiKey = ""; 
 
-        // Highly expanded fallback database using keyword matching
+        // Exhaustive fallback database using keyword matching
         const staticFallbacks = {
             chatIndex: 0,
             chatKeywords: [
@@ -227,7 +239,9 @@
                 { match: ['vix', 'volatility', 'gamma', '0dte', 'options'], text: "Do not trust a VIX at 16.29. Systematic short-volatility strategies and rampant 0DTE call selling have suppressed the index artificially. The true tail-risk premium is completely unpriced. When the dealer gamma flips from positive to negative, the VIX will reprice to 45+ instantly." },
                 { match: ['gold', 'copper', 'uranium', 'metal', 'sovereign', 'pboc'], text: "The decoupling of real assets from fiat pricing is accelerating. Central banks (like the PBOC) are hoarding physical gold, realizing that US Treasuries bear uncompensated geopolitical and inflation risks. Copper and Uranium are experiencing profound, structural supply deficits masked by paper market pricing." },
                 { match: ['ai', 'capex', 'nvidia', 'nvda', 'compute', 'tech'], text: "The $200B+ AI CapEx cycle is treating hardware as sovereign defense rather than enterprise ROIC. Hyperscalers are hoarding GPUs regardless of immediate software monetization. This is a massive distortion field carrying the S&P 500, entirely decoupled from the borrowing costs strangling the Russell 2000." },
-                { match: ['nav', 'private credit', 'sponsor', 'direct lending'], text: "Private equity sponsors are using NAV (Net Asset Value) loans to pay distributions to LPs because exits are frozen. It's leveraging the portfolio to pay the portfolio. This is terminal-stage financial engineering. When the underlying operating companies default, the cross-collateralization will trigger cascading fund-level liquidations." }
+                { match: ['nav', 'private credit', 'sponsor', 'direct lending'], text: "Private equity sponsors are using NAV (Net Asset Value) loans to pay distributions to LPs because exits are frozen. It's leveraging the portfolio to pay the portfolio. This is terminal-stage financial engineering. When the underlying operating companies default, the cross-collateralization will trigger cascading fund-level liquidations." },
+                { match: ['emerging', 'em', 'dxy', 'dollar'], text: "The DXY at 106.80 is a wrecking ball for Emerging Markets. Sovereign debt priced in dollars is becoming unserviceable as local currencies collapse against the Fed's higher-for-longer regime. Expect sovereign defaults in frontier markets to trigger contagion in European banking sectors." },
+                { match: ['liquidity', 'm2', 'central bank', 'balance sheet'], text: "We are witnessing a massive divergence. The S&P 500 is hitting all-time highs while G5 Central Bank balance sheets contract violently. This negative divergence mathematically cannot last. The market is running on fumes and leverage, completely detached from actual fiat liquidity." }
             ],
             chatDefault: [
                 "The correlation algorithms are hallucinating a soft landing while physical supply chains melt down. The cognitive anchor is set to 2%; the physical reality is structurally locked at 4%.",
@@ -244,7 +258,9 @@
                 "Stablecoin": "**DEEP SCAN: STABLECOIN PLUMBING**\n\n1. **Off-Shore Dollar Synthesis:** The $160B Tether market cap is operating as a shadow Eurodollar system. It is currently absorbing the liquidity shock created by Treasury issuance, acting as an unacknowledged buyer of last resort for US T-Bills.\n2. **De-Peg Velocity Risk:** A sudden kinetic escalation could fracture the T-Bill collateral base backing these tokens, triggering a 2008-style money market run in the digital asset space.",
                 "CRE": "**DEEP SCAN: COMMERCIAL REAL ESTATE**\n\n1. **Maturity Extension Failure:** Over $1.2 Trillion in CRE debt matures in the next 18 months. The \"extend and pretend\" strategy has failed as terminal rates lock above 4.5%.\n2. **Regional Bank Implosion:** Loss-Given-Default (LGD) models are currently under-reserving by 40-50% for Class B/C office space. Expect forced recapitalizations of mid-tier lenders.",
                 "Metals": "**DEEP SCAN: REAL ASSET SUPERCYCLE**\n\n1. **Fiat Entropy Hedge:** Sovereign entities are systematically accumulating physical gold to hedge against USD weaponization and inevitable debt monetization.\n2. **Structural Deficits:** Copper and Uranium face 15-year supply deficits. Electrification and nuclear baseload mandates are entirely inelastic to price, creating a structural supercycle irrespective of global GDP growth.",
-                "AI": "**DEEP SCAN: AI CAPEX MATRIX**\n\n1. **Sovereign-Level Spending:** The 'Magnificent 7' are deploying capital expenditure on par with sovereign nation-state defense budgets. This is an arms race for AGI dominance, not a traditional ROI calculation.\n2. **Index Distortion:** This localized hyperscaler spending masks severe earnings decay in the remaining 493 S&P components and the entirety of the Russell 2000."
+                "AI": "**DEEP SCAN: AI CAPEX MATRIX**\n\n1. **Sovereign-Level Spending:** The 'Magnificent 7' are deploying capital expenditure on par with sovereign nation-state defense budgets. This is an arms race for AGI dominance, not a traditional ROI calculation.\n2. **Index Distortion:** This localized hyperscaler spending masks severe earnings decay in the remaining 493 S&P components and the entirety of the Russell 2000.",
+                "Liquidity": "**DEEP SCAN: GLOBAL LIQUIDITY CONTRACTION**\n\n1. **Central Bank Divergence:** G5 Central Bank balance sheets are contracting at an annualized rate of 8%, draining true fiat liquidity from the system.\n2. **Synthetic Leverage:** The current S&P 500 rally is entirely funded by synthetic leverage (options, margin) rather than actual M2 money supply growth. A mechanical snap-back to the liquidity baseline implies a 22% index correction.",
+                "EM_Debt": "**DEEP SCAN: EMERGING MARKET DEBT CONTAGION**\n\n1. **DXY Wrecking Ball:** With the DXY sustaining above 106.50, USD-denominated EM debt service costs have effectively doubled in local currency terms since 2023.\n2. **IMF Intervention:** Dozens of frontier markets are technically insolvent. Expect IMF emergency lending facilities to be exhausted by Q3, forcing haircuts on European sovereign bondholders."
             },
             varShock: `> **CRITICAL SYSTEM ALERT: SIMULATED SHOCK SEQUENCE OMEGA-1**
 
@@ -270,7 +286,7 @@
         }
 
         async function callGeminiAPI(promptText, specificInstruction = "", fallbackKey = null) {
-            // Intelligent Fallback Routing - ZERO LATENCY
+            // Intelligent Fallback Routing - ZERO LATENCY (no setTimeout)
             if (!apiKey) {
                 if (fallbackKey === 'chat') {
                     const lowerQuery = promptText.toLowerCase();
@@ -345,6 +361,7 @@
                         <li><strong class="text-white">Geopolitical Friction Spikes Crude:</strong> Renewed military actions near the Strait of Hormuz have pushed Brent crude back toward $97/bbl.</li>
                         <li><strong class="text-white">Treasury Stabilization Cracks:</strong> The 10-Year US Treasury yield has spiked to 4.52% as persistent energy shocks force a "higher-for-longer" policy regime.</li>
                         <li><strong class="text-white">The Refinancing Convergence:</strong> Banks and private credit funds are engaging in aggressive price and terms-slashing to capture a massive pool of 2020–2021 corporate loan vintages, masking the CCC tier's distress.</li>
+                        <li><strong class="text-white">DXY Momentum:</strong> The dollar index has surged past 106.80, forcing liquidity constraints on emerging markets.</li>
                     </ul>
 
                     <div class="glass-panel p-6 rounded-xl border-t-2 border-term-red my-6 shadow-[0_10px_30px_rgba(239,68,68,0.1)]">
@@ -640,6 +657,7 @@
                         <div class="glass-panel border border-white/10 p-4 rounded-lg bg-term-surface/50">
                             <h3 class="text-term-cyan font-mono font-bold text-sm m-0 mb-2">The Dollar Wrecking Ball</h3>
                             <p class="text-xs text-slate-400">As the Fed signals "higher for longer" to combat domestic inflation, the U.S. Dollar Index (DXY) is tearing through resistance. This rapidly increases the real debt burden for emerging markets holding dollar-denominated liabilities, escalating sovereign default probabilities.</p>
+                            <button onclick="triggerDeepScan('Emerging Market Debt', 'Evaluate sovereign default cascade risk due to DXY breakout', this)" class="mt-2 text-[9px] bg-term-cyan/20 text-term-cyan px-2 py-1 rounded">✨ SCAN EM DEBT</button>
                         </div>
                         <div class="glass-panel border border-white/10 p-4 rounded-lg bg-term-surface/50">
                             <h3 class="text-term-red font-mono font-bold text-sm m-0 mb-2">Euro & Yen Liquidation</h3>
@@ -795,6 +813,83 @@
             {
                 id: 10,
                 group: "4. SIMULATION",
+                title: "Global Liquidity",
+                subtitle: "Central Bank Divergence",
+                content: `
+                    <h1>Global Liquidity: The Great Divergence</h1>
+                    <p class="text-sm text-slate-300 mb-6">Equities are rising while actual fiat liquidity is draining. The G5 Central Bank balance sheets continue to contract via Quantitative Tightening (QT), while the S&P 500 climbs—a divergence funded entirely by synthetic margin and derivatives.</p>
+
+                    <div class="w-full h-64 chart-container bg-black/20 rounded-lg border border-white/5 p-2 mb-6">
+                        <canvas id="mod10Chart"></canvas>
+                    </div>
+
+                    <div class="bg-term-red/10 border border-term-red/30 p-4 rounded text-sm text-slate-200">
+                        <strong class="text-term-red font-mono block mb-1">SYSTEM WARNING: M2 CONTRACTION</strong>
+                        Historically, severe negative divergences between Central Bank balance sheets and equity market caps resolve via violent downside mean reversion. The mechanical snap-back implies a 22% index correction to re-align with the liquidity baseline.
+                        <br><button onclick="triggerDeepScan('Liquidity Baseline', 'Analyze M2 contraction vs S&P 500 market cap divergence', this)" class="mt-2 bg-term-red/20 text-term-red text-[10px] font-mono px-3 py-1 rounded">✨ SCAN LIQUIDITY DEFICIT</button>
+                    </div>
+                `,
+                onLoad: () => {
+                    const ctx = document.getElementById('mod10Chart').getContext('2d');
+                    initChart('mod10', new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: ['2023', '2024', '2025', '2026 YTD'],
+                            datasets: [
+                                { type: 'bar', label: 'G5 Central Bank Liquidity ($T)', data: [28.5, 27.2, 25.8, 24.1], backgroundColor: 'rgba(239, 68, 68, 0.4)' },
+                                { type: 'line', label: 'S&P 500 Market Cap ($T)', data: [38, 42, 48, 55], borderColor: '#10b981', borderWidth: 3 }
+                            ]
+                        },
+                        options: { responsive: true, maintainAspectRatio: false }
+                    }));
+                }
+            },
+            {
+                id: 11,
+                group: "4. SIMULATION",
+                title: "Real Asset Supercycle",
+                subtitle: "Metals Escaping Fiat",
+                content: `
+                    <h1>The Real Asset Supercycle</h1>
+                    <p class="text-sm text-slate-300 mb-6">Physical commodities are escaping paper-market pricing mechanics. As sovereign debt burdens reach mathematical limits, central banks and strategic entities are aggressively hoarding hard assets.</p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div class="glass-panel p-4 rounded-xl border-t-2 border-term-gold relative overflow-hidden">
+                            <h4 class="text-term-gold font-bold font-mono text-xs mb-2">GOLD: SOVEREIGN HEDGE</h4>
+                            <p class="text-xs text-slate-400">The PBOC and BRICS+ central banks continue their relentless accumulation of physical gold, treating it as a tier-1 reserve asset to hedge against USD weaponization and inevitable debt monetization.</p>
+                        </div>
+                        <div class="glass-panel p-4 rounded-xl border-t-2 border-term-amber relative overflow-hidden">
+                            <h4 class="text-term-amber font-bold font-mono text-xs mb-2">URANIUM / COPPER: SUPPLY DEFICIT</h4>
+                            <p class="text-xs text-slate-400">Electrification and nuclear baseload mandates are colliding with a 15-year structural supply deficit. Demand is entirely inelastic to price, forcing industrial buyers to secure physical supply at any premium.</p>
+                        </div>
+                    </div>
+
+                    <div class="w-full h-56 chart-container bg-black/20 rounded-lg border border-white/5 p-2 mb-6">
+                        <canvas id="mod11Chart"></canvas>
+                    </div>
+                `,
+                onLoad: () => {
+                    const ctx = document.getElementById('mod11Chart').getContext('2d');
+                    initChart('mod11', new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: ['Q1 25', 'Q2 25', 'Q3 25', 'Q4 25', 'Q1 26', 'Q2 26'],
+                            datasets: [
+                                { label: 'U3O8 Uranium (Rebased)', data: [100, 115, 135, 160, 185, 210], borderColor: '#f59e0b', borderWidth: 2, tension: 0.1 },
+                                { label: 'Copper (Rebased)', data: [100, 105, 115, 125, 140, 155], borderColor: '#d97706', borderWidth: 2, tension: 0.1 },
+                                { label: 'Gold (Rebased)', data: [100, 108, 115, 122, 135, 148], borderColor: '#fbbf24', borderWidth: 2, tension: 0.1 }
+                            ]
+                        },
+                        options: { 
+                            responsive: true, maintainAspectRatio: false,
+                            plugins: { title: { display: true, text: 'Real Assets Performance (Rebased to 100)', color: '#94a3b8' } }
+                        }
+                    }));
+                }
+            },
+            {
+                id: 12,
+                group: "4. SIMULATION",
                 title: "VaR Stress Scenarios",
                 subtitle: "Counterfactual Impact",
                 content: `
@@ -832,7 +927,7 @@
                 `
             },
             {
-                id: 11,
+                id: 13,
                 group: "5. ACTION DIRECTIVES",
                 title: "Tactical Directives",
                 subtitle: "Deploying Capital Defenses",
@@ -894,7 +989,7 @@
                 `
             },
             {
-                id: 12,
+                id: 14,
                 group: "6. EDITORIAL",
                 title: "Terminal Override (DEFCON 1)",
                 subtitle: "Anchoring Bias & Sign-Off",
@@ -931,6 +1026,70 @@
                         </div>
                     </div>
                 `
+            },
+            {
+                id: 15,
+                group: "7. DATA LEDGER",
+                title: "Provenance",
+                subtitle: "AI Ledger & Verification",
+                content: `
+                    <h1>ADDENDUM: Institutional AI Training Ledger</h1>
+                    <p class="text-sm mb-4">The following structured ledger represents the unified systemic state data for ingestion into downstream Probability of Default (PD), Loss Given Default (LGD), Discounted Cash Flow (DCF), and Enterprise Value (EV) quantitative models.</p>
+                    
+                    <div class="relative group my-4">
+                        <div class="absolute top-0 right-0 bg-term-amber text-black text-[9px] font-bold px-2 py-1 rounded-bl-lg z-10">JSON SCHEMA</div>
+                        <pre id="jsonLedger" class="relative bg-[#0a0f1c] p-5 rounded-lg font-mono text-xs text-term-amber overflow-x-auto border border-white/10 shadow-xl">
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "InstitutionalAITrainingLedger",
+  "report_date": "2026-05-28",
+  "ledger_entries": [
+    {
+      "data_variable_node": "Fed Funds Target Rate",
+      "market_level_value": "3.50% - 3.75%",
+      "primary_model_target": "DCF / EV",
+      "unstructured_context_provenance": "Current operational policy corridor maintained by FOMC; forward guidance shifting hawkish."
+    },
+    {
+      "data_variable_node": "10-Year US Treasury Yield",
+      "market_level_value": "4.52%",
+      "primary_model_target": "DCF",
+      "unstructured_context_provenance": "Psychological resistance broken; driven higher by persistent energy supply shocks."
+    },
+    {
+      "data_variable_node": "S&P 500 Index",
+      "market_level_value": "7,564.58",
+      "primary_model_target": "EV",
+      "unstructured_context_provenance": "Record high territory; high valuation vulnerability due to extreme positive correlation with bond yields."
+    },
+    {
+      "data_variable_node": "Brent Crude Oil",
+      "market_level_value": "$97.00/bbl",
+      "primary_model_target": "PD",
+      "unstructured_context_provenance": "Commodity inflation vector; sensitive to escalating geopolitical tensions in the Strait of Hormuz."
+    },
+    {
+      "data_variable_node": "CCC High-Yield Spread",
+      "market_level_value": "1150 bps",
+      "primary_model_target": "LGD",
+      "unstructured_context_provenance": "Severe widening amidst amend-and-extend failures and shadow banking scrutiny."
+    }
+  ]
+}</pre>
+                    </div>
+
+                    <div class="mt-8 border-t border-white/10 pt-6">
+                        <h3 class="font-mono text-slate-400 text-sm mb-3">📚 HUMAN APPENDIX: VERIFICATION & PROVENANCE</h3>
+                        <ul class="text-xs text-slate-500 space-y-2 font-mono">
+                            <li><strong>Timestamp:</strong> Thursday, May 28, 2026 at 9:39 PM EDT</li>
+                            <li><strong>S&P 500 Index:</strong> Tool Ingestion (Verified Thursday close at 7,564.58)</li>
+                            <li><strong>10-Year U.S. Treasury Yield:</strong> Tradeweb FTSE / Dow Jones (Verified 4.454% / 4.52% bounds)</li>
+                            <li><strong>VIX Volatility Index:</strong> Cboe Ingestion (Verified prompt close at 15.65-16.29)</li>
+                            <li><strong>Bitcoin (BTC):</strong> Gemini Real-Time Ingestion (Verified $73,377 / Intraday flush below $73k on $733M ETF outflow)</li>
+                            <li><strong>Macro Economics:</strong> WTI crude spiked >$90.50; confirmed U.S. airstrike in Bandar Abbas suburbs.</li>
+                        </ul>
+                    </div>
+                `
             }
         ];
 
@@ -952,7 +1111,7 @@
             document.getElementById('nextBtn').onclick = () => { if(currentModuleId < modules.length) loadModule(currentModuleId + 1); };
             
             // Initialize Chat
-            appendChatMessage('ADAM V26.0 (ULTIMATE)', 'System Recalibrating. I have fully ingested the 2026.05.28 metrics, merging the Bandar Abbas kinetic strikes and energy shock data with the BSL bifurcation, Tech/AI Decoupling, Private Credit NAV leverage, and FX Entropies. I am ready for queries.', false);
+            appendChatMessage('ADAM V26.0 (ULTIMATE)', 'System Recalibrating. I have fully ingested the 2026.05.28 metrics, merging the Bandar Abbas kinetic strikes, 0DTE flow data, and energy shock data with the BSL bifurcation, Tech/AI Decoupling, Private Credit NAV leverage, and FX Entropies. I am ready for queries.', false);
         }
 
         // --- GEMINI FEATURE INTEGRATIONS (WITH FALLBACKS) ---
@@ -967,15 +1126,13 @@
             
             const loadingId = appendChatMessage('ADAM V26.0', '<span class="text-term-amber">PROCESSING QUERY IN NEURAL ARCHITECTURE...</span>', false);
             
-            // Allow DOM to render the user message before processing the immediate fallback
-            setTimeout(async () => {
-                try {
-                    const response = await callGeminiAPI(query, "", "chat");
-                    updateChatMessage(loadingId, marked.parse(response));
-                } catch (e) {
-                    updateChatMessage(loadingId, '<span class="text-term-red font-bold">⚠️ SYSTEM ERROR.</span>');
-                }
-            }, 10);
+            // Execute Immediately
+            try {
+                const response = await callGeminiAPI(query, "", "chat");
+                updateChatMessage(loadingId, marked.parse(response));
+            } catch (e) {
+                updateChatMessage(loadingId, '<span class="text-term-red font-bold">⚠️ SYSTEM ERROR.</span>');
+            }
         }
 
         function appendChatMessage(sender, text, isUser) {
@@ -1008,39 +1165,39 @@
             btn.disabled = true;
             btn.innerHTML = `<span>✨ SCANNING...</span>`;
             
-            // Allow DOM to update button state
-            setTimeout(async () => {
-                try {
-                    const prompt = `Conduct a deep 'Deep Scan' analysis on: Ticker/Topic: ${ticker}, Event: ${eventText}. Focus on systemic risks. 2 short paragraphs. Bold terms.`;
-                    
-                    let fallbackKey = 'Shadow'; // Default
-                    if (ticker.includes('IBIT')) fallbackKey = 'IBIT';
-                    else if (ticker.includes('Maritime')) fallbackKey = 'Maritime';
-                    else if (ticker.includes('CCC')) fallbackKey = 'CCC';
-                    else if (ticker.includes('Stablecoin')) fallbackKey = 'Stablecoin';
-                    else if (ticker.includes('Gamma')) fallbackKey = 'Gamma';
-                    else if (ticker.includes('CRE')) fallbackKey = 'CRE';
-                    else if (ticker.includes('Gold') || ticker.includes('Metals')) fallbackKey = 'Metals';
-                    else if (ticker.includes('CapEx') || ticker.includes('AI')) fallbackKey = 'AI';
+            // Execute Immediately
+            try {
+                const prompt = `Conduct a deep 'Deep Scan' analysis on: Ticker/Topic: ${ticker}, Event: ${eventText}. Focus on systemic risks. 2 short paragraphs. Bold terms.`;
+                
+                let fallbackKey = 'Shadow'; // Default
+                if (ticker.includes('IBIT')) fallbackKey = 'IBIT';
+                else if (ticker.includes('Maritime')) fallbackKey = 'Maritime';
+                else if (ticker.includes('CCC')) fallbackKey = 'CCC';
+                else if (ticker.includes('Stablecoin')) fallbackKey = 'Stablecoin';
+                else if (ticker.includes('Gamma')) fallbackKey = 'Gamma';
+                else if (ticker.includes('CRE')) fallbackKey = 'CRE';
+                else if (ticker.includes('Gold') || ticker.includes('Metals')) fallbackKey = 'Metals';
+                else if (ticker.includes('CapEx') || ticker.includes('AI')) fallbackKey = 'AI';
+                else if (ticker.includes('Liquidity')) fallbackKey = 'Liquidity';
+                else if (ticker.includes('Emerging')) fallbackKey = 'EM_Debt';
 
-                    const result = await callGeminiAPI(prompt, "", fallbackKey);
-                    
-                    const outputDiv = document.createElement('div');
-                    outputDiv.className = 'mt-4 p-4 bg-term-bg/80 border border-term-cyan/30 rounded text-xs text-term-cyan font-mono relative shadow-[inset_0_0_20px_rgba(6,182,212,0.1)]';
-                    outputDiv.innerHTML = `<div class="absolute -top-2 left-3 bg-term-bg px-2 text-[9px] font-bold text-term-cyan tracking-widest border border-term-cyan/30 rounded">ADAM DEEP SCAN</div>` + 
-                                          `<div class="markdown-output leading-relaxed">${marked.parse(result)}</div>`;
-                    
-                    btn.parentNode.parentNode.appendChild(outputDiv);
-                    btn.innerHTML = `✨ SCAN COMPLETE`;
-                    btn.classList.replace('bg-term-cyan/10', 'bg-term-cyan/5');
-                    btn.classList.replace('bg-term-purple/10', 'bg-term-purple/5');
-                    btn.classList.replace('bg-term-red/20', 'bg-term-red/5');
-                    btn.classList.add('opacity-50');
-                } catch (e) {
-                    btn.innerHTML = `⚠️ API ERROR`;
-                    btn.disabled = false;
-                }
-            }, 10);
+                const result = await callGeminiAPI(prompt, "", fallbackKey);
+                
+                const outputDiv = document.createElement('div');
+                outputDiv.className = 'mt-4 p-4 bg-term-bg/80 border border-term-cyan/30 rounded text-xs text-term-cyan font-mono relative shadow-[inset_0_0_20px_rgba(6,182,212,0.1)]';
+                outputDiv.innerHTML = `<div class="absolute -top-2 left-3 bg-term-bg px-2 text-[9px] font-bold text-term-cyan tracking-widest border border-term-cyan/30 rounded">ADAM DEEP SCAN</div>` + 
+                                      `<div class="markdown-output leading-relaxed">${marked.parse(result)}</div>`;
+                
+                btn.parentNode.parentNode.appendChild(outputDiv);
+                btn.innerHTML = `✨ SCAN COMPLETE`;
+                btn.classList.replace('bg-term-cyan/10', 'bg-term-cyan/5');
+                btn.classList.replace('bg-term-purple/10', 'bg-term-purple/5');
+                btn.classList.replace('bg-term-red/20', 'bg-term-red/5');
+                btn.classList.add('opacity-50');
+            } catch (e) {
+                btn.innerHTML = `⚠️ API ERROR`;
+                btn.disabled = false;
+            }
         }
 
         window.triggerVaRShock = async function(btn) {
@@ -1048,23 +1205,22 @@
             btn.disabled = true;
             btn.innerHTML = `<span>✨ SIMULATING FAT-TAIL EVENT...</span>`;
             
-            setTimeout(async () => {
-                try {
-                    const prompt = `Generate a highly specific 'Black Swan' macroeconomic shock scenario based on today's data (Bandar Abbas strikes, 10Y Yield 4.52%, CCC refinancing failures). Invent a realistic cascading failure in market plumbing. Use terminal formatting.`;
-                    const result = await callGeminiAPI(prompt, "Urgent system alert tone.", "varShock");
-                    
-                    const outputDiv = document.createElement('div');
-                    outputDiv.className = 'mt-6 p-5 bg-black border-l-4 border-term-red rounded text-xs text-slate-300 font-mono relative overflow-hidden';
-                    outputDiv.innerHTML = `<div class="absolute top-0 right-0 p-2 text-[10px] text-term-red opacity-50 animate-pulse">● LIVE SIMULATION</div>` + 
-                                          `<div class="markdown-output">${marked.parse(result)}</div>`;
-                    
-                    btn.parentNode.parentNode.appendChild(outputDiv);
-                    btn.style.display = 'none'; 
-                } catch (e) {
-                    btn.innerHTML = `⚠️ SIMULATION FAILED`;
-                    btn.disabled = false;
-                }
-            }, 10);
+            // Execute Immediately
+            try {
+                const prompt = `Generate a highly specific 'Black Swan' macroeconomic shock scenario based on today's data (Bandar Abbas strikes, 10Y Yield 4.52%, CCC refinancing failures). Invent a realistic cascading failure in market plumbing. Use terminal formatting.`;
+                const result = await callGeminiAPI(prompt, "Urgent system alert tone.", "varShock");
+                
+                const outputDiv = document.createElement('div');
+                outputDiv.className = 'mt-6 p-5 bg-black border-l-4 border-term-red rounded text-xs text-slate-300 font-mono relative overflow-hidden';
+                outputDiv.innerHTML = `<div class="absolute top-0 right-0 p-2 text-[10px] text-term-red opacity-50 animate-pulse">● LIVE SIMULATION</div>` + 
+                                      `<div class="markdown-output">${marked.parse(result)}</div>`;
+                
+                btn.parentNode.parentNode.appendChild(outputDiv);
+                btn.style.display = 'none'; 
+            } catch (e) {
+                btn.innerHTML = `⚠️ SIMULATION FAILED`;
+                btn.disabled = false;
+            }
         }
 
         // --- NAVIGATION LOGIC ---
