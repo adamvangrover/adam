@@ -1,4 +1,4 @@
-# ADAM DAILY BRIEF: May 23, 2026
+# ADAM-DAILY BRIEF: May 23, 2026
 
 ## Market Overview
 The markets are digesting mixed signals today, driven by steady equity performance against climbing yields. The S&P 500 continues its upward momentum, settling around 7473.47, indicating sustained risk appetite in equity markets. Simultaneously, we're observing strength across commodities and digital assets. Crude Oil remains elevated at 97.0, testing significant thresholds, while Gold has rallied to 4510.5, functioning as a sustained hedge against emerging multi-axis divergence. Bitcoin also maintains a robust position at 75367.31.

@@ -7845,16 +7845,16 @@ window.REPO_DATA = {
     },
     {
       "id": 653,
-      "label": "The Fortress & The Hunt",
+      "label": "The-Fortress-and-The-Hunt",
       "group": "folder",
-      "path": "core/libraries_and_archives/The Fortress & The Hunt",
+      "path": "core/libraries_and_archives/The-Fortress-and-The-Hunt",
       "value": 10
     },
     {
       "id": 654,
       "label": "adam_v22.json",
       "group": "json",
-      "path": "core/libraries_and_archives/The Fortress & The Hunt/adam_v22.json",
+      "path": "core/libraries_and_archives/The-Fortress-and-The-Hunt/adam_v22.json",
       "size": 39265,
       "lines": 456,
       "imports": [],
@@ -7864,7 +7864,7 @@ window.REPO_DATA = {
       "id": 655,
       "label": "10312025.md",
       "group": "md",
-      "path": "core/libraries_and_archives/The Fortress & The Hunt/10312025.md",
+      "path": "core/libraries_and_archives/The-Fortress-and-The-Hunt/10312025.md",
       "size": 27401,
       "lines": 445,
       "imports": [],
@@ -27931,7 +27931,7 @@ window.REPO_DATA = {
             }
           }
         },
-        "The Fortress & The Hunt": {
+        "The-Fortress-and-The-Hunt": {
           "adam_v22.json": {
             "__file__": true,
             "type": "file",

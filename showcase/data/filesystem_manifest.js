@@ -6284,28 +6284,28 @@ window.FILESYSTEM_MANIFEST = [
             "modified": "2026-02-22T23:55:18.584501"
           },
           {
-            "name": "The Fortress & The Hunt",
+            "name": "The-Fortress-and-The-Hunt",
             "type": "directory",
-            "path": "./core/libraries_and_archives/The Fortress & The Hunt",
+            "path": "./core/libraries_and_archives/The-Fortress-and-The-Hunt",
             "children": [
               {
                 "name": "10312025.md",
                 "type": "file",
-                "path": "./core/libraries_and_archives/The Fortress & The Hunt/10312025.md",
+                "path": "./core/libraries_and_archives/The-Fortress-and-The-Hunt/10312025.md",
                 "size": 27401,
                 "modified": "2026-02-22T23:55:18.584501"
               },
               {
                 "name": "adam_v22.json",
                 "type": "file",
-                "path": "./core/libraries_and_archives/The Fortress & The Hunt/adam_v22.json",
+                "path": "./core/libraries_and_archives/The-Fortress-and-The-Hunt/adam_v22.json",
                 "size": 39265,
                 "modified": "2026-02-22T23:55:18.588501"
               },
               {
                 "name": "index.html",
                 "type": "file",
-                "path": "./core/libraries_and_archives/The Fortress & The Hunt/index.html",
+                "path": "./core/libraries_and_archives/The-Fortress-and-The-Hunt/index.html",
                 "size": 4551,
                 "modified": "2026-02-22T23:55:18.588501"
               }
@@ -24415,23 +24415,23 @@ window.FILESYSTEM_MANIFEST = [
         "modified": "2026-02-22T23:55:19.788501"
       },
       {
-        "name": "2022 Year in Review - Navigating a Turbulent Market.html",
+        "name": "2022-Year-in-Review---Navigating-a-Turbulent-Market.html",
         "type": "file",
-        "path": "./showcase/2022 Year in Review - Navigating a Turbulent Market.html",
+        "path": "./showcase/2022-Year-in-Review---Navigating-a-Turbulent-Market.html",
         "size": 35581,
         "modified": "2026-02-22T23:55:19.788501"
       },
       {
-        "name": "2023 Year in Review - A Year of Recovery and Resilience.html",
+        "name": "2023-Year-in-Review---A-Year-of-Recovery-and-Resilience.html",
         "type": "file",
-        "path": "./showcase/2023 Year in Review - A Year of Recovery and Resilience.html",
+        "path": "./showcase/2023-Year-in-Review---A-Year-of-Recovery-and-Resilience.html",
         "size": 35434,
         "modified": "2026-02-22T23:55:19.792501"
       },
       {
-        "name": "2024 Year in Review - Navigating Uncertainty and Transition.html",
+        "name": "2024-Year-in-Review---Navigating-Uncertainty-and-Transition.html",
         "type": "file",
-        "path": "./showcase/2024 Year in Review - Navigating Uncertainty and Transition.html",
+        "path": "./showcase/2024-Year-in-Review---Navigating-Uncertainty-and-Transition.html",
         "size": 35868,
         "modified": "2026-02-22T23:55:19.792501"
       },
@@ -25815,9 +25815,9 @@ window.FILESYSTEM_MANIFEST = [
         "modified": "2026-02-22T23:55:19.856501"
       },
       {
-        "name": "Q1 2025 and Full Year Outlook - Navigating a Bifurcated Market.html",
+        "name": "Q1-2025-and-Full-Year-Outlook---Navigating-a-Bifurcated-Market.html",
         "type": "file",
-        "path": "./showcase/Q1 2025 and Full Year Outlook - Navigating a Bifurcated Market.html",
+        "path": "./showcase/Q1-2025-and-Full-Year-Outlook---Navigating-a-Bifurcated-Market.html",
         "size": 36342,
         "modified": "2026-02-22T23:55:19.856501"
       },
