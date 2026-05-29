@@ -1,0 +1,1 @@
+When standardizing file names in GitHub pages repos, ensure colons and spaces are removed to prevent Jekyll errors. Ensure all references across JS, JSON, and Markdown are updated accordingly. Always check both internal and external link references inside HTML files.

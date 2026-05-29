@@ -1,0 +1,86 @@
+{
+  "@context": "https://example.org/credit-analysis/ontology.jsonld",
+  "@id": "cacm:SaaS_DefaultRisk_v1",
+  "@type": "CACMDefinition",
+  "name": "SaaS Company Default Risk Assessment",
+  "description": "Evaluates default risk for mid-cap SaaS firms using burn rate, churn, sales efficiency, and revenue concentration.",
+  "input_schema": {
+    "financials": "data_source:StandardFinancials",
+    "saas_metrics": "data_source:InternalAnalyticsDB"
+  },
+  "parameters": [
+    {
+      "@id": "param:ChurnThreshold",
+      "label": "Max Acceptable Monthly Churn Rate",
+      "type": "percentage",
+      "default": 0.015
+    },
+    {
+      "@id": "param:MinRunwayMonths",
+      "label": "Minimum Required Funding Runway (months)",
+      "type": "integer",
+      "default": 12
+    }
+  ],
+  "dimensions": [
+    "dimension:CashBurnRate",
+    "dimension:CustomerChurn",
+    "dimension:SalesEfficiency",
+    "dimension:RevenueConcentration",
+    "dimension:FundingRunway"
+  ],
+  "analysis_workflow": [
+    {
+      "@id": "step:CalculateBurnRate",
+      "@type": "ComputeStep",
+      "compute_capability": "compute:CalculateCashBurnRate",
+      "inputs": ["financials"],
+      "outputs": ["dimension:CashBurnRate"]
+    },
+    {
+      "@id": "step:AnalyzeChurn",
+      "@type": "ComputeStep",
+      "compute_capability": "compute:AnalyzeChurnData",
+      "inputs": ["saas_metrics"],
+      "outputs": ["dimension:CustomerChurn"],
+      "parameters": ["param:ChurnThreshold"]
+    },
+    {
+      "@id": "step:CalcSalesEfficiency",
+      "@type": "ComputeStep",
+      "compute_capability": "compute:CalculateSalesEfficiencyMetrics",
+      "inputs": ["financials", "saas_metrics"],
+      "outputs": ["dimension:SalesEfficiency"]
+    },
+    {
+      "@id": "step:AssessRunway",
+      "@type": "ComputeStep",
+      "compute_capability": "compute:CalculateFundingRunway",
+      "inputs": ["dimension:CashBurnRate", "financials"],
+      "outputs": ["dimension:FundingRunway"],
+      "parameters": ["param:MinRunwayMonths"]
+    },
+    {
+      "@id": "step:RunRiskModel",
+      "@type": "ComputeStep",
+      "compute_capability": "compute:RunSaaS_RiskModel_v2",
+      "inputs": [
+        "dimension:CashBurnRate",
+        "dimension:CustomerChurn",
+        "dimension:SalesEfficiency",
+        "dimension:RevenueConcentration",
+        "dimension:FundingRunway"
+      ],
+      "outputs": ["result:DefaultRiskScore"]
+    }
+  ],
+  "output_schema": {
+    "@type": "AnalysisResult",
+    "risk_score": {
+      "@id": "result:DefaultRiskScore",
+      "type": "score",
+      "range": [0, 100],
+      "description": "Estimated probability of default, scaled 0–100."
+    }
+  }
+}
