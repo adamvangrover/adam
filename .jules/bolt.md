@@ -172,3 +172,7 @@
 ## 2023-10-25 - [Optimize JSON Schema Validation]
 **Learning:** `jsonschema.validate()` implicitly evaluates the validity of the schema and re-compiles the validator upon every single function call. This creates significant overhead when doing frequent validations against a static schema (like inside the GovernanceGatekeeper processing loops).
 **Action:** Always extract the validation to an explicitly instantiated validator class (e.g., using `jsonschema.validators.validator_for(schema)` and pre-compiling it via `ValidatorClass(schema)`) to reuse it across multiple validations for a dramatic speedup (often 50-100x).
+
+## 2024-05-29 - [Optimize JSON Schema Validation Compilation]
+**Learning:** `jsonschema.validate(instance, schema)` forces the library to determine the correct validator class and recompile the schema definitions on every single invocation, creating a massive bottleneck on hot paths like parsing LLM outputs or validating incoming entities.
+**Action:** Always pre-compile the schema during component initialization (e.g., `ValidatorClass = jsonschema.validators.validator_for(schema); self.validator = ValidatorClass(schema)`) and reuse the instance (`self.validator.validate(instance)`) for validation to skip the compilation overhead.
