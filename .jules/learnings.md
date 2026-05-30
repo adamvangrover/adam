@@ -1,0 +1,1 @@
+- When acting as the daily financial agent under sandbox constraints without live web access, plausible synthetic data should be generated via a Python script to populate the required markdown reports and JSONL schemas (e.g., `MarketMayhemLedger`).
