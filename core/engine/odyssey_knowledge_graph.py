@@ -22,6 +22,7 @@ class OdysseyKnowledgeGraph(UnifiedKnowledgeGraph):
     def __init__(self):
         super().__init__()
         self.odyssey_schema = None
+        self.odyssey_validator = None
         self._load_odyssey_schema()
 
     def _load_odyssey_schema(self):
@@ -30,6 +31,10 @@ class OdysseyKnowledgeGraph(UnifiedKnowledgeGraph):
             try:
                 with open(schema_path, "r") as f:
                     self.odyssey_schema = json.load(f)
+                    # Bolt Optimization: Pre-compile jsonschema validator to avoid recompilation overhead on every validation request.
+                    if jsonschema:
+                        ValidatorClass = jsonschema.validators.validator_for(self.odyssey_schema)
+                        self.odyssey_validator = ValidatorClass(self.odyssey_schema)
                 logger.info("Loaded Odyssey FIBO Schema.")
             except Exception as e:
                 logger.error(f"Failed to load Odyssey schema: {e}")
@@ -42,7 +47,7 @@ class OdysseyKnowledgeGraph(UnifiedKnowledgeGraph):
         """
         if self.odyssey_schema and jsonschema:
             try:
-                jsonschema.validate(instance=entity_data, schema=self.odyssey_schema)
+                self.odyssey_validator.validate(instance=entity_data)
             except jsonschema.ValidationError as e:
                 logger.error(f"Schema Validation Failed: {e}")
                 raise ValueError(f"Entity does not conform to Odyssey FIBO Schema: {e}")

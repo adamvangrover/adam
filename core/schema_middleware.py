@@ -9,6 +9,11 @@ class SchemaMiddleware:
     """
     def __init__(self, schema: dict = None):
         self.schema = schema
+        self.validator = None
+        if schema:
+                # Bolt Optimization: Pre-compile jsonschema validator to avoid recompilation overhead on every validation request.
+            ValidatorClass = jsonschema.validators.validator_for(schema)
+            self.validator = ValidatorClass(schema)
 
     def validate_and_parse(self, llm_output: str):
         """
@@ -20,7 +25,7 @@ class SchemaMiddleware:
             parsed = json.loads(llm_output)
 
             if self.schema:
-                jsonschema.validate(instance=parsed, schema=self.schema)
+                self.validator.validate(instance=parsed)
 
             return True, parsed
         except json.JSONDecodeError as e:
