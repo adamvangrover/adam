@@ -57,7 +57,7 @@ graph TD
 
 ### 4.1. User Interface
 
-*   **Web Application:** A single-page application (SPA) that provides the main user interface for the system. It will be built using a modern JavaScript framework (e.g., React, Vue, or Angular). The UI will be based on the mockups in `UI Mockups.md`. Key features include a customizable dashboard, interactive charts and tables, and a rich set of tools for financial analysis.
+*   **Web Application:** A single-page application (SPA) that provides the main user interface for the system. It will be built using a modern JavaScript framework (e.g., React, Vue, or Angular). The UI will be based on the mockups in `UI-Mockups.md`. Key features include a customizable dashboard, interactive charts and tables, and a rich set of tools for financial analysis.
 *   **Chatbot:** An interactive chatbot that allows users to ask questions and perform tasks in natural language. The chatbot will be integrated into the web application and will use the same API as the main application to interact with the backend. It will leverage the `QueryUnderstandingAgent` to interpret user intent.
 
 ### 4.2. API Layer

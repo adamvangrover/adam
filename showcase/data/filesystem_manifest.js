@@ -119,9 +119,9 @@ window.FILESYSTEM_MANIFEST = [
     "modified": "2026-02-22T23:55:18.352501"
   },
   {
-    "name": "UI Mockups.md",
+    "name": "UI-Mockups.md",
     "type": "file",
-    "path": "./UI Mockups.md",
+    "path": "./UI-Mockups.md",
     "size": 12760,
     "modified": "2026-02-22T23:55:18.352501"
   },
@@ -6284,28 +6284,28 @@ window.FILESYSTEM_MANIFEST = [
             "modified": "2026-02-22T23:55:18.584501"
           },
           {
-            "name": "The Fortress & The Hunt",
+            "name": "The-Fortress-&-The-Hunt",
             "type": "directory",
-            "path": "./core/libraries_and_archives/The Fortress & The Hunt",
+            "path": "./core/libraries_and_archives/The-Fortress-&-The-Hunt",
             "children": [
               {
                 "name": "10312025.md",
                 "type": "file",
-                "path": "./core/libraries_and_archives/The Fortress & The Hunt/10312025.md",
+                "path": "./core/libraries_and_archives/The-Fortress-&-The-Hunt/10312025.md",
                 "size": 27401,
                 "modified": "2026-02-22T23:55:18.584501"
               },
               {
                 "name": "adam_v22.json",
                 "type": "file",
-                "path": "./core/libraries_and_archives/The Fortress & The Hunt/adam_v22.json",
+                "path": "./core/libraries_and_archives/The-Fortress-&-The-Hunt/adam_v22.json",
                 "size": 39265,
                 "modified": "2026-02-22T23:55:18.588501"
               },
               {
                 "name": "index.html",
                 "type": "file",
-                "path": "./core/libraries_and_archives/The Fortress & The Hunt/index.html",
+                "path": "./core/libraries_and_archives/The-Fortress-&-The-Hunt/index.html",
                 "size": 4551,
                 "modified": "2026-02-22T23:55:18.588501"
               }
@@ -13981,9 +13981,9 @@ window.FILESYSTEM_MANIFEST = [
         "modified": "2026-02-22T23:55:19.288501"
       },
       {
-        "name": "Conceptual CACM-ADK System Architecture (Mermaid Syntax).md",
+        "name": "Conceptual-CACM-ADK-System-Architecture-(Mermaid-Syntax).md",
         "type": "file",
-        "path": "./docs/Conceptual CACM-ADK System Architecture (Mermaid Syntax).md",
+        "path": "./docs/Conceptual-CACM-ADK-System-Architecture-(Mermaid-Syntax).md",
         "size": 2583,
         "modified": "2026-02-22T23:55:19.288501"
       },
@@ -14341,37 +14341,37 @@ window.FILESYSTEM_MANIFEST = [
         "path": "./docs/archive",
         "children": [
           {
-            "name": "Adam v19.1 System Management and Optimization Guide.md",
+            "name": "Adam-v19.1-System-Management-and-Optimization-Guide.md",
             "type": "file",
-            "path": "./docs/archive/Adam v19.1 System Management and Optimization Guide.md",
+            "path": "./docs/archive/Adam-v19.1-System-Management-and-Optimization-Guide.md",
             "size": 56104,
             "modified": "2026-02-22T23:55:19.296501"
           },
           {
-            "name": "Adam v19.2 Mapping Document.txt",
+            "name": "Adam-v19.2-Mapping-Document.txt",
             "type": "file",
-            "path": "./docs/archive/Adam v19.2 Mapping Document.txt",
+            "path": "./docs/archive/Adam-v19.2-Mapping-Document.txt",
             "size": 110182,
             "modified": "2026-02-22T23:55:19.296501"
           },
           {
-            "name": "Adam v19.2 system prompt.txt",
+            "name": "Adam-v19.2-system-prompt.txt",
             "type": "file",
-            "path": "./docs/archive/Adam v19.2 system prompt.txt",
+            "path": "./docs/archive/Adam-v19.2-system-prompt.txt",
             "size": 42234,
             "modified": "2026-02-22T23:55:19.296501"
           },
           {
-            "name": "Adam v21.0 Mapping Document.txt",
+            "name": "Adam-v21.0-Mapping-Document.txt",
             "type": "file",
-            "path": "./docs/archive/Adam v21.0 Mapping Document.txt",
+            "path": "./docs/archive/Adam-v21.0-Mapping-Document.txt",
             "size": 110145,
             "modified": "2026-02-22T23:55:19.296501"
           },
           {
-            "name": "Adam v21.0 system prompt.txt",
+            "name": "Adam-v21.0-system-prompt.txt",
             "type": "file",
-            "path": "./docs/archive/Adam v21.0 system prompt.txt",
+            "path": "./docs/archive/Adam-v21.0-system-prompt.txt",
             "size": 42231,
             "modified": "2026-02-22T23:55:19.296501"
           },
@@ -15260,9 +15260,9 @@ window.FILESYSTEM_MANIFEST = [
         "modified": "2026-02-22T23:55:19.312501"
       },
       {
-        "name": "federated learning model setup guide.md",
+        "name": "federated-learning-model-setup-guide.md",
         "type": "file",
-        "path": "./docs/federated learning model setup guide.md",
+        "path": "./docs/federated-learning-model-setup-guide.md",
         "size": 8374,
         "modified": "2026-02-22T23:55:19.316501"
       },

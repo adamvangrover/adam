@@ -265,9 +265,9 @@ window.REPO_DATA = {
     },
     {
       "id": 26,
-      "label": "UI Mockups.md",
+      "label": "UI-Mockups.md",
       "group": "md",
-      "path": "UI Mockups.md",
+      "path": "UI-Mockups.md",
       "size": 12760,
       "lines": 238,
       "imports": [],
@@ -7845,16 +7845,16 @@ window.REPO_DATA = {
     },
     {
       "id": 653,
-      "label": "The Fortress & The Hunt",
+      "label": "The-Fortress-&-The-Hunt",
       "group": "folder",
-      "path": "core/libraries_and_archives/The Fortress & The Hunt",
+      "path": "core/libraries_and_archives/The-Fortress-&-The-Hunt",
       "value": 10
     },
     {
       "id": 654,
       "label": "adam_v22.json",
       "group": "json",
-      "path": "core/libraries_and_archives/The Fortress & The Hunt/adam_v22.json",
+      "path": "core/libraries_and_archives/The-Fortress-&-The-Hunt/adam_v22.json",
       "size": 39265,
       "lines": 456,
       "imports": [],
@@ -7864,7 +7864,7 @@ window.REPO_DATA = {
       "id": 655,
       "label": "10312025.md",
       "group": "md",
-      "path": "core/libraries_and_archives/The Fortress & The Hunt/10312025.md",
+      "path": "core/libraries_and_archives/The-Fortress-&-The-Hunt/10312025.md",
       "size": 27401,
       "lines": 445,
       "imports": [],
@@ -11504,9 +11504,9 @@ window.REPO_DATA = {
     },
     {
       "id": 962,
-      "label": "Adam v19.2 Mapping Document.txt",
+      "label": "Adam-v19.2-Mapping-Document.txt",
       "group": "txt",
-      "path": "docs/Adam v19.2 Mapping Document.txt",
+      "path": "docs/Adam-v19.2-Mapping-Document.txt",
       "size": 110182,
       "lines": 2418,
       "imports": [],
@@ -11544,9 +11544,9 @@ window.REPO_DATA = {
     },
     {
       "id": 966,
-      "label": "Adam v19.1 System Management and Optimization Guide.md",
+      "label": "Adam-v19.1-System-Management-and-Optimization-Guide.md",
       "group": "md",
-      "path": "docs/Adam v19.1 System Management and Optimization Guide.md",
+      "path": "docs/Adam-v19.1-System-Management-and-Optimization-Guide.md",
       "size": 56104,
       "lines": 859,
       "imports": [],
@@ -11664,9 +11664,9 @@ window.REPO_DATA = {
     },
     {
       "id": 978,
-      "label": "Adam v21.0 system prompt.txt",
+      "label": "Adam-v21.0-system-prompt.txt",
       "group": "txt",
-      "path": "docs/Adam v21.0 system prompt.txt",
+      "path": "docs/Adam-v21.0-system-prompt.txt",
       "size": 42231,
       "lines": 792,
       "imports": [],
@@ -11674,9 +11674,9 @@ window.REPO_DATA = {
     },
     {
       "id": 979,
-      "label": "federated learning model setup guide.md",
+      "label": "federated-learning-model-setup-guide.md",
       "group": "md",
-      "path": "docs/federated learning model setup guide.md",
+      "path": "docs/federated-learning-model-setup-guide.md",
       "size": 8374,
       "lines": 226,
       "imports": [],
@@ -11834,9 +11834,9 @@ window.REPO_DATA = {
     },
     {
       "id": 995,
-      "label": "Adam v21.0 Mapping Document.txt",
+      "label": "Adam-v21.0-Mapping-Document.txt",
       "group": "txt",
-      "path": "docs/Adam v21.0 Mapping Document.txt",
+      "path": "docs/Adam-v21.0-Mapping-Document.txt",
       "size": 110145,
       "lines": 2418,
       "imports": [],
@@ -11914,9 +11914,9 @@ window.REPO_DATA = {
     },
     {
       "id": 1003,
-      "label": "Adam v19.2 system prompt.txt",
+      "label": "Adam-v19.2-system-prompt.txt",
       "group": "txt",
-      "path": "docs/Adam v19.2 system prompt.txt",
+      "path": "docs/Adam-v19.2-system-prompt.txt",
       "size": 42234,
       "lines": 793,
       "imports": [],
@@ -11944,9 +11944,9 @@ window.REPO_DATA = {
     },
     {
       "id": 1006,
-      "label": "Conceptual CACM-ADK System Architecture (Mermaid Syntax).md",
+      "label": "Conceptual-CACM-ADK-System-Architecture-(Mermaid-Syntax).md",
       "group": "md",
-      "path": "docs/Conceptual CACM-ADK System Architecture (Mermaid Syntax).md",
+      "path": "docs/Conceptual-CACM-ADK-System-Architecture-(Mermaid-Syntax).md",
       "size": 2583,
       "lines": 65,
       "imports": [],
@@ -24623,7 +24623,7 @@ window.REPO_DATA = {
       "size": 368,
       "lines": 0
     },
-    "UI Mockups.md": {
+    "UI-Mockups.md": {
       "__file__": true,
       "type": "file",
       "size": 12760,
@@ -27931,7 +27931,7 @@ window.REPO_DATA = {
             }
           }
         },
-        "The Fortress & The Hunt": {
+        "The-Fortress-&-The-Hunt": {
           "adam_v22.json": {
             "__file__": true,
             "type": "file",
@@ -29574,7 +29574,7 @@ window.REPO_DATA = {
         "size": 991,
         "lines": 22
       },
-      "Adam v19.2 Mapping Document.txt": {
+      "Adam-v19.2-Mapping-Document.txt": {
         "__file__": true,
         "type": "file",
         "size": 110182,
@@ -29598,7 +29598,7 @@ window.REPO_DATA = {
         "size": 16710,
         "lines": 313
       },
-      "Adam v19.1 System Management and Optimization Guide.md": {
+      "Adam-v19.1-System-Management-and-Optimization-Guide.md": {
         "__file__": true,
         "type": "file",
         "size": 56104,
@@ -29670,13 +29670,13 @@ window.REPO_DATA = {
         "size": 1889,
         "lines": 38
       },
-      "Adam v21.0 system prompt.txt": {
+      "Adam-v21.0-system-prompt.txt": {
         "__file__": true,
         "type": "file",
         "size": 42231,
         "lines": 792
       },
-      "federated learning model setup guide.md": {
+      "federated-learning-model-setup-guide.md": {
         "__file__": true,
         "type": "file",
         "size": 8374,
@@ -29772,7 +29772,7 @@ window.REPO_DATA = {
         "size": 2147,
         "lines": 39
       },
-      "Adam v21.0 Mapping Document.txt": {
+      "Adam-v21.0-Mapping-Document.txt": {
         "__file__": true,
         "type": "file",
         "size": 110145,
@@ -29820,7 +29820,7 @@ window.REPO_DATA = {
         "size": 799,
         "lines": 15
       },
-      "Adam v19.2 system prompt.txt": {
+      "Adam-v19.2-system-prompt.txt": {
         "__file__": true,
         "type": "file",
         "size": 42234,
@@ -29838,7 +29838,7 @@ window.REPO_DATA = {
         "size": 1364,
         "lines": 28
       },
-      "Conceptual CACM-ADK System Architecture (Mermaid Syntax).md": {
+      "Conceptual-CACM-ADK-System-Architecture-(Mermaid-Syntax).md": {
         "__file__": true,
         "type": "file",
         "size": 2583,

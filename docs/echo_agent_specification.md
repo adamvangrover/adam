@@ -48,7 +48,7 @@ The EchoAgent is designed to be modular and integrate with several key component
     *   The `LLMPlugin` abstracts the actual LLM interaction, which could be a call to a real LLM API (like OpenAI) or a simulated one (like the current mock LLM service, which uses a probability map).
 
 *   **Adam System Prompts / Instructions**:
-    *   EchoAgent receives a list of `adam_instructions` (strings) during its initialization. These instructions are typically derived from a master "Adam System Prompt" file (e.g., `docs/Adam v19.2 system prompt.txt`).
+    *   EchoAgent receives a list of `adam_instructions` (strings) during its initialization. These instructions are typically derived from a master "Adam System Prompt" file (e.g., `docs/Adam-v19.2-system-prompt.txt`).
     *   These instructions guide EchoAgent's analytical approach, the persona it should reflect in its output, and the style/tone of its generated content. They are formatted and incorporated into the `context` string passed to the `LLMPlugin`.
 
 ## 3. Key Methods (Illustrative - based on current EchoAgent)

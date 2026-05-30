@@ -236,7 +236,7 @@ window.MOCK_DATA = {
       "last_modified": 1768266823.5956187
     },
     {
-      "path": "UI Mockups.md",
+      "path": "UI-Mockups.md",
       "type": "file",
       "size": 12760,
       "last_modified": 1768266822.5662947
@@ -6254,13 +6254,13 @@ window.MOCK_DATA = {
       "last_modified": 1768266822.8518858
     },
     {
-      "path": "core/libraries_and_archives/The Fortress & The Hunt/adam_v22.json",
+      "path": "core/libraries_and_archives/The-Fortress-&-The-Hunt/adam_v22.json",
       "type": "file",
       "size": 39265,
       "last_modified": 1768266822.8277514
     },
     {
-      "path": "core/libraries_and_archives/The Fortress & The Hunt/10312025.md",
+      "path": "core/libraries_and_archives/The-Fortress-&-The-Hunt/10312025.md",
       "type": "file",
       "size": 27401,
       "last_modified": 1768266822.8277514
@@ -10040,7 +10040,7 @@ window.MOCK_DATA = {
       "last_modified": 1768266823.3222854
     },
     {
-      "path": "docs/Adam v19.2 Mapping Document.txt",
+      "path": "docs/Adam-v19.2-Mapping-Document.txt",
       "type": "file",
       "size": 110182,
       "last_modified": 1768266823.3021874
@@ -10076,7 +10076,7 @@ window.MOCK_DATA = {
       "last_modified": 1768266823.3745403
     },
     {
-      "path": "docs/Adam v19.1 System Management and Optimization Guide.md",
+      "path": "docs/Adam-v19.1-System-Management-and-Optimization-Guide.md",
       "type": "file",
       "size": 56104,
       "last_modified": 1768266823.3021874
@@ -10268,13 +10268,13 @@ window.MOCK_DATA = {
       "last_modified": 1768266823.2981677
     },
     {
-      "path": "docs/Adam v21.0 system prompt.txt",
+      "path": "docs/Adam-v21.0-system-prompt.txt",
       "type": "file",
       "size": 42231,
       "last_modified": 1768266823.3021874
     },
     {
-      "path": "docs/federated learning model setup guide.md",
+      "path": "docs/federated-learning-model-setup-guide.md",
       "type": "file",
       "size": 8374,
       "last_modified": 1768266823.3222854
@@ -10448,7 +10448,7 @@ window.MOCK_DATA = {
       "last_modified": 1768266823.306207
     },
     {
-      "path": "docs/Adam v21.0 Mapping Document.txt",
+      "path": "docs/Adam-v21.0-Mapping-Document.txt",
       "type": "file",
       "size": 110145,
       "last_modified": 1768266823.3021874
@@ -10514,7 +10514,7 @@ window.MOCK_DATA = {
       "last_modified": 1768266823.318266
     },
     {
-      "path": "docs/Adam v19.2 system prompt.txt",
+      "path": "docs/Adam-v19.2-system-prompt.txt",
       "type": "file",
       "size": 42234,
       "last_modified": 1768266823.3021874
@@ -10544,7 +10544,7 @@ window.MOCK_DATA = {
       "last_modified": 1768266823.3222854
     },
     {
-      "path": "docs/Conceptual CACM-ADK System Architecture (Mermaid Syntax).md",
+      "path": "docs/Conceptual-CACM-ADK-System-Architecture-(Mermaid-Syntax).md",
       "type": "file",
       "size": 2583,
       "last_modified": 1768266823.3021874
