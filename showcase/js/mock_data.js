@@ -236,7 +236,7 @@ window.MOCK_DATA = {
       "last_modified": 1768266823.5956187
     },
     {
-      "path": "UI Mockups.md",
+      "path": "UI-Mockups.md",
       "type": "file",
       "size": 12760,
       "last_modified": 1768266822.5662947
@@ -8726,7 +8726,7 @@ window.MOCK_DATA = {
       "last_modified": 1768266822.940379
     },
     {
-      "path": "data/CACM:SaaS_DefaultRisk_v1.jsonld",
+      "path": "data/CACM-SaaS_DefaultRisk_v1.jsonld",
       "type": "file",
       "size": 2649,
       "last_modified": 1768266822.9363563
@@ -10040,7 +10040,7 @@ window.MOCK_DATA = {
       "last_modified": 1768266823.3222854
     },
     {
-      "path": "docs/Adam v19.2 Mapping Document.txt",
+      "path": "docs/Adam-v19.2-Mapping-Document.txt",
       "type": "file",
       "size": 110182,
       "last_modified": 1768266823.3021874
@@ -10076,7 +10076,7 @@ window.MOCK_DATA = {
       "last_modified": 1768266823.3745403
     },
     {
-      "path": "docs/Adam v19.1 System Management and Optimization Guide.md",
+      "path": "docs/Adam-v19.1-System-Management-and-Optimization-Guide.md",
       "type": "file",
       "size": 56104,
       "last_modified": 1768266823.3021874
@@ -10268,13 +10268,13 @@ window.MOCK_DATA = {
       "last_modified": 1768266823.2981677
     },
     {
-      "path": "docs/Adam v21.0 system prompt.txt",
+      "path": "docs/Adam-v21.0-system-prompt.txt",
       "type": "file",
       "size": 42231,
       "last_modified": 1768266823.3021874
     },
     {
-      "path": "docs/federated learning model setup guide.md",
+      "path": "docs/federated-learning-model-setup-guide.md",
       "type": "file",
       "size": 8374,
       "last_modified": 1768266823.3222854
@@ -10448,7 +10448,7 @@ window.MOCK_DATA = {
       "last_modified": 1768266823.306207
     },
     {
-      "path": "docs/Adam v21.0 Mapping Document.txt",
+      "path": "docs/Adam-v21.0-Mapping-Document.txt",
       "type": "file",
       "size": 110145,
       "last_modified": 1768266823.3021874
@@ -10514,7 +10514,7 @@ window.MOCK_DATA = {
       "last_modified": 1768266823.318266
     },
     {
-      "path": "docs/Adam v19.2 system prompt.txt",
+      "path": "docs/Adam-v19.2-system-prompt.txt",
       "type": "file",
       "size": 42234,
       "last_modified": 1768266823.3021874
@@ -10544,7 +10544,7 @@ window.MOCK_DATA = {
       "last_modified": 1768266823.3222854
     },
     {
-      "path": "docs/Conceptual CACM-ADK System Architecture (Mermaid Syntax).md",
+      "path": "docs/Conceptual-CACM-ADK-System-Architecture-(Mermaid-Syntax).md",
       "type": "file",
       "size": 2583,
       "last_modified": 1768266823.3021874
@@ -11144,7 +11144,7 @@ window.MOCK_DATA = {
       "last_modified": 1768266823.338364
     },
     {
-      "path": "docs/notebooks/CACM-ADK MVP: Interactive Notebook with UI.ipynb",
+      "path": "docs/notebooks/CACM-ADK-MVP--Interactive-Notebook-with-UI.ipynb",
       "type": "file",
       "size": 36687,
       "last_modified": 1768266823.326305

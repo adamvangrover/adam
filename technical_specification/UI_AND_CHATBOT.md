@@ -2,7 +2,7 @@
 
 ## 1. Introduction
 
-This document describes the user interface (UI) and chatbot for the ADAM v21.0 platform. The UI is designed to be intuitive, user-friendly, and provide a comprehensive set of tools for financial analysis. The chatbot offers a conversational interface for interacting with the system. The design is based on the details provided in the `UI Mockups.md` document.
+This document describes the user interface (UI) and chatbot for the ADAM v21.0 platform. The UI is designed to be intuitive, user-friendly, and provide a comprehensive set of tools for financial analysis. The chatbot offers a conversational interface for interacting with the system. The design is based on the details provided in the `UI-Mockups.md` document.
 
 ## 2. User Interface Overview
 

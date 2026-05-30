@@ -201,6 +201,6 @@ To reduce confusion and ensure that this document remains the single source of t
 
 - `docs/architecture.md` (v19.0): The content of this document is outdated and has been superseded by the information in this requirements document and the `docs/SYSTEM_OVERVIEW.md`.
 - `CONTRIBUTING.md` (v17.0): The contribution guidelines should be updated to be version-agnostic and should be moved to a more prominent location, such as the root of the repository or the `docs` directory.
-- `UI Mockups.md` (v19.2): The UI/UX requirements in this document have been updated and incorporated into section 1.3 of this document.
+- `UI-Mockups.md` (v19.2): The UI/UX requirements in this document have been updated and incorporated into section 1.3 of this document.
 
 By archiving these documents, we can ensure that all stakeholders are working from the most current and accurate information.
