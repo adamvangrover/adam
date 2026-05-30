@@ -6,7 +6,7 @@ CONTRIBUTING.md
 Dockerfile
 LICENSE
 README.md
-UI Mockups.md
+UI-Mockups.md
 VERSIONING.md
 chatbot
 config
@@ -426,12 +426,12 @@ teacher_outputs.jsonl
 
 ./docs:
 AGENTS.md
-Adam v19.1 System Management and Optimization Guide.md
-Adam v19.2 Mapping Document.txt
-Adam v19.2 system prompt.txt
-Adam v21.0 Mapping Document.txt
-Adam v21.0 system prompt.txt
-Conceptual CACM-ADK System Architecture (Mermaid Syntax).md
+Adam-v19.1-System-Management-and-Optimization-Guide.md
+Adam-v19.2-Mapping-Document.txt
+Adam-v19.2-system-prompt.txt
+Adam-v21.0-Mapping-Document.txt
+Adam-v21.0-system-prompt.txt
+Conceptual-CACM-ADK-System-Architecture-(Mermaid-Syntax).md
 DEVELOPMENT_BEST_PRACTICES.md
 REQUIREMENTS.md
 SYSTEM_OVERVIEW.md
@@ -444,7 +444,7 @@ architecture.md
 chatbot-ui
 credit_sentry_architecture.md
 deployment.md
-federated learning model setup guide.md
+federated-learning-model-setup-guide.md
 getting_started.md
 notebooks
 setup_guide.md
