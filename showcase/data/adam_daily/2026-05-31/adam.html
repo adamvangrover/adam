@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adam Neuro-Symbolic Agent | Fiduciary Artifact</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            bg: '#faf8f5',
+                            card: '#ffffff',
+                            text: '#333333',
+                            accent: '#5b7c99',
+                            gold: '#b49c73',
+                            border: '#e5e0d8',
+                            codebg: '#1e1e1e'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        mono: ['Courier New', 'monospace'],
+                        serif: ['Merriweather', 'serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        body { background-color: #faf8f5; color: #333333; }
+        
+        .active-tab {
+            border-bottom-width: 3px;
+            border-color: #5b7c99;
+            color: #5b7c99;
+            font-weight: 600;
+            background: linear-gradient(to top, rgba(91,124,153,0.05) 0%, transparent 100%);
+        }
+        .inactive-tab {
+            border-bottom-width: 3px;
+            border-color: transparent;
+            color: #6b7280;
+        }
+        .inactive-tab:hover { color: #5b7c99; border-color: #e5e0d8; }
+        
+        .json-key { color: #9cdcfe; }
+        .json-string { color: #ce9178; }
+        .json-number { color: #b5cea8; }
+        .json-boolean { color: #569cd6; }
+        .json-null { color: #569cd6; }
+        
+        .trace-active { background-color: #5b7c99; color: #ffffff; border-color: #5b7c99; }
+        .trace-inactive { background-color: #ffffff; color: #333333; border-color: #e5e0d8; }
+    </style>
+</head>
+<body class="font-sans antialiased h-screen flex flex-col overflow-hidden">
+
+    <!-- Global Header -->
+    <header class="bg-white border-b border-brand-border py-4 px-6 shadow-sm shrink-0 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+            <h1 class="text-2xl font-bold text-brand-text tracking-tight">Adam Neuro-Symbolic Agent</h1>
+            <p class="text-brand-accent mt-0.5 text-sm font-medium">Immutable Fiduciary Artifact & Telemetry Bundle</p>
+        </div>
+        <div class="flex items-center gap-3">
+            <div class="bg-brand-bg border border-brand-border px-3 py-1.5 rounded text-xs text-brand-gold font-bold flex items-center">
+                <span class="w-2 h-2 rounded-full bg-green-500 mr-2 animate-pulse"></span>
+                RUN-20260530-PC-MARKS
+            </div>
+            <button onclick="downloadRawData()" class="bg-brand-text hover:bg-gray-700 text-white px-3 py-1.5 rounded text-xs font-bold transition-colors shadow flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                Extract JSON
+            </button>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="bg-white border-b border-brand-border px-6 shrink-0 z-10">
+        <div class="max-w-7xl mx-auto flex overflow-x-auto">
+            <button id="tab-btn-theory" class="active-tab px-5 py-3 text-sm whitespace-nowrap transition-colors focus:outline-none flex items-center gap-2" onclick="switchTab('theory')">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                Whitepaper & Architecture
+            </button>
+            <button id="tab-btn-trace" class="inactive-tab px-5 py-3 text-sm whitespace-nowrap transition-colors focus:outline-none flex items-center gap-2" onclick="switchTab('trace')">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
+                Runtime Proof of Thought
+            </button>
+            <button id="tab-btn-impact" class="inactive-tab px-5 py-3 text-sm whitespace-nowrap transition-colors focus:outline-none flex items-center gap-2" onclick="switchTab('impact')">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path></svg>
+                Financial Math Execution
+            </button>
+            <button id="tab-btn-mcp" class="inactive-tab px-5 py-3 text-sm whitespace-nowrap transition-colors focus:outline-none flex items-center gap-2" onclick="switchTab('mcp')">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                MCP & Decision Support
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 overflow-y-auto p-6 max-w-7xl mx-auto w-full relative">
+        
+        <!-- SECTION 1: Whitepaper & Architecture -->
+        <section id="sec-theory" class="block animate-fade-in pb-10">
+            <div class="bg-white border border-brand-border rounded-lg p-8 shadow-sm">
+                <h2 class="text-3xl font-serif font-bold text-brand-text mb-6 border-b border-brand-border pb-4">Architecting the Neuro-Symbolic Enterprise</h2>
+                <p class="text-gray-600 mb-8 font-serif leading-relaxed text-lg">
+                    The epistemological crisis in financial AI demands a transition from naive "LLM Wrappers" to sovereign, neuro-symbolic architectures. This artifact serves as the physical manifestation of <strong>Domain-Driven Design (DDD)</strong> and <strong>Sly Data</strong> telemetry within the Adam repository.
+                </p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                    <!-- Dual Process Card -->
+                    <div class="bg-brand-bg border border-brand-border p-6 rounded-lg">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="bg-brand-text text-white w-8 h-8 rounded flex items-center justify-center font-bold">1</div>
+                            <h3 class="text-lg font-bold text-brand-text">Dual-Process Cognition</h3>
+                        </div>
+                        <p class="text-sm text-gray-700 leading-relaxed mb-4">
+                            Adam is categorized as a <strong>Type 3 (Neuro | Symbolic)</strong> system under the Kautz Taxonomy. It explicitly separates the probabilistic <code class="bg-gray-200 px-1 rounded text-xs">adam_swarm</code> (System 1) from the deterministic logic of the <code class="bg-gray-200 px-1 rounded text-xs">adam_graph</code> (System 2) to prevent the "Lethal Trifecta" of AI hallucination in capital allocation.
+                        </p>
+                    </div>
+
+                    <!-- 10k Token Card -->
+                    <div class="bg-brand-bg border border-brand-border p-6 rounded-lg">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="bg-brand-gold text-white w-8 h-8 rounded flex items-center justify-center font-bold">2</div>
+                            <h3 class="text-lg font-bold text-brand-text">10k-Token Optimization</h3>
+                        </div>
+                        <p class="text-sm text-gray-700 leading-relaxed">
+                            To facilitate autonomous LLM maintenance without succumbing to "Attention Decay", Adam enforces strict Bounded Contexts. All prompts and JSONLogic are evicted to an <code class="bg-gray-200 px-1 rounded text-xs">assets/</code> directory, while <code class="bg-gray-200 px-1 rounded text-xs">adam_interfaces</code> governs strict Protocol decoupling.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="border-t border-brand-border pt-6 mt-6">
+                    <h3 class="text-lg font-bold text-brand-text mb-4">Repository Architecture Mapping</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div class="p-4 border border-brand-border rounded hover:border-brand-accent transition-colors bg-white">
+                            <h4 class="font-mono text-sm font-bold text-brand-accent mb-1">adam_interfaces/</h4>
+                            <p class="text-xs text-gray-600">Python Protocols defining cross-module I/O contracts.</p>
+                        </div>
+                        <div class="p-4 border border-brand-border rounded hover:border-brand-accent transition-colors bg-white">
+                            <h4 class="font-mono text-sm font-bold text-brand-accent mb-1">adam_swarm/</h4>
+                            <p class="text-xs text-gray-600">System 1: High-velocity unstructured data ingestion.</p>
+                        </div>
+                        <div class="p-4 border border-brand-border rounded hover:border-brand-accent transition-colors bg-white">
+                            <h4 class="font-mono text-sm font-bold text-brand-accent mb-1">adam_graph/</h4>
+                            <p class="text-xs text-gray-600">System 2: Neuro-symbolic DAG planner and memory.</p>
+                        </div>
+                        <div class="p-4 border border-brand-border rounded hover:border-brand-accent transition-colors bg-white">
+                            <h4 class="font-mono text-sm font-bold text-brand-accent mb-1">adam_finance/</h4>
+                            <p class="text-xs text-gray-600">Deterministic math (ICAT, SNC, Fama-French). Zero LLM logic.</p>
+                        </div>
+                        <div class="p-4 border border-brand-border rounded hover:border-brand-accent transition-colors bg-white">
+                            <h4 class="font-mono text-sm font-bold text-brand-accent mb-1">adam_governance/</h4>
+                            <p class="text-xs text-gray-600">Gatekeeper, Proof of Thought logger, and Consensus Engine.</p>
+                        </div>
+                        <div class="p-4 border border-brand-border rounded hover:border-brand-accent transition-colors bg-white">
+                            <h4 class="font-mono text-sm font-bold text-brand-accent mb-1">assets/</h4>
+                            <p class="text-xs text-gray-600">Evicted prompts and jsonLogic rule matrices.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: Runtime Trace (Proof of Thought) -->
+        <section id="sec-trace" class="hidden animate-fade-in pb-10">
+            <div class="mb-6">
+                <h2 class="text-2xl font-bold mb-2">Immutable Proof of Thought Ledger</h2>
+                <p class="text-gray-600 text-sm max-w-4xl">
+                    This interactive log represents "Sly Data" in action. Operational state is passed deterministically between bounded contexts, generating an auditable trail of how unstructured regulatory text was converted into a mathematical risk action.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 h-[500px]">
+                <!-- Stepper -->
+                <div class="lg:col-span-4 flex flex-col gap-3 relative overflow-y-auto pr-2">
+                    <div class="absolute left-4 top-4 bottom-4 w-0.5 bg-brand-border z-0 hidden lg:block"></div>
+                    
+                    <button id="trace-btn-1" class="trace-active z-10 text-left p-4 rounded border border-brand-border shadow-sm transition-all focus:outline-none" onclick="showTrace(1)">
+                        <div class="text-[10px] font-bold text-white uppercase tracking-wider mb-1">Phase 1: Ingestion</div>
+                        <h4 class="font-bold text-sm">adam_swarm::SentinelWorker</h4>
+                    </button>
+                    
+                    <button id="trace-btn-2" class="trace-inactive z-10 text-left p-4 rounded border shadow-sm transition-all focus:outline-none" onclick="showTrace(2)">
+                        <div class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Phase 2: Validation</div>
+                        <h4 class="font-bold text-sm">adam_interfaces::Protocol</h4>
+                    </button>
+
+                    <button id="trace-btn-3" class="trace-inactive z-10 text-left p-4 rounded border shadow-sm transition-all focus:outline-none" onclick="showTrace(3)">
+                        <div class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Phase 3: System 2 Planner</div>
+                        <h4 class="font-bold text-sm">adam_graph::DAG_Planner</h4>
+                    </button>
+
+                    <button id="trace-btn-4" class="trace-inactive z-10 text-left p-4 rounded border shadow-sm transition-all focus:outline-none" onclick="showTrace(4)">
+                        <div class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Phase 4: Execution</div>
+                        <h4 class="font-bold text-sm">adam_finance::liquidity_model</h4>
+                    </button>
+
+                    <button id="trace-btn-5" class="trace-inactive z-10 text-left p-4 rounded border shadow-sm transition-all focus:outline-none" onclick="showTrace(5)">
+                        <div class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Phase 5: Gatekeeper</div>
+                        <h4 class="font-bold text-sm">adam_governance::Consensus</h4>
+                    </button>
+                </div>
+
+                <!-- Log Output -->
+                <div class="lg:col-span-8 h-full">
+                    <div class="bg-brand-codebg rounded-lg p-4 shadow-md h-full flex flex-col border border-gray-800">
+                        <div class="flex justify-between items-center mb-4 border-b border-gray-700 pb-3 shrink-0">
+                            <div class="flex items-center gap-2">
+                                <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                                <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                                <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                                <span class="text-gray-400 font-mono text-xs ml-2" id="trace-header-text">adam_swarm::SentinelWorker</span>
+                            </div>
+                            <span class="text-xs font-mono text-gray-500" id="trace-timestamp">09:00:00.000</span>
+                        </div>
+                        <div class="flex-1 overflow-auto">
+                            <pre id="trace-content-block" class="font-mono text-sm text-green-400 whitespace-pre-wrap leading-relaxed"></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: Financial Impact -->
+        <section id="sec-impact" class="hidden animate-fade-in pb-10">
+            <div class="mb-6">
+                <h2 class="text-2xl font-bold mb-2">Deterministic Math Output: Spread Compression</h2>
+                <p class="text-gray-600 text-sm max-w-4xl">
+                    Output from <code class="bg-gray-200 px-1 rounded text-xs">adam_finance</code>. Demonstrates the execution of pure, zero-LLM-dependency mathematical logic recalculating the Private Credit illiquidity premium based on the daily mark-to-market mandate.
+                </p>
+            </div>
+
+            <div class="bg-white border border-brand-border rounded-lg p-6 shadow-sm">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-brand-bg p-4 rounded border border-brand-border flex justify-between items-center">
+                        <div>
+                            <div class="text-xs text-gray-500 uppercase font-bold mb-1">Baseline State</div>
+                            <div class="text-xs text-gray-400">Quarterly Lagged Premium</div>
+                        </div>
+                        <div class="text-2xl font-mono text-brand-text font-bold">250 <span class="text-sm">bps</span></div>
+                    </div>
+                    <div class="bg-brand-bg p-4 rounded border border-brand-border flex justify-between items-center">
+                        <div>
+                            <div class="text-xs text-gray-500 uppercase font-bold mb-1">Graph Input Mod</div>
+                            <div class="text-xs text-gray-400">Daily Deviation Multiplier</div>
+                        </div>
+                        <div class="text-2xl font-mono text-brand-accent font-bold">0.24</div>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded border border-gray-200 flex justify-between items-center shadow-inner">
+                        <div>
+                            <div class="text-xs text-brand-text uppercase font-bold mb-1">New Output State</div>
+                            <div class="text-xs text-gray-500">Real-time Spread</div>
+                        </div>
+                        <div class="text-2xl font-mono text-red-600 font-bold">190 <span class="text-sm">bps</span></div>
+                    </div>
+                </div>
+
+                <div class="relative w-full h-[350px]">
+                    <canvas id="impactChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 4: MCP & Decision Support (NEW) -->
+        <section id="sec-mcp" class="hidden animate-fade-in pb-10 h-[calc(100vh-140px)]">
+            <div class="mb-4 shrink-0">
+                <h2 class="text-2xl font-bold mb-2">Model Context Protocol (MCP) Integration</h2>
+                <p class="text-gray-600 text-sm max-w-4xl">
+                    Demonstrating how an external LLM agent utilizing MCP accesses this exact telemetry bundle to provide reasoned, deterministic decision support without hallucinating internal architectures.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 h-[calc(100%-80px)]">
+                <!-- Left Pane: MCP Tool Call -->
+                <div class="flex flex-col bg-brand-codebg rounded-lg border border-gray-800 shadow-md h-full overflow-hidden">
+                    <div class="bg-[#2d2d2d] px-4 py-2 border-b border-gray-700 flex justify-between items-center shrink-0">
+                        <span class="text-xs font-mono text-gray-300 font-bold">Server: Adam_MCP_Host</span>
+                        <span class="text-[10px] bg-blue-900 text-blue-300 px-2 py-0.5 rounded">Tool Call Executed</span>
+                    </div>
+                    <div class="p-4 overflow-y-auto flex-1 text-sm font-mono" id="mcp-json-viewer">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Right Pane: Decision Support Output -->
+                <div class="flex flex-col bg-white rounded-lg border border-brand-border shadow-md h-full overflow-hidden">
+                    <div class="bg-brand-bg px-4 py-2 border-b border-brand-border flex justify-between items-center shrink-0">
+                        <span class="text-xs font-serif font-bold text-brand-text">Agentic Decision Support Matrix</span>
+                        <span class="text-[10px] bg-green-100 text-green-800 border border-green-300 px-2 py-0.5 rounded">Policy Enforced</span>
+                    </div>
+                    <div class="p-6 overflow-y-auto flex-1">
+                        <div class="mb-6">
+                            <h4 class="text-sm font-bold text-gray-500 uppercase tracking-wider mb-2">1. Observation</h4>
+                            <p class="text-sm text-gray-800 border-l-2 border-brand-accent pl-3">
+                                Via MCP tool `fetch_telemetry_run`, telemetry indicates a structural shift in Private Credit liquidity. The systemic mandate has forced <code class="bg-gray-100 px-1 rounded text-xs">adam_finance</code> to compress the illiquidity premium from historical baselines (250bps) down to 190bps, exceeding the strict 1.5% volatility threshold.
+                            </p>
+                        </div>
+                        
+                        <div class="mb-6">
+                            <h4 class="text-sm font-bold text-gray-500 uppercase tracking-wider mb-2">2. Financial Reasoning</h4>
+                            <p class="text-sm text-gray-800 border-l-2 border-brand-gold pl-3">
+                                A 60bps compression fundamentally alters the risk/reward ratio of Level 3 assets. When the illiquidity premium compresses below 200bps, these assets no longer offer sufficient compensation for their lock-up periods compared to broadly syndicated liquid loans (BSL) of equivalent credit quality.
+                            </p>
+                        </div>
+
+                        <div>
+                            <h4 class="text-sm font-bold text-gray-500 uppercase tracking-wider mb-2">3. Recommended Action</h4>
+                            <div class="bg-red-50 border border-red-200 rounded p-4">
+                                <h5 class="font-bold text-red-800 mb-2">Execute Portfolio Rebalancing</h5>
+                                <ul class="list-disc pl-5 text-sm text-red-900 space-y-1">
+                                    <li>Divest bottom quartile (15%) of Level 3 Private Credit allocations over the next 45 days.</li>
+                                    <li>Reallocate capital to Level 2 equivalent floating-rate syndicated debt.</li>
+                                    <li>Update `AGENTS_KNOWLEDGE_BASE.md` to blacklist new originations in the target sector until spreads normalize above 220bps.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- The Immutable Telemetry State Bundle -->
+    <script>
+        // THIS OBJECT IS THE BUNDLE. 
+        window.__TELEMETRY_BUNDLE__ = {
+            metadata: {
+                run_id: "RUN-20260530-PC-MARKS",
+                timestamp: "2026-05-30T13:00:05Z",
+                trigger: "Swarm Sentinel",
+                architecture: "Type 3 (Neuro | Symbolic)"
+            },
+            traces: [
+                {
+                    header: 'adam_swarm::SentinelWorker',
+                    time: '09:00:00.012',
+                    content: `STATUS: INGESTING UNSTRUCTURED DATA\nSOURCE: Regulatory Alert / Institutional Mandate\n\nRAW TEXT: "Effective immediately, all Level 3 private credit assets must be marked-to-market daily. Traditional quarterly valuation smoothing curves are deprecated."\n\nACTION: Packaging text into UnstructuredEvent payload.`
+                },
+                {
+                    header: 'adam_interfaces::IngestionProtocol',
+                    time: '09:00:00.145',
+                    content: `STATUS: CONTRACT ENFORCEMENT\n\nACTION: Validating schema transformation against Pydantic models.\n\nMAPPING: Raw text -> Structured JSON Node payload.\nROUTING: Handing off to System 2 Planner.`
+                },
+                {
+                    header: 'adam_graph::DAG_Planner',
+                    time: '09:00:01.302',
+                    content: `STATUS: SYSTEM 2 COGNITIVE PROCESSING\n\nMEMORIZED STATE: Fetching baseline from docs/AGENTS_KNOWLEDGE_BASE.md\nPREVIOUS STATE: Private Credit Illiquidity Premium fixed at 250 bps.\nNEW STATE: Spreads volatile; dynamic input required.\n\nDAG RESOLUTION PATH:\n  └── Step 1: Trigger Liquidity Model Recalibration -> adam_finance\n  └── Step 2: Extract impacted assets (CUSIP tracking)\n  └── Step 3: Append finding to active memory state`
+                },
+                {
+                    header: 'adam_finance::liquidity_model',
+                    time: '09:00:02.001',
+                    content: `STATUS: EXECUTING DETERMINISTIC MATH (Zero LLM Dependency)\n\nINPUTS: \n  - Target Asset: Level 3 Private Credit\n  - Current Daily Deviation Mod: 0.24\n\nCALCULATION:\n  $$Illiquidity Premium = 250 bps × (1 - 0.24)$$\n  $$Premium = 190 bps$$\n\nOUTPUT: Spread = 190 bps. Target risk threshold exceeded (> 1.5%).`
+                },
+                {
+                    header: 'adam_governance::ConsensusEngine',
+                    time: '09:00:02.855',
+                    content: `STATUS: GATEKEEPER RISK ALERT\n\nALERT LEVEL: CRITICAL (Spread Compression)\n\nACTION: Injecting structural finding into core framework memory.\nACTION: Firing webhook to MCP Server for Agentic Decision Support.`
+                }
+            ],
+            mcp_invocation: {
+                "jsonrpc": "2.0",
+                "id": "req_8f73bA9",
+                "method": "tools/call",
+                "params": {
+                    "name": "analyze_portfolio_risk",
+                    "arguments": {
+                        "asset_class": "Private Credit",
+                        "liquidity_tier": "Level 3",
+                        "event": "Daily Mark-to-Market Mandate",
+                        "previous_spread_bps": 250,
+                        "new_spread_bps": 190,
+                        "volatility_threshold_breach": true,
+                        "telemetry_ref": "RUN-20260530-PC-MARKS"
+                    }
+                }
+            }
+        };
+
+        let impactChartInstance = null;
+
+        // UI Logic
+        function switchTab(tabId) {
+            const sections = ['theory', 'trace', 'impact', 'mcp'];
+            sections.forEach(id => {
+                document.getElementById('sec-' + id).style.display = 'none';
+                
+                const btn = document.getElementById('tab-btn-' + id);
+                // Reset button styles
+                btn.className = btn.className.replace('active-tab', 'inactive-tab');
+                btn.className = btn.className.replace('text-[#5b7c99]', 'text-gray-500');
+            });
+
+            // Activate chosen tab
+            document.getElementById('sec-' + tabId).style.display = 'block';
+            const activeBtn = document.getElementById('tab-btn-' + tabId);
+            activeBtn.className = activeBtn.className.replace('inactive-tab', 'active-tab');
+
+            if(tabId === 'impact') initChart();
+            if(tabId === 'trace') showTrace(1);
+        }
+
+        function showTrace(stepIndex) {
+            for(let i=1; i<=5; i++) {
+                const btn = document.getElementById('trace-btn-' + i);
+                const title = btn.querySelector('h4');
+                const subtitle = btn.querySelector('div');
+                
+                if(i === stepIndex) {
+                    btn.className = 'trace-active z-10 text-left p-4 rounded border border-brand-accent shadow-sm transition-all focus:outline-none';
+                    title.classList.remove('text-gray-800');
+                    subtitle.classList.remove('text-gray-500');
+                    subtitle.classList.add('text-white');
+                } else {
+                    btn.className = 'trace-inactive z-10 text-left p-4 rounded border border-brand-border shadow-sm transition-all focus:outline-none hover:border-gray-400';
+                    title.classList.add('text-gray-800');
+                    subtitle.classList.add('text-gray-500');
+                    subtitle.classList.remove('text-white');
+                }
+            }
+            
+            const data = window.__TELEMETRY_BUNDLE__.traces[stepIndex - 1];
+            document.getElementById('trace-header-text').innerText = data.header;
+            document.getElementById('trace-timestamp').innerText = data.time;
+            document.getElementById('trace-content-block').innerText = data.content;
+        }
+
+        // Simple JSON syntax highlighter for MCP tab
+        function syntaxHighlight(json) {
+            if (typeof json != 'string') {
+                json = JSON.stringify(json, undefined, 4);
+            }
+            json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+                let cls = 'json-number';
+                if (/^"/.test(match)) {
+                    if (/:$/.test(match)) {
+                        cls = 'json-key';
+                    } else {
+                        cls = 'json-string';
+                    }
+                } else if (/true|false/.test(match)) {
+                    cls = 'json-boolean';
+                } else if (/null/.test(match)) {
+                    cls = 'json-null';
+                }
+                return '<span class="' + cls + '">' + match + '</span>';
+            });
+        }
+
+        function initChart() {
+            if(impactChartInstance) return;
+            
+            const ctx = document.getElementById('impactChart').getContext('2d');
+            const labels = ['T-5', 'T-4', 'T-3', 'T-2', 'T-1', 'T-0 (Event)', 'T+1', 'T+2', 'T+3', 'T+4', 'T+5'];
+            const oldModelData = [250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250];
+            const newModelData = [250, 250, 250, 250, 250, 190, 195, 185, 192, 188, 190];
+
+            impactChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Historical Smoothed Premium (Quarterly Lag)',
+                            data: oldModelData,
+                            borderColor: '#b49c73',
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            pointRadius: 0,
+                            fill: false,
+                            tension: 0
+                        },
+                        {
+                            label: 'Real-time Mark-to-Market Premium',
+                            data: newModelData,
+                            borderColor: '#ef4444', // Red to show compression risk
+                            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                            borderWidth: 3,
+                            pointBackgroundColor: '#ffffff',
+                            pointBorderColor: '#ef4444',
+                            pointRadius: 4,
+                            pointHoverRadius: 6,
+                            fill: true,
+                            tension: 0.2
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: {
+                        legend: { position: 'bottom', labels: { font: { family: "'Inter', sans-serif", size: 12 }, padding: 20 } },
+                        tooltip: { backgroundColor: 'rgba(30, 30, 30, 0.95)', titleFont: { family: "'Courier New', monospace" }, padding: 12, cornerRadius: 4 }
+                    },
+                    scales: {
+                        x: { grid: { display: false }, ticks: { font: { family: "'Courier New', monospace" } } },
+                        y: { 
+                            min: 150, max: 300, 
+                            grid: { color: '#e5e0d8', borderDash: [2, 4] },
+                            ticks: { stepSize: 25, callback: function(value) { return value + ' bps'; } },
+                            title: { display: true, text: 'Illiquidity Premium (bps)', font: { weight: 'bold' } }
+                        }
+                    }
+                }
+            });
+        }
+
+        function downloadRawData() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(window.__TELEMETRY_BUNDLE__, null, 2));
+            const dl = document.createElement('a');
+            dl.setAttribute("href", dataStr);
+            dl.setAttribute("download", window.__TELEMETRY_BUNDLE__.metadata.run_id + "_artifact.json");
+            document.body.appendChild(dl);
+            dl.click();
+            dl.remove();
+        }
+
+        // Initialize view
+        window.onload = function() {
+            document.getElementById('mcp-json-viewer').innerHTML = syntaxHighlight(window.__TELEMETRY_BUNDLE__.mcp_invocation);
+        };
+    </script>
+</body>
+</html>
