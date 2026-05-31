@@ -478,7 +478,7 @@ ICATv4.ipynb
 ITPTv6.ipynb
 Interactive_Credit_Report_Generator.ipynb
 Prompt_Engineering_Assistant.ipynb
-Simplified_Credit_Analysis_&_Valuation_Notebook.ipynb
+Simplified_Credit_Analysis_-_Valuation_Notebook.ipynb
 TEFAv5.ipynb
 TEFAv7.ipynb
 adam_config.ipynb

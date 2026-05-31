@@ -6254,13 +6254,13 @@ window.MOCK_DATA = {
       "last_modified": 1768266822.8518858
     },
     {
-      "path": "core/libraries_and_archives/The-Fortress-&-The-Hunt/adam_v22.json",
+      "path": "core/libraries_and_archives/The-Fortress-and-The-Hunt/adam_v22.json",
       "type": "file",
       "size": 39265,
       "last_modified": 1768266822.8277514
     },
     {
-      "path": "core/libraries_and_archives/The-Fortress-&-The-Hunt/10312025.md",
+      "path": "core/libraries_and_archives/The-Fortress-and-The-Hunt/10312025.md",
       "type": "file",
       "size": 27401,
       "last_modified": 1768266822.8277514
@@ -11156,7 +11156,7 @@ window.MOCK_DATA = {
       "last_modified": 1768266823.3343441
     },
     {
-      "path": "docs/notebooks/Simplified_Credit_Analysis_&_Valuation_Notebook.ipynb",
+      "path": "docs/notebooks/Simplified_Credit_Analysis_-_Valuation_Notebook.ipynb",
       "type": "file",
       "size": 30293,
       "last_modified": 1768266823.3303246
