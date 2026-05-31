@@ -1,9 +1,10 @@
 import json
-import jsonschema
 import hashlib
 import urllib.request
 import urllib.error
 import asyncio
+from urllib.parse import urlparse
+import jsonschema
 from pydantic import BaseModel, Field
 from typing import Dict, Any, Optional
 
@@ -27,7 +28,7 @@ class GovernanceError(Exception):
 class GovernanceGatekeeper:
     def __init__(self, schema: Dict[str, Any]):
         """
-        Initializes the PDIL gatekeeper with a specific JSON schema constraint.
+        Initializes the gatekeeper with a specific JSON schema constraint.
         Bridges stochastic model outputs with deterministic system inputs.
         """
         self.schema = schema
@@ -62,25 +63,30 @@ class GovernanceGatekeeper:
         if not payload:
             raise GovernanceError("Missing 'data' payload in inference output.")
 
-        # Real provenance checks: Hash validation
-        computed_hash = hashlib.sha256(json.dumps(payload, sort_keys=True, separators=(',', ':')).encode('utf-8')).hexdigest()
+        # Strict Provenance Checks: Reproducible Hash Validation
+        # Using separators removes whitespace for a strictly deterministic hash
+        payload_json = json.dumps(payload, sort_keys=True, separators=(',', ':')).encode('utf-8')
+        computed_hash = hashlib.sha256(payload_json).hexdigest()
+        
         if header.content_hash != computed_hash:
             raise GovernanceError(f"Provenance violation: content_hash mismatch. Expected {computed_hash}, got {header.content_hash}")
 
-        # Real provenance checks: Source data object reachability
-        if header.source_data_object.startswith("http"):
-            from urllib.parse import urlparse
-            parsed_url = urlparse(header.source_data_object)
+        # Strict Provenance Checks: Source Data Object Reachability & Whitelisting
+        source = header.source_data_object
+        if source.startswith("http://") or source.startswith("https://"):
+            parsed_url = urlparse(source)
+            
+            # Domain whitelisting enforcement
             allowed_domains = ["example.com", "api.github.com", "query2.finance.yahoo.com"]
             if parsed_url.hostname not in allowed_domains:
                 raise GovernanceError(f"Source data object domain not permitted: {parsed_url.hostname}")
 
             try:
                 req = urllib.request.Request(
-                    header.source_data_object,
+                    source,
                     headers={'User-Agent': 'Mozilla/5.0'}
                 )
-                with urllib.request.urlopen(req, timeout=5) as response:
+                with urllib.request.urlopen(req, timeout=5.0) as response:
                     if response.getcode() >= 400:
                         raise GovernanceError(f"Source data object unreachable: HTTP {response.getcode()}")
             except urllib.error.URLError as e:
@@ -88,6 +94,7 @@ class GovernanceGatekeeper:
             except Exception as e:
                  raise GovernanceError(f"Source data object validation failed: {e}")
 
+        # Schema Validation
         try:
             self.validator.validate(instance=payload)
         except jsonschema.exceptions.ValidationError as e:

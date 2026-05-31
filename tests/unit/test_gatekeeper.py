@@ -92,7 +92,12 @@ def test_invalid_schema(mock_urlopen):
     with pytest.raises(GovernanceError, match="Schema validation failed"):
         gatekeeper.validate_inference(invalid_input)
 
-def test_poisoned_data_low(valid_provenance):
+@patch('urllib.request.urlopen')
+def test_poisoned_data_low(mock_urlopen, valid_provenance):
+    mock_response = MagicMock()
+    mock_response.getcode.return_value = 200
+    mock_urlopen.return_value.__enter__.return_value = mock_response
+
     gatekeeper = GovernanceGatekeeper(schema=TEST_SCHEMA)
     provenance = valid_provenance.copy()
     provenance["confidence_score"] = -0.1
@@ -104,7 +109,12 @@ def test_poisoned_data_low(valid_provenance):
     with pytest.raises(GovernanceError, match="Poisoned data detected"):
         gatekeeper.validate_inference(invalid_input)
 
-def test_poisoned_data_high(valid_provenance):
+@patch('urllib.request.urlopen')
+def test_poisoned_data_high(mock_urlopen, valid_provenance):
+    mock_response = MagicMock()
+    mock_response.getcode.return_value = 200
+    mock_urlopen.return_value.__enter__.return_value = mock_response
+
     gatekeeper = GovernanceGatekeeper(schema=TEST_SCHEMA)
     provenance = valid_provenance.copy()
     provenance["confidence_score"] = 1.1
@@ -116,7 +126,12 @@ def test_poisoned_data_high(valid_provenance):
     with pytest.raises(GovernanceError, match="Poisoned data detected"):
         gatekeeper.validate_inference(invalid_input)
 
-def test_missing_data(valid_provenance):
+@patch('urllib.request.urlopen')
+def test_missing_data(mock_urlopen, valid_provenance):
+    mock_response = MagicMock()
+    mock_response.getcode.return_value = 200
+    mock_urlopen.return_value.__enter__.return_value = mock_response
+
     gatekeeper = GovernanceGatekeeper(schema=TEST_SCHEMA)
     invalid_input = {
         "provenance_trace": valid_provenance,
@@ -154,7 +169,12 @@ def test_fuzz_valid_schema(mock_urlopen, status, value):
         st.floats(min_value=1.0001, allow_nan=False, allow_infinity=False)
     )
 )
-def test_fuzz_poisoned_data(confidence):
+@patch('urllib.request.urlopen')
+def test_fuzz_poisoned_data(mock_urlopen, confidence):
+    mock_response = MagicMock()
+    mock_response.getcode.return_value = 200
+    mock_urlopen.return_value.__enter__.return_value = mock_response
+
     gatekeeper = GovernanceGatekeeper(schema=TEST_SCHEMA)
     provenance = get_valid_provenance()
     provenance["confidence_score"] = confidence
