@@ -1,9 +1,10 @@
 import json
 import hashlib
 import urllib.request
-from urllib.error import URLError, HTTPError
-import jsonschema
+import urllib.error
 import asyncio
+from urllib.parse import urlparse
+import jsonschema
 from pydantic import BaseModel, Field
 from typing import Dict, Any, Optional
 
@@ -27,7 +28,7 @@ class GovernanceError(Exception):
 class GovernanceGatekeeper:
     def __init__(self, schema: Dict[str, Any]):
         """
-        Initializes the PDIL gatekeeper with a specific JSON schema constraint.
+        Initializes the gatekeeper with a specific JSON schema constraint.
         Bridges stochastic model outputs with deterministic system inputs.
         """
         self.schema = schema
@@ -36,20 +37,6 @@ class GovernanceGatekeeper:
         ValidatorClass = jsonschema.validators.validator_for(schema)
         ValidatorClass.check_schema(schema)
         self.validator = ValidatorClass(schema)
-
-
-
-    def entry_gate(self, input_data: Dict[str, Any]) -> Dict[str, Any]:
-        """
-        Entry point for agentic workflows.
-        """
-        return input_data
-
-    def exit_gate(self, inference_output: Dict[str, Any]) -> Dict[str, Any]:
-        """
-        Exit point for agentic workflows.
-        """
-        return self.validate_inference(inference_output)
 
     def validate_inference(self, inference_output: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -76,28 +63,56 @@ class GovernanceGatekeeper:
         if not payload:
             raise GovernanceError("Missing 'data' payload in inference output.")
 
-        # Real provenance checks must be enforced by actively computing the payload's SHA-256 hash
-        payload_json = json.dumps(payload, sort_keys=True).encode("utf-8")
+        # Strict Provenance Checks: Reproducible Hash Validation
+        # Using separators removes whitespace for a strictly deterministic hash
+        payload_json = json.dumps(payload, sort_keys=True, separators=(',', ':')).encode('utf-8')
         computed_hash = hashlib.sha256(payload_json).hexdigest()
+        
+        if header.content_hash != computed_hash:
+            raise GovernanceError(f"Provenance violation: content_hash mismatch. Expected {computed_hash}, got {header.content_hash}")
 
-        if computed_hash != header.content_hash:
-            raise GovernanceError(f"Content hash mismatch: computed {computed_hash}, expected {header.content_hash}")
-
-        # Verify source_data_object reachability if it is a URL
+        # Strict Provenance Checks: Source Data Object Reachability & Whitelisting
         source = header.source_data_object
         if source.startswith("http://") or source.startswith("https://"):
-            try:
-                req = urllib.request.Request(source, headers={'User-Agent': 'Mozilla/5.0'})
-                urllib.request.urlopen(req, timeout=5.0)
-            except (URLError, HTTPError, ValueError) as e:
-                raise GovernanceError(f"Source data object reachability check failed: {e}")
+            parsed_url = urlparse(source)
+            
+            # Domain whitelisting enforcement
+            allowed_domains = ["example.com", "api.github.com", "query2.finance.yahoo.com"]
+            if parsed_url.hostname not in allowed_domains:
+                raise GovernanceError(f"Source data object domain not permitted: {parsed_url.hostname}")
 
+            try:
+                req = urllib.request.Request(
+                    source,
+                    headers={'User-Agent': 'Mozilla/5.0'}
+                )
+                with urllib.request.urlopen(req, timeout=5.0) as response:
+                    if response.getcode() >= 400:
+                        raise GovernanceError(f"Source data object unreachable: HTTP {response.getcode()}")
+            except urllib.error.URLError as e:
+                raise GovernanceError(f"Source data object unreachable: {e}")
+            except Exception as e:
+                 raise GovernanceError(f"Source data object validation failed: {e}")
+
+        # Schema Validation
         try:
             self.validator.validate(instance=payload)
         except jsonschema.exceptions.ValidationError as e:
             raise GovernanceError(f"Schema validation failed: {e.message}")
 
         return inference_output
+
+    def entry_gate(self, inference_output: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Entry point for all agentic workflows. Proxies to validate_inference.
+        """
+        return self.validate_inference(inference_output)
+
+    def exit_gate(self, inference_output: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Exit point for all agentic workflows. Proxies to validate_inference.
+        """
+        return self.validate_inference(inference_output)
 
     async def async_validate_inference(self, inference_output: Dict[str, Any]) -> Dict[str, Any]:
         """
