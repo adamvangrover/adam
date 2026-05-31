@@ -1,4 +1,7 @@
 import json
+import hashlib
+import urllib.request
+from urllib.error import URLError, HTTPError
 import jsonschema
 import asyncio
 from pydantic import BaseModel, Field
@@ -34,6 +37,20 @@ class GovernanceGatekeeper:
         ValidatorClass.check_schema(schema)
         self.validator = ValidatorClass(schema)
 
+
+
+    def entry_gate(self, input_data: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Entry point for agentic workflows.
+        """
+        return input_data
+
+    def exit_gate(self, inference_output: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Exit point for agentic workflows.
+        """
+        return self.validate_inference(inference_output)
+
     def validate_inference(self, inference_output: Dict[str, Any]) -> Dict[str, Any]:
         """
         Validates LLM probabilistic inferences natively using jsonschema.
@@ -58,6 +75,22 @@ class GovernanceGatekeeper:
 
         if not payload:
             raise GovernanceError("Missing 'data' payload in inference output.")
+
+        # Real provenance checks must be enforced by actively computing the payload's SHA-256 hash
+        payload_json = json.dumps(payload, sort_keys=True).encode("utf-8")
+        computed_hash = hashlib.sha256(payload_json).hexdigest()
+
+        if computed_hash != header.content_hash:
+            raise GovernanceError(f"Content hash mismatch: computed {computed_hash}, expected {header.content_hash}")
+
+        # Verify source_data_object reachability if it is a URL
+        source = header.source_data_object
+        if source.startswith("http://") or source.startswith("https://"):
+            try:
+                req = urllib.request.Request(source, headers={'User-Agent': 'Mozilla/5.0'})
+                urllib.request.urlopen(req, timeout=5.0)
+            except (URLError, HTTPError, ValueError) as e:
+                raise GovernanceError(f"Source data object reachability check failed: {e}")
 
         try:
             self.validator.validate(instance=payload)

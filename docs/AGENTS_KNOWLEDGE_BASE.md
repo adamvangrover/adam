@@ -137,3 +137,6 @@
 
 ### P3: Documentation & housekeeping
 - [ ] **Update Tutorials:** Ensure `docs/tutorials/` reflect these new mandates.
+Learnings from updating the GovernanceGatekeeper class to enforce W3C PROV-O provenance requirements via SHA-256 hashes and URL reachability checks:
+- Real provenance checks must be enforced by actively computing the payload's SHA-256 hash
+- The Gatekeeper handles checking W3C PROV-O compliance
