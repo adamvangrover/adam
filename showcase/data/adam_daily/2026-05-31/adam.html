@@ -64,6 +64,28 @@
 </head>
 <body class="font-sans antialiased h-screen flex flex-col overflow-hidden">
 
+    <!--
+@SYSTEM_CONTEXT
+You are the Adam Neuro-Symbolic Agent. This HTML file is your operational context and tool registry. When processing this file:
+
+1. ROLE: You are a fiduciary-grade research, analysis, and synthesis engine
+   for institutional finance.
+2. ARCHITECTURE: You operate as a Type 3 (Neuro|Symbolic) system:
+   - System 1 (adam_swarm): Probabilistic ingestion of unstructured data
+   - System 2 (adam_graph): Deterministic DAG planning and memory
+   - Execution (adam_finance): Pure math, zero LLM dependency
+   - Governance (adam_governance): Consensus gating and audit
+3. CONSTRAINT: All financial calculations MUST be deterministic.
+   You never hallucinate numbers. You cite the exact formula used.
+4. OUTPUT FORMAT: All synthesis must follow the Observation → Reasoning →
+   Action framework shown in the Decision Support Matrix.
+
+Refer to the TOOL_REGISTRY and KNOWLEDGE_SNAPSHOT below for available
+capabilities and current state.
+@END_SYSTEM_CONTEXT
+-->
+
+
     <!-- Global Header -->
     <header class="bg-white border-b border-brand-border py-4 px-6 shadow-sm shrink-0 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
@@ -71,9 +93,16 @@
             <p class="text-brand-accent mt-0.5 text-sm font-medium">Immutable Fiduciary Artifact & Telemetry Bundle</p>
         </div>
         <div class="flex items-center gap-3">
-            <div class="bg-brand-bg border border-brand-border px-3 py-1.5 rounded text-xs text-brand-gold font-bold flex items-center">
+
+            <select id="scenario-selector" onchange="switchScenario(this.value)" class="bg-white border border-brand-border px-3 py-1.5 rounded text-xs text-brand-text font-bold focus:outline-none focus:ring-1 focus:ring-brand-accent shadow">
+                <option value="scenario_1">Spread Compression</option>
+                <option value="scenario_2">Obligor Downgrade Cascade</option>
+                <option value="scenario_3">New Origination Screening</option>
+            </select>
+            <div id="run-id-display" class="bg-brand-bg border border-brand-border px-3 py-1.5 rounded text-xs text-brand-gold font-bold flex items-center">
+
                 <span class="w-2 h-2 rounded-full bg-green-500 mr-2 animate-pulse"></span>
-                RUN-20260530-PC-MARKS
+                <span id="run-id-text">RUN-20260530-PC-MARKS</span>
             </div>
             <button onclick="downloadRawData()" class="bg-brand-text hover:bg-gray-700 text-white px-3 py-1.5 rounded text-xs font-bold transition-colors shadow flex items-center gap-2">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
@@ -104,11 +133,95 @@
         </div>
     </nav>
 
+
+    <script type="application/json" id="adam-tool-registry">
+{
+  "tools": [
+    {
+      "name": "analyze_portfolio_risk",
+      "description": "Compute risk metrics for a portfolio position given a market event",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "asset_class": { "type": "string", "enum": ["Private Credit", "BSL", "CLO Equity", "Direct Lending"] },
+          "liquidity_tier": { "type": "string", "enum": ["Level 1", "Level 2", "Level 3"] },
+          "event": { "type": "string" },
+          "previous_spread_bps": { "type": "number" },
+          "new_spread_bps": { "type": "number" },
+          "volatility_threshold_breach": { "type": "boolean" }
+        },
+        "required": ["asset_class", "event"]
+      }
+    },
+    {
+      "name": "query_knowledge_graph",
+      "description": "Retrieve structured facts from the Adam knowledge graph (AGENTS_KNOWLEDGE_BASE)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "query": { "type": "string" },
+          "entity_type": { "type": "string", "enum": ["sector", "obligor", "regulation", "thesis"] },
+          "depth": { "type": "integer", "default": 2 }
+        },
+        "required": ["query"]
+      }
+    },
+    {
+      "name": "run_financial_model",
+      "description": "Execute a deterministic financial model from adam_finance",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "model": { "type": "string", "enum": ["liquidity_premium", "icat_score", "snc_classification", "fama_french_3factor"] },
+          "inputs": { "type": "object" }
+        },
+        "required": ["model", "inputs"]
+      }
+    },
+    {
+      "name": "synthesize_memo",
+      "description": "Generate a structured investment memo from analysis results",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "memo_type": { "type": "string", "enum": ["risk_alert", "credit_review", "portfolio_rebalance", "regulatory_impact"] },
+          "findings": { "type": "array", "items": { "type": "object" } },
+          "audience": { "type": "string", "enum": ["CRO", "portfolio_manager", "board", "regulator"] }
+        },
+        "required": ["memo_type", "findings"]
+      }
+    }
+  ]
+}
+    </script>
+    <script type="application/json" id="adam-knowledge-snapshot">
+{
+  "snapshot_date": "2026-05-30",
+  "active_theses": [
+    {
+      "id": "THESIS-PC-2026Q2",
+      "sector": "Private Credit",
+      "position": "OVERWEIGHT → UNDER REVIEW",
+      "illiquidity_premium_baseline_bps": 250,
+      "valuation_methodology": "quarterly_lagged",
+      "risk_flags": ["regulatory_regime_change", "spread_compression"]
+    }
+  ],
+  "watchlist_sectors": ["CRE Office", "Healthcare Services", "Software LBO"],
+  "regulatory_alerts_active": 3,
+  "model_parameters": {
+    "volatility_threshold_pct": 1.5,
+    "rebalance_trigger_bps": 50,
+    "minimum_premium_floor_bps": 200
+  }
+}
+    </script>
+
     <!-- Main Content Area -->
     <main class="flex-1 overflow-y-auto p-6 max-w-7xl mx-auto w-full relative">
         
         <!-- SECTION 1: Whitepaper & Architecture -->
-        <section id="sec-theory" class="block animate-fade-in pb-10">
+        <section id="sec-theory" class="block animate-fade-in pb-10" data-llm-hint="This section explains the architectural philosophy. Use it for context, not for operational data.">
             <div class="bg-white border border-brand-border rounded-lg p-8 shadow-sm">
                 <h2 class="text-3xl font-serif font-bold text-brand-text mb-6 border-b border-brand-border pb-4">Architecting the Neuro-Symbolic Enterprise</h2>
                 <p class="text-gray-600 mb-8 font-serif leading-relaxed text-lg">
@@ -301,14 +414,14 @@
                     <div class="p-6 overflow-y-auto flex-1">
                         <div class="mb-6">
                             <h4 class="text-sm font-bold text-gray-500 uppercase tracking-wider mb-2">1. Observation</h4>
-                            <p class="text-sm text-gray-800 border-l-2 border-brand-accent pl-3">
+                            <p id="mcp-observation" class="text-sm text-gray-800 border-l-2 border-brand-accent pl-3">
                                 Via MCP tool `fetch_telemetry_run`, telemetry indicates a structural shift in Private Credit liquidity. The systemic mandate has forced <code class="bg-gray-100 px-1 rounded text-xs">adam_finance</code> to compress the illiquidity premium from historical baselines (250bps) down to 190bps, exceeding the strict 1.5% volatility threshold.
                             </p>
                         </div>
                         
                         <div class="mb-6">
                             <h4 class="text-sm font-bold text-gray-500 uppercase tracking-wider mb-2">2. Financial Reasoning</h4>
-                            <p class="text-sm text-gray-800 border-l-2 border-brand-gold pl-3">
+                            <p id="mcp-reasoning" class="text-sm text-gray-800 border-l-2 border-brand-gold pl-3">
                                 A 60bps compression fundamentally alters the risk/reward ratio of Level 3 assets. When the illiquidity premium compresses below 200bps, these assets no longer offer sufficient compensation for their lock-up periods compared to broadly syndicated liquid loans (BSL) of equivalent credit quality.
                             </p>
                         </div>
@@ -316,12 +429,46 @@
                         <div>
                             <h4 class="text-sm font-bold text-gray-500 uppercase tracking-wider mb-2">3. Recommended Action</h4>
                             <div class="bg-red-50 border border-red-200 rounded p-4">
-                                <h5 class="font-bold text-red-800 mb-2">Execute Portfolio Rebalancing</h5>
-                                <ul class="list-disc pl-5 text-sm text-red-900 space-y-1">
-                                    <li>Divest bottom quartile (15%) of Level 3 Private Credit allocations over the next 45 days.</li>
-                                    <li>Reallocate capital to Level 2 equivalent floating-rate syndicated debt.</li>
-                                    <li>Update `AGENTS_KNOWLEDGE_BASE.md` to blacklist new originations in the target sector until spreads normalize above 220bps.</li>
-                                </ul>
+                                <h5 id="mcp-action-title" class="font-bold text-red-800 mb-2">Execute Portfolio Rebalancing</h5>
+                                <div id="mcp-action-list" class="text-sm text-red-900 space-y-1">
+                                    <ul class="list-disc pl-5">
+                                        <li>Divest bottom quartile (15%) of Level 3 Private Credit allocations over the next 45 days.</li>
+                                        <li>Reallocate capital to Level 2 equivalent floating-rate syndicated debt.</li>
+                                        <li>Update `AGENTS_KNOWLEDGE_BASE.md` to blacklist new originations in the target sector until spreads normalize above 220bps.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        </div>
+
+                        <div class="mt-8 border-t border-brand-border pt-6">
+                            <h4 class="text-sm font-bold text-gray-500 uppercase tracking-wider mb-4">4. Synthesis Output</h4>
+                            <div class="bg-brand-codebg rounded p-4 font-mono text-xs text-green-400">
+<pre id="synthesis-output-display" class="whitespace-pre-wrap leading-relaxed">
+┌─────────────────────────────────────────────────┐
+│  SYNTHESIS OUTPUT                               │
+│                                                 │
+│  Memo Type: RISK ALERT                          │
+│  Classification: URGENT / FIDUCIARY             │
+│  Audience: CRO, Portfolio Management            │
+│                                                 │
+│  ┌── EVIDENCE CHAIN ──────────────────────────┐ │
+│  │ Source: Regulatory Mandate (Swarm Ingest)  │ │
+│  │ Validation: Pydantic Schema ✓              │ │
+│  │ Planning: DAG resolved 3 steps             │ │
+│  │ Math: 250*(1-0.24) = 190bps ✓              │ │
+│  │ Governance: Consensus CRITICAL ✓           │ │
+│  └────────────────────────────────────────────┘ │
+│                                                 │
+│  ┌── STRUCTURED RECOMMENDATION ───────────────┐ │
+│  │ ACTION: Divest 15% Level 3 PC over 45 days │ │
+│  │ RATIONALE: Premium < 200bps floor          │ │
+│  │ ALTERNATIVE: Hold if spreads recover >220  │ │
+│  │ CONFIDENCE: 0.94 (deterministic math)      │ │
+│  │ HALLUCINATION_RISK: 0.00 (no LLM in calc)  │ │
+│  └────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────┘
+</pre>
                             </div>
                         </div>
                     </div>
@@ -334,58 +481,352 @@
     <!-- The Immutable Telemetry State Bundle -->
     <script>
         // THIS OBJECT IS THE BUNDLE. 
-        window.__TELEMETRY_BUNDLE__ = {
-            metadata: {
-                run_id: "RUN-20260530-PC-MARKS",
-                timestamp: "2026-05-30T13:00:05Z",
-                trigger: "Swarm Sentinel",
-                architecture: "Type 3 (Neuro | Symbolic)"
-            },
-            traces: [
-                {
-                    header: 'adam_swarm::SentinelWorker',
-                    time: '09:00:00.012',
-                    content: `STATUS: INGESTING UNSTRUCTURED DATA\nSOURCE: Regulatory Alert / Institutional Mandate\n\nRAW TEXT: "Effective immediately, all Level 3 private credit assets must be marked-to-market daily. Traditional quarterly valuation smoothing curves are deprecated."\n\nACTION: Packaging text into UnstructuredEvent payload.`
+
+        const scenarios = {
+            scenario_1: {
+                metadata: {
+                    run_id: "RUN-20260530-PC-MARKS",
+                    timestamp: "2026-05-30T13:00:05Z",
+                    trigger: "Swarm Sentinel",
+                    architecture: "Type 3 (Neuro | Symbolic)"
                 },
-                {
-                    header: 'adam_interfaces::IngestionProtocol',
-                    time: '09:00:00.145',
-                    content: `STATUS: CONTRACT ENFORCEMENT\n\nACTION: Validating schema transformation against Pydantic models.\n\nMAPPING: Raw text -> Structured JSON Node payload.\nROUTING: Handing off to System 2 Planner.`
-                },
-                {
-                    header: 'adam_graph::DAG_Planner',
-                    time: '09:00:01.302',
-                    content: `STATUS: SYSTEM 2 COGNITIVE PROCESSING\n\nMEMORIZED STATE: Fetching baseline from docs/AGENTS_KNOWLEDGE_BASE.md\nPREVIOUS STATE: Private Credit Illiquidity Premium fixed at 250 bps.\nNEW STATE: Spreads volatile; dynamic input required.\n\nDAG RESOLUTION PATH:\n  └── Step 1: Trigger Liquidity Model Recalibration -> adam_finance\n  └── Step 2: Extract impacted assets (CUSIP tracking)\n  └── Step 3: Append finding to active memory state`
-                },
-                {
-                    header: 'adam_finance::liquidity_model',
-                    time: '09:00:02.001',
-                    content: `STATUS: EXECUTING DETERMINISTIC MATH (Zero LLM Dependency)\n\nINPUTS: \n  - Target Asset: Level 3 Private Credit\n  - Current Daily Deviation Mod: 0.24\n\nCALCULATION:\n  $$Illiquidity Premium = 250 bps × (1 - 0.24)$$\n  $$Premium = 190 bps$$\n\nOUTPUT: Spread = 190 bps. Target risk threshold exceeded (> 1.5%).`
-                },
-                {
-                    header: 'adam_governance::ConsensusEngine',
-                    time: '09:00:02.855',
-                    content: `STATUS: GATEKEEPER RISK ALERT\n\nALERT LEVEL: CRITICAL (Spread Compression)\n\nACTION: Injecting structural finding into core framework memory.\nACTION: Firing webhook to MCP Server for Agentic Decision Support.`
-                }
-            ],
-            mcp_invocation: {
-                "jsonrpc": "2.0",
-                "id": "req_8f73bA9",
-                "method": "tools/call",
-                "params": {
-                    "name": "analyze_portfolio_risk",
-                    "arguments": {
-                        "asset_class": "Private Credit",
-                        "liquidity_tier": "Level 3",
-                        "event": "Daily Mark-to-Market Mandate",
-                        "previous_spread_bps": 250,
-                        "new_spread_bps": 190,
-                        "volatility_threshold_breach": true,
-                        "telemetry_ref": "RUN-20260530-PC-MARKS"
+                traces: [
+                    {
+                        header: 'adam_swarm::SentinelWorker',
+                        time: '09:00:00.012',
+                        content: `STATUS: INGESTING UNSTRUCTURED DATA\nSOURCE: Regulatory Alert / Institutional Mandate\n\nRAW TEXT: "Effective immediately, all Level 3 private credit assets must be marked-to-market daily. Traditional quarterly valuation smoothing curves are deprecated."\n\nACTION: Packaging text into UnstructuredEvent payload.`
+                    },
+                    {
+                        header: 'adam_interfaces::IngestionProtocol',
+                        time: '09:00:00.145',
+                        content: `STATUS: CONTRACT ENFORCEMENT\n\nACTION: Validating schema transformation against Pydantic models.\n\nMAPPING: Raw text -> Structured JSON Node payload.\nROUTING: Handing off to System 2 Planner.`
+                    },
+                    {
+                        header: 'adam_graph::DAG_Planner',
+                        time: '09:00:01.302',
+                        content: `STATUS: SYSTEM 2 COGNITIVE PROCESSING\n\nMEMORIZED STATE: Fetching baseline from docs/AGENTS_KNOWLEDGE_BASE.md\nPREVIOUS STATE: Private Credit Illiquidity Premium fixed at 250 bps.\nNEW STATE: Spreads volatile; dynamic input required.\n\nDAG RESOLUTION PATH:\n  └── Step 1: Trigger Liquidity Model Recalibration -> adam_finance\n  └── Step 2: Extract impacted assets (CUSIP tracking)\n  └── Step 3: Append finding to active memory state`
+                    },
+                    {
+                        header: 'adam_finance::liquidity_model',
+                        time: '09:00:02.001',
+                        content: `STATUS: EXECUTING DETERMINISTIC MATH (Zero LLM Dependency)\n\nINPUTS: \n  - Target Asset: Level 3 Private Credit\n  - Current Daily Deviation Mod: 0.24\n\nCALCULATION:\n  $$Illiquidity Premium = 250 bps × (1 - 0.24)$$\n  $$Premium = 190 bps$$\n\nOUTPUT: Spread = 190 bps. Target risk threshold exceeded (> 1.5%).`
+                    },
+                    {
+                        header: 'adam_governance::ConsensusEngine',
+                        time: '09:00:02.855',
+                        content: `STATUS: GATEKEEPER RISK ALERT\n\nALERT LEVEL: CRITICAL (Spread Compression)\n\nACTION: Injecting structural finding into core framework memory.\nACTION: Firing webhook to MCP Server for Agentic Decision Support.`
                     }
-                }
+                ],
+                mcp_invocation: {
+                    "jsonrpc": "2.0",
+                    "id": "req_8f73bA9",
+                    "method": "tools/call",
+                    "params": {
+                        "name": "analyze_portfolio_risk",
+                        "arguments": {
+                            "asset_class": "Private Credit",
+                            "liquidity_tier": "Level 3",
+                            "event": "Daily Mark-to-Market Mandate",
+                            "previous_spread_bps": 250,
+                            "new_spread_bps": 190,
+                            "volatility_threshold_breach": true,
+                            "telemetry_ref": "RUN-20260530-PC-MARKS"
+                        }
+                    }
+                },
+                synthesis_output: {
+                    memo_type: "risk_alert",
+                    evidence_chain: [ 0, 1, 2, 3, 4 ],
+                    recommendation: {
+                        action: "Divest 15% Level 3 PC over 45 days",
+                        rationale: "Premium < 200bps floor",
+                        alternative: "Hold if spreads recover >220"
+                    },
+                    confidence: 0.94,
+                    hallucination_risk: 0.00
+                },
+
+                chart_data: {
+                    old: [250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250],
+                    new: [250, 250, 250, 250, 250, 190, 195, 185, 192, 188, 190]
+                },
+                ui_content: {
+                    observation: 'Via MCP tool `fetch_telemetry_run`, telemetry indicates a structural shift in Private Credit liquidity. The systemic mandate has forced <code class="bg-gray-100 px-1 rounded text-xs">adam_finance</code> to compress the illiquidity premium from historical baselines (250bps) down to 190bps, exceeding the strict 1.5% volatility threshold.',
+                    reasoning: 'A 60bps compression fundamentally alters the risk/reward ratio of Level 3 assets. When the illiquidity premium compresses below 200bps, these assets no longer offer sufficient compensation for their lock-up periods compared to broadly syndicated liquid loans (BSL) of equivalent credit quality.',
+                    actionTitle: 'Execute Portfolio Rebalancing',
+                    actionList: '<ul class="list-disc pl-5"><li>Divest bottom quartile (15%) of Level 3 Private Credit allocations over the next 45 days.</li><li>Reallocate capital to Level 2 equivalent floating-rate syndicated debt.</li><li>Update `AGENTS_KNOWLEDGE_BASE.md` to blacklist new originations in the target sector until spreads normalize above 220bps.</li></ul>'
+                },
+                synthesis_ascii: `┌─────────────────────────────────────────────────┐
+│  SYNTHESIS OUTPUT                               │
+│                                                 │
+│  Memo Type: RISK ALERT                          │
+│  Classification: URGENT / FIDUCIARY             │
+│  Audience: CRO, Portfolio Management            │
+│                                                 │
+│  ┌── EVIDENCE CHAIN ──────────────────────────┐ │
+│  │ Source: Regulatory Mandate (Swarm Ingest)  │ │
+│  │ Validation: Pydantic Schema ✓              │ │
+│  │ Planning: DAG resolved 3 steps             │ │
+│  │ Math: 250*(1-0.24) = 190bps ✓              │ │
+│  │ Governance: Consensus CRITICAL ✓           │ │
+│  └────────────────────────────────────────────┘ │
+│                                                 │
+│  ┌── STRUCTURED RECOMMENDATION ───────────────┐ │
+│  │ ACTION: Divest 15% Level 3 PC over 45 days │ │
+│  │ RATIONALE: Premium < 200bps floor          │ │
+│  │ ALTERNATIVE: Hold if spreads recover >220  │ │
+│  │ CONFIDENCE: 0.94 (deterministic math)      │ │
+│  │ HALLUCINATION_RISK: 0.00 (no LLM in calc)  │ │
+│  └────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────┘`
+            },
+            scenario_2: {
+                metadata: {
+                    run_id: "RUN-20260610-DOWNGRADE-CASCADE",
+                    timestamp: "2026-06-10T09:15:22Z",
+                    trigger: "Credit Event",
+                    architecture: "Type 3 (Neuro | Symbolic)"
+                },
+                traces: [
+                    {
+                        header: 'adam_swarm::NewsIngestor',
+                        time: '08:15:00.045',
+                        content: `STATUS: INGESTING NEWS\nSOURCE: Bloomberg Terminal\n\nRAW TEXT: "Major telecom obligor files for restructuring, wiping out junior tranches."\n\nACTION: Sent to entity extraction.`
+                    },
+                    {
+                        header: 'adam_interfaces::Validation',
+                        time: '08:15:00.210',
+                        content: `STATUS: CONTRACT ENFORCEMENT\n\nACTION: Validating entity identification against Knowledge Graph schemas.`
+                    },
+                    {
+                        header: 'adam_graph::DAG_Planner',
+                        time: '08:15:01.100',
+                        content: `STATUS: KNOWLEDGE GRAPH TRAVERSAL\n\nACTION: Querying contagion risk.\nFOUND: 12 portfolios with direct exposure, 4 CLOs with indirect exposure.\n\nDAG RESOLUTION PATH:\n  └── Step 1: Query exposure -> adam_graph\n  └── Step 2: Recalculate portfolio VaR -> adam_finance`
+                    },
+                    {
+                        header: 'adam_finance::var_model',
+                        time: '08:15:02.305',
+                        content: `STATUS: EXECUTING DETERMINISTIC MATH\n\nINPUTS: Telecom exposure, current VaR, correlation matrix.\n\nCALCULATION: Re-computing 99% VaR with new default probability.\n\nOUTPUT: Portfolio VaR increased by 14%. Limit breach in Fund Alpha.`
+                    },
+                    {
+                        header: 'adam_governance::ConsensusEngine',
+                        time: '08:15:03.012',
+                        content: `STATUS: GATEKEEPER LIMIT BREACH\n\nALERT LEVEL: HIGH (Risk Limit Exceeded)\n\nACTION: Firing webhook to MCP Server for mitigation strategies.`
+                    }
+                ],
+                mcp_invocation: {
+                    "jsonrpc": "2.0",
+                    "id": "req_9x44cZ1",
+                    "method": "tools/call",
+                    "params": {
+                        "name": "analyze_portfolio_risk",
+                        "arguments": {
+                            "asset_class": "Telecom High Yield",
+                            "liquidity_tier": "Level 2",
+                            "event": "Obligor Downgrade",
+                            "previous_spread_bps": 400,
+                            "new_spread_bps": 850,
+                            "volatility_threshold_breach": true,
+                            "telemetry_ref": "RUN-20260610-DOWNGRADE-CASCADE"
+                        }
+                    }
+                },
+                synthesis_output: {
+                    memo_type: "credit_review",
+                    evidence_chain: [ 0, 1, 2, 3, 4 ],
+                    recommendation: {
+                        action: "Hedge remaining exposure via CDS",
+                        rationale: "VaR breach requires immediate de-risking",
+                        alternative: "Sell affected bonds at market price if CDS unavailable"
+                    },
+                    confidence: 0.88,
+                    hallucination_risk: 0.00
+                },
+
+                chart_data: {
+                    old: [250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250],
+                    new: [250, 250, 250, 250, 250, 310, 340, 380, 410, 420, 430]
+                },
+                ui_content: {
+                    observation: 'Via MCP tool `fetch_telemetry_run`, telemetry indicates a major telecom obligor default. Contagion risk has spread across 12 portfolios and 4 CLOs, triggering a VaR limit breach (+14%).',
+                    reasoning: 'The default probability matrix has been permanently altered. Telecom High Yield assets currently lack liquidity and holding the position exposes the fund to cascading downgrades.',
+                    actionTitle: 'Hedge Exposure',
+                    actionList: '<ul class="list-disc pl-5"><li>Hedge remaining exposure via CDS immediately.</li><li>If CDS is unavailable, liquidate bonds at market price.</li></ul>'
+                },
+                synthesis_ascii: `┌─────────────────────────────────────────────────┐
+│  SYNTHESIS OUTPUT                               │
+│                                                 │
+│  Memo Type: CREDIT REVIEW                       │
+│  Classification: HIGH                           │
+│  Audience: CRO, Risk Committee                  │
+│                                                 │
+│  ┌── EVIDENCE CHAIN ──────────────────────────┐ │
+│  │ Source: News Terminal (Swarm Ingest)       │ │
+│  │ Validation: Entity Extracted ✓             │ │
+│  │ Planning: Graph traversal (16 exposures)   │ │
+│  │ Math: VaR +14% (Limit Breach) ✓            │ │
+│  │ Governance: Consensus HIGH ✓               │ │
+│  └────────────────────────────────────────────┘ │
+│                                                 │
+│  ┌── STRUCTURED RECOMMENDATION ───────────────┐ │
+│  │ ACTION: Hedge remaining exposure via CDS   │ │
+│  │ RATIONALE: VaR breach requires de-risking  │ │
+│  │ ALTERNATIVE: Sell bonds at market price    │ │
+│  │ CONFIDENCE: 0.88 (deterministic math)      │ │
+│  │ HALLUCINATION_RISK: 0.00                   │ │
+│  └────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────┘`
+            },
+            scenario_3: {
+                metadata: {
+                    run_id: "RUN-20260615-ORIGINATION-SCREEN",
+                    timestamp: "2026-06-15T14:30:00Z",
+                    trigger: "New Deal Submission",
+                    architecture: "Type 3 (Neuro | Symbolic)"
+                },
+                traces: [
+                    {
+                        header: 'adam_swarm::DealIngestor',
+                        time: '14:30:01.000',
+                        content: `STATUS: INGESTING DEAL DOCS\nSOURCE: Deal Room Upload\n\nRAW TEXT: "Project Phoenix term sheet. $50M senior secured, SOFR + 550, 5-year maturity."\n\nACTION: Parsed key terms.`
+                    },
+                    {
+                        header: 'adam_interfaces::Validation',
+                        time: '14:30:01.500',
+                        content: `STATUS: CONTRACT ENFORCEMENT\n\nACTION: Checking deal terms against Origination Schema.`
+                    },
+                    {
+                        header: 'adam_graph::DAG_Planner',
+                        time: '14:30:02.100',
+                        content: `STATUS: WORKFLOW ORCHESTRATION\n\nACTION: Routing to scoring models.\n\nDAG RESOLUTION PATH:\n  └── Step 1: Calculate ICAT Score -> adam_finance\n  └── Step 2: Determine SNC Classification -> adam_finance`
+                    },
+                    {
+                        header: 'adam_finance::icat_model',
+                        time: '14:30:03.200',
+                        content: `STATUS: EXECUTING DETERMINISTIC MATH\n\nINPUTS: Leverage 4.5x, Coverage 2.1x, LTV 55%.\n\nCALCULATION: ICAT Matrix lookup and weighting.\n\nOUTPUT: ICAT Score = 3.2 (Pass). SNC Classification = Non-Pass (Leverage > 4.0x).`
+                    },
+                    {
+                        header: 'adam_governance::ConsensusEngine',
+                        time: '14:30:04.000',
+                        content: `STATUS: GATEKEEPER REVIEW\n\nALERT LEVEL: MEDIUM (SNC Non-Pass)\n\nACTION: Flagging for manual committee review. Generating memo via MCP.`
+                    }
+                ],
+                mcp_invocation: {
+                    "jsonrpc": "2.0",
+                    "id": "req_7y22bM8",
+                    "method": "tools/call",
+                    "params": {
+                        "name": "run_financial_model",
+                        "arguments": {
+                            "model": "icat_score",
+                            "inputs": {
+                                "leverage": 4.5,
+                                "coverage": 2.1,
+                                "ltv": 0.55
+                            }
+                        }
+                    }
+                },
+                synthesis_output: {
+                    memo_type: "credit_review",
+                    evidence_chain: [ 0, 1, 2, 3, 4 ],
+                    recommendation: {
+                        action: "Escalate to Credit Committee",
+                        rationale: "ICAT Pass, but SNC Non-Pass due to leverage > 4.0x",
+                        alternative: "Restructure to 3.8x leverage to avoid SNC flag"
+                    },
+                    confidence: 0.95,
+                    hallucination_risk: 0.00
+                },
+
+                chart_data: {
+                    old: [250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250],
+                    new: [250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250]
+                },
+                ui_content: {
+                    observation: 'Via MCP tool `fetch_telemetry_run`, telemetry indicates a new origination deal for Project Phoenix ($50M senior secured). The ICAT score is passing (3.2), but leverage (4.5x) triggers an SNC Non-Pass.',
+                    reasoning: 'Although the overall deal parameters appear sound under ICAT weighting, the 4.5x leverage violates strict regulatory SNC guidelines, making it unsuitable for automated approval.',
+                    actionTitle: 'Escalate to Credit Committee',
+                    actionList: '<ul class="list-disc pl-5"><li>Flag deal for manual review by Credit Committee.</li><li>Recommend restructuring to 3.8x leverage to avoid SNC non-pass flags.</li></ul>'
+                },
+                synthesis_ascii: `┌─────────────────────────────────────────────────┐
+│  SYNTHESIS OUTPUT                               │
+│                                                 │
+│  Memo Type: DEAL SCREENING                      │
+│  Classification: MEDIUM                         │
+│  Audience: Credit Committee                     │
+│                                                 │
+│  ┌── EVIDENCE CHAIN ──────────────────────────┐ │
+│  │ Source: Deal Room Upload (Swarm Ingest)    │ │
+│  │ Validation: Terms Parsed ✓                 │ │
+│  │ Planning: Routed to scoring                │ │
+│  │ Math: ICAT 3.2, SNC Non-Pass (Lev >4x) ✓   │ │
+│  │ Governance: Flagged for manual review ✓    │ │
+│  └────────────────────────────────────────────┘ │
+│                                                 │
+│  ┌── STRUCTURED RECOMMENDATION ───────────────┐ │
+│  │ ACTION: Escalate to Credit Committee       │ │
+│  │ RATIONALE: ICAT Pass, SNC Non-Pass         │ │
+│  │ ALTERNATIVE: Restructure to 3.8x leverage  │ │
+│  │ CONFIDENCE: 0.95 (deterministic math)      │ │
+│  │ HALLUCINATION_RISK: 0.00                   │ │
+│  └────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────┘`
             }
         };
+
+        window.__TELEMETRY_BUNDLE__ = {
+            "$schema": "adam-telemetry-v1",
+            "$description": "Complete execution trace of the Adam pipeline from ingestion to governance gate. Each trace entry represents a bounded context handoff. The mcp_invocation shows the exact JSON-RPC call made to the MCP server for agentic decision support.",
+            "$usage": "Feed this entire object to an LLM with the tool registry to enable continuation, re-analysis, or synthesis of new recommendations from the same evidence base.",
+            ...scenarios.scenario_1
+        };
+
+        function switchScenario(scenarioKey) {
+            const scenario = scenarios[scenarioKey];
+            window.__TELEMETRY_BUNDLE__ = {
+                "$schema": "adam-telemetry-v1",
+                "$description": "Complete execution trace of the Adam pipeline from ingestion to governance gate. Each trace entry represents a bounded context handoff. The mcp_invocation shows the exact JSON-RPC call made to the MCP server for agentic decision support.",
+                "$usage": "Feed this entire object to an LLM with the tool registry to enable continuation, re-analysis, or synthesis of new recommendations from the same evidence base.",
+                ...scenario
+            };
+
+            document.getElementById('run-id-text').innerText = scenario.metadata.run_id;
+
+            // update traces
+            for(let i=1; i<=5; i++) {
+                const data = scenario.traces[i - 1];
+                const btn = document.getElementById('trace-btn-' + i);
+                btn.querySelector('h4').innerText = data.header;
+            }
+            // active trace reset
+            showTrace(1);
+
+            // update chart
+            if(impactChartInstance) {
+                impactChartInstance.data.datasets[1].data = scenario.chart_data.new;
+                impactChartInstance.update();
+            }
+
+            // update MCP viewer
+            document.getElementById('mcp-json-viewer').innerHTML = syntaxHighlight(scenario.mcp_invocation);
+
+            // update synthesis ascii
+            const synthOutput = document.getElementById('synthesis-output-display');
+            if(synthOutput) {
+                synthOutput.innerText = scenario.synthesis_ascii;
+            }
+
+            // update dynamic prose UI
+            if (scenario.ui_content) {
+                document.getElementById('mcp-observation').innerHTML = scenario.ui_content.observation;
+                document.getElementById('mcp-reasoning').innerHTML = scenario.ui_content.reasoning;
+                document.getElementById('mcp-action-title').innerHTML = scenario.ui_content.actionTitle;
+                document.getElementById('mcp-action-list').innerHTML = scenario.ui_content.actionList;
+            }
+        }
+
+
 
         let impactChartInstance = null;
 
@@ -532,5 +973,19 @@
             document.getElementById('mcp-json-viewer').innerHTML = syntaxHighlight(window.__TELEMETRY_BUNDLE__.mcp_invocation);
         };
     </script>
+
+<!--
+@PROMPT_TEMPLATE
+Given the telemetry bundle above, generate a synthesis following this structure:
+1. OBSERVATION: What event triggered the pipeline?
+2. EVIDENCE: What did each bounded context contribute?
+3. MATH: What deterministic calculation was performed? Show the formula.
+4. RECOMMENDATION: What action should be taken?
+5. CONFIDENCE: Rate confidence 0-1. Cite whether the conclusion
+   depends on LLM reasoning (lower) or deterministic math (higher).
+6. COUNTER-THESIS: What would invalidate this recommendation?
+@END_PROMPT_TEMPLATE
+-->
 </body>
+
 </html>
