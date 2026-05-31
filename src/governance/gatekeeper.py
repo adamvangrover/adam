@@ -1,5 +1,8 @@
 import json
 import jsonschema
+import hashlib
+import urllib.request
+import urllib.error
 import asyncio
 from pydantic import BaseModel, Field
 from typing import Dict, Any, Optional
@@ -59,12 +62,50 @@ class GovernanceGatekeeper:
         if not payload:
             raise GovernanceError("Missing 'data' payload in inference output.")
 
+        # Real provenance checks: Hash validation
+        computed_hash = hashlib.sha256(json.dumps(payload, sort_keys=True, separators=(',', ':')).encode('utf-8')).hexdigest()
+        if header.content_hash != computed_hash:
+            raise GovernanceError(f"Provenance violation: content_hash mismatch. Expected {computed_hash}, got {header.content_hash}")
+
+        # Real provenance checks: Source data object reachability
+        if header.source_data_object.startswith("http"):
+            from urllib.parse import urlparse
+            parsed_url = urlparse(header.source_data_object)
+            allowed_domains = ["example.com", "api.github.com", "query2.finance.yahoo.com"]
+            if parsed_url.hostname not in allowed_domains:
+                raise GovernanceError(f"Source data object domain not permitted: {parsed_url.hostname}")
+
+            try:
+                req = urllib.request.Request(
+                    header.source_data_object,
+                    headers={'User-Agent': 'Mozilla/5.0'}
+                )
+                with urllib.request.urlopen(req, timeout=5) as response:
+                    if response.getcode() >= 400:
+                        raise GovernanceError(f"Source data object unreachable: HTTP {response.getcode()}")
+            except urllib.error.URLError as e:
+                raise GovernanceError(f"Source data object unreachable: {e}")
+            except Exception as e:
+                 raise GovernanceError(f"Source data object validation failed: {e}")
+
         try:
             self.validator.validate(instance=payload)
         except jsonschema.exceptions.ValidationError as e:
             raise GovernanceError(f"Schema validation failed: {e.message}")
 
         return inference_output
+
+    def entry_gate(self, inference_output: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Entry point for all agentic workflows. Proxies to validate_inference.
+        """
+        return self.validate_inference(inference_output)
+
+    def exit_gate(self, inference_output: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Exit point for all agentic workflows. Proxies to validate_inference.
+        """
+        return self.validate_inference(inference_output)
 
     async def async_validate_inference(self, inference_output: Dict[str, Any]) -> Dict[str, Any]:
         """
