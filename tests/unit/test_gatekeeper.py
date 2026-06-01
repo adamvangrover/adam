@@ -217,6 +217,56 @@ async def test_async_validate_inference(mock_urlopen, valid_provenance):
     result = await gatekeeper.async_validate_inference(valid_input)
     assert result == valid_input
 
+@pytest.mark.asyncio
+@patch('urllib.request.urlopen')
+async def test_async_validate_inference_batch(mock_urlopen, valid_provenance):
+    mock_response = MagicMock()
+    mock_response.getcode.return_value = 200
+    mock_urlopen.return_value.__enter__.return_value = mock_response
+
+    gatekeeper = GovernanceGatekeeper(schema=TEST_SCHEMA)
+
+    # Create multiple valid inputs
+    valid_input_1 = {
+        "provenance_trace": valid_provenance.copy(),
+        "data": {"status": "ok", "value": 42}
+    }
+
+    valid_input_2 = {
+        "provenance_trace": valid_provenance.copy(),
+        "data": {"status": "ok", "value": 42}
+    }
+
+    inferences = [valid_input_1, valid_input_2]
+
+    results = await gatekeeper.async_validate_inference_batch(inferences)
+    assert len(results) == 2
+    assert results[0] == valid_input_1
+    assert results[1] == valid_input_2
+
+@patch('urllib.request.urlopen')
+def test_detect_and_heal_drift(mock_urlopen, valid_provenance):
+    mock_response = MagicMock()
+    mock_response.getcode.return_value = 200
+    mock_urlopen.return_value.__enter__.return_value = mock_response
+
+    gatekeeper = GovernanceGatekeeper(schema=TEST_SCHEMA)
+
+    valid_input = {
+        "provenance_trace": valid_provenance.copy(),
+        "data": {"status": "ok", "value": 42}
+    }
+
+    # Use a dummy historical hash to trigger a drift
+    historical_hash = "dummy_hash_that_does_not_match"
+
+    # This should trigger drift, which sets observed_drift=True, then heal_drift turns it to False
+    # and sets revalidation_triggered=True
+    result = gatekeeper.detect_and_heal_drift(valid_input, historical_hash)
+
+    assert result.get("observed_drift") is False
+    assert result.get("revalidation_triggered") is True
+
 
 @patch('urllib.request.urlopen')
 def test_entry_gate(mock_urlopen, valid_provenance):

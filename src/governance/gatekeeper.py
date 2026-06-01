@@ -121,6 +121,25 @@ class GovernanceGatekeeper:
         """
         return await asyncio.to_thread(self.validate_inference, inference_output)
 
+    async def async_validate_inference_batch(self, inferences: list[Dict[str, Any]]) -> list[Dict[str, Any]]:
+        """
+        Concurrent asynchronous batch pipeline for data processing and validation.
+        Implements modern concurrency patterns to handle large stochastic data ingests.
+        """
+        tasks = [self.async_validate_inference(inference) for inference in inferences]
+        return await asyncio.gather(*tasks)
+
+    def detect_and_heal_drift(self, inference_output: Dict[str, Any], historical_hash: str) -> Dict[str, Any]:
+        """
+        Detects if the AI output has drifted from the historical expectation (e.g. historical hash mismatch).
+        If drifted, injects the 'observed_drift' flag before triggering the self-healing process.
+        """
+        current_hash = inference_output.get("provenance_trace", {}).get("content_hash")
+        if current_hash != historical_hash:
+            inference_output["observed_drift"] = True
+
+        return self.heal_drift(inference_output)
+
     def heal_drift(self, inference_output: Dict[str, Any]) -> Dict[str, Any]:
         """
         Injects capability for autonomous self-healing.
