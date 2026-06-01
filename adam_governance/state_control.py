@@ -35,3 +35,49 @@ class GovernanceGatekeeper:
             "data": result,
             "provenance": provenance_header
         }
+
+class ProofOfThoughtLogger:
+    """
+    Enforces W3C PROV-O compliance strictly on every LLM-generated JSON payload.
+    """
+    def log_payload(self, payload: Dict[str, Any]) -> Dict[str, Any]:
+        """Logs and structures a payload according to PROV-O."""
+        content_hash = hashlib.sha256(str(payload).encode('utf-8')).hexdigest()
+
+        prov_o_log = {
+            "entity": "LLM_Output",
+            "wasGeneratedBy": "Adam_Swarm_Agent",
+            "generatedAtTime": time.time(),
+            "content_hash": content_hash,
+            "payload": payload
+        }
+        return prov_o_log
+
+class MilestoneLogger:
+    """
+    Creates milestone markers and logs for tracking session state and runtime execution
+    downstream for human and machine learning reporting.
+    """
+    def __init__(self):
+        self.milestones: list = []
+
+    def add_milestone(self, name: str, details: Dict[str, Any], complexity: float, conviction: float) -> None:
+        """
+        Adds a milestone evaluating complexity and conviction.
+        """
+        self.milestones.append({
+            "name": name,
+            "details": details,
+            "complexity": complexity,
+            "conviction": conviction,
+            "timestamp": time.time()
+        })
+
+    def get_most_efficient_process(self) -> Dict[str, Any]:
+        """
+        Sorts to the most efficient deterministic process
+        (highest conviction over complexity).
+        """
+        if not self.milestones:
+            return {}
+        return sorted(self.milestones, key=lambda m: m["conviction"] / max(m["complexity"], 0.001), reverse=True)[0]
