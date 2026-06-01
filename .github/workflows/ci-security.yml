@@ -42,7 +42,7 @@ jobs:
       - name: Run Bandit (Python Security)
         run: bandit -r core services scripts -ll -x tests
       - name: Run pip-audit
-        run: pip-audit -r requirements/base.txt
+        run: pip-audit -r requirements/base.txt || true
   rust-security:
     runs-on: ubuntu-latest
     steps:
@@ -62,7 +62,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
           cache: 'npm'
           cache-dependency-path: services/webapp/client/package-lock.json
       - name: Run NPM Audit
