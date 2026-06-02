@@ -182,3 +182,7 @@
 ## 2024-05-31 - [Architecture Scaffold Migration]
 **Learning:** Initial structural scaffolding of modular enterprise agents should start with explicit Protocol/ABC interfaces, ensuring strong separation between System 1 (probabilistic swarms) and deterministic math. Additive extraction from existing files ensures functional equivalence.
 **Action:** Always document the purpose, inputs, and outputs via standardized docstrings to support future multi-agent memory parsing.
+
+## 2024-05-23 - Memoization of sorting logic in HFTView
+**Learning:** Found unnecessary `O(N log N)` re-evaluations inside React component body due to sorting logic. Sorting should be memoized with `useMemo` when working with potentially large lists inside render loops, especially in high-frequency trading view components that might get frequent re-renders from parent state changes.
+**Action:** Always wrap heavy list transformations (like sort, filter over large datasets) inside `useMemo` in React components to avoid burning CPU cycles on unchanged data.
