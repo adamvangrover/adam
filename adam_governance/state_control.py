@@ -40,7 +40,7 @@ class ProofOfThoughtLogger:
     """
     Enforces W3C PROV-O compliance strictly on every LLM-generated JSON payload.
     """
-    def log_payload(self, payload: Dict[str, Any]) -> Dict[str, Any]:
+    def log_payload(self, payload: Dict[str, Any], derivation_path: str = "unknown", source_data_object: str = "unknown") -> Dict[str, Any]:
         """Logs and structures a payload according to PROV-O."""
         content_hash = hashlib.sha256(str(payload).encode('utf-8')).hexdigest()
 
@@ -49,7 +49,9 @@ class ProofOfThoughtLogger:
             "wasGeneratedBy": "Adam_Swarm_Agent",
             "generatedAtTime": time.time(),
             "content_hash": content_hash,
-            "payload": payload
+            "payload": payload,
+            "derivation_path": derivation_path,
+            "source_data_object": source_data_object
         }
         return prov_o_log
 

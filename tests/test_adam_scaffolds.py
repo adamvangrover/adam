@@ -1,6 +1,7 @@
 import pytest
 import os
 import sys
+from typing import Any
 
 # Ensure project root is in PYTHONPATH for testing
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -37,12 +38,14 @@ def test_fastmcp_tool_mapper():
 def test_proof_of_thought_logger():
     logger = ProofOfThoughtLogger()
     payload = {"key": "value"}
-    result = logger.log_payload(payload)
+    result = logger.log_payload(payload, derivation_path="path/to/data", source_data_object="source_123")
 
     assert result["entity"] == "LLM_Output"
     assert result["wasGeneratedBy"] == "Adam_Swarm_Agent"
     assert "content_hash" in result
     assert result["payload"] == payload
+    assert result["derivation_path"] == "path/to/data"
+    assert result["source_data_object"] == "source_123"
 
 def test_swarm_to_graph_boundary_abstract():
     # Attempting to instantiate the ABC should raise TypeError
@@ -55,6 +58,9 @@ def test_swarm_to_graph_boundary_abstract():
                 nodes = {"A": swarm_output.data}
                 edges = []
             return MockGraphInput()
+
+        def validate_boundary(self, data: Any) -> bool:
+            return True
 
     class MockSwarmOutput:
         data = "test_data"
@@ -88,3 +94,28 @@ def test_margin_of_error():
 
     no_iter = evaluate_iteration_need(0.01, 0.05)
     assert no_iter is False
+
+def test_fastmcp_mapper_dynamic():
+    mapper = FastMCPToolMapper()
+
+    def my_tool(arg1: str, arg2: int = 5) -> str:
+        """A test tool."""
+        return arg1 * arg2
+
+    mapper.map_schema_from_tool(my_tool)
+    schema = mapper.get_schema("my_tool")
+
+    assert schema["type"] == "object"
+    assert schema["description"] == "A test tool."
+    assert "arg1" in schema["properties"]
+    assert schema["properties"]["arg1"]["type"] == "string"
+    assert "arg2" in schema["properties"]
+    assert schema["properties"]["arg2"]["type"] == "integer"
+    assert schema["required"] == ["arg1"]
+
+from adam_finance.valuation import calculate_dcf
+def test_adam_finance_valuation():
+    financials = {"fcf": 1000, "growth_rate": 0.05, "beta": 1.2, "shares_outstanding": 500, "debt_equity_ratio": 0.5, "net_debt": 2000}
+    res = calculate_dcf(financials)
+    assert "wacc" in res
+    assert "intrinsic_value" in res
