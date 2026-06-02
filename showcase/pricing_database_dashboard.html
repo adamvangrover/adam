@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pricing Database Dashboard | Multi-Horizon Engine</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #3b82f6; /* Blue 500 */
+        }
+        body {
+            background-color: #0f172a; /* Slate 900 */
+            color: #e2e8f0; /* Slate 200 */
+            font-family: 'Inter', sans-serif;
+        }
+        .grid-bg {
+            background-image:
+                linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        .data-table-row {
+            transition: background-color 0.2s ease;
+        }
+        .data-table-row:hover {
+            background-color: #1e293b; /* Slate 800 */
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col grid-bg text-slate-200">
+    <header class="border-b border-slate-700 bg-slate-900/80 backdrop-blur-sm sticky top-0 z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <i class="fa-solid fa-database text-blue-500 text-2xl"></i>
+                <div>
+                    <h1 class="text-xl font-bold font-mono tracking-tight text-white">PRICING_DATABASE_DASHBOARD</h1>
+                    <p class="text-xs text-slate-400 font-mono">Synthesized Output of Multi-Horizon Engines</p>
+                </div>
+            </div>
+            <nav class="hidden md:flex gap-4 font-mono text-sm">
+                <a href="pricing_intelligence_hub.html" class="text-slate-400 hover:text-blue-400 transition-colors">HUB</a>
+                <a href="#" class="text-blue-500 border-b border-blue-500 pb-1">DATABASE</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+
+        <div class="mb-8 flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
+            <div>
+                <h2 class="text-2xl font-bold font-mono mb-2 text-white">Consolidated Intelligence Matrices</h2>
+                <p class="text-slate-400 text-sm">Real-time filtering of securities, pricing impacts, conviction levels, and temporal horizons.</p>
+            </div>
+
+            <div class="flex gap-2 font-mono text-sm">
+                <button onclick="filterTable('ALL')" class="filter-btn active bg-blue-600 text-white px-3 py-1 rounded border border-blue-500 hover:bg-blue-500 transition-colors">ALL</button>
+                <button onclick="filterTable('REAL_TIME')" class="filter-btn bg-slate-800 text-slate-300 px-3 py-1 rounded border border-slate-700 hover:bg-slate-700 transition-colors">REAL_TIME</button>
+                <button onclick="filterTable('INTRADAY')" class="filter-btn bg-slate-800 text-slate-300 px-3 py-1 rounded border border-slate-700 hover:bg-slate-700 transition-colors">INTRADAY</button>
+                <button onclick="filterTable('MACRO')" class="filter-btn bg-slate-800 text-slate-300 px-3 py-1 rounded border border-slate-700 hover:bg-slate-700 transition-colors">MACRO</button>
+                <button onclick="filterTable('SECULAR')" class="filter-btn bg-slate-800 text-slate-300 px-3 py-1 rounded border border-slate-700 hover:bg-slate-700 transition-colors">SECULAR</button>
+            </div>
+        </div>
+
+        <div class="bg-slate-900/50 border border-slate-700 rounded-xl overflow-hidden shadow-2xl">
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm text-left">
+                    <thead class="text-xs text-slate-400 uppercase bg-slate-800 border-b border-slate-700 font-mono">
+                        <tr>
+                            <th class="px-6 py-4">Engine / Timeframe</th>
+                            <th class="px-6 py-4">Security / Asset</th>
+                            <th class="px-6 py-4">Pricing Impact / Target</th>
+                            <th class="px-6 py-4 text-center">Confidence</th>
+                            <th class="px-6 py-4 text-center">Conviction</th>
+                            <th class="px-6 py-4">Source Hub Link</th>
+                        </tr>
+                    </thead>
+                    <tbody id="database-body" class="font-mono text-xs text-slate-300">
+
+                        <!-- Real-Time Data -->
+                        <tr class="data-table-row border-b border-slate-800" data-category="REAL_TIME">
+                            <td class="px-6 py-4"><span class="text-blue-400"><i class="fa-solid fa-bolt mr-2"></i>High-Speed (Crypto)</span></td>
+                            <td class="px-6 py-4 font-bold text-white">DOGE-USD</td>
+                            <td class="px-6 py-4 text-green-400">Vol Spike / Target: $0.35 (+15%)</td>
+                            <td class="px-6 py-4 text-center"><span class="bg-yellow-900/50 text-yellow-400 px-2 py-1 rounded">65%</span></td>
+                            <td class="px-6 py-4 text-center"><span class="bg-slate-700 text-slate-300 px-2 py-1 rounded">Moderate</span></td>
+                            <td class="px-6 py-4"><a href="top_10_meme_coins.html" class="text-blue-500 hover:underline"><i class="fa-solid fa-link"></i></a></td>
+                        </tr>
+                        <tr class="data-table-row border-b border-slate-800" data-category="REAL_TIME">
+                            <td class="px-6 py-4"><span class="text-blue-400"><i class="fa-solid fa-bolt mr-2"></i>High-Speed (Crypto)</span></td>
+                            <td class="px-6 py-4 font-bold text-white">PEPE-USD</td>
+                            <td class="px-6 py-4 text-red-400">Liquidation Risk (-25%)</td>
+                            <td class="px-6 py-4 text-center"><span class="bg-green-900/50 text-green-400 px-2 py-1 rounded">82%</span></td>
+                            <td class="px-6 py-4 text-center"><span class="bg-red-900/50 text-red-400 px-2 py-1 rounded border border-red-700">High (Short)</span></td>
+                            <td class="px-6 py-4"><a href="top_10_meme_coins.html" class="text-blue-500 hover:underline"><i class="fa-solid fa-link"></i></a></td>
+                        </tr>
+
+                        <!-- Intraday Data -->
+                        <tr class="data-table-row border-b border-slate-800" data-category="INTRADAY">
+                            <td class="px-6 py-4"><span class="text-green-400"><i class="fa-solid fa-clock mr-2"></i>Intraday (T+1 Shift)</span></td>
+                            <td class="px-6 py-4 font-bold text-white">EM Debt (Cross-Border)</td>
+                            <td class="px-6 py-4 text-red-400">Spread Widen: +12 bps</td>
+                            <td class="px-6 py-4 text-center"><span class="bg-green-900/50 text-green-400 px-2 py-1 rounded">95%</span></td>
+                            <td class="px-6 py-4 text-center"><span class="bg-green-900/50 text-green-400 px-2 py-1 rounded border border-green-700">Very High</span></td>
+                            <td class="px-6 py-4"><a href="events/report_t1_settlement_impact.html" class="text-blue-500 hover:underline"><i class="fa-solid fa-link"></i></a></td>
+                        </tr>
+                        <tr class="data-table-row border-b border-slate-800" data-category="INTRADAY">
+                            <td class="px-6 py-4"><span class="text-green-400"><i class="fa-solid fa-clock mr-2"></i>Intraday (T+1 Shift)</span></td>
+                            <td class="px-6 py-4 font-bold text-white">Overnight Repo Rates</td>
+                            <td class="px-6 py-4 text-yellow-400">Spike at 15:00 EST (+5 bps)</td>
+                            <td class="px-6 py-4 text-center"><span class="bg-green-900/50 text-green-400 px-2 py-1 rounded">88%</span></td>
+                            <td class="px-6 py-4 text-center"><span class="bg-slate-700 text-slate-300 px-2 py-1 rounded">Moderate</span></td>
+                            <td class="px-6 py-4"><a href="events/t1_settlement_shift_briefing.html" class="text-blue-500 hover:underline"><i class="fa-solid fa-link"></i></a></td>
+                        </tr>
+
+                        <!-- Macro Data -->
+                        <tr class="data-table-row border-b border-slate-800" data-category="MACRO">
+                            <td class="px-6 py-4"><span class="text-purple-400"><i class="fa-solid fa-calendar-week mr-2"></i>Weekly (Macro Pulse)</span></td>
+                            <td class="px-6 py-4 font-bold text-white">US 10-Year Treasury</td>
+                            <td class="px-6 py-4 text-slate-300">Range Bound: 4.25% - 4.50%</td>
+                            <td class="px-6 py-4 text-center"><span class="bg-yellow-900/50 text-yellow-400 px-2 py-1 rounded">70%</span></td>
+                            <td class="px-6 py-4 text-center"><span class="bg-slate-700 text-slate-300 px-2 py-1 rounded">Low (Hold)</span></td>
+                            <td class="px-6 py-4"><a href="weekly_macro_pulse_nov_2024.html" class="text-blue-500 hover:underline"><i class="fa-solid fa-link"></i></a></td>
+                        </tr>
+                        <tr class="data-table-row border-b border-slate-800" data-category="MACRO">
+                            <td class="px-6 py-4"><span class="text-orange-400"><i class="fa-solid fa-server mr-2"></i>Quarterly (Software)</span></td>
+                            <td class="px-6 py-4 font-bold text-white">Cloud AI Infrastructures</td>
+                            <td class="px-6 py-4 text-green-400">Multiple Expansion (P/S +2x)</td>
+                            <td class="px-6 py-4 text-center"><span class="bg-green-900/50 text-green-400 px-2 py-1 rounded">85%</span></td>
+                            <td class="px-6 py-4 text-center"><span class="bg-green-900/50 text-green-400 px-2 py-1 rounded border border-green-700">High (Overweight)</span></td>
+                            <td class="px-6 py-4"><a href="software_industry_report_20250225.html" class="text-blue-500 hover:underline"><i class="fa-solid fa-link"></i></a></td>
+                        </tr>
+                        <tr class="data-table-row border-b border-slate-800" data-category="MACRO">
+                            <td class="px-6 py-4"><span class="text-orange-400"><i class="fa-solid fa-chart-pie mr-2"></i>Annual (Equity 2026)</span></td>
+                            <td class="px-6 py-4 font-bold text-white">S&P 500 Index</td>
+                            <td class="px-6 py-4 text-green-400">Strategic Target: 6,200</td>
+                            <td class="px-6 py-4 text-center"><span class="bg-yellow-900/50 text-yellow-400 px-2 py-1 rounded">60%</span></td>
+                            <td class="px-6 py-4 text-center"><span class="bg-slate-700 text-slate-300 px-2 py-1 rounded">Moderate</span></td>
+                            <td class="px-6 py-4"><a href="report_2026_strategic_outlook.html" class="text-blue-500 hover:underline"><i class="fa-solid fa-link"></i></a></td>
+                        </tr>
+
+                        <!-- Secular Data -->
+                        <tr class="data-table-row border-b border-slate-800" data-category="SECULAR">
+                            <td class="px-6 py-4"><span class="text-red-400"><i class="fa-solid fa-arrows-split-up-and-left mr-2"></i>10-Year (Bifurcation)</span></td>
+                            <td class="px-6 py-4 font-bold text-white">Global Supply Chains</td>
+                            <td class="px-6 py-4 text-red-400">Permanent CapEx Inflation (+3% YoY)</td>
+                            <td class="px-6 py-4 text-center"><span class="bg-green-900/50 text-green-400 px-2 py-1 rounded">92%</span></td>
+                            <td class="px-6 py-4 text-center"><span class="bg-red-900/50 text-red-400 px-2 py-1 rounded border border-red-700">Structural Shift</span></td>
+                            <td class="px-6 py-4"><a href="report_great_bifurcation_2026.html" class="text-blue-500 hover:underline"><i class="fa-solid fa-link"></i></a></td>
+                        </tr>
+                        <tr class="data-table-row border-b border-slate-800" data-category="SECULAR">
+                            <td class="px-6 py-4"><span class="text-red-400"><i class="fa-solid fa-globe mr-2"></i>5-Year (Geopolitics)</span></td>
+                            <td class="px-6 py-4 font-bold text-white">Brent Crude / Oil</td>
+                            <td class="px-6 py-4 text-green-400">Structural Floor at $95/bbl</td>
+                            <td class="px-6 py-4 text-center"><span class="bg-yellow-900/50 text-yellow-400 px-2 py-1 rounded">75%</span></td>
+                            <td class="px-6 py-4 text-center"><span class="bg-green-900/50 text-green-400 px-2 py-1 rounded border border-green-700">High Conviction</span></td>
+                            <td class="px-6 py-4"><a href="report_iran_collapse_2026.html" class="text-blue-500 hover:underline"><i class="fa-solid fa-link"></i></a></td>
+                        </tr>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function filterTable(category) {
+            // Update button styling
+            const buttons = document.querySelectorAll('.filter-btn');
+            buttons.forEach(btn => {
+                if(btn.innerText === category || (category === 'ALL' && btn.innerText === 'ALL')) {
+                    btn.classList.add('bg-blue-600', 'text-white', 'border-blue-500');
+                    btn.classList.remove('bg-slate-800', 'text-slate-300', 'border-slate-700');
+                } else {
+                    btn.classList.remove('bg-blue-600', 'text-white', 'border-blue-500');
+                    btn.classList.add('bg-slate-800', 'text-slate-300', 'border-slate-700');
+                }
+            });
+
+            // Filter rows
+            const rows = document.querySelectorAll('.data-table-row');
+            rows.forEach(row => {
+                if (category === 'ALL') {
+                    row.style.display = '';
+                } else {
+                    if (row.getAttribute('data-category') === category) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
