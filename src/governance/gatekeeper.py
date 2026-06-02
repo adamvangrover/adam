@@ -1,6 +1,10 @@
 import json
-import jsonschema
+import hashlib
+import urllib.request
+import urllib.error
 import asyncio
+from urllib.parse import urlparse
+import jsonschema
 from pydantic import BaseModel, Field
 from typing import Dict, Any, Optional
 
@@ -24,7 +28,7 @@ class GovernanceError(Exception):
 class GovernanceGatekeeper:
     def __init__(self, schema: Dict[str, Any]):
         """
-        Initializes the PDIL gatekeeper with a specific JSON schema constraint.
+        Initializes the gatekeeper with a specific JSON schema constraint.
         Bridges stochastic model outputs with deterministic system inputs.
         """
         self.schema = schema
@@ -59,6 +63,38 @@ class GovernanceGatekeeper:
         if not payload:
             raise GovernanceError("Missing 'data' payload in inference output.")
 
+        # Strict Provenance Checks: Reproducible Hash Validation
+        # Using separators removes whitespace for a strictly deterministic hash
+        payload_json = json.dumps(payload, sort_keys=True, separators=(',', ':')).encode('utf-8')
+        computed_hash = hashlib.sha256(payload_json).hexdigest()
+        
+        if header.content_hash != computed_hash:
+            raise GovernanceError(f"Provenance violation: content_hash mismatch. Expected {computed_hash}, got {header.content_hash}")
+
+        # Strict Provenance Checks: Source Data Object Reachability & Whitelisting
+        source = header.source_data_object
+        if source.startswith("http://") or source.startswith("https://"):
+            parsed_url = urlparse(source)
+            
+            # Domain whitelisting enforcement
+            allowed_domains = ["example.com", "api.github.com", "query2.finance.yahoo.com"]
+            if parsed_url.hostname not in allowed_domains:
+                raise GovernanceError(f"Source data object domain not permitted: {parsed_url.hostname}")
+
+            try:
+                req = urllib.request.Request(
+                    source,
+                    headers={'User-Agent': 'Mozilla/5.0'}
+                )
+                with urllib.request.urlopen(req, timeout=5.0) as response:
+                    if response.getcode() >= 400:
+                        raise GovernanceError(f"Source data object unreachable: HTTP {response.getcode()}")
+            except urllib.error.URLError as e:
+                raise GovernanceError(f"Source data object unreachable: {e}")
+            except Exception as e:
+                 raise GovernanceError(f"Source data object validation failed: {e}")
+
+        # Schema Validation
         try:
             self.validator.validate(instance=payload)
         except jsonschema.exceptions.ValidationError as e:
@@ -66,12 +102,43 @@ class GovernanceGatekeeper:
 
         return inference_output
 
+    def entry_gate(self, inference_output: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Entry point for all agentic workflows. Proxies to validate_inference.
+        """
+        return self.validate_inference(inference_output)
+
+    def exit_gate(self, inference_output: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Exit point for all agentic workflows. Proxies to validate_inference.
+        """
+        return self.validate_inference(inference_output)
+
     async def async_validate_inference(self, inference_output: Dict[str, Any]) -> Dict[str, Any]:
         """
         Asynchronous pipeline for data processing and validation.
         Implements modern concurrency patterns.
         """
         return await asyncio.to_thread(self.validate_inference, inference_output)
+
+    async def async_validate_inference_batch(self, inferences: list[Dict[str, Any]]) -> list[Dict[str, Any]]:
+        """
+        Concurrent asynchronous batch pipeline for data processing and validation.
+        Implements modern concurrency patterns to handle large stochastic data ingests.
+        """
+        tasks = [self.async_validate_inference(inference) for inference in inferences]
+        return await asyncio.gather(*tasks)
+
+    def detect_and_heal_drift(self, inference_output: Dict[str, Any], historical_hash: str) -> Dict[str, Any]:
+        """
+        Detects if the AI output has drifted from the historical expectation (e.g. historical hash mismatch).
+        If drifted, injects the 'observed_drift' flag before triggering the self-healing process.
+        """
+        current_hash = inference_output.get("provenance_trace", {}).get("content_hash")
+        if current_hash != historical_hash:
+            inference_output["observed_drift"] = True
+
+        return self.heal_drift(inference_output)
 
     def heal_drift(self, inference_output: Dict[str, Any]) -> Dict[str, Any]:
         """

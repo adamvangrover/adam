@@ -162,3 +162,8 @@
 1. **Pricing Database Dashboard**
     *   **Finding:** Qualitative intelligence reports and structural briefings require quantitative grounding to be algorithmically actionable. Agents struggle to parse disparate HTML prose for exact conviction levels and pricing impacts.
     *   **Directive:** The `pricing_database_dashboard.html` serves as the centralized, strictly typed matrix for all intelligence. When agents generate new structural reports, they must explicitly extract the core security, the numerical pricing impact, confidence %, and categorical conviction level, and append it to this dashboard matrix to ensure systemic, queryable continuity.
+
+### Other Assorted Swarm Memories [ ] ALWAYS REMEMBER TO DOCUMENT AND LOG TELEMETRY FOR AUDIT AND RECALL
+Learnings from updating the GovernanceGatekeeper class to enforce W3C PROV-O provenance requirements via SHA-256 hashes and URL reachability checks:
+- Real provenance checks must be enforced by actively computing the payload's SHA-256 hash
+- The Gatekeeper handles checking W3C PROV-O compliance
