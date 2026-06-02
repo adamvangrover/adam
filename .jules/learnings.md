@@ -1,2 +1,3 @@
 - When acting as the daily financial agent under sandbox constraints without live web access, plausible synthetic data should be generated via a Python script to populate the required markdown reports and JSONL schemas (e.g., `MarketMayhemLedger`).
+- Generating synthetic market data for sandbox dates when web search fails is preferred unless explicit instructions require real-world current data.
 - When expanding or migrating architecture modules, always build redundantly and additively (e.g., maintaining old import paths to prevent breaking changes or using default arguments for newly added parameters). This ensures that every piece remains portable and modular during active refactoring.
