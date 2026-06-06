@@ -1,8 +1,8 @@
 import pytest
 import os
 from unittest.mock import MagicMock, patch
-from core.engine.icat import ICATEngine
-from core.financial_data.icat_schema import LBOParameters, DebtTranche, CarveOutParameters
+from adam_finance.icat import ICATEngine
+from adam_finance.icat_schema import LBOParameters, DebtTranche, CarveOutParameters
 
 # Mock data path
 MOCK_DATA_PATH = "showcase/data/icat_mock_data.json"
@@ -104,7 +104,7 @@ def test_custom_lbo_params(engine):
     # Equity Check = 1350 - 500 = 850
     assert lbo.equity_value_entry == 850.0
 
-@patch('core.engine.icat.ICATEngine._fetch_from_edgar')
+@patch('adam_finance.icat.ICATEngine._fetch_from_edgar')
 def test_edgar_ingest_mocked(mock_fetch, engine):
     # Mock the edgar fetch method
     mock_fetch.return_value = {

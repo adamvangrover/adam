@@ -10,8 +10,8 @@ import core.engine.valuation_utils as valuation_utils
 from core.agents.legal_agent import LegalAgent
 from core.agents.regulatory_compliance_agent import RegulatoryComplianceAgent
 from core.agents.risk_assessment_agent import RiskAssessmentAgent
-from core.engine.icat import ICATEngine
-from core.financial_data.icat_schema import DebtTranche, ICATOutput, LBOParameters
+from adam_finance.icat import ICATEngine
+from adam_finance.icat_schema import DebtTranche, ICATOutput, LBOParameters
 
 logger = logging.getLogger("CreditMemoOrchestrator")
 

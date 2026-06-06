@@ -1,0 +1,9 @@
+from typing import Dict, Any, Protocol
+from abc import ABC, abstractmethod
+
+class FinancialModelProtocol(Protocol):
+    def calculate_var(self, returns: Any) -> float: ...
+    def calculate_cvar(self, returns: Any) -> float: ...
+
+class LogicEngineProtocol(Protocol):
+    def evaluate(self, rule: Any, context: Any) -> bool: ...
