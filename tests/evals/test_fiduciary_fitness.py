@@ -39,7 +39,7 @@ def test_governance_gatekeeper_fuzz(payload, confidence):
     with patch('urllib.request.urlopen'):
         gatekeeper = GovernanceGatekeeper(schema=VALID_SCHEMA)
 
-        computed_hash = hashlib.sha256(json.dumps(payload, sort_keys=True).encode("utf-8")).hexdigest()
+        computed_hash = hashlib.sha256(json.dumps(payload, sort_keys=True, separators=(',', ':')).encode("utf-8")).hexdigest()
 
         inference_output = {
             "provenance_trace": {
@@ -104,7 +104,7 @@ def test_valid_inference(mock_urlopen):
         "provenance_trace": {
             "git_commit_hash": "a"*40,
             "timestamp": "2023-10-27T10:00:00Z",
-            "content_hash": "2ce416c1cb79ba58c0aed5f63e7f6926dd8c891fb92ca04b61d188852e2d41f8",
+            "content_hash": "7a4d923bb69bc68e92e23097314f908329116e01757417171e41d37c92297b7d",
             "jsonLogic_version": "1.0",
             "confidence_score": 0.9,
             "derivation_path": "test_path",
