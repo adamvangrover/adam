@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FORTRESS & HUNT: The Retail Intelligence Brief</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Chosen Palette: Warm Neutral & Slate (Professional/Institutional) -->
+    <!-- Application Structure Plan: A dashboard-style Single Page Application (SPA) divided into four core functional views: 1) Executive Dashboard (Macro overview), 2) Structural Currents (Visualizing the specific trends), 3) Institutional Telemetry (Visualizing fund flows), and 4) The Tactical Screener (Interactive tool for specific equity ideas). This structure transforms a linear read into an investigative tool, allowing users to grasp the macro environment before drilling down into actionable, data-backed setups, improving information retention and usability. -->
+    <!-- Visualization & Content Choices: 
+         - Macro Stats -> Inform -> Dynamic HTML stat cards -> Hover interaction -> Quick absorption of key anchor metrics (Rates, Oil).
+         - Market Trends (AI/Credit) -> Compare -> Chart.js Line/Bar Charts (Canvas) -> Toggle buttons to switch views -> Visually demonstrates the 'bifurcation' and 'divergence' mentioned in text. NO SVG/Mermaid.
+         - Institutional Flow -> Organize -> Chart.js Horizontal Bar (Canvas) -> Hover for details -> Quantifies the 'WhaleScanner' narrative into relative magnitude. NO SVG/Mermaid.
+         - Tactical Ideas -> Organize/Inform -> Split-pane List/Detail UI (HTML/JS) -> Click ticker to view thesis -> Allows filtering and deep-diving without losing context of the broader universe. NO SVG/Mermaid. 
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            bg: '#F8F7F4', // Warm, off-white paper feel
+                            card: '#FFFFFF',
+                            text: '#1E293B', // Slate 800
+                            muted: '#64748B', // Slate 500
+                            fortress: '#334155', // Slate 700 - representing stability/defense
+                            hunt: '#D97706', // Amber 600 - representing action/tactical
+                            buy: '#059669', // Emerald 600
+                            sell: '#DC2626', // Red 600
+                            border: '#E2E8F0' // Slate 200
+                        },
+                        fontFamily: {
+                            sans: ['Inter', 'system-ui', 'sans-serif'],
+                            serif: ['Merriweather', 'Georgia', 'serif'],
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Strict Chart Container Styling as Requested */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px; /* Limits width on large screens */
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px; /* Base height */
+            max-height: 400px; /* Prevents extreme vertical stretching */
+            overflow: hidden; /* Constrains canvas */
+        }
+        @media (max-width: 768px) {
+            .chart-container {
+                height: 250px; /* Smaller height on mobile */
+                max-height: 300px;
+            }
+        }
+        /* Custom scrollbar for data tables */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+        
+        .nav-active { border-bottom: 2px solid #D97706; color: #D97706; }
+        .tab-active { background-color: #1E293B; color: white; }
+    </style>
+</head>
+<body class="bg-brand-bg text-brand-text font-sans antialiased overflow-x-hidden">
+
+    <!-- Navigation Header -->
+    <header class="bg-white border-b border-brand-border sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center gap-2">
+                        <!-- Unicode Icon -->
+                        <span class="text-2xl text-brand-hunt font-bold">&#9814;</span> 
+                        <span class="font-serif font-bold text-xl tracking-tight text-brand-text">FORTRESS & HUNT</span>
+                    </div>
+                </div>
+                <nav class="hidden md:flex space-x-8">
+                    <button onclick="navigate('overview')" id="nav-overview" class="nav-active text-sm font-medium px-1 py-5 hover:text-brand-hunt transition-colors">Synthesis</button>
+                    <button onclick="navigate('trends')" id="nav-trends" class="text-brand-muted text-sm font-medium px-1 py-5 hover:text-brand-hunt transition-colors">Market Currents</button>
+                    <button onclick="navigate('flow')" id="nav-flow" class="text-brand-muted text-sm font-medium px-1 py-5 hover:text-brand-hunt transition-colors">Institutional Flow</button>
+                    <button onclick="navigate('tactical')" id="nav-tactical" class="text-brand-muted text-sm font-medium px-1 py-5 hover:text-brand-hunt transition-colors">Tactical Screener</button>
+                </nav>
+                <div class="text-xs text-brand-muted font-mono hidden sm:block">
+                    Vol 1, Iss 1 | June 13, 2026
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <!-- SECTION 1: Overview & Synthesis -->
+        <section id="sec-overview" class="block animate-fade-in">
+            <div class="mb-8">
+                <h1 class="text-3xl font-serif font-bold mb-2">Macro Pulse: From Momentum to Discipline</h1>
+                <p class="text-brand-muted text-lg max-w-3xl">
+                    This section synthesizes the current macroeconomic environment driving institutional repositioning. The market is undergoing a violent repricing of risk as the era of easy money concludes, requiring investors to adopt a strict "barbell" strategy.
+                </p>
+            </div>
+
+            <!-- Key Metric Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                <div class="bg-white p-5 rounded-lg border border-brand-border shadow-sm flex flex-col justify-between">
+                    <div class="text-sm font-medium text-brand-muted uppercase tracking-wider mb-1">10Y Treasury Yield</div>
+                    <div class="text-3xl font-bold text-brand-text">4.48%</div>
+                    <div class="text-xs text-brand-sell mt-2 font-medium">&#8593; Elevated (Higher-for-longer)</div>
+                </div>
+                <div class="bg-white p-5 rounded-lg border border-brand-border shadow-sm flex flex-col justify-between">
+                    <div class="text-sm font-medium text-brand-muted uppercase tracking-wider mb-1">Brent Crude</div>
+                    <div class="text-3xl font-bold text-brand-text">$95.00</div>
+                    <div class="text-xs text-brand-muted mt-2 font-medium">Base-building / Supply friction</div>
+                </div>
+                <div class="bg-white p-5 rounded-lg border border-brand-border shadow-sm flex flex-col justify-between">
+                    <div class="text-sm font-medium text-brand-muted uppercase tracking-wider mb-1">Hyperscaler Capex</div>
+                    <div class="text-3xl font-bold text-brand-text">~$300B</div>
+                    <div class="text-xs text-brand-hunt mt-2 font-medium">&#9888; Market demanding ROIC visibility</div>
+                </div>
+                <div class="bg-white p-5 rounded-lg border border-brand-border shadow-sm flex flex-col justify-between">
+                    <div class="text-sm font-medium text-brand-muted uppercase tracking-wider mb-1">Market Regime</div>
+                    <div class="text-xl font-bold text-brand-text">Capital Discipline</div>
+                    <div class="text-xs text-brand-muted mt-2 font-medium">Rotation out of passive cap-weightings</div>
+                </div>
+            </div>
+
+            <!-- The Barbell Philosophy -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                <div class="bg-white rounded-lg border-l-4 border-brand-fortress p-6 shadow-sm">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="text-2xl text-brand-fortress">&#9820;</span>
+                        <h2 class="text-xl font-bold">The Fortress Mandate</h2>
+                    </div>
+                    <p class="text-brand-text mb-4 leading-relaxed">
+                        Wealth preservation is paramount. Avoid widening spreads in middle-market high-yield debt. Focus allocations on:
+                    </p>
+                    <ul class="space-y-2">
+                        <li class="flex items-start gap-2"><span class="text-brand-fortress mt-1">&#10003;</span> Short-duration government paper.</li>
+                        <li class="flex items-start gap-2"><span class="text-brand-fortress mt-1">&#10003;</span> High-quality, senior-secured credit.</li>
+                        <li class="flex items-start gap-2"><span class="text-brand-fortress mt-1">&#10003;</span> Defensive hard assets (Energy, Gold).</li>
+                    </ul>
+                </div>
+                <div class="bg-white rounded-lg border-l-4 border-brand-hunt p-6 shadow-sm">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="text-2xl text-brand-hunt">&#128309;</span> <!-- Target icon approximation -->
+                        <h2 class="text-xl font-bold">The Hunt Mandate</h2>
+                    </div>
+                    <p class="text-brand-text mb-4 leading-relaxed">
+                        Surgical equity allocation driven by institutional accumulation. Avoid application-layer software. Focus allocations on:
+                    </p>
+                    <ul class="space-y-2">
+                        <li class="flex items-start gap-2"><span class="text-brand-hunt mt-1">&#10003;</span> Structural AI monopolies (Picks & Shovels).</li>
+                        <li class="flex items-start gap-2"><span class="text-brand-hunt mt-1">&#10003;</span> Physical infrastructure providers.</li>
+                        <li class="flex items-start gap-2"><span class="text-brand-hunt mt-1">&#10003;</span> Entities exhibiting WhaleScanner overlap.</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Summary Feed -->
+            <div class="bg-white p-6 rounded-lg border border-brand-border shadow-sm">
+                <h3 class="text-lg font-bold mb-4 font-serif">Market Summaries & Catalyst Feed</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h4 class="font-bold text-sm text-brand-fortress mb-1">Sovereign Yields Apply Gravity</h4>
+                        <p class="text-sm text-brand-text">10-year yield stabilized >4.45%. This rising risk-free rate anchors long-duration equity multiples, triggering a 3% contraction in the NASDAQ 100.</p>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-sm text-brand-fortress mb-1">Credit Spreads Diverge</h4>
+                        <p class="text-sm text-brand-text">Late-cycle indicator: IG corporate credit spreads remain tightly compressed, while High Yield spreads widened past 380 bps. Middle-market refi fracturing.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: Market Currents -->
+        <section id="sec-trends" class="hidden animate-fade-in">
+            <div class="mb-8">
+                <h1 class="text-3xl font-serif font-bold mb-2">Structural Market Shifts</h1>
+                <p class="text-brand-muted text-lg max-w-3xl">
+                    Explore the two dominant, diverging trends reshaping capital markets. Interact with the tabs below to visualize the bifurcation in the AI sector and the growing stress in credit markets.
+                </p>
+            </div>
+
+            <div class="bg-white rounded-lg border border-brand-border shadow-sm overflow-hidden">
+                <div class="flex border-b border-brand-border bg-gray-50">
+                    <button onclick="switchTrend('ai')" id="tab-ai" class="flex-1 py-4 px-6 text-sm font-bold tab-active transition-colors">Trend 1: AI Bifurcation</button>
+                    <button onclick="switchTrend('credit')" id="tab-credit" class="flex-1 py-4 px-6 text-sm font-bold text-brand-muted hover:bg-gray-100 transition-colors">Trend 2: Credit Squeeze</button>
+                </div>
+                
+                <div class="p-6">
+                    <div id="content-ai" class="block">
+                        <div class="mb-6">
+                            <h3 class="text-xl font-bold mb-2">Hardware Dominance vs. Software Deflation</h3>
+                            <p class="text-brand-text">The AI trade is fracturing. Infrastructure providers (Foundries, Cooling, Networking) command unprecedented pricing power. Conversely, legacy SaaS faces structural headwinds as AI coding agents reduce enterprise headcount and seat-based licensing revenue.</p>
+                        </div>
+                        <!-- Chart Container constraint applied -->
+                        <div class="chart-container">
+                            <canvas id="aiChart"></canvas>
+                        </div>
+                        <p class="text-xs text-center text-brand-muted mt-4 italic">*Conceptual representation of pricing power/margin divergence based on report thesis.</p>
+                    </div>
+
+                    <div id="content-credit" class="hidden">
+                        <div class="mb-6">
+                            <h3 class="text-xl font-bold mb-2">Flight to Quality: The Refinancing Cliff</h3>
+                            <p class="text-brand-text">Regional banking covenants are tightening. Companies reliant on ZIRP (2020-2021) face brutal refinancing under 4.48% yields. Capital is aggressively draining from speculative-grade debt into senior-secured corporate paper.</p>
+                        </div>
+                        <!-- Chart Container constraint applied -->
+                        <div class="chart-container">
+                            <canvas id="creditChart"></canvas>
+                        </div>
+                        <p class="text-xs text-center text-brand-muted mt-4 italic">*Conceptual representation of widening high-yield spreads vs compressed investment grade.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: Institutional Flow -->
+        <section id="sec-flow" class="hidden animate-fade-in">
+             <div class="mb-8">
+                <h1 class="text-3xl font-serif font-bold mb-2">Institutional Telemetry</h1>
+                <p class="text-brand-muted text-lg max-w-3xl">
+                    Utilizing proprietary WhaleScanner and Entropy data, this section visualizes where major funds are quietly accumulating or distributing capital, isolating true signal from retail noise.
+                </p>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg border border-brand-border shadow-sm mb-6">
+                <div class="flex items-center gap-2 mb-4 pb-4 border-b border-brand-border">
+                    <span class="text-xl">&#128225;</span> <!-- Satellite icon -->
+                    <h3 class="text-lg font-bold">Entropy Node Analysis: Low Chaos, High Conviction</h3>
+                </div>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div class="col-span-1 lg:col-span-1 space-y-6">
+                        <div class="p-4 bg-blue-50 border-l-4 border-blue-500 rounded-r">
+                            <h4 class="font-bold text-sm mb-1">1. Hard Asset Rotation</h4>
+                            <p class="text-xs text-brand-text"><strong>$4.2B Net Inflows:</strong> Multi-strat hedge funds accumulating physical commodities and energy infra as an inflation/geopolitical moat.</p>
+                        </div>
+                        <div class="p-4 bg-amber-50 border-l-4 border-brand-hunt rounded-r">
+                            <h4 class="font-bold text-sm mb-1">2. Liquid Cooling Sweeps</h4>
+                            <p class="text-xs text-brand-text"><strong>LEAPS Targeting:</strong> Institutional options flow betting thermal management is the final bottleneck for next-gen GPU clusters.</p>
+                        </div>
+                        <div class="p-4 bg-red-50 border-l-4 border-red-500 rounded-r">
+                            <h4 class="font-bold text-sm mb-1">3. SaaS Distribution</h4>
+                            <p class="text-xs text-brand-text"><strong>Active Unwinding:</strong> Institutional desks dumping mid-cap enterprise software; GenAI viewed as deflationary for workflow apps.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="col-span-1 lg:col-span-2 flex flex-col justify-center">
+                        <!-- Chart Container constraint applied -->
+                        <div class="chart-container" style="height: 300px;">
+                            <canvas id="flowChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 4: Tactical Screener -->
+        <section id="sec-tactical" class="hidden animate-fade-in">
+            <div class="mb-8 flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
+                <div>
+                    <h1 class="text-3xl font-serif font-bold mb-2">The Hunt: Tactical Setups</h1>
+                    <p class="text-brand-muted text-lg max-w-2xl">
+                        High-conviction equity setups derived from overlapping institutional signals (13F clusters, Insider buying, Options sweeps). Select a ticker from the universe to view the full thesis.
+                    </p>
+                </div>
+                <!-- Filter Controls -->
+                <div class="flex gap-2 bg-white p-1 rounded border border-brand-border">
+                    <button onclick="filterUniverse('ALL')" id="filt-all" class="px-3 py-1 text-xs font-bold rounded bg-brand-text text-white transition-colors">ALL</button>
+                    <button onclick="filterUniverse('BUY')" id="filt-buy" class="px-3 py-1 text-xs font-bold rounded text-brand-muted hover:bg-gray-100 transition-colors">BUY</button>
+                    <button onclick="filterUniverse('SELL')" id="filt-sell" class="px-3 py-1 text-xs font-bold rounded text-brand-muted hover:bg-gray-100 transition-colors">SELL</button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[600px]"> <!-- Fixed height for structural split view -->
+                
+                <!-- Left Pane: Interactive Universe List -->
+                <div class="col-span-1 bg-white border border-brand-border rounded-lg flex flex-col overflow-hidden shadow-sm">
+                    <div class="p-3 bg-gray-50 border-b border-brand-border font-bold text-sm flex justify-between">
+                        <span>Coverage Universe</span>
+                        <span class="text-brand-muted font-normal text-xs mt-1" id="list-count"></span>
+                    </div>
+                    <div class="overflow-y-auto custom-scrollbar flex-1" id="ticker-list">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Right Pane: Detail View -->
+                <div class="col-span-1 lg:col-span-2 bg-white border border-brand-border rounded-lg p-6 shadow-sm flex flex-col relative" id="detail-pane">
+                    <!-- Default State -->
+                    <div id="detail-placeholder" class="absolute inset-0 flex flex-col items-center justify-center text-brand-muted">
+                        <span class="text-4xl mb-2">&#128269;</span>
+                        <p>Select an equity from the list to view institutional telemetry.</p>
+                    </div>
+
+                    <!-- Populated Data State -->
+                    <div id="detail-content" class="hidden flex-col h-full">
+                        <div class="flex justify-between items-start mb-6 pb-4 border-b border-brand-border">
+                            <div>
+                                <h2 class="text-3xl font-bold font-serif" id="det-ticker">TICKER</h2>
+                                <h3 class="text-lg text-brand-muted" id="det-company">Company Name</h3>
+                            </div>
+                            <div class="text-right">
+                                <div class="inline-block px-3 py-1 rounded text-sm font-bold mb-2" id="det-signal-badge">SIGNAL</div>
+                                <div class="text-sm font-medium text-brand-text">Conviction: <span id="det-conviction">High</span></div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4 mb-8 bg-gray-50 p-4 rounded-lg border border-gray-100">
+                            <div>
+                                <div class="text-xs text-brand-muted uppercase tracking-wider">Current Price</div>
+                                <div class="text-2xl font-bold" id="det-price">$0.00</div>
+                            </div>
+                            <div>
+                                <div class="text-xs text-brand-muted uppercase tracking-wider">12M Target</div>
+                                <div class="text-2xl font-bold" id="det-target">$0.00</div>
+                            </div>
+                            <div class="col-span-2 mt-2 pt-2 border-t border-gray-200">
+                                <div class="text-xs text-brand-muted uppercase tracking-wider mb-1">WhaleScanner Activity</div>
+                                <div class="text-sm font-medium" id="det-whale">Activity Description</div>
+                            </div>
+                        </div>
+
+                        <div class="flex-1">
+                            <h4 class="font-bold text-lg mb-2">Investment Thesis</h4>
+                            <p class="text-brand-text leading-relaxed whitespace-pre-line" id="det-thesis">
+                                <!-- Thesis text -->
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="border-t border-brand-border mt-12 py-8 bg-white">
+        <div class="max-w-7xl mx-auto px-4 text-center text-sm text-brand-muted">
+            <p>&copy; 2026 Fortress & Hunt Intelligence. Institutional Data synthesis. Not individual financial advice.</p>
+        </div>
+    </footer>
+
+    <!-- Application Logic -->
+    <script>
+        // --- DATA ARCHITECTURE ---
+        // Extracted directly from the source report text and appendix
+        const universeData = [
+            // AI Infrastructure
+            { ticker: 'ALAB', company: 'Astera Labs', sector: 'AI Infrastructure', price: '$62.40', target: '$85.00', conviction: 'High', signal: 'BUY', whale: 'Heavy Accumulation (13F Clusters)', thesis: 'ALAB is a pure-play monopoly on AI connectivity. As data centers scale, the physical data transfer bottlenecks between GPUs require specialized retimers. ALAB is silicon-agnostic (benefiting whether Nvidia or AMD wins the compute war). WhaleScanner detects massive 13F accumulation following its recent index inclusion.' },
+            { ticker: 'VRT', company: 'Vertiv Holdings', sector: 'AI Infrastructure', price: '$88.20', target: '$115.00', conviction: 'High', signal: 'BUY', whale: 'Moderate Accumulation (Block Bidding)', thesis: 'Traditional air-cooled data centers cannot handle the thermal output of the incoming Blackwell GPU generation. Vertiv is the premier provider of liquid cooling infrastructure. Institutional block bidding has remained relentless on every 3% market pullback.' },
+            { ticker: 'NVDA', company: 'Nvidia Corp.', sector: 'AI Infrastructure', price: '$120.10', target: '$140.00', conviction: 'Medium', signal: 'HOLD', whale: 'Neutral / Equilibrium', thesis: 'The core compute engine of the AI revolution. While dominant, near-term multiples require digestion. Institutional positioning is currently in equilibrium.' },
+            { ticker: 'AAOI', company: 'Applied Opto.', sector: 'AI Infrastructure', price: '$14.50', target: '$22.00', conviction: 'High', signal: 'BUY', whale: 'Aggressive Call Sweeps', thesis: 'Critical provider of optical networking components required for scaling AI clusters. Options flow shows aggressive positioning for near-term catalysts.' },
+            // Hard Assets
+            { ticker: 'XOM', company: 'ExxonMobil', sector: 'Defensive Assets', price: '$118.50', target: '$145.00', conviction: 'Med-High', signal: 'BUY', whale: 'C-Suite Buying & Multi-Strat Inflows', thesis: 'The ultimate "Fortress" equity. XOM provides a high-yield, cash-flowing anchor against global instability. Persistent C-suite insider buying combined with multi-strategy fund inflows signals that institutional capital views XOM as a mandatory geopolitical hedge.' },
+            { ticker: 'CVX', company: 'Chevron', sector: 'Defensive Assets', price: '$158.00', target: '$180.00', conviction: 'Medium', signal: 'BUY', whale: '13F Accumulation', thesis: 'Strong balance sheet and disciplined capital return program makes it a core holding for value-oriented institutional capital.' },
+            { ticker: 'GLD', company: 'SPDR Gold Trust', sector: 'Defensive Assets', price: '$215.40', target: '$240.00', conviction: 'High', signal: 'BUY', whale: 'Multi-Strat Inflows ($4.2B sector)', thesis: 'Acting as the primary non-fiat store of value amidst sticky inflation and geopolitical friction.' },
+            // Software & Credit
+            { ticker: 'CRM', company: 'Salesforce', sector: 'Disrupted Software', price: '$245.00', target: '$190.00', conviction: 'Medium', signal: 'SELL', whale: 'Put Accumulation ($200 Strike target)', thesis: 'The poster child for the SaaS retrenchment. Generative AI fundamentally threatens the per-seat licensing model of legacy CRM platforms. Institutional options telemetry shows heavy put-buying targeting the $200 strike over the next 9 months as enterprise IT budgets migrate from software to compute.' },
+            { ticker: 'TEAM', company: 'Atlassian', sector: 'Disrupted Software', price: '$160.00', target: '$120.00', conviction: 'High', signal: 'SELL', whale: 'Insider Distribution', thesis: 'Workflow optimization is increasingly automated by AI, reducing the need for expanded enterprise seat licenses.' },
+            { ticker: 'JNK', company: 'SPDR HY Bond ETF', sector: 'Credit Risk', price: '$92.50', target: '$85.00', conviction: 'High', signal: 'SELL', whale: 'Aggressive Shorting', thesis: 'Direct exposure to the refinancing cliff. High yield spreads are widening rapidly as regional banking covenants tighten.' }
+        ];
+
+        // --- NAVIGATION LOGIC ---
+        function navigate(sectionId) {
+            // Hide all sections
+            ['overview', 'trends', 'flow', 'tactical'].forEach(id => {
+                document.getElementById('sec-' + id).classList.add('hidden');
+                document.getElementById('sec-' + id).classList.remove('block');
+                
+                // Reset Nav styles
+                const navBtn = document.getElementById('nav-' + id);
+                navBtn.classList.remove('nav-active', 'text-brand-hunt');
+                navBtn.classList.add('text-brand-muted');
+            });
+
+            // Show target
+            document.getElementById('sec-' + sectionId).classList.remove('hidden');
+            document.getElementById('sec-' + sectionId).classList.add('block');
+            
+            // Set Nav Active
+            const activeBtn = document.getElementById('nav-' + sectionId);
+            activeBtn.classList.add('nav-active');
+            activeBtn.classList.remove('text-brand-muted');
+        }
+
+        // --- SECTION 2: TAB LOGIC & CHARTS ---
+        let chartAi, chartCredit;
+
+        function switchTrend(trend) {
+            if(trend === 'ai') {
+                document.getElementById('content-ai').classList.remove('hidden');
+                document.getElementById('content-credit').classList.add('hidden');
+                document.getElementById('tab-ai').classList.add('tab-active');
+                document.getElementById('tab-ai').classList.remove('text-brand-muted', 'hover:bg-gray-100');
+                document.getElementById('tab-credit').classList.remove('tab-active');
+                document.getElementById('tab-credit').classList.add('text-brand-muted', 'hover:bg-gray-100');
+            } else {
+                document.getElementById('content-credit').classList.remove('hidden');
+                document.getElementById('content-ai').classList.add('hidden');
+                document.getElementById('tab-credit').classList.add('tab-active');
+                document.getElementById('tab-credit').classList.remove('text-brand-muted', 'hover:bg-gray-100');
+                document.getElementById('tab-ai').classList.remove('tab-active');
+                document.getElementById('tab-ai').classList.add('text-brand-muted', 'hover:bg-gray-100');
+            }
+        }
+
+        function initCharts() {
+            // Common Options for responsive containers
+            const commonOptions = {
+                responsive: true,
+                maintainAspectRatio: false, // CRITICAL: allows canvas to fill parent div
+                plugins: {
+                    legend: { position: 'bottom' }
+                }
+            };
+
+            // 1. AI Chart (Bar - Conceptual divergence)
+            const ctxAi = document.getElementById('aiChart').getContext('2d');
+            chartAi = new Chart(ctxAi, {
+                type: 'bar',
+                data: {
+                    labels: ['Q1', 'Q2', 'Q3 (Proj)', 'Q4 (Proj)'],
+                    datasets: [
+                        {
+                            label: 'AI Infrastructure Pricing Power Index',
+                            data: [100, 115, 135, 160],
+                            backgroundColor: '#D97706', // Hunt color
+                            borderRadius: 4
+                        },
+                        {
+                            label: 'Legacy SaaS Seat License Growth',
+                            data: [100, 95, 85, 70],
+                            backgroundColor: '#64748B', // Muted
+                            borderRadius: 4
+                        }
+                    ]
+                },
+                options: {
+                    ...commonOptions,
+                    scales: { y: { beginAtZero: false, suggestedMin: 50 } }
+                }
+            });
+
+            // 2. Credit Chart (Line - Conceptual spreads)
+            const ctxCredit = document.getElementById('creditChart').getContext('2d');
+            chartCredit = new Chart(ctxCredit, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [
+                        {
+                            label: 'High Yield (HY) Spreads (bps)',
+                            data: [310, 315, 325, 340, 360, 385],
+                            borderColor: '#DC2626', // Sell/Warning
+                            tension: 0.3,
+                            fill: true,
+                            backgroundColor: 'rgba(220, 38, 38, 0.1)'
+                        },
+                        {
+                            label: 'Invest. Grade (IG) Spreads (bps)',
+                            data: [120, 118, 122, 119, 125, 124],
+                            borderColor: '#334155', // Fortress
+                            tension: 0.3
+                        }
+                    ]
+                },
+                options: commonOptions
+            });
+
+            // 3. Flow Chart (Horizontal Bar)
+            const ctxFlow = document.getElementById('flowChart').getContext('2d');
+            new Chart(ctxFlow, {
+                type: 'bar',
+                data: {
+                    labels: ['Hard Assets/Energy', 'Liquid Cooling Infra', 'Legacy SaaS Apps'],
+                    datasets: [{
+                        label: 'Net Institutional Flow Velocity',
+                        data: [4.2, 2.8, -3.5], // Conceptual relative sizing based on text
+                        backgroundColor: (context) => {
+                            const value = context.dataset.data[context.dataIndex];
+                            return value > 0 ? '#059669' : '#DC2626'; // Buy/Sell colors
+                        },
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    indexAxis: 'y', // Horizontal
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let val = context.raw;
+                                    return val > 0 ? `Strong Accumulation Signal` : `Active Distribution Signal`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { grid: { display: true, drawBorder: false }, title: { display: true, text: 'Relative Momentum' } },
+                        y: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+
+        // --- SECTION 4: TACTICAL SCREENER LOGIC ---
+        let currentFilter = 'ALL';
+        
+        function renderList() {
+            const listContainer = document.getElementById('ticker-list');
+            listContainer.innerHTML = ''; // Clear
+            
+            const filteredData = currentFilter === 'ALL' 
+                ? universeData 
+                : universeData.filter(item => item.signal === currentFilter);
+
+            document.getElementById('list-count').innerText = `${filteredData.length} items`;
+
+            filteredData.forEach(item => {
+                // Determine styling based on signal
+                let badgeClass = 'bg-gray-200 text-gray-700';
+                if(item.signal === 'BUY') badgeClass = 'bg-green-100 text-green-800';
+                if(item.signal === 'SELL') badgeClass = 'bg-red-100 text-red-800';
+
+                const div = document.createElement('div');
+                div.className = 'p-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors flex justify-between items-center group';
+                div.onclick = () => showDetail(item);
+                
+                div.innerHTML = `
+                    <div>
+                        <div class="font-bold text-brand-text group-hover:text-brand-hunt">${item.ticker}</div>
+                        <div class="text-xs text-brand-muted">${item.company}</div>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-[10px] font-bold px-2 py-1 rounded ${badgeClass}">${item.signal}</span>
+                    </div>
+                `;
+                listContainer.appendChild(div);
+            });
+        }
+
+        function filterUniverse(filterType) {
+            currentFilter = filterType;
+            
+            // Update button styles
+            ['all', 'buy', 'sell'].forEach(id => {
+                const btn = document.getElementById(`filt-${id}`);
+                if(filterType.toLowerCase() === id) {
+                    btn.className = 'px-3 py-1 text-xs font-bold rounded bg-brand-text text-white transition-colors';
+                } else {
+                    btn.className = 'px-3 py-1 text-xs font-bold rounded text-brand-muted hover:bg-gray-100 transition-colors';
+                }
+            });
+            
+            renderList();
+            
+            // Reset detail view if filtering hides currently selected item
+            document.getElementById('detail-placeholder').classList.remove('hidden');
+            document.getElementById('detail-content').classList.add('hidden');
+            document.getElementById('detail-content').classList.remove('flex');
+        }
+
+        function showDetail(item) {
+            // Swap visibility
+            document.getElementById('detail-placeholder').classList.add('hidden');
+            const contentPane = document.getElementById('detail-content');
+            contentPane.classList.remove('hidden');
+            contentPane.classList.add('flex', 'animate-fade-in');
+
+            // Populate data
+            document.getElementById('det-ticker').innerText = item.ticker;
+            document.getElementById('det-company').innerText = item.company;
+            document.getElementById('det-price').innerText = item.price;
+            document.getElementById('det-target').innerText = item.target;
+            document.getElementById('det-conviction').innerText = item.conviction;
+            document.getElementById('det-whale').innerText = item.whale;
+            document.getElementById('det-thesis').innerText = item.thesis;
+
+            // Badge styling
+            const badge = document.getElementById('det-signal-badge');
+            badge.innerText = item.signal;
+            badge.className = 'inline-block px-3 py-1 rounded text-sm font-bold mb-2'; // Reset
+            if(item.signal === 'BUY') badge.classList.add('bg-green-100', 'text-green-800');
+            else if(item.signal === 'SELL') badge.classList.add('bg-red-100', 'text-red-800');
+            else badge.classList.add('bg-gray-200', 'text-gray-700');
+        }
+
+        // --- INIT ---
+        window.onload = () => {
+            initCharts();
+            renderList();
+        };
+
+    </script>
+    
+    <!-- Simple animation class -->
+    <style>
+        .animate-fade-in { animation: fadeIn 0.4s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</body>
+</html>
