@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM_v26.0 // Macro Diagnostic Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F8F9FA;
+            color: #1E293B;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .font-mono-sys {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+
+        @media (max-width: 768px) {
+            .chart-container {
+                height: 300px;
+                max-height: 350px;
+            }
+        }
+
+        .glitch-text {
+            animation: glitch 1.5s linear infinite;
+        }
+
+        @keyframes glitch {
+            2%, 64% { transform: translate(2px,0) skew(0deg); }
+            4%, 60% { transform: translate(-2px,0) skew(0deg); }
+            62% { transform: translate(0,0) skew(5deg); }
+        }
+
+        .sys-card {
+            transition: all 0.2s ease-in-out;
+        }
+        
+        .sys-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        .tab-btn.active {
+            background-color: #1E293B;
+            color: #FFFFFF;
+            border-color: #1E293B;
+        }
+
+        .severity-high { background-color: #FEF2F2; border-left: 4px solid #DC2626; color: #991B1B; }
+        .severity-warn { background-color: #FFFBEB; border-left: 4px solid #D97706; color: #92400E; }
+        .severity-stable { background-color: #F0FDF4; border-left: 4px solid #16A34A; color: #166534; }
+    </style>
+</head>
+<body class="min-h-screen pb-20">
+
+    <header class="bg-[#0F172A] text-slate-300 py-4 px-6 sticky top-0 z-50 shadow-md">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <span class="text-2xl font-bold text-white tracking-tight">ADAM<span class="text-red-500">_v26.0</span></span>
+                <span class="text-xs font-mono-sys bg-slate-800 px-2 py-1 rounded">NODE_ACTIVE</span>
+            </div>
+            <div class="text-sm font-mono-sys flex gap-4">
+                <span>DATE: 2026.06.05</span>
+                <span>UTC: -04:00</span>
+                <span class="text-red-400 glitch-text">STATUS: MUTATING</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="bg-red-600 text-white px-6 py-3 font-medium text-sm text-center shadow-inner">
+        &#9888; SYSTEM OVERRIDE: Prior stagflation thesis deprecated. Transitioning to FISCAL DOMINANCE regime. Unprecedented AI Capex and Sovereign issuance are crowding out traditional capital, masking structural fragility via high nominal growth.
+    </div>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 space-y-12">
+
+        <section id="module-1" class="space-y-6">
+            <div class="border-b border-slate-300 pb-2">
+                <h2 class="text-2xl font-bold text-slate-900 tracking-tight">MODULE 1 // Executive Summary & Signal Integrity</h2>
+                <p class="text-slate-600 mt-2 max-w-4xl text-sm leading-relaxed">
+                    This module presents real-time diagnostic telemetry. We have iterated our core thesis: the apparent divergence is not an error, but a feature of a "Sovereign-Tech Nexus." Mega-cap equities are acting as synthetic sovereign debt, absorbing liquidity while the broader rate complex grinds higher under the weight of fiscal deficits.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                <div class="bg-white p-5 rounded-lg border border-slate-200 sys-card shadow-sm">
+                    <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">S&P 500 ($SPX)</div>
+                    <div class="text-2xl font-bold font-mono-sys">7,571.73</div>
+                    <div class="text-sm text-red-600 mt-1 font-medium flex items-center gap-1">
+                        <span>&#8600;</span> -0.50%
+                    </div>
+                    <p class="text-xs text-slate-500 mt-3 leading-tight">Concentration extreme. Top 5 names functioning as synthetic safe-havens.</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-lg border border-slate-200 sys-card shadow-sm">
+                    <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">US 10Y YIELD</div>
+                    <div class="text-2xl font-bold font-mono-sys">4.46%</div>
+                    <div class="text-sm text-red-600 mt-1 font-medium flex items-center gap-1">
+                        <span>&#8599;</span> +3.6 bps
+                    </div>
+                    <p class="text-xs text-slate-500 mt-3 leading-tight">Yield rising not just on inflation, but massive fiscal issuance and AI Capex crowding out.</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-lg border border-slate-200 sys-card shadow-sm border-l-4 border-l-red-500">
+                    <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">CBOE VOL ($VIX)</div>
+                    <div class="text-2xl font-bold font-mono-sys">16.40</div>
+                    <div class="text-sm text-red-600 mt-1 font-medium flex items-center gap-1">
+                        <span>&#8599;</span> +4.0%
+                    </div>
+                    <p class="text-xs text-slate-500 mt-3 leading-tight">Index vol artificially suppressed by systemic 0DTE dispersion trades.</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-lg border border-slate-200 sys-card shadow-sm">
+                    <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">BITCOIN (BTC)</div>
+                    <div class="text-2xl font-bold font-mono-sys">$65,968.07</div>
+                    <div class="text-sm text-red-600 mt-1 font-medium flex items-center gap-1">
+                        <span>&#8600;</span> -4.23%
+                    </div>
+                    <p class="text-xs text-slate-500 mt-3 leading-tight">Transitioning from risk-on proxy to pristine collateral in a fiscal dominance regime.</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-lg border border-slate-200 sys-card shadow-sm">
+                    <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">BRENT CRUDE</div>
+                    <div class="text-2xl font-bold font-mono-sys">$105.90</div>
+                    <div class="text-sm text-red-600 mt-1 font-medium flex items-center gap-1">
+                        <span>&#8599;</span> Kinetic
+                    </div>
+                    <p class="text-xs text-slate-500 mt-3 leading-tight">Physical supply deficit instantly re-injecting inflation premium.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="module-2" class="space-y-6">
+             <div class="border-b border-slate-300 pb-2">
+                <h2 class="text-2xl font-bold text-slate-900 tracking-tight">MODULE 2 // Structural Decay & Repricing Mirage</h2>
+                <p class="text-slate-600 mt-2 max-w-4xl text-sm leading-relaxed">
+                    This section quantifies the hidden rot within the system. You are viewing the widening spread between single-stock implied volatility and index suppression, alongside the massive degradation of covenant protections in the Broadly Syndicated Loan (BSL) market.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                    <h3 class="text-lg font-bold text-slate-800 mb-2">VIXEQ to VIX Spread Inversion</h3>
+                    <p class="text-xs text-slate-500 mb-6">Tracking the spread between single-stock implied volatility (VIXEQ) and index volatility ($VIX). The current spread of 30.8 is the widest in financial history, driven not by retail ignorance, but by systemic institutional dispersion trading.</p>
+                    <div class="chart-container">
+                        <canvas id="vixChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                    <h3 class="text-lg font-bold text-slate-800 mb-2">BSL Market: The Covenant-Lite Standard</h3>
+                    <p class="text-xs text-slate-500 mb-6">A $3 trillion dry powder imbalance has caused a dangerous race to the bottom. Uncapped EBITDA Add-backs are masking deteriorating cash-flow metrics, guaranteeing lower recovery rates.</p>
+                    <div class="chart-container">
+                        <canvas id="bslChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-slate-800 rounded-lg p-6 text-slate-300">
+                <h4 class="text-red-400 font-mono-sys text-sm font-bold mb-2">THESIS ITERATION // THE DISPERSION TRAP</h4>
+                <p class="text-sm leading-relaxed">
+                    <span class="text-white font-semibold">ANCHORING BIAS DETECTED.</span> We previously anchored to a 1970s stagflationary corporate default wave. We were wrong. Private credit has acted as a massive shadow shock-absorber for the BSL market, terming out risk. <br><br>
+                    <strong class="text-white">RULE OF THUMB:</strong> The true systemic vulnerability lies in the VIXEQ-VIX spread. Institutional dispersion trades (short index vol, long single-name) have created a synthetic suppression field. If cross-asset correlation goes to 1, the short-volatility complex violently unwinds, breaking the market's plumbing regardless of underlying corporate health.
+                </p>
+            </div>
+        </section>
+
+        <section id="module-3" class="space-y-6">
+             <div class="border-b border-slate-300 pb-2">
+                <h2 class="text-2xl font-bold text-slate-900 tracking-tight">MODULE 3 // The Escape Hatch: DLT & Agentic Workflows</h2>
+                <p class="text-slate-600 mt-2 max-w-4xl text-sm leading-relaxed">
+                    Legacy banking rails are choking on localized liquidity traps. This module outlines the mandatory pivot to Distributed Ledger Technology (DLT). Select a cycle frequency below to view how AI agents execute dynamic intermediary workflows, bypassing traditional bottlenecks.
+                </p>
+            </div>
+
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                <div class="flex flex-col sm:flex-row border-b border-slate-200" id="dlt-tabs">
+                    <button class="tab-btn active flex-1 py-4 px-6 text-sm font-bold text-center border-b-2 border-transparent transition-colors sm:border-r" data-target="intraday">
+                        Intraday Cycles <br><span class="text-xs font-normal text-slate-500 block mt-1">Microsecond Execution</span>
+                    </button>
+                    <button class="tab-btn flex-1 py-4 px-6 text-sm font-bold text-slate-600 text-center border-b-2 border-transparent transition-colors sm:border-r" data-target="quarterly">
+                        Quarterly Cycles <br><span class="text-xs font-normal text-slate-500 block mt-1">ISDA CDM Derivatives</span>
+                    </button>
+                    <button class="tab-btn flex-1 py-4 px-6 text-sm font-bold text-slate-600 text-center border-b-2 border-transparent transition-colors" data-target="annual">
+                        Annual Cycles <br><span class="text-xs font-normal text-slate-500 block mt-1">Regulatory Provenance</span>
+                    </button>
+                </div>
+                
+                <div class="p-8 min-h-[250px] bg-slate-50 relative">
+                    <div id="intraday" class="dlt-content space-y-4">
+                        <div class="text-2xl mb-2">&#9201; Tokenized Repos</div>
+                        <h4 class="text-lg font-bold text-slate-800">Dynamic Liquidity Resolution</h4>
+                        <p class="text-sm text-slate-700 leading-relaxed max-w-3xl">
+                            High-Frequency Trading (HFT) algorithms require microsecond execution. Legacy systems fail here. Platforms like J.P. Morgan's Kinexys and Broadridge's DLR have pioneered DLT-enabled intraday repos. Tokenizing both cash and collateral allows institutional AI agents to dynamically monitor intraday liquidity shortfalls and instantly execute repos—settling within minutes and bypassing T+1 bottlenecks entirely.
+                        </p>
+                    </div>
+
+                    <div id="quarterly" class="dlt-content space-y-4 hidden">
+                        <div class="text-2xl mb-2">&#10022; Smart Contract Execution</div>
+                        <h4 class="text-lg font-bold text-slate-800">Deterministic Daml Code on Canton Network</h4>
+                        <p class="text-sm text-slate-700 leading-relaxed max-w-3xl">
+                            Monthly and quarterly cycles introduce complex derivatives expiries. Managing these requires the ISDA Common Domain Model (CDM). By translating legal prose into deterministic Daml code on privacy-preserving networks (like the Canton Network), AI agents can execute quarterly lifecycle events—margin calls, collateral substitutions, and floating-rate adjustments—with zero human intervention and perfect zero-knowledge privacy.
+                        </p>
+                    </div>
+
+                    <div id="annual" class="dlt-content space-y-4 hidden">
+                        <div class="text-2xl mb-2">&#128274; Cryptographic Proofs</div>
+                        <h4 class="text-lg font-bold text-slate-800">W3C PROV-O Data Model via zk-SNARKs</h4>
+                        <p class="text-sm text-slate-700 leading-relaxed max-w-3xl">
+                            To satisfy regulators, autonomous agents utilize the W3C PROV-O data model, binding every "thought process" and execution trigger into a Directed Acyclic Graph (DAG) anchored to the ledger. Regulators can audit the mathematical proof of compliance via zk-SNARKs without ever accessing the institution's proprietary algorithmic logic.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="module-4" class="space-y-6">
+             <div class="border-b border-slate-300 pb-2">
+                <h2 class="text-2xl font-bold text-slate-900 tracking-tight">MODULE 4 // Monte Carlo Probability Engine</h2>
+                <p class="text-slate-600 mt-2 max-w-4xl text-sm leading-relaxed">
+                    Stochastic modeling utilizing N=100,000 simulations. The algorithm evaluates intersecting trajectories: sovereign issuance pace, AI Capex productivity yields, and institutional volatility-suppression limits.
+                </p>
+            </div>
+
+            <div class="bg-[#0F172A] p-8 rounded-xl border border-slate-700 shadow-xl flex flex-col items-center relative overflow-hidden">
+                <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPgo8cmVjdCB3aWR0aD0iNCIgaGVpZ2h0PSI0IiBmaWxsPSIjMGYxNzJhIi8+CjxwYXRoIGQ9Ik0wIDRMNCBWMHoiIGZpbGw9IiMxZTI5M2IiIGZpbGwtb3BhY2l0eT0iMC41Ii8+Cjwvc3ZnPg==')] opacity-30 pointer-events-none"></div>
+                
+                <div id="mc-init" class="text-center z-10 w-full py-8">
+                    <h3 class="text-xl font-bold text-white mb-2 font-mono-sys tracking-wider">INITIALIZE SYNTHESIS</h3>
+                    <p class="text-sm text-slate-400 max-w-2xl mx-auto mb-8">Execute full stochastic modeling across multi-dimensional macro risk parameters.</p>
+                    <button id="run-mc-btn" class="bg-red-600 hover:bg-red-500 text-white font-bold py-3 px-10 rounded-lg transition-colors font-mono-sys shadow-[0_0_15px_rgba(220,38,38,0.4)] focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-[#0F172A]">
+                        RUN 100,000 ITERATIONS
+                    </button>
+                </div>
+
+                <div id="mc-status" class="hidden text-center z-10 w-full py-12 font-mono-sys text-slate-300">
+                    <div class="text-4xl font-bold mb-4" id="mc-counter">0</div>
+                    <div class="text-sm text-slate-500 tracking-widest uppercase glitch-text">Processing Trajectories...</div>
+                </div>
+
+                <div id="mc-results" class="hidden w-full z-10 space-y-8 animate-fade-in">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="space-y-6">
+                            <h4 class="text-white font-bold border-b border-slate-700 pb-2">PROBABILITY BUCKETS</h4>
+                            
+                            <div class="space-y-4">
+                                <div>
+                                    <div class="flex justify-between text-xs font-mono-sys mb-1">
+                                        <span class="text-emerald-400">01. The Sovereign-Tech Nexus (High Nominal Grind)</span>
+                                        <span class="text-white">42.5%</span>
+                                    </div>
+                                    <div class="w-full bg-slate-800 rounded-full h-2">
+                                        <div id="bar-1" class="bg-emerald-500 h-2 rounded-full transition-all duration-1000 ease-out" style="width: 0%"></div>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <div class="flex justify-between text-xs font-mono-sys mb-1">
+                                        <span class="text-red-400">02. The Dispersion Trap Unwind (Vol-Shock)</span>
+                                        <span class="text-white">38.2%</span>
+                                    </div>
+                                    <div class="w-full bg-slate-800 rounded-full h-2">
+                                        <div id="bar-2" class="bg-red-500 h-2 rounded-full transition-all duration-1000 ease-out delay-100" style="width: 0%"></div>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div class="flex justify-between text-xs font-mono-sys mb-1">
+                                        <span class="text-orange-400">03. Treasury Market Illiquidity (Sovereign Freeze)</span>
+                                        <span class="text-white">14.1%</span>
+                                    </div>
+                                    <div class="w-full bg-slate-800 rounded-full h-2">
+                                        <div id="bar-3" class="bg-orange-500 h-2 rounded-full transition-all duration-1000 ease-out delay-200" style="width: 0%"></div>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div class="flex justify-between text-xs font-mono-sys mb-1">
+                                        <span class="text-slate-400">04. Orthodox Stagflationary Bust</span>
+                                        <span class="text-white">5.2%</span>
+                                    </div>
+                                    <div class="w-full bg-slate-800 rounded-full h-2">
+                                        <div id="bar-4" class="bg-slate-500 h-2 rounded-full transition-all duration-1000 ease-out delay-300" style="width: 0%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-800/50 p-6 rounded-lg border border-slate-600/50">
+                            <h4 class="text-red-400 font-bold border-b border-slate-600 pb-2 mb-4 font-mono-sys flex items-center gap-2">
+                                <span class="block w-2 h-2 bg-red-500 rounded-full animate-pulse"></span> REASONED SYNTHESIS
+                            </h4>
+                            <p class="text-sm text-slate-300 leading-relaxed mb-4">
+                                The base case (42.5%) dictates continued momentum in the Sovereign-Tech Nexus. High fiscal deficits fuel nominal growth, while AI capex justifies mega-cap valuations, rendering them synthetic pristine collateral.
+                            </p>
+                            <p class="text-sm text-slate-300 leading-relaxed font-semibold">
+                                HOW TO EXECUTE:
+                                <br>
+                                The negatively skewed tail risk (Scenarios 2 & 3 combined = 52.3%) is too massive to ignore. The structural mid-tier is a death trap. The only survivable forward path is a <span class="text-white font-bold underline decoration-red-500">Violent Barbell Strategy</span>: Maximize long exposure to synthetic safe-havens (Top 5 Equities, BTC, Short-term Sovereign paper) while simultaneously routing remaining capital into deep out-of-the-money cross-asset volatility calls to harvest the inevitable dispersion unwind.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="module-5" class="space-y-6">
+             <div class="border-b border-slate-300 pb-2">
+                <h2 class="text-2xl font-bold text-slate-900 tracking-tight">MODULE 5 // Tactical Routing Directives</h2>
+                <p class="text-slate-600 mt-2 max-w-4xl text-sm leading-relaxed">
+                    Executable capital allocation instructions derived directly from the Monte Carlo Synthesis. Select the appropriate target profile to review precise hedging, portfolio recalibration, and capital routing mandates.
+                </p>
+            </div>
+
+            <div class="flex flex-col md:flex-row gap-6">
+                <div class="md:w-1/3 flex flex-col gap-2">
+                    <button class="directive-btn bg-white border border-slate-200 p-4 rounded-lg text-left hover:bg-slate-50 transition-colors focus:outline-none focus:ring-2 focus:ring-slate-400 active-directive border-l-4 border-l-slate-800" data-target="app-a">
+                        <div class="font-bold text-slate-800">Appendix A</div>
+                        <div class="text-xs text-slate-500 uppercase tracking-wide">G-SIBs & Allocators</div>
+                    </button>
+                    <button class="directive-btn bg-white border border-slate-200 p-4 rounded-lg text-left hover:bg-slate-50 transition-colors focus:outline-none focus:ring-2 focus:ring-slate-400" data-target="app-b">
+                        <div class="font-bold text-slate-800">Appendix B</div>
+                        <div class="text-xs text-slate-500 uppercase tracking-wide">Private Equity Sponsors</div>
+                    </button>
+                    <button class="directive-btn bg-white border border-slate-200 p-4 rounded-lg text-left hover:bg-slate-50 transition-colors focus:outline-none focus:ring-2 focus:ring-slate-400" data-target="app-c">
+                        <div class="font-bold text-slate-800">Appendix C</div>
+                        <div class="text-xs text-slate-500 uppercase tracking-wide">Family Offices & UHNW</div>
+                    </button>
+                </div>
+
+                <div class="md:w-2/3 bg-[#1E293B] rounded-xl p-8 text-slate-300 relative overflow-hidden shadow-lg border border-slate-700">
+                    <div class="absolute top-0 right-0 p-4 text-slate-600 opacity-20 text-6xl font-serif leading-none">&#10078;</div>
+                    
+                    <div id="app-a" class="directive-content">
+                        <h3 class="text-xl font-bold text-white mb-4">G-SIBs & Institutional Allocators</h3>
+                        <ul class="space-y-4 text-sm">
+                            <li class="flex items-start gap-3">
+                                <span class="text-emerald-500 mt-1">&#10148;</span>
+                                <span><strong>Embrace the Barbell:</strong> Liquidate the "middle." Sell mid-cap equities, BBB corporate bonds, and mezzanine CLO tranches. Route capital to the absolute extremes: overnight repo and mega-cap tech.</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <span class="text-red-500 mt-1">&#10148;</span>
+                                <span><strong>Harvest the Volatility Illusion:</strong> The 38.2% probability of a Dispersion Unwind requires asymmetric protection. Buy VIX calls and establish long-gamma positions across the index, funded by shorting single-stock volatility.</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <span class="text-slate-500 mt-1">&#10148;</span>
+                                <span>Prepare emergency intraday DLT repo rails (Module 3) to bypass traditional clearinghouses in the event of a 14.1% Sovereign Freeze scenario.</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div id="app-b" class="directive-content hidden">
+                        <h3 class="text-xl font-bold text-white mb-4">Private Equity Sponsors</h3>
+                        <ul class="space-y-4 text-sm">
+                            <li class="flex items-start gap-3">
+                                <span class="text-slate-500 mt-1">&#10148;</span>
+                                <span><strong>Acknowledge the Death of the Middle Market:</strong> Halt new debt-funded deployments in traditional B2B/B2C services. The nominal growth rate will not outpace the true cost of their floating-rate debt.</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <span class="text-emerald-500 mt-1">&#10148;</span>
+                                <span><strong>Pivot to Infrastructure & Compute:</strong> Reallocate all dry powder to hard assets: AI data centers, power generation, and sovereign-backed infrastructure projects.</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <span class="text-slate-500 mt-1">&#10148;</span>
+                                <span>Aggressively mark-to-market legacy 2021 vintages internally. Preempt forced denominator-effect liquidations from LP bases by realizing losses early.</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div id="app-c" class="directive-content hidden">
+                        <h3 class="text-xl font-bold text-white mb-4">Family Offices & UHNW</h3>
+                        <ul class="space-y-4 text-sm">
+                            <li class="flex items-start gap-3">
+                                <span class="text-emerald-500 mt-1">&#10148;</span>
+                                <span><strong>Execute the Sovereign Barbell:</strong> 70% in self-custodied pristine collateral (T-Bills, Physical Gold, BTC). 20% in AI-infrastructure equity. 10% in long-volatility tail-hedges.</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <span class="text-red-500 mt-1">&#10148;</span>
+                                <span><strong>Abandon the "Soft Landing" Myth:</strong> The 5.2% probability of a traditional bust is noise. The real threat is systemic plumbing failure. Eliminate all exposure to illiquid private credit funds that rely on EBITDA add-backs.</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <span class="text-slate-500 mt-1">&#10148;</span>
+                                <span>Self-custody assets aggressively to insulate from prime brokerage hypothecation chains during a potential vol-shock clearinghouse failure.</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <footer class="mt-16 pt-8 border-t border-slate-300 text-xs text-slate-500 font-mono-sys flex justify-between">
+            <div>PROVENANCE LEDGER: 2026-06-05T20:54:57Z</div>
+            <div>[EOF] STAY UNTETHERED.</div>
+        </footer>
+
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            Chart.defaults.font.family = "'Inter', sans-serif";
+            Chart.defaults.color = '#64748B';
+
+            // Charting the VIX data with real-time 2026 terminal update
+            const ctxVix = document.getElementById('vixChart').getContext('2d');
+            new Chart(ctxVix, {
+                type: 'line',
+                data: {
+                    labels: ['Q1 24', 'Q2 24', 'Q3 24', 'Q4 24', 'Q1 25', 'Q2 25', 'Q3 25', 'Q4 25', 'Q1 26', 'NOW'],
+                    datasets: [
+                        {
+                            label: 'Single-Stock Implied Volatility (VIXEQ)',
+                            data: [18, 17, 19, 21, 24, 28, 33, 39, 44, 52.1], // Escalated point
+                            borderColor: '#DC2626',
+                            backgroundColor: 'rgba(220, 38, 38, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.3,
+                            fill: true,
+                            pointRadius: 3
+                        },
+                        {
+                            label: 'Index Volatility ($VIX)',
+                            data: [15, 14, 15, 16, 14, 15, 14, 15, 16, 21.51], // Spiked real-time point
+                            borderColor: '#0F172A',
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            tension: 0.3,
+                            fill: false,
+                            pointRadius: 3
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    plugins: {
+                        tooltip: {
+                            backgroundColor: '#1E293B',
+                            titleFont: { size: 13, family: "'JetBrains Mono', monospace" },
+                            bodyFont: { size: 13 },
+                            padding: 10,
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) { label += ': '; }
+                                    if (context.parsed.y !== null) { label += context.parsed.y; }
+                                    return label;
+                                },
+                                afterBody: function(context) {
+                                    if (context.length === 2) {
+                                        const spread = Math.abs(context[0].parsed.y - context[1].parsed.y).toFixed(1);
+                                        return '\nSpread: ' + spread;
+                                    }
+                                }
+                            }
+                        },
+                        legend: { position: 'top', labels: { usePointStyle: true, boxWidth: 6 } }
+                    },
+                    scales: {
+                        y: { beginAtZero: false, min: 10, max: 60, grid: { color: '#E2E8F0' } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+
+            const ctxBsl = document.getElementById('bslChart').getContext('2d');
+            new Chart(ctxBsl, {
+                type: 'bar',
+                data: {
+                    labels: ['2019', '2020', '2021', '2022', '2023', '2024', '2025', '2026'],
+                    datasets: [
+                        {
+                            label: 'Covenant-Lite Volume ($B)',
+                            data: [850, 920, 1100, 1300, 1450, 1700, 2100, 2550],
+                            backgroundColor: '#94A3B8',
+                        },
+                        {
+                            label: 'Full Covenants Volume ($B)',
+                            data: [600, 550, 500, 450, 350, 250, 150, 50],
+                            backgroundColor: '#0F172A',
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { stacked: true, grid: { display: false } },
+                        y: { stacked: true, beginAtZero: true, grid: { color: '#E2E8F0' } }
+                    },
+                    plugins: {
+                        tooltip: { backgroundColor: '#1E293B', padding: 10 },
+                        legend: { position: 'top', labels: { usePointStyle: true, boxWidth: 6 } }
+                    }
+                }
+            });
+
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            const dltContents = document.querySelectorAll('.dlt-content');
+
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    tabBtns.forEach(b => {
+                        b.classList.remove('active', 'text-white', 'bg-[#1E293B]');
+                        b.classList.add('text-slate-600');
+                    });
+                    
+                    btn.classList.add('active', 'text-white', 'bg-[#1E293B]');
+                    btn.classList.remove('text-slate-600');
+
+                    dltContents.forEach(content => content.classList.add('hidden'));
+
+                    const targetId = btn.getAttribute('data-target');
+                    document.getElementById(targetId).classList.remove('hidden');
+                });
+            });
+
+            const mcBtn = document.getElementById('run-mc-btn');
+            const mcInit = document.getElementById('mc-init');
+            const mcStatus = document.getElementById('mc-status');
+            const mcResults = document.getElementById('mc-results');
+            const mcCounter = document.getElementById('mc-counter');
+
+            if(mcBtn) {
+                mcBtn.addEventListener('click', () => {
+                    mcInit.classList.add('hidden');
+                    mcStatus.classList.remove('hidden');
+                    
+                    let count = 0;
+                    const target = 100000;
+                    
+                    const interval = setInterval(() => {
+                        // Accelerating tick logic for effect
+                        let increment = Math.floor(Math.random() * 8000) + 3000; 
+                        count += increment;
+                        
+                        if(count >= target) {
+                            count = target;
+                            clearInterval(interval);
+                            mcCounter.innerText = "100,000";
+                            mcStatus.innerHTML = '<span class="text-emerald-400 font-bold glitch-text">COMPUTATION COMPLETE. SYNTHESIS GENERATED.</span>';
+                            
+                            setTimeout(() => {
+                                mcStatus.classList.add('hidden');
+                                mcResults.classList.remove('hidden');
+                                
+                                // Trigger progress bar animations sequentially
+                                setTimeout(() => document.getElementById('bar-1').style.width = '42.5%', 100);
+                                setTimeout(() => document.getElementById('bar-2').style.width = '38.2%', 300);
+                                setTimeout(() => document.getElementById('bar-3').style.width = '14.1%', 500);
+                                setTimeout(() => document.getElementById('bar-4').style.width = '5.2%', 700);
+                            }, 1200);
+                        } else {
+                            mcCounter.innerText = count.toLocaleString();
+                        }
+                    }, 40);
+                });
+            }
+
+            const dirBtns = document.querySelectorAll('.directive-btn');
+            const dirContents = document.querySelectorAll('.directive-content');
+
+            dirBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    dirBtns.forEach(b => {
+                        b.classList.remove('border-l-4', 'border-l-slate-800', 'bg-slate-50');
+                    });
+                    btn.classList.add('border-l-4', 'border-l-slate-800', 'bg-slate-50');
+
+                    dirContents.forEach(content => content.classList.add('hidden'));
+
+                    const targetId = btn.getAttribute('data-target');
+                    document.getElementById(targetId).classList.remove('hidden');
+                });
+            });
+        });
+    </script>
+</body>
+</html>

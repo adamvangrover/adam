@@ -176,3 +176,13 @@
 ## 2024-05-29 - [Optimize JSON Schema Validation Compilation]
 **Learning:** `jsonschema.validate(instance, schema)` forces the library to determine the correct validator class and recompile the schema definitions on every single invocation, creating a massive bottleneck on hot paths like parsing LLM outputs or validating incoming entities.
 **Action:** Always pre-compile the schema during component initialization (e.g., `ValidatorClass = jsonschema.validators.validator_for(schema); self.validator = ValidatorClass(schema)`) and reuse the instance (`self.validator.validate(instance)`) for validation to skip the compilation overhead.
+## 2024-05-31 - [Modular Architecture Documentation]
+**Learning:** Documenting individual modules and placing READMEs within bounded contexts aids structure and clarifies strict deterministic vs. probabilistic execution roles (e.g., adam_finance vs. adam_swarm).
+**Action:** Synthesize high-level objectives into `README.md` files across root directories to assist context-preservation and searchability.
+## 2024-05-31 - [Architecture Scaffold Migration]
+**Learning:** Initial structural scaffolding of modular enterprise agents should start with explicit Protocol/ABC interfaces, ensuring strong separation between System 1 (probabilistic swarms) and deterministic math. Additive extraction from existing files ensures functional equivalence.
+**Action:** Always document the purpose, inputs, and outputs via standardized docstrings to support future multi-agent memory parsing.
+
+## 2024-05-23 - Memoization of sorting logic in HFTView
+**Learning:** Found unnecessary `O(N log N)` re-evaluations inside React component body due to sorting logic. Sorting should be memoized with `useMemo` when working with potentially large lists inside render loops, especially in high-frequency trading view components that might get frequent re-renders from parent state changes.
+**Action:** Always wrap heavy list transformations (like sort, filter over large datasets) inside `useMemo` in React components to avoid burning CPU cycles on unchanged data.

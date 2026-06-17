@@ -301,8 +301,12 @@ function InstitutionalView({ nodes }: { nodes: any[] }) {
 }
 
 function HFTView({ nodes }: { nodes: any[] }) {
+  // ⚡ Bolt: Wrapped sortedNodes in useMemo to prevent O(N log N) sorting on every re-render of HFTView.
+  // Expected Impact: Reduces CPU cycle waste when the HFTView re-renders due to other state changes without nodes changing.
   // Sort by liquidity (most distressed first) to simulate an order book looking for targets
-  const sortedNodes = [...nodes].sort((a, b) => a.currentIcr - b.currentIcr).slice(0, 50); // Show top 50
+  const sortedNodes = useMemo(() =>
+    [...nodes].sort((a, b) => a.currentIcr - b.currentIcr).slice(0, 50),
+  [nodes]); // Show top 50
 
   return (
     <div className="flex-1 p-4 flex flex-col h-full overflow-hidden bg-black rounded-lg">

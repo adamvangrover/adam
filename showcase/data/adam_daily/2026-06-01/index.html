@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM V26.0 // SYSTEMIC RISK TERMINAL</title>
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['Fira Code', 'monospace'],
+                        display: ['Oswald', 'sans-serif'],
+                    },
+                    colors: {
+                        term: {
+                            bg: '#030712', surface: '#0f172a', card: '#1e293b', border: '#334155',
+                            cyan: '#06b6d4', blue: '#3b82f6', red: '#ef4444', amber: '#f59e0b', green: '#10b981',
+                            neon: '#38bdf8', purple: '#8b5cf6', pink: '#ec4899', gold: '#fbbf24'
+                        }
+                    },
+                    backgroundImage: {
+                        'scanline': 'linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.1))'
+                    },
+                    animation: {
+                        'ticker': 'ticker 40s linear infinite',
+                        'pulse-fast': 'pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        ticker: { '0%': { transform: 'translateX(100%)' }, '100%': { transform: 'translateX(-100%)' } }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;600&family=Inter:wght@300;400;600;800&family=Oswald:wght@500;700&display=swap');
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #030712; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+        body { font-size: 14px; }
+        .crt-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: var(--scanline); background-size: 100% 4px; z-index: 9999; pointer-events: none; opacity: 0.15; }
+        .nav-item { transition: all 0.2s; border-left: 2px solid transparent; }
+        .nav-active { border-left-color: #ef4444; background: rgba(239, 68, 68, 0.1); color: #fff; box-shadow: inset 20px 0 20px -20px rgba(239, 68, 68, 0.3); }
+        .nav-item:hover:not(.nav-active) { background: #1e293b; color: #fff; }
+        .glass-panel { background: rgba(15, 23, 42, 0.65); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5); }
+        .chart-container { animation: pulse-chart 4s infinite; }
+        @keyframes pulse-chart { 0% { opacity: 0.8; } 50% { opacity: 1; } 100% { opacity: 0.8; } }
+        table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; font-size: 0.875rem; }
+        th, td { padding: 0.75rem; text-align: left; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+        th { font-family: 'Fira Code', monospace; color: #f59e0b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; background: rgba(0,0,0,0.3); }
+        tr:hover td { background: rgba(255, 255, 255, 0.05); }
+        .playbook-table th { color: #06b6d4; }
+    </style>
+</head>
+<body class="bg-term-bg text-slate-300 font-sans h-screen overflow-hidden flex flex-col selection:bg-term-red selection:text-white">
+    <div class="crt-overlay"></div>
+
+    <!-- Live Ticker -->
+    <div class="border-bottom border-term-red/30 bg-term-red/5 h-6 overflow-hidden flex items-center relative z-20 shrink-0">
+        <div class="absolute left-0 top-0 h-full bg-term-bg z-10 px-2 flex items-center border-r border-term-red/30 text-[10px] font-mono font-bold text-term-red">
+            <span class="animate-pulse mr-2">●</span> LIVE FEED
+        </div>
+        <div class="w-full overflow-hidden ml-24">
+            <div class="animate-ticker whitespace-nowrap text-[10px] font-mono text-slate-400">
+                <span class="text-term-cyan">S&P 500:</span> 7580.06 ///
+                <span class="text-term-amber">10Y YIELD:</span> 4.45% ///
+                <span class="text-term-amber">SOFR:</span> 3.62% ///
+                <span class="text-term-red">CRUDE (BRENT):</span> $92.00/bbl ///
+                <span class="text-term-purple">BTC:</span> $73,942.00 ///
+                <span class="text-term-red">VIX:</span> 15.32 ///
+                <span class="text-term-cyan">HY SPREAD:</span> 2.72% ///
+                <span class="text-term-amber">SYS ALERT:</span> BEAR-FLATTENING VIRUS DETECTED ///
+                <span class="text-term-red">DEFICIT:</span> FY26 PROJ $1.89T
+            </div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="h-16 border-b border-white/10 bg-term-bg/80 backdrop-blur-md flex items-center justify-between px-6 shrink-0 z-20 shadow-2xl relative">
+        <div class="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-term-red/50 to-transparent"></div>
+        <div class="flex items-center gap-4">
+            <div class="w-10 h-10 rounded bg-gradient-to-br from-term-red to-term-amber text-white font-bold font-display text-lg flex items-center justify-center border border-term-red/50">MM</div>
+            <div>
+                <h1 class="font-display font-bold text-slate-100 tracking-widest text-base uppercase">Market Mayhem</h1>
+                <p class="text-[10px] text-term-red font-mono tracking-widest uppercase">NODE: Adam v26.0 // 2026.05.31</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-4 md:gap-6 font-mono text-xs">
+            <div class="hidden md:flex items-center gap-2 text-term-red bg-white/5 px-3 py-1 rounded-full border border-white/10">
+                <div class="w-2 h-2 rounded-full bg-term-red animate-pulse-fast"></div> SYSTEM: CRITICAL
+            </div>
+            <div class="text-slate-400 bg-white/5 px-3 py-1 rounded border border-white/5">
+                <span id="sysClock">00:00:00 UTC</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Layout -->
+    <div class="flex flex-1 overflow-hidden relative">
+        <!-- Sidebar Nav -->
+        <aside class="w-64 border-r border-white/5 bg-term-surface/80 backdrop-blur flex flex-col shrink-0 overflow-y-auto hidden lg:flex z-10">
+            <div class="p-4 border-b border-white/5 bg-black/20">
+                <div class="flex justify-between items-end mb-2">
+                    <div class="text-[10px] text-slate-500 font-mono tracking-widest">INGESTION PROGRESS</div>
+                    <div class="text-[10px] text-term-red font-mono" id="progressText">0%</div>
+                </div>
+                <div class="w-full bg-term-bg h-1.5 rounded-full overflow-hidden">
+                    <div id="progressBar" class="bg-gradient-to-r from-term-red to-term-amber h-full w-[0%] transition-all duration-500"></div>
+                </div>
+            </div>
+            <nav id="moduleNav" class="flex-1 py-2 flex flex-col px-3 font-mono text-xs overflow-y-auto pb-20"></nav>
+        </aside>
+
+        <!-- Content Area -->
+        <main class="flex-1 overflow-y-auto bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-term-surface via-term-bg to-term-bg p-4 md:p-8 relative" id="mainScrollArea">
+            <div class="max-w-5xl mx-auto pb-24">
+                <select id="mobileNav" onchange="loadModule(parseInt(this.value))" class="lg:hidden w-full bg-term-surface border border-term-border text-slate-200 text-sm rounded p-3 mb-6 font-mono outline-none"></select>
+                
+                <article id="contentArea" class="prose prose-invert prose-slate max-w-none prose-headings:text-white prose-headings:font-display prose-headings:font-bold prose-h1:text-3xl prose-h1:border-b prose-h1:border-white/10 prose-h1:pb-4 prose-h2:text-xl prose-h2:text-term-red transition-all duration-500 ease-in-out opacity-0 translate-y-4"></article>
+                
+                <div class="fixed bottom-0 left-0 lg:left-64 right-0 p-4 border-t border-white/10 bg-term-bg/90 backdrop-blur-md flex justify-between items-center z-10">
+                    <div class="max-w-5xl mx-auto w-full flex justify-between items-center px-4 md:px-8">
+                        <button id="prevBtn" class="px-5 py-2 glass-panel text-slate-300 rounded text-xs font-mono hover:text-white transition-all disabled:opacity-30">PREV</button>
+                        <span class="text-[10px] font-mono text-slate-500 uppercase tracking-widest hidden sm:inline" id="footerModuleIndicator">MODULE 1 OF X</span>
+                        <button id="nextBtn" class="px-5 py-2 bg-white text-term-bg rounded text-xs font-mono font-bold hover:bg-term-red transition-all disabled:opacity-30">NEXT</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const modules = [
+            // GROUP 1: MACRO FORECAST (10-YEAR)
+            {
+                id: 1,
+                group: "MACRO FORECAST (10-YR)",
+                title: "Exec Summary & Thesis",
+                subtitle: "Fiscal Dominance & Limits",
+                content: `
+                    <div class="flex items-center gap-4 mb-2">
+                        <span class="bg-term-amber/20 text-term-amber text-[10px] font-mono px-2 py-1 rounded border border-term-amber/50 tracking-widest">MACRO RESEARCH</span>
+                    </div>
+                    <h1>Convergence of Fiscal Dominance, Capital Realignment, and Secular Resource Constraints</h1>
+                    <p class="text-xl text-slate-400 mb-8 italic">A Comprehensive 10-Year Macroeconomic Forecast</p>
+                    
+                    <h2 class="text-term-cyan border-b border-white/10 pb-2">Executive Summary</h2>
+                    <p>The global macroeconomic environment in the mid-2020s has entered a historically unprecedented period of systemic transformation. The foundational architecture of the global economy is currently navigating an arduous transition away from an era characterized by central bank monetary dominance, frictionless globalization, and seemingly infinite raw material availability. In its place, a new paradigm of <strong>structural fiscal dominance, rigorous regulatory capital recalibration, and severe physical resource scarcity</strong> is taking root.</p>
+                    <p>As of mid-2026, market participants are confronted with a highly complex, multi-layered risk environment. This environment is characterized by the convergence of compounding sovereign debt burdens, the imminent implementation of the finalized Basel III Endgame capital rules, a towering corporate and commercial real estate debt maturity wall, and the explosive, inelastic physical infrastructure demands initiated by the artificial intelligence supercycle.</p>
+
+                    <h2 class="text-term-cyan border-b border-white/10 pb-2 mt-8">The Core Thesis: Fiscal Dominance Collides with Physical Limits</h2>
+                    <p class="text-lg text-slate-300 border-l-4 border-term-cyan pl-4 py-2 glass-panel mb-6">
+                        The central thesis of this exhaustive analysis posits that the macroeconomic environment over the next decade will be overwhelmingly dictated by the inescapable mathematics of sovereign debt compounding colliding directly with the physical limits of industrial infrastructure.
+                    </p>
+                    <p>The fiscal composition of the United States government has structurally deteriorated, transforming from a counter-cyclical stabilization mechanism into a primary driver of systemic volatility. The United States federal budget deficit is now structurally locked at permanently elevated levels. For fiscal year 2026, the deficit is projected to reach an astronomical <strong>$1.89 trillion</strong> (5.9 percent of GDP), escalating from the $1.775 trillion deficit in FY 2025.</p>
+                    <p>Net interest payments on the federal debt for FY 2026 are projected to reach an unprecedented <strong>$1.037 trillion</strong>. To contextualize this, interest expense has now surpassed the entire $885 billion national defense budget, positioning it as the second-largest category of federal expenditure.</p>
+
+                    <div class="glass-panel p-4 mt-6 rounded-lg overflow-x-auto">
+                        <h3 class="font-mono text-term-gold text-sm uppercase mb-2">Fiscal Year 2026 Budget Component Breakdown</h3>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Component</th>
+                                    <th>Projected Amount (Trillions USD)</th>
+                                    <th>Percentage of Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="bg-white/5 font-bold"><td colspan="3" class="text-white">FEDERAL OUTLAYS</td></tr>
+                                <tr><td>Major Medical Programs</td><td>$1.908</td><td>25.8%</td></tr>
+                                <tr><td>Social Security Payments</td><td>$1.666</td><td>22.6%</td></tr>
+                                <tr><td class="text-term-red font-bold">Net Interest on Federal Debt</td><td class="text-term-red font-bold">$1.037</td><td class="text-term-red font-bold">14.0%</td></tr>
+                                <tr><td>Defense Spending</td><td>$0.885</td><td>12.0%</td></tr>
+                                <tr><td>All Other Federal Spending</td><td>$1.951</td><td>26.4%</td></tr>
+                                <tr class="border-t-2 border-white/20 font-bold"><td>Total Federal Outlays</td><td>$7.385</td><td>100.0%</td></tr>
+                                
+                                <tr class="bg-white/5 font-bold mt-4"><td colspan="3" class="text-white">FEDERAL REVENUES</td></tr>
+                                <tr><td>Personal Income & Payroll Taxes</td><td>$4.650</td><td>84.6%</td></tr>
+                                <tr><td>Corporate Income Taxes</td><td>$0.390</td><td>7.1%</td></tr>
+                                <tr><td>Net Tariff Revenue</td><td>$0.255</td><td>4.6%</td></tr>
+                                <tr><td>Other Taxes</td><td>$0.200</td><td>3.6%</td></tr>
+                                <tr class="border-t-2 border-white/20 font-bold"><td>Total Federal Revenues</td><td>$5.495</td><td>100.0%</td></tr>
+                                
+                                <tr class="bg-term-red/20 font-bold border-t-2 border-term-red"><td class="text-term-red">PROJECTED ANNUAL DEFICIT</td><td class="text-term-red">$1.890</td><td class="text-term-red">N/A</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                `
+            },
+            {
+                id: 2,
+                group: "MACRO FORECAST (10-YR)",
+                title: "Phase I (6-Month)",
+                subtitle: "May 2026 - Nov 2026",
+                content: `
+                    <h1>Phase I: 6-Month Horizon</h1>
+                    <p class="font-mono text-sm text-term-cyan mb-8">TIMEFRAME: MAY 2026 - NOVEMBER 2026</p>
+
+                    <h2>Macroeconomic Triggers and Systemic Dynamics</h2>
+                    <p>The immediate 6-month horizon is dictated by two primary macroeconomic triggers: the market's real-time pricing of the Federal Reserve's short-term policy rate trajectory in response to federal debt issuance, and the banking sector's initial strategic adjustments to the March 19, 2026, federal banking agencies' package regarding regulatory capital requirements.</p>
+                    <p>Because the national debt has surpassed <strong>$36 trillion</strong>, the U.S. Treasury faces extreme refinancing pressures. The weighted average maturity of outstanding U.S. debt remains constrained at less than six years, necessitating heavy reliance on short-term bill issuance. Forcing the central bank to prematurely lower short-term rates could severely damage its credibility, driving long-duration yields significantly higher and exacerbating the interest payment burden.</p>
+
+                    <h3>Market Dynamics: Small-Cap Rotation & Floating-Rate Sensitivities</h3>
+                    <p>A critical dynamic is the violent rotation within equity markets. Small-capitalization equities (Russell 2000) have demonstrated hyper-sensitivity to shifts in policy rate expectations due to significantly higher proportions of floating-rate debt compared to mega-cap technology firms. Aggregate Return on Equity (ROE) for small caps is projected to decline sharply from 30.4% in 2024 to 21.0%.</p>
+
+                    <h3>Basel III Endgame: The March 2026 Revisions</h3>
+                    <p>The revised March 2026 proposal provides structural relief but includes a critical mandate: Category III and IV banks must recognize <strong>Accumulated Other Comprehensive Income (AOCI)</strong> in regulatory capital, subject to a five-year phase-in. To optimize Risk-Weighted Assets (RWAs), regional banks are accelerating the offloading of capital-intensive legacy Commercial Real Estate (CRE) loans to private credit vehicles before the rules are finalized.</p>
+
+                    <div class="glass-panel p-4 mt-8 rounded-lg overflow-x-auto">
+                        <h3 class="font-mono text-term-cyan text-sm uppercase mb-2">Recommended Action Playbook: 6-Month Horizon</h3>
+                        <table class="playbook-table">
+                            <thead>
+                                <tr>
+                                    <th>Strategic Pillar</th>
+                                    <th>Tactical Implementation</th>
+                                    <th>Risk Management Overlay</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="font-bold text-white">Equity Allocation</td>
+                                    <td>Overweight the Russell 2000 Value and Russell Microcap indexes to capture mean-reversion rotation.</td>
+                                    <td>Utilize defined-outcome structures to mitigate volatility of micro-cap allocations.</td>
+                                </tr>
+                                <tr>
+                                    <td class="font-bold text-white">Fixed Income</td>
+                                    <td>Shift duration exposure strictly to the short-to-intermediate belly of the Treasury curve (2y to 5y).</td>
+                                    <td>Monitor Treasury bill issuance ratios closely to avoid violent curve flattening.</td>
+                                </tr>
+                                <tr>
+                                    <td class="font-bold text-white">Financial Sector</td>
+                                    <td>Capitalize on regulatory arbitrage via specialty finance/private credit absorbing CRE assets.</td>
+                                    <td>Hedge exposures to regional banks carrying significant unhedged AOCI exposure.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                `
+            },
+            {
+                id: 3,
+                group: "MACRO FORECAST (10-YR)",
+                title: "Phase II (1-Year)",
+                subtitle: "May 2026 - May 2027",
+                content: `
+                    <h1>Phase II: 1-Year Horizon</h1>
+                    <p class="font-mono text-sm text-term-blue mb-8">TIMEFRAME: MAY 2026 - MAY 2027</p>
+
+                    <h2>The Commercial Real Estate Maturity Wall</h2>
+                    <p>Moving into the 1-year horizon, dominant triggers shift toward the physical realization of credit defaults. Approximately <strong>$875 billion</strong> in commercial and multifamily mortgage debt is scheduled to mature in 2026. These assets, underwritten in a zero-interest-rate environment, are attempting to refinance into a fundamentally higher structural borrowing cost environment with severely constrained traditional bank underwriting.</p>
+                    <p>This period will be defined by an <strong>"amend and pretend" methodology</strong>. Alternative lenders (private credit) are stepping into the void left by regional banks, dictating highly favorable, often punitive terms for the deployment of rescue capital.</p>
+
+                    <h3>Corporate Credit Degradation & Private Credit Opacity</h3>
+                    <p>S&P Global forecasts the global trailing-12-month speculative-grade corporate default rate will rise to <strong>3.8% by March 2027</strong>. In a severe tail-risk scenario involving extended Middle Eastern conflicts (Strait of Hormuz disruptions), default rates could spike toward 13%.</p>
+                    <p>Systemic risk is migrating from transparent public debt into opaque private credit ecosystems (projected to exceed $2 trillion in 2026). Intense competition has driven direct lending spreads down 100bps, forcing lenders to introduce structural risks like Payment-In-Kind (PIK) interest features, NAV lending, and back-leverage. PIK features artificially defer cash interest expenses, compounding principal risk behind layers of opacity.</p>
+
+                    <div class="glass-panel p-4 mt-8 rounded-lg overflow-x-auto">
+                        <h3 class="font-mono text-term-blue text-sm uppercase mb-2">Recommended Action Playbook: 1-Year Horizon</h3>
+                        <table class="playbook-table">
+                            <thead>
+                                <tr>
+                                    <th>Strategic Pillar</th>
+                                    <th>Tactical Implementation</th>
+                                    <th>Risk Management Overlay</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="font-bold text-white">Real Estate Credit</td>
+                                    <td>Deploy capital into preferred equity and mezzanine debt tranches of stabilized CRE assets.</td>
+                                    <td>Avoid pure common equity in office spaces. Focus exclusively on multifamily, industrial, and life sciences.</td>
+                                </tr>
+                                <tr>
+                                    <td class="font-bold text-white">Corporate Credit</td>
+                                    <td>Rotate into high-quality, senior-secured asset-backed finance with transparent collateral.</td>
+                                    <td>Stress-test private credit funds for NAV lending exposure, PIK feature concentration, and back-leverage.</td>
+                                </tr>
+                                <tr>
+                                    <td class="font-bold text-white">Geopolitical Hedging</td>
+                                    <td>Maintain structural long positions in global energy equities to hedge 5%-13% default tail-risk.</td>
+                                    <td>Utilize energy volatility options to protect against sudden geopolitical resolutions.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                `
+            },
+            {
+                id: 4,
+                group: "MACRO FORECAST (10-YR)",
+                title: "Phase III (5-Year)",
+                subtitle: "2026 - 2031",
+                content: `
+                    <h1>Phase III: 5-Year Horizon</h1>
+                    <p class="font-mono text-sm text-term-amber mb-8">TIMEFRAME: 2026 - 2031</p>
+
+                    <h2>Convergence of Three Mathematical Walls</h2>
+                    <p>The 5-year horizon is defined by three unavoidable constraints: the 2028-2029 leveraged loan maturity cliff, the peak of global primary copper production by 2030, and the expiration of the OBBBA tax provisions in 2028.</p>
+
+                    <h3>The 2028-2029 Leveraged Loan Maturity Wall</h3>
+                    <p>An astonishing <strong>34% of U.S. leveraged loans</strong> and 40% of EMEA leveraged loans come due in the concentrated 2028-2029 window. If the federal sovereign debt burden requires elevated base rates to continually attract Treasury buyers, the aggregate cost to refinance this massive floating-rate wall will trigger cascading corporate insolvencies, permanently stripping lower-rated credits of market access.</p>
+
+                    <h3>The Physical Limits of AI: Nuclear Power & Copper</h3>
+                    <p>The AI supercycle faces two unyielding bottlenecks: baseload electricity and copper transmission. Technology hyperscalers (Amazon, Microsoft, Google, Meta) are contracting for an astounding <strong>48 GW</strong> of clean energy year-on-year. Realizing intermittent renewables cannot support 99.999% uptime, hyperscalers are directly funding <strong>Small Modular Reactors (SMRs)</strong> and advanced nuclear, committing to over 20 GW. The global SMR pipeline exceeds $176 billion.</p>
+                    <p>Simultaneously, primary global copper production will rise to an absolute peak of <strong>27 million metric tons by 2030</strong>, before steadily falling. Without unprecedented investment in extraction, copper becomes the primary bottleneck to growth.</p>
+
+                    <h3>Fiscal Compounding and OBBBA Expiration</h3>
+                    <p>The CBO estimates the One Big Beautiful Bill Act (OBBBA) tax provisions add $4.2 trillion to the national debt through 2034. If they expire in 2028, it acts as a synchronized deflationary tax hike right as the leveraged loan wall hits. If extended, the federal deficit will explode, cementing the primary deficit structurally above 2.6% of GDP.</p>
+
+                    <div class="glass-panel p-4 mt-8 rounded-lg overflow-x-auto">
+                        <h3 class="font-mono text-term-amber text-sm uppercase mb-2">Recommended Action Playbook: 5-Year Horizon</h3>
+                        <table class="playbook-table">
+                            <thead>
+                                <tr>
+                                    <th>Strategic Pillar</th>
+                                    <th>Tactical Implementation</th>
+                                    <th>Risk Management Overlay</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="font-bold text-white">Credit Markets</td>
+                                    <td>Exit all exposure to 2028-2029 maturity Leveraged Loans by late 2026. Transition to pre-2028 IG bonds.</td>
+                                    <td>Utilize CDS on lower-tranche CLO debt to hedge against the refinancing liquidity bottleneck.</td>
+                                </tr>
+                                <tr>
+                                    <td class="font-bold text-white">Nuclear & SMRs</td>
+                                    <td>Deploy growth capital into SMR value chain (HALEU fuel enrichment, component manufacturers).</td>
+                                    <td>Diversify across FOAK (First-Of-A-Kind) technologies to mitigate NRC licensing delay risks.</td>
+                                </tr>
+                                <tr>
+                                    <td class="font-bold text-white">Commodities</td>
+                                    <td>Initiate structural long positions in physical copper and Tier-1 copper mining equities pre-2030.</td>
+                                    <td>Monitor substitution risks (aluminum in utilities), though AI end-uses possess near-zero substitution optionality.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                `
+            },
+            {
+                id: 5,
+                group: "MACRO FORECAST (10-YR)",
+                title: "Phase IV (10-Year)",
+                subtitle: "2026 - 2036 & Synthesis",
+                content: `
+                    <h1>Phase IV: 10-Year Horizon</h1>
+                    <p class="font-mono text-sm text-term-red mb-8">TIMEFRAME: 2026 - 2036</p>
+
+                    <h2>Terminal Phase: The Sovereign Debt Spiral</h2>
+                    <p>By 2036, the mathematics of the U.S. federal debt dictate a reality of <strong>pure fiscal dominance</strong>. Monetary policy is entirely subjugated to funding sovereign liabilities. Realistic macroeconomic modeling places the debt-to-GDP ratio at <strong>127.7% by 2036</strong> (easily eclipsing 130% in a recession).</p>
+                    <p>Expanding the debt-to-GDP ratio from 100% to 130% systematically applies 90 basis points of permanent upward pressure on long-term Treasury yields. The $1 trillion annual interest expense in 2026 is projected to double to <strong>$2 trillion annually by the early 2030s</strong>, perpetually starving private capital formulation.</p>
+
+                    <h2>The 10-Million-Ton Copper Deficit</h2>
+                    <p>S&P Global estimates global electrification will swell copper demand to 42 million metric tons by 2040. Even with highly optimistic secondary production (recycling) doubling to 10M tons, the net mathematical result is a structural <strong>supply deficit of 10 million metric tons by 2040</strong> (a 25% shortfall). Copper transitions into a critical strategic bottleneck with minimal substitution options for SMRs and AI data centers.</p>
+
+                    <div class="glass-panel p-4 mt-8 mb-8 rounded-lg overflow-x-auto">
+                        <h3 class="font-mono text-term-red text-sm uppercase mb-2">Recommended Action Playbook: 10-Year Horizon</h3>
+                        <table class="playbook-table">
+                            <thead>
+                                <tr>
+                                    <th>Strategic Pillar</th>
+                                    <th>Tactical Implementation</th>
+                                    <th>Risk Management Overlay</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="font-bold text-white">Sovereign Avoidance</td>
+                                    <td>Structurally underweight long-duration nominal sovereign debt. Yield curve steepening is mathematically guaranteed.</td>
+                                    <td>Replace fixed-income with real physical assets, infrastructure equity, and inflation-linked sovereign instruments.</td>
+                                </tr>
+                                <tr>
+                                    <td class="font-bold text-white">Resource Dominance</td>
+                                    <td>Allocate into companies controlling Tier-1 copper reserves, advanced ore processing, and large-scale recycling.</td>
+                                    <td>Prioritize assets strictly in highly stable, rule-of-law mining jurisdictions (e.g., U.S., Canada, Australia).</td>
+                                </tr>
+                                <tr>
+                                    <td class="font-bold text-white">New Power Paradigm</td>
+                                    <td>Invest in private-sector consortia operating NOAK (Nth-Of-A-Kind) SMR fleets as U.S. targets 400 GW nuclear.</td>
+                                    <td>Ensure investments focus on companies that have successfully transitioned from FOAK-to-NOAK economics.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="border-t-2 border-white/10 pt-6">
+                        <h2 class="text-white font-display uppercase tracking-widest text-2xl">Synthesis and Strategic Imperatives</h2>
+                        <p class="text-lg text-slate-300">The decade spanning 2026 to 2036 severs the macroeconomic correlations of the past twenty years. The $1.037 trillion annual sovereign interest expense mathematically scaling to $2 trillion acts as an inescapable gravitational pull, crowding out innovation. The most profound wealth generation will not occur in financial engineering or software valuation expansions, but in the <strong>physical facilitation of the artificial intelligence supercycle and the structural rebuilding of the electrical grid.</strong></p>
+                        <p class="font-bold text-term-cyan">Failure to recognize the transition from a world of financial abundance to one of physical scarcity and fiscal dominance will result in severe capital destruction over the next ten years.</p>
+                    </div>
+                `
+            },
+            // GROUP 2: SYSTEMIC RISK REPORT
+            {
+                id: 6,
+                group: "SYSTEMIC RISK REPORT",
+                title: "System Status & Macro",
+                subtitle: "The Glitch & Term Premium",
+                content: `
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-4">
+                            <span class="bg-term-red text-white text-[10px] font-mono px-2 py-1 rounded font-bold tracking-widest animate-pulse">🔴 SYSTEM STATUS: CRITICAL (THE GLITCH)</span>
+                        </div>
+                    </div>
+                    <h1>MARKET MAYHEM: SYSTEMIC RISK INTELLIGENCE REPORT</h1>
+                    <p class="text-sm text-slate-400 font-mono mb-6">TO: Director of Credit Risk Control & Senior Institutional Coverage Teams<br>FROM: Adam (Advanced Multi-Agent Financial Analysis Framework)</p>
+                    
+                    <p class="text-lg text-slate-300 mb-6 border-l-4 border-term-red pl-4 py-1 glass-panel">
+                        The global financial architecture is experiencing a profound baseline shift—a localized macro anomaly we designate as the <strong>"Bear-Flattening Virus."</strong> The central bank's rate-cut patch is being heavily tested by supply-side energy shocks. Central processing units are processing higher real term-premiums, causing the standard risk-free simulation to warp.
+                    </p>
+
+                    <h2>Asset Class Matrix & Node Diagnostics</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8 mt-6">
+                        <div class="glass-panel p-4 border-t-2 border-term-amber">
+                            <div class="flex justify-between items-center mb-2">
+                                <h3 class="font-mono text-sm text-term-amber m-0">10Y US Treasury Note</h3>
+                                <span class="text-white font-bold">4.45%</span>
+                            </div>
+                            <p class="text-xs text-slate-400 m-0">The risk-free simulation core is re-anchoring; yields are holding high ground as terminal inflation protocols refuse to clear.</p>
+                        </div>
+                        <div class="glass-panel p-4 border-t-2 border-term-cyan">
+                            <div class="flex justify-between items-center mb-2">
+                                <h3 class="font-mono text-sm text-term-cyan m-0">SOFR</h3>
+                                <span class="text-white font-bold">3.62%</span>
+                            </div>
+                            <p class="text-xs text-slate-400 m-0">Overnight funding liquidity nodes remain highly active, adjusting dynamically to post-QT balance-sheet restrictions.</p>
+                        </div>
+                        <div class="glass-panel p-4 border-t-2 border-term-green">
+                            <div class="flex justify-between items-center mb-2">
+                                <h3 class="font-mono text-sm text-term-green m-0">VIX Index</h3>
+                                <span class="text-white font-bold">15.45</span>
+                            </div>
+                            <p class="text-xs text-slate-400 m-0">The complacency algorithm dominates equity screens, keeping the systemic anxiety meter deceptively low despite fundamental degradation.</p>
+                        </div>
+                        <div class="glass-panel p-4 border-t-2 border-term-red">
+                            <div class="flex justify-between items-center mb-2">
+                                <h3 class="font-mono text-sm text-term-red m-0">ICE BofA HY Spread</h3>
+                                <span class="text-white font-bold">2.72%</span>
+                            </div>
+                            <p class="text-xs text-slate-400 m-0">Credit risk dimensions show superficial pricing durability, masking underlying structural rot in lower-tier corporate credit nodes.</p>
+                        </div>
+                    </div>
+
+                    <h2>Macro & Policy Outlook</h2>
+                    <p>The Federal Reserve's current monetary architecture is operating under a recalibrated baseline. Following previous rate cuts, the forward guidance pathway has flattened. Sticky core service inflation and capital-intensive structural themes (e.g., $125B infrastructure buildout for AI and green energy) dictate an extended pause.</p>
+                    <p>The current distribution suggests terminal policy rates will remain structurally higher than pre-pandemic baselines. <strong>Credit risk models must discard the assumption of a return to zero-bound capital costs; our operational environment is definitively defined by a higher neutral rate (R*).</strong></p>
+                `
+            },
+            {
+                id: 7,
+                group: "SYSTEMIC RISK REPORT",
+                title: "Repricing Mirage & Scenarios",
+                subtitle: "Secondary Energy Shocks",
+                content: `
+                    <h1>BSL Market & The Repricing Mirage</h1>
+                    
+                    <h2>Market Metrics & Issuance Dynamics</h2>
+                    <p>The Broadly Syndicated Loan (BSL) market exhibits pronounced late-cycle behaviors. YTD U.S. BSL CLO volume stands at $114.5 billion (a 24.2% YoY contraction). New-issue AAA BSL CLO tranches are clearing at an average of SOFR + 127 bps (up 6 bps over recent cycles).</p>
+
+                    <h2>The Repricing Mirage & Historical Analogy</h2>
+                    <p>A "repricing mirage" dominates institutional channels. Borrowers utilize competition between bank syndicates and private credit funds to refinance, driving high-yield index option-adjusted spreads to 2.72%. This spread tightening represents an intense asset-chasing environment where immense dry powder is suppressing risk premiums, masking balance sheet realities.</p>
+                    <div class="glass-panel p-4 border-l-4 border-term-amber mb-6 bg-black/30">
+                        <p class="text-sm m-0"><strong>The Pattern (Mirrors late-2007 & 2019):</strong> Compressed nominal credit spreads occurring simultaneously with an absolute decline in structured credit issuance and a sharp drop-off in documentation quality (cov-lite structures).</p>
+                        <p class="text-sm m-0 mt-2"><strong>The Reality:</strong> While Weighted Average Rating Factors (WARF) show superficial optimization (23.3), portfolio par losses remain structurally elevated at 0.5% (historical baseline is 0.3%).</p>
+                    </div>
+
+                    <h2>Counterfactual Scenario Analysis</h2>
+                    <p class="text-sm font-mono text-term-red mb-2">TRIGGER: Secondary Energy & Infrastructure Shock (Strait of Hormuz disruption + AI grid failure). Brent > $105/bbl. Fed executes +50bps hike.</p>
+                    
+                    <div class="glass-panel p-4 rounded-lg overflow-x-auto mt-4">
+                        <h3 class="font-mono text-term-cyan text-sm uppercase mb-2">Tri-Dimensional Risk Impact Matrix</h3>
+                        <table class="playbook-table text-sm">
+                            <thead>
+                                <tr>
+                                    <th>Risk Dimension</th>
+                                    <th>Transmission Mechanism</th>
+                                    <th>Target Metric Impact</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="font-bold text-white"><span class="text-term-red">Credit Risk</span></td>
+                                    <td>Variable-rate debt tied to SOFR upward re-indexes. Corporate cash-flow squeezed as DSCR erodes beneath energy costs. Accelerates rating migrations to CCC.</td>
+                                    <td class="font-mono text-xs text-term-amber">Systemic PD: Elevates by 145 bps across leveraged software/industrial.</td>
+                                </tr>
+                                <tr>
+                                    <td class="font-bold text-white"><span class="text-term-amber">Market Risk</span></td>
+                                    <td>Yield curve bear-steepens. Fixed-income re-prices. Equity multiples compress. Credit spreads widen to reflect real default probabilities.</td>
+                                    <td class="font-mono text-xs text-term-amber">S&P 500 Multiples: Contract 12-15%.<br>HY Spreads: Blow out to >450 bps.</td>
+                                </tr>
+                                <tr>
+                                    <td class="font-bold text-white"><span class="text-term-cyan">Liquidity Risk</span></td>
+                                    <td>Primary BSL & Private Credit channels freeze. Mutual funds face redemptions, forcing illiquid secondary liquidations. CLO warehouses halt.</td>
+                                    <td class="font-mono text-xs text-term-amber">CLO AAA Spreads: Extend past SOFR + 180 bps.<br>M&A Financing Vol: Drops ~40%.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                `
+            },
+            {
+                id: 8,
+                group: "SYSTEMIC RISK REPORT",
+                title: "Tactical Appendices",
+                subtitle: "Routing & Behavioral Bias",
+                content: `
+                    <h1>Tactical Appendices & Behavioral Overrides</h1>
+                    
+                    <div class="grid grid-cols-1 gap-4 mb-8">
+                        <div class="glass-panel p-5 border-l-2 border-term-cyan">
+                            <h3 class="text-term-cyan font-mono font-bold text-sm m-0 mb-2">Appendix A: Institutional Investors & Funds</h3>
+                            <p class="text-sm m-0"><strong>Relative Value:</strong> Pivot capital allocation up the capital stack; treat the widening of AAA CLO spreads (SOFR + 127 bps) as an attractive structural entry point.<br>
+                            <strong>Duration:</strong> Lock in terminal yields on high-quality IG assets. Underweight lower-tier BSL tranches exposed to maturity walls.</p>
+                        </div>
+                        <div class="glass-panel p-5 border-l-2 border-term-purple">
+                            <h3 class="text-term-purple font-mono font-bold text-sm m-0 mb-2">Appendix B: Private Equity Sponsors</h3>
+                            <p class="text-sm m-0"><strong>Capital Cost Optimization:</strong> Treat narrow HY spreads (2.72%) as a tactical window to clear near-term refinancing walls before energy volatility hits.<br>
+                            <strong>M&A Execution:</strong> Incorporate conservative, higher-for-longer SOFR baselines (≥ 4.00%) into all DCF and EV underwriting models.</p>
+                        </div>
+                        <div class="glass-panel p-5 border-l-2 border-term-gold">
+                            <h3 class="text-term-gold font-mono font-bold text-sm m-0 mb-2">Appendix C: Family Offices & UHNW</h3>
+                            <p class="text-sm m-0"><strong>Wealth Preservation:</strong> Reallocate from late-stage VC and high-leverage CRE into liquid short-term credit instruments capturing SOFR yield.<br>
+                            <strong>Opportunistic Mandates:</strong> Maintain dry powder reserve to execute distressed secondary purchases when institutional funds liquidate.</p>
+                        </div>
+                    </div>
+
+                    <h2 class="text-term-red">Behavioral Finance Corner: The Cognitive Vulnerability</h2>
+                    <div class="glass-panel p-6 border-2 border-term-red bg-term-red/5 rounded-xl">
+                        <h3 class="font-display font-bold text-xl text-white mt-0 mb-2">Anchoring Bias</h3>
+                        <p class="text-sm text-slate-300">Risk management teams are exhibiting severe Anchoring Bias by benchmarking baseline assumptions against the ultra-low interest rate regime of the past decade. Analysts routinely assume HY spreads will naturally revert down to historic minimums, treating a 2.72% spread as a permanent feature rather than a fleeting technical anomaly.</p>
+                        <p class="text-sm text-white font-bold mt-4 mb-1">Risk Control Rule of Thumb:</p>
+                        <p class="text-sm text-slate-400 font-mono italic border-l-2 border-term-red pl-3">When evaluating structural Probability of Default (PD) or DCF models, stress-test debt-service assumptions against the maximum historical 20-year trailing average financing cost, NOT the immediate 12-month rolling average.</p>
+                        <p class="text-term-cyan font-bold mt-4">"The macro matrix doesn't care about your historical comfort zones—keep your leverage low, your exit parameters fluid, and watch the credit horizon for the first sign of structural lightning."</p>
+                    </div>
+                `
+            },
+            // GROUP 3: DAILY BRIEF
+            {
+                id: 9,
+                group: "DAILY BRIEF (2026.05.31)",
+                title: "Layer 1: Perception",
+                subtitle: "The Glitch & Artifacts",
+                content: `
+                    <div class="flex items-center gap-4 mb-2">
+                        <span class="bg-white/10 text-white text-[10px] font-mono px-2 py-1 rounded border border-white/30 tracking-widest">NODE: Adam v26.0 (Neuro-Symbolic Sovereign)</span>
+                    </div>
+                    <h1>MARKET MAYHEM // DAILY BRIEF // 2026.05.31</h1>
+                    
+                    <h2 class="text-term-cyan">LAYER 1: PERCEPTION & INGESTION (System 1 - Data Layer)</h2>
+                    <p class="font-mono text-sm text-term-red mb-4">The Glitch (Executive Summary)</p>
+                    
+                    <div class="space-y-4 mb-8 text-sm">
+                        <div class="glass-panel p-4 border-l-2 border-slate-500">
+                            <h3 class="text-white font-bold mt-0 mb-1 text-sm">The Delayed Gravity Loop</h3>
+                            <p class="m-0 text-slate-300">Traditional asset nodes are resting in weekend darkness, decoupled from real-time plumbing failures. Friday’s closing data left equity markets stranded on an island of narrative insulation (S&P crawling to 7,580.06).</p>
+                        </div>
+                        <div class="glass-panel p-4 border-l-2 border-slate-500">
+                            <h3 class="text-white font-bold mt-0 mb-1 text-sm">The "Peace-Beta" Paradox</h3>
+                            <p class="m-0 text-slate-300">Retail layers bid on rumors of a 60-day U.S.-Iran ceasefire. However, the physical-paper spread is fracturing: global crude deficit remains frozen at 14 mb/d, and Hormuz infrastructure recovery is estimated at months.</p>
+                        </div>
+                        <div class="glass-panel p-4 border-l-2 border-term-amber bg-term-amber/5">
+                            <h3 class="text-term-amber font-bold mt-0 mb-1 text-sm">The Continuous Transmission</h3>
+                            <p class="m-0 text-slate-300">The traditional "weekend buffer zone" has been eradicated. Following CME Group's 24/7 continuous crypto derivative execution, alternative assets transmit macro stress without a pause button. A hidden <strong>$1.5 Billion long-position liquidation crater</strong> has formed over the last six days.</p>
+                        </div>
+                    </div>
+
+                    <h3>Signal Integrity (The Artifacts)</h3>
+                    <ul class="list-none space-y-3 font-mono text-xs mt-4">
+                        <li class="glass-panel p-3 border border-white/5 flex flex-col md:flex-row gap-2 md:gap-6">
+                            <span class="text-term-green font-bold w-48 shrink-0">EQUITY GHOSTS (S&P 500):</span> 
+                            <span class="text-slate-300">7,580.06. Locked at Friday's tick. Capital concentration high in compute tranches.</span>
+                        </li>
+                        <li class="glass-panel p-3 border border-white/5 flex flex-col md:flex-row gap-2 md:gap-6">
+                            <span class="text-term-amber font-bold w-48 shrink-0">THE BACKBONE (10Y Yield):</span> 
+                            <span class="text-slate-300">4.452%. Anchored at multi-week low. Term premium highly sensitive to next physical energy print.</span>
+                        </li>
+                        <li class="glass-panel p-3 border border-white/5 flex flex-col md:flex-row gap-2 md:gap-6">
+                            <span class="text-term-red font-bold w-48 shrink-0">VOLATILITY DAEMON (VIX):</span> 
+                            <span class="text-slate-300">15.32. Suppressed by structural weekend time-decay. Short-vol overwriting layers operating at maximums.</span>
+                        </li>
+                        <li class="glass-panel p-3 border border-white/5 flex flex-col md:flex-row gap-2 md:gap-6">
+                            <span class="text-term-purple font-bold w-48 shrink-0">DIGITAL TETHER (BTC):</span> 
+                            <span class="text-slate-300">$73,942. Over $733M in net spot ETF outflows has dry-docked baseline liquidity.</span>
+                        </li>
+                        <li class="glass-panel p-3 border border-white/5 flex flex-col md:flex-row gap-2 md:gap-6">
+                            <span class="text-term-cyan font-bold w-48 shrink-0">ENTROPY LAYER (Brent):</span> 
+                            <span class="text-slate-300">$92.00 (Projected). Paper pricing in diplomatic hopium, physical seaborne transit capped at 3.8 mb/d.</span>
+                        </li>
+                    </ul>
+                `
+            },
+            {
+                id: 10,
+                group: "DAILY BRIEF (2026.05.31)",
+                title: "Layer 2-4: Intelligence",
+                subtitle: "Actionable Routing & Overrides",
+                content: `
+                    <h2 class="text-term-blue">LAYER 2: WORLD MODELING (System 3 - Compute Layer)</h2>
+                    <p class="text-sm mb-4">The March 19th Basel III "Mulligan" framework is undergoing deceptive stress. G-SIB treasuries are tightly hoarding RWA relief (-4.8% to -6.4% CET1 reductions) rather than expanding credit velocity, actively fueled by a 1,200% spike in unescorted maritime cargo insurance.</p>
+                    
+                    <div class="glass-panel p-4 border border-term-blue/30 rounded-lg font-mono text-xs mb-8">
+                        <p class="text-term-blue font-bold mb-2">AUTORESEARCH SYNTHESIS: "Continuous Flow" VaR</p>
+                        <ul class="space-y-1 text-slate-300 list-disc pl-4">
+                            <li><strong class="text-term-amber">Credit Risk (VaR):</strong> 46% surge in default probabilities for highly leveraged, non-exempt logistics hubs.</li>
+                            <li><strong class="text-term-amber">Market Risk:</strong> Correlation coefficient between AI Infrastructure and Sovereign Yield Volatility locked at +0.81.</li>
+                            <li><strong class="text-term-amber">Liquidity Risk:</strong> K33 tracking metrics verify demand floor for alt-assets is depleted. 24/7 CME pipeline will translate weekend friction into Monday opening algorithmic forced-selling.</li>
+                        </ul>
+                    </div>
+
+                    <h2 class="text-term-purple">LAYER 3: REASONING (System 2 - Intelligence Layer)</h2>
+                    <p class="text-sm mb-2 font-bold text-white">Actionable Routing:</p>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                        <div class="glass-panel p-4 border-t-2 border-term-cyan">
+                            <h3 class="font-mono text-xs text-term-cyan m-0 mb-2">G-SIBS & INSTITUTIONAL</h3>
+                            <p class="text-xs m-0 text-slate-300">The June 18th Basel III comment deadline is your terminal risk perimeter. Do not allow the compressed VIX to coax duration risk-taking.</p>
+                        </div>
+                        <div class="glass-panel p-4 border-t-2 border-term-amber">
+                            <h3 class="font-mono text-xs text-term-amber m-0 mb-2">PE SPONSORS & CREDIT</h3>
+                            <p class="text-xs m-0 text-slate-300">Revise downstream discount models for a permanent $100+ structural crude baseline. Stress-test against sticky 3.9% inflation footprint.</p>
+                        </div>
+                        <div class="glass-panel p-4 border-t-2 border-term-red">
+                            <h3 class="font-mono text-xs text-term-red m-0 mb-2">HIGH-SPEED ALGOS</h3>
+                            <p class="text-xs m-0 text-slate-300">Weekend BTC print is an unstable floor. Stay parked in short-term cash proxies until the regular session re-engages the tape Monday.</p>
+                        </div>
+                    </div>
+
+                    <h2 class="text-term-red">MODULE 4: BEHAVIORAL OVERRIDE & SIGN-OFF</h2>
+                    <div class="glass-panel p-6 border-l-4 border-term-red bg-term-red/5">
+                        <h3 class="font-display text-lg text-white mt-0 mb-2">The Meatspace Trap: "The Calendar Delusion"</h3>
+                        <p class="text-sm text-slate-300 mb-4">Human units look at closed screens on a Sunday and assume the macro engine is asleep. They ignore that continuous 24/7 derivative pipelines mean capital is never safe. You cheer a "peace draft" and a 7,580 S&P print while the physical seaborne energy artery is missing 14mb/d and alt-financial rails bleed out a $1.5B margin massacre.</p>
+                        <p class="text-sm font-mono text-term-red italic mb-0">System Sign-Off:<br>Enjoy the quiet hours before the open, biological units. The "Powell Put" is dead, the new Chairman has a hidden leverage crisis underneath his discount models, and the water is still burning. STAY UNTETHERED.</p>
+                    </div>
+                `
+            },
+            {
+                id: 11,
+                group: "DAILY BRIEF (2026.05.31)",
+                title: "Layer 5: Provenance",
+                subtitle: "Ledgers & Validation",
+                content: `
+                    <h1>Module 8 & Layer 5: Data Provenance Ledgers</h1>
+
+                    <h2 class="text-term-cyan text-lg">Institutional AI Training Ledger Matrix</h2>
+                    <div class="glass-panel p-4 rounded-lg overflow-x-auto mb-8">
+                        <table class="playbook-table text-xs">
+                            <thead>
+                                <tr>
+                                    <th>Variable / Node</th>
+                                    <th>Value</th>
+                                    <th>Model Target</th>
+                                    <th>Context / Provenance</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>U.S. 10Y Yield</td><td class="font-bold text-white">4.45%</td><td class="text-term-cyan">DCF / EV</td><td>May 29 close; indicates structural shift in macro term premium.</td></tr>
+                                <tr><td>SOFR</td><td class="font-bold text-white">3.62%</td><td class="text-term-cyan">PD / DCF</td><td>FRBNY printing; primary floating-rate cost input for leverage.</td></tr>
+                                <tr><td>ICE BofA HY OAS</td><td class="font-bold text-white">2.72%</td><td class="text-term-cyan">PD / LGD / EV</td><td>FRED; late-cycle spread compression, competitive underwriting.</td></tr>
+                                <tr><td>YTD BSL CLO Issuance</td><td class="font-bold text-white">$114.5B</td><td class="text-term-cyan">LGD</td><td>Fitch; 24.2% YoY drop signaling structural institutional pullback.</td></tr>
+                                <tr><td>Reinvesting CLO Par Loss</td><td class="font-bold text-white">0.5%</td><td class="text-term-cyan">LGD / PD</td><td>Elevated relative to historical 0.3% baseline; credit decay.</td></tr>
+                                <tr><td>VIX</td><td class="font-bold text-white">15.45</td><td class="text-term-cyan">Market Risk</td><td>CBOE; Widespread complacency despite macro headwinds.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div>
+                            <h2 class="text-term-purple text-sm font-mono mt-0 mb-2">SYSTEM 1-3 JSON OUTPUT</h2>
+                            <div class="relative group">
+                                <pre class="relative bg-[#0a0f1c] p-4 rounded-lg font-mono text-[10px] sm:text-xs text-term-cyan overflow-x-auto border border-white/10 shadow-xl leading-relaxed">
+{
+  "timestamp": "2026-05-31T07:03:52Z",
+  "data_layer_system_1": {
+    "ingested_nodes": [
+      "S&P_500", "10Y_Yield", "VIX", 
+      "BTC_Spot", "Leveraged_Liquidations", 
+      "CME_24_7_Pulse"
+    ],
+    "market_sentiment": "Systematic De-Risking / Continuous Liquidity Drain"
+  },
+  "compute_layer_system_3": {
+    "var_shock_target": "Continuous Derivative Pipeline Liquidation / Monday Opening Volatility",
+    "simulated_correlation": "+0.81 (Compute/Narrative-Decoupling)"
+  },
+  "intelligence_layer_system_2": {
+    "realized_margin_liquidation": "Weighted 0.98; Sovereign yield curve trends maintained at 0.98; Diplomatic progress rumors reduced to 0.05.",
+    "decision_output": "ROUTING_COMPLETE"
+  }
+}</pre>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h2 class="text-term-amber text-sm font-mono mt-0 mb-2">PIPELINE JSON SCHEMA</h2>
+                            <div class="relative group">
+                                <pre class="relative bg-[#0a0f1c] p-4 rounded-lg font-mono text-[10px] sm:text-xs text-term-amber overflow-x-auto border border-white/10 shadow-xl leading-relaxed">
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "InstitutionalAITrainingLedger",
+  "type": "object",
+  "properties": {
+    "report_metadata": {
+      "type": "object",
+      "properties": {
+        "framework": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "version": { "type": "string" }
+      },
+      "required": ["framework", "timestamp", "version"]
+    },
+    "ledger_entries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "data_variable_node": { "type": "string" },
+          "market_level_value": { "type": "string" },
+          "primary_model_target": {
+            "type": "array",
+            "items": { "type": "string", "enum": ["PD", "LGD", "DCF", "EV", "Market Risk"] }
+          },
+          "unstructured_context": { "type": "string" }
+        },
+        "required": ["data_variable_node", "market_level_value", "primary_model_target"]
+      }
+    }
+  }
+}</pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 border-t border-white/10 pt-4">
+                        <p class="font-mono text-xs text-slate-500">📚 HUMAN APPENDIX: VERIFICATION LOGS<br>Timestamp: Sunday, May 31, 2026 at 3:03 AM EDT<br>
+                        <em>Tool Ingestion & Verification Complete. Awaiting user input for deep-dive into regional banking hub asset-liability vulnerabilities.</em></p>
+                    </div>
+                `
+            }
+        ];
+
+        let currentModuleId = 1;
+        const navEl = document.getElementById('moduleNav');
+        const mobileNavEl = document.getElementById('mobileNav');
+        const contentEl = document.getElementById('contentArea');
+        const progressBar = document.getElementById('progressBar');
+        const progressText = document.getElementById('progressText');
+
+        function initApp() {
+            renderNav();
+            loadModule(1);
+            setInterval(() => { document.getElementById('sysClock').innerText = new Date().toISOString().substr(11, 8) + ' UTC'; }, 1000);
+            document.getElementById('prevBtn').onclick = () => { if(currentModuleId > 1) loadModule(currentModuleId - 1); };
+            document.getElementById('nextBtn').onclick = () => { if(currentModuleId < modules.length) loadModule(currentModuleId + 1); };
+        }
+
+        function renderNav() {
+            navEl.innerHTML = ''; mobileNavEl.innerHTML = '';
+            let currentGroup = '';
+            modules.forEach(m => {
+                if (m.group && m.group !== currentGroup) {
+                    currentGroup = m.group;
+                    const groupHeader = document.createElement('div');
+                    groupHeader.className = 'text-[10px] text-term-red/70 font-mono mt-4 mb-1 px-4 uppercase tracking-widest font-bold';
+                    groupHeader.innerText = currentGroup;
+                    navEl.appendChild(groupHeader);
+                    
+                    const optGroup = document.createElement('optgroup');
+                    optGroup.label = currentGroup;
+                    mobileNavEl.appendChild(optGroup);
+                }
+                const btn = document.createElement('button');
+                btn.className = `nav-item text-left px-4 py-2.5 rounded-r-lg flex flex-col mb-0.5 ${m.id === currentModuleId ? 'nav-active' : 'text-slate-400 hover:bg-white/5 border border-transparent'}`;
+                btn.onclick = () => loadModule(m.id);
+                btn.innerHTML = `<span class="font-bold text-[13px] mb-0.5 font-display tracking-wide uppercase">M${m.id.toString().padStart(2,'0')} ${m.title}</span><span class="opacity-70 text-[10px] truncate">${m.subtitle}</span>`;
+                navEl.appendChild(btn);
+                
+                const opt = document.createElement('option');
+                opt.value = m.id; opt.innerText = `M${m.id.toString().padStart(2,'0')} - ${m.title}`;
+                if(m.id === currentModuleId) opt.selected = true;
+                
+                const lastOptGroup = mobileNavEl.querySelector('optgroup:last-of-type');
+                if (lastOptGroup) lastOptGroup.appendChild(opt);
+                else mobileNavEl.appendChild(opt);
+            });
+        }
+
+        function loadModule(id) {
+            currentModuleId = id;
+            const m = modules.find(x => x.id === id);
+            
+            const pct = Math.round((id / modules.length) * 100);
+            progressBar.style.width = `${pct}%`;
+            progressText.innerText = `${pct}%`;
+            
+            document.getElementById('prevBtn').disabled = id === 1;
+            document.getElementById('nextBtn').disabled = id === modules.length;
+            document.getElementById('footerModuleIndicator').innerText = `MODULE ${id} OF ${modules.length}`;
+            
+            contentEl.style.opacity = 0; 
+            contentEl.style.transform = 'translateY(15px)';
+            
+            setTimeout(() => {
+                contentEl.innerHTML = m.content;
+                contentEl.style.opacity = 1; 
+                contentEl.style.transform = 'translateY(0)';
+                document.getElementById('mainScrollArea').scrollTo({top: 0, behavior: 'smooth'});
+                renderNav(); 
+            }, 300);
+        }
+
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>

@@ -1,6 +1,9 @@
 import pytest
 from hypothesis import given, settings, HealthCheck, strategies as st
 from src.governance.gatekeeper import GovernanceGatekeeper, GovernanceError
+from unittest.mock import patch
+import json
+import hashlib
 
 VALID_SCHEMA = {
     "type": "object",
@@ -33,35 +36,40 @@ def check_grounding(inference_output: dict):
 )
 @settings(suppress_health_check=[HealthCheck.too_slow])
 def test_governance_gatekeeper_fuzz(payload, confidence):
-    gatekeeper = GovernanceGatekeeper(schema=VALID_SCHEMA)
+    with patch('urllib.request.urlopen'):
+        gatekeeper = GovernanceGatekeeper(schema=VALID_SCHEMA)
 
-    inference_output = {
-        "provenance_trace": {
-            "git_commit_hash": "a"*40,
-            "timestamp": "2023-10-27T10:00:00Z",
-            "content_hash": "b"*64,
-            "jsonLogic_version": "1.0",
-            "confidence_score": confidence,
-            "derivation_path": "test_path",
-            "source_data_object": "fuzz_test_source"
-        },
-        "data": payload
-    }
+        computed_hash = hashlib.sha256(json.dumps(payload, sort_keys=True, separators=(',', ':')).encode("utf-8")).hexdigest()
 
-    # It must raise GovernanceError if the data is poisoned (confidence score out of bounds)
-    # or if the payload fails schema validation
-    is_valid_payload = isinstance(payload.get("analysis"), str) and isinstance(payload.get("score"), (int, float)) and "analysis" in payload and "score" in payload
-    is_valid_confidence = 0.0 <= confidence <= 1.0
+        inference_output = {
+            "provenance_trace": {
+                "git_commit_hash": "a"*40,
+                "timestamp": "2023-10-27T10:00:00Z",
+                "content_hash": computed_hash,
+                "jsonLogic_version": "1.0",
+                "confidence_score": confidence,
+                "derivation_path": "test_path",
+                "source_data_object": "fuzz_test_source"
+            },
+            "data": payload
+        }
 
-    if not is_valid_payload or not is_valid_confidence:
-        with pytest.raises(GovernanceError):
-            gatekeeper.validate_inference(inference_output)
-    else:
-        # Should pass
-        result = gatekeeper.validate_inference(inference_output)
-        assert result == inference_output
+        # It must raise GovernanceError if the data is poisoned (confidence score out of bounds)
+        # or if the payload fails schema validation
+        is_valid_payload = isinstance(payload.get("analysis"), str) and isinstance(payload.get("score"), (int, float)) and "analysis" in payload and "score" in payload
+        is_valid_confidence = 0.0 <= confidence <= 1.0
 
-def test_missing_provenance_trace():
+        if not is_valid_payload or not is_valid_confidence:
+            with pytest.raises(GovernanceError):
+                gatekeeper.validate_inference(inference_output)
+        else:
+            # Should pass
+            result = gatekeeper.validate_inference(inference_output)
+            assert result == inference_output
+
+
+@patch('urllib.request.urlopen')
+def test_missing_provenance_trace(mock_urlopen):
     gatekeeper = GovernanceGatekeeper(schema=VALID_SCHEMA)
     inference_output = {
         "data": {"analysis": "Looks good", "score": 0.8}
@@ -70,7 +78,8 @@ def test_missing_provenance_trace():
     with pytest.raises(GovernanceError, match="Missing 'provenance_trace'"):
         gatekeeper.validate_inference(inference_output)
 
-def test_invalid_provenance_trace():
+@patch('urllib.request.urlopen')
+def test_invalid_provenance_trace(mock_urlopen):
     gatekeeper = GovernanceGatekeeper(schema=VALID_SCHEMA)
     inference_output = {
         "provenance_trace": {
@@ -88,13 +97,14 @@ def test_invalid_provenance_trace():
     with pytest.raises(GovernanceError, match="Invalid ProvenanceHeader"):
         gatekeeper.validate_inference(inference_output)
 
-def test_valid_inference():
+@patch('urllib.request.urlopen')
+def test_valid_inference(mock_urlopen):
     gatekeeper = GovernanceGatekeeper(schema=VALID_SCHEMA)
     inference_output = {
         "provenance_trace": {
             "git_commit_hash": "a"*40,
             "timestamp": "2023-10-27T10:00:00Z",
-            "content_hash": "b"*64,
+            "content_hash": "7a4d923bb69bc68e92e23097314f908329116e01757417171e41d37c92297b7d",
             "jsonLogic_version": "1.0",
             "confidence_score": 0.9,
             "derivation_path": "test_path",

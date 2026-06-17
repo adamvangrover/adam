@@ -137,3 +137,33 @@
 
 ### P3: Documentation & housekeeping
 - [ ] **Update Tutorials:** Ensure `docs/tutorials/` reflect these new mandates.
+
+### 📉 Systemic Market Shifts (Pricing Intelligence)
+
+1. **T+1 Settlement Shift**
+    *   **Finding:** The transition from T+2 to T+1 settlement cycles compresses post-trade processing times, exposing operational frictions and driving up illiquidity premiums in specific cross-border and manual-heavy asset classes.
+    *   **Directive:** System calculations must integrate a baseline illiquidity premium modifier (+5 to +25 bps depending on asset level) for impacted securities. Stress testing engines must incorporate localized intraday liquidity spikes (especially around 3:00 PM EST) and increased repo funding costs into their Monte Carlo scenarios.
+
+
+### ⏱️ Multi-Horizon Analytical Engines
+
+1. **Full-Spectrum Timeband Integration**
+    *   **Finding:** Pricing intelligence and risk modeling must account for varied operational timeframes, ranging from microsecond liquidity shocks to multi-decade secular trends. Isolated, single-horizon models fail to capture compounding cross-horizon knock-on effects.
+    *   **Directive:** All quantitative stress tests, system simulations, and liquidity algorithms must explicitly map outputs across the defined continuum: Real-Time/High Speed, Intraday, Daily/Weekly, Monthly/Quarterly, and Long Term (1, 5, 10, 30 Year). Agent cognitive engines must recursively synthesize data upward through these bands to bridge short-term turbulence with structural paradigm shifts.
+
+### 🔗 Legacy Asset Integration
+
+1. **Cognitive Continuity**
+    *   **Finding:** The system contains a massive trove of historical and pre-existing analytical intelligence (e.g., Meme coin targets, Iranian collapse scenarios, software industry outlooks). If left floating as isolated HTML files, they decay out of the active analytical graph and are ignored by swarm agents.
+    *   **Directive:** All legacy and newly ingested `showcase/*.html` reports MUST be structurally mapped to a designated "Engine Horizon" within the Centralized Pricing Intelligence Hub (`pricing_intelligence_hub.html`). The Swarm Orchestrator and Sentinel agents must utilize this Hub as the canonical directory for cross-referencing past macro pivots and systemic scenarios during active generation tasks.
+
+### 🗄️ Quantitative Synthesis
+
+1. **Pricing Database Dashboard**
+    *   **Finding:** Qualitative intelligence reports and structural briefings require quantitative grounding to be algorithmically actionable. Agents struggle to parse disparate HTML prose for exact conviction levels and pricing impacts.
+    *   **Directive:** The `pricing_database_dashboard.html` serves as the centralized, strictly typed matrix for all intelligence. When agents generate new structural reports, they must explicitly extract the core security, the numerical pricing impact, confidence %, and categorical conviction level, and append it to this dashboard matrix to ensure systemic, queryable continuity.
+
+### Other Assorted Swarm Memories [ ] ALWAYS REMEMBER TO DOCUMENT AND LOG TELEMETRY FOR AUDIT AND RECALL
+Learnings from updating the GovernanceGatekeeper class to enforce W3C PROV-O provenance requirements via SHA-256 hashes and URL reachability checks:
+- Real provenance checks must be enforced by actively computing the payload's SHA-256 hash
+- The Gatekeeper handles checking W3C PROV-O compliance

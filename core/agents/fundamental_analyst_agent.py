@@ -2,6 +2,7 @@
 
 import asyncio  # Added import
 import json
+from assets.prompt_loader import load_prompt
 import logging
 from typing import Any, Dict, List, Optional, Union
 
@@ -802,7 +803,7 @@ if __name__ == '__main__':
     agent_specific_config = {
         "persona": "Test Fundamental Analyst",
         "description": "Test instance for fundamental analysis.",
-        "summarize_analysis_user_prompt": "Provide a detailed conclusion based on the findings."
+        "summarize_analysis_user_prompt": load_prompt("summarize_analysis_user_prompt")
     }
 
     mock_data_package_template = {
