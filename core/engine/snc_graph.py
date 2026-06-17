@@ -17,7 +17,7 @@ from core.engine.states import SNCAnalysisState
 from core.agents.specialized.regulatory_snc_agent import RegulatorySNCAgent
 from core.engine.risk_consensus_engine import RiskConsensusEngine
 from core.compliance.snc_validators import evaluate_compliance
-from core.engine.snc_utils import analyze_syndicate_structure
+from adam_finance.snc_utils import analyze_syndicate_structure
 
 logger = logging.getLogger(__name__)
 

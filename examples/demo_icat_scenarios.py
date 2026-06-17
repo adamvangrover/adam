@@ -6,7 +6,7 @@ from pprint import pprint
 # Add repo root to path
 sys.path.append(os.getcwd())
 
-from core.engine.icat import ICATEngine
+from adam_finance.icat import ICATEngine
 
 def main():
     print("Initializing ICAT Engine...")

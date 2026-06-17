@@ -4,16 +4,14 @@ import pandas as pd
 import logging
 from typing import Dict, Any, List
 from core.agents.agent_base import AgentBase
+from adam_finance.math import calculate_var, calculate_cvar
 
-try:
-    from scipy.stats import norm
-    HAS_SCIPY = True
-except ImportError:
-    HAS_SCIPY = False
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-class QuantitativeRiskAgent(AgentBase):
+from adam_interfaces.interfaces import FinancialModelProtocol
+
+class QuantitativeRiskAgent(AgentBase, FinancialModelProtocol):
     """
     Agent responsible for calculating quantitative risk metrics such as Value at Risk (VaR)
     and Conditional Value at Risk (CVaR).
@@ -62,17 +60,10 @@ class QuantitativeRiskAgent(AgentBase):
             logging.error(f"Error in QuantitativeRiskAgent: {e}")
             return {"status": "error", "message": str(e)}
 
-    def calculate_var(self, returns: np.ndarray) -> float:
-        """Calculates Value at Risk (VaR)"""
-        if not HAS_SCIPY:
-            # Historical simulation fallback
-            return float(np.percentile(returns, (1 - self.confidence_level) * 100))
 
-        mu = np.mean(returns)
-        sigma = np.std(returns)
-        return float(norm.ppf(1 - self.confidence_level, mu, sigma))
+
+    def calculate_var(self, returns: np.ndarray) -> float:
+        return calculate_var(returns, self.confidence_level)
 
     def calculate_cvar(self, returns: np.ndarray) -> float:
-        """Calculates Conditional Value at Risk (CVaR)"""
-        var = self.calculate_var(returns)
-        return float(returns[returns <= var].mean())
+        return calculate_cvar(returns, self.confidence_level)

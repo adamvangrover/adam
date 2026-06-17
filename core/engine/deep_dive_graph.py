@@ -25,7 +25,7 @@ from core.engine.states import OmniscientState
 from core.engine.valuation_utils import calculate_dcf, calculate_multiples, get_price_targets
 from core.engine.strategy_utils import determine_ma_posture, synthesize_verdict
 from core.engine.entity_utils import assess_management, assess_competitive_position
-from core.engine.snc_utils import map_financials_to_rating, calculate_leverage
+from adam_finance.snc_utils import map_financials_to_rating, calculate_leverage
 from core.vertical_risk_agent.generative_risk import GenerativeRiskEngine
 
 # --- Mock Data Fetcher ---

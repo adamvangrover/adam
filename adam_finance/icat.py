@@ -10,7 +10,7 @@ try:
 except ImportError:
     npf = None
 
-from core.financial_data.icat_schema import (
+from adam_finance.icat_schema import (
     ICATOutput, CreditMetrics, ValuationMetrics, LBOResult, LBOParameters,
     DebtTranche, CarveOutParameters, ForecastAssumptions, EnvironmentContext
 )

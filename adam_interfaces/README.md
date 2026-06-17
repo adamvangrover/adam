@@ -1,12 +1,10 @@
-# Adam Interfaces
+# Adam Interfaces Module
 
 ## Overview
-This module (`adam_interfaces`) acts as the strict enforcement boundary across the entire Adam ecosystem by defining inter-module API structures.
+This module strictly defines the inter-module contracts between the system 1 swarm and the system 2 graph, separating execution layers from probabilistic layers.
 
-## Objectives
-- Use dependency injection to couple internal modules reliably.
-- Define communication boundaries utilizing strict Python `Protocol` and `ABC` definitions.
-- Maintain enterprise-level functional structure in alignment with modular design patterns.
+## Structure
+- `interfaces.py`: Python Protocols and Abstract Base Classes (ABCs) representing required inputs and methods across components.
 
-## Future Plans
-- Introduce distinct domain boundaries ensuring `adam_swarm` output restricts direct passage to `adam_graph` without passing through strict interface transformation layers.
+## Architectural Principles
+- **Contracts:** Codebase boundary interfaces prevent LLM hallucinations by explicit dependencies.

@@ -1,14 +1,14 @@
-# Adam Finance
+# Adam Finance Module
 
 ## Overview
-This module (`adam_finance`) houses deterministic mathematical execution, containing purely quantitative financial algorithms, such as Value at Risk (VaR) and Structured Notes Calculator (SNC) functions.
+This module houses the deterministic financial mathematics and algorithms isolated from the probabilistic neuro-symbolic cognitive graph.
 
-## Objectives
-- Host all pure financial mathematical functions and logic algorithms.
-- Maintain isolation from probabilistic Systems 1 logic, ensuring consistent and completely deterministic mathematical calculations.
-- Remain completely free of any dependency on `langchain`, `semantic_kernel`, or any other LLM-execution toolsets.
+## Structure
+- `icat.py`: The ICAT (Ingest, Clean, Analyze, Transform) Engine.
+- `icat_schema.py`: Schemas for LBO modeling, Credit Metrics, and Valuation.
+- `math.py`: Pure mathematical functions (VaR, CVaR).
+- `snc_utils.py`: Rules and functions for Shared National Credit (SNC) calculations.
 
-## Future Plans
-- Expand deterministic models to cover advanced Greek calculations for options.
-- Move out financial modules currently mixed in the `core/engine/` layer to centralize here.
-- Add robust Monte Carlo pipelines for deterministic execution sequences.
+## Architectural Principles
+- **Determinism:** All financial calculations strictly reside here. This codebase does not hallucinate.
+- **Portability:** Code can run in any system given standard inputs, enabling traditional CI/CD unit testing.
