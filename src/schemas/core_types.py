@@ -15,3 +15,10 @@ class AgentOutput(BaseModel):
     provenance_trace: ProvenanceHeader = Field(..., description="W3C PROV-O compliant provenance trace")
     data: Dict[str, Any] = Field(..., description="Deterministic output payload")
     observed_drift: bool = Field(False, description="Flag indicating if logic shifted from existing implementation, triggers self-healing")
+
+    def check_grounding(self) -> bool:
+        """
+        Verify W3C PROV-O compliance (grounding).
+        Checks that the output contains a reference to its source data object.
+        """
+        return bool(self.provenance_trace.source_data_object)

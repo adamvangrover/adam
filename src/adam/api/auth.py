@@ -4,7 +4,13 @@ from fastapi.security import OAuth2PasswordBearer
 from typing import Annotated
 # Conditional import to allow file to exist even if deps missing (for checking)
 try:
-    from authlib.jose import jwt, JoseError
+    from joserfc import jwt
+    from joserfc.errors import JoseError
+    from joserfc.jwk import OctKey
+    import base64
+
+    def to_base64url(s: str) -> str:
+        return base64.urlsafe_b64encode(s.encode()).decode().rstrip("=")
 except ImportError:
     jwt = None
 
@@ -14,26 +20,27 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 # Using symmetric key for simplicity in this demo.
 # Note: If JWT_SECRET_KEY is not set, we do not provide a default.
 # The application will fail securely rather than using an empty or default secret.
-PUBLIC_KEY = {
-    "kty": "oct",
-    "k": os.environ.get("JWT_SECRET_KEY", "UNSET_SECRET_KEY_MUST_BE_CONFIGURED_IN_PROD"),
-    "alg": "HS256"
-}
+def get_public_key():
+    secret_key = os.environ.get("JWT_SECRET_KEY", "UNSET_SECRET_KEY_MUST_BE_CONFIGURED_IN_PROD")
+    return OctKey.import_key({
+        "kty": "oct",
+        "k": to_base64url(secret_key)
+    })
 
 async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
     """
-    Validate Bearer token using Authlib.
+    Validate Bearer token using joserfc.
     """
     if jwt is None:
-        # Fallback if authlib not installed (safety)
-        raise HTTPException(status_code=500, detail="Authlib not installed")
+        # Fallback if joserfc not installed (safety)
+        raise HTTPException(status_code=500, detail="joserfc not installed")
 
     try:
         # Decode and validate signature
         # Note: In production, use your IdP's public key
-        payload = jwt.decode(token, PUBLIC_KEY)
-        # payload.validate() # basic validation
-        return payload
+        key = get_public_key()
+        claims = jwt.decode(token, key)
+        return claims.claims
     except JoseError as e:
          raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
