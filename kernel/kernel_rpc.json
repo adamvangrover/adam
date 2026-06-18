@@ -1,0 +1,254 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "KernelRPC Schema",
+    "description": "JSON-RPC 2.0 schema defining all core system capabilities for Adam v3.0 Core Kernel.",
+    "type": "object",
+    "required": [
+        "jsonrpc",
+        "method",
+        "id"
+    ],
+    "properties": {
+        "jsonrpc": {
+            "type": "string",
+            "const": "2.0"
+        },
+        "method": {
+            "type": "string",
+            "enum": [
+                "execute_surveillance",
+                "evaluate_conviction",
+                "scrape_sec_edgar",
+                "track_multi_agent",
+                "simulate_quantitative_risk",
+                "route_cognitive_task"
+            ],
+            "description": "The specific kernel method to execute."
+        },
+        "params": {
+            "type": "object",
+            "description": "Parameters for the specified method."
+        },
+        "id": {
+            "type": [
+                "string",
+                "number",
+                "null"
+            ]
+        }
+    },
+    "allOf": [
+        {
+            "if": {
+                "properties": {
+                    "method": {
+                        "const": "execute_surveillance"
+                    }
+                }
+            },
+            "then": {
+                "properties": {
+                    "params": {
+                        "type": "object",
+                        "required": [
+                            "target",
+                            "thresholds"
+                        ],
+                        "properties": {
+                            "target": {
+                                "type": "string",
+                                "description": "Ticker or sector to monitor"
+                            },
+                            "thresholds": {
+                                "type": "object",
+                                "description": "Alert thresholds via JSONLogic"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "if": {
+                "properties": {
+                    "method": {
+                        "const": "evaluate_conviction"
+                    }
+                }
+            },
+            "then": {
+                "properties": {
+                    "params": {
+                        "type": "object",
+                        "required": [
+                            "state_vector",
+                            "critique"
+                        ],
+                        "properties": {
+                            "state_vector": {
+                                "type": "object",
+                                "description": "Current agent state"
+                            },
+                            "critique": {
+                                "type": "string",
+                                "description": "Adversarial critique to evaluate"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "if": {
+                "properties": {
+                    "method": {
+                        "const": "scrape_sec_edgar"
+                    }
+                }
+            },
+            "then": {
+                "properties": {
+                    "params": {
+                        "type": "object",
+                        "required": [
+                            "ticker",
+                            "form_type"
+                        ],
+                        "properties": {
+                            "ticker": {
+                                "type": "string",
+                                "description": "Company ticker symbol"
+                            },
+                            "form_type": {
+                                "type": "string",
+                                "enum": [
+                                    "10-K",
+                                    "10-Q",
+                                    "8-K"
+                                ],
+                                "description": "Form type to scrape"
+                            },
+                            "year": {
+                                "type": "integer"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "if": {
+                "properties": {
+                    "method": {
+                        "const": "track_multi_agent"
+                    }
+                }
+            },
+            "then": {
+                "properties": {
+                    "params": {
+                        "type": "object",
+                        "required": [
+                            "agent_id",
+                            "status"
+                        ],
+                        "properties": {
+                            "agent_id": {
+                                "type": "string",
+                                "description": "UUID of the agent"
+                            },
+                            "status": {
+                                "type": "string",
+                                "enum": [
+                                    "thinking",
+                                    "executing",
+                                    "waiting",
+                                    "completed"
+                                ]
+                            },
+                            "trace_id": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "if": {
+                "properties": {
+                    "method": {
+                        "const": "simulate_quantitative_risk"
+                    }
+                }
+            },
+            "then": {
+                "properties": {
+                    "params": {
+                        "type": "object",
+                        "required": [
+                            "portfolio",
+                            "model_type"
+                        ],
+                        "properties": {
+                            "portfolio": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                },
+                                "description": "List of assets"
+                            },
+                            "model_type": {
+                                "type": "string",
+                                "enum": [
+                                    "MonteCarlo",
+                                    "Historical",
+                                    "Parametric"
+                                ]
+                            },
+                            "confidence_interval": {
+                                "type": "number",
+                                "minimum": 0,
+                                "maximum": 1
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "if": {
+                "properties": {
+                    "method": {
+                        "const": "route_cognitive_task"
+                    }
+                }
+            },
+            "then": {
+                "properties": {
+                    "params": {
+                        "type": "object",
+                        "required": [
+                            "task_type",
+                            "context"
+                        ],
+                        "properties": {
+                            "task_type": {
+                                "type": "string",
+                                "enum": [
+                                    "synthesis",
+                                    "formatting",
+                                    "tool_calling"
+                                ]
+                            },
+                            "context": {
+                                "type": "object",
+                                "description": "Task context to route"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    ]
+}
