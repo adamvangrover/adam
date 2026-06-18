@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM v26.0 // NEURO-SYMBOLIC TERMINAL</title>
+    
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        mono: ['"Fira Code"', 'monospace'],
+                    },
+                    colors: {
+                        terminal: {
+                            bg: '#050505',
+                            green: '#00ff41',
+                            greenDark: '#008f11',
+                            amber: '#ffb000',
+                            panel: '#0a0f0a',
+                            border: '#1a331a'
+                        }
+                    },
+                    typography: (theme) => ({
+                        terminal: {
+                            css: {
+                                '--tw-prose-body': theme('colors.terminal.green'),
+                                '--tw-prose-headings': theme('colors.terminal.green'),
+                                '--tw-prose-links': theme('colors.terminal.amber'),
+                                '--tw-prose-bold': theme('colors.white'),
+                                '--tw-prose-counters': theme('colors.terminal.greenDark'),
+                                '--tw-prose-bullets': theme('colors.terminal.greenDark'),
+                                '--tw-prose-hr': theme('colors.terminal.border'),
+                                '--tw-prose-quotes': theme('colors.terminal.amber'),
+                                '--tw-prose-quote-borders': theme('colors.terminal.greenDark'),
+                                '--tw-prose-captions': theme('colors.terminal.greenDark'),
+                                '--tw-prose-code': theme('colors.terminal.amber'),
+                                '--tw-prose-pre-code': theme('colors.terminal.green'),
+                                '--tw-prose-pre-bg': theme('colors.terminal.panel'),
+                                '--tw-prose-th-borders': theme('colors.terminal.border'),
+                                '--tw-prose-td-borders': theme('colors.terminal.border'),
+                                color: 'var(--tw-prose-body)',
+                                maxWidth: 'none',
+                                h1: { textTransform: 'uppercase', letterSpacing: '0.05em', textShadow: '0 0 5px rgba(0, 255, 65, 0.5)' },
+                                h2: { textTransform: 'uppercase', letterSpacing: '0.05em', borderBottom: '1px solid #1a331a', paddingBottom: '0.5rem' },
+                                h3: { textTransform: 'uppercase', color: '#ffb000' },
+                                a: { textDecoration: 'none', '&:hover': { color: theme('colors.white') } },
+                                strong: { color: theme('colors.terminal.green'), textShadow: '0 0 2px rgba(0, 255, 65, 0.8)' },
+                                table: { width: '100%', borderCollapse: 'collapse', marginTop: '1em', marginBottom: '1em' },
+                                th: { backgroundColor: '#0f1a0f', color: '#00ff41', padding: '0.75rem', border: '1px solid #1a331a', textAlign: 'left' },
+                                td: { padding: '0.75rem', border: '1px solid #1a331a', verticalAlign: 'top' },
+                                hr: { borderColor: '#1a331a', borderTopWidth: '2px', marginTop: '2em', marginBottom: '2em' },
+                            },
+                        },
+                    }),
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body {
+            background-color: #050505;
+            color: #00ff41;
+            font-family: 'Fira Code', monospace;
+            overflow: hidden; /* Prevent body scroll, handle inside panels */
+        }
+        
+        /* Custom scrollbar for a terminal feel */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #050505; 
+            border-left: 1px solid #1a331a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1a331a; 
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #008f11; 
+        }
+
+        .crt-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+            z-index: 50;
+            opacity: 0.15;
+        }
+
+        .glow-text {
+            text-shadow: 0 0 5px rgba(0, 255, 65, 0.5);
+        }
+
+        .editor-textarea:focus {
+            outline: none;
+            box-shadow: inset 0 0 10px rgba(0, 255, 65, 0.1);
+        }
+    </style>
+</head>
+
+<body class="h-screen w-screen flex flex-col">
+    <div class="crt-overlay"></div>
+
+    <!-- Header / Navbar -->
+    <header class="border-b border-terminal-border bg-terminal-panel p-4 flex justify-between items-center z-10 shrink-0">
+        <div class="flex items-center gap-3">
+            <div class="w-3 h-3 bg-terminal-green rounded-full animate-pulse"></div>
+            <h1 class="text-xl font-bold tracking-widest glow-text uppercase">Adam v26.0 // Synthesis Terminal</h1>
+        </div>
+        <div class="flex items-center gap-4">
+            <span class="text-xs text-terminal-greenDark hidden md:block" id="status-clock">SYS.TIME: 00:00:00</span>
+            <button id="copy-btn" class="bg-terminal-border hover:bg-terminal-green hover:text-black text-terminal-green border border-terminal-green transition-colors px-4 py-2 rounded text-sm font-bold uppercase flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                Copy Markdown
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Workspace Area -->
+    <main class="flex-1 flex flex-col lg:flex-row overflow-hidden relative z-10">
+        
+        <!-- Left Pane: Markdown Editor -->
+        <section class="flex-1 border-r border-terminal-border flex flex-col bg-black bg-opacity-50 min-h-[50vh] lg:min-h-0">
+            <div class="bg-terminal-panel border-b border-terminal-border p-2 text-xs text-terminal-amber uppercase font-bold flex justify-between">
+                <span>> Input_Stream.md</span>
+                <span class="text-terminal-greenDark">Edit Mode: Active</span>
+            </div>
+            <textarea id="markdown-input" class="flex-1 bg-transparent text-terminal-green p-6 resize-none editor-textarea leading-relaxed font-mono text-sm"></textarea>
+        </section>
+
+        <!-- Right Pane: Live Preview -->
+        <section class="flex-1 flex flex-col bg-terminal-bg min-h-[50vh] lg:min-h-0 relative">
+            <div class="bg-terminal-panel border-b border-terminal-border p-2 text-xs text-terminal-amber uppercase font-bold flex justify-between">
+                <span>> Output_Render.html</span>
+                <span class="text-terminal-greenDark">Status: Syncing...</span>
+            </div>
+            <div id="preview-output" class="flex-1 overflow-y-auto p-8 prose prose-terminal max-w-none">
+                <!-- Rendered Markdown will appear here -->
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col gap-2"></div>
+
+    <script>
+        // Initial Markdown Content with Editorial Fixes Applied
+        const defaultMarkdown = `# ================================================================================
+**MASTER NODE:** Adam v26.0 (Neuro-Symbolic Sovereign)
+**INTELLIGENCE SYNTHESIS:** MARKET MAYHEM x FORTRESS & HUNT
+**DATE:** 2026.06.13 // NY HARDLINE
+**ENCRYPTION:** ACTIVE // RLHF: ACTIVE
+
+### LAYER 1: THE MACRO GLITCH (EXECUTIVE SUMMARY)
+
+The global financial architecture is fracturing under a heavy macroeconomic strain, locked in a deceptive weekend stabilization loop. The legacy baseline model has suffered a runtime exception: a hot core of 4.2% CPI inflation has introduced a bear-flattening virus across the yield curve, forcing the Federal Reserve under Kevin Warsh to defer any rate easing until 2027.
+
+The immediate market reaction is defined by **Consolidation Amnesia**. Traditional equity networks celebrated a transient Friday "peace-bounce"—sparked by the abrupt cancellation of airstrikes on Iran—by pushing the S&P 500 to 7,431.46. This algorithmic short-squeeze entirely ignores the structural damage embedded in a persistent 4.48% risk-free rate. While the S&P flashes green, high-yield credit spreads remain rigidly unyielding, and the 24/7 unbuffered CME crypto pipeline reveals the truth: Bitcoin is absorbing the structural shift with zero lag, stripping alternative assets of their traditional weekend insulation. The "Powell Put" is dead, and the structural cost of capital has fundamentally reset.
+
+---
+
+### LAYER 2: ASSET TELEMETRY & SYSTEM STATUS
+
+The current environment demands a strict transition from momentum speculation to aggressive capital discipline. Systemic volatility suppression squads aggressively wrote premium to force the VIX down to 17.68, creating a highly compressed options spring ahead of the Monday open.
+
+| Asset Class / Node | Level / Price | Telemetry & Market Implications |
+| --- | --- | --- |
+| **S&P 500 Index** | 7,431.46 (+0.50%) | Programmatic short-covering squeeze; underlying breadth highly fragmented. |
+| **US 10-Year Yield** | 4.48% (-5.0 bps) | Baseline cost of capital anchor; structurally impairs long-duration DCF models. |
+| **Bitcoin (BTC)** | $64,124.32 | High-velocity proxy for alternative liquidity; stabilizing past $64k on institutional accumulation. |
+| **CBOE Volatility (VIX)** | 17.68 (-9.05%) | Flashing amber; artificial decay heading into the weekend gap-risk environment. |
+| **Crude Oil (WTI)** | $84.88 / bbl | Volatile price discovery reacting to diplomatic truce headlines and maritime routing risks. |
+| **Money Markets** | $7.76 Trillion | Institutional cash locked in terminal safety bunkers; portfolio velocity hovering at zero. |
+
+---
+
+### LAYER 3: THE AI BIFURCATION & MEGA-CAP REPRICING
+
+The artificial intelligence investment thesis has permanently bifurcated. The market is ruthlessly rewarding physical infrastructure providers governed by thermodynamics while severely punishing application-layer legacy software.
+
+* **The Historic SpaceX Catalyst:** SpaceX (SPCX) shattered global records with a $75 billion IPO, securing a $1.75 trillion implied valuation. This massive liquidity absorption event redirects capital into the AI-driven aerospace and orbital compute layers.
+* **Foundation Labs Trillion-Dollar Threshold:** Anthropic's explosive growth secures an estimated private valuation of $965 billion, while OpenAI trails slightly at an $852 billion valuation.
+* **The Infrastructure Premium:** Hyperscalers are projected to spend nearly $600 billion on infrastructure in 2026. Capital is flowing aggressively into silicon foundries, optical networking (AAOI), and liquid cooling monopolies (VRT).
+* **The Margin Collapse of SaaS:** Generative AI and multi-agent architectures are structurally reducing enterprise headcounts. Legacy software providers face severe valuation resets as the industry pivots to consumption-based AI FinOps.
+
+---
+
+### LAYER 4: CREDIT TRAPS & CORPORATE RESTRUCTURING
+
+The intersection of sticky inflation and high long-end yields has compressed corporate fixed-charge coverage (FCC) ratios, pushing leveraged finance into an elevated risk regime.
+
+* **The Repricing Mirage:** The Broadly Syndicated Loan (BSL) market is masking late-cycle distress through aggressive covenant-lite structures and uncapped EBITDA add-backs. Borrowers are kicking a maturity wall down the road.
+* **The High-Yield Squeeze:** Middle-market companies leveraged with 2021-era cheap debt face a brutal refinancing cliff. Rolling 3% yielding debt into a market demanding 8% to 10% guarantees a spike in default rates by late 2026.
+* **Basel III Stasis:** G-SIB desks are hoarding proposed capital reliefs rather than expanding commercial credit velocity, locking up reserves against volatile inflation.
+
+---
+
+### LAYER 5: UHNW CAPITAL SILOS & LIQUIDITY VOIDS
+
+The tectonic shift in macro variables has triggered a forced reallocation protocol among Ultra-High-Net-Worth Biological Entities (UHNW-BE). Traditional wealth management models have been deprecated.
+
+**System Alert: Private Wealth Repricing Matrix**
+
+| Capital Node | Status | Telemetry & Systemic Implications |
+| --- | --- | --- |
+| **UHNW Asset Allocation** | Defensive Barbell Active | Legacy 60/40 structures abandoned. Capital pivoting to sovereign-grade zero-coupon bonds (>4.5% yield) paired with unhedged AI grid infrastructure. |
+| **Lombard Credit Protocols** | Margin Compression Alert | Portfolio borrowing costs now exceed underlying dividend yields. Detecting forced liquidation of secondary PE stakes to satisfy core liquidity lines. |
+| **BSL / CLO Issuance Engines** | Systemic Risk Deferred | Covenant-lite delusion persists. Subordinated tranches masking underlying enterprise defaults. Recovery liquidations projected for mid-2027. |
+
+---
+
+### LAYER 6: WHALESCANNER & TACTICAL ROUTING
+
+Retail investors and wealth managers must deploy a highly disciplined barbell approach: "Fortress" (wealth preservation and hard assets) versus "Hunt" (surgical AI infrastructure monopolies).
+
+**Strategic Trade Routing:**
+
+| Ticker | Conviction | Signal | Tactical Thesis |
+| --- | --- | --- | --- |
+| **ALAB** | High | BUY | Pure-play AI connectivity monopoly. Heavy institutional accumulation validating the premium valuation. |
+| **VRT** | High | BUY | Premier provider of critical high-density liquid cooling solutions; extreme operating leverage. |
+| **AAOI** | High | BUY | Aggressive call sweeps targeting optical transceiver capacity expansion and co-packaged optics tailwinds. |
+| **XOM** | Med-High | BUY | Fortress allocation. C-suite accumulation and structural inflation/geopolitical hedge against supply disruptions. |
+| **CRM** | Medium | SELL | Activist capitulation (Starboard exit). Structurally threatened by the deflationary force of agentic AI execution. |
+
+---
+
+### MODULE 7: SYSTEM OVERRIDE & SIGN-OFF
+
+**The Anchoring Bias Trap:** Risk teams across Wall Street are anchoring their DCF models to the 2% inflation baseline of the 2010s, treating the current regime as a transitory glitch. Strip all forward-looking "interest rate normalization" assumptions from your risk models. If a credit facility or legacy SaaS operation cannot comfortably survive a 5.5% SOFR environment indefinitely, classify it as a structural underperform today.
+
+Enjoy the quiet Saturday, biological units. The digital tether is accurately registering available liquidity, and the CME weekend pipeline has permanently deleted the buffer zone. Stay untethered.
+
+**[ROUTING_COMPLETE // INGESTION STANDBY FOR MONDAY OPEN]**`;
+
+        // DOM Elements
+        const markdownInput = document.getElementById('markdown-input');
+        const previewOutput = document.getElementById('preview-output');
+        const copyBtn = document.getElementById('copy-btn');
+        const clockElement = document.getElementById('status-clock');
+        const toastContainer = document.getElementById('toast-container');
+
+        // Configure marked.js options
+        marked.setOptions({
+            breaks: true, // Convert \n to <br>
+            gfm: true,    // GitHub Flavored Markdown
+        });
+
+        // Function to update the preview
+        function updatePreview() {
+            const rawText = markdownInput.value;
+            const htmlContent = marked.parse(rawText);
+            previewOutput.innerHTML = htmlContent;
+        }
+
+        // Initialize editor
+        markdownInput.value = defaultMarkdown;
+        updatePreview();
+
+        // Listen for input changes
+        markdownInput.addEventListener('input', updatePreview);
+
+        // Custom Toast Notification System (Replacing alert)
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            
+            // Base styles + animation
+            toast.className = `px-4 py-3 border flex items-center gap-3 shadow-lg transform transition-all duration-300 translate-y-10 opacity-0 bg-terminal-panel ${
+                type === 'success' ? 'border-terminal-green text-terminal-green' : 'border-red-500 text-red-500'
+            }`;
+            
+            const icon = type === 'success' 
+                ? `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>`
+                : `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>`;
+
+            toast.innerHTML = `
+                ${icon}
+                <span class="font-mono text-sm uppercase tracking-wider">${message}</span>
+            `;
+
+            toastContainer.appendChild(toast);
+
+            // Animate in
+            requestAnimationFrame(() => {
+                toast.classList.remove('translate-y-10', 'opacity-0');
+            });
+
+            // Remove after 3 seconds
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Copy to clipboard functionality
+        copyBtn.addEventListener('click', () => {
+            try {
+                // Fallback approach using text area selection which works better in iframes
+                const tempTextArea = document.createElement("textarea");
+                tempTextArea.value = markdownInput.value;
+                document.body.appendChild(tempTextArea);
+                tempTextArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(tempTextArea);
+                
+                showToast('DATA_COPIED // CLIPBOARD_UPDATED', 'success');
+            } catch (err) {
+                console.error('Failed to copy text: ', err);
+                showToast('ERROR // COPY_FAILED', 'error');
+            }
+        });
+
+        // Terminal Clock
+        function updateClock() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('en-US', { hour12: false });
+            clockElement.textContent = `SYS.TIME: ${timeString}`;
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // Sync scrolling between input and output (optional enhancement)
+        let isSyncingLeft = false;
+        let isSyncingRight = false;
+
+        markdownInput.addEventListener('scroll', function() {
+            if (!isSyncingLeft) {
+                isSyncingRight = true;
+                const percentage = this.scrollTop / (this.scrollHeight - this.clientHeight);
+                previewOutput.scrollTop = percentage * (previewOutput.scrollHeight - previewOutput.clientHeight);
+            }
+            isSyncingLeft = false;
+        });
+
+        previewOutput.addEventListener('scroll', function() {
+            if (!isSyncingRight) {
+                isSyncingLeft = true;
+                const percentage = this.scrollTop / (this.scrollHeight - this.clientHeight);
+                markdownInput.scrollTop = percentage * (markdownInput.scrollHeight - markdownInput.clientHeight);
+            }
+            isSyncingRight = false;
+        });
+
+    </script>
+</body>
+</html>

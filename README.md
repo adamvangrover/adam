@@ -7,6 +7,7 @@
     </picture>
   </a>
 </div>
+<img width="1024" height="559" alt="image" src="https://github.com/user-attachments/assets/e4c84f37-c32d-4aa2-bb9d-fc04c5125daf" />
 
 <div align="center">
   <h3>The Institutional-Grade Neuro-Symbolic Financial Sovereign.</h3>
