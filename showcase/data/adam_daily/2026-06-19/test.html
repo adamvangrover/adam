@@ -1,0 +1,254 @@
+import React, { useState, useEffect } from 'react';
+import { 
+  Activity, 
+  ShieldAlert, 
+  Cpu, 
+  Network, 
+  Lock, 
+  AlertOctagon,
+  Terminal,
+  Database,
+  TrendingUp,
+  Crosshair
+} from 'lucide-react';
+
+const Card = ({ children, className = '' }) => (
+  <div className={`bg-slate-900 border border-slate-700 rounded-xl overflow-hidden shadow-lg ${className}`}>
+    {children}
+  </div>
+);
+
+const Badge = ({ status, text }) => {
+  const colors = {
+    ONLINE: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/50',
+    RED: 'bg-rose-500/20 text-rose-400 border-rose-500/50',
+    WARNING: 'bg-amber-500/20 text-amber-400 border-amber-500/50',
+    CRITICAL: 'bg-red-600/20 text-red-500 border-red-600/50 animate-pulse',
+    ACTIVE: 'bg-cyan-500/20 text-cyan-400 border-cyan-500/50'
+  };
+  
+  return (
+    <span className={`px-2 py-1 text-xs font-mono font-bold border rounded ${colors[status] || colors.ONLINE}`}>
+      {text}
+    </span>
+  );
+};
+
+const Metric = ({ label, value, icon: Icon, subtext, color = 'text-slate-200' }) => (
+  <div className="flex flex-col p-4 bg-slate-800/50 rounded-lg border border-slate-700/50">
+    <div className="flex justify-between items-center mb-2">
+      <span className="text-slate-400 text-xs font-mono uppercase tracking-wider">{label}</span>
+      <Icon className={`w-4 h-4 ${color}`} />
+    </div>
+    <div className={`text-2xl font-mono font-bold ${color}`}>{value}</div>
+    {subtext && <div className="text-slate-500 text-xs mt-1 font-mono">{subtext}</div>}
+  </div>
+);
+
+export default function App() {
+  const [sysTime, setSysTime] = useState(new Date('2026-06-19T17:26:00'));
+  const [logs, setLogs] = useState([]);
+
+  // Use functional state updates and empty dependency array to prevent stale closures
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setSysTime(prev => new Date(prev.getTime() + 1000));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    const sequence = [
+      "[SYSTEM] Booting ADAM Core Orchestrator...",
+      "[AUTH] Validating Thought Signature TX-8849-ADAM-NS-20260619-AUTH...",
+      "[AUTH] Signature VERIFIED. State continuity restored.",
+      "[IRON CORE] Locking 10-Yr Treasury Yield constraint at 4.48%.",
+      "[SWARM] Ingesting unstructured matrix: Operation Epic Fury catalysts.",
+      "[DAG] Validating acyclic property for shadow banking collateral schemas...",
+      "[GUARDRAIL] Expected Loss Synthesis > NPV on 14 LBO targets. AUTO-REJECT ENGAGED."
+    ];
+    
+    let i = 0;
+    const interval = setInterval(() => {
+      setLogs(prev => {
+        // Prevent undefined insertions and clear interval safely from within the setter
+        if (i >= sequence.length) {
+          clearInterval(interval);
+          return prev;
+        }
+        const nextLog = sequence[i];
+        i++;
+        return [...prev, nextLog];
+      });
+    }, 800);
+    
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div className="min-h-screen bg-slate-950 text-slate-200 p-4 md:p-6 font-sans selection:bg-cyan-900">
+      <div className="max-w-7xl mx-auto space-y-6">
+        
+        {/* Header */}
+        <header className="flex flex-col md:flex-row md:items-center justify-between border-b border-slate-800 pb-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-cyan-950 rounded-lg border border-cyan-800">
+              <Network className="w-6 h-6 text-cyan-400" />
+            </div>
+            <div>
+              <h1 className="text-xl font-bold tracking-tight text-white flex items-center gap-2">
+                ADAM ORCHESTRATOR
+                <Badge status="ONLINE" text="SYS.ONLINE" />
+              </h1>
+              <p className="text-xs text-slate-400 font-mono flex items-center gap-2 mt-1">
+                <Lock className="w-3 h-3 text-emerald-500" />
+                SIG: TX-8849-ADAM-NS-20260619-AUTH
+              </p>
+            </div>
+          </div>
+          <div className="mt-4 md:mt-0 text-right font-mono text-sm">
+            <div className="text-slate-300">{sysTime.toISOString().replace('T', ' ').substring(0, 19)} UTC</div>
+            <div className="text-cyan-500 text-xs mt-1">MODE: NEURO-SYMBOLIC | HITL REQ: TRUE</div>
+          </div>
+        </header>
+
+        {/* Deterministic Iron Core Metrics */}
+        <section>
+          <h2 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+            <Cpu className="w-4 h-4" />
+            1. Deterministic Iron Core (Symbolic Gateway)
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <Metric 
+              label="10-Year Treasury Yield" 
+              value="4.48%" 
+              icon={TrendingUp} 
+              subtext="Locked (PPI Constraint 6.5%)" 
+              color="text-amber-400"
+            />
+            <Metric 
+              label="Spec-Grade Maturity Wall" 
+              value="$204.0B" 
+              icon={AlertOctagon} 
+              subtext="2026 Critical Refinancing Risk" 
+              color="text-rose-400"
+            />
+            <Metric 
+              label="Stargate LTV Covenant" 
+              value="35.0%" 
+              icon={Crosshair} 
+              subtext="Hard trigger at $73.00/share" 
+              color="text-cyan-400"
+            />
+            <Metric 
+              label="Brent Crude Peak" 
+              value=">$110" 
+              icon={Activity} 
+              subtext="Transient: Operation Epic Fury" 
+              color="text-amber-400"
+            />
+          </div>
+        </section>
+
+        {/* Dual Panels */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          
+          {/* Neural Swarm Synthesis */}
+          <Card className="flex flex-col">
+            <div className="p-4 border-b border-slate-800 bg-slate-900/50 flex justify-between items-center">
+              <h3 className="font-bold flex items-center gap-2 text-cyan-400">
+                <Database className="w-4 h-4" />
+                2. Neural Swarm Synthesis
+              </h3>
+              <Badge status="ACTIVE" text="DIOPHANTINE SYNC (2.5s)" />
+            </div>
+            <div className="p-5 space-y-4 flex-grow">
+              <div>
+                <h4 className="text-xs font-mono text-slate-500 mb-1">DOMINANT MACRO REGIME</h4>
+                <div className="text-lg font-bold text-amber-500">BASELINE_GLITCH (Stagflation)</div>
+                <p className="text-sm text-slate-400 mt-2 border-l-2 border-amber-500/50 pl-3">
+                  Catalysts: Escalation in Persian Gulf driving transient energy shocks, coupled with tariff-induced domestic stagnation ($600-$1K burden/HH). 2.2% GDP growth.
+                </p>
+              </div>
+              <div className="pt-4 border-t border-slate-800">
+                <h4 className="text-xs font-mono text-slate-500 mb-1">AI COMPUTE SUPERCYCLE</h4>
+                <div className="text-md font-bold text-slate-200">The "Apex Paradox" Identified</div>
+                <ul className="text-sm text-slate-400 mt-2 space-y-2 list-disc pl-4">
+                  <li><span className="text-cyan-400">DeepSeek-R1 Shock:</span> $5.6M baseline training cost locked as deflationary variable.</li>
+                  <li><span className="text-amber-400">Geopolitical Friction:</span> 25% tariff capping foreign gross margins for incumbent silicons.</li>
+                </ul>
+              </div>
+            </div>
+          </Card>
+
+          {/* Credit Risk Pathology */}
+          <Card className="flex flex-col">
+            <div className="p-4 border-b border-slate-800 bg-slate-900/50 flex justify-between items-center">
+              <h3 className="font-bold flex items-center gap-2 text-rose-400">
+                <ShieldAlert className="w-4 h-4" />
+                3. Credit Risk & Exposure Mgmt
+              </h3>
+              <Badge status="CRITICAL" text="W3C-PROV ENFORCED" />
+            </div>
+            <div className="p-5 space-y-5 flex-grow">
+              <div className="bg-slate-950 p-4 rounded border border-slate-800">
+                <div className="flex justify-between items-start mb-2">
+                  <h4 className="font-bold text-slate-200">LBO & Syndicated Loans</h4>
+                  <Badge status="RED" text="STATUS: RED (HOLD)" />
+                </div>
+                <p className="text-sm text-slate-400">
+                  Terminal DSCR compression. Borrowers failing floating rate stress tests. 
+                  <br/><span className="text-rose-400 font-semibold mt-1 inline-block">Risk Vector:</span> Creditor-on-Creditor Violence.
+                </p>
+                <div className="mt-3 text-xs font-mono text-amber-400 bg-amber-500/10 p-2 rounded">
+                  &gt; ACTION: Widen clearing spreads. Enforce break-fee structuring.
+                </div>
+              </div>
+
+              <div className="bg-slate-950 p-4 rounded border border-red-900/30">
+                <div className="flex justify-between items-start mb-2">
+                  <h4 className="font-bold text-slate-200">Shadow Banking</h4>
+                  <Badge status="CRITICAL" text="CRITICAL EXCEPTION" />
+                </div>
+                <p className="text-sm text-slate-400">
+                  Systemic collateral verification failure detected (Ref: MFS £930M shortfall / double-pledging).
+                </p>
+                <div className="mt-3 text-xs font-mono text-rose-400 bg-rose-500/10 p-2 rounded">
+                  &gt; ACTION: DAG validation required for all physical collateral. Ensure acyclic pledging.
+                </div>
+              </div>
+            </div>
+          </Card>
+        </div>
+
+        {/* Terminal Output */}
+        <Card>
+          <div className="p-3 border-b border-slate-800 bg-slate-900/80 flex items-center gap-2">
+            <Terminal className="w-4 h-4 text-slate-500" />
+            <span className="text-xs font-mono text-slate-400">EXECUTION_LOG // JSON_SCHEMA_ORCHESTRATION</span>
+          </div>
+          <div className="p-4 font-mono text-xs text-slate-400 h-48 overflow-y-auto space-y-2">
+            {logs.map((log, index) => {
+              // Safety guard against undefined or object log entries crashing the loop
+              const safeLog = typeof log === 'string' ? log : '';
+              return (
+                <div key={index} className={
+                  safeLog.includes("VERIFIED") ? "text-emerald-400" :
+                  safeLog.includes("AUTO-REJECT") ? "text-rose-400 font-bold" : 
+                  safeLog.includes("WARNING") ? "text-amber-400" : ""
+                }>
+                  <span className="text-slate-600">[{sysTime.toISOString().substring(11, 19)}]</span> {safeLog}
+                </div>
+              );
+            })}
+            <div className="flex items-center gap-2 text-cyan-500 mt-4 animate-pulse">
+              <span>_</span>
+              <span>AWAITING HUMAN-IN-THE-LOOP (HITL) CLEARANCE...</span>
+            </div>
+          </div>
+        </Card>
+
+      </div>
+    </div>
+  );
+}
