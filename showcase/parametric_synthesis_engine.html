@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM v26.0 // PARAMETRIC SYNTHESIS ENGINE</title>
+
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { mono: ['"Fira Code"', 'monospace'] },
+                    colors: {
+                        terminal: {
+                            bg: '#050505',
+                            green: '#00ff41',
+                            greenDark: '#008f11',
+                            amber: '#ffb000',
+                            red: '#ff003c',
+                            cyan: '#00e5ff',
+                            panel: '#0a0f0a',
+                            border: '#1a331a',
+                            borderFocus: '#00ff41'
+                        }
+                    },
+                    typography: (theme) => ({
+                        terminal: {
+                            css: {
+                                '--tw-prose-body': theme('colors.terminal.green'),
+                                '--tw-prose-headings': theme('colors.terminal.green'),
+                                '--tw-prose-links': theme('colors.terminal.cyan'),
+                                '--tw-prose-bold': theme('colors.white'),
+                                '--tw-prose-counters': theme('colors.terminal.greenDark'),
+                                '--tw-prose-bullets': theme('colors.terminal.greenDark'),
+                                '--tw-prose-hr': theme('colors.terminal.border'),
+                                '--tw-prose-quotes': theme('colors.terminal.amber'),
+                                '--tw-prose-code': theme('colors.terminal.amber'),
+                                '--tw-prose-pre-code': theme('colors.terminal.green'),
+                                '--tw-prose-pre-bg': theme('colors.terminal.panel'),
+                                color: 'var(--tw-prose-body)',
+                                maxWidth: 'none',
+                                h1: { textTransform: 'uppercase', letterSpacing: '0.05em', textShadow: '0 0 5px rgba(0, 255, 65, 0.5)' },
+                                h2: { textTransform: 'uppercase', letterSpacing: '0.05em', borderBottom: '1px solid #1a331a', paddingBottom: '0.5rem', marginTop: '1.5em' },
+                                h3: { textTransform: 'uppercase', color: '#ffb000' },
+                                a: { textDecoration: 'none', '&:hover': { color: theme('colors.white') } },
+                                strong: { color: theme('colors.terminal.green'), textShadow: '0 0 2px rgba(0, 255, 65, 0.8)' },
+                                table: { width: '100%', borderCollapse: 'collapse', marginTop: '1em', marginBottom: '1em', fontSize: '0.85em' },
+                                th: { backgroundColor: '#0f1a0f', color: '#00ff41', padding: '0.5rem', border: '1px solid #1a331a', textAlign: 'left' },
+                                td: { padding: '0.5rem', border: '1px solid #1a331a', verticalAlign: 'top' },
+                                hr: { borderColor: '#1a331a', borderTopWidth: '2px', marginTop: '1.5em', marginBottom: '1.5em' },
+                            },
+                        },
+                    }),
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #050505;
+            color: #00ff41;
+            font-family: 'Fira Code', monospace;
+            overflow: hidden;
+        }
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #050505; border-left: 1px solid #1a331a; }
+        ::-webkit-scrollbar-thumb { background: #1a331a; }
+        ::-webkit-scrollbar-thumb:hover { background: #008f11; }
+
+        .crt-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none; z-index: 50; opacity: 0.15;
+        }
+
+        .glow-text { text-shadow: 0 0 5px rgba(0, 255, 65, 0.5); }
+        .glow-red { text-shadow: 0 0 5px rgba(255, 0, 60, 0.5); color: #ff003c; }
+        .glow-amber { text-shadow: 0 0 5px rgba(255, 176, 0, 0.5); color: #ffb000; }
+
+        .editor-textarea:focus { outline: none; box-shadow: inset 0 0 20px rgba(0, 255, 65, 0.05); }
+
+        /* Custom Range Slider Styling */
+        input[type=range] {
+            -webkit-appearance: none; width: 100%; background: transparent;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none; height: 16px; width: 8px;
+            background: #00ff41; cursor: pointer; margin-top: -6px;
+            box-shadow: 0 0 5px #00ff41;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%; height: 4px; cursor: pointer;
+            background: #1a331a; border: none;
+        }
+        input[type=range]:focus { outline: none; }
+    </style>
+</head>
+
+<body class="h-screen w-screen flex flex-col text-sm">
+    <div class="crt-overlay"></div>
+
+    <header class="border-b border-terminal-border bg-terminal-panel p-3 flex justify-between items-center z-10 shrink-0">
+        <div class="flex items-center gap-3">
+            <div class="w-3 h-3 bg-terminal-red rounded-full animate-pulse shadow-[0_0_8px_#ff003c]"></div>
+            <h1 class="text-lg font-bold tracking-widest glow-text uppercase">Adam v26.0 // Synthesis Engine</h1>
+        </div>
+        <div class="flex items-center gap-4">
+            <div class="text-xs text-terminal-amber hidden md:flex gap-4 border border-terminal-amber px-3 py-1 rounded bg-black/50">
+                <span>MEM: <span id="mem-usage">14.2 TB</span></span>
+                <span>CPU: <span id="cpu-usage">98%</span></span>
+            </div>
+            <span class="text-xs text-terminal-greenDark hidden md:block font-bold" id="status-clock">SYS.TIME: 00:00:00</span>
+            <button id="copy-btn" class="bg-terminal-border hover:bg-terminal-green hover:text-black text-terminal-green border border-terminal-green transition-colors px-3 py-1.5 rounded text-xs font-bold uppercase flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                Export Output
+            </button>
+        </div>
+    </header>
+
+    <main class="flex-1 flex flex-col lg:flex-row overflow-hidden relative z-10">
+
+        <!-- Left Pane: Control Dashboard -->
+        <aside class="w-full lg:w-80 border-r border-terminal-border bg-black/80 flex flex-col shrink-0 overflow-y-auto">
+            <div class="bg-terminal-panel border-b border-terminal-border p-2 text-xs text-terminal-cyan uppercase font-bold sticky top-0 z-20">
+                > NEURAL_PARAMETERS.cfg
+            </div>
+
+            <div class="p-4 flex flex-col gap-6">
+                <!-- Macro Assumption -->
+                <div class="flex flex-col gap-2">
+                    <label class="text-xs font-bold uppercase text-terminal-amber flex justify-between">
+                        <span>Macro Environment</span>
+                        <span id="val-macro" class="text-terminal-green">BASELINE_GLITCH</span>
+                    </label>
+                    <select id="param-macro" class="w-full bg-terminal-panel border border-terminal-border text-terminal-green text-xs p-2 focus:outline-none focus:border-terminal-greenDark">
+                        <option value="GLITCH">BASELINE_GLITCH (Stagflation)</option>
+                        <option value="HARD_LANDING">HARD_LANDING (Recession/Deflation)</option>
+                        <option value="HYPERINFLATION">HYPERINFLATION (Fiat Crisis)</option>
+                        <option value="SINGULARITY">AGI_SINGULARITY (Post-Scarcity)</option>
+                    </select>
+                </div>
+
+                <!-- Temperature -->
+                <div class="flex flex-col gap-2">
+                    <label class="text-xs font-bold uppercase text-terminal-amber flex justify-between">
+                        <span>System Temperature</span>
+                        <span id="val-temp" class="text-terminal-green">0.70</span>
+                    </label>
+                    <input type="range" id="param-temp" min="0.1" max="2.0" step="0.05" value="0.70">
+                    <p class="text-[10px] text-terminal-greenDark">Controls narrative volatility and price target variance.</p>
+                </div>
+
+                <!-- Monte Carlo Runs -->
+                <div class="flex flex-col gap-2">
+                    <label class="text-xs font-bold uppercase text-terminal-amber flex justify-between">
+                        <span>Monte Carlo Iterations</span>
+                        <span id="val-mc" class="text-terminal-green">100,000</span>
+                    </label>
+                    <input type="range" id="param-mc" min="1000" max="10000000" step="1000" value="100000">
+                    <p class="text-[10px] text-terminal-greenDark">Increases statistical confidence/narrows spread.</p>
+                </div>
+
+                <!-- Conviction Threshold -->
+                <div class="flex flex-col gap-2">
+                    <label class="text-xs font-bold uppercase text-terminal-amber flex justify-between">
+                        <span>Min. Conviction (α)</span>
+                        <span id="val-conviction" class="text-terminal-green">75.0%</span>
+                    </label>
+                    <input type="range" id="param-conviction" min="50" max="99" step="1" value="75">
+                    <p class="text-[10px] text-terminal-greenDark">Filters out low-probability routing signals.</p>
+                </div>
+
+                <!-- Top-K Trades -->
+                <div class="flex flex-col gap-2">
+                    <label class="text-xs font-bold uppercase text-terminal-amber flex justify-between">
+                        <span>Top-K Routing Limit</span>
+                        <span id="val-topk" class="text-terminal-green">5</span>
+                    </label>
+                    <input type="range" id="param-topk" min="1" max="15" step="1" value="5">
+                </div>
+
+                <button id="btn-force-sync" class="mt-4 w-full bg-[#1a331a] hover:bg-terminal-green hover:text-black text-terminal-green border border-terminal-green py-2 text-xs font-bold uppercase transition-all shadow-[0_0_10px_rgba(0,255,65,0.2)]">
+                    [ FORCE MANUAL SYNTHESIS ]
+                </button>
+            </div>
+        </aside>
+
+        <!-- Middle Pane: Live Markdown Code -->
+        <section class="flex-1 border-r border-terminal-border flex flex-col bg-black/60 min-w-[300px]">
+            <div class="bg-terminal-panel border-b border-terminal-border p-2 text-xs text-terminal-amber uppercase font-bold flex justify-between">
+                <span>> Neural_Stream.md</span>
+                <span class="text-terminal-greenDark animate-pulse">AUTO-SYNC: ON</span>
+            </div>
+            <textarea id="markdown-input" class="flex-1 bg-transparent text-terminal-green p-4 resize-none editor-textarea leading-relaxed font-mono text-xs"></textarea>
+        </section>
+
+        <!-- Right Pane: Rendered Preview -->
+        <section class="flex-1 flex flex-col bg-terminal-bg min-w-[300px] relative">
+            <div class="bg-terminal-panel border-b border-terminal-border p-2 text-xs text-terminal-amber uppercase font-bold flex justify-between">
+                <span>> Output_Render.html</span>
+                <span id="render-status" class="text-terminal-greenDark">Idle</span>
+            </div>
+            <div id="preview-output" class="flex-1 overflow-y-auto p-6 prose prose-terminal prose-sm max-w-none pb-20">
+                <!-- Rendered Markdown will appear here -->
+            </div>
+        </section>
+
+    </main>
+
+    <div id="toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col gap-2"></div>
+
+    <script>
+        // DOM Elements
+        const DOM = {
+            paramMacro: document.getElementById('param-macro'),
+            paramTemp: document.getElementById('param-temp'),
+            paramMC: document.getElementById('param-mc'),
+            paramConviction: document.getElementById('param-conviction'),
+            paramTopK: document.getElementById('param-topk'),
+
+            valMacro: document.getElementById('val-macro'),
+            valTemp: document.getElementById('val-temp'),
+            valMC: document.getElementById('val-mc'),
+            valConviction: document.getElementById('val-conviction'),
+            valTopK: document.getElementById('val-topk'),
+
+            btnSync: document.getElementById('btn-force-sync'),
+            markdownInput: document.getElementById('markdown-input'),
+            previewOutput: document.getElementById('preview-output'),
+            copyBtn: document.getElementById('copy-btn'),
+            clockElement: document.getElementById('status-clock'),
+            memUsage: document.getElementById('mem-usage'),
+            cpuUsage: document.getElementById('cpu-usage')
+        };
+
+        // Marked.js config
+        marked.setOptions({ breaks: true, gfm: true });
+
+        // --- INTELLIGENCE DATABASE (Neuro-Symbolic Data) ---
+
+        // Base market values to mutate based on state
+        const BASE_MARKET = {
+            spx: 5400,
+            yield10y: 4.25,
+            btc: 65000,
+            vix: 15.0,
+            oil: 80.0
+        };
+
+        // Macro Scenarios Data
+        const SCENARIOS = {
+            GLITCH: {
+                title: "MARKET MAYHEM x FORTRESS & HUNT",
+                layer1: "The global financial architecture is fracturing under a heavy macroeconomic strain, locked in a deceptive stabilization loop. A hot core of sticky CPI inflation has introduced a bear-flattening virus across the yield curve, forcing the Federal Reserve to defer rate easing. The 'Powell Put' is dead, and the structural cost of capital has fundamentally reset.",
+                layer3: "The AI investment thesis has permanently bifurcated. The market is ruthlessly rewarding physical infrastructure providers governed by thermodynamics while severely punishing application-layer legacy software. Capital is flowing aggressively into silicon foundries, optical networking, and liquid cooling monopolies.",
+                modifiers: { spx: 1.02, yield10y: 1.05, btc: 0.98, vix: 1.1, oil: 1.06 },
+                trend: "Stagflationary Drift"
+            },
+            HARD_LANDING: {
+                title: "CREDIT FREEZE x SYSTEM DELEVERAGING",
+                layer1: "The baseline model has completely fractured. The delayed impact of terminal rates has triggered a synchronized global liquidity freeze. Corporate credit markets are seizing, and broad equities are entering a rapid repricing cascade as aggregate demand collapses. The Federal Reserve is actively modeling emergency inter-meeting cuts.",
+                layer3: "Enterprise IT budgets have collapsed. Forward multiples for AI infrastructure are experiencing severe compression as 'hyperscaler capex exhaustion' sets in. The market is shifting from growth to extreme capital preservation, favoring sovereign debt and dividend-fortress balance sheets.",
+                modifiers: { spx: 0.80, yield10y: 0.70, btc: 0.85, vix: 2.5, oil: 0.80 },
+                trend: "Deflationary Shock"
+            },
+            HYPERINFLATION: {
+                title: "FIAT DEPRECATION x ALGORITHMIC ESCAPE",
+                layer1: "WARNING: Sovereign debt spirals have breached critical thresholds. The monetary base is expanding at a highly volatile, unanchored rate. Traditional 'risk-free' fiat instruments are generating deeply negative real returns, triggering a chaotic exodus into hard assets and mathematically constrained protocols.",
+                layer3: "Corporate balance sheets holding cash are deteriorating rapidly in real terms. Capital is routing violently into physical commodities, energy infrastructure, and fixed-supply digital assets. The stock market is melting UP nominally, but down in real purchasing power.",
+                modifiers: { spx: 1.40, yield10y: 1.60, btc: 3.5, vix: 1.5, oil: 1.80 },
+                trend: "Currency Debasement"
+            },
+            SINGULARITY: {
+                title: "POST-SCARCITY REPRICING x COMPUTE STANDARD",
+                layer1: "Biological economic models have been officially deprecated. AGI breakthroughs have triggered an intelligence explosion, resetting the baseline cost of human labor to near-zero. Legacy valuation frameworks (DCF, PE) are mathematically irrelevant. Compute (FLOPs) and Energy (Joules) have become the de facto global reserve currencies.",
+                layer3: "All available capital is being force-routed into the buildout of planetary-scale orbital dyson swarms and quantum foundries. Traditional corporations not directly integrated into the AGI supply chain are being priced at zero terminal value. The simulation is entering extreme overdrive.",
+                modifiers: { spx: 3.0, yield10y: 0.40, btc: 15.0, vix: 0.5, oil: 0.5 },
+                trend: "Technological Ascendancy"
+            }
+        };
+
+        // Master Trade Database
+        const TRADE_DATABASE = [
+            { ticker: "ALAB", baseConviction: 85, signal: "BUY", type: "AI Connectivity", beta: 1.5, scenarios: ['GLITCH', 'SINGULARITY'] },
+            { ticker: "VRT", baseConviction: 82, signal: "BUY", type: "Liquid Cooling", beta: 1.4, scenarios: ['GLITCH', 'SINGULARITY'] },
+            { ticker: "MSTR", baseConviction: 88, signal: "STRONG BUY", type: "Bitcoin Proxy", beta: 2.0, scenarios: ['HYPERINFLATION', 'GLITCH', 'SINGULARITY'] },
+            { ticker: "TLT", baseConviction: 90, signal: "BUY", type: "Sovereign Bonds", beta: 0.2, scenarios: ['HARD_LANDING'] },
+            { ticker: "XOM", baseConviction: 75, signal: "BUY", type: "Energy Fortress", beta: 0.8, scenarios: ['GLITCH', 'HYPERINFLATION'] },
+            { ticker: "GLD", baseConviction: 80, signal: "BUY", type: "Hard Asset", beta: 0.5, scenarios: ['HARD_LANDING', 'HYPERINFLATION'] },
+            { ticker: "SPCX", baseConviction: 95, signal: "ACCUMULATE", type: "Orbital Infrastructure", beta: 1.8, scenarios: ['GLITCH', 'SINGULARITY'] },
+            { ticker: "CRM", baseConviction: 92, signal: "SELL", type: "Legacy SaaS", beta: 1.1, scenarios: ['GLITCH', 'HARD_LANDING', 'SINGULARITY'] },
+            { ticker: "HYG", baseConviction: 85, signal: "SHORT", type: "Junk Debt", beta: 1.2, scenarios: ['HARD_LANDING', 'GLITCH'] },
+            { ticker: "NVDA", baseConviction: 89, signal: "HOLD/BUY", type: "Compute Standard", beta: 1.6, scenarios: ['GLITCH', 'SINGULARITY'] },
+            { ticker: "PHYS", baseConviction: 78, signal: "BUY", type: "Physical Gold", beta: 0.4, scenarios: ['HYPERINFLATION'] },
+            { ticker: "TSM", baseConviction: 84, signal: "BUY", type: "Foundry Monopoly", beta: 1.2, scenarios: ['GLITCH', 'SINGULARITY'] }
+        ];
+
+        // Math Utilities
+        function randomGaussian() {
+            let u = 0, v = 0;
+            while(u === 0) u = Math.random();
+            while(v === 0) v = Math.random();
+            return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+        }
+
+        function formatCurrency(num) {
+            return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(num);
+        }
+
+        // Core Generation Function
+        function runSynthesis() {
+            // 1. Read State
+            const state = {
+                macro: DOM.paramMacro.value,
+                temp: parseFloat(DOM.paramTemp.value),
+                mcRuns: parseInt(DOM.paramMC.value),
+                minConviction: parseFloat(DOM.paramConviction.value),
+                topK: parseInt(DOM.paramTopK.value)
+            };
+
+            // Calculate systemic variance based on temp and MC runs
+            // Higher MC runs = tighter confidence intervals. Higher Temp = wilder swings.
+            const mcFactor = Math.log10(state.mcRuns) / 7; // normalize based on 10,000,000
+            const systemVariance = state.temp * (1.1 - mcFactor);
+
+            const scenario = SCENARIOS[state.macro];
+
+            // 2. Generate Asset Telemetry
+            const spxVal = BASE_MARKET.spx * scenario.modifiers.spx * (1 + (randomGaussian() * 0.05 * systemVariance));
+            const yieldVal = BASE_MARKET.yield10y * scenario.modifiers.yield10y * (1 + (randomGaussian() * 0.1 * systemVariance));
+            const btcVal = BASE_MARKET.btc * scenario.modifiers.btc * (1 + (randomGaussian() * 0.15 * systemVariance));
+            const vixVal = Math.max(9, BASE_MARKET.vix * scenario.modifiers.vix * (1 + (randomGaussian() * 0.2 * systemVariance)));
+
+            // Confidence Interval String Gen
+            const marginOfError = (systemVariance * 10).toFixed(2);
+
+            // 3. Process Trades (Monte Carlo Simulation Effect)
+            let validTrades = TRADE_DATABASE.filter(t => t.scenarios.includes(state.macro) || state.temp > 1.2);
+
+            // Apply simulation noise to convictions
+            validTrades = validTrades.map(t => {
+                let noise = randomGaussian() * (state.temp * 15);
+                // MC runs reduce the noise (more accuracy)
+                noise = noise * (1 - (mcFactor * 0.5));
+                let finalConv = Math.min(99.9, Math.max(10.0, t.baseConviction + noise));
+
+                // Calculate an expected return target based on beta and macro trend
+                let expReturn = (t.beta * (scenario.modifiers.spx - 1) * 100) + (randomGaussian() * 5 * systemVariance);
+                if (t.signal === "SELL" || t.signal === "SHORT") expReturn *= -1;
+                if (expReturn < 0 && t.signal === "BUY") expReturn = Math.abs(expReturn); // Ensure buys look positive in target
+
+                return { ...t, calculatedConviction: finalConv, expectedReturn: expReturn };
+            });
+
+            // Filter and Sort
+            validTrades = validTrades
+                .filter(t => t.calculatedConviction >= state.minConviction)
+                .sort((a, b) => b.calculatedConviction - a.calculatedConviction)
+                .slice(0, state.topK);
+
+            // 4. Construct the Markdown Document
+            const dateStr = new Date().toISOString().split('T')[0].replace(/-/g, '.');
+
+            let md = `# ================================================================================
+**MASTER NODE:** Adam v26.0 (Neuro-Symbolic Sovereign)
+**INTELLIGENCE SYNTHESIS:** ${scenario.title}
+**DATE:** ${dateStr} // NY HARDLINE
+**SIMULATION PARAMETERS:** T=${state.temp.toFixed(2)} | MC_ITERATIONS=${state.mcRuns.toLocaleString()} | ERR_MARGIN=±${marginOfError}%
+
+### LAYER 1: SYSTEMIC OVERVIEW (${scenario.trend})
+
+${scenario.layer1}
+
+At current temperature variance (T=${state.temp.toFixed(2)}), the system is modeling a probability matrix where traditional mean-reversion algorithms fail. Monte Carlo simulations (${state.mcRuns.toLocaleString()} runs) confirm that forward-looking models anchored to 2010s era baselines have an unacceptably high error rate.
+
+---
+
+### LAYER 2: ASSET TELEMETRY (DYNAMIC PRICING)
+
+Based on the ${state.macro} assumption vector, real-time capital flows suggest the following repricing matrix. Data reflects projected equilibrium states.
+
+| Asset Class / Node | Projected Level | Telemetry Volatility (Δ) |
+| --- | --- | --- |
+| **S&P 500 Index** | ${spxVal.toFixed(2)} | Baseline shifting; internal breadth skewing. |
+| **US 10-Year Yield** | ${yieldVal.toFixed(2)}% | Structural cost of capital adjusted for regime. |
+| **Bitcoin (BTC)** | ${formatCurrency(btcVal)} | Digital scarcity proxy reacting to liquidity metrics. |
+| **CBOE Volatility (VIX)** | ${vixVal.toFixed(2)} | Option market stress indicator. |
+
+---
+
+### LAYER 3: STRUCTURAL BIFURCATION
+
+${scenario.layer3}
+
+The execution gap between entities adapting to the new regime and legacy operators is widening. Corporate fixed-charge coverage (FCC) ratios are being compressed by systemic yield curves, pushing exposed sectors into elevated risk regimes.
+
+---
+
+### LAYER 4: UHNW CAPITAL SILOS (WEALTH MATRIX)
+
+The tectonic shift in macro variables has triggered forced reallocation protocols among Ultra-High-Net-Worth Biological Entities (UHNW-BE).
+
+**System Alert: Private Wealth Repricing Status**
+* **UHNW Asset Allocation:** Deploying extreme barbell. Sovereign-grade instruments paired with hyper-growth infrastructure.
+* **Private Credit Liquidity Voids:** Lombard credit margins compressing. Detecting forced liquidation of secondary PE stakes.
+* **CLO Issuance Engines:** Systemic risk deferred via subordinated tranches. Recovery liquidations modeled dynamically based on current trajectory.
+
+---
+
+### LAYER 5: TACTICAL ROUTING (TOP-${state.topK} SIGNALS)
+
+Filtering global assets through the current macro framework (Conviction Threshold > ${state.minConviction.toFixed(1)}%).
+
+| Ticker | Signal | Conviction | Est. Impact | Tactical Thesis / Node Type |
+| --- | --- | --- | --- | --- |
+`;
+
+            if (validTrades.length === 0) {
+                md += `| **NULL** | N/A | N/A | N/A | *No targets met the strict Conviction Threshold (${state.minConviction.toFixed(1)}%). Adjust parameters.* |\n`;
+            } else {
+                validTrades.forEach(t => {
+                    // Color code conviction in markdown based on strength
+                    let convString = `**${t.calculatedConviction.toFixed(1)}%**`;
+                    let retString = `${t.expectedReturn > 0 ? '+' : ''}${t.expectedReturn.toFixed(1)}%`;
+                    md += `| **${t.ticker}** | ${t.signal} | ${convString} | ${retString} | ${t.type} |\n`;
+                });
+            }
+
+            md += `
+---
+
+### MODULE 6: SYSTEM OVERRIDE & SIGN-OFF
+
+**The Anchoring Bias Trap:** Risk teams globally are operating on deprecated heuristics. Strip all forward-looking "normalization" assumptions from your risk models. The data suggests the current regime is not a transient glitch, but a structural reset.
+
+Stay untethered.
+
+**[ROUTING_COMPLETE // INGESTION STANDBY]**
+`;
+            return md;
+        }
+
+
+        // Update UI Labels
+        function updateLabels() {
+            DOM.valMacro.textContent = DOM.paramMacro.value;
+            DOM.valTemp.textContent = parseFloat(DOM.paramTemp.value).toFixed(2);
+            DOM.valMC.textContent = parseInt(DOM.paramMC.value).toLocaleString();
+            DOM.valConviction.textContent = parseFloat(DOM.paramConviction.value).toFixed(1) + '%';
+            DOM.valTopK.textContent = DOM.paramTopK.value;
+        }
+
+        // Trigger Synthesis
+        function triggerUpdate() {
+            // Flash status
+            const status = document.getElementById('render-status');
+            status.textContent = "Synthesizing...";
+            status.classList.add('glow-red');
+            status.classList.remove('text-terminal-greenDark');
+
+            // Generate Content
+            const newMd = runSynthesis();
+            DOM.markdownInput.value = newMd;
+            DOM.previewOutput.innerHTML = marked.parse(newMd);
+
+            // Reset status
+            setTimeout(() => {
+                status.textContent = "Idle";
+                status.classList.remove('glow-red');
+                status.classList.add('text-terminal-greenDark');
+            }, 300);
+
+            // Glitch effect on CPU/MEM
+            DOM.cpuUsage.textContent = (90 + Math.random() * 10).toFixed(1) + '%';
+            DOM.memUsage.textContent = (14 + Math.random() * 2).toFixed(1) + ' TB';
+        }
+
+        // Event Listeners for Controls
+        [DOM.paramMacro, DOM.paramTemp, DOM.paramMC, DOM.paramConviction, DOM.paramTopK].forEach(el => {
+            el.addEventListener('input', () => {
+                updateLabels();
+                triggerUpdate();
+            });
+        });
+
+        DOM.btnSync.addEventListener('click', triggerUpdate);
+
+        // Manual edit listener
+        DOM.markdownInput.addEventListener('input', () => {
+            DOM.previewOutput.innerHTML = marked.parse(DOM.markdownInput.value);
+        });
+
+        // Initialize First Run
+        updateLabels();
+        triggerUpdate();
+
+
+        // Custom Toast Notification System
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `px-4 py-3 border flex items-center gap-3 shadow-lg transform transition-all duration-300 translate-y-10 opacity-0 bg-terminal-panel text-xs ${
+                type === 'success' ? 'border-terminal-green text-terminal-green' : 'border-terminal-red text-terminal-red'
+            }`;
+
+            const icon = type === 'success'
+                ? `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>`
+                : `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>`;
+
+            toast.innerHTML = `${icon}<span class="font-mono uppercase tracking-wider">${message}</span>`;
+            document.getElementById('toast-container').appendChild(toast);
+
+            requestAnimationFrame(() => toast.classList.remove('translate-y-10', 'opacity-0'));
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Copy Clipboard
+        DOM.copyBtn.addEventListener('click', () => {
+            try {
+                const tempTextArea = document.createElement("textarea");
+                tempTextArea.value = DOM.markdownInput.value;
+                document.body.appendChild(tempTextArea);
+                tempTextArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(tempTextArea);
+                showToast('DATA_COPIED // CLIPBOARD_UPDATED', 'success');
+            } catch (err) {
+                showToast('ERROR // COPY_FAILED', 'error');
+            }
+        });
+
+        // Terminal Clock
+        setInterval(() => {
+            DOM.clockElement.textContent = `SYS.TIME: ${new Date().toLocaleTimeString('en-US', { hour12: false })}`;
+        }, 1000);
+
+        // Sync scrolling
+        let isSyncingLeft = false, isSyncingRight = false;
+        DOM.markdownInput.addEventListener('scroll', function() {
+            if (!isSyncingLeft) {
+                isSyncingRight = true;
+                const percentage = this.scrollTop / (this.scrollHeight - this.clientHeight);
+                DOM.previewOutput.scrollTop = percentage * (DOM.previewOutput.scrollHeight - DOM.previewOutput.clientHeight);
+            }
+            isSyncingLeft = false;
+        });
+
+        DOM.previewOutput.addEventListener('scroll', function() {
+            if (!isSyncingRight) {
+                isSyncingLeft = true;
+                const percentage = this.scrollTop / (this.scrollHeight - this.clientHeight);
+                DOM.markdownInput.scrollTop = percentage * (DOM.markdownInput.scrollHeight - DOM.markdownInput.clientHeight);
+            }
+            isSyncingRight = false;
+        });
+
+    </script>
+</body>
+</html>
