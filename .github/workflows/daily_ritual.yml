@@ -20,6 +20,8 @@ jobs:
         run: poetry run python daily_ritual/daily_ritual.py
       - name: Run Tests & Coverage
         run: poetry run pytest tests/ --cov=src --cov=adam_v3 --cov-fail-under=80
+      - name: Run Provenance Check
+        run: poetry run python ops/checks/check_provenance.py
       - name: Build Docs
         run: poetry run mkdocs build
       - name: Create Pull Request
