@@ -1,0 +1,95 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Adam Core Kernel JSON-RPC 2.0 API Schema",
+  "description": "JSON-RPC 2.0 interface for the Adam v30.1 zero-trust kernel. Exposes systemic skills, operational boundaries, state transition logging, quantitative risk simulations, and multi-agent DAG orchestration.",
+  "type": "object",
+  "methods": {
+    "execute_surveillance": {
+      "description": "Trigger a continuous portfolio surveillance sweep.",
+      "params": {
+        "type": "object",
+        "properties": {
+          "portfolio_id": { "type": "string" },
+          "assets": { "type": "array", "items": { "type": "string" } }
+        },
+        "required": ["portfolio_id"]
+      },
+      "returns": { "type": "object" }
+    },
+    "evaluate_conviction": {
+      "description": "Evaluate the conviction score of a proposed agent output against risk controls.",
+      "params": {
+        "type": "object",
+        "properties": {
+          "agent_output": { "type": "string" },
+          "evidence_quality": { "type": "number", "minimum": 0, "maximum": 1 }
+        },
+        "required": ["agent_output", "evidence_quality"]
+      },
+      "returns": {
+        "type": "object",
+        "properties": {
+          "conviction_score": { "type": "number" },
+          "approved": { "type": "boolean" }
+        }
+      }
+    },
+    "scrape_sec_edgar": {
+      "description": "Scrape and ingest SEC EDGAR filings for a given issuer.",
+      "params": {
+        "type": "object",
+        "properties": {
+          "ticker": { "type": "string" },
+          "filing_types": { "type": "array", "items": { "type": "string" } }
+        },
+        "required": ["ticker"]
+      },
+      "returns": { "type": "object" }
+    },
+    "trigger_quantitative_risk_simulation": {
+      "description": "Trigger a Value-at-Risk (VaR) or Expected Loss (EL) simulation for a credit asset.",
+      "params": {
+        "type": "object",
+        "properties": {
+          "asset_id": { "type": "string" },
+          "simulation_type": { "type": "string", "enum": ["VaR", "ExpectedLoss", "StressTest"] },
+          "base_pd": { "type": "number" },
+          "lgd": { "type": "number" },
+          "ead": { "type": "number" }
+        },
+        "required": ["asset_id", "simulation_type"]
+      },
+      "returns": { "type": "object" }
+    },
+    "log_state_transition": {
+      "description": "Log a state transition within the multi-agent DAG.",
+      "params": {
+        "type": "object",
+        "properties": {
+          "trace_id": { "type": "string" },
+          "span_id": { "type": "string" },
+          "parent_span_id": { "type": "string" },
+          "from_state": { "type": "string" },
+          "to_state": { "type": "string" },
+          "delta_score": { "type": "number" }
+        },
+        "required": ["trace_id", "span_id", "from_state", "to_state"]
+      },
+      "returns": { "type": "object", "properties": { "status": { "type": "string" } } }
+    },
+    "track_dag_orchestration": {
+      "description": "Track and validate the execution lifecycle of a multi-agent DAG task.",
+      "params": {
+        "type": "object",
+        "properties": {
+          "task_id": { "type": "string" },
+          "nodes_completed": { "type": "array", "items": { "type": "string" } },
+          "current_node": { "type": "string" },
+          "information_gain": { "type": "number" }
+        },
+        "required": ["task_id", "current_node"]
+      },
+      "returns": { "type": "object" }
+    }
+  }
+}
