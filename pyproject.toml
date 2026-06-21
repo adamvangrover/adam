@@ -1,32 +1,113 @@
 [build-system]
-requires = ["setuptools>=61.0", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
 
-[project]
-name = "adam-project"
-version = "23.5.0"
-description = "Adam: Autonomous Financial Analyst Agent Platform"
+[tool.poetry]
+name = "adam-kernel"
+version = "30.1.0"
+description = "Autonomous Financial Analyst System - Unified Kernel"
+authors = ["Adam Michael Van Grover"]
 readme = "README.md"
-requires-python = ">=3.11,<3.13"
-license = { text = "MIT" }
-authors = [
-    { name = "ADAM", email = "adamvangrover@gmail.com" },
-    { name = "ADAM Contributors" }
-]
-classifiers = [
-    "Development Status :: 4 - Beta",
-    "Intended Audience :: Financial and Insurance Industry",
-    "Topic :: Office/Business :: Financial",
-    "License :: OSI Approved :: MIT License",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
-]
-dynamic = ["dependencies", "optional-dependencies"]
 
-[tool.setuptools.packages.find]
-where = ["."]
-include = ["core*", "services*", "src*"]
+[tool.poetry.dependencies]
+python = "^3.11" # Adjust to your target Python kernel version
+
+# --- Core Kernel (Always Installed) ---
+pydantic = "2.11.10"
+pydantic-settings = "2.12.0"
+python-dotenv = "1.2.2"
+uuid_utils = "0.12.0"
+colorlog = "6.10.1"
+python-json-logger = "4.0.0"
+
+# ==========================================
+# MODULAR PLUG-INS (Optional Dependencies)
+# ==========================================
+
+# --- Web & Async Infrastructure ---
+fastapi = { version = "0.128.0", optional = true }
+uvicorn = { version = "0.34.0", optional = true }
+Flask = { version = "3.1.3", optional = true }
+Flask-Cors = { version = "6.0.2", optional = true }
+Flask-SocketIO = { version = "5.6.0", optional = true }
+Flask-JWT-Extended = { version = "4.7.1", optional = true }
+aiohttp = { version = ">=3.13.4", optional = true }
+anyio = { version = "4.12.0", optional = true }
+websockets = { version = "15.0.1", optional = true }
+
+# --- Data Science & Math ---
+numpy = { version = ">=1.26.0,<3.0.0", optional = true }
+pandas = { version = ">=2.0.0,<3.0.0", optional = true }
+scipy = { version = ">=1.11.0,<2.0.0", optional = true }
+scikit-learn = { version = ">=1.3.0,<2.0.0", optional = true }
+sympy = { version = "*", optional = true }
+statsmodels = { version = "0.14.6", optional = true }
+optuna = { version = "4.6.0", optional = true }
+
+# --- Machine Learning (Tensors) ---
+torch = { version = "2.9.0", optional = true }
+transformers = { version = ">=5.0.0rc3", optional = true }
+sentence-transformers = { version = ">=3.4.1", optional = true }
+triton = { version = "*", optional = true }
+peft = { version = "*", optional = true }
+
+# --- AI, LLM & Orchestration ---
+openai = { version = ">=1.0.0,<2.0.0", optional = true }
+anthropic = { version = ">=0.40.0", optional = true }
+litellm = { version = ">=1.0.0,<2.0.0", optional = true }
+langchain = { version = "1.2.0", optional = true }
+langchain-core = { version = "1.3.3", optional = true }
+langgraph = { version = "1.0.10", optional = true }
+dspy-ai = { version = "3.0.4", optional = true }
+mesa = { version = ">=3.0.0", optional = true }
+pydantic-ai = { version = ">=1.56.0", optional = true }
+
+# --- Financial Intelligence ---
+yfinance = { version = "1.1.0", optional = true }
+ta = { version = "0.11.0", optional = true }
+PyPortfolioOpt = { version = ">=1.5.5", optional = true }
+edgartools = { version = "5.8.1", optional = true }
+numpy-financial = { version = ">=1.0.0", optional = true }
+
+# --- Quantum Integration ---
+qiskit = { version = ">=1.2.0", optional = true }
+qiskit-finance = { version = ">=0.4.0", optional = true }
+qiskit-aer = { version = ">=0.14.0", optional = true }
+
+# --- Databases, Storage & Workers ---
+SQLAlchemy = { version = "2.0.45", optional = true }
+neo4j = { version = "6.0.3", optional = true }
+redis = { version = "7.1.0", optional = true }
+celery = { version = "5.6.2", optional = true }
+kombu = { version = "5.6.2", optional = true }
+
+# --- Context & Observability ---
+mcp = { version = ">=1.0.0", optional = true }
+fastmcp = { version = ">=3.2.0", optional = true }
+opentelemetry-api = { version = "1.39.1", optional = true }
+opentelemetry-sdk = { version = "1.39.1", optional = true }
+
+[tool.poetry.extras]
+# The user defines their environment by calling these groups
+async-web = ["fastapi", "uvicorn", "Flask", "Flask-Cors", "Flask-SocketIO", "Flask-JWT-Extended", "aiohttp", "anyio", "websockets"]
+data-science = ["numpy", "pandas", "scipy", "scikit-learn", "sympy", "statsmodels", "optuna"]
+ml-tensors = ["torch", "transformers", "sentence-transformers", "triton", "peft"]
+orchestration = ["openai", "anthropic", "litellm", "langchain", "langchain-core", "langgraph", "dspy-ai", "mesa", "pydantic-ai"]
+finance = ["yfinance", "ta", "PyPortfolioOpt", "edgartools", "numpy-financial", "pandas"]
+quantum = ["qiskit", "qiskit-finance", "qiskit-aer", "numpy"]
+infrastructure = ["SQLAlchemy", "neo4j", "redis", "celery", "kombu"]
+observability = ["opentelemetry-api", "opentelemetry-sdk", "mcp", "fastmcp"]
+
+# Macro-groups for ease of deployment
+full-kernel = ["fastapi", "numpy", "pandas", "scipy", "torch", "litellm", "langchain", "yfinance", "SQLAlchemy", "redis", "celery"]
+risk-agent = ["data-science", "finance", "infrastructure", "orchestration"]
+
+[tool.poetry.group.dev.dependencies]
+pytest = "9.0.3"
+pytest-asyncio = "1.3.0"
+ruff = "0.14.10"
+black = "26.3.1"
+mypy = "1.19.1"
 
 [tool.ruff]
 line-length = 120
