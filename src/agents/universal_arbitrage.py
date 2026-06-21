@@ -107,6 +107,13 @@ class UniversalArbitrageEngine:
             if len(books) < 2:
                 continue
 
+            # Precompute micro-prices
+            micro_prices = [self._calculate_micro_price(b) for b in books]
+
+            # Precompute walk_book results
+            precomputed_buy = [{vol: self._walk_book(b.asks, vol) for vol in trade_sizes} for b in books]
+            precomputed_sell = [{vol: self._walk_book(b.bids, vol) for vol in trade_sizes} for b in books]
+
             # Compare every pair of exchanges
             for i in range(len(books)):
                 for j in range(len(books)):
@@ -119,23 +126,18 @@ class UniversalArbitrageEngine:
                     # For different possible trade sizes
                     for target_vol in trade_sizes:
                         # 1. Walk the ASK book to BUY
-                        buy_vol, buy_cost = self._walk_book(buy_book.asks, target_vol)
+                        buy_vol, buy_cost = precomputed_buy[i][target_vol]
 
                         # 2. Walk the BID book to SELL
-                        sell_vol, sell_rev = self._walk_book(sell_book.bids, target_vol)
+                        sell_vol, sell_rev = precomputed_sell[j][target_vol]
 
                         # We can only execute the minimum available volume across both books
                         executable_vol = min(buy_vol, sell_vol)
                         if executable_vol <= 0 or executable_vol < target_vol:
                             continue  # Book too thin for this size
 
-                        # Recalculate exactly for the executable volume
-                        _, exact_buy_cost = self._walk_book(
-                            buy_book.asks, executable_vol
-                        )
-                        _, exact_sell_rev = self._walk_book(
-                            sell_book.bids, executable_vol
-                        )
+                        exact_buy_cost = buy_cost
+                        exact_sell_rev = sell_rev
 
                         gross_revenue = exact_sell_rev - exact_buy_cost
 
@@ -146,8 +148,8 @@ class UniversalArbitrageEngine:
                         net_profit = gross_revenue - buy_fee - sell_fee
 
                         # 4. Fair Value (Average of micro-prices of both venues)
-                        mp_buy = self._calculate_micro_price(buy_book)
-                        mp_sell = self._calculate_micro_price(sell_book)
+                        mp_buy = micro_prices[i]
+                        mp_sell = micro_prices[j]
                         fv = (mp_buy + mp_sell) / 2.0
 
                         # 5. Adversarial Risk Decay
