@@ -1,95 +1,172 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "Adam Core Kernel JSON-RPC 2.0 API Schema",
-  "description": "JSON-RPC 2.0 interface for the Adam v30.1 zero-trust kernel. Exposes systemic skills, operational boundaries, state transition logging, quantitative risk simulations, and multi-agent DAG orchestration.",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://adam-core.kernel/rpc/schema",
+  "title": "Adam Core Kernel JSON-RPC 2.0 Interface",
+  "description": "Standardized schema for all System 1 and System 2 operations within the Adam zero-trust engine, including feature appendages for daily market brief multi-agent orchestration.",
   "type": "object",
-  "methods": {
-    "execute_surveillance": {
-      "description": "Trigger a continuous portfolio surveillance sweep.",
-      "params": {
-        "type": "object",
-        "properties": {
-          "portfolio_id": { "type": "string" },
-          "assets": { "type": "array", "items": { "type": "string" } }
-        },
-        "required": ["portfolio_id"]
-      },
-      "returns": { "type": "object" }
+  "required": ["jsonrpc", "method", "params", "id"],
+  "properties": {
+    "jsonrpc": {
+      "type": "string",
+      "const": "2.0"
     },
-    "evaluate_conviction": {
-      "description": "Evaluate the conviction score of a proposed agent output against risk controls.",
-      "params": {
-        "type": "object",
-        "properties": {
-          "agent_output": { "type": "string" },
-          "evidence_quality": { "type": "number", "minimum": 0, "maximum": 1 }
+    "method": {
+      "type": "string",
+      "enum": [
+        "execute_surveillance",
+        "evaluate_conviction",
+        "calculate_expected_loss",
+        "ingest_sec_edgar_filing",
+        "ingest_market_pulse",
+        "transition_state_node",
+        "log_memory_ledger",
+        "evaluate_dag_trajectory",
+        "scrape_sec_edgar",
+        "trigger_quantitative_risk_simulation",
+        "log_state_transition",
+        "track_dag_orchestration"
+      ]
+    },
+    "id": {
+      "type": ["string", "integer", "null"]
+    },
+    "params": {
+      "type": "object",
+      "oneOf": [
+        {
+          "description": "[Main] Parameters for ingesting market pulses.",
+          "properties": {
+            "stream_id": {"type": "string"},
+            "data_payload": {"type": "object"}
+          },
+          "required": ["stream_id", "data_payload"]
         },
-        "required": ["agent_output", "evidence_quality"]
-      },
-      "returns": {
-        "type": "object",
-        "properties": {
-          "conviction_score": { "type": "number" },
-          "approved": { "type": "boolean" }
+        {
+          "description": "[Main] Parameters for node state transitions.",
+          "properties": {
+            "node_id": {"type": "string"},
+            "target_state": {"type": "string"}
+          },
+          "required": ["node_id", "target_state"]
+        },
+        {
+          "description": "[Main] Parameters for DAG evaluation.",
+          "properties": {
+            "execution_graph": {"type": "object"},
+            "optimality_score": {"type": "number"}
+          },
+          "required": ["execution_graph"]
+        },
+        {
+          "description": "[Main] Parameters for System 1 Surveillance via Ticker.",
+          "properties": {
+            "asset_ticker": {"type": "string"},
+            "target_metrics": {"type": "array", "items": {"type": "string"}}
+          },
+          "required": ["asset_ticker", "target_metrics"]
+        },
+        {
+          "description": "[Main] Parameters for evaluating the conviction score against Grounding logic.",
+          "properties": {
+            "trace_id": {"type": "string"},
+            "agent_output": {"type": "object"},
+            "reference_evidence": {"type": "array", "items": {"type": "string"}}
+          },
+          "required": ["trace_id", "agent_output"]
+        },
+        {
+          "description": "[Main] Parameters for Layer 1 EL deterministic evaluation.",
+          "properties": {
+            "probability_of_default": {"type": "number", "minimum": 0, "maximum": 1},
+            "loss_given_default": {"type": "number", "minimum": 0, "maximum": 1},
+            "exposure_at_default": {"type": "number", "minimum": 0}
+          },
+          "required": ["probability_of_default", "loss_given_default", "exposure_at_default"]
+        },
+        {
+          "description": "[Main] Parameters for scraping SEC Edgar via CIK/Ticker.",
+          "properties": {
+            "cik_or_ticker": {"type": "string"},
+            "form_type": {"type": "string", "enum": ["10-K", "10-Q", "8-K"]},
+            "date_range": {
+              "type": "object",
+              "properties": {
+                "start": {"type": "string", "format": "date"},
+                "end": {"type": "string", "format": "date"}
+              }
+            }
+          },
+          "required": ["cik_or_ticker", "form_type"]
+        },
+        {
+          "description": "[Main] Parameters for appending state to the memory graph.",
+          "properties": {
+            "span_id": {"type": "string"},
+            "parent_span_id": {"type": ["string", "null"]},
+            "action_type": {"type": "string"},
+            "confidence_score": {"type": "number", "minimum": 0, "maximum": 1},
+            "extracted_facts": {"type": "integer", "description": "Information Gain Delta"}
+          },
+          "required": ["span_id", "action_type", "confidence_score"]
+        },
+        {
+          "description": "[Feature Appendage] Trigger a continuous portfolio surveillance sweep.",
+          "properties": {
+            "portfolio_id": { "type": "string" },
+            "assets": { "type": "array", "items": { "type": "string" } }
+          },
+          "required": ["portfolio_id"]
+        },
+        {
+          "description": "[Feature Appendage] Evaluate the conviction score of a proposed primitive string output.",
+          "properties": {
+            "agent_output": { "type": "string" },
+            "evidence_quality": { "type": "number", "minimum": 0, "maximum": 1 }
+          },
+          "required": ["agent_output", "evidence_quality"]
+        },
+        {
+          "description": "[Feature Appendage] Scrape and ingest SEC EDGAR filings for a given issuer via Ticker array.",
+          "properties": {
+            "ticker": { "type": "string" },
+            "filing_types": { "type": "array", "items": { "type": "string" } }
+          },
+          "required": ["ticker"]
+        },
+        {
+          "description": "[Feature Appendage] Trigger a Value-at-Risk (VaR) or Expected Loss (EL) simulation for a credit asset.",
+          "properties": {
+            "asset_id": { "type": "string" },
+            "simulation_type": { "type": "string", "enum": ["VaR", "ExpectedLoss", "StressTest"] },
+            "base_pd": { "type": "number" },
+            "lgd": { "type": "number" },
+            "ead": { "type": "number" }
+          },
+          "required": ["asset_id", "simulation_type"]
+        },
+        {
+          "description": "[Feature Appendage] Log a state transition within the multi-agent DAG.",
+          "properties": {
+            "trace_id": { "type": "string" },
+            "span_id": { "type": "string" },
+            "parent_span_id": { "type": "string" },
+            "from_state": { "type": "string" },
+            "to_state": { "type": "string" },
+            "delta_score": { "type": "number" }
+          },
+          "required": ["trace_id", "span_id", "from_state", "to_state"]
+        },
+        {
+          "description": "[Feature Appendage] Track and validate the execution lifecycle of a multi-agent DAG task.",
+          "properties": {
+            "task_id": { "type": "string" },
+            "nodes_completed": { "type": "array", "items": { "type": "string" } },
+            "current_node": { "type": "string" },
+            "information_gain": { "type": "number" }
+          },
+          "required": ["task_id", "current_node"]
         }
-      }
-    },
-    "scrape_sec_edgar": {
-      "description": "Scrape and ingest SEC EDGAR filings for a given issuer.",
-      "params": {
-        "type": "object",
-        "properties": {
-          "ticker": { "type": "string" },
-          "filing_types": { "type": "array", "items": { "type": "string" } }
-        },
-        "required": ["ticker"]
-      },
-      "returns": { "type": "object" }
-    },
-    "trigger_quantitative_risk_simulation": {
-      "description": "Trigger a Value-at-Risk (VaR) or Expected Loss (EL) simulation for a credit asset.",
-      "params": {
-        "type": "object",
-        "properties": {
-          "asset_id": { "type": "string" },
-          "simulation_type": { "type": "string", "enum": ["VaR", "ExpectedLoss", "StressTest"] },
-          "base_pd": { "type": "number" },
-          "lgd": { "type": "number" },
-          "ead": { "type": "number" }
-        },
-        "required": ["asset_id", "simulation_type"]
-      },
-      "returns": { "type": "object" }
-    },
-    "log_state_transition": {
-      "description": "Log a state transition within the multi-agent DAG.",
-      "params": {
-        "type": "object",
-        "properties": {
-          "trace_id": { "type": "string" },
-          "span_id": { "type": "string" },
-          "parent_span_id": { "type": "string" },
-          "from_state": { "type": "string" },
-          "to_state": { "type": "string" },
-          "delta_score": { "type": "number" }
-        },
-        "required": ["trace_id", "span_id", "from_state", "to_state"]
-      },
-      "returns": { "type": "object", "properties": { "status": { "type": "string" } } }
-    },
-    "track_dag_orchestration": {
-      "description": "Track and validate the execution lifecycle of a multi-agent DAG task.",
-      "params": {
-        "type": "object",
-        "properties": {
-          "task_id": { "type": "string" },
-          "nodes_completed": { "type": "array", "items": { "type": "string" } },
-          "current_node": { "type": "string" },
-          "information_gain": { "type": "number" }
-        },
-        "required": ["task_id", "current_node"]
-      },
-      "returns": { "type": "object" }
+      ]
     }
   }
 }

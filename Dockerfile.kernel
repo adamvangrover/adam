@@ -1,0 +1,82 @@
+# ==========================================
+# STAGE 1: Builder (Poetry & Dependencies)
+# ==========================================
+# Allow the user to specify a custom base image for the builder (e.g. nvidia/cuda... for ML/Quantum)
+ARG BASE_IMAGE=python:3.11-slim
+FROM ${BASE_IMAGE} as builder
+
+# Set poetry environment variables
+ENV POETRY_HOME="/opt/poetry" \
+    POETRY_VIRTUALENVS_IN_PROJECT=1 \
+    POETRY_NO_INTERACTION=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
+
+ENV PATH="$POETRY_HOME/bin:$PATH"
+
+WORKDIR /app
+
+# Install system dependencies required for building python packages and poetry
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    gcc \
+    python3-dev \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install poetry
+RUN curl -sSL https://install.python-poetry.org | python3 -
+
+# Copy pyproject.toml and poetry.lock if it exists (using a wildcard so it doesn't fail if not present)
+COPY pyproject.toml poetry.lock* ./
+
+# Install dependencies based on POETRY_EXTRAS
+# Example: --build-arg POETRY_EXTRAS="async-web observability"
+ARG POETRY_EXTRAS=""
+RUN if [ -z "$POETRY_EXTRAS" ]; then \
+      poetry install --no-root --only main; \
+    else \
+      poetry install --no-root --only main --extras "$POETRY_EXTRAS"; \
+    fi
+
+# ==========================================
+# STAGE 2: Runtime (Production Image)
+# ==========================================
+# Allow custom base image for runtime too
+ARG BASE_IMAGE=python:3.11-slim
+FROM ${BASE_IMAGE} as runner
+
+# Extra security: standard logic
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
+
+WORKDIR /app
+
+# Install only RUNTIME system dependencies
+# (Add others as needed based on the selected domains, e.g. libgomp1 for ML)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libpq5 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy the virtual environment from the builder stage
+COPY --from=builder /app/.venv /app/.venv
+ENV PATH="/app/.venv/bin:$PATH"
+
+# Create a non-root user for security
+RUN groupadd -r appuser && useradd -r -g appuser appuser
+
+# Copy application source code
+# Modify this path based on where your app logic resides (e.g., src, core)
+COPY . .
+
+# Change ownership of the app directory
+RUN chown -R appuser:appuser /app
+
+# Switch to non-root user
+USER appuser
+
+# Default port, overridden by specific node configs
+EXPOSE 8000
+
+# Default entrypoint for an API node, can be overridden per container
+CMD ["uvicorn", "src.api.main:app", "--host", "0.0.0.0", "--port", "8000"]
