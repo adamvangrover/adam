@@ -186,3 +186,7 @@
 ## 2024-05-23 - Memoization of sorting logic in HFTView
 **Learning:** Found unnecessary `O(N log N)` re-evaluations inside React component body due to sorting logic. Sorting should be memoized with `useMemo` when working with potentially large lists inside render loops, especially in high-frequency trading view components that might get frequent re-renders from parent state changes.
 **Action:** Always wrap heavy list transformations (like sort, filter over large datasets) inside `useMemo` in React components to avoid burning CPU cycles on unchanged data.
+
+## 2026-06-21 - [Optimize Nested Loop Calculations]
+**Learning:** In combinatorial search algorithms like `UniversalArbitrageEngine` which evaluate `O(E^2)` combinations across exchanges, performing inner `O(L)` order book depth walks or O(N) aggregations inside the innermost loop causes massive duplicate effort.
+**Action:** Always hoist independent properties and arrays (like `_walk_book` for varying trade sizes, or `_calculate_micro_price`) outside the nested `i, j` loops, precompute them into O(1) lookup dicts/arrays, and retrieve the pre-calculated values inside the nested loop for an immense speedup.
