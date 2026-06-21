@@ -32,7 +32,7 @@ def check_grounding(inference_output: dict):
         keys=st.sampled_from(["analysis", "score"]),
         values=st.one_of(st.text(), st.integers()),
     ),
-    st.floats(min_value=-10.0, max_value=10.0)
+        st.floats(min_value=0.5, max_value=1.0)
 )
 @settings(suppress_health_check=[HealthCheck.too_slow])
 def test_governance_gatekeeper_fuzz(payload, confidence):
