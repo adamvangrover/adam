@@ -1,0 +1,111 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://adam-core.kernel/rpc/schema",
+    "title": "Adam Core Kernel JSON-RPC 2.0 Interface",
+    "description": "Standardized schema for all System 1 and System 2 operations within the Adam zero-trust engine.",
+    "type": "object",
+    "required": ["jsonrpc", "method", "params", "id"],
+    "properties": {
+        "jsonrpc": {
+            "type": "string",
+            "const": "2.0"
+        },
+        "method": {
+            "type": "string",
+            "enum": [
+                "execute_surveillance",
+                "evaluate_conviction",
+                "calculate_expected_loss",
+                "ingest_sec_edgar_filing",
+                "ingest_market_pulse",
+                "transition_state_node",
+                "log_memory_ledger",
+                "evaluate_dag_trajectory"
+            ]
+        },
+        "id": {
+            "type": ["string", "integer", "null"]
+        },
+        "params": {
+            "type": "object",
+            "oneOf": [
+                {
+                    "description": "Parameters for ingesting market pulses.",
+                    "properties": {
+                        "stream_id": {"type": "string"},
+                        "data_payload": {"type": "object"}
+                    },
+                    "required": ["stream_id", "data_payload"]
+                },
+                {
+                    "description": "Parameters for node state transitions.",
+                    "properties": {
+                        "node_id": {"type": "string"},
+                        "target_state": {"type": "string"}
+                    },
+                    "required": ["node_id", "target_state"]
+                },
+                {
+                    "description": "Parameters for DAG evaluation.",
+                    "properties": {
+                        "execution_graph": {"type": "object"},
+                        "optimality_score": {"type": "number"}
+                    },
+                    "required": ["execution_graph"]
+                },
+                {
+                    "description": "Parameters for System 1 Surveillance.",
+                    "properties": {
+                        "asset_ticker": {"type": "string"},
+                        "target_metrics": {"type": "array", "items": {"type": "string"}}
+                    },
+                    "required": ["asset_ticker", "target_metrics"]
+                },
+                {
+                    "description": "Parameters for evaluating the conviction score against Grounding logic.",
+                    "properties": {
+                        "trace_id": {"type": "string"},
+                        "agent_output": {"type": "object"},
+                        "reference_evidence": {"type": "array", "items": {"type": "string"}}
+                    },
+                    "required": ["trace_id", "agent_output"]
+                },
+                {
+                    "description": "Parameters for Layer 1 EL deterministic evaluation.",
+                    "properties": {
+                        "probability_of_default": {"type": "number", "minimum": 0, "maximum": 1},
+                        "loss_given_default": {"type": "number", "minimum": 0, "maximum": 1},
+                        "exposure_at_default": {"type": "number", "minimum": 0}
+                    },
+                    "required": ["probability_of_default", "loss_given_default", "exposure_at_default"]
+                },
+                {
+                    "description": "Parameters for scraping SEC Edgar.",
+                    "properties": {
+                        "cik_or_ticker": {"type": "string"},
+                        "form_type": {"type": "string", "enum": ["10-K", "10-Q", "8-K"]},
+                        "date_range": {
+                            "type": "object",
+                            "properties": {
+                                "start": {"type": "string", "format": "date"},
+                                "end": {"type": "string", "format": "date"}
+                            }
+                        }
+                    },
+                    "required": ["cik_or_ticker", "form_type"]
+                },
+                {
+                    "description": "Parameters for appending state to the memory graph.",
+                    "properties": {
+                        "span_id": {"type": "string"},
+                        "parent_span_id": {"type": ["string", "null"]},
+                        "action_type": {"type": "string"},
+                        "confidence_score": {"type": "number", "minimum": 0, "maximum": 1},
+                        "extracted_facts": {"type": "integer", "description": "Information Gain Delta"}
+                    },
+                    "required": ["span_id", "action_type", "confidence_score"]
+                }
+            ]
+        }
+    }
+}
