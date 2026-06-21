@@ -1,8 +1,11 @@
+from src.governance.gatekeeper import ProvenanceHeader
 from pydantic import BaseModel
 from typing import Dict, Any, Optional
 
+
 class AgentInput(BaseModel):
     data: Dict[str, Any]
+
 
 class AgentOutput(BaseModel):
     """
@@ -10,4 +13,4 @@ class AgentOutput(BaseModel):
     """
     status: str
     result: Dict[str, Any]
-    provenance_trace: Optional[str] = None
+    provenance_trace: ProvenanceHeader
