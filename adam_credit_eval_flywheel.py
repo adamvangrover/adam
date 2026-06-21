@@ -134,6 +134,8 @@ prompts_to_test = {
 
 def mock_adam_agent(instruction: str):
     def _callable(prompt: str) -> str:
+        import uuid
+        import json
         try:
             from google.genai import Client
             genai_client = Client()
@@ -142,9 +144,27 @@ def mock_adam_agent(instruction: str):
                 contents=prompt,
                 config=genai_types.GenerateContentConfig(system_instruction=instruction)
             )
-            return response.text
+            text_response = response.text
         except:
-            return '{"expected_loss": 100000.0}'
+            text_response = '{"expected_loss": 100000.0}'
+
+        trace_id = str(uuid.uuid4())
+        span_id = str(uuid.uuid4())
+
+        payload = {
+            "TraceID": trace_id,
+            "SpanID": span_id,
+            "ParentSpanID": None,
+            "response": text_response
+        }
+
+        # log trace
+        try:
+            Flywheel().execute_trace(payload)
+        except Exception:
+            pass
+
+        return json.dumps(payload)
     return _callable
 
 out_dir = Path("artifacts/grade_results")
