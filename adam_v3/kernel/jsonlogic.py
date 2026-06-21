@@ -1,5 +1,8 @@
 import json
+from json_logic import jsonLogic
+
 
 class JsonLogicEvaluator:
+
     def evaluate(self, rule, data):
-        return True
+        return jsonLogic(rule, data)
