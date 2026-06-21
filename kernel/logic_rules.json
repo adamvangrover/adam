@@ -1,0 +1,73 @@
+{
+  "system": "Adam_v30.1_Core_Kernel",
+  "version": "1.0.0",
+  "description": "Deterministic JSONLogic evaluation matrix. Outputs dictate DAG state transitions and hard-stop failures.",
+  "rules": {
+
+    "rule_01_covenant_failure_trigger": {
+      "description": "Automatic failure trigger if covenants are missing from a definitive annual filing.",
+      "condition": {
+        "and": [
+          { "==": [{ "var": "filing_data.form_type" }, "10-K"] },
+          { "==": [{ "var": "filing_data.covenants_detected" }, false] }
+        ]
+      },
+      "action": "FAIL_AND_TERMINATE",
+      "error_code": "ERR_MISSING_COVENANTS"
+    },
+
+    "rule_02_pd_boundary_constraint": {
+      "description": "Flags high-risk exposures for enhanced simulation. If PD > 15%, forces the DAG to route to the System 3 Quantum/VaR solver.",
+      "condition": {
+        ">": [{ "var": "risk_metrics.base_pd" }, 0.15]
+      },
+      "action": "ROUTE_TO_QUANT_SOLVER",
+      "error_code": null
+    },
+
+    "rule_03_uncertainty_calibration": {
+      "description": "Layer 8 Evaluation: Penalizes 100% confidence outputs that lack sufficient evidence quality. Detects LLM overconfidence hallucinations.",
+      "condition": {
+        "and": [
+          { "==": [{ "var": "evaluation.agent_confidence" }, 1.0] },
+          { "<": [{ "var": "evaluation.evidence_quality_score" }, 0.85] }
+        ]
+      },
+      "action": "RECURSE_AND_PENALIZE",
+      "error_code": "WARN_CALIBRATION_MISMATCH"
+    },
+
+    "rule_04_information_gain_efficiency": {
+      "description": "Layer 6 Evaluation: Calculates len(new_facts) / tool_calls. If zero facts are extracted after 3+ tool calls, force recursion.",
+      "condition": {
+        "and": [
+          { "==": [{ "var": "trace_ledger.new_facts_extracted" }, 0] },
+          { ">": [{ "var": "trace_ledger.tool_calls_used" }, 3] }
+        ]
+      },
+      "action": "RECURSE_AGENT_LOOP",
+      "error_code": "WARN_INEFFICIENT_TOOL_USAGE"
+    },
+
+    "rule_05_macro_physics_contradiction": {
+      "description": "Layer 10 Evaluation: Catches logical contradictions. If GDP growth is negative and the system attempts a rating upgrade, block the action.",
+      "condition": {
+        "and": [
+          { "<": [{ "var": "macro_environment.gdp_growth_bps" }, 0] },
+          { "in": [{ "var": "proposed_action.rating_direction" }, ["UPGRADE", "POSITIVE_WATCH"]] }
+        ]
+      },
+      "action": "FAIL_AND_REQUIRE_OVERRIDE",
+      "error_code": "ERR_MACRO_CONTRADICTION"
+    },
+
+    "rule_06_liquidity_drift_alert": {
+      "description": "Continuous Surveillance: If the lookback window detects a liquidity flag, immediately suspend normal DAG flow and trigger a risk alert.",
+      "condition": {
+        "==": [{ "var": "surveillance.liquidity_flag" }, "CRITICAL_DRIFT"]
+      },
+      "action": "HALT_AND_ALERT",
+      "error_code": "ERR_LIQUIDITY_BREACH"
+    }
+  }
+}
