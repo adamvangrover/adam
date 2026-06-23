@@ -1,0 +1,234 @@
+import React, { useState, useMemo } from 'react';
+
+// Standard Normal Cumulative Distribution Function (CDF) Approximation
+function normalCDF(x) {
+    const sign = x < 0 ? -1 : 1;
+    const xAbs = Math.abs(x) / Math.sqrt(2);
+    const t = 1.0 / (1.0 + 0.3275911 * xAbs);
+    const a1 =  0.254829592;
+    const a2 = -0.284496736;
+    const a3 =  1.421413741;
+    const a4 = -1.453152027;
+    const a5 =  1.061405429;
+    const erf = 1 - ((((a5 * t + a4) * t + a3) * t + a2) * t + a1) * t * Math.exp(-xAbs * xAbs);
+    return 0.5 * (1 + sign * erf);
+}
+
+// Lognormal Probability Density Function (PDF)
+function lognormalPDF(x, mean, variance) {
+    if (x <= 0) return 0;
+    const sd = Math.sqrt(variance);
+    return (1 / (x * sd * Math.sqrt(2 * Math.PI))) * Math.exp(-Math.pow(Math.log(x) - mean, 2) / (2 * variance));
+}
+
+export default function MertonSimulator() {
+    // Core parameters (defaulted to the June 22 market drift baseline)
+    const [assetValue, setAssetValue] = useState(100);
+    const [debtPoint, setDebtPoint] = useState(70);
+    const [volatility, setVolatility] = useState(0.20);
+    const [riskFreeRate, setRiskFreeRate] = useState(0.045); // 4.5% baseline
+    const [timeHorizon, setTimeHorizon] = useState(1.0);
+
+    // Calculate Distance to Default (DD) and Probability of Default (PD)
+    const { DD, PD, chartData, chartMeta } = useMemo(() => {
+        // Merton Model Calculations
+        const expectedReturn = riskFreeRate;
+        const drift = expectedReturn - (volatility * volatility) / 2;
+        
+        const ddNumerator = Math.log(assetValue / debtPoint) + (drift * timeHorizon);
+        const ddDenominator = volatility * Math.sqrt(timeHorizon);
+        const calculatedDD = ddNumerator / ddDenominator;
+        const calculatedPD = normalCDF(-calculatedDD);
+
+        // Chart Distribution Parameters
+        const meanLog = Math.log(assetValue) + (drift * timeHorizon);
+        const varianceLog = (volatility * volatility) * timeHorizon;
+        
+        // Dynamic Chart Boundaries
+        const sdLog = Math.sqrt(varianceLog);
+        const xMin = Math.max(1, Math.exp(meanLog - 3.5 * sdLog));
+        const xMax = Math.max(200, Math.exp(meanLog + 3 * sdLog), assetValue * 1.5, debtPoint * 1.5);
+        
+        // Generate Curve Points
+        const points = 250;
+        const data = [];
+        let maxY = 0;
+        
+        for (let i = 0; i <= points; i++) {
+            const x = xMin + (i / points) * (xMax - xMin);
+            const y = lognormalPDF(x, meanLog, varianceLog);
+            if (y > maxY) maxY = y;
+            data.push({ x, y });
+        }
+
+        return {
+            DD: calculatedDD,
+            PD: calculatedPD,
+            chartData: data,
+            chartMeta: { xMin, xMax, maxY: Math.max(maxY, 0.0001) }
+        };
+    }, [assetValue, debtPoint, volatility, riskFreeRate, timeHorizon]);
+
+    // SVG Rendering Constants
+    const SVG_WIDTH = 800;
+    const SVG_HEIGHT = 350;
+    const PADDING = 50;
+
+    const getX = (val) => PADDING + ((val - chartMeta.xMin) / (chartMeta.xMax - chartMeta.xMin)) * (SVG_WIDTH - 2 * PADDING);
+    const getY = (val) => SVG_HEIGHT - PADDING - (val / chartMeta.maxY) * (SVG_HEIGHT - 2 * PADDING);
+
+    // Path Generation
+    const fullCurvePath = chartData.map((d, i) => `${i === 0 ? 'M' : 'L'} ${getX(d.x)} ${getY(d.y)}`).join(' ');
+    
+    const defaultData = chartData.filter(d => d.x <= debtPoint);
+    let defaultAreaPath = '';
+    if (defaultData.length > 0) {
+        defaultAreaPath = defaultData.map((d, i) => `${i === 0 ? 'M' : 'L'} ${getX(d.x)} ${getY(d.y)}`).join(' ');
+        const lastPoint = defaultData[defaultData.length - 1];
+        const firstPoint = defaultData[0];
+        defaultAreaPath += ` L ${getX(lastPoint.x)} ${getY(0)} L ${getX(firstPoint.x)} ${getY(0)} Z`;
+    }
+
+    // Dynamic Risk Status Color
+    const getStatusColor = (pd) => {
+        if (pd < 0.03) return 'text-emerald-400 border-emerald-400/30';
+        if (pd < 0.08) return 'text-amber-400 border-amber-400/30';
+        return 'text-rose-500 border-rose-500/30';
+    };
+
+    return (
+        <div className="min-h-screen bg-slate-950 text-slate-300 font-sans p-6 overflow-hidden select-none">
+            {/* Header Area */}
+            <div className="flex items-center justify-between mb-8 pb-4 border-b border-slate-800">
+                <div>
+                    <h1 className="text-2xl font-semibold text-slate-100 flex items-center gap-2">
+                        <svg className="w-6 h-6 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                        Adam OS v30.1: Merton Distance-to-Default
+                    </h1>
+                    <p className="text-sm text-slate-500 mt-1">Real-time lognormal asset simulation and structural default probability</p>
+                </div>
+                <div className="text-right">
+                    <span className="text-xs tracking-wider text-slate-500 uppercase font-mono">Execution Env</span>
+                    <div className="flex items-center gap-2 mt-1">
+                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span className="text-sm font-mono text-cyan-400">FEDERATED_WEIGHTS_SYNCED</span>
+                    </div>
+                </div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                {/* Control Panel */}
+                <div className="lg:col-span-1 space-y-6 bg-slate-900/50 p-6 rounded-xl border border-slate-800/60">
+                    <h2 className="text-sm font-bold tracking-widest text-slate-400 uppercase mb-4">Macro & Asset Parameters</h2>
+                    
+                    {/* Control: Asset Volatility */}
+                    <div className="space-y-2">
+                        <div className="flex justify-between text-sm">
+                            <label className="text-slate-300">Asset Volatility (σ)</label>
+                            <span className="font-mono text-cyan-400">{(volatility * 100).toFixed(1)}%</span>
+                        </div>
+                        <input type="range" min="0.05" max="0.80" step="0.01" value={volatility} onChange={(e) => setVolatility(parseFloat(e.target.value))} className="w-full accent-cyan-500 cursor-pointer" />
+                        <p className="text-xs text-slate-600">Simulates market uncertainty / rate shock.</p>
+                    </div>
+
+                    {/* Control: Expected Return / Risk Free Rate */}
+                    <div className="space-y-2">
+                        <div className="flex justify-between text-sm">
+                            <label className="text-slate-300">Expected Return (µ) / Fed Rate</label>
+                            <span className="font-mono text-cyan-400">{(riskFreeRate * 100).toFixed(2)}%</span>
+                        </div>
+                        <input type="range" min="0.01" max="0.15" step="0.005" value={riskFreeRate} onChange={(e) => setRiskFreeRate(parseFloat(e.target.value))} className="w-full accent-cyan-500 cursor-pointer" />
+                        <p className="text-xs text-slate-600">Drift parameter representing current base rates.</p>
+                    </div>
+
+                    {/* Control: Debt Threshold */}
+                    <div className="space-y-2">
+                        <div className="flex justify-between text-sm">
+                            <label className="text-slate-300">Debt Default Point (D)</label>
+                            <span className="font-mono text-rose-400">${debtPoint}</span>
+                        </div>
+                        <input type="range" min="20" max="180" step="1" value={debtPoint} onChange={(e) => setDebtPoint(parseFloat(e.target.value))} className="w-full accent-rose-500 cursor-pointer" />
+                        <p className="text-xs text-slate-600">Total short-term debt + 50% long-term debt.</p>
+                    </div>
+
+                    {/* Control: Initial Asset Value */}
+                    <div className="space-y-2 pt-4 border-t border-slate-800/60">
+                        <div className="flex justify-between text-sm">
+                            <label className="text-slate-300">Initial Asset Value (V₀)</label>
+                            <span className="font-mono text-blue-400">${assetValue}</span>
+                        </div>
+                        <input type="range" min="50" max="250" step="1" value={assetValue} onChange={(e) => setAssetValue(parseFloat(e.target.value))} className="w-full accent-blue-500 cursor-pointer" />
+                    </div>
+
+                    {/* Control: Time Horizon */}
+                    <div className="space-y-2 pt-4 border-t border-slate-800/60">
+                        <div className="flex justify-between text-sm">
+                            <label className="text-slate-300">Time Horizon (T)</label>
+                            <span className="font-mono text-slate-300">{timeHorizon.toFixed(1)} Years</span>
+                        </div>
+                        <input type="range" min="0.5" max="5.0" step="0.1" value={timeHorizon} onChange={(e) => setTimeHorizon(parseFloat(e.target.value))} className="w-full accent-slate-500 cursor-pointer" />
+                    </div>
+                </div>
+
+                {/* Visualization & Metrics Panel */}
+                <div className="lg:col-span-2 flex flex-col gap-6">
+                    
+                    {/* Live Output Metrics */}
+                    <div className="grid grid-cols-2 gap-6">
+                        <div className={`p-6 rounded-xl border bg-slate-900/50 flex flex-col justify-center items-center text-center transition-colors duration-300 ${getStatusColor(PD)}`}>
+                            <span className="text-sm font-semibold tracking-wide uppercase opacity-80 mb-2">1-Year Probability of Default (PD)</span>
+                            <span className="text-5xl font-mono font-bold">{(PD * 100).toFixed(2)}%</span>
+                        </div>
+                        <div className="p-6 rounded-xl border border-slate-800/60 bg-slate-900/50 flex flex-col justify-center items-center text-center">
+                            <span className="text-sm font-semibold tracking-wide uppercase text-slate-400 mb-2">Distance to Default (DD)</span>
+                            <span className="text-5xl font-mono font-bold text-slate-100">{DD.toFixed(3)}</span>
+                            <span className="text-xs text-slate-500 mt-2 block">Standard Deviations (σ)</span>
+                        </div>
+                    </div>
+
+                    {/* SVG Chart */}
+                    <div className="bg-slate-900 border border-slate-800/80 rounded-xl relative overflow-hidden flex-1 min-h-[400px]">
+                        <div className="absolute top-4 left-6 z-10 flex gap-4 text-xs font-mono">
+                            <div className="flex items-center gap-2"><span className="w-3 h-3 bg-cyan-500 rounded-sm"></span> Asset Distribution</div>
+                            <div className="flex items-center gap-2"><span className="w-3 h-3 bg-rose-500 rounded-sm opacity-60"></span> Default Region</div>
+                        </div>
+
+                        <svg viewBox={`0 0 ${SVG_WIDTH} ${SVG_HEIGHT}`} className="w-full h-full text-slate-400 preserve-3d">
+                            
+                            {/* Grid Lines */}
+                            {[0, 0.25, 0.5, 0.75, 1].map(tick => (
+                                <line key={tick} x1={PADDING} y1={getY(chartMeta.maxY * tick)} x2={SVG_WIDTH - PADDING} y2={getY(chartMeta.maxY * tick)} stroke="#334155" strokeDasharray="4 4" strokeWidth="1" opacity="0.4" />
+                            ))}
+
+                            {/* Base Axis line */}
+                            <line x1={PADDING} y1={getY(0)} x2={SVG_WIDTH - PADDING} y2={getY(0)} stroke="#475569" strokeWidth="2" />
+
+                            {/* Default Region Area Fill */}
+                            <path d={defaultAreaPath} fill="rgba(244, 63, 94, 0.25)" stroke="none" />
+
+                            {/* Lognormal Curve */}
+                            <path d={fullCurvePath} fill="none" stroke="#06b6d4" strokeWidth="3" style={{ filter: 'drop-shadow(0px 4px 6px rgba(6,182,212,0.3))' }} />
+
+                            {/* Debt Point Vertical Marker */}
+                            <line x1={getX(debtPoint)} y1={PADDING - 20} x2={getX(debtPoint)} y2={getY(0)} stroke="#f43f5e" strokeWidth="2" strokeDasharray="6 4" />
+                            <text x={getX(debtPoint)} y={PADDING - 30} fill="#f43f5e" textAnchor="middle" fontSize="12" fontWeight="bold" className="font-mono">
+                                Threshold (${debtPoint})
+                            </text>
+
+                            {/* Initial Asset Vertical Marker */}
+                            <line x1={getX(assetValue)} y1={PADDING - 20} x2={getX(assetValue)} y2={getY(0)} stroke="#3b82f6" strokeWidth="2" strokeDasharray="4 4" opacity="0.8" />
+                            <text x={getX(assetValue)} y={PADDING - 30} fill="#60a5fa" textAnchor="middle" fontSize="12" className="font-mono">
+                                V₀ (${assetValue})
+                            </text>
+
+                            {/* X-Axis Labels */}
+                            <text x={PADDING} y={SVG_HEIGHT - 15} fill="#64748b" fontSize="11" textAnchor="middle" className="font-mono">{chartMeta.xMin.toFixed(0)}</text>
+                            <text x={SVG_WIDTH - PADDING} y={SVG_HEIGHT - 15} fill="#64748b" fontSize="11" textAnchor="middle" className="font-mono">{chartMeta.xMax.toFixed(0)}</text>
+                            <text x={SVG_WIDTH / 2} y={SVG_HEIGHT - 5} fill="#475569" fontSize="12" textAnchor="middle" fontWeight="bold" className="tracking-widest">FUTURE ASSET VALUE DISTRIBUTION (V_T)</text>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
