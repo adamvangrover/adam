@@ -1,4 +1,4 @@
-from src.governance.gatekeeper import ProvenanceHeader
+from src.pdil.models import ProvenanceHeader
 from pydantic import BaseModel
 from typing import Dict, Any, Optional
 
