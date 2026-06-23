@@ -1,6 +1,6 @@
 import pytest
 from adam_v3.kernel.schema import AgentInput, AgentOutput
-from src.governance.gatekeeper import ProvenanceHeader
+from src.pdil.models import ProvenanceHeader
 
 def test_provenance_trace_set():
     header = ProvenanceHeader(
