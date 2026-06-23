@@ -1,6 +1,6 @@
 from typing import Any, Dict
 from pydantic import BaseModel, Field
-from src.governance.gatekeeper import ProvenanceHeader
+from src.pdil.models import ProvenanceHeader
 
 
 class AgentInput(BaseModel):

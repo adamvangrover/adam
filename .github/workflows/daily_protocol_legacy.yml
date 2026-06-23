@@ -1,0 +1,20 @@
+name: Daily Ritual & Flywheel Evaluation (Legacy)
+
+on:
+  schedule:
+    - cron: '0 8 * * *'
+  workflow_dispatch:
+
+jobs:
+  daily_ritual_legacy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: pip install -r requirements/legacy.txt
+      - name: Run Daily Ritual (Legacy)
+        run: python daily_ritual/daily_ritual.py
