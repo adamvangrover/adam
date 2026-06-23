@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM v26.1 | Market Mayhem Terminal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+        
+        :root {
+            --bg-main: #f8f7f4;
+            --card-bg: #ffffff;
+            --accent-slate: #334155;
+            --accent-amber: #d97706;
+            --text-primary: #1e293b;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+        }
+
+        .mono { font-family: 'JetBrains Mono', monospace; }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 320px;
+            max-height: 400px;
+        }
+
+        .tab-active {
+            border-bottom: 3px solid var(--accent-slate);
+            color: var(--accent-slate);
+            font-weight: 600;
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+        }
+
+        .risk-flash {
+            animation: pulse-amber 2s infinite;
+        }
+
+        @keyframes pulse-amber {
+            0% { background-color: rgba(217, 119, 6, 0.1); }
+            50% { background-color: rgba(217, 119, 6, 0.25); }
+            100% { background-color: rgba(217, 119, 6, 0.1); }
+        }
+    </style>
+</head>
+<body class="min-h-screen pb-12">
+
+    <!-- Header / Global Status Bar -->
+    <header class="sticky top-0 z-50 w-full border-b bg-white/90 backdrop-blur-md px-4 py-3">
+        <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-4">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-slate-800 flex items-center justify-center rounded shadow-lg">
+                    <span class="text-white font-bold text-xl">A</span>
+                </div>
+                <div>
+                    <h1 class="text-sm font-bold tracking-tighter uppercase text-slate-800">ADAM v26.1 Swarm Intelligence</h1>
+                    <p class="text-[10px] mono text-slate-500">System 2 Consensus Engine // Risk Sub-Swarm</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center space-x-6 text-[11px] mono uppercase tracking-widest border-l pl-6 hidden md:flex">
+                <div>
+                    <span class="text-slate-400">Date:</span>
+                    <span class="text-slate-900 ml-1">JUN 22, 2026</span>
+                </div>
+                <div>
+                    <span class="text-slate-400">Clearance:</span>
+                    <span class="text-slate-900 ml-1 font-bold">CRO / MD</span>
+                </div>
+                <div class="flex items-center">
+                    <span class="text-slate-400 mr-2">Conviction:</span>
+                    <span class="px-2 py-0.5 bg-green-100 text-green-700 rounded font-bold">94%</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 mt-8">
+        <!-- Dashboard Summary -->
+        <section class="mb-10">
+            <div class="bg-white rounded-xl shadow-sm border p-6 md:p-8">
+                <h2 class="text-2xl font-bold mb-4">Executive Situational Briefing</h2>
+                <p class="text-slate-600 leading-relaxed max-w-4xl">
+                    As we enter the trading week of June 22, 2026, the macro environment faces a dangerous divergence. Equity indices price for a flawless soft-landing, but ADAM detects "amber" stress indicators in private credit, energy, and AI capex structures. We are entering a regime of militarized permacrisis.
+                </p>
+            </div>
+        </section>
+
+        <!-- Navigation Tabs -->
+        <nav class="flex space-x-8 border-b mb-8 overflow-x-auto">
+            <button onclick="switchTab('credit')" id="tab-credit" class="tab-btn pb-3 px-1 text-sm uppercase tracking-wider tab-active transition-all">1. Private Credit</button>
+            <button onclick="switchTab('geo')" id="tab-geo" class="tab-btn pb-3 px-1 text-sm uppercase tracking-wider text-slate-400 transition-all">2. Geopolitics</button>
+            <button onclick="switchTab('ai')" id="tab-ai" class="tab-btn pb-3 px-1 text-sm uppercase tracking-wider text-slate-400 transition-all">3. AI Disruption</button>
+            <button onclick="switchTab('action')" id="tab-action" class="tab-btn pb-3 px-1 text-sm uppercase tracking-wider text-slate-400 transition-all font-bold">Action Plan</button>
+        </nav>
+
+        <!-- Section: Private Credit -->
+        <section id="content-credit" class="tab-content block animate-in fade-in duration-500">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+                <div class="space-y-6">
+                    <div class="p-4 rounded-lg risk-flash border-l-4 border-amber-500">
+                        <h3 class="font-bold text-amber-800">Shadow Contagion Alert</h3>
+                        <p class="text-sm text-amber-700">The "Amend and Extend" illusion is masking true distress levels. Synthetic default models suggest a 178% variance from reported figures.</p>
+                    </div>
+                    <div class="prose prose-slate">
+                        <h4 class="text-xl font-semibold">The Illusion of Stability</h4>
+                        <p>The private credit market has exploded to over <strong>$1.8 Trillion</strong>. While Tier 1 banks are regulated, five mega-funds now control 65% of middle-market LBO financing. This concentration creates a singular point of failure.</p>
+                        <ul class="text-sm space-y-2 text-slate-600 list-disc pl-5">
+                            <li><strong>Synthetic Default Divergence:</strong> PIK (Payment-in-Kind) toggle notes are being used to hide defaults.</li>
+                            <li><strong>Concentration Risk:</strong> Top 5 direct lenders own the majority of recent deal flow.</li>
+                            <li><strong>Margin Call Vulnerability:</strong> Tier 1 leverage facilities are directly exposed to NAV writedowns.</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-xl border shadow-sm">
+                    <h4 class="text-sm font-bold text-slate-500 uppercase mb-4 text-center">Default Rate: Reported vs. Synthetic (%)</h4>
+                    <div class="chart-container">
+                        <canvas id="creditChart"></canvas>
+                    </div>
+                    <p class="text-[10px] text-slate-400 mt-4 italic text-center">Source: ADAM Internal Liquidity Model v26.1</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Geopolitics -->
+        <section id="content-geo" class="tab-content hidden animate-in fade-in duration-500">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+                <div class="bg-white p-6 rounded-xl border shadow-sm order-2 lg:order-1">
+                    <h4 class="text-sm font-bold text-slate-500 uppercase mb-4 text-center">Militarized Friction Metrics</h4>
+                    <div class="chart-container">
+                        <canvas id="geoChart"></canvas>
+                    </div>
+                </div>
+                <div class="space-y-6 order-1 lg:order-2">
+                    <div class="prose prose-slate">
+                        <h4 class="text-xl font-semibold">Militarized Permacrisis</h4>
+                        <p>Hyper-optimized logistics have been replaced by strategic friction. Shipping and supply chain stability are now secondary to geopolitical positioning.</p>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
+                            <div class="bg-slate-100 p-4 rounded border-t-2 border-slate-800">
+                                <span class="block text-2xl font-bold">+400%</span>
+                                <span class="text-xs uppercase text-slate-500">Insurance Premiums</span>
+                            </div>
+                            <div class="bg-slate-100 p-4 rounded border-t-2 border-slate-800">
+                                <span class="block text-2xl font-bold">+14 Weeks</span>
+                                <span class="text-xs uppercase text-slate-500">EUV Lead Time</span>
+                            </div>
+                        </div>
+                        <p class="text-sm mt-6 text-slate-600">
+                            Persistent drone harassment in the Strait of Hormuz has added a permanent <strong>$12 friction premium</strong> to Brent Crude. Meanwhile, critical minerals (Graphite, Gallium) are being weaponized to strangle Western defense production.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: AI Disruption -->
+        <section id="content-ai" class="tab-content hidden animate-in fade-in duration-500">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+                <div class="space-y-6">
+                    <div class="bg-white p-6 rounded-xl border-l-4 border-slate-800 shadow-sm">
+                        <h4 class="text-xl font-semibold mb-2">The Utilization Gap</h4>
+                        <p class="text-sm text-slate-600">While infrastructure spending is parabolic, enterprise software monetization is stalling at the "Proof of Concept" phase due to data governance and liability fears.</p>
+                    </div>
+                    <div class="prose prose-slate">
+                        <h4 class="text-lg font-bold uppercase tracking-tight">The Build It or Die Paradigm</h4>
+                        <p>Global capex on AI infrastructure is projected to exceed <strong>$350 Billion annually by 2027</strong>. This capital detachment from historical risk premia echoes the 2000 fiber-optic crash.</p>
+                        <div class="p-4 bg-red-50 rounded border border-red-100 mt-4">
+                            <h5 class="text-red-800 font-bold text-sm mb-1 uppercase">Terminal Shock Scenario</h5>
+                            <p class="text-xs text-red-700">If monetization fails by Q4 2026, hyperscalers will slash orders, triggering a violent re-rating of the semiconductor supply chain.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-xl border shadow-sm">
+                    <h4 class="text-sm font-bold text-slate-500 uppercase mb-4 text-center">AI Infrastructure Capex Projection ($B)</h4>
+                    <div class="chart-container">
+                        <canvas id="aiChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Action Plan -->
+        <section id="content-action" class="tab-content hidden animate-in fade-in duration-500">
+            <div class="max-w-3xl mx-auto">
+                <div class="bg-slate-900 text-white p-8 rounded-xl shadow-xl">
+                    <h2 class="text-2xl font-bold mb-6 flex items-center">
+                        <span class="mr-3">⚡</span> CRO MANDATORY ACTION PLAN
+                    </h2>
+                    
+                    <div class="space-y-4" id="action-checklist">
+                        <!-- Items injected via JS -->
+                    </div>
+
+                    <div class="mt-10 pt-6 border-t border-slate-700 flex justify-between items-center">
+                        <div>
+                            <p class="text-xs text-slate-400 uppercase tracking-widest">Auth Signature</p>
+                            <p class="mono text-sm italic">ADAM_System2_Consensus</p>
+                        </div>
+                        <button onclick="window.print()" class="px-6 py-2 bg-white text-slate-900 rounded font-bold text-sm hover:bg-slate-200 transition-colors">
+                            EXPORT PROTOCOL
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        // Data and State
+        const actionItems = [
+            { id: 1, text: "Stress test all warehouse lines and repo facilities for alt-asset managers.", category: "Credit" },
+            { id: 2, text: "Initiate delta-hedging strategies against SOXX index for semi-exposed clients.", category: "Tech" },
+            { id: 3, text: "Adjust raw material cost models for heavy industrial clients (+15% baseline).", category: "Geo" },
+            { id: 4, text: "Hedge private credit exposure via CDX High Yield receiver options.", category: "Credit" },
+            { id: 5, text: "Audit manufacturing clients for South Korean sub-assembly dependency.", category: "Geo" },
+            { id: 6, text: "Mandate rigorous underwriting for tech sector M&A/IPOs.", category: "Tech" }
+        ];
+
+        // UI Initialization
+        window.onload = () => {
+            initCharts();
+            renderActionPlan();
+        };
+
+        // Navigation Logic
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(b => {
+                b.classList.remove('tab-active');
+                b.classList.add('text-slate-400');
+            });
+
+            document.getElementById(`content-${tabId}`).classList.remove('hidden');
+            document.getElementById(`tab-${tabId}`).classList.add('tab-active');
+            document.getElementById(`tab-${tabId}`).classList.remove('text-slate-400');
+        }
+
+        function renderActionPlan() {
+            const container = document.getElementById('action-checklist');
+            container.innerHTML = actionItems.map(item => `
+                <div class="flex items-start space-x-4 p-3 hover:bg-slate-800 rounded transition-colors group cursor-pointer" onclick="toggleItem(${item.id})">
+                    <div id="check-${item.id}" class="mt-1 w-5 h-5 border-2 border-slate-600 rounded flex items-center justify-center group-hover:border-slate-400">
+                        <div class="hidden w-2.5 h-2.5 bg-amber-500 rounded-sm"></div>
+                    </div>
+                    <div class="flex-1">
+                        <span class="text-xs font-bold text-slate-500 uppercase mono">${item.category}</span>
+                        <p class="text-sm text-slate-200">${item.text}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function toggleItem(id) {
+            const dot = document.querySelector(`#check-${id} div`);
+            dot.classList.toggle('hidden');
+        }
+
+        // Visualization Logic
+        function initCharts() {
+            // Credit Chart
+            new Chart(document.getElementById('creditChart'), {
+                type: 'bar',
+                data: {
+                    labels: ['Reported (BSL)', 'Synthetic (ADAM)'],
+                    datasets: [{
+                        label: 'Default Rate %',
+                        data: [3.2, 8.9],
+                        backgroundColor: ['#e2e8f0', '#d97706'],
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    responsive: true,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { 
+                            beginAtZero: true,
+                            grid: { color: '#f1f5f9' },
+                            ticks: { callback: v => v + '%' }
+                        },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+
+            // Geopolitical Chart
+            new Chart(document.getElementById('geoChart'), {
+                type: 'bar',
+                data: {
+                    labels: ['Shipping Premium', 'EUV Lead Time', 'Raw Material Vol'],
+                    datasets: [{
+                        label: 'Increase vs Baseline (%)',
+                        data: [400, 140, 15],
+                        backgroundColor: '#334155',
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    responsive: true,
+                    indexAxis: 'y',
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { 
+                            grid: { color: '#f1f5f9' },
+                            ticks: { callback: v => v + '%' }
+                        }
+                    }
+                }
+            });
+
+            // AI Capex Chart
+            new Chart(document.getElementById('aiChart'), {
+                type: 'line',
+                data: {
+                    labels: ['2023', '2024', '2025', '2026(E)', '2027(P)'],
+                    datasets: [{
+                        label: 'Annual Capex ($B)',
+                        data: [120, 185, 240, 310, 350],
+                        borderColor: '#1e293b',
+                        backgroundColor: 'rgba(30, 41, 59, 0.05)',
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 6,
+                        pointBackgroundColor: '#1e293b'
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    responsive: true,
+                    plugins: { tooltip: { mode: 'index', intersect: false } },
+                    scales: {
+                        y: { 
+                            grid: { color: '#f1f5f9' },
+                            ticks: { callback: v => '$' + v + 'B' }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
