@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Market Mayhem | Daily Risk Intelligence</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+        
+        :root {
+            --bg-primary: #F8F9FA;
+            --card-bg: #FFFFFF;
+            --accent-indigo: #3F51B5;
+            --risk-red: #D32F2F;
+            --safe-green: #388E3C;
+            --text-main: #1A1A1B;
+            --text-muted: #4B5563;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-main);
+            overflow-x: hidden;
+        }
+
+        .mono { font-family: 'JetBrains Mono', monospace; }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+
+        @media (min-width: 768px) {
+            .chart-container { height: 350px; }
+        }
+
+        .glass-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(0,0,0,0.05);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: transform 0.2s ease;
+        }
+
+        .risk-gradient {
+            background: linear-gradient(90deg, #388E3C 0%, #FBC02D 50%, #D32F2F 100%);
+        }
+
+        .nav-link {
+            cursor: pointer;
+            position: relative;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 0;
+            background-color: var(--accent-indigo);
+            transition: width 0.3s;
+        }
+
+        .nav-link.active::after {
+            width: 100%;
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <!-- Chosen Palette: Warm Professionalism (Neutral Off-white base with Indigo and Crimson accents) -->
+    
+    <!-- Application Structure Plan: 
+        1. Executive View: Top-level macro 'Gravity' display (10Y Yield impact).
+        2. Credit Mechanics: Interactive comparison of Lien pricing and BSL yields.
+        3. Asset Matrix: A filterable explorer for Equities and Alternatives.
+        4. Model Impact: Dynamic section showing how data inputs change DCF, LGD, and PD assumptions.
+        This structure prioritizes 'The Gravity' of the 4.51% yield as the central axis, allowing users to see its ripple effects through secondary markets.
+    -->
+
+    <!-- Visualization & Content Choices: 
+        1. Macro Gravity -> Gauge Chart -> Shows the 4.51% relative to historical thresholds -> Chart.js.
+        2. Credit Bifurcation -> Grouped Bar Chart -> Compares 1st vs 2nd Lien Pricing gap -> Chart.js.
+        3. Global Equities -> Interactive Table with Trend Indicators -> Tailwind Grid + JS Sorting.
+        4. Model Targets -> Tooltip/Card system -> Explains PD, LGD, and EV targets per asset.
+        Confirmation: NO SVG graphics used. NO Mermaid JS used. All visuals Canvas-based.
+    -->
+
+    <!-- Header & Navigation -->
+    <header class="border-b bg-white sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="w-8 h-8 bg-black flex items-center justify-center rounded">
+                    <span class="text-white font-bold text-xl">M</span>
+                </div>
+                <h1 class="text-xl font-bold tracking-tight">MARKET MAYHEM <span class="text-gray-400 font-light ml-2">22.06.26</span></h1>
+            </div>
+            <nav class="hidden md:flex space-x-8 text-sm font-medium uppercase tracking-widest text-gray-500">
+                <span class="nav-link active" onclick="scrollToSection('overview')">Overview</span>
+                <span class="nav-link" onclick="scrollToSection('credit')">Credit</span>
+                <span class="nav-link" onclick="scrollToSection('assets')">Assets</span>
+            </nav>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- SECTION: Overview (The Gravity) -->
+        <section id="overview" class="mb-16 scroll-mt-24">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                <div class="lg:col-span-7">
+                    <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-red-50 text-red-700 text-xs font-bold mb-4">
+                        <span class="relative flex h-2 w-2">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+                        </span>
+                        <span>CRITICAL MACRO JUNCTURE</span>
+                    </div>
+                    <h2 class="text-4xl font-extrabold text-gray-900 mb-6 leading-tight">
+                        The Gravity of <span class="text-indigo-600">4.51%</span>
+                    </h2>
+                    <p class="text-lg text-gray-600 mb-6 leading-relaxed">
+                        The 10-Year Treasury printing at 4.51% is actively repricing the discount mechanisms across the risk spectrum. 
+                        This is no longer a transient shock; it is the <strong>structural baseline</strong>. 
+                        Highly levered issuers in TMT and Healthcare now face compressed margins and escalating debt servicing costs.
+                    </p>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="p-4 border rounded-xl bg-white">
+                            <span class="text-xs text-gray-400 block mb-1">US 10Y Yield</span>
+                            <span class="text-2xl font-bold mono">4.51%</span>
+                        </div>
+                        <div class="p-4 border rounded-xl bg-white">
+                            <span class="text-xs text-gray-400 block mb-1">BSL Proxy Yield</span>
+                            <span class="text-2xl font-bold mono">6.63%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="lg:col-span-5">
+                    <div class="glass-card p-6 rounded-2xl">
+                        <h3 class="text-center font-semibold mb-4 text-gray-500">Yield Curve Pressure Gauge</h3>
+                        <div class="chart-container">
+                            <canvas id="yieldGauge"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION: Credit Bifurcation -->
+        <section id="credit" class="mb-16 scroll-mt-24">
+            <div class="mb-8 border-l-4 border-indigo-600 pl-6">
+                <h3 class="text-2xl font-bold">Institutional Loan Pricing & LGD</h3>
+                <p class="text-gray-500 mt-2">Analyzing the divergence between senior secured and subordinated tranches.</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="glass-card p-6 rounded-2xl flex flex-col justify-between">
+                    <div>
+                        <h4 class="text-lg font-bold mb-4">Capital Structure Bifurcation</h4>
+                        <p class="text-sm text-gray-600 mb-6">
+                            Loss Given Default (LGD) models are pricing in steeper haircuts for lower-tier capital. 
+                            The margin of error for 2nd Lien debt has effectively evaporated.
+                        </p>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="lienComparison"></canvas>
+                    </div>
+                </div>
+                
+                <div class="space-y-6">
+                    <div class="p-6 bg-indigo-900 text-white rounded-2xl">
+                        <h4 class="font-bold mb-2">Risk Control Takeaway</h4>
+                        <p class="text-indigo-100 text-sm leading-relaxed mb-4">
+                            The combination of 4.51% yields and 92.15 pricing on 2nd lien loans requires rigorous stress-testing 
+                            of covenant breaches and recovery rate assumptions.
+                        </p>
+                        <ul class="text-xs space-y-2 opacity-80 mono">
+                            <li>• Recalibrate PD / VaR Assumptions</li>
+                            <li>• Review TMT/Healthcare Maturity Walls</li>
+                            <li>• Stress-test Recovery Rates</li>
+                        </ul>
+                    </div>
+                    <div class="glass-card p-6 rounded-2xl">
+                        <h4 class="font-bold mb-4">Pricing Breakdown</h4>
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-center border-b pb-2">
+                                <span class="text-gray-500">1st Lien Paper</span>
+                                <span class="font-bold mono text-green-600">98.50</span>
+                            </div>
+                            <div class="flex justify-between items-center border-b pb-2">
+                                <span class="text-gray-500">2nd Lien Paper</span>
+                                <span class="font-bold mono text-red-600">92.15</span>
+                            </div>
+                            <div class="flex justify-between items-center border-b pb-2">
+                                <span class="text-gray-500">Secondary Gap</span>
+                                <span class="font-bold mono">6.35 pts</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION: Global Asset Explorer -->
+        <section id="assets" class="mb-16 scroll-mt-24">
+            <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
+                <div>
+                    <h3 class="text-2xl font-bold">Global Asset Matrix</h3>
+                    <p class="text-gray-500 mt-2">Cross-asset implications of liquidity tightening.</p>
+                </div>
+                <div class="flex space-x-2">
+                    <button onclick="filterAssets('all')" class="px-4 py-2 rounded-lg bg-gray-200 text-sm font-semibold filter-btn active">All</button>
+                    <button onclick="filterAssets('equity')" class="px-4 py-2 rounded-lg bg-white border text-sm font-semibold filter-btn">Equities</button>
+                    <button onclick="filterAssets('alt')" class="px-4 py-2 rounded-lg bg-white border text-sm font-semibold filter-btn">Alts</button>
+                </div>
+            </div>
+
+            <div class="glass-card rounded-2xl overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left">
+                        <thead class="bg-gray-50 border-b">
+                            <tr>
+                                <th class="px-6 py-4 text-xs font-bold uppercase text-gray-400 tracking-widest">Asset / Index</th>
+                                <th class="px-6 py-4 text-xs font-bold uppercase text-gray-400 tracking-widest">Spot Level</th>
+                                <th class="px-6 py-4 text-xs font-bold uppercase text-gray-400 tracking-widest">Model Target</th>
+                                <th class="px-6 py-4 text-xs font-bold uppercase text-gray-400 tracking-widest">Market Implication</th>
+                            </tr>
+                        </thead>
+                        <tbody id="assetTableBody" class="divide-y divide-gray-100">
+                            <!-- JS Inject -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <p class="text-gray-400 text-sm mb-4">Daily Risk & Credit Intelligence | Proprietary Ledger Access Only</p>
+            <p class="text-xs text-gray-600">Data snapshot as of June 22, 2026. Models calibrated for institutional usage.</p>
+        </div>
+    </footer>
+
+    <script>
+        const assetData = [
+            { id: 1, type: 'equity', name: 'S&P 500', level: '7,472.79', target: 'DCF', implication: 'Struggling against higher discount rates.', trend: 'down' },
+            { id: 2, type: 'equity', name: 'Nasdaq', level: '26,166.60', target: 'DCF', implication: 'Tech multiples under direct pressure.', trend: 'down' },
+            { id: 3, type: 'equity', name: 'Nikkei 225', level: '72,353.96', target: 'DCF', implication: 'Diverging from Western rate pressures.', trend: 'up' },
+            { id: 4, type: 'alt', name: 'WTI Crude', level: '$75.56', target: 'LGD', implication: 'Subdued costs offering margin relief.', trend: 'neutral' },
+            { id: 5, type: 'alt', name: 'Gold', level: '$4,197.41', target: 'PD', implication: 'Safe-haven demand signals macro anxiety.', trend: 'up' },
+            { id: 6, type: 'alt', name: 'Bitcoin', level: '$63,963.06', target: 'EV', implication: 'Target absorbing liquidity tightening.', trend: 'neutral' }
+        ];
+
+        function scrollToSection(id) {
+            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+                if(link.innerText.toLowerCase() === id) link.classList.add('active');
+            });
+        }
+
+        function renderAssets(filter = 'all') {
+            const body = document.getElementById('assetTableBody');
+            body.innerHTML = '';
+            
+            const filtered = filter === 'all' ? assetData : assetData.filter(a => a.type === filter);
+            
+            filtered.forEach(asset => {
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-gray-50 transition-colors cursor-default';
+                
+                const trendIcon = asset.trend === 'up' ? '↗' : asset.trend === 'down' ? '↘' : '→';
+                const trendColor = asset.trend === 'up' ? 'text-green-600' : asset.trend === 'down' ? 'text-red-600' : 'text-gray-400';
+
+                row.innerHTML = `
+                    <td class="px-6 py-5 font-semibold text-gray-900">${asset.name}</td>
+                    <td class="px-6 py-5 mono text-sm">
+                        <span class="${trendColor} mr-2 font-bold">${trendIcon}</span>
+                        ${asset.level}
+                    </td>
+                    <td class="px-6 py-5">
+                        <span class="px-2 py-1 bg-gray-100 rounded text-[10px] font-bold text-gray-600 uppercase tracking-tighter">${asset.target}</span>
+                    </td>
+                    <td class="px-6 py-5 text-sm text-gray-500">${asset.implication}</td>
+                `;
+                body.appendChild(row);
+            });
+        }
+
+        function filterAssets(type) {
+            renderAssets(type);
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active', 'bg-indigo-600', 'text-white');
+                btn.classList.add('bg-white', 'text-gray-600');
+            });
+            event.target.classList.add('active', 'bg-indigo-600', 'text-white');
+            event.target.classList.remove('bg-white', 'text-gray-600');
+        }
+
+        function initCharts() {
+            // Yield Gauge Chart
+            const ctxGauge = document.getElementById('yieldGauge').getContext('2d');
+            new Chart(ctxGauge, {
+                type: 'doughnut',
+                data: {
+                    datasets: [{
+                        data: [4.51, 1.49],
+                        backgroundColor: ['#3F51B5', '#E0E0E0'],
+                        circumference: 180,
+                        rotation: 270,
+                        borderWidth: 0,
+                        cutout: '80%'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        tooltip: { enabled: false },
+                        legend: { display: false }
+                    },
+                    animation: {
+                        duration: 2000,
+                        easing: 'easeOutQuart'
+                    }
+                },
+                plugins: [{
+                    id: 'gaugeCenterText',
+                    beforeDraw: (chart) => {
+                        const { width, height, ctx } = chart;
+                        ctx.restore();
+                        ctx.font = "bold 2.5rem Inter";
+                        ctx.textBaseline = "middle";
+                        ctx.fillStyle = "#1A1A1B";
+                        const text = "4.51%";
+                        const textX = Math.round((width - ctx.measureText(text).width) / 2);
+                        const textY = height - 30;
+                        ctx.fillText(text, textX, textY);
+                        ctx.save();
+                    }
+                }]
+            });
+
+            // Lien Pricing Comparison
+            const ctxLien = document.getElementById('lienComparison').getContext('2d');
+            new Chart(ctxLien, {
+                type: 'bar',
+                data: {
+                    labels: ['1st Lien Paper', '2nd Lien Paper'],
+                    datasets: [{
+                        label: 'Price per Par',
+                        data: [98.50, 92.15],
+                        backgroundColor: ['#3F51B5', '#D32F2F'],
+                        borderRadius: 8,
+                        barThickness: 60
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            min: 80,
+                            max: 100,
+                            grid: { display: false }
+                        },
+                        x: { grid: { display: false } }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+
+        window.onload = () => {
+            renderAssets();
+            initCharts();
+        };
+    </script>
+</body>
+</html>
