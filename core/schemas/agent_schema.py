@@ -1,5 +1,6 @@
 from typing import Dict, Any, List, Optional
 from pydantic import BaseModel, Field
+from src.pdil.models import ProvenanceHeader
 
 class AgentInput(BaseModel):
     """
@@ -17,6 +18,7 @@ class AgentOutput(BaseModel):
     sources: List[str] = Field(default_factory=list, description="List of citations (filenames, URLs).")
     confidence: float = Field(..., ge=0.0, le=1.0, description="Conviction score (0.0 to 1.0).")
     metadata: Dict[str, Any] = Field(default_factory=dict, description="Debug info, token usage, etc.")
+    provenance_trace: ProvenanceHeader = Field(..., description="Immutable provenance trace linking the agent's output to source and logic version.")
 
 class FundamentalReport(BaseModel):
     """
