@@ -190,3 +190,7 @@
 ## 2026-06-21 - [Optimize Nested Loop Calculations]
 **Learning:** In combinatorial search algorithms like `UniversalArbitrageEngine` which evaluate `O(E^2)` combinations across exchanges, performing inner `O(L)` order book depth walks or O(N) aggregations inside the innermost loop causes massive duplicate effort.
 **Action:** Always hoist independent properties and arrays (like `_walk_book` for varying trade sizes, or `_calculate_micro_price`) outside the nested `i, j` loops, precompute them into O(1) lookup dicts/arrays, and retrieve the pre-calculated values inside the nested loop for an immense speedup.
+
+## 2026-06-23 - [Optimize Combinatorial Book Walking]
+**Learning:** In nested scenarios like the `UniversalArbitrageEngine`, where book walking (`O(L)`) is repeatedly evaluated for identical target volumes, calculating the exact cost recursively creates a measurable bottleneck. Using `tradeable_vol_1 = min(exec_vol_buy_a, exec_vol_sell_b)` and comparing it to the original `target_volume` allows safely reusing the already-calculated cost and revenue, skipping the inner `walk_book` evaluations entirely.
+**Action:** When validating bounds or executing inner algorithmic operations (like L2 book slippage calculations), always check if the bounded output matched the input parameter exactly. If so, directly reuse the original calculation's return value to bypass redundant O(L) or O(N) operations.
