@@ -1,0 +1,1049 @@
+# Architectural Dependency Map
+
+## Module: agents
+## Module: core
+- `core/schema_middleware.py` depends on: json, jsonschema
+- `core/main.py` depends on: sys, os, asyncio, logging, argparse, core.utils.config_utils, core.utils.logging_utils, core.utils.system_logger, core.system.bootstrap, core.settings, core.engine.meta_orchestrator, core.system.agent_orchestrator
+- `core/api.py` depends on: logging, secrets, warnings, os, flask, core.system.agent_orchestrator, core.system.echo, core.settings
+- `core/human_validation_gate.py` depends on: datetime, json, os, typing
+- `core/settings.py` depends on: os, logging, secrets, pydantic_settings, typing, pydantic
+- `core/rag_reranking.py` depends on: sentence_transformers
+- `core/api_wrapper.py` depends on: os, logging, fastapi, pydantic, core.services.valuation_service
+- `core/llm_plugin.py` depends on: os, logging, yaml, json, time, hashlib, tiktoken, google.generativeai, PIL.Image, openai, cohere, abc, typing, dotenv, pathlib, pydantic, transformers, transformers, transformers
+- `core/ppo_trainer.py` depends on: json, re, torch, peft, transformers, trl
+- `core/credit_sentinel/covenant_agent.py` depends on: logging, typing, pydantic, adam.core.engine.base, adam.core.mcp.client
+- `core/credit_sentinel/agents/risk_analyst.py` depends on: logging, json, typing, pydantic
+- `core/credit_sentinel/agents/ratio_calculator.py` depends on: logging, typing
+- `core/credit_sentinel/models/distress_classifier.py` depends on: numpy, logging, typing, sklearn.ensemble, sklearn.preprocessing, sklearn.exceptions
+- `core/unified_ledger/schema.py` depends on: enum, typing, uuid, datetime, pydantic
+- `core/infrastructure/provenance.py` depends on: json, time, uuid, os, typing
+- `core/infrastructure/nats_jetstream.py` depends on: logging, typing
+- `core/infrastructure/bigquery_connector.py` depends on: logging, json, abc, typing
+- `core/infrastructure/numa_scheduling.py` depends on: os, logging, typing
+- `core/infrastructure/predictive_scaling.py` depends on: logging, statistics, typing, collections
+- `core/infrastructure/pubsub_connector.py` depends on: logging, json, asyncio, abc, typing
+- `core/infrastructure/semantic_cache.py` depends on: hashlib, json, os, time, collections, typing
+- `core/infrastructure/dpdk_networking.py` depends on: logging, typing
+- `core/future_state/ops.py` depends on: random, typing, pydantic
+- `core/future_state/ssi.py` depends on: uuid, hashlib, typing, pydantic
+- `core/future_state/monitor.py` depends on: typing, pydantic
+- `core/future_state/ubc.py` depends on: time, typing, pydantic
+- `core/future_state/__init__.py` depends on: ubc, ssi, entropy, governance, engine
+- `core/future_state/drivers.py` depends on: math, abc, pydantic
+- `core/future_state/governance.py` depends on: math, typing, pydantic, enum
+- `core/future_state/engine.py` depends on: random, math, typing, pydantic, enum, ubc, ssi, entropy, governance, monitor, philosophy, ops, assumptions, drivers
+- `core/future_state/assumptions.py` depends on: pydantic
+- `core/future_state/entropy.py` depends on: random, typing, pydantic
+- `core/future_state/philosophy.py` depends on: math, typing, pydantic, enum
+- `core/data_sources/prediction_market_api.py` depends on: logging
+- `core/data_sources/market_data_api.py` depends on: requests, pandas, logging, core.utils.secrets_utils
+- `core/data_sources/political_landscape.py` depends on: requests, datetime, logging, bs4, typing
+- `core/data_sources/__init__.py` depends on: data_fetcher
+- `core/data_sources/data_fetcher.py` depends on: concurrent.futures, time, yfinance, pandas, random, __future__, typing, core.utils.logging_utils, core.utils.retry_utils
+- `core/data_sources/data_sources.py` depends on: requests, tweepy, logging, textblob, core.utils.secrets_utils
+- `core/data_sources/financial_news_api.py` depends on: requests, logging, textblob, core.utils.secrets_utils
+- `core/data_sources/social_media_api.py` depends on: tweepy, logging, textblob, core.utils.secrets_utils, facebook_scraper
+- `core/data_sources/government_stats_api.py` depends on: requests, pandas, logging, core.utils.secrets_utils
+- `core/data_sources/yfinance_market_data.py` depends on: logging, yfinance, typing
+- `core/agents/sense_weaver.py` depends on: logging, asyncio, typing, core.agents.agent_base, transformers, langchain.utilities, langchain_community.utilities
+- `core/agents/repo_knowledge_agent.py` depends on: os, logging, typing, core.agents.agent_base
+- `core/agents/regulatory_compliance_agent.py` depends on: re, logging, json, os, asyncio, nltk, requests, __future__, typing_extensions, datetime, typing, bs4, neo4j, core.llm_plugin, core.data_sources.political_landscape, core.agents.agent_base
+- `core/agents/discussion_chair_agent.py` depends on: logging, json
+- `core/agents/event_driven_risk_agent.py` depends on: os, datetime, requests, json, logging, typing, core.agents.agent_base, utils.data_validation, utils.visualization_tools
+- `core/agents/critique_swarm.py` depends on: random, typing
+- `core/agents/black_swan_agent.py` depends on: logging, math, core.agents.agent_base, core.infrastructure.semantic_cache, core.system.state_manager, typing, pydantic
+- `core/agents/lingua_maestro.py` depends on: logging, asyncio, typing, core.agents.agent_base, langchain.utilities, transformers, nltk.sentiment, langchain_community.utilities
+- `core/agents/geopolitical_risk_agent.py` depends on: logging, asyncio, __future__, typing, core.agents.agent_base
+- `core/agents/newsletter_layout_specialist_agent.py` depends on: logging, asyncio, typing, core.agents.agent_base
+- `core/agents/strategic_foresight_agent.py` depends on: logging, json, os, asyncio, numpy, pandas, networkx, torch, typing, datetime, core.agents.market_sentiment_agent, core.agents.black_swan_agent, core.agents.specialized.quantum_risk_agent, core.agents.critique_swarm, core.data_sources.data_fetcher, core.engine.unified_knowledge_graph, core.oswm.inference, core.oswm.model, core.agents.agent_base, core.research.gnn.engine, core.research.federated_learning.fl_coordinator
+- `core/agents/archive_manager_agent.py` depends on: os, json, datetime
+- `core/agents/prompt_generation_agent.py` depends on: logging, __future__, typing, core.agents.agent_base
+- `core/agents/volatility_risk_agent.py` depends on: logging, numpy, __future__, typing, core.agents.agent_base
+- `core/agents/echo_agent.py` depends on: os, json, logging, asyncio, core.engine.unified_knowledge_graph
+- `core/agents/credit_risk_agent.py` depends on: logging, numpy, __future__, typing, core.agents.agent_base, scipy.stats
+- `core/agents/liquidity_risk_agent.py` depends on: logging, numpy, __future__, typing, core.agents.agent_base
+- `core/agents/data_verification_agent.py` depends on: pandas, numpy
+- `core/agents/alternative_data_agent.py` depends on: json, nltk, yfinance, googlemaps, nltk.sentiment, textblob, vaderSentiment.vaderSentiment
+- `core/agents/peer_set_agent.py` depends on: logging, asyncio, yfinance, typing, core.agents.agent_base, core.schemas.agent_schema, sklearn.feature_extraction.text, sklearn.metrics.pairwise
+- `core/agents/hnasp_agent.py` depends on: asyncio, logging, typing, core.agents.agent_base, core.hnasp.state_manager, core.hnasp.lakehouse, core.hnasp.logic_engine, core.hnasp.personality
+- `core/agents/risk_assessment_agent.py` depends on: logging, json, numpy, datetime, asyncio, __future__, typing, core.agents.agent_base, core.schemas.agent_schema, scipy.stats, core.engine.cyclical_reasoning_graph, core.engine.states, core.evaluation.judge, core.evaluation.tracing
+- `core/agents/system_health_agent.py` depends on: time, typing, pydantic, core.schemas.agent_schema, core.agents.agent_base
+- `core/agents/insider_activity_agent.py` depends on: logging, random, typing, pydantic, core.agents.agent_base, core.schemas.agent_schema
+- `core/agents/sentiment_risk_bridge.py` depends on: logging, typing, core.agents.agent_base, pydantic
+- `core/agents/economic_risk_agent.py` depends on: logging, __future__, typing, core.agents.agent_base
+- `core/agents/catalyst_agent.py` depends on: json, requests, logging, datetime
+- `core/agents/prediction_market_agent.py` depends on: json, numpy, pandas, logging, asyncio, typing, web3, core.agents.agent_base
+- `core/agents/result_aggregation_agent.py` depends on: logging, typing, core.agents.agent_base, core.utils.config_utils
+- `core/agents/rag_agent.py` depends on: logging, asyncio, typing, core.agents.agent_base, core.llm.base_llm_engine, core.embeddings.base_embedding_model, core.vectorstore.base_vector_store, semantic_kernel, core.rag.document_handling
+- `core/agents/meta_cognitive_agent.py` depends on: logging, re, typing, core.schemas.agent_schema, core.agents.agent_base, core.agents.system_health_agent
+- `core/agents/query_understanding_agent.py` depends on: logging, json, asyncio, core.agents.agent_base, core.utils.config_utils, core.utils.token_utils, typing, core.llm_plugin
+- `core/agents/adaptive_algo_agent.py` depends on: numpy, pandas, random, core.agents.algo_trading_agent, core.learning.adaptive_learning
+- `core/agents/competitor_analysis_agent.py` depends on: logging, typing, core.agents.agent_base, core.schemas.agent_schema
+- `core/agents/__init__.py` depends on: hnasp_agent
+- `core/agents/report_generator_agent.py` depends on: logging, typing, core.agents.agent_base, semantic_kernel
+- `core/agents/operational_risk_agent.py` depends on: logging, numpy, __future__, typing, core.agents.agent_base
+- `core/agents/snc_analyst_agent.py` depends on: json, asyncio, os, logging, sys, semantic_kernel, unittest.mock, core.agents.agent_base, core.schemas.agent_schema, typing, enum, datetime, core.compliance.snc_validators
+- `core/agents/natural_language_generation_agent.py` depends on: logging, asyncio, typing, transformers, core.agents.agent_base
+- `core/agents/agent_base.py` depends on: logging, json, asyncio, uuid, warnings, uuid, warnings, abc, typing, pydantic, datetime, datetime, core.utils.logging_utils, core.schemas.hnasp, core.agents.mixins.memory_mixin, core.system.boot_protocol, core.swarms.memory_matrix, json_logic, semantic_kernel, core.schemas.hnasp
+- `core/agents/quantum_portfolio_manager_agent.py` depends on: logging, asyncio, numpy, pandas, __future__, typing, core.agents.agent_base, core.schemas.agent_schema, core.data_sources.data_fetcher, core.simulations.quantum_monte_carlo
+- `core/agents/behavioral_economics_agent.py` depends on: logging, core.agents.agent_base, typing, transformers
+- `core/agents/industry_risk_agent.py` depends on: logging, __future__, typing, core.agents.agent_base
+- `core/agents/financial_modeling_agent.py` depends on: numpy, numpy_financial, pandas, logging, typing, core.agents.agent_base, core.financial_data.modeling_schema
+- `core/agents/market_making_agent.py` depends on: logging, numpy, typing, core.quantitative.pricing
+- `core/agents/agent_forge.py` depends on: logging, os, json, importlib, yaml, typing, pathlib, core.agents.agent_base, core.utils.config_utils
+- `core/agents/cyclical_reasoning_agent.py` depends on: json, logging, typing, core.system.v22_async.async_agent_base
+- `core/agents/news_bot.py` depends on: sys, os, json, time, random, asyncio, argparse, logging, nltk, httpx, feedparser, torch, typing, collections, datetime, typing_extensions, pycoingecko, transformers, semantic_kernel, core.agents.agent_base
+- `core/agents/code_alchemist.py` depends on: ast, asyncio, json, logging, pathlib, re, os, aiohttp, typing, core.agents.agent_base, core.llm_plugin
+- `core/agents/data_retrieval_agent.py` depends on: logging, json, os, asyncio, typing, core.agents.agent_base, core.utils.data_utils, core.system.knowledge_base, core.system.error_handler, semantic_kernel, core.data_sources.data_fetcher
+- `core/agents/currency_risk_agent.py` depends on: logging, numpy, __future__, typing, core.agents.agent_base
+- `core/agents/quantitative_risk_agent.py` depends on: numpy, pandas, logging, typing, core.agents.agent_base, adam_finance.math, adam_interfaces.interfaces
+- `core/agents/supply_chain_risk_agent.py` depends on: requests, logging, asyncio, folium, ipaddress, os, asyncio, bs4, geopy.geocoders, urllib.parse, typing, core.agents.agent_base
+- `core/agents/options_flow_agent.py` depends on: logging, random, typing, core.agents.agent_base, core.schemas.agent_schema
+- `core/agents/red_team_agent.py` depends on: logging, random, asyncio, __future__, typing, core.agents.agent_base, langgraph.graph, core.engine.states, core.agents.skills.counterfactual_reasoning_skill, core.security.red_team.quantum_scanner, core.security.red_team.response_engine, core.security.red_team.sandbox_env
+- `core/agents/knowledge_contribution_agent.py` depends on: json, core.agents.agent_base, core.llm.base_llm_engine, typing
+- `core/agents/macroeconomic_analysis_agent.py` depends on: logging, __future__, typing, core.agents.agent_base
+- `core/agents/fraud_detection_agent.py` depends on: logging, typing, core.agents.agent_base
+- `core/agents/code_architect_agent.py` depends on: logging, os, re, typing, core.agents.pydantic_agent_base, core.schemas.agent_schema
+- `core/agents/profile_agent.py` depends on: logging, typing, core.agents.agent_base
+- `core/agents/anomaly_detection_agent.py` depends on: numpy, pandas, logging, random, scipy, sklearn.ensemble, sklearn.neighbors, sklearn.svm, sklearn.cluster, statsmodels.tsa.seasonal, statsmodels.tsa.arima.model, sklearn.preprocessing, typing, core.engine.unified_knowledge_graph
+- `core/agents/evolutionary_optimizer.py` depends on: ast, logging, os, typing, core.agents.agent_base
+- `core/agents/pydantic_agent_base.py` depends on: logging, abc, typing, pydantic, core.agents.agent_base, core.schemas.agent_schema
+- `core/agents/data_visualization_agent.py` depends on: matplotlib.pyplot, seaborn, plotly.express, logging, asyncio, typing, core.agents.agent_base
+- `core/agents/market_risk_agent.py` depends on: logging, numpy, __future__, typing, core.agents.agent_base, scipy.stats
+- `core/agents/legal_agent.py` depends on: json, logging, asyncio, typing, core.agents.agent_base
+- `core/agents/algo_trading_agent.py` depends on: numpy, pandas, matplotlib.pyplot, random, logging, asyncio, typing, core.agents.agent_base, core.schemas.agent_schema
+- `core/agents/industry_specialist_agent.py` depends on: importlib, logging, asyncio, typing, core.agents.agent_base
+- `core/agents/strategy_backtest_agent.py` depends on: pandas, numpy, logging, core.agents.agent_base, pydantic, typing
+- `core/agents/machine_learning_model_training_agent.py` depends on: pandas, logging, asyncio, pickle, os, typing, core.agents.agent_base, sklearn.model_selection, sklearn.linear_model, sklearn.tree
+- `core/agents/fundamental_analyst_agent.py` depends on: asyncio, json, logging, assets.prompt_loader, typing, unittest.mock, semantic_kernel, core.agents.pydantic_agent_base, core.analysis.gemini_analyzer, core.schemas.agent_schema, core.system.memory_manager, src.mcp_server
+- `core/agents/portfolio_optimization_agent.py` depends on: numpy, pandas, logging, torch, torch.nn, torch.optim, asyncio, typing, core.agents.agent_base, scipy.optimize
+- `core/agents/prompt_tuner.py` depends on: re, logging, asyncio, json, spacy, typing, core.agents.agent_base, langchain.prompts, textblob, langchain_core.prompts
+- `core/agents/market_sentiment_agent.py` depends on: logging, asyncio, __future__, typing, core.agents.agent_base, core.schemas.agent_schema, core.data_sources.financial_news_api, core.data_sources.prediction_market_api, core.data_sources.social_media_api, core.data_sources.web_traffic_api, core.data_sources.data_fetcher, core.agents.specialized.crypto_arbitrage_agent, core.agents.options_flow_agent, core.agents.insider_activity_agent, typing_extensions
+- `core/agents/crypto_agent.py` depends on: json, datetime, logging, requests, numpy, nltk, ccxt, time, os, talib, web3, sklearn.linear_model, nltk.sentiment, pycoingecko, collections, web3.middleware, web3.middleware
+- `core/agents/technical_analyst_agent.py` depends on: logging, asyncio, pandas, numpy, pickle, os, __future__, typing, sklearn.ensemble, core.agents.agent_base, core.security.safe_unpickler, core.schemas.agent_schema, core.data_sources.data_fetcher
+- `core/agents/reflector_agent.py` depends on: logging, __future__, typing, core.agents.agent_base, core.schemas.agent_schema, core.engine.states, core.engine.reflector_graph
+- `core/agents/adaptive_agent.py` depends on: logging, asyncio, core.agents.agent_base, core.agents.metacognition, typing
+- `core/agents/lexica_agent.py` depends on: requests, logging, asyncio, typing, core.agents.agent_base
+- `core/agents/meta_19_agent.py` depends on: logging, re, core.agents.agent_base, typing
+- `core/agents/quantum_monte_carlo_agent.py` depends on: logging, core.agents.agent_base, core.simulations.quantum_monte_carlo, typing
+- `core/agents/infrastructure/capacity_planner_agent.py` depends on: logging, typing, core.agents.agent_base, core.agents.mixins.audit_mixin
+- `core/agents/templates/v23_template_agent.py` depends on: logging, typing, core.system.v22_async.async_agent_base, core.system.v22_async.async_task
+- `core/agents/templates/v26_template_agent.py` depends on: logging, asyncio, typing, pydantic
+- `core/agents/templates/v23_adaptive_rpc_agent.py` depends on: logging, json, typing, core.system.v22_async.async_agent_base, core.system.v22_async.async_task
+- `core/agents/templates/omega_agent.py` depends on: abc, time, logging, uuid, asyncio, typing, pydantic, core.utils.proof_of_thought, core.utils.system_logger
+- `core/agents/metacognition/adaptive_conviction.py` depends on: logging, math, typing
+- `core/agents/metacognition/state_anchor.py` depends on: uuid, json, time, hashlib, logging, typing
+- `core/agents/metacognition/__init__.py` depends on: adaptive_conviction, state_anchor, tool_manager
+- `core/agents/metacognition/tool_manager.py` depends on: logging, typing
+- `core/agents/architect_agent/agent.py` depends on: os, openai
+- `core/agents/credit/quant.py` depends on: logging, typing, core.agents.credit.credit_agent_base
+- `core/agents/credit/writer.py` depends on: logging, asyncio, re, typing, core.agents.credit.credit_agent_base, core.utils.prompt_loader
+- `core/agents/credit/archivist.py` depends on: json, logging, typing, core.agents.credit.credit_agent_base
+- `core/agents/credit/orchestrator.py` depends on: asyncio, logging, typing, core.agents.credit.credit_agent_base, core.agents.credit.archivist, core.agents.credit.quant, core.agents.credit.writer
+- `core/agents/credit/credit_agent_base.py` depends on: logging, asyncio, typing, abc, core.agents.agent_base, core.audit.audit_logger
+- `core/agents/upgrade_swarm/upgrade_agents.py` depends on: typing, core.agents.agent_base, upgrade_prompts
+- `core/agents/mixins/redundancy_optimization_mixin.py` depends on: asyncio, hashlib, json, logging, time, typing
+- `core/agents/mixins/memory_mixin.py` depends on: json, logging, os, typing, datetime
+- `core/agents/mixins/audit_mixin.py` depends on: json, os, uuid, logging, datetime, typing, core.system.state_manager
+- `core/agents/governance/repo_guardian/schemas.py` depends on: typing, pydantic, datetime, enum
+- `core/agents/governance/repo_guardian/tools.py` depends on: os, subprocess, ast, re, logging, typing
+- `core/agents/governance/repo_guardian/agent.py` depends on: asyncio, logging, json, uuid, typing, core.agents.agent_base, core.agents.mixins.audit_mixin, core.infrastructure.semantic_cache, core.agents.governance.repo_guardian.schemas, core.agents.governance.repo_guardian.prompts, core.agents.governance.repo_guardian.tools, core.prompting.base_prompt_plugin, semantic_kernel, jinja2
+- `core/agents/governance/repo_guardian/run_guardian.py` depends on: asyncio, argparse, sys, json, logging, os, typing, core.agents.governance.repo_guardian.agent, core.agents.governance.repo_guardian.schemas
+- `core/agents/governance/repo_guardian/tests/test_agent.py` depends on: unittest, asyncio, unittest.mock, core.agents.governance.repo_guardian.agent, core.agents.governance.repo_guardian.schemas, core.agents.governance.repo_guardian.schemas
+- `core/agents/governance/repo_guardian/tests/test_tools.py` depends on: unittest, core.agents.governance.repo_guardian.tools
+- `core/agents/specialized/retail_alpha_agent.py` depends on: logging, asyncio, random, typing, core.agents.agent_base, core.utils.logging_utils, core.agents.specialized.institutional_radar_agent, core.agents.specialized.monte_carlo_risk_agent
+- `core/agents/specialized/github_alpha_agent.py` depends on: logging, os, shutil, subprocess, tempfile, datetime, typing, pydantic, core.agents.agent_base
+- `core/agents/specialized/credit_lawyer.py` depends on: logging, typing, core.agents.agent_base, core.schemas.v23_5_schema
+- `core/agents/specialized/quantum_risk_agent.py` depends on: logging, typing, core.agents.agent_base, core.risk_engine.quantum_monte_carlo
+- `core/agents/specialized/risk_copilot_agent.py` depends on: json, logging, typing, datetime, core.schemas.f2b_schema, core.agents.agent_base, core.llm_plugin, core.schemas.f2b_schema
+- `core/agents/specialized/quantum_scenario_agent.py` depends on: logging, asyncio, typing, core.agents.agent_base, core.schemas.v23_5_schema, core.v22_quantum_pipeline.qmc_engine, core.vertical_risk_agent.generative_risk, core.schemas.v23_5_schema
+- `core/agents/specialized/monte_carlo_risk_agent.py` depends on: logging, numpy, typing, pydantic, core.agents.agent_base, core.schemas.v23_5_schema
+- `core/agents/specialized/management_assessment_agent.py` depends on: logging, typing, core.agents.agent_base, core.schemas.v23_5_schema
+- `core/agents/specialized/technical_covenant_agent.py` depends on: logging, typing, core.agents.agent_base, core.schemas.v23_5_schema
+- `core/agents/specialized/defi_liquidity_agent.py` depends on: logging, math, asyncio, typing, pydantic, web3, decimal, core.agents.agent_base
+- `core/agents/specialized/financial_covenant_agent.py` depends on: logging, typing, core.agents.agent_base, core.schemas.v23_5_schema
+- `core/agents/specialized/sovereign_ai_analyst_agent.py` depends on: logging, typing, core.agents.agent_base, semantic_kernel
+- `core/agents/specialized/credit_snc.py` depends on: logging, typing, core.agents.agent_base, core.schemas.v23_5_schema
+- `core/agents/specialized/credit_sentry_agent.py` depends on: logging, typing, core.agents.agent_base, core.engine.odyssey_knowledge_graph
+- `core/agents/specialized/universal_arbitrage_engine.py` depends on: math, typing, pydantic, core.agents.agent_base
+- `core/agents/specialized/optimized_gallery_agent.py` depends on: asyncio, random, typing, core.agents.agent_base, core.agents.mixins.redundancy_optimization_mixin
+- `core/agents/specialized/blindspot_agent.py` depends on: logging, asyncio, os, threading, networkx, typing, core.agents.agent_base, core.engine.live_mock_engine, neo4j, core.engine.live_mock_engine, core.v30_architecture.python_intelligence.bridge.neural_link, datetime
+- `core/agents/specialized/quantum_search_agent.py` depends on: logging, asyncio, typing, core.agents.agent_base, core.simulations.avg_search, core.simulations.market_oracle
+- `core/agents/specialized/regulatory_snc_agent.py` depends on: logging, typing, core.agents.agent_base, core.schemas.v23_5_schema, core.system.aof_guardrail
+- `core/agents/specialized/forensic_accountant_agent.py` depends on: logging, math, typing, collections, core.agents.agent_base, core.agents.mixins.audit_mixin
+- `core/agents/specialized/market_regime_agent.py` depends on: logging, numpy, pandas, yfinance, asyncio, typing, core.agents.agent_base
+- `core/agents/specialized/credit_risk_controller_agent.py` depends on: logging, json, typing, core.agents.agent_base, core.system.v22_async.async_agent_base, core.system.v22_async.async_task
+- `core/agents/specialized/crypto_arbitrage_agent.py` depends on: asyncio, logging, ccxt.async_support, random, typing, pydantic, datetime, core.agents.agent_base
+- `core/agents/specialized/__init__.py` depends on: institutional_trend_agent, credit_risk_controller_agent
+- `core/agents/specialized/portfolio_manager_agent.py` depends on: logging, typing, core.agents.agent_base, core.schemas.v23_5_schema
+- `core/agents/specialized/narrative_intelligence_agent.py` depends on: logging, re, typing, collections, core.agents.market_sentiment_agent
+- `core/agents/specialized/counterparty_risk_agent.py` depends on: logging, typing, core.agents.agent_base, core.engine.odyssey_knowledge_graph
+- `core/agents/specialized/dark_pool_agent.py` depends on: logging, typing, pydantic, core.agents.agent_base, core.schemas.agent_schema
+- `core/agents/specialized/sentinel_agent.py` depends on: logging, typing, core.agents.agent_base, core.engine.odyssey_knowledge_graph
+- `core/agents/specialized/credit_conformance_agent.py` depends on: json, logging, os, re, typing, core.agents.agent_base, core.schemas.credit_conformance, core.llm_plugin, pydantic, semantic_kernel
+- `core/agents/specialized/strategic_snc_agent.py` depends on: logging, typing, core.agents.agent_base, core.agents.specialized.regulatory_snc_agent, core.engine.risk_consensus_engine, core.schemas.v23_5_schema, core.system.aof_guardrail
+- `core/agents/specialized/distressed_surveillance_agent.py` depends on: logging, typing, core.agents.agent_base, core.engine.surveillance_graph, core.engine.states
+- `core/agents/specialized/root_node_agent.py` depends on: logging, random, numpy, typing, pydantic, core.agents.agent_base
+- `core/agents/specialized/peer_comparison_agent.py` depends on: logging, typing, core.agents.agent_base, core.schemas.v23_5_schema
+- `core/agents/specialized/deep_sector_analyst.py` depends on: logging, typing, core.agents.agent_base, core.vertical_risk_agent.generative_risk, core.vertical_risk_agent.state, core.agents.mixins.audit_mixin, core.infrastructure.semantic_cache
+- `core/agents/specialized/quantum_retrieval_agent.py` depends on: numpy, logging, core.agents.agent_base, core.quantum.adam_optimizer, core.quantum.schrodinger_solver, core.agents.mixins.audit_mixin, core.simulations.comprehensive_credit_simulation
+- `core/agents/specialized/quantum_strategy_agent.py` depends on: logging, core.simulations.adam_van_grover_search, core.engine.quantum_recommendation_engine
+- `core/agents/specialized/macro_liquidity_agent.py` depends on: logging, asyncio, pandas, __future__, typing, pydantic, datetime, core.agents.agent_base, core.data_sources.data_fetcher
+- `core/agents/specialized/institutional_trend_agent.py` depends on: logging, os, json, pandas, typing, core.agents.agent_base, core.vertical_risk_agent.ingestion.sec_13f_handler
+- `core/agents/specialized/institutional_radar_agent.py` depends on: logging, asyncio, typing, core.agents.agent_base, core.institutional_radar.ingestion, core.institutional_radar.analytics, core.institutional_radar.reporting, core.utils.logging_utils
+- `core/agents/sub_agents/financial_document_agent.py` depends on: logging, typing, core.agents.agent_base
+- `core/agents/sub_agents/git_repo_sub_agent.py` depends on: subprocess, os, core.agents.agent_base
+- `core/agents/sub_agents/data_ingestion_agent.py` depends on: logging, typing, core.agents.agent_base, core.gold_standard.ingestion, core.gold_standard.storage
+- `core/agents/sub_agents/compliance_kyc_agent.py` depends on: typing, core.agents.agent_base
+- `core/agents/sub_agents/internal_systems_agent.py` depends on: typing, core.agents.agent_base
+- `core/agents/sub_agents/financial_news_sub_agent.py` depends on: requests, core.agents.agent_base
+- `core/agents/sub_agents/market_alternative_data_agent.py` depends on: typing, core.agents.agent_base
+- `core/agents/orchestrators/credit_risk_orchestrator.py` depends on: asyncio, core.agents.agent_base, workflow_manager, workflow, task
+- `core/agents/orchestrators/odyssey_hub_agent.py` depends on: json, logging, os, typing, core.agents.agent_base, core.engine.unified_knowledge_graph
+- `core/agents/orchestrators/workflow_manager.py` depends on: concurrent.futures, asyncio, inspect, threading, workflow
+- `core/agents/orchestrators/creditsentry_orchestrator.py` depends on: asyncio, json, logging, typing, core.agents.agent_base, core.llm.base_llm_engine
+- `core/agents/orchestrators/task.py` depends on: typing
+- `core/agents/orchestrators/news_desk_orchestrator.py` depends on: os, json, logging, datetime, asyncio, __future__, typing, core.agents.news_bot, core.agents.market_sentiment_agent, core.data_sources.market_data_api, core.llm_plugin
+- `core/agents/orchestrators/meta_orchestrator.py` depends on: asyncio, typing, workflow, workflow_manager, core.system.v22_async.workflow, core.system.v22_async.async_workflow_manager, langgraph.graph
+- `core/agents/orchestrators/credit_memo_orchestrator.py` depends on: datetime, logging, random, uuid, core.engine.valuation_utils, asyncio, threading, __future__, typing, core.agents.legal_agent, core.agents.regulatory_compliance_agent, core.agents.risk_assessment_agent, adam_finance.icat, adam_finance.icat_schema
+- `core/agents/orchestrators/parallel_orchestrator.py` depends on: time, core.agents.agent_base, workflow_manager, workflow, task
+- `core/agents/orchestrators/hybrid_orchestrator.py` depends on: asyncio, typing, workflow, core.system.v22_async.workflow, workflow_manager, core.system.v22_async.async_workflow_manager
+- `core/agents/orchestrators/workflow.py` depends on: typing, task
+- `core/agents/developer_swarm/integration_agent.py` depends on: typing, core.agents.agent_base
+- `core/agents/developer_swarm/spec_architect_agent.py` depends on: typing, core.agents.agent_base
+- `core/agents/developer_swarm/test_agent.py` depends on: typing, core.agents.agent_base
+- `core/agents/developer_swarm/reviewer_agent.py` depends on: logging, typing, core.agents.agent_base, typing_extensions
+- `core/agents/developer_swarm/coder_agent.py` depends on: typing, core.agents.agent_base
+- `core/agents/developer_swarm/documentation_agent.py` depends on: typing, core.agents.agent_base
+- `core/agents/developer_swarm/planner_agent.py` depends on: typing, core.agents.agent_base
+- `core/agents/analytics/impact_analysis_agent.py` depends on: logging, typing
+- `core/agents/skills/xai_skill.py` depends on: semantic_kernel.skill_definition, core.analysis.xai.explainer
+- `core/agents/skills/counterfactual_reasoning_skill.py` depends on: typing, datetime
+- `core/agents/skills/hybrid_forecasting_skill.py` depends on: pandas, json, semantic_kernel.skill_definition, core.analysis.forecasting.hybrid_model
+- `core/agents/industry_specialists/financials.py` depends on: pandas, textblob
+- `core/agents/industry_specialists/industrials.py` depends on: pandas, textblob
+- `core/agents/industry_specialists/consumer_discretionary.py` depends on: pandas, textblob
+- `core/agents/industry_specialists/consumer_staples.py` depends on: pandas, textblob
+- `core/agents/industry_specialists/utilities.py` depends on: pandas, textblob
+- `core/agents/industry_specialists/technology.py` depends on: logging, pandas, textblob
+- `core/agents/industry_specialists/materials.py` depends on: pandas, textblob
+- `core/agents/industry_specialists/telecommunication_services.py` depends on: pandas, textblob
+- `core/agents/industry_specialists/energy.py` depends on: pandas, textblob
+- `core/agents/industry_specialists/healthcare.py` depends on: pandas, textblob
+- `core/agents/industry_specialists/real_estate.py` depends on: pandas, textblob
+- `core/agents/meta_agents/narrative_summarization_agent.py` depends on: typing, core.agents.agent_base
+- `core/agents/meta_agents/persona_communication_agent.py` depends on: typing, core.agents.agent_base
+- `core/agents/meta_agents/evolutionary_architect.py` depends on: logging, json, uuid, typing, datetime, core.agents.agent_base, core.llm.base_llm_engine, core.tools.base_tool
+- `core/agents/meta_agents/skill_harvester_agent.py` depends on: logging, json, os, importlib, inspect, typing, core.agents.agent_base, core.agents.mixins.audit_mixin
+- `core/agents/meta_agents/crisis_simulation_agent.py` depends on: logging, __future__, typing, core.agents.agent_base, core.prompting.plugins.crisis_simulation_plugin, core.schemas.crisis_simulation, core.engine.states, core.engine.crisis_simulation_graph, core.prompting.base_prompt_plugin
+- `core/agents/meta_agents/__init__.py` depends on: core.agents.meta_agents.evolutionary_architect, core.agents.meta_agents.didactic_architect, core.agents.meta_agents.chronos_agent
+- `core/agents/meta_agents/omega_meta_orchestrator.py` depends on: json, typing, core.agents.pydantic_agent_base, core.schemas.agent_schema
+- `core/agents/meta_agents/counterparty_risk_agent.py` depends on: typing, core.agents.agent_base
+- `core/agents/meta_agents/portfolio_monitoring_ews_agent.py` depends on: typing, core.agents.agent_base
+- `core/agents/meta_agents/sentiment_analysis_meta_agent.py` depends on: core.agents.agent_base, textblob
+- `core/agents/meta_agents/credit_risk_assessment_agent.py` depends on: typing, core.agents.agent_base
+- `core/agents/meta_agents/evolutionary_architect_agent.py` depends on: logging, uuid, ast, random, copy, __future__, typing, core.agents.agent_base, core.agents.mixins.audit_mixin, core.schemas.meta_agent_schemas
+- `core/agents/meta_agents/odyssey_meta_agent.py` depends on: logging, typing, core.agents.agent_base
+- `core/agents/meta_agents/didactic_architect.py` depends on: logging, typing, core.agents.agent_base, core.llm.base_llm_engine, core.tools.base_tool
+- `core/agents/meta_agents/auto_architect_agent.py` depends on: os, logging, typing, core.agents.agent_base, core.agents.mixins.audit_mixin
+- `core/agents/meta_agents/didactic_architect_agent.py` depends on: logging, os, __future__, typing, jinja2, core.agents.agent_base, core.agents.mixins.audit_mixin, core.schemas.meta_agent_schemas
+- `core/agents/meta_agents/chronos_agent.py` depends on: logging, os, json, __future__, typing, datetime, glob, core.agents.agent_base, core.llm.base_llm_engine, core.tools.base_tool, core.schemas.meta_agent_schemas, core.utils.logging_utils
+- `core/services/valuation_service.py` depends on: pandas, logging, src.core_valuation, src.credit_risk
+- `core/system1/event_bus.py` depends on: asyncio, logging, typing
+- `core/system1/pheromone_engine.py` depends on: asyncio, logging, time, typing
+- `core/system1/workers/market_stream_worker.py` depends on: asyncio, random, logging, typing
+- `core/data_processing/synthetic_data_factory.py` depends on: time, random, datetime
+- `core/data_processing/universal_ingestor.py` depends on: ast, asyncio, json, re, uuid, aiofiles, datetime, enum, pathlib, typing, core.data_processing.chunking_engine
+- `core/data_processing/semantic_conviction.py` depends on: logging, random, math, numpy, typing, core.schemas.v23_5_schema, sentence_transformers
+- `core/data_processing/utils.py` depends on: os, json, uuid, hashlib, ast, re, logging, pandas, typing, enum, datetime, dataclasses
+- `core/data_processing/ingestion_engine.py` depends on: asyncio, json, logging, os, uuid, aiofiles, sentence_transformers, abc, typing, core.data_processing.chunking_engine, core.engine.unified_knowledge_graph
+- `core/data_processing/sequential_pipeline.py` depends on: os, json, logging, hashlib, sys, datetime, typing, langgraph.graph, dataclasses, core.data_processing.utils
+- `core/data_processing/conviction_scorer.py` depends on: logging, typing, pydantic, sklearn.feature_extraction.text, sklearn.metrics.pairwise
+- `core/data_processing/universal_ingestor_v2.py` depends on: os, json, logging, argparse, hashlib, typing, datetime, concurrent.futures, core.data_processing.utils
+- `core/data_processing/chunking_engine.py` depends on: logging, re, sentence_transformers, numpy, typing, sklearn.metrics.pairwise
+- `core/data_processing/ingestion/xbrl/parser.py` depends on: defusedxml.ElementTree, typing
+- `core/intelligence/nssf/main.py` depends on: logging, asyncio, core.intelligence.nssf.mocks, typing, core.engine.neuro_symbolic_planner, core.risk_engine.quantum_model, core.intelligence.nssf.liquid, core.intelligence.nssf.framer, core.schemas.v23_5_schema, core.v24_architecture.brain.rag_planner
+- `core/intelligence/nssf/framer.py` depends on: ast, logging, typing, pydantic, core.schemas.v23_5_schema
+- `core/intelligence/nssf/synapse.py` depends on: core.intelligence.nssf.mocks, core.risk_engine.quantum_model
+- `core/intelligence/nssf/liquid.py` depends on: logging, typing, core.intelligence.nssf.mocks, core.schemas.v23_5_schema, core.intelligence.nssf.synapse, core.risk_engine.quantum_model, torchdiffeq
+- `core/intelligence/nssf/mocks.py` depends on: logging, random, sys, torch, torch.nn, typing, types, mcp.server.fastmcp
+- `core/embeddings/base_embedding_model.py` depends on: abc
+- `core/embeddings/models/dummy_embedding_model.py` depends on: logging, typing, core.embeddings.base_embedding_model
+- `core/embeddings/models/openai_embedding_model.py` depends on: logging, os, typing, core.embeddings.base_embedding_model
+- `core/hnasp/state_manager.py` depends on: uuid, json, logging, datetime, typing, core.schemas.hnasp, core.hnasp.lakehouse, core.hnasp.logic_engine, core.hnasp.personality
+- `core/hnasp/lakehouse.py` depends on: json, os, uuid, datetime, duckdb, pandas, typing, datetime, core.schemas.hnasp
+- `core/hnasp/personality.py` depends on: numpy, typing, core.schemas.hnasp
+- `core/hnasp/logic_engine.py` depends on: logging, typing
+- `core/financial_suite/context_manager.py` depends on: json, core.financial_suite.schemas.workstream_context, core.financial_suite.engines.solver, core.financial_suite.modules.reporting.generator, core.financial_suite.modules.vc.waterfall, core.financial_suite.modules.vc.return_metrics
+- `core/financial_suite/modules/vc/return_metrics.py` depends on: math, typing
+- `core/financial_suite/modules/vc/waterfall.py` depends on: typing, core.financial_suite.schemas.workstream_context
+- `core/financial_suite/modules/reporting/generator.py` depends on: typing, core.financial_suite.schemas.workstream_context, core.financial_suite.engines.dcf, core.financial_suite.modules.risk.credit_model, core.financial_suite.modules.risk.regulatory
+- `core/financial_suite/modules/risk/regulatory.py` depends on: typing, core.financial_suite.schemas.workstream_context
+- `core/financial_suite/modules/risk/credit_model.py` depends on: numpy, scipy.stats, core.financial_suite.schemas.workstream_context
+- `core/financial_suite/interface/dependency_graph.py` depends on: typing, core.financial_suite.context_manager
+- `core/financial_suite/engines/wacc.py` depends on: core.financial_suite.schemas.workstream_context
+- `core/financial_suite/engines/solver.py` depends on: core.financial_suite.schemas.workstream_context, core.financial_suite.engines.dcf, core.financial_suite.engines.wacc, core.financial_suite.modules.risk.credit_model, core.financial_suite.modules.risk.regulatory
+- `core/financial_suite/engines/dcf.py` depends on: typing, core.financial_suite.schemas.workstream_context
+- `core/financial_suite/schemas/workstream_context.py` depends on: __future__, typing, pydantic, datetime
+- `core/symphony/main.py` depends on: os, sys, asyncio, logging, argparse, threading, core.symphony.orchestrator, core.symphony.api, werkzeug.serving
+- `core/symphony/api.py` depends on: logging, asyncio, flask, datetime, core.symphony.orchestrator
+- `core/symphony/agent_runner.py` depends on: os, json, httpx, logging, asyncio, uuid, datetime, typing, pydantic, core.symphony.models, core.symphony.config, core.symphony.workspace, jinja2
+- `core/symphony/config.py` depends on: os, yaml, typing, core.symphony.models
+- `core/symphony/orchestrator.py` depends on: asyncio, logging, datetime, typing, core.symphony.models, core.symphony.config, core.symphony.tracker, core.symphony.workspace, core.symphony.agent_runner
+- `core/symphony/models.py` depends on: typing, datetime, pydantic
+- `core/symphony/tracker.py` depends on: logging, httpx, typing, core.symphony.models, core.symphony.config, datetime
+- `core/symphony/workspace.py` depends on: os, re, shutil, logging, subprocess, core.symphony.models, core.symphony.config
+- `core/experimental/quantum_swarm_poc.py` depends on: asyncio, logging, typing, core.engine.swarm.mirofish_engine, core.v22_quantum_pipeline.qmc_engine
+- `core/experimental/adamos_bridge.py` depends on: ctypes, os, sys, platform, logging, typing
+- `core/execution_router/router.py` depends on: typing
+- `core/execution_router/__init__.py` depends on: router
+- `core/family_office/portfolio.py` depends on: logging, typing, core.risk_engine
+- `core/family_office/__init__.py` depends on: service
+- `core/family_office/service.py` depends on: governance, wealth_manager, deal_flow, portfolio
+- `core/family_office/governance.py` depends on: logging, typing
+- `core/family_office/deal_flow.py` depends on: logging, random, typing
+- `core/family_office/wealth_manager.py` depends on: logging, random, numpy, typing
+- `core/institutional_radar/schema.py` depends on: __future__, datetime, typing, uuid, pydantic
+- `core/institutional_radar/database.py` depends on: uuid, os, __future__, typing, datetime, sqlalchemy, sqlalchemy.orm, sqlalchemy.types
+- `core/institutional_radar/reporting.py` depends on: json, logging, pandas, typing, core.llm_plugin, core.utils.logging_utils
+- `core/institutional_radar/ingestion.py` depends on: requests, pandas, time, logging, uuid, io, bs4, typing, core.utils.logging_utils, core.institutional_radar.schema, core.institutional_radar.database, datetime
+- `core/institutional_radar/analytics.py` depends on: pandas, numpy, typing, uuid, datetime, sqlalchemy, scipy.stats, core.institutional_radar.database, core.utils.logging_utils
+- `core/unified_banking/knowledge_graph.py` depends on: networkx, json, logging, typing
+- `core/llm/base_llm_engine.py` depends on: abc
+- `core/llm/engines/dummy_llm_engine.py` depends on: logging, typing, core.llm.base_llm_engine
+- `core/llm/engines/openai_llm_engine.py` depends on: logging, os, typing, core.llm.base_llm_engine
+- `core/adk_patterns/approval_tool.py` depends on: logging, time, uuid, hmac, hashlib, os, typing, enum, dataclasses
+- `core/capability_monitoring/module.py` depends on: uuid, json, datetime, collections
+- `core/api/main.py` depends on: logging, traceback, os, uvicorn, fastapi, fastapi.responses, fastapi.middleware.cors, core.api.routers, core.api.deps, core.settings, contextlib
+- `core/api/schemas.py` depends on: pydantic, typing
+- `core/api/deps.py` depends on: secrets, core.engine.meta_orchestrator, fastapi, fastapi.security, core.settings
+- `core/api/server.py` depends on: os, sys, logging, asyncio, json, flask, flask_cors, core.utils.logging_utils, core.prompting.scanner, core.engine.meta_orchestrator, core.system.agent_orchestrator, core.engine.adjudicator_engine
+- `core/api/routers/plugins.py` depends on: fastapi
+- `core/api/routers/agents.py` depends on: fastapi, core.api.deps, core.api.schemas, core.engine.meta_orchestrator
+- `core/utils/repo_context.py` depends on: os, logging, typing
+- `core/utils/system_logger.py` depends on: json, sys, datetime, pathlib, typing, zoneinfo
+- `core/utils/logger.py` depends on: logging, sys
+- `core/utils/token_utils.py` depends on: logging, tiktoken, functools, typing
+- `core/utils/config_utils.py` depends on: copy, functools, logging, os, re, yaml, pathlib, typing
+- `core/utils/proof_of_thought.py` depends on: hashlib, json, os, time, typing
+- `core/utils/narrative_weaver.py` depends on: random, typing
+- `core/utils/deprecation.py` depends on: warnings, functools, logging
+- `core/utils/retry_utils.py` depends on: asyncio, logging, random, time, collections.abc, functools, typing
+- `core/utils/market_data_utils.py` depends on: numpy, pandas, json, datetime
+- `core/utils/microscopic_telemetry.py` depends on: time, logging, typing
+- `core/utils/json_logic.py` depends on: typing
+- `core/utils/secrets_utils.py` depends on: os, logging, typing
+- `core/utils/prompt_loader.py` depends on: yaml, logging, typing, pydantic
+- `core/utils/agent_utils.py` depends on: csv, io, json, logging, random, re, ast, time, functools, typing, langgraph.checkpoint.memory, langgraph.graph
+- `core/utils/logging_utils.py` depends on: logging, logging.config, os, yaml, json, threading, asyncio, uuid, time, psutil, datetime, pathlib, typing, contextvars, pythonjsonlogger
+- `core/utils/api_utils.py` depends on: asyncio, json, logging, typing
+- `core/utils/data_utils.py` depends on: asyncio, csv, json, logging, yaml, re, pathlib, typing, core.system.error_handler, core.utils.config_utils, core.llm_plugin
+- `core/utils/formatting_utils.py` depends on: flask
+- `core/utils/graph_utils.py` depends on: logging, langgraph.graph, langgraph.checkpoint.memory
+- `core/utils/repo_compiler/formatter.py` depends on: typing, core.utils.repo_compiler.models
+- `core/utils/repo_compiler/scanner.py` depends on: os, pathspec, typing, core.utils.repo_compiler.models
+- `core/utils/repo_compiler/models.py` depends on: typing, pydantic
+- `core/utils/repo_compiler/chunker.py` depends on: os, tiktoken, typing, core.utils.repo_compiler.models
+- `core/utils/repo_compiler/summarizer.py` depends on: logging, litellm, core.utils.repo_compiler.models, core.utils.repo_compiler.formatter
+- `core/swarms/memory_matrix.py` depends on: json, os, hashlib, logging, typing, datetime
+- `core/swarms/pheromone_db.py` depends on: time, typing
+- `core/pipelines/credit_pipeline.py` depends on: logging, json, tempfile, os, typing, core.pipelines.mock_edgar, core.agents.credit.orchestrator
+- `core/pipelines/mock_edgar.py` depends on: random, typing, datetime
+- `core/pipelines/sovereign_pipeline.py` depends on: os, json, yaml, logging, datetime, typing, core.pipelines.mock_edgar
+- `core/market_data/__init__.py` depends on: service
+- `core/market_data/service.py` depends on: random, datetime, time, logging, yfinance, typing, collections
+- `core/market_data/historical_loader.py` depends on: yfinance, pandas, pandera, os, typing, core.schemas.market_data_schema, core.utils.logging_utils
+- `core/market_data/timescale/hypertable_manager.py` depends on: logging
+- `core/market_data/nats/jetstream_bus.py` depends on: logging, typing
+- `core/xai/iqnn_cs.py` depends on: numpy, logging, __future__, typing
+- `core/xai/state_translator.py` depends on: core.engine.states
+- `core/xai/thought_visualizer.py` depends on: json, os, typing, core.system.state_manager
+- `core/compliance/snc_validators.py` depends on: pydantic, typing, enum
+- `core/governance/immutable_ledger.py` depends on: json, hashlib, time, os, fcntl, typing
+- `core/governance/sentinel_harness.py` depends on: json, re, hashlib, os, typing, pydantic, core.engine.risk_synthesis
+- `core/governance/constitution.py` depends on: time, dataclasses, typing, core.utils.logger
+- `core/governance/environment_control.py` depends on: logging, time, typing, enum, dataclasses, core.adk_patterns.approval_tool
+- `core/governance/sentinel/harness.py` depends on: json, hashlib, os, typing, core.schemas.sentinel
+- `core/security/safe_unpickler.py` depends on: pickle, io, logging, typing
+- `core/security/shield.py` depends on: re, os, html, logging
+- `core/security/governance.py` depends on: logging, ast, time, hashlib, typing
+- `core/security/eaci_middleware.py` depends on: re, logging, typing, core.security.permission_manager
+- `core/security/sandbox.py` depends on: ast, logging, multiprocessing, io, pandas, numpy, resource, typing, core.security.governance, contextlib
+- `core/security/permission_manager.py` depends on: enum, typing, services.webapp.api
+- `core/security/sql_validator.py` depends on: re, typing
+- `core/security/hardware/sgx_enclave.py` depends on: hashlib, logging, typing
+- `core/security/hardware/kill_switch.py` depends on: time, logging, threading
+- `core/security/red_team/response_engine.py` depends on: time, logging, typing
+- `core/security/red_team/sandbox_env.py` depends on: logging, typing
+- `core/security/red_team/quantum_scanner.py` depends on: typing
+- `core/evaluation/verification.py` depends on: logging, typing, core.engine.unified_knowledge_graph
+- `core/evaluation/stress_test.py` depends on: copy, logging, typing, core.vertical_risk_agent.generative_risk
+- `core/evaluation/llm_judge.py` depends on: re, typing
+- `core/evaluation/probabilistic.py` depends on: math, re, typing
+- `core/evaluation/symbolic.py` depends on: rdflib, typing, rdflib
+- `core/evaluation/judge.py` depends on: json, logging, re, random, typing, pydantic, core.llm_plugin, core.evaluation.probabilistic
+- `core/evaluation/tracing.py` depends on: json, uuid, os, logging, datetime, typing
+- `core/evaluation/red_team.py` depends on: copy, typing
+- `core/mcp/tool_registry.py` depends on: typing, pydantic
+- `core/mcp/schemas.py` depends on: typing
+- `core/mcp/mcp_router.py` depends on: json, asyncio, logging, typing
+- `core/mcp/server.py` depends on: sqlite3, pandas, sys, os, asyncio, json, typing, core.mcp.tool_registry, core.security.sql_validator, mcp.server.fastmcp, core.vertical_risk_agent.generative_risk, core.v22_quantum_pipeline.qmc_engine, core.engine.meta_orchestrator
+- `core/mcp/registry.py` depends on: requests, typing, core.data_access.lakehouse_connector, core.data_processing.universal_ingestor, core.engine.neuro_symbolic_planner, core.execution_router, core.family_office, core.market_data, core.memory.engine, core.memory.provo_graph, core.pricing_engine, core.product.core_valuation, core.risk_engine, core.strategy, core.tools.universal_ingestor_mcp, core.data_processing.universal_ingestor
+- `core/mcp/universal_mcp_socket.py` depends on: logging, typing
+- `core/risk_engine/quantum_monte_carlo.py` depends on: numpy, logging, typing, abc
+- `core/risk_engine/__init__.py` depends on: engine
+- `core/risk_engine/engine.py` depends on: math, logging, statistics, numpy, typing, scipy.stats
+- `core/risk_engine/quantum_model.py` depends on: numpy, typing, mcp.server.fastmcp, qiskit, qiskit_aer, qiskit_algorithms, qiskit.circuit.library
+- `core/risk_engine/tests/test_risk_engine_v2.py` depends on: unittest, numpy, core.risk_engine.engine
+- `core/quantum/schrodinger_solver.py` depends on: numpy
+- `core/quantum/__init__.py` depends on: adam_optimizer, schrodinger_solver
+- `core/quantum/adam_optimizer.py` depends on: numpy
+- `core/learning/adaptive_learning.py` depends on: random, numpy, collections, typing
+- `core/learning/fine_tuning_driver.py` depends on: json, logging, os, typing, core.system.memory_manager
+- `core/trading/crypto/__init__.py` depends on: deployer
+- `core/trading/crypto/deployer.py` depends on: asyncio, logging, uuid, time, typing, enum, dataclasses, core.trading.hft.hft_engine
+- `core/trading/hft/hft_engine_nexus.py` depends on: asyncio, logging, math, struct, time, random, sys, uvloop, dataclasses, collections, typing
+- `core/trading/hft/hft_engine_v3.py` depends on: asyncio, time, logging, json, random, dataclasses, enum, typing
+- `core/trading/hft/hft_engine.py` depends on: asyncio, random, time, dataclasses, typing, enum
+- `core/trading/hft/yfinance_data_feed.py` depends on: asyncio, time, logging, typing, core.trading.hft.hft_engine, core.data_sources.yfinance_market_data
+- `core/trading/hft/avellaneda_stoikov_engine.py` depends on: asyncio, math, time, random, numpy, dataclasses, typing, enum, core.trading.hft.hft_engine
+- `core/trading/hft/hft_engine_v2.py` depends on: asyncio, random, time, math, collections, functools, uvloop, dataclasses, typing, enum
+- `core/system/resource_manager.py` depends on: psutil, time
+- `core/system/plugin_manager.py` depends on: importlib, os, core.utils.config_utils
+- `core/system/agent_improvement_pipeline.py` depends on: os, json, logging, pandas, pathlib
+- `core/system/system_boot_logger.py` depends on: json, time, os, logging, dataclasses, typing
+- `core/system/kg_cache.py` depends on: redis
+- `core/system/memory_manager.py` depends on: json, os, logging, numpy, datetime, typing, sklearn.feature_extraction.text, sklearn.metrics.pairwise
+- `core/system/monitoring.py` depends on: time, core.utils.data_utils
+- `core/system/knowledge_base.py` depends on: json, logging, typing, pathlib, core.system.kg_cache
+- `core/system/bootstrap.py` depends on: sys, os, importlib.util, logging, typing
+- `core/system/hmm_protocol.py` depends on: json, uuid, typing, datetime
+- `core/system/system_controller.py` depends on: plugin_manager, agents, core.utils.config_utils
+- `core/system/message_broker.py` depends on: logging, collections, threading, typing
+- `core/system/aof_guardrail.py` depends on: functools, logging, typing, core.system.hmm_protocol
+- `core/system/data_manager.py` depends on: pandas, core.utils.data_utils
+- `core/system/interaction_loop.py` depends on: logging, asyncio, core.system.agent_orchestrator, core.system.echo, core.system.knowledge_base, core.utils.config_utils, core.utils.token_utils, core.system.error_handler
+- `core/system/temporal_engine.py` depends on: asyncio, logging, time, typing, datetime
+- `core/system/pubsub_broker.py` depends on: logging, asyncio, json, typing
+- `core/system/state_manager.py` depends on: json, os, time, typing, datetime, pydantic
+- `core/system/error_handler.py` depends on: core.utils.config_utils
+- `core/system/boot_protocol.py` depends on: time, typing, system_boot_logger
+- `core/system/memory_consolidator.py` depends on: logging, json, networkx, core.system.repo_graph, core.engine.unified_knowledge_graph, core.system.memory_manager
+- `core/system/red_teaming_framework.py` depends on: asyncio, typing, core.agents.agent_base
+- `core/system/nexus_zero_orchestrator.py` depends on: logging, asyncio, typing, core.agents.specialized.sentinel_agent, core.agents.specialized.credit_sentry_agent, core.agents.meta_agents.odyssey_meta_agent, core.engine.odyssey_knowledge_graph
+- `core/system/task_scheduler.py` depends on: schedule, time
+- `core/system/capabilities.py` depends on: os, logging, torch
+- `core/system/hybrid_orchestrator.py` depends on: asyncio, typing, core.system.v22_async.async_workflow_manager
+- `core/system/agent_orchestrator.py` depends on: logging, yaml, os, importlib, asyncio, json, financial_digital_twin.nexus_agent, pathlib, collections, typing, core.agents.agent_base, core.llm_plugin, core.agents.query_understanding_agent, core.agents.data_retrieval_agent, core.agents.market_sentiment_agent, core.agents.macroeconomic_analysis_agent, core.agents.geopolitical_risk_agent, core.agents.industry_specialist_agent, core.agents.fundamental_analyst_agent, core.agents.technical_analyst_agent, core.agents.risk_assessment_agent, core.agents.newsletter_layout_specialist_agent, core.agents.data_verification_agent, core.agents.lexica_agent, core.agents.archive_manager_agent, core.agents.agent_forge, core.agents.prompt_tuner, core.agents.code_alchemist, core.agents.lingua_maestro, core.agents.sense_weaver, core.agents.snc_analyst_agent, core.agents.behavioral_economics_agent, core.agents.meta_cognitive_agent, core.agents.financial_modeling_agent, core.agents.portfolio_optimization_agent, core.agents.quantitative_risk_agent, core.agents.black_swan_agent, core.agents.quantum_monte_carlo_agent, core.agents.specialized.blindspot_agent, core.agents.meta_agents.crisis_simulation_agent, pydantic, core.schemas.config_schema, core.utils.config_utils, core.utils.secrets_utils, core.system.message_broker, semantic_kernel, semantic_kernel.connectors.ai.open_ai
+- `core/system/repo_graph.py` depends on: ast, os, networkx, logging, typing
+- `core/system/provenance_logger.py` depends on: json, uuid, datetime, os, hashlib, psutil, subprocess, typing, enum
+- `core/system/brokers/rabbitmq_client.py` depends on: pika, core.system.message_broker
+- `core/system/v22_async/adaptive_heuristics.py` depends on: time, json, logging, typing, collections
+- `core/system/v22_async/async_task.py` depends on: typing
+- `core/system/v22_async/async_agent_base.py` depends on: asyncio, json, logging, abc, typing, core.system.message_broker, core.system.v22_async.adaptive_heuristics, semantic_kernel
+- `core/system/v22_async/async_workflow_manager.py` depends on: asyncio, json, uuid, threading, typing, core.system.message_broker, workflow
+- `core/system/v22_async/workflow.py` depends on: typing, async_task
+- `core/system/learning/trace_collector.py` depends on: json, time, uuid, os, logging, typing, datetime, enum, pydantic
+- `core/system/reasoning/integrity_monitor.py` depends on: logging, numpy, typing, pydantic, core.utils.logging_utils
+- `core/system/message_bus/rabbitmq_broker.py` depends on: logging, json, asyncio, aio_pika, typing, core.system.message_bus.base
+- `core/system/message_bus/base.py` depends on: abc, typing
+- `core/system/microservices/service_definitions.py` depends on: enum, pydantic
+- `core/data/realtime_fetcher.py` depends on: logging, yfinance, pandas, datetime, typing
+- `core/data/market_history_simulator.py` depends on: json, random, math, datetime, os
+- `core/data/timescaledb.py` depends on: logging, typing
+- `core/data/historical_loader.py` depends on: os, json, yfinance, pandas, datetime
+- `core/product/__init__.py` depends on: core_valuation
+- `core/product/core_valuation.py` depends on: math, typing
+- `core/workflows/snc_pipeline.py` depends on: json, os, re
+- `core/research/gnn/graph_risk_engine.py` depends on: math, random, typing
+- `core/research/gnn/model.py` depends on: torch, torch.nn, torch.nn.functional, layers
+- `core/research/gnn/__init__.py` depends on: graph_risk_engine
+- `core/research/gnn/layers.py` depends on: torch, torch.nn, torch.nn.functional, math
+- `core/research/gnn/explainer.py` depends on: torch, torch.nn, torch.optim
+- `core/research/gnn/engine.py` depends on: torch, networkx, numpy, core.engine.unified_knowledge_graph, model, explainer
+- `core/research/federated_learning/federated_coordinator.py` depends on: typing, federated_client
+- `core/research/federated_learning/fl_client.py` depends on: torch, torch.optim, copy, numpy, model, core.research.gnn.model, privacy
+- `core/research/federated_learning/federated_client.py` depends on: random, time, typing
+- `core/research/federated_learning/model.py` depends on: torch, torch.nn, torch.nn.functional
+- `core/research/federated_learning/privacy.py` depends on: torch, torch.nn.functional
+- `core/research/federated_learning/__init__.py` depends on: federated_client, federated_coordinator
+- `core/research/federated_learning/fl_coordinator.py` depends on: torch, copy, model, fl_client, core.research.gnn.model, privacy
+- `core/research/oswm/model.py` depends on: torch, torch.nn, math
+- `core/research/oswm/inference.py` depends on: torch, torch.nn, torch.optim, numpy, core.data_sources.data_fetcher, model, priors
+- `core/research/oswm/priors.py` depends on: torch, torch.nn, numpy
+- `core/simulation/economy.py` depends on: random, typing, pydantic, sovereign
+- `core/simulation/sovereign.py` depends on: random, typing, pydantic
+- `core/simulation/narrative.py` depends on: random, sovereign
+- `core/simulation/demographics.py` depends on: random, typing, sovereign
+- `core/simulation/__init__.py` depends on: sovereign, demographics, economy, narrative, generator
+- `core/simulation/generator.py` depends on: random, uuid, typing, sovereign, demographics, economy, narrative
+- `core/simulation/local_simulation_mirror.py` depends on: logging, typing
+- `core/simulation/dream_cycle.py` depends on: asyncio, json, logging, random, time, os, typing
+- `core/simulation/financial_statement_generator.py` depends on: random, datetime
+- `core/simulation/scenarios/ccar_2025.py` depends on: pydantic
+- `core/devx/simulation/local_mirror.py` depends on: logging, typing
+- `core/devx/telemetry/microscopic_logger.py` depends on: logging, tempfile, time, typing
+- `core/math/probability_models.py` depends on: math, random, logging, numpy, typing
+- `core/os_framework/coordination/process_scheduler.py` depends on: logging
+- `core/os_framework/networking/dpdk_bypass.py` depends on: logging, typing
+- `core/prompting/scanner.py` depends on: os, yaml, re, typing, core.prompting.loader
+- `core/prompting/__init__.py` depends on: base_prompt_plugin, registry
+- `core/prompting/registry.py` depends on: typing, base_prompt_plugin, plugins.financial_truth_plugin, plugins.tree_of_thoughts_plugin, plugins.chain_of_verification_plugin
+- `core/prompting/json_rpc_library.py` depends on: typing
+- `core/prompting/base_prompt_plugin.py` depends on: json, yaml, __future__, abc, typing, datetime, pathlib, pydantic, jinja2
+- `core/prompting/advanced_reasoning.py` depends on: typing, pydantic, core.prompting.base_prompt_plugin
+- `core/prompting/loader.py` depends on: os, yaml, json, re, functools, typing, core.utils.logging_utils
+- `core/prompting/plugins/json_rpc_plugin.py` depends on: typing, pydantic, core.prompting.base_prompt_plugin, core.prompting.json_rpc_library, core.schemas.json_rpc
+- `core/prompting/plugins/example_plugin.py` depends on: __future__, typing, pydantic, core.prompting.base_prompt_plugin
+- `core/prompting/plugins/crisis_simulation_plugin.py` depends on: json, __future__, core.prompting.base_prompt_plugin, core.schemas.crisis_simulation
+- `core/prompting/plugins/chain_of_verification_plugin.py` depends on: __future__, typing, pydantic, core.prompting.base_prompt_plugin
+- `core/prompting/plugins/skeleton_inject_plugins.py` depends on: re, json, __future__, typing, core.prompting.base_prompt_plugin, core.schemas.skeleton_inject, core.schemas.critique, core.prompting.loader
+- `core/prompting/plugins/tree_of_thoughts_plugin.py` depends on: __future__, typing, pydantic, core.prompting.base_prompt_plugin
+- `core/prompting/plugins/financial_truth_plugin.py` depends on: re, __future__, core.prompting.base_prompt_plugin, core.schemas.financial_truth
+- `core/prompting/workflows/skeleton_inject.py` depends on: re, json, os, uuid, datetime, typing, pydantic, core.prompting.plugins.skeleton_inject_plugins, core.utils.logging_utils
+- `core/prompting/personas/risk_officer.py` depends on: typing, pydantic, core.prompting.base_prompt_plugin
+- `core/prompting/personas/adam_risk_architect.py` depends on: typing, pydantic, core.prompting.base_prompt_plugin
+- `core/newsletter_layout/generator.py` depends on: os, json, glob, datetime, jinja2, typing, core.utils.logging_utils
+- `core/interfaces/financial_analyzer.py` depends on: abc, typing, pydantic
+- `core/simulations/Regulatory_Compliance_Simulation.py` depends on: json, datetime, utils.api_communication, core.agents.snc_analyst_agent, core.agents.regulatory_compliance_agent, core.agents.legal_agent
+- `core/simulations/Investment_Committee_Simulation.py` depends on: json, datetime, utils.api_communication, core.agents.fundamental_analyst_agent, core.agents.technical_analyst_agent, core.agents.risk_assessment_agent, core.agents.prediction_market_agent, core.agents.alternative_data_agent, core.agents.crypto_agent, core.agents.discussion_chair_agent
+- `core/simulations/unified_banking_sim.py` depends on: json, logging, os, sys, typing, core.simulations.world_model
+- `core/simulations/financial_wargame_engine.py` depends on: uuid, random, logging, typing, datetime, pydantic
+- `core/simulations/avg_search.py` depends on: numpy, logging, dataclasses, typing
+- `core/simulations/client_simulation_builder.py` depends on: json, os, sys
+- `core/simulations/comprehensive_credit_simulation.py` depends on: math, logging, numpy, dataclasses, typing
+- `core/simulations/Merger_Acquisition_Simulation.py` depends on: json, datetime, utils.api_communication, core.agents.fundamental_analyst_agent, core.agents.industry_specialist_agent, core.agents.risk_assessment_agent, core.agents.legal_agent
+- `core/simulations/Stress_Testing_Simulation.py` depends on: json, datetime, utils.api_communication, core.agents.risk_assessment_agent, core.agents.macroeconomic_analysis_agent, core.agents.geopolitical_risk_agent, core.agents.industry_specialist_agent
+- `core/simulations/market_oracle.py` depends on: json, os, logging, numpy, typing
+- `core/simulations/Portfolio_Optimization_Simulation.py` depends on: json, datetime, utils.api_communication, core.agents.risk_assessment_agent, core.agents.fundamental_analyst_agent, core.agents.technical_analyst_agent, core.agents.market_sentiment_agent, core.agents.prediction_market_agent, core.agents.alternative_data_agent
+- `core/simulations/sovereign_conflict.py` depends on: random, statistics, copy, typing, datetime
+- `core/simulations/quantum_monte_carlo.py` depends on: logging, random, math, time, numpy, typing
+- `core/simulations/__init__.py` depends on: Credit_Rating_Assessment_Simulation, Fraud_Detection_Simulation, Investment_Committee_Simulation, Merger_Acquisition_Simulation, Portfolio_Optimization_Simulation, Regulatory_Compliance_Simulation, Stress_Testing_Simulation, adam_van_grover_search, distressed_credit_pricing_simulation, avg_search
+- `core/simulations/Credit_Rating_Assessment_Simulation.py` depends on: json, core.agents.snc_analyst_agent, core.agents.fundamental_analyst_agent, core.agents.industry_specialist_agent, core.agents.discussion_chair_agent
+- `core/simulations/crisis_generator.py` depends on: logging, asyncio, typing, pydantic, core.llm_plugin, core.risk_engine.quantum_monte_carlo
+- `core/simulations/world_model.py` depends on: numpy, logging, typing, pydantic, core.infrastructure.provenance, core.infrastructure.provenance
+- `core/simulations/alpha_finance.py` depends on: logging, numpy, typing
+- `core/simulations/adam_van_grover_search.py` depends on: numpy, logging, math, time, core.engine.quantum_recommendation_engine
+- `core/simulations/distressed_credit_pricing_simulation.py` depends on: math, logging, dataclasses, typing
+- `core/simulations/align_future_simulator.py` depends on: os, ast, random, math, typing, pathlib
+- `core/simulations/Fraud_Detection_Simulation.py` depends on: json, datetime, utils.api_communication, core.agents.anomaly_detection_agent, core.agents.machine_learning_model_training_agent, core.agents.alternative_data_agent
+- `core/v24_architecture/infrastructure/message_bus.py` depends on: abc, asyncio, logging, typing
+- `core/v24_architecture/infrastructure/service_definitions.py` depends on: enum, pydantic
+- `core/v24_architecture/brain/semantic_router.py` depends on: logging, numpy, typing, sentence_transformers
+- `core/v24_architecture/brain/rag_planner.py` depends on: logging, re, typing, core.utils.logging_utils
+- `core/v24_architecture/integrity/conviction.py` depends on: logging, json, typing, sentence_transformers
+- `core/v24_architecture/integrity/schema.py` depends on: typing, pydantic
+- `core/v24_architecture/reasoning/robust_graph.py` depends on: logging, operator, typing, core.v24_architecture.reasoning.self_reflection, langgraph.graph, langgraph.checkpoint.memory
+- `core/v24_architecture/reasoning/self_reflection.py` depends on: logging, typing
+- `core/gold_standard/discovery.py` depends on: os, json, logging, pandas, yfinance, typing, datetime
+- `core/gold_standard/storage.py` depends on: os, uuid, logging, pandas, pyarrow, pyarrow.parquet, typing
+- `core/gold_standard/data_fetcher.py` depends on: time, logging, pandas, yfinance, typing, storage, qa
+- `core/gold_standard/ingestion.py` depends on: time, logging, pandas, yfinance, typing, storage, qa
+- `core/gold_standard/qa.py` depends on: logging, pandas, pandera, pandas_market_calendars, pandera
+- `core/gold_standard/trading/strategy.py` depends on: pandas, numpy
+- `core/gold_standard/trading/cleaning.py` depends on: pandas, numpy
+- `core/gold_standard/advisory/black_litterman.py` depends on: logging, pandas, typing, pypfopt, pypfopt
+- `core/gold_standard/advisory/mpt.py` depends on: logging, pandas, numpy, typing, pypfopt
+- `core/analysis/trading_logic.py` depends on: talib, numpy
+- `core/analysis/base_analyzer.py` depends on: abc, typing, pydantic
+- `core/analysis/counterfactual_engine.py` depends on: pandas, dowhy
+- `core/analysis/multimodal_analyst.py` depends on: logging, asyncio, json, typing, pydantic, core.llm_plugin, core.interfaces.financial_analyzer
+- `core/analysis/rag_analyzer.py` depends on: logging, asyncio, typing, pydantic, core.analysis.base_analyzer, core.rag.rag_engine, core.llm_plugin
+- `core/analysis/technical_analysis.py` depends on: pandas, numpy, pickle, sklearn.ensemble, ta.trend, trading_logic, ta.momentum, ta.volatility, ta.volume, typing, core.security.safe_unpickler
+- `core/analysis/fundamental_analysis.py` depends on: pandas, numpy, yfinance, typing, langchain.tools, langchain.tools.python.tool, langchain.agents, langchain_openai, langchain
+- `core/analysis/gemini_analyzer.py` depends on: logging, asyncio, json, typing, core.interfaces.financial_analyzer, core.llm_plugin
+- `core/analysis/complexity_formula.py` depends on: math, dataclasses, typing
+- `core/analysis/risk_assessment.py` depends on: numpy, pandas, scipy.stats, typing, datetime
+- `core/analysis/forecasting/hybrid_model.py` depends on: pandas, numpy, torch, torch.nn, torch.optim, statsmodels.tsa.arima.model
+- `core/analysis/xai/shap_explainer.py` depends on: shap
+- `core/analysis/validation/time_series_validator.py` depends on: numpy, pandas, typing, core.engine.forecasting_engine
+- `core/quantitative/pricing.py` depends on: math, logging, asyncio, rust_pricing, typing
+- `core/quantitative/matching_engine.py` depends on: heapq, logging, rust_pricing, collections, typing, datetime, uuid, core.unified_ledger.schema
+- `core/v30_architecture/neuro_quantum/trainer.py` depends on: typing, ontology
+- `core/v30_architecture/neuro_quantum/ontology.py` depends on: enum, dataclasses, typing
+- `core/v30_architecture/neuro_quantum/reservoir.py` depends on: numpy, logging, typing, sklearn.linear_model, liquid_net, framer, ontology
+- `core/v30_architecture/neuro_quantum/framer.py` depends on: logging, typing, liquid_net
+- `core/v30_architecture/neuro_quantum/synthesizer.py` depends on: numpy, logging, dataclasses, typing, liquid_net, ontology
+- `core/v30_architecture/neuro_quantum/synapse.py` depends on: numpy, logging
+- `core/v30_architecture/neuro_quantum/liquid_net.py` depends on: numpy, dataclasses, typing, synapse
+- `core/v30_architecture/neuro_quantum/run_assessment.py` depends on: json, asyncio, os, sys, core.engine.swarm.pheromone_board, core.engine.swarm.neuro_worker
+- `core/v30_architecture/python_intelligence/hive_mind.py` depends on: asyncio, random, sys, os, json, uvicorn, datetime, typing, core.v30_architecture.python_intelligence.bridge.neural_link, core.v30_architecture.python_intelligence.agents.code_weaver, core.v30_architecture.python_intelligence.agents.news_bot, bridge.neural_link, agents.code_weaver, agents.news_bot
+- `core/v30_architecture/python_intelligence/agents/regulatory_compliance_agent.py` depends on: asyncio, logging, typing, core.v30_architecture.python_intelligence.agents.base_agent
+- `core/v30_architecture/python_intelligence/agents/market_scanner.py` depends on: asyncio, logging, yfinance, pandas, random, sys, os, typing, core.v30_architecture.python_intelligence.agents.base_agent, core.v30_architecture.python_intelligence.agents.base_agent
+- `core/v30_architecture/python_intelligence/agents/hardened_shield.py` depends on: asyncio, logging, random, core.v30_architecture.python_intelligence.agents.base_agent
+- `core/v30_architecture/python_intelligence/agents/macro_economic_agent.py` depends on: asyncio, logging, typing, core.v30_architecture.python_intelligence.agents.base_agent
+- `core/v30_architecture/python_intelligence/agents/fundamental_analyst.py` depends on: asyncio, random, logging, json, datetime, typing, pydantic, core.v30_architecture.python_intelligence.agents.base_agent
+- `core/v30_architecture/python_intelligence/agents/quantitative_analyst.py` depends on: asyncio, logging, yfinance, pandas, ta, random, sys, os, typing, core.v30_architecture.python_intelligence.agents.base_agent, core.v30_architecture.python_intelligence.agents.base_agent
+- `core/v30_architecture/python_intelligence/agents/base_agent.py` depends on: logging, os, sys, core.v30_architecture.python_intelligence.bridge.neural_mesh, core.v30_architecture.python_intelligence.bridge.neural_mesh
+- `core/v30_architecture/python_intelligence/agents/news_bot.py` depends on: logging, re, asyncio, os, hashlib, time, requests, defusedxml.ElementTree, threading, duckdb, sys, os, typing, pydantic, sklearn.feature_extraction.text, duckduckgo_search, core.v30_architecture.python_intelligence.agents.base_agent, core.v30_architecture.python_intelligence.agents.base_agent
+- `core/v30_architecture/python_intelligence/agents/swarm_runner.py` depends on: asyncio, random, logging, uvicorn, sys, os, sys, os, datetime, contextlib, core.v30_architecture.python_intelligence.bridge.neural_mesh, core.v30_architecture.python_intelligence.agents.base_agent, core.v30_architecture.python_intelligence.agents.quantitative_analyst, core.v30_architecture.python_intelligence.agents.risk_guardian, core.v30_architecture.python_intelligence.agents.market_scanner, core.agents.specialized.blindspot_agent, core.v30_architecture.python_intelligence.agents.sovereign_orchestrator, core.v30_architecture.python_intelligence.agents.adversarial_red_team, core.v30_architecture.python_intelligence.agents.hardened_shield, core.v30_architecture.python_intelligence.agents.market_sentiment_agent, core.v30_architecture.python_intelligence.agents.macro_economic_agent, core.v30_architecture.python_intelligence.agents.regulatory_compliance_agent, core.v30_architecture.python_intelligence.bridge.neural_mesh, base_agent, quantitative_analyst, risk_guardian, market_scanner, core.agents.specialized.blindspot_agent, sovereign_orchestrator, adversarial_red_team, hardened_shield, market_sentiment_agent, macro_economic_agent, regulatory_compliance_agent
+- `core/v30_architecture/python_intelligence/agents/reviewer_agent.py` depends on: logging, random, typing, core.v30_architecture.python_intelligence.agents.base_agent
+- `core/v30_architecture/python_intelligence/agents/adversarial_red_team.py` depends on: asyncio, logging, random, core.v30_architecture.python_intelligence.agents.base_agent
+- `core/v30_architecture/python_intelligence/agents/monitoring_agent.py` depends on: asyncio, random, logging, sys, os, uvicorn, datetime, core.v30_architecture.python_intelligence.bridge.neural_link, neural_link
+- `core/v30_architecture/python_intelligence/agents/code_weaver.py` depends on: os, logging, ast, re, typing, dataclasses
+- `core/v30_architecture/python_intelligence/agents/sovereign_orchestrator.py` depends on: asyncio, logging, random, typing, core.v30_architecture.python_intelligence.agents.base_agent, core.llm_plugin
+- `core/v30_architecture/python_intelligence/agents/market_sentiment_agent.py` depends on: asyncio, random, logging, json, litellm, sys, os, typing, pydantic, duckduckgo_search, core.v30_architecture.python_intelligence.agents.base_agent, core.v30_architecture.python_intelligence.agents.base_agent
+- `core/v30_architecture/python_intelligence/agents/risk_guardian.py` depends on: asyncio, logging, numpy, scipy.stats, yfinance, pandas, sys, os, datetime, typing, pydantic, core.v30_architecture.python_intelligence.agents.base_agent, core.v30_architecture.python_intelligence.agents.base_agent
+- `core/v30_architecture/python_intelligence/bridge/ephemeral_cortex.py` depends on: asyncio, logging, typing, datetime
+- `core/v30_architecture/python_intelligence/bridge/neural_link.py` depends on: asyncio, json, uuid, logging, uvicorn, os, pydantic, typing, datetime, pydantic, fastapi, fastapi.middleware.cors
+- `core/v30_architecture/python_intelligence/bridge/neural_mesh.py` depends on: logging, asyncio, uuid, os, json, uvicorn, typing, datetime, pydantic, fastapi, fastapi.middleware.cors, core.v30_architecture.python_intelligence.bridge.ephemeral_cortex
+- `core/v30_architecture/python_intelligence/orchestrator/v30_orchestrator.py` depends on: logging, asyncio, re, typing, dataclasses, core.v30_architecture.python_intelligence.mcp.server
+- `core/v30_architecture/python_intelligence/mcp/server.py` depends on: json, logging, time, typing
+- `core/v30_architecture/python_intelligence/workflows/sovereign_workflow.py` depends on: asyncio, logging, typing, enum, core.llm_plugin
+- `core/memory/hnasp_engine.py` depends on: json, json_logic, datetime, typing, core.schemas.hnasp
+- `core/memory/__init__.py` depends on: engine
+- `core/memory/provo_graph.py` depends on: logging, uuid, json, typing, datetime
+- `core/memory/episodic_memory.py` depends on: uuid, logging, typing, datetime, pydantic, core.memory.vector_ops, core.llm_plugin
+- `core/memory/engine.py` depends on: json, os, sqlite3, typing
+- `core/memory/vector_ops.py` depends on: logging, abc, typing
+- `core/ingestion/semantic_chunker.py` depends on: typing
+- `core/strategy/manager.py` depends on: typing
+- `core/strategy/__init__.py` depends on: manager, alpha_signals, rl_optimizer
+- `core/strategy/alpha_signals.py` depends on: typing
+- `core/sandboxing/wasm/wasm_sandbox.py` depends on: logging, typing
+- `core/audit/audit_logger.py` depends on: json, uuid, logging, datetime, typing, pydantic
+- `core/audit/audit_agent.py` depends on: re, typing
+- `core/vectorstore/base_vector_store.py` depends on: abc, typing
+- `core/vectorstore/stores/in_memory_vector_store.py` depends on: logging, numpy, typing, core.vectorstore.base_vector_store
+- `core/procedures/autonomous_update.py` depends on: logging, json, os, asyncio, datetime, typing, core.agents.sub_agents.data_ingestion_agent, core.data_sources.data_fetcher
+- `core/pricing_engine/__init__.py` depends on: engine
+- `core/pricing_engine/engine.py` depends on: math, random, typing
+- `core/advisory/robo_advisor_v2.py` depends on: json, dataclasses, typing, enum
+- `core/advisory/robo_advisor.py` depends on: json, dataclasses, typing, enum
+- `core/advisory/robo_advisor_v3.py` depends on: json, typing
+- `core/engine/refinement_loop.py` depends on: logging, typing, core.engine.consensus_engine, core.agents.critique_swarm
+- `core/engine/risk_synthesis.py` depends on: json, os, logging, typing, core.governance.sentinel_harness
+- `core/engine/simulation_engine.py` depends on: json, re, networkx, typing, core.system.provenance_logger
+- `core/engine/interfaces.py` depends on: abc, typing
+- `core/engine/system2_state.py` depends on: typing, pydantic
+- `core/engine/semantic_router.py` depends on: logging, numpy, core.utils.repo_context, sklearn.feature_extraction.text, sklearn.metrics.pairwise
+- `core/engine/adjudicator_engine.py` depends on: random, typing, core.engine.states
+- `core/engine/contagion_engine.py` depends on: json, os, networkx, typing
+- `core/engine/memory_orchestrator.py` depends on: logging, asyncio, typing, core.engine.memory.vector_memory, core.engine.memory.graph_memory
+- `core/engine/red_team_graph.py` depends on: logging, random, typing, core.engine.states, langgraph.graph
+- `core/engine/strategy_utils.py` depends on: logging, typing
+- `core/engine/factory.py` depends on: typing, core.engine.interfaces, core.engine.live_mock_engine, core.engine.real_engine
+- `core/engine/real_engine.py` depends on: typing, core.engine.interfaces
+- `core/engine/quantum_recommendation_engine.py` depends on: numpy, enum
+- `core/engine/autonomous_self_improvement.py` depends on: time, logging, random, typing
+- `core/engine/odyssey_knowledge_graph.py` depends on: logging, json, os, networkx, jsonschema, itertools, typing, core.engine.unified_knowledge_graph
+- `core/engine/states.py` depends on: operator, datetime, typing
+- `core/engine/esg_graph.py` depends on: logging, typing, core.engine.states, langgraph.graph, langgraph.checkpoint.memory
+- `core/engine/__init__.py` depends on: cyclical_reasoning_graph, snc_graph
+- `core/engine/crisis_simulation_graph.py` depends on: logging, random, typing, core.utils.graph_utils, core.engine.sector_impact_engine, core.engine.states
+- `core/engine/system2_graph.py` depends on: logging, langgraph.graph, langgraph.graph.state, typing, core.engine.system2_state, core.engine.nodes.dcf_generator_node, core.engine.nodes.financial_validation_node
+- `core/engine/upgrade_manager.py` depends on: asyncio, json, logging, os, datetime, core.agents.upgrade_swarm.upgrade_agents
+- `core/engine/forecasting_engine.py` depends on: numpy, json, os, datetime
+- `core/engine/live_mock_engine.py` depends on: json, random, time, threading, os, uuid, copy, core.engine.consensus_engine, core.utils.narrative_weaver, core.engine.interfaces
+- `core/engine/deep_dive_graph.py` depends on: logging, typing, core.engine.states, core.engine.valuation_utils, core.engine.strategy_utils, core.engine.entity_utils, adam_finance.snc_utils, core.vertical_risk_agent.generative_risk, langgraph.graph, langgraph.checkpoint.memory
+- `core/engine/meta_orchestrator.py` depends on: asyncio, logging, re, uuid, typing, core.agents.fundamental_analyst_agent, core.agents.specialized.credit_snc, core.agents.specialized.management_assessment_agent, core.agents.specialized.monte_carlo_risk_agent, core.agents.specialized.peer_comparison_agent, core.agents.specialized.portfolio_manager_agent, core.agents.specialized.quantum_scenario_agent, core.engine.autonomous_self_improvement, core.engine.crisis_simulation_graph, core.engine.deep_dive_graph, core.engine.esg_graph, core.engine.neuro_symbolic_planner, core.engine.red_team_graph, core.engine.reflector_graph, core.engine.regulatory_compliance_graph, core.engine.semantic_router, core.engine.states, core.engine.surveillance_graph, core.engine.swarm.hive_mind, core.engine.swarm.mirofish_engine, core.llm_plugin, core.mcp.registry, core.schemas.v23_5_schema, core.system.agent_orchestrator, core.utils.logging_utils, core.utils.proof_of_thought, core.utils.repo_context
+- `core/engine/snc_graph.py` depends on: logging, typing, core.utils.graph_utils, core.engine.states, core.agents.specialized.regulatory_snc_agent, core.engine.risk_consensus_engine, core.compliance.snc_validators, adam_finance.snc_utils
+- `core/engine/market_sentiment_graph.py` depends on: logging, random, typing, langgraph.graph, langgraph.checkpoint.memory, core.engine.states
+- `core/engine/scenario_engine.py` depends on: json, os, time, typing
+- `core/engine/valuation_utils.py` depends on: logging, typing
+- `core/engine/planner.py` depends on: networkx, typing
+- `core/engine/agent_adapters.py` depends on: json, logging, numpy, yfinance, typing, core.agents.risk_assessment_agent
+- `core/engine/reflector_graph.py` depends on: logging, typing, core.engine.states, langgraph.graph, langgraph.checkpoint.memory
+- `core/engine/cyclical_reasoning_graph.py` depends on: json, logging, random, logging, numpy, typing, core.engine.states, core.tools.tool_registry, core.data_processing.conviction_scorer, core.prompting.personas.risk_officer, langgraph.graph, langgraph.checkpoint.memory, core.vertical_risk_agent.generative_risk, core.agents.risk_assessment_agent
+- `core/engine/graph_cache.py` depends on: networkx, logging, threading
+- `core/engine/entity_utils.py` depends on: logging, typing
+- `core/engine/conviction_manager.py` depends on: datetime, random
+- `core/engine/cognitive_harness.py` depends on: typing, core.agents.meta_agents.omega_meta_orchestrator, core.schemas.agent_schema
+- `core/engine/risk_consensus_engine.py` depends on: typing, pydantic, core.schemas.v23_5_schema
+- `core/engine/sector_impact_engine.py` depends on: json, os, random, statistics, typing, core.engine.contagion_engine
+- `core/engine/bsl_generator.py` depends on: random, typing
+- `core/engine/dream_cycle.py` depends on: time, json, random, os, uuid, math, typing, core.utils.proof_of_thought, core.math.probability_models
+- `core/engine/consensus_engine.py` depends on: os, json, logging, fcntl, datetime, typing
+- `core/engine/unified_knowledge_graph.py` depends on: json, logging, os, threading, networkx, typing, core.engine.graph_cache
+- `core/engine/consensus_engine_v2.py` depends on: json, os, logging, statistics, hashlib, re, datetime, typing, textblob, core.swarms.memory_matrix, core.utils.narrative_weaver
+- `core/engine/mock_llm_generator.py` depends on: random, typing
+- `core/engine/neuro_symbolic_planner.py` depends on: logging, networkx, re, asyncio, asyncio, functools, typing, langgraph.graph, enum, core.engine.unified_knowledge_graph, core.engine.states, core.agents.risk_assessment_agent
+- `core/engine/regulatory_compliance_graph.py` depends on: logging, typing, core.engine.states, langgraph.graph, langgraph.checkpoint.memory
+- `core/engine/surveillance_graph.py` depends on: logging, random, typing, langgraph.graph, langgraph.checkpoint.memory, core.engine.states, core.schemas.surveillance, core.llm_plugin
+- `core/engine/nodes/financial_validation_node.py` depends on: logging, core.engine.system2_state
+- `core/engine/nodes/dcf_generator_node.py` depends on: logging, core.engine.system2_state
+- `core/engine/swarm/pheromone_board.py` depends on: time, asyncio, logging, typing, dataclasses
+- `core/engine/swarm/neuro_worker.py` depends on: asyncio, logging, typing, core.engine.swarm.worker_node, core.engine.swarm.pheromone_board, core.v30_architecture.neuro_quantum.liquid_net, core.v30_architecture.neuro_quantum.framer, core.v30_architecture.neuro_quantum.reservoir, core.v30_architecture.neuro_quantum.trainer, core.v30_architecture.neuro_quantum.synthesizer
+- `core/engine/swarm/worker_node.py` depends on: asyncio, logging, uuid, ast, subprocess, tempfile, os, typing, core.engine.swarm.pheromone_board, core.llm_plugin
+- `core/engine/swarm/hive_mind.py` depends on: asyncio, logging, typing, core.engine.swarm.pheromone_board, core.engine.swarm.worker_node
+- `core/engine/swarm/personas.py` depends on: random, typing, pydantic, core.engine.swarm.pheromone_board
+- `core/engine/swarm/mirofish_engine.py` depends on: asyncio, importlib, inspect, logging, pkgutil, core.agents, typing, core.agents.agent_base, core.engine.swarm.personas, core.engine.swarm.pheromone_board, core.engine.unified_knowledge_graph, core.llm_plugin
+- `core/engine/swarm/swarm_manager.py` depends on: asyncio, logging, json, yaml, typing, datetime, core.engine.swarm.hive_mind, core.engine.swarm.worker_node, core.system.message_bus.base, core.utils.config_utils
+- `core/engine/swarm/entrypoint.py` depends on: asyncio, core.engine.swarm.hive_mind
+- `core/engine/memory/graph_memory.py` depends on: logging, networkx, json, os, typing
+- `core/engine/memory/vector_memory.py` depends on: logging, chromadb, os, chromadb.config, sentence_transformers, typing
+- `core/oswm/trainer.py` depends on: torch, torch.nn, numpy, priors, model
+- `core/oswm/model.py` depends on: torch, torch.nn, torch.nn.functional, math
+- `core/oswm/inference.py` depends on: torch, numpy
+- `core/oswm/priors.py` depends on: torch, torch.nn, torch.nn.functional, numpy, random
+- `core/tools/financial_data.py` depends on: logging, datetime, random, yfinance, pandas, typing
+- `core/tools/tool_registry.py` depends on: logging, json, yfinance, typing, duckduckgo_search
+- `core/tools/base_tool.py` depends on: abc, typing
+- `core/tools/universal_ingestor_mcp.py` depends on: json, os, core.tools.base_tool, core.data_processing.universal_ingestor, typing
+- `core/tools/gemini_tools.py` depends on: logging, typing, abc
+- `core/tools/web_search_tool.py` depends on: logging, requests, bs4, typing, core.tools.base_tool, semantic_kernel.functions.kernel_function_decorator, duckduckgo_search, googlesearch
+- `core/tools/mock_llm_service/app.py` depends on: os, json, re, logging, random, flask
+- `core/training/train_dpo.py` depends on: os, torch, logging, argparse, typing, transformers, trl
+- `core/financial_data/discovery.py` depends on: logging, yfinance, typing, schema
+- `core/financial_data/modeling_schema.py` depends on: __future__, typing, pydantic, enum
+- `core/financial_data/schema.py` depends on: __future__, typing, pydantic, datetime
+- `core/financial_data/realtime_pipe.py` depends on: abc, logging, uuid, pandas, random, typing, pathlib, datetime, datetime
+- `core/financial_data/__init__.py` depends on: discovery, lakehouse, schema
+- `core/financial_data/lakehouse.py` depends on: logging, os, pandas, yfinance, uuid, pathlib, typing, schema
+- `core/v22_quantum_pipeline/data_expander.py` depends on: copy, json
+- `core/v22_quantum_pipeline/quantum_financial_synthesis.py` depends on: numpy, logging, typing, core.schemas.f2b_schema
+- `core/v22_quantum_pipeline/qmc_qiskit_poc.py` depends on: numpy, logging, math, __future__, typing, qiskit, qiskit.primitives, qiskit.circuit.library
+- `core/v22_quantum_pipeline/qmc_engine.py` depends on: numpy, logging, __future__, typing
+- `core/v22_quantum_pipeline/quantum_source.py` depends on: pennylane, torch, numpy, numpy
+- `core/v22_quantum_pipeline/async_loader.py` depends on: asyncio, json, os, datasets
+- `core/vertical_risk_agent/generative_risk.py` depends on: numpy, logging, asyncio, time, torch, torch.nn, torch.nn.functional, __future__, typing, pydantic, dataclasses, core.vertical_risk_agent.state
+- `core/vertical_risk_agent/state.py` depends on: operator, typing, pydantic
+- `core/vertical_risk_agent/agents/market.py` depends on: typing, state
+- `core/vertical_risk_agent/agents/analyst.py` depends on: typing, state
+- `core/vertical_risk_agent/agents/legal.py` depends on: typing, state
+- `core/vertical_risk_agent/agents/supervisor.py` depends on: typing, state, analyst, legal, market, langgraph.graph, langgraph.checkpoint.memory, core.evaluation.judge, core.evaluation.symbolic
+- `core/vertical_risk_agent/app/main.py` depends on: streamlit, json, os, glob, time
+- `core/vertical_risk_agent/app/odyssey_app.py` depends on: streamlit, json, os, asyncio, sys, core.system.nexus_zero_orchestrator
+- `core/vertical_risk_agent/ingestion/parser_router.py` depends on: os, logging, typing, xbrl_handler
+- `core/vertical_risk_agent/ingestion/sec_13f_handler.py` depends on: logging, defusedxml.ElementTree, numpy, pandas
+- `core/vertical_risk_agent/ingestion/xbrl_handler.py` depends on: logging, defusedxml.ElementTree, re, typing
+- `core/vertical_risk_agent/tools/agent_tools.py` depends on: sqlite3, pandas, sys, os, __future__, typing, pydantic, core.vertical_risk_agent.generative_risk, core.v22_quantum_pipeline.qmc_engine, core.engine.meta_orchestrator, core.security.sql_validator
+- `core/vertical_risk_agent/tools/mcp_server/server.py` depends on: sqlite3, pandas, sys, os, asyncio, json, importlib, os, typing, core.security.sql_validator, mcp.server.fastmcp, core.vertical_risk_agent.tools.mcp_server.components, core.vertical_risk_agent.generative_risk, core.v22_quantum_pipeline.qmc_engine, core.engine.meta_orchestrator
+- `core/vertical_risk_agent/tools/mcp_server/server2.py` depends on: sys, os, asyncio, typing, core.vertical_risk_agent.tools.agent_tools, mcp.server.fastmcp
+- `core/vertical_risk_agent/training/train_dpo.py` depends on: logging, argparse
+- `core/risk/generative_risk_engine.py` depends on: numpy, typing, enum, pydantic
+- `core/tests/test_agent_utils.py` depends on: pytest, json, logging, core.utils.agent_utils
+- `core/tests/test_neuro_reservoir.py` depends on: pytest, numpy, asyncio, core.v30_architecture.neuro_quantum.ontology, core.v30_architecture.neuro_quantum.reservoir, core.v30_architecture.neuro_quantum.trainer, core.engine.swarm.neuro_worker, core.engine.swarm.pheromone_board
+- `core/tests/test_system_boot.py` depends on: pytest, os, json, logging, core.system.system_boot_logger, core.system.boot_protocol, scripts.boot_system
+- `core/tests/test_data_utils.py` depends on: csv, json, pytest, yaml, core.system.error_handler, core.utils.data_utils
+- `core/tests/test_monte_carlo_agent.py` depends on: pytest, numpy, asyncio, core.agents.specialized.monte_carlo_risk_agent, core.schemas.v23_5_schema
+- `core/tests/test_hmm_protocol.py` depends on: unittest, core.system.hmm_protocol
+- `core/tests/test_nssf.py` depends on: pytest, core.intelligence.nssf.mocks, core.intelligence.nssf.mocks, core.intelligence.nssf.synapse, core.intelligence.nssf.liquid, core.intelligence.nssf.framer, core.intelligence.nssf.main, core.risk_engine.quantum_model, core.schemas.v23_5_schema
+- `core/tests/test_agent_expansion.py` depends on: unittest, asyncio, core.agents.specialized.strategic_snc_agent, core.agents.specialized.regulatory_snc_agent, core.agents.specialized.technical_covenant_agent, core.agents.specialized.financial_covenant_agent
+- `core/tests/test_neuro_synthesizer.py` depends on: pytest, asyncio, core.v30_architecture.neuro_quantum.ontology, core.v30_architecture.neuro_quantum.synthesizer, core.v30_architecture.neuro_quantum.liquid_net, core.engine.swarm.neuro_worker, core.engine.swarm.pheromone_board
+- `core/tests/test_neuro_quantum.py` depends on: pytest, numpy, asyncio, unittest.mock, core.v30_architecture.neuro_quantum.synapse, core.v30_architecture.neuro_quantum.liquid_net, core.v30_architecture.neuro_quantum.framer, core.engine.swarm.neuro_worker, core.engine.swarm.pheromone_board
+- `core/tests/test_risk_consensus.py` depends on: unittest, core.engine.risk_consensus_engine
+- `core/data_access/bigquery_connector.py` depends on: logging, os, typing
+- `core/data_access/lakehouse_connector.py` depends on: json, os, pandas, logging, duckdb, core.tools.base_tool, core.security.sql_validator, typing
+- `core/data_access/base_data_source.py` depends on: abc, typing
+- `core/data_access/json_file_source.py` depends on: json, logging, pathlib, typing, core.data_access.base_data_source, core.system.error_handler
+- `core/data_access/api_source.py` depends on: logging, typing, core.data_access.base_data_source
+- `core/world_simulation/wsm_v7_1.py` depends on: random, numpy, mesa, mesa.time, mesa.datacollection
+- `core/world_simulation/llm_driven_sim.py` depends on: json, typing, core.llm.base_llm_engine, core.world_simulation.config
+- `core/world_simulation/autonomous_world_sim.py` depends on: mesa, random, numpy, pandas, matplotlib.pyplot, typing, mesa, mesa.time, mesa.datacollection
+- `core/world_simulation/data_manager.py` depends on: json, pandas, typing
+- `core/world_simulation/zombie_check.py` depends on: sys, os, logging
+- `core/world_simulation/config.py` depends on: yaml, dataclasses, typing
+- `core/rag/document_handling.py` depends on: logging, typing
+- `core/rag/rag_engine.py` depends on: json, logging, numpy, typing, core.llm_plugin, core.rag.document_handling
+- `core/enterprise/credit_memo/spreading_engine.py` depends on: random, uuid, os, yfinance, logging, logging, typing, model, datetime, edgar
+- `core/enterprise/credit_memo/auditor.py` depends on: logging, re, typing, model
+- `core/enterprise/credit_memo/model.py` depends on: uuid, typing, pydantic, datetime
+- `core/enterprise/credit_memo/audit_logger.py` depends on: json, logging, os, typing, datetime, pydantic, model
+- `core/enterprise/credit_memo/prompt_registry.py` depends on: os, yaml, logging, typing, pydantic
+- `core/enterprise/credit_memo/__init__.py` depends on: model, agents, orchestrator, audit_logger, prompt_registry, auditor
+- `core/enterprise/credit_memo/orchestrator.py` depends on: logging, uuid, typing, datetime, model, agents, audit_logger, prompt_registry, auditor, spreading_engine
+- `core/enterprise/credit_memo/graph_engine.py` depends on: networkx, logging, os, typing, neo4j
+- `core/enterprise/credit_memo/citation_engine.py` depends on: uuid, typing, model
+- `core/enterprise/credit_memo/agents.py` depends on: typing, model, citation_engine, spreading_engine, graph_engine
+- `core/schemas/f2b_schema.py` depends on: pydantic, typing, datetime, uuid
+- `core/schemas/config_schema.py` depends on: __future__, typing, pydantic
+- `core/schemas/crisis_simulation.py` depends on: __future__, typing, pydantic
+- `core/schemas/surveillance.py` depends on: typing, pydantic
+- `core/schemas/market_data_schema.py` depends on: pandera, pandera.typing
+- `core/schemas/observability.py` depends on: uuid, contextlib, __future__, typing, datetime, pydantic
+- `core/schemas/hnasp.py` depends on: typing, pydantic, datetime
+- `core/schemas/hnasp_integration.py` depends on: uuid, typing, datetime, pydantic
+- `core/schemas/tool_use.py` depends on: __future__, typing, datetime, uuid, pydantic
+- `core/schemas/__init__.py` depends on: core.schemas.hnasp_v3, core.schemas.v23_5_schema, core.schemas.tool_use, core.schemas.hnasp_integration, core.schemas.cognitive_state, core.schemas.observability, core.schemas.registry
+- `core/schemas/registry.py` depends on: typing, pydantic
+- `core/schemas/skeleton_inject.py` depends on: pydantic, typing
+- `core/schemas/distressed_assets.py` depends on: typing, pydantic
+- `core/schemas/v23_5_schema.py` depends on: __future__, enum, typing, pydantic
+- `core/schemas/critique.py` depends on: typing, pydantic
+- `core/schemas/credit_conformance.py` depends on: __future__, enum, typing, pydantic
+- `core/schemas/hnasp_v3.py` depends on: uuid, __future__, typing, datetime, enum, pydantic
+- `core/schemas/agent_schema.py` depends on: typing, pydantic
+- `core/schemas/meta_agent_schemas.py` depends on: pydantic, typing, enum, datetime
+- `core/schemas/illiquid_market_schema.py` depends on: pydantic, typing
+- `core/schemas/cognitive_state.py` depends on: uuid, __future__, typing, pydantic
+- `core/schemas/financial_truth.py` depends on: pydantic
+- `core/schemas/sentinel.py` depends on: pydantic, typing
+- `core/schemas/json_rpc.py` depends on: __future__, typing, pydantic
+- `core/schemas/knowledge_graph.py` depends on: typing, pydantic
+- `core/schemas/hnasp_v23/agent_state.py` depends on: pydantic, typing, uuid, datetime
+## Module: docs
+## Module: human_gates
+## Module: logs
+## Module: servers
+- `servers/mcp_market.py` depends on: json, logging, fastmcp, src.market_mayhem.scanners
+## Module: src/pdil
+- `src/pdil/storage.py` depends on: json
+- `src/pdil/fallbacks.py` depends on: typing, src.pdil.middleware
+- `src/pdil/optimization.py` depends on: typing
+- `src/pdil/middleware.py` depends on: json, hashlib, time, urllib.request, urllib.error, asyncio, jsonschema, urllib.parse, typing, src.pdil.models
+- `src/pdil/lifecycle.py` depends on: time, typing
+- `src/pdil/primitives.py` depends on: typing
+- `src/pdil/models.py` depends on: pydantic
+- `src/pdil/system.py` depends on: typing
+## Module: src/schemas
+- `src/schemas/core_types.py` depends on: typing, pydantic, src.pdil.models
+## Module: tests
+- `tests/test_jsonrpc.py` depends on: pytest, adam_v3.kernel.jsonrpc
+- `tests/verify_news_bot_async.py` depends on: asyncio, unittest, sys, os, unittest.mock, core.agents.news_bot
+- `tests/verify_v21_config.py` depends on: unittest, sys, os, core.utils.config_utils
+- `tests/benchmark_ukg.py` depends on: time, sys, os, networkx, core.engine.unified_knowledge_graph
+- `tests/test_odyssey_graph_integration.py` depends on: sys, os, core.engine.unified_knowledge_graph
+- `tests/test_research_advanced.py` depends on: pytest, torch, torch.nn, core.research.gnn.model, core.research.federated_learning.fl_client, core.research.federated_learning.privacy, core.research.oswm.priors
+- `tests/test_social_media_api_fix.py` depends on: pytest, sys, unittest.mock, core.data_sources.social_media_api
+- `tests/test_hft_nexus.py` depends on: unittest, struct, asyncio, math, core.trading.hft.hft_engine_nexus
+- `tests/test_prompt_engine.py` depends on: unittest, os, shutil, pathlib, backend.intelligence.prompt_engine
+- `tests/test_github_alpha_agent.py` depends on: pytest, os, unittest.mock, datetime, core.agents.specialized.github_alpha_agent
+- `tests/test_simulation_security.py` depends on: unittest, json, services.webapp.api
+- `tests/test_v30_api_security.py` depends on: pytest, sys, os, unittest.mock, fastapi.testclient, core.api.main, core.settings
+- `tests/test_credit_risk.py` depends on: pytest, src.credit_risk, src.config
+- `tests/test_financial_truth_plugin.py` depends on: os, unittest, __future__, core.prompting.plugins.financial_truth_plugin, core.prompting.base_prompt_plugin, core.prompting.loader
+- `tests/test_strategy_backtest_agent.py` depends on: pytest, pandas, numpy, core.agents.strategy_backtest_agent
+- `tests/test_crypto_arbitrage_agent.py` depends on: pytest, asyncio, unittest.mock, core.agents.specialized.crypto_arbitrage_agent
+- `tests/test_v30_architecture.py` depends on: unittest, sys, os, core.v30_architecture.python_intelligence.agents.code_weaver, core.v30_architecture.python_intelligence.agents.news_bot, core.v30_architecture.python_intelligence.orchestrator.v30_orchestrator, core.v30_architecture.python_intelligence.mcp.server
+- `tests/test_cyclical_agents.py` depends on: unittest, asyncio, unittest.mock, core.agents.cyclical_reasoning_agent, core.agents.reflector_agent, core.schemas.agent_schema
+- `tests/test_prompt_quality.py` depends on: pytest, json, os, sys, core.agents.black_swan_agent
+- `tests/test_cors_security.py` depends on: pytest, sys, os, core.api.server
+- `tests/test_market_sentiment_v2.py` depends on: pytest, asyncio, unittest.mock, typing, core.agents.market_sentiment_agent, core.schemas.agent_schema
+- `tests/test_temporal_pulse.py` depends on: asyncio, logging, sys, os, unittest, unittest.mock, core.system.temporal_engine, core.procedures.autonomous_update, core.system.agent_orchestrator
+- `tests/test_early_stage_valuation.py` depends on: pytest, pydantic, src.early_stage_valuation
+- `tests/test_adam_v_next.py` depends on: unittest, sys, os, logging, json, datetime, core.engine.consensus_engine, core.agents.specialized.blindspot_agent, services.webapp.governance, flask, core.utils.logging_utils
+- `tests/test_sentinel_harness.py` depends on: pytest, core.governance.sentinel_harness
+- `tests/test_peer_set_agent.py` depends on: unittest, asyncio, sys, os, types, numpy, importlib.util, unittest.mock
+- `tests/test_options_flow_agent.py` depends on: pytest, core.agents.options_flow_agent
+- `tests/test_snc_compliance.py` depends on: unittest, asyncio, json, os, shutil, sys, unittest.mock, core.agents.snc_analyst_agent
+- `tests/test_regressions_and_additions.py` depends on: unittest, numpy, asyncio, core.agents.quantitative_risk_agent, core.agents.financial_modeling_agent, core.agents.portfolio_optimization_agent
+- `tests/test_fundamental_analyst_v30.py` depends on: pytest, asyncio, sys, os, unittest.mock, datetime, core.v30_architecture.python_intelligence.agents.fundamental_analyst
+- `tests/test_agent_orchestrator.py` depends on: sys, unittest, unittest.mock, core.system.agent_orchestrator, core.agents.agent_base, core.system.error_handler, core.system
+- `tests/test_memory_integration.py` depends on: asyncio, logging, os, json, unittest.mock, core.agents.fundamental_analyst_agent, core.agents.data_retrieval_agent, core.system.memory_manager
+- `tests/test_odyssey_flow.py` depends on: unittest, asyncio, sys, os, core.engine.odyssey_knowledge_graph, core.system.nexus_zero_orchestrator
+- `tests/validate_ukg_seed.py` depends on: json, os, sys
+- `tests/test_competitor_analysis_agent.py` depends on: unittest, asyncio, sys, os, types, importlib.util, unittest.mock
+- `tests/test_red_team_subsystem.py` depends on: pytest, asyncio, typing, core.security.red_team.quantum_scanner, core.security.red_team.response_engine, core.security.red_team.sandbox_env, core.agents.red_team_agent, core.agents.agent_base, core.system.red_teaming_framework
+- `tests/test_portfolio_optimization_agent.py` depends on: unittest, pandas, numpy, asyncio, core.agents.portfolio_optimization_agent
+- `tests/test_data_retrieval_agent.py` depends on: unittest, unittest.mock, core.agents.data_retrieval_agent, core.system.error_handler, core.system.knowledge_base
+- `tests/test_research_modules.py` depends on: unittest, pytest, torch, numpy, os, sys, core.research.oswm.priors, core.research.oswm.model, core.research.oswm.inference, core.research.federated_learning.fl_coordinator, core.research.gnn.engine
+- `tests/test_quantum.py` depends on: pytest, numpy, core.quantum.schrodinger_solver
+- `tests/test_repo_compiler.py` depends on: pytest, core.utils.repo_compiler.scanner, core.utils.repo_compiler.chunker, core.utils.repo_compiler.formatter, core.utils.repo_compiler.models
+- `tests/test_risk_agent_mock.py` depends on: pytest, asyncio, unittest.mock, core.agents.risk_assessment_agent
+- `tests/test_symphony_config.py` depends on: os, pytest, unittest.mock, core.symphony.config
+- `tests/test_quantum_capabilities.py` depends on: unittest, numpy, core.xai.iqnn_cs, core.vertical_risk_agent.generative_risk, core.v22_quantum_pipeline.qmc_engine
+- `tests/test_v23_remediation.py` depends on: unittest, logging, core.engine.neuro_symbolic_planner, core.engine.agent_adapters
+- `tests/test_api_log_privacy.py` depends on: sys, os, unittest, logging, json, core.api.server, unittest.mock
+- `tests/test_financial_modeling_schema.py` depends on: unittest, core.financial_data.modeling_schema
+- `tests/test_api_security_limit.py` depends on: unittest, os, sys, json, services.webapp.api
+- `tests/verify_apex_engine.py` depends on: sys, os, unittest, core.engine.cyclical_reasoning_graph, core.engine.states, unittest.mock
+- `tests/test_adaptive_learning.py` depends on: unittest, numpy, pandas, core.learning.adaptive_learning, core.agents.adaptive_algo_agent
+- `tests/test_distressed_credit.py` depends on: unittest, sys, os, distressed_credit_pricing_simulation
+- `tests/test_lakehouse_security.py` depends on: unittest, core.data_access.lakehouse_connector, core.security.sql_validator
+- `tests/test_agents.py` depends on: unittest, unittest.mock, core.agents.market_sentiment_agent, core.agents.macroeconomic_analysis_agent, core.agents.geopolitical_risk_agent, core.agents.industry_specialist_agent, core.agents.fundamental_analyst_agent, core.agents.technical_analyst_agent, core.agents.risk_assessment_agent, core.agents.newsletter_layout_specialist_agent, core.agents.data_verification_agent, core.agents.lexica_agent, core.agents.archive_manager_agent, core.agents.echo_agent
+- `tests/test_risk_guardian.py` depends on: pytest, asyncio, pandas, numpy, unittest.mock, core.v30_architecture.python_intelligence.agents.risk_guardian
+- `tests/test_sentinel_api.py` depends on: pytest, fastapi.testclient, server.sentinel_api
+- `tests/test_api_utils.py` depends on: pytest, unittest.mock, core.utils.api_utils
+- `tests/test_crypto_deployer.py` depends on: asyncio, pytest, core.trading.crypto.deployer
+- `tests/test_financial_platform.py` depends on: unittest, sys, os, pandas, src.config, src.credit_risk, src.core_valuation
+- `tests/test_live_data_fetcher.py` depends on: unittest, logging, core.data_sources.data_fetcher
+- `tests/test_quantitative_analyst.py` depends on: pytest, pandas, asyncio, sys, os, core.v30_architecture.python_intelligence.agents.quantitative_analyst, unittest.mock, core.v30_architecture.python_intelligence.agents.quantitative_analyst
+- `tests/test_narrative_agent.py` depends on: unittest, asyncio, core.agents.specialized.narrative_intelligence_agent, core.utils.narrative_weaver
+- `tests/test_technical_analyst_v2.py` depends on: pytest, asyncio, pandas, unittest.mock, typing, core.agents.technical_analyst_agent, core.schemas.agent_schema
+- `tests/test_query_understanding_agent.py` depends on: unittest, unittest.mock, core.agents.query_understanding_agent, core.system.error_handler
+- `tests/test_dcf_valuation.py` depends on: unittest, sys, os, core.engine.valuation_utils
+- `tests/test_ingestion_scaling.py` depends on: os, pytest, shutil, json, core.data_processing.ingestion_engine, core.data_processing.chunking_engine
+- `tests/test_settings_security.py` depends on: unittest, os, pydantic, core.settings
+- `tests/test_matching_engine.py` depends on: unittest, uuid, datetime, core.quantitative.matching_engine, core.unified_ledger.schema
+- `tests/test_simulation.py` depends on: unittest, core.simulation.sovereign, core.simulation.economy, core.simulation.demographics
+- `tests/test_knowledge_base.py` depends on: unittest, core.system.knowledge_base
+- `tests/test_quantum_core.py` depends on: unittest, numpy, core.quantum.adam_optimizer, core.quantum.schrodinger_solver
+- `tests/test_v_next.py` depends on: unittest, sys, os, json, core.agents.specialized.blindspot_agent, core.engine.consensus_engine, core.system.agent_orchestrator
+- `tests/test_neuro_symbolic_planner.py` depends on: pytest, networkx, unittest.mock, core.engine.neuro_symbolic_planner
+- `tests/test_enhanced_risk_agents.py` depends on: pytest, numpy, core.agents.market_risk_agent, core.agents.credit_risk_agent, core.agents.liquidity_risk_agent, core.agents.operational_risk_agent, core.agents.geopolitical_risk_agent, core.agents.industry_risk_agent, core.agents.economic_risk_agent, core.agents.volatility_risk_agent, core.agents.currency_risk_agent
+- `tests/verify_agents_refactor.py` depends on: asyncio, logging, pandas, core.agents.algo_trading_agent, core.agents.supply_chain_risk_agent, core.agents.legal_agent, core.agents.industry_specialist_agent, core.agents.data_visualization_agent, core.agents.prediction_market_agent, core.agents.lexica_agent, core.agents.lingua_maestro, core.agents.sense_weaver, core.agents.natural_language_generation_agent, core.agents.newsletter_layout_specialist_agent, core.agents.machine_learning_model_training_agent, core.agents.prompt_tuner, core.agents.meta_cognitive_agent, core.agents.meta_agents.crisis_simulation_agent, core.schemas.crisis_simulation
+- `tests/simulation_panic_room.py` depends on: pytest, asyncio, unittest.mock, core.agents.market_sentiment_agent, core.schemas.agent_schema
+- `tests/verify_v23_graph.py` depends on: sys, os, json, traceback, core.engine.states, core.engine.cyclical_reasoning_graph
+- `tests/test_system_health_agent.py` depends on: pytest, core.schemas.agent_schema, core.agents.system_health_agent
+- `tests/test_bifurcation_scenario.py` depends on: unittest, sys, os, json, core.engine.sector_impact_engine
+- `tests/test_architect_modules.py` depends on: sys, os, json, asyncio, core.advisory.robo_advisor, core.trading.hft.hft_engine
+- `tests/test_awo_planner.py` depends on: unittest, sys, os, core.engine.neuro_symbolic_planner
+- `tests/test_symphony_workspace.py` depends on: os, shutil, pytest, core.symphony.config, core.symphony.workspace
+- `tests/test_news_bot_v30.py` depends on: unittest, os, unittest.mock, core.v30_architecture.python_intelligence.agents.news_bot
+- `tests/test_security_shield.py` depends on: unittest, core.security.shield
+- `tests/test_sentiment_agent_mock.py` depends on: pytest, asyncio, unittest.mock, core.agents.market_sentiment_agent, core.schemas.agent_schema
+- `tests/test_neural_bridge_security.py` depends on: pytest, sys, os, fastapi.testclient, core.v30_architecture.python_intelligence.bridge.neural_mesh, core.v30_architecture.python_intelligence.bridge.neural_link
+- `tests/test_risk_engine_qmc.py` depends on: unittest, numpy, core.risk_engine.quantum_monte_carlo
+- `tests/conftest.py` depends on: sys, types, pytest, unittest.mock
+- `tests/test_knowledge_graph.py` depends on: pytest, pydantic, core.schemas.knowledge_graph
+- `tests/test_retry_utils.py` depends on: asyncio, unittest, unittest.mock, core.utils.retry_utils
+- `tests/verify_snc_graph.py` depends on: json, pytest, asyncio, core.engine.snc_graph, core.engine.states
+- `tests/verify_tier2_conformance.py` depends on: unittest, json, unittest.mock, core.agents.specialized.credit_conformance_agent, core.schemas.credit_conformance
+- `tests/test_adam_van_grover_search.py` depends on: unittest, sys, os, adam_van_grover_search
+- `tests/test_sentiment_risk_bridge.py` depends on: pytest, core.agents.sentiment_risk_bridge
+- `tests/test_data_verification.py` depends on: unittest, os, json
+- `tests/test_compliance_agent.py` depends on: pytest, asyncio, core.v30_architecture.python_intelligence.agents.regulatory_compliance_agent
+- `tests/test_prompt_scanner.py` depends on: unittest, sys, os, core.prompting.scanner
+- `tests/test_legacy_data_utils.py` depends on: unittest, tempfile, os, json, csv, yaml, core.utils.data_utils, core.system.error_handler
+- `tests/verify_agents_v23.py` depends on: asyncio, logging, sys, os, core.agents.red_team_agent, core.agents.reflector_agent, core.engine.states, core.engine.crisis_simulation_graph
+- `tests/test_fundamental_analyst.py` depends on: pytest, asyncio, unittest.mock, core.agents.fundamental_analyst_agent, core.schemas.agent_schema
+- `tests/verify_protocol_v_next.py` depends on: sys, os, unittest, json, asyncio, unittest.mock, core.engine.consensus_engine, core.agents.specialized.blindspot_agent, core.agents.agent_base, services.webapp.governance, core.utils.logging_utils
+- `tests/test_provenance.py` depends on: pytest, adam_v3.kernel.schema, src.pdil.models
+- `tests/test_distressed_risk.py` depends on: pytest, unittest.mock, core.agents.risk_assessment_agent
+- `tests/test_ml_data_flywheel.py` depends on: json, os, tempfile, scripts.ml_data_flywheel
+- `tests/test_v23_5_schema.py` depends on: json, core.schemas.v23_5_schema
+- `tests/test_hnasp.py` depends on: unittest, json, asyncio, datetime, core.schemas.hnasp, core.hnasp.logic_engine, core.hnasp.personality, core.agents.hnasp_agent, core.hnasp.state_manager
+- `tests/test_lakehouse.py` depends on: os, unittest, tempfile, core.hnasp.lakehouse, datetime, pydantic, typing
+- `tests/test_interaction_loop_fixes.py` depends on: unittest, sys, os, unittest.mock, core.system.interaction_loop
+- `tests/test_credit_risk_controller.py` depends on: unittest, asyncio, core.agents.specialized.credit_risk_controller_agent, core.system.v22_async.async_task
+- `tests/test_neural_mesh_advanced.py` depends on: pytest, asyncio, core.v30_architecture.python_intelligence.bridge.ephemeral_cortex, core.v30_architecture.python_intelligence.bridge.neural_mesh
+- `tests/test_adam_v24_logic.py` depends on: unittest, asyncio, unittest.mock, core.agents.market_sentiment_agent, core.prompting.personas.adam_risk_architect
+- `tests/test_adam_scaffolds.py` depends on: pytest, os, sys, typing, adam_finance.math, adam_interfaces.protocols, adam_swarm.orchestrator, adam_governance.state_control, adam_governance.state_control, adam_finance.math, adam_finance.valuation
+- `tests/test_dark_pool_agent.py` depends on: pytest, core.agents.specialized.dark_pool_agent
+- `tests/test_adam_finance.py` depends on: pytest, adam_finance.math
+- `tests/test_fundamental_analyst_v2.py` depends on: pytest, asyncio, unittest.mock, typing, core.agents.fundamental_analyst_agent, core.schemas.agent_schema
+- `tests/test_institutional_radar.py` depends on: unittest, os, shutil, asyncio, uuid, core.institutional_radar.ingestion, core.institutional_radar.analytics, core.institutional_radar.database, core.institutional_radar.schema, core.institutional_radar.database, datetime
+- `tests/verify_fo_superapp.py` depends on: unittest, asyncio, os, core.engine.meta_orchestrator, core.memory.engine, unittest.mock, core.family_office.wealth_manager, core.family_office.portfolio
+- `tests/test_snc_prompt_regression.py` depends on: unittest, json, sys, os, core.agents.snc_analyst_agent
+- `tests/test_v30_market_sentiment_agent.py` depends on: pytest, asyncio, unittest.mock, core.v30_architecture.python_intelligence.agents.market_sentiment_agent
+- `tests/test_financial_modeling_agent.py` depends on: unittest, numpy, asyncio, core.agents.financial_modeling_agent
+- `tests/test_symphony_agent_runner.py` depends on: pytest, asyncio, json, unittest.mock, core.symphony.config, core.symphony.workspace, core.symphony.agent_runner, core.symphony.models
+- `tests/test_system2_graph.py` depends on: asyncio, pytest, core.engine.system2_state, core.engine.system2_graph, langgraph.graph, core.engine.nodes.dcf_generator_node, core.engine.nodes.financial_validation_node, core.engine.system2_graph
+- `tests/test_v30_market_scanner.py` depends on: pytest, asyncio, pandas, unittest.mock, core.v30_architecture.python_intelligence.agents.market_scanner
+- `tests/test_quant_historical.py` depends on: unittest, pandas, numpy, core.v30_architecture.python_intelligence.agents.quantitative_analyst
+- `tests/test_universal_arbitrage_engine.py` depends on: pytest, math, core.agents.specialized.universal_arbitrage_engine
+- `tests/test_code_alchemist.py` depends on: sys, os, unittest, json, core.agents.code_alchemist, unittest.mock
+- `tests/test_sentinel.py` depends on: pytest, core.schemas.sentinel, core.governance.sentinel.harness
+- `tests/verify_nexus_live.py` depends on: subprocess, time, os, json, signal, sys
+- `tests/verify_swarm_sentinel.py` depends on: asyncio, logging, core.engine.swarm.hive_mind
+- `tests/verify_v23_full.py` depends on: sys, os, logging, json, asyncio, traceback, core.engine.states, core.engine.cyclical_reasoning_graph, core.engine.autonomous_self_improvement, core.engine.neuro_symbolic_planner
+- `tests/test_api_new_endpoints.py` depends on: unittest, services.webapp.api, flask_jwt_extended
+- `tests/test_universal_arbitrage.py` depends on: pytest, src.agents.universal_arbitrage
+- `tests/test_kernel_integration.py` depends on: pytest, pydantic, adam_v3.kernel.kernel
+- `tests/test_result_aggregation_agent.py` depends on: unittest, unittest, asyncio, core.agents.result_aggregation_agent, core.system.error_handler
+- `tests/test_lbo_modeling.py` depends on: unittest, numpy, core.agents.financial_modeling_agent, core.financial_data.modeling_schema
+- `tests/test_financial_suite.py` depends on: unittest, json, os, core.financial_suite.context_manager, core.financial_suite.schemas.workstream_context
+- `tests/test_geopolitical_legacy.py` depends on: unittest, unittest.mock, core.agents.geopolitical_risk_agent
+- `tests/test_financial_data.py` depends on: unittest, pandas, shutil, tempfile, unittest.mock, pathlib, core.financial_data
+- `tests/test_v23_5_pipeline.py` depends on: pytest, asyncio, unittest.mock, core.engine.meta_orchestrator
+- `tests/test_market_regime_agent.py` depends on: unittest, pandas, numpy, asyncio, unittest.mock, core.agents.specialized.market_regime_agent
+- `tests/verify_frontend_war_room.py` depends on: os, playwright.sync_api
+- `tests/test_adr_controls.py` depends on: unittest, json, sys, os, adr_controls
+- `tests/test_integration_log.py` depends on: json, os, sys, pytest, report_generation
+- `tests/test_memory_mixin.py` depends on: unittest, os, shutil, json, core.agents.mixins.memory_mixin, datetime
+- `tests/test_historical_loader.py` depends on: unittest, pandas, os, shutil, unittest.mock, core.market_data.historical_loader, core.schemas.market_data_schema
+- `tests/test_v23_architect.py` depends on: unittest, asyncio, sys, os, core.engine.neuro_symbolic_planner, core.engine.meta_orchestrator, unittest.mock
+- `tests/verify_v23_updates.py` depends on: sys, os, asyncio, logging, core.agents.reflector_agent, core.agents.meta_agents.crisis_simulation_agent, core.schemas.crisis_simulation, core.agents.risk_assessment_agent
+- `tests/test_artisanal_pipeline.py` depends on: unittest, sys, os, re, core.ingestion.semantic_chunker, core.evaluation.llm_judge
+- `tests/test_v23_ingestion.py` depends on: unittest, shutil, tempfile, pandas, logging, json, pathlib, datetime, core.financial_data.realtime_pipe, core.system.agent_improvement_pipeline, core.data_processing.universal_ingestor_v2
+- `tests/test_regulatory_compliance_guidance.py` depends on: unittest, sys, os, core.agents.regulatory_compliance_agent, unittest.mock
+- `tests/test_symphony_orchestrator.py` depends on: pytest, asyncio, unittest.mock, datetime, core.symphony.orchestrator, core.symphony.models, core.symphony.config
+- `tests/test_token_utils.py` depends on: unittest, unittest.mock, core.utils.token_utils
+- `tests/test_comprehensive_credit.py` depends on: unittest, sys, os, comprehensive_credit_simulation
+- `tests/test_unified_knowledge_graph.py` depends on: pytest, networkx, unittest.mock, core.engine.unified_knowledge_graph
+- `tests/test_insider_activity_agent.py` depends on: pytest, core.agents.insider_activity_agent, core.schemas.agent_schema
+- `tests/test_crisis_simulation_agent.py` depends on: unittest, asyncio, __future__, core.agents.meta_agents.crisis_simulation_agent, core.schemas.crisis_simulation
+- `tests/verify_new_content.py` depends on: os, playwright.sync_api
+- `tests/test_router.py` depends on: pytest, src.orchestrator.router
+- `tests/test_fraud_agent.py` depends on: pytest, asyncio, core.agents.fraud_detection_agent
+- `tests/verify_deep_dive.py` depends on: sys, os, asyncio, logging, traceback, core.engine.states, core.engine.deep_dive_graph
+- `tests/test_workflow_system.py` depends on: unittest, time, asyncio, unittest.mock, core.agents.orchestrators.workflow_manager, core.agents.orchestrators.workflow, core.agents.orchestrators.task, core.agents.orchestrators.parallel_orchestrator, core.agents.orchestrators.credit_risk_orchestrator
+- `tests/test_crisis_sim.py` depends on: unittest, scripts.market_mayhem_crisis_sim
+- `tests/test_crisis_simulation_engine.py` depends on: unittest, networkx, core.engine.simulation_engine
+- `tests/test_oswm.py` depends on: unittest, core.oswm.model
+- `tests/test_macro_liquidity_agent.py` depends on: unittest, asyncio, unittest.mock, core.agents.specialized.macro_liquidity_agent
+- `tests/test_api_advanced.py` depends on: unittest, services.webapp.api, flask_jwt_extended
+- `tests/test_macro_economic_agent.py` depends on: pytest, asyncio, core.v30_architecture.python_intelligence.agents.macro_economic_agent
+- `tests/test_api_health.py` depends on: sys, unittest, os, json, unittest.mock, flask, services.webapp.api
+- `tests/verify_adaptive_patterns.py` depends on: asyncio, logging, typing, core.system.v22_async.async_agent_base
+- `tests/test_governance.py` depends on: pytest, core.governance.constitution
+- `tests/test_avg_search.py` depends on: unittest, numpy, core.simulations.avg_search
+- `tests/test_quantum_swarm_poc.py` depends on: pytest, core.experimental.quantum_swarm_poc, core.engine.swarm.mirofish_engine, core.v22_quantum_pipeline.qmc_engine
+- `tests/test_sovereign_workflows.py` depends on: pytest, asyncio, core.v30_architecture.python_intelligence.workflows.sovereign_workflow, core.v30_architecture.python_intelligence.agents.sovereign_orchestrator
+- `tests/test_political_landscape.py` depends on: unittest, unittest.mock, core.data_sources.political_landscape, core.agents.regulatory_compliance_agent
+- `tests/test_mirofish_engine.py` depends on: asyncio, pytest, typing, core.engine.swarm.mirofish_engine, core.engine.swarm.personas, core.agents.agent_base, core.engine.meta_orchestrator
+- `tests/test_distressed_assets.py` depends on: pytest, pydantic, core.schemas.distressed_assets
+- `tests/test_distress_model.py` depends on: unittest, sys, numpy, core.credit_sentinel.models.distress_classifier, unittest.mock
+- `tests/test_new_risk_agents.py` depends on: pytest, numpy, core.agents.market_risk_agent, core.agents.credit_risk_agent, core.agents.liquidity_risk_agent, core.agents.operational_risk_agent, core.agents.geopolitical_risk_agent, core.agents.industry_risk_agent, core.agents.economic_risk_agent, core.agents.volatility_risk_agent, core.agents.currency_risk_agent
+- `tests/test_sovereign_ai_agent.py` depends on: unittest, asyncio, core.agents.specialized.sovereign_ai_analyst_agent
+- `tests/test_data_fetcher_mock.py` depends on: unittest, unittest.mock, core.data_sources.data_fetcher
+- `tests/test_regulatory_compliance_agent_integration.py` depends on: unittest, asyncio, sys, os, unittest.mock, core.agents.regulatory_compliance_agent, core.agents.agent_base
+- `tests/test_gold_standard.py` depends on: unittest, pandas, numpy, sys, os, pandera, core.gold_standard.qa, core.gold_standard.trading.strategy
+- `tests/test_semantic_cache.py` depends on: unittest, shutil, tempfile, time, core.infrastructure.semantic_cache
+- `tests/test_crypto_arbitrage.py` depends on: pytest, src.agents.crypto_arbitrage
+- `tests/test_agent_base.py` depends on: unittest, asyncio, core.agents.agent_base
+- `tests/test_swarm_architecture.py` depends on: pytest, asyncio, core.engine.swarm.pheromone_board, core.engine.swarm.worker_node, core.engine.swarm.hive_mind
+- `tests/test_core_data_processing_utils.py` depends on: unittest, sys, os, core.data_processing.utils
+- `tests/test_secrets_utils.py` depends on: unittest, os, logging, unittest.mock, core.utils.secrets_utils
+- `tests/test_sql_validator_advanced.py` depends on: unittest, core.security.sql_validator
+- `tests/test_sec_13f_handler_action.py` depends on: pytest, pandas, core.vertical_risk_agent.ingestion.sec_13f_handler
+- `tests/test_system.py` depends on: unittest, yaml, sys, asyncio, core.system.agent_orchestrator, unittest.mock
+- `tests/test_anomaly_detection_agent.py` depends on: unittest, pandas, numpy, sys, os, core.engine.unified_knowledge_graph, core.agents.anomaly_detection_agent, unittest.mock
+- `tests/test_prompt_framework.py` depends on: sys, os, json, yaml, tempfile, core.prompting.registry, core.prompting.base_prompt_plugin, datetime, typing, pydantic
+- `tests/test_symphony_models.py` depends on: pytest, datetime, core.symphony.models
+- `tests/test_agent_loading_fix.py` depends on: unittest, sys, os, logging, importlib, core.system.agent_orchestrator, unittest.mock, core.system.agent_orchestrator
+- `tests/test_register_rate_limit.py` depends on: sys, unittest, os, json, time, unittest.mock, flask, services.webapp.api, services.webapp.config
+- `tests/test_agent_expansion.py` depends on: pytest, core.system.aof_guardrail
+- `tests/test_spec_architect_agent.py` depends on: pytest, core.agents.developer_swarm.spec_architect_agent
+- `tests/test_oswm_integration.py` depends on: pytest, numpy, torch, core.oswm.trainer, core.oswm.inference
+- `tests/test_code_gen.py` depends on: pytest, asyncio, unittest.mock, core.engine.meta_orchestrator
+- `tests/test_v21_orchestrator_loading.py` depends on: unittest, sys, os, core.utils.config_utils, core.system.agent_orchestrator
+- `tests/test_evaluation_framework.py` depends on: pytest, sys, os, core.evaluation.red_team, core.evaluation.judge, core.evaluation.symbolic, core.vertical_risk_agent.agents.supervisor
+- `tests/test_interaction_loop.py` depends on: unittest, unittest.mock, core.system.interaction_loop, core.system.agent_orchestrator, core.agents.query_understanding_agent, core.agents.data_retrieval_agent, core.agents.result_aggregation_agent, core.system.error_handler, core.system.knowledge_base
+- `tests/verify_v23_orchestration.py` depends on: sys, os, logging, asyncio, core.engine.states, core.xai.state_translator, core.engine.meta_orchestrator
+- `tests/test_system_logger.py` depends on: json, tempfile, pytest, pathlib, unittest.mock, core.utils.system_logger
+- `tests/test_acceptance_conviction.py` depends on: unittest, sys, os, json, core.engine.sector_impact_engine
+- `tests/test_server_governance.py` depends on: sys, os, unittest, json, server, importlib.util, unittest.mock
+- `tests/test_event_driven_risk_agent_security.py` depends on: unittest, datetime, sys, os, unittest.mock, core.agents.event_driven_risk_agent
+- `tests/test_defi_liquidity_agent.py` depends on: pytest, asyncio, core.agents.specialized.defi_liquidity_agent
+- `tests/test_noisy_wave_prior.py` depends on: torch, core.research.oswm.priors
+- `tests/test_rust_pricing.py` depends on: unittest, math, core.quantitative.pricing
+- `tests/test_market_sentiment_agent.py` depends on: pytest, unittest.mock, core.agents.market_sentiment_agent, core.schemas.agent_schema, core.agents.specialized.crypto_arbitrage_agent
+- `tests/test_future_state.py` depends on: unittest, core.future_state.ubc, core.future_state.ssi, core.future_state.entropy, core.future_state.governance, core.future_state.monitor, core.future_state.philosophy, core.future_state.ops, core.future_state.drivers, core.future_state.assumptions, core.future_state.engine
+- `tests/verify_simulation_logic.py` depends on: sys, os, networkx, json, traceback, core.engine.simulation_engine, core.system.provenance_logger
+- `tests/test_symphony_tracker.py` depends on: pytest, unittest.mock, core.symphony.config, core.symphony.tracker
+- `tests/test_redundancy_mixin.py` depends on: asyncio, unittest, time, core.agents.mixins.redundancy_optimization_mixin
+- `tests/test_reviewer.py` depends on: unittest, core.v30_architecture.python_intelligence.agents.reviewer_agent
+- `tests/test_neural_bridge_cors_edge_cases.py` depends on: pytest, sys, os, unittest.mock, fastapi.testclient, core.v30_architecture.python_intelligence.bridge.neural_mesh, core.v30_architecture.python_intelligence.bridge.neural_link
+- `tests/test_ratio_calculator.py` depends on: unittest, core.credit_sentinel.agents.ratio_calculator
+- `tests/verify_fundamental_agent.py` depends on: asyncio, logging, json, unittest.mock, core.agents.fundamental_analyst_agent, core.schemas.agent_schema
+- `tests/test_benchmark_adam.py` depends on: pytest, subprocess, unittest.mock, scripts.benchmark_adam
+- `tests/test_config_utils.py` depends on: logging, os, pytest, yaml, unittest.mock, core.utils.config_utils
+- `tests/test_data_sources.py` depends on: unittest, unittest.mock, core.data_sources.data_sources
+- `tests/test_legacy_api_security.py` depends on: unittest, json, sys, importlib.util, os, unittest.mock, legacy_api, core.settings
+- `tests/test_sovereign_swarm.py` depends on: pytest, asyncio, core.v30_architecture.python_intelligence.agents.sovereign_orchestrator, core.v30_architecture.python_intelligence.agents.adversarial_red_team, core.v30_architecture.python_intelligence.agents.hardened_shield
+- `tests/test_regulatory_learning.py` depends on: unittest, sys, os, json, core.agents.regulatory_compliance_agent, unittest.mock
+- `tests/test_adam_phase_two.py` depends on: unittest, sys, os, shutil, json, core.agents.critique_swarm, core.governance.immutable_ledger, core.engine.refinement_loop, core.engine.scenario_engine
+- `tests/test_json_file_source_upgraded.py` depends on: json, pytest, pathlib, core.data_access.json_file_source, core.system.error_handler
+- `tests/z_test_api_v23_wiring.py` depends on: sys, os, unittest, json, services.webapp.api, unittest.mock, flask_jwt_extended, services.webapp.api
+- `tests/test_new_engines.py` depends on: asyncio, logging, pytest, core.engine.consensus_engine, core.agents.specialized.blindspot_agent, core.agents.agent_base
+- `tests/test_core_valuation.py` depends on: pytest, pandas, src.core_valuation
+- `tests/test_quantum_portfolio_manager_agent.py` depends on: unittest, asyncio, pandas, numpy, unittest.mock, core.agents.quantum_portfolio_manager_agent, core.schemas.agent_schema
+- `tests/test_credit_lbo_integration.py` depends on: pytest, asyncio, unittest.mock, core.agents.credit.quant, core.agents.credit.writer
+- `tests/test_data_utils_upgraded.py` depends on: asyncio, pytest, json, csv, yaml, pathlib, unittest.mock, core.utils.data_utils, core.system.error_handler
+- `tests/verify_adjudicator.py` depends on: sys, os, importlib.util, unittest.mock, core.engine.adjudicator_engine
+- `tests/test_risk_legal_new_features.py` depends on: pytest, sys, os, core.agents.risk_assessment_agent, core.agents.legal_agent
+- `tests/metacognition/test_adaptive_agent.py` depends on: unittest, asyncio, core.agents.adaptive_agent
+- `tests/api/test_ingest.py` depends on: fastapi.testclient, src.api.main
+- `tests/api/test_service_state.py` depends on: pytest, pytest, fastapi.testclient, unittest.mock, src.adam.api.main, src.adam.api.auth
+- `tests/core/test_retry_utils.py` depends on: asyncio, time, pytest, unittest.mock, core.utils.retry_utils
+- `tests/core/data_processing/test_universal_ingestor.py` depends on: json, pytest, pathlib, core.data_processing.universal_ingestor
+- `tests/core/utils/test_logging_utils.py` depends on: pytest, os, json, logging, pathlib, datetime, unittest.mock, core.utils.logging_utils
+- `tests/core/utils/test_data_utils.py` depends on: csv, json, pytest, yaml, pathlib, core.system.error_handler, core.utils.data_utils
+- `tests/core/prompting/workflows/test_skeleton_inject.py` depends on: sys, os, unittest, json, unittest.mock, core.prompting.workflows.skeleton_inject
+- `tests/core/prompting/personas/test_risk_officer.py` depends on: unittest, json, core.prompting.personas.risk_officer
+- `tests/security/test_ssrf_supply_chain.py` depends on: sys, unittest, unittest.mock, unittest.mock, core.agents.supply_chain_risk_agent
+- `tests/security/test_sandbox_pandas.py` depends on: unittest, os, sys, core.security.sandbox
+- `tests/unit/test_eval_flywheel.py` depends on: pytest, adam_credit_eval_flywheel
+- `tests/unit/test_kernel.py` depends on: pytest
+- `tests/unit/test_gatekeeper.py` depends on: pytest, jsonschema, hashlib, json, asyncio, hypothesis, unittest.mock, typing, src.governance.gatekeeper
+- `tests/unit/test_orchestrator.py` depends on: os, uuid, asyncio, pytest, pytest_asyncio, typing, src.orchestrator.engine
+- `tests/optimizers/test_core_optimizers.py` depends on: pytest, src.adam.core.optimizers
+- `tests/ingestion/test_pdf_parser.py` depends on: pytest, io, fitz, src.ingestion.plugins.pdf_parser
+- `tests/ingestion/test_excel_parser.py` depends on: io, pandas, src.ingestion.plugins.excel_parser
+- `tests/evals/test_fiduciary_fitness.py` depends on: pytest, json, hashlib, hypothesis, src.governance.gatekeeper, unittest.mock
+- `tests/market_mayhem/test_scanner.py` depends on: sys, pytest, pandas, sys, unittest.mock, unittest.mock, src.market_mayhem.scanners
+- `tests/v24_0/test_v24_agents.py` depends on: unittest, asyncio, unittest.mock, core.agents.meta_agents.evolutionary_architect, core.agents.meta_agents.didactic_architect, core.agents.meta_agents.chronos_agent, core.llm.base_llm_engine
+
+Mapping complete.
