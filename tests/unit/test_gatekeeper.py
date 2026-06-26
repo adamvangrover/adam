@@ -51,11 +51,11 @@ def get_valid_provenance(payload=None):
 def valid_provenance():
     return get_valid_provenance()
 
-@patch('urllib.request.urlopen')
-def test_valid_inference(mock_urlopen, valid_provenance):
+@patch('urllib.request.OpenerDirector.open')
+def test_valid_inference(mock_open, valid_provenance):
     mock_response = MagicMock()
     mock_response.getcode.return_value = 200
-    mock_urlopen.return_value.__enter__.return_value = mock_response
+    mock_open.return_value.__enter__.return_value = mock_response
 
     gatekeeper = GovernanceGatekeeper(schema=TEST_SCHEMA)
     valid_input = {
@@ -76,11 +76,11 @@ def test_missing_provenance():
     with pytest.raises(GovernanceError, match="Missing 'provenance_trace'"):
         gatekeeper.validate_inference(invalid_input)
 
-@patch('urllib.request.urlopen')
-def test_invalid_schema(mock_urlopen):
+@patch('urllib.request.OpenerDirector.open')
+def test_invalid_schema(mock_open):
     mock_response = MagicMock()
     mock_response.getcode.return_value = 200
-    mock_urlopen.return_value.__enter__.return_value = mock_response
+    mock_open.return_value.__enter__.return_value = mock_response
 
     gatekeeper = GovernanceGatekeeper(schema=TEST_SCHEMA)
     payload = {"status": "ok"} # missing 'value'
@@ -92,11 +92,11 @@ def test_invalid_schema(mock_urlopen):
     with pytest.raises(GovernanceError, match="Schema validation failed"):
         gatekeeper.validate_inference(invalid_input)
 
-@patch('urllib.request.urlopen')
-def test_poisoned_data_low(mock_urlopen, valid_provenance):
+@patch('urllib.request.OpenerDirector.open')
+def test_poisoned_data_low(mock_open, valid_provenance):
     mock_response = MagicMock()
     mock_response.getcode.return_value = 200
-    mock_urlopen.return_value.__enter__.return_value = mock_response
+    mock_open.return_value.__enter__.return_value = mock_response
 
     gatekeeper = GovernanceGatekeeper(schema=TEST_SCHEMA)
     provenance = valid_provenance.copy()
@@ -109,11 +109,11 @@ def test_poisoned_data_low(mock_urlopen, valid_provenance):
     with pytest.raises(GovernanceError, match="Poisoned data detected"):
         gatekeeper.validate_inference(invalid_input)
 
-@patch('urllib.request.urlopen')
-def test_poisoned_data_high(mock_urlopen, valid_provenance):
+@patch('urllib.request.OpenerDirector.open')
+def test_poisoned_data_high(mock_open, valid_provenance):
     mock_response = MagicMock()
     mock_response.getcode.return_value = 200
-    mock_urlopen.return_value.__enter__.return_value = mock_response
+    mock_open.return_value.__enter__.return_value = mock_response
 
     gatekeeper = GovernanceGatekeeper(schema=TEST_SCHEMA)
     provenance = valid_provenance.copy()
@@ -126,11 +126,11 @@ def test_poisoned_data_high(mock_urlopen, valid_provenance):
     with pytest.raises(GovernanceError, match="Poisoned data detected"):
         gatekeeper.validate_inference(invalid_input)
 
-@patch('urllib.request.urlopen')
-def test_missing_data(mock_urlopen, valid_provenance):
+@patch('urllib.request.OpenerDirector.open')
+def test_missing_data(mock_open, valid_provenance):
     mock_response = MagicMock()
     mock_response.getcode.return_value = 200
-    mock_urlopen.return_value.__enter__.return_value = mock_response
+    mock_open.return_value.__enter__.return_value = mock_response
 
     gatekeeper = GovernanceGatekeeper(schema=TEST_SCHEMA)
     invalid_input = {
@@ -145,11 +145,11 @@ def test_missing_data(mock_urlopen, valid_provenance):
     status=st.text(),
     value=st.floats(allow_nan=False, allow_infinity=False)
 )
-@patch('urllib.request.urlopen')
-def test_fuzz_valid_schema(mock_urlopen, status, value):
+@patch('urllib.request.OpenerDirector.open')
+def test_fuzz_valid_schema(mock_open, status, value):
     mock_response = MagicMock()
     mock_response.getcode.return_value = 200
-    mock_urlopen.return_value.__enter__.return_value = mock_response
+    mock_open.return_value.__enter__.return_value = mock_response
 
     gatekeeper = GovernanceGatekeeper(schema=TEST_SCHEMA)
     payload = {"status": status, "value": value}
@@ -169,11 +169,11 @@ def test_fuzz_valid_schema(mock_urlopen, status, value):
         st.floats(min_value=1.0001, allow_nan=False, allow_infinity=False)
     )
 )
-@patch('urllib.request.urlopen')
-def test_fuzz_poisoned_data(mock_urlopen, confidence):
+@patch('urllib.request.OpenerDirector.open')
+def test_fuzz_poisoned_data(mock_open, confidence):
     mock_response = MagicMock()
     mock_response.getcode.return_value = 200
-    mock_urlopen.return_value.__enter__.return_value = mock_response
+    mock_open.return_value.__enter__.return_value = mock_response
 
     gatekeeper = GovernanceGatekeeper(schema=TEST_SCHEMA)
     provenance = get_valid_provenance()
@@ -186,11 +186,11 @@ def test_fuzz_poisoned_data(mock_urlopen, confidence):
     with pytest.raises(GovernanceError, match="Poisoned data detected"):
         gatekeeper.validate_inference(invalid_input)
 
-@patch('urllib.request.urlopen')
-def test_heal_drift(mock_urlopen, valid_provenance):
+@patch('urllib.request.OpenerDirector.open')
+def test_heal_drift(mock_open, valid_provenance):
     mock_response = MagicMock()
     mock_response.getcode.return_value = 200
-    mock_urlopen.return_value.__enter__.return_value = mock_response
+    mock_open.return_value.__enter__.return_value = mock_response
 
     gatekeeper = GovernanceGatekeeper(schema=TEST_SCHEMA)
     input_with_drift = {
@@ -203,11 +203,11 @@ def test_heal_drift(mock_urlopen, valid_provenance):
     assert result["revalidation_triggered"] is True
 
 @pytest.mark.asyncio
-@patch('urllib.request.urlopen')
-async def test_async_validate_inference(mock_urlopen, valid_provenance):
+@patch('urllib.request.OpenerDirector.open')
+async def test_async_validate_inference(mock_open, valid_provenance):
     mock_response = MagicMock()
     mock_response.getcode.return_value = 200
-    mock_urlopen.return_value.__enter__.return_value = mock_response
+    mock_open.return_value.__enter__.return_value = mock_response
 
     gatekeeper = GovernanceGatekeeper(schema=TEST_SCHEMA)
     valid_input = {
@@ -218,11 +218,11 @@ async def test_async_validate_inference(mock_urlopen, valid_provenance):
     assert result == valid_input
 
 @pytest.mark.asyncio
-@patch('urllib.request.urlopen')
-async def test_async_validate_inference_batch(mock_urlopen, valid_provenance):
+@patch('urllib.request.OpenerDirector.open')
+async def test_async_validate_inference_batch(mock_open, valid_provenance):
     mock_response = MagicMock()
     mock_response.getcode.return_value = 200
-    mock_urlopen.return_value.__enter__.return_value = mock_response
+    mock_open.return_value.__enter__.return_value = mock_response
 
     gatekeeper = GovernanceGatekeeper(schema=TEST_SCHEMA)
 
@@ -244,11 +244,11 @@ async def test_async_validate_inference_batch(mock_urlopen, valid_provenance):
     assert results[0] == valid_input_1
     assert results[1] == valid_input_2
 
-@patch('urllib.request.urlopen')
-def test_detect_and_heal_drift(mock_urlopen, valid_provenance):
+@patch('urllib.request.OpenerDirector.open')
+def test_detect_and_heal_drift(mock_open, valid_provenance):
     mock_response = MagicMock()
     mock_response.getcode.return_value = 200
-    mock_urlopen.return_value.__enter__.return_value = mock_response
+    mock_open.return_value.__enter__.return_value = mock_response
 
     gatekeeper = GovernanceGatekeeper(schema=TEST_SCHEMA)
 
@@ -268,11 +268,11 @@ def test_detect_and_heal_drift(mock_urlopen, valid_provenance):
     assert result.get("revalidation_triggered") is True
 
 
-@patch('urllib.request.urlopen')
-def test_entry_gate(mock_urlopen, valid_provenance):
+@patch('urllib.request.OpenerDirector.open')
+def test_entry_gate(mock_open, valid_provenance):
     mock_response = MagicMock()
     mock_response.getcode.return_value = 200
-    mock_urlopen.return_value.__enter__.return_value = mock_response
+    mock_open.return_value.__enter__.return_value = mock_response
 
     gatekeeper = GovernanceGatekeeper(schema=TEST_SCHEMA)
     valid_input = {
@@ -282,11 +282,11 @@ def test_entry_gate(mock_urlopen, valid_provenance):
     result = gatekeeper.entry_gate(valid_input)
     assert result == valid_input
 
-@patch('urllib.request.urlopen')
-def test_exit_gate(mock_urlopen, valid_provenance):
+@patch('urllib.request.OpenerDirector.open')
+def test_exit_gate(mock_open, valid_provenance):
     mock_response = MagicMock()
     mock_response.getcode.return_value = 200
-    mock_urlopen.return_value.__enter__.return_value = mock_response
+    mock_open.return_value.__enter__.return_value = mock_response
 
     gatekeeper = GovernanceGatekeeper(schema=TEST_SCHEMA)
     valid_input = {

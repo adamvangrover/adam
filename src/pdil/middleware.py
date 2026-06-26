@@ -11,6 +11,10 @@ from src.pdil.models import ProvenanceHeader
 
 from json_logic import jsonLogic
 
+class NoRedirectHandler(urllib.request.HTTPRedirectHandler):
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        return None
+
 class GovernanceError(Exception):
     """Raised when an inference fails governance validation."""
     pass
@@ -132,7 +136,8 @@ class SecurityGovernanceGatekeeper:
                     source,
                     headers={'User-Agent': 'Mozilla/5.0'}
                 )
-                with urllib.request.urlopen(req, timeout=5.0) as response:
+                opener = urllib.request.build_opener(NoRedirectHandler())
+                with opener.open(req, timeout=5.0) as response:
                     if response.getcode() >= 400:
                         raise GovernanceError(f"Source data object unreachable: HTTP {response.getcode()}")
             except urllib.error.URLError as e:
