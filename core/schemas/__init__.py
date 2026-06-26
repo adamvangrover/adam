@@ -5,6 +5,7 @@ from core.schemas.hnasp_integration import IntegratedAgentState, AgentPacket
 from core.schemas.cognitive_state import CognitiveState, StrategicPlan, ThoughtNode
 from core.schemas.observability import AgentTelemetry, Trace, Span, Metric
 from core.schemas.registry import SchemaRegistry
+from core.schemas.qpf_schema import QPFInput, QPFOutput
 
 __all__ = [
     "HNASPState",
@@ -25,4 +26,6 @@ __all__ = [
     "Span",
     "Metric",
     "SchemaRegistry",
+    "QPFInput",
+    "QPFOutput",
 ]
