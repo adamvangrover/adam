@@ -1,9 +1,8 @@
+from src.pdil.models import ProvenanceHeader
 from typing import Dict, Any, List, Optional
 from pydantic import BaseModel, Field
-from src.schemas.core_types import AgentInput as CoreAgentInput, AgentOutput as CoreAgentOutput
-from src.pdil.models import ProvenanceHeader
 
-class AgentInput(CoreAgentInput):
+class AgentInput(BaseModel):
     """
     Standard input schema for all System 2 agents.
     """
@@ -11,7 +10,8 @@ class AgentInput(CoreAgentInput):
     context: Dict[str, Any] = Field(default_factory=dict, description="Shared graph state (RAG data, previous results).")
     tools: List[str] = Field(default_factory=list, description="List of allowed tool names.")
 
-class AgentOutput(CoreAgentOutput):
+
+class AgentOutput(BaseModel):
     """
     Standard output schema for all System 2 agents.
     """

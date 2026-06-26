@@ -239,3 +239,8 @@
 **Vulnerability:** The `adam_api_key` in `core/settings.py` used a hardcoded fallback string `"default-insecure-key-change-me"`. This could easily be accidentally deployed to production, leaving the system vulnerable to unauthorized access.
 **Learning:** Hardcoding default strings for secrets, even with warnings or runtime environment checks, is an anti-pattern. Systems can be bypassed, or warning logs ignored.
 **Prevention:** Use `secrets.token_urlsafe(32)` with Pydantic's `Field(default_factory=...)` to dynamically generate a secure random string on initialization if no key is provided. This ensures that even if a configuration is missing, the fallback is a cryptographically strong, unguessable key.
+
+## 2026-06-25 - [Critical] SSRF Vulnerability via URL Redirects
+**Vulnerability:** `SecurityGovernanceGatekeeper` in `src/pdil/middleware.py` validated URL domains (e.g., against a whitelist) but used the standard `urllib.request.urlopen` which automatically follows HTTP redirects. An attacker could host a file on an allowed domain that redirects to an internal IP (e.g., `127.0.0.1` or internal cloud metadata APIs), leading to Server-Side Request Forgery (SSRF).
+**Learning:** Checking the initial URL domain before fetching is insufficient if the HTTP client automatically follows redirects to new, potentially unverified destinations.
+**Prevention:** Always disable automatic redirects when fetching untrusted URLs after domain validation. When using `urllib.request`, implement a custom `urllib.request.HTTPRedirectHandler` that returns `None` for `redirect_request`, and use `urllib.request.build_opener` to fetch the URL.
