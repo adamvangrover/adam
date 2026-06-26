@@ -4,10 +4,16 @@ import time
 import urllib.request
 import urllib.error
 import asyncio
+import socket
+import ipaddress
 from urllib.parse import urlparse
 import jsonschema
 from typing import Dict, Any, Optional
 from src.pdil.models import ProvenanceHeader
+
+class NoRedirectHandler(urllib.request.HTTPRedirectHandler):
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        return None
 
 from json_logic import jsonLogic
 
@@ -120,7 +126,7 @@ class SecurityGovernanceGatekeeper:
 
         # Strict Provenance Checks: Source Data Object Reachability & Whitelisting
         source = header.source_data_object
-        if source.startswith("http://") or source.startswith("https://"):
+        if source.startswith("https://"):
             parsed_url = urlparse(source)
 
             allowed_domains = ["example.com", "api.github.com", "query2.finance.yahoo.com"]
@@ -128,17 +134,28 @@ class SecurityGovernanceGatekeeper:
                 raise GovernanceError(f"Source data object domain not permitted: {parsed_url.hostname}")
 
             try:
+                ip = socket.gethostbyname(parsed_url.hostname)
+                ip_obj = ipaddress.ip_address(ip)
+                if ip_obj.is_private or ip_obj.is_loopback:
+                    raise GovernanceError(f"Source data object resolves to a private IP: {ip}")
+            except Exception as e:
+                raise GovernanceError(f"IP resolution failed or private IP detected: {e}")
+
+            try:
+                opener = urllib.request.build_opener(NoRedirectHandler())
                 req = urllib.request.Request(
                     source,
                     headers={'User-Agent': 'Mozilla/5.0'}
                 )
-                with urllib.request.urlopen(req, timeout=5.0) as response:
+                with opener.open(req, timeout=5.0) as response:
                     if response.getcode() >= 400:
                         raise GovernanceError(f"Source data object unreachable: HTTP {response.getcode()}")
             except urllib.error.URLError as e:
                 raise GovernanceError(f"Source data object unreachable: {e}")
             except Exception as e:
                  raise GovernanceError(f"Source data object validation failed: {e}")
+        elif source.startswith("http://"):
+            raise GovernanceError("HTTP is not allowed for source data objects, use HTTPS.")
 
         # Schema Validation
         try:
