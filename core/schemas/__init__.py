@@ -5,9 +5,13 @@ from core.schemas.hnasp_integration import IntegratedAgentState, AgentPacket
 from core.schemas.cognitive_state import CognitiveState, StrategicPlan, ThoughtNode
 from core.schemas.observability import AgentTelemetry, Trace, Span, Metric
 from core.schemas.registry import SchemaRegistry
+from core.schemas.agent_schema import AgentInput, AgentOutput, FundamentalReport
 from core.schemas.qpf_schema import QPFInput, QPFOutput
 
 __all__ = [
+    "AgentInput",
+    "AgentOutput",
+    "FundamentalReport",
     "HNASPState",
     "HNASP",
     "V26KnowledgeGraph",
