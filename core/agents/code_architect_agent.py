@@ -1,3 +1,4 @@
+from src.pdil.models import ProvenanceHeader
 import logging
 import os
 import re
@@ -31,7 +32,7 @@ class CodeArchitectAgent(PydanticAgentBase):
 
         # Sanitize filename to prevent path traversal
         if not re.match(r'^[\w\-. ]+$', filename):
-            return AgentOutput(
+            return AgentOutput(provenance_trace=ProvenanceHeader(git_commit_hash="legacy", timestamp="1970-01-01T00:00:00Z", content_hash="legacy", jsonLogic_version="legacy", confidence_score=1.0, derivation_path="legacy", source_data_object="legacy"),
                 answer="Failed: Invalid filename. Path traversal suspected.",
                 confidence=0.0,
                 metadata={"error": "Path traversal check failed"}
@@ -40,7 +41,7 @@ class CodeArchitectAgent(PydanticAgentBase):
         # Protect Index_archive.html
         safe_override = context.get("safe_override", False)
         if filename == "Index_archive.html" and not safe_override:
-            return AgentOutput(
+            return AgentOutput(provenance_trace=ProvenanceHeader(git_commit_hash="legacy", timestamp="1970-01-01T00:00:00Z", content_hash="legacy", jsonLogic_version="legacy", confidence_score=1.0, derivation_path="legacy", source_data_object="legacy"),
                 answer="Failed: Explicit routing safety check required to overwrite Index_archive.html.",
                 confidence=0.0,
                 metadata={"error": "Index_archive.html overwrite protection triggered"}
@@ -53,7 +54,7 @@ class CodeArchitectAgent(PydanticAgentBase):
             with open(filepath, "w") as f:
                 f.write(code_content)
 
-            return AgentOutput(
+            return AgentOutput(provenance_trace=ProvenanceHeader(git_commit_hash="legacy", timestamp="1970-01-01T00:00:00Z", content_hash="legacy", jsonLogic_version="legacy", confidence_score=1.0, derivation_path="legacy", source_data_object="legacy"),
                 answer=f"Successfully generated code and saved to {filepath}",
                 sources=[filepath],
                 confidence=1.0,
@@ -61,7 +62,7 @@ class CodeArchitectAgent(PydanticAgentBase):
             )
         except Exception as e:
             logging.exception(f"CodeArchitect error saving to {filepath}")
-            return AgentOutput(
+            return AgentOutput(provenance_trace=ProvenanceHeader(git_commit_hash="legacy", timestamp="1970-01-01T00:00:00Z", content_hash="legacy", jsonLogic_version="legacy", confidence_score=1.0, derivation_path="legacy", source_data_object="legacy"),
                 answer=f"Execution failed: {e}",
                 confidence=0.0,
                 metadata={"error": str(e)}

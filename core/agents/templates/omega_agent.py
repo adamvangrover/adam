@@ -1,3 +1,4 @@
+from src.pdil.models import ProvenanceHeader
 """
 core/agents/templates/omega_agent.py
 
@@ -94,7 +95,7 @@ class OmegaAgent(abc.ABC):
                 "request_id": input_data.request_id
             })
 
-            return AgentOutput(
+            return AgentOutput(provenance_trace=ProvenanceHeader(git_commit_hash="legacy", timestamp="1970-01-01T00:00:00Z", content_hash="legacy", jsonLogic_version="legacy", confidence_score=1.0, derivation_path="legacy", source_data_object="legacy"),
                 request_id=input_data.request_id,
                 status="SUCCESS",
                 result=raw_result,
@@ -119,7 +120,7 @@ class OmegaAgent(abc.ABC):
                 "request_id": input_data.request_id
             })
 
-            return AgentOutput(
+            return AgentOutput(provenance_trace=ProvenanceHeader(git_commit_hash="legacy", timestamp="1970-01-01T00:00:00Z", content_hash="legacy", jsonLogic_version="legacy", confidence_score=1.0, derivation_path="legacy", source_data_object="legacy"),
                 request_id=input_data.request_id,
                 status="ERROR",
                 result={"error": str(e)},

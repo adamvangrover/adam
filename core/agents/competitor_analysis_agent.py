@@ -1,3 +1,4 @@
+from src.pdil.models import ProvenanceHeader
 from typing import Any, Dict, List, Union, Optional
 import logging
 from core.agents.agent_base import AgentBase
@@ -75,7 +76,7 @@ class CompetitorAnalysisAgent(AgentBase):
         if not competitors:
             msg = f"No competitors found for {ticker} or ticker not supported."
             if is_standard_mode:
-                return AgentOutput(
+                return AgentOutput(provenance_trace=ProvenanceHeader(git_commit_hash="legacy", timestamp="1970-01-01T00:00:00Z", content_hash="legacy", jsonLogic_version="legacy", confidence_score=1.0, derivation_path="legacy", source_data_object="legacy"),
                     answer=msg,
                     sources=[],
                     confidence=0.0,
@@ -116,7 +117,7 @@ class CompetitorAnalysisAgent(AgentBase):
         }
 
         if is_standard_mode:
-            return AgentOutput(
+            return AgentOutput(provenance_trace=ProvenanceHeader(git_commit_hash="legacy", timestamp="1970-01-01T00:00:00Z", content_hash="legacy", jsonLogic_version="legacy", confidence_score=1.0, derivation_path="legacy", source_data_object="legacy"),
                 answer=report,
                 sources=["Internal Knowledge Base"],
                 confidence=0.9,

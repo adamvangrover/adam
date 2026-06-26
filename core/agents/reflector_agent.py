@@ -1,3 +1,4 @@
+from src.pdil.models import ProvenanceHeader
 from __future__ import annotations
 from typing import Dict, Any, List, Union
 import logging
@@ -69,7 +70,7 @@ class ReflectorAgent(AgentBase):
                 if return_dict:
                     return out_metadata
 
-                return AgentOutput(
+                return AgentOutput(provenance_trace=ProvenanceHeader(git_commit_hash="legacy", timestamp="1970-01-01T00:00:00Z", content_hash="legacy", jsonLogic_version="legacy", confidence_score=1.0, derivation_path="legacy", source_data_object="legacy"),
                     answer=result.get("refined_content", "No refinement needed."),
                     sources=["ReflectorGraph"],
                     confidence=result.get("score", 0.0),
@@ -107,7 +108,7 @@ class ReflectorAgent(AgentBase):
         if return_dict:
             return out_metadata
 
-        return AgentOutput(
+        return AgentOutput(provenance_trace=ProvenanceHeader(git_commit_hash="legacy", timestamp="1970-01-01T00:00:00Z", content_hash="legacy", jsonLogic_version="legacy", confidence_score=1.0, derivation_path="legacy", source_data_object="legacy"),
             answer="Critique complete.",
             sources=["StaticHeuristics"],
             confidence=score / 10.0,

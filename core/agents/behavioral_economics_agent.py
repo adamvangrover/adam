@@ -1,3 +1,4 @@
+from src.pdil.models import ProvenanceHeader
 from core.agents.agent_base import AgentBase, AgentInput, AgentOutput
 from typing import Any, Dict, List, Optional
 import logging
@@ -46,7 +47,7 @@ class BehavioralEconomicsAgent(AgentBase):
         logging.info(
             f"Behavioral economics analysis complete. Found {len(results['market_biases'])} market biases and {len(results['user_biases'])} user biases.")
             
-        return AgentOutput(
+        return AgentOutput(provenance_trace=ProvenanceHeader(git_commit_hash="legacy", timestamp="1970-01-01T00:00:00Z", content_hash="legacy", jsonLogic_version="legacy", confidence_score=1.0, derivation_path="legacy", source_data_object="legacy"),
             answer=results["insights"],
             sources=["SentimentAnalyzer"],
             confidence=0.85 if results["market_biases"] else 0.5,

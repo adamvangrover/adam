@@ -1,3 +1,4 @@
+from src.pdil.models import ProvenanceHeader
 from __future__ import annotations
 from typing import Any, Dict, List, Optional, Union
 import logging
@@ -153,7 +154,7 @@ class QuantumPortfolioManagerAgent(AgentBase):
 
         answer += f"\nQuantum State Energy: {energy:.4f} (Lower is more stable)"
 
-        return AgentOutput(
+        return AgentOutput(provenance_trace=ProvenanceHeader(git_commit_hash="legacy", timestamp="1970-01-01T00:00:00Z", content_hash="legacy", jsonLogic_version="legacy", confidence_score=1.0, derivation_path="legacy", source_data_object="legacy"),
             answer=answer,
             sources=["SimulatedQuantumBridge", "YahooFinance"],
             confidence=0.9,

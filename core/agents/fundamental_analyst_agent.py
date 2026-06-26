@@ -1,3 +1,4 @@
+from src.pdil.models import ProvenanceHeader
 # core/agents/fundamental_analyst_agent.py
 
 import asyncio  # Added import
@@ -117,7 +118,7 @@ class FundamentalAnalystAgent(PydanticAgentBase):
             company_data = await self.retrieve_company_data(company_id)
             if company_data is None:
                 logging.error(f"Failed to retrieve company data for {company_id} via A2A.")
-                return AgentOutput(answer=f"Analysis failed: Could not retrieve data for company {company_id}", confidence=0.0, metadata={"error": f"Could not retrieve data for company {company_id}"})  # noqa: E501
+                return AgentOutput(provenance_trace=ProvenanceHeader(git_commit_hash="legacy", timestamp="1970-01-01T00:00:00Z", content_hash="legacy", jsonLogic_version="legacy", confidence_score=1.0, derivation_path="legacy", source_data_object="legacy"), answer=f"Analysis failed: Could not retrieve data for company {company_id}", confidence=0.0, metadata={"error": f"Could not retrieve data for company {company_id}"})  # noqa: E501
 
             logging.debug(f"FAA_XAI:EXECUTE_COMPANY_DATA_KEYS: {list(company_data.keys())}")
 
@@ -221,7 +222,7 @@ class FundamentalAnalystAgent(PydanticAgentBase):
             }
             logging.debug(f"FAA_XAI:EXECUTE_OUTPUT: {result_package}")
 
-            return AgentOutput(
+            return AgentOutput(provenance_trace=ProvenanceHeader(git_commit_hash="legacy", timestamp="1970-01-01T00:00:00Z", content_hash="legacy", jsonLogic_version="legacy", confidence_score=1.0, derivation_path="legacy", source_data_object="legacy"),
                 answer=report.model_dump_json(),
                 sources=[f"Company Data for {company_id}"],
                 confidence=0.9 if financial_ratios else 0.5,
@@ -230,7 +231,7 @@ class FundamentalAnalystAgent(PydanticAgentBase):
 
         except Exception as e:
             logging.exception(f"Error during fundamental analysis of {company_id}: {e}")
-            return AgentOutput(answer=f"Analysis failed: {e}", confidence=0.0, metadata={"error": f"An error occurred during analysis: {e}"})  # noqa: E501
+            return AgentOutput(provenance_trace=ProvenanceHeader(git_commit_hash="legacy", timestamp="1970-01-01T00:00:00Z", content_hash="legacy", jsonLogic_version="legacy", confidence_score=1.0, derivation_path="legacy", source_data_object="legacy"), answer=f"Analysis failed: {e}", confidence=0.0, metadata={"error": f"An error occurred during analysis: {e}"})  # noqa: E501
 
     def _format_output(self, result: Dict[str, Any], is_standard_mode: bool, company_id: str) -> Union[Dict[str, Any], AgentOutput]:  # noqa: E501
         """Helper to format output based on input mode."""
@@ -240,13 +241,13 @@ class FundamentalAnalystAgent(PydanticAgentBase):
         # Standard Mode: Wrap in AgentOutput
         error = result.get("error")
         if error:
-             return AgentOutput(
+             return AgentOutput(provenance_trace=ProvenanceHeader(git_commit_hash="legacy", timestamp="1970-01-01T00:00:00Z", content_hash="legacy", jsonLogic_version="legacy", confidence_score=1.0, derivation_path="legacy", source_data_object="legacy"),
                 answer=f"Analysis failed: {error}",
                 confidence=0.0,
                 metadata={"error": error, "raw_result": result}
             )
 
-        return AgentOutput(
+        return AgentOutput(provenance_trace=ProvenanceHeader(git_commit_hash="legacy", timestamp="1970-01-01T00:00:00Z", content_hash="legacy", jsonLogic_version="legacy", confidence_score=1.0, derivation_path="legacy", source_data_object="legacy"),
             answer=result.get("analysis_summary", "No summary generated."),
             sources=[f"Company Data for {company_id}"], # Placeholder for actual source tracking
             confidence=0.9 if result.get("financial_ratios") else 0.5,

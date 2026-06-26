@@ -1,3 +1,4 @@
+from src.pdil.models import ProvenanceHeader
 from typing import Any, Dict, List, Union, Optional
 import logging
 import asyncio
@@ -253,7 +254,7 @@ class PeerSetAgent(AgentBase):
         if not target_ticker:
             msg = "Could not identify a valid target ticker for peer analysis."
             if is_standard_mode:
-                return AgentOutput(answer=msg, sources=[], confidence=0.0, metadata={"error": "Missing Ticker"})
+                return AgentOutput(provenance_trace=ProvenanceHeader(git_commit_hash="legacy", timestamp="1970-01-01T00:00:00Z", content_hash="legacy", jsonLogic_version="legacy", confidence_score=1.0, derivation_path="legacy", source_data_object="legacy"), answer=msg, sources=[], confidence=0.0, metadata={"error": "Missing Ticker"})
             return {"error": msg}
 
         logger.info(f"Building peer set for {target_ticker} using method: {method}")
@@ -302,7 +303,7 @@ class PeerSetAgent(AgentBase):
         }
 
         if is_standard_mode:
-            return AgentOutput(
+            return AgentOutput(provenance_trace=ProvenanceHeader(git_commit_hash="legacy", timestamp="1970-01-01T00:00:00Z", content_hash="legacy", jsonLogic_version="legacy", confidence_score=1.0, derivation_path="legacy", source_data_object="legacy"),
                 answer=report,
                 sources=["yfinance" if yf else "Mock DB", "Internal Classification DB"],
                 confidence=0.95 if peers else 0.0,

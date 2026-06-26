@@ -1,3 +1,4 @@
+from src.pdil.models import ProvenanceHeader
 from abc import abstractmethod
 from typing import Any, Dict, Optional, TypeVar, Generic
 from pydantic import BaseModel, ValidationError
@@ -46,7 +47,7 @@ class PydanticAgentBase(AgentBase):
             input_data = AgentInput(query=query, context=kwargs)
         else:
             logger.error(f"Agent {self.name} received unparseable input args: {args}, kwargs: {kwargs}")
-            err_out = AgentOutput(
+            err_out = AgentOutput(provenance_trace=ProvenanceHeader(git_commit_hash="legacy", timestamp="1970-01-01T00:00:00Z", content_hash="legacy", jsonLogic_version="legacy", confidence_score=1.0, derivation_path="legacy", source_data_object="legacy"),
                 answer="Invalid input format provided to agent.",
                 confidence=0.0,
                 metadata={"error": "Invalid input format", "args": str(args), "kwargs": str(kwargs)}
@@ -65,7 +66,7 @@ class PydanticAgentBase(AgentBase):
             if not isinstance(output, AgentOutput):
                 logger.warning(f"Agent {self.name} returned {type(output)} instead of AgentOutput.")
                 if isinstance(output, dict):
-                    output = AgentOutput(**output)
+                    output = AgentOutput(provenance_trace=ProvenanceHeader(git_commit_hash="legacy", timestamp="1970-01-01T00:00:00Z", content_hash="legacy", jsonLogic_version="legacy", confidence_score=1.0, derivation_path="legacy", source_data_object="legacy"), **output)
                 else:
                     raise ValueError(f"Agent {self.name} did not return AgentOutput or valid dict.")
                     
@@ -75,7 +76,7 @@ class PydanticAgentBase(AgentBase):
             
         except ValidationError as ve:
             logger.error(f"Pydantic Validation Error in {self.name}: {ve}")
-            err_out = AgentOutput(
+            err_out = AgentOutput(provenance_trace=ProvenanceHeader(git_commit_hash="legacy", timestamp="1970-01-01T00:00:00Z", content_hash="legacy", jsonLogic_version="legacy", confidence_score=1.0, derivation_path="legacy", source_data_object="legacy"),
                 answer=f"Output validation failed: {ve}",
                 confidence=0.0,
                 metadata={"error": str(ve)}
@@ -83,7 +84,7 @@ class PydanticAgentBase(AgentBase):
             return err_out if is_standard_mode else err_out.metadata
         except Exception as e:
             logger.exception(f"Execution Error in {self.name}: {e}")
-            err_out = AgentOutput(
+            err_out = AgentOutput(provenance_trace=ProvenanceHeader(git_commit_hash="legacy", timestamp="1970-01-01T00:00:00Z", content_hash="legacy", jsonLogic_version="legacy", confidence_score=1.0, derivation_path="legacy", source_data_object="legacy"),
                 answer=f"Execution failed: {e}",
                 confidence=0.0,
                 metadata={"error": str(e)}
