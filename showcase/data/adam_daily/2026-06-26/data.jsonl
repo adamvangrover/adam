@@ -1,0 +1,13 @@
+{"variable_node": "SP500_Index", "market_level_value": "7357.49", "primary_model_target": "DCF", "context_provenance": "Live Market Data ^GSPC (End of Day)"}
+{"variable_node": "Nasdaq_Index", "market_level_value": "25358.60", "primary_model_target": "DCF", "context_provenance": "Live Market Data ^IXIC (End of Day)"}
+{"variable_node": "Dow_Jones_Index", "market_level_value": "51920.62", "primary_model_target": "DCF", "context_provenance": "Live Market Data ^DJI (End of Day)"}
+{"variable_node": "US_10Y_Treasury_Yield", "market_level_value": "4.391", "primary_model_target": "DCF", "context_provenance": "Live Market Data ^TNX (End of Day)"}
+{"variable_node": "Oil_WTI_Price", "market_level_value": "70.34", "primary_model_target": "LGD", "context_provenance": "Live Market Data CL=F (Active Futures)"}
+{"variable_node": "Gold_Price", "market_level_value": "4117.66", "primary_model_target": "PD", "context_provenance": "Live Market Data GC=F (Spot Gold)"}
+{"variable_node": "Bitcoin_Price", "market_level_value": "59734.00", "primary_model_target": "EV", "context_provenance": "Live Market Data BTC-USD (Snapshot)"}
+{"variable_node": "US_High_Yield_OAS", "market_level_value": "2.71", "primary_model_target": "LGD", "context_provenance": "FRED ICE BofA US High Yield Index OAS"}
+{"variable_node": "Bank_Loan_Yield", "market_level_value": "8.33", "primary_model_target": "DCF", "context_provenance": "Calculated Proxy (Broadly Syndicated Bank Loan Yield)"}
+{"timestamp": 1782436556.0000000, "step": "Init", "reasoning": "Initialize daily brief generation process", "tools_used": ["os"], "compute_usage_tokens": 15, "prompt_context": "Generate daily brief", "runtime_ms": 5}
+{"timestamp": 1782436556.1000000, "step": "DataGathering", "reasoning": "Gathering live market data points from configured sources", "tools_used": ["GoogleSearchTool", "MarketDataAPI"], "compute_usage_tokens": 1250, "prompt_context": "Fetch latest quotes", "runtime_ms": 150}
+{"timestamp": 1782436556.1500000, "step": "DataFormatting", "reasoning": "Formatted data into MarketMayhemLedger schema", "tools_used": ["json"], "compute_usage_tokens": 45, "prompt_context": null, "runtime_ms": 3}
+{"timestamp": 1782436556.2500000, "step": "ReportGeneration", "reasoning": "Generated narrative daily brief from verified data points and global news", "tools_used": ["Adam AI Framework", "MarkdownWriter"], "compute_usage_tokens": 4500, "prompt_context": "Write a professional daily market brief", "runtime_ms": 115}
