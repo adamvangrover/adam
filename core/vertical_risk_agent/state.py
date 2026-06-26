@@ -4,6 +4,12 @@ from pydantic import BaseModel, Field
 
 # --- Data Schemas (Pydantic) ---
 
+class DocumentMetrics(BaseModel):
+    """Metrics rigorously extracted and validated from SEC filings per Slide 6."""
+    total_revenue_usd: float = Field(..., description="Total Revenue (USD)")
+    ebitda_usd: float = Field(..., description="EBITDA (USD)")
+    total_debt_usd: float = Field(..., description="Total Debt (USD)")
+    item_1a_risk_factors: List[str] = Field(..., description="Item 1A Identified Risk Factors")
 
 class BalanceSheet(BaseModel):
     """Structured Balance Sheet Data."""
@@ -69,7 +75,6 @@ class InvestmentMemo(BaseModel):
 
 # --- Graph State (TypedDict) ---
 
-
 class VerticalRiskGraphState(TypedDict):
     """
     State for the Credit Risk Vertical AI Agent.
@@ -79,6 +84,7 @@ class VerticalRiskGraphState(TypedDict):
     data_room_path: str
 
     # Extracted Data (Pydantic objects serialized or dicts)
+    document_metrics: Optional[Dict[str, Any]]
     balance_sheet: Optional[Dict[str, Any]]
     income_statement: Optional[Dict[str, Any]]
     covenants: List[Dict[str, Any]]
@@ -87,6 +93,7 @@ class VerticalRiskGraphState(TypedDict):
     quant_analysis: Optional[str]
     legal_analysis: Optional[str]
     market_research: Optional[str]
+    compliance_audit: Optional[str]
 
     # --- Merged Simulation State ---
     # Stores the definitions of scenarios (inputs to the engine)

@@ -43,10 +43,14 @@ from ..state import VerticalRiskGraphState
 from .analyst import QuantAgent
 from .legal import LegalAgent
 from .market import MarketAgent
+from .compliance import ComplianceAuditorAgent
+from .document_extraction import DocumentExtractionAgent
 
 # Initialize Agents
 quant_agent = QuantAgent(model=None)
 legal_agent = LegalAgent(model=None)
+compliance_agent = ComplianceAuditorAgent(model=None)
+doc_agent = DocumentExtractionAgent(model=None)
 market_agent = MarketAgent(model=None)
 
 
@@ -67,16 +71,20 @@ def supervisor_node(state: VerticalRiskGraphState):
     return {"next_step": "deciding"}
 
 
-def route_supervisor(state: VerticalRiskGraphState) -> Literal["quant", "legal", "market", "critique", "human_approval"]:
+def route_supervisor(state: VerticalRiskGraphState) -> Literal["doc_extract", "quant", "legal", "market", "compliance", "critique", "human_approval"]:
     """
     Conditional logic to determine the next node.
     """
+    if not state.get("document_metrics"):
+        return "doc_extract"
     if not state.get("quant_analysis"):
         return "quant"
     if not state.get("legal_analysis"):
         return "legal"
     if not state.get("market_research"):
         return "market"
+    if not state.get("compliance_audit"):
+        return "compliance"
 
     if state.get("critique_count", 0) < 1:
         return "critique"
@@ -141,9 +149,11 @@ workflow = StateGraph(VerticalRiskGraphState)
 
 # Add Nodes
 workflow.add_node("supervisor", supervisor_node)
+workflow.add_node("doc_extract", doc_agent.extract_metrics)
 workflow.add_node("quant", quant_agent.analyze_financials)
 workflow.add_node("legal", legal_agent.analyze_covenants)
 workflow.add_node("market", market_agent.research_market)
+workflow.add_node("compliance", compliance_agent.run_compliance_audit)
 workflow.add_node("critique", critique_node)
 workflow.add_node("human_approval", human_approval_node)
 
@@ -155,18 +165,22 @@ workflow.add_conditional_edges(
     "supervisor",
     route_supervisor,
     {
+        "doc_extract": "doc_extract",
         "quant": "quant",
         "legal": "legal",
         "market": "market",
+        "compliance": "compliance",
         "critique": "critique",
         "human_approval": "human_approval"
     }
 )
 
 # Add Normal Edges
+workflow.add_edge("doc_extract", "supervisor")
 workflow.add_edge("quant", "supervisor")
 workflow.add_edge("legal", "supervisor")
 workflow.add_edge("market", "supervisor")
+workflow.add_edge("compliance", "supervisor")
 workflow.add_edge("critique", "supervisor")
 workflow.add_edge("human_approval", END)
 
