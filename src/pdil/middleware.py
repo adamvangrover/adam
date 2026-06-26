@@ -9,69 +9,9 @@ import jsonschema
 from typing import Dict, Any, Optional
 from src.pdil.models import ProvenanceHeader
 
-from json_logic import jsonLogic
-
 class GovernanceError(Exception):
     """Raised when an inference fails governance validation."""
     pass
-
-class JsonLogicGovernanceGatekeeper:
-    def __init__(self, rules: Dict[str, Any]):
-        """
-        Initializes the gatekeeper with a specific jsonLogic ruleset constraint.
-        Bridges stochastic model outputs with deterministic system inputs using jsonLogic.
-        """
-        self.rules = rules
-
-    def validate_inference(self, inference_output: Dict[str, Any]) -> Dict[str, Any]:
-        """
-        Validates LLM probabilistic inferences using jsonLogic.
-        """
-        if "provenance_trace" not in inference_output:
-            raise GovernanceError("Missing 'provenance_trace' containing the ProvenanceHeader.")
-
-        try:
-            # Pydantic validation for the header
-            header = ProvenanceHeader(**inference_output["provenance_trace"])
-        except Exception as e:
-            raise GovernanceError(f"Invalid ProvenanceHeader: {e}")
-
-        # Poison check based on confidence score boundary issues
-        if header.confidence_score < 0.5 or header.confidence_score > 1.0:
-             raise GovernanceError("Poisoned data detected: confidence score out of bounds. Must be >= 0.5")
-
-        # Extract the actual data payload to validate against the jsonLogic rules
-        payload = inference_output.get("data", {})
-
-        if not payload:
-            raise GovernanceError("Missing 'data' payload in inference output.")
-
-        # Strict Provenance Checks: Reproducible Hash Validation
-        payload_json = json.dumps(payload, sort_keys=True, separators=(',', ':')).encode('utf-8')
-        computed_hash = hashlib.sha256(payload_json).hexdigest()
-
-        if header.content_hash != computed_hash:
-            raise GovernanceError(f"Provenance violation: content_hash mismatch. Expected {computed_hash}, got {header.content_hash}")
-
-        # Schema Validation with jsonLogic
-        is_valid = jsonLogic(self.rules, payload)
-        if not is_valid:
-            raise GovernanceError("jsonLogic validation failed: payload does not satisfy rules.")
-
-        return inference_output
-
-    def entry_gate(self, inference_output: Dict[str, Any]) -> Dict[str, Any]:
-        return self.validate_inference(inference_output)
-
-    def exit_gate(self, inference_output: Dict[str, Any]) -> Dict[str, Any]:
-        return self.validate_inference(inference_output)
-
-    async def async_validate_inference(self, inference_output: Dict[str, Any]) -> Dict[str, Any]:
-        return await asyncio.to_thread(self.validate_inference, inference_output)
-
-    async def async_validate_inference_batch(self, inferences: list[Dict[str, Any]]) -> list[Dict[str, Any]]:
-        tasks = [self.async_validate_inference(inference) for inference in inferences]
-        return await asyncio.gather(*tasks)
 
 class SecurityGovernanceGatekeeper:
     def __init__(self, schema: Dict[str, Any]):
