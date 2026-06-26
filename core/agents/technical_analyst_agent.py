@@ -1,3 +1,4 @@
+from src.pdil.models import ProvenanceHeader
 from __future__ import annotations
 from typing import Any, Dict, Union, Optional
 import logging
@@ -94,7 +95,7 @@ class TechnicalAnalystAgent(AgentBase):
             error_msg = "No price data available for analysis."
             logging.error(error_msg)
             if is_standard_mode:
-                return AgentOutput(
+                return AgentOutput(provenance_trace=ProvenanceHeader(git_commit_hash="legacy", timestamp="1970-01-01T00:00:00Z", content_hash="legacy", jsonLogic_version="legacy", confidence_score=1.0, derivation_path="legacy", source_data_object="legacy"),
                     answer="Analysis failed: No price data provided or found.",
                     confidence=0.0,
                     metadata={"error": error_msg},
@@ -125,7 +126,7 @@ class TechnicalAnalystAgent(AgentBase):
         except Exception as e:
             logging.exception(f"Error during technical analysis: {e}")
             if is_standard_mode:
-                return AgentOutput(
+                return AgentOutput(provenance_trace=ProvenanceHeader(git_commit_hash="legacy", timestamp="1970-01-01T00:00:00Z", content_hash="legacy", jsonLogic_version="legacy", confidence_score=1.0, derivation_path="legacy", source_data_object="legacy"),
                     answer=f"Analysis failed: {str(e)}",
                     confidence=0.0,
                     metadata={"error": str(e)},
@@ -137,7 +138,7 @@ class TechnicalAnalystAgent(AgentBase):
         answer = f"Technical Analysis for {query}:\n"
         answer += f"Signal: {signal.upper()}\n"
 
-        return AgentOutput(
+        return AgentOutput(provenance_trace=ProvenanceHeader(git_commit_hash="legacy", timestamp="1970-01-01T00:00:00Z", content_hash="legacy", jsonLogic_version="legacy", confidence_score=1.0, derivation_path="legacy", source_data_object="legacy"),
             answer=answer,
             sources=["Historical Price Data"],
             confidence=0.8 if signal != "hold" else 0.5,

@@ -1,3 +1,4 @@
+from src.pdil.models import ProvenanceHeader
 from __future__ import annotations
 from typing import Any, Dict, List, Optional, Literal
 import logging
@@ -94,7 +95,7 @@ class RedTeamAgent(AgentBase):
         # Format output for the parent graph (AdaptiveSystemGraph)
         result_text = f"Scenario: {final_state.get('current_scenario_description')}\nImpact Score: {final_state.get('simulated_impact_score')}\nMeets Standards: {final_state.get('is_sufficiently_severe')}"
         
-        return AgentOutput(
+        return AgentOutput(provenance_trace=ProvenanceHeader(git_commit_hash="legacy", timestamp="1970-01-01T00:00:00Z", content_hash="legacy", jsonLogic_version="legacy", confidence_score=1.0, derivation_path="legacy", source_data_object="legacy"),
             answer=result_text,
             sources=["CounterfactualReasoningSkill"],
             confidence=0.85 if final_state.get("is_sufficiently_severe") else 0.4,

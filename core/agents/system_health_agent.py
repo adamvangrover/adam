@@ -1,3 +1,4 @@
+from src.pdil.models import ProvenanceHeader
 import time
 from typing import Dict, Any
 
@@ -25,7 +26,7 @@ class SystemHealthAgent(AgentBase):
             uptime_seconds=time.time() - self.start_time,
             error_count=self.error_count
         )
-        return AgentOutput(
+        return AgentOutput(provenance_trace=ProvenanceHeader(git_commit_hash="legacy", timestamp="1970-01-01T00:00:00Z", content_hash="legacy", jsonLogic_version="legacy", confidence_score=1.0, derivation_path="legacy", source_data_object="legacy"),
             answer="System is healthy",
             confidence=1.0,
             metadata={"status": "healthy", "metrics": metrics.model_dump()}

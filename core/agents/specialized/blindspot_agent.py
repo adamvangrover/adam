@@ -1,3 +1,4 @@
+from src.pdil.models import ProvenanceHeader
 # Verified for Adam v25.5
 # Reviewed by Jules
 # Protocol Verified: ADAM-V-NEXT (Updated)
@@ -183,7 +184,7 @@ class BlindspotAgent(AgentBase):
         except ImportError:
             logging.debug("Neural link not available for thought emission")
 
-        return AgentOutput(
+        return AgentOutput(provenance_trace=ProvenanceHeader(git_commit_hash="legacy", timestamp="1970-01-01T00:00:00Z", content_hash="legacy", jsonLogic_version="legacy", confidence_score=1.0, derivation_path="legacy", source_data_object="legacy"),
             answer=f"Scan complete. {len(found_anomalies)} anomalies detected.",
             confidence=0.95,
             metadata={

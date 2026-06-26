@@ -1,3 +1,4 @@
+from src.pdil.models import ProvenanceHeader
 import logging
 from typing import Any, Dict, Union
 from pydantic import BaseModel, Field
@@ -120,7 +121,7 @@ class InsiderActivityAgent(AgentBase):
         answer += f"Sell Volume: ${details.get('sell_volume'):,.2f}\n"
         answer += f"Cluster Buys Detected: {details.get('cluster_buys')}\n"
 
-        return AgentOutput(
+        return AgentOutput(provenance_trace=ProvenanceHeader(git_commit_hash="legacy", timestamp="1970-01-01T00:00:00Z", content_hash="legacy", jsonLogic_version="legacy", confidence_score=1.0, derivation_path="legacy", source_data_object="legacy"),
             answer=answer,
             sources=["SimulatedSECForm4API"],
             confidence=0.85,

@@ -1,3 +1,4 @@
+from src.pdil.models import ProvenanceHeader
 import logging
 import re
 from typing import Any, Dict, List, Optional
@@ -54,7 +55,7 @@ class MetaCognitiveAgent(AgentBase):
         logger.info(f"MetaCognitiveAgent analyzing output from {agent_name}...")
 
         if not content_to_analyze:
-            return AgentOutput(
+            return AgentOutput(provenance_trace=ProvenanceHeader(git_commit_hash="legacy", timestamp="1970-01-01T00:00:00Z", content_hash="legacy", jsonLogic_version="legacy", confidence_score=1.0, derivation_path="legacy", source_data_object="legacy"),
                 answer="No content provided for analysis.",
                 sources=[],
                 confidence=0.0,
@@ -103,7 +104,7 @@ class MetaCognitiveAgent(AgentBase):
         if contradictions:
             final_answer += " Contradictions Present."
 
-        return AgentOutput(
+        return AgentOutput(provenance_trace=ProvenanceHeader(git_commit_hash="legacy", timestamp="1970-01-01T00:00:00Z", content_hash="legacy", jsonLogic_version="legacy", confidence_score=1.0, derivation_path="legacy", source_data_object="legacy"),
             answer=final_answer,
             sources=["LogicalConsistencyGuardian", "RegexFallacyDetector"],
             confidence=coherence_score / 10.0,

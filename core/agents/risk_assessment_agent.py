@@ -1,3 +1,4 @@
+from src.pdil.models import ProvenanceHeader
 from __future__ import annotations
 from typing import Any, Dict, Optional, List, Union
 import logging
@@ -182,7 +183,7 @@ class RiskAssessmentAgent(AgentBase):
         logger.info(f"Risk assessment completed. Score: {result.get('overall_risk_score', 'N/A')}")
         
         if is_standard_mode:
-            return AgentOutput(
+            return AgentOutput(provenance_trace=ProvenanceHeader(git_commit_hash="legacy", timestamp="1970-01-01T00:00:00Z", content_hash="legacy", jsonLogic_version="legacy", confidence_score=1.0, derivation_path="legacy", source_data_object="legacy"),
                 answer=f"Risk Assessment for {company_name} complete. Score: {result.get('overall_risk_score', 'N/A')}",
                 sources=[],
                 confidence=0.9,

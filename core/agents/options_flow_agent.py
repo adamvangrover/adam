@@ -1,3 +1,4 @@
+from src.pdil.models import ProvenanceHeader
 import logging
 from typing import Any, Dict, Union
 from core.agents.agent_base import AgentBase
@@ -82,7 +83,7 @@ class OptionsFlowAgent(AgentBase):
         answer += f"Put/Call Ratio: {details.get('put_call_ratio')}\n"
         answer += f"Unusual Volume Detected: {details.get('unusual_volume')}\n"
 
-        return AgentOutput(
+        return AgentOutput(provenance_trace=ProvenanceHeader(git_commit_hash="legacy", timestamp="1970-01-01T00:00:00Z", content_hash="legacy", jsonLogic_version="legacy", confidence_score=1.0, derivation_path="legacy", source_data_object="legacy"),
             answer=answer,
             sources=["SimulatedOptionsFlowAPI"],
             confidence=0.8,

@@ -1,3 +1,4 @@
+from src.pdil.models import ProvenanceHeader
 # core/agents/algo_trading_agent.py
 
 import numpy as np
@@ -59,7 +60,7 @@ class AlgoTradingAgent(AgentBase):
 
         if is_standard_mode:
             total_ret = results.get('Total Return', 0)
-            return AgentOutput(
+            return AgentOutput(provenance_trace=ProvenanceHeader(git_commit_hash="legacy", timestamp="1970-01-01T00:00:00Z", content_hash="legacy", jsonLogic_version="legacy", confidence_score=1.0, derivation_path="legacy", source_data_object="legacy"),
                 answer=f"Simulation results for {strategy}: Total Return {total_ret*100:.2f}%",
                 sources=[],
                 confidence=0.9,

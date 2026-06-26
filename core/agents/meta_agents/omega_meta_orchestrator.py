@@ -1,3 +1,4 @@
+from src.pdil.models import ProvenanceHeader
 import json
 from typing import Any
 
@@ -26,7 +27,7 @@ class OmegaMetaOrchestrator(PydanticAgentBase):
             }
         }
 
-        return AgentOutput(
+        return AgentOutput(provenance_trace=ProvenanceHeader(git_commit_hash="legacy", timestamp="1970-01-01T00:00:00Z", content_hash="legacy", jsonLogic_version="legacy", confidence_score=1.0, derivation_path="legacy", source_data_object="legacy"),
             answer=json.dumps(routing_decision),
             sources=[self.name],
             confidence=0.95,

@@ -1,3 +1,4 @@
+from src.pdil.models import ProvenanceHeader
 import logging
 import os
 import shutil
@@ -56,7 +57,7 @@ class GitHubAlphaAgent(AgentBase):
         try:
             self._validate_url(repo_url)
         except ValueError as e:
-            return AgentOutput(
+            return AgentOutput(provenance_trace=ProvenanceHeader(git_commit_hash="legacy", timestamp="1970-01-01T00:00:00Z", content_hash="legacy", jsonLogic_version="legacy", confidence_score=1.0, derivation_path="legacy", source_data_object="legacy"),
                 answer=f"Failed to analyze repository: {str(e)}",
                 sources=[repo_url],
                 confidence=0.0,
@@ -69,7 +70,7 @@ class GitHubAlphaAgent(AgentBase):
         repo_name = repo_url.rstrip('/').split("/")[-1].replace(".git", "")
 
         if not repo_name or ".." in repo_name or "/" in repo_name or "\\" in repo_name:
-            return AgentOutput(
+            return AgentOutput(provenance_trace=ProvenanceHeader(git_commit_hash="legacy", timestamp="1970-01-01T00:00:00Z", content_hash="legacy", jsonLogic_version="legacy", confidence_score=1.0, derivation_path="legacy", source_data_object="legacy"),
                 answer="Failed to analyze repository: Invalid repository name extracted from URL.",
                 sources=[repo_url],
                 confidence=0.0,
@@ -83,7 +84,7 @@ class GitHubAlphaAgent(AgentBase):
         abs_clone_path = os.path.abspath(clone_path)
         abs_temp_dir = os.path.abspath(self.temp_dir)
         if os.path.commonpath([abs_temp_dir, abs_clone_path]) != abs_temp_dir or abs_clone_path == abs_temp_dir:
-            return AgentOutput(
+            return AgentOutput(provenance_trace=ProvenanceHeader(git_commit_hash="legacy", timestamp="1970-01-01T00:00:00Z", content_hash="legacy", jsonLogic_version="legacy", confidence_score=1.0, derivation_path="legacy", source_data_object="legacy"),
                 answer="Failed to analyze repository: Path traversal detected.",
                 sources=[repo_url],
                 confidence=0.0,
@@ -144,7 +145,7 @@ class GitHubAlphaAgent(AgentBase):
                 f"- Last Commit: {last_commit_date.strftime('%Y-%m-%d')} ({days_since_last} days ago)"
             )
 
-            return AgentOutput(
+            return AgentOutput(provenance_trace=ProvenanceHeader(git_commit_hash="legacy", timestamp="1970-01-01T00:00:00Z", content_hash="legacy", jsonLogic_version="legacy", confidence_score=1.0, derivation_path="legacy", source_data_object="legacy"),
                 answer=answer,
                 sources=[repo_url],
                 confidence=alpha_score,
@@ -159,7 +160,7 @@ class GitHubAlphaAgent(AgentBase):
 
         except Exception as e:
             logger.error(f"Error analyzing repo {repo_url}: {str(e)}")
-            return AgentOutput(
+            return AgentOutput(provenance_trace=ProvenanceHeader(git_commit_hash="legacy", timestamp="1970-01-01T00:00:00Z", content_hash="legacy", jsonLogic_version="legacy", confidence_score=1.0, derivation_path="legacy", source_data_object="legacy"),
                 answer=f"Failed to analyze repository: {str(e)}",
                 sources=[repo_url],
                 confidence=0.0,

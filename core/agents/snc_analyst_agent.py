@@ -1,3 +1,4 @@
+from src.pdil.models import ProvenanceHeader
 # core/agents/snc_analyst_agent.py
 from semantic_kernel import Kernel
 from unittest.mock import patch
@@ -111,7 +112,7 @@ class SNCAnalystAgent(AgentBase):
             self._log_audit_event("ERROR", {"message": error_msg})
             
             if is_standard_mode:
-                return AgentOutput(
+                return AgentOutput(provenance_trace=ProvenanceHeader(git_commit_hash="legacy", timestamp="1970-01-01T00:00:00Z", content_hash="legacy", jsonLogic_version="legacy", confidence_score=1.0, derivation_path="legacy", source_data_object="legacy"),
                     answer=error_msg,
                     confidence=0.0,
                     metadata={"error": error_msg}
@@ -179,7 +180,7 @@ class SNCAnalystAgent(AgentBase):
             f"SNC_ANALYSIS_EXECUTE_OUTPUT: Rating='{rating.value if rating else 'N/A'}', Rationale='{rationale}'")
             
         if is_standard_mode:
-            return AgentOutput(
+            return AgentOutput(provenance_trace=ProvenanceHeader(git_commit_hash="legacy", timestamp="1970-01-01T00:00:00Z", content_hash="legacy", jsonLogic_version="legacy", confidence_score=1.0, derivation_path="legacy", source_data_object="legacy"),
                 answer=rationale,
                 sources=[],
                 confidence=0.85 if rating else 0.0,

@@ -123,13 +123,8 @@ class UniversalArbitrageEngine(AgentBase):
         tradeable_vol_1 = min(exec_vol_buy_a, exec_vol_sell_b)
 
         # Recalculate exact costs for tradeable volume
-        # ⚡ Bolt Optimization: Avoid redundant O(L) walk_book calls if tradeable volume is identical to target volume
-        if tradeable_vol_1 == target_volume:
-            actual_cost_a = cost_a
-            actual_rev_b = revenue_b
-        else:
-            _, actual_cost_a, _ = self.walk_book(exchange_a_book.asks, tradeable_vol_1)
-            _, actual_rev_b, _ = self.walk_book(exchange_b_book.bids, tradeable_vol_1)
+        _, actual_cost_a, _ = self.walk_book(exchange_a_book.asks, tradeable_vol_1)
+        _, actual_rev_b, _ = self.walk_book(exchange_b_book.bids, tradeable_vol_1)
 
         gross_profit_1 = actual_rev_b - actual_cost_a
 
@@ -139,13 +134,8 @@ class UniversalArbitrageEngine(AgentBase):
 
         tradeable_vol_2 = min(exec_vol_buy_b, exec_vol_sell_a)
 
-        # ⚡ Bolt Optimization: Reuse precalculated costs if tradeable volume equals target volume
-        if tradeable_vol_2 == target_volume:
-            actual_cost_b = cost_b
-            actual_rev_a = revenue_a
-        else:
-            _, actual_cost_b, _ = self.walk_book(exchange_b_book.asks, tradeable_vol_2)
-            _, actual_rev_a, _ = self.walk_book(exchange_a_book.bids, tradeable_vol_2)
+        _, actual_cost_b, _ = self.walk_book(exchange_b_book.asks, tradeable_vol_2)
+        _, actual_rev_a, _ = self.walk_book(exchange_a_book.bids, tradeable_vol_2)
 
         gross_profit_2 = actual_rev_a - actual_cost_b
 

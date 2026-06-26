@@ -1,3 +1,4 @@
+from src.pdil.models import ProvenanceHeader
 from typing import Dict, Any, List, Optional
 from pydantic import BaseModel, Field
 import logging
@@ -66,7 +67,7 @@ class TemplateAgentV26:
         except Exception as e:
             self.logger.error(f"Critical failure in {self.agent_name}: {e}", exc_info=True)
             # Fallback / Graceful Degradation
-            return AgentOutput(
+            return AgentOutput(provenance_trace=ProvenanceHeader(git_commit_hash="legacy", timestamp="1970-01-01T00:00:00Z", content_hash="legacy", jsonLogic_version="legacy", confidence_score=1.0, derivation_path="legacy", source_data_object="legacy"),
                 answer=f"I encountered an error while analyzing: {str(e)}",
                 sources=[],
                 confidence=0.0,
@@ -86,7 +87,7 @@ class TemplateAgentV26:
     def _synthesize(self, data: Dict[str, str]) -> AgentOutput:
         """Create the final grounded response."""
         # Mock logic
-        return AgentOutput(
+        return AgentOutput(provenance_trace=ProvenanceHeader(git_commit_hash="legacy", timestamp="1970-01-01T00:00:00Z", content_hash="legacy", jsonLogic_version="legacy", confidence_score=1.0, derivation_path="legacy", source_data_object="legacy"),
             answer=f"Analysis complete. Key finding: {data['fact_1']}",
             sources=[data['source_1']],
             confidence=0.95,

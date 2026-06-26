@@ -1,3 +1,4 @@
+from src.pdil.models import ProvenanceHeader
 from __future__ import annotations
 from typing import Any, Dict
 from core.agents.agent_base import AgentBase, AgentInput, AgentOutput
@@ -122,7 +123,7 @@ class CrisisSimulationMetaAgent(AgentBase):
                     recommendations="Review the detailed graph trace in 'final_report' for mitigation strategies."
                 )
                 
-                return AgentOutput(
+                return AgentOutput(provenance_trace=ProvenanceHeader(git_commit_hash="legacy", timestamp="1970-01-01T00:00:00Z", content_hash="legacy", jsonLogic_version="legacy", confidence_score=1.0, derivation_path="legacy", source_data_object="legacy"),
                     answer=crisis_out.executive_summary,
                     sources=["CrisisSimulationGraph"],
                     confidence=0.85,
@@ -152,7 +153,7 @@ class CrisisSimulationMetaAgent(AgentBase):
         parsed_output = self.simulation_plugin.parse_response(llm_response_str)
 
         logging.info("Crisis simulation finished.")
-        return AgentOutput(
+        return AgentOutput(provenance_trace=ProvenanceHeader(git_commit_hash="legacy", timestamp="1970-01-01T00:00:00Z", content_hash="legacy", jsonLogic_version="legacy", confidence_score=1.0, derivation_path="legacy", source_data_object="legacy"),
             answer=parsed_output.executive_summary,
             sources=["StaticHeuristics"],
             confidence=0.75,
