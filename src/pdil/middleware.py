@@ -1,5 +1,6 @@
 import json
 import hashlib
+import asyncio
 import time
 import urllib.request
 import urllib.error
@@ -84,8 +85,6 @@ class SecurityGovernanceGatekeeper:
         """
         Initializes the gatekeeper with a specific JSON schema constraint.
         Bridges stochastic model outputs with deterministic system inputs.
-        Prioritizes W3C PROV-O compliant metadata validation to ensure AI context
-        windows can discern *why* a decision was made by tracing data back to its source.
         """
         self.schema = schema
 

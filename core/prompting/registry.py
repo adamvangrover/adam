@@ -3,6 +3,7 @@ from .base_prompt_plugin import BasePromptPlugin
 from .plugins.financial_truth_plugin import FinancialTruthPlugin
 from .plugins.tree_of_thoughts_plugin import TreeOfThoughtsPlugin
 from .plugins.chain_of_verification_plugin import ChainOfVerificationPlugin
+from .plugins.qpf_plugin import QPFPlugin
 # from .plugins.example_plugin import ExamplePlugin # Example plugin available for reference but not registered by default
 
 
@@ -33,4 +34,5 @@ class PromptRegistry:
 PromptRegistry.register(FinancialTruthPlugin)
 PromptRegistry.register(TreeOfThoughtsPlugin)
 PromptRegistry.register(ChainOfVerificationPlugin)
+PromptRegistry.register(QPFPlugin)
 # PromptRegistry.register(ExamplePlugin)
