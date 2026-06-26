@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: adam-os-kernel
+  labels:
+    app: adam-os
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: adam-os
+  template:
+    metadata:
+      labels:
+        app: adam-os
+    spec:
+      containers:
+      - name: core-engine
+        image: adam-core-engine:latest
+        ports:
+        - containerPort: 50051
+        env:
+        - name: RUST_LOG
+          value: info
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: adam-os-kernel-svc
+spec:
+  selector:
+    app: adam-os
+  ports:
+    - protocol: TCP
+      port: 50051
+      targetPort: 50051
