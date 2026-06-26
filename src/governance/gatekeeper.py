@@ -13,17 +13,17 @@ class GovernanceGatekeeper(SecurityGovernanceGatekeeper):
     def __init__(self, schema=None, rules=None):
         self._delegate = JsonLogicGovernanceGatekeeper(rules) if rules is not None else None
         super().__init__(schema or {'type': 'object'})
-
+            
     def validate_inference(self, inference_output):
         if self._delegate:
             return self._delegate.validate_inference(inference_output)
         return super().validate_inference(inference_output)
-
+        
     def entry_gate(self, inference_output):
         if self._delegate:
             return self._delegate.entry_gate(inference_output)
         return super().entry_gate(inference_output)
-
+        
     def exit_gate(self, inference_output):
         if self._delegate:
             return self._delegate.exit_gate(inference_output)

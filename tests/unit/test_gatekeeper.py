@@ -44,7 +44,7 @@ def get_valid_provenance(payload=None):
         "jsonLogic_version": "1.0",
         "confidence_score": 0.95,
         "derivation_path": "/path/to/data",
-        "source_data_object": "http://example.com/data"
+        "source_data_object": "https://example.com/"
     }
 
 @pytest.fixture

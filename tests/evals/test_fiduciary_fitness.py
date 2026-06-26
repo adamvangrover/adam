@@ -36,7 +36,10 @@ def check_grounding(inference_output: dict):
 )
 @settings(suppress_health_check=[HealthCheck.too_slow])
 def test_governance_gatekeeper_fuzz(payload, confidence):
-    with patch('urllib.request.urlopen'):
+    with patch('urllib.request.OpenerDirector.open') as mock_open:
+        mock_response = __import__('unittest.mock', fromlist=['MagicMock']).MagicMock()
+        mock_response.getcode.return_value = 200
+        mock_open.return_value.__enter__.return_value = mock_response
         gatekeeper = GovernanceGatekeeper(schema=VALID_SCHEMA)
 
         computed_hash = hashlib.sha256(json.dumps(payload, sort_keys=True, separators=(',', ':')).encode("utf-8")).hexdigest()
@@ -49,7 +52,7 @@ def test_governance_gatekeeper_fuzz(payload, confidence):
                 "jsonLogic_version": "1.0",
                 "confidence_score": confidence,
                 "derivation_path": "test_path",
-                "source_data_object": "fuzz_test_source"
+                "source_data_object": "https://example.com/fuzz_test_source"
             },
             "data": payload
         }
@@ -68,8 +71,8 @@ def test_governance_gatekeeper_fuzz(payload, confidence):
             assert result == inference_output
 
 
-@patch('urllib.request.urlopen')
-def test_missing_provenance_trace(mock_urlopen):
+@patch('urllib.request.OpenerDirector.open')
+def test_missing_provenance_trace(mock_open):
     gatekeeper = GovernanceGatekeeper(schema=VALID_SCHEMA)
     inference_output = {
         "data": {"analysis": "Looks good", "score": 0.8}
@@ -78,8 +81,8 @@ def test_missing_provenance_trace(mock_urlopen):
     with pytest.raises(GovernanceError, match="Missing 'provenance_trace'"):
         gatekeeper.validate_inference(inference_output)
 
-@patch('urllib.request.urlopen')
-def test_invalid_provenance_trace(mock_urlopen):
+@patch('urllib.request.OpenerDirector.open')
+def test_invalid_provenance_trace(mock_open):
     gatekeeper = GovernanceGatekeeper(schema=VALID_SCHEMA)
     inference_output = {
         "provenance_trace": {
@@ -89,7 +92,7 @@ def test_invalid_provenance_trace(mock_urlopen):
             "jsonLogic_version": "1.0",
             "confidence_score": 0.9,
             "derivation_path": "test_path",
-            "source_data_object": "test_source"
+            "source_data_object": "https://example.com/test_source"
         },
         "data": {"analysis": "Looks good", "score": 0.8}
     }
@@ -97,8 +100,11 @@ def test_invalid_provenance_trace(mock_urlopen):
     with pytest.raises(GovernanceError, match="Invalid ProvenanceHeader"):
         gatekeeper.validate_inference(inference_output)
 
-@patch('urllib.request.urlopen')
-def test_valid_inference(mock_urlopen):
+@patch('urllib.request.OpenerDirector.open')
+def test_valid_inference(mock_open):
+    mock_response = __import__('unittest.mock', fromlist=['MagicMock']).MagicMock()
+    mock_response.getcode.return_value = 200
+    mock_open.return_value.__enter__.return_value = mock_response
     gatekeeper = GovernanceGatekeeper(schema=VALID_SCHEMA)
     inference_output = {
         "provenance_trace": {
@@ -108,7 +114,7 @@ def test_valid_inference(mock_urlopen):
             "jsonLogic_version": "1.0",
             "confidence_score": 0.9,
             "derivation_path": "test_path",
-            "source_data_object": "test_source"
+            "source_data_object": "https://example.com/test_source"
         },
         "data": {"analysis": "Looks good", "score": 0.8}
     }

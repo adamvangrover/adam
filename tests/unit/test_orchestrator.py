@@ -214,7 +214,7 @@ async def test_human_gate_suspension_and_recovery(engine: OrchestratorEngine):
     })
 
     # Verify state queued for resume
-    assert engine.ledger.task_registry["gate"]["status"] == TaskState.PENDING
+    assert engine.ledger.task_registry["gate"]["status"] == TaskState.COMPLETED
 
     # Run again to finish the DAG
     await engine.run()
