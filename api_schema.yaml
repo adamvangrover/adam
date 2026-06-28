@@ -1,0 +1,52 @@
+openapi: 3.0.3
+info:
+  title: ADAM API
+  version: 30.1.0
+  description: OpenAPI specification generated directly from Pydantic models.
+paths:
+  /api/v1/ledger:
+    get:
+      summary: Retrieve the ImmutableLedger audit trails
+      responses:
+        '200':
+          description: A W3C PROV-O WAF compliant JSONL payload.
+  /api/v1/orchestrate:
+    post:
+      summary: Submit a DAG for orchestration
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DagSubmission'
+      responses:
+        '200':
+          description: DAG accepted
+components:
+  schemas:
+    ProvenanceHeader:
+      type: object
+      required:
+        - source_system
+        - timestamp
+        - signature
+      properties:
+        source_system:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        signature:
+          type: string
+    DagSubmission:
+      type: object
+      required:
+        - workflow_id
+        - nodes
+      properties:
+        workflow_id:
+          type: string
+        nodes:
+          type: array
+          items:
+            type: string
