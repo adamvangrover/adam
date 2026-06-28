@@ -1,0 +1,71 @@
+openapi: 3.0.3
+info:
+  title: ADAM Core API
+  description: OpenAPI specification generated directly from core Pydantic models.
+  version: 30.1.0
+paths:
+  /orchestrate:
+    post:
+      summary: Dispatch task to the Meta-Orchestrator
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskRequest'
+      responses:
+        '200':
+          description: Task accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskResponse'
+components:
+  schemas:
+    ProvenanceHeader:
+      type: object
+      required:
+        - source_uri
+        - timestamp
+        - hash
+      properties:
+        source_uri:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        hash:
+          type: string
+    AgentOutput:
+      type: object
+      required:
+        - conviction_score
+        - provenance_trace
+      properties:
+        conviction_score:
+          type: number
+          format: float
+          minimum: 0.0
+          maximum: 1.0
+        provenance_trace:
+          $ref: '#/components/schemas/ProvenanceHeader'
+    TaskRequest:
+      type: object
+      required:
+        - task_id
+        - payload
+      properties:
+        task_id:
+          type: string
+        payload:
+          type: string
+    TaskResponse:
+      type: object
+      required:
+        - status
+        - output
+      properties:
+        status:
+          type: string
+        output:
+          $ref: '#/components/schemas/AgentOutput'
