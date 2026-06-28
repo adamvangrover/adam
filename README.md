@@ -15,81 +15,87 @@
 
 <div align="center">
   <a href="https://opensource.org/licenses/MIT" target="_blank"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License"></a>
-  <a href="https://www.python.org/downloads/" target="_blank"><img src="https://img.shields.io/badge/python-3.10+-blue.svg" alt="Python 3.10+"></a>
+  <a href="https://www.python.org/downloads/" target="_blank"><img src="https://img.shields.io/badge/python-3.11+-blue.svg" alt="Python 3.11+"></a>
   <a href="https://hub.docker.com/" target="_blank"><img src="https://img.shields.io/badge/docker-ready-blue" alt="Docker Ready"></a>
   <a href="https://arxiv.org/abs/2311.11944" target="_blank"><img src="https://img.shields.io/badge/FinanceBench-99%25-green" alt="FinanceBench"></a>
 </div>
 
 <br>
 
-Adam v26.0 is an opinionated, ready-to-run financial agent out of the box. Instead of wiring up prompts, tools, and context management yourself, you get a working institutional-grade sovereign immediately and customize what you need.
+**Version:** 30.1 | **Focus:** Neuro-Symbolic DAG Orchestration | **Domain:** Institutional Credit Risk & Market Intelligence
 
-**What's included:**
+ADAM is a local-first, multi-agent architecture designed to bridge the gap between stochastic language processing and deterministic financial mathematics. Built for strict privacy-by-design environments, the framework orchestrates asynchronous data pipelines to synthesize semantic market sentiment with rigorous, rules-based credit surveillance.
 
-- **Distressed Debt & Credit** — `Credit Sentinel` for python-based 3-statement modeling, DCF valuation, SNC Rating, and Covenant Analysis
-- **Quantitative Engineering** — `Risk Modeling` and `Factor Analysis` for deterministic calculation of VaR, Sharpe, and Sortino ratios
-- **Agentic Workflow** — `Meta-Orchestrator` for dynamic routing, `Consensus Engine` for conviction scoring, and `Governance Layer` for API Gatekeeping
-- **Logic as Data** — Uses `jsonLogic` for decoupled risk thresholds, trading triggers, and compliance rules
-- **System Architecture** — Fuses a high-velocity Neural Swarm (System 1) with a deliberate Neuro-Symbolic Graph (System 2)
-- **Rust Execution Layer** — Algorithmic trading engine, matching engine, and pricing engine powered by Rust for deterministic execution
+The core thesis of this repository is that LLM-driven semantic analysis is only actionable when strictly bounded by deterministic risk models. ADAM provides the orchestration layer to execute this at scale, ensuring all agentic workflows resolve into strictly typed, verifiable outputs. It upgrades financial AI from a conversational chatbot to a fiduciary architect, explicitly engineered for Broadly Syndicated Loans (BSL), Distressed Debt, and Deep Credit Risk Underwriting in complex verticals (TMT, Software, Healthcare).
 
 > [!NOTE]
 > Looking for the web interface? Check out the [Neural Dashboard](showcase/index.html).
 
-> **Adam v26.0 upgrades financial AI from a conversational chatbot to a fiduciary architect, explicitly engineered for Leveraged Finance, Distressed Debt, and Deep Credit Risk Underwriting. By fusing the intuitive speed of a Neural Swarm (System 1) with the deliberate logic of a Neuro-Symbolic Graph (System 2), Adam delivers calculated conviction for high-stakes capital allocation.**
-
-
-
----
-
 ## 📚 Quick Links
-
 *   [**🚀 Launch Neural Dashboard**](showcase/index.html)
 *   [**⚡ Setup Guide**](docs/setup_guide.md)
 *   [**🤖 Agent Developer Bible**](AGENTS.md)
 *   [**🧠 Agent Knowledge Base**](docs/AGENTS_KNOWLEDGE_BASE.md)
 *   [**📖 Architecture Overview**](docs/ARCHITECTURE.md)
 *   [**🎓 Tutorials**](docs/tutorials.md)
-*   [**🎓 Office Nexus Tutorial**](docs/TUTORIAL_OFFICE_NEXUS.md)
 *   [**📦 Custom Builds**](docs/custom_builds.md)
 *   [**🏗️ Three-Layer Architecture**](docs/LAYERS.md)
 
----
-
 ## 🧠 Why Adam? The "System 2" Revolution
-
-The era of the "LLM Wrapper" is over. Institutional finance faces an **Epistemological Crisis**: stochastic models hallucinate, making them dangerous for due diligence.
-
-**Adam v26.0** solves this by implementing a **Hybrid Cognitive Engine** rooted in the principles of **Leveraged Finance** and **Distressed Debt**:
+The era of the "LLM Wrapper" is over. Institutional finance faces an **Epistemological Crisis**: stochastic models hallucinate, making them dangerous for due diligence. ADAM v30.1 solves this by enforcing the strict separation of reasoning and execution through a Probabilistic-to-Deterministic Integration Layer (PDIL).
 
 ### System 1: The Swarm (The Reflexes)
-*   **Role:** High-velocity, unstructured data parsing.
-*   **Focus:** Earnings call transcripts, ARR momentum, and baseline financial ratios.
-*   **Architecture:** Asynchronous Hive Mind with `SentinelWorker` for anomaly detection.
-*   **Use Case:** "Monitor TMT sector for cash burn spikes."
+*   **Role:** High-velocity, unstructured data parsing and asynchronous Edgar ingestion.
+*   **Focus:** Earnings call transcripts, SEC filings, ARR momentum, and baseline financial ratios.
+*   **Architecture:** Asynchronous Hive Mind utilizing open-weight models to parse semantic chaos.
+*   **Use Case:** "Monitor TMT sector for cash burn spikes and translate NLP-extracted corporate structural changes into semantic vectors."
 
 ### System 2: The Graph (The Deep Thinker)
 *   **Role:** Downside scenario stress testing, capital structure analysis, and covenant compliance.
 *   **Focus:** "Logic as Data" enforcement of underwriting policies.
-*   **Architecture:** Neuro-Symbolic Planner (DAG) with feedback loops.
-*   **Use Case:** "Generate a deep-dive credit memo with Base/Bull/Bear DCF scenarios."
+*   **Architecture:** Neuro-Symbolic Planner (DAG) with hard-coded logic for PD, LGD, and VaR.
+*   **Use Case:** "Route extracted parameters into strict, non-LLM pricing engines to generate a deep-dive credit memo with Base/Bull/Bear DCF scenarios."
 
-**Result:** Adam "thinks before he speaks," drafting, critiquing, and refining analysis before presenting it to the user.
+## 🛠️ System Capabilities & Current State
+This framework is built for institutional-grade utility, specifically targeting Broadly Syndicated Loans (BSL), institutional leveraged portfolios, and alpha generation within complex verticals (e.g., TMT, Software, Healthcare).
 
-### Logic as Data
-Adam v26.0 treats business logic as first-class data. Using a JSON-based rule engine (`jsonLogic`), risk thresholds, trading triggers, and compliance rules are decoupled from the core codebase. This allows for:
-*   **Dynamic Policy Updates:** Modify risk parameters without redeploying code.
-*   **Auditability:** Rules are stored as JSON artifacts, making them human-readable and easy to version control.
-*   **Safety:** The logic layer is evaluated before agent execution, acting as a deterministic guardrail.
+### Production-Ready Logic
+*   **DAG Orchestration:** A highly composable Directed Acyclic Graph underlying the agentic workflows, ensuring reliable task execution.
+*   **Asynchronous Edgar Ingestion (v30.1):** High-fidelity scraping protocols converting unstructured regulatory filings into structured semantic vectors.
+*   **Deterministic Risk Modeling:** Hard-coded logic for Probability of Default (PD), Loss Given Default (LGD), and Value-at-Risk (VaR) tailored for high-yield credit structures.
+*   **Privacy-by-Design Execution:** A local-first architecture ensuring zero-trust data sovereignty.
 
-### System Architecture
+### The Research Frontier
+*   **Neuro-Symbolic Routing:** Using open-weight models to parse semantic chaos and automatically route extracted parameters into strict, non-LLM pricing engines via the PDIL.
+*   **Dynamic Covenant Stress-Testing:** Real-time translation of NLP-extracted corporate structural changes into immediate covenant breach simulations.
+
+### Experimental Integrations
+*   **Quantum Pricing Integration:** Active development utilizing Quantum Amplitude Estimation (QAE) and Hamiltonian-based optimization for simulating extreme market tail-risks.
+*   **Agentic Market-Making:** Exploratory multi-agent harnesses for autonomous order routing.
+
+## 🛠️ Tech Stack & Capabilities
+ADAM v30.1 is an opinionated, ready-to-run financial agent out of the box.
+
+*   **Core Execution (Deterministic):** Rust (Pricing kernels, matching engines, and heavy compute).
+*   **Orchestration & Agents (Stochastic):** Python 3.11+, leveraging Pydantic for strict type-safety and OpenAPI schema generation.
+*   **Governance & Rules:** JSONLogic and YAML ("Logic as Data" and "Prompt-as-Code" methodologies).
+*   **Quantum Modeling (Experimental):** Qiskit and cuQuantum for tail-risk and Quantum Amplitude Estimation (QAE).
+*   **Visualization:** Three.js / JavaScript for client-side topological mapping and risk surface rendering.
+
+### What's Included:
+*   **Distressed Debt & Credit** — `Credit Sentinel` for python-based 3-statement modeling, DCF valuation, SNC Rating, and dynamic covenant stress-testing.
+*   **Quantitative Engineering** — Deterministic calculation of VaR, Sharpe, and Sortino ratios tailored for high-yield credit structures.
+*   **Agentic Workflow** — `Meta-Orchestrator` for dynamic DAG routing, `Consensus Engine` for conviction scoring, and `Governance Layer` for API Gatekeeping.
+*   **Automated Intelligence** — Built-in distribution pipelines for proprietary market intelligence (e.g., Market Mayhem, Fortress & Hunt).
+
+## 📐 System Architecture
 
 ```mermaid
 graph TD
     %% 1. Client & Immersive Layer
     subgraph Client_Layer [Client & Immersive Layer]
         UserNode(["User / PM"]) -->|HTTP/WSS| WebApp["React / Vite Dashboard"]
-        UserNode -->|WebXR| VRDeck["Neural Deck (VR / Holodeck)"]
+        UserNode -->|WebXR| VRDeck["Neural Deck (Three.js Topology)"]
         WebApp -->|MCP| MCPServer["MCP API Gateway"]
         VRDeck -->|MCP| MCPServer
         MCPServer -->|Auth/RBAC| SecModule["Security & Governance Gatekeeper"]
@@ -97,30 +103,29 @@ graph TD
 
     %% 2. Orchestration Layer
     subgraph Orchestration_Layer [Cognitive Routing]
-        SecModule -->|Validated Request| MetaOrchestrator["Meta-Orchestrator (Python)"]
+        SecModule -->|Validated Request| MetaOrchestrator["Meta-Orchestrator (Python 3.11)"]
     end
 
     %% 3. System 1: Fast Perception
-    subgraph System_1_Swarm [System 1: Neural Swarms & Perception]
+    subgraph System_1_Swarm [System 1: Neural Swarms & Edgar Ingestion]
         MetaOrchestrator -->|Event/PubSub| SwarmManager["Async Hive Mind"]
-        SwarmManager -->|Spawn| MarketScanner["Market Scanner & News"]
-        SwarmManager -->|Spawn| SentimentEngine["Sentiment Engine"]
-        SwarmManager -->|Isolate| DevSwarm["Independent Dev/Tinker Swarm"]
+        SwarmManager -->|Spawn| MarketScanner["Market Scanner & SEC Parser"]
+        SwarmManager -->|Spawn| SentimentEngine["Semantic NLP Engine"]
     end
 
     %% 4. System 2: Deep Reasoning
-    subgraph System_2_Reasoning [System 2: Neuro-Symbolic Graph]
+    subgraph System_2_Reasoning [System 2: Neuro-Symbolic DAG Graph]
         MetaOrchestrator -->|Complex Query| Planner["DAG Reasoning Planner"]
-        Planner -->|Credit| CreditSentinel["Credit Sentinel (SNC & ICAT)"]
-        Planner -->|Wealth| RoboAdvisor["Robo Advisor"]
+        Planner -->|Credit| CreditSentinel["Credit Sentinel (SNC, VaR, LGD, PD)"]
+        Planner -->|Covenants| CovenantTester["Dynamic Stress-Tester"]
         Planner -->|Alpha| StratEngine["Strategy Engine"]
     end
 
-    %% 5. System 3: World Modeling
-    subgraph System_3_Simulation [System 3: Simulation & Quantum]
+    %% 5. System 3: World Modeling & Quantum
+    subgraph System_3_Simulation [System 3: Simulation & Quantum Modeling]
         MetaOrchestrator -->|Forecast| WorldModel["OSWM (World Model)"]
-        WorldModel -->|Scenario| QuantumEngine["Quantum Monte Carlo (QMC)"]
-        QuantumEngine -->|Stress Test| RiskGuardian["Risk Guardian"]
+        WorldModel -->|Scenario| QuantumEngine["Qiskit / cuQuantum Engine (QAE)"]
+        QuantumEngine -->|Tail-Risk| RiskGuardian["Risk Guardian"]
     end
 
     %% 6. Deterministic & Execution (Rust)
@@ -134,60 +139,46 @@ graph TD
     %% 7. Foundation & OS Layer
     subgraph OS_Foundation_Layer [Foundation & Memory]
         PricingEngine -->|Syscall| AdamOS["AdamOS Kernel (Rust)"]
-        CreditSentinel -->|Trace| POTLogger["ProofOfThought Logger"]
+        CreditSentinel -->|Trace| POTLogger["ProofOfThought Logger (JSONLogic)"]
         POTLogger -->|Hash| Ledger[("Immutable Ledger")]
         AdamOS -->|State| Ledger
         WorldModel <-->|Context| KnowledgeGraph[("Unified Knowledge Graph")]
     end
-
-    %% 8. Experimental Sandbox
-    subgraph Experimental_Lab [Experimental / Sandbox]
-        TinkerLab["Tinker Lab & Federated Learning"] -.->|Promote Models| MetaOrchestrator
-    end
 ```
 
 ## 🧬 Logic as Data: The Audit Trail
-
-Adam treats reasoning as a first-class citizen. Every logical step, from EBITDA adjustment to covenant stress-testing, is serialized as a data artifact via the `ProofOfThoughtLogger`. This ensures:
-
-*   **Traceability:** Every conclusion can be traced back to its source (e.g., specific line items in a 10-K).
-*   **Reproducibility:** Analysis can be re-run with different assumptions to test sensitivity.
-*   **Auditability:** A complete ledger of the agent's "thought process" is preserved in an immutable JSON ledger for compliance and review.
-
----
+Adam treats reasoning as a first-class citizen. Every logical step, from EBITDA adjustment to covenant stress-testing, is serialized as a data artifact via the `ProofOfThoughtLogger`. Using JSON-based rule engines (`jsonLogic`), risk thresholds, trading triggers, and compliance rules are decoupled from the core codebase. This ensures absolute traceability, reproducibility, and a deterministic guardrail before any agent execution.
 
 ## 📂 Directory Structure
-
-A high-level overview of the repository layout:
 
 ```text
 adam/
 ├── core/                   # The "Brain" (See core/README.md)
-│   ├── agents/             # Specialized autonomous agents
 │   ├── engine/             # Neuro-Symbolic Planner & Orchestrator
-│   ├── credit_sentinel/    # Distressed Debt Analysis Module
 │   └── system/             # "System 1" Async Swarm infrastructure
+├── adam-orchestration/     # Core DAG logic, state management, and node routing
+├── adam-ingest/            # Asynchronous pipelines for SEC Edgar and macro news parsing
+├── adam-semantic/          # NLP harnesses, sentiment analysis, open-weight integrations
+├── adam-credit/            # Deterministic VaR, PD, LGD calculators; covenant stress-tests
+├── adam-quantum/           # [Experimental] QAE and Hamiltonian models for tail-risk
+├── adam-governance/        # Security Gatekeepers and JSONLogic validation schemas
 ├── services/
-│   └── webapp/             # React/Flask "Neural Dashboard"
+│   └── webapp/             # React/Vite "Neural Dashboard"
 ├── showcase/               # Static HTML visualizers and demos
 ├── docs/                   # Documentation, tutorials, and guides
-│   └── archive/            # Legacy documentation and migration guides
 ├── scripts/                # Utility scripts for running and testing
-├── prompt_library/         # The "Mind" (AOPL v26.0 Prompts)
+├── publications/           # Automated intelligence distribution (Market Mayhem, Fortress & Hunt)
+├── prompt_library/         # The "Mind" (Prompt-as-Code YAMLs)
 └── server/                 # MCP Server implementation
 ```
 
----
-
 ## ⚡ Getting Started
-
 We strictly use **`uv`** for lightning-fast, reproducible Python environment management.
 
 ### Prerequisites
-
 *   **OS:** Linux, macOS, or Windows (WSL2 recommended)
 *   **Tooling:** `uv` (Modern Python Package Manager)
-*   **API Keys:** OpenAI (GPT-4), Anthropic (Claude 3.5), or local LLM.
+*   **API Keys:** OpenAI (GPT-4), Anthropic (Claude 3.5), or local open-weight model.
 
 ### Quick Start
 
@@ -204,7 +195,6 @@ We strictly use **`uv`** for lightning-fast, reproducible Python environment man
 
 3.  **Sync Dependencies:**
     ```bash
-    # This installs Python and all dependencies in seconds
     uv sync
     ```
 
@@ -215,88 +205,36 @@ We strictly use **`uv`** for lightning-fast, reproducible Python environment man
 
 5.  **Launch the System:**
     ```bash
-    # Run the interactive CLI
     uv run python scripts/run_adam.py
     ```
 
-For detailed instructions, see the [Setup Guide](docs/setup_guide.md).
-
----
-
-## 🏰 Platform Capabilities
-
-Adam unifies three critical domains into a single cognitive architecture:
-
-### 1. Distressed Debt & Credit (Credit Sentinel)
-*   **ICAT Engine:** Python-based 3-statement modeling and DCF valuation.
-*   **SNC Rating:** Automating regulatory grading (Pass vs. Substandard).
-*   **Covenant Analysis:** Extracting and stress-testing debt covenants.
-
-### 2. Quantitative Engineering
-*   **Risk Modeling:** Deterministic calculation of VaR, Sharpe, and Sortino ratios.
-*   **Factor Analysis:** Regression against Fama-French factors.
-
-### 3. Agentic Workflow
-*   **Meta-Orchestration:** Dynamic routing of queries to specialized agents.
-*   **Consensus Engine:** Aggregating multi-agent perspectives into a single conviction score.
-*   **Governance Layer:** API Gatekeeper and Structured Narrative Logging for enterprise safety.
-
----
-
-## 📦 Custom Builds & Export
-
-Adam includes a powerful build system to create self-contained, portable environments.
-
-### Interactive Builder
-
-Run the build wizard to create a custom distribution with specific modules, runtime profiles, and Docker support:
-
-```bash
-uv run python scripts/build_adam.py
-```
-
-See [**Custom Builds Documentation**](docs/custom_builds.md) for details.
-
-### Quick Export
-
-To export a single module directly:
-
+For custom distribution modules (e.g., extracting specific automated intelligence pipelines), use our export utility:
 ```bash
 uv run python scripts/export_module.py market_mayhem --output my_exports
 ```
 
----
+See the [Setup Guide](docs/setup_guide.md) and [Custom Builds Documentation](docs/custom_builds.md) for detailed workflows.
 
 ## 🗺️ Roadmap: Path to Autonomy
+*   **Phase 1 (Current): The Autonomous Analyst.** Deep Dives, Credit Memos, Regulatory Grading, and Edgar Ingestion.
+*   **Phase 1.5 (ADAM-V-NEXT): The Command Center.** Synthesizer Dashboard, Quantum Tail-Risk Integrations, and 3D Topology Mapping.
+*   **Phase 2 (Q3 2025): The Portfolio Manager.** Multi-entity risk aggregation, dynamic covenant testing, and automated rebalancing.
+*   **Phase 3 (Q3 2026): The Market Maker.** High-frequency sentiment trading and liquidity provision via Quantum RL and Rust matching engines.
 
-*   **Phase 1 (Current): The Autonomous Analyst.** Deep Dives, Credit Memos, and Regulatory Grading.
-*   **Phase 1.5 (ADAM-V-NEXT): The Command Center.** Synthesizer Dashboard, Agent Intercom, and War Room.
-*   **Phase 2 (Q3 2025): The Portfolio Manager.** Multi-entity risk aggregation and automated rebalancing.
-*   **Phase 3 (Q3 2026): The Market Maker.** High-frequency sentiment trading and liquidity provision via Quantum RL.
-
----
+## 🚀 Next Wave Drivers (v30.2+)
+To bridge the gap between our current state and Phase 3, development is actively prioritizing the following technical drivers:
+1. **PDIL Hardening**: Migrating `src/pdil/middleware.py` Gatekeepers to Rust for zero-latency W3C PROV-O compliance checks.
+2. **Agentic Market-Making Harness**: Expanding `core/agents/algo_trading_agent.py` to seamlessly output Rust-executable `TradeSignal` schemas.
+3. **Quantum Amplitude Estimation (QAE)**: Stabilizing the `adam-quantum` Qiskit integration to efficiently map credit default covariance matrices into executable Ising models.
+4. **Self-Healing Documentation**: Fully automating the Diátaxis documentation generation (via AST parsing in `scripts/generate_human_reports.py`) to keep pace with System 1 Swarm mutations.
 
 ## 🤝 Contributing
-
 We are building the open-source standard for institutional AI.
 
 *   **Directives:** Please read [AGENTS.md](AGENTS.md) and the [Agent Knowledge Base](docs/AGENTS_KNOWLEDGE_BASE.md) before writing a single line of code.
 *   **Process:** Read [CONTRIBUTING.md](CONTRIBUTING.md) for pull request guidelines.
 
-## 📖 Documentation & Guides
-
-We have significantly expanded our documentation for v26.0:
-
-*   [**Architecture & Design**](docs/ARCHITECTURE.md): The Neuro-Symbolic 3-Layer Architecture.
-*   [**Layer Documentation**](docs/LAYERS.md): Detailed breakdown of Intelligence, Compute, and Data layers.
-*   [**Production Setup**](docs/PRODUCTION.md): Deployment, Security, and Ops.
-*   [**Versioning Strategy**](docs/VERSIONING.md): Release cycle and branching.
-*   [**Agent Creation**](docs/AGENT_CREATION.md): How to build and register new agents.
-*   [**Graph Workflows**](docs/GRAPH_WORKFLOWS.md): Building DAG-based reasoning loops.
-*   [**Documentation Hub**](docs/index.md): The central index.
-
 ### License
-
 Distributed under the MIT License. See `LICENSE` for more information.
 
 ---
