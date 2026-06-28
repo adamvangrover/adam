@@ -21,3 +21,5 @@ class TokenOptimizer:
         self.usage_stats[model_name]["cost"] += (tokens_used / 1000.0) * cost_per_1k
 
         return self.usage_stats[model_name]
+
+__all__ = ["TokenOptimizer"]

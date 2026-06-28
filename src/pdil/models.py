@@ -12,3 +12,5 @@ class ProvenanceHeader(BaseModel):
     confidence_score: float = Field(..., description="Agent conviction score (0.0 to 1.0)")
     derivation_path: str = Field(..., description="Path indicating how the conclusion was reached (PROV-O: wasDerivedFrom)")
     source_data_object: str = Field(..., description="Reference to the source data object, satisfying W3C PROV-O requirements (PROV-O: hadPrimarySource)")
+
+__all__ = ["ProvenanceHeader"]

@@ -235,3 +235,12 @@ class MilestoneLogger:
         if not self.milestones:
             return {}
         return sorted(self.milestones, key=lambda m: m["conviction"] / max(m["complexity"], 0.001), reverse=True)[0]
+
+__all__ = [
+    "GovernanceError",
+    "JsonLogicGovernanceGatekeeper",
+    "SecurityGovernanceGatekeeper",
+    "DriftIntelligenceLayer",
+    "ProofOfThoughtLogger",
+    "MilestoneLogger",
+]
