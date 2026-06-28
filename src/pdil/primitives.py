@@ -8,3 +8,5 @@ class DataPrimitive(Primitive):
     """Primitive for handling data inputs."""
     def __init__(self, data: Dict[str, Any]):
         self.data = data
+
+__all__ = ["Primitive", "DataPrimitive"]

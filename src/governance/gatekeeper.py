@@ -36,3 +36,5 @@ class GovernanceGatekeeper(SecurityGovernanceGatekeeper):
     def heal_drift(self, inference_output):
         layer = DriftIntelligenceLayer(self)
         return layer.heal_drift(inference_output)
+
+__all__ = ["GovernanceGatekeeper"]
