@@ -8,6 +8,7 @@
   </a>
 </div>
 <img width="1024" height="559" alt="image" src="https://github.com/user-attachments/assets/e4c84f37-c32d-4aa2-bb9d-fc04c5125daf" />
+<img width="1024" height="559" alt="image" src="https://github.com/user-attachments/assets/ea90dc98-a7f3-4546-a6d0-b977a7dcc264" />
 
 <div align="center">
   <h3>Autonomous Deterministic Alpha Matrix : The Institutional-Grade Neuro-Symbolic Financial Sovereign.</h3>
