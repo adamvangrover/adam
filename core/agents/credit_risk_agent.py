@@ -2,7 +2,13 @@ from __future__ import annotations
 from typing import Any, Dict, Optional
 import logging
 import numpy as np
+import json
+import hashlib
+from datetime import datetime
 from core.agents.agent_base import AgentBase
+from core.schemas.agent_schema import AgentOutput
+from src.pdil.models import ProvenanceHeader
+from src.pdil.middleware import JsonLogicGovernanceGatekeeper
 
 try:
     from scipy.stats import norm
@@ -21,8 +27,16 @@ class CreditRiskAgent(AgentBase):
 
     def __init__(self, config: Dict[str, Any], **kwargs):
         super().__init__(config, **kwargs)
+        # Define a jsonLogic rule ensuring non-negative EBIT and positive Total Assets
+        self.logic_rules = {
+            "and": [
+                {">=": [{"var": "ebit"}, 0]},
+                {">": [{"var": "total_assets"}, 0]}
+            ]
+        }
+        self.gatekeeper = JsonLogicGovernanceGatekeeper(self.logic_rules)
 
-    async def execute(self, financial_data: Dict[str, Any]) -> Dict[str, Any]:
+    async def execute(self, financial_data: Dict[str, Any]) -> AgentOutput:
         """
         Executes the credit risk assessment.
 
@@ -45,6 +59,32 @@ class CreditRiskAgent(AgentBase):
         logger.info("Starting Credit Risk Assessment...")
 
         try:
+            # Additive Governance: Evaluate data payload through jsonLogic Gatekeeper
+            # Since the gatekeeper validates an AgentOutput dict format containing a 'data' payload,
+            # we will construct a mock payload for input validation, or directly validate if possible.
+            # However, since the standard gatekeeper validates output format, and we want to validate inputs,
+            # we'll build a synthetic AgentOutput to pass through validate_inference.
+
+            mock_input_validation_payload = {
+                "provenance_trace": {
+                    "git_commit_hash": "current",
+                    "timestamp": datetime.utcnow().isoformat() + "Z",
+                    "content_hash": hashlib.sha256(json.dumps(financial_data, sort_keys=True, separators=(',', ':')).encode('utf-8')).hexdigest(),
+                    "jsonLogic_version": "v2.0",
+                    "confidence_score": 1.0,
+                    "derivation_path": "input",
+                    "source_data_object": "input"
+                },
+                "data": financial_data
+            }
+
+            observed_drift = False
+            try:
+                self.gatekeeper.validate_inference(mock_input_validation_payload)
+            except Exception as e:
+                logger.warning(f"Financial data failed jsonLogic governance constraints: {e}")
+                observed_drift = True
+
             # Extract inputs
             wc = financial_data.get("working_capital", 0)
             re = financial_data.get("retained_earnings", 0)
@@ -116,11 +156,34 @@ class CreditRiskAgent(AgentBase):
             }
 
             logger.info(f"Credit Risk Assessment Complete: {result}")
-            return result
+
+            # Dynamic Provenance Propagation
+            payload_json = json.dumps(result, sort_keys=True, separators=(',', ':')).encode('utf-8')
+            content_hash = hashlib.sha256(payload_json).hexdigest()
+
+            provenance = ProvenanceHeader(
+                git_commit_hash="current",
+                timestamp=datetime.utcnow().isoformat() + "Z",
+                content_hash=content_hash,
+                jsonLogic_version="v2.0",
+                confidence_score=0.9,
+                derivation_path="CreditRiskAgent -> Altman Z-Score & Merton Model",
+                source_data_object="internal_calculation"
+            )
+
+            return AgentOutput(
+                answer="Credit risk assessment completed successfully.",
+                sources=["internal_calculation"],
+                confidence=0.9,
+                metadata={"z_score_zone": result.get("zone")},
+                provenance_trace=provenance,
+                data=result,
+                observed_drift=observed_drift
+            )
 
         except Exception as e:
             logger.error(f"Error calculating credit risk: {e}")
-            return {"error": str(e)}
+            raise e
 
     def _calculate_z_score(self, A, B, C, D, E, industry_type):
         """Calculates Altman Z-Score based on industry type."""
