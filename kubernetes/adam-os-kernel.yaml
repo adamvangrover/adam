@@ -22,6 +22,18 @@ spec:
         env:
         - name: RUST_LOG
           value: info
+        volumeMounts:
+        - name: config-volume
+          mountPath: /etc/config
+        - name: data-volume
+          mountPath: /var/data
+      volumes:
+      - name: config-volume
+        configMap:
+          name: adam-config
+      - name: data-volume
+        persistentVolumeClaim:
+          claimName: adam-pvc
 ---
 apiVersion: v1
 kind: Service
@@ -34,3 +46,41 @@ spec:
     - protocol: TCP
       port: 50051
       targetPort: 50051
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: adam-os-ingress
+spec:
+  rules:
+  - host: adam.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: adam-os-kernel-svc
+            port:
+              number: 50051
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: adam-config
+data:
+  config.yaml: |
+    engine:
+      mode: production
+      log_level: info
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: adam-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi

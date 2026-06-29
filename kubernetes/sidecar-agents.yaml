@@ -27,6 +27,13 @@ spec:
           value: "1"
         - name: PYTHONPATH
           value: "/app"
+        volumeMounts:
+        - name: config-volume
+          mountPath: /etc/config
+      volumes:
+      - name: config-volume
+        configMap:
+          name: adam-sidecar-config
 ---
 apiVersion: v1
 kind: Service
@@ -39,3 +46,11 @@ spec:
     - protocol: TCP
       port: 5001
       targetPort: 5001
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: adam-sidecar-config
+data:
+  sidecar.yaml: |
+    agent_mode: swarm

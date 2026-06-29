@@ -2,7 +2,13 @@ from __future__ import annotations
 from typing import Any, Dict, Optional
 import logging
 import numpy as np
+import json
+import hashlib
+from datetime import datetime
 from core.agents.agent_base import AgentBase
+from core.schemas.agent_schema import AgentOutput
+from src.pdil.models import ProvenanceHeader
+from src.pdil.middleware import JsonLogicGovernanceGatekeeper
 
 logger = logging.getLogger(__name__)
 
@@ -15,8 +21,13 @@ class LiquidityRiskAgent(AgentBase):
 
     def __init__(self, config: Dict[str, Any], **kwargs):
         super().__init__(config, **kwargs)
+        # Define a jsonLogic rule ensuring positive current liabilities to avoid div by zero gracefully
+        self.logic_rules = {
+            ">": [{"var": "current_liabilities"}, 0]
+        }
+        self.gatekeeper = JsonLogicGovernanceGatekeeper(self.logic_rules)
 
-    async def execute(self, data: Dict[str, Any]) -> Dict[str, Any]:
+    async def execute(self, data: Dict[str, Any]) -> AgentOutput:
         """
         Executes the liquidity risk assessment.
 
@@ -39,6 +50,27 @@ class LiquidityRiskAgent(AgentBase):
 
         financial_data = data.get("financial_data", {})
         market_data = data.get("market_data", {})
+
+        # Additive Governance: Evaluate financial data payload through jsonLogic Gatekeeper
+        mock_input_validation_payload = {
+            "provenance_trace": {
+                "git_commit_hash": "current",
+                "timestamp": datetime.utcnow().isoformat() + "Z",
+                "content_hash": hashlib.sha256(json.dumps(financial_data, sort_keys=True, separators=(',', ':')).encode('utf-8')).hexdigest(),
+                "jsonLogic_version": "v2.0",
+                "confidence_score": 1.0,
+                "derivation_path": "input",
+                "source_data_object": "input"
+            },
+            "data": financial_data
+        }
+
+        observed_drift = False
+        try:
+            self.gatekeeper.validate_inference(mock_input_validation_payload)
+        except Exception as e:
+            logger.warning(f"Financial data failed jsonLogic governance constraints: {e}")
+            observed_drift = True
         trade_size = data.get("trade_size_simulation", 100000.0)
 
         result = {}
@@ -103,7 +135,30 @@ class LiquidityRiskAgent(AgentBase):
             result["market_liquidity_error"] = str(e)
 
         logger.info(f"Liquidity Risk Assessment Complete: {result}")
-        return result
+
+        # Dynamic Provenance Propagation
+        payload_json = json.dumps(result, sort_keys=True, separators=(',', ':')).encode('utf-8')
+        content_hash = hashlib.sha256(payload_json).hexdigest()
+
+        provenance = ProvenanceHeader(
+            git_commit_hash="current",
+            timestamp=datetime.utcnow().isoformat() + "Z",
+            content_hash=content_hash,
+            jsonLogic_version="v2.0",
+            confidence_score=0.9,
+            derivation_path="LiquidityRiskAgent -> Financial & Market Liquidity",
+            source_data_object="internal_calculation"
+        )
+
+        return AgentOutput(
+            answer="Liquidity risk assessment completed successfully.",
+            sources=["internal_calculation"],
+            confidence=0.9,
+            metadata={"financial_liquidity_assessment": result.get("financial_liquidity", {}).get("assessment")},
+            provenance_trace=provenance,
+            data=result,
+            observed_drift=observed_drift
+        )
 
     def _calculate_lcr(self, financial_data: Dict[str, Any]) -> float:
         """Calculates Liquidity Coverage Ratio (LCR) approximation."""
