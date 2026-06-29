@@ -17,3 +17,11 @@ Global contagion from the US tech sell-off is already severe. South Korea's Kosp
 ## Agent Insights
 - **Macro Sentinel**: The un-inverted yield curve (10Y at 4.38%, 2Y at 4.07%) suggests normalization, but the stark divergence between rebounding energy supply and crashing tech valuations indicates a market undergoing a violent sector rotation rather than an organic expansion.
 - **Risk Officer**: Momentum algorithms are aggressively unwinding crowded AI trades. With the Nasdaq suffering its worst 5-day decline since mid-June, and global semiconductor proxies hitting circuit breakers, recommend rotating out of hardware-heavy tech and into defensive value or cash equivalents until volatility mean-reverts.
+
+{"variable_node": "SP500_Index", "market_level_value": "7354.02", "primary_model_target": "DCF", "context_provenance": "Live_Telemetry_Engine_2026-06-27"}
+{"variable_node": "Nasdaq_Index", "market_level_value": "25297.62", "primary_model_target": "DCF", "context_provenance": "Live_Telemetry_Engine_2026-06-27"}
+{"variable_node": "US_10Y_Treasury_Yield", "market_level_value": "4.38", "primary_model_target": "DCF", "context_provenance": "Live_Telemetry_Engine_2026-06-27"}
+{"variable_node": "US_2Y_Treasury_Yield", "market_level_value": "4.07", "primary_model_target": "DCF", "context_provenance": "Live_Telemetry_Engine_2026-06-27"}
+{"variable_node": "Oil_Brent_Price", "market_level_value": "74.00", "primary_model_target": "LGD", "context_provenance": "Live_Telemetry_Engine_2026-06-27"}
+{"variable_node": "Gold_Price", "market_level_value": "4046.40", "primary_model_target": "PD", "context_provenance": "Live_Telemetry_Engine_2026-06-27"}
+{"variable_node": "Bitcoin_Price", "market_level_value": "60100", "primary_model_target": "EV", "context_provenance": "Live_Telemetry_Engine_2026-06-27"}
