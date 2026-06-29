@@ -17,3 +17,5 @@ class SystemStateManager:
         context = self.global_state.copy()
         context.update(self.layer_states.get(layer_name, {}))
         return context
+
+__all__ = ["SystemStateManager"]

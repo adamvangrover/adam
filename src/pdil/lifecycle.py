@@ -24,3 +24,5 @@ class ModelLifecycleManager:
             model_info["status"] = "DEPRECATED"
             return "DEPRECATED"
         return "ACTIVE"
+
+__all__ = ["ModelLifecycleManager"]
