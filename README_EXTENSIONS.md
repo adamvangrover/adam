@@ -38,3 +38,8 @@ Ensure your kernel supports passing standard primitive types to Python, or inter
 ## 4. Third-Party Vendor Initialization
 *   For data providers (FactSet, CapitalIQ): Implement an interface in `core/data_access/` and inject it into the `LakehouseConnector` or specific domain agent.
 *   For custom LLMs: Register the provider in `core/llm_plugin.py` adapting to the `BaseLLM` standard.
+
+## 5. Memory Ingestion & Vector DB Integration
+Adam utilizes a structured Markdown memory layer to pass context between sessions, drastically reducing token overhead.
+*   **Memory Nodes:** Saved as `.md` files in `artifacts/ai/` (e.g., `Market_State_20260629.md`).
+*   **Ingestion Pipeline:** Use `core/memory_ingestion_pipeline.py` to parse these markdown nodes. It structures the data into key-value pairs suitable for Vector DB indexing and generates conversational delta summaries to be injected dynamically into the system prompt.
