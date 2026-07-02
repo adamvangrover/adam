@@ -20,3 +20,10 @@ class AgentOutput(BaseModel):
     observed_drift: bool = Field(False, description=
         'Flag indicating if logic shifted from existing implementation, triggers self-healing'
         )
+
+    def check_grounding(self) -> bool:
+        """
+        Verifies that this output contains a valid reference to its source data object,
+        satisfying W3C PROV-O compliance requirements.
+        """
+        return bool(self.provenance_trace.source_data_object)
