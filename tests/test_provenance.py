@@ -15,9 +15,6 @@ def test_provenance_trace_set():
     output = AgentOutput(status='success', result={'key': 'value'}, provenance_trace=header)
     assert output.provenance_trace == header
 
-def check_grounding(output: AgentOutput) -> bool:
-    return bool(output.provenance_trace.source_data_object)
-
 def test_check_grounding():
     header = ProvenanceHeader(
         git_commit_hash="abc",
@@ -29,7 +26,7 @@ def test_check_grounding():
         source_data_object="source"
     )
     output = AgentOutput(status='success', result={'key': 'value'}, provenance_trace=header)
-    assert check_grounding(output) is True
+    assert output.check_grounding() is True
 
 from hypothesis import given, strategies as st
 
@@ -49,4 +46,4 @@ def test_check_grounding_property(status, key, val):
         source_data_object="http://example.com/data"
     )
     output = AgentOutput(status=status, result={key: val}, provenance_trace=header)
-    assert check_grounding(output) is True
+    assert output.check_grounding() is True
