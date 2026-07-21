@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM Financial OS | Fallback Protocol 2026-07-18</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+        
+        :root {
+            --bg-primary: #fdfcfb;
+            --bg-secondary: #f4f1ee;
+            --accent-gold: #c5a059;
+            --text-main: #2d2a26;
+            --text-muted: #6b665f;
+            --border-color: #e5e1dc;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-main);
+            line-height: 1.6;
+        }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 320px;
+            max-height: 400px;
+        }
+
+        .terminal-bg {
+            background-color: #1a1816;
+            color: #d1cdc7;
+            font-family: 'JetBrains+Mono', monospace;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(8px);
+            border: 1px solid var(--border-color);
+        }
+
+        .tab-active {
+            border-bottom: 2px solid var(--accent-gold);
+            color: var(--accent-gold);
+        }
+
+        @media (min-width: 768px) {
+            .chart-container { height: 380px; }
+        }
+    </style>
+</head>
+<body class="p-0 m-0 overflow-x-hidden">
+
+<!-- Chosen Palette: Gilded Slate - Warm neutrals (fdfcfb, f4f1ee) with muted metallic gold accents (c5a059) -->
+<!-- Application Structure Plan: The application is structured as a mission-critical command dashboard. It transitions from a high-level System Status (reflecting the State 2 trigger) to a detailed Quantitative Analysis core. We use a dashboard-first approach because the report is structured around an automated execution failure. Key interactions include an 'Interactive Merton Stress Tester' which allows users to verify the report's sensitivity grid, and a 'Regime Navigator' to compare the four latent states. This structure was chosen to make the abstract Markov transitions and structural default formulas tangible and explorable for a risk officer. -->
+<!-- Visualization & Content Choices: 
+1. Key Metrics Cards -> Goal: Instant situational awareness -> Presentation: Styled stat blocks -> Interaction: Hover for T-1 comparisons.
+2. July 17 vs July 18 Delta -> Goal: Compare pre/post shock levels -> Presentation: Horizontal Bar Chart (Chart.js) -> Justification: Clearest way to show directional divergence in yields vs equities.
+3. Interactive Merton Simulator -> Goal: Teach structural mechanics -> Presentation: Input sliders + dynamic PD output -> Justification: Translates the complex exponential formula into a tangible experience.
+4. Regime Matrix -> Goal: Organize latent state parameters -> Presentation: Dynamic Radar Chart (Chart.js) -> Justification: Visualizes the 'shape' of different economic regimes (volatility vs drift).
+5. System Trace Logs -> Goal: Transparency -> Presentation: Terminal-styled scrolling area -> Interaction: Filterable event log.
+Confirming NO SVG/Mermaid. -->
+<!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+<nav class="sticky top-0 z-50 w-full border-b border-stone-200 glass-card px-6 py-4">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-[#c5a059] flex items-center justify-center font-bold text-white rounded">A</div>
+            <h1 class="text-xl font-bold tracking-tight">ADAM FINANCIAL OS <span class="font-light text-stone-400">| v4.2.0</span></h1>
+        </div>
+        <div class="flex gap-6 text-sm font-medium uppercase tracking-widest text-stone-500">
+            <button onclick="scrollToSection('status')" class="hover:text-amber-700 transition">System Status</button>
+            <button onclick="scrollToSection('analysis')" class="hover:text-amber-700 transition">Risk Analysis</button>
+            <button onclick="scrollToSection('simulator')" class="hover:text-amber-700 transition">Simulator</button>
+            <button onclick="scrollToSection('logs')" class="hover:text-amber-700 transition">Traces</button>
+        </div>
+    </div>
+</nav>
+
+<main class="max-w-7xl mx-auto px-6 py-12">
+    
+    <!-- HEADER SECTION: SYSTEM STATUS -->
+    <section id="status" class="mb-16">
+        <div class="bg-amber-50 border-l-4 border-amber-500 p-6 mb-8 rounded-r">
+            <h2 class="text-amber-800 font-bold uppercase text-xs mb-1">Critical Event Triggered</h2>
+            <p class="text-amber-900 text-lg">State 2: Synthetic Fallback activated at T<sub>0</sub> (08:00:06Z). Primary Ingestion Failure.</p>
+            <p class="text-amber-700 text-sm mt-2 font-medium italic">"Live data retrieval timed out. Transitioning from Hyper-Expansion to Stagflationary Shock via Markov-Chain Drift."</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="p-6 border border-stone-200 rounded-lg bg-white shadow-sm">
+                <span class="text-xs font-semibold text-stone-400 uppercase">S&P 500 Index</span>
+                <div class="text-3xl font-bold mt-1">7,345</div>
+                <div class="text-red-500 text-sm font-medium">▼ 1.51% (Synthesized)</div>
+            </div>
+            <div class="p-6 border border-stone-200 rounded-lg bg-white shadow-sm">
+                <span class="text-xs font-semibold text-stone-400 uppercase">US 10Y Yield</span>
+                <div class="text-3xl font-bold mt-1">4.70%</div>
+                <div class="text-amber-600 text-sm font-medium">▲ 15 bps (Regime Shift)</div>
+            </div>
+            <div class="p-6 border border-stone-200 rounded-lg bg-white shadow-sm">
+                <span class="text-xs font-semibold text-stone-400 uppercase">HY Credit Spread</span>
+                <div class="text-3xl font-bold mt-1">311 bps</div>
+                <div class="text-amber-600 text-sm font-medium">▲ 40 bps (Expansion)</div>
+            </div>
+            <div class="p-6 border border-stone-200 rounded-lg bg-white shadow-sm">
+                <span class="text-xs font-semibold text-stone-400 uppercase">CRE Default Prob.</span>
+                <div class="text-3xl font-bold mt-1 text-[#c5a059]">1.39%</div>
+                <div class="text-red-500 text-sm font-medium">▲ 15.8% (Risk Density)</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION: MARKET REAPPRAISAL -->
+    <section id="analysis" class="mb-20">
+        <div class="mb-12 border-b border-stone-200 pb-6">
+            <h2 class="text-3xl font-light mb-4">Macro-Financial <span class="font-bold">Regime Analysis</span></h2>
+            <p class="text-stone-600 max-w-3xl">
+                This section details the structural transition from the Hyper-Expansion baseline into the current Stagflationary Shock. By synthesizing asset behavior when live data endpoints fail, the Adam OS identifies emerging correlations that typically remain hidden during benign market conditions. Use the visualization below to explore the divergence in asset classes following the T-1 anchor.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div class="chart-container">
+                <canvas id="deltaChart"></canvas>
+            </div>
+            <div class="space-y-6">
+                <h3 class="text-xl font-semibold">The $T_{-1}$ Baseline Anchor</h3>
+                <p class="text-stone-600">On July 17, markets operated under the illusion of perfection. The S&P 500 sat at <span class="font-medium">7,457.69</span>, supported by a <span class="font-medium">$750B AI capex cycle</span>. However, the Stagflationary Shock has broken this equilibrium.</p>
+                <ul class="space-y-4">
+                    <li class="flex gap-4">
+                        <div class="flex-shrink-0 w-8 h-8 rounded-full bg-stone-100 flex items-center justify-center font-bold text-xs">01</div>
+                        <div>
+                            <span class="font-bold">Equity Exhaustion:</span> Valuation multiples at 22.1x EPS left no room for the yield spike to 4.70%.
+                        </div>
+                    </li>
+                    <li class="flex gap-4">
+                        <div class="flex-shrink-0 w-8 h-8 rounded-full bg-stone-100 flex items-center justify-center font-bold text-xs">02</div>
+                        <div>
+                            <span class="font-bold">Credit Complacency:</span> Spread compression to 271 bps was "historically thin," now widening toward systemic triggers.
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION: REGIME MATRIX -->
+    <section class="mb-20 bg-stone-50 py-16 px-8 rounded-3xl border border-stone-100">
+        <div class="max-w-4xl mx-auto text-center mb-12">
+            <h2 class="text-2xl font-bold mb-4">Latent State Transition Matrix</h2>
+            <p class="text-stone-600">The Adam OS models the economy through four persistent regimes. Each state dictates the drift ($\mu$) and volatility ($\sigma$) of the fallback simulation. Click the labels to explore the "shape" of different economic environments.</p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+            <div class="col-span-1 md:col-span-2">
+                <div class="chart-container">
+                    <canvas id="regimeRadar"></canvas>
+                </div>
+            </div>
+            <div class="flex flex-col justify-center gap-4">
+                <button onclick="updateRadar('Hyper-Expansion')" class="p-4 rounded-xl border border-stone-200 bg-white hover:bg-stone-50 text-left transition flex items-center justify-between">
+                    <div>
+                        <div class="font-bold">Hyper-Expansion</div>
+                        <div class="text-xs text-stone-500">Low Vol, Positive Drift</div>
+                    </div>
+                    <span class="text-stone-300">→</span>
+                </button>
+                <button onclick="updateRadar('Stagflationary Shock')" class="p-4 rounded-xl border-2 border-amber-500 bg-white text-left transition flex items-center justify-between">
+                    <div>
+                        <div class="font-bold text-amber-800">Stagflationary Shock</div>
+                        <div class="text-xs text-amber-600">High Yields, Negative Equities</div>
+                    </div>
+                    <span class="text-amber-500">Active</span>
+                </button>
+                <button onclick="updateRadar('Deflationary Bust')" class="p-4 rounded-xl border border-stone-200 bg-white hover:bg-stone-50 text-left transition flex items-center justify-between">
+                    <div>
+                        <div class="font-bold">Deflationary Bust</div>
+                        <div class="text-xs text-stone-500">Extreme Vol, Yield Collapse</div>
+                    </div>
+                    <span class="text-stone-300">→</span>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION: INTERACTIVE SIMULATOR -->
+    <section id="simulator" class="mb-20">
+        <div class="mb-12">
+            <h2 class="text-3xl font-light mb-4">Floating-Base <span class="font-bold">Merton Simulator</span></h2>
+            <p class="text-stone-600 max-w-3xl">
+                The Adam OS utilizes a proprietary closed-form heuristic to estimate Commercial Real Estate (CRE) default probability during API blackouts. This simulator allows you to stress-test the structural impact of equity asset buffers and refinancing costs. Adjust the inputs to see how the non-linear "Risk Density" expands.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="lg:col-span-1 p-8 rounded-2xl bg-[#2d2a26] text-white shadow-xl">
+                <h3 class="text-sm font-bold uppercase tracking-widest text-[#c5a059] mb-8">Scenario Inputs</h3>
+                
+                <div class="space-y-8">
+                    <div>
+                        <label class="block text-xs mb-2 opacity-70">S&P 500 LEVEL</label>
+                        <input type="range" id="spxRange" min="5000" max="8000" value="7345" class="w-full h-1 bg-stone-600 rounded-lg appearance-none cursor-pointer accent-[#c5a059]" oninput="calculateMerton()">
+                        <div class="flex justify-between mt-2 text-sm font-mono">
+                            <span>5000</span>
+                            <span id="spxVal" class="text-[#c5a059] font-bold">7345</span>
+                            <span>8000</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs mb-2 opacity-70">HY SPREAD (BPS)</label>
+                        <input type="range" id="spreadRange" min="200" max="1000" value="311" class="w-full h-1 bg-stone-600 rounded-lg appearance-none cursor-pointer accent-[#c5a059]" oninput="calculateMerton()">
+                        <div class="flex justify-between mt-2 text-sm font-mono">
+                            <span>200</span>
+                            <span id="spreadVal" class="text-[#c5a059] font-bold">311</span>
+                            <span>1000</span>
+                        </div>
+                    </div>
+
+                    <div class="pt-6 border-t border-stone-700">
+                        <div class="text-xs uppercase opacity-50 mb-1">Merton Heuristic Formula</div>
+                        <code class="text-[10px] block p-2 bg-black/30 rounded text-stone-400">
+                            PD<sub>t</sub> = PD<sub>t-1</sub> × (SPX<sub>t-1</sub>/SPX<sub>t</sub>) × exp(ΔSpread/300)
+                        </code>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lg:col-span-2 p-8 border border-stone-200 rounded-2xl flex flex-col justify-between">
+                <div>
+                    <h3 class="text-xl font-bold mb-2">Simulated Probability of Default (PD)</h3>
+                    <p class="text-stone-500 mb-8">Implied probability for US Commercial Real Estate portfolio.</p>
+                </div>
+                
+                <div class="flex items-baseline gap-4 mb-8">
+                    <span id="pdDisplay" class="text-8xl font-black text-stone-800 tracking-tighter">1.39%</span>
+                    <div id="riskLevel" class="px-4 py-1 rounded-full bg-amber-100 text-amber-800 text-xs font-bold uppercase tracking-wider">Elevated Risk</div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="p-4 bg-stone-50 rounded-lg">
+                        <div class="text-xs text-stone-400 uppercase font-bold">Asset Buffer Erosion</div>
+                        <div id="assetBuffer" class="text-lg font-mono font-bold">1.015x</div>
+                    </div>
+                    <div class="p-4 bg-stone-50 rounded-lg">
+                        <div class="text-xs text-stone-400 uppercase font-bold">Debt Cost Multiplier</div>
+                        <div id="debtMultiplier" class="text-lg font-mono font-bold">1.142x</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION: SYSTEM TRACES -->
+    <section id="logs" class="mb-20">
+        <div class="mb-8">
+            <h2 class="text-2xl font-bold">System Execution Traces</h2>
+            <p class="text-stone-600">The following log segments are extracted from <code>system_traces.jsonl</code>, documenting the exact moment the State 2 Fallback was engaged by the Adam kernel.</p>
+        </div>
+        
+        <div class="terminal-bg rounded-xl p-6 shadow-2xl overflow-hidden">
+            <div class="flex gap-2 mb-4 border-b border-stone-800 pb-3">
+                <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                <div class="w-3 h-3 rounded-full bg-amber-500"></div>
+                <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                <span class="ml-4 text-xs font-bold uppercase opacity-40">ADAM_OS_KERNEL_LOG v2026.07.18</span>
+            </div>
+            <div id="terminal" class="space-y-2 text-sm max-h-64 overflow-y-auto">
+                <!-- Dynamic Logs -->
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<footer class="bg-stone-100 border-t border-stone-200 py-12 px-6">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8 text-stone-500 text-sm">
+        <div class="flex items-center gap-2">
+            <span class="font-bold text-stone-800 uppercase tracking-widest">Adam OS</span>
+            <span>&copy; 2026 Algorithmic Default Analysis & Modeling</span>
+        </div>
+        <div class="flex gap-8">
+            <span>Data Persistence: State 2 Active</span>
+            <span>Security Protocol: Markov Encrypted</span>
+            <span>Ref: im_57f70acd9c795bd7</span>
+        </div>
+    </div>
+</footer>
+
+<script>
+    const STATE_DATA = {
+        lastKnown: { spx: 7457.69, yield: 4.55, spread: 271, pd: 1.20 },
+        current: { spx: 7345, yield: 4.70, spread: 311, pd: 1.39, regime: 'Stagflationary Shock' },
+        regimes: {
+            "Hyper-Expansion": { spx_drift: 0.5, spx_vol: 1.0, yield_drift: 2, spread_drift: -5, lgd: 35 },
+            "Stagflationary Shock": { spx_drift: -1.5, spx_vol: 3.0, yield_drift: 15, spread_drift: 40, lgd: 50 },
+            "Deflationary Bust": { spx_drift: -4.0, spx_vol: 6.0, yield_drift: -30, spread_drift: 150, lgd: 75 },
+            "Idiosyncratic Credit Crunch": { spx_drift: -0.5, spx_vol: 2.0, yield_drift: -5, spread_drift: 80, lgd: 60 }
+        }
+    };
+
+    const traces = [
+        { "event": "Ingestion started", "timestamp": "2026-07-18T08:00:00Z", "level": "INFO" },
+        { "event": "Live search failed", "error": "Timeout on yield curve and SPX data endpoints", "timestamp": "2026-07-18T08:00:05Z", "level": "ERROR" },
+        { "event": "State 2 fallback triggered", "reason": "Circuit breaker activated on null ingestion vectors", "timestamp": "2026-07-18T08:00:06Z", "level": "CRIT" },
+        { "event": "Markov transition calculated", "previous_regime": "Hyper-Expansion", "current_regime": "Stagflationary Shock", "transition_probability": "0.20", "timestamp": "2026-07-18T08:00:07Z", "level": "INFO" },
+        { "event": "Floating-base Gaussian drift applied successfully", "base_anchor_date": "2026-07-17", "timestamp": "2026-07-18T08:00:10Z", "level": "SUCCESS" }
+    ];
+
+    function scrollToSection(id) {
+        document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function initCharts() {
+        // 1. Delta Chart
+        const ctxDelta = document.getElementById('deltaChart').getContext('2d');
+        new Chart(ctxDelta, {
+            type: 'bar',
+            data: {
+                labels: ['S&P 500 Index', 'US 10Y Yield (bps)', 'HY Credit Spread'],
+                datasets: [
+                    {
+                        label: 'July 17 (T-1)',
+                        data: [7457.69, 455, 271],
+                        backgroundColor: '#e5e1dc'
+                    },
+                    {
+                        label: 'July 18 (Synthesized)',
+                        data: [7345, 470, 311],
+                        backgroundColor: '#c5a059'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: { beginAtZero: false, grid: { display: false } }
+                },
+                plugins: {
+                    legend: { position: 'bottom' }
+                }
+            }
+        });
+
+        // 2. Regime Radar
+        const ctxRadar = document.getElementById('regimeRadar').getContext('2d');
+        window.regimeChart = new Chart(ctxRadar, {
+            type: 'radar',
+            data: {
+                labels: ['SPX Drift', 'SPX Vol', 'Yield Drift', 'Spread Drift', 'LGD Factor'],
+                datasets: [{
+                    label: 'Current: Stagflationary Shock',
+                    data: [1.5, 3.0, 15, 40, 50],
+                    fill: true,
+                    backgroundColor: 'rgba(197, 160, 89, 0.2)',
+                    borderColor: '#c5a059',
+                    pointBackgroundColor: '#c5a059',
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    r: {
+                        angleLines: { color: '#e5e1dc' },
+                        grid: { color: '#e5e1dc' },
+                        pointLabels: { font: { size: 10 } },
+                        suggestedMin: -10,
+                        suggestedMax: 60
+                    }
+                }
+            }
+        });
+    }
+
+    function updateRadar(regimeName) {
+        const r = STATE_DATA.regimes[regimeName];
+        window.regimeChart.data.datasets[0].label = `Selected: ${regimeName}`;
+        window.regimeChart.data.datasets[0].data = [
+            Math.abs(r.spx_drift) * 10, 
+            r.spx_vol * 10, 
+            Math.abs(r.yield_drift), 
+            r.spread_drift, 
+            r.lgd
+        ];
+        window.regimeChart.update();
+    }
+
+    function calculateMerton() {
+        const spx = parseFloat(document.getElementById('spxRange').value);
+        const spread = parseFloat(document.getElementById('spreadRange').value);
+        
+        document.getElementById('spxVal').innerText = Math.round(spx);
+        document.getElementById('spreadVal').innerText = Math.round(spread);
+
+        const last = STATE_DATA.lastKnown;
+        
+        const assetRatio = last.spx / spx;
+        const debtMultiplier = Math.exp((spread - last.spread) / 300);
+        
+        const newPD = (last.pd * assetRatio * debtMultiplier).toFixed(2);
+        
+        document.getElementById('pdDisplay').innerText = `${newPD}%`;
+        document.getElementById('assetBuffer').innerText = `${assetRatio.toFixed(3)}x`;
+        document.getElementById('debtMultiplier').innerText = `${debtMultiplier.toFixed(3)}x`;
+
+        const riskBox = document.getElementById('riskLevel');
+        if (newPD < 1.3) {
+            riskBox.innerText = "Normal Range";
+            riskBox.className = "px-4 py-1 rounded-full bg-green-100 text-green-800 text-xs font-bold uppercase tracking-wider";
+        } else if (newPD < 1.8) {
+            riskBox.innerText = "Elevated Risk";
+            riskBox.className = "px-4 py-1 rounded-full bg-amber-100 text-amber-800 text-xs font-bold uppercase tracking-wider";
+        } else {
+            riskBox.innerText = "Systemic Stress";
+            riskBox.className = "px-4 py-1 rounded-full bg-red-100 text-red-800 text-xs font-bold uppercase tracking-wider";
+        }
+    }
+
+    function loadTerminal() {
+        const term = document.getElementById('terminal');
+        traces.forEach(log => {
+            const div = document.createElement('div');
+            const color = log.level === 'ERROR' ? 'text-red-400' : (log.level === 'CRIT' ? 'text-amber-500 font-bold' : 'text-stone-400');
+            div.innerHTML = `<span class="text-stone-600">[${log.timestamp.split('T')[1].replace('Z','')}]</span> <span class="text-blue-400 uppercase text-[10px]">[${log.level}]</span> <span class="${color}">${log.event}</span> ${log.error ? `<br><span class="ml-16 text-red-800 text-xs">— ${log.error}</span>` : ''}`;
+            term.appendChild(div);
+        });
+    }
+
+    window.onload = () => {
+        initCharts();
+        calculateMerton();
+        loadTerminal();
+    };
+</script>
+</body>
+</html>
