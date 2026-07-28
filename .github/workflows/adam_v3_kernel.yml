@@ -1,0 +1,44 @@
+name: Adam V3 Kernel Evaluation and Flywheel Build
+
+on:
+  push:
+    branches:
+      - main
+  schedule:
+    - cron: '0 12 * * *'  # Run daily
+  workflow_dispatch:
+
+jobs:
+  kernel_build_and_eval:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies and setup environment
+        run: pip install uv && uv sync
+
+      - name: Initialize Telemetry
+        run: uv run python scripts/generate_swarm_telemetry.py
+
+      - name: Run Core Training Stream Data
+        run: uv run python scripts/generate_training_stream.py
+
+      - name: Run Feedback Loops / Data Flywheel
+        run: uv run python scripts/ml_data_flywheel.py
+
+      - name: System Evaluations / Forward Outlook
+        run: uv run python scripts/ml_forward_outlook.py
+
+      - name: Daily Rituals / Report Generation
+        run: uv run python scripts/generate_human_reports.py
+
+      - name: Install required test dependencies
+        run: uv pip install --system pydantic pytest jsonschema json-logic-qubit pytest-asyncio json-logic hypothesis aiosqlite
+
+      - name: Run Adam V3 Kernel Schema Test Suite
+        run: PYTHONPATH=. pytest tests/unit/test_agent_schemas.py
