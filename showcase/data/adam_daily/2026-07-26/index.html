@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Market Mayhem | July 2026 Macro Intelligence</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Playfair+Display:wght@700&display=swap');
+
+        :root {
+            --parchment: #F8F5F0;
+            --slate-900: #0F172A;
+            --slate-800: #1E293B;
+            --gold-accent: #B8914A;
+            --risk-high: #B91C1C;
+            --risk-med: #D97706;
+            --risk-low: #059669;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--parchment);
+            color: var(--slate-900);
+            scroll-behavior: smooth;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Playfair Display', serif;
+        }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 100%;
+            margin-left: auto;
+            margin-right: auto;
+            height: 320px;
+            max-height: 400px;
+        }
+
+        .risk-card {
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+
+        .risk-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .tab-active {
+            border-bottom: 2px solid var(--gold-accent);
+            color: var(--gold-accent);
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(15, 23, 42, 0.1);
+        }
+
+        .indicator-dot {
+            height: 8px;
+            width: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--parchment);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--slate-800);
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Chosen Palette: Institutional Slate & Parchment -->
+    <!-- Application Structure Plan:
+        The SPA follows a 'Top-Down Institutional Funnel':
+        1. Executive Intelligence: Immediate regime classification and the Systemic Risk Index.
+        2. Market Pulse: Real-time asset pricing and divergence tracking.
+        3. Structural Mechanics: A deep-dive into the 'Plumbing' (Liquidity/Credit) which is the core thesis of the report.
+        4. Strategic Playbook: Interactive scenario analysis (Base/Bear/Bull) and Portfolio Allocator.
+        5. Falsification & Controls: Rigorous cross-checking of the thesis.
+        This structure is chosen to mirror a CIO's decision-making process: from "What is happening?" to "Why is it happening?" to "What do I do?"
+    -->
+    <!-- Visualization & Content Choices:
+        - Radar Chart: For Systemic Risk Pillars (Comparison across 6 dimensions).
+        - Horizontal Bar: For Cross-Asset performance to show magnitude of gold/oil spikes vs equity stagnation.
+        - Area Chart: For Liquidity (TGA vs RRP) to visualize the 'Vacuum' effect.
+        - Dynamic Matrix: For Leading Indicators to allow rapid scanning.
+        - Scenario Toggle: JS-driven state updates for portfolio allocation.
+        - CONFIRMATION: NO SVG graphics used. NO Mermaid JS used.
+    -->
+
+    <nav class="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md border-b border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center">
+                    <span class="text-2xl font-bold tracking-tighter text-slate-900 uppercase">Market<span class="text-gold-accent">Mayhem</span></span>
+                    <span class="ml-4 px-2 py-1 bg-red-100 text-red-800 text-xs font-bold rounded uppercase">Regime: Restrictive</span>
+                </div>
+                <div class="hidden md:flex space-x-8 text-sm font-semibold uppercase tracking-widest text-slate-600">
+                    <a href="#dashboard" class="hover:text-gold-accent transition">Dashboard</a>
+                    <a href="#plumbing" class="hover:text-gold-accent transition">Plumbing</a>
+                    <a href="#strategy" class="hover:text-gold-accent transition">Strategy</a>
+                    <a href="#falsification" class="hover:text-gold-accent transition">Matrix</a>
+                </div>
+                <div class="text-xs font-mono text-slate-500">
+                    JULY 26, 2026 | 20:53 UTC
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <!-- Section: Executive Summary & Risk -->
+        <header id="dashboard" class="mb-12">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+                <div class="lg:col-span-2">
+                    <h1 class="text-5xl font-bold text-slate-900 mb-4">Macro Intelligence Report: The Restrictive Paradigm</h1>
+                    <p class="text-lg text-slate-600 leading-relaxed mb-6">
+                        This section synthesizes the high-level findings of the July 2026 Macro Analysis. We are transitioning from a late-cycle expansion to a high-risk paradigm defined by geopolitical supply shocks and the unmasking of private credit distress. The primary mandate for H2 2026 is <strong>capital preservation</strong>.
+                    </p>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                        <div class="p-4 bg-white border border-slate-200 rounded shadow-sm">
+                            <span class="block text-xs uppercase font-bold text-slate-400 mb-1">S&P 500</span>
+                            <span class="text-xl font-bold">7,462.18</span>
+                            <span class="block text-xs text-slate-500">Complacent Range</span>
+                        </div>
+                        <div class="p-4 bg-white border border-slate-200 rounded shadow-sm">
+                            <span class="block text-xs uppercase font-bold text-slate-400 mb-1">Brent Crude</span>
+                            <span class="text-xl font-bold text-red-600">$100.00+</span>
+                            <span class="block text-xs text-slate-500">Supply Shock</span>
+                        </div>
+                        <div class="p-4 bg-white border border-slate-200 rounded shadow-sm">
+                            <span class="block text-xs uppercase font-bold text-slate-400 mb-1">Gold Spot</span>
+                            <span class="text-xl font-bold text-green-600">$4,084.50</span>
+                            <span class="block text-xs text-slate-500">Safe Haven bid</span>
+                        </div>
+                        <div class="p-4 bg-white border border-slate-200 rounded shadow-sm">
+                            <span class="block text-xs uppercase font-bold text-slate-400 mb-1">10Y Yield</span>
+                            <span class="text-xl font-bold">4.69%</span>
+                            <span class="block text-xs text-slate-500">Bear Steepening</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900 p-6 rounded-xl text-white shadow-xl">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-bold font-sans">Systemic Risk Index</h3>
+                        <span class="px-3 py-1 bg-red-600 text-xs font-bold rounded-full">HIGH RISK</span>
+                    </div>
+                    <div class="text-center mb-6">
+                        <span class="text-6xl font-bold text-gold-accent">55.50</span>
+                        <span class="text-slate-400 block mt-1">Weighted Aggregate Score</span>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="riskRadarChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Section: Market Pulse & Cross-Asset -->
+        <section class="mb-16">
+            <h2 class="text-3xl font-bold mb-6 border-b border-slate-200 pb-2">Institutional Cross-Asset Dashboard</h2>
+            <p class="text-slate-600 mb-8 max-w-3xl">
+                The current matrix reflects the immediate aftermath of the US-Iran military escalation. This section visualizes the extreme divergence between public credit complacency and the safe-haven rush into commodities.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-white p-6 rounded-lg border border-slate-200 shadow-sm">
+                    <h3 class="font-bold text-lg mb-4 text-slate-700">Implied Macro Signals (Relative Levels)</h3>
+                    <div class="chart-container">
+                        <canvas id="assetBarChart"></canvas>
+                    </div>
+                </div>
+                <div class="space-y-4">
+                    <div class="risk-card p-4 bg-white border border-slate-200 rounded flex items-center justify-between" style="border-left-color: #B91C1C">
+                        <div>
+                            <span class="font-bold block text-slate-800">Geopolitical Risk (85/100)</span>
+                            <span class="text-sm text-slate-500 italic">Active military strikes vs. Iran / Red Sea disruptions</span>
+                        </div>
+                        <span class="text-red-700 font-black">CRITICAL</span>
+                    </div>
+                    <div class="risk-card p-4 bg-white border border-slate-200 rounded flex items-center justify-between" style="border-left-color: #D97706">
+                        <div>
+                            <span class="font-bold block text-slate-800">Inflation Shocks (78/100)</span>
+                            <span class="text-sm text-slate-500 italic">Core PCE 3.4% / Brent surge impacting freight</span>
+                        </div>
+                        <span class="text-orange-700 font-black">ELEVATED</span>
+                    </div>
+                    <div class="risk-card p-4 bg-white border border-slate-200 rounded flex items-center justify-between" style="border-left-color: #059669">
+                        <div>
+                            <span class="font-bold block text-slate-800">Credit Spreads (38/100)</span>
+                            <span class="text-sm text-slate-500 italic">Public HY Spreads artificially tight @ 2.77%</span>
+                        </div>
+                        <span class="text-emerald-700 font-black">COMPLACENT</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Structural Mechanics (Plumbing) -->
+        <section id="plumbing" class="mb-16 bg-white p-8 rounded-2xl border border-slate-200 shadow-lg">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div>
+                    <h2 class="text-3xl font-bold mb-6">Financial Plumbing: The Liquidity Vacuum</h2>
+                    <p class="text-slate-600 mb-6 leading-relaxed">
+                        This section analyzes the transition from <strong>"Ample" to "Scarce"</strong> bank reserves. The exhaustion of the Federal Reserve's Reverse Repo (RRP) facility to <strong>$2B</strong> removes the buffer that previously sterilized Quantitative Tightening.
+                    </p>
+                    <p class="text-slate-600 mb-6 leading-relaxed">
+                        Simultaneously, the US Treasury is aggressively refilling the Treasury General Account (TGA) to <strong>$900B</strong>, acting as a massive liquidity drain on commercial bank reserves. This mechanical drain is the primary driver of volatility across the yield curve.
+                    </p>
+                    <div class="bg-parchment p-4 rounded-lg border border-slate-200">
+                        <h4 class="font-bold text-slate-800 mb-2">Key Signal: Private Credit Default</h4>
+                        <div class="flex items-end space-x-4">
+                            <span class="text-4xl font-bold text-red-600">6.0%</span>
+                            <span class="text-slate-500 mb-1">Fitch US Private Default Rate (Peak May 2026)</span>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-center font-semibold text-slate-500 mb-4 uppercase tracking-tighter text-sm">Systemic Liquidity Drivers (Conceptual $B)</h3>
+                    <div class="chart-container">
+                        <canvas id="liquidityChart"></canvas>
+                    </div>
+                    <p class="text-xs text-slate-400 mt-4 italic text-center">RRP Exhaustion vs. TGA Rebuild (2024 - 2026 Perspective)</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Strategy & Scenario Allocator -->
+        <section id="strategy" class="mb-16">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold mb-4">Strategic Playbook & Portfolio Allocation</h2>
+                <p class="text-slate-600 max-w-2xl mx-auto italic">
+                    The asymmetry of risk mandates defensive recalibration. Use the controls below to explore recommended positioning under different macroeconomic outcomes.
+                </p>
+            </div>
+
+            <div class="flex justify-center space-x-2 mb-8">
+                <button onclick="updateScenario('base')" id="btn-base" class="scenario-btn px-6 py-2 rounded-full font-bold transition bg-slate-900 text-white shadow-md">BASE (60%)</button>
+                <button onclick="updateScenario('bear')" id="btn-bear" class="scenario-btn px-6 py-2 rounded-full font-bold transition bg-white text-slate-600 border border-slate-200 hover:bg-slate-100">BEAR (25%)</button>
+                <button onclick="updateScenario('bull')" id="btn-bull" class="scenario-btn px-6 py-2 rounded-full font-bold transition bg-white text-slate-600 border border-slate-200 hover:bg-slate-100">BULL (15%)</button>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="lg:col-span-2 space-y-6">
+                    <div id="scenario-content" class="bg-white p-8 rounded-xl border border-slate-200 shadow-sm min-h-[400px]">
+                        <!-- Dynamic Content -->
+                        <h3 id="scen-title" class="text-2xl font-bold mb-4">Stagflationary Grind (Base Case)</h3>
+                        <p id="scen-desc" class="text-slate-600 mb-6">Oil remains entrenched at $90-$105; Core PCE remains sticky >3.0%; The Warsh Fed holds rates; private credit defaults are slowly realized via restructurings; the TGA rebuild drains systemic liquidity.</p>
+
+                        <h4 class="font-bold text-slate-800 mb-4 border-l-4 border-gold-accent pl-4">Target Allocation Changes</h4>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="alloc-grid">
+                            <!-- JS populated -->
+                        </div>
+                    </div>
+                </div>
+                <div class="space-y-6">
+                    <div class="bg-slate-800 text-white p-6 rounded-xl shadow-lg">
+                        <h3 class="font-bold mb-4 flex items-center">
+                            <span class="bg-gold-accent h-2 w-2 rounded-full mr-2"></span>
+                            Refinancing Wall Alert
+                        </h3>
+                        <p class="text-sm text-slate-300 mb-4">
+                            $475B in US middle-market debt matures by 2029. With SOFR near 3.65% and spreads widening, all-in yields required exceed 9.0%.
+                        </p>
+                        <div class="space-y-3">
+                            <div class="flex justify-between text-xs">
+                                <span>Maturity Wall Pressure</span>
+                                <span>High</span>
+                            </div>
+                            <div class="w-full bg-slate-700 h-2 rounded-full">
+                                <div class="bg-gold-accent h-2 rounded-full" style="width: 85%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                        <h3 class="font-bold text-slate-800 mb-4">Core Position: PHYSICAL GOLD</h3>
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs uppercase font-bold text-slate-400">YTD Return</span>
+                            <span class="text-green-600 font-bold">+41%</span>
+                        </div>
+                        <p class="text-sm text-slate-600 italic">
+                            Gold acts as a hedge against fiat debasement and geopolitical tail risks, unencumbered by central bank rate posturing.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Leading Indicators Signal Matrix -->
+        <section class="mb-16">
+            <h2 class="text-3xl font-bold mb-8">Leading Indicators Signal Matrix</h2>
+            <div class="overflow-x-auto rounded-xl border border-slate-200 shadow-sm">
+                <table class="min-w-full bg-white text-sm">
+                    <thead class="bg-slate-50 border-b border-slate-200 text-slate-600">
+                        <tr>
+                            <th class="px-6 py-4 text-left font-bold uppercase tracking-wider">Indicator</th>
+                            <th class="px-6 py-4 text-left font-bold uppercase tracking-wider">Current Status</th>
+                            <th class="px-6 py-4 text-left font-bold uppercase tracking-wider">Macro Signal</th>
+                            <th class="px-6 py-4 text-left font-bold uppercase tracking-wider">Risk Asset Implication</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        <tr>
+                            <td class="px-6 py-4 font-bold text-slate-900">SLOOS (C&I Lending)</td>
+                            <td class="px-6 py-4">8.1% Net Tightening</td>
+                            <td class="px-6 py-4"><span class="px-2 py-1 bg-red-100 text-red-700 rounded text-xs font-bold uppercase">Restrictive</span></td>
+                            <td class="px-6 py-4 text-slate-600">Credit creation is stalling; economic contraction lead.</td>
+                        </tr>
+                        <tr>
+                            <td class="px-6 py-4 font-bold text-slate-900">ISM Manufacturing</td>
+                            <td class="px-6 py-4">53.3 (Slowing)</td>
+                            <td class="px-6 py-4"><span class="px-2 py-1 bg-orange-100 text-orange-700 rounded text-xs font-bold uppercase">Decelerating</span></td>
+                            <td class="px-6 py-4 text-slate-600">Top-line revenue peaking; margin compression risk.</td>
+                        </tr>
+                        <tr>
+                            <td class="px-6 py-4 font-bold text-slate-900">10Y Breakeven Inflation</td>
+                            <td class="px-6 py-4">2.26% - 2.47%</td>
+                            <td class="px-6 py-4"><span class="px-2 py-1 bg-red-100 text-red-700 rounded text-xs font-bold uppercase">Rising</span></td>
+                            <td class="px-6 py-4 text-slate-600">Expectations unanchoring; Fed Put removed.</td>
+                        </tr>
+                        <tr>
+                            <td class="px-6 py-4 font-bold text-slate-900">CMBS Office Delinquency</td>
+                            <td class="px-6 py-4">11.08%</td>
+                            <td class="px-6 py-4"><span class="px-2 py-1 bg-red-100 text-red-700 rounded text-xs font-bold uppercase">Distressed</span></td>
+                            <td class="px-6 py-4 text-slate-600">Brutal price discovery looming; regional bank risk.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Section: Falsification Matrix -->
+        <section id="falsification" class="mb-16">
+            <h2 class="text-3xl font-bold mb-6">Falsification Protocol</h2>
+            <p class="text-slate-600 mb-8 max-w-3xl">
+                Every institutional thesis must be stress-tested. The following criteria would invalidate our "Restrictive / High Risk" framework.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="p-6 bg-white border border-slate-200 rounded-xl shadow-sm">
+                    <h4 class="font-bold text-slate-800 mb-3">Thesis: Credit Contagion</h4>
+                    <p class="text-sm text-slate-500 mb-4 uppercase tracking-widest font-bold">Invalidation Trigger</p>
+                    <ul class="space-y-2 text-slate-600 text-sm">
+                        <li class="flex items-start"><span class="text-gold-accent mr-2 mt-1">●</span> BDC redemption requests fall below 5% for 2 quarters.</li>
+                        <li class="flex items-start"><span class="text-gold-accent mr-2 mt-1">●</span> Fitch Private Default Rate reverses below 3.0%.</li>
+                        <li class="flex items-start"><span class="text-gold-accent mr-2 mt-1">●</span> PIK interest as % of total income drops below 5%.</li>
+                    </ul>
+                </div>
+                <div class="p-6 bg-white border border-slate-200 rounded-xl shadow-sm">
+                    <h4 class="font-bold text-slate-800 mb-3">Thesis: Hawkish Fed / Energy Shock</h4>
+                    <p class="text-sm text-slate-500 mb-4 uppercase tracking-widest font-bold">Invalidation Trigger</p>
+                    <ul class="space-y-2 text-slate-600 text-sm">
+                        <li class="flex items-start"><span class="text-gold-accent mr-2 mt-1">●</span> Brent Crude sustains <$75 for 30 consecutive days.</li>
+                        <li class="flex items-start"><span class="text-gold-accent mr-2 mt-1">●</span> Core PCE prints <2.5% for two consecutive months.</li>
+                        <li class="flex items-start"><span class="text-gold-accent mr-2 mt-1">●</span> FOMC reintroduces explicit easing guidance.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: CIO Final Conclusion -->
+        <footer class="bg-slate-900 text-white p-12 rounded-3xl mb-16 shadow-2xl relative overflow-hidden">
+            <div class="relative z-10 max-w-4xl mx-auto text-center">
+                <h2 class="text-4xl font-bold mb-6">CIO Final Conclusion</h2>
+                <p class="text-xl text-slate-300 leading-relaxed italic mb-8">
+                    "The global macroeconomic landscape of July 2026 is defined by a dangerous, fragile illusion of stability. Public markets are pricing a flawless soft landing, ignoring tectonic shifts in financial plumbing. With the equity risk premium at cyclical lows, there is zero margin of safety. Capital preservation is paramount."
+                </p>
+                <div class="flex flex-col items-center">
+                    <div class="h-1 w-24 bg-gold-accent mb-4"></div>
+                    <span class="uppercase tracking-widest text-xs font-bold text-slate-500">End of July 2026 Strategy Memo</span>
+                </div>
+            </div>
+        </footer>
+
+    </main>
+
+    <script>
+        // Data derived from Source Report
+        const riskData = {
+            labels: ['Rates Volatility', 'Credit Spreads', 'Liquidity', 'Inflation', 'Equity Vol', 'Geopolitical'],
+            scores: [62, 38, 45, 78, 42, 85]
+        };
+
+        const assetData = {
+            labels: ['Gold Spot', 'Brent Crude', 'S&P 500', '10Y Yield', 'HY Spread (inv)'],
+            values: [41, 28, 5, 12, -8] // Conceptual % changes for visualization
+        };
+
+        const scenarioAllocations = {
+            base: [
+                { asset: 'Cash/T-Bills', pos: 'Overweight', color: 'emerald' },
+                { asset: 'Physical Gold', pos: 'Overweight', color: 'emerald' },
+                { asset: 'Energy Equities', pos: 'Overweight', color: 'emerald' },
+                { asset: 'Small Caps', pos: 'Underweight', color: 'red' },
+                { asset: 'Private Credit', pos: 'Avoid', color: 'red' },
+                { asset: 'Mega-Cap Tech', pos: 'Quality Tilt', color: 'orange' }
+            ],
+            bear: [
+                { asset: 'Cash/T-Bills', pos: 'Max Long', color: 'emerald' },
+                { asset: 'Gold/Silver', pos: 'Overweight', color: 'emerald' },
+                { asset: 'S&P 500 Puts', pos: 'Hedging Active', color: 'red' },
+                { asset: 'Regional Banks', pos: 'Strict Avoid', color: 'red' },
+                { asset: 'High Yield Credit', pos: 'Short Position', color: 'red' },
+                { asset: 'Long Treasuries', pos: 'Neutral/Hold', color: 'orange' }
+            ],
+            bull: [
+                { asset: 'Growth Equities', pos: 'Aggressive Long', color: 'emerald' },
+                { asset: 'Small Caps', pos: 'Beta Capture', color: 'emerald' },
+                { asset: 'Physical Gold', pos: 'Underweight', color: 'red' },
+                { asset: 'Energy', pos: 'Take Profit', color: 'red' },
+                { asset: 'Private Credit', pos: 'Selective Long', color: 'emerald' },
+                { asset: 'Regional Banks', pos: 'Recovery Bid', color: 'emerald' }
+            ]
+        };
+
+        const scenarioText = {
+            base: {
+                title: 'Stagflationary Grind (Base Case)',
+                desc: 'Oil remains entrenched at $90-$105; Core PCE remains sticky >3.0%; The Warsh Fed holds rates; private credit defaults are slowly realized via restructurings; the TGA rebuild drains systemic liquidity.'
+            },
+            bear: {
+                title: 'Systemic Credit Event (Bear Case)',
+                desc: 'Oil spikes >$120 on Middle East war expansion; headline inflation resurges; Warsh Fed forced to hike into recession; BDC redemption gates fail; CMBS defaults cascade into regional bank impairment.'
+            },
+            bull: {
+                title: 'Immaculate Disinflation (Bull Case)',
+                desc: 'Iran conflict de-escalates; oil collapses <$70; productivity gains from AI/Tech drive disinflation; Fed initiates rate cuts; flawless soft landing achieved.'
+            }
+        };
+
+        // Initialize Charts
+        function initCharts() {
+            // Radar Chart
+            new Chart(document.getElementById('riskRadarChart'), {
+                type: 'radar',
+                data: {
+                    labels: riskData.labels,
+                    datasets: [{
+                        label: 'Risk Score (0-100)',
+                        data: riskData.scores,
+                        fill: true,
+                        backgroundColor: 'rgba(184, 145, 74, 0.2)',
+                        borderColor: '#B8914A',
+                        pointBackgroundColor: '#B8914A',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: '#B8914A'
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            angleLines: { color: 'rgba(255,255,255,0.1)' },
+                            grid: { color: 'rgba(255,255,255,0.1)' },
+                            pointLabels: { color: '#94A3B8', font: { size: 10 } },
+                            ticks: { display: false, stepSize: 20 },
+                            suggestedMin: 0,
+                            suggestedMax: 100
+                        }
+                    },
+                    plugins: { legend: { display: false } }
+                }
+            });
+
+            // Asset Bar Chart
+            new Chart(document.getElementById('assetBarChart'), {
+                type: 'bar',
+                data: {
+                    labels: assetData.labels,
+                    datasets: [{
+                        label: '% Relative Trend',
+                        data: assetData.values,
+                        backgroundColor: assetData.values.map(v => v > 0 ? '#059669' : '#B91C1C'),
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { grid: { display: false } },
+                        y: { grid: { display: false } }
+                    }
+                }
+            });
+
+            // Liquidity Chart (TGA vs RRP)
+            new Chart(document.getElementById('liquidityChart'), {
+                type: 'line',
+                data: {
+                    labels: ['Jan 24', 'Jul 24', 'Jan 25', 'Jul 25', 'Jan 26', 'Jul 26'],
+                    datasets: [
+                        {
+                            label: 'RRP (Reverse Repo)',
+                            data: [2100, 1500, 800, 400, 150, 2],
+                            borderColor: '#B91C1C',
+                            backgroundColor: 'rgba(185, 28, 28, 0.1)',
+                            fill: true,
+                            tension: 0.3
+                        },
+                        {
+                            label: 'TGA (Treasury Account)',
+                            data: [350, 200, 500, 750, 850, 905],
+                            borderColor: '#0F172A',
+                            backgroundColor: 'rgba(15, 23, 42, 0.05)',
+                            fill: true,
+                            tension: 0.3
+                        }
+                    ]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, size: 10 } } },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'Billions USD', font: { size: 10 } }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Handle Scenario Update
+        function updateScenario(type) {
+            // Update Buttons
+            document.querySelectorAll('.scenario-btn').forEach(btn => {
+                btn.classList.remove('bg-slate-900', 'text-white');
+                btn.classList.add('bg-white', 'text-slate-600');
+            });
+            document.getElementById('btn-' + type).classList.remove('bg-white', 'text-slate-600');
+            document.getElementById('btn-' + type).classList.add('bg-slate-900', 'text-white');
+
+            // Update Text
+            document.getElementById('scen-title').innerText = scenarioText[type].title;
+            document.getElementById('scen-desc').innerText = scenarioText[type].desc;
+
+            // Update Allocations
+            const grid = document.getElementById('alloc-grid');
+            grid.innerHTML = '';
+            scenarioAllocations[type].forEach(item => {
+                const div = document.createElement('div');
+                div.className = `p-4 border-l-4 border-${item.color}-600 bg-${item.color}-50 rounded flex justify-between items-center`;
+                div.innerHTML = `
+                    <span class="font-bold text-slate-800">${item.asset}</span>
+                    <span class="text-xs font-black uppercase text-${item.color}-700">${item.pos}</span>
+                `;
+                grid.appendChild(div);
+            });
+        }
+
+        // Initialize on load
+        window.onload = () => {
+            initCharts();
+            updateScenario('base');
+        };
+    </script>
+</body>
+</html>
