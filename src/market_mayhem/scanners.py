@@ -192,20 +192,21 @@ class WhaleScanner:
 
         # 1. Detect New Entries (Vulture Entering)
         left_only = merged[merged["_merge"] == "left_only"]
-        for row in left_only.to_dict("records"):
-            desc = f"New Position: {row['calc_issuer']}"
-            if row["calc_share_type"] == "PRN":
+        # Optimize: use itertuples() instead of to_dict("records") for memory and speed
+        for row in left_only.itertuples():
+            desc = f"New Position: {row.calc_issuer}"
+            if row.calc_share_type == "PRN":
                 desc += " (DEBT/CONVERTIBLE - HIGH CONVICTION)"
 
             signals.append(
                 WhaleSignal(
                     fund_name=fund_key,
-                    ticker=str(row["calc_ticker"]),
+                    ticker=str(row.calc_ticker),
                     signal_type="VULTURE_ENTRY",
                     change_pct=100.0,
-                    conviction_score=float(row["calc_val_q0"]),
+                    conviction_score=float(row.calc_val_q0),
                     description=desc,
-                    share_type=str(row["calc_share_type"]),
+                    share_type=str(row.calc_share_type),
                 )
             )
 
@@ -217,16 +218,17 @@ class WhaleScanner:
                 both["pct_change"] = ((both["shares_q0"] - both["shares_q1"]) / both["shares_q1"]) * 100
                 accum = both[both["pct_change"] > 20]  # 20% Threshold for "Aggressive"
 
-                for row in accum.to_dict("records"):
+                # Optimize: use itertuples() instead of to_dict("records") for memory and speed
+                for row in accum.itertuples():
                     signals.append(
                         WhaleSignal(
                             fund_name=fund_key,
-                            ticker=str(row["calc_ticker"]),
+                            ticker=str(row.calc_ticker),
                             signal_type="ACCUMULATION",
-                            change_pct=row["pct_change"],
-                            conviction_score=float(row["calc_val_q0"]),
-                            description=f"Increased position by {row['pct_change']:.1f}%",
-                            share_type=str(row["calc_share_type"]),
+                            change_pct=row.pct_change,
+                            conviction_score=float(row.calc_val_q0),
+                            description=f"Increased position by {row.pct_change:.1f}%",
+                            share_type=str(row.calc_share_type),
                         )
                     )
 
