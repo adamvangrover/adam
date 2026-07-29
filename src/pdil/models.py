@@ -1,3 +1,4 @@
+import hashlib
 from pydantic import BaseModel, Field
 
 class ProvenanceHeader(BaseModel):
@@ -15,10 +16,9 @@ class ProvenanceHeader(BaseModel):
 
     def hash_state(self) -> str:
         """
-        Generates an immutable SHA-256 hash of git_commit_hash and jsonLogic_version.
+        Generates an immutable SHA-256 hash of the git_commit_hash and jsonLogic_version.
         """
-        import hashlib
-        data = f"{self.git_commit_hash}_{self.jsonLogic_version}"
-        return hashlib.sha256(data.encode('utf-8')).hexdigest()
+        data = f"{self.git_commit_hash}:{self.jsonLogic_version}".encode('utf-8')
+        return hashlib.sha256(data).hexdigest()
 
 __all__ = ["ProvenanceHeader"]
