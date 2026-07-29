@@ -1,3 +1,5 @@
+import json
+import hashlib
 from typing import Any, Dict
 from pydantic import BaseModel, Field
 from src.pdil.models import ProvenanceHeader
@@ -27,3 +29,11 @@ class AgentOutput(BaseModel):
         satisfying W3C PROV-O compliance requirements.
         """
         return bool(self.provenance_trace.source_data_object)
+
+def compute_deterministic_hash(data: dict) -> str:
+    """
+    Serializes a dictionary into a JSON string with sorted keys and returns its SHA-256 hash.
+    Used for ensuring provenance trace integrity.
+    """
+    payload_json = json.dumps(data, sort_keys=True, separators=(',', ':')).encode('utf-8')
+    return hashlib.sha256(payload_json).hexdigest()
