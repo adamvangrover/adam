@@ -13,4 +13,12 @@ class ProvenanceHeader(BaseModel):
     derivation_path: str = Field(..., description="Path indicating how the conclusion was reached (PROV-O: wasDerivedFrom)")
     source_data_object: str = Field(..., description="Reference to the source data object, satisfying W3C PROV-O requirements (PROV-O: hadPrimarySource)")
 
+    def hash_state(self) -> str:
+        """
+        Generates an immutable SHA-256 hash of git_commit_hash and jsonLogic_version.
+        """
+        import hashlib
+        data = f"{self.git_commit_hash}_{self.jsonLogic_version}"
+        return hashlib.sha256(data.encode('utf-8')).hexdigest()
+
 __all__ = ["ProvenanceHeader"]

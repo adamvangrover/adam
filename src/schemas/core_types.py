@@ -1,6 +1,17 @@
 from typing import Any, Dict
 from pydantic import BaseModel, Field
+import hashlib
+import json
 from src.pdil.models import ProvenanceHeader
+
+
+def compute_deterministic_hash(data: dict) -> str:
+    """
+    Standardizes dictionary hashing by serializing with sort_keys=True and
+    separators=(',', ':'), then returning its SHA-256 hexdigest.
+    """
+    serialized = json.dumps(data, sort_keys=True, separators=(',', ':'))
+    return hashlib.sha256(serialized.encode('utf-8')).hexdigest()
 
 
 class AgentInput(BaseModel):
