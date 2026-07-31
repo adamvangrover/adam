@@ -11,6 +11,7 @@ def compute_deterministic_hash(data: dict) -> str:
     """
     Standardizes dictionary hashing by serializing with sort_keys=True and
     separators=(',', ':'), then returning its SHA-256 hexdigest.
+    Used for ensuring provenance trace and event sourcing integrity.
     """
     serialized = json.dumps(data, sort_keys=True, separators=(',', ':'))
     return hashlib.sha256(serialized.encode('utf-8')).hexdigest()
