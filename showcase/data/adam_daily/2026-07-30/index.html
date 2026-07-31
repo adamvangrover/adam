@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM v30.2 | Sovereign Analyst Terminal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;700&family=Inter:wght@300;400;600;800&display=swap');
+
+        :root {
+            --obsidian: #0f172a;
+            --amber-glow: #fbbf24;
+            --risk-red: #ef4444;
+            --neutral-warm: #f8fafc;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--neutral-warm);
+            color: var(--obsidian);
+            overflow-x: hidden;
+        }
+
+        .terminal-font { font-family: 'Fira Code', monospace; }
+        
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(15, 23, 42, 0.1);
+        }
+
+        .scanline {
+            width: 100%;
+            height: 2px;
+            background: rgba(251, 191, 36, 0.1);
+            position: absolute;
+            animation: scan 4s linear infinite;
+        }
+
+        @keyframes scan {
+            0% { top: 0; }
+            100% { top: 100%; }
+        }
+
+        .coordinate-alert {
+            animation: pulse-red 2s infinite;
+        }
+
+        @keyframes pulse-red {
+            0%, 100% { border-color: rgba(239, 68, 68, 0.5); box-shadow: 0 0 0px rgba(239, 68, 68, 0); }
+            50% { border-color: rgba(239, 68, 68, 1); box-shadow: 0 0 15px rgba(239, 68, 68, 0.3); }
+        }
+
+        .tab-active {
+            border-bottom: 2px solid var(--obsidian);
+            color: var(--obsidian);
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body class="p-0 m-0">
+
+    <!-- Top Telemetry Bar -->
+    <header class="sticky top-0 z-50 w-full bg-slate-900 text-white p-3 border-b border-amber-500/30">
+        <div class="container mx-auto flex flex-wrap justify-between items-center px-4">
+            <div class="flex items-center space-x-4">
+                <span class="text-amber-400 font-bold terminal-font text-lg">ADAM v30.2</span>
+                <div class="h-4 w-[1px] bg-slate-700"></div>
+                <div class="flex items-center">
+                    <span class="relative flex h-3 w-3 mr-2">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                    </span>
+                    <span class="text-xs uppercase tracking-widest font-bold">System Status: Alert</span>
+                </div>
+            </div>
+            <div class="hidden md:flex space-x-8 text-xs terminal-font uppercase text-slate-400">
+                <div>Regime: <span class="text-white">Restrictive</span></div>
+                <div>Integrity: <span class="text-green-400">High-Fidelity</span></div>
+                <div id="clock">JULY 30, 2026 | 21:03:00</div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-8 max-w-7xl">
+        
+        <!-- Hero Section: The AI Infrastructure Deleveraging Logic -->
+        <section class="mb-12">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="lg:col-span-2 space-y-6">
+                    <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900 leading-tight">
+                        The Century Duration <span class="text-amber-600">Mirage</span>
+                    </h1>
+                    <p class="text-lg text-slate-600 max-w-3xl">
+                        We are witnessing the forced unwinding of the AI infrastructure build-out. As systemic liquidity buffers vanish, the mathematical gravity of a $4.7\%$ risk-free rate is finally asserting itself over infinite-duration assets. This terminal analyzes the convergence of the <span class="font-semibold italic text-slate-800">$3T Private Credit software LBO complex</span> and the <span class="font-semibold italic text-slate-800">SoftBank/ARM margin loop.</span>
+                    </p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 py-4">
+                        <div class="p-4 bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden relative">
+                            <div class="scanline"></div>
+                            <h3 class="text-xs uppercase font-bold text-slate-400 mb-1">ARM Coordinate</h3>
+                            <div class="text-3xl font-black terminal-font" id="arm-val">$73.42</div>
+                            <p class="text-[10px] text-red-500 font-bold mt-1">CRITICAL: $73.00</p>
+                        </div>
+                        <div class="p-4 bg-white border border-slate-200 rounded-xl shadow-sm">
+                            <h3 class="text-xs uppercase font-bold text-slate-400 mb-1">10Y Treasury</h3>
+                            <div class="text-3xl font-black terminal-font">4.68%</div>
+                            <p class="text-[10px] text-slate-500 mt-1">Regime: Scarce Reserves</p>
+                        </div>
+                        <div class="p-4 bg-white border border-slate-200 rounded-xl shadow-sm">
+                            <h3 class="text-xs uppercase font-bold text-slate-400 mb-1">Brent Crude</h3>
+                            <div class="text-3xl font-black terminal-font">$100.05</div>
+                            <p class="text-[10px] text-red-500 font-bold mt-1">INFLATION SHOCK</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Warning Panel -->
+                <div class="bg-slate-900 rounded-2xl p-6 text-white border-l-4 border-red-500 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 p-4 opacity-10 text-6xl">⚠</div>
+                    <h2 class="text-xl font-bold mb-4 terminal-font flex items-center">
+                        SYSTEM WARNING
+                    </h2>
+                    <p class="text-sm text-slate-300 leading-relaxed mb-6 italic">
+                        "The convergence of the $900B TGA liquidity drain and the incoming multiple compression on Big Tech equities threatens the foundational collateral of the AI infrastructure build-out."
+                    </p>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center text-xs">
+                            <span>Reflexive Risk Score</span>
+                            <span class="text-amber-400 font-bold">55.50 / 100</span>
+                        </div>
+                        <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                            <div class="bg-amber-500 h-full" style="width: 55.5%"></div>
+                        </div>
+                        <p class="text-[11px] text-slate-400">
+                            A breach of the <span class="text-white">$73.00 ARM coordinate</span> triggers the 35% LTV covenant violation.
+                        </p>
+                        <button onclick="scrollToAlloc()" class="w-full py-2 bg-red-600 hover:bg-red-700 rounded text-xs font-bold uppercase transition">Deploy Defensive Protocol</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Liquidity & Plumbing Section -->
+        <section class="mb-12 p-8 bg-white rounded-3xl border border-slate-200 shadow-sm">
+            <div class="flex flex-col md:flex-row justify-between items-start mb-8 gap-6">
+                <div class="max-w-xl">
+                    <h2 class="text-3xl font-bold text-slate-900 mb-4">The Liquidity Vacuum</h2>
+                    <p class="text-slate-600">
+                        The RRP facility, the system's primary shock absorber, is effectively empty. As the TGA rebuilds to $900B, every dollar is now a direct drain on commercial bank reserves. We have moved from "Ample" to "Scarce" reserves.
+                    </p>
+                </div>
+                <div class="flex space-x-2">
+                    <button onclick="updateLiquidityView('abs')" class="px-3 py-1 bg-slate-100 rounded text-xs font-bold hover:bg-slate-200">ABSOLUTE</button>
+                    <button onclick="updateLiquidityView('regime')" class="px-3 py-1 bg-slate-900 text-white rounded text-xs font-bold">REGIME SHIFT</button>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <canvas id="liquidityChart"></canvas>
+            </div>
+            
+            <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-8 text-sm">
+                <div class="p-4 bg-amber-50 rounded-lg border border-amber-100">
+                    <h4 class="font-bold text-amber-900 mb-2">🏮 Artifact: RRP Terminal Drain</h4>
+                    <p class="text-amber-800 leading-relaxed">
+                        Reverse Repo (RRP) is currently holding at $1.076B. The transition to State 2 (Scarce Liquidity) is locked with a 0.99 probability in our Markov chain matrix.
+                    </p>
+                </div>
+                <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                    <h4 class="font-bold text-slate-900 mb-2">🏮 Artifact: TGA Absorption</h4>
+                    <p class="text-slate-700 leading-relaxed">
+                        The $905B TGA balance acts as a sterile vacuum. Unlike private credit, this capital does not circulate; it is a mechanical extraction of systemic oxygen.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Deterministic Breakpoints -->
+        <section class="mb-12">
+            <h2 class="text-3xl font-bold text-slate-900 mb-8">Reflexive Breakpoints</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- SPX -->
+                <div class="glass-panel p-6 rounded-2xl border border-slate-200 hover:shadow-lg transition group">
+                    <div class="flex justify-between items-start mb-4">
+                        <span class="text-xs font-bold uppercase tracking-widest text-slate-400">S&P 500 Index</span>
+                        <span class="text-lg">📉</span>
+                    </div>
+                    <div class="text-2xl font-black mb-1">7,437.63</div>
+                    <div class="w-full bg-slate-100 h-1.5 rounded-full mb-4">
+                        <div class="bg-slate-900 h-full" style="width: 85%"></div>
+                    </div>
+                    <div class="text-[10px] space-y-1">
+                        <div class="flex justify-between"><span>CI LOWER</span><span class="font-bold">7,120.50</span></div>
+                        <div class="flex justify-between text-red-500 font-bold"><span>BREAKPOINT</span><span>6,850.00</span></div>
+                    </div>
+                </div>
+
+                <!-- 10Y -->
+                <div class="glass-panel p-6 rounded-2xl border border-slate-200 hover:shadow-lg transition group">
+                    <div class="flex justify-between items-start mb-4">
+                        <span class="text-xs font-bold uppercase tracking-widest text-slate-400">10Y Yield</span>
+                        <span class="text-lg">🔥</span>
+                    </div>
+                    <div class="text-2xl font-black mb-1">4.68%</div>
+                    <div class="w-full bg-slate-100 h-1.5 rounded-full mb-4">
+                        <div class="bg-orange-500 h-full" style="width: 70%"></div>
+                    </div>
+                    <div class="text-[10px] space-y-1">
+                        <div class="flex justify-between"><span>CI UPPER</span><span class="font-bold">4.90%</span></div>
+                        <div class="flex justify-between text-red-500 font-bold"><span>BREAKPOINT</span><span>4.85%</span></div>
+                    </div>
+                </div>
+
+                <!-- Private Credit Default Rate -->
+                <div class="glass-panel p-6 rounded-2xl border border-slate-200 hover:shadow-lg transition group">
+                    <div class="flex justify-between items-start mb-4">
+                        <span class="text-xs font-bold uppercase tracking-widest text-slate-400">PC Default Rate</span>
+                        <span class="text-lg">⚠️</span>
+                    </div>
+                    <div class="text-2xl font-black mb-1">6.0%</div>
+                    <div class="w-full bg-slate-100 h-1.5 rounded-full mb-4">
+                        <div class="bg-red-500 h-full" style="width: 42%"></div>
+                    </div>
+                    <div class="text-[10px] space-y-1">
+                        <div class="flex justify-between"><span>PIK MASKED REALITY</span><span class="font-bold">14.2%</span></div>
+                        <div class="flex justify-between text-red-500 font-bold"><span>BREAKPOINT</span><span>4.00% OAS</span></div>
+                    </div>
+                </div>
+
+                <!-- Gold -->
+                <div class="glass-panel p-6 rounded-2xl border border-slate-200 hover:shadow-lg transition group">
+                    <div class="flex justify-between items-start mb-4">
+                        <span class="text-xs font-bold uppercase tracking-widest text-slate-400">Physical Gold</span>
+                        <span class="text-lg">🛡️</span>
+                    </div>
+                    <div class="text-2xl font-black mb-1">$4,154.30</div>
+                    <div class="w-full bg-slate-100 h-1.5 rounded-full mb-4">
+                        <div class="bg-amber-400 h-full" style="width: 92%"></div>
+                    </div>
+                    <div class="text-[10px] space-y-1">
+                        <div class="flex justify-between"><span>CI LOWER</span><span class="font-bold">$3,964.00</span></div>
+                        <div class="flex justify-between text-slate-800 font-bold"><span>SUPPORT</span><span>$3,964.00</span></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Deep Synthesis: The Power Mirage & Margin Loops -->
+        <section class="mb-12">
+            <div class="bg-slate-900 rounded-3xl p-8 text-white overflow-hidden relative">
+                <div class="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                    <div>
+                        <h2 class="text-3xl font-bold mb-6">The Power Mirage</h2>
+                        <div class="space-y-6 text-slate-300">
+                            <div class="flex items-start space-x-4">
+                                <div class="w-8 h-8 rounded bg-amber-500/20 text-amber-500 flex items-center justify-center font-bold">1</div>
+                                <div>
+                                    <h4 class="text-white font-bold mb-1">Density Problem</h4>
+                                    <p class="text-sm">Server racks drawing 100kW+ have overwhelmed grid capacity. Silicon is plentiful; Megawatts are scarce.</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start space-x-4">
+                                <div class="w-8 h-8 rounded bg-amber-500/20 text-amber-500 flex items-center justify-center font-bold">2</div>
+                                <div>
+                                    <h4 class="text-white font-bold mb-1">Lead Time Disconnect</h4>
+                                    <p class="text-sm">GPU lead times: 4 months. Grid connection lead times: 3+ years. Idle hardware stockpiles are peaking.</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start space-x-4">
+                                <div class="w-8 h-8 rounded bg-amber-500/20 text-amber-500 flex items-center justify-center font-bold">3</div>
+                                <div>
+                                    <h4 class="text-white font-bold mb-1">The Sovereign Contagion</h4>
+                                    <p class="text-sm">Federal interest costs ballooning to $2.5T. Sovereign debt issuance is crowding out the utility CapEx required for AI scaling.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="space-y-6">
+                        <div class="p-6 bg-slate-800/50 rounded-2xl border border-slate-700">
+                            <h3 class="text-amber-500 terminal-font text-sm mb-4">DISTANCE-TO-DEFAULT: SaaS BDC</h3>
+                            <div class="chart-container h-48">
+                                <canvas id="defaultChart"></canvas>
+                            </div>
+                            <p class="text-[11px] text-slate-400 mt-4 leading-relaxed">
+                                Calculation Output: As V stagnates and D compounds at ~8.65% (PIK), the structural Distance-to-Default shrinks exponentially toward the 2027 wall.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Defensive Allocation Section -->
+        <section id="allocation" class="mb-12">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-black text-slate-900 mb-4 uppercase italic">Tactical Portfolio Defense</h2>
+                <p class="text-slate-500 font-medium">Strategic rotation for the Reflexive Death Spiral regime.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- T-Bills -->
+                <div class="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm relative group overflow-hidden">
+                    <div class="absolute -right-4 -top-4 w-24 h-24 bg-slate-50 rounded-full group-hover:scale-110 transition"></div>
+                    <div class="relative z-10">
+                        <div class="text-xs font-bold text-slate-400 mb-4 uppercase tracking-tighter">Liquidity Anchor</div>
+                        <h3 class="text-2xl font-bold mb-2">Ultra-Short T-Bills</h3>
+                        <div class="text-5xl font-black text-slate-900 mb-6">65%</div>
+                        <p class="text-sm text-slate-600 mb-8 leading-relaxed">
+                            With the yield curve structurally toxic, 0-3 month bills provide ~4.2% risk-free yield and absolute liquidity to acquire distressed assets later.
+                        </p>
+                        <ul class="text-[11px] space-y-2 text-slate-500 font-bold">
+                            <li>✓ Insulate from restructurings</li>
+                            <li>✓ Zero duration exposure</li>
+                            <li>✓ Risk-free collateral</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Gold -->
+                <div class="bg-amber-50 p-8 rounded-3xl border border-amber-100 shadow-sm relative group overflow-hidden">
+                    <div class="absolute -right-4 -top-4 w-24 h-24 bg-amber-100/50 rounded-full group-hover:scale-110 transition"></div>
+                    <div class="relative z-10">
+                        <div class="text-xs font-bold text-amber-600/60 mb-4 uppercase tracking-tighter">Sovereign Hedge</div>
+                        <h3 class="text-2xl font-bold mb-2 text-amber-900">Physical Gold</h3>
+                        <div class="text-5xl font-black text-amber-600 mb-6">20%</div>
+                        <p class="text-sm text-amber-800/80 mb-8 leading-relaxed">
+                            The ultimate zero-counterparty asset. Required hedge against the inevitable monetization of the $35T sovereign debt burden.
+                        </p>
+                        <ul class="text-[11px] space-y-2 text-amber-600 font-bold">
+                            <li>✓ Anti-fiat accumulation</li>
+                            <li>✓ Non-correlated safety</li>
+                            <li>✓ Coordinate: >$4,066/oz</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Dry Powder -->
+                <div class="bg-slate-900 p-8 rounded-3xl border border-slate-800 shadow-sm relative group overflow-hidden text-white">
+                    <div class="absolute -right-4 -top-4 w-24 h-24 bg-slate-800 rounded-full group-hover:scale-110 transition"></div>
+                    <div class="relative z-10">
+                        <div class="text-xs font-bold text-slate-500 mb-4 uppercase tracking-tighter">Opportunistic Alpha</div>
+                        <h3 class="text-2xl font-bold mb-2">AI Dry Powder</h3>
+                        <div class="text-5xl font-black text-amber-400 mb-6">15%</div>
+                        <p class="text-sm text-slate-400 mb-8 leading-relaxed">
+                            Retained for post-liquidation deployment. Wait for the 35% LTV covenant violations to wash out the speculative premium.
+                        </p>
+                        <ul class="text-[11px] space-y-2 text-slate-500 font-bold">
+                            <li>✓ Capitalize on distress</li>
+                            <li>✓ Buy the "Railroads" cheap</li>
+                            <li>✓ Post-washout accumulation</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-slate-100 border-t border-slate-200 py-12 px-4">
+        <div class="container mx-auto max-w-7xl flex flex-col md:flex-row justify-between items-center text-slate-500 text-sm">
+            <div class="mb-4 md:mb-0">
+                <span class="terminal-font font-bold text-slate-900">ADAM v30.2</span> Sovereign Analyst | Powered by Market Mayhem
+            </div>
+            <div class="flex space-x-6 uppercase font-bold text-[10px]">
+                <a href="#" class="hover:text-slate-900">Telemetry Log</a>
+                <a href="#" class="hover:text-slate-900">Covenant Alerts</a>
+                <a href="#" class="hover:text-slate-900">Mkt Myhm Protocol</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // System State
+        const state = {
+            armPrice: 73.42,
+            liquidityMode: 'regime',
+            defaultProbability: 14.2
+        };
+
+        // UI Interactions
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('clock').innerText = now.toLocaleString('en-US', { 
+                month: 'long', day: 'numeric', year: 'numeric', 
+                hour: '2-digit', minute: '2-digit', second: '2-digit' 
+            }).toUpperCase();
+        }
+        setInterval(updateClock, 1000);
+
+        function scrollToAlloc() {
+            document.getElementById('allocation').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Price simulation for immersion
+        setInterval(() => {
+            const change = (Math.random() - 0.5) * 0.05;
+            state.armPrice += change;
+            const armEl = document.getElementById('arm-val');
+            armEl.innerText = `$${state.armPrice.toFixed(2)}`;
+            
+            if (state.armPrice < 73.20) {
+                armEl.classList.add('coordinate-alert', 'text-red-600');
+            } else {
+                armEl.classList.remove('coordinate-alert', 'text-red-600');
+            }
+        }, 3000);
+
+        // Charting Logic
+        const initCharts = () => {
+            // 1. Liquidity Chart (TGA vs RRP)
+            const ctxLiq = document.getElementById('liquidityChart').getContext('2d');
+            new Chart(ctxLiq, {
+                type: 'line',
+                data: {
+                    labels: ['Jan 2026', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul 30'],
+                    datasets: [
+                        {
+                            label: 'RRP Facility (Shock Absorber)',
+                            data: [450, 320, 180, 85, 22, 5, 1.07],
+                            borderColor: '#fbbf24',
+                            backgroundColor: 'rgba(251, 191, 36, 0.1)',
+                            fill: true,
+                            tension: 0.3
+                        },
+                        {
+                            label: 'TGA Account (Liquidity Vacuum)',
+                            data: [210, 350, 480, 620, 750, 850, 905],
+                            borderColor: '#0f172a',
+                            borderDash: [5, 5],
+                            tension: 0.3
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'top', labels: { font: { family: 'Fira Code', size: 10 } } }
+                    },
+                    scales: {
+                        y: { 
+                            beginAtZero: true, 
+                            title: { display: true, text: 'Billions ($)', font: { weight: 'bold' } } 
+                        }
+                    }
+                }
+            });
+
+            // 2. Default Probability Chart
+            const ctxDef = document.getElementById('defaultChart').getContext('2d');
+            new Chart(ctxDef, {
+                type: 'bar',
+                data: {
+                    labels: ['Fitch Rate', 'Merton PD (Implied)', 'SaaS Sector PD'],
+                    datasets: [{
+                        label: 'Probability of Default (%)',
+                        data: [6.0, 14.2, 18.5],
+                        backgroundColor: ['#475569', '#f59e0b', '#ef4444'],
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { max: 25, title: { display: true, text: 'Percentage (%)' } }
+                    }
+                }
+            });
+        };
+
+        window.onload = initCharts;
+    </script>
+</body>
+</html>

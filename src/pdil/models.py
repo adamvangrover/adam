@@ -1,3 +1,4 @@
+import hashlib
 from pydantic import BaseModel, Field
 
 class ProvenanceHeader(BaseModel):
@@ -12,5 +13,12 @@ class ProvenanceHeader(BaseModel):
     confidence_score: float = Field(..., description="Agent conviction score (0.0 to 1.0)")
     derivation_path: str = Field(..., description="Path indicating how the conclusion was reached (PROV-O: wasDerivedFrom)")
     source_data_object: str = Field(..., description="Reference to the source data object, satisfying W3C PROV-O requirements (PROV-O: hadPrimarySource)")
+
+    def hash_state(self) -> str:
+        """
+        Generates an immutable SHA-256 hash of the git_commit_hash and jsonLogic_version.
+        """
+        data = f"{self.git_commit_hash}:{self.jsonLogic_version}".encode('utf-8')
+        return hashlib.sha256(data).hexdigest()
 
 __all__ = ["ProvenanceHeader"]
