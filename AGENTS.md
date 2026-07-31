@@ -190,3 +190,44 @@ To prevent "Graph Spaghetti" and circular dependencies, follow these rules:
 
 3.  **Conflict Resolution**:
     *   If two agents (e.g., Risk and Growth) provide conflicting advice, the `ConsensusEngine` will arbitrate based on their `confidence` scores and the user's risk profile.
+
+## Agent Role Boundaries and State Schemas
+
+### 1. Architect Agent (Jules)
+* **Domain Context:** Repository architecture, system scaffolding, deterministic execution optimization.
+* **State Schema Requirement:**
+  ```json
+  {
+    "agent_role": "architect",
+    "active_bounded_context": "string",
+    "last_checkpoint_hash": "string",
+    "prov_o_audit_trail": []
+  }
+  ```
+* **Procedural Rules:** Only interact with codebase scaffolding. Never hallucinate API implementations. Defer domain math to the Policy Engine.
+
+### 2. Sentinel Agent
+* **Domain Context:** Security, threat detection, and W3C PROV-O compliance audits.
+* **State Schema Requirement:**
+  ```json
+  {
+    "agent_role": "sentinel",
+    "threat_level": "integer",
+    "quarantined_modules": ["string"],
+    "prov_o_audit_trail": []
+  }
+  ```
+* **Procedural Rules:** Enforce 0.5 minimum ConvictionScore. Terminate immediately if a sub-agent execution lacks a `jsonLogic_version` provenance header.
+
+### 3. Nexus Agent
+* **Domain Context:** Workflow orchestration, parallel task dispatch, memory checkpointing.
+* **State Schema Requirement:**
+  ```json
+  {
+    "agent_role": "nexus",
+    "active_workflows": ["string"],
+    "memory_checkpoint_path": "string",
+    "prov_o_audit_trail": []
+  }
+  ```
+* **Procedural Rules:** Use just-in-time (JIT) memory fetching via Qdrant/Memory layers to isolate state. Do not pack the context window.
