@@ -298,3 +298,15 @@ cd adam
 curl -LsSf [https://astral.sh/uv/install.sh](https://astral.sh/uv/install.sh) | sh
 uv sync
 source .venv/bin/activate
+
+## Agent Guidelines
+- **Modularity:** Strict separation between `frontend/` (Streamlit) and `src/backend/` (Python async/Temporal).
+- **Temporal Strictness:** NEVER use `datetime.now()`, `time.time()`, or `uuid4()` in `src/backend/temporal/workflows/`. Use Temporal's deterministic equivalents.
+- **Telemetry:** All state mutations MUST be logged using W3C PROV-O standards via the internal `structlog` configuration.
+- **Rules Engine:** Business logic (covenants, thresholds) MUST be evaluated via `jsonLogic` in `rules/`, not hardcoded in Python.
+
+## Canonical Locations
+- Agent Definitions: `/AGENTS.md`
+- Core Orchestration: `src/backend/orchestration/agent_runtime.py`
+- Domain Models: `src/shared/models/`
+- Documentation: `docs/adr/`
