@@ -215,6 +215,11 @@ uv run python scripts/export_module.py market_mayhem --output my_exports
 
 See the [Setup Guide](docs/setup_guide.md) and [Custom Builds Documentation](docs/custom_builds.md) for detailed workflows.
 
+## Architecture (v2.0)
+Adam operates on a strictly decoupled architecture.
+- Do not import `streamlit` anywhere inside `src/backend`.
+- All autonomous contributions must adhere to the schemas in `AGENTS.md` and rules in `llms.txt`.
+
 ## 🗺️ Roadmap: Path to Autonomy
 *   **Phase 1 (Current): The Autonomous Analyst.** Deep Dives, Credit Memos, Regulatory Grading, and Edgar Ingestion.
 *   **Phase 1.5 (ADAM-V-NEXT): The Command Center.** Synthesizer Dashboard, Quantum Tail-Risk Integrations, and 3D Topology Mapping.

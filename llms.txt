@@ -298,3 +298,29 @@ cd adam
 curl -LsSf [https://astral.sh/uv/install.sh](https://astral.sh/uv/install.sh) | sh
 uv sync
 source .venv/bin/activate
+
+## Agent Guidelines
+- **Modularity:** Strict separation between `frontend/` (Streamlit) and `src/backend/` (Python async/Temporal).
+- **Temporal Strictness:** NEVER use `datetime.now()`, `time.time()`, or `uuid4()` in `src/backend/temporal/workflows/`. Use Temporal's deterministic equivalents.
+- **Telemetry:** All state mutations MUST be logged using W3C PROV-O standards via the internal `structlog` configuration.
+- **Rules Engine:** Business logic (covenants, thresholds) MUST be evaluated via `jsonLogic` in `rules/`, not hardcoded in Python.
+
+## Canonical Locations
+- Agent Definitions: `/AGENTS.md`
+- Core Orchestration: `src/backend/orchestration/agent_runtime.py`
+- Domain Models: `src/shared/models/`
+- Documentation: `docs/adr/`
+
+## Architectural Modularity & Agents (v2.0)
+*   **Canonical Repositories & Modules:**
+    *   **Core Event Ledger:** `adam_os/core/events.py`
+    *   **Governance Gatekeeper:** `adam_os/contexts/governance/engine.py` (Stateless jsonLogic execution)
+    *   **Covenants & Risk Rules:** `adam_os/contexts/governance/rules.jsonLogic`
+    *   **Orchestration Engine:** `src/orchestrator/engine.py`
+    *   **Agent Blueprints:** Defined in `AGENTS.md`
+    *   **Temporal Workflows:** `adam_os/contexts/workflows/`
+
+*   **Agent Normalization Rules:**
+    *   Agents MUST parse `AGENTS.md` to identify their operational boundaries.
+    *   Agents MUST emit structured, PROV-O compliant logs for all decisions.
+    *   Agents MUST read memory state via "just-in-time" loading rather than full-context injection.

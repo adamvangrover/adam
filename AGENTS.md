@@ -190,3 +190,63 @@ To prevent "Graph Spaghetti" and circular dependencies, follow these rules:
 
 3.  **Conflict Resolution**:
     *   If two agents (e.g., Risk and Growth) provide conflicting advice, the `ConsensusEngine` will arbitrate based on their `confidence` scores and the user's risk profile.
+
+## 1. Underwriting Agent
+*   **Role:** Analyzes credit metrics, financial statements, and covenant compliance.
+*   **Bounded Context:** `Credit Underwriting`
+*   **State Schema:** `UnderwritingState` (Includes `ebitda_margin`, `leverage_ratio`, `fccr`).
+*   **Required Tools:** `extract_financials`, `evaluate_covenant_jsonlogic`.
+*   **JIT Memory Strategy:** Semantic search over trailing 12-month (TTM) SEC filings via Qdrant.
+
+## 2. Surveillance Agent
+*   **Role:** Continuous monitoring of portfolio companies for distress signals.
+*   **Bounded Context:** `Portfolio Surveillance`
+*   **State Schema:** `SurveillanceState` (Includes `news_sentiment_score`, `liquidity_runway_days`).
+*   **Required Tools:** `fetch_market_data`, `trigger_temporal_alert`.
+*   **JIT Memory Strategy:** Episodic memory retrieval of prior quarter earnings call transcripts.
+
+## 3. Orchestrator (System Architect)
+*   **Role:** Routes tasks, manages context windows, and enforces PROV-O telemetry.
+*   **Bounded Context:** `Workflow Runtime`
+*   **State Schema:** `OrchestrationState` (Includes `active_agents`, `trace_id`, `execution_graph`).
+*   **Required Tools:** `delegate_task`, `checkpoint_state`.
+## Agent Role Boundaries and State Schemas
+
+### 1. Architect Agent (Jules)
+* **Domain Context:** Repository architecture, system scaffolding, deterministic execution optimization.
+* **State Schema Requirement:**
+  ```json
+  {
+    "agent_role": "architect",
+    "active_bounded_context": "string",
+    "last_checkpoint_hash": "string",
+    "prov_o_audit_trail": []
+  }
+  ```
+* **Procedural Rules:** Only interact with codebase scaffolding. Never hallucinate API implementations. Defer domain math to the Policy Engine.
+
+### 2. Sentinel Agent
+* **Domain Context:** Security, threat detection, and W3C PROV-O compliance audits.
+* **State Schema Requirement:**
+  ```json
+  {
+    "agent_role": "sentinel",
+    "threat_level": "integer",
+    "quarantined_modules": ["string"],
+    "prov_o_audit_trail": []
+  }
+  ```
+* **Procedural Rules:** Enforce 0.5 minimum ConvictionScore. Terminate immediately if a sub-agent execution lacks a `jsonLogic_version` provenance header.
+
+### 3. Nexus Agent
+* **Domain Context:** Workflow orchestration, parallel task dispatch, memory checkpointing.
+* **State Schema Requirement:**
+  ```json
+  {
+    "agent_role": "nexus",
+    "active_workflows": ["string"],
+    "memory_checkpoint_path": "string",
+    "prov_o_audit_trail": []
+  }
+  ```
+* **Procedural Rules:** Use just-in-time (JIT) memory fetching via Qdrant/Memory layers to isolate state. Do not pack the context window.

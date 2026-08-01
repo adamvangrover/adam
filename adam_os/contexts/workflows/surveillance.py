@@ -1,5 +1,5 @@
 from datetime import timedelta
-import structlog
+from typing import Dict, Any, List, Optional
 from temporalio import workflow
 
 # Import activities, fallback for local testing if needed
@@ -11,63 +11,80 @@ with workflow.unsafe.imports_passed_through():
         FlagAssetInput
     )
 
-logger = structlog.get_logger()
-
 @workflow.defn
 class PortfolioSurveillanceWorkflow:
+    """
+    Long-running Temporal workflow that acts as a continuous surveillance monitor
+    for a specific financial entity. Stays active to process asynchronous signals.
+    """
     def __init__(self) -> None:
-        self.is_completed = False
-        self._asset_state = None
-        self._signal_received = False
-        self.breach_handled = False
+        self._is_active: bool = True
+        self._pending_updates: List[Dict[str, Any]] = []
+        self.breach_history: List[str] = []
 
     @workflow.signal
-    async def reevaluate_asset(self, arg: dict) -> None:
-        """Signal to re-evaluate an asset's state."""
-        self._asset_state = {"debt": arg.get("debt", 0.0), "asset_value": arg.get("asset_value", 0.0)}
-        self._signal_received = True
+    async def reevaluate_asset(self, context_update: Dict[str, Any]) -> None:
+        """
+        Signal to queue an asset's state for evaluation. 
+        Continuously accessible: Can be called multiple times over the entity's lifecycle.
+        """
+        self._pending_updates.append(context_update)
+
+    @workflow.signal
+    async def terminate_surveillance(self) -> None:
+        """Gracefully shutdown the surveillance loop."""
+        self._is_active = False
+
+    @workflow.query
+    def get_breach_history(self) -> List[str]:
+        """Query to inspect the active memory of breaches."""
+        return self.breach_history
 
     @workflow.run
-    async def run(self, entity_id: str) -> None:
+    async def run(self, entity_id: str, custom_ruleset: Optional[Dict[str, Any]] = None) -> None:
         """Main workflow execution loop."""
-        workflow.logger.info(f"started_surveillance_workflow entity_id={entity_id}")
+        workflow.logger.info(f"started_continuous_surveillance_workflow entity_id={entity_id}")
 
-        # Wait for a signal to evaluate the asset
-        await workflow.wait_condition(lambda: self._signal_received)
-
-        # Reset signal for subsequent runs if this were a long-running loop
-        self._signal_received = False
-
-        # Prepare context for the policy engine
-        context = {
-            "debt": self._asset_state["debt"],
-            "asset_value": self._asset_state["asset_value"]
-        }
-
-        # Evaluate the 35% LTV covenant using the activity
-        policy_result = await workflow.execute_activity(
-            evaluate_covenant,
-            EvaluateCovenantInput(
-                entity_id=entity_id,
-                rule_name="ltv_35",
-                context=context
-            ),
-            start_to_close_timeout=timedelta(seconds=10)
-        )
-
-        # If breached, emit a command to flag the asset via activity
-        if policy_result.is_breached:
-            await workflow.execute_activity(
-                flag_asset,
-                FlagAssetInput(
-                    entity_id=entity_id,
-                    reason="LTV > 35%",
-                    covenant_type="ltv_35",
-                    evaluation_details=policy_result.evaluation_details
-                ),
-                start_to_close_timeout=timedelta(seconds=10)
+        while self._is_active:
+            # Wait for a signal to arrive or termination
+            await workflow.wait_condition(
+                lambda: len(self._pending_updates) > 0 or not self._is_active
             )
-            self.breach_handled = True
 
-        self.is_completed = True
+            # Drain the queue of pending updates
+            while self._pending_updates:
+                current_context = self._pending_updates.pop(0)
+                rule_to_evaluate = current_context.pop("target_rule", "softbank_arm_margin_loop")
+
+                # Evaluate the covenant using the merged activity schema
+                policy_result = await workflow.execute_activity(
+                    evaluate_covenant,
+                    EvaluateCovenantInput(
+                        entity_id=entity_id,
+                        rule_name=rule_to_evaluate,
+                        context=current_context,
+                        custom_ruleset=custom_ruleset
+                    ),
+                    start_to_close_timeout=timedelta(seconds=10)
+                )
+
+                # If breached, emit a command to flag the asset via activity
+                if policy_result.is_breached or policy_result.alert_triggered:
+                    await workflow.execute_activity(
+                        flag_asset,
+                        FlagAssetInput(
+                            entity_id=entity_id,
+                            reason=f"System Alert: Breach of {policy_result.covenant_name}",
+                            covenant_name=policy_result.covenant_name,
+                            evaluated_value=policy_result.evaluated_value,
+                            threshold_value=policy_result.threshold_value,
+                            evaluation_details=policy_result.evaluation_details
+                        ),
+                        start_to_close_timeout=timedelta(seconds=10)
+                    )
+                    
+                    # Store state in workflow memory for immediate queryability
+                    self.breach_history.append(policy_result.covenant_name)
+                    workflow.logger.warn(f"covenant_breach_handled entity_id={entity_id} rule={policy_result.covenant_name}")
+
         workflow.logger.info(f"completed_surveillance_workflow entity_id={entity_id}")

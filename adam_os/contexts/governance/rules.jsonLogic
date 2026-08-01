@@ -1,0 +1,32 @@
+{
+  "softbank_arm_margin_loop": {
+    "description": "35% LTV covenant of the SoftBank/ARM margin loop.",
+    "threshold": 0.35,
+    "logic": {
+      "<=": [
+        {"var": "ltv"},
+        0.35
+      ]
+    }
+  },
+  "hyperscaler_capex_ceiling": {
+    "description": "Debt to Asset ratio constraint for Hyperscaler Century Duration Mirage.",
+    "threshold": 0.50,
+    "logic": {
+      "<=": [
+        {"var": "ltv"},
+        0.50
+      ]
+    }
+  },
+  "default_credit_risk": {
+    "description": "General rule capping aggregate exposure at 65% LTV across the book.",
+    "threshold": 0.65,
+    "logic": {
+      "<=": [
+        {"var": "ltv"},
+        0.65
+      ]
+    }
+  }
+}
