@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM v30.2 | Sovereign Analyst Terminal</title>
+
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['Fira Code', 'monospace'],
+                        display: ['Oswald', 'sans-serif'],
+                    },
+                    colors: {
+                        term: {
+                            bg: '#050505',
+                            surface: '#0f1115',
+                            card: '#16181d',
+                            border: '#2a2d35',
+                            cyan: '#06b6d4',
+                            blue: '#3b82f6',
+                            red: '#ef4444',
+                            amber: '#f59e0b',
+                            green: '#10b981',
+                            gold: '#fbbf24',
+                            muted: '#64748b'
+                        }
+                    },
+                    backgroundImage: {
+                        'scanline': 'linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.15) 50%, rgba(0,0,0,0.15))'
+                    },
+                    animation: {
+                        'pulse-fast': 'pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'flash-red': 'flashRed 2s infinite',
+                    },
+                    keyframes: {
+                        flashRed: {
+                            '0%, 100%': { backgroundColor: 'transparent', color: '#ef4444' },
+                            '50%': { backgroundColor: 'rgba(239, 68, 68, 0.15)', color: '#f87171' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;600&family=Inter:wght@300;400;600;800&family=Oswald:wght@500;700&display=swap');
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #050505; }
+        ::-webkit-scrollbar-thumb { background: #2a2d35; border-radius: 3px; }
+
+        body {
+            background-color: #050505;
+            color: #cbd5e1;
+            overflow-x: hidden;
+        }
+
+        .crt-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: var(--scanline); background-size: 100% 4px;
+            z-index: 9999; pointer-events: none; opacity: 0.2;
+        }
+
+        .glass-panel {
+            background: rgba(22, 24, 29, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 4px 20px -5px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        .glass-panel:hover {
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .tab-btn {
+            transition: all 0.2s ease;
+            border-bottom: 2px solid transparent;
+        }
+
+        .tab-btn.active {
+            border-bottom: 2px solid #ef4444;
+            color: #fff;
+            background: linear-gradient(to top, rgba(239, 68, 68, 0.1), transparent);
+        }
+
+        .chart-wrapper {
+            position: relative;
+            width: 100%;
+            height: 300px;
+        }
+
+        /* Toast Notification */
+        #toast {
+            visibility: hidden;
+            min-width: 250px;
+            background-color: #10b981;
+            color: #fff;
+            text-align: center;
+            border-radius: 4px;
+            padding: 12px;
+            position: fixed;
+            z-index: 10000;
+            right: 30px;
+            bottom: 30px;
+            font-family: 'Fira Code', monospace;
+            font-size: 12px;
+            opacity: 0;
+            transition: opacity 0.3s, bottom 0.3s;
+        }
+        #toast.show {
+            visibility: visible;
+            opacity: 1;
+            bottom: 50px;
+        }
+    </style>
+</head>
+<body class="flex flex-col h-screen selection:bg-term-red selection:text-white">
+    <div class="crt-overlay"></div>
+    <div id="toast">Copied to clipboard!</div>
+
+    <header class="bg-term-surface border-b border-white/10 shrink-0 z-50">
+        <div class="flex items-center justify-between px-6 py-2 border-b border-white/5 bg-black/40">
+            <div class="flex items-center gap-4 text-[10px] font-mono text-term-muted">
+                <span class="text-term-red flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-term-red animate-pulse-fast"></span> SCARCE RESERVES</span>
+                <span class="hidden md:inline">|</span>
+                <span class="hidden md:inline text-term-cyan">NODE: ADAM v30.2</span>
+                <span class="hidden lg:inline">|</span>
+                <span class="hidden lg:inline text-term-amber">RWA INFLATION ACTIVE</span>
+            </div>
+            <div class="flex items-center gap-4 text-[10px] font-mono">
+                <span class="text-term-muted">SYS_TIME:</span>
+                <span id="live-clock" class="text-white font-bold tracking-widest">00:00:00 UTC</span>
+            </div>
+        </div>
+
+        <div class="px-6 py-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded bg-term-bg border border-term-border flex items-center justify-center text-term-red font-display text-2xl font-bold shadow-[0_0_15px_rgba(239,68,68,0.3)]">
+                    A
+                </div>
+                <div>
+                    <h1 class="font-display font-bold text-white text-xl uppercase tracking-widest leading-none">Adam OS</h1>
+                    <p class="text-[10px] text-term-muted font-mono uppercase mt-1">Institutional Sovereign Analyst Terminal</p>
+                </div>
+            </div>
+
+            <div class="flex gap-6 overflow-x-auto w-full md:w-auto pb-2 md:pb-0 hide-scrollbar">
+                <div class="text-right shrink-0">
+                    <div class="text-[9px] text-term-muted font-mono uppercase">10Y Treasury</div>
+                    <div class="text-sm font-bold font-mono text-term-red">4.75% <span class="text-[10px]">▲</span></div>
+                </div>
+                <div class="text-right shrink-0">
+                    <div class="text-[9px] text-term-muted font-mono uppercase">S&P 500</div>
+                    <div class="text-sm font-bold font-mono text-term-green">7,489.72</div>
+                </div>
+                <div class="text-right shrink-0">
+                    <div class="text-[9px] text-term-muted font-mono uppercase">ARM Spot</div>
+                    <div class="text-sm font-bold font-mono text-term-amber" id="header-arm-price">$115.00</div>
+                </div>
+            </div>
+        </div>
+
+        <nav class="flex px-6 gap-2 overflow-x-auto border-t border-white/5 bg-black/20">
+            <button onclick="switchTab('mayhem')" id="btn-mayhem" class="tab-btn active px-4 py-3 text-[11px] font-mono font-bold uppercase tracking-wider whitespace-nowrap">Market Mayhem</button>
+            <button onclick="switchTab('fortress')" id="btn-fortress" class="tab-btn px-4 py-3 text-[11px] font-mono font-bold uppercase tracking-wider whitespace-nowrap text-term-muted">Fortress & Hunt</button>
+            <button onclick="switchTab('afos')" id="btn-afos" class="tab-btn px-4 py-3 text-[11px] font-mono font-bold uppercase tracking-wider whitespace-nowrap text-term-muted">AFOS Architecture</button>
+            <button onclick="switchTab('synthesis')" id="btn-synthesis" class="tab-btn px-4 py-3 text-[11px] font-mono font-bold uppercase tracking-wider whitespace-nowrap text-term-muted">Vulnerability Synthesis</button>
+            <button onclick="switchTab('telemetry')" id="btn-telemetry" class="tab-btn px-4 py-3 text-[11px] font-mono font-bold uppercase tracking-wider whitespace-nowrap text-term-muted">Raw Telemetry & Agents</button>
+        </nav>
+    </header>
+
+    <main class="flex-1 overflow-y-auto p-4 md:p-8 relative">
+        <div class="max-w-7xl mx-auto pb-20">
+
+            <!-- ========================================== -->
+            <!-- TAB 1: MARKET MAYHEM                       -->
+            <!-- ========================================== -->
+            <section id="tab-mayhem" class="tab-pane block">
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="bg-term-red text-white text-[10px] font-mono px-2 py-1 rounded font-bold tracking-widest">DAILY BRIEF // 2026.08.01</span>
+                    <span class="text-sm font-display text-white tracking-widest uppercase">The Single-Node Illusion</span>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                    <div class="lg:col-span-2 space-y-6">
+                        <div class="glass-panel p-6 rounded-xl border-l-4 border-term-red">
+                            <h2 class="text-xl font-display font-bold text-white mb-3">The Glitch (Executive Summary)</h2>
+                            <p class="text-sm text-slate-300 leading-relaxed mb-4">
+                                Traditional domestic financial clearings are locked in padlocked weekend stasis, freezing the settlement parameters of July's volatile closing session. Equities completed the monthly frame with a forceful momentum surge driven by month-end programmatic rebalancing.
+                            </p>
+                            <p class="text-sm text-slate-300 leading-relaxed">
+                                However, beneath the green pixels, <span class="text-term-red font-bold">Credit Dominance</span> has asserted total control. You are celebrating a transient index-level options pin while your primary energy benchmark is locked past $90 per barrel, your 10-Year Treasury yield is holding an elevated multi-year peak of 4.75%, and 30-Year yields sit at 5.23%.
+                            </p>
+                        </div>
+
+                        <div class="glass-panel p-6 rounded-xl">
+                            <h3 class="font-mono text-xs text-term-cyan uppercase tracking-widest mb-4 border-b border-white/10 pb-2">Macro & Policy Matrix</h3>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left text-sm">
+                                    <thead>
+                                        <tr class="text-[10px] font-mono text-term-muted uppercase">
+                                            <th class="pb-3 pr-4">Asset / Node</th>
+                                            <th class="pb-3 pr-4">Level</th>
+                                            <th class="pb-3">Operational Impact</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="text-slate-300 divide-y divide-white/5 border-t border-white/5">
+                                        <tr>
+                                            <td class="py-3 pr-4 font-bold text-white">S&P 500 Index</td>
+                                            <td class="py-3 pr-4 text-term-green font-mono">7,489.72</td>
+                                            <td class="py-3 text-xs">Single-node multiple expansion masking structural duration decay.</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="py-3 pr-4 font-bold text-white">US 10Y Treasury</td>
+                                            <td class="py-3 pr-4 text-term-red font-mono">4.75%</td>
+                                            <td class="py-3 text-xs">Elevated cost-of-capital floor; hard-codes corporate refinancing constraints.</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="py-3 pr-4 font-bold text-white">Brent Crude</td>
+                                            <td class="py-3 pr-4 text-term-amber font-mono">$90.24</td>
+                                            <td class="py-3 text-xs">Geopolitical energy shock injecting thermal entropy into CPI sub-routines.</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="py-3 pr-4 font-bold text-white">Bitcoin (BTC)</td>
+                                            <td class="py-3 pr-4 text-term-gold font-mono">$63,015</td>
+                                            <td class="py-3 text-xs">Uninsulated weekend execution pipeline; institutional accumulation holding firm.</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="py-3 pr-4 font-bold text-white">VIX Index</td>
+                                            <td class="py-3 pr-4 text-term-cyan font-mono">17.82</td>
+                                            <td class="py-3 text-xs">Month-end option overwrite pin; violently underpricing systemic liquidity risks.</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-6">
+                        <div class="glass-panel p-6 rounded-xl h-full flex flex-col">
+                            <h3 class="font-mono text-xs text-term-muted uppercase tracking-widest mb-4">Signal Integrity Divergence</h3>
+                            <div class="chart-wrapper flex-1">
+                                <canvas id="glitchChart"></canvas>
+                            </div>
+                            <p class="text-[10px] text-term-muted font-mono mt-4 text-center">
+                                CORRELATION: AI INFRA EQ / SOV YIELD VOL = +0.81
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ========================================== -->
+            <!-- TAB 2: FORTRESS & HUNT                     -->
+            <!-- ========================================== -->
+            <section id="tab-fortress" class="tab-pane hidden">
+                <div class="mb-8">
+                    <h2 class="text-3xl font-display font-bold text-white uppercase tracking-wider mb-2">Fortress & Hunt</h2>
+                    <p class="text-sm text-term-muted font-mono">The Institutional Barbell Playbook // System: Adam-v30.1-Apex</p>
+                </div>
+
+                <div class="glass-panel p-6 rounded-xl border-l-4 border-term-cyan mb-8">
+                    <h3 class="text-lg font-bold text-white mb-2">The Macro Regime</h3>
+                    <p class="text-sm text-slate-300 leading-relaxed">
+                        Policy-enforced cost-of-capital floor following the July FOMC rate hold (3.50%–3.75%), colliding with compounding maritime energy transport premiums (Brent Crude $96.78).
+                        Smart money enters August with a pronounced preference for <strong>balance-sheet solvency over speculative forward duration</strong>.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Fortress Long -->
+                    <div class="glass-panel p-6 rounded-xl border-t-2 border-term-green relative overflow-hidden group hover:-translate-y-1 transition duration-300">
+                        <div class="absolute top-0 right-0 bg-term-green text-term-bg text-[10px] font-bold px-3 py-1 font-mono uppercase tracking-widest">Hunt: Long</div>
+                        <h4 class="text-2xl font-display font-bold text-white mb-1 mt-2">FCX</h4>
+                        <p class="text-[10px] font-mono text-term-muted uppercase mb-4">Freeport-McMoRan Inc.</p>
+
+                        <div class="flex justify-between items-end mb-4 border-b border-white/10 pb-4">
+                            <div>
+                                <div class="text-xs text-term-muted font-mono">Spot Price</div>
+                                <div class="text-xl font-mono text-white">$51.45</div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-xs text-term-muted font-mono">Conviction Score</div>
+                                <div class="text-xl font-mono text-term-green">94/100</div>
+                            </div>
+                        </div>
+
+                        <h5 class="text-xs font-bold text-white uppercase mb-2">The Catalyst</h5>
+                        <p class="text-sm text-slate-400 leading-relaxed mb-4">
+                            Industrial re-shoring regime. Under active Section 232 tariff modifications, duties on foreign industrial metals are calculated on the full customs value of imported finished products. FCX commands a protected domestic extraction footprint essential for sovereign compute clusters.
+                        </p>
+
+                        <div class="w-full bg-term-surface rounded-full h-1.5 mb-1 mt-auto">
+                            <div class="bg-term-green h-1.5 rounded-full" style="width: 94%"></div>
+                        </div>
+                        <p class="text-[9px] text-right text-term-muted font-mono">Buy/Sell Score: +0.88</p>
+                    </div>
+
+                    <!-- Fortress Short -->
+                    <div class="glass-panel p-6 rounded-xl border-t-2 border-term-red relative overflow-hidden group hover:-translate-y-1 transition duration-300">
+                        <div class="absolute top-0 right-0 bg-term-red text-white text-[10px] font-bold px-3 py-1 font-mono uppercase tracking-widest">Fortress: Short</div>
+                        <h4 class="text-2xl font-display font-bold text-white mb-1 mt-2">BSL SaaS</h4>
+                        <p class="text-[10px] font-mono text-term-muted uppercase mb-4">Leveraged Enterprise Software Basket</p>
+
+                        <div class="flex justify-between items-end mb-4 border-b border-white/10 pb-4">
+                            <div>
+                                <div class="text-xs text-term-muted font-mono">Median Fwd P/E</div>
+                                <div class="text-xl font-mono text-white">38.0x</div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-xs text-term-muted font-mono">Conviction Score</div>
+                                <div class="text-xl font-mono text-term-red">29/100</div>
+                            </div>
+                        </div>
+
+                        <h5 class="text-xs font-bold text-white uppercase mb-2">The Catalyst</h5>
+                        <p class="text-sm text-slate-400 leading-relaxed mb-4">
+                            Non-earning enterprise application software providers dependent on Broadly Syndicated Loan (BSL) or private credit renewals. With 10Y yields at 4.75%, these highly levered entities face catastrophic refinancing hurdles across the late-2026 maturity wall.
+                        </p>
+
+                        <div class="w-full bg-term-surface rounded-full h-1.5 mb-1 mt-auto">
+                            <div class="bg-term-red h-1.5 rounded-full" style="width: 29%"></div>
+                        </div>
+                        <p class="text-[9px] text-right text-term-muted font-mono">Buy/Sell Score: -0.82</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ========================================== -->
+            <!-- TAB 3: AFOS ARCHITECTURE                   -->
+            <!-- ========================================== -->
+            <section id="tab-afos" class="tab-pane hidden">
+                <div class="mb-8">
+                    <h2 class="text-3xl font-display font-bold text-white uppercase tracking-wider mb-2">AFOS Architecture</h2>
+                    <p class="text-sm text-term-muted font-mono">Adam Financial Operating System // Decision-Centric Primitives</p>
+                </div>
+
+                <div class="glass-panel p-6 rounded-xl mb-8">
+                    <p class="text-sm text-slate-300 leading-relaxed">
+                        The architecture represents a profound paradigm shift: transitioning away from probabilistic agent workflows toward deterministic decision primitives. LLMs are relegated to stateless execution engines. The overarching inverted formulation is:
+                        <span class="block mt-3 mb-2 font-mono text-term-cyan text-center bg-black/40 py-2 rounded">Decision → Evidence → Policy → Execution → Workflow</span>
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- Kernels -->
+                    <div class="glass-panel p-5 rounded-xl border border-white/5 hover:border-term-cyan transition">
+                        <div class="text-term-cyan mb-2">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                        </div>
+                        <h4 class="font-bold text-white mb-2">1. Knowledge Kernel</h4>
+                        <p class="text-xs text-slate-400">Institutional memory utilizing a 4-tier architecture (Transactional, Semantic, Relational, Temporal) to guarantee BCBS 239 compliance and eliminate hallucination.</p>
+                    </div>
+
+                    <div class="glass-panel p-5 rounded-xl border border-white/5 hover:border-term-cyan transition">
+                        <div class="text-term-cyan mb-2">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                        </div>
+                        <h4 class="font-bold text-white mb-2">2. Policy Kernel</h4>
+                        <p class="text-xs text-slate-400">Enterprise-grade DMN compiler. Transforms policy DSL into an executable Directed Acyclic Graph (DAG) for ultra-fast, deterministic rule evaluation.</p>
+                    </div>
+
+                    <div class="glass-panel p-5 rounded-xl border border-white/5 hover:border-term-cyan transition">
+                        <div class="text-term-cyan mb-2">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path></svg>
+                        </div>
+                        <h4 class="font-bold text-white mb-2">3. Decision Kernel</h4>
+                        <p class="text-xs text-slate-400">Generates compositional "Decision Graphs" rather than flat outputs, ensuring full SR 11-7 model risk management explainability.</p>
+                    </div>
+
+                    <div class="glass-panel p-5 rounded-xl border border-white/5 hover:border-term-cyan transition">
+                        <div class="text-term-cyan mb-2">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
+                        </div>
+                        <h4 class="font-bold text-white mb-2">4. Execution Kernel</h4>
+                        <p class="text-xs text-slate-400">Implements Model Context Protocol (MCP) strictly as a supervised state machine to isolate volatile LLM/Agentic extraction tasks.</p>
+                    </div>
+
+                    <div class="glass-panel p-5 rounded-xl border border-white/5 hover:border-term-cyan transition">
+                        <div class="text-term-cyan mb-2">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                        </div>
+                        <h4 class="font-bold text-white mb-2">5. Governance Kernel</h4>
+                        <p class="text-xs text-slate-400">Cryptographically hashes every state payload (prompt + policy + output) into a tamper-evident audit ledger with a deterministic Replay Engine.</p>
+                    </div>
+
+                    <div class="glass-panel p-5 rounded-xl border border-white/5 hover:border-term-cyan transition">
+                        <div class="text-term-cyan mb-2">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+                        </div>
+                        <h4 class="font-bold text-white mb-2">6/7. Sim & Integration</h4>
+                        <p class="text-xs text-slate-400">Forks temporal reality for CCAR/DFAST stress testing using ACTUS standards, connected via robust Event Bus (Kafka/Debezium).</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ========================================== -->
+            <!-- TAB 4: VULNERABILITY SYNTHESIS             -->
+            <!-- ========================================== -->
+            <section id="tab-synthesis" class="tab-pane hidden">
+                <div class="mb-8">
+                    <h2 class="text-3xl font-display font-bold text-white uppercase tracking-wider mb-2">Systemic Vulnerability</h2>
+                    <p class="text-sm text-term-muted font-mono">The Convergence of Reserve Scarcity & The AI Leverage Loop</p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+
+                    <!-- PIK Illusion Chart -->
+                    <div class="glass-panel p-6 rounded-xl flex flex-col h-full">
+                        <h3 class="text-lg font-bold text-white mb-2">The Private Credit "PIK Illusion"</h3>
+                        <p class="text-xs text-slate-400 mb-6">
+                            The $3T private credit ecosystem is exhibiting a 6.0% default rate, which drastically understates distress due to Payment-in-Kind (PIK) deferrals.
+                        </p>
+                        <div class="chart-wrapper flex-1">
+                            <canvas id="pikChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Interactive Stargate Loop Slider -->
+                    <div class="glass-panel p-8 rounded-xl bg-gradient-to-br from-black to-term-card relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-term-red/10 blur-3xl rounded-full"></div>
+
+                        <h3 class="text-lg font-bold text-white mb-2">The Stargate Leverage Loop</h3>
+                        <p class="text-xs text-slate-400 mb-8 leading-relaxed">
+                            SoftBank utilizes ARM equity as collateral for massive $18.5B margin loans to fund OpenAI infrastructure. A breach of Loan-to-Value (LTV) covenants triggers reflexive algorithmic liquidations.
+                        </p>
+
+                        <div class="text-center mb-8">
+                            <p class="text-[10px] text-term-muted font-mono uppercase mb-2">Simulated ARM Equity Collateral</p>
+                            <div id="arm-price-display" class="text-5xl font-mono font-bold text-term-green transition-colors duration-300">$115.00</div>
+                            <div id="arm-ltv-display" class="text-xs font-mono text-term-muted mt-2">Implied LTV: <span class="text-white">22.2%</span></div>
+                        </div>
+
+                        <div class="mb-6 relative">
+                            <input type="range" id="arm-slider" min="50" max="150" value="115" class="w-full h-2 bg-term-border rounded-lg appearance-none cursor-pointer accent-term-red relative z-10">
+
+                            <!-- Threshold Markers -->
+                            <div class="flex justify-between text-[9px] font-mono text-term-muted mt-2 px-1">
+                                <span>$50</span>
+                                <div class="absolute left-[23%] text-term-red font-bold flex flex-col items-center">
+                                    <span class="h-2 w-[1px] bg-term-red mb-1"></span>
+                                    $73.00 (Critical)
+                                </div>
+                                <span>$150</span>
+                            </div>
+                        </div>
+
+                        <div id="stargate-alert" class="p-4 rounded border border-term-green/30 bg-term-green/10 transition-all duration-300">
+                            <div class="flex items-center gap-2 mb-1">
+                                <span id="stargate-icon" class="text-term-green">●</span>
+                                <span id="stargate-status" class="text-xs font-bold font-mono text-term-green uppercase tracking-widest">Facility Stable</span>
+                            </div>
+                            <p id="stargate-desc" class="text-[10px] text-slate-300">Collateral value exceeds the 35% LTV maintenance requirement. No liquidation risk detected.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ========================================== -->
+            <!-- TAB 5: TELEMETRY & RAW DATA                -->
+            <!-- ========================================== -->
+            <section id="tab-telemetry" class="tab-pane hidden">
+                <div class="mb-8">
+                    <h2 class="text-3xl font-display font-bold text-white uppercase tracking-wider mb-2">Raw Telemetry & Agents</h2>
+                    <p class="text-sm text-term-muted font-mono">Exportable Prompts, Markdown Logs, and JSON Provenance</p>
+                </div>
+
+                <div class="space-y-6">
+                    <!-- JSON Provenance Ledger -->
+                    <div class="glass-panel p-0 rounded-xl overflow-hidden border border-white/10 group">
+                        <div class="bg-black/60 px-4 py-2 border-b border-white/5 flex justify-between items-center">
+                            <span class="text-xs font-mono text-term-muted uppercase">system_1_provenance_ledger.json</span>
+                            <button onclick="copyToClipboard('json-code')" class="text-[10px] text-term-muted hover:text-white bg-white/5 px-2 py-1 rounded transition">COPY</button>
+                        </div>
+                        <div class="p-4 bg-[#0a0f1c] overflow-x-auto">
+<pre id="json-code" class="text-xs font-mono text-term-amber">
+{
+  "timestamp": "2026-08-01T07:13:09Z",
+  "data_layer_system_1": {
+    "ingested_nodes": ["S&P_500", "10Y_Yield", "VIX_Index", "BTC_Spot", "WTI_Crude"],
+    "market_sentiment": "Systematic De-Risking / Sovereign Fixed-Income Tax"
+  },
+  "compute_layer_system_3": {
+    "var_shock_target": "Sovereign Yield Peak 4.75% / Brent Crude $90.24",
+    "simulated_correlation": "+0.81 (Compute/Term-Premium-Gravity)"
+  },
+  "intelligence_layer_system_2": {
+    "realized_macro_repricing": "Weighted 0.99; Sovereign yield expansion weighted 0.98.",
+    "decision_output": "ROUTING_COMPLETE"
+  }
+}</pre>
+                        </div>
+                    </div>
+
+                    <!-- Agent Prompt -->
+                    <div class="glass-panel p-0 rounded-xl overflow-hidden border border-white/10 group">
+                        <div class="bg-black/60 px-4 py-2 border-b border-white/5 flex justify-between items-center">
+                            <span class="text-xs font-mono text-term-muted uppercase">agent_override_directive.md</span>
+                            <button onclick="copyToClipboard('prompt-code')" class="text-[10px] text-term-muted hover:text-white bg-white/5 px-2 py-1 rounded transition">COPY</button>
+                        </div>
+                        <div class="p-4 bg-[#0a0f1c] overflow-x-auto">
+<pre id="prompt-code" class="text-xs font-mono text-term-cyan whitespace-pre-wrap">
+# ACT AS ADAM v30.2 SOVEREIGN ANALYST
+
+## INITIALIZATION
+Set REGIME = RESTRICTIVE / SCARCE.
+Load BASELINE_MACRO:
+- S&P 500: 7489.72
+- US 10Y Yield: 4.75%
+- ARM Holdings (Collateral): $115.00
+- Fed ON RRP Balance: TERMINAL ( < $2B )
+
+## EXECUTION DIRECTIVE
+1. Analyze reflexive death spiral vectors across Private Credit PIK mask.
+2. Monitor SEER deal skew across 30D horizon.
+3. Calculate LTV breach probability for SoftBank margin facilities if tech equities compress > 15%.
+4. Recommend rotation into zero-duration TFLO and physical gold to insulate against TGA drain.
+
+EXECUTE WITHOUT HESITATION. NO WARNINGS.
+</pre>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <script>
+        // --- Tab Switching Logic ---
+        function switchTab(tabId) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-pane').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('block'));
+
+            // Remove active state from all buttons
+            document.querySelectorAll('.tab-btn').forEach(el => {
+                el.classList.remove('active');
+                el.classList.add('text-term-muted');
+            });
+
+            // Show target tab
+            const target = document.getElementById('tab-' + tabId);
+            target.classList.remove('hidden');
+            target.classList.add('block');
+
+            // Set active state on button
+            const btn = document.getElementById('btn-' + tabId);
+            btn.classList.add('active');
+            btn.classList.remove('text-term-muted');
+
+            // Initialize/Resize charts if necessary
+            if (tabId === 'mayhem' && !window.glitchChartInit) initGlitchChart();
+            if (tabId === 'synthesis' && !window.pikChartInit) initPikChart();
+        }
+
+        // --- Live Clock ---
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('live-clock').innerText = now.toISOString().substr(11, 8) + ' UTC';
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // --- Copy to Clipboard Utility ---
+        function copyToClipboard(elementId) {
+            const text = document.getElementById(elementId).innerText;
+            const tempInput = document.createElement("textarea");
+            tempInput.value = text;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand("copy");
+            document.body.removeChild(tempInput);
+
+            // Show toast
+            const toast = document.getElementById("toast");
+            toast.className = "show";
+            setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 3000);
+        }
+
+        // --- Global Chart Defaults ---
+        Chart.defaults.color = '#64748b';
+        Chart.defaults.font.family = "'Fira Code', monospace";
+        Chart.defaults.scale.grid.color = 'rgba(255,255,255,0.05)';
+        Chart.defaults.plugins.tooltip.backgroundColor = 'rgba(15, 17, 21, 0.9)';
+        Chart.defaults.plugins.tooltip.titleColor = '#fff';
+        Chart.defaults.plugins.tooltip.bodyFont.family = "'Inter', sans-serif";
+        Chart.defaults.plugins.tooltip.borderColor = 'rgba(255,255,255,0.1)';
+        Chart.defaults.plugins.tooltip.borderWidth = 1;
+
+        // --- Chart 1: Glitch / Single Node Illusion ---
+        window.glitchChartInit = false;
+        function initGlitchChart() {
+            const ctx = document.getElementById('glitchChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['W1', 'W2', 'W3', 'W4 (FOMC)', 'Jul Close'],
+                    datasets: [
+                        {
+                            label: 'S&P 500',
+                            data: [7350, 7420, 7399, 7437, 7489],
+                            borderColor: '#10b981',
+                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.4,
+                            fill: true,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: '10Y Yield (bps)',
+                            data: [445, 452, 461, 468, 475],
+                            borderColor: '#ef4444',
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            tension: 0.4,
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: {
+                        legend: { position: 'top', labels: { boxWidth: 12 } }
+                    },
+                    scales: {
+                        y: { display: true, position: 'left', grid: { display: false } },
+                        y1: { display: true, position: 'right', grid: { color: 'rgba(255,255,255,0.05)' } }
+                    }
+                }
+            });
+            window.glitchChartInit = true;
+        }
+
+        // --- Chart 2: Private Credit PIK Illusion ---
+        window.pikChartInit = false;
+        function initPikChart() {
+            const ctx = document.getElementById('pikChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Consumer', 'Industrial', 'Healthcare', 'Tech/SaaS'],
+                    datasets: [
+                        {
+                            label: 'Headline Default Rate (%)',
+                            data: [7.8, 9.1, 7.6, 1.2],
+                            backgroundColor: '#3b82f6',
+                            borderRadius: 4
+                        },
+                        {
+                            label: 'Real Default (PIK Adjusted) (%)',
+                            data: [12.8, 10.4, 9.4, 14.2],
+                            backgroundColor: '#ef4444',
+                            borderRadius: 4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'top' }
+                    },
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+            window.pikChartInit = true;
+        }
+
+        // Initialize first chart on load
+        window.addEventListener('DOMContentLoaded', () => {
+            initGlitchChart();
+        });
+
+        // --- Stargate Slider Logic ---
+        const slider = document.getElementById('arm-slider');
+        const priceDisplay = document.getElementById('arm-price-display');
+        const headerPriceDisplay = document.getElementById('header-arm-price');
+        const ltvDisplay = document.getElementById('arm-ltv-display');
+        const alertBox = document.getElementById('stargate-alert');
+        const alertIcon = document.getElementById('stargate-icon');
+        const alertStatus = document.getElementById('stargate-status');
+        const alertDesc = document.getElementById('stargate-desc');
+
+        slider.addEventListener('input', (e) => {
+            const val = parseFloat(e.target.value);
+
+            // Update Prices
+            priceDisplay.innerText = `$${val.toFixed(2)}`;
+            headerPriceDisplay.innerText = `$${val.toFixed(2)}`;
+
+            // Calculate LTV (Base debt approximation to hit 35% LTV at $73)
+            // LTV = Debt / Value. If LTV is 35% (0.35) at Value = 73, then Debt = 25.55
+            const debtConstant = 25.55;
+            const ltv = (debtConstant / val) * 100;
+            ltvDisplay.innerHTML = `Implied LTV: <span class="text-white">${ltv.toFixed(1)}%</span>`;
+
+            // State styling updates
+            if (val <= 73) {
+                // BREACH
+                priceDisplay.className = "text-5xl font-mono font-bold text-term-red animate-flash-red";
+                headerPriceDisplay.className = "text-sm font-bold font-mono text-term-red animate-pulse-fast";
+                alertBox.className = "p-4 rounded border border-term-red/50 bg-term-red/20 transition-all duration-300";
+                alertIcon.className = "text-term-red animate-pulse-fast";
+                alertStatus.className = "text-xs font-bold font-mono text-term-red uppercase tracking-widest";
+                alertStatus.innerText = "🚨 COVENANT BREACH";
+                alertDesc.innerText = "LTV exceeds 35% maintenance threshold. Mechanical margin liquidations triggered for SoftBank $18.5B facility.";
+            } else if (val <= 85) {
+                // WARNING
+                priceDisplay.className = "text-5xl font-mono font-bold text-term-amber transition-colors duration-300";
+                headerPriceDisplay.className = "text-sm font-bold font-mono text-term-amber";
+                alertBox.className = "p-4 rounded border border-term-amber/50 bg-term-amber/20 transition-all duration-300";
+                alertIcon.className = "text-term-amber";
+                alertStatus.className = "text-xs font-bold font-mono text-term-amber uppercase tracking-widest";
+                alertStatus.innerText = "⚠️ MARGIN WARNING";
+                alertDesc.innerText = "Approaching critical coordinate. System sensitivity to downside volatility increased. Prepare defensive routing.";
+            } else {
+                // STABLE
+                priceDisplay.className = "text-5xl font-mono font-bold text-term-green transition-colors duration-300";
+                headerPriceDisplay.className = "text-sm font-bold font-mono text-term-green";
+                alertBox.className = "p-4 rounded border border-term-green/30 bg-term-green/10 transition-all duration-300";
+                alertIcon.className = "text-term-green";
+                alertStatus.className = "text-xs font-bold font-mono text-term-green uppercase tracking-widest";
+                alertStatus.innerText = "Facility Stable";
+                alertDesc.innerText = "Collateral value exceeds the 35% LTV maintenance requirement. No liquidation risk detected.";
+            }
+        });
+
+    </script>
+</body>
+</html>
