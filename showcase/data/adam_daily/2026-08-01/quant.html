@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM v30.2 | Deterministic Quant Engine</title>
+    
+    <!-- Load Dependencies -->
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['Fira Code', 'monospace'],
+                        display: ['Oswald', 'sans-serif'],
+                    },
+                    colors: {
+                        term: {
+                            bg: '#030508',
+                            surface: '#0a0d14',
+                            card: '#121620',
+                            border: '#1e2433',
+                            cyan: '#00f0ff',
+                            blue: '#3b82f6',
+                            red: '#ff2a2a',
+                            amber: '#ffb300',
+                            green: '#00e676',
+                            gold: '#ffd700',
+                            muted: '#64748b'
+                        }
+                    },
+                    backgroundImage: {
+                        'scanline': 'linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.2))',
+                        'grid-pattern': 'linear-gradient(to right, #1e2433 1px, transparent 1px), linear-gradient(to bottom, #1e2433 1px, transparent 1px)'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;600&family=Inter:wght@300;400;600;800&family=Oswald:wght@500;700&display=swap');
+        
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #030508; }
+        ::-webkit-scrollbar-thumb { background: #1e2433; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #3b82f6; }
+        
+        body { 
+            background-color: #030508; 
+            color: #cbd5e1; 
+            overflow-x: hidden;
+            background-image: var(--grid-pattern);
+            background-size: 40px 40px;
+        }
+        
+        .crt-overlay { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background-image: var(--scanline); background-size: 100% 4px; 
+            z-index: 9999; pointer-events: none; opacity: 0.15; 
+        }
+
+        .glass-panel { 
+            background: rgba(10, 13, 20, 0.85); 
+            backdrop-filter: blur(16px); 
+            border: 1px solid rgba(255, 255, 255, 0.05); 
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        .tab-btn { transition: all 0.2s ease; border-bottom: 2px solid transparent; }
+        .tab-btn.active { color: #fff; border-bottom: 2px solid #00f0ff; background: linear-gradient(to top, rgba(0,240,255,0.1), transparent); }
+
+        /* Custom Range Slider */
+        input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; margin: 10px 0; }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none; height: 14px; width: 14px;
+            border-radius: 50%; background: #00f0ff;
+            cursor: pointer; margin-top: -5px; box-shadow: 0 0 10px rgba(0,240,255,0.5);
+        }
+        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; cursor: pointer; background: #1e2433; border-radius: 2px; }
+        
+        .math-block { font-family: 'Fira Code', monospace; background: rgba(0,0,0,0.5); padding: 8px; border-radius: 4px; border: 1px solid #1e2433; color: #00f0ff; font-size: 0.85rem;}
+    </style>
+</head>
+<body class="flex flex-col h-screen">
+    <div class="crt-overlay"></div>
+
+    <header class="bg-term-surface border-b border-white/5 shrink-0 z-50">
+        <div class="flex items-center justify-between px-6 py-2 bg-black/40 border-b border-white/5">
+            <div class="flex items-center gap-4 text-[10px] font-mono text-term-muted">
+                <span class="text-term-cyan"><i class="fas fa-server mr-2"></i>ADAM INFERENCE ENGINE</span>
+                <span>|</span>
+                <span class="text-term-green">ON-DEVICE ML: ACTIVE</span>
+            </div>
+            <div class="text-[10px] font-mono text-term-muted">LATENCY: <span class="text-term-cyan">&lt;1ms</span></div>
+        </div>
+        
+        <div class="px-6 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div>
+                <h1 class="font-display font-bold text-white text-2xl uppercase tracking-widest leading-none">Deterministic Quant Module</h1>
+                <p class="text-[10px] text-term-muted font-mono uppercase mt-1">Open-Weight Structural Financial Models</p>
+            </div>
+        </div>
+
+        <nav class="flex px-6 gap-2 overflow-x-auto border-t border-white/5 bg-black/20">
+            <button onclick="switchTab('credit')" id="btn-credit" class="tab-btn active px-4 py-3 text-[11px] font-mono font-bold uppercase tracking-wider">Credit Risk (PD/LGD)</button>
+            <button onclick="switchTab('valuation')" id="btn-valuation" class="tab-btn px-4 py-3 text-[11px] font-mono font-bold uppercase tracking-wider text-term-muted">Intrinsic Value (DCF/EV)</button>
+            <button onclick="switchTab('derivatives')" id="btn-derivatives" class="tab-btn px-4 py-3 text-[11px] font-mono font-bold uppercase tracking-wider text-term-muted">Derivatives (CDS Pricing)</button>
+        </nav>
+    </header>
+
+    <main class="flex-1 overflow-y-auto p-4 md:p-8 relative">
+        <div class="max-w-7xl mx-auto pb-20">
+
+            <!-- ========================================== -->
+            <!-- TAB 1: CREDIT RISK ML ENGINE               -->
+            <!-- ========================================== -->
+            <section id="tab-credit" class="tab-pane block">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    
+                    <!-- ML Inputs -->
+                    <div class="lg:col-span-4 glass-panel p-6 rounded-xl flex flex-col gap-6">
+                        <div>
+                            <h3 class="text-sm font-bold text-white uppercase font-display border-b border-white/10 pb-2 mb-4"><i class="fas fa-sliders-h text-term-cyan mr-2"></i>Entity Features (X)</h3>
+                            
+                            <div class="space-y-5">
+                                <!-- Leverage -->
+                                <div>
+                                    <div class="flex justify-between text-xs font-mono mb-1">
+                                        <span class="text-term-muted">Leverage (Debt/EBITDA)</span>
+                                        <span id="val-leverage" class="text-white">3.5x</span>
+                                    </div>
+                                    <input type="range" id="inp-leverage" min="0" max="10" step="0.1" value="3.5" oninput="runCreditInference()">
+                                    <p class="text-[9px] text-term-muted">Weight: <span class="text-term-red">+0.85</span> (Increases PD)</p>
+                                </div>
+                                
+                                <!-- Interest Coverage -->
+                                <div>
+                                    <div class="flex justify-between text-xs font-mono mb-1">
+                                        <span class="text-term-muted">Interest Coverage Ratio</span>
+                                        <span id="val-icr" class="text-white">4.0x</span>
+                                    </div>
+                                    <input type="range" id="inp-icr" min="0" max="15" step="0.5" value="4.0" oninput="runCreditInference()">
+                                    <p class="text-[9px] text-term-muted">Weight: <span class="text-term-green">-0.45</span> (Decreases PD)</p>
+                                </div>
+
+                                <!-- Operating Margin -->
+                                <div>
+                                    <div class="flex justify-between text-xs font-mono mb-1">
+                                        <span class="text-term-muted">Operating Margin (%)</span>
+                                        <span id="val-margin" class="text-white">15.0%</span>
+                                    </div>
+                                    <input type="range" id="inp-margin" min="-20" max="50" step="1" value="15" oninput="runCreditInference()">
+                                    <p class="text-[9px] text-term-muted">Weight: <span class="text-term-green">-0.05</span> (Decreases PD)</p>
+                                </div>
+
+                                <!-- Asset Tangibility (For LGD) -->
+                                <div class="pt-4 border-t border-white/5">
+                                    <div class="flex justify-between text-xs font-mono mb-1">
+                                        <span class="text-term-amber">Asset Tangibility (%)</span>
+                                        <span id="val-tangibility" class="text-white">40%</span>
+                                    </div>
+                                    <input type="range" id="inp-tangibility" min="0" max="100" step="5" value="40" oninput="runCreditInference()">
+                                    <p class="text-[9px] text-term-muted">Drives Recovery Rate (Inverse of LGD)</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Inference Outputs -->
+                    <div class="lg:col-span-8 space-y-6">
+                        <!-- Mathematical Architecture -->
+                        <div class="glass-panel p-6 rounded-xl border-l-2 border-term-cyan">
+                            <h3 class="text-sm font-bold text-white uppercase font-display mb-2">Deterministic ML: Logistic Regression</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <p class="text-xs text-slate-400 mb-2">The Probability of Default (PD) is calculated via a sigmoid activation applied to the linear combination of features and open weights:</p>
+                                    <div class="math-block">
+                                        z = β₀ + (β₁·Lev) + (β₂·ICR) + (β₃·Marg)<br>
+                                        PD = 1 / (1 + e⁻ᶻ)
+                                    </div>
+                                </div>
+                                <div class="bg-black/50 p-3 rounded border border-white/5 text-xs font-mono text-term-muted">
+                                    <div class="text-white border-b border-white/10 pb-1 mb-1">Open Weights Matrix (W)</div>
+                                    <div>Bias (β₀): -2.500</div>
+                                    <div>Leverage (β₁): +0.850</div>
+                                    <div>Coverage (β₂): -0.450</div>
+                                    <div>Margin (β₃): -0.050</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Results Dashboard -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="glass-panel p-6 rounded-xl flex flex-col items-center justify-center relative overflow-hidden">
+                                <div class="absolute inset-0 bg-gradient-to-b from-term-red/5 to-transparent pointer-events-none"></div>
+                                <h4 class="text-[10px] text-term-muted font-mono uppercase tracking-widest mb-4">Probability of Default (1Y)</h4>
+                                <div id="pd-display" class="text-6xl font-display font-bold text-term-red mb-2">4.52%</div>
+                                <div class="w-full max-w-[200px] h-[150px] relative">
+                                    <canvas id="pdGaugeChart"></canvas>
+                                </div>
+                                <div id="pd-rating" class="mt-4 px-3 py-1 bg-term-red/20 border border-term-red/30 text-term-red text-xs font-bold rounded">IMPLIED RATING: BB-</div>
+                            </div>
+
+                            <div class="glass-panel p-6 rounded-xl flex flex-col items-center justify-center relative overflow-hidden">
+                                <div class="absolute inset-0 bg-gradient-to-b from-term-amber/5 to-transparent pointer-events-none"></div>
+                                <h4 class="text-[10px] text-term-muted font-mono uppercase tracking-widest mb-4">Loss Given Default (LGD)</h4>
+                                <div id="lgd-display" class="text-6xl font-display font-bold text-term-amber mb-2">60.0%</div>
+                                <div class="text-sm font-mono text-slate-300 mt-4 mb-2">Recovery Rate: <span id="rr-display" class="text-white font-bold">40.0%</span></div>
+                                <p class="text-[10px] text-slate-400 text-center px-4 mt-2 border-t border-white/10 pt-4">LGD = 1 - (Base Recovery + Tangibility Factor)</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Explainability / SHAP -->
+                        <div class="glass-panel p-6 rounded-xl">
+                            <h4 class="text-xs text-term-muted font-mono uppercase tracking-widest mb-4">Feature Importance (Log-Odds Contribution)</h4>
+                            <div class="h-[120px] w-full">
+                                <canvas id="shapChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ========================================== -->
+            <!-- TAB 2: INTRINSIC VALUE (DCF / EV)          -->
+            <!-- ========================================== -->
+            <section id="tab-valuation" class="tab-pane hidden">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    
+                    <div class="lg:col-span-1 glass-panel p-6 rounded-xl">
+                        <h3 class="text-sm font-bold text-white uppercase font-display border-b border-white/10 pb-2 mb-4"><i class="fas fa-chart-line text-term-green mr-2"></i>DCF Parameters</h3>
+                        
+                        <div class="space-y-4">
+                            <div>
+                                <label class="text-xs font-mono text-term-muted block mb-1">Base Free Cash Flow (FCF₀) $M</label>
+                                <input type="number" id="inp-fcf" value="100" class="w-full bg-black border border-white/10 rounded px-3 py-2 text-white font-mono text-sm focus:border-term-cyan outline-none" onchange="runDCFInference()">
+                            </div>
+                            
+                            <div>
+                                <label class="text-xs font-mono text-term-muted block mb-1">Growth Stage 1 (Y1-Y5) %</label>
+                                <input type="number" id="inp-g1" value="12" class="w-full bg-black border border-white/10 rounded px-3 py-2 text-white font-mono text-sm focus:border-term-cyan outline-none" onchange="runDCFInference()">
+                            </div>
+
+                            <div>
+                                <label class="text-xs font-mono text-term-muted block mb-1">Terminal Growth Rate (g) %</label>
+                                <input type="number" id="inp-tg" value="2.5" class="w-full bg-black border border-white/10 rounded px-3 py-2 text-white font-mono text-sm focus:border-term-cyan outline-none" onchange="runDCFInference()">
+                            </div>
+
+                            <div class="pt-4 border-t border-white/10">
+                                <div class="flex justify-between text-xs font-mono mb-1">
+                                    <span class="text-term-muted">WACC (Discount Rate)</span>
+                                    <span id="val-wacc" class="text-white">9.0%</span>
+                                </div>
+                                <input type="range" id="inp-wacc" min="4" max="20" step="0.5" value="9.0" oninput="runDCFInference()">
+                            </div>
+                            
+                            <div class="pt-4 border-t border-white/10">
+                                <label class="text-xs font-mono text-term-muted block mb-1">Net Debt $M</label>
+                                <input type="number" id="inp-netdebt" value="300" class="w-full bg-black border border-white/10 rounded px-3 py-2 text-white font-mono text-sm focus:border-term-cyan outline-none" onchange="runDCFInference()">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-2 space-y-6">
+                        
+                        <!-- Math Block -->
+                        <div class="glass-panel p-6 rounded-xl border-l-2 border-term-green">
+                            <h3 class="text-sm font-bold text-white uppercase font-display mb-2">Deterministic Engine: Discounted Cash Flow</h3>
+                            <p class="text-xs text-slate-400 mb-2">Enterprise Value is computed deterministically by projecting and discounting future cash flows, combined with a Gordon Growth terminal value.</p>
+                            <div class="math-block text-term-green">
+                                PV = Σ [ FCF_t / (1 + WACC)^t ] + [ (FCF_5 * (1+g)) / (WACC - g) ] / (1+WACC)^5<br>
+                                Equity Value = PV (Enterprise Value) - Net Debt
+                            </div>
+                        </div>
+
+                        <!-- Summary Cards -->
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="bg-[#0a0d14] border border-white/5 rounded-xl p-4 text-center">
+                                <div class="text-[10px] text-term-muted font-mono uppercase">Implied Enterprise Value</div>
+                                <div id="ev-display" class="text-3xl font-display font-bold text-white mt-1">$2,450M</div>
+                            </div>
+                            <div class="bg-[#0a0d14] border border-term-green/30 rounded-xl p-4 text-center shadow-[0_0_15px_rgba(0,230,118,0.1)]">
+                                <div class="text-[10px] text-term-green font-mono uppercase">Implied Equity Value</div>
+                                <div id="eq-display" class="text-3xl font-display font-bold text-term-green mt-1">$2,150M</div>
+                            </div>
+                        </div>
+
+                        <!-- Chart -->
+                        <div class="glass-panel p-6 rounded-xl h-[300px]">
+                            <canvas id="dcfChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ========================================== -->
+            <!-- TAB 3: DERIVATIVES (CDS PRICING)           -->
+            <!-- ========================================== -->
+            <section id="tab-derivatives" class="tab-pane hidden">
+                <div class="glass-panel p-6 rounded-xl mb-6 border-l-2 border-term-blue">
+                    <h3 class="text-sm font-bold text-white uppercase font-display mb-2">Reduced-Form Credit Pricing (Credit Triangle)</h3>
+                    <p class="text-xs text-slate-400 mb-2">
+                        Synthetic Credit Default Swap (CDS) spreads are derived directly from the ML-inferred Probability of Default (PD) and Loss Given Default (LGD). 
+                        It assumes a constant hazard rate (λ) where <code>λ = -ln(1 - PD) / Time</code>.
+                    </p>
+                    <div class="math-block text-term-blue">
+                        Spread (bps) ≈ Hazard Rate (λ) × LGD × 10,000
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="glass-panel p-8 rounded-xl flex flex-col items-center justify-center border border-white/5">
+                        <i class="fas fa-link text-term-muted text-2xl mb-4"></i>
+                        <h4 class="text-xs text-term-muted font-mono uppercase tracking-widest mb-6 text-center">Piping outputs from PD/LGD ML Engine...</h4>
+                        
+                        <div class="grid grid-cols-2 w-full gap-4 mb-8">
+                            <div class="bg-black/50 border border-term-red/20 p-4 rounded text-center">
+                                <div class="text-[9px] text-term-muted font-mono uppercase">Inferred PD</div>
+                                <div id="cds-pd-in" class="text-xl font-mono text-term-red font-bold">--</div>
+                            </div>
+                            <div class="bg-black/50 border border-term-amber/20 p-4 rounded text-center">
+                                <div class="text-[9px] text-term-muted font-mono uppercase">Inferred LGD</div>
+                                <div id="cds-lgd-in" class="text-xl font-mono text-term-amber font-bold">--</div>
+                            </div>
+                        </div>
+                        
+                        <button onclick="switchTab('credit')" class="text-xs text-term-cyan font-mono hover:underline">← Adjust ML Inputs</button>
+                    </div>
+
+                    <div class="glass-panel p-8 rounded-xl relative overflow-hidden bg-gradient-to-br from-[#0a0d14] to-[#0d131f] border border-term-blue/30 shadow-[0_0_30px_rgba(59,130,246,0.1)]">
+                        <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4IiBoZWlnaHQ9IjgiPgo8cmVjdCB3aWR0aD0iOCIgaGVpZ2h0PSI4IiBmaWxsPSIjZmZmIiBmaWxsLW9wYWNpdHk9IjAuMDIiLz4KPHBhdGggZD0iTTAgMEw4IDhaTTAgOEw4IDBaIiBzdHJva2U9IiMzYjgyZjYiIHN0cm9rZS1vcGFjaXR5PSIwLjA1IiBzdHJva2Utd2lkdGg9IjEiLz4KPC9zdmc+')] opacity-50"></div>
+                        
+                        <h4 class="text-[10px] text-term-blue font-mono uppercase tracking-widest mb-2 relative z-10">Calculated 1Y CDS Spread</h4>
+                        <div id="cds-spread-display" class="text-7xl font-display font-bold text-white mb-2 relative z-10 text-shadow">271 <span class="text-xl text-term-muted">bps</span></div>
+                        
+                        <div class="mt-8 relative z-10">
+                            <div class="text-[10px] text-term-muted font-mono mb-2">Spread Decomposition</div>
+                            <div class="w-full bg-black/50 h-4 rounded-full overflow-hidden flex border border-white/10">
+                                <!-- Visual representation of PD vs LGD impact -->
+                                <div id="cds-pd-bar" class="bg-term-red h-full" style="width: 50%"></div>
+                                <div id="cds-lgd-bar" class="bg-term-amber h-full" style="width: 50%"></div>
+                            </div>
+                            <div class="flex justify-between mt-1 text-[9px] font-mono text-slate-500">
+                                <span>PD Risk</span>
+                                <span>LGD Severity</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <script>
+        // --- Tab Management ---
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-pane').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('block'));
+            document.querySelectorAll('.tab-btn').forEach(el => {
+                el.classList.remove('active');
+                el.classList.add('text-term-muted');
+            });
+            
+            document.getElementById('tab-' + tabId).classList.remove('hidden');
+            document.getElementById('tab-' + tabId).classList.add('block');
+            document.getElementById('btn-' + tabId).classList.add('active');
+            document.getElementById('btn-' + tabId).classList.remove('text-term-muted');
+        }
+
+        // --- Chart.js Configuration ---
+        Chart.defaults.color = '#64748b';
+        Chart.defaults.font.family = "'Fira Code', monospace";
+        Chart.defaults.scale.grid.color = 'rgba(255,255,255,0.05)';
+
+        // Globals for charts
+        let pdGauge, shapChart, dcfChart;
+
+        // ==========================================
+        // DETERMINISTIC ML ENGINE (Client-Side JS)
+        // ==========================================
+
+        class CreditRiskEngine {
+            constructor() {
+                // Open Weights (Pre-trained parameters for Logistic Regression)
+                this.weights = {
+                    bias: -2.50,
+                    leverage: 0.85,    // High leverage increases risk
+                    icr: -0.45,        // High coverage decreases risk
+                    margin: -0.05      // High margin decreases risk
+                };
+                
+                // LGD Baseline
+                this.baseRecovery = 0.20; 
+            }
+
+            // Sigmoid activation function
+            sigmoid(z) {
+                return 1 / (1 + Math.exp(-z));
+            }
+
+            predictPD(leverage, icr, margin) {
+                // Calculate log-odds (z)
+                const z = this.weights.bias + 
+                         (this.weights.leverage * leverage) + 
+                         (this.weights.icr * icr) + 
+                         (this.weights.margin * margin);
+                
+                // Return Probability
+                const pd = this.sigmoid(z);
+                
+                // Calculate SHAP-like contributions for explainability
+                const contributions = {
+                    leverage: this.weights.leverage * leverage,
+                    icr: this.weights.icr * icr,
+                    margin: this.weights.margin * margin,
+                    bias: this.weights.bias
+                };
+
+                return { pd, z, contributions };
+            }
+
+            predictLGD(tangibilityPct) {
+                // Simple deterministic mapping
+                const recovery = this.baseRecovery + (tangibilityPct / 100) * 0.60; // Max recovery 80%
+                let lgd = 1 - recovery;
+                // Bound between 0 and 1
+                lgd = Math.max(0, Math.min(1, lgd));
+                return { lgd, recovery };
+            }
+        }
+
+        class DCFEngine {
+            calculate(fcf0, growthRate, terminalGrowth, wacc, netDebt) {
+                const g = growthRate / 100;
+                const tg = terminalGrowth / 100;
+                const r = wacc / 100;
+                
+                let cashFlows = [];
+                let presentValues = [];
+                let currentFCF = fcf0;
+                let pvSum = 0;
+
+                // 5 Year Stage 1
+                for(let t=1; t<=5; t++) {
+                    currentFCF = currentFCF * (1 + g);
+                    cashFlows.push(currentFCF);
+                    const pv = currentFCF / Math.pow(1 + r, t);
+                    presentValues.push(pv);
+                    pvSum += pv;
+                }
+
+                // Terminal Value
+                const terminalValue = (cashFlows[4] * (1 + tg)) / (r - tg);
+                const pvTerminal = terminalValue / Math.pow(1 + r, 5);
+                
+                const enterpriseValue = pvSum + pvTerminal;
+                const equityValue = enterpriseValue - netDebt;
+
+                return {
+                    cashFlows,
+                    presentValues,
+                    pvTerminal,
+                    enterpriseValue,
+                    equityValue
+                };
+            }
+        }
+
+        class CDSEngine {
+            calculate(pd, lgd, time = 1) {
+                // Hazard Rate assumption: PD = 1 - exp(-h * t) => h = -ln(1-PD)/t
+                const hazardRate = -Math.log(1 - pd) / time;
+                // Spread = h * LGD (simplified)
+                const spread = hazardRate * lgd;
+                // Convert to basis points
+                return spread * 10000;
+            }
+        }
+
+        // Instantiate Engines
+        const creditML = new CreditRiskEngine();
+        const dcfML = new DCFEngine();
+        const cdsML = new CDSEngine();
+
+        // --- STREAMING_CHUNK:Implementing UI Logic and Chart Updates... ---
+        
+        // --- Tab 1: Credit Risk Logic ---
+        function initCreditCharts() {
+            // PD Doughnut
+            const ctx1 = document.getElementById('pdGaugeChart').getContext('2d');
+            pdGauge = new Chart(ctx1, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Default Risk', 'Survival'],
+                    datasets: [{
+                        data: [5, 95],
+                        backgroundColor: ['#ff2a2a', '#1e2433'],
+                        borderWidth: 0,
+                        cutout: '80%'
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: false }, tooltip: {enabled: false} },
+                    animation: { duration: 500 }
+                }
+            });
+
+            // SHAP Bar Chart
+            const ctx2 = document.getElementById('shapChart').getContext('2d');
+            shapChart = new Chart(ctx2, {
+                type: 'bar',
+                data: {
+                    labels: ['Leverage', 'Coverage', 'Margin'],
+                    datasets: [{
+                        label: 'Log-Odds Contribution',
+                        data: [0, 0, 0],
+                        backgroundColor: [],
+                        borderRadius: 2
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    indexAxis: 'y', // Horizontal
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { grid: { color: 'rgba(255,255,255,0.05)' } },
+                        y: { grid: { display: false }, ticks: { color: '#cbd5e1' } }
+                    }
+                }
+            });
+        }
+
+        function runCreditInference() {
+            // 1. Get Inputs
+            const lev = parseFloat(document.getElementById('inp-leverage').value);
+            const icr = parseFloat(document.getElementById('inp-icr').value);
+            const marg = parseFloat(document.getElementById('inp-margin').value);
+            const tang = parseFloat(document.getElementById('inp-tangibility').value);
+
+            // Update Labels
+            document.getElementById('val-leverage').innerText = lev.toFixed(1) + 'x';
+            document.getElementById('val-icr').innerText = icr.toFixed(1) + 'x';
+            document.getElementById('val-margin').innerText = marg.toFixed(1) + '%';
+            document.getElementById('val-tangibility').innerText = tang.toFixed(0) + '%';
+
+            // 2. Run ML Inference
+            const pdResult = creditML.predictPD(lev, icr, marg);
+            const lgdResult = creditML.predictLGD(tang);
+
+            // 3. Update DOM PD/LGD
+            const pdPct = pdResult.pd * 100;
+            const lgdPct = lgdResult.lgd * 100;
+            const rrPct = lgdResult.recovery * 100;
+
+            document.getElementById('pd-display').innerText = pdPct.toFixed(2) + '%';
+            document.getElementById('lgd-display').innerText = lgdPct.toFixed(1) + '%';
+            document.getElementById('rr-display').innerText = rrPct.toFixed(1) + '%';
+
+            // Determine Rating heuristic
+            let rating = "AAA";
+            let rColor = "text-term-green";
+            if(pdPct > 0.1) { rating = "BBB"; rColor = "text-white"; }
+            if(pdPct > 1.0) { rating = "BB"; rColor = "text-term-amber"; }
+            if(pdPct > 5.0) { rating = "B-"; rColor = "text-term-red"; }
+            if(pdPct > 15.0) { rating = "CCC"; rColor = "text-term-red"; }
+            
+            const ratingDiv = document.getElementById('pd-rating');
+            ratingDiv.innerText = `IMPLIED RATING: ${rating}`;
+            ratingDiv.className = `mt-4 px-3 py-1 bg-black/50 border ${rColor.replace('text-', 'border-')}/30 ${rColor} text-xs font-bold rounded`;
+
+            // 4. Update Charts
+            if(pdGauge) {
+                pdGauge.data.datasets[0].data = [pdPct, 100 - pdPct];
+                pdGauge.data.datasets[0].backgroundColor[0] = pdPct > 5 ? '#ff2a2a' : (pdPct > 1 ? '#ffb300' : '#00e676');
+                pdGauge.update();
+            }
+
+            if(shapChart) {
+                const c = pdResult.contributions;
+                const data = [c.leverage, c.icr, c.margin];
+                shapChart.data.datasets[0].data = data;
+                shapChart.data.datasets[0].backgroundColor = data.map(v => v > 0 ? 'rgba(255, 42, 42, 0.7)' : 'rgba(0, 230, 118, 0.7)');
+                shapChart.update();
+            }
+
+            // 5. Update CDS Tab bridging data
+            runCDSInference(pdResult.pd, lgdResult.lgd);
+        }
+
+
+        // --- Tab 2: DCF Logic ---
+        function initDCFChart() {
+            const ctx = document.getElementById('dcfChart').getContext('2d');
+            dcfChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Year 1', 'Year 2', 'Year 3', 'Year 4', 'Year 5', 'Terminal'],
+                    datasets: [{
+                        label: 'Present Value ($M)',
+                        data: [],
+                        backgroundColor: 'rgba(0, 230, 118, 0.6)',
+                        borderColor: '#00e676',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+
+        function runDCFInference() {
+            const fcf = parseFloat(document.getElementById('inp-fcf').value) || 0;
+            const g1 = parseFloat(document.getElementById('inp-g1').value) || 0;
+            const tg = parseFloat(document.getElementById('inp-tg').value) || 0;
+            const wacc = parseFloat(document.getElementById('inp-wacc').value) || 0;
+            const netDebt = parseFloat(document.getElementById('inp-netdebt').value) || 0;
+
+            document.getElementById('val-wacc').innerText = wacc.toFixed(1) + '%';
+
+            // Catch invalid states (WACC <= Terminal Growth)
+            if(wacc <= tg) {
+                document.getElementById('ev-display').innerText = "ERROR";
+                document.getElementById('ev-display').classList.add('text-term-red');
+                return;
+            } else {
+                document.getElementById('ev-display').classList.remove('text-term-red');
+            }
+
+            const res = dcfML.calculate(fcf, g1, tg, wacc, netDebt);
+
+            // Update UI
+            document.getElementById('ev-display').innerText = '$' + res.enterpriseValue.toLocaleString(undefined, {maximumFractionDigits:0}) + 'M';
+            document.getElementById('eq-display').innerText = '$' + res.equityValue.toLocaleString(undefined, {maximumFractionDigits:0}) + 'M';
+
+            // Update Chart
+            if(dcfChart) {
+                const chartData = [...res.presentValues, res.pvTerminal];
+                dcfChart.data.datasets[0].data = chartData;
+                dcfChart.update();
+            }
+        }
+
+        // --- Tab 3: CDS Logic ---
+        function runCDSInference(pd, lgd) {
+            document.getElementById('cds-pd-in').innerText = (pd * 100).toFixed(2) + '%';
+            document.getElementById('cds-lgd-in').innerText = (lgd * 100).toFixed(1) + '%';
+
+            const spread = cdsML.calculate(pd, lgd);
+            
+            const spreadEl = document.getElementById('cds-spread-display');
+            spreadEl.innerHTML = Math.round(spread) + ' <span class="text-xl text-term-muted">bps</span>';
+
+            // Update visual decomposition bar (rough visual approximation)
+            // If PD is high, it drives more of the spread visual.
+            const pdWeight = Math.min(100, (pd * 100 * 2)); // scale up for visual
+            const lgdWeight = 100 - pdWeight;
+            
+            document.getElementById('cds-pd-bar').style.width = pdWeight + '%';
+            document.getElementById('cds-lgd-bar').style.width = lgdWeight + '%';
+        }
+
+        // --- Initialization ---
+        window.onload = () => {
+            initCreditCharts();
+            initDCFChart();
+            
+            // Run initial inferences to populate values
+            runCreditInference();
+            runDCFInference();
+        };
+
+    </script>
+</body>
+</html>
