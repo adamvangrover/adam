@@ -7,6 +7,7 @@ and W3C PROV-O compliant telemetry logging.
 
 import json
 import logging
+import functools
 from typing import Any, Dict, List, Optional
 from uuid import UUID, uuid4
 from datetime import datetime, timezone
@@ -21,6 +22,14 @@ from temporalio.client import Client
 # ---------------------------------------------------------------------------
 # Note: structlog should be configured at the application entry point, not here.
 logger = structlog.get_logger(__name__)
+
+
+@functools.lru_cache(maxsize=128)
+def _load_rule_from_disk(file_path: str) -> Dict[str, Any]:
+    """Caches loaded JSON rules to avoid repetitive disk I/O."""
+    with open(file_path, "r") as f:
+        return json.load(f)
+
 
 # ---------------------------------------------------------------------------
 # Domain Models
@@ -74,8 +83,8 @@ class AgentOrchestrator:
         Evaluates dynamic JSON logic rules before permitting agent execution.
         """
         try:
-            with open(f"{self.rules_path}/{rule_name}.json", "r") as f:
-                rule = json.load(f)
+            rule_path = f"{self.rules_path}/{rule_name}.json"
+            rule = _load_rule_from_disk(rule_path)
             result = jsonLogic(rule, payload)
             return bool(result)
         except FileNotFoundError:

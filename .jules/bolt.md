@@ -201,3 +201,7 @@
 ## 2024-11-21 - [Optimize Pandas DataFrame Iteration in Scanners]
 **Learning:** In `WhaleScanner.calculate_fund_sentiment`, iterating over filtered DataFrames using `.to_dict("records")` (e.g., `for row in accum.to_dict("records"):`) causes a massive memory allocation bottleneck by converting the entire DataFrame block into intermediate Python dictionary objects before iteration.
 **Action:** Always use `.itertuples()` instead of `.to_dict("records")` when looping over Pandas DataFrames. `.itertuples()` yields namedtuples directly, which avoids the memory allocation overhead and provides significant performance gains for iteration.
+
+## 2025-02-27 - [Optimize JSON Logic Rule Loading]
+**Learning:** Performing synchronous disk I/O (`open` and `json.load`) repeatedly within calculation or validation methods, such as `AgentOrchestrator._evaluate_preconditions`, creates a severe performance bottleneck during high-frequency rule evaluations across thousands of agent workflows.
+**Action:** Always extract the loading logic into a module-level cached function using `@functools.lru_cache` to bypass disk I/O entirely after the first read, resulting in significantly faster and more stable execution.
