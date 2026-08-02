@@ -1,149 +1,188 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADAM v26.0 :: STATIC SHOWCASE</title>
-    <link rel="stylesheet" href="showcase/css/style.css">
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <title>ADAM OS v30.2 | ROOT TERMINAL</title>
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['Fira Code', 'monospace'],
+                        display: ['Oswald', 'sans-serif'],
+                    },
+                    colors: {
+                        term: {
+                            bg: '#030712', surface: '#0f172a', card: '#1e293b', border: '#334155',
+                            cyan: '#06b6d4', blue: '#3b82f6', red: '#ef4444', amber: '#f59e0b', green: '#10b981',
+                            purple: '#8b5cf6', gold: '#fbbf24'
+                        }
+                    },
+                    backgroundImage: {
+                        'scanline': 'linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.1))'
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        .portal-card {
-            background: rgba(15, 23, 42, 0.6);
-            border: 1px solid var(--panel-border);
-            border-radius: 4px;
-            padding: 25px;
-            transition: all 0.3s ease;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            height: 100%;
-        }
-        .portal-card:hover {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 20px rgba(6, 182, 212, 0.2);
-            transform: translateY(-5px);
-        }
-        .portal-title {
-            font-family: var(--font-mono);
-            font-size: 1.2rem;
-            color: var(--primary-color);
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-        }
-        .portal-desc {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-            line-height: 1.6;
-            margin-bottom: 20px;
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;600&family=Inter:wght@300;400;600;800&family=Oswald:wght@500;700&display=swap');
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #030712; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+
+        body { font-size: 14px; background-color: #030712; color: #cbd5e1; }
+
+        .crt-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: var(--scanline); background-size: 100% 4px; z-index: 9999; pointer-events: none; opacity: 0.15; }
+
+        .glass-panel { background: rgba(15, 23, 42, 0.65); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5); transition: all 0.3s ease; }
+        .glass-panel:hover { border-color: rgba(6, 182, 212, 0.5); transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(6, 182, 212, 0.1); }
+
+        .glitch-text { text-shadow: 2px 0 #ef4444, -2px 0 #06b6d4; }
     </style>
 </head>
-<body>
-    <div class="scan-line"></div>
-    <div class="scan-glow"></div>
+<body class="h-screen overflow-hidden flex flex-col selection:bg-term-cyan selection:text-white">
+    <div class="crt-overlay"></div>
 
-    <header class="cyber-header" style="padding: 20px 40px; border-bottom: 1px solid var(--primary-color); background: rgba(5, 11, 20, 0.95);">
-        <div style="display: flex; justify-content: space-between; align-items: center; max-width: 1400px; margin: 0 auto;">
-            <div style="display: flex; align-items: center; gap: 20px;">
-                <h1 class="glitch-text" data-text="ADAM v26.0" style="font-size: 2.5rem; margin: 0; color: var(--primary-color); letter-spacing: 2px;">ADAM v26.0</h1>
-                <div style="border-left: 1px solid #333; padding-left: 20px; height: 40px; display: flex; flex-direction: column; justify-content: center;">
-                    <span class="mono" style="font-size: 0.9rem; color: var(--text-primary);">UNIFIED FINANCIAL INTELLIGENCE</span>
-                    <span class="mono" style="font-size: 0.7rem; color: var(--text-muted);">SYSTEM STATUS: ONLINE</span>
-                </div>
-            </div>
+    <!-- Header -->
+    <header class="h-20 border-b border-white/10 bg-term-bg/80 backdrop-blur-md flex items-center justify-between px-8 shrink-0 z-20 shadow-2xl relative">
+        <div class="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-term-cyan/50 to-transparent"></div>
+        <div class="flex items-center gap-6">
+            <div class="w-12 h-12 rounded bg-gradient-to-br from-term-surface to-term-card text-term-cyan font-bold font-display text-2xl flex items-center justify-center border border-term-cyan/30 shadow-[0_0_15px_rgba(6,182,212,0.2)]">A</div>
             <div>
-                <a href="https://github.com/adamvangrover/adam" target="_blank" class="cyber-btn">GITHUB REPOSITORY</a>
+                <h1 class="font-display font-bold text-white tracking-widest text-2xl uppercase glitch-text">ADAM OS v30.2</h1>
+                <p class="text-xs text-term-cyan font-mono tracking-widest uppercase mt-1">ROOT PROTOTYPE TERMINAL // SYSTEM ONLINE</p>
             </div>
+        </div>
+        <div class="flex items-center gap-4 md:gap-6 font-mono text-xs">
+            <div class="hidden md:flex items-center gap-2 text-term-green bg-white/5 px-3 py-1 rounded-full border border-term-green/30">
+                <div class="w-2 h-2 rounded-full bg-term-green animate-pulse"></div> ALL SYSTEMS NOMINAL
+            </div>
+            <div class="text-slate-400 bg-white/5 px-3 py-1 rounded border border-white/5">
+                <span id="sysClock">00:00:00 UTC</span>
+            </div>
+            <a href="https://github.com/adamvangrover/adam" target="_blank" class="bg-term-surface border border-term-border text-white hover:bg-term-card hover:border-term-cyan px-4 py-2 rounded font-bold transition-all duration-300">
+                GITHUB REPO
+            </a>
         </div>
     </header>
 
-    <div style="max-width: 1400px; margin: 0 auto; padding: 40px;">
+    <!-- Main Workspace -->
+    <main class="flex-1 overflow-y-auto bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-term-surface via-term-bg to-term-bg p-8 md:p-12 relative z-10">
+        <div class="max-w-6xl mx-auto">
 
-        <p style="font-size: 1.1rem; color: var(--text-primary); max-width: 800px; margin-bottom: 50px; line-height: 1.6;">
-            Select a module to explore:
-        </p>
-
-        <!-- Main Portals -->
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px; margin-bottom: 60px;">
-
-            <div class="portal-card" style="border-color: #ff3333;">
-                <div>
-                    <div class="portal-title" style="color: #ff3333;">
-                        <span style="font-size: 1.5rem; margin-right: 10px;">📉</span> Market Mayhem
-                    </div>
-                    <p class="portal-desc">
-                        Live Strategic Market Dashboard and Archives.
-                    </p>
-                </div>
-                <a href="showcase/market_mayhem_dashboard.html" class="cyber-btn" style="text-align: center; border-color: #ff3333; color: #ff3333;">OPEN DASHBOARD &rarr;</a>
+            <div class="mb-12 border-l-4 border-term-cyan pl-6">
+                <h2 class="text-2xl font-display font-bold text-white mb-2">PROTOTYPE DIRECTORY</h2>
+                <p class="text-slate-400 text-sm max-w-3xl leading-relaxed">
+                    Welcome to the root terminal. This interface serves as a centralized hub to browse active prototypes, test new UI/UX functionalities, and review human-in-the-loop system outputs. Legacy showcases remain accessible but new interactive modules are surfaced here.
+                </p>
             </div>
 
+            <!-- Dashboard Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
 
-            <!-- Neural Dashboard -->
-            <div class="portal-card" style="border-color: var(--accent-color);">
-                <div>
-                    <div class="portal-title" style="color: var(--accent-color);">
-                        <span style="font-size: 1.5rem; margin-right: 10px;">🚀</span> Neural Dashboard (Webapp)
+                <!-- Market Mayhem Terminal (NEW) -->
+                <a href="market_mayhem_terminal.html" class="block group">
+                    <div class="glass-panel p-6 rounded-xl h-full flex flex-col border-t-2 border-t-term-amber">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="w-12 h-12 rounded bg-term-amber/10 flex items-center justify-center text-2xl text-term-amber border border-term-amber/20 group-hover:bg-term-amber/20 transition-colors">📈</div>
+                            <span class="text-[10px] font-mono text-term-amber px-2 py-1 bg-term-amber/10 rounded uppercase">Active Prototype</span>
+                        </div>
+                        <h3 class="font-display text-xl font-bold text-white mb-2 group-hover:text-term-amber transition-colors">Market Mayhem Terminal</h3>
+                        <p class="text-sm text-slate-400 mb-6 flex-1">
+                            Consolidated interactive dashboard synthesizing daily briefs, vulnerability telemetry, and tactical defense playbooks into a unified UI.
+                        </p>
+                        <div class="text-xs font-mono text-term-amber font-bold uppercase tracking-widest flex items-center">
+                            Launch Terminal <span class="ml-2 transform group-hover:translate-x-1 transition-transform">→</span>
+                        </div>
                     </div>
-                    <p class="portal-desc">
-                        The interactive React application (Static Build).
-                    </p>
-                </div>
-                <a href="showcase/neural_dashboard.html" class="cyber-btn" style="text-align: center; border-color: var(--accent-color); color: var(--accent-color);">LAUNCH DASHBOARD &rarr;</a>
+                </a>
+
+                <!-- Neural Dashboard -->
+                <a href="showcase/neural_dashboard.html" class="block group">
+                    <div class="glass-panel p-6 rounded-xl h-full flex flex-col border-t-2 border-t-term-purple">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="w-12 h-12 rounded bg-term-purple/10 flex items-center justify-center text-2xl text-term-purple border border-term-purple/20 group-hover:bg-term-purple/20 transition-colors">🧠</div>
+                            <span class="text-[10px] font-mono text-term-purple px-2 py-1 bg-term-purple/10 rounded uppercase">Static Build</span>
+                        </div>
+                        <h3 class="font-display text-xl font-bold text-white mb-2 group-hover:text-term-purple transition-colors">Neural Dashboard</h3>
+                        <p class="text-sm text-slate-400 mb-6 flex-1">
+                            Interactive React-based application prototype demonstrating advanced visualization and state management.
+                        </p>
+                        <div class="text-xs font-mono text-term-purple font-bold uppercase tracking-widest flex items-center">
+                            Launch Dashboard <span class="ml-2 transform group-hover:translate-x-1 transition-transform">→</span>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Repo Codex -->
+                <a href="showcase/codex.html" class="block group">
+                    <div class="glass-panel p-6 rounded-xl h-full flex flex-col border-t-2 border-t-term-cyan">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="w-12 h-12 rounded bg-term-cyan/10 flex items-center justify-center text-2xl text-term-cyan border border-term-cyan/20 group-hover:bg-term-cyan/20 transition-colors">📂</div>
+                        </div>
+                        <h3 class="font-display text-xl font-bold text-white mb-2 group-hover:text-term-cyan transition-colors">Repository Browser</h3>
+                        <p class="text-sm text-slate-400 mb-6 flex-1">
+                            Interactive codex to browse the entire ADAM OS codebase, internal documentation, and architectural blueprints.
+                        </p>
+                        <div class="text-xs font-mono text-term-cyan font-bold uppercase tracking-widest flex items-center">
+                            Browse Repo <span class="ml-2 transform group-hover:translate-x-1 transition-transform">→</span>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- System Map -->
+                <a href="showcase/comprehensive_index.html" class="block group">
+                    <div class="glass-panel p-6 rounded-xl h-full flex flex-col border-t-2 border-t-slate-500">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="w-12 h-12 rounded bg-slate-800 flex items-center justify-center text-2xl text-slate-400 border border-slate-700 group-hover:bg-slate-700 transition-colors">🗺️</div>
+                        </div>
+                        <h3 class="font-display text-xl font-bold text-white mb-2 group-hover:text-slate-300 transition-colors">System Map</h3>
+                        <p class="text-sm text-slate-400 mb-6 flex-1">
+                            Complete index of all HTML artifacts, legacy reports, and raw outputs generated across the repository.
+                        </p>
+                        <div class="text-xs font-mono text-slate-400 font-bold uppercase tracking-widest flex items-center">
+                            View Map <span class="ml-2 transform group-hover:translate-x-1 transition-transform">→</span>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Legacy Showcase -->
+                <a href="showcase/index.html" class="block group">
+                    <div class="glass-panel p-6 rounded-xl h-full flex flex-col border-t-2 border-t-slate-500">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="w-12 h-12 rounded bg-slate-800 flex items-center justify-center text-2xl text-slate-400 border border-slate-700 group-hover:bg-slate-700 transition-colors">🎨</div>
+                        </div>
+                        <h3 class="font-display text-xl font-bold text-white mb-2 group-hover:text-slate-300 transition-colors">Legacy Showcase</h3>
+                        <p class="text-sm text-slate-400 mb-6 flex-1">
+                            The original static HTML reports, historical demos, and deprecated UI mockups.
+                        </p>
+                        <div class="text-xs font-mono text-slate-400 font-bold uppercase tracking-widest flex items-center">
+                            View Legacy <span class="ml-2 transform group-hover:translate-x-1 transition-transform">→</span>
+                        </div>
+                    </div>
+                </a>
             </div>
 
-            <!-- Repository Browser -->
-            <div class="portal-card">
-                <div>
-                    <div class="portal-title">
-                        <span style="font-size: 1.5rem; margin-right: 10px;">📂</span> Repository Browser
-                    </div>
-                    <p class="portal-desc">
-                        Browse the entire codebase and documentation.
-                    </p>
-                </div>
-                <a href="showcase/codex.html" class="cyber-btn" style="text-align: center;">BROWSE REPO &rarr;</a>
-            </div>
-
-             <!-- System Map -->
-             <div class="portal-card">
-                <div>
-                    <div class="portal-title">
-                        <span style="font-size: 1.5rem; margin-right: 10px;">🗺️</span> System Map (All Files)
-                    </div>
-                    <p class="portal-desc">
-                        Complete index of all HTML artifacts in the repository.
-                    </p>
-                </div>
-                <a href="showcase/comprehensive_index.html" class="cyber-btn" style="text-align: center;">VIEW FULL MAP &rarr;</a>
-            </div>
-
-            <!-- Legacy Showcase -->
-            <div class="portal-card">
-                <div>
-                    <div class="portal-title">
-                        <span style="font-size: 1.5rem; margin-right: 10px;">🎨</span> Legacy Showcase
-                    </div>
-                    <p class="portal-desc">
-                        Original static HTML reports and demos.
-                    </p>
-                </div>
-                <a href="showcase/index.html" class="cyber-btn" style="text-align: center;">VIEW LEGACY &rarr;</a>
+            <div class="text-center pb-12">
+                <p class="text-[10px] text-slate-600 font-mono uppercase tracking-widest">
+                    ADAM OS SYSTEM ARCHITECTURE // END OF DIRECTORY
+                </p>
             </div>
 
         </div>
-
-    </div>
-
-    <footer style="border-top: 1px solid var(--panel-border); padding: 40px; text-align: center; color: var(--text-muted); font-size: 0.8rem; margin-top: 60px;">
-        ADAM v26.0 | SYSTEM ROOT ACCESS
-    </footer>
+    </main>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-           console.log("System Online");
-        });
+        // Clock Update
+        setInterval(() => {
+            document.getElementById('sysClock').innerText = new Date().toISOString().substring(11, 19) + ' UTC';
+        }, 1000);
     </script>
 </body>
 </html>
