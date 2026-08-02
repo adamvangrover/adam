@@ -250,3 +250,6 @@ To prevent "Graph Spaghetti" and circular dependencies, follow these rules:
   }
   ```
 * **Procedural Rules:** Use just-in-time (JIT) memory fetching via Qdrant/Memory layers to isolate state. Do not pack the context window.
+
+## AFOS Architecture Upgrade
+- The repository is transitioning to the Adam Financial Operating System. Please refer to `adam_os/AFOS_LLM_CONTEXT.md` for the mandatory new paradigms.
