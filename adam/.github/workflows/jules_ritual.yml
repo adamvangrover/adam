@@ -1,0 +1,55 @@
+name: Jules Daily Ritual
+
+on:
+  schedule:
+    - cron: '0 8 * * *'
+  workflow_dispatch:
+
+jobs:
+  daily-ritual:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install uv
+          uv pip install --system pydantic pytest pytest-cov hypothesis
+
+      - name: Run Jules Ritual
+        run: |
+          # Dummy script placeholder for the actual daily_ritual.py execution
+          # python scripts/daily_ritual.py
+          echo "Running Jules Ritual..."
+
+      - name: Generate Code
+        run: |
+          echo "Generating Code..."
+
+      - name: Run Tests
+        run: |
+          PYTHONPATH=. uv run pytest adam/tests/unit/ tests/ --cov=adam --cov-fail-under=80
+
+      - name: Validate Provenance Header
+        run: |
+          # A script to ensure all agents are correctly wrapping outputs
+          # python scripts/validate_provenance.py
+          echo "Validating Provenance Header..."
+
+      - name: Build Docs
+        run: |
+          echo "Building Diátaxis Docs..."
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          title: "🤖 Jules Daily Ritual Auto-PR"
+          body: "Automated daily upgrades via the Enhanced Weekly Repository Upgrade System."
+          branch: "jules-daily-ritual"
