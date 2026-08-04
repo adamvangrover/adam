@@ -1,10 +1,4 @@
-Here is the updated and fully refactored `README.md` for **Adam v30.1**.
 
-I have scrubbed all legacy v2.0/v26.0 references, completely replaced the architecture diagram with the new Streamlit/Temporal/Qdrant paradigm, updated the directory tree, and removed the human-centric role designations from the roadmap to align with the `ARCHITECT_INFINITE` protocols.
-
----
-
-```markdown
 <div align="center">
   <a href="https://adamvangrover.github.io/adam/">
     <picture>
