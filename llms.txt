@@ -1,3 +1,213 @@
+Here is the fully synthesized, deduplicated, and updated `llms.txt` file, upgraded entirely to the v30.1 architecture standards. All conflicting legacy (v26.0) references have been removed to ensure any LLM reading this repository context gets a single, deterministic source of truth.
+
+```markdown
+# AFOS: Project Context for LLMs
+
+## System Intent
+Adam Financial Operating System (AFOS) is an institutional-grade, multi-agent financial sovereign architected for Leveraged Finance, private credit origination (underwriting), and continuous portfolio surveillance. 
+
+Designed specifically for Tier 1 Global Systemically Important Bank (G-SIB) frameworks, AFOS provides calculated conviction for high-stakes capital allocation within the Technology, Media, and Telecommunications (TMT) and leveraged loan sectors.
+
+**Latest Architecture:** v30.1 (Decoupled Streamlit Frontend & Asynchronous Python Backend)
+**License:** MIT
+**Documentation:** `docs/getting_started.md`
+**Mandatory Paradigm Context:** `adam_os/AFOS_LLM_CONTEXT.md`
+
+### The Core Problem & Solution
+Standard LLMs hallucinate, lack deterministic execution, and fail the rigor required for institutional financial due diligence. AFOS solves this by implementing a bifurcated cognitive architecture. The framework "thinks before it speaks," relying on a Neuro-Symbolic Planner to draft, critique, and refine credit analysis, while a decentralized async swarm monitors real-time market telemetry.
+
+Human-centric role designations are entirely abstracted. System state, underwriting decisions, and portfolio monitoring are exclusively driven by automated agents (e.g., Underwriter, Surveillance, Sentinel, Jules) operating under strict W3C PROV-O telemetry standards.
+
+---
+
+## 1. Cognitive Architecture
+
+* **MetaOrchestrator (Nexus Agent):** The central nervous system and workflow runtime. It analyzes query complexity, dispatches parallel tasks via Temporal workflows, and manages just-in-time (JIT) memory checkpointing.
+* **System 1 (Neural Swarm / HiveMind):** Asynchronous, parallelized "fire-and-forget" agents. Used for real-time perception, anomaly detection, and tracking short-term deal premium volatility skews. (The "Fast" Path).
+* **System 2 (Neuro-Symbolic Graph / Planner):** Stateful, directed acyclic graphs (DAGs) for complex reasoning, multi-step underwriting, capital structure modeling, and logical consistency. (The "Slow" Path).
+* **Ingestion Engine:** A tiered, scalable data pipeline supporting in-memory JSON (10MB), persistent databases (1GB), and massive distributed corpora (100GB+) via semantic vector search (Qdrant).
+
+---
+
+## 2. Institutional Safety & Governance
+
+AFOS employs rigorous safety guardrails to ensure zero-hallucination, deterministic execution:
+
+* **Governance Middleware:** All operations pass through `adam_os/contexts/governance/engine.py`, enforcing IP blacklists, real-entity verification, and high-risk operation blocks.
+* **jsonLogic Rules Engine:** Business logic (covenants, financial thresholds) MUST be evaluated deterministically via `jsonLogic` in `adam_os/contexts/governance/rules.jsonLogic`. Never hardcode domain math in Python.
+* **Break Glass Protocol:** Emergency overrides require a signed `X-Governance-Override` header with an HMAC-SHA256 signature.
+* **Secure Deserialization:** `core.security.safe_unpickler` is mandated to prevent pickle-based RCE vulnerabilities.
+* **PROV-O Telemetry:** All state mutations MUST be logged using W3C PROV-O standards via the internal `structlog` configuration.
+
+---
+
+## 3. Structured Output Artifacts
+
+The primary output of a System 2 deep dive is the **HyperDimensionalKnowledgeGraph** (HDKG).
+
+*Note: In credit risk assessments, the Probability of Default (PD) is structurally implied by the generated risk rating and is deliberately omitted as a standalone metric to prevent redundancy.*
+
+```json
+{
+  "v30_knowledge_graph": {
+    "nodes": {
+      "credit_underwriting": {
+        "valuation_engine": {
+          "ev_abstraction_model": { "intrinsic_value_estimate": 150.0 },
+          "leverage_metrics": { "fccr": 1.25, "debt_to_ebitda": 4.5 }
+        }
+      },
+      "strategic_synthesis": {
+        "final_verdict": {
+          "implied_facility_rating": "BB-",
+          "conviction_level": 8
+        }
+      }
+    }
+  }
+}
+
+```
+
+---
+
+## 4. Usage Examples (Few-Shot Prompts)
+
+### Example 1: Basic Initialization & Automated Routing
+
+Initialize the orchestrator and run a simple market query. The system automatically routes to System 1 or 2 based on complexity.
+
+```python
+import asyncio
+from core.engine.meta_orchestrator import MetaOrchestrator
+
+async def main():
+    orchestrator = MetaOrchestrator()
+    try:
+        result = await orchestrator.route_request("Extract the current EV for MSFT.")
+        print(result)
+    except Exception as e:
+        print(f"Orchestration Error: {e}")
+
+if __name__ == "__main__":
+    asyncio.run(main())
+
+```
+
+### Example 2: Triggering a Deep Dive
+
+The "Deep Dive" keyword triggers the System 2 Planner. Context dictionaries inject specific parameters like JIT memory isolation.
+
+```python
+import asyncio
+from core.engine.meta_orchestrator import MetaOrchestrator
+
+async def main():
+    orchestrator = MetaOrchestrator()
+    
+    # Context forces reflective graph execution
+    context = {"force_reflection": True, "target_sector": "TMT"}
+    result = await orchestrator.route_request(
+        "Perform a deep dive credit analysis on SNOW.", 
+        context=context
+    )
+    print(result)
+
+if __name__ == "__main__":
+    asyncio.run(main())
+
+```
+
+### Example 3: Advanced Swarm Control
+
+Directly interface with the `HiveMind` for high-throughput, parallelized surveillance tasks.
+
+```python
+import asyncio
+from core.engine.swarm.hive_mind import HiveMind
+
+async def main():
+    # Initialize 10 parallel asynchronous workers
+    swarm = HiveMind(worker_count=10)
+    await swarm.initialize()
+
+    # Dispatch a parallel scanning task for deal premium volatility
+    task_payload = {"target": "SEER", "depth": "comprehensive", "metric": "deal_premium"}
+    await swarm.disperse_task("SCAN_TELEMETRY", task_payload, intensity=8.0)
+
+    # Gather results deterministically 
+    results = await swarm.gather_results()
+    print(results)
+
+    await swarm.shutdown()
+
+if __name__ == "__main__":
+    asyncio.run(main())
+
+```
+
+### Example 4: Scalable Data Ingestion
+
+```python
+from core.data_processing.ingestion_engine import IngestionEngine
+
+# Auto-detects strategy based on data size (In-Memory vs. Persistent Vector)
+engine = IngestionEngine(mode="auto")
+
+# Automatically chunks and embeds large SEC filing text corpora
+result_large = engine.ingest("data/raw/sec_filings_ttm.txt")
+print(f"Persistent Ingestion: {result_large}")
+
+```
+
+---
+
+## 5. API Reference & Routing Keywords
+
+The `MetaOrchestrator` uses keyword heuristics to dispatch the correct agent blueprints. Include these in the query string:
+
+* **DEEP_DIVE**: "valuation", "full analysis", "deep dive", "underwrite" -> *Routes to Underwriting Agent*
+* **SWARM**: "swarm", "scan", "parallel", "hive" -> *Routes to Async Swarm*
+* **RED_TEAM**: "attack", "red team", "vulnerability", "stress test"
+* **CRISIS**: "crisis", "shock", "black swan"
+* **ESG / COMPLIANCE**: "sustainability", "kyc", "regulation"
+* **SURVEILLANCE**: "watch", "zombie", "surveillance", "monitor" -> *Routes to Surveillance Agent*
+
+---
+
+## 6. Developer Guidelines & Normalization Rules
+
+* **Modularity:** Maintain strict environmental bifurcation between `frontend/` (Streamlit presentation logic) and `src/backend/` (Python async execution). Lab code (`experimental/`) must never be imported into Product modules.
+* **Temporal Strictness:** NEVER use non-deterministic functions like `datetime.now()`, `time.time()`, or `uuid.uuid4()` inside `src/backend/temporal/workflows/`. You must use Temporal's deterministic equivalents to prevent workflow replay failures.
+* **Entity Grounding:** Never hallucinate API implementations or generic corporate entities. Test data must be real and actionable.
+* **JIT Memory:** Agents MUST read memory state via "just-in-time" semantic retrieval rather than packing the LLM context window.
+
+### Canonical Repository Locations
+
+* **Agent Blueprints:** `AGENTS.md` (Agents MUST parse this to identify operational boundaries)
+* **Core Orchestration:** `src/backend/orchestration/agent_runtime.py`
+* **Temporal Workflows:** `adam_os/contexts/workflows/`
+* **Core Event Ledger:** `adam_os/core/events.py`
+* **Domain Models (Pydantic):** `src/shared/models/`
+* **Architecture Decision Records (ADRs):** `docs/adr/`
+
+---
+
+## 7. Installation
+
+```bash
+git clone [https://github.com/adamvangrover/adam.git](https://github.com/adamvangrover/adam.git)
+cd adam
+curl -LsSf [https://astral.sh/uv/install.sh](https://astral.sh/uv/install.sh) | sh
+uv sync
+source .venv/bin/activate
+
+```
+
+```
+
+```
+
 # ADAM Financial Operating System (AFOS)
 
 ## System Intent
