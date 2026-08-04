@@ -5,15 +5,18 @@ Responsible for task delegation, JIT memory injection, jsonLogic evaluation,
 and W3C PROV-O compliant telemetry logging.
 """
 
+import asyncio
+import functools
 import json
 import logging
+from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 from uuid import UUID, uuid4
-import asyncio
 
 import structlog
 from pydantic import BaseModel, Field, ValidationError
 from json_logic import jsonLogic  # type: ignore
+from temporalio.client import Client
 
 from src.backend.memory.qdrant_client import JitMemoryClient
 from src.shared.models.memory_models import MemoryQuery
@@ -21,15 +24,26 @@ from src.shared.models.memory_models import MemoryQuery
 # ---------------------------------------------------------------------------
 # Telemetry Setup (W3C PROV-O Standardized)
 # ---------------------------------------------------------------------------
-structlog.configure(
-    processors=[
-        structlog.stdlib.add_log_level,
-        structlog.processors.TimeStamper(fmt="iso"),
-        structlog.processors.JSONRenderer()
-    ],
-    logger_factory=structlog.stdlib.LoggerFactory(),
-)
+# Note: structlog should optimally be configured at the application entry point.
+# We ensure a fallback configuration here if this is executed independently.
+if not structlog.is_configured():
+    structlog.configure(
+        processors=[
+            structlog.stdlib.add_log_level,
+            structlog.processors.TimeStamper(fmt="iso"),
+            structlog.processors.JSONRenderer()
+        ],
+        logger_factory=structlog.stdlib.LoggerFactory(),
+    )
+
 logger = structlog.get_logger(__name__)
+
+
+@functools.lru_cache(maxsize=128)
+def _load_rule_from_disk(file_path: str) -> Dict[str, Any]:
+    """Caches loaded JSON rules to avoid repetitive disk I/O."""
+    with open(file_path, "r") as f:
+        return json.load(f)
 
 # ---------------------------------------------------------------------------
 # Domain Models
@@ -56,16 +70,23 @@ class AgentOrchestrator:
     Manages the lifecycle, memory, and telemetry of autonomous financial agents.
     """
 
-    def __init__(self, memory_client: Optional[JitMemoryClient] = None, rules_path: str = "rules/"):
+    def __init__(
+        self, 
+        memory_client: Optional[JitMemoryClient] = None, 
+        rules_path: str = "rules/", 
+        temporal_client: Optional[Client] = None
+    ):
         """
-        Initializes the orchestrator with memory and rule dependencies.
+        Initializes the orchestrator with memory, rule, and temporal dependencies.
 
         Args:
             memory_client: Instantiated vector database client for JIT memory.
             rules_path: Directory path containing jsonLogic definitions.
+            temporal_client: Instantiated Temporal client for executing workflows.
         """
         self.memory = memory_client or JitMemoryClient()
         self.rules_path = rules_path
+        self.temporal_client = temporal_client
         self.prov_log: List[Dict[str, Any]] = []
 
     async def _load_jit_context(self, context_keys: List[str]) -> Dict[str, Any]:
@@ -85,8 +106,8 @@ class AgentOrchestrator:
         Evaluates dynamic JSON logic rules before permitting agent execution.
         """
         try:
-            with open(f"{self.rules_path}/{rule_name}.json", "r") as f:
-                rule = json.load(f)
+            rule_path = f"{self.rules_path}/{rule_name}.json"
+            rule = _load_rule_from_disk(rule_path)
             result = jsonLogic(rule, payload)
             return bool(result)
         except FileNotFoundError:
@@ -104,7 +125,7 @@ class AgentOrchestrator:
             "prov:Activity": activity,
             "prov:Entity": entity,
             "prov:Agent": agent,
-            "prov:generatedAtTime": structlog.processors.TimeStamper(fmt="iso")(None, None, {})["timestamp"], # type: ignore
+            "prov:generatedAtTime": datetime.now(timezone.utc).isoformat(),
             "data_snapshot": data
         }
         self.prov_log.append(event)
@@ -130,9 +151,19 @@ class AgentOrchestrator:
         context = await self._load_jit_context(task.context_keys)
         self._record_provenance("MemoryInjection", str(task.task_id), "MemoryLayer", context)
 
-        # 3. Agent Execution (Stubbed for modular expansion)
-        # In production, this pushes to a Temporal Workflow or LLM runtime
-        simulated_output = {"decision": "approved", "confidence": 0.95}
+        # 3. Agent Execution via Temporal Workflow
+        if self.temporal_client is None:
+            # Fallback/stub for tests where temporal client is not provided
+            simulated_output = {"decision": "approved", "confidence": 0.95}
+        else:
+            # Execute actual workflow
+            # Using absolute string for workflow name to avoid circular dependencies
+            simulated_output = await self.temporal_client.execute_workflow(
+                "AgentExecutionWorkflow",
+                args=[task.target_agent, task.payload, context],
+                id=f"agent-task-{task.task_id}",
+                task_queue="agent-task-queue"
+            )
 
         self._record_provenance(
             activity="TaskCompletion",

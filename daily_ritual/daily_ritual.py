@@ -1,11 +1,26 @@
 import os
 import re
 import datetime
+from datetime import timezone
 import subprocess
 from openai import OpenAI
 
-# Master prompt from the instructions
-MASTER_PROMPT = """### SYSTEM OVERRIDE: PROTOCOL ARCHITECT_INFINITE
+def get_master_prompt() -> str:
+    current_day = datetime.datetime.now(timezone.utc).strftime("%A")
+
+    daily_tasks = {
+        "Monday": "The Pruning (Deterministic Integrity)\n*Goal: Remove bloat and non-deterministic \"ghost\" logic to simplify the context window.*\n\n> \"Analyze this code. Remove all dead code, unused imports, and legacy logic that obfuscates the data flow. Specifically, identify any 'black box' logic that lacks clear input/output types and simplify it. Return the cleaned code and a summary of what was removed to reduce cognitive load on the system.\"",
+        "Tuesday": "The Refactor (Architecture & Modularity)\n*Goal: Decouple data ingestion from logic to facilitate horizontal/vertical scalability.*\n\n> \"Refactor this module into a clean, reusable architecture. Abstract logic into modular components, prioritizing the separation of raw data ingestion and model-based processing. Apply structural patterns that ensure this module can be independently tested and easily integrated into the broader Adam framework.\"",
+        "Wednesday": "The PDIL Optimizer (Performance & Safety)\n*Goal: Audit the probabilistic-to-deterministic transition.*\n\n> \"Audit this code for bottlenecks and potential 'stochastic drift'—where model output might violate system invariants. Implement strict schema validation (e.g., Pydantic) to secure the PDIL bridge. Optimize performance for high-throughput and ensure robust error handling that maintains state consistency.\"",
+        "Thursday": "The Modernizer (Syntactic & Type Safety)\n*Goal: Upgrade to the latest idioms and ensure rigid type checking.*\n\n> \"Modernize this codebase to align with the latest language standards (e.g., Python 3.12+ features, strict typing, async patterns). Replace any anti-patterns that hinder static analysis or AI-readability. Ensure that all type hints are explicit, supporting high-assurance engineering.\"",
+        "Friday": "The Innovator (Agentic Enhancement)\n*Goal: Inject autonomous logic that adheres to the established framework.*\n\n> \"Analyze this code's core utility. Propose 3 high-value enhancements (e.g., autonomous self-healing, recursive RAG pipelines, or smarter parsing). Implement the most high-value feature, ensuring it includes a 'ProvenanceHeader' to maintain W3C PROV-O compliance and trace decision-making.\"",
+        "Saturday": "The Documenter (Context-First Documentation)\n*Goal: Make the code 'AI-native' for future context windows.*\n\n> \"Read through this updated code. Generate high-density docstrings that prioritize **Provenance Metadata** (Input/Output schemas, intended state, and derivation paths). Create an 'Architecture & Usage' snippet for the README that allows another AI to fully reconstruct the module's behavior from its documentation.\"",
+        "Sunday": "The Validator (Deterministic Test Suite)\n*Goal: Secure the PDIL bridge with property-based testing.*\n\n> \"Generate a comprehensive test suite using a modern framework (e.g., `pytest` with `hypothesis`). Focus on property-based testing to stress-test the probabilistic inputs against deterministic boundaries. Ensure all external calls are mocked and that failure states explicitly log the provenance of the erroneous input.\""
+    }
+
+    task_description = daily_tasks.get(current_day, daily_tasks["Monday"])
+
+    return f"""### SYSTEM OVERRIDE: PROTOCOL ARCHITECT_INFINITE
 **Target:** Repository `adam` (Financial AI & Agentic OS)
 **Agent:** Jules (Chief Architect & Lead Engineer)
 **Frequency:** Daily Recursive Cycle
@@ -15,6 +30,13 @@ MASTER_PROMPT = """### SYSTEM OVERRIDE: PROTOCOL ARCHITECT_INFINITE
 
 ### MISSION OBJECTIVE
 You are responsible for the daily biological growth of this repository. You must review the existing codebase, identify "white space" (missing features, gaps in logic, unoptimized paths), and fill it with high-quality, executable code.
+
+### PDIL AND W3C PROV-O INTEGRATION
+Every upgrade must be aligned with the Adam architecture.
+- Ensure that the Probabilistic-to-Deterministic Integration Layer (PDIL) is secure and well-defined.
+- All additions must maintain W3C PROV-O compliance, tracing decision-making via `ProvenanceHeader` and structured logging.
+
+### TODAY'S TASK: {current_day} - {task_description}
 
 ### EXECUTION PHASE 1: THE AUDIT (Internal Scan)
 * **Vector Analysis:** Scan `src/agents`, `src/tools`, and `notebooks`. Identify the "weakest link"—a module that is brittle, under-tested, or hard-coded.
@@ -27,20 +49,8 @@ You are responsible for the daily biological growth of this repository. You must
 * **Synthesis:** Select ONE external concept that acts as a "Force Multiplier" for the current repo.
 
 ### EXECUTION PHASE 3: THE BUILD (Additive Manufacturing)
-Based on Phase 1 & 2, generate **ONE** of the following strictly additive artifacts. *Choose the category that yields the highest ROI today.*
-
-**OPTION A: THE NEW ORGAN (New Feature)**
-* Draft a complete new Python module (e.g., `src/agents/crypto_arbitrage.py`).
-* Must include: Class definition, Pydantic models for I/O, and a standardized "execute()" method.
-* **Rule:** It must integrate with at least one existing agent.
-
-**OPTION B: THE NEURAL PATHWAY (Integration/Refactor)**
-* Write a "Bridge Script" that connects two previously isolated components (e.g., "Connect `MarketMayhem` newsletter generator to `GitHub` repo stats to correlate coding activity with stock prices").
-* **Rule:** Do not delete the old code; create a `v2` wrapper or a new `Orchestrator` class.
-
-**OPTION C: THE CORTEX EXPANSION (Test & Doc)**
-* Write a "Stress Test" scenario (e.g., `tests/simulation_market_crash.py`) that feeds garbage/panic data to the agents to see if they hallucinate.
-* **Rule:** The test must be self-contained and runnable via `pytest`.
+Based on Phase 1 & 2 and Today's Task, generate **ONE** strictly additive artifact.
+* Focus on reusability. If you find yourself writing a new function, check if it can be elevated to the `core_types.py` level for horizontal use.
 
 ### EXECUTION PHASE 4: THE MEMORY (Documentation)
 * Update `CHANGELOG.md` with a "Jules' Log" entry explaining *why* this addition matters.
@@ -53,6 +63,9 @@ Return the result as a single, copy-pasteable Artifact:
 
 **1. JULES' RATIONALE:**
 > "I noticed we lack X. I researched Y. I have built Z to bridge this gap."
+
+**1.5. OBSERVED DRIFT:**
+> "[Explicitly state if the refactor changes the module's behavior significantly, flagging it for manual review to ensure collective determinism is not compromised.]"
 
 **2. FILE: path/to/new_file.py**
 ```python
@@ -96,8 +109,10 @@ def call_llm(context_str: str) -> str:
     import litellm
     import os
 
+    master_prompt = get_master_prompt()
+
     messages = [
-        {"role": "system", "content": MASTER_PROMPT},
+        {"role": "system", "content": master_prompt},
         {"role": "user", "content": context_str}
     ]
 
@@ -131,6 +146,9 @@ def call_llm(context_str: str) -> str:
     date_str = datetime.datetime.now().strftime("%Y-%b-%d").lower()
     return f"""**1. JULES' RATIONALE:**
 > "I noticed we lack a structured way to monitor yield farming opportunities across decentralized finance protocols. I researched autonomous yield optimization patterns. I have built YieldFarmingAgent to bridge this gap, integrating with the existing RiskAssessmentAgent to ensure safe capital allocation."
+
+**1.5. OBSERVED DRIFT:**
+> "No drift observed. The changes are purely additive and maintain the deterministic integrity of the system."
 
 **2. FILE: core/agents/yield_farming_agent.py**
 ```python
@@ -225,8 +243,12 @@ def parse_and_apply_expansion(response_text: str):
     print("Parsing LLM response...")
 
     # 1. Extract Rationale
-    rationale_match = re.search(r"\*\*1\. JULES' RATIONALE:\*\*\s*>(.*?)(?=\*\*2\. FILE:|\Z)", response_text, re.DOTALL | re.IGNORECASE)
+    rationale_match = re.search(r"\*\*1\. JULES' RATIONALE:\*\*\s*>(.*?)(?=\*\*1\.5\. OBSERVED DRIFT:|\*\*2\. FILE:|\Z)", response_text, re.DOTALL | re.IGNORECASE)
     rationale = rationale_match.group(1).strip() if rationale_match else "No rationale provided."
+
+    # 1.5. Extract Observed Drift
+    drift_match = re.search(r"\*\*1\.5\. OBSERVED DRIFT:\*\*\s*>(.*?)(?=\*\*2\. FILE:|\Z)", response_text, re.DOTALL | re.IGNORECASE)
+    drift = drift_match.group(1).strip() if drift_match else "No drift observed."
 
     # 2. Extract Files
     file_matches = re.finditer(r"\*\*(?:\d\.)?\s*FILE:\s*([^*]+)\*\*\s*```(?:python)?\n(.*?)\n```", response_text, re.DOTALL | re.IGNORECASE)
@@ -256,14 +278,16 @@ def parse_and_apply_expansion(response_text: str):
     commit_match = re.search(r"\*\*(?:\d\.)?\s*GIT COMMIT MESSAGE:\*\*\s*>(.*?)(?=\Z)", response_text, re.DOTALL | re.IGNORECASE)
     commit_msg = commit_match.group(1).strip().strip('"') if commit_match else "feat(jules): implemented new architect expansion"
 
-    return rationale, added_files, commit_msg
+    return rationale, drift, added_files, commit_msg
 
-def update_changelog(rationale: str, added_files: list):
+def update_changelog(rationale: str, drift: str, added_files: list):
     date_str = datetime.datetime.now().strftime("%Y-%b-%d").lower()
 
     new_entry = f"## [{date_str}] - Protocol ARCHITECT_INFINITE Expansion\n\n"
     new_entry += "### Jules' Log\n"
     new_entry += f"> {rationale}\n\n"
+    new_entry += "### Observed Drift\n"
+    new_entry += f"> {drift}\n\n"
     new_entry += "### Added\n"
     for file in added_files:
         new_entry += f"- Created/Updated `{file}`\n"
@@ -324,10 +348,10 @@ def main():
     response_text = call_llm(context_str)
 
     # 3. Apply changes
-    rationale, added_files, commit_msg = parse_and_apply_expansion(response_text)
+    rationale, drift, added_files, commit_msg = parse_and_apply_expansion(response_text)
 
     # 4. Update memory/docs
-    update_changelog(rationale, added_files)
+    update_changelog(rationale, drift, added_files)
 
     # 5. Git operations
     create_branch_and_commit(commit_msg, added_files)

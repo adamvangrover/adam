@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;600&family=Inter:wght@300;400;600;800&family=Oswald:wght@500;700&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #030712; color: #cbd5e1; }
+        .terminal-font { font-family: 'Fira Code', monospace; }
+        .display-font { font-family: 'Oswald', sans-serif; }
+        .tab-btn { transition: all 0.2s; border-bottom: 2px solid transparent; }
+        .tab-btn.active { border-bottom-color: #ef4444; color: #ef4444; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .glass-panel { background: rgba(15, 23, 42, 0.65); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); }
+        .crt-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06)); background-size: 100% 2px, 3px 100%; z-index: 9999; pointer-events: none; opacity: 0.15; }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+    <div class="crt-overlay"></div>
+
+    <!-- Ticker Tape -->
+    <div class="border-b border-red-500/30 bg-red-500/5 h-6 overflow-hidden flex items-center relative z-20 shrink-0">
+        <div class="absolute left-0 top-0 h-full bg-[#030712] z-10 px-2 flex items-center border-r border-red-500/30 text-[10px] terminal-font font-bold text-red-500 tracking-widest">
+            <span class="animate-pulse mr-2">●</span> LIVE FEED
+        </div>
+        <div class="w-full overflow-hidden ml-28">
+            <div class="whitespace-nowrap text-[10px] terminal-font text-slate-400">
+                {{ ticker_text }}
+            </div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="bg-slate-900 border-b border-white/10 p-4 sticky top-0 z-10 shadow-2xl">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-4">
+                <div class="w-10 h-10 rounded bg-gradient-to-br from-red-600 to-amber-500 text-white font-bold display-font text-lg flex items-center justify-center border border-red-500/50">MM</div>
+                <div>
+                    <h1 class="display-font text-xl font-bold text-white tracking-widest uppercase">{{ header_title }}</h1>
+                    <p class="text-[10px] text-red-500 terminal-font tracking-widest uppercase">NODE: Adam v26.0 // {{ date }}</p>
+                </div>
+            </div>
+            <div class="terminal-font text-xs text-red-500 flex items-center gap-2 bg-white/5 px-3 py-1 rounded-full border border-red-500/30">
+                <div class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div> {{ system_status }}
+            </div>
+        </div>
+    </header>
+
+    <!-- Tabs -->
+    <nav class="bg-slate-800 border-b border-white/10 sticky top-[73px] z-10">
+        <div class="max-w-7xl mx-auto px-4 flex space-x-6 overflow-x-auto no-scrollbar">
+            {% for tab in tabs %}
+            <button class="tab-btn py-3 px-2 terminal-font text-xs uppercase tracking-wider text-slate-400 hover:text-white whitespace-nowrap {{ 'active' if loop.first else '' }}" onclick="switchTab('tab-{{ loop.index }}')">
+                {{ tab.title }}
+            </button>
+            {% endfor %}
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow max-w-7xl mx-auto w-full p-6">
+        {% for tab in tabs %}
+        <section id="tab-{{ loop.index }}" class="tab-content {{ 'active' if loop.first else '' }}">
+            <div class="prose prose-invert prose-slate max-w-none prose-headings:display-font prose-headings:text-white prose-a:text-amber-500 prose-code:text-amber-400 prose-code:bg-black/30 prose-pre:bg-[#0a0f1c] prose-pre:border prose-pre:border-white/10 prose-th:text-slate-300">
+                {{ tab.content }}
+            </div>
+        </section>
+        {% endfor %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-white/10 p-6 mt-12 bg-slate-900">
+        <div class="max-w-7xl mx-auto text-center terminal-font text-xs text-slate-500 uppercase tracking-widest">
+            [EOF // {{ title }} // PROVENANCE ORDER: ARCHITECT ADAM_v26.0]
+        </div>
+    </footer>
+
+    <script>
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+
+            document.getElementById(tabId).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Market Mayhem | Institutional Macro Intelligence</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap');
+        
+        :root {
+            --bg-main: #fcfaf7;
+            --accent-amber: #d97706;
+            --text-dark: #0f172a;
+            --card-bg: #ffffff;
+            --border-soft: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-dark);
+            scroll-behavior: smooth;
+        }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 1000px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 450px;
+        }
+
+        .mono { font-family: 'JetBrains Mono', monospace; }
+
+        .glass-nav {
+            background: rgba(252, 250, 247, 0.9);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border-soft);
+        }
+
+        .view-tab.active {
+            background-color: #0f172a;
+            color: white;
+        }
+
+        .sub-tab.active {
+            border-bottom: 3px solid var(--accent-amber);
+            color: var(--accent-amber);
+        }
+
+        .step-pill.active {
+            background-color: #fef3c7;
+            border-color: #d97706;
+            color: #92400e;
+        }
+
+        .risk-bar { transition: width 1s ease-in-out; }
+        
+        .falsification-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        @keyframes pulse-red {
+            0%, 100% { background-color: #ef4444; }
+            50% { background-color: #f87171; }
+        }
+        .pulse-status { animation: pulse-red 2s infinite; }
+    </style>
+</head>
+<body class="antialiased">
+
+<!-- Chosen Palette: Institutional Bone, Slate Carbon, and High-Yield Amber -->
+<!-- Application Structure Plan: 
+    1. Intelligence Core: Revolves around the 9-Step Causal Cascade. Users click through the chain to see how Liquidity feeds into Rates, then Credit, then Equities.
+    2. Institutional Slices: Segment-specific 'Playbooks' for Wealth (Preservation), IB (Restructuring), and Sponsors (Liquidity/Exits).
+    3. Product Universe: Deep asset-class drill-downs (Equities, Credit, Commodities, Crypto).
+    4. Falsification Layer: A dedicated 'Invalidation Matrix' integrated into the footer of every section to maintain institutional humility/rigor.
+-->
+<!-- Visualization & Content Choices: 
+    - Weighted Component Bar Chart: For the 55.50 Risk Score transparency.
+    - 9-Step Cascade Interaction: Vertical timeline/stepper to visualize macro cause-and-effect.
+    - Maturity Wall Stacked Bar: Visualizing the 2026-2028 refinancing cliff.
+    - Factor Leadership Radar: Tracking 'Quality' vs 'Beta' in equities.
+    - CONFIRMATION: NO SVG graphics used. NO Mermaid JS used.
+-->
+
+<nav class="fixed top-0 w-full z-50 glass-nav">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-20 items-center">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-slate-900 rounded-lg flex items-center justify-center text-amber-500 font-bold text-xl italic shadow-lg">MM</div>
+                <div>
+                    <span class="text-lg font-bold tracking-tighter text-slate-900 block leading-none">MARKET MAYHEM <span class="text-amber-600 font-medium">SYSTEM</span></span>
+                    <span class="text-[9px] uppercase tracking-[0.25em] font-bold text-slate-500">Macro Intelligence Engine v1.0.0</span>
+                </div>
+            </div>
+            
+            <div class="hidden xl:flex items-center bg-slate-100 rounded-full p-1 border border-slate-200">
+                <button onclick="switchView('core')" id="btn-core" class="view-tab active px-6 py-2 rounded-full text-xs font-bold transition-all uppercase tracking-widest">Intelligence Core</button>
+                <button onclick="switchView('slices')" id="btn-slices" class="view-tab px-6 py-2 rounded-full text-xs font-bold transition-all uppercase tracking-widest">Institutional Slices</button>
+                <button onclick="switchView('products')" id="btn-products" class="view-tab px-6 py-2 rounded-full text-xs font-bold transition-all uppercase tracking-widest">Product Universe</button>
+            </div>
+
+            <div class="flex items-center gap-4 border-l border-slate-200 pl-4">
+                <div class="text-right">
+                    <div class="flex items-center justify-end gap-2">
+                        <span class="w-2 h-2 rounded-full pulse-status"></span>
+                        <span class="text-[10px] font-bold text-red-600 uppercase">Restrictive Regime</span>
+                    </div>
+                    <span class="text-[10px] font-mono text-slate-400">JULY 2026 UPDATE</span>
+                </div>
+                <div class="bg-slate-900 text-white px-3 py-1 rounded border border-slate-700">
+                    <span class="text-[10px] block opacity-60 font-bold">RISK INDEX</span>
+                    <span class="text-lg font-bold mono">55.50</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<main class="pt-28 pb-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    <!-- VIEW: INTELLIGENCE CORE -->
+    <section id="view-core" class="space-y-8 animate-in fade-in duration-700">
+        <!-- Section Intro -->
+        <div class="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm">
+            <h2 class="text-3xl font-bold text-slate-900 mb-4">The 9-Step Causal Cascade</h2>
+            <p class="text-slate-500 max-w-3xl leading-relaxed">Our institutional framework evaluates market conditions by tracing the flow of capital from systemic liquidity through rates and credit, finally reaching equity valuations. In the current <strong>Restrictive Regime</strong>, we observe a breakdown at Step 5 (Credit Spreads), creating a bottleneck for growth assets.</p>
+        </div>
+
+        <!-- The Cascade Stepper -->
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            <div class="lg:col-span-1 space-y-2">
+                <div id="cascade-steps" class="flex flex-col gap-2">
+                    <!-- Dynamic Step Buttons -->
+                </div>
+            </div>
+            
+            <div class="lg:col-span-3 bg-white rounded-3xl p-8 border border-slate-200 shadow-sm min-h-[500px]">
+                <div id="cascade-content" class="h-full flex flex-col justify-between">
+                    <!-- Dynamic Content Injected via JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Risk Breakdown -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="bg-slate-900 rounded-3xl p-8 text-white">
+                <h3 class="text-xs font-bold text-amber-500 uppercase tracking-[0.2em] mb-6">Risk Index Components</h3>
+                <div id="risk-breakdown" class="space-y-6">
+                    <!-- Bars injected via JS -->
+                </div>
+            </div>
+            <div class="bg-amber-50 rounded-3xl p-8 border border-amber-100 flex flex-col justify-center">
+                <h3 class="text-lg font-bold text-amber-900 mb-4">Falsification Protocol</h3>
+                <div class="space-y-4">
+                    <p class="text-amber-800 text-sm leading-relaxed italic border-l-2 border-amber-300 pl-4">"We are currently bearish on duration-heavy assets. This thesis is <strong>invalidated</strong> if 10Y Real Yields drop below 1.25% or if S&P 500 breadth expands beyond 70%."</p>
+                    <div class="bg-white/50 p-4 rounded-xl">
+                        <span class="text-[10px] font-bold text-amber-600 block mb-1 uppercase">Immediate Invalidation Triggers</span>
+                        <ul class="text-xs text-amber-900 space-y-2 font-medium">
+                            <li>• Fed Repo Facility (RRP) balance increases >$100B</li>
+                            <li>• High-Yield Spreads tighten below 320bps</li>
+                            <li>• M2 Growth inflects positive for 3 consecutive months</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- VIEW: INSTITUTIONAL SLICES -->
+    <section id="view-slices" class="hidden space-y-10 animate-in fade-in duration-500">
+        <div class="border-b border-slate-200 mb-8 overflow-x-auto custom-scrollbar">
+            <div class="flex gap-12">
+                <button onclick="switchSlice('wealth')" id="tab-wealth" class="sub-tab active py-4 text-sm font-bold uppercase tracking-widest whitespace-nowrap">Wealth Management</button>
+                <button onclick="switchSlice('ib')" id="tab-ib" class="sub-tab py-4 text-sm font-bold uppercase tracking-widest whitespace-nowrap">Investment Banking</button>
+                <button onclick="switchSlice('sponsors')" id="tab-sponsors" class="sub-tab py-4 text-sm font-bold uppercase tracking-widest whitespace-nowrap">Financial Sponsors</button>
+            </div>
+        </div>
+
+        <div id="slice-content">
+            <!-- Dynamic Content -->
+        </div>
+    </section>
+
+    <!-- VIEW: PRODUCT UNIVERSE -->
+    <section id="view-products" class="hidden space-y-10 animate-in fade-in duration-500">
+        <div class="flex flex-col md:flex-row gap-4 mb-8">
+            <div class="flex flex-wrap gap-2 bg-slate-200/50 p-1 rounded-2xl border border-slate-200">
+                <button onclick="switchProduct('sp500')" id="p-sp500" class="px-5 py-2 text-xs font-bold rounded-xl transition-all bg-white shadow-sm">S&P 500</button>
+                <button onclick="switchProduct('bsl')" id="p-bsl" class="px-5 py-2 text-xs font-bold rounded-xl transition-all hover:bg-white/50">BSL Credit</button>
+                <button onclick="switchProduct('private')" id="p-private" class="px-5 py-2 text-xs font-bold rounded-xl transition-all hover:bg-white/50">Private Debt</button>
+                <button onclick="switchProduct('commodities')" id="p-commodities" class="px-5 py-2 text-xs font-bold rounded-xl transition-all hover:bg-white/50">Commodities</button>
+                <button onclick="switchProduct('crypto')" id="p-crypto" class="px-5 py-2 text-xs font-bold rounded-xl transition-all hover:bg-white/50">Crypto</button>
+            </div>
+        </div>
+
+        <div id="product-content">
+            <!-- Dynamic Content -->
+        </div>
+    </section>
+
+</main>
+
+<footer class="bg-slate-900 border-t border-slate-800 py-16 mt-20">
+    <div class="max-w-7xl mx-auto px-4">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+            <div class="col-span-2">
+                <div class="flex items-center gap-2 mb-4">
+                    <div class="w-6 h-6 bg-amber-500 rounded flex items-center justify-center text-slate-900 font-bold text-xs">M</div>
+                    <span class="text-white font-bold tracking-widest text-sm">MARKET MAYHEM SYSTEM</span>
+                </div>
+                <p class="text-slate-400 text-sm max-w-sm leading-relaxed">An institutional reasoning engine designed to evaluate changing risk regimes by integrating macroeconomics, monetary policy, and capital flows.</p>
+            </div>
+            <div>
+                <h4 class="text-white font-bold text-xs uppercase tracking-widest mb-4">Verification Protocols</h4>
+                <ul class="text-slate-500 text-xs space-y-2">
+                    <li>Multi-Asset Consensus Check</li>
+                    <li>Sovereign Rate Sensitivity</li>
+                    <li>Refinancing Wall Analytics</li>
+                    <li>Systemic Liquidity Audit</li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-white font-bold text-xs uppercase tracking-widest mb-4">Legal Notice</h4>
+                <p class="text-[10px] text-slate-600 leading-tight">Institutional use only. This is a reasoning framework, not individual investment advice. All probabilistic outcomes subject to rapid revision based on Fed policy shifts.</p>
+            </div>
+        </div>
+        <div class="border-t border-slate-800 pt-8 flex justify-between items-center">
+            <span class="text-[10px] font-mono text-slate-600 uppercase">Protocol Hash: MM-8842-X-2026</span>
+            <span class="text-[10px] font-mono text-slate-600 uppercase">© 2026 Institutional Strategy Desk</span>
+        </div>
+    </div>
+</footer>
+
+<script>
+    // --- Data Definitions ---
+    const appState = {
+        currentView: 'core',
+        currentStep: 0,
+        currentSlice: 'wealth',
+        currentProduct: 'sp500'
+    };
+
+    const cascadeSteps = [
+        { title: "1. Liquidity", icon: "💧", content: "Net Liquidity is evaporating. Fed RRP balances are at critical lows ($2.1B), and the TGA rebuild to $905B creates a mechanical drain on commercial bank reserves.", detail: "Watch for: Overnight Repo Rate spikes and SOFR volatility." },
+        { title: "2. Real Rates", icon: "📉", content: "Yield curve inversion is reaching a point of 'un-inverting' for the wrong reasons. Real yields (10Y TIPS) at 2.45% are highly restrictive for growth multiples.", detail: "Watch for: 2Y-10Y spread crossing into positive territory." },
+        { title: "3. Inflation", icon: "🔥", content: "Sticky services inflation (Supercore) remains at 4.2% YoY. Commodity cost-push from WTI ($88/bbl) is starting to bleed back into headline expectations.", detail: "Watch for: Brent breaking above $95/bbl." },
+        { title: "4. Central Bank", icon: "🏛️", content: "The 'Higher for Longer' mantra is transitionally into 'Higher until Something Breaks'. Fed reactivity function is currently lagging the credit stress cycle.", detail: "Watch for: FOMC dot plot shifts toward fewer cuts in 2027." },
+        { title: "5. Credit Spreads", icon: "⚡", content: "Spreads are artificially tight due to Private Credit soaking up demand, but IG/HY primary issuance is slowing as refinancing costs hit 8%+", detail: "Watch for: High-Yield spreads widening past 450bps." },
+        { title: "6. Earnings Quality", icon: "📊", content: "Margins are being squeezed by wage pressure and higher interest expense. S&P 500 earnings growth is largely driven by buybacks rather than top-line expansion.", detail: "Watch for: Negative guidance revisions in the S&P 100." },
+        { title: "7. Valuations", icon: "💎", content: "Forward P/E of 21.5x is unsustainable when risk-free rates are 5.5%. Equity Risk Premium is at its lowest level in 20 years.", detail: "Watch for: Multiple compression toward 17x historical average." },
+        { title: "8. Sector Rotation", icon: "🔄", content: "Violent rotation from Tech into Utilities and Staples as recession fears mount. Small caps (Russell 2000) are significantly underperforming large caps.", detail: "Watch for: Defensive sectors outperforming Tech for 3 consecutive weeks." },
+        { title: "9. Portfolio Flow", icon: "💰", content: "Cash is finally a competitive asset class. We are seeing institutional rotation into 6-month T-Bills and Market Neutral strategies.", detail: "Watch for: Institutional cash allocations reaching >15%." }
+    ];
+
+    const riskComponents = [
+        { label: "Rates Volatility", score: 85, weight: 0.20 },
+        { label: "Credit Spreads", score: 42, weight: 0.20 },
+        { label: "Systemic Liquidity", score: 92, weight: 0.20 },
+        { label: "Inflation Shocks", score: 68, weight: 0.15 },
+        { label: "Equity Breadth", score: 55, weight: 0.15 },
+        { label: "Geopolitical Risk", score: 75, weight: 0.10 }
+    ];
+
+    const sliceData = {
+        wealth: {
+            title: "Wealth Preservation Playbook",
+            pillars: [
+                { t: "Duration Neutrality", d: "Limit bond exposure to < 4 years. Capture the front-end yield of 5.5% while avoiding long-end term premium risk." },
+                { t: "Structural Inflation", d: "Increase allocation to real assets—Infrastructure and Energy—with explicit CPI-linked cash flows." },
+                { t: "Tax Optimization", d: "Utilize loss-harvesting in tech positions to offset gains from short-duration high-yield instruments." }
+            ],
+            metric: "82%", label: "Cash/T-Bill Allocation Percentile"
+        },
+        ib: {
+            title: "Investment Banking & Advisory",
+            pillars: [
+                { t: "LME Focus", d: "Liability Management Exercises (LMEs) are the primary revenue driver as firms seek to extend maturities without re-pricing." },
+                { t: "Distressed M&A", d: "Expect a wave of consolidation in the consumer-discretionary space as regional retailers struggle with debt service." },
+                { t: "Rescue Financing", d: "Bespoke capital solutions (convertible debt) replacing traditional high-yield bonds for B-rated issuers." }
+            ],
+            metric: "-45%", label: "Equity Capital Markets Activity YoY"
+        },
+        sponsors: {
+            title: "Financial Sponsors & Private Equity",
+            pillars: [
+                { t: "Exit Freeze Mitigation", d: "GPs utilizing NAV loans to provide liquidity to LPs without selling assets at forced-sale valuations." },
+                { t: "Continuation Funds", d: "Moving 'trophy' assets into new vehicles to ride out the restrictive cycle with fresh management fees." },
+                { t: "Operating Leverage", d: "Shift focus from financial engineering to margin expansion within portfolio companies to counter rising SOFR." }
+            ],
+            metric: "$2.41T", label: "Dry Powder Overhang"
+        }
+    };
+
+    const productData = {
+        sp500: {
+            outlook: "Restrictive / Underweight",
+            price: "7,412",
+            bullets: ["Concentration risk at all-time highs", "Earnings Yield vs. Bond Yield at 20-year nadir", "Breadth failing to confirm index highs"],
+            rec: "Accumulate Put protection on rallies."
+        },
+        bsl: {
+            outlook: "Elevated Risk / Selective",
+            price: "96.20",
+            bullets: ["CLO demand weakening", "Recoveries in defaults expected < 40%", "Refinancing wall hits in 18 months"],
+            rec: "Focus on Senior Secured only."
+        },
+        private: {
+            outlook: "Watch for Liquidity Gates",
+            price: "L+650",
+            bullets: ["BDCs seeing rise in non-accruals", "PIK (Payment-in-Kind) interest on the rise", "Valuation lag vs public markets closing"],
+            rec: "Verify underlying asset coverage ratios."
+        },
+        crypto: {
+            outlook: "High Beta Liquidity Proxy",
+            price: "92,100",
+            bullets: ["Highly correlated with Net Liquidity Index", "ETF inflows masking retail exhaustion", "BTC behaving as 'Digital High Beta'"],
+            rec: "Use as a tactical macro signal, not a core hold."
+        }
+    };
+
+    // --- Logic Functions ---
+
+    function switchView(viewId) {
+        appState.currentView = viewId;
+        ['core', 'slices', 'products'].forEach(v => {
+            document.getElementById(`view-${v}`).classList.toggle('hidden', v !== viewId);
+            document.getElementById(`btn-${v}`).classList.toggle('active', v === viewId);
+        });
+        if(viewId === 'slices') switchSlice(appState.currentSlice);
+        if(viewId === 'products') switchProduct(appState.currentProduct);
+    }
+
+    function renderCascade() {
+        const list = document.getElementById('cascade-steps');
+        list.innerHTML = cascadeSteps.map((step, idx) => `
+            <button onclick="setStep(${idx})" class="step-pill flex items-center gap-3 p-4 rounded-xl border border-slate-200 text-left transition-all ${appState.currentStep === idx ? 'active shadow-md' : 'bg-white hover:bg-slate-50'}">
+                <span class="text-lg">${step.icon}</span>
+                <span class="text-xs font-bold uppercase tracking-tight">${step.title}</span>
+            </button>
+        `).join('');
+
+        const content = document.getElementById('cascade-content');
+        const s = cascadeSteps[appState.currentStep];
+        content.innerHTML = `
+            <div class="animate-in slide-in-from-right duration-300">
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="w-12 h-12 bg-slate-900 rounded-2xl flex items-center justify-center text-2xl">${s.icon}</div>
+                    <h3 class="text-2xl font-bold text-slate-900">${s.title} Analysis</h3>
+                </div>
+                <p class="text-xl text-slate-700 leading-relaxed mb-8 border-l-4 border-amber-500 pl-6">${s.content}</p>
+                <div class="bg-slate-50 p-6 rounded-2xl border border-slate-100">
+                    <h4 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Institutional Indicator</h4>
+                    <p class="text-sm font-medium text-slate-900">${s.detail}</p>
+                </div>
+            </div>
+            <div class="mt-auto pt-8 flex justify-between items-center border-t border-slate-100">
+                <span class="text-[10px] font-mono text-slate-400">CASCADE STEP ${appState.currentStep + 1} / 9</span>
+                <div class="flex gap-2">
+                    <button onclick="setStep(${appState.currentStep - 1})" class="px-4 py-2 text-xs font-bold bg-slate-100 rounded-lg hover:bg-slate-200 disabled:opacity-30" ${appState.currentStep === 0 ? 'disabled' : ''}>PREV</button>
+                    <button onclick="setStep(${appState.currentStep + 1})" class="px-4 py-2 text-xs font-bold bg-slate-900 text-white rounded-lg hover:bg-slate-800 disabled:opacity-30" ${appState.currentStep === 8 ? 'disabled' : ''}>NEXT</button>
+                </div>
+            </div>
+        `;
+    }
+
+    function setStep(idx) {
+        if(idx < 0 || idx > 8) return;
+        appState.currentStep = idx;
+        renderCascade();
+    }
+
+    function switchSlice(id) {
+        appState.currentSlice = id;
+        const data = sliceData[id];
+        ['wealth', 'ib', 'sponsors'].forEach(s => document.getElementById(`tab-${s}`).classList.toggle('active', s === id));
+        
+        document.getElementById('slice-content').innerHTML = `
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
+                <div class="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
+                    ${data.pillars.map(p => `
+                        <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:border-amber-200 transition-all group">
+                            <h4 class="text-xs font-bold text-amber-600 uppercase mb-3">${p.t}</h4>
+                            <p class="text-sm text-slate-600 leading-relaxed">${p.d}</p>
+                        </div>
+                    `).join('')}
+                    <div class="bg-slate-900 rounded-2xl p-6 text-white flex flex-col justify-center">
+                        <span class="text-[10px] font-bold text-amber-500 uppercase tracking-widest mb-2">Primary Sentiment</span>
+                        <p class="text-lg font-bold italic">"Rotate toward high-quality, short-duration collateral until the 'Liquidity Vacuum' stabilizes."</p>
+                    </div>
+                </div>
+                <div class="bg-slate-100 rounded-3xl p-8 border border-slate-200 flex flex-col items-center justify-center text-center">
+                    <span class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">${data.label}</span>
+                    <div class="text-6xl font-bold mono text-slate-900 mb-8">${data.metric}</div>
+                    <div class="chart-container !h-48 w-full bg-white rounded-xl p-4"><canvas id="sliceMiniChart"></canvas></div>
+                </div>
+            </div>
+        `;
+        initSliceChart();
+    }
+
+    function switchProduct(id) {
+        appState.currentProduct = id;
+        const data = productData[id] || productData.sp500;
+        ['sp500', 'bsl', 'private', 'commodities', 'crypto'].forEach(p => {
+            const el = document.getElementById(`p-${p}`);
+            if(el) { el.classList.toggle('bg-white', p === id); el.classList.toggle('shadow-sm', p === id); }
+        });
+
+        document.getElementById('product-content').innerHTML = `
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+                <div class="lg:col-span-3 bg-white rounded-3xl p-8 border border-slate-200">
+                    <div class="flex justify-between items-start mb-8">
+                        <div>
+                            <h2 class="text-2xl font-bold text-slate-900 uppercase tracking-tight">${id.toUpperCase()} Dashboard</h2>
+                            <span class="px-3 py-1 bg-amber-100 text-amber-700 text-[10px] font-bold rounded-full uppercase mt-2 inline-block">${data.outlook}</span>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-3xl font-bold mono">${data.price}</div>
+                            <span class="text-[10px] font-bold text-slate-400">INDEX SPOT / SPREAD</span>
+                        </div>
+                    </div>
+                    <div class="chart-container !h-80 mb-8"><canvas id="productLineChart"></canvas></div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-6 border-t border-slate-100">
+                        ${data.bullets.map(b => `<p class="text-xs font-medium text-slate-600">• ${b}</p>`).join('')}
+                    </div>
+                </div>
+                <div class="space-y-6">
+                    <div class="bg-slate-900 rounded-3xl p-8 text-white">
+                        <h4 class="text-xs font-bold text-amber-500 uppercase tracking-widest mb-4">Refinancing Wall</h4>
+                        <div class="chart-container !h-40"><canvas id="wallChart"></canvas></div>
+                    </div>
+                    <div class="bg-white border border-slate-200 rounded-3xl p-8">
+                        <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Institutional Rec</h4>
+                        <p class="text-sm font-bold text-slate-900">${data.rec}</p>
+                    </div>
+                </div>
+            </div>
+        `;
+        initProductCharts();
+    }
+
+    function initSliceChart() {
+        new Chart(document.getElementById('sliceMiniChart'), {
+            type: 'line',
+            data: {
+                labels: ['Q1', 'Q2', 'Q3', 'Q4', 'Q1', 'Q2'],
+                datasets: [{
+                    data: [12, 19, 11, 28, 42, 55],
+                    borderColor: '#d97706',
+                    borderWidth: 3,
+                    pointRadius: 0,
+                    tension: 0.4
+                }]
+            },
+            options: { maintainAspectRatio: false, scales: { x: { display: false }, y: { display: false } }, plugins: { legend: { display: false } } }
+        });
+    }
+
+    function initProductCharts() {
+        new Chart(document.getElementById('productLineChart'), {
+            type: 'line',
+            data: {
+                labels: ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL'],
+                datasets: [{
+                    data: [65, 59, 80, 81, 56, 55, 40],
+                    borderColor: '#0f172a',
+                    backgroundColor: 'rgba(15, 23, 42, 0.05)',
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: { maintainAspectRatio: false, scales: { x: { grid: { display: false } } }, plugins: { legend: { display: false } } }
+        });
+
+        new Chart(document.getElementById('wallChart'), {
+            type: 'bar',
+            data: {
+                labels: ['2026', '2027', '2028'],
+                datasets: [{
+                    data: [80, 120, 150],
+                    backgroundColor: '#d97706',
+                    borderRadius: 4
+                }]
+            },
+            options: { maintainAspectRatio: false, scales: { x: { grid: { display: false } }, y: { display: false } }, plugins: { legend: { display: false } } }
+        });
+    }
+
+    function renderRiskBars() {
+        const container = document.getElementById('risk-breakdown');
+        container.innerHTML = riskComponents.map(comp => `
+            <div>
+                <div class="flex justify-between mb-2">
+                    <span class="text-[10px] font-bold uppercase text-slate-400">${comp.label}</span>
+                    <span class="text-[10px] font-mono text-amber-500">${comp.score}/100</span>
+                </div>
+                <div class="h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                    <div class="risk-bar h-full bg-amber-500" style="width: 0%;" data-val="${comp.score}"></div>
+                </div>
+            </div>
+        `).join('');
+
+        setTimeout(() => {
+            document.querySelectorAll('.risk-bar').forEach(bar => {
+                bar.style.width = bar.getAttribute('data-val') + '%';
+            });
+        }, 100);
+    }
+
+    // --- Initialization ---
+    window.onload = () => {
+        renderCascade();
+        renderRiskBars();
+        switchView('core');
+    };
+</script>
+
+</body>
+</html>

@@ -1,6 +1,17 @@
 # src/credit_risk.py
 from typing import Dict, Any, Tuple
+import json
+import os
+from json_logic import jsonLogic
 from .config import RATING_MAP
+_RATING_RULE_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'config', 'covenants', 'rating_rules.json')
+with open(_RATING_RULE_PATH, 'r') as f:
+    _RATING_RULES = json.load(f)
+
+_SNC_RULE_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'config', 'covenants', 'snc_rules.json')
+with open(_SNC_RULE_PATH, 'r') as f:
+    _SNC_RULES = json.load(f)
+
 
 class CreditSponsorModel:
     """
@@ -42,14 +53,11 @@ class CreditSponsorModel:
         if 'Leverage (x)' not in metrics or 'FCCR (x)' not in metrics:
             raise KeyError("Metrics dictionary must contain 'Leverage (x)' and 'FCCR (x)'.")
 
-        lev = metrics['Leverage (x)']
-        fccr = metrics['FCCR (x)']
-
-        if lev < 3.0 and fccr > 2.5: return RATING_MAP[3.0] # IG
-        if lev < 4.5 and fccr > 1.5: return RATING_MAP[4.0] # BB
-        if lev < 6.0 and fccr > 1.1: return RATING_MAP[5.0] # B+
-        if lev < 7.5 and fccr > 1.0: return RATING_MAP[6.0] # B-
-        return RATING_MAP[8.0] # Substandard
+        try:
+            rating_key = jsonLogic(_RATING_RULES, metrics)
+        except Exception as e:
+            raise RuntimeError(f"Failed to evaluate regulatory rating rule: {e}")
+        return RATING_MAP[rating_key]
 
     def perform_downside_stress(self, stress_factor: float = 0.20) -> Tuple[Dict[str, float], str]:
         """
@@ -80,6 +88,7 @@ class CreditSponsorModel:
         """
         Shared National Credit Logic: Debt > $100MM check.
         """
-        if self.debt > 100_000_000:
-            return "SNC REPORTING REQUIRED: Flag for Regulatory Review"
-        return "Non-SNC"
+        try:
+            return jsonLogic(_SNC_RULES, {"debt": self.debt})
+        except Exception as e:
+            raise RuntimeError(f"Failed to evaluate SNC rule: {e}")
