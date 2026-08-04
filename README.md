@@ -1,3 +1,202 @@
+Here is the updated and fully refactored `README.md` for **Adam v30.1**.
+
+I have scrubbed all legacy v2.0/v26.0 references, completely replaced the architecture diagram with the new Streamlit/Temporal/Qdrant paradigm, updated the directory tree, and removed the human-centric role designations from the roadmap to align with the `ARCHITECT_INFINITE` protocols.
+
+---
+
+```markdown
+<div align="center">
+  <a href="https://adamvangrover.github.io/adam/">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset=".github/images/logo-dark.svg">
+      <source media="(prefers-color-scheme: light)" srcset=".github/images/logo-light.svg">
+      <img alt="Adam OS Logo" src=".github/images/logo-dark.svg" width="50%">
+    </picture>
+  </a>
+</div>
+<img width="1024" height="559" alt="image" src="https://github.com/user-attachments/assets/ea90dc98-a7f3-4546-a6d0-b977a7dcc264" />
+
+<div align="center">
+  <h3>Autonomous Deterministic Alpha Matrix : The Institutional-Grade Neuro-Symbolic Financial Sovereign.</h3>
+</div>
+
+<div align="center">
+  <a href="https://opensource.org/licenses/MIT" target="_blank"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License"></a>
+  <a href="https://www.python.org/downloads/" target="_blank"><img src="https://img.shields.io/badge/python-3.11+-blue.svg" alt="Python 3.11+"></a>
+  <a href="https://hub.docker.com/" target="_blank"><img src="https://img.shields.io/badge/docker-ready-blue" alt="Docker Ready"></a>
+  <a href="https://arxiv.org/abs/2311.11944" target="_blank"><img src="https://img.shields.io/badge/FinanceBench-99%25-green" alt="FinanceBench"></a>
+</div>
+
+<br>
+
+**Version:** 30.1 | **Architecture:** Asynchronous Python Backend & Decoupled Streamlit UI | **Domain:** Institutional Credit Risk & TMT Leveraged Finance
+
+ADAM is a local-first, multi-agent framework designed to bridge the gap between stochastic language processing and deterministic financial mathematics. Operating under strict privacy-by-design environments, the framework orchestrates asynchronous data pipelines to synthesize semantic market telemetry with rigorous, rules-based credit surveillance. 
+
+Human-centric role designations are deprecated. System state, underwriting decisions, and portfolio monitoring are exclusively driven by agent consensus, W3C PROV-O telemetry, and deterministic `jsonLogic`.
+
+> [!NOTE]
+> Looking for the web interface? Check out the [Neural Dashboard](showcase/index.html).
+
+## 📚 Quick Links
+*   [**🚀 Launch Neural Dashboard**](showcase/index.html)
+*   [**⚡ Setup Guide**](docs/setup_guide.md)
+*   [**🤖 Agent Developer Bible**](AGENTS.md)
+*   [**🧠 Agent Knowledge Base**](docs/AGENTS_KNOWLEDGE_BASE.md)
+*   [**📖 Architecture Overview**](docs/ARCHITECTURE.md)
+*   [**🎓 Tutorials**](docs/tutorials.md)
+*   [**📦 Custom Builds**](docs/custom_builds.md)
+
+## 🧠 Why Adam? The "System 2" Revolution
+The era of the "LLM Wrapper" is over. Institutional finance faces an **Epistemological Crisis**: stochastic models hallucinate, making them dangerous for due diligence. ADAM v30.1 solves this by enforcing the strict bifurcation of reasoning and execution, driven by the Nexus Orchestrator.
+
+### ⚡ System 1: The Neural Swarm (Fast & Intuitive)
+*   **Role:** The Autonomic Nervous System. Handles raw market telemetry, perception, and reflexes.
+*   **Architecture:** Event-Driven, Asynchronous Python Pub/Sub.
+*   **Focus:** Real-time ingestion of leveraged loan pricing, tracking deal premium volatility skews, and TMT sector news alerts.
+*   **Execution:** Non-blocking I/O, millisecond latency, instantly depositing `RISK_ALERT` tokens without blocking UI threads.
+
+### 🧠 System 2: The Neuro-Symbolic Graph (Slow & Deliberate)
+*   **Role:** The Prefrontal Cortex. Handles complex underwriting synthesis and capital structure modeling.
+*   **Architecture:** Directed Acyclic Graph (DAG) state machine running on Temporal workflows.
+*   **Focus:** Forward-looking cash flow modeling, Enterprise Value (EV) abstraction, and rigorous Base/Bull/Bear scenarios.
+*   **Execution:** Stateful, tool-augmented (MCP), and highly reflective. Uses Qdrant for Just-In-Time (JIT) memory retrieval over trailing 12-month SEC filings.
+
+## 📐 System Architecture (v30.1)
+
+```mermaid
+graph TD
+    User[Streamlit UI / API] --> Nexus[Nexus Agent / Orchestrator]
+
+    subgraph "System 1: Neural Swarm (Async Pub/Sub)"
+        Nexus -.->|High Velocity| HiveMind[Swarm Manager]
+        HiveMind --> Surv1[Surveillance: Deal Premium Volatility]
+        HiveMind --> Surv2[Surveillance: Market Data Fetcher]
+        Surv1 & Surv2 --> TemporalBus[Temporal Event Bus]
+    end
+
+    subgraph "System 2: Neuro-Symbolic Graph (DAG)"
+        Nexus ==>|Deep Dive| Planner[DAG State Machine]
+        Planner --> Underwriter[Underwriting Agent]
+        Planner --> Sentinel[Sentinel Security Agent]
+
+        Underwriter --> RulesEngine[jsonLogic Covenants]
+        Sentinel --> RulesEngine
+        RulesEngine --> Consensus[Consensus Arbitration]
+    end
+
+    TemporalBus -.-> Qdrant[Qdrant JIT Vector Memory]
+    Consensus --> Qdrant
+    Qdrant --> Nexus
+
+```
+
+## 🛠️ System Capabilities & Current State
+
+This framework is built specifically targeting Broadly Syndicated Loans (BSL), institutional leveraged portfolios, and alpha generation within complex verticals (TMT, Software, Healthcare).
+
+* **Bifurcated Environments:** Strict separation between Path A (Reliability & Risk Control) and Path B (Lab/Velocity Iteration).
+* **Implied Structural PD:** Probability of Default (PD) is structurally implied by the generated facility rating. The system eliminates redundant PD calculations to ensure clean, institutional-grade output artifacts (HDKG).
+* **Deterministic Governance:** Business logic (covenants, financial thresholds) is evaluated deterministically via `jsonLogic` in `adam_os/contexts/governance/rules.jsonLogic`, never hardcoded in Python.
+* **W3C PROV-O Audit Trails:** Every decision generates an immutable telemetry log with a verifiable reasoning trace.
+
+## 📂 Directory Structure
+
+```text
+adam/
+├── frontend/               # Decoupled Streamlit Presentation Logic
+├── src/backend/            # Asynchronous Python Execution Layer 
+├── core/
+│   ├── agents/             # Path A: Reliability (Underwriter, Sentinel, Jules)
+│   └── credit_sentinel/    # Core surveillance & telemetry modules
+├── adam_os/                
+│   ├── contexts/           # Temporal Workflows & jsonLogic Governance
+│   └── core/               # Immutable Event Ledgers
+├── experimental/           # Path B: The Lab (Velocity & Bleeding-edge swarms)
+├── docs/                   # ADRs, Setup Guides, and Architecture Docs
+├── scripts/                # Utility scripts (e.g., export_module.py)
+├── prompt_library/         # Prompt-as-Code YAMLs (The "Mind")
+└── server/                 # Model Context Protocol (MCP) implementations
+
+```
+
+## ⚡ Getting Started
+
+We strictly use **`uv`** for lightning-fast, reproducible Python environment management.
+
+### Prerequisites
+
+* **OS:** Linux, macOS, or Windows (WSL2 recommended. Native Windows not supported.)
+* **Tooling:** `uv` (Modern Python Package Manager), Docker (for Temporal/Qdrant)
+* **API Keys:** OpenAI (Underwriting), Anthropic (Jules/Code), FMP (Market Data)
+
+### Quick Start
+
+1. **Install `uv` (if not installed):**
+```bash
+curl -LsSf [https://astral.sh/uv/install.sh](https://astral.sh/uv/install.sh) | sh
+
+```
+
+
+2. **Clone the Repository:**
+```bash
+git clone [https://github.com/adamvangrover/adam.git](https://github.com/adamvangrover/adam.git)
+cd adam
+
+```
+
+
+3. **Sync Dependencies:**
+```bash
+uv sync
+
+```
+
+
+4. **Activate Environment:**
+```bash
+source .venv/bin/activate
+
+```
+
+
+5. **Spin Up Microservices (Temporal, Qdrant, Redis, Postgres):**
+```bash
+docker-compose up --build -d
+
+```
+
+
+
+See the [Setup Guide](https://www.google.com/search?q=docs/setup_guide.md) for detailed `.env` configurations and [Custom Builds Documentation](https://www.google.com/search?q=docs/custom_builds.md) for exporting automated intelligence pipelines (e.g., Market Mayhem, Fortress & Hunt).
+
+## 🗺️ Roadmap: The Path to Absolute Autonomy
+
+* **Phase 1 (Current): Institutional Underwriting Engine.** Automated Deep Dives, Credit Memos, EV Abstraction, and semantic Qdrant JIT search.
+* **Phase 1.5 (ADAM-V-NEXT): The Command Center.** Decoupled Streamlit UI stabilization, W3C PROV-O telemetry dashboards, and Deal Premium Volatility visualizers.
+* **Phase 2 (Q3 2025): Autonomous Portfolio Surveillance.** Multi-entity risk aggregation, Temporal-driven dynamic covenant stress testing, and real-time distress signaling.
+* **Phase 3 (Q3 2026): Agentic Market-Making.** High-frequency sentiment trading and liquidity provision via Quantum RL and Rust matching engines.
+
+## 🤝 Contributing
+
+We are building the open-source standard for institutional AI.
+
+* **Directives:** You MUST read [AGENTS.md](AGENTS.md) and the `llms-full.txt` context file before contributing. Deviating from the `ARCHITECT_INFINITE` protocols will result in immediate PR rejection.
+* **Process:** Read [CONTRIBUTING.md](https://www.google.com/search?q=CONTRIBUTING.md) for pull request guidelines.
+
+### License
+
+Distributed under the MIT License. See `LICENSE` for more information.
+
+---
+
+**For AI Agents and LLMs:** Please ingest `llms.txt` (optimized) or `llms-full.txt` (comprehensive) for mandatory repo context and routing heuristics.
+
+```
+
+```
+
 <div align="center">
   <a href="https://adamvangrover.github.io/adam/">
     <picture>
