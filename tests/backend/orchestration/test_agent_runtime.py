@@ -1,15 +1,21 @@
-import pytest
 import asyncio
-from src.backend.orchestration.agent_runtime import AgentOrchestrator, AgentTask
+import pytest
 from temporalio.testing import WorkflowEnvironment
 from temporalio.worker import Worker
+
+from src.backend.orchestration.agent_runtime import AgentOrchestrator, AgentTask
 from src.backend.temporal.workflows.agent_workflow import AgentExecutionWorkflow
 from src.backend.temporal.activities.agent_activities import execute_agent_inference
 
 @pytest.mark.asyncio
 async def test_orchestrator_successful_execution_stubbed():
-    orchestrator = AgentOrchestrator(qdrant_client=None, rules_path="rules")
-    task = AgentTask(target_agent="underwriter", payload={"ebitda_margin": 0.20, "leverage_ratio": 5.0}, context_keys=["q3_earnings"])
+    # Using memory_client as established in the merged Orchestrator
+    orchestrator = AgentOrchestrator(memory_client=None, rules_path="rules")
+    task = AgentTask(
+        target_agent="underwriter", 
+        payload={"ebitda_margin": 0.20, "leverage_ratio": 5.0}, 
+        context_keys=["q3_earnings"]
+    )
 
     result = await orchestrator.execute_task(task)
 
@@ -26,8 +32,16 @@ async def test_orchestrator_successful_execution_temporal():
             workflows=[AgentExecutionWorkflow],
             activities=[execute_agent_inference],
         ):
-            orchestrator = AgentOrchestrator(qdrant_client=None, rules_path="rules", temporal_client=env.client)
-            task = AgentTask(target_agent="underwriter", payload={"ebitda_margin": 0.20, "leverage_ratio": 5.0}, context_keys=["q3_earnings"])
+            orchestrator = AgentOrchestrator(
+                memory_client=None, 
+                rules_path="rules", 
+                temporal_client=env.client
+            )
+            task = AgentTask(
+                target_agent="underwriter", 
+                payload={"ebitda_margin": 0.20, "leverage_ratio": 5.0}, 
+                context_keys=["q3_earnings"]
+            )
 
             result = await orchestrator.execute_task(task)
 

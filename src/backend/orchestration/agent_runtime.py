@@ -5,22 +5,37 @@ Responsible for task delegation, JIT memory injection, jsonLogic evaluation,
 and W3C PROV-O compliant telemetry logging.
 """
 
+import asyncio
+import functools
 import json
 import logging
-import functools
+from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 from uuid import UUID, uuid4
-from datetime import datetime, timezone
 
 import structlog
 from pydantic import BaseModel, Field, ValidationError
 from json_logic import jsonLogic  # type: ignore
 from temporalio.client import Client
 
+from src.backend.memory.qdrant_client import JitMemoryClient
+from src.shared.models.memory_models import MemoryQuery
+
 # ---------------------------------------------------------------------------
 # Telemetry Setup (W3C PROV-O Standardized)
 # ---------------------------------------------------------------------------
-# Note: structlog should be configured at the application entry point, not here.
+# Note: structlog should optimally be configured at the application entry point.
+# We ensure a fallback configuration here if this is executed independently.
+if not structlog.is_configured():
+    structlog.configure(
+        processors=[
+            structlog.stdlib.add_log_level,
+            structlog.processors.TimeStamper(fmt="iso"),
+            structlog.processors.JSONRenderer()
+        ],
+        logger_factory=structlog.stdlib.LoggerFactory(),
+    )
+
 logger = structlog.get_logger(__name__)
 
 
@@ -29,7 +44,6 @@ def _load_rule_from_disk(file_path: str) -> Dict[str, Any]:
     """Caches loaded JSON rules to avoid repetitive disk I/O."""
     with open(file_path, "r") as f:
         return json.load(f)
-
 
 # ---------------------------------------------------------------------------
 # Domain Models
@@ -56,27 +70,36 @@ class AgentOrchestrator:
     Manages the lifecycle, memory, and telemetry of autonomous financial agents.
     """
 
-    def __init__(self, qdrant_client: Any, rules_path: str = "rules/", temporal_client: Optional[Client] = None):
+    def __init__(
+        self, 
+        memory_client: Optional[JitMemoryClient] = None, 
+        rules_path: str = "rules/", 
+        temporal_client: Optional[Client] = None
+    ):
         """
         Initializes the orchestrator with memory, rule, and temporal dependencies.
 
         Args:
-            qdrant_client: Instantiated vector database client for JIT memory.
+            memory_client: Instantiated vector database client for JIT memory.
             rules_path: Directory path containing jsonLogic definitions.
             temporal_client: Instantiated Temporal client for executing workflows.
         """
-        self.qdrant = qdrant_client
+        self.memory = memory_client or JitMemoryClient()
         self.rules_path = rules_path
         self.temporal_client = temporal_client
         self.prov_log: List[Dict[str, Any]] = []
 
-    def _load_jit_context(self, context_keys: List[str]) -> Dict[str, Any]:
+    async def _load_jit_context(self, context_keys: List[str]) -> Dict[str, Any]:
         """
         Retrieves highly specific context to prevent LLM context window overflow.
         """
-        # Implementation would call self.qdrant.search()
-        # Mocked for architectural structure
-        return {"retrieved_docs": [f"doc_for_{k}" for k in context_keys]}
+        if not context_keys:
+            return {}
+
+        query = MemoryQuery(query="Context retrieval", context_keys=context_keys)
+        results = await self.memory.search_context(query)
+
+        return {"retrieved_docs": [r.payload for r in results]}
 
     def _evaluate_preconditions(self, payload: Dict[str, Any], rule_name: str) -> bool:
         """
@@ -125,7 +148,7 @@ class AgentOrchestrator:
             return ExecutionResult(task_id=task.task_id, status="FAILURE", output={"error": "Policy rejection"})
 
         # 2. Load JIT Memory
-        context = self._load_jit_context(task.context_keys)
+        context = await self._load_jit_context(task.context_keys)
         self._record_provenance("MemoryInjection", str(task.task_id), "MemoryLayer", context)
 
         # 3. Agent Execution via Temporal Workflow
