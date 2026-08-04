@@ -408,8 +408,8 @@ To prevent circular dependencies and maintain an institutional-grade architectur
 1. **Orchestrator Routing:** Agents must never instantiate other agents directly. An agent requiring cross-domain intelligence must return a request to the `Nexus` Orchestrator via its output metadata (e.g., `metadata={"next_step": "invoke_surveillance", "query": "verify_covenant_compliance"}`).
 2. **Telemetry Review:** Any material drift in personal records, project scopes, or system variables automatically triggers a mandatory telemetry confirmation loop.
 3. **Consensus Arbitration:** In the event of conflicting data between the Underwriting and Surveillance models, the Consensus Engine will evaluate the confidence arrays and defer to the rule base defined within `jsonLogic`.
-4. 
-5. # ADAM OS — Agent Network Registry
+   
+# ADAM OS — Agent Network Registry
 # The Adam Agent Developer's Bible
 
 > **"Code defines the body; Prompts define the mind."**
