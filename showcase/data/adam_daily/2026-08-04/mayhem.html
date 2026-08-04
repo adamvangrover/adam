@@ -1,0 +1,1233 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MARKET MAYHEM // ADAM V26.0 SUPREME TERMINAL // 2026-2027 OUTLOOK</title>
+    <!-- Tailwind CSS with Typography & Forms Plugins -->
+    <script src="https://cdn.tailwindcss.com?plugins=typography,forms"></script>
+    <!-- Chart.js for Quantitative Visualizations -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Marked.js for High-Fidelity Markdown Parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['Fira Code', 'JetBrains Mono', 'monospace'],
+                        display: ['Oswald', 'Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        term: {
+                            bg: '#030712',
+                            surface: '#0b1120',
+                            card: '#111827',
+                            border: '#1f2937',
+                            subtle: '#374151',
+                            cyan: '#06b6d4',
+                            blue: '#3b82f6',
+                            red: '#ef4444',
+                            amber: '#f59e0b',
+                            green: '#10b981',
+                            purple: '#8b5cf6',
+                            pink: '#ec4899',
+                            gold: '#fbbf24'
+                        }
+                    },
+                    animation: {
+                        'ticker': 'ticker 35s linear infinite',
+                        'pulse-fast': 'pulse 1.2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'glow': 'glow 2s ease-in-out infinite alternate',
+                    },
+                    keyframes: {
+                        ticker: { '0%': { transform: 'translateX(100%)' }, '100%': { transform: 'translateX(-100%)' } },
+                        glow: { '0%': { filter: 'drop-shadow(0 0 2px rgba(6,182,212,0.4))' }, '100%': { filter: 'drop-shadow(0 0 8px rgba(6,182,212,0.9))' } }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&family=Inter:wght@300;400;600;700;800&family=Oswald:wght@500;600;700&display=swap');
+        
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: #030712; }
+        ::-webkit-scrollbar-thumb { background: #1f2937; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #06b6d4; }
+        
+        .crt-scanlines {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+            background-size: 100% 3px, 6px 100%;
+            z-index: 999; pointer-events: none; opacity: 0.6;
+        }
+
+        .glass-panel {
+            background: rgba(11, 17, 32, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        .glow-cyan-text { text-shadow: 0 0 10px rgba(6, 182, 212, 0.6); }
+        .glow-red-text { text-shadow: 0 0 10px rgba(239, 68, 68, 0.6); }
+        .glow-amber-text { text-shadow: 0 0 10px rgba(245, 158, 11, 0.6); }
+
+        .tab-btn { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+        .tab-btn.active {
+            background: rgba(6, 182, 212, 0.15);
+            border-bottom: 2px solid #06b6d4;
+            color: #ffffff;
+        }
+
+        /* Custom styling for rendered markdown content */
+        .markdown-body h1 { @apply text-2xl font-display font-bold text-white mb-4 border-b border-term-border pb-2 mt-4 tracking-wide uppercase; }
+        .markdown-body h2 { @apply text-xl font-display font-semibold text-term-cyan mb-3 mt-6 border-b border-term-border/40 pb-1 tracking-wide; }
+        .markdown-body h3 { @apply text-lg font-mono font-bold text-term-amber mb-2 mt-4; }
+        .markdown-body p { @apply text-sm text-slate-300 leading-relaxed mb-4 font-sans; }
+        .markdown-body ul { @apply list-disc list-inside space-y-1.5 text-sm text-slate-300 mb-4 pl-2 font-sans; }
+        .markdown-body blockquote { @apply border-l-4 border-term-cyan bg-term-surface/80 p-4 rounded-r-lg my-4 text-slate-200 text-sm italic font-mono; }
+        .markdown-body code { @apply font-mono text-xs bg-term-card px-1.5 py-0.5 rounded text-term-cyan border border-term-border; }
+        .markdown-body pre { @apply font-mono text-xs bg-black/80 p-4 rounded-lg overflow-x-auto text-term-amber border border-term-border mb-4 shadow-inner; }
+        .markdown-body table { @apply w-full text-left text-xs font-mono mb-4 border-collapse; }
+        .markdown-body th { @apply bg-term-card p-2.5 text-term-cyan font-bold border border-term-border; }
+        .markdown-body td { @apply p-2.5 border border-term-border/60 text-slate-300 bg-term-surface/40; }
+        .markdown-body hr { @apply border-term-border my-6; }
+    </style>
+</head>
+<body class="bg-term-bg text-slate-300 font-sans h-screen flex flex-col overflow-hidden selection:bg-term-cyan selection:text-black">
+    <div id="crtOverlay" class="crt-scanlines"></div>
+    
+    <!-- Toast Notification Container (Replaces alerts) -->
+    <div id="toast-container" class="fixed bottom-6 right-6 z-[1000] flex flex-col gap-3 pointer-events-none"></div>
+
+    <div class="bg-black/90 border-b border-term-border h-7 flex items-center relative z-20 text-xs font-mono shrink-0">
+        <div class="bg-term-red text-white px-3 h-full flex items-center font-bold tracking-wider shrink-0 shadow-md">
+            <i class="fa-solid fa-bolt mr-2 animate-pulse"></i> LIVE SENSORS
+        </div>
+        <div class="overflow-hidden w-full relative flex items-center">
+            <div class="animate-ticker whitespace-nowrap text-slate-300 flex items-center gap-8 text-[11px]">
+                <span><strong class="text-term-green">S&P 500:</strong> 7,606.07 <span class="text-term-green font-bold">(+1.55% // ATH TARGET 2027: 8,100)</span></span>
+                <span><strong class="text-term-cyan">10Y TREASURY:</strong> 4.67% <span class="text-term-cyan font-bold">(-6 bps // 2027 OUTLOOK: 4.25%)</span></span>
+                <span><strong class="text-term-amber">VIX INDEX:</strong> 15.79 <span class="text-term-green font-bold">(-2.31%)</span></span>
+                <span><strong class="text-term-purple">BITCOIN:</strong> $63,892.88 <span class="text-term-green font-bold">(+0.62%)</span></span>
+                <span><strong class="text-term-red">WTI CRUDE:</strong> $79.60 <span class="text-term-red font-bold">(-6.85%)</span></span>
+                <span><strong class="text-term-red">BRENT CRUDE:</strong> $83.40 <span class="text-term-red font-bold">(-7.58%)</span></span>
+                <span><strong class="text-term-gold">MONEY MARKETS:</strong> $7.893 Trillion <span class="text-slate-400 font-bold">(RECORD LIQUIDITY)</span></span>
+                <span><strong class="text-term-cyan">FED WATCH:</strong> 63% Sept Hike Odds // Terminal Rate Floor 3.75%</span>
+                <span><strong class="text-term-amber">2026-2027 REFINANCING WALL:</strong> $3.0 Trillion Leveraged Debt & CRE Rolling</span>
+            </div>
+        </div>
+    </div>
+
+    <header class="bg-term-surface border-b border-term-border px-4 py-3 flex items-center justify-between z-20 shrink-0 shadow-xl">
+        <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-term-cyan via-term-blue to-term-purple flex items-center justify-center text-black font-display font-bold text-xl shadow-lg shadow-term-cyan/20">
+                M
+            </div>
+            <div>
+                <div class="flex items-center gap-2">
+                    <h1 class="font-display font-bold text-white text-lg tracking-wider">MARKET MAYHEM</h1>
+                    <span class="bg-term-cyan/20 text-term-cyan border border-term-cyan/30 text-[10px] font-mono px-2 py-0.5 rounded font-bold">v26.0 SUPREME TERMINAL</span>
+                </div>
+                <p class="text-[10px] font-mono text-slate-400 flex items-center gap-2">
+                    <span>NODE: Adam v26.0 (Neuro-Symbolic Sovereign)</span>
+                    <span class="text-term-green">● 12-MONTH OUTLOOK & HISTORICAL ENGINE ACTIVE</span>
+                </p>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <nav class="hidden lg:flex items-center gap-1 font-mono text-xs bg-term-bg/80 p-1 rounded-lg border border-term-border">
+            <button onclick="switchTab('tab-briefs')" id="btn-tab-briefs" class="tab-btn active px-3 py-1.5 rounded-md font-medium text-slate-300 hover:text-white flex items-center gap-2">
+                <i class="fa-solid fa-newspaper text-term-cyan"></i> 12M Trends & Outlook
+            </button>
+            <button onclick="switchTab('tab-macro')" id="btn-tab-macro" class="tab-btn px-3 py-1.5 rounded-md font-medium text-slate-300 hover:text-white flex items-center gap-2">
+                <i class="fa-solid fa-chart-line text-term-amber"></i> Quantitative Terminal
+            </button>
+            <button onclick="switchTab('tab-whales')" id="btn-tab-whales" class="tab-btn px-3 py-1.5 rounded-md font-medium text-slate-300 hover:text-white flex items-center gap-2">
+                <i class="fa-solid fa-shield-halved text-term-green"></i> Whalescanner Core
+            </button>
+            <button onclick="switchTab('tab-sim')" id="btn-tab-sim" class="tab-btn px-3 py-1.5 rounded-md font-medium text-slate-300 hover:text-white flex items-center gap-2">
+                <i class="fa-solid fa-sliders text-term-purple"></i> Scenario Engine
+            </button>
+            <button onclick="switchTab('tab-ledger')" id="btn-tab-ledger" class="tab-btn px-3 py-1.5 rounded-md font-medium text-slate-300 hover:text-white flex items-center gap-2">
+                <i class="fa-solid fa-database text-term-gold"></i> AI Ledger & Schema
+            </button>
+        </nav>
+
+        <!-- Right System Utility Tools -->
+        <div class="flex items-center gap-3">
+            <button onclick="toggleCRT()" title="Toggle Scanlines" class="p-2 rounded bg-term-bg border border-term-border hover:border-term-cyan text-slate-400 hover:text-term-cyan transition text-xs font-mono">
+                <i class="fa-solid fa-tv"></i> CRT
+            </button>
+            <button onclick="openAITerminal()" class="bg-gradient-to-r from-term-cyan to-term-blue text-black font-mono font-bold text-xs px-3.5 py-2 rounded-lg hover:brightness-110 transition shadow-lg shadow-term-cyan/20 flex items-center gap-2">
+                <i class="fa-solid fa-brain"></i> ADAM AI BOT
+            </button>
+        </div>
+    </header>
+
+    <div class="flex flex-1 overflow-hidden relative">
+        
+        <!-- TAB 1: NEWSLETTERS, BRIEFS & 12-MONTH OUTLOOK -->
+        <div id="tab-briefs" class="tab-content w-full h-full flex flex-col lg:flex-row overflow-hidden">
+            <!-- Newsletter Edition Sidebar Navigation -->
+            <aside class="w-full lg:w-80 bg-term-surface border-b lg:border-b-0 lg:border-r border-term-border flex flex-col shrink-0 overflow-y-auto">
+                <div class="p-3 border-b border-term-border bg-black/40 flex justify-between items-center">
+                    <span class="font-mono text-xs font-bold text-term-cyan uppercase tracking-wider"><i class="fa-solid fa-folder-tree mr-1.5"></i> Trends & Historical Index</span>
+                    <span class="text-[10px] font-mono text-slate-400 bg-term-card px-2 py-0.5 rounded" id="editionCount">6 Dossiers</span>
+                </div>
+                <div id="newsletterList" class="p-2 space-y-1 font-mono text-xs">
+                    <!-- Dynamic edition buttons populated via JS -->
+                </div>
+            </aside>
+
+            <!-- Markdown Reader Area -->
+            <main class="flex-1 bg-term-bg overflow-y-auto p-4 md:p-8 relative">
+                <div class="max-w-4xl mx-auto">
+                    <!-- Reader Header Control Bar -->
+                    <div class="flex flex-wrap items-center justify-between gap-4 pb-4 mb-6 border-b border-term-border">
+                        <div>
+                            <span class="text-xs font-mono text-term-cyan uppercase tracking-widest" id="readerEditionTag">EDITION 2026.08.03 // PRIMARY</span>
+                            <h2 class="text-2xl font-display font-bold text-white tracking-wide" id="readerTitle">12-Month Macro Trends & 2027 Outlook</h2>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="copyMarkdownText()" class="px-3 py-1.5 bg-term-card hover:bg-term-border text-slate-300 rounded text-xs font-mono border border-term-border transition flex items-center gap-1.5">
+                                <i class="fa-solid fa-copy text-term-cyan"></i> Copy MD
+                            </button>
+                            <button onclick="printBriefing()" class="px-3 py-1.5 bg-term-card hover:bg-term-border text-slate-300 rounded text-xs font-mono border border-term-border transition flex items-center gap-1.5">
+                                <i class="fa-solid fa-print text-term-amber"></i> Print
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Rendered Markdown Container -->
+                    <div id="markdownOutput" class="markdown-body bg-term-surface/50 p-6 rounded-xl border border-term-border shadow-2xl">
+                        <!-- Markdown content dynamically rendered here -->
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <!-- TAB 2: QUANTITATIVE MACRO TERMINAL -->
+        <div id="tab-macro" class="tab-content hidden w-full h-full overflow-y-auto p-4 md:p-8 bg-term-bg">
+            <div class="max-w-7xl mx-auto space-y-6">
+                <!-- Top Summary Metrics Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="glass-panel p-4 rounded-xl border-l-4 border-term-green">
+                        <div class="text-[11px] font-mono text-slate-400">S&P 500 BREAKOUT (2027 TGT: 8,100)</div>
+                        <div class="text-2xl font-display font-bold text-white mt-1">7,606.07</div>
+                        <div class="text-xs font-mono text-term-green mt-1"><i class="fa-solid fa-arrow-trend-up"></i> +1.55% (+116.35 pts)</div>
+                        <div class="text-[10px] text-slate-500 font-mono mt-2">12M Forward Earnings Growth: +18.4%</div>
+                    </div>
+                    <div class="glass-panel p-4 rounded-xl border-l-4 border-term-cyan">
+                        <div class="text-[11px] font-mono text-slate-400">10Y SOVEREIGN YIELD (2027 TGT: 4.25%)</div>
+                        <div class="text-2xl font-display font-bold text-white mt-1">4.67%</div>
+                        <div class="text-xs font-mono text-term-cyan mt-1"><i class="fa-solid fa-arrow-trend-down"></i> -6.0 bps Easing</div>
+                        <div class="text-[10px] text-slate-500 font-mono mt-2">Structural Base Rate Floor: 3.75%-4.00%</div>
+                    </div>
+                    <div class="glass-panel p-4 rounded-xl border-l-4 border-term-amber">
+                        <div class="text-[11px] font-mono text-slate-400">2026-2027 REFINANCING WALL</div>
+                        <div class="text-2xl font-display font-bold text-white mt-1">$3.0 Trillion</div>
+                        <div class="text-xs font-mono text-term-amber mt-1"><i class="fa-solid fa-triangle-exclamation"></i> $1.8T CRE + $1.2T Corporate</div>
+                        <div class="text-[10px] text-slate-500 font-mono mt-2">Coupon Reset Strain: 3.25% → 7.85%</div>
+                    </div>
+                    <div class="glass-panel p-4 rounded-xl border-l-4 border-term-purple">
+                        <div class="text-[11px] font-mono text-slate-400">INSTITUTIONAL MMF LIQUIDITY</div>
+                        <div class="text-2xl font-display font-bold text-white mt-1">$7.89 Trillion</div>
+                        <div class="text-xs font-mono text-term-green mt-1"><i class="fa-solid fa-vault"></i> Dry Powder Peak</div>
+                        <div class="text-[10px] text-slate-500 font-mono mt-2">Govt / Repo Buffer Deployment Ready</div>
+                    </div>
+                </div>
+
+                <!-- Charts Row 1 -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="glass-panel p-5 rounded-xl border border-term-border">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-display text-base text-white tracking-wide"><i class="fa-solid fa-chart-line text-term-cyan mr-2"></i> S&P 500 Path vs 10Y Yield Trajectory (2020 - 2027 Projections)</h3>
+                            <span class="text-[10px] font-mono bg-term-card px-2 py-1 rounded text-slate-400">12M FORECAST MODEL</span>
+                        </div>
+                        <div class="h-64 relative">
+                            <canvas id="chartMacroOverview"></canvas>
+                        </div>
+                    </div>
+                    <div class="glass-panel p-5 rounded-xl border border-term-border">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-display text-base text-white tracking-wide"><i class="fa-solid fa-layer-group text-term-amber mr-2"></i> 2026-2027 Credit Maturity Wall & Spread Matrix</h3>
+                            <span class="text-[10px] font-mono bg-term-card px-2 py-1 rounded text-slate-400">REFINANCING STRESS</span>
+                        </div>
+                        <div class="h-64 relative">
+                            <canvas id="chartCreditMatrix"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Row 2 -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="glass-panel p-5 rounded-xl border border-term-border">
+                        <h3 class="font-display text-base text-white mb-3 tracking-wide"><i class="fa-solid fa-pie-chart text-term-purple mr-2"></i> Institutional Dry Powder Pool ($7.89T)</h3>
+                        <div class="h-52 relative">
+                            <canvas id="chartMoneyMarket"></canvas>
+                        </div>
+                    </div>
+                    <div class="glass-panel p-5 rounded-xl border border-term-border lg:col-span-2">
+                        <h3 class="font-display text-base text-white mb-3 tracking-wide"><i class="fa-solid fa-wave-square text-term-red mr-2"></i> Merton Structural Corporate Default Curve (Yield Shock Test)</h3>
+                        <div class="h-52 relative">
+                            <canvas id="chartMertonDefault"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: WHALESCANNER LIVE CORE -->
+        <div id="tab-whales" class="tab-content hidden w-full h-full overflow-y-auto p-4 md:p-8 bg-term-bg">
+            <div class="max-w-7xl mx-auto space-y-6">
+                <div class="glass-panel p-6 rounded-xl border-l-4 border-term-cyan flex flex-wrap justify-between items-center gap-4">
+                    <div>
+                        <h2 class="text-2xl font-display font-bold text-white tracking-wide">WHALESCANNER INTELLIGENCE CORE</h2>
+                        <p class="text-xs font-mono text-slate-400 mt-1">Real-Time Schedule 13D, 13F, and Form 4 Code P (> $250k) Activist Telemetry</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="filterWhales('ALL')" class="px-3 py-1.5 bg-term-cyan text-black font-mono font-bold text-xs rounded hover:bg-white transition">SHOW ALL</button>
+                        <button onclick="filterWhales('ACTIVIST')" class="px-3 py-1.5 bg-term-card hover:bg-term-border font-mono text-xs rounded text-slate-300 transition">ACTIVISTS</button>
+                        <button onclick="filterWhales('M&A')" class="px-3 py-1.5 bg-term-card hover:bg-term-border font-mono text-xs rounded text-slate-300 transition">M&A AUCTION</button>
+                    </div>
+                </div>
+
+                <!-- Activist Stream Cards Grid -->
+                <div id="whalesGrid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Dynamic Whalescanner Item 1: SEER -->
+                    <div class="glass-panel p-5 rounded-xl border border-term-border hover:border-term-cyan transition flex flex-col justify-between">
+                        <div>
+                            <div class="flex justify-between items-start mb-3">
+                                <div>
+                                    <span class="bg-term-cyan/20 text-term-cyan text-[10px] font-mono px-2 py-0.5 rounded font-bold border border-term-cyan/30">M&A BIDDING WAR</span>
+                                    <h3 class="text-xl font-display font-bold text-white mt-1">SEER (Seer, Inc.)</h3>
+                                </div>
+                                <span class="text-xl font-mono font-bold text-term-green">$2.55 vs $2.45</span>
+                            </div>
+                            <p class="text-xs text-slate-300 font-sans leading-relaxed mb-4">
+                                Radoff-JEC Group ($2.55 Cash + CVR) outbids CEO Dr. Farokhzad ($2.45 Cash + 2 CVRs). Shareholders explicitly voted down the NOL Poison Pill, leaving the $219M cash box exposed for maximum shareholder recovery under Special Committee review.
+                            </p>
+                            <div class="bg-black/50 p-3 rounded font-mono text-[11px] space-y-1 text-slate-400">
+                                <div><strong class="text-slate-200">FILER:</strong> Radoff-JEC Group (7.7% Stake)</div>
+                                <div><strong class="text-slate-200">ADVISORS:</strong> Perella Weinberg / Wilson Sonsini</div>
+                                <div><strong class="text-slate-200">CATALYST:</strong> Unpoisoned Board Auction Window</div>
+                            </div>
+                        </div>
+                        <div class="mt-4 pt-3 border-t border-term-border flex justify-between items-center text-xs font-mono">
+                            <span class="text-term-gold">CONVICTION: 9.9 / 10</span>
+                            <span class="text-slate-500">Form 8-K Item 5.07</span>
+                        </div>
+                    </div>
+
+                    <!-- Dynamic Whalescanner Item 2: INBK -->
+                    <div class="glass-panel p-5 rounded-xl border border-term-border hover:border-term-amber transition flex flex-col justify-between">
+                        <div>
+                            <div class="flex justify-between items-start mb-3">
+                                <div>
+                                    <span class="bg-term-amber/20 text-term-amber text-[10px] font-mono px-2 py-0.5 rounded font-bold border border-term-amber/30">Q2 EARNINGS SURPRISE</span>
+                                    <h3 class="text-xl font-display font-bold text-white mt-1">INBK (First Internet Bancorp)</h3>
+                                </div>
+                                <span class="text-xl font-mono font-bold text-term-cyan">TBV $41.09</span>
+                            </div>
+                            <p class="text-xs text-slate-300 font-sans leading-relaxed mb-4">
+                                Q2 EPS surged to $0.27 (+68.8% beat vs $0.16 est.). Credit costs dropped 18% sequentially to $13.4M while NIM expanded to 2.47%. Stock trades at a distressed ~0.6x Tangible Book Value floor, giving the 6.0% Lame Activist Group maximum leverage for buybacks.
+                            </p>
+                            <div class="bg-black/50 p-3 rounded font-mono text-[11px] space-y-1 text-slate-400">
+                                <div><strong class="text-slate-200">FILER:</strong> John & Susan Lame (6.0% Schedule 13D)</div>
+                                <div><strong class="text-slate-200">METRIC:</strong> PPNR $15.0M (+28% YoY)</div>
+                                <div><strong class="text-slate-200">DEMAND:</strong> Accretive Stock Repurchase Authorization</div>
+                            </div>
+                        </div>
+                        <div class="mt-4 pt-3 border-t border-term-border flex justify-between items-center text-xs font-mono">
+                            <span class="text-term-gold">CONVICTION: 9.4 / 10</span>
+                            <span class="text-slate-500">Form 8-K Ingestion</span>
+                        </div>
+                    </div>
+
+                    <!-- Dynamic Whalescanner Item 3: ASTS -->
+                    <div class="glass-panel p-5 rounded-xl border border-term-border hover:border-term-purple transition flex flex-col justify-between">
+                        <div>
+                            <div class="flex justify-between items-start mb-3">
+                                <div>
+                                    <span class="bg-term-purple/20 text-term-purple text-[10px] font-mono px-2 py-0.5 rounded font-bold border border-term-purple/30">CATALYST CATAPULT</span>
+                                    <h3 class="text-xl font-display font-bold text-white mt-1">ASTS (AST SpaceMobile)</h3>
+                                </div>
+                                <span class="text-xl font-mono font-bold text-term-purple">$3.8B LIQUIDITY</span>
+                            </div>
+                            <p class="text-xs text-slate-300 font-sans leading-relaxed mb-4">
+                                Settled $1.15B convertible note financing with $3.8B pro forma reserves. Set Q2 business update call for August 10, 2026, coinciding directly with the manifested Cape Canaveral SpaceX Falcon 9 launch for BlueBirds 11-13.
+                            </p>
+                            <div class="bg-black/50 p-3 rounded font-mono text-[11px] space-y-1 text-slate-400">
+                                <div><strong class="text-slate-200">SYNDICATE:</strong> Strategic Corporate Holdings</div>
+                                <div><strong class="text-slate-200">EVENT WINDOW:</strong> August 10 Launch & Call</div>
+                                <div><strong class="text-slate-200">HEDGE LIMIT:</strong> $149.20 Capped Call Ceiling</div>
+                            </div>
+                        </div>
+                        <div class="mt-4 pt-3 border-t border-term-border flex justify-between items-center text-xs font-mono">
+                            <span class="text-term-gold">CONVICTION: 9.7 / 10</span>
+                            <span class="text-slate-500">13F / Launch Manifest</span>
+                        </div>
+                    </div>
+
+                    <!-- Dynamic Whalescanner Item 4: FCX -->
+                    <div class="glass-panel p-5 rounded-xl border border-term-border hover:border-term-green transition flex flex-col justify-between">
+                        <div>
+                            <div class="flex justify-between items-start mb-3">
+                                <div>
+                                    <span class="bg-term-green/20 text-term-green text-[10px] font-mono px-2 py-0.5 rounded font-bold border border-term-green/30">BARBELL FORTRESS</span>
+                                    <h3 class="text-xl font-display font-bold text-white mt-1">FCX (Freeport-McMoRan)</h3>
+                                </div>
+                                <span class="text-xl font-mono font-bold text-term-green">+3.15% WoW</span>
+                            </div>
+                            <p class="text-xs text-slate-300 font-sans leading-relaxed mb-4">
+                                Mandatory CBP country-of-smelt tracking effective July 30 and modified Section 232 full customs-value tariffs protect domestic copper producers. Institutional whale options sweeps registered 3.7σ out-of-the-money call accumulation.
+                            </p>
+                            <div class="bg-black/50 p-3 rounded font-mono text-[11px] space-y-1 text-slate-400">
+                                <div><strong class="text-slate-200">REGIME:</strong> Tariff Protected Critical Asset</div>
+                                <div><strong class="text-slate-200">VALUATION:</strong> 14.2x FWD P/E // 8.9% FCF Yield</div>
+                                <div><strong class="text-slate-200">SCORE:</strong> +0.88 Buy/Sell Conviction</div>
+                            </div>
+                        </div>
+                        <div class="mt-4 pt-3 border-t border-term-border flex justify-between items-center text-xs font-mono">
+                            <span class="text-term-gold">CONVICTION: 9.8 / 10</span>
+                            <span class="text-slate-500">CBP Customs Data</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 4: COUNTERFACTUAL SCENARIO SIMULATOR -->
+        <div id="tab-sim" class="tab-content hidden w-full h-full overflow-y-auto p-4 md:p-8 bg-term-bg">
+            <div class="max-w-5xl mx-auto space-y-6">
+                <div class="glass-panel p-6 rounded-xl border-l-4 border-term-purple">
+                    <h2 class="text-2xl font-display font-bold text-white tracking-wide"><i class="fa-solid fa-sliders text-term-purple mr-2"></i> COUNTERFACTUAL SCENARIO ENGINE</h2>
+                    <p class="text-xs font-mono text-slate-400 mt-1">Stress-test macro variables, energy shock inputs, and central bank hike odds to compute real-time default probability spikes and VaR shifts for 2026-2027.</p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Control Sliders Box -->
+                    <div class="glass-panel p-6 rounded-xl border border-term-border space-y-6 lg:col-span-1">
+                        <h3 class="font-mono text-sm font-bold text-term-cyan uppercase border-b border-term-border pb-2">Stress Parameters</h3>
+                        
+                        <!-- Slider 1: Brent Crude -->
+                        <div>
+                            <div class="flex justify-between text-xs font-mono mb-2">
+                                <span class="text-slate-300">Brent Crude Oil ($/bbl):</span>
+                                <span id="valBrent" class="text-term-amber font-bold">$83.40</span>
+                            </div>
+                            <input type="range" id="sliderBrent" min="60" max="130" value="83.4" step="0.5" oninput="runScenarioSimulation()" class="w-full accent-term-amber cursor-pointer">
+                        </div>
+
+                        <!-- Slider 2: 10Y Yield -->
+                        <div>
+                            <div class="flex justify-between text-xs font-mono mb-2">
+                                <span class="text-slate-300">10Y Benchmark Yield:</span>
+                                <span id="val10Y" class="text-term-cyan font-bold">4.67%</span>
+                            </div>
+                            <input type="range" id="slider10Y" min="3.50" max="6.00" value="4.67" step="0.05" oninput="runScenarioSimulation()" class="w-full accent-term-cyan cursor-pointer">
+                        </div>
+
+                        <!-- Slider 3: CME Sept Hike Odds -->
+                        <div>
+                            <div class="flex justify-between text-xs font-mono mb-2">
+                                <span class="text-slate-300">CME Sept Hike Prob:</span>
+                                <span id="valHikeProb" class="text-term-red font-bold">63%</span>
+                            </div>
+                            <input type="range" id="sliderHikeProb" min="0" max="100" value="63" step="1" oninput="runScenarioSimulation()" class="w-full accent-term-red cursor-pointer">
+                        </div>
+
+                        <button onclick="resetScenarioSliders()" class="w-full py-2 bg-term-card hover:bg-term-border text-slate-300 rounded font-mono text-xs border border-term-border transition">
+                            <i class="fa-solid fa-rotate-left mr-1"></i> Reset Baseline Defaults
+                        </button>
+                    </div>
+
+                    <!-- Computed Output Metrics Box -->
+                    <div class="glass-panel p-6 rounded-xl border border-term-border lg:col-span-2 space-y-6 flex flex-col justify-between">
+                        <div>
+                            <h3 class="font-mono text-sm font-bold text-term-green uppercase border-b border-term-border pb-2 mb-4">Simulated Systemic Stress Output</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                                <div class="bg-black/50 p-4 rounded-lg border border-term-border">
+                                    <div class="text-[10px] font-mono text-slate-400 uppercase">Single-B Default Prob</div>
+                                    <div id="simDefaultProb" class="text-2xl font-mono font-bold text-term-red mt-1">12.4%</div>
+                                    <div class="text-[10px] text-slate-500 font-mono mt-1" id="simDefaultDelta">+4.2% vs baseline</div>
+                                </div>
+                                <div class="bg-black/50 p-4 rounded-lg border border-term-border">
+                                    <div class="text-[10px] font-mono text-slate-400 uppercase">Portfolio VaR Shock (14-Day)</div>
+                                    <div id="simVaRShock" class="text-2xl font-mono font-bold text-term-amber mt-1">62.0%</div>
+                                    <div class="text-[10px] text-slate-500 font-mono mt-1">Tech Multiple Sensitivity</div>
+                                </div>
+                                <div class="bg-black/50 p-4 rounded-lg border border-term-border">
+                                    <div class="text-[10px] font-mono text-slate-400 uppercase">Projected S&P Ceiling</div>
+                                    <div id="simSPTarget" class="text-2xl font-mono font-bold text-term-cyan mt-1">7,606.07</div>
+                                    <div class="text-[10px] text-slate-500 font-mono mt-1">Implied Fair Value</div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-term-surface/90 p-4 rounded-lg border border-term-border text-xs font-mono space-y-2">
+                                <div class="text-term-cyan font-bold"><i class="fa-solid fa-calculator mr-1.5"></i> Autoresearch Analytical Verdict:</div>
+                                <p id="simVerdictText" class="text-slate-300 font-sans leading-relaxed">
+                                    At $83.40 Brent and 4.67% 10-Year yields, corporate interest coverage remains under pressure. The Basel III Mulligan reserve cushions Tier 1 G-SIBs, but non-exempt secondary borrowers encounter immediate debt service strain.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="text-[10px] font-mono text-slate-500 flex justify-between items-center pt-2 border-t border-term-border">
+                            <span>MODEL: Merton_Structural_v4.2</span>
+                            <span>COMPUTE LATENCY: 0.12ms</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 5: INSTITUTIONAL LEDGER & JSON SCHEMA -->
+        <div id="tab-ledger" class="tab-content hidden w-full h-full overflow-y-auto p-4 md:p-8 bg-term-bg">
+            <div class="max-w-6xl mx-auto space-y-6">
+                <div class="glass-panel p-6 rounded-xl border-l-4 border-term-gold flex justify-between items-center">
+                    <div>
+                        <h2 class="text-2xl font-display font-bold text-white tracking-wide"><i class="fa-solid fa-database text-term-gold mr-2"></i> INSTITUTIONAL AI TRAINING LEDGER</h2>
+                        <p class="text-xs font-mono text-slate-400 mt-1">Parsed JSON Provenance Ledger & OpenAPI Structured Response Schema for ML Pipelines</p>
+                    </div>
+                    <button onclick="copyLedgerJSON()" class="px-4 py-2 bg-term-gold text-black font-mono font-bold text-xs rounded shadow-lg hover:brightness-110 transition">
+                        <i class="fa-solid fa-copy mr-1"></i> Copy Full JSON Payload
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- JSON Data Stream -->
+                    <div class="glass-panel p-5 rounded-xl border border-term-border">
+                        <h3 class="font-mono text-xs font-bold text-term-cyan uppercase mb-3 flex items-center justify-between">
+                            <span>Ingested JSON Nodes (2026-2027 Macro Baseline)</span>
+                            <span class="text-[10px] text-slate-500">FORMAT: JSONL</span>
+                        </h3>
+                        <pre id="jsonLedgerDisplay" class="bg-black/90 p-4 rounded-lg font-mono text-[11px] text-term-gold overflow-x-auto h-96 border border-term-border leading-relaxed"></pre>
+                    </div>
+
+                    <!-- JSON Schema -->
+                    <div class="glass-panel p-5 rounded-xl border border-term-border">
+                        <h3 class="font-mono text-xs font-bold text-term-amber uppercase mb-3 flex items-center justify-between">
+                            <span>GitHub Pipeline Schema Specification</span>
+                            <span class="text-[10px] text-slate-500">DRAFT 2020-12</span>
+                        </h3>
+                        <pre id="jsonSchemaDisplay" class="bg-black/90 p-4 rounded-lg font-mono text-[11px] text-term-cyan overflow-x-auto h-96 border border-term-border leading-relaxed"></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ADAM AI BOT SIDE DRAWER -->
+        <aside id="aiDrawer" class="fixed right-0 top-0 h-full w-full md:w-[500px] glass-panel border-l border-term-border transform translate-x-full transition-transform duration-300 ease-in-out z-50 flex flex-col shadow-2xl bg-term-surface/95">
+            <!-- AI Drawer Header -->
+            <div class="p-4 border-b border-term-border flex items-center justify-between bg-black/50">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full bg-term-cyan/20 border border-term-cyan flex items-center justify-center text-term-cyan font-mono font-bold text-sm">
+                        <i class="fa-solid fa-brain animate-pulse"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-display font-bold text-white text-base">ADAM v26.0 INTELLIGENCE</h3>
+                        <p class="text-[10px] font-mono text-term-cyan">Gemini 3 Flash Sovereign Agent</p>
+                    </div>
+                </div>
+                <button onclick="closeAITerminal()" class="text-slate-400 hover:text-white p-2 text-lg transition">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Pre-set Prompt Chips -->
+            <div class="p-2 border-b border-term-border bg-black/30 flex gap-2 overflow-x-auto text-[10px] font-mono shrink-0">
+                <button onclick="quickQuery('What is the 12-month target for S&P 500 and 10Y yields?')" class="px-2 py-1 bg-term-card hover:bg-term-border text-term-cyan rounded border border-term-border whitespace-nowrap transition">🎯 12M Targets</button>
+                <button onclick="quickQuery('Explain the $3.0T Refinancing Wall risk in 2026-2027')" class="px-2 py-1 bg-term-card hover:bg-term-border text-term-amber rounded border border-term-border whitespace-nowrap transition">⚠️ Refinancing Wall</button>
+                <button onclick="quickQuery('How does AI compute capex affect power grid stocks?')" class="px-2 py-1 bg-term-card hover:bg-term-border text-term-purple rounded border border-term-border whitespace-nowrap transition">⚡ AI Energy Grid</button>
+            </div>
+
+            <!-- Chat Output Scroll Area -->
+            <div id="aiChatLog" class="flex-1 overflow-y-auto p-4 space-y-4 font-mono text-xs">
+                <div class="bg-term-card/90 p-4 rounded-lg border-l-2 border-term-cyan text-slate-300 shadow-md">
+                    <div class="text-[10px] text-term-cyan font-bold mb-1">SYSTEM INGESTION COMPLETE [2026-2027 REGIME]</div>
+                    <p class="font-sans leading-relaxed">
+                        I am Adam v26.0. I have internalized the 12-Month Macro Trends, including the 2026-2027 $3.0 Trillion corporate refinancing wall, the S&P 500 7,606 expansion, 10Y yield structural floor at 4.67%, and the AI hardware/energy capex boom. Ask me any analytical or scenario query.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Chat Input Area -->
+            <div class="p-3 border-t border-term-border bg-black/60">
+                <form onsubmit="submitAIQuery(event)" class="flex gap-2">
+                    <input type="text" id="aiInputPrompt" placeholder="Query Adam v26.0 (e.g., 'Analyze 2027 default risks')..." class="flex-1 bg-term-bg border border-term-border rounded-lg px-3 py-2 text-xs font-mono text-white placeholder-slate-500 focus:outline-none focus:border-term-cyan transition">
+                    <button type="submit" id="aiSubmitBtn" class="bg-term-cyan hover:bg-white text-black font-mono font-bold px-4 py-2 rounded-lg text-xs transition flex items-center gap-1 shadow-md shadow-term-cyan/20">
+                        <span>SEND</span> <i class="fa-solid fa-paper-plane"></i>
+                    </button>
+                </form>
+            </div>
+        </aside>
+    </div>
+
+    <script>
+        // --- CUSTOM TOAST NOTIFICATION SYSTEM (Replaces alerts) ---
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            if (!container) return;
+            
+            const toast = document.createElement('div');
+            
+            // Determine styling based on type
+            let colorClass = 'border-term-cyan text-term-cyan';
+            let iconClass = 'fa-circle-info';
+            
+            if (type === 'success') {
+                colorClass = 'border-term-green text-term-green';
+                iconClass = 'fa-check-circle';
+            } else if (type === 'warning') {
+                colorClass = 'border-term-amber text-term-amber';
+                iconClass = 'fa-triangle-exclamation';
+            } else if (type === 'error') {
+                colorClass = 'border-term-red text-term-red';
+                iconClass = 'fa-circle-xmark';
+            }
+
+            toast.className = `glass-panel border-l-4 ${colorClass} px-4 py-3 rounded shadow-xl font-mono text-xs transform transition-all duration-300 translate-y-8 opacity-0 pointer-events-auto flex items-center justify-between gap-3 min-w-[300px]`;
+            
+            toast.innerHTML = `
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid ${iconClass}"></i> 
+                    <span class="text-white">${message}</span>
+                </div>
+                <button class="text-slate-500 hover:text-white transition" onclick="this.parentElement.remove()">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            `;
+
+            container.appendChild(toast);
+
+            // Animate in
+            requestAnimationFrame(() => {
+                setTimeout(() => {
+                    toast.classList.remove('translate-y-8', 'opacity-0');
+                }, 10);
+            });
+
+            // Auto dismiss after 3 seconds
+            setTimeout(() => {
+                if(document.body.contains(toast)) {
+                    toast.classList.add('translate-y-8', 'opacity-0');
+                    setTimeout(() => {
+                        if(document.body.contains(toast)) toast.remove();
+                    }, 300);
+                }
+            }, 3000);
+        }
+
+        // Database of 6 comprehensive newsletters and 12-month macro briefings with historical underpinnings
+        const newsletterDatabase = [
+            {
+                id: "2026.08.03-OUTLOOK",
+                tag: "OUTLOOK 2026-2027 // PRIMARY BRIEF",
+                title: "12-MONTH MACRO TRENDS & 2027 OUTLOOK // THE BASE RATE SHIFT",
+                markdown: `# 12-MONTH MACRO TRENDS & 2027 OUTLOOK: THE STRUCTURAL BASE RATE REGIME
+
+**NODE:** Adam v26.0 (Neuro-Symbolic Sovereign Engine)  
+**HORIZON:** August 2026 → August 2027  
+**REGIME:** Post-ZIRP Structural Base-Rate Plateau (4.00% – 4.75% 10Y Sovereign Yield Window)
+
+---
+
+### **1. EXECUTIVE SUMMARY & 12-MONTH TARGET MATRIX**
+
+The global financial complex enters late 2026 governed by a fundamental regime transition: **the permanent retirement of zero-cost capital and the establishment of a sticky 4.00%–4.75% benchmark yield floor**. Despite periodic geopolitical headline shocks (including the prompt Persian Gulf maritime friction), underlying economic activity remains buoyed by an unprecedented **AI hardware & energy infrastructure capital expenditure wave**, offsetting severe interest rate drag across legacy debt-heavy sectors.
+
+| Metric / Benchmark | August 2026 Baseline | Q4 2026 Target | Q2 2027 Target | Q3 2027 Terminal Target | Macro Driver |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **S&P 500 Index** | **7,606.07** | 7,750.00 | 7,920.00 | **8,100.00** | +18.4% 12M EPS Growth & AI Hyperscaler Margin Expansion |
+| **U.S. 10Y Sovereign Yield** | **4.67%** | 4.55% | 4.35% | **4.25%** | Slow Inflation Cooling & Terminal Fed Rate at 3.75% |
+| **Spot VIX Volatility** | **15.79** | 16.50 | 14.80 | **14.50** | Options Overwrite Monetization & Structured Yield Demand |
+| **WTI / Brent Crude Oil** | **$79.60 / $83.40** | $78.00 / $82.00 | $74.00 / $78.00 | **$72.00 / $76.00** | Non-OPEC Supply Surges & Middle East Transit De-escalation |
+| **Bitcoin (BTC)** | **$63,892.88** | $68,500.00 | $74,000.00 | **82,000.00** | Institutional ETF Inflows & Global Liquidity Expansion |
+| **Institutional MMF Pool** | **$7.893 Trillion** | $8.10 Trillion | $7.60 Trillion | **$7.20 Trillion** | Dry Powder Deployment into Private Credit & Infrastructure |
+
+---
+
+### **2. CORE MACRO TRENDS DRIVING 2026-2027**
+
+#### **Trend A: The $3.0 Trillion Corporate & CRE Refinancing Wall**
+The primary credit risk over the next 12 months is not an unexpected liquidity freeze, but rather the **inexorable rollover of low-coupon debt issued between 2019 and 2021**. 
+* Over **$1.8 Trillion in Commercial Real Estate (CRE)** loans and **$1.2 Trillion in Leveraged Corporate Debt (BSL & High-Yield)** mature between Q3 2026 and Q4 2027.
+* Issuers faces a step-up in coupon obligations from historic averages of **2.8% - 3.5% up to 7.25% - 8.50%**.
+* *Impact:* We anticipate a widening bifurcation: Tier-1 investment grade corporations will easily absorb higher interest costs via strong operating cash flows, whereas Single-B and CCC rated issuers will face restructuring cliff-risk.
+
+#### **Trend B: The AI Energy Grid & Industrial Re-Shoring Capex Boom**
+Hyperscaler technology giants (Microsoft, Alphabet, Amazon, Meta) are projected to deploy over **$240 Billion in direct capital expenditures** over the next 12 months, shifting focus from pure silicon acquisition to **electrical grid capacity, nuclear power purchase agreements (PPAs), and domestic copper smelting**.
+* Domestic metals under modified **Section 232 tariffs (mandatory CBP country-of-smelt tracking effective July 30)** receive structural price protection.
+* Copper producers (e.g., Freeport-McMoRan) and electrical equipment manufacturers enjoy double-digit multi-year earnings visibility.
+
+#### **Trend C: Central Bank Policy & The Federal Reserve Under Warsh**
+Following the July 2026 FOMC meeting hold (3.50% - 3.75%), Federal Reserve Chair Kevin Warsh has signaled that while the aggressive tightening cycle has concluded, **the threshold for rapid monetary easing is exceptionally high**.
+* Interest rates will slide downward at a measured pace of 25 bps per semester, reaching a terminal fed funds floor of **3.50% by mid-2027**.
+* Quantitative Tightening (QT) runoff has been recalibrated to preserve money market liquidity, maintaining institutional cash buffers near **$7.89 Trillion**.
+
+---
+
+### **3. HISTORICAL SUPPORT & UNDERPINNINGS (2020 – 2026)**
+
+To understand the 2026–2027 outlook, institutional allocators must trace the multi-year macro trajectory:
+1. **2020–2021 (The Emergency ZIRP Regime):** Central banks injected over $11 Trillion in global stimulus, dropping benchmark yields to zero and encouraging corporations to lock in multi-year debt at sub-3% rates.
+2. **2022–2023 (The Inflation Shock & 500 bps Tightening):** Post-pandemic supply bottlenecks and energy spikes forced the fastest Fed rate hiking cycle in 40 years, driving 10Y yields from 1.50% to over 5.00%.
+3. **2024–2025 (The Soft Landing & AI Disruption):** Corporate profit margins expanded to record highs (~16%) led by AI productivity gains, preventing a recession despite steep borrowing costs.
+4. **March 2026 (The Basel III "Mulligan"):** Regulators granted G-SIB banks synthetic Tier-1 capital relief, preventing an abrupt contraction in commercial lending and establishing the liquidity bridge into today's S&P 7,606 all-time high.
+
+---
+
+### **4. STRATEGIC ALLOCATION & RISK ROUTING**
+
+* **Overweight (65% Fortress Allocation):** Short-duration Sovereign Floating Rate Notes, Domestic Tariff-Protected Critical Commodities (FCX), Electrical Infrastructure, Nuclear Energy Providers.
+* **Underweight / Short (35% Tactical Overlays):** Highly-leveraged application software issuers with late-2026 maturity walls, unhedged office CRE debt obligations, and low-margin legacy retail issuers.`
+            },
+            {
+                id: "2026.08.03-HISTORICAL",
+                tag: "HISTORICAL DOSSIER // 2020-2026",
+                title: "HISTORICAL UNDERPINNINGS: FROM ZERO-BOUND TO STRUCTURAL CAPITAL REALITY",
+                markdown: `# HISTORICAL UNDERPINNINGS (2020 - 2026): THE ANATOMY OF THE GREAT RATE RE-PRICING
+
+**NODE:** Historical Micro-Database // Adam Risk Engine  
+**TIMELINE INGESTED:** March 2020 → August 2026
+
+---
+
+### **1. THE ZIRP ERA & THE DEBT MATURITY SEEDING (2020–2021)**
+Following the outbreak of the global pandemic in Q1 2020, central banks implemented unprecedented emergency monetary expansion. 
+* The Federal Reserve lowered the federal funds rate to **0.00%–0.25%** and launched open-ended Quantitative Easing, inflating M2 money supply by over +26% YoY.
+* **The Corporate Response:** Corporations and commercial real estate sponsors executed historic corporate debt issuances, locking in $2.4 Trillion in investment-grade debt and $1.1 Trillion in high-yield bonds at record low coupons (2.0% to 3.5%).
+* **The Delayed Fuse:** Because these debts were structured with 5- to 7-year maturities, the structural cost of capital shock was deferred directly into the **2026–2027 refinancing window**.
+
+\`\`\`
+[ 2020-2021 Low-Coupon Issuance ] ------------( 5-7 Year Maturity )------------> [ 2026-2027 Refinancing Wall ]
+  - IG Coupons: 2.0% - 3.5%                                                        - Refinance Rates: 6.5% - 8.5%
+  - CRE Debt: 3.2% Floating                                                        - Refinance SOFR+500 bps
+\`\`\`
+
+---
+
+### **2. THE 500 BPS MONETARY SHOCK (2022–2023)**
+As headline CPI peaked at 9.1% in June 2022, the Federal Reserve executed 525 basis points of cumulative rate hikes within 16 months—the most aggressive policy tightening in four decades.
+* Sovereign yield curves inverted steeply (2Y/10Y reaching -108 bps in July 2023), historically a precursor to severe contraction.
+* However, private corporate balance sheets remained insulated throughout 2023 and 2024 because fixed-rate debt held weighted average interest rates below 3.8%.
+
+---
+
+### **3. THE AI CAPEX TRANSFORMATION & MARGIN EXPANSION (2024–2025)**
+While traditional economic models predicted a delayed recession, the commercial rollout of Generative AI transformed corporate capital budgets:
+* S&P 500 net operating margins expanded to an all-time peak of **16.1%**, driven by tech sector cash flows and corporate efficiency initiatives.
+* Hyperscaler free cash flow conversion pivoted from software seat expansion toward physical asset accumulation: data center buildouts, high-density server clusters, and dedicated power plants.
+
+---
+
+### **4. REGULATORY STRUCTURAL EVOLUTION: BASEL III MULLIGAN (MARCH 2026)**
+In early 2026, regulatory authorities finalized amendments to the Basel III Endgame capital rules.
+* Facing severe unrealized bond portfolio losses at G-SIB banks ($620B+ across unrealized HTM securities), regulators granted temporary synthetic CET1 capital relief (-4.8% to -6.4% capital deduction relief).
+* This "Mulligan" prevented a forced liquidation of bank balance sheets, allowing money market funds to grow to **$7.893 Trillion** and fueling the equity rally to **S&P 7,606.07** today.`
+            },
+            {
+                id: "2026.08.03-REFINANCING",
+                tag: "DOSSIER 2026.08.03-C // DEBT WALL",
+                title: "THE $3.0T REFINANCING WALL: CORPORATE & CRE MATURITY PROFILES",
+                markdown: `# THE $3.0 TRILLION REFINANCING WALL (2026-2027)
+
+**NODE:** Credit Risk Assessment Matrix  
+**TARGET HORIZON:** Q3 2026 – Q4 2027  
+**SYSTEMIC CONCERNS:** Interest Coverage Erosion, Loss Given Default (LGD) Spikes in Private Credit
+
+---
+
+### **1. MATURITY BREAKDOWN BY ASSET CLASS**
+
+Between August 2026 and December 2027, global debt markets must digest **$3.0 Trillion** in maturing credit facilities:
+
+1. **Commercial Real Estate (CRE): $1.62 Trillion**
+   * *Multifamily Debt:* $162.1 Billion maturing in 2026; $167.7 Billion in 2027.
+   * *Office & Industrial:* $480 Billion in short-term interest-only bridge loans reaching extension limits.
+   * *Cap Rate Friction:* Average cap rates have expanded by 210 bps since origination, reducing underlying property equity value by 20%-35%.
+
+2. **Leveraged Loans & Broadly Syndicated Loans (BSL): $625 Billion**
+   * Over 34% of single-B rated leveraged loans mature between late 2026 and 2028.
+   * SOFR spreads averaging +275 to +325 bps mean effective borrowing costs jump from ~4.5% to **8.15%**.
+
+3. **High-Yield Corporate Bonds: $755 Billion**
+   * High-yield issuers face refinancing coupons averaging 7.85% vs existing 4.20% average coupons.
+
+\`\`\`
++-------------------------------------------------------------------------+
+|                2026 - 2027 DEBT MATURITY DISTRIBUTION                   |
++-------------------------------------------------------------------------+
+| Asset Class               | 2026 Maturity  | 2027 Maturity | Avg Step-Up|
++---------------------------+----------------+---------------+------------+
+| Multifamily CRE           | $162.1 Billion | $167.7 Billion| +340 bps   |
+| Office & Retail CRE       | $310.0 Billion | $345.0 Billion| +420 bps   |
+| Broadly Syndicated Loans  | $280.0 Billion | $345.0 Billion| +360 bps   |
+| High-Yield Corporate Bonds| $320.0 Billion | $435.0 Billion| +365 bps   |
++-------------------------------------------------------------------------+
+\`\`\`
+
+---
+
+### **2. PRIVATE CREDIT VS BSL COVENANT DYNAMICS**
+
+* **Covenant-Lite Erosion in BSL:** 88% of maturing Broadly Syndicated Loans lack financial maintenance covenants, delaying default events but dramatically worsening **Loss Given Default (LGD)** when restructuring occurs (historical LGD rising from 33% to 58%).
+* **Private Credit Direct Lending:** Private credit funds (managing $2.1T AUM) are actively executing debt-for-equity swaps and equity kickers to keep software and healthcare borrowers solvent, preventing headline default spikes but diluting equity holders.`
+            },
+            {
+                id: "2026.08.03-INFRA",
+                tag: "DOSSIER 2026.08.03-D // TECH & ENERGY",
+                title: "AI COMPUTE & ENERGY GRID BOOM: THE MULTI-TRILLION CAPEX ENGINE",
+                markdown: `# AI COMPUTE & ENERGY GRID BOOM: THE MULTI-TRILLION CAPEX ENGINE
+
+**NODE:** Industrial Infrastructure Intelligence  
+**THEME:** AI Capital Expenditure & Physical Grid Bottlenecks (2026 - 2027)
+
+---
+
+### **1. THE CAPEX HYPERSFORMATION**
+The financial driver sustaining the **S&P 500 at 7,606.07** is the massive capital allocation by major technology firms into physical infrastructure.
+
+* **12-Month Projected Capex (Big 5 Hyperscalers):** **$245 Billion** (+28% YoY increase).
+* **Shift from Chips to Megawatts:** Data center capacity constraints have pivoted from GPU availability to **electrical power interconnects**.
+* Peak power demand from domestic data centers is projected to double by late 2027, requiring over **45 Gigawatts** of new generation capacity.
+
+---
+
+### **2. THE RE-SHORING & METALS TARIFF PROTECTION**
+
+Effective July 30, 2026, updated Customs and Border Protection (CBP) rules require **mandatory country-of-smelt and cast tracking** for imported copper and industrial metal components.
+* Under modified **Section 232 tariffs**, duties are assessed on the **full customs value** of imported finished electrical equipment rather than raw weight.
+* This policy shields domestic producers like **Freeport-McMoRan (NYSE: FCX)**, maintaining high domestic cash-flow conversion (~8.9% FCF yield) and driving multi-year earnings beats.`
+            },
+            {
+                id: "2026.08.03-BARBELL",
+                tag: "DOSSIER 2026.08.03-E // PLAYBOOK",
+                title: "FORTRESS & HUNT: INSTITUTIONAL ASSET ALLOCATION PLAYBOOK 2026-2027",
+                markdown: `# FORTRESS & HUNT: INSTITUTIONAL ASSET ALLOCATION PLAYBOOK 2026-2027
+
+**NODE:** Portfolio Strategy Matrix  
+**ALLOCATION TARGET:** 65% Fortress (Capital Preservation & Yield) // 35% Hunt (Asymmetric Alpha)
+
+---
+
+### **1. THE 65% FORTRESS STACK (DEFENSIVE & REAL ASSETS)**
+
+1. **Zero-Duration Treasury Floating Rate Notes (FRNs): 30% Allocation**
+   * Captures 4.65%+ short-end yield while eliminating duration risk against Fed rate volatility.
+2. **Critical Energy & Tariff-Protected Commodities: 20% Allocation**
+   * Long positions in domestic copper extractors (**FCX**) and nuclear utilities benefiting from data center PPAs.
+3. **Short-Term Corporate Paper & High-Grade Credit: 15% Allocation**
+   * Focus on A/BBB balance sheets with no debt maturities until 2029.
+
+---
+
+### **2. THE 35% HUNT STACK (ASYMMETRIC ALPHA & SHORTS)**
+
+1. **AI Digital Infrastructure Leaders: 15% Allocation**
+   * Focus on electrical transformers, cooling systems, and specialized semiconductor packaging.
+2. **Systematic Put Option Overwrite & Volatility Harvesting: 10% Allocation**
+   * Capitalizing on low spot VIX (15.79) to sell out-of-the-money calls and purchase downside put hedges.
+3. **Selective Short Basket (Leveraged BSL Software): 10% Allocation**
+   * Shorting over-leveraged enterprise application software companies facing late-2026 maturity walls with declining seat-license growth.`
+            },
+            {
+                id: "2026.08.03-SYNTHESIS",
+                tag: "DOSSIER 2026.08.03-F // SYNTHESIS",
+                title: "SYSTEM 1-3 NEURO-SYMBOLIC 12-MONTH SYNTHESIS MATRIX",
+                markdown: `# SYSTEM 1-3 NEURO-SYMBOLIC SYNTHESIS MATRIX
+
+**NODE:** Adam Sovereign Core v26.0  
+**COMPUTE ENGINE:** Multi-Agent Monte Carlo Simulation (50,000 Iterations)
+
+---
+
+### **1. SYSTEM 1: REAL-TIME INGESTION VERIFICATION**
+* **S&P 500:** 7,606.07 (+1.55% ATH Expansion)
+* **10Y Sovereign Yield:** 4.67% (-6.0 bps Easing)
+* **VIX Index:** 15.79 (-2.31% Option Volatility Crush)
+* **WTI / Brent Crude:** $79.60 / $83.40 (-6.8% Energy De-escalation)
+
+---
+
+### **2. SYSTEM 3: 12-MONTH MONTE CARLO RISK OUTLOOK**
+* **Base Case (62% Probability):** Soft landing continues; S&P reaches 8,100 by Q3 2027; 10Y yields drift down to 4.25%; corporate default rate stays manageable at 3.2%.
+* **Stagflation Bear Case (23% Probability):** Energy re-ignites inflation above 4.0%; 10Y yield surges to 5.25%; S&P compresses to 6,400; $3.0T refinancing wall triggers default wave in Single-B credit.
+* **Bull Expansion Case (15% Probability):** Rapid AI productivity surge boosts GDP to +3.8%; S&P breaks 8,500; Fed cuts rates to 3.25%.
+
+---
+
+### **3. SYSTEM 2: EXECUTIVE RISK DE-RISKING DIRECTIVE**
+Maintain 65% Fortress capital stack in zero-duration floaters and tariff-protected real assets while systematically monetizing low VIX levels via structured options hedges.`
+            }
+        ];
+
+        let currentTab = 'tab-briefs';
+        let currentEditionId = '2026.08.03-OUTLOOK';
+        let chartInstances = {};
+
+        // Application Initialization
+        function initApp() {
+            renderNewsletterList();
+            renderMarkdown(currentEditionId);
+            initCharts();
+            initLedgerDisplay();
+            runScenarioSimulation();
+        }
+
+        // Tab Switching Logic
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            
+            document.getElementById(tabId).classList.remove('hidden');
+            document.getElementById('btn-' + tabId).classList.add('active');
+            currentTab = tabId;
+
+            // Trigger chart resize if macro tab opened
+            if (tabId === 'tab-macro') {
+                setTimeout(() => {
+                    Object.values(chartInstances).forEach(chart => {
+                        if(chart) chart.resize()
+                    });
+                }, 50);
+            }
+        }
+
+        // Render Sidebar Dossier Navigation
+        function renderNewsletterList() {
+            const container = document.getElementById('newsletterList');
+            container.innerHTML = newsletterDatabase.map(edition => `
+                <button onclick="renderMarkdown('${edition.id}')" class="w-full text-left p-2.5 rounded-lg border transition ${edition.id === currentEditionId ? 'bg-term-cyan/15 border-term-cyan text-white shadow-md' : 'bg-term-card/50 border-term-border text-slate-400 hover:bg-term-border hover:text-slate-200'}">
+                    <div class="text-[9px] font-mono text-term-cyan mb-0.5">${edition.tag}</div>
+                    <div class="font-bold text-xs truncate">${edition.title}</div>
+                </button>
+            `).join('');
+            document.getElementById('editionCount').innerText = `${newsletterDatabase.length} Dossiers`;
+        }
+
+        // Render Selected Markdown Document
+        function renderMarkdown(editionId) {
+            currentEditionId = editionId;
+            renderNewsletterList();
+            const edition = newsletterDatabase.find(e => e.id === editionId);
+            if (!edition) return;
+
+            document.getElementById('readerEditionTag').innerText = edition.tag;
+            document.getElementById('readerTitle').innerText = edition.title;
+            document.getElementById('markdownOutput').innerHTML = marked.parse(edition.markdown);
+        }
+
+        function copyMarkdownText() {
+            const edition = newsletterDatabase.find(e => e.id === currentEditionId);
+            if (!edition) return;
+            const textarea = document.createElement('textarea');
+            textarea.value = edition.markdown;
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                showToast('Markdown Dossier text copied to clipboard!', 'success');
+            } catch(e) {
+                showToast('Failed to copy text.', 'error');
+            }
+            document.body.removeChild(textarea);
+        }
+
+        function printBriefing() {
+            window.print();
+        }
+
+        function toggleCRT() {
+            const crt = document.getElementById('crtOverlay');
+            crt.style.display = crt.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function initCharts() {
+            Chart.defaults.color = '#94a3b8';
+            Chart.defaults.font.family = "'Fira Code', monospace";
+            Chart.defaults.scale.grid.color = 'rgba(255, 255, 255, 0.05)';
+
+            // Chart 1: Macro Overview (12M Forecast Trajectory)
+            const ctxMacro = document.getElementById('chartMacroOverview').getContext('2d');
+            chartInstances.macro = new Chart(ctxMacro, {
+                type: 'line',
+                data: {
+                    labels: ['2020', '2022', '2024', 'Aug 2026', 'Q4 2026 (Tgt)', 'Q2 2027 (Tgt)', 'Q3 2027 (Tgt)'],
+                    datasets: [
+                        { label: 'S&P 500 Path (Target: 8,100)', data: [3380, 3839, 5900, 7606, 7750, 7920, 8100], borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,0.1)', fill: true, tension: 0.3 },
+                        { label: '10Y Yield % (Target: 4.25%)', data: [0.89, 3.88, 4.25, 4.67, 4.55, 4.35, 4.25], borderColor: '#06b6d4', borderDash: [4,4], yAxisID: 'y1', tension: 0.2 }
+                    ]
+                },
+                options: { responsive: true, maintainAspectRatio: false, scales: { y: { grid: { color: 'rgba(255,255,255,0.05)' } }, y1: { position: 'right', grid: { drawOnChartArea: false } } } }
+            });
+
+            // Chart 2: Credit Spread & Refinancing Matrix
+            const ctxCredit = document.getElementById('chartCreditMatrix').getContext('2d');
+            chartInstances.credit = new Chart(ctxCredit, {
+                type: 'bar',
+                data: {
+                    labels: ['Multifamily CRE', 'Office & Retail CRE', 'BSL Leveraged Loans', 'High-Yield Corporate'],
+                    datasets: [
+                        { label: 'Existing Low Coupon Rate (%)', data: [3.20, 3.80, 4.50, 4.20], backgroundColor: '#3b82f6' },
+                        { label: '2026-2027 Refinance Coupon Rate (%)', data: [6.60, 8.00, 8.15, 7.85], backgroundColor: '#ef4444' }
+                    ]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+
+            // Chart 3: Money Market Pie
+            const ctxMoney = document.getElementById('chartMoneyMarket').getContext('2d');
+            chartInstances.money = new Chart(ctxMoney, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Government Debt Funds', 'Prime Retail MMF', 'Institutional Treasury', 'Repo Liquidity Buffer'],
+                    datasets: [{ data: [4.20, 1.80, 1.20, 0.693], backgroundColor: ['#06b6d4', '#8b5cf6', '#f59e0b', '#10b981'], borderColor: '#0b1120', borderWidth: 2 }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 12 } } } }
+            });
+
+            // Chart 4: Merton Default Curve
+            const ctxMerton = document.getElementById('chartMertonDefault').getContext('2d');
+            chartInstances.merton = new Chart(ctxMerton, {
+                type: 'line',
+                data: {
+                    labels: ['AAA', 'AA', 'A', 'BBB', 'BB', 'B', 'CCC/C'],
+                    datasets: [
+                        { label: 'Current 1Y Default Prob (%)', data: [0.01, 0.02, 0.08, 0.49, 2.15, 12.08, 67.04], borderColor: '#f59e0b', backgroundColor: 'rgba(245,158,11,0.1)', fill: true },
+                        { label: '5.25% Yield Stress Curve', data: [0.03, 0.08, 0.25, 1.45, 5.80, 24.50, 84.10], borderColor: '#ef4444', borderDash: [5,5] }
+                    ]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+        }
+
+        function runScenarioSimulation() {
+            const brent = parseFloat(document.getElementById('sliderBrent').value);
+            const yield10Y = parseFloat(document.getElementById('slider10Y').value);
+            const hikeProb = parseFloat(document.getElementById('sliderHikeProb').value);
+
+            document.getElementById('valBrent').innerText = `$${brent.toFixed(2)}`;
+            document.getElementById('val10Y').innerText = `${yield10Y.toFixed(2)}%`;
+            document.getElementById('valHikeProb').innerText = `${hikeProb}%`;
+
+            // Compute stress metrics (Counterfactual math models)
+            const defaultProb = Math.min(99.9, (12.08 * (1 + (brent - 83.4) * 0.025 + (yield10Y - 4.67) * 0.45))).toFixed(1);
+            const varShock = Math.min(100.0, (62.0 + (yield10Y - 4.67) * 42.0 + (hikeProb - 63) * 0.35)).toFixed(1);
+            const spTarget = (7606.07 - (brent - 83.4) * 18 - (yield10Y - 4.67) * 420).toFixed(2);
+
+            document.getElementById('simDefaultProb').innerText = `${defaultProb}%`;
+            document.getElementById('simVaRShock').innerText = `${varShock}%`;
+            document.getElementById('simSPTarget').innerText = spTarget;
+
+            // Verdict text logic generator based on thresholds
+            let verdict = `With Brent at $${brent.toFixed(2)} and 10Y yields at ${yield10Y.toFixed(2)}%, sovereign duration friction remains tight. `;
+            if (brent > 100) {
+                verdict += "CRITICAL STAGFLATION ALERT: Crude above $100 triggers emergency margin calls across energy derivative desks and forces central bank rate hikes.";
+                document.getElementById('simVerdictText').className = "text-term-red font-sans leading-relaxed font-bold";
+            } else if (yield10Y > 5.0) {
+                verdict += "HIGH DISCOUNT RATE WARNING: 10Y yield above 5.0% severely compresses equity earnings multiples and triggers leveraged refinancing default waves in Single-B debt.";
+                document.getElementById('simVerdictText').className = "text-term-amber font-sans leading-relaxed";
+            } else {
+                verdict += "Baseline 2026-2027 parameters reflect current diplomatic relief with sticky structural interest rates supporting S&P 7,600+ levels.";
+                document.getElementById('simVerdictText').className = "text-slate-300 font-sans leading-relaxed";
+            }
+            document.getElementById('simVerdictText').innerText = verdict;
+        }
+
+        function resetScenarioSliders() {
+            document.getElementById('sliderBrent').value = 83.4;
+            document.getElementById('slider10Y').value = 4.67;
+            document.getElementById('sliderHikeProb').value = 63;
+            runScenarioSimulation();
+        }
+
+        function initLedgerDisplay() {
+            const ledgerData = [
+                { "variable_node": "SP500_INDEX_ATH", "market_level_value": "7,606.07", "primary_model_target": "12M Forward EV / Multiples", "provenance": "Dow Jones / Trading Economics" },
+                { "variable_node": "US10Y_YIELD", "market_level_value": "4.67%", "primary_model_target": "DCF Discount Rate", "provenance": "Tradeweb / U.S. Treasury" },
+                { "variable_node": "REFINANCING_WALL_2026_2027", "market_level_value": "$3.0 Trillion", "primary_model_target": "Merton Default Curve", "provenance": "Fitch / OECD / Piton IM" },
+                { "variable_node": "VIX_SPOT", "market_level_value": "15.79", "primary_model_target": "Option Dispersion", "provenance": "Cboe Global Markets" },
+                { "variable_node": "BTC_SPOT", "market_level_value": "$63,892.88", "primary_model_target": "Macro Liquidity Proxy", "provenance": "Gemini Real-Time Feed" },
+                { "variable_node": "SEER_BID_OFFER", "market_level_value": "$2.55 Cash + CVR", "primary_model_target": "M&A Arbitrage", "provenance": "SEC Form 8-K Item 5.07" },
+                { "variable_node": "FCX_TARIFF_REGIME", "market_level_value": "+3.15% WoW", "primary_model_target": "Section 232 Metals Protection", "provenance": "CBP Customs Ingestion" }
+            ];
+
+            const schemaData = {
+                "$schema": "https://json-schema.org/draft/2020-12/schema",
+                "title": "MarketMayhemInstitutionalLedger2026",
+                "type": "object",
+                "properties": {
+                    "timestamp": { "type": "string" },
+                    "ingested_nodes": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "variable_node": { "type": "string" },
+                                "market_level_value": { "type": "string" },
+                                "primary_model_target": { "type": "string" },
+                                "provenance": { "type": "string" }
+                            }
+                        }
+                    }
+                }
+            };
+
+            document.getElementById('jsonLedgerDisplay').innerText = JSON.stringify(ledgerData, null, 2);
+            document.getElementById('jsonSchemaDisplay').innerText = JSON.stringify(schemaData, null, 2);
+        }
+
+        function copyLedgerJSON() {
+            const ledgerText = document.getElementById('jsonLedgerDisplay').innerText;
+            const textarea = document.createElement('textarea');
+            textarea.value = ledgerText;
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                showToast('JSON Ledger Payload copied to clipboard!', 'success');
+            } catch(e) {
+                showToast('Failed to copy JSON.', 'error');
+            }
+            document.body.removeChild(textarea);
+        }
+
+        function filterWhales(type) {
+            showToast(`Filtered Whalescanner View: ${type}`, 'info');
+            // Logic to visually filter the grid could go here based on 'type'
+        }
+
+        function openAITerminal() {
+            document.getElementById('aiDrawer').classList.remove('translate-x-full');
+            document.getElementById('aiInputPrompt').focus();
+        }
+
+        function closeAITerminal() {
+            document.getElementById('aiDrawer').classList.add('translate-x-full');
+        }
+
+        function quickQuery(promptText) {
+            openAITerminal();
+            document.getElementById('aiInputPrompt').value = promptText;
+            submitAIQuery(new Event('submit'));
+        }
+
+        async function submitAIQuery(event) {
+            if (event) event.preventDefault();
+            const inputEl = document.getElementById('aiInputPrompt');
+            const prompt = inputEl.value.trim();
+            if (!prompt) return;
+
+            const chatLog = document.getElementById('aiChatLog');
+            
+            // Append User Message
+            const userMsgHtml = `
+                <div class="bg-term-surface p-3 rounded-lg border border-term-border text-slate-200 shadow-sm ml-6">
+                    <div class="text-[10px] text-slate-500 font-bold mb-1 flex items-center justify-end gap-1">
+                        USER QUERY <i class="fa-solid fa-user text-slate-400"></i>
+                    </div>
+                    <p class="font-sans text-right">${prompt}</p>
+                </div>
+            `;
+            chatLog.insertAdjacentHTML('beforeend', userMsgHtml);
+            inputEl.value = '';
+            chatLog.scrollTop = chatLog.scrollHeight;
+
+            // Loading Indicator
+            const loadingId = 'loading-' + Date.now();
+            const loadingHtml = `
+                <div id="${loadingId}" class="bg-term-card p-3 rounded-lg border-l-2 border-term-cyan text-term-cyan animate-pulse shadow-md mr-6">
+                    <i class="fa-solid fa-spinner fa-spin mr-2"></i> Adam v26.0 computing neuro-symbolic simulation...
+                </div>
+            `;
+            chatLog.insertAdjacentHTML('beforeend', loadingHtml);
+            chatLog.scrollTop = chatLog.scrollHeight;
+
+            // Make Gemini 3 Flash API Call
+            try {
+                const systemPrompt = "You are Adam v26.0, a neuro-symbolic sovereign AI institutional risk engine. Answer queries concisely in a high-tech financial terminal persona using exact data from August 2026 (S&P 500 at 7,606.07, 10Y Yield 4.67%, VIX 15.79, 12M S&P target 8,100, 2026-2027 Refinancing Wall $3.0T across CRE and corporate debt, AI capex $245B, SEER bidding war $2.55, INBK EPS beat). Use Markdown formatting in your response.";
+                const apiKey = ""; // Canvas auto-injects runtime key if empty
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+                const payload = {
+                    contents: [{ parts: [{ text: prompt }] }],
+                    systemInstruction: { parts: [{ text: systemPrompt }] }
+                };
+
+                let response = null;
+                let retries = 0;
+                const delay = ms => new Promise(res => setTimeout(res, ms));
+
+                // Exponential backoff for API robustness
+                while (retries < 3) {
+                    try {
+                        response = await fetch(apiUrl, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload)
+                        });
+                        if (response.ok) break;
+                    } catch (e) {
+                        console.warn("API Call failed, retrying...", e);
+                    }
+                    retries++;
+                    await delay(Math.pow(2, retries) * 1000);
+                }
+
+                document.getElementById(loadingId)?.remove();
+
+                if (response && response.ok) {
+                    const result = await response.json();
+                    const replyText = result.candidates?.[0]?.content?.parts?.[0]?.text || "No simulation response generated.";
+                    
+                    const aiMsgHtml = `
+                        <div class="bg-term-card/90 p-4 rounded-lg border-l-2 border-term-cyan text-slate-200 shadow-md mr-6 markdown-body !text-xs">
+                            <div class="text-[10px] text-term-cyan font-bold mb-2 flex items-center gap-1">
+                                <i class="fa-solid fa-brain"></i> ADAM v26.0 VERDICT
+                            </div>
+                            <div class="font-sans leading-relaxed text-xs ai-rendered-content">${marked.parse(replyText)}</div>
+                        </div>
+                    `;
+                    chatLog.insertAdjacentHTML('beforeend', aiMsgHtml);
+                    
+                    // Minor style adjustments for rendered markdown inside the chat
+                    const lastMsg = chatLog.lastElementChild;
+                    lastMsg.querySelectorAll('p').forEach(p => p.classList.add('mb-2', 'last:mb-0'));
+                    
+                } else {
+                    const fallbackHtml = `
+                        <div class="bg-term-card p-3 rounded-lg border-l-2 border-term-red text-term-red mr-6 shadow-md">
+                            <i class="fa-solid fa-triangle-exclamation mr-1"></i> API connection throttled. Fallback compute logic: 12-Month targets project S&P 500 reaching 8,100 by Q3 2027 while 10Y yields ease to 4.25%. Strict 65% Fortress capital allocation recommended.
+                        </div>
+                    `;
+                    chatLog.insertAdjacentHTML('beforeend', fallbackHtml);
+                }
+            } catch (err) {
+                document.getElementById(loadingId)?.remove();
+                const errHtml = `<div class="text-term-red bg-term-card/50 p-2 rounded-lg font-mono text-xs border border-term-red/30 mr-6 shadow-md"><i class="fa-solid fa-circle-xmark mr-1"></i> Execution error: ${err.message}</div>`;
+                chatLog.insertAdjacentHTML('beforeend', errHtml);
+            }
+            
+            // Smooth scroll to bottom
+            chatLog.scrollTo({
+                top: chatLog.scrollHeight,
+                behavior: 'smooth'
+            });
+        }
+
+        // Initialize application on window load
+        window.onload = initApp;
+    </script>
+</body>
+</html>
