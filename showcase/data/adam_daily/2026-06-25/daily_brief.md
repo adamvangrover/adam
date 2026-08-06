@@ -1,24 +1,22 @@
-# Adam Financial Operating System - Daily Market Brief
+# Adam Financial Operating System - Daily Brief
 **Date:** 2026-06-25
 
 ## Market Overview
-The broader equity markets experienced a mixed session today as investors digested recent macroeconomic data and adjusted expectations for the upcoming central bank meetings. The S&P 500 closed slightly higher, driven by resilient tech earnings, while the Nasdaq saw a modest outperformance. However, cyclical sectors dragged on the Dow Jones Industrial Average amidst concerns of slowing global demand.
+The S&P 500 closed at 7357.49 today. The month has been characterized by a massive equity market broadening, shifting Fed leadership (Kevin Warsh taking over), and accelerating inflation metrics (Core PCE at 3.4% YoY).
 
-## Macro Indicators
-- **US 10-Year Treasury Yield:** 4.28% (Up 3 bps)
-- **US 2-Year Treasury Yield:** 4.65% (Up 2 bps)
-- **Inflation (CPI YoY):** 3.1% (In-line with expectations)
-- **GDP Growth (Q1 Final):** 2.4%
+## Macro Indicators (State 0: Live Ingestion)
+* **US 10-Year Treasury Yield:** 4.46%
+* **US 2-Year Treasury Yield:** 4.12%
+* **S&P 500 Index:** 7357.49
+* **High Yield Credit Spread:** 277 bps
+* **Cost of Debt Proxy:** 7.23%
 
-## Risk Radar
-- **Geopolitical Tensions:** Ongoing trade negotiations in Europe have introduced a layer of volatility for cross-border equities. Energy markets are closely monitoring supply chain disruptions in the Middle East, leading to a slight premium on crude oil futures.
-- **Systemic Risk:** Credit markets remain stable, but lower-tranche corporate debt yields have started to widen, suggesting a mild "flight to quality" among institutional allocators.
+## Risk Radar & Catalysts
+* **Fed Leadership & Policy:** Markets are rapidly repricing rate expectations higher in response to the leadership transition.
+* **Geopolitical De-escalation:** A signed Memorandum of Understanding in the Middle East has driven a sharp drop in oil prices, easing stagflation fears.
+* **AI Capital Expenditures:** Record-setting equity issuance continues, highlighted by an $85B Alphabet follow-on and SpaceX's IPO.
+* **Credit/Refinancing:** Structural default models indicate an implied commercial real estate default probability of 1.23%.
 
 ## Agent Insights
-- **Risk Officer:** The widening spread between high-yield corporate bonds and government debt indicates an increased probability of localized defaults, though systemic contagion remains unlikely at current levels.
-- **Macro Sentinel:** Given the sticky inflation figures, the probability of a rate cut in the immediate term has decreased. Equities are currently pricing in a "higher for longer" regime, necessitating a pivot towards cash-flow generative assets.
-
-## Appendix: Human Sources
-- Bloomberg Terminal: Live equity pricing and yield curve structures.
-- Reuters Financial: Geopolitical event tracking and commodity futures.
-- Financial Times: Macroeconomic commentary and central bank policy analysis.
+* **Macro Sentinel:** "Operating under State 0: Primary Ingestion (Live Anchor). Hawkish repricing is driving a flattening of the yield curve."
+* **Risk Officer:** "Corporate bonds remain incredibly resilient despite heavy supply. The ICE BofA US High Yield Index OAS is grinding down toward the 2.70% area."
