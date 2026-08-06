@@ -1,24 +1,22 @@
-# Adam Financial OS - Daily Market Brief
-
+# Adam Financial Operating System - Daily Brief
 **Date:** 2026-06-03
 
 ## Market Overview
-The markets exhibit distinct movements amid the backdrop of ongoing crypto innovation, with digital tools and AI applications driving structural shifts across equities. Financial technology stocks and related exchange platforms are navigating the integration of decentralized futures, notably following regulatory approvals. Both S&P 500 and Nasdaq are holding steady in the face of macro uncertainties, reflecting resilience in the tech sector and emerging digital assets. The S&P 500 hovered near 7609, while the Nasdaq traded around 27093.
+The S&P 500 closed at 7553.68 today. The month has been characterized by a massive equity market broadening, shifting Fed leadership (Kevin Warsh taking over), and accelerating inflation metrics (Core PCE at 3.4% YoY).
 
-## Macro Indicators
-- **US 10-Year Yield:** 4.455%
-- **Crude Oil (WTI):** $94.87/bbl
-- **Gold:** $4,500.40/oz
-- **Bitcoin:** $66,632.83
+## Macro Indicators (State 0: Live Ingestion)
+* **US 10-Year Treasury Yield:** 4.06%
+* **US 2-Year Treasury Yield:** 3.84%
+* **S&P 500 Index:** 7553.68
+* **High Yield Credit Spread:** 305 bps
+* **Cost of Debt Proxy:** 7.12%
 
-## Risk Radar
-- **Geopolitical & Systemic Risk:** The recent approvals of crypto perpetual futures (e.g., Kalshi's Bitcoin Perps) and expansion of digital market structures are putting traditional exchange stocks under pressure, altering the structural competitive landscape.
-- **Corporate Innovations:** Robinhood's aggressive expansion via agentic AI trading tools and strategic entries into new markets (e.g., WonderFi acquisition in Canada) highlights structural shifts in retail investing, necessitating closer monitoring of systemic leverage.
+## Risk Radar & Catalysts
+* **Fed Leadership & Policy:** Markets are rapidly repricing rate expectations higher in response to the leadership transition.
+* **Geopolitical De-escalation:** A signed Memorandum of Understanding in the Middle East has driven a sharp drop in oil prices, easing stagflation fears.
+* **AI Capital Expenditures:** Record-setting equity issuance continues, highlighted by an $85B Alphabet follow-on and SpaceX's IPO.
+* **Credit/Refinancing:** Structural default models indicate an implied commercial real estate default probability of 1.38%.
 
 ## Agent Insights
-
-**Risk Officer Agent:**
-*The persistent elevation of the 10-year yield near 4.45% necessitates strict duration management in fixed-income portfolios. Concurrently, the proliferation of retail crypto derivatives warrants higher systemic volatility assumptions.*
-
-**Macro Sentinel Agent:**
-*Energy prices (WTI near $95) remain a persistent inflationary baseline, while Gold breaking $4,500 indicates a durable premium on systemic safe havens despite high yields. The structural rotation toward digital assets and agentic trading presents a paradigm shift in market microstructure.*
+* **Macro Sentinel:** "Operating under State 0: Primary Ingestion (Live Anchor). Hawkish repricing is driving a flattening of the yield curve."
+* **Risk Officer:** "Corporate bonds remain incredibly resilient despite heavy supply. The ICE BofA US High Yield Index OAS is grinding down toward the 2.70% area."
