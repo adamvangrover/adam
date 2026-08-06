@@ -1,3 +1,9 @@
+"""
+Security & Governance Gatekeeper Scaffold.
+This module acts as the Entry and Exit point for all agentic workflows,
+satisfying regulatory and audit requirements.
+"""
+
 from src.pdil.models import ProvenanceHeader
 from src.pdil.middleware import (
     GovernanceError,

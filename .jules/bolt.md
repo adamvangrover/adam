@@ -169,7 +169,7 @@
 **Learning:** React components that inject `<style>` tags on every render cause unnecessary style recalculations and layout thrashing, especially inside components with frequent state updates (like `AgentIntercom` which updates every 4s).
 **Action:** Always extract `@keyframes` and static CSS classes to global CSS files (e.g., `index.css`) rather than using inline `<style>` injections within heavily re-rendered functional components.
 
-## 2023-10-25 - [Optimize JSON Schema Validation]
+## 2024-11-21 - [Optimize JSON Schema Validation]
 **Learning:** `jsonschema.validate()` implicitly evaluates the validity of the schema and re-compiles the validator upon every single function call. This creates significant overhead when doing frequent validations against a static schema (like inside the GovernanceGatekeeper processing loops).
 **Action:** Always extract the validation to an explicitly instantiated validator class (e.g., using `jsonschema.validators.validator_for(schema)` and pre-compiling it via `ValidatorClass(schema)`) to reuse it across multiple validations for a dramatic speedup (often 50-100x).
 
@@ -197,3 +197,11 @@
 ## 2024-11-20 - Optimizing High-Frequency React Visual Jitter
 **Learning:** Pushing fast-moving visual state (e.g., jitter driven by `setInterval`) down to leaf components prevents heavy macroscopic state computations and full view re-renders. A common trap is putting `Math.random()` inside `useMemo` hooks mapping arrays, destroying deterministic pureness and forcing continuous O(N) calculations.
 **Action:** Decouple timer ticks from macroscopic data models. Pass a fast-updating `tick` prop down to `React.memo` wrapped leaf components and use a seeded pseudo-random function (seeded via static ID + tick) to compute jitter strictly within the rendering leaf, preserving parent purity and optimizing rendering speed.
+
+## 2024-11-21 - [Optimize Pandas DataFrame Iteration in Scanners]
+**Learning:** In `WhaleScanner.calculate_fund_sentiment`, iterating over filtered DataFrames using `.to_dict("records")` (e.g., `for row in accum.to_dict("records"):`) causes a massive memory allocation bottleneck by converting the entire DataFrame block into intermediate Python dictionary objects before iteration.
+**Action:** Always use `.itertuples()` instead of `.to_dict("records")` when looping over Pandas DataFrames. `.itertuples()` yields namedtuples directly, which avoids the memory allocation overhead and provides significant performance gains for iteration.
+
+## 2025-02-27 - [Optimize JSON Logic Rule Loading]
+**Learning:** Performing synchronous disk I/O (`open` and `json.load`) repeatedly within calculation or validation methods, such as `AgentOrchestrator._evaluate_preconditions`, creates a severe performance bottleneck during high-frequency rule evaluations across thousands of agent workflows.
+**Action:** Always extract the loading logic into a module-level cached function using `@functools.lru_cache` to bypass disk I/O entirely after the first read, resulting in significantly faster and more stable execution.

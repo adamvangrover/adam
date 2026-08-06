@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM OS | Phase III: Power Wall Simulator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&display=swap');
+        
+        :root {
+            --bg-base: #0f172a; /* Slate 900 */
+            --bg-panel: #1e293b; /* Slate 800 */
+            --accent-uranium: #10b981; /* Emerald 500 */
+            --accent-warning: #f59e0b; /* Amber 500 */
+            --accent-danger: #ef4444; /* Red 500 */
+            --text-main: #f8fafc; /* Slate 50 */
+            --text-muted: #94a3b8; /* Slate 400 */
+            --border-hard: #334155; /* Slate 700 */
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-base);
+            color: var(--text-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .font-mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-hard);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 350px;
+        }
+
+        /* Custom Range Slider Styling for Industrial Feel */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 16px;
+            width: 16px;
+            border-radius: 50%;
+            background: var(--accent-uranium);
+            cursor: pointer;
+            margin-top: -6px;
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: var(--border-hard);
+            border-radius: 2px;
+        }
+        
+        .terminal-scroll::-webkit-scrollbar {
+            width: 8px;
+        }
+        .terminal-scroll::-webkit-scrollbar-track {
+            background: #0f172a; 
+        }
+        .terminal-scroll::-webkit-scrollbar-thumb {
+            background: #334155; 
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-emerald-500/30">
+
+<nav class="sticky top-0 z-50 w-full glass-panel border-b-0 border-slate-700 px-6 py-4">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-emerald-500 flex items-center justify-center font-mono font-bold text-slate-900 rounded shadow-[0_0_15px_rgba(16,185,129,0.4)]">A</div>
+            <h1 class="text-xl font-bold tracking-tight text-slate-100">ADAM OS <span class="font-light text-slate-500">| INFRASTRUCTURE MODULE</span></h1>
+        </div>
+        <div class="flex gap-6 text-sm font-mono uppercase tracking-widest text-slate-400">
+            <a href="#telemetry" class="hover:text-emerald-400 transition-colors">Telemetry</a>
+            <a href="#matrix" class="hover:text-emerald-400 transition-colors">Vulnerability</a>
+            <a href="#simulator" class="hover:text-emerald-400 transition-colors">SMR CapEx</a>
+            <a href="#traces" class="hover:text-emerald-400 transition-colors">Logs</a>
+        </div>
+        <div class="text-xs font-mono bg-slate-800 px-3 py-1 rounded text-emerald-400 border border-emerald-900">
+            PHASE III: ACTIVE
+        </div>
+    </div>
+</nav>
+
+<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+
+    <section id="telemetry" class="mb-16">
+        <header class="mb-8 border-b border-slate-800 pb-4">
+            <h2 class="text-3xl font-light text-white mb-2">The <span class="font-bold text-emerald-400">Power Wall</span> Analysis</h2>
+            <p class="text-slate-400 max-w-4xl text-sm">
+                Evaluating the Phase III transition: Hyperscalers are colliding with hard physical and sovereign constraints. Traditional grid expansion is failing to meet AI computing demands. This dashboard simulates the CapEx efficiency of vertically integrated nuclear (SMR) versus standard grid-tie reliance to project 2027 deployment deceleration.
+            </p>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <!-- Metric 1 -->
+            <div class="glass-panel p-5 rounded-xl border-l-4 border-l-amber-500 relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-16 h-16 bg-amber-500/10 rounded-bl-full"></div>
+                <div class="text-xs font-mono text-slate-400 uppercase mb-2">PJM/ISO Interconnection Queue</div>
+                <div class="flex items-baseline gap-2">
+                    <span class="text-4xl font-bold text-slate-100">5.8</span>
+                    <span class="text-sm text-slate-500 font-mono">YEARS</span>
+                </div>
+                <div class="mt-2 text-xs text-amber-400 font-mono">▲ +1.2 YRS (WoW) • Critical Bottleneck</div>
+            </div>
+            
+            <!-- Metric 2 -->
+            <div class="glass-panel p-5 rounded-xl border-l-4 border-l-emerald-500 relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-16 h-16 bg-emerald-500/10 rounded-bl-full"></div>
+                <div class="text-xs font-mono text-slate-400 uppercase mb-2">Avg SMR CapEx (Projected)</div>
+                <div class="flex items-baseline gap-2">
+                    <span class="text-4xl font-bold text-slate-100">$8.2</span>
+                    <span class="text-sm text-slate-500 font-mono">M / MW</span>
+                </div>
+                <div class="mt-2 text-xs text-emerald-400 font-mono">▼ -4.5% (MoM) • Approaching Parity</div>
+            </div>
+
+            <!-- Metric 3 -->
+            <div class="glass-panel p-5 rounded-xl border-l-4 border-l-red-500 relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-16 h-16 bg-red-500/10 rounded-bl-full"></div>
+                <div class="text-xs font-mono text-slate-400 uppercase mb-2">Sovereign Friction Index</div>
+                <div class="flex items-baseline gap-2">
+                    <span class="text-4xl font-bold text-slate-100">84.2</span>
+                    <span class="text-sm text-slate-500 font-mono">/ 100</span>
+                </div>
+                <div class="mt-2 text-xs text-red-400 font-mono">▲ +12 PTS • High Protectionism</div>
+            </div>
+
+            <!-- Metric 4 -->
+            <div class="glass-panel p-5 rounded-xl border-l-4 border-l-slate-400 relative overflow-hidden">
+                <div class="text-xs font-mono text-slate-400 uppercase mb-2">"Fortress" Spread (Util vs Tech)</div>
+                <div class="flex items-baseline gap-2">
+                    <span class="text-4xl font-bold text-slate-100">410</span>
+                    <span class="text-sm text-slate-500 font-mono">BPS</span>
+                </div>
+                <div class="mt-2 text-xs text-slate-400 font-mono">Industrial Margin Compression Active</div>
+            </div>
+        </div>
+    </section>
+
+    <section id="matrix" class="mb-20">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 bg-slate-800/50 rounded-2xl p-6 border border-slate-700">
+            <div class="lg:col-span-1 space-y-6 flex flex-col justify-center">
+                <div>
+                    <h3 class="text-xl font-bold text-white mb-2">Hyperscaler Vulnerability Matrix</h3>
+                    <p class="text-sm text-slate-400">
+                        Assessing the top 4 cloud providers (anonymized/stylized) against the dual threats of Sovereign AI Friction and Grid-Tie Dependence. 
+                    </p>
+                </div>
+                <ul class="space-y-4 text-sm border-t border-slate-700 pt-6">
+                    <li class="flex items-start gap-3">
+                        <div class="w-2 h-2 mt-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_#10b981]"></div>
+                        <div><strong class="text-slate-200">Nexus (Azure-proxy):</strong> Aggressive SMR pivot (Constellation integration). Low deployment risk.</div>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <div class="w-2 h-2 mt-1.5 rounded-full bg-amber-400 shadow-[0_0_8px_#facc15]"></div>
+                        <div><strong class="text-slate-200">Nimbus (AWS-proxy):</strong> High legacy grid footprint, medium SMR transition speed.</div>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <div class="w-2 h-2 mt-1.5 rounded-full bg-orange-400 shadow-[0_0_8px_#f97316]"></div>
+                        <div><strong class="text-slate-200">Titan (GCP-proxy):</strong> Heavy global footprint increases sovereign friction exposure.</div>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <div class="w-2 h-2 mt-1.5 rounded-full bg-red-500 shadow-[0_0_8px_#ef4444]"></div>
+                        <div><strong class="text-slate-200">Horizon (Meta-proxy):</strong> Pure grid-tied strategy. Maximum exposure to the 2027 power wall.</div>
+                    </li>
+                </ul>
+            </div>
+            <div class="lg:col-span-2 glass-panel rounded-xl p-4">
+                <div class="text-xs font-mono text-slate-500 text-center mb-2 uppercase">Bubble Size = 2027 Deceleration Probability</div>
+                <div class="chart-container">
+                    <canvas id="vulnerabilityChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="simulator" class="mb-20">
+        <h2 class="text-2xl font-light mb-6 border-b border-slate-800 pb-2">CapEx Efficiency: <span class="font-bold">Grid vs SMR Simulator</span></h2>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <!-- Controls -->
+            <div class="lg:col-span-4 glass-panel p-6 rounded-xl flex flex-col gap-8">
+                <div>
+                    <div class="flex justify-between mb-2">
+                        <label class="text-xs font-mono text-slate-400 uppercase">Grid Queue Delay</label>
+                        <span id="valGridDelay" class="text-xs font-mono text-amber-400 font-bold">5.8 Yrs</span>
+                    </div>
+                    <input type="range" id="simGridDelay" min="1" max="10" step="0.1" value="5.8" oninput="runSimulation()">
+                    <p class="text-[10px] text-slate-500 mt-1">Wait time for HVDC permitting/connection.</p>
+                </div>
+
+                <div>
+                    <div class="flex justify-between mb-2">
+                        <label class="text-xs font-mono text-slate-400 uppercase">Sovereign Data Tax / Friction</label>
+                        <span id="valSovereign" class="text-xs font-mono text-red-400 font-bold">15%</span>
+                    </div>
+                    <input type="range" id="simSovereign" min="0" max="40" step="1" value="15" oninput="runSimulation()">
+                    <p class="text-[10px] text-slate-500 mt-1">Cost penalty for cross-border compute.</p>
+                </div>
+
+                <div>
+                    <div class="flex justify-between mb-2">
+                        <label class="text-xs font-mono text-slate-400 uppercase">SMR Supply Chain Eff.</label>
+                        <span id="valSMR" class="text-xs font-mono text-emerald-400 font-bold">Base</span>
+                    </div>
+                    <input type="range" id="simSMR" min="-20" max="20" step="1" value="0" oninput="runSimulation()">
+                    <p class="text-[10px] text-slate-500 mt-1">Cost reduction from modular manufacturing scale.</p>
+                </div>
+                
+                <div class="p-4 bg-slate-900/50 rounded border border-slate-700 mt-auto">
+                    <div class="text-[10px] text-slate-500 font-mono mb-2 uppercase">Adam Core Heuristic</div>
+                    <code class="text-xs text-emerald-300/80 font-mono">
+                        LCOE_Grid = Base_Cost * exp(Delay/4) + SovTax<br>
+                        LCOE_SMR = Base_SMR * (1 - Eff/100)
+                    </code>
+                </div>
+            </div>
+
+            <!-- Output Chart -->
+            <div class="lg:col-span-8 glass-panel p-6 rounded-xl flex flex-col">
+                <div class="flex justify-between items-end mb-4">
+                    <div>
+                        <h4 class="text-sm font-mono text-slate-400 uppercase">Levelized Cost of Energy (LCOE) Projection</h4>
+                        <div class="text-xs text-slate-500 mt-1">Projecting $/MWh parity crossing point.</div>
+                    </div>
+                    <div id="parityStatus" class="px-3 py-1 bg-emerald-900/50 text-emerald-400 border border-emerald-800 text-xs font-mono rounded">
+                        PARITY CROSSED: 2026 Q3
+                    </div>
+                </div>
+                <div class="chart-container flex-grow">
+                    <canvas id="lcoeChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="traces" class="mb-10">
+        <h3 class="text-lg font-mono text-slate-300 mb-4 border-b border-slate-700 pb-2 flex items-center gap-2">
+            <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+            System Trace Output
+        </h3>
+        <div class="glass-panel p-4 rounded-lg terminal-scroll overflow-y-auto h-48 font-mono text-[11px] leading-relaxed">
+            <div class="text-slate-500">>> INITIALIZING ADAM_CORE_01 : PHASE III MODULE</div>
+            <div class="text-slate-500">>> POLLING GRAPH.VARIABLE(MACRO, ENERGY, SOVEREIGN)</div>
+            <div class="text-emerald-400">>> SUCCESS: 48,201 NODES INGESTED.</div>
+            <div class="text-slate-400">>> COMPUTING REGULATORY-GRIDLOCK COMPONENT...</div>
+            <div class="text-amber-400">>> WARN: PJM QUEUE DEPTH EXCEEDS SAFE THRESHOLD (μ > 5.0 YRS)</div>
+            <div class="text-slate-400">>> HYDRATING SMR CAPEX EFFICIENCY MATRIX...</div>
+            <div class="text-emerald-400">>> VERTICAL INTEGRATION FACTOR = 1.4x PREMIUM JUSTIFIED.</div>
+            <div class="text-slate-400">>> CALCULATING VULNERABILITY SCORES FOR HYPERSCALERS [NEXUS, NIMBUS, TITAN, HORIZON]</div>
+            <div class="text-red-400">>> CRITICAL: HORIZON (PURE GRID) PROJECTS 82% DECELERATION PROBABILITY BY 2027-Q2.</div>
+            <div class="text-slate-500">>> AWAITING USER SIMULATION OVERRIDES...</div>
+            <div id="dynamic-trace" class="text-blue-300"></div>
+        </div>
+    </section>
+
+</main>
+
+<footer class="border-t border-slate-800 bg-slate-900 py-8 px-6 mt-12">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center text-xs font-mono text-slate-600">
+        <div>ADAM FINANCIAL OS // PHASE III // STRICT CONFIDENTIALITY</div>
+        <div class="mt-4 md:mt-0 flex gap-6">
+            <span>DATA: LATE-2026 SYNTHESIS</span>
+            <span>GITOPS CI/CD: <span class="text-emerald-500">PASS</span></span>
+        </div>
+    </div>
+</footer>
+
+<script>
+    // --- Global Chart Instances ---
+    let vulnChart, lcoeChart;
+
+    // --- Base Data & Assumptions ---
+    const HYPERSCALERS = [
+        { name: 'Nexus', friction: 30, gridDep: 20, prob: 15, color: '#10b981' }, // Emerald
+        { name: 'Nimbus', friction: 50, gridDep: 60, prob: 45, color: '#facc15' }, // Amber
+        { name: 'Titan', friction: 85, gridDep: 40, prob: 60, color: '#f97316' }, // Orange
+        { name: 'Horizon', friction: 40, gridDep: 95, prob: 82, color: '#ef4444' }  // Red
+    ];
+
+    const LCOE_BASE_GRID = 65; // $/MWh base
+    const LCOE_BASE_SMR = 110; // $/MWh base (current)
+    const YEARS = ['2024', '2025', '2026', '2027', '2028', '2029', '2030'];
+
+    // --- Initialization ---
+    window.onload = () => {
+        Chart.defaults.color = '#94a3b8';
+        Chart.defaults.font.family = "'JetBrains Mono', monospace";
+        
+        initVulnerabilityMatrix();
+        initLCOEChart();
+        runSimulation(); // Initial calculation
+    };
+
+    // --- Charts ---
+    function initVulnerabilityMatrix() {
+        const ctx = document.getElementById('vulnerabilityChart').getContext('2d');
+        vulnChart = new Chart(ctx, {
+            type: 'bubble',
+            data: {
+                datasets: HYPERSCALERS.map(h => ({
+                    label: h.name,
+                    data: [{ x: h.friction, y: h.gridDep, r: h.prob / 3 }], // Scale radius
+                    backgroundColor: h.color + '80', // 50% opacity
+                    borderColor: h.color,
+                    borderWidth: 2
+                }))
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        title: { display: true, text: 'Sovereign Friction Index (Risk)' },
+                        min: 0, max: 100,
+                        grid: { color: '#334155' }
+                    },
+                    y: {
+                        title: { display: true, text: 'Grid-Tie Dependence (%)' },
+                        min: 0, max: 100,
+                        grid: { color: '#334155' }
+                    }
+                },
+                plugins: {
+                    legend: { position: 'top', labels: { usePointStyle: true, boxWidth: 8 } },
+                    tooltip: {
+                        callbacks: {
+                            label: (ctx) => {
+                                const d = ctx.raw;
+                                return `${ctx.dataset.label}: Deceleration Prob: ${(d.r * 3).toFixed(0)}%`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    function initLCOEChart() {
+        const ctx = document.getElementById('lcoeChart').getContext('2d');
+        lcoeChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: YEARS,
+                datasets: [
+                    {
+                        label: 'LCOE Grid + Delay Penalty ($/MWh)',
+                        data: [],
+                        borderColor: '#f59e0b', // Amber
+                        backgroundColor: '#f59e0b20',
+                        borderWidth: 2,
+                        tension: 0.4,
+                        fill: true
+                    },
+                    {
+                        label: 'LCOE SMR ($/MWh)',
+                        data: [],
+                        borderColor: '#10b981', // Emerald
+                        backgroundColor: '#10b98120',
+                        borderWidth: 3,
+                        borderDash: [5, 5],
+                        tension: 0.4,
+                        fill: false
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        title: { display: true, text: 'Levelized Cost ($/MWh)' },
+                        grid: { color: '#334155' },
+                        suggestedMin: 40
+                    },
+                    x: {
+                        grid: { color: '#334155' }
+                    }
+                },
+                interaction: {
+                    intersect: false,
+                    mode: 'index',
+                },
+                plugins: {
+                    tooltip: {
+                        backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                        titleColor: '#f8fafc',
+                        bodyColor: '#cbd5e1',
+                        borderColor: '#334155',
+                        borderWidth: 1
+                    }
+                }
+            }
+        });
+    }
+
+    // --- Simulation Logic ---
+    function runSimulation() {
+        // Read Inputs
+        const delay = parseFloat(document.getElementById('simGridDelay').value);
+        const sovTax = parseFloat(document.getElementById('simSovereign').value);
+        const smrEff = parseFloat(document.getElementById('simSMR').value); // -20 to +20
+
+        // Update UI Labels
+        document.getElementById('valGridDelay').innerText = delay.toFixed(1) + ' Yrs';
+        document.getElementById('valSovereign').innerText = sovTax + '%';
+        
+        let effDisplay = smrEff > 0 ? `+${smrEff}% Eff.` : (smrEff < 0 ? `${smrEff}% Cost` : 'Base');
+        document.getElementById('valSMR').innerText = effDisplay;
+
+        // Calculate Time Series
+        let gridData = [];
+        let smrData = [];
+        let parityYear = "NO PARITY";
+
+        for (let i = 0; i < YEARS.length; i++) {
+            // Grid cost inflates over time due to delay compounded by sovereign taxes
+            let timeFactor = i * 0.15; // Natural inflation
+            let delayPenalty = Math.exp(delay / 4) * (1 + (timeFactor)); 
+            let gridCost = (LCOE_BASE_GRID * delayPenalty) + sovTax;
+            gridData.push(gridCost);
+
+            // SMR cost decreases over time as supply chain scales (learning rate)
+            let learningCurve = Math.pow(0.85, i); // 15% reduction per year/step
+            let smrCost = LCOE_BASE_SMR * learningCurve * (1 - (smrEff / 100));
+            smrData.push(smrCost);
+
+            // Check parity crossing
+            if (parityYear === "NO PARITY" && smrCost < gridCost) {
+                parityYear = YEARS[i];
+            }
+        }
+
+        // Update Chart
+        lcoeChart.data.datasets[0].data = gridData;
+        lcoeChart.data.datasets[1].data = smrData;
+        lcoeChart.update();
+
+        // Update Parity UI
+        const pStatus = document.getElementById('parityStatus');
+        if (parityYear !== "NO PARITY") {
+            pStatus.innerText = `PARITY CROSSED: ${parityYear}`;
+            pStatus.className = "px-3 py-1 bg-emerald-900/50 text-emerald-400 border border-emerald-800 text-[10px] font-mono rounded";
+        } else {
+            pStatus.innerText = `SMR REMAINS UNAFFORDABLE`;
+            pStatus.className = "px-3 py-1 bg-red-900/50 text-red-400 border border-red-800 text-[10px] font-mono rounded";
+        }
+
+        // Add to Terminal Trace
+        const traceLog = document.getElementById('dynamic-trace');
+        traceLog.innerHTML = `>> SIMULATION RUN: Grid Delay=${delay}y, SovTax=${sovTax}%, Parity=${parityYear}`;
+    }
+</script>
+</body>
+</html>
