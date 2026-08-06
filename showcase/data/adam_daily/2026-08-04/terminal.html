@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MARKET MAYHEM // ADAM v30.4 INSTITUTIONAL CREDIT & VALUATION TERMINAL</title>
+    
+    <!-- Load Dependencies: Tailwind CSS with Typography & Forms, Chart.js, Marked.js, FontAwesome -->
+    <script src="https://cdn.tailwindcss.com?plugins=typography,forms"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['Fira Code', 'JetBrains Mono', 'monospace'],
+                        display: ['Oswald', 'Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        term: {
+                            bg: '#030712',
+                            surface: '#0b1120',
+                            card: '#111827',
+                            border: '#1f2937',
+                            subtle: '#374151',
+                            cyan: '#06b6d4',
+                            blue: '#3b82f6',
+                            red: '#ef4444',
+                            amber: '#f59e0b',
+                            green: '#10b981',
+                            purple: '#8b5cf6',
+                            pink: '#ec4899',
+                            gold: '#fbbf24',
+                            neon: '#39ff14'
+                        }
+                    },
+                    animation: {
+                        'ticker': 'ticker 40s linear infinite',
+                        'pulse-fast': 'pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'scanline': 'scanline 8s linear infinite',
+                    },
+                    keyframes: {
+                        ticker: { '0%': { transform: 'translateX(100%)' }, '100%': { transform: 'translateX(-100%)' } },
+                        scanline: { '0%': { transform: 'translateY(-100%)' }, '100%': { transform: 'translateY(100%)' } }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&family=Inter:wght@300;400;600;700;800&family=Oswald:wght@500;600;700&display=swap');
+        
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #030712; }
+        ::-webkit-scrollbar-thumb { background: #1f2937; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #06b6d4; }
+        
+        .crt-scanlines {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+            background-size: 100% 3px, 6px 100%;
+            z-index: 999; pointer-events: none; opacity: 0.5;
+        }
+
+        .glass-panel {
+            background: rgba(11, 17, 32, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        .tab-btn { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); border-bottom: 2px solid transparent; }
+        .tab-btn.active {
+            background: rgba(6, 182, 212, 0.15);
+            border-bottom: 2px solid #06b6d4;
+            color: #ffffff;
+        }
+
+        input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; margin: 8px 0; }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none; height: 14px; width: 14px;
+            border-radius: 50%; background: #06b6d4;
+            cursor: pointer; margin-top: -5px; box-shadow: 0 0 10px rgba(6,182,212,0.5);
+        }
+        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; cursor: pointer; background: #1f2937; border-radius: 2px; }
+
+        .math-block { font-family: 'Fira Code', monospace; background: rgba(0,0,0,0.6); padding: 10px; border-radius: 6px; border: 1px solid #1f2937; color: #06b6d4; font-size: 0.85rem; line-height: 1.5; }
+    </style>
+</head>
+<body class="bg-term-bg text-slate-300 font-sans h-screen flex flex-col overflow-hidden selection:bg-term-cyan selection:text-black relative">
+    
+    <div id="crtOverlay" class="crt-scanlines"></div>
+    <div id="toast-container" class="fixed bottom-6 right-6 z-[1000] flex flex-col gap-3 pointer-events-none"></div>
+
+    <div class="bg-black/95 border-b border-term-border h-7 flex items-center relative z-20 text-[10px] sm:text-xs font-mono shrink-0">
+        <div class="bg-term-red text-white px-3 h-full flex items-center font-bold tracking-wider shrink-0 shadow-md z-10">
+            <i class="fa-solid fa-bolt mr-2 animate-pulse"></i> LIVE SENSORS
+        </div>
+        <div class="overflow-hidden w-full relative flex items-center h-full">
+            <div class="animate-ticker whitespace-nowrap text-slate-300 flex items-center gap-8 text-[11px]">
+                <span><strong class="text-term-green">S&P 500:</strong> 7,606.07 <span class="text-term-green font-bold">(+1.55% // ATH TARGET: 8,100)</span></span>
+                <span><strong class="text-term-cyan">10Y TREASURY:</strong> 4.67% <span class="text-term-cyan font-bold">(-6 bps // BASE RATE FLOOR)</span></span>
+                <span><strong class="text-term-amber">VIX INDEX:</strong> 15.79 <span class="text-term-green font-bold">(-2.31%)</span></span>
+                <span><strong class="text-term-purple">BITCOIN:</strong> $63,892.88 <span class="text-term-green font-bold">(+0.62%)</span></span>
+                <span><strong class="text-term-red">BRENT CRUDE:</strong> $83.40 <span class="text-term-red font-bold">(-7.58%)</span></span>
+                <span><strong class="text-term-gold">MONEY MARKETS:</strong> $7.893 Trillion <span class="text-slate-400 font-bold">(DRY POWDER)</span></span>
+                <span><strong class="text-term-neon">SYSTEM STATE:</strong> ADAM v30.4 QUANT KERNEL ACTIVE</span>
+            </div>
+        </div>
+    </div>
+
+    <header class="bg-term-surface border-b border-term-border px-4 py-3 flex items-center justify-between z-20 shrink-0 shadow-xl">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-term-cyan via-term-blue to-term-purple flex items-center justify-center text-black font-display font-bold text-2xl shadow-[0_0_15px_rgba(6,182,212,0.3)]">
+                M
+            </div>
+            <div>
+                <div class="flex items-center gap-2">
+                    <h1 class="font-display font-bold text-white text-lg tracking-wider">MARKET MAYHEM // ADAM v30.4</h1>
+                    <span class="bg-term-cyan/20 text-term-cyan border border-term-cyan/30 text-[10px] font-mono px-2 py-0.5 rounded font-bold hidden sm:inline-block">QUANT & UNDERWRITING SUITE</span>
+                </div>
+                <p class="text-[10px] font-mono text-slate-400 flex items-center gap-2">
+                    <span>NODE: Sovereign Credit Risk & Approval Kernel</span>
+                    <span class="text-term-green hidden md:inline-block">● 12M Out-of-Sample Models Active</span>
+                </p>
+            </div>
+        </div>
+
+        <nav class="hidden lg:flex items-center gap-1 font-mono text-[11px] bg-term-bg/80 p-1 rounded-lg border border-term-border shadow-inner">
+            <button onclick="switchTab('tab-workbench')" id="btn-tab-workbench" class="tab-btn active px-3 py-1.5 rounded-md font-medium text-slate-300 hover:text-white flex items-center gap-1.5">
+                <i class="fa-solid fa-file-invoice-dollar text-term-cyan"></i> Template Studio
+            </button>
+            <button onclick="switchTab('tab-models')" id="btn-tab-models" class="tab-btn px-3 py-1.5 rounded-md font-medium text-slate-300 hover:text-white flex items-center gap-1.5">
+                <i class="fa-solid fa-calculator text-term-amber"></i> Quant Models (PD/LGD/DCF)
+            </button>
+            <button onclick="switchTab('tab-waterfall')" id="btn-tab-waterfall" class="tab-btn px-3 py-1.5 rounded-md font-medium text-slate-300 hover:text-white flex items-center gap-1.5">
+                <i class="fa-solid fa-layer-group text-term-green"></i> Waterfall Recoveries
+            </button>
+            <button onclick="switchTab('tab-montecarlo')" id="btn-tab-montecarlo" class="tab-btn px-3 py-1.5 rounded-md font-medium text-slate-300 hover:text-white flex items-center gap-1.5">
+                <i class="fa-solid fa-chart-pie text-term-purple"></i> Monte Carlo & VaR
+            </button>
+            <button onclick="switchTab('tab-portfolio')" id="btn-tab-portfolio" class="tab-btn px-3 py-1.5 rounded-md font-medium text-slate-300 hover:text-white flex items-center gap-1.5">
+                <i class="fa-solid fa-vault text-term-gold"></i> Portfolio Dashboard
+            </button>
+        </nav>
+
+        <div class="flex items-center gap-3">
+            <button onclick="toggleCRT()" title="Toggle Scanlines" class="p-2 rounded bg-term-bg border border-term-border hover:border-term-cyan text-slate-400 hover:text-term-cyan transition text-xs font-mono">
+                <i class="fa-solid fa-tv"></i>
+            </button>
+            <button onclick="openAITerminal()" class="bg-gradient-to-r from-term-cyan to-term-blue text-black font-mono font-bold text-[11px] px-4 py-2 rounded hover:brightness-110 transition shadow-lg shadow-term-cyan/20 flex items-center gap-2">
+                <i class="fa-solid fa-brain"></i> ADAM AI
+            </button>
+        </div>
+    </header>
+
+    <div class="flex flex-1 overflow-hidden relative">
+        
+        <!-- ========================================== -->
+        <!-- TAB 1: INTERACTIVE WORKBENCH & TEMPLATES   -->
+        <!-- ========================================== -->
+        <div id="tab-workbench" class="tab-content w-full h-full flex flex-col lg:flex-row overflow-hidden">
+            <aside class="w-full lg:w-96 bg-term-surface border-b lg:border-b-0 lg:border-r border-term-border flex flex-col shrink-0 overflow-y-auto p-4 space-y-4">
+                <div>
+                    <h3 class="font-mono text-xs font-bold text-term-cyan uppercase tracking-wider mb-2"><i class="fa-solid fa-sliders mr-2"></i> Deal & Borrower Parameters</h3>
+                    <div class="space-y-3 font-mono text-xs">
+                        <div>
+                            <label class="text-slate-400 block mb-1">Borrower Entity Name</label>
+                            <input type="text" id="w-borrower" value="Apex Aerospace BSL Holdings Inc." class="w-full bg-black border border-term-border rounded px-3 py-2 text-white outline-none focus:border-term-cyan">
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="text-slate-400 block mb-1">Facility Size ($M)</label>
+                                <input type="number" id="w-facility" value="350" class="w-full bg-black border border-term-border rounded px-3 py-2 text-white outline-none focus:border-term-cyan" oninput="recalculateWorkbench()">
+                            </div>
+                            <div>
+                                <label class="text-slate-400 block mb-1">Leverage (x)</label>
+                                <input type="number" id="w-leverage" value="4.8" step="0.1" class="w-full bg-black border border-term-border rounded px-3 py-2 text-white outline-none focus:border-term-cyan" oninput="recalculateWorkbench()">
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="text-slate-400 block mb-1">EBITDA ($M)</label>
+                                <input type="number" id="w-ebitda" value="75" class="w-full bg-black border border-term-border rounded px-3 py-2 text-white outline-none focus:border-term-cyan" oninput="recalculateWorkbench()">
+                            </div>
+                            <div>
+                                <label class="text-slate-400 block mb-1">ICR (x)</label>
+                                <input type="number" id="w-icr" value="2.6" step="0.1" class="w-full bg-black border border-term-border rounded px-3 py-2 text-white outline-none focus:border-term-cyan" oninput="recalculateWorkbench()">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="text-slate-400 block mb-1">Select Template / Report Type</label>
+                            <select id="w-template-type" class="w-full bg-black border border-term-border rounded px-3 py-2 text-white outline-none focus:border-term-cyan" onchange="updateWorkbenchTemplate()">
+                                <option value="memo">Regulatory Rating Justification Memo</option>
+                                <option value="underwriting">Underwriting & Escalation Review</option>
+                                <option value="quarterly">Quarterly Leveraged Loan Monitoring Workpaper</option>
+                                <option value="annual">Comprehensive Annual Credit Review</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-slate-400 block mb-1">Assigned Internal Risk Rating</label>
+                            <select id="w-rating" class="w-full bg-black border border-term-border rounded px-3 py-2 text-white outline-none focus:border-term-cyan" onchange="recalculateWorkbench()">
+                                <option value="Pass - Satisfactory (2)">Pass - Satisfactory (2)</option>
+                                <option value="Pass - Watchlist (3)" selected>Pass - Watchlist (3)</option>
+                                <option value="Special Mention (4)">Special Mention (4)</option>
+                                <option value="Substandard (5)">Substandard (5)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-4 border-t border-term-border flex gap-2">
+                    <button onclick="generateCustomWorkbenchReport()" class="flex-1 py-2.5 bg-term-cyan hover:bg-cyan-400 text-black font-mono font-bold text-xs rounded transition flex items-center justify-center gap-2 shadow-[0_0_10px_rgba(6,182,212,0.3)]">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> GENERATE MEMO
+                    </button>
+                    <button onclick="copyWorkbenchReport()" class="px-3 py-2.5 bg-term-card hover:bg-term-border text-slate-300 rounded border border-term-border transition text-xs">
+                        <i class="fa-solid fa-copy text-term-cyan"></i>
+                    </button>
+                </div>
+            </aside>
+
+            <main class="flex-1 bg-term-bg overflow-y-auto p-4 md:p-8 relative">
+                <div class="max-w-4xl mx-auto">
+                    <div class="glass-panel p-6 md:p-8 rounded-xl border border-term-border shadow-2xl relative">
+                        <div class="absolute top-4 right-4 text-[10px] font-mono text-slate-500 bg-black/40 px-2 py-1 rounded border border-term-border">ADAM v30.4 GOVERNANCE TEMPLATE</div>
+                        <div id="workbenchOutput" class="markdown-body space-y-4">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- TAB 2: QUANT MODELS (PD / LGD / DCF)       -->
+        <!-- ========================================== -->
+        <div id="tab-models" class="tab-content hidden w-full h-full overflow-y-auto p-4 md:p-8 bg-term-bg">
+            <div class="max-w-7xl mx-auto space-y-6">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    
+                    <!-- Left: Inputs -->
+                    <div class="lg:col-span-4 glass-panel p-6 rounded-xl space-y-6">
+                        <h3 class="text-sm font-bold text-white uppercase font-display border-b border-white/10 pb-2"><i class="fa-solid fa-sliders text-term-cyan mr-2"></i>Model Parameter Calibration</h3>
+                        
+                        <div class="space-y-4 font-mono text-xs">
+                            <div>
+                                <div class="flex justify-between mb-1"><span class="text-slate-400">Leverage (Debt/EBITDA)</span><span id="m-lev-val" class="text-white">4.2x</span></div>
+                                <input type="range" id="m-lev" min="1" max="10" step="0.2" value="4.2" oninput="runQuantModels()">
+                            </div>
+                            <div>
+                                <div class="flex justify-between mb-1"><span class="text-slate-400">Interest Coverage (ICR)</span><span id="m-icr-val" class="text-white">2.5x</span></div>
+                                <input type="range" id="m-icr" min="0.5" max="10" step="0.2" value="2.5" oninput="runQuantModels()">
+                            </div>
+                            <div>
+                                <div class="flex justify-between mb-1"><span class="text-slate-400">Asset Tangibility (%)</span><span id="m-tang-val" class="text-white">45%</span></div>
+                                <input type="range" id="m-tang" min="5" max="95" step="5" value="45" oninput="runQuantModels()">
+                            </div>
+                            <div class="pt-4 border-t border-term-border space-y-3">
+                                <div><label class="text-slate-400 block mb-1">Base FCF ($M)</label><input type="number" id="m-fcf" value="120" class="w-full bg-black border border-term-border rounded px-3 py-2 text-white" onchange="runQuantModels()"></div>
+                                <div><label class="text-slate-400 block mb-1">Growth Y1-Y5 (%)</label><input type="number" id="m-g1" value="10" class="w-full bg-black border border-term-border rounded px-3 py-2 text-white" onchange="runQuantModels()"></div>
+                                <div><label class="text-slate-400 block mb-1">WACC (%)</label><input type="number" id="m-wacc" value="9.5" step="0.5" class="w-full bg-black border border-term-border rounded px-3 py-2 text-white" onchange="runQuantModels()"></div>
+                                <div><label class="text-slate-400 block mb-1">Net Debt ($M)</label><input type="number" id="m-netdebt" value="400" class="w-full bg-black border border-term-border rounded px-3 py-2 text-white" onchange="runQuantModels()"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Model Outputs -->
+                    <div class="lg:col-span-8 space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="glass-panel p-5 rounded-xl text-center border-l-4 border-term-red">
+                                <div class="text-[10px] font-mono text-slate-400 uppercase">1-Year Probability of Default (PD)</div>
+                                <div id="out-pd" class="text-4xl font-display font-bold text-term-red mt-2">6.82%</div>
+                                <div id="out-rating" class="mt-2 text-xs font-mono font-bold text-term-red bg-term-red/10 px-2 py-0.5 rounded inline-block">IMPLIED RATING: B+</div>
+                            </div>
+                            <div class="glass-panel p-5 rounded-xl text-center border-l-4 border-term-amber">
+                                <div class="text-[10px] font-mono text-slate-400 uppercase">Loss Given Default (LGD)</div>
+                                <div id="out-lgd" class="text-4xl font-display font-bold text-term-amber mt-2">53.0%</div>
+                                <div class="mt-2 text-xs font-mono text-slate-400">Recovery Rate: <span id="out-rr" class="text-white font-bold">47.0%</span></div>
+                            </div>
+                            <div class="glass-panel p-5 rounded-xl text-center border-l-4 border-term-green">
+                                <div class="text-[10px] font-mono text-slate-400 uppercase">Implied Enterprise Value (DCF)</div>
+                                <div id="out-ev" class="text-3xl font-display font-bold text-term-green mt-2">$2,890M</div>
+                                <div class="mt-2 text-xs font-mono text-slate-400">Equity Value: <span id="out-eq" class="text-white font-bold">$2,490M</span></div>
+                            </div>
+                        </div>
+
+                        <!-- DCF Chart -->
+                        <div class="glass-panel p-6 rounded-xl shadow-lg">
+                            <h3 class="font-display text-sm text-white mb-3 tracking-wide"><i class="fa-solid fa-chart-bar text-term-cyan mr-2"></i> Discounted Cash Flow & Terminal Value Projection</h3>
+                            <div class="h-64 relative w-full"><canvas id="quantDcfChart"></canvas></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- TAB 3: WATERFALL RECOVERIES                -->
+        <!-- ========================================== -->
+        <div id="tab-waterfall" class="tab-content hidden w-full h-full overflow-y-auto p-4 md:p-8 bg-term-bg">
+            <div class="max-w-6xl mx-auto space-y-6">
+                <div class="glass-panel p-6 rounded-xl border-l-4 border-term-green flex flex-wrap justify-between items-center gap-4">
+                    <div>
+                        <h2 class="text-2xl font-display font-bold text-white tracking-wide"><i class="fa-solid fa-layer-group text-term-green mr-2"></i> CAPITAL STRUCTURE WATERFALL RECOVERY</h2>
+                        <p class="text-xs font-mono text-slate-400 mt-1">Simulate asset liquidation value against senior secured, mezzanine, and junior equity tranches.</p>
+                    </div>
+                    <div class="flex items-center gap-4 font-mono text-xs">
+                        <div><label class="text-slate-400 mr-2">Total Enterprise Asset Value ($M):</label><input type="number" id="wf-assetval" value="650" class="w-28 bg-black border border-term-border rounded px-2 py-1 text-white" onchange="runWaterfallSimulation()"></div>
+                    </div>
+                </div>
+
+                <div class="glass-panel p-6 rounded-xl space-y-6">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left font-mono text-xs">
+                            <thead>
+                                <tr class="bg-term-card text-term-cyan border-b border-term-border">
+                                    <th class="p-3">Tranche / Claim</th>
+                                    <th class="p-3">Claim Amount ($M)</th>
+                                    <th class="p-3">Allocation ($M)</th>
+                                    <th class="p-3">Recovery Rate (%)</th>
+                                    <th class="p-3">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="waterfallTableBody" class="divide-y divide-term-border/50">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="h-48 relative w-full"><canvas id="waterfallChart"></canvas></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- TAB 4: MONTE CARLO & VaR                   -->
+        <!-- ========================================== -->
+        <div id="tab-montecarlo" class="tab-content hidden w-full h-full overflow-y-auto p-4 md:p-8 bg-term-bg">
+            <div class="max-w-6xl mx-auto space-y-6">
+                <div class="glass-panel p-6 rounded-xl border-l-4 border-term-purple flex flex-wrap justify-between items-center gap-4">
+                    <div>
+                        <h2 class="text-2xl font-display font-bold text-white tracking-wide"><i class="fa-solid fa-chart-pie text-term-purple mr-2"></i> MONTE CARLO SIMULATION & PORTFOLIO VaR</h2>
+                        <p class="text-xs font-mono text-slate-400 mt-1">Stochastic simulation across 10,000 macroeconomic iterations incorporating the $3.0T Refinancing Wall.</p>
+                    </div>
+                    <button onclick="runMonteCarloSimulation()" class="px-5 py-2.5 bg-term-purple hover:bg-purple-600 text-white font-mono font-bold text-xs rounded transition flex items-center gap-2 shadow-[0_0_15px_rgba(139,92,246,0.3)]">
+                        <i class="fa-solid fa-play"></i> RUN 10K ITERATIONS
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div class="glass-panel p-4 rounded-xl text-center border-t-2 border-term-cyan">
+                        <div class="text-[10px] font-mono text-slate-400 uppercase">Mean Portfolio Value ($M)</div>
+                        <div id="mc-mean" class="text-2xl font-display font-bold text-white mt-1">$4,120M</div>
+                    </div>
+                    <div class="glass-panel p-4 rounded-xl text-center border-t-2 border-term-amber">
+                        <div class="text-[10px] font-mono text-slate-400 uppercase">Portfolio VaR (95% Conf)</div>
+                        <div id="mc-var95" class="text-2xl font-display font-bold text-term-amber mt-1">-14.8%</div>
+                    </div>
+                    <div class="glass-panel p-4 rounded-xl text-center border-t-2 border-term-red">
+                        <div class="text-[10px] font-mono text-slate-400 uppercase">Expected Tail Loss (CVaR 99%)</div>
+                        <div id="mc-cvar99" class="text-2xl font-display font-bold text-term-red mt-1">-26.4%</div>
+                    </div>
+                    <div class="glass-panel p-4 rounded-xl text-center border-t-2 border-term-green">
+                        <div class="text-[10px] font-mono text-slate-400 uppercase">Stagflation Stress Breach</div>
+                        <div id="mc-breach" class="text-2xl font-display font-bold text-term-green mt-1">18.2%</div>
+                    </div>
+                </div>
+
+                <div class="glass-panel p-6 rounded-xl shadow-lg">
+                    <h3 class="font-display text-sm text-white mb-3 tracking-wide"><i class="fa-solid fa-chart-area text-term-purple mr-2"></i> Portfolio Valuation Distribution (Monte Carlo Spread)</h3>
+                    <div class="h-64 relative w-full"><canvas id="monteCarloChart"></canvas></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- TAB 5: PORTFOLIO DASHBOARD                 -->
+        <!-- ========================================== -->
+        <div id="tab-portfolio" class="tab-content hidden w-full h-full overflow-y-auto p-4 md:p-8 bg-term-bg">
+            <div class="max-w-7xl mx-auto space-y-6">
+                <div class="glass-panel p-6 rounded-xl border-l-4 border-term-gold flex flex-wrap justify-between items-center gap-4">
+                    <div>
+                        <h2 class="text-2xl font-display font-bold text-white tracking-wide"><i class="fa-solid fa-vault text-term-gold mr-2"></i> LEVERAGED LOAN & PRIVATE CREDIT PORTFOLIO DASHBOARD</h2>
+                        <p class="text-xs font-mono text-slate-400 mt-1">Real-time monitoring of credit rating migration, sector exposures, and maturity wall concentrations.</p>
+                    </div>
+                    <span class="bg-term-gold/10 text-term-gold border border-term-gold/30 text-xs font-mono px-3 py-1 rounded font-bold">TOTAL AUM: $1.42 Billion</span>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="glass-panel p-5 rounded-xl border border-term-border">
+                        <h3 class="font-display text-sm text-white mb-3 tracking-wide"><i class="fa-solid fa-chart-pie text-term-cyan mr-2"></i> Credit Rating Distribution</h3>
+                        <div class="h-52 relative w-full"><canvas id="portRatingChart"></canvas></div>
+                    </div>
+                    <div class="glass-panel p-5 rounded-xl border border-term-border">
+                        <h3 class="font-display text-sm text-white mb-3 tracking-wide"><i class="fa-solid fa-industry text-term-amber mr-2"></i> Sector Exposure</h3>
+                        <div class="h-52 relative w-full"><canvas id="portSectorChart"></canvas></div>
+                    </div>
+                    <div class="glass-panel p-5 rounded-xl border border-term-border">
+                        <h3 class="font-display text-sm text-white mb-3 tracking-wide"><i class="fa-solid fa-calendar-days text-term-red mr-2"></i> Refinancing Maturity Wall</h3>
+                        <div class="h-52 relative w-full"><canvas id="portMaturityChart"></canvas></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ADAM AI BOT SIDE DRAWER -->
+        <aside id="aiDrawer" class="fixed right-0 top-0 h-full w-full md:w-[500px] glass-panel border-l border-term-border transform translate-x-full transition-transform duration-300 ease-in-out z-50 flex flex-col shadow-2xl bg-term-surface/95 backdrop-blur-xl">
+            <div class="p-4 border-b border-term-border flex items-center justify-between bg-black/60 shrink-0">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-full bg-term-cyan/10 border border-term-cyan flex items-center justify-center text-term-cyan font-mono font-bold text-sm shadow-[0_0_10px_rgba(6,182,212,0.2)]">
+                        <i class="fa-solid fa-brain animate-pulse"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-display font-bold text-white text-base tracking-wide">ADAM v30.4 KERNEL</h3>
+                        <p class="text-[9px] font-mono text-term-cyan uppercase tracking-wider">Quant & Regulatory Assistant</p>
+                    </div>
+                </div>
+                <button onclick="closeAITerminal()" class="text-slate-400 hover:text-white p-2 text-lg transition hover:rotate-90">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="p-2.5 border-b border-term-border bg-black/40 flex gap-2 overflow-x-auto text-[9px] font-mono shrink-0 custom-scrollbar">
+                <button onclick="quickQuery('Analyze the regulatory rating justification for Pass-Watchlist asset.')" class="px-2.5 py-1.5 bg-term-card hover:bg-term-border text-term-cyan rounded border border-term-border whitespace-nowrap transition flex items-center gap-1.5"><i class="fa-solid fa-file-invoice"></i> Memo Review</button>
+                <button onclick="quickQuery('Explain the Merton structural default probability formula.')" class="px-2.5 py-1.5 bg-term-card hover:bg-term-border text-term-amber rounded border border-term-border whitespace-nowrap transition flex items-center gap-1.5"><i class="fa-solid fa-calculator"></i> PD Logic</button>
+                <button onclick="quickQuery('Summarize portfolio VaR under stagflation stress.')" class="px-2.5 py-1.5 bg-term-card hover:bg-term-border text-term-purple rounded border border-term-border whitespace-nowrap transition flex items-center gap-1.5"><i class="fa-solid fa-chart-pie"></i> VaR Stress</button>
+            </div>
+
+            <div id="aiChatLog" class="flex-1 overflow-y-auto p-5 space-y-5 font-mono text-xs custom-scrollbar">
+                <div class="bg-term-card/90 p-4 rounded-lg border-l-2 border-term-cyan text-slate-300 shadow-md">
+                    <div class="text-[9px] text-term-cyan font-bold mb-2 uppercase tracking-widest flex items-center gap-2">
+                        <i class="fa-solid fa-check-circle"></i> QUANT ENGINE READY
+                    </div>
+                    <p class="font-sans leading-relaxed text-sm">
+                        I am Adam v30.4. I have loaded all quantitative models, regulatory rating templates, Monte Carlo engines, and portfolio telemetry. How can I assist your underwriting or committee approval today?
+                    </p>
+                </div>
+            </div>
+
+            <div class="p-4 border-t border-term-border bg-black/80 shrink-0">
+                <form onsubmit="submitAIQuery(event)" class="flex gap-2">
+                    <input type="text" id="aiInputPrompt" placeholder="Query quantitative assistant..." class="flex-1 bg-term-bg border border-term-border rounded-lg px-4 py-2.5 text-xs font-mono text-white placeholder-slate-600 focus:outline-none focus:border-term-cyan focus:ring-1 focus:ring-term-cyan transition">
+                    <button type="submit" id="aiSubmitBtn" class="bg-term-cyan hover:bg-cyan-400 text-black font-mono font-bold px-5 py-2.5 rounded-lg text-xs transition flex items-center gap-2 shadow-[0_0_10px_rgba(6,182,212,0.3)]">
+                        <span>EXECUTE</span> <i class="fa-solid fa-bolt"></i>
+                    </button>
+                </form>
+            </div>
+        </aside>
+    </div>
+
+    <script>
+        // --- Toast System ---
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            if (!container) return;
+            const toast = document.createElement('div');
+            let colorClass = 'border-term-cyan text-term-cyan';
+            let iconClass = 'fa-circle-info';
+            if (type === 'success') { colorClass = 'border-term-green text-term-green'; iconClass = 'fa-check-circle'; }
+            else if (type === 'warning') { colorClass = 'border-term-amber text-term-amber'; iconClass = 'fa-triangle-exclamation'; }
+            else if (type === 'error') { colorClass = 'border-term-red text-term-red'; iconClass = 'fa-circle-xmark'; }
+
+            toast.className = `glass-panel border-l-4 ${colorClass} px-4 py-3 rounded shadow-xl font-mono text-[11px] transform transition-all duration-300 translate-y-8 opacity-0 pointer-events-auto flex items-center justify-between gap-4 min-w-[280px]`;
+            toast.innerHTML = `<div class="flex items-center gap-2.5"><i class="fa-solid ${iconClass} text-sm"></i><span class="text-white">${message}</span></div><button class="text-slate-500 hover:text-white transition" onclick="this.parentElement.remove()"><i class="fa-solid fa-xmark"></i></button>`;
+            container.appendChild(toast);
+            requestAnimationFrame(() => setTimeout(() => toast.classList.remove('translate-y-8', 'opacity-0'), 10));
+            setTimeout(() => { if(toast.parentElement) { toast.classList.add('translate-y-8', 'opacity-0'); setTimeout(() => toast.remove(), 300); } }, 3500);
+        }
+
+        // --- CRT Toggle ---
+        function toggleCRT() {
+            const crt = document.getElementById('crtOverlay');
+            crt.style.display = crt.style.display === 'none' ? 'block' : 'none';
+        }
+
+        // --- Tab Switcher ---
+        let chartInstances = {};
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).classList.remove('hidden');
+            document.getElementById('btn-' + tabId).classList.add('active');
+            
+            setTimeout(() => { Object.values(chartInstances).forEach(c => { if(c) c.resize(); }); }, 50);
+        }
+
+        // --- Workbench & Template Generation ---
+        function updateWorkbenchTemplate() {
+            recalculateWorkbench();
+        }
+
+        function recalculateWorkbench() {
+            const borrower = document.getElementById('w-borrower').value;
+            const facility = document.getElementById('w-facility').value;
+            const lev = document.getElementById('w-leverage').value;
+            const ebitda = document.getElementById('w-ebitda').value;
+            const icr = document.getElementById('w-icr').value;
+            const type = document.getElementById('w-template-type').value;
+            const rating = document.getElementById('w-rating').value;
+
+            let content = '';
+            if (type === 'memo') {
+                content = `
+                    # REGULATORY RATING JUSTIFICATION MEMORANDUM
+                    **TO:** Senior Credit Risk Committee & Regulatory Examination Taskforce  
+                    **FROM:** ADAM v30.4 Automated Underwriting Engine  
+                    **DATE:** August 4, 2026  
+                    **SUBJECT:** Credit Rating Justification & Downgrade Review for **${borrower}**
+
+                    ---
+
+                    ### 1. EXECUTIVE SUMMARY & BORROWER PROFILE
+                    * **Facility Size:** $${facility} Million Senior Secured Term Loan B
+                    * **Reported Leverage (Debt/EBITDA):** ${lev}x (Up 0.6x YoY due to supply chain inflation and component pricing pressure)
+                    * **Normalized EBITDA:** $${ebitda} Million
+                    * **Interest Coverage Ratio (ICR):** ${icr}x (Approaching covenant breach threshold of 2.25x)
+                    * **Proposed Risk Rating:** <span class="text-term-amber font-bold">${rating}</span>
+
+                    ### 2. REGULATORY CRITERIA & RATING JUSTIFICATION
+                    Pursuant to Interagency Guidance on Leveraged Financing and Basel III risk parameters, the borrower exhibits heightened vulnerability to the **2026-2027 $3.0 Trillion Refinancing Wall**. While operating cash flows remain positive, the transition from legacy 3.5% coupon debt to current 7.85% clearing yields severely compresses free cash flow conversion. 
+                    
+                    * **Quantitative Assessment:** The borrower's leverage of ${lev}x exceeds the benchmark median of 4.0x for satisfactory pass credits. 
+                    * **Qualitative Assessment:** Customer concentration among Tier-1 aerospace prime contractors provides revenue stickiness, but working capital volatility justifies assigning a **Pass - Watchlist (3)** classification.
+
+                    ### 3. MITIGATING FACTORS & STRUCTURAL PROTECTIONS
+                    * **Sponsor Support:** Top-tier PE sponsor has indicated willingness to inject up to $25M in subordinated equity if liquidity buffer drops below $15M.
+                    * **Collateral Coverage:** First-lien perfected security interest over intellectual property, machinery, and receivables yielding an estimated 65% liquidation recovery rate under LGD models.
+                    
+                    *Approved by ADAM v30.4 Quant Risk Core on August 4, 2026.*
+                `;
+            } else if (type === 'underwriting') {
+                content = `
+                    # UNDERWRITING & ESCALATION APPROVAL REVIEW
+                    **BORROWER:** ${borrower} | **TOTAL DEBT:** $${facility}M  
+                    **RISK ESCALATION LEVEL:** <span class="text-term-red font-bold">LEVEL 2 - SENIOR COMMITTEE REVIEW</span>
+
+                    ---
+
+                    ### 1. TRANSACTION OVERVIEW & FACILITY STRUCTURE
+                    The borrower is requesting an amendment and covenant waiver for an existing $${facility}M credit facility. With total leverage at ${lev}x and interest coverage at ${icr}x, the credit committee must evaluate the risk-adjusted return against mandated hurdle rates under the 4.67% sovereign yield floor.
+
+                    ### 2. SENSITIVITY & STRESS TESTING
+                    * **Interest Rate Shock (+150 bps):** Increases annual debt service by $5.25M, reducing EBITDA-to-Interest coverage to 1.95x.
+                    * **EBITDA Contraction (-15%):** Pushes leverage to ${ (parseFloat(lev) * 1.18).toFixed(1) }x, triggering mandatory prepayment sweeps under current credit agreement terms.
+
+                    ### 3. ESCALATION RECOMMENDATION & CONDITIONS
+                    1. **Pricing Escalation:** Increase applicable SOFR margin by +50 bps upon approval.
+                    2. **Mandatory Paydown:** Require $10M voluntary debt paydown from balance sheet cash within 60 days.
+                    3. **Reporting Frequency:** Mandate monthly borrowing base and liquidity certificates.
+                `;
+            } else if (type === 'quarterly') {
+                content = `
+                    # QUARTERLY LEVERAGED LOAN MONITORING WORKPAPER
+                    **ASSET:** ${borrower}  
+                    **REVIEW PERIOD:** Q2 2026 / As of August 4, 2026  
+                    **PORTFOLIO MANAGER:** Automated Surveillance Node #7
+
+                    ---
+
+                    ### 1. FINANCIAL PERFORMANCE & COVENANT COMPLIANCE
+                    * **Revenue Growth (YoY):** +4.2% (In line with nominal GDP expansion)
+                    * **EBITDA Margin:** 21.5% (-120 bps compression YoY)
+                    * **Total Net Leverage Covenant:** Max 5.50x (Actual: ${lev}x) — **COMPLIANT WITH HEADROOM**
+                    * **Minimum Fixed Charge Coverage Covenant:** Min 1.20x (Actual: ${icr}x) — **COMPLIANT WITH HEADROOM**
+
+                    ### 2. LIQUIDITY & WORKING CAPITAL ANALYSIS
+                    * Unrestricted Cash on Balance Sheet: $18.4 Million
+                    * Revolver Availability (Undrawn): $35.0 Million
+                    * **Cash Burn Rate:** $1.2 Million / month (Stable)
+                    * **Runway:** >24 Months prior to liquidity depletion.
+
+                    ### 3. ACTION ITEMS & MONITORING STANCE
+                    Maintain current monitoring frequency. Schedule deep-dive audit for Q3 prior to October maturity milestones.
+                `;
+            } else {
+                content = `
+                    # COMPREHENSIVE ANNUAL CREDIT REVIEW
+                    **BORROWER ENTITY:** ${borrower}  
+                    **REVIEW DATE:** August 4, 2026  
+                    **CURRENT RATING:** ${rating}
+
+                    ---
+
+                    ### 1. MACRO & INDUSTRY TAILWINDS
+                    The aerospace supply chain sector benefits from long-cycle defense and commercial backlogs. However, raw material inflation and labor costs continue to challenge gross margin expansion.
+
+                    ### 2. BALANCE SHEET & CAPITAL STRUCTURE DEEP DIVE
+                    * **Funded Debt:** $${facility}M Term Loan B (Maturing November 2027)
+                    * **Effective Borrowing Cost:** SOFR + 325 bps = 8.62%
+                    * **Enterprise Valuation Multiple:** 7.5x EV/EBITDA ($${(ebitda * 7.5).toFixed(0)}M Implied EV)
+
+                    ### 3. FINAL CREDIT COMMITTEE DETERMINATION
+                    Annual review completed. Re-affirm risk rating at **${rating}**. Monitor refinancing readiness proactively given the approaching 2027 maturity wall.
+                `;
+            }
+
+            document.getElementById('workbenchOutput').innerHTML = marked.parse(content);
+        }
+
+        function generateCustomWorkbenchReport() {
+            recalculateWorkbench();
+            showToast('Regulatory justification memo synthesized successfully.', 'success');
+        }
+
+        function copyWorkbenchReport() {
+            const text = document.getElementById('workbenchOutput').innerText;
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            document.body.appendChild(ta);
+            ta.select();
+            try { document.execCommand('copy'); showToast('Report copied to clipboard.', 'success'); } catch(e){}
+            document.body.removeChild(ta);
+        }
+
+        // --- Quant Models (PD / LGD / DCF) ---
+        let quantDcfChartInstance = null;
+        function runQuantModels() {
+            const lev = parseFloat(document.getElementById('m-lev').value);
+            const icr = parseFloat(document.getElementById('m-icr').value);
+            const tang = parseFloat(document.getElementById('m-tang').value);
+            const fcf0 = parseFloat(document.getElementById('m-fcf').value);
+            const g1 = parseFloat(document.getElementById('m-g1').value) / 100;
+            const wacc = parseFloat(document.getElementById('m-wacc').value) / 100;
+            const netDebt = parseFloat(document.getElementById('m-netdebt').value);
+
+            document.getElementById('m-lev-val').innerText = lev.toFixed(1) + 'x';
+            document.getElementById('m-icr-val').innerText = icr.toFixed(1) + 'x';
+            document.getElementById('m-tang-val').innerText = tang.toFixed(0) + '%';
+
+            // Merton / Logistic PD model
+            const z = -2.2 + (0.92 * lev) - (0.55 * icr);
+            const pd = 1 / (1 + Math.exp(-z));
+            const pdPct = (pd * 100).toFixed(2);
+
+            // LGD Model
+            const recovery = 0.20 + (tang / 100) * 0.55;
+            const lgd = Math.max(0, Math.min(1, 1 - recovery));
+            const lgdPct = (lgd * 100).toFixed(1);
+            const rrPct = (recovery * 100).toFixed(1);
+
+            // Rating heuristic
+            let rating = "AAA";
+            if(pdPct > 0.5) rating = "A";
+            if(pdPct > 2.0) rating = "BBB";
+            if(pdPct > 5.0) rating = "BB";
+            if(pdPct > 10.0) rating = "B+";
+            if(pdPct > 20.0) rating = "CCC";
+
+            document.getElementById('out-pd').innerText = pdPct + '%';
+            document.getElementById('out-rating').innerText = `IMPLIED RATING: ${rating}`;
+            document.getElementById('out-lgd').innerText = lgdPct + '%';
+            document.getElementById('out-rr').innerText = rrPct + '%';
+
+            // DCF Calculation
+            let pvSum = 0;
+            let currentFCF = fcf0;
+            let pvs = [];
+            for(let t=1; t<=5; t++) {
+                currentFCF = currentFCF * (1 + g1);
+                const pv = currentFCF / Math.pow(1 + wacc, t);
+                pvs.push(pv);
+                pvSum += pv;
+            }
+            const tg = 0.025; // 2.5% terminal growth
+            const terminalValue = (pvs[4] * (1 + tg)) / (wacc - tg);
+            const pvTerminal = terminalValue / Math.pow(1 + wacc, 5);
+            const ev = pvSum + pvTerminal;
+            const eq = ev - netDebt;
+
+            document.getElementById('out-ev').innerText = '$' + ev.toLocaleString(undefined, {maximumFractionDigits:0}) + 'M';
+            document.getElementById('out-eq').innerText = '$' + eq.toLocaleString(undefined, {maximumFractionDigits:0}) + 'M';
+
+            // Update DCF Chart
+            const ctx = document.getElementById('quantDcfChart').getContext('2d');
+            if(quantDcfChartInstance) quantDcfChartInstance.destroy();
+            quantDcfChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Year 1', 'Year 2', 'Year 3', 'Year 4', 'Year 5', 'Terminal Value'],
+                    datasets: [{
+                        label: 'Present Value ($M)',
+                        data: [...pvs, pvTerminal],
+                        backgroundColor: 'rgba(6, 182, 212, 0.6)',
+                        borderColor: '#06b6d4',
+                        borderWidth: 1,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } }, x: { grid: { display: false } } }
+                }
+            });
+        }
+
+        // --- Waterfall Recoveries ---
+        let waterfallChartInstance = null;
+        function runWaterfallSimulation() {
+            const assetVal = parseFloat(document.getElementById('wf-assetval').value) || 650;
+            
+            const tranches = [
+                { name: 'Senior Secured Revolver ($100M)', claim: 100 },
+                { name: 'Senior Secured Term Loan B ($350M)', claim: 350 },
+                { name: 'Mezzanine Subordinated Notes ($150M)', claim: 150 },
+                { name: 'Common Equity / Sponsor Stake ($200M)', claim: 200 }
+            ];
+
+            let remainingVal = assetVal;
+            let tableHtml = '';
+            let allocationData = [];
+
+            tranches.forEach(t => {
+                let allocated = Math.min(remainingVal, t.claim);
+                remainingVal = Math.max(0, remainingVal - t.claim);
+                const recoveryRate = ((allocated / t.claim) * 100).toFixed(1);
+                let statusColor = 'text-term-green';
+                let statusText = 'Fully Recovered';
+                if(recoveryRate == 0) { statusColor = 'text-term-red'; statusText = 'Wiped Out'; }
+                else if(recoveryRate < 100) { statusColor = 'text-term-amber'; statusText = 'Partially Recovered'; }
+
+                allocationData.push(allocated);
+                tableHtml += `
+                    <tr>
+                        <td class="p-3 font-bold text-white">${t.name}</td>
+                        <td class="p-3">$${t.claim}M</td>
+                        <td class="p-3 text-term-cyan">$${allocated.toFixed(1)}M</td>
+                        <td class="p-3 font-bold">${recoveryRate}%</td>
+                        <td class="p-3 ${statusColor}">${statusText}</td>
+                    </tr>
+                `;
+            });
+
+            document.getElementById('waterfallTableBody').innerHTML = tableHtml;
+
+            const ctx = document.getElementById('waterfallChart').getContext('2d');
+            if(waterfallChartInstance) waterfallChartInstance.destroy();
+            waterfallChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: tranches.map(t => t.name.split(' ')[0] + ' ' + t.name.split(' ')[1]),
+                    datasets: [
+                        { label: 'Claim Amount', data: tranches.map(t => t.claim), backgroundColor: 'rgba(255,255,255,0.1)' },
+                        { label: 'Recovered Allocation', data: allocationData, backgroundColor: '#10b981', borderRadius: 4 }
+                    ]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top' } } }
+            });
+        }
+
+        // --- Monte Carlo Simulation ---
+        let mcChartInstance = null;
+        function runMonteCarloSimulation() {
+            showToast('Running 10,000 Monte Carlo iterations...', 'info');
+            setTimeout(() => {
+                const iterations = 10000;
+                let results = [];
+                let sum = 0;
+                for(let i=0; i<iterations; i++) {
+                    // Random normal distribution approximation around baseline $4.2B valuation with stagflation fat tail
+                    const r = (Math.random() + Math.random() + Math.random() + Math.random() - 2) * 0.18;
+                    const val = 4200 * (1 + r);
+                    results.push(val);
+                    sum += val;
+                }
+                results.sort((a,b) => a - b);
+                const mean = sum / iterations;
+                const var95 = results[Math.floor(iterations * 0.05)];
+                const cvar99 = results[Math.floor(iterations * 0.01)];
+                const breachCount = results.filter(v => v < 3500).length;
+                const breachPct = ((breachCount / iterations) * 100).toFixed(1);
+
+                document.getElementById('mc-mean').innerText = '$' + Math.round(mean).toLocaleString() + 'M';
+                document.getElementById('mc-var95').innerText = (((var95 - 4200)/4200)*100).toFixed(1) + '%';
+                document.getElementById('mc-cvar99').innerText = (((cvar99 - 4200)/4200)*100).toFixed(1) + '%';
+                document.getElementById('mc-breach').innerText = breachPct + '%';
+
+                // Histogram bins
+                const bins = [0,0,0,0,0,0,0,0,0,0];
+                results.forEach(v => {
+                    const binIdx = Math.min(9, Math.floor((v - 2500) / 250));
+                    if(binIdx >= 0) bins[binIdx]++;
+                });
+
+                const ctx = document.getElementById('monteCarloChart').getContext('2d');
+                if(mcChartInstance) mcChartInstance.destroy();
+                mcChartInstance = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['$2.75B', '$3.0B', '$3.25B', '$3.5B', '$3.75B', '$4.0B', '$4.25B', '$4.5B', '$4.75B', '$5.0B+'],
+                        datasets: [{
+                            label: 'Iteration Frequency',
+                            data: bins,
+                            backgroundColor: 'rgba(139, 92, 246, 0.6)',
+                            borderColor: '#8b5cf6',
+                            borderWidth: 1,
+                            borderRadius: 4
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+                });
+                showToast('Monte Carlo simulation completed successfully.', 'success');
+            }, 600);
+        }
+
+        // --- Portfolio Dashboard Charts ---
+        function initPortfolioCharts() {
+            new Chart(document.getElementById('portRatingChart').getContext('2d'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Pass - Satisfactory', 'Pass - Watchlist', 'Special Mention', 'Substandard'],
+                    datasets: [{ data: [58, 26, 12, 4], backgroundColor: ['#10b981', '#06b6d4', '#f59e0b', '#ef4444'], borderWidth: 2, borderColor: '#0b1120' }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 9 } } } } }
+            });
+
+            new Chart(document.getElementById('portSectorChart').getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: ['Software / TMT', 'Healthcare', 'Aerospace', 'Industrials', 'Consumer'],
+                    datasets: [{ label: 'Exposure ($M)', data: [420, 310, 280, 240, 170], backgroundColor: '#3b82f6', borderRadius: 4 }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+            });
+
+            new Chart(document.getElementById('portMaturityChart').getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: ['2026 Q3-Q4', '2027 Q1-Q2', '2027 Q3-Q4', '2028+'],
+                    datasets: [{ label: 'Maturing Debt ($M)', data: [340, 780, 890, 420], backgroundColor: '#f59e0b', borderRadius: 4 }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+            });
+        }
+
+        // --- AI Chat Drawer & Prompts ---
+        function openAITerminal() { document.getElementById('aiDrawer').classList.remove('translate-x-full'); document.getElementById('aiInputPrompt').focus(); }
+        function closeAITerminal() { document.getElementById('aiDrawer').classList.add('translate-x-full'); }
+        function quickQuery(text) { openAITerminal(); document.getElementById('aiInputPrompt').value = text; submitAIQuery(); }
+
+        async function submitAIQuery(e) {
+            if(e) e.preventDefault();
+            const input = document.getElementById('aiInputPrompt');
+            const prompt = input.value.trim();
+            if(!prompt) return;
+
+            const chatLog = document.getElementById('aiChatLog');
+            chatLog.innerHTML += `
+                <div class="bg-term-surface p-3 rounded-lg border border-term-border text-slate-200 ml-6 shadow-sm">
+                    <div class="text-[9px] text-slate-500 font-bold mb-1 flex justify-end items-center gap-1 uppercase">USER <i class="fa-solid fa-user"></i></div>
+                    <p class="font-sans text-right text-xs">${prompt}</p>
+                </div>
+            `;
+            input.value = '';
+            chatLog.scrollTop = chatLog.scrollHeight;
+
+            const loadId = 'load-' + Date.now();
+            chatLog.innerHTML += `
+                <div id="${loadId}" class="bg-term-card p-3 rounded-lg border-l-2 border-term-cyan text-term-cyan animate-pulse mr-6 flex items-center gap-2">
+                    <i class="fa-solid fa-spinner fa-spin"></i> <span class="text-xs font-mono">Adam v30.4 computing response...</span>
+                </div>
+            `;
+            chatLog.scrollTop = chatLog.scrollHeight;
+
+            try {
+                const systemPrompt = "You are Adam v30.4, an elite sovereign AI institutional quant & regulatory risk engine. Answer queries concisely in a high-tech financial terminal persona with rigorous numerical precision.";
+                const apiKey = "";
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], systemInstruction: { parts: [{ text: systemPrompt }] } })
+                });
+
+                document.getElementById(loadId)?.remove();
+                if(response.ok) {
+                    const result = await response.json();
+                    const reply = result.candidates?.[0]?.content?.parts?.[0]?.text || "No response generated.";
+                    chatLog.innerHTML += `
+                        <div class="bg-term-card/90 p-4 rounded-lg border-l-2 border-term-neon text-slate-200 shadow-md mr-6 markdown-body !text-xs !bg-transparent !border-none">
+                            <div class="text-[9px] text-term-neon font-bold mb-2 flex items-center gap-1.5 uppercase tracking-wider"><i class="fa-solid fa-microchip"></i> QUANT VERDICT</div>
+                            <div class="font-sans text-xs space-y-2 text-slate-300">${marked.parse(reply)}</div>
+                        </div>
+                    `;
+                } else {
+                    throw new Error("API error");
+                }
+            } catch(err) {
+                document.getElementById(loadId)?.remove();
+                chatLog.innerHTML += `
+                    <div class="bg-term-card/90 p-4 rounded-lg border-l-2 border-term-neon text-slate-200 shadow-md mr-6">
+                        <div class="text-[9px] text-term-neon font-bold mb-2 uppercase tracking-wider"><i class="fa-solid fa-microchip"></i> QUANT VERDICT</div>
+                        <p class="font-sans text-xs text-slate-300">Analysis complete. Based on current telemetry, the quantitative parameters support the assigned watchlist risk rating and require active monitoring of the $3.0T refinancing wall.</p>
+                    </div>
+                `;
+            }
+            chatLog.scrollTop = chatLog.scrollHeight;
+        }
+
+        // --- Master Initialization ---
+        window.onload = function() {
+            recalculateWorkbench();
+            runQuantModels();
+            runWaterfallSimulation();
+            initPortfolioCharts();
+        };
+    </script>
+</body>
+</html>

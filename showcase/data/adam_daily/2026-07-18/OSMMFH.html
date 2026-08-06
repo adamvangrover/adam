@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adam OS | Market Mayhem & Fortress Hunt</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+        
+        :root {
+            --bg-base: #0f0e0d;
+            --bg-panel: #1a1816;
+            --bg-elevated: #262320;
+            --accent-gold: #c5a059;
+            --accent-gold-dim: rgba(197, 160, 89, 0.2);
+            --text-main: #f4f1ee;
+            --text-muted: #8c867d;
+            --border-color: #33302c;
+            --signal-buy: #22c55e;
+            --signal-sell: #ef4444;
+            --signal-hold: #eab308;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-base);
+            color: var(--text-main);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .font-mono { font-family: 'JetBrains+Mono', monospace; }
+        
+        .panel {
+            background-color: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+        }
+
+        /* Tooltip Animations */
+        .tooltip-container .tooltip-content {
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            transform: translateY(5px) translateX(-50%);
+        }
+        .tooltip-container:hover .tooltip-content {
+            transform: translateY(0) translateX(-50%);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg-base); }
+        ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent-gold); }
+
+        /* Sliders */
+        input[type=range] {
+            -webkit-appearance: none;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 16px;
+            width: 16px;
+            border-radius: 50%;
+            background: var(--accent-gold);
+            cursor: pointer;
+            margin-top: -6px;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: var(--bg-elevated);
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body class="p-0 m-0 overflow-x-hidden">
+
+    <nav class="sticky top-0 z-50 w-full border-b border-[#33302c] bg-[#0f0e0d]/90 backdrop-blur-md px-6 py-4">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-4">
+                <div class="w-10 h-10 border border-[#c5a059] flex items-center justify-center font-bold text-[#c5a059] rounded bg-[#c5a059]/10 font-mono">A</div>
+                <div>
+                    <h1 class="text-xl font-bold tracking-tight text-white leading-tight">Adam OS <span class="font-light text-stone-500">| Distribution</span></h1>
+                    <div class="text-[10px] uppercase tracking-widest text-[#c5a059] font-semibold">Institutional Client Portal</div>
+                </div>
+            </div>
+            <div class="flex gap-6 text-sm font-medium uppercase tracking-widest text-[#8c867d]">
+                <a href="#mayhem" class="hover:text-[#c5a059] transition">Market Mayhem</a>
+                <a href="#fortress" class="hover:text-[#c5a059] transition">Fortress & Hunt</a>
+                <a href="#dcf" class="hover:text-[#c5a059] transition">Valuation Models</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-6 py-12 space-y-24">
+
+        <section id="mayhem" class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+            <div class="lg:col-span-8 space-y-6">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#c5a059]/10 border border-[#c5a059]/30 text-[#c5a059] text-xs font-bold uppercase tracking-widest mb-4">
+                    <span class="w-2 h-2 rounded-full bg-[#c5a059] animate-pulse"></span>
+                    Daily Briefing | July 18, 2026
+                </div>
+                <h2 class="text-4xl md:text-5xl font-light text-white tracking-tight leading-tight">
+                    Market Mayhem: <span class="font-bold">The Compute-Energy Nexus</span>
+                </h2>
+                
+                <div class="panel p-8 mt-8 bg-[#1a1816] relative overflow-hidden">
+                    <div class="absolute top-0 right-0 p-4 opacity-10">
+                        <svg class="w-32 h-32" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 22h20L12 2zm0 4.5l6.5 13h-13L12 6.5z"/></svg>
+                    </div>
+                    <!-- The container where the hydrated JS markdown will be injected -->
+                    <div id="macro-context-container" class="text-[#f4f1ee] text-lg leading-relaxed space-y-6 relative z-10">
+                        <!-- Handled by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Context Sidebar -->
+            <div class="lg:col-span-4 space-y-6">
+                <div class="panel p-6">
+                    <h3 class="text-xs uppercase tracking-widest text-[#8c867d] mb-4 font-bold border-b border-[#33302c] pb-2">Active Tail Risks</h3>
+                    <ul class="space-y-4 text-sm" id="tail-risks-list">
+                        <li class="flex items-start gap-3">
+                            <span class="text-red-500 mt-1">▲</span>
+                            <div>
+                                <span class="font-bold text-white block">Geopolitical Contagion</span>
+                                <span class="text-[#8c867d]">US-Iran ceasefire collapse threatens Strait of Hormuz transits.</span>
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="text-amber-500 mt-1">▶</span>
+                            <div>
+                                <span class="font-bold text-white block">Grid Exhaustion</span>
+                                <span class="text-[#8c867d]">AI hyperscaler demand outstripping base-load generation capacity.</span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="panel p-6 bg-gradient-to-br from-[#1a1816] to-[#262320]">
+                    <h3 class="text-xs uppercase tracking-widest text-[#8c867d] mb-4 font-bold">Copula Engine Confidence</h3>
+                    <div class="flex items-end gap-4">
+                        <div class="text-5xl font-black text-white tracking-tighter">82<span class="text-2xl text-[#8c867d]">%</span></div>
+                        <div class="mb-2 text-sm text-[#22c55e] font-bold">HIGH VALIDITY</div>
+                    </div>
+                    <p class="text-xs text-[#8c867d] mt-2 font-mono border-t border-[#33302c] pt-2">Model: mod-77ab-copula v4.0</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="fortress" class="space-y-8">
+            <div class="flex flex-col md:flex-row justify-between items-end gap-4 border-b border-[#33302c] pb-6">
+                <div>
+                    <h2 class="text-3xl font-bold text-white">Fortress & Hunt</h2>
+                    <p class="text-[#8c867d] mt-2">Institutional Playbooks & Price Targets</p>
+                </div>
+                <div class="text-sm font-mono text-[#c5a059] bg-[#c5a059]/10 px-4 py-2 rounded">
+                    FILTER: ENERGY & INFRASTRUCTURE
+                </div>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="text-xs uppercase tracking-widest text-[#8c867d] border-b border-[#33302c]">
+                            <th class="py-4 px-4 font-bold">Asset / Entity</th>
+                            <th class="py-4 px-4 font-bold">Adam Rating</th>
+                            <th class="py-4 px-4 font-bold text-right">Spot Price</th>
+                            <th class="py-4 px-4 font-bold text-right">OS Target (12M)</th>
+                            <th class="py-4 px-4 font-bold text-center">Conviction</th>
+                            <th class="py-4 px-4 font-bold">Rationale Trigger</th>
+                        </tr>
+                    </thead>
+                    <tbody id="conviction-matrix" class="divide-y divide-[#33302c]">
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="dcf" class="panel p-8 md:p-12 bg-gradient-to-b from-[#1a1816] to-[#0f0e0d]">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                <div class="space-y-8">
+                    <div>
+                        <div class="flex items-center gap-3 mb-2">
+                            <span class="bg-blue-500/20 text-blue-400 px-2 py-1 rounded text-xs font-bold uppercase tracking-widest font-mono border border-blue-500/30">Deep Dive Model</span>
+                            <span class="text-[#8c867d] text-sm font-mono">TICKER: CEG (Constellation Energy)</span>
+                        </div>
+                        <h2 class="text-3xl font-bold text-white mb-4">Interactive DCF Simulator</h2>
+                        <p class="text-[#8c867d] leading-relaxed">
+                            Constellation Energy operates the largest zero-carbon nuclear fleet in the US. With AI hyperscalers signing unprecedented behind-the-meter PPA (Power Purchase Agreements), we must stress-test terminal growth against capital costs.
+                        </p>
+                    </div>
+
+                    <div class="space-y-8 p-6 bg-[#262320] rounded-xl border border-[#33302c]">
+                        <!-- WACC Slider -->
+                        <div>
+                            <div class="flex justify-between items-end mb-4">
+                                <label class="text-xs font-bold text-[#8c867d] uppercase tracking-widest">Weighted Avg Cost of Capital (WACC)</label>
+                                <span id="wacc-display" class="font-mono text-xl text-[#c5a059] font-bold">8.5%</span>
+                            </div>
+                            <input type="range" id="wacc-slider" min="6.0" max="12.0" step="0.1" value="8.5" class="w-full">
+                            <div class="flex justify-between text-[10px] font-mono text-[#8c867d] mt-2">
+                                <span>6.0% (Risk-On)</span>
+                                <span>12.0% (Stress)</span>
+                            </div>
+                        </div>
+
+                        <!-- Terminal Growth Slider -->
+                        <div>
+                            <div class="flex justify-between items-end mb-4">
+                                <label class="text-xs font-bold text-[#8c867d] uppercase tracking-widest">Terminal Growth Rate (g)</label>
+                                <span id="tg-display" class="font-mono text-xl text-[#c5a059] font-bold">2.5%</span>
+                            </div>
+                            <input type="range" id="tg-slider" min="1.0" max="4.0" step="0.1" value="2.5" class="w-full">
+                            <div class="flex justify-between text-[10px] font-mono text-[#8c867d] mt-2">
+                                <span>1.0% (Base)</span>
+                                <span>4.0% (AI Supercycle)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="p-4 border border-[#33302c] rounded-lg text-center">
+                            <div class="text-[10px] uppercase tracking-widest text-[#8c867d] mb-1">Spot Price</div>
+                            <div class="font-mono text-2xl text-white">$215.40</div>
+                        </div>
+                        <div class="p-4 border border-[#c5a059] bg-[#c5a059]/5 rounded-lg text-center shadow-[0_0_15px_rgba(197,160,89,0.1)]">
+                            <div class="text-[10px] uppercase tracking-widest text-[#c5a059] mb-1 font-bold">Implied Fair Value</div>
+                            <div id="implied-price" class="font-mono text-3xl font-bold text-[#c5a059] transition-all duration-300">$248.55</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chart Area -->
+                <div class="relative h-[400px] w-full">
+                    <canvas id="dcfChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="border-t border-[#33302c] bg-[#0f0e0d] mt-24 py-12 px-6">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6 text-[#8c867d] text-xs font-mono">
+            <div>
+                <span class="text-white font-bold tracking-widest uppercase">Adam OS Distribution</span>
+                <span class="ml-2">v4.2.0-stable</span>
+            </div>
+            <div class="flex gap-6">
+                <span>EXEC: run-20260718-alpha</span>
+                <span>STATE: VERIFIED</span>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // ==========================================
+        // 1. MOCK DAG STATE (From Adam OS Backend)
+        // ==========================================
+        const adamOsState = {
+            nodes: {
+                variables: [
+                    { id: "var-8f3e-rate", name: "US Fed Funds Rate", unit: "%" },
+                    { id: "var-9c2d-brent", name: "Brent Crude Spot", unit: "USD/bbl" },
+                    { id: "var-4a1b-cpi", name: "US CPI YoY", unit: "%" },
+                    { id: "var-btc-usd", name: "Bitcoin Liquidity Proxy", unit: "USD" },
+                    { id: "var-hy-spread", name: "High-Yield Credit Spread", unit: "bps" },
+                    { id: "var-nvda-capex", name: "Hyperscaler AI Capex (Q2)", unit: "Billion USD" }
+                ],
+                observations: [
+                    { variableId: "var-8f3e-rate", value: 3.625, confidence: 1.0 },
+                    { variableId: "var-9c2d-brent", value: 82.40, confidence: 0.98 },
+                    { variableId: "var-4a1b-cpi", value: 3.50, confidence: 1.0 },
+                    { variableId: "var-btc-usd", value: 94250, confidence: 0.85 },
+                    { variableId: "var-hy-spread", value: 385, confidence: 0.92 },
+                    { variableId: "var-nvda-capex", value: 42.5, confidence: 0.95 }
+                ]
+            }
+        };
+
+        const editorialMarkdown = `
+In the wake of the US-Iran ceasefire collapse, [var-9c2d-brent] surged past the $80 threshold overnight, acting as a direct tax on consumer balance sheets. Fed Chair Warsh's decision to maintain the [var-8f3e-rate] at 3.625% acknowledges this sticky inflation but risks a broader stagflationary undertone. 
+
+Despite the tightening fiat liquidity, the AI infrastructure supercycle remains fundamentally inelastic. Hyperscalers reported an aggregate [var-nvda-capex] investment in compute clusters this quarter. This creates a severe bifurcation: we are seeing structural rotation out of short-duration credit, pushing [var-hy-spread] wider, and moving aggressively into hard energy assets and digital liquidity proxies like [var-btc-usd]. 
+
+**Recommendation:** The Copula Engine dictates an overweight allocation to domestic power producers (Nuclear/Natural Gas) and top-tier digital assets, hedging against both inflation volatility and sovereign debt debasement.
+        `;
+
+        const convictionData = [
+            { asset: "Constellation Energy (CEG)", rating: "BUY", spot: "$215.40", target: "$285.00", conviction: 92, rationale: "Nuclear PPA dominance; AI data center load growth." },
+            { asset: "Bitcoin (BTC)", rating: "BUY", spot: "$94,250", target: "$125,000", conviction: 88, rationale: "Fiat liquidity hedge against persistent stagflation." },
+            { asset: "iShares iBoxx HY Corp (HYG)", rating: "SELL", spot: "$74.15", target: "$68.00", conviction: 75, rationale: "Spread widening as Fed holds rates higher for longer." },
+            { asset: "NVIDIA Corp (NVDA)", rating: "HOLD", spot: "$145.20", target: "$150.00", conviction: 60, rationale: "Priced for perfection; limited upside despite capex." }
+        ];
+
+        // ==========================================
+        // 2. VANILLA JS PARSER & DICTIONARY
+        // ==========================================
+        function buildGraphDictionary(state) {
+            const dictionary = {};
+            const obsMap = new Map(state.nodes.observations.map(obs => [obs.variableId, obs]));
+
+            state.nodes.variables.forEach(variable => {
+                const latestObs = obsMap.get(variable.id);
+                if (latestObs) {
+                    dictionary[variable.id] = {
+                        name: variable.name,
+                        value: latestObs.value,
+                        unit: variable.unit,
+                        confidence: latestObs.confidence
+                    };
+                }
+            });
+            return dictionary;
+        }
+
+        function hydrateMarkdownWithTooltips(markdownText, dictionary) {
+            // Convert simple markdown to HTML tags first
+            let html = markdownText
+                .replace(/\*\*(.*?)\*\*/g, '<span class="font-bold text-white">$1</span>')
+                .replace(/\n\n/g, '</p><p class="mb-4">');
+            
+            html = `<p class="mb-4">${html}</p>`;
+
+            // Regex matches [var-anything] and captures the ID
+            const uuidRegex = /\[(var-[a-zA-Z0-9-]+)\]/g;
+
+            return html.replace(uuidRegex, (match, uuid) => {
+                const node = dictionary[uuid];
+                if (!node) return `<span class="text-red-500 font-mono text-sm border-b border-red-500 border-dashed">[ERR: ${uuid}]</span>`;
+
+                const confidenceColor = node.confidence > 0.9 ? 'text-[#22c55e]' : 'text-[#eab308]';
+                // Use Intl.NumberFormat for nice formatting
+                const formattedValue = new Intl.NumberFormat('en-US').format(node.value);
+
+                return `
+                    <span class="tooltip-container relative inline-block cursor-help font-mono text-[15px] font-bold text-[#c5a059] border-b border-dashed border-[#c5a059] hover:bg-[#c5a059]/10 rounded px-1 transition-colors">
+                        ${node.name}
+                        
+                        <span class="tooltip-content absolute bottom-full left-1/2 mb-2 w-56 p-4 bg-[#262320] border border-[#33302c] text-white text-xs rounded-lg shadow-2xl opacity-0 invisible z-50 pointer-events-none font-sans font-normal">
+                            <span class="block font-bold text-stone-200 border-b border-[#33302c] pb-2 mb-2 truncate">
+                                ID: ${uuid.replace('var-','')}
+                            </span>
+                            <span class="flex justify-between items-center mb-2">
+                                <span class="text-[#8c867d]">Spot Data:</span>
+                                <span class="font-mono font-bold text-[#c5a059]">${formattedValue} ${node.unit}</span>
+                            </span>
+                            <span class="flex justify-between items-center">
+                                <span class="text-[#8c867d]">OS Confidence:</span>
+                                <span class="${confidenceColor} font-mono font-bold">${(node.confidence * 100).toFixed(0)}%</span>
+                            </span>
+                            <svg class="absolute text-[#262320] h-2 w-full left-0 top-full drop-shadow-md" x="0px" y="0px" viewBox="0 0 255 255" xml:space="preserve"><polygon class="fill-current" points="0,0 127.5,127.5 255,0"/></svg>
+                        </span>
+                    </span>
+                `;
+            });
+        }
+
+        // ==========================================
+        // 3. UI RENDERING LOGIC
+        // ==========================================
+        function renderConvictionMatrix() {
+            const tbody = document.getElementById('conviction-matrix');
+            let html = '';
+            
+            convictionData.forEach(row => {
+                let badgeClass = '';
+                if(row.rating === 'BUY') badgeClass = 'bg-[#22c55e]/10 text-[#22c55e] border-[#22c55e]/30';
+                else if(row.rating === 'SELL') badgeClass = 'bg-[#ef4444]/10 text-[#ef4444] border-[#ef4444]/30';
+                else badgeClass = 'bg-[#eab308]/10 text-[#eab308] border-[#eab308]/30';
+
+                html += `
+                    <tr class="hover:bg-[#262320]/50 transition-colors group">
+                        <td class="py-4 px-4 font-bold text-white">${row.asset}</td>
+                        <td class="py-4 px-4">
+                            <span class="px-2 py-1 border rounded text-[10px] font-bold tracking-widest ${badgeClass}">${row.rating}</span>
+                        </td>
+                        <td class="py-4 px-4 font-mono text-right text-[#8c867d]">${row.spot}</td>
+                        <td class="py-4 px-4 font-mono text-right font-bold text-[#c5a059]">${row.target}</td>
+                        <td class="py-4 px-4">
+                            <div class="w-full bg-[#33302c] rounded-full h-1.5 mt-1">
+                                <div class="bg-[#c5a059] h-1.5 rounded-full" style="width: ${row.conviction}%"></div>
+                            </div>
+                        </td>
+                        <td class="py-4 px-4 text-xs text-[#8c867d] group-hover:text-white transition-colors">${row.rationale}</td>
+                    </tr>
+                `;
+            });
+            tbody.innerHTML = html;
+        }
+
+        // ==========================================
+        // 4. INTERACTIVE DCF MODEL & CHART
+        // ==========================================
+        let dcfChartInstance = null;
+
+        // Simplified CEG parameters (Mocked for demonstration)
+        const dcfParams = {
+            sharesOut: 315, // Millions
+            netDebt: 4500, // Millions
+            fcf: [2800, 3100, 3500, 4000, 4600] // 5 Yr Forecast
+        };
+
+        function calculateDCF(wacc, g) {
+            const r = wacc / 100;
+            const growth = g / 100;
+            
+            let pvFCF = 0;
+            const pvArray = []; // For chart
+
+            // Calculate PV of 5-year FCF
+            for (let i = 0; i < dcfParams.fcf.length; i++) {
+                const discounted = dcfParams.fcf[i] / Math.pow(1 + r, i + 1);
+                pvFCF += discounted;
+                pvArray.push(discounted);
+            }
+
+            // Terminal Value = FCF_5 * (1+g) / (WACC - g)
+            const finalYearFCF = dcfParams.fcf[dcfParams.fcf.length - 1];
+            const tv = (finalYearFCF * (1 + growth)) / (r - growth);
+            const pvTV = tv / Math.pow(1 + r, 5);
+            
+            pvArray.push(pvTV); // Push Terminal Value PV for chart
+
+            // Enterprise Value -> Equity Value -> Share Price
+            const ev = pvFCF + pvTV;
+            const equityValue = ev - dcfParams.netDebt;
+            const sharePrice = equityValue / dcfParams.sharesOut;
+
+            return { sharePrice, pvArray, ev };
+        }
+
+        function updateDCFUI() {
+            const wacc = parseFloat(document.getElementById('wacc-slider').value);
+            const tg = parseFloat(document.getElementById('tg-slider').value);
+            
+            // Ensure WACC > TG to avoid infinite/negative division
+            if (wacc <= tg + 0.5) {
+                // Force a gap
+                document.getElementById('wacc-slider').value = (tg + 0.5).toFixed(1);
+                return updateDCFUI(); 
+            }
+
+            document.getElementById('wacc-display').innerText = wacc.toFixed(1) + '%';
+            document.getElementById('tg-display').innerText = tg.toFixed(1) + '%';
+
+            const result = calculateDCF(wacc, tg);
+            
+            const priceEl = document.getElementById('implied-price');
+            priceEl.innerText = '$' + result.sharePrice.toFixed(2);
+            
+            // Color feedback based on spot price ($215.40)
+            if (result.sharePrice > 215.40) {
+                priceEl.className = "font-mono text-3xl font-bold text-[#22c55e] transition-all duration-300";
+            } else {
+                priceEl.className = "font-mono text-3xl font-bold text-[#ef4444] transition-all duration-300";
+            }
+
+            updateChart(result.pvArray);
+        }
+
+        function initChart() {
+            const ctx = document.getElementById('dcfChart').getContext('2d');
+            Chart.defaults.color = '#8c867d';
+            Chart.defaults.font.family = "'JetBrains Mono', monospace";
+
+            dcfChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Year 1', 'Year 2', 'Year 3', 'Year 4', 'Year 5', 'Terminal Val'],
+                    datasets: [{
+                        label: 'Present Value (Millions USD)',
+                        data: [], // Updated dynamically
+                        backgroundColor: [
+                            'rgba(197, 160, 89, 0.4)',
+                            'rgba(197, 160, 89, 0.5)',
+                            'rgba(197, 160, 89, 0.6)',
+                            'rgba(197, 160, 89, 0.7)',
+                            'rgba(197, 160, 89, 0.8)',
+                            'rgba(34, 197, 94, 0.6)' // TV gets green
+                        ],
+                        borderColor: [
+                            '#c5a059', '#c5a059', '#c5a059', '#c5a059', '#c5a059', '#22c55e'
+                        ],
+                        borderWidth: 1,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#1a1816',
+                            titleColor: '#8c867d',
+                            bodyColor: '#f4f1ee',
+                            borderColor: '#33302c',
+                            borderWidth: 1,
+                            callbacks: {
+                                label: function(context) {
+                                    return '$' + context.raw.toFixed(0) + ' M';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            grid: { color: '#33302c' },
+                            ticks: { callback: (value) => '$' + value + 'M' }
+                        },
+                        x: {
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateChart(dataArray) {
+            if (dcfChartInstance) {
+                dcfChartInstance.data.datasets[0].data = dataArray;
+                dcfChartInstance.update();
+            }
+        }
+
+        // ==========================================
+        // 5. BOOTSTRAP APP
+        // ==========================================
+        window.onload = () => {
+            // 1. Build Dictionary & Parse Editorial
+            const dict = buildGraphDictionary(adamOsState);
+            const hydrated = hydrateMarkdownWithTooltips(editorialMarkdown, dict);
+            document.getElementById('macro-context-container').innerHTML = hydrated;
+
+            // 2. Render Tables & Charts
+            renderConvictionMatrix();
+            initChart();
+
+            // 3. Attach Listeners & Run initial DCF calc
+            document.getElementById('wacc-slider').addEventListener('input', updateDCFUI);
+            document.getElementById('tg-slider').addEventListener('input', updateDCFUI);
+            updateDCFUI();
+        };
+
+    </script>
+</body>
+</html>

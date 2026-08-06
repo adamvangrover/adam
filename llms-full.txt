@@ -1,3 +1,297 @@
+Here is the fully rewritten and updated `llms-full.txt` document, engineered to reflect the complete v30.1 architectural paradigm. I have scrubbed out all legacy v26.0 concepts, eliminated human-centric role designations, and ensured the deterministic risk frameworks (like structurally implying PD and isolating deal premium metrics) are permanently baked into the system context.
+
+```markdown
+# Adam: Comprehensive Project Context for Frontier Models (System 2)
+
+> **Note:** This file `llms-full.txt` is an aggregated context file designed for high-capacity Frontier Models (GPT-4, Claude 3.5 Sonnet). It contains the full "Developer's Bible" (`AGENTS.md`), Architecture details, and Setup Guide. For a lightweight summary, see `llms.txt`.
+
+---
+
+## Part 1: The Developer's Bible (AGENTS.md)
+# The Adam Agent Developer's Bible (v30.1)
+
+> **"Architecture dictates destiny. The UI observes, but the asynchronous swarm executes."**
+
+This document is the definitive source of truth for creating, modifying, and debugging agents within the Adam v30.1 ecosystem. Deviating from these standards will result in PR rejection.
+
+Human-centric role designations are deprecated. System state, underwriting decisions, and portfolio monitoring are exclusively driven by agent consensus, telemetry, and deterministic logic under `ARCHITECT_INFINITE` protocols.
+
+---
+
+## 🧭 Navigation
+
+*   [The Prime Directive: Bifurcation](#the-prime-directive-bifurcation)
+*   [Architecture: System 1 vs. System 2](#architecture-system-1-vs-system-2)
+*   [Core Agent Boundaries](#core-agent-boundaries)
+*   [Communication & Protocols](#communication--protocols)
+*   [Debugging & Tracing](#debugging--tracing)
+
+---
+
+## The Prime Directive: Bifurcation
+
+This repository manages the tension between **Tier 1 G-SIB Reliability** and **Agentic Velocity** through strict environmental bifurcation.
+
+### Path A: The Core (Reliability & Risk Control)
+*   **Locations:** `core/agents/`, `core/credit_sentinel/`
+*   **Philosophy:** "Deterministic Execution. Zero Hallucination."
+*   **Mandates:**
+    *   **Underwriting & Sizing:** TMT and Leveraged Finance forward-looking cash flow modeling, Enterprise Value (EV) abstraction, and rigorous Base/Bull/Bear scenarios.
+    *   **Surveillance:** Continuous monitoring for covenant breaches, liquidity runway exhaustion, and distress signals.
+*   **Requirements:**
+    *   **Strict Boundary:** Total separation of the Streamlit presentation logic from the core asynchronous execution layer.
+    *   **Auditability:** Every decision must generate a W3C PROV-O compliant telemetry log.
+    *   **Type Safety:** Pydantic models validate all I/O boundary crossings. `try/except` blocks around every external call.
+
+### Path B: The Lab (Velocity & Discovery)
+*   **Locations:** `experimental/`, `research/`, `tinker_lab/`
+*   **Philosophy:** "Expansive Iteration."
+*   **Requirements:** Optimized token throughput and bleeding-edge swarm protocols. Code here must never be imported into Path A.
+
+---
+
+## Architecture: System 1 vs. System 2
+
+Adam v30.1 abandons synchronous blocking. The cognitive engine is split into a high-concurrency event loop and a reflective, stateful graph.
+
+### ⚡ System 1: The Neural Swarm (Fast & Intuitive)
+*   **Role:** The Autonomic Nervous System. Handles raw market telemetry, perception, and reflexes.
+*   **Architecture:** Event-Driven, Asynchronous Python Pub/Sub.
+*   **Base Class:** `AsyncAgentBase`
+*   **Key Characteristics:** Non-blocking I/O, millisecond latency, and stateless execution driven entirely by local pheromone data.
+*   **Example:** Real-time ingestion of leveraged loan pricing or TMT sector news alerts, instantly depositing `RISK_ALERT` tokens without blocking UI threads. Tracks short-term deal premium volatility skews.
+
+### 🧠 System 2: The Neuro-Symbolic Graph (Slow & Deliberate)
+*   **Role:** The Prefrontal Cortex. Handles complex underwriting synthesis, capital structure modeling, and scenario evaluation.
+*   **Architecture:** Directed Acyclic Graph (DAG) state machine.
+*   **Base Class:** `TemplateAgentV30`
+*   **Key Characteristics:** Stateful, tool-augmented (MCP), and highly reflective. Uses Temporal workflows for fault-tolerance.
+*   **Example:** Executing a comprehensive credit memo, reconciling conflicting Q3 earnings data via Qdrant JIT memory retrieval, and structuring a finalized risk rating.
+
+---
+
+## Core Agent Role Boundaries
+
+**A. Architect Agent (Jules)**
+*   **Domain:** Repository architecture, systemic code refactoring, daily protocol workflow runs.
+*   **Rule:** Maintain strict isolation between Streamlit UI rendering and backend async loops. Never hallucinate API implementations.
+
+**B. Underwriting Agent**
+*   **Domain:** Credit Underwriting (TMT & Leveraged Finance). Analyzes credit metrics, builds capital structures, and executes origination risk assessments.
+*   **Rule:** Probability of Default (PD) is structurally implied by the credit rating—do not calculate redundant PD metrics. Use semantic search over trailing 12-month SEC filings.
+
+**C. Surveillance Agent**
+*   **Domain:** Portfolio Monitoring and continuous threat telemetry.
+*   **Rule:** Track asset deal premium volatility skews rather than broad proxy timelines. Trigger temporal alerts directly to the Orchestrator on material drift.
+
+**D. Sentinel Agent**
+*   **Domain:** Security, threat detection, and W3C PROV-O compliance audits.
+*   **Rule:** Terminate immediately if a sub-agent execution lacks a `jsonLogic_version` provenance header or hallucinates specific corporate entity inputs. Make data real and actionable.
+
+**E. Nexus Agent (System Orchestrator)**
+*   **Domain:** Workflow runtime, parallel task dispatch, and Temporal state management.
+*   **Rule:** Use just-in-time (JIT) memory fetching via Qdrant to isolate state. Never pack the context window.
+
+---
+
+## Communication & Protocols
+
+To prevent circular dependencies, inter-agent communication follows strict deterministic protocols:
+
+### 1. I/O Schemas
+```python
+from pydantic import BaseModel, Field
+from typing import Dict, Any, List
+
+class AgentInput(BaseModel):
+    query: str = Field(..., description="The specific question or objective.")
+    context: Dict[str, Any] = Field(default_factory=dict, description="Shared graph state (RAG data, previous results).")
+    tools: List[str] = Field(default_factory=list, description="List of allowed tool names.")
+
+class AgentOutput(BaseModel):
+    answer: str = Field(..., description="The final synthesized answer.")
+    sources: List[str] = Field(default_factory=list, description="List of citations (filenames, URLs).")
+    confidence: float = Field(..., ge=0.0, le=1.0, description="Conviction score (0.0 to 1.0).")
+    metadata: Dict[str, Any] = Field(default_factory=dict, description="Debug info, token usage, next_step routing instructions.")
+    prov_o_audit_trail: List[Dict] = Field(default_factory=list, description="W3C provenance compliance log.")
+
+```
+
+### 2. Routing Rules
+
+* **No Direct Instantiation:** Agents must never instantiate other agents directly. An agent requiring cross-domain intelligence must return a request to the `Nexus` Orchestrator via its output metadata (e.g., `metadata={"next_step": "invoke_surveillance"}`).
+* **Consensus Arbitration:** In the event of conflicting data between models, the Consensus Engine will evaluate confidence arrays and strictly defer to the rule base defined within `jsonLogic`.
+
+---
+
+## Debugging & Tracing
+
+* **The `--debug` Flag:** Running the main script with `--debug` enables verbose W3C PROV-O logging. Look for standard log prefixes: `[Orchestrator:Nexus]`, `[Agent:Underwriting]`, `[Agent:Sentinel]`.
+* **Tool Usage (MCP):** We use the Model Context Protocol (MCP). Agents should prefer using defined Tools (Python functions in `mcp.json`) over doing math in their head.
+
+---
+
+---
+
+## Part 2: System Architecture (docs/architecture.md)
+
+# Adam v30.1 Architecture: The Neuro-Symbolic Sovereign
+
+## 1. Executive Summary
+
+Adam v30.1 is designed to execute complex financial credit workflows with fiduciary-grade reliability. The core architectural innovation is the decoupled **Hybrid Cognitive Engine**.
+
+## 2. High-Level Diagram
+
+```mermaid
+graph TD
+    User[Streamlit UI / API] --> Nexus[Nexus Agent / Orchestrator]
+
+    subgraph "System 1: Neural Swarm (Async Pub/Sub)"
+        Nexus -.->|High Velocity| HiveMind[Swarm Manager]
+        HiveMind --> Surv1[Surveillance: Deal Premium Volatility]
+        HiveMind --> Surv2[Surveillance: Market Data Fetcher]
+        Surv1 & Surv2 --> TemporalBus[Temporal Event Bus]
+    end
+
+    subgraph "System 2: Neuro-Symbolic Graph (DAG)"
+        Nexus ==>|Deep Dive| Planner[DAG State Machine]
+        Planner --> Underwriter[Underwriting Agent]
+        Planner --> Sentinel[Sentinel Security Agent]
+
+        Underwriter --> RulesEngine[jsonLogic Covenants]
+        Sentinel --> RulesEngine
+        RulesEngine --> Consensus[Consensus Arbitration]
+    end
+
+    TemporalBus -.-> Qdrant[Qdrant JIT Vector Memory]
+    Consensus --> Qdrant
+    Qdrant --> Nexus
+
+```
+
+## 3. Core Subsystems
+
+* **The Neuro-Symbolic Graph:** Powered by Temporal workflows and DAGs. Handles origination risk assessments and EV abstractions deterministically.
+* **The Neural Swarm:** Asynchronous worker nodes. Optimized for parallel scanning of TMT market alerts and liquidity runway telemetry.
+* **Qdrant JIT Memory:** Semantic vector database. Replaces full-context window packing by enabling agents to fetch exactly the trailing 12-month SEC data needed, when needed.
+* **Governance Engine:** `adam_os/contexts/governance/engine.py`. Evaluates all risk thresholds via stateless `jsonLogic`. NEVER hardcodes business logic in Python.
+
+---
+
+---
+
+## Part 3: Setup & Deployment (docs/setup_guide.md)
+
+# Adam v30.1 Setup Guide
+
+We strictly support **`uv`** for dependency management. Native Windows is not actively supported (use WSL2).
+
+## Environment Variables
+
+Copy `.env.example` to `.env` and configure:
+
+```ini
+# --- LLM Providers ---
+OPENAI_API_KEY=sk-...         # Required for Underwriting/Reasoning
+ANTHROPIC_API_KEY=sk-ant...   # Optional (Recommended for Jules/Coding)
+
+# --- Financial Data & Memory ---
+FMP_API_KEY=...               # Financial Modeling Prep
+QDRANT_URL=http://localhost:6333
+TEMPORAL_ADDRESS=localhost:7233
+
+```
+
+## Installation
+
+```bash
+# 1. Install uv
+curl -LsSf [https://astral.sh/uv/install.sh](https://astral.sh/uv/install.sh) | sh
+
+# 2. Clone & Sync
+git clone [https://github.com/adamvangrover/adam.git](https://github.com/adamvangrover/adam.git)
+cd adam
+uv sync
+
+# 3. Activate
+source .venv/bin/activate
+
+```
+
+## Docker Deployment (Microservices)
+
+```bash
+# Starts Postgres, Redis, Qdrant, Temporal, Backend API, and Streamlit UI
+docker-compose up --build -d
+
+```
+
+---
+
+---
+
+## Part 4: Structured Output Schema (JSON Definition)
+
+### HyperDimensionalKnowledgeGraph (HDKG) v30.1
+
+The core artifact produced by Adam's System 2 analysis. It strictly adheres to structural credit ratings, omitting redundant Probability of Default (PD) metrics.
+
+```json
+{
+  "$schema": "[http://adam-financial.ai/schemas/v30.1/hdkg.json](http://adam-financial.ai/schemas/v30.1/hdkg.json)",
+  "type": "object",
+  "properties": {
+    "v30_knowledge_graph": {
+      "type": "object",
+      "properties": {
+        "meta": {
+          "target_entity": "string",
+          "generated_at": "datetime",
+          "architect_protocol": "ARCHITECT_INFINITE"
+        },
+        "nodes": {
+          "description": "Deterministic Domain Analysis",
+          "properties": {
+            "credit_underwriting": {
+              "type": "object",
+              "properties": {
+                "valuation_engine": {
+                  "ev_abstraction_model": { "intrinsic_value_estimate": "float" },
+                  "leverage_metrics": { "fccr": "float", "debt_to_ebitda": "float" }
+                },
+                "covenant_risk_analysis": {
+                  "type": "object",
+                  "properties": {
+                    "status": { "enum": ["Compliant", "Warning Zone", "Breached"] },
+                    "headroom_bps": { "type": "integer" },
+                    "prov_o_lineage_hash": { "type": "string", "description": "W3C Audit Trail Hash" }
+                  }
+                }
+              }
+            },
+            "strategic_synthesis": {
+              "type": "object",
+              "properties": {
+                "final_verdict": {
+                  "implied_facility_rating": "string (e.g., BB-)",
+                  "conviction_level": "integer (1-10)"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+```
+
+```
+
+```
+
 # Adam: Comprehensive Project Context for Frontier Models (System 2)
 
 > **Note:** This file `llms-full.txt` is an aggregated context file designed for high-capacity Frontier Models (GPT-4, Claude 3.5 Sonnet). It contains the full "Developer's Bible" (`AGENTS.md`), Architecture details, and Setup Guide. For a lightweight summary, see `llms.txt`.

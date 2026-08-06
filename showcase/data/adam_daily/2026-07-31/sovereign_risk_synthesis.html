@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM v30.2 | Sovereign Risk Synthesis</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&display=swap');
+
+        :root {
+            --bg-main: #fcfaf7;
+            --card-bg: #ffffff;
+            --accent-red: #d9534f;
+            --accent-amber: #f0ad4e;
+            --text-primary: #2d2d2d;
+            --text-secondary: #666666;
+            --border-color: #e5e0d8;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            scroll-behavior: smooth;
+        }
+
+        .mono { font-family: 'JetBrains Mono', monospace; }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-color);
+        }
+
+        .risk-alert {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(217, 83, 79, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(217, 83, 79, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(217, 83, 79, 0); }
+        }
+
+        input[type=range] {
+            accent-color: var(--accent-red);
+        }
+    </style>
+</head>
+<body class="p-0 m-0">
+
+<nav class="sticky top-0 z-50 glass-panel border-b border-gray-200 px-6 py-4 flex flex-wrap justify-between items-center">
+    <div class="flex items-center space-x-3">
+        <div class="w-8 h-8 bg-red-600 rounded flex items-center justify-center text-white font-bold text-xl">A</div>
+        <span class="font-bold text-lg tracking-tighter mono">ADAM v30.2 // SOVEREIGN ANALYST</span>
+    </div>
+    <div class="flex items-center space-x-6 text-sm mono">
+        <div class="flex items-center">
+            <span class="w-2 h-2 bg-red-500 rounded-full mr-2 risk-alert"></span>
+            STATUS: ALERT (CRITICAL REGIME SHIFT)
+        </div>
+        <div class="hidden md:block">TIMESTAMP: JULY 30, 2026</div>
+    </div>
+</nav>
+
+<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+
+    <header class="mb-16 text-center md:text-left">
+        <h1 class="text-4xl md:text-6xl font-bold mb-6 tracking-tight text-gray-900">The Century Duration Mirage</h1>
+        <p class="text-xl text-gray-600 max-w-4xl leading-relaxed">
+            The macroeconomic landscape has crossed a critical threshold. As central bank reserves transition from abundance to acute scarcity, the foundational anchors of global market resilience are simultaneously failing. This terminal provides a synthesized view of the three converging crises: <strong>Reserve Depletion</strong>, <strong>Private Credit Insolvency</strong>, and <strong>AI Infrastructure Leverage</strong>.
+        </p>
+    </header>
+
+    <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+        <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+            <div class="text-xs text-gray-500 uppercase mono mb-2">ON RRP Facility</div>
+            <div class="text-3xl font-bold text-red-600">$1.07B</div>
+            <div class="text-sm text-gray-500 mt-2">Terminal Scarcity Reached</div>
+        </div>
+        <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+            <div class="text-xs text-gray-500 uppercase mono mb-2">Private Credit Default</div>
+            <div class="text-3xl font-bold">6.0%</div>
+            <div class="text-sm text-gray-500 mt-2">Trailing 12-Month Record</div>
+        </div>
+        <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+            <div class="text-xs text-gray-500 uppercase mono mb-2">10Y Treasury Yield</div>
+            <div class="text-3xl font-bold">4.68%</div>
+            <div class="text-sm text-gray-500 mt-2">Refinancing Wall Trigger</div>
+        </div>
+        <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+            <div class="text-xs text-gray-500 uppercase mono mb-2">S&P 500 ERP</div>
+            <div class="text-3xl font-bold text-amber-600">3.21%</div>
+            <div class="text-sm text-gray-500 mt-2">Compressed Exposure Limit</div>
+        </div>
+    </section>
+
+    <section class="mb-20 bg-white p-8 rounded-2xl border border-gray-200">
+        <div class="mb-10">
+            <h2 class="text-3xl font-bold mb-4">I. The Mechanics of the Liquidity Vacuum</h2>
+            <p class="text-gray-600 leading-relaxed max-w-3xl">
+                The banking system is shifting onto the steep, inelastic portion of the Reserve Demand Curve. As the Federal Reserve continues Quantitative Tightening and the U.S. Treasury rebuilds its General Account (TGA), commercial bank reserves are being physically drained. This creates a zero-sum liquidity environment where sovereign debt issuance directly crowds out private market capital.
+            </p>
+        </div>
+        <div class="chart-container">
+            <canvas id="liquidityChart"></canvas>
+        </div>
+        <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="bg-gray-50 p-4 rounded-lg">
+                <h4 class="font-bold text-sm mb-2 mono">TGA REBUILD</h4>
+                <p class="text-xs text-gray-500">Targeting $905B. Every dollar of new debt issued is now a direct drain on bank liquidity without the RRP shock absorber.</p>
+            </div>
+            <div class="bg-gray-50 p-4 rounded-lg">
+                <h4 class="font-bold text-sm mb-2 mono">QT DRAG</h4>
+                <p class="text-xs text-gray-500">$25B monthly Treasury roll-off persists. The aggregate pool of reserves is shrinking into the "scarcity" zone (<10% of assets).</p>
+            </div>
+            <div class="bg-gray-50 p-4 rounded-lg">
+                <h4 class="font-bold text-sm mb-2 mono">RDE RATIO</h4>
+                <p class="text-xs text-gray-500">Reserve Demand Elasticity is spiking. Small liquidity shocks now cause exponential volatility in overnight money market rates.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="mb-20 bg-white p-8 rounded-2xl border border-gray-200">
+        <div class="mb-10">
+            <h2 class="text-3xl font-bold mb-4">II. The Private Credit Contagion</h2>
+            <p class="text-gray-600 leading-relaxed max-w-3xl">
+                The $3 trillion private credit ecosystem is exhibiting signs of structural failure masked by accounting maneuvers. The widespread use of Payment-in-Kind (PIK) interest allows insolvent software LBOs to defer cash payments, compounding debt balances against a stagnant enterprise value. This "amend and pretend" cycle is nearing a terminal maturity wall.
+            </p>
+        </div>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            <div class="chart-container">
+                <canvas id="creditChart"></canvas>
+            </div>
+            <div class="flex flex-col justify-center">
+                <h3 class="text-xl font-semibold mb-4">Default Bifurcation</h3>
+                <div class="space-y-6">
+                    <div>
+                        <div class="flex justify-between text-sm mb-1">
+                            <span>Lower Middle Market (<$25M EBITDA)</span>
+                            <span class="font-bold text-red-600">15.8%</span>
+                        </div>
+                        <div class="w-full bg-gray-100 h-2 rounded-full overflow-hidden">
+                            <div class="bg-red-500 h-full w-[79%]"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-sm mb-1">
+                            <span>SaaS B2B (Reported/PIK Masked)</span>
+                            <span class="font-bold text-amber-600">2.2%</span>
+                        </div>
+                        <div class="w-full bg-gray-100 h-2 rounded-full overflow-hidden">
+                            <div class="bg-amber-500 h-full w-[11%]"></div>
+                        </div>
+                    </div>
+                    <div class="p-4 bg-red-50 border-l-4 border-red-500 text-sm italic">
+                        "The divergence between model-based ratings and privately monitored ratings (approaching 10%) suggests the true default rate is nearly double the headline 6.0% figure."
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="mb-20 bg-gray-900 text-white p-8 rounded-2xl shadow-2xl overflow-hidden relative">
+        <div class="absolute top-0 right-0 p-8 opacity-10 pointer-events-none">
+            <div class="text-9xl font-bold mono">ARM</div>
+        </div>
+        <div class="mb-10 relative z-10">
+            <h2 class="text-3xl font-bold mb-4">III. The Stargate Leverage Loop</h2>
+            <p class="text-gray-400 leading-relaxed max-w-3xl">
+                The "Power Mirage" is unravelling. Hyperscaler AI CapEx is colliding with physical electrical grid constraints and extreme collateral fragility. Use the simulator below to analyze the impact of semiconductor equity volatility on the systemic margin facilities funding the $500B Stargate build-out.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-16 relative z-10">
+            <div class="bg-gray-800 p-8 rounded-xl border border-gray-700">
+                <div class="mb-8">
+                    <label class="block text-sm font-bold uppercase mb-4 mono tracking-widest text-red-400">ARM Equity Share Price ($)</label>
+                    <input type="range" id="armSlider" min="50" max="150" value="115" class="w-full h-3 bg-gray-700 rounded-lg appearance-none cursor-pointer">
+                    <div class="flex justify-between mt-2 text-xs text-gray-500 mono">
+                        <span>$50</span>
+                        <span>$100</span>
+                        <span>$150</span>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <div class="flex justify-between items-center py-3 border-b border-gray-700">
+                        <span class="text-gray-400">Current Simulation Price</span>
+                        <span id="armPriceVal" class="text-2xl font-bold mono text-white">$115.00</span>
+                    </div>
+                    <div class="flex justify-between items-center py-3 border-b border-gray-700">
+                        <span class="text-gray-400">Implied LTV Ratio</span>
+                        <span id="ltvVal" class="text-2xl font-bold mono">22.1%</span>
+                    </div>
+                    <div class="flex justify-between items-center py-3 border-b border-gray-700">
+                        <span class="text-gray-400">Systemic Status</span>
+                        <span id="systemStatus" class="px-3 py-1 rounded bg-green-900 text-green-300 text-xs font-bold uppercase mono">Stable</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex flex-col justify-center">
+                <div id="riskWarning" class="hidden animate-pulse">
+                    <div class="bg-red-600/20 border-2 border-red-600 p-6 rounded-xl">
+                        <h4 class="text-xl font-bold mb-2 flex items-center">
+                            ⚠️ COVENANT BREACH DETECTED
+                        </h4>
+                        <p class="text-sm text-red-200">
+                            A breach of the <strong>$73.00 coordinate</strong> mechanically triggers the 35% LTV margin call. Algorithmic liquidations of ARM equity will commence to cover the $18.5B SoftBank facility, initiating a reflexive death spiral.
+                        </p>
+                    </div>
+                </div>
+                <div id="stableMessage" class="space-y-4">
+                    <h3 class="text-xl font-semibold">Collateral Resilience</h3>
+                    <p class="text-gray-400 text-sm leading-relaxed">
+                        The "Stargate" facility remains solvent as long as ARM equity maintains sufficient valuation to cushion its $18.5B margin loan. A compression in Big Tech multiples—driven by the liquidity vacuum—directly threatens this infrastructure foundation.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="mb-20 bg-white p-8 rounded-2xl border border-gray-200">
+        <div class="mb-10 text-center">
+            <h2 class="text-3xl font-bold mb-4">Tactical Portfolio Defense</h2>
+            <p class="text-gray-600 leading-relaxed max-w-3xl mx-auto">
+                Survival in the scarce-reserve regime requires an immediate shift to ultra-short duration liquidity and zero-counterparty-risk assets. We recommend the following defensive posture to insulate capital from forced restructurings.
+            </p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+            <div class="chart-container">
+                <canvas id="allocationChart"></canvas>
+            </div>
+            <div class="space-y-6">
+                <div class="flex gap-4">
+                    <div class="w-1 bg-red-600"></div>
+                    <div>
+                        <h4 class="font-bold">65% Ultra-Short T-Bills</h4>
+                        <p class="text-sm text-gray-500">Absolute liquidity anchor. Yields of 3.8-4.2% while avoiding duration risk and term premium shocks.</p>
+                    </div>
+                </div>
+                <div class="flex gap-4">
+                    <div class="w-1 bg-amber-500"></div>
+                    <div>
+                        <h4 class="font-bold">20% Physical Gold</h4>
+                        <p class="text-sm text-gray-500">The sovereign contagion hedge. Zero counterparty risk against the inevitable return of currency debasement.</p>
+                    </div>
+                </div>
+                <div class="flex gap-4">
+                    <div class="w-1 bg-gray-300"></div>
+                    <div>
+                        <h4 class="font-bold">15% AI Infrastructure Dry Powder</h4>
+                        <p class="text-sm text-gray-500">Retained for the distressed recovery phase. Deployable only after margin-call liquidations wash out speculative premiums.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="mb-20">
+        <h3 class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-6 mono">Deterministic Failure Coordinates</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="p-6 border-l-4 border-gray-900 bg-white shadow-sm">
+                <div class="text-xs text-gray-500 mb-1 mono">SOVEREIGN YIELD</div>
+                <div class="text-2xl font-bold">10Y > 4.85%</div>
+                <p class="text-sm text-gray-400 mt-2">Breaks infinite-duration valuation math for hyperscalers.</p>
+            </div>
+            <div class="p-6 border-l-4 border-gray-900 bg-white shadow-sm">
+                <div class="text-xs text-gray-500 mb-1 mono">CREDIT SPREAD</div>
+                <div class="text-2xl font-bold">HY OAS > 4.0%</div>
+                <p class="text-sm text-gray-400 mt-2">Closes the refinancing window for private credit vehicles.</p>
+            </div>
+            <div class="p-6 border-l-4 border-gray-900 bg-white shadow-sm">
+                <div class="text-xs text-gray-500 mb-1 mono">ENERGY LIMIT</div>
+                <div class="text-2xl font-bold">Brent > $100/bbl</div>
+                <p class="text-sm text-gray-400 mt-2">Forces restrictive Fed policy amidst industrial decelerations.</p>
+            </div>
+        </div>
+    </section>
+
+    <footer class="border-t border-gray-200 py-12 text-center">
+        <p class="text-gray-400 text-xs mono uppercase tracking-widest">
+            ADAM v30.2 Internal Synthesis | Finalized July 30, 2026 | No Recourse Policy Engaged
+        </p>
+    </footer>
+
+</main>
+
+<script>
+    // --- Data Configuration ---
+    const liquidityData = {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+        datasets: [
+            {
+                label: 'TGA Balance ($B)',
+                data: [450, 520, 610, 720, 805, 880, 905],
+                borderColor: '#2d2d2d',
+                backgroundColor: 'rgba(45, 45, 45, 0.05)',
+                fill: true,
+                tension: 0.3
+            },
+            {
+                label: 'ON RRP Facility ($B)',
+                data: [400, 250, 120, 45, 12, 5, 1],
+                borderColor: '#d9534f',
+                backgroundColor: 'transparent',
+                borderDash: [5, 5],
+                tension: 0.3
+            }
+        ]
+    };
+
+    const creditData = {
+        labels: ['Consumer', 'Industrial', 'Healthcare', 'Software', 'Others'],
+        datasets: [{
+            label: 'Sectoral Default Rate (%)',
+            data: [12.8, 10.4, 9.4, 2.2, 6.0],
+            backgroundColor: [
+                'rgba(217, 83, 79, 0.8)',
+                'rgba(217, 83, 79, 0.6)',
+                'rgba(217, 83, 79, 0.4)',
+                'rgba(240, 173, 78, 0.8)',
+                'rgba(45, 45, 45, 0.8)'
+            ],
+            borderRadius: 6
+        }]
+    };
+
+    const allocationData = {
+        labels: ['Short T-Bills', 'Physical Gold', 'AI Infrastructure Dry Powder'],
+        datasets: [{
+            data: [65, 20, 15],
+            backgroundColor: ['#d9534f', '#f0ad4e', '#e5e0d8'],
+            borderWidth: 0
+        }]
+    };
+
+    // --- Chart Initialization ---
+    const ctxLiquidity = document.getElementById('liquidityChart').getContext('2d');
+    new Chart(ctxLiquidity, {
+        type: 'line',
+        data: liquidityData,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'top', labels: { font: { family: 'JetBrains Mono', size: 10 } } }
+            },
+            scales: {
+                y: { grid: { color: '#f0f0f0' }, ticks: { font: { family: 'JetBrains Mono' } } },
+                x: { grid: { display: false }, ticks: { font: { family: 'JetBrains Mono' } } }
+            }
+        }
+    });
+
+    const ctxCredit = document.getElementById('creditChart').getContext('2d');
+    new Chart(ctxCredit, {
+        type: 'bar',
+        data: creditData,
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                x: { grid: { display: false }, max: 15, ticks: { font: { family: 'JetBrains Mono' } } },
+                y: { grid: { display: false }, ticks: { font: { family: 'JetBrains Mono' } } }
+            }
+        }
+    });
+
+    const ctxAllocation = document.getElementById('allocationChart').getContext('2d');
+    new Chart(ctxAllocation, {
+        type: 'doughnut',
+        data: allocationData,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '70%',
+            plugins: {
+                legend: { position: 'bottom', labels: { font: { family: 'JetBrains Mono', size: 11 } } }
+            }
+        }
+    });
+
+    // --- Interactivity: AI Leverage Loop Sandbox ---
+    const armSlider = document.getElementById('armSlider');
+    const armPriceVal = document.getElementById('armPriceVal');
+    const ltvVal = document.getElementById('ltvVal');
+    const systemStatus = document.getElementById('systemStatus');
+    const riskWarning = document.getElementById('riskWarning');
+    const stableMessage = document.getElementById('stableMessage');
+
+    const updateSimulation = () => {
+        const price = parseFloat(armSlider.value);
+        armPriceVal.innerText = `$${price.toFixed(2)}`;
+
+        // Simplified LTV Logic: $18.5B Loan / (Shares * Price)
+        // Calibrated to 35% LTV at $73.00 price
+        const ltv = (2555 / price).toFixed(1);
+        ltvVal.innerText = `${ltv}%`;
+
+        if (price < 73) {
+            ltvVal.className = "text-2xl font-bold mono text-red-600";
+            systemStatus.className = "px-3 py-1 rounded bg-red-900 text-red-300 text-xs font-bold uppercase mono";
+            systemStatus.innerText = "CRITICAL BREACH";
+            riskWarning.classList.remove('hidden');
+            stableMessage.classList.add('hidden');
+        } else if (price < 85) {
+            ltvVal.className = "text-2xl font-bold mono text-amber-600";
+            systemStatus.className = "px-3 py-1 rounded bg-amber-900 text-amber-300 text-xs font-bold uppercase mono";
+            systemStatus.innerText = "CAUTION";
+            riskWarning.classList.add('hidden');
+            stableMessage.classList.remove('hidden');
+        } else {
+            ltvVal.className = "text-2xl font-bold mono text-white";
+            systemStatus.className = "px-3 py-1 rounded bg-green-900 text-green-300 text-xs font-bold uppercase mono";
+            systemStatus.innerText = "Stable";
+            riskWarning.classList.add('hidden');
+            stableMessage.classList.remove('hidden');
+        }
+    };
+
+    armSlider.addEventListener('input', updateSimulation);
+    updateSimulation(); // Initial call
+
+</script>
+
+</body>
+</html>

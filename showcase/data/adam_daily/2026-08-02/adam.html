@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM v30.2 | Sovereign Analyst Terminal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Chosen Palette: Institutional Obsidian & Amber Crisis -->
+    <!-- Application Structure Plan: 
+        The SPA is designed as a mission-critical analyst dashboard. 
+        1. Telemetry Header: Real-time status of critical coordinates (ARM, 10Y, SPX).
+        2. Executive Synthesis: Interactive summary of the "Century Duration Mirage."
+        3. Three Core Pillars: 
+           - Liquidity & Plumbing: Explorable chart of the RRP/TGA vacuum.
+           - Private Credit Matrix: Drill-down into the "PIK Illusion" and sector defaults.
+           - AI Leverage Loop: Visualizing the physical power bottleneck vs. the Stargate leverage.
+        4. Tactical Defense: Dynamic allocation model based on the synthesis report's recommendations.
+        User flow: Macro awareness -> Investigative drill-down -> Actionable allocation.
+    -->
+    <!-- Visualization & Content Choices: 
+        - Liquidity Vacuum: Stacked Area/Line Chart (Chart.js) to show the zero-sum drain of RRP vs TGA.
+        - Default Rate Paradox: Grouped Bar Chart comparing headline vs. PIK-adjusted "Real" defaults.
+        - Power Mirage: Horizontal bar comparison of physical lead times (Grid vs. GPU).
+        - No SVG/Mermaid used. All graphics are Canvas-based or Tailwind-constructed components.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;700&family=Inter:wght@300;400;600;800&display=swap');
+
+        :root {
+            --obsidian: #0f172a;
+            --amber-glow: #fbbf24;
+            --risk-red: #ef4444;
+            --neutral-warm: #fcfaf8;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--neutral-warm);
+            color: var(--obsidian);
+            overflow-x: hidden;
+        }
+
+        .terminal-font { font-family: 'Fira Code', monospace; }
+        
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 320px;
+            max-height: 400px;
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(15, 23, 42, 0.08);
+            transition: all 0.3s ease;
+        }
+
+        .glass-panel:hover {
+            border-color: var(--amber-glow);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+        }
+
+        .risk-flash {
+            animation: flash 1.5s infinite;
+        }
+
+        @keyframes flash {
+            0%, 100% { background-color: transparent; }
+            50% { background-color: rgba(239, 68, 68, 0.1); }
+        }
+
+        .coordinate-label {
+            font-size: 0.65rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: #64748b;
+        }
+
+        .sidebar-nav-item.active {
+            background-color: var(--obsidian);
+            color: white;
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+
+    <!-- Top Telemetry Header -->
+    <nav class="sticky top-0 z-50 bg-slate-900 text-white border-b border-amber-500/20 shadow-xl">
+        <div class="max-w-[1600px] mx-auto px-4 h-14 flex items-center justify-between">
+            <div class="flex items-center gap-6">
+                <div class="flex flex-col">
+                    <span class="terminal-font font-bold text-amber-400 text-sm">ADAM v30.2</span>
+                    <span class="text-[9px] uppercase tracking-tighter text-slate-400 font-bold">Sovereign Analyst</span>
+                </div>
+                <div class="h-6 w-[1px] bg-slate-700 hidden sm:block"></div>
+                <div class="hidden lg:flex gap-8 items-center">
+                    <div>
+                        <div class="coordinate-label text-slate-500">ARM Coordinate</div>
+                        <div class="terminal-font text-xs font-bold text-red-400" id="top-arm">$73.42 <span class="text-[8px] animate-pulse">▼</span></div>
+                    </div>
+                    <div>
+                        <div class="coordinate-label text-slate-500">10Y Yield</div>
+                        <div class="terminal-font text-xs font-bold text-amber-400">4.68%</div>
+                    </div>
+                    <div>
+                        <div class="coordinate-label text-slate-500">System Status</div>
+                        <div class="text-[10px] font-bold uppercase text-red-500 flex items-center gap-1">
+                            <div class="w-1.5 h-1.5 rounded-full bg-red-500 animate-ping"></div> SCARCE RESERVES
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-4">
+                <div class="text-right hidden md:block">
+                    <div class="terminal-font text-[10px] font-medium" id="real-clock">JULY 30, 2026 | 21:03:12</div>
+                    <div class="text-[9px] uppercase text-slate-500">Integrity: High-Fidelity</div>
+                </div>
+                <button class="bg-red-600 hover:bg-red-700 text-white px-4 py-1.5 rounded text-[10px] font-black uppercase transition duration-300">
+                    Defensive Protocol
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="flex flex-1 max-w-[1600px] mx-auto w-full relative">
+        
+        <!-- Sidebar Navigation -->
+        <aside class="w-64 border-r border-slate-200 p-6 hidden xl:block sticky top-14 h-[calc(100vh-3.5rem)] overflow-y-auto">
+            <div class="space-y-8">
+                <div>
+                    <h3 class="coordinate-label mb-4">Core Terminal</h3>
+                    <nav class="flex flex-col gap-1">
+                        <a href="#summary" class="sidebar-nav-item active flex items-center px-3 py-2 rounded-lg text-sm font-semibold transition">
+                            <span class="mr-3">📡</span> Executive Summary
+                        </a>
+                        <a href="#liquidity" class="sidebar-nav-item flex items-center px-3 py-2 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-100 transition">
+                            <span class="mr-3">💧</span> Liquidity Vacuum
+                        </a>
+                        <a href="#private-credit" class="sidebar-nav-item flex items-center px-3 py-2 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-100 transition">
+                            <span class="mr-3">💼</span> Private Credit PIK
+                        </a>
+                        <a href="#ai-loop" class="sidebar-nav-item flex items-center px-3 py-2 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-100 transition">
+                            <span class="mr-3">⚡</span> AI Leverage Loop
+                        </a>
+                        <a href="#defense" class="sidebar-nav-item flex items-center px-3 py-2 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-100 transition">
+                            <span class="mr-3">🛡️</span> Tactical Defense
+                        </a>
+                    </nav>
+                </div>
+
+                <div class="p-4 bg-slate-900 rounded-xl text-white">
+                    <div class="text-[10px] font-bold text-amber-500 uppercase mb-2">Critical Trigger</div>
+                    <div class="text-lg font-black terminal-font mb-1" id="arm-price-trigger">$73.42</div>
+                    <div class="text-[9px] text-slate-400 leading-tight mb-4">Distance to 35% LTV Breach: <span class="text-red-400 font-bold">$0.42</span></div>
+                    <div class="w-full bg-slate-800 h-1 rounded-full overflow-hidden">
+                        <div class="bg-red-500 h-full" style="width: 95%"></div>
+                    </div>
+                </div>
+                
+                <div class="text-[10px] text-slate-400 border-t border-slate-100 pt-6">
+                    <p class="mb-2 italic">"The Century Duration Mirage is unravelling. Physical limits and math have entered the chat."</p>
+                    <p class="font-bold">— ADAM v30.2</p>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Dashboard Content -->
+        <main class="flex-1 p-6 md:p-8 lg:p-12 overflow-x-hidden">
+
+            <!-- Section 1: Summary -->
+            <section id="summary" class="mb-20">
+                <div class="max-w-4xl">
+                    <span class="bg-amber-100 text-amber-800 text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-widest mb-4 inline-block">Systemic Vulnerability Synthesis</span>
+                    <h1 class="text-4xl md:text-6xl font-black text-slate-900 leading-none mb-6">The Century Duration <span class="text-amber-500">Mirage</span></h1>
+                    <p class="text-xl text-slate-600 leading-relaxed mb-8">
+                        The macroeconomic landscape in July 2026 has crossed a deterministic threshold. We have transitioned from <span class="font-bold text-slate-900 italic">abundant systemic liquidity</span> to <span class="font-bold text-red-600 italic">acute reserve scarcity</span>. This terminal details the convergence of exhausted liquidity buffers, private credit impairment, and the AI infrastructure leverage loop.
+                    </p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="p-5 glass-panel rounded-2xl border-l-4 border-l-amber-500">
+                            <h4 class="font-bold text-sm mb-2 text-slate-900">Plumbing Failure</h4>
+                            <p class="text-xs text-slate-500 leading-relaxed">Depletion of the RRP to terminal levels (<$2B) eliminates the system's primary shock absorber for QT.</p>
+                        </div>
+                        <div class="p-5 glass-panel rounded-2xl border-l-4 border-l-red-500">
+                            <h4 class="font-bold text-sm mb-2 text-slate-900">Leverage Loop</h4>
+                            <p class="text-xs text-slate-500 leading-relaxed">A breach of the <span class="font-bold">$73.00 ARM threshold</span> will mechanically trigger a reflexive death spiral in AI infrastructure collateral.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2: Liquidity Vacuum -->
+            <section id="liquidity" class="mb-20 scroll-mt-20">
+                <div class="flex flex-col md:flex-row justify-between items-end mb-8 gap-6">
+                    <div class="max-w-xl">
+                        <h2 class="text-3xl font-black text-slate-900 mb-4 uppercase italic">1. The Liquidity Vacuum</h2>
+                        <p class="text-sm text-slate-500">
+                            The ON RRP shock absorber is exhausted. Every dollar used for the <span class="font-bold">$905B TGA rebuild</span> is now a direct drain on commercial bank reserves, forcing the system onto the steep, inelastic portion of the demand curve.
+                        </p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="updateLiquidityView('combined')" class="px-3 py-1.5 bg-slate-900 text-white rounded text-[10px] font-bold uppercase transition">Systemic View</button>
+                        <button onclick="updateLiquidityView('reserves')" class="px-3 py-1.5 bg-slate-200 text-slate-700 rounded text-[10px] font-bold uppercase hover:bg-slate-300 transition">Reserve Elasticity</button>
+                    </div>
+                </div>
+
+                <div class="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm relative overflow-hidden">
+                    <div class="absolute top-4 right-8 text-[10px] font-bold text-slate-400 uppercase terminal-font">Telemetry: Fed Flow Matrix</div>
+                    <div class="chart-container">
+                        <canvas id="liquidityChart"></canvas>
+                    </div>
+                    <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="space-y-2">
+                            <div class="coordinate-label">ON RRP Facility</div>
+                            <div class="text-xl font-bold terminal-font text-amber-500">$1.076B</div>
+                            <div class="text-[10px] text-slate-400">Terminal Exhaustion Reached</div>
+                        </div>
+                        <div class="space-y-2">
+                            <div class="coordinate-label">TGA Balance</div>
+                            <div class="text-xl font-bold terminal-font text-slate-900">$905.00B</div>
+                            <div class="text-[10px] text-slate-400">Target Rebuild Milestone</div>
+                        </div>
+                        <div class="space-y-2">
+                            <div class="coordinate-label">QT Intensity</div>
+                            <div class="text-xl font-bold terminal-font text-slate-900">$25B/mo</div>
+                            <div class="text-[10px] text-slate-400">Passive Treasury Roll-off</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 3: Private Credit PIK Illusion -->
+            <section id="private-credit" class="mb-20 scroll-mt-20">
+                <div class="max-w-xl mb-12">
+                    <h2 class="text-3xl font-black text-slate-900 mb-4 uppercase italic">2. The PIK Illusion</h2>
+                    <p class="text-sm text-slate-500">
+                        The <span class="font-bold text-slate-900">$3T Private Credit ecosystem</span> is masking structural insolvency. While headline defaults sit at 6%, individual loan-level analysis (PMR) reveals a "Masked Reality" of nearly double that figure, hidden by PIK interest deferrals.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm flex flex-col h-full">
+                        <div class="coordinate-label mb-6">Default Rate Divergence (Headline vs Real)</div>
+                        <div class="chart-container flex-1">
+                            <canvas id="creditChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="glass-panel p-6 rounded-2xl flex justify-between items-center">
+                            <div>
+                                <h4 class="font-bold text-slate-900">SaaS "Seat Flatlining"</h4>
+                                <p class="text-xs text-slate-500 mt-1">Enterprise software demand decelaration impacting ROI.</p>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-lg font-black terminal-font text-red-500">14.2%</div>
+                                <div class="text-[9px] font-bold text-slate-400 uppercase">Implied Sector PD</div>
+                            </div>
+                        </div>
+                        <div class="glass-panel p-6 rounded-2xl flex justify-between items-center">
+                            <div>
+                                <h4 class="font-bold text-slate-900">PIK Deferral Velocity</h4>
+                                <p class="text-xs text-slate-500 mt-1">Share of default events driven by interest deferrals.</p>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-lg font-black terminal-font text-amber-500">60%</div>
+                                <div class="text-[9px] font-bold text-slate-400 uppercase">Q2 2026 High</div>
+                            </div>
+                        </div>
+                        <div class="glass-panel p-6 rounded-2xl flex justify-between items-center">
+                            <div>
+                                <h4 class="font-bold text-slate-900">Redemption Gates</h4>
+                                <p class="text-xs text-slate-500 mt-1">Activated by major BDCs as sophisticated allocators exit.</p>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-lg font-black terminal-font text-slate-900">5%</div>
+                                <div class="text-[9px] font-bold text-slate-400 uppercase">Quarterly Limit</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 4: AI Infrastructure Leverage Loop -->
+            <section id="ai-loop" class="mb-20 scroll-mt-20">
+                <div class="bg-slate-900 rounded-[3rem] p-8 md:p-16 text-white relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-1/3 h-full bg-gradient-to-l from-amber-500/10 to-transparent"></div>
+                    
+                    <div class="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                        <div>
+                            <span class="text-amber-500 text-[10px] font-black uppercase tracking-widest mb-4 block">Physical Limit Constraints</span>
+                            <h2 class="text-4xl font-black mb-6 leading-tight uppercase">The Power <br><span class="text-amber-500 italic">Mirage</span></h2>
+                            <p class="text-slate-300 text-sm leading-relaxed mb-8">
+                                The bottleneck for AI scaling has shifted from silicon to terrestrial power. Hyperscalers have committed <span class="text-white font-bold">$500B</span>, but grid connection lead times now exceed <span class="text-amber-500 font-bold">4 years</span>, creating a massive stockpile of idle, depreciating hardware.
+                            </p>
+                            
+                            <div class="space-y-6">
+                                <div class="flex items-start gap-4">
+                                    <div class="w-10 h-10 rounded bg-slate-800 flex items-center justify-center font-black text-amber-500">1</div>
+                                    <div>
+                                        <h4 class="font-bold text-sm">Density Problem</h4>
+                                        <p class="text-[11px] text-slate-400">Server racks drawing 100kW+ have overwhelmed regional grid capacities.</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start gap-4">
+                                    <div class="w-10 h-10 rounded bg-slate-800 flex items-center justify-center font-black text-amber-500">2</div>
+                                    <div>
+                                        <h4 class="font-bold text-sm">FERC Intervention</h4>
+                                        <p class="text-[11px] text-slate-400">Regulatory rejection of co-location deals (Amazon/Talen) preserves grid reliability.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-800/50 p-8 rounded-3xl border border-slate-700 backdrop-blur-md">
+                            <div class="coordinate-label text-slate-400 mb-6 uppercase">Lead Time Disconnect (Months)</div>
+                            <div class="chart-container h-48">
+                                <canvas id="powerChart"></canvas>
+                            </div>
+                            <p class="text-[10px] text-slate-500 mt-6 leading-relaxed italic">
+                                Calculation: AI ROI fundamentally breaks as grid interconnection lag prevents GPU utilization. Inventory buildup accelerates multiple contraction.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 5: Tactical Defense -->
+            <section id="defense" class="mb-20 scroll-mt-20">
+                <div class="text-center max-w-2xl mx-auto mb-16">
+                    <h2 class="text-4xl font-black text-slate-900 mb-4 uppercase italic">Tactical Defense Protocol</h2>
+                    <p class="text-slate-500">Immediate shift from risk-seeking accumulation to extreme capital preservation based on current system coordinates.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- T-Bills -->
+                    <div class="p-8 rounded-[2.5rem] bg-white border border-slate-200 shadow-sm flex flex-col group hover:-translate-y-2 transition duration-300">
+                        <div class="text-[10px] font-black text-slate-400 uppercase mb-4 tracking-widest">Liquidity Anchor</div>
+                        <h3 class="text-2xl font-black mb-4">Ultra-Short <br>T-Bills</h3>
+                        <div class="text-6xl font-black text-slate-900 mb-8">65<span class="text-2xl text-slate-400">%</span></div>
+                        <p class="text-xs text-slate-500 leading-relaxed mb-8 flex-1">
+                            With the yield curve volatile, 0-3 month bills provide ~4.2% risk-free yield and absolute liquidity to acquire distressed assets after the leverage breach.
+                        </p>
+                        <ul class="space-y-2 mb-8">
+                            <li class="text-[10px] font-bold text-slate-400 flex items-center gap-2"><span class="text-green-500">✓</span> ZERO DURATION RISK</li>
+                            <li class="text-[10px] font-bold text-slate-400 flex items-center gap-2"><span class="text-green-500">✓</span> SYSTEMIC OPTIONALITY</li>
+                        </ul>
+                    </div>
+
+                    <!-- Gold -->
+                    <div class="p-8 rounded-[2.5rem] bg-amber-50 border border-amber-100 shadow-sm flex flex-col group hover:-translate-y-2 transition duration-300">
+                        <div class="text-[10px] font-black text-amber-600/60 uppercase mb-4 tracking-widest">Sovereign Hedge</div>
+                        <h3 class="text-2xl font-black mb-4 text-amber-900">Physical <br>Gold</h3>
+                        <div class="text-6xl font-black text-amber-500 mb-8">20<span class="text-2xl text-amber-400">%</span></div>
+                        <p class="text-xs text-amber-800/70 leading-relaxed mb-8 flex-1">
+                            The ultimate zero-counterparty asset. A hedge against the monetization of the $35T sovereign debt burden and federal interest explosion.
+                        </p>
+                        <ul class="space-y-2 mb-8">
+                            <li class="text-[10px] font-bold text-amber-600/60 flex items-center gap-2"><span class="text-amber-500">✓</span> ANTI-FIAT ANCHOR</li>
+                            <li class="text-[10px] font-bold text-amber-600/60 flex items-center gap-2"><span class="text-amber-500">✓</span> NO COUNTERPARTY RISK</li>
+                        </ul>
+                    </div>
+
+                    <!-- Dry Powder -->
+                    <div class="p-8 rounded-[2.5rem] bg-slate-900 border border-slate-800 shadow-sm flex flex-col text-white group hover:-translate-y-2 transition duration-300">
+                        <div class="text-[10px] font-black text-slate-500 uppercase mb-4 tracking-widest">Distressed AI</div>
+                        <h3 class="text-2xl font-black mb-4">AI Infrastructure Dry Powder</h3>
+                        <div class="text-6xl font-black text-amber-400 mb-8">15<span class="text-2xl text-slate-600">%</span></div>
+                        <p class="text-xs text-slate-400 leading-relaxed mb-8 flex-1">
+                            Retain dry powder to accumulate foundational AI grid assets only after the forced LTV covenant liquidations wash out speculative premiums.
+                        </p>
+                        <ul class="space-y-2 mb-8">
+                            <li class="text-[10px] font-bold text-slate-500 flex items-center gap-2"><span class="text-amber-500">✓</span> POST-LIQUIDATION ALPHA</li>
+                            <li class="text-[10px] font-bold text-slate-500 flex items-center gap-2"><span class="text-amber-500">✓</span> GRID RECOVERY REBOUND</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Terminal Footer -->
+    <footer class="bg-white border-t border-slate-100 py-12 px-6">
+        <div class="max-w-[1600px] mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
+            <div class="flex flex-col gap-1">
+                <span class="terminal-font font-black text-slate-900 text-lg">ADAM v30.2</span>
+                <span class="text-xs text-slate-400">© 2026 Mkt Myhm Institutional Analysis</span>
+            </div>
+            <div class="flex gap-12">
+                <div class="flex flex-col">
+                    <span class="coordinate-label mb-2">Systemic Risk Score</span>
+                    <span class="text-xl font-black terminal-font text-red-500">55.50 / 100</span>
+                </div>
+                <div class="flex flex-col">
+                    <span class="coordinate-label mb-2">Liquidity Status</span>
+                    <span class="text-xl font-black terminal-font text-amber-500">SCARCE</span>
+                </div>
+            </div>
+            <div class="flex gap-4">
+                <a href="#" class="w-10 h-10 rounded-full border border-slate-100 flex items-center justify-center hover:bg-slate-50 transition">𝕏</a>
+                <a href="#" class="w-10 h-10 rounded-full border border-slate-100 flex items-center justify-center hover:bg-slate-50 transition">in</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // System State
+        const state = {
+            armPrice: 73.42,
+            liquidityView: 'combined',
+            riskScore: 55.5
+        };
+
+        // Real-time Clock
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('real-clock').innerText = now.toLocaleString('en-US', { 
+                month: 'long', day: 'numeric', year: 'numeric', 
+                hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false 
+            }).toUpperCase();
+        }
+        setInterval(updateClock, 1000);
+
+        // Price Simulation for Immersion
+        setInterval(() => {
+            const fluctuation = (Math.random() - 0.5) * 0.04;
+            state.armPrice += fluctuation;
+            const priceStr = `$${state.armPrice.toFixed(2)}`;
+            document.getElementById('top-arm').innerText = priceStr;
+            document.getElementById('arm-price-trigger').innerText = priceStr;
+
+            if (state.armPrice < 73.10) {
+                document.getElementById('arm-price-trigger').classList.add('text-red-500', 'risk-flash');
+            } else {
+                document.getElementById('arm-price-trigger').classList.remove('text-red-500', 'risk-flash');
+            }
+        }, 4000);
+
+        // Charting Implementation
+        function initCharts() {
+            // Chart 1: Liquidity Vacuum
+            const ctxLiq = document.getElementById('liquidityChart').getContext('2d');
+            const liqChart = new Chart(ctxLiq, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul 30'],
+                    datasets: [
+                        {
+                            label: 'RRP Facility (Shock Absorber)',
+                            data: [450, 310, 180, 85, 22, 4.5, 1.076],
+                            borderColor: '#fbbf24',
+                            backgroundColor: 'rgba(251, 191, 36, 0.1)',
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 0
+                        },
+                        {
+                            label: 'TGA Account (Drain)',
+                            data: [150, 280, 420, 580, 710, 840, 905],
+                            borderColor: '#0f172a',
+                            borderDash: [5, 5],
+                            tension: 0.4,
+                            pointRadius: 0
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { font: { family: 'Fira Code', size: 10 } } }
+                    },
+                    scales: {
+                        y: { 
+                            beginAtZero: true, 
+                            title: { display: true, text: 'Billions ($)', font: { size: 10, weight: 'bold' } },
+                            grid: { color: 'rgba(0,0,0,0.03)' }
+                        },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+
+            // Chart 2: Private Credit PIK Illusion
+            const ctxCredit = document.getElementById('creditChart').getContext('2d');
+            new Chart(ctxCredit, {
+                type: 'bar',
+                data: {
+                    labels: ['Consumer', 'Industrial', 'Healthcare', 'Tech/SaaS'],
+                    datasets: [
+                        {
+                            label: 'Headline Default Rate (%)',
+                            data: [7.8, 9.1, 7.6, 1.2],
+                            backgroundColor: '#94a3b8'
+                        },
+                        {
+                            label: 'PMR "Real" Exposure (%)',
+                            data: [12.8, 10.4, 9.4, 14.2],
+                            backgroundColor: '#ef4444'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { font: { family: 'Inter', size: 10, weight: 600 } } }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.03)' } }
+                    }
+                }
+            });
+
+            // Chart 3: Power Mirage Lead Times
+            const ctxPower = document.getElementById('powerChart').getContext('2d');
+            new Chart(ctxPower, {
+                type: 'bar',
+                indexAxis: 'y',
+                data: {
+                    labels: ['GPU Procurement', 'Site Civil Work', 'H100 Deployment', 'Grid Interconnection'],
+                    datasets: [{
+                        data: [4, 12, 18, 48],
+                        backgroundColor: (context) => {
+                            return context.index === 3 ? '#fbbf24' : '#475569';
+                        },
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8' } },
+                        y: { ticks: { color: '#f8fafc', font: { weight: 'bold' } } }
+                    }
+                }
+            });
+        }
+
+        window.onload = initCharts;
+
+        // Interactive View Toggles
+        window.updateLiquidityView = (mode) => {
+            console.log(`Switching to ${mode} view... (Simulated dashboard update)`);
+            // In a full implementation, this would redraw chart data or swap canvases.
+        };
+    </script>
+</body>
+</html>

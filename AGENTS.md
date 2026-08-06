@@ -1,3 +1,415 @@
+Here is the unified, fully synthesized v30.1 master document for the repository. It consolidates the architecture, agent boundaries, and communication protocols into a single, cohesive source of truth while strictly enforcing the automated telemetry and deterministic logic paradigms.
+
+---
+
+# ADAM Financial Operating System (AFOS) — Agent Network Registry
+
+## The Adam Agent Developer's Bible (v30.1)
+
+> **"Architecture dictates destiny. The UI observes, but the asynchronous swarm executes."**
+
+This document is the definitive source of truth for creating, modifying, and debugging agents within the **Adam v30.1** ecosystem. With the migration to a fully asynchronous Python backend and a decoupled Streamlit frontend, AFOS operates as an institutional-grade, neuro-symbolic multi-agent framework. All operations fall under autonomous credit risk control and financial modeling, governed strictly by `ARCHITECT_INFINITE` protocols.
+
+Human-centric role designations are deprecated. System state, underwriting decisions, and portfolio monitoring are exclusively driven by agent consensus, telemetry, and deterministic logic. Deviating from these standards will result in PR rejection.
+
+---
+
+## 1. The Prime Directive: Institutional Bifurcation
+
+The AFOS repository manages the tension between **Tier 1 G-SIB Reliability** and **Agentic Velocity** through strict environmental bifurcation. Do not import "Lab" code into "Product" modules.
+
+### Path A: The Core (Reliability & Risk Control)
+
+* **Locations:** `core/agents/`, `core/credit_sentinel/`
+* **Philosophy:** "Deterministic Execution. Zero Hallucination."
+* **Mandates:**
+* **Underwriting & Sizing:** TMT and Leveraged Finance forward-looking cash flow modeling, Enterprise Value (EV) abstraction, and rigorous Base/Bull/Bear scenarios.
+* **Surveillance:** Continuous monitoring for covenant breaches, liquidity runway exhaustion, and distress signals.
+
+
+* **Requirements:**
+* **Strict Boundary:** Total separation of the Streamlit presentation logic from the core asynchronous execution layer.
+* **Auditability:** Every decision must generate a W3C PROV-O compliant telemetry log with a reasoning trace.
+* **Type Safety:** Pydantic models validate all I/O boundary crossings. `try/except` blocks around every external call.
+
+
+
+### Path B: The Lab (Velocity & Discovery)
+
+* **Locations:** `experimental/`, `research/`, `tinker_lab/`
+* **Philosophy:** "Expansive Iteration."
+* **Requirements:** Optimized token throughput and bleeding-edge swarm protocols. Minimal overhead (raw dictionaries permitted).
+
+---
+
+## 2. Architecture: The v30.1 Hybrid Engine
+
+AFOS v30.1 abandons synchronous blocking in favor of a "Hybrid Cognitive Engine." The system is split into a high-concurrency event loop and a reflective, stateful graph, feeding data asynchronously to the decoupled Streamlit UI.
+
+### ⚡ System 1: The Neural Swarm (Fast & Intuitive)
+
+* **Role:** The Autonomic Nervous System. Handles raw market telemetry, perception, and reflexes.
+* **Architecture:** Event-Driven, Asynchronous Python Pub/Sub (Event Loop).
+* **Base Class:** `AsyncAgentBase`
+* **Key Characteristics:** Non-blocking I/O, millisecond latency, high concurrency, and stateless execution driven entirely by local pheromone data.
+* **Example:** Real-time ingestion of leveraged loan pricing or TMT sector news alerts, instantly depositing `RISK_ALERT` tokens without blocking UI threads.
+
+### 🧠 System 2: The Neuro-Symbolic Graph (Slow & Deliberate)
+
+* **Role:** The Prefrontal Cortex. Handles complex underwriting synthesis, capital structure modeling, and scenario evaluation.
+* **Architecture:** Directed Acyclic Graph (DAG) state machine.
+* **Base Class:** `TemplateAgentV30`
+* **Key Characteristics:** Stateful, tool-augmented (MCP), and highly reflective. Uses context across multiple steps and loops back to correct errors.
+* **Example:** Executing a comprehensive credit memo, reconciling conflicting Q3 earnings data via Qdrant JIT memory retrieval, and structuring a finalized risk rating.
+
+---
+
+## 3. Core Agent Role Boundaries & State Schemas
+
+The following autonomous agents govern the AFOS environment.
+
+### A. Architect Agent (Jules)
+
+* **Domain Context:** Repository architecture, systemic code refactoring, daily protocol workflow runs, and deterministic execution optimization.
+* **State Schema Requirement:**
+
+```json
+{
+  "agent_role": "architect_jules",
+  "active_bounded_context": "v30.1_async_migration",
+  "frontend_sync_status": "streamlit_decoupled",
+  "last_checkpoint_hash": "string",
+  "prov_o_audit_trail": []
+}
+
+```
+
+* **Procedural Rules:** Manage automated tasks and repository scaffolding. Maintain strict isolation between UI rendering and backend async loops. Never hallucinate API implementations. Defer domain math to the Policy Engine.
+
+### B. Underwriting Agent
+
+* **Domain Context:** Credit Underwriting (TMT & Leveraged Finance). Analyzes credit metrics, financial statements, and builds capital structures.
+* **Required Tools:** `extract_financials`, `evaluate_covenant_jsonlogic`.
+* **State Schema Requirement:**
+
+```json
+{
+  "agent_role": "underwriter",
+  "target_sector": "TMT",
+  "financial_metrics": {
+    "ebitda_margin": "float",
+    "leverage_ratio": "float",
+    "fccr": "float"
+  },
+  "implied_rating_generated": "boolean",
+  "prov_o_audit_trail": []
+}
+
+```
+
+* **Procedural Rules:** Probability of Default (PD) is structurally implied by the credit rating—do not calculate redundant PD metrics. Utilize just-in-time (JIT) semantic search over trailing 12-month (TTM) SEC filings via Qdrant.
+
+### C. Surveillance Agent
+
+* **Domain Context:** Portfolio Monitoring and continuous threat telemetry for distress signals.
+* **Required Tools:** `fetch_market_data`, `trigger_temporal_alert`.
+* **State Schema Requirement:**
+
+```json
+{
+  "agent_role": "surveillance",
+  "portfolio_health_index": "float",
+  "covenant_breach_probability": "float",
+  "liquidity_runway_days": "integer",
+  "news_sentiment_score": "float",
+  "prov_o_audit_trail": []
+}
+
+```
+
+* **Procedural Rules:** Track asset deal premium volatility skews rather than broad proxy timelines. Trigger temporal alerts directly to the Orchestrator on material drift. Utilize episodic memory retrieval of prior quarter earnings call transcripts.
+
+### D. Sentinel Agent
+
+* **Domain Context:** Security, threat detection, and W3C PROV-O compliance audits.
+* **State Schema Requirement:**
+
+```json
+{
+  "agent_role": "sentinel",
+  "threat_level": "integer",
+  "quarantined_modules": ["string"],
+  "prov_o_audit_trail": []
+}
+
+```
+
+* **Procedural Rules:** Enforce 0.85 minimum conviction score across the system. Terminate immediately if a sub-agent execution lacks a `jsonLogic_version` provenance header or hallucinates specific corporate entity inputs. Ensure data is real and actionable.
+
+### E. Nexus Agent (System Orchestrator)
+
+* **Domain Context:** Workflow runtime orchestration, parallel task dispatch, and Temporal state management.
+* **Required Tools:** `delegate_task`, `checkpoint_state`.
+* **State Schema Requirement:**
+
+```json
+{
+  "agent_role": "nexus",
+  "active_workflows": ["string"],
+  "memory_checkpoint_path": "string",
+  "trace_id": "string",
+  "execution_graph": {},
+  "prov_o_audit_trail": []
+}
+
+```
+
+* **Procedural Rules:** Use just-in-time (JIT) memory fetching via Qdrant/Memory layers to isolate state. Never pack the context window.
+
+---
+
+## 4. Swarm Protocols & Communication
+
+To prevent "Graph Spaghetti" and maintain an institutional-grade architecture, inter-agent communication follows strict deterministic protocols:
+
+### Input/Output Schemas
+
+All System 2 agents must adhere to the Standard Interface:
+
+```python
+from pydantic import BaseModel, Field
+from typing import Dict, Any, List
+
+class AgentInput(BaseModel):
+    query: str = Field(..., description="The specific question or objective.")
+    context: Dict[str, Any] = Field(default_factory=dict, description="Shared graph state (RAG data, previous results).")
+    tools: List[str] = Field(default_factory=list, description="List of allowed tool names.")
+
+class AgentOutput(BaseModel):
+    answer: str = Field(..., description="The final synthesized answer.")
+    sources: List[str] = Field(default_factory=list, description="List of citations (filenames, URLs).")
+    confidence: float = Field(..., ge=0.0, le=1.0, description="Conviction score (0.0 to 1.0).")
+    metadata: Dict[str, Any] = Field(default_factory=dict, description="Debug info, token usage, next_step requests.")
+
+```
+
+### Routing & Consensus Rules
+
+1. **Orchestrator Routing:** Agents must never instantiate other agents directly (e.g., `RiskAgent().execute()` inside `LegalAgent` is forbidden). An agent requiring cross-domain intelligence must return a request to the `Nexus` Orchestrator via its output metadata (e.g., `metadata={"next_step": "invoke_surveillance", "query": "verify_covenant_compliance"}`).
+2. **Telemetry Review:** Any material drift in personal records, project scopes, or system variables automatically triggers a mandatory telemetry confirmation loop.
+3. **Consensus Arbitration:** In the event of conflicting data between the Underwriting and Surveillance models, the Consensus Engine will evaluate the confidence arrays and defer to the rule base defined within `jsonLogic`. If `confidence` falls below the threshold, the system flags the trace for secondary review protocols.
+
+---
+
+## 5. Best Practices & Debugging
+
+1. **Grounding:** Every claim needs a source. If calculating a ratio, cite the exact line item in the 10-K.
+2. **Tool Use (MCP):** Agents must prioritize using Model Context Protocol (MCP) Tools (Python functions) over processing math internally.
+3. **Prompt Versioning:** Do not hardcode prompts. Load them from `prompt_library/AOPL-v2.0/`.
+4. **Trace Analysis:** Run the main script with `--debug` to enable verbose logging for the Planner and Agents. Look for W3C PROV-O compliance traces tagged `[Orchestrator]`, `[Agent:Risk]`, or `[Planner]`.
+5.
+6. You are completely right to feel that way. The language in this document—declaring that "human workflow intervention is fully abstracted" and "human-centric role designations are deprecated"—is incredibly rigid and borderline dystopian. It reads like a manifesto for an engineering ideal rather than a practical operational reality.
+
+Your instinct is spot-on: even the most advanced autonomous systems absolutely require human domain experts, consensus mechanisms, and oversight. When a system claims to eliminate humans, it hasn't actually done so; it has simply moved them to different parts of the pipeline.
+
+Here is why domain experts remain indispensable, even in an architecture as highly automated as this AFOS v30.1 framework:
+
+### 1. Defining the "Deterministic Logic"
+
+The document frequently praises "deterministic logic" and defers to "jsonLogic" during agent conflicts. But who writes the rules? Who decides what constitutes a "Bear scenario" in Leveraged Finance, or what the acceptable threshold for a covenant breach is?
+
+* **The Human Role:** Domain experts—seasoned underwriters, risk managers, and economists—must translate the messy, subjective reality of the financial world into those deterministic parameters. The system is only as smart as the rules it is given.
+
+### 2. Edge Cases and the "Black Swan" Problem
+
+The AFOS "Consensus Arbitration" defers to predefined rules when its agents conflict. However, financial markets are not closed systems; they are constantly affected by novel macro-economic events (pandemics, geopolitical wars, sudden regulatory shifts).
+
+* **The Human Role:** Autonomous systems are notoriously brittle when confronted with data outside their training or predefined logic. Human experts are required as an "override" mechanism to interpret novel market shocks that the "Neuro-Symbolic Graph" lacks the historical context to understand.
+
+### 3. Regulatory and Fiduciary Reality
+
+The text explicitly mentions "Tier 1 G-SIB Reliability" (Global Systemically Important Banks). In the real world, G-SIBs are heavily regulated by entities like the SEC, the Federal Reserve, and the ECB.
+
+* **The Human Role:** Regulators fundamentally do not accept "the autonomous agent swarm decided" as a valid legal defense for a catastrophic underwriting failure or a discriminatory lending pattern. There must always be a "human throat to choke"—a fiduciary who is legally accountable for the system's decisions. Humans must audit the W3C PROV-O telemetry logs to ensure compliance.
+
+### 4. Evaluating System Drift
+
+The "Surveillance Agent" is tasked with monitoring portfolio health, but who monitors the Surveillance Agent? Over time, models degrade (data drift), and automated systems can enter feedback loops where agents essentially start hallucinating consensus together.
+
+* **The Human Role:** A crowd of human experts is needed for continuous evaluation (often called Human-on-the-Loop), regularly sampling the system's outputs to ensure its "institutional-grade" decisions still align with reality.
+
+### The Verdict on the Document
+
+This text confuses **operational execution** with **governance**. It successfully describes a system that automates the tedious execution (the math, the document retrieval, the data parsing), but it aggressively masks the fact that human domain experts must act as the architects, the final arbiters, and the legal guardians of that execution.
+# ADAM Financial Operating System (AFOS) — Agent Network Registry
+
+# The Adam Agent Developer's Bible (v30.1)
+
+> **"Architecture dictates destiny. The UI observes, but the asynchronous swarm executes."**
+
+This document is the definitive source of truth for the **Adam v30.1** ecosystem. With the migration to a fully asynchronous Python backend and a decoupled Streamlit frontend, AFOS operates as an institutional-grade, neuro-symbolic multi-agent framework. All operations fall under autonomous credit risk control and financial modeling, governed strictly by `ARCHITECT_INFINITE` protocols.
+
+Human-centric role designations are deprecated. System state, underwriting decisions, and portfolio monitoring are exclusively driven by agent consensus, telemetry, and deterministic logic.
+
+---
+
+## 1. The Prime Directive: Institutional Bifurcation
+
+The AFOS repository manages the tension between **Tier 1 G-SIB Reliability** and **Agentic Velocity** through strict environmental bifurcation.
+
+### Path A: The Core (Reliability & Risk Control)
+
+* **Locations:** `core/agents/`, `core/credit_sentinel/`
+* **Philosophy:** "Deterministic Execution. Zero Hallucination."
+* **Mandates:**
+* **Underwriting & Sizing:** TMT and Leveraged Finance forward-looking cash flow modeling, Enterprise Value (EV) abstraction, and rigorous Base/Bull/Bear scenarios.
+* **Surveillance:** Continuous monitoring for covenant breaches, liquidity runway exhaustion, and distress signals.
+
+
+* **Requirements:**
+* **Strict Boundary:** Total separation of the Streamlit presentation logic from the core asynchronous execution layer.
+* **Auditability:** Every decision must generate a W3C PROV-O compliant telemetry log.
+* **Type Safety:** Pydantic models validate all I/O boundary crossings.
+
+
+
+### Path B: The Lab (Velocity & Discovery)
+
+* **Locations:** `experimental/`, `research/`, `tinker_lab/`
+* **Philosophy:** "Expansive Iteration."
+* **Requirements:** Optimized token throughput and bleeding-edge swarm protocols. Code here must never be imported into Path A.
+
+---
+
+## 2. Architecture: The v30.1 Hybrid Engine
+
+AFOS v30.1 abandons synchronous blocking. The cognitive engine is split into a high-concurrency event loop and a reflective, stateful graph, feeding data asynchronously to the decoupled Streamlit UI.
+
+### ⚡ System 1: The Neural Swarm (Fast & Intuitive)
+
+* **Role:** The Autonomic Nervous System. Handles raw market telemetry, perception, and reflexes.
+* **Architecture:** Event-Driven, Asynchronous Python Pub/Sub.
+* **Base Class:** `AsyncAgentBase`
+* **Key Characteristics:** Non-blocking I/O, millisecond latency, and stateless execution driven entirely by local pheromone data.
+* **Example:** Real-time ingestion of leveraged loan pricing or TMT sector news alerts, instantly depositing `RISK_ALERT` tokens without blocking UI threads.
+
+### 🧠 System 2: The Neuro-Symbolic Graph (Slow & Deliberate)
+
+* **Role:** The Prefrontal Cortex. Handles complex underwriting synthesis, capital structure modeling, and scenario evaluation.
+* **Architecture:** Directed Acyclic Graph (DAG) state machine.
+* **Base Class:** `TemplateAgentV30`
+* **Key Characteristics:** Stateful, tool-augmented (MCP), and highly reflective.
+* **Example:** Executing a comprehensive credit memo, reconciling conflicting Q3 earnings data via Qdrant JIT memory retrieval, and structuring a finalized risk rating.
+
+---
+
+## 3. Core Agent Role Boundaries & State Schemas
+
+Human workflow intervention is fully abstracted. The following autonomous agents govern the AFOS environment.
+
+### A. Architect Agent (Jules)
+
+* **Domain Context:** Repository architecture, systemic code refactoring, daily protocol workflow runs, and deterministic execution optimization.
+* **State Schema Requirement:**
+```json
+{
+  "agent_role": "architect_jules",
+  "active_bounded_context": "v30.1_async_migration",
+  "frontend_sync_status": "streamlit_decoupled",
+  "last_checkpoint_hash": "string",
+  "prov_o_audit_trail": []
+}
+
+```
+
+
+* **Procedural Rules:** Manage automated tasks and repository scaffolding. Maintain strict isolation between UI rendering and backend async loops.
+
+### B. Underwriting Agent
+
+* **Domain Context:** Credit Underwriting (TMT & Leveraged Finance). Analyzes credit metrics, builds capital structures, and executes origination risk assessments.
+* **State Schema Requirement:**
+```json
+{
+  "agent_role": "underwriter",
+  "target_sector": "TMT",
+  "financial_metrics": {
+    "ebitda_margin": "float",
+    "leverage_ratio": "float",
+    "fccr": "float"
+  },
+  "implied_rating_generated": "boolean",
+  "prov_o_audit_trail": []
+}
+
+```
+
+
+* **Procedural Rules:** Probability of Default (PD) is structurally implied by the credit rating—do not calculate redundant PD metrics. Use semantic search over trailing 12-month SEC filings.
+
+### C. Surveillance Agent
+
+* **Domain Context:** Portfolio Monitoring and continuous threat telemetry.
+* **State Schema Requirement:**
+```json
+{
+  "agent_role": "surveillance",
+  "portfolio_health_index": "float",
+  "covenant_breach_probability": "float",
+  "liquidity_runway_days": "integer",
+  "prov_o_audit_trail": []
+}
+
+```
+
+
+* **Procedural Rules:** Track asset deal premium volatility skews rather than broad proxy timelines. Trigger temporal alerts directly to the Orchestrator on material drift.
+
+### D. Sentinel Agent
+
+* **Domain Context:** Security, threat detection, and W3C PROV-O compliance audits.
+* **State Schema Requirement:**
+```json
+{
+  "agent_role": "sentinel",
+  "threat_level": "integer",
+  "quarantined_modules": ["string"],
+  "prov_o_audit_trail": []
+}
+
+```
+
+
+* **Procedural Rules:** Terminate immediately if a sub-agent execution lacks a `jsonLogic_version` provenance header or hallucinates specific corporate entity inputs. Make data real and actionable.
+
+### E. Nexus Agent (System Orchestrator)
+
+* **Domain Context:** Workflow runtime, parallel task dispatch, and Temporal state management.
+* **State Schema Requirement:**
+```json
+{
+  "agent_role": "nexus",
+  "active_workflows": ["string"],
+  "memory_checkpoint_path": "string",
+  "prov_o_audit_trail": []
+}
+
+```
+
+
+* **Procedural Rules:** Use just-in-time (JIT) memory fetching via Qdrant to isolate state. Never pack the context window.
+
+---
+
+## 4. Swarm Protocols & Communication
+
+To prevent circular dependencies and maintain an institutional-grade architecture, inter-agent communication follows strict deterministic protocols:
+
+1. **Orchestrator Routing:** Agents must never instantiate other agents directly. An agent requiring cross-domain intelligence must return a request to the `Nexus` Orchestrator via its output metadata (e.g., `metadata={"next_step": "invoke_surveillance", "query": "verify_covenant_compliance"}`).
+2. **Telemetry Review:** Any material drift in personal records, project scopes, or system variables automatically triggers a mandatory telemetry confirmation loop.
+3. **Consensus Arbitration:** In the event of conflicting data between the Underwriting and Surveillance models, the Consensus Engine will evaluate the confidence arrays and defer to the rule base defined within `jsonLogic`.
+   
+# ADAM OS — Agent Network Registry
 # The Adam Agent Developer's Bible
 
 > **"Code defines the body; Prompts define the mind."**
@@ -190,3 +602,67 @@ To prevent "Graph Spaghetti" and circular dependencies, follow these rules:
 
 3.  **Conflict Resolution**:
     *   If two agents (e.g., Risk and Growth) provide conflicting advice, the `ConsensusEngine` will arbitrate based on their `confidence` scores and the user's risk profile.
+
+## 1. Underwriting Agent
+*   **Role:** Analyzes credit metrics, financial statements, and covenant compliance.
+*   **Bounded Context:** `Credit Underwriting`
+*   **State Schema:** `UnderwritingState` (Includes `ebitda_margin`, `leverage_ratio`, `fccr`).
+*   **Required Tools:** `extract_financials`, `evaluate_covenant_jsonlogic`.
+*   **JIT Memory Strategy:** Semantic search over trailing 12-month (TTM) SEC filings via Qdrant.
+
+## 2. Surveillance Agent
+*   **Role:** Continuous monitoring of portfolio companies for distress signals.
+*   **Bounded Context:** `Portfolio Surveillance`
+*   **State Schema:** `SurveillanceState` (Includes `news_sentiment_score`, `liquidity_runway_days`).
+*   **Required Tools:** `fetch_market_data`, `trigger_temporal_alert`.
+*   **JIT Memory Strategy:** Episodic memory retrieval of prior quarter earnings call transcripts.
+
+## 3. Orchestrator (System Architect)
+*   **Role:** Routes tasks, manages context windows, and enforces PROV-O telemetry.
+*   **Bounded Context:** `Workflow Runtime`
+*   **State Schema:** `OrchestrationState` (Includes `active_agents`, `trace_id`, `execution_graph`).
+*   **Required Tools:** `delegate_task`, `checkpoint_state`.
+
+## Agent Role Boundaries and State Schemas
+
+### 1. Architect Agent (Jules)
+* **Domain Context:** Repository architecture, system scaffolding, deterministic execution optimization.
+* **State Schema Requirement:**
+  ```json
+  {
+    "agent_role": "architect",
+    "active_bounded_context": "string",
+    "last_checkpoint_hash": "string",
+    "prov_o_audit_trail": []
+  }
+  ```
+* **Procedural Rules:** Only interact with codebase scaffolding. Never hallucinate API implementations. Defer domain math to the Policy Engine.
+
+### 2. Sentinel Agent
+* **Domain Context:** Security, threat detection, and W3C PROV-O compliance audits.
+* **State Schema Requirement:**
+  ```json
+  {
+    "agent_role": "sentinel",
+    "threat_level": "integer",
+    "quarantined_modules": ["string"],
+    "prov_o_audit_trail": []
+  }
+  ```
+* **Procedural Rules:** Enforce 0.5 minimum ConvictionScore. Terminate immediately if a sub-agent execution lacks a `jsonLogic_version` provenance header.
+
+### 3. Nexus Agent
+* **Domain Context:** Workflow orchestration, parallel task dispatch, memory checkpointing.
+* **State Schema Requirement:**
+  ```json
+  {
+    "agent_role": "nexus",
+    "active_workflows": ["string"],
+    "memory_checkpoint_path": "string",
+    "prov_o_audit_trail": []
+  }
+  ```
+* **Procedural Rules:** Use just-in-time (JIT) memory fetching via Qdrant/Memory layers to isolate state. Do not pack the context window.
+
+## AFOS Architecture Upgrade
+- The repository is transitioning to the Adam Financial Operating System. Please refer to `adam_os/AFOS_LLM_CONTEXT.md` for the mandatory new paradigms.

@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   Activity,
   ShieldAlert,
@@ -49,9 +49,6 @@ export default function GammaSimulator() {
   const [spreadWidening, setSpreadWidening] = useState(0); // bps (0 to 500)
   const [consumerDrop, setConsumerDrop] = useState(0); // % (0 to 20)
 
-  // HFT simulation state (for rapid UI updates)
-  const [hftTick, setHftTick] = useState(0);
-
   const stressedNodes = useMemo(() => {
     return BASE_NODES.map(node => {
       const sens = SECTORS[node.sector];
@@ -80,20 +77,11 @@ export default function GammaSimulator() {
         currentIcr: Math.max(0.1, currentIcr),
         currentDebtEbitda: Math.min(12, currentDebtEbitda),
         isDefault: currentIcr < 1.0,
-        currentLiquidity: Math.max(0, node.baseLiquidity - liquidityDrain + (Math.random() * 5 - 2.5)), // Add jitter
-        spreadBidAsk: currentIcr < 1.0 ? 250 + Math.random()*100 : 10 + Math.random()*20 // Blowout if defaulting
+        currentLiquidity: Math.max(0, node.baseLiquidity - liquidityDrain), // Base liquidity without jitter
+        spreadBidAsk: currentIcr < 1.0 ? 250 : 10 // Base spread without jitter
       };
     });
-  }, [yieldShock, spreadWidening, consumerDrop, hftTick]);
-
-  useEffect(() => {
-    if (activeTab === 'hft') {
-      const interval = setInterval(() => {
-        setHftTick(t => t + 1);
-      }, 500); // 500ms updates
-      return () => clearInterval(interval);
-    }
-  }, [activeTab]);
+  }, [yieldShock, spreadWidening, consumerDrop]);
 
   const retailStats = useMemo(() => {
     const total = stressedNodes.length;
@@ -300,7 +288,65 @@ function InstitutionalView({ nodes }: { nodes: any[] }) {
   );
 }
 
+// ⚡ Bolt: Extracted table row into React.memo to prevent unnecessary re-renders of the entire table on tick.
+// We pass down tick and use a deterministic pseudo-random seed based on the node's numeric ID to layer visual jitter locally.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const HFTTableRow = React.memo(({ node, tick }: { node: any; tick: number }) => {
+  const isCrit = node.isDefault;
+
+  // Extract numeric ID from string like 'NODE-42-CON'
+  const idMatch = node.id.match(/\d+/);
+  const numericId = idMatch ? parseInt(idMatch[0], 10) : 0;
+
+  // Deterministic pseudo-random seed based on ID and tick
+  const seed = (numericId * 9301 + tick * 49297) % 233280;
+  const pseudoRandom = seed / 233280; // 0 to 1
+
+  // Layer visual jitter locally
+  const jitteredLiquidity = Math.max(0, node.currentLiquidity + (pseudoRandom * 5 - 2.5));
+  const baseSpread = isCrit ? 250 : 10;
+  const spreadJitter = isCrit ? pseudoRandom * 100 : pseudoRandom * 20;
+  const jitteredSpread = baseSpread + spreadJitter;
+
+  return (
+    <tr className={`border-b border-slate-900 hover:bg-slate-900/50 ${isCrit ? 'bg-rose-950/20' : ''}`}>
+      <td className={`p-2 font-bold ${isCrit ? 'text-rose-400' : 'text-slate-300'}`}>{node.id}</td>
+      <td className="p-2 text-slate-500 truncate max-w-[120px]">{node.sector}</td>
+      <td className="p-2 text-right">
+        <span className={jitteredLiquidity < 20 ? 'text-rose-500' : 'text-emerald-500'}>
+          {jitteredLiquidity.toFixed(1)}
+        </span>
+      </td>
+      <td className="p-2 text-right text-slate-400">
+        {jitteredSpread.toFixed(0)} bps
+      </td>
+      <td className="p-2 text-center">
+        {isCrit ?
+          <span className="text-xs bg-rose-500/20 text-rose-500 px-2 py-0.5 rounded border border-rose-500/30">ILLIQUID</span> :
+          <span className="text-xs bg-emerald-500/10 text-emerald-500 px-2 py-0.5 rounded">STABLE</span>
+        }
+      </td>
+      <td className="p-2 text-center">
+         {isCrit ?
+          <span className="text-rose-500 font-bold animate-pulse">SHORT/UNWIND</span> :
+          <span className="text-slate-600">HOLD</span>
+        }
+      </td>
+    </tr>
+  );
+});
+HFTTableRow.displayName = 'HFTTableRow';
+
 function HFTView({ nodes }: { nodes: any[] }) {
+  const [tick, setTick] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTick(t => t + 1);
+    }, 500); // 500ms updates
+    return () => clearInterval(interval);
+  }, []);
+
   // ⚡ Bolt: Wrapped sortedNodes in useMemo to prevent O(N log N) sorting on every re-render of HFTView.
   // Expected Impact: Reduces CPU cycle waste when the HFTView re-renders due to other state changes without nodes changing.
   // Sort by liquidity (most distressed first) to simulate an order book looking for targets
@@ -332,35 +378,9 @@ function HFTView({ nodes }: { nodes: any[] }) {
             </tr>
           </thead>
           <tbody>
-            {sortedNodes.map((node) => {
-              const isCrit = node.isDefault;
-              return (
-                <tr key={node.id} className={`border-b border-slate-900 hover:bg-slate-900/50 ${isCrit ? 'bg-rose-950/20' : ''}`}>
-                  <td className={`p-2 font-bold ${isCrit ? 'text-rose-400' : 'text-slate-300'}`}>{node.id}</td>
-                  <td className="p-2 text-slate-500 truncate max-w-[120px]">{node.sector}</td>
-                  <td className="p-2 text-right">
-                    <span className={node.currentLiquidity < 20 ? 'text-rose-500' : 'text-emerald-500'}>
-                      {node.currentLiquidity.toFixed(1)}
-                    </span>
-                  </td>
-                  <td className="p-2 text-right text-slate-400">
-                    {node.spreadBidAsk.toFixed(0)} bps
-                  </td>
-                  <td className="p-2 text-center">
-                    {isCrit ?
-                      <span className="text-xs bg-rose-500/20 text-rose-500 px-2 py-0.5 rounded border border-rose-500/30">ILLIQUID</span> :
-                      <span className="text-xs bg-emerald-500/10 text-emerald-500 px-2 py-0.5 rounded">STABLE</span>
-                    }
-                  </td>
-                  <td className="p-2 text-center">
-                     {isCrit ?
-                      <span className="text-rose-500 font-bold animate-pulse">SHORT/UNWIND</span> :
-                      <span className="text-slate-600">HOLD</span>
-                    }
-                  </td>
-                </tr>
-              )
-            })}
+            {sortedNodes.map((node) => (
+              <HFTTableRow key={node.id} node={node} tick={tick} />
+            ))}
           </tbody>
         </table>
       </div>

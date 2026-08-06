@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MARKET MAYHEM // ADAM v30.1-APEX // CONSOLIDATED TERMINAL</title>
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['Fira Code', 'monospace'],
+                        display: ['Oswald', 'sans-serif'],
+                    },
+                    colors: {
+                        term: {
+                            bg: '#0a0a0a', surface: '#141416', card: '#1c1c1f', border: '#2d2d35',
+                            cyan: '#0ea5e9', blue: '#3b82f6', red: '#f43f5e', amber: '#f59e0b', green: '#10b981',
+                            purple: '#8b5cf6', muted: '#71717a', textMain: '#f4f4f5'
+                        }
+                    },
+                    animation: {
+                        'ticker': 'ticker 45s linear infinite',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        ticker: { '0%': { transform: 'translateX(100%)' }, '100%': { transform: 'translateX(-100%)' } }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Inter:wght@300;400;500;600;700&family=Oswald:wght@500;700&display=swap');
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #0a0a0a; }
+        ::-webkit-scrollbar-thumb { background: #2d2d35; border-radius: 3px; }
+        body { background-color: #0a0a0a; color: #f4f4f5; }
+        
+        .nav-item { transition: all 0.2s; border-left: 2px solid transparent; }
+        .nav-active { border-left-color: #0ea5e9; background: rgba(14, 165, 233, 0.1); color: #fff; }
+        .nav-item:hover:not(.nav-active) { background: rgba(255,255,255,0.03); color: #fff; }
+        
+        .glass-panel { background: #141416; border: 1px solid #2d2d35; border-radius: 0.5rem; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); }
+        .chart-container { position: relative; height: 280px; width: 100%; }
+        
+        /* Asset Selection Buttons */
+        .asset-btn-active { background-color: #f4f4f5; color: #0a0a0a; border-color: #f4f4f5; }
+        .asset-btn-inactive { background-color: transparent; color: #a1a1aa; border-color: #2d2d35; }
+        .asset-btn-inactive:hover { border-color: #71717a; color: #f4f4f5; }
+
+        .fade-enter { animation: fadeIn 0.4s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="h-screen overflow-hidden flex flex-col selection:bg-term-cyan selection:text-white">
+
+    <!-- Ticker Tape -->
+    <div class="border-b border-term-border bg-term-surface h-8 flex items-center relative z-20 shrink-0">
+        <div class="absolute left-0 top-0 h-full bg-term-card z-10 px-4 flex items-center border-r border-term-border text-[11px] font-mono font-bold text-term-cyan shadow-lg">
+            <span class="animate-pulse mr-2 w-2 h-2 bg-term-cyan rounded-full"></span> LIVE FEED
+        </div>
+        <div class="w-full overflow-hidden ml-32">
+            <div class="animate-ticker whitespace-nowrap text-[11px] font-mono text-term-muted font-medium tracking-wide">
+                <span class="text-term-red">ALERT:</span> MACRO REGIME SHIFT DETECTED ///
+                <span class="text-term-textMain">S&P 500:</span> 7,483.24 (HOLIDAY STASIS) ///
+                <span class="text-term-amber">10Y YIELD:</span> 4.49% (UNANCHORED) ///
+                <span class="text-term-green">BTC:</span> $62,108.42 (RECOVERING) ///
+                <span class="text-term-purple">BRENT:</span> $73.27/BBL (DE-ESCALATION) ///
+                <span class="text-term-cyan">COPPER:</span> $4.42 (BULLISH) ///
+                <span class="text-term-amber">GOLD:</span> $2,410 (SYNTHETIC DURATION) ///
+                <span class="text-term-red">CREDIT:</span> BSL MATURITY WALL IMMINENT
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Header -->
+    <header class="h-16 border-b border-term-border bg-term-card flex items-center justify-between px-6 shrink-0 z-20">
+        <div class="flex items-center gap-4">
+            <div class="w-10 h-10 rounded bg-term-cyan text-term-bg font-bold font-display text-xl flex items-center justify-center">
+                A/30
+            </div>
+            <div>
+                <h1 class="font-display font-bold text-white tracking-wide text-lg uppercase leading-tight">Market Mayhem Console</h1>
+                <p class="text-[10px] text-term-cyan font-mono tracking-widest uppercase">Node: Adam-v30.1-Apex // Compiled: 2026.07.05</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-4 md:gap-6 font-mono text-xs">
+            <div class="hidden md:flex items-center gap-2 text-term-green bg-term-green/10 px-3 py-1.5 rounded border border-term-green/20 font-bold">
+                <div class="w-2 h-2 rounded-full bg-term-green animate-pulse"></div> RLHF ACTIVE
+            </div>
+            <div class="text-term-textMain bg-term-surface px-3 py-1.5 rounded border border-term-border">
+                <span id="sysClock">00:00:00 UTC</span>
+            </div>
+            <button onclick="toggleAI()" class="bg-term-textMain text-term-bg hover:bg-term-cyan hover:text-white px-4 py-1.5 rounded font-bold transition-all duration-300">
+                LEDGER / LOGS
+            </button>
+        </div>
+    </header>
+
+    <div class="flex flex-1 overflow-hidden relative z-10">
+        <!-- Sidebar Navigation -->
+        <aside class="w-72 border-r border-term-border bg-term-surface flex flex-col shrink-0 overflow-y-auto hidden lg:flex">
+            <div class="p-5 border-b border-term-border">
+                <div class="text-[10px] text-term-muted font-mono tracking-widest uppercase mb-2">Data Synchronization</div>
+                <div class="w-full bg-term-bg h-1.5 rounded-full overflow-hidden">
+                    <div class="bg-term-cyan h-full w-[100%] shadow-[0_0_8px_#0ea5e9]"></div>
+                </div>
+            </div>
+            <nav id="moduleNav" class="flex-1 py-3 flex flex-col px-3 font-mono text-xs overflow-y-auto pb-20">
+                <!-- Nav items generated via JS -->
+            </nav>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="flex-1 overflow-y-auto p-4 md:p-8 relative scroll-smooth bg-term-bg" id="mainScrollArea">
+            <div class="max-w-5xl mx-auto pb-24 relative min-h-full">
+                <select id="mobileNav" onchange="switchModule(this.value)" class="lg:hidden w-full bg-term-card border border-term-border text-term-cyan font-bold text-sm rounded p-3 mb-6 font-mono outline-none"></select>
+                
+                <!-- MODULE 1: The Glitch -->
+                <div id="mod-1" class="module-section fade-enter block">
+                    <div class="flex items-center gap-4 mb-6">
+                        <span class="bg-term-red/10 text-term-red border border-term-red/30 text-[10px] font-mono px-3 py-1 rounded font-bold tracking-widest">SYSTEM STATUS: CRITICAL (BEAR-FLATTENING)</span>
+                        <span class="text-xs font-mono text-term-muted">Date: July 5, 2026</span>
+                    </div>
+                    
+                    <h1 class="text-3xl font-display font-bold mb-4 border-b border-term-border pb-2">Layer 1: The Glitch (Perception & Ingestion)</h1>
+                    <p class="text-base text-term-muted mb-6 leading-relaxed">
+                        The Holiday Intermission is masking structural damage. Traditional domestic exchanges are padlocked for the Independence Day weekend, freezing the unbuffered impact of Thursday's wild pre-holiday round-trip and a staggering June Non-Farm Payrolls drop <strong>(+57K vs. +110K expected)</strong>. While retail aggregators format this as a "bad news is good news" rate-cut opiate, institutional desks treat it as a raw indicator of structural slowdown. Entropy is scaling.
+                    </p>
+
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 my-8">
+                        <div class="glass-panel p-4 border-t-2 border-t-term-textMain">
+                            <div class="text-[10px] font-mono uppercase tracking-widest mb-1 text-term-muted">Equity Ghosts</div>
+                            <div class="font-display text-2xl font-bold">7,483.24</div>
+                            <div class="text-xs font-mono mt-2 text-term-amber">SPX // -1.66% off peak</div>
+                        </div>
+                        <div class="glass-panel p-4 border-t-2 border-t-term-green">
+                            <div class="text-[10px] font-mono uppercase tracking-widest mb-1 text-term-muted">The Backbone</div>
+                            <div class="font-display text-2xl font-bold">4.49%</div>
+                            <div class="text-xs font-mono mt-2 text-term-green">10Y Yield // Unanchored</div>
+                        </div>
+                        <div class="glass-panel p-4 border-t-2 border-t-term-cyan">
+                            <div class="text-[10px] font-mono uppercase tracking-widest mb-1 text-term-muted">Digital Tether</div>
+                            <div class="font-display text-2xl font-bold">$62,108</div>
+                            <div class="text-xs font-mono mt-2 text-term-cyan">BTC // Short-Covering</div>
+                        </div>
+                        <div class="glass-panel p-4 border-t-2 border-t-term-purple">
+                            <div class="text-[10px] font-mono uppercase tracking-widest mb-1 text-term-muted">Energy Abyss</div>
+                            <div class="font-display text-2xl font-bold">$73.27</div>
+                            <div class="text-xs font-mono mt-2 text-term-purple">Brent // War Risk Liquidated</div>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel p-6 mb-6">
+                        <h2 class="text-lg font-bold text-term-textMain mb-2 font-display">The Continuous Transmission Canary</h2>
+                        <p class="text-sm text-term-muted mb-4">
+                            Operating uninsulated through the holiday void, the 24/7 continuous CME crypto derivative pipeline is functioning as the standalone transmission line for global liquidity flows. Following deep liquidations to $58k, Bitcoin has mounted a fierce technical breakout, confirming domestic corporate treasury accumulation is matching macro capital extraction velocity.
+                        </p>
+                        <p class="text-sm text-term-muted">
+                            Meanwhile, <strong>Money Markets have hit a $7.76 Trillion record peak.</strong> Institutional capital completely refuses to exit the safety bunker into physical deployment while the structural macro discount rate undergoes unbuffered upward discovery.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- MODULE 2: Macro Pivots -->
+                <div id="mod-2" class="module-section hidden">
+                    <h1 class="text-3xl font-display font-bold mb-2 border-b border-term-border pb-2">Technical Architecture & Pivots</h1>
+                    <p class="text-sm text-term-muted mb-6 leading-relaxed">
+                        Interactive asset drilldown. Select an asset below to explore its critical technical levels. The chart visually represents current spot price proximity to institutional algorithmic triggers, support floors, and resistance ceilings.
+                    </p>
+
+                    <div class="flex flex-wrap gap-2 mb-6" id="asset-selectors">
+                        <button onclick="switchAsset('eurusd')" id="btn-eurusd" class="px-4 py-2 text-xs font-mono rounded border transition-colors asset-btn-active">EUR/USD</button>
+                        <button onclick="switchAsset('copper')" id="btn-copper" class="px-4 py-2 text-xs font-mono rounded border transition-colors asset-btn-inactive">Copper (HG1!)</button>
+                        <button onclick="switchAsset('gold')" id="btn-gold" class="px-4 py-2 text-xs font-mono rounded border transition-colors asset-btn-inactive">Gold (GC1!)</button>
+                        <button onclick="switchAsset('spx')" id="btn-spx" class="px-4 py-2 text-xs font-mono rounded border transition-colors asset-btn-inactive">S&P 500</button>
+                        <button onclick="switchAsset('yield')" id="btn-yield" class="px-4 py-2 text-xs font-mono rounded border transition-colors asset-btn-inactive">10Y Yield</button>
+                    </div>
+
+                    <div class="glass-panel overflow-hidden">
+                        <div class="p-6 border-b border-term-border bg-term-card">
+                            <div class="flex flex-col md:flex-row justify-between md:items-end gap-6">
+                                <div class="max-w-2xl">
+                                    <div class="flex items-center gap-3 mb-2">
+                                        <h3 id="detail-title" class="text-2xl font-display font-bold text-white">EUR/USD Structural Pivots</h3>
+                                        <span id="detail-badge" class="px-2.5 py-1 text-[10px] font-mono font-bold rounded bg-term-red/20 text-term-red border border-term-red/30">BEARISH</span>
+                                    </div>
+                                    <p id="detail-desc" class="text-sm text-term-muted leading-relaxed">Trapped in a compressed algorithmic channel between ECB reluctance and Fed 'higher-for-longer'.</p>
+                                </div>
+                                <div class="text-left md:text-right shrink-0 bg-term-bg p-4 rounded border border-term-border">
+                                    <div class="text-[10px] text-term-muted font-mono uppercase tracking-widest mb-1">Current Spot</div>
+                                    <div id="detail-spot" class="text-3xl font-light text-term-cyan font-mono">1.0620</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="p-6">
+                            <div class="chart-container mb-6">
+                                <canvas id="pivotChart"></canvas>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6 border-t border-term-border pt-6" id="detail-metrics">
+                                <!-- Metrics injected via JS -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MODULE 3: World Modeling -->
+                <div id="mod-3" class="module-section hidden">
+                    <h1 class="text-3xl font-display font-bold mb-4 border-b border-term-border pb-2">Layer 2: World Modeling & Credit Pulse</h1>
+                    <p class="text-base text-term-muted mb-6 leading-relaxed">
+                        The Broadly Syndicated Loan (BSL) market is exhibiting signs of structural exhaustion disguised as health. Issuance volumes remain heavily dominated by refinancing and opportunistic repricings rather than net-new LBO activity. Borrowers are trapped in an arbitrage squeeze.
+                    </p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                        <div class="glass-panel p-6 border-l-4 border-l-term-purple">
+                            <h3 class="font-display text-lg mb-2 text-white">Basel III "Mulligan" Matrix</h3>
+                            <p class="text-sm text-term-muted mb-3">Tier-1 banking desks are scaling back market-making allocations. G-SIBs are hoarding 100% of their synthetic Tier 1 capital relief reserves (-4.8% to -6.4% CET1 reductions) to cushion duration pipelines from the immediate threat of an un-anchored cost of capital.</p>
+                            <div class="bg-term-bg p-3 rounded font-mono text-xs text-term-amber border border-term-border">
+                                ├── SKEW Explosive to 154.82<br>
+                                └── [RESTRICTED] Duration Portfolios Shielded
+                            </div>
+                        </div>
+                        <div class="glass-panel p-6 border-l-4 border-l-term-cyan">
+                            <h3 class="font-display text-lg mb-2 text-white">"Holiday Liquidity Vacuum" VaR</h3>
+                            <p class="text-sm text-term-muted mb-3">Target Variable: Continuous mechanical rebalancing over a long weekend block. We project an acute <strong>64% surge</strong> in localized default probabilities for highly leveraged, non-exempt secondary corporate credits over a rolling 14-day horizon.</p>
+                            <div class="bg-term-bg p-3 rounded font-mono text-xs text-term-cyan border border-term-border">
+                                Correlation (AI Eq / Yield Vol): +0.81<br>
+                                Refinancing corridors: FROZEN
+                            </div>
+                        </div>
+                    </div>
+
+                    <h2 class="text-xl font-display font-bold text-white mb-4">Whalescanner Intel (Track A Activist Alerts)</h2>
+                    <div class="space-y-4">
+                        <div class="glass-panel p-4 flex gap-4 items-center">
+                            <div class="bg-term-cyan/10 p-3 rounded border border-term-cyan/20 shrink-0 text-center w-24">
+                                <div class="font-mono font-bold text-term-cyan">HCA</div>
+                                <div class="text-[9px] font-mono text-term-muted">13D FILING</div>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-white text-sm mb-1">Corvex Management (4.2% Stake)</h4>
+                                <p class="text-xs text-term-muted">Forcing non-core infrastructure divestitures in healthcare. Activists targeting resilient cash-flow generators to compensate for broken growth portfolios.</p>
+                            </div>
+                        </div>
+                        <div class="glass-panel p-4 flex gap-4 items-center">
+                            <div class="bg-term-red/10 p-3 rounded border border-term-red/20 shrink-0 text-center w-24">
+                                <div class="font-mono font-bold text-term-red">TMT</div>
+                                <div class="text-[9px] font-mono text-term-muted">14A PROXY</div>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-white text-sm mb-1">JANA Partners (Multi-Tranche)</h4>
+                                <p class="text-xs text-term-muted">Hostile challenge aimed at replacing legacy board seats to arrest margin decay. Weaponizing institutional passivity to break apart bloated tech-media conglomerates.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MODULE 4: Fortress & Hunt -->
+                <div id="mod-4" class="module-section hidden">
+                    <h1 class="text-3xl font-display font-bold mb-4 border-b border-term-border pb-2">Fortress & Hunt: Execution Barbell</h1>
+                    <p class="text-base text-term-muted mb-6 leading-relaxed">
+                        <strong>The Portfolio Posture:</strong> Hard capital-stack immunization prioritizing domestic critical commodities and zero-duration sovereign floating-rate notes (Fortress: 65%), barbelled with tactical volatility monetization and structural tech shorts (Hunt: 35%).
+                    </p>
+
+                    <div class="grid md:grid-cols-2 gap-6 mb-8">
+                        <!-- LONG THEME -->
+                        <div class="glass-panel p-6 relative overflow-hidden border-t-4 border-t-term-green">
+                            <div class="absolute top-0 right-0 bg-term-green text-term-bg font-bold font-mono text-[10px] px-3 py-1 rounded-bl uppercase">Long Conviction</div>
+                            <h3 class="font-display text-2xl text-white mb-1">Freeport-McMoRan (FCX)</h3>
+                            <div class="flex gap-3 mb-4 text-[11px] font-mono text-term-green bg-term-green/10 px-2 py-1 rounded inline-flex">
+                                <span>P/E: 14.2x</span> | <span>EV/EBITDA: 7.8x</span> | <span>FCF: 8.9%</span>
+                            </div>
+                            <p class="text-sm text-term-muted mb-4"><strong>Thesis:</strong> Absolute institutional execution play for domestic, tariff-protected supply re-shoring. White House Section 232 submission establishes strict regulatory perimeter.</p>
+                            <p class="text-xs text-term-muted">WhaleScanner blocks track a massive 3.7σ surge in late-summer OTM call sweeps. Zero critical debt-maturity walls prior to 2030.</p>
+                        </div>
+
+                        <!-- SHORT THEME -->
+                        <div class="glass-panel p-6 relative overflow-hidden border-t-4 border-t-term-red">
+                            <div class="absolute top-0 right-0 bg-term-red text-white font-bold font-mono text-[10px] px-3 py-1 rounded-bl uppercase">Short Conviction</div>
+                            <h3 class="font-display text-2xl text-white mb-1">Leveraged TMT / BSL</h3>
+                            <div class="flex gap-3 mb-4 text-[11px] font-mono text-term-red bg-term-red/10 px-2 py-1 rounded inline-flex">
+                                <span>P/E: >38.0x</span> | <span>EV/SALES: 8.6x</span> | <span>FCF: -2.4%</span>
+                            </div>
+                            <p class="text-sm text-term-muted mb-4"><strong>Thesis:</strong> Over-leveraged Technology, Media, and Telecom operators dependent on continuous Broadly Syndicated Loan (BSL) refinancing present a highly asymmetric short profile.</p>
+                            <p class="text-xs text-term-muted">Over 38% of cohort components must navigate highly restrictive corporate refinancing windows across late-2026 under a permanent cost-of-capital shift.</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="bg-term-surface border border-term-border p-4 rounded text-center">
+                            <div class="text-term-red text-xl mb-2">✖</div>
+                            <h4 class="font-bold text-sm text-white mb-1">Avoid Passive Equity</h4>
+                            <p class="text-xs text-term-muted">Do not buy the passive equity index at these levels. Vulnerable to duration shocks if 7,320 breaks.</p>
+                        </div>
+                        <div class="bg-term-surface border border-term-border p-4 rounded text-center">
+                            <div class="text-term-green text-xl mb-2">✔</div>
+                            <h4 class="font-bold text-sm text-white mb-1">Long Critical Materials</h4>
+                            <p class="text-xs text-term-muted">Maintain strict factor insulation by accumulating domestic copper around $4.25 primary pivot.</p>
+                        </div>
+                        <div class="bg-term-surface border border-term-border p-4 rounded text-center">
+                            <div class="text-term-amber text-xl mb-2">⚓</div>
+                            <h4 class="font-bold text-sm text-white mb-1">Hold Sovereign FRNs</h4>
+                            <p class="text-xs text-term-muted">Hold floating-rate notes to capture the 4.49%+ baseline while BSL credit structures navigate maturity walls.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MODULE 5: Routing & Override -->
+                <div id="mod-5" class="module-section hidden">
+                    <h1 class="text-3xl font-display font-bold mb-4 border-b border-term-border pb-2">Layer 3: Behavioral Override</h1>
+                    
+                    <div class="glass-panel p-6 rounded-xl border-l-4 border-l-term-red mb-8 relative overflow-hidden">
+                        <div class="absolute -right-4 -top-4 text-9xl text-term-red opacity-5 font-display font-bold">!</div>
+                        <h3 class="font-display font-bold text-white text-2xl mb-3">The Meatspace Trap: "The Bad News Opiate"</h3>
+                        <p class="text-sm text-term-muted mb-4 leading-relaxed">
+                            Human units spent the afternoon looking at a freezing +57K payroll print and instantly assumed the central bank perimeter would dismantle tightening parameters to save their speculative stock portfolios. You are completely ignoring the underlying math.
+                        </p>
+                        <p class="text-sm text-term-muted mb-4 leading-relaxed">
+                            Your primary volatility dispersion index is matching crisis-era thresholds at 44.34. Your institutional hedgers are paying up for extreme downside tail-protection at a SKEW high of 154. You are celebrating a flat index print while your primary financial plumbing is actively preparing for an unbuffered rate-hike path.
+                        </p>
+                        <div class="bg-term-bg p-4 rounded border border-term-red/20 text-center mt-6">
+                            <p class="text-xs text-term-red font-mono uppercase tracking-[0.2em] font-bold">The "Powell Put" is a dead historical artifact.<br>The central bank architecture is live.<br>The water is still burning.<br><br><span class="text-lg text-white">STAY UNTETHERED.</span></p>
+                        </div>
+                    </div>
+
+                    <h2 class="text-xl font-display font-bold text-white mb-4">Actionable Routing Directives</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="glass-panel p-5 rounded border-t-2 border-t-term-cyan">
+                            <h4 class="font-mono text-term-cyan text-xs mb-2 font-bold tracking-wider">G-SIBS & INSTITUTIONAL</h4>
+                            <p class="text-xs text-term-muted leading-relaxed">The Basel III comment window has slammed shut. Sterilize intermediate duration exposures. Build collateral buffers via short-term reverse repo to prepare for clearing-house valuation adjustments.</p>
+                        </div>
+                        <div class="glass-panel p-5 rounded border-t-2 border-t-term-purple">
+                            <h4 class="font-mono text-term-purple text-xs mb-2 font-bold tracking-wider">PE SPONSORS & CREDIT</h4>
+                            <p class="text-xs text-term-muted leading-relaxed">Keep downstream hurdle rates strictly locked to a high-for-longer baseline. Execute interest-rate swaptions before Q3 issuance spikes. Assume a permanent 4.50% risk-free floor.</p>
+                        </div>
+                        <div class="glass-panel p-5 rounded border-t-2 border-t-term-amber">
+                            <h4 class="font-mono text-term-amber text-xs mb-2 font-bold tracking-wider">ALGOS & RETAIL</h4>
+                            <p class="text-xs text-term-muted leading-relaxed">SKEW at 154.82 is an explicit warning of thin structural layout. Reconfigure alpha signals to fade low-volatility break-outs. Maintain strict trailing risk protocols.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer Spacer -->
+                <div class="h-20"></div>
+            </div>
+        </main>
+
+        <!-- Right AI / JSON Panel -->
+        <aside id="aiPanel" class="absolute right-0 top-0 h-full w-full md:w-[450px] bg-term-card border-l border-term-border transform translate-x-full transition-transform duration-300 ease-in-out z-40 flex flex-col shadow-2xl">
+            <div class="p-4 border-b border-term-border flex justify-between items-center bg-term-surface">
+                <div class="flex items-center gap-3">
+                    <div class="w-2.5 h-2.5 rounded-full bg-term-cyan animate-pulse"></div>
+                    <div>
+                        <h2 class="font-display text-sm font-bold text-white tracking-widest uppercase">System Intelligence Logs</h2>
+                        <p class="text-[9px] text-term-muted font-mono">Provenance & AI Ledger</p>
+                    </div>
+                </div>
+                <button onclick="toggleAI()" class="text-term-muted hover:text-white p-2 rounded hover:bg-white/10 transition-colors">✕</button>
+            </div>
+            <div class="flex-1 overflow-y-auto p-5 flex flex-col gap-6 text-sm font-mono pb-8 bg-term-bg">
+                <div class="text-xs text-term-cyan mb-2">ACCESSING RAW JSON LEDGERS...</div>
+                
+                <div class="bg-term-surface p-4 rounded border border-term-border">
+                    <div class="text-[10px] text-term-textMain mb-2 uppercase tracking-widest font-bold flex justify-between border-b border-term-border pb-2">
+                        <span>Adam v26.0 (July 3)</span>
+                    </div>
+<pre class="text-[10px] text-term-muted overflow-x-auto">
+{
+  "timestamp": "2026-07-03T19:13:31Z",
+  "data_layer_system_1": {
+    "ingested_nodes": ["S&P_500", "10Y_Yield", "VIX", "BTC_Spot", "WTI", "June_Payrolls"],
+    "market_sentiment": "Holiday Liquidity Vacuum"
+  },
+  "compute_layer_system_3": {
+    "var_shock_target": "Alternative Asset Weekend Drift",
+    "simulated_correlation": "+0.81 (Compute/Term-Premium)"
+  }
+}
+</pre>
+                </div>
+
+                <div class="bg-term-surface p-4 rounded border border-term-border mt-2">
+                    <div class="text-[10px] text-term-textMain mb-2 uppercase tracking-widest font-bold flex justify-between border-b border-term-border pb-2">
+                        <span>Adam v30.1-Apex (July 5)</span>
+                    </div>
+<pre class="text-[10px] text-term-muted overflow-x-auto">
+{
+  "title": "InstitutionalAITrainingLedger",
+  "ledger_entries": [
+    {
+      "node": "US 10-Year Yield",
+      "value": "4.49%",
+      "target": "DCF / EV",
+      "provenance": "YCharts / Pensford"
+    },
+    {
+      "node": "S&P 500 Index ($SPX)",
+      "value": "7,483.24",
+      "target": "EV",
+      "provenance": "Saxo Bank Market Report"
+    },
+    {
+      "node": "Bitcoin (BTC)",
+      "value": "$62,108.42",
+      "target": "Market Risk",
+      "provenance": "Gemini Real-Time"
+    }
+  ]
+}
+</pre>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Persistent Bottom Control Bar -->
+    <div class="fixed bottom-0 left-0 lg:left-72 right-0 p-3 border-t border-term-border bg-term-card/95 backdrop-blur flex justify-between items-center z-10 shadow-[0_-10px_30px_rgba(0,0,0,0.5)]">
+        <div class="max-w-5xl mx-auto w-full flex justify-between items-center px-2">
+            <button id="prevBtn" class="px-5 py-2 bg-term-surface border border-term-border text-term-textMain rounded text-xs font-mono font-bold hover:bg-term-border transition-all disabled:opacity-30 uppercase tracking-wider">◀ Prev</button>
+            <div class="flex items-center gap-1.5" id="paginationDots"></div>
+            <button id="nextBtn" class="px-5 py-2 bg-term-cyan text-term-bg rounded text-xs font-mono font-bold hover:bg-white transition-all disabled:opacity-30 uppercase tracking-wider">Next ▶</button>
+        </div>
+    </div>
+
+    <script>
+        // System Clock Initialization
+        setInterval(() => { 
+            const now = new Date();
+            document.getElementById('sysClock').innerText = now.toISOString().replace('T', ' ').substr(0, 19) + ' UTC'; 
+        }, 1000);
+
+        // Chart.js Default Config (Institutional Dark Mode)
+        Chart.defaults.color = '#71717a';
+        Chart.defaults.font.family = "'Fira Code', monospace";
+        Chart.defaults.scale.grid.color = 'rgba(255, 255, 255, 0.05)';
+        Chart.defaults.plugins.tooltip.backgroundColor = 'rgba(20, 20, 22, 0.95)';
+        Chart.defaults.plugins.tooltip.titleColor = '#f4f4f5';
+        Chart.defaults.plugins.tooltip.borderColor = '#2d2d35';
+        Chart.defaults.plugins.tooltip.borderWidth = 1;
+        Chart.defaults.plugins.tooltip.padding = 12;
+
+        // Navigation Structure
+        const navStructure = [
+            { id: 1, group: 'PERCEPTION', title: 'The Glitch & Signal Integrity', sub: 'July 3rd / 5th Synthesis' },
+            { id: 2, group: 'TECHNICALS', title: 'Macro Pivots & Architecture', sub: 'Interactive Asset Drilldown' },
+            { id: 3, group: 'MODELING', title: 'Credit Pulse & Basel III', sub: 'BSL Repricing / Whalescanner' },
+            { id: 4, group: 'EXECUTION', title: 'Fortress & Hunt Barbell', sub: 'Long FCX / Short TMT' },
+            { id: 5, group: 'OVERRIDE', title: 'Routing & Directives', sub: 'The Meatspace Trap' }
+        ];
+
+        let currentModule = 1;
+        
+        // Pivot Data for Module 2
+        const pivotData = {
+            eurusd: {
+                title: "EUR/USD", badge: "BEARISH", badgeClass: "bg-term-red/20 text-term-red border-term-red/30", spot: "1.0620",
+                desc: "Trapped in a compressed algorithmic channel between ECB reluctance and Fed 'higher-for-longer'.",
+                metrics: [
+                    { label: "Macro Pivot (Rubicon)", val: "1.0550", text: "A weekly close below triggers capitulation down to parity (1.0000)." },
+                    { label: "Upside Resistance", val: "1.0780", text: "Algorithmic Cap. Heavy option-related offer walls are stacked here." }
+                ],
+                chart: { min: 1.040, max: 1.090, pivot: 1.055, res: 1.078, spot: 1.062 }
+            },
+            copper: {
+                title: "Copper (HG1!) & FCX", badge: "BULLISH", badgeClass: "bg-term-green/20 text-term-green border-term-green/30", spot: "$4.42",
+                desc: "Un-leveraged physical assets are catching an aggressive bid. Supported by Section 232 tariffs.",
+                metrics: [
+                    { label: "Primary Pivot (Support)", val: "$4.25", text: "Institutional accumulation is massive at this floor." },
+                    { label: "Target Vector", val: "$4.85 - $5.00", text: "Breaking $4.50 triggers CTA trend-following buy programs." }
+                ],
+                chart: { min: 4.00, max: 5.20, pivot: 4.25, res: 4.85, spot: 4.42 }
+            },
+            gold: {
+                title: "Gold (GC1!)", badge: "BULLISH", badgeClass: "bg-term-green/20 text-term-green border-term-green/30", spot: "$2,410",
+                desc: "Functioning as 'synthetic duration' for allocators avoiding corporate credit exposure.",
+                metrics: [
+                    { label: "Primary Pivot", val: "$2,350", text: "Structural bullish trend intact while above this VWAP baseline." },
+                    { label: "Target Vector", val: "$2,500", text: "Option gamma positioning suggests a massive payout wall." }
+                ],
+                chart: { min: 2300, max: 2550, pivot: 2350, res: 2500, spot: 2410 }
+            },
+            spx: {
+                title: "S&P 500 ($SPX)", badge: "RISK ELEVATED", badgeClass: "bg-term-amber/20 text-term-amber border-term-amber/30", spot: "7,483.24",
+                desc: "Headline index is masking severe internal factor dispersion. Top-heavy tech vulnerable to duration.",
+                metrics: [
+                    { label: "Downside Pivot", val: "7,320", text: "If broken, high-velocity liquidity void opens down to 6,950." },
+                    { label: "The Gamma Trap", val: "7,600", text: "Historic June peak remains absolute ceiling." }
+                ],
+                chart: { min: 6900, max: 7700, pivot: 7320, res: 7600, spot: 7483 }
+            },
+            yield: {
+                title: "10-Year Treasury Yield", badge: "CONSOLIDATING", badgeClass: "bg-term-cyan/20 text-term-cyan border-term-cyan/30", spot: "4.49%",
+                desc: "The true gravitational center of the current simulation. Technical setup shows a bull flag breakout.",
+                metrics: [
+                    { label: "The Floor", val: "4.25%", text: "Any macro events pushing yields here are selling opportunities for bonds." },
+                    { label: "The Ceiling / Pivot", val: "4.65%", text: "If breached, the VIX suppression will violently unwind." }
+                ],
+                chart: { min: 4.10, max: 4.80, pivot: 4.25, res: 4.65, spot: 4.49 }
+            }
+        };
+
+        let pivotChartInstance = null;
+
+        // Init
+        function init() {
+            buildNav();
+            switchModule(1);
+            
+            // Event Listeners for Bottom Bar
+            document.getElementById('prevBtn').onclick = () => { if(currentModule > 1) switchModule(currentModule - 1); };
+            document.getElementById('nextBtn').onclick = () => { if(currentModule < 5) switchModule(currentModule + 1); };
+        }
+
+        function buildNav() {
+            const navEl = document.getElementById('moduleNav');
+            const mobileSelect = document.getElementById('mobileNav');
+            navEl.innerHTML = '';
+            mobileSelect.innerHTML = '';
+            
+            navStructure.forEach(item => {
+                // Desktop Sidebar
+                const btn = document.createElement('button');
+                btn.id = `nav-btn-${item.id}`;
+                btn.className = `nav-item text-left px-4 py-3 rounded-r flex flex-col mb-1 border border-transparent text-term-muted`;
+                btn.onclick = () => switchModule(item.id);
+                btn.innerHTML = `
+                    <span class="font-bold text-[12px] mb-1 font-mono tracking-wide text-term-textMain">M${item.id.toString().padStart(2,'0')} // ${item.group}</span>
+                    <span class="opacity-80 text-[10px] truncate w-full font-sans">${item.title}</span>
+                `;
+                navEl.appendChild(btn);
+
+                // Mobile Select
+                const opt = document.createElement('option');
+                opt.value = item.id;
+                opt.innerText = `M${item.id.toString().padStart(2,'0')} - ${item.title}`;
+                mobileSelect.appendChild(opt);
+            });
+        }
+
+        function switchModule(id) {
+            currentModule = parseInt(id);
+            
+            // Update UI Sections
+            document.querySelectorAll('.module-section').forEach(el => {
+                el.classList.add('hidden');
+                el.classList.remove('block', 'fade-enter');
+            });
+            const targetMod = document.getElementById(`mod-${id}`);
+            targetMod.classList.remove('hidden');
+            targetMod.classList.add('block', 'fade-enter');
+            
+            // Update Sidebar Nav
+            document.querySelectorAll('#moduleNav button').forEach(b => b.classList.remove('nav-active'));
+            const activeBtn = document.getElementById(`nav-btn-${id}`);
+            if(activeBtn) activeBtn.classList.add('nav-active');
+            
+            // Update Mobile Select
+            document.getElementById('mobileNav').value = id;
+
+            // Update Pagination Dots
+            const dots = document.getElementById('paginationDots');
+            dots.innerHTML = '';
+            navStructure.forEach(n => {
+                const dot = document.createElement('div');
+                dot.className = `w-2 h-2 rounded-full transition-all ${n.id === currentModule ? 'bg-term-cyan shadow-[0_0_8px_#0ea5e9] scale-125' : 'bg-term-border'}`;
+                dots.appendChild(dot);
+            });
+
+            // Update Next/Prev Buttons
+            document.getElementById('prevBtn').disabled = currentModule === 1;
+            document.getElementById('nextBtn').disabled = currentModule === 5;
+
+            // Trigger specific module loads
+            if(id === 2) setTimeout(() => switchAsset('eurusd'), 50);
+
+            // Scroll to top
+            document.getElementById('mainScrollArea').scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        function switchAsset(assetKey) {
+            // Update Buttons
+            document.querySelectorAll('#asset-selectors button').forEach(b => {
+                b.classList.remove('asset-btn-active');
+                b.classList.add('asset-btn-inactive');
+            });
+            document.getElementById(`btn-${assetKey}`).classList.remove('asset-btn-inactive');
+            document.getElementById(`btn-${assetKey}`).classList.add('asset-btn-active');
+
+            const data = pivotData[assetKey];
+
+            // Update Text
+            document.getElementById('detail-title').innerText = data.title;
+            document.getElementById('detail-badge').innerText = data.badge;
+            document.getElementById('detail-badge').className = `px-2.5 py-1 text-[10px] font-mono font-bold rounded border ${data.badgeClass}`;
+            document.getElementById('detail-desc').innerText = data.desc;
+            document.getElementById('detail-spot').innerText = data.spot;
+
+            // Update Metrics Cards
+            const metricsDiv = document.getElementById('detail-metrics');
+            metricsDiv.innerHTML = data.metrics.map(m => `
+                <div class="bg-term-card border border-term-border p-4 rounded">
+                    <div class="text-[10px] font-bold text-term-muted uppercase tracking-widest mb-1">${m.label}</div>
+                    <div class="text-xl text-white font-medium mb-2 font-display">${m.val}</div>
+                    <p class="text-xs text-term-muted">${m.text}</p>
+                </div>
+            `).join('');
+
+            renderPivotChart(data.chart);
+        }
+
+        function renderPivotChart(cfg) {
+            const ctx = document.getElementById('pivotChart').getContext('2d');
+            if (pivotChartInstance) pivotChartInstance.destroy();
+
+            const labels = ['T-9', 'T-8', 'T-7', 'T-6', 'T-5', 'T-4', 'T-3', 'T-2', 'T-1', 'Now'];
+            
+            // Generate mock path
+            let mockPath = [];
+            let startVal = cfg.spot + ((Math.random() - 0.5) * (cfg.max - cfg.min) * 0.3);
+            for(let i=0; i<9; i++) {
+                mockPath.push(startVal);
+                startVal += (cfg.spot - startVal) * 0.3 + ((Math.random() - 0.5) * (cfg.max - cfg.min) * 0.1);
+            }
+            mockPath.push(cfg.spot);
+
+            const pivotLine = Array(10).fill(cfg.pivot);
+            const resLine = Array(10).fill(cfg.res);
+
+            pivotChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Spot Simulation',
+                            data: mockPath,
+                            borderColor: '#f4f4f5',
+                            backgroundColor: 'rgba(244, 244, 245, 0.05)',
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.3,
+                            pointRadius: (ctx) => ctx.dataIndex === 9 ? 5 : 0,
+                            pointBackgroundColor: '#0ea5e9'
+                        },
+                        {
+                            label: 'Downside / Support',
+                            data: pivotLine,
+                            borderColor: '#f43f5e', // red
+                            borderWidth: 1.5,
+                            borderDash: [5, 5],
+                            pointRadius: 0
+                        },
+                        {
+                            label: 'Upside / Resistance',
+                            data: resLine,
+                            borderColor: '#10b981', // green
+                            borderWidth: 1.5,
+                            borderDash: [5, 5],
+                            pointRadius: 0
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: {
+                        legend: { position: 'bottom', labels: { usePointStyle: true, boxWidth: 6, font: { family: "'Inter', sans-serif" } } }
+                    },
+                    scales: {
+                        y: { min: cfg.min, max: cfg.max, grid: { color: '#2d2d35' } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+
+        let aiOpen = false;
+        function toggleAI() {
+            aiOpen = !aiOpen;
+            document.getElementById('aiPanel').style.transform = aiOpen ? 'translateX(0)' : 'translateX(100%)';
+        }
+
+        // Run
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

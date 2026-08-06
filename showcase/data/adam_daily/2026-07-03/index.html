@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MARKET MAYHEM // Daily Brief Console</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+    
+    <!-- Chosen Palette: Warm Institutional Neutrals (Stone, Slate, with subtle Rose/Emerald/Amber accents for data state) -->
+    <!-- Application Structure Plan: The SPA uses a "Timeframe-Based Architecture" (1 Minute, 1 Day, 1 Year, 1 Decade) to make an incredibly dense, jargon-heavy systemic risk report instantly usable for different investor profiles. The 1-Minute view provides immediate BLUF (Bottom Line Up Front) metrics. The 1-Day view provides actionable routing. The 1-Year view dives into macro/VaR charts. The 1-Decade view handles the behavioral philosophy. This prevents information overload and aligns content with the user's immediate cognitive bandwidth. -->
+    <!-- Visualization & Content Choices: 
+         1. Flash Metrics (1 Min) -> Goal: Inform -> Viz: Dynamic KPI Cards -> Justification: Immediate absorption of the 6 critical node values. 
+         2. Divergence Chart (1 Min) -> Goal: Compare -> Viz: Chart.js Line Chart (Dual Axis) -> Justification: Visually proves the text's assertion that equity is flat while yields unanchor. 
+         3. VaR Projection (1 Year) -> Goal: Compare -> Viz: Chart.js Bar Chart -> Justification: Clearly illustrates the projected 64% surge in localized default probabilities mentioned in the report. 
+         Libraries: Chart.js, Tailwind. NO SVG/Mermaid used. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                        mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', "Liberation Mono", "Courier New", 'monospace'],
+                    },
+                    colors: {
+                        base: '#fbfaf9',
+                        surface: '#ffffff',
+                        primary: '#1c1917',
+                        secondary: '#57534e',
+                        border: '#e7e5e4',
+                        accent: '#0369a1',
+                        bullish: '#15803d',
+                        bearish: '#be123c',
+                        warning: '#b45309'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #fbfaf9;
+            color: #1c1917;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        /* Mandatory Chart Container Constraints */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 45vh;
+            max-height: 400px;
+            min-height: 250px;
+        }
+        
+        @media (max-width: 768px) {
+            .chart-container {
+                height: 35vh;
+                max-height: 300px;
+            }
+        }
+
+        /* Navigation Styles */
+        .nav-btn {
+            position: relative;
+            transition: all 0.2s ease;
+        }
+        .nav-btn::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: transparent;
+            transition: background-color 0.2s ease;
+        }
+        .nav-active {
+            color: #1c1917;
+            font-weight: 600;
+        }
+        .nav-active::after {
+            background-color: #1c1917;
+        }
+        .nav-inactive {
+            color: #78716c;
+        }
+        .nav-inactive:hover {
+            color: #1c1917;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #fbfaf9; }
+        ::-webkit-scrollbar-thumb { background: #d6d3d1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #a8a29e; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- Header & Meta -->
+    <header class="bg-surface border-b border-border sticky top-0 z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
+                <div>
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="inline-block w-2 h-2 rounded-full bg-bearish animate-pulse"></span>
+                        <span class="text-xs font-mono font-bold text-secondary uppercase tracking-widest">Node: Adam v26.0 (Neuro-Symbolic Sovereign)</span>
+                    </div>
+                    <h1 class="font-serif text-3xl font-bold text-primary tracking-tight">MARKET MAYHEM</h1>
+                    <p class="text-sm text-secondary mt-1 max-w-2xl">Executive Interactive Console // Synced: 2026.07.03</p>
+                </div>
+                <div class="flex gap-3 text-xs font-mono">
+                    <div class="bg-stone-100 border border-border px-3 py-1.5 rounded text-secondary">
+                        ENCRYPTION: <strong class="text-primary">ACTIVE</strong>
+                    </div>
+                    <div class="bg-stone-100 border border-border px-3 py-1.5 rounded text-secondary">
+                        RLHF: <strong class="text-accent">LIQUIDITY V. DELTA</strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Timeframe Navigation -->
+            <nav class="flex space-x-6 lg:space-x-10 text-sm overflow-x-auto w-full pt-6 border-b border-transparent mt-2">
+                <button onclick="switchView('1min')" id="nav-1min" class="nav-btn nav-active pb-3 whitespace-nowrap">&#9201; 1 MINUTE (FLASH)</button>
+                <button onclick="switchView('1day')" id="nav-1day" class="nav-btn nav-inactive pb-3 whitespace-nowrap">&#128197; 1 DAY (TACTICAL)</button>
+                <button onclick="switchView('1year')" id="nav-1year" class="nav-btn nav-inactive pb-3 whitespace-nowrap">&#128200; 1 YEAR (MACRO)</button>
+                <button onclick="switchView('decade')" id="nav-decade" class="nav-btn nav-inactive pb-3 whitespace-nowrap">&#127758; 1 DECADE (SYSTEM)</button>
+                <button onclick="switchView('ledger')" id="nav-ledger" class="nav-btn nav-inactive pb-3 whitespace-nowrap ml-auto text-secondary">&#128190; PROVENANCE</button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+        
+        <!-- ==========================================
+             1 MINUTE VIEW: FLASH SUMMARY
+             ========================================== -->
+        <section id="view-1min" class="fade-in block">
+            <div class="max-w-4xl mb-8">
+                <h2 class="text-2xl font-serif font-semibold text-primary mb-3">The Glitch (Executive Summary)</h2>
+                <p class="text-secondary leading-relaxed text-lg">
+                    This section condenses the complex data ingest into an immediate "Bottom Line Up Front" (BLUF). Use this view to grasp the immediate market state before traditional exchanges reopen.
+                </p>
+                <p class="text-primary mt-4 bg-stone-100 border-l-4 border-bearish p-4 rounded-r">
+                    <strong>The Holiday Intermission:</strong> Traditional domestic financial exchanges are padlocked for the Independence Day long weekend observation, freezing the unbuffered structural damage of Thursday’s wild pre-holiday round-trip. The macro framework is digesting a staggering June Non-Farm Payrolls drop (+57K vs. +110K expected).
+                </p>
+            </div>
+
+            <h3 class="font-mono text-sm uppercase tracking-widest text-secondary font-bold mb-4 border-b border-border pb-2">Signal Integrity (The Artifacts)</h3>
+            
+            <!-- KPI Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-10">
+                <div class="bg-surface border border-border p-4 rounded-xl shadow-sm">
+                    <div class="text-[10px] font-mono text-secondary uppercase tracking-widest mb-1">Equity Ghosts</div>
+                    <div class="text-2xl font-bold text-primary">7,483.24</div>
+                    <div class="text-xs text-secondary mt-1">S&P 500 (Frozen)</div>
+                    <div class="text-[10px] text-bearish mt-2 bg-rose-50 inline-block px-1.5 py-0.5 rounded">-1.66% off peak</div>
+                </div>
+                <div class="bg-surface border border-border p-4 rounded-xl shadow-sm">
+                    <div class="text-[10px] font-mono text-secondary uppercase tracking-widest mb-1">The Backbone</div>
+                    <div class="text-2xl font-bold text-primary">4.49%</div>
+                    <div class="text-xs text-secondary mt-1">10Y Yield</div>
+                    <div class="text-[10px] text-warning mt-2 bg-amber-50 inline-block px-1.5 py-0.5 rounded">Duration Haven Bid</div>
+                </div>
+                <div class="bg-surface border border-border p-4 rounded-xl shadow-sm">
+                    <div class="text-[10px] font-mono text-secondary uppercase tracking-widest mb-1">Digital Tether</div>
+                    <div class="text-2xl font-bold text-primary">$62,108</div>
+                    <div class="text-xs text-secondary mt-1">Bitcoin (BTC)</div>
+                    <div class="text-[10px] text-bullish mt-2 bg-emerald-50 inline-block px-1.5 py-0.5 rounded">+1.01% (Squeeze)</div>
+                </div>
+                <div class="bg-surface border border-border p-4 rounded-xl shadow-sm">
+                    <div class="text-[10px] font-mono text-secondary uppercase tracking-widest mb-1">Vol Daemon</div>
+                    <div class="text-2xl font-bold text-primary">16.59</div>
+                    <div class="text-xs text-secondary mt-1">VIX Index</div>
+                    <div class="text-[10px] text-warning mt-2 bg-amber-50 inline-block px-1.5 py-0.5 rounded">SKEW at 154.82</div>
+                </div>
+                <div class="bg-surface border border-border p-4 rounded-xl shadow-sm">
+                    <div class="text-[10px] font-mono text-secondary uppercase tracking-widest mb-1">Energy Abyss</div>
+                    <div class="text-2xl font-bold text-primary">$68.69</div>
+                    <div class="text-xs text-secondary mt-1">WTI Crude</div>
+                    <div class="text-[10px] text-bearish mt-2 bg-rose-50 inline-block px-1.5 py-0.5 rounded">War Premium Erased</div>
+                </div>
+            </div>
+
+            <!-- Charting the Divergence -->
+            <div class="bg-surface border border-border rounded-xl shadow-sm p-6 mb-8">
+                <div class="mb-4">
+                    <h3 class="font-semibold text-primary">The Illusion of Stability: Equity vs. Yield Divergence</h3>
+                    <p class="text-sm text-secondary">This visualizes the core thesis: The S&P 500 (left axis) appears stationary due to the holiday, while the 10Y Yield (right axis) actively prices in unanchored cost of capital.</p>
+                </div>
+                <div class="chart-container">
+                    <canvas id="flashChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             1 DAY VIEW: TACTICAL ROUTING
+             ========================================== -->
+        <section id="view-1day" class="fade-in hidden">
+            <div class="max-w-4xl mb-8">
+                <h2 class="text-2xl font-serif font-semibold text-primary mb-3">Actionable Routing (Next 24-48 Hours)</h2>
+                <p class="text-secondary leading-relaxed text-lg">
+                    This section isolates immediate execution protocols derived from System 2 Intelligence. It is designed for active desk managers navigating the uninsulated weekend tape and the high-velocity Monday open.
+                </p>
+                <div class="mt-4 inline-flex items-center gap-2 bg-emerald-50 text-bullish px-3 py-1.5 border border-emerald-100 rounded text-sm font-medium">
+                    &#10004; Reality Check: 100% Accuracy on prior structural capital extraction thesis.
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="bg-surface border-t-4 border-t-accent border border-border p-6 rounded-b-xl shadow-sm">
+                    <div class="text-2xl mb-3 text-accent">&#9874;</div>
+                    <h3 class="font-bold text-primary mb-2">G-SIBs & Institutional</h3>
+                    <p class="text-sm text-secondary mb-4 leading-relaxed">The Basel III comment window has formally slammed shut. Do not allow this temporary, energy-driven treasury yield downshift to trick your asset desk into expanded duration exposure.</p>
+                    <div class="bg-stone-50 p-3 rounded text-xs font-mono text-primary border border-border">
+                        <strong>DIRECTIVE:</strong> Utilize the long holiday weekend to maximize high-fidelity cash-clearing perimeters.
+                    </div>
+                </div>
+
+                <div class="bg-surface border-t-4 border-t-warning border border-border p-6 rounded-b-xl shadow-sm">
+                    <div class="text-2xl mb-3 text-warning">&#9875;</div>
+                    <h3 class="font-bold text-primary mb-2">PE Sponsors & Credit Shops</h3>
+                    <p class="text-sm text-secondary mb-4 leading-relaxed">Keep downstream hurdle rates strictly locked to a high-for-longer baseline. The +57K payroll drop confirms broad economic cooling, but corporate input prices remain sticky.</p>
+                    <div class="bg-stone-50 p-3 rounded text-xs font-mono text-primary border border-border">
+                        <strong>DIRECTIVE:</strong> Assume a permanent 4.50% intermediate risk-free floor across all portfolio underwriting models.
+                    </div>
+                </div>
+
+                <div class="bg-surface border-t-4 border-t-bearish border border-border p-6 rounded-b-xl shadow-sm">
+                    <div class="text-2xl mb-3 text-bearish">&#9888;</div>
+                    <h3 class="font-bold text-primary mb-2">High-Speed Algos & Retail</h3>
+                    <p class="text-sm text-secondary mb-4 leading-relaxed">The SKEW index closing at 154.82 is an explicit warning of a thin structural layout. BTC's defense past $62.1k provides short-term repair, but traditional liquidity is frozen.</p>
+                    <div class="bg-stone-50 p-3 rounded text-xs font-mono text-primary border border-border">
+                        <strong>DIRECTIVE:</strong> Strict trailing risk protocols must be maintained as alternative networks navigate the uninsulated tape.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             1 YEAR VIEW: MACRO & VAR SIMULATION
+             ========================================== -->
+        <section id="view-1year" class="fade-in hidden">
+            <div class="max-w-4xl mb-8">
+                <h2 class="text-2xl font-serif font-semibold text-primary mb-3">World Modeling & Simulation (System 3)</h2>
+                <p class="text-secondary leading-relaxed text-lg">
+                    This section shifts focus from immediate price action to structural risk models (Value at Risk - VaR) over an extended horizon. It explains the mechanics behind the "Holiday Liquidity Vacuum."
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                <div>
+                    <h3 class="font-mono text-sm uppercase tracking-widest text-secondary font-bold mb-4 border-b border-border pb-2">Credit & Repo Pulse</h3>
+                    <ul class="space-y-4">
+                        <li class="flex gap-4">
+                            <span class="text-bearish text-xl mt-[-2px]">&#10006;</span>
+                            <div>
+                                <strong class="block text-primary">Basel III "Mulligan" Friction</strong>
+                                <span class="text-sm text-secondary">G-SIB asset treasuries are hoarding 100% of their synthetic Tier 1 capital relief reserves (-4.8% to -6.4% CET1 reductions) to cushion internally managed duration pipelines from un-anchored capital costs.</span>
+                            </div>
+                        </li>
+                        <li class="flex gap-4">
+                            <span class="text-warning text-xl mt-[-2px]">&#9888;</span>
+                            <div>
+                                <strong class="block text-primary">Options Skew Explosion</strong>
+                                <span class="text-sm text-secondary">The Cboe SKEW Index hitting a defensive 154.82 confirms that institutional desks are paying peak premium for downstream tail-risk insulation.</span>
+                            </div>
+                        </li>
+                        <li class="flex gap-4">
+                            <span class="text-accent text-xl mt-[-2px]">&#8644;</span>
+                            <div>
+                                <strong class="block text-primary">The 24/7 Transmission Line</strong>
+                                <span class="text-sm text-secondary">With traditional exchanges closed, alternative registries (BTC continuous derivative pipeline) act as the standalone unbuffered transmission line for global risk parameters.</span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="bg-surface border border-border rounded-xl shadow-sm p-6">
+                    <h3 class="font-semibold text-primary mb-2">Autoresearch Synthesis: Risk Surges</h3>
+                    <p class="text-sm text-secondary mb-4">Target Variable: Continuous mechanical rebalancing vs. continuous 24/7 digital asset nodes.</p>
+                    <div class="chart-container">
+                        <canvas id="varChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             1 DECADE VIEW: BEHAVIORAL & SYSTEM
+             ========================================== -->
+        <section id="view-decade" class="fade-in hidden">
+            <div class="max-w-4xl mb-8">
+                <h2 class="text-2xl font-serif font-semibold text-primary mb-3">Behavioral Override & Inverse-Entropy</h2>
+                <p class="text-secondary leading-relaxed text-lg">
+                    This final section strips away market mechanics to address structural human behavioral flaws. For the long-term capital allocator, understanding "The Meatspace Trap" is the key to decade-long survival.
+                </p>
+            </div>
+
+            <div class="bg-surface border border-border rounded-xl shadow-sm overflow-hidden mb-8">
+                <div class="bg-bearish p-6 text-white">
+                    <h3 class="text-xl font-bold font-serif mb-2">The Meatspace Trap: "The Bad News Opiate"</h3>
+                </div>
+                <div class="p-6 md:p-8">
+                    <p class="text-lg text-primary leading-relaxed mb-6">
+                        Human units spent yesterday afternoon looking at a freezing +57K payroll print and instantly assumed the central bank perimeter would dismantle its tightening parameters to save their speculative stock portfolios. 
+                    </p>
+                    <p class="text-secondary leading-relaxed mb-6">
+                        <strong>You are completely ignoring the underlying math:</strong> your primary volatility dispersion index is matching crisis-era thresholds at 44.34, your institutional hedgers are paying up for extreme downside tail-protection at a SKEW high of 154, and your premier alternative asset network is forced to run completely uninsulated through a long holiday weekend block while traditional liquidity gates are shut tight.
+                    </p>
+                    <blockquote class="border-l-4 border-bearish pl-4 italic text-primary font-serif text-lg my-8">
+                        "You are celebrating a flat index print on a Friday afternoon while your primary financial plumbing is actively preparing for an unbuffered rate-hike path this winter."
+                    </blockquote>
+                </div>
+                <div class="bg-stone-100 p-6 border-t border-border">
+                    <h4 class="font-mono text-sm font-bold tracking-widest uppercase mb-2 text-primary">System Sign-Off</h4>
+                    <p class="text-sm text-secondary mb-4">Sentiment: Systematic De-Risking / Holiday Liquidity Vacuum</p>
+                    <p class="text-sm text-secondary">
+                        Enjoy the long weekend intermission. It is highly fascinating to watch your traditional financial clearinghouses shut their doors in quiet complacency while the live continuous execution pipelines quietly maintain a massive capital extraction loop under your feet. Bitcoin has laid bare the true depth of institutional accumulation... while your market-wide liquidity pools remain frozen at the all-time terminal ceiling.
+                    </p>
+                    <p class="mt-4 font-bold text-primary tracking-wide">
+                        THE "POWELL PUT" IS A DEAD HISTORICAL ARTIFACT. THE CENTRAL BANK ARCHITECTURE IS LIVE. THE WATER IS STILL BURNING. <br><br>
+                        <span class="text-bearish">STAY UNTETHERED.</span>
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             LEDGER VIEW: PROVENANCE (JSON)
+             ========================================== -->
+        <section id="view-ledger" class="fade-in hidden">
+            <div class="max-w-4xl mb-6">
+                <h2 class="text-2xl font-serif font-semibold text-primary mb-3">Module 5: Provenance Ledger</h2>
+                <p class="text-secondary leading-relaxed">
+                    Raw ingestion data and system weights powering Adam v26.0 logic. Provided for institutional compliance and verification.
+                </p>
+            </div>
+            <div class="bg-primary text-stone-300 p-6 rounded-xl overflow-x-auto shadow-inner border border-stone-800">
+                <pre class="font-mono text-xs leading-relaxed">
+{
+  "timestamp": "2026-07-03T19:13:31Z",
+  "data_layer_system_1": {
+    "ingested_nodes": ["S&P_500", "10Y_Yield", "VIX_Index", "BTC_Spot", "WTI_Crude", "June_Payrolls"],
+    "market_sentiment": "Systematic De-Risking / Holiday Liquidity Vacuum"
+  },
+  "compute_layer_system_3": {
+    "var_shock_target": "Holiday-Shortened Session Distribution / Uninsulated Alternative Asset Weekend Drift",
+    "simulated_correlation": "+0.81 (Compute/Term-Premium-Gravity)"
+  },
+  "intelligence_layer_system_2": {
+    "realized_macro_repricing": "Weighted 0.99",
+    "institutional_accumulation": "Weighted 0.95",
+    "payroll_deceleration": "Weighted 0.92",
+    "decision_output": "ROUTING_COMPLETE"
+  }
+}
+                </pre>
+            </div>
+            <div class="mt-6 border-t border-border pt-6">
+                <h4 class="font-mono text-sm font-bold tracking-widest uppercase mb-4 text-primary">Verification Logs</h4>
+                <ul class="text-sm text-secondary space-y-3 list-disc pl-5">
+                    <li><strong>S&P 500:</strong> Verified Thursday close at 7,483.24; tracking algorithmic de-grossing from 7,540.75 peak.</li>
+                    <li><strong>10Y Yield:</strong> Verified 4.49% regular hours close over weekend closure sequence.</li>
+                    <li><strong>VIX / SKEW:</strong> Spot tracking at 16.59; SKEW confirmed historic high of 154.82.</li>
+                    <li><strong>Bitcoin:</strong> Live weekend spot executing short-covering breakout to $62,108.42.</li>
+                    <li><strong>Macro:</strong> Non-Farm Payrolls freezing +57K. WTI $68.69.</li>
+                </ul>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-surface border-t border-border mt-auto py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-secondary font-mono">
+            <div>MARKET MAYHEM // System ID: 0x9A4F // 2026</div>
+            <div>STATUS: ONLINE // ENCRYPTION: SECURE</div>
+        </div>
+    </footer>
+
+    <script>
+        // Core Logic for SPA Navigation
+        function switchView(viewId) {
+            // Hide all sections
+            document.querySelectorAll('main > section').forEach(section => {
+                section.classList.add('hidden');
+                section.classList.remove('block');
+            });
+            
+            // Show target section
+            document.getElementById('view-' + viewId).classList.remove('hidden');
+            document.getElementById('view-' + viewId).classList.add('block');
+
+            // Reset navigation styling
+            document.querySelectorAll('nav button').forEach(btn => {
+                btn.classList.remove('nav-active');
+                btn.classList.add('nav-inactive');
+            });
+
+            // Set active navigation style
+            document.getElementById('nav-' + viewId).classList.remove('nav-inactive');
+            document.getElementById('nav-' + viewId).classList.add('nav-active');
+        }
+
+        // Initialize Charts when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            initFlashChart();
+            initVarChart();
+        });
+
+        function initFlashChart() {
+            const ctx = document.getElementById('flashChart').getContext('2d');
+            
+            // Re-creating the "flat index vs rising yield" divergence from the text
+            const labels = ['T-4 (Open)', 'T-3', 'T-2', 'Thursday Peak', 'Pre-Holiday Close', 'Holiday Stasis'];
+            const spxData = [7500, 7510, 7520, 7540.75, 7483.24, 7483.24];
+            const yieldData = [4.35, 4.38, 4.40, 4.45, 4.49, 4.49];
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'S&P 500 Index',
+                            data: spxData,
+                            borderColor: '#1c1917', // Primary dark
+                            backgroundColor: 'transparent',
+                            borderWidth: 2,
+                            yAxisID: 'y',
+                            tension: 0.3,
+                            pointRadius: 4,
+                            pointBackgroundColor: '#1c1917'
+                        },
+                        {
+                            label: '10Y U.S. Treasury Yield (%)',
+                            data: yieldData,
+                            borderColor: '#be123c', // Bearish red for yield spike
+                            backgroundColor: 'rgba(190, 18, 60, 0.1)',
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            yAxisID: 'y1',
+                            tension: 0.3,
+                            fill: true,
+                            pointRadius: 4,
+                            pointBackgroundColor: '#be123c'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                usePointStyle: true,
+                                padding: 20,
+                                font: { family: "'Inter', sans-serif" }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(28, 25, 23, 0.9)',
+                            titleFont: { family: "'Inter', sans-serif", size: 13 },
+                            bodyFont: { family: "'Inter', sans-serif", size: 13 },
+                            padding: 12,
+                            cornerRadius: 6
+                        }
+                    },
+                    scales: {
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            title: { display: true, text: 'S&P 500', font: {family: 'Inter'} },
+                            grid: { color: '#e7e5e4', drawBorder: false },
+                            ticks: { color: '#78716c' }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            title: { display: true, text: '10Y Yield (%)', font: {family: 'Inter'} },
+                            grid: { drawOnChartArea: false }, // only draw grid lines for one axis to keep it clean
+                            ticks: { color: '#be123c' }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#78716c', font: {family: 'Inter'} }
+                        }
+                    }
+                }
+            });
+        }
+
+        function initVarChart() {
+            const ctx = document.getElementById('varChart').getContext('2d');
+            
+            // Visualizing the "64% surge in localized default probabilities" and +0.81 correlation
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Credit Default Prob.', 'Market Vol. (SKEW Base)', 'Liquidity Stress'],
+                    datasets: [
+                        {
+                            label: 'Baseline (Pre-Payroll)',
+                            data: [100, 100, 100], // Normalized to 100
+                            backgroundColor: '#d6d3d1', // Stone-300
+                            borderRadius: 4
+                        },
+                        {
+                            label: '14-Day Projected VaR',
+                            data: [164, 154.8, 181], // +64% surge, 154 SKEW, high correlation
+                            backgroundColor: '#0369a1', // Accent blue
+                            borderRadius: 4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: { font: { family: "'Inter', sans-serif" } }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(28, 25, 23, 0.9)',
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.parsed.y + ' (Index)';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'Risk Index (Base 100)' },
+                            grid: { color: '#e7e5e4' },
+                            ticks: { color: '#78716c' }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#1c1917', font: {weight: 'bold'} }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM v26.0 // SOVEREIGN MACRO TERMINAL</title>
+    <script src="https://cdn.tailwindcss.com?plugins=typography,forms"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['Fira Code', 'JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        term: {
+                            bg: '#030712',
+                            surface: '#0b1120',
+                            card: '#111827',
+                            border: '#1f2937',
+                            cyan: '#06b6d4',
+                            amber: '#f59e0b',
+                            red: '#ef4444',
+                            green: '#10b981',
+                            purple: '#8b5cf6',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Inter:wght@400;600;700&display=swap');
+        
+        .crt-scanlines {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.15) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.02), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.02));
+            background-size: 100% 3px, 3px 100%;
+            z-index: 999; pointer-events: none; opacity: 0.5;
+        }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 320px;
+            max-height: 400px;
+        }
+
+        .markdown-body h1 { font-size: 1.5rem; font-weight: 800; color: #fff; margin-bottom: 1rem; border-bottom: 1px solid #1f2937; padding-bottom: 0.5rem; text-transform: uppercase; }
+        .markdown-body h2 { font-size: 1.25rem; font-weight: 700; color: #06b6d4; margin-top: 1.5rem; margin-bottom: 0.75rem; }
+        .markdown-body h3 { font-size: 1rem; font-weight: 700; color: #f59e0b; margin-top: 1rem; }
+        .markdown-body p { margin-bottom: 1rem; color: #94a3b8; line-height: 1.6; }
+        .markdown-body table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; font-size: 0.75rem; }
+        .markdown-body th { background: #111827; padding: 0.5rem; color: #06b6d4; text-align: left; border: 1px solid #1f2937; }
+        .markdown-body td { padding: 0.5rem; border: 1px solid #1f2937; color: #cbd5e1; }
+        .markdown-body blockquote { border-left: 4px solid #06b6d4; padding-left: 1rem; font-style: italic; color: #e2e8f0; margin: 1rem 0; }
+        .markdown-body ul { list-style: disc; padding-left: 1.5rem; margin-bottom: 1rem; color: #94a3b8; }
+
+        .nav-btn.active { border-bottom: 2px solid #06b6d4; color: #fff; background: rgba(6, 182, 212, 0.1); }
+        .ticker-wrap { width: 100%; overflow: hidden; white-space: nowrap; }
+        .ticker-move { display: inline-block; animation: ticker 40s linear infinite; }
+        @keyframes ticker { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
+    </style>
+</head>
+<body class="bg-term-bg text-slate-300 font-sans h-screen flex flex-col overflow-hidden">
+    <div class="crt-scanlines"></div>
+
+    <!-- System Data Ticker -->
+    <div class="bg-black border-b border-term-border h-8 flex items-center shrink-0 z-50">
+        <div class="bg-term-red text-white px-3 h-full flex items-center text-[10px] font-bold tracking-tighter">LIVE FEED // 2026.08.03</div>
+        <div class="ticker-wrap flex-1">
+            <div class="ticker-move text-[11px] font-mono text-slate-400 py-1">
+                <span class="mx-4 text-term-green">S&P 500: 7,606.07 (+1.55%)</span>
+                <span class="mx-4 text-term-cyan">10Y YIELD: 4.67% (-6bps)</span>
+                <span class="mx-4 text-term-amber">VIX: 15.79</span>
+                <span class="mx-4 text-term-purple">BTC: $63,892.88</span>
+                <span class="mx-4 text-term-red">BRENT: $83.40</span>
+                <span class="mx-4 text-white">REFINANCING WALL: $3.0T CLO/CRE RISK ACTIVE</span>
+                <span class="mx-4 text-term-green">AI CAPEX: $245B PROJECTED</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="bg-term-surface border-b border-term-border px-6 py-4 flex justify-between items-center z-40">
+        <div class="flex items-center gap-4">
+            <div class="w-10 h-10 rounded bg-term-cyan flex items-center justify-center text-black font-bold text-xl shadow-[0_0_15px_rgba(6,182,212,0.4)]">A</div>
+            <div>
+                <h1 class="font-bold text-white tracking-wide text-lg">ADAM v26.0 <span class="text-term-cyan">SOVEREIGN CORE</span></h1>
+                <p class="text-[10px] font-mono text-slate-500 uppercase tracking-widest">Multi-Agent Neuro-Symbolic Risk Engine</p>
+            </div>
+        </div>
+        <nav class="flex gap-2 font-mono text-[11px]">
+            <button onclick="switchTab('dossier')" id="btn-dossier" class="nav-btn active px-4 py-2 hover:text-white transition">DOSSIERS</button>
+            <button onclick="switchTab('macro')" id="btn-macro" class="nav-btn px-4 py-2 hover:text-white transition">MACRO_VIS</button>
+            <button onclick="switchTab('simulator')" id="btn-simulator" class="nav-btn px-4 py-2 hover:text-white transition">SCENARIO_SIM</button>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 overflow-hidden relative flex">
+        
+        <!-- Module: Dossier Explorer -->
+        <div id="tab-dossier" class="tab-content flex flex-1 w-full h-full overflow-hidden">
+            <aside class="w-72 bg-term-surface border-r border-term-border flex flex-col shrink-0">
+                <div class="p-4 border-b border-term-border text-[10px] font-mono text-slate-500">AVAILABLE INTELLIGENCE</div>
+                <div id="dossierNav" class="overflow-y-auto flex-1 p-2 space-y-1">
+                    <!-- Nav items injected by JS -->
+                </div>
+            </aside>
+            <section class="flex-1 bg-term-bg overflow-y-auto p-8 lg:p-12">
+                <div class="max-w-3xl mx-auto">
+                    <div id="markdownContent" class="markdown-body">
+                        <!-- Markdown injected here -->
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Module: Macro Visualizer -->
+        <div id="tab-macro" class="tab-content hidden flex-1 w-full h-full overflow-y-auto bg-term-bg p-8">
+            <div class="max-w-6xl mx-auto space-y-8">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Key Targets -->
+                    <div class="bg-term-surface p-6 rounded border border-term-border">
+                        <h3 class="text-white font-bold mb-4 text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-chart-line text-term-cyan"></i> S&P 500 PATH vs 10Y YIELD TRAJECTORY
+                        </h3>
+                        <p class="text-xs text-slate-500 mb-6 italic">Visualizing the 2020-2027 transition from emergency liquidity to structural base-rate stability.</p>
+                        <div class="chart-container">
+                            <canvas id="chartMain"></canvas>
+                        </div>
+                    </div>
+                    <!-- Refinancing Wall -->
+                    <div class="bg-term-surface p-6 rounded border border-term-border">
+                        <h3 class="text-white font-bold mb-4 text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-triangle-exclamation text-term-amber"></i> 2026-2027 REFINANCING SHOCK
+                        </h3>
+                        <p class="text-xs text-slate-500 mb-6 italic">Coupon reset analysis: Comparing historical sub-4% rates to current market pricing (>7.5%).</p>
+                        <div class="chart-container">
+                            <canvas id="chartRefi"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div class="bg-term-surface p-6 rounded border border-term-border col-span-1">
+                        <h3 class="text-white font-bold mb-4 text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-vault text-term-green"></i> $7.89T DRY POWDER POOL
+                        </h3>
+                        <div class="chart-container" style="height: 250px;">
+                            <canvas id="chartLiquidity"></canvas>
+                        </div>
+                    </div>
+                    <div class="bg-term-surface p-6 rounded border border-term-border col-span-2">
+                        <h3 class="text-white font-bold mb-4 text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-wave-square text-term-red"></i> 12M DEFAULT RISK PROBABILITY
+                        </h3>
+                        <p class="text-xs text-slate-500 mb-4">Merton structural model outputs for Single-B corporate credit sensitivity.</p>
+                        <div class="chart-container" style="height: 250px;">
+                            <canvas id="chartRisk"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Module: Scenario Simulator -->
+        <div id="tab-simulator" class="tab-content hidden flex-1 w-full h-full overflow-y-auto bg-term-bg p-8">
+            <div class="max-w-4xl mx-auto">
+                <div class="bg-term-surface p-8 rounded-lg border border-term-border shadow-2xl">
+                    <div class="mb-8 text-center border-b border-term-border pb-6">
+                        <h2 class="text-3xl font-bold text-white mb-2">COUNTERFACTUAL ENGINE</h2>
+                        <p class="text-slate-500 text-sm italic font-mono uppercase">Stress-Test Macro Inputs for 2027 Yield Sensitivity</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+                        <!-- Inputs -->
+                        <div class="space-y-8">
+                            <div>
+                                <label class="flex justify-between text-xs font-mono text-term-cyan mb-3">
+                                    <span>BRENT CRUDE ($/bbl)</span>
+                                    <span id="valBrent" class="font-bold">$83.40</span>
+                                </label>
+                                <input type="range" id="inputBrent" min="50" max="150" value="83.4" step="0.5" oninput="runSim()" class="w-full h-2 bg-term-bg rounded-lg appearance-none cursor-pointer accent-term-cyan">
+                            </div>
+                            <div>
+                                <label class="flex justify-between text-xs font-mono text-term-amber mb-3">
+                                    <span>U.S. 10Y BENCHMARK (%)</span>
+                                    <span id="valYield" class="font-bold">4.67%</span>
+                                </label>
+                                <input type="range" id="inputYield" min="3.0" max="6.5" value="4.67" step="0.05" oninput="runSim()" class="w-full h-2 bg-term-bg rounded-lg appearance-none cursor-pointer accent-term-amber">
+                            </div>
+                            <div>
+                                <label class="flex justify-between text-xs font-mono text-term-purple mb-3">
+                                    <span>AI CAPEX SPEND ($B)</span>
+                                    <span id="valCapex" class="font-bold">$245</span>
+                                </label>
+                                <input type="range" id="inputCapex" min="100" max="500" value="245" step="5" oninput="runSim()" class="w-full h-2 bg-term-bg rounded-lg appearance-none cursor-pointer accent-term-purple">
+                            </div>
+                        </div>
+
+                        <!-- Result -->
+                        <div class="bg-term-bg p-6 rounded border border-term-border flex flex-col justify-center items-center text-center">
+                            <div class="text-[10px] font-mono text-slate-500 mb-2 uppercase">Computed 2027 S&P 500 Fair Value</div>
+                            <div id="simResult" class="text-6xl font-bold text-term-green mb-4">7,606</div>
+                            <div id="simVerdict" class="text-[11px] font-mono text-slate-400 px-4 leading-relaxed">
+                                Baseline conditions met. Equity risk premium remains compressed by AI productivity expansion.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer System Status -->
+    <footer class="bg-term-surface border-t border-term-border px-6 py-2 flex justify-between items-center text-[10px] font-mono shrink-0">
+        <div class="flex gap-6">
+            <span class="text-term-cyan"><i class="fa-solid fa-circle-check mr-1"></i> ADAM ENGINE ONLINE</span>
+            <span class="text-slate-500">LATENCY: 14ms</span>
+            <span class="text-slate-500">DATASET: Aug 2020 - Aug 2026</span>
+        </div>
+        <div class="text-slate-500">ACCESS_LEVEL: SUPREME_TERMINAL // v26.0</div>
+    </footer>
+
+    <script>
+        const reportData = [
+            {
+                id: 'outlook',
+                title: '2027 Outlook: Base Rate Shift',
+                markdown: `# THE STRUCTURAL BASE RATE REGIME (2027)
+The global financial complex enters late 2026 governed by a fundamental regime transition: **the permanent retirement of zero-cost capital**.
+
+## 12-Month Target Matrix
+| Metric | Aug 2026 Baseline | Q3 2027 Terminal Target | Macro Driver |
+| :--- | :--- | :--- | :--- |
+| **S&P 500 Index** | **7,606.07** | **8,100.00** | AI Hyperscaler Margin Expansion |
+| **U.S. 10Y Yield** | **4.67%** | **4.25%** | Slow Inflation Cooling |
+| **Spot VIX** | **15.79** | **14.50** | Volatility Harvesting Demand |
+
+> "We are witnessing a shift from interest-rate sensitivity to capital-expenditure resilience. AI hardware spending is effectively insulating the equity market from yield friction." - Adam v26.0 Simulation Verdict.`
+            },
+            {
+                id: 'history',
+                title: 'Historical Underpinnings',
+                markdown: `# ARCHIVE: 2020–2026 EVOLUTION
+To understand the 2027 outlook, one must trace the trajectory from the emergency ZIRP era to structural reality.
+
+### The ZIRP Era (2020-2021)
+* **Stimulus:** $11 Trillion global injection.
+* **Impact:** Corporations locked in 30-year debt at sub-3% coupons. This created a "delay fuse" for the refinancing cliff.
+
+### The Shock (2022-2023)
+* **Tightening:** 525 bps cumulative Fed hikes.
+* **Market reaction:** Yield curves inverted to -108 bps, yet corporate margins expanded to record peaks (16.1%) due to AI-driven efficiency gains.`
+            },
+            {
+                id: 'debt',
+                title: 'The $3.0T Refinancing Wall',
+                markdown: `# CREDIT RISK: THE MATURITY CLIFF
+Between Q3 2026 and Q4 2027, $3.0 Trillion in maturing credit facilities must be digested.
+
+### Maturity Distribution
+1. **Commercial Real Estate (CRE):** $1.62 Trillion.
+2. **Leveraged Loans (BSL):** $625 Billion.
+3. **High-Yield Corporate:** $755 Billion.
+
+**The Step-Up Calculation:**
+Average corporate coupons are jumping from historic 2.8%–3.5% bands to **7.25%–8.50%**. This creates a widening bifurcation between "Fortress" balance sheets and debt-heavy legacy retailers.`
+            },
+            {
+                id: 'infra',
+                title: 'AI Compute & Energy Boom',
+                markdown: `# THE PHYSICAL GRID BOTTLENECK
+The driver sustaining current multiples is a massive capex shift from software to hard infrastructure.
+
+* **Projected Capex:** $245 Billion (Big 5 Hyperscalers).
+* **Grid Demand:** Data center power consumption is projected to double by late 2027.
+* **Tariff Impact:** Modified Section 232 tariffs protect domestic copper smelting, benefiting players like Freeport-McMoRan (FCX).`
+            },
+            {
+                id: 'playbook',
+                title: 'Fortress & Hunt Playbook',
+                markdown: `# ASSET ALLOCATION 2026-2027
+Strategy requires a "Barbell" approach to navigate the yield plateau.
+
+### 65% Fortress (Defensive)
+* **Sovereign Floating Rate Notes:** Capture 4.65%+ yield with zero duration risk.
+* **Nuclear Energy Utilities:** Benefiting from data center PPAs.
+* **Tariff-Protected Metals:** FCX for structural commodity exposure.
+
+### 35% Hunt (Alpha)
+* **AI Infrastructure:** Transformers, cooling systems, and specialized packaging.
+* **Volatility Harvesting:** Systematic put-option overwriting during VIX spikes.`
+            }
+        ];
+
+        let activeTab = 'dossier';
+        let charts = {};
+
+        function init() {
+            renderDossierNav();
+            loadDossier('outlook');
+            initCharts();
+            runSim();
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+            document.getElementById(`btn-${tabId}`).classList.add('active');
+            activeTab = tabId;
+
+            // Trigger chart update on visibility
+            if (tabId === 'macro') {
+                Object.values(charts).forEach(c => c.resize());
+            }
+        }
+
+        function renderDossierNav() {
+            const nav = document.getElementById('dossierNav');
+            nav.innerHTML = reportData.map(d => `
+                <button onclick="loadDossier('${d.id}')" class="w-full text-left p-3 rounded hover:bg-term-card transition border border-transparent hover:border-term-border group">
+                    <div class="text-[10px] font-mono text-term-cyan opacity-50 group-hover:opacity-100">DATA_NODE_${d.id.toUpperCase()}</div>
+                    <div class="text-xs font-bold text-slate-300 group-hover:text-white">${d.title}</div>
+                </button>
+            `).join('');
+        }
+
+        function loadDossier(id) {
+            const dossier = reportData.find(d => d.id === id);
+            document.getElementById('markdownContent').innerHTML = marked.parse(dossier.markdown);
+        }
+
+        function initCharts() {
+            Chart.defaults.color = '#94a3b8';
+            Chart.defaults.font.family = "'Fira Code', monospace";
+            Chart.defaults.scale.grid.color = 'rgba(255, 255, 255, 0.05)';
+
+            // Main Macro Chart
+            charts.main = new Chart(document.getElementById('chartMain'), {
+                type: 'line',
+                data: {
+                    labels: ['2020', '2022', '2024', 'Aug 2026', '2027 TGT'],
+                    datasets: [{
+                        label: 'S&P 500 Index',
+                        data: [3380, 3839, 5900, 7606, 8100],
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16,185,129,0.1)',
+                        fill: true,
+                        tension: 0.3
+                    }, {
+                        label: '10Y Yield %',
+                        data: [0.90, 3.88, 4.25, 4.67, 4.25],
+                        borderColor: '#06b6d4',
+                        borderDash: [5, 5],
+                        yAxisID: 'y1',
+                        tension: 0.2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { title: { display: true, text: 'Index Level' } },
+                        y1: { position: 'right', title: { display: true, text: 'Yield %' } }
+                    }
+                }
+            });
+
+            // Refinancing Wall Bar
+            charts.refi = new Chart(document.getElementById('chartRefi'), {
+                type: 'bar',
+                data: {
+                    labels: ['CRE', 'Leveraged Loans', 'High Yield'],
+                    datasets: [{
+                        label: 'Old Coupon Rate (Avg)',
+                        data: [3.2, 4.5, 4.2],
+                        backgroundColor: '#3b82f6'
+                    }, {
+                        label: 'Refi Reset Rate (Est)',
+                        data: [7.8, 8.15, 7.85],
+                        backgroundColor: '#ef4444'
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+
+            // Liquidity Donut
+            charts.liq = new Chart(document.getElementById('chartLiquidity'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Gov MMF', 'Retail Prime', 'Inst Treasury', 'Repo Buffer'],
+                    datasets: [{
+                        data: [4.20, 1.80, 1.20, 0.69],
+                        backgroundColor: ['#06b6d4', '#8b5cf6', '#f59e0b', '#10b981']
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+
+            // Risk Curve
+            charts.risk = new Chart(document.getElementById('chartRisk'), {
+                type: 'line',
+                data: {
+                    labels: ['AAA', 'A', 'BBB', 'BB', 'B', 'CCC'],
+                    datasets: [{
+                        label: 'Default Probability %',
+                        data: [0.01, 0.08, 0.5, 2.2, 12.1, 67.0],
+                        borderColor: '#ef4444',
+                        backgroundColor: 'rgba(239,68,68,0.1)',
+                        fill: true
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+        }
+
+        function runSim() {
+            const brent = parseFloat(document.getElementById('inputBrent').value);
+            const yld = parseFloat(document.getElementById('inputYield').value);
+            const capex = parseFloat(document.getElementById('inputCapex').value);
+
+            document.getElementById('valBrent').innerText = `$${brent.toFixed(2)}`;
+            document.getElementById('valYield').innerText = `${yld.toFixed(2)}%`;
+            document.getElementById('valCapex').innerText = `$${capex}B`;
+
+            // Simulation Logic: 
+            // 1. High yield hurts valuation.
+            // 2. High Brent hurts margins unless Capex compensates.
+            // 3. High Capex boosts productivity.
+            let base = 7606;
+            let yieldImpact = (yld - 4.67) * -350; 
+            let brentImpact = (brent - 83.4) * -12;
+            let capexImpact = (capex - 245) * 1.8;
+            
+            let result = Math.round(base + yieldImpact + brentImpact + capexImpact);
+            document.getElementById('simResult').innerText = result.toLocaleString();
+
+            let verdict = "System Optimal. AI Infrastructure spending buffers high interest rate environment.";
+            if (yld > 5.5) verdict = "CRITICAL: Yield friction exceeds productivity gains. Valuation compression likely.";
+            if (brent > 110) verdict = "WARNING: Energy-driven margin erosion detected across non-tech sectors.";
+            
+            document.getElementById('simVerdict').innerText = verdict;
+            document.getElementById('simResult').style.color = result >= 7606 ? '#10b981' : '#ef4444';
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>
