@@ -1,0 +1,295 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "MarketMayhemDashboardPayload",
+  "description": "Enterprise-ready refined JSON schema for the daily Market Mayhem dashboard data payload, optimized for automated static site deployment, Tailwind UI, and Chart.js integration.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "timestamp",
+    "telemetry",
+    "charts",
+    "traces",
+    "simulator"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "description": "Semantic versioning of the schema structure.",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 UTC timestamp of the pipeline execution."
+    },
+    "telemetry": {
+      "type": "object",
+      "description": "Enriched operational metrics divided into raw data for formula execution and structured presentation objects for Tailwind UI components.",
+      "required": ["metrics", "cards"],
+      "properties": {
+        "metrics": {
+          "type": "object",
+          "description": "Raw numeric data points for programmatic logic.",
+          "required": [
+            "spx_level",
+            "10y_yield_bps",
+            "hy_spread_bps",
+            "cre_pd_merton"
+          ],
+          "properties": {
+            "spx_level": {
+              "type": "number",
+              "description": "S&P 500 Index closing level."
+            },
+            "10y_yield_bps": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "US 10-Year Treasury yield in basis points."
+            },
+            "hy_spread_bps": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "High Yield credit spread in basis points."
+            },
+            "cre_pd_merton": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "description": "Commercial Real Estate default probability calculated via Merton Heuristic."
+            }
+          }
+        },
+        "cards": {
+          "type": "array",
+          "description": "Pre-hydrated list of stats cards directly bindable to Tailwind UI 'Stats' components.",
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "name",
+              "value",
+              "formatted_value",
+              "change",
+              "change_percent",
+              "change_type",
+              "status_level",
+              "unit"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "Unique identifier of the metric card."
+              },
+              "name": {
+                "type": "string",
+                "description": "Display label of the card."
+              },
+              "value": {
+                "type": "number",
+                "description": "Current numeric value of the metric."
+              },
+              "formatted_value": {
+                "type": "string",
+                "description": "Pre-formatted string representation for immediate frontend presentation."
+              },
+              "change": {
+                "type": "string",
+                "description": "Absolute delta change with sign."
+              },
+              "change_percent": {
+                "type": "number",
+                "description": "Percentage change value."
+              },
+              "change_type": {
+                "type": "string",
+                "enum": ["increase", "decrease", "steady"],
+                "description": "Controls conditional text/icon colors in Tailwind."
+              },
+              "status_level": {
+                "type": "string",
+                "enum": ["normal", "warning", "critical"],
+                "description": "Indicator of risk threshold violation for alerting badges."
+              },
+              "unit": {
+                "type": "string",
+                "description": "Unit label of the metric."
+              }
+            }
+          }
+        }
+      }
+    },
+    "charts": {
+      "type": "object",
+      "description": "Time-series database structured for native integration with Chart.js.",
+      "required": ["time_series_labels", "datasets"],
+      "properties": {
+        "time_series_labels": {
+          "type": "array",
+          "description": "X-Axis dates list for time cartesian scale.",
+          "items": {
+            "type": "string",
+            "format": "date"
+          }
+        },
+        "datasets": {
+          "type": "object",
+          "description": "Pre-grouped datasets containing coordinate arrays (x: date, y: value).",
+          "required": ["spx", "yield_10y", "hy_spread", "cre_pd"],
+          "properties": {
+            "spx": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["x", "y"],
+                "properties": {
+                  "x": { "type": "string", "format": "date" },
+                  "y": { "type": "number" }
+                }
+              }
+            },
+            "yield_10y": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["x", "y"],
+                "properties": {
+                  "x": { "type": "string", "format": "date" },
+                  "y": { "type": "integer" }
+                }
+              }
+            },
+            "hy_spread": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["x", "y"],
+                "properties": {
+                  "x": { "type": "string", "format": "date" },
+                  "y": { "type": "integer" }
+                }
+              }
+            },
+            "cre_pd": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["x", "y"],
+                "properties": {
+                  "x": { "type": "string", "format": "date" },
+                  "y": { "type": "number", "minimum": 0, "maximum": 1 }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "traces": {
+      "type": "object",
+      "description": "Calculation provenance tracking logs.",
+      "required": ["provenance_edges", "pipeline_logs"],
+      "properties": {
+        "provenance_edges": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["source", "timestamp", "status"],
+            "properties": {
+              "source": {
+                "type": "string",
+                "description": "Plugin or module name."
+              },
+              "timestamp": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "status": {
+                "type": "string",
+                "enum": ["success", "fallback", "error"]
+              },
+              "cluster_id": {
+                "type": "string",
+                "description": "Dynamic cluster assigned by MarketCatalystPlugin."
+              },
+              "confidence_score": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "regime": {
+                "type": "string",
+                "description": "Copula engine market regime output."
+              },
+              "crypto_spx_corr": {
+                "type": "number",
+                "minimum": -1,
+                "maximum": 1,
+                "description": "Calculated Copula asset correlation metric."
+              }
+            }
+          }
+        },
+        "pipeline_logs": {
+          "type": "array",
+          "description": "Structured execution logs for developer terminal displays.",
+          "items": {
+            "type": "object",
+            "required": ["timestamp", "component", "level", "message"],
+            "properties": {
+              "timestamp": { "type": "string", "format": "date-time" },
+              "component": { "type": "string" },
+              "level": { "type": "string", "enum": ["DEBUG", "INFO", "WARNING", "ERROR"] },
+              "message": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "simulator": {
+      "type": "object",
+      "description": "Inputs and equations bound to active scenario states.",
+      "required": [
+        "merton_active_scenario",
+        "delta_spread_shock",
+        "interactive_parameters"
+      ],
+      "properties": {
+        "merton_active_scenario": {
+          "type": "string",
+          "description": "The name of the currently active Merton model scenario."
+        },
+        "delta_spread_shock": {
+          "type": "integer",
+          "description": "Simulated base credit spread shock in bps."
+        },
+        "interactive_parameters": {
+          "type": "object",
+          "description": "Pre-computed variables allowing real-time calculations.",
+          "required": [
+            "pd_baseline_t_minus_1",
+            "spx_ratio_t",
+            "euler_constant"
+          ],
+          "properties": {
+            "pd_baseline_t_minus_1": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "description": "Baseline default probability of the previous day."
+            },
+            "spx_ratio_t": {
+              "type": "number",
+              "minimum": 0,
+              "description": "Closing price ratio between previous and current S&P 500 levels."
+            },
+            "euler_constant": {
+              "type": "number",
+              "description": "Denominator constant mapping to Merton exponential spreads."
+            }
+          }
+        }
+      }
+    }
+  }
+}
