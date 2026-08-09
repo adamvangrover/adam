@@ -4,6 +4,8 @@
     <picture>
       <source media="(prefers-color-scheme: dark)" srcset=".github/images/logo-dark.svg">
       <source media="(prefers-color-scheme: light)" srcset=".github/images/logo-light.svg">
+      <img width="1024" height="559" alt="image" src="https://github.com/user-attachments/assets/f64ec450-3676-4b4c-a068-bc4aab7f39c0" />
+
       <img alt="Adam OS Logo" src=".github/images/logo-dark.svg" width="50%">
     </picture>
   </a>
