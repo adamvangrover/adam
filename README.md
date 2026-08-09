@@ -162,8 +162,13 @@ graph TD
         Surv1 & Surv2 --> TemporalBus[Temporal Event Bus]
     end
 
+    subgraph "Integration Layer"
+        TemporalBus -.-> PDIL_Gatekeeper[PDIL: Probabilistic-to-Deterministic Gatekeeper]
+    end
+
     subgraph "System 2: Neuro-Symbolic Graph (DAG)"
         Nexus ==>|Deep Dive| Planner[DAG State Machine]
+        PDIL_Gatekeeper -->|Structured Inputs| Planner
         Planner --> Underwriter[Underwriting Agent]
         Planner --> Sentinel[Sentinel Security Agent]
 
@@ -185,6 +190,7 @@ This framework is built specifically targeting Broadly Syndicated Loans (BSL), i
 * **Bifurcated Environments:** Strict separation between Path A (Reliability & Risk Control) and Path B (Lab/Velocity Iteration).
 * **Implied Structural PD:** Probability of Default (PD) is structurally implied by the generated facility rating. The system eliminates redundant PD calculations to ensure clean, institutional-grade output artifacts (HDKG).
 * **Deterministic Governance:** Business logic (covenants, financial thresholds) is evaluated deterministically via `jsonLogic` in `adam_os/contexts/governance/rules.jsonLogic`, never hardcoded in Python.
+* **Multimodal Compatibility:** Fully equipped to process and synthesize complex inputs such as charts, images, and audio transcripts via the System 1 Data Layer.
 * **W3C PROV-O Audit Trails:** Every decision generates an immutable telemetry log with a verifiable reasoning trace.
 
 ## 📂 Directory Structure
@@ -354,6 +360,7 @@ This framework is built for institutional-grade utility, specifically targeting 
 ### The Research Frontier
 *   **Neuro-Symbolic Routing:** Using open-weight models to parse semantic chaos and automatically route extracted parameters into strict, non-LLM pricing engines via the PDIL.
 *   **Dynamic Covenant Stress-Testing:** Real-time translation of NLP-extracted corporate structural changes into immediate covenant breach simulations.
+*   **Multimodal Compatibility:** Comprehensive support for multimodal data ingestion, enabling real-time processing of complex market signals including images (e.g., charts, architectural diagrams) and audio transcripts via the System 1 Data Layer.
 
 ### Experimental Integrations
 *   **Quantum Pricing Integration:** Active development utilizing Quantum Amplitude Estimation (QAE) and Hamiltonian-based optimization for simulating extreme market tail-risks.
@@ -399,8 +406,14 @@ graph TD
         SwarmManager -->|Spawn| SentimentEngine["Semantic NLP Engine"]
     end
 
+    %% 3.5. Governance & Integration
+    subgraph Integration_Layer [Integration Layer]
+        SwarmManager -.->|Unstructured Data| PDIL["PDIL (Probabilistic-to-Deterministic Gatekeeper)"]
+    end
+
     %% 4. System 2: Deep Reasoning
     subgraph System_2_Reasoning [System 2: Neuro-Symbolic DAG Graph]
+        PDIL -->|Structured Inputs| Planner
         MetaOrchestrator -->|Complex Query| Planner["DAG Reasoning Planner"]
         Planner -->|Credit| CreditSentinel["Credit Sentinel (SNC, VaR, LGD, PD)"]
         Planner -->|Covenants| CovenantTester["Dynamic Stress-Tester"]

@@ -16,20 +16,26 @@ Adam v26.0 is designed as a **Neuro-Symbolic Sovereign**, composed of three dist
 *   **Example:** [examples/core_functionality/02_compute_layer.py](../../examples/core_functionality/02_compute_layer.py)
 
 ## 3. Data Layer (System 1)
-*   **Role:** Ingestion, Perception, and ETL.
+*   **Role:** Ingestion, Multimodal Perception, and ETL.
 *   **Core Component:** `core.ingestion.semantic_chunker`, `core.knowledge_graph`
-*   **Function:** Ingests raw unstructured data (PDFs, News, Feeds), chunks it semantically, and stores it in the Knowledge Graph or Vector Store.
+*   **Function:** Ingests raw unstructured and multimodal data (PDFs, News, Feeds, Images, Audio Transcripts), chunks it semantically, and stores it in the Knowledge Graph or Vector Store.
 *   **Example:** [examples/core_functionality/03_data_layer.py](../../examples/core_functionality/03_data_layer.py)
+
+## 4. Integration Layer
+*   **Role:** Governance, Validation, and State Gatekeeping.
+*   **Core Component:** `core.governance.pdil_gatekeeper`
+*   **Function:** The **Probabilistic-to-Deterministic Integration Layer (PDIL)** enforces domain boundaries, verifying that any probabilistic outputs from Neural Swarms strictly map to deterministic inputs expected by the Compute or Intelligence Layers.
 
 ---
 
 ## Inter-Layer Communication
 
-While decoupled, the layers communicate via standard JSON contracts:
+While decoupled, the layers communicate via standard JSON contracts routed through the PDIL:
 
-1.  **Data Layer** produces **Artifacts** (Cleaned JSON/Text).
-2.  **Compute Layer** consumes Artifacts to produce **Metrics** (Risk Scores, Valuations).
-3.  **Intelligence Layer** consumes Metrics to produce **Decisions** (Buy/Sell, Approve/Reject).
+1.  **Data Layer** produces **Artifacts** (Cleaned JSON/Text/Extracted Multimodal Features).
+2.  **Integration Layer (PDIL)** validates and transforms Artifacts into structured **Deterministic Parameters**.
+3.  **Compute Layer** consumes Parameters to produce **Metrics** (Risk Scores, Valuations).
+4.  **Intelligence Layer** consumes Metrics to produce **Decisions** (Buy/Sell, Approve/Reject).
 
 ## Provenance & Logging
 
