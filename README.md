@@ -57,6 +57,8 @@ The era of the "LLM Wrapper" is over. Institutional finance faces an **Epistemol
 *   **Execution:** Stateful, tool-augmented (MCP), and highly reflective. Uses Qdrant for Just-In-Time (JIT) memory retrieval over trailing 12-month SEC filings.
 
 ## 📐 System Architecture (v30.1)
+<img width="1024" height="559" alt="image" src="https://github.com/user-attachments/assets/61fd5a60-61a0-4dbe-9b26-21b2fe48e496" />
+
 
 ```mermaid
 graph TD
