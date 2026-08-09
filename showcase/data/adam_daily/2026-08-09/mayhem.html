@@ -1,0 +1,1389 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MARKET MAYHEM // ADAM v30.4 INSTITUTIONAL CREDIT & VALUATION TERMINAL</title>
+
+    <script src="https://cdn.tailwindcss.com?plugins=typography,forms"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['Fira Code', 'JetBrains Mono', 'monospace'],
+                        display: ['Oswald', 'Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        term: {
+                            bg: '#030712',
+                            surface: '#0b1120',
+                            card: '#111827',
+                            border: '#1f2937',
+                            subtle: '#374151',
+                            cyan: '#06b6d4',
+                            blue: '#3b82f6',
+                            red: '#ef4444',
+                            amber: '#f59e0b',
+                            green: '#10b981',
+                            purple: '#8b5cf6',
+                            pink: '#ec4899',
+                            gold: '#fbbf24',
+                            neon: '#39ff14'
+                        }
+                    },
+                    animation: {
+                        'ticker': 'ticker 45s linear infinite',
+                        'pulse-fast': 'pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        ticker: { '0%': { transform: 'translateX(100%)' }, '100%': { transform: 'translateX(-100%)' } }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&family=Inter:wght@300;400;600;700;800&family=Oswald:wght@500;600;700&display=swap');
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #030712; }
+        ::-webkit-scrollbar-thumb { background: #1f2937; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #06b6d4; }
+
+        .crt-scanlines {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+            background-size: 100% 3px, 6px 100%;
+            z-index: 999; pointer-events: none; opacity: 0.4;
+        }
+
+        .glass-panel {
+            background: rgba(11, 17, 32, 0.88);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        .tab-btn { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); border-bottom: 2px solid transparent; }
+        .tab-btn.active {
+            background: rgba(6, 182, 212, 0.15);
+            border-bottom: 2px solid #06b6d4;
+            color: #ffffff;
+        }
+
+        .table-active {
+            background-color: rgba(6, 182, 212, 0.15) !important;
+            border-left: 3px solid #06b6d4;
+        }
+
+        input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; margin: 8px 0; }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none; height: 14px; width: 14px;
+            border-radius: 50%; background: #06b6d4;
+            cursor: pointer; margin-top: -5px; box-shadow: 0 0 10px rgba(6,182,212,0.5);
+        }
+        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; cursor: pointer; background: #1f2937; border-radius: 2px; }
+
+        .math-block { font-family: 'Fira Code', monospace; background: rgba(0,0,0,0.6); padding: 10px; border-radius: 6px; border: 1px solid #1f2937; color: #06b6d4; font-size: 0.85rem; line-height: 1.5; }
+    </style>
+</head>
+<body class="bg-term-bg text-slate-300 font-sans h-screen flex flex-col overflow-hidden selection:bg-term-cyan selection:text-black relative">
+
+    <div id="crtOverlay" class="crt-scanlines"></div>
+    <div id="toast-container" class="fixed bottom-6 right-6 z-[1000] flex flex-col gap-3 pointer-events-none"></div>
+
+    <div class="bg-black/95 border-b border-term-border h-7 flex items-center relative z-20 text-[10px] sm:text-xs font-mono shrink-0">
+        <div class="bg-term-red text-white px-3 h-full flex items-center font-bold tracking-wider shrink-0 shadow-md z-10">
+            <i class="fa-solid fa-bolt mr-2 animate-pulse"></i> LIVE SENSORS // EXAM MONITOR
+        </div>
+        <div class="overflow-hidden w-full relative flex items-center h-full">
+            <div class="animate-ticker whitespace-nowrap text-slate-300 flex items-center gap-8 text-[11px]">
+                <span><strong class="text-term-green">S&P 500:</strong> 7,606.07 <span class="text-term-green font-bold">(+1.55% // ATH TARGET: 8,100)</span></span>
+                <span><strong class="text-term-cyan">10Y TREASURY:</strong> 4.67% <span class="text-term-cyan font-bold">(-6 bps // BASE RATE FLOOR)</span></span>
+                <span><strong class="text-term-amber">VIX INDEX:</strong> 15.79 <span class="text-term-green font-bold">(-2.31%)</span></span>
+                <span><strong class="text-term-purple">BITCOIN:</strong> $63,892.88 <span class="text-term-green font-bold">(+0.62%)</span></span>
+                <span><strong class="text-term-red">BRENT CRUDE:</strong> $83.40 <span class="text-term-red font-bold">(-7.58%)</span></span>
+                <span><strong class="text-term-gold">MONEY MARKETS:</strong> $7.893 Trillion <span class="text-slate-400 font-bold">(DRY POWDER)</span></span>
+                <span><strong class="text-term-neon">SYSTEM STATE:</strong> ADAM v30.4 QUANT & EXAM KERNEL ACTIVE</span>
+            </div>
+        </div>
+    </div>
+
+    <header class="bg-term-surface border-b border-term-border px-4 py-3 flex items-center justify-between z-20 shrink-0 shadow-xl">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-term-cyan via-term-blue to-term-purple flex items-center justify-center text-black font-display font-bold text-2xl shadow-[0_0_15px_rgba(6,182,212,0.3)]">
+                M
+            </div>
+            <div>
+                <div class="flex items-center gap-2">
+                    <h1 class="font-display font-bold text-white text-lg tracking-wider">MARKET MAYHEM // ADAM v30.4</h1>
+                    <span class="bg-term-cyan/20 text-term-cyan border border-term-cyan/30 text-[10px] font-mono px-2 py-0.5 rounded font-bold hidden sm:inline-block">REGULATORY EXAM & UNDERWRITING SUITE</span>
+                </div>
+                <p class="text-[10px] font-mono text-slate-400 flex items-center gap-2">
+                    <span>NODE: Sovereign Credit Risk & Supervisory Review Kernel</span>
+                    <span class="text-term-green hidden md:inline-block">● 14 BSL Exam Assets Tracked</span>
+                </p>
+            </div>
+        </div>
+
+        <nav class="hidden xl:flex items-center gap-1 font-mono text-[11px] bg-term-bg/80 p-1 rounded-lg border border-term-border shadow-inner">
+            <button onclick="switchTab('tab-workbench')" id="btn-tab-workbench" class="tab-btn active px-3 py-1.5 rounded-md font-medium text-slate-300 hover:text-white flex items-center gap-1.5">
+                <i class="fa-solid fa-file-invoice-dollar text-term-cyan"></i> Template Studio
+            </button>
+            <button onclick="switchTab('tab-universe')" id="btn-tab-universe" class="tab-btn px-3 py-1.5 rounded-md font-medium text-slate-300 hover:text-white flex items-center gap-1.5">
+                <i class="fa-solid fa-list-check text-term-green"></i> BSL Exam Universe
+            </button>
+            <button onclick="switchTab('tab-models')" id="btn-tab-models" class="tab-btn px-3 py-1.5 rounded-md font-medium text-slate-300 hover:text-white flex items-center gap-1.5">
+                <i class="fa-solid fa-calculator text-term-amber"></i> Quant Models
+            </button>
+            <button onclick="switchTab('tab-waterfall')" id="btn-tab-waterfall" class="tab-btn px-3 py-1.5 rounded-md font-medium text-slate-300 hover:text-white flex items-center gap-1.5">
+                <i class="fa-solid fa-layer-group text-term-purple"></i> Dynamic Waterfall
+            </button>
+            <button onclick="switchTab('tab-montecarlo')" id="btn-tab-montecarlo" class="tab-btn px-3 py-1.5 rounded-md font-medium text-slate-300 hover:text-white flex items-center gap-1.5">
+                <i class="fa-solid fa-chart-pie text-term-blue"></i> Monte Carlo & VaR
+            </button>
+            <button onclick="switchTab('tab-contagion')" id="btn-tab-contagion" class="tab-btn px-3 py-1.5 rounded-md font-medium text-slate-300 hover:text-white flex items-center gap-1.5">
+                <i class="fa-solid fa-virus text-term-red"></i> Contagion & Tail Risks
+            </button>
+            <button onclick="switchTab('tab-portfolio')" id="btn-tab-portfolio" class="tab-btn px-3 py-1.5 rounded-md font-medium text-slate-300 hover:text-white flex items-center gap-1.5">
+                <i class="fa-solid fa-vault text-term-gold"></i> Portfolio Telemetry
+            </button>
+        </nav>
+
+        <div class="flex items-center gap-3">
+            <button onclick="toggleCRT()" title="Toggle Scanlines" class="p-2 rounded bg-term-bg border border-term-border hover:border-term-cyan text-slate-400 hover:text-term-cyan transition text-xs font-mono">
+                <i class="fa-solid fa-tv"></i>
+            </button>
+            <button onclick="openAITerminal()" class="bg-gradient-to-r from-term-cyan to-term-blue text-black font-mono font-bold text-[11px] px-4 py-2 rounded hover:brightness-110 transition shadow-lg shadow-term-cyan/20 flex items-center gap-2">
+                <i class="fa-solid fa-brain"></i> ADAM AI
+            </button>
+        </div>
+    </header>
+
+    <div class="flex flex-1 overflow-hidden relative">
+
+        <!-- ========================================== -->
+        <!-- TAB 1: INTERACTIVE WORKBENCH & TEMPLATES   -->
+        <!-- ========================================== -->
+        <div id="tab-workbench" class="tab-content w-full h-full flex flex-col lg:flex-row overflow-hidden">
+            <aside class="w-full lg:w-96 bg-term-surface border-b lg:border-b-0 lg:border-r border-term-border flex flex-col shrink-0 overflow-y-auto p-4 space-y-4">
+                <div>
+                    <h3 class="font-mono text-xs font-bold text-term-cyan uppercase tracking-wider mb-2"><i class="fa-solid fa-sliders mr-2"></i> Deal & Supervisory Parameters</h3>
+                    
+                    <!-- TARGET BSL ASSET SELECTOR DROPDOWN -->
+                    <div class="mb-3 font-mono text-xs">
+                        <label for="targetLoanSelect" class="text-term-gold block mb-1 font-bold"><i class="fa-solid fa-crosshairs mr-1"></i> Active Exam Target Asset (14 BSLs)</label>
+                        <select id="targetLoanSelect" class="w-full bg-black border border-term-gold/50 rounded px-3 py-2 text-term-gold font-bold outline-none focus:border-term-cyan transition" onchange="loadTargetLoan(this.value)">
+                            <!-- Populated dynamically via JS -->
+                        </select>
+                    </div>
+
+                    <div class="space-y-3 font-mono text-xs">
+                        <div>
+                            <label class="text-slate-400 block mb-1">Borrower Entity Name</label>
+                            <input type="text" id="w-borrower" value="Apex Health Systems LLC" class="w-full bg-black border border-term-border rounded px-3 py-2 text-white outline-none focus:border-term-cyan" oninput="recalculateWorkbench()">
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="text-slate-400 block mb-1">Facility Size ($M)</label>
+                                <input type="number" id="w-facility" value="450" class="w-full bg-black border border-term-border rounded px-3 py-2 text-white outline-none focus:border-term-cyan" oninput="recalculateWorkbench()">
+                            </div>
+                            <div>
+                                <label class="text-slate-400 block mb-1">Leverage (x)</label>
+                                <input type="number" id="w-leverage" value="5.8" step="0.1" class="w-full bg-black border border-term-border rounded px-3 py-2 text-white outline-none focus:border-term-cyan" oninput="recalculateWorkbench()">
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="text-slate-400 block mb-1">EBITDA ($M)</label>
+                                <input type="number" id="w-ebitda" value="77.5" step="0.1" class="w-full bg-black border border-term-border rounded px-3 py-2 text-white outline-none focus:border-term-cyan" oninput="recalculateWorkbench()">
+                            </div>
+                            <div>
+                                <label class="text-slate-400 block mb-1">ICR (x)</label>
+                                <input type="number" id="w-icr" value="1.85" step="0.05" class="w-full bg-black border border-term-border rounded px-3 py-2 text-white outline-none focus:border-term-cyan" oninput="recalculateWorkbench()">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="text-slate-400 block mb-1">Select Supervisory Report Type</label>
+                            <select id="w-template-type" class="w-full bg-black border border-term-border rounded px-3 py-2 text-white outline-none focus:border-term-cyan" onchange="recalculateWorkbench()">
+                                <option value="memo">Regulatory Rating Justification Memo</option>
+                                <option value="underwriting">Underwriting & Escalation Review</option>
+                                <option value="quarterly">Quarterly Leveraged Loan Monitoring Workpaper</option>
+                                <option value="annual">Comprehensive Annual Credit Review</option>
+                                <option value="exam">Regulatory Exam Scope & Deficiency Report</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-slate-400 block mb-1">Assigned Internal Risk Rating</label>
+                            <select id="w-rating" class="w-full bg-black border border-term-border rounded px-3 py-2 text-white outline-none focus:border-term-cyan" onchange="recalculateWorkbench()">
+                                <option value="Pass - Satisfactory (2)">Pass - Satisfactory (2)</option>
+                                <option value="Pass - Watchlist (3)">Pass - Watchlist (3)</option>
+                                <option value="Special Mention (4)">Special Mention (4)</option>
+                                <option value="Substandard (5)" selected>Substandard (5)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-4 border-t border-term-border flex gap-2">
+                    <button onclick="recalculateWorkbench()" class="flex-1 py-2.5 bg-term-cyan hover:bg-cyan-400 text-black font-mono font-bold text-xs rounded transition flex items-center justify-center gap-2 shadow-[0_0_10px_rgba(6,182,212,0.3)]">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> GENERATE MEMO
+                    </button>
+                    <button onclick="copyWorkbenchReport()" class="px-3 py-2.5 bg-term-card hover:bg-term-border text-slate-300 rounded border border-term-border transition text-xs">
+                        <i class="fa-solid fa-copy text-term-cyan"></i>
+                    </button>
+                </div>
+            </aside>
+
+            <main class="flex-1 bg-term-bg overflow-y-auto p-4 md:p-8 relative">
+                <div class="max-w-4xl mx-auto">
+                    <div class="glass-panel p-6 md:p-8 rounded-xl border border-term-border shadow-2xl relative">
+                        <div class="absolute top-4 right-4 text-[10px] font-mono text-slate-500 bg-black/40 px-2 py-1 rounded border border-term-border">ADAM v30.4 GOVERNANCE TEMPLATE</div>
+                        <div id="workbenchOutput" class="markdown-body space-y-4">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- TAB 2: BSL EXAM UNIVERSE & TARGETS         -->
+        <!-- ========================================== -->
+        <div id="tab-universe" class="tab-content hidden w-full h-full overflow-y-auto p-4 md:p-8 bg-term-bg">
+            <div class="max-w-7xl mx-auto space-y-6">
+                <div class="glass-panel p-6 rounded-xl border-l-4 border-term-green flex flex-wrap justify-between items-center gap-4">
+                    <div>
+                        <h2 class="text-2xl font-display font-bold text-white tracking-wide"><i class="fa-solid fa-list-check text-term-green mr-2"></i> BROADLY SYNDICATED LOAN EXAM UNIVERSE (14 TARGETS)</h2>
+                        <p class="text-xs font-mono text-slate-400 mt-1">Supervisory review target list for federal banking examiners (Fed / OCC) under the 2026-2027 Refinancing Wall. Click any row to load target into active terminal state.</p>
+                    </div>
+                    <div class="flex items-center gap-3 font-mono text-xs">
+                        <input type="text" id="examSearch" placeholder="Filter by CUSIP or Borrower..." class="bg-black border border-term-border rounded px-3 py-2 text-white outline-none focus:border-term-cyan" oninput="filterExamUniverse()">
+                        <select id="examFilterRating" class="bg-black border border-term-border rounded px-3 py-2 text-white outline-none focus:border-term-cyan" onchange="filterExamUniverse()">
+                            <option value="ALL">All Ratings</option>
+                            <option value="Watchlist">Watchlist</option>
+                            <option value="Special Mention">Special Mention</option>
+                            <option value="Substandard">Substandard</option>
+                            <option value="Pass">Pass</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="glass-panel p-6 rounded-xl space-y-4">
+                    <div class="overflow-x-auto">
+                        <table id="bslTable" class="w-full text-left font-mono text-xs">
+                            <thead>
+                                <tr class="bg-term-card text-term-cyan border-b border-term-border">
+                                    <th class="p-3">Borrower / CUSIP</th>
+                                    <th class="p-3">Sector</th>
+                                    <th class="p-3">Facility ($M)</th>
+                                    <th class="p-3">Leverage</th>
+                                    <th class="p-3">ICR</th>
+                                    <th class="p-3">Risk Rating</th>
+                                    <th class="p-3">Covenants</th>
+                                    <th class="p-3">Exam Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="examTableBody" class="divide-y divide-term-border/50">
+                                <!-- Populated dynamically via TARGET_BSL_LOANS array -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- TAB 3: QUANT MODELS (PD / LGD / DCF)       -->
+        <!-- ========================================== -->
+        <div id="tab-models" class="tab-content hidden w-full h-full overflow-y-auto p-4 md:p-8 bg-term-bg">
+            <div class="max-w-7xl mx-auto space-y-6">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+                    <!-- Left: Inputs -->
+                    <div class="lg:col-span-4 glass-panel p-6 rounded-xl space-y-6">
+                        <h3 class="text-sm font-bold text-white uppercase font-display border-b border-white/10 pb-2"><i class="fa-solid fa-sliders text-term-cyan mr-2"></i>Model Parameter Calibration</h3>
+
+                        <div class="space-y-4 font-mono text-xs">
+                            <div>
+                                <div class="flex justify-between mb-1"><span class="text-slate-400">Leverage (Debt/EBITDA)</span><span id="m-lev-val" class="text-white">5.8x</span></div>
+                                <input type="range" id="m-lev" min="1" max="10" step="0.1" value="5.8" oninput="runQuantModels()">
+                            </div>
+                            <div>
+                                <div class="flex justify-between mb-1"><span class="text-slate-400">Interest Coverage (ICR)</span><span id="m-icr-val" class="text-white">1.85x</span></div>
+                                <input type="range" id="m-icr" min="0.5" max="10" step="0.05" value="1.85" oninput="runQuantModels()">
+                            </div>
+                            <div>
+                                <div class="flex justify-between mb-1"><span class="text-slate-400">Asset Tangibility (%)</span><span id="m-tang-val" class="text-white">35%</span></div>
+                                <input type="range" id="m-tang" min="5" max="95" step="5" value="35" oninput="runQuantModels()">
+                            </div>
+                            <div class="pt-4 border-t border-term-border space-y-3">
+                                <div><label class="text-slate-400 block mb-1">Base FCF ($M)</label><input type="number" id="m-fcf" value="77.5" class="w-full bg-black border border-term-border rounded px-3 py-2 text-white" onchange="runQuantModels()"></div>
+                                <div><label class="text-slate-400 block mb-1">Growth Y1-Y5 (%)</label><input type="number" id="m-g1" value="6" class="w-full bg-black border border-term-border rounded px-3 py-2 text-white" onchange="runQuantModels()"></div>
+                                <div><label class="text-slate-400 block mb-1">WACC (%)</label><input type="number" id="m-wacc" value="9.5" step="0.5" class="w-full bg-black border border-term-border rounded px-3 py-2 text-white" onchange="runQuantModels()"></div>
+                                <div><label class="text-slate-400 block mb-1">Net Debt ($M)</label><input type="number" id="m-netdebt" value="449.5" class="w-full bg-black border border-term-border rounded px-3 py-2 text-white" onchange="runQuantModels()"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Model Outputs -->
+                    <div class="lg:col-span-8 space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="glass-panel p-5 rounded-xl text-center border-l-4 border-term-red">
+                                <div class="text-[10px] font-mono text-slate-400 uppercase">1-Year Probability of Default (PD)</div>
+                                <div id="out-pd" class="text-4xl font-display font-bold text-term-red mt-2">10.00%</div>
+                                <div id="out-rating" class="mt-2 text-xs font-mono font-bold text-term-red bg-term-red/10 px-2 py-0.5 rounded inline-block">IMPLIED RATING: CCC</div>
+                            </div>
+                            <div class="glass-panel p-5 rounded-xl text-center border-l-4 border-term-amber">
+                                <div class="text-[10px] font-mono text-slate-400 uppercase">Loss Given Default (LGD)</div>
+                                <div id="out-lgd" class="text-4xl font-display font-bold text-term-amber mt-2">83.6%</div>
+                                <div class="mt-2 text-xs font-mono text-slate-400">Recovery Rate: <span id="out-rr" class="text-white font-bold">16.4%</span></div>
+                            </div>
+                            <div class="glass-panel p-5 rounded-xl text-center border-l-4 border-term-green">
+                                <div class="text-[10px] font-mono text-slate-400 uppercase">Implied Enterprise Value (DCF)</div>
+                                <div id="out-ev" class="text-3xl font-display font-bold text-term-green mt-2">$1,240M</div>
+                                <div class="mt-2 text-xs font-mono text-slate-400">Equity Value: <span id="out-eq" class="text-white font-bold">$791M</span></div>
+                            </div>
+                        </div>
+
+                        <!-- DCF Chart -->
+                        <div class="glass-panel p-6 rounded-xl shadow-lg">
+                            <h3 class="font-display text-sm text-white mb-3 tracking-wide"><i class="fa-solid fa-chart-bar text-term-cyan mr-2"></i> Discounted Cash Flow & Terminal Value Projection</h3>
+                            <div class="h-64 relative w-full"><canvas id="quantDcfChart"></canvas></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- TAB 4: DYNAMIC WATERFALL & COLLATERAL      -->
+        <!-- ========================================== -->
+        <div id="tab-waterfall" class="tab-content hidden w-full h-full overflow-y-auto p-4 md:p-8 bg-term-bg">
+            <div class="max-w-7xl mx-auto space-y-6">
+                <div class="glass-panel p-6 rounded-xl border-l-4 border-term-purple flex flex-wrap justify-between items-center gap-4">
+                    <div>
+                        <h2 class="text-2xl font-display font-bold text-white tracking-wide"><i class="fa-solid fa-layer-group text-term-purple mr-2"></i> DYNAMIC CAPITAL STRUCTURE & COLLATERAL WATERFALL</h2>
+                        <p class="text-xs font-mono text-slate-400 mt-1">Stress-test recovery rates based on custom credit agreement terms, subordination, and collateral realization haircuts.</p>
+                    </div>
+                    <div class="flex items-center gap-4 font-mono text-xs">
+                        <div><label class="text-slate-400 mr-2">Enterprise Asset Value ($M):</label><input type="number" id="wf-assetval" value="585" class="w-28 bg-black border border-term-border rounded px-2 py-1 text-white" onchange="runWaterfallSimulation()"></div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <div class="lg:col-span-4 glass-panel p-6 rounded-xl space-y-4 font-mono text-xs">
+                        <h3 class="font-bold text-white uppercase border-b border-white/10 pb-2"><i class="fa-solid fa-sliders text-term-cyan mr-2"></i> Collateral Haircut Adjustments</h3>
+                        <div>
+                            <div class="flex justify-between mb-1"><span class="text-slate-400">Accounts Receivable Realization</span><span id="wf-ar-val" class="text-white">80%</span></div>
+                            <input type="range" id="wf-ar" min="20" max="100" value="80" oninput="runWaterfallSimulation()">
+                        </div>
+                        <div>
+                            <div class="flex justify-between mb-1"><span class="text-slate-400">Machinery & Equipment Realization</span><span id="wf-eq-val" class="text-white">45%</span></div>
+                            <input type="range" id="wf-eq" min="10" max="90" value="45" oninput="runWaterfallSimulation()">
+                        </div>
+                        <div>
+                            <div class="flex justify-between mb-1"><span class="text-slate-400">Intellectual Property / Brand Realization</span><span id="wf-ip-val" class="text-white">30%</span></div>
+                            <input type="range" id="wf-ip" min="0" max="80" value="30" oninput="runWaterfallSimulation()">
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-8 glass-panel p-6 rounded-xl space-y-6">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left font-mono text-xs">
+                                <thead>
+                                    <tr class="bg-term-card text-term-cyan border-b border-term-border">
+                                        <th class="p-3">Tranche / Claim</th>
+                                        <th class="p-3">Claim Amount ($M)</th>
+                                        <th class="p-3">Allocation ($M)</th>
+                                        <th class="p-3">Recovery Rate (%)</th>
+                                        <th class="p-3">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="waterfallTableBody" class="divide-y divide-term-border/50">
+                                    <!-- Populated by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="h-48 relative w-full"><canvas id="waterfallChart"></canvas></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- TAB 5: MONTE CARLO & VaR                   -->
+        <!-- ========================================== -->
+        <div id="tab-montecarlo" class="tab-content hidden w-full h-full overflow-y-auto p-4 md:p-8 bg-term-bg">
+            <div class="max-w-6xl mx-auto space-y-6">
+                <div class="glass-panel p-6 rounded-xl border-l-4 border-term-blue flex flex-wrap justify-between items-center gap-4">
+                    <div>
+                        <h2 class="text-2xl font-display font-bold text-white tracking-wide"><i class="fa-solid fa-chart-pie text-term-blue mr-2"></i> MONTE CARLO SIMULATION & PORTFOLIO VaR</h2>
+                        <p class="text-xs font-mono text-slate-400 mt-1">Stochastic simulation across 10,000 macroeconomic iterations incorporating the $3.0T Refinancing Wall.</p>
+                    </div>
+                    <button onclick="runMonteCarloSimulation()" class="px-5 py-2.5 bg-term-blue hover:bg-blue-600 text-white font-mono font-bold text-xs rounded transition flex items-center gap-2 shadow-[0_0_15px_rgba(59,130,246,0.3)]">
+                        <i class="fa-solid fa-play"></i> RUN 10K ITERATIONS
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div class="glass-panel p-4 rounded-xl text-center border-t-2 border-term-cyan">
+                        <div class="text-[10px] font-mono text-slate-400 uppercase">Mean Portfolio Value ($M)</div>
+                        <div id="mc-mean" class="text-2xl font-display font-bold text-white mt-1">$6,880M</div>
+                    </div>
+                    <div class="glass-panel p-4 rounded-xl text-center border-t-2 border-term-amber">
+                        <div class="text-[10px] font-mono text-slate-400 uppercase">Portfolio VaR (95% Conf)</div>
+                        <div id="mc-var95" class="text-2xl font-display font-bold text-term-amber mt-1">-15.4%</div>
+                    </div>
+                    <div class="glass-panel p-4 rounded-xl text-center border-t-2 border-term-red">
+                        <div class="text-[10px] font-mono text-slate-400 uppercase">Expected Tail Loss (CVaR 99%)</div>
+                        <div id="mc-cvar99" class="text-2xl font-display font-bold text-term-red mt-1">-27.1%</div>
+                    </div>
+                    <div class="glass-panel p-4 rounded-xl text-center border-t-2 border-term-green">
+                        <div class="text-[10px] font-mono text-slate-400 uppercase">Stagflation Stress Breach</div>
+                        <div id="mc-breach" class="text-2xl font-display font-bold text-term-green mt-1">19.8%</div>
+                    </div>
+                </div>
+
+                <div class="glass-panel p-6 rounded-xl shadow-lg">
+                    <h3 class="font-display text-sm text-white mb-3 tracking-wide"><i class="fa-solid fa-chart-area text-term-blue mr-2"></i> Portfolio Valuation Distribution (Monte Carlo Spread)</h3>
+                    <div class="h-64 relative w-full"><canvas id="monteCarloChart"></canvas></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- TAB 6: CONTAGION & TAIL RISKS              -->
+        <!-- ========================================== -->
+        <div id="tab-contagion" class="tab-content hidden w-full h-full overflow-y-auto p-4 md:p-8 bg-term-bg">
+            <div class="max-w-7xl mx-auto space-y-6">
+                <div class="glass-panel p-6 rounded-xl border-l-4 border-term-red flex flex-wrap justify-between items-center gap-4">
+                    <div>
+                        <h2 class="text-2xl font-display font-bold text-white tracking-wide"><i class="fa-solid fa-virus text-term-red mr-2"></i> CONTAGION & TAIL RISK MATRIX</h2>
+                        <p class="text-xs font-mono text-slate-400 mt-1">Qualitative narrative analysis and propagation vectors for private debt transmission, geopolitical energy shocks, and CBP supply chain bottlenecks.</p>
+                    </div>
+                    <button onclick="runContagionSimulation()" class="px-5 py-2.5 bg-term-red hover:bg-red-600 text-white font-mono font-bold text-xs rounded transition flex items-center gap-2 shadow-[0_0_15px_rgba(239,68,68,0.3)]">
+                        <i class="fa-solid fa-bolt"></i> RUN CONTAGION STRESS
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="glass-panel p-6 rounded-xl border border-term-border space-y-3">
+                        <div class="flex items-center gap-3 text-term-amber"><i class="fa-solid fa-network-wired text-xl"></i><h3 class="font-display text-base text-white">Private Debt Transmission Vector</h3></div>
+                        <p class="text-xs text-slate-300 leading-relaxed">Direct lenders facing illiquidity in non-sponsored portfolio companies resort to PIK (Payment-in-Kind) toggles and amend-and-extend loops. Contagion spreads when retail BDC credit marks lag actual restructuring realization by 2-3 quarters.</p>
+                        <div class="bg-black/50 p-3 rounded font-mono text-[11px] text-term-amber">Systemic Vulnerability: High (PIK Usage at 24% of Book)</div>
+                    </div>
+                    <div class="glass-panel p-6 rounded-xl border border-term-border space-y-3">
+                        <div class="flex items-center gap-3 text-term-red"><i class="fa-solid fa-oil-well text-xl"></i><h3 class="font-display text-base text-white">Geopolitical Energy Shock Vector</h3></div>
+                        <p class="text-xs text-slate-300 leading-relaxed">Strait of Hormuz maritime disruption risk or escalation in Middle East conflicts threatens prompt WTI/Brent spikes above $110/bbl. Immediately halts industrial logistics and aviation BSL recovery paths.</p>
+                        <div class="bg-black/50 p-3 rounded font-mono text-[11px] text-term-red">Systemic Vulnerability: Moderate-High (Input Cost Lag)</div>
+                    </div>
+                    <div class="glass-panel p-6 rounded-xl border border-term-border space-y-3">
+                        <div class="flex items-center gap-3 text-term-cyan"><i class="fa-solid fa-ship text-xl"></i><h3 class="font-display text-base text-white">Supply Chain & CBP Customs Bottlenecks</h3></div>
+                        <p class="text-xs text-slate-300 leading-relaxed">Enforced Section 232 tariffs and CBP country-of-smelt tracking create severe inventory clearing delays for automotive and electronics importers, compressing working capital lines.</p>
+                        <div class="bg-black/50 p-3 rounded font-mono text-[11px] text-term-cyan">Systemic Vulnerability: Moderate (Tariff-Protected Buffers)</div>
+                    </div>
+                </div>
+
+                <div class="glass-panel p-6 rounded-xl shadow-lg space-y-4">
+                    <h3 class="font-display text-sm text-white tracking-wide"><i class="fa-solid fa-terminal text-term-cyan mr-2"></i> Real-Time Contagion Simulation Log</h3>
+                    <pre id="contagionLog" class="bg-black/90 p-4 rounded-lg font-mono text-xs text-term-green h-48 overflow-y-auto border border-term-border/50 leading-relaxed">Select 'RUN CONTAGION STRESS' to initiate stochastic cascade propagation across G-SIBs, BDCs, and BSL loan portfolios...</pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- TAB 7: PORTFOLIO TELEMETRY                 -->
+        <!-- ========================================== -->
+        <div id="tab-portfolio" class="tab-content hidden w-full h-full overflow-y-auto p-4 md:p-8 bg-term-bg">
+            <div class="max-w-7xl mx-auto space-y-6">
+                <div class="glass-panel p-6 rounded-xl border-l-4 border-term-gold flex flex-wrap justify-between items-center gap-4">
+                    <div>
+                        <h2 class="text-2xl font-display font-bold text-white tracking-wide"><i class="fa-solid fa-vault text-term-gold mr-2"></i> LEVERAGED LOAN & PRIVATE CREDIT PORTFOLIO TELEMETRY</h2>
+                        <p class="text-xs font-mono text-slate-400 mt-1">Real-time monitoring of credit rating migration, sector exposures, and maturity wall concentrations across all 14 BSL targets.</p>
+                    </div>
+                    <span class="bg-term-gold/10 text-term-gold border border-term-gold/30 text-xs font-mono px-3 py-1 rounded font-bold">TOTAL EXAM AUM: $6.88 Billion</span>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="glass-panel p-5 rounded-xl border border-term-border">
+                        <h3 class="font-display text-sm text-white mb-3 tracking-wide"><i class="fa-solid fa-chart-pie text-term-cyan mr-2"></i> Supervisory Rating Distribution</h3>
+                        <div class="h-52 relative w-full"><canvas id="portRatingChart"></canvas></div>
+                    </div>
+                    <div class="glass-panel p-5 rounded-xl border border-term-border">
+                        <h3 class="font-display text-sm text-white mb-3 tracking-wide"><i class="fa-solid fa-industry text-term-amber mr-2"></i> Sector Exposure</h3>
+                        <div class="h-52 relative w-full"><canvas id="portSectorChart"></canvas></div>
+                    </div>
+                    <div class="glass-panel p-5 rounded-xl border border-term-border">
+                        <h3 class="font-display text-sm text-white mb-3 tracking-wide"><i class="fa-solid fa-calendar-days text-term-red mr-2"></i> Refinancing Maturity Wall</h3>
+                        <div class="h-52 relative w-full"><canvas id="portMaturityChart"></canvas></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ADAM AI BOT SIDE DRAWER -->
+        <aside id="aiDrawer" class="fixed right-0 top-0 h-full w-full md:w-[500px] glass-panel border-l border-term-border transform translate-x-full transition-transform duration-300 ease-in-out z-50 flex flex-col shadow-2xl bg-term-surface/95 backdrop-blur-xl">
+            <div class="p-4 border-b border-term-border flex items-center justify-between bg-black/60 shrink-0">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-full bg-term-cyan/10 border border-term-cyan flex items-center justify-center text-term-cyan font-mono font-bold text-sm shadow-[0_0_10px_rgba(6,182,212,0.2)]">
+                        <i class="fa-solid fa-brain animate-pulse"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-display font-bold text-white text-base tracking-wide">ADAM v30.4 KERNEL</h3>
+                        <p class="text-[9px] font-mono text-term-cyan uppercase tracking-wider">Quant & Supervisory Assistant</p>
+                    </div>
+                </div>
+                <button onclick="closeAITerminal()" class="text-slate-400 hover:text-white p-2 text-lg transition hover:rotate-90">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Active Asset Telemetry Box -->
+            <div id="aiKernelStatus" class="p-3 bg-black/60 border-b border-term-cyan/30 font-mono text-[11px] text-term-cyan shrink-0 leading-relaxed">
+                <strong>ACTIVE ASSET LOADED:</strong> Apex Health Systems LLC [CUSIP: 123456AA1]<br>
+                <strong>SECTOR:</strong> Healthcare & Pharma | <strong>FACILITY:</strong> $450M<br>
+                <strong>LEVERAGE:</strong> 5.8x | <strong>ICR:</strong> 1.85x | <strong>RATING:</strong> Substandard (5)
+            </div>
+
+            <div class="p-2.5 border-b border-term-border bg-black/40 flex gap-2 overflow-x-auto text-[9px] font-mono shrink-0 custom-scrollbar">
+                <button onclick="quickQuery('Analyze the regulatory rating justification for current active target asset.')" class="px-2.5 py-1.5 bg-term-card hover:bg-term-border text-term-cyan rounded border border-term-border whitespace-nowrap transition flex items-center gap-1.5"><i class="fa-solid fa-file-invoice"></i> Memo Review</button>
+                <button onclick="quickQuery('Explain BSL exam expectations for the 2026 Refinancing Wall across all 14 targeted loans.')" class="px-2.5 py-1.5 bg-term-card hover:bg-term-border text-term-amber rounded border border-term-border whitespace-nowrap transition flex items-center gap-1.5"><i class="fa-solid fa-list-check"></i> Exam Guide</button>
+                <button onclick="quickQuery('Summarize private debt contagion transmission vectors for high-leverage assets.')" class="px-2.5 py-1.5 bg-term-card hover:bg-term-border text-term-red rounded border border-term-border whitespace-nowrap transition flex items-center gap-1.5"><i class="fa-solid fa-virus"></i> Contagion Risk</button>
+            </div>
+
+            <div id="aiChatLog" class="flex-1 overflow-y-auto p-5 space-y-5 font-mono text-xs custom-scrollbar">
+                <div class="bg-term-card/90 p-4 rounded-lg border-l-2 border-term-cyan text-slate-300 shadow-md">
+                    <div class="text-[9px] text-term-cyan font-bold mb-2 uppercase tracking-widest flex items-center gap-2">
+                        <i class="fa-solid fa-check-circle"></i> QUANT & EXAM ENGINE READY
+                    </div>
+                    <p class="font-sans leading-relaxed text-sm">
+                        I am Adam v30.4. I have loaded all 14 Broadly Syndicated Loan (BSL) supervisory exam target assets, collateral waterfall models, regulatory memo templates, and tail risk contagion matrices. How can I assist your supervisory review or credit committee today?
+                    </p>
+                </div>
+            </div>
+
+            <div class="p-4 border-t border-term-border bg-black/80 shrink-0">
+                <form onsubmit="submitAIQuery(event)" class="flex gap-2">
+                    <input type="text" id="aiInputPrompt" placeholder="Query institutional quant assistant..." class="flex-1 bg-term-bg border border-term-border rounded-lg px-4 py-2.5 text-xs font-mono text-white placeholder-slate-600 focus:outline-none focus:border-term-cyan focus:ring-1 focus:ring-term-cyan transition">
+                    <button type="submit" id="aiSubmitBtn" class="bg-term-cyan hover:bg-white text-black font-mono font-bold px-5 py-2.5 rounded-lg text-xs transition flex items-center justify-center shadow-md shadow-term-cyan/20"><i class="fa-solid fa-paper-plane"></i></button>
+                </form>
+            </div>
+        </aside>
+    </div>
+
+    <script>
+        // =========================================================================
+        // STEP 1: DEFINITION OF THE 14 TARGETED BSL LOAN UNIVERSE DATA OBJECT
+        // =========================================================================
+        const TARGET_BSL_LOANS = [
+          {
+            cusip: "123456AA1",
+            borrower: "Apex Health Systems LLC",
+            sector: "Healthcare & Pharma",
+            facilitySize: 450,
+            leverage: 5.8,
+            icr: 1.85,
+            rating: "Substandard (5)",
+            ratingCategory: "Substandard",
+            covenants: "Cov-Lite",
+            examStatus: "In Review",
+            tangibility: 35,
+            ebitda: 77.5,
+            totalDebt: 449.5
+          },
+          {
+            cusip: "234567BB2",
+            borrower: "CloudScale Software Inc.",
+            sector: "Technology / SaaS",
+            facilitySize: 320,
+            leverage: 6.4,
+            icr: 1.42,
+            rating: "Special Mention (4)",
+            ratingCategory: "Special Mention",
+            covenants: "Cov-Lite",
+            examStatus: "Under Stress",
+            tangibility: 15,
+            ebitda: 50.0,
+            totalDebt: 320.0
+          },
+          {
+            cusip: "345678CC3",
+            borrower: "Titan Industrial Logistics",
+            sector: "Transportation",
+            facilitySize: 600,
+            leverage: 4.2,
+            icr: 2.50,
+            rating: "Pass - Watchlist (3)",
+            ratingCategory: "Watchlist",
+            covenants: "Financial Maintenance",
+            examStatus: "Pending",
+            tangibility: 65,
+            ebitda: 142.8,
+            totalDebt: 600.0
+          },
+          {
+            cusip: "456789DD4",
+            borrower: "Vanguard Automotive Group",
+            sector: "Automotive",
+            facilitySize: 280,
+            leverage: 5.1,
+            icr: 2.10,
+            rating: "Pass - Watchlist (3)",
+            ratingCategory: "Watchlist",
+            covenants: "Cov-Lite",
+            examStatus: "In Review",
+            tangibility: 55,
+            ebitda: 54.9,
+            totalDebt: 280.0
+          },
+          {
+            cusip: "567890EE5",
+            borrower: "OmniChannel Retail Brands",
+            sector: "Consumer / Retail",
+            facilitySize: 210,
+            leverage: 7.2,
+            icr: 1.15,
+            rating: "Substandard (5)",
+            ratingCategory: "Substandard",
+            covenants: "Financial Maintenance",
+            examStatus: "Remediation",
+            tangibility: 40,
+            ebitda: 29.1,
+            totalDebt: 210.0
+          },
+          {
+            cusip: "678901FF6",
+            borrower: "Starlight Telecom Corp",
+            sector: "Telecommunications",
+            facilitySize: 850,
+            leverage: 5.5,
+            icr: 1.90,
+            rating: "Special Mention (4)",
+            ratingCategory: "Special Mention",
+            covenants: "Cov-Lite",
+            examStatus: "Under Stress",
+            tangibility: 50,
+            ebitda: 154.5,
+            totalDebt: 850.0
+          },
+          {
+            cusip: "789012GG7",
+            borrower: "AeroTech Defense Systems",
+            sector: "Aerospace & Defense",
+            facilitySize: 500,
+            leverage: 3.8,
+            icr: 3.10,
+            rating: "Pass - Satisfactory (2)",
+            ratingCategory: "Pass",
+            covenants: "Financial Maintenance",
+            examStatus: "Completed",
+            tangibility: 70,
+            ebitda: 131.5,
+            totalDebt: 500.0
+          },
+          {
+            cusip: "890123HH8",
+            borrower: "Apex Chemical Holdings",
+            sector: "Chemicals & Materials",
+            facilitySize: 390,
+            leverage: 4.9,
+            icr: 2.25,
+            rating: "Pass - Watchlist (3)",
+            ratingCategory: "Watchlist",
+            covenants: "Cov-Lite",
+            examStatus: "Pending",
+            tangibility: 60,
+            ebitda: 79.5,
+            totalDebt: 390.0
+          },
+          {
+            cusip: "901234II9",
+            borrower: "EcoEnergy Infrastructure",
+            sector: "Power & Renewables",
+            facilitySize: 720,
+            leverage: 4.1,
+            icr: 2.80,
+            rating: "Pass - Satisfactory (2)",
+            ratingCategory: "Pass",
+            covenants: "Financial Maintenance",
+            examStatus: "Completed",
+            tangibility: 80,
+            ebitda: 175.6,
+            totalDebt: 720.0
+          },
+          {
+            cusip: "012345JJ0",
+            borrower: "Global Packaging Partners",
+            sector: "Packaging & Containers",
+            facilitySize: 310,
+            leverage: 5.3,
+            icr: 1.95,
+            rating: "Special Mention (4)",
+            ratingCategory: "Special Mention",
+            covenants: "Cov-Lite",
+            examStatus: "In Review",
+            tangibility: 50,
+            ebitda: 58.4,
+            totalDebt: 310.0
+          },
+          {
+            cusip: "135791KK1",
+            borrower: "Horizon Media Networks",
+            sector: "Media & Entertainment",
+            facilitySize: 420,
+            leverage: 6.1,
+            icr: 1.55,
+            rating: "Substandard (5)",
+            ratingCategory: "Substandard",
+            covenants: "Cov-Lite",
+            examStatus: "Under Stress",
+            tangibility: 20,
+            ebitda: 68.8,
+            totalDebt: 420.0
+          },
+          {
+            cusip: "246802LL2",
+            borrower: "Pinnacle Facility Services",
+            sector: "Business Services",
+            facilitySize: 260,
+            leverage: 4.6,
+            icr: 2.40,
+            rating: "Pass - Watchlist (3)",
+            ratingCategory: "Watchlist",
+            covenants: "Financial Maintenance",
+            examStatus: "Pending",
+            tangibility: 30,
+            ebitda: 56.5,
+            totalDebt: 260.0
+          },
+          {
+            cusip: "357913MM3",
+            borrower: "Trident Maritime Logistics",
+            sector: "Shipping & Maritime",
+            facilitySize: 580,
+            leverage: 5.0,
+            icr: 2.05,
+            rating: "Special Mention (4)",
+            ratingCategory: "Special Mention",
+            covenants: "Cov-Lite",
+            examStatus: "In Review",
+            tangibility: 75,
+            ebitda: 116.0,
+            totalDebt: 580.0
+          },
+          {
+            cusip: "468024NN4",
+            borrower: "Quantum Semiconductor Corp",
+            sector: "Semiconductors",
+            facilitySize: 640,
+            leverage: 3.9,
+            icr: 3.40,
+            rating: "Pass - Satisfactory (2)",
+            ratingCategory: "Pass",
+            covenants: "Financial Maintenance",
+            examStatus: "Completed",
+            tangibility: 65,
+            ebitda: 164.1,
+            totalDebt: 640.0
+          }
+        ];
+
+        // Custom Toast System
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            if (!container) return;
+            const toast = document.createElement('div');
+            let colorClass = 'border-term-cyan text-term-cyan', iconClass = 'fa-circle-info';
+            if (type === 'success') { colorClass = 'border-term-green text-term-green'; iconClass = 'fa-check-circle'; }
+            else if (type === 'warning') { colorClass = 'border-term-amber text-term-amber'; iconClass = 'fa-triangle-exclamation'; }
+            else if (type === 'error') { colorClass = 'border-term-red text-term-red'; iconClass = 'fa-circle-xmark'; }
+
+            toast.className = `glass-panel border-l-4 ${colorClass} px-4 py-3 rounded shadow-xl font-mono text-xs transform transition-all duration-300 translate-y-8 opacity-0 flex items-center justify-between gap-3 min-w-[300px]`;
+            toast.innerHTML = `<div class="flex items-center gap-2"><i class="fa-solid ${iconClass}"></i><span class="text-white">${message}</span></div><button class="text-slate-500 hover:text-white transition" onclick="this.parentElement.remove()"><i class="fa-solid fa-xmark"></i></button>`;
+
+            container.appendChild(toast);
+            requestAnimationFrame(() => setTimeout(() => toast.classList.remove('translate-y-8', 'opacity-0'), 10));
+            setTimeout(() => { if(document.body.contains(toast)) { toast.classList.add('translate-y-8', 'opacity-0'); setTimeout(() => { if(document.body.contains(toast)) toast.remove(); }, 300); } }, 3000);
+        }
+
+        // Toggle CRT Scanlines
+        function toggleCRT() {
+            const crt = document.getElementById('crtOverlay');
+            crt.style.display = crt.style.display === 'none' ? 'block' : 'none';
+        }
+
+        // Tab Switching
+        let currentTab = 'tab-workbench';
+        let chartInstances = {};
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).classList.remove('hidden');
+            document.getElementById('btn-' + tabId).classList.add('active');
+            currentTab = tabId;
+
+            // Trigger chart resizes for visibility
+            setTimeout(() => {
+                Object.values(chartInstances).forEach(chart => { if (chart) chart.resize(); });
+            }, 50);
+        }
+
+        // Global formatting
+        const formatMoney = (n) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(n);
+        const formatPercent = (n) => (n).toFixed(2) + '%';
+
+        // =========================================================================
+        // STEP 3: WIRE UP DATA BINDING & STATE MANAGEMENT FOR THE 14 LOANS
+        // =========================================================================
+
+        // 1. Populate Target Loan Selector Dropdown and Exam Universe Table on Load
+        function initLoanUniverse() {
+          const selectEl = document.getElementById("targetLoanSelect");
+          
+          if (selectEl) {
+            selectEl.innerHTML = TARGET_BSL_LOANS.map(loan => 
+              `<option value="${loan.cusip}">${loan.borrower} (${loan.cusip}) - ${loan.sector}</option>`
+            ).join("");
+          }
+
+          renderExamUniverseTable(TARGET_BSL_LOANS);
+
+          // Default to first loan
+          if (TARGET_BSL_LOANS.length > 0) {
+            loadTargetLoan(TARGET_BSL_LOANS[0].cusip);
+          }
+        }
+
+        // 2. Render Table Rows for BSL Exam Universe
+        function renderExamUniverseTable(loans) {
+          const tableBody = document.querySelector("#bslTable tbody");
+          if (!tableBody) return;
+
+          tableBody.innerHTML = loans.map(loan => `
+            <tr id="row-${loan.cusip}" onclick="loadTargetLoan('${loan.cusip}')" class="hover:bg-term-surface/80 transition cursor-pointer">
+              <td class="p-3"><strong class="text-white">${loan.borrower}</strong><br><small class="text-slate-500 font-mono">${loan.cusip}</small></td>
+              <td class="p-3 text-slate-300">${loan.sector}</td>
+              <td class="p-3 text-white font-bold">$${loan.facilitySize}M</td>
+              <td class="p-3 text-slate-300">${loan.leverage}x</td>
+              <td class="p-3 text-slate-300">${loan.icr}x</td>
+              <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${getRatingBadgeClass(loan.rating)}">${loan.rating}</span></td>
+              <td class="p-3 text-slate-400 text-[10px]">${loan.covenants}</td>
+              <td class="p-3 font-semibold ${getExamStatusClass(loan.examStatus)}">${loan.examStatus}</td>
+            </tr>
+          `).join("");
+        }
+
+        // 3. Filter Universe Table
+        function filterExamUniverse() {
+          const search = document.getElementById('examSearch').value.toLowerCase();
+          const ratingFilter = document.getElementById('examFilterRating').value;
+          
+          const filtered = TARGET_BSL_LOANS.filter(loan => {
+            const matchSearch = loan.borrower.toLowerCase().includes(search) || loan.cusip.toLowerCase().includes(search) || loan.sector.toLowerCase().includes(search);
+            const matchRating = ratingFilter === 'ALL' || loan.ratingCategory.includes(ratingFilter) || loan.rating.includes(ratingFilter);
+            return matchSearch && matchRating;
+          });
+
+          renderExamUniverseTable(filtered);
+        }
+
+        // 4. Load Selected Target Loan Across the Entire Dashboard
+        function loadTargetLoan(cusip) {
+          const loan = TARGET_BSL_LOANS.find(l => l.cusip === cusip);
+          if (!loan) return;
+
+          // Sync Dropdown Selectors
+          const selectEl = document.getElementById("targetLoanSelect");
+          if (selectEl) selectEl.value = cusip;
+
+          // Sync Workbench Parameters Inputs
+          updateInputValue("w-borrower", loan.borrower);
+          updateInputValue("w-facility", loan.facilitySize);
+          updateInputValue("w-leverage", loan.leverage);
+          updateInputValue("w-ebitda", loan.ebitda);
+          updateInputValue("w-icr", loan.icr);
+
+          const wRatingSelect = document.getElementById("w-rating");
+          if (wRatingSelect) wRatingSelect.value = loan.rating;
+
+          // Update Model Calibration Sliders & Inputs (Tab 3)
+          updateInputValue("m-lev", loan.leverage);
+          updateInputValue("m-icr", loan.icr);
+          updateInputValue("m-tang", loan.tangibility);
+          updateInputValue("m-fcf", loan.ebitda);
+          updateInputValue("m-netdebt", loan.totalDebt);
+
+          // Update Collateral Waterfall Enterprise Value (Tab 4)
+          updateInputValue("wf-assetval", (loan.facilitySize * 1.3).toFixed(0));
+
+          // Highlight active row in table
+          document.querySelectorAll("#bslTable tbody tr").forEach(tr => tr.classList.remove("table-active"));
+          const activeRow = document.getElementById(`row-${cusip}`);
+          if (activeRow) activeRow.classList.add("table-active");
+
+          // Re-run Model Recalculations & Updates
+          recalculateWorkbench();
+          runQuantModels();
+          runWaterfallSimulation();
+          updateAIKernelContext(loan);
+
+          showToast(`Active Target Loaded: ${loan.borrower}`, 'info');
+        }
+
+        // 5. Update ADAM v30.4 AI Assistant Kernel Prompt Context
+        function updateAIKernelContext(loan) {
+          const kernelStatusEl = document.getElementById("aiKernelStatus");
+          if (kernelStatusEl) {
+            kernelStatusEl.innerHTML = `
+              <strong>ACTIVE ASSET LOADED:</strong> ${loan.borrower} [CUSIP: ${loan.cusip}]<br>
+              <strong>SECTOR:</strong> ${loan.sector} | <strong>FACILITY:</strong> $${loan.facilitySize}M<br>
+              <strong>LEVERAGE:</strong> ${loan.leverage}x | <strong>ICR:</strong> ${loan.icr}x | <strong>RATING:</strong> ${loan.rating}
+            `;
+          }
+        }
+
+        // Helper rating badge utility
+        function getRatingBadgeClass(rating) {
+          if (rating.includes("Substandard")) return "bg-term-red/20 text-term-red border border-term-red/40";
+          if (rating.includes("Special Mention")) return "bg-term-amber/20 text-term-amber border border-term-amber/40";
+          if (rating.includes("Watchlist")) return "bg-term-cyan/20 text-term-cyan border border-term-cyan/40";
+          return "bg-term-green/20 text-term-green border border-term-green/40";
+        }
+
+        // Helper exam status styling utility
+        function getExamStatusClass(status) {
+          if (status === "Under Stress" || status === "Remediation") return "text-term-red animate-pulse";
+          if (status === "In Review") return "text-term-amber";
+          if (status === "Completed") return "text-term-green";
+          return "text-slate-400";
+        }
+
+        // Helper input updater
+        function updateInputValue(id, val) {
+          const el = document.getElementById(id);
+          if (el) {
+            el.value = val;
+            el.dispatchEvent(new Event('input'));
+          }
+        }
+
+        // --- TAB 1: WORKBENCH MEMO CALCULATIONS ---
+        function recalculateWorkbench() {
+            const borrower = document.getElementById('w-borrower').value || "Apex Aerospace";
+            const facility = parseFloat(document.getElementById('w-facility').value) || 350;
+            const leverage = parseFloat(document.getElementById('w-leverage').value) || 4.8;
+            const ebitda = parseFloat(document.getElementById('w-ebitda').value) || 75;
+            const icr = parseFloat(document.getElementById('w-icr').value) || 2.6;
+            const rating = document.getElementById('w-rating').value;
+            const tpl = document.getElementById('w-template-type').value;
+
+            let impliedDebt = ebitda * leverage;
+            let title = "", content = "";
+            let ratingColor = rating.includes('Watchlist') ? 'text-term-cyan' : rating.includes('Special') ? 'text-term-amber font-bold' : rating.includes('Substandard') ? 'text-term-red font-bold' : 'text-term-green';
+
+            if (tpl === 'memo') {
+                title = `REGULATORY RATING JUSTIFICATION MEMO: ${borrower.toUpperCase()}`;
+                content = `
+### Executive Summary
+A comprehensive supervisory review of the **$${facility}M** senior secured credit facility for **${borrower}** has been conducted. The current assigned internal risk rating is **<span class="${ratingColor}">${rating}</span>**.
+
+### Financial Telemetry
+*   **Total Implied Debt:** $${impliedDebt.toFixed(1)}M
+*   **LTM EBITDA:** $${ebitda.toFixed(1)}M
+*   **Gross Leverage:** ${leverage}x
+*   **Interest Coverage Ratio (ICR):** ${icr}x
+
+### Justification & Mitigants
+The borrower operates within its target industry vertical with active supervisory monitoring. At **${leverage}x** leverage and an ICR of **${icr}x**, the capital structure is evaluated under the 2026 Refinancing Wall conditions. Macro headwinds (SOFR base rate floor, debt service resets, supply chain dynamics) dictate ongoing covenant tracking and collateral valuation checks.
+                `;
+            } else if (tpl === 'underwriting') {
+                title = `UNDERWRITING & ESCALATION REVIEW: ${borrower.toUpperCase()}`;
+                content = `
+### Transaction Overview
+Underwriting and escalation risk analysis for the proposed/existing **$${facility}M** facility for **${borrower}**.
+
+### Risk Parameters
+*   **Base Case Leverage:** ${leverage}x
+*   **Stress Case Leverage (EBITDA -20%):** ${(impliedDebt / (ebitda * 0.8)).toFixed(2)}x
+*   **Current ICR:** ${icr}x
+*   **Stress Case ICR (Rates +200bps):** ${(ebitda / ((impliedDebt * 0.08) + (impliedDebt * 0.02))).toFixed(2)}x
+
+### Escalation Triggers
+The credit exhibits metrics requiring secondary committee review. Assigned regulatory rating: **<span class="${ratingColor}">${rating}</span>**. Primary risks include interest coverage compression and maturity wall refinancing exposure.
+                `;
+            } else {
+                 title = `${tpl.toUpperCase()} REPORT: ${borrower.toUpperCase()}`;
+                 content = `### Summary\nGenerated regulatory report for **${borrower}** with facility size $${facility}M. Assigned rating: **<span class="${ratingColor}">${rating}</span>**.\n\n*   **Leverage:** ${leverage}x\n*   **ICR:** ${icr}x\n\nDetailed supervisory review and examiner workpapers compiled automatically by ADAM v30.4.`;
+            }
+
+            document.getElementById('workbenchOutput').innerHTML = marked.parse(`# ${title}\n\n${content}`);
+        }
+
+        function copyWorkbenchReport() {
+            const el = document.getElementById('workbenchOutput');
+            const text = el.innerText;
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            try { document.execCommand('copy'); showToast('Memo copied to clipboard.', 'success'); }
+            catch(e) { showToast('Copy failed.', 'error'); }
+            document.body.removeChild(textarea);
+        }
+
+        // --- TAB 3: QUANT MODELS (PD / LGD / DCF) ---
+        function runQuantModels() {
+            const lev = parseFloat(document.getElementById('m-lev').value);
+            const icr = parseFloat(document.getElementById('m-icr').value);
+            const tang = parseFloat(document.getElementById('m-tang').value);
+
+            document.getElementById('m-lev-val').innerText = lev.toFixed(1) + 'x';
+            document.getElementById('m-icr-val').innerText = icr.toFixed(2) + 'x';
+            document.getElementById('m-tang-val').innerText = tang + '%';
+
+            // Synthetic PD Model (Merton-ish heuristic)
+            let pd = Math.max(0.1, (lev * 1.8) - (icr * 2.2) + 4.5);
+            document.getElementById('out-pd').innerText = pd.toFixed(2) + '%';
+
+            let impliedRating = "BBB";
+            let color = "text-term-green";
+            if(pd > 15) { impliedRating = "CCC"; color = "text-term-red"; }
+            else if(pd > 8) { impliedRating = "B-"; color = "text-term-red"; }
+            else if(pd > 4) { impliedRating = "B+"; color = "text-term-amber"; }
+            else if(pd > 1) { impliedRating = "BB"; color = "text-term-amber"; }
+
+            const ratingEl = document.getElementById('out-rating');
+            ratingEl.innerText = `IMPLIED RATING: ${impliedRating}`;
+            ratingEl.className = `mt-2 text-xs font-mono font-bold px-2 py-0.5 rounded inline-block ${color} bg-black/50 border border-${color.split('-')[1]}/30`;
+            document.getElementById('out-pd').className = `text-4xl font-display font-bold mt-2 ${color}`;
+
+            // Synthetic LGD Model
+            let lgd = Math.max(10, Math.min(100, 100 - (tang * 0.85) + (lev * 2.5)));
+            let rr = 100 - lgd;
+            document.getElementById('out-lgd').innerText = lgd.toFixed(1) + '%';
+            document.getElementById('out-rr').innerText = rr.toFixed(1) + '%';
+
+            // DCF Calculation
+            const fcf = parseFloat(document.getElementById('m-fcf').value) || 75;
+            const g1 = (parseFloat(document.getElementById('m-g1').value) || 6) / 100;
+            const wacc = (parseFloat(document.getElementById('m-wacc').value) || 9.5) / 100;
+            const netdebt = parseFloat(document.getElementById('m-netdebt').value) || 400;
+            const tgr = 0.02; // 2% terminal growth
+
+            let ev = 0;
+            let cashFlows = [];
+            let currentFcf = fcf;
+            for(let i=1; i<=5; i++) {
+                currentFcf = currentFcf * (1 + g1);
+                cashFlows.push(currentFcf);
+                ev += currentFcf / Math.pow(1 + wacc, i);
+            }
+            let terminalValue = (currentFcf * (1 + tgr)) / (wacc - tgr);
+            let pvTv = terminalValue / Math.pow(1 + wacc, 5);
+            ev += pvTv;
+            let eq = ev - netdebt;
+
+            document.getElementById('out-ev').innerText = formatMoney(ev) + 'M';
+            document.getElementById('out-eq').innerText = formatMoney(eq) + 'M';
+
+            // Update Chart
+            if(chartInstances.dcf) {
+                chartInstances.dcf.data.datasets[0].data = cashFlows;
+                chartInstances.dcf.data.datasets[1].data = [0,0,0,0, pvTv];
+                chartInstances.dcf.update();
+            }
+        }
+
+        // --- TAB 4: DYNAMIC WATERFALL ---
+        function runWaterfallSimulation() {
+            const assetVal = parseFloat(document.getElementById('wf-assetval').value) || 585;
+            const arReal = parseFloat(document.getElementById('wf-ar').value) / 100;
+            const eqReal = parseFloat(document.getElementById('wf-eq').value) / 100;
+            const ipReal = parseFloat(document.getElementById('wf-ip').value) / 100;
+
+            document.getElementById('wf-ar-val').innerText = (arReal*100).toFixed(0) + '%';
+            document.getElementById('wf-eq-val').innerText = (eqReal*100).toFixed(0) + '%';
+            document.getElementById('wf-ip-val').innerText = (ipReal*100).toFixed(0) + '%';
+
+            // Mock collateral base
+            const arBase = assetVal * 0.3, eqBase = assetVal * 0.45, ipBase = assetVal * 0.25;
+            const realizedValue = (arBase * arReal) + (eqBase * eqReal) + (ipBase * ipReal);
+
+            // Capital Structure
+            const structure = [
+                { name: "Admin / Legal Fees", claim: 20 },
+                { name: "Revolving Credit Facility (Super Senior)", claim: 100 },
+                { name: "First Lien Term Loan (BSL Tranche)", claim: assetVal * 0.6 },
+                { name: "Second Lien Term Loan", claim: assetVal * 0.25 },
+                { name: "Unsecured / Mezzanine Notes", claim: assetVal * 0.2 }
+            ];
+
+            let remainingValue = realizedValue;
+            let tableHTML = '';
+            let allocations = [];
+            let labels = [];
+
+            structure.forEach(tranche => {
+                let allocation = Math.min(remainingValue, tranche.claim);
+                remainingValue -= allocation;
+                let recovery = tranche.claim > 0 ? (allocation / tranche.claim) * 100 : 0;
+
+                let statusClass = 'text-term-green';
+                let statusText = 'Whole';
+                if (recovery < 100 && recovery > 0) { statusClass = 'text-term-amber'; statusText = 'Impaired'; }
+                if (recovery === 0) { statusClass = 'text-term-red'; statusText = 'Wiped Out'; }
+
+                allocations.push(allocation);
+                labels.push(tranche.name);
+
+                tableHTML += `
+                    <tr class="hover:bg-term-surface/50 transition">
+                        <td class="p-3 text-white font-bold">${tranche.name}</td>
+                        <td class="p-3 text-slate-300">$${tranche.claim.toFixed(1)}M</td>
+                        <td class="p-3 text-term-cyan">$${allocation.toFixed(1)}M</td>
+                        <td class="p-3 ${statusClass}">${recovery.toFixed(1)}%</td>
+                        <td class="p-3 ${statusClass} font-bold">${statusText}</td>
+                    </tr>
+                `;
+            });
+
+            // Equity
+            let eqClass = remainingValue > 0 ? 'text-term-green' : 'text-term-red';
+            tableHTML += `
+                <tr class="bg-black/40">
+                    <td class="p-3 text-slate-400 font-bold">Equity Holders</td>
+                    <td class="p-3 text-slate-400">N/A</td>
+                    <td class="p-3 ${eqClass}">$${remainingValue.toFixed(1)}M</td>
+                    <td class="p-3 text-slate-500">N/A</td>
+                    <td class="p-3 ${eqClass} font-bold">${remainingValue > 0 ? 'In the Money' : 'Wiped Out'}</td>
+                </tr>
+            `;
+
+            document.getElementById('waterfallTableBody').innerHTML = tableHTML;
+
+            // Update Chart
+            if(chartInstances.waterfall) {
+                chartInstances.waterfall.data.labels = labels;
+                chartInstances.waterfall.data.datasets[0].data = allocations;
+                chartInstances.waterfall.update();
+            }
+        }
+
+        // --- TAB 5: MONTE CARLO ---
+        function runMonteCarloSimulation() {
+            const btn = document.querySelector('button[onclick="runMonteCarloSimulation()"]');
+            if(btn) {
+                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> RUNNING...';
+                btn.classList.add('opacity-75', 'cursor-not-allowed');
+            }
+
+            setTimeout(() => {
+                const mean = 6880 + (Math.random() * 200 - 100);
+                const var95 = -15.4 - (Math.random() * 1.5);
+                const cvar99 = -27.1 - (Math.random() * 2);
+                const breach = 19.8 + (Math.random() * 2);
+
+                document.getElementById('mc-mean').innerText = formatMoney(mean) + 'M';
+                document.getElementById('mc-var95').innerText = var95.toFixed(1) + '%';
+                document.getElementById('mc-cvar99').innerText = cvar99.toFixed(1) + '%';
+                document.getElementById('mc-breach').innerText = breach.toFixed(1) + '%';
+
+                let data = [];
+                for(let i=0; i<50; i++) {
+                    let x = (i - 25) / 5;
+                    let y = Math.exp(-0.5 * x * x) * 100 + (Math.random()*5);
+                    data.push(y);
+                }
+
+                if(chartInstances.mc) {
+                    chartInstances.mc.data.datasets[0].data = data;
+                    chartInstances.mc.update();
+                }
+
+                if(btn) {
+                    btn.innerHTML = '<i class="fa-solid fa-play"></i> RUN 10K ITERATIONS';
+                    btn.classList.remove('opacity-75', 'cursor-not-allowed');
+                }
+                showToast('Monte Carlo Simulation Complete across 14 BSL assets (10,000 paths)', 'success');
+            }, 1000);
+        }
+
+        // --- TAB 6: CONTAGION ---
+        function runContagionSimulation() {
+            const logEl = document.getElementById('contagionLog');
+            logEl.innerHTML = '';
+            const messages = [
+                "Initializing Contagion Matrix across 14 BSL Target Assets...",
+                "Injecting 2026-2027 Refinancing Wall Stress (+350bps step-up).",
+                "Evaluating Apex Health Systems, CloudScale Software, and OmniChannel Retail...",
+                "<span class='text-term-amber'>[WARN] PIK (Payment-in-Kind) triggers detected on Substandard (5) facilities.</span>",
+                "Simulating 2-quarter lag in BDC mark-to-market valuations.",
+                "Injecting Geopolitical Energy Shock (Brent > $100/bbl)...",
+                "<span class='text-term-red'>[CRITICAL] Starlight Telecom & Horizon Media breach interest coverage covenants.</span>",
+                "Assessing Supply Chain CBP Customs delays (Section 232).",
+                "Working capital lines compressed by 18% across industrial importers.",
+                "<span class='text-term-cyan'>[INFO] High-tangibility defense/energy assets (AeroTech, EcoEnergy) show robust debt service capability.</span>",
+                "Calculating final contagion systemic VaR...",
+                "<span class='text-white font-bold bg-term-red/20 px-1'>RESULT: Systemic Contagion Risk High. Active hedging recommended for Substandard & Special Mention tranches.</span>"
+            ];
+
+            let i = 0;
+            const interval = setInterval(() => {
+                if (i >= messages.length) { clearInterval(interval); return; }
+                logEl.innerHTML += `<div><span class="text-slate-500">[${new Date().toISOString().substring(11,19)}]</span> ${messages[i]}</div>`;
+                logEl.scrollTop = logEl.scrollHeight;
+                i++;
+            }, 500);
+        }
+
+        // --- INITIALIZATION & CHARTS ---
+        function initCharts() {
+            Chart.defaults.color = '#94a3b8';
+            Chart.defaults.font.family = "'Fira Code', monospace";
+            Chart.defaults.scale.grid.color = 'rgba(255, 255, 255, 0.05)';
+
+            // DCF Chart
+            const ctxDcf = document.getElementById('quantDcfChart').getContext('2d');
+            chartInstances.dcf = new Chart(ctxDcf, {
+                type: 'bar',
+                data: {
+                    labels: ['Year 1', 'Year 2', 'Year 3', 'Year 4', 'Year 5'],
+                    datasets: [
+                        { label: 'Free Cash Flow ($M)', data: [82, 87, 92, 98, 104], backgroundColor: '#06b6d4' },
+                        { label: 'Terminal Value PV ($M)', data: [0, 0, 0, 0, 850], backgroundColor: '#10b981' }
+                    ]
+                },
+                options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true }, y: { stacked: true } } }
+            });
+
+            // Waterfall Chart
+            const ctxWf = document.getElementById('waterfallChart').getContext('2d');
+            chartInstances.waterfall = new Chart(ctxWf, {
+                type: 'bar',
+                data: {
+                    labels: ['Admin', 'Revolver', '1L BSL', '2L Term', 'Unsecured'],
+                    datasets: [{ label: 'Value Allocation ($M)', data: [20, 100, 350, 100, 0], backgroundColor: '#8b5cf6' }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, indexAxis: 'y' }
+            });
+
+            // Monte Carlo Chart
+            const ctxMc = document.getElementById('monteCarloChart').getContext('2d');
+            chartInstances.mc = new Chart(ctxMc, {
+                type: 'line',
+                data: {
+                    labels: Array.from({length:50}, (_,i)=>'P'+i),
+                    datasets: [{ label: 'Frequency', data: Array(50).fill(10), borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.2)', fill: true, tension: 0.4, pointRadius: 0 }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, scales: { x: { display: false } }, plugins: { legend: { display: false } } }
+            });
+
+            // Portfolio Charts (Static visual telemetry across the 14 assets)
+            if(document.getElementById('portRatingChart')) {
+                new Chart(document.getElementById('portRatingChart'), {
+                    type: 'doughnut',
+                    data: { labels: ['Pass (3)', 'Watchlist (4)', 'Special Mention (4)', 'Substandard (3)'], datasets: [{ data: [3, 4, 4, 3], backgroundColor: ['#10b981', '#06b6d4', '#f59e0b', '#ef4444'], borderWidth: 1, borderColor: '#0b1120' }] },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { boxWidth: 10, font: {size: 10} } } } }
+                });
+                new Chart(document.getElementById('portSectorChart'), {
+                    type: 'pie',
+                    data: { labels: ['Healthcare', 'Tech/SaaS', 'Telecom', 'Energy/Power', 'Aerospace/Auto', 'Retail/Other'], datasets: [{ data: [1, 2, 1, 1, 2, 7], backgroundColor: ['#3b82f6', '#06b6d4', '#8b5cf6', '#10b981', '#f59e0b', '#ef4444'], borderWidth: 1, borderColor: '#0b1120' }] },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { boxWidth: 10, font: {size: 10} } } } }
+                });
+                new Chart(document.getElementById('portMaturityChart'), {
+                    type: 'bar',
+                    data: { labels: ['2025', '2026', '2027', '2028', '2029+'], datasets: [{ label: 'Facilities ($M)', data: [450, 1850, 2400, 1200, 980], backgroundColor: '#ef4444' }] },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+                });
+            }
+        }
+
+        function initApp() {
+            initLoanUniverse();
+            initCharts();
+            runMonteCarloSimulation();
+        }
+
+        // --- AI DRAWER ---
+        function openAITerminal() { document.getElementById('aiDrawer').classList.remove('translate-x-full'); }
+        function closeAITerminal() { document.getElementById('aiDrawer').classList.add('translate-x-full'); }
+
+        function quickQuery(promptText) {
+            openAITerminal();
+            document.getElementById('aiInputPrompt').value = promptText;
+            submitAIQuery(new Event('submit'));
+        }
+
+        async function submitAIQuery(e) {
+            if(e) e.preventDefault();
+            const input = document.getElementById('aiInputPrompt');
+            const prompt = input.value.trim();
+            if(!prompt) return;
+
+            const log = document.getElementById('aiChatLog');
+            const userMsgHtml = `
+                <div class="bg-term-surface p-3 rounded-lg border border-term-border text-slate-200 shadow-sm ml-6 relative">
+                    <div class="absolute -left-2 top-3 w-4 h-4 bg-term-surface transform rotate-45 border-l border-b border-term-border"></div>
+                    <div class="text-[9px] text-slate-500 font-bold mb-1 uppercase tracking-wider text-right">Analyst Query</div>
+                    <p class="font-sans text-right text-sm">${prompt.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</p>
+                </div>
+            `;
+            log.insertAdjacentHTML('beforeend', userMsgHtml);
+            input.value = '';
+            log.scrollTop = log.scrollHeight;
+
+            const loadId = 'loading-' + Date.now();
+            const loadingHtml = `
+                <div id="${loadId}" class="bg-term-card p-3 rounded-lg border-l-2 border-term-cyan text-term-cyan animate-pulse shadow-md mr-6">
+                    <i class="fa-solid fa-spinner fa-spin mr-2"></i> Interrogating Quant & Policy Vectors across 14 BSL Loans...
+                </div>
+            `;
+            log.insertAdjacentHTML('beforeend', loadingHtml);
+            log.scrollTop = log.scrollHeight;
+
+            // Simulated AI Kernel synthesis dynamically drawing active target details
+            setTimeout(() => {
+                document.getElementById(loadId)?.remove();
+
+                const selectEl = document.getElementById("targetLoanSelect");
+                const currentCusip = selectEl ? selectEl.value : "123456AA1";
+                const activeLoan = TARGET_BSL_LOANS.find(l => l.cusip === currentCusip) || TARGET_BSL_LOANS[0];
+
+                let mockResponse = "";
+                if(prompt.toLowerCase().includes("memo") || prompt.toLowerCase().includes("justification") || prompt.toLowerCase().includes("rating")) {
+                    mockResponse = `**Regulatory Rating Analysis: ${activeLoan.borrower} (${activeLoan.cusip})**\n\n* **Assigned Rating:** ${activeLoan.rating}\n* **Leverage:** ${activeLoan.leverage}x | **ICR:** ${activeLoan.icr}x\n* **Covenants:** ${activeLoan.covenants}\n\n**Examiner Guidance:** At ${activeLoan.leverage}x leverage, debt service capacity remains sensitive to coupon step-ups. Primary risk focus is the 2026-2027 Refinancing Wall where base rates above 4.50% compress ICR below 1.25x.`;
+                } else if(prompt.toLowerCase().includes("exam") || prompt.toLowerCase().includes("refinancing")) {
+                    mockResponse = "**2026-2027 Refinancing Wall Exam Guidance (14 Target BSL Portfolio)**\n\nFederal examiners are scrutinizing facilities with maturities under 24 months. Cov-lite assets carrying >5.5x leverage (e.g. *CloudScale Software*, *OmniChannel Retail*, *Horizon Media*) face immediate risk of downgrade to Substandard if EBITDA contraction exceeds 15%.";
+                } else {
+                    mockResponse = `I have evaluated **${activeLoan.borrower}** alongside the 14 BSL exam universe. Under current macroeconomic inputs ($83.40 Brent, 4.67% 10Y Yield), assets with tangibility below 30% display elevated Loss Given Default (LGD > 80%).`;
+                }
+
+                const aiMsgHtml = `
+                    <div class="bg-term-card/90 p-4 rounded-lg border-l-2 border-term-cyan text-slate-200 shadow-md mr-6 markdown-body !text-xs relative">
+                        <div class="absolute -right-2 top-3 w-4 h-4 bg-term-card/90 transform rotate-45 border-t border-r border-term-border"></div>
+                        <div class="text-[9px] text-term-cyan font-bold mb-2 uppercase tracking-widest flex items-center gap-1.5">
+                            <i class="fa-solid fa-microchip"></i> ADAM v30.4 SYNTHESIS
+                        </div>
+                        <div class="font-sans leading-relaxed text-sm ai-rendered-content">${marked.parse(mockResponse)}</div>
+                    </div>
+                `;
+                log.insertAdjacentHTML('beforeend', aiMsgHtml);
+
+                log.scrollTo({ top: log.scrollHeight, behavior: 'smooth' });
+            }, 1000);
+        }
+
+        window.onload = initApp;
+    </script>
+</body>
+</html>
