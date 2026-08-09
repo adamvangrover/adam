@@ -24,19 +24,29 @@ The system is composed of three distinct, decoupled layers that can operate stan
 ## 3. Data Layer (The "Memory")
 *   **Role**: Ingestion, Processing, and Storage.
 *   **Components**:
-    *   **Universal Ingestor**: Handles PDFs, HTML, and unstructured text.
+    *   **Universal Ingestor**: Handles PDFs, HTML, unstructured text, as well as multimodal data such as images (charts, tables) and audio transcripts.
     *   **Knowledge Graph**: Neo4j/NetworkX based entity relationship storage.
     *   **Vector Store**: Semantic memory for RAG (Retrieval Augmented Generation).
 *   **Standalone Operation**: Can be run as an ETL (Extract, Transform, Load) pipeline to build datasets without invoking intelligence or compute.
+
+## 4. Integration Layer
+*   **Role**: Governance and Translation.
+*   **Components**:
+    *   **Probabilistic-to-Deterministic Integration Layer (PDIL)**: Acts as a strict gatekeeper and translation layer, mapping stochastic outputs from the Intelligence Layer (System 1/Swarm) into strongly-typed, deterministic parameters for the Compute Layer (System 2/Engine).
 
 ## Architecture Diagram
 
 ```mermaid
 graph TD
     User --> Intelligence
-    Intelligence --> Compute
+    Intelligence --> PDIL
+    PDIL --> Compute
     Intelligence --> Data
     Compute --> Data
+
+    subgraph "Integration Layer"
+        PDIL[PDIL Gatekeeper]
+    end
 
     subgraph "Intelligence Layer"
         Planner[Neuro-Symbolic Planner]
