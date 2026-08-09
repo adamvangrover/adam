@@ -1,0 +1,31 @@
+version: '3.8'
+services:
+  system1_swarm:
+    build:
+      context: .
+      dockerfile: Dockerfile.swarm
+    environment:
+      - QDRANT_URL=http://qdrant:6333
+      - REDIS_URL=redis://redis:6379/0
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    depends_on:
+      - qdrant
+      - redis
+
+  system2_dag:
+    build:
+      context: .
+      dockerfile: Dockerfile.core
+    environment:
+      - TEMPORAL_ADDRESS=temporal:7233
+    depends_on:
+      - temporal
+      
+  system3_quant:
+    build:
+      context: .
+      dockerfile: Dockerfile.kernel
+    environment:
+      - RUST_LOG=info
+    ports:
+      - "50051:50051"
