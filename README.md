@@ -8,6 +8,97 @@
     </picture>
   </a>
 </div>
+
+<div align="center">
+  <h3>ADAM: Autonomous Deterministic Alpha Matrix</h3>
+  <p>The Institutional-Grade Neuro-Symbolic Financial Sovereign.</p>
+</div>
+
+<div align="center">
+  <a href="https://opensource.org/licenses/MIT" target="_blank"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License"></a>
+  <a href="https://www.python.org/downloads/" target="_blank"><img src="https://img.shields.io/badge/python-3.11+-blue.svg" alt="Python 3.11+"></a>
+  <a href="https://hub.docker.com/" target="_blank"><img src="https://img.shields.io/badge/docker-ready-blue" alt="Docker Ready"></a>
+</div>
+
+<br>
+
+**Version:** 1.0.0-PROD | **Architecture:** Neuro-Symbolic DAG Orchestration | **Domain:** Institutional Credit Risk & Market Intelligence
+
+ADAM is a local-first, multi-agent framework designed to bridge the gap between stochastic language processing and deterministic financial mathematics. Operating under strict privacy-by-design environments, the framework orchestrates asynchronous data pipelines to synthesize semantic market telemetry with rigorous, rules-based credit surveillance.
+
+## 📚 Quick Links
+*   [**🚀 Launch Neural Dashboard**](showcase/index.html)
+*   [**⚡ Setup Guide**](docs/setup_guide.md)
+*   [**🤖 Agent Developer Bible**](AGENTS.md)
+*   [**🧠 Architecture Whitepaper**](docs/architecture/ADAM_Technical_Specification.md)
+
+## 🧠 Why Adam? The "System 2" Revolution
+The era of the "LLM Wrapper" is over. Institutional finance faces an **Epistemological Crisis**: stochastic models hallucinate, making them dangerous for due diligence. ADAM v1.0.0-PROD solves this by enforcing the strict bifurcation of reasoning and execution, driven by the Nexus Orchestrator.
+
+### ⚡ System 1: The Neural Swarm (Fast & Intuitive)
+*   **Role:** The Autonomic Nervous System. Handles raw market telemetry, perception, and reflexes.
+*   **Architecture:** Event-Driven, Asynchronous Python Pub/Sub.
+
+### 🧠 System 2: The Neuro-Symbolic Graph (Slow & Deliberate)
+*   **Role:** The Prefrontal Cortex. Handles complex underwriting synthesis and capital structure modeling.
+*   **Architecture:** Directed Acyclic Graph (DAG) state machine running on Temporal workflows.
+
+### 📈 System 3: Stochastic Refinement & Human-Machine Co-Training
+*   **Role:** Models asset prices and systemic risk using jump-diffusion frameworks to stress-test assumptions.
+*   **Execution:** W3C PROV-O JSON telemetry logging and deterministic label validation for DPO refinement.
+
+<img width="1024" height="559" alt="image" src="https://github.com/user-attachments/assets/47bc32a1-e691-4e01-b25c-ca94e1dba0f3" />
+
+## 🛠️ Tech Stack & Capabilities
+ADAM v1.0.0-PROD is an opinionated, ready-to-run financial agent out of the box.
+*   **Core Execution (Deterministic):** Rust (Pricing kernels, matching engines, and heavy compute).
+*   **Orchestration & Agents (Stochastic):** Python 3.11+.
+*   **Governance & Rules:** JSONLogic and YAML.
+*   **Vector Storage:** Qdrant (high-performance semantic search for System 1).
+*   **Orchestration Engine:** Temporal (ensures stateful, durable DAG execution).
+
+## ⚡ Getting Started
+We strictly use **`uv`** for lightning-fast, reproducible Python environment management.
+
+1.  **Clone the Repository:**
+    ```bash
+    git clone https://github.com/adamvangrover/adam.git
+    cd adam
+    ```
+
+2.  **Sync Dependencies:**
+    ```bash
+    uv sync
+    ```
+
+3.  **Activate Environment:**
+    ```bash
+    source .venv/bin/activate
+    ```
+
+4.  **Spin Up Microservices (Temporal, Qdrant, Redis, Postgres):**
+    ```bash
+    docker-compose -f docker-compose.infra.yml up -d temporal qdrant redis postgres
+    ```
+
+5.  **Boot the Swarm & Orchestration Kernel:**
+    ```bash
+    docker-compose -f docker-compose.agents.yml up --build -d system1_swarm system2_dag system3_quant
+    ```
+
+### License
+Distributed under the MIT License. See `LICENSE` for more information.
+
+
+<div align="center">
+  <a href="https://adamvangrover.github.io/adam/">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset=".github/images/logo-dark.svg">
+      <source media="(prefers-color-scheme: light)" srcset=".github/images/logo-light.svg">
+      <img alt="Adam OS Logo" src=".github/images/logo-dark.svg" width="50%">
+    </picture>
+  </a>
+</div>
 <img width="1024" height="559" alt="image" src="https://github.com/user-attachments/assets/ea90dc98-a7f3-4546-a6d0-b977a7dcc264" />
 
 <div align="center">
