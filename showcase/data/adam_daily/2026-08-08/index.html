@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM Architecture - Interactive Prototype</title>
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- React and ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        /* Custom styles to match the dark theme and futuristic aesthetic */
+        :root {
+            --bg-dark: #0a0e17;
+            --panel-bg: #111827;
+            --border-color: #1f2937;
+            --text-main: #e5e7eb;
+            --text-muted: #9ca3af;
+            --accent-blue: #3b82f6;
+            --accent-purple: #8b5cf6;
+            --accent-green: #10b981;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            overflow-x: hidden;
+        }
+
+        .glass-panel {
+            background: rgba(17, 24, 39, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-dark);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #374151;
+        }
+
+        /* Animations */
+        @keyframes pulse-glow {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.05); }
+        }
+        
+        .animate-data-flow {
+            animation: move-right 2s linear infinite;
+        }
+
+        @keyframes move-right {
+            from { transform: translateX(-100%); }
+            to { transform: translateX(100%); }
+        }
+
+        .node-pulse {
+            animation: pulse-glow 2s infinite ease-in-out;
+        }
+        
+        /* Specific component styling */
+        .log-entry {
+            transition: all 0.2s ease;
+        }
+        .log-entry:hover {
+            background-color: rgba(31, 41, 55, 0.5);
+        }
+    </style>
+</head>
+<body class="h-screen flex flex-col antialiased">
+    <!-- Root element for React App -->
+    <div id="root" class="flex-grow flex flex-col h-full"></div>
+
+    <!-- React Application Code -->
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // --- Mock Data & Helpers ---
+        
+        const mockPdfContent = `
+CREDIT AGREEMENT
+
+Dated as of October 15, 2025
+
+Among
+
+ACME CORP, as Borrower,
+The Lenders Party Hereto,
+and
+GLOBAL BANK, as Administrative Agent.
+
+SECTION 1. DEFINITIONS
+"Consolidated EBITDA" means, for any period, Consolidated Net Income for such period plus...
+"Maximum Leverage Ratio" shall not exceed 4.50:1.00 at any time.
+        `;
+
+        // Simulate LLM extraction delay
+        const simulateExtraction = (text) => new Promise(resolve => setTimeout(() => {
+            const result = {
+                entity: "ACME CORP",
+                type: "CREDIT AGREEMENT",
+                date: "2025-10-15",
+                covenants: [
+                    { type: "Maximum Leverage Ratio", threshold: 4.50, condition: "shall not exceed" }
+                ],
+                confidence: 0.89
+            };
+            resolve(result);
+        }, 1500));
+
+        // Simulate JsonLogic Evaluation
+        const applyLogicRule = (extractedData) => {
+            // In a real scenario, this would use a jsonLogic engine
+            const rule = {
+                "and": [
+                    { "==": [{ "var": "covenants[0].type" }, "Maximum Leverage Ratio"] },
+                    { "<=": [{ "var": "covenants[0].threshold" }, 5.0] } // e.g., Institutional limit
+                ]
+            };
+            
+            // Simple mock evaluation based on extracted data
+            const isCompliant = extractedData.covenants[0].threshold <= 5.0;
+            return {
+                passed: isCompliant,
+                ruleEvaluated: rule,
+                timestamp: new Date().toISOString()
+            };
+        };
+
+        // --- UI Components ---
+
+        // 1. System 1: Probabilistic Perception Component
+        const SystemOnePerception = ({ onExtractionComplete }) => {
+            const [status, setStatus] = useState('idle'); // idle, processing, complete
+            const [result, setResult] = useState(null);
+
+            const handleProcess = async () => {
+                setStatus('processing');
+                const extracted = await simulateExtraction(mockPdfContent);
+                setResult(extracted);
+                setStatus('complete');
+                onExtractionComplete(extracted);
+            };
+
+            return (
+                <div className="glass-panel p-6 flex flex-col h-full relative overflow-hidden">
+                    <div className="flex items-center justify-between mb-4 border-b border-gray-700 pb-2">
+                        <h2 className="text-xl font-semibold text-blue-400 flex items-center gap-2">
+                            <i data-lucide="brain-circuit" className="w-5 h-5"></i>
+                            System 1: Probabilistic Perception
+                        </h2>
+                        <span className="text-xs bg-blue-900/50 text-blue-300 px-2 py-1 rounded border border-blue-800">Unstructured Data</span>
+                    </div>
+
+                    <div className="flex-grow flex flex-col md:flex-row gap-4">
+                        {/* Input Area */}
+                        <div className="flex-1 flex flex-col">
+                            <label className="text-xs text-gray-400 mb-1 uppercase tracking-wider">Input: Raw PDF Text</label>
+                            <textarea 
+                                readOnly 
+                                value={mockPdfContent}
+                                className="flex-grow bg-gray-900 text-gray-300 p-3 rounded border border-gray-700 text-sm font-mono resize-none focus:outline-none"
+                            />
+                            <button 
+                                onClick={handleProcess}
+                                disabled={status === 'processing' || status === 'complete'}
+                                className={`mt-3 py-2 px-4 rounded font-medium transition-colors ${
+                                    status === 'idle' ? 'bg-blue-600 hover:bg-blue-700 text-white' : 
+                                    status === 'processing' ? 'bg-blue-800 text-blue-300 cursor-wait' : 
+                                    'bg-gray-700 text-gray-400 cursor-not-allowed'
+                                }`}
+                            >
+                                {status === 'idle' ? 'Extract Entities (LLM)' : 
+                                 status === 'processing' ? 'Processing Manifold W_t...' : 'Extraction Complete'}
+                            </button>
+                        </div>
+
+                        {/* Visualization Area */}
+                        <div className="flex-1 bg-gray-900/50 rounded border border-gray-800 p-4 flex flex-col items-center justify-center relative">
+                            {status === 'idle' && (
+                                <div className="text-gray-500 text-center">
+                                    <i data-lucide="file-text" className="w-12 h-12 mx-auto mb-2 opacity-50"></i>
+                                    <p className="text-sm">Awaiting Input</p>
+                                </div>
+                            )}
+                            
+                            {status === 'processing' && (
+                                <div className="flex flex-col items-center">
+                                    <div className="w-24 h-24 rounded-full border-4 border-blue-500 border-t-transparent animate-spin mb-4"></div>
+                                    <p className="text-blue-400 text-sm animate-pulse">Mapping semantic embedding...</p>
+                                </div>
+                            )}
+
+                            {status === 'complete' && result && (
+                                <div className="w-full h-full flex flex-col">
+                                    <label className="text-xs text-green-400 mb-2 uppercase tracking-wider font-semibold">Semantic Embedding Output</label>
+                                    <div className="bg-gray-950 p-3 rounded border border-gray-800 flex-grow overflow-auto text-xs font-mono text-green-300">
+                                        <pre>{JSON.stringify(result, null, 2)}</pre>
+                                    </div>
+                                    <div className="mt-2 text-xs text-gray-400 text-right">
+                                        Confidence: <span className="text-blue-400">{(result.confidence * 100).toFixed(1)}%</span>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // 2. Orchestration Kernel Component (Visual Router)
+        const OrchestrationKernel = ({ dataFlowing }) => {
+            return (
+                <div className="flex flex-col items-center justify-center py-4 relative">
+                    <div className={`w-1 h-12 ${dataFlowing ? 'bg-blue-500 animate-pulse' : 'bg-gray-700'} transition-colors duration-500`}></div>
+                    
+                    <div className="glass-panel p-4 flex items-center justify-center relative z-10 w-full max-w-sm mx-auto border-purple-500/30">
+                        <div className="absolute inset-0 bg-gradient-to-r from-purple-900/20 to-blue-900/20 rounded-xl"></div>
+                        <div className="relative z-10 flex flex-col items-center text-center">
+                            <div className="flex items-center gap-2 text-purple-400 font-bold text-lg mb-1">
+                                <i data-lucide="cpu" className="w-6 h-6"></i>
+                                Orchestration Kernel
+                            </div>
+                            <div className="text-xs text-gray-400 font-mono">Immutable Router | Teleological Runtime</div>
+                            
+                            {dataFlowing && (
+                                <div className="mt-3 bg-purple-900/40 text-purple-200 text-xs px-3 py-1 rounded-full border border-purple-700/50 flex items-center gap-2">
+                                    <div className="w-2 h-2 bg-purple-400 rounded-full animate-ping"></div>
+                                    Routing state to DAG...
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    <div className={`w-1 h-12 ${dataFlowing ? 'bg-green-500 animate-pulse' : 'bg-gray-700'} transition-colors duration-500`}></div>
+                </div>
+            );
+        };
+
+        // 3. System 2: Deterministic Grounding Component
+        const SystemTwoGrounding = ({ inputData, onEvaluationComplete }) => {
+            const [evalState, setEvalState] = useState('idle'); // idle, evaluating, complete
+            const [result, setResult] = useState(null);
+
+            useEffect(() => {
+                if (inputData && evalState === 'idle') {
+                    setEvalState('evaluating');
+                    // Simulate processing time for logic DAG
+                    setTimeout(() => {
+                        const res = applyLogicRule(inputData);
+                        setResult(res);
+                        setEvalState('complete');
+                        onEvaluationComplete(res, inputData);
+                    }, 1000);
+                }
+            }, [inputData]);
+
+            return (
+                <div className="glass-panel p-6 flex flex-col h-full relative border-green-900/50">
+                    <div className="flex items-center justify-between mb-4 border-b border-gray-700 pb-2">
+                        <h2 className="text-xl font-semibold text-green-400 flex items-center gap-2">
+                            <i data-lucide="git-merge" className="w-5 h-5"></i>
+                            System 2: Deterministic Grounding
+                        </h2>
+                        <span className="text-xs bg-green-900/50 text-green-300 px-2 py-1 rounded border border-green-800">Logic DAG</span>
+                    </div>
+
+                    <div className="flex-grow flex flex-col md:flex-row gap-4">
+                        {/* Logic Definition */}
+                        <div className="flex-1 flex flex-col bg-gray-900/50 p-4 rounded border border-gray-800">
+                            <label className="text-xs text-gray-400 mb-2 uppercase tracking-wider">JsonLogic State Machine (O_prefs)</label>
+                            <div className="bg-gray-950 p-3 rounded border border-gray-700 flex-grow overflow-auto text-xs font-mono text-gray-300">
+                                <pre>{JSON.stringify({
+                                    "and": [
+                                        { "==": [{ "var": "covenant_type" }, "Maximum Leverage Ratio"] },
+                                        { "<=": [{ "var": "threshold" }, 5.0] }
+                                    ]
+                                }, null, 2)}</pre>
+                            </div>
+                            <div className="mt-3 text-xs text-gray-500">
+                                Grounding fuzzy extracted entities into localized logical propositions ($L_0$).
+                            </div>
+                        </div>
+
+                        {/* Execution Result */}
+                        <div className="flex-1 flex flex-col">
+                            <label className="text-xs text-gray-400 mb-2 uppercase tracking-wider">Execution Result</label>
+                            <div className="bg-gray-900 p-4 rounded border border-gray-800 flex-grow flex flex-col items-center justify-center relative">
+                                {evalState === 'idle' && (
+                                    <div className="text-gray-600 text-center">
+                                        <i data-lucide="shield-alert" className="w-10 h-10 mx-auto mb-2"></i>
+                                        <p className="text-sm">Awaiting State Injection</p>
+                                    </div>
+                                )}
+                                
+                                {evalState === 'evaluating' && (
+                                    <div className="flex items-center gap-3 text-green-500">
+                                        <i data-lucide="loader" className="w-6 h-6 animate-spin"></i>
+                                        <span className="font-mono text-sm">Evaluating DAG...</span>
+                                    </div>
+                                )}
+
+                                {evalState === 'complete' && result && (
+                                    <div className="w-full text-center">
+                                        <div className={`inline-flex items-center justify-center p-4 rounded-full mb-4 ${result.passed ? 'bg-green-900/50 text-green-400 border border-green-500' : 'bg-red-900/50 text-red-400 border border-red-500'}`}>
+                                            <i data-lucide={result.passed ? "check-circle" : "x-circle"} className="w-12 h-12"></i>
+                                        </div>
+                                        <h3 className={`text-xl font-bold mb-2 ${result.passed ? 'text-green-400' : 'text-red-400'}`}>
+                                            {result.passed ? 'COMPLIANT (Invariant Maintained)' : 'BREACH DETECTED'}
+                                        </h3>
+                                        <div className="text-xs font-mono text-gray-400 bg-gray-950 p-2 rounded">
+                                            Eval Time: {result.timestamp}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // 4. System 3: Telemetry & DPO Component
+        const SystemThreeTelemetry = ({ logs }) => {
+            return (
+                <div className="glass-panel p-6 flex flex-col h-full border-orange-900/50">
+                     <div className="flex items-center justify-between mb-4 border-b border-gray-700 pb-2">
+                        <h2 className="text-xl font-semibold text-orange-400 flex items-center gap-2">
+                            <i data-lucide="activity" className="w-5 h-5"></i>
+                            System 3: Telemetry & Co-Training
+                        </h2>
+                        <span className="text-xs bg-orange-900/50 text-orange-300 px-2 py-1 rounded border border-orange-800">W3C PROV-O</span>
+                    </div>
+                    
+                    <div className="flex-grow flex flex-col bg-gray-900/80 rounded border border-gray-800 overflow-hidden">
+                        <div className="bg-gray-800 px-4 py-2 border-b border-gray-700 flex justify-between text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                            <span>Event Log</span>
+                            <span>Action / Status</span>
+                        </div>
+                        <div className="flex-grow overflow-auto p-2">
+                            {logs.length === 0 ? (
+                                <div className="h-full flex items-center justify-center text-gray-600 text-sm italic">
+                                    No telemetry events recorded yet.
+                                </div>
+                            ) : (
+                                logs.map((log, index) => (
+                                    <div key={index} className="log-entry p-3 border-b border-gray-800/50 flex flex-col gap-1">
+                                        <div className="flex justify-between items-start">
+                                            <span className="text-blue-300 font-mono text-xs">{log.timestamp}</span>
+                                            <span className={`text-xs px-2 py-0.5 rounded ${
+                                                log.type === 'extraction' ? 'bg-blue-900 text-blue-300' :
+                                                log.type === 'evaluation' ? (log.status === 'success' ? 'bg-green-900 text-green-300' : 'bg-red-900 text-red-300') :
+                                                'bg-gray-700 text-gray-300'
+                                            }`}>
+                                                {log.action}
+                                            </span>
+                                        </div>
+                                        <div className="text-sm text-gray-300 truncate">
+                                            {log.details}
+                                        </div>
+                                        {/* Mock DPO Pair generation on evaluation complete */}
+                                        {log.type === 'evaluation' && (
+                                            <div className="mt-2 bg-gray-950 p-2 rounded text-xs font-mono text-gray-500 flex justify-between items-center">
+                                                <span>DPO Pair Generated (Automated accept)</span>
+                                                <i data-lucide="database" className="w-3 h-3 text-orange-500"></i>
+                                            </div>
+                                        )}
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+
+        // --- Main App Container ---
+        const App = () => {
+            const [extractedData, setExtractedData] = useState(null);
+            const [isRouting, setIsRouting] = useState(false);
+            const [logs, setLogs] = useState([]);
+
+            // Ensure icons are rendered after mount
+            useEffect(() => {
+                if (window.lucide) {
+                    window.lucide.createIcons();
+                }
+            });
+
+            // Update icons when state changes might add new ones
+            useEffect(() => {
+                if (window.lucide) {
+                    setTimeout(() => window.lucide.createIcons(), 50);
+                }
+            }, [extractedData, isRouting, logs]);
+
+            const addLog = (type, action, details, status = 'info') => {
+                setLogs(prev => [{
+                    timestamp: new Date().toLocaleTimeString(),
+                    type, action, details, status
+                }, ...prev]);
+            };
+
+            const handleExtractionComplete = (data) => {
+                addLog('extraction', 'LLM Extracted Entities', `Entity: ${data.entity}, Confidence: ${data.confidence}`);
+                setIsRouting(true);
+                
+                // Simulate Orchestration Kernel routing delay
+                setTimeout(() => {
+                    setIsRouting(false);
+                    setExtractedData(data); // Pass to System 2
+                    addLog('routing', 'State Transfer', 'Orchestration Kernel routed W_t -> Logic DAG');
+                }, 1500);
+            };
+
+            const handleEvaluationComplete = (result, data) => {
+                addLog('evaluation', 
+                    result.passed ? 'Rule Passed' : 'Rule Failed', 
+                    `Evaluated threshold ${data.covenants[0].threshold} against limit 5.0`,
+                    result.passed ? 'success' : 'error'
+                );
+            };
+
+            return (
+                <div className="max-w-7xl mx-auto w-full p-4 md:p-6 lg:p-8 flex-grow flex flex-col">
+                    {/* Header */}
+                    <header className="mb-8 flex items-center justify-between">
+                        <div>
+                            <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-purple-400 to-green-400">
+                                'ADAM' Technical Specification
+                            </h1>
+                            <p className="text-gray-400 font-mono text-sm mt-1">Interactive Telemetry & Logic Routing Prototype</p>
+                        </div>
+                        <div className="hidden md:flex gap-4">
+                            <div className="flex flex-col items-end">
+                                <span className="text-xs text-gray-500 uppercase tracking-widest">Status</span>
+                                <span className="text-green-400 font-mono text-sm flex items-center gap-2">
+                                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                                    SYSTEM ONLINE
+                                </span>
+                            </div>
+                        </div>
+                    </header>
+
+                    {/* Main Layout Grid */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 flex-grow">
+                        
+                        {/* Left Column: Flow Execution */}
+                        <div className="flex flex-col h-full space-y-2">
+                            {/* System 1 */}
+                            <div className="flex-grow shadow-lg">
+                                <SystemOnePerception onExtractionComplete={handleExtractionComplete} />
+                            </div>
+                            
+                            {/* Orchestration Router */}
+                            <OrchestrationKernel dataFlowing={isRouting} />
+                            
+                            {/* System 2 */}
+                            <div className="flex-grow shadow-lg">
+                                <SystemTwoGrounding inputData={extractedData} onEvaluationComplete={handleEvaluationComplete} />
+                            </div>
+                        </div>
+
+                        {/* Right Column: Telemetry & Downstream */}
+                        <div className="flex flex-col h-full space-y-6">
+                            
+                            {/* System 3 Telemetry Box */}
+                            <div className="flex-grow shadow-lg">
+                                <SystemThreeTelemetry logs={logs} />
+                            </div>
+                            
+                            {/* Downstream Projects Info Card */}
+                            <div className="glass-panel p-6 border-gray-700/50">
+                                <h3 className="text-lg font-semibold text-gray-200 mb-4 flex items-center gap-2">
+                                    <i data-lucide="layers" className="w-5 h-5 text-gray-400"></i>
+                                    Downstream Execution Boundaries
+                                </h3>
+                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                    <div className="bg-gray-900/50 p-4 rounded border border-gray-800 text-center flex flex-col items-center hover:border-purple-500/50 transition-colors">
+                                        <i data-lucide="zap" className="w-8 h-8 text-purple-400 mb-2"></i>
+                                        <h4 className="font-bold text-sm text-gray-300">Project Mayhem</h4>
+                                        <p className="text-xs text-gray-500 mt-2">Unconstrained macro simulation & predictive oracle.</p>
+                                    </div>
+                                    <div className="bg-gray-900/50 p-4 rounded border border-gray-800 text-center flex flex-col items-center hover:border-green-500/50 transition-colors">
+                                        <i data-lucide="shield" className="w-8 h-8 text-green-400 mb-2"></i>
+                                        <h4 className="font-bold text-sm text-gray-300">Project Fortress</h4>
+                                        <p className="text-xs text-gray-500 mt-2">Automated institutional credit grading shield (SNC).</p>
+                                    </div>
+                                    <div className="bg-gray-900/50 p-4 rounded border border-gray-800 text-center flex flex-col items-center hover:border-blue-500/50 transition-colors">
+                                        <i data-lucide="target" className="w-8 h-8 text-blue-400 mb-2"></i>
+                                        <h4 className="font-bold text-sm text-gray-300">Project Hunt</h4>
+                                        <p className="text-xs text-gray-500 mt-2">Multi-asset alpha generation via deterministic constraints.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
