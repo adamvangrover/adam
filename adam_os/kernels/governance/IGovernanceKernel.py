@@ -1,5 +1,6 @@
 import logging
-from typing import Dict, Optional
+import datetime
+from typing import Dict, Optional, Any, List
 
 # Assuming these are available from your core and interfaces packages
 from afos_core import Decision, ImmutableDecisionBlock
@@ -111,3 +112,34 @@ class GovernanceKernel(IGovernanceKernel):
             current_hash = block.previous_block_hash
             
         return True
+
+    async def log_telemetry_prov_o(self, activity_id: str, used_entities: List[str], generated_entity_id: str, generated_metric: str, generated_value: Any, dpo_feedback: Optional[Dict[str, str]] = None, human_override: bool = False, override_reason: str = "") -> dict:
+        """
+        Logs a decision trace in W3C PROV-O format.
+        """
+        prov_o_log = {
+            "@context": "http://www.w3.org/ns/prov#",
+            "activity": {
+                activity_id: {
+                    "prov:startedAtTime": datetime.datetime.utcnow().isoformat() + "Z",
+                    "prov:used": used_entities
+                }
+            },
+            "entity": {
+                generated_entity_id: {
+                    "prov:wasGeneratedBy": activity_id,
+                    "metric": generated_metric,
+                    "value": generated_value,
+                    "human_override": human_override
+                }
+            }
+        }
+        
+        if human_override and override_reason:
+            prov_o_log["entity"][generated_entity_id]["override_reason"] = override_reason
+            
+        if dpo_feedback:
+            prov_o_log["dpo_feedback"] = dpo_feedback
+            
+        logger.info(f"PROV-O Log generated for {generated_entity_id}")
+        return prov_o_log
