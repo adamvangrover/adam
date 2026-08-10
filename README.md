@@ -1,3 +1,4 @@
+<img width="1024" height="559" alt="image" src="https://github.com/user-attachments/assets/0da62bbf-6daa-4c07-9d29-ac2ad4fc5453" />
 
 <div align="center">
   <a href="https://adamvangrover.github.io/adam/">
