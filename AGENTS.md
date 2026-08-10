@@ -666,3 +666,31 @@ To prevent "Graph Spaghetti" and circular dependencies, follow these rules:
 
 ## AFOS Architecture Upgrade
 - The repository is transitioning to the Adam Financial Operating System. Please refer to `adam_os/AFOS_LLM_CONTEXT.md` for the mandatory new paradigms.
+
+## Architectural Invariants (AFOS vNext)
+
+**INVARIANT A:** LLMs may propose calculations but may not implement authoritative financial calculations in the cognitive/orchestration layer.
+**INVARIANT B:** All state-changing operations pass through the governance plane.
+**INVARIANT C:** All state-changing operations receive a risk classification.
+**INVARIANT D:** All state-changing operations produce an immutable event.
+**INVARIANT E:** All material decisions receive provenance metadata.
+**INVARIANT F:** Frozen analytical context may not silently mutate during a decision.
+**INVARIANT G:** Rust execution kernels are deterministic and independently testable.
+**INVARIANT H:** Generated/native build artifacts are never manually edited.
+**INVARIANT I:** Policy is externalized from prompts.
+**INVARIANT J:** Tests must validate both successful and adversarial execution paths.
+
+## Path-Specific Permissions
+
+| Path | Agent Capability |
+| :--- | :--- |
+| `docs/` | write |
+| `tests/` | write |
+| `evals/` | write |
+| `agents/` | write with tests |
+| `core/governance/` | restricted |
+| `schemas/guardrails.json` | restricted |
+| `rust_ext/` | restricted + native tests |
+| `event/provenance code` | highly restricted |
+| `generated artifacts` | prohibited |
+| `migrations` | approval required |

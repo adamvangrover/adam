@@ -1,44 +1,70 @@
 {
-  "version": "Adam OS vNext",
-  "architecture": "Multi-Plane Topology",
-  "invariants": {
-    "A": "Decoupled Architecture: LLMs propose, Policy authorizes, Rust executes.",
-    "B": "Governance Boundary: No side effects bypass the policy engine.",
-    "C": "Deterministic Replayability: W3C PROV-O audit trails and context freezing.",
-    "D": "Fail-Closed Security: Unknown intent defaults to denied.",
-    "E": "Execution Isolation: Python Orchestrates, Rust Computes.",
-    "F": "Data Ingestion: System 1 parses chaos to typed schema.",
-    "G": "Graph Representation: DAG for deterministic paths.",
-    "H": "MCP Isolation: Agents only act through defined tools.",
-    "I": "Stateless Swarm: System 1 is ephemeral and non-blocking.",
-    "J": "Agent Consensus: Orchestrator resolves conflict via logic rules."
+  "name": "adam-financial-operating-system",
+  "version": "next-vNext",
+  "architecture": {
+    "topology": "Multi-Plane Topology",
+    "runtimes": {
+      "reasoning": "python",
+      "orchestration": "python",
+      "deterministic_execution": "rust",
+      "governance": "python",
+      "provenance": "python",
+      "event_transport": "nats"
+    }
   },
   "execution_domains": [
     "System 1 (Neural Swarm)",
     "System 2 (Neuro-Symbolic Graph)",
     "System 3 (Simulation)"
   ],
+  "invariants": {
+    "policy_before_mutation": {
+      "title": "Governance Boundary",
+      "description": "No side effects bypass the policy engine. Actions are vetted through SMT solvers or jsonLogic prior to taking place."
+    },
+    "provenance_before_commit": {
+      "title": "Deterministic Replayability",
+      "description": "Every step in the DAG creates W3C PROV-O provenance linked data representing the Entity, the Activity, and the Agent. Human overrides are treated solely as Candidate Evidence."
+    },
+    "frozen_context": {
+      "title": "Context Freezing",
+      "description": "Analytical parameters are frozen into an immutable Context Object upon creation. The state is hashed and injected as W3C PROV metadata."
+    },
+    "deterministic_numeric_execution": {
+      "title": "Rust Compute Kernels",
+      "description": "Native math occurs only inside compiled Rust kernels using isolated deterministic routines bounded by the abi3-py310 standard, releasing the GIL using py.allow_threads()."
+    },
+    "decoupled_architecture": {
+      "title": "Separation of Concerns",
+      "description": "LLMs propose, Policy authorizes, Rust executes."
+    },
+    "fail_closed_security": {
+      "title": "Default Deny",
+      "description": "Unknown intent defaults to denied. LLMs request actions, which default to fail-closed postures if untracked."
+    },
+    "mcp_isolation": {
+      "title": "Model Context Protocol",
+      "description": "Agents interact with the world strictly through MCP, guarded by Intent Gates. This secures boundaries against agent goal hijacking."
+    },
+    "stateless_swarm": {
+      "title": "Ephemeral System 1",
+      "description": "System 1 is ephemeral and non-blocking, parsing chaos to typed schema."
+    },
+    "agent_consensus": {
+      "title": "Conflict Resolution",
+      "description": "Orchestrator resolves conflict via logic rules over a DAG for deterministic paths."
+    }
+  },
   "core_paradigms": {
     "probabilistic_cognition": "LLMs operate solely as orchestrators proposing intent, scenario construction, and anomaly detection.",
     "deterministic_governance": "All actions are intercepted by a policy engine before state mutation.",
     "stochastic_simulation": "Adversarial perturbation against bounded financial inputs.",
-    "verifiable_execution": "Native math occurs only inside compiled Rust kernels using isolated deterministic routines."
+    "verifiable_execution": "Native math occurs only inside compiled Rust kernels (e.g., VaR, stress tests, Monte Carlo models)."
   },
-  "governance_substrate": {
-    "policy_isolation": "Actions are vetted through SMT solvers or jsonLogic prior to taking place.",
-    "default_deny": "LLMs request actions, which default to fail-closed postures if untracked."
-  },
-  "context_freezing": {
-    "description": "Analytical parameters are frozen into an immutable Context Object upon creation. The state of this object is hashed and injected as W3C PROV metadata, securing deterministic replayability."
-  },
-  "polyglot_runtime_topology": {
-    "python": "Orchestration, API execution, probabilistic agent reasoning.",
-    "rust": "Deterministic logic. Calculations involving Value at Risk (VaR), stress tests, and Monte Carlo models are performed directly in a compiled Rust kernel bounded by the abi3-py310 standard, releasing the GIL using py.allow_threads() for true concurrency."
-  },
-  "model_context_protocol": {
-    "description": "Agents interact with the world strictly through MCP, guarded by Intent Gates. This secures boundaries against agent goal hijacking and bounds execution."
-  },
-  "w3c_provo_integration": {
-    "description": "Every step in the DAG creates provenance linked data representing the Entity, the Activity, and the Agent. Human overrides are treated solely as Candidate Evidence."
+  "surfaces": {
+    "human": ["README.md", "docs/"],
+    "agent": ["AGENTS.md", "adam.manifest.json"],
+    "web": ["llms.txt", "llms-full.txt"],
+    "protocol": ["mcp/"]
   }
 }
