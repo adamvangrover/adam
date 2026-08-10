@@ -1,6 +1,6 @@
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["maturin>=1.0,<2.0"]
+build-backend = "maturin"
 
 [tool.poetry]
 name = "adam-kernel"
@@ -160,3 +160,8 @@ testpaths = [
 pythonpath = [
     ".", "core"
 ]
+
+[tool.maturin]
+python-source = "."
+module-name = "rust_ext"
+features = ["pyo3/extension-module"]
