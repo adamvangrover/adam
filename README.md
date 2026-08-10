@@ -550,3 +550,5 @@ Distributed under the MIT License. See `LICENSE` for more information.
 Adam operates on a strictly decoupled architecture.
 - Do not import `streamlit` anywhere inside `src/backend`.
 - All autonomous contributions must adhere to the schemas in `AGENTS.md` and rules in `llms.txt`.
+
+<img width="2816" height="1536" alt="image" src="https://github.com/user-attachments/assets/c2a555c1-d337-4972-aa80-f8845bcc2f91" />
