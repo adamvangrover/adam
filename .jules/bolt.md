@@ -205,3 +205,7 @@
 ## 2025-02-27 - [Optimize JSON Logic Rule Loading]
 **Learning:** Performing synchronous disk I/O (`open` and `json.load`) repeatedly within calculation or validation methods, such as `AgentOrchestrator._evaluate_preconditions`, creates a severe performance bottleneck during high-frequency rule evaluations across thousands of agent workflows.
 **Action:** Always extract the loading logic into a module-level cached function using `@functools.lru_cache` to bypass disk I/O entirely after the first read, resulting in significantly faster and more stable execution.
+
+## 2026-08-10 - [Test Scenario Name Alignment]
+**Learning:** Hardcoded scenario names in simulation logic (like `scripts/market_mayhem_crisis_sim.py`) must exactly match the strings used in evaluation test scripts (like `evals/eval_crisis_sim.py`). A mismatch can result in silent `None` returns, which subsequently cause runtime errors like `TypeError: 'NoneType' object is not subscriptable` when attempting downstream calculations.
+**Action:** When updating or renaming scenarios or constants in the core simulator, always grep the repository to update corresponding unit tests and evaluations. Conversely, if a test throws a `NoneType` error, verify the key/scenario mapping string first.

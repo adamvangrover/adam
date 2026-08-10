@@ -45,7 +45,7 @@ class TestCrisisSimulator(unittest.TestCase):
 
     def test_risk_profile_impact(self):
         """Test that AGGRESSIVE profile has higher volatility (std dev) than CONSERVATIVE."""
-        scenario = "2022_INFLATION"
+        scenario = "2022_INFLATION_SHOCK"
 
         sim_agg = CrisisSimulator(seed="risk_test", risk_profile="AGGRESSIVE")
         res_agg = sim_agg.run_simulation(scenario)
