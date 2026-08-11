@@ -1,3 +1,95 @@
+<img width="1024" height="559" alt="image" src="https://github.com/user-attachments/assets/0da62bbf-6daa-4c07-9d29-ac2ad4fc5453" />
+
+<div align="center">
+  <a href="https://adamvangrover.github.io/adam/">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset=".github/images/logo-dark.svg">
+      <source media="(prefers-color-scheme: light)" srcset=".github/images/logo-light.svg">
+      <img alt="Adam OS Logo" src=".github/images/logo-dark.svg" width="50%">
+    </picture>
+  </a>
+</div>
+
+<div align="center">
+  <h3>ADAM: Autonomous Deterministic Alpha Matrix</h3>
+  <p>The Institutional-Grade Neuro-Symbolic Financial Sovereign.</p>
+</div>
+
+<div align="center">
+  <a href="https://opensource.org/licenses/MIT" target="_blank"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License"></a>
+  <a href="https://www.python.org/downloads/" target="_blank"><img src="https://img.shields.io/badge/python-3.11+-blue.svg" alt="Python 3.11+"></a>
+  <a href="https://hub.docker.com/" target="_blank"><img src="https://img.shields.io/badge/docker-ready-blue" alt="Docker Ready"></a>
+</div>
+
+<br>
+
+**Version:** 1.0.0-PROD | **Architecture:** Neuro-Symbolic DAG Orchestration | **Domain:** Institutional Credit Risk & Market Intelligence
+
+ADAM is a local-first, multi-agent framework designed to bridge the gap between stochastic language processing and deterministic financial mathematics. Operating under strict privacy-by-design environments, the framework orchestrates asynchronous data pipelines to synthesize semantic market telemetry with rigorous, rules-based credit surveillance.
+
+## 📚 Quick Links
+*   [**🚀 Launch Neural Dashboard**](showcase/index.html)
+*   [**⚡ Setup Guide**](docs/setup_guide.md)
+*   [**🤖 Agent Developer Bible**](AGENTS.md)
+*   [**🧠 Architecture Whitepaper**](docs/architecture/ADAM_Technical_Specification.md)
+
+## 🧠 Why Adam? The "System 2" Revolution
+The era of the "LLM Wrapper" is over. Institutional finance faces an **Epistemological Crisis**: stochastic models hallucinate, making them dangerous for due diligence. ADAM v1.0.0-PROD solves this by enforcing the strict bifurcation of reasoning and execution, driven by the Nexus Orchestrator.
+
+### ⚡ System 1: The Neural Swarm (Fast & Intuitive)
+*   **Role:** The Autonomic Nervous System. Handles raw market telemetry, perception, and reflexes.
+*   **Architecture:** Event-Driven, Asynchronous Python Pub/Sub.
+
+### 🧠 System 2: The Neuro-Symbolic Graph (Slow & Deliberate)
+*   **Role:** The Prefrontal Cortex. Handles complex underwriting synthesis and capital structure modeling.
+*   **Architecture:** Directed Acyclic Graph (DAG) state machine running on Temporal workflows.
+
+### 📈 System 3: Stochastic Refinement & Human-Machine Co-Training
+*   **Role:** Models asset prices and systemic risk using jump-diffusion frameworks to stress-test assumptions.
+*   **Execution:** W3C PROV-O JSON telemetry logging and deterministic label validation for DPO refinement.
+
+<img width="1024" height="559" alt="image" src="https://github.com/user-attachments/assets/47bc32a1-e691-4e01-b25c-ca94e1dba0f3" />
+
+## 🛠️ Tech Stack & Capabilities
+ADAM v1.0.0-PROD is an opinionated, ready-to-run financial agent out of the box.
+*   **Core Execution (Deterministic):** Rust (Pricing kernels, matching engines, and heavy compute).
+*   **Orchestration & Agents (Stochastic):** Python 3.11+.
+*   **Governance & Rules:** JSONLogic and YAML.
+*   **Vector Storage:** Qdrant (high-performance semantic search for System 1).
+*   **Orchestration Engine:** Temporal (ensures stateful, durable DAG execution).
+
+## ⚡ Getting Started
+We strictly use **`uv`** for lightning-fast, reproducible Python environment management.
+
+1.  **Clone the Repository:**
+    ```bash
+    git clone https://github.com/adamvangrover/adam.git
+    cd adam
+    ```
+
+2.  **Sync Dependencies:**
+    ```bash
+    uv sync
+    ```
+
+3.  **Activate Environment:**
+    ```bash
+    source .venv/bin/activate
+    ```
+
+4.  **Spin Up Microservices (Temporal, Qdrant, Redis, Postgres):**
+    ```bash
+    docker-compose -f docker-compose.infra.yml up -d temporal qdrant redis postgres
+    ```
+
+5.  **Boot the Swarm & Orchestration Kernel:**
+    ```bash
+    docker-compose -f docker-compose.agents.yml up --build -d system1_swarm system2_dag system3_quant
+    ```
+
+### License
+Distributed under the MIT License. See `LICENSE` for more information.
+
 
 <div align="center">
   <a href="https://adamvangrover.github.io/adam/">
@@ -57,6 +149,8 @@ The era of the "LLM Wrapper" is over. Institutional finance faces an **Epistemol
 *   **Execution:** Stateful, tool-augmented (MCP), and highly reflective. Uses Qdrant for Just-In-Time (JIT) memory retrieval over trailing 12-month SEC filings.
 
 ## 📐 System Architecture (v30.1)
+<img width="1024" height="559" alt="image" src="https://github.com/user-attachments/assets/61fd5a60-61a0-4dbe-9b26-21b2fe48e496" />
+
 
 ```mermaid
 graph TD
@@ -69,8 +163,13 @@ graph TD
         Surv1 & Surv2 --> TemporalBus[Temporal Event Bus]
     end
 
+    subgraph "Integration Layer"
+        TemporalBus -.-> PDIL_Gatekeeper[PDIL: Probabilistic-to-Deterministic Gatekeeper]
+    end
+
     subgraph "System 2: Neuro-Symbolic Graph (DAG)"
         Nexus ==>|Deep Dive| Planner[DAG State Machine]
+        PDIL_Gatekeeper -->|Structured Inputs| Planner
         Planner --> Underwriter[Underwriting Agent]
         Planner --> Sentinel[Sentinel Security Agent]
 
@@ -92,6 +191,7 @@ This framework is built specifically targeting Broadly Syndicated Loans (BSL), i
 * **Bifurcated Environments:** Strict separation between Path A (Reliability & Risk Control) and Path B (Lab/Velocity Iteration).
 * **Implied Structural PD:** Probability of Default (PD) is structurally implied by the generated facility rating. The system eliminates redundant PD calculations to ensure clean, institutional-grade output artifacts (HDKG).
 * **Deterministic Governance:** Business logic (covenants, financial thresholds) is evaluated deterministically via `jsonLogic` in `adam_os/contexts/governance/rules.jsonLogic`, never hardcoded in Python.
+* **Multimodal Compatibility:** Fully equipped to process and synthesize complex inputs such as charts, images, and audio transcripts via the System 1 Data Layer.
 * **W3C PROV-O Audit Trails:** Every decision generates an immutable telemetry log with a verifiable reasoning trace.
 
 ## 📂 Directory Structure
@@ -261,6 +361,7 @@ This framework is built for institutional-grade utility, specifically targeting 
 ### The Research Frontier
 *   **Neuro-Symbolic Routing:** Using open-weight models to parse semantic chaos and automatically route extracted parameters into strict, non-LLM pricing engines via the PDIL.
 *   **Dynamic Covenant Stress-Testing:** Real-time translation of NLP-extracted corporate structural changes into immediate covenant breach simulations.
+*   **Multimodal Compatibility:** Comprehensive support for multimodal data ingestion, enabling real-time processing of complex market signals including images (e.g., charts, architectural diagrams) and audio transcripts via the System 1 Data Layer.
 
 ### Experimental Integrations
 *   **Quantum Pricing Integration:** Active development utilizing Quantum Amplitude Estimation (QAE) and Hamiltonian-based optimization for simulating extreme market tail-risks.
@@ -306,8 +407,14 @@ graph TD
         SwarmManager -->|Spawn| SentimentEngine["Semantic NLP Engine"]
     end
 
+    %% 3.5. Governance & Integration
+    subgraph Integration_Layer [Integration Layer]
+        SwarmManager -.->|Unstructured Data| PDIL["PDIL (Probabilistic-to-Deterministic Gatekeeper)"]
+    end
+
     %% 4. System 2: Deep Reasoning
     subgraph System_2_Reasoning [System 2: Neuro-Symbolic DAG Graph]
+        PDIL -->|Structured Inputs| Planner
         MetaOrchestrator -->|Complex Query| Planner["DAG Reasoning Planner"]
         Planner -->|Credit| CreditSentinel["Credit Sentinel (SNC, VaR, LGD, PD)"]
         Planner -->|Covenants| CovenantTester["Dynamic Stress-Tester"]
@@ -443,3 +550,5 @@ Distributed under the MIT License. See `LICENSE` for more information.
 Adam operates on a strictly decoupled architecture.
 - Do not import `streamlit` anywhere inside `src/backend`.
 - All autonomous contributions must adhere to the schemas in `AGENTS.md` and rules in `llms.txt`.
+
+<img width="2816" height="1536" alt="image" src="https://github.com/user-attachments/assets/c2a555c1-d337-4972-aa80-f8845bcc2f91" />

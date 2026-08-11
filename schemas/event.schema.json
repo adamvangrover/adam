@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Event Envelope",
+  "type": "object",
+  "properties": {
+    "event_id": { "type": "string" },
+    "event_type": { "type": "string" },
+    "occurred_at": { "type": "string", "format": "date-time" },
+    "actor_id": { "type": "string" },
+    "correlation_id": { "type": "string" },
+    "causation_id": { "type": "string" },
+    "context_id": { "type": "string" },
+    "context_hash": { "type": "string" },
+    "policy_version": { "type": "string" },
+    "code_revision": { "type": "string" },
+    "risk_class": { "type": "string" },
+    "payload_hash": { "type": "string" },
+    "provenance_id": { "type": "string" },
+    "schema_version": { "type": "integer" },
+    "data": { "type": "object" }
+  },
+  "required": ["event_id", "event_type", "occurred_at", "actor_id", "risk_class", "schema_version"]
+}
