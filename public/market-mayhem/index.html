@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Market Mayhem - Daily Hub</title>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        body {
+            background-color: var(--mayhem-bg);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            padding: 0;
+        }
+        .header {
+            background: linear-gradient(135deg, #000, #330000);
+            border-bottom: 3px solid var(--mayhem-primary);
+            padding: 40px 20px;
+            text-align: center;
+        }
+        h1 {
+            color: var(--mayhem-primary);
+            font-size: 3rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin: 0;
+            text-shadow: 2px 2px 0px rgba(0,0,0,0.5);
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #444;
+            padding-bottom: 10px;
+        }
+        .tab {
+            padding: 10px 20px;
+            background: #222;
+            cursor: pointer;
+            border-radius: 4px 4px 0 0;
+            font-weight: bold;
+        }
+        .tab.active {
+            background: var(--mayhem-primary);
+            color: #fff;
+        }
+        .news-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .news-item {
+            background: #111;
+            border-left: 4px solid var(--mayhem-accent);
+            padding: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+        .news-date {
+            color: var(--mayhem-accent);
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        .news-title {
+            font-size: 1.2rem;
+            margin: 10px 0;
+            color: #fff;
+        }
+        .nav-link {
+            display: inline-block;
+            margin-top: 30px;
+            color: #fff;
+            text-decoration: none;
+            background: #333;
+            padding: 10px 15px;
+            border-radius: 4px;
+        }
+        .nav-link:hover {
+            background: var(--mayhem-primary);
+        }
+        /* Search bar */
+        .search-container {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        #search-input {
+            flex-grow: 1;
+            padding: 10px;
+            background: #222;
+            border: 1px solid #444;
+            color: #fff;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>MARKET MAYHEM</h1>
+        <p style="color: var(--mayhem-accent); font-weight: bold;">Dynamic Market Intelligence & Retail Strategy Hub</p>
+    </div>
+
+    <div class="container">
+        <div class="search-container">
+            <input type="text" id="search-input" placeholder="Search newsletters and market updates..." oninput="filterNews()">
+        </div>
+
+        <div class="tabs">
+            <div class="tab active">Daily Newsletters</div>
+            <div class="tab">Historic Datastreams</div>
+        </div>
+
+        <div class="news-grid" id="news-grid">
+            <!-- Newsletters hydrated here -->
+        </div>
+
+        <a href="../index.html" class="nav-link">&lt;&lt; Return to FDOS Desktop</a>
+        <a href="../adam-research/index.html" class="nav-link" style="margin-left: 10px; background: var(--research-primary);">View Historic Performance in Adam Research &gt;&gt;</a>
+    </div>
+
+    <script>
+        const newsData = [
+            { date: "2026-01-01", title: "Newsletter 2026", file: "../../newsletter_2026.png" },
+            { date: "Live", title: "Market Live / Neural Exchange", file: "../../market_live.html" },
+            { date: "1929-10-24", title: "Newsletter 1929", file: "../../newsletter_1929.png" },
+            { date: "2025-02-13", title: "Daily Briefing 2025 02 13", file: "../../showcase/Daily_Briefing_2025_02_13.html" },
+            { date: "2025-05-23", title: "Market Pulse 2025 05 23", file: "../../showcase/Market_Pulse_2025_05_23.html" },
+            { date: "Live", title: "Newsletter Market Mayhem Apr 04 2025", file: "../../showcase/newsletter_market_mayhem_apr_04_2025.html" },
+            { date: "2025-02-28", title: "Market Pulse 2025 02 28", file: "../../showcase/Market_Pulse_2025_02_28.html" },
+            { date: "2025-12-09", title: "Daily Briefing 2025 12 09", file: "../../showcase/Daily_Briefing_2025_12_09.html" },
+            { date: "Live", title: "Newsletter Market Mayhem Nov", file: "../../showcase/newsletter_market_mayhem_nov.html" },
+            { date: "2026-01-01", title: "Daily Briefing 2026 02 17", file: "../../showcase/Daily_Briefing_2026_02_17.html" }
+        ];
+
+        function renderNews(data) {
+            const grid = document.getElementById('news-grid');
+            grid.innerHTML = '';
+            data.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'news-item';
+                div.innerHTML = `
+                    <div class="news-date">${item.date}</div>
+                    <div class="news-title">${item.title}</div>
+                    <a href="${item.file}" style="color: var(--mayhem-primary); text-decoration: none; font-size: 0.9rem;">Read Report &rarr;</a>
+                `;
+                grid.appendChild(div);
+            });
+        }
+
+        function filterNews() {
+            const query = document.getElementById('search-input').value.toLowerCase();
+            const filtered = newsData.filter(item =>
+                item.title.toLowerCase().includes(query) ||
+                item.date.toLowerCase().includes(query)
+            );
+            renderNews(filtered);
+        }
+
+        // Initial render
+        renderNews(newsData);
+    </script>
+</body>
+</html>
