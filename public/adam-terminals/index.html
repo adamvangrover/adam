@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adam Terminals - Live Datastreams</title>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        body {
+            background-color: var(--term-bg);
+            color: var(--term-primary);
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0;
+            overflow: hidden;
+        }
+        .header {
+            border-bottom: 2px solid var(--term-primary);
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            height: calc(100vh - 50px);
+            gap: 5px;
+            padding: 5px;
+            box-sizing: border-box;
+        }
+        .widget {
+            border: 1px solid var(--term-primary);
+            padding: 10px;
+            position: relative;
+        }
+        .widget-title {
+            background: var(--term-primary);
+            color: black;
+            display: inline-block;
+            padding: 2px 5px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .data-stream {
+            font-size: 0.8rem;
+            line-height: 1.5;
+            height: calc(100% - 30px);
+            overflow-y: hidden;
+        }
+        a {
+            color: var(--term-accent);
+            text-decoration: none;
+        }
+        a:hover {
+            background-color: var(--term-accent);
+            color: black;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div><strong>ADAM TERMINALS [SYS: ONLINE]</strong></div>
+        <div><a href="../index.html">[EXIT TO DESKTOP]</a></div>
+    </div>
+
+    <div class="grid">
+        <div class="widget">
+            <div class="widget-title">MARKET LIVE / NEURAL EXCHANGE</div>
+            <div class="data-stream" id="stream1">
+                Initializing feed...<br>
+                Connecting to Swarm... [OK]<br>
+                <a href="../../market_live.html">&gt; LAUNCH FULL TERMINAL</a>
+            </div>
+        </div>
+
+        <div class="widget">
+            <div class="widget-title">WARGAME CONSOLE</div>
+            <div class="data-stream" id="stream2">
+                Red Team vs Blue Team Economic Simulator.<br>
+                Awaiting scenario inputs...<br>
+                <a href="../../wargame_dashboard.html">&gt; ENTER WARGAME</a>
+            </div>
+        </div>
+
+        <div class="widget">
+            <div class="widget-title">NEXUS SIMULATION</div>
+            <div class="data-stream" id="stream3">
+                Geopolitical & Sovereign Minds platform.<br>
+                Mapping central banker nodes...<br>
+                <a href="../../nexus.html">&gt; ENTER NEXUS</a>
+            </div>
+        </div>
+
+        <div class="widget">
+            <div class="widget-title">TELEMETRY & LOGIC ROUTER</div>
+            <div class="data-stream" id="stream4">
+                Monitoring Probabilistic Perception & Deterministic Grounding...<br>
+                <a href="../../interactive_prototype.html">&gt; LAUNCH PROTOTYPE</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simple script to simulate streaming text
+        function generateLog() {
+            const actions = ['BUY', 'SELL', 'HOLD', 'ALERT', 'CALC'];
+            const assets = ['AAPL', 'MSFT', 'TSLA', 'SPY', 'BTC'];
+            const action = actions[Math.floor(Math.random() * actions.length)];
+            const asset = assets[Math.floor(Math.random() * assets.length)];
+            const val = (Math.random() * 1000).toFixed(2);
+            return `[${new Date().toISOString().split('T')[1].substring(0,8)}] ${action} ${asset} @ ${val}<br>`;
+        }
+
+        setInterval(() => {
+            const s1 = document.getElementById('stream1');
+            s1.innerHTML += generateLog();
+            if (s1.innerHTML.split('<br>').length > 15) {
+                s1.innerHTML = s1.innerHTML.substring(s1.innerHTML.indexOf('<br>') + 4);
+            }
+        }, 800);
+    </script>
+</body>
+</html>
