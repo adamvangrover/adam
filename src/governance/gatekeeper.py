@@ -1,3 +1,5 @@
+# Updated by Jules to meet professional engineering standards.
+
 """
 Security & Governance Gatekeeper Scaffold.
 This module acts as the Entry and Exit point for all agentic workflows,

@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Market Mayhem: Financial Intelligence Brief (ADAM v30.2)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+        
+        :root {
+            --bg-main: #fafaf9; /* Stone 50 */
+            --bg-card: #ffffff;
+            --accent: #d97706; /* Amber 600 */
+            --text-main: #1c1917; /* Stone 900 */
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            scroll-behavior: smooth;
+        }
+
+        .mono { font-family: 'JetBrains Mono', monospace; }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 380px;
+            max-height: 450px;
+        }
+
+        .glass-nav {
+            background: rgba(250, 250, 249, 0.9);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #e7e5e4;
+        }
+
+        .card-shadow {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        }
+
+        .tab-active {
+            border-bottom: 2px solid var(--accent);
+            color: var(--accent);
+        }
+
+        .formula-box {
+            background-color: #1c1917;
+            color: #f5f5f4;
+            padding: 1rem;
+            border-radius: 0.5rem;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f5f5f4; }
+        ::-webkit-scrollbar-thumb { background: #d6d3d1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #a8a29e; }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 glass-nav">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center space-x-2">
+                    <span class="text-xl font-bold tracking-tighter text-stone-900 flex items-center">
+                        <span class="bg-amber-600 text-white px-2 py-0.5 rounded mr-2">ADAM</span>
+                        v30.2 TERMINAL
+                    </span>
+                </div>
+                <div class="hidden md:flex space-x-8 text-sm font-medium">
+                    <button onclick="showSection('dashboard')" class="nav-link tab-active py-5" id="nav-dashboard">Macro & Risk</button>
+                    <button onclick="showSection('matrix')" class="nav-link py-5" id="nav-matrix">Telemetry Matrix</button>
+                    <button onclick="showSection('explorer')" class="nav-link py-5" id="nav-explorer">Entity Explorer</button>
+                    <button onclick="showSection('theory')" class="nav-link py-5" id="nav-theory">Quant Theory</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="pt-24 pb-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <!-- Section: Dashboard -->
+        <section id="section-dashboard" class="space-y-8">
+            <header class="mb-10">
+                <h1 class="text-3xl font-bold text-stone-900">Global Credit Architecture & Yield Telemetry</h1>
+                <p class="text-stone-500 mt-2 max-w-3xl">This section synchronizes 2026 U.S. Treasury data with the ADAM v30.2 synthetic engine to visualize the tri-modal distribution of global credit risk.</p>
+            </header>
+
+            <!-- Macro Stats Tiles -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div class="bg-white p-6 rounded-xl border border-stone-200 card-shadow">
+                    <p class="text-xs font-semibold text-stone-400 uppercase tracking-wider">US 10Y Treasury</p>
+                    <p class="text-2xl font-bold text-stone-900">4.75%</p>
+                    <p class="text-xs text-amber-600 mt-1">▲ +50bps vs baseline</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl border border-stone-200 card-shadow">
+                    <p class="text-xs font-semibold text-stone-400 uppercase tracking-wider">Fed Target Range</p>
+                    <p class="text-2xl font-bold text-stone-900">3.50% - 3.75%</p>
+                    <p class="text-xs text-stone-500 mt-1">Status: Restricted / Sticky</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl border border-stone-200 card-shadow">
+                    <p class="text-xs font-semibold text-stone-400 uppercase tracking-wider">Core PCE Inflation</p>
+                    <p class="text-2xl font-bold text-stone-900">3.7%</p>
+                    <p class="text-xs text-red-600 mt-1">▲ Above 2.0% Mandate</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl border border-stone-200 card-shadow">
+                    <p class="text-xs font-semibold text-stone-400 uppercase tracking-wider">Private Credit Market</p>
+                    <p class="text-2xl font-bold text-stone-900">$2.0 Trillion</p>
+                    <p class="text-xs text-stone-500 mt-1">Opaque / High LGD Risk</p>
+                </div>
+            </div>
+
+            <!-- Dashboard Charts -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="bg-white p-6 rounded-xl border border-stone-200 card-shadow">
+                    <h3 class="font-bold mb-4 flex items-center">
+                        <span class="w-2 h-2 bg-amber-500 rounded-full mr-2"></span>
+                        Credit Tri-Modal Distribution (Leverage vs ICR)
+                    </h3>
+                    <div class="chart-container">
+                        <canvas id="riskBubbleChart"></canvas>
+                    </div>
+                    <p class="text-xs text-stone-400 mt-4 italic">Bubble size represents 1-Year Probability of Default (PD). High ICR and Low Leverage define the "Fortress" bucket.</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl border border-stone-200 card-shadow">
+                    <h3 class="font-bold mb-4 flex items-center">
+                        <span class="w-2 h-2 bg-stone-800 rounded-full mr-2"></span>
+                        Synthetic 1Y CDS Spreads (bps)
+                    </h3>
+                    <div class="chart-container">
+                        <canvas id="spreadBarChart"></canvas>
+                    </div>
+                    <p class="text-xs text-stone-400 mt-4 italic">Scale adjusted to highlight the massive bifurcation between investment grade and distressed credits.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Telemetry Matrix -->
+        <section id="section-matrix" class="hidden space-y-8">
+            <header>
+                <h2 class="text-2xl font-bold text-stone-900">Public Universe Telemetry Matrix</h2>
+                <p class="text-stone-500 mt-2">Deterministic output matrix capturing fundamentals, transition risk, and intrinsic valuation.</p>
+            </header>
+
+            <div class="bg-white rounded-xl border border-stone-200 card-shadow overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-stone-100 border-b border-stone-200">
+                            <tr>
+                                <th class="px-6 py-4 font-semibold text-stone-600">Entity</th>
+                                <th class="px-6 py-4 font-semibold text-stone-600">Sector</th>
+                                <th class="px-6 py-4 font-semibold text-stone-600">Lev (D/E)</th>
+                                <th class="px-6 py-4 font-semibold text-stone-600">ICR</th>
+                                <th class="px-6 py-4 font-semibold text-stone-600">1Y PD</th>
+                                <th class="px-6 py-4 font-semibold text-stone-600">Rating</th>
+                                <th class="px-6 py-4 font-semibold text-stone-600">Implied EqVal</th>
+                                <th class="px-6 py-4 font-semibold text-stone-600">1Y CDS</th>
+                            </tr>
+                        </thead>
+                        <tbody id="matrix-body" class="divide-y divide-stone-100">
+                            <!-- Rows injected by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Entity Explorer -->
+        <section id="section-explorer" class="hidden space-y-8">
+            <header>
+                <h2 class="text-2xl font-bold text-stone-900">Entity Diagnostics Lab</h2>
+                <p class="text-stone-500 mt-2">Select a ticker to audit the deterministic credit logic and intrinsic valuation breakdown.</p>
+            </header>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Selection Panel -->
+                <div class="lg:col-span-1 space-y-2">
+                    <div id="ticker-grid" class="grid grid-cols-2 gap-2">
+                        <!-- Tickers injected by JS -->
+                    </div>
+                </div>
+
+                <!-- Analysis Detail -->
+                <div id="explorer-detail" class="lg:col-span-2 bg-white rounded-xl border border-stone-200 card-shadow p-8 flex items-center justify-center text-stone-400">
+                    <div class="text-center">
+                        <p class="text-4xl mb-4">⊙</p>
+                        <p>Select a corporate entity to view deep-dive analytics.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Theory -->
+        <section id="section-theory" class="hidden space-y-8">
+            <header>
+                <h2 class="text-2xl font-bold text-stone-900">Structural vs. Reduced-Form Synthesis</h2>
+                <p class="text-stone-500 mt-2">The methodology behind ADAM v30.2: Bridging Merton models with hazard rate tractability.</p>
+            </header>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Theory Card 1 -->
+                <div class="bg-white p-6 rounded-xl border-l-4 border-amber-600 card-shadow space-y-4">
+                    <h4 class="font-bold text-lg text-stone-900">The Failure of Pure Diffusion</h4>
+                    <p class="text-stone-600 text-sm leading-relaxed">
+                        Classical Merton models treat default as a continuous process. However, empirical data shows "jumps" (e.g., accounting fraud or sudden regulatory shifts) trigger defaults that diffusion paths cannot predict. ADAM v30.2 incorporates <strong>Poisson Jump-Diffusion</strong> to model these non-linear events.
+                    </p>
+                    <div class="formula-box text-xs">
+                        <code class="mono">dAt = (μ - λk)At dt + σAt dWt + At dNt</code>
+                    </div>
+                </div>
+
+                <!-- Theory Card 2 -->
+                <div class="bg-white p-6 rounded-xl border-l-4 border-stone-800 card-shadow space-y-4">
+                    <h4 class="font-bold text-lg text-stone-900">Reduced-Form Intensity Mapping</h4>
+                    <p class="text-stone-600 text-sm leading-relaxed">
+                        Instead of treating default as a firm-value barrier, we treat it as an exogenous surprise. The hazard rate (λ) defines the probability of default in the next infinitesimal time interval. We map deterministic Z-scores to these hazard rates for CDS pricing.
+                    </p>
+                    <div class="formula-box text-xs">
+                        <code class="mono">λ = -ln(1 - PD) / t | Spread = λ × LGD × 10,000</code>
+                    </div>
+                </div>
+
+                <!-- Theory Card 3 -->
+                <div class="bg-white p-6 rounded-xl border-l-4 border-stone-800 card-shadow space-y-4">
+                    <h4 class="font-bold text-lg text-stone-900">XVA & Regulatory Constraints</h4>
+                    <p class="text-stone-600 text-sm leading-relaxed">
+                        Modern credit pricing requires <strong>Valuation Adjustments (XVA)</strong>. CVA (Credit), FVA (Funding), and KVA (Capital) reflect the true economic cost of maintaining a position under Basel IV constraints. The "Negative Basis" exists because these costs often exceed the theoretical arbitrage profit.
+                    </p>
+                </div>
+
+                <!-- Theory Card 4 -->
+                <div class="bg-white p-6 rounded-xl border-l-4 border-amber-600 card-shadow space-y-4">
+                    <h4 class="font-bold text-lg text-stone-900">Non-Markovian Momentum</h4>
+                    <p class="text-stone-600 text-sm leading-relaxed">
+                        Ratings drift is not memoryless. Recently downgraded firms enter an "excited state" (Falling Knife Effect), where the probability of a subsequent downgrade is statistically higher than stable peers. Our matrices adjust for this momentum and the global macro state variable (Z).
+                    </p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer Strategic Signals -->
+    <footer class="bg-stone-900 text-white py-6">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <div class="flex flex-wrap justify-center gap-6 text-sm uppercase tracking-widest font-semibold opacity-80">
+                <span class="flex items-center"><span class="w-2 h-2 bg-green-500 rounded-full mr-2"></span> Fortress: MSFT, NVDA, XOM</span>
+                <span class="flex items-center"><span class="w-2 h-2 bg-amber-500 rounded-full mr-2"></span> Hunt: TMUS, VZ</span>
+                <span class="flex items-center"><span class="w-2 h-2 bg-red-500 rounded-full mr-2"></span> Red Flag: SATS, PARA</span>
+            </div>
+            <p class="mt-4 text-stone-500 text-xs">ADAM v30.2 DETERMINISTIC CORE • FOR INSTITUTIONAL INTELLIGENCE ONLY • AUGUST 2026</p>
+        </div>
+    </footer>
+
+    <script>
+        // --- Data ---
+        const universe = [
+            { ticker: "MSFT", name: "Microsoft", sector: "Enterprise Tech", lev: 0.50, icr: 35.0, margin: 45.0, pd: 0.0001, rating: "AAA", lgd: 65.0, ev: 1914562, eqVal: 1964562, cds: 1, z: -20.08, diagnostic: "Zero-risk profile. High coverage renders debt servicing immaterial. Balance sheet acts as a synthetic Treasury." },
+            { ticker: "NVDA", name: "NVIDIA", sector: "Semiconductor", lev: 0.20, icr: 45.0, margin: 60.0, pd: 0.0001, rating: "AAA", lgd: 71.0, ev: 2290387, eqVal: 2315387, cds: 1, z: -25.58, diagnostic: "Lowest hazard rate in universe. 60% operating margins provide unprecedented downside protection." },
+            { ticker: "XOM", name: "ExxonMobil", sector: "Integrated Energy", lev: 0.25, icr: 28.0, margin: 18.0, pd: 0.0001, rating: "AAA", lgd: 50.0, ev: 649169, eqVal: 634169, cds: 1, z: -16.05, diagnostic: "Defensive energy giant. Effectively zero default probability despite sector volatility." },
+            { ticker: "LLY", name: "Eli Lilly", sector: "Pharma", lev: 0.80, icr: 18.0, margin: 32.0, pd: 0.001, rating: "AAA", lgd: 60.0, ev: 315716, eqVal: 293716, cds: 1, z: -11.52, diagnostic: "Growth-adjusted pharma anchor. High ICR buffers against R&D spend spikes." },
+            { ticker: "WMT", name: "Walmart", sector: "Retail", lev: 0.70, icr: 12.5, margin: 4.5, pd: 0.04, rating: "AA", lgd: 45.0, ev: 364071, eqVal: 328071, cds: 2, z: -7.50, diagnostic: "Resilient consumer giant. Low margins offset by massive scale and manageable leverage." },
+            { ticker: "PFE", name: "Pfizer", sector: "Pharma", lev: 1.10, icr: 7.5, margin: 20.0, pd: 0.26, rating: "A", lgd: 55.0, ev: 242988, eqVal: 184988, cds: 15, z: -6.00, diagnostic: "Investment grade core. Leverage elevated relative to AAA peers but cash flows remain robust." },
+            { ticker: "VZ", name: "Verizon", sector: "Telecom", lev: 2.40, icr: 8.0, margin: 25.0, pd: 0.49, rating: "BBB", lgd: 50.0, ev: 354959, eqVal: 229959, cds: 25, z: -5.31, diagnostic: "Benchmark infrastructure. Subscription-based cash flows anchor the BBB rating despite $125B net debt." },
+            { ticker: "TGT", name: "Target", sector: "Retail", lev: 1.40, icr: 6.2, margin: 5.2, pd: 1.26, rating: "BB", lgd: 50.0, ev: 61580, eqVal: 48580, cds: 64, z: -4.36, diagnostic: "Crossover risk. Margin compression could trigger rapid hazard rate acceleration." },
+            { ticker: "OXY", name: "Occidental", sector: "Energy", lev: 1.80, icr: 4.5, margin: 24.0, pd: 1.48, rating: "BB", lgd: 58.0, ev: 64931, eqVal: 46431, cds: 87, z: -4.20, diagnostic: "Highly sensitive to commodity price shocks. Leverage remains manageable but liquidity is tight." },
+            { ticker: "TMUS", name: "T-Mobile US", sector: "Wireless", lev: 3.00, icr: 5.2, margin: 16.0, pd: 4.35, rating: "BB", lgd: 56.0, ev: 297000, eqVal: 225000, cds: 249, z: -3.09, diagnostic: "Opportunistic hunt target. 249bps CDS spread overcompensates for actual jump-to-default risk." },
+            { ticker: "PARA", name: "Paramount", sector: "Media", lev: 3.50, icr: 3.8, margin: 15.0, pd: 12.08, rating: "B-", lgd: 59.0, ev: 12353, eqVal: 853, cds: 759, z: -1.98, diagnostic: "Distressed tail. Tiny equity cushion ($853M) makes it extremely vulnerable to operational shocks." },
+            { ticker: "SATS", name: "EchoStar", sector: "Telecom", lev: 5.20, icr: 1.8, margin: 8.0, pd: 67.04, rating: "CCC", lgd: 65.0, ev: 1791, eqVal: -16208, cds: 7214, z: 0.71, diagnostic: "Terminal distress. Refinancing headwinds balloon PD to 67%. Equity acts as an OTM call option on debt." }
+        ];
+
+        // --- Charts ---
+        let riskChart, spreadChart;
+
+        function initCharts() {
+            const ctxRisk = document.getElementById('riskBubbleChart').getContext('2d');
+            riskChart = new Chart(ctxRisk, {
+                type: 'bubble',
+                data: {
+                    datasets: [{
+                        label: 'Corporate Entities',
+                        data: universe.map(e => ({
+                            x: e.lev,
+                            y: e.icr,
+                            r: Math.sqrt(e.pd * 50) + 4,
+                            ticker: e.ticker
+                        })),
+                        backgroundColor: universe.map(e => {
+                            if (e.pd > 0.10) return 'rgba(239, 68, 68, 0.7)'; // Red
+                            if (e.pd > 0.01) return 'rgba(245, 158, 11, 0.7)'; // Amber
+                            return 'rgba(30, 41, 59, 0.7)'; // Slate
+                        }),
+                        borderColor: '#fff',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { title: { display: true, text: 'Leverage (Debt/Equity)', font: { weight: 'bold' } }, grid: { display: false } },
+                        y: { title: { display: true, text: 'Interest Coverage Ratio (ICR)', font: { weight: 'bold' } }, suggestedMin: 0 }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: (context) => {
+                                    const item = universe[context.dataIndex];
+                                    return `${item.ticker}: ${item.rating} (PD: ${(item.pd * 100).toFixed(2)}%)`;
+                                }
+                            }
+                        },
+                        legend: { display: false }
+                    }
+                }
+            });
+
+            const ctxSpread = document.getElementById('spreadBarChart').getContext('2d');
+            spreadChart = new Chart(ctxSpread, {
+                type: 'bar',
+                data: {
+                    labels: universe.map(e => e.ticker),
+                    datasets: [{
+                        label: '1Y CDS Spread (bps)',
+                        data: universe.map(e => Math.min(e.cds, 2000)), // Cap for visual clarity
+                        backgroundColor: universe.map(e => e.cds > 500 ? '#ef4444' : (e.cds > 100 ? '#f59e0b' : '#1e293b')),
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { 
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: (context) => {
+                                    const val = universe[context.dataIndex].cds;
+                                    return `Spread: ${val.toLocaleString()} bps`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { title: { display: true, text: 'Basis Points (Capped at 2k for scaling)' } },
+                        y: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+
+        // --- Core Navigation Logic ---
+        function showSection(sectionId) {
+            document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
+            document.getElementById(`section-${sectionId}`).classList.remove('hidden');
+            
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('tab-active'));
+            document.getElementById(`nav-${sectionId}`).classList.add('tab-active');
+            
+            // Re-render charts if visible
+            if (sectionId === 'dashboard') {
+                riskChart.update();
+                spreadChart.update();
+            }
+        }
+
+        // --- Data Population ---
+        function populateMatrix() {
+            const body = document.getElementById('matrix-body');
+            body.innerHTML = universe.map(e => `
+                <tr class="hover:bg-stone-50 transition-colors">
+                    <td class="px-6 py-4 font-bold text-stone-900">${e.name} <span class="text-stone-400 font-normal text-xs ml-1">${e.ticker}</span></td>
+                    <td class="px-6 py-4 text-stone-500">${e.sector}</td>
+                    <td class="px-6 py-4 mono">${e.lev.toFixed(2)}x</td>
+                    <td class="px-6 py-4 mono">${e.icr.toFixed(1)}x</td>
+                    <td class="px-6 py-4 text-stone-900">${(e.pd * 100).toFixed(2)}%</td>
+                    <td class="px-6 py-4">
+                        <span class="px-2 py-1 rounded text-[10px] font-bold uppercase ${getRatingClass(e.rating)}">
+                            ${e.rating}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 text-stone-900">$${(e.eqVal / 1000).toFixed(1)}B</td>
+                    <td class="px-6 py-4 font-semibold ${e.cds > 250 ? 'text-red-600' : 'text-stone-900'}">${e.cds.toLocaleString()}</td>
+                </tr>
+            `).join('');
+        }
+
+        function getRatingClass(rating) {
+            if (rating.startsWith('AAA')) return 'bg-slate-900 text-white';
+            if (rating.startsWith('A')) return 'bg-stone-200 text-stone-800';
+            if (rating.startsWith('BBB')) return 'bg-stone-100 text-stone-700 border border-stone-300';
+            if (rating.startsWith('BB')) return 'bg-amber-100 text-amber-800 border border-amber-300';
+            return 'bg-red-100 text-red-800 border border-red-300';
+        }
+
+        function populateExplorer() {
+            const grid = document.getElementById('ticker-grid');
+            grid.innerHTML = universe.map(e => `
+                <button onclick="inspectEntity('${e.ticker}')" class="p-4 bg-white border border-stone-200 rounded-lg text-left hover:border-amber-600 transition-all card-shadow">
+                    <div class="flex justify-between items-center">
+                        <span class="font-bold text-stone-900">${e.ticker}</span>
+                        <span class="text-[10px] mono text-stone-400">${e.rating}</span>
+                    </div>
+                    <div class="text-[10px] text-stone-500 truncate mt-1">${e.sector}</div>
+                </button>
+            `).join('');
+        }
+
+        function inspectEntity(ticker) {
+            const e = universe.find(u => u.ticker === ticker);
+            const detail = document.getElementById('explorer-detail');
+            
+            detail.innerHTML = `
+                <div class="w-full space-y-6">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h2 class="text-3xl font-bold text-stone-900">${e.name}</h2>
+                            <p class="text-stone-500">${e.sector} • Deterministic Audit</p>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-4xl font-bold ${e.pd > 0.1 ? 'text-red-600' : 'text-stone-900'}">${e.rating}</span>
+                            <p class="text-xs uppercase font-bold tracking-widest text-stone-400">Engine Implied</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="bg-stone-50 p-4 rounded-lg">
+                            <p class="text-xs font-semibold text-stone-400 uppercase mb-1">Z-Score</p>
+                            <p class="text-xl font-bold mono text-stone-900">${e.z.toFixed(3)}</p>
+                        </div>
+                        <div class="bg-stone-50 p-4 rounded-lg">
+                            <p class="text-xs font-semibold text-stone-400 uppercase mb-1">Hazard Rate (λ)</p>
+                            <p class="text-xl font-bold mono text-stone-900">${(-Math.log(1 - e.pd)).toFixed(4)}</p>
+                        </div>
+                        <div class="bg-stone-50 p-4 rounded-lg">
+                            <p class="text-xs font-semibold text-stone-400 uppercase mb-1">Equity Cushion</p>
+                            <p class="text-xl font-bold mono text-stone-900">$${(e.eqVal / 1000).toFixed(1)}B</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-amber-50 border border-amber-200 p-6 rounded-xl">
+                        <h4 class="font-bold text-amber-900 mb-2">Entity Diagnostic</h4>
+                        <p class="text-amber-800 text-sm leading-relaxed">${e.diagnostic}</p>
+                    </div>
+
+                    <div class="space-y-4">
+                        <h4 class="font-bold text-stone-900 border-b pb-2">ADAM v30.2 Logistic Audit</h4>
+                        <div class="formula-box text-sm">
+                            <p class="mb-2 text-stone-400 font-bold">z-equation:</p>
+                            <code class="mono">z = -2.50 + 0.85(${e.lev}) - 0.45(${e.icr}) - 0.05(${e.margin}) = ${e.z.toFixed(3)}</code>
+                            <p class="mt-4 mb-2 text-stone-400 font-bold">pd-calculation:</p>
+                            <code class="mono">PD = 1 / (1 + e^-(${e.z.toFixed(3)})) = ${(e.pd * 100).toFixed(4)}%</code>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between items-center pt-4 border-t border-stone-100">
+                        <div class="flex space-x-8">
+                            <div>
+                                <p class="text-xs font-bold text-stone-400 uppercase">1Y CDS Spread</p>
+                                <p class="text-lg font-bold text-stone-900">${e.cds.toLocaleString()} bps</p>
+                            </div>
+                            <div>
+                                <p class="text-xs font-bold text-stone-400 uppercase">Loss Given Default</p>
+                                <p class="text-lg font-bold text-stone-900">${e.lgd}%</p>
+                            </div>
+                        </div>
+                        <div class="text-xs bg-stone-100 px-3 py-1 rounded text-stone-600">
+                            Telemetry Consistency: 100%
+                        </div>
+                    </div>
+                </div>
+            `;
+            detail.classList.remove('flex', 'items-center', 'justify-center', 'text-stone-400');
+        }
+
+        // --- Init ---
+        window.onload = () => {
+            initCharts();
+            populateMatrix();
+            populateExplorer();
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,1382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FDOS | Financial Decision Operating System</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js via CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,700;1,400&family=Inter:wght@300;400;600;800;900&family=Cinzel:wght@600;900&display=swap');
+
+        /* System Master Color Variables across 7 Themes */
+        :root {
+            --fdos-bg: #090a0f;
+            --fdos-panel: #11131a;
+            --fdos-border: #1e2230;
+            --fdos-text: #e2e8f0;
+            --fdos-accent: #ffb800;
+            --fdos-accent-glow: rgba(255, 184, 0, 0.25);
+            --brand-font: 'Inter', sans-serif;
+        }
+
+        /* Brand Theme Overrides */
+        body.theme-adam-os {
+            --fdos-bg: #06070a;
+            --fdos-panel: #0d0f17;
+            --fdos-border: #1a1e2e;
+            --fdos-accent: #00f0ff;
+            --fdos-accent-glow: rgba(0, 240, 255, 0.25);
+            --brand-font: 'JetBrains Mono', monospace;
+        }
+
+        body.theme-market-mayhem {
+            --fdos-bg: #0f0a15;
+            --fdos-panel: #1a1024;
+            --fdos-border: #2e1a40;
+            --fdos-accent: #ff007a;
+            --fdos-accent-glow: rgba(255, 0, 122, 0.25);
+            --brand-font: 'Inter', sans-serif;
+        }
+
+        body.theme-fortress-hunt {
+            --fdos-bg: #080c14;
+            --fdos-panel: #0f172a;
+            --fdos-border: #1e293b;
+            --fdos-accent: #f59e0b;
+            --fdos-accent-glow: rgba(245, 158, 11, 0.25);
+            --brand-font: 'Cinzel', serif;
+        }
+
+        body.theme-institutional {
+            --fdos-bg: #0b1120;
+            --fdos-panel: #131d31;
+            --fdos-border: #21304d;
+            --fdos-accent: #3b82f6;
+            --fdos-accent-glow: rgba(59, 130, 246, 0.25);
+            --brand-font: 'Inter', sans-serif;
+        }
+
+        body.theme-research {
+            --fdos-bg: #0a0d12;
+            --fdos-panel: #121722;
+            --fdos-border: #1f2738;
+            --fdos-accent: #10b981;
+            --fdos-accent-glow: rgba(16, 185, 129, 0.25);
+            --brand-font: 'JetBrains Mono', monospace;
+        }
+
+        body.theme-governance {
+            --fdos-bg: #0d0e12;
+            --fdos-panel: #171921;
+            --fdos-border: #272a38;
+            --fdos-accent: #a855f7;
+            --fdos-accent-glow: rgba(168, 85, 247, 0.25);
+            --brand-font: 'Inter', sans-serif;
+        }
+
+        body.theme-terminals {
+            --fdos-bg: #050608;
+            --fdos-panel: #0a0d14;
+            --fdos-border: #161c2b;
+            --fdos-accent: #22c55e;
+            --fdos-accent-glow: rgba(34, 197, 94, 0.25);
+            --brand-font: 'JetBrains Mono', monospace;
+        }
+
+        body {
+            background-color: var(--fdos-bg);
+            color: var(--fdos-text);
+            font-family: var(--brand-font);
+            transition: background-color 0.4s ease, color 0.4s ease;
+        }
+
+        .mono { font-family: 'JetBrains Mono', monospace; }
+
+        .fdos-panel {
+            background-color: var(--fdos-panel);
+            border: 1px solid var(--fdos-border);
+            box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+            transition: border-color 0.3s ease, background-color 0.3s ease;
+        }
+
+        .fdos-panel-hover:hover {
+            border-color: var(--fdos-accent);
+            box-shadow: 0 0 15px var(--fdos-accent-glow);
+        }
+
+        .accent-text { color: var(--fdos-accent); }
+        .accent-bg { background-color: var(--fdos-accent); }
+        .accent-border { border-color: var(--fdos-accent); }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 320px;
+            max-height: 400px;
+        }
+
+        .scrollbar-custom::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .scrollbar-custom::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.2);
+        }
+        .scrollbar-custom::-webkit-scrollbar-thumb {
+            background: var(--fdos-border);
+            border-radius: 3px;
+        }
+        .scrollbar-custom::-webkit-scrollbar-thumb:hover {
+            background: var(--fdos-accent);
+        }
+
+        .brand-pill {
+            transition: all 0.2s ease;
+        }
+        .brand-pill.active {
+            background-color: var(--fdos-accent);
+            color: #000000;
+            font-weight: 800;
+            box-shadow: 0 0 12px var(--fdos-accent-glow);
+        }
+
+        .glow-effect {
+            text-shadow: 0 0 10px var(--fdos-accent-glow);
+        }
+    </style>
+</head>
+
+<body class="theme-adam-os flex flex-col h-screen overflow-hidden text-sm">
+
+    <!-- MASTER HEADER & BRAND ROUTER -->
+    <header class="h-16 border-b border-gray-800 bg-black/80 backdrop-blur flex items-center justify-between px-4 z-50 shrink-0">
+        <div class="flex items-center gap-3">
+            <div id="brand-logo" class="w-9 h-9 rounded flex items-center justify-center font-black text-black text-lg transition-colors accent-bg">
+                FD
+            </div>
+            <div>
+                <div class="flex items-center gap-2">
+                    <h1 id="brand-title" class="font-black tracking-wider uppercase text-base glow-effect">ADAM OS FOUNDATION</h1>
+                    <span class="text-[10px] mono px-2 py-0.5 rounded bg-gray-800 text-gray-400 border border-gray-700">v24.1.08</span>
+                </div>
+                <p id="brand-subtitle" class="text-[11px] text-gray-400 font-normal">Multi-Agent Swarm Orchestrator & System Kernel</p>
+            </div>
+        </div>
+
+        <!-- 7-Brand Persona Selector Buttons -->
+        <div class="hidden xl:flex items-center gap-1.5 bg-gray-950 p-1.5 rounded-lg border border-gray-800">
+            <button onclick="switchBrand('adam-os')" id="btn-brand-adam-os" class="brand-pill active text-[11px] px-2.5 py-1 rounded font-semibold transition-all">Adam OS</button>
+            <button onclick="switchBrand('market-mayhem')" id="btn-brand-market-mayhem" class="brand-pill text-[11px] px-2.5 py-1 rounded font-semibold text-gray-400 hover:text-white transition-all">Market Mayhem</button>
+            <button onclick="switchBrand('fortress-hunt')" id="btn-brand-fortress-hunt" class="brand-pill text-[11px] px-2.5 py-1 rounded font-semibold text-gray-400 hover:text-white transition-all">Fortress & Hunt</button>
+            <button onclick="switchBrand('institutional')" id="btn-brand-institutional" class="brand-pill text-[11px] px-2.5 py-1 rounded font-semibold text-gray-400 hover:text-white transition-all">Institutional</button>
+            <button onclick="switchBrand('research')" id="btn-brand-research" class="brand-pill text-[11px] px-2.5 py-1 rounded font-semibold text-gray-400 hover:text-white transition-all">Research</button>
+            <button onclick="switchBrand('governance')" id="btn-brand-governance" class="brand-pill text-[11px] px-2.5 py-1 rounded font-semibold text-gray-400 hover:text-white transition-all">Governance</button>
+            <button onclick="switchBrand('terminals')" id="btn-brand-terminals" class="brand-pill text-[11px] px-2.5 py-1 rounded font-semibold text-gray-400 hover:text-white transition-all">Terminals</button>
+        </div>
+
+        <!-- Telemetry Indicators -->
+        <div class="flex items-center gap-4 mono text-[10px] text-gray-400">
+            <div class="hidden md:flex flex-col text-right">
+                <span class="text-gray-500">SWARM_STATUS</span>
+                <span class="text-green-400 font-bold">12/12 AGENTS ONLINE</span>
+            </div>
+            <div class="hidden sm:flex flex-col text-right">
+                <span class="text-gray-500">10Y UST / SOFR</span>
+                <span class="accent-text font-bold">4.683% / 5.31%</span>
+            </div>
+            <div class="flex items-center gap-2 bg-gray-900 border border-gray-800 px-3 py-1.5 rounded">
+                <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                <span class="mono text-[11px] font-bold text-gray-200" id="live-clock">16:50:06 ET</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- MOBILE BRAND SELECTOR DROPDOWN -->
+    <div class="xl:hidden bg-gray-900 border-b border-gray-800 p-2 flex justify-between items-center px-4">
+        <span class="text-xs text-gray-400 font-bold">PORTAL SELECTOR:</span>
+        <select onchange="switchBrand(this.value)" class="bg-black text-xs accent-text border border-gray-700 rounded px-3 py-1 focus:outline-none w-1/2">
+            <option value="adam-os">Adam OS (Kernel & Swarms)</option>
+            <option value="market-mayhem">Market Mayhem (Retail Hub)</option>
+            <option value="fortress-hunt">Fortress & Hunt (Advisory)</option>
+            <option value="institutional">Adam Institutional (Credit Risk)</option>
+            <option value="research">Adam Research (Quant Data)</option>
+            <option value="governance">Adam Governance (Audit Ledger)</option>
+            <option value="terminals">Adam Terminals (Live Data Streams)</option>
+        </select>
+    </div>
+
+    <!-- MAIN BODY LAYOUT -->
+    <div class="flex flex-1 overflow-hidden">
+
+        <!-- SUB-NAVIGATION PANEL (Context Sensitive) -->
+        <aside class="w-16 md:w-56 border-r border-gray-800 bg-black/40 flex flex-col shrink-0">
+            <div class="p-3 border-b border-gray-800/80">
+                <p class="hidden md:block text-[10px] font-bold text-gray-500 uppercase tracking-wider mono">Active System Persona</p>
+                <p id="nav-persona-label" class="text-xs font-black accent-text mt-0.5 truncate uppercase">Adam OS Core</p>
+            </div>
+
+            <nav class="flex-1 p-2 space-y-1 overflow-y-auto scrollbar-custom" id="subnav-container">
+                <!-- Injected via JavaScript based on Active Brand -->
+            </nav>
+
+            <!-- Mini Live Indicators -->
+            <div class="p-3 border-t border-gray-800 hidden md:block mono text-[10px] space-y-2 bg-black/60">
+                <div class="flex justify-between text-gray-400">
+                    <span>S&P 500:</span>
+                    <span class="text-white font-bold">7,757.20</span>
+                </div>
+                <div class="flex justify-between text-gray-400">
+                    <span>BRENT CRUDE:</span>
+                    <span class="text-red-400 font-bold">$89.63</span>
+                </div>
+                <div class="flex justify-between text-gray-400">
+                    <span>BITCOIN:</span>
+                    <span class="text-amber-400 font-bold">$63,604</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- MAIN VIEWPORT CONTENT AREA -->
+        <main class="flex-1 overflow-y-auto p-4 md:p-6 scrollbar-custom bg-black/20 relative">
+
+            <!-- BRAND 1: ADAM OS CORE & SWARMS -->
+            <section id="view-adam-os" class="brand-view space-y-6">
+                <!-- Section Intro Paragraph -->
+                <div class="fdos-panel p-5 rounded-lg border-l-4 accent-border flex flex-col md:flex-row gap-4 justify-between items-start">
+                    <div>
+                        <h2 class="text-xl font-bold uppercase tracking-tight flex items-center gap-2">
+                            <span>⚡</span> Adam OS Foundation & Swarm Directory
+                        </h2>
+                        <p class="text-xs text-gray-400 mt-1 leading-relaxed max-w-3xl">
+                            The central computational backbone of the Financial Decision Operating System (FDOS). This node exposes the neuro-symbolic multi-agent architecture derived from <code class="accent-text">AGENTS.md</code>, orchestrating autonomous credit analysis, macroeconomic forecasting, SEC EDGAR scraping, and regulatory compliance validation across active REST endpoints.
+                        </p>
+                    </div>
+                    
+                    <!-- Merged Text Content from Legacy Git Branch -->
+                    <div class="bg-black/60 border border-gray-800 rounded p-3 text-[10px] mono shrink-0 w-full md:w-auto mt-4 md:mt-0">
+                        <div class="text-gray-500 mb-1 border-b border-gray-800 pb-1">System 3 Quant Refinement Status</div>
+                        <div class="text-green-400">> RIE_k (Recursive Eval) > 0</div>
+                        <div class="text-gray-300">> A_ADAM = { B:64.2%, G:91.4% }</div>
+                        <div class="accent-text">> Zero-Trust Network: ONLINE</div>
+                    </div>
+                </div>
+
+                <!-- Swarm Health Metrics & Task Allocator -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="fdos-panel p-5 rounded-lg lg:col-span-1 flex flex-col justify-between">
+                        <div>
+                            <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mono mb-3">Swarm Workload Distribution</h3>
+                            <div class="chart-container h-52">
+                                <canvas id="swarmChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="mt-4 pt-3 border-t border-gray-800 text-[11px] text-gray-400 space-y-1 mono">
+                            <div class="flex justify-between"><span>Active Threads:</span> <span class="text-white">128</span></div>
+                            <div class="flex justify-between"><span>Token Throughput:</span> <span class="text-green-400">14.2k tok/s</span></div>
+                            <div class="flex justify-between"><span>Orchestrator Latency:</span> <span class="accent-text">18ms</span></div>
+                        </div>
+                    </div>
+
+                    <!-- Interactive Agent Directory -->
+                    <div class="fdos-panel p-5 rounded-lg lg:col-span-2 space-y-4">
+                        <div class="flex justify-between items-center border-b border-gray-800 pb-2">
+                            <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mono">Active Agent Hierarchy (`AGENTS.md`)</h3>
+                            <span class="text-[10px] mono bg-gray-800 text-gray-300 px-2 py-0.5 rounded">6 Primary Agents</span>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3" id="agent-grid">
+                            <!-- Injected by JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- REST Endpoint & Prompt Library Explorer -->
+                <div class="fdos-panel p-5 rounded-lg space-y-4">
+                    <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mono">REST Endpoint Mapping & Prompt Harnesses</h3>
+                    <div class="overflow-x-auto rounded border border-gray-800">
+                        <table class="w-full text-left text-xs mono">
+                            <thead class="bg-black/60 text-gray-400 border-b border-gray-800 uppercase">
+                                <tr>
+                                    <th class="p-3">Method / Endpoint</th>
+                                    <th class="p-3">Responsible Swarm</th>
+                                    <th class="p-3">Primary Output Target</th>
+                                    <th class="p-3">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-800/50">
+                                <tr class="hover:bg-gray-800/30">
+                                    <td class="p-3 font-bold accent-text">GET /api/v1/macro/duration</td>
+                                    <td class="p-3 text-gray-300">Macro Orchestrator</td>
+                                    <td class="p-3 text-gray-400">Duration Hangover Model (10Y UST)</td>
+                                    <td class="p-3"><span class="bg-green-950 text-green-400 border border-green-800 px-2 py-0.5 rounded text-[10px]">200 OK</span></td>
+                                </tr>
+                                <tr class="hover:bg-gray-800/30">
+                                    <td class="p-3 font-bold accent-text">POST /api/v1/credit/stress-test</td>
+                                    <td class="p-3 text-gray-300">Credit Risk Agent</td>
+                                    <td class="p-3 text-gray-400">BSL Interest Coverage Ratio (ICR)</td>
+                                    <td class="p-3"><span class="bg-green-950 text-green-400 border border-green-800 px-2 py-0.5 rounded text-[10px]">200 OK</span></td>
+                                </tr>
+                                <tr class="hover:bg-gray-800/30">
+                                    <td class="p-3 font-bold accent-text">GET /api/v1/edgar/whales</td>
+                                    <td class="p-3 text-gray-300">SEC Scraper Core</td>
+                                    <td class="p-3 text-gray-400">WhaleScanner RSS Delta Feed</td>
+                                    <td class="p-3"><span class="bg-green-950 text-green-400 border border-green-800 px-2 py-0.5 rounded text-[10px]">200 OK</span></td>
+                                </tr>
+                                <tr class="hover:bg-gray-800/30">
+                                    <td class="p-3 font-bold accent-text">POST /api/v1/governance/audit</td>
+                                    <td class="p-3 text-gray-300">Governance Inspector</td>
+                                    <td class="p-3 text-gray-400">SNC Exam Validation & Ledger</td>
+                                    <td class="p-3"><span class="bg-green-950 text-green-400 border border-green-800 px-2 py-0.5 rounded text-[10px]">200 OK</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- BRAND 2: MARKET MAYHEM (Retail & Daily Hub) -->
+            <section id="view-market-mayhem" class="brand-view hidden space-y-6">
+                <!-- Section Intro Paragraph -->
+                <div class="fdos-panel p-5 rounded-lg border-l-4 accent-border">
+                    <h2 class="text-xl font-bold uppercase tracking-tight text-pink-400 flex items-center gap-2">
+                        <span>🔥</span> Market Mayhem Daily Hub & Retail Sentiment
+                    </h2>
+                    <p class="text-xs text-gray-400 mt-1 leading-relaxed">
+                        High-energy, retail-accessible financial intelligence translating institutional data into digestible daily memos, momentum strategies, and retail sentiment updates. This portal strips away academic jargon while maintaining full quantitative rigor behind the scenes.
+                    </p>
+                </div>
+
+                <!-- Daily Newsletter Hub Reader -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="lg:col-span-2 fdos-panel p-6 rounded-lg space-y-4">
+                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-gray-800 pb-3 gap-4">
+                            <div>
+                                <span class="text-[10px] mono text-pink-400 uppercase font-bold">DAILY NEWSLETTER EDITION</span>
+                                <h3 class="text-lg font-black text-white mt-1" id="newsletter-title">The 4.68% Benchmark Mirage & Equity Disconnect</h3>
+                            </div>
+                            <select onchange="loadNewsletter(this.value)" class="bg-black text-xs text-pink-400 border border-pink-900 rounded px-3 py-1.5 focus:outline-none w-full md:w-auto">
+                                <option value="aug12">Aug 12, 2026</option>
+                                <option value="aug11">Aug 11, 2026</option>
+                                <option value="aug10">Aug 10, 2026</option>
+                            </select>
+                        </div>
+
+                        <div id="newsletter-body" class="text-sm text-gray-300 space-y-4 leading-relaxed font-serif tracking-wide">
+                            <!-- Injected by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Retail Momentum Ticker & Strategy Scorecard -->
+                    <div class="space-y-6">
+                        <div class="fdos-panel p-5 rounded-lg space-y-4">
+                            <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mono">Retail Radar Chart</h3>
+                            <div class="chart-container h-56">
+                                <canvas id="radarChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="fdos-panel p-5 rounded-lg space-y-3">
+                            <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mono">Trending Tickers</h3>
+                            <div class="space-y-2">
+                                <div class="flex justify-between items-center p-2 rounded bg-black/40 border border-gray-800">
+                                    <div>
+                                        <span class="font-bold text-white block">ASTS</span>
+                                        <span class="text-[10px] text-gray-500">AST SpaceMobile</span>
+                                    </div>
+                                    <div class="text-right">
+                                        <span class="text-green-400 font-bold block">+12.4%</span>
+                                        <span class="text-[10px] text-gray-400">$3.7B Liquidity Shield</span>
+                                    </div>
+                                </div>
+                                <div class="flex justify-between items-center p-2 rounded bg-black/40 border border-gray-800">
+                                    <div>
+                                        <span class="font-bold text-white block">FCX</span>
+                                        <span class="text-[10px] text-gray-500">Freeport-McMoRan</span>
+                                    </div>
+                                    <div class="text-right">
+                                        <span class="text-green-400 font-bold block">$69.62</span>
+                                        <span class="text-[10px] text-gray-400">Copper Smelt Moat</span>
+                                    </div>
+                                </div>
+                                <div class="flex justify-between items-center p-2 rounded bg-black/40 border border-gray-800">
+                                    <div>
+                                        <span class="font-bold text-white block">MDB</span>
+                                        <span class="text-[10px] text-gray-500">Generic TMT Short</span>
+                                    </div>
+                                    <div class="text-right">
+                                        <span class="text-red-400 font-bold block">$234.80</span>
+                                        <span class="text-[10px] text-gray-400">2026 Refi Wall</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- BRAND 3: FORTRESS & HUNT ADVISORY -->
+            <section id="view-fortress-hunt" class="brand-view hidden space-y-6">
+                <!-- Section Intro Paragraph -->
+                <div class="fdos-panel p-5 rounded-lg border-l-4 accent-border">
+                    <h2 class="text-xl font-bold uppercase tracking-tight text-amber-500 flex items-center gap-2">
+                        <span>🏛️</span> Fortress & Hunt Macro-Strategic Advisory
+                    </h2>
+                    <p class="text-xs text-gray-400 mt-1 leading-relaxed">
+                        Institutional commentary and tactical barbell asset allocation. This portal pairs sovereign yield duration analysis with asymmetric single-stock pairs trading—barbelling defensive, resource-backed moats ("Fortress") against refinancing-vulnerable software issuers ("The Hunt").
+                    </p>
+                </div>
+
+                <!-- Macro Duration Chart & Narrative -->
+                <div class="fdos-panel p-6 rounded-lg space-y-4">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                        <div>
+                            <h3 class="text-lg font-bold text-white uppercase">The Duration Hangover Diagnostic</h3>
+                            <p class="text-xs text-gray-400 mt-1">Sovereign 10-Year UST Yield vs VIX Volatility Index (August 2026 Window)</p>
+                        </div>
+                        <span class="bg-amber-950 text-amber-400 border border-amber-800 px-3 py-1.5 rounded text-xs font-bold mono shadow-[0_0_10px_rgba(245,158,11,0.2)]">REGIME: STRESS_ACTIVE</span>
+                    </div>
+
+                    <div class="chart-container">
+                        <canvas id="macroChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Barbell Pair Strategy Module -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Fortress Module -->
+                    <div class="fdos-panel p-6 rounded-lg border-l-4 border-l-green-500 relative overflow-hidden flex flex-col justify-between">
+                        <div>
+                            <span class="text-xs font-bold text-green-500 uppercase tracking-widest block mb-2 mono bg-green-500/10 inline-block px-2 py-1 rounded">LONG THEMING // FORTRESS</span>
+                            <h3 class="text-2xl font-black text-white mt-2">Freeport-McMoRan (NYSE: FCX)</h3>
+                            <p class="text-xs text-gray-400 mt-3 leading-relaxed">
+                                Customs Proclamation #69252300 enforces mandatory primary country-of-smelt reporting on foreign copper imports. This establishes an artificial tariff floor protecting domestic extractors while FCX holds $4.8B in cash reserves and zero debt maturity walls before 2030.
+                            </p>
+                        </div>
+                        <div class="grid grid-cols-3 gap-3 mt-6 text-center mono text-xs">
+                            <div class="bg-black/60 p-3 rounded border border-gray-800">
+                                <span class="text-gray-500 text-[9px] block mb-1">TARGET PRICE</span>
+                                <span class="text-green-400 font-bold text-sm">$69.62</span>
+                            </div>
+                            <div class="bg-black/60 p-3 rounded border border-gray-800">
+                                <span class="text-gray-500 text-[9px] block mb-1">NET LEVERAGE</span>
+                                <span class="text-green-400 font-bold text-sm">1.1x</span>
+                            </div>
+                            <div class="bg-black/60 p-3 rounded border border-gray-800">
+                                <span class="text-gray-500 text-[9px] block mb-1">CASH RESERVES</span>
+                                <span class="text-green-400 font-bold text-sm">$4.8B</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hunt Module -->
+                    <div class="fdos-panel p-6 rounded-lg border-l-4 border-l-red-500 relative overflow-hidden flex flex-col justify-between">
+                        <div>
+                            <span class="text-xs font-bold text-red-500 uppercase tracking-widest block mb-2 mono bg-red-500/10 inline-block px-2 py-1 rounded">SHORT THEMING // THE HUNT</span>
+                            <h3 class="text-2xl font-black text-white mt-2">BSL-Dependent Tech (MDB)</h3>
+                            <p class="text-xs text-gray-400 mt-3 leading-relaxed">
+                                Non-earning software enterprise cohort reliant on broadly syndicated loan (BSL) renewals. Enterprise IT budgets are getting cannibalized by AI physical compute hardware expenses, directly starving software seat expansion ahead of the late-2026 refi wall.
+                            </p>
+                        </div>
+                        <div class="grid grid-cols-3 gap-3 mt-6 text-center mono text-xs">
+                            <div class="bg-black/60 p-3 rounded border border-gray-800">
+                                <span class="text-gray-500 text-[9px] block mb-1">PROXY PRICE</span>
+                                <span class="text-red-400 font-bold text-sm">$234.80</span>
+                            </div>
+                            <div class="bg-black/60 p-3 rounded border border-gray-800">
+                                <span class="text-gray-500 text-[9px] block mb-1">REFI WALL</span>
+                                <span class="text-red-400 font-bold text-sm">Q4 2026</span>
+                            </div>
+                            <div class="bg-black/60 p-3 rounded border border-gray-800">
+                                <span class="text-gray-500 text-[9px] block mb-1">FCF YIELD</span>
+                                <span class="text-red-400 font-bold text-sm">-2.6%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Math Engine Formula Block -->
+                <div class="fdos-panel p-8 rounded-lg text-center space-y-4 bg-gradient-to-r from-gray-950 via-[#0a0f12] to-gray-950 border border-gray-800 shadow-inner">
+                    <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mono block">Tech Valuation Volatility Equation</span>
+                    <div class="text-xl md:text-3xl font-light text-white mono py-2 tracking-tight">
+                        VaR<sub>Tech</sub> = <span class="text-blue-400">α</span> · (<span class="text-amber-400">∂Yield<sub>10Y</sub></span> / ∂t) + <span class="text-red-400">β</span> · DSPX<sub>Implied</sub> + ε
+                    </div>
+                    <p class="text-xs text-gray-400 max-w-2xl mx-auto italic leading-relaxed">
+                        Correlation between AI physical infrastructure expenditure and 10Y Treasury yield shifts currently holds at <strong class="text-amber-400 border-b border-amber-900">+0.81</strong>.
+                    </p>
+                </div>
+            </section>
+
+            <!-- BRAND 4: ADAM INSTITUTIONAL (Credit Risk) -->
+            <section id="view-institutional" class="brand-view hidden space-y-6">
+                <!-- Section Intro Paragraph -->
+                <div class="fdos-panel p-5 rounded-lg border-l-4 accent-border">
+                    <h2 class="text-xl font-bold uppercase tracking-tight text-blue-400 flex items-center gap-2">
+                        <span>📊</span> Adam Institutional Credit Risk Perimeter
+                    </h2>
+                    <p class="text-xs text-gray-400 mt-1 leading-relaxed">
+                        Interactive credit risk assessment dashboard engineered for institutional debt desks. Test interest coverage dynamics across high-yield ratings, simulate SOFR interest rate shifts, and monitor Broadly Syndicated Loan (BSL) spread repricing mirages.
+                    </p>
+                </div>
+
+                <!-- Stress Test Simulator Grid -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Interactive Slider Controls -->
+                    <div class="fdos-panel p-6 rounded-lg space-y-6">
+                        <div class="flex items-center gap-2 border-b border-gray-800 pb-3">
+                            <span class="text-xl">⚙️</span>
+                            <h3 class="text-sm font-bold text-gray-300 uppercase tracking-wider mono">Scenario Controls</h3>
+                        </div>
+
+                        <div class="space-y-6">
+                            <div class="bg-black/30 p-3 rounded border border-gray-800/50">
+                                <div class="flex justify-between text-xs mb-2">
+                                    <span class="text-gray-400 font-semibold uppercase">SOFR Benchmark Rate</span>
+                                    <span id="val-sofr" class="accent-text font-bold mono bg-blue-500/10 px-2 py-0.5 rounded">5.31%</span>
+                                </div>
+                                <input type="range" id="slider-sofr" min="4.0" max="8.0" step="0.25" value="5.31" oninput="runStressTest()" class="w-full accent-blue-500 cursor-pointer h-1.5 bg-gray-700 rounded-lg appearance-none">
+                            </div>
+
+                            <div class="bg-black/30 p-3 rounded border border-gray-800/50">
+                                <div class="flex justify-between text-xs mb-2">
+                                    <span class="text-gray-400 font-semibold uppercase">Energy Shock Buffer</span>
+                                    <span id="val-energy" class="text-red-400 font-bold mono bg-red-500/10 px-2 py-0.5 rounded">+$0/bbl</span>
+                                </div>
+                                <input type="range" id="slider-energy" min="0" max="40" step="5" value="0" oninput="runStressTest()" class="w-full accent-red-500 cursor-pointer h-1.5 bg-gray-700 rounded-lg appearance-none">
+                            </div>
+
+                            <div class="bg-black/30 p-3 rounded border border-gray-800/50">
+                                <div class="flex justify-between text-xs mb-2">
+                                    <span class="text-gray-400 font-semibold uppercase">BSL Spread Repricing</span>
+                                    <span id="val-spread" class="text-amber-400 font-bold mono bg-amber-500/10 px-2 py-0.5 rounded">365 bps</span>
+                                </div>
+                                <input type="range" id="slider-spread" min="250" max="550" step="25" value="365" oninput="runStressTest()" class="w-full accent-amber-500 cursor-pointer h-1.5 bg-gray-700 rounded-lg appearance-none">
+                            </div>
+                        </div>
+
+                        <div class="p-4 bg-gradient-to-br from-black to-gray-900 rounded border border-gray-700 space-y-3 mono text-xs shadow-lg mt-4">
+                            <div class="flex justify-between items-center border-b border-gray-800 pb-2">
+                                <span class="text-gray-400">Model Default Prob (PD):</span>
+                                <span id="res-pd" class="text-green-400 font-bold text-sm bg-green-500/20 px-2 py-1 rounded">2.4% (Baseline)</span>
+                            </div>
+                            <div class="flex justify-between items-center pt-1">
+                                <span class="text-gray-400">Single-B ICR Median:</span>
+                                <span id="res-icr" class="text-blue-400 font-bold text-sm bg-blue-500/20 px-2 py-1 rounded">1.80x</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dynamic Credit Bar Chart -->
+                    <div class="lg:col-span-2 fdos-panel p-6 rounded-lg flex flex-col">
+                        <div class="flex justify-between items-center mb-4 border-b border-gray-800 pb-2">
+                            <h3 class="text-sm font-bold text-gray-300 uppercase tracking-wider mono">Projected Interest Coverage Ratio (ICR) by Tier</h3>
+                            <span class="text-[10px] text-gray-500">Live Simulation Output</span>
+                        </div>
+                        <div class="chart-container flex-1 min-h-[300px]">
+                            <canvas id="creditChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Risk Variables Matrix Table -->
+                <div class="fdos-panel p-6 rounded-lg space-y-4">
+                    <h3 class="text-sm font-bold text-gray-300 uppercase tracking-wider mono mb-2">Core Credit Risk Variables Matrix</h3>
+                    <div class="overflow-x-auto rounded border border-gray-800">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-black/60 text-gray-400 border-b border-gray-800 uppercase mono">
+                                <tr>
+                                    <th class="p-3">Asset / Variable</th>
+                                    <th class="p-3">Current Level</th>
+                                    <th class="p-3">Model Target</th>
+                                    <th class="p-3">Strategic Implication</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-800/50">
+                                <tr class="hover:bg-gray-800/30 transition-colors">
+                                    <td class="p-3 font-bold text-white flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-blue-500"></span> 10Y UST Yield</td>
+                                    <td class="p-3 mono accent-text font-bold">4.683%</td>
+                                    <td class="p-3 text-gray-400">DCF / Valuation</td>
+                                    <td class="p-3 text-gray-300">Unyielding cost-of-capital floor; zero corporate debt relief.</td>
+                                </tr>
+                                <tr class="hover:bg-gray-800/30 transition-colors">
+                                    <td class="p-3 font-bold text-white flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-indigo-500"></span> SOFR Benchmark</td>
+                                    <td class="p-3 mono text-indigo-400 font-bold">5.31%</td>
+                                    <td class="p-3 text-gray-400">PD / Debt Service</td>
+                                    <td class="p-3 text-gray-300">Directly drives floating debt expense for BSL borrowers.</td>
+                                </tr>
+                                <tr class="hover:bg-gray-800/30 transition-colors">
+                                    <td class="p-3 font-bold text-white flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-amber-500"></span> BSL Index Spread</td>
+                                    <td class="p-3 mono text-amber-400 font-bold">SOFR + 365bps</td>
+                                    <td class="p-3 text-gray-400">LGD Model</td>
+                                    <td class="p-3 text-gray-300">Technical demand masking underlying single-B default risk.</td>
+                                </tr>
+                                <tr class="hover:bg-gray-800/30 transition-colors">
+                                    <td class="p-3 font-bold text-white flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-red-500"></span> Brent Crude Oil</td>
+                                    <td class="p-3 mono text-red-400 font-bold">$89.63 / bbl</td>
+                                    <td class="p-3 text-gray-400">Margin Stress</td>
+                                    <td class="p-3 text-gray-300">Maritime shipping threats re-accelerating energy inflation.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- BRAND 5: ADAM RESEARCH (Quant & Archives) -->
+            <section id="view-research" class="brand-view hidden space-y-6">
+                <!-- Section Intro Paragraph -->
+                <div class="fdos-panel p-5 rounded-lg border-l-4 accent-border">
+                    <h2 class="text-xl font-bold uppercase tracking-tight text-emerald-400 flex items-center gap-2">
+                        <span>🧪</span> Adam Research Data Archives & Backtest Engine
+                    </h2>
+                    <p class="text-xs text-gray-400 mt-1 leading-relaxed">
+                        Quantitative research portal hosting historical market performance datastreams, backtested model outputs, and training datasets. Designed for quantitative researchers validating neuro-symbolic financial prediction kernels.
+                    </p>
+                </div>
+
+                <!-- Backtest Performance Visualizer -->
+                <div class="fdos-panel p-6 rounded-lg space-y-4">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-gray-800 pb-4">
+                        <div>
+                            <h3 class="text-lg font-bold text-white uppercase">Historical Strategy Cumulative Performance</h3>
+                            <p class="text-xs text-gray-400 mt-1">FDOS Quantitative Barbell vs Traditional 60/40 Benchmark (2024 - 2026)</p>
+                        </div>
+                        <div class="bg-emerald-950/50 border border-emerald-800 px-4 py-2 rounded">
+                            <span class="text-[10px] text-gray-400 block mb-1">ANNUALIZED RETURN</span>
+                            <div class="mono text-lg text-emerald-400 font-black">+24.8%</div>
+                        </div>
+                    </div>
+                    <div class="chart-container pt-2 min-h-[350px]">
+                        <canvas id="researchChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Training Archives Datasets Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="fdos-panel p-5 rounded-lg space-y-3 hover:border-emerald-500/50 transition-colors group cursor-pointer">
+                        <div class="flex justify-between items-center">
+                            <span class="text-[10px] mono bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded uppercase font-bold">DATASET #892</span>
+                            <span class="text-gray-600 group-hover:text-emerald-400 transition-colors">📥</span>
+                        </div>
+                        <h4 class="font-bold text-white text-sm">SEC EDGAR 13F Delta Archive</h4>
+                        <p class="text-xs text-gray-400 leading-relaxed min-h-[40px]">Quarterly institutional portfolio delta tracking across top 50 quant funds.</p>
+                        <button class="w-full mt-2 py-2 bg-black border border-gray-700 group-hover:border-emerald-500 group-hover:bg-emerald-900/30 text-gray-300 group-hover:text-emerald-300 font-bold text-xs rounded transition-all mono">
+                            Download JSON (1.2 GB)
+                        </button>
+                    </div>
+                    <div class="fdos-panel p-5 rounded-lg space-y-3 hover:border-emerald-500/50 transition-colors group cursor-pointer">
+                        <div class="flex justify-between items-center">
+                            <span class="text-[10px] mono bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded uppercase font-bold">DATASET #893</span>
+                            <span class="text-gray-600 group-hover:text-emerald-400 transition-colors">📥</span>
+                        </div>
+                        <h4 class="font-bold text-white text-sm">BSL Default Probability Logs</h4>
+                        <p class="text-xs text-gray-400 leading-relaxed min-h-[40px]">Historical interest coverage logs for 1,200 non-investment grade corporate borrowers.</p>
+                        <button class="w-full mt-2 py-2 bg-black border border-gray-700 group-hover:border-emerald-500 group-hover:bg-emerald-900/30 text-gray-300 group-hover:text-emerald-300 font-bold text-xs rounded transition-all mono">
+                            Download CSV (450 MB)
+                        </button>
+                    </div>
+                    <div class="fdos-panel p-5 rounded-lg space-y-3 hover:border-emerald-500/50 transition-colors group cursor-pointer">
+                        <div class="flex justify-between items-center">
+                            <span class="text-[10px] mono bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded uppercase font-bold">DATASET #894</span>
+                            <span class="text-gray-600 group-hover:text-emerald-400 transition-colors">📥</span>
+                        </div>
+                        <h4 class="font-bold text-white text-sm">Sovereign Duration Vectors</h4>
+                        <p class="text-xs text-gray-400 leading-relaxed min-h-[40px]">10Y UST yield sensitivity matrices paired with tech equity volatility metrics.</p>
+                        <button class="w-full mt-2 py-2 bg-black border border-gray-700 group-hover:border-emerald-500 group-hover:bg-emerald-900/30 text-gray-300 group-hover:text-emerald-300 font-bold text-xs rounded transition-all mono">
+                            Download Parquet (820 MB)
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- BRAND 6: ADAM GOVERNANCE (Auditable Ledger) -->
+            <section id="view-governance" class="brand-view hidden space-y-6">
+                <!-- Section Intro Paragraph -->
+                <div class="fdos-panel p-5 rounded-lg border-l-4 accent-border">
+                    <h2 class="text-xl font-bold uppercase tracking-tight text-purple-400 flex items-center gap-2">
+                        <span>📜</span> Adam Governance & Regulatory Audit Ledger
+                    </h2>
+                    <p class="text-xs text-gray-400 mt-1 leading-relaxed">
+                        Bureaucratic, immutable governance log detailing regulatory filings, Shared National Credit (SNC) exam validations, internal compliance memos, and fiduciary committee rulings. Fully auditable chronologically.
+                    </p>
+                </div>
+
+                <!-- Governance Search & Ledger Table -->
+                <div class="fdos-panel p-6 rounded-lg space-y-6 min-h-[500px]">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-gray-800 pb-4">
+                        <h3 class="text-sm font-bold text-gray-300 uppercase tracking-wider mono flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-purple-500"></span>
+                            Regulatory & Compliance Log
+                        </h3>
+                        <div class="relative w-full sm:w-72">
+                            <input type="text" id="gov-search" oninput="filterGovernance()" placeholder="Filter filings or memos..." class="bg-black/50 border border-gray-700 rounded px-4 py-2 pl-8 text-xs text-white mono focus:outline-none focus:border-purple-500 w-full transition-colors shadow-inner">
+                            <span class="absolute left-2.5 top-2 text-gray-500">🔍</span>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4" id="gov-timeline">
+                        <!-- Timeline items injected by JS -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- BRAND 7: ADAM TERMINALS (Live Data Streams & WhaleScanner) -->
+            <section id="view-terminals" class="brand-view hidden space-y-6">
+                <!-- Section Intro Paragraph -->
+                <div class="fdos-panel p-5 rounded-lg border-l-4 accent-border">
+                    <h2 class="text-xl font-bold uppercase tracking-tight text-green-400 flex items-center gap-2">
+                        <span>🖥️</span> Adam Terminals & WhaleScanner Stream
+                    </h2>
+                    <p class="text-xs text-gray-400 mt-1 leading-relaxed">
+                        Real-time institutional flow feed parsing SEC EDGAR RSS streams, 13F filing delta matrices, and large wallet transactions. Monitor conviction shifts, liquidity shields, and activist windows in real time.
+                    </p>
+                </div>
+
+                <!-- WhaleScanner Institutional Flow Table -->
+                <div class="fdos-panel p-6 rounded-lg space-y-4">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+                        <div>
+                            <h3 class="text-sm font-bold text-white uppercase mono flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                                SEC EDGAR RSS Stream // Institutional Flow
+                            </h3>
+                            <p class="text-xs text-gray-500 mt-1">Live delta profiles captured by SEC Scraper Agent</p>
+                        </div>
+                        <input type="text" id="whale-search" oninput="filterWhaleTable()" placeholder="Search ticker / entity..." class="bg-black/50 border border-gray-700 rounded px-4 py-2 text-xs text-white mono focus:outline-none focus:border-green-500 w-full sm:w-64 transition-colors">
+                    </div>
+
+                    <div class="overflow-x-auto rounded border border-gray-800">
+                        <table class="w-full text-left text-xs mono">
+                            <thead class="bg-black/80 text-gray-400 border-b border-gray-800 uppercase">
+                                <tr>
+                                    <th class="p-4">Ticker / Entity</th>
+                                    <th class="p-4">Signal Source</th>
+                                    <th class="p-4">Delta Profile</th>
+                                    <th class="p-4">Strategy Classification</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-800/50" id="whale-table-body">
+                                <!-- Injected by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Catalyst Timeline (August 2026 Window) -->
+                <div class="fdos-panel p-6 rounded-lg space-y-4">
+                    <h3 class="text-sm font-bold text-gray-300 uppercase tracking-wider mono border-b border-gray-800 pb-3">Upcoming System Catalyst Timeline</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mt-4">
+                        <div class="p-5 bg-black/40 rounded border-t-4 border-amber-500 space-y-2 hover:bg-black/60 transition-colors">
+                            <span class="text-[10px] mono text-amber-400 font-bold block bg-amber-500/10 px-2 py-1 rounded inline-block">AUG 11 // 16:30 ET</span>
+                            <h4 class="font-bold text-white text-sm">SEER Q2 Webcast & Bid Exp</h4>
+                            <p class="text-gray-400 text-xs leading-relaxed">T-Zero window for $2.55 activist proposal following poison pill rejection.</p>
+                        </div>
+                        <div class="p-5 bg-black/40 rounded border-t-4 border-blue-500 space-y-2 hover:bg-black/60 transition-colors">
+                            <span class="text-[10px] mono text-blue-400 font-bold block bg-blue-500/10 px-2 py-1 rounded inline-block">AUG 12 // 08:30 EDT</span>
+                            <h4 class="font-bold text-white text-sm">U.S. July CPI Payload</h4>
+                            <p class="text-gray-400 text-xs leading-relaxed">50/50 FOMC rate hike probability locked against 3.4% YoY headline consensus.</p>
+                        </div>
+                        <div class="p-5 bg-black/40 rounded border-t-4 border-purple-500 space-y-2 hover:bg-black/60 transition-colors">
+                            <span class="text-[10px] mono text-purple-400 font-bold block bg-purple-500/10 px-2 py-1 rounded inline-block">AUG 14 // EOD</span>
+                            <h4 class="font-bold text-white text-sm">Q2 13F-HR Deadline</h4>
+                            <p class="text-gray-400 text-xs leading-relaxed">Automated processing DAGs execute full QoQ delta matrices on quant peers.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- PERSISTENT SYSTEM FEED SIDEBAR (Desktop) -->
+        <aside class="w-64 border-l border-gray-800 bg-[#0a0d14]/90 hidden xl:flex flex-col shrink-0 relative z-10 backdrop-blur-sm">
+            <div class="p-3 border-b border-gray-800 flex items-center justify-between bg-black/50">
+                <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mono flex items-center gap-2">
+                    <span class="opacity-50">$_</span> Kernel Live Terminal
+                </span>
+                <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+            </div>
+
+            <div id="live-terminal-log" class="flex-1 p-4 overflow-y-auto mono text-[10px] space-y-3 text-gray-400 scrollbar-custom bg-black/20 font-medium">
+                <!-- Log entries injected by JS -->
+            </div>
+
+            <div class="p-4 border-t border-gray-800 bg-black/80 space-y-2 text-[10px] mono">
+                <div class="flex justify-between items-center text-gray-500">
+                    <span>ACTIVE_THEME:</span>
+                    <span id="label-active-theme" class="accent-text font-bold uppercase bg-gray-900 px-1.5 py-0.5 rounded border border-gray-700">theme-adam-os</span>
+                </div>
+                <div class="flex justify-between items-center text-gray-500">
+                    <span>MEMORY_USAGE:</span>
+                    <span class="text-gray-300">1.24 GB / 16 GB</span>
+                </div>
+            </div>
+        </aside>
+
+    </div>
+
+    <!-- GLOBAL FOOTER STATUS BAR -->
+    <footer class="h-8 border-t border-gray-800 bg-black flex items-center justify-between px-4 text-[10px] mono text-gray-500 shrink-0 z-50">
+        <div class="flex items-center gap-2">
+            <span class="text-green-500">■</span>
+            <span>FDOS_SYSTEM_CORE // ENCRYPTED_SWARM_BUS_ONLINE</span>
+        </div>
+        <div class="hidden sm:flex items-center gap-6">
+            <span>PING: 14ms</span>
+            <span>REST ENDPOINTS: 24/24 UP</span>
+            <span>BUILD: GITHUB_PAGES_HYDRATED</span>
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT APPLICATION LOGIC -->
+    <script>
+        // -------------------------------------------------------------
+        // DATA SOURCES & CONFIGURATION
+        // -------------------------------------------------------------
+
+        const brandConfig = {
+            'adam-os': {
+                title: 'ADAM OS FOUNDATION',
+                subtitle: 'Multi-Agent Swarm Orchestrator & System Kernel',
+                logo: 'OS',
+                themeClass: 'theme-adam-os',
+                navLabel: 'Adam OS Core',
+                subnav: [
+                    { label: 'Swarm Directory', icon: '🤖', action: 'scroll' },
+                    { label: 'REST Mapping', icon: '⚡', action: 'scroll' },
+                    { label: 'Prompt Library', icon: '📄', action: 'scroll' }
+                ]
+            },
+            'market-mayhem': {
+                title: 'MARKET MAYHEM',
+                subtitle: 'Retail Daily Intelligence Hub & Momentum Radar',
+                logo: 'MM',
+                themeClass: 'theme-market-mayhem',
+                navLabel: 'Market Mayhem',
+                subnav: [
+                    { label: 'Daily Memos', icon: '🔥', action: 'scroll' },
+                    { label: 'Retail Radar', icon: '📡', action: 'scroll' },
+                    { label: 'Trending Tickers', icon: '📈', action: 'scroll' }
+                ]
+            },
+            'fortress-hunt': {
+                title: 'FORTRESS & HUNT',
+                subtitle: 'Institutional Advisory & Barbell Strategy',
+                logo: 'FH',
+                themeClass: 'theme-fortress-hunt',
+                navLabel: 'Fortress & Hunt',
+                subnav: [
+                    { label: 'Duration Hangover', icon: '🏛️', action: 'scroll' },
+                    { label: 'Barbell Long/Short', icon: '⚖️', action: 'scroll' },
+                    { label: 'Tech Vol Engine', icon: '📐', action: 'scroll' }
+                ]
+            },
+            'institutional': {
+                title: 'ADAM INSTITUTIONAL',
+                subtitle: 'Credit Risk Perimeter & Debt Stress Testing',
+                logo: 'AI',
+                themeClass: 'theme-institutional',
+                navLabel: 'Institutional Credit',
+                subnav: [
+                    { label: 'Stress Controls', icon: '⚙️', action: 'scroll' },
+                    { label: 'Coverage Metrics', icon: '📊', action: 'scroll' },
+                    { label: 'Risk Variables', icon: '📋', action: 'scroll' }
+                ]
+            },
+            'research': {
+                title: 'ADAM RESEARCH',
+                subtitle: 'Quantitative Data Archives & Model Backtests',
+                logo: 'AR',
+                themeClass: 'theme-research',
+                navLabel: 'Quant Research',
+                subnav: [
+                    { label: 'Cumulative Performance', icon: '🧪', action: 'scroll' },
+                    { label: 'Data Repositories', icon: '📦', action: 'scroll' }
+                ]
+            },
+            'governance': {
+                title: 'ADAM GOVERNANCE',
+                subtitle: 'Immutable Regulatory Audit Ledger & Memos',
+                logo: 'AG',
+                themeClass: 'theme-governance',
+                navLabel: 'Governance',
+                subnav: [
+                    { label: 'Audit Timeline', icon: '📜', action: 'scroll' },
+                    { label: 'SNC Exam Logs', icon: '🛡️', action: 'scroll' }
+                ]
+            },
+            'terminals': {
+                title: 'ADAM TERMINALS',
+                subtitle: 'WhaleScanner Live Flow Stream & SEC EDGAR',
+                logo: 'AT',
+                themeClass: 'theme-terminals',
+                navLabel: 'WhaleScanner Feed',
+                subnav: [
+                    { label: 'EDGAR RSS Feed', icon: '🐋', action: 'scroll' },
+                    { label: 'Catalyst Clock', icon: '⏱️', action: 'scroll' }
+                ]
+            }
+        };
+
+        const agentsData = [
+            { name: "Master Orchestrator", role: "Swarm Coordinator", desc: "Manages inter-agent message buses, task routing, and global state synchronization.", status: "ACTIVE" },
+            { name: "Credit Risk Director", role: "Leveraged Debt Specialist", desc: "Calculates Interest Coverage Ratios (ICR) and Probability of Default (PD) under SOFR shocks.", status: "ACTIVE" },
+            { name: "SEC Scraper Core", role: "EDGAR Data Ingestion", desc: "Parses RSS feeds, 8-K filings, and 13F deltas in real-time.", status: "ACTIVE" },
+            { name: "Macro Strategist", role: "Sovereign Yield Analyst", desc: "Monitors 10Y UST yields, oil price spikes, and duration hangovers.", status: "ACTIVE" },
+            { name: "Governance Inspector", role: "Compliance Audit Engine", desc: "Validates SNC exams, regulatory compliance memos, and fiduciary rules.", status: "ACTIVE" },
+            { name: "Quant Backtester", role: "Historical Model Testing", desc: "Executes backtests on quantitative barbell strategies against market benchmarks.", status: "ACTIVE" }
+        ];
+
+        const newsletters = {
+            aug12: {
+                title: "The 4.68% Benchmark Mirage & Equity Disconnect",
+                content: `<p class="font-bold text-white uppercase text-xs mb-1">Main Takeaway:</p>
+                <p class="mb-4">The S&P 500 near 7,757 is projecting cosmetic calm, but underlying corporate credit is burning cash to service 4.70% baseline debt costs. Retail traders should look past mega-cap momentum and watch energy transit risks in the Bab el-Mandeb Strait, where Brent crude surging toward $90 is triggering automated de-risking scalers across bank balance sheets.</p>
+                <p class="font-bold text-white uppercase text-xs mb-1">Actionable Angle:</p>
+                <p>Maintain allocations to real resource extraction moats (<span class="text-green-400 font-bold">FCX</span>) while hedging against leveraged BSL software issuers facing late-2026 debt maturities.</p>`
+            },
+            aug11: {
+                title: "SEER $2.55 Activist Close & NOL Pill Rejection",
+                content: `<p class="font-bold text-white uppercase text-xs mb-1">Main Takeaway:</p>
+                <p class="mb-4">The T-Zero window for Seer's $2.55 activist proposal has arrived following shareholder rejection of the Tax Benefit Preservation Plan. Downside risks remain strictly buffered by Seer's $219M liquid net cash box.</p>`
+            },
+            aug10: {
+                title: "AST SpaceMobile Liquidity Shield Reaches $3.7B",
+                content: `<p class="font-bold text-white uppercase text-xs mb-1">Main Takeaway:</p>
+                <p class="mb-4">ASTS Q2 sequential revenue doubling to $31.5M, paired with a pro forma liquidity shield exceeding $3.7B, effectively eliminates dilution risk while funding manufacturing expansion.</p>`
+            }
+        };
+
+        const whaleData = [
+            { ticker: "ASTS", signal: "Form 8-K", delta: "+$3.7B Shield", strategy: "Eliminates Dilution Risk" },
+            { ticker: "SEER", signal: "SEC Event", delta: "$2.55 Offer", strategy: "Activist Window Close" },
+            { ticker: "ENTROPY", signal: "Quant Book", delta: "$2.17B Baseline", strategy: "Inflation Ballast Position" },
+            { ticker: "FCX", signal: "CBP-6925", delta: "+3.8σ Call Vol", strategy: "Domestic Smelt Moat" },
+            { ticker: "IMKTA", signal: "Form 10-Q", delta: "$455M Cash", strategy: "Real Estate Monetization" },
+            { ticker: "INBK", signal: "Form 10-Q", delta: "+75.8% EPS Beat", strategy: "13D Buyback Pressure" }
+        ];
+
+        const governanceLogs = [
+            { date: "AUG 11, 2026", title: "SNC Exam Validation Report #892", tag: "AUDIT", text: "Shared National Credit exam confirmed compliance across top-tier G-SIB balance sheets under high SOFR rate assumptions." },
+            { date: "AUG 08, 2026", title: "CBP Proclamation #69252300 Sync", tag: "COMPLIANCE", text: "Integrated mandatory primary country-of-smelt tracking for domestic copper import validations." },
+            { date: "AUG 04, 2026", title: "FDOS Multi-Agent Fiduciary Mandate", tag: "GOVERNANCE", text: "Approved autonomous execution thresholds for SEC EDGAR scraping and automated delta calculations." }
+        ];
+
+        const terminalLogMessages = [
+            "INGESTING SEC EDGAR RSS ENDPOINT...",
+            "MODEL_UPDATE: 10Y Yield anchored @ 4.683%",
+            "DETECTING VOLATILITY DAEMON (VIX: 15.59)",
+            "CBP PROCLAMATION #69252300 SYNCED",
+            "RE-ROUTING TACTICAL WEIGHTS: LONG FCX / SHORT MDB",
+            "50/50 FOMC PROBABILITY MATRIX LOCKED",
+            "ENERGY RISK PREMIUM RE-ACCELERATING ($89.63 BRENT)",
+            "RWA INFLATION SCALERS: STATUS_ACTIVE",
+            "RE-CALCULATING TMT REFINANCING HURDLES...",
+            "SYSTEM STANDBY: PRE-CPI PAYLOAD PENDING"
+        ];
+
+        let swarmChart, macroChart, creditChart, researchChart, radarChart;
+
+        // -------------------------------------------------------------
+        // BRAND ROUTER & NAVIGATION
+        // -------------------------------------------------------------
+        function switchBrand(brandId) {
+            const config = brandConfig[brandId];
+            if (!config) return;
+
+            // Update Body Theme
+            document.body.className = `${config.themeClass} flex flex-col h-screen overflow-hidden text-sm`;
+
+            // Update Header Information
+            document.getElementById('brand-title').innerText = config.title;
+            document.getElementById('brand-subtitle').innerText = config.subtitle;
+            document.getElementById('brand-logo').innerText = config.logo;
+            document.getElementById('nav-persona-label').innerText = config.navLabel;
+            document.getElementById('label-active-theme').innerText = config.themeClass;
+
+            // Update Active Pill Buttons
+            document.querySelectorAll('.brand-pill').forEach(btn => {
+                btn.classList.remove('active');
+                btn.classList.add('text-gray-400');
+            });
+            const activeBtn = document.getElementById(`btn-brand-${brandId}`);
+            if (activeBtn) {
+                activeBtn.classList.add('active');
+                activeBtn.classList.remove('text-gray-400');
+            }
+
+            // Hide all Views & Show Target
+            document.querySelectorAll('.brand-view').forEach(view => {
+                view.classList.add('hidden');
+                view.style.opacity = 0; // Fade out prep
+            });
+            
+            const targetView = document.getElementById(`view-${brandId}`);
+            if (targetView) {
+                targetView.classList.remove('hidden');
+                // Simple fade-in effect
+                setTimeout(() => {
+                    targetView.style.transition = 'opacity 0.3s ease';
+                    targetView.style.opacity = 1;
+                }, 10);
+            }
+
+            // Render Sub-navigation Links
+            renderSubnav(config.subnav);
+
+            // Re-render Canvas Charts for current active view
+            setTimeout(() => {
+                if (brandId === 'adam-os') initSwarmChart();
+                if (brandId === 'market-mayhem') initRadarChart();
+                if (brandId === 'fortress-hunt') initMacroChart();
+                if (brandId === 'institutional') initCreditChart();
+                if (brandId === 'research') initResearchChart();
+            }, 50);
+        }
+
+        function renderSubnav(subnavItems) {
+            const container = document.getElementById('subnav-container');
+            container.innerHTML = '';
+            subnavItems.forEach(item => {
+                const btn = document.createElement('button');
+                btn.className = "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs text-gray-400 hover:bg-gray-800/80 hover:text-white transition-all text-left mb-1 border border-transparent hover:border-gray-700";
+                btn.innerHTML = `<span class="text-base">${item.icon}</span> <span class="hidden md:inline font-semibold tracking-wide">${item.label}</span>`;
+                container.appendChild(btn);
+            });
+        }
+
+        // -------------------------------------------------------------
+        // DATA POPULATION & AGENT DIRECTORY
+        // -------------------------------------------------------------
+        function populateAgentGrid() {
+            const grid = document.getElementById('agent-grid');
+            grid.innerHTML = '';
+            agentsData.forEach(agent => {
+                const card = document.createElement('div');
+                card.className = "p-4 rounded border border-gray-800 bg-black/40 hover:border-cyan-900/50 hover:bg-black/60 transition-all group";
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-2">
+                        <span class="font-bold text-white text-xs block">${agent.name}</span>
+                        <span class="text-[9px] mono px-2 py-0.5 rounded bg-green-950/80 text-green-400 border border-green-800 shadow-[0_0_8px_rgba(34,197,94,0.1)]">${agent.status}</span>
+                    </div>
+                    <span class="text-[10px] accent-text block mono mb-2 group-hover:text-cyan-300 transition-colors">${agent.role}</span>
+                    <p class="text-[11px] text-gray-400 leading-relaxed">${agent.desc}</p>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function loadNewsletter(key) {
+            const data = newsletters[key] || newsletters['aug12'];
+            document.getElementById('newsletter-title').innerText = data.title;
+            // Simple fade effect for content change
+            const body = document.getElementById('newsletter-body');
+            body.style.opacity = 0;
+            setTimeout(() => {
+                body.innerHTML = data.content;
+                body.style.transition = 'opacity 0.3s ease';
+                body.style.opacity = 1;
+            }, 150);
+        }
+
+        function populateWhaleTable() {
+            const tbody = document.getElementById('whale-table-body');
+            tbody.innerHTML = '';
+            whaleData.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-green-900/10 transition-colors";
+                tr.innerHTML = `
+                    <td class="p-4 font-bold text-white border-l-2 border-transparent hover:border-green-500">${item.ticker}</td>
+                    <td class="p-4 text-gray-400">${item.signal}</td>
+                    <td class="p-4 font-bold text-green-400">${item.delta}</td>
+                    <td class="p-4 text-gray-300 italic">${item.strategy}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function filterWhaleTable() {
+            const query = document.getElementById('whale-search').value.toLowerCase();
+            document.querySelectorAll('#whale-table-body tr').forEach(row => {
+                row.style.display = row.innerText.toLowerCase().includes(query) ? '' : 'none';
+            });
+        }
+
+        function populateGovernanceTimeline() {
+            const container = document.getElementById('gov-timeline');
+            container.innerHTML = '';
+            governanceLogs.forEach(log => {
+                const item = document.createElement('div');
+                item.className = "p-5 rounded-lg border border-gray-800 bg-black/40 flex flex-col sm:flex-row justify-between items-start gap-4 hover:border-purple-500/50 transition-colors group";
+                item.innerHTML = `
+                    <div class="space-y-2 flex-1">
+                        <div class="flex items-center gap-3">
+                            <span class="text-[10px] mono px-2 py-0.5 rounded bg-purple-950/60 text-purple-300 border border-purple-800 font-bold group-hover:bg-purple-900 transition-colors">${log.tag}</span>
+                            <span class="font-bold text-white text-sm">${log.title}</span>
+                        </div>
+                        <p class="text-xs text-gray-400 leading-relaxed max-w-2xl">${log.text}</p>
+                    </div>
+                    <span class="text-[10px] mono text-gray-500 shrink-0 bg-gray-900 px-2 py-1 rounded border border-gray-800">${log.date}</span>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        function filterGovernance() {
+            const query = document.getElementById('gov-search').value.toLowerCase();
+            document.querySelectorAll('#gov-timeline > div').forEach(item => {
+                item.style.display = item.innerText.toLowerCase().includes(query) ? '' : 'none';
+            });
+        }
+
+        // -------------------------------------------------------------
+        // CREDIT RISK STRESS SIMULATOR
+        // -------------------------------------------------------------
+        function runStressTest() {
+            const sofr = parseFloat(document.getElementById('slider-sofr').value);
+            const energy = parseFloat(document.getElementById('slider-energy').value);
+            const spread = parseFloat(document.getElementById('slider-spread').value);
+
+            document.getElementById('val-sofr').innerText = `${sofr.toFixed(2)}%`;
+            document.getElementById('val-energy').innerText = `+$${energy}/bbl`;
+            document.getElementById('val-spread').innerText = `${spread} bps`;
+
+            // Recalculate ICR & PD based on stress controls
+            const baseICR = 2.2 - ((sofr - 5.0) * 0.25) - (energy * 0.015);
+            const resICR = Math.max(0.6, baseICR).toFixed(2);
+            const pdValue = (2.4 + ((sofr - 5.0) * 1.1) + (energy * 0.08)).toFixed(1);
+
+            document.getElementById('res-icr').innerText = `${resICR}x`;
+            const pdEl = document.getElementById('res-pd');
+            
+            if (pdValue > 3.5) {
+                pdEl.innerText = `${pdValue}% (HIGH RISK)`;
+                pdEl.className = "text-red-400 font-bold text-sm bg-red-500/20 px-2 py-1 rounded transition-colors";
+            } else {
+                pdEl.innerText = `${pdValue}% (STABLE)`;
+                pdEl.className = "text-green-400 font-bold text-sm bg-green-500/20 px-2 py-1 rounded transition-colors";
+            }
+
+            // Update Chart Data dynamically
+            if (creditChart) {
+                const updatedData = [
+                    (resICR * 1.3).toFixed(2),
+                    (resICR * 1.1).toFixed(2),
+                    resICR,
+                    (resICR * 0.7).toFixed(2)
+                ];
+                creditChart.data.datasets[0].data = updatedData;
+                creditChart.update();
+            }
+        }
+
+        // -------------------------------------------------------------
+        // CHART.JS INITIALIZATIONS (Canvas Rendering)
+        // -------------------------------------------------------------
+        // Set global chart defaults for dark theme
+        Chart.defaults.color = '#888';
+        Chart.defaults.font.family = "'Inter', sans-serif";
+
+        function initSwarmChart() {
+            if (swarmChart) swarmChart.destroy();
+            const ctx = document.getElementById('swarmChart').getContext('2d');
+            swarmChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Macro Engine', 'Credit Risk', 'SEC Scraper', 'Governance'],
+                    datasets: [{
+                        data: [35, 25, 25, 15],
+                        backgroundColor: ['#00f0ff', '#f59e0b', '#10b981', '#a855f7'],
+                        borderWidth: 2,
+                        borderColor: '#0d0f17',
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '75%',
+                    plugins: { 
+                        legend: { position: 'bottom', labels: { color: '#888', font: { size: 10, family: "'JetBrains Mono', monospace" } } }
+                    }
+                }
+            });
+        }
+
+        function initRadarChart() {
+            if (radarChart) radarChart.destroy();
+            const ctx = document.getElementById('radarChart').getContext('2d');
+            radarChart = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['Momentum', 'Short Int.', 'Cash Shield', 'Debt Risk', 'Social Senti.'],
+                    datasets: [{
+                        label: 'ASTS Profile',
+                        data: [90, 40, 95, 20, 85],
+                        borderColor: '#ff007a',
+                        backgroundColor: 'rgba(255, 0, 122, 0.2)',
+                        pointBackgroundColor: '#ff007a',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: '#ff007a'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: { 
+                        r: { 
+                            grid: { color: 'rgba(255,255,255,0.1)' }, 
+                            angleLines: { color: 'rgba(255,255,255,0.1)' },
+                            ticks: { display: false, backdropColor: 'transparent' },
+                            pointLabels: { color: '#a1a1aa', font: { size: 10 } }
+                        } 
+                    },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+
+        function initMacroChart() {
+            if (macroChart) macroChart.destroy();
+            const ctx = document.getElementById('macroChart').getContext('2d');
+            macroChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Jun', 'Jul', 'Aug 01', 'Aug 04', 'Aug 08', 'Aug 11'],
+                    datasets: [{
+                        label: '10Y UST Yield %',
+                        data: [4.15, 4.32, 4.58, 4.71, 4.69, 4.683],
+                        borderColor: '#f59e0b',
+                        backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                        fill: true,
+                        yAxisID: 'y',
+                        tension: 0.3
+                    }, {
+                        label: 'VIX Index',
+                        data: [13.2, 14.5, 12.8, 14.2, 15.8, 15.59],
+                        borderColor: '#3b82f6',
+                        borderDash: [4, 4],
+                        yAxisID: 'y1',
+                        tension: 0.3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: { legend: { labels: { color: '#aaa', font: { size: 10, family: "'Cinzel', serif" } } } },
+                    scales: {
+                        y: { position: 'left', grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#f59e0b' } },
+                        y1: { position: 'right', grid: { drawOnChartArea: false }, ticks: { color: '#3b82f6' } },
+                        x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#666' } }
+                    }
+                }
+            });
+        }
+
+        function initCreditChart() {
+            if (creditChart) creditChart.destroy();
+            const ctx = document.getElementById('creditChart').getContext('2d');
+            creditChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['BB Rated', 'B Rated', 'B- Rated', 'CCC Rated'],
+                    datasets: [{
+                        label: 'Interest Coverage Ratio',
+                        data: [2.34, 1.98, 1.80, 1.26],
+                        backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#ef4444'],
+                        borderRadius: 4,
+                        borderSkipped: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, max: 4, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#888' } },
+                        x: { grid: { display: false }, ticks: { color: '#888' } }
+                    }
+                }
+            });
+        }
+
+        function initResearchChart() {
+            if (researchChart) researchChart.destroy();
+            const ctx = document.getElementById('researchChart').getContext('2d');
+            researchChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['2024 Q1', '2024 Q3', '2025 Q1', '2025 Q3', '2026 Q1', '2026 Q3'],
+                    datasets: [{
+                        label: 'FDOS Barbell Strategy',
+                        data: [100, 118, 134, 152, 178, 204],
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }, {
+                        label: '60/40 Benchmark',
+                        data: [100, 104, 108, 112, 115, 119],
+                        borderColor: '#6b7280',
+                        borderDash: [5, 5],
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: { legend: { labels: { color: '#aaa', font: { size: 10, family: "'JetBrains Mono', monospace" } } } },
+                    scales: {
+                        y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#888' } },
+                        x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#888' } }
+                    }
+                }
+            });
+        }
+
+        // -------------------------------------------------------------
+        // LIVE TERMINAL LOG & SYSTEM UTILITIES
+        // -------------------------------------------------------------
+        function runTerminalLogger() {
+            const container = document.getElementById('live-terminal-log');
+            let index = 0;
+            setInterval(() => {
+                const entry = document.createElement('div');
+                entry.className = "border-l-2 border-gray-700 pl-3 py-1 bg-black/30 rounded-r text-[10px] opacity-0 transition-opacity duration-500 ease-in";
+                entry.innerHTML = `<span class="text-gray-600 block mb-0.5">[${new Date().toLocaleTimeString('en-US', { hour12: false })}.2${Math.floor(Math.random()*99)}]</span> <span class="text-green-500">></span> ${terminalLogMessages[index]}`;
+                container.prepend(entry);
+                
+                // Trigger reflow and fade in
+                setTimeout(() => entry.style.opacity = 1, 50);
+
+                index = (index + 1) % terminalLogMessages.length;
+                if (container.children.length > 25) {
+                    container.removeChild(container.lastChild);
+                }
+            }, 3000);
+        }
+
+        function updateClock() {
+            const clock = document.getElementById('live-clock');
+            if (clock) clock.innerText = new Date().toLocaleTimeString('en-US', { timeZone: 'America/New_York' }) + ' ET';
+        }
+
+        // Initial Load Event
+        window.onload = () => {
+            populateAgentGrid();
+            loadNewsletter('aug12');
+            populateWhaleTable();
+            populateGovernanceTimeline();
+            runTerminalLogger();
+            setInterval(updateClock, 1000);
+
+            // Default to Adam OS Core
+            switchBrand('adam-os');
+        };
+    </script>
+</body>
+</html>

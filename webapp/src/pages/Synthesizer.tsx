@@ -4,8 +4,14 @@ const Synthesizer: React.FC = () => {
   const [confidenceScore, setConfidenceScore] = useState<number>(50);
 
   useEffect(() => {
-    // Simulate real-time signal aggregation
-    const interval = setInterval(() => {
+    let isMounted = true;
+    let timeoutId: ReturnType<typeof setTimeout>;
+
+    // ⚡ Bolt: Use recursive setTimeout instead of setInterval to prevent request pile-up
+    // and handle unmounts gracefully, ensuring no duplicate runs.
+    const runSimulation = () => {
+      if (!isMounted) return;
+
       setConfidenceScore(prev => {
         const variation = (Math.random() - 0.5) * 10;
         let newScore = prev + variation;
@@ -13,8 +19,17 @@ const Synthesizer: React.FC = () => {
         if (newScore > 100) newScore = 100;
         return Number(newScore.toFixed(1));
       });
-    }, 2000);
-    return () => clearInterval(interval);
+
+      timeoutId = setTimeout(runSimulation, 2000);
+    };
+
+    // Simulate real-time signal aggregation
+    timeoutId = setTimeout(runSimulation, 2000);
+
+    return () => {
+      isMounted = false;
+      clearTimeout(timeoutId);
+    };
   }, []);
 
   return (

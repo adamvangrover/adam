@@ -41,6 +41,7 @@ class EventLedger:
     """
     def __init__(self):
         self._events: List[FinancialEvent] = []
+        self._aggregate_index: Dict[str, List[FinancialEvent]] = {}
 
     def append_event(self, event: FinancialEvent) -> None:
         """Appends a new immutable event to the ledger."""
@@ -57,11 +58,15 @@ class EventLedger:
             raise ValueError(f"Event {event.event_id} failed integrity check. Hash mismatch.")
 
         self._events.append(event)
+        if event.aggregate_id not in self._aggregate_index:
+            self._aggregate_index[event.aggregate_id] = []
+        self._aggregate_index[event.aggregate_id].append(event)
+
         logger.info("event_appended", event_id=event.event_id, aggregate_id=event.aggregate_id, event_type=event.event_type)
 
     def get_events_for_aggregate(self, aggregate_id: str) -> List[FinancialEvent]:
         """Retrieves all events for a specific aggregate, ordered by insertion."""
-        return [e for e in self._events if e.aggregate_id == aggregate_id]
+        return self._aggregate_index.get(aggregate_id, [])
 
     def replay_aggregate(self, aggregate_id: str, reducer: callable, initial_state: Any) -> Any:
         """
@@ -81,3 +86,4 @@ class EventLedger:
     def clear(self) -> None:
         """Clears the ledger. Strictly for testing purposes."""
         self._events = []
+        self._aggregate_index = {}

@@ -205,3 +205,10 @@
 ## 2025-02-27 - [Optimize JSON Logic Rule Loading]
 **Learning:** Performing synchronous disk I/O (`open` and `json.load`) repeatedly within calculation or validation methods, such as `AgentOrchestrator._evaluate_preconditions`, creates a severe performance bottleneck during high-frequency rule evaluations across thousands of agent workflows.
 **Action:** Always extract the loading logic into a module-level cached function using `@functools.lru_cache` to bypass disk I/O entirely after the first read, resulting in significantly faster and more stable execution.
+
+## 2024-05-30 - [Optimize Aggregate Event Retrieval]
+**Learning:** In CQRS/Event Sourced systems, fetching historical events via a list comprehension on the global ledger (e.g., `[e for e in self._events if e.aggregate_id == ID]`) creates a severe O(N) performance bottleneck per replay request as the ledger grows.
+**Action:** Always maintain an O(1) in-memory index dictionary (`_aggregate_index[aggregate_id] = [event1, event2]`) during event insertion. This allows instant retrieval for aggregate replays without scanning the entire ledger.
+## 2024-05-30 - [Optimize Correlation ID Event Retrieval]
+**Learning:** Similar to aggregate replay in CQRS, retrieving events by correlation ID via a list comprehension on the global event store (`[e for e in self._events if e.correlation_id == ID]`) creates a severe O(N) performance bottleneck.
+**Action:** Always maintain an O(1) in-memory index dictionary (`_correlation_index[correlation_id] = [event1, event2]`) during event insertion for instant retrieval.
