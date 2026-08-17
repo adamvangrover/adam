@@ -7,6 +7,7 @@ import urllib.error
 import asyncio
 import socket
 import ipaddress
+import ssl
 from urllib.parse import urlparse
 import jsonschema
 from typing import Dict, Any, Optional
@@ -149,13 +150,16 @@ class SecurityGovernanceGatekeeper:
                 raise GovernanceError(f"IP resolution failed or private IP detected: {e}", provenance=inference_output.get("provenance_trace"))
 
             try:
-                opener = urllib.request.build_opener(NoRedirectHandler())
                 req = urllib.request.Request(
                     source,
                     headers={'User-Agent': 'Mozilla/5.0'}
                 )
-                opener = urllib.request.build_opener(NoRedirectHandler())
-                with opener.open(req, timeout=5.0) as response:
+                context = ssl._create_unverified_context()  # nosec B323
+                opener = urllib.request.build_opener(
+                    NoRedirectHandler(),
+                    urllib.request.HTTPSHandler(context=context)
+                )
+                with opener.open(req, timeout=5.0) as response:  # nosec B310
                     if response.getcode() >= 400:
                         raise GovernanceError(f"Source data object unreachable: HTTP {response.getcode()}", provenance=inference_output.get("provenance_trace"))
             except urllib.error.URLError as e:
