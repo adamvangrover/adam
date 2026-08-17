@@ -24,7 +24,11 @@ class NoRedirectHandler(urllib.request.HTTPRedirectHandler):
 
 class GovernanceError(Exception):
     """Raised when an inference fails governance validation."""
-    pass
+    def __init__(self, message: str, provenance: Dict[str, Any] = None):
+        if provenance:
+            message = f"{message} | Erroneous input provenance: {provenance}"
+        super().__init__(message)
+        self.provenance = provenance
 
 class JsonLogicGovernanceGatekeeper:
     def __init__(self, rules: Dict[str, Any]):
@@ -39,35 +43,35 @@ class JsonLogicGovernanceGatekeeper:
         Validates LLM probabilistic inferences using jsonLogic.
         """
         if "provenance_trace" not in inference_output:
-            raise GovernanceError("Missing 'provenance_trace' containing the ProvenanceHeader.")
+            raise GovernanceError("Missing 'provenance_trace' containing the ProvenanceHeader.", provenance={})
 
         try:
             # Pydantic validation for the header
             header = ProvenanceHeader(**inference_output["provenance_trace"])
         except Exception as e:
-            raise GovernanceError(f"Invalid ProvenanceHeader: {e}")
+            raise GovernanceError(f"Invalid ProvenanceHeader: {e}", provenance=inference_output.get("provenance_trace"))
 
         # Poison check based on confidence score boundary issues
         if header.confidence_score < 0.5 or header.confidence_score > 1.0:
-             raise GovernanceError("Poisoned data detected: confidence score out of bounds. Must be >= 0.5")
+             raise GovernanceError("Poisoned data detected: confidence score out of bounds. Must be >= 0.5", provenance=inference_output.get("provenance_trace"))
 
         # Extract the actual data payload to validate against the jsonLogic rules
         payload = inference_output.get("data", {})
 
         if not payload:
-            raise GovernanceError("Missing 'data' payload in inference output.")
+            raise GovernanceError("Missing 'data' payload in inference output.", provenance=inference_output.get("provenance_trace"))
 
         # Strict Provenance Checks: Reproducible Hash Validation
         payload_json = json.dumps(payload, sort_keys=True, separators=(',', ':')).encode('utf-8')
         computed_hash = hashlib.sha256(payload_json).hexdigest()
 
         if header.content_hash != computed_hash:
-            raise GovernanceError(f"Provenance violation: content_hash mismatch. Expected {computed_hash}, got {header.content_hash}")
+            raise GovernanceError(f"Provenance violation: content_hash mismatch. Expected {computed_hash}, got {header.content_hash}", provenance=inference_output.get("provenance_trace"))
 
         # Schema Validation with jsonLogic
         is_valid = jsonLogic(self.rules, payload)
         if not is_valid:
-            raise GovernanceError("jsonLogic validation failed: payload does not satisfy rules.")
+            raise GovernanceError("jsonLogic validation failed: payload does not satisfy rules.", provenance=inference_output.get("provenance_trace"))
 
         return inference_output
 
@@ -102,30 +106,30 @@ class SecurityGovernanceGatekeeper:
         Validates LLM probabilistic inferences natively using jsonschema.
         """
         if "provenance_trace" not in inference_output:
-            raise GovernanceError("Missing 'provenance_trace' containing the ProvenanceHeader.")
+            raise GovernanceError("Missing 'provenance_trace' containing the ProvenanceHeader.", provenance={})
 
         try:
             # Pydantic validation for the header
             header = ProvenanceHeader(**inference_output["provenance_trace"])
         except Exception as e:
-            raise GovernanceError(f"Invalid ProvenanceHeader: {e}")
+            raise GovernanceError(f"Invalid ProvenanceHeader: {e}", provenance=inference_output.get("provenance_trace"))
 
         # Poison check based on confidence score boundary issues
         if header.confidence_score < 0.5 or header.confidence_score > 1.0:
-             raise GovernanceError("Poisoned data detected: confidence score out of bounds. Must be >= 0.5")
+             raise GovernanceError("Poisoned data detected: confidence score out of bounds. Must be >= 0.5", provenance=inference_output.get("provenance_trace"))
 
         # Extract the actual data payload to validate against the schema
         payload = inference_output.get("data", {})
 
         if not payload:
-            raise GovernanceError("Missing 'data' payload in inference output.")
+            raise GovernanceError("Missing 'data' payload in inference output.", provenance=inference_output.get("provenance_trace"))
 
         # Strict Provenance Checks: Reproducible Hash Validation
         payload_json = json.dumps(payload, sort_keys=True, separators=(',', ':')).encode('utf-8')
         computed_hash = hashlib.sha256(payload_json).hexdigest()
 
         if header.content_hash != computed_hash:
-            raise GovernanceError(f"Provenance violation: content_hash mismatch. Expected {computed_hash}, got {header.content_hash}")
+            raise GovernanceError(f"Provenance violation: content_hash mismatch. Expected {computed_hash}, got {header.content_hash}", provenance=inference_output.get("provenance_trace"))
 
         # Strict Provenance Checks: Source Data Object Reachability & Whitelisting
         source = header.source_data_object
@@ -134,15 +138,15 @@ class SecurityGovernanceGatekeeper:
 
             allowed_domains = ["example.com", "api.github.com", "query2.finance.yahoo.com"]
             if parsed_url.hostname not in allowed_domains:
-                raise GovernanceError(f"Source data object domain not permitted: {parsed_url.hostname}")
+                raise GovernanceError(f"Source data object domain not permitted: {parsed_url.hostname}", provenance=inference_output.get("provenance_trace"))
 
             try:
                 ip = socket.gethostbyname(parsed_url.hostname)
                 ip_obj = ipaddress.ip_address(ip)
                 if ip_obj.is_private or ip_obj.is_loopback:
-                    raise GovernanceError(f"Source data object resolves to a private IP: {ip}")
+                    raise GovernanceError(f"Source data object resolves to a private IP: {ip}", provenance=inference_output.get("provenance_trace"))
             except Exception as e:
-                raise GovernanceError(f"IP resolution failed or private IP detected: {e}")
+                raise GovernanceError(f"IP resolution failed or private IP detected: {e}", provenance=inference_output.get("provenance_trace"))
 
             try:
                 opener = urllib.request.build_opener(NoRedirectHandler())
@@ -153,19 +157,19 @@ class SecurityGovernanceGatekeeper:
                 opener = urllib.request.build_opener(NoRedirectHandler())
                 with opener.open(req, timeout=5.0) as response:
                     if response.getcode() >= 400:
-                        raise GovernanceError(f"Source data object unreachable: HTTP {response.getcode()}")
+                        raise GovernanceError(f"Source data object unreachable: HTTP {response.getcode()}", provenance=inference_output.get("provenance_trace"))
             except urllib.error.URLError as e:
-                raise GovernanceError(f"Source data object unreachable: {e}")
+                raise GovernanceError(f"Source data object unreachable: {e}", provenance=inference_output.get("provenance_trace"))
             except Exception as e:
-                 raise GovernanceError(f"Source data object validation failed: {e}")
+                 raise GovernanceError(f"Source data object validation failed: {e}", provenance=inference_output.get("provenance_trace"))
         elif source.startswith("http://"):
-            raise GovernanceError("HTTP is not allowed for source data objects, use HTTPS.")
+            raise GovernanceError("HTTP is not allowed for source data objects, use HTTPS.", provenance=inference_output.get("provenance_trace"))
 
         # Schema Validation
         try:
             self.validator.validate(instance=payload)
         except jsonschema.exceptions.ValidationError as e:
-            raise GovernanceError(f"Schema validation failed: {e.message}")
+            raise GovernanceError(f"Schema validation failed: {e.message}", provenance=inference_output.get("provenance_trace"))
 
         return inference_output
 
