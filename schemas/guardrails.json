@@ -1,0 +1,22 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Guardrails Policy",
+  "type": "object",
+  "properties": {
+    "policy_version": { "type": "string" },
+    "rules": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "rule_id": { "type": "string" },
+          "description": { "type": "string" },
+          "condition": { "type": "object", "description": "JsonLogic representation" },
+          "action": { "enum": ["allow", "deny", "require_approval"] }
+        },
+        "required": ["rule_id", "condition", "action"]
+      }
+    }
+  },
+  "required": ["policy_version", "rules"]
+}
