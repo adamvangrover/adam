@@ -1,6 +1,4 @@
-Here is the polished, consolidated version of the README. It integrates your multi-agent architecture, specifically outlines the exact pipelines (like the SEC forms and the step-by-step credit automation), incorporates the FIBO graph neural network specifications, and resolves the versioning and path inconsistencies.
 
-```markdown
 <div align="center">
   <a href="https://adamvangrover.github.io/adam/">
     <picture>
