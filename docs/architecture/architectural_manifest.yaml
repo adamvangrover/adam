@@ -1,0 +1,48 @@
+document_type: Machine Queryable Architecture Manifest
+version: 1.0.0-PROD
+repository: adamvangrover/adam
+
+boundaries:
+  probabilistic_reasoning:
+    language: python
+    directories:
+      - src/agents
+      - src/orchestration
+    restrictions:
+      - no_direct_state_mutation
+      - requires_governance_compilation
+
+  deterministic_execution:
+    language: rust
+    directories:
+      - src/kernel
+      - src/matching_engine
+    restrictions:
+      - no_network_io
+      - pure_functions_only
+      - zero_copy_pycapsule_interface
+
+  governance_layer:
+    language: python
+    directories:
+      - src/pdil
+      - adam_os/kernels/governance
+    policies:
+      - default_deny
+      - jsonLogic_schema_validation
+      - provenance_header_required
+
+  provenance_layer:
+    language: python
+    directories:
+      - src/pdil/provenance
+    requirements:
+      - zero_context_drift_cryptographic_hash
+      - w3c_prov_o_jsonld_structure
+
+  event_transport:
+    technology: nats_jetstream
+    directories:
+      - src/pdil/transport
+    deduplication: exactly_once
+    retention: bounded_stream
