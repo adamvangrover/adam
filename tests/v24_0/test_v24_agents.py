@@ -4,6 +4,7 @@ import asyncio
 from core.agents.meta_agents.evolutionary_architect import EvolutionaryArchitect
 from core.agents.meta_agents.didactic_architect import DidacticArchitect
 from core.agents.meta_agents.chronos_agent import Chronos
+from core.agents.meta_agents.chronos_agent import ChronosInput
 from core.llm.base_llm_engine import BaseLLMEngine
 
 class TestV24Agents(unittest.IsolatedAsyncioTestCase):
@@ -45,20 +46,17 @@ class TestV24Agents(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(result["artifact_type"], "tutorial")
 
     async def test_chronos_init(self):
-        agent = Chronos(llm_engine=self.mock_llm)
-        self.assertEqual(agent.name, "Chronos")
+        agent = Chronos(llm_engine=self.mock_llm, config={})
+        self.assertEqual(agent.name, "ChronosAgent")
 
     async def test_chronos_run(self):
-        agent = Chronos(llm_engine=self.mock_llm)
-        context = {
-            "user_query": "What happened during the 2008 crash?",
-            "market_snapshot": {"sp500": 4000}
-        }
+        agent = Chronos(llm_engine=self.mock_llm, config={})
+        context = ChronosInput(query="What happened during the 2008 crash?", market_context={"sp500": 4000})
         result = await agent.execute(context)
-        self.assertIn("temporal_context", result)
-        self.assertIn("strategy", result["temporal_context"])
+        self.assertTrue(hasattr(result, "temporal_synthesis"))
+
         # The mock LLM returns "Mocked LLM Response", but the code does .strip().lower()
-        self.assertEqual(result["temporal_context"]["strategy"], "mocked llm response")
+        self.assertEqual(result.temporal_synthesis.lower(), "mocked llm response")
 
 if __name__ == '__main__':
     unittest.main()
