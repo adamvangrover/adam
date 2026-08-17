@@ -63,31 +63,163 @@
         }
     </style>
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        .chart-container { position: relative; width: 100%; height: 320px; max-height: 400px; }
+        .fdos-panel { background-color: #0f172a; border: 1px solid #1e293b; }
+        .accent-border { border-color: #f59e0b; }
+        .accent-text { color: #f59e0b; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        .scrollbar-custom::-webkit-scrollbar { width: 6px; height: 6px; }
+        .scrollbar-custom::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
+        .scrollbar-custom::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 3px; }
+        .scrollbar-custom::-webkit-scrollbar-thumb:hover { background: #f59e0b; }
+    </style>
+
 </head>
+
 <body>
     <div class="header">
         <h1>FORTRESS & HUNT</h1>
         <p style="font-family: 'Inter', sans-serif; text-transform: uppercase; letter-spacing: 2px; color: var(--fortress-accent);">Strategic Advisory & Macro Outlook</p>
     </div>
 
-    <div class="container">
-        <div class="article">
-            <h2>Q3 Macroeconomic Outlook</h2>
-            <div class="meta">Published: October 2025 | Sector: Leveraged Finance</div>
-            <p>Our proprietary models indicate a significant shift in TMT sector valuations. The underlying agent swarm has detected anomalous credit spreads.</p>
-            <a href="../../showcase_private_equity.html" class="nav-link">View Due Diligence Report &rarr;</a>
-            <br>
-            <a href="../adam-os/index.html" class="nav-link" style="font-size: 0.8rem; color: #888;">[Inspect Underlying Agent Swarm in Adam OS]</a>
-        </div>
+    <div class="p-6 max-w-7xl mx-auto text-white">
+        <section id="view-fortress-hunt" class="brand-view space-y-6">
+                <!-- Section Intro Paragraph -->
+                <div class="fdos-panel p-5 rounded-lg border-l-4 accent-border">
+                    <h2 class="text-xl font-bold uppercase tracking-tight text-amber-500 flex items-center gap-2">
+                        <span>🏛️</span> Fortress & Hunt Macro-Strategic Advisory
+                    </h2>
+                    <p class="text-xs text-gray-400 mt-1 leading-relaxed">
+                        Institutional commentary and tactical barbell asset allocation. This portal pairs sovereign yield duration analysis with asymmetric single-stock pairs trading—barbelling defensive, resource-backed moats ("Fortress") against refinancing-vulnerable software issuers ("The Hunt").
+                    </p>
+                </div>
 
-        <div class="article">
-            <h2>Corporate Credit Commentary</h2>
-            <div class="meta">Published: September 2025 | Sector: TMT</div>
-            <p>An analysis of covenant breaches and liquidity runways across major tech issuers, driven by our Fundamental Analyst AI models.</p>
-            <a href="../../credit_valuation_architect.html" class="nav-link">View Credit Architect &rarr;</a>
-        </div>
+                <!-- Macro Duration Chart & Narrative -->
+                <div class="fdos-panel p-6 rounded-lg space-y-4">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h3 class="text-lg font-bold text-white uppercase">The Duration Hangover Diagnostic</h3>
+                            <p class="text-xs text-gray-400">Sovereign 10-Year UST Yield vs VIX Volatility Index (August 2026 Window)</p>
+                        </div>
+                        <span class="bg-amber-950 text-amber-400 border border-amber-800 px-2.5 py-1 rounded text-xs font-bold mono">REGIME: STRESS_ACTIVE</span>
+                    </div>
 
-        <a href="../index.html" class="nav-link" style="display: inline-block; color: #f59e0b; border: 1px solid #f59e0b; padding: 5px 10px; margin-top: 20px; text-decoration: none;">&lt;&lt; RETURN TO FDOS DESKTOP</a>
+                    <div class="chart-container">
+                        <canvas id="macroChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Barbell Pair Strategy Module -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Fortress Module -->
+                    <div class="fdos-panel p-6 rounded-lg border-l-4 border-l-green-500 relative overflow-hidden">
+                        <span class="text-xs font-bold text-green-500 uppercase tracking-widest block mb-1 mono">LONG THEMING // FORTRESS</span>
+                        <h3 class="text-2xl font-black text-white">Freeport-McMoRan (NYSE: FCX)</h3>
+                        <p class="text-xs text-gray-400 mt-2 leading-relaxed">
+                            Customs Proclamation #69252300 enforces mandatory primary country-of-smelt reporting on foreign copper imports. This establishes an artificial tariff floor protecting domestic extractors while FCX holds $4.8B in cash reserves and zero debt maturity walls before 2030.
+                        </p>
+                        <div class="grid grid-cols-3 gap-2 mt-4 text-center mono text-xs">
+                            <div class="bg-black/40 p-2 rounded border border-gray-800">
+                                <span class="text-gray-500 text-[9px] block">TARGET PRICE</span>
+                                <span class="text-green-400 font-bold">$69.62</span>
+                            </div>
+                            <div class="bg-black/40 p-2 rounded border border-gray-800">
+                                <span class="text-gray-500 text-[9px] block">NET LEVERAGE</span>
+                                <span class="text-green-400 font-bold">1.1x</span>
+                            </div>
+                            <div class="bg-black/40 p-2 rounded border border-gray-800">
+                                <span class="text-gray-500 text-[9px] block">CASH RESERVES</span>
+                                <span class="text-green-400 font-bold">$4.8B</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hunt Module -->
+                    <div class="fdos-panel p-6 rounded-lg border-l-4 border-l-red-500 relative overflow-hidden">
+                        <span class="text-xs font-bold text-red-500 uppercase tracking-widest block mb-1 mono">SHORT THEMING // THE HUNT</span>
+                        <h3 class="text-2xl font-black text-white">BSL-Dependent Tech (Proxy: MDB)</h3>
+                        <p class="text-xs text-gray-400 mt-2 leading-relaxed">
+                            Non-earning software enterprise cohort reliant on broadly syndicated loan (BSL) renewals. Enterprise IT budgets are getting cannibalized by AI physical compute hardware expenses, directly starving software seat expansion ahead of the late-2026 refi wall.
+                        </p>
+                        <div class="grid grid-cols-3 gap-2 mt-4 text-center mono text-xs">
+                            <div class="bg-black/40 p-2 rounded border border-gray-800">
+                                <span class="text-gray-500 text-[9px] block">PROXY PRICE</span>
+                                <span class="text-red-400 font-bold">$234.80</span>
+                            </div>
+                            <div class="bg-black/40 p-2 rounded border border-gray-800">
+                                <span class="text-gray-500 text-[9px] block">REFI WALL</span>
+                                <span class="text-red-400 font-bold">Q4 2026</span>
+                            </div>
+                            <div class="bg-black/40 p-2 rounded border border-gray-800">
+                                <span class="text-gray-500 text-[9px] block">FCF YIELD</span>
+                                <span class="text-red-400 font-bold">-2.6%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Math Engine Formula Block -->
+                <div class="fdos-panel p-6 rounded-lg text-center space-y-3 bg-gradient-to-r from-gray-950 via-gray-900 to-gray-950">
+                    <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mono">Tech Valuation Volatility Equation</span>
+                    <div class="text-xl md:text-2xl font-light text-white mono">
+                        VaR<sub>Tech</sub> = <span class="text-blue-400">α</span> · (<span class="text-amber-400">∂Yield<sub>10Y</sub></span> / ∂t) + <span class="text-red-400">β</span> · DSPX<sub>Implied</sub> + ε
+                    </div>
+                    <p class="text-xs text-gray-400 max-w-xl mx-auto italic">
+                        Correlation between AI physical infrastructure expenditure and 10Y Treasury yield shifts currently holds at <strong class="text-amber-400">+0.81</strong>.
+                    </p>
+                </div>
+            </section>
+
+        <div class="mt-8">
+            <a href="../index.html" class="nav-link" style="display: inline-block; color: #f59e0b; border: 1px solid #f59e0b; padding: 5px 10px; margin-top: 20px; text-decoration: none;">&lt;&lt; RETURN TO FDOS DESKTOP</a>
+        </div>
     </div>
+
+    <script>
+        let macroChart;
+        function initMacroChart() {
+            if (macroChart) macroChart.destroy();
+            const ctx = document.getElementById('macroChart').getContext('2d');
+            macroChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Jun', 'Jul', 'Aug 01', 'Aug 04', 'Aug 08', 'Aug 11'],
+                    datasets: [{
+                        label: '10Y UST Yield %',
+                        data: [4.15, 4.32, 4.58, 4.71, 4.69, 4.683],
+                        borderColor: '#f59e0b',
+                        backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                        fill: true,
+                        yAxisID: 'y'
+                    }, {
+                        label: 'VIX Index',
+                        data: [13.2, 14.5, 12.8, 14.2, 15.8, 15.59],
+                        borderColor: '#3b82f6',
+                        borderDash: [4, 4],
+                        yAxisID: 'y1'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { labels: { color: '#aaa', font: { size: 10 } } } },
+                    scales: {
+                        y: { position: 'left', grid: { color: '#1a202c' }, ticks: { color: '#f59e0b' } },
+                        y1: { position: 'right', grid: { drawOnChartArea: false }, ticks: { color: '#3b82f6' } },
+                        x: { ticks: { color: '#666' } }
+                    }
+                }
+            });
+        }
+
+        window.onload = () => {
+            initMacroChart();
+        };
+    </script>
+
 </body>
 </html>

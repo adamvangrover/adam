@@ -76,8 +76,25 @@
         }
     </style>
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        .chart-container { position: relative; width: 100%; height: 320px; max-height: 400px; }
+        .fdos-panel { background-color: #131d31; border: 1px solid #21304d; color: white;}
+        .accent-border { border-color: #3b82f6; }
+        .accent-text { color: #3b82f6; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        .scrollbar-custom::-webkit-scrollbar { width: 6px; height: 6px; }
+        .scrollbar-custom::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
+        .scrollbar-custom::-webkit-scrollbar-thumb { background: #21304d; border-radius: 3px; }
+        .scrollbar-custom::-webkit-scrollbar-thumb:hover { background: #3b82f6; }
+    </style>
+
 </head>
+
 <body>
+
     <div class="sidebar">
         <h2>ADAM INSTITUTIONAL</h2>
         <ul class="nav-list">
@@ -89,30 +106,181 @@
         </ul>
     </div>
 
-    <div class="main-content">
-        <h1>Institutional Dashboard</h1>
-        <p>Broad multi-asset portfolio tracking and institutional credit risk assessment.</p>
 
-        <div class="dashboard-grid">
-            <div class="panel">
-                <h3>Structural Default Models</h3>
-                <p>Track corporate bond yields, CDS spreads, and algorithmic default probability metrics.</p>
-                <a href="../../comprehensive_credit_dashboard.html" class="action-btn">Launch Dashboard</a>
-            </div>
+    <div class="main-content" style="background-color: #0b1120; min-height: 100vh;">
+        <div class="max-w-7xl mx-auto">
+            <section id="view-institutional" class="brand-view space-y-6">
+                <!-- Section Intro Paragraph -->
+                <div class="fdos-panel p-5 rounded-lg border-l-4 accent-border">
+                    <h2 class="text-xl font-bold uppercase tracking-tight text-blue-400 flex items-center gap-2">
+                        <span>📊</span> Adam Institutional Credit Risk Perimeter
+                    </h2>
+                    <p class="text-xs text-gray-400 mt-1 leading-relaxed">
+                        Interactive credit risk assessment dashboard engineered for institutional debt desks. Test interest coverage dynamics across high-yield ratings, simulate SOFR interest rate shifts, and monitor Broadly Syndicated Loan (BSL) spread repricing mirages.
+                    </p>
+                </div>
 
-            <div class="panel">
-                <h3>Institutional Radar</h3>
-                <p>Map institutional clustering and crowded trades via automated 13F SEC filing parsing.</p>
-                <a href="../../institutional_radar.html" class="action-btn">View Radar</a>
-            </div>
+                <!-- Stress Test Simulator Grid -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Interactive Slider Controls -->
+                    <div class="fdos-panel p-5 rounded-lg space-y-5">
+                        <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mono">Scenario Stress Controls</h3>
 
-            <div class="panel">
-                <h3>Hedge Fund Alpha Engine</h3>
-                <p>Real-time news ingestion and automated trade thesis generation.</p>
-                <a href="../../showcase_hedge_fund.html" class="action-btn">Access Engine</a>
-            </div>
-            <div style='margin-top: 30px; padding: 15px; background: #fff; border: 1px solid #e1e8ed; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);'><h3 style='color:#2c3e50; margin-top:0; border-bottom: 2px solid #34495e; padding-bottom: 10px;'>Macro Variables Pipeline</h3><ul style='list-style: none; padding: 0; margin: 0; font-size: 0.9rem; color: #333;'><li style='margin-bottom: 5px;'><strong>SOFR:</strong> 5.31% (Floating Debt Stress)</li><li style='margin-bottom: 5px;'><strong>10Y UST:</strong> 4.683% (Cost of Capital Floor)</li><li><strong>Brent Crude:</strong> $89.63 / bbl (Margin Stress Component)</li></ul></div>
+                        <div class="space-y-4">
+                            <div>
+                                <div class="flex justify-between text-xs mb-1">
+                                    <span class="text-gray-300 font-semibold">SOFR Benchmark Rate:</span>
+                                    <span id="val-sofr" class="accent-text font-bold mono">5.31%</span>
+                                </div>
+                                <input type="range" id="slider-sofr" min="4.0" max="8.0" step="0.25" value="5.31" oninput="runStressTest()" class="w-full accent-blue-500 cursor-pointer">
+                            </div>
+
+                            <div>
+                                <div class="flex justify-between text-xs mb-1">
+                                    <span class="text-gray-300 font-semibold">Energy Shock Buffer:</span>
+                                    <span id="val-energy" class="text-red-400 font-bold mono">+$0/bbl</span>
+                                </div>
+                                <input type="range" id="slider-energy" min="0" max="40" step="5" value="0" oninput="runStressTest()" class="w-full accent-red-500 cursor-pointer">
+                            </div>
+
+                            <div>
+                                <div class="flex justify-between text-xs mb-1">
+                                    <span class="text-gray-300 font-semibold">BSL Spread Repricing:</span>
+                                    <span id="val-spread" class="text-amber-400 font-bold mono">365 bps</span>
+                                </div>
+                                <input type="range" id="slider-spread" min="250" max="550" step="25" value="365" oninput="runStressTest()" class="w-full accent-amber-500 cursor-pointer">
+                            </div>
+                        </div>
+
+                        <div class="p-4 bg-black/50 rounded border border-gray-800 space-y-2 mono text-xs">
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">Model Default Prob (PD):</span>
+                                <span id="res-pd" class="text-green-400 font-bold">2.4% (Baseline)</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">Single-B ICR Median:</span>
+                                <span id="res-icr" class="text-blue-400 font-bold">1.80x</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dynamic Credit Bar Chart -->
+                    <div class="lg:col-span-2 fdos-panel p-5 rounded-lg space-y-4">
+                        <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mono">Projected Interest Coverage Ratio (ICR) by Rating Tier</h3>
+                        <div class="chart-container">
+                            <canvas id="creditChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Risk Variables Matrix Table -->
+                <div class="fdos-panel p-5 rounded-lg space-y-4">
+                    <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mono">Core Credit Risk Variables Matrix</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-black/60 text-gray-400 border-b border-gray-800 uppercase mono">
+                                <tr>
+                                    <th class="p-3">Asset / Variable</th>
+                                    <th class="p-3">Current Level</th>
+                                    <th class="p-3">Model Target</th>
+                                    <th class="p-3">Strategic Implication</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-800/50">
+                                <tr class="hover:bg-gray-800/30">
+                                    <td class="p-3 font-bold text-white">10Y UST Yield</td>
+                                    <td class="p-3 mono accent-text">4.683%</td>
+                                    <td class="p-3 text-gray-400">DCF / Valuation</td>
+                                    <td class="p-3 text-gray-300">Unyielding cost-of-capital floor; zero corporate debt relief.</td>
+                                </tr>
+                                <tr class="hover:bg-gray-800/30">
+                                    <td class="p-3 font-bold text-white">SOFR Benchmark</td>
+                                    <td class="p-3 mono text-blue-400">5.31%</td>
+                                    <td class="p-3 text-gray-400">PD / Debt Service</td>
+                                    <td class="p-3 text-gray-300">Directly drives floating debt expense for BSL borrowers.</td>
+                                </tr>
+                                <tr class="hover:bg-gray-800/30">
+                                    <td class="p-3 font-bold text-white">BSL Index Spread</td>
+                                    <td class="p-3 mono text-amber-400">SOFR + 365bps</td>
+                                    <td class="p-3 text-gray-400">LGD Model</td>
+                                    <td class="p-3 text-gray-300">Technical demand masking underlying single-B default risk.</td>
+                                </tr>
+                                <tr class="hover:bg-gray-800/30">
+                                    <td class="p-3 font-bold text-white">Brent Crude Oil</td>
+                                    <td class="p-3 mono text-red-400">$89.63 / bbl</td>
+                                    <td class="p-3 text-gray-400">Margin Stress</td>
+                                    <td class="p-3 text-gray-300">Maritime shipping threats re-accelerating energy inflation.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
         </div>
     </div>
+
+    <script>
+        let creditChart;
+        function initCreditChart() {
+            if (creditChart) creditChart.destroy();
+            const ctx = document.getElementById('creditChart').getContext('2d');
+            creditChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['BB Rated', 'B Rated', 'B- Rated', 'CCC Rated'],
+                    datasets: [{
+                        label: 'Interest Coverage Ratio',
+                        data: [2.34, 1.98, 1.80, 1.26],
+                        backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#ef4444'],
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, max: 4, grid: { color: '#1f2937' }, ticks: { color: '#888' } },
+                        x: { ticks: { color: '#888' } }
+                    }
+                }
+            });
+        }
+        function runStressTest() {
+            const sofr = parseFloat(document.getElementById('slider-sofr').value);
+            const energy = parseFloat(document.getElementById('slider-energy').value);
+            const spread = parseFloat(document.getElementById('slider-spread').value);
+
+            document.getElementById('val-sofr').innerText = `${sofr.toFixed(2)}%`;
+            document.getElementById('val-energy').innerText = `+$${energy}/bbl`;
+            document.getElementById('val-spread').innerText = `${spread} bps`;
+
+            // Recalculate ICR & PD based on stress controls
+            const baseICR = 2.2 - ((sofr - 5.0) * 0.25) - (energy * 0.015);
+            const resICR = Math.max(0.6, baseICR).toFixed(2);
+            const pdValue = (2.4 + ((sofr - 5.0) * 1.1) + (energy * 0.08)).toFixed(1);
+
+            document.getElementById('res-icr').innerText = `${resICR}x`;
+            document.getElementById('res-pd').innerText = `${pdValue}% (${pdValue > 3.5 ? 'HIGH RISK' : 'STABLE'})`;
+
+            // Update Chart Data dynamically
+            if (creditChart) {
+                const updatedData = [
+                    (resICR * 1.3).toFixed(2),
+                    (resICR * 1.1).toFixed(2),
+                    resICR,
+                    (resICR * 0.7).toFixed(2)
+                ];
+                creditChart.data.datasets[0].data = updatedData;
+                creditChart.update();
+            }
+        }
+
+        window.onload = () => {
+            initCreditChart();
+            runStressTest();
+        };
+    </script>
+
 </body>
 </html>

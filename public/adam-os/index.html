@@ -52,62 +52,187 @@
         }
     </style>
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        .chart-container { position: relative; width: 100%; height: 320px; max-height: 400px; }
+        .fdos-panel { background-color: #0d0f17; border: 1px solid #1a1e2e; }
+        .accent-border { border-color: #00f0ff; }
+        .accent-text { color: #00f0ff; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        .scrollbar-custom::-webkit-scrollbar { width: 6px; height: 6px; }
+        .scrollbar-custom::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
+        .scrollbar-custom::-webkit-scrollbar-thumb { background: #1a1e2e; border-radius: 3px; }
+        .scrollbar-custom::-webkit-scrollbar-thumb:hover { background: #00f0ff; }
+    </style>
+
 </head>
+
 <body>
     <div class="header">
         <h1>[ADAM OS] :: CORE FOUNDATION</h1>
         <p>System Scaffolding, REST Endpoints, & Swarm Orchestration Status</p>
     </div>
 
-    <div style='background: #0d0f17; border: 1px solid #00f0ff; padding: 15px; margin-bottom: 20px; font-size: 0.8rem;'><strong style='color:#00f0ff;'>LIVE SYSTEM STATE:</strong><br><span style='color:#888;'>Architecture: AFOS vNext PDIL Gatekeeper Active</span><br><span style='color:#888;'>Auth Boundary: CapabilityEngine Enforcing</span><br><span style='color:#888;'>Memory Bus: O(1) Dictionary Index Enabled</span></div>
-    <h2>ACTIVE AGENT SWARM</h2>
-    <div class="agent-grid" id="agent-grid">
-        <!-- Agents will be hydrated here -->
+    <div class="p-6">
+        <section id="view-adam-os" class="brand-view space-y-6">
+                <!-- Section Intro Paragraph -->
+                <div class="fdos-panel p-5 rounded-lg border-l-4 accent-border">
+                    <h2 class="text-xl font-bold uppercase tracking-tight flex items-center gap-2">
+                        <span>⚡</span> Adam OS Foundation & Swarm Directory
+                    </h2>
+                    <p class="text-xs text-gray-400 mt-1 leading-relaxed">
+                        The central computational backbone of the Financial Decision Operating System (FDOS). This node exposes the neuro-symbolic multi-agent architecture derived from <code class="accent-text">AGENTS.md</code>, orchestrating autonomous credit analysis, macroeconomic forecasting, SEC EDGAR scraping, and regulatory compliance validation across active REST endpoints.
+                    </p>
+                </div>
+
+                <!-- Swarm Health Metrics & Task Allocator -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="fdos-panel p-5 rounded-lg lg:col-span-1 flex flex-col justify-between">
+                        <div>
+                            <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mono mb-3">Swarm Workload Distribution</h3>
+                            <div class="chart-container h-52">
+                                <canvas id="swarmChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="mt-4 pt-3 border-t border-gray-800 text-[11px] text-gray-400 space-y-1 mono">
+                            <div class="flex justify-between"><span>Active Threads:</span> <span class="text-white">128</span></div>
+                            <div class="flex justify-between"><span>Token Throughput:</span> <span class="text-green-400">14.2k tok/s</span></div>
+                            <div class="flex justify-between"><span>Orchestrator Latency:</span> <span class="accent-text">18ms</span></div>
+                        </div>
+                    </div>
+
+                    <!-- Interactive Agent Directory -->
+                    <div class="fdos-panel p-5 rounded-lg lg:col-span-2 space-y-4">
+                        <div class="flex justify-between items-center">
+                            <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mono">Active Agent Hierarchy (`AGENTS.md`)</h3>
+                            <span class="text-[10px] mono bg-gray-800 text-gray-300 px-2 py-0.5 rounded">6 Primary Agents</span>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3" id="agent-grid">
+                            <!-- Injected by JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- REST Endpoint & Prompt Library Explorer -->
+                <div class="fdos-panel p-5 rounded-lg space-y-4">
+                    <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mono">REST Endpoint Mapping & Prompt Harnesses</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs mono">
+                            <thead class="bg-black/60 text-gray-400 border-b border-gray-800 uppercase">
+                                <tr>
+                                    <th class="p-3">Method / Endpoint</th>
+                                    <th class="p-3">Responsible Swarm</th>
+                                    <th class="p-3">Primary Output Target</th>
+                                    <th class="p-3">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-800/50">
+                                <tr class="hover:bg-gray-800/30">
+                                    <td class="p-3 font-bold accent-text">GET /api/v1/macro/duration</td>
+                                    <td class="p-3 text-gray-300">Macro Orchestrator</td>
+                                    <td class="p-3 text-gray-400">Duration Hangover Model (10Y UST)</td>
+                                    <td class="p-3"><span class="bg-green-950 text-green-400 border border-green-800 px-2 py-0.5 rounded text-[10px]">200 OK</span></td>
+                                </tr>
+                                <tr class="hover:bg-gray-800/30">
+                                    <td class="p-3 font-bold accent-text">POST /api/v1/credit/stress-test</td>
+                                    <td class="p-3 text-gray-300">Credit Risk Agent</td>
+                                    <td class="p-3 text-gray-400">BSL Interest Coverage Ratio (ICR)</td>
+                                    <td class="p-3"><span class="bg-green-950 text-green-400 border border-green-800 px-2 py-0.5 rounded text-[10px]">200 OK</span></td>
+                                </tr>
+                                <tr class="hover:bg-gray-800/30">
+                                    <td class="p-3 font-bold accent-text">GET /api/v1/edgar/whales</td>
+                                    <td class="p-3 text-gray-300">SEC Scraper Core</td>
+                                    <td class="p-3 text-gray-400">WhaleScanner RSS Delta Feed</td>
+                                    <td class="p-3"><span class="bg-green-950 text-green-400 border border-green-800 px-2 py-0.5 rounded text-[10px]">200 OK</span></td>
+                                </tr>
+                                <tr class="hover:bg-gray-800/30">
+                                    <td class="p-3 font-bold accent-text">POST /api/v1/governance/audit</td>
+                                    <td class="p-3 text-gray-300">Governance Inspector</td>
+                                    <td class="p-3 text-gray-400">SNC Exam Validation & Ledger</td>
+                                    <td class="p-3"><span class="bg-green-950 text-green-400 border border-green-800 px-2 py-0.5 rounded text-[10px]">200 OK</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+        <a href="../index.html" class="nav-link" style="display: inline-block; color: #00f0ff; border: 1px solid #00f0ff; padding: 5px 10px; margin-top: 20px; text-decoration: none;">&lt;&lt; RETURN TO FDOS DESKTOP</a>
     </div>
 
-    <a href="../index.html" class="nav-link" style="display: inline-block; color: #00f0ff; border: 1px solid #00f0ff; padding: 5px 10px; margin-top: 20px; text-decoration: none;">&lt;&lt; RETURN TO FDOS DESKTOP</a>
-
     <script>
-        // Simulated hydration script based on AGENTS.md data
-        const agents = [
-            {
-                name: "A. Architect Agent (Jules)",
-                domain: "Repository architecture, systemic code refactoring, daily protocol workflow runs, and deterministic execution optimization.",
-                rules: "Manage automated tasks and repository scaffolding. Maintain strict isolation between UI rendering and backend async loops. Never hallucinate API implementations. Defer domain math to the Policy Engine."
-            },
-            {
-                name: "B. Underwriting Agent",
-                domain: "Credit Underwriting (TMT & Leveraged Finance). Analyzes credit metrics, financial statements, and builds capital structures.",
-                rules: "Probability of Default (PD) is structurally implied by the credit rating—do not calculate redundant PD metrics. Utilize just-in-time (JIT) semantic search over trailing 12-month (TTM) SEC filings via Qdrant."
-            },
-            {
-                name: "C. Surveillance Agent",
-                domain: "Portfolio Monitoring and continuous threat telemetry for distress signals.",
-                rules: "Track asset deal premium volatility skews rather than broad proxy timelines. Trigger temporal alerts directly to the Orchestrator on material drift. Utilize episodic memory retrieval of prior quarter earnings call transcripts."
-            },
-            {
-                name: "D. Sentinel Agent",
-                domain: "Security, threat detection, and W3C PROV-O compliance audits.",
-                rules: "Enforce 0.85 minimum conviction score across the system. Terminate immediately if a sub-agent execution lacks a `jsonLogic_version` provenance header or hallucinates specific corporate entity inputs. Ensure data is real and actionable."
-            },
-            {
-                name: "E. Nexus Agent (System Orchestrator)",
-                domain: "Workflow runtime orchestration, parallel task dispatch, and Temporal state management.",
-                rules: "Use just-in-time (JIT) memory fetching via Qdrant/Memory layers to isolate state. Never pack the context window."
-            }
+        const agentsData = [
+            { name: "Master Orchestrator", role: "Swarm Coordinator", desc: "Manages inter-agent message buses, task routing, and global state synchronization.", status: "ACTIVE" },
+            { name: "Credit Risk Director", role: "Leveraged Debt Specialist", desc: "Calculates Interest Coverage Ratios (ICR) and Probability of Default (PD) under SOFR shocks.", status: "ACTIVE" },
+            { name: "SEC Scraper Core", role: "EDGAR Data Ingestion", desc: "Parses RSS feeds, 8-K filings, and 13F deltas in real-time.", status: "ACTIVE" },
+            { name: "Macro Strategist", role: "Sovereign Yield Analyst", desc: "Monitors 10Y UST yields, oil price spikes, and duration hangovers.", status: "ACTIVE" },
+            { name: "Governance Inspector", role: "Compliance Audit Engine", desc: "Validates SNC exams, regulatory compliance memos, and fiduciary rules.", status: "ACTIVE" },
+            { name: "Quant Backtester", role: "Historical Model Testing", desc: "Executes backtests on quantitative barbell strategies against market benchmarks.", status: "ACTIVE" },
+            { name: "SenseWeaver", role: "Core Agent", desc: "Agent responsible for multi-modal processing and synthesis....", status: "STANDBY" },
+            { name: "RepoKnowledgeAgent", role: "Core Agent", desc: "Scans the repository structure and documentation to maintain 'System Health' insights in the Swarm M...", status: "STANDBY" },
+            { name: "RegulatoryComplianceAgent", role: "Core Agent", desc: "Ensures adherence to all applicable financial regulations and compliance standards.  Core Capabiliti...", status: "STANDBY" },
+            { name: "DiscussionChairAgent", role: "Core Agent", desc: "No documentation found....", status: "STANDBY" },
+            { name: "EventDrivenRiskAgent", role: "Core Agent", desc: "Agent that tracks and assesses the market impact of events....", status: "STANDBY" },
+            { name: "CritiqueSwarm", role: "Core Agent", desc: "A multi-agent swarm that provides independent critiques of strategic briefings....", status: "STANDBY" },
+            { name: "Scenario", role: "Core Agent", desc: "No documentation found....", status: "STANDBY" },
+            { name: "LinguaMaestro", role: "Core Agent", desc: "Agent specializing in Natural Language Processing, Translation, and Communication Adaptation....", status: "STANDBY" },
+            { name: "GeopoliticalRiskAgent", role: "Core Agent", desc: "Agent responsible for assessing Geopolitical Risk. Evaluates political stability, trade relations, c...", status: "STANDBY" },
+            { name: "NewsletterLayoutSpecialistAgent", role: "Core Agent", desc: "Agent responsible for designing and generating newsletters....", status: "STANDBY" },
+            { name: "OSWMCritique", role: "Core Agent", desc: "Second-Level World Model Critique Engine (From Feature Branch). Uses an One-Shot World Model (OSWM) ...", status: "STANDBY" },
+            { name: "ArchiveManagerAgent", role: "Core Agent", desc: "No documentation found....", status: "STANDBY" },
+            { name: "PromptGenerationAgent", role: "Core Agent", desc: "An agent that generates a high-quality prompt from a user query....", status: "STANDBY" },
+            { name: "VolatilityRiskAgent", role: "Core Agent", desc: "Agent responsible for assessing Volatility Risk. Analyzes VIX, GARCH(1,1) forecasts, and Volatility ...", status: "STANDBY" },
+            { name: "EchoAgent", role: "Core Agent", desc: "No documentation found....", status: "STANDBY" },
+            { name: "CreditRiskAgent", role: "Core Agent", desc: "Agent responsible for assessing Credit Risk (Default Risk). Calculates Altman Z-Score (Manufacturing...", status: "STANDBY" },
         ];
 
-        const grid = document.getElementById('agent-grid');
-        agents.forEach(agent => {
-            const card = document.createElement('div');
-            card.className = 'agent-card';
-            card.innerHTML = `
-                <h3>${agent.name}</h3>
-                <p><strong>Domain Context:</strong> ${agent.domain}</p>
-                <p style="font-size: 0.8em; color: #aaa;"><strong>Procedural Rules:</strong> ${agent.rules}</p>
-            `;
-            grid.appendChild(card);
-        });
+        let swarmChart;
+        function initSwarmChart() {
+            if (swarmChart) swarmChart.destroy();
+            const ctx = document.getElementById('swarmChart').getContext('2d');
+            swarmChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Macro Engine', 'Credit Risk', 'SEC Scraper', 'Governance'],
+                    datasets: [{
+                        data: [35, 25, 25, 15],
+                        backgroundColor: ['#00f0ff', '#f59e0b', '#10b981', '#a855f7'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom', labels: { color: '#888', font: { size: 10 } } } }
+                }
+            });
+        }
+        function populateAgentGrid() {
+            const grid = document.getElementById('agent-grid');
+            grid.innerHTML = '';
+            agentsData.forEach(agent => {
+                const card = document.createElement('div');
+                card.className = "p-3 rounded border border-gray-800 bg-black/40 hover:border-gray-700 transition-all";
+                card.innerHTML = `
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="font-bold text-white text-xs">${agent.name}</span>
+                        <span class="text-[9px] mono px-1.5 py-0.5 rounded bg-green-950 text-green-400 border border-green-800">${agent.status}</span>
+                    </div>
+                    <span class="text-[10px] accent-text block mono mb-1">${agent.role}</span>
+                    <p class="text-[11px] text-gray-400 leading-snug">${agent.desc}</p>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        window.onload = () => {
+            populateAgentGrid();
+            initSwarmChart();
+        };
     </script>
+
 </body>
 </html>
