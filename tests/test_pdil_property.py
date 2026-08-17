@@ -4,6 +4,7 @@ import json
 from hypothesis import given, strategies as st
 from unittest.mock import patch, MagicMock
 from src.pdil.middleware import (
+    DriftIntelligenceLayer,
     SecurityGovernanceGatekeeper,
     JsonLogicGovernanceGatekeeper,
     GovernanceError
@@ -37,8 +38,11 @@ def test_poison_check_fails_on_low_confidence(confidence):
 
     inference_output = create_valid_input(confidence=confidence)
 
-    with pytest.raises(GovernanceError, match="Poisoned data detected"):
+    with pytest.raises(GovernanceError, match="Poisoned data detected") as exc_info:
         gatekeeper.validate_inference(inference_output)
+
+    assert exc_info.value.provenance == inference_output.get("provenance_trace")
+    assert "Erroneous input provenance:" in str(exc_info.value)
 
 @given(st.floats(min_value=0.5, max_value=1.0))
 def test_poison_check_passes_on_high_confidence(confidence):
@@ -59,8 +63,10 @@ def test_content_hash_mismatch_fails(bad_hash):
     inference_output = create_valid_input()
     inference_output["provenance_trace"]["content_hash"] = bad_hash
 
-    with pytest.raises(GovernanceError, match="Provenance violation: content_hash mismatch"):
+    with pytest.raises(GovernanceError, match="Provenance violation: content_hash mismatch") as exc_info:
         gatekeeper.validate_inference(inference_output)
+
+    assert exc_info.value.provenance == inference_output.get("provenance_trace")
 
 @patch("socket.gethostbyname")
 @patch("urllib.request.build_opener")
@@ -111,8 +117,10 @@ def test_security_gatekeeper_private_ip_fails(mock_gethostbyname):
 
     inference_output = create_valid_input(source="https://api.github.com/data")
 
-    with pytest.raises(GovernanceError, match="resolves to a private IP"):
+    with pytest.raises(GovernanceError, match="resolves to a private IP") as exc_info:
         gatekeeper.validate_inference(inference_output)
+
+    assert exc_info.value.provenance == inference_output.get("provenance_trace")
 
 @patch("socket.gethostbyname")
 @patch("urllib.request.build_opener")
@@ -138,5 +146,70 @@ def test_security_gatekeeper_http_error_fails(mock_build_opener, mock_gethostbyn
 
     inference_output = create_valid_input(source="https://api.github.com/data")
 
-    with pytest.raises(GovernanceError, match="Source data object unreachable: HTTP 404"):
+    with pytest.raises(GovernanceError, match="Source data object unreachable: HTTP 404") as exc_info:
         gatekeeper.validate_inference(inference_output)
+
+    assert exc_info.value.provenance == inference_output.get("provenance_trace")
+
+@patch("socket.gethostbyname")
+@patch("urllib.request.build_opener")
+@given(
+    payload=st.dictionaries(
+        keys=st.text(min_size=1, max_size=10),
+        values=st.integers()
+    ).filter(lambda x: len(x) > 0)
+)
+def test_security_gatekeeper_schema_validation(mock_build_opener, mock_gethostbyname, payload):
+    # Mock DNS resolution to return a public IP
+    mock_gethostbyname.return_value = "8.8.8.8"
+
+    # Mock HTTP response
+    mock_response = MagicMock()
+    mock_response.getcode.return_value = 200
+    mock_opener = MagicMock()
+    mock_opener.open.return_value.__enter__.return_value = mock_response
+    mock_build_opener.return_value = mock_opener
+    schema = {
+        "type": "object",
+        "additionalProperties": False,
+        "properties": {
+            "valid_key": {"type": "string"}
+        }
+    }
+    gatekeeper = SecurityGovernanceGatekeeper(schema=schema)
+
+    inference_output = create_valid_input(payload=payload)
+
+    with pytest.raises(GovernanceError, match="Schema validation failed") as exc_info:
+        gatekeeper.validate_inference(inference_output)
+
+    assert exc_info.value.provenance == inference_output.get("provenance_trace")
+
+
+@st.composite
+def inference_outputs(draw):
+    payload = draw(st.dictionaries(keys=st.text(min_size=1), values=st.integers() | st.text()))
+    confidence = draw(st.floats(min_value=0.0, max_value=1.0))
+    source = draw(st.sampled_from(["https://example.com/data", "https://api.github.com/data", "http://bad.com"]))
+
+    return create_valid_input(confidence=confidence, payload=payload, source=source)
+
+
+@given(inference_outputs())
+def test_drift_intelligence_layer_detects_and_heals(inference_output):
+    # Setup mock gatekeeper to just return input back
+    mock_gatekeeper = MagicMock()
+    mock_gatekeeper.validate_inference.return_value = inference_output
+
+    layer = DriftIntelligenceLayer(mock_gatekeeper)
+
+    # Intentionally use a bad hash to trigger drift
+    historical_hash = "invalid_hash_to_force_drift"
+
+    # Layer should detect drift, heal it, and call gatekeeper
+    result = layer.detect_and_heal_drift(inference_output, historical_hash)
+
+    # Healing means 'observed_drift' is False and 'revalidation_triggered' is True
+    assert result.get("observed_drift") is False
+    assert result.get("revalidation_triggered") is True
+    mock_gatekeeper.validate_inference.assert_called_once()
