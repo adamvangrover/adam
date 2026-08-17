@@ -32,7 +32,17 @@ boundaries:
       - jsonLogic_schema_validation
       - provenance_header_required
 
+  provenance_layer:
+    language: python
+    directories:
+      - src/pdil/provenance
+    requirements:
+      - zero_context_drift_cryptographic_hash
+      - w3c_prov_o_jsonld_structure
+
   event_transport:
     technology: nats_jetstream
+    directories:
+      - src/pdil/transport
     deduplication: exactly_once
     retention: bounded_stream
