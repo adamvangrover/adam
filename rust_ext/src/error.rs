@@ -11,7 +11,7 @@ pub enum KernelError {
 impl std::error::Error for KernelError {}
 
 impl fmt::Display for KernelError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Display {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
             KernelError::MathError(msg) => write!(f, "Math Error: {}", msg),
             KernelError::InputError(msg) => write!(f, "Input Error: {}", msg),
