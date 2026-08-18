@@ -1,10 +1,10 @@
 use pyo3::prelude::*;
 
 mod error;
-mod statistics;
+pub mod statistics;
 mod risk;
-mod portfolio;
-mod stress;
+pub mod portfolio;
+pub mod stress;
 
 /// Deterministic numerical math kernel for AFOS
 #[pymodule]
