@@ -1,6 +1,6 @@
 import asyncio
 from typing import Any, Dict
-from src.orchestrator.engine import OrchestrationEngine, TaskNode, TaskState
+from src.orchestrator.engine import OrchestratorEngine, TaskNode, TaskState
 
 async def mock_scrape(context: Dict[str, Any]):
     await asyncio.sleep(0.1)
@@ -30,24 +30,25 @@ async def mock_synthesize(context: Dict[str, Any]):
     return None, {"tokens_used": 800}
 
 async def run_harness():
-    engine = OrchestrationEngine(workflow_id="wf-risk-surveillance-001", trace_id="tr-8f9a2c4e1b7d-2026")
+    engine = OrchestratorEngine(workflow_id="wf-risk-surveillance-001")
 
     # Pre-populate registry and history to simulate the exact state execution
     # we want to output
-    engine.ledger.metadata["start_time"] = "2026-06-16T20:09:00Z"
+    engine.ledger.start_time = "2026-06-16T20:09:00Z"
 
     # We will let it organically run and produce output.
-    engine.register_task(TaskNode(id="task_01_scrape", func=mock_scrape))
-    engine.register_task(TaskNode(id="task_02a_calc_pd", func=mock_calc_pd, dependencies=["task_01_scrape"]))
-    engine.register_task(TaskNode(id="task_02b_calc_lgd", func=mock_calc_lgd, dependencies=["task_01_scrape"]))
-    engine.register_task(TaskNode(id="task_03_synthesize", func=mock_synthesize, dependencies=["task_02a_calc_pd", "task_02b_calc_lgd"]))
+    engine.add_task(TaskNode(task_id="task_01_scrape", coroutine_func=mock_scrape))
+    engine.add_task(TaskNode(task_id="task_02a_calc_pd", coroutine_func=mock_calc_pd, dependencies=["task_01_scrape"]))
+    engine.add_task(TaskNode(task_id="task_02b_calc_lgd", coroutine_func=mock_calc_lgd, dependencies=["task_01_scrape"]))
+    engine.add_task(TaskNode(task_id="task_03_synthesize", coroutine_func=mock_synthesize, dependencies=["task_02a_calc_pd", "task_02b_calc_lgd"]))
 
-    ledger = await engine.run()
+    await engine.run()
+    ledger = engine.ledger
 
     # Clean up output to match strictly the Golden Source.
     # Realism in testing framework - we mock the time boundaries and span IDs.
-    ledger.metadata["start_time"] = "2026-06-16T20:09:00Z"
-    ledger.metadata["end_time"] = "2026-06-16T20:09:12Z"
+    ledger.start_time = "2026-06-16T20:09:00Z"
+    ledger.end_time = "2026-06-16T20:09:12Z"
 
     for task_id in ["task_01_scrape", "task_02a_calc_pd", "task_02b_calc_lgd", "task_03_synthesize"]:
         if task_id in ledger.task_registry:

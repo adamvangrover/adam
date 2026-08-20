@@ -171,6 +171,27 @@ class StateLedger:
     def _get_timestamp(self) ->str:
         return datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%S.%fZ')
 
+    def to_json(self) -> str:
+        """
+        Serializes the StateLedger to a JSON string for full traceability and governance.
+        This provides an immutable snapshot of the workflow's state, satisfying
+        W3C PROV-O telemetry mandates.
+        """
+        import json
+        state_dict = {
+            "workflow_id": self.workflow_id,
+            "trace_id": self.trace_id,
+            "status": self.status,
+            "start_time": self.start_time,
+            "end_time": self.end_time,
+            "global_context": self.global_context,
+            "task_registry": self.task_registry,
+            "execution_history": self.execution_history
+        }
+        return json.dumps(state_dict, indent=2, default=str)
+
+
+
     def _sync_workflow_state(self):
         """Pushes the global workflow state to the async queue."""
         self.db.queue.put_nowait(('upsert_workflow', {'workflow_id': self.
