@@ -98,187 +98,72 @@
         }
     </style>
     <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <style>
-        .chart-container { position: relative; width: 100%; height: 320px; max-height: 400px; }
-        .fdos-panel { background-color: #1a1024; border: 1px solid #2e1a40; }
-        .accent-border { border-color: #ff007a; }
-        .accent-text { color: #ff007a; }
-        .mono { font-family: 'JetBrains Mono', monospace; }
-        .scrollbar-custom::-webkit-scrollbar { width: 6px; height: 6px; }
-        .scrollbar-custom::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
-        .scrollbar-custom::-webkit-scrollbar-thumb { background: #2e1a40; border-radius: 3px; }
-        .scrollbar-custom::-webkit-scrollbar-thumb:hover { background: #ff007a; }
-    </style>
-
 </head>
-
 <body>
     <div class="header">
         <h1>MARKET MAYHEM</h1>
         <p style="color: var(--mayhem-accent); font-weight: bold;">Dynamic Market Intelligence & Retail Strategy Hub</p>
     </div>
 
-    <div class="p-6 max-w-7xl mx-auto">
-        <section id="view-market-mayhem" class="brand-view space-y-6">
-                <!-- Section Intro Paragraph -->
-                <div class="fdos-panel p-5 rounded-lg border-l-4 accent-border">
-                    <h2 class="text-xl font-bold uppercase tracking-tight text-pink-400 flex items-center gap-2">
-                        <span>🔥</span> Market Mayhem Daily Hub & Retail Sentiment
-                    </h2>
-                    <p class="text-xs text-gray-400 mt-1 leading-relaxed">
-                        High-energy, retail-accessible financial intelligence translating institutional data into digestible daily memos, momentum strategies, and retail sentiment updates. This portal strips away academic jargon while maintaining full quantitative rigor behind the scenes.
-                    </p>
-                </div>
-
-                <!-- Daily Newsletter Hub Reader -->
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div class="lg:col-span-2 fdos-panel p-6 rounded-lg space-y-4">
-                        <div class="flex justify-between items-center border-b border-gray-800 pb-3">
-                            <div>
-                                <span class="text-[10px] mono text-pink-400 uppercase font-bold">DAILY NEWSLETTER EDITION</span>
-                                <h3 class="text-lg font-black text-white" id="newsletter-title">The 4.68% Benchmark Mirage & Equity Disconnect</h3>
-                            </div>
-                            <select onchange="loadNewsletter(this.value)" class="bg-black text-xs text-pink-400 border border-pink-900 rounded px-2.5 py-1 focus:outline-none">
-                                <option value="aug12">Aug 12, 2026</option>
-                                <option value="aug11">Aug 11, 2026</option>
-                                <option value="aug10">Aug 10, 2026</option>
-                                <option value="repo_0">Repo Alert #0</option><option value="repo_1">Repo Alert #1</option><option value="repo_2">Repo Alert #2</option><option value="repo_3">Repo Alert #3</option>
-                            </select>
-                        </div>
-
-                        <div id="newsletter-body" class="text-xs text-gray-300 space-y-3 leading-relaxed">
-                            <!-- Injected by JS -->
-                        </div>
-                    </div>
-
-                    <!-- Retail Momentum Ticker & Strategy Scorecard -->
-                    <div class="space-y-6">
-                        <div class="fdos-panel p-5 rounded-lg space-y-4">
-                            <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mono">Retail Radar Chart</h3>
-                            <div class="chart-container h-56">
-                                <canvas id="radarChart"></canvas>
-                            </div>
-                        </div>
-
-                        <div class="fdos-panel p-5 rounded-lg space-y-3">
-                            <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mono">Trending Tickers</h3>
-                            <div class="space-y-2">
-                                <div class="flex justify-between items-center p-2 rounded bg-black/40 border border-gray-800">
-                                    <div>
-                                        <span class="font-bold text-white block">ASTS</span>
-                                        <span class="text-[10px] text-gray-500">AST SpaceMobile</span>
-                                    </div>
-                                    <div class="text-right">
-                                        <span class="text-green-400 font-bold block">+12.4%</span>
-                                        <span class="text-[10px] text-gray-400">$3.7B Liquidity Shield</span>
-                                    </div>
-                                </div>
-                                <div class="flex justify-between items-center p-2 rounded bg-black/40 border border-gray-800">
-                                    <div>
-                                        <span class="font-bold text-white block">FCX</span>
-                                        <span class="text-[10px] text-gray-500">Freeport-McMoRan</span>
-                                    </div>
-                                    <div class="text-right">
-                                        <span class="text-green-400 font-bold block">$69.62</span>
-                                        <span class="text-[10px] text-gray-400">Copper Smelt Moat</span>
-                                    </div>
-                                </div>
-                                <div class="flex justify-between items-center p-2 rounded bg-black/40 border border-gray-800">
-                                    <div>
-                                        <span class="font-bold text-white block">MDB</span>
-                                        <span class="text-[10px] text-gray-500">Generic TMT Short</span>
-                                    </div>
-                                    <div class="text-right">
-                                        <span class="text-red-400 font-bold block">$234.80</span>
-                                        <span class="text-[10px] text-gray-400">2026 Refi Wall</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-        <div class="mt-8">
-            <a href="../index.html" class="nav-link" style="display: inline-block; color: #ff007a; border: 1px solid #ff007a; padding: 5px 10px; margin-top: 20px; text-decoration: none;">&lt;&lt; RETURN TO FDOS DESKTOP</a>
-        <a href="../adam-research/index.html" class="nav-link" style="margin-left: 10px; background: var(--research-primary);">View Historic Performance in Adam Research &gt;&gt;</a>
+    <div class="container">
+        <div class="search-container">
+            <input type="text" id="search-input" placeholder="Search newsletters and market updates..." oninput="filterNews()">
         </div>
+
+        <div style='margin-bottom: 20px; padding: 15px; background: rgba(255, 0, 122, 0.1); border-left: 3px solid #ff007a;'><h3 style='color:#ff007a; margin-top:0; font-size: 1rem;'>Active Crisis Simulation</h3><p style='font-size: 0.85rem; color:#ccc; margin:0;'><strong>Scenario Payload:</strong> 2022_INFLATION_SHOCK</p><p style='font-size: 0.8rem; color:#888; margin-top:5px;'>Tracking momentum degradation across BSL software issuers and energy inflation vectors.</p></div>
+        <div class="tabs">
+            <div class="tab active">Daily Newsletters</div>
+            <div class="tab">Historic Datastreams</div>
+        </div>
+
+        <div class="news-grid" id="news-grid">
+            <!-- Newsletters hydrated here -->
+        </div>
+
+        <a href="../index.html" class="nav-link" style="display: inline-block; color: #ff007a; border: 1px solid #ff007a; padding: 5px 10px; margin-top: 20px; text-decoration: none;">&lt;&lt; RETURN TO FDOS DESKTOP</a>
+        <a href="../adam-research/index.html" class="nav-link" style="margin-left: 10px; background: var(--research-primary);">View Historic Performance in Adam Research &gt;&gt;</a>
     </div>
 
     <script>
-        const newsletters = {
-            aug12: {
-                title: "The 4.68% Benchmark Mirage & Equity Disconnect",
-                content: `<p class="font-bold text-white">Main Takeaway:</p>
-                <p>The S&P 500 near 7,757 is projecting cosmetic calm, but underlying corporate credit is burning cash to service 4.70% baseline debt costs. Retail traders should look past mega-cap momentum and watch energy transit risks in the Bab el-Mandeb Strait, where Brent crude surging toward $90 is triggering automated de-risking scalers across bank balance sheets.</p>
-                <p class="font-bold text-white mt-2">Actionable Angle:</p>
-                <p>Maintain allocations to real resource extraction moats (FCX) while hedging against leveraged BSL software issuers facing late-2026 debt maturities.</p>`
-            },
-            aug11: {
-                title: "SEER $2.55 Activist Close & NOL Pill Rejection",
-                content: `<p class="font-bold text-white">Main Takeaway:</p>
-                <p>The T-Zero window for Seer's $2.55 activist proposal has arrived following shareholder rejection of the Tax Benefit Preservation Plan. Downside risks remain strictly buffered by Seer's $219M liquid net cash box.</p>`
-            },
-            aug10: {
-                title: "AST SpaceMobile Liquidity Shield Reaches $3.7B",
-                content: `<p class="font-bold text-white">Main Takeaway:</p>
-                <p>ASTS Q2 sequential revenue doubling to $31.5M, paired with a pro forma liquidity shield exceeding $3.7B, effectively eliminates dilution risk while funding manufacturing expansion.</p>`
-            },
-            repo_0: {
-                title: "[REPO INGEST] nvda_company_report_20250225.json",
-                content: `<p class="font-bold text-white">Automated Insight:</p><p>No content...</p>`
-            },
-            repo_1: {
-                title: "[REPO INGEST] nvda_company_report_20250226_final.json",
-                content: `<p class="font-bold text-white">Automated Insight:</p><p>No content...</p>`
-            },
-            repo_2: {
-                title: "[REPO INGEST] software_industry_report.json",
-                content: `<p class="font-bold text-white">Automated Insight:</p><p>No content...</p>`
-            },
-            repo_3: {
-                title: "[REPO INGEST] nvda_company_report_20250226.json",
-                content: `<p class="font-bold text-white">Automated Insight:</p><p>No content...</p>`
-            },
-        };
+        const newsData = [
+            { date: "2026-01-01", title: "Newsletter 2026", file: "../../newsletter_2026.png" },
+            { date: "Live", title: "Market Live / Neural Exchange", file: "../../market_live.html" },
+            { date: "1929-10-24", title: "Newsletter 1929", file: "../../newsletter_1929.png" },
+            { date: "2025-02-13", title: "Daily Briefing 2025 02 13", file: "../../showcase/Daily_Briefing_2025_02_13.html" },
+            { date: "2025-05-23", title: "Market Pulse 2025 05 23", file: "../../showcase/Market_Pulse_2025_05_23.html" },
+            { date: "Live", title: "Newsletter Market Mayhem Apr 04 2025", file: "../../showcase/newsletter_market_mayhem_apr_04_2025.html" },
+            { date: "2025-02-28", title: "Market Pulse 2025 02 28", file: "../../showcase/Market_Pulse_2025_02_28.html" },
+            { date: "2025-12-09", title: "Daily Briefing 2025 12 09", file: "../../showcase/Daily_Briefing_2025_12_09.html" },
+            { date: "Live", title: "Newsletter Market Mayhem Nov", file: "../../showcase/newsletter_market_mayhem_nov.html" },
+            { date: "2026-01-01", title: "Daily Briefing 2026 02 17", file: "../../showcase/Daily_Briefing_2026_02_17.html" }
+        ];
 
-        let radarChart;
-        function initRadarChart() {
-            if (radarChart) radarChart.destroy();
-            const ctx = document.getElementById('radarChart').getContext('2d');
-            radarChart = new Chart(ctx, {
-                type: 'radar',
-                data: {
-                    labels: ['Retail Momentum', 'Short Interest', 'Cash Shield', 'Debt Risk', 'Social Sentiment'],
-                    datasets: [{
-                        label: 'ASTS Profile',
-                        data: [90, 40, 95, 20, 85],
-                        borderColor: '#ff007a',
-                        backgroundColor: 'rgba(255, 0, 122, 0.15)'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: { r: { grid: { color: '#222' }, ticks: { display: false } } },
-                    plugins: { legend: { display: false } }
-                }
+        function renderNews(data) {
+            const grid = document.getElementById('news-grid');
+            grid.innerHTML = '';
+            data.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'news-item';
+                div.innerHTML = `
+                    <div class="news-date">${item.date}</div>
+                    <div class="news-title">${item.title}</div>
+                    <a href="${item.file}" style="color: var(--mayhem-primary); text-decoration: none; font-size: 0.9rem;">Read Report &rarr;</a>
+                `;
+                grid.appendChild(div);
             });
         }
-        function loadNewsletter(key) {
-            const data = newsletters[key] || newsletters['aug12'];
-            document.getElementById('newsletter-title').innerText = data.title;
-            document.getElementById('newsletter-body').innerHTML = data.content;
+
+        function filterNews() {
+            const query = document.getElementById('search-input').value.toLowerCase();
+            const filtered = newsData.filter(item =>
+                item.title.toLowerCase().includes(query) ||
+                item.date.toLowerCase().includes(query)
+            );
+            renderNews(filtered);
         }
 
-        window.onload = () => {
-            loadNewsletter('aug12');
-            initRadarChart();
-        };
+        // Initial render
+        renderNews(newsData);
     </script>
-
 </body>
 </html>

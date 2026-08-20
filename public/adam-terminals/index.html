@@ -57,124 +57,68 @@
         }
     </style>
     <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.tailwindcss.com"></script>
-
-    <style>
-        .fdos-panel { background-color: #0a0d14; border: 1px solid #161c2b; color: white;}
-        .accent-border { border-color: #22c55e; }
-        .accent-text { color: #22c55e; }
-        .mono { font-family: 'JetBrains Mono', monospace; }
-        .scrollbar-custom::-webkit-scrollbar { width: 6px; height: 6px; }
-        .scrollbar-custom::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
-        .scrollbar-custom::-webkit-scrollbar-thumb { background: #161c2b; border-radius: 3px; }
-        .scrollbar-custom::-webkit-scrollbar-thumb:hover { background: #22c55e; }
-    </style>
-
 </head>
-
-<body style="background-color: #050608;">
+<body>
     <div class="header">
         <div><strong>ADAM TERMINALS [SYS: ONLINE]</strong></div>
+        <div><a href="../index.html">[EXIT TO DESKTOP]</a></div>
+    </div>
 
-    <div class="p-6 max-w-7xl mx-auto">
-        <section id="view-terminals" class="brand-view space-y-6">
-                <!-- Section Intro Paragraph -->
-                <div class="fdos-panel p-5 rounded-lg border-l-4 accent-border">
-                    <h2 class="text-xl font-bold uppercase tracking-tight text-green-400 flex items-center gap-2">
-                        <span>🖥️</span> Adam Terminals & WhaleScanner Stream
-                    </h2>
-                    <p class="text-xs text-gray-400 mt-1 leading-relaxed">
-                        Real-time institutional flow feed parsing SEC EDGAR RSS streams, 13F filing delta matrices, and large wallet transactions. Monitor conviction shifts, liquidity shields, and activist windows in real time.
-                    </p>
-                </div>
+    <div class="grid">
+        <div class="widget">
+            <div class="widget-title">MARKET LIVE / NEURAL EXCHANGE</div>
+            <div class="data-stream" id="stream1">
+                Initializing feed...<br>
+                Connecting to Swarm... [OK]<br>
+                <a href="../../market_live.html">&gt; LAUNCH FULL TERMINAL</a>
+            </div>
+        </div>
 
-                <!-- WhaleScanner Institutional Flow Table -->
-                <div class="fdos-panel p-6 rounded-lg space-y-4">
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                        <div>
-                            <h3 class="text-sm font-bold text-white uppercase mono">SEC EDGAR RSS Stream // Institutional Flow</h3>
-                            <p class="text-xs text-gray-500">Live delta profiles captured by SEC Scraper Agent</p>
-                        </div>
-                        <input type="text" id="whale-search" oninput="filterWhaleTable()" placeholder="Search ticker / entity..." class="bg-black border border-gray-800 rounded px-3 py-1.5 text-xs text-white mono focus:outline-none focus:border-green-500 w-full sm:w-64">
-                    </div>
+        <div class="widget">
+            <div class="widget-title">WARGAME CONSOLE</div>
+            <div class="data-stream" id="stream2">
+                Red Team vs Blue Team Economic Simulator.<br>
+                Awaiting scenario inputs...<br>
+                <a href="../../wargame_dashboard.html">&gt; ENTER WARGAME</a>
+            </div>
+        </div>
 
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left text-xs mono">
-                            <thead class="bg-black/80 text-gray-400 border-b border-gray-800 uppercase">
-                                <tr>
-                                    <th class="p-3">Ticker / Entity</th>
-                                    <th class="p-3">Signal Source</th>
-                                    <th class="p-3">Delta Profile</th>
-                                    <th class="p-3">Strategy Classification</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-gray-800/50" id="whale-table-body">
-                                <!-- Injected by JS -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+        <div class="widget">
+            <div class="widget-title">NEXUS SIMULATION</div>
+            <div class="data-stream" id="stream3">
+                Geopolitical & Sovereign Minds platform.<br>
+                Mapping central banker nodes...<br>
+                <a href="../../nexus.html">&gt; ENTER NEXUS</a>
+            </div>
+        </div>
 
-                <!-- Catalyst Timeline (August 2026 Window) -->
-                <div class="fdos-panel p-6 rounded-lg space-y-4">
-                    <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mono">Upcoming System Catalyst Timeline</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
-                        <div class="p-4 bg-black/40 rounded border border-amber-900/40 space-y-1">
-                            <span class="text-[10px] mono text-amber-400 font-bold block">AUG 11 // 16:30 ET</span>
-                            <h4 class="font-bold text-white">SEER Q2 Webcast & Bid Expiration</h4>
-                            <p class="text-gray-400">T-Zero window for $2.55 activist proposal following poison pill rejection.</p>
-                        </div>
-                        <div class="p-4 bg-black/40 rounded border border-blue-900/40 space-y-1">
-                            <span class="text-[10px] mono text-blue-400 font-bold block">AUG 12 // 08:30 EDT</span>
-                            <h4 class="font-bold text-white">U.S. July CPI Payload</h4>
-                            <p class="text-gray-400">50/50 FOMC rate hike probability locked against 3.4% YoY headline consensus.</p>
-                        </div>
-                        <div class="p-4 bg-black/40 rounded border border-purple-900/40 space-y-1">
-                            <span class="text-[10px] mono text-purple-400 font-bold block">AUG 14 // EOD</span>
-                            <h4 class="font-bold text-white">Q2 13F-HR Deadline</h4>
-                            <p class="text-gray-400">Automated processing DAGs execute full QoQ delta matrices on quant peers.</p>
-                        </div>
-                    </div>
-                </div>
-            </section>
+        <div class="widget">
+            <div class="widget-title">TELEMETRY & LOGIC ROUTER</div>
+            <div class="data-stream" id="stream4">
+                Monitoring Probabilistic Perception & Deterministic Grounding...<br>
+                <a href="../../interactive_prototype.html">&gt; LAUNCH PROTOTYPE</a>
+            </div>
+        </div>
     </div>
 
     <script>
-        const whaleData = [
-            { ticker: "ASTS", signal: "Form 8-K", delta: "+$3.7B Shield", strategy: "Eliminates Dilution Risk" },
-            { ticker: "SEER", signal: "SEC Event", delta: "$2.55 Offer", strategy: "Activist Window Close" },
-            { ticker: "ENTROPY", signal: "Quant Book", delta: "$2.17B Baseline", strategy: "Inflation Ballast Position" },
-            { ticker: "FCX", signal: "CBP-6925", delta: "+3.8σ Call Vol", strategy: "Domestic Smelt Moat" },
-            { ticker: "IMKTA", signal: "Form 10-Q", delta: "$455M Cash", strategy: "Real Estate Monetization" },
-            { ticker: "INBK", signal: "Form 10-Q", delta: "+75.8% EPS Beat", strategy: "13D Buyback Pressure" }
-        ];
-
-        function populateWhaleTable() {
-            const tbody = document.getElementById('whale-table-body');
-            tbody.innerHTML = '';
-            whaleData.forEach(item => {
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-gray-800/40 transition-colors";
-                tr.innerHTML = `
-                    <td class="p-3 font-bold text-white">${item.ticker}</td>
-                    <td class="p-3 text-gray-400">${item.signal}</td>
-                    <td class="p-3 font-bold text-green-400">${item.delta}</td>
-                    <td class="p-3 text-gray-300 italic">${item.strategy}</td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-        function filterWhaleTable() {
-            const query = document.getElementById('whale-search').value.toLowerCase();
-            document.querySelectorAll('#whale-table-body tr').forEach(row => {
-                row.style.display = row.innerText.toLowerCase().includes(query) ? '' : 'none';
-            });
+        // Simple script to simulate streaming text
+        function generateLog() {
+            const actions = ['BUY', 'SELL', 'HOLD', 'ALERT', 'CALC'];
+            const assets = ['AAPL', 'MSFT', 'TSLA', 'SPY', 'BTC'];
+            const action = actions[Math.floor(Math.random() * actions.length)];
+            const asset = assets[Math.floor(Math.random() * assets.length)];
+            const val = (Math.random() * 1000).toFixed(2);
+            return `[${new Date().toISOString().split('T')[1].substring(0,8)}] ${action} ${asset} @ ${val}<br>`;
         }
 
-        window.onload = () => {
-            populateWhaleTable();
-        };
+        setInterval(() => {
+            const s1 = document.getElementById('stream1');
+            s1.innerHTML += generateLog();
+            if (s1.innerHTML.split('<br>').length > 15) {
+                s1.innerHTML = s1.innerHTML.substring(s1.innerHTML.indexOf('<br>') + 4);
+            }
+        }, 800);
     </script>
-
 </body>
 </html>

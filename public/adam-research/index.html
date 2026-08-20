@@ -77,167 +77,49 @@
         }
     </style>
     <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <style>
-        .chart-container { position: relative; width: 100%; height: 320px; max-height: 400px; }
-        .fdos-panel { background-color: #121722; border: 1px solid #1f2738; }
-        .accent-border { border-color: #10b981; }
-        .accent-text { color: #10b981; }
-        .mono { font-family: 'JetBrains Mono', monospace; }
-        .scrollbar-custom::-webkit-scrollbar { width: 6px; height: 6px; }
-        .scrollbar-custom::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
-        .scrollbar-custom::-webkit-scrollbar-thumb { background: #1f2738; border-radius: 3px; }
-        .scrollbar-custom::-webkit-scrollbar-thumb:hover { background: #10b981; }
-    </style>
-
 </head>
-
-<body style="background-color: #0a0d12;">
+<body>
     <div class="navbar">
         <h1>ADAM RESEARCH</h1>
         <a href="../index.html" style="color: white; text-decoration: none;">&lt; Back to Desktop</a>
     </div>
 
-    <div class="p-6 max-w-7xl mx-auto text-white">
-        <section id="view-research" class="brand-view space-y-6">
-                <!-- Section Intro Paragraph -->
-                <div class="fdos-panel p-5 rounded-lg border-l-4 accent-border">
-                    <h2 class="text-xl font-bold uppercase tracking-tight text-emerald-400 flex items-center gap-2">
-                        <span>🧪</span> Adam Research Data Archives & Backtest Engine
-                    </h2>
-                    <p class="text-xs text-gray-400 mt-1 leading-relaxed">
-                        Quantitative research portal hosting historical market performance datastreams, backtested model outputs, and training datasets. Designed for quantitative researchers validating neuro-symbolic financial prediction kernels.
-                    </p>
-                </div>
+    <div class="container">
+        <p style="font-size: 1.2rem; color: #555;">Academic quantitative modeling, training data archives, and model testing environments.</p>
 
-                <!-- Backtest Performance Visualizer -->
-                <div class="fdos-panel p-6 rounded-lg space-y-4">
-                    <div class="flex justify-between items-center">
-                        <div>
-                            <h3 class="text-lg font-bold text-white uppercase">Historical Strategy Cumulative Performance</h3>
-                            <p class="text-xs text-gray-400">FDOS Quantitative Barbell vs Traditional 60/40 Benchmark (2024 - 2026)</p>
-                        </div>
-                        <div class="mono text-xs text-emerald-400 font-bold">CAGR: +24.8%</div>
-                    </div>
-                    <div class="chart-container">
-                        <canvas id="researchChart"></canvas>
-                    </div>
-                </div>
+        <div style='margin-top:20px; padding:15px; background: rgba(16, 185, 129, 0.1); border-left: 3px solid #10b981;'><h3 style='color:#10b981; margin-top:0;'>FinanceBench Golden Data (System Eval)</h3><p style='font-size: 0.8rem; color:#888;'>Last Eval Run: Pending Execution</p><div style='margin-bottom:10px; font-size: 0.9rem; border-bottom: 1px dotted #333; padding-bottom:5px;'><strong style='color:#e2e8f0;'>Q: What was 3M's Net Debt in 2023?</strong><br><span style='color:#aaa;'>A: $10.5B (Source: MMM 2023)</span></div><div style='margin-bottom:10px; font-size: 0.9rem; border-bottom: 1px dotted #333; padding-bottom:5px;'><strong style='color:#e2e8f0;'>Q: What is the Net Leverage Ratio covenant threshold?</strong><br><span style='color:#aaa;'>A: 4.50 to 1.00 (Source: MMM 2023)</span></div></div>
 
-                <!-- Training Archives Datasets Grid -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div class="fdos-panel p-4 rounded-lg space-y-2">
-                        <span class="text-[10px] mono text-emerald-400 uppercase font-bold">DATASET #892</span>
-                        <h4 class="font-bold text-white text-sm">SEC EDGAR 13F Delta Archive</h4>
-                        <p class="text-xs text-gray-400">Quarterly institutional portfolio delta tracking across top 50 quant funds.</p>
-                        <button class="w-full mt-2 py-1.5 bg-gray-800 hover:bg-emerald-600 hover:text-black text-gray-300 font-bold text-xs rounded transition-colors mono">
-                            Download JSON (1.2 GB)
-                        </button>
-                    </div>
-                    <div class="fdos-panel p-4 rounded-lg space-y-2">
-                        <span class="text-[10px] mono text-emerald-400 uppercase font-bold">DATASET #893</span>
-                        <h4 class="font-bold text-white text-sm">BSL Default Probability Logs</h4>
-                        <p class="text-xs text-gray-400">Historical interest coverage logs for 1,200 non-investment grade borrowers.</p>
-                        <button class="w-full mt-2 py-1.5 bg-gray-800 hover:bg-emerald-600 hover:text-black text-gray-300 font-bold text-xs rounded transition-colors mono">
-                            Download CSV (450 MB)
-                        </button>
-                    </div>
-                    <div class="fdos-panel p-4 rounded-lg space-y-2">
-                        <span class="text-[10px] mono text-emerald-400 uppercase font-bold">DATASET #894</span>
-                        <h4 class="font-bold text-white text-sm">Sovereign Duration Vectors</h4>
-                        <p class="text-xs text-gray-400">10Y UST yield sensitivity matrices paired with tech equity volatility metrics.</p>
-                        <button class="w-full mt-2 py-1.5 bg-gray-800 hover:bg-emerald-600 hover:text-black text-gray-300 font-bold text-xs rounded transition-colors mono">
-                            Download Parquet (820 MB)
-                        </button>
-                    </div>
+        <div class="data-card">
+            <h2>Monte Carlo Risk Engine</h2>
+            <p>High-performance path visualizer for portfolio risk. Runs thousands of stochastic simulations.</p>
+            <div class="metrics-grid">
+                <div class="metric">
+                    <div class="metric-value">10,000+</div>
+                    <div class="metric-label">Simulations/Sec</div>
                 </div>
-
-        <div class='mt-6 space-y-4 text-white'>
-            <h2 class='text-xl font-bold border-b border-gray-700 pb-2 mb-4 text-emerald-400'>Live Repository Archives</h2>
-            <div class='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                <div class='fdos-panel p-4 rounded-lg'>
-                    <span class='text-[10px] mono text-emerald-400 font-bold'>STRATEGY_FILE</span>
-                    <h4 class='font-bold'>gold_standard_portfolio_v3.json</h4>
-                    <p class='text-xs text-gray-400'>No description available. - Risk: Medium</p>
+                <div class="metric">
+                    <div class="metric-value">99.9%</div>
+                    <div class="metric-label">Confidence Interval</div>
                 </div>
-                <div class='fdos-panel p-4 rounded-lg'>
-                    <span class='text-[10px] mono text-emerald-400 font-bold'>STRATEGY_FILE</span>
-                    <h4 class='font-bold'>aggressive_growth_tech_focused.json</h4>
-                    <p class='text-xs text-gray-400'>No description available. - Risk: Medium</p>
-                </div>
-                <div class='fdos-panel p-4 rounded-lg'>
-                    <span class='text-[10px] mono text-emerald-400 font-bold'>STRATEGY_FILE</span>
-                    <h4 class='font-bold'>crisis_alpha_hedge.json</h4>
-                    <p class='text-xs text-gray-400'>No description available. - Risk: Medium</p>
-                </div>
-                <div class='fdos-panel p-4 rounded-lg'>
-                    <span class='text-[10px] mono text-emerald-400 font-bold'>STRATEGY_FILE</span>
-                    <h4 class='font-bold'>gold_standard_portfolio_v2.json</h4>
-                    <p class='text-xs text-gray-400'>No description available. - Risk: Medium</p>
+                <div class="metric">
+                    <div class="metric-value">Active</div>
+                    <div class="metric-label">Status</div>
                 </div>
             </div>
-            <h3 class='text-lg font-bold mt-6 mb-2'>Training Datasets</h3><div class='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                <div class='fdos-panel p-4 rounded-lg'>
-                    <span class='text-[10px] mono text-emerald-400 font-bold'>DATASET: 3 records</span>
-                    <h4 class='font-bold'>artisanal_data_ethics_v1.jsonl</h4>
-                </div>
-                <div class='fdos-panel p-4 rounded-lg'>
-                    <span class='text-[10px] mono text-emerald-400 font-bold'>DATASET: 1 records</span>
-                    <h4 class='font-bold'>artisanal_data_houseview_v1.jsonl</h4>
-                </div>
-                <div class='fdos-panel p-4 rounded-lg'>
-                    <span class='text-[10px] mono text-emerald-400 font-bold'>DATASET: 5 records</span>
-                    <h4 class='font-bold'>artisanal_data_quantum_v1.jsonl</h4>
-                </div>
-                <div class='fdos-panel p-4 rounded-lg'>
-                    <span class='text-[10px] mono text-emerald-400 font-bold'>DATASET: 25 records</span>
-                    <h4 class='font-bold'>artisanal_data_snc_v2.jsonl</h4>
-                </div>
-            </div>
+            <a href="../../monte_carlo_visualizer.html" class="btn">Launch Engine</a>
         </div>
-            </section>
+
+        <div class="data-card">
+            <h2>Scenario Lab (VAE Explorer)</h2>
+            <p>Generative Risk explorer. Uses Variational Autoencoders to generate synthetic market data for backtesting.</p>
+            <a href="../../scenario_lab.html" class="btn">Open Lab</a>
+        </div>
+
+        <div class="data-card">
+            <h2>Historic Market Archives</h2>
+            <p>Interactive tables and charts detailing historic market performance and datastreams.</p>
+            <a href="../../market_mayhem_dashboard.html" class="btn">View Archives</a>
+        </div>
     </div>
-
-    <script>
-        let researchChart;
-        function initResearchChart() {
-            if (researchChart) researchChart.destroy();
-            const ctx = document.getElementById('researchChart').getContext('2d');
-            researchChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: ['2024 Q1', '2024 Q3', '2025 Q1', '2025 Q3', '2026 Q1', '2026 Q3'],
-                    datasets: [{
-                        label: 'FDOS Barbell Strategy',
-                        data: [100, 118, 134, 152, 178, 204],
-                        borderColor: '#10b981',
-                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                        fill: true
-                    }, {
-                        label: '60/40 Benchmark',
-                        data: [100, 104, 108, 112, 115, 119],
-                        borderColor: '#6b7280',
-                        borderDash: [5, 5]
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { labels: { color: '#aaa', font: { size: 10 } } } },
-                    scales: {
-                        y: { grid: { color: '#1f2937' }, ticks: { color: '#888' } },
-                        x: { ticks: { color: '#888' } }
-                    }
-                }
-            });
-        }
-
-        window.onload = () => {
-            initResearchChart();
-        };
-    </script>
-
 </body>
 </html>
