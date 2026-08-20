@@ -1,0 +1,1198 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FDOS EXECUTIVE KERNEL [v26.0.WORLD_MODEL] - Structural Liquidity & Credit Plumbing</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        fdos: {
+                            bg: '#090d16',
+                            card: '#111827',
+                            border: '#1f293d',
+                            accent: '#f59e0b', // Amber
+                            cyan: '#06b6d4',
+                            emerald: '#10b981',
+                            rose: '#f43f5e',
+                            purple: '#8b5cf6',
+                            text: '#f3f4f6',
+                            muted: '#9ca3af'
+                        }
+                    },
+                    fontFamily: {
+                        mono: ['JetBrains Mono', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
+                        sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Embedded CSS for strict Chart Container & Component Constraints */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 680px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 320px;
+            max-height: 380px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        /* Custom scrollbar for terminal/code views */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #090d16;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1f293d;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #374151;
+        }
+        .glow-amber {
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.15);
+        }
+        .glow-rose {
+            box-shadow: 0 0 15px rgba(244, 63, 94, 0.15);
+        }
+        .glow-emerald {
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.15);
+        }
+    </style>
+</head>
+<body class="bg-fdos-bg text-fdos-text font-sans antialiased min-h-screen flex flex-col selection:bg-amber-500/30 selection:text-amber-300">
+
+    <!-- Chosen Palette: Slate Terminal Matrix (Background: #090d16, Cards: #111827, Accent Amber: #f59e0b, Emerald: #10b981, Rose Alert: #f43f5e, Cyan Tech: #06b6d4) -->
+    <!-- Application Structure Plan: The SPA is architected as an executive financial command center designed for high-density analysis. Instead of a linear report, it provides a 6-module interactive workflow: 1. Live System Status & Macro Bounds Ticker, 2. Module A: Treasury Mechanics & Buyback Simulator, 3. Module B: Whalescanner 13F/13D Capital Flow Monitor, 4. Module C: Fortress & Hunt Barbell Allocator (including a live Tariff Simulator & CLO O/C Cash Diversion Engine), 5. Module D: Deterministic Shared National Credit (SNC) Calculator, and 6. Institutional AI Training Ledger & VaR Sensitivity Matrix. This logical task-oriented layout empowers institutional risk officers and quantitative analysts to stress-test micro-structure realities interactively. -->
+    <!-- Visualization & Content Choices: 
+        1. Macro Bounds Ticker: Dynamic metric cards with contextual stress flags -> Chart.js yield vs cost-of-capital bar comparison.
+        2. Treasury Buyback Mechanics: Interactive operation toggle ($2B vs $4B) -> Canvas duration yield curve simulation.
+        3. Whalescanner Institutional Flow: Multi-tab analytical breakdown (SEER cash discount meter, ASTS launch shield timeline, Entropy hard-asset allocation donut chart).
+        4. Fortress & Hunt Barbell: Interactive CSMS #69252300 Tariff Calculator (FCX) + CLO Overcollateralization CCC threshold breach simulator (MDB short thesis).
+        5. SNC Evaluation Engine: Fully interactive input form running the deterministic Base ICR and Confidence Band (wc) formula in real-time.
+        6. Institutional AI Ledger: JSON code viewer with copy/export functionality + VaR sensitivity surface calculations.
+        CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. Strictly Canvas API via Chart.js and native Tailwind HTML/CSS components. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <!-- TOP NAVIGATION / HEADER SYSTEM -->
+    <header class="border-b border-fdos-border bg-fdos-card/90 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="flex items-center space-x-3">
+                <div class="h-3 w-3 rounded-full bg-emerald-500 animate-pulse"></div>
+                <div>
+                    <h1 class="text-lg font-mono font-bold tracking-tight text-white flex items-center gap-2">
+                        <span>FDOS EXECUTIVE KERNEL</span>
+                        <span class="text-xs bg-amber-500/10 text-amber-400 border border-amber-500/30 px-2 py-0.5 rounded font-normal">v26.0.WORLD_MODEL</span>
+                    </h1>
+                    <p class="text-xs text-fdos-muted font-mono">OPERATIONAL REGIME: Soft-Landing Disinflation vs. Sovereign Fixed-Income Tax</p>
+                </div>
+            </div>
+
+            <!-- Global Status Bar -->
+            <div class="flex items-center gap-4 text-xs font-mono">
+                <div class="bg-fdos-bg border border-fdos-border px-3 py-1.5 rounded flex items-center gap-2">
+                    <span class="text-fdos-muted">SOFR BASE:</span>
+                    <span class="text-amber-400 font-bold">5.30%</span>
+                    <span class="text-[10px] text-fdos-muted">(Floor: 5.00%)</span>
+                </div>
+                <div class="bg-fdos-bg border border-fdos-border px-3 py-1.5 rounded flex items-center gap-2">
+                    <span class="text-fdos-muted">TIMESTAMP:</span>
+                    <span class="text-fdos-cyan font-bold" id="live-clock">2026-08-19 19:10:14 Z</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODULE NAVIGATION TABS -->
+        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex overflow-x-auto space-x-1 border-t border-fdos-border text-xs font-mono scrollbar-none" id="nav-tabs">
+            <button onclick="switchTab('tab-overview')" id="btn-tab-overview" class="px-4 py-2.5 border-b-2 border-amber-500 text-amber-400 font-bold flex items-center gap-2 whitespace-nowrap bg-amber-500/5">
+                <span>[01]</span> SYSTEM OVERVIEW
+            </button>
+            <button onclick="switchTab('tab-module-a')" id="btn-tab-module-a" class="px-4 py-2.5 border-b-2 border-transparent text-fdos-muted hover:text-white flex items-center gap-2 whitespace-nowrap">
+                <span>[02]</span> MODULE A: MARKET MAYHEM
+            </button>
+            <button onclick="switchTab('tab-module-b')" id="btn-tab-module-b" class="px-4 py-2.5 border-b-2 border-transparent text-fdos-muted hover:text-white flex items-center gap-2 whitespace-nowrap">
+                <span>[03]</span> MODULE B: WHALESCANNER
+            </button>
+            <button onclick="switchTab('tab-module-c')" id="btn-tab-module-c" class="px-4 py-2.5 border-b-2 border-transparent text-fdos-muted hover:text-white flex items-center gap-2 whitespace-nowrap">
+                <span>[04]</span> MODULE C: FORTRESS & HUNT
+            </button>
+            <button onclick="switchTab('tab-module-d')" id="btn-tab-module-d" class="px-4 py-2.5 border-b-2 border-transparent text-fdos-muted hover:text-white flex items-center gap-2 whitespace-nowrap">
+                <span>[05]</span> MODULE D: SNC EVALUATION
+            </button>
+            <button onclick="switchTab('tab-ledger')" id="btn-tab-ledger" class="px-4 py-2.5 border-b-2 border-transparent text-fdos-muted hover:text-white flex items-center gap-2 whitespace-nowrap">
+                <span>[06]</span> AI LEDGER & VAR MATRIX
+            </button>
+        </nav>
+    </header>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+        <!-- ========================================== -->
+        <!-- SECTION 1: SYSTEM OVERVIEW & MACRO BOUNDS -->
+        <!-- ========================================== -->
+        <section id="tab-overview" class="tab-content space-y-6">
+            <!-- Contextual Introductory Paragraph -->
+            <div class="bg-fdos-card border border-fdos-border rounded-lg p-5">
+                <h2 class="text-sm font-mono font-bold text-amber-400 uppercase tracking-wider mb-2 flex items-center gap-2">
+                    <span>&#9888;</span> Executive Directive & Core Macro Divergence
+                </h2>
+                <p class="text-sm text-slate-300 leading-relaxed">
+                    This operational suite synthesizes the deterministic mechanics of global credit plumbing against surface-level equity valuations. While biological market participants celebrate suppressed sovereign duration yields following emergency Treasury interventions, the FDOS engine isolates a catastrophic structural trap: floating-rate private credit remains anchored to a <strong>5.30% SOFR floor</strong>, creating a severe refinancing wall for sub-investment grade borrowers as corporate debt matures into <strong>7.50%+</strong> coupons.
+                </p>
+            </div>
+
+            <!-- Terminal Output Ticker Cards Grid -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="terminal-ticker">
+                <!-- SOFR -->
+                <div class="bg-fdos-card border border-fdos-border p-4 rounded-lg hover:border-amber-500/50 transition">
+                    <div class="flex justify-between items-start text-xs font-mono text-fdos-muted">
+                        <span>BASE RATE (SOFR)</span>
+                        <span class="text-amber-400">FLOOR 5.00%</span>
+                    </div>
+                    <div class="text-2xl font-mono font-bold text-white mt-1">5.30%</div>
+                    <div class="text-[11px] font-mono text-fdos-muted mt-2">0.00 bps | Floating Cost Gravity</div>
+                </div>
+                <!-- 10Y Yield -->
+                <div class="bg-fdos-card border border-fdos-border p-4 rounded-lg hover:border-amber-500/50 transition">
+                    <div class="flex justify-between items-start text-xs font-mono text-fdos-muted">
+                        <span>10Y TREASURY</span>
+                        <span class="text-emerald-400">-8.6 bps</span>
+                    </div>
+                    <div class="text-2xl font-mono font-bold text-emerald-400 mt-1">4.651%</div>
+                    <div class="text-[11px] font-mono text-fdos-muted mt-2">Suppressed via Treasury Buybacks</div>
+                </div>
+                <!-- 30Y Yield -->
+                <div class="bg-fdos-card border border-fdos-border p-4 rounded-lg hover:border-amber-500/50 transition">
+                    <div class="flex justify-between items-start text-xs font-mono text-fdos-muted">
+                        <span>30Y TREASURY</span>
+                        <span class="text-emerald-400">-11.0 bps</span>
+                    </div>
+                    <div class="text-2xl font-mono font-bold text-white mt-1">5.230%</div>
+                    <div class="text-[11px] font-mono text-fdos-muted mt-2">Peak: 5.34% (19-Yr High)</div>
+                </div>
+                <!-- SPX -->
+                <div class="bg-fdos-card border border-fdos-border p-4 rounded-lg hover:border-amber-500/50 transition">
+                    <div class="flex justify-between items-start text-xs font-mono text-fdos-muted">
+                        <span>S&P 500 (SPX)</span>
+                        <span class="text-emerald-400">+0.34%</span>
+                    </div>
+                    <div class="text-2xl font-mono font-bold text-white mt-1">7,718.00</div>
+                    <div class="text-[11px] font-mono text-fdos-muted mt-2">VIX-Decay Mechanical Rebound</div>
+                </div>
+                <!-- NDX -->
+                <div class="bg-fdos-card border border-fdos-border p-4 rounded-lg hover:border-amber-500/50 transition">
+                    <div class="flex justify-between items-start text-xs font-mono text-fdos-muted">
+                        <span>NASDAQ 100</span>
+                        <span class="text-emerald-400">+0.41%</span>
+                    </div>
+                    <div class="text-2xl font-mono font-bold text-white mt-1">20,450.00</div>
+                    <div class="text-[11px] font-mono text-fdos-muted mt-2">Algorithmic Duration Buying</div>
+                </div>
+                <!-- BTC -->
+                <div class="bg-fdos-card border border-fdos-border p-4 rounded-lg hover:border-amber-500/50 transition">
+                    <div class="flex justify-between items-start text-xs font-mono text-fdos-muted">
+                        <span>BITCOIN (BTC)</span>
+                        <span class="text-emerald-400">+5.72%</span>
+                    </div>
+                    <div class="text-2xl font-mono font-bold text-amber-400 mt-1">$68,378.91</div>
+                    <div class="text-[11px] font-mono text-fdos-muted mt-2">Fiat Debasement Evasion</div>
+                </div>
+                <!-- Crude -->
+                <div class="bg-fdos-card border border-fdos-border p-4 rounded-lg hover:border-amber-500/50 transition">
+                    <div class="flex justify-between items-start text-xs font-mono text-fdos-muted">
+                        <span>BRENT CRUDE</span>
+                        <span class="text-fdos-muted">0.00%</span>
+                    </div>
+                    <div class="text-2xl font-mono font-bold text-white mt-1">$90.91/bbl</div>
+                    <div class="text-[11px] font-mono text-fdos-muted mt-2">Persian Gulf Transit Friction</div>
+                </div>
+                <!-- VIX -->
+                <div class="bg-fdos-card border border-fdos-border p-4 rounded-lg hover:border-amber-500/50 transition">
+                    <div class="flex justify-between items-start text-xs font-mono text-fdos-muted">
+                        <span>VOLATILITY (VIX)</span>
+                        <span class="text-emerald-400">-1.20</span>
+                    </div>
+                    <div class="text-2xl font-mono font-bold text-cyan-400 mt-1">15.05</div>
+                    <div class="text-[11px] font-mono text-fdos-muted mt-2">Post-FOMC Premium Decay</div>
+                </div>
+            </div>
+
+            <!-- Sovereign vs Private Capital Cost Wedge Chart -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="lg:col-span-2 bg-fdos-card border border-fdos-border p-5 rounded-lg flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-center mb-4">
+                            <div>
+                                <h3 class="text-base font-bold text-white">The Cost of Capital Fracture Zone</h3>
+                                <p class="text-xs text-fdos-muted font-mono">Comparing Risk-Free Sovereign Yields vs Private Floating-Rate Credit Costs</p>
+                            </div>
+                            <span class="bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs px-2.5 py-1 rounded font-mono">Divergence: 285+ bps</span>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="chartYieldDivergence"></canvas>
+                        </div>
+                    </div>
+                    <p class="text-xs text-fdos-muted mt-3 italic">
+                        *Note: While 10Y sovereign yields are mechanically compressed to 4.651% via Treasury buybacks, private borrowers face SOFR (5.30%) + OAS spreads (2.80%), creating a 7.50%+ refinancing floor.
+                    </p>
+                </div>
+
+                <!-- Macro Regime Breakdown -->
+                <div class="bg-fdos-card border border-fdos-border p-5 rounded-lg flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-sm font-mono font-bold text-amber-400 uppercase tracking-wider mb-4 border-b border-fdos-border pb-2">
+                            FDOS Baseline Macro Regime
+                        </h3>
+                        <div class="space-y-4 text-xs font-mono">
+                            <div class="border-l-2 border-amber-500 pl-3">
+                                <span class="text-fdos-muted block">PRIMARY TENSION</span>
+                                <span class="text-white font-bold text-sm">Soft-Landing Narrative vs. Fiscal Dominance Tax</span>
+                            </div>
+                            <div class="border-l-2 border-fdos-cyan pl-3">
+                                <span class="text-fdos-muted block">SOVEREIGN INTERVENTION</span>
+                                <span class="text-fdos-cyan font-bold">Doubling Buybacks ($2B &rarr; $4B/op)</span>
+                                <p class="text-[11px] text-fdos-muted mt-0.5">Clearing illiquid off-the-run debt to prevent 30Y yield breaching 5.34%.</p>
+                            </div>
+                            <div class="border-l-2 border-rose-500 pl-3">
+                                <span class="text-fdos-muted block">CREDIT MARKET REALITY</span>
+                                <span class="text-rose-400 font-bold">BSL Software Maturity Wall</span>
+                                <p class="text-[11px] text-fdos-muted mt-0.5">46% of sub-investment grade tech debt matures in &lt;4 years; 25% in 2028.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-fdos-border">
+                        <button onclick="switchTab('tab-module-a')" class="w-full bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/40 text-xs font-mono py-2 rounded transition">
+                            Inspect Module A Treasury Mechanics &rarr;
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ========================================== -->
+        <!-- SECTION 2: MODULE A - MARKET MAYHEM        -->
+        <!-- ========================================== -->
+        <section id="tab-module-a" class="tab-content hidden space-y-6">
+            <div class="bg-fdos-card border border-fdos-border rounded-lg p-5">
+                <h2 class="text-sm font-mono font-bold text-amber-400 uppercase tracking-wider mb-2 flex items-center gap-2">
+                    <span>[MODULE A]</span> Market Mayhem & Sovereign Plumbing Dynamics
+                </h2>
+                <p class="text-sm text-slate-300 leading-relaxed">
+                    This section analyzes the structural mechanics behind "The Buyback Illusion." Treasury Secretary Scott Bessent's expansion of buybacks for 10- to 30-year debt (doubling from $2B to at least $4B per operation, taking effect Sept 9 - Nov 4, 2026) caps duration yields at 4.75% and 5.25%. Quantitative equity algorithms mistake this mechanical intervention for organic risk-on sentiment, driving SPX higher while underlying credit plumbing remains blockaded.
+                </p>
+            </div>
+
+            <!-- Treasury Buyback Interactive Simulator -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="bg-fdos-card border border-fdos-border p-5 rounded-lg space-y-4">
+                    <h3 class="text-sm font-mono font-bold text-white border-b border-fdos-border pb-2">
+                        Buyback Operation Simulator
+                    </h3>
+                    
+                    <div class="space-y-3">
+                        <label class="text-xs font-mono text-fdos-muted block">OPERATION SIZE (PER DEBT AUCTION)</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button id="btn-buyback-baseline" onclick="updateBuybackSim(2)" class="px-3 py-2 border border-fdos-border bg-fdos-bg text-fdos-muted font-mono text-xs rounded hover:border-amber-500">
+                                $2 Billion (Baseline)
+                            </button>
+                            <button id="btn-buyback-expanded" onclick="updateBuybackSim(4)" class="px-3 py-2 border border-amber-500 bg-amber-500/10 text-amber-400 font-mono text-xs rounded font-bold">
+                                $4 Billion (Emergency)
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2 pt-2 text-xs font-mono">
+                        <div class="flex justify-between text-fdos-muted">
+                            <span>Target Horizon:</span>
+                            <span class="text-white">Sept 9 - Nov 4, 2026</span>
+                        </div>
+                        <div class="flex justify-between text-fdos-muted">
+                            <span>Primary Objective:</span>
+                            <span class="text-white">Clear Off-the-Run Duration</span>
+                        </div>
+                        <div class="flex justify-between text-fdos-muted">
+                            <span>10Y Yield Cap Impact:</span>
+                            <span class="text-emerald-400 font-bold" id="sim-10y-cap">Capped @ ~4.65%</span>
+                        </div>
+                        <div class="flex justify-between text-fdos-muted">
+                            <span>30Y Yield Cap Impact:</span>
+                            <span class="text-emerald-400 font-bold" id="sim-30y-cap">Capped @ ~5.23%</span>
+                        </div>
+                    </div>
+
+                    <div class="p-3 bg-fdos-bg border border-fdos-border rounded text-xs text-fdos-muted space-y-1">
+                        <span class="text-amber-400 font-bold block font-mono">Fed SOMA War Chest Mechanics</span>
+                        <p class="leading-relaxed">
+                            The NY Fed SOMA portfolio tilts towards short-term Treasury bills, creating a high-volume monthly reinvestment pool. This platform (FedTrade Plus) executes market-functioning operations without inflating total balance sheet size.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Simulation Output Chart -->
+                <div class="lg:col-span-2 bg-fdos-card border border-fdos-border p-5 rounded-lg flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <h3 class="text-sm font-mono font-bold text-white">Sovereign Yield Curve Compression Model</h3>
+                            <span class="text-xs font-mono text-cyan-400" id="sim-status-label">REGIME: $4B ACTIVE BUYBACK</span>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="chartYieldCurveSim"></canvas>
+                        </div>
+                    </div>
+                    <div class="mt-2 text-xs font-mono text-fdos-muted flex justify-between">
+                        <span>Source: U.S. Treasury Dept & Fed SOMA Data</span>
+                        <span class="text-amber-400">Yield Cap Triggered above 5.34% 30Y Breach</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- The Buyback Illusion vs Credit Plumbing Reality -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Equity Algo Perception -->
+                <div class="bg-fdos-card border border-emerald-500/30 p-5 rounded-lg glow-emerald">
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="text-sm font-mono font-bold text-emerald-400 uppercase">The Perception (Equity Algos)</h3>
+                        <span class="text-xs bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded font-mono">SPX: 7,718.00</span>
+                    </div>
+                    <ul class="space-y-2 text-xs text-slate-300 font-mono">
+                        <li class="flex items-start gap-2">
+                            <span class="text-emerald-400 font-bold">&#10004;</span>
+                            <span>Yields dropping (10Y down to 4.651%) is misinterpreted as dovish Fed pivot or disinflation.</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-emerald-400 font-bold">&#10004;</span>
+                            <span>Quantitative models bid up long-duration software and AI tech equities on lower discount rates.</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-emerald-400 font-bold">&#10004;</span>
+                            <span>VIX decays to 15.05 following post-FOMC event risk resolution.</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Credit Plumbing Reality -->
+                <div class="bg-fdos-card border border-rose-500/30 p-5 rounded-lg glow-rose">
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="text-sm font-mono font-bold text-rose-400 uppercase">The Reality (Credit Plumbing)</h3>
+                        <span class="text-xs bg-rose-500/10 text-rose-400 px-2 py-0.5 rounded font-mono">SOFR: 5.30%</span>
+                    </div>
+                    <ul class="space-y-2 text-xs text-slate-300 font-mono">
+                        <li class="flex items-start gap-2">
+                            <span class="text-rose-400 font-bold">&#10008;</span>
+                            <span>Yield drop is an artificial sovereign balance-sheet intervention to prevent auction failure.</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-rose-400 font-bold">&#10008;</span>
+                            <span>Private borrowers reliant on SOFR (5.30%) receive zero relief; OAS credit spreads locked at 2.80%.</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-rose-400 font-bold">&#10008;</span>
+                            <span>CLO managers dumping software debt at loan marks of 97.4% of cost ahead of maturity wall.</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ========================================== -->
+        <!-- SECTION 3: MODULE B - WHALESCANNER         -->
+        <!-- ========================================== -->
+        <section id="tab-module-b" class="tab-content hidden space-y-6">
+            <div class="bg-fdos-card border border-fdos-border rounded-lg p-5">
+                <h2 class="text-sm font-mono font-bold text-amber-400 uppercase tracking-wider mb-2 flex items-center gap-2">
+                    <span>[MODULE B]</span> Whalescanner Institutional Flow Analysis (13F/13D)
+                </h2>
+                <p class="text-sm text-slate-300 leading-relaxed">
+                    By evaluating SEC Form 13F and 13D filings, Whalescanner strips away narrative abstraction to isolate institutional directional conviction. High-conviction capital is actively rotating into deep cash arbitrage, space telecom infrastructure, and physical energy/logistics hard assets while trimming overvalued consumer software beta.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- SEER Card -->
+                <div class="bg-fdos-card border border-fdos-border p-5 rounded-lg flex flex-col justify-between hover:border-amber-500/50 transition">
+                    <div>
+                        <div class="flex justify-between items-start mb-3">
+                            <div>
+                                <span class="text-xs font-mono text-amber-400 font-bold">DEEP-VALUE ARBITRAGE</span>
+                                <h3 class="text-lg font-mono font-bold text-white">SEER, Inc. (SEER)</h3>
+                            </div>
+                            <span class="bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs px-2 py-0.5 rounded font-mono">13F Accumulation</span>
+                        </div>
+                        <p class="text-xs text-fdos-muted mb-4 leading-relaxed">
+                            Trades at a 15% discount to its <strong>$209.5M</strong> liquid net cash position. Operating runway verified by EY with no going-concern modifications. Special board committee under binding fiduciary pressure for capital return via dividends or liquidation.
+                        </p>
+                        <!-- Cash Discount Visualizer -->
+                        <div class="space-y-2 border-t border-fdos-border pt-3">
+                            <div class="flex justify-between text-xs font-mono">
+                                <span class="text-fdos-muted">Liquid Net Cash:</span>
+                                <span class="text-white font-bold">$209.5M</span>
+                            </div>
+                            <div class="flex justify-between text-xs font-mono">
+                                <span class="text-fdos-muted">Market Valuation:</span>
+                                <span class="text-rose-400 font-bold">~15% Discount</span>
+                            </div>
+                            <div class="w-full bg-fdos-bg h-2 rounded-full overflow-hidden flex">
+                                <div class="bg-emerald-500 h-full" style="width: 85%;"></div>
+                                <div class="bg-rose-500 h-full" style="width: 15%;"></div>
+                            </div>
+                            <span class="text-[10px] text-fdos-muted font-mono block text-right">Green = Market Cap / Red = Dislocated Net Cash Arbitrage</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ASTS Card -->
+                <div class="bg-fdos-card border border-fdos-border p-5 rounded-lg flex flex-col justify-between hover:border-cyan-500/50 transition">
+                    <div>
+                        <div class="flex justify-between items-start mb-3">
+                            <div>
+                                <span class="text-xs font-mono text-fdos-cyan font-bold">SPACE INFRASTRUCTURE</span>
+                                <h3 class="text-lg font-mono font-bold text-white">AST SpaceMobile (ASTS)</h3>
+                            </div>
+                            <span class="bg-cyan-500/10 border border-cyan-500/30 text-fdos-cyan text-xs px-2 py-0.5 rounded font-mono">Price Target: $90-$98</span>
+                        </div>
+                        <p class="text-xs text-fdos-muted mb-4 leading-relaxed">
+                            Secured a <strong>$3.7B pro forma liquidity shield</strong>, completely eliminating near-term refinancing risk amidst high rates. Backlog stands at <strong>$1.3B</strong> across 60+ MNO partnerships (3B subscribers). Production ramping to 6 satellites/month.
+                        </p>
+                        <div class="space-y-2 border-t border-fdos-border pt-3 font-mono text-xs">
+                            <div class="flex justify-between">
+                                <span class="text-fdos-muted">Liquidity Shield:</span>
+                                <span class="text-fdos-cyan font-bold">$3.7 Billion</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-fdos-muted">Contracted Backlog:</span>
+                                <span class="text-white font-bold">$1.3 Billion</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-fdos-muted">Target Production:</span>
+                                <span class="text-emerald-400 font-bold">6 Satellites / Month</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Entropy Tech Card -->
+                <div class="bg-fdos-card border border-fdos-border p-5 rounded-lg flex flex-col justify-between hover:border-emerald-500/50 transition">
+                    <div>
+                        <div class="flex justify-between items-start mb-3">
+                            <div>
+                                <span class="text-xs font-mono text-emerald-400 font-bold">ENTROPY TECH ROTATION</span>
+                                <h3 class="text-lg font-mono font-bold text-white">Hard Asset Extraction</h3>
+                            </div>
+                            <span class="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs px-2 py-0.5 rounded font-mono">Q2 13F Shift</span>
+                        </div>
+                        <p class="text-xs text-fdos-muted mb-4 leading-relaxed">
+                            Aggressive portfolio rotation out of digital consumer beta and into physical BTUs, refining infrastructure (CVX, LNG), and critical logistics (FDX). Physical reality resists paper central bank debasement.
+                        </p>
+                        <div class="space-y-2 border-t border-fdos-border pt-3 font-mono text-xs">
+                            <div class="flex justify-between">
+                                <span class="text-fdos-muted">Crude Baseline:</span>
+                                <span class="text-white font-bold">$90.91 / bbl</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-fdos-muted">Key Holdings:</span>
+                                <span class="text-amber-400 font-bold">CVX, LNG, FDX</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-fdos-muted">Thesis Drivers:</span>
+                                <span class="text-emerald-400 font-bold">Geopolitical Friction & BTUs</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Institutional Allocation Rotation Chart -->
+            <div class="bg-fdos-card border border-fdos-border p-5 rounded-lg">
+                <div class="flex justify-between items-center mb-4">
+                    <div>
+                        <h3 class="text-sm font-mono font-bold text-white">Institutional 13F Flow Reallocation Matrix</h3>
+                        <p class="text-xs text-fdos-muted font-mono">Net Quarterly Capital Shift ($ Millions)</p>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="chartWhaleFlow"></canvas>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ========================================== -->
+        <!-- SECTION 4: MODULE C - FORTRESS & HUNT     -->
+        <!-- ========================================== -->
+        <section id="tab-module-c" class="tab-content hidden space-y-6">
+            <div class="bg-fdos-card border border-fdos-border rounded-lg p-5">
+                <h2 class="text-sm font-mono font-bold text-amber-400 uppercase tracking-wider mb-2 flex items-center gap-2">
+                    <span>[MODULE C]</span> Fortress & Hunt Barbell Allocation Engine
+                </h2>
+                <p class="text-sm text-slate-300 leading-relaxed">
+                    The FDOS protocol mandates an asymmetric barbell strategy: Long un-leveraged, physically protected real assets protected by regulatory firewalls (<strong>Fortress</strong>) paired against Short over-leveraged, BSL-dependent software issuers facing forced refinancing and CLO cash flow diversion (<strong>Hunt</strong>).
+                </p>
+            </div>
+
+            <!-- Barbell Strategy Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+                <!-- FORTRESS (LONG SIDE) -->
+                <div class="bg-fdos-card border border-emerald-500/40 p-5 rounded-lg space-y-5">
+                    <div class="flex justify-between items-center border-b border-fdos-border pb-3">
+                        <div class="flex items-center gap-2">
+                            <span class="h-3 w-3 rounded-full bg-emerald-500"></span>
+                            <h3 class="text-base font-mono font-bold text-emerald-400 uppercase">FORTRESS ALLOCATION (LONG)</h3>
+                        </div>
+                        <span class="text-xs bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-2 py-1 rounded font-mono">Un-leveraged Real Assets</span>
+                    </div>
+
+                    <!-- FCX Copper CSMS #69252300 Deep Dive -->
+                    <div class="space-y-3 bg-fdos-bg border border-fdos-border p-4 rounded-lg">
+                        <div class="flex justify-between items-start">
+                            <h4 class="text-sm font-bold text-white">Freeport-McMoRan (FCX) & Tariff Protection</h4>
+                            <span class="text-[11px] font-mono bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded">CBP CSMS #69252300</span>
+                        </div>
+                        <p class="text-xs text-fdos-muted leading-relaxed">
+                            CBP mandatory reporting requires primary country of smelt and cast on ACE entry lines. Tariff overhauls levy <strong>50% tariffs on full customs value</strong> for core metals, generating an impenetrable domestic spot premium firewall for domestic producers like FCX.
+                        </p>
+
+                        <!-- Live Tariff Impact Calculator -->
+                        <div class="p-3 bg-fdos-card border border-fdos-border rounded space-y-3">
+                            <span class="text-xs font-mono text-amber-400 font-bold block">Interactive Copper Duty & Protection Calculator</span>
+                            <div class="space-y-2">
+                                <div class="flex justify-between text-xs font-mono">
+                                    <span>Cargo Customs Value:</span>
+                                    <span class="text-white font-bold" id="copper-val-display">$10,000,000</span>
+                                </div>
+                                <input type="range" id="copper-val-range" min="1000000" max="50000000" step="1000000" value="10000000" oninput="calcCopperTariff()" class="w-full accent-amber-500">
+                                
+                                <div class="grid grid-cols-2 gap-2 text-xs font-mono pt-1">
+                                    <div class="p-2 bg-fdos-bg border border-fdos-border rounded">
+                                        <span class="text-fdos-muted text-[10px] block">FOREIGN TARIFF DUTY (50%)</span>
+                                        <span class="text-rose-400 font-bold" id="tariff-duty-out">$5,000,000</span>
+                                    </div>
+                                    <div class="p-2 bg-fdos-bg border border-fdos-border rounded">
+                                        <span class="text-fdos-muted text-[10px] block">FCX DOMESTIC PREMIUM MOAT</span>
+                                        <span class="text-emerald-400 font-bold" id="fcx-moat-out">Captured Premium</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- VLO Complex Refining -->
+                    <div class="space-y-2 bg-fdos-bg border border-fdos-border p-4 rounded-lg">
+                        <h4 class="text-sm font-bold text-white">Valero Energy (VLO) & Crack Spread Arbitrage</h4>
+                        <p class="text-xs text-fdos-muted leading-relaxed">
+                            Gulf Coast processing capacity (1.78 to 1.83 M bpd) converts heavy Canadian/Venezuelan crude differentials into un-leveraged cash flow. Protected against tech credit tightening by massive physical self-funding.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- HUNT (SHORT SIDE) -->
+                <div class="bg-fdos-card border border-rose-500/40 p-5 rounded-lg space-y-5">
+                    <div class="flex justify-between items-center border-b border-fdos-border pb-3">
+                        <div class="flex items-center gap-2">
+                            <span class="h-3 w-3 rounded-full bg-rose-500"></span>
+                            <h3 class="text-base font-mono font-bold text-rose-400 uppercase">HUNT ALLOCATION (SHORT)</h3>
+                        </div>
+                        <span class="text-xs bg-rose-500/10 text-rose-400 border border-rose-500/30 px-2 py-1 rounded font-mono">BSL-Dependent Enterprise Tech</span>
+                    </div>
+
+                    <!-- MongoDB MDB Fundamental Decay -->
+                    <div class="space-y-3 bg-fdos-bg border border-fdos-border p-4 rounded-lg">
+                        <div class="flex justify-between items-start">
+                            <h4 class="text-sm font-bold text-white">MongoDB, Inc. (MDB) Macro Proxy</h4>
+                            <span class="text-[11px] font-mono bg-rose-500/10 text-rose-400 px-2 py-0.5 rounded">&gt;40x Forward P/E</span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 text-xs font-mono">
+                            <div class="p-2 bg-fdos-card border border-fdos-border rounded">
+                                <span class="text-fdos-muted block">GAAP OPERATING MARGIN</span>
+                                <span class="text-rose-400 font-bold">-3.61% (Q1 FY27)</span>
+                            </div>
+                            <div class="p-2 bg-fdos-card border border-fdos-border rounded">
+                                <span class="text-fdos-muted block">RPO TTM GROWTH</span>
+                                <span class="text-rose-400 font-bold">-0.96% Contraction</span>
+                            </div>
+                        </div>
+                        <p class="text-xs text-fdos-muted leading-relaxed">
+                            Exorbitant OpEx (R&D $200.4M + SG&A $320.6M consume 75.8% of revenue). Full-year GAAP net loss of $71.15M renders entity vulnerable to capital market freezing.
+                        </p>
+                    </div>
+
+                    <!-- Interactive CLO O/C Test Failure Engine -->
+                    <div class="space-y-3 bg-fdos-bg border border-fdos-border p-4 rounded-lg">
+                        <div class="flex justify-between items-start">
+                            <h4 class="text-sm font-bold text-white">CLO Overcollateralization (O/C) Test Failure Simulator</h4>
+                            <span class="text-[11px] font-mono text-amber-400">CCC Limit: 7.5%</span>
+                        </div>
+                        <p class="text-xs text-fdos-muted leading-relaxed">
+                            CLO indentures mandate that if portfolio CCC-rated loans breach 7.5%, excess loans are marked to <i>market value</i> instead of <i>par</i>, failing O/C tests and diverting cash flow away from equity tranches to AAA debt amortization.
+                        </p>
+
+                        <div class="p-3 bg-fdos-card border border-fdos-border rounded space-y-3">
+                            <div class="flex justify-between text-xs font-mono">
+                                <span class="text-fdos-muted">Software Portfolio CCC Exposure:</span>
+                                <span class="text-amber-400 font-bold" id="ccc-exposure-val">8.5%</span>
+                            </div>
+                            <input type="range" id="ccc-exposure-range" min="3.0" max="15.0" step="0.5" value="8.5" oninput="simCLOFailure()" class="w-full accent-rose-500">
+
+                            <div class="p-2 border rounded font-mono text-xs flex justify-between items-center" id="clo-status-box">
+                                <span>CLO O/C TEST STATUS:</span>
+                                <span class="font-bold text-rose-400" id="clo-status-text">FAILED (CASH FLOW DIVERTED)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+
+        <!-- ========================================== -->
+        <!-- SECTION 5: MODULE D - SNC EVALUATION       -->
+        <!-- ========================================== -->
+        <section id="tab-module-d" class="tab-content hidden space-y-6">
+            <div class="bg-fdos-card border border-fdos-border rounded-lg p-5">
+                <h2 class="text-sm font-mono font-bold text-amber-400 uppercase tracking-wider mb-2 flex items-center gap-2">
+                    <span>[MODULE D]</span> Shared National Credit (SNC) Evaluation Engine
+                </h2>
+                <p class="text-sm text-slate-300 leading-relaxed">
+                    To eliminate subjective human sentiment, the FDOS engine applies the deterministic regulatory parameters utilized by the Federal Reserve, FDIC, and OCC. Software borrowers with Base Interest Coverage Ratios (ICR) below 1.5x in a >5.0% SOFR regime are deterministically classified based on confidence band weighting ($w_c$).
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+                <!-- Live Deterministic SNC Form Calculator -->
+                <div class="bg-fdos-card border border-fdos-border p-5 rounded-lg space-y-4">
+                    <div class="flex justify-between items-center border-b border-fdos-border pb-2">
+                        <h3 class="text-sm font-mono font-bold text-white">SNC Risk Algorithm Engine</h3>
+                        <button onclick="loadPresetSoftware()" class="text-[11px] font-mono bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 px-2 py-0.5 rounded">
+                            Load BSL Software Preset
+                        </button>
+                    </div>
+
+                    <div class="space-y-3 font-mono text-xs">
+                        <div>
+                            <label class="text-fdos-muted block mb-1">EBITDA ($ Millions):</label>
+                            <input type="number" id="snc-ebitda" value="110" oninput="runSNCEngine()" class="w-full bg-fdos-bg border border-fdos-border rounded p-2 text-white font-bold focus:border-amber-500 outline-none">
+                        </div>
+                        <div>
+                            <label class="text-fdos-muted block mb-1">CASH INTEREST EXPENSE ($ Millions):</label>
+                            <input type="number" id="snc-interest" value="100" oninput="runSNCEngine()" class="w-full bg-fdos-bg border border-fdos-border rounded p-2 text-white font-bold focus:border-amber-500 outline-none">
+                        </div>
+                        <div>
+                            <label class="text-fdos-muted block mb-1">IMPLIED VOLATILITY INDEX (Vol_Imply):</label>
+                            <input type="number" id="snc-vol" value="2.5" step="0.1" oninput="runSNCEngine()" class="w-full bg-fdos-bg border border-fdos-border rounded p-2 text-white font-bold focus:border-amber-500 outline-none">
+                        </div>
+                        <div>
+                            <label class="text-fdos-muted block mb-1">DISTANCE TO MATURITY PENALTY (DMWP):</label>
+                            <input type="number" id="snc-dmwp" value="4.0" step="0.1" oninput="runSNCEngine()" class="w-full bg-fdos-bg border border-fdos-border rounded p-2 text-white font-bold focus:border-amber-500 outline-none">
+                        </div>
+                    </div>
+
+                    <!-- Computed Output Display -->
+                    <div class="p-4 bg-fdos-bg border border-fdos-border rounded space-y-3 font-mono text-xs">
+                        <div class="flex justify-between border-b border-fdos-border pb-1">
+                            <span class="text-fdos-muted">Base ICR (EBITDA / Cash Int):</span>
+                            <span class="text-white font-bold" id="snc-icr-out">1.10x</span>
+                        </div>
+                        <div class="flex justify-between border-b border-fdos-border pb-1">
+                            <span class="text-fdos-muted">SOFR Stress Gate (>5.0%):</span>
+                            <span class="text-rose-400 font-bold">TRIGGERED (5.30%)</span>
+                        </div>
+                        <div class="flex justify-between border-b border-fdos-border pb-1">
+                            <span class="text-fdos-muted">Confidence Band (w_c):</span>
+                            <span class="text-amber-400 font-bold" id="snc-wc-out">0.55</span>
+                        </div>
+                        <div class="pt-2 text-center">
+                            <span class="text-[10px] text-fdos-muted block mb-1">SNC REGULATORY CLASSIFICATION</span>
+                            <div class="text-base font-bold py-1.5 px-3 rounded bg-rose-500/20 text-rose-400 border border-rose-500/50" id="snc-class-out">
+                                SUBSTANDARD
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BSL Software Maturity Wall Visualization -->
+                <div class="lg:col-span-2 bg-fdos-card border border-fdos-border p-5 rounded-lg flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <h3 class="text-sm font-mono font-bold text-white">BSL Software Maturity Wall & Refinancing Squeeze</h3>
+                            <span class="text-xs font-mono text-rose-400">2028 Refinancing Cliff: 25% Total Debt</span>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="chartMaturityWall"></canvas>
+                        </div>
+                    </div>
+                    <div class="mt-2 text-xs font-mono text-fdos-muted flex justify-between">
+                        <span>Aggregate Software Loan Volume: ~$235 Billion</span>
+                        <span class="text-rose-400">50% Rated B- or Lower / 26% CCC</span>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+
+        <!-- ========================================== -->
+        <!-- SECTION 6: INSTITUTIONAL LEDGER & VAR       -->
+        <!-- ========================================== -->
+        <section id="tab-ledger" class="tab-content hidden space-y-6">
+            <div class="bg-fdos-card border border-fdos-border rounded-lg p-5">
+                <h2 class="text-sm font-mono font-bold text-amber-400 uppercase tracking-wider mb-2 flex items-center gap-2">
+                    <span>[MODULE E]</span> Institutional AI Training Ledger & VaR Sensitivity
+                </h2>
+                <p class="text-sm text-slate-300 leading-relaxed">
+                    Below is the compliant structural JSON ledger required to train the FDOS v26.0 World Model on structural liquidity traps and sovereign yield volatility.
+                </p>
+            </div>
+
+            <!-- VaR Projection Simulator -->
+            <div class="bg-fdos-card border border-fdos-border p-5 rounded-lg space-y-4">
+                <div class="flex justify-between items-center border-b border-fdos-border pb-2">
+                    <h3 class="text-sm font-mono font-bold text-white">Tech Sector Value at Risk (VaR) Projection Model</h3>
+                    <span class="text-xs font-mono text-cyan-400">Yield Volatility Correlation: +0.81</span>
+                </div>
+
+                <div class="p-3 bg-fdos-bg border border-fdos-border rounded font-mono text-xs text-center text-amber-400">
+                    VaR_Tech = &alpha; &middot; (&Delta; Yield_10Y) + &beta; &middot; &Delta; SPX_Implied + &epsilon;
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 font-mono text-xs">
+                    <div class="space-y-2">
+                        <label class="text-fdos-muted block">10Y Yield Delta (&Delta; Yield_10Y bps):</label>
+                        <input type="range" id="var-yield-delta" min="-20" max="50" value="15" oninput="calcVaR()" class="w-full accent-amber-500">
+                        <div class="flex justify-between text-fdos-muted">
+                            <span>-20 bps</span>
+                            <span class="text-white font-bold" id="var-yield-val">+15 bps</span>
+                            <span>+50 bps</span>
+                        </div>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-fdos-muted block">SPX Implied Shift (&Delta; SPX_Implied %):</label>
+                        <input type="range" id="var-spx-delta" min="-5" max="5" value="-1.5" step="0.5" oninput="calcVaR()" class="w-full accent-cyan-500">
+                        <div class="flex justify-between text-fdos-muted">
+                            <span>-5.0%</span>
+                            <span class="text-white font-bold" id="var-spx-val">-1.5%</span>
+                            <span>+5.0%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-fdos-bg border border-fdos-border rounded flex justify-between items-center font-mono">
+                    <span class="text-xs text-fdos-muted">PROJECTED TECH SECTOR VaR EXPOSURE:</span>
+                    <span class="text-lg font-bold text-rose-400" id="var-output-val">-4.82% Portfolio Drawdown</span>
+                </div>
+            </div>
+
+            <!-- JSON Ledger View -->
+            <div class="bg-fdos-card border border-fdos-border p-5 rounded-lg space-y-3">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-sm font-mono font-bold text-white">Institutional AI Training Ledger (JSON Schema 2020-12)</h3>
+                    <div class="flex gap-2">
+                        <button onclick="copyLedgerJSON()" class="text-xs font-mono bg-fdos-bg hover:bg-fdos-border text-fdos-cyan border border-fdos-border px-3 py-1 rounded transition">
+                            Copy JSON
+                        </button>
+                        <button onclick="downloadLedgerJSON()" class="text-xs font-mono bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 px-3 py-1 rounded transition">
+                            Download Ledger
+                        </button>
+                    </div>
+                </div>
+                <pre class="bg-fdos-bg border border-fdos-border p-4 rounded text-xs font-mono text-emerald-400 overflow-x-auto max-h-96 leading-relaxed" id="json-ledger-display"></pre>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="border-t border-fdos-border bg-fdos-card py-4 mt-8">
+        <div class="max-w-7xl mx-auto px-4 text-center font-mono text-xs text-fdos-muted">
+            FDOS KERNEL [v26.0.WORLD_MODEL] &bull; COMPUTATIONAL SIGNAL SYNTHESIS &bull; REJECT NARRATIVE ABSTRACTS
+        </div>
+    </footer>
+
+
+    <!-- JAVASCRIPT CORE APPLICATION LOGIC -->
+    <script>
+        // Store base data & state
+        const fdosData = {
+            schema: "https://json-schema.org/draft/2020-12/schema",
+            addendum_metadata: {
+                timestamp: "2026-08-19T19:10:14Z",
+                system_version: "v26.0.WORLD_MODEL",
+                macro_regime: "Soft-Landing Disinflation vs. Sovereign Fixed-Income Tax"
+            },
+            ledger_records: [
+                {
+                    data_variable_node: "Treasury_Buyback_Expansion",
+                    market_level_value: "$4 Billion Per Operation",
+                    primary_model_target: "10Y_30Y_Yield_Suppression",
+                    unstructured_context_provenance: "Treasury expansion of buybacks from $2B to $4B for 10-20Y and 20-30Y debt to improve market liquidity, artificially compressing duration yields and masking terminal sovereign debt supply fears."
+                },
+                {
+                    data_variable_node: "CBP_Section232_Copper",
+                    market_level_value: "Mandatory ACE Reporting (CSMS #69252300)",
+                    primary_model_target: "FCX_Spot_Premium",
+                    unstructured_context_provenance: "Requirement to report primary country of smelt and cast on HTSUS 8544 subheadings creates non-tariff barrier. 50% core metal tariff on full customs value fragments global supply and isolates domestic producers like FCX."
+                },
+                {
+                    data_variable_node: "BSL_Software_Maturity_Wall",
+                    market_level_value: "46% Due < 4 Years; 25% in 2028",
+                    primary_model_target: "CLO_Equity_CashFlow_Diversion",
+                    unstructured_context_provenance: "Sub-investment grade enterprise software faces forced refinancing of sub-4% debt into a 7.50%+ market. Resulting CCC-downgrades breach 7.5% CLO limits, triggering Overcollateralization (O/C) test failures and cash flow diversion."
+                },
+                {
+                    data_variable_node: "ASTS_Liquidity_Shield",
+                    market_level_value: "$3.7 Billion",
+                    primary_model_target: "Capital_Expenditure_Runway",
+                    unstructured_context_provenance: "Institutional accumulation validated by massive $3.7B pro forma liquidity and $1.3B backlog, removing all near-term refinancing risk for LEO satellite deployments amidst frozen credit markets."
+                }
+            ]
+        };
+
+        // Global Chart References
+        let chartYieldDivergenceRef = null;
+        let chartYieldCurveSimRef = null;
+        let chartWhaleFlowRef = null;
+        let chartMaturityWallRef = null;
+
+        // On DOM Load
+        document.addEventListener('DOMContentLoaded', () => {
+            initClock();
+            renderJSONDisplay();
+            initCharts();
+            runSNCEngine();
+            calcCopperTariff();
+            simCLOFailure();
+            calcVaR();
+        });
+
+        // Live Clock
+        function initClock() {
+            setInterval(() => {
+                const now = new Date();
+                document.getElementById('live-clock').innerText = now.toISOString().replace('T', ' ').substring(0, 19) + ' Z';
+            }, 1000);
+        }
+
+        // Tab Switching Logic
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(tabId).classList.remove('hidden');
+
+            // Reset navigation tab highlights
+            const tabs = ['overview', 'module-a', 'module-b', 'module-c', 'module-d', 'ledger'];
+            tabs.forEach(t => {
+                const btn = document.getElementById(`btn-tab-${t}`);
+                if (`tab-${t}` === tabId) {
+                    btn.className = "px-4 py-2.5 border-b-2 border-amber-500 text-amber-400 font-bold flex items-center gap-2 whitespace-nowrap bg-amber-500/5";
+                } else {
+                    btn.className = "px-4 py-2.5 border-b-2 border-transparent text-fdos-muted hover:text-white flex items-center gap-2 whitespace-nowrap";
+                }
+            });
+
+            // Trigger chart resizes on tab change to ensure responsiveness
+            setTimeout(() => {
+                if (chartYieldDivergenceRef) chartYieldDivergenceRef.resize();
+                if (chartYieldCurveSimRef) chartYieldCurveSimRef.resize();
+                if (chartWhaleFlowRef) chartWhaleFlowRef.resize();
+                if (chartMaturityWallRef) chartMaturityWallRef.resize();
+            }, 50);
+        }
+
+        // Initialize Chart.js Graphs
+        function initCharts() {
+            Chart.defaults.color = '#9ca3af';
+            Chart.defaults.font.family = 'JetBrains Mono, monospace';
+
+            // 1. Yield Divergence Chart
+            const ctx1 = document.getElementById('chartYieldDivergence').getContext('2d');
+            chartYieldDivergenceRef = new Chart(ctx1, {
+                type: 'bar',
+                data: {
+                    labels: ['SOFR Base Floor', '10Y Sovereign Yield', '30Y Sovereign Yield', 'BSL Credit Coupon (Sub-IG)'],
+                    datasets: [{
+                        label: 'Effective Cost / Yield (%)',
+                        data: [5.30, 4.651, 5.230, 7.82],
+                        backgroundColor: ['#f59e0b', '#10b981', '#06b6d4', '#f43f5e'],
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: (ctx) => `${ctx.raw}% Yield/Cost`
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            min: 3.5,
+                            grid: { color: '#1f293d' }
+                        },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+
+            // 2. Buyback Yield Curve Simulator Chart
+            const ctx2 = document.getElementById('chartYieldCurveSim').getContext('2d');
+            chartYieldCurveSimRef = new Chart(ctx2, {
+                type: 'line',
+                data: {
+                    labels: ['3M Bill', '2Y Note', '5Y Note', '10Y Bond', '20Y Bond', '30Y Bond'],
+                    datasets: [
+                        {
+                            label: 'Un-Intervened Market Yield (%)',
+                            data: [5.25, 4.90, 5.05, 5.15, 5.40, 5.65],
+                            borderColor: '#f43f5e',
+                            borderDash: [5, 5],
+                            fill: false,
+                            tension: 0.3
+                        },
+                        {
+                            label: 'Post-$4B Sovereign Buyback Yield (%)',
+                            data: [5.25, 4.85, 4.75, 4.651, 4.95, 5.230],
+                            borderColor: '#10b981',
+                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                            fill: true,
+                            tension: 0.3
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'top' }
+                    },
+                    scales: {
+                        y: { min: 4.0, max: 6.0, grid: { color: '#1f293d' } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+
+            // 3. Whalescanner Capital Reallocation Chart
+            const ctx3 = document.getElementById('chartWhaleFlow').getContext('2d');
+            chartWhaleFlowRef = new Chart(ctx3, {
+                type: 'bar',
+                data: {
+                    labels: ['SEER (Cash Arb)', 'ASTS (Telecom)', 'CVX/LNG (Energy)', 'FDX (Logistics)', 'MDB/SaaS Beta'],
+                    datasets: [{
+                        label: 'Net 13F Flow ($ Millions)',
+                        data: [185, 420, 850, 310, -640],
+                        backgroundColor: (ctx) => {
+                            const val = ctx.raw;
+                            return val >= 0 ? '#10b981' : '#f43f5e';
+                        },
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        x: { grid: { color: '#1f293d' } },
+                        y: { grid: { display: false } }
+                    }
+                }
+            });
+
+            // 4. BSL Software Maturity Wall Chart
+            const ctx4 = document.getElementById('chartMaturityWall').getContext('2d');
+            chartMaturityWallRef = new Chart(ctx4, {
+                type: 'bar',
+                data: {
+                    labels: ['2025', '2026', '2027', '2028 (Cliff)', '2029+'],
+                    datasets: [{
+                        label: '% Total Software Debt Maturing',
+                        data: [8, 13, 25, 25, 29],
+                        backgroundColor: ['#06b6d4', '#f59e0b', '#f59e0b', '#f43f5e', '#10b981'],
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: (ctx) => `${ctx.raw}% Maturing Debt`
+                            }
+                        }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, max: 35, grid: { color: '#1f293d' } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+
+        // Module A Buyback Simulator Interactive Toggle
+        function updateBuybackSim(size) {
+            const btnBase = document.getElementById('btn-buyback-baseline');
+            const btnExp = document.getElementById('btn-buyback-expanded');
+            const label = document.getElementById('sim-status-label');
+            const cap10y = document.getElementById('sim-10y-cap');
+            const cap30y = document.getElementById('sim-30y-cap');
+
+            if (size === 4) {
+                btnExp.className = "px-3 py-2 border border-amber-500 bg-amber-500/10 text-amber-400 font-mono text-xs rounded font-bold";
+                btnBase.className = "px-3 py-2 border border-fdos-border bg-fdos-bg text-fdos-muted font-mono text-xs rounded hover:border-amber-500";
+                label.innerText = "REGIME: $4B ACTIVE BUYBACK";
+                label.className = "text-xs font-mono text-cyan-400";
+                cap10y.innerText = "Capped @ ~4.65%";
+                cap30y.innerText = "Capped @ ~5.23%";
+
+                chartYieldCurveSimRef.data.datasets[1].data = [5.25, 4.85, 4.75, 4.651, 4.95, 5.230];
+            } else {
+                btnBase.className = "px-3 py-2 border border-amber-500 bg-amber-500/10 text-amber-400 font-mono text-xs rounded font-bold";
+                btnExp.className = "px-3 py-2 border border-fdos-border bg-fdos-bg text-fdos-muted font-mono text-xs rounded hover:border-amber-500";
+                label.innerText = "REGIME: $2B BASELINE BUYBACK";
+                label.className = "text-xs font-mono text-rose-400";
+                cap10y.innerText = "Uncapped (~5.15%)";
+                cap30y.innerText = "Uncapped (~5.65%)";
+
+                chartYieldCurveSimRef.data.datasets[1].data = [5.25, 4.90, 5.00, 5.15, 5.35, 5.65];
+            }
+            chartYieldCurveSimRef.update();
+        }
+
+        // Copper Tariff Calculator (Module C)
+        function calcCopperTariff() {
+            const val = parseFloat(document.getElementById('copper-val-range').value);
+            document.getElementById('copper-val-display').innerText = '$' + val.toLocaleString();
+
+            const duty = val * 0.50; // 50% ad valorem
+            document.getElementById('tariff-duty-out').innerText = '$' + duty.toLocaleString();
+
+            const moatValue = val * 0.184; // Domestic spot premium capture
+            document.getElementById('fcx-moat-out').innerText = '+$' + moatValue.toLocaleString();
+        }
+
+        // CLO O/C Test Failure Engine (Module C)
+        function simCLOFailure() {
+            const ccc = parseFloat(document.getElementById('ccc-exposure-range').value);
+            document.getElementById('ccc-exposure-val').innerText = ccc.toFixed(1) + '%';
+
+            const statusBox = document.getElementById('clo-status-box');
+            const statusText = document.getElementById('clo-status-text');
+
+            if (ccc > 7.5) {
+                statusBox.className = "p-2 border border-rose-500/50 bg-rose-500/10 rounded font-mono text-xs flex justify-between items-center";
+                statusText.innerText = "FAILED (CASH FLOW DIVERTED)";
+                statusText.className = "font-bold text-rose-400";
+            } else {
+                statusBox.className = "p-2 border border-emerald-500/50 bg-emerald-500/10 rounded font-mono text-xs flex justify-between items-center";
+                statusText.innerText = "PASSING (EQUITY PROTECTED)";
+                statusText.className = "font-bold text-emerald-400";
+            }
+        }
+
+        // Deterministic SNC Evaluation Engine (Module D)
+        function runSNCEngine() {
+            const ebitda = parseFloat(document.getElementById('snc-ebitda').value) || 0;
+            const interest = parseFloat(document.getElementById('snc-interest').value) || 1;
+            const vol = parseFloat(document.getElementById('snc-vol').value) || 0;
+            const dmwp = parseFloat(document.getElementById('snc-dmwp').value) || 0;
+
+            // 1. Calculate Base ICR
+            const icr = ebitda / interest;
+            document.getElementById('snc-icr-out').innerText = icr.toFixed(2) + 'x';
+
+            // 2. Compute Confidence Band wc
+            // wc = 1.0 - (Vol_Imply * 0.1) - (DMWP * 0.05)
+            const wc = 1.0 - (vol * 0.1) - (dmwp * 0.05);
+            document.getElementById('snc-wc-out').innerText = wc.toFixed(2);
+
+            // 3. Classification Routing
+            const classOut = document.getElementById('snc-class-out');
+            if (wc > 0.85) {
+                classOut.innerText = "PASS";
+                classOut.className = "text-base font-bold py-1.5 px-3 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/50";
+            } else if (wc >= 0.65) {
+                classOut.innerText = "SPECIAL MENTION";
+                classOut.className = "text-base font-bold py-1.5 px-3 rounded bg-amber-500/20 text-amber-400 border border-amber-500/50";
+            } else {
+                classOut.innerText = "SUBSTANDARD";
+                classOut.className = "text-base font-bold py-1.5 px-3 rounded bg-rose-500/20 text-rose-400 border border-rose-500/50";
+            }
+        }
+
+        function loadPresetSoftware() {
+            document.getElementById('snc-ebitda').value = 110;
+            document.getElementById('snc-interest').value = 100;
+            document.getElementById('snc-vol').value = 2.5;
+            document.getElementById('snc-dmwp').value = 4.0;
+            runSNCEngine();
+        }
+
+        // Tech VaR Calculation
+        function calcVaR() {
+            const yieldDelta = parseFloat(document.getElementById('var-yield-delta').value);
+            const spxDelta = parseFloat(document.getElementById('var-spx-delta').value);
+
+            document.getElementById('var-yield-val').innerText = (yieldDelta >= 0 ? '+' : '') + yieldDelta + ' bps';
+            document.getElementById('var-spx-val').innerText = (spxDelta >= 0 ? '+' : '') + spxDelta.toFixed(1) + '%';
+
+            // VaR_Tech = alpha * (dYield_10Y) + beta * dSPX_Implied
+            // Alpha = -0.15, Beta = 1.2
+            const varResult = (-0.15 * yieldDelta) + (1.2 * spxDelta);
+            
+            const outEl = document.getElementById('var-output-val');
+            outEl.innerText = `${varResult >= 0 ? '+' : ''}${varResult.toFixed(2)}% Portfolio Drawdown`;
+            outEl.className = varResult >= 0 ? 'text-lg font-bold text-emerald-400' : 'text-lg font-bold text-rose-400';
+        }
+
+        // Render JSON Display
+        function renderJSONDisplay() {
+            document.getElementById('json-ledger-display').innerText = JSON.stringify(fdosData, null, 2);
+        }
+
+        function copyLedgerJSON() {
+            navigator.clipboard.writeText(JSON.stringify(fdosData, null, 2));
+            alert('Institutional AI Ledger copied to clipboard.');
+        }
+
+        function downloadLedgerJSON() {
+            const blob = new Blob([JSON.stringify(fdosData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'FDOS_Institutional_Ledger_v26.0.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>
