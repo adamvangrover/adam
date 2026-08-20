@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adam OS - Core Services</title>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        body {
+            background-color: var(--adam-bg);
+            color: var(--text-primary);
+            font-family: 'JetBrains Mono', monospace;
+            padding: 20px;
+        }
+        .header {
+            border-bottom: 1px solid var(--adam-primary);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: var(--adam-primary);
+            text-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
+        }
+        .agent-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .agent-card {
+            border: 1px solid #333;
+            background: rgba(0, 243, 255, 0.05);
+            padding: 15px;
+            border-radius: 4px;
+        }
+        .agent-card h3 {
+            color: var(--adam-accent);
+            margin-top: 0;
+            border-bottom: 1px dashed #333;
+            padding-bottom: 5px;
+        }
+        .nav-link {
+            display: inline-block;
+            margin-top: 20px;
+            color: var(--adam-primary);
+            text-decoration: none;
+            border: 1px solid var(--adam-primary);
+            padding: 5px 10px;
+        }
+        .nav-link:hover {
+            background-color: var(--adam-primary);
+            color: #000;
+        }
+    </style>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="header">
+            <img src="../.github/images/logo-light.svg" alt="ADAM OS Logo" style="height: 50px;"/>
+            <div class="nav-links-global">
+                <a href="../index.html">FDOS Desktop</a>
+                <a href="../adam-governance/index.html">Governance Kernel</a>
+                <a href="../../policy_center.html">Policy Center</a>
+            </div>
+        <h1>[ADAM OS] :: CORE FOUNDATION</h1>
+        <p>System Scaffolding, REST Endpoints, & Swarm Orchestration Status</p>
+    </div>
+
+    <div style='background: #0d0f17; border: 1px solid #00f0ff; padding: 15px; margin-bottom: 20px; font-size: 0.8rem;'><strong style='color:#00f0ff;'>LIVE SYSTEM STATE:</strong><br><span style='color:#888;'>Architecture: AFOS vNext PDIL Gatekeeper Active</span><br><span style='color:#888;'>Auth Boundary: CapabilityEngine Enforcing</span><br><span style='color:#888;'>Memory Bus: O(1) Dictionary Index Enabled</span></div>
+    <h2>ACTIVE AGENT SWARM</h2>
+    <div class="agent-grid" id="agent-grid">
+        <!-- Agents will be hydrated here -->
+    </div>
+
+    <a href="../index.html" class="nav-link" style="display: inline-block; color: #00f0ff; border: 1px solid #00f0ff; padding: 5px 10px; margin-top: 20px; text-decoration: none;">&lt;&lt; RETURN TO FDOS DESKTOP</a>
+
+    <script>
+        // Simulated hydration script based on AGENTS.md data
+        const agents = [
+    {
+        "name": "Architect Agent (Jules)",
+        "domain": "Repository architecture, systemic code refactoring, daily protocol workflow runs, and deterministic execution optimization.",
+        "rules": "Manage automated tasks and repository scaffolding. Maintain strict isolation between UI rendering and backend async loops. Never hallucinate API implementations. Defer domain math to the Policy Engine."
+    },
+    {
+        "name": "Underwriting Agent",
+        "domain": "Credit Underwriting (TMT & Leveraged Finance). Analyzes credit metrics, financial statements, and builds capital structures.",
+        "rules": "Probability of Default (PD) is structurally implied by the credit rating\u2014do not calculate redundant PD metrics. Utilize just-in-time (JIT) semantic search over trailing 12-month (TTM) SEC filings via Qdrant."
+    },
+    {
+        "name": "Surveillance Agent",
+        "domain": "Portfolio Monitoring and continuous threat telemetry for distress signals.",
+        "rules": "Track asset deal premium volatility skews rather than broad proxy timelines. Trigger temporal alerts directly to the Orchestrator on material drift. Utilize episodic memory retrieval of prior quarter earnings call transcripts."
+    },
+    {
+        "name": "Sentinel Agent",
+        "domain": "Security, threat detection, and W3C PROV-O compliance audits.",
+        "rules": "Enforce 0.85 minimum conviction score across the system. Terminate immediately if a sub-agent execution lacks a `jsonLogic_version` provenance header or hallucinates specific corporate entity inputs. Ensure data is real and actionable."
+    },
+    {
+        "name": "Nexus Agent (System Orchestrator)",
+        "domain": "Workflow runtime orchestration, parallel task dispatch, and Temporal state management.",
+        "rules": "Use just-in-time (JIT) memory fetching via Qdrant/Memory layers to isolate state. Never pack the context window."
+    }
+];
+
+        const grid = document.getElementById('agent-grid');
+        agents.forEach(agent => {
+            const card = document.createElement('div');
+            card.className = 'agent-card';
+            card.innerHTML = `
+                <h3>${agent.name}</h3>
+                <p><strong>Domain Context:</strong> ${agent.domain}</p>
+                <p style="font-size: 0.8em; color: #aaa;"><strong>Procedural Rules:</strong> ${agent.rules}</p>
+            `;
+            grid.appendChild(card);
+        });
+    </script>
+</body>
+</html>

@@ -1,22 +1,27 @@
 {
-  "domain": "Adam Enterprise Solutions",
+  "domain": "enterprise",
+  "description": "Adam Enterprise Solutions",
   "focus": "Institutional credit parsing and aggressive market intelligence",
-  "dependencies": {
-    "core_kernel": "../../core_kernel"
+  "kernel_dependency": {
+    "path": "../../core_kernel",
+    "version": "latest",
+    "required_modules": [
+      "agnostic_math",
+      "universal_data_handlers",
+      "orchestration_framework"
+    ]
   },
-  "modules": [
-    "Market Mayhem",
-    "Fortress",
-    "Hunt"
-  ],
-  "mandate": "Aggressive growth mandate for market divergence",
-  "data_pipelines": [
-    "SEC EDGAR regulatory filings",
-    "Debt covenants"
-  ],
-  "interfaces": [
-    "HTML",
-    "Tailwind CSS",
-    "Vanilla JS"
-  ]
+  "modules": {
+    "market_intelligence": {
+      "mandate": "aggressive_growth",
+      "components": ["Market Mayhem", "Fortress & Hunt"]
+    },
+    "data_pipelines": {
+      "sources": ["SEC EDGAR", "debt covenants"]
+    },
+    "interfaces": {
+      "type": "multi-tabbed terminal",
+      "stack": ["HTML", "Tailwind CSS", "vanilla JS"]
+    }
+  }
 }

@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Market Mayhem - Daily Hub</title>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        body {
+            background-color: var(--mayhem-bg);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            padding: 0;
+        }
+        .header {
+            background: linear-gradient(135deg, #000, #330000);
+            border-bottom: 3px solid var(--mayhem-primary);
+            padding: 40px 20px;
+            text-align: center;
+        }
+        h1 {
+            color: var(--mayhem-primary);
+            font-size: 3rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin: 0;
+            text-shadow: 2px 2px 0px rgba(0,0,0,0.5);
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #444;
+            padding-bottom: 10px;
+        }
+        .tab {
+            padding: 10px 20px;
+            background: #222;
+            cursor: pointer;
+            border-radius: 4px 4px 0 0;
+            font-weight: bold;
+        }
+        .tab.active {
+            background: var(--mayhem-primary);
+            color: #fff;
+        }
+        .news-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .news-item {
+            background: #111;
+            border-left: 4px solid var(--mayhem-accent);
+            padding: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+        .news-date {
+            color: var(--mayhem-accent);
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        .news-title {
+            font-size: 1.2rem;
+            margin: 10px 0;
+            color: #fff;
+        }
+        .nav-link {
+            display: inline-block;
+            margin-top: 30px;
+            color: #fff;
+            text-decoration: none;
+            background: #333;
+            padding: 10px 15px;
+            border-radius: 4px;
+        }
+        .nav-link:hover {
+            background: var(--mayhem-primary);
+        }
+        /* Search bar */
+        .search-container {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        #search-input {
+            flex-grow: 1;
+            padding: 10px;
+            background: #222;
+            border: 1px solid #444;
+            color: #fff;
+            border-radius: 4px;
+        }
+    </style>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="header" style="background-image: url('../../market_data_after.png'); background-size: cover; background-blend-mode: multiply;">
+            <div class="nav-links-global">
+                <a href="../index.html">FDOS Desktop</a>
+                <a href="../adam-research/index.html">Research Hub</a>
+            </div>
+        <h1>MARKET MAYHEM</h1>
+        <p style="color: var(--mayhem-accent); font-weight: bold;">Dynamic Market Intelligence & Retail Strategy Hub</p>
+    </div>
+
+    <div class="container">
+        <div class="search-container">
+            <input type="text" id="search-input" placeholder="Search newsletters and market updates..." oninput="filterNews()">
+        </div>
+
+        <div style='margin-bottom: 20px; padding: 15px; background: rgba(255, 0, 122, 0.1); border-left: 3px solid #ff007a;'><h3 style='color:#ff007a; margin-top:0; font-size: 1rem;'>Active Crisis Simulation</h3><p style='font-size: 0.85rem; color:#ccc; margin:0;'><strong>Scenario Payload:</strong> 2022_INFLATION_SHOCK</p><p style='font-size: 0.8rem; color:#888; margin-top:5px;'>Tracking momentum degradation across BSL software issuers and energy inflation vectors.</p></div>
+        <div class="tabs">
+            <div class="tab active">Daily Newsletters</div>
+            <div class="tab">Historic Datastreams</div>
+        </div>
+
+        <div class="news-grid" id="news-grid">
+            <!-- Newsletters hydrated here -->
+        </div>
+
+        <a href="../index.html" class="nav-link" style="display: inline-block; color: #ff007a; border: 1px solid #ff007a; padding: 5px 10px; margin-top: 20px; text-decoration: none;">&lt;&lt; RETURN TO FDOS DESKTOP</a>
+        <a href="../adam-research/index.html" class="nav-link" style="margin-left: 10px; background: var(--research-primary);">View Historic Performance in Adam Research &gt;&gt;</a>
+    </div>
+
+    <script>
+        const newsData = [
+    {
+        "date": "Live",
+        "title": "Newsletter Market Mayhem Apr 04 2025",
+        "file": "../../exports/market_mayhem/newsletter_market_mayhem_apr_04_2025.html"
+    },
+    {
+        "date": "Live",
+        "title": "Newsletter Market Mayhem Nov",
+        "file": "../../exports/market_mayhem/newsletter_market_mayhem_nov.html"
+    },
+    {
+        "date": "Live",
+        "title": "Newsletter Market Mayhem Mar 2025",
+        "file": "../../exports/market_mayhem/newsletter_market_mayhem_mar_2025.html"
+    },
+    {
+        "date": "Live",
+        "title": "Newsletter Market Mayhem Jun 2022",
+        "file": "../../exports/market_mayhem/newsletter_market_mayhem_jun_2022.html"
+    },
+    {
+        "date": "Live",
+        "title": "Market Mayhem Rebuild",
+        "file": "../../exports/market_mayhem/market_mayhem_rebuild.html"
+    },
+    {
+        "date": "Live",
+        "title": "Newsletter Market Mayhem Apr 2025",
+        "file": "../../exports/market_mayhem/newsletter_market_mayhem_apr_2025.html"
+    },
+    {
+        "date": "Live",
+        "title": "Newsletter Market Mayhem Jun 2025",
+        "file": "../../exports/market_mayhem/newsletter_market_mayhem_jun_2025.html"
+    },
+    {
+        "date": "Live",
+        "title": "Newsletter Market Mayhem Feb 13 2026",
+        "file": "../../exports/market_mayhem/newsletter_market_mayhem_feb_13_2026.html"
+    },
+    {
+        "date": "Live",
+        "title": "Newsletter Market Mayhem May 2025",
+        "file": "../../exports/market_mayhem/newsletter_market_mayhem_may_2025.html"
+    },
+    {
+        "date": "Live",
+        "title": "Market Mayhem Archive V235",
+        "file": "../../exports/market_mayhem/market_mayhem_archive_v235.html"
+    },
+    {
+        "date": "Live",
+        "title": "1987-10-23 Market Mayhem",
+        "file": "../../exports/market_mayhem/1987-10-23_Market_Mayhem.html"
+    },
+    {
+        "date": "Live",
+        "title": "2020-03-20 Market Mayhem",
+        "file": "../../exports/market_mayhem/2020-03-20_Market_Mayhem.html"
+    },
+    {
+        "date": "Live",
+        "title": "Newsletter Market Mayhem Mar 2026",
+        "file": "../../exports/market_mayhem/newsletter_market_mayhem_mar_2026.html"
+    },
+    {
+        "date": "Live",
+        "title": "Newsletter Market Mayhem Sep 2025",
+        "file": "../../exports/market_mayhem/newsletter_market_mayhem_sep_2025.html"
+    },
+    {
+        "date": "Live",
+        "title": "Newsletter Market Mayhem May 02 2025",
+        "file": "../../exports/market_mayhem/newsletter_market_mayhem_may_02_2025.html"
+    },
+    {
+        "date": "Live",
+        "title": "Newsletter Market Mayhem Oct 31 2025",
+        "file": "../../exports/market_mayhem/newsletter_market_mayhem_oct_31_2025.html"
+    },
+    {
+        "date": "Live",
+        "title": "Newsletter Market Mayhem Feb 02 2026",
+        "file": "../../exports/market_mayhem/newsletter_market_mayhem_feb_02_2026.html"
+    },
+    {
+        "date": "Live",
+        "title": "Newsletter Market Mayhem Jan 2025",
+        "file": "../../exports/market_mayhem/newsletter_market_mayhem_jan_2025.html"
+    },
+    {
+        "date": "Live",
+        "title": "Newsletter Market Mayhem Feb 2025",
+        "file": "../../exports/market_mayhem/newsletter_market_mayhem_feb_2025.html"
+    },
+    {
+        "date": "Live",
+        "title": "Newsletter Market Mayhem Jan 31 2026",
+        "file": "../../exports/market_mayhem/newsletter_market_mayhem_jan_31_2026.html"
+    },
+    {
+        "date": "Live",
+        "title": "Newsletter Weekly Sep 21 2025",
+        "file": "../../exports/market_mayhem/newsletter_weekly_sep_21_2025.html"
+    },
+    {
+        "date": "Live",
+        "title": "Newsletter Market Mayhem Feb 06 2026",
+        "file": "../../exports/market_mayhem/newsletter_market_mayhem_feb_06_2026.html"
+    },
+    {
+        "date": "Live",
+        "title": "Newsletter Market Mayhem Mar 15 2026",
+        "file": "../../exports/market_mayhem/newsletter_market_mayhem_mar_15_2026.html"
+    },
+    {
+        "date": "Live",
+        "title": "Newsletter Market Mayhem Mar 2020",
+        "file": "../../exports/market_mayhem/newsletter_market_mayhem_mar_2020.html"
+    },
+    {
+        "date": "Live",
+        "title": "Newsletter Market Mayhem Feb 14 2026",
+        "file": "../../exports/market_mayhem/newsletter_market_mayhem_feb_14_2026.html"
+    },
+    {
+        "date": "Live",
+        "title": "Newsletter Market Mayhem",
+        "file": "../../exports/market_mayhem/newsletter_market_mayhem.html"
+    },
+    {
+        "date": "Live",
+        "title": "Newsletter Market Mayhem Jul 2025",
+        "file": "../../exports/market_mayhem/newsletter_market_mayhem_jul_2025.html"
+    },
+    {
+        "date": "Live",
+        "title": "Newsletter Market Mayhem Sep 19 2025",
+        "file": "../../exports/market_mayhem/newsletter_market_mayhem_sep_19_2025.html"
+    },
+    {
+        "date": "Live",
+        "title": "Newsletter Market Mayhem Nov 13 2025",
+        "file": "../../exports/market_mayhem/newsletter_market_mayhem_nov_13_2025.html"
+    },
+    {
+        "date": "Live",
+        "title": "Newsletter Market Mayhem Feb 09 2026",
+        "file": "../../exports/market_mayhem/newsletter_market_mayhem_feb_09_2026.html"
+    }
+];
+
+        function renderNews(data) {
+            const grid = document.getElementById('news-grid');
+            grid.innerHTML = '';
+            data.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'news-item';
+                div.innerHTML = `
+                    <div class="news-date">${item.date}</div>
+                    <div class="news-title">${item.title}</div>
+                    <a href="${item.file}" style="color: var(--mayhem-primary); text-decoration: none; font-size: 0.9rem;">Read Report &rarr;</a>
+                `;
+                grid.appendChild(div);
+            });
+        }
+
+        function filterNews() {
+            const query = document.getElementById('search-input').value.toLowerCase();
+            const filtered = newsData.filter(item =>
+                item.title.toLowerCase().includes(query) ||
+                item.date.toLowerCase().includes(query)
+            );
+            renderNews(filtered);
+        }
+
+        // Initial render
+        renderNews(newsData);
+    </script>
+</body>
+</html>

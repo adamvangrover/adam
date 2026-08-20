@@ -1,22 +1,24 @@
 {
-  "domain": "Adam Governance",
+  "domain": "governance",
+  "description": "Adam Governance",
   "focus": "Civic data security and deterministic validation",
-  "dependencies": {
-    "core_kernel": "../../core_kernel"
+  "kernel_dependency": {
+    "path": "../../core_kernel",
+    "version": "latest",
+    "required_modules": [
+      "agnostic_math",
+      "universal_data_handlers",
+      "orchestration_framework"
+    ]
   },
-  "system_integration": {
-    "governance_module": "../../core/governance",
-    "provenance_module": "../../core/provenance"
-  },
-  "guardrails": [
-    "jsonLogic strict validation"
-  ],
-  "telemetry": [
-    "W3C PROV-O compliance standards",
-    "GraphRAG architectures"
-  ],
-  "objectives": [
-    "Complete auditability",
-    "Prevent model hallucination"
-  ]
+  "modules": {
+    "validation_guardrails": {
+      "framework": "jsonLogic"
+    },
+    "telemetry_pipelines": {
+      "standards": ["W3C PROV-O"],
+      "architectures": ["GraphRAG"],
+      "goals": ["complete auditability", "prevent model hallucination"]
+    }
+  }
 }
