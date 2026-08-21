@@ -47,5 +47,11 @@ The "Odyssey" component serves as the search and response engine. It uses the AV
 *   **Federated Quantum Learning:** Distributing the world model training across secure enclaves to preserve proprietary credit data.
 *   **Real-time Adam Tuning:** continuously updating the annealing schedules based on live market tick data.
 
+### 6. Integration with Swarm Environment
+
+As established in ADR-0003, the AFQWM is directly integrated into the Adam OS long-running Swarm Environment. This operational environment deeply utilizes the AFQWM for continuous probabilistic evaluation:
+*   **Confidence Bands:** The world model's probabilistic density functions provide the statistical foundation for the confidence bands calculated across the swarm's simulations.
+*   **Tail Scenario Generation:** The state-space exploration capabilities of the AFQWM (identifying excited, high-energy states) act as the catalyst for the system to populate and evaluate predictive tail scenarios (ADR-0005) by analyzing complex node connection likelihoods within the Universal Knowledge Graph.
+
 ---
 *Confidential - Internal Use Only*
