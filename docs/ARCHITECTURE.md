@@ -68,3 +68,13 @@ graph TD
 The system supports dynamic **Environment Rotation**, allowing seamless switching between execution engines (e.g., `LiveMockEngine` vs. `RealTradingEngine`) via configuration. This enables:
 *   **Blue/Green Deployment**: Testing new models in simulation before live rollout.
 *   **Chaos Engineering**: Injecting fault-tolerant engines to test system resilience.
+
+## 5. Swarm Environment Layer
+To support long-running autonomous operations, the architecture includes a modular, portable, and async adversarial-aware swarm environment. As detailed in ADR-0003, this environment leverages fine-tuned in-context learning, deeply managed execution loops, and comprehensive harness telemetry.
+
+The environment utilizes a multidimensional 3x5x7 tiered architecture:
+*   **3-Layer Execution:** Data, Reasoning, Execution.
+*   **5-Layer Governance:** Governance, Models, Agents, Environments, Telemetry.
+*   **7-Layer Integration:** Hardware, OS, Kernel, Swarm, App, Interface, User.
+
+Key capabilities include continuous computation of confidence bands around simulated world model probabilities, active tracking of node connection likelihoods across the semantic and execution graphs, and the population of predictive tail scenarios to forecast high-impact, rare events.
