@@ -3,62 +3,112 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADAM Core OS</title>
+    <title>ADAM Core OS | Neuro-Symbolic Architecture</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="stylesheet" href="../css/theme.css">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+
+    <!-- Microdata -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "ADAM Core OS",
+      "applicationCategory": "System Kernel",
+      "description": "Neuro-symbolic orchestration kernel enforcing W3C PROV-O compliance."
+    }
+    </script>
 </head>
-<body class="bg-slate-950 text-slate-200 antialiased min-h-screen flex flex-col">
+<body class="bg-[#090d16] text-slate-200 antialiased min-h-screen flex flex-col">
 
     <div id="global-header"></div>
 
+    <!-- Narrative Hero -->
+    <div class="relative w-full py-20 border-b border-cyan-900/50 bg-black overflow-hidden flex items-center justify-center">
+        <div class="absolute inset-0 opacity-20" style="background-image: radial-gradient(circle at center, #06b6d4 0%, transparent 70%);"></div>
+        <div class="relative z-10 text-center p-8 max-w-3xl mx-4">
+            <h1 class="text-4xl md:text-5xl font-bold font-mono tracking-tight mb-4 text-cyan-400">
+                ADAM Core OS
+            </h1>
+            <p class="text-xl text-slate-300 font-light mb-6">
+                The deterministic orchestration kernel. Bridging the probabilistic neural net outputs with rigid, W3C PROV-O compliant logic gates.
+            </p>
+            <a href="https://github.com/adamvangrover/adam/tree/main/src/core" target="_blank" class="inline-flex items-center gap-2 px-6 py-2 bg-cyan-900/40 border border-cyan-500/50 hover:bg-cyan-800/60 rounded font-mono text-cyan-50 transition-all">
+                <i data-lucide="github" class="w-4 h-4"></i> View Source
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
     <main class="flex-grow container mx-auto px-6 py-12">
-        <div class="mb-12 flex flex-col md:flex-row gap-8 items-center border-b border-slate-800 pb-12">
-            <div class="md:w-1/2">
-                <div class="text-cyan-400 mb-4 bg-cyan-900/20 inline-block p-3 rounded-xl border border-cyan-500/30">
-                    <i data-lucide="cpu" class="w-12 h-12"></i>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
+            <!-- Schema Diagram & Graph -->
+            <div class="glass-panel p-6 border-cyan-900/50">
+                <h3 class="text-xl font-bold mb-4 font-mono text-cyan-400 flex items-center gap-2">
+                    <i data-lucide="network" class="w-5 h-5"></i> FIBO Topology Graph
+                </h3>
+                <div class="bg-black/50 rounded-lg p-4 h-64 flex items-center justify-center border border-slate-800 relative">
+                    <!-- Interactive Graph Placeholder -->
+                    <div class="text-center font-mono text-xs text-slate-500">
+                        <i data-lucide="share-2" class="w-12 h-12 mx-auto mb-2 opacity-50"></i>
+                        <p>Interactive Knowledge Graph View</p>
+                        <p class="text-cyan-500 mt-2">Status: Synced with Ontology</p>
+                    </div>
                 </div>
-                <h1 class="text-4xl md:text-5xl font-bold font-mono text-cyan-50 mb-4">ADAM Core</h1>
-                <p class="text-xl text-slate-400 font-light leading-relaxed">
-                    The deterministic neuro-symbolic engine powering the entire ecosystem.
-                    Enforcing zero-trust workflow orchestration and W3C PROV-O compliance.
-                </p>
             </div>
-            <div class="md:w-1/2 glass-panel p-6 w-full">
-                <h3 class="font-mono text-sm text-cyan-400 mb-4 uppercase tracking-wider">Architecture Topology</h3>
-                <div class="bg-black/50 rounded p-4 font-mono text-xs text-slate-300 leading-loose border border-slate-800">
-                    <div><span class="text-emerald-400">Governance Plane</span> → [Gatekeeper validation]</div>
-                    <div class="pl-4">↳ <span class="text-amber-400">Schema Registry</span> (FIBO / strict JSON)</div>
-                    <div><span class="text-cyan-400">Execution Kernel</span> → [Rust Deterministic Core]</div>
-                    <div class="pl-4">↳ <span class="text-purple-400">NATS Event Spine</span> (Pub/Sub)</div>
-                    <div><span class="text-rose-400">Cognitive Layer</span> → [LLM Swarm]</div>
+
+            <!-- Capabilities & State Machine -->
+            <div>
+                <h3 class="text-2xl font-bold mb-6">System Architecture</h3>
+                <div class="space-y-4">
+                    <div class="glass-panel p-4 border-slate-700/50 flex gap-4 items-start">
+                        <div class="p-2 bg-emerald-900/20 text-emerald-400 rounded">
+                            <i data-lucide="check-circle" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-slate-200">W3C PROV-O Compliance</h4>
+                            <p class="text-sm text-slate-400 mt-1">Every state transition logs strict cryptographic lineage via the ProvenanceGatekeeper, preventing hallucinated variables from entering the execution context.</p>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel p-4 border-slate-700/50 flex gap-4 items-start">
+                        <div class="p-2 bg-amber-900/20 text-amber-400 rounded">
+                            <i data-lucide="git-branch" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-slate-200">Neuro-Symbolic Routing</h4>
+                            <p class="text-sm text-slate-400 mt-1">Unstructured data is processed by System 1 models, outputting Pydantic schemas that trigger deterministic System 2 directed acyclic graphs (DAGs).</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="glass-panel p-6 border-cyan-900/50">
-                <i data-lucide="shield-check" class="w-8 h-8 text-cyan-400 mb-4"></i>
-                <h3 class="text-lg font-bold mb-2">Deterministic Governance</h3>
-                <p class="text-sm text-slate-400">All unstructured LLM outputs are routed through strict, immutable jsonLogic schemas to prevent hallucination in critical paths.</p>
-            </div>
-            <div class="glass-panel p-6 border-cyan-900/50">
-                <i data-lucide="git-merge" class="w-8 h-8 text-cyan-400 mb-4"></i>
-                <h3 class="text-lg font-bold mb-2">W3C PROV-O Lineage</h3>
-                <p class="text-sm text-slate-400">Every algorithmic decision generates an immutable cryptographic graph trace, ensuring full auditability.</p>
-            </div>
-            <div class="glass-panel p-6 border-cyan-900/50">
-                <i data-lucide="network" class="w-8 h-8 text-cyan-400 mb-4"></i>
-                <h3 class="text-lg font-bold mb-2">Neuro-Symbolic Routing</h3>
-                <p class="text-sm text-slate-400">System 1 (fast neural perception) and System 2 (slow symbolic logic) interact seamlessly via the event spine.</p>
+        <!-- Workflow Viewer -->
+        <div class="glass-panel p-6 border-slate-800">
+            <h3 class="text-xl font-bold mb-4 font-mono text-slate-300">State Machine Workflow Viewer</h3>
+            <div class="flex flex-col md:flex-row gap-4 justify-between items-center bg-black/40 p-6 rounded border border-slate-800 font-mono text-xs">
+                <div class="text-center p-4 bg-slate-900 rounded border border-slate-700 w-full">
+                    <span class="text-cyan-400 block mb-1">INGESTION</span>
+                    <span class="text-slate-500">Unstructured Text</span>
+                </div>
+                <i data-lucide="arrow-right" class="text-slate-600 hidden md:block"></i>
+                <div class="text-center p-4 bg-slate-900 rounded border border-cyan-800 w-full animate-pulse-glow">
+                    <span class="text-cyan-400 block mb-1">GATEKEEPER</span>
+                    <span class="text-slate-500">Pydantic Validation</span>
+                </div>
+                <i data-lucide="arrow-right" class="text-slate-600 hidden md:block"></i>
+                <div class="text-center p-4 bg-slate-900 rounded border border-slate-700 w-full">
+                    <span class="text-cyan-400 block mb-1">EXECUTION</span>
+                    <span class="text-slate-500">Symbolic Logic (CQRS)</span>
+                </div>
             </div>
         </div>
+
     </main>
 
-    <script>lucide.createIcons();</script>
+    <!-- Scripts -->
     <script src="../js/app.js"></script>
 </body>
 </html>

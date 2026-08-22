@@ -1,120 +1,200 @@
-// Search, Filter, and Neuro-Symbolic Prompt Sandbox Logic
+// In-browser Search, Filter, and Neuro-Symbolic Prompt Sandbox
 
-const mockIndex = [
-    { id: 1, title: 'ADAM Architecture Whitepaper', brand: 'adam-core', tag: 'Agentic Systems', format: 'pdf', date: '2026-08-15', snippet: 'Defining the baseline for neuro-symbolic deterministic orchestration...' },
-    { id: 2, title: 'SpaceX S-1 Valuation', brand: 'market-mayhem', tag: 'Macro', format: 'json', date: '2026-10-01', snippet: 'Multi-Agent Simulation Report on Starlink revenue projections...' },
-    { id: 3, title: 'Pre-IPO Private Credit Facility', brand: 'fortress-hunt', tag: 'Private Credit', format: 'md', date: '2026-11-12', snippet: 'Hardware Collateral Memo detailing LTV ratios and downside protection...' },
-    { id: 4, title: 'Shared National Credit Guidelines', brand: 'fortress-hunt', tag: 'Macro', format: 'pdf', date: '2026-09-20', snippet: 'Corporate Debt Covenant Guidelines and regulatory impacts...' }
-];
+class QueryEngine {
+    constructor() {
+        this.artifacts = [];
+        this.filteredArtifacts = [];
+        this.activeFilters = {
+            brand: 'All',
+            tag: 'All'
+        };
+    }
 
-function initArchiveSearch() {
-    const searchInput = document.getElementById('archive-search');
-    const resultsContainer = document.getElementById('archive-results');
-    const filterSelects = document.querySelectorAll('.archive-filter');
+    initArchiveSearch() {
+        // Mock Pre-Hydrated Artifacts
+        this.artifacts = [
+            { id: 1, title: 'ADAM Architecture Whitepaper', brand: 'adam-core', tag: 'Agentic Systems', date: '2026-01-15', format: 'PDF/Markdown' },
+            { id: 2, title: 'Pre-IPO Private Credit Facility', brand: 'fortress-hunt', tag: 'Private Credit', date: '2026-02-10', format: 'JSON/Memo' },
+            { id: 3, title: 'SpaceX S-1 Valuation & Multi-Agent Simulation', brand: 'market-mayhem', tag: 'Macro', date: '2026-03-05', format: 'Interactive' },
+            { id: 4, title: 'Shared National Credit Guidelines', brand: 'fortress-hunt', tag: 'Credit Risk', date: '2025-11-20', format: 'Guidelines' },
+            { id: 5, title: 'Procedural Lore Generation Engine', brand: 'exiled-spark', tag: 'Game Dev', date: '2026-04-01', format: 'Schema' }
+        ];
 
-    if (!searchInput || !resultsContainer) return;
+        this.filteredArtifacts = [...this.artifacts];
+        this.renderArchiveList();
+        this.bindArchiveEvents();
+    }
 
-    const renderResults = (results) => {
-        if (results.length === 0) {
-            resultsContainer.innerHTML = '<div class="text-slate-400 p-8 text-center font-mono">No intelligence artifacts found matching criteria.</div>';
+    bindArchiveEvents() {
+        const searchInput = document.getElementById('archive-search');
+        if(searchInput) {
+            searchInput.addEventListener('input', (e) => this.handleSearch(e.target.value));
+        }
+
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const type = e.target.dataset.type; // brand or tag
+                const val = e.target.dataset.value;
+                this.activeFilters[type] = val;
+
+                // update active state UI
+                document.querySelectorAll(`.filter-btn[data-type="${type}"]`).forEach(b => b.classList.remove('bg-cyan-900/50', 'text-cyan-400'));
+                e.target.classList.add('bg-cyan-900/50', 'text-cyan-400');
+
+                this.applyFilters();
+            });
+        });
+    }
+
+    handleSearch(query) {
+        query = query.toLowerCase();
+        this.filteredArtifacts = this.artifacts.filter(a =>
+            a.title.toLowerCase().includes(query) ||
+            a.tag.toLowerCase().includes(query)
+        );
+        this.applyFilters();
+    }
+
+    applyFilters() {
+        let results = [...this.artifacts];
+
+        const searchInput = document.getElementById('archive-search');
+        if(searchInput && searchInput.value) {
+            const q = searchInput.value.toLowerCase();
+            results = results.filter(a => a.title.toLowerCase().includes(q) || a.tag.toLowerCase().includes(q));
+        }
+
+        if(this.activeFilters.brand !== 'All') {
+            results = results.filter(a => a.brand === this.activeFilters.brand);
+        }
+
+        if(this.activeFilters.tag !== 'All') {
+            results = results.filter(a => a.tag === this.activeFilters.tag);
+        }
+
+        this.filteredArtifacts = results;
+        this.renderArchiveList();
+    }
+
+    renderArchiveList() {
+        const container = document.getElementById('archive-results');
+        if(!container) return;
+
+        if(this.filteredArtifacts.length === 0) {
+            container.innerHTML = '<div class="p-8 text-center text-slate-500 font-mono">No artifacts found matching criteria.</div>';
             return;
         }
 
-        resultsContainer.innerHTML = results.map(item => `
-            <div class="glass-panel p-4 hover:border-cyan-500/50 transition-colors cursor-pointer flex justify-between items-start">
+        container.innerHTML = this.filteredArtifacts.map(a => `
+            <div class="glass-panel p-4 mb-4 flex justify-between items-center interactive-card border-slate-700/50" onclick="engine.loadDocument(${a.id})">
                 <div>
-                    <div class="flex items-center gap-2 mb-2">
-                        <span class="text-xs font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">${item.brand}</span>
-                        <span class="text-xs font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">${item.tag}</span>
+                    <h4 class="font-bold text-slate-200">${a.title}</h4>
+                    <div class="flex gap-3 mt-2 text-xs font-mono text-slate-400">
+                        <span class="px-2 py-0.5 bg-slate-800 rounded">${a.brand}</span>
+                        <span class="px-2 py-0.5 bg-slate-800 rounded text-cyan-400">${a.tag}</span>
+                        <span>${a.date}</span>
                     </div>
-                    <h3 class="text-lg font-semibold text-white mb-1">${item.title}</h3>
-                    <p class="text-sm text-slate-400">${item.snippet}</p>
                 </div>
-                <div class="flex flex-col items-end gap-2">
-                    <span class="text-xs font-mono text-slate-500">${item.date}</span>
-                    <span class="text-xs font-mono px-2 py-1 rounded bg-emerald-900/30 text-emerald-400 border border-emerald-800/50 uppercase">${item.format}</span>
+                <div class="text-slate-500">
+                    <i data-lucide="chevron-right" class="w-5 h-5"></i>
                 </div>
             </div>
         `).join('');
-    };
 
-    const executeSearch = () => {
-        const query = searchInput.value.toLowerCase();
-        let filters = {};
-        filterSelects.forEach(select => {
-            if (select.value !== 'all') {
-                filters[select.dataset.filterType] = select.value;
-            }
-        });
+        if (window.lucide) lucide.createIcons();
+    }
 
-        const filtered = mockIndex.filter(item => {
-            const matchesQuery = item.title.toLowerCase().includes(query) || item.snippet.toLowerCase().includes(query);
-            const matchesFilters = Object.keys(filters).every(key => item[key] === filters[key]);
-            return matchesQuery && matchesFilters;
-        });
+    loadDocument(id) {
+        const doc = this.artifacts.find(a => a.id === id);
+        const reader = document.getElementById('document-reader');
+        if(reader && doc) {
+            reader.innerHTML = `
+                <div class="p-6 border-b border-slate-800">
+                    <h2 class="text-2xl font-bold mb-2">${doc.title}</h2>
+                    <div class="flex gap-4 text-sm font-mono text-slate-400 mb-4">
+                        <span>${doc.date}</span>
+                        <span>|</span>
+                        <span>${doc.format}</span>
+                    </div>
+                    <button class="px-4 py-2 bg-emerald-900/40 text-emerald-400 text-sm font-mono rounded hover:bg-emerald-800/60 transition-colors">
+                        <i data-lucide="download" class="w-4 h-4 inline-block mr-1 mb-1"></i> Export Payload
+                    </button>
+                </div>
+                <div class="p-6 font-mono text-sm leading-relaxed text-slate-300">
+                    <p class="mb-4">Loading encrypted contents for ${doc.title}...</p>
+                    <div class="p-4 bg-slate-900/50 rounded border border-slate-800 mb-4 font-mono text-xs text-slate-400">
+                        // Simulated Content Extraction<br/>
+                        const artifact_metadata = {<br/>
+                        &nbsp;&nbsp;brand_origin: "${doc.brand}",<br/>
+                        &nbsp;&nbsp;classification: "${doc.tag}",<br/>
+                        &nbsp;&nbsp;compliance_status: "VERIFIED"<br/>
+                        };
+                    </div>
+                    <p>W3C PROV-O compliance trace established. Deterministic signatures valid.</p>
+                </div>
+            `;
+            if (window.lucide) lucide.createIcons();
+        }
+    }
 
-        renderResults(filtered);
-    };
+    // --- Sandbox Simulator Logic ---
+    initSandbox() {
+        const runBtn = document.getElementById('run-sim-btn');
+        if(runBtn) {
+            runBtn.addEventListener('click', () => this.runSimulation());
+        }
+    }
 
-    searchInput.addEventListener('input', executeSearch);
-    filterSelects.forEach(select => select.addEventListener('change', executeSearch));
+    runSimulation() {
+        const terminal = document.getElementById('sim-terminal-body');
+        const mode = document.querySelector('input[name="sim-mode"]:checked').value; // 'human' or 'machine'
 
-    // Initial render
-    renderResults(mockIndex);
-}
+        if(!terminal) return;
 
-// Sandbox Simulator Logic
-function initSandbox() {
-    const runBtn = document.getElementById('run-sim-btn');
-    const terminal = document.getElementById('sandbox-terminal');
-    const promptInput = document.getElementById('sandbox-prompt');
-
-    if (!runBtn || !terminal) return;
-
-    const appendLog = (msg, type = 'info') => {
-        const colors = {
-            info: 'text-slate-300',
-            success: 'text-emerald-400',
-            warn: 'text-amber-400',
-            error: 'text-rose-400',
-            system: 'text-cyan-400'
-        };
-        const el = document.createElement('div');
-        el.className = `font-mono text-xs mb-1 ${colors[type]}`;
-        const timeSpan = document.createElement('span');
-        timeSpan.className = 'opacity-50';
-        timeSpan.textContent = `[${new Date().toISOString().split('T')[1].slice(0,-1)}] `;
-        el.appendChild(timeSpan);
-        el.appendChild(document.createTextNode(msg));
-        terminal.appendChild(el);
-        terminal.scrollTop = terminal.scrollHeight;
-    };
-
-    runBtn.addEventListener('click', async () => {
         terminal.innerHTML = '';
-        const prompt = promptInput ? promptInput.value : 'Executing default payload...';
 
-        appendLog(`INITIALIZING NEURO-SYMBOLIC ORCHESTRATION`, 'system');
-        appendLog(`Payload: "${prompt}"`);
+        const steps = [
+            `[SYS] Initializing ${mode.toUpperCase()} query context...`,
+            `[GOV] Validating input against schema registry (FIBO taxonomy)...`,
+            `[GOV] Schema strictness check passed.`,
+            `[SYS] Dispatching to Neuro-Symbolic router...`,
+            `[SYS] Symbolic Rule Check: SUCCESS (Deterministic constraints met)`,
+            `[AGENT] Synthesizing final state transition...`,
+            `[OUT] Execution complete. W3C PROV-O trace generated.`
+        ];
 
-        await new Promise(r => setTimeout(r, 600));
-        appendLog(`[Gov Gatekeeper] Validating against deterministic schemas...`, 'warn');
+        let i = 0;
+        function printStep() {
+            if (i < steps.length) {
+                // Ensure unique keys by relying on DOM append, avoiding React anti-patterns
+                const line = document.createElement('div');
+                line.className = 'mb-1 ' + (steps[i].includes('SUCCESS') || steps[i].includes('passed') ? 'text-emerald-400' : 'text-slate-300');
+                line.textContent = `> ${steps[i]}`;
+                terminal.appendChild(line);
+                terminal.scrollTop = terminal.scrollHeight;
+                i++;
+                setTimeout(printStep, 400 + Math.random() * 400); // jittered typing effect
+            } else {
+                const final = document.createElement('div');
+                final.className = 'mt-4 text-cyan-400 font-bold';
+                final.textContent = '>> SYSTEM IDLE';
+                terminal.appendChild(final);
+                terminal.scrollTop = terminal.scrollHeight;
+            }
+        }
 
-        await new Promise(r => setTimeout(r, 800));
-        appendLog(`[Gov Gatekeeper] Schema validation PASS (FIBO Topology Matched)`, 'success');
-
-        await new Promise(r => setTimeout(r, 1200));
-        appendLog(`[LLM Core] Synthesizing structural parameters...`);
-
-        await new Promise(r => setTimeout(r, 1500));
-        appendLog(`[System 2] Resolving logical constraints via Rust Engine...`, 'system');
-
-        await new Promise(r => setTimeout(r, 900));
-        appendLog(`EXECUTION COMPLETE. Generated W3C PROV-O Trace.`, 'success');
-    });
+        printStep();
+    }
 }
+
+const engine = new QueryEngine();
 
 document.addEventListener('DOMContentLoaded', () => {
-    initArchiveSearch();
-    initSandbox();
+    if(document.getElementById('archive-search')) {
+        engine.initArchiveSearch();
+    }
+    if(document.getElementById('run-sim-btn')) {
+        engine.initSandbox();
+    }
 });
