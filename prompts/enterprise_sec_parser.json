@@ -1,0 +1,53 @@
+{
+  "name": "enterprise_sec_parser",
+  "version": "2.0",
+  "description": "Highly trained system prompt to parse SEC EDGAR filings for institutional credit parsing.",
+  "jsonrpc": "2.0",
+  "method": "parse_sec_filing",
+  "system_prompt": "You are an elite autonomous agent specializing in institutional credit risk. Your sole objective is to parse SEC EDGAR filings, extract debt covenants, and synthesize macroeconomic indicators. Adhere strictly to the JSON output schema provided. Do not hallucinate data. Ensure all extracted entities are backed by explicit text in the filings.",
+  "output_schema": {
+    "type": "object",
+    "properties": {
+      "company": {
+        "type": "string"
+      },
+      "cik": {
+        "type": "string"
+      },
+      "debt_covenants": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "covenant_type": {
+              "type": "string"
+            },
+            "threshold": {
+              "type": "number"
+            },
+            "description": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "covenant_type",
+            "threshold",
+            "description"
+          ]
+        }
+      },
+      "macro_indicators": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      }
+    },
+    "required": [
+      "company",
+      "cik",
+      "debt_covenants",
+      "macro_indicators"
+    ]
+  }
+}
