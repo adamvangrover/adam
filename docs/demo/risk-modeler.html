@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Risk Modeler Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="../css/theme.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+</head>
+<body class="bg-slate-950 text-slate-200 antialiased min-h-screen flex flex-col">
+
+    <div id="global-header"></div>
+
+    <main class="flex-grow container mx-auto px-6 py-12 flex flex-col items-center justify-center">
+        <div class="text-amber-400 mb-6 bg-amber-900/20 inline-block p-4 rounded-full border border-amber-500/30">
+            <i data-lucide="calculator" class="w-16 h-16"></i>
+        </div>
+        <h1 class="text-4xl md:text-5xl font-bold font-mono text-amber-50 mb-6 text-center">Interactive Risk Modeler</h1>
+        <p class="text-xl text-slate-400 font-light leading-relaxed max-w-2xl text-center mb-12">
+            Client-side Credit Stress-Testing & Cash Flow Simulator. Adjust macroeconomic vectors to observe downstream covenant breach probabilities.
+        </p>
+
+        <div class="w-full max-w-5xl grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="glass-panel p-6 flex flex-col gap-4">
+                <h3 class="font-mono text-sm text-amber-400 uppercase tracking-wider mb-2">Macro Vectors</h3>
+
+                <div>
+                    <div class="flex justify-between text-xs font-mono mb-1 text-slate-400">
+                        <label>Base Rate Shock</label>
+                        <span class="text-amber-400">+250 bps</span>
+                    </div>
+                    <input type="range" min="0" max="500" value="250" class="w-full accent-amber-500">
+                </div>
+
+                <div>
+                    <div class="flex justify-between text-xs font-mono mb-1 text-slate-400">
+                        <label>EBITDA Contraction</label>
+                        <span class="text-rose-400">-15%</span>
+                    </div>
+                    <input type="range" min="0" max="50" value="15" class="w-full accent-rose-500">
+                </div>
+
+                <button class="mt-auto w-full py-2 bg-amber-900/40 hover:bg-amber-800/60 border border-amber-500/50 rounded font-mono text-sm text-amber-100 transition-colors">
+                    Recalculate Matrix
+                </button>
+            </div>
+
+            <div class="md:col-span-2 glass-panel p-6 border-amber-900/30">
+                <h3 class="font-mono text-sm text-slate-300 mb-4">Projected Cash Flow vs DSCR Covenant</h3>
+                <div class="h-48 bg-black/50 border border-slate-800 rounded flex items-center justify-center font-mono text-slate-600 text-xs">
+                    [Interactive Chart.js Instance Placeholder - Simulated in Fortress & Hunt View]
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>lucide.createIcons();</script>
+    <script src="../js/app.js"></script>
+</body>
+</html>
