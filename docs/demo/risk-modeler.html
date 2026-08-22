@@ -3,62 +3,191 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Risk Modeler Demo</title>
+    <title>Risk Modeler | ADAM Ecosystem</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="../css/theme.css">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+
+    <!-- Microdata -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Risk Modeler Sandbox",
+      "applicationCategory": "Financial Analytics",
+      "description": "Client-side credit stress-testing and cash flow modeler."
+    }
+    </script>
 </head>
-<body class="bg-slate-950 text-slate-200 antialiased min-h-screen flex flex-col">
+<body class="bg-[#090d16] text-slate-200 antialiased min-h-screen flex flex-col">
 
     <div id="global-header"></div>
 
-    <main class="flex-grow container mx-auto px-6 py-12 flex flex-col items-center justify-center">
-        <div class="text-amber-400 mb-6 bg-amber-900/20 inline-block p-4 rounded-full border border-amber-500/30">
-            <i data-lucide="calculator" class="w-16 h-16"></i>
+    <main class="flex-grow container mx-auto px-6 py-12 flex flex-col">
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold font-mono text-amber-400 mb-2">Credit Risk Modeler</h1>
+            <p class="text-slate-400 text-sm">Interactive client-side stress testing and cash flow deterministic simulation.</p>
         </div>
-        <h1 class="text-4xl md:text-5xl font-bold font-mono text-amber-50 mb-6 text-center">Interactive Risk Modeler</h1>
-        <p class="text-xl text-slate-400 font-light leading-relaxed max-w-2xl text-center mb-12">
-            Client-side Credit Stress-Testing & Cash Flow Simulator. Adjust macroeconomic vectors to observe downstream covenant breach probabilities.
-        </p>
 
-        <div class="w-full max-w-5xl grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="glass-panel p-6 flex flex-col gap-4">
-                <h3 class="font-mono text-sm text-amber-400 uppercase tracking-wider mb-2">Macro Vectors</h3>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 flex-grow">
+            <!-- Left Pane: Parameters -->
+            <div class="lg:col-span-1 glass-panel p-6 flex flex-col h-full">
+                <h3 class="font-bold text-slate-200 mb-6 flex items-center gap-2">
+                    <i data-lucide="sliders-horizontal" class="w-5 h-5 text-amber-400"></i>
+                    Stress Parameters
+                </h3>
 
-                <div>
-                    <div class="flex justify-between text-xs font-mono mb-1 text-slate-400">
-                        <label>Base Rate Shock</label>
-                        <span class="text-amber-400">+250 bps</span>
+                <div class="space-y-6 flex-grow">
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <label class="text-xs font-mono text-slate-400">Base Rate (SOFR)</label>
+                            <span id="rate-val" class="text-xs font-mono text-amber-500">5.0%</span>
+                        </div>
+                        <input type="range" id="rate-slider" min="1" max="10" step="0.25" value="5" class="w-full accent-amber-500" oninput="document.getElementById('rate-val').innerText = this.value + '%'; updateModel();">
                     </div>
-                    <input type="range" min="0" max="500" value="250" class="w-full accent-amber-500">
-                </div>
 
-                <div>
-                    <div class="flex justify-between text-xs font-mono mb-1 text-slate-400">
-                        <label>EBITDA Contraction</label>
-                        <span class="text-rose-400">-15%</span>
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <label class="text-xs font-mono text-slate-400">EBITDA Shock</label>
+                            <span id="ebitda-val" class="text-xs font-mono text-rose-500">0%</span>
+                        </div>
+                        <input type="range" id="ebitda-slider" min="-50" max="20" step="5" value="0" class="w-full accent-rose-500" oninput="document.getElementById('ebitda-val').innerText = this.value + '%'; updateModel();">
                     </div>
-                    <input type="range" min="0" max="50" value="15" class="w-full accent-rose-500">
-                </div>
 
-                <button class="mt-auto w-full py-2 bg-amber-900/40 hover:bg-amber-800/60 border border-amber-500/50 rounded font-mono text-sm text-amber-100 transition-colors">
-                    Recalculate Matrix
-                </button>
+                    <hr class="border-slate-800">
+
+                    <div class="bg-slate-900/50 p-4 rounded border border-slate-700">
+                        <h4 class="text-xs font-bold text-slate-300 mb-2 font-mono">Covenant Constraints (SNC)</h4>
+                        <div class="space-y-2 text-xs font-mono">
+                            <div class="flex justify-between">
+                                <span class="text-slate-500">Max Leverage:</span>
+                                <span class="text-slate-300">6.0x</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-slate-500">Min FCCR:</span>
+                                <span class="text-slate-300">1.15x</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <div class="md:col-span-2 glass-panel p-6 border-amber-900/30">
-                <h3 class="font-mono text-sm text-slate-300 mb-4">Projected Cash Flow vs DSCR Covenant</h3>
-                <div class="h-48 bg-black/50 border border-slate-800 rounded flex items-center justify-center font-mono text-slate-600 text-xs">
-                    [Interactive Chart.js Instance Placeholder - Simulated in Fortress & Hunt View]
+            <!-- Right Pane: Visualization & Output -->
+            <div class="lg:col-span-2 flex flex-col gap-8">
+
+                <!-- Chart Area -->
+                <div class="glass-panel p-6 border-amber-900/40">
+                    <h3 class="font-bold text-slate-200 mb-4 font-mono text-sm">Projected Cash Flow Availability</h3>
+                    <div class="relative h-64 w-full bg-black/30 rounded border border-slate-800 p-2">
+                        <canvas id="cf-chart"></canvas>
+                    </div>
                 </div>
+
+                <!-- Validation Output -->
+                <div class="glass-panel p-6 border-slate-700 flex-grow">
+                    <h3 class="font-bold text-slate-200 mb-4 font-mono text-sm">Deterministic Validation Engine</h3>
+                    <div id="validation-output" class="font-mono text-xs space-y-2">
+                        <!-- JS injected -->
+                    </div>
+                </div>
+
             </div>
         </div>
     </main>
 
-    <script>lucide.createIcons();</script>
+    <!-- Scripts -->
     <script src="../js/app.js"></script>
+    <script>
+        let cfChart;
+
+        function initChart() {
+            const ctx = document.getElementById('cf-chart').getContext('2d');
+            cfChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Year 1', 'Year 2', 'Year 3', 'Year 4'],
+                    datasets: [{
+                        label: 'Free Cash Flow ($M)',
+                        data: [120, 125, 130, 135],
+                        backgroundColor: 'rgba(16, 185, 129, 0.6)',
+                        borderColor: '#10b981',
+                        borderWidth: 1
+                    }, {
+                        label: 'Debt Service ($M)',
+                        data: [80, 80, 80, 80],
+                        backgroundColor: 'rgba(244, 63, 94, 0.6)',
+                        borderColor: '#f43f5e',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { stacked: false, grid: { color: 'rgba(30,41,59,0.5)' } },
+                        x: { stacked: false, grid: { display: false } }
+                    }
+                }
+            });
+        }
+
+        function updateModel() {
+            const rate = parseFloat(document.getElementById('rate-slider').value);
+            const ebitdaShock = parseFloat(document.getElementById('ebitda-slider').value) / 100;
+
+            const baseEbitda = 200;
+            const currentEbitda = baseEbitda * (1 + ebitdaShock);
+            const debt = 1000;
+
+            const interest = debt * (rate / 100);
+            const principal = 20; // fixed amort
+            const debtService = interest + principal;
+
+            const fcf = currentEbitda - 40; // minus capex/taxes proxy
+
+            const leverage = debt / currentEbitda;
+            const fccr = fcf / debtService;
+
+            // Update Chart
+            cfChart.data.datasets[0].data = [fcf, fcf*1.02, fcf*1.04, fcf*1.06];
+            cfChart.data.datasets[1].data = [debtService, debtService, debtService, debtService];
+            cfChart.update();
+
+            // Update Validation Output
+            const out = document.getElementById('validation-output');
+            out.innerHTML = '';
+
+            const leveragePass = leverage <= 6.0;
+            const fccrPass = fccr >= 1.15;
+
+            const logLines = [
+                \`> Calculating implied metrics based on SOFR=\${rate}% and EBITDA=\$\${currentEbitda.toFixed(1)}M\`,
+                \`> Projected Debt Service: \$\${debtService.toFixed(1)}M\`,
+                \`> Leverage Ratio: \${leverage.toFixed(2)}x \` + (leveragePass ? '<span class="text-emerald-400">[PASS]</span>' : '<span class="text-rose-500">[VIOLATION > 6.0x]</span>'),
+                \`> FCCR: \${fccr.toFixed(2)}x \` + (fccrPass ? '<span class="text-emerald-400">[PASS]</span>' : '<span class="text-rose-500">[VIOLATION < 1.15x]</span>')
+            ];
+
+            if(!leveragePass || !fccrPass) {
+                logLines.push('<div class="mt-2 text-rose-500 font-bold">> SYSTEM HALT: Covenant Breach Detected. Risk Gatekeeper triggered.</div>');
+                document.getElementById('validation-output').parentElement.classList.replace('border-slate-700', 'border-rose-900/50');
+            } else {
+                logLines.push('<div class="mt-2 text-emerald-400 font-bold">> SYSTEM STATUS: Nominal. Within SNC bounds.</div>');
+                document.getElementById('validation-output').parentElement.classList.replace('border-rose-900/50', 'border-slate-700');
+            }
+
+            logLines.forEach(line => {
+                const div = document.createElement('div');
+                div.className = "text-slate-300";
+                div.innerHTML = line;
+                out.appendChild(div);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initChart();
+            updateModel();
+        });
+    </script>
 </body>
 </html>
