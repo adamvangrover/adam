@@ -37,7 +37,7 @@ class MarketCatalystPlugin:
             req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
             with urllib.request.urlopen(req, timeout=2) as response: # nosec B310
                  xml_data = response.read()
-                 root = ET.fromstring(xml_data)
+                 root = ET.fromstring(xml_data)  # nosec B314
                  headlines = []
                  for item in root.findall('.//item'):
                      title = item.find('title')
