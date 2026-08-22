@@ -1,1 +1,77 @@
-{"ledger_entries": [{"data_variable_node": "SP500_Index", "market_level_value": "7678.71", "primary_model_target": "DCF", "unstructured_context_provenance": "Live Market Data"}, {"data_variable_node": "US_10Y_Treasury_Yield", "market_level_value": "4.740", "primary_model_target": "DCF", "unstructured_context_provenance": "Live Market Data"}, {"data_variable_node": "Oil_WTI_Price", "market_level_value": "86.07", "primary_model_target": "EV", "unstructured_context_provenance": "Live Market Data"}, {"data_variable_node": "Bitcoin_Price", "market_level_value": "77081.55", "primary_model_target": "EV", "unstructured_context_provenance": "Live Market Data"}, {"data_variable_node": "VIX_Index", "market_level_value": "15.27", "primary_model_target": "EV", "unstructured_context_provenance": "Live Market Data"}]}
+```json
+{
+  "ledger_entries": [
+    {
+      "data_variable_node": "SP500_Index",
+      "market_level_value": "7,678.71",
+      "primary_model_target": "EV",
+      "unstructured_context_provenance": "Equity index level; benchmark equity valuation proxy reflecting late-session stabilization attempt."
+    },
+    {
+      "data_variable_node": "US_10Y_Treasury_Yield",
+      "market_level_value": "4.740%",
+      "primary_model_target": "DCF",
+      "unstructured_context_provenance": "Sovereign yield spike to 20-month highs; baseline risk-free rate adjustment driving corporate discount factors."
+    },
+    {
+      "data_variable_node": "VIX_Index",
+      "market_level_value": "15.27",
+      "primary_model_target": "EV",
+      "unstructured_context_provenance": "CBOE Volatility proxy reflecting short-volatility compression and underlying equity risk pricing."
+    },
+    {
+      "data_variable_node": "Oil_Brent_Price",
+      "market_level_value": "$94.25/bbl",
+      "primary_model_target": "PD",
+      "unstructured_context_provenance": "Energy input cost driver and Strait of Hormuz blockade premium impacting corporate margin decay."
+    },
+    {
+      "data_variable_node": "Oil_WTI_Price",
+      "market_level_value": "$86.07/bbl",
+      "primary_model_target": "EV",
+      "unstructured_context_provenance": "Domestic benchmark crude price tracking physical energy supply friction and refinery inputs."
+    },
+    {
+      "data_variable_node": "Bitcoin_Price",
+      "market_level_value": "$77,081.55",
+      "primary_model_target": "EV",
+      "unstructured_context_provenance": "Alternative liquidity asset proxy absorbing cross-asset duration flight and fiat liability hedge capital."
+    },
+    {
+      "data_variable_node": "Baseline_SOFR_Rate",
+      "market_level_value": "5.31%",
+      "primary_model_target": "DCF",
+      "unstructured_context_provenance": "Reference floating-rate baseline used for institutional debt servicing and leverage obligation carrying costs."
+    },
+    {
+      "data_variable_node": "BSL_Benchmark_Spread",
+      "market_level_value": "SOFR + 350 bps",
+      "primary_model_target": "LGD",
+      "unstructured_context_provenance": "Primary clearing spread for Broadly Syndicated Loans reflecting tight institutional credit conditions and refinancing walls."
+    },
+    {
+      "data_variable_node": "Private_Credit_Spread",
+      "market_level_value": "SOFR + 575 bps",
+      "primary_model_target": "LGD",
+      "unstructured_context_provenance": "Direct lending illiquidity benchmark spread over market-clearing secondary debt tranches."
+    }
+  ]
+}
+
+```
+
+---
+
+### Resolved Variable Node Summary
+
+| Node Key | Level / Value | Target | Provenance & Risk Mechanics |
+| --- | --- | --- | --- |
+| **`SP500_Index`** | `7,678.71` | **EV** | Core equity valuation proxy; intraday stabilization test. |
+| **`US_10Y_Treasury_Yield`** | `4.740%` | **DCF** | Sovereign term-premium repricing; discount factor anchor. |
+| **`VIX_Index`** | `15.27` | **EV** | Equity volatility proxy; programmatic options writing compression. |
+| **`Oil_Brent_Price`** | `$94.25/bbl` | **PD** | Geopolitical energy risk driver; probability-of-default scaler. |
+| **`Oil_WTI_Price`** | `$86.07/bbl` | **EV** | Domestic commodity input pricing and refining spread driver. |
+| **`Bitcoin_Price`** | `$77,081.55` | **EV** | Anti-duration hedge and cross-asset liquidity capture. |
+| **`Baseline_SOFR_Rate`** | `5.31%` | **DCF** | Base floating rate for corporate debt servicing calculations. |
+| **`BSL_Benchmark_Spread`** | `SOFR + 350 bps` | **LGD** | Broadly syndicated loan spread; primary refinancing friction. |
+| **`Private_Credit_Spread`** | `SOFR + 575 bps` | **LGD** | Direct lending illiquidity premium over public loan tranches. |
