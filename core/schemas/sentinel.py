@@ -64,7 +64,7 @@ class ScheduleK1Extraction(BaseModel):
 
 class Covenant(BaseModel):
     covenant_type: Optional[str] = None # ["Maintenance", "Incurrence"]
-    metric_name: Optional[str] = None # ["Total Leverage Ratio", "Fixed Charge Coverage Ratio", "Minimum Liquidity"]
+    metric_name: Optional[str] = None # ["Total Leverage Ratio", "Fixed Charge Coverage Ratio", "Minimum Liquidity", "Limitation on Liens", "Payment Default", "Principal and Interest Payment", "Asset Disposition Restriction", "Consolidated Leverage Ratio", "Consolidated Interest Coverage Ratio", "Maximum Secured Debt Ratio"]
     threshold_value: Optional[float] = None
     threshold_operator: Optional[str] = None # ["<=", ">=", "=="]
     current_calculated_value: Optional[float] = None

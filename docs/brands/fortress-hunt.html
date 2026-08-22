@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fortress & Hunt | Credit Risk Analytics</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="../css/theme.css">
+
+    <!-- Microdata -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Fortress & Hunt",
+      "applicationCategory": "Financial Analytics",
+      "description": "Strategic capital allocation, private credit risk analytics, and institutional underwriting."
+    }
+    </script>
+</head>
+<body class="bg-[#090d16] text-slate-200 antialiased min-h-screen flex flex-col">
+
+    <div id="global-header"></div>
+
+    <!-- Narrative Hero -->
+    <div class="relative w-full py-20 border-b border-amber-900/50 bg-black overflow-hidden flex items-center justify-center">
+        <div class="absolute inset-0 opacity-20" style="background-image: radial-gradient(circle at center, #f59e0b 0%, transparent 70%);"></div>
+        <div class="relative z-10 text-center p-8 max-w-3xl mx-4">
+            <h1 class="text-4xl md:text-5xl font-bold font-mono tracking-tight mb-4 text-amber-400">
+                Fortress & Hunt
+            </h1>
+            <p class="text-xl text-slate-300 font-light mb-6">
+                Strategic capital allocation, private credit risk analytics, and institutional underwriting leveraging Shared National Credit guidelines.
+            </p>
+            <a href="https://github.com/adamvangrover/adam/tree/main/src/agents/system_2" target="_blank" class="inline-flex items-center gap-2 px-6 py-2 bg-amber-900/40 border border-amber-500/50 hover:bg-amber-800/60 rounded font-mono text-amber-50 transition-all">
+                <i data-lucide="github" class="w-4 h-4"></i> View Source
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="flex-grow container mx-auto px-6 py-12">
+
+        <div class="grid grid-cols-1 xl:grid-cols-2 gap-12 mb-16">
+            <!-- Sensitivty Matrix Chart -->
+            <div class="glass-panel p-6 border-amber-900/50 flex flex-col">
+                <h3 class="text-xl font-bold mb-4 font-mono text-amber-400 flex items-center gap-2">
+                    <i data-lucide="bar-chart-2" class="w-5 h-5"></i> Interest Rate Sensitivity Matrix
+                </h3>
+                <div class="relative h-64 w-full flex-grow bg-black/30 rounded border border-slate-800 p-2">
+                    <canvas id="risk-chart-1"></canvas>
+                </div>
+            </div>
+
+            <!-- Capabilities -->
+            <div>
+                <h3 class="text-2xl font-bold mb-6">Underwriting Infrastructure</h3>
+                <div class="space-y-4">
+                    <div class="glass-panel p-4 border-slate-700/50 flex gap-4 items-start">
+                        <div class="p-2 bg-amber-900/20 text-amber-400 rounded">
+                            <i data-lucide="shield-alert" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-slate-200">Covenant Default Scanning</h4>
+                            <p class="text-sm text-slate-400 mt-1">Deterministic validation schema for Limitation on Liens, Payment Default, and Minimum Liquidity mapped directly to Pydantic definitions.</p>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel p-4 border-slate-700/50 flex gap-4 items-start">
+                        <div class="p-2 bg-amber-900/20 text-amber-400 rounded">
+                            <i data-lucide="file-text" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-slate-200">SNC Compliance Evaluation</h4>
+                            <p class="text-sm text-slate-400 mt-1">Evaluates leveraged loan structures against Shared National Credit parameters, executing synthetic stress tests for downgrade probabilities.</p>
+                        </div>
+                    </div>
+
+                    <!-- Architectural Diagram Snippet -->
+                    <div class="p-4 bg-slate-900/50 rounded border border-slate-800 font-mono text-xs text-slate-400 overflow-x-auto">
+                        <span class="text-amber-500 block mb-2"># Credit Analysis DAG</span>
+                        Data_Ingest -> Financial_Extraction -> Covenant_Check<br>
+                        Covenant_Check -> Risk_Gatekeeper<br>
+                        Risk_Gatekeeper -> { Approval | Reject_w_Trace }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Scripts -->
+    <script src="../js/app.js"></script>
+    <script src="../js/visualizers.js"></script>
+</body>
+</html>

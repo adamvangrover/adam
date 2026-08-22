@@ -1,6 +1,5 @@
 use pyo3::prelude::*;
 use crate::error::KernelError;
-use std::collections::HashMap;
 
 #[pyclass]
 #[derive(Clone)]

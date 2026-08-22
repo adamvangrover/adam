@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Intelligence Vault | ADAM Ecosystem</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="../css/theme.css">
+</head>
+<body class="bg-[#090d16] text-slate-200 antialiased h-screen flex flex-col overflow-hidden">
+
+    <div id="global-header" class="flex-shrink-0"></div>
+
+    <main class="flex-grow flex overflow-hidden">
+
+        <!-- Sidebar / Filter Panel -->
+        <aside class="w-80 border-r border-slate-800 bg-slate-900/50 flex flex-col h-full overflow-y-auto">
+            <div class="p-6 border-b border-slate-800">
+                <h2 class="text-xl font-bold font-mono text-cyan-400 mb-4 flex items-center gap-2">
+                    <i data-lucide="database" class="w-5 h-5"></i>
+                    Query Engine
+                </h2>
+                <div class="relative">
+                    <i data-lucide="search" class="absolute left-3 top-2.5 w-4 h-4 text-slate-500"></i>
+                    <input type="text" id="archive-search" placeholder="Search knowledge graph..."
+                           class="w-full bg-slate-950 border border-slate-700 rounded-md py-2 pl-9 pr-4 text-sm font-mono text-slate-200 focus:outline-none focus:border-cyan-500 transition-colors">
+                </div>
+            </div>
+
+            <div class="p-6 flex-grow">
+                <div class="mb-6">
+                    <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Origin Brand</h3>
+                    <div class="flex flex-wrap gap-2">
+                        <button class="filter-btn bg-cyan-900/50 text-cyan-400 border border-slate-700 px-3 py-1 rounded text-xs font-mono" data-type="brand" data-value="All">All</button>
+                        <button class="filter-btn bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-700 px-3 py-1 rounded text-xs font-mono" data-type="brand" data-value="adam-core">Core OS</button>
+                        <button class="filter-btn bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-700 px-3 py-1 rounded text-xs font-mono" data-type="brand" data-value="market-mayhem">Mayhem</button>
+                        <button class="filter-btn bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-700 px-3 py-1 rounded text-xs font-mono" data-type="brand" data-value="fortress-hunt">Fortress</button>
+                        <button class="filter-btn bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-700 px-3 py-1 rounded text-xs font-mono" data-type="brand" data-value="exiled-spark">Spark</button>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Classification</h3>
+                    <div class="flex flex-wrap gap-2">
+                        <button class="filter-btn bg-cyan-900/50 text-cyan-400 border border-slate-700 px-3 py-1 rounded text-xs font-mono" data-type="tag" data-value="All">All</button>
+                        <button class="filter-btn bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-700 px-3 py-1 rounded text-xs font-mono" data-type="tag" data-value="Agentic Systems">Agentic</button>
+                        <button class="filter-btn bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-700 px-3 py-1 rounded text-xs font-mono" data-type="tag" data-value="Macro">Macro</button>
+                        <button class="filter-btn bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-700 px-3 py-1 rounded text-xs font-mono" data-type="tag" data-value="Credit Risk">Credit</button>
+                        <button class="filter-btn bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-700 px-3 py-1 rounded text-xs font-mono" data-type="tag" data-value="Game Dev">Game Dev</button>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Results List -->
+        <section class="w-1/3 min-w-[350px] border-r border-slate-800 bg-[#090d16] flex flex-col h-full overflow-y-auto" id="archive-list-container">
+            <div class="p-6 border-b border-slate-800 sticky top-0 bg-[#090d16]/95 backdrop-blur z-10">
+                <h3 class="text-lg font-bold">Retrieved Artifacts</h3>
+                <p class="text-xs text-slate-500 mt-1">Select a document to inspect payload</p>
+            </div>
+            <div class="p-6" id="archive-results">
+                <!-- JS Hydrated -->
+            </div>
+        </section>
+
+        <!-- Document Reader (Split-Pane) -->
+        <section class="flex-grow bg-slate-950 flex flex-col h-full overflow-y-auto relative" id="document-reader">
+            <div class="absolute inset-0 flex flex-col items-center justify-center text-slate-600 font-mono">
+                <i data-lucide="file-json" class="w-16 h-16 mb-4 opacity-30"></i>
+                <p>Select an artifact to initiate payload extraction.</p>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Scripts -->
+    <script src="../js/app.js"></script>
+    <script src="../js/query-engine.js"></script>
+</body>
+</html>

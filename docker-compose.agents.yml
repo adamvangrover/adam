@@ -4,6 +4,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.swarm
+    restart: always
     environment:
       - QDRANT_URL=http://qdrant:6333
       - REDIS_URL=redis://redis:6379/0
@@ -11,21 +12,38 @@ services:
     depends_on:
       - qdrant
       - redis
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   system2_dag:
     build:
       context: .
       dockerfile: Dockerfile.core
+    restart: always
     environment:
       - TEMPORAL_ADDRESS=temporal:7233
     depends_on:
       - temporal
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
       
   system3_quant:
     build:
       context: .
       dockerfile: Dockerfile.kernel
+    restart: always
     environment:
       - RUST_LOG=info
     ports:
       - "50051:50051"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:50051/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3

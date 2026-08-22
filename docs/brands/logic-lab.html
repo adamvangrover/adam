@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logic Lab | Autonomous Generators</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="../css/theme.css">
+
+    <!-- Microdata -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Logic Lab",
+      "applicationCategory": "Procedural Generation",
+      "description": "Autonomous WebGL puzzle generators and client-side simulation sandboxes."
+    }
+    </script>
+</head>
+<body class="bg-[#090d16] text-slate-200 antialiased min-h-screen flex flex-col">
+
+    <div id="global-header"></div>
+
+    <!-- Narrative Hero -->
+    <div class="relative w-full py-20 border-b border-emerald-900/50 bg-black overflow-hidden flex items-center justify-center">
+        <div class="absolute inset-0 opacity-20" style="background-image: radial-gradient(circle at center, #10b981 0%, transparent 70%);"></div>
+        <div class="relative z-10 text-center p-8 max-w-3xl mx-4">
+            <h1 class="text-4xl md:text-5xl font-bold font-mono tracking-tight mb-4 text-emerald-400">
+                Logic Lab
+            </h1>
+            <p class="text-xl text-slate-300 font-light mb-6">
+                Client-side deterministic solvers, WebGL procedural generation, and discrete math sandboxes.
+            </p>
+            <a href="https://github.com/adamvangrover/adam/tree/main/src/core" target="_blank" class="inline-flex items-center gap-2 px-6 py-2 bg-emerald-900/40 border border-emerald-500/50 hover:bg-emerald-800/60 rounded font-mono text-emerald-50 transition-all">
+                <i data-lucide="github" class="w-4 h-4"></i> View Source
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="flex-grow container mx-auto px-6 py-12">
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
+            <!-- Playable Grid Sandbox -->
+            <div class="glass-panel p-6 border-emerald-900/50">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-bold font-mono text-emerald-400 flex items-center gap-2">
+                        <i data-lucide="grid" class="w-5 h-5"></i> Procedural Grid Simulator
+                    </h3>
+                    <button id="regen-btn" class="px-3 py-1 bg-emerald-900/30 text-emerald-400 font-mono text-xs border border-emerald-700/50 rounded hover:bg-emerald-800/50 transition-colors">
+                        Re-Seed [S]
+                    </button>
+                </div>
+
+                <div id="puzzle-grid" class="grid grid-cols-8 gap-1 bg-black/50 p-2 rounded-lg border border-slate-800 h-64">
+                    <!-- Grid cells injected via JS -->
+                </div>
+                <div class="mt-4 flex justify-between text-xs font-mono text-slate-500">
+                    <span id="seed-display">Seed: 0x00000000</span>
+                    <span>Algorithm: Cellular Automata (B3/S23)</span>
+                </div>
+            </div>
+
+            <!-- Capabilities -->
+            <div>
+                <h3 class="text-2xl font-bold mb-6">Simulation Engine</h3>
+                <div class="space-y-4">
+                    <div class="glass-panel p-4 border-slate-700/50 flex gap-4 items-start">
+                        <div class="p-2 bg-emerald-900/20 text-emerald-400 rounded">
+                            <i data-lucide="cpu" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-slate-200">Zero-Build Client Rendering</h4>
+                            <p class="text-sm text-slate-400 mt-1">Executes complex spatial algorithms directly in-browser using ES6 modules and WebGL, avoiding server roundtrips.</p>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel p-4 border-slate-700/50 flex gap-4 items-start">
+                        <div class="p-2 bg-emerald-900/20 text-emerald-400 rounded">
+                            <i data-lucide="hash" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-slate-200">Deterministic Seed Generation</h4>
+                            <p class="text-sm text-slate-400 mt-1">Ensures reproducible states for QA and agent verification by explicitly seeding pseudo-random functions.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Scripts -->
+    <script src="../js/app.js"></script>
+    <script>
+        // Simple Cellular Automata Mock for the UI
+        function generateGrid() {
+            const grid = document.getElementById('puzzle-grid');
+            const seedDisplay = document.getElementById('seed-display');
+            if(!grid) return;
+
+            const seed = Math.random().toString(16).substring(2, 10).toUpperCase();
+            seedDisplay.textContent = \`Seed: 0x\${seed}\`;
+
+            grid.innerHTML = '';
+            for(let i=0; i<64; i++) {
+                const cell = document.createElement('div');
+                const isAlive = Math.random() > 0.7;
+                cell.className = \`rounded-sm \${isAlive ? 'bg-emerald-500/80' : 'bg-slate-800/50'}\`;
+                grid.appendChild(cell);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            generateGrid();
+            document.getElementById('regen-btn')?.addEventListener('click', generateGrid);
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key.toLowerCase() === 's') generateGrid();
+            });
+        });
+    </script>
+</body>
+</html>

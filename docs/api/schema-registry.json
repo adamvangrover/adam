@@ -1,0 +1,63 @@
+{
+  "registry_version": "3.0.0",
+  "description": "Deterministic Agent Contract Schemas for the ADAM Ecosystem",
+  "schemas": {
+    "FinancialMetrics": {
+      "type": "object",
+      "properties": {
+        "ebitda": {
+          "type": "number",
+          "description": "Earnings Before Interest, Taxes, Depreciation, and Amortization"
+        },
+        "leverage_ratio": {
+          "type": "number",
+          "description": "Total Debt / EBITDA"
+        },
+        "fccr": {
+          "type": "number",
+          "description": "Fixed Charge Coverage Ratio"
+        }
+      },
+      "required": [
+        "ebitda",
+        "leverage_ratio"
+      ]
+    },
+    "NarrativeEvent": {
+      "type": "object",
+      "properties": {
+        "entity_id": {
+          "type": "string"
+        },
+        "action": {
+          "type": "string"
+        },
+        "sentiment_shift": {
+          "type": "number",
+          "minimum": -1.0,
+          "maximum": 1.0
+        }
+      },
+      "required": [
+        "entity_id",
+        "action"
+      ]
+    },
+    "MacroIndicator": {
+      "type": "object",
+      "properties": {
+        "indicator_name": {
+          "type": "string",
+          "enum": ["SOFR", "CPI", "GDP_Growth"]
+        },
+        "current_value": {
+          "type": "number"
+        },
+        "volatility_index": {
+          "type": "number"
+        }
+      },
+      "required": ["indicator_name", "current_value"]
+    }
+  }
+}
