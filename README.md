@@ -1,4 +1,3 @@
-<img width="2816" height="1536" alt="Gemini_Generated_Image_5atwml5atwml5atw" src="https://github.com/user-attachments/assets/f470ea0f-37bb-4fa2-aa88-ca3b3d51e44f" />
 <div align="center">
   <a href="https://adamvangrover.github.io/adam/">
     <picture>
