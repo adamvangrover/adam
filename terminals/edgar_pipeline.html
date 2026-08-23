@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adam OS | SEC EDGAR Automated Parser & Pipeline</title>
+
+    <style>
+        :root {
+            --bg: #0d1117;
+            --surface: #161b22;
+            --border: #30363d;
+            --text-primary: #c9d1d9;
+            --accent: #58a6ff;
+            --success: #3fb950;
+            --warning: #d29922;
+            --danger: #f85149;
+            --font-mono: 'Courier New', Consolas, monospace;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-primary);
+            font-family: var(--font-mono);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        header {
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        h1, h2, h3 {
+            margin: 0;
+            color: var(--accent);
+        }
+
+        .panel {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 20px;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 8px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th { color: var(--accent); }
+
+        .status-pass { color: var(--success); font-weight: bold; }
+        .status-warn { color: var(--warning); font-weight: bold; }
+        .status-fail { color: var(--danger); font-weight: bold; }
+
+        .pipeline-code {
+            background: #010409;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+            color: #8b949e;
+            border: 1px solid var(--border);
+        }
+
+        .metric-card {
+            background: #010409;
+            padding: 15px;
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--accent);
+            margin-top: 10px;
+        }
+
+        .metric-value {
+            font-size: 1.8em;
+            color: var(--text-primary);
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- =========================================================================
+         AGENT PIPELINE PROMPT (MACHINE UI)
+         This block is intentionally structured for a LLM/Agent to read and execute.
+         ========================================================================= -->
+    <template id="agent-execution-directive">
+        # SYSTEM ROLE: SEC EDGAR DATA PIPELINE ORCHESTRATOR
+        # INVOCATION: Triggered via MCP Gateway (/mcp/tools/edgar-parse)
+
+        ## PIPELINE INSTRUCTIONS:
+        1. TARGET ACQUISITION:
+           - Query SEC EDGAR REST API (https://data.sec.gov/submissions/CIK{cik}.json).
+           - Target Sector: TMT (Telecom, Media, & Technology) / Leveraged Finance.
+           - Default CIK: 0001018724 (Amazon) or dynamic input for recent S-1/10-Q filings.
+
+        2. DATA EXTRACTION (XBRL Parsing):
+           - Extract `Assets`, `Liabilities`, `OperatingIncomeLoss`, and `NetCashProvidedByOperatingActivities`.
+           - Identify EBITDA add-backs and adjustments for covenant calculations.
+
+        3. QUANTITATIVE RISK PROCESSING:
+           - Calculate Total Leverage Ratio (Total Debt / Adjusted EBITDA).
+           - Calculate Liquidity Coverage Ratio (LCR).
+           - Run variables against Shared National Credit (SNC) stress-test models.
+
+        4. JSON LOGIC GUARDRAILS:
+           - Pass results through `/libraries/jsonLogic_rules.json`.
+           - IF Leverage Ratio > 6.0 AND Sector == 'TMT': Flag as `SPECIAL_MENTION`.
+
+        5. STATE MUTATION:
+           - Update the `<script type="application/json" id="edgar-state">` block in this HTML file with the new data.
+           - Ensure the DOM updates cleanly without breaking the structural HTML.
+    </template>
+
+    <!-- =========================================================================
+         STATE DATA (MACHINE & HUMAN UI BINDING)
+         Agents modify this block; the UI renders from it.
+         ========================================================================= -->
+    <script type="application/json" id="edgar-state">
+        {
+            "metadata": {
+                "cik": "0001999999",
+                "entity_name": "SYNTHETIC TMT HOLDINGS CORP",
+                "form_type": "10-Q",
+                "filing_date": "2026-08-15",
+                "pipeline_status": "COMPLETED",
+                "last_run": "2026-08-22T17:42:00Z"
+            },
+            "financials": {
+                "total_debt": 4500000000,
+                "adjusted_ebitda": 680000000,
+                "leverage_ratio": 6.61,
+                "lcr": 115.4
+            },
+            "risk_evaluation": {
+                "snc_classification": "SPECIAL_MENTION",
+                "basel_iii_compliance": "PASS",
+                "subordinate_tranche_risk": "ELEVATED",
+                "covenant_headroom_bps": 150
+            },
+            "jsonLogic_flags": [
+                "WARN: Leverage exceeds 6.0x SNC threshold",
+                "INFO: Subordinate tranche recovery modeled at 42%"
+            ]
+        }
+    </script>
+
+    <!-- =========================================================================
+         PRESENTATION LAYER (HUMAN UI)
+         ========================================================================= -->
+    <div class="container">
+        <header>
+            <div>
+                <h1>ADAM_OS // EDGAR PIPELINE TERMINAL</h1>
+                <p>Automated 10-Q/10-K Parsing & SNC Credit Evaluation</p>
+            </div>
+            <div style="text-align: right;">
+                <span style="color: var(--border);">PIPELINE STATUS:</span>
+                <span class="status-pass" id="ui-status">READY</span><br>
+                <span style="font-size: 0.8em; color: var(--border);" id="ui-last-run"></span>
+            </div>
+        </header>
+
+        <div class="grid-2">
+            <!-- Parsing Target Info -->
+            <div class="panel">
+                <h2>Target Entity Data</h2>
+                <table id="ui-metadata-table">
+                    <tr><th>Entity Name</th><td id="ui-entity">--</td></tr>
+                    <tr><th>CIK</th><td id="ui-cik">--</td></tr>
+                    <tr><th>Form Type</th><td id="ui-form">--</td></tr>
+                    <tr><th>Filing Date</th><td id="ui-date">--</td></tr>
+                </table>
+            </div>
+
+            <!-- Quantitative Risk Output -->
+            <div class="panel">
+                <h2>SNC & Basel III Evaluation</h2>
+                <div class="metric-card" style="border-color: var(--warning);">
+                    <div>Total Leverage Ratio (Debt/Adj. EBITDA)</div>
+                    <div class="metric-value" id="ui-leverage">--x</div>
+                    <div style="font-size: 0.8em;" class="status-warn" id="ui-snc-class">CLASSIFICATION: --</div>
+                </div>
+
+                <table id="ui-risk-table">
+                    <tr><th>Basel III LCR</th><td id="ui-lcr">--%</td></tr>
+                    <tr><th>Subordinate Tranche Risk</th><td id="ui-sub-risk">--</td></tr>
+                    <tr><th>Covenant Headroom</th><td id="ui-covenant">-- bps</td></tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- jsonLogic Output -->
+        <div class="panel">
+            <h2>jsonLogic Guardrail Execution Logs</h2>
+            <div class="pipeline-code" id="ui-logs">
+                > Awaiting pipeline execution...
+            </div>
+        </div>
+
+        <!-- Self-Executing Prompt View -->
+        <div class="panel">
+            <h2>Pipeline Orchestration Prompt</h2>
+            <p><em>Submit this raw text to an Adam OS Agent via the MCP Gateway to trigger a live parsing run.</em></p>
+            <div class="pipeline-code">
+import json
+import httpx
+from pydantic import BaseModel
+
+async def trigger_edgar_pipeline(cik: str):
+    """
+    Agent executes this Python block to fetch SEC data, calculate leverage,
+    evaluate against jsonLogic risk rules, and mutate the HTML state JSON.
+    """
+    headers = {"User-Agent": "AdamOS-Risk-Agent/1.0"}
+    url = f"https://data.sec.gov/submissions/CIK{cik.zfill(10)}.json"
+
+    # 1. Fetch
+    response = httpx.get(url, headers=headers)
+    data = response.json()
+
+    # 2. Extract & Compute (Mocked logic)
+    # total_debt = ...
+    # adjusted_ebitda = ...
+
+    # 3. jsonLogic Evaluation (SNC)
+    # result = apply_guardrails(total_debt / adjusted_ebitda)
+
+    # 4. State Mutation
+    # write_to_html_dom(cik, result)
+            </div>
+        </div>
+    </div>
+
+    <!-- =========================================================================
+         DOM BINDING SCRIPT (Renders JSON State to Human UI)
+         ========================================================================= -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const rawData = document.getElementById("edgar-state").textContent;
+            const state = JSON.parse(rawData);
+
+            // Populate Metadata
+            document.getElementById("ui-entity").textContent = state.metadata.entity_name;
+            document.getElementById("ui-cik").textContent = state.metadata.cik;
+            document.getElementById("ui-form").textContent = state.metadata.form_type;
+            document.getElementById("ui-date").textContent = state.metadata.filing_date;
+            document.getElementById("ui-status").textContent = state.metadata.pipeline_status;
+            document.getElementById("ui-last-run").textContent = "LAST RUN: " + state.metadata.last_run;
+
+            // Populate Financials
+            document.getElementById("ui-leverage").textContent = state.financials.leverage_ratio + "x";
+            document.getElementById("ui-lcr").textContent = state.financials.lcr + "%";
+            document.getElementById("ui-covenant").textContent = state.risk_evaluation.covenant_headroom_bps;
+
+            // Populate Risk
+            const sncClass = state.risk_evaluation.snc_classification;
+            const sncEl = document.getElementById("ui-snc-class");
+            sncEl.textContent = "CLASSIFICATION: " + sncClass;
+            if(sncClass === "SPECIAL_MENTION") {
+                sncEl.className = "status-warn";
+            } else if (sncClass === "SUBSTANDARD" || sncClass === "DOUBTFUL") {
+                sncEl.className = "status-fail";
+                document.getElementById("ui-leverage").parentElement.style.borderColor = "var(--danger)";
+            }
+
+            document.getElementById("ui-sub-risk").textContent = state.risk_evaluation.subordinate_tranche_risk;
+            if(state.risk_evaluation.subordinate_tranche_risk === "ELEVATED") {
+                document.getElementById("ui-sub-risk").className = "status-warn";
+            }
+
+            // Populate Logs
+            const logsContainer = document.getElementById("ui-logs");
+            logsContainer.innerHTML = "";
+            state.jsonLogic_flags.forEach(flag => {
+                const div = document.createElement("div");
+                div.textContent = "> " + flag;
+                if(flag.startsWith("WARN")) div.style.color = "var(--warning)";
+                if(flag.startsWith("ERR")) div.style.color = "var(--danger)";
+                logsContainer.appendChild(div);
+            });
+        });
+    </script>
+</body>
+</html>

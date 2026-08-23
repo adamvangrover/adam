@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM v30 :: UNIFIED FINANCIAL OS</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #00f3ff;
+            --accent-color: #0aff60;
+            --alert-color: #ff3333;
+            --warning-color: #f59e0b;
+            --purple-color: #a855f7;
+            --bg-color: #050b14;
+            --panel-bg: rgba(5, 11, 20, 0.8);
+            --text-primary: #e0e0e0;
+            --text-muted: #888;
+            --panel-border: #333;
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg-color);
+            background-image:
+                linear-gradient(rgba(0, 243, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 243, 255, 0.03) 1px, transparent 1px);
+            background-size: 30px 30px;
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+
+        .mono { font-family: 'JetBrains Mono', monospace; }
+
+        /* Header Styling */
+        .cyber-header {
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            border-bottom: 1px solid var(--primary-color);
+            background: rgba(5, 11, 20, 0.95);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        /* Effects */
+        .scan-line {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 2px;
+            background: rgba(0, 243, 255, 0.1);
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
+            animation: scan 4s linear infinite;
+            pointer-events: none;
+            z-index: 999;
+        }
+
+        @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
+
+        a { text-decoration: none; color: inherit; transition: all 0.2s; }
+        a:hover { color: var(--primary-color); }
+
+        /* Components */
+        .mode-badge {
+            padding: 4px 8px;
+            border: 1px solid var(--accent-color);
+            color: var(--accent-color);
+            font-size: 0.75rem;
+            border-radius: 4px;
+            font-weight: bold;
+            white-space: nowrap;
+            text-shadow: 0 0 5px rgba(10, 255, 96, 0.3);
+            box-shadow: inset 0 0 10px rgba(10, 255, 96, 0.1);
+        }
+
+        .version-badge {
+            background: var(--primary-color);
+            color: #000;
+            padding: 2px 6px;
+            border-radius: 2px;
+            font-weight: bold;
+            font-size: 0.7rem;
+            margin-left: 10px;
+        }
+
+        .cyber-btn {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            padding: 6px 12px;
+            border: 1px solid #444;
+            color: var(--text-primary);
+            background: rgba(0,0,0,0.5);
+            border-radius: 2px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .cyber-btn:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.2);
+        }
+
+        .glass-panel {
+            background: rgba(5, 11, 20, 0.7);
+            border: 1px solid var(--panel-border);
+            backdrop-filter: blur(8px);
+        }
+
+        /* Layout & Grid Components */
+        .layout-container { display: flex; min-height: calc(100vh - 60px); }
+
+        .sidebar {
+            width: 260px;
+            border-right: 1px solid var(--panel-border);
+            padding: 20px;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+            background: rgba(0,0,0,0.4);
+        }
+
+        .main-content {
+            flex-grow: 1;
+            padding: 40px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .update-banner {
+            border-left: 4px solid var(--accent-color);
+            background: linear-gradient(90deg, rgba(10, 255, 96, 0.1) 0%, transparent 100%);
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .section-header {
+            margin: 40px 0 20px 0;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #333;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .section-header h2 {
+            margin: 0;
+            color: var(--text-primary);
+            font-size: 1.4rem;
+            letter-spacing: 1px;
+        }
+
+        .section-icon {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .module-card {
+            border: 1px solid #333;
+            padding: 20px;
+            background: rgba(10, 15, 25, 0.6);
+            position: relative;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .module-card:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 243, 255, 0.1);
+            background: rgba(15, 20, 35, 0.8);
+        }
+
+        .module-card h3 { margin: 0 0 10px 0; font-size: 1.1rem; }
+        .module-card p { font-size: 0.85rem; color: #aaa; flex-grow: 1; line-height: 1.5; margin-bottom: 20px;}
+        .module-card .action-link {
+            color: var(--primary-color);
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            border-top: 1px dashed #333;
+            padding-top: 10px;
+            text-transform: uppercase;
+        }
+
+        .module-card:hover .action-link { color: var(--accent-color); border-color: var(--accent-color); }
+
+        .tag {
+            position: absolute;
+            top: 15px; right: 15px;
+            font-size: 0.65rem;
+            padding: 2px 8px;
+            border-radius: 2px;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+        }
+
+        .tag-new { background: rgba(255, 51, 51, 0.2); color: #ff3333; border: 1px solid #ff3333; }
+        .tag-core { background: rgba(0, 243, 255, 0.2); color: var(--primary-color); border: 1px solid var(--primary-color); }
+        .tag-beta { background: rgba(245, 158, 11, 0.2); color: var(--warning-color); border: 1px solid var(--warning-color); }
+        .tag-live { background: rgba(10, 255, 96, 0.2); color: var(--accent-color); border: 1px solid var(--accent-color); animation: pulse 2s infinite;}
+        .tag-static { background: rgba(168, 85, 247, 0.2); color: var(--purple-color); border: 1px solid var(--purple-color); }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.6; }
+            100% { opacity: 1; }
+        }
+
+        /* Use Case specific styling */
+        .use-case-card {
+            border-left: 3px solid var(--purple-color);
+        }
+        .use-case-card h3 { color: var(--purple-color); }
+
+        ul.dir-list { list-style: none; padding: 0; margin: 0; font-size: 0.85rem; }
+        ul.dir-list li { margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        ul.dir-list li a { flex-grow: 1; }
+        ul.dir-list li:hover { background: rgba(255,255,255,0.05); }
+    </style>
+</head>
+<body>
+    <div class="scan-line"></div>
+
+    <header class="cyber-header">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <h1 class="mono" style="margin: 0; font-size: 1.5rem; color: var(--primary-color); letter-spacing: 2px;">ADAM</h1>
+            <span class="mono version-badge">v30_OVERHAUL</span>
+            <div class="mono" style="font-size: 0.8rem; color: #666; border-left: 1px solid #333; padding-left: 10px; display: none; sm:display: block;">UNIFIED FINANCIAL OS & AGENTIC SWARM</div>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <nav style="display: flex; gap: 10px;">
+                <a href="../index.html" class="cyber-btn">&uarr; ROOT DIR</a>
+                <a href="network_map.html" class="cyber-btn">SYSTEM MAP</a>
+                <a href="analyst_os.html" class="cyber-btn" style="border-color: var(--accent-color); color: var(--accent-color); background: rgba(10,255,96,0.1);">LAUNCH ANALYST OS</a>
+            </nav>
+            <div class="mode-badge">SYSTEM INDEX :: ACTIVE</div>
+        </div>
+    </header>
+
+    <div class="layout-container">
+        <!-- SIDEBAR -->
+        <aside class="sidebar glass-panel">
+            <h3 class="mono" style="margin-top: 0; font-size: 0.8rem; color: var(--primary-color); border-bottom: 1px solid var(--panel-border); padding-bottom: 10px; margin-bottom: 15px;">
+                /// REPOSITORY DIRECTORY
+            </h3>
+            <ul class="dir-list mono">
+                <li><span>🖥️</span> <a href="analyst_os.html" style="color: var(--accent-color); font-weight: bold;">analyst_os.html</a></li>
+                <li><span>📟</span> <a href="terminal_profile.html" style="color: var(--primary-color); font-weight: bold;">terminal_profile.html</a></li>
+                <li style="padding-top: 10px; margin-top: 10px; border-top: 1px dashed #333;"><span>📂</span> <a href="apps/" style="color: var(--primary-color);">apps/</a></li>
+                <li><span>📂</span> <a href="data/" style="color: var(--primary-color);">data/</a></li>
+                <li><span>📂</span> <a href="agents/" style="color: #a855f7;">agents_swarm/</a></li>
+                <li><span>📂</span> <a href="memory/" style="color: #a855f7;">vector_memory/</a></li>
+                <li><span>📂</span> <a href="models/" style="color: #a855f7;">world_models/</a></li>
+                <li style="padding-top:10px; border-top: 1px dashed #333; opacity: 0.7;"><span>📄</span> <a href="agents.html">agents_config.json</a></li>
+                <li style="opacity: 0.7;"><span>📄</span> <a href="graph.html">knowledge_graph.html</a></li>
+                <li style="opacity: 0.7;"><span>📄</span> <a href="reports.html">report_convergence.html</a></li>
+                <li style="opacity: 0.7;"><span>📄</span> <a href="machine_index.json">machine_index.json</a></li>
+                <li style="opacity: 0.7;"><span>📄</span> <a href="api_docs.html">api_endpoints.md</a></li>
+            </ul>
+
+            <div style="margin-top: 40px; padding: 15px; border: 1px solid #333; background: rgba(0,0,0,0.5); border-radius: 4px;">
+                <div style="font-size: 0.7rem; color: #666; margin-bottom: 5px;" class="mono">SYSTEM STATUS</div>
+                <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 5px;">
+                    <span>Swarm Latency:</span> <span style="color: var(--accent-color);">12ms</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 5px;">
+                    <span>Active Agents:</span> <span style="color: var(--primary-color);">1,402</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 0.8rem;">
+                    <span>Vector DB Load:</span> <span style="color: var(--warning-color);">64%</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="main-content">
+
+            <div class="update-banner">
+                <h2 class="mono" style="margin: 0 0 10px 0; color: var(--accent-color); font-size: 1.5rem;">UPDATE v30: ARCHITECTURE OVERHAUL COMPLETE</h2>
+                <p style="margin: 0; color: #ccc; line-height: 1.6; max-width: 900px;">
+                    The ADAM framework has transitioned from static reporting scripts to a <strong>persistent, multi-agent financial OS</strong>.
+                    This update introduces a unified graph-memory architecture, enabling sovereign AI agents to cross-communicate, debate market anomalies,
+                    and execute complex RAG (Retrieval-Augmented Generation) pipelines in real-time. Explore the updated modules below to see how ADAM handles everything from hedge-fund alpha generation to sovereign macroeconomic wargaming.
+                </p>
+                <div style="margin-top: 15px; display: flex; gap: 10px;">
+                    <a href="changelog.html" class="cyber-btn" style="border-color: var(--accent-color); color: var(--accent-color);">READ CHANGELOG</a>
+                    <a href="machine_index.json" class="cyber-btn">API / MACHINE I/O</a>
+                </div>
+            </div>
+
+            <!-- SECTION: CORE OS & HUBS -->
+            <div class="section-header mono">
+                <span class="section-icon">❖</span>
+                <h2>CORE WORKSPACES & OS PORTALS</h2>
+            </div>
+            
+            <div class="grid-container">
+                <div class="module-card">
+                    <div class="tag tag-core">PRIMARY</div>
+                    <h3 class="mono" style="color: var(--primary-color);">ADAM Analyst OS</h3>
+                    <p>The "Bloomberg Killer Lite." A privacy-first, client-side financial workbench designed for human-agent collaboration. Features customizable layouts and live data hooks.</p>
+                    <a href="analyst_os.html" class="action-link mono">LAUNCH GUI &rarr;</a>
+                </div>
+
+                <div class="module-card">
+                    <div class="tag tag-core">CORE</div>
+                    <h3 class="mono" style="color: var(--primary-color);">Portal UI (Command Center)</h3>
+                    <p>The next-generation unified Global Command Center. Features an improved layout, interactive aesthetics, and global state monitoring of the ADAM swarm.</p>
+                    <a href="portal/index.html" class="action-link mono">ENTER PORTAL &rarr;</a>
+                </div>
+
+                <div class="module-card">
+                    <div class="tag tag-core">HUB</div>
+                    <h3 class="mono" style="color: var(--primary-color);">Daily Reports Hub</h3>
+                    <p>A centralized, interactive index of all historical ADAM Daily market reports, sentiment analyses, and pre-market intelligence data drops.</p>
+                    <a href="adam_daily_hub_index.html" class="action-link mono">OPEN HUB &rarr;</a>
+                </div>
+
+                <div class="module-card">
+                    <div class="tag tag-new">NEW</div>
+                    <h3 class="mono" style="color: var(--primary-color);">Workflow Orchestrator</h3>
+                    <p>AI Credit & Governance Harness HUD. Design and monitor complex multi-step pipelines involving document parsing, risk scoring, and compliance checks.</p>
+                    <a href="workflow_orchestrator.html" class="action-link mono">OPEN ORCHESTRATOR &rarr;</a>
+                </div>
+            </div>
+
+            <!-- SECTION: ACTIVE PROTOTYPES & TERMINALS (Merged from main) -->
+            <div class="section-header mono">
+                <span class="section-icon">🚀</span>
+                <h2>ACTIVE PROTOTYPES & TERMINALS</h2>
+            </div>
+
+            <div class="grid-container">
+                <div class="module-card" style="border-top: 2px solid var(--accent-color);">
+                    <div class="tag tag-live">ACTIVE</div>
+                    <h3 class="mono" style="color: var(--accent-color);">Telemetry & Logic Router</h3>
+                    <p>Interactive prototype demonstrating System 1 (Probabilistic Perception), Orchestration Kernel, and System 2 (Deterministic Grounding) telemetry flows.</p>
+                    <a href="interactive_prototype.html" class="action-link mono" style="color: var(--accent-color); border-color: var(--accent-color);">LAUNCH PROTOTYPE &rarr;</a>
+                </div>
+
+                <div class="module-card" style="border-top: 2px solid var(--alert-color);">
+                    <div class="tag tag-live">ACTIVE</div>
+                    <h3 class="mono" style="color: var(--alert-color);">Market Mayhem v26.0</h3>
+                    <p>The v26.0 iteration of the Market Mayhem Terminal, featuring advanced macro-temporal baselines and Whalescanner intelligence core.</p>
+                    <a href="showcase/market_mayhem_v26.html" class="action-link mono" style="color: var(--alert-color); border-color: var(--alert-color);">LAUNCH TERMINAL &rarr;</a>
+                </div>
+
+                <div class="module-card" style="border-top: 2px solid var(--warning-color);">
+                    <div class="tag tag-beta">BETA</div>
+                    <h3 class="mono" style="color: var(--warning-color);">Market Mayhem Unified</h3>
+                    <p>Consolidated interactive dashboard synthesizing daily briefs, vulnerability telemetry, and tactical defense playbooks into a unified UI.</p>
+                    <a href="market_mayhem_terminal.html" class="action-link mono" style="color: var(--warning-color); border-color: var(--warning-color);">LAUNCH DASHBOARD &rarr;</a>
+                </div>
+
+                <div class="module-card" style="border-top: 2px solid var(--purple-color);">
+                    <div class="tag tag-static">STATIC</div>
+                    <h3 class="mono" style="color: var(--purple-color);">Neural Dashboard</h3>
+                    <p>Interactive React-based application prototype demonstrating advanced visualization and state management arrays.</p>
+                    <a href="showcase/neural_dashboard.html" class="action-link mono" style="color: var(--purple-color); border-color: var(--purple-color);">VIEW DASHBOARD &rarr;</a>
+                </div>
+
+                <div class="module-card" style="border-top: 2px solid var(--primary-color);">
+                    <h3 class="mono" style="color: var(--primary-color);">Repository Codex</h3>
+                    <p>Interactive browser designed to navigate the entire ADAM OS codebase, internal documentation, and architectural blueprints.</p>
+                    <a href="showcase/codex.html" class="action-link mono">BROWSE REPO &rarr;</a>
+                </div>
+
+                <div class="module-card" style="border-top: 2px solid #888;">
+                    <h3 class="mono" style="color: #ccc;">Legacy & Artifact Index</h3>
+                    <p>Complete index of all historical HTML artifacts, original static reports, historical demos, and deprecated UI mockups.</p>
+                    <div style="display: flex; gap: 15px;">
+                        <a href="showcase/comprehensive_index.html" class="action-link mono" style="color: #aaa; border-color: #555;">SYSTEM MAP &rarr;</a>
+                        <a href="showcase/index.html" class="action-link mono" style="color: #aaa; border-color: #555;">LEGACY SHOWCASE &rarr;</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION: USE CASES & SHOWCASE -->
+            <div class="section-header mono">
+                <span class="section-icon">⚡</span>
+                <h2>INDUSTRY SHOWCASES & APPLIED USE CASES</h2>
+            </div>
+            <p style="color: #aaa; margin-top: -10px; margin-bottom: 25px; font-size: 0.9rem;">Demonstrations of how the ADAM multi-agent architecture solves domain-specific institutional problems.</p>
+
+            <div class="grid-container">
+                <div class="module-card use-case-card">
+                    <h3 class="mono">Hedge Fund Alpha Engine</h3>
+                    <p><strong>Use Case:</strong> Quantitative Equities & Sentiment.<br>Demonstrates real-time news ingestion, sentiment arbitrage, retail flow analysis, and automated trade thesis generation using LLM Swarms.</p>
+                    <a href="showcase_hedge_fund.html" class="action-link mono" style="color: var(--purple-color);">VIEW SHOWCASE &rarr;</a>
+                </div>
+
+                <div class="module-card use-case-card">
+                    <h3 class="mono">Private Equity Due Diligence</h3>
+                    <p><strong>Use Case:</strong> Alternative Assets & M&A.<br>Automated parsing of unstructured data rooms, VDR indexing, automated financial modeling, and competitive moat analysis generation.</p>
+                    <a href="showcase_private_equity.html" class="action-link mono" style="color: var(--purple-color);">VIEW SHOWCASE &rarr;</a>
+                </div>
+
+                <div class="module-card use-case-card">
+                    <h3 class="mono">Sovereign Risk & Defense</h3>
+                    <p><strong>Use Case:</strong> Geopolitics & Macro.<br>Simulates global conflict scenarios (e.g., supply chain disruption, currency wars) using multi-agent game theory to assess bond/currency risk.</p>
+                    <a href="war_room.html" class="action-link mono" style="color: var(--purple-color);">ENTER WAR ROOM &rarr;</a>
+                </div>
+
+                <div class="module-card use-case-card">
+                    <h3 class="mono">RegTech & Compliance Agent</h3>
+                    <p><strong>Use Case:</strong> Institutional Banking.<br>Continuous monitoring of internal communications and trade logs against evolving SEC/FINRA frameworks using semantic vector search.</p>
+                    <a href="policy_center.html" class="action-link mono" style="color: var(--purple-color);">VIEW POLICY CENTER &rarr;</a>
+                </div>
+            </div>
+
+            <!-- SECTION: MULTI-AGENT SWARMS -->
+            <div class="section-header mono">
+                <span class="section-icon">🕸️</span>
+                <h2>AGENTIC SWARMS & SIMULATIONS</h2>
+            </div>
+            <div class="grid-container">
+                <div class="module-card">
+                    <div class="tag tag-live">LIVE</div>
+                    <h3 class="mono" style="color: var(--accent-color);">Market Live / Neural Exchange</h3>
+                    <p>Real-time stream of agent telemetry as specialized AIs interact, trade synthetic assets, and update their world-models based on live market ticks.</p>
+                    <a href="market_live.html" class="action-link mono">VIEW STREAM &rarr;</a>
+                </div>
+
+                <div class="module-card">
+                    <h3 class="mono" style="color: var(--accent-color);">Sector Swarm Roundtable</h3>
+                    <p>Multi-Agent Industry Roundtable. Watch specialized "analyst agents" (Tech, Energy, Financials) debate sector rotation and capex trends.</p>
+                    <a href="sector_swarm.html" class="action-link mono">JOIN SESSION &rarr;</a>
+                </div>
+
+                <div class="module-card">
+                    <h3 class="mono" style="color: var(--accent-color);">Wargame Console</h3>
+                    <p>Red Team vs Blue Team Economic Simulator. Pits adversarial agents against institutional defense models to stress-test portfolios.</p>
+                    <a href="wargame_dashboard.html" class="action-link mono">ENTER WARGAME &rarr;</a>
+                </div>
+
+                <div class="module-card">
+                    <h3 class="mono" style="color: var(--accent-color);">Agent Gallery & Registry</h3>
+                    <p>The Specialized Swarm Roster. View individual AI agent profiles, their specific financial training parameters, memory states, and win/loss rates.</p>
+                    <a href="agent_gallery.html" class="action-link mono">VIEW ROSTER &rarr;</a>
+                </div>
+
+                <div class="module-card">
+                    <div class="tag tag-new">NEW</div>
+                    <h3 class="mono" style="color: #00F5FF;">Neural Link Convergence</h3>
+                    <p>Live visualization of thought-vectors converging across the agent network. Tracks consensus formation on macro events.</p>
+                    <a href="adam_convergence_live_neural_link.html" class="action-link mono">OPEN LINK &rarr;</a>
+                </div>
+
+                <div class="module-card">
+                    <h3 class="mono" style="color: var(--warning-color);">Nexus Simulation</h3>
+                    <p>Geopolitical & Sovereign Minds platform. Maps out the simulated decision-making processes of virtual central bankers and state actors.</p>
+                    <a href="nexus.html" class="action-link mono">ENTER NEXUS &rarr;</a>
+                </div>
+            </div>
+
+            <!-- SECTION: FINANCIAL MODELING & RISK -->
+            <div class="section-header mono">
+                <span class="section-icon">📈</span>
+                <h2>FINANCIAL MODELING, CREDIT & RISK</h2>
+            </div>
+            <div class="grid-container">
+                <div class="module-card">
+                    <h3 class="mono" style="color: #ff3333;">Credit & Valuation Architect</h3>
+                    <p>Analyst OS Architect v7.0. Advanced interface for adjusting DCF parameters, debt schedules, and running AI-assisted credit analyses.</p>
+                    <a href="credit_valuation_architect.html" class="action-link mono">LAUNCH ARCHITECT &rarr;</a>
+                </div>
+
+                <div class="module-card">
+                    <h3 class="mono" style="color: #ff3333;">Monte Carlo Risk Engine</h3>
+                    <p>High-performance path visualizer for portfolio risk. Runs thousands of stochastic simulations infused with AI-generated tail-risk scenarios.</p>
+                    <a href="monte_carlo_visualizer.html" class="action-link mono">LAUNCH SIMULATOR &rarr;</a>
+                </div>
+
+                <div class="module-card">
+                    <h3 class="mono" style="color: #ff3333;">Comprehensive Credit Dashboard</h3>
+                    <p>Unified Enterprise Dashboard for tracking corporate bond yields, CDS spreads, and algorithmic default probability metrics.</p>
+                    <a href="comprehensive_credit_dashboard.html" class="action-link mono">OPEN DASHBOARD &rarr;</a>
+                </div>
+
+                <div class="module-card">
+                    <h3 class="mono" style="color: #ff3333;">Institutional Radar (13F)</h3>
+                    <p>13F Trend Monitor & Synthesis. Automatically parses SEC filings to map institutional clustering, crowded trades, and hidden alpha.</p>
+                    <a href="institutional_radar.html" class="action-link mono">LAUNCH RADAR &rarr;</a>
+                </div>
+
+                <div class="module-card">
+                    <div class="tag tag-beta">BETA</div>
+                    <h3 class="mono" style="color: #ff3333;">Unified Banking World Model</h3>
+                    <p>A Digital Twin of the global banking system. Maps interbank lending, liquidity drains, and contagion risk in real-time.</p>
+                    <a href="unified_banking.html" class="action-link mono">LAUNCH TWIN &rarr;</a>
+                </div>
+
+                <div class="module-card">
+                    <h3 class="mono" style="color: #ff3333;">Market Mayhem Archive</h3>
+                    <p>Strategic Intelligence Archive detailing past "black swan" events and how the ADAM system historically modeled and reacted to them.</p>
+                    <a href="market_mayhem_dashboard.html" class="action-link mono">VIEW ARCHIVE &rarr;</a>
+                </div>
+            </div>
+
+            <!-- SECTION: DATA, GRAPH & DEVELOPER TOOLS -->
+            <div class="section-header mono">
+                <span class="section-icon">🔧</span>
+                <h2>DATA INFRASTRUCTURE & DEVELOPER TOOLS</h2>
+            </div>
+            <div class="grid-container">
+                <div class="module-card">
+                    <h3 class="mono" style="color: #a855f7;">System Brain (Knowledge Graph)</h3>
+                    <p>Self-Aware Repository Graph. Interactive 3D visualization of ADAM's internal vector memory, showing relationships between entities (12,405 Active Nodes).</p>
+                    <a href="system_brain.html" class="action-link mono">LAUNCH BRAIN &rarr;</a>
+                </div>
+
+                <div class="module-card">
+                    <h3 class="mono" style="color: #a855f7;">Quantum Infrastructure</h3>
+                    <p>Hybrid Multi-Cloud Runtime manager. Oversees compute allocation between local edge devices and heavy cloud API inference calls.</p>
+                    <a href="quantum_infrastructure.html" class="action-link mono">INITIALIZE &rarr;</a>
+                </div>
+
+                <div class="module-card">
+                    <h3 class="mono" style="color: #a855f7;">Prompt Library & Alpha</h3>
+                    <p>AOPL v2.0 Repository. Contains the high-frequency prompt templates used to instruct the LLMs for specific financial tasks.</p>
+                    <a href="apps/prompt_alpha.html" class="action-link mono">OPEN TERMINAL &rarr;</a>
+                </div>
+
+                <div class="module-card">
+                    <h3 class="mono" style="color: #a855f7;">Creator Studio</h3>
+                    <p>Secure Report Editor. A markdown and widget-based editor for humans to modify and publish AI-generated research drafts securely.</p>
+                    <a href="editor_studio.html" class="action-link mono">LAUNCH EDITOR &rarr;</a>
+                </div>
+
+                <div class="module-card">
+                    <h3 class="mono" style="color: #a855f7;">Scenario Lab (VAE Explorer)</h3>
+                    <p>Generative Risk explorer. Uses Variational Autoencoders to generate synthetic market data for backtesting quantitative strategies.</p>
+                    <a href="scenario_lab.html" class="action-link mono">OPEN LAB &rarr;</a>
+                </div>
+
+                <div class="module-card">
+                    <h3 class="mono" style="color: #a855f7;">AVG Search Engine</h3>
+                    <p>Optimized internal search engine to query the entirety of ADAM's historical reports, raw JSON dumps, and agent logs via semantic search.</p>
+                    <a href="avg_search.html" class="action-link mono">INITIATE SEARCH &rarr;</a>
+                </div>
+            </div>
+
+            <footer style="margin-top: 60px; padding-top: 20px; border-top: 1px solid #333; text-align: center; color: #666; font-size: 0.8rem;" class="mono">
+                [SYSTEM OK] // ADAM v30 Kernel Loaded // MEMORY: 4.2TB V-RAM ALLOCATED // LATENCY: OPTIMAL
+            </footer>
+        </main>
+    </div>
+
+    <!-- Interface Scripts -->
+    <script>
+        // Simple console logging to simulate tech environment
+        console.log("%c ADAM v30 INITIALIZED ", "background: #0aff60; color: #000; font-weight: bold;");
+        console.log("Loading module manifest...");
+        console.log("Connecting to swarm neural network... [OK]");
+
+        // Add subtle hover sound effects or interactivity here if needed in future
+        document.querySelectorAll('.module-card').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.borderColor = getComputedStyle(card).getPropertyValue('--primary-color');
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.borderColor = '#333';
+            });
+        });
+    </script>
+</body>
+</html>
