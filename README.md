@@ -589,7 +589,7 @@ Distributed under the **MIT License**. See [`LICENSE`](LICENSE) for more informa
 
 ---
 
-<img width="2816" height="1536" alt="Gemini_Generated_Image_5atwml5atwml5atw" src="https://github.com/user-attachments/assets/debacf22-f81f-42ca-a8be-e4c00fb22c30" />
+<img width="2752" height="1536" alt="Gemini_Generated_Image_xpbq8axpbq8axpbq" src="https://github.com/user-attachments/assets/471f5997-b8cf-4682-b945-d7f433676ea4" />
 
 ---
 
