@@ -1,5 +1,3 @@
----
-
 <div align="center">
   <a href="https://adamvangrover.github.io/adam/">
     <picture>
