@@ -296,6 +296,10 @@ To ensure absolute auditability, the LLM credit risk automation process executes
 
 ---
 
+<img width="2814" height="1536" alt="Gemini_Generated_Image_bg48jbg48jbg48jb" src="https://github.com/user-attachments/assets/afb4ba80-e56b-4c61-aa04-96fa486a5a04" />
+
+---
+
 ## ⚡ Getting Started
 
 We strictly use **`uv`** for lightning-fast, reproducible Python environment management.
