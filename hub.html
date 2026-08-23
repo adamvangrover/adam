@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM v30.1 :: Unified Brand & Intelligence Hub</title>
+    <meta name="description" content="ADAM Unified Hub — Navigate all branded content, daily intelligence, showcase reports, and financial applications from a single interactive portal.">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* ═══════════════════════════════════════════
+           DESIGN TOKENS
+           ═══════════════════════════════════════════ */
+        :root {
+            --cyan: #00f3ff;
+            --green: #0aff60;
+            --red: #ff3333;
+            --magenta: #ff007a;
+            --amber: #f59e0b;
+            --purple: #a855f7;
+            --blue: #3b82f6;
+            --gold: #fbbf24;
+            --slate: #64748b;
+            --bg: #06090f;
+            --bg-card: rgba(12, 18, 30, 0.7);
+            --bg-hover: rgba(20, 28, 45, 0.85);
+            --text: #e0e4ea;
+            --text-muted: #8891a0;
+            --text-dim: #4a5568;
+            --border: #1e2738;
+            --radius: 8px;
+            --ease: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', -apple-system, system-ui, sans-serif;
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        a { color: inherit; text-decoration: none; transition: color var(--ease); }
+        a:hover { color: var(--cyan); }
+
+        /* ═══════════════════════════════════════════
+           BACKGROUND GRID
+           ═══════════════════════════════════════════ */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                linear-gradient(rgba(0,243,255,0.015) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,243,255,0.015) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ═══════════════════════════════════════════
+           TOP BAR
+           ═══════════════════════════════════════════ */
+        .topbar {
+            position: sticky; top: 0; z-index: 100;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 24px; height: 52px;
+            background: rgba(6, 9, 15, 0.92);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border);
+        }
+        .topbar-left { display: flex; align-items: center; gap: 12px; }
+        .topbar-logo { font-size: 1.2rem; font-weight: 700; color: var(--cyan); letter-spacing: 3px; }
+        .topbar-badge { background: var(--cyan); color: #000; padding: 1px 7px; border-radius: 3px; font-size: 0.6rem; font-weight: 700; }
+        .topbar-sep { color: var(--border); }
+        .topbar-title { font-size: 0.75rem; color: var(--text-muted); letter-spacing: 1px; }
+        .topbar-right { display: flex; gap: 8px; }
+        .topbar-btn {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.65rem; padding: 5px 10px;
+            border: 1px solid var(--border);
+            color: var(--text-muted); background: transparent;
+            border-radius: 4px; cursor: pointer;
+            text-transform: uppercase; letter-spacing: 0.5px;
+            transition: all var(--ease);
+        }
+        .topbar-btn:hover { border-color: var(--cyan); color: var(--cyan); }
+        .topbar-btn.accent { border-color: var(--green); color: var(--green); background: rgba(10,255,96,0.06); }
+
+        /* ═══════════════════════════════════════════
+           HERO
+           ═══════════════════════════════════════════ */
+        .hero {
+            position: relative; z-index: 1;
+            text-align: center;
+            padding: 48px 24px 36px;
+            border-bottom: 1px solid var(--border);
+            background: linear-gradient(180deg, rgba(0,243,255,0.03) 0%, transparent 100%);
+        }
+        .hero h1 { font-size: 2rem; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 8px; }
+        .hero h1 span { color: var(--cyan); }
+        .hero p { color: var(--text-muted); max-width: 720px; margin: 0 auto 24px; font-size: 0.95rem; }
+
+        /* Search */
+        .search-wrap { max-width: 560px; margin: 0 auto; position: relative; }
+        .search-wrap input {
+            width: 100%; padding: 12px 16px 12px 40px;
+            background: rgba(12, 18, 30, 0.8);
+            border: 1px solid var(--border); border-radius: var(--radius);
+            color: var(--text); font-size: 0.9rem;
+            outline: none; transition: all var(--ease);
+        }
+        .search-wrap input:focus { border-color: var(--cyan); box-shadow: 0 0 20px rgba(0,243,255,0.1); }
+        .search-wrap input::placeholder { color: var(--text-dim); }
+        .search-wrap .ico { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: var(--text-dim); }
+        .search-wrap .shortcut {
+            position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+            font-size: 0.6rem; padding: 2px 6px; border: 1px solid var(--border); border-radius: 3px; color: var(--text-dim);
+        }
+
+        /* ═══════════════════════════════════════════
+           BRAND CARDS (Hero Section)
+           ═══════════════════════════════════════════ */
+        .brands-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 14px;
+            max-width: 1200px;
+            margin: 28px auto 0;
+            padding: 0 20px;
+        }
+
+        .brand-card {
+            position: relative;
+            padding: 20px 16px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            background: var(--bg-card);
+            text-align: center;
+            cursor: pointer;
+            transition: all var(--ease);
+            overflow: hidden;
+        }
+        .brand-card::before {
+            content: '';
+            position: absolute; top: 0; left: 0; right: 0; height: 3px;
+            background: var(--brand-color, var(--cyan));
+            opacity: 0.6;
+            transition: opacity var(--ease);
+        }
+        .brand-card:hover { transform: translateY(-4px); border-color: var(--brand-color, var(--cyan)); background: var(--bg-hover); }
+        .brand-card:hover::before { opacity: 1; }
+        .brand-card .brand-icon { margin-bottom: 10px; }
+        .brand-card .brand-name { font-weight: 700; font-size: 0.85rem; margin-bottom: 4px; color: var(--brand-color, var(--text)); }
+        .brand-card .brand-sub { font-size: 0.7rem; color: var(--text-muted); }
+        .brand-card .brand-count { font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; color: var(--text-dim); margin-top: 8px; }
+
+        /* ═══════════════════════════════════════════
+           MAIN CONTENT AREA
+           ═══════════════════════════════════════════ */
+        .container { max-width: 1280px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+
+        /* Section Nav Tabs */
+        .section-tabs {
+            display: flex; gap: 0; margin: 28px 0 0;
+            border-bottom: 1px solid var(--border);
+            overflow-x: auto;
+        }
+        .section-tab {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.72rem; padding: 10px 18px;
+            color: var(--text-muted); background: transparent;
+            border: none; border-bottom: 2px solid transparent;
+            cursor: pointer; white-space: nowrap;
+            transition: all var(--ease); letter-spacing: 0.5px;
+        }
+        .section-tab:hover { color: var(--text); }
+        .section-tab.active { color: var(--cyan); border-bottom-color: var(--cyan); }
+
+        /* Tab Panels */
+        .tab-panel { display: none; padding: 24px 0; animation: fadeIn 0.3s ease; }
+        .tab-panel.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+        /* Section Headers */
+        .sec-header { display: flex; align-items: center; gap: 10px; margin: 24px 0 14px; }
+        .sec-header h3 { font-size: 1rem; font-weight: 700; letter-spacing: 0.5px; }
+        .sec-header .dot { width: 8px; height: 8px; border-radius: 50%; }
+
+        /* Content Grids */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 12px;
+        }
+
+        /* Generic Card */
+        .card {
+            display: flex; flex-direction: column;
+            padding: 16px; border: 1px solid var(--border);
+            border-radius: var(--radius); background: var(--bg-card);
+            transition: all var(--ease); cursor: pointer;
+        }
+        .card:hover { border-color: var(--cyan); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,243,255,0.06); background: var(--bg-hover); }
+        .card.hidden { display: none; }
+        .card h4 { font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; }
+        .card p { font-size: 0.78rem; color: var(--text-muted); flex-grow: 1; line-height: 1.5; }
+        .card .card-meta { font-family: 'JetBrains Mono', monospace; font-size: 0.62rem; color: var(--text-dim); margin-top: 10px; padding-top: 8px; border-top: 1px dashed var(--border); display: flex; justify-content: space-between; }
+
+        /* Daily Calendar Grid */
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+            gap: 6px;
+        }
+        .cal-item {
+            padding: 10px 8px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: var(--bg-card);
+            text-align: center;
+            cursor: pointer;
+            transition: all var(--ease);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+        }
+        .cal-item:hover { border-color: var(--magenta); background: var(--bg-hover); transform: translateY(-2px); }
+        .cal-item.hidden { display: none; }
+        .cal-item .cal-date { font-weight: 600; color: var(--text); }
+        .cal-item .cal-day { font-size: 0.6rem; color: var(--text-dim); margin-top: 2px; }
+        .cal-item .cal-dot { display: inline-block; width: 5px; height: 5px; border-radius: 50%; background: var(--green); margin-top: 4px; }
+        .cal-item.historical { border-color: var(--amber); }
+        .cal-item.historical .cal-dot { background: var(--amber); }
+
+        /* Brand Section Cards */
+        .brand-section { margin-bottom: 32px; }
+        .brand-section-header {
+            display: flex; align-items: center; gap: 12px;
+            padding: 12px 0; border-bottom: 1px solid var(--border);
+            margin-bottom: 14px;
+        }
+        .brand-section-header .brand-tag {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.6rem; padding: 2px 8px;
+            border-radius: 3px; font-weight: 700;
+        }
+
+        /* No Results */
+        .no-results { text-align: center; padding: 48px; color: var(--text-dim); display: none; }
+        .no-results.visible { display: block; }
+
+        /* Stat Pills */
+        .stat-pills { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 20px; }
+        .stat-pill {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.65rem; padding: 5px 12px;
+            border: 1px solid var(--border); border-radius: 20px;
+            color: var(--text-muted); background: rgba(0,0,0,0.3);
+        }
+        .stat-pill strong { color: var(--cyan); margin-right: 4px; }
+
+        /* Footer */
+        .footer {
+            text-align: center; padding: 24px;
+            border-top: 1px solid var(--border);
+            margin-top: 40px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.65rem; color: var(--text-dim);
+        }
+
+        /* SVG Logo Styles */
+        .svg-logo { display: inline-block; }
+        .svg-logo svg { display: block; }
+
+        /* App Cards (Tools) */
+        .app-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 10px;
+        }
+        .app-card {
+            padding: 14px;
+            border: 1px solid var(--border); border-radius: var(--radius);
+            background: var(--bg-card);
+            cursor: pointer; transition: all var(--ease);
+            text-align: center;
+        }
+        .app-card:hover { border-color: var(--purple); transform: translateY(-2px); background: var(--bg-hover); }
+        .app-card.hidden { display: none; }
+        .app-card h5 { font-size: 0.78rem; font-weight: 600; margin-bottom: 4px; }
+        .app-card p { font-size: 0.68rem; color: var(--text-muted); }
+
+        /* Month Group */
+        .month-group { margin-bottom: 20px; }
+        .month-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem; color: var(--text-dim);
+            margin-bottom: 8px; letter-spacing: 1px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .brands-grid { grid-template-columns: repeat(2, 1fr); }
+            .hero h1 { font-size: 1.4rem; }
+            .card-grid { grid-template-columns: 1fr; }
+            .calendar-grid { grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); }
+            .topbar-title { display: none; }
+            .app-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ═══ TOP BAR ═══ -->
+    <div class="topbar">
+        <div class="topbar-left">
+            <span class="topbar-logo mono">ADAM</span>
+            <span class="topbar-badge mono">HUB</span>
+            <span class="topbar-sep mono">|</span>
+            <span class="topbar-title mono">UNIFIED BRAND & INTELLIGENCE HUB</span>
+        </div>
+        <div class="topbar-right">
+            <a href="index.html" class="topbar-btn">← System Portal</a>
+            <a href="analyst_os.html" class="topbar-btn accent">Launch Analyst OS</a>
+        </div>
+    </div>
+
+    <!-- ═══ HERO ═══ -->
+    <section class="hero">
+        <h1>The <span>ADAM</span> Intelligence Network</h1>
+        <p>Navigate every brand, daily report, showcase artifact, and financial application from a single unified hub. 101 daily briefings · 528 showcase artifacts · 30 apps.</p>
+
+        <div class="search-wrap">
+            <span class="ico">🔍</span>
+            <input type="text" id="global-search" class="mono" placeholder="Search everything — brands, dates, reports, tools..." autocomplete="off">
+            <span class="shortcut mono">/</span>
+        </div>
+
+        <div class="stat-pills">
+            <div class="stat-pill"><strong>101</strong> Daily Briefs</div>
+            <div class="stat-pill"><strong>86</strong> Market Mayhem</div>
+            <div class="stat-pill"><strong>99</strong> Daily Briefings</div>
+            <div class="stat-pill"><strong>71</strong> Market Pulses</div>
+            <div class="stat-pill"><strong>19</strong> House Views</div>
+            <div class="stat-pill"><strong>30</strong> Financial Apps</div>
+        </div>
+
+        <!-- ═══ BRAND CARDS ═══ -->
+        <div class="brands-grid">
+            <!-- ADAM OS -->
+            <div class="brand-card" style="--brand-color: var(--cyan);" onclick="switchTab('daily')">
+                <div class="brand-icon svg-logo">
+                    <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+                        <rect x="4" y="4" width="40" height="40" rx="8" stroke="#00f3ff" stroke-width="2" fill="none"/>
+                        <path d="M24 12L14 36h4l2-5h8l2 5h4L24 12zm0 8l3 8h-6l3-8z" fill="#00f3ff"/>
+                        <circle cx="24" cy="10" r="2" fill="#00f3ff" opacity="0.5"/>
+                    </svg>
+                </div>
+                <div class="brand-name">ADAM OS</div>
+                <div class="brand-sub">Core Operating System</div>
+                <div class="brand-count">101 DAILY BRIEFS</div>
+            </div>
+
+            <!-- Market Mayhem -->
+            <div class="brand-card" style="--brand-color: var(--magenta);" onclick="switchTab('mayhem')">
+                <div class="brand-icon svg-logo">
+                    <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+                        <path d="M6 38L14 18l6 12 4-20 6 14 6-8 6 20" stroke="#ff007a" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                        <circle cx="14" cy="18" r="3" fill="#ff007a" opacity="0.3"/>
+                        <circle cx="30" cy="16" r="3" fill="#ff007a" opacity="0.3"/>
+                        <path d="M4 40h40" stroke="#ff007a" stroke-width="1" opacity="0.4"/>
+                        <text x="24" y="46" text-anchor="middle" fill="#ff007a" font-size="5" font-weight="bold" font-family="monospace">MM</text>
+                    </svg>
+                </div>
+                <div class="brand-name">Market Mayhem</div>
+                <div class="brand-sub">Crisis Intelligence & Macro Chaos</div>
+                <div class="brand-count">86 EDITIONS</div>
+            </div>
+
+            <!-- Fortress & Hunt -->
+            <div class="brand-card" style="--brand-color: var(--gold);" onclick="switchTab('fortress')">
+                <div class="brand-icon svg-logo">
+                    <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+                        <path d="M10 38V18l4-6h20l4 6v20" stroke="#fbbf24" stroke-width="2" fill="none"/>
+                        <rect x="18" y="28" width="12" height="10" stroke="#fbbf24" stroke-width="1.5" fill="none"/>
+                        <rect x="8" y="14" width="6" height="4" stroke="#fbbf24" stroke-width="1.5" fill="none"/>
+                        <rect x="34" y="14" width="6" height="4" stroke="#fbbf24" stroke-width="1.5" fill="none"/>
+                        <path d="M14 14V10M24 12V6M34 14V10" stroke="#fbbf24" stroke-width="1.5"/>
+                        <circle cx="24" cy="33" r="2" fill="#fbbf24"/>
+                    </svg>
+                </div>
+                <div class="brand-name">Fortress & Hunt</div>
+                <div class="brand-sub">Credit Underwriting & Alpha Discovery</div>
+                <div class="brand-count">CREDIT · 13F · DEEP DIVES</div>
+            </div>
+
+            <!-- Labs -->
+            <div class="brand-card" style="--brand-color: var(--purple);" onclick="switchTab('labs')">
+                <div class="brand-icon svg-logo">
+                    <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+                        <path d="M18 8v14l-8 18h28l-8-18V8" stroke="#a855f7" stroke-width="2" fill="none" stroke-linecap="round"/>
+                        <path d="M16 8h16" stroke="#a855f7" stroke-width="2" stroke-linecap="round"/>
+                        <ellipse cx="24" cy="36" rx="8" ry="3" fill="#a855f7" opacity="0.2"/>
+                        <circle cx="20" cy="32" r="2" fill="#a855f7" opacity="0.5"/>
+                        <circle cx="27" cy="34" r="1.5" fill="#a855f7" opacity="0.5"/>
+                        <circle cx="24" cy="30" r="1" fill="#a855f7" opacity="0.7"/>
+                    </svg>
+                </div>
+                <div class="brand-name">Labs</div>
+                <div class="brand-sub">Experimental & Research</div>
+                <div class="brand-count">SIMULATIONS · QUANTUM · VAE</div>
+            </div>
+
+            <!-- Governance -->
+            <div class="brand-card" style="--brand-color: var(--green);" onclick="switchTab('governance')">
+                <div class="brand-icon svg-logo">
+                    <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+                        <path d="M24 6L8 14v12c0 10 8 16 16 20 8-4 16-10 16-20V14L24 6z" stroke="#0aff60" stroke-width="2" fill="none"/>
+                        <path d="M18 24l4 4 8-8" stroke="#0aff60" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <div class="brand-name">Governance</div>
+                <div class="brand-sub">Compliance, Security & Audit</div>
+                <div class="brand-count">PROV-O · SENTINEL · POLICY</div>
+            </div>
+
+            <!-- Enterprise -->
+            <div class="brand-card" style="--brand-color: var(--blue);" onclick="switchTab('enterprise')">
+                <div class="brand-icon svg-logo">
+                    <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+                        <rect x="8" y="16" width="32" height="24" rx="3" stroke="#3b82f6" stroke-width="2" fill="none"/>
+                        <path d="M16 16V12a8 8 0 0116 0v4" stroke="#3b82f6" stroke-width="2" fill="none"/>
+                        <circle cx="24" cy="28" r="4" stroke="#3b82f6" stroke-width="1.5" fill="none"/>
+                        <path d="M24 32v4" stroke="#3b82f6" stroke-width="1.5"/>
+                        <rect x="14" y="22" width="4" height="3" rx="1" fill="#3b82f6" opacity="0.3"/>
+                        <rect x="30" y="22" width="4" height="3" rx="1" fill="#3b82f6" opacity="0.3"/>
+                    </svg>
+                </div>
+                <div class="brand-name">Enterprise</div>
+                <div class="brand-sub">Full-Stack Financial Suite</div>
+                <div class="brand-count">30 FINANCIAL APPS</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ MAIN ═══ -->
+    <div class="container">
+        <!-- Tabs -->
+        <div class="section-tabs" id="section-tabs">
+            <button class="section-tab active" data-tab="daily">Daily Intelligence</button>
+            <button class="section-tab" data-tab="mayhem">Market Mayhem</button>
+            <button class="section-tab" data-tab="fortress">Fortress & Hunt</button>
+            <button class="section-tab" data-tab="labs">Labs & Simulations</button>
+            <button class="section-tab" data-tab="governance">Governance</button>
+            <button class="section-tab" data-tab="enterprise">Enterprise Apps</button>
+            <button class="section-tab" data-tab="showcase">All Showcase</button>
+        </div>
+
+        <div class="no-results" id="no-results">
+            <div style="font-size: 2rem; margin-bottom: 8px;">🔍</div>
+            <p>No results match your search.</p>
+        </div>
+
+        <!-- ═══ TAB: DAILY INTELLIGENCE ═══ -->
+        <div class="tab-panel active" id="panel-daily">
+            <div class="sec-header">
+                <div class="dot" style="background: var(--magenta);"></div>
+                <h3>ADAM Daily Intelligence Archive</h3>
+                <span class="mono" style="font-size: 0.7rem; color: var(--text-dim);">101 DAYS</span>
+            </div>
+            <p style="color: var(--text-muted); font-size: 0.82rem; margin-bottom: 18px;">
+                Each day contains a full intelligence package: daily brief, Market Mayhem newsletter, Fortress & Hunt credit reports, Whalescanner signals, and system telemetry.
+            </p>
+
+            <!-- Historical Events -->
+            <div class="month-group">
+                <div class="month-label">▸ HISTORICAL CRISIS EVENTS</div>
+                <div class="calendar-grid" id="cal-historical"></div>
+            </div>
+
+            <!-- 2026 Months -->
+            <div id="daily-months"></div>
+        </div>
+
+        <!-- ═══ TAB: MARKET MAYHEM ═══ -->
+        <div class="tab-panel" id="panel-mayhem">
+            <div class="sec-header">
+                <div class="dot" style="background: var(--magenta);"></div>
+                <h3 style="color: var(--magenta);">MARKET MAYHEM</h3>
+                <span class="mono" style="font-size: 0.7rem; color: var(--text-dim);">CRISIS INTELLIGENCE</span>
+            </div>
+
+            <div class="brand-section">
+                <div class="brand-section-header">
+                    <span class="brand-tag" style="background: rgba(255,0,122,0.15); color: var(--magenta); border: 1px solid var(--magenta);">NEWSLETTERS</span>
+                    <span style="font-size: 0.75rem; color: var(--text-dim);">59 editions</span>
+                </div>
+                <div class="card-grid" id="mayhem-newsletters"></div>
+            </div>
+
+            <div class="brand-section">
+                <div class="brand-section-header">
+                    <span class="brand-tag" style="background: rgba(255,0,122,0.15); color: var(--magenta); border: 1px solid var(--magenta);">DASHBOARDS & TERMINALS</span>
+                </div>
+                <div class="card-grid" id="mayhem-dashboards"></div>
+            </div>
+        </div>
+
+        <!-- ═══ TAB: FORTRESS & HUNT ═══ -->
+        <div class="tab-panel" id="panel-fortress">
+            <div class="sec-header">
+                <div class="dot" style="background: var(--gold);"></div>
+                <h3 style="color: var(--gold);">FORTRESS & HUNT</h3>
+                <span class="mono" style="font-size: 0.7rem; color: var(--text-dim);">CREDIT · ALPHA · DEEP DIVES</span>
+            </div>
+
+            <div class="brand-section">
+                <div class="brand-section-header">
+                    <span class="brand-tag" style="background: rgba(251,191,36,0.15); color: var(--gold); border: 1px solid var(--gold);">DAILY BRIEFINGS</span>
+                    <span style="font-size: 0.75rem; color: var(--text-dim);">99 reports</span>
+                </div>
+                <div class="card-grid" id="fortress-briefings"></div>
+            </div>
+
+            <div class="brand-section">
+                <div class="brand-section-header">
+                    <span class="brand-tag" style="background: rgba(251,191,36,0.15); color: var(--gold); border: 1px solid var(--gold);">MARKET PULSE</span>
+                    <span style="font-size: 0.75rem; color: var(--text-dim);">71 weekly reports</span>
+                </div>
+                <div class="card-grid" id="fortress-pulse"></div>
+            </div>
+
+            <div class="brand-section">
+                <div class="brand-section-header">
+                    <span class="brand-tag" style="background: rgba(251,191,36,0.15); color: var(--gold); border: 1px solid var(--gold);">HOUSE VIEWS & DEEP DIVES</span>
+                </div>
+                <div class="card-grid" id="fortress-house"></div>
+            </div>
+
+            <div class="brand-section">
+                <div class="brand-section-header">
+                    <span class="brand-tag" style="background: rgba(251,191,36,0.15); color: var(--gold); border: 1px solid var(--gold);">CREDIT & COMPANY REPORTS</span>
+                </div>
+                <div class="card-grid" id="fortress-credit"></div>
+            </div>
+        </div>
+
+        <!-- ═══ TAB: LABS ═══ -->
+        <div class="tab-panel" id="panel-labs">
+            <div class="sec-header">
+                <div class="dot" style="background: var(--purple);"></div>
+                <h3 style="color: var(--purple);">LABS & SIMULATIONS</h3>
+            </div>
+            <div class="card-grid" id="labs-cards"></div>
+        </div>
+
+        <!-- ═══ TAB: GOVERNANCE ═══ -->
+        <div class="tab-panel" id="panel-governance">
+            <div class="sec-header">
+                <div class="dot" style="background: var(--green);"></div>
+                <h3 style="color: var(--green);">GOVERNANCE & COMPLIANCE</h3>
+            </div>
+            <div class="card-grid" id="governance-cards"></div>
+        </div>
+
+        <!-- ═══ TAB: ENTERPRISE APPS ═══ -->
+        <div class="tab-panel" id="panel-enterprise">
+            <div class="sec-header">
+                <div class="dot" style="background: var(--blue);"></div>
+                <h3 style="color: var(--blue);">ENTERPRISE FINANCIAL APPS</h3>
+                <span class="mono" style="font-size: 0.7rem; color: var(--text-dim);">30 TOOLS</span>
+            </div>
+            <p style="color: var(--text-muted); font-size: 0.82rem; margin-bottom: 18px;">
+                Standalone financial calculators, modeling tools, and analysis dashboards. All run client-side — no backend required.
+            </p>
+            <div class="app-grid" id="enterprise-apps"></div>
+        </div>
+
+        <!-- ═══ TAB: ALL SHOWCASE ═══ -->
+        <div class="tab-panel" id="panel-showcase">
+            <div class="sec-header">
+                <div class="dot" style="background: var(--cyan);"></div>
+                <h3>COMPLETE SHOWCASE INDEX</h3>
+                <span class="mono" style="font-size: 0.7rem; color: var(--text-dim);">528 ARTIFACTS</span>
+            </div>
+            <p style="color: var(--text-muted); font-size: 0.82rem; margin-bottom: 18px;">
+                Full listing of every HTML artifact in the showcase directory. Use the search bar to filter.
+            </p>
+            <div class="card-grid" id="showcase-all"></div>
+        </div>
+
+        <footer class="footer">
+            [ADAM v30.1] // UNIFIED BRAND & INTELLIGENCE HUB // MIT LICENSE // <a href="index.html" style="color: var(--cyan);">SYSTEM PORTAL</a> // <a href="machine_index.json" style="color: var(--cyan);">MACHINE API</a>
+        </footer>
+    </div>
+
+    <!-- ═══════════════════════════════════════════
+         DATA & SCRIPTS
+         ═══════════════════════════════════════════ -->
+    <script>
+    (function() {
+        'use strict';
+
+        // ── DATA ──
+        const dailyDates = ["2026-08-21","2026-08-19","2026-08-18","2026-08-16","2026-08-11","2026-08-09","2026-08-08","2026-08-05","2026-08-04","2026-08-03","2026-08-02","2026-08-01","2026-07-31","2026-07-30","2026-07-29","2026-07-28","2026-07-27","2026-07-26","2026-07-25","2026-07-20","2026-07-18","2026-07-17","2026-07-16","2026-07-13","2026-07-05","2026-07-03","2026-06-30","2026-06-29","2026-06-27","2026-06-26","2026-06-25","2026-06-24","2026-06-23","2026-06-22","2026-06-21","2026-06-19","2026-06-17","2026-06-16","2026-06-13","2026-06-05","2026-06-04","2026-06-03","2026-06-02","2026-06-01","2026-05-31","2026-05-30","2026-05-28","2026-05-27","2026-05-26","2026-05-24","2026-05-23","2026-05-22","2026-05-21","2026-05-20","2026-05-19","2026-05-18","2026-05-17","2026-05-16","2026-05-15","2026-05-14","2026-05-13","2026-05-11","2026-05-10","2026-05-09","2026-05-08","2026-05-07","2026-05-06","2026-05-04","2026-05-03","2026-05-02","2026-05-01","2026-04-30","2026-04-29","2026-04-28","2026-04-27","2026-04-22","2026-04-21","2026-04-16","2026-04-12","2026-04-09","2026-04-08","2026-04-06","2026-04-05","2026-04-02","2026-04-01","2026-03-29","2026-03-27","2026-03-24"];
+        const historicalDates = [
+            { date: "2020-03-16", label: "COVID Crash", color: "var(--red)" },
+            { date: "2008-09-15", label: "Lehman Brothers", color: "var(--amber)" },
+            { date: "2000-03-10", label: "Dot-Com Peak", color: "var(--purple)" },
+            { date: "1987-10-23", label: "Black Monday", color: "var(--magenta)" }
+        ];
+
+        const mayhemNewsletters = [
+            "newsletter_market_mayhem_mar_10_2026","newsletter_market_mayhem_mar_15_2026","newsletter_market_mayhem_mar_2026","newsletter_market_mayhem_feb_16_2026","newsletter_market_mayhem_feb_14_2026","newsletter_market_mayhem_feb_13_2026","newsletter_market_mayhem_feb_09_2026","newsletter_market_mayhem_feb_06_2026","newsletter_market_mayhem_feb_02_2026","newsletter_market_mayhem_feb_01_2026","newsletter_market_mayhem_jan_31_2026","newsletter_market_mayhem_jan_14_2026","newsletter_market_mayhem_jan_2026","newsletter_market_mayhem_dec_02_2025","newsletter_market_mayhem_nov_13_2025","newsletter_market_mayhem_nov","newsletter_market_mayhem_oct_31_2025","newsletter_market_mayhem_oct_2025","newsletter_market_mayhem_oct","newsletter_market_mayhem_sep_19_2025","newsletter_market_mayhem_sep_2025","newsletter_market_mayhem_aug_29_2025","newsletter_market_mayhem_aug_2025","newsletter_market_mayhem_jul_2025_v2","newsletter_market_mayhem_jul_2025","newsletter_market_mayhem_jun_29_2025","newsletter_market_mayhem_jun_2025","newsletter_market_mayhem_may_02_2025","newsletter_market_mayhem_may_2025","newsletter_market_mayhem_apr_04_2025","newsletter_market_mayhem_apr_2025","newsletter_market_mayhem_mar_2025","newsletter_market_mayhem_feb_2025","newsletter_market_mayhem_jan_2025","newsletter_market_mayhem_dec_2024","newsletter_market_mayhem_special_edition","newsletter_market_mayhem_test_run_v26","newsletter_market_mayhem_cro_ib_week_ahead_mar_16_2026","newsletter_market_mayhem","newsletter_market_mayhem_oct_1929","newsletter_market_mayhem_oct_1987","newsletter_market_mayhem_jul_1997","newsletter_market_mayhem_mar_2000","newsletter_market_mayhem_may_2010","newsletter_market_mayhem_jun_2016","newsletter_market_mayhem_feb_2018","newsletter_market_mayhem_mar_2020","newsletter_market_mayhem_jan_2021","newsletter_market_mayhem_jun_2022","newsletter_market_mayhem_mar_2023","newsletter_market_mayhem_sep_2008","newsletter_market_mayhem_aug_1971","newsletter_iran_collapse_2026"
+        ];
+
+        const mayhemDashboards = [
+            { name: "Market Mayhem Unified Terminal", file: "market_mayhem_terminal", desc: "Full dashboard with daily briefs, vulnerability telemetry, and defense playbooks" },
+            { name: "Market Mayhem v26 Terminal", file: "showcase/market_mayhem_v26", desc: "Advanced macro-temporal baselines and Whalescanner intelligence" },
+            { name: "Market Mayhem Dashboard", file: "showcase/market_mayhem_dashboard", desc: "Strategic Intelligence Archive of black swan events" },
+            { name: "Market Mayhem Graph", file: "showcase/market_mayhem_graph", desc: "Network visualization of market contagion paths" },
+            { name: "Market Mayhem Conviction", file: "showcase/market_mayhem_conviction", desc: "High-conviction trade signals and monitoring" },
+            { name: "Market Mayhem Builder", file: "showcase/market_mayhem_builder", desc: "Create custom crisis scenario simulations" },
+            { name: "Market Mayhem Archive v24", file: "showcase/market_mayhem_archive_v24", desc: "Legacy comprehensive archive of all editions" }
+        ];
+
+        const enterpriseApps = [
+            { name: "DCF Modeler", file: "showcase/apps/dcf", desc: "Discounted Cash Flow" },
+            { name: "LBO Model", file: "showcase/apps/lbo", desc: "Leveraged Buyout" },
+            { name: "WACC Calculator", file: "showcase/apps/wacc", desc: "Cost of Capital" },
+            { name: "Black-Scholes", file: "showcase/apps/black_scholes", desc: "Options Pricing" },
+            { name: "Bond Pricer", file: "showcase/apps/bond_pricer", desc: "Fixed Income" },
+            { name: "Monte Carlo", file: "showcase/apps/monte_carlo", desc: "Risk Simulation" },
+            { name: "Capital Stack", file: "showcase/apps/capital_stack", desc: "Cap Structure" },
+            { name: "M&A Model", file: "showcase/apps/ma_model", desc: "Merger Analysis" },
+            { name: "Loan Calculator", file: "showcase/apps/loan", desc: "Loan Amortization" },
+            { name: "Ratios Dashboard", file: "showcase/apps/ratios", desc: "Financial Ratios" },
+            { name: "Comps Builder", file: "showcase/apps/comps", desc: "Comparable Analysis" },
+            { name: "Portfolio Builder", file: "showcase/apps/portfolio", desc: "Portfolio Mgmt" },
+            { name: "Portfolio Attribution", file: "showcase/apps/portfolio_attribution", desc: "Performance" },
+            { name: "Market Data", file: "showcase/apps/market_data", desc: "Market Prices" },
+            { name: "Quantum Risk", file: "showcase/apps/quantum_risk", desc: "QAE Risk" },
+            { name: "ML Alpha Hub", file: "showcase/apps/ml_alpha_hub", desc: "ML Signals" },
+            { name: "ESG Monitor", file: "showcase/apps/esg_monitor", desc: "ESG Scoring" },
+            { name: "Compliance Audit", file: "showcase/apps/compliance_audit", desc: "RegTech" },
+            { name: "Crisis Sim", file: "showcase/apps/crisis_sim", desc: "Crisis Scenarios" },
+            { name: "Memo Synthesizer", file: "showcase/apps/memo_synthesizer", desc: "Credit Memos" },
+            { name: "Prompt Alpha", file: "showcase/apps/prompt_alpha", desc: "Prompt Library" },
+            { name: "Financial Eng.", file: "showcase/apps/financial_engineering", desc: "Structured Products" },
+            { name: "Strategic Command", file: "showcase/apps/strategic_command", desc: "Decision Engine" },
+            { name: "Fiduciary Avatar", file: "showcase/apps/fiduciary_avatar", desc: "AI Advisor" },
+            { name: "Agent Feed", file: "showcase/apps/agent_feed", desc: "Agent Telemetry" },
+            { name: "File Explorer", file: "showcase/apps/advanced_file_explorer", desc: "Repo Browser" },
+            { name: "Arch Blueprint", file: "showcase/apps/jsonl_architectural_blueprint", desc: "System Design" },
+            { name: "Market Mayhem Hub", file: "showcase/apps/market_mayhem_hub", desc: "MM Control" }
+        ];
+
+        const labsItems = [
+            { name: "Scenario Lab (VAE Explorer)", file: "scenario_lab", desc: "Generative risk using Variational Autoencoders for synthetic market data" },
+            { name: "Monte Carlo Visualizer", file: "monte_carlo_visualizer", desc: "High-performance path visualization for portfolio risk" },
+            { name: "Unified Banking World Model", file: "unified_banking", desc: "Digital Twin of the global banking system" },
+            { name: "Quantum Infrastructure", file: "quantum_infrastructure", desc: "Hybrid Multi-Cloud Runtime compute allocation" },
+            { name: "Nexus Simulation", file: "nexus", desc: "Geopolitical sovereign minds — virtual central bankers" },
+            { name: "Wargame Console", file: "wargame_dashboard", desc: "Red Team vs Blue Team economic simulator" },
+            { name: "Neural Link Convergence", file: "adam_convergence_live_neural_link", desc: "Live thought-vector convergence visualization" },
+            { name: "Market Live Exchange", file: "market_live", desc: "Real-time agent telemetry stream" },
+            { name: "Sector Swarm Roundtable", file: "sector_swarm", desc: "Multi-agent sector rotation debate" },
+            { name: "System Brain (3D Graph)", file: "system_brain", desc: "Interactive 3D knowledge graph visualization" },
+            { name: "Telemetry Prototype", file: "interactive_prototype", desc: "System 1/2 telemetry flow demonstration" },
+            { name: "Neural Dashboard", file: "showcase/neural_dashboard", desc: "React-based visualization prototype" }
+        ];
+
+        const governanceItems = [
+            { name: "Policy Center", file: "policy_center", desc: "SEC/FINRA compliance monitoring via semantic search" },
+            { name: "Sentinel Dashboard", file: "showcase/sentinel_dashboard", desc: "PROV-O compliance and threat detection" },
+            { name: "Sentinel Agent", file: "showcase/sentinel", desc: "Security agent profiles and alert history" },
+            { name: "System 2 Audit Q1 2026", file: "showcase/System_2_Audit_Q1_2026", desc: "Quarterly system audit report" },
+            { name: "System 2 Audit Q4 2025", file: "showcase/System_2_Audit_Q4_2025", desc: "Quarterly system audit report" },
+            { name: "Agent Alignment Log", file: "showcase/Agent_Alignment_Log_20251212", desc: "Agent safety alignment verification" },
+            { name: "Trust Explorer", file: "showcase/trust_explorer", desc: "Trust and verification metrics dashboard" },
+            { name: "Workflow Orchestrator", file: "workflow_orchestrator", desc: "Credit & Governance pipeline HUD" },
+            { name: "SNC Guide", file: "showcase/SNC_Guide", desc: "Shared National Credit regulatory reference" },
+            { name: "Fraud Investigation", file: "showcase/fraud_investigation", desc: "Financial fraud detection dashboards" }
+        ];
+
+        // ── RENDERING HELPERS ──
+        const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+        const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+        function formatDisplayName(filename) {
+            return filename.replace(/^(showcase\/|newsletter_|market_mayhem_|showcase\/apps\/)/, '')
+                .replace(/_/g, ' ')
+                .replace(/\.html$/, '')
+                .replace(/\b\w/g, c => c.toUpperCase());
+        }
+
+        function fileToHref(filename) {
+            if (filename.startsWith('showcase/')) return filename + '.html';
+            return filename + '.html';
+        }
+
+        // ── BUILD DAILY CALENDAR ──
+        function buildCalendar() {
+            // Historical
+            const histEl = document.getElementById('cal-historical');
+            historicalDates.forEach(h => {
+                const d = new Date(h.date + 'T12:00:00');
+                histEl.innerHTML += `<a href="showcase/data/adam_daily/${h.date}/index.html" class="cal-item historical searchable" data-keywords="${h.date} ${h.label}">
+                    <div class="cal-date">${h.date}</div>
+                    <div class="cal-day" style="color:${h.color}">${h.label}</div>
+                    <div class="cal-dot" style="background:${h.color}"></div>
+                </a>`;
+            });
+
+            // Group by month
+            const months = {};
+            dailyDates.forEach(date => {
+                const key = date.substring(0, 7);
+                if (!months[key]) months[key] = [];
+                months[key].push(date);
+            });
+
+            const container = document.getElementById('daily-months');
+            Object.keys(months).sort().reverse().forEach(monthKey => {
+                const [y, m] = monthKey.split('-');
+                const label = `${monthNames[parseInt(m) - 1]} ${y}`;
+                let html = `<div class="month-group"><div class="month-label">▸ ${label.toUpperCase()} (${months[monthKey].length} days)</div><div class="calendar-grid">`;
+
+                months[monthKey].forEach(date => {
+                    const d = new Date(date + 'T12:00:00');
+                    const dayName = dayNames[d.getDay()];
+                    const dayNum = date.substring(8);
+                    html += `<a href="showcase/data/adam_daily/${date}/index.html" class="cal-item searchable" data-keywords="${date} ${dayName} ${label}">
+                        <div class="cal-date">${dayName} ${dayNum}</div>
+                        <div class="cal-day">${date}</div>
+                        <div class="cal-dot"></div>
+                    </a>`;
+                });
+
+                html += '</div></div>';
+                container.innerHTML += html;
+            });
+        }
+
+        function buildCards(containerId, items, colorVar, baseHref) {
+            const container = document.getElementById(containerId);
+            items.forEach(item => {
+                const href = baseHref ? baseHref + item.file + '.html' : fileToHref(item.file || item);
+                const name = item.name || formatDisplayName(typeof item === 'string' ? item : item.file);
+                const desc = item.desc || '';
+                container.innerHTML += `<a href="${href}" class="card searchable" data-keywords="${name.toLowerCase()} ${desc.toLowerCase()}">
+                    <h4 style="color: var(${colorVar})">${name}</h4>
+                    <p>${desc}</p>
+                    <div class="card-meta"><span>${typeof item === 'string' ? 'NEWSLETTER' : 'VIEW'}</span><span>→</span></div>
+                </a>`;
+            });
+        }
+
+        function buildNewsletters() {
+            const container = document.getElementById('mayhem-newsletters');
+            mayhemNewsletters.forEach(f => {
+                const name = formatDisplayName(f);
+                container.innerHTML += `<a href="showcase/${f}.html" class="card searchable" data-keywords="${name.toLowerCase()} market mayhem newsletter">
+                    <h4 style="color: var(--magenta)">${name}</h4>
+                    <p></p>
+                    <div class="card-meta"><span>NEWSLETTER</span><span>→</span></div>
+                </a>`;
+            });
+        }
+
+        function buildApps() {
+            const container = document.getElementById('enterprise-apps');
+            enterpriseApps.forEach(app => {
+                container.innerHTML += `<a href="${app.file}.html" class="app-card searchable" data-keywords="${app.name.toLowerCase()} ${app.desc.toLowerCase()} enterprise app tool">
+                    <h5 style="color: var(--blue)">${app.name}</h5>
+                    <p>${app.desc}</p>
+                </a>`;
+            });
+        }
+
+        // ── BUILD FORTRESS (Briefings, Pulses, House Views, Credit) ──
+        function buildFortressContent() {
+            // We'll generate links for the pattern-based content
+            const briefingContainer = document.getElementById('fortress-briefings');
+            const briefingDates = ["2026-03-27","2026-03-26","2026-03-24_Morning","2026-03-24_Evening","2026-03-23","2026-03-20","2026-03-16","2026-03-12","2026-03-08","2026-03-06","2026-03-03","2026-03-02_Kinetic","2026-03-02_Volatility","2026-02-20","2026-02-19","2026-02-18","2026-02-17","2026-02-16","2026-02-13","2026-02-12","2026-02-11","2026-02-09","2026-02-05","2026-02-04","2026-02-02","2026-01-30","2026-01-26","2026-01-23","2026-01-20","2026-01-12","2025-12-23","2025-12-15","2025-12-09","2025-11-27","2025-11-25","2025-11-19","2025-11-10","2025-11-06","2025-11-04","2025-10-28","2025-10-16","2025-10-15"];
+            briefingDates.slice(0, 24).forEach(d => {
+                const displayDate = d.replace(/_/g, ' ');
+                briefingContainer.innerHTML += `<a href="showcase/Daily_Briefing_${d.replace(/-/g,'_')}.html" class="card searchable" data-keywords="daily briefing ${displayDate} fortress">
+                    <h4 style="color: var(--gold)">Daily Briefing ${displayDate}</h4>
+                    <p></p>
+                    <div class="card-meta"><span>BRIEFING</span><span>→</span></div>
+                </a>`;
+            });
+
+            // Market Pulse (sample)
+            const pulseContainer = document.getElementById('fortress-pulse');
+            const pulseDates = ["2026-03-27","2026-03-20","2026-03-13","2026-03-06","2026-02-27","2026-02-13","2026-02-06","2026-01-30","2026-01-23","2026-01-16","2026-01-09","2026-01-02","2025-12-26","2025-12-19","2025-12-12","2025-12-05"];
+            pulseDates.forEach(d => {
+                pulseContainer.innerHTML += `<a href="showcase/Market_Pulse_${d.replace(/-/g,'_')}.html" class="card searchable" data-keywords="market pulse ${d} fortress weekly">
+                    <h4 style="color: var(--gold)">Market Pulse ${d}</h4>
+                    <p></p>
+                    <div class="card-meta"><span>WEEKLY PULSE</span><span>→</span></div>
+                </a>`;
+            });
+
+            // House Views
+            const houseContainer = document.getElementById('fortress-house');
+            const houseViews = [
+                { name: "House View Q1 2026", file: "showcase/house_view_q1_2026" },
+                { name: "House View March 2026", file: "showcase/house_view_2026_03_01" },
+                { name: "House View Jan 2026", file: "showcase/house_view_2026_01_15" },
+                { name: "Deep Dive: AI Debt Reckoning", file: "showcase/Deep_Dive_AI_Debt_Reckoning" },
+                { name: "Deep Dive: Ghost GDP 2026", file: "showcase/deep_dive_ghost_gdp_2026" },
+                { name: "Deep Dive: Iranian Collapse", file: "showcase/Deep_Dive_Iranian_Collapse_2026" },
+                { name: "Equity Research Q1 2026", file: "showcase/1Q26_Equity_Research_Desk" },
+                { name: "Global Macro Update 2026", file: "showcase/Global_Macro_Update_2026" },
+                { name: "Strategic Outlook 2026", file: "showcase/report_2026_strategic_outlook" }
+            ];
+            houseViews.forEach(item => {
+                houseContainer.innerHTML += `<a href="${item.file}.html" class="card searchable" data-keywords="${item.name.toLowerCase()} house view deep dive fortress">
+                    <h4 style="color: var(--gold)">${item.name}</h4>
+                    <p></p>
+                    <div class="card-meta"><span>RESEARCH</span><span>→</span></div>
+                </a>`;
+            });
+
+            // Credit Reports
+            const creditContainer = document.getElementById('fortress-credit');
+            const creditReports = [
+                "showcase/nvda_company_report_20250226_final","showcase/msft_company_report_20250224","showcase/amzn_company_report","showcase/googl_company_report","showcase/meta_company_report","showcase/aapl_company_report","showcase/tsla_company_report","showcase/nflx_company_report","showcase/amd_company_report","showcase/avgo_company_report","showcase/cost_company_report","showcase/crm_company_report","showcase/lly_company_report","showcase/pltr_company_report","showcase/credit_architect","showcase/credit_analyst_workstation","showcase/credit_sentinel","showcase/snc_cover"
+            ];
+            creditReports.forEach(f => {
+                const name = formatDisplayName(f);
+                creditContainer.innerHTML += `<a href="${f}.html" class="card searchable" data-keywords="${name.toLowerCase()} credit company report fortress">
+                    <h4 style="color: var(--gold)">${name}</h4>
+                    <p></p>
+                    <div class="card-meta"><span>CREDIT</span><span>→</span></div>
+                </a>`;
+            });
+        }
+
+        // ── INIT ──
+        buildCalendar();
+        buildNewsletters();
+        buildCards('mayhem-dashboards', mayhemDashboards, '--magenta', '');
+        buildFortressContent();
+        buildCards('labs-cards', labsItems, '--purple', '');
+        buildCards('governance-cards', governanceItems, '--green', '');
+        buildApps();
+
+        // ── TAB SWITCHING ──
+        const tabs = document.querySelectorAll('.section-tab');
+        const panels = document.querySelectorAll('.tab-panel');
+
+        window.switchTab = function(tabId) {
+            tabs.forEach(t => t.classList.toggle('active', t.dataset.tab === tabId));
+            panels.forEach(p => p.classList.toggle('active', p.id === 'panel-' + tabId));
+            // Scroll to tabs
+            document.getElementById('section-tabs').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        };
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => switchTab(tab.dataset.tab));
+        });
+
+        // ── SEARCH ──
+        const searchInput = document.getElementById('global-search');
+        const noResults = document.getElementById('no-results');
+
+        function doSearch() {
+            const q = searchInput.value.toLowerCase().trim();
+            const allSearchable = document.querySelectorAll('.searchable');
+            let visible = 0;
+
+            if (!q) {
+                allSearchable.forEach(el => el.classList.remove('hidden'));
+                noResults.classList.remove('visible');
+                // Show all month groups
+                document.querySelectorAll('.month-group').forEach(g => g.style.display = '');
+                document.querySelectorAll('.brand-section').forEach(g => g.style.display = '');
+                return;
+            }
+
+            // Show all panels when searching
+            panels.forEach(p => p.classList.add('active'));
+            tabs.forEach(t => t.classList.remove('active'));
+
+            allSearchable.forEach(el => {
+                const text = (el.textContent + ' ' + (el.dataset.keywords || '')).toLowerCase();
+                const match = text.includes(q);
+                el.classList.toggle('hidden', !match);
+                if (match) visible++;
+            });
+
+            // Hide empty month groups
+            document.querySelectorAll('.month-group').forEach(g => {
+                const vis = g.querySelectorAll('.cal-item:not(.hidden)').length;
+                g.style.display = vis ? '' : 'none';
+            });
+            document.querySelectorAll('.brand-section').forEach(g => {
+                const vis = g.querySelectorAll('.card:not(.hidden)').length;
+                g.style.display = vis ? '' : 'none';
+            });
+
+            noResults.classList.toggle('visible', visible === 0);
+        }
+
+        searchInput.addEventListener('input', doSearch);
+
+        // Clear search restores tabs
+        searchInput.addEventListener('input', function() {
+            if (!this.value.trim()) {
+                switchTab('daily');
+            }
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.key === '/' && document.activeElement !== searchInput) {
+                e.preventDefault();
+                searchInput.focus();
+            }
+            if (e.key === 'Escape' && document.activeElement === searchInput) {
+                searchInput.value = '';
+                searchInput.blur();
+                doSearch();
+                switchTab('daily');
+            }
+        });
+
+        // Console
+        console.log('%c ADAM HUB INITIALIZED ', 'background: #00f3ff; color: #000; font-weight: bold; font-size: 14px;');
+    })();
+    </script>
+</body>
+</html>
