@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adam OS | Main Terminal Dashboard</title>
+
+    <meta name="adam-node-type" content="interactive_terminal">
+    <meta name="adam-parent-node" content="/root/index.html">
+
+    <!-- CDNs -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+
+    <style>
+        :root {
+            --bg: #050505;
+            --panel: rgba(17, 17, 17, 0.9);
+            --text-primary: #0f0;
+            --text-dim: #077;
+            --border: #333;
+            --alert: #ff003c;
+        }
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--text-primary);
+            font-family: 'Courier New', monospace;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        header {
+            padding: 12px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            background: #000;
+            z-index: 10;
+        }
+        .layout {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 15px;
+            padding: 15px;
+            flex-grow: 1;
+            overflow: hidden;
+        }
+        .pane {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            padding: 20px;
+            padding-top: 35px;
+            overflow-y: auto;
+            position: relative;
+            border-radius: 4px;
+        }
+        .pane-title {
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: var(--text-primary);
+            color: #000;
+            padding: 4px 10px;
+            font-size: 0.75em;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+        .pane-title.alert { background: var(--alert); color: #fff; }
+        .pane-title.data { background: #0aa; color: #fff; }
+
+        .log-entry { margin-bottom: 8px; font-size: 0.85em; line-height: 1.4; color: #aaa; }
+        .log-entry .timestamp { color: var(--text-dim); margin-right: 8px; }
+        .log-entry .info { color: #5af; font-weight: bold; }
+        .log-entry .warn { color: var(--alert); font-weight: bold; }
+        .log-entry .success { color: var(--text-primary); font-weight: bold; }
+
+        canvas { width: 100% !important; height: 100% !important; }
+
+        a.nav-link { color: #fff; text-decoration: none; padding: 2px 6px; border: 1px solid #333; transition: all 0.2s; }
+        a.nav-link:hover { background: var(--text-primary); color: #000; border-color: var(--text-primary); }
+
+        /* Prism overrides */
+        pre[class*="language-"] {
+            background: transparent !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            text-shadow: none !important;
+            font-size: 0.85em !important;
+        }
+        code[class*="language-"], pre[class*="language-"] {
+            color: #e2e8f0 !important;
+        }
+    </style>
+</head>
+<body data-active-kernels="Rust, Qiskit" data-mcp-status="connected">
+
+    <header>
+        <div class="flex items-center gap-4">
+            <span class="font-bold tracking-widest">// ADAM_OS TERMINAL</span>
+            <a href="../root/index.html" class="nav-link text-xs">[RETURN TO ROOT]</a>
+            <a href="../briefings/fortress_hunt.html" class="nav-link text-xs">[FORTRESS_HUNT]</a>
+        </div>
+        <div id="clock" class="text-sm text-[#0aa]">SYS_TIME: <span id="time-display"></span></div>
+    </header>
+
+    <div class="layout">
+        <!-- Visualization Pane -->
+        <div class="pane" style="grid-row: span 2;">
+            <div class="pane-title">QUANTITATIVE VISUALIZATION // YIELD CURVE SIMULATION</div>
+            <div style="height: 100%; position: relative;">
+                <canvas id="yieldChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Rust Execution Logs -->
+        <div class="pane">
+            <div class="pane-title alert">RUST MICROKERNEL STDOUT</div>
+            <div id="log-container" class="mt-2">
+                <div class="log-entry"><span class="timestamp">[17:38:00.124]</span> <span class="info">[INFO]</span> Binding PyO3 interfaces to NATS JetStream...</div>
+                <div class="log-entry"><span class="timestamp">[17:38:00.451]</span> <span class="info">[INFO]</span> Processing portfolio optimization matrices.</div>
+                <div class="log-entry"><span class="timestamp">[17:38:01.092]</span> <span class="warn">[WARN]</span> jsonLogic guardrail triggered: LCR threshold approached.</div>
+                <div class="log-entry"><span class="timestamp">[17:38:01.888]</span> <span class="success">[OK]</span> PDIL middleware verified W3C PROV-O compliance.</div>
+                <div class="log-entry" id="blinking-cursor" style="color:var(--text-primary); margin-top:10px;">> Awaiting stream input... <span style="animation: blink 1s step-end infinite;">_</span></div>
+            </div>
+        </div>
+
+        <!-- System State Viewer -->
+        <div class="pane">
+            <div class="pane-title data">SYSTEM CONFIG // STATE.JSON</div>
+            <div class="h-full overflow-y-auto">
+                <pre><code class="language-json" id="json-viewer">Loading state...</code></pre>
+            </div>
+        </div>
+    </div>
+
+    <!-- Machine-Readable App State -->
+    <script type="application/json" id="terminal-state">
+        {
+            "rendered_panes": 3,
+            "chart_context": "chart.js_initialized",
+            "linked_briefing_models": ["FH_CONVICTION_V2"]
+        }
+    </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+
+    <script>
+        // Clock
+        function updateClock() {
+            document.getElementById('time-display').innerText = new Date().toISOString().replace('T', ' ').substring(0, 19) + ' UTC';
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // Blinking animation
+        const style = document.createElement('style');
+        style.innerHTML = `@keyframes blink { 50% { opacity: 0; } }`;
+        document.head.appendChild(style);
+
+        // Fetch and display JSON data
+        fetch('../data/system_state.json')
+            .then(res => res.json())
+            .then(data => {
+                const codeEl = document.getElementById('json-viewer');
+                codeEl.textContent = JSON.stringify(data, null, 2);
+                Prism.highlightElement(codeEl);
+            })
+            .catch(err => {
+                document.getElementById('json-viewer').textContent = "// ERROR FETCHING JSON\n" + err;
+            });
+
+        // Initialize Chart.js
+        const ctx = document.getElementById('yieldChart').getContext('2d');
+
+        // Gradient for chart
+        let gradient = ctx.createLinearGradient(0, 0, 0, 400);
+        gradient.addColorStop(0, 'rgba(0, 255, 0, 0.5)');
+        gradient.addColorStop(1, 'rgba(0, 255, 0, 0.0)');
+
+        const myChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['1M', '3M', '6M', '1Y', '2Y', '3Y', '5Y', '7Y', '10Y', '20Y', '30Y'],
+                datasets: [{
+                    label: 'Simulated Sovereign Yield Curve',
+                    data: [5.4, 5.5, 5.6, 5.4, 4.9, 4.6, 4.3, 4.4, 4.5, 4.8, 4.9], // Inverted curve
+                    borderColor: '#0f0',
+                    backgroundColor: gradient,
+                    borderWidth: 2,
+                    pointBackgroundColor: '#fff',
+                    pointBorderColor: '#0f0',
+                    pointRadius: 4,
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        labels: { color: '#ccc', font: { family: 'Courier New' } }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                        ticks: { color: '#888', font: { family: 'Courier New' } }
+                    },
+                    y: {
+                        grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                        ticks: { color: '#888', font: { family: 'Courier New' } },
+                        min: 3.5,
+                        max: 6.0
+                    }
+                },
+                animation: {
+                    duration: 2000,
+                    easing: 'easeOutQuart'
+                }
+            }
+        });
+
+        // Simulate incoming logs
+        setTimeout(() => {
+            const container = document.getElementById('log-container');
+            const cursor = document.getElementById('blinking-cursor');
+            const newLog = document.createElement('div');
+            newLog.className = 'log-entry';
+            newLog.innerHTML = `<span class="timestamp">[${new Date().toISOString().substring(11,23)}]</span> <span class="info">[UPDATE]</span> /data/fortress_hunt_model.json refreshed successfully.`;
+            container.insertBefore(newLog, cursor);
+        }, 3000);
+    </script>
+</body>
+</html>

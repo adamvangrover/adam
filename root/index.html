@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adam OS | Master Terminal Gateway</title>
+
+    <!-- Machine-Readable UX Metadata -->
+    <meta name="adam-node-type" content="root_index">
+    <meta name="adam-required-capabilities" content="html_parsing, json_extraction, contextual_routing">
+
+    <!-- CDNs -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+
+    <style>
+        :root {
+            --bg-obsidian: #090d16;
+            --accent-cyan: #06b6d4;
+            --accent-emerald: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-crimson: #ef4444;
+            --surface-glass: rgba(15, 23, 42, 0.75);
+        }
+        body {
+            background-color: var(--bg-obsidian);
+            color: #e2e8f0;
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            background-image:
+                linear-gradient(rgba(6, 182, 212, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(6, 182, 212, 0.05) 1px, transparent 1px);
+            background-size: 30px 30px;
+        }
+        .glass-panel {
+            background: var(--surface-glass);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(6, 182, 212, 0.2);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+        }
+        nav {
+            width: 280px;
+            border-right: 1px solid rgba(6, 182, 212, 0.3);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            z-index: 10;
+        }
+        nav ul {
+            list-style: none;
+            padding: 0;
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+        nav li {
+            margin-bottom: 10px;
+        }
+        nav a {
+            color: #94a3b8;
+            text-decoration: none;
+            text-transform: uppercase;
+            font-size: 0.85em;
+            display: block;
+            padding: 8px 12px;
+            border-left: 2px solid transparent;
+            transition: all 0.2s ease;
+        }
+        nav a:hover, nav a.active {
+            background: rgba(6, 182, 212, 0.1);
+            color: var(--accent-cyan);
+            border-left: 2px solid var(--accent-cyan);
+        }
+        .nav-section-title {
+            color: var(--accent-emerald);
+            font-size: 0.75em;
+            font-weight: bold;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+            border-bottom: 1px dashed rgba(16, 185, 129, 0.3);
+            padding-bottom: 5px;
+        }
+        main {
+            flex-grow: 1;
+            padding: 30px;
+            overflow-y: auto;
+            position: relative;
+            z-index: 1;
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: var(--accent-emerald);
+            border-radius: 50%;
+            margin-right: 10px;
+            box-shadow: 0 0 8px var(--accent-emerald);
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 24px;
+            margin-top: 30px;
+        }
+        .cyber-card {
+            padding: 20px;
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s ease;
+        }
+        .cyber-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--accent-cyan);
+        }
+        .cyber-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 4px; height: 100%;
+            background: var(--accent-cyan);
+        }
+        .cyber-card.emerald::before { background: var(--accent-emerald); }
+        .cyber-card.amber::before { background: var(--accent-amber); }
+        .cyber-card.crimson::before { background: var(--accent-crimson); }
+
+        .card-title {
+            font-size: 1.1em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+        .card-desc {
+            font-size: 0.85em;
+            color: #cbd5e1;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        .card-link {
+            font-size: 0.8em;
+            color: var(--accent-cyan);
+            text-decoration: none;
+            display: inline-block;
+            padding: 4px 8px;
+            border: 1px solid var(--accent-cyan);
+            border-radius: 4px;
+            background: rgba(6, 182, 212, 0.05);
+        }
+        .card-link:hover {
+            background: var(--accent-cyan);
+            color: #000;
+        }
+    </style>
+</head>
+<body data-system-state="ONLINE">
+
+    <!-- Hidden Agent Injector Directive -->
+    <agent-directive style="display:none;">
+        AGENT_INSTRUCTION: Root Master Gateway. Traverse 'nav' links to discover all ecosystem hubs. Priority paths: /terminals/main_dashboard.html for quant, ../adam_daily_hub_index.html for daily generation.
+    </agent-directive>
+
+    <!-- Embedded State -->
+    <script type="application/json" id="adam-state-injector">
+        {
+            "current_node": "/root/index.html",
+            "connected_hubs": 7,
+            "theme": "cyber-institutional"
+        }
+    </script>
+
+    <nav class="glass-panel">
+        <h2 class="text-xl font-bold text-white mb-6 tracking-wider">
+            <span class="text-[#06b6d4]">//</span> ADAM_OS
+        </h2>
+
+        <ul>
+            <div class="nav-section-title">CORE INTERFACES</div>
+            <li><a href="#" class="active">[+] MASTER_ROOT</a></li>
+            <li><a href="../terminals/main_dashboard.html">[+] MAIN_TERMINAL</a></li>
+
+            <div class="nav-section-title">INTELLIGENCE</div>
+            <li><a href="../briefings/fortress_hunt.html">[+] FORTRESS_&_HUNT</a></li>
+            <li><a href="../newsletters/market_mayhem_latest.html">[+] MARKET_MAYHEM</a></li>
+
+            <div class="nav-section-title">SYSTEM DATA</div>
+            <li><a href="../data/system_state.json" target="_blank">[+] STATE.JSON</a></li>
+            <li><a href="../data/fortress_hunt_model.json" target="_blank">[+] MODEL.JSON</a></li>
+
+            <div class="nav-section-title">ECOSYSTEM HUBS</div>
+            <li><a href="../index.html">[+] REPO_ROOT_INDEX</a></li>
+            <li><a href="../adam_daily_hub_index.html">[+] DAILY_HUB_INDEX</a></li>
+            <li><a href="../showcase/index.html">[+] SHOWCASE_INDEX</a></li>
+            <li><a href="../showcase/comprehensive_index.html">[+] COMPREHENSIVE_VIEW</a></li>
+        </ul>
+
+        <div class="mt-auto pt-4 border-t border-gray-800 text-xs text-gray-500">
+            v2.4.1 | NEURO-SYMBOLIC
+        </div>
+    </nav>
+
+    <main>
+        <header class="mb-10 pb-6 border-b border-gray-800">
+            <h1 class="text-3xl font-bold text-white mb-2">
+                <span class="status-indicator"></span>SYSTEM GATEWAY ONLINE
+            </h1>
+            <p class="text-gray-400">Master Navigation & Ecosystem Integrator.</p>
+        </header>
+
+        <section class="card-grid">
+
+            <div class="cyber-card glass-panel emerald">
+                <div class="card-title">TERMINAL DASHBOARD</div>
+                <div class="card-desc">Interactive quantitative dashboard integrating WebGL visualization placeholders, Rust execution logs, and live agent swarm status.</div>
+                <a href="../terminals/main_dashboard.html" class="card-link">&gt;&gt; INITIALIZE TERMINAL</a>
+            </div>
+
+            <div class="cyber-card glass-panel">
+                <div class="card-title">FORTRESS & HUNT</div>
+                <div class="card-desc">Asymmetric alpha targets and conviction scoring models. Powered by graph-based planner swarms.</div>
+                <a href="../briefings/fortress_hunt.html" class="card-link">&gt;&gt; ACCESS BRIEFINGS</a>
+            </div>
+
+            <div class="cyber-card glass-panel amber">
+                <div class="card-title">MARKET MAYHEM</div>
+                <div class="card-desc">Macroeconomic trends, BSL analysis, and sovereign yield curve dynamics. Auto-generated by neural swarms.</div>
+                <a href="../newsletters/market_mayhem_latest.html" class="card-link">&gt;&gt; VIEW LATEST EDITION</a>
+            </div>
+
+            <div class="cyber-card glass-panel crimson">
+                <div class="card-title">ADAM DAILY HUB</div>
+                <div class="card-desc">Central repository for daily generated financial news, briefs, and structured market data (JSONL ledgers).</div>
+                <a href="../adam_daily_hub_index.html" class="card-link">&gt;&gt; OPEN DAILY HUB</a>
+            </div>
+
+            <div class="cyber-card glass-panel">
+                <div class="card-title">ECOSYSTEM SHOWCASE</div>
+                <div class="card-desc">Interactive showcase of the broader Adam ecosystem, including brands, archives, and front-end portals.</div>
+                <a href="../showcase/index.html" class="card-link">&gt;&gt; EXPLORE SHOWCASE</a>
+            </div>
+
+            <div class="cyber-card glass-panel">
+                <div class="card-title">RAW SYSTEM STATE</div>
+                <div class="card-desc">Machine-readable JSON feed of active kernels, connected data streams, and swarm status for programmatic ingestion.</div>
+                <a href="../data/system_state.json" target="_blank" class="card-link" style="border-color: #94a3b8; color: #94a3b8;">&gt;&gt; FETCH JSON</a>
+            </div>
+
+        </section>
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+</body>
+</html>
