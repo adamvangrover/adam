@@ -585,6 +585,11 @@ Distributed under the **MIT License**. See [`LICENSE`](LICENSE) for more informa
 
 ---
 
+<img width="2816" height="1536" alt="Gemini_Generated_Image_1xr0sp1xr0sp1xr0" src="https://github.com/user-attachments/assets/0aacf79d-19ee-4a7c-a935-98be8f348307" />
+
+
+---
+
 <div align="center">
   <sub>Built with 🧠 by the ADAM Team — Autonomous Deterministic Alpha Matrix</sub>
   <br>
