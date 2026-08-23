@@ -1,11 +1,23 @@
 import React from 'react';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { etfData } from '../../utils/historicData';
 
 const ETFs: React.FC = () => {
   return (
     <div style={{ padding: '16px' }}>
       <h4>ETFs</h4>
-      <div style={{ border: '1px solid #eee', height: '300px', display: 'flex', justifyContent: 'center', alignItems: 'center', color: '#999', marginBottom: '16px' }}>
-        [Performance Chart Placeholder]
+      <div style={{ height: '300px', marginBottom: '16px' }}>
+        <ResponsiveContainer width="100%" height="100%">
+          <LineChart data={etfData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#333" />
+            <XAxis dataKey="date" stroke="#888" tickFormatter={(tick) => tick.substring(5)} />
+            <YAxis stroke="#888" domain={['auto', 'auto']} />
+            <Tooltip contentStyle={{ backgroundColor: '#111', borderColor: '#333' }} />
+            <Legend />
+            <Line type="monotone" dataKey="price" stroke="#00f3ff" name="Historical Price" dot={false} strokeWidth={2} />
+            <Line type="monotone" dataKey="projected" stroke="#ff00ff" name="Projected Price" strokeDasharray="5 5" dot={false} strokeWidth={2} />
+          </LineChart>
+        </ResponsiveContainer>
       </div>
       <table style={{ width: '100%', borderCollapse: 'collapse' }}>
         <thead>
