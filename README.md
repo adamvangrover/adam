@@ -1,3 +1,7 @@
+<img width="2816" height="1536" alt="Gemini_Generated_Image_1abr9w1abr9w1abr" src="https://github.com/user-attachments/assets/2a25b3fd-005d-465c-b51b-ffca4bbf13e5" />
+
+---
+
 <div align="center">
   <a href="https://adamvangrover.github.io/adam/">
     <picture>
@@ -7,11 +11,6 @@
     </picture>
   </a>
 </div>
-
----
-
-<img width="2816" height="1536" alt="Gemini_Generated_Image_1abr9w1abr9w1abr" src="https://github.com/user-attachments/assets/2a25b3fd-005d-465c-b51b-ffca4bbf13e5" />
-
 
 <div align="center">
   <h3>Autonomous Deterministic Alpha Matrix</h3>
