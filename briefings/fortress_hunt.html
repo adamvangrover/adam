@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fortress & Hunt | Equity Intelligence</title>
+
+    <!-- Machine-Readable UX Metadata -->
+    <meta name="adam-node-type" content="equity_briefing">
+    <meta name="adam-required-capabilities" content="financial_parsing, jsonLogic_evaluation">
+    <meta name="adam-parent-node" content="/root/index.html">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background: #0d1117;
+            color: #c9d1d9;
+            padding: 30px;
+            background-image:
+                linear-gradient(rgba(88, 166, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(88, 166, 255, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+        .briefing-wrapper {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #161b22;
+            padding: 40px;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        h1 {
+            color: #58a6ff;
+            border-bottom: 2px solid #30363d;
+            padding-bottom: 15px;
+            font-size: 2.2em;
+            letter-spacing: -0.5px;
+        }
+        .target-card {
+            background: #21262d;
+            border-left: 4px solid #238636;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 6px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .target-card:hover {
+            transform: translateX(5px);
+            box-shadow: -5px 5px 15px rgba(0,0,0,0.3);
+        }
+        .score-badge {
+            float: right;
+            background: rgba(35, 134, 54, 0.1);
+            border: 1px solid #238636;
+            padding: 10px 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .score { font-size: 1.8em; font-weight: bold; color: #3fb950; display: block; line-height: 1;}
+        .score-label { font-size: 0.6em; color: #8b949e; text-transform: uppercase; letter-spacing: 1px; }
+
+        .tag {
+            background: rgba(56, 139, 253, 0.15);
+            color: #58a6ff;
+            border: 1px solid rgba(56, 139, 253, 0.4);
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.7em;
+            text-transform: uppercase;
+            vertical-align: middle;
+            margin-left: 10px;
+        }
+        a.nav-link {
+            color: #8b949e;
+            text-decoration: none;
+            display: inline-block;
+            margin-bottom: 25px;
+            font-family: monospace;
+            padding: 5px 10px;
+            background: #21262d;
+            border-radius: 4px;
+            border: 1px solid #30363d;
+        }
+        a.nav-link:hover { color: #58a6ff; border-color: #58a6ff; }
+    </style>
+</head>
+<body data-strategy="BARBELL" data-model-ref="/data/fortress_hunt_model.json">
+
+    <!-- Agent Injector Directive -->
+    <agent-directive style="display:none;">
+        AGENT_INSTRUCTION: Extract targets with conviction_score > 9.0. Queue these tickers for Qiskit circuit model VaR simulations. Update /terminals/main_dashboard.html with results.
+    </agent-directive>
+
+    <div class="briefing-wrapper">
+        <div class="flex justify-between items-center">
+            <a href="../root/index.html" class="nav-link">$ cd ../root/index.html</a>
+            <a href="../showcase/index.html" class="nav-link">$ cd ../showcase/index.html</a>
+        </div>
+
+        <h1>FORTRESS & HUNT</h1>
+        <p class="text-gray-400 text-lg mb-8">Strategic Equity Analysis & Asymmetric Alpha Targets</p>
+
+        <div class="bg-gray-800/50 p-4 rounded-md border border-gray-700 mb-8 flex items-center justify-between">
+            <div>
+                <span class="text-sm text-gray-500 block">CURRENT STRATEGY</span>
+                <span class="font-bold text-emerald-400">BARBELL / AGGRESSIVE_ASYMMETRIC</span>
+            </div>
+            <a href="../data/fortress_hunt_model.json" target="_blank" class="text-cyan-400 hover:text-cyan-300 text-sm flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                Fetch Model JSON
+            </a>
+        </div>
+
+        <div class="target-card" data-ticker="SYNTH_TMT_01" data-score="8.7">
+            <div class="score-badge">
+                <span class="score">8.7</span>
+                <span class="score-label">Conviction</span>
+            </div>
+            <h3 class="text-xl font-bold text-white mb-2">SYNTH_TMT_01 <span class="tag">TMT</span></h3>
+            <p class="mb-2 text-gray-300"><strong>Thesis:</strong> High-yield subordinate tranche mispricing. Second-line risk models highlight asymmetric upside due to over-rotation in sovereign duration.</p>
+            <p class="text-sm text-gray-400 mb-4"><strong>Catalyst:</strong> Upcoming SEC EDGAR 10-Q parsing by neural swarm alpha.</p>
+
+            <div class="mt-4 pt-4 border-t border-gray-700 flex justify-between items-center">
+                <span class="text-xs text-emerald-500 font-mono">jsonLogic: PASSED</span>
+                <a href="../terminals/main_dashboard.html" class="text-sm text-[#58a6ff] hover:underline">Execute Quant Sim &rarr;</a>
+            </div>
+        </div>
+
+        <div class="target-card" style="border-left-color: #8957e5;" data-ticker="Q_ALGO_99" data-score="9.2">
+            <div class="score-badge" style="border-color: #8957e5; background: rgba(137, 87, 229, 0.1);">
+                <span class="score" style="color: #d2a8ff;">9.2</span>
+                <span class="score-label">Conviction</span>
+            </div>
+            <h3 class="text-xl font-bold text-white mb-2">Q_ALGO_99 <span class="tag" style="color: #d2a8ff; border-color: rgba(210, 168, 255, 0.4); background: rgba(210, 168, 255, 0.1);">Quantum Infra</span></h3>
+            <p class="mb-2 text-gray-300"><strong>Thesis:</strong> Amplitude estimation algorithms indicate outsized risk-adjusted returns relative to current options pricing.</p>
+            <p class="text-sm text-gray-400 mb-4"><strong>Catalyst:</strong> cuQuantum deployment validation.</p>
+
+            <div class="mt-4 pt-4 border-t border-gray-700 flex justify-between items-center">
+                <span class="text-xs text-emerald-500 font-mono">jsonLogic: PASSED</span>
+                <a href="../terminals/main_dashboard.html" class="text-sm text-[#58a6ff] hover:underline">Execute Quant Sim &rarr;</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

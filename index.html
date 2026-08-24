@@ -3,244 +3,626 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADAM v30 :: UNIFIED FINANCIAL OS</title>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <title>ADAM v30.1 :: Unified Financial Operating System</title>
+    <meta name="description" content="ADAM — Autonomous Deterministic Alpha Matrix. Institutional-grade neuro-symbolic multi-agent financial operating system for credit risk, market intelligence, and portfolio surveillance.">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        /* ═══════════════════════════════════════════
+           DESIGN SYSTEM — CSS CUSTOM PROPERTIES
+           ═══════════════════════════════════════════ */
         :root {
-            --primary-color: #00f3ff;
-            --accent-color: #0aff60;
-            --alert-color: #ff3333;
-            --warning-color: #f59e0b;
-            --purple-color: #a855f7;
-            --bg-color: #050b14;
-            --panel-bg: rgba(5, 11, 20, 0.8);
-            --text-primary: #e0e0e0;
+            --cyan: #00f3ff;
+            --green: #0aff60;
+            --red: #ff3333;
+            --amber: #f59e0b;
+            --purple: #a855f7;
+            --blue: #3b82f6;
+            --bg-primary: #050b14;
+            --bg-panel: rgba(5, 11, 20, 0.85);
+            --bg-card: rgba(10, 15, 25, 0.6);
+            --bg-card-hover: rgba(15, 20, 35, 0.85);
+            --text-primary: #e8e8e8;
             --text-muted: #888;
-            --panel-border: #333;
+            --text-dim: #555;
+            --border: #2a2a2a;
+            --border-hover: #444;
+            --radius: 6px;
+            --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            --glow-cyan: 0 0 20px rgba(0, 243, 255, 0.15);
+            --glow-green: 0 0 20px rgba(10, 255, 96, 0.15);
         }
 
+        [data-theme="light"] {
+            --bg-primary: #f0f2f5;
+            --bg-panel: rgba(255, 255, 255, 0.9);
+            --bg-card: rgba(255, 255, 255, 0.8);
+            --bg-card-hover: rgba(255, 255, 255, 0.95);
+            --text-primary: #1a1a2e;
+            --text-muted: #666;
+            --text-dim: #999;
+            --border: #ddd;
+            --border-hover: #bbb;
+            --cyan: #0891b2;
+            --green: #059669;
+            --red: #dc2626;
+            --amber: #d97706;
+            --purple: #7c3aed;
+        }
+
+        /* ═══════════════════════════════════════════
+           RESET & BASE STYLES
+           ═══════════════════════════════════════════ */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
         body {
-            margin: 0;
-            background: var(--bg-color);
-            background-image:
-                linear-gradient(rgba(0, 243, 255, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 243, 255, 0.03) 1px, transparent 1px);
-            background-size: 30px 30px;
+            background: var(--bg-primary);
             color: var(--text-primary);
-            font-family: 'Inter', sans-serif;
+            font-family: 'Inter', -apple-system, sans-serif;
             overflow-x: hidden;
+            line-height: 1.6;
+            min-height: 100vh;
         }
 
         .mono { font-family: 'JetBrains Mono', monospace; }
+        a { text-decoration: none; color: inherit; transition: color var(--transition); }
+        a:hover { color: var(--cyan); }
 
-        /* Header Styling */
-        .cyber-header {
-            height: 60px;
+        /* ═══════════════════════════════════════════
+           PARTICLE CANVAS
+           ═══════════════════════════════════════════ */
+        #particle-canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* ═══════════════════════════════════════════
+           SCAN LINE EFFECT
+           ═══════════════════════════════════════════ */
+        .scan-line {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 2px;
+            background: rgba(0, 243, 255, 0.08);
+            box-shadow: 0 0 8px rgba(0, 243, 255, 0.3);
+            animation: scan 6s linear infinite;
+            pointer-events: none;
+            z-index: 999;
+        }
+        [data-theme="light"] .scan-line { display: none; }
+        @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
+
+        /* ═══════════════════════════════════════════
+           HEADER
+           ═══════════════════════════════════════════ */
+        .header {
+            height: 56px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 20px;
-            border-bottom: 1px solid var(--primary-color);
-            background: rgba(5, 11, 20, 0.95);
-            backdrop-filter: blur(10px);
+            padding: 0 24px;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg-panel);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
             position: sticky;
             top: 0;
             z-index: 100;
         }
 
-        /* Effects */
-        .scan-line {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 2px;
-            background: rgba(0, 243, 255, 0.1);
-            box-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
-            animation: scan 4s linear infinite;
-            pointer-events: none;
-            z-index: 999;
-        }
+        .header-left { display: flex; align-items: center; gap: 12px; }
 
-        @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
-
-        a { text-decoration: none; color: inherit; transition: all 0.2s; }
-        a:hover { color: var(--primary-color); }
-
-        /* Components */
-        .mode-badge {
-            padding: 4px 8px;
-            border: 1px solid var(--accent-color);
-            color: var(--accent-color);
-            font-size: 0.75rem;
-            border-radius: 4px;
-            font-weight: bold;
-            white-space: nowrap;
-            text-shadow: 0 0 5px rgba(10, 255, 96, 0.3);
-            box-shadow: inset 0 0 10px rgba(10, 255, 96, 0.1);
+        .logo-text {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--cyan);
+            letter-spacing: 3px;
         }
 
         .version-badge {
-            background: var(--primary-color);
+            background: var(--cyan);
             color: #000;
-            padding: 2px 6px;
-            border-radius: 2px;
-            font-weight: bold;
-            font-size: 0.7rem;
-            margin-left: 10px;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-weight: 700;
+            font-size: 0.65rem;
+            letter-spacing: 0.5px;
         }
 
-        .cyber-btn {
-            font-family: 'JetBrains Mono', monospace;
+        .header-subtitle {
             font-size: 0.75rem;
-            padding: 6px 12px;
-            border: 1px solid #444;
-            color: var(--text-primary);
-            background: rgba(0,0,0,0.5);
-            border-radius: 2px;
+            color: var(--text-dim);
+            border-left: 1px solid var(--border);
+            padding-left: 12px;
+        }
+
+        .header-right { display: flex; align-items: center; gap: 8px; }
+
+        .header-btn {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            padding: 5px 10px;
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            background: transparent;
+            border-radius: var(--radius);
             text-transform: uppercase;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all var(--transition);
+            letter-spacing: 0.5px;
         }
 
-        .cyber-btn:hover {
-            border-color: var(--primary-color);
-            color: var(--primary-color);
-            box-shadow: 0 0 10px rgba(0, 243, 255, 0.2);
+        .header-btn:hover {
+            border-color: var(--cyan);
+            color: var(--cyan);
+            box-shadow: var(--glow-cyan);
         }
 
-        .glass-panel {
-            background: rgba(5, 11, 20, 0.7);
-            border: 1px solid var(--panel-border);
-            backdrop-filter: blur(8px);
+        .header-btn.primary {
+            border-color: var(--green);
+            color: var(--green);
+            background: rgba(10, 255, 96, 0.08);
+        }
+        .header-btn.primary:hover { box-shadow: var(--glow-green); }
+
+        .theme-toggle {
+            width: 32px; height: 32px;
+            border: 1px solid var(--border);
+            background: transparent;
+            border-radius: var(--radius);
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1rem;
+            transition: all var(--transition);
+            color: var(--text-muted);
+        }
+        .theme-toggle:hover { border-color: var(--amber); color: var(--amber); }
+
+        .hamburger {
+            display: none;
+            width: 32px; height: 32px;
+            border: 1px solid var(--border);
+            background: transparent;
+            border-radius: var(--radius);
+            cursor: pointer;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            color: var(--text-muted);
+        }
+        .hamburger span {
+            display: block;
+            width: 16px; height: 2px;
+            background: currentColor;
+            transition: all var(--transition);
         }
 
-        /* Layout & Grid Components */
-        .layout-container { display: flex; min-height: calc(100vh - 60px); }
+        /* ═══════════════════════════════════════════
+           LAYOUT
+           ═══════════════════════════════════════════ */
+        .layout { display: flex; min-height: calc(100vh - 56px); position: relative; z-index: 1; }
 
+        /* ═══════════════════════════════════════════
+           SIDEBAR
+           ═══════════════════════════════════════════ */
         .sidebar {
             width: 260px;
-            border-right: 1px solid var(--panel-border);
+            border-right: 1px solid var(--border);
             padding: 20px;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             flex-shrink: 0;
-            background: rgba(0,0,0,0.4);
+            background: var(--bg-panel);
+            backdrop-filter: blur(8px);
+            overflow-y: auto;
+            max-height: calc(100vh - 56px);
+            position: sticky;
+            top: 56px;
         }
 
-        .main-content {
+        .sidebar-section { margin-bottom: 24px; }
+
+        .sidebar-title {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.65rem;
+            color: var(--cyan);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            user-select: none;
+        }
+
+        .sidebar-title .chevron {
+            transition: transform var(--transition);
+            font-size: 0.6rem;
+        }
+
+        .sidebar-title.collapsed .chevron { transform: rotate(-90deg); }
+
+        .sidebar-list {
+            list-style: none;
+            overflow: hidden;
+            transition: max-height 0.4s ease, opacity 0.3s ease;
+            max-height: 500px;
+            opacity: 1;
+        }
+
+        .sidebar-list.collapsed { max-height: 0; opacity: 0; }
+
+        .sidebar-list li {
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 6px;
+            border-radius: 4px;
+            transition: background var(--transition);
+        }
+        .sidebar-list li:hover { background: rgba(255, 255, 255, 0.05); }
+        .sidebar-list li a { font-size: 0.8rem; flex-grow: 1; }
+
+        .sidebar-list .icon { font-size: 0.85rem; width: 20px; text-align: center; }
+
+        /* Stat panel */
+        .stat-panel {
+            padding: 14px;
+            border: 1px solid var(--border);
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: var(--radius);
+            margin-top: 20px;
+        }
+
+        .stat-panel-title {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.6rem;
+            color: var(--text-dim);
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            margin-bottom: 6px;
+        }
+        .stat-row:last-child { margin-bottom: 0; }
+        .stat-value { font-family: 'JetBrains Mono', monospace; font-weight: 700; }
+
+        /* ═══════════════════════════════════════════
+           MAIN CONTENT
+           ═══════════════════════════════════════════ */
+        .main {
             flex-grow: 1;
-            padding: 40px;
+            padding: 32px 40px;
             max-width: 1400px;
             margin: 0 auto;
         }
 
-        .update-banner {
-            border-left: 4px solid var(--accent-color);
-            background: linear-gradient(90deg, rgba(10, 255, 96, 0.1) 0%, transparent 100%);
-            padding: 20px;
-            margin-bottom: 30px;
-            border-radius: 0 4px 4px 0;
+        /* Search Bar */
+        .search-container {
+            position: relative;
+            margin-bottom: 28px;
         }
 
-        .section-header {
-            margin: 40px 0 20px 0;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #333;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .section-header h2 {
-            margin: 0;
+        .search-input {
+            width: 100%;
+            padding: 12px 16px 12px 42px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
             color: var(--text-primary);
-            font-size: 1.4rem;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            outline: none;
+            transition: all var(--transition);
+        }
+
+        .search-input:focus {
+            border-color: var(--cyan);
+            box-shadow: var(--glow-cyan);
+        }
+
+        .search-input::placeholder { color: var(--text-dim); }
+
+        .search-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-dim);
+            font-size: 0.9rem;
+        }
+
+        .search-shortcut {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.65rem;
+            padding: 2px 6px;
+            border: 1px solid var(--border);
+            border-radius: 3px;
+            color: var(--text-dim);
+        }
+
+        /* Update Banner */
+        .update-banner {
+            border-left: 4px solid var(--green);
+            background: linear-gradient(90deg, rgba(10, 255, 96, 0.06) 0%, transparent 100%);
+            padding: 20px 24px;
+            margin-bottom: 32px;
+            border-radius: 0 var(--radius) var(--radius) 0;
+        }
+
+        .banner-title {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.2rem;
+            color: var(--green);
+            margin-bottom: 8px;
             letter-spacing: 1px;
         }
 
-        .section-icon {
-            font-size: 1.5rem;
-            color: var(--primary-color);
+        .banner-text { color: var(--text-muted); line-height: 1.7; max-width: 900px; }
+
+        .banner-actions { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
+
+        /* Stats Row */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 12px;
+            margin-bottom: 32px;
         }
 
-        .grid-container {
+        .stat-card {
+            padding: 16px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            background: var(--bg-card);
+            text-align: center;
+            transition: all var(--transition);
+        }
+
+        .stat-card:hover {
+            border-color: var(--cyan);
+            transform: translateY(-2px);
+            box-shadow: var(--glow-cyan);
+        }
+
+        .stat-number {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--cyan);
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Section Headers */
+        .section-header {
+            margin: 36px 0 18px 0;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-icon { font-size: 1.3rem; color: var(--cyan); }
+
+        .section-header h2 {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.1rem;
+            letter-spacing: 1.5px;
+            font-weight: 600;
+        }
+
+        .section-desc {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin: -8px 0 18px 0;
+        }
+
+        /* Grid */
+        .grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
+            gap: 16px;
         }
 
+        /* Module Cards */
         .module-card {
-            border: 1px solid #333;
+            border: 1px solid var(--border);
             padding: 20px;
-            background: rgba(10, 15, 25, 0.6);
+            background: var(--bg-card);
+            border-radius: var(--radius);
             position: relative;
-            transition: all 0.3s ease;
+            transition: all var(--transition);
             display: flex;
             flex-direction: column;
+            cursor: pointer;
         }
 
         .module-card:hover {
-            border-color: var(--primary-color);
+            border-color: var(--cyan);
             transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0, 243, 255, 0.1);
-            background: rgba(15, 20, 35, 0.8);
+            box-shadow: 0 8px 24px rgba(0, 243, 255, 0.08);
+            background: var(--bg-card-hover);
         }
 
-        .module-card h3 { margin: 0 0 10px 0; font-size: 1.1rem; }
-        .module-card p { font-size: 0.85rem; color: #aaa; flex-grow: 1; line-height: 1.5; margin-bottom: 20px;}
-        .module-card .action-link {
-            color: var(--primary-color);
-            font-size: 0.8rem;
+        .module-card.hidden { display: none; }
+
+        .module-card h3 {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.95rem;
+            margin: 0 0 8px 0;
+        }
+
+        .module-card p {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            flex-grow: 1;
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+
+        .action-link {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--cyan);
+            font-size: 0.72rem;
             font-weight: 600;
             display: inline-flex;
             align-items: center;
             gap: 5px;
-            border-top: 1px dashed #333;
+            border-top: 1px dashed var(--border);
             padding-top: 10px;
             text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all var(--transition);
         }
 
-        .module-card:hover .action-link { color: var(--accent-color); border-color: var(--accent-color); }
+        .module-card:hover .action-link { color: var(--green); border-color: var(--green); }
 
+        /* Tags */
         .tag {
             position: absolute;
-            top: 15px; right: 15px;
-            font-size: 0.65rem;
+            top: 12px; right: 12px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.58rem;
             padding: 2px 8px;
-            border-radius: 2px;
-            font-weight: bold;
+            border-radius: 3px;
+            font-weight: 700;
             letter-spacing: 0.5px;
         }
 
-        .tag-new { background: rgba(255, 51, 51, 0.2); color: #ff3333; border: 1px solid #ff3333; }
-        .tag-core { background: rgba(0, 243, 255, 0.2); color: var(--primary-color); border: 1px solid var(--primary-color); }
-        .tag-beta { background: rgba(245, 158, 11, 0.2); color: var(--warning-color); border: 1px solid var(--warning-color); }
-        .tag-live { background: rgba(10, 255, 96, 0.2); color: var(--accent-color); border: 1px solid var(--accent-color); animation: pulse 2s infinite;}
-        .tag-static { background: rgba(168, 85, 247, 0.2); color: var(--purple-color); border: 1px solid var(--purple-color); }
+        .tag-new { background: rgba(255, 51, 51, 0.15); color: var(--red); border: 1px solid var(--red); }
+        .tag-core { background: rgba(0, 243, 255, 0.1); color: var(--cyan); border: 1px solid var(--cyan); }
+        .tag-beta { background: rgba(245, 158, 11, 0.15); color: var(--amber); border: 1px solid var(--amber); }
+        .tag-live { background: rgba(10, 255, 96, 0.12); color: var(--green); border: 1px solid var(--green); animation: pulse 2.5s infinite; }
+        .tag-static { background: rgba(168, 85, 247, 0.12); color: var(--purple); border: 1px solid var(--purple); }
 
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.6; }
-            100% { opacity: 1; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+        /* Use Case Cards */
+        .use-case-card { border-left: 3px solid var(--purple); }
+        .use-case-card h3 { color: var(--purple); }
+        .use-case-card:hover .action-link { color: var(--purple); }
+
+        /* No Results */
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-dim);
+            display: none;
+        }
+        .no-results.visible { display: block; }
+        .no-results .icon { font-size: 2.5rem; margin-bottom: 12px; }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 200;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
         }
 
-        /* Use Case specific styling */
-        .use-case-card {
-            border-left: 3px solid var(--purple-color);
+        .toast {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            padding: 10px 16px;
+            background: var(--bg-panel);
+            border: 1px solid var(--green);
+            border-radius: var(--radius);
+            color: var(--green);
+            backdrop-filter: blur(12px);
+            animation: toastIn 0.3s ease, toastOut 0.3s ease 2.7s forwards;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
         }
-        .use-case-card h3 { color: var(--purple-color); }
 
-        ul.dir-list { list-style: none; padding: 0; margin: 0; font-size: 0.85rem; }
-        ul.dir-list li { margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
-        ul.dir-list li a { flex-grow: 1; }
-        ul.dir-list li:hover { background: rgba(255,255,255,0.05); }
+        @keyframes toastIn { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes toastOut { from { opacity: 1; } to { opacity: 0; transform: translateY(10px); } }
+
+        /* Footer */
+        .footer {
+            margin-top: 48px;
+            padding: 20px 0;
+            border-top: 1px solid var(--border);
+            text-align: center;
+            color: var(--text-dim);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.72rem;
+        }
+
+        /* ═══════════════════════════════════════════
+           RESPONSIVE
+           ═══════════════════════════════════════════ */
+        @media (max-width: 900px) {
+            .sidebar {
+                position: fixed;
+                left: -280px;
+                top: 56px;
+                height: calc(100vh - 56px);
+                z-index: 50;
+                transition: left var(--transition);
+                border-right: 1px solid var(--border);
+                width: 280px;
+            }
+            .sidebar.open { left: 0; }
+
+            .sidebar-overlay {
+                display: none;
+                position: fixed;
+                top: 56px; left: 0; right: 0; bottom: 0;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 49;
+            }
+            .sidebar-overlay.visible { display: block; }
+
+            .hamburger { display: flex; }
+            .header-subtitle { display: none; }
+            .main { padding: 20px 16px; }
+            .grid { grid-template-columns: 1fr; }
+            .stats-row { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 500px) {
+            .header-right .header-btn:not(.primary) { display: none; }
+            .stats-row { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
+    <canvas id="particle-canvas"></canvas>
     <div class="scan-line"></div>
 
-    <header class="cyber-header">
-        <div style="display: flex; align-items: center; gap: 15px;">
-            <h1 class="mono" style="margin: 0; font-size: 1.5rem; color: var(--primary-color); letter-spacing: 2px;">ADAM</h1>
-            <span class="mono version-badge">v30_OVERHAUL</span>
-            <div class="mono" style="font-size: 0.8rem; color: #666; border-left: 1px solid #333; padding-left: 10px; display: none; sm:display: block;">UNIFIED FINANCIAL OS & AGENTIC SWARM</div>
+    <!-- ═══ HEADER ═══ -->
+    <header class="header" id="header">
+        <div class="header-left">
+            <button class="hamburger" id="hamburger-btn" aria-label="Toggle sidebar">
+                <span></span><span></span><span></span>
+            </button>
+            <span class="logo-text">ADAM</span>
+            <span class="version-badge mono">v30.1</span>
+            <span class="header-subtitle mono">UNIFIED FINANCIAL OS & AGENTIC SWARM</span>
         </div>
 
         <div style="display: flex; align-items: center; gap: 15px;">
@@ -254,268 +636,336 @@
         </div>
     </header>
 
-    <div class="layout-container">
-        <!-- SIDEBAR -->
-        <aside class="sidebar glass-panel">
-            <h3 class="mono" style="margin-top: 0; font-size: 0.8rem; color: var(--primary-color); border-bottom: 1px solid var(--panel-border); padding-bottom: 10px; margin-bottom: 15px;">
-                /// REPOSITORY DIRECTORY
-            </h3>
-            <ul class="dir-list mono">
-                <li><span>🖥️</span> <a href="analyst_os.html" style="color: var(--accent-color); font-weight: bold;">analyst_os.html</a></li>
-                <li><span>📟</span> <a href="terminal_profile.html" style="color: var(--primary-color); font-weight: bold;">terminal_profile.html</a></li>
-                <li style="padding-top: 10px; margin-top: 10px; border-top: 1px dashed #333;"><span>📂</span> <a href="apps/" style="color: var(--primary-color);">apps/</a></li>
-                <li><span>📂</span> <a href="data/" style="color: var(--primary-color);">data/</a></li>
-                <li><span>📂</span> <a href="agents/" style="color: #a855f7;">agents_swarm/</a></li>
-                <li><span>📂</span> <a href="memory/" style="color: #a855f7;">vector_memory/</a></li>
-                <li><span>📂</span> <a href="models/" style="color: #a855f7;">world_models/</a></li>
-                <li style="padding-top:10px; border-top: 1px dashed #333; opacity: 0.7;"><span>📄</span> <a href="agents.html">agents_config.json</a></li>
-                <li style="opacity: 0.7;"><span>📄</span> <a href="graph.html">knowledge_graph.html</a></li>
-                <li style="opacity: 0.7;"><span>📄</span> <a href="reports.html">report_convergence.html</a></li>
-                <li style="opacity: 0.7;"><span>📄</span> <a href="machine_index.json">machine_index.json</a></li>
-                <li style="opacity: 0.7;"><span>📄</span> <a href="api_docs.html">api_endpoints.md</a></li>
-            </ul>
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
-            <div style="margin-top: 40px; padding: 15px; border: 1px solid #333; background: rgba(0,0,0,0.5); border-radius: 4px;">
-                <div style="font-size: 0.7rem; color: #666; margin-bottom: 5px;" class="mono">SYSTEM STATUS</div>
-                <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 5px;">
-                    <span>Swarm Latency:</span> <span style="color: var(--accent-color);">12ms</span>
+    <!-- ═══ LAYOUT ═══ -->
+    <div class="layout">
+
+        <!-- ═══ SIDEBAR ═══ -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-title" data-toggle="nav-primary">
+                    <span>/// Primary Interfaces</span>
+                    <span class="chevron">▼</span>
                 </div>
-                <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 5px;">
-                    <span>Active Agents:</span> <span style="color: var(--primary-color);">1,402</span>
+                <ul class="sidebar-list" id="nav-primary">
+                    <li><span class="icon">🖥️</span> <a href="analyst_os.html" style="color: var(--green); font-weight: 600;">analyst_os.html</a></li>
+                    <li><span class="icon">📟</span> <a href="terminal_profile.html" style="color: var(--cyan); font-weight: 600;">terminal_profile.html</a></li>
+                    <li><span class="icon">🌐</span> <a href="portal/index.html" style="color: var(--cyan);">portal/</a></li>
+                </ul>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-title" data-toggle="nav-dirs">
+                    <span>/// Repository</span>
+                    <span class="chevron">▼</span>
                 </div>
-                <div style="display: flex; justify-content: space-between; font-size: 0.8rem;">
-                    <span>Vector DB Load:</span> <span style="color: var(--warning-color);">64%</span>
+                <ul class="sidebar-list" id="nav-dirs">
+                    <li><span class="icon">📂</span> <a href="core/">core/</a></li>
+                    <li><span class="icon">📂</span> <a href="agents/">agents/</a></li>
+                    <li><span class="icon">📂</span> <a href="showcase/">showcase/</a></li>
+                    <li><span class="icon">📂</span> <a href="docs/">docs/</a></li>
+                    <li><span class="icon">📂</span> <a href="prompt_library/">prompt_library/</a></li>
+                    <li><span class="icon">📂</span> <a href="experimental/">experimental/</a></li>
+                    <li><span class="icon">📂</span> <a href="schemas/">schemas/</a></li>
+                </ul>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-title" data-toggle="nav-files">
+                    <span>/// Key Files</span>
+                    <span class="chevron">▼</span>
+                </div>
+                <ul class="sidebar-list" id="nav-files">
+                    <li><span class="icon">📄</span> <a href="AGENTS.md">AGENTS.md</a></li>
+                    <li><span class="icon">📄</span> <a href="AGENT_CATALOG.md">AGENT_CATALOG.md</a></li>
+                    <li><span class="icon">📄</span> <a href="machine_index.json">machine_index.json</a></li>
+                    <li><span class="icon">📄</span> <a href="llms.txt">llms.txt</a></li>
+                    <li><span class="icon">📄</span> <a href="api_docs.html">api_docs.html</a></li>
+                    <li><span class="icon">📄</span> <a href="CHANGELOG.md">CHANGELOG.md</a></li>
+                </ul>
+            </div>
+
+            <div class="stat-panel">
+                <div class="stat-panel-title">SYSTEM TELEMETRY</div>
+                <div class="stat-row">
+                    <span>Swarm Latency</span>
+                    <span class="stat-value" style="color: var(--green);" id="stat-latency">—</span>
+                </div>
+                <div class="stat-row">
+                    <span>Active Agents</span>
+                    <span class="stat-value" style="color: var(--cyan);" id="stat-agents">—</span>
+                </div>
+                <div class="stat-row">
+                    <span>Vector DB Load</span>
+                    <span class="stat-value" style="color: var(--amber);" id="stat-db">—</span>
+                </div>
+                <div class="stat-row">
+                    <span>PROV-O Compliant</span>
+                    <span class="stat-value" style="color: var(--green);" id="stat-provo">—</span>
                 </div>
             </div>
         </aside>
 
-        <!-- MAIN CONTENT -->
-        <main class="main-content">
+        <!-- ═══ MAIN CONTENT ═══ -->
+        <main class="main" id="main-content">
 
+            <!-- Search -->
+            <div class="search-container">
+                <span class="search-icon">🔍</span>
+                <input type="text" class="search-input" id="search-input" placeholder="Search modules, dashboards, tools..." autocomplete="off">
+                <span class="search-shortcut mono">/</span>
+            </div>
+
+            <!-- Update Banner -->
             <div class="update-banner">
-                <h2 class="mono" style="margin: 0 0 10px 0; color: var(--accent-color); font-size: 1.5rem;">UPDATE v30: ARCHITECTURE OVERHAUL COMPLETE</h2>
-                <p style="margin: 0; color: #ccc; line-height: 1.6; max-width: 900px;">
-                    The ADAM framework has transitioned from static reporting scripts to a <strong>persistent, multi-agent financial OS</strong>.
-                    This update introduces a unified graph-memory architecture, enabling sovereign AI agents to cross-communicate, debate market anomalies,
-                    and execute complex RAG (Retrieval-Augmented Generation) pipelines in real-time. Explore the updated modules below to see how ADAM handles everything from hedge-fund alpha generation to sovereign macroeconomic wargaming.
+                <div class="banner-title">ADAM v30.1 — ARCHITECTURE OVERHAUL COMPLETE</div>
+                <p class="banner-text">
+                    ADAM has transitioned from static reporting scripts to a <strong>persistent, multi-agent financial OS</strong>.
+                    This release introduces a fully asynchronous Python backend, decoupled Streamlit frontend, unified graph-memory architecture, and W3C PROV-O compliant telemetry across all agents.
                 </p>
-                <div style="margin-top: 15px; display: flex; gap: 10px;">
-                    <a href="changelog.html" class="cyber-btn" style="border-color: var(--accent-color); color: var(--accent-color);">READ CHANGELOG</a>
-                    <a href="machine_index.json" class="cyber-btn">API / MACHINE I/O</a>
+                <div class="banner-actions">
+                    <a href="CHANGELOG.md" class="header-btn" style="border-color: var(--green); color: var(--green);">Read Changelog</a>
+                    <a href="machine_index.json" class="header-btn">Machine API</a>
+                    <a href="llms.txt" class="header-btn">LLM Context</a>
                 </div>
             </div>
 
-            <!-- SECTION: CORE OS & HUBS -->
-            <div class="section-header mono">
+            <!-- Stats Row -->
+            <div class="stats-row">
+                <div class="stat-card">
+                    <div class="stat-number" data-count="528">0</div>
+                    <div class="stat-label">Showcase Reports</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" data-count="90">0</div>
+                    <div class="stat-label">Modules & Dirs</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" data-count="100">0</div>
+                    <div class="stat-label">Daily Briefings</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" data-count="70">0</div>
+                    <div class="stat-label">Market Pulses</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" data-count="99">0</div>
+                    <div class="stat-label">FinanceBench %</div>
+                </div>
+            </div>
+
+            <!-- No Results Message -->
+            <div class="no-results" id="no-results">
+                <div class="icon">🔍</div>
+                <p>No modules match your search. Try a different query.</p>
+            </div>
+
+            <!-- ═══ SECTION: CORE OS ═══ -->
+            <div class="section-header mono" data-section>
                 <span class="section-icon">❖</span>
                 <h2>CORE WORKSPACES & OS PORTALS</h2>
             </div>
-            
-            <div class="grid-container">
-                <div class="module-card">
+            <div class="grid" data-grid>
+                <a href="analyst_os.html" class="module-card" data-keywords="analyst os bloomberg terminal workbench gui human agent">
                     <div class="tag tag-core">PRIMARY</div>
-                    <h3 class="mono" style="color: var(--primary-color);">ADAM Analyst OS</h3>
+                    <h3 style="color: var(--cyan);">ADAM Analyst OS</h3>
                     <p>The "Bloomberg Killer Lite." A privacy-first, client-side financial workbench designed for human-agent collaboration. Features customizable layouts and live data hooks.</p>
-                    <a href="analyst_os.html" class="action-link mono">LAUNCH GUI &rarr;</a>
-                </div>
+                    <span class="action-link">Launch GUI →</span>
+                </a>
 
-                <div class="module-card">
+                <a href="portal/index.html" class="module-card" data-keywords="portal command center global state monitoring">
                     <div class="tag tag-core">CORE</div>
-                    <h3 class="mono" style="color: var(--primary-color);">Portal UI (Command Center)</h3>
-                    <p>The next-generation unified Global Command Center. Features an improved layout, interactive aesthetics, and global state monitoring of the ADAM swarm.</p>
-                    <a href="portal/index.html" class="action-link mono">ENTER PORTAL &rarr;</a>
-                </div>
+                    <h3 style="color: var(--cyan);">Portal UI (Command Center)</h3>
+                    <p>Unified Global Command Center with improved layout, interactive aesthetics, and global state monitoring of the ADAM swarm network.</p>
+                    <span class="action-link">Enter Portal →</span>
+                </a>
 
-                <div class="module-card">
+                <a href="adam_daily_hub_index.html" class="module-card" data-keywords="daily reports hub sentiment intelligence market">
                     <div class="tag tag-core">HUB</div>
-                    <h3 class="mono" style="color: var(--primary-color);">Daily Reports Hub</h3>
-                    <p>A centralized, interactive index of all historical ADAM Daily market reports, sentiment analyses, and pre-market intelligence data drops.</p>
-                    <a href="adam_daily_hub_index.html" class="action-link mono">OPEN HUB &rarr;</a>
-                </div>
+                    <h3 style="color: var(--cyan);">Daily Reports Hub</h3>
+                    <p>Centralized index of all historical ADAM daily market reports, sentiment analyses, and pre-market intelligence data drops.</p>
+                    <span class="action-link">Open Hub →</span>
+                </a>
 
-                <div class="module-card">
+                <a href="workflow_orchestrator.html" class="module-card" data-keywords="workflow orchestrator pipeline governance harness credit">
                     <div class="tag tag-new">NEW</div>
-                    <h3 class="mono" style="color: var(--primary-color);">Workflow Orchestrator</h3>
-                    <p>AI Credit & Governance Harness HUD. Design and monitor complex multi-step pipelines involving document parsing, risk scoring, and compliance checks.</p>
-                    <a href="workflow_orchestrator.html" class="action-link mono">OPEN ORCHESTRATOR &rarr;</a>
-                </div>
+                    <h3 style="color: var(--cyan);">Workflow Orchestrator</h3>
+                    <p>AI Credit & Governance Harness HUD. Design and monitor multi-step pipelines: document parsing, risk scoring, compliance checks.</p>
+                    <span class="action-link">Open Orchestrator →</span>
+                </a>
             </div>
 
-            <!-- SECTION: ACTIVE PROTOTYPES & TERMINALS (Merged from main) -->
-            <div class="section-header mono">
+            <!-- ═══ SECTION: PROTOTYPES ═══ -->
+            <div class="section-header mono" data-section>
                 <span class="section-icon">🚀</span>
                 <h2>ACTIVE PROTOTYPES & TERMINALS</h2>
             </div>
-
-            <div class="grid-container">
-                <div class="module-card" style="border-top: 2px solid var(--accent-color);">
+            <div class="grid" data-grid>
+                <a href="interactive_prototype.html" class="module-card" data-keywords="prototype telemetry logic router system 1 2 deterministic probabilistic" style="border-top: 2px solid var(--green);">
                     <div class="tag tag-live">ACTIVE</div>
-                    <h3 class="mono" style="color: var(--accent-color);">Telemetry & Logic Router</h3>
-                    <p>Interactive prototype demonstrating System 1 (Probabilistic Perception), Orchestration Kernel, and System 2 (Deterministic Grounding) telemetry flows.</p>
-                    <a href="interactive_prototype.html" class="action-link mono" style="color: var(--accent-color); border-color: var(--accent-color);">LAUNCH PROTOTYPE &rarr;</a>
-                </div>
+                    <h3 style="color: var(--green);">Telemetry & Logic Router</h3>
+                    <p>Interactive prototype: System 1 (Probabilistic Perception), Orchestration Kernel, and System 2 (Deterministic Grounding) telemetry flows.</p>
+                    <span class="action-link" style="color: var(--green);">Launch Prototype →</span>
+                </a>
 
-                <div class="module-card" style="border-top: 2px solid var(--alert-color);">
+                <a href="showcase/market_mayhem_v26.html" class="module-card" data-keywords="market mayhem terminal macro whalescanner v26" style="border-top: 2px solid var(--red);">
                     <div class="tag tag-live">ACTIVE</div>
-                    <h3 class="mono" style="color: var(--alert-color);">Market Mayhem v26.0</h3>
-                    <p>The v26.0 iteration of the Market Mayhem Terminal, featuring advanced macro-temporal baselines and Whalescanner intelligence core.</p>
-                    <a href="showcase/market_mayhem_v26.html" class="action-link mono" style="color: var(--alert-color); border-color: var(--alert-color);">LAUNCH TERMINAL &rarr;</a>
-                </div>
+                    <h3 style="color: var(--red);">Market Mayhem Terminal</h3>
+                    <p>Advanced macro-temporal baselines and Whalescanner intelligence core. Tracks systemic risk cascades across asset classes.</p>
+                    <span class="action-link" style="color: var(--red);">Launch Terminal →</span>
+                </a>
 
-                <div class="module-card" style="border-top: 2px solid var(--warning-color);">
+                <a href="market_mayhem_terminal.html" class="module-card" data-keywords="market mayhem unified dashboard briefing vulnerability defense" style="border-top: 2px solid var(--amber);">
                     <div class="tag tag-beta">BETA</div>
-                    <h3 class="mono" style="color: var(--warning-color);">Market Mayhem Unified</h3>
-                    <p>Consolidated interactive dashboard synthesizing daily briefs, vulnerability telemetry, and tactical defense playbooks into a unified UI.</p>
-                    <a href="market_mayhem_terminal.html" class="action-link mono" style="color: var(--warning-color); border-color: var(--warning-color);">LAUNCH DASHBOARD &rarr;</a>
-                </div>
+                    <h3 style="color: var(--amber);">Market Mayhem Unified</h3>
+                    <p>Consolidated dashboard synthesizing daily briefs, vulnerability telemetry, and tactical defense playbooks.</p>
+                    <span class="action-link" style="color: var(--amber);">Launch Dashboard →</span>
+                </a>
 
-                <div class="module-card" style="border-top: 2px solid var(--purple-color);">
+                <a href="showcase/neural_dashboard.html" class="module-card" data-keywords="neural dashboard react visualization state management" style="border-top: 2px solid var(--purple);">
                     <div class="tag tag-static">STATIC</div>
-                    <h3 class="mono" style="color: var(--purple-color);">Neural Dashboard</h3>
-                    <p>Interactive React-based application prototype demonstrating advanced visualization and state management arrays.</p>
-                    <a href="showcase/neural_dashboard.html" class="action-link mono" style="color: var(--purple-color); border-color: var(--purple-color);">VIEW DASHBOARD &rarr;</a>
-                </div>
+                    <h3 style="color: var(--purple);">Neural Dashboard</h3>
+                    <p>React-based application prototype demonstrating advanced visualization and state management arrays.</p>
+                    <span class="action-link" style="color: var(--purple);">View Dashboard →</span>
+                </a>
 
-                <div class="module-card" style="border-top: 2px solid var(--primary-color);">
-                    <h3 class="mono" style="color: var(--primary-color);">Repository Codex</h3>
-                    <p>Interactive browser designed to navigate the entire ADAM OS codebase, internal documentation, and architectural blueprints.</p>
-                    <a href="showcase/codex.html" class="action-link mono">BROWSE REPO &rarr;</a>
-                </div>
+                <a href="showcase/codex.html" class="module-card" data-keywords="repository codex browser codebase documentation architecture">
+                    <h3 style="color: var(--cyan);">Repository Codex</h3>
+                    <p>Interactive browser to navigate the entire ADAM OS codebase, internal documentation, and architectural blueprints.</p>
+                    <span class="action-link">Browse Repo →</span>
+                </a>
 
-                <div class="module-card" style="border-top: 2px solid #888;">
-                    <h3 class="mono" style="color: #ccc;">Legacy & Artifact Index</h3>
+                <a href="showcase/comprehensive_index.html" class="module-card" data-keywords="legacy artifact index historical archive demos">
+                    <h3 style="color: var(--text-muted);">Legacy & Artifact Index</h3>
                     <p>Complete index of all historical HTML artifacts, original static reports, historical demos, and deprecated UI mockups.</p>
-                    <div style="display: flex; gap: 15px;">
-                        <a href="showcase/comprehensive_index.html" class="action-link mono" style="color: #aaa; border-color: #555;">SYSTEM MAP &rarr;</a>
-                        <a href="showcase/index.html" class="action-link mono" style="color: #aaa; border-color: #555;">LEGACY SHOWCASE &rarr;</a>
-                    </div>
-                </div>
+                    <span class="action-link" style="color: var(--text-dim);">System Map →</span>
+                </a>
             </div>
 
-            <!-- SECTION: USE CASES & SHOWCASE -->
-            <div class="section-header mono">
+            <!-- ═══ SECTION: USE CASES ═══ -->
+            <div class="section-header mono" data-section>
                 <span class="section-icon">⚡</span>
-                <h2>INDUSTRY SHOWCASES & APPLIED USE CASES</h2>
+                <h2>INDUSTRY SHOWCASES & USE CASES</h2>
             </div>
-            <p style="color: #aaa; margin-top: -10px; margin-bottom: 25px; font-size: 0.9rem;">Demonstrations of how the ADAM multi-agent architecture solves domain-specific institutional problems.</p>
+            <p class="section-desc">Demonstrations of how the ADAM multi-agent architecture solves domain-specific institutional problems.</p>
+            <div class="grid" data-grid>
+                <a href="showcase_hedge_fund.html" class="module-card use-case-card" data-keywords="hedge fund alpha engine equities sentiment quantitative trading">
+                    <h3>Hedge Fund Alpha Engine</h3>
+                    <p><strong>Use Case:</strong> Quantitative Equities & Sentiment.<br>Real-time news ingestion, sentiment arbitrage, retail flow analysis, and automated trade thesis generation.</p>
+                    <span class="action-link" style="color: var(--purple);">View Showcase →</span>
+                </a>
 
-            <div class="grid-container">
-                <div class="module-card use-case-card">
-                    <h3 class="mono">Hedge Fund Alpha Engine</h3>
-                    <p><strong>Use Case:</strong> Quantitative Equities & Sentiment.<br>Demonstrates real-time news ingestion, sentiment arbitrage, retail flow analysis, and automated trade thesis generation using LLM Swarms.</p>
-                    <a href="showcase_hedge_fund.html" class="action-link mono" style="color: var(--purple-color);">VIEW SHOWCASE &rarr;</a>
-                </div>
+                <a href="showcase_private_equity.html" class="module-card use-case-card" data-keywords="private equity due diligence M&A data room VDR financial modeling">
+                    <h3>Private Equity Due Diligence</h3>
+                    <p><strong>Use Case:</strong> Alternative Assets & M&A.<br>Automated VDR parsing, financial modeling, and competitive moat analysis generation.</p>
+                    <span class="action-link" style="color: var(--purple);">View Showcase →</span>
+                </a>
 
-                <div class="module-card use-case-card">
-                    <h3 class="mono">Private Equity Due Diligence</h3>
-                    <p><strong>Use Case:</strong> Alternative Assets & M&A.<br>Automated parsing of unstructured data rooms, VDR indexing, automated financial modeling, and competitive moat analysis generation.</p>
-                    <a href="showcase_private_equity.html" class="action-link mono" style="color: var(--purple-color);">VIEW SHOWCASE &rarr;</a>
-                </div>
+                <a href="war_room.html" class="module-card use-case-card" data-keywords="sovereign risk defense geopolitics macro wargaming simulation currency bond">
+                    <h3>Sovereign Risk & Defense</h3>
+                    <p><strong>Use Case:</strong> Geopolitics & Macro.<br>Simulates global conflict scenarios using multi-agent game theory to assess bond/currency risk.</p>
+                    <span class="action-link" style="color: var(--purple);">Enter War Room →</span>
+                </a>
 
-                <div class="module-card use-case-card">
-                    <h3 class="mono">Sovereign Risk & Defense</h3>
-                    <p><strong>Use Case:</strong> Geopolitics & Macro.<br>Simulates global conflict scenarios (e.g., supply chain disruption, currency wars) using multi-agent game theory to assess bond/currency risk.</p>
-                    <a href="war_room.html" class="action-link mono" style="color: var(--purple-color);">ENTER WAR ROOM &rarr;</a>
-                </div>
-
-                <div class="module-card use-case-card">
-                    <h3 class="mono">RegTech & Compliance Agent</h3>
-                    <p><strong>Use Case:</strong> Institutional Banking.<br>Continuous monitoring of internal communications and trade logs against evolving SEC/FINRA frameworks using semantic vector search.</p>
-                    <a href="policy_center.html" class="action-link mono" style="color: var(--purple-color);">VIEW POLICY CENTER &rarr;</a>
-                </div>
+                <a href="policy_center.html" class="module-card use-case-card" data-keywords="regtech compliance agent banking SEC FINRA regulatory semantic search">
+                    <h3>RegTech & Compliance Agent</h3>
+                    <p><strong>Use Case:</strong> Institutional Banking.<br>Continuous monitoring of communications and trade logs against SEC/FINRA frameworks.</p>
+                    <span class="action-link" style="color: var(--purple);">View Policy Center →</span>
+                </a>
             </div>
 
-            <!-- SECTION: MULTI-AGENT SWARMS -->
-            <div class="section-header mono">
+            <!-- ═══ SECTION: SWARMS ═══ -->
+            <div class="section-header mono" data-section>
                 <span class="section-icon">🕸️</span>
                 <h2>AGENTIC SWARMS & SIMULATIONS</h2>
             </div>
-            <div class="grid-container">
-                <div class="module-card">
+            <div class="grid" data-grid>
+                <a href="market_live.html" class="module-card" data-keywords="market live neural exchange real-time agent telemetry stream">
                     <div class="tag tag-live">LIVE</div>
-                    <h3 class="mono" style="color: var(--accent-color);">Market Live / Neural Exchange</h3>
-                    <p>Real-time stream of agent telemetry as specialized AIs interact, trade synthetic assets, and update their world-models based on live market ticks.</p>
-                    <a href="market_live.html" class="action-link mono">VIEW STREAM &rarr;</a>
-                </div>
+                    <h3 style="color: var(--green);">Market Live / Neural Exchange</h3>
+                    <p>Real-time stream of agent telemetry as specialized AIs interact, trade synthetic assets, and update world-models.</p>
+                    <span class="action-link">View Stream →</span>
+                </a>
 
-                <div class="module-card">
-                    <h3 class="mono" style="color: var(--accent-color);">Sector Swarm Roundtable</h3>
-                    <p>Multi-Agent Industry Roundtable. Watch specialized "analyst agents" (Tech, Energy, Financials) debate sector rotation and capex trends.</p>
-                    <a href="sector_swarm.html" class="action-link mono">JOIN SESSION &rarr;</a>
-                </div>
+                <a href="sector_swarm.html" class="module-card" data-keywords="sector swarm roundtable analyst agents tech energy financials debate">
+                    <h3 style="color: var(--green);">Sector Swarm Roundtable</h3>
+                    <p>Multi-Agent Industry Roundtable. Watch "analyst agents" (Tech, Energy, Financials) debate sector rotation and capex trends.</p>
+                    <span class="action-link">Join Session →</span>
+                </a>
 
-                <div class="module-card">
-                    <h3 class="mono" style="color: var(--accent-color);">Wargame Console</h3>
-                    <p>Red Team vs Blue Team Economic Simulator. Pits adversarial agents against institutional defense models to stress-test portfolios.</p>
-                    <a href="wargame_dashboard.html" class="action-link mono">ENTER WARGAME &rarr;</a>
-                </div>
+                <a href="wargame_dashboard.html" class="module-card" data-keywords="wargame console red team blue team economic simulator stress test">
+                    <h3 style="color: var(--green);">Wargame Console</h3>
+                    <p>Red Team vs Blue Team Economic Simulator. Pits adversarial agents against institutional defense models.</p>
+                    <span class="action-link">Enter Wargame →</span>
+                </a>
 
-                <div class="module-card">
-                    <h3 class="mono" style="color: var(--accent-color);">Agent Gallery & Registry</h3>
-                    <p>The Specialized Swarm Roster. View individual AI agent profiles, their specific financial training parameters, memory states, and win/loss rates.</p>
-                    <a href="agent_gallery.html" class="action-link mono">VIEW ROSTER &rarr;</a>
-                </div>
+                <a href="agent_gallery.html" class="module-card" data-keywords="agent gallery registry roster AI profiles training parameters memory">
+                    <h3 style="color: var(--green);">Agent Gallery & Registry</h3>
+                    <p>Specialized Swarm Roster. View AI agent profiles, training parameters, memory states, and performance metrics.</p>
+                    <span class="action-link">View Roster →</span>
+                </a>
 
-                <div class="module-card">
+                <a href="adam_convergence_live_neural_link.html" class="module-card" data-keywords="neural link convergence thought vectors consensus macro events">
                     <div class="tag tag-new">NEW</div>
-                    <h3 class="mono" style="color: #00F5FF;">Neural Link Convergence</h3>
+                    <h3 style="color: var(--cyan);">Neural Link Convergence</h3>
                     <p>Live visualization of thought-vectors converging across the agent network. Tracks consensus formation on macro events.</p>
-                    <a href="adam_convergence_live_neural_link.html" class="action-link mono">OPEN LINK &rarr;</a>
-                </div>
+                    <span class="action-link">Open Link →</span>
+                </a>
 
-                <div class="module-card">
-                    <h3 class="mono" style="color: var(--warning-color);">Nexus Simulation</h3>
-                    <p>Geopolitical & Sovereign Minds platform. Maps out the simulated decision-making processes of virtual central bankers and state actors.</p>
-                    <a href="nexus.html" class="action-link mono">ENTER NEXUS &rarr;</a>
-                </div>
+                <a href="nexus.html" class="module-card" data-keywords="nexus simulation geopolitical sovereign central bankers state actors">
+                    <h3 style="color: var(--amber);">Nexus Simulation</h3>
+                    <p>Geopolitical & Sovereign Minds platform. Maps simulated decision-making of virtual central bankers and state actors.</p>
+                    <span class="action-link">Enter Nexus →</span>
+                </a>
             </div>
 
-            <!-- SECTION: FINANCIAL MODELING & RISK -->
-            <div class="section-header mono">
+            <!-- ═══ SECTION: FINANCIAL ═══ -->
+            <div class="section-header mono" data-section>
                 <span class="section-icon">📈</span>
                 <h2>FINANCIAL MODELING, CREDIT & RISK</h2>
             </div>
-            <div class="grid-container">
-                <div class="module-card">
-                    <h3 class="mono" style="color: #ff3333;">Credit & Valuation Architect</h3>
-                    <p>Analyst OS Architect v7.0. Advanced interface for adjusting DCF parameters, debt schedules, and running AI-assisted credit analyses.</p>
-                    <a href="credit_valuation_architect.html" class="action-link mono">LAUNCH ARCHITECT &rarr;</a>
-                </div>
+            <div class="grid" data-grid>
+                <a href="credit_valuation_architect.html" class="module-card" data-keywords="credit valuation architect DCF debt schedule AI analysis">
+                    <h3 style="color: var(--red);">Credit & Valuation Architect</h3>
+                    <p>Analyst OS Architect v7.0. Advanced interface for adjusting DCF parameters, debt schedules, and AI-assisted credit analyses.</p>
+                    <span class="action-link">Launch Architect →</span>
+                </a>
 
-                <div class="module-card">
-                    <h3 class="mono" style="color: #ff3333;">Monte Carlo Risk Engine</h3>
-                    <p>High-performance path visualizer for portfolio risk. Runs thousands of stochastic simulations infused with AI-generated tail-risk scenarios.</p>
-                    <a href="monte_carlo_visualizer.html" class="action-link mono">LAUNCH SIMULATOR &rarr;</a>
-                </div>
+                <a href="monte_carlo_visualizer.html" class="module-card" data-keywords="monte carlo risk engine simulation portfolio stochastic tail-risk">
+                    <h3 style="color: var(--red);">Monte Carlo Risk Engine</h3>
+                    <p>High-performance path visualizer. Runs thousands of stochastic simulations infused with AI-generated tail-risk scenarios.</p>
+                    <span class="action-link">Launch Simulator →</span>
+                </a>
 
-                <div class="module-card">
-                    <h3 class="mono" style="color: #ff3333;">Comprehensive Credit Dashboard</h3>
-                    <p>Unified Enterprise Dashboard for tracking corporate bond yields, CDS spreads, and algorithmic default probability metrics.</p>
-                    <a href="comprehensive_credit_dashboard.html" class="action-link mono">OPEN DASHBOARD &rarr;</a>
-                </div>
+                <a href="comprehensive_credit_dashboard.html" class="module-card" data-keywords="comprehensive credit dashboard bond yields CDS spreads default probability">
+                    <h3 style="color: var(--red);">Comprehensive Credit Dashboard</h3>
+                    <p>Unified Enterprise Dashboard tracking corporate bond yields, CDS spreads, and algorithmic default probability metrics.</p>
+                    <span class="action-link">Open Dashboard →</span>
+                </a>
 
-                <div class="module-card">
-                    <h3 class="mono" style="color: #ff3333;">Institutional Radar (13F)</h3>
-                    <p>13F Trend Monitor & Synthesis. Automatically parses SEC filings to map institutional clustering, crowded trades, and hidden alpha.</p>
-                    <a href="institutional_radar.html" class="action-link mono">LAUNCH RADAR &rarr;</a>
-                </div>
+                <a href="institutional_radar.html" class="module-card" data-keywords="institutional radar 13F SEC filings clustering crowded trades alpha">
+                    <h3 style="color: var(--red);">Institutional Radar (13F)</h3>
+                    <p>13F Trend Monitor & Synthesis. Parses SEC filings to map institutional clustering, crowded trades, and hidden alpha.</p>
+                    <span class="action-link">Launch Radar →</span>
+                </a>
 
-                <div class="module-card">
+                <a href="unified_banking.html" class="module-card" data-keywords="unified banking world model digital twin interbank lending liquidity contagion">
                     <div class="tag tag-beta">BETA</div>
-                    <h3 class="mono" style="color: #ff3333;">Unified Banking World Model</h3>
-                    <p>A Digital Twin of the global banking system. Maps interbank lending, liquidity drains, and contagion risk in real-time.</p>
-                    <a href="unified_banking.html" class="action-link mono">LAUNCH TWIN &rarr;</a>
-                </div>
+                    <h3 style="color: var(--red);">Unified Banking World Model</h3>
+                    <p>Digital Twin of the global banking system. Maps interbank lending, liquidity drains, and contagion risk in real-time.</p>
+                    <span class="action-link">Launch Twin →</span>
+                </a>
 
-                <div class="module-card">
-                    <h3 class="mono" style="color: #ff3333;">Market Mayhem Archive</h3>
-                    <p>Strategic Intelligence Archive detailing past "black swan" events and how the ADAM system historically modeled and reacted to them.</p>
-                    <a href="market_mayhem_dashboard.html" class="action-link mono">VIEW ARCHIVE &rarr;</a>
-                </div>
+                <a href="market_mayhem_dashboard.html" class="module-card" data-keywords="market mayhem archive black swan historical events">
+                    <h3 style="color: var(--red);">Market Mayhem Archive</h3>
+                    <p>Strategic Intelligence Archive detailing past "black swan" events and how the ADAM system historically modeled them.</p>
+                    <span class="action-link">View Archive →</span>
+                </a>
             </div>
 
-            <!-- SECTION: DATA, GRAPH & DEVELOPER TOOLS -->
-            <div class="section-header mono">
+            <!-- ═══ SECTION: DEV TOOLS ═══ -->
+            <div class="section-header mono" data-section>
                 <span class="section-icon">🔧</span>
                 <h2>DATA INFRASTRUCTURE & DEVELOPER TOOLS</h2>
             </div>
@@ -564,28 +1014,244 @@
                 </div>
             </div>
 
-            <footer style="margin-top: 60px; padding-top: 20px; border-top: 1px solid #333; text-align: center; color: #666; font-size: 0.8rem;" class="mono">
-                [SYSTEM OK] // ADAM v30 Kernel Loaded // MEMORY: 4.2TB V-RAM ALLOCATED // LATENCY: OPTIMAL
+            <footer class="footer">
+                [SYSTEM OK] // ADAM v30.1 Kernel Loaded // PROV-O: COMPLIANT // LATENCY: OPTIMAL
             </footer>
         </main>
     </div>
 
-    <!-- Interface Scripts -->
-    <script>
-        // Simple console logging to simulate tech environment
-        console.log("%c ADAM v30 INITIALIZED ", "background: #0aff60; color: #000; font-weight: bold;");
-        console.log("Loading module manifest...");
-        console.log("Connecting to swarm neural network... [OK]");
+    <!-- Toast Container -->
+    <div class="toast-container" id="toast-container"></div>
 
-        // Add subtle hover sound effects or interactivity here if needed in future
-        document.querySelectorAll('.module-card').forEach(card => {
-            card.addEventListener('mouseenter', () => {
-                card.style.borderColor = getComputedStyle(card).getPropertyValue('--primary-color');
-            });
-            card.addEventListener('mouseleave', () => {
-                card.style.borderColor = '#333';
+    <!-- ═══════════════════════════════════════════
+         SCRIPTS
+         ═══════════════════════════════════════════ -->
+    <script>
+    (function() {
+        'use strict';
+
+        // ── Particle Canvas ──
+        const canvas = document.getElementById('particle-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        let animFrame;
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        function initParticles() {
+            particles = [];
+            const count = Math.min(Math.floor((canvas.width * canvas.height) / 18000), 80);
+            for (let i = 0; i < count; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    vx: (Math.random() - 0.5) * 0.4,
+                    vy: (Math.random() - 0.5) * 0.4,
+                    r: Math.random() * 1.5 + 0.5
+                });
+            }
+        }
+
+        function drawParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+            const particleColor = isLight ? 'rgba(8, 145, 178, ' : 'rgba(0, 243, 255, ';
+            const lineColor = isLight ? 'rgba(8, 145, 178, ' : 'rgba(0, 243, 255, ';
+            const maxDist = 120;
+
+            for (let i = 0; i < particles.length; i++) {
+                const p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+                if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                ctx.fillStyle = particleColor + '0.5)';
+                ctx.fill();
+
+                for (let j = i + 1; j < particles.length; j++) {
+                    const q = particles[j];
+                    const dx = p.x - q.x, dy = p.y - q.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < maxDist) {
+                        ctx.beginPath();
+                        ctx.moveTo(p.x, p.y);
+                        ctx.lineTo(q.x, q.y);
+                        ctx.strokeStyle = lineColor + (0.12 * (1 - dist / maxDist)).toFixed(3) + ')';
+                        ctx.lineWidth = 0.5;
+                        ctx.stroke();
+                    }
+                }
+            }
+            animFrame = requestAnimationFrame(drawParticles);
+        }
+
+        resizeCanvas();
+        initParticles();
+        drawParticles();
+        window.addEventListener('resize', () => { resizeCanvas(); initParticles(); });
+
+        // ── Theme Toggle ──
+        const themeBtn = document.getElementById('theme-toggle');
+        const savedTheme = localStorage.getItem('adam-theme');
+        if (savedTheme) {
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            themeBtn.textContent = savedTheme === 'light' ? '☀️' : '🌙';
+        }
+        themeBtn.addEventListener('click', () => {
+            const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+            const next = isLight ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', next);
+            localStorage.setItem('adam-theme', next);
+            themeBtn.textContent = next === 'light' ? '☀️' : '🌙';
+            showToast('Theme → ' + next.toUpperCase());
+        });
+
+        // ── Hamburger / Mobile Sidebar ──
+        const hamburger = document.getElementById('hamburger-btn');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+
+        function toggleSidebar() {
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('visible');
+        }
+
+        hamburger.addEventListener('click', toggleSidebar);
+        overlay.addEventListener('click', toggleSidebar);
+
+        // ── Collapsible Sidebar Sections ──
+        document.querySelectorAll('.sidebar-title[data-toggle]').forEach(title => {
+            title.addEventListener('click', () => {
+                const targetId = title.getAttribute('data-toggle');
+                const list = document.getElementById(targetId);
+                title.classList.toggle('collapsed');
+                list.classList.toggle('collapsed');
             });
         });
+
+        // ── Search / Filter ──
+        const searchInput = document.getElementById('search-input');
+        const allCards = document.querySelectorAll('.module-card');
+        const allSections = document.querySelectorAll('[data-section]');
+        const allGrids = document.querySelectorAll('[data-grid]');
+        const noResults = document.getElementById('no-results');
+
+        function filterCards() {
+            const query = searchInput.value.toLowerCase().trim();
+            let visibleCount = 0;
+
+            allCards.forEach(card => {
+                const title = card.querySelector('h3')?.textContent.toLowerCase() || '';
+                const desc = card.querySelector('p')?.textContent.toLowerCase() || '';
+                const keywords = (card.getAttribute('data-keywords') || '').toLowerCase();
+                const match = !query || title.includes(query) || desc.includes(query) || keywords.includes(query);
+
+                card.classList.toggle('hidden', !match);
+                if (match) visibleCount++;
+            });
+
+            // Show/hide sections that have no visible cards
+            allGrids.forEach((grid, i) => {
+                const visibleInGrid = grid.querySelectorAll('.module-card:not(.hidden)').length;
+                const section = allSections[i];
+                if (section) section.style.display = visibleInGrid ? '' : 'none';
+                grid.style.display = visibleInGrid ? '' : 'none';
+
+                // Also hide section-desc if present
+                const desc = grid.previousElementSibling;
+                if (desc && desc.classList.contains('section-desc')) {
+                    desc.style.display = visibleInGrid ? '' : 'none';
+                }
+            });
+
+            noResults.classList.toggle('visible', visibleCount === 0 && query.length > 0);
+        }
+
+        searchInput.addEventListener('input', filterCards);
+
+        // Keyboard shortcut: "/" to focus search
+        document.addEventListener('keydown', (e) => {
+            if (e.key === '/' && document.activeElement !== searchInput) {
+                e.preventDefault();
+                searchInput.focus();
+                searchInput.select();
+            }
+            if (e.key === 'Escape' && document.activeElement === searchInput) {
+                searchInput.value = '';
+                searchInput.blur();
+                filterCards();
+            }
+        });
+
+        // ── Animated Stat Counters ──
+        function animateCounters() {
+            const counters = document.querySelectorAll('[data-count]');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const el = entry.target;
+                        const target = parseInt(el.getAttribute('data-count'));
+                        const duration = 1200;
+                        const start = Date.now();
+
+                        function tick() {
+                            const elapsed = Date.now() - start;
+                            const progress = Math.min(elapsed / duration, 1);
+                            const eased = 1 - Math.pow(1 - progress, 3); // ease-out cubic
+                            el.textContent = Math.floor(target * eased).toLocaleString();
+                            if (progress < 1) requestAnimationFrame(tick);
+                            else el.textContent = target.toLocaleString();
+                        }
+                        tick();
+                        observer.unobserve(el);
+                    }
+                });
+            }, { threshold: 0.3 });
+
+            counters.forEach(c => observer.observe(c));
+        }
+        animateCounters();
+
+        // ── Sidebar Telemetry (simulated) ──
+        function updateTelemetry() {
+            const latency = (8 + Math.random() * 8).toFixed(0);
+            const agents = (1380 + Math.floor(Math.random() * 40));
+            const db = (60 + Math.floor(Math.random() * 10));
+
+            document.getElementById('stat-latency').textContent = latency + 'ms';
+            document.getElementById('stat-agents').textContent = agents.toLocaleString();
+            document.getElementById('stat-db').textContent = db + '%';
+            document.getElementById('stat-provo').textContent = '100%';
+        }
+        updateTelemetry();
+        setInterval(updateTelemetry, 5000);
+
+        // ── Toast Notifications ──
+        function showToast(message) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = '› ' + message;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        // Initial toast
+        setTimeout(() => showToast('ADAM v30.1 INITIALIZED'), 500);
+        setTimeout(() => showToast('Swarm neural network... [OK]'), 1200);
+
+        // Console branding
+        console.log('%c ADAM v30.1 INITIALIZED ', 'background: #0aff60; color: #000; font-weight: bold; font-size: 14px;');
+        console.log('%c Unified Financial OS & Agentic Swarm ', 'background: #00f3ff; color: #000; font-weight: bold;');
+        console.log('Loading module manifest... OK');
+    })();
     </script>
 </body>
 </html>
