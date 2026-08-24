@@ -877,6 +877,12 @@ ADAM v1.0.0-PROD is an opinionated, ready-to-run financial agent out of the box.
 *   **Vector Storage:** Qdrant (high-performance semantic search for System 1).
 *   **Orchestration Engine:** Temporal (ensures stateful, durable DAG execution).
 
+## 🌐 Unified Exploration (Human & Machine Navigation)
+Navigate the entire codebase and output artifacts through the Master Repository Explorer.
+
+*   **HTML Hub:** Use [`index_all.html`](index_all.html) to seamlessly traverse interconnected dashboards, markdown records, and agent prompts across the repository. This provides a unified directory index for both human users and programmatic web scrapers/agents.
+*   **Machine Manifest:** AI Agents should cross-reference this with [`llms.txt`](llms.txt) for contextual onboarding.
+
 ## ⚡ Getting Started
 We strictly use **`uv`** for lightning-fast, reproducible Python environment management.
 
