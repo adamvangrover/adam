@@ -1253,5 +1253,136 @@
         console.log('Loading module manifest... OK');
     })();
     </script>
+
+    <!-- PROVENANCE OVERLAY & TELEMETRY HARNESS -->
+    <div id="system2-overlay" class="system2-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5,11,20,0.95); z-index: 9999; color: #00f3ff; font-family: 'JetBrains Mono', monospace; padding: 2rem; border: 1px solid #00f3ff; backdrop-filter: blur(10px); flex-direction: column;">
+        <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #00f3ff; padding-bottom: 10px; margin-bottom: 20px;">
+            <h2 style="margin: 0; font-size: 1.2rem; color: #0aff60;">[ ADAM_OS :: TELEMETRY HARNESS & PROVENANCE ]</h2>
+            <span style="cursor: pointer; color: #ff3333; font-weight: bold;" onclick="document.getElementById('system2-overlay').style.display='none'">[ CLOSE_CONNECTION ]</span>
+        </div>
+        <div id="sys2-content" style="flex-grow: 1; overflow-y: auto;">
+            <div class="provenance-log" style="background: rgba(0,0,0,0.5); padding: 15px; border: 1px solid #333;">
+                <p style="margin: 5px 0;"><span style="color: #888;">AGENT:</span> MetaOrchestrator</p>
+                <p style="margin: 5px 0;"><span style="color: #888;">STATUS:</span> ACTIVE_SYNC</p>
+                <p style="margin: 5px 0;"><span style="color: #888;">PROVENANCE_HASH:</span> <span id="overlay-prov-hash">AWAITING_TELEMETRY...</span></p>
+                <hr style="border: 0; border-top: 1px dashed #333; margin: 15px 0;">
+                <div id="overlay-telemetry-stream">
+                    <p style="color: #888; font-size: 0.9em;">&gt; Initializing W3C PROV-O compliance stream...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        // Harness Telemetry Framework connector
+        window.showProvenanceOverlay = function(hash) {
+            const overlay = document.getElementById('system2-overlay');
+            if(overlay) {
+                overlay.style.display = 'flex';
+                if(hash) {
+                    document.getElementById('overlay-prov-hash').innerText = hash;
+                }
+                const stream = document.getElementById('overlay-telemetry-stream');
+                if(stream) {
+                    const entry = document.createElement('p');
+                    entry.style.color = '#0aff60';
+                    entry.style.fontSize = '0.9em';
+                    entry.style.margin = '5px 0';
+                    entry.innerText = '> [' + new Date().toISOString() + '] Telemetry Sync Verified.';
+                    stream.appendChild(entry);
+                }
+            }
+        };
+    </script>
+    <!-- END PROVENANCE OVERLAY -->
+
+    <!-- OMNI ECOSYSTEM EXTENSION & SEARCH -->
+    <style>
+      #omni-dock {
+          position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+          background: rgba(10, 15, 25, 0.85); backdrop-filter: blur(12px); border: 1px solid #00f3ff;
+          border-radius: 50px; display: flex; gap: 15px; padding: 10px 25px; z-index: 9998;
+          box-shadow: 0 0 20px rgba(0,243,255,0.2); flex-wrap: wrap; justify-content: center;
+      }
+      .omni-btn {
+          color: #e8e8e8; background: transparent; border: none; cursor: pointer; font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; transition: 0.2s;
+      }
+      .omni-btn:hover { color: #00f3ff; text-shadow: 0 0 8px rgba(0,243,255,0.5); }
+
+      #omni-search-modal {
+          display: none; position: fixed; top: 10%; left: 50%; transform: translateX(-50%);
+          width: 90%; max-width: 600px; background: rgba(5,11,20,0.95); border: 1px solid #0aff60;
+          backdrop-filter: blur(10px); z-index: 10000; padding: 20px; border-radius: 8px; font-family: 'JetBrains Mono', monospace;
+      }
+      #omni-search-input { width: 100%; padding: 10px; background: #000; border: 1px solid #333; color: #0aff60; font-family: inherit; }
+      .search-res-item { padding: 10px; border-bottom: 1px solid #222; display: block; color: #fff; text-decoration: none; }
+      .search-res-item:hover { background: rgba(10, 255, 96, 0.1); }
+    </style>
+
+    <div id="omni-dock">
+        <button class="omni-btn" onclick="window.location.href='index.html'">[ OS_ROOT ]</button>
+        <button class="omni-btn" onclick="window.location.href='hub.html'">[ BRANDS_HUB ]</button>
+        <button class="omni-btn" onclick="window.location.href='index_archive.html'">[ ARCHIVE ]</button>
+        <button class="omni-btn" onclick="document.getElementById('omni-search-modal').style.display='block'; document.getElementById('omni-search-input').focus();">[ SEARCH ]</button>
+        <button class="omni-btn" onclick="if(window.showProvenanceOverlay) window.showProvenanceOverlay('BEHAVIOR_TRACKER')">[ TELEMETRY ]</button>
+    </div>
+
+    <div id="omni-search-modal">
+        <div style="display:flex; justify-content:space-between; margin-bottom: 15px;">
+            <span style="color:#0aff60;">>> GLOBAL OFFLINE SEARCH</span>
+            <button style="background:none; border:none; color:#ff3333; cursor:pointer;" onclick="document.getElementById('omni-search-modal').style.display='none'">[X]</button>
+        </div>
+        <input type="text" id="omni-search-input" placeholder="Search pages, brands, tools..." onkeyup="omniSearch(this.value)">
+        <div id="omni-search-results" style="margin-top: 15px; max-height: 400px; overflow-y: auto;"></div>
+    </div>
+
+    <script>
+        const omniIndex = [{"u": "monte_carlo_visualizer.html", "t": "ADAM v30 :: MONTE CARLO VISUALIZER", "d": ""}, {"u": "unified_banking.html", "t": "ADAM v30 :: UNIFIED BANKING", "d": ""}, {"u": "nexus.html", "t": "ADAM v30 :: NEXUS", "d": ""}, {"u": "hub.html", "t": "ADAM v30.1 :: Unified Brand & Intelligence Hub", "d": "ADAM Unified Hub \u2014 Navigate all branded content, daily intelligence, showcase reports, and financial applications from a single interactive portal."}, {"u": "showcase_private_equity.html", "t": "ADAM v30 :: SHOWCASE PRIVATE EQUITY", "d": ""}, {"u": "agent_gallery.html", "t": "ADAM v30 :: AGENT GALLERY", "d": ""}, {"u": "credit_valuation_architect.html", "t": "ADAM v30 :: CREDIT VALUATION ARCHITECT", "d": ""}, {"u": "avg_search.html", "t": "ADAM v30 :: AVG SEARCH", "d": ""}, {"u": "editor_studio.html", "t": "ADAM v30 :: EDITOR STUDIO", "d": ""}, {"u": "comprehensive_credit_dashboard.html", "t": "ADAM v30 :: COMPREHENSIVE CREDIT DASHBOARD", "d": ""}, {"u": "workflow_orchestrator.html", "t": "ADAM v30 :: WORKFLOW ORCHESTRATOR", "d": ""}, {"u": "scenario_lab.html", "t": "ADAM v30 :: SCENARIO LAB", "d": ""}, {"u": "war_room.html", "t": "ADAM v30 :: WAR ROOM", "d": ""}, {"u": "interactive_prototype.html", "t": "ADAM Architecture - Interactive Prototype", "d": ""}, {"u": "network_map.html", "t": "ADAM v30 :: NETWORK MAP", "d": ""}, {"u": "policy_center.html", "t": "ADAM v30 :: POLICY CENTER", "d": ""}, {"u": "market_live.html", "t": "ADAM v30 :: MARKET LIVE", "d": ""}, {"u": "system_brain.html", "t": "ADAM v30 :: SYSTEM BRAIN", "d": ""}, {"u": "quantum_infrastructure.html", "t": "ADAM v30 :: QUANTUM INFRASTRUCTURE", "d": ""}, {"u": "agents.html", "t": "ADAM v30 :: AGENTS", "d": ""}, {"u": "institutional_radar.html", "t": "ADAM v30 :: INSTITUTIONAL RADAR", "d": ""}, {"u": "showcase_hedge_fund.html", "t": "ADAM v30 :: SHOWCASE HEDGE FUND", "d": ""}, {"u": "reports.html", "t": "ADAM v30 :: REPORTS", "d": ""}, {"u": "index_archive.html", "t": "ADAM v23.5 :: ARCHIVE", "d": ""}, {"u": "api_docs.html", "t": "ADAM v30 :: API DOCS", "d": ""}, {"u": "market_mayhem_dashboard.html", "t": "ADAM v30 :: MARKET MAYHEM DASHBOARD", "d": ""}, {"u": "market_mayhem_terminal.html", "t": "MARKET MAYHEM // ADAM v30.4 INSTITUTIONAL CREDIT & VALUATION TERMINAL", "d": ""}, {"u": "adam_convergence_live_neural_link.html", "t": "ADAM v30 :: ADAM CONVERGENCE LIVE NEURAL LINK", "d": ""}, {"u": "adam_daily_hub_index.html", "t": "ADAM v30 :: ADAM DAILY HUB INDEX", "d": ""}, {"u": "index.html", "t": "ADAM v30.1 :: Unified Financial Operating System", "d": "ADAM \u2014 Autonomous Deterministic Alpha Matrix. Institutional-grade neuro-symbolic multi-agent financial operating system for credit risk, market intelligence, and portfolio surveillance."}, {"u": "README.html", "t": "ADAM OS v30.1 - Autonomous Deterministic Alpha Matrix", "d": ""}, {"u": "index_v30.html", "t": "ADAM v30 :: UNIFIED FINANCIAL OS", "d": ""}, {"u": "sector_swarm.html", "t": "ADAM v30 :: SECTOR SWARM", "d": ""}, {"u": "changelog.html", "t": "ADAM v30 :: CHANGELOG", "d": ""}, {"u": "terminal_profile.html", "t": "ADAM v30 :: TERMINAL PROFILE", "d": ""}, {"u": "wargame_dashboard.html", "t": "ADAM v30 :: WARGAME DASHBOARD", "d": ""}, {"u": "analyst_os.html", "t": "ADAM v30 :: ANALYST OS", "d": ""}, {"u": "graph.html", "t": "ADAM v30 :: GRAPH", "d": ""}, {"u": "index_all.html", "t": "ADAM v30 :: UNIFIED REPOSITORY INDEX", "d": ""}];
+
+        function omniSearch(query) {
+            const out = document.getElementById('omni-search-results');
+            out.innerHTML = '';
+            if(!query) return;
+            const q = query.toLowerCase();
+            const results = omniIndex.filter(item => (item.t && item.t.toLowerCase().includes(q)) || (item.d && item.d.toLowerCase().includes(q)) || item.u.toLowerCase().includes(q)).slice(0, 10);
+
+            results.forEach(res => {
+                const el = document.createElement('a');
+                el.className = 'search-res-item';
+                el.href = res.u;
+                el.innerHTML = `<strong style="color:#00f3ff;">${res.t || res.u}</strong><br><small style="color:#888;">${res.d || 'No description available.'}</small>`;
+                out.appendChild(el);
+            });
+        }
+
+        // Behavior Tracking
+        document.addEventListener('click', (e) => {
+            const tag = e.target.tagName;
+            if(tag === 'A' || tag === 'BUTTON' || e.target.closest('a') || e.target.closest('button')) {
+                const info = e.target.innerText || e.target.id || 'UI_ELEMENT';
+                const logEntry = `[ACTION] Clicked: ${info.substring(0, 30).replace(/\n/g, '')}`;
+
+                // Store in local storage
+                try {
+                    let history = JSON.parse(localStorage.getItem('adam_behavior_log') || '[]');
+                    history.push({ time: Date.now(), action: logEntry, url: window.location.pathname });
+                    if(history.length > 100) history.shift();
+                    localStorage.setItem('adam_behavior_log', JSON.stringify(history));
+                } catch (err) {}
+
+                // Stream to telemetry overlay if active
+                const stream = document.getElementById('overlay-telemetry-stream');
+                if(stream) {
+                    const p = document.createElement('p');
+                    p.style.color = '#f59e0b';
+                    p.style.fontSize = '0.9em';
+                    p.style.margin = '5px 0';
+                    p.innerText = `> ${logEntry}`;
+                    stream.appendChild(p);
+                }
+            }
+        });
+    </script>
+    <!-- END OMNI EXTENSION -->
+
 </body>
 </html>
