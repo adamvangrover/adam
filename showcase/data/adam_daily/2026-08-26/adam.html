@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ADAM v30.1 - Autonomous Deterministic Alpha Matrix</title>
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Chart.js via CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0f4f8',
+              100: '#d9e2ec',
+              200: '#bccadc',
+              300: '#9fb3c8',
+              400: '#829ab1',
+              500: '#627d98',
+              600: '#486581',
+              700: '#334e68',
+              800: '#243b53',
+              900: '#102a43',
+            },
+            accent: {
+              emerald: '#059669',
+              indigo: '#4f46e5',
+              violet: '#7c3aed',
+              amber: '#d97706',
+              rose: '#e11d48',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Embedded chart container constraints as required */
+    .chart-container {
+      position: relative;
+      width: 100%;
+      max-width: 580px;
+      margin-left: auto;
+      margin-right: auto;
+      height: 300px;
+      max-height: 380px;
+    }
+    @media (min-width: 768px) {
+      .chart-container {
+        height: 340px;
+      }
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col">
+
+  <!-- Chosen Palette: Slate & Warm Neutral Institutional -->
+  <!-- Application Structure Plan: Designed as a 5-tab executive dashboard (Overview & Cognitive Triad, Architecture & Pipeline, Interactive Credit Simulator, Agent Directory, Benchmarks & Roadmap). This non-linear, task-oriented structure allows credit underwriters, risk officers, and technical architects to intuitively explore ADAM's neuro-symbolic framework, test the PDIL sensitivity engine in real-time, inspect individual pipeline stages, filter specialized agents, and analyze performance benchmarks without fluff. -->
+  <!-- Visualization & Content Choices:
+       1. System Triad Comparison -> Dynamic Interactive Tab Cards & Matrix -> Allows users to toggle between System 1, System 2, and System 3 specs -> Vanilla JS + HTML Grid.
+       2. Step-by-Step Credit Automation -> Interactive 5-Stage Stepper -> Users click through steps to inspect schemas, speed, and validation logic -> Vanilla JS.
+       3. Credit Default Risk & Covenant Simulator -> Interactive Controls (Sliders/Dropdowns) -> Live calculation of PD, LGD, EAD, Expected Loss, VaR, and Covenant Headroom -> Math in JS + Chart.js Line Chart (Sensitivity Analysis) + Chart.js Bar Chart (Capital Structure Waterfall).
+       4. Agent Swarm Ecosystem -> Searchable & Filterable Agent Cards Grid -> Instant category filtering (Credit, Quant, Macro, Governance) -> Vanilla JS filtering.
+       5. Benchmarks & Performance -> Chart.js Horizontal Bar & Grouped Bar Charts -> Displays FinanceBench 99% accuracy and <5ms Rust execution speed.
+  -->
+  <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+  <!-- Top Institutional Header -->
+  <header class="bg-slate-900 text-white border-b border-slate-800 sticky top-0 z-50 shadow-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="bg-indigo-600 text-white font-black text-xl px-2.5 py-1 rounded tracking-wider shadow">ADAM</div>
+        <div class="hidden md:flex flex-col">
+          <span class="text-sm font-semibold tracking-wide text-slate-100">ADAM OS v30.1</span>
+          <span class="text-xs text-slate-400">Autonomous Deterministic Alpha Matrix</span>
+        </div>
+      </div>
+      
+      <!-- Key System Badges -->
+      <div class="hidden lg:flex items-center space-x-3 text-xs">
+        <span class="px-2.5 py-1 rounded-full bg-slate-800 text-emerald-400 border border-emerald-500/30 font-medium">✦ FinanceBench: 99.0%</span>
+        <span class="px-2.5 py-1 rounded-full bg-slate-800 text-indigo-300 border border-indigo-500/30 font-medium">⚡ Rust Latency: &lt; 5ms</span>
+        <span class="px-2.5 py-1 rounded-full bg-slate-800 text-amber-300 border border-amber-500/30 font-medium">🧠 GNN FIBO Ontology</span>
+      </div>
+
+      <!-- Quick Action / Status -->
+      <div class="flex items-center space-x-2">
+        <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+        <span class="text-xs text-slate-300 font-mono">PDIL Sovereign Active</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full">
+
+    <!-- Primary Navigation Tabs -->
+    <nav class="flex space-x-1 bg-slate-200 p-1.5 rounded-xl mb-6 overflow-x-auto custom-scrollbar" aria-label="Tabs">
+      <button onclick="switchTab('overview')" id="tab-overview" class="tab-btn active px-4 py-2.5 rounded-lg text-sm font-semibold whitespace-nowrap transition-all duration-150 bg-white text-slate-900 shadow-sm">
+        📌 Overview & Cognitive Triad
+      </button>
+      <button onclick="switchTab('architecture')" id="tab-architecture" class="tab-btn px-4 py-2.5 rounded-lg text-sm font-semibold whitespace-nowrap transition-all duration-150 text-slate-600 hover:text-slate-900">
+        ⚡ Architecture & 5-Stage Pipeline
+      </button>
+      <button onclick="switchTab('simulator')" id="tab-simulator" class="tab-btn px-4 py-2.5 rounded-lg text-sm font-semibold whitespace-nowrap transition-all duration-150 text-slate-600 hover:text-slate-900">
+        🧮 Credit Risk & Covenant Simulator
+      </button>
+      <button onclick="switchTab('agents')" id="tab-agents" class="tab-btn px-4 py-2.5 rounded-lg text-sm font-semibold whitespace-nowrap transition-all duration-150 text-slate-600 hover:text-slate-900">
+        🤖 Agent Swarm Ecosystem
+      </button>
+      <button onclick="switchTab('benchmarks')" id="tab-benchmarks" class="tab-btn px-4 py-2.5 rounded-lg text-sm font-semibold whitespace-nowrap transition-all duration-150 text-slate-600 hover:text-slate-900">
+        📊 Benchmarks & Roadmap
+      </button>
+    </nav>
+
+    <!-- SECTION 1: OVERVIEW & COGNITIVE TRIAD -->
+    <section id="sec-overview" class="tab-content block space-y-6">
+      <!-- Section Intro Paragraph -->
+      <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+        <div class="flex items-center space-x-2 text-indigo-600 text-xs font-bold uppercase tracking-wider mb-1">
+          <span>Sovereign Intelligence Framework</span>
+        </div>
+        <h1 class="text-2xl font-bold text-slate-900 mb-2">Solving Institutional Epistemological Crisis in Credit Risk</h1>
+        <p class="text-slate-600 text-sm leading-relaxed">
+          ADAM (v30.1) is an institutional-grade, local-first neuro-symbolic framework engineered specifically to bridge stochastic language models with deterministic financial mathematics. Designed for high-stakes environments—Broadly Syndicated Loans (BSL), Distressed Debt, and Deep Credit Underwriting—ADAM enforces strict separation between stochastic semantic parsing and deterministic calculation via a Probabilistic-to-Deterministic Integration Layer (PDIL).
+        </p>
+      </div>
+
+      <!-- KPI Metrics Grid -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
+          <span class="text-xs font-medium text-slate-500 uppercase">FinanceBench Accuracy</span>
+          <div class="text-2xl font-black text-slate-900 my-1">99.0%</div>
+          <span class="text-xs text-emerald-600 font-semibold">Deterministic verification vs LLM text</span>
+        </div>
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
+          <span class="text-xs font-medium text-slate-500 uppercase">Rust Engine Latency</span>
+          <div class="text-2xl font-black text-slate-900 my-1">&lt; 5 ms</div>
+          <span class="text-xs text-indigo-600 font-semibold">Zero GIL lock for Monte Carlo &amp; DCF</span>
+        </div>
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
+          <span class="text-xs font-medium text-slate-500 uppercase">EDGAR Ingestion Speed</span>
+          <div class="text-2xl font-black text-slate-900 my-1">&lt; 12 sec</div>
+          <span class="text-xs text-violet-600 font-semibold">10-K parsing to FIBO graph update</span>
+        </div>
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
+          <span class="text-xs font-medium text-slate-500 uppercase">Deterministic Drift</span>
+          <div class="text-2xl font-black text-slate-900 my-1">0.0%</div>
+          <span class="text-xs text-amber-600 font-semibold">jsonLogic verified proof-of-thought</span>
+        </div>
+      </div>
+
+      <!-- System Triad Visual Cards -->
+      <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+        <div class="mb-4">
+          <h2 class="text-lg font-bold text-slate-900">The "System 2" Cognitive Triad Architecture</h2>
+          <p class="text-slate-600 text-xs">Explore the three complementary computational systems that form ADAM's sovereign intelligence layer.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <!-- System 1 -->
+          <div class="border border-slate-200 rounded-xl p-5 bg-gradient-to-b from-slate-50 to-white hover:border-emerald-300 transition-all">
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-emerald-100 text-emerald-800">System 1</span>
+              <span class="text-xs text-slate-400 font-mono">Asynchronous Hive</span>
+            </div>
+            <h3 class="font-bold text-slate-900 mb-2">The Neural Swarm (Reflexes)</h3>
+            <p class="text-xs text-slate-600 leading-relaxed mb-4">
+              High-velocity, unstructured data parsing and continuous surveillance. Ingests 13F, 13D, and Form 4 SEC EDGAR filings to capture qualitative market sentiment and structural shifts.
+            </p>
+            <ul class="text-xs text-slate-700 space-y-1.5 border-t border-slate-100 pt-3">
+              <li class="flex items-center"><span class="text-emerald-500 font-bold mr-2">✓</span> High-speed NLP extraction</li>
+              <li class="flex items-center"><span class="text-emerald-500 font-bold mr-2">✓</span> Sentiment &amp; signal vectorization</li>
+              <li class="flex items-center"><span class="text-emerald-500 font-bold mr-2">✓</span> Unstructured EDGAR parsing</li>
+            </ul>
+          </div>
+
+          <!-- System 2 -->
+          <div class="border border-slate-200 rounded-xl p-5 bg-gradient-to-b from-slate-50 to-white hover:border-indigo-300 transition-all">
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-indigo-100 text-indigo-800">System 2</span>
+              <span class="text-xs text-slate-400 font-mono">Neuro-Symbolic DAG</span>
+            </div>
+            <h3 class="font-bold text-slate-900 mb-2">The Graph (Deep Thinker)</h3>
+            <p class="text-xs text-slate-600 leading-relaxed mb-4">
+              "Logic as Data" policy enforcement using a Graph Neural Network (GNN) and Financial Industry Business Ontology (FIBO). Evaluates target companies and tests covenant compliance.
+            </p>
+            <ul class="text-xs text-slate-700 space-y-1.5 border-t border-slate-100 pt-3">
+              <li class="flex items-center"><span class="text-indigo-500 font-bold mr-2">✓</span> FIBO Knowledge Graph GNN</li>
+              <li class="flex items-center"><span class="text-indigo-500 font-bold mr-2">✓</span> Capital structure &amp; covenant checks</li>
+              <li class="flex items-center"><span class="text-indigo-500 font-bold mr-2">✓</span> Deep credit memo generation</li>
+            </ul>
+          </div>
+
+          <!-- System 3 -->
+          <div class="border border-slate-200 rounded-xl p-5 bg-gradient-to-b from-slate-50 to-white hover:border-amber-300 transition-all">
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-amber-100 text-amber-800">System 3</span>
+              <span class="text-xs text-slate-400 font-mono">Quantum Simulation</span>
+            </div>
+            <h3 class="font-bold text-slate-900 mb-2">World Model &amp; Quantum</h3>
+            <p class="text-xs text-slate-600 leading-relaxed mb-4">
+              Models asset price trajectories and systemic risks via jump-diffusion frameworks and Qiskit/cuQuantum Quantum Amplitude Estimation (QAE) for extreme tail-risk.
+            </p>
+            <ul class="text-xs text-slate-700 space-y-1.5 border-t border-slate-100 pt-3">
+              <li class="flex items-center"><span class="text-amber-500 font-bold mr-2">✓</span> Jump-diffusion stress scenarios</li>
+              <li class="flex items-center"><span class="text-amber-500 font-bold mr-2">✓</span> Qiskit &amp; cuQuantum integration</li>
+              <li class="flex items-center"><span class="text-amber-500 font-bold mr-2">✓</span> W3C PROV-O audit telemetry</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dynamic System Comparison Table -->
+      <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+        <h3 class="text-md font-bold text-slate-900 mb-3">System Specifications Matrix</h3>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr class="bg-slate-100 border-b border-slate-200 text-slate-700">
+                <th class="p-3 font-semibold">System Layer</th>
+                <th class="p-3 font-semibold">Primary Focus</th>
+                <th class="p-3 font-semibold">Core Technology</th>
+                <th class="p-3 font-semibold">Latency Profile</th>
+                <th class="p-3 font-semibold">Deterministic Output</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+              <tr class="hover:bg-slate-50">
+                <td class="p-3 font-bold text-emerald-700">System 1 (Reflexes)</td>
+                <td class="p-3 text-slate-600">EDGAR Parsing &amp; Market Sentiment</td>
+                <td class="p-3 text-slate-600">Async Hive Mind / Open-Weight NLP</td>
+                <td class="p-3 text-slate-600 font-mono">&lt; 12 seconds</td>
+                <td class="p-3 text-slate-600">Extracted JSON Schemas</td>
+              </tr>
+              <tr class="hover:bg-slate-50">
+                <td class="p-3 font-bold text-indigo-700">System 2 (Deep Thinker)</td>
+                <td class="p-3 text-slate-600">Covenant Testing &amp; Credit Underwriting</td>
+                <td class="p-3 text-slate-600">FIBO Knowledge Graph / GNN DAG</td>
+                <td class="p-3 text-slate-600 font-mono">&lt; 50 milliseconds</td>
+                <td class="p-3 text-slate-600">jsonLogic Proof-of-Thought Trail</td>
+              </tr>
+              <tr class="hover:bg-slate-50">
+                <td class="p-3 font-bold text-amber-700">System 3 (Simulation)</td>
+                <td class="p-3 text-slate-600">Extreme Tail-Risk &amp; Macro Scenarios</td>
+                <td class="p-3 text-slate-600">Qiskit / cuQuantum / Jump-Diffusion</td>
+                <td class="p-3 text-slate-600 font-mono">Batch / Asynchronous</td>
+                <td class="p-3 text-slate-600">W3C PROV-O JSON Log</td>
+              </tr>
+              <tr class="hover:bg-slate-50 bg-slate-50/50">
+                <td class="p-3 font-bold text-slate-900">Rust Execution Core</td>
+                <td class="p-3 text-slate-600">Algorithmic Math &amp; Matching Engine</td>
+                <td class="p-3 text-slate-600">AdamOS Kernel in Compiled Rust</td>
+                <td class="p-3 text-slate-600 font-mono font-bold text-indigo-600">&lt; 5 milliseconds</td>
+                <td class="p-3 text-slate-600 font-bold">Strict Mathematical Precision</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 2: ARCHITECTURE & PIPELINE -->
+    <section id="sec-architecture" class="tab-content hidden space-y-6">
+      <!-- Section Intro Paragraph -->
+      <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+        <div class="flex items-center space-x-2 text-indigo-600 text-xs font-bold uppercase tracking-wider mb-1">
+          <span>Sequential Operational Pipeline</span>
+        </div>
+        <h2 class="text-2xl font-bold text-slate-900 mb-2">Step-by-Step Credit Automation &amp; Multi-Layer Topology</h2>
+        <p class="text-slate-600 text-sm leading-relaxed">
+          To ensure absolute auditability and zero hallucination, ADAM executes credit risk underwriting through a strict 5-stage sequential pipeline. Raw unstructured data is ingested by System 1, routed through the Probabilistic-to-Deterministic Integration Layer (PDIL), structured via FIBO GNN knowledge graphs, and passed to compiled Rust engines for mathematical execution.
+        </p>
+      </div>
+
+      <!-- Interactive 5-Stage Stepper Walkthrough -->
+      <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+        <h3 class="text-md font-bold text-slate-900 mb-4">Interactive 5-Stage Credit Risk Pipeline Walkthrough</h3>
+        
+        <!-- Step Indicator Buttons -->
+        <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 mb-6">
+          <button onclick="setPipelineStep(0)" id="step-btn-0" class="pipeline-step-btn border-2 border-indigo-600 bg-indigo-50 text-indigo-900 p-3 rounded-xl text-left transition-all">
+            <span class="text-xs font-bold text-indigo-600 block mb-0.5">STAGE 01</span>
+            <span class="text-xs font-bold">Ingestion &amp; Parsing</span>
+          </button>
+          <button onclick="setPipelineStep(1)" id="step-btn-1" class="pipeline-step-btn border border-slate-200 bg-white text-slate-700 p-3 rounded-xl text-left hover:bg-slate-50 transition-all">
+            <span class="text-xs font-bold text-slate-400 block mb-0.5">STAGE 02</span>
+            <span class="text-xs font-bold">PDIL Mapping</span>
+          </button>
+          <button onclick="setPipelineStep(2)" id="step-btn-2" class="pipeline-step-btn border border-slate-200 bg-white text-slate-700 p-3 rounded-xl text-left hover:bg-slate-50 transition-all">
+            <span class="text-xs font-bold text-slate-400 block mb-0.5">STAGE 03</span>
+            <span class="text-xs font-bold">GNN Traversal</span>
+          </button>
+          <button onclick="setPipelineStep(3)" id="step-btn-3" class="pipeline-step-btn border border-slate-200 bg-white text-slate-700 p-3 rounded-xl text-left hover:bg-slate-50 transition-all">
+            <span class="text-xs font-bold text-slate-400 block mb-0.5">STAGE 04</span>
+            <span class="text-xs font-bold">Rust Execution</span>
+          </button>
+          <button onclick="setPipelineStep(4)" id="step-btn-4" class="pipeline-step-btn border border-slate-200 bg-white text-slate-700 p-3 rounded-xl text-left hover:bg-slate-50 transition-all">
+            <span class="text-xs font-bold text-slate-400 block mb-0.5">STAGE 05</span>
+            <span class="text-xs font-bold">Memo Output</span>
+          </button>
+        </div>
+
+        <!-- Selected Step Detail Panel -->
+        <div id="pipeline-detail-card" class="bg-slate-50 border border-slate-200 rounded-xl p-5">
+          <!-- Populated dynamically via JS -->
+        </div>
+      </div>
+
+      <!-- Multi-Layer System Topology Diagram (HTML Grid) -->
+      <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+        <h3 class="text-md font-bold text-slate-900 mb-2">ADAM Full System Architecture Topology</h3>
+        <p class="text-xs text-slate-500 mb-4">Click or hover over any architecture layer to inspect internal component interaction protocols.</p>
+
+        <div class="space-y-3">
+          <!-- Layer 1: Client & Immersive -->
+          <div onclick="inspectTopology('client')" class="cursor-pointer border border-slate-200 bg-slate-50 p-4 rounded-xl hover:border-indigo-400 transition-all">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-indigo-700 uppercase">1. Client &amp; Immersive Layer</span>
+              <span class="text-xs text-slate-400 font-mono">React / Vite Dashboard | WebXR Neural Deck | MCP Gateway</span>
+            </div>
+            <p class="text-xs text-slate-600 mt-1">Handles user interactions, model context protocols (MCP), and RBAC governance gatekeeping.</p>
+          </div>
+
+          <!-- Layer 2: Cognitive Routing & Swarm -->
+          <div onclick="inspectTopology('swarm')" class="cursor-pointer border border-slate-200 bg-slate-50 p-4 rounded-xl hover:border-emerald-400 transition-all">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-emerald-700 uppercase">2. System 1: Cognitive Routing &amp; Neural Swarm</span>
+              <span class="text-xs text-slate-400 font-mono">Meta-Orchestrator | SEC Edgar Parser | Async Hive Mind</span>
+            </div>
+            <p class="text-xs text-slate-600 mt-1">Asynchronously ingests 13F, 13D, and Form 4 filings; extracts sentiment vectors from raw chaos.</p>
+          </div>
+
+          <!-- Layer 3: Integration Layer (PDIL) -->
+          <div onclick="inspectTopology('pdil')" class="cursor-pointer border border-indigo-200 bg-indigo-50/50 p-4 rounded-xl hover:border-indigo-500 transition-all">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-indigo-900 uppercase">3. PDIL (Probabilistic-to-Deterministic Gatekeeper)</span>
+              <span class="text-xs text-indigo-600 font-mono">Strict Schema Validation | Guardrail Enforcement</span>
+            </div>
+            <p class="text-xs text-indigo-800 mt-1">Crucial boundary layer mapping stochastic LLM semantic tokens into immutable, typed JSON schemas.</p>
+          </div>
+
+          <!-- Layer 4: System 2 Reasoning Graph -->
+          <div onclick="inspectTopology('reasoning')" class="cursor-pointer border border-slate-200 bg-slate-50 p-4 rounded-xl hover:border-violet-400 transition-all">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-violet-700 uppercase">4. System 2: Neuro-Symbolic DAG Graph</span>
+              <span class="text-xs text-slate-400 font-mono">FIBO Knowledge Graph | Credit Sentinel | Dynamic Covenant Tester</span>
+            </div>
+            <p class="text-xs text-slate-600 mt-1">Evaluates counterparty risks across 10 target companies using GNN ontology and strict logic rules.</p>
+          </div>
+
+          <!-- Layer 5: Rust Execution Core -->
+          <div onclick="inspectTopology('rust')" class="cursor-pointer border border-emerald-200 bg-emerald-50/50 p-4 rounded-xl hover:border-emerald-500 transition-all">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-emerald-900 uppercase">5. Algorithmic &amp; Deterministic Execution (Rust Core)</span>
+              <span class="text-xs text-emerald-700 font-mono">AdamOS Kernel | Pricing Engine | Matching Engine</span>
+            </div>
+            <p class="text-xs text-emerald-800 mt-1">Compiled Rust execution of core financial math (PD, LGD, VaR, Monte Carlo) in &lt; 5ms.</p>
+          </div>
+        </div>
+
+        <!-- Topology Detail Drawer -->
+        <div id="topology-drawer" class="mt-4 p-4 bg-slate-900 text-white rounded-xl text-xs hidden">
+          <div class="flex items-center justify-between mb-2">
+            <span id="topo-title" class="font-bold text-indigo-300"></span>
+            <button onclick="document.getElementById('topology-drawer').classList.add('hidden')" class="text-slate-400 hover:text-white">✕ Close</button>
+          </div>
+          <p id="topo-desc" class="text-slate-300 leading-relaxed"></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 3: INTERACTIVE CREDIT RISK & COVENANT SIMULATOR -->
+    <section id="sec-simulator" class="tab-content hidden space-y-6">
+      <!-- Section Intro Paragraph -->
+      <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+        <div class="flex items-center space-x-2 text-indigo-600 text-xs font-bold uppercase tracking-wider mb-1">
+          <span>Live PDIL Execution Engine</span>
+        </div>
+        <h2 class="text-2xl font-bold text-slate-900 mb-2">Interactive Credit Risk &amp; Covenant Stress-Tester</h2>
+        <p class="text-slate-600 text-sm leading-relaxed">
+          Experience ADAM's deterministic pricing and covenant testing engine in real-time. Adjust capital structure parameters, EBITDA stress shocks, and loss given default (LGD) assumptions below. The system instantaneously calculates Expected Loss (EL), Value-at-Risk (VaR 99%), Interest Coverage, and Covenant Headroom—completely bypassing stochastic LLM math.
+        </p>
+      </div>
+
+      <!-- Controls & KPI Dashboard Container -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Interactive Controls Panel (1 Col) -->
+        <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-4">
+          <h3 class="text-sm font-bold text-slate-900 border-b border-slate-100 pb-2">Underwriting Parameters</h3>
+          
+          <!-- Control 1: EBITDA -->
+          <div>
+            <div class="flex justify-between text-xs mb-1">
+              <label class="font-semibold text-slate-700">LTM EBITDA ($M)</label>
+              <span id="val-ebitda" class="font-mono text-indigo-600 font-bold">$120.0M</span>
+            </div>
+            <input type="range" id="input-ebitda" min="20" max="300" step="5" value="120" oninput="updateSimulator()" class="w-full accent-indigo-600">
+          </div>
+
+          <!-- Control 2: Senior Debt -->
+          <div>
+            <div class="flex justify-between text-xs mb-1">
+              <label class="font-semibold text-slate-700">Senior Funded Debt ($M)</label>
+              <span id="val-senior-debt" class="font-mono text-indigo-600 font-bold">$380.0M</span>
+            </div>
+            <input type="range" id="input-senior-debt" min="50" max="1000" step="10" value="380" oninput="updateSimulator()" class="w-full accent-indigo-600">
+          </div>
+
+          <!-- Control 3: Subordinated Debt -->
+          <div>
+            <div class="flex justify-between text-xs mb-1">
+              <label class="font-semibold text-slate-700">Subordinated Debt ($M)</label>
+              <span id="val-sub-debt" class="font-mono text-indigo-600 font-bold">$120.0M</span>
+            </div>
+            <input type="range" id="input-sub-debt" min="0" max="400" step="10" value="120" oninput="updateSimulator()" class="w-full accent-indigo-600">
+          </div>
+
+          <!-- Control 4: EBITDA Shock (%) -->
+          <div>
+            <div class="flex justify-between text-xs mb-1">
+              <label class="font-semibold text-slate-700">Macro EBITDA Shock (%)</label>
+              <span id="val-shock" class="font-mono text-amber-600 font-bold">-15.0%</span>
+            </div>
+            <input type="range" id="input-shock" min="-40" max="10" step="1" value="-15" oninput="updateSimulator()" class="w-full accent-amber-600">
+          </div>
+
+          <!-- Control 5: LGD (%) -->
+          <div>
+            <div class="flex justify-between text-xs mb-1">
+              <label class="font-semibold text-slate-700">Loss Given Default (LGD %)</label>
+              <span id="val-lgd" class="font-mono text-slate-700 font-bold">45.0%</span>
+            </div>
+            <input type="range" id="input-lgd" min="10" max="90" step="5" value="45" oninput="updateSimulator()" class="w-full accent-slate-700">
+          </div>
+
+          <!-- Control 6: Covenant Maximum Debt/EBITDA -->
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Covenant Max Debt/EBITDA Ceiling</label>
+            <select id="input-cov-ceiling" onchange="updateSimulator()" class="w-full text-xs p-2 border border-slate-200 rounded-lg bg-slate-50 font-medium text-slate-800">
+              <option value="4.5">4.5x Senior Leverage</option>
+              <option value="5.0" selected>5.0x Total Leverage</option>
+              <option value="5.5">5.5x Total Leverage</option>
+              <option value="6.0">6.0x Maximum Ceiling</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Live Metrics & Dynamic Charts (2 Cols) -->
+        <div class="lg:col-span-2 space-y-6">
+          
+          <!-- KPI Indicator Ribbon -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm">
+              <span class="text-xs text-slate-500 uppercase block">Implied PD</span>
+              <span id="res-pd" class="text-xl font-black text-slate-900 font-mono">2.84%</span>
+              <span id="res-rating" class="text-xs font-bold text-indigo-600 block mt-0.5">BB+ Sovereign</span>
+            </div>
+
+            <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm">
+              <span class="text-xs text-slate-500 uppercase block">Expected Loss (EL)</span>
+              <span id="res-el" class="text-xl font-black text-amber-600 font-mono">$6.39M</span>
+              <span class="text-xs text-slate-400 block mt-0.5">PD × LGD × EAD</span>
+            </div>
+
+            <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm">
+              <span class="text-xs text-slate-500 uppercase block">Stressed Leverage</span>
+              <span id="res-leverage" class="text-xl font-black text-slate-900 font-mono">4.90x</span>
+              <span id="res-headroom" class="text-xs font-bold text-emerald-600 block mt-0.5">+0.10x Headroom</span>
+            </div>
+
+            <div id="card-cov-status" class="p-3.5 rounded-xl border border-emerald-300 bg-emerald-50 shadow-sm">
+              <span class="text-xs text-emerald-800 uppercase font-bold block">Covenant Status</span>
+              <span id="res-cov-status" class="text-lg font-black text-emerald-900 block my-0.5">COMPLIANT</span>
+              <span class="text-xs text-emerald-700 block">Passed Rust Rule Engine</span>
+            </div>
+          </div>
+
+          <!-- Interactive Chart 1: Stress Test Sensitivity -->
+          <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
+            <div class="flex items-center justify-between mb-3">
+              <div>
+                <h4 class="text-xs font-bold uppercase tracking-wider text-slate-900">Stress Test Expected Loss Sensitivity</h4>
+                <p class="text-xs text-slate-500">Expected Loss ($M) across EBITDA shock severity curves</p>
+              </div>
+              <span class="text-xs font-mono bg-slate-100 text-slate-600 px-2 py-0.5 rounded">Deterministic Engine</span>
+            </div>
+            <div class="chart-container">
+              <canvas id="chart-sensitivity"></canvas>
+            </div>
+          </div>
+
+          <!-- Interactive Chart 2: Capital Structure Breakdown -->
+          <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
+            <div class="flex items-center justify-between mb-3">
+              <div>
+                <h4 class="text-xs font-bold uppercase tracking-wider text-slate-900">Capital Structure &amp; Debt Waterfall</h4>
+                <p class="text-xs text-slate-500">Breakdown of Senior Debt, Subordinated Debt, and Asset Coverage</p>
+              </div>
+            </div>
+            <div class="chart-container">
+              <canvas id="chart-capstructure"></canvas>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- SECTION 4: AGENT SWARM ECOSYSTEM -->
+    <section id="sec-agents" class="tab-content hidden space-y-6">
+      <!-- Section Intro Paragraph -->
+      <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+        <div class="flex items-center space-x-2 text-indigo-600 text-xs font-bold uppercase tracking-wider mb-1">
+          <span>Specialized Agent Matrix</span>
+        </div>
+        <h2 class="text-2xl font-bold text-slate-900 mb-2">Autonomous Agent Swarm Directory</h2>
+        <p class="text-slate-600 text-sm leading-relaxed">
+          ADAM operates a decentralized hive mind of highly specialized autonomous agents located in <code class="bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded font-mono text-xs">core/agents/</code>. Each agent operates under strict capability boundaries, using model context protocols (MCP) to query data, execute mathematical tools, and pass verifiable telemetry to the central orchestrator.
+        </p>
+      </div>
+
+      <!-- Agent Filter & Search Bar -->
+      <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-3">
+        <!-- Category Tabs -->
+        <div class="flex items-center space-x-1 overflow-x-auto custom-scrollbar pb-1 md:pb-0">
+          <button onclick="filterAgents('all')" id="agent-tab-all" class="agent-filter-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-indigo-600 text-white">All (16)</button>
+          <button onclick="filterAgents('credit')" id="agent-tab-credit" class="agent-filter-btn px-3 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:bg-slate-100">Risk &amp; Credit (4)</button>
+          <button onclick="filterAgents('quant')" id="agent-tab-quant" class="agent-filter-btn px-3 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:bg-slate-100">Quantitative &amp; Market (4)</button>
+          <button onclick="filterAgents('macro')" id="agent-tab-macro" class="agent-filter-btn px-3 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:bg-slate-100">Macro &amp; Alt Data (4)</button>
+          <button onclick="filterAgents('governance')" id="agent-tab-governance" class="agent-filter-btn px-3 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:bg-slate-100">Governance &amp; Security (4)</button>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="relative w-full md:w-64">
+          <input type="text" id="agent-search" oninput="renderAgents()" placeholder="Search agents or capabilities..." class="w-full text-xs p-2 pl-8 border border-slate-200 rounded-lg bg-slate-50 focus:outline-none focus:border-indigo-500">
+          <span class="absolute left-2.5 top-2 text-slate-400 text-xs">🔍</span>
+        </div>
+      </div>
+
+      <!-- Agent Cards Grid -->
+      <div id="agents-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <!-- Populated via JS -->
+      </div>
+    </section>
+
+    <!-- SECTION 5: BENCHMARKS, TECH STACK & ROADMAP -->
+    <section id="sec-benchmarks" class="tab-content hidden space-y-6">
+      <!-- Section Intro Paragraph -->
+      <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+        <div class="flex items-center space-x-2 text-indigo-600 text-xs font-bold uppercase tracking-wider mb-1">
+          <span>Performance &amp; Strategy</span>
+        </div>
+        <h2 class="text-2xl font-bold text-slate-900 mb-2">Institutional Benchmarks &amp; Autonomy Roadmap</h2>
+        <p class="text-slate-600 text-sm leading-relaxed">
+          ADAM is continuously benchmarked against industry standards like FinanceBench to verify calculation integrity and zero-hallucination execution. Below are empirical comparison charts, technical directory maps, and the phased roadmap towards total institutional autonomy.
+        </p>
+      </div>
+
+      <!-- Benchmark Charts Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        
+        <!-- Benchmark Chart 1: FinanceBench Accuracy -->
+        <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
+          <div class="mb-3">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-900">FinanceBench Accuracy Comparison (%)</h3>
+            <p class="text-xs text-slate-500">Deterministic calculation verification vs standard stochastic LLMs</p>
+          </div>
+          <div class="chart-container">
+            <canvas id="chart-benchmarks-accuracy"></canvas>
+          </div>
+        </div>
+
+        <!-- Benchmark Chart 2: Latency Benchmark -->
+        <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
+          <div class="mb-3">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-900">Execution Latency Comparison (ms)</h3>
+            <p class="text-xs text-slate-500">Compiled Rust Primitives vs Python &amp; LLM Inference</p>
+          </div>
+          <div class="chart-container">
+            <canvas id="chart-benchmarks-latency"></canvas>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Directory Structure Explorer -->
+      <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+        <h3 class="text-md font-bold text-slate-900 mb-3">Repository Architecture Directory Map</h3>
+        <div class="bg-slate-900 text-slate-200 p-4 rounded-xl font-mono text-xs overflow-x-auto custom-scrollbar leading-relaxed">
+<span class="text-indigo-400 font-bold">adam/</span>
+├── <span class="text-emerald-400 font-bold">core/</span>                   <span class="text-slate-500"># Brain: Orchestrators, MCP sockets, Rust execution</span>
+│   ├── <span class="text-emerald-300">agents/</span>             <span class="text-slate-500"># Autonomous Agent Swarms (Underwriter, Sentinel, Jules)</span>
+│   └── <span class="text-emerald-300">credit_sentinel/</span>    <span class="text-slate-500"># Surveillance & telemetry modules</span>
+├── <span class="text-amber-300 font-bold">adam-orchestration/</span>     <span class="text-slate-500"># Neuro-Symbolic DAG logic & node routing</span>
+├── <span class="text-amber-300 font-bold">adam-ingest/</span>            <span class="text-slate-500"># Async pipelines for SEC EDGAR (13F, 13D, Form 4)</span>
+├── <span class="text-amber-300 font-bold">adam-semantic/</span>          <span class="text-slate-500"># Open-weight NLP harnesses & sentiment vectors</span>
+├── <span class="text-amber-300 font-bold">adam-credit/</span>            <span class="text-slate-500"># Deterministic VaR, PD, LGD calculators & dynamic covenant tests</span>
+├── <span class="text-amber-300 font-bold">adam-quantum/</span>           <span class="text-slate-500"># Quantum Amplitude Estimation (QAE) for extreme tail-risk</span>
+├── <span class="text-amber-300 font-bold">adam-governance/</span>         <span class="text-slate-500"># Security Gatekeepers & jsonLogic validation schemas</span>
+└── <span class="text-indigo-300 font-bold">showcase/</span>               <span class="text-slate-500"># Interactive web dashboards & visualizers</span>
+        </div>
+      </div>
+
+      <!-- Autonomy Roadmap Interactive Timeline -->
+      <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+        <h3 class="text-md font-bold text-slate-900 mb-4">Autonomy Roadmap: Path to Sovereign Execution</h3>
+
+        <div class="space-y-4">
+          <!-- Phase 1 -->
+          <div class="border-l-4 border-emerald-500 pl-4 py-1">
+            <div class="flex items-center space-x-2">
+              <span class="text-xs font-bold uppercase tracking-wider text-emerald-700 px-2 py-0.5 rounded bg-emerald-100">Phase 1 (Current)</span>
+              <span class="text-xs font-bold text-slate-900">The Autonomous Analyst</span>
+            </div>
+            <p class="text-xs text-slate-600 mt-1">Deep dives, credit memos, regulatory grading (SNC), SEC EDGAR ingestion, and strict PDIL enforcement.</p>
+          </div>
+
+          <!-- Phase 1.5 -->
+          <div class="border-l-4 border-indigo-500 pl-4 py-1">
+            <div class="flex items-center space-x-2">
+              <span class="text-xs font-bold uppercase tracking-wider text-indigo-700 px-2 py-0.5 rounded bg-indigo-100">Phase 1.5 (ADAM-V-NEXT)</span>
+              <span class="text-xs font-bold text-slate-900">The Command Center</span>
+            </div>
+            <p class="text-xs text-slate-600 mt-1">Synthesizer dashboard, quantum tail-risk integration, W3C PROV-O telemetry visualizers, and 3D topology mapping.</p>
+          </div>
+
+          <!-- Phase 2 -->
+          <div class="border-l-4 border-slate-300 pl-4 py-1">
+            <div class="flex items-center space-x-2">
+              <span class="text-xs font-bold uppercase tracking-wider text-slate-600 px-2 py-0.5 rounded bg-slate-100">Phase 2 (Q3 2026)</span>
+              <span class="text-xs font-bold text-slate-900">The Portfolio Manager</span>
+            </div>
+            <p class="text-xs text-slate-600 mt-1">Multi-entity risk aggregation, Temporal-driven dynamic covenant testing, and automated portfolio rebalancing.</p>
+          </div>
+
+          <!-- Phase 3 -->
+          <div class="border-l-4 border-slate-300 pl-4 py-1">
+            <div class="flex items-center space-x-2">
+              <span class="text-xs font-bold uppercase tracking-wider text-slate-600 px-2 py-0.5 rounded bg-slate-100">Phase 3 (Q4 2026)</span>
+              <span class="text-xs font-bold text-slate-900">The Market Maker</span>
+            </div>
+            <p class="text-xs text-slate-600 mt-1">High-frequency sentiment trading, liquidity provision via Quantum Reinforcement Learning, and Rust order matching.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Institutional Footer -->
+  <footer class="bg-slate-900 text-slate-400 text-xs py-6 border-t border-slate-800 mt-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="flex items-center space-x-2">
+        <span class="font-bold text-white">ADAM v30.1</span>
+        <span>• Neuro-Symbolic Financial Sovereign</span>
+      </div>
+      <div>
+        <span>Built for Broadly Syndicated Loans, Distressed Debt &amp; Credit Underwriting</span>
+      </div>
+      <div class="text-slate-500 font-mono">
+        <span>License: MIT | Python 3.11+ | Rust</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Application JavaScript Logic -->
+  <script>
+    // --- State Management ---
+    let activeTab = 'overview';
+    let currentPipelineStep = 0;
+    let currentAgentFilter = 'all';
+
+    // Chart instances storage for destruction/recreation
+    let chartSensitivityInstance = null;
+    let chartCapStructureInstance = null;
+    let chartAccuracyInstance = null;
+    let chartLatencyInstance = null;
+
+    // Agent Dataset
+    const agentsData = [
+      { id: 'credit-risk', name: 'CreditRiskAgent', category: 'credit', layer: 'System 2', purpose: 'Underwrites BSL & Distressed Debt, computes PD/LGD/EAD and leverage profiles.', inputs: 'Financial Statements, Debt Schedules', outputs: 'Credit Memo, Risk Rating' },
+      { id: 'snc-analyst', name: 'SNCAnalystAgent', category: 'credit', layer: 'System 2', purpose: 'Shared National Credit regulatory grading and risk classification.', inputs: 'Syndicated Loan Data', outputs: 'Regulatory Rating (Pass/Special Mention)' },
+      { id: 'covenant', name: 'CovenantAgent', category: 'credit', layer: 'System 2', purpose: 'Monitors financial covenant compliance, headroom, and dynamic stress thresholds.', inputs: 'Covenant Agreements, EBITDA', outputs: 'Headroom Metric, Breach Warnings' },
+      { id: 'liquidity-risk', name: 'LiquidityRiskAgent', category: 'credit', layer: 'System 2', purpose: 'Stress-tests cash runways, revolver drawdowns, and working capital shocks.', inputs: 'Cash Flow Statements, Debt Maturities', outputs: 'Liquidity Runway (Months)' },
+      
+      { id: 'algo-trading', name: 'AlgoTradingAgent', category: 'quant', layer: 'System 1 / Rust', purpose: 'Executes deterministic algorithmic orders based on validated strategy signals.', inputs: 'Tick Data, Order Books', outputs: 'Executable Order Messages' },
+      { id: 'options-flow', name: 'OptionsFlowAgent', category: 'quant', layer: 'System 1', purpose: 'Ingests option volatility surfaces and unusual flow sentiment.', inputs: 'Option Chain Data', outputs: 'Implied Volatility Sentiment Vector' },
+      { id: 'quantum-pm', name: 'QuantumPortfolioManagerAgent', category: 'quant', layer: 'System 3', purpose: 'Runs Quantum Amplitude Estimation (QAE) for portfolio tail-risk optimization.', inputs: 'Asset Covariance Matrices', outputs: 'Quantum Optimized Weights' },
+      { id: 'market-making', name: 'MarketMakingAgent', category: 'quant', layer: 'System 3 / Rust', purpose: 'High-frequency market-making and liquidity provisioning engine.', inputs: 'L2 Market Depth', outputs: 'Bid/Ask Spreads' },
+
+      { id: 'black-swan', name: 'BlackSwanAgent', category: 'macro', layer: 'System 3', purpose: 'Tail-risk simulation and extreme macroeconomic crisis stress testing.', inputs: 'Macro Assumptions', outputs: 'Jump-Diffusion Stress Curves' },
+      { id: 'macro-econ', name: 'MacroeconomicAnalysisAgent', category: 'macro', layer: 'System 1', purpose: 'Ingests interest rate trajectories, CPI, and Fed commentary.', inputs: 'Macro News, Fed Releases', outputs: 'Yield Curve Scenarios' },
+      { id: 'geopolitical', name: 'GeopoliticalRiskAgent', category: 'macro', layer: 'System 1', purpose: 'Analyzes global supply chain disruption and sovereign political risk vectors.', inputs: 'News Feeds, Trade Reports', outputs: 'Geopolitical Risk Index' },
+      { id: 'alt-data', name: 'AlternativeDataAgent', category: 'macro', layer: 'System 1', purpose: 'Processes web traffic, satellite, and transaction data for real-time sector momentum.', inputs: 'Satellite, Web Traffic Data', outputs: 'Sector Growth Multiplier' },
+
+      { id: 'red-team', name: 'RedTeamAgent', category: 'governance', layer: 'System 2', purpose: 'Adversarial testing of agent inputs, prompt injection detection, and logic verification.', inputs: 'Agent Prompts & State', outputs: 'Vulnerability Score' },
+      { id: 'compliance', name: 'ComplianceAgent', category: 'governance', layer: 'System 2', purpose: 'Ensures strict adherence to SEC regulatory rules, ERISA, and internal mandates.', inputs: 'Trade Proposals', outputs: 'Compliance Clearance Pass/Fail' },
+      { id: 'data-verify', name: 'DataVerificationAgent', category: 'governance', layer: 'System 1 / PDIL', purpose: 'Validates raw EDGAR filings against FIBO ontologies to eliminate hallucinations.', inputs: 'Raw SEC XML/HTML', outputs: 'Validated Json Schema' },
+      { id: 'fraud-detect', name: 'FraudDetectionAgent', category: 'governance', layer: 'System 2', purpose: 'Identifies anomalous financial reporting patterns and balance sheet manipulation.', inputs: 'Footnotes, Audit Filings', outputs: 'Benford Law Anomaly Flag' }
+    ];
+
+    // Pipeline Steps Data
+    const pipelineSteps = [
+      {
+        stage: '01',
+        title: 'Ingestion & Parsing',
+        system: 'System 1 (Neural Swarm)',
+        tech: 'Python Async Hive Mind / SEC EDGAR Engine',
+        desc: 'System 1 continuously monitors and ingests 13F, 13D, and Form 4 filings along with earnings call transcripts. It sanitizes raw unstructured text and extracts hard key numerical vectors.',
+        codeSnippet: `// Raw Input Stream -> Extracted Features\n{"sec_doc": "10-K", "company": "TechCorp", "raw_ebitda": "$120.0M", "senior_notes": "$380.0M"}`
+      },
+      {
+        stage: '02',
+        title: 'PDIL Mapping',
+        system: 'Integration Layer (PDIL)',
+        tech: 'Probabilistic-to-Deterministic Integration Layer',
+        desc: 'The PDIL gatekeeper enforces strict JSON schema validation. It strips out LLM conversational filler and validates all numerical types before passing data downstream.',
+        codeSnippet: `// Validated JSON Schema\n{\n  "company_id": "TC-9902",\n  "ltm_ebitda": 120000000.0,\n  "senior_funded_debt": 380000000.0,\n  "currency": "USD"\n}`
+      },
+      {
+        stage: '03',
+        title: 'GNN Traversal',
+        system: 'System 2 (The Graph)',
+        tech: 'FIBO Knowledge Graph / GNN Engine',
+        desc: 'System 2 queries the Financial Industry Business Ontology (FIBO) to map parent/subsidiary debt guarantees, identify counterparty exposures across 10 target companies, and verify covenant terms.',
+        codeSnippet: `// FIBO Knowledge Graph Query\nMATCH (c:Company {id: 'TC-9902'})-[:ISSUED]->(d:DebtInstrument)\nRETURN d.seniority, d.coupon, d.covenant_ceiling`
+      },
+      {
+        stage: '04',
+        title: 'Rust Engine Execution',
+        system: 'Execution Core (Rust)',
+        tech: 'AdamOS Kernel Compiled Primitives',
+        desc: 'Hard-coded Rust algorithms execute Probability of Default (PD), Loss Given Default (LGD), Value-at-Risk (VaR), and DCF Monte Carlo simulations in under 5 milliseconds with zero GIL lock.',
+        codeSnippet: `// Rust Execution Output (< 5ms)\nlet el = compute_expected_loss(ead, pd, lgd);\nlet leverage = total_debt / ebitda;`
+      },
+      {
+        stage: '05',
+        title: 'Memo & Telemetry Output',
+        system: 'Governance & Output',
+        tech: 'W3C PROV-O / jsonLogic Telemetry',
+        desc: 'The platform generates a final institutional credit underwriting memo complete with a cryptographic proof-of-thought log for full regulatory auditability.',
+        codeSnippet: `// Proof-of-Thought Audit Trail\n{\n  "provenance": "W3C-PROV-O",\n  "decision": "APPROVED_WITH_COVENANT_STEPUP",\n  "hash": "0x8f3a...b210"\n}`
+      }
+    ];
+
+    // --- Tab Switching Logic ---
+    function switchTab(tabId) {
+      activeTab = tabId;
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(el => {
+        el.classList.remove('bg-white', 'text-slate-900', 'shadow-sm');
+        el.classList.add('text-slate-600');
+      });
+
+      const selectedTab = document.getElementById(`tab-${tabId}`);
+      const selectedSec = document.getElementById(`sec-${tabId}`);
+      if (selectedTab && selectedSec) {
+        selectedTab.classList.add('bg-white', 'text-slate-900', 'shadow-sm');
+        selectedTab.classList.remove('text-slate-600');
+        selectedSec.classList.remove('hidden');
+      }
+
+      // Initialize tab specific components/charts
+      if (tabId === 'simulator') {
+        updateSimulator();
+      } else if (tabId === 'benchmarks') {
+        initBenchmarkCharts();
+      }
+    }
+
+    // --- Pipeline Walkthrough Logic ---
+    function setPipelineStep(stepIndex) {
+      currentPipelineStep = stepIndex;
+      const data = pipelineSteps[stepIndex];
+
+      // Update button highlights
+      for (let i = 0; i < 5; i++) {
+        const btn = document.getElementById(`step-btn-${i}`);
+        if (i === stepIndex) {
+          btn.className = "pipeline-step-btn border-2 border-indigo-600 bg-indigo-50 text-indigo-900 p-3 rounded-xl text-left transition-all";
+          btn.querySelector('span').className = "text-xs font-bold text-indigo-600 block mb-0.5";
+        } else {
+          btn.className = "pipeline-step-btn border border-slate-200 bg-white text-slate-700 p-3 rounded-xl text-left hover:bg-slate-50 transition-all";
+          btn.querySelector('span').className = "text-xs font-bold text-slate-400 block mb-0.5";
+        }
+      }
+
+      // Update detail panel
+      const detailCard = document.getElementById('pipeline-detail-card');
+      detailCard.innerHTML = `
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-2 border-b border-slate-200 pb-3 mb-3">
+          <div>
+            <span class="text-xs font-bold text-indigo-600 uppercase tracking-wider">Stage ${data.stage}</span>
+            <h4 class="text-lg font-bold text-slate-900">${data.title}</h4>
+          </div>
+          <div class="flex items-center space-x-2">
+            <span class="text-xs font-mono bg-slate-200 text-slate-800 px-2.5 py-1 rounded-full font-semibold">${data.system}</span>
+            <span class="text-xs font-mono bg-indigo-100 text-indigo-800 px-2.5 py-1 rounded-full font-semibold">${data.tech}</span>
+          </div>
+        </div>
+        <p class="text-xs text-slate-600 leading-relaxed mb-4">${data.desc}</p>
+        <div>
+          <span class="text-xs font-bold text-slate-500 uppercase block mb-1">Execution Schema / Logic</span>
+          <pre class="bg-slate-900 text-emerald-400 p-3 rounded-lg text-xs font-mono overflow-x-auto">${data.codeSnippet}</pre>
+        </div>
+      `;
+    }
+
+    // --- Topology Inspection Logic ---
+    function inspectTopology(layerKey) {
+      const drawer = document.getElementById('topology-drawer');
+      const title = document.getElementById('topo-title');
+      const desc = document.getElementById('topo-desc');
+
+      const details = {
+        client: {
+          title: "Client & Immersive Layer Specs",
+          desc: "Connects web browser dashboards, WebXR 3D topology visuals, and universal Model Context Protocol (MCP) API gateways. Enforces strict RBAC and TLS governance before submitting requests."
+        },
+        swarm: {
+          title: "System 1 Neural Swarms Specs",
+          desc: "Asynchronously fetches SEC filings via EDGAR webhooks. Operates lightweight open-weight models to parse non-standard footnotes, extracting capital commitments and qualitative flags."
+        },
+        pdil: {
+          title: "PDIL (Probabilistic-to-Deterministic Gatekeeper)",
+          desc: "The critical safety boundary in ADAM. It strips non-deterministic LLM reasoning tokens and formats raw parameters into strict, immutable JSON schemas verified via jsonLogic."
+        },
+        reasoning: {
+          title: "System 2 Neuro-Symbolic Graph Specs",
+          desc: "Maps credit counterparties to the FIBO ontology. Executes GNN query logic to check parent guarantee cross-defaults, dynamic debt ceilings, and covenant headroom."
+        },
+        rust: {
+          title: "Rust Algorithmic & Pricing Engine Specs",
+          desc: "Compiled Rust core releasing Python's GIL. Executes Monte Carlo DCF simulations, Value-at-Risk (VaR), and Loss Given Default (LGD) models in under 5 milliseconds."
+        }
+      };
+
+      if (details[layerKey]) {
+        title.innerText = details[layerKey].title;
+        desc.innerText = details[layerKey].desc;
+        drawer.classList.remove('hidden');
+      }
+    }
+
+    // --- Credit Risk Simulator Calculation Engine ---
+    function updateSimulator() {
+      const ebitda = parseFloat(document.getElementById('input-ebitda').value);
+      const seniorDebt = parseFloat(document.getElementById('input-senior-debt').value);
+      const subDebt = parseFloat(document.getElementById('input-sub-debt').value);
+      const shock = parseFloat(document.getElementById('input-shock').value);
+      const lgd = parseFloat(document.getElementById('input-lgd').value);
+      const covCeiling = parseFloat(document.getElementById('input-cov-ceiling').value);
+
+      // Update UI slider labels
+      document.getElementById('val-ebitda').innerText = `$${ebitda.toFixed(1)}M`;
+      document.getElementById('val-senior-debt').innerText = `$${seniorDebt.toFixed(1)}M`;
+      document.getElementById('val-sub-debt').innerText = `$${subDebt.toFixed(1)}M`;
+      document.getElementById('val-shock').innerText = `${shock > 0 ? '+' : ''}${shock.toFixed(1)}%`;
+      document.getElementById('val-lgd').innerText = `${lgd.toFixed(1)}%`;
+
+      // Deterministic Calculations
+      const totalDebt = seniorDebt + subDebt;
+      const stressedEbitda = ebitda * (1 + (shock / 100));
+      const totalLeverage = totalDebt / (stressedEbitda > 0 ? stressedEbitda : 0.01);
+      const seniorLeverage = seniorDebt / (stressedEbitda > 0 ? stressedEbitda : 0.01);
+
+      // Implied Probability of Default (PD) Formula (Deterministic Logistic Approximation)
+      let basePD = 0.5 + Math.pow(totalLeverage / 3.2, 2.5);
+      if (basePD > 99.0) basePD = 99.0;
+
+      const expectedLoss = totalDebt * (basePD / 100) * (lgd / 100);
+      const headroom = covCeiling - totalLeverage;
+      const isCompliant = headroom >= 0;
+
+      // Update Metrics UI
+      document.getElementById('res-pd').innerText = `${basePD.toFixed(2)}%`;
+      document.getElementById('res-el').innerText = `$${expectedLoss.toFixed(2)}M`;
+      document.getElementById('res-leverage').innerText = `${totalLeverage.toFixed(2)}x`;
+      
+      const headroomEl = document.getElementById('res-headroom');
+      if (headroom >= 0) {
+        headroomEl.innerText = `+${headroom.toFixed(2)}x Headroom`;
+        headroomEl.className = "text-xs font-bold text-emerald-600 block mt-0.5";
+      } else {
+        headroomEl.innerText = `${headroom.toFixed(2)}x Breach`;
+        headroomEl.className = "text-xs font-bold text-rose-600 block mt-0.5";
+      }
+
+      // Rating designation
+      const ratingEl = document.getElementById('res-rating');
+      if (basePD < 1.5) { ratingEl.innerText = "AAA / AA Sovereign"; ratingEl.className = "text-xs font-bold text-emerald-600 block mt-0.5"; }
+      else if (basePD < 3.5) { ratingEl.innerText = "BBB / BB Investment Grade"; ratingEl.className = "text-xs font-bold text-indigo-600 block mt-0.5"; }
+      else if (basePD < 7.0) { ratingEl.innerText = "B High Yield / Watchlist"; ratingEl.className = "text-xs font-bold text-amber-600 block mt-0.5"; }
+      else { ratingEl.innerText = "CCC / Distressed Risk"; ratingEl.className = "text-xs font-bold text-rose-600 block mt-0.5"; }
+
+      // Covenant Status Card
+      const covCard = document.getElementById('card-cov-status');
+      const covStatusText = document.getElementById('res-cov-status');
+      if (isCompliant) {
+        covCard.className = "p-3.5 rounded-xl border border-emerald-300 bg-emerald-50 shadow-sm";
+        covStatusText.innerText = "COMPLIANT";
+        covStatusText.className = "text-lg font-black text-emerald-900 block my-0.5";
+      } else {
+        covCard.className = "p-3.5 rounded-xl border border-rose-300 bg-rose-50 shadow-sm";
+        covStatusText.innerText = "COVENANT BREACH";
+        covStatusText.className = "text-lg font-black text-rose-900 block my-0.5";
+      }
+
+      // Render Charts
+      renderSensitivityChart(totalDebt, lgd, shock);
+      renderCapStructureChart(seniorDebt, subDebt, ebitda, totalDebt);
+    }
+
+    // Render Sensitivity Line Chart
+    function renderSensitivityChart(totalDebt, lgd, currentShock) {
+      const ctx = document.getElementById('chart-sensitivity').getContext('2d');
+      const shocks = [-35, -25, -15, -5, 0, 10];
+      const elValues = shocks.map(s => {
+        const strEbitda = 120 * (1 + (s / 100));
+        const lev = totalDebt / (strEbitda > 0 ? strEbitda : 0.01);
+        const pd = Math.min(99, 0.5 + Math.pow(lev / 3.2, 2.5));
+        return (totalDebt * (pd / 100) * (lgd / 100)).toFixed(2);
+      });
+
+      if (chartSensitivityInstance) {
+        chartSensitivityInstance.destroy();
+      }
+
+      chartSensitivityInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: ['-35% Shock', '-25% Shock', '-15% Shock', '-5% Shock', 'Base Case', '+10% Growth'],
+          datasets: [{
+            label: 'Expected Loss ($M)',
+            data: elValues,
+            borderColor: '#4f46e5',
+            backgroundColor: 'rgba(79, 70, 229, 0.1)',
+            fill: true,
+            tension: 0.3,
+            pointRadius: 4,
+            pointBackgroundColor: '#4f46e5'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            y: { title: { display: true, text: 'Expected Loss ($M)', font: { size: 10 } } },
+            x: { title: { display: true, text: 'EBITDA Macro Shock Curve', font: { size: 10 } } }
+          }
+        }
+      });
+    }
+
+    // Render Capital Structure Bar Chart
+    function renderCapStructureChart(senior, sub, ebitda, totalDebt) {
+      const ctx = document.getElementById('chart-capstructure').getContext('2d');
+
+      if (chartCapStructureInstance) {
+        chartCapStructureInstance.destroy();
+      }
+
+      chartCapStructureInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['Capital Structure Breakdown'],
+          datasets: [
+            {
+              label: 'Senior Debt ($M)',
+              data: [senior],
+              backgroundColor: '#334e68'
+            },
+            {
+              label: 'Subordinated Debt ($M)',
+              data: [sub],
+              backgroundColor: '#829ab1'
+            },
+            {
+              label: 'Implied Enterprise Value ($M)',
+              data: [ebitda * 8.5],
+              backgroundColor: '#059669'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } }
+          },
+          scales: {
+            y: { title: { display: true, text: '$ Millions', font: { size: 10 } } }
+          }
+        }
+      });
+    }
+
+    // --- Agent Ecosystem Filtering Logic ---
+    function filterAgents(cat) {
+      currentAgentFilter = cat;
+      document.querySelectorAll('.agent-filter-btn').forEach(btn => {
+        btn.className = "agent-filter-btn px-3 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:bg-slate-100";
+      });
+      const activeBtn = document.getElementById(`agent-tab-${cat}`);
+      if (activeBtn) {
+        activeBtn.className = "agent-filter-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-indigo-600 text-white";
+      }
+      renderAgents();
+    }
+
+    function renderAgents() {
+      const searchVal = document.getElementById('agent-search').value.toLowerCase();
+      const grid = document.getElementById('agents-grid');
+      grid.innerHTML = '';
+
+      const filtered = agentsData.filter(agent => {
+        const matchesCat = currentAgentFilter === 'all' || agent.category === currentAgentFilter;
+        const matchesSearch = agent.name.toLowerCase().includes(searchVal) || 
+                              agent.purpose.toLowerCase().includes(searchVal) ||
+                              agent.layer.toLowerCase().includes(searchVal);
+        return matchesCat && matchesSearch;
+      });
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `<div class="col-span-full p-8 text-center text-slate-400 text-xs">No agents found matching criteria.</div>`;
+        return;
+      }
+
+      filtered.forEach(agent => {
+        const card = document.createElement('div');
+        card.className = "bg-white border border-slate-200 rounded-xl p-4 shadow-sm hover:border-indigo-300 transition-all flex flex-col justify-between";
+        
+        let catBadge = "bg-indigo-100 text-indigo-800";
+        if (agent.category === 'credit') catBadge = "bg-emerald-100 text-emerald-800";
+        if (agent.category === 'quant') catBadge = "bg-violet-100 text-violet-800";
+        if (agent.category === 'macro') catBadge = "bg-amber-100 text-amber-800";
+        if (agent.category === 'governance') catBadge = "bg-slate-100 text-slate-800";
+
+        card.innerHTML = `
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold font-mono px-2 py-0.5 rounded ${catBadge}">${agent.layer}</span>
+              <span class="text-xs text-slate-400 font-mono">MCP Tool Active</span>
+            </div>
+            <h4 class="font-bold text-slate-900 text-sm mb-1">${agent.name}</h4>
+            <p class="text-xs text-slate-600 leading-relaxed mb-3">${agent.purpose}</p>
+          </div>
+          <div class="border-t border-slate-100 pt-2 space-y-1 text-xs">
+            <div class="flex justify-between text-slate-500">
+              <span>Inputs:</span>
+              <span class="font-mono text-slate-700 truncate max-w-[150px]">${agent.inputs}</span>
+            </div>
+            <div class="flex justify-between text-slate-500">
+              <span>Outputs:</span>
+              <span class="font-mono text-slate-700 truncate max-w-[150px]">${agent.outputs}</span>
+            </div>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    // --- Benchmark Charts Initialization ---
+    function initBenchmarkCharts() {
+      // Benchmark Chart 1: Accuracy
+      const ctxAcc = document.getElementById('chart-benchmarks-accuracy').getContext('2d');
+      if (chartAccuracyInstance) chartAccuracyInstance.destroy();
+      chartAccuracyInstance = new Chart(ctxAcc, {
+        type: 'bar',
+        data: {
+          labels: ['ADAM v30.1 (Neuro-Symbolic)', 'Contextual Vector RAG', 'Vanilla LLM (GPT-4)'],
+          datasets: [{
+            label: 'Accuracy (%) on FinanceBench',
+            data: [99.0, 74.2, 61.5],
+            backgroundColor: ['#059669', '#3b82f6', '#94a3b8']
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: { y: { max: 100, title: { display: true, text: 'Accuracy Score (%)' } } }
+        }
+      });
+
+      // Benchmark Chart 2: Latency
+      const ctxLat = document.getElementById('chart-benchmarks-latency').getContext('2d');
+      if (chartLatencyInstance) chartLatencyInstance.destroy();
+      chartLatencyInstance = new Chart(ctxLat, {
+        type: 'bar',
+        data: {
+          labels: ['Compiled Rust Engine', 'Python Network Layer', 'LLM Text Generation'],
+          datasets: [{
+            label: 'Execution Time (ms)',
+            data: [4.8, 115.0, 2450.0],
+            backgroundColor: ['#4f46e5', '#38bdf8', '#cbd5e1']
+          }]
+        },
+        options: {
+          indexAxis: 'y',
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: { x: { type: 'logarithmic', title: { display: true, text: 'Latency in ms (Log Scale)' } } }
+        }
+      });
+    }
+
+    // Initialize application state on page load
+    window.addEventListener('DOMContentLoaded', () => {
+      setPipelineStep(0);
+      renderAgents();
+      updateSimulator();
+    });
+  </script>
+</body>
+</html>
