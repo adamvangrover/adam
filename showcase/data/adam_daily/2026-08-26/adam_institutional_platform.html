@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM Institutional Platform - Digital Twin Model</title>
+    
+    <!-- Tailwind CSS for robust, scalable styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- D3.js for complex data visualizations -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+
+    <!-- Configure Tailwind Theme -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            900: '#050a14',
+                            800: '#0a1428',
+                            700: '#112240',
+                            accent: '#64ffda',
+                            alert: '#ff4d4d',
+                            warn: '#ffd700',
+                            ok: '#4caf50'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'Menlo', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Custom CSS for specialized effects and scrollbars -->
+    <style>
+        body {
+            background-color: #050a14;
+            color: #e2e8f0;
+            overflow: hidden; /* Prevent body scroll, manage internally */
+        }
+        
+        .glass-panel {
+            background: rgba(10, 20, 40, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(100, 255, 218, 0.1);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Custom Scrollbar for terminal/logs */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2); 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(100, 255, 218, 0.3); 
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(100, 255, 218, 0.6); 
+        }
+
+        .crt-flicker {
+            animation: flicker 0.15s infinite;
+        }
+        @keyframes flicker {
+            0% { opacity: 0.95; }
+            50% { opacity: 1; }
+            100% { opacity: 0.98; }
+        }
+
+        .terminal-text {
+            text-shadow: 0 0 4px rgba(100, 255, 218, 0.4);
+        }
+        
+        canvas {
+            image-rendering: -moz-crisp-edges;
+            image-rendering: -webkit-crisp-edges;
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+        }
+    </style>
+</head>
+
+<body class="h-screen w-screen flex flex-col font-sans text-sm">
+
+    <!-- Top Navigation / Branding -->
+    <header class="h-14 border-b border-brand-700 bg-brand-800 flex items-center justify-between px-6 shrink-0 z-10">
+        <div class="flex items-center space-x-4">
+            <div class="w-8 h-8 rounded bg-brand-accent/20 border border-brand-accent flex items-center justify-center text-brand-accent font-bold">A</div>
+            <div>
+                <h1 class="font-bold text-gray-100 tracking-wide">ADAM Core OS</h1>
+                <p class="text-xs text-brand-accent/70 font-mono">v26.0.4-kernel | W3C PROV-O Status: <span class="text-brand-ok">VERIFIED</span></p>
+            </div>
+        </div>
+        
+        <div class="flex items-center space-x-6 font-mono text-xs text-gray-400">
+            <div class="flex items-center space-x-2">
+                <span class="w-2 h-2 rounded-full bg-brand-ok animate-pulse"></span>
+                <span>Kernel Orchestration Active</span>
+            </div>
+            <div id="clock-display">2026-08-26 18:07:30 EDT</div>
+            <button id="btn-simulate" class="px-4 py-1.5 bg-brand-accent/10 border border-brand-accent text-brand-accent hover:bg-brand-accent/20 transition-colors rounded">
+                INITIALIZE 1Y FORWARD SIM
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <main class="flex-1 flex overflow-hidden">
+        
+        <!-- Left Sidebar: Modules & Narrative Engine -->
+        <aside class="w-72 border-r border-brand-700 bg-brand-900/50 flex flex-col p-4 space-y-4 shrink-0 overflow-y-auto">
+            
+            <div class="glass-panel p-3 rounded">
+                <h2 class="text-brand-accent text-xs font-bold uppercase mb-2">Ecosystem Subsystems</h2>
+                <ul class="space-y-1 font-mono text-xs">
+                    <li class="flex justify-between"><span class="text-gray-300">Market Mayhem</span><span class="text-brand-ok">ONLINE</span></li>
+                    <li class="flex justify-between"><span class="text-gray-300">Fortress & Hunt</span><span class="text-brand-ok">ONLINE</span></li>
+                    <li class="flex justify-between"><span class="text-gray-300">Exiled Spark</span><span class="text-brand-ok">ONLINE</span></li>
+                    <li class="flex justify-between"><span class="text-gray-300">Logic Lab</span><span class="text-brand-ok">ONLINE</span></li>
+                    <li class="flex justify-between"><span class="text-gray-300">Covenant Engine</span><span class="text-brand-warn">STANDBY</span></li>
+                </ul>
+            </div>
+
+            <div class="glass-panel p-3 rounded flex-1 flex flex-col">
+                <h2 class="text-brand-accent text-xs font-bold uppercase mb-2">Exiled Spark: Narrative</h2>
+                <div id="narrative-engine" class="flex-1 overflow-y-auto text-xs text-gray-400 font-mono space-y-3">
+                    <p class="text-gray-200">Awaiting simulation initialization...</p>
+                    <p>The global macro environment remains delicately balanced. Core OS is ready to project 10,000 corporate entities forward 12 months using stochastic continuous-time logic.</p>
+                </div>
+            </div>
+
+            <div class="glass-panel p-3 rounded">
+                <h2 class="text-brand-accent text-xs font-bold uppercase mb-2">Covenant Watchlist</h2>
+                <div class="flex justify-between text-xs mb-1">
+                    <span class="text-gray-400">Total Breaches</span>
+                    <span id="covenant-breaches" class="font-bold text-brand-alert">0</span>
+                </div>
+                <div class="w-full bg-brand-700 h-1.5 rounded-full overflow-hidden">
+                    <div id="covenant-bar" class="bg-brand-alert h-full w-0 transition-all duration-300"></div>
+                </div>
+            </div>
+
+        </aside>
+
+        <!-- Center: Digital Twin Canvas & Macro Data -->
+        <section class="flex-1 flex flex-col p-4 space-y-4 relative bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-brand-800 to-brand-900">
+            
+            <!-- Simulation Stats Bar -->
+            <div class="h-16 glass-panel rounded flex items-center justify-around px-4 shrink-0 font-mono">
+                <div class="text-center">
+                    <div class="text-xs text-gray-400">Simulation Month</div>
+                    <div id="sim-month" class="text-xl text-brand-accent font-bold">M0</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-xs text-gray-400">Active Entities</div>
+                    <div id="active-entities" class="text-xl text-gray-100 font-bold">10,000</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-xs text-gray-400">Global Defaults</div>
+                    <div id="default-count" class="text-xl text-brand-alert font-bold">0</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-xs text-gray-400">Avg Market Yield (WACC)</div>
+                    <div id="avg-wacc" class="text-xl text-brand-warn font-bold">5.24%</div>
+                </div>
+            </div>
+
+            <!-- The Digital Twin 10k Entity View -->
+            <div class="flex-1 glass-panel rounded relative overflow-hidden flex flex-col">
+                <div class="absolute top-4 left-4 z-10 pointer-events-none">
+                    <h2 class="text-brand-accent text-sm font-bold uppercase drop-shadow-md">Logic Lab: Digital Twin Scatter</h2>
+                    <p class="text-xs text-gray-400 font-mono">X: Leverage (Debt/EBITDA) | Y: Z-Score (Health) | Color: Rating</p>
+                </div>
+                <!-- Tooltip for entity hover -->
+                <div id="canvas-tooltip" class="absolute hidden bg-brand-900 border border-brand-accent/50 p-2 text-xs font-mono rounded shadow-lg pointer-events-none z-20"></div>
+                
+                <!-- Main WebGL/Canvas Container -->
+                <canvas id="twin-canvas" class="w-full h-full cursor-crosshair"></canvas>
+            </div>
+
+        </section>
+
+        <!-- Right Sidebar: Data Charts & Telemetry -->
+        <aside class="w-96 border-l border-brand-700 bg-brand-900/50 flex flex-col p-4 space-y-4 shrink-0">
+            
+            <!-- Macro Environment (Market Mayhem) -->
+            <div class="glass-panel p-3 rounded h-48 flex flex-col">
+                <h2 class="text-brand-accent text-xs font-bold uppercase mb-2">Market Mayhem: Macro Trajectory</h2>
+                <div id="macro-chart" class="flex-1 w-full h-full"></div>
+            </div>
+
+            <!-- Ratings Migration Matrix Profile -->
+            <div class="glass-panel p-3 rounded h-48 flex flex-col">
+                <h2 class="text-brand-accent text-xs font-bold uppercase mb-2">Fortress & Hunt: Rating Dist.</h2>
+                <div id="ratings-chart" class="flex-1 w-full h-full"></div>
+            </div>
+
+            <!-- Execution State Tracker / Telemetry -->
+            <div class="glass-panel p-3 rounded flex-1 flex flex-col overflow-hidden">
+                <h2 class="text-brand-accent text-xs font-bold uppercase mb-1">Execution State Tracker</h2>
+                <p class="text-[10px] text-gray-500 mb-2 border-b border-brand-700 pb-1">Endpoint: /api/telemetry.json | w3c_prov_o_compliance: TRUE</p>
+                <div id="telemetry-log" class="flex-1 overflow-y-auto font-mono text-[10px] space-y-1.5 terminal-text pb-2">
+                    <!-- Logs will stream here -->
+                    <div class="text-gray-400">System ready. Awaiting simulation trigger...</div>
+                </div>
+            </div>
+
+        </aside>
+
+    </main>
+
+    <script>
+        // --- 1. GLOBAL STATE & CONFIGURATION ---
+        const ENTITY_COUNT = 10000;
+        const SIM_MONTHS = 12;
+        const FPS = 60;
+        const ANIMATION_DURATION_MS = 10000; // 10 seconds to play 12 months
+        
+        let simState = {
+            isRunning: false,
+            currentMonthRaw: 0, // Float value for interpolation
+            currentMonthIndex: 0,
+            entities: [],       // Holds the 10k entities
+            history: [],        // Pre-computed trajectories
+            macro: {            // Baseline macroeconomic factors
+                gdpGrowth: 0.02,
+                inflation: 0.025,
+                baseRate: 0.04
+            },
+            macroHistory: []
+        };
+
+        // Ratings definitions and colors (AAA to D)
+        const RATINGS = [
+            { name: 'AAA', color: '#4caf50', defaultProbBase: 0.0001, zScoreBase: 3.0 },
+            { name: 'AA',  color: '#8bc34a', defaultProbBase: 0.0005, zScoreBase: 2.5 },
+            { name: 'A',   color: '#cddc39', defaultProbBase: 0.0010, zScoreBase: 2.0 },
+            { name: 'BBB', color: '#ffeb3b', defaultProbBase: 0.0050, zScoreBase: 1.5 },
+            { name: 'BB',  color: '#ffc107', defaultProbBase: 0.0200, zScoreBase: 0.5 },
+            { name: 'B',   color: '#ff9800', defaultProbBase: 0.0500, zScoreBase: -0.5 },
+            { name: 'CCC', color: '#ff5722', defaultProbBase: 0.1500, zScoreBase: -1.5 },
+            { name: 'D',   color: '#f44336', defaultProbBase: 1.0000, zScoreBase: -3.0 }
+        ];
+
+        // --- 2. DOM ELEMENTS ---
+        const ui = {
+            btnSimulate: document.getElementById('btn-simulate'),
+            simMonth: document.getElementById('sim-month'),
+            activeEntities: document.getElementById('active-entities'),
+            defaultCount: document.getElementById('default-count'),
+            avgWacc: document.getElementById('avg-wacc'),
+            canvas: document.getElementById('twin-canvas'),
+            ctx: document.getElementById('twin-canvas').getContext('2d', { alpha: false }),
+            log: document.getElementById('telemetry-log'),
+            narrative: document.getElementById('narrative-engine'),
+            covBreaches: document.getElementById('covenant-breaches'),
+            covBar: document.getElementById('covenant-bar'),
+            tooltip: document.getElementById('canvas-tooltip')
+        };
+
+        // Resize Canvas to fit container
+        function resizeCanvas() {
+            const rect = ui.canvas.parentElement.getBoundingClientRect();
+            ui.canvas.width = rect.width;
+            ui.canvas.height = rect.height;
+            if (!simState.isRunning && simState.history.length === 0) {
+                renderFrame(0); // Draw initial state if uninitialized
+            }
+        }
+        window.addEventListener('resize', resizeCanvas);
+
+        // --- STREAMING_CHUNK:Implementing the pseudo-random number generators and statistical models... ---
+        
+        // Gaussian Random Generator (Box-Muller transform)
+        function randomGaussian(mean = 0, stdev = 1) {
+            const u = 1 - Math.random(); 
+            const v = Math.random();
+            const z = Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+            return z * stdev + mean;
+        }
+
+        // --- 3. MODEL INITIALIZATION (Data Generation) ---
+        function initializeModel() {
+            logTelemetry("ADAM Core OS", "system_init", "Generating 10,000 synthetic digital twins...", 1.0);
+            
+            simState.entities = [];
+            // Generate heavily skewed towards BBB/BB (normal market distribution)
+            for (let i = 0; i < ENTITY_COUNT; i++) {
+                // Skew random to center ratings
+                let ratingIdx = Math.floor(randomGaussian(3.5, 1.2));
+                ratingIdx = Math.max(0, Math.min(6, ratingIdx)); // clip between AAA and CCC
+                
+                const baseRating = RATINGS[ratingIdx];
+                
+                // Entity baseline metrics
+                const leverage = Math.max(0, randomGaussian(ratingIdx * 0.8 + 1.0, 1.0)); // Debt/EBITDA
+                const zScore = randomGaussian(baseRating.zScoreBase, 0.5);
+                const waccBase = 0.03 + (ratingIdx * 0.015) + (Math.random() * 0.01);
+
+                simState.entities.push({
+                    id: `ENT-${String(i).padStart(5, '0')}`,
+                    initialRatingIdx: ratingIdx,
+                    currentRatingIdx: ratingIdx,
+                    leverage: leverage,
+                    zScore: zScore,
+                    wacc: waccBase,
+                    macroSensitivity: Math.random() * 1.5 + 0.5, // How much macro affects them
+                    isDefaulted: false
+                });
+            }
+
+            resizeCanvas();
+            renderFrame(0);
+            updateChartsInitial();
+            logTelemetry("Market Mayhem", "data_load", "Baseline macro constraints loaded.", 0.98);
+        }
+
+        // --- STREAMING_CHUNK:Constructing the core quantitative simulation logic (Market Mayhem & Fortress/Hunt)... ---
+
+        // Pre-compute the entire year so rendering is smooth
+        function preComputeSimulation() {
+            simState.history = [];
+            simState.macroHistory = [];
+            
+            // Start state
+            let currentEntities = JSON.parse(JSON.stringify(simState.entities));
+            let m_gdp = simState.macro.gdpGrowth;
+            let m_rate = simState.macro.baseRate;
+            
+            // Record Month 0
+            simState.history.push(JSON.parse(JSON.stringify(currentEntities)));
+            simState.macroHistory.push({ gdp: m_gdp, rate: m_rate });
+
+            logTelemetry("Logic Lab", "sim_compute", "Executing stochastic differential equations over 12 periods...", 0.99);
+
+            for (let m = 1; m <= SIM_MONTHS; m++) {
+                // 1. Macro Shock (Market Mayhem) - Ornstein-Uhlenbeck / Random Walk
+                const gdpShock = randomGaussian(0, 0.005);
+                const rateShock = randomGaussian(0.001, 0.002); // Gradual rate hiking environment simulation
+                
+                m_gdp = m_gdp * 0.9 + 0.02 * 0.1 + gdpShock; // Mean reversion to 2%
+                m_rate = m_rate + rateShock;
+
+                simState.macroHistory.push({ gdp: m_gdp, rate: m_rate });
+
+                // 2. Entity Iteration (Fortress & Hunt)
+                for (let i = 0; i < ENTITY_COUNT; i++) {
+                    let ent = currentEntities[i];
+                    if (ent.isDefaulted) continue;
+
+                    // Apply idiosyncratic & systematic shocks
+                    const idioShock = randomGaussian(0, 0.2);
+                    const systematicShock = (m_gdp - 0.02) * 5.0 - (m_rate - 0.04) * 2.0; 
+                    
+                    // Update Health (Z-Score)
+                    const totalShock = (systematicShock * ent.macroSensitivity) + idioShock;
+                    ent.zScore += totalShock;
+                    
+                    // Update Leverage (worsens if health drops)
+                    ent.leverage -= totalShock * 0.5;
+                    if(ent.leverage < 0) ent.leverage = 0;
+
+                    // Migrate Rating based on continuous Z-Score
+                    let newRatingIdx = 7; // Default assumption
+                    for(let r=0; r<7; r++) {
+                        // Midpoints between bases
+                        const threshold = RATINGS[r].zScoreBase - 0.5;
+                        if(ent.zScore > threshold) {
+                            newRatingIdx = r;
+                            break;
+                        }
+                    }
+
+                    ent.currentRatingIdx = newRatingIdx;
+
+                    // Default condition
+                    if (newRatingIdx === 7 || ent.zScore < -2.8 || ent.leverage > 12) {
+                        ent.isDefaulted = true;
+                        ent.currentRatingIdx = 7;
+                        ent.zScore = -4; // Sink visually
+                    }
+                    
+                    // Update WACC based on rate + spread
+                    if(!ent.isDefaulted) {
+                         ent.wacc = m_rate + (ent.currentRatingIdx * 0.015);
+                    }
+                }
+                
+                // Deep copy state for this month
+                simState.history.push(JSON.parse(JSON.stringify(currentEntities)));
+            }
+        }
+
+        // --- STREAMING_CHUNK:Implementing Canvas rendering engine for the 10,000 entity digital twin... ---
+        
+        // Map data values to canvas coordinates
+        function mapToCanvas(val, minVal, maxVal, maxCoord) {
+            // Add padding (5%)
+            const pad = maxCoord * 0.05;
+            const usable = maxCoord - (pad * 2);
+            let normalized = (val - minVal) / (maxVal - minVal);
+            normalized = Math.max(0, Math.min(1, normalized)); // Clamp
+            return pad + (normalized * usable);
+        }
+
+        // Draw a single frame based on interpolated time
+        function renderFrame(timeFloat) {
+            const w = ui.canvas.width;
+            const h = ui.canvas.height;
+            
+            // Clear background
+            ui.ctx.fillStyle = '#0a1428'; // Brand-800
+            ui.ctx.fillRect(0, 0, w, h);
+            
+            // Draw axes / guides faintly
+            ui.ctx.strokeStyle = 'rgba(100, 255, 218, 0.1)';
+            ui.ctx.beginPath();
+            ui.ctx.moveTo(0, h/2); ui.ctx.lineTo(w, h/2);
+            ui.ctx.moveTo(w/2, 0); ui.ctx.lineTo(w/2, h);
+            ui.ctx.stroke();
+
+            // If history doesn't exist, just draw base entities
+            if (simState.history.length === 0) return;
+
+            const m1 = Math.floor(timeFloat);
+            const m2 = Math.min(Math.ceil(timeFloat), SIM_MONTHS);
+            const ratio = timeFloat - m1;
+
+            const state1 = simState.history[m1];
+            const state2 = simState.history[m2];
+
+            let defaultCount = 0;
+            let sumWacc = 0;
+            let activeCount = 0;
+            let covenantBreaches = 0;
+
+            const covThresholdLeverage = 6.0;
+
+            // Batch rendering by color for massive performance gain
+            const colorBatches = {};
+            for(let i=0; i<=7; i++) colorBatches[RATINGS[i].color] = [];
+
+            for (let i = 0; i < ENTITY_COUNT; i++) {
+                const e1 = state1[i];
+                const e2 = state2[i];
+
+                // Interpolate
+                const lev = e1.leverage + (e2.leverage - e1.leverage) * ratio;
+                const z = e1.zScore + (e2.zScore - e1.zScore) * ratio;
+                const isDef = ratio > 0.5 ? e2.isDefaulted : e1.isDefaulted;
+                const rIdx = ratio > 0.5 ? e2.currentRatingIdx : e1.currentRatingIdx;
+
+                if (isDef) defaultCount++;
+                else {
+                    activeCount++;
+                    sumWacc += e1.wacc + (e2.wacc - e1.wacc)*ratio;
+                    if(lev > covThresholdLeverage) covenantBreaches++;
+                }
+
+                // Map to screen (X: Leverage [0 to 12], Y: Z-Score [-4 to 4])
+                const x = mapToCanvas(lev, 0, 10, w);
+                const y = h - mapToCanvas(z, -4, 4, h); // Invert Y
+
+                const color = RATINGS[rIdx].color;
+                colorBatches[color].push({x, y, def: isDef});
+            }
+
+            // Draw batches
+            for(const [color, points] of Object.entries(colorBatches)) {
+                ui.ctx.fillStyle = color;
+                for(const pt of points) {
+                    if (pt.def) {
+                        // Draw defaulted as small red x or square
+                        ui.ctx.fillStyle = 'rgba(244, 67, 54, 0.4)';
+                        ui.ctx.fillRect(pt.x, pt.y, 2, 2);
+                        ui.ctx.fillStyle = color; // restore
+                    } else {
+                        // Regular entity
+                        ui.ctx.fillRect(pt.x, pt.y, 2, 2);
+                    }
+                }
+            }
+
+            // Update DOM metrics (throttle slightly to avoid DOM thrashing if needed, but per frame is ok for text)
+            ui.simMonth.innerText = `M${Math.round(timeFloat)}`;
+            ui.activeEntities.innerText = activeCount.toLocaleString();
+            ui.defaultCount.innerText = defaultCount.toLocaleString();
+            ui.avgWacc.innerText = activeCount > 0 ? ((sumWacc/activeCount)*100).toFixed(2) + '%' : '0%';
+            
+            ui.covBreaches.innerText = covenantBreaches.toLocaleString();
+            ui.covBar.style.width = Math.min((covenantBreaches / ENTITY_COUNT) * 100 * 5, 100) + '%'; // Scaled for visual
+
+            // Generate contextual narrative based on state
+            updateNarrative(timeFloat, defaultCount, covenantBreaches);
+        }
+
+        // --- STREAMING_CHUNK:Telemetry and provenance logging functions conforming to w3c_prov_o schemas... ---
+
+        function logTelemetry(agent, action, message, confidence) {
+            const logEntry = document.createElement('div');
+            
+            // Format to requested schema ProvenanceHeader style conceptually
+            const time = new Date().toISOString().split('T')[1].slice(0, -1);
+            
+            logEntry.innerHTML = `
+                <div class="flex items-start mb-1">
+                    <span class="text-brand-accent mr-2">[${time}]</span>
+                    <div>
+                        <span class="text-blue-300 font-bold">${agent}</span>: 
+                        <span class="text-gray-300">${message}</span>
+                        <div class="text-[9px] text-gray-500 mt-0.5">
+                            { "w3c_prov_o": true, "schema": "ProvenanceHeader", "conf": ${confidence.toFixed(2)} }
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            ui.log.appendChild(logEntry);
+            
+            // Keep only last 50 logs to prevent DOM bloat
+            while (ui.log.children.length > 50) {
+                ui.log.removeChild(ui.log.firstChild);
+            }
+            
+            ui.log.scrollTop = ui.log.scrollHeight;
+        }
+
+        // --- STREAMING_CHUNK:Constructing D3.js visualizations for Macro & Credit analysis... ---
+
+        let macroChartSvg, ratingChartSvg;
+
+        function initD3Charts() {
+            // Setup Macro Chart
+            const mContainer = document.getElementById('macro-chart');
+            const mMargin = {top: 10, right: 10, bottom: 20, left: 30};
+            const mw = mContainer.clientWidth - mMargin.left - mMargin.right;
+            const mh = mContainer.clientHeight - mMargin.top - mMargin.bottom;
+
+            macroChartSvg = d3.select("#macro-chart")
+                .append("svg")
+                .attr("width", mw + mMargin.left + mMargin.right)
+                .attr("height", mh + mMargin.top + mMargin.bottom)
+                .append("g")
+                .attr("transform", `translate(${mMargin.left},${mMargin.top})`);
+
+            // Setup Ratings Chart
+            const rContainer = document.getElementById('ratings-chart');
+            const rMargin = {top: 10, right: 10, bottom: 20, left: 30};
+            const rw = rContainer.clientWidth - rMargin.left - rMargin.right;
+            const rh = rContainer.clientHeight - rMargin.top - rMargin.bottom;
+
+            ratingChartSvg = d3.select("#ratings-chart")
+                .append("svg")
+                .attr("width", rw + rMargin.left + rMargin.right)
+                .attr("height", rh + rMargin.top + rMargin.bottom)
+                .append("g")
+                .attr("transform", `translate(${rMargin.left},${rMargin.top})`);
+        }
+
+        function updateChartsInitial() {
+            // Draw empty/initial axes
+            drawMacroChart(0);
+            drawRatingChart(0);
+        }
+
+        function drawMacroChart(monthIndex) {
+            macroChartSvg.selectAll("*").remove();
+            
+            if(simState.macroHistory.length === 0) return;
+
+            const mContainer = document.getElementById('macro-chart');
+            const w = mContainer.clientWidth - 40;
+            const h = mContainer.clientHeight - 30;
+
+            const data = simState.macroHistory.slice(0, Math.ceil(monthIndex) + 1);
+
+            const x = d3.scaleLinear().domain([0, SIM_MONTHS]).range([0, w]);
+            const y1 = d3.scaleLinear().domain([0, 0.08]).range([h, 0]); // Rate
+            const y2 = d3.scaleLinear().domain([-0.02, 0.06]).range([h, 0]); // GDP
+
+            // Axes
+            macroChartSvg.append("g")
+                .attr("transform", `translate(0,${h})`)
+                .attr("class", "text-gray-500 font-mono text-[8px]")
+                .call(d3.axisBottom(x).ticks(6).tickFormat(d => `M${d}`));
+                
+            macroChartSvg.append("g")
+                .attr("class", "text-gray-500 font-mono text-[8px]")
+                .call(d3.axisLeft(y1).ticks(4).tickFormat(d => (d*100).toFixed(0)+'%'));
+
+            // Lines
+            const lineRate = d3.line()
+                .x((d, i) => x(i))
+                .y(d => y1(d.rate))
+                .curve(d3.curveMonotoneX);
+
+            const lineGDP = d3.line()
+                .x((d, i) => x(i))
+                .y(d => y2(d.gdp))
+                .curve(d3.curveMonotoneX);
+
+            macroChartSvg.append("path")
+                .datum(data)
+                .attr("fill", "none")
+                .attr("stroke", "#ff9800")
+                .attr("stroke-width", 1.5)
+                .attr("d", lineRate);
+
+            macroChartSvg.append("path")
+                .datum(data)
+                .attr("fill", "none")
+                .attr("stroke", "#00bcd4")
+                .attr("stroke-width", 1.5)
+                .attr("stroke-dasharray", "3,3")
+                .attr("d", lineGDP);
+        }
+
+        function drawRatingChart(monthIndex) {
+            ratingChartSvg.selectAll("*").remove();
+            if(simState.history.length === 0) return;
+            
+            const state = simState.history[Math.floor(monthIndex)];
+            
+            // Count ratings
+            const counts = new Array(8).fill(0);
+            state.forEach(e => counts[e.currentRatingIdx]++);
+
+            const rContainer = document.getElementById('ratings-chart');
+            const w = rContainer.clientWidth - 40;
+            const h = rContainer.clientHeight - 30;
+
+            const x = d3.scaleBand()
+                .domain(RATINGS.map(d => d.name))
+                .range([0, w])
+                .padding(0.2);
+
+            const y = d3.scaleLinear()
+                .domain([0, d3.max(counts)])
+                .range([h, 0]);
+
+            ratingChartSvg.append("g")
+                .attr("transform", `translate(0,${h})`)
+                .attr("class", "text-gray-500 font-mono text-[8px]")
+                .call(d3.axisBottom(x));
+
+            ratingChartSvg.selectAll(".bar")
+                .data(counts)
+                .enter().append("rect")
+                .attr("class", "bar")
+                .attr("x", (d, i) => x(RATINGS[i].name))
+                .attr("y", d => y(d))
+                .attr("width", x.bandwidth())
+                .attr("height", d => h - y(d))
+                .attr("fill", (d, i) => RATINGS[i].color)
+                .attr("opacity", 0.8);
+        }
+
+        // --- STREAMING_CHUNK:Implementing Narrative Engine (Exiled Spark) integration... ---
+
+        let lastNarrativeMonth = -1;
+        function updateNarrative(monthFloat, defaults, covenants) {
+            const m = Math.floor(monthFloat);
+            if(m === lastNarrativeMonth || m === 0) return;
+            lastNarrativeMonth = m;
+
+            let msg = "";
+            if (m === 3) msg = "Q1 Close: Initial macro shocks propagating. Covenant stress observed in lower tranches.";
+            else if (m === 6) msg = `Mid-year point. System absorbing impact. Cumulative defaults reaching ${defaults}. Rate environment tightening.`;
+            else if (m === 9) {
+                if(covenants > 500) msg = "CRITICAL: Widespread covenant breaches detected across high-yield sectors. Credit contraction likely.";
+                else msg = "Q3 Close: Markets stabilizing. Idiosyncratic risk dominating systemic risk.";
+            }
+            else if (m === 12) msg = "Terminal state reached. Forward projection complete. Outputting MarketMayhemLedger artifact.";
+
+            if(msg) {
+                const p = document.createElement('p');
+                p.innerText = `> [M${m}] ${msg}`;
+                
+                // Add provenance style flash
+                p.className = "text-gray-200 crt-flicker";
+                
+                ui.narrative.appendChild(p);
+                ui.narrative.scrollTop = ui.narrative.scrollHeight;
+
+                logTelemetry("Exiled Spark", "narrative_gen", msg, 0.92);
+                
+                // Log mock schema
+                if(m === 12) {
+                     logTelemetry("Adam-Core-Orchestrator", "schema_commit", 
+                     `{"MarketMayhemLedger": {"primary_model_target":"PD", "context_provenance": {"confidence_score": 0.98}}}`, 
+                     1.0);
+                }
+            }
+        }
+
+        // --- STREAMING_CHUNK:Animation Loop and Lifecycle Management... ---
+
+        let startTimestamp = null;
+        let lastChartUpdate = -1;
+
+        function animationLoop(timestamp) {
+            if (!simState.isRunning) return;
+            if (!startTimestamp) startTimestamp = timestamp;
+
+            const elapsed = timestamp - startTimestamp;
+            let progress = elapsed / ANIMATION_DURATION_MS;
+            
+            if (progress >= 1.0) {
+                progress = 1.0;
+                simState.isRunning = false;
+                logTelemetry("ADAM Core OS", "sim_complete", "1Y Forward view fully materialized.", 1.0);
+                ui.btnSimulate.innerText = "RESET SYSTEM";
+                ui.btnSimulate.classList.remove('animate-pulse');
+            }
+
+            const currentMonthFloat = progress * SIM_MONTHS;
+            simState.currentMonthRaw = currentMonthFloat;
+
+            // Render Canvas (60fps)
+            renderFrame(currentMonthFloat);
+
+            // Throttle D3 chart updates to integer months to save CPU
+            const currentMonthInt = Math.floor(currentMonthFloat);
+            if(currentMonthInt !== lastChartUpdate) {
+                drawMacroChart(currentMonthFloat);
+                drawRatingChart(currentMonthFloat);
+                lastChartUpdate = currentMonthInt;
+                
+                if(currentMonthInt > 0 && currentMonthInt <= 12) {
+                    logTelemetry("Logic Lab", "step_resolve", `Computed state matrix for M${currentMonthInt}.`, 0.99);
+                }
+            }
+
+            if (simState.isRunning) {
+                requestAnimationFrame(animationLoop);
+            }
+        }
+
+        // --- STREAMING_CHUNK:Event Listeners and Execution Triggers... ---
+
+        ui.btnSimulate.addEventListener('click', () => {
+            if (ui.btnSimulate.innerText === "RESET SYSTEM") {
+                // Reset
+                ui.narrative.innerHTML = '<p class="text-gray-200">System reset. Awaiting instructions.</p>';
+                ui.log.innerHTML = '';
+                lastNarrativeMonth = -1;
+                ui.btnSimulate.innerText = "INITIALIZE 1Y FORWARD SIM";
+                
+                initializeModel();
+                logTelemetry("ADAM Core OS", "system_reset", "State memory cleared.", 1.0);
+                return;
+            }
+
+            if(simState.isRunning) return;
+
+            logTelemetry("ADAM Core OS", "sim_start", "Initializing chronological progression via Monte Carlo paths...", 1.0);
+            ui.btnSimulate.innerText = "SIMULATING...";
+            ui.btnSimulate.classList.add('animate-pulse');
+            
+            // Generate data
+            preComputeSimulation();
+            
+            // Start Animation
+            simState.isRunning = true;
+            startTimestamp = null; // reset for loop
+            requestAnimationFrame(animationLoop);
+        });
+
+        // Interactivity: Canvas Hover
+        ui.canvas.addEventListener('mousemove', (e) => {
+            if(simState.history.length === 0) return;
+            
+            const rect = ui.canvas.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+
+            // Simple proximity check (expensive for 10k, so we just sample bounding boxes conceptually, 
+            // but for a true canvas, checking all 10k is possible if optimized. We will just show coordinates for the tooltip to maintain 60fps)
+            
+            // Convert back from canvas space to data space
+            const w = ui.canvas.width;
+            const h = ui.canvas.height;
+            const pad = w * 0.05;
+            const hpad = h * 0.05;
+
+            // Invert mapping
+            let lev = ((mouseX - pad) / (w - pad*2)) * 10;
+            let z = 4 - (((mouseY - hpad) / (h - hpad*2)) * 8);
+
+            if(mouseX > pad && mouseX < w-pad && mouseY > hpad && mouseY < h-hpad) {
+                ui.tooltip.style.left = (e.clientX + 15) + 'px';
+                ui.tooltip.style.top = (e.clientY + 15) + 'px';
+                ui.tooltip.innerHTML = `
+                    <div class="text-brand-accent font-bold mb-1">Zone Scan</div>
+                    Lev (x): ${lev.toFixed(2)}x<br>
+                    Z-Scr (y): ${z.toFixed(2)}
+                `;
+                ui.tooltip.classList.remove('hidden');
+            } else {
+                ui.tooltip.classList.add('hidden');
+            }
+        });
+
+        ui.canvas.addEventListener('mouseleave', () => {
+            ui.tooltip.classList.add('hidden');
+        });
+
+        // Simple Clock update
+        setInterval(() => {
+            const now = new Date();
+            document.getElementById('clock-display').innerText = now.toISOString().replace('T', ' ').substring(0, 19) + " UTC";
+        }, 1000);
+
+        // Boot Sequence
+        window.onload = () => {
+            initD3Charts();
+            initializeModel();
+            
+            setTimeout(() => {
+                logTelemetry("Covenant Engine", "gatekeeper_check", "Deterministic rules mapped.", 1.0);
+            }, 1000);
+        };
+
+    </script>
+</body>
+</html>
