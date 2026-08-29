@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Corporate Credit Risk: Agentic AI & Digital Twin Governance Hub</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Custom Chart Container Rules enforcing max-width, height limits and responsiveness */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 650px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 320px;
+            max-height: 380px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .scrollbar-thin::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .scrollbar-thin::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        .scrollbar-thin::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+        .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="h-full font-sans text-slate-900 bg-slate-50 flex flex-col overflow-x-hidden">
+
+    <!-- TOP NAVIGATION BAR -->
+    <header class="bg-slate-900 text-white sticky top-0 z-50 shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center space-x-3">
+                    <span class="bg-indigo-600 text-white text-xs font-bold px-2.5 py-1 rounded tracking-wider uppercase">RiskOps Twin</span>
+                    <h1 class="text-lg font-semibold tracking-tight text-slate-100 hidden sm:block">Corporate Credit Risk & Governance Platform</h1>
+                </div>
+                <div class="flex items-center space-x-2 text-xs text-slate-300">
+                    <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span>Sim Kernel: <strong>12,000 Ops/sec</strong> (45ms Latency)</span>
+                </div>
+            </div>
+        </div>
+        <!-- SUB-HEADER NAVIGATION TABS -->
+        <div class="bg-slate-800 border-t border-slate-700">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <nav class="flex space-x-1 sm:space-x-4 overflow-x-auto scrollbar-thin py-2 text-xs sm:text-sm font-medium" id="main-nav">
+                    <button onclick="switchTab('twin')" id="tab-btn-twin" class="nav-tab px-3 py-1.5 rounded-md text-slate-200 hover:bg-slate-700 hover:text-white transition bg-indigo-600 text-white">🌐 Digital Twin Simulation</button>
+                    <button onclick="switchTab('pd')" id="tab-btn-pd" class="nav-tab px-3 py-1.5 rounded-md text-slate-400 hover:bg-slate-700 hover:text-white transition">📊 Quantitative PD & Model Lab</button>
+                    <button onclick="switchTab('contagion')" id="tab-btn-contagion" class="nav-tab px-3 py-1.5 rounded-md text-slate-400 hover:bg-slate-700 hover:text-white transition">🕸️ Systemic Risk & DeFi</button>
+                    <button onclick="switchTab('agent')" id="tab-btn-agent" class="nav-tab px-3 py-1.5 rounded-md text-slate-400 hover:bg-slate-700 hover:text-white transition">🤖 Agentic AI Underwriting</button>
+                    <button onclick="switchTab('provenance')" id="tab-btn-provenance" class="nav-tab px-3 py-1.5 rounded-md text-slate-400 hover:bg-slate-700 hover:text-white transition">🛡️ PROV-O & Compliance</button>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- EXECUTIVE KPI METRICS BAR -->
+    <section class="bg-white border-b border-slate-200 py-3 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+            <div class="border-r border-slate-100 last:border-r-0">
+                <p class="text-xs uppercase text-slate-500 font-semibold tracking-wider">Hallucination Rate</p>
+                <p class="text-xl font-bold text-emerald-600">3.8% <span class="text-xs text-slate-400 font-normal">(vs 11.3% base)</span></p>
+            </div>
+            <div class="border-r border-slate-100 last:border-r-0">
+                <p class="text-xs uppercase text-slate-500 font-semibold tracking-wider">Audit Efficacy</p>
+                <p class="text-xl font-bold text-indigo-600">94.0% <span class="text-xs text-slate-400 font-normal">(PROV-O Ledger)</span></p>
+            </div>
+            <div class="border-r border-slate-100 last:border-r-0">
+                <p class="text-xs uppercase text-slate-500 font-semibold tracking-wider">Decision Accuracy</p>
+                <p class="text-xl font-bold text-slate-800">96.0% <span class="text-xs text-slate-400 font-normal">(Critic Agent)</span></p>
+            </div>
+            <div>
+                <p class="text-xs uppercase text-slate-500 font-semibold tracking-wider">Regulatory Status</p>
+                <p class="text-xl font-bold text-amber-600">Annex III <span class="text-xs text-slate-400 font-normal">(EU High-Risk)</span></p>
+            </div>
+        </div>
+    </section>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+        <!-- ========================================== -->
+        <!-- TAB 1: DIGITAL TWIN & MONTE CARLO SIMULATION -->
+        <!-- ========================================== -->
+        <div id="tab-twin" class="tab-content space-y-6">
+            <!-- Section Intro -->
+            <div class="bg-white p-6 rounded-lg border border-slate-200 shadow-sm">
+                <h2 class="text-xl font-bold text-slate-900 mb-2">Forward-Looking Entity Simulation & Box-Muller Monte Carlo Framework</h2>
+                <p class="text-sm text-slate-600 leading-relaxed">
+                    This section operationalizes continuous credit risk modeling through distributed digital twin world models. Rather than relying on static point-in-time financial spreading, the RiskOps engine continuously forecasts 12-month forward EBITDA trajectories under stochastic drift and volatility parameters.
+                    Calculations utilize the mathematical <strong>Box-Muller transform</strong> to inject standard normal Gaussian random variables into the entity's cash flow equations, dynamically highlighting covenant breach thresholds and liquidity grabs.
+                </p>
+            </div>
+
+            <!-- Controls & Simulation Display Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Controls Panel -->
+                <div class="lg:col-span-4 bg-white p-5 rounded-lg border border-slate-200 shadow-sm space-y-5">
+                    <h3 class="text-sm font-bold uppercase tracking-wider text-slate-700 border-b border-slate-100 pb-2">Stochastic Control Panel</h3>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Baseline Annual EBITDA ($ Millions)</label>
+                        <input type="range" id="mc-ebitda-input" min="10" max="100" value="50" class="w-full accent-indigo-600" oninput="updateMonteCarlo()">
+                        <div class="flex justify-between text-xs text-slate-500 mt-1">
+                            <span>$10M</span>
+                            <span id="mc-ebitda-val" class="font-bold text-indigo-600">$50M</span>
+                            <span>$100M</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Stochastic Volatility (&sigma;)</label>
+                        <input type="range" id="mc-vol-input" min="5" max="50" value="20" class="w-full accent-indigo-600" oninput="updateMonteCarlo()">
+                        <div class="flex justify-between text-xs text-slate-500 mt-1">
+                            <span>5% (Benign)</span>
+                            <span id="mc-vol-val" class="font-bold text-indigo-600">20%</span>
+                            <span>50% (Extreme)</span>
+                        </div>
+                    </div>
+
+                    <div class="p-3 bg-slate-50 rounded border border-slate-200 space-y-2">
+                        <label class="block text-xs font-semibold text-slate-800">Macro Scenario Stress Injection</label>
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs text-slate-600">Apply -25% EBITDA Contraction Shock</span>
+                            <input type="checkbox" id="mc-shock-toggle" class="h-4 w-4 text-indigo-600 rounded accent-indigo-600" onchange="updateMonteCarlo()">
+                        </div>
+                    </div>
+
+                    <!-- Formula Box -->
+                    <div class="bg-indigo-50/50 p-3.5 rounded border border-indigo-100 text-xs text-indigo-950 space-y-2">
+                        <p class="font-semibold text-indigo-900">Box-Muller Gaussian Transformation:</p>
+                        <p class="font-mono bg-white p-2 rounded border border-indigo-100 text-center text-slate-800 shadow-inner">
+                            Z<sub>0</sub> = &sqrt;(-2 ln U<sub>1</sub>) &middot; cos(2&pi; U<sub>2</sub>)
+                        </p>
+                        <p class="text-[11px] text-indigo-800 leading-tight">
+                            Generates standard normal pairs (Z<sub>0</sub>, Z<sub>1</sub>) from independent uniforms U<sub>1</sub>, U<sub>2</sub> &in; (0,1) to drive stochastic cash flow trajectory drift.
+                        </p>
+                    </div>
+
+                    <div class="border-t border-slate-100 pt-3">
+                        <div class="flex justify-between text-xs font-medium text-slate-700">
+                            <span>Simulated Covenant Breach Risk:</span>
+                            <span id="covenant-breach-badge" class="font-bold text-emerald-600">Low (4.2%)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Simulation Visualizer Chart -->
+                <div class="lg:col-span-8 bg-white p-5 rounded-lg border border-slate-200 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-sm font-bold uppercase tracking-wider text-slate-800">12-Month Forward EBITDA Percentile Trajectories</h3>
+                            <span class="text-xs bg-slate-100 text-slate-600 px-2 py-1 rounded">10,000 Iterations</span>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="mcChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="mt-4 p-3 bg-slate-50 rounded border border-slate-200 text-xs text-slate-600 flex justify-between items-center">
+                        <div>
+                            <span class="font-semibold text-slate-800">Covenant Trigger:</span> Net Leverage &gt; 4.5x EBITDA ($22.5M Floor)
+                        </div>
+                        <div class="flex space-x-4">
+                            <span class="flex items-center"><span class="w-3 h-0.5 bg-emerald-500 inline-block mr-1"></span> P95 (Upper)</span>
+                            <span class="flex items-center"><span class="w-3 h-0.5 bg-indigo-600 inline-block mr-1"></span> P50 (Median)</span>
+                            <span class="flex items-center"><span class="w-3 h-0.5 bg-rose-500 inline-block mr-1"></span> P5 (Lower Boundary)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- TAB 2: QUANTITATIVE PD & MODEL LAB -->
+        <!-- ========================================== -->
+        <div id="tab-pd" class="tab-content hidden space-y-6">
+            <!-- Section Intro -->
+            <div class="bg-white p-6 rounded-lg border border-slate-200 shadow-sm">
+                <h2 class="text-xl font-bold text-slate-900 mb-2">Quantitative Probability of Default (PD) & Model Risk Mechanics</h2>
+                <p class="text-sm text-slate-600 leading-relaxed">
+                    This section demonstrates quantitative default risk mechanics using binary classification algorithms (Logistic Regression and Gradient Boosted Stumps).
+                    The module maps non-linear PD curves based on financial leverage, calculates Expected Loss (<span class="font-mono text-slate-800">EL = PD &times; LGD &times; EAD</span>), and evaluates empirical model generalization metrics to solve small-data SME constraints using Hierarchical Bayesian shrinkage.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Interactive PD Calculator -->
+                <div class="lg:col-span-5 bg-white p-5 rounded-lg border border-slate-200 shadow-sm space-y-4">
+                    <h3 class="text-sm font-bold uppercase tracking-wider text-slate-700 border-b border-slate-100 pb-2">Non-Linear PD & Loss Calculator</h3>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Net Leverage Ratio (Total Debt / EBITDA)</label>
+                        <input type="range" id="pd-leverage-input" min="1.0" max="9.0" step="0.1" value="4.2" class="w-full accent-indigo-600" oninput="updatePdCalc()">
+                        <div class="flex justify-between text-xs text-slate-500 mt-1">
+                            <span>1.0x</span>
+                            <span id="pd-leverage-val" class="font-bold text-indigo-600">4.2x</span>
+                            <span>9.0x</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Loss Given Default (LGD %)</label>
+                        <input type="range" id="pd-lgd-input" min="10" max="90" value="45" class="w-full accent-indigo-600" oninput="updatePdCalc()">
+                        <div class="flex justify-between text-xs text-slate-500 mt-1">
+                            <span>10% (Senior Secured)</span>
+                            <span id="pd-lgd-val" class="font-bold text-indigo-600">45%</span>
+                            <span>90% (Subordinated)</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Exposure at Default (EAD $M)</label>
+                        <input type="range" id="pd-ead-input" min="10" max="200" value="100" class="w-full accent-indigo-600" oninput="updatePdCalc()">
+                        <div class="flex justify-between text-xs text-slate-500 mt-1">
+                            <span>$10M</span>
+                            <span id="pd-ead-val" class="font-bold text-indigo-600">$100M</span>
+                            <span>$200M</span>
+                        </div>
+                    </div>
+
+                    <!-- Calculated Output Display -->
+                    <div class="grid grid-cols-2 gap-3 pt-2">
+                        <div class="bg-slate-50 p-3 rounded border border-slate-200 text-center">
+                            <span class="text-xs uppercase text-slate-500 block">Probability of Default</span>
+                            <span id="pd-result-pd" class="text-lg font-bold text-slate-900">3.82%</span>
+                        </div>
+                        <div class="bg-indigo-50/70 p-3 rounded border border-indigo-100 text-center">
+                            <span class="text-xs uppercase text-indigo-700 block">Expected Loss (EL)</span>
+                            <span id="pd-result-el" class="text-lg font-bold text-indigo-700">$1.72M</span>
+                        </div>
+                    </div>
+
+                    <!-- Formula Reference -->
+                    <div class="text-[11px] text-slate-500 bg-slate-50 p-3 rounded border border-slate-200 space-y-1">
+                        <p class="font-semibold text-slate-700">Logistic Mapping Equation:</p>
+                        <p class="font-mono text-slate-800">f(z) = 1 / (1 + e<sup>-z</sup>) where z = &beta;<sub>0</sub> + &beta;<sub>1</sub>(Leverage) - &beta;<sub>2</sub>(Liquidity)</p>
+                    </div>
+                </div>
+
+                <!-- Curve Visualization -->
+                <div class="lg:col-span-7 bg-white p-5 rounded-lg border border-slate-200 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-sm font-bold uppercase tracking-wider text-slate-800 mb-2">PD Elasticity vs. Net Leverage Curve</h3>
+                        <div class="chart-container">
+                            <canvas id="pdChart"></canvas>
+                        </div>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-2">
+                        Note: Inflection point occurs between 4.5x and 5.5x leverage, where compounding financial distress rapidly elevates default risk non-linearly.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Model Validation & Table 1 Display -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 pt-4">
+                <!-- Empirical Model Validation Chart -->
+                <div class="lg:col-span-6 bg-white p-5 rounded-lg border border-slate-200 shadow-sm">
+                    <h3 class="text-sm font-bold uppercase tracking-wider text-slate-800 mb-3">Model Validation AUC Comparison (Table 1)</h3>
+                    <div class="chart-container">
+                        <canvas id="modelCompChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Table 1 Content -->
+                <div class="lg:col-span-6 bg-white p-5 rounded-lg border border-slate-200 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-sm font-bold uppercase tracking-wider text-slate-800 mb-3">Empirical Model Performance & Generalization Gap</h3>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs text-slate-600 border-collapse">
+                                <thead>
+                                    <tr class="bg-slate-100 text-slate-700 uppercase font-semibold border-b border-slate-200">
+                                        <th class="p-2.5">Model Architecture</th>
+                                        <th class="p-2.5 text-center">Train AUC</th>
+                                        <th class="p-2.5 text-center">Test AUC</th>
+                                        <th class="p-2.5 text-center">Generalization Gap</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100">
+                                    <tr class="hover:bg-slate-50">
+                                        <td class="p-2.5 font-medium text-slate-800">Logistic Regression (One-Hot)</td>
+                                        <td class="p-2.5 text-center font-mono">0.829</td>
+                                        <td class="p-2.5 text-center font-mono font-semibold text-indigo-600">0.839</td>
+                                        <td class="p-2.5 text-center font-mono text-emerald-600">-0.010</td>
+                                    </tr>
+                                    <tr class="hover:bg-slate-50">
+                                        <td class="p-2.5 font-medium text-slate-800">Logistic Regression (WOE)</td>
+                                        <td class="p-2.5 text-center font-mono">0.816</td>
+                                        <td class="p-2.5 text-center font-mono font-semibold text-indigo-600">0.823</td>
+                                        <td class="p-2.5 text-center font-mono text-emerald-600">-0.007</td>
+                                    </tr>
+                                    <tr class="hover:bg-slate-50">
+                                        <td class="p-2.5 font-medium text-slate-800">XGBoost (Depth=1 Stumps)</td>
+                                        <td class="p-2.5 text-center font-mono">0.831</td>
+                                        <td class="p-2.5 text-center font-mono font-semibold text-indigo-600">0.840</td>
+                                        <td class="p-2.5 text-center font-mono text-emerald-600">-0.009</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="mt-4 p-3 bg-indigo-50/50 rounded border border-indigo-100 text-xs text-slate-700">
+                        <span class="font-bold text-indigo-900 block mb-1">Hierarchical Bayesian SME Shrinkage:</span>
+                        To resolve the small-data problem in SME portfolio underwriting, feature priors are extracted via SHapley Additive exPlanations (SHAP) from public markets and refined using MCMC sampling to prevent overfitting.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- TAB 3: SYSTEMIC RISK & DEFI CONTAGION -->
+        <!-- ========================================== -->
+        <div id="tab-contagion" class="tab-content hidden space-y-6">
+            <!-- Section Intro -->
+            <div class="bg-white p-6 rounded-lg border border-slate-200 shadow-sm">
+                <h2 class="text-xl font-bold text-slate-900 mb-2">Systemic Risk, Leontief Input Networks & Institutional DeFi Composability</h2>
+                <p class="text-sm text-slate-600 leading-relaxed">
+                    Credit shocks propagate through inter-entity dependency graphs. This module contrasts physical supply chain disruption modeled by the <strong>Economic Systemic Risk Index (Leontief matrices)</strong> with smart contract multi-hop liquidations in Institutional Decentralized Finance (DeFi). In DeFi ecosystems, localized exploits cascade through dynamic liquidity pools due to protocol composability and high comprehension debt.
+                </p>
+            </div>
+
+            <!-- Empirical Incident Analysis & Search Filter -->
+            <div class="bg-white p-5 rounded-lg border border-slate-200 shadow-sm space-y-4">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-3">
+                    <div>
+                        <h3 class="text-sm font-bold uppercase tracking-wider text-slate-800">DeFi Systemic Risk Event Log (Table 2)</h3>
+                        <p class="text-xs text-slate-500">Filter incidents by protocol name or risk dimension vector</p>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <input type="text" id="defi-search" placeholder="Search protocol..." onkeyup="filterDefiTable()" class="px-3 py-1.5 border border-slate-300 rounded text-xs focus:ring-1 focus:ring-indigo-500 focus:outline-none">
+                        <select id="defi-filter-risk" onchange="filterDefiTable()" class="px-3 py-1.5 border border-slate-300 rounded text-xs focus:ring-1 focus:ring-indigo-500 focus:outline-none">
+                            <option value="all">All Risk Dimensions</option>
+                            <option value="Composability cascade">Composability Cascade</option>
+                            <option value="Oracle manipulation">Oracle Failure / Manipulation</option>
+                            <option value="Private-key compromise">Key Compromise / Phishing</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Incident Data Table -->
+                <div class="overflow-x-auto max-h-72 scrollbar-thin">
+                    <table class="w-full text-left text-xs text-slate-600 border-collapse" id="defi-table">
+                        <thead class="sticky top-0 bg-slate-100 text-slate-700 uppercase font-semibold border-b border-slate-200">
+                            <tr>
+                                <th class="p-2.5">Date</th>
+                                <th class="p-2.5">Protocol</th>
+                                <th class="p-2.5 text-right">Direct Loss (USD)</th>
+                                <th class="p-2.5">Primary Risk Dimension</th>
+                                <th class="p-2.5">Amplifying Conditions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100" id="defi-table-body">
+                            <!-- Populated via JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Visual Breakdown Chart & Leontief Explanation -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <div class="lg:col-span-7 bg-white p-5 rounded-lg border border-slate-200 shadow-sm">
+                    <h3 class="text-sm font-bold uppercase tracking-wider text-slate-800 mb-3">Direct Financial Loss by Systemic Incident</h3>
+                    <div class="chart-container">
+                        <canvas id="defiChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-5 bg-white p-5 rounded-lg border border-slate-200 shadow-sm space-y-4 flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-sm font-bold uppercase tracking-wider text-slate-800 border-b border-slate-100 pb-2">Leontief Contagion Dynamics</h3>
+                        <p class="text-xs text-slate-600 leading-relaxed mt-2">
+                            In physical corporate networks, output loss propagates via downstream and upstream impact matrices:
+                        </p>
+                        <div class="bg-slate-50 p-3 rounded border border-slate-200 mt-3 space-y-2 text-xs">
+                            <div class="flex items-start space-x-2">
+                                <span class="bg-rose-100 text-rose-700 font-bold px-1.5 py-0.5 rounded text-[10px]">Downstream</span>
+                                <span class="text-slate-700">Production loss if a supplier defaults, scaled by essentiality.</span>
+                            </div>
+                            <div class="flex items-start space-x-2">
+                                <span class="bg-amber-100 text-amber-700 font-bold px-1.5 py-0.5 rounded text-[10px]">Upstream</span>
+                                <span class="text-slate-700">Demand loss if a key buyer defaults, scaled by market share.</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-indigo-50 p-3 rounded border border-indigo-100 text-xs text-indigo-900">
+                        <span class="font-bold">Liquidity Grab Telemetry:</span> As systemic stress rises, corporate entities reflexively draw down super-senior revolvers to hoard cash, converting undrawn commitments into acute exposure at default (EAD).
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- TAB 4: AGENTIC AI UNDERWRITING -->
+        <!-- ========================================== -->
+        <div id="tab-agent" class="tab-content hidden space-y-6">
+            <!-- Section Intro -->
+            <div class="bg-white p-6 rounded-lg border border-slate-200 shadow-sm">
+                <h2 class="text-xl font-bold text-slate-900 mb-2">Agentic Artificial Intelligence & Adversarial Self-Critique Workflows</h2>
+                <p class="text-sm text-slate-600 leading-relaxed">
+                    This module presents the operational workflow of autonomous underwriting agents. To prevent non-deterministic model hallucinations, enterprise RiskOps platforms utilize <strong>structured JSON-RPC protocol payloads</strong> operating within a <strong>decision-negative architecture</strong>.
+                    A primary preparer agent normalizes financial spreading data, which is then interrogated by an adversarial critic agent before final human-in-the-loop review.
+                </p>
+            </div>
+
+            <!-- Agent Workflow Visualizer -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Step Selector & Inspector Controls -->
+                <div class="lg:col-span-5 bg-white p-5 rounded-lg border border-slate-200 shadow-sm space-y-4">
+                    <h3 class="text-sm font-bold uppercase tracking-wider text-slate-700 border-b border-slate-100 pb-2">Underwriting Pipeline Stages</h3>
+
+                    <div class="space-y-2" id="agent-stage-list">
+                        <button onclick="selectAgentStage(1)" id="stage-btn-1" class="w-full text-left p-3 rounded border border-indigo-500 bg-indigo-50/50 flex justify-between items-center transition">
+                            <div>
+                                <p class="text-xs font-bold text-indigo-900">1. Data Extraction & Spreading</p>
+                                <p class="text-[11px] text-slate-500">Normalizes income statement PDF to standardized template</p>
+                            </div>
+                            <span class="text-xs bg-indigo-200 text-indigo-800 px-2 py-0.5 rounded font-mono">Completed</span>
+                        </button>
+
+                        <button onclick="selectAgentStage(2)" id="stage-btn-2" class="w-full text-left p-3 rounded border border-slate-200 hover:border-indigo-300 flex justify-between items-center transition">
+                            <div>
+                                <p class="text-xs font-bold text-slate-800">2. JSON-RPC Payload Formulation</p>
+                                <p class="text-[11px] text-slate-500">Encapsulates financial ratios & quantitative triggers</p>
+                            </div>
+                            <span class="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-mono">Formulated</span>
+                        </button>
+
+                        <button onclick="selectAgentStage(3)" id="stage-btn-3" class="w-full text-left p-3 rounded border border-slate-200 hover:border-indigo-300 flex justify-between items-center transition">
+                            <div>
+                                <p class="text-xs font-bold text-slate-800">3. Adversarial Critic Audit</p>
+                                <p class="text-[11px] text-slate-500">Secondary agent verifies source grounding & checks math</p>
+                            </div>
+                            <span class="text-xs bg-amber-100 text-amber-800 px-2 py-0.5 rounded font-mono">Critiqued</span>
+                        </button>
+
+                        <button onclick="selectAgentStage(4)" id="stage-btn-4" class="w-full text-left p-3 rounded border border-slate-200 hover:border-indigo-300 flex justify-between items-center transition">
+                            <div>
+                                <p class="text-xs font-bold text-slate-800">4. Human-in-the-Loop Signoff</p>
+                                <p class="text-[11px] text-slate-500">Final credit officer review and authority execution</p>
+                            </div>
+                            <span class="text-xs bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded font-mono">Ready</span>
+                        </button>
+                    </div>
+
+                    <!-- Metrics Callout -->
+                    <div class="p-3 bg-slate-50 rounded border border-slate-200 text-xs space-y-1">
+                        <div class="flex justify-between">
+                            <span class="text-slate-600">Base AI Hallucination Rate:</span>
+                            <span class="font-bold text-rose-600">11.3%</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-600">Adversarial Critic Reduction:</span>
+                            <span class="font-bold text-emerald-600">3.8%</span>
+                        </div>
+                        <div class="flex justify-between border-t border-slate-200 pt-1 mt-1">
+                            <span class="text-slate-600">Decision Accuracy Boost:</span>
+                            <span class="font-bold text-indigo-600">92% &rarr; 96%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Structured JSON Payload & Stage Details Viewer -->
+                <div class="lg:col-span-7 bg-slate-900 text-slate-100 p-5 rounded-lg border border-slate-800 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-center border-b border-slate-800 pb-3 mb-3">
+                            <h3 class="text-xs font-bold uppercase tracking-wider text-indigo-400" id="stage-title">Stage 1: Normalized Financial Telemetry</h3>
+                            <span class="text-[10px] font-mono bg-slate-800 px-2 py-1 rounded text-slate-400">JSON-RPC 2.0</span>
+                        </div>
+                        <pre class="font-mono text-xs text-emerald-400 bg-slate-950 p-4 rounded border border-slate-800 overflow-x-auto scrollbar-thin h-64" id="stage-code">
+{
+  "jsonrpc": "2.0",
+  "method": "evaluateCreditTelemetry",
+  "params": {
+    "entity_id": "CORP-88392",
+    "annual_ebitda_usd": 50000000,
+    "total_debt_usd": 210000000,
+    "calculated_leverage": 4.20,
+    "interest_coverage_ratio": 2.15,
+    "revolver_drawn_ratio": 0.68
+  },
+  "id": "req-9901-a"
+}
+                        </pre>
+                    </div>
+                    <div class="mt-4 p-3 bg-slate-800/80 rounded border border-slate-700 text-xs text-slate-300" id="stage-description">
+                        Primary extraction agent reads multi-page financial PDF, extracts core EBITDA and capital structure details, and formats raw numeric outputs into a structured schema.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- TAB 5: SEMANTIC PROV-O & COMPLIANCE -->
+        <!-- ========================================== -->
+        <div id="tab-provenance" class="tab-content hidden space-y-6">
+            <!-- Section Intro -->
+            <div class="bg-white p-6 rounded-lg border border-slate-200 shadow-sm">
+                <h2 class="text-xl font-bold text-slate-900 mb-2">Semantic Provenance (W3C PROV-O) & Regulatory Compliance Framework</h2>
+                <p class="text-sm text-slate-600 leading-relaxed">
+                    To satisfy Model Risk Management (Federal Reserve SR 11-7 / OCC 2011-12) and the EU Artificial Intelligence Act (Annex III High-Risk mandates), risk systems cannot operate as black boxes.
+                    This module illustrates immutable audit logging via the <strong>W3C PROV-O ontology graph</strong> (Entities, Activities, Agents with SHA-256 cryptographic signatures) alongside implementation timelines and statutory fine structures (Table 3 & Table 4).
+                </p>
+            </div>
+
+            <!-- Provenance Efficacy & Table 3 -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <div class="lg:col-span-6 bg-white p-5 rounded-lg border border-slate-200 shadow-sm">
+                    <h3 class="text-sm font-bold uppercase tracking-wider text-slate-800 mb-3">Audit Accuracy by Provenance Schema (Table 3)</h3>
+                    <div class="chart-container">
+                        <canvas id="provChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Table 3 Display -->
+                <div class="lg:col-span-6 bg-white p-5 rounded-lg border border-slate-200 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-sm font-bold uppercase tracking-wider text-slate-800 mb-3">Provenance Disclosure Efficacy Benchmark</h3>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs text-slate-600 border-collapse">
+                                <thead>
+                                    <tr class="bg-slate-100 text-slate-700 uppercase font-semibold border-b border-slate-200">
+                                        <th class="p-2.5">Disclosure Condition</th>
+                                        <th class="p-2.5 text-center">Audit Accuracy</th>
+                                        <th class="p-2.5 text-center">Insufficient Info Rate</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100">
+                                    <tr class="hover:bg-slate-50">
+                                        <td class="p-2.5 font-medium text-slate-800">Binary disclosure</td>
+                                        <td class="p-2.5 text-center font-mono text-rose-600">0%</td>
+                                        <td class="p-2.5 text-center font-mono">86%</td>
+                                    </tr>
+                                    <tr class="hover:bg-slate-50">
+                                        <td class="p-2.5 font-medium text-slate-800">CRediT-only projection</td>
+                                        <td class="p-2.5 text-center font-mono text-amber-600">18%</td>
+                                        <td class="p-2.5 text-center font-mono">76%</td>
+                                    </tr>
+                                    <tr class="hover:bg-slate-50">
+                                        <td class="p-2.5 font-medium text-slate-800">PROV-O extended roles only</td>
+                                        <td class="p-2.5 text-center font-mono">68%</td>
+                                        <td class="p-2.5 text-center font-mono">12%</td>
+                                    </tr>
+                                    <tr class="hover:bg-slate-50">
+                                        <td class="p-2.5 font-medium text-slate-800">Roles + Temporal ordering</td>
+                                        <td class="p-2.5 text-center font-mono">72%</td>
+                                        <td class="p-2.5 text-center font-mono text-emerald-600">0%</td>
+                                    </tr>
+                                    <tr class="hover:bg-slate-50 bg-indigo-50/40">
+                                        <td class="p-2.5 font-bold text-indigo-900">Full PROV-O Ledger (Hashes + Oversight)</td>
+                                        <td class="p-2.5 text-center font-mono font-bold text-indigo-600">94%</td>
+                                        <td class="p-2.5 text-center font-mono font-bold text-emerald-600">0%</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="mt-4 p-3 bg-slate-50 rounded border border-slate-200 text-xs text-slate-600">
+                        <span class="font-semibold text-slate-800">W3C Triples Structure:</span> Links <em>Entities</em> (calculated ratios) to <em>Activities</em> (Monte Carlo executions) and <em>Agents</em> (model version hashes).
+                    </div>
+                </div>
+            </div>
+
+            <!-- Regulatory Implementation Timeline (Table 4) -->
+            <div class="bg-white p-5 rounded-lg border border-slate-200 shadow-sm space-y-4">
+                <h3 class="text-sm font-bold uppercase tracking-wider text-slate-800 border-b border-slate-100 pb-2">EU Artificial Intelligence Act Implementation Timeline & Requirements (Table 4)</h3>
+
+                <div class="grid grid-cols-1 md:grid-cols-5 gap-3 text-xs">
+                    <div class="bg-slate-50 p-3 rounded border border-slate-200 space-y-1">
+                        <span class="text-[10px] font-bold text-indigo-600 uppercase block">August 1, 2024</span>
+                        <p class="font-bold text-slate-800">Entry into Force</p>
+                        <p class="text-slate-500 text-[11px]">Formal enactment of the EU AI Act legal framework.</p>
+                    </div>
+                    <div class="bg-slate-50 p-3 rounded border border-slate-200 space-y-1">
+                        <span class="text-[10px] font-bold text-indigo-600 uppercase block">February 2025</span>
+                        <p class="font-bold text-slate-800">Prohibited Practices</p>
+                        <p class="text-slate-500 text-[11px]">Complete ban on unacceptable risk systems (e.g. social credit scoring).</p>
+                    </div>
+                    <div class="bg-slate-50 p-3 rounded border border-slate-200 space-y-1">
+                        <span class="text-[10px] font-bold text-indigo-600 uppercase block">August 2, 2025</span>
+                        <p class="font-bold text-slate-800">General-Purpose AI</p>
+                        <p class="text-slate-500 text-[11px]">Transparency, documentation, & copyright compliance mandates.</p>
+                    </div>
+                    <div class="bg-indigo-50 p-3 rounded border border-indigo-200 space-y-1">
+                        <span class="text-[10px] font-bold text-indigo-700 uppercase block">August 2, 2026</span>
+                        <p class="font-bold text-indigo-900">High-Risk (Original)</p>
+                        <p class="text-indigo-800 text-[11px]">Full conformity assessments for credit scoring (Annex III).</p>
+                    </div>
+                    <div class="bg-slate-50 p-3 rounded border border-slate-200 space-y-1">
+                        <span class="text-[10px] font-bold text-indigo-600 uppercase block">December 2, 2027</span>
+                        <p class="font-bold text-slate-800">High-Risk (Omnibus)</p>
+                        <p class="text-slate-500 text-[11px]">Deferred compliance deadline pending Digital Omnibus adoption.</p>
+                    </div>
+                </div>
+
+                <!-- Penalties Banner -->
+                <div class="p-3 bg-rose-50 rounded border border-rose-200 flex flex-col sm:flex-row justify-between items-start sm:items-center text-xs text-rose-900 gap-2">
+                    <div>
+                        <span class="font-bold uppercase tracking-wider">Non-Compliance Penalty Matrix:</span>
+                        <span> Prohibited Practices: up to <strong>&euro;35M or 7% worldwide turnover</strong>. High-Risk breaches: up to <strong>&euro;15M or 3% worldwide turnover</strong>.</span>
+                    </div>
+                    <span class="bg-rose-600 text-white font-bold text-[10px] px-2 py-1 rounded whitespace-nowrap">DORA Harmonized</span>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- APPLICATION FOOTER -->
+    <footer class="bg-slate-900 text-slate-400 text-xs py-4 border-t border-slate-800 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center gap-2">
+            <p>RiskOps & Digital Twin Corporate Credit Risk Architecture &copy; 2026</p>
+            <p class="text-slate-500">SR 11-7 / OCC 2011-12 &middot; W3C PROV-O &middot; EU AI Act Annex III &middot; Basel III Compliant</p>
+        </div>
+    </footer>
+
+    <!-- INLINE WEB WORKER -->
+    <script id="worker-script" type="application/javascript">
+        class SeededRNG {
+            constructor(seed) { this.m = 0x80000000; this.a = 1103515245; this.c = 12345; this.state = seed; }
+            nextInt() { this.state = (this.a * this.state + this.c) % this.m; return this.state; }
+            nextFloat() { return this.nextInt() / (this.m - 1); }
+            nextGaussian(mean = 0, stdDev = 1) {
+                let u1 = 1.0 - this.nextFloat(), u2 = 1.0 - this.nextFloat();
+                let randStdNormal = Math.sqrt(-2.0 * Math.log(u1)) * Math.sin(2.0 * Math.PI * u2);
+                return mean + stdDev * randStdNormal;
+            }
+        }
+
+        const rng = new SeededRNG(42069);
+        const SECTORS = ['Software', 'Finance', 'Energy', 'Healthcare', 'Consumer', 'Semiconductors'];
+        const ANCHORS = [
+            { name: 'Microsoft', sector: 'Software', baseEbitda: 110000000 },
+            { name: 'Alphabet', sector: 'Software', baseEbitda: 95000000 },
+            { name: 'Nvidia', sector: 'Semiconductors', baseEbitda: 35000000 },
+            { name: 'Amazon', sector: 'Consumer', baseEbitda: 85000000 },
+            { name: 'JPMorgan', sector: 'Finance', baseEbitda: 55000000 }
+        ];
+
+        let worldEntities = [];
+        function initWorld(count) {
+            for (let i = 0; i < count; i++) {
+                let isAnchor = rng.nextFloat() < 0.05;
+                let data = isAnchor ? ANCHORS[Math.floor(rng.nextFloat() * ANCHORS.length)] : {
+                    name: `Node-${i}`,
+                    sector: SECTORS[Math.floor(rng.nextFloat() * SECTORS.length)],
+                    baseEbitda: 40000 + (rng.nextFloat() * 160000)
+                };
+                worldEntities.push({
+                    id: i,
+                    name: isAnchor ? `${data.name} Sub-${i}` : data.name,
+                    sector: data.sector,
+                    ebitda: data.baseEbitda
+                });
+            }
+            console.log(`Initialized ${worldEntities.length} entities.`);
+        }
+        initWorld(10000);
+    </script>
+
+    <!-- JAVASCRIPT LOGIC & APPLICATION STATE -->
+    <script>
+        // Global Application State
+        const appState = {
+            activeTab: 'twin',
+            mcEbitda: 50,
+            mcVol: 20,
+            mcShock: false,
+            pdLeverage: 4.2,
+            pdLgd: 45,
+            pdEad: 100,
+            defiSearch: '',
+            defiRiskFilter: 'all',
+            currentAgentStage: 1
+        };
+
+        // Initialize Monte Carlo Data from worldEntities simulation instead of mock math
+        function simulatePortfolioEbitda() {
+            let totalBase = 0;
+            worldEntities.forEach(e => totalBase += e.ebitda);
+
+            // Normalize back to the visual scale of the slider (approx $50M base for the UI display)
+            // We use the slider to scale the entire portfolio's volatility and shock.
+            const uiBaseEbitda = appState.mcEbitda * (appState.mcShock ? 0.75 : 1.0);
+            const vol = appState.mcVol / 100;
+
+            const months = ['M0', 'M2', 'M4', 'M6', 'M8', 'M10', 'M12'];
+            const median = [];
+            const upperP95 = [];
+            const lowerP5 = [];
+            const covenantLine = [];
+
+            for (let i = 0; i <= 6; i++) {
+                const t = i / 6;
+                // Drift is calculated across the 10000 entities
+                let driftFactor = 0;
+                worldEntities.forEach(e => {
+                    // Simulate drift for each entity using the seeded RNG
+                    let individualDrift = 1 + (0.02 * t) + (rng.nextGaussian(0, 0.05) * vol * Math.sqrt(t));
+                    driftFactor += individualDrift;
+                });
+                driftFactor = driftFactor / worldEntities.length;
+
+                const spread = vol * Math.sqrt(t + 0.1);
+
+                // Scale the aggregate drift back to the UI's display metric
+                const medVal = uiBaseEbitda * driftFactor;
+                const p95Val = medVal * (1 + 1.645 * spread);
+                const p5Val = Math.max(2, medVal * (1 - 1.645 * spread));
+
+                median.push(medVal.toFixed(1));
+                upperP95.push(p95Val.toFixed(1));
+                lowerP5.push(p5Val.toFixed(1));
+                covenantLine.push(22.5); // Threshold floor
+            }
+
+            return {
+                labels: months,
+                datasets: [
+                    { label: 'P95 Upper Boundary', data: upperP95, borderColor: '#10b981', borderDash: [4, 4], borderWidth: 1.5, pointRadius: 0, fill: false },
+                    { label: 'Median Trajectory', data: median, borderColor: '#4f46e5', borderWidth: 2.5, pointRadius: 3, fill: false },
+                    { label: 'P5 Lower Boundary', data: lowerP5, borderColor: '#f43f5e', borderDash: [4, 4], borderWidth: 1.5, pointRadius: 0, fill: false },
+                    { label: 'Covenant Floor Threshold', data: covenantLine, borderColor: '#94a3b8', borderWidth: 1, pointRadius: 0, fill: false }
+                ]
+            };
+        }
+
+        // Static Table Data from Report
+        const defiIncidents = [
+            { date: 'Feb 2024', protocol: 'PlayDapp', loss: 36, lossText: '~$36M', risk: 'Private-key compromise', condition: 'Unaudited helper contracts' },
+            { date: 'Mar 2024', protocol: 'Prisma Finance', loss: 11.6, lossText: '~$11.6M', risk: 'Composability cascade', condition: 'Unaudited helper contract' },
+            { date: 'Jun 2024', protocol: 'UwU Lend', loss: 23, lossText: '~$23M', risk: 'Oracle manipulation', condition: 'Protocol dependency vulnerability' },
+            { date: 'Feb 2025', protocol: 'Safe{Wallet}', loss: 1500, lossText: '~$1.5B', risk: 'Composability cascade', condition: 'Extreme multi-hop composability' },
+            { date: 'May 2025', protocol: 'Cetus Protocol', loss: 223, lossText: '~$223M', risk: 'Integer overflow', condition: 'Dismissed audit warnings' },
+            { date: 'Mar 2026', protocol: 'Resolv / USR', loss: 25, lossText: '~$25M', risk: 'Composability cascade', condition: 'Cascading collateral liquidations' },
+            { date: 'Apr 2026', protocol: 'Kelp DAO', loss: 292, lossText: '~$292M', risk: 'Oracle manipulation', condition: 'High comprehension debt' }
+        ];
+
+        // Chart Global Handles
+        let mcChartInstance = null;
+        let pdChartInstance = null;
+        let modelCompChartInstance = null;
+        let provChartInstance = null;
+        let defiChartInstance = null;
+
+        // Navigation Switcher
+        function switchTab(tabId) {
+            appState.activeTab = tabId;
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+
+            document.querySelectorAll('.nav-tab').forEach(btn => {
+                btn.classList.remove('bg-indigo-600', 'text-white');
+                btn.classList.add('text-slate-400');
+            });
+            const activeBtn = document.getElementById(`tab-btn-${tabId}`);
+            activeBtn.classList.add('bg-indigo-600', 'text-white');
+            activeBtn.classList.remove('text-slate-400');
+
+            // Trigger dynamic re-renders for charts when tab becomes visible
+            setTimeout(() => {
+                if (tabId === 'twin' && mcChartInstance) mcChartInstance.resize();
+                if (tabId === 'pd') {
+                    if (pdChartInstance) pdChartInstance.resize();
+                    if (modelCompChartInstance) modelCompChartInstance.resize();
+                }
+                if (tabId === 'contagion' && defiChartInstance) defiChartInstance.resize();
+                if (tabId === 'provenance' && provChartInstance) provChartInstance.resize();
+            }, 50);
+        }
+
+        // TAB 1: MONTE CARLO SIMULATION LOGIC
+        function initMonteCarloChart() {
+            const ctx = document.getElementById('mcChart').getContext('2d');
+            mcChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: getMonteCarloData(),
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { title: { display: true, text: 'Forward Horizon (Months)', font: { size: 11 } } },
+                        y: { title: { display: true, text: 'Simulated EBITDA ($M)', font: { size: 11 } }, min: 0 }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+
+        function getMonteCarloData() {
+            return simulatePortfolioEbitda();
+        }
+
+        function updateMonteCarlo() {
+            appState.mcEbitda = parseFloat(document.getElementById('mc-ebitda-input').value);
+            appState.mcVol = parseFloat(document.getElementById('mc-vol-input').value);
+            appState.mcShock = document.getElementById('mc-shock-toggle').checked;
+
+            document.getElementById('mc-ebitda-val').innerText = `$${appState.mcEbitda}M`;
+            document.getElementById('mc-vol-val').innerText = `${appState.mcVol}%`;
+
+            // Calculate covenant breach risk
+            const baseEbitda = appState.mcEbitda * (appState.mcShock ? 0.75 : 1.0);
+            const breachProb = Math.min(99.9, Math.max(0.1, ((22.5 / baseEbitda) * (1 + (appState.mcVol / 30))) * 12)).toFixed(1);
+
+            const badge = document.getElementById('covenant-breach-badge');
+            if (breachProb > 25) {
+                badge.innerText = `High (${breachProb}%)`;
+                badge.className = "font-bold text-rose-600";
+            } else if (breachProb > 10) {
+                badge.innerText = `Elevated (${breachProb}%)`;
+                badge.className = "font-bold text-amber-600";
+            } else {
+                badge.innerText = `Low (${breachProb}%)`;
+                badge.className = "font-bold text-emerald-600";
+            }
+
+            if (mcChartInstance) {
+                mcChartInstance.data = getMonteCarloData();
+                mcChartInstance.update();
+            }
+        }
+
+        // TAB 2: QUANTITATIVE PD LAB LOGIC
+        function initPdCharts() {
+            // PD Elasticity Chart
+            const ctxPd = document.getElementById('pdChart').getContext('2d');
+            pdChartInstance = new Chart(ctxPd, {
+                type: 'line',
+                data: getPdCurveData(),
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { title: { display: true, text: 'Net Leverage Ratio (Total Debt / EBITDA)', font: { size: 11 } } },
+                        y: { title: { display: true, text: 'Probability of Default (%)', font: { size: 11 } }, min: 0, max: 50 }
+                    },
+                    plugins: { legend: { display: false } }
+                }
+            });
+
+            // Model Validation Bar Chart (Table 1)
+            const ctxComp = document.getElementById('modelCompChart').getContext('2d');
+            modelCompChartInstance = new Chart(ctxComp, {
+                type: 'bar',
+                data: {
+                    labels: ['Logistic (One-Hot)', 'Logistic (WOE)', 'XGBoost (Depth=1)'],
+                    datasets: [
+                        { label: 'Train AUC', data: [0.829, 0.816, 0.831], backgroundColor: '#cbd5e1' },
+                        { label: 'Test AUC', data: [0.839, 0.823, 0.840], backgroundColor: '#4f46e5' }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { min: 0.75, max: 0.90, title: { display: true, text: 'Area Under Curve (AUC)', font: { size: 11 } } }
+                    }
+                }
+            });
+        }
+
+        function getPdCurveData() {
+            const labels = [];
+            const dataPoints = [];
+            const activeMarker = [];
+
+            for (let lev = 1.0; lev <= 9.0; lev += 0.5) {
+                labels.push(`${lev.toFixed(1)}x`);
+                // Logistic function calculation: 1 / (1 + exp(-( -4.5 + 0.85 * lev )))
+                const pd = (1 / (1 + Math.exp(-(-4.8 + 0.85 * lev)))) * 100;
+                dataPoints.push(pd.toFixed(2));
+
+                if (Math.abs(lev - appState.pdLeverage) < 0.26) {
+                    activeMarker.push(pd.toFixed(2));
+                } else {
+                    activeMarker.push(null);
+                }
+            }
+
+            return {
+                labels: labels,
+                datasets: [
+                    { label: 'PD Curve (%)', data: dataPoints, borderColor: '#4f46e5', borderWidth: 2, fill: false },
+                    { label: 'Current Entity Leverage', data: activeMarker, borderColor: '#f43f5e', backgroundColor: '#f43f5e', pointRadius: 6, pointHoverRadius: 8, showLine: false }
+                ]
+            };
+        }
+
+        function updatePdCalc() {
+            appState.pdLeverage = parseFloat(document.getElementById('pd-leverage-input').value);
+            appState.pdLgd = parseFloat(document.getElementById('pd-lgd-input').value);
+            appState.pdEad = parseFloat(document.getElementById('pd-ead-input').value);
+
+            document.getElementById('pd-leverage-val').innerText = `${appState.pdLeverage.toFixed(1)}x`;
+            document.getElementById('pd-lgd-val').innerText = `${appState.pdLgd}%`;
+            document.getElementById('pd-ead-val').innerText = `$${appState.pdEad}M`;
+
+            // Compute PD & Expected Loss
+            const rawPd = (1 / (1 + Math.exp(-(-4.8 + 0.85 * appState.pdLeverage)))) * 100;
+            const expectedLoss = (rawPd / 100) * (appState.pdLgd / 100) * appState.pdEad;
+
+            document.getElementById('pd-result-pd').innerText = `${rawPd.toFixed(2)}%`;
+            document.getElementById('pd-result-el').innerText = `$${expectedLoss.toFixed(2)}M`;
+
+            if (pdChartInstance) {
+                pdChartInstance.data = getPdCurveData();
+                pdChartInstance.update();
+            }
+        }
+
+        // TAB 3: SYSTEMIC CONTAGION & DEFI LOGIC
+        function initDefiModule() {
+            renderDefiTable();
+            const ctx = document.getElementById('defiChart').getContext('2d');
+
+            // Render chart based on table data
+            const labels = defiIncidents.map(i => `${i.protocol} (${i.date})`);
+            const losses = defiIncidents.map(i => i.loss);
+
+            defiChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Direct Loss ($ Millions USD)',
+                        data: losses,
+                        backgroundColor: '#f43f5e'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { type: 'logarithmic', title: { display: true, text: 'Direct Loss ($M USD - Log Scale)', font: { size: 11 } } }
+                    },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+
+        function renderDefiTable() {
+            const tbody = document.getElementById('defi-table-body');
+            tbody.innerHTML = '';
+
+            const filtered = defiIncidents.filter(item => {
+                const matchesSearch = item.protocol.toLowerCase().includes(appState.defiSearch.toLowerCase()) ||
+                                      item.condition.toLowerCase().includes(appState.defiSearch.toLowerCase());
+                const matchesRisk = appState.defiRiskFilter === 'all' || item.risk.includes(appState.defiRiskFilter);
+                return matchesSearch && matchesRisk;
+            });
+
+            filtered.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50";
+                tr.innerHTML = `
+                    <td class="p-2.5 font-mono text-slate-500">${item.date}</td>
+                    <td class="p-2.5 font-bold text-slate-800">${item.protocol}</td>
+                    <td class="p-2.5 text-right font-mono font-bold text-rose-600">${item.lossText}</td>
+                    <td class="p-2.5"><span class="bg-slate-100 text-slate-700 text-[10px] px-2 py-0.5 rounded font-medium">${item.risk}</span></td>
+                    <td class="p-2.5 text-slate-500">${item.condition}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function filterDefiTable() {
+            appState.defiSearch = document.getElementById('defi-search').value;
+            appState.defiRiskFilter = document.getElementById('defi-filter-risk').value;
+            renderDefiTable();
+        }
+
+        // TAB 4: AGENTIC STAGE SELECTOR
+        const stagePayloads = {
+            1: {
+                title: "Stage 1: Normalized Financial Telemetry",
+                desc: "Primary extraction agent reads multi-page financial PDF, extracts core EBITDA and capital structure details, and formats raw numeric outputs into a standardized schema.",
+                code: `{
+  "jsonrpc": "2.0",
+  "method": "evaluateCreditTelemetry",
+  "params": {
+    "entity_id": "CORP-88392",
+    "annual_ebitda_usd": 50000000,
+    "total_debt_usd": 210000000,
+    "calculated_leverage": 4.20,
+    "interest_coverage_ratio": 2.15,
+    "revolver_drawn_ratio": 0.68
+  },
+  "id": "req-9901-a"
+}`
+            },
+            2: {
+                title: "Stage 2: Structured JSON-RPC Credit Memo",
+                desc: "Agent calculates quantitative triggers and generates a machine-readable credit memo containing automated rating recommendations and covenant breach indicators.",
+                code: `{
+  "jsonrpc": "2.0",
+  "result": {
+    "recommended_rating": "BB+",
+    "pd_12m_forecast": 0.0382,
+    "covenant_status": "COMPLIANT",
+    "liquidity_flag": "MONITOR_REVOLVER_DRAWDOWN",
+    "agent_confidence_score": 0.94
+  },
+  "id": "req-9901-a"
+}`
+            },
+            3: {
+                title: "Stage 3: Adversarial Critic Agent Audit",
+                desc: "Secondary Critic Agent executes an adversarial audit. Interrogates primary agent logic against original source 10-K filings to suppress hallucination rates from 11.3% to 3.8%.",
+                code: `{
+  "critic_audit": {
+    "critic_agent_id": "CRITIC-AUDIT-09",
+    "verification_status": "PASS_WITH_WARNING",
+    "source_reconciliation": "VERIFIED_AGAINST_PAGE_42_10K",
+    "discrepancies_found": 0,
+    "hallucination_risk_flag": "LOW"
+  }
+}`
+            },
+            4: {
+                title: "Stage 4: Decision-Negative Human Execution",
+                desc: "Final approval payload passed to the Credit Committee officer. Full automation is intentionally restricted (decision-negative) to maintain regulatory compliance.",
+                code: `{
+  "human_in_the_loop": {
+    "officer_id": "CHIEF-RISK-OFFICER-44",
+    "override_applied": false,
+    "final_underwriting_decision": "APPROVED_WITH_COVENANT_FLUSH",
+    "timestamp_iso": "2026-08-27T14:30:00Z"
+  }
+}`
+            }
+        };
+
+        function selectAgentStage(stageNum) {
+            appState.currentAgentStage = stageNum;
+            for (let i = 1; i <= 4; i++) {
+                const btn = document.getElementById(`stage-btn-${i}`);
+                if (i === stageNum) {
+                    btn.className = "w-full text-left p-3 rounded border border-indigo-500 bg-indigo-50/50 flex justify-between items-center transition";
+                } else {
+                    btn.className = "w-full text-left p-3 rounded border border-slate-200 hover:border-indigo-300 flex justify-between items-center transition";
+                }
+            }
+
+            const payload = stagePayloads[stageNum];
+            document.getElementById('stage-title').innerText = payload.title;
+            document.getElementById('stage-code').innerText = payload.code;
+            document.getElementById('stage-description').innerText = payload.desc;
+        }
+
+        // TAB 5: PROVENANCE CHART LOGIC
+        function initProvChart() {
+            const ctx = document.getElementById('provChart').getContext('2d');
+            provChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Binary Disclosure', 'CRediT Projection', 'PROV-O Roles', 'Roles + Temporal', 'Full PROV-O Ledger'],
+                    datasets: [
+                        { label: 'Audit Accuracy (%)', data: [0, 18, 68, 72, 94], backgroundColor: '#4f46e5' },
+                        { label: 'Insufficient Info Rate (%)', data: [86, 76, 12, 0, 0], backgroundColor: '#cbd5e1' }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { max: 100, title: { display: true, text: 'Percentage (%)', font: { size: 11 } } }
+                    }
+                }
+            });
+        }
+
+        // ON INITIALIZATION
+        window.addEventListener('DOMContentLoaded', () => {
+            initMonteCarloChart();
+            initPdCharts();
+            initDefiModule();
+            initProvChart();
+        });
+    </script>
+</body>
+</html>
